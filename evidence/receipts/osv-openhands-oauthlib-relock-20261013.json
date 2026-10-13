@@ -1,0 +1,332 @@
+{
+  "schema_version": 1,
+  "record": "OpenHands oauthlib 4.0.0 security relock, native integration receipt",
+  "purpose": "Clear GHSA-hj66-6f7g-4r5v and GHSA-xpv3-w29h-x7cv from the live OpenHands recipe lock by moving oauthlib 3.3.1 to 4.0.0, their first patched release, and delete their expired ordinary ignores (ignoreUntil 2026-10-13), their IGNORE_SCOPES rows and the lock's IGNORE_ALLOWED_LOCKS entry, which from 2026-10-13T00:00Z failed the required osv-scanner check on every run",
+  "checked_commit": "738fdf7002c1c3c1c9a26e30ce26f07f2dc3caa0",
+  "observed_utc": "2026-10-13T00:20:16Z",
+  "observed_until_utc": "2026-10-13T03:52:18Z",
+  "authorization": "Command-center incident brief for one foundation-lane PR (2026-10-13): relock the OpenHands recipe lock onto oauthlib 4.0.0 through its own documented process, delete both expired oauthlib ignores once the Lumibot lock is confirmed outside the ordinary scan, and leave the hash-bound Lumibot lock unchanged",
+  "sources": [
+    "https://github.com/advisories/GHSA-hj66-6f7g-4r5v",
+    "https://github.com/advisories/GHSA-xpv3-w29h-x7cv",
+    "https://osv.dev/vulnerability/PYSEC-2026-4113",
+    "https://osv.dev/vulnerability/PYSEC-2026-4114",
+    "https://pypi.org/pypi/oauthlib/4.0.0/json",
+    "https://github.com/oauthlib/oauthlib/releases/tag/v4.0.0",
+    "https://pypi.org/pypi/requests-oauthlib/2.0.0/json",
+    "https://github.com/astral-sh/uv/releases/tag/0.12.22",
+    "https://github.com/google/osv-scanner/releases/tag/v2.6.0",
+    "native-agent-stack@738fdf7002c1c3c1c9a26e30ce26f07f2dc3caa0:blueprints/runtime-workers/openhands/evidence/relock-2026-10-05-fsspec.relock.sh.txt",
+    "native-agent-stack@738fdf7002c1c3c1c9a26e30ce26f07f2dc3caa0:.github/workflows/security-scan.yml:50-128"
+  ],
+  "lock": "blueprints/runtime-workers/openhands/requirements.lock",
+  "sha256_before": "2837036a2bb832958e2daad6094811610d1fd605a315dacd9a0616841e9e2401",
+  "sha256": "32bc153428aaef2018adcdca53337e4a74b464ca94a96b9905e1bc6174503400",
+  "moved_pins": [
+    {
+      "package": "oauthlib",
+      "before": "3.3.1",
+      "after": "4.0.0",
+      "reason": "First patched release for GHSA-hj66-6f7g-4r5v (CVE-2026-49264, >= 0.6.1, <= 3.3.1) and GHSA-xpv3-w29h-x7cv (CVE-2026-49265, >= 3.0.0, < 4.0.0), GitHub advisory records read 2026-10-13; OSV PYSEC-2026-4113 and PYSEC-2026-4114 give the same fixed version"
+    }
+  ],
+  "reproduction": {
+    "evidence_class": "local_integration",
+    "uv_version": "0.12.22",
+    "sdk_source_archive_sha256": "2d3006de86eaec690a82e497fcd4459816637afe6e53f7da87783183792148a8",
+    "upstream_uv_lock_sha256": "d13a41b86c48e66e1719b19d8e2d3a315abfab87c257fb18881ce4e31075c910",
+    "command": "uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 --upgrade-package pyjwt==2.15.0 --upgrade-package urllib3==2.8.0 --upgrade-package litellm==1.93.2 --upgrade-package fsspec==2026.6.0 --upgrade-package multidict==6.9.1 --upgrade-package oauthlib==4.0.0",
+    "workspace_edits": "The two resolution-only edits of the earlier relocks: environments = linux x86_64 in [tool.uv], and the litellm exclude-newer-package cap and pin; the workspace's exclude-newer = \"7 days\" applies (UV_NO_CONFIG unset)",
+    "resolver_exit": 0,
+    "lock_check_exit": 0,
+    "export_exit": 0,
+    "control_matches_before_bytes": true,
+    "uv_lock_diff": "the oauthlib package entry only: version, sdist and wheel lines",
+    "uv_change_list_delta": "Updated oauthlib v3.3.1 -> v4.0.0 is the only line the new run prints that the control does not",
+    "changed_package_blocks": [
+      "oauthlib"
+    ],
+    "export_diff_lines": "389-391",
+    "adopted_matches_native_export_exit": 0,
+    "other_exported_requirements_unchanged": true,
+    "sdk_build_lock_and_wheel_pins_unchanged": true,
+    "forced_changes": [],
+    "outputs": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-13-oauthlib.relock.sh.txt and .relock.txt"
+  },
+  "release_choice": {
+    "evidence_class": "source_review",
+    "version": "4.0.0",
+    "pypi_latest": "4.0.0",
+    "files": [
+      {
+        "filename": "oauthlib-4.0.0-py3-none-any.whl",
+        "sha256": "624c28c13a0a59cabf9747dfa52af63be3e512a7f2714df16e91b5b3a145e6cd",
+        "uploaded": "2026-09-28T06:01:17.008169Z"
+      },
+      {
+        "filename": "oauthlib-4.0.0.tar.gz",
+        "sha256": "efb274799819440f95b4ab3b818869f1ce9ae26c5beacba0201d1a1b76b54f86",
+        "uploaded": "2026-09-28T06:01:18.770551Z"
+      }
+    ],
+    "exclude_newer": "Outside the workspace's 7-day exclude-newer window since 2026-10-05T06:01:19Z",
+    "requires_python": ">=3.9",
+    "requires_dist": "extras only: rsa and signedtoken (cryptography>=3.0.0, pyjwt<3,>=2.0.0), signals (blinker>=1.4.0); the lock requests no oauthlib extra",
+    "release_notes": "oauthlib v4.0.0 (tag commit 145a9a4690cb4d9de30d15fcc2984e34c49df741, published 2026-09-28T08:39:03Z) lists two breaking changes, JSONP removed from the token revocation endpoint (#951) and grant_type validated before client authentication across grants (#919, #920), and the PKCE comparison fix (#963); Python 3.8 is dropped",
+    "scope": "oauthlib only. The plan recorded in research.md and #518 also moved PyJWT to 2.15.1; that half is deferred to its own change, and PyJWT stays at 2.15.0, for which the scan lists no advisory"
+  },
+  "dependent_metadata": {
+    "evidence_class": "source_review",
+    "direct_dependents": [
+      {
+        "package": "requests-oauthlib",
+        "version": "2.0.0",
+        "requirement": "oauthlib>=3.0.0",
+        "fixed_version_permitted": true,
+        "source": "https://pypi.org/pypi/requests-oauthlib/2.0.0/json and the new uv.lock"
+      }
+    ],
+    "caps_below_fixed": []
+  },
+  "hash_check": {
+    "evidence_class": "local_integration",
+    "script": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-05-fsspec.hash-check.py.txt (unchanged, argument oauthlib)",
+    "exit": 0,
+    "listed_hashes": 2,
+    "universal_wheel_and_sdist_verified": true,
+    "yanked": false,
+    "unlisted_supported_files": []
+  },
+  "install_check": {
+    "evidence_class": "local_integration",
+    "script": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-13-oauthlib.install-check.sh.txt",
+    "exit": 0,
+    "python": "3.13.16",
+    "isolated_environment": true,
+    "venv_exit": 0,
+    "hashed_build_install_exit": 0,
+    "hashed_runtime_install_exit": 0,
+    "uv_pip_check_exit": 0,
+    "active_packages_checked": 178,
+    "sdk_tool_import_exit": 0,
+    "oauthlib_import_exit": 0,
+    "versions": {
+      "oauthlib": "4.0.0",
+      "requests-oauthlib": "2.0.0",
+      "pyjwt": "2.15.0",
+      "litellm": "1.93.2",
+      "openhands-sdk": "1.49.6",
+      "openhands-tools": "1.49.6"
+    },
+    "limits": "Recipe install/import integration on the host network; no model request, image build or container acceptance"
+  },
+  "upstream_tests": {
+    "evidence_class": "local_integration",
+    "script": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-13-oauthlib.requests-oauthlib-tests.sh.txt",
+    "what": "requests-oauthlib 2.0.0's own five test modules (unchanged upstream test code from the sdist whose sha256 b3dffaebd884d8cd778494369603a9e7b58d29111bf6b41bdc2dcd87203af4e9 the lock lists), in venvs built from each tree's hashed lock plus pytest 9.1.1, requests-mock 1.12.1 and mock 5.2.0 installed against a freeze of the lock install (additions only); the repeat on the real lock that research.md and #518 planned",
+    "base_lock": {
+      "oauthlib": "3.3.1",
+      "passed": 72,
+      "failed": 2,
+      "pytest_exit": 1,
+      "imports": "requests_oauthlib and google_auth_oauthlib.flow OK"
+    },
+    "new_lock": {
+      "oauthlib": "4.0.0",
+      "passed": 72,
+      "failed": 2,
+      "pytest_exit": 1,
+      "imports": "requests_oauthlib and google_auth_oauthlib.flow OK"
+    },
+    "failures_identical": [
+      "tests/test_compliance_fixes.py::MailChimpComplianceFixTest::test_fetch_access_token",
+      "tests/test_compliance_fixes.py::PlentymarketsComplianceFixTest::test_fetch_access_token"
+    ],
+    "failure_kind": "assertAlmostEqual of expires_at to 2 places against the wall clock; the same two failed under both oauthlib versions here and in the 2026-09-30 pre-check (relock-2026-09-30.txt section J)"
+  },
+  "importer_review": {
+    "evidence_class": "source_review",
+    "script": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-13-oauthlib.oauthlib-importers.py.txt",
+    "py_files_searched_outside_oauthlib": 10908,
+    "importers": {
+      "requests_oauthlib": [
+        "oauthlib.common",
+        "oauthlib.oauth1",
+        "oauthlib.oauth2"
+      ]
+    },
+    "server_side_imports": [],
+    "limits": "Static text search of single-line import statements in the relocked venv; not a runtime trace"
+  },
+  "osv": {
+    "evidence_class": "local_integration",
+    "version": "2.6.0",
+    "commit": "e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6",
+    "binary_sha256": "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108",
+    "installed_as": "security-scan.yml's install step: release download of osv-scanner_linux_amd64 and sha256sum --check",
+    "script": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-13-oauthlib.osv-scan-step.sh.txt",
+    "ordinary_inputs": 60,
+    "before": {
+      "tree": "738fdf7002c1c3c1c9a26e30ce26f07f2dc3caa0 (git clone --shared)",
+      "workflow_step_exit": 1,
+      "preflight": "Ran 23 tests, FAILED (failures=1): FrozenScanTests.test_the_ordinary_config_has_no_exception_for_a_frozen_advisory, ignoreUntil has expired for both oauthlib ignores",
+      "ordinary_exit": 1,
+      "ordinary_packages": 1,
+      "ordinary_advisories": 2,
+      "findings": [
+        "PYSEC-2026-4113 / GHSA-hj66-6f7g-4r5v, oauthlib 3.3.1, fixed 4.0.0, blueprints/runtime-workers/openhands/requirements.lock",
+        "PYSEC-2026-4114 / GHSA-xpv3-w29h-x7cv, oauthlib 3.3.1, fixed 4.0.0, blueprints/runtime-workers/openhands/requirements.lock"
+      ]
+    },
+    "after": {
+      "tree": "the relock commit (e3933560's content), before the review fix",
+      "workflow_step_exit": 0,
+      "preflight": "Ran 23 tests, OK",
+      "ordinary_exit": 0,
+      "ordinary_packages": 0,
+      "ordinary_advisories": 0,
+      "result": "No issues found"
+    },
+    "final": {
+      "tree": "the review-fix head, with no ordinary ignore left",
+      "workflow_step_exit": 0,
+      "preflight": "Ran 23 tests, OK",
+      "ordinary_exit": 0,
+      "ordinary_packages": 0,
+      "ordinary_advisories": 0,
+      "result": "No issues found",
+      "unused_ignores_reported": []
+    },
+    "unused_ignores_reported": {
+      "before": [
+        "GHSA-8mgp-746c-j5xp",
+        "GHSA-h35f-9h28-mq5c",
+        "GHSA-hj66-6f7g-4r5v",
+        "GHSA-xpv3-w29h-x7cv"
+      ],
+      "after": [
+        "GHSA-8mgp-746c-j5xp",
+        "GHSA-h35f-9h28-mq5c"
+      ],
+      "final": [],
+      "note": "OSV-Scanner reported the nltk and setuptools ignores unused once the Lumibot lockchecks left the inventory; the review fix deletes them (unused_ignores_removed)"
+    },
+    "removed_ignores": [
+      "GHSA-hj66-6f7g-4r5v",
+      "GHSA-xpv3-w29h-x7cv",
+      "GHSA-8mgp-746c-j5xp",
+      "GHSA-h35f-9h28-mq5c"
+    ],
+    "output_refs": {
+      "before": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-13-oauthlib.osv-before.ordinary.txt",
+      "after": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-13-oauthlib.osv-after.ordinary.txt",
+      "final": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-13-oauthlib.osv-final.ordinary.txt",
+      "summary": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-13-oauthlib.txt",
+      "sanitization": "Only the scratch, checkout and home paths are replaced; native reports, arguments and partitions are preserved"
+    }
+  },
+  "ci_failure": {
+    "evidence_class": "native_proven",
+    "runs_failed_after_expiry": [
+      "38325995985 (pull_request, created 2026-10-13T00:11:19Z)",
+      "38326624900 (pull_request, created 2026-10-13T00:18:57Z)",
+      "38326740785 (push to main, created 2026-10-13T00:20:20Z)"
+    ],
+    "log_read": "38326740785, osv-scanner job: FrozenScanTests.test_the_ordinary_config_has_no_exception_for_a_frozen_advisory failed with 'GHSA-hj66-6f7g-4r5v: ignoreUntil has expired' and 'GHSA-xpv3-w29h-x7cv: ignoreUntil has expired'; Ran 23 tests, FAILED (failures=1), exit code 1",
+    "limits": "One log read; the other two runs' conclusions are from gh run list"
+  },
+  "lumibot_lock": {
+    "evidence_class": "source_review",
+    "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/lumibot.lock",
+    "inventory_class": "excluded (neither the ordinary scan nor the frozen-evidence report), since the 2026-10-06 ruling recorded in evidence/receipts/osv-captured-lumibot-lockchecks-20261005.json",
+    "sha256": "a8dce0af2b20c6a0a8829c8fcdd9a3c3207e9e2d57a62d2498bc0116f1af0f1f",
+    "unchanged": true,
+    "note": "The brief expected the lock in the frozen set; it is excluded instead, which also keeps it out of the ordinary scan, so the ignores were deleted rather than renewed. No workflow scans it; the exclusion's own condition (restore scanning before any replay, adoption or new consuming route) still applies"
+  },
+  "tests": {
+    "evidence_class": "local_integration",
+    "timezone": "UTC (the runner's zone; the ignore expiry is date-based)",
+    "modules": [
+      "tests.test_osv_lockfile_coverage",
+      "tests.test_openhands_lock_binding",
+      "tests.test_frozen_macos_variant_no_use"
+    ],
+    "before": {
+      "tree": "738fdf7002c1c3c1c9a26e30ce26f07f2dc3caa0",
+      "ran": 74,
+      "failures": 4,
+      "exit": 1,
+      "failed": [
+        "AllowedLockTests.test_allowed_advisories_are_scoped_active_ignores",
+        "FrozenPolicyMutationTests.test_frozen_advisory_or_package_override_cannot_leak_to_ordinary_inputs (mutation='advisory')",
+        "FrozenScanTests.test_the_ordinary_config_has_no_exception_for_a_frozen_advisory",
+        "IgnorePolicyTests.test_every_ignore_has_id_reason_and_a_near_expiry"
+      ]
+    },
+    "after": {
+      "tree": "this change",
+      "ran": 74,
+      "failures": 0,
+      "exit": 0
+    },
+    "broad": {
+      "modules": "the 19 test modules git grep -l openhands -- 'tests/test_*.py' names, plus tests.test_wsl_retrieval, tests.test_workflow_security_coverage, tests.test_starred_convergence and tests.test_ecosystem_manifest (23)",
+      "started_utc": "2026-10-13T00:39:43Z",
+      "ended_utc": "2026-10-13T00:51:40Z",
+      "ran": 1855,
+      "skipped": 43,
+      "failures": 0,
+      "errors": 0,
+      "duration_seconds": 716.294,
+      "exit": 0
+    }
+  },
+  "failed_attempts": [
+    {
+      "stage": "requests-oauthlib tests, first run",
+      "cause": "The lock's libtmux 0.53.0 registers a pytest11 plugin (libtmux = libtmux.pytest_plugin) that pytest 9.1.1 rejects at startup ('Marks cannot be applied to fixtures'), in both venvs; the retained run adds -p no:libtmux",
+      "adopted": false,
+      "pytest_exit": 1
+    },
+    {
+      "stage": "OSV before run, first tree",
+      "cause": "A git archive extraction of 738fdf70 has no .git, so tests.test_wsl_retrieval.RetiredRunnerTests cannot list tracked files and fails beside the expected FrozenScanTests failure; the retained before run uses a git clone --shared of the same commit",
+      "adopted": false,
+      "workflow_step_exit": 1
+    }
+  ],
+  "corrections": [
+    {
+      "id": "correction #161",
+      "found_by": "Claude read of #1060 at e3933560 (CHANGES_REQUESTED, P1)",
+      "what": "The first head published the sha256 of the two scratch uv.lock files, control and new, in this receipt's reproduction block and in relock-2026-10-13-oauthlib.relock.txt. Those files are not in the repository, so no one could check the digests from it",
+      "fix": "Both receipt fields, both relock.txt lines and the uv.lock argument of the relock script's sha256sum are deleted; uv_lock_diff and uv_change_list_delta carry the claim without a digest",
+      "rule": "docs/decisions/2026-10-12-harbor-parallel-runtimes.md, Custody of the run originals: only bytes in the repository are published with a digest",
+      "regression_test": "tests/test_receipt_sha256_key_custody.py, which fails at e3933560 on exactly these two keys",
+      "verification": "A re-run of the corrected script at 2026-10-13T03:02:13Z, from the same checksum-verified archive, reproduced the committed requirements.lock (cmp exit 0); its output, path-sanitized, equals relock.txt except four timestamps and two resolver timings"
+    }
+  ],
+  "unused_ignores_removed": {
+    "evidence_class": "local_integration",
+    "found_by": "GPT read (Astra) of #1060 at e3933560, follow-up 1, taken into the review-fix commit by the command center",
+    "ids": [
+      "GHSA-8mgp-746c-j5xp",
+      "GHSA-h35f-9h28-mq5c"
+    ],
+    "what": "The nltk (no patched release) and setuptools (fixed in 83.0.0) ignores of 2026-09-26, until 2026-12-24, whose only allowed lock was the Lumibot lockcheck",
+    "why": "That lock has been excluded from the inventory since 2026-10-06, OSV-Scanner reported both ignores unused, and on 2026-12-24 ignore_entry_problems would have failed the scan step's preflight, as the oauthlib pair did on 2026-10-13",
+    "precondition": "affected_pins over the 60 ordinary inputs for both advisories returned []: no scanned lock pins nltk, or setuptools below 83.0.0",
+    "before": "ignore_entry_problems with the date 2026-12-24 returned 'GHSA-8mgp-746c-j5xp: ignoreUntil has expired' and 'GHSA-h35f-9h28-mq5c: ignoreUntil has expired'; with the real date it returned []",
+    "after": "ignore_entry_problems returns [] with the date 2026-12-24 and with the real date; the ordinary config parses to an empty table",
+    "removed": ".github/osv-scanner.toml loses both [[IgnoredVulns]] entries; in tests/test_osv_lockfile_coverage.py both IGNORE_SCOPES rows move to GUARD_FIXTURE_SCOPES, the fixtures the guard's own mutation tests use, and IGNORE_SCOPES is empty",
+    "scan": "osv.final: workflow scan step exit 0, ordinary scan exit 0, No issues found"
+  },
+  "not_covered": [
+    "The agent-server image's server binary, a PyInstaller build of upstream's unchanged uv.lock (sha256 d13a41b86c48e66e1719b19d8e2d3a315abfab87c257fb18881ce4e31075c910, oauthlib 3.3.1), and the grader venv keep their own locks; the inventory scans neither",
+    "No OpenHands task ran with the relocked venv; an installation that recorded the old lock digest must re-run install before the next run",
+    "OSV results hold for the scan time only: an advisory published later for any pinned package fails the required check again"
+  ],
+  "hosted_acceptance": "unobserved",
+  "cross_family_review": "Claude read of #1060 at e3933560: CHANGES_REQUESTED (P1, the two scratch uv.lock digests; P3, text that called this read pending), both addressed in the review-fix commit. GPT read (Astra) of #1060 at e3933560: ACK with no blockers; its follow-up 1 (the unused nltk and setuptools ignores) is addressed in the same commit, and follow-ups 2 to 4 are listed in the PR body",
+  "overturn": "OSV lists an advisory for oauthlib 4.0.0 that only a later release fixes; an OpenHands run of the recipe fails with oauthlib 4.0.0 and passes with 3.3.1; a scanned lock pins oauthlib below 4.0.0 again (relock it; an ignore needs its own reachability review); or upstream's workspace publishes a lock with oauthlib 4.0.0 or later (the next relock follows that lock)"
+}

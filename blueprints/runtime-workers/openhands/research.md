@@ -678,3 +678,64 @@ formatter attempts remain disclosed; neither candidate was adopted.
 Overturn: any additional package move, incompatible declared range, failed
 hash/install/check, new consuming route into preserved evidence, expiry or a
 fresh OSV finding reopens acceptance. A local pass is not hosted acceptance.
+
+## Runtime lock oauthlib relock (2026-10-13)
+
+requirements.lock moved from oauthlib 3.3.1 to 4.0.0 and nothing else changed (the three oauthlib lines, 389-391), SHA256
+32bc153428aaef2018adcdca53337e4a74b464ca94a96b9905e1bc6174503400, previously 2837036a2bb8. GHSA-hj66-6f7g-4r5v (JSONP
+callback injection in `RevocationEndpoint`, oauthlib 0.6.1 through 3.3.1) and GHSA-xpv3-w29h-x7cv (PKCE `code_verifier`
+compared with `==`, oauthlib 3.x) name 4.0.0 as their first patched release (GitHub advisories; OSV PYSEC-2026-4113 and
+PYSEC-2026-4114). Their ordinary ignores carried `ignoreUntil = 2026-10-13`, so from 2026-10-13T00:00Z the required
+osv-scanner job failed in its unittest preflight (`FrozenScanTests.test_the_ordinary_config_has_no_exception_for_a_frozen_advisory`,
+"ignoreUntil has expired"; CI run 38326740785, the one log read), and the ordinary OSV-Scanner 2.6.0 invocation alone exits
+1 with exactly these two findings in this lock. Both ignores, their `IGNORE_SCOPES` rows and this lock's
+`IGNORE_ALLOWED_LOCKS` entry are gone. The Lumibot lock the ignores also covered has been excluded from the inventory since
+2026-10-06 and is unchanged. Record:
+[osv-openhands-oauthlib-relock-20261013.json](../../../evidence/receipts/osv-openhands-oauthlib-relock-20261013.json);
+returned outputs: the relock-2026-10-13-oauthlib prefix beside this recipe.
+
+The method is the 2026-10-05 fsspec one (uv 0.12.22, a fresh extraction of the pinned archive, the `environments` and
+litellm edits, without UV_NO_CONFIG) with one more version-pinned upgrade. The control, the nine upgrades of that relock,
+reproduces the committed lock byte for byte:
+
+    uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 \
+      --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 \
+      --upgrade-package pyjwt==2.15.0 --upgrade-package urllib3==2.8.0 \
+      --upgrade-package litellm==1.93.2 \
+      --upgrade-package fsspec==2026.6.0 --upgrade-package multidict==6.9.1 \
+      --upgrade-package oauthlib==4.0.0
+
+The new uv.lock differs from the control's in the oauthlib entry only, uv's change list differs by `Updated oauthlib
+v3.3.1 -> v4.0.0` only, and the export differs in the three oauthlib lines; the committed lock equals the export plus the
+pins.json wheel entries (`cmp` exit 0). Its two hashes are PyPI's wheel and sdist of 4.0.0 (uploaded 2026-09-28T06:01:17Z
+and 06:01:18Z, outside the workspace's 7-day `exclude-newer` window since 2026-10-05T06:01:19Z); 4.0.0 is PyPI's latest
+oauthlib. oauthlib 4.0.0 declares dependencies only under extras, and its one dependent in the lock, requests-oauthlib
+2.0.0, requires `oauthlib>=3.0.0`, so no other pin moved.
+
+- **Checks.** The recipe's hashed install in a scratch CPython 3.13.16 venv installed 178 packages, `uv pip check` exited 0,
+  and the SDK/tools import check and an oauthlib 4.0.0 / requests-oauthlib 2.0.0 import check passed. The repeat of the
+  2026-09-30 requests-oauthlib pre-check on the real locks: in venvs built from the base lock (oauthlib 3.3.1) and the new
+  lock (4.0.0), with only pytest, requests-mock and mock added against a freeze of the lock install, requests-oauthlib
+  2.0.0's own five test modules gave the same result, 72 passed and the same two timing assertions failed (the MailChimp
+  and Plentymarkets `test_fetch_access_token` expiry rounding, which also failed in the pre-check), and `import
+  requests_oauthlib, google_auth_oauthlib.flow` succeeded in both. The first run of that check stopped at pytest startup in
+  both venvs, because the lock's libtmux 0.53.0 registers a pytest11 plugin that pytest 9.1.1 rejects; the retained run
+  blocks that plugin with `-p no:libtmux`. The workflow's own scan step, run by bash under UTC as on a pull request, exits 1
+  at 738fdf70 and 0 on this change; its ordinary OSV invocation alone exits 1 (the two oauthlib findings) and 0 ("No issues
+  found") over the 60 ordinary inputs.
+- **The two breaking changes of 4.0.0 are server-side.** Its release notes (oauthlib v4.0.0, tag commit 145a9a46) list the
+  removal of JSONP from the token revocation endpoint (#951) and grant_type validation before client authentication (#919,
+  #920); 4.0.0 also drops Python 3.8. In the new venv, a static search of the 10,908 .py files outside oauthlib finds
+  requests_oauthlib as the only importer (oauthlib.common, oauthlib.oauth1, oauthlib.oauth2) and no import of oauthlib's
+  endpoints, grant types or servers.
+- **oauthlib only; the joint relock is superseded.** The plan above (#518) also moved PyJWT to 2.15.1. This change moves
+  oauthlib alone, the smallest change that clears the failing check. PyJWT stays at 2.15.0, for which the scan lists no
+  advisory; 2.15.1 (Base64URL padding) is left to a change of its own.
+- **Not covered.** The image's server binary (a PyInstaller build of upstream's unchanged uv.lock, SHA256 d13a41b8..., which
+  pins oauthlib 3.3.1) and the grader venv are not relocked, and the inventory scans neither. No OpenHands task ran with the
+  relocked venv. An installation that recorded the old lock digest must re-run install (host.py refuses to run it
+  otherwise).
+
+Overturn conditions: (a) OSV lists an advisory for oauthlib 4.0.0 that only a later release fixes; (b) an OpenHands run of
+the recipe fails with oauthlib 4.0.0 and passes with 3.3.1; (c) upstream's workspace publishes a lock with oauthlib 4.0.0 or
+later (the next relock then follows that lock).

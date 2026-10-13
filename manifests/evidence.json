@@ -5082,8 +5082,8 @@
     },
     {
       "path": ".github/osv-scanner.toml",
-      "sha256": "dc6c8e8a535f78314525b8845d64f12bb743457147c9db0cae6d84c9297f9f87",
-      "bytes": 7252
+      "sha256": "b4882e6b8cbb524bab7f6c30836fc9a5902b47353591bfc263c0f325545167a8",
+      "bytes": 2235
     },
     {
       "path": ".github/pull_request_template.md",
@@ -11357,6 +11357,56 @@
       "bytes": 2266
     },
     {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-13-oauthlib.install-check.sh.txt",
+      "sha256": "5da71e9349a2ae17f36c713dfb84e6dc6de332b2c2b77b8cd0894ec31b19b694",
+      "bytes": 2208
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-13-oauthlib.oauthlib-importers.py.txt",
+      "sha256": "bcc14e3bf5f542263139dbbac54d1372eb727c435d6072ae8d1390522b3499a2",
+      "bytes": 2528
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-13-oauthlib.osv-after.ordinary.txt",
+      "sha256": "66c0e5ceb1719a859d422d631049b2ad66258a3427570a8858d414103712b02f",
+      "bytes": 6973
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-13-oauthlib.osv-before.ordinary.txt",
+      "sha256": "02e30fd072362d6ac7ad8484d60cc145c9bdb23ad345ec0e85ca51f85b843d2c",
+      "bytes": 8379
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-13-oauthlib.osv-final.ordinary.txt",
+      "sha256": "5fb1e9afb07a4be66cfd22f752aec59fafbdb3bbbe7bb06d81e4be708f0a1bf0",
+      "bytes": 6879
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-13-oauthlib.osv-scan-step.sh.txt",
+      "sha256": "6f360af9bd74ef22aa5f45f23d5993d6e762d0a762646b44f145981b58c7f0b4",
+      "bytes": 2417
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-13-oauthlib.relock.sh.txt",
+      "sha256": "5d1252d833c174ba885d73914e3547434a7688645677a34fa311e8e9ab7b6d31",
+      "bytes": 3950
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-13-oauthlib.relock.txt",
+      "sha256": "bb51a64ebe8aa4c55fc3443f1578bc24610bcceb88651f6e7cc6b72984ee4bea",
+      "bytes": 4482
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-13-oauthlib.requests-oauthlib-tests.sh.txt",
+      "sha256": "02563efc491a0dfbcd206431c7a81f67966f775531485f23b1dccbb9960f7267",
+      "bytes": 4557
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-13-oauthlib.txt",
+      "sha256": "dc2c1eb0548d33c2ebd1eb193c3dd2678a2d34d12caedb65c189012f3212c703",
+      "bytes": 21915
+    },
+    {
       "path": "blueprints/runtime-workers/openhands/evidence/repair-round-commands.json",
       "sha256": "89e32d55231db27386ed16dc077fa56dbd710c9c45f80433fa02c6b42e13b54e",
       "bytes": 24151
@@ -11493,7 +11543,7 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/pins.json",
-      "sha256": "10a548ea8734e7c2c64f42c1f1bdb5fdf0de80a0e2efd770a38d1c01524f7845",
+      "sha256": "ffc3000f7fb26bf601fc2ba7c291f52e5e57f88d2551681e182fe1ba700ac56a",
       "bytes": 4460
     },
     {
@@ -11513,13 +11563,13 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/requirements.lock",
-      "sha256": "2837036a2bb832958e2daad6094811610d1fd605a315dacd9a0616841e9e2401",
+      "sha256": "32bc153428aaef2018adcdca53337e4a74b464ca94a96b9905e1bc6174503400",
       "bytes": 106427
     },
     {
       "path": "blueprints/runtime-workers/openhands/research.md",
-      "sha256": "3d0f7da2b69ff91702d7db7fd6a9c3b14689a9d4f1e408c6457b272269229795",
-      "bytes": 77696
+      "sha256": "ba841b2f859bfa79b4df5000ed298436e03d7ceb7236f6eaff0acf818ccab4ea",
+      "bytes": 83150
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver.py",
@@ -18048,8 +18098,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "572f707148b14e996441cbe00ec3dc76d5e0f86eb3a247bc0bf3ee9e9fa36a74",
-      "bytes": 161476
+      "sha256": "0e849abe2740ecd21c9e960034f5c3fbb02aca55fcb405edd7f6ee274393beb8",
+      "bytes": 166107
     },
     {
       "path": "docs/decisions/2026-09-23-max-effort-default.md",
@@ -59902,6 +59952,11 @@
       "bytes": 37224
     },
     {
+      "path": "evidence/receipts/osv-openhands-oauthlib-relock-20261013.json",
+      "sha256": "81df9998ee735fe1f139670940dfb7389355f7207818b857d1e307655b4ca6ed",
+      "bytes": 19606
+    },
+    {
       "path": "evidence/receipts/osv-openhands-pyjwt-relock-20260930.json",
       "sha256": "44682cd5fe1a556a06fee4d797ea2eae2bff55ff69dda8570abbf61aeb6051c4",
       "bytes": 30986
@@ -62588,8 +62643,8 @@
     },
     {
       "path": "tests/test_local_pages_policy_grants.py",
-      "sha256": "f9e1e854ed27c2d20b5338c22d28a0a4b33e7dba206695d0f47037107b55efcd",
-      "bytes": 26987
+      "sha256": "5821eae4b5f34f8ed3d407d7e2460091aacf84d9e9a593e3c407a4607f44e732",
+      "bytes": 27271
     },
     {
       "path": "tests/test_managed_block.py",
@@ -62853,8 +62908,8 @@
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
-      "sha256": "872353e08e80d23d52c6ec59a24de5cae7447f3d8e9be5b0b75edbb0bf0d5405",
-      "bytes": 79565
+      "sha256": "825264f884ad09a8b2649ce3ccc0c726d170ac48b26fb2be06c0bf995d6992fb",
+      "bytes": 79961
     },
     {
       "path": "tests/test_overfitting_riskl_parity.py",
@@ -62930,6 +62985,11 @@
       "path": "tests/test_r3_verify.py",
       "sha256": "3c9daa4270f4309cf73ac412808b3bbebe7489a9685eb03897f64d7db5810bed",
       "bytes": 23428
+    },
+    {
+      "path": "tests/test_receipt_sha256_key_custody.py",
+      "sha256": "7641084e7ea4a6e7c07209263433f9acb4182d38955b9c21b7edd5733967eb4b",
+      "bytes": 18401
     },
     {
       "path": "tests/test_receipt_staleness.py",
@@ -63693,8 +63753,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "9d0c0a4ba2c87c63a55caa0f86515090328a02772e067239744f3a265d41b0d2",
-      "bytes": 759847
+      "sha256": "d3bc37ce42a461b489146cc578cc2fb6121357ecab590b3534cb0d27ec5ecee1",
+      "bytes": 759968
     },
     {
       "path": "tools/omniroute/gateway_record.py",

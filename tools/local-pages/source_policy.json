@@ -20830,6 +20830,10 @@
       },
       {
         "root": "repo",
+        "path": "evidence/receipts/osv-openhands-oauthlib-relock-20261013.json"
+      },
+      {
+        "root": "repo",
         "path": "evidence/receipts/osv-openhands-pyjwt-relock-20260930.json"
       },
       {

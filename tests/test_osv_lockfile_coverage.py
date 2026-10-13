@@ -68,24 +68,20 @@ JS_LOCK_NAMES = {"package-lock.json", "npm-shrinkwrap.json", "yarn.lock", "pnpm-
 # sha256 of the lock content that review covered and the repository path of its evidence. A changed lock needs a new
 # review before its new digest is recorded here, and an allowed lock must be self-contained: its digest covers only its
 # own bytes, not a file it includes.
-IGNORE_SCOPES = {
-    # nltk: no patched release, so every version is affected.
+# Empty since 2026-10-13 (#1060), with CONFIG holding no ignore: the two oauthlib rows went with the OpenHands recipe's
+# relock onto oauthlib 4.0.0, and the nltk and setuptools rows with their unused ignores, which would have expired on
+# 2026-12-24 (evidence/receipts/osv-openhands-oauthlib-relock-20261013.json). A new ignore needs its row here again.
+IGNORE_SCOPES = {}
+# The guard's own tests exercise it with the scopes of the last two ordinary ignores: nltk (no patched release, so every
+# version is affected) and setuptools (fixed in 83.0.0). These are fixtures, not grants: no ignore uses them.
+GUARD_FIXTURE_SCOPES = {
     "GHSA-8mgp-746c-j5xp": {"package": "nltk", "fixed": None},
     "GHSA-h35f-9h28-mq5c": {"package": "setuptools", "fixed": (83, 0, 0)},
-    # oauthlib 4.0.0 fixes both oauthlib advisories (GitHub and OSV records, 2026-09-29).
-    "GHSA-hj66-6f7g-4r5v": {"package": "oauthlib", "fixed": (4, 0, 0)},
-    "GHSA-xpv3-w29h-x7cv": {"package": "oauthlib", "fixed": (4, 0, 0)},
 }
-IGNORE_ALLOWED_LOCKS = {
-    # Live recipe lock; the 2026-10-05 relock changes only fsspec and multidict
-    # and carries the existing oauthlib review forward at the new exact digest.
-    # No fsspec ignore is granted; moving oauthlib to 4.0.0 removes this entry.
-    "blueprints/runtime-workers/openhands/requirements.lock": {
-        "advisories": ["GHSA-hj66-6f7g-4r5v", "GHSA-xpv3-w29h-x7cv"],
-        "sha256": "2837036a2bb832958e2daad6094811610d1fd605a315dacd9a0616841e9e2401",
-        "evidence": "evidence/receipts/osv-openhands-fsspec-relock-20261005.json",
-    },
-}
+# Empty since 2026-10-13: the OpenHands recipe lock's entry (the two oauthlib advisories) went with its relock onto
+# oauthlib 4.0.0, together with those ignores and their IGNORE_SCOPES rows
+# (evidence/receipts/osv-openhands-oauthlib-relock-20261013.json).
+IGNORE_ALLOWED_LOCKS = {}
 # OSV's explicit config has invocation-wide scope (v2.6.0 docs/configuration.md and Manager.Get).
 # FROZEN_LOCKS binds the independent, unsuppressed report to reviewed bytes and an inactive disposition.
 # The historical advisory IDs prevent their exceptions leaking into production; they grant no suppression.
@@ -212,13 +208,15 @@ def affected(version, fixed):
     return not PLAIN_RELEASE.fullmatch(version) or tuple(int(part) for part in version.split(".")) < fixed
 
 
-def affected_pins(entries, ignore_ids, allowed=IGNORE_ALLOWED_LOCKS):
+def affected_pins(entries, ignore_ids, allowed=IGNORE_ALLOWED_LOCKS, scopes=None):
     """(path, package, version, advisory) for each pin, in an inventory lockfile or a file it includes, of a version an
     active repo-wide ignore could hide (affected), and (path, None, line, "unparseable") for each line the guard cannot
     parse strictly, which fails closed. A lock that `allowed` names is exempt only for the advisories its entry lists,
-    and only for its own lines: its digest does not cover a file it includes."""
+    and only for its own lines: its digest does not cover a file it includes. `scopes` defaults to IGNORE_SCOPES; the
+    guard's own tests pass GUARD_FIXTURE_SCOPES."""
     if not ignore_ids:
         return []  # no ignore, nothing hidden
+    scopes = IGNORE_SCOPES if scopes is None else scopes
     found = []
     for entry in entries:
         lock = ROOT / entry["path"]
@@ -229,7 +227,7 @@ def affected_pins(entries, ignore_ids, allowed=IGNORE_ALLOWED_LOCKS):
                 found.append((path, None, version, "unparseable"))
                 continue
             for advisory in ignore_ids:
-                scope = IGNORE_SCOPES[advisory]
+                scope = scopes[advisory]
                 if package != canonical(scope["package"]) or (file == lock and advisory in exempt):
                     continue
                 if affected(version, scope["fixed"]):
@@ -363,8 +361,8 @@ def tracked_files():
 
 
 def scratch_findings(files, allowed_advisories=(), scanned="requirements.lock", parser="requirements.txt"):
-    """affected_pins for every IGNORE_SCOPES advisory over scratch files (name: text or bytes), scanning `scanned` by
-    its absolute path (ROOT / path keeps it as is) and allowing it `allowed_advisories`; paths are shown relative to
+    """affected_pins for every GUARD_FIXTURE_SCOPES advisory over scratch files (name: text or bytes), scanning `scanned`
+    by its absolute path (ROOT / path keeps it as is) and allowing it `allowed_advisories`; paths are shown relative to
     the scratch directory."""
     with tempfile.TemporaryDirectory() as scratch:
         for name, content in files.items():
@@ -373,7 +371,8 @@ def scratch_findings(files, allowed_advisories=(), scanned="requirements.lock", 
             path.write_bytes(content if isinstance(content, bytes) else content.encode("utf-8"))
         lock = str(Path(scratch) / scanned)
         allowed = {lock: {"advisories": list(allowed_advisories)}} if allowed_advisories else {}
-        found = affected_pins([{"path": lock, "parser": parser}], list(IGNORE_SCOPES), allowed)
+        found = affected_pins([{"path": lock, "parser": parser}], list(GUARD_FIXTURE_SCOPES), allowed,
+                              scopes=GUARD_FIXTURE_SCOPES)
     return [(os.path.relpath(path, scratch), package, version, advisory) for path, package, version, advisory in found]
 
 
@@ -497,7 +496,8 @@ class IgnorePolicyTests(unittest.TestCase):
             lock = Path(scratch) / "requirements.lock"  # an absolute path: ROOT / path keeps it as is
             lock.write_text("nltk==3.9.1 \\\n    --hash=sha256:00\nsetuptools==80.9.0\nSetuptools==84.0.0\n"
                             "setuptools\n# nltk==1.0 in a comment\n", encoding="utf-8")
-            found = affected_pins([{"path": str(lock), "parser": "requirements.txt"}], list(IGNORE_SCOPES))
+            found = affected_pins([{"path": str(lock), "parser": "requirements.txt"}], list(GUARD_FIXTURE_SCOPES),
+                                  scopes=GUARD_FIXTURE_SCOPES)
         self.assertEqual(sorted((package, version) for _, package, version, _ in found),
                          [("nltk", "3.9.1"), ("setuptools", "80.9.0")])
 
@@ -1178,7 +1178,7 @@ class AllowedLockTests(unittest.TestCase):
                                    {"id": "GHSA-d", "ignoreUntil": today + timedelta(days=1)},
                                    {"id": "GHSA-e", "ignoreUntil": datetime(2000, 1, 1, tzinfo=timezone.utc)}]}
         self.assertEqual(active_ignores(config, today), {"GHSA-d"})
-        expired = {"IgnoredVulns": [dict(entry, ignoreUntil=date(2000, 1, 1)) for entry in self.config["IgnoredVulns"]]}
+        expired = {"IgnoredVulns": [dict(entry, ignoreUntil=date(2000, 1, 1)) for entry in self.config.get("IgnoredVulns", [])]}
         for path, grant in IGNORE_ALLOWED_LOCKS.items():
             self.assertFalse(set(grant["advisories"]) <= active_ignores(expired), path)
 
@@ -1192,7 +1192,8 @@ class AllowedLockTests(unittest.TestCase):
             evidence.write_text("{}\n", encoding="utf-8")
             allowed = {str(lock): {"advisories": ["GHSA-8mgp-746c-j5xp"],
                                    "sha256": hashlib.sha256(lock.read_bytes()).hexdigest(), "evidence": str(evidence)}}
-            found = affected_pins([{"path": str(lock), "parser": "requirements.txt"}], list(IGNORE_SCOPES), allowed)
+            found = affected_pins([{"path": str(lock), "parser": "requirements.txt"}], list(GUARD_FIXTURE_SCOPES), allowed,
+                                  scopes=GUARD_FIXTURE_SCOPES)
         self.assertEqual([(package, version, advisory) for _, package, version, advisory in found],
                          [("setuptools", "80.10.2", "GHSA-h35f-9h28-mq5c")])
 

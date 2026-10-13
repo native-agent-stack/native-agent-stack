@@ -1,0 +1,329 @@
+Native returned outputs of the 2026-10-13 oauthlib relock, path-sanitized: <scratch-relock> is the owned scratch
+directory, <worktree> the owned checkout, <scan-root> the scanned tree and ~ the home directory.
+Baseline native-agent-stack@738fdf7002c1c3c1c9a26e30ce26f07f2dc3caa0; uv 0.12.22; CPython 3.13.16; OSV-Scanner 2.6.0
+(osv-scanner_linux_amd64 sha256 ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108, installed as
+security-scan.yml installs it). Each section names the script beside this file that produced it.
+
+## A. Paired relock (relock-2026-10-13-oauthlib.relock.sh.txt); full output: relock-2026-10-13-oauthlib.relock.txt
+$ cmp <scratch-relock>/u3/new/requirements.lock.repro <worktree>/blueprints/runtime-workers/openhands/requirements.lock
+cmp adopted lock vs resolver output exit: 0
+
+## B. Hash check (relock-2026-10-05-fsspec.hash-check.py.txt, unchanged, argument oauthlib)
+oauthlib==4.0.0: 2 hash lines; source https://pypi.org/pypi/oauthlib/4.0.0/json
+  624c28c13a0a59cabf9747dfa52af63be3e512a7f2714df16e91b5b3a145e6cd -> oauthlib-4.0.0-py3-none-any.whl (uploaded 2026-09-28T06:01:17.008169Z, not yanked)
+  efb274799819440f95b4ab3b818869f1ce9ae26c5beacba0201d1a1b76b54f86 -> oauthlib-4.0.0.tar.gz (uploaded 2026-09-28T06:01:18.770551Z, not yanked)
+unlisted supported artifacts: none
+hash-check exit: 0
+
+## C. Isolated hashed install (relock-2026-10-13-oauthlib.install-check.sh.txt)
+Creating virtual environment at: u3/venv
+Activate with: source u3/venv/bin/activate
+venv exit: 0
+ + packaging==26.3
+ + setuptools==84.0.0
+ + wheel==0.46.3
+build-requirements install exit: 0
+ + wrapt==1.17.3
+ + yarl==1.22.0
+ + zipp==3.23.0
+runtime lock install exit: 0
+Using Python 3.13.16 environment at: u3/venv
+Checked 178 packages in 4ms
+All installed packages are compatible
+uv pip check exit: 0
++----------------------------------------------------------------------+
+
+SDK/tools 1.49.6 imports passed; no model request
+sdk import exit: 0
+oauthlib 4.0.0 requests-oauthlib 2.0.0 pyjwt 2.15.0 litellm 1.93.2
+fixed-package imports exit: 0
+done, status 0
+install-check script exit: 0
+
+## D. requests-oauthlib 2.0.0's own tests on the base and new locks (relock-2026-10-13-oauthlib.requests-oauthlib-tests.sh.txt)
+### base tree
+requests-oauthlib 2.0.0 sdist sha256 b3dffaebd884d8cd778494369603a9e7b58d29111bf6b41bdc2dcd87203af4e9 appears 1 time(s) in the tree's requirements.lock
+$ diff <freeze after the lock install> <freeze after the test extras>     # additions only
+62a63
+> iniconfig==2.3.1
+87a89
+> mock==5.2.0
+111a114
+> pluggy==1.6.0
+131a135
+> pytest==9.1.1
+143a148
+> requests-mock==1.12.1
+$ uv pip list | grep -E "^(oauthlib|requests-oauthlib|google-auth-oauthlib|requests|requests-mock|mock|pytest|pyjwt|cryptography) "
+cryptography                             50.0.0
+google-auth-oauthlib                     1.2.2
+mock                                     5.2.0
+oauthlib                                 3.3.1
+pyjwt                                    2.15.0
+pytest                                   9.1.1
+requests                                 2.33.0
+requests-mock                            1.12.1
+requests-oauthlib                        2.0.0
+$ python -c "import requests_oauthlib, google_auth_oauthlib.flow; print('imports OK')"
+imports OK
+$ python -m pytest -q -rf --tb=line -p no:cacheprovider -p no:libtmux tests/test_compliance_fixes.py tests/test_core.py tests/test_oauth1_session.py tests/test_oauth2_auth.py tests/test_oauth2_session.py     # in the sdist tree; full output
+...F.......F............................................................ [ 97%]
+..                                                                       [100%]
+=================================== FAILURES ===================================
+E   AssertionError: 1791855195 != 1791855194.6803737 within 2 places (0.3196263313293457 difference)
+~/.local/share/mise/installs/python/3.13.16/lib/python3.13/unittest/case.py:961: AssertionError: 1791855195 != 1791855194.6803737 within 2 places (0.3196263313293457 difference)
+E   AssertionError: 1791937995 != 1791937994.6918428 within 2 places (0.30815720558166504 difference)
+~/.local/share/mise/installs/python/3.13.16/lib/python3.13/unittest/case.py:961: AssertionError: 1791937995 != 1791937994.6918428 within 2 places (0.30815720558166504 difference)
+=========================== short test summary info ============================
+FAILED tests/test_compliance_fixes.py::MailChimpComplianceFixTest::test_fetch_access_token
+FAILED tests/test_compliance_fixes.py::PlentymarketsComplianceFixTest::test_fetch_access_token
+2 failed, 72 passed in 0.67s
+exit: 1
+script exit (base): 0
+### new tree
+requests-oauthlib 2.0.0 sdist sha256 b3dffaebd884d8cd778494369603a9e7b58d29111bf6b41bdc2dcd87203af4e9 appears 1 time(s) in the tree's requirements.lock
+$ diff <freeze after the lock install> <freeze after the test extras>     # additions only
+62a63
+> iniconfig==2.3.1
+87a89
+> mock==5.2.0
+111a114
+> pluggy==1.6.0
+131a135
+> pytest==9.1.1
+143a148
+> requests-mock==1.12.1
+$ uv pip list | grep -E "^(oauthlib|requests-oauthlib|google-auth-oauthlib|requests|requests-mock|mock|pytest|pyjwt|cryptography) "
+cryptography                             50.0.0
+google-auth-oauthlib                     1.2.2
+mock                                     5.2.0
+oauthlib                                 4.0.0
+pyjwt                                    2.15.0
+pytest                                   9.1.1
+requests                                 2.33.0
+requests-mock                            1.12.1
+requests-oauthlib                        2.0.0
+$ python -c "import requests_oauthlib, google_auth_oauthlib.flow; print('imports OK')"
+imports OK
+$ python -m pytest -q -rf --tb=line -p no:cacheprovider -p no:libtmux tests/test_compliance_fixes.py tests/test_core.py tests/test_oauth1_session.py tests/test_oauth2_auth.py tests/test_oauth2_session.py     # in the sdist tree; full output
+...F.......F............................................................ [ 97%]
+..                                                                       [100%]
+=================================== FAILURES ===================================
+E   AssertionError: 1791855200 != 1791855199.6202283 within 2 places (0.37977170944213867 difference)
+~/.local/share/mise/installs/python/3.13.16/lib/python3.13/unittest/case.py:961: AssertionError: 1791855200 != 1791855199.6202283 within 2 places (0.37977170944213867 difference)
+E   AssertionError: 1791938000 != 1791937999.631537 within 2 places (0.36846303939819336 difference)
+~/.local/share/mise/installs/python/3.13.16/lib/python3.13/unittest/case.py:961: AssertionError: 1791938000 != 1791937999.631537 within 2 places (0.36846303939819336 difference)
+=========================== short test summary info ============================
+FAILED tests/test_compliance_fixes.py::MailChimpComplianceFixTest::test_fetch_access_token
+FAILED tests/test_compliance_fixes.py::PlentymarketsComplianceFixTest::test_fetch_access_token
+2 failed, 72 passed in 0.61s
+exit: 1
+script exit (new): 0
+
+## E. Failed attempt of D, retained, not adopted: the same script before -p no:libtmux (both venvs, pytest startup)
+### base tree
+  File "<scratch-relock>/ro/venv-base/lib/python3.13/site-packages/libtmux/pytest_plugin.py", line 52, in <module>
+Failed: Marks cannot be applied to fixtures.
+exit: 1
+script exit (base): 0
+### new tree
+  File "<scratch-relock>/ro/venv-new/lib/python3.13/site-packages/libtmux/pytest_plugin.py", line 52, in <module>
+Failed: Marks cannot be applied to fixtures.
+exit: 1
+script exit (new): 0
+
+## F. oauthlib importers in the relocked venv (relock-2026-10-13-oauthlib.oauthlib-importers.py.txt, on <scratch-relock>/u3/venv)
+py files searched outside oauthlib: 10908
+top-level distributions importing oauthlib: {'requests_oauthlib': ['oauthlib.common', 'oauthlib.oauth1', 'oauthlib.oauth2']}
+imports of oauthlib endpoints, grant types or servers outside oauthlib: none
+exit: 0
+
+## G. OSV (relock-2026-10-13-oauthlib.osv-scan-step.sh.txt): the workflow's own scan step, then its ordinary invocation
+### before: native-agent-stack@738fdf70 in a git clone --shared of this checkout (full report: relock-2026-10-13-oauthlib.osv-before.ordinary.txt)
+44547b18f6b2551fb488cfeadaf7b1acb4d0432274f0787fe092ce2a7397d937  .github/workflows/security-scan.yml
+bc5680fd3290c1e0c4202c5a5fb1de68a5f09a422faecadf884f55cdae16d5bf  <scratch-relock>/osv-out/before.step.sh
+workflow scan step exit: 1
+ordinary entries 60
+ordinary scan exit: 1
+FAIL: test_the_ordinary_config_has_no_exception_for_a_frozen_advisory (tests.test_osv_lockfile_coverage.FrozenScanTests.test_the_ordinary_config_has_no_exception_for_a_frozen_advisory)
+Ran 23 tests in 0.321s
+FAILED (failures=1)
+Total 1 package affected by 2 known vulnerabilities (0 Critical, 0 High, 2 Medium, 0 Low, 0 Unknown) from 1 ecosystem.
+| https://osv.dev/PYSEC-2026-4113     | 6.1  | PyPI      | oauthlib | 3.3.1   | 4.0.0         | blueprints/runtime-workers/openhands/requirements.lock |
+| https://osv.dev/GHSA-hj66-6f7g-4r5v |      |           |          |         |               |                                                        |
+| https://osv.dev/PYSEC-2026-4114     | 6.8  | PyPI      | oauthlib | 3.3.1   | 4.0.0         | blueprints/runtime-workers/openhands/requirements.lock |
+| https://osv.dev/GHSA-xpv3-w29h-x7cv |      |           |          |         |               |                                                        |
+7144307f3a0d2938aa5d256aa0802965264155a48ac8b615f4c06f79dd73730d  <scratch-relock>/osv-out/before.step.txt
+02e30fd072362d6ac7ad8484d60cc145c9bdb23ad345ec0e85ca51f85b843d2c  <scratch-relock>/osv-out/before.ordinary.txt
+scan-step script exit: 0
+### the step's output, before (its unittest preflight stops it, as in CI)
+...............F.......
+======================================================================
+FAIL: test_the_ordinary_config_has_no_exception_for_a_frozen_advisory (tests.test_osv_lockfile_coverage.FrozenScanTests.test_the_ordinary_config_has_no_exception_for_a_frozen_advisory)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scan-root>/tests/test_osv_lockfile_coverage.py", line 652, in test_the_ordinary_config_has_no_exception_for_a_frozen_advisory
+    self.assertEqual(ignore_entry_problems(self.ordinary_config), [])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['GHSA-hj66-6f7g-4r5v: ignoreUntil has exp[49 chars]red'] != []
+
+First list contains 2 additional elements.
+First extra element 0:
+'GHSA-hj66-6f7g-4r5v: ignoreUntil has expired'
+
++ []
+- ['GHSA-hj66-6f7g-4r5v: ignoreUntil has expired',
+-  'GHSA-xpv3-w29h-x7cv: ignoreUntil has expired']
+
+----------------------------------------------------------------------
+Ran 23 tests in 0.321s
+
+FAILED (failures=1)
+### after: the relock commit's tree, e3933560's content, before the review fixes of section K (full report: relock-2026-10-13-oauthlib.osv-after.ordinary.txt)
+44547b18f6b2551fb488cfeadaf7b1acb4d0432274f0787fe092ce2a7397d937  .github/workflows/security-scan.yml
+bc5680fd3290c1e0c4202c5a5fb1de68a5f09a422faecadf884f55cdae16d5bf  <scratch-relock>/osv-out/after-early.step.sh
+workflow scan step exit: 0
+ordinary entries 60
+ordinary scan exit: 0
+Ran 23 tests in 0.366s
+OK
+No issues found
+OSV primary exit code: ordinary=0; frozen evidence reports separately
+No issues found
+d42238b5b02377b740f019edf6adaadb99ef173f48fab3be24c23e6f11ef8317  <scratch-relock>/osv-out/after-early.step.txt
+66c0e5ceb1719a859d422d631049b2ad66258a3427570a8858d414103712b02f  <scratch-relock>/osv-out/after-early.ordinary.txt
+scan-step script exit: 0
+### the step's output, after, without the 60 Scanned lines it shares with the report
+.......................
+----------------------------------------------------------------------
+Ran 23 tests in 0.366s
+
+OK
+Starting filesystem walk for root: /
+End status: 0 dirs visited, 60 inodes visited, 60 Extract calls, 166.530233ms elapsed, 166.530963ms wall time
+Filtered 175 local/unscannable package/s from the scan.
+.github/osv-scanner.toml has unused ignores:
+ - GHSA-8mgp-746c-j5xp
+ - GHSA-h35f-9h28-mq5c
+
+No issues found
+OSV primary exit code: ordinary=0; frozen evidence reports separately
+### failed attempt, retained, not adopted: the before run on a git archive extraction, which has no .git
+osv-before-archive-tree.out:workflow scan step exit: 1
+osv-before-archive-tree.out:ordinary scan exit: 1
+osv-before-archive-tree.out:FAIL: test_the_ordinary_config_has_no_exception_for_a_frozen_advisory (tests.test_osv_lockfile_coverage.FrozenScanTests.test_the_ordinary_config_has_no_exception_for_a_frozen_advisory)
+osv-before-archive-tree.out:FAIL: test_offline_cli_checks_retirement_without_qualifying_history (tests.test_wsl_retrieval.RetiredRunnerTests.test_offline_cli_checks_retirement_without_qualifying_history)
+osv-before-archive-tree.out:scan-step script exit: 0
+osv-out/before-archive-tree.step.txt:FAIL: test_the_ordinary_config_has_no_exception_for_a_frozen_advisory (tests.test_osv_lockfile_coverage.FrozenScanTests.test_the_ordinary_config_has_no_exception_for_a_frozen_advisory)
+osv-out/before-archive-tree.step.txt:FAIL: test_offline_cli_checks_retirement_without_qualifying_history (tests.test_wsl_retrieval.RetiredRunnerTests.test_offline_cli_checks_retirement_without_qualifying_history)
+osv-out/before-archive-tree.step.txt:ValueError: cannot list the files Git tracks in the partition
+
+## H. Unit tests under TZ=UTC: tests.test_osv_lockfile_coverage tests.test_openhands_lock_binding tests.test_frozen_macos_variant_no_use
+### before, native-agent-stack@738fdf70 (the shared clone)
+FAIL: test_allowed_advisories_are_scoped_active_ignores (tests.test_osv_lockfile_coverage.AllowedLockTests.test_allowed_advisories_are_scoped_active_ignores)
+FAIL: test_frozen_advisory_or_package_override_cannot_leak_to_ordinary_inputs (tests.test_osv_lockfile_coverage.FrozenPolicyMutationTests.test_frozen_advisory_or_package_override_cannot_leak_to_ordinary_inputs) (mutation='advisory')
+'GHSA-hj66-6f7g-4r5v: ignoreUntil has expired'
+- ['GHSA-hj66-6f7g-4r5v: ignoreUntil has expired',
+-  'GHSA-xpv3-w29h-x7cv: ignoreUntil has expired']
+FAIL: test_the_ordinary_config_has_no_exception_for_a_frozen_advisory (tests.test_osv_lockfile_coverage.FrozenScanTests.test_the_ordinary_config_has_no_exception_for_a_frozen_advisory)
+'GHSA-hj66-6f7g-4r5v: ignoreUntil has expired'
+- ['GHSA-hj66-6f7g-4r5v: ignoreUntil has expired',
+-  'GHSA-xpv3-w29h-x7cv: ignoreUntil has expired']
+FAIL: test_every_ignore_has_id_reason_and_a_near_expiry (tests.test_osv_lockfile_coverage.IgnorePolicyTests.test_every_ignore_has_id_reason_and_a_near_expiry)
+'GHSA-hj66-6f7g-4r5v: ignoreUntil has expired'
+- ['GHSA-hj66-6f7g-4r5v: ignoreUntil has expired',
+-  'GHSA-xpv3-w29h-x7cv: ignoreUntil has expired'] : <scratch-relock>/base-clone/.github/osv-scanner.toml
+Ran 74 tests in 8.080s
+FAILED (failures=4)
+exit: 1
+### after, this change
+Ran 74 tests in 8.525s
+OK
+exit: 0
+
+## I. CI: the one failed log read, run 38326740785 (push to main, created 2026-10-13T00:20:20Z), osv-scanner job
+osv-scanner | Scan every listed lockfile and manifest (fails on any unignored vulnerability) | 2026-10-13T00:20:42.1989053Z FAIL: test_the_ordinary_config_has_no_exception_for_a_frozen_advisory (tests.test_osv_lockfile_coverage.FrozenScanTests.test_the_ordinar
+osv-scanner | Scan every listed lockfile and manifest (fails on any unignored vulnerability) | 2026-10-13T00:20:42.1990808Z AssertionError: Lists differ: ['GHSA-hj66-6f7g-4r5v: ignoreUntil has exp[49 chars]red'] != []
+osv-scanner | Scan every listed lockfile and manifest (fails on any unignored vulnerability) | 2026-10-13T00:20:42.1991350Z 'GHSA-hj66-6f7g-4r5v: ignoreUntil has expired'
+osv-scanner | Scan every listed lockfile and manifest (fails on any unignored vulnerability) | 2026-10-13T00:20:42.1991635Z - ['GHSA-hj66-6f7g-4r5v: ignoreUntil has expired',
+osv-scanner | Scan every listed lockfile and manifest (fails on any unignored vulnerability) | 2026-10-13T00:20:42.1991814Z -  'GHSA-xpv3-w29h-x7cv: ignoreUntil has expired']
+osv-scanner | Scan every listed lockfile and manifest (fails on any unignored vulnerability) | 2026-10-13T00:20:42.1992440Z Ran 23 tests in 0.423s
+osv-scanner | Scan every listed lockfile and manifest (fails on any unignored vulnerability) | 2026-10-13T00:20:42.1992560Z FAILED (failures=1)
+osv-scanner | Scan every listed lockfile and manifest (fails on any unignored vulnerability) | 2026-10-13T00:20:42.2109349Z ##[error]Process completed with exit code 1.
+
+## J. Broad unit run under TZ=UTC: the modules git grep -l openhands -- 'tests/test_*.py' names, plus tests.test_wsl_retrieval,
+##    tests.test_workflow_security_coverage, tests.test_starred_convergence and tests.test_ecosystem_manifest (23 modules)
+started 2026-10-13T00:39:43Z
+Ran 1855 tests in 716.294s
+OK (skipped=43)
+exit: 0
+2026-10-13T00:51:40Z
+
+## K. Review fixes on the rebased commit 8d459ce9 (the Claude read and the GPT read of e3933560)
+### P1: the corrected relock script, re-run from the same checksum-verified archive
+$ cmp <scratch-relock>/rerun-p1/u3/new/requirements.lock.repro <worktree>/blueprints/runtime-workers/openhands/requirements.lock
+cmp re-run repro vs committed lock: 0
+$ diff relock-2026-10-13-oauthlib.relock.txt <the re-run output, path-sanitized>     # relock.txt is the first run without its two uv.lock digest lines
+1c1
+< [2026-10-13T00:29:37Z] uv 0.12.22 (x86_64-unknown-linux-gnu)
+---
+> [2026-10-13T03:02:13Z] uv 0.12.22 (x86_64-unknown-linux-gnu)
+5c5
+< [2026-10-13T00:29:39Z] control uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 --upgrade-package pyjwt==2.15.0 --upgrade-package urllib3==2.8.0 --upgrade-package litellm==1.93.2 --upgrade-package fsspec==2026.6.0 --upgrade-package multidict==6.9.1
+---
+> [2026-10-13T03:02:14Z] control uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 --upgrade-package pyjwt==2.15.0 --upgrade-package urllib3==2.8.0 --upgrade-package litellm==1.93.2 --upgrade-package fsspec==2026.6.0 --upgrade-package multidict==6.9.1
+9c9
+< Resolved 412 packages in 2.21s
+---
+> Resolved 412 packages in 1.76s
+27c27
+< [2026-10-13T00:29:43Z] new uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 --upgrade-package pyjwt==2.15.0 --upgrade-package urllib3==2.8.0 --upgrade-package litellm==1.93.2 --upgrade-package fsspec==2026.6.0 --upgrade-package multidict==6.9.1 --upgrade-package oauthlib==4.0.0
+---
+> [2026-10-13T03:02:18Z] new uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 --upgrade-package pyjwt==2.15.0 --upgrade-package urllib3==2.8.0 --upgrade-package litellm==1.93.2 --upgrade-package fsspec==2026.6.0 --upgrade-package multidict==6.9.1 --upgrade-package oauthlib==4.0.0
+31c31
+< Resolved 412 packages in 730ms
+---
+> Resolved 412 packages in 1.08s
+73c73
+< [2026-10-13T00:29:46Z] new paired lock generated; inspect every pin delta before adoption
+---
+> [2026-10-13T03:02:20Z] new paired lock generated; inspect every pin delta before adoption
+diff exit: 1
+### P1 regression: tests.test_receipt_sha256_key_custody, copied into git clones at e3933560 and 8d459ce9 (TZ=UTC)
+#### e3933560e
+FAIL: test_no_receipt_sha256_key_lacks_a_checkable_preimage (tests.test_receipt_sha256_key_custody.ReceiptSha256KeyCustodyTests.test_no_receipt_sha256_key_lacks_a_checkable_preimage)
+FAIL: test_the_oauthlib_relock_receipt_publishes_no_scratch_digest (tests.test_receipt_sha256_key_custody.ReceiptSha256KeyCustodyTests.test_the_oauthlib_relock_receipt_publishes_no_scratch_digest)
+Ran 12 tests in 4.746s
+FAILED (failures=2)
+- {'evidence/receipts/osv-openhands-oauthlib-relock-20261013.json': ['reproduction.control_uv_lock_sha256',
+-                                                                    'reproduction.new_uv_lock_sha256']} : receipt keys ending in _sha256 wh
+unittest exit: 1
+#### 8d459ce91
+FAIL: test_no_receipt_sha256_key_lacks_a_checkable_preimage (tests.test_receipt_sha256_key_custody.ReceiptSha256KeyCustodyTests.test_no_receipt_sha256_key_lacks_a_checkable_preimage)
+FAIL: test_the_oauthlib_relock_receipt_publishes_no_scratch_digest (tests.test_receipt_sha256_key_custody.ReceiptSha256KeyCustodyTests.test_the_oauthlib_relock_receipt_publishes_no_scratch_digest)
+Ran 12 tests in 10.539s
+FAILED (failures=2)
+- {'evidence/receipts/osv-openhands-oauthlib-relock-20261013.json': ['reproduction.control_uv_lock_sha256',
+-                                                                    'reproduction.new_uv_lock_sha256']} : receipt keys ending in _sha256 wh
+unittest exit: 1
+### GPT read follow-up 1: the nltk and setuptools ignores, before the deletion
+config ids: ['GHSA-8mgp-746c-j5xp', 'GHSA-h35f-9h28-mq5c']
+ignore_entry_problems, real date: []
+ignore_entry_problems, date 2026-12-24: ['GHSA-8mgp-746c-j5xp: ignoreUntil has expired', 'GHSA-h35f-9h28-mq5c: ignoreUntil has expired']
+affected_pins over the 60 ordinary inputs for GHSA-8mgp-746c-j5xp and GHSA-h35f-9h28-mq5c: []
+### after the deletion
+config: {}
+ignore_entry_problems, real date: []
+ignore_entry_problems, date 2026-12-24: []
+active_ignores at 2026-12-24: set()
+IGNORE_SCOPES: {} | GUARD_FIXTURE_SCOPES ids: ['GHSA-8mgp-746c-j5xp', 'GHSA-h35f-9h28-mq5c']
+### the workflow's scan step on the final tree (full report: relock-2026-10-13-oauthlib.osv-final.ordinary.txt; digest lines omitted)
+workflow scan step exit: 0
+ordinary entries 60
+ordinary scan exit: 0
+Ran 23 tests in 0.306s
+OK
+No issues found
+OSV primary exit code: ordinary=0; frozen evidence reports separately
+No issues found
+scan-step script exit: 0

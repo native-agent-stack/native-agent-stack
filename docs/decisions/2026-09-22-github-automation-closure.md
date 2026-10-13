@@ -202,7 +202,11 @@ locally with `GH_TOKEN` set and no `--offline`, using
   OpenHands recipe lock and the same Lumibot lock) and GHSA-w6j9-cwv2-h6wq
   (PyJWT 2.13.0, OpenHands lock only); see **oauthlib and PyJWT
   (2026-09-29)** below. The PyJWT one ended on 2026-09-30, leaving two (**PyJWT
-  relock (2026-09-30)** below).
+  relock (2026-09-30)** below). **Superseded (2026-10-13):** the two oauthlib
+  ignores are deleted and no ordinary ignore covers oauthlib; the two Lumibot
+  entries for nltk and setuptools are deleted as well, unused, so the ordinary
+  config holds no ignore; see **oauthlib relock and the end of the oauthlib
+  ignores (2026-10-13)** at the end of this record.
   osv-scanner 2.6.0 matches `[[IgnoredVulns]]` by id and expiry only
   ([`internal/config/config.go:104-112`](https://github.com/google/osv-scanner/blob/v2.6.0/internal/config/config.go#L104-L112)),
   and the workflow's single `--config` replaces every per-directory
@@ -2105,3 +2109,69 @@ fsspec/filesystem_spec@2026.6.0, aio-libs/multidict@v6.9.1,
 sqlalchemy/mako@rel_1_4_2 and 7rulnik/source-map-js@v1.2.2; #562 at
 74cc5468 and #587 at 798ac445. Native evidence is retained in the three
 relock-2026-10-05 prefixes and linked receipts.
+
+### oauthlib relock and the end of the oauthlib ignores (2026-10-13)
+
+The two oauthlib ignores of 2026-09-29 (GHSA-hj66-6f7g-4r5v and
+GHSA-xpv3-w29h-x7cv, `ignoreUntil` 2026-10-13) expired, and from
+2026-10-13T00:00Z the required osv-scanner job failed in its unittest
+preflight on every run
+(`FrozenScanTests.test_the_ordinary_config_has_no_exception_for_a_frozen_advisory`,
+"ignoreUntil has expired"; run 38326740785, the one log read). The OpenHands
+recipe lock, the only scanned lock for which the scan reports either advisory
+(oauthlib 3.3.1), is relocked onto 4.0.0, the first patched release of both,
+with the recipe's own method: the nine version-pinned upgrades of the fsspec
+relock plus `--upgrade-package oauthlib==4.0.0` under uv 0.12.22. Its control
+reproduces the committed lock byte for byte, and the new lock differs in the
+three oauthlib lines only. Both ignores, their `IGNORE_SCOPES` rows and the
+lock's `IGNORE_ALLOWED_LOCKS` entry are deleted, so `IGNORE_ALLOWED_LOCKS` is
+empty.
+
+This supersedes, for the Lumibot lock, the **Expiry** sentences of **oauthlib
+and PyJWT (2026-09-29)** and **PyJWT relock (2026-09-30)** above (renew the
+two ignores for that lock alone, or delete it). Neither is needed: the ruling
+of 2026-10-06 above excluded the captured Lumibot lockchecks from the
+inventory, so neither the required scan nor the non-required frozen-evidence
+report reads them, and their bytes stay unchanged (the exclusion's own
+condition, restoring a scan before any replay, adoption or new consuming
+route, still applies). The ordinary config carries no exception for either
+advisory, as `docs/decisions/2026-10-07-frozen-evidence-osv-reporting.md`
+requires. PyJWT 2.15.1, which #518 planned together with oauthlib, is not part
+of this change.
+
+**Result:** the workflow's own scan step, run by bash under UTC as on a pull
+request, exits 1 at 738fdf70 and 0 on this change; its ordinary OSV-Scanner
+2.6.0 invocation alone exits 1 with the two oauthlib findings and 0 ("No
+issues found") over the 60 ordinary inputs. The recipe's hashed install,
+`uv pip check`, the SDK import check and requests-oauthlib 2.0.0's own tests
+(the same 72 passed and 2 timing failures under 3.3.1 and 4.0.0) pass on the
+new lock. **Not covered:** the image's server binary and the grader venv,
+which keep upstream's own locks, and any OpenHands task run. **Overturn:** OSV
+lists an advisory for oauthlib 4.0.0 that only a later release fixes, or a
+scanned lock pins oauthlib below 4.0.0 again (relock it; an ignore needs its
+own reachability review). Sources: GHSA-hj66-6f7g-4r5v and
+GHSA-xpv3-w29h-x7cv (first patched 4.0.0); oauthlib 4.0.0 on PyPI and its
+release notes (tag commit 145a9a46); uv 0.12.22; OSV-Scanner 2.6.0. Evidence:
+`evidence/receipts/osv-openhands-oauthlib-relock-20261013.json` and the
+relock-2026-10-13-oauthlib prefix beside the OpenHands recipe.
+
+**The nltk and setuptools ignores (review fix of #1060).** The GPT read of
+#1060 at e3933560 found the next calendar failure: the two entries of
+2026-09-26 for the Lumibot lock, GHSA-8mgp-746c-j5xp (nltk) and
+GHSA-h35f-9h28-mq5c (setuptools below 83.0.0), expire on 2026-12-24, when
+`ignore_entry_problems` fails the scan step's preflight, as it did for the
+oauthlib pair on 2026-10-13. Both had been unused since the ruling of
+2026-10-06 excluded the Lumibot lockchecks: OSV-Scanner reported them unused,
+and the guard's `affected_pins` finds no ordinary input that pins nltk, or
+setuptools below 83.0.0. Both entries and their `IGNORE_SCOPES` rows are
+deleted. The guard's own mutation tests keep the two scopes as
+`GUARD_FIXTURE_SCOPES`, which grant nothing. This supersedes the **Expiry**
+sentences of the **Ignores** list's 2026-09-26 entries and of the
+**Scoped, digest-bound allowlist (2026-09-27)** above: relocking onto a fixed
+nltk release, or a renewal, is no longer needed. **Result:** the ordinary
+config parses to an empty table, `ignore_entry_problems` returns nothing with
+the date 2026-12-24 (before the deletion it returned "ignoreUntil has expired"
+for both), and the scan step exits 0 with "No issues found" and no unused
+ignore. **Overturn:** a new ordinary ignore needs its own reachability
+review, an `IGNORE_SCOPES` row and, for a lock that pins an affected version,
+an `IGNORE_ALLOWED_LOCKS` entry.
