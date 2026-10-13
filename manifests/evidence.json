@@ -13442,6 +13442,11 @@
       "sha256": "cf2bbe96fc27696ebd92965171da1540514bf1858ff5c048a976546741cff366"
     },
     {
+      "path": "blueprints/us-equities/adaptive-paper/overnight-cancel-refusal-validation.json",
+      "bytes": 4269,
+      "sha256": "c2cd4bcf9033d242b355b59336438b310b2aa166032fad37e5bf7856c9073a3c"
+    },
+    {
       "path": "blueprints/us-equities/adaptive-paper/overnight-guard-pins-validation.json",
       "bytes": 5314,
       "sha256": "5da6869beff88ab197d70edc90aa26b4224e151e6da960457229e5a112cfa9a3"
@@ -13553,8 +13558,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "bytes": 11101,
-      "sha256": "83527f03d600c8c1bf5b9abfee8736bef85f5535aa19c75b6a3232e712af328c"
+      "bytes": 11228,
+      "sha256": "0e89b92349010dbd40ee452c8132b28bc5f87f88f6842c4de14e3b7e18c7b5cd"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/start_readiness.py",
@@ -13573,8 +13578,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/transport.py",
-      "bytes": 112602,
-      "sha256": "b713e2e3bb0827f09b803d40e4d94d46a56165b3393d9a6e33feb6aa0c33dff7"
+      "bytes": 112765,
+      "sha256": "08740b0f6c784d1adf70ade3ced86a856cd82a01ba275d51efcad3f3fd39ddc8"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/README.md",
@@ -19178,8 +19183,8 @@
     },
     {
       "path": "docs/decisions/2026-10-13-overnight-rest-arming.md",
-      "bytes": 12339,
-      "sha256": "0417bbb15d5d4ac3825101680ab2ec692ffcc8395d18372ff56d4f7eb50524cb"
+      "bytes": 13291,
+      "sha256": "b9e72cdfb873a3568ef2cea53ea8ee0a72b8dc351b2f378cfa34ba8750d09786"
     },
     {
       "path": "docs/decisions/2026-10-13-paper-configurable-risk-ceilings.md",
@@ -48642,6 +48647,66 @@
       "sha256": "adfbf11b6518c3ce83c97d37256754c4c837d598be71e34447499176b5361456"
     },
     {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel422/cancel422-base-ea0-red.sanitized.txt",
+      "bytes": 2012,
+      "sha256": "c4f0bc47d81895cb21550a2a5d24be714fbc100dbaf2161ed094b960132f74fb"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel422/cancel422-green-transport.sanitized.txt",
+      "bytes": 2761,
+      "sha256": "44c982031644f082cedabb3cde81c68b1f2e47eb7693352ac7d31927696c2e7c"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel422/historical/2026-10-13-overnight-rest-arming.md.txt",
+      "bytes": 12339,
+      "sha256": "0417bbb15d5d4ac3825101680ab2ec692ffcc8395d18372ff56d4f7eb50524cb"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel422/historical/credential_source.py.txt",
+      "bytes": 9305,
+      "sha256": "0bbe30aab4e665226e230e9927ef51e7f8875c53dda6527d19e6efe76bbaeacc"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel422/historical/mover.py.txt",
+      "bytes": 77613,
+      "sha256": "94ce6735ccb3cf1d0884a1c988e67b3f15d649b864ba1ece36ec20b9bb63b802"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel422/historical/runner.py.txt",
+      "bytes": 180421,
+      "sha256": "d531b494e2c125b663e62512771460704b69877ae07badbdf544a42ad67450a1"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel422/historical/safety.py.txt",
+      "bytes": 100515,
+      "sha256": "6d8b3f0cbfcc0517015b5e450ab9b88eb2baae3812da3385e6e6e9bf202fcab9"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel422/historical/strategies_v1.py.txt",
+      "bytes": 29807,
+      "sha256": "7a6bcf9154656d174790d2ddd5aedba6f50242677b6b86ff6ea1c767837619b8"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel422/historical/test_adaptive_paper_credential_source.py.txt",
+      "bytes": 25506,
+      "sha256": "73b03dbca953df186b25354db9da8fa24d2ec7e767513f630289de9a75f75c14"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel422/historical/test_adaptive_paper_transport.py.txt",
+      "bytes": 117897,
+      "sha256": "915973f08c21091abc73585f704b0ae6235f7f8fb1ff59760815f6542c99d52d"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel422/historical/test_overnight_published_preimages.py.txt",
+      "bytes": 5568,
+      "sha256": "09a2a13f176e962d54e44ec3e5d0fbca3e68a91b332f183adc54b8aefa4c1853"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel422/historical/transport.py.txt",
+      "bytes": 107161,
+      "sha256": "76af68629b6792801f2bd07c514e470d77cbd32eb52e666ac7177cdd35469bf3"
+    },
+    {
       "path": "evidence/artifacts/overnight-arming-20261013/review-fix/arming-inventory-grant-green.sanitized.txt",
       "bytes": 194,
       "sha256": "5b81d6143ae257c7a89e12d5b9e40b27532586e7d106b4d4f6230c5897b4324b"
@@ -62752,6 +62817,11 @@
       "sha256": "5d2fa0071940b2dc910fd9f61c0a09a3d89ef43216c4a6b8099453c13420d7d8"
     },
     {
+      "path": "tests/test_adaptive_paper_overnight_cancel_refusal.py",
+      "bytes": 3973,
+      "sha256": "6cc2e37d96fa7e7960d5bb31bb20345347d65b8923d35db0d0f0fccc290df80c"
+    },
+    {
       "path": "tests/test_adaptive_paper_overnight_guard_mutations.py",
       "bytes": 11076,
       "sha256": "ea526b0119708daa2047d16abaf1d8eb6cc37d06ae3ffeae3b687a3c3df3746d"
@@ -62818,8 +62888,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_transport.py",
-      "sha256": "915973f08c21091abc73585f704b0ae6235f7f8fb1ff59760815f6542c99d52d",
-      "bytes": 117897
+      "bytes": 117965,
+      "sha256": "eb7f0463d581807caa2f70d627d294cb8b48e38545c2a7d5b2c98e13c13dda0d"
     },
     {
       "path": "tests/test_adjudicate.py",
@@ -63798,8 +63868,8 @@
     },
     {
       "path": "tests/test_overnight_published_preimages.py",
-      "bytes": 5568,
-      "sha256": "09a2a13f176e962d54e44ec3e5d0fbca3e68a91b332f183adc54b8aefa4c1853"
+      "bytes": 5662,
+      "sha256": "2f18c04e06000221e9a3a871acc2d8084d6188c72ec7d38c48bf08e3859ca12c"
     },
     {
       "path": "tests/test_paired_runs_results.py",

@@ -1,0 +1,81 @@
+{
+  "base_revision": "ea0a51a6b2a485977d8aaf8e11dc0e93fe820a06",
+  "evidence_class": "synthetic",
+  "input_hashes": {
+    "blueprints/us-equities/adaptive-paper/runner.py": "d531b494e2c125b663e62512771460704b69877ae07badbdf544a42ad67450a1",
+    "blueprints/us-equities/adaptive-paper/transport.py": "ddd524ed241098595ba418e418dd7a4a98d6e1d0a95321adf028ab5b059a3ea7",
+    "docs/decisions/2026-10-13-overnight-rest-arming.md": "b9e72cdfb873a3568ef2cea53ea8ee0a72b8dc351b2f378cfa34ba8750d09786",
+    "tests/test_adaptive_paper_overnight_cancel_refusal.py": "6cc2e37d96fa7e7960d5bb31bb20345347d65b8923d35db0d0f0fccc290df80c",
+    "tests/test_adaptive_paper_transport.py": "eb7f0463d581807caa2f70d627d294cb8b48e38545c2a7d5b2c98e13c13dda0d",
+    "tests/test_overnight_published_preimages.py": "2f18c04e06000221e9a3a871acc2d8084d6188c72ec7d38c48bf08e3859ca12c"
+  },
+  "limitations": [
+    "SDK I/O is synthetic; production cancel, lookup, observation and Controller latch code execute.",
+    "No separate order_cancel_rejected stream event is supplied; a successful retry produces a canceled lookup.",
+    "HTTP204 acknowledges the request; terminal snapshots resolve404/422; unknown finality and refused live orders are failures.",
+    "Historical source preimages preserve prior receipt inputs across the approved main integration.",
+    "No broker, actual credential, fee, latency or paper-acceptance claim."
+  ],
+  "paper_acceptance": "NOT_RUN",
+  "runs": [
+    {
+      "assertion_failures": 1,
+      "command": "CPUWeight=idle native runtime_read_lock",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 1.478,
+      "errors": 0,
+      "exit_code": 1,
+      "output_bytes": 2012,
+      "output_sha256": "c4f0bc47d81895cb21550a2a5d24be714fbc100dbaf2161ed094b960132f74fb",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel422/cancel422-base-ea0-red.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel422/cancel422-base-ea0-red.sanitized.txt",
+      "python_argv": [
+        "-c",
+        "import sys,unittest; sys.path.insert(0,\"blueprints/us-equities/adaptive-paper\"); import runtime_lock\nwith runtime_lock.runtime_read_lock():\n r=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromName(\"tests.test_adaptive_paper_overnight_cancel_refusal\"))\n sys.exit(not r.wasSuccessful())"
+      ],
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "tests_run": 1
+    },
+    {
+      "assertion_failures": 0,
+      "command": "CPUWeight=idle native runtime_read_lock",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 6.398,
+      "errors": 0,
+      "exit_code": 0,
+      "output_bytes": 2761,
+      "output_sha256": "44c982031644f082cedabb3cde81c68b1f2e47eb7693352ac7d31927696c2e7c",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel422/cancel422-green-transport.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel422/cancel422-green-transport.sanitized.txt",
+      "python_argv": [
+        "-c",
+        "import sys,unittest; sys.path.insert(0,\"blueprints/us-equities/adaptive-paper\"); import runtime_lock\nwith runtime_lock.runtime_read_lock():\n r=unittest.TextTestRunner(verbosity=1).run(unittest.defaultTestLoader.loadTestsFromNames([\"tests.test_adaptive_paper_overnight_cancel_refusal\",\"tests.test_adaptive_paper_transport\"]))\n sys.exit(not r.wasSuccessful())"
+      ],
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "tests_run": 132
+    }
+  ],
+  "schema_version": 1,
+  "scope": "Pre-rebase422 blocker proof; post-rebase verification is recorded separately against its final tree",
+  "sources": {
+    "alpaca_py_pin": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+    "cancel_api": "https://docs.alpaca.markets/us/reference/deleteorderbyorderid-1.md"
+  },
+  "test_ids": [
+    "tests.test_adaptive_paper_overnight_cancel_refusal.OvernightCancelRefusal.test_422_live_lookup_releases_latch_retries_and_stops_entry_at_cutoff"
+  ]
+}

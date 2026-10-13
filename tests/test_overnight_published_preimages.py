@@ -14,7 +14,8 @@ spec.loader.exec_module(policy)
 RECEIPTS = ("blueprints/us-equities/adaptive-paper/overnight-arming-validation.json",
             "blueprints/us-equities/adaptive-paper/overnight-guard-pins-validation.json",
             "blueprints/us-equities/adaptive-paper/overnight-review-fix-validation.json",
-            "blueprints/us-equities/adaptive-paper/overnight-review-round2-validation.json")
+            "blueprints/us-equities/adaptive-paper/overnight-review-round2-validation.json",
+            "blueprints/us-equities/adaptive-paper/overnight-cancel-refusal-validation.json")
 ARTIFACTS = "evidence/artifacts/overnight-arming-20261013"
 
 

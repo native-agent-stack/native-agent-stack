@@ -179,3 +179,19 @@ contains no blacklist. Historical public input source blobs are retained as
 published preimages. Derived registry hashes are checked by their owning listing
 contract rather than treated as execution inputs in the older fix receipt.
 The historical SHAs remain viewable; no purge or broker acceptance is claimed.
+
+## REST cancellation refusal
+
+A broker DELETE refusal followed by a still-live order is a failed cancellation,
+not an acknowledgement. The transport now raises its bounded TransportError for
+that result, an unobserved broker identity, or missing post-DELETE finality.
+The controller's tracked cancellation task releases its retry latch on that
+failure. A synthetic SDK422/live lookup followed by204/canceled proves the
+entry stops working at cutoff without a rejection stream message. Confirmed
+terminal404/422 observations and successful204 acknowledgements remain data.
+This retains Alpaca's documented DELETE semantics through the installed SDK;
+no broker acceptance or cancellation-latency bound is claimed.
+
+The CC's20:12Z cue approves one blocker commit and a leased conflict-only rebase
+onto the named main base in one push. Historical public inputs that main changes
+are preserved before rebasing, so old execution receipts remain verifiable.

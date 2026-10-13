@@ -1919,7 +1919,7 @@ class AlpacaPaperTransport:
                 order = await self._lookup(client_order_id)
                 if order is None:
                     self.freeze_health("cancel_identity_unobserved")
-                    return None
+                    raise TransportError("cancel_identity_unobserved")
             self._assert_matches(order, self._intents[client_order_id])
             answer = 204
             try:
@@ -1937,9 +1937,11 @@ class AlpacaPaperTransport:
             final = await self._lookup(client_order_id)
             if final is None:
                 self.freeze_health("cancel_finality_unobserved")
-            elif answer in (404, 422) and final["status"] not in TERMINAL:
+                raise TransportError("cancel_finality_unobserved")
+            elif answer != 204 and final["status"] not in TERMINAL:
                 # A refusal for an order that is still working is not resolved data.
                 self.freeze_health("cancellation_unresolved")
+                raise TransportError("cancellation_unresolved")
             return final
 
     def _pages(self, status, *, after=None):

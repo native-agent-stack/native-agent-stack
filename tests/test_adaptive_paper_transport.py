@@ -740,8 +740,8 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
         missing = response({"code": 404, "message": "not found"}, 404)
         with patch.object(self.port._client._session._session, "request",
                           side_effect=[response(None, 204), missing]) as request:
-            result = await self.port.cancel("trial-1")
-        self.assertIsNone(result)
+            with self.assertRaisesRegex(t.TransportError,"cancel_finality_unobserved"):
+                await self.port.cancel("trial-1")
         # The known broker id is cancelled directly; no pre-DELETE lookup decides for the caller.
         self.assertEqual([c.args[0] for c in request.call_args_list], ["DELETE", "GET"])
         self.assertTrue(request.call_args_list[0].args[1].endswith("/v2/orders/" + ID))
@@ -782,8 +782,8 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
         with patch.object(self.port._client._session._session, "request", side_effect=[
                 response({"code": 42210000, "message": "not cancelable"}, 422),
                 response(order(status="pending_cancel", updated_at="2026-09-21T15:00:01Z"))]):
-            result = await self.port.cancel("trial-1")
-        self.assertEqual(result["status"], "pending_cancel")
+            with self.assertRaisesRegex(t.TransportError,"cancellation_unresolved"):
+                await self.port.cancel("trial-1")
         self.assertIn("cancellation_unresolved", self.port.health["reasons"])
 
     async def test_cancel_server_error_stays_unresolved(self):
