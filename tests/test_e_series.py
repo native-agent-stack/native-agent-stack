@@ -7,6 +7,7 @@ Every behaviour is paired with a negative control in the same test or in a sibli
 
 from __future__ import annotations
 
+import errno
 import hashlib
 import json
 import os
@@ -17,6 +18,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import uuid
 from pathlib import Path
 from unittest import mock
 
@@ -1487,6 +1489,15 @@ class PrepareTests(unittest.TestCase):
                     found[relative] = path.read_bytes()
         return found
 
+    def writer_folder(self):
+        """A new empty folder of this test's scratch directory, for the tests of write_owned that list what a call leaves behind."""
+        return Path(tempfile.mkdtemp(prefix="writer-", dir=self._tmp.name))
+
+    def file_identity(self, path):
+        """(bytes, inode, device, link count) of a file, read without following a link: what a file has that a write through another name of its inode would change."""
+        found = os.lstat(path)
+        return Path(path).read_bytes(), found.st_ino, found.st_dev, found.st_nlink
+
     def test_a_rebuild_never_follows_a_link_of_an_owned_root(self):
         """Review of #1046 at a461c2d76 (P1): `--rebuild` removed config/ with errors ignored, which leaves a link to a directory in place (shutil.rmtree raises on one, python/cpython@cbc944f4 Lib/shutil.py L676,
         and L736 swallows the error), and the copies then opened the link's target for writing (L262): an unrelated promptfooconfig.yaml was overwritten and the staged files were written beside it, exit 0. The same
@@ -1539,6 +1550,61 @@ class PrepareTests(unittest.TestCase):
                     self.assertEqual(done.returncode, 2, done.stdout + done.stderr)
                     self.assertIn(expected, done.stderr)
                     self.assertEqual(self.tree_state(root), before, "nothing was changed")
+
+    def test_a_hard_link_behind_an_owned_file_is_refused_and_its_other_name_is_never_written(self):
+        """Review of #1046 at 6ee9f2214 (P1): the entry check kept only the mode of an entry, so a settings.json or manifest.json that is a hard link passed it, and `--rebuild` truncated the unrelated file that shares
+        its inode (the reviewer's reproduction: a foreign sentinel hard-linked as the entry, exit 0, the sentinel replaced by the new settings or the new manifest). The writer now replaces the entry, and the check
+        refuses a file with another name first; the sentinel keeps its bytes, its inode and its link count, and the root is as it was, with or without --rebuild and under --dry-run."""
+        s = self.s
+        self.assertEqual(set(e1_prepare.OWNED_FILES), {"settings.json", "manifest.json"})
+        for name in e1_prepare.OWNED_FILES:
+            slug = name.replace(".", "-")
+            root, foreign = s.work / f"root-{slug}", s.work / f"foreign-{slug}"
+            self.assertEqual(s.prepare(root=root).returncode, 0)
+            foreign.write_bytes((root / name).read_bytes() if name == e1_prepare.MANIFEST else b"someone else's file\n")   # a valid manifest behind the link: the ownership check reads through it
+            (root / name).unlink()
+            os.link(foreign, root / name)
+            sentinel = self.file_identity(foreign)
+            self.assertEqual(sentinel[3], 2, "the entry and the sentinel are two names of one inode")
+            before = self.tree_state(root)
+            for extra in ((), ("--rebuild",), ("--rebuild", "--dry-run")):
+                with self.subTest(entry=name, arguments=extra):
+                    done = s.prepare(*extra, root=root)
+                    self.assertEqual(self.file_identity(foreign), sentinel, "the other name of the inode is as it was: bytes, inode, link count")
+                    self.assertEqual(done.returncode, 2, done.stdout + done.stderr)
+                    self.assertIn(f"{name} has more than one hard link", done.stderr)
+                    self.assertIn("nothing was changed", done.stderr)
+                    self.assertEqual(self.tree_state(root), before, "the root is as it was")
+
+    def test_a_hard_link_inside_an_owned_directory_is_not_followed_by_the_rebuild_and_a_file_with_one_name_is_not_refused(self):
+        """The boundary of the second line: it concerns the two files the script writes. A name inside config/ that shares an inode with a foreign file is removed as a name (shutil.rmtree unlinks), the foreign file
+        keeps its bytes and its inode, and a normal rebuild of a root whose files have one name each is not refused."""
+        s = self.s
+        self.assertEqual(s.prepare().returncode, 0)
+        foreign = s.work / "foreign-inside"
+        foreign.write_bytes(b"someone else's file\n")
+        os.link(foreign, s.root / "config" / "shared.txt")
+        sentinel = self.file_identity(foreign)
+        self.assertEqual(sentinel[3], 2)
+        self.assertEqual(e1_prepare.entry_problems(s.root), [], "directories, whose link count is not 1, and files with one name are what the script makes")
+        done = s.prepare("--rebuild")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertEqual(self.file_identity(foreign), (sentinel[0], sentinel[1], sentinel[2], 1), "only the name inside config/ was removed")
+        self.assertFalse((s.root / "config" / "shared.txt").exists())
+
+    def test_entry_problems_refuses_an_owned_file_with_more_than_one_name_and_nothing_else(self):
+        folder = Path(self._tmp.name) / "root"
+        (folder / "trees" / "base" / "sub").mkdir(parents=True)
+        (folder / "settings.json").write_text("{}\n")
+        (folder / "manifest.json").write_text("{}\n")
+        self.assertEqual(e1_prepare.entry_problems(folder), [])
+        os.link(folder / "manifest.json", folder.parent / "other-name")
+        self.assertEqual(e1_prepare.entry_problems(folder), ["manifest.json has more than one hard link"])
+        os.link(folder / "settings.json", folder.parent / "settings-other-name")
+        self.assertEqual(e1_prepare.entry_problems(folder), ["settings.json has more than one hard link", "manifest.json has more than one hard link"])
+        (folder / "settings.json").unlink()
+        (folder / "settings.json").symlink_to(folder.parent / "settings-other-name")
+        self.assertEqual(e1_prepare.entry_problems(folder), ["settings.json is a link", "manifest.json has more than one hard link"], "a link is a link, and the hard link is still named")
 
     def test_a_rebuild_of_an_owned_root_replaces_trees_and_config_keeps_out_and_leaves_the_sdk_copy_alone(self):
         """The control of the containment test above: with no link in the root a rebuild still replaces trees/ and config/ (the link INSIDE config/ to the SDK copy is removed as a link, its target is not followed)
@@ -1618,19 +1684,124 @@ class PrepareTests(unittest.TestCase):
         self.assertTrue(link.is_symlink())
         self.assertEqual((target / "keep.txt").read_text(), "kept\n")
 
-    def test_write_owned_rewrites_a_regular_file_and_refuses_a_link_whose_target_it_leaves_alone(self):
-        folder = Path(self._tmp.name)
+    def test_write_owned_replaces_the_entry_and_never_writes_through_a_hard_link_or_a_symbolic_link(self):
+        """Review of #1046 at 6ee9f2214 (P1): the writer opened the entry itself with O_TRUNC, which writes through every other name of its inode. It makes a new file and renames it over the entry (python/cpython@cbc944f4bc59
+        Doc/library/os.rst L2754-L2761; rename(2): any other hard link to the file is unaffected, and a symbolic link at the new name is overwritten), so even a link that appeared after the entry check leaves its target alone."""
+        folder = self.writer_folder()
+        foreign = folder / "foreign.json"
+        foreign.write_text("foreign\n")
+        entry = folder / "settings.json"
+        os.link(foreign, entry)
+        before = self.file_identity(foreign)
+        self.assertEqual(before[3], 2)
+        e1_prepare.write_owned(entry, "new text\n")
+        after = self.file_identity(foreign)
+        self.assertEqual(after, (before[0], before[1], before[2], 1), "the other name keeps its bytes and its inode; the entry is no longer one of its names")
+        self.assertEqual(entry.read_text(), "new text\n")
+        self.assertNotEqual(os.lstat(entry).st_ino, before[1])
+        self.assertEqual(os.lstat(entry).st_nlink, 1)
         target = folder / "target.txt"
         target.write_text("foreign\n")
         link = folder / "link.json"
         link.symlink_to(target)
-        with self.assertRaises(e1_prepare.Refusal):
-            e1_prepare.write_owned(link, "overwritten\n")
-        self.assertEqual(target.read_text(), "foreign\n")
+        target_before = self.file_identity(target)
+        e1_prepare.write_owned(link, "overwritten\n")
+        self.assertFalse(link.is_symlink(), "the link itself was replaced")
+        self.assertEqual(link.read_text(), "overwritten\n")
+        self.assertEqual(self.file_identity(target), target_before, "what the link named is as it was")
         plain = folder / "plain.json"
         e1_prepare.write_owned(plain, "one long line\n")
         e1_prepare.write_owned(plain, "two\n")
-        self.assertEqual(plain.read_text(), "two\n", "an existing regular file is truncated and rewritten")
+        self.assertEqual(plain.read_text(), "two\n", "an existing regular file is rewritten")
+        umask = os.umask(0)
+        os.umask(umask)
+        self.assertEqual(stat.S_IMODE(os.lstat(plain).st_mode), 0o666 & ~umask, "the mode these files always had: 0666 less the umask")
+        self.assertEqual(sorted(p.name for p in folder.iterdir() if p.name.startswith(".")), [], "no new file is left behind")
+
+    def test_write_owned_makes_a_new_file_beside_the_entry_syncs_it_and_renames_it_over_the_entry(self):
+        """The three steps of the ruling, in order: a new file in the same directory created with O_CREAT|O_EXCL|O_NOFOLLOW (and without O_TRUNC), written and fsynced, then os.replace."""
+        folder = self.writer_folder()
+        entry = folder / "manifest.json"
+        entry.write_text("old\n")
+        events = []
+        real_open, real_fsync, real_replace = os.open, os.fsync, os.replace
+
+        def recording_open(path, flags, *rest, **keywords):
+            events.append(("open", Path(path), flags))
+            return real_open(path, flags, *rest, **keywords)
+
+        def recording_fsync(descriptor):
+            events.append(("fsync", descriptor))
+            events.append(("bytes at fsync", events[0][1].read_bytes()))       # the new file, whose name the open recorded
+            return real_fsync(descriptor)
+
+        def recording_replace(source, destination, *rest, **keywords):
+            events.append(("replace", Path(source), Path(destination)))
+            events.append(("bytes at replace", Path(source).read_bytes()))
+            return real_replace(source, destination, *rest, **keywords)
+        with mock.patch.object(os, "open", recording_open), mock.patch.object(os, "fsync", recording_fsync), mock.patch.object(os, "replace", recording_replace):
+            e1_prepare.write_owned(entry, "new text\n")
+        kinds = [event[0] for event in events]
+        self.assertEqual(kinds, ["open", "fsync", "bytes at fsync", "replace", "bytes at replace"], "one new file: created, synced, renamed")
+        opened, replaced = events[0], events[3]
+        temporary = opened[1]
+        self.assertNotEqual(temporary, entry)
+        self.assertEqual(temporary.parent, entry.parent, "the same directory, so the rename does not cross a file system")
+        for flag in ("O_WRONLY", "O_CREAT", "O_EXCL", "O_NOFOLLOW"):
+            self.assertTrue(opened[2] & getattr(os, flag), flag)
+        self.assertFalse(opened[2] & os.O_TRUNC, "the entry is never truncated in place")
+        self.assertEqual(events[2][1], b"new text\n", "the bytes were flushed before the sync")
+        self.assertEqual((replaced[1], replaced[2]), (temporary, entry), "the new file is renamed over the entry")
+        self.assertEqual(events[4][1], b"new text\n")
+        self.assertEqual(entry.read_text(), "new text\n")
+        self.assertFalse(temporary.exists())
+
+    def test_write_owned_leaves_the_entry_as_it_was_and_no_new_file_behind_when_the_replace_fails(self):
+        folder = self.writer_folder()
+        entry = folder / "settings.json"
+        entry.write_text("old\n")
+        before = self.file_identity(entry)
+        with mock.patch.object(os, "replace", side_effect=OSError(errno.EXDEV, "cross-device")):
+            with self.assertRaises(e1_prepare.Refusal) as caught:
+                e1_prepare.write_owned(entry, "new text\n")
+        self.assertIn("settings.json could not be written", str(caught.exception))
+        self.assertEqual(self.file_identity(entry), before, "the entry is as it was")
+        self.assertEqual(sorted(p.name for p in folder.iterdir()), ["settings.json"], "the new file was removed again")
+        with mock.patch.object(os, "fsync", side_effect=KeyboardInterrupt):
+            with self.assertRaises(KeyboardInterrupt):
+                e1_prepare.write_owned(entry, "new text\n")
+        self.assertEqual(sorted(p.name for p in folder.iterdir()), ["settings.json"], "not an OSError either: the new file is removed and the exception goes on")
+        self.assertEqual(self.file_identity(entry), before)
+
+    def test_write_owned_never_opens_a_file_that_already_has_the_name_of_its_new_file(self):
+        """O_EXCL: a planted file or link at the name of the new file is refused, left alone and not removed, and nothing is written through it."""
+        folder = self.writer_folder()
+        entry = folder / "settings.json"
+        fixed = uuid.UUID(int=0x1234)
+        names = []
+        real_open = os.open
+
+        def recording_open(path, flags, *rest, **keywords):
+            names.append(Path(path))
+            return real_open(path, flags, *rest, **keywords)
+        with mock.patch.object(e1_prepare.uuid, "uuid4", return_value=fixed), mock.patch.object(os, "open", recording_open):
+            e1_prepare.write_owned(entry, "learned the name\n")
+        planted = names[0]
+        self.assertEqual(planted.parent, folder)
+        self.assertFalse(planted.exists())
+        entry.write_text("old\n")
+        target = folder / "target.txt"
+        target.write_text("foreign\n")
+        for label, plant in (("a regular file", lambda: planted.write_text("planted\n")), ("a symbolic link", lambda: planted.symlink_to(target))):
+            with self.subTest(planted=label):
+                plant()
+                before = {path.name: (path.is_symlink(), path.read_bytes() if not path.is_symlink() else os.readlink(path)) for path in (planted, target, entry)}
+                with mock.patch.object(e1_prepare.uuid, "uuid4", return_value=fixed):
+                    with self.assertRaises(e1_prepare.Refusal):
+                        e1_prepare.write_owned(entry, "new text\n")
+                after = {path.name: (path.is_symlink(), path.read_bytes() if not path.is_symlink() else os.readlink(path)) for path in (planted, target, entry)}
+                self.assertEqual(after, before, "the planted file, what it names and the entry are as they were")
+                planted.unlink()
 
     def test_each_field_a_later_step_reads_is_checked_in_an_otherwise_valid_manifest(self):
         s = self.s

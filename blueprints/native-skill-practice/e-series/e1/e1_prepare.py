@@ -12,12 +12,16 @@ The root must be outside the repository and outside $HOME (the fence denies read
 manifest of this harness (validate_manifest), and replacing it takes --rebuild, which replaces its trees and config and keeps out/ (each result file there is bound to the preparation that produced it by
 e1_gate.py, so a rebuild does not let an older generation's files be decided with a newer one's). Any other non-empty directory is refused, with or without --rebuild, and left as it was. Nothing here calls
 a model or reads a key. Exit 0 prepared, 2 a refusal with the reason on stderr.
-A rebuild never follows a link: each entry it removes, creates or writes (trees/, config/, the work directories, settings.json, manifest.json) is looked at with lstat before anything is changed, and an owned
-root in which one of them is a link, or is not what the script makes (a directory; a regular file for settings.json and manifest.json), is refused and left as it was. shutil.rmtree stops at a link to a directory and the copies that follow
-open the link's target for writing (CPython cbc944f4 Lib/shutil.py L676, L736, L262), so removing with errors ignored and then populating would write into whatever the link names. A removal that fails stops
-the rebuild: nothing is written into a path that could not be cleared.
+A rebuild never follows a link and never writes through an inode: each entry it removes, creates or writes (trees/, config/, the work directories, settings.json, manifest.json) is looked at with lstat before anything is
+changed, and an owned root in which one of them is a link, is not what the script makes (a directory; a regular file for settings.json and manifest.json), or is a regular file with more than one hard link, is refused and left
+as it was. shutil.rmtree stops at a link to a directory and the copies that follow open the link's target for writing (CPython cbc944f4 Lib/shutil.py L676, L736, L262), so removing with errors ignored and then populating
+would write into whatever the link names. A removal that fails stops the rebuild: nothing is written into a path that could not be cleared. settings.json and manifest.json are written by atomic replace (write_owned): a new
+file made in the same directory with O_CREAT|O_EXCL|O_NOFOLLOW, written, fsynced and os.replace()d over the entry. rename(2) replaces the directory entry and leaves the old inode, and every other name it has, as it was, so a
+hard link or a symbolic link at the entry cannot redirect or truncate another file even if it appeared after the check; the check is the second line (CPython cbc944f4 Doc/library/os.rst L2754-L2761 and Modules/posixmodule.c
+L5863; Linux man-pages 6.19 rename(2); POSIX.1-2024 rename()).
 """
 import argparse
+import contextlib
 import hashlib
 import json
 import os
@@ -113,22 +117,25 @@ def owner_problems(root):
 
 
 def entry_problems(root):
-    """The entries of `root` that are not the ones this script makes: each of OWNED_DIRS must be absent or a real directory and each of OWNED_FILES absent or a regular file. lstat, so a link is seen as one and
-    never followed: a rebuild removes and writes into what these names lead to, and a link leads out of the root."""
+    """The entries of `root` that are not the ones this script makes: each of OWNED_DIRS must be absent or a real directory and each of OWNED_FILES absent or a regular file with one name. lstat, so a link is seen as one
+    and never followed: a rebuild removes and writes into what these names lead to, and a link leads out of the root. A regular file with more than one hard link is refused too (st_nlink, CPython cbc944f4
+    Doc/library/os.rst L3125): another name of its inode is outside the root. write_owned replaces the entry and never writes through it, so this is the second line behind it, and it keeps the root as it was."""
     problems = []
     for names, wanted, kind in ((OWNED_DIRS, stat.S_ISDIR, "a directory"), (OWNED_FILES, stat.S_ISREG, "a regular file")):
         for name in names:
             try:
-                mode = os.lstat(root / name).st_mode
+                found = os.lstat(root / name)
             except FileNotFoundError:
                 continue
             except OSError:
                 problems.append(f"{name} cannot be inspected")
                 continue
-            if stat.S_ISLNK(mode):
+            if stat.S_ISLNK(found.st_mode):
                 problems.append(f"{name} is a link")
-            elif not wanted(mode):
+            elif not wanted(found.st_mode):
                 problems.append(f"{name} is not {kind}")
+            elif wanted is stat.S_ISREG and found.st_nlink > 1:
+                problems.append(f"{name} has more than one hard link")
     return problems
 
 
@@ -144,13 +151,29 @@ def remove_tree(path):
 
 
 def write_owned(path, text):
-    """Write `text` to the file `path` of the root without following a link at `path` (O_NOFOLLOW), even if one appeared after entry_problems looked."""
+    """Write `text` as the file `path` of the root by atomic replace, so that nothing at `path` is ever written through: a new file is made in the same directory (O_CREAT|O_EXCL|O_NOFOLLOW, under a name no file has),
+    written, fsynced, and os.replace()d over `path`. rename(2) replaces the directory entry and leaves the old inode, and every other name it has, as it was: a hard link or a symbolic link at `path` can no longer redirect or
+    truncate another file, even one that appeared after entry_problems looked (CPython cbc944f4 Doc/library/os.rst L2754-L2761 and Modules/posixmodule.c L5863; Linux man-pages 6.19 rename(2) L47-L50, L58-L63, L92-L97;
+    POSIX.1-2024 rename()). The new file is in the same directory so that the rename does not cross a file system, and is removed again if anything fails before the replace; one left by a crash is a stray file that
+    nothing reads. The directory is not fsynced: a crash leaves the old entry or the new one, and a rebuild is the recovery."""
+    path = Path(path)
+    temporary = path.with_name(f".{path.name}.{uuid.uuid4().hex}.tmp")
     try:
-        descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC | getattr(os, "O_NOFOLLOW", 0), 0o666)
+        descriptor = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0), 0o666)
     except OSError as error:
-        raise Refusal(f"{Path(path).name} could not be written without following a link ({error.strerror or type(error).__name__})") from None
-    with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
-        stream.write(text)
+        raise Refusal(f"{path.name} could not be written ({error.strerror or type(error).__name__})") from None
+    try:
+        with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
+            stream.write(text)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, path)
+    except BaseException as error:
+        with contextlib.suppress(OSError):
+            os.unlink(temporary)
+        if isinstance(error, OSError):
+            raise Refusal(f"{path.name} could not be written ({error.strerror or type(error).__name__})") from None
+        raise
 
 
 def check_root(root, repo, home, rebuild=False):
@@ -170,8 +193,8 @@ def check_root(root, repo, home, rebuild=False):
     if problems:   # a file named manifest.json does not make a directory ours: nothing in a directory that is not a root of this harness is changed, with or without --rebuild
         raise Refusal(f"the root exists, is not empty and is not a root of this harness ({problems[0]}); nothing was changed")
     problems = entry_problems(root)
-    if problems:   # a rebuild removes and writes into what these names lead to: a link, or an entry of the wrong kind, is refused before anything is changed, with or without --rebuild
-        raise Refusal(f"the root holds an entry that is not the one this script makes ({problems[0]}): a rebuild would remove or write through it; nothing was changed")
+    if problems:   # a rebuild removes and writes into what these names lead to: a link, an entry of the wrong kind, or a file with another name, is refused before anything is changed, with or without --rebuild
+        raise Refusal(f"the root holds an entry that is not the one this script makes ({problems[0]}): a rebuild would remove or replace what it leads to; nothing was changed")
     if not rebuild:
         raise Refusal("the root already holds a prepared E1 root; pass --rebuild to replace its trees, config and manifest")
 
