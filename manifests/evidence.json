@@ -5252,8 +5252,8 @@
     },
     {
       "path": ".gitleaksignore",
-      "sha256": "b17156d26a9041d78135927b08fc45bd892d0c603e9484966f8c47c3d8d41721",
-      "bytes": 7333
+      "sha256": "29b1fe5eae0c3b02c6b4e3b7c636062a11df8ce499e4756930e462acf152c284",
+      "bytes": 12865
     },
     {
       "path": ".jcodemunch.jsonc",

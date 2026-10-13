@@ -95,3 +95,45 @@
 # the default all-refs acceptance command reach 0 findings without editing
 # .gitleaks.toml (owned by another PR) or that sibling branch.
 34fc51beaf24114fe266f73b2e36ae8176c8a521:tests/test_lane_packets.py:generic-api-key:255
+
+# 2026-10-13: the same reviewed narrative lines, found again in the two merge commits that integrated them into main
+# (9b7a67b9, "Integrate PRs #55-#58 into one grand-catalog base", and 5cfed346, "Merge PR #55 ... into the grand-catalog
+# base"). The CI history scan has read merge commits as first-parent diffs (`--diff-merges=first-parent`) since the
+# 2026-10-09 out-of-memory fix, so it now reaches these two commits, which the 2026-09-22 `--log-opts=HEAD` generation
+# above did not fingerprint. Verified shape-only by the api-actions lane: all 30 findings (28 fingerprints, 10 distinct
+# values) are 40-character lower-case hex git object ids with no `sgp_` prefix. Eight values resolve as commit objects in
+# local mirrors of the upstream repositories the text names, and the other two as commits of the GitHub repositories
+# named in this repository's own blob/ and tree/ links to them. The command center confirmed each fingerprint from that
+# value-free table (its confirmation record of 2026-10-13, cited by name).
+
+# evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json (2026-10-13, merge commits 9b7a67b9 and 5cfed346)
+9b7a67b98eea708af7b495037c01b3f8f327d558:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:338
+9b7a67b98eea708af7b495037c01b3f8f327d558:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:424
+9b7a67b98eea708af7b495037c01b3f8f327d558:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:462
+9b7a67b98eea708af7b495037c01b3f8f327d558:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:468
+9b7a67b98eea708af7b495037c01b3f8f327d558:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:525
+9b7a67b98eea708af7b495037c01b3f8f327d558:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:682
+9b7a67b98eea708af7b495037c01b3f8f327d558:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:1439
+9b7a67b98eea708af7b495037c01b3f8f327d558:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:1445
+9b7a67b98eea708af7b495037c01b3f8f327d558:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:2567
+9b7a67b98eea708af7b495037c01b3f8f327d558:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:2915
+9b7a67b98eea708af7b495037c01b3f8f327d558:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:2950
+5cfed346a4e56cafbf448b51a1422ae47e5ae8f0:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:338
+5cfed346a4e56cafbf448b51a1422ae47e5ae8f0:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:424
+5cfed346a4e56cafbf448b51a1422ae47e5ae8f0:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:462
+5cfed346a4e56cafbf448b51a1422ae47e5ae8f0:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:468
+5cfed346a4e56cafbf448b51a1422ae47e5ae8f0:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:525
+5cfed346a4e56cafbf448b51a1422ae47e5ae8f0:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:682
+5cfed346a4e56cafbf448b51a1422ae47e5ae8f0:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:1439
+5cfed346a4e56cafbf448b51a1422ae47e5ae8f0:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:1445
+5cfed346a4e56cafbf448b51a1422ae47e5ae8f0:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:2567
+5cfed346a4e56cafbf448b51a1422ae47e5ae8f0:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:2915
+5cfed346a4e56cafbf448b51a1422ae47e5ae8f0:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:2950
+
+# evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json (2026-10-13, merge commits 9b7a67b9 and 5cfed346)
+9b7a67b98eea708af7b495037c01b3f8f327d558:evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json:sourcegraph-access-token:9360
+9b7a67b98eea708af7b495037c01b3f8f327d558:evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json:sourcegraph-access-token:10815
+9b7a67b98eea708af7b495037c01b3f8f327d558:evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json:sourcegraph-access-token:10890
+5cfed346a4e56cafbf448b51a1422ae47e5ae8f0:evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json:sourcegraph-access-token:9360
+5cfed346a4e56cafbf448b51a1422ae47e5ae8f0:evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json:sourcegraph-access-token:10815
+5cfed346a4e56cafbf448b51a1422ae47e5ae8f0:evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json:sourcegraph-access-token:10890
