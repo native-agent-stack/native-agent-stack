@@ -71,7 +71,7 @@ class _NoLeakMixin:
 
 class PaperBaseUrl(_NoLeakMixin, unittest.TestCase):
     def test_normalization_is_idempotent_for_every_allowed_spelling(self):
-        for authority in ("paper-api.alpaca.markets","paper-api.alpaca.markets:443"):
+        for authority in ("paper-api.alpaca.markets",):
             for path in ("","/","/v2","/v2/"):
                 value="https://"+authority+path
                 with self.subTest(value=value):
@@ -81,7 +81,7 @@ class PaperBaseUrl(_NoLeakMixin, unittest.TestCase):
 
     def test_strict_components_and_all_ascii_controls_are_refused(self):
         bad=[PAPER+suffix for suffix in ("//","/v1","/v2/extra","/v2//","?","#","/v2?","/v2#","/v%32")]
-        bad += ["https://paper-api.alpaca.markets:"+port+"/v2" for port in ("","8443","invalid","00443")]
+        bad += ["https://paper-api.alpaca.markets:"+port+"/v2" for port in ("","443","8443","invalid","00443")]
         bad += ["https://"+prefix+"paper-api.alpaca.markets/v2" for prefix in ("@","user@","user:pass@")]
         bad += [None, b"https://paper-api.alpaca.markets/v2",7,PAPER+" "," "+PAPER]
         for value in bad:
@@ -92,13 +92,37 @@ class PaperBaseUrl(_NoLeakMixin, unittest.TestCase):
                 with self.subTest(value=repr(value)):
                     self.assertIsNone(cs.normalize_paper_base_url(value))
 
-    def test_all_version_and_default_port_spellings_share_the_paper_pin(self):
-        for authority in ("paper-api.alpaca.markets","paper-api.alpaca.markets:443"):
+    def test_all_version_spellings_share_the_paper_pin(self):
+        for authority in ("paper-api.alpaca.markets",):
             for path in ("","/","/v2","/v2/"):
                 value="https://"+authority+path
                 with self.subTest(value=value):
                     self.assertIsNone(cs.paper_base_url_reason(value))
                     cs.require_paper_base_url(value)
+
+    def test_every_explicit_port_is_refused_without_leak(self):
+        for port in ("443", "80", "8443", "00443", "", "invalid"):
+            for suffix in ("", "/", "/v2", "/v2/"):
+                value=PAPER+":"+port+suffix
+                with self.subTest(value=value):
+                    self.assertIsNone(cs.normalize_paper_base_url(value))
+                    with self.assertRaises(cs.CredentialSourceError) as caught:
+                        cs.require_paper_base_url(value)
+                    self.assertRefusedWithoutLeak(caught.exception,cs.REASON_NOT_PAPER,value)
+
+    def test_noncanonical_case_unicode_and_foreign_userinfo_are_refused(self):
+        for value in (
+                "https://paper-api.alpaca.markets@foreign.invalid/v2",
+                "https://Paper-Api.alpaca.markets/v2", PAPER+"/V2",
+                "https://paper-api.alpaca.markets./v2", PAPER+"\u00a0",
+                "https://p\u0430per-api.alpaca.markets/v2",
+                "https://xn--paper-api-2jg.alpaca.markets/v2",
+                "https://\uff50aper-api.alpaca.markets/v2"):
+            with self.subTest(value=value):
+                self.assertIsNone(cs.normalize_paper_base_url(value))
+                with self.assertRaises(cs.CredentialSourceError) as caught:
+                    cs.require_paper_base_url(value)
+                self.assertRefusedWithoutLeak(caught.exception,cs.REASON_NOT_PAPER,value)
 
     def test_absent_and_exact_paper_url_are_accepted(self):
         for value in (None, PAPER, PAPER + "/"):
@@ -305,16 +329,27 @@ def write_env(directory, *extra_lines):
 
 
 class EnvFilePaperOnly(_NoLeakMixin, unittest.TestCase):
+    """Both loaders' `credentials(path, paper_only=True)` refuse a non-paper
+    APCA_API_BASE_URL line; the default keeps the earlier behavior."""
+
     def test_versioned_paper_url_is_accepted_by_both_real_file_loaders(self):
-        for authority in ("paper-api.alpaca.markets","paper-api.alpaca.markets:443"):
+        for authority in ("paper-api.alpaca.markets",):
             for suffix in ("","/","/v2","/v2/"):
                 path=write_env(self.root,"APCA_API_BASE_URL=https://"+authority+suffix)
                 for loader in (runner_module.credentials,mr.credentials):
                     with self.subTest(authority=authority,suffix=suffix,loader=loader.__module__):
                         self.assertEqual(loader(path,paper_only=True),(KEY,SECRET))
 
-    """Both loaders' `credentials(path, paper_only=True)` refuse a non-paper
-    APCA_API_BASE_URL line; the default keeps the earlier behavior."""
+    def test_explicit_default_port_is_refused_by_both_real_file_loaders(self):
+        for suffix in ("", "/", "/v2", "/v2/"):
+            value=PAPER+":443"+suffix
+            path=write_env(self.root,"APCA_API_BASE_URL="+value)
+            for loader,error_type in ((runner_module.credentials,runner_module.SafetyError),
+                                      (mr.credentials,mr.ResearchError)):
+                with self.subTest(suffix=suffix,loader=loader.__module__):
+                    with self.assertRaises(error_type) as caught:
+                        loader(path,paper_only=True)
+                    self.assertRefusedWithoutLeak(caught.exception,cs.REASON_NOT_PAPER,value)
 
     def test_fixture_text_carries_the_stand_ins(self):
         self.assertEqual(ENV_BODY.splitlines(), [f"APCA_API_KEY_ID={KEY}", f"APCA_API_SECRET_KEY={SECRET}"])

@@ -13118,8 +13118,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README.md",
-      "sha256": "9694aa4d91adb67ca6896ac6b2a291c42f9dc34306fa0206bd326c9be2f4da07",
-      "bytes": 20966
+      "sha256": "ca19dba61099fc8a672fb891bc042101da9db7ebb654b2d8da3971a0beea6c4c",
+      "bytes": 21261
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/adaptive_policy_v1.receipt.json",
@@ -13178,8 +13178,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/credential_source.py",
-      "sha256": "917f2a2b30065ff9340b577be29931a36b6106a5148498e9f7c7dd5c919c21c6",
-      "bytes": 10202
+      "sha256": "e1a57dd899c9499ec36e6fc07518e1f2224d1fb9c3709f78808d830bcc459b10",
+      "bytes": 10160
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/evidence-hashes.json",
@@ -13503,7 +13503,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "9dcc93a0a6bb30f85f4dee17f37887079499b1f9f003a3541ef368277b28f685",
+      "sha256": "7fe87ad78e29e9378013c7481765e79cb4f0a67fdaf601ce49ea713f679900ec",
       "bytes": 9624
     },
     {
@@ -18113,8 +18113,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-broker-credential-handling.md",
-      "sha256": "7dcc0f11fc5c24ceaf7c791a7556e3efb204068a49cb3345ef23ed1282535eba",
-      "bytes": 30740
+      "sha256": "1b6324c5cb9cf9c825f038e0ff0334d6459622dc0211683f72d7b147af38edf9",
+      "bytes": 30730
     },
     {
       "path": "docs/decisions/2026-09-22-codeql-first-analysis.md",
@@ -19093,8 +19093,8 @@
     },
     {
       "path": "docs/decisions/2026-10-13-strict-paper-url-gates.md",
-      "sha256": "be95ba0bd6aedd5334cf2d97cd1ebbab300aff21f7990cd8609267ec064d48ab",
-      "bytes": 5386
+      "sha256": "172927d56413762dc04f333cb6c236b1a85bb70a06740a8359c0d8cac904e8af",
+      "bytes": 6429
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -61903,8 +61903,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_credential_source.py",
-      "sha256": "a14049da20bc68c98cd6cf06382c41fedef0cd9fb999f959c748ce0209c553f6",
-      "bytes": 28531
+      "sha256": "a743392ae1f8b4d7e52fe56d905e76fda1d70c88f3f3433fc3e069c1169b24e7",
+      "bytes": 30528
     },
     {
       "path": "tests/test_adaptive_paper_exit_quote_age.py",
@@ -62958,8 +62958,8 @@
     },
     {
       "path": "tests/test_order_throughput.py",
-      "sha256": "c275233b4acca371f4e9c68ec11abeade2a4f43ce200b2befbc56c8b70def322",
-      "bytes": 79866
+      "sha256": "ed000da074fef397cd5577ae9401d77c3870e8bd28fcb054ff505e53bd92a2af",
+      "bytes": 81008
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",

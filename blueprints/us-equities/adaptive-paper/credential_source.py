@@ -15,8 +15,8 @@ Two explicit sources, chosen with `--credentials`:
 
 Both sources are paper-only. The base URL is pinned to `PAPER_BASE_URL`; an
 `APCA_API_BASE_URL` in the process environment (either source) or in the env
-file (`env-file`) accepts only the canonical HTTPS paper authority (optional
-port 443) with no path or `/v2`, each optionally ending in one slash.
+file (`env-file`) accepts only the canonical HTTPS paper authority without
+any explicit port, with no path or `/v2`, each optionally ending in one slash.
 Everything else is refused before any broker request: the live trading
 host with `REASON_LIVE_HOST`, every other value with `REASON_NOT_PAPER`.
 
@@ -100,8 +100,7 @@ def normalize_paper_base_url(value):
         parsed=urlsplit(value)
     except ValueError:
         return None
-    if (parsed.netloc not in
-            ("paper-api.alpaca.markets","paper-api.alpaca.markets:443")
+    if (parsed.netloc != "paper-api.alpaca.markets"
             or parsed.path not in ("","/","/v2","/v2/")):
         return None
     return PAPER_BASE_URL

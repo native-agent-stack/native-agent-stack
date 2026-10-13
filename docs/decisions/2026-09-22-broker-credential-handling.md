@@ -308,9 +308,9 @@ error.
 The strict spelling rules below apply to `APCA_API_BASE_URL` in the process environment (both sources)
 or in the env file (`env-file`, via `credentials(path, paper_only=True)`); other values refuse before any request:
 `alpaca_paper_only:live_host` for `api.alpaca.markets`, and `alpaca_paper_only:not_paper_host` for everything
-else, including an empty value, `http`, a nondefault/malformed port, userinfo,
+else, including an empty value, `http`, any explicit port, userinfo,
 an unsupported path and a noncanonical letter case. As corrected on 2026-10-13,
-the canonical HTTPS paper authority accepts optional port 443 and paths empty,
+the canonical HTTPS paper authority refuses all ports and accepts paths empty,
 `/`, `/v2` or `/v2/`, while raw controls/whitespace and query/fragment delimiters
 refuse. The transport already sends every request to the paper host (`PAPER_URL`, `paper=True`) and
 `runner.load_config` already requires the paper endpoint. This rule makes a live setting in the shell or the file stop the run

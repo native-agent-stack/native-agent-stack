@@ -29,17 +29,26 @@ and reuses it from capacity.env_base_url instead of keeping two parsers.
 
 The shared normalizer returns only the canonical paper host or None. It
 requires HTTPS and the exact canonical authority paper-api.alpaca.markets,
-with optional explicit port 443. Paths are empty, /, /v2 or /v2/.
-Userinfo, other authorities/ports, an empty or malformed port, other paths,
+with no explicit port. Paths are empty, /, /v2 or /v2/; /v2// is refused.
+Userinfo, other authorities, every port (including 443), other paths,
 query/fragment delimiters (including empty components), whitespace and raw
-ASCII controls are refused. Exact authority matching also retains the prior
-credential gate's conservative case and port-spelling policy. A versioned
-env value never becomes the request URL.
+ASCII controls are refused. The CC's 2026-10-13 review ruling retains the
+prior credential gate's no-port policy and makes capacity stricter than #1069,
+whose port rule accepted 443. A versioned env value never becomes the request URL.
+
+[RFC 3986 section 3.2.2](https://www.rfc-editor.org/rfc/rfc3986#section-3.2.2)
+defines hosts as case-insensitive and recommends lowercase registered names.
+This gate deliberately requires the exact lowercase canonical spelling rather
+than accepting and case-folding equivalent names. Mixed-case, trailing-dot,
+IDN/punycode and fullwidth host spellings are refused, as are uppercase /V2,
+foreign-host userinfo and Unicode whitespace including U+00A0.
 
 The credential-source reason gate retains absent-URL compatibility and its
 fixed live-host/other-host refusal codes. Both env-file loaders (runner and
 market_research), keychain-env and process-env selection use that same gate.
-Mover reuses runner's file loader; it adds no independent URL parser. The
+Mover reuses runner's file loader without paper_only=True and has no URL
+gate at its paper/recover credential reads; adding that gate is a separate
+follow-up, not coverage supplied by this PR. The
 capacity external env reader uses the shared normalizer; internal
 CapacityConfig.validate still requires the canonical PAPER_URL.
 Capacity's new receipts include credential_source.py in source_provenance,
@@ -71,15 +80,21 @@ by this source PR; no paper command is run from its unmerged branch.
 
 Fail-before tests on the base reproduce rejection of /v2 in the shared reason
 gate, keychain-env and env-file source selection. Fake-file tests exercise
-both real guarded loaders. Capacity's eight accepted authority/path forms
+both real guarded loaders. Capacity's four accepted authority/path forms
 and rejection controls continue to run through its actual config validation.
 All fake files live in scratch outside Git; no real keys or broker calls.
 
-Normalization idempotence covers all eight allowed lower-case spellings;
+Normalization idempotence covers all four allowed lower-case spellings;
 the raw-input matrix checks all ASCII controls at multiple positions plus
 malformed components. These are deterministic unittest matrices and finite
 metamorphic checks, not a claim of exhaustive testing of arbitrary Unicode.
+Review regressions for :443 fail at 3b6279f3 through the normalizer, reason
+gate, both guarded file loaders and capacity. The additional case, userinfo
+and Unicode refusal cases already pass there; their new tests pin existing
+behavior rather than claim a reproduced acceptance defect.
 
-Follow-ups: the separately recorded mover config-snapshot race remains a
-different PR. Actual account readiness and the new unit/pin activation are
+Follow-ups: add the missing paper_only base-URL gate to mover paper and
+recover credential reads (mover_runner.py:705,936 at 3b6279f3) in its own PR.
+The separately recorded mover config-snapshot race remains a different PR.
+Actual account readiness and the new unit/pin activation are
 observed operator events, not predictions from these synthetic checks.
