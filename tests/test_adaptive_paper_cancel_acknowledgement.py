@@ -39,7 +39,13 @@ class CancelAcknowledgement(unittest.TestCase):
                 with self.subTest(status=status.value, terminal_source=terminal_source):
                     self._exercise(status, terminal_source)
 
-    def _exercise(self, status, terminal_source):
+    def test_rejection_during_lookup_releases_pending_and_allows_one_retry(self):
+        for status in (OrderStatus.ACCEPTED, OrderStatus.NEW, OrderStatus.PENDING_CANCEL):
+            for terminal_source in ('stream', 'lookup'):
+                with self.subTest(status=status.value, terminal_source=terminal_source):
+                    self._exercise(status, terminal_source, reject_first=True)
+
+    def _exercise(self, status, terminal_source, reject_first=False):
         from native_strategy import AdaptiveStrategy
         from mover import MoverBook
         from safety import Ledger
@@ -59,11 +65,18 @@ class CancelAcknowledgement(unittest.TestCase):
                 'qty': '1', 'limit_price': '10.01', 'filled_qty': '0', 'filled_avg_price': None,
                 'status': status.value,
                 'updated_at': datetime.fromtimestamp(clock[0], timezone.utc).isoformat()}
-            calls, closed, frozen = [], [], []
+            calls, closed, frozen, rejections = [], [], [], []
 
             class HTTP:
                 def request(self, method, url, **kwargs):
                     calls.append((method, bool(closed)))
+                    if method == 'GET' and reject_first and not rejections:
+                        # Deliver the real normalized stream observation while
+                        # the synchronous SDK getter/follow-up lookup is live.
+                        observation = normalize_order(payload)
+                        observation['event'] = 'order_cancel_rejected'
+                        asyncio.run_coroutine_threadsafe(port._observe(observation), port._loop).result(3)
+                        rejections.append(True)
                     response = requests.Response()
                     response.status_code = 204 if method == 'DELETE' else 200
                     response._content = b'' if method == 'DELETE' else json.dumps(payload).encode()
@@ -125,12 +138,15 @@ class CancelAcknowledgement(unittest.TestCase):
                         'controller_pending': 'entry' in c._overnight_cancel_pending,
                         'adaptive_pending': info['cancel_requested'],
                         'mover_pending': record.cancel_requested})
-                print('ack_three_ticks', status.value, terminal_source, json.dumps(states), flush=True)
-                self.assertEqual([s['deletes'] for s in states], [1, 1, 1],
-                                 'an acknowledged live cancellation must not send another DELETE')
-                self.assertTrue(all(s['controller_pending'] and s['adaptive_pending'] and s['mover_pending']
-                                    for s in states), 'broker acknowledgement must retain all pending marks')
-                self.assertEqual(sum(r['kind'] == 'cancel' for r in c.requests), 1)
+                print('ack_three_ticks', status.value, terminal_source, 'refusal', reject_first, json.dumps(states), flush=True)
+                expected = [1, 2, 2] if reject_first else [1, 1, 1]
+                self.assertEqual([s['deletes'] for s in states], expected,
+                                 'a refusal permits one retry; an acknowledged live cancellation permits none')
+                expected_pending = [False, True, True] if reject_first else [True, True, True]
+                for key in ('controller_pending', 'adaptive_pending', 'mover_pending'):
+                    self.assertEqual([s[key] for s in states], expected_pending, key)
+                self.assertEqual(sum(r['kind'] == 'cancel' for r in c.requests), 2 if reject_first else 1)
+                self.assertEqual(len(rejections), int(reject_first))
                 self.assertEqual(frozen, [])
                 self.assertEqual(engine_cancels, [])
                 self.assertEqual(len(c.ledger.unresolved()), 1)
@@ -146,7 +162,7 @@ class CancelAcknowledgement(unittest.TestCase):
                 self.assertFalse(record.cancel_requested)
                 self.assertEqual(c.ledger.unresolved(), [])
                 await c.overnight_tick(clock[0])
-                self.assertEqual(sum(method == 'DELETE' for method, _ in calls), 1)
+                self.assertEqual(sum(method == 'DELETE' for method, _ in calls), expected[-1])
             finally:
                 await c.stop_overnight_cancels()
                 await port.stop()

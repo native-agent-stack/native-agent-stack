@@ -1385,6 +1385,7 @@ class AlpacaPaperTransport:
         self._tasks = []
         self._operation_lock = asyncio.Lock()
         self._cancel_operations = {}
+        self._cancel_refusals = set()
         self._cancel_started = set()
         self._cancel_workers = {}
         self._cancel_executor = None
@@ -1654,6 +1655,11 @@ class AlpacaPaperTransport:
                               or (previous["status"] in TERMINAL and order["status"] not in TERMINAL))))
             if stale and not new_execution:
                 return previous
+        operation = getattr(self, "_cancel_operations", {}).get(cid)
+        if order.get("event") == "order_cancel_rejected" and operation is not None and not operation.done():
+            # Keep this refusal tied to this operation: its live lookup may
+            # still return a nonterminal order after the stream rejects DELETE.
+            self._cancel_refusals.add(operation)
         await self._invoke(self.sink_observation, dict(order))
         if new_execution:
             self._executions.setdefault(cid, set()).add(execution)
@@ -1912,6 +1918,7 @@ class AlpacaPaperTransport:
         # Protocol fixtures may construct the transport without SDK startup.
         if not hasattr(self, "_cancel_operations"):
             self._cancel_operations = {}
+            self._cancel_refusals = set()
             self._cancel_started = set()
             self._cancel_workers = {}
             self._cancel_executor = None
@@ -1926,10 +1933,12 @@ class AlpacaPaperTransport:
                 self._cancel_started.discard(client_order_id)
                 pending = getattr(self, "overnight_cancel_pending", None)
                 failed = operation.cancelled() or operation.exception() is not None
+                refused = operation in self._cancel_refusals
+                self._cancel_refusals.discard(operation)
                 # HTTP204 finishes the local worker, not broker cancellation.
                 # Keep an acknowledged live order pending until an observation
                 # confirms terminal state; explicit failures permit a retry.
-                resolved = failed or operation.result()["status"] in (
+                resolved = failed or refused or operation.result()["status"] in (
                     "canceled", "filled", "expired", "rejected")
                 if pending is not None and resolved:
                     pending.discard(client_order_id)

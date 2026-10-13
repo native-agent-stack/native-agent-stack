@@ -40,7 +40,7 @@
   "blueprints/us-equities/adaptive-paper/start_readiness.py": "ed920cef48ae9c778b190c5f83b73f9818d1bfc966a4fea027efe1521fa3b72f",
   "blueprints/us-equities/adaptive-paper/strategies.py": "2d488a4fdd21ad323ab07cf7fb147b3623fd6e38951abcf2fc59cf8094a1383e",
   "blueprints/us-equities/adaptive-paper/strategies_v1.py": "53c4d7dab6c4638b03720c30c3469a91afe96ee5a6e83a78baa6fa43235212a4",
-  "blueprints/us-equities/adaptive-paper/transport.py": "5eb614bcd082237b0cbcebcb638bf2921eb0fd7172d41e2f54ae3d0ad8a87769",
+  "blueprints/us-equities/adaptive-paper/transport.py": "4a2f2cb1f75427c91bbc8f569829e44b833a4df5895452d854a4b8b9ea8775b6",
   "tests/_credential_mutation_driver.py": "bfe35e69702016718452ed702aab20a0a33da5723e28a61de513b3c268849301",
   "tests/adaptive_paper_hermetic.py": "ee3fe5d3f97143e9361281f2c4d95076b758ec8d245a942bd7470412673558cd",
   "tests/fixtures/adaptive_paper_citations/asset-attributes.json": "89b5ac4e7cb4c9d040f80159bbe689c2ac98777cfafdacde57aa7f477a41784d",
@@ -49,7 +49,7 @@
   "tests/fixtures/adaptive_paper_overnight_cutoff.json": "f55094153bde74217f8c5ac2d5f2828ae3224d2f11180c4f87ade39c3c7249a5",
   "tests/test_adaptive_market_research.py": "4580c2271b946425b660639548b9fea579ef945ff612797927399289431017ed",
   "tests/test_adaptive_paper_adaptive_sell_age.py": "6c474815e58477d5f1772a6d937a672bc6db7c73869247d83379846f93fb13e9",
-  "tests/test_adaptive_paper_cancel_acknowledgement.py": "7a09f2b738b881a487eb7bee4f6ae46ae70ea03b9e64039c94160c81ae463fa2",
+  "tests/test_adaptive_paper_cancel_acknowledgement.py": "bcb4c2469bf95a634e7302aef13c9f26d543d4360eca668b6ed25469f0675b31",
   "tests/test_adaptive_paper_cancel_worker_ownership.py": "55f23fb4f52f6704ee2ac649392852f5aeeca3436d99bf91d06f9281efa6d694",
   "tests/test_adaptive_paper_configurable_ceilings.py": "73fce266396489fc651cda1ec599583427c993e3332f3f6e0736fb6631d45a63",
   "tests/test_adaptive_paper_corporate_actions.py": "b88fef5acad4b522225d13fdba24099667aa83c9e7e0777da0d0c9a35401db53",
@@ -91,7 +91,7 @@
   "tests/test_adaptive_paper_transport.py": "eb7f0463d581807caa2f70d627d294cb8b48e38545c2a7d5b2c98e13c13dda0d",
   "tests/test_alpaca_admission_regressions.py": "eda6f09d15346c4162619ee390e6eff4f4cce447b91bbb00e789258b44640442",
   "tests/test_mover_exit_chain.py": "74d91bd14ffb76ab2a499072a756d0b4bfdf9af70ac88905ac075bcdd9028e7a",
-  "tests/test_overnight_published_preimages.py": "ee5dc9b4aa4bb9fa17207c888b8fd0fae30b72f77ef487fa48f8752bab2c5b63",
+  "tests/test_overnight_published_preimages.py": "cd657bebf47262310b2be4d57fc979ccb0005a0e68bbfb2552b3f2fe26f7680c",
   "tests/test_runtime_directory_identity.py": "9a5db043d9d2837d3319a95a69bfe6c514a5ef99057bd4c7a0e7a171fd348814",
   "tests/test_scheduled_trial.py": "85cac37a4230533135eb2c680430a814278ad578b90bc4e7a3f3ea5f02acf9ce"
 }

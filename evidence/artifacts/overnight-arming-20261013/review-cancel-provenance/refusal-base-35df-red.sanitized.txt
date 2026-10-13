@@ -1,0 +1,218 @@
+test_rejection_during_lookup_releases_pending_and_allows_one_retry (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_rejection_during_lookup_releases_pending_and_allows_one_retry) ... ack_three_ticks accepted stream refusal True [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+
+  test_rejection_during_lookup_releases_pending_and_allows_one_retry (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_rejection_during_lookup_releases_pending_and_allows_one_retry) (status='accepted', terminal_source='stream') ... FAIL
+ack_three_ticks accepted lookup refusal True [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+  test_rejection_during_lookup_releases_pending_and_allows_one_retry (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_rejection_during_lookup_releases_pending_and_allows_one_retry) (status='accepted', terminal_source='lookup') ... FAIL
+ack_three_ticks new stream refusal True [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+  test_rejection_during_lookup_releases_pending_and_allows_one_retry (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_rejection_during_lookup_releases_pending_and_allows_one_retry) (status='new', terminal_source='stream') ... FAIL
+ack_three_ticks new lookup refusal True [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+  test_rejection_during_lookup_releases_pending_and_allows_one_retry (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_rejection_during_lookup_releases_pending_and_allows_one_retry) (status='new', terminal_source='lookup') ... FAIL
+ack_three_ticks pending_cancel stream refusal True [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+  test_rejection_during_lookup_releases_pending_and_allows_one_retry (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_rejection_during_lookup_releases_pending_and_allows_one_retry) (status='pending_cancel', terminal_source='stream') ... FAIL
+ack_three_ticks pending_cancel lookup refusal True [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+  test_rejection_during_lookup_releases_pending_and_allows_one_retry (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_rejection_during_lookup_releases_pending_and_allows_one_retry) (status='pending_cancel', terminal_source='lookup') ... FAIL
+test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal) ... ack_three_ticks accepted stream refusal False [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks accepted lookup refusal False [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks new stream refusal False [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks new lookup refusal False [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks pending_cancel stream refusal False [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks pending_cancel lookup refusal False [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ok
+
+======================================================================
+FAIL: test_rejection_during_lookup_releases_pending_and_allows_one_retry (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_rejection_during_lookup_releases_pending_and_allows_one_retry) (status='accepted', terminal_source='stream')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 46, in test_rejection_during_lookup_releases_pending_and_allows_one_retry
+    self._exercise(status, terminal_source, reject_first=True)
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 171, in _exercise
+    asyncio.run(exercise())
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 143, in exercise
+    self.assertEqual([s['deletes'] for s in states], expected,
+AssertionError: Lists differ: [1, 1, 1] != [1, 2, 2]
+
+First differing element 1:
+1
+2
+
+- [1, 1, 1]
+?     ^  ^
+
++ [1, 2, 2]
+?     ^  ^
+ : a refusal permits one retry; an acknowledged live cancellation permits none
+
+======================================================================
+FAIL: test_rejection_during_lookup_releases_pending_and_allows_one_retry (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_rejection_during_lookup_releases_pending_and_allows_one_retry) (status='accepted', terminal_source='lookup')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 46, in test_rejection_during_lookup_releases_pending_and_allows_one_retry
+    self._exercise(status, terminal_source, reject_first=True)
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 171, in _exercise
+    asyncio.run(exercise())
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 143, in exercise
+    self.assertEqual([s['deletes'] for s in states], expected,
+AssertionError: Lists differ: [1, 1, 1] != [1, 2, 2]
+
+First differing element 1:
+1
+2
+
+- [1, 1, 1]
+?     ^  ^
+
++ [1, 2, 2]
+?     ^  ^
+ : a refusal permits one retry; an acknowledged live cancellation permits none
+
+======================================================================
+FAIL: test_rejection_during_lookup_releases_pending_and_allows_one_retry (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_rejection_during_lookup_releases_pending_and_allows_one_retry) (status='new', terminal_source='stream')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 46, in test_rejection_during_lookup_releases_pending_and_allows_one_retry
+    self._exercise(status, terminal_source, reject_first=True)
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 171, in _exercise
+    asyncio.run(exercise())
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 143, in exercise
+    self.assertEqual([s['deletes'] for s in states], expected,
+AssertionError: Lists differ: [1, 1, 1] != [1, 2, 2]
+
+First differing element 1:
+1
+2
+
+- [1, 1, 1]
+?     ^  ^
+
++ [1, 2, 2]
+?     ^  ^
+ : a refusal permits one retry; an acknowledged live cancellation permits none
+
+======================================================================
+FAIL: test_rejection_during_lookup_releases_pending_and_allows_one_retry (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_rejection_during_lookup_releases_pending_and_allows_one_retry) (status='new', terminal_source='lookup')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 46, in test_rejection_during_lookup_releases_pending_and_allows_one_retry
+    self._exercise(status, terminal_source, reject_first=True)
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 171, in _exercise
+    asyncio.run(exercise())
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 143, in exercise
+    self.assertEqual([s['deletes'] for s in states], expected,
+AssertionError: Lists differ: [1, 1, 1] != [1, 2, 2]
+
+First differing element 1:
+1
+2
+
+- [1, 1, 1]
+?     ^  ^
+
++ [1, 2, 2]
+?     ^  ^
+ : a refusal permits one retry; an acknowledged live cancellation permits none
+
+======================================================================
+FAIL: test_rejection_during_lookup_releases_pending_and_allows_one_retry (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_rejection_during_lookup_releases_pending_and_allows_one_retry) (status='pending_cancel', terminal_source='stream')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 46, in test_rejection_during_lookup_releases_pending_and_allows_one_retry
+    self._exercise(status, terminal_source, reject_first=True)
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 171, in _exercise
+    asyncio.run(exercise())
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 143, in exercise
+    self.assertEqual([s['deletes'] for s in states], expected,
+AssertionError: Lists differ: [1, 1, 1] != [1, 2, 2]
+
+First differing element 1:
+1
+2
+
+- [1, 1, 1]
+?     ^  ^
+
++ [1, 2, 2]
+?     ^  ^
+ : a refusal permits one retry; an acknowledged live cancellation permits none
+
+======================================================================
+FAIL: test_rejection_during_lookup_releases_pending_and_allows_one_retry (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_rejection_during_lookup_releases_pending_and_allows_one_retry) (status='pending_cancel', terminal_source='lookup')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 46, in test_rejection_during_lookup_releases_pending_and_allows_one_retry
+    self._exercise(status, terminal_source, reject_first=True)
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 171, in _exercise
+    asyncio.run(exercise())
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 143, in exercise
+    self.assertEqual([s['deletes'] for s in states], expected,
+AssertionError: Lists differ: [1, 1, 1] != [1, 2, 2]
+
+First differing element 1:
+1
+2
+
+- [1, 1, 1]
+?     ^  ^
+
++ [1, 2, 2]
+?     ^  ^
+ : a refusal permits one retry; an acknowledged live cancellation permits none
+
+----------------------------------------------------------------------
+Ran 2 tests in 6.781s
+
+FAILED (failures=6)
+ASSERTION_FAILURES 6 ERRORS 0 SKIPS 0

@@ -13447,6 +13447,11 @@
       "sha256": "6cf6e501cab47687f6983182e15ac59ff233b94f9664706e165e4cf685609bb6"
     },
     {
+      "path": "blueprints/us-equities/adaptive-paper/overnight-cancel-provenance-validation.json",
+      "bytes": 8850,
+      "sha256": "a426e77c9a271b327752ce435a76e21ce1a75fee153730b4fbe3813fde7016f0"
+    },
+    {
       "path": "blueprints/us-equities/adaptive-paper/overnight-cancel-refusal-validation.json",
       "bytes": 4269,
       "sha256": "c2cd4bcf9033d242b355b59336438b310b2aa166032fad37e5bf7856c9073a3c"
@@ -13569,7 +13574,7 @@
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
       "bytes": 11604,
-      "sha256": "68a698b382d21f925a5c4029f35505e7c12442c776ffd124159dfb0c00307b87"
+      "sha256": "5c0deeebda3dd613bf7fa26a584ad865d69e7d5e07c08cac7d19c702cf5145f5"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/start_readiness.py",
@@ -13588,8 +13593,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/transport.py",
-      "bytes": 116542,
-      "sha256": "5eb614bcd082237b0cbcebcb638bf2921eb0fd7172d41e2f54ae3d0ad8a87769"
+      "bytes": 117134,
+      "sha256": "4a2f2cb1f75427c91bbc8f569829e44b833a4df5895452d854a4b8b9ea8775b6"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/README.md",
@@ -19193,8 +19198,8 @@
     },
     {
       "path": "docs/decisions/2026-10-13-overnight-rest-arming.md",
-      "bytes": 19288,
-      "sha256": "34a25c4dadfc9cd6667e4b61fe218dd7e2290f85cb8c04bbc9489630ad892062"
+      "bytes": 21304,
+      "sha256": "75028f6ff836e02564bcf920adca06b8a6b1c12dcc282ca49dd7a53e0fe2945d"
     },
     {
       "path": "docs/decisions/2026-10-13-paper-configurable-risk-ceilings.md",
@@ -48812,6 +48817,61 @@
       "sha256": "ddcde61fc0a4d2c5c986fbe2213b6d13c277bfbc78f54d7d24009f41a749cc2a"
     },
     {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/ack-check.py.txt",
+      "bytes": 1487,
+      "sha256": "8b0bce810de47d382068ba44b5bb4b18406ff3890fa49dcc275e0e6e6b8ab00b"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/ack-related-suite.py.txt",
+      "bytes": 1018,
+      "sha256": "65d24867a76f50d52a3296e4a40c3638f944ce9059f3f3705e7f81e164532865"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/historical/2026-10-13-overnight-rest-arming.md.txt",
+      "bytes": 19288,
+      "sha256": "34a25c4dadfc9cd6667e4b61fe218dd7e2290f85cb8c04bbc9489630ad892062"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/historical/test_adaptive_paper_cancel_acknowledgement.py.txt",
+      "bytes": 8150,
+      "sha256": "7a09f2b738b881a487eb7bee4f6ae46ae70ea03b9e64039c94160c81ae463fa2"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/historical/test_overnight_published_preimages.py.txt",
+      "bytes": 5954,
+      "sha256": "ee5dc9b4aa4bb9fa17207c888b8fd0fae30b72f77ef487fa48f8752bab2c5b63"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/historical/transport.py.txt",
+      "bytes": 111101,
+      "sha256": "1e45e3c598d7719be84f5ffe782d2c7000694cff6fb2128ad5d0f362995b1288"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/refusal-base-35df-red.sanitized.txt",
+      "bytes": 17573,
+      "sha256": "3eaa48db5181d621bd40be80bee342245d69647bfbd179ff933d80d4c7ca7564"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/refusal-guard-removal-red.sanitized.txt",
+      "bytes": 17573,
+      "sha256": "252fa4eee93f33f489a5a422bc7c907ed7f81306016897072534e901f6d60e9e"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/refusal-head-green.sanitized.txt",
+      "bytes": 4498,
+      "sha256": "4b643ea9f733a4e4153f7b2119756e884e04052c378cd545ba53f0cd40faef1b"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/refusal-related-ci.sanitized.txt",
+      "bytes": 44654,
+      "sha256": "d20b6581ae8134b39c206a67d48a9b1fb6ae16d955ef8084ef823541e10195fa"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/refusal-related-native.sanitized.txt",
+      "bytes": 44478,
+      "sha256": "eda8df1f44c951aad330866af5b82f8f2eb9406eb9458ecfbfa28f79e455aefa"
+    },
+    {
       "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-base-final4.sanitized.txt",
       "bytes": 6085,
       "sha256": "64217faa05f51575ef9e515e6c5123727841341ac05cfc2d28bc43d40037f7c6"
@@ -63013,8 +63073,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_cancel_acknowledgement.py",
-      "bytes": 8150,
-      "sha256": "7a09f2b738b881a487eb7bee4f6ae46ae70ea03b9e64039c94160c81ae463fa2"
+      "bytes": 9366,
+      "sha256": "bcb4c2469bf95a634e7302aef13c9f26d543d4360eca668b6ed25469f0675b31"
     },
     {
       "path": "tests/test_adaptive_paper_cancel_worker_ownership.py",
@@ -64178,8 +64238,8 @@
     },
     {
       "path": "tests/test_overnight_published_preimages.py",
-      "bytes": 5954,
-      "sha256": "ee5dc9b4aa4bb9fa17207c888b8fd0fae30b72f77ef487fa48f8752bab2c5b63"
+      "bytes": 6051,
+      "sha256": "cd657bebf47262310b2be4d57fc979ccb0005a0e68bbfb2552b3f2fe26f7680c"
     },
     {
       "path": "tests/test_paired_runs_results.py",

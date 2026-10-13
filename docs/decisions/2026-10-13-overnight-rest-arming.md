@@ -281,3 +281,33 @@ Removing the guard reproduces the baseline failure. Earlier worker join,
 HTTP422 retry and strategy-strand checks are retained in the focused integration.
 Historical source and proof hashes retain exact published preimages. No actual
 credential, broker operation or paper acceptance is claimed.
+
+### Refusal provenance through local completion
+
+Under the CC's23:43Z final narrow ruling, an `order_cancel_rejected` observed
+while the cancellation operation or its follow-up lookup is live is retained
+against that specific operation. At completion the callback consumes this
+provenance: refusal plus a nonterminal lookup releases pending for one retry.
+The retry without a new refusal stays pending after its204/nonterminal result;
+the existing no-refusal three-tick behavior is unchanged. Terminal outcomes and
+operation failures retain their existing release behavior. Provenance is removed
+with the completed operation, so it cannot release a later operation's marks.
+
+Alpaca's [Orders page](https://docs.alpaca.markets/us/docs/orders-at-alpaca.md)
+L1564 documents that `pending_replace` "will reject cancel request while in this
+state," one cause of a cancellation refusal. At the installed SDK pin
+cc4cb3b7ba50ae250e621983c2779047fb16bb28, `alpaca/trading/enums.py:321-333`
+defines TradeEvent names including pending_cancel/pending_replace, but does not
+declare an order_cancel_rejected member; `alpaca/trading/models.py:640` permits
+`Union[TradeEvent, str]`. The stream dispatch (`alpaca/trading/stream.py:115-139`)
+therefore preserves this string event for the existing controller path. This
+does not claim that an enum member exists where the pinned source has none.
+
+The builder's rejected-during-lookup probe is now a real-SDK regression: an HTTP
+response boundary delivers the normalized rejection observation on the owner
+loop while the SDK GET remains live. Each of accepted/new/pending_cancel, with
+stream and later-lookup terminal controls, must release all mirrored marks after
+the first refusal, send exactly one retry, and then remain acknowledged-pending.
+At35dfd01 the six cases strand at1/1/1 DELETEs; after this change they send1/2/2.
+The original no-refusal cases remain1/1/1. Guard removal restores stranding.
+The SDK, worker joins, strategy algorithms and retry budget remain unchanged.
