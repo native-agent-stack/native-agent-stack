@@ -195,7 +195,7 @@ remain open for part 2. This repair does not qualify the future V2 runner.
 
 | File | Runs | Role |
 | --- | --- | --- |
-| `build_inputs.py` | checkout | Writes the per-layer inputs the workers read, `<work-dir>/inputs/<layer>.json`, and `layers.json`, from the frozen scope, the landscape catalogs, the ledger's last completed sweep of the run's modality, a baseline manifest, a freshness manifest, the gap-wave ledgers and optional seeds. |
+| `build_inputs.py` | checkout | Writes the per-layer inputs the workers read, `<work-dir>/inputs/<layer>.json`, and `layers.json`, from the frozen scope, the landscape catalogs and their planned layers, the ledger's last completed sweep of the run's modality, a baseline manifest, a freshness manifest, the gap-wave ledgers and optional seeds. |
 | `build_args.py` | checkout | Stages a run into the work directory: frozen dated templates, schemas, the GPT-6 runtime, first-round GPT-6 prompts, `staged.json`, `prompts_sha256.txt`, the compact `args.json` and `sweep.embedded.js`. |
 | `sweep.js` | Workflow | The lane itself (`const A = args`; its header documents the args object). |
 | `codex_call.sh`, `codex_job.py` | staged | The GPT-6 job runner the wrapper agents call (`start`, `wait`, `result`). |
@@ -809,6 +809,31 @@ Read these fields of `convert.py`'s summary before appending:
   as `{lost: true}` too. `convert.py` refuses a return whose follow-up rounds do not match the critic's requests,
   so no round can go missing silently.
 
+## Planned layers
+
+A planned layer is a row of `catalogs/landscape/planned-layers.json`: a layer that an approved plan names and that
+has no landscape row yet. `scripts/final_stack.py` lists it as `unswept` until a completed sweep covers it, then as
+`no-winner` until a verdict wave records its row. The repository modality sweeps it like any other layer of its
+catalog (`foundation` or `us-equities`):
+
+- **Scope.** `saturation_ledger.py --scope` freezes its requirement hash: the sha256 of the canonical
+  `{requirement, acceptance}` of its planned row (`planned_requirement_sha256`). `--report` lists it after the
+  research-state layers, with research status `planned`, so `build_args.py --due-report` stages it when it is due.
+  A scope frozen before this change lacks the planned layers, and `build_inputs.py` refuses it; freeze it again.
+- **Input.** `build_inputs.py` writes `inputs/<layer>.json` after its catalog's landscape rows. The input has every
+  field of a landscape input, plus `acceptance` and `planned` (`ref`, the planned row's pointer, and `source`, the
+  approving record). It has no sealed verdict, so `winners`, `alternatives`, `open_gaps` and
+  `components_vs_upstream` are empty, and `verdict_note` says so: there is no incumbent, and every proposal is
+  judged against the requirement and the acceptance. `--seeds` may name it. `previous_sweep` comes from the ledger,
+  as for any layer.
+- **Record.** The sweep's manifest has no row for it: `build_manifest.py` files its lane rows under
+  `lane_groupings`. `saturation_ledger.py --append` marks its entry `planned: true`, and a survivor binds to its
+  retained votes and its source review, as a skills survivor does (`catalogs/saturation/README.md`, Planned
+  layers).
+- **Refusals.** A planned layer that also has a landscape row, or a research-state row, is refused, as
+  `final_stack.py` refuses it. `--contract-version 2` builds no planned layer yet, since its blind fit projection
+  reads a verdict row, and it refuses seeds for one rather than dropping them.
+
 ## Skills modality
 
 The second discovery modality sweeps skills per lifecycle task instead of repositories per landscape layer. A skill is
@@ -829,7 +854,8 @@ one `SKILL.md` folder, named `owner/repo@name`. The rounds, worker labels, survi
   record: `status` stale, `checked_at` and the API fact as `evidence`. On 2026-09-30 only `openai-skills` did (no `main`
   commit since 2026-06-24). It stays listed for its four installed skills, whose tasks name it as an open gap, and
   `discover_skills` labels its skills `not_adopted` unless a maintained fork or replacement is found.
-- **Scope.** `saturation_ledger.py --scope` covers only the layers of `research-state.json`. So
+- **Scope.** `saturation_ledger.py --scope` covers only the layers of `research-state.json` and the planned layers
+  (see Planned layers). So
   `build_inputs.py --skills-scope` prints the skills layers' frozen scope in the same format, computed with the
   ledger's own functions (`skills_requirement_sha256`, which `--report` and `--append` recompute). Each hash covers the
   task's `lifecycle_task`, `requirement` and `overturn_when`.

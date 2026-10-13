@@ -34,12 +34,18 @@ python3 scripts/saturation_ledger.py --report --staleness "$WORK_DIR/receipt-sta
 ```
 
 The due layers are every layer that is not a saturation candidate. A layer with a current reopen
-trigger is always due. Freeze the scope, meaning the layer list and each layer's
-`research-state.json` row, before starting, and keep its hashes:
+trigger is always due. The report lists the planned layers of
+`catalogs/landscape/planned-layers.json` too, due by the same rule
+(`catalogs/saturation/README.md`, Planned layers). Freeze the scope,
+meaning the layer list and each layer's `research-state.json` row or planned row, before
+starting, and keep its hashes:
 
 ```sh
 python3 scripts/saturation_ledger.py --scope > "$WORK_DIR/scope.json"
 ```
+
+A scope frozen before the planned layers were sweepable lacks their hashes, so `build_inputs.py`
+refuses it; freeze it again.
 
 ## 2. Run the lane
 

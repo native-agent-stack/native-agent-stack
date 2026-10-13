@@ -8271,7 +8271,11 @@
       "layer_id": "catalysts-sentiment",
       "open_gaps": null,
       "research": null,
-      "saturation": null,
+      "saturation": {
+        "clean_count": 0,
+        "last_sweep": null,
+        "saturation_candidate": false
+      },
       "source": "catalogs/landscape/planned-layers.json#/layers/0",
       "status": "unswept",
       "survivors": [],
@@ -8735,7 +8739,11 @@
       "layer_id": "judgment-features",
       "open_gaps": null,
       "research": null,
-      "saturation": null,
+      "saturation": {
+        "clean_count": 0,
+        "last_sweep": null,
+        "saturation_candidate": false
+      },
       "source": "catalogs/landscape/planned-layers.json#/layers/1",
       "status": "unswept",
       "survivors": [],

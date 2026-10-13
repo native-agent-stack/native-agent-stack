@@ -34,9 +34,20 @@ Skills layers: the landscape sweep's skills modality sweeps the tasks of
 ``catalogs/landscape/skills-lifecycle.json`` as catalog ``skills`` layers (``skills-<task>``). ``--report``
 lists them beside the research-state layers and ``--append`` records them. Their requirement hash
 covers the task's lifecycle_task, requirement and overturn_when (``skills_requirement_sha256``; the
-sweep freezes it with ``build_inputs.py --skills-scope``, since ``--scope`` covers research-state
-rows only). A SOTA-convergence manifest has no skills section, so a skills survivor binds to its
+sweep freezes it with ``build_inputs.py --skills-scope``, since ``--scope`` covers the research-state
+and planned rows only). A SOTA-convergence manifest has no skills section, so a skills survivor binds to its
 retained votes and its source review, not to a manifest row.
+
+Planned layers: the rows of ``catalogs/landscape/planned-layers.json`` (layers an approved plan names
+that have no landscape row yet) are swept as repository layers of their own catalog, foundation or
+us-equities. ``--scope`` freezes them, ``--report`` lists them after the research-state layers and
+``--append`` records them. Their requirement hash covers the planned row's requirement and acceptance
+(``planned_requirement_sha256``). A planned layer has no row in its sweep's SOTA-convergence manifest
+(build_manifest.py files its lane rows under lane_groupings), so ``--append`` marks its record
+``planned: true`` and its survivors bind to their retained votes and source reviews, as a skills
+survivor's do. The mark is durable: when a verdict wave later records the layer's landscape row, its
+research-state row supplies the requirement hash (a requirement_changed reset) and the records made
+while it was planned still check.
 
   python3 scripts/saturation_ledger.py --check                  # schema, chain and bindings
   python3 scripts/saturation_ledger.py --check --base origin/main  # also: base ledger is a prefix
@@ -70,6 +81,10 @@ RESEARCH_STATE = "catalogs/landscape/research-state.json"
 SKILLS_CATALOG = "catalogs/landscape/skills-lifecycle.json"
 SKILLS = "skills"
 SKILLS_REQUIREMENT_FIELDS = ("lifecycle_task", "requirement", "overturn_when")
+# Planned layers: the rows of the planned-layers catalog (an approved plan's layers with no landscape row yet), swept
+# as repository layers of their own catalog. Their requirement hash covers these fields of the planned row.
+PLANNED_LAYERS = "catalogs/landscape/planned-layers.json"
+PLANNED_REQUIREMENT_FIELDS = ("requirement", "acceptance")
 ADOPTION = "adoption/manifest.json"
 EVIDENCE = "manifests/evidence.json"
 # Paths this script must never write (the landscape owners' files and the verdict data).
@@ -94,12 +109,13 @@ SWEEP_FIELDS = ("sweep_id", "date", "workflow_run", "status", "manifest_ref", "m
                 "prompts_sha256", "usage_ref", "usage_sha256", "lower_bound_usage", "returns_ref",
                 "returns_sha256", "record_ref", "lane_calls", "lost_workers", "not_retained", "notes",
                 "prev_sha256", "layers")
-LAYER_FIELDS = ("catalog", "layer_id", "requirement_sha256", "platform_profiles_sha256", "votes", "votes_note",
-                "discovery_ref", "calls", "proposed", "known", "new", "survived", "refuted", "reopen")
+LAYER_FIELDS = ("catalog", "layer_id", "requirement_sha256", "platform_profiles_sha256", "planned", "votes",
+                "votes_note", "discovery_ref", "calls", "proposed", "known", "new", "survived", "refuted", "reopen")
 V2_LAYER_FIELDS = (*LAYER_FIELDS, "contract_version", "field_sha256", "source_field_sha256", "eligible_field", "pending")
 # A manifest lens-vote pointer: /<section>/<layer index>/candidates/<row>/adversarial_verification/votes/<k>
 LENS_POINTER = re.compile(r"/(foundation|trading)/(\d+)/candidates/(\d+)/adversarial_verification/votes/(\d+)")
-COMPUTED_LAYER_FIELDS = ("requirement_sha256", "platform_profiles_sha256", "known", "new")
+# planned is true only on the record of a layer that was a planned layer when --append recorded it.
+COMPUTED_LAYER_FIELDS = ("requirement_sha256", "platform_profiles_sha256", "planned", "known", "new")
 # Scope hashes a retained discovery return carries, frozen before the run (--scope).
 FROZEN_SCOPE_FIELDS = ("requirement_sha256", "platform_profiles_sha256")
 
@@ -531,6 +547,11 @@ def skills_requirement_sha256(task: dict) -> str:
     return sha256_bytes(canonical({field: task.get(field) for field in SKILLS_REQUIREMENT_FIELDS}))
 
 
+def planned_requirement_sha256(row: dict) -> str:
+    """A planned layer's frozen requirement: its planned row's requirement and acceptance."""
+    return sha256_bytes(canonical({field: row.get(field) for field in PLANNED_REQUIREMENT_FIELDS}))
+
+
 def platform_profiles_sha256(adoption: dict) -> str:
     return sha256_bytes(canonical(adoption.get("platform_profiles")))
 
@@ -572,12 +593,53 @@ def skills_rows(root: Path) -> dict:
             if isinstance(task, dict) and isinstance(task.get("layer_id"), str)}
 
 
+def planned_rows(root: Path) -> dict:
+    """{(catalog, layer_id): row} for the rows of the planned-layers catalog; {} when the checkout has none. Each row
+    needs a repository catalog (foundation or us-equities) and a layer_id, once."""
+    if not safe_path(root, PLANNED_LAYERS).is_file():
+        return {}
+    document = load_json(root, PLANNED_LAYERS)
+    rows = {}
+    for position, row in enumerate((document.get("layers") if isinstance(document, dict) else None) or []):
+        if not (isinstance(row, dict) and row.get("catalog") in MANIFEST_SECTION
+                and isinstance(row.get("layer_id"), str)):
+            raise LedgerError(f"{PLANNED_LAYERS} layers[{position}] needs a catalog in {sorted(MANIFEST_SECTION)} "
+                              "and a layer_id")
+        key = (row["catalog"], row["layer_id"])
+        if key in rows:
+            raise LedgerError(f"planned layer {key[0]}/{key[1]} is listed more than once in {PLANNED_LAYERS}")
+        rows[key] = row
+    return rows
+
+
+def repository_requirements(root: Path) -> dict:
+    """{(catalog, layer_id): requirement hash} of the repository layers a sweep can record: the research-state rows,
+    then the planned rows. A planned layer that also has a research-state row is refused: when a verdict wave records
+    its landscape row it leaves the planned-layers catalog (scripts/final_stack.py refuses the same collision)."""
+    research = research_rows(root)
+    requirements = {key: requirement_sha256(row) for key, row in research.items()}
+    for key, row in planned_rows(root).items():
+        if key in research:
+            raise LedgerError(f"planned layer {key[0]}/{key[1]} collides with its {RESEARCH_STATE} row; remove it "
+                              f"from {PLANNED_LAYERS}")
+        requirements[key] = planned_requirement_sha256(row)
+    return requirements
+
+
 def layer_requirements(root: Path) -> dict:
-    """{(catalog, layer_id): requirement hash} of every layer a sweep can record: the research-state rows, then the
-    skills lifecycle tasks."""
-    requirements = {key: requirement_sha256(row) for key, row in research_rows(root).items()}
+    """{(catalog, layer_id): requirement hash} of every layer a sweep can record: the research-state rows, the planned
+    rows, then the skills lifecycle tasks."""
+    requirements = repository_requirements(root)
     requirements.update({key: skills_requirement_sha256(task) for key, task in skills_rows(root).items()})
     return requirements
+
+
+def requirement_ref(key: tuple, planned: dict) -> str:
+    """The file whose row supplies a layer's requirement hash: the skills catalog, the planned-layers catalog or the
+    research state."""
+    if key[0] == SKILLS:
+        return SKILLS_CATALOG
+    return PLANNED_LAYERS if key in planned else RESEARCH_STATE
 
 
 def registered_files(root: Path) -> dict:
@@ -1019,6 +1081,9 @@ class Checker:
         if (catalog not in MANIFEST_SECTION and catalog != SKILLS) or not isinstance(layer_id, str):
             self.error(f"{label}: catalog must be one of {sorted([*MANIFEST_SECTION, SKILLS])} with a layer_id")
             return
+        planned = layer.get("planned") is True
+        if "planned" in layer and not (planned and catalog in MANIFEST_SECTION):
+            self.error(f"{label}: planned, when present, is true on a foundation or us-equities layer")
         for field in ("requirement_sha256", "platform_profiles_sha256"):
             if not (isinstance(layer.get(field), str) and HEX64.fullmatch(layer[field])):
                 self.error(f"{label}: {field} must be 64 lowercase hex")
@@ -1048,8 +1113,9 @@ class Checker:
             self.check_discovery(sweep, layer, f"{label}.discovery_ref", proposed)
         # known/new partition proposed, recomputed from the manifest baseline and earlier sweeps.
         located = manifest_layer(manifest, catalog, layer_id) if manifest is not None else None
-        # A manifest has no skills section: a skills layer's outcomes bind to its retained votes and source reviews.
-        if manifest is not None and located is None and catalog != SKILLS:
+        # A manifest has no skills section and no row for a planned layer (build_manifest.py files a planned layer's
+        # lane rows under lane_groupings): such a layer's outcomes bind to its retained votes and source reviews.
+        if manifest is not None and located is None and catalog != SKILLS and not planned:
             self.error(f"{label}: layer {catalog}/{layer_id} is not in {sweep.get('manifest_ref')}")
         baseline = baseline_repositories(located[0], located[2], lane) if located else set()
         known, new = split_known(proposed, baseline, earlier)
@@ -1075,7 +1141,7 @@ class Checker:
                     self.error(f"{entry_label}: listed as {field} but its votes give "
                                f"{'survived' if entry_survives(entry) else 'refuted'}")
                 if survives:
-                    self.check_survivor(entry, entry_label, layer_id, located, lane, catalog)
+                    self.check_survivor(entry, entry_label, layer_id, located, lane, catalog, planned)
         if sweep.get("status") == "completed":
             missing = [repo for repo in proposed if norm_repo(repo) not in adjudicated]
             if missing:
@@ -1289,8 +1355,8 @@ class Checker:
             if candidate.get("lane") != lane or norm_repo(str(candidate.get("repository", ""))) != norm_repo(entry["repo"]):
                 self.error(f"{vote_label}: {vote['ref']} is a vote on a different candidate row")
 
-    def check_survivor(self, entry, label, layer_id, located, lane, catalog=None) -> None:
-        if catalog == SKILLS:
+    def check_survivor(self, entry, label, layer_id, located, lane, catalog=None, planned=False) -> None:
+        if catalog == SKILLS or (planned and located is None):
             pass  # no manifest row to bind to: the retained votes (check_votes) and the source review below bind it
         elif located is None:
             self.error(f"{label}: a survivor needs a manifest layer to bind to")
@@ -1353,7 +1419,10 @@ def check_append_only(root: Path, ledger: dict, base: str) -> list[str]:
 def derive(ledger: dict, current: dict | None = None) -> dict:
     """Per-layer consecutive-clean count. ``current`` optionally carries today's inputs:
     {"requirements": {(catalog, layer_id): sha}, "platform_profiles_sha256": sha,
-     "triggers": {(catalog, layer_id): [{"trigger", "ref"}]}}.
+     "triggers": {(catalog, layer_id): [{"trigger", "ref"}]},
+     "requirement_refs": {(catalog, layer_id): the file whose row supplies that requirement}}.
+    Without a requirement_refs entry a changed requirement cites the skills catalog for a skills layer and the
+    research state otherwise.
 
     Resets recorded in the ledger (survivors, reopen entries, hash changes between sweeps, missing
     returns) are durable. ``current`` inputs hold the count at 0 only while they stand: a receipt
@@ -1412,7 +1481,8 @@ def derive(ledger: dict, current: dict | None = None) -> dict:
         wanted = (current.get("requirements") or {}).get(key)
         if wanted is not None and entry["requirement_sha256"] not in (None, wanted):
             reasons.append({"trigger": "requirement_changed",
-                            "ref": SKILLS_CATALOG if key[0] == SKILLS else RESEARCH_STATE})
+                            "ref": (current.get("requirement_refs") or {}).get(key)
+                            or (SKILLS_CATALOG if key[0] == SKILLS else RESEARCH_STATE)})
         profiles = current.get("platform_profiles_sha256")
         if profiles is not None and entry["platform_profiles_sha256"] not in (None, profiles):
             reasons.append({"trigger": "platform_profile_changed", "ref": f"{ADOPTION}#/platform_profiles"})
@@ -1521,9 +1591,12 @@ def build_report(root: Path, ledger: dict, staleness=None, freshness=None, fresh
     triggers, notes = external_triggers(baseline, staleness, freshness)
     freshness_state, freshness_notes = freshness_input(freshness, freshness_status)
     notes = freshness_notes + notes
-    requirements = layer_requirements(root)  # the research-state layers, then the skills layers (no research status)
+    # The research-state layers, the planned layers, then the skills layers (planned and skills: no research status).
+    requirements = layer_requirements(root)
+    planned = planned_rows(root)
     current = {"requirements": requirements,
-               "platform_profiles_sha256": platform_profiles_sha256(adoption), "triggers": triggers}
+               "platform_profiles_sha256": platform_profiles_sha256(adoption), "triggers": triggers,
+               "requirement_refs": {key: requirement_ref(key, planned) for key in requirements}}
     state = derive(ledger, current)
     layers = []
     for key in requirements:
@@ -1531,6 +1604,7 @@ def build_report(root: Path, ledger: dict, staleness=None, freshness=None, fresh
                                    "last_counted": None}
         layers.append({
             "catalog": key[0], "layer_id": key[1], "research_status": (rows.get(key) or {}).get("status"),
+            "planned": key in planned,
             "clean_count": entry["count"], "saturation_candidate": entry["saturation_candidate"],
             "due": not entry["saturation_candidate"], "last_sweep": entry.get("last_sweep"),
             "last_counted": entry.get("last_counted"), "reset": entry.get("reset") or [],
@@ -1582,7 +1656,9 @@ def render_markdown(report: dict) -> str:
         reasons = "; ".join(f"{r.get('trigger')} ({r.get('ref')})" for r in (layer["reset"] or [])[:4]) or "-"
         if len(layer["reset"] or []) > 4:
             reasons += f"; +{len(layer['reset']) - 4} more"
-        status = "-" if layer["research_status"] is None else layer["research_status"]  # a skills layer has none
+        # A planned or skills layer has no research status.
+        status = ("planned" if layer.get("planned") else "-") if layer["research_status"] is None \
+            else layer["research_status"]
         lines.append(f"| {layer['catalog']}/{layer['layer_id']} | {status} | {layer['clean_count']} | "
                      f"{'yes' if layer['saturation_candidate'] else 'no'} | {layer['last_sweep'] or '-'} | {reasons} |")
     for note in report["notes"]:
@@ -1594,12 +1670,11 @@ def render_markdown(report: dict) -> str:
 
 
 def scope_hashes(root: Path) -> dict:
-    """The scope to freeze before a sweep: each layer's requirement hash and the platform-profile
-    hash, which the sweep retains in every discovery return it cites."""
-    rows = research_rows(root)
+    """The scope to freeze before a sweep: each repository layer's requirement hash (the research-state layers, then
+    the planned layers) and the platform-profile hash, which the sweep retains in every discovery return it cites."""
     return {"platform_profiles_sha256": platform_profiles_sha256(load_json(root, ADOPTION)),
-            "requirement_sha256": {f"{catalog}/{layer_id}": requirement_sha256(row)
-                                   for (catalog, layer_id), row in rows.items()}}
+            "requirement_sha256": {f"{catalog}/{layer_id}": sha
+                                   for (catalog, layer_id), sha in repository_requirements(root).items()}}
 
 
 def frozen_scope(root: Path, returns_ref, discovery_ref) -> dict | None:
@@ -1621,7 +1696,7 @@ def frozen_scope(root: Path, returns_ref, discovery_ref) -> dict | None:
 
 
 def complete_result(root: Path, ledger: dict, result: dict) -> dict:
-    """Turn a sweep result into a ledger record: add the computed hashes and known/new."""
+    """Turn a sweep result into a ledger record: add the computed hashes, the planned mark and known/new."""
     if not isinstance(result, dict):
         raise LedgerError("result must be a JSON object")
     for field in COMPUTED_FIELDS:
@@ -1629,6 +1704,7 @@ def complete_result(root: Path, ledger: dict, result: dict) -> dict:
             raise LedgerError(f"result must not set computed field {field}")
     record = copy.deepcopy(result)
     requirements = layer_requirements(root)
+    planned = planned_rows(root)
     profiles = platform_profiles_sha256(load_json(root, ADOPTION))
     if record.get("manifest_ref") is not None:
         record["manifest_sha256"] = file_sha256(root, record["manifest_ref"])
@@ -1658,13 +1734,17 @@ def complete_result(root: Path, ledger: dict, result: dict) -> dict:
                 raise LedgerError(f"result layer must not set computed field {field}")
         key = (layer.get("catalog"), layer.get("layer_id"))
         if key not in requirements:
-            raise LedgerError(f"{key[0]}/{key[1]} is not a layer in {RESEARCH_STATE} or a task in {SKILLS_CATALOG}")
+            raise LedgerError(f"{key[0]}/{key[1]} is not a layer in {RESEARCH_STATE} or {PLANNED_LAYERS} or a task "
+                              f"in {SKILLS_CATALOG}")
         located = manifest_layer(manifest, *key) if manifest is not None else None
         baseline = baseline_repositories(located[0], located[2], record.get("lane")) if located else set()
         known, new = split_known(layer.get("proposed") or [], baseline, earlier.get(key, set()))
         ordered = {"catalog": key[0], "layer_id": key[1],
                    "requirement_sha256": requirements[key],
                    "platform_profiles_sha256": profiles}
+        if key in planned:
+            # Durable: the record keeps saying the layer was planned when it ran, after its landscape row exists.
+            ordered["planned"] = True
         frozen = frozen_scope(root, record.get("returns_ref"), layer.get("discovery_ref"))
         if frozen is not None:
             # The workers evaluated the scope frozen before the run, not today's files: record that

@@ -78,8 +78,9 @@
    "properties": {
     "catalog": {"enum": ["foundation", "us-equities", "skills"]},
     "layer_id": {"type": "string", "minLength": 1},
-    "requirement_sha256": {"$ref": "#/$defs/sha256", "description": "sha256 of canonical {next_action, decision_ref} of the layer's research-state row at append time."},
+    "requirement_sha256": {"$ref": "#/$defs/sha256", "description": "sha256 of canonical {next_action, decision_ref} of the layer's research-state row at append time; for a planned layer, of canonical {requirement, acceptance} of its catalogs/landscape/planned-layers.json row; for a skills layer, of canonical {lifecycle_task, requirement, overturn_when} of its skills lifecycle task."},
     "platform_profiles_sha256": {"$ref": "#/$defs/sha256", "description": "sha256 of canonical adoption/manifest.json#/platform_profiles at append time."},
+    "planned": {"const": true, "description": "Computed at append: the layer was a row of catalogs/landscape/planned-layers.json, with no landscape row and so no manifest row; its survivors bind to their retained votes and source reviews. Absent otherwise; it stays after the layer's landscape row is recorded."},
     "votes": {"enum": ["retained", "not_retained", "not_returned"]},
     "votes_note": {"type": "string", "minLength": 1},
     "discovery_ref": {"type": "string", "minLength": 1, "pattern": "#/", "description": "The sweep's returns_ref file with a pointer to this layer's retained discovery return: {catalog, layer_id, proposed[], requirement_sha256, platform_profiles_sha256}, the last two frozen before the run."},

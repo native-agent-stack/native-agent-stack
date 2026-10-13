@@ -955,6 +955,196 @@ def sl_rechain(ledger):
     return ledger
 
 
+# --------------------------------------------------------------------------- planned layers
+
+
+FLEET_SURV, FLEET_REF = "https://github.com/o/fleet-view", "https://github.com/o/fleet-other"
+PLANNED_SWEEP = "fx-planned"
+PLANNED_MANIFEST_REF = "catalogs/sota-convergence/manifest-fx-planned.json"
+PLANNED_USAGE = "evidence/artifacts/fx/child-usage-wf_fx-planned.json"
+PLANNED_RETURNS = "evidence/artifacts/fx/fx-planned/returns.json"
+PLANNED_REVIEW = "evidence/artifacts/fx/o-fleet-view.json"
+PLANNED_ROWS = [{"catalog": "foundation", "layer_id": "fleet", "title": "Fleet supervision",
+                 "requirement": "one view of every lane", "acceptance": "per-lane rows with staleness",
+                 "source": {"record": "a dated ruling", "approved": "2026-10-13"}}]
+# Spelled out, not read from the module, so the fixture also builds against a ledger without planned layers.
+PLANNED_PATH = "catalogs/landscape/planned-layers.json"
+
+
+def planned_hash(row: dict) -> str:
+    """The documented planned requirement hash: the sha256 of the canonical {requirement, acceptance}."""
+    return hashlib.sha256(json.dumps({"requirement": row.get("requirement"), "acceptance": row.get("acceptance")},
+                                     sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()).hexdigest()
+
+
+def build_planned_fixture(root: Path) -> None:
+    """The fixture checkout plus a one-row planned-layers catalog and one sweep of that layer's retained files: its
+    manifest (no foundation row for the planned layer, whose lane rows build_manifest.py files under lane_groupings),
+    usage, returns (frozen scope included) and one source review."""
+    write(root, PLANNED_PATH, {"schema_version": 1, "layers": PLANNED_ROWS})
+    profiles = sl.platform_profiles_sha256(json.loads((root / sl.ADOPTION).read_text(encoding="utf-8")))
+    write(root, PLANNED_MANIFEST_REF, {"checked_at": "2026-10-03", "foundation": [], "trading": [],
+                                       "lane_groupings": [{"layer": "fleet", "selected": []}]})
+    write(root, PLANNED_USAGE, usage_of(f"wf_{PLANNED_SWEEP}", [
+        {"label": f"{role}:fleet", "complete": True} for role in ("discover", "refute-facts", "refute-fit")]))
+    write(root, PLANNED_RETURNS, {
+        "workflow_run": f"wf_{PLANNED_SWEEP}",
+        "discovery": {"fleet": {"catalog": "foundation", "layer_id": "fleet", "proposed": [FLEET_SURV, FLEET_REF],
+                                "requirement_sha256": planned_hash(PLANNED_ROWS[0]),
+                                "platform_profiles_sha256": profiles}},
+        "votes": {"fleet": [
+            {"facts": {"role": "facts", "repository": FLEET_SURV, "refuted": False},
+             "fit": {"role": "fit", "repository": FLEET_SURV, "refuted": False}},
+            {"facts": {"role": "facts", "repository": FLEET_REF, "refuted": False},
+             "fit": {"role": "fit", "repository": FLEET_REF, "refuted": True}}]}})
+    write(root, PLANNED_REVIEW, {"repository": FLEET_SURV, "layers": ["fleet"]})
+    register(root)
+
+
+def planned_result(**overrides):
+    """make_result.py's RESULT.json for the fixture's planned-layer sweep: one survivor, one refuted repository."""
+    votes = f"{PLANNED_RETURNS}#/votes/fleet"
+    value = {"sweep_id": PLANNED_SWEEP, "date": "2026-10-03", "workflow_run": f"wf_{PLANNED_SWEEP}",
+             "status": "completed", "manifest_ref": PLANNED_MANIFEST_REF, "lane": PLANNED_SWEEP,
+             "prompts_sha256": "e" * 64, "usage_ref": PLANNED_USAGE, "lower_bound_usage": False,
+             "returns_ref": PLANNED_RETURNS,
+             "layers": [{"catalog": "foundation", "layer_id": "fleet", "votes": "retained",
+                         "discovery_ref": f"{PLANNED_RETURNS}#/discovery/fleet", "calls": None,
+                         "proposed": [FLEET_SURV, FLEET_REF],
+                         "survived": [{"repo": FLEET_SURV, "source_review": PLANNED_REVIEW,
+                                       "facts": {"vote": "not_refuted", "ref": f"{votes}/0/facts"},
+                                       "fit": {"vote": "not_refuted", "ref": f"{votes}/0/fit"}}],
+                         "refuted": [{"repo": FLEET_REF,
+                                      "facts": {"vote": "not_refuted", "ref": f"{votes}/1/facts"},
+                                      "fit": {"vote": "refuted", "ref": f"{votes}/1/fit"}}],
+                         "reopen": []}]}
+    value.update(overrides)
+    return value
+
+
+class PlannedLayerTests(FixtureCase):
+    """The rows of catalogs/landscape/planned-layers.json in the scope, the report and the ledger: before this, a
+    planned layer was 'not a layer in research-state.json', so no sweep could record it and scripts/final_stack.py's
+    no-winner state for a planned layer covered by a completed sweep had no tool that produced it."""
+
+    def setUp(self):
+        super().setUp()
+        build_planned_fixture(self.root)
+
+    def test_a_planned_layer_sweep_appends_and_checks_without_a_manifest_row(self):
+        ledger = self.appended(planned_result())
+        self.assertEqual(sl.check_ledger(self.root, ledger), [])
+        fleet = ledger["sweeps"][0]["layers"][0]
+        self.assertEqual((fleet["catalog"], fleet["layer_id"], fleet["planned"]), ("foundation", "fleet", True))
+        self.assertEqual(fleet["requirement_sha256"], planned_hash(PLANNED_ROWS[0]))
+        self.assertEqual((fleet["known"], fleet["new"]), ([], [FLEET_SURV, FLEET_REF]))
+        # The planned row's hash covers exactly its requirement and acceptance.
+        self.assertEqual((sl.PLANNED_LAYERS, sl.planned_requirement_sha256(PLANNED_ROWS[0])),
+                         (PLANNED_PATH, planned_hash(PLANNED_ROWS[0])))
+        for field, value in (("title", "x"), ("source", {"record": "another"})):
+            self.assertEqual(sl.planned_requirement_sha256(dict(PLANNED_ROWS[0], **{field: value})),
+                             sl.planned_requirement_sha256(PLANNED_ROWS[0]))
+        for field in ("requirement", "acceptance"):
+            self.assertNotEqual(sl.planned_requirement_sha256(dict(PLANNED_ROWS[0], **{field: "x"})),
+                                sl.planned_requirement_sha256(PLANNED_ROWS[0]))
+        # A research-state layer's record carries no mark.
+        ledger = self.appended(result(), planned_result())
+        self.assertNotIn("planned", ledger["sweeps"][0]["layers"][0])
+
+    def test_the_scope_and_the_report_carry_the_planned_layer(self):
+        scope = sl.scope_hashes(self.root)
+        self.assertEqual(scope["requirement_sha256"].get("foundation/fleet"), planned_hash(PLANNED_ROWS[0]))
+        self.assertEqual(sorted(scope["requirement_sha256"]),
+                         ["foundation/alpha", "foundation/fleet", "foundation/gamma", "us-equities/beta"])
+        report = sl.build_report(self.root, self.appended(planned_result()))
+        keys = [(row["catalog"], row["layer_id"]) for row in report["layers"]]
+        self.assertEqual(keys, [("foundation", "alpha"), ("us-equities", "beta"), ("foundation", "gamma"),
+                                ("foundation", "fleet")])
+        fleet = report["layers"][3]
+        self.assertEqual((fleet["research_status"], fleet["planned"], fleet["due"], fleet["clean_count"],
+                          fleet["last_sweep"]), (None, True, True, 0, PLANNED_SWEEP))
+        self.assertEqual(fleet["reset"], [{"trigger": "survivor", "ref": f"{PLANNED_SWEEP}:{FLEET_SURV}"}])
+        self.assertFalse(report["layers"][0]["planned"])
+        self.assertIn(f"| foundation/fleet | planned | 0 | no | {PLANNED_SWEEP} |", sl.render_markdown(report))
+        # The --report --json rows build_args.py --due-report reads: catalog, layer_id and due.
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+            self.assertEqual(sl.main(["--root", str(self.root), "--report", "--json"]), 0)
+        self.assertIn({"catalog": "foundation", "layer_id": "fleet", "due": True},
+                      [{key: row[key] for key in ("catalog", "layer_id", "due")}
+                       for row in json.loads(out.getvalue())["layers"]])
+
+    def test_a_changed_planned_requirement_is_a_current_trigger_citing_the_planned_layers(self):
+        ledger = self.appended(planned_result())
+        catalog = json.loads((self.root / PLANNED_PATH).read_text(encoding="utf-8"))
+        catalog["layers"][0]["acceptance"] = "per-lane rows, staleness and invoke rates"
+        write(self.root, PLANNED_PATH, catalog)
+        report = sl.build_report(self.root, ledger)
+        self.assertEqual(report["current_reopen_triggers"]["foundation/fleet"],
+                         [{"trigger": "requirement_changed", "ref": PLANNED_PATH}])
+        # The record keeps the scope frozen before the run.
+        self.assertEqual(sl.check_ledger(self.root, ledger), [])
+
+    def test_the_planned_mark_is_computed_and_is_what_lifts_the_manifest_row_rule(self):
+        forged = planned_result()
+        forged["layers"][0]["planned"] = True
+        with self.assertRaisesRegex(sl.LedgerError, r"must not set computed field planned"):
+            sl.append(self.root, self.ledger(), forged)
+        ledger = self.appended(planned_result())
+        for value in (False, "yes"):
+            with self.subTest(planned=value):
+                changed = copy.deepcopy(ledger)
+                changed["sweeps"][0]["layers"][0]["planned"] = value
+                self.assertErrorMatches(sl_rechain(changed), r"planned, when present, is true")
+        unmarked = copy.deepcopy(ledger)
+        del unmarked["sweeps"][0]["layers"][0]["planned"]
+        self.assertErrorMatches(sl_rechain(unmarked), r"layer foundation/fleet is not in .*manifest-fx-planned")
+        self.assertErrorMatches(sl_rechain(unmarked), r"a survivor needs a manifest layer")
+        # A planned survivor still binds to its retained votes and its source review.
+        other = copy.deepcopy(ledger)
+        other["sweeps"][0]["layers"][0]["survived"][0]["source_review"] = REVIEW  # a review of o/surv
+        self.assertErrorMatches(sl_rechain(other), r"reviews a different repository")
+        vote = copy.deepcopy(ledger)
+        vote["sweeps"][0]["layers"][0]["survived"][0]["fit"]["ref"] = f"{PLANNED_RETURNS}#/votes/fleet/1/fit"
+        self.assertErrorMatches(sl_rechain(vote), r"vote on a different repository")
+
+    def test_the_mark_outlives_the_layers_promotion_to_a_landscape_row(self):
+        ledger = self.appended(planned_result())
+        write(self.root, PLANNED_PATH, {"schema_version": 1, "layers": []})
+        state = json.loads((self.root / sl.RESEARCH_STATE).read_text(encoding="utf-8"))
+        state["layers"].append({"catalog": "foundation", "layer_id": "fleet", "status": "comparison_required",
+                                "next_action": "compare fleet", "decision_ref": "catalogs/landscape/foundation.json"})
+        write(self.root, sl.RESEARCH_STATE, state)
+        self.assertEqual(sl.check_ledger(self.root, ledger), [])
+        report = sl.build_report(self.root, ledger)
+        self.assertEqual(report["current_reopen_triggers"]["foundation/fleet"],
+                         [{"trigger": "requirement_changed", "ref": sl.RESEARCH_STATE}])
+        self.assertFalse(next(row for row in report["layers"] if row["layer_id"] == "fleet")["planned"])
+
+    def test_a_planned_layer_with_a_research_state_row_and_malformed_rows_are_refused(self):
+        state = json.loads((self.root / sl.RESEARCH_STATE).read_text(encoding="utf-8"))
+        state["layers"].append({"catalog": "foundation", "layer_id": "fleet", "status": "comparison_required",
+                                "next_action": "compare fleet", "decision_ref": "catalogs/landscape/foundation.json"})
+        write(self.root, sl.RESEARCH_STATE, state)
+        for call in (lambda: sl.scope_hashes(self.root), lambda: sl.build_report(self.root, self.ledger()),
+                     lambda: sl.append(self.root, self.ledger(), planned_result())):
+            with self.assertRaisesRegex(sl.LedgerError, r"planned layer foundation/fleet collides with its "
+                                                        r"catalogs/landscape/research-state\.json row"):
+                call()
+        build_fixture(self.root)  # the research state without the fleet row
+        for rows, message in (([PLANNED_ROWS[0], PLANNED_ROWS[0]], r"listed more than once"),
+                              ([dict(PLANNED_ROWS[0], catalog="skills")], r"needs a catalog in"),
+                              ([dict(PLANNED_ROWS[0], layer_id=None)], r"needs a catalog in")):
+            with self.subTest(message=message):
+                write(self.root, PLANNED_PATH, {"schema_version": 1, "layers": rows})
+                with self.assertRaisesRegex(sl.LedgerError, message):
+                    sl.scope_hashes(self.root)
+        # Without a planned-layers catalog the planned layer is unknown, as before.
+        (self.root / PLANNED_PATH).unlink()
+        with self.assertRaisesRegex(sl.LedgerError, r"foundation/fleet is not a layer in .*planned-layers\.json"):
+            sl.append(self.root, self.ledger(), planned_result())
+
+
 # --------------------------------------------------------------------------- separation
 
 
@@ -1029,13 +1219,24 @@ class RepositoryLedgerTests(unittest.TestCase):
         report = sl.build_report(ROOT, ledger)
         tasks = json.loads((ROOT / sl.SKILLS_CATALOG).read_text(encoding="utf-8"))["tasks"]
         research = list(sl.research_rows(ROOT))
+        planned = [(row["catalog"], row["layer_id"])
+                   for row in json.loads((ROOT / PLANNED_PATH).read_text(encoding="utf-8"))["layers"]]
         keys = [(row["catalog"], row["layer_id"]) for row in report["layers"]]
-        self.assertEqual(keys, research + [("skills", task["layer_id"]) for task in tasks])
+        # The research-state layers, the planned layers, then the skills lifecycle tasks.
+        self.assertEqual(keys, research + planned + [("skills", task["layer_id"]) for task in tasks])
         skills = [row for row in report["layers"] if row["catalog"] == "skills"]
         self.assertTrue(skills)
         # No skills sweep is recorded yet, so every skills layer is due with a clean count of 0.
         self.assertTrue(all(row["due"] and row["clean_count"] == 0 and row["research_status"] is None
                             for row in skills))
+        # Nor is a planned-layer sweep: each planned layer is due, unswept, with no research status.
+        rows = [row for row in report["layers"] if row["planned"]]
+        self.assertEqual([(row["catalog"], row["layer_id"]) for row in rows], planned)
+        self.assertTrue(planned)
+        self.assertTrue(all(row["due"] and row["clean_count"] == 0 and row["research_status"] is None
+                            and row["last_sweep"] is None for row in rows))
+        self.assertEqual(set(sl.scope_hashes(ROOT)["requirement_sha256"]),
+                         {f"{catalog}/{layer_id}" for catalog, layer_id in research + planned})
 
     # The requirement and platform-profile hashes are computed from the research-state and adoption
     # files at append time. They legitimately differ from today's files after a landscape edit, so

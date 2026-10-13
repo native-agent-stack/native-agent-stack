@@ -37,11 +37,14 @@ Each layer entry holds these fields:
 
 - `catalog` (`foundation`, `us-equities` or `skills`, the skills modality keyed by lifecycle task) and `layer_id`
 - `requirement_sha256`: the sha256 of the canonical JSON `{next_action, decision_ref}` from the
-  layer's `research-state.json` row
+  layer's `research-state.json` row. A planned layer (below) hashes `{requirement, acceptance}` from
+  its `catalogs/landscape/planned-layers.json` row, and a skills layer
+  `{lifecycle_task, requirement, overturn_when}` from its skills lifecycle task.
 - `platform_profiles_sha256`: the sha256 of the canonical `adoption/manifest.json#/platform_profiles`
 
   Both are the scope frozen before the run (`--scope`) when the layer cites a discovery return,
   which retains them; otherwise `--append` computes them from that day's files.
+- `planned`, computed by `--append`: `true` when the layer was a planned layer, absent otherwise.
 - `votes`: `retained`, `not_retained` or `not_returned`, with a `votes_note` unless `retained`
 - `discovery_ref`, required with `votes: retained`: `returns_ref#/pointer` to the layer's
   discovery return, `{catalog, layer_id, proposed[], requirement_sha256, platform_profiles_sha256}`
@@ -69,6 +72,23 @@ round as `not_adjudicated`, not as `refuted`.
 
 The sha256 values use canonical JSON: sorted keys, no whitespace, UTF-8. The first record chains
 to `{schema_version, policy}`, so changing `policy` also breaks the chain.
+
+### Planned layers
+
+A planned layer is a row of
+[`catalogs/landscape/planned-layers.json`](../landscape/planned-layers.json): a layer an approved
+plan names that has no landscape row yet. It is swept as a repository layer of its own catalog
+(`foundation` or `us-equities`). `--scope` freezes its requirement hash with the research-state
+layers, `--report` lists it after them (research status `planned`), and `--append` records it.
+A planned layer that also has a `research-state.json` row is refused, as
+`scripts/final_stack.py` refuses one that has a landscape row.
+
+A planned layer has no row in its sweep's SOTA manifest: `build_manifest.py` files its lane rows
+under `lane_groupings`. So `--append` marks its entry `planned: true`, `--check` does not require
+the manifest row, and a survivor binds to its retained votes and its source review, as a skills
+survivor does. The mark is durable. Once a verdict wave records the layer's landscape row and its
+research-state row, that row supplies the requirement hash, which `--report` shows as a
+`requirement_changed` reset, and the entries recorded while the layer was planned still check.
 
 ## What `--check` verifies
 
