@@ -125,7 +125,7 @@ class Guards(unittest.TestCase):
             self.plan.session("lev4", datetime(2026, 10, 12, 19, 50, tzinfo=timezone.utc).timestamp())
         config = self.plan.config("lev4")
         with self.assertRaisesRegex(d.Refused, "^unsupported_session_kind$"):
-            d.validate_sizing_and_scope(config, "adaptive", "PRE")
+            d.validate_sizing_and_scope(config, "adaptive", "OVERNIGHT")
         changed = dict(config, sessions=dict(config["sessions"], overnight_holds=True))
         with self.assertRaisesRegex(d.Refused, "^unsupported_overnight_policy$"):
             d.validate_sizing_and_scope(changed, "adaptive", "RTH")
@@ -140,7 +140,7 @@ class Guards(unittest.TestCase):
         with self.assertRaisesRegex(d.Refused, "^stage_runtime_or_namespace_mismatch$"): self.plan.verify()
 
     def test_verify_source_inventory_label_and_native_effective_digest(self):
-        self.plan.stage("lev4")["session_kind"] = "PRE"
+        self.plan.stage("lev4")["session_kind"] = "OVERNIGHT"
         with self.assertRaisesRegex(d.Refused, "^unsupported_session_kind$"): self.plan.verify()
         self.plan.stage("lev4")["session_kind"] = "RTH"
         with patch.object(d, "config_hashes", return_value=(
@@ -1171,7 +1171,7 @@ class Guards(unittest.TestCase):
             with self.assertRaisesRegex(d.Refused, "^" + reason + "$"): d.Deployment(self.bundle, self.plan.state)
             (self.bundle / "deployment.json").write_bytes(original)
         for field, value, reason in [("engine_kind", "other", "unsupported_engine_kind"),
-                                    ("session_kind", "PRE", "unsupported_session_kind")]:
+                                    ("session_kind", "OVERNIGHT", "unsupported_session_kind")]:
             original_bytes = (self.bundle / "deployment.json").read_bytes()
             original = load_json(self.bundle / "deployment.json")
             original["stages"]["lev4"][field] = value

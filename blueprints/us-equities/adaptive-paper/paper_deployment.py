@@ -273,13 +273,30 @@ def config_hashes(path, kind):
 
 
 def validate_sizing_and_scope(config, kind, session):
-    if session not in ("RTH", "POST"):
+    if session not in ("PRE", "RTH", "POST") or (session == "PRE" and kind != "adaptive"):
         raise Refused("unsupported_session_kind")
     if config.get("sessions", {}).get("overnight_holds") is not False:
         raise Refused("unsupported_overnight_policy")
-    if kind == "adaptive" and ("leverage_policy" in config or float(config["max_leverage"]) > 1
-                              or float(config["max_gross_exposure_usd"]) > 5000):
-        raise Refused("unregistered_sizing_setting")
+    if kind == "adaptive":
+        if session in ("PRE", "POST") and "leverage_policy" in config:
+            # Admit only the shipped canonical 1x setting outside RTH; no
+            # caller alias, larger gross/order/loss cap or different policy.
+            from leverage import CANONICAL_V1_BLOCK
+            required = {"capital_usd": "10000", "max_leverage": "1",
+                        "max_gross_exposure_usd": "10000", "max_order_notional_usd": "1000",
+                        "max_order_quantity": 100, "max_order_qty_mode": "notional",
+                        "max_gross_loss_usd": "25", "max_drawdown_usd": "25"}
+            if (any(config.get(k) != v for k, v in required.items())
+                    or config.get("leverage_policy") != CANONICAL_V1_BLOCK):
+                raise Refused("unregistered_sizing_setting")
+        elif ("leverage_policy" in config or float(config["max_leverage"]) > 1
+                or float(config["max_gross_exposure_usd"]) > 5000):
+            raise Refused("unregistered_sizing_setting")
+        if session in ("PRE", "POST") and (
+                config.get("regular_session_only") is not False
+                or config.get("extended_hours_enabled") is not True
+                or config.get("sessions", {}).get("extended_hours") is not True):
+            raise Refused("extended_session_config_required")
     if kind == "mover":
         required = {"capital_usd": "10000", "max_leverage": "4", "max_gross_exposure_usd": "40000",
                     "max_order_notional_usd": "10000", "max_order_quantity": 100,
@@ -368,6 +385,7 @@ def build(root, *, deployment, order, stage_specs=None):
         raise Refused("invalid_stage_order")
     names = {"lev1": "config-leverage-1x.json", "lev2": "config-leverage-2x.json",
              "lev4": "config-leverage-4x.json", "post1": "config-leverage-1x.json",
+             "pre-1x": "config-leverage-1x.json", "post-1x": "config-leverage-1x.json",
              "mover1": "config-mover.json", "mover2": "config-mover.json",
              "mover4": "config-mover.json", "postmover1": "config-mover.json",
              "mover-max": "config-mover.json", "postmover-max": "config-mover.json"}
@@ -389,8 +407,10 @@ def build(root, *, deployment, order, stage_specs=None):
             config["max_order_qty_mode"] = original.get("max_order_qty_mode", "fixed")
         config["notes"] = "Lane B exploratory; native limits; no qualification claim."
         kind = custom["engine_kind"] if custom else ("mover" if "mover" in stage else "adaptive")
-        session = custom["session_kind"] if custom else ("POST" if stage.startswith("post") else "RTH")
-        if kind not in ("adaptive", "mover", "t22") or session not in ("RTH", "POST"):
+        session = custom["session_kind"] if custom else ("PRE" if stage.startswith("pre-") else
+                                                        "POST" if stage.startswith("post") else "RTH")
+        if (kind not in ("adaptive", "mover", "t22") or session not in ("PRE", "RTH", "POST")
+                or (session == "PRE" and kind != "adaptive")):
             raise Refused("unsupported_stage_kind")
         mover = kind == "mover"
         post = session == "POST"
@@ -405,7 +425,7 @@ def build(root, *, deployment, order, stage_specs=None):
                                    session_scope="any_session", trial_end_et="19:55" if post else "15:55",
                                    exit="X3", max_entry_notional_usd="1000",
                                    rung_schedule=[{"from_session": 1, "to_session": 1000, "rung": str(rung)}])
-        if stage == "post1":
+        if kind == "adaptive" and session in ("PRE", "POST"):
             config["regular_session_only"] = False
             config["extended_hours_enabled"] = True
             config["sessions"].update(extended_hours=True, overnight_holds=False)
@@ -458,7 +478,7 @@ def cut(root, *, deployment, order, source_pin, stage_spec=None):
     import tarfile
     root = bundle_destination(root)
     systemd_path(root)
-    if any(stage in {"lev1", "lev2", "lev4", "mover1", "mover2", "mover4", "post1", "postmover1"}
+    if any(stage in {"lev1", "lev2", "lev4", "mover1", "mover2", "mover4", "postmover1"}
            for stage in order):
         raise Refused("rung_deployment_requires_registered_sizing_preset")
     if root.exists():
@@ -514,7 +534,9 @@ class Deployment:
             identifier(stage)
             if self.stage(stage).get("engine_kind") not in ("adaptive", "mover", "t22"):
                 raise Refused("unsupported_engine_kind")
-            if self.stage(stage).get("session_kind") not in ("RTH", "POST"):
+            if (self.stage(stage).get("session_kind") not in ("PRE", "RTH", "POST")
+                    or (self.stage(stage).get("session_kind") == "PRE"
+                        and self.stage(stage).get("engine_kind") != "adaptive")):
                 raise Refused("unsupported_session_kind")
             self.config(stage)
 

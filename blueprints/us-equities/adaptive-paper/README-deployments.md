@@ -9,12 +9,31 @@ evidence_class=exploratory, with relative artifact ids and hashes.
 
 ## Scope and current limitations
 
-This PR admits RTH and POST kinds only. PRE and intentional overnight require
-separately reviewed lifecycle work. At the current native producer pin, TIMES
+The helper admits adaptive PRE and POST controls at the shipped canonical1x
+setting, alongside the existing RTH program. Intentional overnight and PRE
+mover/T22 stages require separate reviewed lifecycle work. At the current native producer pin, TIMES
 ends at10:00: the proposed16:05 POST mover recipe is REFUSED at build and verify,
 not presented as runnable. A reviewed producer capability and producer-to-helper
 integration receipt must precede enabling that rule. No earlier data is
 restamped. A supported POST kind alone does not establish a supported mover scan.
+
+Extended controls use `--order pre-1x post-1x` (or adaptive custom aliases with
+session_kind PRE/POST and the same shipped1x limits). The builder freezes the
+three native extended-session flags, no overnight hold, duration1200s and
+150REST/120submit budgets. The source1x policy, capital/gross10000USD,
+order1000USD,100-share notional cap and25USD loss/drawdown are preserved.
+Larger exposure/order/loss settings and leverage above1 are refused; RTH rung
+restrictions remain as before. Native leverage.py owns PRE/POST ceilings and
+sessions.py owns actual venue sessions/early closes, not a new market schedule.
+
+Each stage has its own GO, actual flat readiness, native CLI invocation and
+exact-CONFIG recovery. PRE and POST use the SAME account-state journal and
+effective-config namespace when their frozen configs match; no fresh per-stage
+DB or account is created. Existing config changes still require native rotation
+and fee/cash continuity. The broker receives stock LIMIT/DAY extended-hours
+orders through the existing adapter, with the same quote/risk/exit gates.
+The installed sealed series is unchanged; a reviewed landed pin, strict NEW
+bundle seal, full wiring dry run and NEW validity binding precede deployment.
 
 The first mover recipe is ONE setting at the code's existing ceiling:
 mover-max, canonical max-leverage4, gross40,000 USD, order10,000 USD,
@@ -61,7 +80,8 @@ and fresh flat/account/cash/fee checks; before it lands changed-config orders
 are refused. Never create another DB to bypass continuity.
 
 A custom stage specification maps ids to engine_kind adaptive|mover|t22,
-session_kind RTH|POST and relative config file. T22 requires native resolved
+session_kind PRE|RTH|POST and relative config file; PRE supports adaptive only.
+T22 requires native resolved
 _t22, exact factor bytes and declared availability; an old source cannot
 silently fall back to baseline. No live-dir is passed. Multi-config deployments
 remain unusable at this base until the native rotation API lands.
