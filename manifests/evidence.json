@@ -13178,8 +13178,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/credential_source.py",
-      "sha256": "0bbe30aab4e665226e230e9927ef51e7f8875c53dda6527d19e6efe76bbaeacc",
-      "bytes": 9305
+      "sha256": "917f2a2b30065ff9340b577be29931a36b6106a5148498e9f7c7dd5c919c21c6",
+      "bytes": 10202
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/evidence-hashes.json",
@@ -13503,7 +13503,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "68caad4b32806917d515b2c9ef337e617f1717403887d651af1709c01c7aa8d1",
+      "sha256": "9dcc93a0a6bb30f85f4dee17f37887079499b1f9f003a3541ef368277b28f685",
       "bytes": 9624
     },
     {
@@ -16532,6 +16532,11 @@
       "bytes": 26070
     },
     {
+      "path": "blueprints/us-equities/order-throughput/capacity.py",
+      "sha256": "ae22572ba814f2c561ea7bd4ee8c13611881098932ad448100b0fd000136b3f5",
+      "bytes": 82333
+    },
+    {
       "path": "blueprints/us-equities/order-throughput/rate_limit_evidence.py",
       "sha256": "3967619143bdd20239d34783748589d4881c5ca915e114cfb0f19fb4c1e8bb1a",
       "bytes": 10588
@@ -18108,8 +18113,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-broker-credential-handling.md",
-      "sha256": "2447e90754081adc0bcaf5980dfee51c5b03048478a4239d13fa7ecd5e8a24ff",
-      "bytes": 30178
+      "sha256": "7dcc0f11fc5c24ceaf7c791a7556e3efb204068a49cb3345ef23ed1282535eba",
+      "bytes": 30740
     },
     {
       "path": "docs/decisions/2026-09-22-codeql-first-analysis.md",
@@ -19085,6 +19090,11 @@
       "path": "docs/decisions/2026-10-13-lane-a-frozen-field-continuity.md",
       "sha256": "4da74df3105b3e30d5408e17c15cc0b369c9feac2e7391f404b1e1669e55a073",
       "bytes": 5792
+    },
+    {
+      "path": "docs/decisions/2026-10-13-strict-paper-url-gates.md",
+      "sha256": "be95ba0bd6aedd5334cf2d97cd1ebbab300aff21f7990cd8609267ec064d48ab",
+      "bytes": 5386
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -61893,8 +61903,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_credential_source.py",
-      "sha256": "73b03dbca953df186b25354db9da8fa24d2ec7e767513f630289de9a75f75c14",
-      "bytes": 25506
+      "sha256": "a14049da20bc68c98cd6cf06382c41fedef0cd9fb999f959c748ce0209c553f6",
+      "bytes": 28531
     },
     {
       "path": "tests/test_adaptive_paper_exit_quote_age.py",
@@ -62948,8 +62958,8 @@
     },
     {
       "path": "tests/test_order_throughput.py",
-      "sha256": "5c85734ed8e7915a540c7c1a5ebc058fa35d10efef29c97988e3b3b40b52b189",
-      "bytes": 79596
+      "sha256": "c275233b4acca371f4e9c68ec11abeade2a4f43ce200b2befbc56c8b70def322",
+      "bytes": 79866
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",

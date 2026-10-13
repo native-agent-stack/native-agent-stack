@@ -70,6 +70,36 @@ class _NoLeakMixin:
 
 
 class PaperBaseUrl(_NoLeakMixin, unittest.TestCase):
+    def test_normalization_is_idempotent_for_every_allowed_spelling(self):
+        for authority in ("paper-api.alpaca.markets","paper-api.alpaca.markets:443"):
+            for path in ("","/","/v2","/v2/"):
+                value="https://"+authority+path
+                with self.subTest(value=value):
+                    normalized=cs.normalize_paper_base_url(value)
+                    self.assertEqual(normalized,PAPER)
+                    self.assertEqual(cs.normalize_paper_base_url(normalized),PAPER)
+
+    def test_strict_components_and_all_ascii_controls_are_refused(self):
+        bad=[PAPER+suffix for suffix in ("//","/v1","/v2/extra","/v2//","?","#","/v2?","/v2#","/v%32")]
+        bad += ["https://paper-api.alpaca.markets:"+port+"/v2" for port in ("","8443","invalid","00443")]
+        bad += ["https://"+prefix+"paper-api.alpaca.markets/v2" for prefix in ("@","user@","user:pass@")]
+        bad += [None, b"https://paper-api.alpaca.markets/v2",7,PAPER+" "," "+PAPER]
+        for value in bad:
+            with self.subTest(value=repr(value)):
+                self.assertIsNone(cs.normalize_paper_base_url(value))
+        for char in [chr(i) for i in range(32)]+[chr(127)]:
+            for value in (char+PAPER,PAPER+char,PAPER.replace("paper-api","paper"+char+"-api")):
+                with self.subTest(value=repr(value)):
+                    self.assertIsNone(cs.normalize_paper_base_url(value))
+
+    def test_all_version_and_default_port_spellings_share_the_paper_pin(self):
+        for authority in ("paper-api.alpaca.markets","paper-api.alpaca.markets:443"):
+            for path in ("","/","/v2","/v2/"):
+                value="https://"+authority+path
+                with self.subTest(value=value):
+                    self.assertIsNone(cs.paper_base_url_reason(value))
+                    cs.require_paper_base_url(value)
+
     def test_absent_and_exact_paper_url_are_accepted(self):
         for value in (None, PAPER, PAPER + "/"):
             with self.subTest(value=value):
@@ -88,7 +118,7 @@ class PaperBaseUrl(_NoLeakMixin, unittest.TestCase):
         for value in ("", OTHER, "https://data.alpaca.markets", "https://broker-api.alpaca.markets",
                       "https://paper-api.alpaca.markets.example.invalid", "http://paper-api.alpaca.markets",
                       "https://paper-api.alpaca.markets:8443", "https://user@paper-api.alpaca.markets",
-                      "https://paper-api.alpaca.markets/v2", "https://paper-api.alpaca.markets?x=1",
+                      "https://paper-api.alpaca.markets/v1", "https://paper-api.alpaca.markets?x=1",
                       "paper-api.alpaca.markets", "HTTPS://PAPER-API.ALPACA.MARKETS", "https://[::1",
                       b"https://paper-api.alpaca.markets", 7):
             with self.subTest(value=value):
@@ -152,6 +182,11 @@ class KeychainEnvCredentials(_NoLeakMixin, unittest.TestCase):
 
     def test_paper_base_url_is_accepted(self):
         self.assertEqual(cs.keychain_env_credentials(pair(APCA_API_BASE_URL=PAPER)), (KEY, SECRET))
+
+    def test_versioned_paper_url_needs_no_child_override(self):
+        environ=pair(APCA_API_BASE_URL=PAPER+"/v2")
+        self.assertEqual(cs.keychain_env_credentials(environ),(KEY,SECRET))
+        self.assertEqual(environ,{cs.BASE_URL_VARIABLE:PAPER+"/v2"})
 
     def test_neither_set_is_missing(self):
         self.refused({}, cs.REASON_ENV_MISSING)
@@ -220,6 +255,12 @@ class KeychainEnvCredentials(_NoLeakMixin, unittest.TestCase):
 
 
 class SelectCredentials(_NoLeakMixin, unittest.TestCase):
+    def test_versioned_process_url_reaches_the_env_file_loader(self):
+        loader=Mock(return_value=(KEY,SECRET))
+        self.assertEqual(cs.select_credentials(cs.SOURCE_ENV_FILE,Path("paper.env"),
+            env_file_loader=loader,environ=pair(APCA_API_BASE_URL=PAPER+"/v2/")),(KEY,SECRET))
+        loader.assert_called_once_with(Path("paper.env"))
+
     def test_keychain_source_never_calls_the_file_loader(self):
         loader = Mock(side_effect=AssertionError("env file read"))
         self.assertEqual(cs.select_credentials(cs.SOURCE_KEYCHAIN_ENV, None, env_file_loader=loader,
@@ -264,6 +305,14 @@ def write_env(directory, *extra_lines):
 
 
 class EnvFilePaperOnly(_NoLeakMixin, unittest.TestCase):
+    def test_versioned_paper_url_is_accepted_by_both_real_file_loaders(self):
+        for authority in ("paper-api.alpaca.markets","paper-api.alpaca.markets:443"):
+            for suffix in ("","/","/v2","/v2/"):
+                path=write_env(self.root,"APCA_API_BASE_URL=https://"+authority+suffix)
+                for loader in (runner_module.credentials,mr.credentials):
+                    with self.subTest(authority=authority,suffix=suffix,loader=loader.__module__):
+                        self.assertEqual(loader(path,paper_only=True),(KEY,SECRET))
+
     """Both loaders' `credentials(path, paper_only=True)` refuse a non-paper
     APCA_API_BASE_URL line; the default keeps the earlier behavior."""
 

@@ -15,8 +15,9 @@ Two explicit sources, chosen with `--credentials`:
 
 Both sources are paper-only. The base URL is pinned to `PAPER_BASE_URL`; an
 `APCA_API_BASE_URL` in the process environment (either source) or in the env
-file (`env-file`) that is anything other than that exact URL (an optional
-trailing `/` aside) is refused before any broker request: the live trading
+file (`env-file`) accepts only the canonical HTTPS paper authority (optional
+port 443) with no path or `/v2`, each optionally ending in one slash.
+Everything else is refused before any broker request: the live trading
 host with `REASON_LIVE_HOST`, every other value with `REASON_NOT_PAPER`.
 
 Every refusal is one of the fixed `REASON_*` codes below. None carries a
@@ -83,12 +84,32 @@ class CredentialSourceError(RuntimeError):
     fixed `REASON_*` codes above, never a value or a path."""
 
 
-def paper_base_url_reason(value):
-    """`None` when `value` is absent (`None`) or exactly `PAPER_BASE_URL`
-    (an optional trailing `/` aside); otherwise the fixed reason code."""
-    if value is None:
+def normalize_paper_base_url(value):
+    """Return the pinned host for strict paper URL spellings, else ``None``.
+
+    alpaca-py v0.44.0 common/rest.py:107-109 appends v2 separately to
+    BaseURL.TRADING_PAPER; accepting the env's version suffix never routes
+    a request through that text. Shared with the capacity env-file gate.
+    """
+    if not isinstance(value,str) or not value.startswith("https://"):
         return None
-    if isinstance(value, str) and value.rstrip("/") == PAPER_BASE_URL:
+    # urlsplit strips some controls. Raw delimiters forbid even empty components.
+    if any(char.isspace() or ord(char)<32 or ord(char)==127 for char in value) or "?" in value or "#" in value:
+        return None
+    try:
+        parsed=urlsplit(value)
+    except ValueError:
+        return None
+    if (parsed.netloc not in
+            ("paper-api.alpaca.markets","paper-api.alpaca.markets:443")
+            or parsed.path not in ("","/","/v2","/v2/")):
+        return None
+    return PAPER_BASE_URL
+
+
+def paper_base_url_reason(value):
+    """Keep absent-URL compatibility and fixed refusals; normalize strict inputs."""
+    if value is None or normalize_paper_base_url(value) is not None:
         return None
     return REASON_LIVE_HOST if _hostname(value) == LIVE_TRADING_HOST else REASON_NOT_PAPER
 

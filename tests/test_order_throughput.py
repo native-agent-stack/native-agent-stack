@@ -547,6 +547,10 @@ class CapacityRunTests(unittest.TestCase):
 
 
 class PaperEnvURLTests(unittest.TestCase):
+    def test_capacity_source_receipt_binds_the_shared_url_gate(self):
+        row=c.source_provenance()["source_sha256"]["adaptive-paper/credential_source.py"]
+        self.assertEqual(row,c.hashlib.sha256((c.ADAPTIVE/"credential_source.py").read_bytes()).hexdigest())
+
     """Fake-key env files exercise the URL gate; no broker or network calls."""
 
     def setUp(self):
@@ -1104,7 +1108,7 @@ class ReviewFixTests(unittest.TestCase):
         for key in ("git_revision", "source_sha256", "alpaca_py_version", "python_version", "argv",
                     "ended_at", "exit_code"):
             self.assertIn(key, prov)
-        self.assertEqual(len(prov["source_sha256"]), 8)
+        self.assertEqual(len(prov["source_sha256"]), 9)
         self.assertTrue(all(re.fullmatch(r"[0-9a-f]{64}", v) for v in prov["source_sha256"].values()))
         self.assertEqual(c.sanitize_argv(["paper", "--env-file", "/srv/private/p.env", "--output=/x/y.json",
                                           "--cap", "1000"]),
