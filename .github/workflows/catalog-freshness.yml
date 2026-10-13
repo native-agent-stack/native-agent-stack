@@ -184,6 +184,22 @@ jobs:
           --all-recorded --root . --json
       - name: Install the native runtime-name scanner for synthetic validation tests
         uses: $/.github/actions/setup-host-name-scanner
+      - name: Provision the Bun that Claude Code 2.1.296 embeds, for the agent front matter tests
+        env:
+          BUN_VERSION: '1.4.3'
+          # https://github.com/oven-sh/bun/releases/download/bun-v1.4.3/SHASUMS256.txt, the line of bun-linux-x64.zip
+          BUN_SHA256: 3e730528d89775f03f87f05c06787c4df4099d0a37f3f252e7b829cb23816e18
+        # The same pin and checksum as the step of validate.yml (tests.test_adoption_status.WorkflowPinTests holds the two equal). The suite below reaches tests/test_adoption_status.py, whose
+        # bun tests fail under GitHub Actions rather than skip (unavailable()), so a runner without this bun fails the scheduled and the manual run and the propose job never starts.
+        run: |
+          mkdir -p "$RUNNER_TEMP/bun"
+          curl --fail --silent --show-error --location --retry 3 \
+            "https://github.com/oven-sh/bun/releases/download/bun-v${BUN_VERSION}/bun-linux-x64.zip" \
+            --output "$RUNNER_TEMP/bun/archive.zip"
+          printf '%s  %s\n' "$BUN_SHA256" "$RUNNER_TEMP/bun/archive.zip" | sha256sum --check
+          unzip -q "$RUNNER_TEMP/bun/archive.zip" -d "$RUNNER_TEMP/bun"
+          "$RUNNER_TEMP/bun/bun-linux-x64/bun" --version
+          echo "AGENT_FRONTMATTER_BUN=$RUNNER_TEMP/bun/bun-linux-x64/bun" >> "$GITHUB_ENV"
       - name: Run project test suite
         # --durations 50 lists the 50 slowest tests at the end of the run (Python 3.12+; this job sets up 3.13). GNU
         # timeout sends SIGABRT at 55 minutes, five under the job's limit, and SIGKILL 60 s later; with

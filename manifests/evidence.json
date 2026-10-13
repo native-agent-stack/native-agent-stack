@@ -5137,8 +5137,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "fe15308e810b3e0534c6cbbda9fdf237ec7941549a9d06277ecefb8733f37349",
-      "bytes": 27298
+      "sha256": "0bb8f0237ca45bb787620a9c08f9ceaafcaf58eddb512496aefebf45696ddae3",
+      "bytes": 28607
     },
     {
       "path": ".github/workflows/dependency-review.yml",
@@ -19103,8 +19103,8 @@
     },
     {
       "path": "docs/decisions/2026-10-13-claude-agent-drift-check.md",
-      "sha256": "069773373bf07ece21a52796c8e7c02b6810c8fe3c5405b06702ccb738a97529",
-      "bytes": 39516
+      "sha256": "b1f4cf2a44669cd12ffe04bf4f3255270774032291a5ffa42c8e0082b725689c",
+      "bytes": 41530
     },
     {
       "path": "docs/decisions/2026-10-13-lane-a-frozen-field-continuity.md",
@@ -19968,8 +19968,8 @@
     },
     {
       "path": "evidence/artifacts/agent-drift-check-20261013/README.md",
-      "sha256": "302701e1b20bc09b2b544761941a311f6ee676bd284900885ff045c438a6fc7d",
-      "bytes": 7168
+      "sha256": "4f96cb94cf408c71db0253d9fdc2a25b6b9b736a23d107150e4493b88ccd06f7",
+      "bytes": 7995
     },
     {
       "path": "evidence/artifacts/agent-drift-check-20261013/receipts/client-oracle.txt",
@@ -19992,6 +19992,11 @@
       "bytes": 1559
     },
     {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/fail-before-freshness-bun.txt",
+      "sha256": "84e2a0a97a2871af168e22ea9b9a07c0bb763f5e627ff858e2ab0cde3ac8110e",
+      "bytes": 890
+    },
+    {
       "path": "evidence/artifacts/agent-drift-check-20261013/receipts/fail-before-precheck.txt",
       "sha256": "e2b3fee16a0a44bf59470bc01b688bcd555ab5ab02a5257410ccd3f2d58af88c",
       "bytes": 1506
@@ -20010,6 +20015,11 @@
       "path": "evidence/artifacts/agent-drift-check-20261013/receipts/fail-before.txt",
       "sha256": "2eedb1737eadde92d6e6a6c47b48bc6342317f4332ac02db6c57aa91b7d4c6ed",
       "bytes": 1334
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/freshness-bun-local-check.txt",
+      "sha256": "1617169fac6f6b26ff2f84a2690441252cf8c5068e66a120ebf5595ac40b636c",
+      "bytes": 1283
     },
     {
       "path": "evidence/artifacts/agent-drift-check-20261013/receipts/host-run.json",
@@ -20040,6 +20050,11 @@
       "path": "evidence/artifacts/agent-drift-check-20261013/receipts/mutants-dotdot.txt",
       "sha256": "3ca8acdc9092092e27c83445d8326f3cc3f1ac44d4f4d4e1120d58b00c578092",
       "bytes": 1059
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/mutants-freshness-bun-13.txt",
+      "sha256": "c28a6573caf703049850a4c28f2ec6caf34abf42646345f09d6926d7af0fc2cd",
+      "bytes": 1559
     },
     {
       "path": "evidence/artifacts/agent-drift-check-20261013/receipts/mutants-precheck.txt",
@@ -62178,8 +62193,8 @@
     },
     {
       "path": "tests/test_adoption_status.py",
-      "sha256": "d26c047e452d839f21aefff51491696b5290bac815cdd860178370e1bc884e85",
-      "bytes": 248952
+      "sha256": "044a64bd2cf50352c4ae9ab4dea8e183950b711fb06786b99788549112f8965b",
+      "bytes": 254952
     },
     {
       "path": "tests/test_adoption_version_probes.py",

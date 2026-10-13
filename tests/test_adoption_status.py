@@ -2360,6 +2360,92 @@ class WorkflowPinTests(unittest.TestCase):
             self.assertIn(needle, step)
         self.assertLess(step.index("sha256sum --check"), step.index("unzip"), "the archive is checked before it is unpacked")
 
+    # The tests that need the real bun fail under GitHub Actions rather than skip, so every job whose unittest step reaches this module must provision the bun before it. The reader below is a text reader of the
+    # workflow files, as tests/test_workflow_hardening.py's jobs() is: a job is a two-space key under `jobs:`, a step a `- ` item at six spaces.
+    @staticmethod
+    def jobs_and_steps(text):
+        """[(job id, [step text, ...])] of a workflow file."""
+        jobs, job, step, in_jobs = [], None, None, False
+        for line in text.splitlines():
+            if re.match(r"^jobs:\s*$", line):
+                in_jobs = True
+                continue
+            if not in_jobs:
+                continue
+            if re.match(r"^[^\s#]", line):
+                in_jobs = False
+                continue
+            key = re.match(r"^  ([A-Za-z0-9_-]+):\s*$", line)
+            if key:
+                job, step = (key.group(1), []), None
+                jobs.append(job)
+            elif job is not None and re.match(r"^      - ", line):
+                step = [line]
+                job[1].append(step)
+            elif step is not None:
+                step.append(line)
+        return [(name, ["\n".join(lines) for lines in steps]) for name, steps in jobs]
+
+    @staticmethod
+    def reaches_the_bun_tests(step):
+        """True when the run block of `step` starts the unittest suite so that tests.test_adoption_status is among what it runs: `-m unittest` with no module argument (discovery of the checkout), one that names
+        tests.test_adoption_status, or the shard runner of validate.yml."""
+        match = re.search(r"(?m)^        run:[ \t]*(.*)\n?((?:(?:        [ \t]+.*|[ \t]*)\n?)*)", step)
+        if not match:
+            return False
+        block = re.sub(r"\\\n\s*", " ", match.group(1) + "\n" + match.group(2))
+        block = "\n".join(line for line in block.splitlines() if not line.strip().startswith("#"))
+        if re.search(r"validate_shards\.py\s+run\b", block):
+            return True
+        for command in re.finditer(r"-m\s+unittest\b([^|;&>\n]*)", block):
+            words = command.group(1).split()
+            if "discover" in words:
+                start = words.index("-s") + 1 if "-s" in words else None
+                if start is not None and start < len(words) and not words[start].startswith(("tests", ".")):
+                    continue
+                return True
+            named = [word for word in words if not word.startswith("-") and not word.isdigit()]
+            if not named or any(word == "tests.test_adoption_status" or word.startswith("tests.test_adoption_status.") for word in named):
+                return True
+        return False
+
+    def test_the_reader_tells_the_suite_runners_from_the_named_modules(self):
+        def one(run):
+            return "      - name: x\n        run: " + run + "\n"
+        reaching = ("python3 -m unittest", "python3 -m unittest --durations 50 2>&1 | tee log", "python3 -m unittest -v", "python3 -m unittest tests.test_adoption_status -v",
+                    "python3 -m unittest tests.test_a tests.test_adoption_status.ClientWiringTests", "python3 scripts/validate_shards.py run -v --shard 1", "python3 -m unittest discover -s tests",
+                    "|\n          set -o pipefail\n          timeout 55m \\\n            python3 -m unittest --durations 50 2>&1 | tee log")
+        elsewhere = ("python3 -m unittest tests.test_receipt_staleness -v", "python3 -m unittest discover -s tools/token-report -p test_token_manifest.py -q",
+                     "python3 -m unittest tests.test_a tests.test_adoption_status_extra", "echo hello", "|\n          # python3 -m unittest\n          echo done")
+        for run in reaching:
+            with self.subTest(reaching=run):
+                self.assertTrue(self.reaches_the_bun_tests(one(run)))
+        for run in elsewhere:
+            with self.subTest(elsewhere=run):
+                self.assertFalse(self.reaches_the_bun_tests(one(run)))
+
+    def test_every_job_that_runs_the_suite_provisions_the_pinned_bun_before_it(self):
+        """validate.yml (the shards) and catalog-freshness.yml (`python3 -m unittest --durations 50`) run the whole suite; the scheduled and the manual freshness run failed at the bun tests until its job
+        provisioned the same bun (the local review of the landing rebase, P1). Both steps carry one version and one checksum."""
+        shipped = re.search(r"BUN_SHA256: ([0-9a-f]{64})\n", (ROOT / ".github/workflows/validate.yml").read_text(encoding="utf-8"))
+        self.assertIsNotNone(shipped, "the release's checksum is written in validate.yml's step")
+        runners = {}
+        for path in sorted((ROOT / ".github/workflows").glob("*.y*ml")):
+            for job, steps in self.jobs_and_steps(path.read_text(encoding="utf-8")):
+                first = next((index for index, step in enumerate(steps) if self.reaches_the_bun_tests(step)), None)
+                if first is not None:
+                    runners[(path.name, job)] = steps[:first]
+        self.assertTrue({"validate.yml", "catalog-freshness.yml"} <= {name for name, _ in runners}, f"the reader finds the two known suite runners: {sorted(runners)}")
+        for (name, job), before in sorted(runners.items()):
+            with self.subTest(workflow=name, job=job):
+                provisioning = [step for step in before if f'echo "{adoption_status.BUN_ENV}=' in step and "GITHUB_ENV" in step]
+                self.assertEqual(len(provisioning), 1, "one step before the suite exports the bun's path")
+                step = provisioning[0]
+                self.assertIn(f"BUN_VERSION: '{adoption_status.CLIENT_BUN_VERSION}'", step)
+                self.assertIn(f"BUN_SHA256: {shipped.group(1)}", step)
+                self.assertIn("releases/download/bun-v${BUN_VERSION}/bun-linux-x64.zip", step)
+                self.assertLess(step.index("sha256sum --check"), step.index("unzip"), "the archive is checked before it is unpacked")
+
 
 class NeedsBunTests(unittest.TestCase):
     """The tests that need the real bun skip on a developer's machine and fail under GitHub Actions (the command center's adjudication of 2026-10-13, point 4; the pattern of tests/test_token_full_save_evidence.py)."""
