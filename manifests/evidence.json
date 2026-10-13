@@ -5137,8 +5137,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "fe15308e810b3e0534c6cbbda9fdf237ec7941549a9d06277ecefb8733f37349",
-      "bytes": 27298
+      "sha256": "0bb8f0237ca45bb787620a9c08f9ceaafcaf58eddb512496aefebf45696ddae3",
+      "bytes": 28607
     },
     {
       "path": ".github/workflows/dependency-review.yml",
@@ -5237,8 +5237,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "c2298315123147ec18ee56f7af0dafa1a55a39c0a2fb828adb0dee8b02bfb0c3",
-      "bytes": 45356
+      "sha256": "a026b23a199814534e94acd948dc11b01ac53bfbd90b292d9ab3c73032eadd9a",
+      "bytes": 46696
     },
     {
       "path": ".gitignore",
@@ -11488,8 +11488,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-read-deltas.json",
-      "sha256": "9350bfd9b61a0f26fb3d159d2d9ccf54836d6054e55ae8a77fb306695a97f9b4",
-      "bytes": 587
+      "sha256": "ca56f6daf8e577ab089d4898b06e0c93fd6d7d70e0575c628c803623418975e1",
+      "bytes": 925
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
@@ -11520,6 +11520,21 @@
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261013-pr1057-delta.json",
       "sha256": "59772b7af0a432d1f90151381993bf667c39a25da2152cc83975090493f46123",
       "bytes": 12295
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261013-pr1062-delta.json",
+      "sha256": "c10ba5cde317db1cc69fd5be13769ba29383dcf7f796b16fc176aaea2377dffe",
+      "bytes": 17036
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261013-pr1062-design-delta.json",
+      "sha256": "24bc390103366a709f62f6b1c22e75f485e2feab3a8b14ba76e120c180647e6e",
+      "bytes": 17279
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261013-pr1062-dotdot-delta.json",
+      "sha256": "126427e342993b0a890c71f59c25026fd09df89d635b87abbc2a873d839a9dd3",
+      "bytes": 17537
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261013-pr1070-delta.json",
@@ -17418,7 +17433,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "7ffbbacca1721baeee78d1c9ad8f86a20037eee660f254973ae50557381e6e5d",
+      "sha256": "28631f14e8a3a29bc4d4f91e67dee582a8d01ea144502510d6551522a843c078",
       "bytes": 190328
     },
     {
@@ -19092,6 +19107,11 @@
       "bytes": 19447
     },
     {
+      "path": "docs/decisions/2026-10-13-claude-agent-drift-check.md",
+      "sha256": "b1f4cf2a44669cd12ffe04bf4f3255270774032291a5ffa42c8e0082b725689c",
+      "bytes": 41530
+    },
+    {
       "path": "docs/decisions/2026-10-13-lane-a-frozen-field-continuity.md",
       "sha256": "4da74df3105b3e30d5408e17c15cc0b369c9feac2e7391f404b1e1669e55a073",
       "bytes": 5792
@@ -19578,8 +19598,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.md",
-      "sha256": "91160fc24641c22d8321f45d94ce0736db24b1ed066f2a7e5edd01fbff5a8982",
-      "bytes": 33891
+      "sha256": "11f24ab833e6368fbe9ecf7020be5fbd87910f7000c444d4053e7f9121009220",
+      "bytes": 35528
     },
     {
       "path": "docs/token-native-saturation.md",
@@ -19970,6 +19990,111 @@
       "path": "evidence/artifacts/agent-browser-lna-20260930/run.sh.txt",
       "sha256": "d115d6b622752b7bd57f3529e5b7f4fd7ac7d56995989dc26b4a822482196b4d",
       "bytes": 1340
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/README.md",
+      "sha256": "4f96cb94cf408c71db0253d9fdc2a25b6b9b736a23d107150e4493b88ccd06f7",
+      "bytes": 7995
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/client-oracle.txt",
+      "sha256": "59b41c6acb9c7f2c35160d7315f2684d88bf0be521cbfdb384c479e6268b789d",
+      "bytes": 11568
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/fail-before-absolute-bun.txt",
+      "sha256": "9e00f539e392e7980099db06d42174e5f0cad1890071cad371cbc3aaf5cd08f8",
+      "bytes": 2087
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/fail-before-design.txt",
+      "sha256": "94174a9cada19a56e64be7b139b992cb632364c4af06dc42057ffc144f73cff5",
+      "bytes": 4858
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/fail-before-dotdot.txt",
+      "sha256": "dd87b6a1fb56f077021fdaadfb56e05a3b0d31735d96e8a68232ee0dbd3156b6",
+      "bytes": 1559
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/fail-before-freshness-bun.txt",
+      "sha256": "84e2a0a97a2871af168e22ea9b9a07c0bb763f5e627ff858e2ab0cde3ac8110e",
+      "bytes": 890
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/fail-before-precheck.txt",
+      "sha256": "e2b3fee16a0a44bf59470bc01b688bcd555ab5ab02a5257410ccd3f2d58af88c",
+      "bytes": 1506
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/fail-before-review.txt",
+      "sha256": "9ddc3eaffb8dfb98e148b10d51942d97b84402281247e18d03bf787accae3e27",
+      "bytes": 2055
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/fail-before-round2.txt",
+      "sha256": "3cf8db4d0ab3d125a7ca20a393182b9e95aa07eb44b839fb7004d9a30a651ec9",
+      "bytes": 1742
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/fail-before.txt",
+      "sha256": "2eedb1737eadde92d6e6a6c47b48bc6342317f4332ac02db6c57aa91b7d4c6ed",
+      "bytes": 1334
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/freshness-bun-local-check.txt",
+      "sha256": "1617169fac6f6b26ff2f84a2690441252cf8c5068e66a120ebf5595ac40b636c",
+      "bytes": 1283
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/host-run.json",
+      "sha256": "d7dd8b863bca8906bc29184495f59071a99bc0df795eb1b22f79f2747c9da94f",
+      "bytes": 1603
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/identity-oracle.txt",
+      "sha256": "e2ece90be35d989731de19cb8b01400358e3c9a5f0523ff9d99c8150eee9f801",
+      "bytes": 4709
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/mutants-20.txt",
+      "sha256": "67d078ee076d4e57a66003bb0c482b1574c1689212a70e54edc5eeb949d34188",
+      "bytes": 1418
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/mutants-absolute-bun.txt",
+      "sha256": "5c5b192937bb7a20adaefe1476aa3a71ba47a3f768fa55c0478133f8ac45409c",
+      "bytes": 1344
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/mutants-design.txt",
+      "sha256": "7bcb4aa202b2820640473722d3cdaa3d4869bca535fe023b1b28f1bf45637e00",
+      "bytes": 2588
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/mutants-dotdot.txt",
+      "sha256": "3ca8acdc9092092e27c83445d8326f3cc3f1ac44d4f4d4e1120d58b00c578092",
+      "bytes": 1059
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/mutants-freshness-bun-13.txt",
+      "sha256": "c28a6573caf703049850a4c28f2ec6caf34abf42646345f09d6926d7af0fc2cd",
+      "bytes": 1559
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/mutants-precheck.txt",
+      "sha256": "6c2499c5d409205375aa893760c572b3e5c93c98d43e00f5f7526a1dda9b3e81",
+      "bytes": 680
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/mutants-review.txt",
+      "sha256": "4b2b4d17927720ab201e4b2083dc6584b426a6125a9a27a8f4659a4ad2563b43",
+      "bytes": 2927
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/mutants-round2.txt",
+      "sha256": "f2c51880037d7f6819e5e6bc4b078819198dc3e05351cc66ea7611a2458134d9",
+      "bytes": 5505
     },
     {
       "path": "evidence/artifacts/agentsview-044-qualification-20260927/README.md",
@@ -61383,8 +61508,8 @@
     },
     {
       "path": "scripts/adoption_status.py",
-      "sha256": "c5ea86bd324e9baf3263ac7f6edd107c736e3fa5c62c6395161d3319b4458998",
-      "bytes": 98120
+      "sha256": "cd8490a71854f68e1f4c2017c895723591f0dd80046c69408d418dba2774db46",
+      "bytes": 122433
     },
     {
       "path": "scripts/build_ecosystem.py",
@@ -61645,6 +61770,11 @@
       "path": "tests/fixtures/adaptive_paper_exit_quote_age/aggregate-selection.json",
       "sha256": "aaa3f7180569798e9108a2d758ce6748190f845c39ed2d7b7e5dd75606196b76",
       "bytes": 2435
+    },
+    {
+      "path": "tests/fixtures/agent_frontmatter/client-oracle.json",
+      "sha256": "735ffb970329ebafa7e255bdb96013dde70ecf8cbc038fdbb076e88cf62ff3c0",
+      "bytes": 341189
     },
     {
       "path": "tests/fixtures/codex-worker-lane/README.md",
@@ -62093,13 +62223,18 @@
     },
     {
       "path": "tests/test_adoption_status.py",
-      "sha256": "ff9bd18c08199728ba70eeb8bc4e107c017fc96cbbac5b64a8d2076cc6de19a2",
-      "bytes": 161018
+      "sha256": "044a64bd2cf50352c4ae9ab4dea8e183950b711fb06786b99788549112f8965b",
+      "bytes": 254952
     },
     {
       "path": "tests/test_adoption_version_probes.py",
       "sha256": "36de5b9442ea76c735ef789599dfcf2b7d903d34f69d844f22423501bbde5054",
       "bytes": 23447
+    },
+    {
+      "path": "tests/test_agent_drift_record.py",
+      "sha256": "c9d6ddc7ff8ac6aa58a45c507684bfc7a6adae566edbea63e75a9d5e8bb02a23",
+      "bytes": 3128
     },
     {
       "path": "tests/test_agentsview_qualification.py",
@@ -63573,8 +63708,8 @@
     },
     {
       "path": "tools/adoption/host-baseline.md",
-      "sha256": "e7527052bd6c4f36bc7449185a978406bc796acf0f30c328f9ee6ec495a75a86",
-      "bytes": 16770
+      "sha256": "eb128ec84b91dcc9b34ed56ed5ec09228a421bf5e656ce20ae5d4de25ed2a000",
+      "bytes": 16827
     },
     {
       "path": "tools/adoption/host_baseline_probe.py",

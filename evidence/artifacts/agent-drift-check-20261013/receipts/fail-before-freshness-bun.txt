@@ -1,0 +1,9 @@
+The test of the local review's P1 of the landing rebase of #1062 (a scheduled or manual catalog-freshness run fails at the bun tests: its job runs the whole suite under GitHub Actions and, unlike
+validate.yml's job, did not provision the bun that the tests need) against the workflow as at 4e3780b10 and against this head. Command: GITHUB_ACTIONS=true python3 -m unittest
+tests.test_adoption_status.WorkflowPinTests (the other two tests of the class hold at both).
+
+== .github/workflows/catalog-freshness.yml as at 4e3780b10 (no Bun step), this test module
+   tests.test_adoption_status.WorkflowPinTests: Ran 3, FAILED (failures=1)
+      test_every_job_that_runs_the_suite_provisions_the_pinned_bun_before_it (workflow='catalog-freshness.yml', job='freshness'): one step before the suite exports the bun's path: 0 != 1
+== this head
+   tests.test_adoption_status.WorkflowPinTests: Ran 3, OK

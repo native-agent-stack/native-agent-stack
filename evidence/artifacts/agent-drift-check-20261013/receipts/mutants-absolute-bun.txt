@@ -1,0 +1,12 @@
+The 9 mutants of the local codex re-review round of #1062 (the selected bun made absolute before either launch: the selection left as found, a relative PATH entry or a relative value left relative, a value with no directory taken as a file of the caller's directory or ignored, the supplied PATH not searched, a value with a directory looked up on PATH, a gone directory answered with the relative path, a missing selection not refused): one exact change each to scripts/adoption_status.py, in place and restored after each run, then tests.test_adoption_status with the bun 1.4.3 named in AGENT_FRONTMATTER_BUN and GITHUB_ACTIONS=true; a mutant is killed when the run fails (the unmutated run passes first).
+
+killed   (failed) the selection stays as it was found (the defect)
+killed   (failed) a relative PATH entry stays relative
+killed   (failed) a relative value of the variable stays relative
+killed   (failed) a value with no directory is taken as a file of the caller's directory
+killed   (failed) a value with no directory is ignored
+killed   (failed) the supplied PATH is not the one searched
+killed   (failed) a value with a directory is looked up on PATH
+killed   (failed) a caller whose directory is gone gets the relative path back
+killed   (failed) a selection that is not there is not refused
+9 mutants, 9 killed, survivors: none

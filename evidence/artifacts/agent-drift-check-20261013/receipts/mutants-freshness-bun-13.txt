@@ -1,0 +1,19 @@
+The 13 mutants of the freshness workflow's Bun step and of the reader that tests it (the step absent, another version, another checksum, after the suite, the archive unpacked before it is checked,
+the path not exported, another release URL; validate.yml's checksum changed so that the two differ; another workflow running the whole suite or the bun tests without the bun; the reader taking a bare
+unittest for a named run, ignoring the shard runner, or finding no steps in validate.yml). Each is one exact change to one file (restored after each run); tests.test_adoption_status.WorkflowPinTests runs
+with GITHUB_ACTIONS=true; a mutant is killed when the run fails. The unmutated run passes first.
+
+killed   (failed) the freshness job has no Bun step
+killed   (failed) the freshness step pins another version
+killed   (failed) the freshness step carries another checksum
+killed   (failed) the step stands after the suite
+killed   (failed) the archive is unpacked before it is checked
+killed   (failed) the step does not export the path
+killed   (failed) the step comes from another release URL
+killed   (failed) validate.yml's checksum changes (the two steps differ)
+killed   (failed) another workflow runs the whole suite without the bun
+killed   (failed) another workflow names the bun tests without the bun
+killed   (failed) the reader takes a bare unittest for a named run
+killed   (failed) the reader ignores the shard runner
+killed   (failed) validate.yml's steps are indented deeper (the reader finds none there)
+13 mutants, 13 killed, survivors: none

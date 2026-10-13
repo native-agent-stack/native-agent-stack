@@ -181,7 +181,23 @@ clients. `client_wiring` checks three places:
   `CLAUDE_CODE_EFFORT_LEVEL` does not appear in the settings or the checker's
   environment. The agent-teams opt-in is reported as information only
   (`agent_teams_opt_in`, 0 or 1), because agent teams are an allowed dispatch mode
-  since 2026-09-27;
+  since 2026-09-27. How many Claude agent definitions under the user home's `agents/`
+  differ from this checkout's `adoption/agents/claude` is counted byte for byte
+  (`stack_agents_drift`): each shipped `*.md` whose installed copy at the top of the folder is
+  absent, a link, a folder or not equal, and each other `*.md` at any depth (the client loads
+  that folder recursively), except the four vendor-installed search definitions at the top
+  (`codebase-memory`, `codebase-memory-auditor`, `codebase-memory-scout`, `semble-search`),
+  which count too when their front matter declares the name of a shipped definition (read by the
+  client's own YAML parser, `Bun.YAML.parse`, run by a `bun` of the version the client embeds, 1.4.3,
+  on `PATH` or named in `AGENT_FRONTMATTER_BUN`; the count is `null` where there is no such bun or
+  the name they declare cannot be told).
+  The client serves a user-scope definition to every project that does not define the name itself, so a
+  stale or wider copy (an omitted `tools` field means every tool) goes unseen until something
+  reads it. The count must be 0 and is part of the wiring rule; it is `null` when the
+  checkout's source folder, the `agents/` folder (a link, or not a folder), a link below it that
+  leads to a folder, or a shipped definition's installed copy cannot be read, and on a platform
+  that cannot read without following a link. The folders are read through descriptors, never
+  through a link ([the decision](decisions/2026-10-13-claude-agent-drift-check.md));
 - `project`, this checkout: `.claude/settings.json` sets the depth and the cap, and
   a project `.codex/config.toml` names the Serena, SocratiCode and ai-memory servers
   (optional since 2026-09-25: those servers now live at Codex user scope, so a fresh
@@ -249,7 +265,8 @@ The practice is applied on a host when all of these hold:
   every `claude`, `project` and `codex` boolean is `true` (each Codex server named in
   the user or the project `config.toml`), both hook counts are above zero, and every
   Codex event that runs ai-memory runs it trusted (`ai_memory_hook_events_trusted`
-  equals `ai_memory_hook_events`); `stack_roles_matching` adds nothing to the rule but its `null`,
+  equals `ai_memory_hook_events`); `stack_agents_drift` is 0 (since 2026-10-13: a stale, missing or
+  unlisted Claude agent definition makes `complete` false); `stack_roles_matching` adds nothing to the rule but its `null`,
   since every `null` leaf makes `complete` false. The rule changed after `v2026.09.26.2`: that
   release's check accepts a bare `@RTK.md` reference and counts hooks whatever their
   trust, so it reports `complete: true` for a Codex that sees no RTK instructions and

@@ -1,0 +1,18 @@
+tests/test_adoption_status.py of CPA-V-10 against scripts/adoption_status.py at c63c83a82 (origin/main) with STACK_AGENTS_SOURCE and VENDOR_HOST_AGENTS added, constants only, so that the tests fail on the behavior and not on a missing name: Ran 153 tests, FAILED (failures=15, errors=1).
+Tests that fail (16):
+  test_a_link_or_a_folder_in_place_of_a_definition_is_drift
+  test_a_null_drift_makes_complete_false_like_every_other_null
+  test_a_stale_or_wider_user_agent_makes_the_wiring_incomplete
+  test_a_wired_home_reports_every_check_and_no_file_text
+  test_an_absent_agents_folder_counts_every_definition_of_the_checkout
+  test_an_unwired_home_reports_false_and_zero
+  test_client_homes_follow_claude_config_dir_and_codex_home
+  test_drift_counts_each_changed_missing_and_unlisted_definition
+  test_the_drift_follows_claude_config_dir
+  test_the_drift_is_null_for_an_unreadable_folder_or_definition
+  test_the_drift_is_null_when_a_source_or_the_folder_cannot_be_compared
+  test_the_drift_key_is_the_last_claude_key_and_a_count
+  test_the_four_vendor_definitions_are_listed_and_files_the_client_does_not_load_are_ignored
+  test_the_limitations_name_the_agent_folders_the_check_compares
+  test_the_two_argument_form_of_claude_wiring_compares_with_this_repositorys_own_definitions
+  test_wrong_types_inside_valid_files_are_not_wiring

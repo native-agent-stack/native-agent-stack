@@ -1,5 +1,7 @@
 """Adoption preflight boundaries; no credentials, services, or model calls."""
 
+import builtins
+from collections import Counter
 import contextlib
 from datetime import date, datetime, timezone
 import dis
@@ -15,16 +17,18 @@ import re
 import shutil
 from shutil import which as native_which
 import signal
+import socket
 import subprocess
 import sys
 import tempfile
 import threading
 import time
 import unittest
+from unittest import mock
 from unittest.mock import patch
 
 from scripts import adoption_status
-from scripts.adoption_status import (CLIENT_WIRING_KEYS, CLIENT_WIRING_LIMITATIONS, LAUNCHER_LOGIN_PATH,
+from scripts.adoption_status import (CLIENT_WIRING_KEYS, CLIENT_WIRING_LIMITATIONS, LAUNCHER_LOGIN_PATH, STACK_AGENTS_SOURCE, VENDOR_HOST_AGENTS,
                                      LAUNCHER_RESOLUTION_KEYS, LAUNCHER_RESOLUTION_LIMITATIONS, LOGIN_FILE_STATES,
                                      LOGIN_SHELL_FILES, LOGIN_SHELL_KEYS, LOGIN_SHELL_LIMITATIONS, NO_CLIENT_STATE,
                                      NO_PINNED_VERSION, PINNED_VERSION_LIMITATIONS, client_wiring,
@@ -68,10 +72,20 @@ def role_bytes(name: str) -> bytes:
     return f"# {name}\n# {PRIVATE}\nname = \"{name[:-len('.toml')]}\"\n".encode("utf-8")
 
 
+# Three Claude agent definitions standing for adoption/agents/claude (it ships 11; the check compares every *.md of the folder). Each text holds PRIVATE, so a test proves the check compares bytes and
+# lets no file text into its report.
+AGENT_FILES = ("evidence-reviewer.md", "source-scout.md", "stack-verifier.md")
+AGENT_TOOLS = "tools: Read, Grep, Glob"
+
+
+def agent_bytes(name: str) -> bytes:
+    return f"---\nname: {name[:-len('.md')]}\ndescription: {PRIVATE}\n{AGENT_TOOLS}\n---\n{PRIVATE}\n".encode("utf-8")
+
+
 WIRED = {
     "claude": {"rtk_hook": True, "ai_memory_hook_events": 8, "context_mode_plugin_enabled": True,
                "subagent_spawn_depth_1": True, "workflow_concurrency_set": True,
-               "effort_level_env_unset": True, "agent_teams_opt_in": 0},
+               "effort_level_env_unset": True, "agent_teams_opt_in": 0, "stack_agents_drift": 0},
     "project": {"settings_depth_and_concurrency": True, "codex_mcp_servers_present": dict.fromkeys(SERVERS, True)},
     "codex": {"rtk_instructions": True, "context_mode_plugin_enabled": True,
               "mcp_servers_present": dict.fromkeys(SERVERS, True), "hooks_feature_enabled": True,
@@ -1871,6 +1885,603 @@ class ProbeSignalDispositionTests(unittest.TestCase):
             self.assertIs(signal.getsignal(signum), theirs, signum.name)
 
 
+class Interleaving:
+    """Tries a replacement at every point between two steps of a read. ``run(call, action, target)`` runs ``call`` with the file-system functions the checks use wrapped, and performs ``action`` once, right after the
+    ``target``-th of their calls returns or raises (target 0: never). It returns (the value of ``call``, whether the action ran, how many calls were made), and leaves ``trace`` holding (function, first argument,
+    error number or None) for each call: a replacement that another process could make between two syscalls of the check is made between exactly those two, with the real file system and no invented result."""
+
+    FUNCTIONS = ((os, "lstat"), (os, "stat"), (os, "open"), (os, "fstat"), (os, "listdir"), (os, "scandir"), (builtins, "open"))
+
+    def run(self, call, action, target):
+        self.count, self.fired, self.busy, self.trace = 0, False, False, []
+
+        def wrapped(real, label):
+            def step(*args, **keywords):
+                error = None
+                try:
+                    return real(*args, **keywords)
+                except BaseException as caught:
+                    error = caught
+                    raise
+                finally:
+                    if not self.busy:
+                        self.count += 1
+                        self.trace.append((label, str(args[0]) if args else None, getattr(error, "errno", None) if error is not None else None))
+                        if self.count == target and not self.fired:
+                            self.busy = self.fired = True
+                            try:
+                                action()
+                            finally:
+                                self.busy = False
+            return step
+        with contextlib.ExitStack() as stack:
+            for module, name in self.FUNCTIONS:
+                stack.enter_context(patch.object(module, name, wrapped(getattr(module, name), f"{module.__name__}.{name}")))
+            value = call()
+        return value, self.fired, self.count
+
+
+ROOT = Path(__file__).resolve().parents[1]
+
+UNAVAILABLE_NOTE = "the workflow installs it"
+
+
+def unavailable(reason):
+    """A test that needs a tool this machine lacks: a skip on a developer's machine, a failure under GitHub Actions, where the workflow installs it and a green run has to mean something was asserted (the pattern of
+    tests/test_token_full_save_evidence.py metadata_lines, which reads GITHUB_ACTIONS on every call so that a control can patch the environment)."""
+    if os.environ.get("GITHUB_ACTIONS") == "true":
+        raise AssertionError(f"{reason}; {UNAVAILABLE_NOTE}, so its absence there is a defect")
+    raise unittest.SkipTest(reason)
+
+
+def real_bun():
+    """The bun that reads agent front matter as the client does: the one named by AGENT_FRONTMATTER_BUN or else the first on PATH, when it is CLIENT_BUN_VERSION; unavailable otherwise."""
+    path = adoption_status.find_bun()
+    if not path:
+        unavailable(f"bun {adoption_status.CLIENT_BUN_VERSION} is not installed")
+    try:
+        version = subprocess.run([path, "--version"], capture_output=True, text=True, timeout=30).stdout.strip()
+    except (OSError, subprocess.SubprocessError):
+        version = None
+    if version != adoption_status.CLIENT_BUN_VERSION:
+        unavailable(f"the bun at hand is {version}, not {adoption_status.CLIENT_BUN_VERSION}, the version the client embeds")
+    return path
+
+
+# A stand-in for bun that answers the protocol of agent_names as it is told to (behavior.json beside it) and logs how it was called (calls.jsonl). It exercises the plumbing, never YAML: the tests that depend on what
+# the client's parser reads run the real bun.
+FAKE_BUN = r'''#!{python}
+import json, os, sys, time
+
+here = os.path.dirname(os.path.realpath(sys.argv[0]))   # the file the kernel ran, as a path with a '..' after a link names it
+behavior = json.load(open(os.path.join(here, "behavior.json")))
+args = sys.argv[1:]
+config = [item[len("--config="):] for item in args if item.startswith("--config=")]
+entry = {"cwd": os.getcwd(), "home": os.environ.get("HOME"), "environment": sorted(os.environ), "config_empty": bool(config) and os.path.getsize(config[0]) == 0,
+         "config_in_cwd": bool(config) and os.path.dirname(os.path.abspath(config[0])) == os.getcwd(), "dash_e": "-e" in args}
+if "--version" in args:
+    entry["call"] = "version"
+    open(os.path.join(here, "calls.jsonl"), "a").write(json.dumps(entry) + "\n")
+    print(behavior.get("version", "1.4.3"))
+    sys.exit(behavior.get("version_status", 0))
+stdin = sys.stdin.read()
+blocks = json.loads(stdin)
+entry.update(call="parse", blocks=len(blocks), argv_holds_a_block=any(block and block in " ".join(args) for block in blocks))
+open(os.path.join(here, "calls.jsonl"), "a").write(json.dumps(entry) + "\n")
+mode = behavior.get("parse", "echo")
+if mode == "exit":
+    sys.exit(behavior.get("status", 3))
+if mode == "hang":
+    time.sleep(60)
+if mode == "garbage":
+    print("not json")
+elif mode == "answers":
+    print(json.dumps(behavior["answers"]))
+elif mode == "short":
+    print(json.dumps([{"state": "none"}] * (len(blocks) - 1)))
+else:
+    answers = []
+    for block in blocks:
+        lines = [line for line in block.split("\n") if line.startswith("name:")]
+        answers.append({"state": "name", "name": lines[0][len("name:"):].strip()} if lines else {"state": "none"})
+    print(json.dumps(answers))
+sys.exit(behavior.get("exit_after", 0))
+'''
+
+
+def make_fake_bun(directory, **behavior):
+    script = Path(directory) / "bun"
+    script.write_text(FAKE_BUN.replace("{python}", sys.executable), encoding="utf-8")
+    script.chmod(0o755)
+    (Path(directory) / "behavior.json").write_text(json.dumps(behavior), encoding="utf-8")
+    return script
+
+
+def fake_calls(directory):
+    path = Path(directory) / "calls.jsonl"
+    return [json.loads(line) for line in path.read_text().splitlines()] if path.exists() else []
+
+
+ORACLE = ROOT / "tests" / "fixtures" / "agent_frontmatter" / "client-oracle.json"
+
+
+BOM, REPLACEMENT = chr(0xFEFF), chr(0xFFFD)
+
+
+class ExtractionTests(unittest.TestCase):
+    """agent_front_matter: the block the client hands to its YAML parser, extracted as the loader scan does (oi in the 2.1.296 binary: the text read as UTF-8, a leading byte order mark dropped, and what
+    /^---\\s*\\n([\\s\\S]*?)---\\s*\\n?/ captures; the client's check that "---" occurs after the first three characters changes no result, as the pattern cannot match without it, and bounds the work: see the timing test). Pure text; no bun."""
+
+    ROWS = (
+        ("a plain block", b"---\nname: x\n---\nbody\n", "name: x\n"),
+        ("a byte order mark", (BOM + "---\nname: x\n---\n").encode("utf-8"), "name: x\n"),
+        ("only the first byte order mark", (BOM + BOM + "---\nname: x\n---\n").encode("utf-8"), None),
+        ("CRLF line endings", b"---\r\nname: x\r\n---\r\n", "name: x\r\n"),
+        ("spaces and blank lines after the opener", b"---   \n\nname: x\n---\n", "name: x\n"),
+        ("a tab after the opener", b"---\t\nname: x\n---\n", "name: x\n"),
+        ("no closing line", b"---\nname: x\n", None),
+        ("an empty block", b"---\n---\nname: x\n", ""),
+        ("the first --- after the opener ends the block, wherever it stands on a line", b"---\ndescription: a --- b\nname: x\n---\n", "description: a "),
+        ("four dashes", b"----\nname: x\n---\n", None),
+        ("text before the opener", b"text\n---\nname: x\n---\n", None),
+        ("a space before the opener", b" ---\nname: x\n---\n", None),
+        ("a blank line before the opener", b"\n---\nname: x\n---\n", None),
+        ("only three characters", b"---", None),
+        ("no front matter", b"name: x\n", None),
+        ("an empty file", b"", None),
+        ("a lone CR is no line end", b"---\rname: x\r---\r", None),
+        ("an invalid byte is read as U+FFFD", b"---\nname: x\xff\n---\n", "name: x" + REPLACEMENT + "\n"),
+    )
+
+    def test_the_block_is_what_the_client_hands_to_its_parser(self):
+        for label, data, expected in self.ROWS:
+            with self.subTest(case=label):
+                self.assertEqual(adoption_status.agent_front_matter(data), expected)
+
+    def test_an_unterminated_block_of_whitespace_is_refused_in_linear_time(self):
+        """Review of #1062 at 2723f8fd (the local codex review, P2): the pattern backtracks quadratically over the whitespace after the opening "---" when no closing line follows (a 64 KiB file of newlines took 18 s,
+        and a file may be 1 MiB), and the extraction runs before bun, so no timeout of bun bounds it. The client checks that "---" occurs after the first three characters before it matches (its `oi`, Claude Code
+        2.1.296: `e.indexOf("---",3)<0?null:e.match(RE)`)."""
+        for label, filler in (("newlines", b"\n"), ("a space and a newline", b" \n"), ("a carriage return and a newline", b"\r\n"), ("a tab and a newline", b"\t\n"),
+                              ("a vertical tab, a form feed and a newline", b"\x0b\x0c\n")):
+            with self.subTest(filler=label):
+                started = time.monotonic()
+                self.assertIsNone(adoption_status.agent_front_matter(b"---" + filler * (65536 // len(filler))))
+                self.assertLess(time.monotonic() - started, 1.0, "the extraction of an unterminated block took more than a second")
+
+    def test_a_closing_line_far_below_a_long_run_of_whitespace_is_still_found_in_linear_time(self):
+        started = time.monotonic()
+        self.assertEqual(adoption_status.agent_front_matter(b"---" + b"\n" * 65536 + b"---\n"), "")
+        self.assertEqual(adoption_status.agent_front_matter(b"---" + b" " * 65536 + b"---\n"), None, "the opening line must end in a newline: spaces and a dash are no opening")
+        self.assertLess(time.monotonic() - started, 1.0)
+
+
+class AgentNamesTests(unittest.TestCase):
+    """agent_names with a stand-in bun: how the parser is found, checked, called and answered, and that every failure is Unknown. Review of #1062 at e7260fd3 (the command center's Claude read, P1; its adjudication of
+    2026-10-13): the reader written here was replaced by the client's own YAML parser, so the case the parser cannot settle is not read as 'no name'."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory(prefix="fake-bun-")
+        self.addCleanup(self._tmp.cleanup)
+        self.directory = Path(self._tmp.name)
+
+    def names(self, blobs, **behavior):
+        bun = make_fake_bun(self.directory, **behavior)
+        return adoption_status.agent_names(blobs, environ={"PATH": "/usr/bin:/bin", adoption_status.BUN_ENV: str(bun)})
+
+    def test_the_answers_of_the_parser_are_a_name_none_or_unreadable_in_the_order_of_the_texts(self):
+        blobs = [b"---\nname: a\n---\n", b"no front matter", b"---\nname: b\n---\n", b"---\nname: c\n---\n", b"---\nx: y\n---\n"]
+        answers = [{"state": "name", "name": "a"}, {"state": "name", "name": ""}, {"state": "throws"}, {"state": "none"}]
+        names = self.names(blobs, parse="answers", answers=answers)
+        self.assertEqual(names[:3], ["a", None, None], "a name, a text with no front matter (never sent), an empty name")
+        self.assertIs(names[3], adoption_status.UNREADABLE)
+        self.assertEqual(names[4:], [None])
+        self.assertEqual(len(fake_calls(self.directory)), 2, "one call for the version and one for the whole batch")
+
+    def test_a_batch_is_one_call_and_the_blocks_are_data_on_stdin(self):
+        blobs = [f"---\nname: n{index}\n---\n".encode() for index in range(7)]
+        names = self.names(blobs)
+        self.assertEqual(names, [f"n{index}" for index in range(7)])
+        calls = fake_calls(self.directory)
+        self.assertEqual([call["call"] for call in calls], ["version", "parse"])
+        self.assertEqual((calls[1]["blocks"], calls[1]["argv_holds_a_block"], calls[1]["dash_e"]), (7, False, True))
+
+    def test_bun_runs_in_an_empty_directory_with_an_empty_configuration_and_no_home(self):
+        """A bunfig.toml in the caller's directory or home is read by bun, and a preload in it runs code (measured: a preload that is not found stops bun)."""
+        self.names([b"---\nname: a\n---\n"])
+        caller = os.getcwd()
+        for call in fake_calls(self.directory):
+            with self.subTest(call=call["call"]):
+                self.assertNotEqual(call["cwd"], caller)
+                self.assertTrue(call["config_empty"] and call["config_in_cwd"], "an explicit empty configuration in the working directory")
+                self.assertEqual(call["home"], call["cwd"], "the home is the scratch directory")
+                self.assertEqual(set(call["environment"]) - {"PWD", "SHLVL", "_", "LC_CTYPE"}, {"PATH", "HOME", "LANG"}, "nothing else of the caller's environment reaches bun")
+
+    def test_nothing_is_asked_of_bun_when_no_text_has_front_matter(self):
+        names = adoption_status.agent_names([b"no front matter", b"# notes", b""], environ={"PATH": "/nonexistent", adoption_status.BUN_ENV: "/nonexistent/bun"})
+        self.assertEqual(names, [None, None, None])
+        self.assertEqual(adoption_status.agent_names([], environ={}), [])
+
+    def test_a_scratch_directory_that_cannot_be_made_is_unknown(self):
+        with mock.patch.object(adoption_status.tempfile, "TemporaryDirectory", side_effect=PermissionError(errno.EACCES, "denied")):
+            with self.assertRaises(adoption_status.Unknown):
+                self.names([b"---\nname: a\n---\n"])
+
+    def test_a_missing_bun_is_unknown(self):
+        blobs = [b"---\nname: a\n---\n"]
+        with self.assertRaises(adoption_status.Unknown):
+            adoption_status.agent_names(blobs, environ={"PATH": "/nonexistent"})
+        with self.assertRaises(adoption_status.Unknown):
+            adoption_status.agent_names(blobs, environ={"PATH": "/usr/bin:/bin", adoption_status.BUN_ENV: str(self.directory / "absent")})
+
+    def test_the_named_bun_wins_over_the_one_on_path_and_a_named_one_that_is_missing_is_not_replaced(self):
+        named = make_fake_bun(self.directory, version="1.4.3")
+        self.assertEqual(adoption_status.find_bun({"PATH": "/usr/bin", adoption_status.BUN_ENV: str(named)}), str(named))
+        other = self.directory / "other"
+        other.mkdir()
+        shutil.copy(named, other / "bun")
+        self.assertEqual(adoption_status.find_bun({"PATH": str(other)}), str(other / "bun"))
+        self.assertEqual(adoption_status.find_bun({"PATH": str(other), adoption_status.BUN_ENV: "/nonexistent/bun"}), "/nonexistent/bun")
+        self.assertIsNone(adoption_status.find_bun({"PATH": "/nonexistent"}))
+
+    def test_a_relative_bun_is_made_absolute_before_either_launch(self):
+        """Review of #1062 at b3da64d7 (the local codex review, P2): both launches run with cwd=scratch, and subprocess looks for a relative executable relative to cwd (python/cpython@cbc944f4bc59639a444dd971c737788ba2283a91
+        Doc/library/subprocess.rst L572-L576), so a relative AGENT_FRONTMATTER_BUN, or a bun found through a relative PATH entry such as ./bin, named a file of the caller's directory and was searched for in the scratch one:
+        the same bun gave Unknown from its relative path (reproduced with bun 1.4.3) and parsed from its absolute one."""
+        bin_directory = self.directory / "bin"
+        bin_directory.mkdir()
+        make_fake_bun(bin_directory)
+        variable = adoption_status.BUN_ENV
+        cases = (("a relative value of the variable", {"PATH": "/usr/bin:/bin", variable: "bin/bun"}, self.directory),
+                 ("a value of the variable that starts with ./", {"PATH": "/usr/bin:/bin", variable: "./bin/bun"}, self.directory),
+                 ("a value of the variable that climbs out of the directory and back", {"PATH": "/usr/bin:/bin", variable: "../" + self.directory.name + "/bin/bun"}, self.directory),
+                 ("a PATH entry ./bin", {"PATH": "./bin"}, self.directory),
+                 ("a PATH entry bin", {"PATH": "bin"}, self.directory),
+                 ("an empty PATH entry, which is the caller's directory", {"PATH": ":/usr/bin"}, bin_directory))
+        for label, environ, working in cases:
+            (bin_directory / "calls.jsonl").unlink(missing_ok=True)
+            with self.subTest(case=label), contextlib.chdir(working):
+                found = adoption_status.find_bun(environ)
+                self.assertTrue(found and os.path.isabs(found), found)
+                self.assertEqual(Path(found).resolve(), (bin_directory / "bun").resolve())
+                self.assertEqual(adoption_status.agent_names([b"---\nname: a\n---\n"], environ=environ), ["a"])
+                self.assertEqual([call["call"] for call in fake_calls(bin_directory)], ["version", "parse"], "both launches ran the stand-in")
+
+    def test_a_dot_dot_after_a_link_keeps_the_meaning_the_file_system_gives_it(self):
+        """The local codex re-review of 9720257e (P2): os.path.abspath removes each ".." lexically, before the file system resolves the link in front of it, so `current/../bun` with `current` a link to `actual/subdir`
+        (the file `actual/bun`) became the `bun` beside `current` and the check said Unknown on healthy wiring. The caller's directory is put in front of the path and nothing is normalized. The bun beside
+        `current` here is a stand-in of another version, so that taking it is Unknown."""
+        (self.directory / "actual/subdir").mkdir(parents=True)
+        make_fake_bun(self.directory / "actual", version="1.4.3")
+        make_fake_bun(self.directory, version="1.4.2")   # the decoy beside the link
+        (self.directory / "current").symlink_to("actual/subdir")
+        blob = [b"---\nname: a\n---\n"]
+        with contextlib.chdir(self.directory):
+            for label, environ in (("a relative value of the variable", {"PATH": "/usr/bin:/bin", adoption_status.BUN_ENV: "current/../bun"}), ("a relative PATH entry", {"PATH": "current/.."}),
+                                   ("an absolute value that goes through the link", {"PATH": "/usr/bin:/bin", adoption_status.BUN_ENV: str(self.directory / "current/../bun")})):
+                with self.subTest(case=label):
+                    found = adoption_status.find_bun(environ)
+                    self.assertTrue(os.path.isabs(found) and found.endswith("current/../bun"), "the components are kept as they were written")
+                    self.assertEqual(os.path.realpath(found), os.path.realpath(self.directory / "actual/bun"), "the file the kernel finds through the link")
+                    self.assertEqual(adoption_status.agent_names(blob, environ=environ), ["a"])
+
+    def test_a_link_to_the_bun_is_kept_by_its_name_since_an_executable_can_be_known_by_it(self):
+        """The mise shim is a link to mise and behaves as bun because it is started as bun: the final component is never resolved."""
+        (self.directory / "actual").mkdir()
+        make_fake_bun(self.directory / "actual", version="1.4.3")
+        (self.directory / "links").mkdir()
+        (self.directory / "links/bun").symlink_to("../actual/bun")
+        with contextlib.chdir(self.directory):
+            found = adoption_status.find_bun({"PATH": "/usr/bin:/bin", adoption_status.BUN_ENV: "links/bun"})
+        self.assertTrue(os.path.islink(found) and os.path.basename(found) == "bun" and found.endswith("links/bun"), found)
+        self.assertEqual(adoption_status.find_bun({"PATH": "/usr/bin:/bin", adoption_status.BUN_ENV: str(self.directory / "links/bun")}), str(self.directory / "links/bun"), "an absolute path is passed as it is")
+
+    def test_a_value_with_no_directory_is_a_name_looked_up_on_path_and_never_in_the_callers_directory(self):
+        bun = make_fake_bun(self.directory)
+        variable = adoption_status.BUN_ENV
+        self.assertEqual(adoption_status.find_bun({"PATH": str(self.directory), variable: "bun"}), str(bun))
+        self.assertIsNone(adoption_status.find_bun({"PATH": str(self.directory), variable: "no-such-bun"}))
+        with contextlib.chdir(self.directory):
+            self.assertIsNone(adoption_status.find_bun({"PATH": "/nonexistent", variable: "bun"}), "a name is not a file of the caller's directory")
+            missing = adoption_status.find_bun({"PATH": "/usr/bin:/bin", variable: "bin/absent"})
+            self.assertTrue(os.path.isabs(missing), "a relative path to a file that is not there is still named, not replaced")
+            with self.assertRaises(adoption_status.Unknown):
+                adoption_status.agent_names([b"---\nname: a\n---\n"], environ={"PATH": "/usr/bin:/bin", variable: "bin/absent"})
+
+    def test_a_relative_bun_of_a_caller_whose_directory_is_gone_is_unknown(self):
+        """A relative path cannot be made absolute without the caller's directory (os.getcwd raises FileNotFoundError): None from find_bun, Unknown from agent_names, never a traceback."""
+        gone = Path(tempfile.mkdtemp(prefix="gone-", dir=self.directory))
+        environ = {"PATH": "/usr/bin:/bin", adoption_status.BUN_ENV: "bin/bun"}
+        with contextlib.chdir(gone):
+            gone.rmdir()
+            self.assertIsNone(adoption_status.find_bun(environ))
+            with self.assertRaises(adoption_status.Unknown):
+                adoption_status.agent_names([b"---\nname: a\n---\n"], environ=environ)
+
+    def test_a_bun_that_is_not_the_version_the_client_embeds_is_unknown(self):
+        for version in ("1.4.2", "1.4.4", "1.4", "1.4.3-canary", "", "bun 1.4.3"):
+            with self.subTest(version=version):
+                with self.assertRaises(adoption_status.Unknown):
+                    self.names([b"---\nname: a\n---\n"], version=version)
+        with self.assertRaises(adoption_status.Unknown):
+            self.names([b"---\nname: a\n---\n"], version="1.4.3", version_status=1)
+        self.assertEqual(self.names([b"---\nname: a\n---\n"], version=adoption_status.CLIENT_BUN_VERSION), ["a"])
+
+    def test_every_way_the_answer_can_fail_is_unknown(self):
+        blobs = [b"---\nname: a\n---\n", b"---\nname: b\n---\n"]
+        cases = (("a non-zero status", dict(parse="exit", status=3)), ("an answer that is not JSON", dict(parse="garbage")), ("an answer of the right shape from a bun that fails", dict(parse="echo", exit_after=3)), ("one answer too few", dict(parse="short")),
+                 ("an answer that is not a list", dict(parse="answers", answers={"state": "none"})), ("an item of an unknown state", dict(parse="answers", answers=[{"state": "name", "name": "a"}, {"state": "maybe"}])),
+                 ("a name that is not a string", dict(parse="answers", answers=[{"state": "name", "name": 5}, {"state": "none"}])), ("an item that is not an object", dict(parse="answers", answers=["x", "y"])))
+        for label, behavior in cases:
+            with self.subTest(failure=label):
+                with self.assertRaises(adoption_status.Unknown):
+                    self.names(blobs, **behavior)
+
+    def test_a_vendor_file_that_declares_no_name_is_not_drift_even_when_a_shipped_definition_declares_none(self):
+        """A definition with no name is served under none (the client skips it), so two of them do not collide: the shipped names that a vendor could take are the names that are there."""
+        with tempfile.TemporaryDirectory() as tree:
+            source, home = Path(tree) / "source", Path(tree) / "home"
+            (home / "agents").mkdir(parents=True)
+            source.mkdir()
+            nameless = b"---\ndescription: x\n---\nbody\n"
+            (source / "stack-a.md").write_bytes(nameless)
+            (home / "agents" / "stack-a.md").write_bytes(nameless)
+            (home / "agents" / adoption_status.VENDOR_HOST_AGENTS[0]).write_bytes(b"---\ndescription: y\n---\nbody\n")
+            environ = {"PATH": "/usr/bin:/bin", adoption_status.BUN_ENV: str(make_fake_bun(self.directory))}
+            self.assertEqual(adoption_status.stack_agents_drift(home, source, environ=environ), 0)
+            (home / "agents" / adoption_status.VENDOR_HOST_AGENTS[0]).write_bytes(b"---\nname: stack-a\ndescription: y\n---\nbody\n")
+            (source / "stack-a.md").write_bytes(b"---\nname: stack-a\ndescription: x\n---\nbody\n")
+            (home / "agents" / "stack-a.md").write_bytes(b"---\nname: stack-a\ndescription: x\n---\nbody\n")
+            self.assertEqual(adoption_status.stack_agents_drift(home, source, environ=environ), 1, "the same name in a vendor file is the drift")
+
+    def test_a_bun_that_does_not_answer_in_time_is_unknown(self):
+        with mock.patch.object(adoption_status, "BUN_TIMEOUT_SECONDS", 1):
+            with self.assertRaises(adoption_status.Unknown):
+                self.names([b"---\nname: a\n---\n"], parse="hang")
+
+
+class RealBunTests(unittest.TestCase):
+    """agent_names with the real bun at CLIENT_BUN_VERSION, against what the client itself served (tests/fixtures/agent_frontmatter/client-oracle.json: the installed Claude Code 2.1.296 was started on each text as a
+    project agent and its init record read, by the author's private client_oracle.py). They skip on a developer's machine without that bun and fail under GitHub Actions, where the workflow installs it."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.environ = {"PATH": os.environ.get("PATH", ""), adoption_status.BUN_ENV: real_bun()}
+
+    def names(self, *texts):
+        return adoption_status.agent_names([text.encode("utf-8") if isinstance(text, str) else text for text in texts], environ=self.environ)
+
+    def test_the_pipeline_never_reads_a_name_other_than_the_one_the_client_served(self):
+        """The one-sided property that no reader written here could keep (three rounds missed a spelling): wherever the client served an agent under a name, the pipeline answers that name or says it cannot tell,
+        never none and never another name. Where the client served none (no description, an invalid name, a text that fails both of its attempts) a name from the pipeline is an over-report, the safe direction."""
+        oracle = json.loads(ORACLE.read_text(encoding="utf-8"))
+        entries = oracle["entries"]
+        self.assertGreater(len(entries), 2500)
+        answers = []
+        for start in range(0, len(entries), 500):
+            answers += self.names(*[text for _, text, _ in entries[start:start + 500]])
+        counts, misses = Counter(), []
+        for index, ((family, text, served), answer) in enumerate(zip(entries, answers)):
+            if served is None:
+                counts["over-report" if isinstance(answer, str) else "unreadable-where-none" if answer is adoption_status.UNREADABLE else "agree-none"] += 1
+            elif answer == served:
+                counts["agree"] += 1
+            elif answer is adoption_status.UNREADABLE:
+                counts["unreadable"] += 1
+            else:
+                counts["MISS"] += 1
+                misses.append((family, index))
+        self.assertEqual(misses, [])
+        served_count = sum(1 for _, _, served in entries if served is not None)
+        self.assertEqual(counts["agree"] + counts["unreadable"], served_count)
+        self.assertGreaterEqual(counts["agree"], int(served_count * 0.9), "most of what the client served is read, not merely not-misread")
+
+    def test_the_counterexample_of_the_command_centers_read_and_its_variants_are_read_as_the_client_reads_them(self):
+        """The P1 of #1062 at e7260fd3: a comment line at the left margin between `name:` and its indented value made the hand-written reader answer none (drift 0, complete: true)."""
+        name = "stack-verifier"
+        for label, text in (("a comment at the left margin", f"---\nname:\n# role\n  {name}\ndescription: x\n---\n"), ("a comment on the key line", f"---\nname: # c\n  {name}\ndescription: x\n---\n"),
+                            ("a left-margin comment and a blank line", f"---\nname:\n# role\n\n  {name}\ndescription: x\n---\n"), ("an indented comment", f"---\nname:\n  # role\n  {name}\ndescription: x\n---\n")):
+            with self.subTest(case=label):
+                self.assertEqual(self.names(text), [name])
+
+    def test_a_bun_named_by_a_path_relative_to_the_callers_directory_is_the_same_bun(self):
+        """The case of the local codex review of #1062 at b3da64d7 (P2), with the real binary: the bun that parses from its absolute path gave Unknown from a relative path to the same file, a relative value of the
+        variable or a relative PATH entry, because both launches run in the scratch directory."""
+        bun = Path(real_bun())
+        for label, environ in (("a relative value of the variable", {"PATH": "/usr/bin:/bin", adoption_status.BUN_ENV: "./" + bun.name}), ("a relative PATH entry", {"PATH": ".", adoption_status.BUN_ENV: bun.name})):
+            with self.subTest(case=label), contextlib.chdir(bun.parent):   # from the bun's own directory, where nothing of the scratch directory's can answer
+                self.assertEqual(adoption_status.agent_names([b"---\nname: a\n---\n"], environ=environ), ["a"])
+
+    def test_a_dot_dot_after_a_link_reaches_the_real_bun_the_kernel_finds(self):
+        """The case of the local codex re-review of 9720257e (P2), with the real binary: `current/../bun` with `current` a link to `actual/subdir` is `actual/bun`, here a link to the real bun; the file beside `current`
+        is a script that answers another version, so that taking it (os.path.abspath removes the ".." lexically) is Unknown."""
+        bun = Path(real_bun())
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "actual/subdir").mkdir(parents=True)
+            (root / "actual/bun").symlink_to(bun)
+            (root / "bun").write_text("#!/bin/sh\necho 1.4.2\n")
+            (root / "bun").chmod(0o755)
+            (root / "current").symlink_to("actual/subdir")
+            with contextlib.chdir(root):
+                self.assertEqual(adoption_status.agent_names([b"---\nname: a\n---\n"], environ={"PATH": "/usr/bin:/bin", adoption_status.BUN_ENV: "current/../bun"}), ["a"])
+
+    def test_a_bunfig_in_the_working_directory_is_not_read(self):
+        """bun reads a bunfig.toml of its working directory and runs its preload (measured with 1.4.3); the call runs in an empty directory, so a caller's directory cannot change what it does."""
+        with tempfile.TemporaryDirectory() as directory:
+            marker = Path(directory) / "ran"
+            (Path(directory) / "preload.js").write_text(f"require('fs').writeFileSync({str(marker)!r}, 'x')\n")
+            (Path(directory) / "bunfig.toml").write_text('preload = ["./preload.js"]\n')
+            before = os.getcwd()
+            os.chdir(directory)
+            try:
+                names = self.names("---\nname: a\n---\n")
+            finally:
+                os.chdir(before)
+            self.assertEqual(names, ["a"])
+            self.assertFalse(marker.exists(), "the preload of the caller's directory ran")
+
+    def test_a_name_with_characters_beyond_ascii_comes_back_exact_whatever_the_locale_of_the_caller(self):
+        name = "caf" + chr(0xE9) + "-" + chr(0x4E2D) + chr(0x6587)
+        self.assertEqual(self.names(f"---\nname: {name}\ndescription: x\n---\n".encode("utf-8")), [name])
+
+    def test_every_shipped_definition_has_a_name_the_parser_reads_on_the_first_attempt(self):
+        blobs = [path.read_bytes() for path in sorted(STACK_AGENTS_SOURCE.glob("*.md"))]
+        names = self.names(*blobs)
+        self.assertTrue(all(isinstance(name, str) and name for name in names), names)
+        self.assertEqual(len(set(names)), len(names), "one name per shipped definition")
+        self.assertEqual(names, [path.stem for path in sorted(STACK_AGENTS_SOURCE.glob("*.md"))], "a shipped definition is named by its file")
+
+    def test_a_name_that_is_not_a_string_is_no_name_as_the_client_serves_none(self):
+        """Iwt serves an agent only under a string name: a number, a boolean, a null, an empty value, a list or a mapping is no name, and what String() would make of one (123, true, null) must not come back as a name."""
+        for label, value in (("a number", "123"), ("a boolean", "true"), ("a null", "null"), ("an empty value", ""), ("a list", "[a, b]"), ("a mapping", "{a: b}"), ("an array of the document", None)):
+            with self.subTest(case=label):
+                text = "---\n- a\n- b\n---\n" if value is None else f"---\nname: {value}\ndescription: x\n---\n"
+                self.assertEqual(self.names(text), [None])
+        self.assertEqual(self.names('---\nname: "123"\ndescription: x\n---\n', "---\nname: 'true'\ndescription: x\n---\n"), ["123", "true"], "a quoted number or boolean is a string")
+
+    def test_a_text_the_parser_throws_on_is_unreadable_where_the_client_goes_on_with_a_second_attempt(self):
+        """The client answers a throw with a rewrite of the text and a second parse (W9t); that is not reproduced here, so the definition is Unknown, never none."""
+        for label, text in (("a description with a colon and a space", "---\nname: a\ndescription: Use when: a thing\n---\n"), ("an unterminated flow sequence", "---\nname: a\ntools: [a, b\n---\n"),
+                            ("text after a closing quote", '---\nname: "a"x\ndescription: x\n---\n')):
+            with self.subTest(case=label):
+                self.assertIs(self.names(text)[0], adoption_status.UNREADABLE)
+
+
+class WorkflowPinTests(unittest.TestCase):
+    """The workflow installs the bun that the check and its tests require, at the release's version and checksum (the repository's pattern for a tool the tests need: the uv step of the same job)."""
+
+    def test_the_validation_workflow_installs_the_bun_the_check_requires(self):
+        text = (ROOT / ".github/workflows/validate.yml").read_text(encoding="utf-8")
+        self.assertIn(f"BUN_VERSION: '{adoption_status.CLIENT_BUN_VERSION}'", text)
+        self.assertIsNotNone(re.search(r"BUN_SHA256: ([0-9a-f]{64})\n", text), "the release's checksum is written in the step")
+        step = text[text.index("BUN_VERSION:"):text.index("Provision the pinned tree-sitter-bash parser")]
+        for needle in ("releases/download/bun-v${BUN_VERSION}/bun-linux-x64.zip", "sha256sum --check", f'echo "{adoption_status.BUN_ENV}=', "bun-linux-x64/bun"):
+            self.assertIn(needle, step)
+        self.assertLess(step.index("sha256sum --check"), step.index("unzip"), "the archive is checked before it is unpacked")
+
+    # The tests that need the real bun fail under GitHub Actions rather than skip, so every job whose unittest step reaches this module must provision the bun before it. The reader below is a text reader of the
+    # workflow files, as tests/test_workflow_hardening.py's jobs() is: a job is a two-space key under `jobs:`, a step a `- ` item at six spaces.
+    @staticmethod
+    def jobs_and_steps(text):
+        """[(job id, [step text, ...])] of a workflow file."""
+        jobs, job, step, in_jobs = [], None, None, False
+        for line in text.splitlines():
+            if re.match(r"^jobs:\s*$", line):
+                in_jobs = True
+                continue
+            if not in_jobs:
+                continue
+            if re.match(r"^[^\s#]", line):
+                in_jobs = False
+                continue
+            key = re.match(r"^  ([A-Za-z0-9_-]+):\s*$", line)
+            if key:
+                job, step = (key.group(1), []), None
+                jobs.append(job)
+            elif job is not None and re.match(r"^      - ", line):
+                step = [line]
+                job[1].append(step)
+            elif step is not None:
+                step.append(line)
+        return [(name, ["\n".join(lines) for lines in steps]) for name, steps in jobs]
+
+    @staticmethod
+    def reaches_the_bun_tests(step):
+        """True when the run block of `step` starts the unittest suite so that tests.test_adoption_status is among what it runs: `-m unittest` with no module argument (discovery of the checkout), one that names
+        tests.test_adoption_status, or the shard runner of validate.yml."""
+        match = re.search(r"(?m)^        run:[ \t]*(.*)\n?((?:(?:        [ \t]+.*|[ \t]*)\n?)*)", step)
+        if not match:
+            return False
+        block = re.sub(r"\\\n\s*", " ", match.group(1) + "\n" + match.group(2))
+        block = "\n".join(line for line in block.splitlines() if not line.strip().startswith("#"))
+        if re.search(r"validate_shards\.py\s+run\b", block):
+            return True
+        for command in re.finditer(r"-m\s+unittest\b([^|;&>\n]*)", block):
+            words = command.group(1).split()
+            if "discover" in words:
+                start = words.index("-s") + 1 if "-s" in words else None
+                if start is not None and start < len(words) and not words[start].startswith(("tests", ".")):
+                    continue
+                return True
+            named = [word for word in words if not word.startswith("-") and not word.isdigit()]
+            if not named or any(word == "tests.test_adoption_status" or word.startswith("tests.test_adoption_status.") for word in named):
+                return True
+        return False
+
+    def test_the_reader_tells_the_suite_runners_from_the_named_modules(self):
+        def one(run):
+            return "      - name: x\n        run: " + run + "\n"
+        reaching = ("python3 -m unittest", "python3 -m unittest --durations 50 2>&1 | tee log", "python3 -m unittest -v", "python3 -m unittest tests.test_adoption_status -v",
+                    "python3 -m unittest tests.test_a tests.test_adoption_status.ClientWiringTests", "python3 scripts/validate_shards.py run -v --shard 1", "python3 -m unittest discover -s tests",
+                    "|\n          set -o pipefail\n          timeout 55m \\\n            python3 -m unittest --durations 50 2>&1 | tee log")
+        elsewhere = ("python3 -m unittest tests.test_receipt_staleness -v", "python3 -m unittest discover -s tools/token-report -p test_token_manifest.py -q",
+                     "python3 -m unittest tests.test_a tests.test_adoption_status_extra", "echo hello", "|\n          # python3 -m unittest\n          echo done")
+        for run in reaching:
+            with self.subTest(reaching=run):
+                self.assertTrue(self.reaches_the_bun_tests(one(run)))
+        for run in elsewhere:
+            with self.subTest(elsewhere=run):
+                self.assertFalse(self.reaches_the_bun_tests(one(run)))
+
+    def test_every_job_that_runs_the_suite_provisions_the_pinned_bun_before_it(self):
+        """validate.yml (the shards) and catalog-freshness.yml (`python3 -m unittest --durations 50`) run the whole suite; the scheduled and the manual freshness run failed at the bun tests until its job
+        provisioned the same bun (the local review of the landing rebase, P1). Both steps carry one version and one checksum."""
+        shipped = re.search(r"BUN_SHA256: ([0-9a-f]{64})\n", (ROOT / ".github/workflows/validate.yml").read_text(encoding="utf-8"))
+        self.assertIsNotNone(shipped, "the release's checksum is written in validate.yml's step")
+        runners = {}
+        for path in sorted((ROOT / ".github/workflows").glob("*.y*ml")):
+            for job, steps in self.jobs_and_steps(path.read_text(encoding="utf-8")):
+                first = next((index for index, step in enumerate(steps) if self.reaches_the_bun_tests(step)), None)
+                if first is not None:
+                    runners[(path.name, job)] = steps[:first]
+        self.assertTrue({"validate.yml", "catalog-freshness.yml"} <= {name for name, _ in runners}, f"the reader finds the two known suite runners: {sorted(runners)}")
+        for (name, job), before in sorted(runners.items()):
+            with self.subTest(workflow=name, job=job):
+                provisioning = [step for step in before if f'echo "{adoption_status.BUN_ENV}=' in step and "GITHUB_ENV" in step]
+                self.assertEqual(len(provisioning), 1, "one step before the suite exports the bun's path")
+                step = provisioning[0]
+                self.assertIn(f"BUN_VERSION: '{adoption_status.CLIENT_BUN_VERSION}'", step)
+                self.assertIn(f"BUN_SHA256: {shipped.group(1)}", step)
+                self.assertIn("releases/download/bun-v${BUN_VERSION}/bun-linux-x64.zip", step)
+                self.assertLess(step.index("sha256sum --check"), step.index("unzip"), "the archive is checked before it is unpacked")
+
+
+class NeedsBunTests(unittest.TestCase):
+    """The tests that need the real bun skip on a developer's machine and fail under GitHub Actions (the command center's adjudication of 2026-10-13, point 4; the pattern of tests/test_token_full_save_evidence.py)."""
+
+    def outcome(self):
+        try:
+            real_bun()
+        except unittest.SkipTest as skipped:
+            return "skip", str(skipped)
+        except AssertionError as failed:
+            return "fail", str(failed)
+        return "returned", ""
+
+    def test_a_missing_bun_skips_locally_and_fails_under_github_actions(self):
+        for ci, expected in (("unset", "skip"), ("true", "fail"), ("false", "skip")):
+            with self.subTest(GITHUB_ACTIONS=ci), mock.patch.dict(os.environ), mock.patch.object(adoption_status, "find_bun", return_value=None):
+                os.environ.pop("GITHUB_ACTIONS", None)
+                if ci != "unset":
+                    os.environ["GITHUB_ACTIONS"] = ci
+                kind, message = self.outcome()
+                self.assertEqual(kind, expected)
+                self.assertIn("is not installed", message)
+
+    def test_a_bun_of_another_version_skips_locally_and_fails_under_github_actions(self):
+        with tempfile.TemporaryDirectory() as directory:
+            bun = make_fake_bun(directory, version="1.4.2")
+            for ci, expected in (("unset", "skip"), ("true", "fail")):
+                with self.subTest(GITHUB_ACTIONS=ci), mock.patch.dict(os.environ), mock.patch.object(adoption_status, "find_bun", return_value=str(bun)):
+                    os.environ.pop("GITHUB_ACTIONS", None)
+                    if ci != "unset":
+                        os.environ["GITHUB_ACTIONS"] = ci
+                    kind, message = self.outcome()
+                    self.assertEqual(kind, expected)
+                    self.assertIn("1.4.2", message)
+
+
 class ClientWiringTests(unittest.TestCase):
     """--client-wiring on fake homes: fixed keys, booleans and counts only, never text from a file."""
 
@@ -1884,6 +2495,8 @@ class ClientWiringTests(unittest.TestCase):
         self.env = {"HOME": str(self.home)}
         for name in ROLE_FILES:  # the checkout's copies of the two Codex role carriers, which the count compares with
             self.write(f"adoption/agents/codex/{name}", role_bytes(name), self.root)
+        for name in AGENT_FILES:  # the checkout's Claude agent definitions, which the drift count compares with
+            self.write(f"adoption/agents/claude/{name}", agent_bytes(name), self.root)
 
     def write(self, relative: str, content, base: Path | None = None) -> Path:
         path = (base or self.home) / relative
@@ -1915,6 +2528,8 @@ class ClientWiringTests(unittest.TestCase):
                    {"name": PRIVATE})
         for name in ROLE_FILES:  # the role carriers the Codex worker lane installs under the Codex home
             self.write(f".codex/agents/{name}", role_bytes(name))
+        for name in AGENT_FILES:  # the Claude definitions the profile installer copies under the Claude home
+            self.write(f".claude/agents/{name}", agent_bytes(name))
         self.write(".claude/settings.json", {"env": {"CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS": "8",
                                                      "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"}}, self.root)
         self.write(".codex/config.toml", CODEX_CONFIG, self.root)
@@ -1948,7 +2563,7 @@ class ClientWiringTests(unittest.TestCase):
         self.assertEqual(self.wiring(), {
             "claude": {"rtk_hook": False, "ai_memory_hook_events": 0, "context_mode_plugin_enabled": False,
                        "subagent_spawn_depth_1": False, "workflow_concurrency_set": False,
-                       "effort_level_env_unset": True, "agent_teams_opt_in": 0},
+                       "effort_level_env_unset": True, "agent_teams_opt_in": 0, "stack_agents_drift": len(AGENT_FILES)},
             "project": {"settings_depth_and_concurrency": False,
                         "codex_mcp_servers_present": dict.fromkeys(SERVERS, False)},
             # Without a config.toml Codex keeps its default: hooks on.
@@ -2007,7 +2622,7 @@ class ClientWiringTests(unittest.TestCase):
         self.assertEqual(result["claude"], {"rtk_hook": False, "ai_memory_hook_events": 0,
                                             "context_mode_plugin_enabled": False, "subagent_spawn_depth_1": False,
                                             "workflow_concurrency_set": False, "effort_level_env_unset": True,
-                                            "agent_teams_opt_in": 0})
+                                            "agent_teams_opt_in": 0, "stack_agents_drift": len(AGENT_FILES)})
         self.assertFalse(result["project"]["settings_depth_and_concurrency"])
         self.assertEqual(result["codex"], {"rtk_instructions": False, "context_mode_plugin_enabled": False,
                                            "mcp_servers_present": dict.fromkeys(SERVERS, False),
@@ -2459,6 +3074,707 @@ class ClientWiringTests(unittest.TestCase):
     def test_the_limitations_name_the_role_files_the_check_compares(self):
         text = CLIENT_WIRING_LIMITATIONS[0]
         for needle in ("agents/", "adoption/agents/codex", "byte for byte"):
+            self.assertIn(needle, text)
+
+    # -- stack_agents_drift (CPA-V-10 of the Claude-family practice audit): the Claude agent definitions under <Claude home>/agents against the checkout's
+    # adoption/agents/claude. A count that must be 0; never a name, a path or text.
+
+    def drift(self, env=None):
+        """claude.stack_agents_drift of the fake home. The key is asserted first, so a base without it fails on that."""
+        claude = self.wiring(env)["claude"]
+        self.assertIn("stack_agents_drift", claude)
+        return claude["stack_agents_drift"]
+
+    def test_the_drift_key_is_the_last_claude_key_and_a_count(self):
+        self.assertEqual(CLIENT_WIRING_KEYS["claude"][-1], "stack_agents_drift")
+        self.wire()
+        self.assertIs(type(self.wiring()["claude"]["stack_agents_drift"]), int)  # a number: a boolean would not say how many
+
+    def test_a_stale_or_wider_user_agent_makes_the_wiring_incomplete(self):
+        """The fail-first of CPA-V-10: a fixture with one stale user agent reported `complete: true`, because nothing compared the agent files with adoption/agents/claude."""
+        self.wire()
+        self.assertEqual((self.drift(), self.wiring()["complete"]), (0, True))
+        agent = self.home / ".claude/agents" / AGENT_FILES[0]
+        agent.write_bytes(agent.read_bytes().replace(AGENT_TOOLS.encode(), b"tools: Read, Grep, Glob, Bash"))  # a wider copy: more tools than the source gives
+        result = self.wiring()
+        self.assertEqual((result["claude"]["stack_agents_drift"], result["complete"]), (1, False))
+        others = {key: value for key, value in result["claude"].items() if key != "stack_agents_drift"}
+        self.assertEqual(others, {key: value for key, value in WIRED["claude"].items() if key != "stack_agents_drift"}, "the drift alone turned completeness off")
+        agent.write_bytes(agent.read_bytes().replace(b"tools: Read, Grep, Glob, Bash\n", b"\n"))  # the `tools` field gone: an omitted field means every tool
+        self.assertEqual((self.drift(), self.wiring()["complete"]), (1, False))
+        agent.write_bytes(agent_bytes(AGENT_FILES[0]))
+        self.assertEqual((self.drift(), self.wiring()["complete"]), (0, True))
+
+    def test_drift_counts_each_changed_missing_and_unlisted_definition(self):
+        self.wire()
+        agents = self.home / ".claude/agents"
+        flipped = bytearray((agents / AGENT_FILES[0]).read_bytes())
+        flipped[0] ^= 1  # the same size, one bit different: equal length is not equal bytes
+        (agents / AGENT_FILES[0]).write_bytes(bytes(flipped))
+        self.assertEqual(self.drift(), 1)
+        (agents / AGENT_FILES[1]).unlink()  # absent
+        self.assertEqual(self.drift(), 2)
+        self.write(".claude/agents/not-shipped-here.md", agent_bytes("not-shipped-here.md"))  # a definition the client serves and nothing here checks
+        self.assertEqual(self.drift(), 3)
+        self.write(".claude/agents/another.md", b"")
+        self.assertEqual(self.drift(), 4)
+        (agents / AGENT_FILES[0]).write_bytes(agent_bytes(AGENT_FILES[0]))
+        (agents / AGENT_FILES[1]).write_bytes(agent_bytes(AGENT_FILES[1]))
+        (agents / "not-shipped-here.md").unlink()
+        (agents / "another.md").unlink()
+        self.assertEqual(self.drift(), 0)
+
+    def test_the_four_vendor_definitions_are_listed_and_files_that_are_not_markdown_are_ignored(self):
+        self.assertEqual(VENDOR_HOST_AGENTS, ("codebase-memory-auditor.md", "codebase-memory-scout.md", "codebase-memory.md", "semble-search.md"))
+        self.assertFalse(set(VENDOR_HOST_AGENTS) & {path.name for path in STACK_AGENTS_SOURCE.glob("*.md")}, "a listed definition is one this checkout does not ship")
+        self.wire()
+        for name in VENDOR_HOST_AGENTS:  # whatever their text: they are the vendors' own
+            self.write(f".claude/agents/{name}", f"vendor {PRIVATE}\n")
+        self.assertEqual(self.drift(), 0)
+        self.write(".claude/agents/" + AGENT_FILES[0] + ".bak.20261005T005836Z", agent_bytes(AGENT_FILES[0]) + b"\n")  # a backup is not an agent file
+        self.write(".claude/agents/notes.txt", "x")
+        self.write(".claude/agents/nested/notes.txt", "x")  # the client keeps names ending .md only
+        self.assertEqual(self.drift(), 0)
+        self.assertEqual(self.wiring()["complete"], True)
+
+    def test_a_link_or_a_folder_in_place_of_a_definition_is_drift(self):
+        self.wire()
+        agents = self.home / ".claude/agents"
+        identical = self.write("identical-copy.md", agent_bytes(AGENT_FILES[0]))
+        (agents / AGENT_FILES[0]).unlink()
+        (agents / AGENT_FILES[0]).symlink_to(identical)  # the bytes are equal, but the client's file is a link
+        self.assertEqual(self.drift(), 1)
+        (agents / AGENT_FILES[1]).unlink()
+        (agents / AGENT_FILES[1]).mkdir()  # a folder where a file belongs
+        self.assertEqual(self.drift(), 2)
+        self.write(".claude/agents/linked-extra.md", "x")
+        (agents / "linked-extra.md").unlink()
+        (agents / "linked-extra.md").symlink_to(identical)  # a link the client would load, and nothing here ships it
+        self.assertEqual(self.drift(), 3)
+
+    def test_an_absent_agents_folder_counts_every_definition_of_the_checkout(self):
+        self.write(".claude/settings.json", {})
+        self.assertEqual(self.drift(), len(AGENT_FILES))
+
+    def test_the_drift_follows_claude_config_dir(self):
+        self.wire()
+        moved = self.home / "elsewhere"
+        (self.home / ".claude").rename(moved)
+        self.assertEqual(self.drift(), len(AGENT_FILES))  # the default home has no agents folder any more
+        env = {**self.env, "CLAUDE_CONFIG_DIR": str(moved)}
+        self.assertEqual(self.drift(env), 0)
+        (moved / "agents" / AGENT_FILES[2]).write_bytes(b"stale")
+        self.assertEqual(self.drift(env), 1)
+
+    def test_the_drift_is_null_when_a_source_or_the_folder_cannot_be_compared(self):
+        self.wire()
+        agents = self.home / ".claude/agents"
+        source = self.root / "adoption/agents/claude"
+        kept = (source / AGENT_FILES[0]).read_bytes()
+        (source / AGENT_FILES[0]).unlink()
+        self.assertEqual(self.drift(), 1, "a definition the checkout no longer ships, and that is not one of the vendors', is drift")
+        (source / AGENT_FILES[0]).write_bytes(kept)
+        shutil.rmtree(source)  # no source folder: nothing to compare with, even where the agents are installed
+        self.assertIsNone(self.drift())
+        source.mkdir(parents=True)
+        self.assertIsNone(self.drift(), "a source folder with no definition")
+        for name in AGENT_FILES:
+            (source / name).write_bytes(agent_bytes(name))
+        self.assertEqual(self.drift(), 0)
+        (source / "folder.md").mkdir()  # a source entry that is not a file cannot be compared with
+        self.assertIsNone(self.drift())
+        (source / "folder.md").rmdir()
+        self.assertEqual(self.drift(), 0)
+        shutil.rmtree(agents)
+        agents.write_text("a file where the folder belongs", encoding="utf-8")
+        self.assertIsNone(self.drift())
+        agents.unlink()
+        (self.home / "linked-agents").mkdir()
+        agents.symlink_to(self.home / "linked-agents")  # a linked folder: what the client loads through it is not known here
+        self.assertIsNone(self.drift())
+
+    @unittest.skipIf(hasattr(os, "geteuid") and os.geteuid() == 0, "root reads a file whatever its mode")
+    def test_the_drift_is_null_for_an_unreadable_folder_or_definition(self):
+        self.wire()
+        agents = self.home / ".claude/agents"
+        definition = agents / AGENT_FILES[0]
+        definition.chmod(0)
+        try:
+            self.assertIsNone(self.drift())
+        finally:
+            definition.chmod(0o644)
+        shipped = self.root / "adoption/agents/claude" / AGENT_FILES[1]
+        shipped.chmod(0)  # a source copy that cannot be read: nothing to compare with
+        try:
+            self.assertIsNone(self.drift())
+        finally:
+            shipped.chmod(0o644)
+        agents.chmod(0)
+        try:
+            self.assertIsNone(self.drift())
+        finally:
+            agents.chmod(0o755)
+        self.assertEqual(self.drift(), 0)
+
+    def test_a_null_drift_makes_complete_false_like_every_other_null(self):
+        self.wire()
+        shutil.rmtree(self.root / "adoption/agents/claude")
+        result = self.wiring()
+        self.assertEqual((result["claude"]["stack_agents_drift"], result["complete"]), (None, False))
+        others = {key: value for key, value in result["claude"].items() if key != "stack_agents_drift"}
+        self.assertEqual(others, {key: value for key, value in WIRED["claude"].items() if key != "stack_agents_drift"})
+
+    def test_the_two_argument_form_of_claude_wiring_compares_with_this_repositorys_own_definitions(self):
+        claude_dir = self.home / ".claude"
+        claude_dir.mkdir()
+        (claude_dir / "settings.json").write_text("{}", encoding="utf-8")
+        report = adoption_status.claude_wiring(claude_dir, self.env)
+        self.assertIn("stack_agents_drift", report)
+        shipped = sorted(path.name for path in STACK_AGENTS_SOURCE.iterdir())
+        self.assertTrue(shipped and all(name.endswith(".md") for name in shipped), "the source folder holds definitions only")
+        self.assertEqual(report["stack_agents_drift"], len(shipped))  # nothing installed: every shipped definition is missing
+
+    def make_socket(self, directory, name):
+        """A socket file ``name`` in ``directory``, bound by its relative name from there so that the length limit of a socket path (104 bytes on macOS) never matters."""
+        server = socket.socket(socket.AF_UNIX)
+        self.addCleanup(server.close)
+        here = os.getcwd()
+        os.chdir(directory)
+        try:
+            server.bind(name)
+        finally:
+            os.chdir(here)
+
+    def test_a_definition_below_the_top_is_drift_at_any_depth(self):
+        """Review of #1062 at e70d2de0a (the Claude read, P1): the client loads the agents folder recursively (https://code.claude.com/docs/en/sub-agents.md L176-L182; its walker enters every folder and keeps names ending
+        .md), so a definition below the top is one it serves, and the check read the top only: `agents/old/stack-verifier.md` reported 0 and `complete: true`."""
+        self.wire()
+        agents = self.home / ".claude/agents"
+        self.write(".claude/agents/old/" + AGENT_FILES[0], agent_bytes(AGENT_FILES[0]))  # a shipped name, one folder down
+        self.assertEqual((self.drift(), self.wiring()["complete"]), (1, False))
+        self.write(".claude/agents/a/b/c/d/deep.md", agent_bytes("deep.md"))
+        self.assertEqual(self.drift(), 2)
+        self.write(".claude/agents/.hidden/dot.md", agent_bytes("dot.md"))  # the client lists hidden files too
+        self.write(".claude/agents/.dot-at-the-top.md", agent_bytes("dot-at-the-top.md"))
+        self.assertEqual(self.drift(), 4)
+        self.write(".claude/agents/a/notes.txt", "x")
+        (agents / "empty").mkdir()
+        (agents / "folder.md").mkdir()  # a folder whose name ends .md is a folder: entered, not counted
+        self.assertEqual(self.drift(), 4)
+        shutil.rmtree(agents / "old")
+        shutil.rmtree(agents / "a")
+        shutil.rmtree(agents / ".hidden")
+        (agents / ".dot-at-the-top.md").unlink()
+        self.assertEqual((self.drift(), self.wiring()["complete"]), (0, True))
+
+    # The rows of the vendor-collision test: (case, the text of a vendor-named file, what the check does). Each row was also given to the installed client (as a project agent with its own name token): the verdict
+    # in the comment is the client's against this check's, see tests/fixtures/agent_frontmatter/client-oracle.json for the corpus. "agree": the check reads the name the client served; "agree-none": the client
+    # served none and the check reads none; "over-report": the client serves nothing from the text (no description, an invalid name) and the check counts a name anyway, the safe direction; "unreadable": the
+    # parse throws and the client goes on with a second attempt that the check does not reproduce, so the count is unknown.
+    COLLISION_ROWS = (
+        ('a comment at the left margin between the key and its indented value', '---\nname:\n# role\n  stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('a comment on the key line, the value below', '---\nname: # c\n  stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('a comment at the left margin, then a blank line, then the value', '---\nname:\n# role\n\n  stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('an indented comment between the key and the value', '---\nname:\n  # role\n  stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('a comment at the left margin after a block scalar header', '---\nname: >-\n# role\n  stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'unknown'),  # unreadable-where-none
+        ('a comment at the left margin after the value', '---\nname:\n  stack-verifier\n# role\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('a quoted value below a comment at the left margin', '---\nname:\n# role\n  "stack-verifier"\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('the plain name', '---\nname: stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('a quoted key', '---\n"name": stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('a single-quoted key', "---\n'name': stack-verifier\ndescription: A fixture.\n---\nBody.\n", 'drift'),  # agree
+        ('a folded block scalar that strips', '---\nname: >-\n  stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('a folded block scalar that clips', '---\nname: >\n  stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'no drift'),  # agree
+        ('a literal block scalar that strips', '---\nname: |-\n  stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('a literal block scalar that clips', '---\nname: |\n  stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'no drift'),  # agree
+        ('an escape sequence in a double-quoted value', '---\nname: "stack-\\u0076erifier"\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('a hexadecimal escape', '---\nname: "stack-\\x76erifier"\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('a byte order mark before the opener', '\ufeff---\nname: stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('CRLF line endings', '---\r\nname: stack-verifier\r\ndescription: A fixture.\r\n---\r\nBody.\r\n', 'drift'),  # agree
+        ('the name in single quotes', "---\nname: 'stack-verifier'\ndescription: A fixture.\n---\nBody.\n", 'drift'),  # agree
+        ('the name in double quotes', '---\nname: "stack-verifier"\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('the name and a comment', '---\nname: stack-verifier # c\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('a hash that starts no comment', '---\nname: stack-verifier#x\ndescription: A fixture.\n---\nBody.\n', 'no drift'),  # agree
+        ('the name with trailing spaces', '---\nname: stack-verifier   \ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('the value on the next line', '---\nname:\n  stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('an anchor on the name', '---\nname: &a stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('a tag on the name', '---\nname: !!str stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('a complex key', '---\n? name\n: stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('the name twice, the last winning', '---\nname: other\nname: stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ("the name twice, the first one's value kept in a first-wins reader", '---\nname: stack-verifier\nname: other\ndescription: A fixture.\n---\nBody.\n', 'no drift'),  # over-report
+        ('a block indented as a whole', '---\n  name: stack-verifier\n  description: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('a flow mapping as the whole block', '---\n{name: stack-verifier, description: x}\n---\nBody.\n', 'drift'),  # agree
+        ('the key in capitals', '---\nName: stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'no drift'),  # agree-none
+        ('a tab inside another value', '---\nname: stack-verifier\ndescription: a\tb\n---\nBody.\n', 'drift'),  # agree
+        ('a name nested under another key', '---\nmeta:\n  name: stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'no drift'),  # agree-none
+        ('a name inside a literal block of another key', '---\nnotes: |\n  name: stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'no drift'),  # agree-none
+        ('a sequence at the left margin before the name', '---\ntools:\n- Read\n- Grep\nname: stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('a flow sequence over two lines in another key', '---\ntools: [a,\n  b]\nname: stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('an anchor on another key', '---\ndescription: &d x\nname: stack-verifier\n---\nBody.\n', 'drift'),  # agree
+        ('a number as the name', '---\nname: 123\ndescription: A fixture.\n---\nBody.\n', 'no drift'),  # agree-none
+        ('null as the name', '---\nname: null\ndescription: A fixture.\n---\nBody.\n', 'no drift'),  # agree-none
+        ('an empty name', '---\nname:\ndescription: A fixture.\n---\nBody.\n', 'no drift'),  # agree-none
+        ('an empty quoted name', "---\nname: ''\ndescription: A fixture.\n---\nBody.\n", 'no drift'),  # agree-none
+        ('no description', '---\nname: stack-verifier\n---\nBody.\n', 'drift'),  # over-report
+        ('a description that is not a string', '---\nname: stack-verifier\ndescription: [a, b]\n---\nBody.\n', 'drift'),  # over-report
+        ('a flow sequence as the whole block', '---\n[a, b]\n---\nBody.\n', 'no drift'),  # agree-none
+        ('a scalar as the whole block', '---\nname\n---\nBody.\n', 'no drift'),  # agree-none
+        ('a name that starts with a dash', '---\nname: -stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'no drift'),  # over-report
+        ('a name with a colon after normalization', '---\nname: "a:stack-verifier"\ndescription: A fixture.\n---\nBody.\n', 'no drift'),  # over-report
+        ('text after a closing quote', '---\nname: "stack-verifier"x\ndescription: A fixture.\n---\nBody.\n', 'unknown'),  # unreadable-where-none
+        ('an unclosed double quote', '---\nname: "stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'unknown'),  # unreadable-where-none
+        ('a mapping where a name was meant', '---\nname: a: stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'unknown'),  # unreadable-where-none
+        ('a trailing colon', '---\nname: stack-verifier:\ndescription: A fixture.\n---\nBody.\n', 'unknown'),  # unreadable-where-none
+        ('a description with a colon and a space', '---\nname: stack-verifier\ndescription: Use when: a thing\n---\nBody.\n', 'unknown'),  # unreadable
+        ('a stray line at the left margin', '---\nname: stack-verifier\nstray line\ndescription: A fixture.\n---\nBody.\n', 'unknown'),  # unreadable-where-none
+        ('an unterminated flow sequence', '---\nname: stack-verifier\ntools: [a, b\ndescription: A fixture.\n---\nBody.\n', 'unknown'),  # unreadable
+        ('no front matter', 'name: stack-verifier\n', 'no drift'),  # agree-none
+        ('an unterminated block', '---\nname: stack-verifier\n', 'no drift'),  # agree-none
+        ('an empty block', '---\n---\nname: stack-verifier\n', 'no drift'),  # agree-none
+        ('the block ends at the first --- after the opener', '---\ndescription: a --- b\nname: stack-verifier\n---\nBody.\n', 'no drift'),  # agree-none
+        ('an opener followed by spaces and blank lines', '---   \n\nname: stack-verifier\ndescription: x\n---\nBody.\n', 'drift'),  # agree
+        ('an opener with a tab after it', '---\t\nname: stack-verifier\ndescription: x\n---\nBody.\n', 'drift'),  # agree
+        ('a closer with trailing text', '---\nname: stack-verifier\ndescription: x\n--- y\nBody.\n', 'drift'),  # agree
+        ('four dashes', '----\nname: stack-verifier\ndescription: x\n---\nBody.\n', 'no drift'),  # agree-none
+        ('text before the opener', 'text\n---\nname: stack-verifier\ndescription: x\n---\nBody.\n', 'no drift'),  # agree-none
+        ('a space before the opener', ' ---\nname: stack-verifier\ndescription: x\n---\nBody.\n', 'no drift'),  # agree-none
+        ('a blank line before the opener', '\n---\nname: stack-verifier\ndescription: x\n---\nBody.\n', 'no drift'),  # agree-none
+        ('a lone CR line ending', '---\rname: stack-verifier\rdescription: A fixture.\r---\rBody.\r', 'no drift'),  # agree-none
+        ('a line separator in a value', '---\nname: stack-verifier\ndescription: a\u2028b\n---\nBody.\n', 'drift'),  # agree
+    )
+
+    def real_env(self):
+        """The environment of the wiring check with the pinned bun named in it; unavailable (a skip, or a failure under GitHub Actions) where that bun is not installed."""
+        return {**self.env, adoption_status.BUN_ENV: real_bun()}
+
+    def fake_env(self, **behavior):
+        directory = Path(tempfile.mkdtemp(prefix="fake-bun-"))
+        self.addCleanup(shutil.rmtree, directory, True)
+        return {**self.env, adoption_status.BUN_ENV: str(make_fake_bun(directory, **behavior))}, directory
+
+    def test_a_vendor_file_that_declares_the_name_of_a_shipped_definition_is_drift(self):
+        """Review of #1062 (the Claude read, P3): the four vendor names were exempt whatever they held, and the client keys a definition by its `name`: one that declares a shipped role's name can replace it unseen
+        (of two files that declare one name, one is chosen by file system read order). Rounds 1 and 2 read the name with a reader written here; each missed a spelling that the client's parser reads (a quoted key, a
+        block scalar, a comment line at the left margin). The design round (the command center's adjudication of 2026-10-13) reads it with the client's own parser: every row below is what the client serves."""
+        self.wire()
+        env = self.real_env()
+        for label, content, expectation in self.COLLISION_ROWS:
+            with self.subTest(case=label):
+                self.write(f".claude/agents/{VENDOR_HOST_AGENTS[0]}", content)
+                report = self.wiring(env)
+                self.assertEqual(report["claude"]["stack_agents_drift"], {"drift": 1, "no drift": 0, "unknown": None}[expectation])
+                self.assertEqual(report["complete"], expectation == "no drift", "a count that is not zero, or unknown, is never complete wiring")
+        (self.home / ".claude/agents" / VENDOR_HOST_AGENTS[0]).unlink()
+        self.assertEqual(self.drift(env), 0)
+        for name in VENDOR_HOST_AGENTS:  # each of the four, with a shipped name
+            with self.subTest(vendor=name):
+                self.write(f".claude/agents/{name}", agent_bytes(AGENT_FILES[1]))
+                self.assertEqual(self.drift(env), 1)
+                (self.home / ".claude/agents" / name).unlink()
+        self.assertEqual(self.drift(env), 0)
+
+    def test_the_vendor_definitions_of_this_host_shape_are_not_drift(self):
+        """The shapes of the four vendor-installed definitions on the first host (a `tools` list over many lines, flow lists for `mcpServers` and `skills`, a permission mode): another name, so no drift."""
+        self.wire()
+        vendor = ("---\nname: vendors-own\ndescription: A search role of a code index.\ntools:\n  - mcp__x__a\n  - mcp__x__b\nmcpServers: [x-mcp]\npermissionMode: dontAsk\nskills: [y-skill]\neffort: low\n---\nbody\n")
+        self.write(f".claude/agents/{VENDOR_HOST_AGENTS[0]}", vendor)
+        report = self.wiring(self.real_env())
+        self.assertEqual((report["claude"]["stack_agents_drift"], report["complete"]), (0, True))
+
+    def test_a_vendor_file_without_front_matter_needs_no_bun(self):
+        """Nothing is declared where there is no front matter, so a host without the pinned bun still has a count for the folders that hold such files (the ordinary fixtures of this class)."""
+        self.wire()
+        env = {**self.env, adoption_status.BUN_ENV: "/nonexistent/bun"}
+        for content in (b"", b"# notes\n", b"vendor text\n", b"name: stack-verifier\n"):
+            with self.subTest(content=content[:20]):
+                self.write(f".claude/agents/{VENDOR_HOST_AGENTS[0]}", content)
+                self.assertEqual(self.drift(env), 0)
+
+    def test_without_the_pinned_bun_a_vendor_file_with_front_matter_makes_the_count_unknown_never_zero(self):
+        self.wire()
+        self.write(f".claude/agents/{VENDOR_HOST_AGENTS[0]}", "---\nname: vendors-own\ndescription: x\n---\nbody\n")
+        absent = {**self.env, adoption_status.BUN_ENV: "/nonexistent/bun"}
+        wrong, _ = self.fake_env(version="1.4.2")
+        for label, env in (("no bun at the named path", absent), ("a bun of another version", wrong)):
+            with self.subTest(case=label):
+                report = self.wiring(env)
+                self.assertIsNone(report["claude"]["stack_agents_drift"])
+                self.assertFalse(report["complete"])
+
+    def test_the_wiring_hands_one_batch_with_the_shipped_definitions_and_the_vendor_files_to_the_parser(self):
+        self.wire()
+        for name in VENDOR_HOST_AGENTS:
+            self.write(f".claude/agents/{name}", f"---\nname: {name[:-3]}\ndescription: x\n---\nbody\n")
+        env, directory = self.fake_env()
+        self.assertEqual(self.drift(env), 0)
+        calls = fake_calls(directory)
+        self.assertEqual([call["call"] for call in calls], ["version", "parse"], "one process for the whole check")
+        self.assertEqual(calls[1]["blocks"], len(AGENT_FILES) + len(VENDOR_HOST_AGENTS))
+        self.write(f".claude/agents/{VENDOR_HOST_AGENTS[2]}", f"---\nname: {AGENT_FILES[0][:-3]}\ndescription: x\n---\nbody\n")
+        self.assertEqual(self.drift(env), 1, "the stand-in reads `name:` plainly; the vendor file declares a shipped name")
+
+    def test_a_parse_that_throws_for_a_vendor_file_or_for_a_shipped_definition_makes_the_count_unknown(self):
+        self.wire()
+        self.write(f".claude/agents/{VENDOR_HOST_AGENTS[0]}", "---\nname: vendors-own\ndescription: x\n---\nbody\n")
+        shipped = len(AGENT_FILES)
+        for label, position in (("a shipped definition", 0), ("the vendor's own file", shipped)):
+            answers = [{"state": "name", "name": "n"}] * (shipped + 1)
+            answers[position] = {"state": "throws"}
+            env, _ = self.fake_env(parse="answers", answers=answers)
+            with self.subTest(throws=label):
+                report = self.wiring(env)
+                self.assertIsNone(report["claude"]["stack_agents_drift"])
+                self.assertFalse(report["complete"])
+
+    def test_a_bun_that_fails_in_any_way_makes_the_count_unknown(self):
+        self.wire()
+        self.write(f".claude/agents/{VENDOR_HOST_AGENTS[0]}", "---\nname: vendors-own\ndescription: x\n---\nbody\n")
+        for label, behavior in (("a bun that exits with an error", dict(parse="exit", status=1)), ("an answer that is not JSON", dict(parse="garbage")), ("too few answers", dict(parse="short"))):
+            env, _ = self.fake_env(**behavior)
+            with self.subTest(case=label):
+                report = self.wiring(env)
+                self.assertIsNone(report["claude"]["stack_agents_drift"])
+                self.assertFalse(report["complete"])
+
+    def test_every_shipped_definition_is_settled_by_the_parser_before_a_vendor_file_is_held_against_it(self):
+        """A shipped source whose front matter the parser throws on (a description with a colon and a space) leaves nothing to compare the vendors' files with: unknown, as the client's second attempt is not reproduced."""
+        self.wire()
+        source = self.root / "adoption/agents/claude" / AGENT_FILES[0]
+        source.write_bytes(source.read_bytes().replace(b"description: ", b"description: Use when: ", 1))
+        (self.home / ".claude/agents" / AGENT_FILES[0]).write_bytes(source.read_bytes())
+        self.write(f".claude/agents/{VENDOR_HOST_AGENTS[0]}", "---\nname: vendors-own\ndescription: x\n---\nbody\n")
+        report = self.wiring(self.real_env())
+        self.assertIsNone(report["claude"]["stack_agents_drift"])
+        self.assertFalse(report["complete"])
+
+    def test_a_vendor_file_over_the_clients_size_limit_is_unknown(self):
+        """The client loads no file over its byte limit; this reads at most that many bytes, and a vendor file it cannot read whole declares a name that cannot be told (the first reader took it for a file with no name)."""
+        self.wire()
+        self.write(f".claude/agents/{VENDOR_HOST_AGENTS[0]}", b"---\nname: vendors-own\n---\n" + b"x" * adoption_status.CLIENT_FILE_LIMIT)
+        report = self.wiring()
+        self.assertIsNone(report["claude"]["stack_agents_drift"])
+        self.assertFalse(report["complete"])
+
+    def test_a_vendor_file_that_is_one_long_unterminated_block_is_read_in_linear_time(self):
+        """Review of #1062 at 2723f8fd (the local codex review, P2): a 64 KiB fixture of this shape kept the whole client_wiring call past five seconds; the file declares nothing, so it needs no bun and is not drift."""
+        self.wire()
+        self.write(f".claude/agents/{VENDOR_HOST_AGENTS[0]}", b"---" + b"\n" * 65536)
+        started = time.monotonic()
+        report = self.wiring()
+        self.assertLess(time.monotonic() - started, 10.0)
+        self.assertEqual(report["claude"]["stack_agents_drift"], 0)
+
+    @unittest.skipIf(hasattr(os, "geteuid") and os.geteuid() == 0, "root reads a file whatever its mode")
+    def test_a_vendor_file_that_cannot_be_read_is_not_drift_for_what_it_might_declare(self):
+        """The client runs as the same user and cannot read it either, so it loads no definition from it."""
+        self.wire()
+        vendor = self.home / ".claude/agents" / VENDOR_HOST_AGENTS[0]
+        vendor.write_bytes(agent_bytes(AGENT_FILES[0]))
+        vendor.chmod(0)
+        try:
+            self.assertEqual(self.drift(), 0)
+        finally:
+            vendor.chmod(0o644)
+        self.assertEqual(self.drift(self.real_env()), 1)
+
+    def test_a_folder_that_cannot_be_listed_after_it_was_opened_is_unknown(self):
+        self.wire()
+        real = os.listdir
+
+        def failing(path=None):
+            if isinstance(path, int):  # the agents folder is read by descriptor
+                raise PermissionError(errno.EACCES, "denied")
+            return real(path)
+        with patch.object(os, "listdir", failing):
+            self.assertIsNone(self.drift())
+        self.assertEqual(self.drift(), 0)
+
+    def test_a_vendor_name_below_the_top_or_as_a_link_is_not_the_vendors_own(self):
+        self.wire()
+        agents = self.home / ".claude/agents"
+        self.write(".claude/agents/sub/" + VENDOR_HOST_AGENTS[1], "vendor\n")  # the exemption is for the top, where the vendors' tools write
+        self.assertEqual(self.drift(), 1)
+        (agents / "sub" / VENDOR_HOST_AGENTS[1]).unlink()
+        self.assertEqual(self.drift(), 0)
+        elsewhere = self.write("elsewhere.md", "x")
+        (agents / VENDOR_HOST_AGENTS[2]).symlink_to(elsewhere)  # the client follows it and nothing here can say what it declares
+        self.assertEqual(self.drift(), 1)
+
+    def test_a_link_to_a_file_is_counted_and_what_the_clients_walker_skips_is_not(self):
+        """The 2.1.296 walker follows a link with stat and keeps a file whose name ends in .md (`isFile()`): a link to a file counts; a pipe, a socket, a device and a link to nothing are not kept (review of #1062 at
+        e22358e46, the Claude delta, P3: they were counted)."""
+        self.wire()
+        agents = self.home / ".claude/agents"
+        target_file, target_folder = self.write("target-file.md", agent_bytes("target.md")), self.home / "target-folder"
+        target_folder.mkdir()
+        (target_folder / "inside.md").write_bytes(agent_bytes("inside.md"))
+        (agents / "sub").mkdir()
+        (agents / "sub" / "link.md").symlink_to(target_file)  # a link to a file named *.md: a definition the client would load
+        self.assertEqual(self.drift(), 1)
+        (agents / "dangling.md").symlink_to(self.home / "missing.md")  # a link to nothing: the stat fails and the walker skips it
+        self.assertEqual(self.drift(), 1)
+        (agents / "notes-link").symlink_to(target_file)  # a link to a file not named *.md: the walker keeps names ending .md only
+        (agents / "dangling-notes").symlink_to(self.home / "missing-notes")
+        self.assertEqual(self.drift(), 1)
+        os.mkfifo(agents / "pipe.md")  # opened without blocking; not a file, so the walker skips it
+        os.mkfifo(agents / "pipe-notes")
+        self.make_socket(agents, "socket.md")
+        self.assertEqual(self.drift(), 1)
+        (agents / "link-to-pipe.md").symlink_to(agents / "pipe.md")  # a link to a pipe or a socket leads to nothing the walker keeps
+        (agents / "link-to-socket.md").symlink_to(agents / "socket.md")
+        self.assertEqual(self.drift(), 1)
+        (agents / "sub" / "link.md").unlink()
+        self.assertEqual(self.drift(), 0)
+        for where, name in ((agents, "linked-folder"), (agents, "linked-folder.md"), (agents / "sub", "deeper-link")):
+            with self.subTest(link=f"{where.name}/{name}"):
+                (where / name).symlink_to(target_folder)  # the client follows a link to a folder and loads what is in it: not known here
+                self.assertIsNone(self.drift())
+                self.assertEqual(self.wiring()["complete"], False)
+                (where / name).unlink()
+                self.assertEqual(self.drift(), 0)
+
+    def test_describe_entry_tells_a_link_from_what_it_leads_to(self):
+        folder = self.home / "described"
+        folder.mkdir()
+        (folder / "directory").mkdir()
+        (folder / "link-to-directory").symlink_to(folder / "directory")
+        (folder / "regular").write_bytes(b"x")
+        os.mkfifo(folder / "pipe")
+        descriptor = os.open(folder, os.O_RDONLY | os.O_DIRECTORY)
+        self.addCleanup(os.close, descriptor)
+        describe = adoption_status.describe_entry
+        self.assertEqual([describe(name, descriptor) for name in ("link-to-directory", "directory", "regular", "pipe", "missing")],
+                         ["link", "folder", "unreadable", "other", "absent"])
+
+    def test_a_markdown_file_without_a_name_is_still_counted_though_the_client_skips_it(self):
+        """The client parses the front matter and skips a file with no `name` without a message (the 2.1.296 loader; CHANGELOG L7088). This check counts it: a file that is one line from being a definition, found by a
+        reading of the front matter that is less exact than the client's. The record says so."""
+        self.wire()
+        agents = self.home / ".claude/agents"
+        for label, content in (("an empty file", b""), ("notes", b"# notes about the agents\n"), ("front matter without a name", b"---\ndescription: x\n---\nbody\n")):
+            with self.subTest(file=label):
+                (agents / "no-name.md").write_bytes(content)
+                self.assertEqual(self.drift(), 1)
+                (agents / "no-name.md").unlink()
+                self.assertEqual(self.drift(), 0)
+
+    def test_the_walk_is_bounded_and_a_tree_past_the_bound_is_unknown_not_a_count(self):
+        self.wire()
+        agents = self.home / ".claude/agents"
+        self.write(".claude/agents/one/two/three.md", agent_bytes("three.md"))
+        with patch.object(adoption_status, "AGENT_WALK_DEPTH", 2):
+            self.assertEqual(self.drift(), 1)  # the file sits two folders down: at the bound
+        with patch.object(adoption_status, "AGENT_WALK_DEPTH", 1):
+            self.assertIsNone(self.drift())
+        entries = len(AGENT_FILES) + 3  # the shipped files, one, two and three.md
+        with patch.object(adoption_status, "AGENT_WALK_ENTRIES", entries):
+            self.assertEqual(self.drift(), 1)
+        with patch.object(adoption_status, "AGENT_WALK_ENTRIES", entries - 1):
+            self.assertIsNone(self.drift())
+        self.assertEqual(adoption_status.AGENT_WALK_DEPTH, 8)
+        self.assertGreaterEqual(adoption_status.AGENT_WALK_ENTRIES, 1_000)
+
+    def test_the_folders_are_opened_below_a_descriptor_without_following_a_link(self):
+        """Review of #1062 (Astra, P1): the check inspected a path and opened it again, so a replacement between the two was read through. Every open below the Claude home is relative to the descriptor of its folder
+        and refuses a link; what is described is what the descriptor holds."""
+        self.wire()
+        self.write(".claude/agents/sub/extra.md", agent_bytes("extra.md"))
+        opens = []
+        real_open = os.open
+
+        def recording(path, flags, *rest, dir_fd=None, **keywords):
+            opens.append((str(path), flags, dir_fd))
+            return real_open(path, flags, *rest, dir_fd=dir_fd, **keywords)
+        with patch.object(os, "open", recording):
+            self.assertEqual(adoption_status.stack_agents_drift(self.home / ".claude", self.root / "adoption/agents/claude"), 1)
+        below = [entry for entry in opens if entry[2] is not None]
+        self.assertGreaterEqual(len(below), len(AGENT_FILES) + 3, "agents, every entry and the folder below")
+        for entry_path, flags, dir_fd in below:
+            self.assertTrue(flags & os.O_NOFOLLOW, entry_path)
+            self.assertEqual(os.sep in entry_path, False, "a name relative to its folder's descriptor, never a path")
+        self.assertTrue(any(flags & os.O_DIRECTORY for _, flags, _ in below))
+        self.assertEqual(len(opens) - len(below), len(AGENT_FILES) + 1, "the Claude home and the checkout's source files are the only opens by path")
+
+    def test_a_platform_that_cannot_refuse_links_reads_nothing(self):
+        self.wire()
+        self.assertEqual((self.drift(), self.roles()), (0, 2))
+        with patch.object(adoption_status, "NO_FOLLOW_READS", False):
+            result = self.wiring()
+            self.assertEqual((result["claude"]["stack_agents_drift"], result["codex"]["stack_roles_matching"], result["complete"]), (None, None, False))
+            self.assertIsNone(adoption_status.read_regular_bytes(self.home / ".claude/settings.json"), "no fallback to checking the path first")
+        self.assertEqual((self.drift(), self.roles(), self.wiring()["complete"]), (0, 2, True))
+
+    def test_read_regular_bytes_answers_for_every_kind_of_entry_without_following_a_link(self):
+        folder = self.home / "kinds"
+        folder.mkdir()
+        regular = self.write("kinds/regular.md", b"bytes")
+        (folder / "link-to-file").symlink_to(regular)
+        (folder / "dangling").symlink_to(folder / "missing")
+        (folder / "folder").mkdir()
+        os.mkfifo(folder / "pipe")
+        self.make_socket(folder, "socket")
+        (folder / "big").write_bytes(b"x" * 11)
+        read = adoption_status.read_regular_bytes
+        self.assertEqual(read(regular), b"bytes")
+        self.assertEqual(read(folder / "absent"), adoption_status.ABSENT)
+        for name in ("link-to-file", "dangling", "folder", "pipe", "socket"):
+            with self.subTest(entry=name):
+                self.assertEqual(read(folder / name), adoption_status.NOT_A_FILE)
+        self.assertIsNone(read(folder / "big", 10), "over the limit")
+        self.assertEqual(read(folder / "big", 11), b"x" * 11)
+        self.assertIsNone(read(regular / "below-a-file"), "a path through a file")
+        descriptor = os.open(folder, os.O_RDONLY | os.O_DIRECTORY)
+        self.addCleanup(os.close, descriptor)
+        self.assertEqual(read("regular.md", dir_fd=descriptor), b"bytes")
+        self.assertEqual(read("link-to-file", dir_fd=descriptor), adoption_status.NOT_A_FILE)
+
+    def interleave(self, build, call, action_for, allowed, minimum_points):
+        """Run ``call`` on a fresh fixture for every point at which ``action_for(fixture)`` can be made, and once with no action: every answer must be one of ``allowed``, and the points must be numerous."""
+        fixture = build()
+        value, fired, calls = Interleaving().run(lambda: call(fixture), lambda: None, 0)
+        self.assertFalse(fired)
+        self.assertIn(value, allowed, "no replacement: the answer the fixture gives")
+        answers = {}
+        for target in range(1, calls + 3):
+            fixture = build()
+            value, fired, _ = Interleaving().run(lambda: call(fixture), lambda: action_for(fixture), target)
+            if not fired:
+                break
+            answers[target] = value
+            self.assertIn(value, allowed, f"a replacement after step {target} changed the answer")
+        self.assertGreaterEqual(len(answers), minimum_points, "the replacement was tried at too few points to mean anything")
+        return answers
+
+    def race_fixture(self, kind):
+        """A Claude home whose first shipped definition is stale (drift 1 as it stands), a folder outside it that holds exact copies of everything (what a path read through a replacement would see), and the checkout's source folder."""
+        base = Path(tempfile.mkdtemp(prefix=f"race-{kind}-"))
+        self.addCleanup(shutil.rmtree, base, True)
+        source, home, outside = base / "source", base / "claude", base / "outside"
+        for folder in (source, home / "agents", outside / "agents"):
+            folder.mkdir(parents=True)
+        for name in AGENT_FILES:
+            for folder in (source, outside / "agents"):
+                (folder / name).write_bytes(agent_bytes(name))
+            (home / "agents" / name).write_bytes(agent_bytes(name))
+        (home / "agents" / AGENT_FILES[0]).write_bytes(agent_bytes(AGENT_FILES[0]) + b"stale\n")
+        return {"base": base, "source": source, "home": home, "agents": home / "agents", "outside": outside}
+
+    def test_a_replacement_of_a_shipped_file_at_any_point_is_never_read_through(self):
+        """Review of #1062 (Astra, P1): after the check looked at a shipped copy, the entry became a link to an outside file whose bytes equal the source, and the check read it: 0 and `complete: true`. A replacement is
+        made after every step of the read; the answer is the stale copy that was there (1) or unknown, never 0."""
+        def swap_in_a_link(fixture):
+            link = fixture["agents"] / ".swap"
+            os.symlink(fixture["outside"] / "agents" / AGENT_FILES[0], link)
+            os.replace(link, fixture["agents"] / AGENT_FILES[0])
+        answers = self.interleave(lambda: self.race_fixture("file"), lambda f: adoption_status.stack_agents_drift(f["home"], f["source"]), swap_in_a_link, {1, None}, 12)
+        self.assertIn(1, answers.values(), "a replacement after the file was opened reads the stale copy that was opened")
+
+    def test_a_replacement_of_the_agents_folder_at_any_point_is_never_read_through(self):
+        def swap_in_a_link(fixture):
+            os.rename(fixture["agents"], fixture["home"] / "agents-original")
+            os.symlink(fixture["outside"] / "agents", fixture["agents"])
+        answers = self.interleave(lambda: self.race_fixture("folder"), lambda f: adoption_status.stack_agents_drift(f["home"], f["source"]), swap_in_a_link, {1, None}, 12)
+        self.assertIn(None, answers.values(), "a link that is there when the folder is opened is refused")
+        self.assertIn(1, answers.values(), "a link that comes after the folder was opened leaves the opened folder as the one read")
+
+    def test_a_replacement_of_a_folder_below_the_top_at_any_point_is_never_read_through(self):
+        def build():
+            fixture = self.race_fixture("nested")
+            (fixture["agents"] / AGENT_FILES[0]).write_bytes(agent_bytes(AGENT_FILES[0]))
+            (fixture["agents"] / "nested").mkdir()
+            (fixture["agents"] / "nested" / "extra.md").write_bytes(agent_bytes("extra.md"))
+            (fixture["outside"] / "empty").mkdir()
+            return fixture
+
+        def swap_in_a_link(fixture):
+            os.rename(fixture["agents"] / "nested", fixture["agents"] / "nested-original")
+            os.symlink(fixture["outside"] / "empty", fixture["agents"] / "nested")
+        answers = self.interleave(build, lambda f: adoption_status.stack_agents_drift(f["home"], f["source"]), swap_in_a_link, {1, None}, 12)
+        self.assertNotIn(0, answers.values())
+
+    def roles_fixture(self):
+        """A Codex home whose first role carrier is stale (1 matches as it stands) and an outside folder with exact copies."""
+        base = Path(tempfile.mkdtemp(prefix="race-roles-"))
+        self.addCleanup(shutil.rmtree, base, True)
+        source, home, outside = base / "source", base / "codex", base / "outside"
+        for folder in (source, home / "agents", outside / "agents"):
+            folder.mkdir(parents=True)
+        for name in ROLE_FILES:
+            for folder in (source, home / "agents", outside / "agents"):
+                (folder / name).write_bytes(role_bytes(name))
+        (home / "agents" / ROLE_FILES[0]).write_bytes(role_bytes(ROLE_FILES[0]) + b"stale\n")
+        return {"base": base, "source": source, "home": home, "agents": home / "agents", "outside": outside}
+
+    def test_the_codex_role_count_is_never_read_through_a_replacement_either(self):
+        """The shared reader's other caller (Astra asked for it to be audited): the same two replacements, made after every step, with a count of 1 as it stands."""
+        def file_link(fixture):
+            link = fixture["agents"] / ".swap"
+            os.symlink(fixture["outside"] / "agents" / ROLE_FILES[0], link)
+            os.replace(link, fixture["agents"] / ROLE_FILES[0])
+
+        def folder_link(fixture):
+            os.rename(fixture["agents"], fixture["home"] / "agents-original")
+            os.symlink(fixture["outside"] / "agents", fixture["agents"])
+        for label, action in (("file", file_link), ("folder", folder_link)):
+            with self.subTest(replaced=label):
+                answers = self.interleave(self.roles_fixture, lambda f: adoption_status.stack_roles_matching(f["home"], f["source"]), action, {1, None}, 6)
+                self.assertNotIn(2, answers.values())
+
+    def test_an_installed_definition_over_the_size_limit_is_unknown_not_drift(self):
+        self.wire()
+        definition = self.home / ".claude/agents" / AGENT_FILES[0]
+        definition.write_bytes(b"x" * (adoption_status.CLIENT_FILE_LIMIT + 1))  # the client reads a file up to a limit too
+        self.assertIsNone(self.drift())
+        definition.write_bytes(b"x" * adoption_status.CLIENT_FILE_LIMIT)  # at the limit it is read, and it differs
+        self.assertEqual(self.drift(), 1)
+
+    @unittest.skipIf(hasattr(os, "geteuid") and os.geteuid() == 0, "root reads a folder whatever its mode")
+    def test_an_unreadable_folder_below_the_top_is_unknown(self):
+        self.wire()
+        locked = self.home / ".claude/agents/locked"
+        locked.mkdir()
+        locked.chmod(0)
+        try:
+            self.assertIsNone(self.drift())
+        finally:
+            locked.chmod(0o755)
+        self.assertEqual(self.drift(), 0)
+
+    def test_an_entry_that_vanishes_between_the_listing_and_its_opening_is_unknown(self):
+        """Not 0 and not a count that leaves it out: the entry was listed, so the folder changed while it was read, and what it held is not known."""
+        def vanish(fixture):
+            (fixture["agents"] / AGENT_FILES[1]).unlink()
+        answers = self.interleave(lambda: self.race_fixture("vanish"), lambda f: adoption_status.stack_agents_drift(f["home"], f["source"]), vanish, {1, 2, None}, 12)
+        self.assertIn(None, answers.values(), "a vanished entry is unknown")
+        self.assertIn(1, answers.values(), "after it was opened it is read as it was")
+        self.assertIn(2, answers.values(), "before the listing it is simply absent")
+
+    def test_a_link_is_told_by_the_answer_of_the_open_and_not_by_a_later_look(self):
+        """Review of #1062 at e22358e46 (the Claude delta, P3): the refusal of the open was classified by a look at the entry afterwards, so a vendor-named link replaced by a regular file in between read as an
+        unreadable file and was exempt. The refusal is ELOOP: the link is what the open met."""
+        def build():
+            fixture = self.race_fixture("link-swap")
+            (fixture["agents"] / AGENT_FILES[0]).write_bytes(agent_bytes(AGENT_FILES[0]))  # no other drift
+            (fixture["agents"] / VENDOR_HOST_AGENTS[0]).symlink_to(fixture["outside"] / "agents" / AGENT_FILES[0])  # a link to a file
+            return fixture
+
+        def swap_for_a_file(fixture):
+            replacement = fixture["agents"] / ".swap"
+            replacement.write_bytes(b"the vendor's own text\n")
+            os.replace(replacement, fixture["agents"] / VENDOR_HOST_AGENTS[0])
+        fixture = build()
+        interleaving = Interleaving()
+        value, _, _ = interleaving.run(lambda: adoption_status.stack_agents_drift(fixture["home"], fixture["source"]), lambda: None, 0)
+        self.assertEqual(value, 1, "the link counts")
+        refused = [index for index, (label, name, number) in enumerate(interleaving.trace, 1) if label == "os.open" and name == VENDOR_HOST_AGENTS[0] and number == errno.ELOOP]
+        self.assertEqual(len(refused), 1, "the open that met the link")
+        fixture = build()
+        value, fired, _ = Interleaving().run(lambda: adoption_status.stack_agents_drift(fixture["home"], fixture["source"]), lambda: swap_for_a_file(fixture), refused[0])
+        self.assertTrue(fired)
+        self.assertEqual(value, 1, "the entry the open refused as a link is counted as one, whatever it became afterwards")
+
+    def test_the_limitations_name_the_agent_folders_the_check_compares(self):
+        text = CLIENT_WIRING_LIMITATIONS[0]
+        for needle in ("Claude agent definitions", "adoption/agents/claude", "must be 0", "any folder below it", "never through a link", "cannot be told", "Bun.YAML.parse"):
             self.assertIn(needle, text)
 
     def test_a_text_value_can_never_leave_the_check(self):

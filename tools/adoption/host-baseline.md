@@ -218,7 +218,7 @@ The evidence manifest does not register its own bytes.
   Windows-user-path patterns; the three committed host artifacts supply the
   Claude version-banner fixtures. No host is recaptured to test those banners.
 - Privacy repair reference `22ec2b15419cb5f508976bac586aece72c3a7a3b`:
-  `scripts/adoption_status.py:1124-1134` defines the default launcher root; the
+  `scripts/adoption_status.py:1124-1134` at that commit (now `:1521-1531`, `launcher_resolution`) defines the default launcher root; the
   committed 26.04 package rows retain `coreutils-from-uutils 0.0.0~ubuntu25`.
   Replaying those captures supplies the scoped system-label controls.
 - Structural privacy repair reference `ce2c11ba0382e9d227f241669f20094a4490edaa`:

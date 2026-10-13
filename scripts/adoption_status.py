@@ -12,7 +12,9 @@ in-process and emits no value from them: fixed booleans and hook-event counts on
 never a value, command, path or environment value (Codex hook trust is compared as a
 SHA-256 inside this process, as Codex computes it; the two Codex role files under the
 Codex home's agents/ are compared byte for byte with this checkout's adoption/agents/codex
-copies and only how many are equal is reported). The opt-in --pinned-versions execs
+copies and only how many are equal is reported; the Claude agent definitions under the Claude home's agents/, at any depth, are
+compared with this checkout's adoption/agents/claude copies and only how many differ is reported; both folders are read through descriptors, never through a
+link). The opt-in --pinned-versions execs
 a profile's PATH-resolved commands with their platform pin's declared "exec"
 version_probe only (never one declared "npm-metadata" or another method, since that
 method exists exactly because running the tool starts a server or a UI), each in its
@@ -34,6 +36,7 @@ from __future__ import annotations
 import argparse
 import contextlib
 import datetime
+import errno
 import hashlib
 import json
 import os
@@ -73,7 +76,13 @@ CLIENT_WIRING_LIMITATIONS = [
     "AGENTS.override.md, AGENTS.md and RTK.md, and this checkout's .claude/settings.json and .codex/config.toml whole "
     "and in-process, and emits no value from them: fixed booleans and hook-event counts only. It also compares the two "
     "Codex role files under the Codex home's agents/ with this checkout's adoption/agents/codex copies byte for byte "
-    "and reports how many are equal, a count and never a name or text. It opens no credential "
+    "and reports how many are equal, a count and never a name or text; and it compares the Claude agent definitions "
+    "under the Claude home's agents/ with this checkout's adoption/agents/claude copies byte for byte and reports "
+    "how many differ, are missing or are not shipped here, in that folder and in any folder below it as the client "
+    "loads them (four vendor-installed search definitions are listed, not counted unless their front matter declares "
+    "a shipped name, which Bun.YAML.parse reads as the client's own parser does, run by a bun of the version the client "
+    "embeds, and unknown where that cannot be done or the name cannot be told), a count that must be 0 for the wiring "
+    "to be complete. It reads those folders through descriptors and never through a link. It opens no credential "
     "store (~/.claude.json, ~/.claude/.credentials.json, ~/.codex/auth.json), network endpoint or running process; "
     "environment variables only locate the client homes, and two opt-ins are checked by name.",
     "Configured wiring is not activation: managed, project or local Claude settings, and Codex profiles, project "
@@ -231,7 +240,7 @@ REGEX_SUBSET_MAX_DEPTH = 64
 CLIENT_FILE_LIMIT = 1_048_576
 CLIENT_WIRING_KEYS = {
     "claude": ("rtk_hook", "ai_memory_hook_events", "context_mode_plugin_enabled", "subagent_spawn_depth_1",
-               "workflow_concurrency_set", "effort_level_env_unset", "agent_teams_opt_in"),
+               "workflow_concurrency_set", "effort_level_env_unset", "agent_teams_opt_in", "stack_agents_drift"),
     "project": ("settings_depth_and_concurrency", "codex_mcp_servers_present"),
     "codex": ("rtk_instructions", "context_mode_plugin_enabled", "mcp_servers_present", "hooks_feature_enabled",
               "ai_memory_hook_events", "ai_memory_hook_events_trusted", "stack_roles_matching"),
@@ -240,6 +249,16 @@ CLIENT_WIRING_KEYS = {
 # this checkout ships in adoption/agents/codex, whose SHA256SUMS names exactly these two files.
 STACK_ROLE_FILES = ("stack-researcher.toml", "stack-verifier.toml")
 STACK_ROLES_SOURCE = Path(__file__).resolve().parents[1] / "adoption" / "agents" / "codex"
+# The Claude agent definitions this checkout ships (every *.md in adoption/agents/claude), which tools/adoption/install_claude_profile.py copies verbatim to <Claude home>/agents. The client serves a user-scope definition to
+# every project that does not define the name itself, and a copy that is stale or wider than the source goes unseen until something reads it (an omitted `tools` field means every tool: anthropics/claude-code@3deb8736
+# plugins/plugin-dev/skills/agent-development/SKILL.md L152-L154). It loads that folder recursively: every *.md at any depth, links followed, hidden files included, a definition keyed by its front matter `name`, and of
+# two files that declare one name only one is loaded, chosen by file system read order (https://code.claude.com/docs/en/sub-agents.md L176-L182, read 2026-10-13; the installed 2.1.296 client's loader walks the same way: its
+# JS walker enters every folder and keeps names ending .md, its ripgrep path is `--files --hidden --follow --no-ignore --glob *.md`, and its definitions are merged by name, a later one replacing an earlier). Four more
+# definitions sit at the top of that folder on a host, installed by the tools they route to and not shipped here (tools/local-pages/architecture_mapping.json names them as the search roles of code navigation and semantic
+# retrieval): they are listed, so they are not drift unless their front matter declares the name of a shipped definition, and the count is unknown when the names cannot be told with the client's own parser (agent_names). Any other *.md, at any depth, is.
+STACK_AGENTS_SOURCE = Path(__file__).resolve().parents[1] / "adoption" / "agents" / "claude"
+VENDOR_HOST_AGENTS = ("codebase-memory-auditor.md", "codebase-memory-scout.md", "codebase-memory.md", "semble-search.md")
+AGENT_WALK_DEPTH, AGENT_WALK_ENTRIES = 8, 5_000  # a tree deeper, or with more entries, than any agents folder is unknown, not a count
 ABSENT, NOT_A_FILE = "absent", "not_a_file"
 
 
@@ -460,7 +479,7 @@ def mcp_servers_present(config) -> dict:
             for name in WIRED_MCP_SERVERS}
 
 
-def claude_wiring(claude_dir: Path, env) -> dict:
+def claude_wiring(claude_dir: Path, env, *, agents_source: Path | None = None) -> dict:
     settings = read_client_file(claude_dir / "settings.json", "json")
     if settings is None:
         return dict.fromkeys(CLIENT_WIRING_KEYS["claude"])
@@ -484,6 +503,8 @@ def claude_wiring(claude_dir: Path, env) -> dict:
         # (user instructions 2026-09-27; https://code.claude.com/docs/en/agent-teams). A 0/1 count, not a bool,
         # so the all-booleans completeness rule never counts it and the output stays flags and counts only.
         "agent_teams_opt_in": int(AGENT_TEAMS_VARIABLE in names or AGENT_TEAMS_VARIABLE in env),
+        # Drift between the installed definitions and this checkout's: a count that must be 0 (wiring_complete). A caller that passes no source gets this repository's own.
+        "stack_agents_drift": stack_agents_drift(claude_dir, STACK_AGENTS_SOURCE if agents_source is None else agents_source, env),
     }
 
 
@@ -883,24 +904,95 @@ def codex_ai_memory_hook_counts(events: dict, config, key_root: str) -> tuple[in
                             and states.get(key, {}).get("trusted_hash") == digest})
 
 
-def read_regular_bytes(path: Path, limit: int = CLIENT_FILE_LIMIT):
-    """The bytes of a regular file, never read through a link: ABSENT when there is none, NOT_A_FILE for a link, a folder or
-    another kind of file, None when it cannot be read (a folder that cannot be searched, a path through a file, no
-    permission) or is over ``limit``."""
+# A client folder is read through descriptors, so that what is looked at is what is read: each entry is opened with
+# O_NOFOLLOW relative to the descriptor of its folder and described by fstat on the descriptor it opened, never
+# inspected by path and then opened by path (a replacement between the two would be read through: CPython's ordinary
+# open passes the path to open(2) as given, python/cpython@cbc944f4bc59 Modules/_io/fileio.c L404). A platform without
+# O_NOFOLLOW, O_DIRECTORY or descriptor-relative open, stat and listdir cannot keep that boundary, and then the read
+# is unknown: there is no fallback to checking the path first.
+NO_FOLLOW_READS = (hasattr(os, "O_NOFOLLOW") and hasattr(os, "O_DIRECTORY") and os.open in os.supports_dir_fd
+                   and os.stat in os.supports_dir_fd and os.listdir in os.supports_fd)
+READ_FLAGS = (os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0) | getattr(os, "O_NOCTTY", 0)
+              | getattr(os, "O_CLOEXEC", 0))
+LINK_ERRNOS = frozenset({errno.ELOOP, getattr(errno, "EMLINK", errno.ELOOP)})  # open(2) with O_NOFOLLOW on a link: ELOOP on Linux (measured on the first host, 6.18); EMLINK is accepted too
+
+
+class Unknown(Exception):
+    """A client folder cannot be compared with. Raised and answered inside this module as None; it carries no text."""
+
+
+def describe_entry(name, dir_fd) -> str:
+    """What a name is that could not be opened, from its own metadata (a link is not followed): "link", "folder",
+    "other" (a socket or another kind of file), "absent", or "unreadable" (a regular file that cannot be opened, or
+    metadata that cannot be had)."""
     try:
-        mode = os.lstat(path).st_mode
+        mode = os.stat(name, dir_fd=dir_fd, follow_symlinks=False).st_mode
     except FileNotFoundError:
-        return ABSENT
+        return "absent"
     except OSError:
-        return None
-    if not stat.S_ISREG(mode):
-        return NOT_A_FILE
+        return "unreadable"
+    if stat.S_ISLNK(mode):
+        return "link"
+    if stat.S_ISDIR(mode):
+        return "folder"
+    return "unreadable" if stat.S_ISREG(mode) else "other"
+
+
+def open_below(name, dir_fd=None, extra: int = 0):
+    """(kind, descriptor, mode) of what is at ``name``, relative to the folder descriptor ``dir_fd`` when there is
+    one, opened for reading without following a link at the last component. kind "open" carries a descriptor, which
+    the caller closes, and the mode of the object that descriptor holds (fstat of it, so what is described is what
+    will be read). The other kinds carry neither: "absent", "link" (the open itself was refused with ELOOP, which is how
+    O_NOFOLLOW meets a symbolic link, so a link is told by the answer of the open and not by a later look that a
+    replacement could have changed), "other" (ENXIO: a socket), "folder" and the rest (not opened; described by lstat,
+    and so also what ENOTDIR leaves under O_DIRECTORY), "unreadable". A platform that cannot refuse links gives
+    "unreadable" for everything."""
+    if not NO_FOLLOW_READS:
+        return "unreadable", None, 0
     try:
-        with open(path, "rb") as handle:
+        descriptor = os.open(name, READ_FLAGS | extra, dir_fd=dir_fd)
+    except FileNotFoundError:
+        return "absent", None, 0
+    except OSError as error:
+        if error.errno in LINK_ERRNOS:
+            return "link", None, 0
+        if error.errno == errno.ENXIO:
+            return "other", None, 0
+        return describe_entry(name, dir_fd), None, 0
+    try:
+        return "open", descriptor, os.fstat(descriptor).st_mode
+    except OSError:
+        os.close(descriptor)
+        return "unreadable", None, 0
+
+
+def read_descriptor(descriptor, limit: int):
+    """At most ``limit`` bytes from an open descriptor (which stays open); None when there are more or it cannot be read."""
+    try:
+        with os.fdopen(descriptor, "rb", closefd=False) as handle:
             data = handle.read(limit + 1)
     except OSError:
         return None
     return data if len(data) <= limit else None
+
+
+def read_regular_bytes(path, limit: int = CLIENT_FILE_LIMIT, *, dir_fd: int | None = None):
+    """The bytes of a regular file, never read through a link: ABSENT when there is none, NOT_A_FILE for a link, a
+    folder or another kind of file, None when it cannot be read (a folder that cannot be searched, a path through a
+    file, no permission, a platform that cannot refuse links) or is over ``limit``. The last component is opened with
+    O_NOFOLLOW (relative to ``dir_fd`` when given) and described by fstat of the descriptor it opened, so a link
+    put there after anyone looked is not read through."""
+    kind, descriptor, mode = open_below(path, dir_fd)
+    if kind == "absent":
+        return ABSENT
+    if kind in ("link", "folder", "other"):
+        return NOT_A_FILE
+    if kind != "open":
+        return None
+    try:
+        return read_descriptor(descriptor, limit) if stat.S_ISREG(mode) else NOT_A_FILE
+    finally:
+        os.close(descriptor)
 
 
 def stack_roles_matching(codex_dir: Path, roles_source: Path) -> int | None:
@@ -909,32 +1001,301 @@ def stack_roles_matching(codex_dir: Path, roles_source: Path) -> int | None:
 
     0 when the agents folder is absent. A carrier that is absent, a link, a folder or another kind of file, or that differs,
     does not count. None when the comparison cannot be made: a source copy is unreadable (also where the folder is absent),
-    the agents path is a link or not a folder (what Codex would load through it is not known here), or the folder or an
-    installed carrier cannot be read. Codex discovers a role from every *.toml below agents/ (codex-rs/agent-roles/src/
-    discovery.rs at rust-v0.157.1), so an extra file is another role: tools/adoption/apply_codex_lane.py and
-    tools/token-e2e/freeze_snapshot.py count those, and this count does not."""
+    the agents path is a link or not a folder (what Codex would load through it is not known here), the folder or an
+    installed carrier cannot be read, or the platform cannot read without following a link. The folder and its carriers
+    are read through descriptors (open_below), so a replacement of either after it was looked at is not read through.
+    Codex discovers a role from every *.toml below agents/ (codex-rs/agent-roles/src/discovery.rs at rust-v0.157.1), so an
+    extra file is another role: tools/adoption/apply_codex_lane.py and tools/token-e2e/freeze_snapshot.py count those,
+    and this count does not."""
     sources = []
     for name in STACK_ROLE_FILES:
         data = read_regular_bytes(roles_source / name)
         if not isinstance(data, bytes):
             return None
         sources.append(data)
-    agents = codex_dir / "agents"
+    if not NO_FOLLOW_READS:
+        return None
     try:
-        mode = os.lstat(agents).st_mode
+        home = os.open(codex_dir, os.O_RDONLY | os.O_DIRECTORY | getattr(os, "O_CLOEXEC", 0))
     except FileNotFoundError:
         return 0
     except OSError:
         return None
-    if not stat.S_ISDIR(mode):  # lstat does not follow a link, so a linked folder is not a folder here
-        return None
-    matching = 0
-    for name, expected in zip(STACK_ROLE_FILES, sources):
-        found = read_regular_bytes(agents / name)
-        if found is None:
+    try:
+        kind, agents, _ = open_below("agents", home, os.O_DIRECTORY)
+        if kind == "absent":
+            return 0
+        if kind != "open":  # a link, a file, or a folder that cannot be searched
             return None
-        matching += isinstance(found, bytes) and found == expected
-    return matching
+        try:
+            matching = 0
+            for name, expected in zip(STACK_ROLE_FILES, sources):
+                found = read_regular_bytes(name, dir_fd=agents)
+                if found is None:
+                    return None
+                matching += isinstance(found, bytes) and found == expected
+            return matching
+        finally:
+            os.close(agents)
+    finally:
+        os.close(home)
+
+
+# What a definition declares is whatever the client's own YAML parser reads from its front matter, and the only way to know that is to ask the same parser. Claude Code 2.1.296 parses each agent file with Bun.YAML.parse
+# (its loader scan calls oi(text, path, {normalizeKeys: true}): a leading byte order mark is dropped, the block is what /^---\s*\n([\s\S]*?)---\s*\n?/ captures, the block goes to
+# Bun.YAML.parse, and a second attempt is made on a rewrite of the text when the first throws), keeps the result when it is a mapping, and serves the agent under the raw `name` of that mapping (Iwt: a string, not empty,
+# not starting with "-", at most 256 characters, with no ":" after NFKC normalization, and a `description` that is a non-empty string); it skips a file over 1 MiB (Vk). Three rounds of a reader written here each missed a
+# spelling that this parser reads (a quoted key, a block scalar, a comment line at the left margin), because the spellings of YAML are not a list. So this module reads no YAML: it extracts the block the way the client does and
+# hands it to Bun.YAML.parse, run with the Bun that the client embeds, and every case it cannot settle is Unknown: no bun, another version of it, a parse that throws (the client's second attempt is not reproduced here), a bun
+# that does not answer.
+CLIENT_BUN_VERSION = "1.4.3"   # "Bun v1.4.3" inside the 2.1.296 binary; its build (eecfd55de) is not a public commit, the 1.4.3 release is c6da4a4d3: docs/decisions/2026-10-13-claude-agent-drift-check.md, "The parser"
+BUN_ENV = "AGENT_FRONTMATTER_BUN"   # the bun to use, when it is not the first on PATH
+BUN_TIMEOUT_SECONDS = 30
+JS_SPACE = re.escape("".join(map(chr, (9, 10, 11, 12, 13, 32, 0xA0, 0x1680, *range(0x2000, 0x200B), 0x2028, 0x2029, 0x202F, 0x205F, 0x3000, 0xFEFF))))  # what \s matches in a JavaScript regular expression
+AGENT_FRONT_MATTER = re.compile(f"---[{JS_SPACE}]*\\n(.*?)---[{JS_SPACE}]*\\n?", re.DOTALL)
+# One call parses the whole batch. A block is data on stdin, never a command-line argument or a file that bun runs.
+BUN_PARSER = """const blocks = JSON.parse(await Bun.stdin.text());
+console.log(JSON.stringify(blocks.map((block) => {
+  try {
+    const value = Bun.YAML.parse(block);
+    if (value === null || typeof value !== "object") return {state: "none"};
+    return typeof value.name === "string" ? {state: "name", name: value.name} : {state: "none"};
+  } catch (error) {
+    return {state: "throws"};
+  }
+})));"""
+
+
+class _Unreadable:
+    def __repr__(self):
+        return "UNREADABLE"
+
+
+UNREADABLE = _Unreadable()   # a definition whose name cannot be told here (its parse throws)
+
+
+def agent_front_matter(data: bytes):
+    """The block of front matter that the client hands to its YAML parser: the text decoded as the client reads a file (invalid bytes become U+FFFD), a leading byte order mark dropped, and what the client's pattern captures
+    between the opening line and the first "---" after it. None when the client finds no front matter. The client first checks that "---" occurs after the first three characters (its `oi`, Claude Code 2.1.296, bytes
+    211908840-211910460: `e.indexOf("---",3)<0?null:e.match(RE)`). The check changes no result, as the closing "---" starts after the opening line, but it bounds the work: the pattern backtracks quadratically over the
+    whitespace after the opening "---" when no closing line follows (a 64 KiB file of newlines took 18 s), and a file may be 1 MiB."""
+    text = data.decode("utf-8", errors="replace")
+    if text[:1] == chr(0xFEFF):
+        text = text[1:]
+    if text.find("---", 3) < 0:
+        return None
+    match = AGENT_FRONT_MATTER.match(text)
+    return None if match is None else match.group(1)
+
+
+def find_bun(environ=None):
+    """The bun to run, as an absolute path: the one BUN_ENV names, else the first on PATH. Both launches run in a scratch directory (cwd=scratch), and subprocess looks for a relative executable relative to cwd
+    (python/cpython@cbc944f4bc59639a444dd971c737788ba2283a91 Doc/library/subprocess.rst L572-L576; Lib/subprocess.py L1912-L1919: a name with no directory is joined to each directory of the exec path as it stands,
+    a relative one included). So a relative value of the variable (`bin/bun`, `./bun`) or a relative entry of PATH (`./bin`, an empty entry) named a file of the caller's directory and was searched for in the scratch
+    one: a bun that parses from its absolute path gave Unknown from a relative one (reproduced with bun 1.4.3). A value with no directory is a name, looked up on PATH as a shell does. A relative path is made absolute by
+    putting the caller's directory in front of it and nothing else: os.path.abspath would also remove each ".." lexically, before the file system resolves the link in front of it, and `current/../bun` with `current` a
+    link to `actual/subdir` (the file `actual/bun`) would become the `bun` beside `current`; and a link is not resolved either, since an executable can be known by its name (the mise shim is a link to mise). A caller
+    whose own directory is gone cannot make a relative path absolute: None, which is Unknown."""
+    environ = os.environ if environ is None else environ
+    named = environ.get(BUN_ENV)
+    chosen = named if named and os.sep in named else shutil.which(named or "bun", path=environ.get("PATH"))
+    if not chosen:
+        return None
+    if os.path.isabs(chosen):
+        return chosen
+    try:
+        return os.path.join(os.getcwd(), chosen)
+    except OSError:
+        return None
+
+
+def agent_names(blobs, *, environ=None):
+    """The name the client serves each of the definitions ``blobs`` (bytes) under, read with Bun.YAML.parse at CLIENT_BUN_VERSION in one call: a string; None when the client loads no name from the text (no front matter, not a
+    mapping, no string name, an empty one); UNREADABLE when the parse throws, which the client answers with a second attempt that this does not reproduce. Raises Unknown for the whole batch when there is no bun, its version is
+    not CLIENT_BUN_VERSION, or it does not answer in time. Run in an empty directory with an empty configuration and home, so that no bunfig.toml of the caller's directory or home (a preload runs code) is read. Names never
+    leave the caller: only the comparison does."""
+    blocks = [agent_front_matter(data) for data in blobs]
+    if not any(block is not None for block in blocks):
+        return [None] * len(blocks)
+    bun = find_bun(environ)
+    if not bun:
+        raise Unknown
+    try:
+        scratch_directory = tempfile.TemporaryDirectory(prefix="agent-names-")
+    except OSError:
+        raise Unknown from None
+    with scratch_directory as scratch:
+        base = {"PATH": (os.environ if environ is None else environ).get("PATH", ""), "HOME": scratch, "LANG": "C.UTF-8"}
+        try:
+            config = Path(scratch) / "bunfig.toml"
+            config.write_bytes(b"")
+            version = subprocess.run([bun, f"--config={config}", "--version"], capture_output=True, text=True, encoding="utf-8", timeout=BUN_TIMEOUT_SECONDS, cwd=scratch, env=base)
+            if version.returncode != 0 or version.stdout.strip() != CLIENT_BUN_VERSION:
+                raise Unknown
+            done = subprocess.run([bun, f"--config={config}", "-e", BUN_PARSER], input=json.dumps([block for block in blocks if block is not None]), capture_output=True, text=True, encoding="utf-8",
+                                  timeout=BUN_TIMEOUT_SECONDS, cwd=scratch, env=base)
+        except (OSError, subprocess.SubprocessError, ValueError):
+            raise Unknown from None
+    if done.returncode != 0:
+        raise Unknown
+    try:
+        answers = json.loads(done.stdout)
+    except ValueError:
+        raise Unknown from None
+    if not isinstance(answers, list) or len(answers) != sum(block is not None for block in blocks):
+        raise Unknown
+    names, position = [], 0
+    for block in blocks:
+        if block is None:
+            names.append(None)
+            continue
+        answer, position = answers[position], position + 1
+        state = answer.get("state") if isinstance(answer, dict) else None
+        if state == "name" and isinstance(answer.get("name"), str):
+            names.append(answer["name"] or None)
+        elif state == "none":
+            names.append(None)
+        elif state == "throws":
+            names.append(UNREADABLE)
+        else:
+            raise Unknown
+    return names
+
+
+def link_target(name, dir_fd) -> str:
+    """What the link ``name`` of the folder ``dir_fd`` leads to, as the client's walker would find it by following it
+    (it stats the target): "folder", "file" (a regular file) or "nothing" (a dangling link, a pipe, a socket, a device,
+    or a target whose type cannot be had: the walker keeps regular files only). Its type only; nothing is read through
+    the link."""
+    try:
+        mode = os.stat(name, dir_fd=dir_fd).st_mode
+    except OSError:
+        return "nothing"
+    return "folder" if stat.S_ISDIR(mode) else "file" if stat.S_ISREG(mode) else "nothing"
+
+
+def agent_drift_below(agents_fd: int, expected: dict, environ=None) -> int:
+    """The drift count for the agents folder held open as ``agents_fd`` (see stack_agents_drift); raises Unknown when
+    a folder, an entry or a shipped copy cannot be compared with, or when the name of a vendor-named file cannot be told
+    (agent_names). Every entry is opened below the descriptor of its folder, and what is described and read is what was
+    opened."""
+    drift, present, seen, vendors = 0, set(), [0], []
+
+    def visit(folder_fd: int, depth: int) -> None:
+        nonlocal drift
+        if depth > AGENT_WALK_DEPTH:
+            raise Unknown
+        try:
+            names = sorted(os.listdir(folder_fd))
+        except OSError:
+            raise Unknown from None
+        for name in names:
+            seen[0] += 1
+            if seen[0] > AGENT_WALK_ENTRIES:
+                raise Unknown
+            top, markdown = depth == 0, name.endswith(".md")
+            shipped = top and name in expected
+            kind, descriptor, mode = open_below(name, folder_fd)
+            try:
+                if kind in ("absent", "folder"):  # listed and gone before it was opened, or a folder that cannot be searched
+                    raise Unknown
+                if kind == "link":
+                    target = link_target(name, folder_fd)
+                    if target == "folder":  # the client follows it; what is below is not known here
+                        raise Unknown
+                    drift += int(markdown and target == "file" and not shipped)  # a link to nothing is not loaded
+                elif kind == "other":  # a socket: the client's walker keeps regular files only
+                    pass
+                elif kind == "unreadable":
+                    if shipped:
+                        raise Unknown
+                    drift += int(markdown and not (top and name in VENDOR_HOST_AGENTS))
+                elif stat.S_ISDIR(mode):
+                    visit(descriptor, depth + 1)
+                elif not stat.S_ISREG(mode):  # a pipe or a device: not loaded either
+                    pass
+                elif shipped:
+                    data = read_descriptor(descriptor, CLIENT_FILE_LIMIT)
+                    if data is None:
+                        raise Unknown
+                    present.add(name)
+                    drift += int(data != expected[name])
+                elif top and name in VENDOR_HOST_AGENTS:  # the vendors' own, unless one takes the name of a shipped role
+                    data = read_descriptor(descriptor, CLIENT_FILE_LIMIT)
+                    if data is None:
+                        raise Unknown
+                    vendors.append(data)   # settled below, with the shipped names, in one call to the parser
+                else:
+                    drift += int(markdown)
+            finally:
+                if descriptor is not None:
+                    os.close(descriptor)
+
+    visit(agents_fd, 0)
+    declaring = [data for data in vendors if agent_front_matter(data) is not None]   # a file with no front matter declares nothing and needs no parser
+    if declaring:
+        shipped = list(expected.values())
+        names = agent_names([*shipped, *declaring], environ=environ)
+        if any(name is UNREADABLE for name in names):   # a shipped definition or a vendor's own that the parser throws on: no comparison can be made
+            raise Unknown
+        declared = {name for name in names[:len(shipped)] if name}
+        drift += sum(1 for name in names[len(shipped):] if name in declared)
+    return drift + len(expected) - len(present)
+
+
+def stack_agents_drift(claude_dir: Path, agents_source: Path, environ=None) -> int | None:
+    """How many Claude agent definitions under ``claude_dir``/agents are not what this checkout ships in ``agents_source``:
+    a count, 0 for none, never a name or text.
+
+    Counted: each *.md of ``agents_source`` whose installed copy at the top of the folder is absent, a link, a folder or
+    another kind of file, or not byte for byte the source (a stale copy and a wider one, a ``tools`` field gone or longer,
+    are both bytes that differ); and every other *.md in the installed folder at any depth that is not one of
+    VENDOR_HOST_AGENTS at the top (a definition nothing here ships is a definition nothing here checks; a link to a file
+    named *.md counts too). Apart from the vendor names it reads no front matter of a file it does not ship, so a *.md
+    with no ``name`` (which the client skips) counts as well: it is one line from being a definition, and the way out is to remove
+    or rename it. Not counted, because the client's walker keeps regular files only: a pipe, a socket, a device, and a
+    link to nothing. The client loads the folder recursively, so a copy below the top is a definition it serves, and a
+    vendor-named file at the top whose front matter declares the name of a shipped definition is counted as well: one
+    name, one definition wins (code.claude.com/docs/en/sub-agents.md L176-L182). An absent agents folder counts every
+    source file. None when the comparison cannot be made: the source folder has no *.md or one of them cannot be read,
+    the agents path is a link or not a folder, a link below leads to a folder (what the client loads through a link is
+    not known here), a folder, an entry or a shipped copy cannot be read or vanishes while it is read, the tree is deeper
+    than AGENT_WALK_DEPTH or holds more than AGENT_WALK_ENTRIES entries, the platform cannot read without following
+    a link (NO_FOLLOW_READS), or, when the folder holds a vendor-named file, the names of the definitions cannot be told
+    with the client's own parser (agent_names: no bun, a bun that is not CLIENT_BUN_VERSION, a parse that throws, a
+    vendor-named file over the limit). The folder is read through descriptors (open_below)."""
+    try:
+        names = sorted(entry for entry in os.listdir(agents_source) if entry.endswith(".md"))
+    except OSError:
+        return None
+    expected = {}
+    for name in names:
+        data = read_regular_bytes(agents_source / name)
+        if not isinstance(data, bytes):
+            return None
+        expected[name] = data
+    if not expected or not NO_FOLLOW_READS:
+        return None
+    try:
+        home = os.open(claude_dir, os.O_RDONLY | os.O_DIRECTORY | getattr(os, "O_CLOEXEC", 0))
+    except FileNotFoundError:
+        return len(expected)
+    except OSError:
+        return None
+    try:
+        kind, agents, _ = open_below("agents", home, os.O_DIRECTORY)
+        if kind == "absent":
+            return len(expected)
+        if kind != "open":  # a link, a file, or a folder that cannot be searched
+            return None
+        try:
+            return agent_drift_below(agents, expected, environ)
+        except Unknown:
+            return None
+        finally:
+            os.close(agents)
+    finally:
+        os.close(home)
 
 
 def codex_wiring(codex_dir: Path, key_root: str | None = None, *, roles_source: Path | None = None) -> dict:
@@ -1006,14 +1367,17 @@ def wiring_complete(groups: dict) -> bool:
     true with each Codex server named in the user or the project config.toml, both hook counts above zero, and
     every Codex event that runs ai-memory trusted, so Codex actually runs its hook. The count of matching role files
     (stack_roles_matching) is information: a number, 0 included, never blocks completeness, but its None (a file, the folder
-    or a source copy that cannot be read) does, like every other null."""
+    or a source copy that cannot be read) does, like every other null. The count of Claude agent definitions that differ from
+    this checkout's (stack_agents_drift) is part of the rule: it must be 0, so a stale, missing or unlisted definition makes
+    ``complete`` false, and its None does like every other null."""
     if None in leaves(groups):
         return False
     claude, project, codex = groups["claude"], groups["project"], groups["codex"]
     servers = all(codex["mcp_servers_present"][name] or project["codex_mcp_servers_present"][name]
                   for name in WIRED_MCP_SERVERS)
     flags = all(value for group in groups.values() for value in group.values() if isinstance(value, bool))
-    return (servers and flags and claude["ai_memory_hook_events"] > 0 and codex["ai_memory_hook_events"] > 0
+    return (servers and flags and claude["ai_memory_hook_events"] > 0 and claude["stack_agents_drift"] == 0
+            and codex["ai_memory_hook_events"] > 0
             and codex["ai_memory_hook_events_trusted"] == codex["ai_memory_hook_events"])
 
 
@@ -1029,7 +1393,8 @@ def client_wiring(root: Path, env=None) -> dict:
     # Codex's own spelling of its home in hook keys: a set CODEX_HOME canonicalized, else $HOME/.codex as is
     # (codex-rs/utils/home-dir find_codex_home).
     key_root = os.path.realpath(codex_home) if codex_home else os.path.normpath(f"{home}/.codex")
-    groups = {"claude": claude_wiring(Path(env.get("CLAUDE_CONFIG_DIR") or f"{home}/.claude"), env),
+    groups = {"claude": claude_wiring(Path(env.get("CLAUDE_CONFIG_DIR") or f"{home}/.claude"), env,
+                                      agents_source=root / "adoption" / "agents" / "claude"),
               "project": project_wiring(root),
               "codex": codex_wiring(Path(codex_home or f"{home}/.codex"), key_root,
                                     roles_source=root / "adoption" / "agents" / "codex")}
