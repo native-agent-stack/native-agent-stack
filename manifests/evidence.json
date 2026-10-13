@@ -13118,8 +13118,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README.md",
-      "sha256": "3cfecac5e77fc5b53a2aeefce73a290f2b3238d35a2e8cc078603b24d85f0eb1",
-      "bytes": 20256
+      "sha256": "9694aa4d91adb67ca6896ac6b2a291c42f9dc34306fa0206bd326c9be2f4da07",
+      "bytes": 20966
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/adaptive_policy_v1.receipt.json",
@@ -13468,8 +13468,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "b41dbaefcf5e80af3bedf8e2180813513b154585d63fb756b50f2ee30d361a9f",
-      "bytes": 164279
+      "sha256": "4b6837321850011a9b17dfcbf77a8b80a7b26d8b1de0900dd61a9faa6a5c9f46",
+      "bytes": 166468
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runtime_lock.py",
@@ -13503,8 +13503,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "488bb599340bfb4f2251530ede8f48d8eee3fa62233c3f9f39f55870afc6e5e4",
-      "bytes": 9504
+      "sha256": "68caad4b32806917d515b2c9ef337e617f1717403887d651af1709c01c7aa8d1",
+      "bytes": 9624
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/strategies.py",
@@ -19080,6 +19080,11 @@
       "path": "docs/decisions/2026-10-12-skills-installer-foreign-content.md",
       "sha256": "086d80eea068c899dae3c49b8befb83731f87c88b33c01e9dec88cf9f439c23a",
       "bytes": 19447
+    },
+    {
+      "path": "docs/decisions/2026-10-13-lane-a-frozen-field-continuity.md",
+      "sha256": "4da74df3105b3e30d5408e17c15cc0b369c9feac2e7391f404b1e1669e55a073",
+      "bytes": 5792
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -61925,6 +61930,11 @@
       "path": "tests/test_adaptive_paper_financing.py",
       "sha256": "69f423ed8190f418b9c6c907c8c64612a45c4d1613707099781edafe3c38e5c5",
       "bytes": 8704
+    },
+    {
+      "path": "tests/test_adaptive_paper_lane_a_continuity.py",
+      "sha256": "51057bb41d16bbd5e383213e0e71febfe5c73081f844ca3bf9aadaf22bec4108",
+      "bytes": 19078
     },
     {
       "path": "tests/test_adaptive_paper_leverage.py",

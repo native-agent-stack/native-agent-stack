@@ -378,8 +378,45 @@ def strategy_pool_and_selector(config, registry_entries, *, session="regular"):
     return pool, selector
 
 
-def load_config(path, *, registry_path=None):
-    c = json.loads(Path(path).read_text())
+def frozen_trading_config_sha256(raw_config):
+    """Bind every config value except the three coordinated session flags.
+
+    README's same-ledger path must retain trading/risk fields. The session
+    clock still validates each flag combination independently; this digest
+    never grants admission, clears a halt or changes persisted RiskLimits.
+    """
+    frozen=json.loads(json.dumps(raw_config))
+    frozen.pop("regular_session_only",None)
+    frozen.pop("extended_hours_enabled",None)
+    if isinstance(frozen.get("sessions"),dict):
+        frozen["sessions"].pop("extended_hours",None)
+    return hashlib.sha256(json.dumps(frozen,sort_keys=True,separators=(",",":")).encode()).hexdigest()
+
+
+def lane_a_config_continues(metadata, raw_config):
+    """Require the stored frozen signature, or exact retained shipped bytes.
+
+    Legacy trial.json records only a raw digest. Resolve it solely against a
+    retained nonsymlink config whose bytes equal that digest; never infer the
+    previous settings from current limits or a new supplied config.
+    """
+    current=frozen_trading_config_sha256(raw_config)
+    stored=metadata.get("frozen_trading_config_sha256")
+    if stored is not None:
+        return stored==current
+    prior=metadata.get("config_sha256")
+    for path in sorted(SOURCE.glob("config*.json")):
+        if path.is_symlink() or not path.is_file():
+            continue
+        raw=path.read_bytes()
+        if hashlib.sha256(raw).hexdigest()==prior:
+            return frozen_trading_config_sha256(json.loads(raw))==current
+    return False
+
+
+def load_config(path, *, registry_path=None, config_bytes=None):
+    # main captures immutable bytes once. Standalone callers retain the path API.
+    c = json.loads(config_bytes if config_bytes is not None else Path(path).read_text())
     is_exploratory(c)
     apply_exit_preset(c, "adaptive")
     require_qualified_stream(c["feed"])
@@ -2354,7 +2391,8 @@ def main():
         parser.error(problem)
     if not re.fullmatch(r"[a-z0-9-]{1,24}", args.trial):
         raise ValueError("invalid_trial_id")
-    raw_config = json.loads(args.config.read_text())
+    config_bytes = args.config.read_bytes()
+    raw_config = json.loads(config_bytes)
     exploratory = is_exploratory(raw_config)
     RECEIPT_LABELS = receipt_labels(raw_config)
     validate_exploratory_paths(raw_config, args.state_root, args.output, live_dir=args.live_dir)
@@ -2363,7 +2401,7 @@ def main():
         raise SafetyError("exploratory_qualification_forbidden")
     if exploratory and args.command == "paper" and DEFAULT_STOP.exists():
         raise SafetyError("global_stop_latched")
-    config, limits, policy_config = load_config(args.config)
+    config, limits, policy_config = load_config(args.config, config_bytes=config_bytes)
     RECEIPT_LABELS = receipt_labels(config)
     session_policy = validate_session_policy(config)
     try:
@@ -2410,9 +2448,9 @@ def main():
     summary.update(RECEIPT_LABELS)
     summary["http"] = responses
     summary["order_contract"] = contract_status
-    summary["config_sha256"] = config_digest(config, args.config.read_bytes(), limits=limits)
+    summary["config_sha256"] = config_digest(config, config_bytes, limits=limits)
     if exploratory:
-        summary["raw_config_sha256"] = hashlib.sha256(args.config.read_bytes()).hexdigest()
+        summary["raw_config_sha256"] = hashlib.sha256(config_bytes).hexdigest()
     if args.command == "preflight":
         try:
             validate_preflight(observation, config, require_open=True, session_policy=session_policy)
@@ -2575,7 +2613,8 @@ def main():
                     now = time.time()
                 if previous_metadata:
                     if previous_metadata["config_sha256"] != summary["config_sha256"] and (
-                            not exploratory or resumable_hold):
+                            (not exploratory and not lane_a_config_continues(previous_metadata,raw_config))
+                            or resumable_hold):
                         raise SafetyError("next_trial_config_differs_from_frozen_limits")
                     if (ledger.positions() or ledger.unresolved()) and not resumable_hold:
                         raise SafetyError("next_trial_requires_recovery")
@@ -2612,6 +2651,8 @@ def main():
                             "phase": "starting"}
                 if exploratory:
                     metadata.update(engine_kind="adaptive", **RECEIPT_LABELS)
+                else:
+                    metadata["frozen_trading_config_sha256"]=frozen_trading_config_sha256(raw_config)
                 if resumable_hold:
                     held_resume_matches_ledger(ledger, observation)
                     ledger.resume_held_trial(now, args.trial)
@@ -2708,6 +2749,9 @@ def main():
             phase, exit_code = trial_phase_and_exit_code(result)
             metadata["phase"] = phase
             metadata["status"] = result["status"]
+            if not exploratory and args.command == "paper":
+                metadata["config_sha256"]=summary["config_sha256"]
+                metadata["frozen_trading_config_sha256"]=frozen_trading_config_sha256(raw_config)
             publish_trial_projection(ledger,metadata_path,metadata,save)
             save(args.output, result)
             print(json.dumps({k: result.get(k) for k in ("status", "flat", "native_fill_events")}, default=str))
