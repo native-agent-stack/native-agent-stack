@@ -36,6 +36,10 @@
     {
       "date": "2026-10-13",
       "path": "unclassified-gate-reads-20261013-pr1074-delta.json"
+    },
+    {
+      "date": "2026-10-13",
+      "path": "unclassified-gate-reads-20261013-installer-agents-delta.json"
     }
   ]
 }
