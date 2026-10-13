@@ -1,0 +1,59 @@
+The client's bundled claude-api skill (Claude Code 2.1.296) against the plugin's copy at the pin of the manifest row (claude-api@anthropic-agent-skills; anthropics/skills dbd4588f9e1033efb41dad4bef2f7947c8993d44), 2026-10-13.
+
+Folder, by sha256 of each file (the bundled folder is the one the client unpacks and names in the skill's header line):
+files: bundled 94 plugin 96
+only in the bundled folder: 0 []
+only in the plugin folder: 2 ['LICENSE.txt', 'SKILL.md']
+same name, different bytes: 3 ['shared/evals/build-eval.md', 'shared/evals/eval-hillclimb.md', 'shared/model-migration.md']
+
+The three files that differ (a difflib summary; B is the bundled copy, P the plugin's):
+== shared/evals/build-eval.md lines 236 234 ratio 0.9872
+   delete bundled 20 21 plugin 20 19
+      B: 
+      B: For a complete worked example of this flow end to end - cases, labeling policy, runner, and a five-round hillclimb - see `shared/evals/examples/clawd-
+   replace bundled 152 152 plugin 150 150
+       delete B: 'present only when the skill was installed from the EAP package; `/claude-api` in the CLI does ' P: ''
+       insert B: '' P: 'ed with this skill (nor'
+       replace B: 't (or' P: 's'
+       insert B: '' P: ', so it is usually absent'
+   replace bundled 219 219 plugin 217 217
+       delete B: '; the full viewer regenerates the same way on an EAP install' P: ''
+== shared/evals/eval-hillclimb.md lines 339 339 ratio 0.9941
+   replace bundled 203 203 plugin 203 203
+       delete B: "EAP install only - the CLI doesn't extract " P: ''
+       insert B: '' P: ' sources are not extracted with this skill'
+   replace bundled 265 265 plugin 265 265
+       delete B: ' (EAP install)' P: ''
+== shared/model-migration.md lines 2421 2421 ratio 0.9988
+   replace bundled 1362 1362 plugin 1362 1362
+       delete B: 'early-access builds hard-rejected wi' P: ''
+       delete B: ' `' P: ''
+       delete B: 'nvalid_reque' P: ''
+       delete B: 't_error`; that broke workflows and was reverted before launch, but the new' P: ''
+       delete B: 'ei' P: ''
+       insert B: '' P: ' d'
+       insert B: '' P: 'op'
+       replace B: 'ou' P: 'being silen'
+       delete B: 'come' P: ''
+   replace bundled 1448 1448 plugin 1448 1448
+       insert B: '' P: 'pr'
+       replace B: 'arly-acc' P: 'vi'
+       replace B: 'ss' P: 'w'
+   replace bundled 1520 1520 plugin 1520 1520
+       delete B: ' early-access' P: ''
+
+SKILL.md: the bundled one is inlined in the prompt the client expands for the skill (611 lines; no digest of that prompt is published, because its first line names the folder the client unpacked the skill into on this host); the plugin's is the file (sha256 40537cca17c4aa86e4ce83ced39efcbfb1204905e3cf4c4ff98f2eab011e4b7f, the pinned bytes, 617 lines):
+== skill.txt lines 611 617 ratio 0.9886
+   replace bundled 1 1 plugin 1 8
+      B: Base directory for this skill: <the client's unpacked bundled claude-api folder>
+      P: ---
+      P: name: claude-api
+      P: description: |-
+   replace bundled 526 526 plugin 533 533
+       delete B: ' (EAP install)' P: ''
+   replace bundled 607 607 plugin 614 614
+       delete B: ' (EAP install)' P: ''
+   delete bundled 611 611 plugin 618 617
+      B: No project language was auto-detected. Ask the user which language they are using (see Language Detection above), then Read the matching `{lang}/claud
+
+Reading. 91 of the 94 files of the bundled folder are byte for byte the plugin's. The three that differ differ in wording about the early-access install (the bundled variants say what holds "only when the skill was installed from the EAP package"; the plugin's omit it), and the bundled model-migration.md carries a few early-access phrasings that the plugin's replaces. SKILL.md differs by the client's header line against the plugin's frontmatter, two " (EAP install)" phrases and one closing line about language detection that only the bundled prompt has. The pointer of the bundled build-eval.md to a worked example names a folder (shared/evals/examples/clawd-triggering/, which the text itself says the CLI does not extract) that neither folder holds. So the plugin's copy at the pin lacks nothing of substance that the bundled one has, and hiding the bundled copy (the plugin stays, as the manifest pins it) loses no content. Not established: whether the bundled copy moves ahead of the pin in a later client release; the comparison is the trigger to repeat.

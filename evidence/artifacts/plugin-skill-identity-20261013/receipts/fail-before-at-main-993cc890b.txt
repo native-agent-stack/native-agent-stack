@@ -1,0 +1,29 @@
+The fail-first replay of the first commit of #1074 (CPA-V-07) at the exact base of its head: the three test modules as they stood at 2dae97511 (the commit that Astra's read named) run against the sources of 993cc890b, main when the pull request was opened and the merge base of that head. The earlier receipt (receipts/fail-before.txt) was taken against 3f1a921dd, the base before the landing rebase.
+
+test_skills_manifest: Ran 38 tests, FAILED (failures=3, errors=1), 3 tests fail or raise
+   test_every_row_a_plugin_delivers_names_the_listing_it_gets
+   test_the_practice_page_and_its_json_state_the_plugin_exception
+   test_the_two_skills_listed_twice_on_the_first_host_name_their_twin
+test_skills_status: Ran 88 tests, FAILED (failures=7, errors=23), 11 tests fail or raise
+   test_a_bundled_twin_is_hidden_under_its_own_name
+   test_a_plugin_row_that_is_not_as_pinned_fails_even_with_its_twin_hidden
+   test_a_plugin_that_is_installed_and_enabled_makes_the_personal_copy_a_duplicate_until_it_is_hidden
+   test_a_row_without_a_twin_has_no_twin_entry_and_the_text_shows_it_only_for_a_twin
+   test_an_unreadable_settings_file_lists_no_plugin_and_the_personal_row_fails_on_its_own_listing_check
+   test_only_an_explicit_true_enables_a_plugin_and_only_a_user_install_counts
+   test_only_off_hides_the_twin
+   test_overrides_of_the_wrong_type_hide_nothing_so_the_twin_stays_a_duplicate
+   test_the_bundled_twin_of_a_native_plugin_row_must_be_hidden_where_the_plugin_is_enabled
+   test_the_manifest_loader_checks_the_plugin_fields
+   test_without_the_plugin_the_personal_copy_keeps_the_manifest_listing_so_a_fresh_host_keeps_its_one_copy
+test_skill_usage_daily: Ran 16 tests, FAILED (failures=1, errors=7), 8 tests fail or raise
+   test_a_listing_named_twice_is_one_listing
+   test_a_row_without_a_twin_ignores_a_same_name_row
+   test_an_unknown_context_stays_unknown_and_a_window_the_rows_hold_is_dropped
+   test_both_listings_are_one_row_with_the_uses_added
+   test_one_listing_is_that_row_and_none_is_none
+   test_the_bundled_twin_of_a_native_plugin_row_is_added_too
+   test_the_last_use_is_that_of_the_listing_that_was_used
+   test_the_report_counts_the_uses_of_both_listings
+
+22 of 142 tests fail or raise at the exact base.

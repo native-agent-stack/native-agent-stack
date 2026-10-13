@@ -1,0 +1,180 @@
+{
+  "what": "Headless init records of Claude Code 2.1.296 (the skills the client lists), started in an empty directory with a --settings file whose env entry holds one JSON value, spelled as written below, killed at the init record before any model call. Each run is labelled with its variable: 26 for CLAUDE_CODE_DISABLE_BUNDLED_SKILLS and two (1.0 and 1e0) for the skill's own switch CLAUDE_CODE_DISABLE_CLAUDE_API_SKILL. bundled_claude_api_listed is the client's own claude-api (bare name), plugin_claude_api_listed the plugin's claude-api:claude-api; the plugin claude-api@anthropic-agent-skills is enabled in the profile.",
+  "client": "2.1.296",
+  "captured_utc": "2026-10-13T18:34Z to 18:48Z",
+  "reading": {
+    "set (61 skills with the all-bundled switch, 76 with the skill's own)": "1, 1.0, 1e0, 10e-1, 0.1e1, 1E0, 1.00, true, \"1\", [1], [\"1\"], [true], [[1]]",
+    "not set (77 skills)": "0, 0.0, 2, 1.5, -0, null, [], {\"a\": 1}, [1, 2], [\"1\", \"x\"], [null], [null, 1], [1, true]",
+    "rule": "the client's environment takes JavaScript's String() of the JSON value: a number is its integral value without a point or an exponent, an array its elements joined by commas (a nested array flattened, null empty), an object \"[object Object]\"; the switch is set for 1, true, yes and on in any case, padded or not"
+  },
+  "runs": [
+    {
+      "run": "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS=1",
+      "skills_listed": 61,
+      "bundled_claude_api_listed": false,
+      "plugin_claude_api_listed": true
+    },
+    {
+      "run": "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS=1.0",
+      "skills_listed": 61,
+      "bundled_claude_api_listed": false,
+      "plugin_claude_api_listed": true
+    },
+    {
+      "run": "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS=1e0",
+      "skills_listed": 61,
+      "bundled_claude_api_listed": false,
+      "plugin_claude_api_listed": true
+    },
+    {
+      "run": "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS=10e-1",
+      "skills_listed": 61,
+      "bundled_claude_api_listed": false,
+      "plugin_claude_api_listed": true
+    },
+    {
+      "run": "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS=0.1e1",
+      "skills_listed": 61,
+      "bundled_claude_api_listed": false,
+      "plugin_claude_api_listed": true
+    },
+    {
+      "run": "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS=1E0",
+      "skills_listed": 61,
+      "bundled_claude_api_listed": false,
+      "plugin_claude_api_listed": true
+    },
+    {
+      "run": "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS=1.00",
+      "skills_listed": 61,
+      "bundled_claude_api_listed": false,
+      "plugin_claude_api_listed": true
+    },
+    {
+      "run": "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS=true",
+      "skills_listed": 61,
+      "bundled_claude_api_listed": false,
+      "plugin_claude_api_listed": true
+    },
+    {
+      "run": "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS=\"1\"",
+      "skills_listed": 61,
+      "bundled_claude_api_listed": false,
+      "plugin_claude_api_listed": true
+    },
+    {
+      "run": "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS=0",
+      "skills_listed": 77,
+      "bundled_claude_api_listed": true,
+      "plugin_claude_api_listed": true
+    },
+    {
+      "run": "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS=0.0",
+      "skills_listed": 77,
+      "bundled_claude_api_listed": true,
+      "plugin_claude_api_listed": true
+    },
+    {
+      "run": "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS=2",
+      "skills_listed": 77,
+      "bundled_claude_api_listed": true,
+      "plugin_claude_api_listed": true
+    },
+    {
+      "run": "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS=1.5",
+      "skills_listed": 77,
+      "bundled_claude_api_listed": true,
+      "plugin_claude_api_listed": true
+    },
+    {
+      "run": "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS=-0",
+      "skills_listed": 77,
+      "bundled_claude_api_listed": true,
+      "plugin_claude_api_listed": true
+    },
+    {
+      "run": "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS=[1]",
+      "skills_listed": 61,
+      "bundled_claude_api_listed": false,
+      "plugin_claude_api_listed": true
+    },
+    {
+      "run": "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS=[\"1\"]",
+      "skills_listed": 61,
+      "bundled_claude_api_listed": false,
+      "plugin_claude_api_listed": true
+    },
+    {
+      "run": "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS={\"a\": 1}",
+      "skills_listed": 77,
+      "bundled_claude_api_listed": true,
+      "plugin_claude_api_listed": true
+    },
+    {
+      "run": "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS=null",
+      "skills_listed": 77,
+      "bundled_claude_api_listed": true,
+      "plugin_claude_api_listed": true
+    },
+    {
+      "run": "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS=[]",
+      "skills_listed": 77,
+      "bundled_claude_api_listed": true,
+      "plugin_claude_api_listed": true
+    },
+    {
+      "run": "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS=[true]",
+      "skills_listed": 61,
+      "bundled_claude_api_listed": false,
+      "plugin_claude_api_listed": true
+    },
+    {
+      "run": "CLAUDE_CODE_DISABLE_CLAUDE_API_SKILL=1.0",
+      "skills_listed": 76,
+      "bundled_claude_api_listed": false,
+      "plugin_claude_api_listed": true
+    },
+    {
+      "run": "CLAUDE_CODE_DISABLE_CLAUDE_API_SKILL=1e0",
+      "skills_listed": 76,
+      "bundled_claude_api_listed": false,
+      "plugin_claude_api_listed": true
+    },
+    {
+      "run": "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS=[1, 2]",
+      "skills_listed": 77,
+      "bundled_claude_api_listed": true,
+      "plugin_claude_api_listed": true
+    },
+    {
+      "run": "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS=[\"1\", \"x\"]",
+      "skills_listed": 77,
+      "bundled_claude_api_listed": true,
+      "plugin_claude_api_listed": true
+    },
+    {
+      "run": "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS=[[1]]",
+      "skills_listed": 61,
+      "bundled_claude_api_listed": false,
+      "plugin_claude_api_listed": true
+    },
+    {
+      "run": "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS=[null]",
+      "skills_listed": 77,
+      "bundled_claude_api_listed": true,
+      "plugin_claude_api_listed": true
+    },
+    {
+      "run": "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS=[null, 1]",
+      "skills_listed": 77,
+      "bundled_claude_api_listed": true,
+      "plugin_claude_api_listed": true
+    },
+    {
+      "run": "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS=[1, true]",
+      "skills_listed": 77,
+      "bundled_claude_api_listed": true,
+      "plugin_claude_api_listed": true
+    }
+  ]
+}

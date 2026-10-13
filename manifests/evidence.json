@@ -4987,8 +4987,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/instructions-skills.md",
-      "sha256": "d6b5834d8e5e00969a60f740ce389d5c7d402b9d4669673ac0e0f9a542edf8cf",
-      "bytes": 9387
+      "sha256": "7fa69465f85dff3136ebf925924152bafe97bc6cde941ad09f408aa848a15f17",
+      "bytes": 10415
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/isolation.md",
@@ -5017,8 +5017,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.json",
-      "sha256": "76d5eff876c5ecf316b1006f0c8d2929b11d3d70ed0be3edeb67ab3aa3c1b046",
-      "bytes": 151622
+      "sha256": "b0b9d7949e07dd86ab80b34747cbc538a5eb6c97d1dec26e6684c0e1ffd7b2a1",
+      "bytes": 152660
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.md",
@@ -5772,8 +5772,8 @@
     },
     {
       "path": "adoption/skills/manifest.json",
-      "sha256": "699b0c0aa5df0631bdf56ac7633029a3355d96bc5ca6503f81bfcc1b96f822d8",
-      "bytes": 64517
+      "sha256": "f55d6065c4022b8b8164a8cd6c70bb83f78968c0e289579c3642ebc08fa4d724",
+      "bytes": 64651
     },
     {
       "path": "adoption/templates/claude.settings.linux-wsl2.overlay.json",
@@ -11488,8 +11488,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-read-deltas.json",
-      "sha256": "ca56f6daf8e577ab089d4898b06e0c93fd6d7d70e0575c628c803623418975e1",
-      "bytes": 925
+      "sha256": "f1fc89bb64f6094398b679cea33f05df077706dd663de0c156fe71baeb5d8332",
+      "bytes": 1033
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
@@ -11540,6 +11540,11 @@
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261013-pr1070-delta.json",
       "sha256": "8c5503bd3eba5b6ae2bb770e06121b68f49ad5d015d8d7bc80f8b9d7c6f1fe17",
       "bytes": 12645
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261013-pr1074-delta.json",
+      "sha256": "b1c9a6f590066a80876670bef8e439c9b4d163b18a6197ec9c3028ef1d0edde9",
+      "bytes": 15771
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unit-pass.txt",
@@ -17408,7 +17413,7 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "14fd038fb205c6a4ffb54c49c4d3a86b04d9b917b28a39e3866c9b43e56810ce",
+      "sha256": "cddb68683ccc06101378c861a0af2bd3504d0a2ac3f070e93b66335bd3442cac",
       "bytes": 326277
     },
     {
@@ -17433,7 +17438,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "28631f14e8a3a29bc4d4f91e67dee582a8d01ea144502510d6551522a843c078",
+      "sha256": "bf487822050bda202410b00e980e5f8d8db07cf5900bcffe80f5042699028a38",
       "bytes": 190328
     },
     {
@@ -19122,6 +19127,11 @@
       "bytes": 4526
     },
     {
+      "path": "docs/decisions/2026-10-13-plugin-skill-identity.md",
+      "sha256": "b4887a13c1ae27bfbec85ad51ffe8e96b73c6200279f7d6b437d10a5295c6f6f",
+      "bytes": 26299
+    },
+    {
       "path": "docs/decisions/2026-10-13-strict-paper-url-gates.md",
       "sha256": "172927d56413762dc04f333cb6c236b1a85bb70a06740a8359c0d8cac904e8af",
       "bytes": 6429
@@ -19493,12 +19503,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "4ce5f261562807cc0eca8e31aaf65cb7bf4c42bc115cf994905fc5ea1dd0bb6e",
+      "sha256": "bb68a0d06802f17a02ac00ced40d582de339b800c5e646b818c46eafb0d6b474",
       "bytes": 699356
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "46043b18cade9b754a5a0c8cd6a02e0a39296230de94d5820866a39734f5dc72",
+      "sha256": "4352377ae90828283e8ac3c078e386a633a12773f82a04565cfa22a575d04fb0",
       "bytes": 369789
     },
     {
@@ -21453,8 +21463,8 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/claude-native-slot-manifest.json",
-      "sha256": "ca47cdf806dd6fe1571a5bb0e366d8dbd6d5de86b93f00972f9ab76a5209b5d5",
-      "bytes": 238146
+      "sha256": "b3db948a9878156abec03a3dc11764b1595c5c43b348d483c2a24355ca649e80",
+      "bytes": 238162
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/cross-client-lines.json",
@@ -43553,7 +43563,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "dad311e1a21d3d05ecb371ef3c1d2c49bba31a85dea75e44724c880826a27dda",
+      "sha256": "2ae75db2cf89adee8dae05ac303dc9d61487befbb6e9fd0a02d63db3eefcafa0",
       "bytes": 78495
     },
     {
@@ -48275,6 +48285,101 @@
       "path": "evidence/artifacts/osv-split-hardening-port-20261003/zizmor-offline.stdout.txt",
       "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
       "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/README.md",
+      "sha256": "b6afce8e7008ad7470041bcd52d3d1829a8e4e2f110e20e53ba4c5f66496910f",
+      "bytes": 6792
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/claude-api-currency.txt",
+      "sha256": "7200438cc4f17d8162b19d12085c8efffe3fa064a5306288bbc1c54154af3f3f",
+      "bytes": 4413
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/docs-env-vars-excerpt.txt",
+      "sha256": "b323fde91aa47e0ce3ac25d0c7159dad1f513a5e7fa946531b6fdc0e94027c09",
+      "bytes": 1226
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/docs-skills-md-excerpt.txt",
+      "sha256": "6abf92133e3efb31a3ddb3be51e754e8978065a89c6bf8767b5db2a92276b573",
+      "bytes": 859
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/fail-before-at-main-993cc890b.txt",
+      "sha256": "2d1e2647556a0b8dd5dc6f179df47abc6bbc4b79cae54c951315d413fde76668",
+      "bytes": 2228
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/fail-before-round1.txt",
+      "sha256": "69037613ae97a6860dba48d1c874f538ae2d95433b1c5c44ba7ba90d59b638b9",
+      "bytes": 3865
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/fail-before-round2.txt",
+      "sha256": "392d3e532109605eb35df315f2128d310d67e9969c969d7aecb36b5f29234427",
+      "bytes": 1137
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/fail-before-round3.txt",
+      "sha256": "d1607e353c3f9dd25edbb6a6b10b3f42fbd7e2b40ea56fee7ce83975b6459acb",
+      "bytes": 996
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/fail-before.txt",
+      "sha256": "2ec026093bc4ffb7ef4e95d0ad69779457fcfd66f71d9d276d95f7ace2de92df",
+      "bytes": 2540
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/global-disable-init-records.json",
+      "sha256": "0a3356a1a7c8f0b8a75a0c3ce0db6001f65566c1ddb95287e06bda4d953538db",
+      "bytes": 5479
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/host-overlay-simulation.json",
+      "sha256": "447ce48cc40d1fff4e092a313c45fc1e884de59bdd120fe80510ec3a69806433",
+      "bytes": 853
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/listing-init-records.json",
+      "sha256": "ec27df33a6d71168ab57df6337e076ef4ba1767bcb4da84e9b5958567a3bb9a4",
+      "bytes": 2569
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/mutants-round1-30.txt",
+      "sha256": "f7ec469dde150c69e9b592d0b9a81706b916d682452c681551c6f7b9b9a29427",
+      "bytes": 2561
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/mutants-round2.txt",
+      "sha256": "1196e0295262ff136a774d8c8c90cc1e5fa19c7e29b21bb31196ae480d9271cd",
+      "bytes": 1608
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/mutants-round3-12.txt",
+      "sha256": "f410f1d804c5c45c5f6eee002dd9326b49035816241ad4eab2e41ce948c4c1cc",
+      "bytes": 1342
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/mutants-v07-41.txt",
+      "sha256": "980780b95b4036ade1fab15df573421f0d7a2b2459b554157b0cf2e58d09ebc9",
+      "bytes": 2735
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/numeric-env-init-records.json",
+      "sha256": "fe7d1413f1c4fa4a234fb619e21caf306a1bdc62fc72896c06d2570cdd18df19",
+      "bytes": 6314
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/preload-probes.json",
+      "sha256": "d36a9c8948697b9a8018394fc58647f8b59b083422c6ffcc3c129ede82f573cd",
+      "bytes": 2939
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/skill-switch-init-records.json",
+      "sha256": "26a0bff8bc5515974da84f60167d7806c2f9732accdb069ebb6f08a8171adbd8",
+      "bytes": 3554
     },
     {
       "path": "evidence/artifacts/portable-claude-native-qualification-20260921/angle1-upstream.json",
@@ -61668,8 +61773,8 @@
     },
     {
       "path": "scripts/skills_status.py",
-      "sha256": "aa03834a67b0aea20557a9ef6452050f26b1cb936c47ecf010f243d8a0136af4",
-      "bytes": 47370
+      "sha256": "70c1232390f99cc5b0cb3aaf23abef56ef9f6c69011981762c26aa03ff09aaa8",
+      "bytes": 61214
     },
     {
       "path": "scripts/starred_convergence.py",
@@ -63157,6 +63262,11 @@
       "bytes": 38625
     },
     {
+      "path": "tests/test_plugin_skill_identity_receipts.py",
+      "sha256": "ab92db30fd45367bd9c6998142b9b95f854c05965ad93daaaaf1a7879846c709",
+      "bytes": 4574
+    },
+    {
       "path": "tests/test_point_in_time.py",
       "sha256": "1f92eb8fb3f6abb1f6da24c89570900b1944816e691c5a77cc92c60e32579382",
       "bytes": 7481
@@ -63423,18 +63533,18 @@
     },
     {
       "path": "tests/test_skill_usage_daily.py",
-      "sha256": "620152c398c44829b9f0a57ed415c17026998e3014b44ae8912134ce7ae378fa",
-      "bytes": 10233
+      "sha256": "04719068560e1e4daa32ed6b3363646c29e1e6e73f3eb9b75f22d074f0e3993f",
+      "bytes": 17439
     },
     {
       "path": "tests/test_skills_manifest.py",
-      "sha256": "5b9336366957584a595d7c99549167f4816a1aa4a3663b8b1e89b2b463c6adb5",
-      "bytes": 20249
+      "sha256": "9416da75a268c51b5f87430f8e7214b1a799f72a7894a30d63df9b9f63555db3",
+      "bytes": 23850
     },
     {
       "path": "tests/test_skills_status.py",
-      "sha256": "25721f7174192f3e5e9b5a4ff10fe7b03789ad3f605803025f04623fa12d8f04",
-      "bytes": 79705
+      "sha256": "c4cf2a7fa2539ed1c1c452441ae36d3d24e0ed4691ca30f8aed3dcc51bd1cfec",
+      "bytes": 118297
     },
     {
       "path": "tests/test_sota_convergence.py",
@@ -64053,8 +64163,8 @@
     },
     {
       "path": "tools/skill-usage/skill_usage.py",
-      "sha256": "17aad1420b54ebac3e023b44b9de699802e133837dfd4d1d5dc149f527b95c3d",
-      "bytes": 158548
+      "sha256": "0c16c817238bf687596a14e5fccc129e2703544cb3d053d46c13466c1c784a96",
+      "bytes": 161317
     },
     {
       "path": "tools/skill-usage/stage_routing_eval.py",

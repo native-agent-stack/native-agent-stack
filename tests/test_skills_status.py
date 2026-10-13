@@ -8,6 +8,7 @@ mutates content and lets the digest follow rather than embedding a second,
 independently-typed expectation.
 """
 
+import contextlib
 import hashlib
 import importlib.util
 import json
@@ -136,6 +137,472 @@ class SkillsStatusTests(unittest.TestCase):
         self.write_claude_settings({"beta-skill": "name-only"})
         self.write_codex_config(["beta-skill"])
         return manifest, alpha, beta
+
+    # -- CPA-V-07: a skill that a plugin also delivers is listed twice; only the other copy can be hidden ------------------------
+
+    def write_plugin_state(self, plugin_id, *, enabled=True, installed=True, overrides=None, scope="user", shape="list", settings=None):
+        """settings.json with skillOverrides and enabledPlugins (and any ``settings`` keys besides), and the user-plugin registry. ``shape`` is how the registry holds the install: a list of installs (schema 2) or one
+        object; ``installed="invalid"`` writes a registry that is not JSON. For the plugin of the row that twin_row made, the install is the pinned plugin: its cache holds the row's SKILL.md at the row's commit (a
+        replacement plugin is accepted only so; break it with ``break_plugin``)."""
+        claude_dir = self.home / ".claude"
+        (claude_dir / "plugins").mkdir(parents=True, exist_ok=True)
+        (claude_dir / "settings.json").write_text(json.dumps({"skillOverrides": overrides or {}, "enabledPlugins": {plugin_id: enabled}, **(settings or {})}))
+        install = {"scope": scope, "installPath": "x", "gitCommitSha": "a" * 40}
+        skill = getattr(self, "twin_skill", None)
+        if skill is not None and skill.get("claude_plugin") == plugin_id and installed is True:
+            root = claude_dir / "plugins/cache/market" / plugin_id.split("@")[0] / "pinned"
+            (root / skill["path"]).mkdir(parents=True, exist_ok=True)
+            source = next(path for path in (self.home / ".agents/skills" / skill["name"] / "SKILL.md", self.home / ".claude/skills" / skill["name"] / "SKILL.md") if path.is_file())
+            shutil.copy(source, root / skill["path"] / "SKILL.md")
+            install = {"scope": scope, "installPath": str(root), "gitCommitSha": skill["ref"], "installedAt": "2026-10-10T00:00:00Z"}
+        registry = {"version": 2, "plugins": {plugin_id: [install] if shape == "list" else install} if installed is True else {}}
+        text = "{not json" if installed == "invalid" else json.dumps(registry)
+        (claude_dir / "plugins" / "installed_plugins.json").write_text(text)
+
+    def twin_row(self, name="twin-skill", plugin="twin@market"):
+        skill = self.make_skill(name)
+        skill.update(claude_plugin=plugin, claude_skill_name=f"{plugin.split('@')[0]}:{name}", ref="a" * 40, path=f"skills/{name}")
+        self.twin_skill = skill
+        self.write_lock(self.lock_entries_for([skill]))
+        self.write_claude_link(name)
+        self.write_codex_config([])
+        return skill
+
+    def break_plugin(self, how):
+        """Make the installed plugin of twin_row something other than the pinned one: another commit, a folder outside the plugin cache, a SKILL.md that is not the pinned bytes, or no SKILL.md at all."""
+        registry_path = self.home / ".claude/plugins/installed_plugins.json"
+        registry = json.loads(registry_path.read_text())
+        install = registry["plugins"][self.twin_skill["claude_plugin"]][0]
+        skill_md = Path(install["installPath"]) / self.twin_skill["path"] / "SKILL.md"
+        if how == "pin":
+            install["gitCommitSha"] = "b" * 40
+        elif how == "outside":
+            outside = self.tmp / "elsewhere-plugin"
+            (outside / self.twin_skill["path"]).mkdir(parents=True, exist_ok=True)
+            shutil.copy(skill_md, outside / self.twin_skill["path"] / "SKILL.md")
+            install["installPath"] = str(outside)
+        elif how == "bytes":
+            skill_md.write_bytes(skill_md.read_bytes() + b"changed\n")
+        elif how == "gone":
+            skill_md.unlink()
+        else:
+            raise ValueError(how)
+        registry_path.write_text(json.dumps(registry))
+
+    def test_a_plugin_that_is_installed_and_enabled_makes_the_personal_copy_a_duplicate_until_it_is_hidden(self):
+        skill = self.twin_row()
+        manifest = self.build_manifest([skill])
+        self.write_plugin_state("twin@market")
+        entry = ss.inspect(manifest, self.home, self.env)["skills"][0]
+        self.assertEqual(entry["claude_twin"], {"state": "duplicate_listing", "twin": "twin-skill", "plugin_present": True})
+        self.assertEqual(entry["claude_listing"], {"state": "mismatch", "actual": "on"}, "where the plugin is present the other copy is expected hidden")
+        self.assertFalse(entry["pass"])
+        self.write_plugin_state("twin@market", overrides={"twin-skill": "off"})
+        report = ss.inspect(manifest, self.home, self.env)
+        entry = report["skills"][0]
+        self.assertEqual(entry["claude_twin"]["state"], "ok")
+        self.assertEqual(entry["claude_listing"], {"state": "ok", "actual": "off"})
+        self.assertTrue(entry["pass"])
+        self.assertEqual(report["result"], "ok")
+
+    def test_without_the_plugin_the_personal_copy_keeps_the_manifest_listing_so_a_fresh_host_keeps_its_one_copy(self):
+        skill = self.twin_row()
+        manifest = self.build_manifest([skill])
+        for label, state in (("not enabled", dict(enabled=False)), ("not installed", dict(installed=False)), ("neither", dict(enabled=False, installed=False))):
+            with self.subTest(plugin=label):
+                self.write_plugin_state("twin@market", **state)
+                entry = ss.inspect(manifest, self.home, self.env)["skills"][0]
+                self.assertEqual(entry["claude_twin"], {"state": "ok", "twin": "twin-skill", "plugin_present": False})
+                self.assertTrue(entry["pass"])
+                self.write_plugin_state("twin@market", overrides={"twin-skill": "off"}, **state)  # hiding the only copy is wrong where there is no plugin
+                entry = ss.inspect(manifest, self.home, self.env)["skills"][0]
+                self.assertEqual(entry["claude_listing"], {"state": "mismatch", "actual": "off"})
+                self.assertFalse(entry["pass"])
+
+    def test_overrides_of_the_wrong_type_hide_nothing_so_the_twin_stays_a_duplicate(self):
+        skill = self.twin_row()
+        self.write_plugin_state("twin@market")
+        settings = json.loads((self.home / ".claude/settings.json").read_text())
+        settings["skillOverrides"] = ["twin-skill"]  # not a mapping: nothing is hidden by it
+        (self.home / ".claude/settings.json").write_text(json.dumps(settings))
+        entry = ss.inspect(self.build_manifest([skill]), self.home, self.env)["skills"][0]
+        self.assertEqual(entry["claude_twin"]["state"], "duplicate_listing")
+        self.assertFalse(entry["pass"])
+
+    def test_only_an_explicit_true_enables_a_plugin_and_only_a_user_install_counts(self):
+        """settings reference, enabledPlugins: a Boolean per plugin; an install of another scope serves another project, and an unreadable registry is no install."""
+        skill = self.twin_row()
+        manifest = self.build_manifest([skill])
+        cases = (("a string", dict(enabled="true"), False), ("a number", dict(enabled=1), False), ("a list", dict(enabled=["x"]), False), ("false", dict(enabled=False), False),
+                 ("a project-scope install", dict(scope="project"), False), ("a local-scope install", dict(scope="local"), False), ("an unreadable registry", dict(installed="invalid"), False),
+                 ("a user install written as one object", dict(shape="object"), True), ("a user install in a list", dict(), True))
+        for label, state, present in cases:
+            with self.subTest(case=label):
+                self.write_plugin_state("twin@market", **state)
+                entry = ss.inspect(manifest, self.home, self.env)["skills"][0]
+                self.assertEqual(entry["claude_twin"]["plugin_present"], present)
+                self.assertEqual(entry["claude_twin"]["state"], "duplicate_listing" if present else "ok")
+
+    def test_only_off_hides_the_twin(self):
+        skill = self.twin_row()
+        manifest = self.build_manifest([skill])
+        for value in ("on", "name-only", "user-invocable-only", "off"):
+            with self.subTest(override=value):
+                self.write_plugin_state("twin@market", overrides={"twin-skill": value})
+                entry = ss.inspect(manifest, self.home, self.env)["skills"][0]
+                self.assertEqual(entry["claude_twin"]["state"], "ok" if value == "off" else "duplicate_listing")
+
+    def test_a_native_plugin_row_without_a_bundled_twin_has_no_twin_entry(self):
+        skill = {k: v for k, v in self.native_twin_row(hidden=False).items() if k != "bundled_twin"}
+        entry = ss.inspect(self.build_manifest([skill]), self.home, self.env)["skills"][0]
+        self.assertNotIn("claude_twin", entry)
+        self.assertTrue(entry["pass"])
+
+    def test_a_bundled_twin_is_hidden_under_its_own_name(self):
+        """The row's name and the bundled skill's name need not be the same word; the override that hides the bundled copy is keyed by the bundled name."""
+        skill = {**self.native_twin_row(hidden=False), "bundled_twin": "claude-api-bundled"}
+        entry = ss.inspect(self.build_manifest([skill]), self.home, self.env)["skills"][0]
+        self.assertEqual(entry["claude_twin"], {"state": "duplicate_listing", "twin": "claude-api-bundled", "plugin_present": True})
+        self.write_plugin_state("claude-api@market", overrides={"claude-api-bundled": "off"})
+        registry = json.loads((self.home / ".claude/plugins/installed_plugins.json").read_text())
+        registry["plugins"]["claude-api@market"][0]["installPath"] = str(self.home / ".claude/plugins/cache/market/claude-api/pinned")
+        (self.home / ".claude/plugins/installed_plugins.json").write_text(json.dumps(registry))
+        entry = ss.inspect(self.build_manifest([skill]), self.home, self.env)["skills"][0]
+        self.assertEqual(entry["claude_twin"]["state"], "ok")
+
+    def test_a_plugin_row_that_is_not_as_pinned_fails_even_with_its_twin_hidden(self):
+        skill = self.native_twin_row(hidden=True)
+        skill["skill_md_sha256"] = "0" * 64  # the installed plugin's SKILL.md is not the pinned one
+        entry = ss.inspect(self.build_manifest([skill]), self.home, self.env)["skills"][0]
+        self.assertEqual(entry["claude_twin"], {"state": "plugin_invalid", "twin": "claude-api", "plugin_present": True, "plugin": "hash_mismatch"}, "the twin is hidden, and the plugin that remains is not the pinned one")
+        self.assertNotEqual(entry["canonical"]["state"], "ok")
+        self.assertFalse(entry["pass"])
+
+    def test_an_unreadable_settings_file_lists_no_plugin_and_the_personal_row_fails_on_its_own_listing_check(self):
+        skill = self.twin_row()
+        self.write_plugin_state("twin@market", overrides={"twin-skill": "off"})
+        (self.home / ".claude/settings.json").write_text("{not json")
+        entry = ss.inspect(self.build_manifest([skill]), self.home, self.env)["skills"][0]
+        self.assertEqual(entry["claude_twin"], {"state": "ok", "twin": "twin-skill", "plugin_present": False})
+        self.assertEqual(entry["claude_listing"]["state"], "settings_unreadable")
+        self.assertFalse(entry["pass"])
+
+    def test_a_row_without_a_twin_has_no_twin_entry_and_the_text_shows_it_only_for_a_twin(self):
+        manifest, alpha, beta = self.setup_pair()
+        report = ss.inspect(manifest, self.home, self.env)
+        self.assertTrue(all("claude_twin" not in entry for entry in report["skills"]))
+        self.assertNotIn("twin=", ss.render_text(report))
+        skill = self.twin_row()
+        self.write_plugin_state("twin@market", overrides={"twin-skill": "off"})
+        text = ss.render_text(ss.inspect(self.build_manifest([skill]), self.home, self.env))
+        self.assertIn("twin=ok", text)
+
+    def native_twin_row(self, *, hidden):
+        """The claude-api shape: a native plugin row whose bundled twin is listed under the bare name."""
+        config = self.home / ".claude"
+        root = config / "plugins/cache/market/claude-api/pinned"
+        (root / "skills/claude-api").mkdir(parents=True)
+        raw = b"---\nname: claude-api\ndescription: fixture\n---\n"
+        (root / "skills/claude-api/SKILL.md").write_bytes(raw)
+        skill = {"name": "claude-api", "native_plugin": "claude-api@market", "claude_skill_name": "claude-api:claude-api", "bundled_twin": "claude-api", "path": "skills/claude-api",
+                 "ref": "a" * 40, "skill_md_sha256": hashlib.sha256(raw).hexdigest(), "tree_sha": "b" * 40, "skill_md_bytes": len(raw), "description_chars": 10,
+                 "claude_listing": "on", "codex_enabled": False}
+        self.write_plugin_state("claude-api@market", overrides={"claude-api": "off"} if hidden else {})
+        registry = {"version": 2, "plugins": {"claude-api@market": [{"scope": "user", "installPath": str(root), "gitCommitSha": "a" * 40, "installedAt": "2026-10-10T00:00:00Z"}]}}
+        (config / "plugins/installed_plugins.json").write_text(json.dumps(registry))
+        return skill
+
+    def test_the_bundled_twin_of_a_native_plugin_row_must_be_hidden_where_the_plugin_is_enabled(self):
+        for hidden, state, ok in ((False, "duplicate_listing", False), (True, "ok", True)):
+            with self.subTest(hidden=hidden):
+                skill = self.native_twin_row(hidden=hidden)
+                entry = ss.inspect(self.build_manifest([skill]), self.home, self.env)["skills"][0]
+                self.assertEqual(entry["canonical"]["state"], "ok", "the plugin itself is as pinned")
+                self.assertEqual(entry["claude_twin"], {"state": state, "twin": "claude-api", "plugin_present": True})
+                self.assertEqual(entry["pass"], ok)
+                shutil.rmtree(self.home / ".claude")
+
+    # -- review of #1074 at 2dae9751 (Astra's read and the local codex review) -------------------------------------------------
+
+    def change_settings(self, **changes):
+        path = self.home / ".claude/settings.json"
+        data = json.loads(path.read_text())
+        data.update(changes)
+        path.write_text(json.dumps(data))
+
+    def test_a_bundled_twin_is_hidden_by_disabling_bundled_skills_as_a_whole(self):
+        """Astra's read (P1): disableBundledSkills hides every bundled skill and keeps the plugin's copy listed (measured on 2.1.296, receipts/global-disable-init-records.json: 77 skills listed, 61 with it, the bundled
+        claude-api gone and claude-api:claude-api kept), so a host that disables them has one copy of the skill and was reported as a duplicate. Only the JSON boolean true counts."""
+        manifest = self.build_manifest([self.native_twin_row(hidden=False)])
+        for label, value, hidden in (("true", True, True), ("false", False, False), ("the string true", "true", False), ("the number 1", 1, False), ("null", None, False)):
+            with self.subTest(disableBundledSkills=label):
+                self.change_settings(disableBundledSkills=value)
+                entry = ss.inspect(manifest, self.home, self.env)["skills"][0]
+                self.assertEqual(entry["claude_twin"], {"state": "ok" if hidden else "duplicate_listing", "twin": "claude-api", "plugin_present": True})
+                self.assertEqual(entry["pass"], hidden)
+
+    def test_a_bundled_twin_is_hidden_by_the_environment_equivalent_of_that_setting(self):
+        """The variable reads as set for 1, true, TRUE, yes, on and a padded " 1", and for no other value (measured on 2.1.296: 0, 2, false, off, no, y, t, enabled and an empty value list 77 skills)."""
+        manifest = self.build_manifest([self.native_twin_row(hidden=False)])
+        for value, hidden in (("1", True), ("true", True), ("TRUE", True), ("yes", True), ("on", True), (" 1", True), ("0", False), ("2", False), ("", False), ("false", False), ("off", False), ("no", False), ("y", False)):
+            with self.subTest(value=value):
+                env = {**self.env, "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS": value}
+                self.assertEqual(ss.inspect(manifest, self.home, env)["skills"][0]["claude_twin"]["state"], "ok" if hidden else "duplicate_listing")
+        self.assertEqual(ss.inspect(manifest, self.home, self.env)["skills"][0]["claude_twin"]["state"], "duplicate_listing", "without the variable")
+
+    def test_the_env_entry_of_settings_overrides_the_environment_and_may_be_a_number_or_a_boolean(self):
+        """Measured on 2.1.296: an env entry of settings.json becomes the client's environment (the string 1 or true, the number 1, the boolean true), and it overrides the process environment in both directions (1 in
+        the environment and 0 in the entry: not disabled; 0 and 1: disabled)."""
+        manifest = self.build_manifest([self.native_twin_row(hidden=False)])
+        name = "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS"
+        for label, entry_value, process_value, hidden in (("the string 1", "1", None, True), ("the number 1", 1, None, True), ("the boolean true", True, None, True), ("the string 0", "0", None, False),
+                                                          ("the boolean false", False, None, False), ("0 in the entry beats 1 in the environment", "0", "1", False),
+                                                          ("1 in the entry beats 0 in the environment", "1", "0", True)):
+            with self.subTest(case=label):
+                self.change_settings(env={name: entry_value})
+                env = {**self.env, **({name: process_value} if process_value is not None else {})}
+                self.assertEqual(ss.inspect(manifest, self.home, env)["skills"][0]["claude_twin"]["state"], "ok" if hidden else "duplicate_listing")
+        self.change_settings(env={"SOME_OTHER_SETTING": "x"})
+        self.assertEqual(ss.inspect(manifest, self.home, {**self.env, name: "1"})["skills"][0]["claude_twin"]["state"], "ok", "an env entry for another variable leaves the environment's")
+
+    def test_a_number_or_an_array_in_an_env_entry_is_the_text_javascript_makes_of_it(self):
+        """The local review of the rebased head (P2-1, `skills_status.py` env_text): the client reads a settings env value as JavaScript's String() of it, so 1.0 and 1e0 are 1 and an array is its elements joined
+        by commas. Measured on 2.1.296 (receipts/numeric-env-init-records.json, 28 init-record runs): 61 skills listed, the bundled claude-api gone, with 1, 1.0, 1e0, 10e-1, 0.1e1, 1E0, 1.00, true, "1", [1], ["1"],
+        [true] and [[1]]; 77 with 0, 0.0, 2, 1.5, -0, null, [], an object, [1, 2], ["1", "x"], [null], [null, 1] and [1, true]; the skill's own switch reads 1.0 and 1e0 the same way."""
+        manifest = self.build_manifest([self.native_twin_row(hidden=False)])
+        settings = self.home / ".claude/settings.json"
+        base = json.loads(settings.read_text())
+        name = "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS"
+        for raw, hidden in (("1", True), ("1.0", True), ("1e0", True), ("10e-1", True), ("0.1e1", True), ("1E0", True), ("1.00", True), ("true", True), ('"1"', True), ("[1]", True), ('["1"]', True),
+                            ("[true]", True), ("[[1]]", True), ("0", False), ("0.0", False), ("2", False), ("1.5", False), ("-0", False), ("null", False), ("[]", False), ('{"a": 1}', False), ('"0"', False),
+                            ("[1, 2]", False), ('["1", "x"]', False), ("[null]", False), ("[null, 1]", False), ("[1, true]", False)):
+            with self.subTest(env_value=raw):
+                settings.write_text(json.dumps({**base, "env": {name: "@@RAW@@"}}).replace('"@@RAW@@"', raw))
+                self.assertEqual(ss.bundled_skills_disabled(settings, self.env), hidden)
+                self.assertEqual(ss.inspect(manifest, self.home, self.env)["skills"][0]["claude_twin"]["state"], "ok" if hidden else "duplicate_listing")
+        skill_switch = "CLAUDE_CODE_DISABLE_CLAUDE_API_SKILL"
+        for raw in ("1.0", "1e0", "[1]"):
+            with self.subTest(skill_switch=raw):
+                settings.write_text(json.dumps({**base, "env": {skill_switch: "@@RAW@@"}}).replace('"@@RAW@@"', raw))
+                self.assertTrue(ss.bundled_skill_disabled(settings, self.env, "claude-api"))
+                self.assertFalse(ss.bundled_skills_disabled(settings, self.env), "the skill's own switch hides that skill only")
+        deep = []
+        for _ in range(5000):
+            deep = [deep]
+        self.assertFalse(ss.env_switch({name: deep}, {}, name), "an array nested beyond the interpreter's depth is no switch and no crash")
+
+    def test_a_missing_settings_file_is_empty_settings_and_the_environment_switch_still_counts(self):
+        """The local review of the rebased head (P2-2, `skills_status.py` read_switches): with no settings.json the client starts with empty settings and reads its environment, so
+        CLAUDE_CODE_DISABLE_BUNDLED_SKILLS=1 still hides the bundled copy; the plugin is not enabled either (no settings), so no route lists the skill and the row fails. A file that exists and cannot be read
+        still disables nothing."""
+        manifest = self.build_manifest([self.native_twin_row(hidden=False)])
+        settings = self.home / ".claude/settings.json"
+        settings.unlink()
+        switched = {**self.env, "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS": "1"}
+        self.assertTrue(ss.bundled_skills_disabled(settings, switched))
+        self.assertTrue(ss.bundled_skill_disabled(settings, {**self.env, "CLAUDE_CODE_DISABLE_CLAUDE_API_SKILL": "1"}, "claude-api"))
+        self.assertFalse(ss.bundled_skills_disabled(settings, self.env), "no file and no variable: nothing is hidden")
+        entry = ss.inspect(manifest, self.home, switched)["skills"][0]
+        self.assertEqual(entry["claude_twin"]["state"], "not_listed", "the bundled copy is hidden by the environment and no plugin is enabled: no route lists the skill")
+        self.assertFalse(entry["pass"])
+        self.assertEqual(ss.inspect(manifest, self.home, self.env)["skills"][0]["claude_twin"]["state"], "ok", "without the variable the bundled copy is the one listed")
+        settings.write_text("{not json")
+        self.assertFalse(ss.bundled_skills_disabled(settings, switched), "a file that exists and cannot be read disables nothing")
+
+    def test_disabling_bundled_skills_hides_no_personal_copy_and_an_unreadable_settings_file_disables_nothing(self):
+        """The personal twin is not a bundled skill: it stays listed, so it stays a duplicate until skillOverrides hides it. Settings that cannot be read disable nothing (the personal row then fails on its listing)."""
+        skill = self.twin_row()
+        manifest = self.build_manifest([skill])
+        self.write_plugin_state("twin@market", settings={"disableBundledSkills": True})
+        env = {**self.env, "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS": "1"}
+        entry = ss.inspect(manifest, self.home, env)["skills"][0]
+        self.assertEqual(entry["claude_twin"], {"state": "duplicate_listing", "twin": "twin-skill", "plugin_present": True})
+        self.assertFalse(entry["pass"])
+        self.write_plugin_state("twin@market", overrides={"twin-skill": "off"}, settings={"disableBundledSkills": True})
+        self.assertTrue(ss.inspect(manifest, self.home, env)["skills"][0]["pass"])
+        bundled = self.build_manifest([self.native_twin_row(hidden=False)])
+        (self.home / ".claude/settings.json").write_text("{not json")
+        self.assertFalse(ss.bundled_skills_disabled(self.home / ".claude/settings.json", env))
+        self.assertEqual(ss.inspect(bundled, self.home, env)["skills"][0]["claude_twin"]["plugin_present"], False)
+
+    def test_the_skill_specific_switch_hides_the_bundled_twin_and_only_that_twin(self):
+        """The local codex review of f7e0cd70 (P2): the client disables its bundled claude-api through `registerClaudeApiSkill({disabled: env.CLAUDE_CODE_DISABLE_CLAUDE_API_SKILL === true})` (the installed 2.1.296
+        binary; receipts/skill-switch-init-records.json: 77 skills, 76 with the switch, the bundled copy gone and the plugin's kept), so a host that sets it has one copy and was reported as a duplicate. The
+        variable reads as the all-bundled one does (1, true, yes, on in any case, padded or not; not 0, 2, false or empty), the settings env entry overrides the process environment either way, and a bundled
+        twin of another name has no such switch."""
+        manifest = self.build_manifest([self.native_twin_row(hidden=False)])
+        name = "CLAUDE_CODE_DISABLE_CLAUDE_API_SKILL"
+        for value, hidden in (("1", True), ("true", True), ("TRUE", True), ("yes", True), ("on", True), (" 1", True), ("0", False), ("2", False), ("", False), ("false", False)):
+            with self.subTest(process_environment=value):
+                env = {**self.env, name: value}
+                self.assertEqual(ss.inspect(manifest, self.home, env)["skills"][0]["claude_twin"]["state"], "ok" if hidden else "duplicate_listing")
+        for label, entry, process, hidden in (("the string 1", "1", None, True), ("the number 1", 1, None, True), ("the boolean true", True, None, True), ("0 in the entry beats 1 in the environment", "0", "1", False),
+                                              ("1 in the entry beats 0 in the environment", "1", "0", True)):
+            with self.subTest(settings_env=label):
+                self.change_settings(env={name: entry})
+                env = {**self.env, **({name: process} if process is not None else {})}
+                self.assertEqual(ss.inspect(manifest, self.home, env)["skills"][0]["claude_twin"]["state"], "ok" if hidden else "duplicate_listing")
+        self.change_settings(env={})
+        other = {**manifest["skills"][0], "bundled_twin": "claude-api-bundled"}
+        entry = ss.inspect(self.build_manifest([other]), self.home, {**self.env, name: "1"})["skills"][0]
+        self.assertEqual(entry["claude_twin"]["state"], "duplicate_listing", "the switch is the client's for its claude-api, not for any bundled name")
+        # the switch of one skill hides no personal twin either
+        personal = self.twin_row()
+        self.write_plugin_state("twin@market")
+        entry = ss.inspect(self.build_manifest([personal]), self.home, {**self.env, name: "1"})["skills"][0]
+        self.assertEqual(entry["claude_twin"]["state"], "duplicate_listing")
+
+    def test_a_bundled_twin_that_no_route_lists_is_not_listed_and_fails_the_row(self):
+        """Astra's read of 48e083e8 (P2, adjacent) and the same case through the switches: with the plugin disabled and the bundled twin hidden (skillOverrides, the all-bundled switch or the skill's own) the
+        skill is listed by no route, and the row passed. A disabled plugin with the bundled copy visible is one copy and is fine; the personal twin's listing is the manifest's own check."""
+        name = "CLAUDE_CODE_DISABLE_CLAUDE_API_SKILL"
+        skill = self.native_twin_row(hidden=True)
+        manifest = self.build_manifest([skill])
+        registry_path = self.home / ".claude/plugins/installed_plugins.json"
+        registry = registry_path.read_text()   # the pinned install that native_twin_row wrote
+
+        def settings(*, enabled, overrides=None, extra=None, registered=True):
+            (self.home / ".claude/settings.json").write_text(json.dumps({"skillOverrides": overrides or {}, "enabledPlugins": {"claude-api@market": enabled}, **(extra or {})}))
+            registry_path.write_text(registry if registered else json.dumps({"version": 2, "plugins": {}}))
+        for label, overrides, extra, env_extra in (("skillOverrides off", {"claude-api": "off"}, {}, {}), ("disableBundledSkills", {}, {"disableBundledSkills": True}, {}),
+                                                   ("the skill's own switch", {}, {}, {name: "1"}), ("the all-bundled variable", {}, {}, {"CLAUDE_CODE_DISABLE_BUNDLED_SKILLS": "1"})):
+            with self.subTest(hidden_by=label):
+                settings(enabled=False, overrides=overrides, extra=extra)
+                env = {**self.env, **env_extra}
+                entry = ss.inspect(manifest, self.home, env)["skills"][0]
+                self.assertEqual(entry["canonical"]["state"], "ok", "the plugin itself is installed as pinned")
+                self.assertEqual(entry["claude_twin"], {"state": "not_listed", "twin": "claude-api", "plugin_present": False})
+                self.assertFalse(entry["pass"])
+                self.assertIn("twin=not_listed", ss.render_text(ss.inspect(manifest, self.home, env)))
+        with self.subTest(case="a plugin that is enabled and not registered"):
+            settings(enabled=True, overrides={"claude-api": "off"}, registered=False)
+            entry = ss.inspect(manifest, self.home, self.env)["skills"][0]
+            self.assertEqual(entry["claude_twin"]["state"], "not_listed")
+            self.assertFalse(entry["pass"])
+        with self.subTest(case="a disabled plugin with the bundled copy visible"):
+            settings(enabled=False)
+            entry = ss.inspect(manifest, self.home, self.env)["skills"][0]
+            self.assertEqual(entry["claude_twin"], {"state": "ok", "twin": "claude-api", "plugin_present": False})
+            self.assertTrue(entry["pass"], "one copy, the client's own")
+        with self.subTest(case="an enabled plugin with the twin hidden"):
+            settings(enabled=True, overrides={"claude-api": "off"})
+            entry = ss.inspect(manifest, self.home, self.env)["skills"][0]
+            self.assertEqual((entry["claude_twin"]["state"], entry["pass"]), ("ok", True))
+        with self.subTest(case="an enabled plugin with the twin hidden by the skill's own switch"):
+            settings(enabled=True)
+            entry = ss.inspect(manifest, self.home, {**self.env, name: "1"})["skills"][0]
+            self.assertEqual((entry["claude_twin"]["state"], entry["pass"]), ("ok", True))
+
+    def test_a_replacement_plugin_that_is_not_the_pinned_one_is_not_accepted_for_a_hidden_copy(self):
+        """The local codex review (P2): a registry row with scope user was enough, even at another commit or with its cached skill gone, so the personal copy hidden behind such a plugin passed although nothing
+        pinned was listed. The client lists the plugin all the same, so the twin check reports it (plugin_invalid), whether or not the other copy is hidden."""
+        skill = self.twin_row()
+        manifest = self.build_manifest([skill])
+        for how, expected in (("pin", "pin_mismatch"), ("outside", "invalid_install_path"), ("bytes", "hash_mismatch"), ("gone", "cache_unreadable")):
+            for hidden in (True, False):
+                with self.subTest(plugin=how, personal_copy_hidden=hidden):
+                    self.write_plugin_state("twin@market", overrides={"twin-skill": "off"} if hidden else {})
+                    self.break_plugin(how)
+                    entry = ss.inspect(manifest, self.home, self.env)["skills"][0]
+                    self.assertEqual(entry["claude_twin"], {"state": "plugin_invalid", "twin": "twin-skill", "plugin_present": True, "plugin": expected})
+                    self.assertFalse(entry["pass"])
+        self.write_plugin_state("twin@market", overrides={"twin-skill": "off"})
+        entry = ss.inspect(manifest, self.home, self.env)["skills"][0]
+        self.assertEqual((entry["claude_twin"]["state"], entry["pass"]), ("ok", True), "the pinned plugin is accepted")
+        self.write_plugin_state("twin@market", enabled=False)
+        self.break_plugin("pin")
+        self.assertEqual(ss.inspect(manifest, self.home, self.env)["skills"][0]["claude_twin"]["state"], "ok", "a plugin that is not enabled is not listed, so its state does not matter")
+
+    def test_a_native_plugin_row_that_is_not_as_pinned_reports_its_twin_as_invalid_too(self):
+        skill = self.native_twin_row(hidden=True)
+        skill["ref"] = "c" * 40
+        entry = ss.inspect(self.build_manifest([skill]), self.home, self.env)["skills"][0]
+        self.assertEqual(entry["canonical"]["state"], "pin_mismatch")
+        self.assertEqual(entry["claude_twin"], {"state": "plugin_invalid", "twin": "claude-api", "plugin_present": True, "plugin": "pin_mismatch"})
+        self.assertFalse(entry["pass"])
+
+    def test_a_registry_of_the_wrong_shape_is_no_plugin_rather_than_a_crash(self):
+        skill = self.twin_row()
+        self.write_plugin_state("twin@market", overrides={"twin-skill": "off"})
+        (self.home / ".claude/plugins/installed_plugins.json").write_text("[]")
+        entry = ss.inspect(self.build_manifest([skill]), self.home, self.env)["skills"][0]
+        self.assertEqual(entry["claude_twin"], {"state": "ok", "twin": "twin-skill", "plugin_present": False})
+
+    def test_the_plugin_registry_is_read_from_the_folder_of_the_settings_that_enable_the_plugin(self):
+        """The local codex review (P2): the settings are read under CLAUDE_CONFIG_DIR as the client reads them (not trimmed, a blank value counts: its resolution is the working directory), the plugin registry was read
+        under the skills CLI's trimmed folder, so a padded or blank value sent the two to different folders and an enabled plugin looked absent. CLAUDE_CONFIG_DIR moves "all settings, session history, and plugins"
+        (code.claude.com/docs/en/env-vars, fetched 2026-10-13)."""
+        skill = self.twin_row()
+        manifest = self.build_manifest([skill])
+        installed = self.home / ".claude"
+        self.write_plugin_state("twin@market", overrides={"twin-skill": "off"})
+        registry = installed / "plugins/installed_plugins.json"
+        padded = self.tmp / "padded "
+        shutil.copytree(installed, padded, symlinks=True)
+        rewritten = registry.read_text().replace(str(installed), str(padded))
+        (padded / "plugins/installed_plugins.json").write_text(rewritten)
+        shutil.rmtree(installed / "plugins")  # the home's own folder holds no registry: only the folder the variable names does
+        entry = ss.inspect(manifest, self.home, {**self.env, "CLAUDE_CONFIG_DIR": str(padded)})["skills"][0]
+        self.assertEqual(entry["claude_twin"], {"state": "ok", "twin": "twin-skill", "plugin_present": True}, "a trailing blank belongs to the name, as the client reads it")
+        cwd = self.tmp / "cwd"
+        shutil.copytree(padded, cwd, symlinks=True)
+        (cwd / "plugins/installed_plugins.json").write_text(rewritten.replace(str(padded), str(cwd)))
+        with contextlib.chdir(cwd):
+            entry = ss.inspect(manifest, self.home, {**self.env, "CLAUDE_CONFIG_DIR": ""})["skills"][0]
+        self.assertTrue(entry["claude_twin"]["plugin_present"], "a blank value is the working directory, for the settings and for the plugins alike")
+
+    def test_the_native_plugin_status_reads_the_registry_of_the_folder_the_client_uses(self):
+        """The same root for the native plugin rows: a padded CLAUDE_CONFIG_DIR names a folder of its own, the one holding both the settings and the registry."""
+        skill = self.native_twin_row(hidden=True)
+        padded = self.tmp / "padded "
+        (self.home / ".claude").rename(padded)
+        registry = padded / "plugins/installed_plugins.json"
+        registry.write_text(registry.read_text().replace(str(self.home / ".claude"), str(padded)))
+        env = {**self.env, "CLAUDE_CONFIG_DIR": str(padded)}
+        self.assertEqual(ss.native_plugin_status(skill, self.home, env)["state"], "ok")
+        entry = ss.inspect(self.build_manifest([skill]), self.home, env)["skills"][0]
+        self.assertEqual((entry["canonical"]["state"], entry["claude_twin"]["state"], entry["pass"]), ("ok", "ok", True))
+
+    def test_a_claude_only_copied_skill_gets_the_twin_policy_too(self):
+        """The local codex review (P2): a row with copy and claude_plugin took the copied-skill branch, which never computed the twin, so with the plugin installed and enabled a copy left on passed with duplicate
+        listings and a copy hidden failed as a mismatch."""
+        skill = self.twin_row()
+        skill.update(copy=True, agents=["claude-code"], codex_enabled=False)
+        (self.home / ".claude/skills/twin-skill").unlink()
+        shutil.copytree(self.home / ".agents/skills/twin-skill", self.home / ".claude/skills/twin-skill")
+        shutil.rmtree(self.home / ".agents/skills/twin-skill")
+        manifest = self.build_manifest([skill])
+        self.write_plugin_state("twin@market")
+        entry = ss.inspect(manifest, self.home, self.env)["skills"][0]
+        self.assertEqual(entry["scope"], "claude-code copy")
+        self.assertEqual(entry["claude_twin"], {"state": "duplicate_listing", "twin": "twin-skill", "plugin_present": True})
+        self.assertFalse(entry["pass"], "left on, beside the plugin's copy")
+        self.write_plugin_state("twin@market", overrides={"twin-skill": "off"})
+        entry = ss.inspect(manifest, self.home, self.env)["skills"][0]
+        self.assertEqual((entry["claude_twin"]["state"], entry["claude_listing"], entry["pass"]), ("ok", {"state": "ok", "actual": "off"}, True))
+        self.write_plugin_state("twin@market", enabled=False, overrides={"twin-skill": "off"})
+        entry = ss.inspect(manifest, self.home, self.env)["skills"][0]
+        self.assertEqual((entry["claude_twin"]["plugin_present"], entry["claude_listing"]["state"], entry["pass"]), (False, "mismatch", False), "hiding the only copy is wrong where there is no plugin")
+
+    def test_the_manifest_loader_checks_the_plugin_fields(self):
+        base = self.make_skill("loader-skill")
+        cases = {
+            "a plugin id without a marketplace": dict(claude_plugin="twin", claude_skill_name="twin:loader-skill"),
+            "a listing name that is not <plugin>:<skill>": dict(claude_plugin="twin@market", claude_skill_name="loader-skill"),
+            "a listing name of another plugin": dict(claude_plugin="twin@market", claude_skill_name="other:loader-skill"),
+            "a copy and a plugin row at once": dict(claude_plugin="twin@market", native_plugin="twin@market", claude_skill_name="twin:loader-skill"),
+            "a bundled twin on a row that is not a plugin row": dict(bundled_twin="loader-skill"),
+            "a bundled twin that is not a name": dict(native_plugin="twin@market", claude_skill_name="twin:loader-skill", bundled_twin="not a name"),
+        }
+        path = self.tmp / "manifest.json"
+        for label, extra in cases.items():
+            with self.subTest(case=label):
+                path.write_text(json.dumps(self.build_manifest([{**base, **extra}])))
+                with self.assertRaises(ss.ManifestError):
+                    ss.load_manifest(path)
+        good = {**base, "claude_plugin": "twin@market", "claude_skill_name": "twin:loader-skill"}
+        path.write_text(json.dumps(self.build_manifest([good])))
+        self.assertEqual(ss.load_manifest(path)["skills"][0]["claude_plugin"], "twin@market")
 
     def make_fake_bin(self, version_output: str, exit_code=0) -> Path:
         script = self.tmp / "fake-skills-bin"

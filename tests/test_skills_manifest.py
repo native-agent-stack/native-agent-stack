@@ -282,6 +282,59 @@ class LlmNativeListingTests(unittest.TestCase):
         self.assertIn("dated decision record", prune_rule)
 
 
+PLUGIN_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]*@[A-Za-z0-9][A-Za-z0-9_.-]*$")
+PRACTICE_REFERENCE = ROOT / ".claude" / "skills" / "claude-native-practice" / "reference"
+
+
+class PluginTwinTests(unittest.TestCase):
+    """CPA-V-07 (plugin skill identity). Claude Code lists a plugin's skill as <plugin>:<skill> and `skillOverrides` does not govern it (docs, skills page: "Plugin skills are not affected by skillOverrides";
+    measured on 2.1.296, docs/decisions/2026-10-13-plugin-skill-identity.md), so a skill that a plugin and another copy both deliver is listed twice. The rows say which, and the template hides neither copy: a
+    fresh host installs one."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.manifest = load_json(MANIFEST_PATH)
+        cls.by_name = {skill["name"]: skill for skill in cls.manifest["skills"]}
+
+    def test_the_two_skills_listed_twice_on_the_first_host_name_their_twin(self):
+        typesafe, api = self.by_name["typesafe-ai"], self.by_name["claude-api"]
+        self.assertEqual((typesafe["claude_plugin"], typesafe["claude_skill_name"]), ("typesafe@typesafe-ai", "typesafe:typesafe-ai"))
+        self.assertEqual((api["native_plugin"], api["claude_skill_name"], api["bundled_twin"]), ("claude-api@anthropic-agent-skills", "claude-api:claude-api", "claude-api"))
+
+    def test_every_row_a_plugin_delivers_names_the_listing_it_gets(self):
+        rows = [skill for skill in self.manifest["skills"] if skill.get("claude_plugin") or skill.get("native_plugin")]
+        self.assertEqual({skill["name"] for skill in rows}, {"typesafe-ai", "claude-api"})
+        for skill in rows:
+            with self.subTest(skill=skill["name"]):
+                plugin = skill.get("claude_plugin") or skill["native_plugin"]
+                self.assertRegex(plugin, PLUGIN_ID)
+                self.assertEqual(skill["claude_skill_name"], f"{plugin.split('@')[0]}:{skill['name']}")
+
+    def test_a_row_has_a_personal_copy_or_is_the_plugin_and_only_a_plugin_row_has_a_bundled_twin(self):
+        for skill in self.manifest["skills"]:
+            with self.subTest(skill=skill["name"]):
+                self.assertFalse(skill.get("claude_plugin") and skill.get("native_plugin"))
+                if skill.get("bundled_twin"):
+                    self.assertTrue(skill.get("native_plugin"))
+
+    def test_the_template_hides_neither_copy_because_a_fresh_host_installs_one(self):
+        overrides = load_json(SETTINGS_TEMPLATE_PATH)["skillOverrides"]
+        self.assertEqual(overrides["typesafe-ai"], "on")
+        self.assertNotIn("claude-api", overrides)
+        self.assertNotIn("typesafe:typesafe-ai", overrides)
+        self.assertNotIn("claude-api:claude-api", overrides)
+
+    def test_the_practice_page_and_its_json_state_the_plugin_exception(self):
+        """The audit's fail-first: the page said skills are governed by skillOverrides and named no exception."""
+        page = (PRACTICE_REFERENCE / "instructions-skills.md").read_text(encoding="utf-8")
+        row = next(line for line in page.splitlines() if line.startswith("- **Notes:** Adjudicated: the native mechanism with the pinned manifest stands"))
+        slot = next(item for item in load_json(PRACTICE_REFERENCE / "slots.json")["slots"] if item["id"] == "skills-library")
+        for text, where in ((row, "the page"), (slot["notes"], "slots.json")):
+            with self.subTest(where=where):
+                for needle in ("Plugin exception", "<plugin>:<skill>", "typesafe:typesafe-ai", "claude-api:claude-api", "changes nothing", "duplicate_listing"):
+                    self.assertIn(needle, text)
+
+
 class ListingBudgetTemplateTests(unittest.TestCase):
     """The listing budgets the two client templates set (2026-09-30 record)."""
 
