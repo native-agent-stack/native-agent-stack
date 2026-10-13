@@ -99,6 +99,26 @@ when a precondition is missing. Only the explicit REST adapter and complete fres
 inputs admit OVERNIGHT. Plain/streamed BOATS configurations still fail before
 credential selection. Delayed `overnight` is never admitted as a fresh feed.
 
+An exit derives the current admitted market window at reservation and pending
+revalidation. The same controller therefore keeps a PRE/RTH/POST reduce-only
+exit path after its original overnight close, including automatic recovery.
+Persisted entry cutoff/expiry and ledger trial/recovery deadlines stay unchanged;
+a refreshed market close does not extend cleanup. CLOSED still refuses. A resting
+adaptive exit checks the port's admission before cancellation or repricing in
+every session, preserving it while the carrier is missing, stale or not tradable.
+
+Asset observations are queued when their SDK read completes, independently of
+a subsequent quote timeout, missing symbol or 429. Each symbol delivers and
+reschedules its own REST cycle; a slow request cannot hold another symbol's
+completed quote or halt carrier behind a gather barrier.
+
+Fixture output digests bind sanitized bytes published under
+`evidence/artifacts/overnight-arming-20261013/`. The existing
+`host_receipts.sanitize` redactor masks home/user/private-content values before
+digesting. Historical public source inputs and the exact peer patch are published
+for the older receipts. A regression rejects a digest whose preimage is outside
+the published file set, including a locally accessible private retained log.
+
 The final carrier
 check at the SDK wire boundary returns to the owner loop through the existing
 `_on_owner` hook. The journal records that boundary's midpoint and clock before

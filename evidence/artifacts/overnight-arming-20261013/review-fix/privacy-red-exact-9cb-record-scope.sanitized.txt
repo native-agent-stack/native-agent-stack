@@ -1,0 +1,37 @@
+Running as unit: run-p528181-i159566276.scope; invocation ID: 4f9cde67a0db4627a75ae1a9478dfad1
+test_absent_preimage_fails_even_when_its_private_bytes_can_be_found (tests.test_overnight_published_preimages.PublishedPreimages.test_absent_preimage_fails_even_when_its_private_bytes_can_be_found) ... ok
+test_all_overnight_receipt_digests_resolve_to_published_bytes (tests.test_overnight_published_preimages.PublishedPreimages.test_all_overnight_receipt_digests_resolve_to_published_bytes) ... FAIL
+test_published_logs_are_sanitized_and_named_inside_publication (tests.test_overnight_published_preimages.PublishedPreimages.test_published_logs_are_sanitized_and_named_inside_publication) ... FAIL
+
+======================================================================
+FAIL: test_all_overnight_receipt_digests_resolve_to_published_bytes (tests.test_overnight_published_preimages.PublishedPreimages.test_all_overnight_receipt_digests_resolve_to_published_bytes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-arming-review-base-9cb7c0d3/tests/test_overnight_published_preimages.py", line 40, in test_all_overnight_receipt_digests_resolve_to_published_bytes
+    self.assertEqual(policy.unpublished_digests(records,files),[],
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     "a published digest has no file inside the published set")
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [('blueprints/us-equities/adaptive-paper/o[1509 chars]56')] != []
+
+First list contains 14 additional elements.
+First extra element 0:
+('blueprints/us-equities/adaptive-paper/overnight-arming-validation.json', '/input_hashes/blueprints/us-equities/adaptive-paper/runner.py')
+
+Diff is 1659 characters long. Set self.maxDiff to None to see it. : a published digest has no file inside the published set
+
+======================================================================
+FAIL: test_published_logs_are_sanitized_and_named_inside_publication (tests.test_overnight_published_preimages.PublishedPreimages.test_published_logs_are_sanitized_and_named_inside_publication)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-arming-review-base-9cb7c0d3/tests/test_overnight_published_preimages.py", line 47, in test_published_logs_are_sanitized_and_named_inside_publication
+    self.assertIn("published_log",run,"output digest names only a private host-local preimage")
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'published_log' not found in {'command_recipe': 'canonical runtime read lock; python -m unittest discover -s tests -t . -p test_adaptive_paper_*.py -q', 'elapsed_seconds': 406.208, 'evidence_class': 'synthetic_native_engine_fixture', 'exit_code': 0, 'input_revision': '965fcb62ac52a3b5c4048ebaae3099a3e7984652', 'output_bytes': 14232, 'output_sha256': '[private digest removed]', 'retained_log': '/var/tmp/ns-seeds-overnight-arming-20261013/logs/restage-native-sealed.log', 'skipped': 0, 'tests_run': 1511} : output digest names only a private host-local preimage
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.026s
+
+FAILED (failures=2)
+BASE_RECORD_SCOPE: only receipt published at exact9cb; no production change
+BASE_EXPECTATION:2 assertion failures/0errors; missing public preimage and private retained locator

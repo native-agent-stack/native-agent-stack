@@ -5247,8 +5247,8 @@
     },
     {
       "path": ".gitleaks.toml",
-      "sha256": "96482136147070cd68f0369d628b20f37103db882edb310724cb74efee46b551",
-      "bytes": 33456
+      "sha256": "dfef1ed7a1be7f8a7146f8a84bf2be050a431b9be3f04aabb9c1981bbdaeec24",
+      "bytes": 34005
     },
     {
       "path": ".gitleaksignore",
@@ -13088,8 +13088,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-overnight.md",
-      "sha256": "cabb282274214861d5eb3172a3b78b141b1bfe9ebeddbf5ff2c6ff38aab063da",
-      "bytes": 17527
+      "sha256": "2d3bd67ef05fcf9ba10f57a3bc97e03d7a10e0096d2489a4dc6fa1b2a3b30d0d",
+      "bytes": 18813
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-paper-exploration.md",
@@ -13408,23 +13408,28 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native_strategy.py",
-      "sha256": "f2472067be553b53535084776725a6b8144079c3024aef2d385b7ca7726d1ff1",
-      "bytes": 88467
+      "sha256": "769b5084a2e0ae9597d650a3a54e18f46074a4ee5371301d4fcadfeb2c70613a",
+      "bytes": 88424
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/overnight-arming-validation.json",
-      "sha256": "8c1ec4c4d2e58542848b87924e6658b4418aa48f8cfb7fb9f8aaa61617dbf566",
-      "bytes": 15781
+      "sha256": "cf2bbe96fc27696ebd92965171da1540514bf1858ff5c048a976546741cff366",
+      "bytes": 17872
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/overnight-guard-pins-validation.json",
-      "sha256": "6c882ece5599fe809046124a6c0b29ce54abdcf8a42cac93f839dd47a97d87a5",
-      "bytes": 4831
+      "sha256": "5da6869beff88ab197d70edc90aa26b4224e151e6da960457229e5a112cfa9a3",
+      "bytes": 5314
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/overnight-review-fix-validation.json",
+      "sha256": "927dbe2779f81b4a63a84dd8a9d7cb03f89004369709ab94fae22f97339289e9",
+      "bytes": 10877
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/overnight.py",
-      "sha256": "f52eabbf188b4cbd5f56ae139a2d916bddd1de142cf7a74eeba4b77cb30f63ba",
-      "bytes": 8212
+      "sha256": "fa3917d5a423bd873dd6f64805bd4755c1b0da6de132911906f7267476a22c1d",
+      "bytes": 8475
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/receipt.json",
@@ -13463,8 +13468,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/recovery.py",
-      "sha256": "ab191814fa124f3f6c77c6e5c27f70b10d794ad733355b8764f0d6f304d4eacf",
-      "bytes": 18930
+      "sha256": "7eb26ce910f35e9e820c8320a7e806c9932ad04eab7093ed2c71a4307de6381a",
+      "bytes": 19174
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/registry.json",
@@ -13483,8 +13488,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "4f35334a9b75cd523c9367f5270abb47ff385f3c9033e6e936db921e033f7077",
-      "bytes": 178364
+      "sha256": "e708e8275c63c8a0cda226c7575916045642fb2c3de3ba393be482a8e92fbdbe",
+      "bytes": 179178
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runtime_lock.py",
@@ -13518,8 +13523,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "4f9d0ed81f9f7c46037dce620c3d064bc0b6e5aa16e37343e09a188f2fb57d53",
-      "bytes": 10370
+      "sha256": "3f835b3bb6b3a394907241a76c02d7be1547c49c4aa480569f56382eab4461eb",
+      "bytes": 10610
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/strategies.py",
@@ -13533,8 +13538,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/transport.py",
-      "sha256": "ddae9b3967fe1dcd3cd39299068b3ca28bcd11196d0ea876f6d324b0b1a104d1",
-      "bytes": 106843
+      "sha256": "76af68629b6792801f2bd07c514e470d77cbd32eb52e666ac7177cdd35469bf3",
+      "bytes": 107161
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/README.md",
@@ -19103,8 +19108,8 @@
     },
     {
       "path": "docs/decisions/2026-10-13-overnight-rest-arming.md",
-      "sha256": "77c0eaaa5afc87af54d5cc09e522f305c84539af63deec9e0987b598b3e27912",
-      "bytes": 8383
+      "sha256": "52c1734c321f31a9968a232919fdbd712eddf3c8a32740beae70d195076722cd",
+      "bytes": 9645
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -48142,6 +48147,196 @@
       "bytes": 2
     },
     {
+      "path": "evidence/artifacts/overnight-arming-20261013/historical/21da37beff26ace2a8445c983b0f8c1bb46640ed667c07117ae3cb01b21a4b8c/runner.py.txt",
+      "sha256": "21da37beff26ace2a8445c983b0f8c1bb46640ed667c07117ae3cb01b21a4b8c",
+      "bytes": 176175
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/historical/44c08b7cd391a090fcb7deb925924692e966169a8d7528d00f2c31f53369542a/source-hashes.json.txt",
+      "sha256": "44c08b7cd391a090fcb7deb925924692e966169a8d7528d00f2c31f53369542a",
+      "bytes": 10127
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/historical/4f35334a9b75cd523c9367f5270abb47ff385f3c9033e6e936db921e033f7077/runner.py.txt",
+      "sha256": "4f35334a9b75cd523c9367f5270abb47ff385f3c9033e6e936db921e033f7077",
+      "bytes": 178364
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/historical/4f9d0ed81f9f7c46037dce620c3d064bc0b6e5aa16e37343e09a188f2fb57d53/source-hashes.json.txt",
+      "sha256": "4f9d0ed81f9f7c46037dce620c3d064bc0b6e5aa16e37343e09a188f2fb57d53",
+      "bytes": 10370
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/historical/77c0eaaa5afc87af54d5cc09e522f305c84539af63deec9e0987b598b3e27912/2026-10-13-overnight-rest-arming.md.txt",
+      "sha256": "77c0eaaa5afc87af54d5cc09e522f305c84539af63deec9e0987b598b3e27912",
+      "bytes": 8383
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/historical/ab191814fa124f3f6c77c6e5c27f70b10d794ad733355b8764f0d6f304d4eacf/recovery.py.txt",
+      "sha256": "ab191814fa124f3f6c77c6e5c27f70b10d794ad733355b8764f0d6f304d4eacf",
+      "bytes": 18930
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/historical/cabb282274214861d5eb3172a3b78b141b1bfe9ebeddbf5ff2c6ff38aab063da/README-overnight.md.txt",
+      "sha256": "cabb282274214861d5eb3172a3b78b141b1bfe9ebeddbf5ff2c6ff38aab063da",
+      "bytes": 17527
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/historical/ddae9b3967fe1dcd3cd39299068b3ca28bcd11196d0ea876f6d324b0b1a104d1/transport.py.txt",
+      "sha256": "ddae9b3967fe1dcd3cd39299068b3ca28bcd11196d0ea876f6d324b0b1a104d1",
+      "bytes": 106843
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/historical/f2472067be553b53535084776725a6b8144079c3024aef2d385b7ca7726d1ff1/native_strategy.py.txt",
+      "sha256": "f2472067be553b53535084776725a6b8144079c3024aef2d385b7ca7726d1ff1",
+      "bytes": 88467
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/historical/f52eabbf188b4cbd5f56ae139a2d916bddd1de142cf7a74eeba4b77cb30f63ba/overnight.py.txt",
+      "sha256": "f52eabbf188b4cbd5f56ae139a2d916bddd1de142cf7a74eeba4b77cb30f63ba",
+      "bytes": 8212
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/logs/addendum-four-green.sanitized.txt",
+      "sha256": "e8ad62cbdd8b1defe60d122a2fff4d60683c6b5e699b7c8989568d8505caab54",
+      "bytes": 786
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/logs/addendum-four-red-e73.sanitized.txt",
+      "sha256": "0b0952e792ae206fa58f215bd32341667f2f19cc19824d39a040684a2fcc2501",
+      "bytes": 4945
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/logs/addendum-runner-ci.sanitized.txt",
+      "sha256": "b41cb80b89169b9224e2dcfb24aa35d53137454a7009794e81e52337631aa04f",
+      "bytes": 1544
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/logs/addendum-runner-native.sanitized.txt",
+      "sha256": "a0bd72fede46b4ae18a5185e144d805c43a0c8cc3023a610d1a0e8459d9951f7",
+      "bytes": 3112
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/logs/f1-f4-ci-final.sanitized.txt",
+      "sha256": "1130c694cc08cf8d043a93e6d0fb11daf6ca9c2ec6ef59600eec9a866754202e",
+      "bytes": 1427
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/logs/f1-f4-ci-related.sanitized.txt",
+      "sha256": "c27c95279ecf0e90994a537c95330793369e16f155012df2dec51023bbc824e9",
+      "bytes": 5296
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/logs/f1-f4-native-final.sanitized.txt",
+      "sha256": "146dfdb26ba78f80e8c88aba236a319f59a85c98565fe2b9a0441585f70c5b4f",
+      "bytes": 5242
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/logs/restage-ci-sealed.sanitized.txt",
+      "sha256": "c994717e384214546c63091236ad315f4bd9267d549043faaed52b0c0a6068a8",
+      "bytes": 9764
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/logs/restage-four-sealed-green.sanitized.txt",
+      "sha256": "db0deeded783fc32530777469151579dc2f4ad5ee38fe62c83a0e7bad4ab64c4",
+      "bytes": 786
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/logs/restage-guards37-ci.sanitized.txt",
+      "sha256": "e2126ef68c26f3def327f8b2669b248ee74a4ddd9885963f8e0fe544524e842f",
+      "bytes": 171
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/logs/restage-native-sealed.sanitized.txt",
+      "sha256": "93414b7bd4ce4cc9d504f2faa0271520eec94b6fae322e423df89751db551d1d",
+      "bytes": 13982
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/logs/restage-shared-ci.sanitized.txt",
+      "sha256": "295979d7d04aa62d37b1de5cf29aa98a366dd5fe439f3e8b611b87ee648a92a1",
+      "bytes": 98
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/logs/restage-shared-native.sanitized.txt",
+      "sha256": "4addca7c838a8568884c5094d803980440a7d9dea7bb6c536c8fb493928b8a57",
+      "bytes": 98
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/probes/peer-order-contract.patch.txt",
+      "sha256": "9bde0dd6631b4d77a8e258a279d79fe84bf1483d5f349b1de06a1ea28eec3fd0",
+      "bytes": 29023
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/probes/prepush-red-probe.py.txt",
+      "sha256": "adfbf11b6518c3ce83c97d37256754c4c837d598be71e34447499176b5361456",
+      "bytes": 3106
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/privacy-red-exact-9cb-record-scope.sanitized.txt",
+      "sha256": "3de81b2bee2c1d8c6690903786d14421de0f52f300be7ff8b3cafdd22e61e25b",
+      "bytes": 3607
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-final-transition-native.sanitized.txt",
+      "sha256": "afa6de9a7f98c369033a645d6771ac5e12932210c5a0e31c9d34d85c39c14bbd",
+      "bytes": 699
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-functional-ci-final.sanitized.txt",
+      "sha256": "6c19cb8a58b9acd6755a421102bca537ce7214c4857db8eab3ce31c07966a93f",
+      "bytes": 5802
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-functional-native-related.sanitized.txt",
+      "sha256": "e5113c3ab785edd6cc9c43f9ef83cd4b9a70602af729c8acabb37d8fb6995a16",
+      "bytes": 25524
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-gitleaks-config-full.sanitized.txt",
+      "sha256": "f42eb49cf942bb53c5290839adbfc4972379e6510b8c10c9f2b939a61092892b",
+      "bytes": 195
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-gitleaks-historical-scopes.sanitized.txt",
+      "sha256": "511e9a0a6df6d3cd079ee745437cf457d1ca4ad598cff63f0b2225b2200b554c",
+      "bytes": 192
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-native-related-repeat.sanitized.txt",
+      "sha256": "dc857324991fbec6c45236bc3fa274bbe3228eca6ccd7dc19d83a964abd7b3a1",
+      "bytes": 11584
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-native-timing-base-alone.sanitized.txt",
+      "sha256": "f5b682fce7ffa4680613ecefb218d1c201881e1350f3adf681498d6f5c4fee12",
+      "bytes": 191
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-native-timing-head-alone.sanitized.txt",
+      "sha256": "370c4a333d3677a76a0b75db8f44644a659eb701fab039bad71a985f459ae7a1",
+      "bytes": 191
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-parent-2658-final-red.sanitized.txt",
+      "sha256": "b380b32b0dc9b5c73eb1685df80aea5d257e51fbe76d308518f2df3be15a118f",
+      "bytes": 19381
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-publication-inventory-final.sanitized.txt",
+      "sha256": "8a0ab1f280f5f50c9972f7a84ce9028801db190658604d2b37bec403488e429b",
+      "bytes": 192
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-published-digest-guard.sanitized.txt",
+      "sha256": "aacebebe98e56ac540ae565489849da91a49c05b0d5bbf34629b694ee8aa96cf",
+      "bytes": 194
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-snapshot-publication-final.sanitized.txt",
+      "sha256": "3289ab1b1b6f01e5e4c36fe9475c98e4e13c267215a39f85f1a32078f3cceeaf",
+      "bytes": 193
+    },
+    {
       "path": "evidence/artifacts/portable-claude-native-qualification-20260921/angle1-upstream.json",
       "sha256": "d9d5d282a45d2b7e39b7cffeddaf73e50f07d24344cd77cff0484a33041cc756",
       "bytes": 80969
@@ -61507,6 +61702,11 @@
       "bytes": 24443
     },
     {
+      "path": "scripts/published_preimages.py",
+      "sha256": "86f47a20e287fc433f901c1c9ee71e1bad58ce22cb42e391e2747b8e08987e59",
+      "bytes": 942
+    },
+    {
       "path": "scripts/receipt_staleness.py",
       "sha256": "2360fcd200cf9a98914367408aca1ec7df44fdadf32c97c2f13df27a2b18a997",
       "bytes": 13408
@@ -62017,6 +62217,11 @@
       "bytes": 28233
     },
     {
+      "path": "tests/test_adaptive_paper_overnight_transition.py",
+      "sha256": "2dbd14ff97713792e6c2d3a501ff214960aaff0577957fb03686a01cdb941003",
+      "bytes": 16350
+    },
+    {
       "path": "tests/test_adaptive_paper_recovery.py",
       "sha256": "ca1bb1dabb164fcb67ab249197192b78e376d4f03935b3e2b9d5a8504d5926c6",
       "bytes": 49890
@@ -62513,8 +62718,8 @@
     },
     {
       "path": "tests/test_gitleaks_config.py",
-      "sha256": "b668888f4ddafd075e144d9c6f483150d8588a138c2545c4d91c8249937e84f7",
-      "bytes": 91041
+      "sha256": "3802dff4c595d1d2531c58e43233728d1f71241fa3ee4852b8cf767e39719314",
+      "bytes": 92390
     },
     {
       "path": "tests/test_gitleaks_guarded_macos.py",
@@ -63005,6 +63210,11 @@
       "path": "tests/test_overfitting_riskl_parity.py",
       "sha256": "ed2dbdc9108109a50da5ffca6561ef0a7695f36fef4784d754cc2420f40e9d94",
       "bytes": 15821
+    },
+    {
+      "path": "tests/test_overnight_published_preimages.py",
+      "sha256": "920f59dcd3b84f3be965cebd784d17f11111bd51103172171ba1645ca5e062c7",
+      "bytes": 4654
     },
     {
       "path": "tests/test_paired_runs_results.py",

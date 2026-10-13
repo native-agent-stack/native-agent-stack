@@ -1,0 +1,92 @@
+~/projects/us-equities-runtime/.venv/lib/python3.12/site-packages/websockets/legacy/__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
+  warnings.warn(  # deprecated in 14.0 - 2024-11-09
+adaptive-paper metrics exporter listening on http://127.0.0.1:56081/metrics (read-only; ledger=/var/tmp/ns-seeds-overnight-arming-20261013/tmpuvla04vy/ledger.sqlite3; file_sd=/var/tmp/ns-seeds-overnight-arming-20261013/tmpuvla04vy/config/adaptive-paper-targets.json)
+adaptive-paper metrics exporter 127.0.0.1:56081 deregistered
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpevkzl_r1'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmp6nod02we'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpmhpnwnsh'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmptdk614ct'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpfrjvs9z7'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpkaqnbfkz'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmp55f5q24u'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmp7vqcp4wh'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmp03oax7je'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpwzsglhu9'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpoi5a7j6i'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmppfr_i3bw'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmp0p03oyfm'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpk3_mgvdl'>
+  _warnings.warn(warn_message, ResourceWarning)
+[1m2026-10-13T06:58:37.943392829Z[0m [1;31m[ERROR] ADAPTIVE-001.nautilus_live::node: Error disconnecting clients: Failed to disconnect data clients: Failed to disconnect data clients: RuntimeError: port.stop() itself fails; failed to disconnect execution clients: Failed to disconnect execution clients: RuntimeError: port.stop() itself fails[0m
+[1m2026-10-13T06:58:47.943425970Z[0m [1;31m[ERROR] ADAPTIVE-001.nautilus_live::node: Timed out (10s) waiting for engines to disconnect
+DataEngine.check_disconnected() == false
+ExecEngine.check_disconnected() == false[0m
+[1m2026-10-13T06:58:47.945244838Z[0m [1;31m[ERROR] ADAPTIVE-001.nautilus_live::python::node: Hosted run failed: Failed to disconnect data clients: Failed to disconnect data clients: RuntimeError: port.stop() itself fails; failed to disconnect execution clients: Failed to disconnect execution clients: RuntimeError: port.stop() itself fails; failed while awaiting engine disconnection: disconnect readiness timeout while waiting for engine disconnections[0m
+/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/blueprints/us-equities/adaptive-paper/transport.py:1135: DeprecationWarning: websockets.exceptions.RedirectHandshake is deprecated
+  from websockets.exceptions import RedirectHandshake
+refused: canonical runtime lock unavailable
+refused: canonical runtime lock unavailable
+/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/blueprints/us-equities/adaptive-paper/transport.py:1135: DeprecationWarning: websockets.exceptions.RedirectHandshake is deprecated
+  from websockets.exceptions import RedirectHandshake
+Executing <Task pending name='Task-1895' coro=<AsyncTransport.test_b2_fallback_never_rolls_back_or_freezes_either_arrival_order() running at /var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_transport.py:1051> wait_for=<Future pending cb=[Task.task_wakeup()] created at ~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py:449> cb=[_run_until_complete_cb() at ~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py:182] created at ~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py:100> took 0.109 seconds
+Executing <Task pending name='Task-2063' coro=<AsyncTransport.test_other_422_stays_ambiguous() running at /var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_transport.py:837> wait_for=<Future pending cb=[_chain_future.<locals>._call_check_cancel() at ~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/futures.py:387, Task.task_wakeup()] created at ~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py:449> cb=[_run_until_complete_cb() at ~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py:182] created at ~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py:100> took 0.126 seconds
+Executing <Task pending name='Task-2256' coro=<AsyncTransport.test_stream_fill_time_reaches_ledger_losslessly() running at /var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_transport.py:1001> wait_for=<Future pending cb=[Task.task_wakeup()] created at ~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py:449> cb=[_run_until_complete_cb() at ~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py:182] created at ~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py:100> took 0.137 seconds
+/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_transport.py:1466: DeprecationWarning: websockets.exceptions.RedirectHandshake is deprecated
+  from websockets.exceptions import RedirectHandshake
+----------------------------------------------------------------------
+Ran 1511 tests in 406.208s
+
+OK
+
+real mutation-kill report (subprocess-executed, pristine-baseline-verified):
+  allow_ancestor_writable_without_sticky: KILLED (test_ids=['tests.test_adaptive_paper_credential_race.AncestorRenameResistance.test_attacker_writable_non_sticky_ancestor_is_rejected_even_when_the_parent_is_fine'], returncode=1, diff_lines=11)
+  disable_hardlink_check: KILLED (test_ids=['tests.test_adaptive_paper_runner.CredentialFilePermissions.test_hard_link_is_rejected'], returncode=1, diff_lines=11)
+  disable_o_nofollow: KILLED (test_ids=['tests.test_adaptive_market_research.MarketResearchCredentialFilePermissions.test_symlink_is_rejected'], returncode=1, diff_lines=22)
+  disable_o_nonblock: KILLED (test_ids=['tests.test_adaptive_paper_runner.CredentialFilePermissions.test_fifo_is_rejected_and_does_not_hang'], returncode=1, diff_lines=11)
+  disable_parent_directory_check: KILLED (test_ids=['tests.test_adaptive_paper_runner.CredentialFilePermissions.test_world_writable_parent_directory_is_rejected'], returncode=1, diff_lines=11)
+  disable_root_ancestor_check: KILLED (test_ids=['tests.test_adaptive_paper_credential_race.RootDirectoryOwnershipIsChecked.test_foreign_owned_world_writable_root_is_rejected'], returncode=1, diff_lines=19)
+  disable_runner_size_check: KILLED (test_ids=['tests.test_adaptive_paper_runner.CredentialFilePermissions.test_oversized_file_is_rejected_not_silently_truncated_and_accepted'], returncode=1, diff_lines=11)
+  disable_worktree_check: KILLED (test_ids=['tests.test_adaptive_paper_runner.CredentialFilePermissions.test_inside_git_worktree_is_rejected'], returncode=1, diff_lines=10)
+  double_close_on_bufferedreader_failure: KILLED (test_ids=['tests.test_adaptive_paper_credential_race.FdOpenFailureCleanup.test_wrap_failure_does_not_double_close_a_reused_fd'], returncode=1, diff_lines=9)
+  extra_close_after_raw_close: KILLED (test_ids=['tests.test_adaptive_paper_credential_race.FdOpenFailureCleanup.test_wrap_failure_does_not_double_close_a_reused_fd'], returncode=1, diff_lines=8)
+  narrow_symlink_component_exception_handler: KILLED (test_ids=['tests.test_adaptive_paper_credential_race.NoPathLeakInErrors.test_surrogate_in_an_ancestor_directory_component_never_leaks'], returncode=1, diff_lines=11)
+  normalize_dotdot_lexically: KILLED (test_ids=['tests.test_adaptive_paper_credential_race.DotDotIsRejected.test_dotdot_through_a_symlinked_component_is_refused_not_normalized_away'], returncode=1, diff_lines=13)
+  read_whole_file_market_research: KILLED (test_ids=['tests.test_adaptive_paper_credential_race.BoundedReadIsActuallyBounded.test_market_research_reads_at_most_cap_plus_one'], returncode=1, diff_lines=11)
+  revert_strict_parent_rule: KILLED (test_ids=['tests.test_adaptive_paper_credential_race.ImmediateParentStrictRule.test_sticky_1777_parent_is_refused'], returncode=1, diff_lines=28)
+  skip_fstat_owner_identity: KILLED (test_ids=['tests.test_adaptive_paper_credential_race.ForeignFileOwnerAloneIsRejected.test_foreign_file_owner_is_rejected_with_a_correctly_owned_parent'], returncode=1, diff_lines=11)
+  skip_fstat_use_prestat: KILLED (test_ids=['tests.test_adaptive_paper_credential_race.FstatNotPathnameStat.test_rejection_uses_the_fds_own_metadata_not_a_pathname_restat'], returncode=1, diff_lines=24)
+  worktree_final_path_by_name: KILLED (test_ids=['tests.test_adaptive_paper_credential_race.HookInjectedRaces.test_worktree_marker_added_just_before_ancestor_open_is_caught_by_the_per_fd_check'], returncode=1, diff_lines=11)
+{"status": "completed_no_signals", "flat": true, "evidence_class": "exploratory"}
+{"status": "completed_no_signals", "flat": true, "native_fill_events": 0}
+{"status": "not_started", "stage": "validation", "reason": "scan_stale", "orders_submitted": 0}
+{"status": "not_started", "stage": "validation", "reason": "scan_empty", "orders_submitted": 0}
+{"status": "not_started", "stage": "validation", "reason": "scan_from_future", "orders_submitted": 0}
+overnight_guard_mutations 37 killed_by_assertions 118 secondary_errors 2
+{"status": "not_started", "reason": "promotion_gate_failed_check", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_missing", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_missing", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_failed", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_mismatch", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_empty", "orders_submitted": 0}
+{"status": "not_started", "reason": "account_not_ready", "orders_submitted": 0}
+{"status": "ready", "orders_submitted": 0}
+{"status": "ready", "orders_submitted": 0}
+{"status": "not_started", "stage": "order_contract", "reason": "order_contract_boundary_inactive:invalid_sentinel_accepted", "orders_submitted": 0}
+{"status": "not_started", "stage": "order_contract", "reason": "order_contract_boundary_inactive:invalid_sentinel_accepted", "orders_submitted": 0}
+{"status": "not_started", "stage": "order_contract", "reason": "order_contract_boundary_inactive:invalid_sentinel_accepted", "orders_submitted": 0}
+{"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}
+{"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}
+{"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}

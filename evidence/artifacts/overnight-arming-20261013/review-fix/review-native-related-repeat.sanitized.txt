@@ -1,0 +1,94 @@
+Running as unit: run-p692969-i159731044.scope; invocation ID: 1b484ed2bd854a58a51c59aa026f43ff
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpz8siqcfw'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmp_zz_merc'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmp5_fncjvu'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmp4h9f9k__'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpxe5qy3jp'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmp83oslfah'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmp7jw7mgm3'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpf9bdwdsc'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmp7ttrofk2'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmplfz0gs_s'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmprhrns9bu'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmp77aw59_9'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpxmfidtei'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpvh6fzj1f'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.venv/lib/python3.12/site-packages/websockets/legacy/__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
+  warnings.warn(  # deprecated in 14.0 - 2024-11-09
+/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/blueprints/us-equities/adaptive-paper/transport.py:1135: DeprecationWarning: websockets.exceptions.RedirectHandshake is deprecated
+  from websockets.exceptions import RedirectHandshake
+[1m2026-10-13T16:26:19.400430708Z[0m [1;31m[ERROR] ADAPTIVE-001.nautilus_live::node: Error disconnecting clients: Failed to disconnect data clients: Failed to disconnect data clients: RuntimeError: port.stop() itself fails; failed to disconnect execution clients: Failed to disconnect execution clients: RuntimeError: port.stop() itself fails[0m
+[1m2026-10-13T16:26:29.401395337Z[0m [1;31m[ERROR] ADAPTIVE-001.nautilus_live::node: Timed out (10s) waiting for engines to disconnect
+DataEngine.check_disconnected() == false
+ExecEngine.check_disconnected() == false[0m
+[1m2026-10-13T16:26:29.402447781Z[0m [1;31m[ERROR] ADAPTIVE-001.nautilus_live::python::node: Hosted run failed: Failed to disconnect data clients: Failed to disconnect data clients: RuntimeError: port.stop() itself fails; failed to disconnect execution clients: Failed to disconnect execution clients: RuntimeError: port.stop() itself fails; failed while awaiting engine disconnection: disconnect readiness timeout while waiting for engine disconnections[0m
+/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/blueprints/us-equities/adaptive-paper/transport.py:1135: DeprecationWarning: websockets.exceptions.RedirectHandshake is deprecated
+  from websockets.exceptions import RedirectHandshake
+/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/blueprints/us-equities/adaptive-paper/transport.py:1135: DeprecationWarning: websockets.exceptions.RedirectHandshake is deprecated
+  from websockets.exceptions import RedirectHandshake
+Executing <Task pending name='Task-1405' coro=<AsyncTransport.test_b2_fallback_never_rolls_back_or_freezes_either_arrival_order() running at /var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_transport.py:1051> wait_for=<Future pending cb=[Task.task_wakeup()] created at ~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py:449> cb=[_run_until_complete_cb() at ~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py:182] created at ~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py:100> took 0.297 seconds
+Executing <Task pending name='Task-1405' coro=<AsyncTransport.test_b2_fallback_never_rolls_back_or_freezes_either_arrival_order() running at /var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_transport.py:1051> wait_for=<Future pending cb=[Task.task_wakeup()] created at ~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py:449> cb=[_run_until_complete_cb() at ~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py:182] created at ~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py:100> took 0.277 seconds
+Executing <Task pending name='Task-1766' coro=<AsyncTransport.test_stream_fill_time_reaches_ledger_losslessly() running at /var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_transport.py:1001> wait_for=<Future pending cb=[Task.task_wakeup()] created at ~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py:449> cb=[_run_until_complete_cb() at ~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py:182] created at ~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py:100> took 0.306 seconds
+/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_transport.py:1466: DeprecationWarning: websockets.exceptions.RedirectHandshake is deprecated
+  from websockets.exceptions import RedirectHandshake
+----------------------------------------------------------------------
+Ran 547 tests in 292.515s
+
+OK
+transition_mutant reserve-current-close assertion_failures 1 errors 0
+transition_mutant pending-current-close assertion_failures 1 errors 0
+transition_mutant recovery-current-close assertion_failures 1 errors 0
+transition_mutant residual-reprice-admission assertion_failures 9 errors 0
+transition_mutant independent-asset-delivery assertion_failures 2 errors 0
+transition_mutant independent-quote-delivery assertion_failures 1 errors 0
+transition_mutant per-symbol-reschedule assertion_failures 1 errors 0
+followup_mutant M2-reserve assertion_failures 1 errors 0
+followup_mutant M3-wire assertion_failures 1 errors 0
+followup_mutant M4-admission assertion_failures 1 errors 0
+followup_mutant M6-emitter assertion_failures 1 errors 0
+followup_mutant M8-active assertion_failures 1 errors 0
+followup_mutant M8-tradable assertion_failures 1 errors 0
+followup_mutant M9-halt assertion_failures 1 errors 0
+followup_mutant M10-window assertion_failures 1 errors 0
+followup_mutant M11-normalize assertion_failures 1 errors 0
+followup_mutant M15-preflight assertion_failures 3 errors 0
+followup_mutant F1-adaptive-direct assertion_failures 1 errors 0
+followup_mutant F1-adaptive-replacement assertion_failures 1 errors 0
+followup_mutant F3-admission-side assertion_failures 1 errors 0
+followup_mutant F3-admission-owned assertion_failures 1 errors 0
+followup_mutant F3-admission-calendar assertion_failures 1 errors 0
+followup_mutant M2-reserve+M3-wire assertion_failures 2 errors 0
+followup_mutant M2-reserve+M4-admission assertion_failures 2 errors 0
+followup_mutant M3-wire+M4-admission assertion_failures 2 errors 0
+followup_mutant M2-reserve+M3-wire+M4-admission assertion_failures 3 errors 0
+followup_mutants_killed 19 survived 0
+overnight_guard_mutations 37 killed_by_assertions 118 secondary_errors 2
+{"status": "not_started", "reason": "promotion_gate_failed_check", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_missing", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_missing", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_failed", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_mismatch", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_empty", "orders_submitted": 0}
+{"status": "not_started", "reason": "account_not_ready", "orders_submitted": 0}
+{"status": "ready", "orders_submitted": 0}
+{"status": "ready", "orders_submitted": 0}
+{"status": "not_started", "stage": "order_contract", "reason": "order_contract_boundary_inactive:invalid_sentinel_accepted", "orders_submitted": 0}
+{"status": "not_started", "stage": "order_contract", "reason": "order_contract_boundary_inactive:invalid_sentinel_accepted", "orders_submitted": 0}
+{"status": "not_started", "stage": "order_contract", "reason": "order_contract_boundary_inactive:invalid_sentinel_accepted", "orders_submitted": 0}
+{"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}
+{"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}
+{"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}

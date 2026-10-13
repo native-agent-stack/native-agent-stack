@@ -1,0 +1,19 @@
+----------------------------------------------------------------------
+Ran 202 tests in 1.860s
+
+OK (skipped=66)
+{"status": "not_started", "reason": "promotion_gate_failed_check", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_missing", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_missing", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_failed", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_mismatch", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_empty", "orders_submitted": 0}
+{"status": "not_started", "reason": "account_not_ready", "orders_submitted": 0}
+{"status": "ready", "orders_submitted": 0}
+{"status": "ready", "orders_submitted": 0}
+{"status": "not_started", "stage": "order_contract", "reason": "order_contract_boundary_inactive:invalid_sentinel_accepted", "orders_submitted": 0}
+{"status": "not_started", "stage": "order_contract", "reason": "order_contract_boundary_inactive:invalid_sentinel_accepted", "orders_submitted": 0}
+{"status": "not_started", "stage": "order_contract", "reason": "order_contract_boundary_inactive:invalid_sentinel_accepted", "orders_submitted": 0}
+{"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}
+{"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}
+{"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}

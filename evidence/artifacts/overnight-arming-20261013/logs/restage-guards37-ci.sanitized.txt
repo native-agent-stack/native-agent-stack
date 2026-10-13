@@ -1,0 +1,5 @@
+----------------------------------------------------------------------
+Ran 70 tests in 4.682s
+
+OK
+overnight_guard_mutations 37 killed_by_assertions 118 secondary_errors 2

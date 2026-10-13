@@ -1,0 +1,235 @@
+Running as unit: run-p774127-i159812208.scope; invocation ID: 3b0ec6d18b60404294201a9fedc36746
+======================================================================
+FAIL: test_healthy_symbol_delivered_before_other_symbol_finishes (tests.test_adaptive_paper_overnight_transition.OvernightTransition.test_healthy_symbol_delivered_before_other_symbol_finishes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-arming-review-parent-2658e7b8/tests/test_adaptive_paper_overnight_transition.py", line 208, in test_healthy_symbol_delivered_before_other_symbol_finishes
+    asyncio.run(exercise())
+  File "~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-arming-review-parent-2658e7b8/tests/test_adaptive_paper_overnight_transition.py", line 201, in exercise
+    self.assertTrue(healthy.is_set(),"completed healthy observation held behind slow symbol")
+AssertionError: False is not true : completed healthy observation held behind slow symbol
+
+======================================================================
+FAIL: test_pending_exit_revalidates_at_boundary_on_original_controller (tests.test_adaptive_paper_overnight_transition.OvernightTransition.test_pending_exit_revalidates_at_boundary_on_original_controller)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-arming-review-parent-2658e7b8/tests/test_adaptive_paper_overnight_transition.py", line 60, in test_pending_exit_revalidates_at_boundary_on_original_controller
+    asyncio.run(c.before_request("submit",client_id="pin-exit"))
+  File "~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-arming-review-parent-2658e7b8/blueprints/us-equities/adaptive-paper/runner.py", line 957, in before_request
+    self.ledger.validate_pending(client_id, quote=self.quotes[intent.symbol], now=self.clock(),
+  File "/var/tmp/native-agent-stack-ns-seeds-arming-review-parent-2658e7b8/blueprints/us-equities/adaptive-paper/safety.py", line 1116, in validate_pending
+    raise SafetyError("outside_allowed_session")
+safety.SafetyError: outside_allowed_session
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-arming-review-parent-2658e7b8/tests/test_adaptive_paper_overnight_transition.py", line 62, in test_pending_exit_revalidates_at_boundary_on_original_controller
+    self.fail("pending residual refused at crossing: "+str(error))
+AssertionError: pending residual refused at crossing: outside_allowed_session
+
+======================================================================
+FAIL: test_production_poller_reschedules_fast_symbol_while_slow_request_waits (tests.test_adaptive_paper_overnight_transition.OvernightTransition.test_production_poller_reschedules_fast_symbol_while_slow_request_waits)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-arming-review-parent-2658e7b8/tests/test_adaptive_paper_overnight_transition.py", line 239, in test_production_poller_reschedules_fast_symbol_while_slow_request_waits
+    asyncio.run(exercise())
+  File "~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-arming-review-parent-2658e7b8/tests/test_adaptive_paper_overnight_transition.py", line 232, in exercise
+    self.assertTrue(twice.is_set(),"healthy symbol cannot repoll while another SDK read waits")
+AssertionError: False is not true : healthy symbol cannot repoll while another SDK read waits
+
+======================================================================
+FAIL: test_residual_admission_is_checked_before_resting_exit_reprice (tests.test_adaptive_paper_overnight_transition.OvernightTransition.test_residual_admission_is_checked_before_resting_exit_reprice) (session='PRE', reason='overnight_status_stale')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-arming-review-parent-2658e7b8/tests/test_adaptive_paper_overnight_transition.py", line 134, in test_residual_admission_is_checked_before_resting_exit_reprice
+    self.assertFalse(decision.submit)
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_residual_admission_is_checked_before_resting_exit_reprice (tests.test_adaptive_paper_overnight_transition.OvernightTransition.test_residual_admission_is_checked_before_resting_exit_reprice) (session='PRE', reason='overnight_status_unknown')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-arming-review-parent-2658e7b8/tests/test_adaptive_paper_overnight_transition.py", line 134, in test_residual_admission_is_checked_before_resting_exit_reprice
+    self.assertFalse(decision.submit)
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_residual_admission_is_checked_before_resting_exit_reprice (tests.test_adaptive_paper_overnight_transition.OvernightTransition.test_residual_admission_is_checked_before_resting_exit_reprice) (session='PRE', reason='exit_asset_not_tradable')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-arming-review-parent-2658e7b8/tests/test_adaptive_paper_overnight_transition.py", line 134, in test_residual_admission_is_checked_before_resting_exit_reprice
+    self.assertFalse(decision.submit)
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_residual_admission_is_checked_before_resting_exit_reprice (tests.test_adaptive_paper_overnight_transition.OvernightTransition.test_residual_admission_is_checked_before_resting_exit_reprice) (session='RTH', reason='overnight_status_stale')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-arming-review-parent-2658e7b8/tests/test_adaptive_paper_overnight_transition.py", line 134, in test_residual_admission_is_checked_before_resting_exit_reprice
+    self.assertFalse(decision.submit)
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_residual_admission_is_checked_before_resting_exit_reprice (tests.test_adaptive_paper_overnight_transition.OvernightTransition.test_residual_admission_is_checked_before_resting_exit_reprice) (session='RTH', reason='overnight_status_unknown')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-arming-review-parent-2658e7b8/tests/test_adaptive_paper_overnight_transition.py", line 134, in test_residual_admission_is_checked_before_resting_exit_reprice
+    self.assertFalse(decision.submit)
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_residual_admission_is_checked_before_resting_exit_reprice (tests.test_adaptive_paper_overnight_transition.OvernightTransition.test_residual_admission_is_checked_before_resting_exit_reprice) (session='RTH', reason='exit_asset_not_tradable')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-arming-review-parent-2658e7b8/tests/test_adaptive_paper_overnight_transition.py", line 134, in test_residual_admission_is_checked_before_resting_exit_reprice
+    self.assertFalse(decision.submit)
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_residual_admission_is_checked_before_resting_exit_reprice (tests.test_adaptive_paper_overnight_transition.OvernightTransition.test_residual_admission_is_checked_before_resting_exit_reprice) (session='POST', reason='overnight_status_stale')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-arming-review-parent-2658e7b8/tests/test_adaptive_paper_overnight_transition.py", line 134, in test_residual_admission_is_checked_before_resting_exit_reprice
+    self.assertFalse(decision.submit)
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_residual_admission_is_checked_before_resting_exit_reprice (tests.test_adaptive_paper_overnight_transition.OvernightTransition.test_residual_admission_is_checked_before_resting_exit_reprice) (session='POST', reason='overnight_status_unknown')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-arming-review-parent-2658e7b8/tests/test_adaptive_paper_overnight_transition.py", line 134, in test_residual_admission_is_checked_before_resting_exit_reprice
+    self.assertFalse(decision.submit)
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_residual_admission_is_checked_before_resting_exit_reprice (tests.test_adaptive_paper_overnight_transition.OvernightTransition.test_residual_admission_is_checked_before_resting_exit_reprice) (session='POST', reason='exit_asset_not_tradable')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-arming-review-parent-2658e7b8/tests/test_adaptive_paper_overnight_transition.py", line 134, in test_residual_admission_is_checked_before_resting_exit_reprice
+    self.assertFalse(decision.submit)
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_same_controller_refreshes_before_automatic_recovery (tests.test_adaptive_paper_overnight_transition.OvernightTransition.test_same_controller_refreshes_before_automatic_recovery)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-arming-review-parent-2658e7b8/tests/test_adaptive_paper_overnight_transition.py", line 113, in test_same_controller_refreshes_before_automatic_recovery
+    self.assertEqual((result["status"],result["flat"]),("passed",True),result["errors"])
+AssertionError: Tuples differ: ('needs_attention', False) != ('passed', True)
+
+First differing element 0:
+'needs_attention'
+'passed'
+
+- ('needs_attention', False)
++ ('passed', True) : ['outside_allowed_session']
+
+======================================================================
+FAIL: test_same_controller_reserves_pre_exit_without_manual_close (tests.test_adaptive_paper_overnight_transition.OvernightTransition.test_same_controller_reserves_pre_exit_without_manual_close)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-arming-review-parent-2658e7b8/tests/test_adaptive_paper_overnight_transition.py", line 43, in test_same_controller_reserves_pre_exit_without_manual_close
+    c.before_submit(self.order())
+  File "/var/tmp/native-agent-stack-ns-seeds-arming-review-parent-2658e7b8/blueprints/us-equities/adaptive-paper/runner.py", line 1018, in before_submit
+    raise NativeOrderRejected(str(exc)) from None
+NativeOrderRejected: outside_allowed_session
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-arming-review-parent-2658e7b8/tests/test_adaptive_paper_overnight_transition.py", line 45, in test_same_controller_reserves_pre_exit_without_manual_close
+    self.fail("same-controller residual refused: "+str(error))
+AssertionError: same-controller residual refused: outside_allowed_session
+
+======================================================================
+FAIL: test_successful_halt_delivered_even_when_quote_fails_or_rate_limits (tests.test_adaptive_paper_overnight_transition.OvernightTransition.test_successful_halt_delivered_even_when_quote_fails_or_rate_limits) (rate_limited=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-arming-review-parent-2658e7b8/tests/test_adaptive_paper_overnight_transition.py", line 177, in test_successful_halt_delivered_even_when_quote_fails_or_rate_limits
+    asyncio.run(exercise(rate))
+  File "~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-arming-review-parent-2658e7b8/tests/test_adaptive_paper_overnight_transition.py", line 159, in exercise
+    self.assertTrue(c.is_halted("SPY"))
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_successful_halt_delivered_even_when_quote_fails_or_rate_limits (tests.test_adaptive_paper_overnight_transition.OvernightTransition.test_successful_halt_delivered_even_when_quote_fails_or_rate_limits) (rate_limited=True)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-arming-review-parent-2658e7b8/tests/test_adaptive_paper_overnight_transition.py", line 177, in test_successful_halt_delivered_even_when_quote_fails_or_rate_limits
+    asyncio.run(exercise(rate))
+  File "~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-arming-review-parent-2658e7b8/tests/test_adaptive_paper_overnight_transition.py", line 159, in exercise
+    self.assertTrue(c.is_halted("SPY"))
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_all_overnight_receipt_digests_resolve_to_published_bytes (tests.test_overnight_published_preimages.PublishedPreimages.test_all_overnight_receipt_digests_resolve_to_published_bytes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-arming-review-parent-2658e7b8/tests/test_overnight_published_preimages.py", line 42, in test_all_overnight_receipt_digests_resolve_to_published_bytes
+    self.assertEqual(policy.unpublished_digests(records,files),[],
+AssertionError: Lists differ: [('blueprints/us-equities/adaptive-paper/o[1824 chars]56')] != []
+
+First list contains 17 additional elements.
+First extra element 0:
+('blueprints/us-equities/adaptive-paper/overnight-arming-validation.json', '/input_hashes/blueprints/us-equities/adaptive-paper/runner.py')
+
+Diff is 1995 characters long. Set self.maxDiff to None to see it. : a published digest has no file inside the published set
+
+======================================================================
+FAIL: test_published_logs_are_sanitized_and_named_inside_publication (tests.test_overnight_published_preimages.PublishedPreimages.test_published_logs_are_sanitized_and_named_inside_publication)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-arming-review-parent-2658e7b8/tests/test_overnight_published_preimages.py", line 49, in test_published_logs_are_sanitized_and_named_inside_publication
+    self.assertIn("published_log",run,"output digest names only a private host-local preimage")
+AssertionError: 'published_log' not found in {'command_recipe': 'canonical runtime read lock; python -m unittest discover -s tests -t . -p test_adaptive_paper_*.py -q', 'elapsed_seconds': 406.208, 'evidence_class': 'synthetic_native_engine_fixture', 'exit_code': 0, 'input_revision': '965fcb62ac52a3b5c4048ebaae3099a3e7984652', 'output_bytes': 14232, 'output_sha256': '[private digest removed]', 'retained_log': '/var/tmp/ns-seeds-overnight-arming-20261013/logs/restage-native-sealed.log', 'skipped': 0, 'tests_run': 1511} : output digest names only a private host-local preimage
+
+----------------------------------------------------------------------
+Ran 10 tests in 3.391s
+
+FAILED (failures=18)

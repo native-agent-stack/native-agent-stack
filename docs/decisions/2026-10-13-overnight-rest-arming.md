@@ -92,6 +92,25 @@ adapter; other transports keep their DAY-only contract.
 
 ## Evidence and remaining acceptance
 
+The 2026-10-13 cross-family execution review superseded the earlier isolated
+PRE-exit and host-local-log conclusions with reproduced same-controller and
+private-preimage defects. The correction derives a SELL's current admitted
+calendar close at reservation and pending revalidation and refreshes the reused
+controller before recovery. It keeps immutable carry/expiry and cleanup budgets.
+Residual admission precedes adaptive exit cancellation/repricing in every
+session. Asset status is delivered immediately after its SDK read even when the
+quote fails, and each symbol polls independently. These mechanisms still use
+the pinned SDK/calendar and the engine's reduce-only flag cited above.
+
+The privacy correction adopts `scripts/host_receipts.py:sanitize` and publishes
+sanitized log preimages before computing output hashes, following the repository's
+#161 published-byte rule and the CC's 16:02Z ruling. Both receipt registries bind
+those published bytes; historical public source inputs stay separately available.
+A generic receipt regression rejects a digest whose preimage is absent from the
+published set, including an a0491701-style private-preimage publication. No
+history rewrite is performed; the fast-forward correction and squash keep main
+clean.
+
 Guard evidence is synthetic, using hermetic protocol fixtures and temporary
 SQLite journals, including close/reopen and the halted/unknown cutoff fixture.
 The committed native dispatch method also runs in CI against protocol fixtures

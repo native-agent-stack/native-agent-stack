@@ -209,6 +209,8 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
     if before_request is not None:
         port.before_request = recovery_request
     try:
+        if callable(getattr(controller, "refresh_exit_session", None)):
+            controller.refresh_exit_session()
         ledger.begin_recovery(controller.clock())
         for intent in ledger.intents():
             if (intent.status == "reserved" and not intent.submit_attempted
@@ -244,6 +246,8 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
         # exit still ends recovery, including the transport's pre-wire refusal (not_sent) of
         # a quote that went stale before the POST.
         while ledger.positions():
+            if callable(getattr(controller, "refresh_exit_session", None)):
+                controller.refresh_exit_session()
             guard_observation_integrity()
             if len(submitted) >= 100:
                 raise SafetyError("recovery_order_bound_reached")

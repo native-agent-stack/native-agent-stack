@@ -1,0 +1,55 @@
+"""Run current regressions against e73 production bytes without editing sources."""
+import ast
+from contextlib import ExitStack
+from pathlib import Path
+import subprocess
+import sys
+import unittest
+from unittest.mock import patch
+
+ROOT = Path('/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013')
+sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / 'blueprints/us-equities/adaptive-paper'))
+import runner, overnight, transport, native_adapter
+from runtime_lock import runtime_read_lock
+
+def original(file):
+    return subprocess.check_output(['git', 'show', 'e73b42f2:blueprints/us-equities/adaptive-paper/' + file],
+                                   cwd=ROOT, text=True)
+
+def definition(file, name, scope):
+    tree = ast.parse(original(file))
+    parts = name.split('.')
+    nodes = tree.body
+    for part in parts:
+        node = next(n for n in nodes if isinstance(n, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)) and n.name == part)
+        nodes = node.body
+    local = dict(scope)
+    exec(compile(ast.fix_missing_locations(ast.Module(body=[node], type_ignores=[])), '<e73:' + name + '>', 'exec'), local)
+    return local[parts[-1]]
+
+with runtime_read_lock(), ExitStack() as stack:
+    for module, file, name, owner in (
+        (overnight, 'overnight.py', 'overnight_dispatch_refusal', overnight),
+        (runner, 'runner.py', '_controller_session', runner),
+        (runner, 'runner.py', 'Controller._check_overnight_admission', runner.Controller),
+        (runner, 'runner.py', 'Controller._check_overnight_status', runner.Controller),
+        (runner, 'runner.py', 'Controller.before_submit', runner.Controller),
+        (transport, 'transport.py', 'AlpacaPaperTransport._wire_guard', transport.AlpacaPaperTransport),
+        (native_adapter, 'native_adapter.py', 'AlpacaExecutionClient._submit_order', native_adapter.AlpacaExecutionClient),
+    ):
+        stack.enter_context(patch.object(owner, name.split('.')[-1], definition(file, name, module.__dict__)))
+    old_read = Path.read_text
+    old_native = original('native_adapter.py')
+    def read(path, *args, **kwargs):
+        return old_native if path == ROOT / 'blueprints/us-equities/adaptive-paper/native_adapter.py' else old_read(path, *args, **kwargs)
+    stack.enter_context(patch.object(Path, 'read_text', read))
+    names = [
+        'tests.test_adaptive_paper_runner.IntegratedRunner.test_stale_overnight_entry_keeps_native_node_and_other_position_alive',
+        'tests.test_adaptive_paper_runner.IntegratedRunner.test_held_overnight_native_reduce_only_exit_routes_in_pre',
+        'tests.test_adaptive_paper_overnight_arming.OvernightArming.test_pre_entry_remains_refused',
+        'tests.test_adaptive_paper_recovery.RecoveryTests.test_overnight_recovery_outside_overnight_exits_owned_position',
+    ]
+    result = unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromNames(names))
+    print('BASE_EXPECTATION: 4 run, 3 assertion failures, 0 errors; PRE entry passes')
+    sys.exit(0 if result.testsRun == 4 and len(result.failures) == 3 and not result.errors else 1)
