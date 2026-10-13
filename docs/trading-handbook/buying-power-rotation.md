@@ -3,8 +3,8 @@
 A buying-power refusal does not establish that another holding was sold or that
 funds became available. This chapter documents the broker mechanism separately
 from the **paper trial's rotation policy**, stated in the
-[approved calculator projection](../../evidence/artifacts/trading-handbook-20261013/account-c-calc-contracts-20261013.md).
-That retained policy does not establish a newly measured rotation. See
+[account-neutral public calculator specification v1](../../evidence/artifacts/trading-handbook-20261013/agent-lane-calculator-policy-spec-v1-20261013.md).
+That policy does not establish a newly measured rotation. See
 [the source and gap inventory](sources/luld-bp-20261013.json).
 The [registered vendor excerpts](../../evidence/artifacts/trading-handbook-20261013/alpaca-buying-power-passages-20261013.md)
 retain the cited text. Raw HTML and the docs host's page bundle are not published;
@@ -34,36 +34,33 @@ lookup methods. Reuse those supported interfaces for an approved experiment;
 this chapter adds no replacement order writer or retry loop.
 [Source: TradingClient at cc4cb3b7, submit and lookup methods:90–160](https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/alpaca/trading/client.py#L90-L160).
 
-## Recorded trial rotation contract
+## Public trial rotation contract
 
-The v2.8 rule marks **one held name for exit** when an attempted entry has
-confidence at least 0.3 and is refused for buying power. The candidate is a
+The specification selects **one held name for exit** when an attempted entry
+has confidence at least 0.3 and is refused for buying power. The candidate is a
 held name **not eligible in the current round**, with the least progress,
-measured as high-water mark divided by entry price. The projection protects
-winners and still-eligible names by rotating them last or never, and prevents
-re-entry of a rotated name. This is a trial allocation rule, not an Alpaca
-requirement. Source: approved projection, **Exits / Buying-power rotation**,
-SHA256 `0b4aeac7f2714006ce0c7e647417109b19357a64d0fb711a237f998597dc7fcc`.
+measured as high-water mark divided by entry price. This is a trial allocation
+rule, not an Alpaca requirement.
+Source: public specification v1, **Exits / Buying-power rotation**, SHA256
+`d00cde3a89a7ad939ee0e9b5488a10c9605746416513462253ea84da597393f5`.
 
-The informal description "weakest stale large cap" must not add criteria absent
-from that rule. The projection states an ineligibility/progress selector; it
-does not state a market-cap threshold or a separate numeric holding-age test.
-Its selection section describes confidence as a score share, not a calibrated
-probability; for v3.0, the denominator is the best eligible score in the same
-group. A threshold of 0.3 therefore must not be presented as a 30% probability
-of success. Source: approved projection, **Selection** and **Exits**.
+The selector does not define a market-cap threshold or a separate numeric
+holding-age test. Its selection section describes confidence as a score share,
+with the denominator being the best eligible score in the same group.
+A threshold of 0.3 therefore must not be presented as a 30% probability
+of success. Source: public specification v1, **Selection** and **Exits**.
 
-Re-admission still requires the actual broker state: a marked exit is not a
+Re-admission still requires the actual broker state: a selected exit is not a
 filled disposal. The captured buying-power rule makes available funds
-execution-dependent. The projection does not specify a tie-break for equal
-progress, every reservation/partial-fill case or the receipt for a completed
-rotation. These remain the named `rotation-contract-details` and
-`rotation-execution` gaps in [the inventory](sources/luld-bp-20261013.json).
+execution-dependent. The specification does not define a tie-break for equal
+progress, every reservation/partial-fill case, a re-entry rule for a rotated
+name or a receipt for a completed rotation. These remain the named
+`rotation-contract-details` and `rotation-execution` gaps in
+[the inventory](sources/luld-bp-20261013.json).
 Any additional handling described later remains proposed until its contract
 and receipt exist. The public paper contract requires frozen inputs,
-deterministic risk, a durable journal,
-stable identities and reconciliation. It also requires actual failed or
-inconclusive outcomes to remain visible.
+deterministic risk, a durable journal, stable identities and reconciliation.
+It also requires actual failed or inconclusive outcomes to remain visible.
 [Source: paper policy:21–40](https://github.com/native-agent-stack/native-agent-stack/blob/df3a477c84aafed82757d120268ac58dea1fbd30/docs/paper-lane-policy.md#L21-L40).
 
 ## Evidence for a completed rotation
@@ -79,8 +76,7 @@ Sources: capture `alpaca-orders`, **Buying Power** and **Order Lifecycle**, and
 [the public acceptance contract](https://github.com/native-agent-stack/native-agent-stack/blob/df3a477c84aafed82757d120268ac58dea1fbd30/docs/paper-lane-policy.md#L29-L40).
 
 No refusal, ranking observation, sell, fill or replacement trade is reported as
-measured in this chapter. Private trading state and events are not accessed by
-the documentation workflow. Related chapter:
-[LULD bands and halt-aware sizing](luld-halt-sizing.md). The section's agreed
-index placement is after halt sizing and before broker throughput, once the
-chapter publications are available for integration.
+measured in this chapter. Account-specific observations remain private.
+Related chapter: [LULD bands and halt-aware sizing](luld-halt-sizing.md).
+Index integration follows the reviewed public chapter publications and the
+section lead's order.

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "recorded_date": "2026-10-13",
-  "scope": "Public primary-source captures plus a byte-identical publication-approved calculator projection. Policy facts are source_review of that projection; observations retain its scope and are not new execution by this documentation task.",
+  "scope": "Public primary-source captures plus the account-neutral public calculator policy specification v1. Policy facts are source_review; this documentation reports no account-specific observations or new execution.",
   "public_captures": [
     {
       "id": "luld-overview",
@@ -145,7 +145,7 @@
         "quantity rounding and cost details",
         "timestamp/tier-data binding",
         "holiday and early-close handling",
-        "prior-close below $0.75 proxy handling"
+        "prior-close below $0.75 handling and exact-$3 late-doubling boundary"
       ],
       "observed_execution": null
     },
@@ -167,7 +167,8 @@
       "missing": [
         "equal-progress tie-break",
         "refusal and reservation taxonomy",
-        "partial-fill and re-admission timing details"
+        "partial-fill and re-admission timing details",
+        "re-entry rule for a rotated name"
       ],
       "observed_execution": null
     },
@@ -200,24 +201,13 @@
     "commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e"
   },
   "execution": "Documentation only; no orders, data acquisition or runtime qualification",
-  "approved_projection": {
-    "name": "account-c-calc-contracts-20261013.md",
-    "path": "evidence/artifacts/trading-handbook-20261013/account-c-calc-contracts-20261013.md",
-    "bytes": 5585,
-    "sha256": "0b4aeac7f2714006ce0c7e647417109b19357a64d0fb711a237f998597dc7fcc",
-    "status": "sealed_publication_approved",
-    "evidence_class": "source_review",
-    "scope": "CC-prepared projection of its calculator source and receipts. This handbook does not access private state or independently repeat execution."
-  },
   "trial_policy_facts": {
     "evidence_class": "source_review",
-    "source_ref": "evidence/artifacts/trading-handbook-20261013/account-c-calc-contracts-20261013.md",
+    "source_ref": "evidence/artifacts/trading-handbook-20261013/agent-lane-calculator-policy-spec-v1-20261013.md",
     "gap_budget": {
       "fraction_of_equity": 0.06,
       "equation": "sum(held_halt_prone_notional * assumed_band_fraction) <= 0.06 * equity",
-      "band_proxy_above_3": 0.1,
-      "band_proxy_0_75_through_3": 0.2,
-      "tier_membership_available": false
+      "band_source": "luld-overview; actual tier, price bucket and session inputs required"
     },
     "halt_exit_start": {
       "local_time": "15:25",
@@ -227,9 +217,21 @@
     "rotation": {
       "confidence_min": 0.3,
       "max_names_marked_for_exit": 1,
-      "candidate": "held name ineligible in the current round with the least high_water_mark / entry",
-      "reentry": false
+      "candidate": "held name ineligible in the current round with the least high_water_mark / entry"
     },
     "execution_repeated": false
+  },
+  "public_policy_spec": {
+    "name": "agent-lane-calculator-policy-spec-v1-20261013.md",
+    "path": "evidence/artifacts/trading-handbook-20261013/agent-lane-calculator-policy-spec-v1-20261013.md",
+    "bytes": 4559,
+    "sha256": "d00cde3a89a7ad939ee0e9b5488a10c9605746416513462253ea84da597393f5",
+    "status": "public_account_neutral_specification",
+    "evidence_class": "source_review",
+    "scope": "Account-neutral numeric policy only. Account-specific observations stay in the private trading repository."
+  },
+  "private_provenance": {
+    "name": "account-c-calc-contracts-20261013.md",
+    "citation": "name_only; not published or digested here"
   }
 }

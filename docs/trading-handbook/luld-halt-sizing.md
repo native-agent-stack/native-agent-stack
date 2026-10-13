@@ -2,8 +2,8 @@
 
 LULD price bands constrain eligible trades; they do not promise that a position
 can be liquidated at a chosen loss. This chapter separates the published Plan
-mechanism from the **paper trial's sizing policy**, documented in a
-[publication-approved calculator projection](../../evidence/artifacts/trading-handbook-20261013/account-c-calc-contracts-20261013.md).
+mechanism from the **paper trial's sizing policy**, documented in the
+[account-neutral public calculator specification v1](../../evidence/artifacts/trading-handbook-20261013/agent-lane-calculator-policy-spec-v1-20261013.md).
 Reading that policy is source review, not a new execution result. Evidence
 status and captured public bytes are recorded in
 [the source inventory](sources/luld-bp-20261013.json).
@@ -48,28 +48,30 @@ qualifies overnight trading. Sources: captures `luld-plan-index` and
 
 ## Trial sizing and the 6% gap budget
 
-The approved projection states the following calculator policy. Let `E` be
-equity, `c` confidence, `N` position notional, and `b` the band fraction. The
-base risk is `E × (0.0025 + 0.0075 × c)`. The trailing percentage is one quarter
-of session range, clamped to 1.5%–10%. A name is classified as halt-prone when
-its session range is at least half the assumed band and session dollar volume
-is below $200 million. For such a name the effective stop is the larger of the
-trail and the band; otherwise it is the trail. Initial notional is risk divided
-by that effective-stop fraction.
-Source: approved projection, **Sizing**, SHA256
-`0b4aeac7f2714006ce0c7e647417109b19357a64d0fb711a237f998597dc7fcc`.
+The public specification states the following calculator policy. Let `E` be
+current equity, `c` confidence, `N` position notional, and `b` the band fraction.
+Base risk is `E × (0.0025 + 0.0075 × c)`. Its drawdown control scales base risk
+by `max(0.25, 1 − dd / 0.06)`, where `dd` is the fractional drop of current
+equity below the day's first equity. Initial notional is **scaled risk** divided
+by the effective-stop fraction. These are stated settings, not measured
+drawdown or execution results.
+Source: public specification v1, **Sizing**, SHA256
+`d00cde3a89a7ad939ee0e9b5488a10c9605746416513462253ea84da597393f5`.
 
-Here `c` is the calculator's confidence score. The projection's **Selection**
+Here `c` is the calculator's confidence score. The specification's **Selection**
 section describes normalization within each selection group; it does not
 establish a calibrated probability of profit for the sizing equation.
 
-The trial uses a **Tier 2 proxy** from previous close because tier membership
-is missing from its inputs: 10% above $3, and 20% from $0.75 through $3.
-This is not a reconstruction of the actual SIP band for every security.
-The vendor overview distinguishes Tier 1 and Tier 2 and documents late-session
-doubling for the specified categories; do not silently replace those rules with
-the calculator's proxy. Source: approved projection, **Sizing**, and capture
-`luld-overview`, **Calculation of Price Bands**.
+The trailing percentage is one quarter of session range, clamped to 1.5%–10%.
+A name is classified as halt-prone when its session range is at least half the
+band and session dollar volume is below $200 million. For such a name the
+effective stop is the larger of the trail and band. The specification cites
+tier-dependent LULD rules and late-session doubling. Applying them needs the
+actual tier, previous-close bucket and session context; a universal Tier 2
+percentage is insufficient. This source review supplies no as-known band
+observation for an executed entry.
+Sources: public specification v1, **Sizing / Stops** and **LULD bands**, and
+capture `luld-overview`, **Calculation of Price Bands**.
 
 The additional trial gap budget is:
 
@@ -78,21 +80,22 @@ sum(N_i × b_i for held halt-prone names) ≤ 0.06 × E
 ```
 
 **The denominator is equity**, not buying power, gross exposure or a percentage
-of the new order alone. An additional halt-prone entry shrinks to the unused
-budget or is refused when it is exhausted. The projection also caps notional
-at 2% of session dollar volume and 25% of the gross cap per name, with gross
-exposure bounded by 3× equity and broker buying power as an outer constraint.
-These are trial settings, not exchange rules or a guarantee that losses cannot
-exceed 6%. Source: approved projection, **Sizing / Notional**.
+of the new order alone. The specification caps notional at 2% of session dollar
+volume and 25% of the gross cap per name, with gross exposure bounded by 3×
+equity and broker buying power as an outer constraint. It also refuses a
+candidate whose prior daily returns correlate at least 0.7 with two or more
+held names, requiring at least six common returns. These are trial settings,
+not exchange rules or a guarantee that losses cannot exceed 6%.
+Source: public specification v1, **Sizing / Notional**.
 
 Equivalently, define remaining modeled gap capacity as
 `R = max(0, 0.06 × E − sum(N_i × b_i))` over the held halt-prone names.
-For an additional halt-prone entry with a positive assumed band fraction `b`,
+For an additional halt-prone entry with a positive band fraction `b`,
 its gap-budget notional ceiling is `R / b`, before the other sizing caps.
 If held positions already consume or exceed the budget, `R` is zero and
 there is no gap capacity for another such entry. This is an algebraic
-restatement of the projection's budget and shrink-or-refuse rule; it does not
-specify an automatic disposal of existing positions.
+restatement of the specification's constraint; it does not specify an
+automatic disposal of existing positions.
 
 For an explicitly **synthetic arithmetic illustration**, if `E = $100,000`,
 the aggregate modeled gap budget is $6,000. A held $20,000 notional with
@@ -102,20 +105,20 @@ illustrates the stated equation; it is not a trade or a replay result.
 
 ## Trial halt-window exit
 
-The projection states that halt-prone positions begin their exit **from
-15:25 ET**, ahead of the 15:35 late-band window described there. Its separate
-time-exit policy starts at 15:45 ET and targets flat state by 15:55 ET.
-These are paper-trial boundaries, not LULD-mandated liquidation times or
-proof of completion. Source: approved projection, **Exits / Halt window** and
-**Time exit**, with vendor timing checked against capture `luld-overview`.
+The specification states that halt-prone positions begin their exit **from
+15:25 ET**. Its separate time-exit policy starts at 15:45 ET and targets flat
+state by 15:55 ET. These are paper-trial boundaries, not LULD-mandated
+liquidation times or proof of completion.
+Source: public specification v1, **Exits / Halt window** and **Time exit**.
 
-The 15:25 ET policy applies to the trial's halt-prone classification, including
-its Tier 2 proxy. It does not mean that every classified security's actual
-band doubles at 15:35: the vendor categories above and the calculator proxy
-are different inputs. Neither a scheduled exit start nor a band change
-establishes that a liquidation order can fill during a pause.
+The 15:25 ET policy applies to the trial's halt-prone classification.
+It does not mean that every classified security's actual band doubles at 15:35:
+halt-prone classification and the vendor's doubling categories are different
+inputs. Neither a scheduled exit start nor a band change establishes that a
+liquidation order can fill during a pause.
+Sources: public specification v1 and capture `luld-overview`.
 
-The projection does not supply a holiday/early-close adjustment, execution
+The specification does not supply a holiday/early-close adjustment, execution
 receipt for this exit rule, or full quantity-rounding/timestamp inputs.
 Those remain named gaps in [the registered inventory](sources/luld-bp-20261013.json).
 Treat any use outside the stated regular-session context as proposed until
@@ -133,8 +136,7 @@ native behavior distinct from the proposed 15:25 ET policy and require a
 receipt for any claimed completion.
 [Source: strategies.md:716–745](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/docs/concepts/strategies.md#L716-L745).
 
-This is documentation and source review. It submits no order and changes no
-stop or recovery state. Related chapter:
-[Buying-power rotation](buying-power-rotation.md). The section's agreed index
-placement follows the fade/deal examples and precedes broker throughput; the
-index integration occurs when the chapter publications exist.
+This is documentation and source review. Related chapter:
+[Buying-power rotation](buying-power-rotation.md). Index integration follows
+the reviewed public chapter publications and the section lead's order.
+Account-specific observation pages belong in the private trading repository.
