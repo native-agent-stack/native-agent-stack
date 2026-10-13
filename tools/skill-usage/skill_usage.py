@@ -192,12 +192,12 @@ def parse_claude_output(raw: str) -> dict:
     # so only a result that is both "success" and not is_error carries a /skill-doctor table.
     if result_event.get("subtype") != "success" or result_event.get("is_error") is not False:
         return {"format": "json", "rows": {}, "total_cost_usd": total_cost_usd, "num_turns": num_turns,
-                "error": f"refusing an error result (subtype={result_event.get('subtype')!r}, "
-                         f"is_error={result_event.get('is_error')!r})"}
+                "error": f"refusing an error result (subtype={safe_scalar(result_event.get('subtype'))}, "
+                         f"is_error={safe_scalar(result_event.get('is_error'))})"}
     if not evaluate_cost(total_cost_usd, num_turns):
         return {"format": "json", "rows": {}, "total_cost_usd": total_cost_usd, "num_turns": num_turns,
-                "error": f"refusing a nonzero-cost result (total_cost_usd={total_cost_usd!r}, "
-                         f"num_turns={num_turns!r}); a native /skill-doctor run is zero-cost"}
+                "error": f"refusing a nonzero-cost result (total_cost_usd={safe_scalar(total_cost_usd)}, "
+                         f"num_turns={safe_scalar(num_turns)}); a native /skill-doctor run is zero-cost"}
     text = result_event.get("result")
     if not isinstance(text, str):
         return {"format": "json", "rows": {}, "total_cost_usd": total_cost_usd, "num_turns": num_turns,
@@ -2350,7 +2350,7 @@ def render_lanes_text(report: dict) -> str:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser = FixedErrorParser(description=__doc__.splitlines()[0])
     parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
     claude_source = parser.add_mutually_exclusive_group()
     claude_source.add_argument("--claude-skill-doctor", type=Path, metavar="FILE",
@@ -2410,14 +2410,14 @@ def main(argv=None) -> int:
     try:
         manifest = load_manifest(args.manifest)
     except (OSError, ValueError) as error:
-        print(f"skill_usage: invalid manifest {args.manifest}: {type(error).__name__}: {error}",
-              file=sys.stderr)
+        print(f"skill_usage: invalid manifest ({type(error).__name__})",
+              file=sys.stderr)   # the class only: the path and the text of the error are the caller's
         return 2
 
     try:
         now = parse_iso(args.now) if args.now else now_utc()
-    except ValueError as error:
-        print(f"skill_usage: invalid --now: {error}", file=sys.stderr)
+    except ValueError:
+        print("skill_usage: invalid --now", file=sys.stderr)   # the text of the parser's error holds the argument (python/cpython@cbc944f4bc59 Modules/_datetimemodule.c L5774-L5775)
         return 2
 
     if args.lanes:
@@ -2486,7 +2486,7 @@ def out_refused(out: Path | None) -> bool:
         return False
     resolved_out = out.resolve()
     if resolved_out == ROOT or ROOT in resolved_out.parents:
-        print(f"skill_usage: refusing --out inside the repository checkout: {out}", file=sys.stderr)
+        print("skill_usage: refusing --out inside the repository checkout", file=sys.stderr)
         return True
     return False
 
@@ -2613,8 +2613,8 @@ def lanes_main(args, manifest: dict, now: datetime) -> int:
     try:
         since = parse_iso(args.since) if args.since is not None else None
         until = parse_iso(args.until) if args.until is not None else None
-    except ValueError as error:
-        print(f"skill_usage: invalid --since/--until: {error}", file=sys.stderr)
+    except ValueError:
+        print("skill_usage: invalid --since/--until", file=sys.stderr)
         return 2
     if since is not None and until is not None and since >= until:
         print("skill_usage: --since must be earlier than --until", file=sys.stderr)
@@ -2655,8 +2655,8 @@ def lanes_main(args, manifest: dict, now: datetime) -> int:
     if ledger is not None:
         try:
             write_private_ledger(args.call_ledger, ledger)
-        except ValueError as error:
-            print(f"skill_usage: --call-ledger: {error}", file=sys.stderr)
+        except ValueError:
+            print("skill_usage: --call-ledger: refused (the path is inside a git work tree or exists)", file=sys.stderr)
             return 2
         except OSError as error:
             print(f"skill_usage: --call-ledger: cannot create the file ({type(error).__name__})", file=sys.stderr)
@@ -2665,6 +2665,28 @@ def lanes_main(args, manifest: dict, now: datetime) -> int:
         return 2
     print(json.dumps(report, indent=2, sort_keys=True) if args.json else render_lanes_text(report))
     return 0
+
+
+# These sit at the end of the module so that no line number cited by another record (ledger_path_issue, the native metadata) moves; build_parser and parse_claude_output use them at call time.
+ARGUMENT_REFUSAL = "skill_usage: the command line has an argument this version does not take, or lacks one it needs; nothing was run"
+
+
+class FixedErrorParser(argparse.ArgumentParser):
+    """A command line this program cannot use ends in one fixed line and exit 2: argparse's own message names the values it could not use (`unrecognized arguments: ...`, `invalid int value: ...`), and a
+    command line of this program carries paths. `error` is argparse's hook for another behavior (python/cpython@cbc944f4bc59639a444dd971c737788ba2283a91 Lib/argparse.py L1925-L1932 builds the message from the
+    values and calls it; L2675-L2686 prints the message to stderr and exits 2, and says an override should exit or raise)."""
+
+    def error(self, message):
+        self.exit(2, ARGUMENT_REFUSAL + "\n")
+
+
+def safe_scalar(value) -> str:
+    """A value of a captured result as a diagnostic may carry it: a boolean, a finite number or a short word of letters, digits and `_.-`; any other value (a longer text, a path, a container) is `other`."""
+    if isinstance(value, (bool, int)) or (isinstance(value, float) and value == value and abs(value) != float("inf")):
+        return repr(value)
+    if isinstance(value, str) and re.fullmatch(r"[A-Za-z0-9_.-]{1,40}", value):
+        return repr(value)
+    return "other"
 
 
 if __name__ == "__main__":

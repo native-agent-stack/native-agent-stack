@@ -3857,5 +3857,75 @@ class CodexCallLedger(unittest.TestCase):
         assert_id_free_report(self, report, [*self.SECRETS, str(root), str(target)])
 
 
+
+class NativeCliDiagnosticTests(unittest.TestCase):
+    """The command center's design decision on #1043 (2026-10-13), after Astra's read of c23b9ce48 (P1 2): the diagnostics of this program's command line name no value of an argument: argparse's own errors
+    (`unrecognized arguments: ...`, `invalid int value: ...`) and the program's (the text of an exception that holds the argument) end in one fixed line each. Every option is driven with a value that
+    carries a private-looking path; the case passes when the marker reaches neither stream and no traceback does."""
+
+    MARK = "PRIVATE-MARKER"
+
+    def run_cli(self, arguments, cwd):
+        return subprocess.run([sys.executable, "-B", str(ROOT / "tools/skill-usage/skill_usage.py"), *arguments], capture_output=True, text=True, timeout=180, cwd=cwd)
+
+    def test_no_option_of_the_command_line_echoes_its_value(self):
+        mark = self.MARK
+        with tempfile.TemporaryDirectory() as temp:
+            work = Path(temp)
+            bad_manifest = work / "bad-manifest.json"
+            bad_manifest.write_text(json.dumps({"skills": mark}))
+            capture = work / "capture.json"
+            capture.write_text(json.dumps({"type": "result", "subtype": f"/fixture/{mark}/subtype", "is_error": False, "total_cost_usd": 0, "num_turns": 0, "result": ""}))
+            capture_cost = work / "capture-cost.json"
+            capture_cost.write_text(json.dumps({"type": "result", "subtype": "success", "is_error": False, "total_cost_usd": f"/fixture/{mark}/cost", "num_turns": f"/fixture/{mark}/turns", "result": ""}))
+            existing = work / f"{mark}-existing.jsonl"
+            existing.write_text("")
+            lanes = ["--lanes", "--codex-root", f"/fixture/{mark}/root"]
+            cases = (
+                ("--manifest missing", ["--manifest", f"/fixture/{mark}/missing.json"], 2), ("--manifest of the wrong shape", ["--manifest", str(bad_manifest)], 2),
+                ("--now text", ["--now", f"/fixture/{mark}/now"], 2), ("--now overflow low", ["--now", "0001-01-01T00:00:00+01:00"], 2), ("--now overflow high", ["--now", "9999-12-31T23:59:59-01:00"], 2),
+                ("--window text", ["--window", f"/fixture/{mark}/window"], 2), ("--window without a value", ["--window"], 2), ("--claude-timeout text", ["--claude-timeout", f"/fixture/{mark}/timeout"], 2),
+                ("--claude-skill-doctor missing", ["--claude-skill-doctor", f"/fixture/{mark}/missing"], 2),
+                ("--claude-skill-doctor subtype", ["--claude-skill-doctor", str(capture)], 0), ("--claude-skill-doctor cost", ["--claude-skill-doctor", str(capture_cost)], 0),
+                ("--runtime-log", ["--runtime-log", mark, f"/fixture/{mark}/log.jsonl"], 2),
+                ("--out in the checkout", ["--out", str(ROOT / f"{mark}-out.json")], 2),
+                ("an unrecognized option", [f"--{mark}-option", "value"], 2), ("an unrecognized argument", [f"/fixture/{mark}/positional"], 2),
+                ("--lanes --since text", lanes + ["--since", f"/fixture/{mark}/since"], 2), ("--lanes --until text", lanes + ["--until", f"/fixture/{mark}/until"], 2),
+                ("--lanes --since overflow", lanes + ["--since", "0001-01-01T00:00:00+01:00"], 2), ("--lanes --until overflow", lanes + ["--until", "9999-12-31T23:59:59-01:00"], 2),
+                ("--lanes --marker blank", lanes + ["--marker", "   "], 2), ("--lanes --call-ledger existing", lanes + ["--call-ledger", str(existing)], 2),
+                ("--lanes --exceptions missing", lanes + ["--exceptions", f"/fixture/{mark}/exceptions.json"], 2),
+            )
+            self.assertEqual(len(cases), 22, "every option of the command line is driven")
+            for label, arguments, code in cases:
+                with self.subTest(case=label):
+                    done = self.run_cli(arguments, work)
+                    self.assertEqual(done.returncode, code, done.stderr[-300:])
+                    self.assertNotIn(mark, done.stderr)
+                    self.assertNotIn(mark, done.stdout)
+                    self.assertNotIn("Traceback", done.stderr)
+
+    def test_the_fixed_lines_say_what_was_refused_and_help_still_works(self):
+        with tempfile.TemporaryDirectory() as temp:
+            for arguments in (["--window", "x"], ["--nonsense"], ["--window"]):
+                with self.subTest(arguments=arguments):
+                    done = self.run_cli(arguments, temp)
+                    self.assertEqual((done.returncode, done.stdout, done.stderr),
+                                     (2, "", "skill_usage: the command line has an argument this version does not take, or lacks one it needs; nothing was run\n"))
+            done = self.run_cli(["--help"], temp)
+            self.assertEqual(done.returncode, 0)
+            self.assertIn("--claude-skill-doctor", done.stdout)
+            for arguments, line in ((["--now", "tomorrow"], "skill_usage: invalid --now\n"), (["--lanes", "--codex-root", "/fixture/root", "--since", "tomorrow"], "skill_usage: invalid --since/--until\n")):
+                with self.subTest(arguments=arguments):
+                    done = self.run_cli(arguments, temp)
+                    self.assertEqual((done.returncode, done.stderr), (2, line))
+
+    def test_a_refused_capture_names_a_word_or_a_number_and_never_the_value(self):
+        """The reason of a capture that the program refuses is part of its report (`claude.reason`) and of its diagnostic: a boolean, a finite number or a short word may stand in it, anything else is `other`."""
+        for value, shown in ((True, "True"), (0, "0"), (1.5, "1.5"), ("error_max_turns", "'error_max_turns'"), (f"/fixture/{self.MARK}/x", "other"), ("a" * 41, "other"), ([1], "other"), ({"a": 1}, "other"),
+                             (None, "other"), (float("inf"), "other"), (float("nan"), "other")):
+            with self.subTest(value=repr(value)[:40]):
+                self.assertEqual(S.safe_scalar(value), shown)
+
+
 if __name__ == "__main__":
     unittest.main()

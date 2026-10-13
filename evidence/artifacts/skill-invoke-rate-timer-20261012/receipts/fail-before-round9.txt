@@ -1,0 +1,25 @@
+Round 9 of #1043 (Astra's two P1 of the read of c23b9ce48: a scalar of the native report copied into the record, and the native collector CLI's diagnostics that name an argument; and the command center's design decision of 2026-10-13: one closed-schema check where the record is written, fixed-text diagnostics for every option) against the sources of c23b9ce48 (GITHUB_ACTIONS=true).
+
+== c23b9ce48, the head that was read (its sources, these test modules)
+   test_skill_usage_daily.ClosedRecordTests: Ran 7, FAILED (failures=3, errors=5)
+      ClosedRecordTests.test_a_measured_flag_that_is_not_true_is_false_and_a_count_beyond_reason_is_unknown: 1 failing subtests
+      ClosedRecordTests.test_both_outputs_are_the_checked_rendering_of_whatever_the_projection_returns: 2 failing subtests, e.g. output='standard output'
+      ClosedRecordTests.test_every_scalar_of_a_stored_half_is_checked_in_the_merge: 1 failing subtests
+      ClosedRecordTests.test_every_scalar_the_projection_reads_is_checked_whatever_it_holds: 1 failing subtests
+      ClosedRecordTests.test_the_file_and_the_standard_output_are_one_rendering_and_the_check_precedes_any_write: 1 failing subtests
+      ClosedRecordTests.test_the_policy_scalar_of_the_native_report_is_a_count_through_both_outputs: 1 failing subtests
+      ClosedRecordTests.test_the_schema_holds_without_the_producers_checks: 1 failing subtests
+   test_skill_usage.NativeCliDiagnosticTests: Ran 3, FAILED (failures=16, errors=11)
+      NativeCliDiagnosticTests.test_a_refused_capture_names_a_word_or_a_number_and_never_the_value: 11 failing subtests, e.g. value='True'
+      NativeCliDiagnosticTests.test_no_option_of_the_command_line_echoes_its_value: 11 failing subtests, e.g. case='--manifest missing'
+      NativeCliDiagnosticTests.test_the_fixed_lines_say_what_was_refused_and_help_still_works: 5 failing subtests, e.g. arguments=['--window', 'x']
+== this head
+   test_skill_usage_daily.ClosedRecordTests: Ran 7, OK
+   test_skill_usage.NativeCliDiagnosticTests: Ran 3, OK
+== the reviewer's commands (Astra's read of c23b9ce48): the daily record with a policy scalar that is an object, and the native collector with a private-looking --now
+   daily record, policy scalar an object, at c23b9ce48: rc 0, the marker in stdout; codex_bulk_scan_limit: {"path": "/fixture/PRIVATE-MARKER/path", "prompt": "PRIVATE-MARKER"}
+   skill_usage.py --now <private path>, at c23b9ce48: rc 2, the marker in stderr; stderr: skill_usage: invalid --now: Invalid isoformat string: '/fixture/PRIVATE-MARKER/now'
+   daily record, policy scalar an object, at this head: rc 0, the marker not in stdout; codex_bulk_scan_limit: null
+   skill_usage.py --now <private path>, at this head: rc 2, the marker not in stderr; stderr: skill_usage: invalid --now
+
+Tests that fail or raise on c23b9ce48: 10 (the two new classes; the rest of both modules is unchanged and passes at both heads).

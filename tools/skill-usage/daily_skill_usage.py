@@ -65,7 +65,67 @@ TIMEOUTS = {"claude_sweep": 600, "codex_host": 600, "codex_lanes": 3120}
 
 
 def count(value):
-    return value if isinstance(value, int) and not isinstance(value, bool) and value >= 0 else None
+    return value if isinstance(value, int) and not isinstance(value, bool) and 0 <= value <= MAX_COUNT else None
+
+
+# The record's closed schema (the command center's design decision on #1043, 2026-10-13, after the reviews found a copied field twice: a lane's own fields, then a scalar of the native report's policy block).
+# The record is assembled from a native report or from a stored half, field by field, and each field that was copied without its check was a way for an input to reach the record. What is written, to stdout or
+# to the private file, goes through counts_only at the one place that writes it (render_record): every key is one of the schema's, every leaf is null, a boolean, a non-negative integer, an ISO timestamp, a name
+# of the allowed pattern or one of a few fixed words, and anything else is null and never copied. The projection and the merge still validate what they read (count(), NAME, table()); this is the check that
+# does not depend on their having done so.
+MAX_COUNT = 10 ** 12
+TIME_TEXT = re.compile(r"[0-9TZ:+.\-]{10,40}\Z")
+LANE_SKILL = {"name": "name", "count": "count", "raw_reads": "count"}
+RECORD_ROW = {"name": "name", "claude_uses_lifetime": "count", "wiring": "name", "codex_use": "count", "codex_skill_md_reads": "count", "codex_name_mentions": "count"}
+RECORD_LANE = {"client": frozenset(("claude", "codex")), "lane": "name", "metric": frozenset(("use", "skill_calls")), "skills": ("rows", LANE_SKILL)}
+RECORD_SCHEMA = {"schema": frozenset((SCHEMA,)), "half": frozenset(("claude", "codex", "all")), "generated_at": "time", "window_days": "count", "host": ("rows", RECORD_ROW), "lanes": ("rows", RECORD_LANE),
+                 "zero_use": {"codex": ("names",), "claude_host_lifetime": ("names",)}, "codex_bulk_scan_limit": "count", "halves": {"claude": "time", "codex": "time"},
+                 "measured": ("flags", ("host", "codex", "claude"))}
+
+
+def closed(value, spec):
+    """`value` as the closed schema `spec` lets it through: a leaf of the kind `spec` names, or null; a key of the schema that is present, never one that is not."""
+    if isinstance(spec, str):
+        if value is None:
+            return None
+        if spec == "count":
+            return count(value)
+        if spec == "name":
+            return value if isinstance(value, str) and NAME.fullmatch(value) else None
+        if spec == "time":
+            if not (isinstance(value, str) and TIME_TEXT.fullmatch(value)):
+                return None
+            try:
+                skill_usage.parse_iso(value)
+            except Exception:  # noqa: BLE001 - a time that cannot be read is unknown
+                return None
+            return value
+        return None
+    if isinstance(spec, frozenset):
+        return value if isinstance(value, str) and value in spec else None
+    if isinstance(spec, dict):
+        return {key: closed(value[key], sub) for key, sub in spec.items() if key in value} if isinstance(value, dict) else None
+    kind = spec[0]
+    if kind == "flags":
+        return {key: value.get(key) is True for key in spec[1] if key in value} if isinstance(value, dict) else None
+    if not isinstance(value, list):
+        return None
+    if kind == "rows":
+        return [closed(item, spec[1]) for item in value if isinstance(item, dict)]
+    if kind == "names":
+        return [item for item in value if isinstance(item, str) and NAME.fullmatch(item)]
+    return None
+
+
+def counts_only(report):
+    """The record as the closed schema lets it through (see RECORD_SCHEMA); a `measured` flag that is not the boolean true is false."""
+    result = closed(report, RECORD_SCHEMA)
+    return result if isinstance(result, dict) else {}
+
+
+def render_record(report):
+    """The text of the record, the only place it is turned into output: stdout and the file are both this."""
+    return json.dumps(counts_only(report), indent=2, sort_keys=True) + "\n"
 
 
 def counts(value):
@@ -182,7 +242,7 @@ def project_reports(host, codex, claude, *, now, window, half="all"):
             "host": host_rows, "lanes": lanes if codex is not None or claude is not None else None,
             "zero_use": {"codex": [row["name"] for row in host_rows or [] if row["codex_use"] == 0],
                          "claude_host_lifetime": [row["name"] for row in host_rows or [] if row["claude_uses_lifetime"] == 0]},
-            "codex_bulk_scan_limit": table(host_t.get("codex_use_policy")).get("max_distinct_skill_reads"),
+            "codex_bulk_scan_limit": count(table(host_t.get("codex_use_policy")).get("max_distinct_skill_reads")),
             "measured": {key: measured[key] for key in HALF_KEYS[half]}}
 
 
@@ -414,12 +474,12 @@ def require_outside_worktrees(path):
 
 def publish(path, report):
     require_outside_worktrees(path)
+    text = render_record(report)   # before anything is created: the record is checked first
     path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
     descriptor, temp = tempfile.mkstemp(prefix=".skill-usage-", dir=path.parent)
     try:
         with os.fdopen(descriptor, "w") as stream:
-            json.dump(report, stream, indent=2, sort_keys=True)
-            stream.write("\n")
+            stream.write(text)
         os.replace(temp, path)
     finally:
         if os.path.exists(temp):
@@ -510,7 +570,7 @@ def main(argv=None):
         if args.out:
             publish(args.out.absolute(), report)
         else:
-            print(json.dumps(report, indent=2, sort_keys=True))
+            sys.stdout.write(render_record(report))
         if args.combined_out and args.half and not refresh_combined(args.combined_out, report, args.other_record):
             print("daily skill usage: the combined record was not refreshed", file=sys.stderr)
         return 0 if all(report["measured"].values()) else 1

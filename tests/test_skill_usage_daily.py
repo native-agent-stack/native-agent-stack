@@ -3,6 +3,7 @@ import contextlib
 import getpass
 import importlib.util
 import io
+from datetime import datetime
 import json
 import os
 from pathlib import Path
@@ -660,6 +661,207 @@ class NativeReportShapeTests(unittest.TestCase):
                     self.assertEqual(len(calls), 2, "the second command still runs")
                     self.assertIsNone(reports[slots[0]], "an output that cannot be used leaves its slot unmeasured")
                     self.assertIsInstance(reports[slots[1]], dict, "the other command's report is kept")
+
+
+RECORD_KEYS = {"schema", "half", "generated_at", "window_days", "host", "lanes", "zero_use", "codex_bulk_scan_limit", "halves", "measured", "name", "claude_uses_lifetime", "wiring", "codex_use", "codex_skill_md_reads",
+               "codex_name_mentions", "client", "lane", "metric", "skills", "count", "raw_reads", "claude", "codex", "claude_host_lifetime"}
+RECORD_WORDS = {"skill-invoke-rate-daily/1", "claude", "codex", "all", "use", "skill_calls"}
+PRIVATE = "PRIVATE-MARKER"
+HOSTILE = (("an object", {"prompt": f"/fixture/{PRIVATE}/prompt", "path": f"/fixture/{PRIVATE}/path"}), ("a list", [f"/fixture/{PRIVATE}/item"]), ("a path", f"/fixture/{PRIVATE}/value"),
+           ("a negative number", -1), ("a float", 1.5), ("a boolean", True), ("a huge number", 10 ** 30), ("a short word", "wired"), ("null", None),
+           ("a time that does not exist", "9999-99-99T99:99:99Z"), ("a time with another separator", "2026-10-12 10:00:00"), ("a time with a slash", "2026-10-12/10:00:00"),
+           ("a name with a space", f"{PRIVATE} text"), ("a long word", "w" * 400))
+
+
+def leaf_paths(value, path=()):
+    """Every scalar of a JSON structure, as the path of keys and indexes that leads to it, and every object as a path too (for a key to be added to)."""
+    if isinstance(value, dict):
+        yield path, "object"
+        for key, item in value.items():
+            yield from leaf_paths(item, path + (key,))
+    elif isinstance(value, list):
+        for index, item in enumerate(value):
+            yield from leaf_paths(item, path + (index,))
+    else:
+        yield path, "leaf"
+
+
+def with_value(structure, path, value, *, key=None):
+    """A copy of `structure` with the scalar at `path` replaced by `value`, or, with `key`, with that key added (to the object at `path`) holding `value`."""
+    copy = json.loads(json.dumps(structure))
+    cursor = copy
+    for step in path[:-1] if key is None else path:
+        cursor = cursor[step]
+    if key is None:
+        cursor[path[-1]] = value
+    else:
+        cursor[key] = value
+    return copy
+
+
+def assert_counts_only(case, value, where="record"):
+    """The independent statement of the contract: only keys of the schema, and leaves that are null, a boolean, a non-negative integer, a name of the allowed pattern, a timestamp or one of the fixed words."""
+    if isinstance(value, dict):
+        for key, item in value.items():
+            case.assertIn(key, RECORD_KEYS, f"{where}: a key outside the schema")
+            assert_counts_only(case, item, f"{where}.{key}")
+    elif isinstance(value, list):
+        for index, item in enumerate(value):
+            assert_counts_only(case, item, f"{where}[{index}]")
+    elif value is None or isinstance(value, bool):
+        pass
+    elif isinstance(value, int):
+        case.assertGreaterEqual(value, 0, where)
+    else:
+        case.assertIsInstance(value, str, where)
+        if value in RECORD_WORDS or re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.:-]{0,100}", value):
+            return
+        case.assertRegex(value, r"\d{4}-\d{2}-\d{2}T[0-9:.]+(?:Z|[+-]\d{2}:\d{2})", f"{where}: a string that is no name, word or time")
+        datetime.fromisoformat(value.replace("Z", "+00:00"))   # raises for a time that does not exist
+
+
+def assert_times(case, record):
+    """The time-typed fields hold a time that exists, in the program's own spelling: a string that merely has the shape of a name is not accepted there."""
+    stamps = [record.get("generated_at"), *(record.get("halves") or {}).values()] if isinstance(record, dict) else []
+    for stamp in stamps:
+        if stamp is not None:
+            case.assertRegex(stamp, r"^\d{4}-\d{2}-\d{2}T[0-9:.]+(?:Z|[+-]\d{2}:\d{2})$")
+            datetime.fromisoformat(stamp.replace("Z", "+00:00"))
+
+
+class ClosedRecordTests(unittest.TestCase):
+    """The command center's design decision on #1043 (2026-10-13), after Astra's read of c23b9ce48 found a scalar of the native report copied into the record without its check (the second field of that kind
+    after a lane's own fields): the record is written through one closed-schema check (render_record), so that no field depends on its producer having validated it."""
+
+    def test_every_scalar_the_projection_reads_is_checked_whatever_it_holds(self):
+        daily = daily_module()
+        checked = 0
+        for half, reports in (("claude", claude_reports()), ("codex", codex_reports())):
+            for index, native in enumerate(reports):
+                if native is None:
+                    continue
+                for path, kind in list(leaf_paths(native)):
+                    variants = [("replaced by " + label, with_value(native, path, value)) for label, value in HOSTILE] if kind == "leaf" else []
+                    variants += [(f"gains a key holding {label}", with_value(native, path, value, key=f"/fixture/{PRIVATE}/key")) for label, value in HOSTILE[:3]] if kind == "object" else []
+                    for label, changed in variants:
+                        arguments = list(reports)
+                        arguments[index] = changed
+                        report = daily.project_reports(*arguments, now=NOW, window=7, half=half)
+                        written = daily.render_record(report)
+                        checked += 1
+                        with self.subTest(half=half, native=index, path="/".join(map(str, path)), case=label):
+                            self.assertNotIn(PRIVATE, written)
+                            assert_counts_only(self, json.loads(written))
+                            assert_times(self, json.loads(written))
+        self.assertGreater(checked, 300, "the corpus covers every scalar of the fixtures")
+
+    def test_every_scalar_of_a_stored_half_is_checked_in_the_merge(self):
+        daily = daily_module()
+        halves = {"claude": projected("claude"), "codex": projected("codex")}
+        checked = 0
+        for name, record in halves.items():
+            for path, kind in list(leaf_paths(record)):
+                variants = [("replaced by " + label, with_value(record, path, value)) for label, value in HOSTILE] if kind == "leaf" else \
+                           [(f"gains a key holding {label}", with_value(record, path, value, key=f"/fixture/{PRIVATE}/key")) for label, value in HOSTILE[:3]]
+                for label, changed in variants:
+                    arguments = {"claude": halves["claude"], "codex": halves["codex"]}
+                    arguments[name] = changed
+                    written = daily.render_record(daily.merge_halves(arguments["claude"], arguments["codex"]))
+                    checked += 1
+                    with self.subTest(half=name, path="/".join(map(str, path)), case=label):
+                        self.assertNotIn(PRIVATE, written)
+                        assert_counts_only(self, json.loads(written))
+                        assert_times(self, json.loads(written))
+        self.assertGreater(checked, 150)
+
+    def test_the_schema_holds_without_the_producers_checks(self):
+        """The layer itself: a record whose every scalar is replaced, one at a time, by a hostile value is written through the check without anyone having validated it (the producers' own checks are not in
+        the path), for the record of each half and for the combined record."""
+        daily = daily_module()
+        records = {"claude half": projected("claude"), "codex half": projected("codex"), "combined": daily.merge_halves(projected("claude"), projected("codex"))}
+        checked = 0
+        for name, record in records.items():
+            self.assertEqual(json.loads(daily.render_record(record)), json.loads(json.dumps(record)), "a record the program builds itself is not changed by the check")
+            for path, kind in list(leaf_paths(record)):
+                variants = [("replaced by " + label, with_value(record, path, value)) for label, value in HOSTILE] if kind == "leaf" else \
+                           [(f"gains a key holding {label}", with_value(record, path, value, key=f"/fixture/{PRIVATE}/key")) for label, value in HOSTILE[:3]]
+                for label, changed in variants:
+                    written = daily.render_record(changed)
+                    checked += 1
+                    with self.subTest(record=name, path="/".join(map(str, path)), case=label):
+                        self.assertNotIn(PRIVATE, written)
+                        assert_counts_only(self, json.loads(written))
+                        assert_times(self, json.loads(written))
+        self.assertGreater(checked, 400)
+
+    def test_both_outputs_are_the_checked_rendering_of_whatever_the_projection_returns(self):
+        """The check stands at the place that writes, not in the projection: a report that the projection returns with a field of its own is written without it, to stdout and to the file."""
+        daily = daily_module()
+        hostile = projected("codex")
+        hostile["codex_bulk_scan_limit"] = {"prompt": f"/fixture/{PRIVATE}/prompt"}
+        hostile["extra_field"] = f"/fixture/{PRIVATE}/extra"
+        hostile["host"][0]["name"] = f"/fixture/{PRIVATE}/name"
+        with tempfile.TemporaryDirectory() as temp:
+            directory = Path(temp)
+            (directory / "host.json").write_text("{}")
+            for label, extra, file_output in (("standard output", [], False), ("the file", ["--out", str(directory / "record.json")], True)):
+                out = io.StringIO()
+                with self.subTest(output=label), mock.patch.object(daily, "project_reports", return_value=hostile), contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+                    daily.main(["--half", "codex", "--host-report", str(directory / "host.json"), "--now", NOW, *extra])
+                    written = (directory / "record.json").read_text() if file_output else out.getvalue()
+                    self.assertNotIn(PRIVATE, written)
+                    self.assertEqual(written, daily.render_record(hostile))
+                    self.assertNotIn("extra_field", json.loads(written))
+
+    def test_the_policy_scalar_of_the_native_report_is_a_count_through_both_outputs(self):
+        """Astra's read of c23b9ce48 (P1): `codex_use_policy.max_distinct_skill_reads` was copied into the record whatever it held; the record then carried an object with a prompt and a path, to stdout and to the file."""
+        daily = daily_module()
+        host, lanes, _ = codex_reports()
+        for label, value in HOSTILE + (("a valid count", 25),):
+            changed = json.loads(json.dumps(host))
+            changed["codex_use_policy"] = {"max_distinct_skill_reads": value}
+            projected_limit = daily.project_reports(changed, lanes, None, now=NOW, window=7, half="codex")["codex_bulk_scan_limit"]
+            self.assertEqual(projected_limit, 25 if label == "a valid count" else None, "the projection validates the scalar itself, before the output check")
+            with self.subTest(policy=label), tempfile.TemporaryDirectory() as temp:
+                directory = Path(temp)
+                (directory / "host.json").write_text(json.dumps(changed))
+                (directory / "lanes.json").write_text(json.dumps(lanes))
+                out = io.StringIO()
+                with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+                    daily.main(["--half", "codex", "--host-report", str(directory / "host.json"), "--codex-lanes-report", str(directory / "lanes.json"), "--now", NOW])
+                self.assertNotIn(PRIVATE, out.getvalue())
+                expected = 25 if label == "a valid count" else None
+                self.assertEqual(json.loads(out.getvalue())["codex_bulk_scan_limit"], expected)
+                with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                    daily.main(["--half", "codex", "--host-report", str(directory / "host.json"), "--codex-lanes-report", str(directory / "lanes.json"), "--now", NOW,
+                                "--out", str(directory / "record.json")])
+                written = (directory / "record.json").read_text()
+                self.assertNotIn(PRIVATE, written)
+                self.assertEqual(json.loads(written)["codex_bulk_scan_limit"], expected)
+
+    def test_the_file_and_the_standard_output_are_one_rendering_and_the_check_precedes_any_write(self):
+        daily = daily_module()
+        report = projected("claude")
+        report["codex_bulk_scan_limit"] = {"prompt": f"/fixture/{PRIVATE}/prompt"}
+        report["extra_field"] = f"/fixture/{PRIVATE}/extra"
+        with tempfile.TemporaryDirectory() as temp:
+            target = Path(temp) / "record.json"
+            daily.publish(target, report)
+            written = target.read_text()
+        self.assertEqual(written, daily.render_record(report))
+        self.assertNotIn(PRIVATE, written)
+        self.assertNotIn("extra_field", json.loads(written), "a key outside the schema is dropped")
+        self.assertIsNone(json.loads(written)["codex_bulk_scan_limit"])
+        self.assertEqual(daily.render_record(projected("claude")), json.dumps(projected("claude"), indent=2, sort_keys=True) + "\n", "a record the program writes itself is unchanged by the check")
+
+    def test_a_measured_flag_that_is_not_true_is_false_and_a_count_beyond_reason_is_unknown(self):
+        daily = daily_module()
+        report = projected("codex")
+        report["measured"] = {"codex": "yes"}
+        report["window_days"] = 10 ** 30
+        written = json.loads(daily.render_record(report))
+        self.assertEqual(written["measured"], {"codex": False})
+        self.assertIsNone(written["window_days"])
 
 
 class HalvesTests(unittest.TestCase):
