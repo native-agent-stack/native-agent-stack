@@ -16,6 +16,7 @@ calling it at a pinned commit. These tests keep the two copies one check:
   scaffold keeps that file under a `.template` name that validate.yml's repository-wide zizmor gate does not collect.
 """
 
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -225,6 +226,834 @@ class GateBehaviourTests(unittest.TestCase):
                 empty, done = run_check(script, [body(text), body(filled)])
                 self.assertIsNotNone(empty["failed"])
                 self.assertIsNone(done["failed"], done)
+
+
+# Correction #145: home paths reached public PR bodies. The fixtures assemble each private-looking value at run time,
+# so this file itself carries none of them for scripts/validate.py's own scan.
+SOURCES = "\n\n### SOTA sources\n- https://github.com/o/r at v1.2.3, src/x.py\n"
+HOME = "/" + "home/"
+BS = "\\"
+GRAPH_ID = "home-" + "alice-code-project"  # a graph project id, in the form without a leading dash
+CJK_NAME = chr(0x5F20) + chr(0x4F1F)  # an account name of two CJK letters
+MAX_BODY = 262144  # the gate's own bound, in code points
+PRIVACY_CASES = [
+    # (case, body, the rule ids the gate must name; [] means the body passes)
+    ("a Linux home path", "Logs are in " + HOME + "alice/state/x.log." + SOURCES, ["personal-home-path"]),
+    ("a macOS home path", "See /" + "Users/alice/notes.md." + SOURCES, ["personal-home-path"]),
+    ("a Windows profile through WSL", "From /mnt/c/" + "Users/Alice/AppData." + SOURCES,
+     ["personal-home-path", "windows-user-path"]),  # its /Users/<name>/ part is a home path as well, as in Python
+    ("an encoded scratch directory", "In /tmp/claude-1000/" + "-home-" + "alice-code-x/scratchpad." + SOURCES,
+     ["encoded-home-path"]),
+    ("an Anthropic-shaped key", "key " + "sk-" + "ant-" + "A" * 30 + SOURCES, ["api-secret"]),
+    ("a GitHub token", "token " + "gh" + "p_" + "a" * 36 + SOURCES, ["github-token"]),
+    ("a tilde path passes", "Logs are in ~/" + ".local/state/x.log." + SOURCES, []),
+    ("a masked home passes", "Logs are in " + HOME + "<user>/state/x.log." + SOURCES, []),
+    ("the documented example home passes", "e.g. " + HOME + "example/x." + SOURCES, []),
+    # The co-op's GPT read of 07595323 (P2-1): escaped and rendered forms are judged as they read.
+    ("a percent-encoded home path", "%2F" + "home%2Falice%2Fx" + SOURCES, ["personal-home-path"]),
+    ("a JSON-escaped slash", HOME.replace("/", "\\/") + "alice\\/x" + SOURCES, ["personal-home-path"]),
+    ("a JSON unicode escape", "\\u002f" + "home\\u002falice\\u002fx" + SOURCES, ["personal-home-path"]),
+    ("HTML character references", "&#47;" + "home&#x2F;alice&sol;x" + SOURCES, ["personal-home-path"]),
+    ("a name split by a Markdown link", HOME + "[al](https://example.org)ice/x" + SOURCES, ["personal-home-path"]),
+    ("a name split by emphasis", HOME + "**alice**/x" + SOURCES, ["personal-home-path"]),
+    ("a home path as a link destination", "[logs](file://" + HOME + "alice/x)" + SOURCES, ["personal-home-path"]),
+    ("a mixed-case macOS home", "See /" + "uSeRs/alice/x" + SOURCES, ["macos-user-path"]),
+    ("a lower-case macOS home", "See /" + "users/alice/x" + SOURCES, ["macos-user-path"]),
+    ("an API route passes", "GET https://api.github.com/" + "users/alice" + SOURCES, []),
+    ("an encoded masked home passes", "%2F" + "home%2F%3Cuser%3E%2Fx" + SOURCES, []),
+    ("an escaped example home passes", "&#47;" + "home&#47;example&#47;x" + SOURCES, []),
+    ("a rendered masked home passes", HOME + "**<user>**/x" + SOURCES, []),
+    ("a glob home passes", "Under /mnt/c/" + "Users/*/AppData and C:\\" + "Users\\*\\x" + SOURCES, []),
+    ("a glob under a home passes", HOME + "*/" + ".config" + SOURCES, []),
+    ("an underscored name", HOME + "_alice_/x" + SOURCES, ["personal-home-path"]),
+    # The command center's micro at 4360b9e2 (2c): GitHub hides a placeholder tag, so a forward-slash profile shows
+    # Users//x and is refused; an escaped '<' (\<name>, as in the Windows form below) shows the placeholder and passes.
+    ("an escaped placeholder in a Windows profile passes", "C:\\" + "Users\\<name>\\AppData" + SOURCES, []),
+    ("a placeholder tag in a forward-slash profile is refused", "/mnt/c/" + "Users/<name>/x" + SOURCES,
+     ["windows-user-path"]),
+    ("a path split by an inline tag", "/" + "home<b></b>/alice/x" + SOURCES, ["personal-home-path"]),
+    # (P2-2) Python's Unicode \w, not JavaScript's: an accented name is a word, and so is an accent before a token.
+    ("an accented encoded name", "home-" + chr(0xE9) + "-code-x" + SOURCES, ["encoded-home-path"]),
+    ("an accent glued to a token passes", chr(0xE9) + "hf_" + "a" * 20 + SOURCES, []),
+    # Codex's review of de4eed8f: decoders compose, PKCS #8 and OpenPGP key labels, a repository named like a graph
+    # project, and redundant leading slashes.
+    ("character references around emphasis", "&#47;" + "home&#47;**alice**&#47;x" + SOURCES, ["personal-home-path"]),
+    ("percent escapes around a link-split name", "%2F" + "home%2F[al](https://example.org)ice%2Fx" + SOURCES,
+     ["personal-home-path"]),
+    ("an escaped masked home around emphasis passes", "&#47;" + "home&#47;**<user>**&#47;x" + SOURCES, []),
+    ("an encrypted PKCS #8 key", "-----BEGIN " + "ENCRYPTED PRIVATE KEY-----" + SOURCES, ["private-key"]),
+    ("an OpenPGP private key block", "-----BEGIN " + "PGP PRIVATE KEY BLOCK-----" + SOURCES, ["private-key"]),
+    ("a public key passes", "-----BEGIN " + "PUBLIC KEY-----" + SOURCES, []),
+    ("a repository named like a graph project is refused", "https://github.com/acme/" + "home-" + "assistant-code-review"
+     + SOURCES, ["encoded-home-path"]),
+    ("a graph project id in a cache path", "~/.cache/codebase-memory-mcp/" + "home-" + "alice-code-x.db" + SOURCES,
+     ["encoded-home-path"]),
+    ("an encoded home in a local URL", "http://127.0.0.1:8788/p/" + "-home-" + "alice-code-x/" + SOURCES,
+     ["encoded-home-path"]),
+    ("a lower-case macOS home in a file URL", "file:///" + "users/alice/x" + SOURCES,
+     ["windows-user-path", "macos-user-path"]),  # file: ends in a drive-letter shape, as in Python
+    ("redundant leading slashes", "///" + "users/alice/x" + SOURCES, ["macos-user-path"]),
+    ("a doubled slash inside a URL path passes", "https://example.org/a//" + "users/alice" + SOURCES, []),
+    # The co-op's GPT read of fc60da90: the URL exemption is for a public code host's URL path only. A graph id behind a
+    # loopback, localhost, private or unlisted host, in userinfo or a query, or under an upper-case host is still read.
+    ("a graph id in a loopback URL", "http://127.0.0.1:8788/p/" + GRAPH_ID + SOURCES, ["encoded-home-path"]),
+    ("a graph id in a localhost URL", "https://localhost/p/" + GRAPH_ID + SOURCES, ["encoded-home-path"]),
+    ("a graph id in an IPv6 loopback URL", "http://[::1]/p/" + GRAPH_ID + SOURCES, ["encoded-home-path"]),
+    ("a graph id under a .localhost name", "http://pages.localhost/p/" + GRAPH_ID + SOURCES, ["encoded-home-path"]),
+    ("a graph id in a private-address URL", "http://192.168.1.5:8788/" + GRAPH_ID + SOURCES, ["encoded-home-path"]),
+    ("a graph id on an unlisted public host", "https://example.org/p/" + GRAPH_ID + SOURCES, ["encoded-home-path"]),
+    ("a graph id behind a code host in userinfo", "https://github.com@127.0.0.1/" + GRAPH_ID + SOURCES,
+     ["encoded-home-path"]),
+    ("a graph id in a code host URL's query", "https://github.com/a?u=" + GRAPH_ID + SOURCES, ["encoded-home-path"]),
+    ("a graph id under an upper-case code host", "https://GITHUB.COM/acme/" + GRAPH_ID + SOURCES, ["encoded-home-path"]),
+    ("a repository on a code host's subdomain is refused", "https://gist.github.com/acme/" + GRAPH_ID + SOURCES,
+     ["encoded-home-path"]),
+    # The command center's Claude read of 4e5ef13d (B3): the exemption is for the repository segment of a code-host URL
+    # that starts its own token, so an inner scheme, a query, a link destination, a delimiter or a deeper path is read.
+    ("a graph id behind a code host inside a local URL", "http://127.0.0.1:8788/p/https://github.com/" + GRAPH_ID + SOURCES,
+     ["encoded-home-path"]),
+    ("a graph id behind a code host in a local URL's query", "http://localhost/?q=https://github.com/p/" + GRAPH_ID + SOURCES,
+     ["encoded-home-path"]),
+    ("a graph id as a code-host link's destination", "[https://github.com/o/r](" + GRAPH_ID + ")" + SOURCES,
+     ["encoded-home-path"]),
+    ("a graph id after a comma behind a code-host URL", "https://github.com/o/r," + GRAPH_ID + SOURCES, ["encoded-home-path"]),
+    ("a graph id deeper in a code-host URL's path", "https://github.com/o/r/blob/main/" + GRAPH_ID + ".db" + SOURCES,
+     ["encoded-home-path"]),
+    ("a graph id after a pipe behind a code-host URL", "| https://github.com/o|" + GRAPH_ID + " |" + SOURCES,
+     ["encoded-home-path"]),
+    ("a graph id after a table cell's code-host URL", "|https://github.com/acme|/" + GRAPH_ID + "|" + SOURCES,
+     ["encoded-home-path"]),
+    ("a graph id after a code-host URL and a semicolon", "https://github.com/acme;/" + GRAPH_ID + SOURCES,
+     ["encoded-home-path"]),
+    ("a graph id after a code-host URL and a comma", "https://github.com/acme,/" + GRAPH_ID + SOURCES,
+     ["encoded-home-path"]),
+    ("a linked repository named like a graph project is refused", "[r](https://github.com/acme/" + GRAPH_ID + ")" + SOURCES,
+     ["encoded-home-path"]),
+    ("an autolinked repository named like a graph project is refused", "<https://gitlab.com/acme/" + GRAPH_ID + ">"
+     + SOURCES, ["encoded-home-path"]),
+    # The command center's Claude micro at 752d9618 (M2): a code-host URL glued inside another URL after a token-start
+    # character still exempted a graph id. With the exemption gone, each is refused.
+    *[("a graph id behind a code host glued after " + glue, "http://localhost/?q=" + glue + "https://github.com/o/" + GRAPH_ID
+       + SOURCES, ["encoded-home-path"]) for glue in ("(", "'", '"', "[", "<", ">")],
+    ("a graph id behind a code host in a nested link destination", "[t](http://localhost/(https://github.com/o/" + GRAPH_ID
+     + "))" + SOURCES, ["encoded-home-path"]),
+    # Codex's review of d81969dd (T8): GitHub hides an HTML comment, so a value split by one reads whole.
+    ("a home path split by an HTML comment", "/ho<!--x-->me/alice/x" + SOURCES, ["personal-home-path"]),
+    ("a home path split by an empty HTML comment", "/ho<!-->me/alice/x" + SOURCES, ["personal-home-path"]),
+    ("a token split by an HTML comment", "gh<!-- -->p_" + "a" * 36 + SOURCES, ["github-token"]),
+    ("a home path split by a reference to a zero-width space", "/ho&#x200b;me/alice/x" + SOURCES, ["personal-home-path"]),
+    # The micro at 752d9618: two link shapes 4e5ef13d decoded and 752d9618 did not.
+    ("a name split by a link whose title is on the next line", HOME + "[al](https://example.org\n\"t\")ice/x" + SOURCES,
+     ["personal-home-path"]),
+    ("a name split by a link whose title holds a parenthesis", HOME + "[al](https://example.org \"t(x\")ice/x" + SOURCES,
+     ["personal-home-path"]),
+    # The same read (B4): a WSL distribution's home through its Windows UNC path, as File Explorer and the WSL
+    # documentation write it, and JSON-escaped.
+    ("a WSL home through wsl.localhost", BS * 2 + "wsl.localhost" + BS + "Ubuntu" + BS + "home" + BS + "alice" + BS + "x"
+     + SOURCES, ["personal-home-path"]),
+    ("a WSL home through wsl$", BS * 2 + "wsl$" + BS + "Ubuntu-24.04" + BS + "home" + BS + "alice" + SOURCES,
+     ["personal-home-path"]),
+    ("a WSL home through the wsl prefix", BS * 2 + "WSL" + BS + "Ubuntu" + BS + "home" + BS + "alice" + SOURCES,
+     ["personal-home-path"]),
+    ("a JSON-escaped WSL home", BS * 4 + "wsl.localhost" + BS * 2 + "Ubuntu" + BS * 2 + "home" + BS * 2 + "alice" + BS * 2
+     + "x" + SOURCES, ["personal-home-path"]),
+    ("a masked WSL home passes", BS * 2 + "wsl$" + BS + "Ubuntu" + BS + "home" + BS + "<WSL_USER>" + BS + "x" + SOURCES, []),
+    ("the example WSL home passes", BS * 2 + "wsl.localhost" + BS + "Ubuntu" + BS + "home" + BS + "example" + BS + "x"
+     + SOURCES, []),
+    # The micro at 752d9618: the rarer UNC forms (.NET's file path formats: device UNC paths, either slash).
+    ("a WSL home through a device UNC path", BS * 2 + "?" + BS + "UNC" + BS + "wsl.localhost" + BS + "D" + BS + "home" + BS
+     + "alice" + SOURCES, ["personal-home-path"]),
+    ("a WSL home through a dot device UNC path", BS * 2 + "." + BS + "unc" + BS + "wsl$" + BS + "D" + BS + "home" + BS
+     + "alice" + BS + "x" + SOURCES, ["personal-home-path"]),
+    ("a WSL home with mixed slashes", "//wsl$/D" + BS + "home" + BS + "alice" + BS + "x" + SOURCES, ["personal-home-path"]),
+    ("a WSL home under a distribution name with a space", BS * 2 + "wsl$" + BS + "Ubuntu 24.04" + BS + "home" + BS + "alice"
+     + SOURCES, ["personal-home-path"]),
+    ("a WSL home under a long distribution name", BS * 2 + "wsl$" + BS + "d" * 100 + BS + "home" + BS + "alice" + SOURCES,
+     ["personal-home-path"]),
+    ("a Windows profile through a WSL home's mount", BS * 2 + "wsl.localhost" + BS + "D" + BS + "mnt" + BS + "c" + BS
+     + "Users" + BS + "alice" + BS + "x" + SOURCES, ["personal-home-path"]),
+    # Codex's threads 4246122631 and 4246122640 at 30f2e005: an account name is any run of word characters (Unicode
+    # letters and digits too), and a bearer value takes RFC 6750 2.1's b64token alphabet with its '=' padding, in
+    # scripts/validate.py and both copies.
+    ("a CJK account name in a Linux home", HOME + CJK_NAME + "/x" + SOURCES, ["personal-home-path"]),
+    ("a CJK account name in a macOS home", "/" + "Users/" + CJK_NAME + "/x" + SOURCES, ["personal-home-path"]),
+    ("a CJK account name in a WSL home", BS * 2 + "wsl$" + BS + "Ubuntu" + BS + "home" + BS + CJK_NAME + BS + "x" + SOURCES,
+     ["personal-home-path"]),
+    ("a CJK account name in a Windows profile", "C:" + BS + "Users" + BS + CJK_NAME + BS + "x" + SOURCES,
+     ["windows-user-path"]),
+    ("a CJK account name in an encoded home", "-home-" + CJK_NAME + "-code-x" + SOURCES, ["encoded-home-path"]),
+    ("a bearer token with an early plus", "Bearer " + "abcdefghij+klmnopqrstuvwxyz1234567890==" + SOURCES,
+     ["bearer-credential"]),
+    ("a bearer token with an early slash", "Bearer " + "abcdefghij/klmnopqrstuvwxyz1234567890" + SOURCES,
+     ["bearer-credential"]),
+    ("a short padded bearer value passes", "Bearer " + "a" * 29 + "==" + SOURCES, []),
+]
+
+# Cases the gate judges beyond validate.py's patterns: decoded, rendered or projected forms, and the gate-only macOS rule.
+GATE_ONLY_CASES = {"a percent-encoded home path", "a JSON-escaped slash", "a JSON unicode escape",
+                   "HTML character references", "a name split by a Markdown link", "a name split by emphasis", "a path split by an inline tag",
+                   "a mixed-case macOS home", "a lower-case macOS home", "character references around emphasis",
+                   "percent escapes around a link-split name", "a home path split by an HTML comment",
+                   "a home path split by an empty HTML comment", "a token split by an HTML comment",
+                   "a home path split by a reference to a zero-width space",
+                   "a name split by a link whose title is on the next line",
+                   "a name split by a link whose title holds a parenthesis",
+                   "a lower-case macOS home in a file URL", "redundant leading slashes",
+                   "a placeholder tag in a forward-slash profile is refused"}
+
+# The HTML5 named-reference table as github/cmark-gfm pins it (src/entities.inc), the gate's subset's source.
+CMARK_PIN = "587a12bb54d95ac37241377e6ddc93ea0e45439b"
+ENTITY_FIXTURE = ROOT / "tests/fixtures/cmark-gfm-entities-587a12bb.json"
+UPSTREAM_CMARK = Path.home() / "code/upstream/github/cmark-gfm"
+NODE_PROJECT = r"""
+const fs = require('fs');
+const project = (s) => s.replace(/(?![\t\n\r])[\p{Cc}\p{Cf}\p{Zl}\p{Zp}\p{Default_Ignorable_Code_Point}]/gu, '').normalize('NFKC');
+process.stdout.write(JSON.stringify(JSON.parse(fs.readFileSync(0, 'utf8')).map(project)));
+"""
+
+
+def node_project(text: str) -> str:
+    """The gate's character projection (strip, then NFKC), run in node as the job runs it."""
+    result = subprocess.run([NODE, "-e", NODE_PROJECT], input=json.dumps([text]), capture_output=True, text=True,
+                            timeout=60, check=True)
+    return json.loads(result.stdout)[0]
+
+
+def gate_entities() -> dict:
+    """The gate's named-reference map, evaluated from the job's script between its entities markers."""
+    script = inline_script(sota_job(GATE))
+    block = script.split("// entities-begin\n", 1)[1].split("// entities-end\n", 1)[0]
+    result = subprocess.run([NODE, "-e", block + "\nprocess.stdout.write(JSON.stringify(Object.fromEntries(named)));"],
+                            capture_output=True, text=True, timeout=60, check=True)
+    return json.loads(result.stdout)
+
+
+# The command center's micro and the GPT read at 4360b9e2: the gate reads the text github/cmark-gfm@587a12bb displays.
+# For each body of a fixed corpus (values with markup inserted or wrapped around their spans), the fixture records the
+# rules validate.py's PRIVATE_CONTENT finds in the pinned renderer's visible text; both copies must refuse each.
+RENDERED_FIXTURE = ROOT / "tests/fixtures/cmark-gfm-rendered-rules-587a12bb.json"
+CMARK_ARGS = ["--unsafe", "-e", "strikethrough", "-e", "table", "-e", "autolink", "-e", "tasklist"]
+GCC = shutil.which("gcc")
+
+
+def rendered_corpus() -> list:
+    """The parity corpus: each value with a construct inserted at every position, or wrapped around each span of up to
+    four characters, then a line holding two reference definitions; every third body, sorted, is kept."""
+    values = [HOME + "alice/x", "C:/" + "Users/alice/x", "C:" + BS + "Users" + BS + "alice" + BS + "x",
+              "-home-" + "alice-code-x", "home-" + "alice-code-x", "gh" + "p_" + "a" * 36, "github" + "_pat_" + "a" * 30,
+              "Bearer " + "A" * 40]
+    inserts = ["*", "**", "_", "__", "~~", "`", "[", "]", "[x](y)", "<x>", "<!--x-->", BS, "&amp;"]
+    wraps = [("*", "*"), ("**", "**"), ("_", "_"), ("~~", "~~"), ("`", "`"), ("[", "](u)"), ("[", "](u(v))"),
+             ("[", "][r]"), ("[", "]"), ("**", "*"), ("![", "](u)")]
+    bodies = set()
+    for value in values:
+        for at in range(1, len(value)):
+            bodies.update(value[:at] + piece + value[at:] for piece in inserts)
+        for start in range(len(value)):
+            for end in range(start + 1, min(len(value), start + 4) + 1):
+                bodies.update(value[:start] + left + value[start:end] + right + value[end:] for left, right in wraps)
+    return sorted("x " + text + " y\n\n[r]: https://example.org\n[alice]: https://example.org\n" for text in bodies)[::3]
+
+
+def build_pinned_cmark(directory: Path) -> Path:
+    """cmark-gfm at CMARK_PIN from the github/cmark-gfm mirror, compiled with gcc (CMake is not needed): its three
+    generated headers are written as its CMake files write them for a C99 platform with stdbool, __builtin_expect
+    and __attribute__."""
+    archive = subprocess.run(["git", "-C", str(UPSTREAM_CMARK), "archive", CMARK_PIN], capture_output=True, check=True)
+    subprocess.run(["tar", "-x", "-C", str(directory)], input=archive.stdout, check=True)
+    build = directory / "build"
+    build.mkdir()
+    config = (directory / "src/config.h.in").read_text(encoding="utf-8")
+    for name in ("HAVE_STDBOOL_H", "HAVE___BUILTIN_EXPECT", "HAVE___ATTRIBUTE__"):
+        config = config.replace("#cmakedefine " + name, "#define " + name)
+    (build / "config.h").write_text(config, encoding="utf-8")
+    version = (directory / "src/cmark-gfm_version.h.in").read_text(encoding="utf-8")
+    for key, value in (("MAJOR", "0"), ("MINOR", "29"), ("PATCH", "0"), ("GFM", "13")):
+        version = version.replace("@PROJECT_VERSION_" + key + "@", value)
+    (build / "cmark-gfm_version.h").write_text(version, encoding="utf-8")
+    (build / "cmark-gfm_export.h").write_text("#define CMARK_GFM_EXPORT\n#define CMARK_GFM_NO_EXPORT\n"
+                                               "#define CMARK_GFM_DEPRECATED\n", encoding="utf-8")
+    (build / "cmark-gfm-extensions_export.h").write_text("#define CMARK_GFM_EXTENSIONS_EXPORT\n"
+                                                          "#define CMARK_GFM_EXTENSIONS_NO_EXPORT\n", encoding="utf-8")
+    sources = sorted(str(path) for folder in ("src", "extensions") for path in (directory / folder).glob("*.c"))
+    binary = build / "cmark-gfm"
+    subprocess.run([GCC, "-O2", "-std=c99", "-D_GNU_SOURCE", "-I" + str(build), "-I" + str(directory / "src"),
+                    "-I" + str(directory / "extensions"), "-o", str(binary), *sources], capture_output=True, check=True)
+    return binary
+
+
+def visible_text(markup: str) -> str:
+    """The text a reader sees in rendered HTML: text nodes and image alt text, a line break per block."""
+    import html.parser
+
+    class Visible(html.parser.HTMLParser):
+        def __init__(self):
+            super().__init__(convert_charrefs=True)
+            self.out = []
+
+        def handle_data(self, data):
+            self.out.append(data)
+
+        def handle_starttag(self, tag, attrs):
+            if tag == "img":
+                self.out.append(dict(attrs).get("alt") or "")
+            if tag in ("p", "li", "td", "th", "br", "h1", "h2", "h3", "h4", "h5", "h6", "pre", "blockquote", "tr"):
+                self.out.append("\n")
+
+    parser = Visible()
+    parser.feed(markup)
+    parser.close()
+    return "".join(parser.out)
+
+
+def displayed_rules(text: str) -> str:
+    """The gate ids of validate.py's rules that find something in text, sorted and comma-joined."""
+    sys.path.insert(0, str(ROOT / "scripts"))
+    import validate
+    patterns = dict(validate.PRIVATE_CONTENT)
+    return ",".join(sorted(rule for rule, name in PYTHON_NAMES.items() if patterns[name].search(text)))
+
+
+# The repository's own WSL recipe, receipts and their frozen copies write the UNC form with the user masked.
+MASKED_WSL_FILES = ["adoption/platforms/linux-wsl2-new-distro.md", "adoption/templates/wsl/stage1-receipt.example.json",
+                    "docs/decisions/2026-10-01-new-wsl-distro-recipe.md", "docs/secret-storage.md",
+                    "evidence/artifacts/new-wsl-fix-wave-20261004/frozen-inputs/linux-wsl2-new-distro.md.txt",
+                    "evidence/artifacts/new-wsl-fix-wave-20261004/frozen-inputs/test_wsl_new_distro_recipe.py.txt",
+                    "evidence/artifacts/new-wsl-rehearsal-20261002/runs-on-wsl-3.0.1.json",
+                    "evidence/artifacts/new-wsl-rehearsal-20261002/stage1-receipt.json",
+                    "evidence/artifacts/user-facing-local-time-20261005/frozen-inputs/2026-10-01-new-wsl-distro-recipe.md.txt",
+                    "evidence/artifacts/user-facing-local-time-20261005/frozen-inputs/stage1-receipt.example.json.txt",
+                    "tests/test_wsl_new_distro_recipe.py"]
+
+
+class ScriptsValidateWslHomeTests(unittest.TestCase):
+    def test_scripts_validate_reads_a_wsl_unc_home(self):
+        # The command center's Claude read of 4e5ef13d (B4), in validate.py's copy of the rule.
+        sys.path.insert(0, str(ROOT / "scripts"))
+        import validate
+        pattern = dict(validate.PRIVATE_CONTENT)["personal home path"]
+        cases = [(case, text, rules) for case, text, rules in PRIVACY_CASES if "WSL home" in case]
+        self.assertEqual(len(cases), 13)  # with the CJK account name (Codex's thread 4246122631)
+        for case, text, rules in cases:
+            with self.subTest(case=case):
+                self.assertEqual(bool(pattern.search(text)), rules == ["personal-home-path"])
+
+    def test_the_tracked_masked_wsl_homes_stay_clean(self):
+        sys.path.insert(0, str(ROOT / "scripts"))
+        import validate
+        pattern = dict(validate.PRIVATE_CONTENT)["personal home path"]
+        unc_home = re.compile(r"\\\\+[Ww][Ss][Ll](?:\.localhost|\$)\\+[^\\\s]+\\+home\\+")
+        lines = [line for path in MASKED_WSL_FILES for line in (ROOT / path).read_text(encoding="utf-8").splitlines()
+                 if unc_home.search(line)]
+        self.assertGreaterEqual(len(lines), len(MASKED_WSL_FILES))
+        self.assertEqual(sum(1 for line in lines if pattern.search(line)), 0)
+
+
+@unittest.skipUnless(NODE, "node unavailable; CI's runner images carry it")
+class GatePrivacyTests(unittest.TestCase):
+    def test_both_copies_fail_a_private_body_naming_only_the_rule(self):
+        payloads = [body(text) for _, text, _ in PRIVACY_CASES]
+        outcomes = {path.name: run_check(inline_script(sota_job(path)), payloads) for path in (VALIDATE, GATE)}
+        self.assertEqual(outcomes["pr-metadata.yml"], outcomes["sota-sources-gate.yml"])
+        for (case, text, rules), outcome in zip(PRIVACY_CASES, outcomes["sota-sources-gate.yml"]):
+            with self.subTest(case=case):
+                if not rules:
+                    self.assertIsNone(outcome["failed"], outcome)
+                    continue
+                self.assertIsNotNone(outcome["failed"])
+                self.assertIn(f"(rules: {', '.join(rules)})", outcome["failed"])
+                for token in re.findall(r"\S+", text):  # no piece of the body is echoed back
+                    if "/" in token or token.startswith(("sk-", "ghp_")) or "home-" in token:
+                        self.assertNotIn(token.strip(".,"), outcome["failed"])
+
+    def test_both_problems_are_reported_together(self):
+        (outcome,) = run_check(inline_script(sota_job(GATE)), [body("See " + HOME + "alice/x.")])
+        self.assertIn('non-empty "SOTA sources" section', outcome["failed"])
+        self.assertIn("(rules: personal-home-path)", outcome["failed"])
+
+    def test_the_body_is_refused_before_it_is_read(self):
+        # (P2-3) A non-text, oversized, malformed or control-character body fails with a fixed id, in both copies.
+        # The size bound is the gate's own, in code points: GitHub's REST update keeps at most 262,144 UTF-8 bytes
+        # (measured 2026-10-11), and #786's description has 75,726 characters.
+        at_limit = "x" * (MAX_BODY - len(SOURCES)) + SOURCES
+        astral = chr(0x1F600) * (MAX_BODY - len(SOURCES)) + SOURCES  # twice as many UTF-16 code units
+        cases = [
+            ("at the limit", body(at_limit), None),
+            ("one over the limit", body(at_limit + "x"), "body-size"),
+            ("astral characters at the limit", body(astral), None),
+            ("one astral character over the limit", body(astral + chr(0x1F600)), "body-size"),
+            ("a description as long as #786's", body("x" * (75_726 - len(SOURCES)) + SOURCES), None),
+            ("far over the limit", body("a" * 4 * MAX_BODY + SOURCES), "body-size"),
+            ("a NUL", body("abc\x00def" + SOURCES), "body-control"),
+            ("an escape character", body("\x1b[31m" + SOURCES), "body-control"),
+            ("a C1 control", body("\x9b" + SOURCES), "body-control"),
+            ("a lone surrogate", body("\ud800" + SOURCES), "body-encoding"),
+            ("an object", body({}), "body-type"),
+            ("a list", body([]), "body-type"),
+            ("a number", body(12), "body-type"),
+            ("a boolean", body(True), "body-type"),
+            ("tabs and CRLF pass", body("a\tb\r\n" + SOURCES), None),
+        ]
+        payloads = [payload for _, payload, _ in cases]
+        outcomes = {path.name: run_check(inline_script(sota_job(path)), payloads) for path in (VALIDATE, GATE)}
+        self.assertEqual(outcomes["pr-metadata.yml"], outcomes["sota-sources-gate.yml"])
+        for (case, _, refused), outcome in zip(cases, outcomes["sota-sources-gate.yml"]):
+            with self.subTest(case=case):
+                if refused is None:
+                    self.assertIsNone(outcome["failed"], outcome)
+                else:
+                    self.assertEqual(outcome["failed"], f"The PR description cannot be checked (rule: {refused}): it "
+                                     f"must be text of at most {MAX_BODY} characters, with no control characters "
+                                     "other than tabs and line breaks.")
+
+    def test_the_guard_admits_tabs_and_line_breaks_only(self):
+        # The command center's Claude read of 4e5ef13d (B1): #1003's mirror finds section content in U+001C and U+0085,
+        # so the guard must not refuse them. A line break is a paragraph separator, Bidi_Class B in the Unicode
+        # Character Database Python carries; every other C0 and C1 control is refused, in both copies.
+        import unicodedata
+        controls = [chr(code) for code in [*range(0x20), *range(0x7F, 0xA0)]]
+        payloads = [body("a" + control + "b" + SOURCES) for control in controls]
+        outcomes = {path.name: run_check(inline_script(sota_job(path)), payloads) for path in (VALIDATE, GATE)}
+        self.assertEqual(outcomes["pr-metadata.yml"], outcomes["sota-sources-gate.yml"])
+        for control, outcome in zip(controls, outcomes["sota-sources-gate.yml"]):
+            with self.subTest(control=hex(ord(control))):
+                admitted = control == "\t" or unicodedata.bidirectional(control) == "B"
+                self.assertEqual(outcome["failed"] is None, admitted, outcome)
+                if not admitted:
+                    self.assertIn("(rule: body-control)", outcome["failed"])
+
+    def test_a_value_split_by_an_admitted_or_format_character_is_still_caught(self):
+        # The command center's Claude micro at 752d9618 (M1): the guard admits U+001C to U+001E and U+0085, and the
+        # scan never removed them, so a value split by one passed both copies (52 of 68); at 4e5ef13d all 68 were
+        # refused. The rules now also read a projection without Cc, Cf, Zl and Zp characters (but tab, LF and CR).
+        shapes = ["/home/<s>alice/x", "/ho<s>me/alice/x", "/home<s>/alice/x", "-home-<s>alice-code-x/", "home-al<s>ice-code-x",
+                  "ho<s>me-alice-code-x", "C:" + BS + "Users" + BS + "<s>Alice", "C:" + BS + "Us<s>ers" + BS + "Alice",
+                  BS * 2 + "wsl$" + BS + "D" + BS + "home" + BS + "<s>alice", BS * 2 + "wsl$" + BS + "D" + BS + "ho<s>me" + BS
+                  + "alice", "gh" + "p_<s>" + "a" * 36, "gh" + "p_" + "a" * 18 + "<s>" + "a" * 18, "sk-" + "ant-<s>" + "A" * 30,
+                  # the separator only beside the value
+                  "<s>" + HOME + "alice/x", HOME + "alice/x<s>", "<s>" + GRAPH_ID, "<s>gh" + "p_" + "a" * 36]
+        separators = ["\x1c", "\x1d", "\x1e", "\x85", "\u200b", "\u00ad", "\u2028", "\u2029", "\u202e", "\ufeff", "\u2060"]
+        cases = [(shape, separator) for separator in separators for shape in shapes]
+        payloads = [body("x " + shape.replace("<s>", separator) + " y" + SOURCES) for shape, separator in cases]
+        outcomes = {path.name: run_check(inline_script(sota_job(path)), payloads) for path in (VALIDATE, GATE)}
+        self.assertEqual(outcomes["pr-metadata.yml"], outcomes["sota-sources-gate.yml"])
+        self.assertEqual(len(cases), 187)
+        for (shape, separator), outcome in zip(cases, outcomes["sota-sources-gate.yml"]):
+            with self.subTest(shape=shape[:24], separator=hex(ord(separator))):
+                self.assertIn("(rules: ", outcome["failed"] or "")
+
+    def test_a_value_split_or_completed_by_markup_references_or_ignorables_is_caught(self):
+        # The command center's micro at e15d1259 (N1, N2, N3) and its terminal ruling: the projection reads the sets the
+        # specifications define. Raw HTML of every kind in the GFM grammar (github/cmark-gfm@587a12bb test/spec.txt
+        # :9360-9431), the HTML5 named references, every Default_Ignorable_Code_Point, and NFKC width forms.
+        cases = []
+        markup = ["<x>", "</x>", "<x/>", '<x y="z">', "<font>", "</font>", "<nobr>", "<input>", "<template></template>",
+                  "<custom-el>", "<![CDATA[x]]>", "<?x?>", "<!-- c -->", "<!DOCTYPE x>", "<a href='q'>", "<x\ny=z>"]
+        for piece in markup:
+            cases.append(("markup " + piece, "/ho" + piece + "me/alice/x", "personal-home-path"))
+        cases += [("markup in a Windows profile", "C:" + BS + "Us<x>ers" + BS + "Alice", "windows-user-path"),
+                  ("CDATA in a Windows profile", "C:" + BS + "Users" + BS + "Al<![CDATA[]]>ice", "windows-user-path"),
+                  ("markup in a graph id", "home-al<x>ice-code-x", "encoded-home-path"),
+                  ("a processing instruction in a graph id", "home-al<?p?>ice-code-x", "encoded-home-path"),
+                  ("markup in a GitHub token", "gh<b>p_" + "a" * 36, "github-token"),
+                  ("markup in an Anthropic key", "sk-" + "ant-" + "A" * 15 + "<i>" + "A" * 15, "api-secret")]
+        for name in ("shy", "zwj", "zwnj", "lrm", "rlm", "ZeroWidthSpace", "NoBreak", "it", "ic", "af", "InvisibleTimes",
+                     "NegativeThinSpace"):
+            cases.append(("reference &" + name + ";", "/ho&" + name + ";me/alice/x", "personal-home-path"))
+        cases += [("&UnderBar; completes a token", "ghp&UnderBar;" + "a" * 36, "github-token"),
+                  ("&UnderBar; in a fine-grained token", "github&UnderBar;pat_" + "a" * 30, "github-token"),
+                  ("&dollar; completes a UNC home", BS * 2 + "wsl&dollar;" + BS + "D" + BS + "home" + BS + "alice",
+                   "personal-home-path"),
+                  ("&quest; completes a device path", BS * 2 + "&quest;" + BS + "UNC" + BS + "wsl.localhost" + BS + "D" + BS
+                   + "home" + BS + "alice", "personal-home-path"),
+                  ("&sol; and math letters", "&sol;&hopf;ome&sol;alice&sol;x", "personal-home-path")]
+        # Astra's read at 30f2e005 (P1): the placeholder exception kept a construct between whitespace, so a comment or a
+        # tag between "Bearer" and its token hid it from the bearer rule, while GitHub shows the token whole.
+        for piece in ("<!--x-->", "<x>", "<font>", "<input>", "<?x?>", "<![CDATA[x]]>", "<!X y>", "</x>"):
+            cases.append(("bearer split by " + piece, "Bearer " + piece + " " + "A" * 40, "bearer-credential"))
+            cases.append(("a token prefix split by " + piece, "gh" + "p_" + piece + "a" * 36, "github-token"))
+            cases.append(("a key prefix split by " + piece, "sk-" + "ant-" + piece + "A" * 30, "api-secret"))
+            cases.append(("a fine-grained token prefix split by " + piece, "github" + "_pat_" + piece + "a" * 30,
+                          "github-token"))
+            cases.append(("a Hugging Face prefix split by " + piece, "hf" + "_" + piece + "a" * 20, "hugging-face-token"))
+            cases.append(("a Tavily prefix split by " + piece, "tvly-" + piece + "a" * 24, "tavily-token"))
+            cases.append(("a spaced token prefix split by " + piece, "Bearer " + piece + " " + "gh" + "p_" + "a" * 36,
+                          "github-token"))
+        # GitHub hides any raw-HTML construct between path separators, a tag too (the micro at 4360b9e2, 2c), so the
+        # Windows profile name after it is read.
+        for piece in ("<!-- -->", "<?x?>", "<!X y>", "<![CDATA[]]>", "<x>", "<name>"):
+            cases.append(("a home split by " + piece + " between separators", "C:/" + "Users/" + piece + "/Alice",
+                          "windows-user-path"))
+        for point in (0x034F, 0xFE00, 0xFE0F, 0xE0100, 0x180B, 0x180F, 0x17B4, 0x3164, 0x115F, 0x2065, 0xFFF0, 0xE0002,
+                      0xE0041, 0xE007F):
+            cases.append((f"default-ignorable U+{point:04X}", "/ho" + chr(point) + "me/alice/x", "personal-home-path"))
+        cases += [("a numeric reference to VS16", "/ho&#xFE0F;me/alice/x", "personal-home-path"),
+                  ("a numeric reference to CGJ", "/ho&#x34F;me/alice/x", "personal-home-path"),
+                  ("a fullwidth solidus", chr(0xFF0F) + "home" + chr(0xFF0F) + "alice" + chr(0xFF0F) + "x", "personal-home-path"),
+                  ("a fullwidth reverse solidus", "C:" + chr(0xFF3C) + "Users" + chr(0xFF3C) + "Alice", "windows-user-path"),
+                  ("fullwidth letters", "/" + "".join(chr(0xFF41 + ord(c) - 97) for c in "home") + "/alice/x",
+                   "personal-home-path")]
+        payloads = [body("x " + text + " y" + SOURCES) for _, text, _ in cases]
+        outcomes = {path.name: run_check(inline_script(sota_job(path)), payloads) for path in (VALIDATE, GATE)}
+        self.assertEqual(outcomes["pr-metadata.yml"], outcomes["sota-sources-gate.yml"])
+        for (case, _, rule), outcome in zip(cases, outcomes["sota-sources-gate.yml"]):
+            with self.subTest(case=case):
+                self.assertIn(rule, outcome["failed"] or "")
+
+    def test_a_sample_across_the_entity_table_is_decoded(self):
+        # Every 2nd name of the pinned table, each placed where its decoded text completes a value: inside a home's
+        # name when it is word characters (an account name takes any), in place of a character a value holds, or, for a
+        # name that projects to nothing, inside one (the micro at 4360b9e2, 2d: names outside the old subset completed
+        # values the rules read).
+        table = gate_entities()
+        templates = [(HOME + "alice/x", "personal-home-path"), ("gh" + "p_" + "abcdefghijklmnopqrstuvwxyz0123456789",
+                                                             "github-token"), ("C:" + BS + "Users" + BS + "Alice", "windows-user-path")]
+        cases = []
+        for name in sorted(table)[::2]:
+            projected = node_project(table[name])
+            if projected == "":
+                cases.append((name, "/ho&" + name + ";me/alice/x", "personal-home-path"))
+            elif re.fullmatch(r"\w+", projected):
+                cases.append((name, HOME + "al&" + name + ";ice/x", "personal-home-path"))
+            elif len(projected) == 1:
+                for template, rule in templates:
+                    if projected in template:
+                        cases.append((name, template.replace(projected, "&" + name + ";", 1), rule))
+                        break
+        self.assertGreater(len(cases), 250)
+        payloads = [body("x " + text + " y" + SOURCES) for _, text, _ in cases]
+        outcomes = run_check(inline_script(sota_job(GATE)), payloads)
+        for (name, _, rule), outcome in zip(cases, outcomes):
+            with self.subTest(name=name):
+                self.assertIn(rule, outcome["failed"] or "")
+
+    def test_the_gate_holds_the_pinned_entity_table(self):
+        # The gate's map is the whole pinned HTML5 table (cmark-gfm src/entities.inc at 587a12bb, kept as
+        # tests/fixtures/cmark-gfm-entities-587a12bb.json): with account names of any word characters, a name outside
+        # the old ASCII subset completes a value (the micro at 4360b9e2, 2d), so every name is decoded as GitHub does.
+        fixture = json.loads(ENTITY_FIXTURE.read_text(encoding="utf-8"))
+        self.assertEqual(len(fixture["entities"]), 2125)
+        self.assertEqual(gate_entities(), {name: "".join(map(chr, points)) for name, points in fixture["entities"].items()})
+
+    @unittest.skipUnless((UPSTREAM_CMARK / "src/entities.inc").exists(), "the github/cmark-gfm mirror is not on this host")
+    def test_the_entity_fixture_is_the_pinned_upstream_table(self):
+        raw = subprocess.run(["git", "-C", str(UPSTREAM_CMARK), "show", CMARK_PIN + ":src/entities.inc"],
+                             capture_output=True, check=True).stdout
+        fixture = json.loads(ENTITY_FIXTURE.read_text(encoding="utf-8"))
+        self.assertEqual(hashlib.sha256(raw).hexdigest(), fixture["sha256"])
+        table = {}
+        for name, numbers in re.findall(rb'[{][(]unsigned char[*][)]"([A-Za-z0-9]+)", [{]([0-9, ]+)[}][}]', raw):
+            data = bytes(int(number) for number in numbers.decode().split(","))
+            table[name.decode()] = [ord(c) for c in data.split(b"\0", 1)[0].decode("utf-8")]
+        self.assertEqual(table, fixture["entities"])
+
+    def test_ordinary_markup_and_placeholders_still_pass(self):
+        texts = ["<details><summary>Notes</summary>See ~/" + ".config and the logs.</details>", "a <b>bold</b> word<br>",
+                 "<!-- a comment --> and <sub>2</sub>", "C:" + BS + "Users" + BS + "<name>" + BS + "AppData",
+                 HOME + "<user>/x", BS * 2 + "wsl$" + BS + "D" + BS + "home" + BS + "<WSL_USER>" + BS + "x",
+                 "Use `<x>` or <kbd>Ctrl</kbd>&shy;C, a&zwj;b, x&UnderBar;y and &dollar;5.", "fullwidth " + chr(0xFF21) + "BC",
+                 "an unclosed <!-- comment", "an unclosed <?pi and <![CDATA[ and <!X", "a < b > c and 1<2",
+                 "`C:/" + "Users/<name>/AppData` in a code span", "C:/" + "Users/" + BS + "<name>/AppData, escaped",
+                 "Bearer <user> token", HOME + "[alice]/x with no definition", HOME + "[al][ice]x/y, undefined",
+                 "/ho&#0;me/alice/x",
+                 # The rule of three (process_emphasis): GitHub shows these delimiters as written, so no value shows.
+                 "**/h*" + "ome/alice/x", "**-h*" + "ome-alice-code-x", "gh**p_a*" + "a" * 35,
+                 # A backslash-escaped '<' is text: GitHub shows C:\\Users<x>alice, so the tag is not removed.
+                 "C:" + BS + "Users" + BS + "<x>alice"]
+        outcomes = {path.name: run_check(inline_script(sota_job(path)), [body(text + SOURCES) for text in texts])
+                    for path in (VALIDATE, GATE)}
+        self.assertEqual(outcomes["pr-metadata.yml"], outcomes["sota-sources-gate.yml"])
+        self.assertEqual([outcome["failed"] for outcome in outcomes["sota-sources-gate.yml"]], [None] * len(texts))
+
+    def test_a_value_github_shows_whole_through_markdown_is_refused(self):
+        # The GPT read and the command center's micro at 4360b9e2: Codex's threads 4246122618 (a nested link destination),
+        # 4246122624 (a defined shortcut reference) and 4246122650 (nested emphasis), and the micro's 2a (escaped or
+        # emphasized underscores in a token), 2b (emphasis around '_' or a separator), 2c (a tag before a forward-slash
+        # profile name) and 2d (a reference outside the old ASCII subset). github/cmark-gfm@587a12bb shows each value
+        # whole; the gate now reads the text its inline parser displays.
+        cases = [
+            ("a nested link destination", HOME + "[al](foo(and(more)))ice/x", "personal-home-path"),
+            ("a defined shortcut reference", HOME + "[alice]/x\n\n[alice]: https://example.org", "personal-home-path"),
+            ("a defined collapsed reference", HOME + "[alice][]/x\n\n[alice]: https://example.org", "personal-home-path"),
+            ("nested emphasis", HOME + "**al*ice***/x", "personal-home-path"),
+            ("escaped underscores in a fine-grained token", "github" + BS + "_pat" + BS + "_" + "a" * 30, "github-token"),
+            ("emphasis inside a fine-grained token", "*g*" + "ithub_pat_" + "a" * 30, "github-token"),
+            ("emphasis around an underscore in a token", "gh*p_a*" + "a" * 35, "github-token"),
+            ("emphasis around a bearer's space", "*Bearer A*" + "A" * 39, "bearer-credential"),
+            ("emphasis around a home's separator", "/ho*me/" + "al*ice/x", "personal-home-path"),
+            ("strikethrough around a separator", "/ho~~me/" + "al~~ice/x", "personal-home-path"),
+            ("a link title on the next line", HOME + "[al](u\n'(t)')ice/x", "personal-home-path"),
+            ("an image's alt text", HOME + "![al](u)ice/x", "personal-home-path"),
+            ("a tag before a forward-slash profile name", "C:/" + "Users/<x>/alice/x", "windows-user-path"),
+            ("a reference outside the old subset in a graph id", "home-a&eacute;b-code-x", "encoded-home-path"),
+            ("a dotted capital I in a Windows profile", "C:/" + "Users/&Idot;lice/x", "windows-user-path"),
+            ("a dotted capital I opening a bearer value", "Bearer &Idot;" + "a" * 30, "bearer-credential"),
+            ("emphasis in a table cell", "| a |\n|---|\n| " + HOME + "*al*ice/x |", "personal-home-path"),
+            ("emphasis in a block quote", "> " + HOME + "_al_\n> ice/x", "personal-home-path"),
+        ]
+        payloads = [body(text + SOURCES) for _, text, _ in cases]
+        outcomes = {path.name: run_check(inline_script(sota_job(path)), payloads) for path in (VALIDATE, GATE)}
+        self.assertEqual(outcomes["pr-metadata.yml"], outcomes["sota-sources-gate.yml"])
+        for (case, _, rule), outcome in zip(cases, outcomes["sota-sources-gate.yml"]):
+            with self.subTest(case=case):
+                self.assertIn(rule, outcome["failed"] or "")
+
+    def test_clean_bodies_with_admitted_and_format_characters_pass(self):
+        # The projection removes characters; it never refuses a body that carries them around ordinary text.
+        texts = ["See the notes" + character + "in the docs, ~/" + ".config and <user>." for character in
+                 ("\x1c", "\x1d", "\x1e", "\x85", "\u200b", "\u00ad", "\u2028", "\u2029", "\u202e", "\ufeff", "<!-- a comment -->")]
+        outcomes = {path.name: run_check(inline_script(sota_job(path)), [body(text + SOURCES) for text in texts])
+                    for path in (VALIDATE, GATE)}
+        self.assertEqual(outcomes["pr-metadata.yml"], outcomes["sota-sources-gate.yml"])
+        self.assertEqual([outcome["failed"] for outcome in outcomes["sota-sources-gate.yml"]], [None] * len(texts))
+
+    def test_a_body_at_the_bound_is_scanned_in_bounded_time(self):
+        # The graph-id rule searched from every home- to the end of its run, quadratic in the run's length: a
+        # 262,144-character run of "home-a.b-c_d-" took 21 s in the gate per form and 93 s in validate.py. The name now
+        # runs at most 256 characters to -code-.
+        sys.path.insert(0, str(ROOT / "scripts"))
+        import time
+        import validate
+        run = ("home-a.b-c_d-" * (MAX_BODY // 13 + 1))[:MAX_BODY - len(SOURCES)]
+        start = time.monotonic()
+        dict(validate.PRIVATE_CONTENT)["encoded home path"].search(run)
+        self.assertLess(time.monotonic() - start, 5)
+        mixed = ("home-a.b-c_d-%2F&#47;**a**\\/" * (MAX_BODY // 27 + 1))[:MAX_BODY - len(SOURCES)]
+        # The co-op's GPT read of fc60da90: a link label that may hold '[' rescans to the end of the body from every
+        # unmatched '[', so 262,144 of them gave no verdict within 125 s.
+        brackets = ["[" * (MAX_BODY - len(SOURCES)), ("![" * MAX_BODY)[:MAX_BODY - len(SOURCES)],
+                    ("[a][" * MAX_BODY)[:MAX_BODY - len(SOURCES)]]
+        # The command center's Claude read of 4e5ef13d (B2): adjacent whitespace quantifiers around an empty link
+        # destination retried every split of the run, so "[a](" and 65,536 spaces gave no verdict within 130 s.
+        unclosed = ["[a](" + filler * (MAX_BODY - 4 - len(SOURCES)) for filler in (" ", "\n", "\t")] + [
+            ("[a](" + "(b) " * MAX_BODY)[:MAX_BODY - len(SOURCES)], ("[a](b " * MAX_BODY)[:MAX_BODY - len(SOURCES)]]
+        # Round 2: unclosed comments, and the titled link shape's quote and whitespace runs.
+        projected = [("<!--" * MAX_BODY)[:MAX_BODY - len(SOURCES)], ("[a](" + '"' * MAX_BODY)[:MAX_BODY - len(SOURCES)],
+                     ("[a](b " + " \n" * MAX_BODY)[:MAX_BODY - len(SOURCES)], ("[a](\"x" * MAX_BODY)[:MAX_BODY - len(SOURCES)]]
+        # The terminal round: unclosed markup of each kind, attribute runs, references and width forms.
+        projected += [(unit * MAX_BODY)[:MAX_BODY - len(SOURCES)] for unit in
+                      ("<?", "<![CDATA[", "<!X", "<a b='", '<a b="', "<a b ", "<a ", "&shy;", "&UnderBar;", chr(0xFF0F))]
+        start = time.monotonic()
+        outcomes = run_check(inline_script(sota_job(GATE)),
+                             [body(text + SOURCES) for text in [run, mixed] + brackets + unclosed + projected])
+        self.assertLess(time.monotonic() - start, 45)
+        self.assertEqual([outcome["failed"] for outcome in outcomes], [None] * 24)
+
+    def test_a_body_built_against_the_renderer_is_scanned_in_bounded_time(self):
+        # The renderer port (the micro and the GPT read at 4360b9e2) at the bound: delimiter and bracket runs, deep
+        # destinations, backtick runs of every length, references, long link text, many lines, quotes, table cells and
+        # headings. Each is read in linear time, as cmark-gfm's own scanners are (its backtick and raw-HTML memos, the
+        # 32-deep destination limit, the 1,000-character label limit), and each decoder runs once per distinct text.
+        import time
+        n = MAX_BODY - len(SOURCES)
+        fill = lambda unit: (unit * (n // len(unit) + 1))[:n]  # noqa: E731
+        texts = [fill(unit) for unit in ("*a", "_a", "a_ _a", "~~a", "***a ", "[", "[]", "`a", "``a`", "&", "\\", "<x",
+                                          "[x]", "[a]: b\n", "\n", "> ", "# a #\n", "- ", "```\n", '[a](b "', "![",
+                                          "*[a](b)*", "_[_", "*_~`[]!<&\\(\n")]
+        texts += [("[a](" + "(" * n)[:n], ("[" + "a" * n)[:n - 1] + "]", ("# a" + " " * n)[:n],
+                  ("| a | b |\n|---|---|\n" + "| x " * n)[:n], "".join("`" * (i % 80 + 1) + "a" for i in range(4000))[:n]]
+        start = time.monotonic()
+        outcomes = run_check(inline_script(sota_job(GATE)), [body(text + SOURCES) for text in texts])
+        self.assertLess(time.monotonic() - start, 45)
+        self.assertEqual([outcome["failed"] for outcome in outcomes], [None] * len(texts))
+
+    def test_credential_lengths_agree_with_scripts_validate_at_each_minimum(self):
+        # (P2-2) one below, at and one above each rule's minimum length, alone and glued to Unicode word characters.
+        sys.path.insert(0, str(ROOT / "scripts"))
+        import validate
+        patterns = dict(validate.PRIVATE_CONTENT)
+        grid = [("hugging-face-token", "Hugging Face token", ["hf_"], 20),
+                ("github-token", "GitHub token", ["gh" + c + "_" for c in "pousr"] + ["github_pat_"], 30),
+                ("tavily-token", "Tavily token", ["tvly-", "tvly-prod-", "tvly-dev-"], 24),
+                ("api-secret", "API secret", ["sk-", "sk-proj-", "sk-ant-"], 24),
+                ("bearer-credential", "bearer credential", ["Bearer ", "bearer\u3000"], 30)]
+        cases = []
+        for rule, name, prefixes, minimum in grid:
+            for prefix in prefixes:
+                for length in (minimum - 1, minimum, minimum + 1):
+                    for before, after in (("", ""), (chr(0xE9), ""), ("", chr(0xE9)), ("x", ""), ("\u0663", "")):
+                        cases.append((rule, name, before + prefix + "a" * length + after))
+        outcomes = run_check(inline_script(sota_job(GATE)), [body(text + SOURCES) for _, _, text in cases])
+        for (rule, name, text), outcome in zip(cases, outcomes):
+            with self.subTest(rule=rule, case=repr(text[:16]), length=len(text)):
+                self.assertEqual(rule in (outcome["failed"] or ""), bool(patterns[name].search(text + SOURCES)))
+
+    def test_each_rule_agrees_with_scripts_validate(self):
+        # The gate's rules are validate.py's PRIVATE_CONTENT patterns written in JavaScript; on every case each rule
+        # gives the same verdict as its Python original.
+        sys.path.insert(0, str(ROOT / "scripts"))
+        import validate
+        patterns = dict(validate.PRIVATE_CONTENT)
+        corpus = [text for case, text, _ in PRIVACY_CASES if case not in GATE_ONLY_CASES] + [
+            "hf_" + "b" * 24, "tvly-" + "dev-" + "c" * 26, "-----BEGIN " + "RSA PRIVATE KEY-----",
+            "-----BEGIN " + "EC PRIVATE KEY-----", "-----BEGIN " + "PRIVATE KEY BLOCK-----",
+            "Bearer " + "d" * 40, "C:\\" + "Users\\Bob\\x", "-" + "Users-" + "bob-x", "home-" + "bob-code-x",
+            "plain text with no secret", HOME + "example/a", "x-home-" + "example-y",
+            "home-" + "a" * 256 + "-code-x", "home-" + "a" * 257 + "-code-x", "home-" + "a.b-" * 64 + "-code-x"]
+        outcomes = run_check(inline_script(sota_job(GATE)), [body(text + SOURCES) for text in corpus])
+        for text, outcome in zip(corpus, outcomes):
+            for rule, name in PYTHON_NAMES.items():
+                with self.subTest(rule=rule, case=text[:24]):
+                    self.assertEqual(rule in (outcome["failed"] or ""), bool(patterns[name].search(text + SOURCES)))
+
+
+class GateRendererParityTests(unittest.TestCase):
+    def test_every_body_whose_rendered_text_trips_a_rule_is_refused(self):
+        fixture = json.loads(RENDERED_FIXTURE.read_text(encoding="utf-8"))
+        corpus = rendered_corpus()
+        self.assertEqual(hashlib.sha256("\0".join(corpus).encode()).hexdigest(), fixture["corpus_sha256"])
+        self.assertEqual(len(fixture["rules"]), len(corpus))
+        self.assertGreater(sum(1 for rules in fixture["rules"] if rules), 2500)
+        payloads = [body(text + SOURCES) for text in corpus]
+        outcomes = {path.name: run_check(inline_script(sota_job(path)), payloads) for path in (VALIDATE, GATE)}
+        self.assertEqual(outcomes["pr-metadata.yml"], outcomes["sota-sources-gate.yml"])
+        missed = [(text, rules) for text, rules, outcome in zip(corpus, fixture["rules"], outcomes["sota-sources-gate.yml"])
+                  if any(rule not in (outcome["failed"] or "") for rule in filter(None, rules.split(",")))]
+        self.assertEqual(missed, [])
+
+    @unittest.skipUnless(GCC and (UPSTREAM_CMARK / "src/inlines.c").exists(), "gcc or the github/cmark-gfm mirror is not on this host")
+    def test_the_rendered_fixture_is_the_pinned_renderers_output(self):
+        fixture = json.loads(RENDERED_FIXTURE.read_text(encoding="utf-8"))
+        with tempfile.TemporaryDirectory() as directory:
+            binary = build_pinned_cmark(Path(directory))
+            spec = subprocess.run(["python3", str(Path(directory) / "test/spec_tests.py"), "--spec",
+                                   str(Path(directory) / "test/spec.txt"), "--program", f"{binary} --unsafe"],
+                                  capture_output=True, text=True, check=False)
+            self.assertIn("0 failed, 0 errored", spec.stdout)
+            rules = [displayed_rules(visible_text(subprocess.run([str(binary), *CMARK_ARGS], input=text, capture_output=True,
+                                                                 text=True, check=True).stdout)) for text in rendered_corpus()]
+        self.assertEqual(rules, fixture["rules"])
+
+
+# (P2-2) Each rule against its Python original over every code point Python assigns (bar surrogates and the
+# supplementary private-use planes), placed where Unicode classes and boundaries decide the verdict.
+PYTHON_NAMES = {"personal-home-path": "personal home path", "windows-user-path": "Windows user path",
+                "encoded-home-path": "encoded home path", "hugging-face-token": "Hugging Face token",
+                "github-token": "GitHub token", "tavily-token": "Tavily token", "api-secret": "API secret",
+                "private-key": "private key", "bearer-credential": "bearer credential"}
+# validate.py rules the gate leaves out (a pull request body may cite an identifier on purpose), and gate-only rules.
+SESSION_RULES = {"local session identifier", "local companion task handle"}
+GATE_ONLY_RULES = {"macos-user-path"}
+X = "\x01"  # where each code point goes
+TEMPLATES = {
+    "personal-home-path": ["/home/" + X, X + "/home" + "/al", "/home" + "/al" + X, "/home/example" + X, "/Users/" + X + "/a",
+                           "/" + X + "ome/al/", BS * 2 + "wsl$" + BS + "U" + BS + "home" + BS + X,
+                           BS * 2 + "wsl$" + BS + "U" + BS + "home" + BS + "example" + X,
+                           BS * 2 + "ws" + X + ".localhost" + BS + "U" + BS + "home" + BS + "al",
+                           BS * 2 + "wsl.localhos" + X + BS + "U" + BS + "home" + BS + "al",
+                           BS * 2 + "wsl$" + BS + X + BS + "home" + BS + "al", BS + X + "wsl$" + BS + "U" + BS + "home" + BS + "al",
+                           BS * 2 + "wsl$" + BS + "U" + BS + "hom" + X + BS + "al",
+                           BS * 2 + "wsl" + X + BS + "U" + BS + "home" + BS + "al",
+                           BS * 2 + "?" + BS + "UN" + X + BS + "wsl$" + BS + "U" + BS + "home" + BS + "al",
+                           BS * 2 + X + BS + "UNC" + BS + "wsl$" + BS + "U" + BS + "home" + BS + "al",
+                           "/" + X + "wsl$/U" + BS + "home" + BS + "al",
+                           BS * 2 + "wsl$" + BS + "U" + BS + "mnt" + BS + "c" + BS + "User" + X + BS + "al",
+                           BS * 2 + "wsl$" + BS + "U" + BS + "mn" + X + BS + "c" + BS + "Users" + BS + "al"],
+    "windows-user-path": ["C:\\User" + X + "\\bo", X + ":\\Users\\bo", "C:\\Users\\" + X,
+                          "C:\\Users\\example" + X, "/mnt/" + X + "/Users" + "/bo", "c:\\" + X + "sers\\bo"],
+    "encoded-home-path": [X + "-home-" + "bo-x", "-home-" + X, "-home-" + "bo" + X, "-home-example" + X, "home-" + X + "-code-x",
+                          X + "home-bo" + "-code-", "-User" + X + "-bo-", X + "--Users-" + "bo-", "-mnt-" + X + "-Users-" + "bo-",
+                          "-home-" + "bo" + X + "x", "home-bo" + X + "-code-"],
+    "hugging-face-token": [X + "hf_" + "a" * 20, "hf_" + "a" * 20 + X, "hf_" + "a" * 19 + X],
+    "github-token": [X + "ghp_" + "a" * 30, "ghp_" + "a" * 30 + X, "github_pat_" + "a" * 29 + X],
+    "tavily-token": [X + "tvly-" + "a" * 24, "tvly-" + "a" * 24 + X, "tvly-dev-" + "a" * 23 + X],
+    "api-secret": [X + "sk-" + "a" * 24, "sk-" + "a" * 24 + X, "sk-ant-" + "a" * 23 + X],
+    "private-key": ["-----BEGIN " + X + "PRIVATE KEY-----", "-----BEGIN" + X + "PRIVATE KEY-----",
+                    "-----BEGIN ENCRYPTED" + X + "PRIVATE KEY-----", "-----BEGIN PGP PRIVATE KEY" + X + "BLOCK-----",
+                    "-----BEGIN PRIVATE KEY" + X + "-----"],
+    "bearer-credential": [X + "Bearer " + "a" * 30, "Bearer" + X + "a" * 30, "Bearer " + "a" * 29 + X,
+                          "Bearer " + X + "a" * 29],
+}
+# Every letter the Python rules match case-insensitively, replaced in turn (re.IGNORECASE folds some non-ASCII
+# letters onto ASCII ones).
+for word, prefix, suffix, rule in (("Users", "C:\\", "\\bo", "windows-user-path"),
+                                   ("mnt", "/", "/c/Users" + "/bo", "windows-user-path"),
+                                   ("example", "C:\\Users\\", "", "windows-user-path"),
+                                   ("Users", "-", "-bo-", "encoded-home-path"),
+                                   ("mnt", "-", "-c-Users-bo-", "encoded-home-path"),
+                                   ("Bearer", "", " " + "a" * 30, "bearer-credential")):
+    for index in range(len(word)):
+        TEMPLATES[rule].append(prefix + word[:index] + X + word[index + 1:] + suffix)
+ORACLE = r"""
+const fs = require('fs');
+const {rules, templates, ranges} = JSON.parse(fs.readFileSync(0, 'utf8'));
+const privacy = new Function(rules + '\nreturn privacy;')();
+const points = [];
+for (const [first, last] of ranges) for (let cp = first; cp <= last; cp++) points.push(cp);
+const out = {flags: Object.fromEntries(privacy.map(([id, pattern]) => [id, pattern.flags])), verdicts: {}};
+for (const [id, pattern] of privacy) {
+  if (!(id in templates)) continue;
+  out.verdicts[id] = templates[id].map((template) => {
+    const [head, tail] = template.split('\x01');
+    return points.map((cp) => (pattern.test(head + String.fromCodePoint(cp) + tail) ? '1' : '0')).join('');
+  });
+}
+process.stdout.write(JSON.stringify(out));
+"""
+
+
+def assigned_ranges():
+    import unicodedata
+    ranges, start, previous = [], None, None
+    for cp in range(0x110000):
+        category = unicodedata.category(chr(cp))
+        keep = category not in ("Cn", "Cs") and not (category == "Co" and cp > 0xFFFF) and cp != 1
+        if keep and start is None:
+            start = cp
+        if not keep and start is not None:
+            ranges.append((start, previous))
+            start = None
+        previous = cp
+    if start is not None:
+        ranges.append((start, previous))
+    return ranges
+
+
+def privacy_rules(script: str) -> str:
+    return script.split("// privacy-rules-begin\n", 1)[1].split("// privacy-rules-end\n", 1)[0]
+
+
+@unittest.skipUnless(NODE, "node unavailable; CI's runner images carry it")
+class GateUnicodeParityTests(unittest.TestCase):
+    def test_every_rule_is_unicode_aware(self):
+        result = subprocess.run([NODE, "-e", ORACLE], input=json.dumps(
+            {"rules": privacy_rules(inline_script(sota_job(GATE))), "templates": {}, "ranges": []}),
+            capture_output=True, text=True, timeout=60, check=True)
+        for rule, flags in json.loads(result.stdout)["flags"].items():
+            with self.subTest(rule=rule):
+                self.assertIn("u", flags)
+
+    def test_every_scripts_validate_rule_has_its_gate_rule(self):
+        # Codex's review of de4eed8f: a rule added to or renamed in validate.py's PRIVATE_CONTENT fails here until
+        # the gate carries it, so the two scans cannot drift apart unnoticed.
+        sys.path.insert(0, str(ROOT / "scripts"))
+        import validate
+        self.assertEqual(set(PYTHON_NAMES.values()), {name for name, _ in validate.PRIVATE_CONTENT} - SESSION_RULES)
+        result = subprocess.run([NODE, "-e", ORACLE], input=json.dumps(
+            {"rules": privacy_rules(inline_script(sota_job(GATE))), "templates": {}, "ranges": []}),
+            capture_output=True, text=True, timeout=60, check=True)
+        self.assertEqual(set(json.loads(result.stdout)["flags"]), set(PYTHON_NAMES) | GATE_ONLY_RULES)
+
+    def test_each_rule_agrees_with_python_on_every_code_point(self):
+        sys.path.insert(0, str(ROOT / "scripts"))
+        import validate
+        patterns = dict(validate.PRIVATE_CONTENT)
+        ranges = assigned_ranges()
+        points = [cp for first, last in ranges for cp in range(first, last + 1)]
+        result = subprocess.run([NODE, "-e", ORACLE], input=json.dumps(
+            {"rules": privacy_rules(inline_script(sota_job(GATE))), "templates": TEMPLATES, "ranges": ranges}),
+            capture_output=True, text=True, timeout=900, check=False)
+        self.assertEqual(result.returncode, 0, result.stderr[-2000:])
+        verdicts = json.loads(result.stdout)["verdicts"]
+        self.assertEqual(set(verdicts), set(TEMPLATES))
+        for rule, templates in TEMPLATES.items():
+            pattern = patterns[PYTHON_NAMES[rule]]
+            for template, javascript in zip(templates, verdicts[rule]):
+                head, tail = template.split(X)
+                python = "".join("1" if pattern.search(head + chr(cp) + tail) else "0" for cp in points)
+                differing = [hex(cp) for cp, left, right in zip(points, python, javascript) if left != right]
+                with self.subTest(rule=rule, template=template.replace(X, "<X>")):
+                    self.assertEqual(differing, [], f"{len(differing)} code points differ")
 
 
 def zizmor(path: Path, directory: Path) -> tuple:

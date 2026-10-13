@@ -39,25 +39,40 @@ PRIVATE_CONTENT = (
     # Historical prose can glue a UUID to a word; word boundaries miss it.
     ("local session identifier", re.compile(r"[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}", re.I)),
     ("local companion task handle", re.compile(r"task-[a-z0-9]{8}-[a-z0-9]{6}", re.I)),
-    ("personal home path", re.compile(r"/(?:home|Users)/(?!example(?:/|\b))[A-Za-z0-9_.-]+(?:/|\b)")),
-    ("Windows user path", re.compile(r"(?:[A-Za-z]:[/\\]+|/mnt/[A-Za-z]/)Users[/\\]+(?!example(?:[/\\]|\b))[A-Za-z0-9_.-]+", re.I)),
+    # A WSL distribution's home through its Windows UNC path: \\wsl$\<distro>\home\<name>, \\wsl\... or
+    # \\wsl.localhost\..., the prefix in any case (MicrosoftDocs/wsl@a1473a69 WSL/filesystems.md:34;
+    # wsl-config.md:162; release-notes.md:24, :76, :145), also as a device UNC path (\\?\UNC\..., \\.\UNC\...),
+    # with either slash, and <distro>\mnt\<drive>\Users\<name> too (dotnet/docs@8a189e07
+    # docs/standard/io/file-path-formats.md:94-95, :155, :206), and JSON-escaped. An account name is any run of word
+    # characters (Unicode letters and digits too, Codex's thread 4246122631 on #991), dots and hyphens.
+    ("personal home path", re.compile(r"/(?:home|Users)/(?!example(?:/|\b))[\w.-]+(?:/|\b)"
+                                      r"|[\\/]{2,4}(?:[?.][\\/]{1,2}[Uu][Nn][Cc][\\/]{1,2})?[Ww][Ss][Ll]"
+                                      r"(?:\.[Ll][Oo][Cc][Aa][Ll][Hh][Oo][Ss][Tt]|\$)?[\\/]{1,2}[^\\/\r\n]{1,255}[\\/]{1,2}"
+                                      r"(?:home|mnt[\\/]{1,2}[A-Za-z][\\/]{1,2}[Uu][Ss][Ee][Rr][Ss])[\\/]{1,2}"
+                                      r"(?!example(?:[\\/]|\b))[\w.-]+(?:[\\/]|\b)")),
+    ("Windows user path", re.compile(r"(?:[A-Za-z]:[/\\]+|/mnt/[A-Za-z]/)Users[/\\]+(?!example(?:[/\\]|\b))[\w.-]+", re.I)),
     # Claude project and scratchpad directories encode path separators as dashes,
     # including bare homes and Windows profiles reached through WSL mounts. The Users
     # branches ignore case (Windows and default macOS filesystems are case-insensitive);
     # Linux's /home stays case-sensitive, like the plain home-path rule above.
     ("encoded home path", re.compile(
         r"(?<![\w-])(?:-home-|(?i:-Users-|[A-Za-z]--Users-|-mnt-[A-Za-z]-Users-))"
-        r"(?!example(?:-|[/\\\"'\s`)\]]|$))[A-Za-z0-9_.]+(?:-|(?=[/\\\"'\s`)\]]|$))"
+        r"(?!example(?:-|[/\\\"'\s`)\]]|$))[\w.]+(?:-|(?=[/\\\"'\s`)\]]|$))"
         # Graph project IDs omit the leading dash. Every punctuation wrapper,
         # including '_' and '-', is a boundary; Unicode alphanumerics are not.
-        # '<user>', '%u' and the complete 'example' placeholder remain exempt.
-        r"|(?<![^\W_])home-(?!example-code-)[\w.]+(?:-+[\w.]+)*-*-code-")),
+        # '<user>', '%u' and the complete 'example' placeholder remain exempt. The name
+        # runs at most 256 characters to -code-, so each home- is checked in bounded time.
+        r"|(?<![^\W_])home-(?!example-code-)[\w.][\w.-]{0,255}-code-")),
     ("Hugging Face token", re.compile(r"\bhf_[A-Za-z0-9]{20,}\b")),
     ("GitHub token", re.compile(r"\b(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,})\b")),
     ("Tavily token", re.compile(r"\btvly-(?:(?:prod|dev)-)?[A-Za-z0-9_-]{24,}\b")),
     ("API secret", re.compile(r"\bsk-(?:proj-|ant-)?[A-Za-z0-9_-]{24,}\b")),
-    ("private key", re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----")),
-    ("bearer credential", re.compile(r"\bBearer\s+[A-Za-z0-9._~-]{30,}", re.I)),
+    # gitleaks's private-key header (config/gitleaks.toml, rule private-key, at 83d9cd684c87), without its (?i):
+    # any PEM label, so PKCS #8 ENCRYPTED and OpenPGP "PRIVATE KEY BLOCK" headers too.
+    ("private key", re.compile(r"-----BEGIN[ A-Z0-9_-]{0,100}PRIVATE KEY(?: BLOCK)?-----")),
+    # RFC 6750 2.1's b64token: letters, digits, '-', '.', '_', '~', '+' and '/', then any '=' padding
+    # (rfc6750.txt:252-254, https://www.rfc-editor.org/rfc/rfc6750.txt; Codex's thread 4246122640 on #991).
+    ("bearer credential", re.compile(r"\bBearer\s+[A-Za-z0-9._~+/-]{30,}=*", re.I)),
 )
 
 

@@ -5167,8 +5167,8 @@
     },
     {
       "path": ".github/workflows/pr-metadata.yml",
-      "sha256": "3f0d77d6d28e2c1a15905a277cff15326a75c4960e37f634e2a2c12e2e7bffe6",
-      "bytes": 9927
+      "sha256": "cbcb0a3fcc7ec8d195df278e55e1ed204912509e2016bd0503d134aea10fc2cb",
+      "bytes": 94211
     },
     {
       "path": ".github/workflows/practice-references-freshness.yml",
@@ -5207,8 +5207,8 @@
     },
     {
       "path": ".github/workflows/sota-sources-gate.yml",
-      "sha256": "468a1d1b8b765823dc5175f546c236cdf026669de2581e8149c1ef68177274e7",
-      "bytes": 3020
+      "sha256": "adf95ab85f7a12416c90e1982cc4c1f6c379606a46daa3dedf0171d651fdca5a",
+      "bytes": 87304
     },
     {
       "path": ".github/workflows/supply-chain.yml",
@@ -18138,8 +18138,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-top-rule-sota-sources.md",
-      "sha256": "6d3f575b608c77b9bd1f976c3a67e509181afe758f534eac4f7e30df4457da77",
-      "bytes": 5226
+      "sha256": "49a7bf7390519c2d9f2db5fe5e2c03d54676efa06c8653d2599d028a38855240",
+      "bytes": 48231
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
@@ -61508,8 +61508,8 @@
     },
     {
       "path": "scripts/validate.py",
-      "sha256": "3f916684e81286af40aba000b8519cc54e6c5851e27f21f3d6115ffff2a3b882",
-      "bytes": 43199
+      "sha256": "8b5fde4c09af38186a742ba6acbf6bce59787b2bec33e85b9afbddbbe3df4c02",
+      "bytes": 44741
     },
     {
       "path": "scripts/validate_catalogs.py",
@@ -61580,6 +61580,16 @@
       "path": "tests/fixtures/adaptive_paper_exit_quote_age/aggregate-selection.json",
       "sha256": "aaa3f7180569798e9108a2d758ce6748190f845c39ed2d7b7e5dd75606196b76",
       "bytes": 2435
+    },
+    {
+      "path": "tests/fixtures/cmark-gfm-entities-587a12bb.json",
+      "sha256": "863c4003aa39e6445f112408678045391500bee219fb9dcf7ae847015dde0c0e",
+      "bytes": 60057
+    },
+    {
+      "path": "tests/fixtures/cmark-gfm-rendered-rules-587a12bb.json",
+      "sha256": "18d7949fbae523e02e80bbc12f92395f835ec0fbc2735e494c93f0c55f1e328a",
+      "bytes": 66963
     },
     {
       "path": "tests/fixtures/codex-worker-lane/README.md",
@@ -63223,8 +63233,8 @@
     },
     {
       "path": "tests/test_sota_sources_gate.py",
-      "sha256": "869038ea7c6261e335e942934b335789e9f3e883ee172835a1c0828ea4afa870",
-      "bytes": 16230
+      "sha256": "38df8b4c25009157ccd6bcd7708ff22e6db4cd7371a8dd7a105743949db37a33",
+      "bytes": 78595
     },
     {
       "path": "tests/test_spy_parity.py",
@@ -63338,8 +63348,8 @@
     },
     {
       "path": "tests/test_validate.py",
-      "sha256": "2fadd21151974c7ffbd0141a8c45ad3c2a833090d4d615476c3cd2318cf8bcaf",
-      "bytes": 53117
+      "sha256": "efd387aac30d8df5fa91898d172d4fca36b868aa959b17dc431908648b609f87",
+      "bytes": 55163
     },
     {
       "path": "tests/test_validate_shards.py",
