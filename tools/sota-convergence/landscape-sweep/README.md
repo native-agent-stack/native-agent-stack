@@ -818,7 +818,8 @@ catalog (`foundation` or `us-equities`):
 
 - **Scope.** `saturation_ledger.py --scope` freezes its requirement hash: the sha256 of the canonical
   `{requirement, acceptance}` of its planned row (`planned_requirement_sha256`). `--report` lists it after the
-  research-state layers, with research status `planned`, so `build_args.py --due-report` stages it when it is due.
+  research-state layers (in `--json`, `planned: true` and no `research_status`; the Markdown table shows `planned`),
+  so `build_args.py --due-report` stages it when it is due.
   A scope frozen before this change lacks the planned layers, and `build_inputs.py` refuses it; freeze it again.
 - **Input.** `build_inputs.py` writes `inputs/<layer>.json` after its catalog's landscape rows. The input has every
   field of a landscape input, plus `acceptance` and `planned` (`ref`, the planned row's pointer, and `source`, the

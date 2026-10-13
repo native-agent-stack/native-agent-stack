@@ -79,7 +79,8 @@ A planned layer is a row of
 [`catalogs/landscape/planned-layers.json`](../landscape/planned-layers.json): a layer an approved
 plan names that has no landscape row yet. It is swept as a repository layer of its own catalog
 (`foundation` or `us-equities`). `--scope` freezes its requirement hash with the research-state
-layers, `--report` lists it after them (research status `planned`), and `--append` records it.
+layers, `--report` lists it after them, and `--append` records it. A `--report --json` row has
+`planned: true` and no `research_status`; the Markdown table shows `planned` in that column.
 A planned layer that also has a `research-state.json` row is refused, as
 `scripts/final_stack.py` refuses one that has a landscape row.
 
