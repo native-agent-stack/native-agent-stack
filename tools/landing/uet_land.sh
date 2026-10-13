@@ -20,10 +20,14 @@
 # are used only in their typed shape, git's stderr is dropped, and the gate's output is echoed only when it is one of its own status lines (lg_gate).
 # #975 round 4 (2026-10-11, the CC's micro and Codex P1 at 761810d7): one landing per repository at a time (lg_lock), and one final_gate
 # after every slow step that reads each gate again, with nothing but the merge after it; a failed trading-cc-read read stops (exit 2).
+# 2026-10-13 (CC correction #198 and the owner's direction for local reviews): the no-reply author comes from LG_AUTHOR_LOGIN, and when
+# LOCAL_REVIEWS (or CODEX_LOCAL_REVIEW) names review files the Codex gate decides from them alone (README); this repository keeps the connector.
 set -u
 # Parsed whole before it runs: an edit while a landing runs cannot shift what the running copy executes (2026-10-09).
 {
 R=seathatflowsinourveins/us-equities-trading
+# CC correction #198: the merging account, whose no-reply address authors the squash merge (lg_author_email); the same account as nas_land.sh's.
+LG_AUTHOR_LOGIN=${LG_AUTHOR_LOGIN:-seathatflowsinourveins}
 N=${1:?pr}; E=${2:?read head}
 U=${LANDING_UET_REPO:-$HOME/code/us-equities-trading}; COORD=${LANDING_COORD:-${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/coordination}
 LG_GIT="git -C $U"
@@ -158,8 +162,14 @@ lg_follow_head() {  # <read head> <new head> <follows so far>
 # Correction #148 (2026-10-10): GitHub authors a squash merge with the account's primary email unless the merge names one, so every landing
 # published the owner's personal address. The merge names the no-reply form <id>+<login>@users.noreply.github.com (`gh pr merge -A`, gh 2.102.0);
 # the id comes from the public users API, because `gh api user` is refused by the secret-path guard. No stored address is ever printed.
-lg_author_email() {  # <owner/repo> : the account's no-reply address; rc 1 and nothing printed when the id is not a number
-  local login=${1%%/*} id
+# CC correction #198 (2026-10-13): the login is the merging account, LG_AUTHOR_LOGIN, and R's owner only when that is unset. After the
+# transfer R's owner was an organization, and the squash merge failed with GraphQL "Invalid email address": the no-reply form belongs to a
+# user account, "ID+USERNAME@users.noreply.github.com" (github/docs@be38ec5d email-addresses-reference.md:47). A login of another shape than
+# GitHub's (at most 39 alphanumerics and single inner dashes, username-considerations-for-external-authentication.md:94, :103, :126-127)
+# is refused before any call.
+lg_author_email() {  # <owner/repo> : the account's no-reply address; rc 1 and nothing printed when the login or the id is not well formed
+  local login=${LG_AUTHOR_LOGIN:-${1%%/*}} id
+  [[ "$login" =~ ^[A-Za-z0-9](-?[A-Za-z0-9])*$ ]] && [ "${#login}" -le 39 ] || return 1
   id=$(gh api "users/$login" --jq .id 2>/dev/null) || return 1
   case "$id" in ''|*[!0-9]*) return 1 ;; esac
   printf '%s+%s@users.noreply.github.com\n' "$id" "$login"
@@ -189,11 +199,30 @@ lg_have() {  # <commit>
 # (CPython v3.13.16 Modules/main.c:403-410), and an exception outside the gate's handler, such as a syntax error, prints a traceback
 # and exits 1 (:437-441, :118-123; Doc/library/sys.rst:394-399). The read head goes to the gate, which counts only a review of it or of
 # the current head (#975 round 4).
-lg_gate() {  # <gate> <owner/repo> <pr> <read head> : prints one line; returns 0, 3, 4 or 5
-  local g gr q="'" re
-  re="^(Codex review |Codex unavailable: |no Codex review |Codex gate error: )[A-Za-z0-9 :;,.()_+${q}-]*\$"
-  g=$(python3 -I "$1" "$2" "$3" "$4" 2>&1); gr=$?
-  case "$gr" in 0|3|4|5) ;; *) echo "Codex gate failed with exit $gr; details withheld"; return 4 ;; esac
+# Local reviews (2026-10-13, the owner's direction: reviews run locally, the connector cannot reach the organization's repository): when
+# LOCAL_REVIEWS or its alias CODEX_LOCAL_REVIEW names normalized review files (colon-separated), the gate decides from the files alone. A
+# file whose head_sha is not the read head counts only when that head carries the read head's change, by this block's change identity
+# (lg_same_change); each such head is passed to the gate after the read head (the first call fetches a head the clone lacks, lg_have). The
+# gate's 2 (a file malformed, incomplete or of another head) is echoed when it is one of its "Local reviews: " lines; python3's own 2 is not.
+lg_gate() {  # <gate> <owner/repo> <pr> <read head> : prints one line; returns 0, 2, 3, 4 or 5
+  local g gr q="'" re part f h files=() more=() same=()
+  re="^(Codex review |Codex unavailable: |no Codex review |Codex gate error: |Local reviews: )[A-Za-z0-9 :;,.()_+${q}-]*\$"
+  for part in "${LOCAL_REVIEWS:-}" "${CODEX_LOCAL_REVIEW:-}"; do
+    [ -n "$part" ] || continue
+    IFS=: read -r -a more <<< "$part"; files+=(${more[@]+"${more[@]}"})
+  done
+  for f in ${files[@]+"${files[@]}"}; do
+    [ -n "$f" ] || continue
+    h=$({ jq -r 'if type == "object" and (.head_sha | type) == "string" then .head_sha else empty end' < "$f"; } 2>/dev/null)
+    lg_hex40 "$h" && [ "$h" != "$4" ] && [[ " ${same[*]-} " != *" $h "* ]] || continue
+    lg_have "$h" && lg_same_change "$4" "$h" && same+=("$h")
+  done
+  g=$(python3 -I "$1" "$2" "$3" "$4" ${same[@]+"${same[@]}"} 2>&1); gr=$?
+  case "$gr" in
+    0|3|4|5) ;;
+    2) [[ "$g" == "Local reviews: "* ]] || { echo "Codex gate failed with exit 2; details withheld"; return 4; } ;;
+    *) echo "Codex gate failed with exit $gr; details withheld"; return 4 ;;
+  esac
   [[ "$g" =~ $re ]] || { echo "Codex gate printed no status line of its own; details withheld"; return 4; }
   echo "$g"; return "$gr"
 }

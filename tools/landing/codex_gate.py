@@ -13,7 +13,24 @@ Prints one status line. Exit codes:
      activity at all for NOSTART_MINUTES (the landing proceeds on its other reviews and logs this line).
      Measured 2026-10-09: the connector answered "You have reached your Codex usage limits" at 22:42:34Z (uet#51)
      and started nothing on nas#885 after its 22:44:17Z ready mark, while it starts within seconds when available
-     (uet#47: 11 s; nas#939). A Running review is always waited for.
+     (uet#47: 11 s; nas#939). A Running review is waited for until it is stale (CC correction #200, below).
+  2  only with local reviews (below): a review file is unreadable or malformed, names another head, or did not complete.
+
+CC correction #200 (2026-10-13): a review the summary shows running, with no connector activity after its start for
+STALE_RUNNING_MINUTES, is stale and counts as unavailable (5), like the idle rule, never as a finished review: the transfer of
+native-agent-stack to an organization cut the connector's access in the middle of a review, whose row stayed Running. Activity is a
+connector note other than a summary, a connector reaction, or an edit of a summary; the start itself writes a summary edit and an eyes
+reaction within seconds, so the age runs from the LAST activity.
+
+Local reviews (2026-10-13, the owner's direction: reviews run locally, Codex through the gateway on the subscription pool, and the
+connector cannot reach the organization's repository): when LOCAL_REVIEWS, or its alias CODEX_LOCAL_REVIEW, names normalized review
+files (colon-separated; tools/landing/review_normalize.py writes them; the schema is in the README, "Local reviews"), the gate decides
+from the files alone and calls nothing:
+  2  a file cannot be read, is not a normalized review, names a head that is neither the read head (the third argument) nor a head the
+     caller passed after it as carrying the read head's change (the landing scripts' lg_gate passes those), or did not complete;
+  4  otherwise, a finding of priority 0 or 1 exists: a person decides (the CC adjudicates);
+  0  otherwise; the P2 and P3 findings are printed as counts, for the pull request's Follow-ups.
+A file is named in the output by its place in the list, never by its path, and no finding's text is printed.
 
 Sources (the connector's own summary comment, read on uet#47 and nas#939 on 2026-10-09, and captured from nas#975 on 2026-10-11 in
 tests/fixtures/landing/codex-summary-comment.json, whose body has sha256 1236fe48…):
@@ -51,16 +68,23 @@ nothing. Without such a revision nothing is attributed (fail closed: exit 3, or 
     attributed stays 3 and never turns into "no connector activity" (5) after NOSTART_MINUTES.
 
 usage: codex_gate.py <owner/repo> <pr> [<read head>]
+       with LOCAL_REVIEWS: codex_gate.py <owner/repo> <pr> <read head> [<head carrying the read head's change> ...]
 """
 import json
+import os
 import re
 import subprocess
 import sys
+from collections import Counter
 from datetime import datetime, timezone
 
 BOT = "chatgpt-codex-connector[bot]"  # the connector's login in the REST API
 ACTOR = "chatgpt-codex-connector"  # the same account in GraphQL: a Bot, whose Actor.login has no [bot] suffix (measured on nas#975, 2026-10-11)
 NOSTART_MINUTES = 10
+# CC 2026-10-13 (correction #200): a review the summary shows running, with no connector note or reaction after its start
+# for this long, is stale (the nas transfer to an organization cut the connector's access mid-review); it counts as
+# unavailable (5), like the idle rule below, never as a finished review.
+STALE_RUNNING_MINUTES = 90
 SUMMARY = "codex-pull-request-review-summary"
 UNAVAILABLE = re.compile(r"reached your Codex usage limits|create a Codex account", re.I)
 ROW = re.compile(r"\*\*(?P<status>[A-Za-z][A-Za-z ]*)\*\*[^|]*?datetime=\"(?P<time>[^\"]+)\"")
@@ -71,6 +95,13 @@ COMMIT = re.compile(r"`?(?P<sha>[0-9a-f]{7,40})`?")  # the row's commit cell: th
 COMMENTS = ("query($owner: String!, $repo: String!, $pr: Int!, $endCursor: String) { repository(owner: $owner, name: $repo) { pullRequest(number: $pr) { "
             "comments(first: 100, after: $endCursor) { pageInfo { hasNextPage endCursor } nodes { fullDatabaseId author { __typename login } createdAt body "
             "userContentEdits(first: 100) { nodes { editedAt diff editor { __typename login } } } } } } } }")
+# Local reviews (2026-10-13): the variables that name normalized review files (the second is the first's alias), the reviewers
+# review_normalize.py writes for, and the normalized review's fields (README "Local reviews"); a finding carries no prose body.
+LOCAL = ("LOCAL_REVIEWS", "CODEX_LOCAL_REVIEW")
+REVIEWERS = ("codex-review", "claude-code-review")
+REVIEW_KEYS = frozenset({"reviewer", "reviewer_version", "head_sha", "completed", "findings"})
+FINDING_KEYS = frozenset({"priority", "location", "title"})
+SHA = re.compile(r"[0-9a-f]{40}")
 
 
 def gh(path):
@@ -132,7 +163,91 @@ def running(status):
     return status.lower().startswith("running")
 
 
-def main(repo, pr, read=None):
+def local_review_files():
+    """The files LOCAL_REVIEWS and its alias CODEX_LOCAL_REVIEW name (colon-separated, each list in order, empty names dropped), or None
+    when both are unset or empty: the connector decides then, as before."""
+    values = [os.environ.get(name, "") for name in LOCAL]
+    if not any(values):
+        return None
+    return [path for value in values for path in value.split(":") if path]
+
+
+def unique_keys(pairs):
+    """An object whose keys are unique: json.loads keeps the last of a repeated key, so a second "completed" would override the first."""
+    if len({key for key, _ in pairs}) != len(pairs):
+        raise ValueError("a repeated key")
+    return dict(pairs)
+
+
+def no_constant(name):
+    raise ValueError(f"{name} is not JSON")  # json.loads accepts NaN and Infinity unless parse_constant refuses them
+
+
+def review_problem(review):
+    """Why a parsed file is not a normalized review (README "Local reviews"), or None; the reasons are fixed text."""
+    if not isinstance(review, dict) or set(review) != REVIEW_KEYS:
+        return "its fields are not reviewer, reviewer_version, head_sha, completed and findings"
+    if review["reviewer"] not in REVIEWERS:
+        return "its reviewer is not codex-review or claude-code-review"
+    if not isinstance(review["reviewer_version"], str) or not review["reviewer_version"].strip():
+        return "its reviewer_version is empty or not a string"
+    if not isinstance(review["head_sha"], str) or not SHA.fullmatch(review["head_sha"]):
+        return "its head_sha is not 40 lower-case hex digits"
+    if not isinstance(review["completed"], bool):
+        return "its completed is not true or false"
+    if not isinstance(review["findings"], list):
+        return "its findings are not a list"
+    for number, finding in enumerate(review["findings"], 1):
+        if not isinstance(finding, dict) or set(finding) != FINDING_KEYS or type(finding["priority"]) is not int \
+                or not 0 <= finding["priority"] <= 3 or not isinstance(finding["location"], str) or not isinstance(finding["title"], str):
+            return f"its finding {number} is not a priority 0 to 3 with a location and a title"
+    return None
+
+
+def local_gate(paths, read, heads):
+    """The decision from the local review files alone (README "Local reviews"): one line, and 0, 2 or 4. Every file must be a normalized
+    review that completed, of the read head or of a head the caller passed as carrying its change; then a P0 or P1 finding is 4."""
+    if not paths:
+        print("Local reviews: LOCAL_REVIEWS names no file; stop")
+        return 2
+    if not read or not SHA.fullmatch(read) or not all(SHA.fullmatch(head) for head in heads):
+        print("Local reviews: the read head and each head after it must be 40 lower-case hex digits; stop")
+        return 2
+    accepted, reviews = {read, *heads}, []
+    for number, path in enumerate(paths, 1):
+        which = f"review file {number} of {len(paths)}"  # by its place in the list, never by its path
+        try:
+            with open(path, "rb") as handle:
+                review = json.loads(handle.read().decode("utf-8"), object_pairs_hook=unique_keys, parse_constant=no_constant)
+        except (OSError, UnicodeDecodeError, ValueError):
+            print(f"Local reviews: {which} cannot be read as JSON; stop")
+            return 2
+        problem = review_problem(review)
+        if problem:
+            print(f"Local reviews: {which} is not a normalized review: {problem}; stop")
+            return 2
+        if review["head_sha"] not in accepted:
+            print(f"Local reviews: {which} ({review['reviewer']}) names commit {review['head_sha'][:8]}, which is neither the read head "
+                  f"{read[:8]} nor a head carrying its change; stop")
+            return 2
+        if not review["completed"]:
+            print(f"Local reviews: {which} ({review['reviewer']}) of {review['head_sha'][:8]} did not complete; stop")
+            return 2
+        reviews.append(review)
+    counts = Counter(finding["priority"] for review in reviews for finding in review["findings"])
+    names = ", ".join(review["reviewer"] for review in reviews)
+    tail = f"P2 findings {counts[2]}, P3 findings {counts[3]} (for the Follow-ups)"
+    if counts[0] or counts[1]:
+        print(f"Local reviews: {names} of {read[:8]}: P0 findings {counts[0]}, P1 findings {counts[1]}; a person decides; {tail}")
+        return 4
+    print(f"Local reviews: {names} of {read[:8]} completed with no P0 or P1 finding; {tail}")
+    return 0
+
+
+def main(repo, pr, read=None, *same):
+    files = local_review_files()
+    if files is not None:  # the owner's direction of 2026-10-13: a local review set decides alone, and nothing is called
+        return local_gate(files, read, same)
     notes = comments(repo, pr)  # first: what comes after this snapshot is newer than every start in it
     pull = json.loads(subprocess.run(["gh", "api", f"repos/{repo}/pulls/{pr}"],
                                      capture_output=True, text=True, check=True).stdout)
@@ -158,7 +273,18 @@ def main(repo, pr, read=None):
     current = [r for _, body, _ in summaries for r in rows(body)]
     now_running = [t for _, s, t in current if running(s)]
     if now_running:
-        print(f"Codex review running since {max(now_running):%Y-%m-%dT%H:%M:%SZ}")
+        start = max(now_running)
+        # progress after the start: a non-summary connector note, a connector reaction, or an edit of a summary
+        later = [created for _, bot, created, body, _ in notes if bot and created > start and SUMMARY not in body]
+        later += [e[0] for _, _, edits in summaries for e in edits if e[0] > start]
+        later += [when(r["created_at"]) for r in reactions if r["user"]["login"] == BOT and when(r["created_at"]) > start]
+        last = max([start] + later)  # the start itself writes a summary edit and an eyes reaction within seconds
+        age = (datetime.now(timezone.utc) - last).total_seconds() / 60
+        if age >= STALE_RUNNING_MINUTES:
+            print(f"Codex unavailable: a review shown running since {start:%Y-%m-%dT%H:%M:%SZ} has had no connector activity "
+                  f"since {last:%Y-%m-%dT%H:%M:%SZ} ({age:.0f} min; stale); proceeding on the other reviews")
+            return 5
+        print(f"Codex review running since {start:%Y-%m-%dT%H:%M:%SZ}")
         return 3
     eyes = [when(r["created_at"]) for r in reactions if r["user"]["login"] == BOT and r["content"] == "eyes"]
     if eyes:
@@ -216,7 +342,8 @@ def main(repo, pr, read=None):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) not in (3, 4):
+    # two or three arguments; with a local review set, also the heads lg_gate found to carry the read head's change
+    if len(sys.argv) < 3 or (len(sys.argv) > 4 and local_review_files() is None):
         sys.exit(__doc__)
     try:
         code = main(*sys.argv[1:])

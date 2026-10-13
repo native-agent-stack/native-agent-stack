@@ -62,7 +62,8 @@ OTHER = "9f8e7d6c5b4a39281706f5e4d3c2b1a098765432"
 NOREPLY = "4242424+seathatflowsinourveins@users.noreply.github.com"  # the fake gh serves id 4242424 for the repository owner
 PR = str(90000000 + os.getpid())  # per process: the nas script makes /var/tmp/nas-land-<pr>-XXXXXX worktrees, which parallel runs must not share
 UET_REPO = "seathatflowsinourveins/us-equities-trading"
-NAS_REPO = "seathatflowsinourveins/native-agent-stack"
+NAS_REPO = "native-agent-stack/native-agent-stack"  # 2026-10-13: the repository moved to the organization; nas_land.sh's default R
+MERGING_ACCOUNT = "seathatflowsinourveins"  # CC correction #198: LG_AUTHOR_LOGIN's default, whose no-reply address authors both scripts' merges
 # #975 P2-3: GitHub's CheckConclusionState as captured from its published GraphQL schema, with the REST description's check-run enum
 CONCLUSIONS = ROOT / "tests/fixtures/landing/check-conclusion-state.json"
 PASSING_CONCLUSIONS = ("SUCCESS", "NEUTRAL", "SKIPPED")  # the scripts' allow-list; any other completed conclusion, null included, fails
@@ -625,7 +626,8 @@ class ScriptTextTests(LandingCase):
                 self.assertEqual(script.text.count("lg_gate \"$GATE\""), calls)
                 self.assertIn(f'g=$(lg_gate "$GATE" "$R" "$N" "{read}"); gr=$?', script.final)
                 self.assertEqual(script.text.count("python3 -I"), 1)
-                self.assertIn('g=$(python3 -I "$1" "$2" "$3" "$4" 2>&1)', script.block)
+                # 2026-10-13: the heads that carry the read head's change follow it, only with a local review set (empty otherwise)
+                self.assertIn('g=$(python3 -I "$1" "$2" "$3" "$4" ${same[@]+"${same[@]}"} 2>&1)', script.block)
                 self.assertEqual(len(re.findall(r"^GATE=", script.text, re.M)), 1)
 
     def test_every_child_that_waits_or_detaches_runs_without_the_lock_descriptor(self):
@@ -656,7 +658,7 @@ class ScriptTextTests(LandingCase):
             with self.subTest(script=script.key):
                 for name in sorted(set(re.findall(r"\bLANDING_[A-Z_]+\b", script.text))):
                     self.assertIn(f"`{name}`", readme)
-                for name in ("VERDICT_FILES", "GATES_DONE", "GPT_VERDICT"):
+                for name in ("VERDICT_FILES", "GATES_DONE", "GPT_VERDICT", "LG_AUTHOR_LOGIN", "LOCAL_REVIEWS", "CODEX_LOCAL_REVIEW"):
                     if name in script.text:
                         self.assertIn(f"`{name}`", readme)
                 section = readme.split("## Exit codes", 1)[1].split("\n## ", 1)[0]
@@ -669,7 +671,7 @@ class ScriptTextTests(LandingCase):
         # #975 (review of the P2 fix commit): the "Here" column held the bytes from before the review's edits. The last cell of each row is the file's
         # sha256 and line count as committed, so an edit that leaves it behind fails here.
         readme = (LANDING / "README.md").read_text(encoding="utf-8")
-        for name in ("uet_land.sh", "nas_land.sh", "codex_gate.py"):
+        for name in ("uet_land.sh", "nas_land.sh", "codex_gate.py", "review_normalize.py"):
             with self.subTest(file=name):
                 row = next(line for line in readme.splitlines() if line.startswith(f"| `{name}` |"))
                 cell = re.fullmatch(r"`([0-9a-f]{64})` \((\d+) lines\)", row.rstrip(" |").rsplit("|", 1)[1].strip())
@@ -741,6 +743,44 @@ class ScriptTextTests(LandingCase):
         for name, arg0, extra, expected in cases:
             with self.subTest(case=name):
                 self.assertEqual(self.evaluate([gate_line], ["GATE"], arg0=arg0, **extra), [expected])
+
+    def test_the_repository_defaults_to_the_organizations_slug_and_the_author_to_the_merging_account(self):
+        # 2026-10-13: native-agent-stack moved to the organization; R was a literal of the old slug (c63c83a8 nas_land.sh:28). GitHub redirects
+        # the old one (github/docs@be38ec5d transferring-a-repository.md:62) until a new repository takes the old location (:68-69).
+        nas_r = [self.nas.line("R=")]
+        for name, extra, expected in (("default", {}, NAS_REPO), ("LANDING_REPO", {"LANDING_REPO": "o/r"}, "o/r"),
+                                      ("empty falls back", {"LANDING_REPO": ""}, NAS_REPO)):
+            with self.subTest(script="nas", case=name):
+                self.assertEqual(self.evaluate(nas_r, ["R"], **extra), [expected])
+        self.assertEqual(self.uet.line("R="), f"R={UET_REPO}", "the trading repository did not move")
+        for script in (self.uet, self.nas):  # CC correction #198: the merging account is one variable in both scripts
+            line = [script.line("LG_AUTHOR_LOGIN=")]
+            for name, extra, expected in (("default", {}, MERGING_ACCOUNT), ("override", {"LG_AUTHOR_LOGIN": "another-lander"}, "another-lander"),
+                                          ("empty falls back", {"LG_AUTHOR_LOGIN": ""}, MERGING_ACCOUNT)):
+                with self.subTest(script=script.key, case=name):
+                    self.assertEqual(self.evaluate(line, ["LG_AUTHOR_LOGIN"], **extra), [expected])
+
+    def test_the_no_reply_author_is_the_merging_account_not_the_repository_owner(self):
+        # CC correction #198 (2026-10-13): lg_author_email took the login from R's owner, an organization since the transfer, and GitHub refused
+        # the squash merge (GraphQL "Invalid email address"): the no-reply form is a user account's, "ID+USERNAME@users.noreply.github.com"
+        # (github/docs@be38ec5d email-addresses-reference.md:47). At c63c83a8 the first case asked users/native-agent-stack for the id.
+        cases = [
+            ("the merging account, with the organization's slug", f"R={NAS_REPO}; LG_AUTHOR_LOGIN={MERGING_ACCOUNT}", MERGING_ACCOUNT),
+            ("R's owner when LG_AUTHOR_LOGIN is unset (the block on its own)", "R=owner-example/r; unset LG_AUTHOR_LOGIN", "owner-example"),
+            ("R's owner when LG_AUTHOR_LOGIN is empty", "R=owner-example/r; LG_AUTHOR_LOGIN=", "owner-example"),
+            ("a login of 39 characters, the longest", f"R={NAS_REPO}; LG_AUTHOR_LOGIN={'a' * 38}b", "a" * 38 + "b"),
+        ]
+        refused = ["a/b", "-lead", "trail-", "two--dashes", "a" * 40, "with space", "semi;colon", 'quote"d', "dot.ted"]
+        for script in (self.uet, self.nas):
+            for name, prelude, login in cases + [(f"a login of another shape: {bad!r}", f"R={NAS_REPO}; LG_AUTHOR_LOGIN={q(bad)}", None) for bad in refused]:
+                with self.subTest(script=script.key, case=name):
+                    log = self.write("author.log", "")
+                    code, out = self.bash(f"{prelude}\nN=1\n{script.block}\n", 'lg_author_email "$R"', FAKE_LOG=str(log))
+                    calls = log.read_text(encoding="utf-8").splitlines()
+                    if login is None:
+                        self.assertEqual((code, out, calls), (1, "", []), "refused before any call, nothing printed")
+                    else:
+                        self.assertEqual((code, out, calls), (0, f"4242424+{login}@users.noreply.github.com", [f"gh api users/{login} --jq .id"]))
 
 
 # ---------------------------------------------------------------------------------------------- 2. verdict files
@@ -1554,6 +1594,30 @@ def limit_notice(when):
     return comment(BOT, when, "You have reached your Codex usage limits for code reviews. You can see your limits in the Codex usage dashboard.")
 
 
+LOCAL_VARIABLES = ("LOCAL_REVIEWS", "CODEX_LOCAL_REVIEW")  # 2026-10-13: the gate's local review set and its alias
+LOCAL_LINE = re.compile(r"Local reviews: [A-Za-z0-9 :;,.()_+'-]*")  # what lg_gate echoes (its status-line characters)
+
+
+@contextlib.contextmanager
+def local_reviews_env(values=None):
+    """os.environ with the local review variables as given and otherwise unset: the gate reads them, and the shell that runs the tests may
+    have set them. patch.dict restores the environment afterwards."""
+    with mock.patch.dict(os.environ):
+        for name in LOCAL_VARIABLES:
+            os.environ.pop(name, None)
+        os.environ.update(values or {})
+        yield
+
+
+def normalized(head, findings=(), completed=True, reviewer="codex-review", version="codex-cli 0.162.1"):
+    """A normalized review (README "Local reviews"; review_normalize.py writes them)."""
+    return {"reviewer": reviewer, "reviewer_version": version, "head_sha": head, "completed": completed, "findings": list(findings)}
+
+
+def finding(priority, title="A finding", location="tools/landing/x.py:3-5"):
+    return {"priority": priority, "location": location, "title": title}
+
+
 class CodexGateTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -1598,10 +1662,33 @@ class CodexGateTests(unittest.TestCase):
             return subprocess.CompletedProcess(cmd, 0, json.dumps([list(lists[key])]), "")
 
         out = io.StringIO()
-        with mock.patch.object(self.gate.subprocess, "run", fake_run), mock.patch.object(self.gate, "datetime", Frozen), \
+        with local_reviews_env(), mock.patch.object(self.gate.subprocess, "run", fake_run), mock.patch.object(self.gate, "datetime", Frozen), \
                 contextlib.redirect_stdout(out):
             code = self.gate.main("o/r", "7", *([read] if read else []))
         return code, out.getvalue().strip()
+
+    def run_local(self, *reviews, read=GATE_HEAD, same=(), variables=None, names=None):
+        """The gate with a local review set: each review (a dict, or the file's bytes) in a file of its own, LOCAL_REVIEWS naming them in
+        order unless `variables` maps the variables to lists of review numbers (or `names` gives the value as is). No command may run."""
+        with tempfile.TemporaryDirectory(prefix="local-reviews-") as scratch:
+            paths = []
+            for number, review in enumerate(reviews):
+                path = Path(scratch) / f"review-{number}.json"
+                path.write_bytes(review if isinstance(review, bytes) else json.dumps(review).encode("utf-8"))
+                paths.append(str(path))
+            values = {"LOCAL_REVIEWS": ":".join(paths)} if variables is None else {k: ":".join(paths[i] for i in v) for k, v in variables.items()}
+            if names is not None:
+                values = {"LOCAL_REVIEWS": names.replace("{dir}", scratch)}
+
+            def no_command(*args, **kwargs):
+                raise AssertionError("the gate ran a command although a local review set was given")
+
+            out = io.StringIO()
+            with local_reviews_env(values), mock.patch.object(self.gate.subprocess, "run", no_command), contextlib.redirect_stdout(out):
+                code = self.gate.main("o/r", "7", *([read] if read else []), *same)
+            line = out.getvalue().strip()
+            self.assertNotIn(scratch, line, "a file is named by its place, never by its path")
+            return code, line
 
     def test_exit_code_precedence_on_canned_api_data(self):
         completed = summary(row("Completed", "2026-10-10T12:01:00Z"))
@@ -1883,13 +1970,136 @@ class CodexGateTests(unittest.TestCase):
                 ) if found]
                 self.assertEqual(problems, [])
 
+    # ------------------------------------------------------------------------------------------ CC correction #200 (2026-10-13)
+    def test_a_running_review_without_connector_activity_for_90_minutes_is_unavailable(self):
+        # The transfer of native-agent-stack to an organization cut the connector's access mid-review, and its row stayed Running: a Running
+        # row gave 3 for ever (at c63c83a8 each case below that expects 5 gave 3). Activity after the start resets the age: a connector
+        # note other than a summary, a connector reaction, or an edit of a summary; the start's own edit and eyes come seconds after it.
+        start = "2026-10-10T12:03:00Z"
+        running_row = row("Running since", start)
+        stalled = summary(running_row)
+        note = comment(BOT, "2026-10-10T13:03:00Z", "Still reviewing.")
+        edited = {**stalled, "edits": [{"editedAt": "2026-10-10T13:03:00Z", "diff": summary_body(running_row)}, *stalled["edits"]]}
+
+        def reaction(content, at, login=BOT):
+            return {"user": {"login": login}, "content": content, "created_at": at}
+
+        cases = [
+            ("89:59 after the start", dict(comments=[stalled], now="2026-10-10T13:32:59Z"), 3, f"running since {start}"),
+            ("90 minutes after the start", dict(comments=[stalled], now="2026-10-10T13:33:00Z"), 5,
+             f"Codex unavailable: a review shown running since {start} has had no connector activity since {start} (90 min; stale)"),
+            ("the start's own eyes reaction, 5 s later, is the last activity", dict(comments=[stalled], reactions=[reaction("eyes", "2026-10-10T12:03:05Z")],
+                                                                                 now="2026-10-10T13:33:04Z"), 3, "running since"),
+            ("90 minutes after that reaction", dict(comments=[stalled], reactions=[reaction("eyes", "2026-10-10T12:03:05Z")], now="2026-10-10T13:33:05Z"), 5,
+             "since 2026-10-10T12:03:05Z (90 min; stale)"),
+            ("a connector note an hour in", dict(comments=[stalled, note], now="2026-10-10T14:32:59Z"), 3, "running since"),
+            ("90 minutes after that note", dict(comments=[stalled, note], now="2026-10-10T14:33:00Z"), 5, "since 2026-10-10T13:03:00Z (90 min; stale)"),
+            ("an edit of the summary an hour in", dict(comments=[edited], now="2026-10-10T14:32:59Z"), 3, "running since"),
+            ("a connector reaction an hour in", dict(comments=[stalled], reactions=[reaction("rocket", "2026-10-10T13:03:00Z")], now="2026-10-10T14:32:59Z"), 3,
+             "running since"),
+            ("a person's comment is no connector activity", dict(comments=[stalled, comment("someone", "2026-10-10T13:03:00Z", "Any news?")],
+                                                                 now="2026-10-10T13:33:00Z"), 5, "stale"),
+            ("a person's reaction is none either", dict(comments=[stalled], reactions=[reaction("eyes", "2026-10-10T13:03:00Z", "someone")],
+                                                        now="2026-10-10T13:33:00Z"), 5, "stale"),
+        ]
+        for name, kwargs, code, text in cases:
+            with self.subTest(case=name):
+                got, line = self.run_gate(**kwargs)
+                self.assertEqual((got, text in line), (code, True), line)
+
+    # ------------------------------------------------------------------------------------------ local reviews (2026-10-13)
+    def test_a_local_review_set_decides_from_the_files_alone(self):
+        # The owner's direction: reviews run locally (the connector cannot reach the organization's repository). The gate reads the files and
+        # nothing else: 2 for a file that is not a completed normalized review of the read head, else 4 for a P0 or P1 finding, else 0.
+        clean, follow_ups = normalized(GATE_HEAD), normalized(GATE_HEAD, [finding(2), finding(2), finding(3)])
+        claude = normalized(GATE_HEAD, [finding(1, "The plugin's issue")], reviewer="claude-code-review", version="code-review@f359d43b")
+        cases = [
+            ("one completed review", (clean,), {}, 0, f"Local reviews: codex-review of {GATE_HEAD[:8]} completed with no P0 or P1 finding; "
+                                                    "P2 findings 0, P3 findings 0 (for the Follow-ups)"),
+            ("P2 and P3 findings are counted", (follow_ups,), {}, 0, "P2 findings 2, P3 findings 1 (for the Follow-ups)"),
+            ("a P1 finding", (normalized(GATE_HEAD, [finding(1), finding(2)]),), {}, 4, "P0 findings 0, P1 findings 1; a person decides; P2 findings 1"),
+            ("a P0 finding", (normalized(GATE_HEAD, [finding(0)]),), {}, 4, "P0 findings 1, P1 findings 0; a person decides"),
+            ("two reviewers, one with a P1", (clean, claude), {}, 4, "codex-review, claude-code-review of"),
+            ("a review of another head", (normalized(OTHER),), {}, 2, f"review file 1 of 1 (codex-review) names commit {OTHER[:8]}, which is neither "
+                                                                       f"the read head {GATE_HEAD[:8]} nor a head carrying its change"),
+            ("the same review, its head passed as carrying the read head's change", (normalized(OTHER),), {"same": (OTHER,)}, 0, "completed with no P0"),
+            ("a review that did not complete", (clean, normalized(GATE_HEAD, completed=False)), {}, 2,
+             f"review file 2 of 2 (codex-review) of {GATE_HEAD[:8]} did not complete"),
+            ("a malformed file is refused before any finding counts", (normalized(GATE_HEAD, [finding(1)]), b"{"), {}, 2, "review file 2 of 2 cannot be read as JSON"),
+            ("no read head", (clean,), {"read": None}, 2, "the read head and each head after it must be 40 lower-case hex digits"),
+            ("a short read head", (clean,), {"read": GATE_HEAD[:8]}, 2, "must be 40 lower-case hex digits"),
+            ("a head after it that is not a commit", (clean,), {"same": ("abc",)}, 2, "must be 40 lower-case hex digits"),
+            ("the alias alone", (follow_ups,), {"variables": {"CODEX_LOCAL_REVIEW": [0]}}, 0, "P2 findings 2, P3 findings 1"),
+            ("both variables: every file of both counts", (clean, claude), {"variables": {"LOCAL_REVIEWS": [0], "CODEX_LOCAL_REVIEW": [1]}}, 4,
+             "codex-review, claude-code-review of"),
+            ("a file that does not exist", (), {"names": "{dir}/absent.json"}, 2, "review file 1 of 1 cannot be read as JSON"),
+            ("separators and no name", (), {"names": "::"}, 2, "Local reviews: LOCAL_REVIEWS names no file"),
+        ]
+        for name, reviews, kwargs, code, text in cases:
+            with self.subTest(case=name):
+                got, line = self.run_local(*reviews, **kwargs)
+                self.assertEqual((got, text in line), (code, True), line)
+                self.assertTrue(LOCAL_LINE.fullmatch(line), f"every local line is one lg_gate echoes: {line}")
+                self.assertNotIn("The plugin's issue", line, "no finding's text is printed")
+
+    def test_a_file_that_is_not_a_normalized_review_is_refused_with_2(self):
+        good = normalized(GATE_HEAD, [finding(2)])
+        variants = [
+            ("a finding with a prose body", {**good, "findings": [{**finding(2), "body": "prose"}]}, "its finding 1 is not a priority 0 to 3"),
+            ("a finding without a location", {**good, "findings": [{"priority": 2, "title": "t"}]}, "its finding 1"),
+            ("priority 4", {**good, "findings": [finding(4)]}, "its finding 1"),
+            ("priority -1", {**good, "findings": [finding(-1)]}, "its finding 1"),
+            ("priority as text", {**good, "findings": [finding("1")]}, "its finding 1"),
+            ("priority true", {**good, "findings": [finding(True)]}, "its finding 1"),
+            ("priority 1.0", {**good, "findings": [finding(1.0)]}, "its finding 1"),
+            ("priority null (Codex's rubric allows it, the struct does not)", {**good, "findings": [finding(None)]}, "its finding 1"),
+            ("an extra field", {**good, "overall_correctness": "patch is correct"}, "its fields are not reviewer"),
+            ("a missing field", {k: v for k, v in good.items() if k != "completed"}, "its fields are not reviewer"),
+            ("another reviewer", {**good, "reviewer": "someone-else"}, "its reviewer is not codex-review or claude-code-review"),
+            ("an empty version", {**good, "reviewer_version": " "}, "its reviewer_version is empty"),
+            ("a short head", {**good, "head_sha": GATE_HEAD[:12]}, "its head_sha is not 40 lower-case hex digits"),
+            ("an upper-case head", {**good, "head_sha": GATE_HEAD.upper()}, "its head_sha is not 40"),
+            ("completed as text", {**good, "completed": "true"}, "its completed is not true or false"),
+            ("findings as an object", {**good, "findings": {}}, "its findings are not a list"),
+            ("a list, not an object", [good], "its fields are not reviewer"),
+        ]
+        raw = [("a repeated key (the later completed would win)", b'{"reviewer": "codex-review", "reviewer_version": "v", "head_sha": "' + GATE_HEAD.encode()
+                + b'", "completed": false, "completed": true, "findings": []}', "cannot be read as JSON"),
+               ("NaN", json.dumps(good).replace('"findings": [', '"findings": [NaN, ').encode(), "cannot be read as JSON"),
+               ("not UTF-8", b"\xff\xfe{}", "cannot be read as JSON")]
+        for name, review, text in [(n, json.dumps(r).encode("utf-8"), t) for n, r, t in variants] + raw:
+            with self.subTest(case=name):
+                got, line = self.run_local(review)
+                self.assertEqual((got, text in line), (2, True), line)
+                self.assertTrue(LOCAL_LINE.fullmatch(line), line)
+
+    def test_without_a_local_review_set_the_connector_decides_as_before(self):
+        # Unset or empty variables leave the connector path as it was (us-equities-trading still uses it): the gate reads GitHub.
+        completed = summary(row("Completed", "2026-10-10T12:01:00Z"))
+        for values in ({}, {"LOCAL_REVIEWS": "", "CODEX_LOCAL_REVIEW": ""}):
+            with self.subTest(values=values):
+                with local_reviews_env(values):
+                    self.assertIsNone(self.gate.local_review_files())
+                self.assertEqual(self.run_gate(comments=[completed])[0], 0)
+
     def test_command_line_needs_two_or_three_arguments(self):
-        # #975 round 4: the third is the read head (the scripts pass it), whose review counts as well as the current head's.
+        # #975 round 4: the third is the read head (the scripts pass it), whose review counts as well as the current head's. 2026-10-13: with
+        # a local review set, the heads lg_gate found to carry the read head's change may follow it. The environment is given whole.
+        environment = {"PATH": os.environ["PATH"], "LC_ALL": "C.UTF-8"}
         for argv in ([], ["o/r"], ["o/r", "7", "abc", "extra"]):
             with self.subTest(argv=argv):
-                done = subprocess.run([sys.executable, "-I", str(LANDING / "codex_gate.py"), *argv], capture_output=True, text=True, timeout=30)
+                done = subprocess.run([sys.executable, "-I", str(LANDING / "codex_gate.py"), *argv], capture_output=True, text=True, timeout=30,
+                                      env=environment)
                 self.assertEqual(done.returncode, 1)
                 self.assertIn("usage: codex_gate.py <owner/repo> <pr> [<read head>]", done.stderr)
+        with tempfile.TemporaryDirectory(prefix="local-reviews-") as scratch:
+            review = Path(scratch) / "review.json"
+            review.write_text(json.dumps(normalized(OTHER)), encoding="utf-8")
+            for argv, code in ((["o/r", "7", GATE_HEAD, OTHER], 0), (["o/r", "7", GATE_HEAD], 2), (["o/r", "7"], 2), (["o/r"], 1)):
+                with self.subTest(argv=argv, local=True):
+                    done = subprocess.run([sys.executable, "-I", str(LANDING / "codex_gate.py"), *argv], capture_output=True, text=True, timeout=30,
+                                          env={**environment, "LOCAL_REVIEWS": str(review)})
+                    self.assertEqual((done.returncode, done.stderr if code != 1 else ""), (code, ""), done.stdout)
 
 
 # ---------------------------------------------------------------------------------------------- 7. the scripts end to end
@@ -2876,6 +3086,424 @@ class EndToEndTests(LandingCase):
                 self.assertEqual((code, self.merge_calls(log)), (expected, []), out)
                 self.assertNotIn(str(self.dir), out, "no path is printed")
                 self.assertNotIn("/home/example", out)
+
+    # ------------------------------------------------------------------------------------------ 2026-10-13: the transfer, #198, local reviews
+    def test_nas_lands_on_the_organizations_repository_with_the_merging_accounts_address(self):
+        # Every repository-scoped gh call names the new slug (or LANDING_REPO), and the author address is the merging account's, never the
+        # organization's (CC correction #198). At c63c83a8 every call named the old slug.
+        for extra, repo in (({}, NAS_REPO), ({"LANDING_REPO": "example-org/native-agent-stack"}, "example-org/native-agent-stack")):
+            with self.subTest(repo=repo):
+                code, out, log = self.land(self.nas, **extra)
+                self.assertEqual(code, 0, out)
+                self.assertEqual(self.merge_calls(log), [f"gh pr merge {PR} -R {repo} --squash --match-head-commit {self.head} -A {NOREPLY}"])
+                self.assertEqual([line for line in log if line.startswith("gh api users/")], [f"gh api users/{MERGING_ACCOUNT} --jq .id"])
+                scoped = [line for line in log if line.startswith("gh ") and (" -R " in line or " repos/" in line)]
+                self.assertTrue(scoped)
+                self.assertEqual([line for line in scoped if f" -R {repo}" not in line and f" repos/{repo}/" not in line], [])
+                self.assertFalse(any(f"{MERGING_ACCOUNT}/native-agent-stack" in line for line in log), "the old slug is never used")
+                self.assertTrue((self.dir / "coord/command-center/landing-locks/native-agent-stack.lock").exists())
+
+    def test_the_merging_account_names_the_author_in_both_scripts(self):
+        for script in (self.uet, self.nas):
+            with self.subTest(script=script.key):
+                address = "4242424+another-lander@users.noreply.github.com"
+                code, out, log = self.land(script, LG_AUTHOR_LOGIN="another-lander", FAKE_COMMIT_EMAIL=address)
+                self.assertEqual(code, 0, out)
+                self.assertEqual([line for line in log if line.startswith("gh api users/")], ["gh api users/another-lander --jq .id"])
+                self.assertTrue(self.merge_calls(log)[0].endswith(f" -A {address}"))
+                code, out, log = self.land(script, LG_AUTHOR_LOGIN="not/a/login")
+                self.assertEqual((code, self.merge_calls(log)), (11, []), out)
+                self.assertEqual([line for line in log if line.startswith("gh api users/")], [], "refused before any call")
+
+    def local_review(self, head, findings=(), **kwargs):
+        path = self.dir / f"review-{next(self.counter)}.json"
+        path.write_text(json.dumps(normalized(head, findings, **kwargs)), encoding="utf-8")
+        return str(path)
+
+    def test_a_local_review_set_decides_the_codex_gate_through_the_real_gate_in_both_scripts(self):
+        # The owner's direction of 2026-10-13. With LOCAL_REVIEWS set, the real codex_gate.py runs (FAKE_REAL_PYTHON) and decides from the files:
+        # it calls nothing (the fake gh fails every connector read, so a call would give exit 9). lg_gate echoes its 2 as well as its 0 and 4.
+        p1 = finding(1, "A blocking finding", "change.txt:1-1")
+        p2 = finding(2, "A follow-up", "change.txt:1-1")
+        malformed = self.dir / f"review-{next(self.counter)}.json"
+        malformed.write_text(json.dumps({**normalized(self.head), "body": "prose"}), encoding="utf-8")
+        for script in (self.uet, self.nas):
+            repo, calls = (UET_REPO, 2) if script.key == "uet" else (NAS_REPO, 3)
+            cases = [
+                ("a completed review of the read head", {"LOCAL_REVIEWS": self.local_review(self.head, [p2])}, 0,
+                 f"Local reviews: codex-review of {self.head[:8]} completed with no P0 or P1 finding; P2 findings 1, P3 findings 0 (for the Follow-ups)", calls),
+                ("two reviewers, the second through the alias", {"LOCAL_REVIEWS": self.local_review(self.head),
+                                                                  "CODEX_LOCAL_REVIEW": self.local_review(self.head, reviewer="claude-code-review")}, 0,
+                 "codex-review, claude-code-review of", calls),
+                ("a P1 finding", {"LOCAL_REVIEWS": self.local_review(self.head, [p1, p2])}, 9, "P1 findings 1; a person decides", 1),
+                ("a review of another change", {"LOCAL_REVIEWS": self.local_review(self.other)}, 9, f"names commit {self.other[:8]}", 1),
+                ("a review that did not complete", {"LOCAL_REVIEWS": self.local_review(self.head, completed=False)}, 9, "did not complete", 1),
+                ("a malformed file", {"LOCAL_REVIEWS": str(malformed)}, 9, "is not a normalized review: its fields are not", 1),
+                ("a missing file", {"LOCAL_REVIEWS": str(self.dir / "absent-review.json")}, 9, "review file 1 of 1 cannot be read as JSON", 1),
+            ]
+            for name, extra, expected, text, gate_calls in cases:
+                with self.subTest(script=script.key, case=name):
+                    code, out, log = self.land(script, FAKE_REAL_PYTHON=sys.executable, **extra)
+                    self.assertEqual(code, expected, out)
+                    self.assertIn(text, out)
+                    self.assertEqual(len(self.gate_calls(log)), gate_calls)
+                    self.assertEqual(len(self.merge_calls(log)), 1 if expected == 0 else 0)
+                    self.assertEqual([line for line in log if line.startswith("gh api graphql") or "/issues/" in line or "/pulls/" in line], [],
+                                     "no connector read")
+                    self.assertNotIn(str(self.dir), out, "no path is printed")
+                    if expected == 9:
+                        self.assertNotIn("details withheld", out, "the gate's own line is echoed")
+
+    def test_a_local_review_of_a_pure_rebase_counts_by_the_scripts_change_identity(self):
+        # "or a pure rebase of it, using the scripts' existing change check": lg_gate runs lg_same_change on each file's head and passes the
+        # heads that carry the read head's change after it; any other head is refused by the gate (above).
+        gate = f"{os.path.realpath(LANDING)}/codex_gate.py"
+        for script in (self.uet, self.nas):
+            repo, calls = (UET_REPO, 2) if script.key == "uet" else (NAS_REPO, 3)
+            with self.subTest(script=script.key):
+                code, out, log = self.land(script, FAKE_REAL_PYTHON=sys.executable, LOCAL_REVIEWS=self.local_review(self.rebased))
+                self.assertEqual(code, 0, out)
+                self.assertEqual(self.gate_calls(log), [f"python3 -I {gate} {repo} {PR} {self.head} {self.rebased}"] * calls)
+            with self.subTest(script=script.key, case="the same rebase in two files, and another change"):
+                files = ":".join([self.local_review(self.rebased), self.local_review(self.rebased, reviewer="claude-code-review"),
+                                  self.local_review(self.other)])
+                code, out, log = self.land(script, FAKE_REAL_PYTHON=sys.executable, LOCAL_REVIEWS=files)
+                self.assertEqual((code, self.merge_calls(log)), (9, []), out)
+                self.assertEqual(self.gate_calls(log), [f"python3 -I {gate} {repo} {PR} {self.head} {self.rebased}"],
+                                 "the rebase is passed once, the other change not at all")
+                self.assertIn(f"review file 3 of 3 (codex-review) names commit {self.other[:8]}", out)
+
+    def test_the_landing_lock_is_held_through_every_local_review_gate_call(self):
+        # The advisor's check: lg_gate's new reads (a here-string read, jq, the change identity) must leave the lock held. At each gate call a
+        # second flock -n on the lock file fails while the landing runs, and the lock is free once it ends.
+        import fcntl
+        for script in (self.uet, self.nas):
+            with self.subTest(script=script.key):
+                probe, lock = self.dir / f"lock-probe-{next(self.counter)}.txt", self.lock_path(script)
+                # -E 75: a conflict exits 75 (util-linux flock.1.adoc), so any other failure is "error", never taken for "held"
+                hook = (f"flock -n -E 75 {q(lock)} true; rc=$?; case $rc in 0) echo free ;; 75) echo held ;; *) echo error-$rc ;; esac >> {q(probe)}")
+                code, out, log = self.land(script, FAKE_REAL_PYTHON=sys.executable, LOCAL_REVIEWS=self.local_review(self.rebased), FAKE_GATE_HOOK=hook)
+                self.assertEqual(code, 0, out)
+                self.assertEqual(probe.read_text(encoding="utf-8").split(), ["held"] * (2 if script.key == "uet" else 3))
+                subprocess.run(["sh", "-c", hook], check=True, timeout=30)  # the control: the same probe once the landing has ended
+                self.assertEqual(probe.read_text(encoding="utf-8").split()[-1], "free")
+                with open(lock, "a", encoding="utf-8") as handle:
+                    fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)  # BlockingIOError if the lock outlived the landing
+
+    def test_with_a_local_review_of_the_read_head_the_final_gate_reads_the_same_calls(self):
+        # The advisor's pin of the local path's call shape: a review of the read head adds no call to the final gate (lg_gate reads the file
+        # with jq, which is not logged, and fetches nothing), so the final gate's reads are those of the connector path.
+        expected = {"uet": ["head", "change", "trading-cc-read", "codex", "ci"], "nas": ["head", "change", "trading-cc-read", "codex", "ci", "main"]}
+        for script in (self.uet, self.nas):
+            with self.subTest(script=script.key):
+                code, out, log = self.land(script, FAKE_REAL_PYTHON=sys.executable, LOCAL_REVIEWS=self.local_review(self.head))
+                self.assertEqual((code, len(self.merge_calls(log))), (0, 1), out)
+                self.assertEqual(self.final_reads(script, log), expected[script.key])
+
+
+# ---------------------------------------------------------------------------------------------- 8. review_normalize.py
+ROLLOUT_ROOT = "/srv/review-example/cr-1/wt"  # synthetic: the worktree a codex review ran in (session_meta cwd)
+
+
+def rollout(*, output, target=None, commit=HEAD, version="0.162.1", cwd=ROLLOUT_ROOT, reviews=1, git=True, before=(), after=()):
+    """A `codex review` session rollout as codex-cli 0.162.1 writes it (measured on 15 local rollouts on 2026-10-13: the first line is
+    session_meta, the request and the result are event_msg item_completed lines; openai/codex@rust-v0.162.1
+    codex-rs/history/src/rollout_payload.rs:32-33, codex-rs/protocol/src/items.rs:173-183)."""
+    meta = {"id": "t-1", "timestamp": "2026-10-13T01:00:00Z", "cwd": cwd, "originator": "codex_exec", "cli_version": version}
+    if git:
+        meta["git"] = {"commit_hash": commit, "branch": None}
+    lines = [{"timestamp": "2026-10-13T01:00:00Z", "type": "session_meta", "payload": meta}, *before]
+    for _ in range(reviews):
+        for item in ({"type": "EnteredReviewMode", "id": "e-1", "target": target or {"type": "baseBranch", "branch": "vendor-review/base-1"},
+                      "user_facing_hint": "changes against vendor-review/base-1"},
+                     {"type": "ExitedReviewMode", "id": "x-1", "review_output": output}):
+            lines.append({"timestamp": "2026-10-13T01:05:00Z", "type": "event_msg",
+                          "payload": {"type": "item_completed", "thread_id": "t-1", "turn_id": "1", "item": item}})
+    return "".join(json.dumps(line) + "\n" for line in [*lines, *after])
+
+
+def codex_finding(path, priority, start=10, end=12, title="[P1] A finding"):
+    """A finding as ReviewFinding serializes it (protocol.rs:3525-3531), body included: the normalized file must drop it."""
+    return {"title": title, "body": "A prose body the normalized file does not carry.", "confidence_score": 0.8, "priority": priority,
+            "code_location": {"absolute_file_path": path, "line_range": {"start": start, "end": end}}}
+
+
+def codex_output(findings=(), correctness="patch is incorrect"):
+    return {"findings": list(findings), "overall_correctness": correctness, "overall_explanation": "Prose.", "overall_confidence_score": 0.7}
+
+
+PLUGIN_AUTHOR = "lander-example"  # synthetic: the account that ran /code-review
+PLUGIN_SINCE = "2026-10-13T01:00:00Z"
+
+
+def plugin_comment(body, author=PLUGIN_AUTHOR, created="2026-10-13T01:10:00Z", edited=None, ident="6200000001"):
+    """An IssueComment node as the normalizer's query reads it (schema.docs.graphql sha256 3ed09565…: author :21215, body :21225,
+    createdAt :21240, fullDatabaseId :21260, lastEditedAt :21290)."""
+    return {"fullDatabaseId": ident, "author": None if author is None else {"login": author}, "createdAt": created, "lastEditedAt": edited,
+            "body": body}
+
+
+def plugin_found(head, repo=NAS_REPO):
+    """The plugin's found-issues comment in its format (anthropics/claude-plugins-official@f359d43b plugins/code-review/commands/code-review.md:52-72)."""
+    return (f"### Code review\n\nFound 2 issues:\n\n1. The lock is released before the merge (bug due to `exec 9>&-` in lg_lock)\n\n"
+            f"https://github.com/{repo}/blob/{head}/tools/landing/nas_land.sh#L56-L60\n\n"
+            f"2. The README names the old slug (CLAUDE.md says \"keep the docs current\")\n\n"
+            f"https://github.com/{repo}/blob/{head}/tools/landing/READ%20ME.md#L20\n\n"
+            "\U0001f916 Generated with [Claude Code](https://claude.ai/code)\n\n"
+            "<sub>- If this code review was useful, please react with \U0001f44d. Otherwise, react with \U0001f44e.</sub>\n")
+
+
+PLUGIN_CLEAN = ("### Code review\n\nNo issues found. Checked for bugs and CLAUDE.md compliance.\n\n"
+                "\U0001f916 Generated with [Claude Code](https://claude.ai/code)\n")
+
+
+class ReviewNormalizeTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        spec = importlib.util.spec_from_file_location("landing_review_normalize", LANDING / "review_normalize.py")
+        cls.normalize = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cls.normalize)
+        gate = importlib.util.spec_from_file_location("landing_codex_gate_for_normalize", LANDING / "codex_gate.py")
+        cls.gate = importlib.util.module_from_spec(gate)
+        gate.loader.exec_module(cls.gate)
+
+    def run_cli(self, argv, graphql=None, gh_rc=0):
+        """The normalizer's main() with the out file in a scratch directory; `graphql` is what gh api graphql prints (a list of pages)."""
+        calls = []
+
+        def fake_run(cmd, capture_output=False, text=False, check=False):
+            calls.append(cmd)
+            self.assertEqual(cmd[:5], ["gh", "api", "graphql", "--paginate", "--slurp"])
+            return subprocess.CompletedProcess(cmd, gh_rc, json.dumps(graphql) if gh_rc == 0 else f"gh: HTTP 502 {ADDRESS}", "")
+
+        with tempfile.TemporaryDirectory(prefix="normalize-") as scratch:
+            out_file = Path(scratch) / "review.json"
+            argv = [part.replace("{dir}", scratch) for part in argv] + ["--out", str(out_file)]
+            out = io.StringIO()
+            with mock.patch.object(self.normalize.subprocess, "run", fake_run), contextlib.redirect_stdout(out):
+                code = self.normalize.main(argv)
+            written = json.loads(out_file.read_text(encoding="utf-8")) if out_file.exists() else None
+            mode = stat.S_IMODE(out_file.stat().st_mode) if out_file.exists() else None
+            leftovers = sorted(p.name for p in Path(scratch).iterdir() if p.name not in ("review.json", "rollout.jsonl"))
+            line = out.getvalue().strip()
+            self.assertNotIn(scratch, line, "no path is printed")
+            self.assertEqual(leftovers, [], "nothing but the file is left")
+            return code, line, written, mode, calls
+
+    def codex(self, text, *extra):
+        with tempfile.TemporaryDirectory(prefix="rollout-") as scratch:
+            path = Path(scratch) / "rollout.jsonl"
+            path.write_text(text, encoding="utf-8")
+            return self.run_cli(["codex-review", "--rollout", str(path), *extra])
+
+    def assert_gate(self, review, code):
+        """The written file is a normalized review the gate reads with this outcome."""
+        self.assertIsNone(self.gate.review_problem(review))
+        with tempfile.TemporaryDirectory(prefix="local-reviews-") as scratch:
+            path = Path(scratch) / "review.json"
+            path.write_text(json.dumps(review), encoding="utf-8")
+            with local_reviews_env({"LOCAL_REVIEWS": str(path)}), contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(self.gate.main("o/r", "7", review["head_sha"]), code)
+
+    # -- codex-review
+    def test_a_codex_review_becomes_its_findings_without_bodies_relative_to_the_worktree(self):
+        output = codex_output([codex_finding(f"{ROLLOUT_ROOT}/tools/landing/nas_land.sh", 1, 40, 44),
+                               codex_finding(f"{ROLLOUT_ROOT}/README.md", 2, 3, 3, "[P2] Docs"), codex_finding(f"{ROLLOUT_ROOT}/x.py", 3, 1, 2, "[P3] Nit")])
+        code, line, written, mode, calls = self.codex(rollout(output=output))
+        self.assertEqual((code, mode, calls), (0, 0o600, []))
+        self.assertEqual(written, {"reviewer": "codex-review", "reviewer_version": "codex-cli 0.162.1", "head_sha": HEAD, "completed": True,
+                                   "findings": [{"priority": 1, "location": "tools/landing/nas_land.sh:40-44", "title": "[P1] A finding"},
+                                                {"priority": 2, "location": "README.md:3-3", "title": "[P2] Docs"},
+                                                {"priority": 3, "location": "x.py:1-2", "title": "[P3] Nit"}]})
+        self.assertEqual(line, f"review_normalize: codex-review of {HEAD[:8]}: completed; overall_correctness 'patch is incorrect'; "
+                               "findings P0 0, P1 1, P2 1, P3 1; written to review.json")
+        self.assertNotIn("prose body", json.dumps(written))
+        self.assert_gate(written, 4)
+
+    def test_a_clean_codex_review_passes_the_gate_and_another_verdict_is_named_only_by_its_form(self):
+        code, line, written, _, _ = self.codex(rollout(output=codex_output(correctness="patch is correct")), "--head", HEAD)
+        self.assertEqual((code, written["completed"], written["findings"]), (0, True, []), line)
+        self.assertIn("overall_correctness 'patch is correct'; findings P0 0, P1 0, P2 0, P3 0", line)
+        self.assert_gate(written, 0)
+        code, line, written, _, _ = self.codex(rollout(output=codex_output([codex_finding(f"{ROLLOUT_ROOT}/a.py", 2)], correctness="see /srv/x")))
+        self.assertEqual((code, written["completed"]), (0, True))
+        self.assertIn("overall_correctness of another form", line)
+        self.assertNotIn("/srv/x", line)
+
+    def test_a_codex_review_without_a_structured_result_is_not_completed(self):
+        # review_output null: interrupted (review.rs exit_review_mode(None)). Empty overall_correctness and no findings: the reviewer's JSON did
+        # not parse, which review.rs:188-208 turns into findings [] (a finding without a priority does it: the rubric allows omitting it,
+        # rubric.md:58 and :78, the struct requires it, protocol.rs:3525-3531). Either would pass as "no finding" if counted as completed.
+        for name, output, note in (("interrupted", None, "the review was interrupted (review_output null)"),
+                                   ("the parse fallback", {"findings": [], "overall_correctness": "", "overall_explanation": "{\"findings\": [...]}",
+                                                           "overall_confidence_score": 0.0}, "the reviewer's JSON did not parse")):
+            with self.subTest(case=name):
+                code, line, written, _, _ = self.codex(rollout(output=output))
+                self.assertEqual((code, written), (0, {"reviewer": "codex-review", "reviewer_version": "codex-cli 0.162.1", "head_sha": HEAD,
+                                                         "completed": False, "findings": []}), line)
+                self.assertIn(f"NOT completed (the gate refuses this file); {note}", line)
+                self.assertIsNone(self.gate.review_problem(written))
+                with tempfile.TemporaryDirectory(prefix="local-reviews-") as scratch:
+                    path = Path(scratch) / "r.json"
+                    path.write_text(json.dumps(written), encoding="utf-8")
+                    with local_reviews_env({"LOCAL_REVIEWS": str(path)}), contextlib.redirect_stdout(io.StringIO()):
+                        self.assertEqual(self.gate.main("o/r", "7", HEAD), 2)
+
+    def test_a_codex_rollout_that_cannot_give_one_review_of_the_pull_requests_change_is_refused(self):
+        good = codex_output([codex_finding(f"{ROLLOUT_ROOT}/a.py", 1)])
+        cases = [
+            ("a commit review (one commit, not the pull request's change)", rollout(output=good, target={"type": "commit", "sha": HEAD, "title": "t"}),
+             "the review's target is commit, not baseBranch"),
+            ("uncommitted changes", rollout(output=good, target={"type": "uncommittedChanges"}), "the review's target is uncommittedChanges"),
+            ("custom instructions", rollout(output=good, target={"type": "custom", "instructions": "x"}), "the review's target is custom"),
+            ("a target of another form", rollout(output=good, target={"type": "a/../b"}), "the review's target is of another form"),
+            ("two reviews in one rollout", rollout(output=good, reviews=2), "2 review requests and 2 review results"),
+            ("no review", rollout(output=good, reviews=0), "0 review requests and 0 review results"),
+            ("a line that is not JSON", rollout(output=good) + "{\"truncated\n", "line 4 of the rollout is not JSON"),
+            ("no session_meta", rollout(output=good).split("\n", 1)[1], "no session_meta line"),
+            ("no commit in session_meta", rollout(output=good, git=False), "names no commit"),
+            ("a short commit", rollout(output=good, commit=HEAD[:12]), "names no commit"),
+            ("another --head", (rollout(output=good), "--head", OTHER), f"reviewed {HEAD[:8]}, not --head {OTHER[:8]}"),
+            ("a version of another form", rollout(output=good, version="0.162.1 /srv/x"), "no cli_version of the usual form"),
+            ("a priority of 4", rollout(output=codex_output([codex_finding("/a.py", 4)])), "finding 1 has no priority from 0 to 3"),
+            ("a priority of null", rollout(output=codex_output([codex_finding("/a.py", None)])), "finding 1 has no priority from 0 to 3"),
+            ("a priority of true", rollout(output=codex_output([codex_finding("/a.py", True)])), "finding 1"),
+            ("no code_location", rollout(output=codex_output([{**codex_finding("/a.py", 1), "code_location": None}])), "finding 1"),
+            ("a result that is not an object", rollout(output=["x"]), "the review result is not a review_output object"),
+        ]
+        for name, text, phrase in cases:
+            with self.subTest(case=name):
+                text, extra = (text[0], text[1:]) if isinstance(text, tuple) else (text, ())
+                code, line, written, _, calls = self.codex(text, *extra)
+                self.assertEqual((code, written, calls), (1, None, []), line)
+                self.assertEqual(line, f"review_normalize: codex-review: refused: {line.split(': refused: ', 1)[1]}")
+                self.assertIn(phrase, line)
+                self.assertTrue(line.endswith("; nothing written"))
+                self.assertNotIn("/srv/x", line)
+
+    def test_a_codex_path_outside_the_worktree_keeps_its_form_with_the_home_directory_as_a_tilde(self):
+        with mock.patch.dict(os.environ, {"HOME": "/srv/reviewer"}):
+            self.assertEqual(self.normalize.where("/srv/reviewer/elsewhere/x.py", ROLLOUT_ROOT), "~/elsewhere/x.py")
+            self.assertEqual(self.normalize.where("/opt/x.py", ROLLOUT_ROOT), "/opt/x.py")
+            self.assertEqual(self.normalize.where(f"{ROLLOUT_ROOT}/a/b.py", ROLLOUT_ROOT + "/"), "a/b.py")
+            self.assertEqual(self.normalize.where(f"{ROLLOUT_ROOT}-other/b.py", ROLLOUT_ROOT), f"{ROLLOUT_ROOT}-other/b.py")
+            self.assertEqual(self.normalize.where("/a.py", "relative/cwd"), "/a.py")
+
+    # -- claude-code-review
+    def plugin(self, comments, head=HEAD, *, heads=None, since=PLUGIN_SINCE, author=PLUGIN_AUTHOR, gh_rc=0):
+        pages = [{"data": {"repository": {"pullRequest": {"headRefOid": page_head, "comments": {
+            "pageInfo": {"hasNextPage": False, "endCursor": None}, "nodes": nodes}}}}} for page_head, nodes in zip(heads or [head], [comments] + [[]] * 9)]
+        return self.run_cli(["claude-code-review", "--repo", NAS_REPO, "--pr", "1018", "--head", head, "--since", since, "--author", author,
+                             "--reviewer-version", "code-review@claude-plugins-official@f359d43b; Claude Code 2.1.296"], graphql=pages, gh_rc=gh_rc)
+
+    def test_the_plugins_issues_become_priority_1_findings_located_by_their_links(self):
+        code, line, written, mode, calls = self.plugin([plugin_comment(plugin_found(HEAD))])
+        self.assertEqual((code, mode), (0, 0o600), line)
+        self.assertEqual(written, {"reviewer": "claude-code-review", "reviewer_version": "code-review@claude-plugins-official@f359d43b; Claude Code 2.1.296",
+                                   "head_sha": HEAD, "completed": True, "findings": [
+                                       {"priority": 1, "location": "tools/landing/nas_land.sh:56-60",
+                                        "title": "The lock is released before the merge (bug due to `exec 9>&-` in lg_lock)"},
+                                       {"priority": 1, "location": "tools/landing/READ ME.md:20",
+                                        "title": "The README names the old slug (CLAUDE.md says \"keep the docs current\")"}]})
+        self.assertEqual(line, f"review_normalize: claude-code-review of {HEAD[:8]}: completed; comment 6200000001; findings P0 0, P1 2, P2 0, P3 0; "
+                               "written to review.json")
+        self.assertEqual(calls[0][5:], ["-f", f"query={self.normalize.COMMENTS}", "-f", "owner=native-agent-stack", "-f", "repo=native-agent-stack",
+                                        "-F", "pr=1018"])
+        self.assert_gate(written, 4)
+
+    def test_the_plugins_no_issues_comment_is_a_completed_review_without_findings(self):
+        code, line, written, _, _ = self.plugin([plugin_comment(PLUGIN_CLEAN.replace("\n", "\r\n"))])
+        self.assertEqual((code, written["completed"], written["findings"]), (0, True, []), line)
+        self.assert_gate(written, 0)
+
+    def test_no_comment_of_this_run_is_a_review_that_did_not_complete(self):
+        # The plugin posts nothing for a closed, draft, trivial or already reviewed pull request, nor when no issue scored 80
+        # (plugins/code-review/README.md:157-167): such a run gives completed false, which the gate refuses.
+        cases = [("no comment", []),
+                 ("only a comment from before the run", [plugin_comment(PLUGIN_CLEAN, created="2026-10-13T00:59:59Z")]),
+                 ("a comment by another account (anyone can post the format)", [plugin_comment(PLUGIN_CLEAN, author="someone-else")]),
+                 ("a comment of a deleted account", [plugin_comment(PLUGIN_CLEAN, author=None)]),
+                 ("a comment that only quotes the heading", [plugin_comment("As said:\n### Code review\nNo issues found.")])]
+        for name, comments in cases:
+            with self.subTest(case=name):
+                code, line, written, _, _ = self.plugin(comments)
+                self.assertEqual((code, written), (0, {"reviewer": "claude-code-review", "reviewer_version": written["reviewer_version"], "head_sha": HEAD,
+                                                         "completed": False, "findings": []}), line)
+                self.assertIn("NOT completed (the gate refuses this file); no code-review comment by --author since --since", line)
+
+    def test_the_author_is_matched_without_regard_to_case_and_at_the_start_time(self):
+        code, line, written, _, _ = self.plugin([plugin_comment(PLUGIN_CLEAN, author=PLUGIN_AUTHOR.upper(), created=PLUGIN_SINCE)])
+        self.assertEqual((code, written["completed"]), (0, True), line)
+
+    def test_a_plugin_comment_that_cannot_be_bound_to_the_head_or_read_is_refused(self):
+        found = plugin_found(HEAD)
+        cases = [
+            ("the head moved during the review", dict(comments=[plugin_comment(found)], heads=[OTHER]), f"head is not --head {HEAD[:8]} now"),
+            ("the head moved between pages", dict(comments=[plugin_comment(found)], heads=[HEAD, OTHER]), "head is not --head"),
+            ("an edited comment", dict(comments=[plugin_comment(found, edited="2026-10-13T01:20:00Z")]), "was edited after it was posted"),
+            ("two comments of the run", dict(comments=[plugin_comment(found), plugin_comment(PLUGIN_CLEAN, ident="6200000002")]),
+             "2 code-review comments by --author since --since"),
+            ("a count that does not match its list", dict(comments=[plugin_comment(found.replace("Found 2 issues", "Found 3 issues"))]),
+             "announces 3 issues and lists 2"),
+            ("a list out of order", dict(comments=[plugin_comment(found.replace("\n2. ", "\n3. "))]), "announces 2 issues and lists 1"),
+            ("found no issues by count", dict(comments=[plugin_comment("### Code review\n\nFound 0 issues:\n")]), "announces 0 issues and lists 0"),
+            ("another format", dict(comments=[plugin_comment("### Code review\n\nLooks fine to me.")]), "neither the plugin's found-issues list"),
+            ("only the heading", dict(comments=[plugin_comment("### Code review")]), "neither the plugin's found-issues list"),
+            ("gh fails", dict(comments=[], gh_rc=1), "gh api graphql exited 1 (its output withheld)"),
+        ]
+        for name, kwargs, phrase in cases:
+            with self.subTest(case=name):
+                code, line, written, _, _ = self.plugin(**kwargs)
+                self.assertEqual((code, written), (1, None), line)
+                self.assertIn(phrase, line)
+                self.assertNotIn(ADDRESS, line, "nothing gh printed is shown")
+                self.assertNotIn("lock is released", line, "no title is printed")
+
+    def test_a_reply_that_is_not_the_pull_request_is_refused(self):
+        for name, reply in (("no data", [{"errors": [{"message": ADDRESS}]}]), ("not pages", {"data": None}), ("a bad time", None)):
+            with self.subTest(case=name):
+                if reply is None:
+                    code, line, written, _, _ = self.plugin([plugin_comment(PLUGIN_CLEAN, created="yesterday")])
+                else:
+                    code, line, written, _, _ = self.run_cli(["claude-code-review", "--repo", NAS_REPO, "--pr", "1", "--head", HEAD, "--since",
+                                                              PLUGIN_SINCE, "--author", PLUGIN_AUTHOR, "--reviewer-version", "v"], graphql=reply)
+                self.assertEqual((code, written), (1, None), line)
+                self.assertIn("the GraphQL reply is not the pull request with its comments", line)
+                self.assertNotIn(ADDRESS, line)
+
+    def test_usage_errors_exit_2_and_write_nothing(self):
+        base = ["claude-code-review", "--repo", NAS_REPO, "--pr", "1", "--head", HEAD, "--since", PLUGIN_SINCE, "--author", PLUGIN_AUTHOR,
+                "--reviewer-version", "v"]
+        bad = [("a short head", {"--head": HEAD[:8]}), ("a repository without its owner", {"--repo": "native-agent-stack"}),
+               ("pr 0", {"--pr": "0"}), ("a login of another shape", {"--author": "a/b"}), ("a time without its offset", {"--since": "2026-10-13T01:00:00"}),
+               ("an empty version", {"--reviewer-version": " "}), ("a version of two lines", {"--reviewer-version": "a\nb"})]
+        for name, change in bad:
+            with self.subTest(case=name):
+                argv = list(base)
+                for flag, value in change.items():
+                    argv[argv.index(flag) + 1] = value
+                with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit) as raised:
+                    self.run_cli(argv, graphql=[])
+                self.assertEqual(raised.exception.code, 2)
+        with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit) as raised:
+            self.run_cli(["codex-review", "--rollout", "{dir}/r.jsonl", "--head", "abc"])
+        self.assertEqual(raised.exception.code, 2)
+
+    def test_an_unreadable_rollout_prints_one_line_with_the_error_class_and_no_path(self):
+        code, line, written, _, _ = self.run_cli(["codex-review", "--rollout", "{dir}/absent.jsonl"])
+        self.assertEqual((code, written), (1, None))
+        self.assertEqual(line, "review_normalize: codex-review: refused: FileNotFoundError, details withheld; nothing written")
+
+    def test_the_script_runs_isolated_as_the_readme_shows(self):
+        with tempfile.TemporaryDirectory(prefix="normalize-") as scratch:
+            path, out = Path(scratch) / "rollout.jsonl", Path(scratch) / "review.json"
+            path.write_text(rollout(output=codex_output(correctness="patch is correct")), encoding="utf-8")
+            done = subprocess.run([sys.executable, "-I", str(LANDING / "review_normalize.py"), "codex-review", "--rollout", str(path), "--out", str(out)],
+                                  capture_output=True, text=True, timeout=30, env={"PATH": os.environ["PATH"], "LC_ALL": "C.UTF-8"})
+            self.assertEqual((done.returncode, done.stderr), (0, ""), done.stdout)
+            self.assertIn("completed; overall_correctness 'patch is correct'", done.stdout)
+            self.assertNotIn(scratch, done.stdout)
+            self.assertEqual(json.loads(out.read_text(encoding="utf-8"))["head_sha"], HEAD)
 
 
 if __name__ == "__main__":
