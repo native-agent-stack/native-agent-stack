@@ -11,7 +11,10 @@ import json
 from pathlib import Path
 import sys
 import tempfile
+import threading
 import time
+from types import SimpleNamespace
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
@@ -123,17 +126,190 @@ def ledger_probe(*, separate_budgets=False):
             "pending_after_refusal": "100.01", "data": "SYN_QUOTES_AND_REQUEST_CLOCK"}
 
 
+def adaptive_controls():
+    """A: actual class cannot register twice. B: identity-only repair is unsafe.
+
+    B inherits the real rebalance/minting path and native submit/cache operation.
+    Only registration identity and policy decisions are fixtures. The node is
+    never run: no port starts, broker I/O, credential access or external state.
+    """
+    from tests.test_adaptive_paper_native import ADAPTER, FakePort
+    from native_strategy import AdaptiveStrategy
+    from strategies import AdaptivePolicy, PolicyConfig
+    from safety import Ledger, RiskLimits
+    from nautilus_trader.config import StrategyConfig
+    from nautilus_trader.model import StrategyId
+    from nautilus_trader.trading import Strategy
+
+    class IdentityOnly(AdaptiveStrategy):
+        def __new__(cls, policy, ledger, trial_id, **kwargs):
+            tag = "A1" if policy.config.symbols[0] == "SPY" else "B2"
+            return Strategy.__new__(cls, StrategyConfig(strategy_id=StrategyId("ADAPTIVE-" + tag),
+                order_id_tag=tag, log_events=False, log_commands=False, manage_stop=False))
+
+        def submit_order(self, order):
+            self.minted_order = order
+            Strategy.submit_order(self, order)
+
+    with tempfile.TemporaryDirectory(dir="/var/tmp") as scratch:
+        ledger = Ledger(Path(scratch) / "account.sqlite3", RiskLimits())
+        now = 1800000000.
+        ledger.begin_next_trial(now, "shared-trial")
+        def make(cls, symbol):
+            universe = (symbol,) + tuple(s for s in ("SPY", "QQQ", "IWM", "DIA", "AAPL", "MSFT") if s != symbol)
+            policy = AdaptivePolicy(PolicyConfig(symbols=universe, max_positions=6))
+            policy.observe(symbol, 100, 100.01, now)
+            return cls(policy, ledger, "shared-trial", stop_file=Path(scratch) / "unused-SYN-stop",
+                       clock=lambda: now)
+        try:
+            port_a = FakePort()
+            try:
+                ADAPTER.build_node(port_a, [{"symbol": "SPY"}],
+                                   [make(AdaptiveStrategy, "SPY"), make(AdaptiveStrategy, "QQQ")])
+            except RuntimeError as error:
+                refusal = str(error)
+                if refusal != "Strategy ADAPTIVE-001-A is already registered":
+                    raise AssertionError("unexpected_control_A_refusal:" + refusal) from error
+            else:
+                raise AssertionError("actual_adaptive_duplicate_identity_was_admitted")
+
+            port_b = FakePort()
+            siblings = [make(IdentityOnly, symbol) for symbol in ("SPY", "QQQ")]
+            ADAPTER.build_node(port_b, [{"symbol": s} for s in ("SPY", "QQQ")], siblings)
+            owners = []
+            for sibling, symbol in zip(siblings, ("SPY", "QQQ")):
+                sibling.started = sibling.enabled = True
+                decision = SimpleNamespace(timestamp=now, regime="SYN", targets={symbol: 1},
+                    signals=(), exits={}, effective_leverage=1, reason="SYN_ID_COLLISION")
+                with patch.object(sibling.policy, "decide", return_value=decision):
+                    sibling.rebalance(now)
+                owners.append(str(sibling.cache.strategy_id_for_order(sibling.minted_order.client_order_id)))
+            ids = [str(s.minted_order.client_order_id) for s in siblings]
+            cached = siblings[0].cache.order(siblings[0].minted_order.client_order_id)
+            if ids != ["adp-shared-trial-0000001"] * 2 or owners != ["ADAPTIVE-A1", "ADAPTIVE-B2"]:
+                raise AssertionError("identity_only_collision_not_reproduced:" + repr((ids, owners)))
+            if str(cached.instrument_id) != "QQQ.ALPACA":
+                raise AssertionError("second_order_did_not_replace_first_cache_entry")
+            if any((port_a.started, port_b.started, port_a.submissions, port_b.submissions)):
+                raise AssertionError("adaptive_controls_reached_external_io")
+        finally:
+            ledger.close()
+    return {"A": {"expected_refusal": refusal, "actual_class": "AdaptiveStrategy"},
+            "B": {"fixture": "identity-only subclass; inherited production rebalance and IDs",
+                  "ids": ids, "cache_owner_after_each_submit": owners,
+                  "cached_instrument_after_second_submit": "QQQ.ALPACA",
+                  "unsafe_cache_replacement_reproduced": True},
+            "port_starts": 0, "external_submissions": 0}
+
+
+def coupling_probe():
+    """Exercise the real shared Controller and 429 freeze methods, no SDK client."""
+    from runner import Controller
+    from safety import Ledger, SafetyError
+    from native_adapter import NativeOrderRejected
+    from transport import AlpacaPaperTransport
+
+    class SharedPort:
+        request_observer = None
+        freeze_health = AlpacaPaperTransport.freeze_health
+        _response_sync = AlpacaPaperTransport._response_sync
+        def __init__(self):
+            self._state_lock, self._reasons = threading.Lock(), set()
+        @property
+        def ready(self):
+            return not self._reasons
+
+    with tempfile.TemporaryDirectory(dir="/var/tmp") as scratch:
+        ledger = Ledger(Path(scratch) / "account.sqlite3")
+        now = 1800000000.
+        ledger.begin_next_trial(now, "coupling")
+        controller = Controller(ledger, now + 3600, market_open=True, clock=lambda: now,
+                                stop_file=Path(scratch) / "unused-SYN-stop")
+        controller.port = SharedPort()
+        try:
+            orders = []
+            for tag, symbol in (("A1", "SPY"), ("B2", "QQQ")):
+                controller.quote({"symbol": symbol, "bid": "100", "ask": "100.01", "ts_ns": int(now * 1e9)})
+                order = {"client_order_id": "coupling-" + tag, "symbol": symbol,
+                         "side": "buy", "qty": "1", "limit_price": "100.03", "strategy": tag}
+                controller.before_submit(order)
+                orders.append(order)
+            if any(ledger.request_budget(now, "submit") for _ in range(180)):
+                raise AssertionError("account_submit_reservation_failed")
+            refusals = []
+            for order in orders:
+                try:
+                    asyncio.run(controller.before_request("submit", order["client_order_id"]))
+                except SafetyError as error:
+                    if str(error) != "submission_rate_deferred":
+                        raise
+                    refusals.append(str(error))
+                else:
+                    raise AssertionError("sibling_bypassed_shared_submit_window")
+            if controller.defer_until <= now or any(ledger.request_budget(now, "cancel") for _ in range(20)):
+                raise AssertionError("shared_deferral_or_cancel_headroom_failed")
+            controller.port._response_sync({"status": 429})
+            frozen = []
+            for order in orders:
+                try:
+                    controller.before_submit({**order, "client_order_id": order["client_order_id"] + "-after429"})
+                except NativeOrderRejected as error:
+                    if str(error) != "admissions_not_ready":
+                        raise
+                    frozen.append(str(error))
+                else:
+                    raise AssertionError("sibling_buy_bypassed_shared_429_freeze")
+            if controller.port._reasons != {"rate_limited"}:
+                raise AssertionError("unexpected_shared_429_freeze_reason")
+        finally:
+            ledger.close()
+    return {"submit_refusals_by_preset": refusals, "shared_defer_until_advanced": True,
+            "reserved_cancel_slots_admitted": 20, "http_429_reason": "rate_limited",
+            "buy_refusals_by_preset_after_429": frozen,
+            "scope": "actual Controller/transport methods; fixture health shell, no HTTP or node"}
+
+
 def main():
     if version("nautilus_trader") != "2.0.0rc5":
         raise RuntimeError("selected_native_runtime_required")
     duplicate = "--duplicate-tags" in sys.argv
+    if duplicate:
+        try:
+            native_probe(duplicate_tags=True)
+        except RuntimeError as error:
+            if str(error) != "Strategy Preset-A1 is already registered":
+                raise AssertionError("unexpected_duplicate_tag_refusal") from error
+            print("EXPECTED_CONTROL=Strategy Preset-A1 is already registered")
+            print('CONTROL_RECEIPT={"paper_lane":"B","evidence_class":"synthetic",'
+                  '"strategy_version":"concurrent-presets-proposal-v2","status":"expected_refusal"}')
+            return 1
+        raise AssertionError("duplicate_tag_control_was_admitted")
+    if "--separate-budgets" in sys.argv:
+        try:
+            ledger_probe(separate_budgets=True)
+        except AssertionError as error:
+            if str(error) != "unsafe_separate_preset_counters_admit_201":
+                raise
+            print("EXPECTED_CONTROL=unsafe_separate_preset_counters_admit_201")
+            print('CONTROL_RECEIPT={"paper_lane":"B","evidence_class":"synthetic",'
+                  '"strategy_version":"concurrent-presets-proposal-v2","status":"expected_refusal"}')
+            return 1
+        raise AssertionError("separate_budget_control_did_not_violate_account_cap")
     result = native_probe(duplicate_tags=duplicate)
-    budget = ledger_probe(separate_budgets="--separate-budgets" in sys.argv)
+    budget = ledger_probe()
+    controls = adaptive_controls()
+    coupling = coupling_probe()
     print("PROPOSAL_RESULT=" + json.dumps({"paper_lane": "B", "evidence_class": "synthetic",
+          "strategy_version": "concurrent-presets-proposal-v2",
+          "presets": [{"preset_id": "A1", "version": "SYN-roundtrip-v1"},
+                      {"preset_id": "B2", "version": "SYN-roundtrip-v1"}],
           "scope": "proposal feasibility, not concurrent broker acceptance",
           "native_version": "2.0.0rc5", "native": result, "account_ledger": budget,
+          "adaptive_controls": controls,
+          "shared_coupling": coupling,
           "broker_execution": "NOT_RUN", "status": "passed"}, sort_keys=True))
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

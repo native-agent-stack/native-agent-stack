@@ -1,5 +1,6 @@
 {
   "schema_version": 1,
+  "strategy_version": "concurrent-presets-proposal-v2",
   "paper_lane": "B",
   "evidence_class": "source_review",
   "source_pin": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
@@ -120,6 +121,62 @@
       "bytes": 58087,
       "sha256": "131cbf0c840267c921cc7b3878571adf855e7376ac91224cc3aba4edaa4eaee4",
       "locators_at_pin": "98-124;299-458"
+    },
+    {
+      "repository": "nautechsystems/nautilus_trader",
+      "pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "path": "crates/live/src/python/node.rs",
+      "bytes": 185847,
+      "sha256": "f0d492b0c4828f58ca34633406e214c4dd8a08c6d6d27c7b842a4ff5ec57f4c4",
+      "locators_at_pin": "1321-1411"
+    },
+    {
+      "repository": "nautechsystems/nautilus_trader",
+      "pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "path": "crates/system/src/python/registration.rs",
+      "bytes": 25947,
+      "sha256": "fa70476409a0bff8711566e44cad37047c7d117ae9457dedf2cf6dc33232c423",
+      "locators_at_pin": "192-250;292-317"
+    },
+    {
+      "repository": "nautechsystems/nautilus_trader",
+      "pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "path": "crates/trading/src/strategy/mod.rs",
+      "bytes": 260969,
+      "sha256": "3244ea43665cf9c66d88db0debd3546a8ee3adca6d8cbe9a6ad00b4f817b502c",
+      "locators_at_pin": "2346-2385"
+    },
+    {
+      "repository": "nautechsystems/nautilus_trader",
+      "pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "path": "crates/common/src/cache/mod.rs",
+      "bytes": 295601,
+      "sha256": "58fe6478cc93b064bdd6e46f4316806e2b3013b933fc802ba0e50279916be63a",
+      "locators_at_pin": "4718-4745"
+    },
+    {
+      "repository": "nautechsystems/nautilus_trader",
+      "pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "path": "crates/risk/src/engine/mod.rs",
+      "bytes": 87892,
+      "sha256": "204e32e8aec96552dbe740a79216813935c82a64c640b3f7aed6410827b80160",
+      "locators_at_pin": "226-299"
+    },
+    {
+      "repository": "native-agent-stack",
+      "pin": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "path": "blueprints/us-equities/adaptive-paper/transport.py",
+      "bytes": 99384,
+      "sha256": "14f30b03548bde1bdb3330db95eeb8565b1970152967c7b0f877036f80a98257",
+      "locators_at_pin": "1416-1420"
+    },
+    {
+      "repository": "nautechsystems/nautilus_trader",
+      "pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "path": "crates/system/src/config.rs",
+      "bytes": 15281,
+      "sha256": "7ae6034d75b71b755578996911c2db82cd2201295d01492bcb2ea1779abdec46",
+      "locators_at_pin": "100-105"
     }
   ],
   "financial_input_scope": "Existing published configs/retained receipts only; no new data acquisition, paid calls or private preimages."
