@@ -313,15 +313,15 @@ class NativeReportShapeTests(unittest.TestCase):
         ("claude", "a skill's window is an array", lambda h, c, l: h["skills"][0].update(codex={"counts": {"7": []}}), {}),
         ("claude", "a skill's use counts are an array", lambda h, c, l: h["skills"][0].update(codex={"use_counts": []}), {}),
         ("claude", "the use policy is an array", lambda h, c, l: h.update(codex_use_policy=[]), {}),
-        ("claude", "the claude groups are an array", lambda h, c, l: l.update(groups=[]), {}),
-        ("claude", "the spawn groups are an array", lambda h, c, l: l.update(groups={"by_spawn_and_agent_type": []}), {}),
-        ("claude", "a spawn's agents are an array", lambda h, c, l: l.update(groups={"by_spawn_and_agent_type": {"workflow": []}}), {}),
-        ("claude", "the main lane is an array", lambda h, c, l: l.update(main=[]), {}),
+        ("claude", "the claude groups are an array", lambda h, c, l: l.update(groups=[]), {"claude": False}),
+        ("claude", "the spawn groups are an array", lambda h, c, l: l.update(groups={"by_spawn_and_agent_type": []}), {"claude": False}),
+        ("claude", "a spawn's agents are an array", lambda h, c, l: l.update(groups={"by_spawn_and_agent_type": {"workflow": []}}), {"claude": False}),
+        ("claude", "the main lane is an array", lambda h, c, l: l.update(main=[]), {"claude": False}),
         ("codex", "the host's codex state is an array", lambda h, c, l: h.update(codex=[]), {"codex": False}),
-        ("codex", "the codex groups are an array", lambda h, c, l: c.update(groups=[]), {}),
-        ("codex", "the workers_by_role groups are an array", lambda h, c, l: c["groups"].update(workers_by_role=[]), {}),
-        ("codex", "the workers_by_kind groups are a string", lambda h, c, l: c["groups"].update(workers_by_kind="worker"), {}),
-        ("codex", "the workers group is an array", lambda h, c, l: c["groups"].update(workers=[]), {}),
+        ("codex", "the codex groups are an array", lambda h, c, l: c.update(groups=[]), {"codex": False}),
+        ("codex", "the workers_by_role groups are an array", lambda h, c, l: c["groups"].update(workers_by_role=[]), {"codex": False}),
+        ("codex", "the workers_by_kind groups are a string", lambda h, c, l: c["groups"].update(workers_by_kind="worker"), {"codex": False}),
+        ("codex", "the workers group is an array", lambda h, c, l: c["groups"].update(workers=[]), {"codex": False}),
         ("codex", "the use groups of the roles are an array", lambda h, c, l: (c["groups"].update(workers_by_role={"worker": {"sessions": 1, "skill_md_reads": {"gh-fix-ci": 4}}}),
                                                                               h["codex_use_groups"]["7"].update(workers_by_role=["zz-fake"])), {}),
         ("codex", "the use groups of the kinds are an array", lambda h, c, l: (c["groups"].update(workers_by_kind={"edit": {"sessions": 1, "skill_md_reads": {"gh-fix-ci": 4}}}),
@@ -393,6 +393,70 @@ class NativeReportShapeTests(unittest.TestCase):
                 self.assertEqual(done.returncode, 1 if label == "claude is an array" else 0, done.stdout)
                 record = json.loads(out.read_text())
                 self.assertIs(record["measured"]["host"], label != "claude is an array", "the host is measured only when its own state says so")
+
+    LANE_CASES = (
+        ("claude", "groups and main are arrays", lambda l: l.update(groups=[], main=[])),
+        ("claude", "groups is an array", lambda l: l.update(groups=[])),
+        ("claude", "the spawn groups are an array", lambda l: l["groups"].update(by_spawn_and_agent_type=[])),
+        ("claude", "a spawn's agents are an array", lambda l: l["groups"].update(by_spawn_and_agent_type={"workflow": []})),
+        ("claude", "an agent's counts are an array", lambda l: l["groups"]["by_spawn_and_agent_type"]["workflow"]["security-reviewer"].update(skill_calls=[])),
+        ("claude", "main has no counts", lambda l: l.update(main={})),
+        ("codex", "groups is an array", lambda l: l.update(groups=[])),
+        ("codex", "the workers group has no counts", lambda l: l["groups"]["workers"].pop("skill_md_reads")),
+        ("codex", "workers_by_role is an array", lambda l: l["groups"].update(workers_by_role=[])),
+    )
+
+    def test_a_lanes_report_with_a_container_of_the_wrong_shape_is_never_published_as_measured(self):
+        """Review of #1043 at 9caafa601 (P2): the lanes report of the right kind was a measured success whatever its containers, so `groups: []` published `measured.claude: true` with no lane."""
+        daily = daily_module()
+        for half, label, change in self.LANE_CASES:
+            host, codex, claude = claude_reports() if half == "claude" else codex_reports()
+            report = claude if half == "claude" else codex
+            change(report)
+            key = "claude" if half == "claude" else "codex"
+            with self.subTest(half=half, case=label):
+                projected = daily.project_reports(host, codex, claude, now=NOW, window=7, half=half)
+                self.assertIs(projected["measured"][key], False)
+                self.assertEqual([row for row in projected["lanes"] if row["client"] == key], [], "no lane of a report that cannot be read is published")
+                notes = daily.unusable_reports(codex, claude)
+                self.assertEqual(len(notes), 1)
+                self.assertNotIn("/", notes[0])
+        for half in ("claude", "codex"):          # a valid empty object is not a malformed one
+            host, codex, claude = claude_reports() if half == "claude" else codex_reports()
+            report = claude if half == "claude" else codex
+            report["groups"] = {"by_spawn_and_agent_type": {}} if half == "claude" else {}
+            if half == "claude":
+                report["main"] = {"skill_calls": {}}
+            with self.subTest(half=half, case="valid and empty"):
+                self.assertIs(daily.project_reports(host, codex, claude, now=NOW, window=7, half=half)["measured"][half], True)
+                self.assertEqual(daily.unusable_reports(codex, claude), [])
+
+    def test_the_command_line_publishes_a_malformed_lanes_report_as_not_measured_with_a_fixed_reason(self):
+        copy = self.copied_tool()
+        daily_path = copy / "tools/skill-usage/daily_skill_usage.py"
+        account, home = getpass.getuser(), str(Path.home())
+        destination = Path(tempfile.mkdtemp(prefix="skill-lane-out-"))
+        self.addCleanup(shutil.rmtree, destination, True)
+        for half, label, change in self.LANE_CASES:
+            host, codex, claude = claude_reports() if half == "claude" else codex_reports()
+            report = claude if half == "claude" else codex
+            change(report)
+            (copy / "host.json").write_text(json.dumps(host))
+            (copy / "lanes.json").write_text(json.dumps(report))
+            own, combined = destination / "own.json", destination / "combined.json"
+            for stale in (own, combined):
+                stale.unlink(missing_ok=True)
+            flag = "--claude-lanes-report" if half == "claude" else "--codex-lanes-report"
+            with self.subTest(half=half, case=label):
+                done = subprocess.run([sys.executable, "-B", str(daily_path), "--half", half, "--host-report", str(copy / "host.json"), flag, str(copy / "lanes.json"), "--now", NOW,
+                                       "--out", str(own), "--combined-out", str(combined)], capture_output=True, text=True, timeout=60)
+                self.assertEqual(done.returncode, 1, done.stdout + done.stderr)
+                self.assertNotIn("Traceback", done.stderr)
+                self.assertNotIn(account, done.stderr)
+                self.assertNotIn(home, done.stderr)
+                self.assertEqual(done.stderr.strip().splitlines(), [f"daily skill usage: the {half.capitalize()} lanes report has a container of the wrong shape; its half is read as not measured"])
+                self.assertIs(json.loads(own.read_text())["measured"][half], False)
+                self.assertIs(json.loads(combined.read_text())["measured"][half], False, "no falsely measured combined publication")
 
     def test_an_error_nobody_foresaw_is_a_fixed_diagnostic_without_its_text_or_a_traceback(self):
         daily = daily_module()
@@ -911,7 +975,7 @@ sys.path.insert(0, sys.argv[1])
 import daily_skill_usage as daily
 try:
     daily.require_confined(sys.argv[2:])
-except daily.Unconfined:
+except daily.Refused:
     sys.exit(3)
 """
 
@@ -941,6 +1005,8 @@ sys.exit(subprocess.run(arguments[index:], cwd=directory, env=environment).retur
 """
 
 UNCONFINED_MESSAGE = "daily skill usage refused: this process can write where its service unit forbids it, so the unit's file system directives are not in effect and it did not run\n"
+UNVERIFIED_MESSAGE = ("daily skill usage refused: a directory that the unit's directives make read-only refused the write by a mode or a policy and not as a read-only file system does, "
+                      "so the directives are not shown to be in effect and it did not run\n")
 
 
 class ManagerProbes:
@@ -1027,6 +1093,25 @@ class StubManagerTests(ManagerProbes, unittest.TestCase):
                 self.assertEqual(self.check(self.properties(section, str(fixture / "records")), fixture), 3, "with the directives accepted and not applied it is refused too")
         self.assertEqual(sorted(path.name for folder in (fixture / "clone", fixture / "other", Path.home()) for path in folder.iterdir() if path.name.startswith(".skill-usage-confinement")), [],
                          "the probing leaves no file behind")
+
+    def test_a_permission_refusal_does_not_pass_for_a_process_the_manager_left_unconfined(self):
+        """Review of #1043 at 9caafa601 (P1), the reviewer's reproduction: a home and a clone of mode 0500 refuse a new entry by their mode, a writable directory sits below the home, and the manager applied no
+        directive. The check accepted the refusals; the process then created a directory and a marker below the home, outside any record directory. It must stop first."""
+        base = Path(tempfile.mkdtemp(prefix="skill-two-roots-"))
+        self.addCleanup(shutil.rmtree, base, True)
+        home, clone = base / "home", base / "clone"
+        (home / "client-state").mkdir(parents=True)
+        clone.mkdir()
+        shutil.copytree(ROOT / "tools/skill-usage", base / "tool", ignore=shutil.ignore_patterns("__pycache__"))
+        home.chmod(0o500)
+        clone.chmod(0o500)
+        self.addCleanup(lambda: [path.chmod(0o700) for path in (home, clone)])
+        marker = home / "client-state" / "marker"
+        script = CHECK + f"\nopen({str(marker)!r}, 'w').write('written')\n"
+        done = subprocess.run([*self.manager, "-p", f"WorkingDirectory={base}", "-p", "Environment=PYTHONDONTWRITEBYTECODE=1", sys.executable, "-B", "-c", script, str(base / "tool"), str(home), str(clone)],
+                              capture_output=True, text=True, timeout=120)
+        self.assertEqual(done.returncode, 3, done.stderr)
+        self.assertFalse(marker.exists(), "the process must not get past the check")
 
     def test_the_rendered_command_line_stops_before_any_work_when_the_manager_applied_nothing(self):
         """The service-level negative control: the unit's own command line, under a manager that ignores the sandbox, exits 2 with the fixed message and writes no record."""
@@ -1130,17 +1215,29 @@ class RequireConfinedTests(unittest.TestCase):
         self.assertNotIn(str(self.directory), str(caught.exception))
         self.assertIsInstance(caught.exception, self.daily.Refused)
 
-    def test_a_refused_write_is_what_confinement_looks_like(self):
-        for number in (errno.EROFS, errno.EACCES, errno.EPERM):
+    def test_a_read_only_file_system_is_what_confinement_looks_like(self):
+        """Review of #1043 at 9caafa601 (P1): EACCES and EPERM were accepted too. The directives set MS_RDONLY on the mounts (systemd-stable@387a14a7b67b v255.4 src/core/namespace.c make_read_only L1708-L1754;
+        man/systemd.exec.xml L1630-L1632: "writing will be refused even if the usual file access controls would permit this") and the kernel answers a write there with EROFS (open(2), man-pages 6.19)."""
+        self.assertEqual(self.daily.READ_ONLY_REFUSAL, errno.EROFS)
+        self.assertIsNone(self.daily.require_confined([self.directory], opener=self.refusing(errno.EROFS)))
+        self.assertEqual(list(self.directory.iterdir()), [], "nothing was created")
+
+    def test_a_refusal_by_a_mode_or_a_policy_is_not_confinement(self):
+        for number in (errno.EACCES, errno.EPERM):
             with self.subTest(errno=errno.errorcode[number]):
-                self.assertIsNone(self.daily.require_confined([self.directory], opener=self.refusing(number)))
-                self.assertEqual(list(self.directory.iterdir()), [], "nothing was created")
+                with self.assertRaises(self.daily.Unverified) as caught:
+                    self.daily.require_confined([self.directory], opener=self.refusing(number))
+                self.assertIsInstance(caught.exception, self.daily.Refused)
+                self.assertEqual(str(caught.exception), UNVERIFIED_MESSAGE[len("daily skill usage refused: "):-1])
+                self.assertNotIn(str(self.directory), str(caught.exception))
+        self.assertNotIsInstance(self.daily.Unverified("x"), self.daily.Unconfined)
 
     @unittest.skipIf(os.geteuid() == 0, "root can create a file in a directory whose mode forbids it")
-    def test_a_directory_whose_mode_forbids_the_write_passes(self):
+    def test_a_directory_whose_mode_forbids_the_write_is_not_confined(self):
         self.directory.chmod(0o500)
         self.addCleanup(self.directory.chmod, 0o700)
-        self.assertIsNone(self.daily.require_confined([self.directory]))
+        with self.assertRaises(self.daily.Unverified):
+            self.daily.require_confined([self.directory])
 
     def test_an_error_that_says_nothing_about_confinement_refuses_the_run_without_naming_the_path(self):
         for number in (errno.ENOENT, errno.EIO, errno.ENOSPC, errno.EEXIST):
@@ -1184,6 +1281,16 @@ class RequireConfinedTests(unittest.TestCase):
         self.assertIsNone(self.daily.require_confined([confined], opener=opener))
         self.assertIsNone(self.daily.require_confined([]), "nothing to ask")
 
+    def test_one_directory_that_is_not_read_only_is_enough_to_refuse(self):
+        read_only, mode_only = self.directory / "a", self.directory / "b"
+        read_only.mkdir()
+        mode_only.mkdir()
+
+        def opener(path, flags, mode=0o777):
+            raise OSError(errno.EROFS if str(path).startswith(str(read_only)) else errno.EACCES, "refused")
+        with self.assertRaises(self.daily.Unverified):
+            self.daily.require_confined([read_only, mode_only], opener=opener)
+
 
 class ConfinementOptionTests(unittest.TestCase):
     """--refuse-writable: the check comes first, a refusal publishes nothing, and rendering the units (which writes by design) is not subject to it."""
@@ -1211,6 +1318,17 @@ class ConfinementOptionTests(unittest.TestCase):
         self.assertEqual((code, stderr, calls), (2, UNCONFINED_MESSAGE, []))
         self.assertFalse(out.exists())
         self.assertEqual(sorted(path.name for path in self.directory.iterdir()), [], "the probe was removed")
+
+    @unittest.skipIf(os.geteuid() == 0, "root can create a file in a directory whose mode forbids it")
+    def test_a_directory_that_only_its_mode_protects_stops_the_run_before_any_work(self):
+        """Review of #1043 at 9caafa601 (P1): a mode-only refusal passed the guard and the process then wrote elsewhere under the protected home."""
+        self.directory.chmod(0o500)
+        self.addCleanup(self.directory.chmod, 0o700)
+        out = Path(tempfile.mkdtemp(prefix="skill-unverified-")) / "claude.json"
+        self.addCleanup(shutil.rmtree, out.parent, True)
+        code, stderr, calls = self.run_main("--half", "claude", "--claude-root", "/fixture/root", "--now", NOW, "--out", str(out), "--refuse-writable", str(self.directory))
+        self.assertEqual((code, stderr, calls), (2, UNVERIFIED_MESSAGE, []))
+        self.assertFalse(out.exists())
 
     def test_a_confined_process_goes_on_to_the_work_and_each_directory_is_asked_first(self):
         order = []

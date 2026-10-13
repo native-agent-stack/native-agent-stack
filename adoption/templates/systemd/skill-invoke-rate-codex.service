@@ -22,7 +22,8 @@ Nice=10
 # only case it covers. A manager that creates the user namespace but cannot create the mount namespace in it, or runs where a container or a security module denies it, starts the unit without ProtectSystem= and
 # the others and says nothing (exec-invoke.c L3212-L3237, src/core/namespace.c L2488-L2497; the manual calls these features "gracefully turned off", systemd/systemd@e846bbad man/systemd.exec.xml L1476; measured on the
 # GitHub-hosted runner, docs/decisions/2026-10-12-skill-invoke-rate-timer.md), so the program asks the file system first: --refuse-writable makes it try to create a file in the home directory and in the clone,
-# and it exits 2 before any work if it can. The directory must exist before the unit starts (mkdir -m 0700 -p): ReadWritePaths= without a leading "-" fails closed on a missing path.
+# and it exits 2 before any work unless the file system answers EROFS, the answer of the read-only mounts these directives make; a refusal by a mode or a policy (EACCES, EPERM) shows nothing about them. It
+# probes the top of each directory once, when it starts: the directives are the boundary and this tells a unit started without them from one started with them. The directory must exist before the unit starts (mkdir -m 0700 -p): ReadWritePaths= without a leading "-" fails closed on a missing path.
 # PYTHONDONTWRITEBYTECODE=1 reaches every interpreter the service starts (-B on the parent alone would not), and PrivateTmp=true gives the client its own temporary directory under ProtectSystem=strict.
 ProtectSystem=strict
 ProtectHome=read-only

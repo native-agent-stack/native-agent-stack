@@ -23,7 +23,8 @@ commits of its own, is refused, and so is rendering the units for one.
 The service units confine the process (ProtectSystem=, ProtectHome=, ReadWritePaths=, PrivateTmp=, PrivateUsers=), but systemd starts a unit without the file system namespace, and says nothing, when its
 manager cannot create one (systemd/systemd-stable@387a14a7b67b, v255.4: src/core/exec-invoke.c L3212-L3237 and src/core/namespace.c L2488-L2497; man/systemd.exec.xml of systemd/systemd@e846bbad,
 "gracefully turned off"; seen on the GitHub-hosted runner, docs/decisions/2026-10-12-skill-invoke-rate-timer.md). A unit that started therefore proves nothing about confinement. `--refuse-writable DIR` (repeatable; the units
-pass the home directory and the clone) makes the program check first, before any work: it creates a file in each DIR and refuses (exit 2, a fixed message) if it could.
+pass the home directory and the clone) makes the program check first, before any work: it tries to create a file in each DIR and goes on only if the file system answers EROFS, the answer of the read-only mounts
+the directives make; it refuses (exit 2, a fixed message) when the file could be created and when a mode or a policy refused it (EACCES, EPERM), which says nothing about the directives.
 """
 import argparse
 import contextlib
@@ -83,13 +84,52 @@ def table(value):
     return value if isinstance(value, dict) else {}
 
 
+def aggregate_usable(aggregate, field):
+    """A lane aggregate the projection can read: an object that holds its counts (`field`) as an object. `counts` of anything else would read as no skills, a measured zero lane."""
+    return isinstance(aggregate, dict) and isinstance(aggregate.get(field), dict)
+
+
+def claude_lanes_usable(report):
+    """Whether a Claude lanes report of the right kind has the containers the projection reads: `groups.by_spawn_and_agent_type` an object of objects of lane aggregates that hold `skill_calls` as an object,
+    and `main`, when the report has one, such an aggregate. A report of the right kind whose containers are not these is unusable: it is read as not measured, never as a measured empty set of lanes."""
+    groups = report.get("groups")
+    spawns = groups.get("by_spawn_and_agent_type") if isinstance(groups, dict) else None
+    if not isinstance(spawns, dict) or ("main" in report and not aggregate_usable(report["main"], "skill_calls")):
+        return False
+    return all(isinstance(agents, dict) and all(aggregate_usable(group, "skill_calls") for group in agents.values()) for agents in spawns.values())
+
+
+def codex_lanes_usable(report):
+    """The same for a Codex lanes report: `groups` an object whose `workers`, `negative_controls` and `unclassified`, when present, are lane aggregates that hold `skill_md_reads` as an object, and whose
+    `workers_by_role` and `workers_by_kind`, when present, are objects of such aggregates."""
+    groups = report.get("groups")
+    if not isinstance(groups, dict):
+        return False
+    if any(name in groups and not aggregate_usable(groups[name], "skill_md_reads") for name in ("workers", "negative_controls", "unclassified")):
+        return False
+    return all(name not in groups or (isinstance(groups[name], dict) and all(aggregate_usable(group, "skill_md_reads") for group in groups[name].values()))
+               for name in ("workers_by_role", "workers_by_kind"))
+
+
+def unusable_reports(codex, claude):
+    """Fixed one-line notes for the lanes reports of the right kind whose containers have the wrong shape (a note names no path and no value)."""
+    notes = []
+    if isinstance(codex, dict) and codex.get("kind") == KINDS[1] and not codex_lanes_usable(codex):
+        notes.append("the Codex lanes report has a container of the wrong shape; its half is read as not measured")
+    if isinstance(claude, dict) and claude.get("kind") == KINDS[2] and not claude_lanes_usable(claude):
+        notes.append("the Claude lanes report has a container of the wrong shape; its half is read as not measured")
+    return notes
+
+
 def project_reports(host, codex, claude, *, now, window, half="all"):
     """Project native aggregates, preserving client/group and measurement meaning. `half` names the client halves the record is for (HALF_KEYS): `measured` holds only their keys, so a half is not
     unmeasured for want of the other half's report. Every container of a native report is read through `table`, so a report of the wrong shape cannot raise here."""
     host_t, codex_t, claude_t = table(host), table(codex), table(claude)
+    codex_ok = codex_t.get("kind") == KINDS[1] and codex_lanes_usable(codex_t)
+    claude_ok = claude_t.get("kind") == KINDS[2] and claude_lanes_usable(claude_t)
     use_groups = table(table(host_t.get("codex_use_groups")).get(str(window)))
     codex_state = table(host_t.get("codex"))
-    codex_measured = (codex_t.get("kind") == KINDS[1] and bool(use_groups)
+    codex_measured = (codex_ok and bool(use_groups)
                       and codex_state.get("measured") is True
                       and (count(codex_state.get("roots_count")) or 0) > 0
                       and (count(codex_state.get("files_scanned")) or 0) > 0)
@@ -122,7 +162,7 @@ def project_reports(host, codex, claude, *, now, window, half="all"):
                         if isinstance(skill, str) and NAME.fullmatch(skill)]
             lanes.append({"client": client, "lane": name, "skills": rows,
                           "metric": "use" if client == "codex" else "skill_calls"})
-    if codex_t.get("kind") == KINDS[1]:
+    if codex_ok:
         groups = table(codex_t.get("groups"))
         for name in ("workers", "negative_controls", "unclassified"):
             if name in groups:
@@ -131,7 +171,7 @@ def project_reports(host, codex, claude, *, now, window, half="all"):
             lane("codex", "role:" + name, group, "skill_md_reads", table(use_groups.get("workers_by_role")).get(name))
         for name, group in table(groups.get("workers_by_kind")).items():
             lane("codex", "kind:" + name, group, "skill_md_reads", table(use_groups.get("workers_by_kind")).get(name))
-    if claude_t.get("kind") == KINDS[2]:
+    if claude_ok:
         for spawn, agents in table(table(claude_t.get("groups")).get("by_spawn_and_agent_type")).items():
             for name, group in table(agents).items():
                 lane("claude", spawn + ":" + name, group, "skill_calls")
@@ -139,7 +179,7 @@ def project_reports(host, codex, claude, *, now, window, half="all"):
             lane("claude", "main", claude_t["main"], "skill_calls")
     measured = {"host": host_rows is not None and table(host_t.get("claude")).get("measured") is True,
                 "codex": codex_measured,
-                "claude": claude_t.get("kind") == KINDS[2]}
+                "claude": claude_ok}
     return {"schema": SCHEMA, "half": half, "generated_at": now, "window_days": window,
             "host": host_rows, "lanes": lanes if codex is not None or claude is not None else None,
             "zero_use": {"codex": [row["name"] for row in host_rows or [] if row["codex_use"] == 0],
@@ -160,23 +200,35 @@ class Unconfined(Refused):
     """The process can write where its service unit forbids it. The message is fixed text, safe to print."""
 
 
-# A refused write is what a confined process sees: EROFS from a read-only mount (ProtectSystem=, ProtectHome=), EACCES or EPERM where the mode or a policy forbids it. Anything else (a directory that is not there,
-# an I/O error) says nothing about confinement.
-WRITE_REFUSED = (errno.EROFS, errno.EACCES, errno.EPERM)
+class Unverified(Refused):
+    """The write was refused, but not by a read-only file system. The message is fixed text, safe to print."""
+
+
+# What the directives leave behind. ProtectSystem=strict and ProtectHome=read-only make the file system hierarchy read-only by setting MS_RDONLY on its mounts (systemd/systemd-stable@387a14a7b67b, v255.4:
+# src/core/namespace.c make_read_only L1708-L1754; man/systemd.exec.xml L1381-L1382, and L1630-L1632 for the paths a unit may only read: "writing will be refused even if the usual file access controls would
+# permit this"), and the kernel answers a write on a read-only file system with EROFS (open(2), man-pages 6.19: "path refers to a file on a read-only filesystem and write access was requested"). EACCES and
+# EPERM are the other thing: the usual file access controls ("the requested access to the file is not allowed ... or write access to the parent directory is not allowed"), which refuse on a host whose
+# directives were never applied. Only EROFS is evidence of the mechanism.
+READ_ONLY_REFUSAL = errno.EROFS
+ACCESS_REFUSALS = (errno.EACCES, errno.EPERM)
 
 
 def require_confined(directories, *, opener=os.open, remover=os.unlink):
-    """Refuse (Unconfined) unless a file cannot be created in any of `directories`. systemd starts a unit without the file system namespace, and says nothing, when its manager cannot create one, so a unit
-    that started does not prove that ProtectSystem=, ProtectHome= and ReadWritePaths= are in effect (systemd/systemd-stable@387a14a7b67b, v255.4: src/core/exec-invoke.c L3212-L3237, src/core/namespace.c
-    L2488-L2497). The check asks the file system instead. A probe file that could be created is removed again. A directory that cannot be probed (absent, an I/O error) is a ValueError: the run is refused
-    because nothing is known."""
+    """Go on only if the file system answers EROFS (READ_ONLY_REFUSAL, the answer of the read-only mounts the unit's directives make) to the creation of a file in each of `directories`. systemd starts a unit
+    without the file system namespace, and says nothing, when its manager cannot create one, so a unit that started does not prove that ProtectSystem=, ProtectHome= and ReadWritePaths= are in effect
+    (systemd/systemd-stable@387a14a7b67b, v255.4: src/core/exec-invoke.c L3212-L3237, src/core/namespace.c L2488-L2497). Unconfined when the file could be created (it is removed again); Unverified when the
+    usual file access controls refused it (EACCES, EPERM), which a host without the directives also does; a ValueError for any other answer (an absent directory, an I/O error): nothing is known.
+    The limits: it probes the top of each directory, once, when it runs. It does not show that every path under the home is read-only, and it is no boundary against a mount or a permission change after it ran:
+    the directives are the boundary, and this tells a unit that was started without them from one that was started with them."""
     for directory in directories:
         probe = os.path.join(str(directory), f".skill-usage-confinement-probe-{os.getpid()}")
         try:
             descriptor = opener(probe, os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0), 0o600)
         except OSError as error:
-            if error.errno in WRITE_REFUSED:
+            if error.errno == READ_ONLY_REFUSAL:
                 continue
+            if error.errno in ACCESS_REFUSALS:
+                raise Unverified("a directory that the unit's directives make read-only refused the write by a mode or a policy and not as a read-only file system does, so the directives are not shown to be in effect and it did not run") from None
             raise ValueError("a directory that must be read-only cannot be probed") from None
         os.close(descriptor)
         with contextlib.suppress(OSError):
@@ -417,6 +469,8 @@ def main(argv=None):
                 raise ValueError("the root of the half's client must be explicit")
             require_reviewed_main(ROOT)
             reports = collect_half(args.half, roots, window=args.window, now=now, node=args.node, claude_timeout=args.claude_timeout)
+        for note in unusable_reports(reports[1], reports[2]):
+            print(f"daily skill usage: {note}", file=sys.stderr)
         report = project_reports(*reports, now=now.isoformat(), window=args.window, half=half)
         if args.out:
             publish(args.out.absolute(), report)

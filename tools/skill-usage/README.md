@@ -46,7 +46,8 @@ before enabling the timers, because a missing path fails the unit), and
 (docs/decisions/2026-10-12-skill-invoke-rate-timer.md, decision 7). systemd starts a unit without these
 directives, and says nothing, when its manager cannot create the file system namespace (it ran the probe
 unconfined on the GitHub-hosted runner), so each service passes `--refuse-writable` for the home directory
-and the clone: the program tries to create a file there before any work and exits 2 if it can
+and the clone: the program tries to create a file there before any work and goes on only if the file system answers EROFS, the answer of the read-only mounts the directives make (it exits 2 if the file can be created, and
+if a mode or a policy refused it: EACCES and EPERM are the usual file access controls, which refuse on a host without the directives too)
 (`PrivateUsers=true` makes the one case that systemd can see, a user namespace that cannot be created, fail
 the unit). The refresh of
 the combined record holds a lock, so two halves that finish together (both timers

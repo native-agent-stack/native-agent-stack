@@ -20,6 +20,8 @@ decision's tables had no receipts in the repository; what has none is listed at 
 | `receipts/ci-runner-unconfined-20261013.txt` | round 3: the failed shard of the pull request at `68d4f4343` on a GitHub-hosted runner (run 38325995828, job 115064673607): the manager accepted the rendered directives and the probe wrote to the clone, a sibling directory and the home directory; the runner image and the systemd version it lists |
 | `receipts/fail-before-round3.txt` | the round-3 test file against the sources of `68d4f4343`: `FAILED (failures=11, errors=39)` of 59 tests, in 20 tests |
 | `receipts/mutants-round3-35.txt` | the 35 mutants of round 3 (the native-report shapes, the confinement check and its option, the unit templates): 35 of 35 killed |
+| `receipts/fail-before-round4.txt` | the round-4 test file against the sources of `9caafa601`: the stand-in manager's two-root regression fails (`0 != 3`: the process got past the check) and so do the lanes-report tests |
+| `receipts/mutants-round4-24.txt` | the 24 mutants of round 4 (only `EROFS` is confinement; a lanes report with a container of the wrong shape is not measured, publishes no lane and says why): 24 of 24 killed |
 
 The mutation driver of round 3 (`daily_mutants_r3.py`) and the receipts builder are scripts of the author's private record; the mutants are listed in `receipts/mutants-round3-35.txt` by label, one change each.
 
