@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "paper_lane": "B",
+  "evidence_class": "synthetic",
+  "source_pin": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+  "native_version": "2.0.0rc5",
+  "upstream_pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+  "status": "passed",
+  "broker_execution": "NOT_RUN",
+  "commands": [
+    {"arguments": [], "rc": 0, "fresh_processes": 2, "equal_structured_results": true},
+    {"arguments": ["--duplicate-tags"], "rc": 1, "expected_refusal": "Strategy Preset-A1 is already registered"},
+    {"arguments": ["--separate-budgets"], "rc": 1, "expected_refusal": "unsafe_separate_preset_counters_admit_201"}
+  ],
+  "command_prefix": "systemd-run --user --scope -p CPUWeight=idle --quiet -- env TMPDIR=/var/tmp PY -E -s -B blueprints/us-equities/concurrent-paper-presets/probe.py",
+  "native": {
+    "data": "SYN_SAME_SYMBOL_QUOTES",
+    "strategies": 2,
+    "execution_clients": 1,
+    "port_starts": 1,
+    "port_stops": 1,
+    "submissions": 4,
+    "fills_per_strategy": [2, 2],
+    "flat": true,
+    "distinct_strategy_ids": 2,
+    "distinct_order_ids": 4
+  },
+  "account_ledger": {
+    "data": "SYN_QUOTES_AND_REQUEST_CLOCK",
+    "same_account_requests_admitted": 200,
+    "request_201_deferred": true,
+    "budget_survives_reopen": true,
+    "window_after_61s_releases": true,
+    "individual_order_notional": "100.01",
+    "account_gross_cap": "150",
+    "second_individually_valid_order_refused": "aggregate_exposure_cap_exceeded",
+    "pending_after_refusal": "100.01"
+  },
+  "limitations": [
+    "Native node and Ledger checks are separate slices; the fixture port does not connect the node to the production Controller or account risk journal.",
+    "The same-symbol fill example establishes order/event attribution only, not safe per-preset cash, ownership, exits, restart or recovery.",
+    "Rate checks use an artificial fixed clock, not elapsed throughput, broker rate-limit acceptance or a recommendation to consume all 200 slots.",
+    "No native trading feature was changed: duplicate tags and separate budget counters are unsafe comparators, not a claim that upstream multiple-strategy registration failed before a production fix.",
+    "Earlier harness-constructor and unstarted-Ledger attempts failed before reaching intended checks; those are fixture errors, not fail-first evidence.",
+    "Raw local output is private and uncommitted; no public hash commits to it. This inspectable structured record is the portable result."
+  ]
+}
