@@ -828,7 +828,8 @@ catalog (`foundation` or `us-equities`):
   judged against the requirement and the acceptance. `--seeds` may name it. `previous_sweep` comes from the ledger,
   as for any layer.
 - **Record.** The sweep's manifest has no section row for it: `build_manifest.py` files its lane rows under
-  `lane_groupings`. `saturation_ledger.py --append` marks its entry `planned: true`, and `--check` binds the entry to
+  `lane_groupings`, and writes that row even when the layer's discovery proposed nothing.
+  `saturation_ledger.py --append` marks its entry `planned: true`, and `--check` binds the entry to
   that `lane_groupings` row as it binds a landscape layer to its section row; a mark without the row is refused
   (`catalogs/saturation/README.md`, Planned layers). Every retained vote, for any layer, must sit under the layer's
   own `#/votes/<layer_id>/`. Append the sweep before a verdict wave promotes the layer to a landscape row.
@@ -992,8 +993,8 @@ python3 $H/make_result.py --decision-record "$W/RESULT.json"
   changed task requirement is a current `requirement_changed` trigger citing the skills catalog.
   `catalogs/saturation/ledger.schema.json` lists `skills` in its layer `catalog` enum beside `foundation` and
   `us-equities`, so a skills record validates against the schema as well as `--check`. `build_manifest.py` has no
-  skills section: its docstring (`build_manifest.py:1301-1303`) puts a lane layer that is not a foundation or trading
-  row in `lane_groupings`. No skills run has exercised that path yet.
+  skills section: its module docstring (the `trading[]` paragraph) puts a lane layer that is not a foundation or
+  trading row in `lane_groupings`. No skills run has exercised that path yet.
 
 ## Cost reference
 

@@ -1454,6 +1454,27 @@ class LaneGroupingTests(unittest.TestCase):
         manifest = self.build()
         self.assertEqual([r["layer"] for r in manifest["trading"]], ["layer-z", "layer-a"])
 
+    def test_an_empty_reported_layer_outside_the_baseline_keeps_an_empty_row_and_a_known_one_gets_none(self):
+        # Review of #1066 at 1765a420 (GPT P2, Claude N1): a planned layer whose discovery found nothing was reported
+        # by the lane (landscape-sweep/convert.py writes a lane layer for every swept layer) but got no lane_groupings
+        # row, so scripts/saturation_ledger.py could not bind its record and refused the whole sweep.
+        doc = self._lanes_doc()
+        empty = {"selected": [], "alternatives_keep_but_compare": [], "new_candidates": [], "open_gaps": []}
+        doc["lanes"][0]["result"]["layers"] += [dict(empty, layer_id=layer_id)
+                                                for layer_id in ("planned-empty", "found-a", "layer-a")]
+        self._lanes_doc = lambda: doc
+        manifest = self.build()
+        groups = {g["layer"]: g for g in manifest["lane_groupings"]}
+        self.assertEqual(set(groups), {"awesome-list-convergence", "star-audit-targeted-candidates", "planned-empty"})
+        self.assertEqual(groups["planned-empty"], {"layer": "planned-empty", "lane": "beyond", "selected": [],
+                                                   "alternatives_keep_but_compare": [], "candidates": [],
+                                                   "open_gaps": []})
+        # A catalog layer keeps its section row and never gets a grouping, empty or not.
+        self.assertIn("found-a", {r["layer"] for r in manifest["foundation"]})
+        self.assertIn("layer-a", {r["layer"] for r in manifest["trading"]})
+        # The non-empty groupings are unchanged by the empty one.
+        self.assertEqual(groups["awesome-list-convergence"]["lane"], "beyond")
+
     def test_non_taxonomy_lane_layers_are_not_trading_rows(self):
         manifest = self.build()
         trading_layer_ids = {r["layer"] for r in manifest["trading"]}

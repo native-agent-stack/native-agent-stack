@@ -148,7 +148,10 @@ The model-running landscape-sweep lane of `recipes/saturation-sweep.md` has its 
    `lane_groupings`. `lane_groupings` carries, verbatim, any
    review-lane layer id outside the foundation/taxonomy baseline (e.g. a
    "beyond" lane's own grouping like `awesome-list-convergence`) that would
-   otherwise not match `trading[].layer`'s exact-taxonomy contract.
+   otherwise not match `trading[].layer`'s exact-taxonomy contract. Every
+   layer a lane result reports outside that baseline gets its row, even an
+   empty one: a planned layer whose discovery found nothing keeps an empty
+   row, which `scripts/saturation_ledger.py` binds its record to.
    `unmatched_lane_items` publishes every lane `selected[]` item at a
    foundation/trading layer that no card row took (`reason`
    `no_card_with_repository_in_layer` or `catalog_id_names_no_card`; with

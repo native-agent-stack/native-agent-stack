@@ -85,7 +85,9 @@ A planned layer that also has a `research-state.json` row is refused, as
 `scripts/final_stack.py` refuses one that has a landscape row.
 
 A planned layer has no row in its catalog's section of the sweep's SOTA manifest:
-`build_manifest.py` files its lane rows under `lane_groupings`, in the same `candidates` shape. So
+`build_manifest.py` files its lane rows under `lane_groupings`, in the same `candidates` shape,
+and writes the row even when the sweep proposed nothing for the layer (the empty row is the
+record of that sweep; a missing discovery still resets the count through its `retained_failure`). So
 `--append` marks its entry `planned: true`, and `--check` binds a marked entry to that
 `lane_groupings` row as it binds a landscape layer to its section row. `proposed` must equal the
 row's lane rows, survival must agree with them, and a survivor needs a surviving lane row and a

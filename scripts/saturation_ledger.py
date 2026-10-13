@@ -43,7 +43,8 @@ that have no landscape row yet) are swept as repository layers of their own cata
 us-equities. ``--scope`` freezes them, ``--report`` lists them after the research-state layers and
 ``--append`` records them. Their requirement hash covers the planned row's requirement and acceptance
 (``planned_requirement_sha256``). A planned layer has no row in its catalog's section of the sweep's
-SOTA-convergence manifest: build_manifest.py files its lane rows under lane_groupings. So ``--append``
+SOTA-convergence manifest: build_manifest.py files its lane rows under lane_groupings, an empty row when
+the sweep proposed nothing for it. So ``--append``
 marks its record ``planned: true``, and ``--check`` binds a marked record to that lane_groupings row as it
 binds a landscape layer to its section row (proposed equals the lane rows, survival agrees, a survivor
 needs a surviving lane row); a mark without that row is refused. The mark is durable: when a verdict wave

@@ -481,6 +481,14 @@ def select_layers(layers: list, only=None, due_report=None, smoke=None) -> list:
     elif due_report is not None:
         due = {(row.get("catalog"), row.get("layer_id")) for row in due_report.get("layers") or [] if row.get("due")}
         wanted = [layer["layer_id"] for layer in layers if (layer["catalog"], layer["layer_id"]) in due]
+        # A due layer of this work directory's own catalogs is staged or named, never dropped. (A due layer of another
+        # modality's catalog belongs to another run.) Under --contract-version 2 the planned layers have no input.
+        present = {(layer["catalog"], layer["layer_id"]) for layer in layers}
+        catalogs = {layer["catalog"] for layer in layers}
+        missing = sorted(str(layer_id) for catalog, layer_id in due - present if catalog in catalogs)
+        if missing:
+            raise ValueError(f"due layers without an input in layers.json: {missing}; rebuild the inputs with "
+                             "build_inputs.py (contract version 2 builds no planned input), or pass --layers")
     else:
         wanted = [layer["layer_id"] for layer in layers]
     unknown = [layer_id for layer_id in wanted if layer_id not in by_id]
@@ -624,7 +632,9 @@ def main(argv=None) -> int:
                         help="V1 runner only; V2 producer contracts await the future V2 runner")
     choose = parser.add_mutually_exclusive_group()
     choose.add_argument("--layers", help="comma-separated layer ids, swept in the order given")
-    choose.add_argument("--due-report", type=Path, help="saturation_ledger.py --report --json output: its due layers")
+    choose.add_argument("--due-report", type=Path,
+                        help="saturation_ledger.py --report --json output: its due layers (a due layer of this work "
+                             "directory's catalogs without an input is an error, never dropped)")
     choose.add_argument("--smoke", metavar="LAYER_ID", help="one layer, first round only (args.test = true)")
     stars = parser.add_mutually_exclusive_group()
     stars.add_argument("--stars", type=Path, help="star-candidates.json (default <work-dir>/work/star-candidates.json)")

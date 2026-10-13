@@ -17,6 +17,9 @@ rows are exactly the taxonomy layer ids from
 outside the foundation/taxonomy baseline (e.g. a "beyond" lane's own grouping
 like ``awesome-list-convergence``) is never folded into ``trading[]`` -- it is
 carried verbatim into ``lane_groupings`` instead, see ``build_manifest``.
+Every layer a lane result reports outside that baseline gets its
+``lane_groupings`` row, even an empty one (a planned layer whose discovery
+found nothing), so the manifest records each layer the sweep covered.
 
 No network access. All host-path fragments, and any bare session UUID, are
 removed from the manifest's decoded string values (``sanitize_value``,
@@ -1894,8 +1897,17 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
             first_repository = min(entry["repository"] for entry in entries)
             status_by_layer[status_layer_id].append((first_repository, catalog_id, entries))
 
+    # Every layer a lane result reports, with the lanes that report it. A reported layer outside the catalog baseline
+    # gets its lane_groupings row even when it carries no candidate, gap, alternative or reviewed selection: a planned
+    # layer whose discovery found nothing was still swept, and its empty row is the record of that sweep (a catalog
+    # layer is always in known_layers, so it never gets one; scripts/saturation_ledger.py binds a planned record to
+    # this row). Every swept layer is reported (landscape-sweep/convert.py writes a lane layer for each).
+    reported_lanes = defaultdict(set)
+    for lane in lanes_doc.get("lanes", []):
+        for layer in lane["result"].get("layers", []):
+            reported_lanes[layer["layer_id"]].add(lane["lane"])
     lane_grouping_layer_ids = sorted(
-        (set(cands) | set(gaps) | set(alts) | set(status_by_layer)) - known_layers
+        (set(cands) | set(gaps) | set(alts) | set(status_by_layer) | set(reported_lanes)) - known_layers
     )
     for layer_id in lane_grouping_layer_ids:
         selected = []
@@ -1936,6 +1948,8 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
             for item in source:
                 if item.get("lane"):
                     lane_names.add(item["lane"])
+        if not lane_names:  # an empty reported layer: name the lanes that reported it
+            lane_names = set(reported_lanes.get(layer_id, set()))
         manifest["lane_groupings"].append({
             "layer": layer_id,
             # A single contributing lane is the observed case (see
