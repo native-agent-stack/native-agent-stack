@@ -19,10 +19,14 @@ ANTHROPIC_API_KEY alone in a private env file, in inventory order. For each one:
    first eight characters of the anthropic-organization-id response header of GET /v1/models.
 
 Neither request uses tokens. The report never holds a key or a piece of one, an organization name or a response body.
-Exit status: 0 when every stored slot's GET /v1/models answered 2xx from a probe that exited 0 and reported no error;
-1 when a stored slot's did not, a slot is unsafe or could not be checked, or the inventory fails the repository's own
-check (scripts/credential_status.py), declares an anthropic-api slot in another shape, or declares none; 2 for a usage
-error. A slot that is not stored is reported and fails nothing.
+Exit status: 0 when every stored slot's GET /v1/models answered 2xx, or 429 with a retry-after header, from a probe that
+exited 0 and reported no error; 1 when a stored slot's answered anything else, a slot is unsafe or could not be checked,
+or the inventory fails the repository's own check (scripts/credential_status.py), declares an anthropic-api slot in
+another shape, or declares none; 2 for a usage error. A slot that is not stored, and a slot that was rate limited (429
+with retry-after: the key was accepted far enough to be throttled, and a later check will tell), are reported and fail
+nothing, so a daily timer does not alarm on throttling. A 429 without retry-after is the spend cap (Anthropic's rate
+limits page, "Reaching your spend cap": usage pauses until the next month, and retry-after "Not sent with the spend-cap
+429"), reported as spend_capped, and it fails: that key has no usable credit until access resumes.
 
 A port of the command center's cc-tools/anthropic_key_health.sh (2026-10-10) without its organization-name read and
 its admin-key probe (GET /v1/organizations/api_keys). The HTTP side follows tools/credentials/alpaca_rate_limit_probe.py
@@ -149,6 +153,9 @@ def probe(headers: dict, environ, *, opener=None) -> dict:
             result[name] = {"status": None, "error": type(error).__name__}
             continue
         result[name] = {"status": status if isinstance(status, int) else None}
+        if name == "models" and status == 429:
+            # Throttling sends retry-after; the spend-cap 429 does not (validity). Only the header's presence is kept.
+            result[name]["retry_after"] = response_headers is not None and response_headers.get("retry-after") is not None
         if name == "models" and response_headers is not None:
             prefix = (response_headers.get(ORGANIZATION_HEADER) or "").strip()[:8]
             result["organization_id_prefix"] = prefix if PREFIX.fullmatch(prefix) else None
@@ -219,15 +226,20 @@ def status_class(status) -> str:
     return f"{status // 100}xx" if isinstance(status, int) and 100 <= status <= 599 else "none"
 
 
-def validity(status) -> str:
+def validity(status, retry_after: bool = False) -> str:
     """What GET /v1/models says about the key: valid (2xx), invalid (401: a wrong, disabled or revoked key), forbidden
-    (403), rate_limited (429), server_error (5xx), unexpected (any other status) or unreachable (no response). A
-    probe that reported an error is probe_failed whatever status it printed (health)."""
+    (403), rate_limited (429 with a retry-after header), spend_capped (429 without one: the tier's spend cap, which
+    https://platform.claude.com/docs/en/api/rate-limits sends with no retry-after and which lasts until the next month),
+    server_error (5xx), unexpected (any other status) or unreachable (no response). A 429 whose header was not seen is
+    spend_capped, so an unknown answer fails. A probe that reported an error is probe_failed whatever status it printed
+    (health)."""
     if not isinstance(status, int):
         return "unreachable"
     if 200 <= status <= 299:
         return "valid"
-    named = {401: "invalid", 403: "forbidden", 429: "rate_limited"}
+    if status == 429:
+        return "rate_limited" if retry_after is True else "spend_capped"
+    named = {401: "invalid", 403: "forbidden"}
     return named.get(status, "server_error" if 500 <= status <= 599 else "unexpected")
 
 
@@ -286,7 +298,7 @@ def health(selected: list, run=subprocess.run) -> list:
             prefix = result.get("organization_id_prefix")
             failed = result.get("error") is not None or models.get("error") is not None
             row.update({"models_status": status, "status_class": status_class(status),
-                        "validity": "probe_failed" if failed else validity(status),
+                        "validity": "probe_failed" if failed else validity(status, models.get("retry_after") is True),
                         "organization_status": organization_status,
                         "organization_id_prefix": prefix if isinstance(prefix, str) and PREFIX.fullmatch(prefix)
                         else None})
@@ -316,9 +328,12 @@ def render(row: dict) -> str:
             f"organization {row['organization_id_prefix'] or '?'}")
 
 
+PASSING_VALIDITY = ("valid", "rate_limited")
+
+
 def exit_code(rows: list) -> int:
-    failed = any(row["state"] in FAILING_STATES or (row["state"] == "stored" and row.get("validity") != "valid")
-                 for row in rows)
+    failed = any(row["state"] in FAILING_STATES
+                 or (row["state"] == "stored" and row.get("validity") not in PASSING_VALIDITY) for row in rows)
     return 1 if failed else 0
 
 

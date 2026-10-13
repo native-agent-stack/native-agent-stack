@@ -91,9 +91,11 @@ pull requests now. It reuses the repository's own fence: main at the working dir
    - `HOME`, `CLAUDE_CONFIG_DIR` (fresh per run), `TMPDIR`, `USER`, `PATH` and `LANG`.
 
    Fill-first (owner direction, relayed by the command center on 2026-10-10 at about 14:19Z; it replaces the single-key
-   mode of 01:49Z). The keys are tried in the order of `CLAUDE_REVIEW_KEYS`, by default `anthropic-api-4`,
-   `anthropic-api-3`, `anthropic-api-2`, `anthropic-api-5`, `anthropic-api`, then `anthropic-api-6` to
-   `anthropic-api-10`. The owner's direction of about 15:12Z (via the command center) put `anthropic-api-3` second: it
+   mode of 01:49Z). The keys are tried in the order of `CLAUDE_REVIEW_KEYS`, by default `anthropic-api-7`,
+   `anthropic-api-4`, `anthropic-api-3`, `anthropic-api-2`, `anthropic-api-5`, `anthropic-api`, then `anthropic-api-8`
+   to `anthropic-api-10` (`anthropic-api-6`, a second key of `anthropic-api-5`'s account, is its spare and left the order
+   on 2026-10-12, the command center's ruling of 20:34Z; `anthropic-api-7`, the owner's Max-plan API credit, which the
+   subscription includes, went first on 2026-10-12, the command center's request of about 23:17Z). The owner's direction of about 15:12Z (via the command center) put `anthropic-api-3` second: it
    served CI review first (the main-only `claude-review` environment secret) and local quality work second. #981
    (`8bffa2c4`) removed the in-GitHub Claude workflows, so no workflow on main uses that environment now. The owner's
    direction of 2026-10-11 at about 22:33Z (via the command center) put `anthropic-api-2` third.

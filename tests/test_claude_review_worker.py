@@ -40,7 +40,7 @@ crw = load("claude_review_worker", TOOL / "worker.py")
 probes = load("claude_review_worker_probes", TOOL / "probes.py")  # it reuses the module loaded above
 assert probes.crw is crw
 
-KEYS = ("anthropic-api-4", "anthropic-api-3", "anthropic-api-2")  # the head of the fill-first order
+KEYS = ("anthropic-api-4", "anthropic-api-3", "anthropic-api-2")  # three keys of the fill-first order, in order
 GIT_ID = {"GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@example.invalid", "GIT_COMMITTER_NAME": "t",
           "GIT_COMMITTER_EMAIL": "t@example.invalid"}
 
@@ -916,11 +916,15 @@ class ReviewRunTest(unittest.TestCase):
         self.assertEqual([r["kind"] for r in h.rows()], ["debit", "void", "switch", "debit", "settle"])
         self.assertEqual(h.rows()[2]["reason"], "revoked_key (HTTP 401)")
 
-    def test_the_default_key_order_is_fill_first_with_api_3_second_and_api_2_third(self):
-        # The owner's directions: api-3 second (2026-10-10 ~15:12Z), api-2 third (2026-10-11 ~22:33Z).
-        self.assertEqual(crw.DEFAULT_KEYS, ("anthropic-api-4", "anthropic-api-3", "anthropic-api-2", "anthropic-api-5",
-                                            "anthropic-api", "anthropic-api-6", "anthropic-api-7", "anthropic-api-8",
-                                            "anthropic-api-9", "anthropic-api-10"))
+    def test_the_default_key_order_is_fill_first_with_the_max_plan_credit_first(self):
+        # The owner's directions: api-3 after api-4 (2026-10-10 ~15:12Z), api-2 after api-3 (2026-10-11 ~22:33Z); api-6, a
+        # second key of api-5's account, is its spare and not in the order (the command center's ruling of 2026-10-12,
+        # 20:34Z); api-7 holds the Max-plan API credit, which the subscription includes, so it fills first (the command
+        # center's request of 2026-10-12, ~23:17Z).
+        self.assertEqual(crw.DEFAULT_KEYS, ("anthropic-api-7", "anthropic-api-4", "anthropic-api-3", "anthropic-api-2",
+                                            "anthropic-api-5", "anthropic-api", "anthropic-api-8", "anthropic-api-9",
+                                            "anthropic-api-10"))
+        self.assertNotIn("anthropic-api-6", crw.DEFAULT_KEYS)
 
     def test_a_key_the_runner_refuses_is_skipped_before_any_debit(self):
         with tempfile.TemporaryDirectory() as temporary:

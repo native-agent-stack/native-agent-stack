@@ -27,7 +27,7 @@ against it.
 | `anthropic-api-3` | Anthropic Claude API key, third key (CI Claude review first, then local quality work) | optional | `<store>/anthropic-api-3.env` | `ANTHROPIC_API_KEY` |
 | `anthropic-api-4` | Anthropic Claude API key, fourth key (additional credit; direct use only) | optional | `<store>/anthropic-api-4.env` | `ANTHROPIC_API_KEY` |
 | `anthropic-api-5` | Anthropic Claude API key, fifth key (additional credit; direct use only) | optional | `<store>/anthropic-api-5.env` | `ANTHROPIC_API_KEY` |
-| `anthropic-api-6` | Anthropic Claude API key, sixth key (additional credit; direct use only) | optional | `<store>/anthropic-api-6.env` | `ANTHROPIC_API_KEY` |
+| `anthropic-api-6` | Anthropic Claude API key, sixth key: a spare of anthropic-api-5's account (no added credit; direct use only) | optional | `<store>/anthropic-api-6.env` | `ANTHROPIC_API_KEY` |
 | `anthropic-api-7` | Anthropic Claude API key, seventh key (additional credit; direct use only) | optional | `<store>/anthropic-api-7.env` | `ANTHROPIC_API_KEY` |
 | `anthropic-api-8` | Anthropic Claude API key, eighth key (additional credit; direct use only) | optional | `<store>/anthropic-api-8.env` | `ANTHROPIC_API_KEY` |
 | `anthropic-api-9` | Anthropic Claude API key, ninth key (additional credit; direct use only) | optional | `<store>/anthropic-api-9.env` | `ANTHROPIC_API_KEY` |
@@ -111,11 +111,14 @@ records the evidence and the alternatives.
 
 | Slot | Organization id prefix | Purpose |
 | --- | --- | --- |
-| `anthropic-api-3` | `cd36eeda` | CI Claude review first, then local quality work (its key is the main-only `claude-review` environment secret) |
-| `anthropic-api-4` | `72e62741` | Quality-critical work and the north star's multi-model QA; the default when work uses a single key |
-| `anthropic-api-5` | `e02c4dee` | Additional credit; next in line after `anthropic-api-3` |
-| `anthropic-api`, `anthropic-api-2` | `9b5bb5b0`, `e0da7458` | Spares |
-| `anthropic-api-6` to `anthropic-api-10` | none stored | The next keys, filled in slot order |
+| `anthropic-api-3` | `cd36eeda` | Local quality work, third in the fill-first order; it served CI Claude review first (the main-only `claude-review` environment secret) until #981 |
+| `anthropic-api-4` | `72e62741` | Quality-critical work and the north star's multi-model QA; the default when work uses a single key; second in the fill-first order |
+| `anthropic-api-5` | `e02c4dee` | Additional credit; fifth in the fill-first order |
+| `anthropic-api-2` | `e0da7458` | Fourth in the fill-first order (the owner, 2026-10-11) |
+| `anthropic-api` | `9b5bb5b0` | Sixth in the fill-first order |
+| `anthropic-api-6` | `e02c4dee` (the same account as `anthropic-api-5`) | A spare: a second key of `anthropic-api-5`'s account, so it adds no credit to the fill-first order |
+| `anthropic-api-7` | not recorded | The owner's Max-plan API credit (subscription), a personal key scoped to one workspace: first in the fill-first order |
+| `anthropic-api-8` to `anthropic-api-10` | none stored | The next keys, filled in slot order |
 
 A prefix is the first eight characters of the id of the organization that a
 slot's key belongs to. The prefixes are the command center's reading of
@@ -145,9 +148,12 @@ individual account. Account names and credit balances are not recorded here.
 5. **CI.** A key reaches GitHub only as an environment secret of an
    environment restricted to `main`. Under the owner's ruling of 2026-10-10
    (PR #968), the `claude-review` environment, whose deployment branch
-   policy is `main`, holds the CI key from `anthropic-api-3`. The command
-   center sets it from the slot by running `gh secret set` with
-   `--env claude-review` under `credential_run.py`, with the value on gh's
+   policy was `main`, held the CI key from `anthropic-api-3` until #981
+   removed the in-GitHub Claude workflows that used it; the repository's
+   environment list, read 2026-10-12, no longer has that environment, and
+   no Anthropic key is in GitHub. A later CI key is set from its slot by
+   running `gh secret set` with `--env <environment>` under
+   `credential_run.py`, with the value on gh's
    standard input and never in argv; the installed gh 2.102.0 help says
    `--body` "reads from standard input if not specified". Never put a key in
    a repository-level secret of a public repository. At this change's base
@@ -186,33 +192,45 @@ individual account. Account names and credit balances are not recorded here.
    again when the slot backs CI, run the health check, then delete the old
    key in the Console.
 9. **Spend control.** Each account's Console holds a spend limit per
-   workspace (an owner action). The CI review also caps itself at $55 a day
-   (the command center's record; that cap is not in the workflows at this
-   change's base).
+   workspace (an owner action). The retired CI review (#981) capped itself
+   at $55 a day (the command center's record; that cap was never in the
+   workflows).
 10. **Fill-first failover** (the owner, 2026-10-10, relayed by the command
     center). Keys are not pooled; each spends its own account's credit.
     Quality work uses one key until Anthropic reports that key's credit
     exhausted, or answers 401 for a revoked key, and then moves to the next
-    in a fixed order: `anthropic-api-4`, `anthropic-api-3`, `anthropic-api-5`,
-    `anthropic-api`, `anthropic-api-2`, then `anthropic-api-6` to
-    `anthropic-api-10` as they are stored. `anthropic-api-3` serves the CI
-    review first and local quality work second. The owner set this order at
+    in a fixed order: `anthropic-api-7`, `anthropic-api-4`, `anthropic-api-3`,
+    `anthropic-api-2`, `anthropic-api-5`, `anthropic-api`, then `anthropic-api-8`
+    to `anthropic-api-10` as they are stored. `anthropic-api-7` holds the
+    owner's Max-plan API credit, which the subscription includes, so it fills
+    before the paid keys (the command center's request of 2026-10-12, about 23:17Z, on the owner's subscription-oriented direction); its organization's
+    name and id are not recorded here. The owner set the first order at
     about 15:12Z on 2026-10-10 (relayed by the command center), moving
-    `anthropic-api-3` into it; the command center's 14:15Z record had kept
-    that slot for CI alone. Never round-robin. Anthropic's
+    `anthropic-api-3` into it, and put `anthropic-api-2` third on 2026-10-11
+    at about 22:33Z (the command center's `ruling-anthropic-api-automation-practice-20261011.md`, a private record cited by name). `anthropic-api-3`'s CI-review purpose
+    ended when #981 removed the in-GitHub Claude workflows, so it serves local
+    work only. `anthropic-api-6` is `anthropic-api-5`'s spare and stays out of
+    the order, used only to replace that key: it holds a second key of
+    `anthropic-api-5`'s account, so it caps exactly when `anthropic-api-5`
+    caps (the command center's ruling of 2026-10-12, 20:34Z, following the
+    owner's intent of filling distinct credit pools first). Never round-robin. Anthropic's
     [prompt-caching page](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching)
     ("Cache storage and sharing", read 2026-10-10) states "Caches are
     isolated between organizations. Different organizations never share
     caches, even if they use identical prompts." The stored slots belong to
-    five different organizations (the distinct prefixes above), so
+    five different organizations (the distinct prefixes above), and the
+    command center's key-health reading of 2026-10-12 placed none of the
+    slots it measured in the Max-plan credit's organization, so
     alternating between them makes each account write and hold its own copy
     of a cached prefix, while filling one account first keeps one cache
     warm. The same page also isolates caches per workspace within an
-    organization on the Claude API. Each switch is to be a ledger row and a
-    command-center alert; the launcher that implements this is an
-    api-actions follow-up outside this change.
+    organization on the Claude API. Each switch is a ledger row and a
+    command-center alert. The api-actions harness and the review worker
+    (#953, `DEFAULT_KEYS`) implement the order.
 11. **Next key.** Add a key by opening the terminal for the next empty slot,
-    `anthropic-api-6` first.
+    `anthropic-api-8` first (`anthropic-api-7` holds the Max-plan API
+    credit), and from an account that no stored slot uses, so
+    that it adds credit.
 
 <a id="using-a-key"></a>
 
