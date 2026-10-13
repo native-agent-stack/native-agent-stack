@@ -47927,8 +47927,8 @@
     },
     {
       "path": "evidence/artifacts/paper-deployment-pr1042-guards-20261012.json",
-      "sha256": "c8744d3081dc3bee5cfd4ae13af72fac842a31c44ff9458a94fc915c725f2e60",
-      "bytes": 4687
+      "sha256": "5db58ade5187981540fb1304ccc2809adbd2e01138d525d2071a4fb273ae864f",
+      "bytes": 2585
     },
     {
       "path": "evidence/artifacts/portable-claude-native-qualification-20260921/angle1-upstream.json",

@@ -150,11 +150,16 @@ class DeploymentContract(unittest.TestCase):
             fingerprint = "a" * 64
             metadata = plan.native_state() / fingerprint / "adaptive" / "trial.json"
             deployment.save(metadata, {"phase": "finished", "config_sha256": "0" * 64})
-            with self.assertRaisesRegex(deployment.Refused, "rotation_source_not_ready"):
-                plan.namespace_ready("lev4", fingerprint)
+            from types import SimpleNamespace
+            # Select the actual legacy capability seam even on a newer main.
+            native_ledger = SimpleNamespace()
+            with patch("safety.Ledger", native_ledger):
+                with self.assertRaisesRegex(deployment.Refused, "rotation_source_not_ready"):
+                    plan.namespace_ready("lev4", fingerprint)
             deployment.save(metadata, {"phase": "running", "config_sha256": plan.stage("lev4")["config_sha256"]})
-            with self.assertRaisesRegex(deployment.Refused, "existing_native_trial_requires_recovery"):
-                plan.namespace_ready("lev4", fingerprint)
+            with patch("safety.Ledger", native_ledger):
+                with self.assertRaisesRegex(deployment.Refused, "existing_native_trial_requires_recovery"):
+                    plan.namespace_ready("lev4", fingerprint)
             self.assertFalse((plan.slot("lev4") / "GO.sha256").exists())
 
     def test_units_dispatch_only_after_go_and_bound_trial_cleanup(self):
@@ -193,14 +198,20 @@ class DeploymentContract(unittest.TestCase):
             deployment.save(packet / "ranked-100.json", {**deployment.LABEL, "symbols": [row]})
             deployment.save(packet / "input.json", {**deployment.LABEL, "source": {
                 "mode": "intraday", "signal_cutoff_utc": "2026-10-12T15:00:00Z", "observed_at": "2026-10-12T15:00:00Z"}})
-            commitment = {**deployment.LABEL, "config_sha256": plan.stage("mover-max")["config_sha256"],
+            commitment = {**deployment.LABEL,
+                          "config_file_sha256": plan.stage("mover-max")["config_file_sha256"],
+                          "config_sha256": plan.stage("mover-max")["config_file_sha256"],
+                          "effective_config_sha256": plan.stage("mover-max")["config_sha256"],
                           "scan_sha256": deployment.digest(packet / "scan.json"),
                           "ranked_sha256": deployment.digest(packet / "ranked-100.json"),
                           "input_sha256": deployment.digest(packet / "input.json"),
                           "code_sha256": "a" * 64, "observed_at": "2026-10-12T15:00:00Z",
                           "source_observed_at": "2026-10-12T15:00:00Z",
-                          "session_date": "2026-10-12"}
+                          "session_date": "2026-10-12", "started_at": "2026-10-12T15:00:00Z",
+                          "committed_at": "2026-10-12T15:00:00Z"}
             deployment.save(packet / "commitment.json", commitment)
+            import os
+            os.utime(packet, ns=(int(now * 1e9), int(now * 1e9)))
             with patch.object(deployment, "lane_a_absent", return_value=True):
                 ready = plan.publish_scan("mover-max", packet, now=now)
                 self.assertEqual(ready["engine_scan_sha256"], commitment["scan_sha256"])

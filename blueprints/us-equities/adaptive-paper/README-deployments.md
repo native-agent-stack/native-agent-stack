@@ -92,6 +92,10 @@ salt-keyed account commitment appears in public readiness/GO bindings.
 Native child preflight compares the actual account to that private binding,
 including recovery, before engine dispatch. Account A's readiness cannot admit
 account B, even if B is flat and has an occupied namespace.
+Both lookup sites are bound: transport.preflight and runner.preflight, the
+name imported by the adaptive/T22 caller. The real runner.main regression
+exercises the injected child for paper and recover before account-lock entry,
+rather than only calling the account check in isolation.
 Readiness is at most30s old, never future. Native startup rechecks positions,
 orders, assets, entitlements and quote freshness through its ordinary path.
 
@@ -106,14 +110,23 @@ Both issue and start check STOP, HOLD, active state, lane A inventory/processes,
 config/bundle, session headroom, account and scan bindings, the cursor and replay.
 A refused token is retired, retained and not silently reissued. Unit start limits
 bound repeated supervisor activation, including validation failure before run.
+An unactivated, unconsumed trial also retires its pending cursor relation and
+records its refused id; the stage never advances and no flat proof is invented.
+A new unique trial requires fresh full readiness; an issued id cannot be reused.
+Consumed/active or otherwise unknown state retains its recovery obligation.
 STOP is the native safety.DEFAULT_STOP, never an arbitrary state.parent latch.
 Only the service's own unchanged STOP may clear AFTER its durable native flat
 validation; foreign or changed STOP remains. Recovery retains hook ownership
+even for a foreign leaf symlink: it is never followed for content or cleared,
+but it does not prevent exact-config sell-only recovery.
 on retries and waits boundedly for the writer lock. Unknown/missing output
 refuses; only native no_owned_trial_to_recover invokes the GET-only flat proof.
 Mover recover argv has no --trial; native engine exceptions produce fixed
 failure receipts. Completion timestamps are captured AFTER recovery, and the
 60s request drain includes the last account trial across passes/deployments.
+Every stage checks that account-wide window, including stages mid-pass.
+Unexpected engine exceptions report broker observation not_established, never
+an invented zero-order count. Only a proven no-owned-trial refusal claims zero.
 
 The account's native Ledger remains authoritative for orders/budgets. Readiness
 uses its own50 REST/min Ledger, native trial150 REST/min and120 submit/min caps;
@@ -135,12 +148,27 @@ acquisition. Both data and generation must be fresh. Morning protocol issuance
 is outside this RTH/POST helper's scope.
 
 Each artifact is read ONCE into bounded bytes, then hashed, parsed and retained.
-The full list's first at most5 native rows equal scan.symbols exactly.
+Mover stages consume the exact first5 rows of the issued top100 (or all rows
+when fewer than5 were issued), through native load_scan with real freshness.
+A shorter committed prefix is refused rather than silently dropping ranked
+picks. The merged producer is uet64f52815, research/ranking/exploratory/scan.py;
+its original scan/rank bytes and hashes remain bound before dispatch.
 SCAN-READY publishes only after native schema/rule/rank/date/freshness and
 commitment checks. Every admission independently checks the RETAINED commitment
 against the retained bytes; startup copies the already-verified bytes, never
 an unchecked path reread. Publishing a scan writes no GO.
 Source closure/code provenance remains distinct from data freshness.
+Until the producer's F2 publication recheck is reviewed and deployed, the
+consumer enforces the CC interim issue margin: started_at must be at least60s
+before issuance expiry, and the ORIGINAL issue-directory st_mtime_ns must be
+strictly before that expiry. For this intraday consumer expiry is the earlier
+of scan_time+300s and source-data-cutoff+300s, per uet64f52815. The already
+observed source cutoff is not an issuance deadline. The physical directory
+identity/mtime is checked for change during reads, then retained in a timing
+proof bound to commitment bytes and SCAN-READY/GO; copied directory metadata
+never substitutes for that observation. No mtime lower bound or clock tolerance
+is invented. Directorymtime does not prove final parent-fsync completion;
+native current-data freshness remains mandatory at publication and admission.
 
 ## Installation and follow-ups
 
@@ -166,6 +194,7 @@ No native engine or safety ceiling is changed by this helper.
   alpaca/trading/client.py get_orders107/get_all_positions235/get_account465.
 - systemd e846bbad04d87e58ba9c3e30d8a1087141691715:
   systemd.path.xml PathExists, systemd.service.xml ExecStopPost/RuntimeMaxSec,
+  systemd.unit.xml:1214-1220 StartLimitIntervalSec/StartLimitBurst,
   systemd.resource-control.xml CPUWeight; unit commands reject unsupported path
   characters rather than silently misparse whitespace or percent specifiers.
 

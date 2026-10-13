@@ -40,6 +40,17 @@ class Guards(unittest.TestCase):
         d.build(self.bundle, deployment="guard-pass", order=list(specs), stage_specs=specs)
         self.plan = d.Deployment(self.bundle, self.root / "exploratory")
         self.now = datetime(2026, 10, 12, 15, 0, tzinfo=timezone.utc).timestamp()
+        # Producer fixtures use a fixed market clock; align only their SYN
+        # directory metadata after atomic writes. Production metadata is never
+        # restamped by the helper. Timing-specific tests set their own mtime.
+        original_save = d.save
+        def save_fixture(path, value):
+            original_save(path, value)
+            if Path(path).parent == self.root / "packet":
+                stamp = int(self.now * 1_000_000_000)
+                os.utime(Path(path).parent, ns=(stamp, stamp))
+        p = patch.object(d, "save", side_effect=save_fixture)
+        p.start(); self.addCleanup(p.stop)
         self.lane = patch.object(d, "lane_a_absent", return_value=True)
         self.lane.start(); self.addCleanup(self.lane.stop)
         self.proof = self.ready("lev4", "start")
@@ -434,8 +445,10 @@ class Guards(unittest.TestCase):
         self.issue()
         slot = self.plan.slot("lev4")
         original = d.read_bytes(slot / "GO.sha256")
+        original_cursor = load_json(self.plan.sequence_path())
         def reset():
             (slot / "GO.sha256").write_bytes(original)
+            d.save(self.plan.sequence_path(), original_cursor)
         stop = self.plan.state.parent / "STOP"; stop.touch()
         with self.assertRaisesRegex(d.Refused, "^STOP_present$"): self.plan.run("lev4", now=self.now)
         stop.unlink(); reset()
@@ -553,6 +566,7 @@ class Guards(unittest.TestCase):
         def reset(go=original_go):
             d.save(slot / "GO.json", go)
             (slot / "GO.sha256").write_text(d.digest(slot / "GO.json"))
+            d.save(self.plan.sequence_path(), original_cursor)
         with patch.object(self.plan, "native_call") as child:
             (slot / "GO.sha256").write_text("wrong")
             with self.assertRaisesRegex(d.Refused, "^GO_hash_mismatch$"): self.plan.run("lev4", now=self.now)
@@ -671,6 +685,207 @@ class Guards(unittest.TestCase):
                 self.assertEqual(receipt["reason"], reason)
                 self.assertEqual(receipt["evidence_class"], "exploratory")
                 self.assertNotIn("SYN-private-error", json.dumps(receipt))
+
+    def test_real_adaptive_main_rejects_changed_account_in_paper_and_recover(self):
+        # Keep runner.main REAL. Replace only external credential/broker seams
+        # and use a tripwire at account-lock entry if binding is accidentally
+        # skipped. No engine, journal or order can then start on account B.
+        import runner
+        import transport
+        from types import SimpleNamespace
+        from tests.test_adaptive_paper_runner import _paper_ready_observation
+        self.issue()
+        go = load_json(self.plan.slot("lev4") / "GO.json")
+        d.save(self.plan.active_path("start"), go)
+        (self.plan.slot("lev4") / "GO.sha256").replace(self.plan.instance("start") / "GO.used.sha256")
+        observation = _paper_ready_observation(int(self.now * 1e9), symbols=tuple(self.plan.config("lev4")["symbols"]))
+        observation.update(account_identity_sha256="c" * 64, open_orders_complete=True)
+        resolver = SimpleNamespace(expand_template=lambda *_: self.root / "SYN-loader-placeholder")
+        for mode in ["paper", "recover"]:
+            active = self.plan.active_path("start")
+            d.save(active, go)
+            secret = "SYN-launch-capability"
+            capability = {**d.LABEL, "deployment": self.plan.deployment, "stage": "lev4", "trial": "start",
+                          "mode": mode, "bundle_sha256": self.plan.bundle_hash(),
+                          "config_sha256": self.plan.stage("lev4")["config_sha256"],
+                          "active_sha256": d.digest(active), "account_commitment": go["account_commitment"],
+                          "issued_at": self.now, "token_sha256": hashlib.sha256(secret.encode()).hexdigest()}
+            d.save(self.plan.instance("start") / ("launch-" + mode + ".json"), capability)
+            read, write = os.pipe(); os.write(write, secret.encode()); os.close(write)
+            (self.plan.instance("start") / (mode + ".json")).unlink(missing_ok=True)
+            with patch.dict(sys.modules, {"credential_status": resolver}), \
+                 patch.object(runner, "credentials", return_value=("SYN-placeholder", "SYN-placeholder")), \
+                 patch.object(transport, "preflight", return_value=observation), \
+                 patch.object(runner, "preflight", return_value=observation), \
+                 patch.object(runner, "account_lock_fingerprint", side_effect=RuntimeError("SYN_wrong_account_dispatch")) as writer, \
+                 patch.object(self.plan, "check_account", wraps=self.plan.check_account) as account, \
+                 patch.object(d.time, "time", return_value=self.now):
+                with self.subTest(mode=mode):
+                    self.assertEqual(self.plan.native_child(mode, "lev4", "start", launch_fd=read), 2)
+                    account.assert_called_once()
+                    writer.assert_not_called()
+
+    def test_native_exception_after_possible_submission_never_claims_zero_orders(self):
+        import runner
+        resolver = SimpleNamespace(expand_template=lambda *_: self.root / "SYN-loader-placeholder")
+        with patch.object(self.plan, "consume_capability", return_value={}), \
+             patch.dict(sys.modules, {"credential_status": resolver}), \
+             patch.object(runner, "main", side_effect=RuntimeError("SYN-mid-trial")):
+            self.assertEqual(self.plan.native_child("paper", "lev4", "start"), 2)
+        receipt = load_json(self.plan.instance("start") / "paper.json")
+        self.assertEqual(receipt["status"], "failed")
+        self.assertEqual(receipt["broker_observation"], "not_established")
+        self.assertNotIn("orders_submitted", receipt)
+
+    def test_real_mover_main_rejects_changed_account_in_paper_and_recover(self):
+        import mover_runner
+        import runner
+        import transport
+        from tests.test_adaptive_paper_runner import _paper_ready_observation
+        plan, packet, _ = self.mover_packet()
+        plan.publish_scan("mover-max", packet, now=self.now)
+        trial = "mover-bound"
+        d.save(plan.instance(trial) / "account.private.json", {"fingerprint": "a" * 64, "salt": "b" * 64})
+        proof = {**self.proof, "deployment": plan.deployment, "stage": "mover-max", "trial": trial,
+                 "bundle_sha256": plan.bundle_hash(), "config_sha256": plan.stage("mover-max")["config_sha256"]}
+        d.save(plan.instance(trial) / "readiness.json", proof)
+        plan.issue("mover-max", trial, previous=None, now=self.now)
+        go = load_json(plan.slot("mover-max") / "GO.json")
+        d.save(plan.active_path(trial), go)
+        (plan.slot("mover-max") / "GO.sha256").replace(plan.instance(trial) / "GO.used.sha256")
+        (plan.instance(trial) / "scan.json").write_bytes((packet / "scan.json").read_bytes())
+        observation = _paper_ready_observation(int(self.now * 1e9), symbols=tuple(plan.config("mover-max")["benchmarks"]))
+        observation.update(account_identity_sha256="c" * 64, open_orders_complete=True)
+        resolver = SimpleNamespace(expand_template=lambda *_: self.root / "SYN-loader-placeholder")
+        for mode in ["paper", "recover"]:
+            secret = "SYN-mover-capability"
+            capability = {**d.LABEL, "deployment": plan.deployment, "stage": "mover-max", "trial": trial,
+                          "mode": mode, "bundle_sha256": plan.bundle_hash(),
+                          "config_sha256": plan.stage("mover-max")["config_sha256"],
+                          "active_sha256": d.digest(plan.active_path(trial)), "account_commitment": go["account_commitment"],
+                          "issued_at": self.now, "token_sha256": hashlib.sha256(secret.encode()).hexdigest()}
+            d.save(plan.instance(trial) / ("launch-" + mode + ".json"), capability)
+            read, write = os.pipe(); os.write(write, secret.encode()); os.close(write)
+            (plan.instance(trial) / (mode + ".json")).unlink(missing_ok=True)
+            with patch.dict(sys.modules, {"credential_status": resolver}), \
+                 patch.object(mover_runner, "credentials", return_value=("SYN-placeholder", "SYN-placeholder")), \
+                 patch.object(runner, "credentials", return_value=("SYN-placeholder", "SYN-placeholder")), \
+                 patch.object(transport, "preflight", return_value=observation), \
+                 patch.object(mover_runner, "account_lock_fingerprint", side_effect=RuntimeError("SYN_wrong_mover_account")) as writer, \
+                 patch.object(plan, "check_account", wraps=plan.check_account) as account, \
+                 patch.object(d.time, "time", return_value=self.now):
+                with self.subTest(mode=mode):
+                    self.assertEqual(plan.native_child(mode, "mover-max", trial, launch_fd=read), 2)
+                    account.assert_called_once()
+                    writer.assert_not_called()
+
+    def test_refusal_before_activation_retires_pending_but_never_reuses_trial(self):
+        self.issue()
+        held = self.plan.state / "ISSUER-HOLD"; held.touch()
+        with self.assertRaisesRegex(d.Refused, "^issuer_hold$"): self.plan.run("lev4", now=self.now)
+        self.assertFalse(self.plan.active_path("start").exists())
+        cursor = load_json(self.plan.sequence_path())
+        self.assertIsNone(cursor["pending"])
+        self.assertEqual(cursor["next_index"], 0)
+        self.assertEqual(cursor["refused_trials"], ["start"])
+        held.unlink()
+        self.ready("lev4", "fresh-trial")
+        self.assertEqual(self.plan.issue("lev4", "fresh-trial", previous=None, now=self.now, check_only=True)["status"], "ready")
+        with self.assertRaisesRegex(d.Refused, "^trial_already_issued$"): self.issue()
+
+    def test_lane_a_recover_gate_timer_is_in_native_inventory(self):
+        self.lane.stop()
+        def systemctl(argv, **kwargs):
+            self.assertIn("/usr/bin/systemctl", argv)
+            if "--type=timer" in argv:
+                self.assertIn("paper-recover-a2-*", argv)
+                return SimpleNamespace(returncode=0, stdout="paper-recover-a2-gate-syn.timer loaded active waiting")
+            return SimpleNamespace(returncode=0, stdout="")
+        with patch.object(d.subprocess, "run", side_effect=systemctl):
+            with self.assertRaisesRegex(d.Refused, "^lane_A_timer_pending$"): d.lane_a_absent()
+
+    def test_foreign_symlink_stop_blocks_entries_but_not_exact_config_recovery(self):
+        d.save(self.plan.active_path("start"), {"stage": "lev4", "trial": "start",
+                "bundle_sha256": self.plan.bundle_hash(), "config_sha256": self.plan.stage("lev4")["config_sha256"]})
+        foreign = self.root / "operator-stop"; foreign.write_text("SYN-latch")
+        stop = self.root / "STOP"; stop.symlink_to(foreign)
+        def native(mode, stage, trial, output):
+            d.save(output, {"status": "passed", "flat": True, "positions": [], "unresolved_orders": [],
+                            "reconciliation": {"positions": 0, "open_orders": 0}})
+            return 0
+        with patch.object(self.plan, "native_call", side_effect=native):
+            self.assertEqual(self.plan.recover("start"), 0)
+        self.assertTrue(stop.is_symlink())
+        self.assertEqual(foreign.read_text(), "SYN-latch")
+        with self.assertRaisesRegex(d.Refused, "^STOP_present$"): self.issue(check_only=True)
+
+    def test_each_go_drains_latest_account_window_even_mid_pass(self):
+        self.ready("lev2", "second")
+        d.save(self.plan.sequence_path(), {"deployment": self.plan.deployment, "pass_id": "pass",
+               "next_index": 1, "last_trial": "first", "pending": None, "passes": ["pass"]})
+        d.save(self.plan.state / "account-last.json", {**d.LABEL, "flat": True,
+               "trial": "other-deployment", "finished_at": self.now - 59})
+        with patch.object(self.plan, "previous", return_value="SYN-existing-flat-proof"):
+            with self.assertRaisesRegex(d.Refused, "^request_window_not_drained$"):
+                self.plan.issue("lev2", "second", previous="first", now=self.now, check_only=True)
+
+    def test_start_drains_latest_account_completion_after_go_was_issued(self):
+        self.issue()
+        def native(mode, stage, trial, output):
+            d.save(output, {"status": "passed", "flat": True, "positions": [], "unresolved_orders": [],
+                            "reconciliation": {"positions": 0, "open_orders": 0}})
+            return 0
+        with patch.object(self.plan, "native_call", side_effect=native):
+            self.plan.run("lev4", now=self.now); self.plan.recover("start", now=self.now)
+        self.now += 61
+        self.ready("lev2", "second")
+        self.plan.issue("lev2", "second", previous="start", now=self.now)
+        d.save(self.plan.state / "account-last.json", {**d.LABEL, "flat": True,
+               "trial": "other-deployment", "finished_at": self.now - 1})
+        with patch.object(self.plan, "native_call") as dispatch:
+            with self.assertRaisesRegex(d.Refused, "^request_window_not_drained$"):
+                self.plan.run("lev2", now=self.now)
+            dispatch.assert_not_called()
+
+    def test_two_deployments_drain_latest_recovery_at_issue_and_start(self):
+        def native(mode, stage, trial, output):
+            d.save(output, {"status": "passed", "flat": True, "positions": [], "unresolved_orders": [],
+                            "reconciliation": {"positions": 0, "open_orders": 0}})
+            return 0
+        specs = {"only": {"engine_kind": "adaptive", "session_kind": "RTH",
+                          "config": str(SOURCE / "config-sip.json")}}
+        bundle = self.root / "second-bundle"
+        d.build(bundle, deployment="other-deployment", order=["only"], stage_specs=specs)
+        other = d.Deployment(bundle, self.plan.state)
+        def ready_other(trial):
+            account = {"fingerprint": "a" * 64, "salt": "b" * 64}
+            d.save(other.instance(trial) / "account.private.json", account)
+            value = {**self.proof, "deployment": other.deployment, "stage": "only", "trial": trial,
+                     "bundle_sha256": other.bundle_hash(), "config_sha256": other.stage("only")["config_sha256"],
+                     "observed_at": self.now}
+            d.save(other.instance(trial) / "readiness.json", value)
+        with patch.object(self.plan, "native_call", side_effect=native), patch.object(other, "native_call", side_effect=native):
+            self.issue()
+            self.plan.run("lev4", now=self.now); self.plan.recover("start", now=self.now)
+            self.now += 61
+            ready_other("other-one")
+            other.issue("only", "other-one", previous=None, now=self.now)
+            other.run("only", now=self.now); other.recover("other-one", now=self.now)
+            self.now += 1; self.ready("lev2", "second")
+            with self.assertRaisesRegex(d.Refused, "^request_window_not_drained$"):
+                self.plan.issue("lev2", "second", previous="start", now=self.now)
+            self.now += 61; self.ready("lev2", "second")
+            self.plan.issue("lev2", "second", previous="start", now=self.now)
+            # A GO already issued before another deployment completes cannot
+            # bypass the account-wide check at actual dispatch.
+            ready_other("other-two")
+            other.issue("only", "other-two", previous=None, now=self.now)
+            other.run("only", now=self.now); other.recover("other-two", now=self.now)
+            self.now += 1
+            with patch.object(self.plan, "native_call") as dispatch:
+                with self.assertRaisesRegex(d.Refused, "^request_window_not_drained$"):
+                    self.plan.run("lev2", now=self.now)
+                dispatch.assert_not_called()
 
     def test_admission_calls_integrity_lane_a_and_selected_availability(self):
         dispatch = patch.object(self.plan, "native_call", side_effect=d.Refused("SYN_dispatch_tripwire"))
@@ -794,7 +1009,8 @@ class Guards(unittest.TestCase):
             "scan_sha256": d.digest(packet / "scan.json"), "ranked_sha256": d.digest(packet / "ranked-100.json"),
             "input_sha256": d.digest(packet / "input.json"), "code_sha256": "a" * 64,
             "observed_at": "2026-10-12T15:00:00Z", "source_observed_at": "2026-10-12T15:00:00Z",
-            "session_date": "2026-10-12"}
+            "session_date": "2026-10-12", "started_at": "2026-10-12T15:00:00Z",
+            "committed_at": "2026-10-12T15:00:00Z"}
         d.save(packet / "commitment.json", commitment)
         return plan, packet, commitment
 
@@ -819,6 +1035,53 @@ class Guards(unittest.TestCase):
         verified, body = plan.scan_binding("mover-max", self.now, return_bytes=True)
         self.assertEqual(hashlib.sha256(body).hexdigest(), commitment["scan_sha256"])
         self.assertEqual(body, original)
+
+    def test_mover_consumes_exact_top_five_of_issued_list_without_truncating(self):
+        plan, packet, good = self.mover_packet()
+        scan = load_json(packet / "scan.json")
+        template = scan["symbols"][0]
+        rows = [dict(template, symbol=symbol, rank=index) for index, symbol in
+                enumerate(["SPY", "QQQ", "IWM", "DIA", "XLK", "XLF"], 1)]
+        d.save(packet / "ranked-100.json", {**d.LABEL, "symbols": rows})
+        # A committed but shorter prefix must not silently drop ranked picks.
+        d.save(packet / "scan.json", dict(scan, symbols=rows[:1]))
+        d.save(packet / "commitment.json", dict(good, scan_sha256=d.digest(packet / "scan.json"),
+                                               ranked_sha256=d.digest(packet / "ranked-100.json")))
+        with self.assertRaisesRegex(d.Refused, "^ranked_top_scan_mismatch$"):
+            plan.publish_scan("mover-max", packet, now=self.now)
+        d.save(packet / "scan.json", dict(scan, symbols=rows[:5]))
+        d.save(packet / "commitment.json", dict(good, scan_sha256=d.digest(packet / "scan.json"),
+                                               ranked_sha256=d.digest(packet / "ranked-100.json")))
+        ready = plan.publish_scan("mover-max", packet, now=self.now)
+        checked, retained = plan.scan_binding("mover-max", self.now, return_bytes=True)
+        self.assertEqual(checked, ready)
+        self.assertEqual([row["symbol"] for row in json.loads(retained)["symbols"]],
+                         ["SPY", "QQQ", "IWM", "DIA", "XLK"])
+
+    def test_issued_directory_mtime_and_start_margin_are_checked_before_scan_ready(self):
+        plan, packet, good = self.mover_packet()
+        cutoff_base = self.now
+        self.now += 250
+        # Intraday generation/data at15:00 expire at15:05; the issue must
+        # start by15:04, with the directory's final child entry before15:05.
+        def issue(started, committed, mtime):
+            d.save(packet / "commitment.json", dict(good, started_at=started, committed_at=committed))
+            os.utime(packet, (mtime, mtime))
+            return plan.publish_scan("mover-max", packet, now=self.now)
+        for start, finish, mtime, reason in [
+            ("2026-10-12T15:04:01Z", "2026-10-12T15:04:02Z", cutoff_base + 242, "issue_start_margin"),
+            ("2026-10-12T15:00:00Z", "2026-10-12T15:00:01Z", cutoff_base + 300, "issue_directory_late")]:
+            with self.subTest(reason=reason):
+                with self.assertRaisesRegex(d.Refused, "^" + reason + "$"): issue(start, finish, mtime)
+                self.assertFalse((plan.slot("mover-max") / "SCAN-READY.json").exists())
+        # Matching start/commit and physical mtime are observed on a completed
+        # issue; current native freshness remains an independent bound.
+        self.now += 2
+        ready = issue("2026-10-12T15:00:00Z", "2026-10-12T15:00:01Z", self.now)
+        self.assertIn("issue_timing_sha256", ready)
+        checked, retained = plan.scan_binding("mover-max", self.now, return_bytes=True)
+        self.assertEqual(checked, ready)
+        self.assertEqual(json.loads(retained)["symbols"][0]["symbol"], "SPY")
 
     def test_each_scan_commitment_config_clock_rank_and_retained_hash_is_required(self):
         plan, packet, good = self.mover_packet()

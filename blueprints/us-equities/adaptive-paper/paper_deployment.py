@@ -84,7 +84,11 @@ def stop_path():
     from safety import DEFAULT_STOP
     # The canonical root makes this the native global account latch. Tests
     # substitute the native default along with the isolated canonical root.
-    return safe_path(DEFAULT_STOP)
+    path = Path(DEFAULT_STOP).absolute()
+    # A foreign leaf symlink is a latched control, not an input file. Never
+    # follow/read/delete its target; permit exact-config sell-only cleanup.
+    safe_path(path.parent)
+    return path
 
 
 class Refused(ValueError):
@@ -185,7 +189,7 @@ def lane_a_absent():
             raise Refused("lane_A_writer_active")
     timers = subprocess.run(["/usr/bin/systemctl", "--user", "list-units", "--all", "--type=timer",
                              "--no-legend", "--plain", "paper-pre-*", "paper-ext-*", "paper-rth-*",
-                             "paper-n2-*"], capture_output=True, text=True)
+                             "paper-n2-*", "paper-recover-a2-*"], capture_output=True, text=True)
     if timers.returncode:
         raise Refused("lane_A_inventory_unavailable")
     for line in timers.stdout.splitlines():
@@ -636,6 +640,8 @@ class Deployment:
         directory = "adaptive" if rotation or engine != "mover" else "mover"
         state_dir = safe_path(self.native_state() / fingerprint / directory)
         path = state_dir / "trial.json"
+        if path.is_symlink():
+            raise Refused("unsafe_native_state")
         if rotation:
             try:
                 from exploration import active_trial_metadata
@@ -730,7 +736,7 @@ class Deployment:
         self.stage(stage)
         return safe_path(self.state / "deployments" / self.deployment / "ready" / stage)
 
-    def scan_snapshot(self, stage, snapshot, now):
+    def scan_snapshot(self, stage, snapshot, now, *, issue_timing=None):
         """Validate hashes and meaning on the exact bytes retained for dispatch."""
         from mover import load_mover_config, load_scan
         commitment = json.loads(snapshot["commitment.json"])
@@ -783,15 +789,41 @@ class Deployment:
             raise Refused("input_data_stale")
         rows = ranked.get("symbols")
         if (not isinstance(rows, list) or len(rows) > 100
-                or rows[:len(scan["symbols"])] != scan["symbols"]):
+                or rows[:5] != scan["symbols"]):
             raise Refused("ranked_top_scan_mismatch")
+        # CC interim rule at the merged uet64f52815 producer: "cutoff" here
+        # is the issuance expiry, not the already observed source cutoff.
+        # The producer's directory mtime is NOT final parent-fsync completion.
+        deadline_ns = int(min(parsed.scan_time + 300, data_at + 300) * 1_000_000_000)
+        try:
+            started = datetime.fromisoformat(commitment["started_at"].replace("Z", "+00:00"))
+            committed = datetime.fromisoformat(commitment["committed_at"].replace("Z", "+00:00"))
+        except (KeyError, TypeError, ValueError):
+            raise Refused("issue_timing_required") from None
+        if (started.tzinfo is None or committed.tzinfo is None or committed < started
+                or committed.timestamp() > now):
+            raise Refused("issue_clock_invalid")
+        if int(started.timestamp() * 1_000_000_000) > deadline_ns - 60_000_000_000:
+            raise Refused("issue_start_margin")
+        if (not isinstance(issue_timing, dict)
+                or any(issue_timing.get(k) != v for k, v in LABEL.items())
+                or issue_timing.get("commitment_sha256") != hashlib.sha256(snapshot["commitment.json"]).hexdigest()
+                or issue_timing.get("started_at") != commitment["started_at"]
+                or issue_timing.get("committed_at") != commitment["committed_at"]
+                or issue_timing.get("deadline_ns") != deadline_ns
+                or type(issue_timing.get("directory_mtime_ns")) is not int):
+            raise Refused("issue_timing_binding")
+        if issue_timing["directory_mtime_ns"] >= deadline_ns:
+            raise Refused("issue_directory_late")
         return {**LABEL, "schema_version": 1, "deployment": self.deployment, "stage": stage,
                 "session_date": date, "config_file_sha256": spec["config_file_sha256"],
                 "config_sha256": spec["config_sha256"],
                 "engine_scan_sha256": commitment["scan_sha256"],
                 "commitment_sha256": hashlib.sha256(snapshot["commitment.json"]).hexdigest(),
                 "observed_at": commitment["observed_at"], "source_observed_at": acquired.isoformat(),
-                "ranked_sha256": commitment["ranked_sha256"], "input_sha256": commitment["input_sha256"]}
+                "ranked_sha256": commitment["ranked_sha256"], "input_sha256": commitment["input_sha256"],
+                "issue_timing_sha256": hashlib.sha256(json.dumps(issue_timing, sort_keys=True,
+                    separators=(",", ":")).encode()).hexdigest()}
 
     def publish_scan(self, stage, packet, *, now=None):
         self.verify()
@@ -799,8 +831,25 @@ class Deployment:
         if self.stage(stage)["engine_kind"] != "mover":
             raise Refused("scan_requires_mover_stage")
         names = ["scan.json", "ranked-100.json", "input.json", "commitment.json"]
-        snapshot = {name: read_bytes(Path(packet) / name) for name in names}
-        ready = self.scan_snapshot(stage, snapshot, now)
+        packet = safe_path(packet)
+        before = packet.stat()
+        snapshot = {name: read_bytes(packet / name) for name in names}
+        after = packet.stat()
+        if (before.st_dev, before.st_ino, before.st_mtime_ns) != (after.st_dev, after.st_ino, after.st_mtime_ns):
+            raise Refused("issued_directory_changed")
+        commitment = json.loads(snapshot["commitment.json"])
+        # Preserve the physical source-directory observation, not copied-state
+        # metadata. Revalidation binds the retained proof to these exact bytes.
+        scan = json.loads(snapshot["scan.json"])
+        scan_at = datetime.fromisoformat(scan["scan_time"].replace("Z", "+00:00")).timestamp()
+        data_at = datetime.fromisoformat(commitment["observed_at"].replace("Z", "+00:00")).timestamp()
+        issue_timing = {**LABEL, "commitment_sha256": hashlib.sha256(snapshot["commitment.json"]).hexdigest(),
+                        "started_at": commitment.get("started_at"), "committed_at": commitment.get("committed_at"),
+                        "directory_mtime_ns": after.st_mtime_ns,
+                        "deadline_ns": int(min(scan_at + 300, data_at + 300) * 1_000_000_000),
+                        "checked_at": now, "producer_pin": "64f52815",
+                        "completion_proof": "NOT_ESTABLISHED_BY_DIRECTORY_MTIME"}
+        ready = self.scan_snapshot(stage, snapshot, now, issue_timing=issue_timing)
         with exclusive(self.state / "deployment-writer.lock"):
             slot = self.slot(stage)
             if (slot / "GO.sha256").exists() or any((self.state / "active").glob("*.json")):
@@ -814,6 +863,7 @@ class Deployment:
                 if not dest.exists():
                     with dest.open("xb") as stream:
                         stream.write(body); stream.flush(); os.fsync(stream.fileno())
+            save(retained / "issue-timing.json", issue_timing)
             save(slot / "SCAN-READY.json", ready)
         return ready
 
@@ -827,7 +877,8 @@ class Deployment:
         retained = safe_path(self.state / "inputs" / commitment_hash)
         snapshot = {name: read_bytes(retained / name) for name in
                     ["scan.json", "ranked-100.json", "input.json", "commitment.json"]}
-        checked = self.scan_snapshot(stage, snapshot, now)
+        issue_timing = read_json(retained / "issue-timing.json")
+        checked = self.scan_snapshot(stage, snapshot, now, issue_timing=issue_timing)
         if checked != ready:
             raise Refused("scan_ready_binding_mismatch")
         return (ready, snapshot["scan.json"]) if return_bytes else ready
@@ -913,6 +964,7 @@ class Deployment:
             lane_a_absent()
             date = self.session(stage, now)
             self.availability(stage)
+            self.account_window(now)
             sequence = self.sequence_next(stage, trial, previous, pass_id)
             prior = self.previous(stage, previous, now)
             readiness = self.readiness(stage, trial, now)
@@ -920,6 +972,8 @@ class Deployment:
             slot = self.slot(stage)
             if (slot / "GO.sha256").exists() or (self.instance(trial) / "GO.used.sha256").exists():
                 raise Refused("GO_pending_or_used")
+            if (self.instance(trial) / "issue.json").exists():
+                raise Refused("trial_already_issued")
             value = {**LABEL, "schema_version": 1, "deployment": self.deployment,
                      "stage": stage, "trial": trial, "bundle_sha256": self.bundle_hash(),
                      "pass_id": sequence["pass_id"],
@@ -1092,6 +1146,8 @@ class Deployment:
             original_save(path, public_result(value) if Path(path) == output else value)
         native_module.save = labelled_save
         transport.preflight = checked_preflight
+        original_runner_preflight = runner.preflight
+        runner.preflight = checked_preflight
         old_argv = sys.argv
         try:
             sys.argv = argv
@@ -1101,11 +1157,16 @@ class Deployment:
                 except Exception as exc:
                     from safety import SafetyError
                     reason = str(exc) if isinstance(exc, SafetyError) and str(exc) == "no_owned_trial_to_recover" else type(exc).__name__
-                    save(output, {**LABEL, "status": "refused", "reason": reason,
-                                  "orders_submitted": 0})
+                    if reason == "no_owned_trial_to_recover":
+                        save(output, {**LABEL, "status": "refused", "reason": reason,
+                                      "orders_submitted": 0})
+                    else:
+                        save(output, {**LABEL, "status": "failed", "reason": reason,
+                                      "broker_observation": "not_established"})
                     return 2
         finally:
             transport.preflight = original_preflight
+            runner.preflight = original_runner_preflight
             native_module.save = original_save
             sys.argv = old_argv
 
@@ -1123,7 +1184,26 @@ class Deployment:
                 save(slot / ("refusal." + stamp + ".json"), {**LABEL, "status": "refused",
                      "deployment": self.deployment, "stage": stage,
                      "reason": str(exc) if isinstance(exc, Refused) else type(exc).__name__, "orders_dispatched": 0})
+            self.retire_refused_pending(stage)
             raise
+
+    def retire_refused_pending(self, stage):
+        # Clear only an issued trial that provably never activated/consumed GO.
+        # No completion, flat proof, stage advancement or automatic new GO is
+        # fabricated. A fresh unique trial still needs full readiness checks.
+        with exclusive(self.state / "deployment-writer.lock"):
+            path = self.sequence_path()
+            if not path.is_file():
+                return
+            sequence = read_json(path)
+            trial = sequence.get("pending")
+            if (trial is None or sequence.get("next_index") != self.order.index(stage)
+                    or any((self.state / "active").glob("*.json"))
+                    or (self.instance(trial) / "GO.used.sha256").exists()):
+                return
+            retired = sequence.get("refused_trials", [])
+            sequence.update(pending=None, refused_trials=retired + [trial])
+            save(path, sequence)
 
     def run_bound(self, stage, *, now=None):
         self.verify()
@@ -1151,6 +1231,7 @@ class Deployment:
                     raise Refused("issuer_hold")
                 lane_a_absent()
                 self.availability(stage)
+                self.account_window(now)
                 sequence = read_json(self.sequence_path())
                 if (sequence.get("pending") != trial or sequence.get("pass_id") != go.get("pass_id")
                         or sequence.get("next_index") != self.order.index(stage)):
