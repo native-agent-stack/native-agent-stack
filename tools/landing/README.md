@@ -267,8 +267,10 @@ after each of three validations, moved after the last validation (read at the fi
 merge landed but its commit's author is not that address or the commit could not be read (CC correction #148), and 14 when another
 landing of the same repository holds the landing lock or the lock cannot be opened or taken (nothing has run; #975 round 4).
 `codex_gate.py`: 0, 3, 4 and 5 as above; a gate that fails itself exits 4, which both scripts stop on with 9. With a local review set
-("Local reviews"): 0 (every file a completed review of the read head or of a head with its change, and no P0 or P1 finding), 2 (a file
-unreadable, malformed, of another head or not completed) and 4 (a P0 or P1 finding); both scripts stop with 9 on its 2 and its 4.
+("Local reviews"): 0 (every file a review of the read head or of a head with its change, every `codex-review` completed with `patch is
+correct` and no P0 or P1 finding), 2 (a file unreadable, malformed or of another head, a `codex-review` not completed or with another
+verdict, or no completed `codex-review`) and 4 (`patch is incorrect`, or a P0 or P1 finding of a `codex-review`); the advisory plugin arm
+never stops it; both scripts stop with 9 on its 2 and its 4.
 `review_normalize.py`: 0 the file was written, 1 the input was refused (nothing written), 2 usage.
 
 ## The record convention
@@ -298,17 +300,31 @@ key or `NaN` is refused:
 
 ```json
 {"reviewer": "codex-review", "reviewer_version": "codex-cli 0.162.1", "head_sha": "<40 lower-case hex digits>", "completed": true,
- "findings": [{"priority": 1, "location": "tools/landing/nas_land.sh:40-44", "title": "[P1] ..."}]}
+ "overall_correctness": "patch is correct", "overall_confidence_score": 0.8,
+ "findings": [{"priority": 2, "location": "tools/landing/nas_land.sh:40-44", "title": "[P2] ..."}]}
 ```
 
 `reviewer` is `codex-review` or `claude-code-review`, `reviewer_version` non-empty text, `head_sha` the commit reviewed, and `completed`
 true only for a structured result (below); each finding has an integer `priority` from 0 to 3, a `location` (`<path>:<start>-<end>`, or
-empty) and a `title`.
+empty) and a `title`. A `codex-review` also carries Codex's verdict, `overall_correctness`, as Codex wrote it (null when the review was
+interrupted), and `overall_confidence_score` when the result has one. The rubric fixes the verdict, `"overall_correctness": "patch is
+correct" | "patch is incorrect"` (`codex-rs/prompts/templates/review/rubric.md:85`), while its wire type is a free `String`
+(`codex-rs/protocol/src/protocol.rs:3507`; the score is `f32`, `:3509`): both files are the same bytes at `rust-v0.162.1`, the installed
+version, and in the upstream mirror at `092d3acd6` (2026-10-09). A `claude-code-review` carries neither field.
 
-**The gate** requires every listed file to be such a review, of the read head or of a head that carries the read head's change, with
-`completed` true. It gives 2 for the first file that cannot be read, is not a normalized review, names another head or did not complete;
-otherwise 4 when a finding of priority 0 or 1 exists ("a person decides": the CC adjudicates); otherwise 0. The P2 and P3 findings are
-printed as counts, for the pull request's Follow-ups. The pure-rebase check is the scripts' own: `lg_gate` runs `lg_same_change` (the change
+**The required arm and the advisory arm (the CC, 2026-10-13).** `codex review` is the required local arm. The `/code-review` plugin's arm
+is ADVISORY until the CC's review-replay addendum measures it (arms E and F): below a score of 80 the plugin does not proceed to its comment
+(`code-review.md:26`, "If there are no issues that meet this criteria, do not proceed"), and it skips a pull request it already reviewed
+(`:11`), so a missing comment says nothing about the head.
+
+**The gate** requires every listed file to be such a review, of the read head or of a head that carries the read head's change. It gives
+2 for the first file that cannot be read, is not a normalized review or names another head, whatever its reviewer; for a `codex-review`
+that did not complete or whose `overall_correctness` is not exactly `patch is correct` or `patch is incorrect` (fail closed); and when no
+completed `codex-review` is listed. Otherwise it gives 4 when a `codex-review` says `patch is incorrect`, whatever its findings'
+priorities, or has a finding of priority 0 or 1 ("a person decides": the CC adjudicates); otherwise 0. The P2 and P3 findings are printed as
+counts, for the pull request's Follow-ups. The plugin's arm never stops the gate: its issues are printed as a count, each scored 80 or more
+by the plugin's filter (its comment carries no score), and a run without a comment (`completed` false) is counted with the citation above,
+both marked advisory. The pure-rebase check is the scripts' own: `lg_gate` runs `lg_same_change` (the change
 identity above) on each file's `head_sha` that is not the read head, fetching a commit the clone lacks (`lg_have`, at the first call), and
 passes the heads that carry the read head's change to the gate after the read head; the gate accepts those and no other. Its lines start
 with `Local reviews: `, which `lg_gate` echoes for a 2 as well (python3's own exit 2 keeps its fixed line), and name a file by its place
@@ -326,7 +342,8 @@ whole (a new 0600 file, renamed over the target) and prints one line, never a pa
   `overall_correctness` (`protocol.rs:3503-3545`). The rollout must hold exactly one review, of target `baseBranch`: the pull request's
   change against its base, the wrapper's default. A `--commit` review covers one commit and is refused, as are `uncommittedChanges` and
   `custom`. `head_sha` is the rollout's commit (`--head` must agree), `reviewer_version` is `codex-cli <cli_version>`, each location is
-  relative to the worktree, and the bodies are dropped. `completed` is false when `review_output` is null (an interrupted review,
+  relative to the worktree, the bodies are dropped, and `overall_correctness` is carried verbatim, with `overall_confidence_score` when
+  present (a finite number, or the input is refused). `completed` is false when `review_output` is null (an interrupted review,
   `review.rs:94-95`) or `overall_correctness` is empty: when the reviewer's JSON does not parse, Codex keeps the text in
   `overall_explanation` and leaves `findings` empty (`codex-rs/core/src/tasks/review.rs:188-208`). One way there: the rubric lets a finding
   omit its priority or set it null (`codex-rs/prompts/templates/review/rubric.md:58`, `:78`), while `ReviewFinding.priority` is a required
@@ -340,9 +357,9 @@ whole (a new 0600 file, renamed over the target) and prints one line, never a pa
   the pull request's `headRefOid` and every comment. "The PR head at the time of the comment" is defined as the head the caller read before
   the run (`--head`), which must still be the head when the comment is read, the comment bound to the run by `--since`: exactly one comment
   by `--author` (the account that ran the plugin; anyone can post the format) created at or after `--since`, whose first line is the
-  heading and which was never edited (`lastEditedAt` null). No such comment gives `completed` false: the plugin posts nothing for a closed,
-  draft, trivial or already reviewed pull request, nor when no issue scored 80 (its `README.md:157-167`). Two such comments, an edit, a
-  head that moved or a count that does not match the list is refused.
+  heading and which was never edited (`lastEditedAt` null). No such comment gives `completed` false, which the gate notes as advisory: the
+  plugin posts nothing for a closed, draft, trivial or already reviewed pull request, nor when no issue scored 80 (its `README.md:157-167`;
+  `code-review.md:11`, `:26`). Two such comments, an edit, a head that moved or a count that does not match the list is refused.
 
 Running each reviewer headless (commands only; neither was run by this change, and running the plugin posts a comment on the pull request):
 
@@ -366,7 +383,8 @@ LOCAL_REVIEWS=<codex file>:<claude file> nas_land.sh <pr> <read head prefix> <ve
 Measured on 2026-10-13 (read only): of the 15 local rollouts with an `ExitedReviewMode` item (codex-cli 0.160.0 to 0.162.1), every one had
 it and its `EnteredReviewMode` at `payload.item` of `event_msg` `item_completed` lines; their targets were `baseBranch` 6, `commit` 4,
 `uncommittedChanges` 3 and `custom` 2; one `review_output` was null; and one completed review said "patch is incorrect" with a single P2
-finding. `review_normalize.py` gave, on the first `baseBranch` review, "codex-review of 8eb4b532: completed; overall_correctness 'patch is
+finding (a `custom` review); a `baseBranch` review like it passed the gate at a6c8bf7c and is blocked now (4). `review_normalize.py` gave,
+on the first `baseBranch` review, "codex-review of 8eb4b532: completed; overall_correctness 'patch is
 correct'; findings P0 0, P1 0, P2 0, P3 0" (exit 0, mode 0600), and refused the "patch is incorrect" review and the null one on their
 targets (`custom`, `uncommittedChanges`; exit 1). `python3 -I` keeps the environment, so the variables reach the gate (measured with
 Python 3.13.16). The plugin's run, the headless commands and a landing on local reviews are untested here.
@@ -409,8 +427,8 @@ sha256 and line count.
 | --- | --- | --- | --- | --- |
 | `uet_land.sh` | `b794e3a46772c0a598dff9eee972ad449e5d63f0c81b60b9db1d5cb4944747bb` (115 lines) | `301fb5b07274b28fde0f2061356bf9682883eca352c8bcb7a3119e8934920c7d` (232 lines) | `bfe664bcc00fd99cbe2a0afe7a76c483d8d7896e44f665eac066972cdec2ed7a` (233 lines) | `62ea1ce42fd500be55168c80a826b0bc84098409f6b6a0147bf1a44350fc1de2` (416 lines) |
 | `nas_land.sh` | `2fefe070b95229de3dcad14052cf5c031b70c202bf4a34f4452e6e0cb5832936` (135 lines) | `96144670bc301036604fc39e57e3ab4e4a2e43a6b9d6b8b645ef7b02482f4017` (243 lines) | `842b85b7f53048e9df027ca537ea99b6208e616e0f239ca30bb1748a5bc1f2ad` (246 lines) | `77e667a336653a3302bc1a4949eb40a459dbf08c06f29d0dde667d42475f7d9f` (479 lines) |
-| `codex_gate.py` | (unchanged) | `31524d2871cde79ecb2c5b9bc56b6175ce9fafab9ad4d2e2e3eb3594e1cb2422` (108 lines) | the same | `495eeb78c94b06723de46038cda953722fbde4d72df78dd96d9dbfc962989ee5` (353 lines) |
-| `review_normalize.py` | (none) | (none) | (none) | `96cb16373ea9e413f48eeb8de1e27a51eeff72b93fd0da6545ec3d914dffe875` (277 lines) |
+| `codex_gate.py` | (unchanged) | `31524d2871cde79ecb2c5b9bc56b6175ce9fafab9ad4d2e2e3eb3594e1cb2422` (108 lines) | the same | `d3cbc950e9be7af9a5def4c7e687d91c3fdec8b1cc0a793824d5236caddd0c63` (396 lines) |
+| `review_normalize.py` | (none) | (none) | (none) | `19db14a40e7022590ff48db62a92052967bb14516e5af9328e0af2cd0622322c` (291 lines) |
 
 On 2026-10-13 three fixes the CC had made in its live copies were ported here alone: the repository slug and the merging account in
 `nas_land.sh` (CC correction #198; here also `LANDING_REPO`, the login check, and `uet_land.sh`, whose block is shared), and the stale
@@ -467,15 +485,11 @@ and 4). These stay until a change with its own tests fixes them:
   `scripts/host_name_scan.py`), or a generic running account joined by a character outside the joiner class.
 - Very short prohibited names fail on coincidences (the CC's P3-6 at af9d1901): a two-letter name matches base64 fragments in several
   files and a one-letter name matches every file. This fails closed; names under about four characters are not useful entries.
-- Local reviews (2026-10-13), for the owner:
-  - The normalized review does not carry Codex's `overall_correctness`, as specified. A review that calls the patch incorrect with no P0
-    or P1 finding passes the gate with its P2 and P3 counted. One of the 14 completed local reviews measured was such a review (a
-    `custom` one, which the normalizer refuses on its target). The normalizer prints the verdict, so the CC sees it when it writes the file.
-  - A clean plugin run may post no comment (`README.md:157-167`: "No issues scored ≥80 (no comment needed)"), and such a run gives
-    `completed` false, which the gate refuses (2) until a person decides. The plugin also skips a pull request that "already has a code
-    review from you from earlier" (`code-review.md:11`), so a run after a new push may post nothing either: the review of the new head
-    then needs the earlier comment gone before the run (not measured), or the CC decides without that reviewer.
-  - The plugin's head is the caller's two reads: a head that moved away and back during the run is not seen.
+- Local reviews (2026-10-13):
+  - The normalizer accepts only a `baseBranch` review, the pull request's whole change against its base: a review the wrapper runs with
+    `--commit` covers one commit and is refused, so the required arm must be run in the wrapper's default mode.
+  - The plugin's arm is advisory (above): until the review-replay addendum measures it, its issues and a run without a comment are noted
+    and never stop a landing. Its head is the caller's two reads: a head that moved away and back during the run is not seen.
   - The files are read at every gate call, each once, so a file rewritten between two calls is decided on its new text at the later one.
 
 ## Tests
@@ -574,6 +588,14 @@ errors):
   - a head that moved, an edited comment, two comments, a count that does not match, another format and a failed `gh`, each refused;
   - its usage errors (exit 2) and the script run isolated.
   - Each written file is read back by the gate.
+- The CC's follow-up of 2026-10-13 (the verdict and the advisory arm) adds, each failing at a6c8bf7c (measured as above against that
+  commit's `tools/landing`; the count is under "Local commands run" in the pull request):
+  - `patch is incorrect` with only P2 and P3 findings, and with none, blocked (4), in the gate and end to end;
+  - a verdict that is not exactly one of the two stopping (2): unknown text, a trailing space, other capitals, null on a completed review;
+  - `patch is correct` with P2 and P3 passing, counted; the verdict and the confidence carried by the normalizer, a confidence that is
+    not a finite number refused;
+  - the plugin's issues and a run without a comment noted as advisory, never stopping the gate or a landing; the plugin's arm alone is
+    no review (2); a plugin file of another head still stops (2).
 
 ## Upstream sources for the #975 corrections
 
@@ -640,6 +662,7 @@ above still hold; the schema's bytes are unchanged, sha256 `3ed09565…`); insta
 | The no-reply address is a user account's (#198) | `github/docs@be38ec5d:content/account-and-profile/reference/email-addresses-reference.md`, `fbbf1c5f700d977f8672462859621f9412e65531a57790fa779e191a4d1c0949` | `:47` "your `noreply` email address is an ID number and your username in the form of ID+USERNAME@users.noreply.github.com" |
 | A login's shape (#198, the login check) | `github/docs@be38ec5d`, the IAM configuration reference's `username-considerations-for-external-authentication.md`, `591df6bd88afa6f28a4f0d030331821dfbef256187da3834cece6d13b4468ef4` | `:94` usernames "must not exceed 39 characters"; `:103` they "can only contain alphanumeric characters and dashes (`-`)"; `:126-127` a name that starts with a dash or holds two consecutive dashes is not created |
 | `codex review`'s result and its rollout | `openai/codex@rust-v0.162.1`: `codex-rs/protocol/src/protocol.rs` `499bd1fd429418778d26998c48da2a5a22fe2965f4684e69fdf99e6b4c7e4330`, `codex-rs/protocol/src/items.rs` `5ca7f804a77dc8f132bb1eda4045e693d2d9b595cf70fc0877ca0cc98c5b621c`, `codex-rs/core/src/tasks/review.rs` `4961b4deff8f665501b3bd5ad9fd386c9651999df8a7cf757bf8567b380eab52`, `codex-rs/history/src/rollout_payload.rs` `ac6c17fda98ecc6377132ac9a34fb4771e902632b943decc94261961891a3598`, `codex-rs/prompts/templates/review/rubric.md` `ec60e7f36a1d1c2679ce095c0205ecc56f7dd8fb57707a13ef362072390f219f` | `protocol.rs:3503-3545` `ReviewOutputEvent` (`findings`, `overall_correctness`, `overall_explanation`, `overall_confidence_score`), `ReviewFinding` (`title`, `body`, `confidence_score`, `priority: i32`, `code_location`), `ReviewCodeLocation` (`absolute_file_path`, `line_range`), `ReviewLineRange` (`start`, `end`); `items.rs:44-46` `TurnItem` is tagged by `type`, `:173-183` `EnteredReviewModeItem` (`target`) and `ExitedReviewModeItem` (`review_output: Option<ReviewOutputEvent>`); `review.rs:94-95` an abort exits review mode with no output, `:188-208` a text that does not parse becomes `overall_explanation`, every other field at its default; `rollout_payload.rs:32-33` a rollout line's item is tagged by `type`, in snake case; `rubric.md:58`, `:78` a finding's priority may be omitted or null, `:85` `overall_correctness` is "patch is correct" or "patch is incorrect" |
-| The `/code-review` plugin | `anthropics/claude-plugins-official@f359d43b406057f1a8cdbc4ea93b827642c162e6` (committed 2026-10-11T02:41:21Z): `plugins/code-review/commands/code-review.md` `7d5a0bc9a41babad32a387152f9680316997bc4ad376928827d670b1760cc890`, `plugins/code-review/README.md` `1fca74bab6969b609519927ae49112760e15d8113eef6bbcf9b9a96c49d73c89` | `code-review.md:2` its `allowed-tools`; `:11` it does not proceed on a closed, draft or trivial pull request or one that "already has a code review from you from earlier"; `:20-26` each issue is scored from 0 to 100 and those under 80 are filtered out; `:28` it comments with `gh`; `:50-84` the comment's two forms; `:86-92` a link names the full SHA and `#L<start>-L<end>`; `README.md:157-167` "No review comment posted", among its causes "No issues scored ≥80 (no comment needed)" |
+| The `/code-review` plugin | `anthropics/claude-plugins-official@f359d43b406057f1a8cdbc4ea93b827642c162e6` (committed 2026-10-11T02:41:21Z): `plugins/code-review/commands/code-review.md` `7d5a0bc9a41babad32a387152f9680316997bc4ad376928827d670b1760cc890`, `plugins/code-review/README.md` `1fca74bab6969b609519927ae49112760e15d8113eef6bbcf9b9a96c49d73c89` | `code-review.md:2` its `allowed-tools`; `:11` it does not proceed on a closed, draft or trivial pull request or one that "already has a code review from you from earlier"; `:20-26` each issue is scored from 0 to 100 and those under 80 are filtered out, `:26` "If there are no issues that meet this criteria, do not proceed" (why its arm is advisory and a missing comment does not stop the gate); `:28` it comments with `gh`; `:50-84` the comment's two forms; `:86-92` a link names the full SHA and `#L<start>-L<end>`; `README.md:157-167` "No review comment posted", among its causes "No issues scored ≥80 (no comment needed)" |
 | The comment's fields | the GraphQL schema, `3ed09565…` | `:21203` `type IssueComment`, `:21215` `author: Actor` (nullable), `:21225` `body: String!`, `:21240` `createdAt: DateTime!`, `:21260` `fullDatabaseId: BigInt`, `:21287-21290` "The moment the editor made the last edit", `lastEditedAt: DateTime` (nullable); `:44787` `PullRequest.headRefOid: GitObjectID!` |
+| Codex's verdict (the CC's follow-up) | `openai/codex@rust-v0.162.1` (installed: codex-cli 0.162.1) `codex-rs/prompts/templates/review/rubric.md` `ec60e7f3…` and `codex-rs/protocol/src/protocol.rs` `499bd1fd…`; the upstream mirror at `092d3acd6bec3e3a14bdc7e7a2810ab628ab759d` (2026-10-09) holds the same bytes of both | `rubric.md:85` `"overall_correctness": "patch is correct" \| "patch is incorrect"`; `protocol.rs:3507` `pub overall_correctness: String` (free text on the wire, so the gate stops on any other value), `:3509` `pub overall_confidence_score: f32` |
 | The variables reach the gate under `-I` | measured with Python 3.13.16 | `LOCAL_REVIEWS=x python3 -I -c 'import os; print(os.environ.get("LOCAL_REVIEWS"))'` printed `x`: isolated mode ignores the `PYTHON*` variables, not the environment |

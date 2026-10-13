@@ -1609,9 +1609,19 @@ def local_reviews_env(values=None):
         yield
 
 
-def normalized(head, findings=(), completed=True, reviewer="codex-review", version="codex-cli 0.162.1"):
-    """A normalized review (README "Local reviews"; review_normalize.py writes them)."""
-    return {"reviewer": reviewer, "reviewer_version": version, "head_sha": head, "completed": completed, "findings": list(findings)}
+VERDICT_DEFAULT = object()  # normalized(): "patch is correct" for a completed codex-review, null for one that did not complete
+
+
+def normalized(head, findings=(), completed=True, reviewer="codex-review", version="codex-cli 0.162.1", correctness=VERDICT_DEFAULT,
+               confidence=None):
+    """A normalized review (README "Local reviews"; review_normalize.py writes them). A codex-review carries Codex's verdict
+    (rubric.md:85) and, when given, its confidence; a claude-code-review carries neither."""
+    review = {"reviewer": reviewer, "reviewer_version": version, "head_sha": head, "completed": completed, "findings": list(findings)}
+    if reviewer == "codex-review":
+        review["overall_correctness"] = (("patch is correct" if completed else None) if correctness is VERDICT_DEFAULT else correctness)
+        if confidence is not None:
+            review["overall_confidence_score"] = confidence
+    return review
 
 
 def finding(priority, title="A finding", location="tools/landing/x.py:3-5"):
@@ -2010,19 +2020,38 @@ class CodexGateTests(unittest.TestCase):
     # ------------------------------------------------------------------------------------------ local reviews (2026-10-13)
     def test_a_local_review_set_decides_from_the_files_alone(self):
         # The owner's direction: reviews run locally (the connector cannot reach the organization's repository). The gate reads the files and
-        # nothing else: 2 for a file that is not a completed normalized review of the read head, else 4 for a P0 or P1 finding, else 0.
+        # nothing else: 2 for a file that is not a normalized review of the read head, a codex-review that did not complete or whose verdict is
+        # not exactly one of the rubric's two, or no codex-review at all; else 4 for "patch is incorrect" or a P0 or P1 codex finding; else 0.
+        # The CC, 2026-10-13: the /code-review plugin arm is advisory (its issues and a missing comment never block).
         clean, follow_ups = normalized(GATE_HEAD), normalized(GATE_HEAD, [finding(2), finding(2), finding(3)])
         claude = normalized(GATE_HEAD, [finding(1, "The plugin's issue")], reviewer="claude-code-review", version="code-review@f359d43b")
+        no_comment = normalized(GATE_HEAD, completed=False, reviewer="claude-code-review", version="code-review@f359d43b")
         cases = [
-            ("one completed review", (clean,), {}, 0, f"Local reviews: codex-review of {GATE_HEAD[:8]} completed with no P0 or P1 finding; "
+            ("one completed review", (clean,), {}, 0, f"Local reviews: codex-review of {GATE_HEAD[:8]}: patch is correct, no P0 or P1 finding; "
                                                     "P2 findings 0, P3 findings 0 (for the Follow-ups)"),
-            ("P2 and P3 findings are counted", (follow_ups,), {}, 0, "P2 findings 2, P3 findings 1 (for the Follow-ups)"),
+            ("P2 and P3 findings with patch is correct pass, counted", (follow_ups,), {}, 0, "patch is correct, no P0 or P1 finding; P2 findings 2, P3 findings 1"),
             ("a P1 finding", (normalized(GATE_HEAD, [finding(1), finding(2)]),), {}, 4, "P0 findings 0, P1 findings 1; a person decides; P2 findings 1"),
             ("a P0 finding", (normalized(GATE_HEAD, [finding(0)]),), {}, 4, "P0 findings 1, P1 findings 0; a person decides"),
-            ("two reviewers, one with a P1", (clean, claude), {}, 4, "codex-review, claude-code-review of"),
+            # the CC, 2026-10-13: "patch is incorrect" blocks whatever the findings' priorities (a6c8bf7c refused the verdict field: 2)
+            ("patch is incorrect with only P2 and P3 findings is blocked", (normalized(GATE_HEAD, [finding(2), finding(3)], correctness="patch is incorrect"),),
+             {}, 4, "patch is incorrect, P0 findings 0, P1 findings 0; a person decides; P2 findings 1, P3 findings 1"),
+            ("patch is incorrect with no finding is blocked", (normalized(GATE_HEAD, correctness="patch is incorrect"),), {}, 4, "patch is incorrect"),
+            ("two codex reviews, one incorrect", (clean, normalized(GATE_HEAD, correctness="patch is incorrect")), {}, 4,
+             "codex-review, codex-review of 5e6f7a8b: patch is incorrect in 1 of 2"),
+            ("an unknown verdict stops", (normalized(GATE_HEAD, [finding(3)], correctness="patch is mostly correct"),), {}, 2,
+             "review file 1 of 1 (codex-review) of 5e6f7a8b has an overall_correctness that is not exactly patch is correct or patch is incorrect"),
+            ("a verdict with a trailing space stops", (normalized(GATE_HEAD, correctness="patch is correct "),), {}, 2, "is not exactly patch is correct"),
+            ("a verdict in other capitals stops", (normalized(GATE_HEAD, correctness="Patch is correct"),), {}, 2, "is not exactly patch is correct"),
+            ("a completed review with a null verdict stops", (normalized(GATE_HEAD, correctness=None),), {}, 2, "is not exactly patch is correct"),
+            ("the plugin's P1 is advisory", (clean, claude), {}, 0, "patch is correct, no P0 or P1 finding; P2 findings 0, P3 findings 0 (for the Follow-ups); "
+             "advisory, not blocking: claude-code-review issues 1 (each scored 80 or more, code-review.md:26), runs without a comment 0"),
+            ("a missing plugin comment does not stop the gate", (clean, no_comment), {}, 0, "runs without a comment 1 (code-review.md:26, :11)"),
+            ("the advisory arm alone is no review", (claude,), {}, 2, "no completed codex-review is listed (the required arm"),
+            ("a plugin file of another head still stops", (clean, normalized(OTHER, reviewer="claude-code-review")), {}, 2,
+             f"review file 2 of 2 (claude-code-review) names commit {OTHER[:8]}"),
             ("a review of another head", (normalized(OTHER),), {}, 2, f"review file 1 of 1 (codex-review) names commit {OTHER[:8]}, which is neither "
                                                                        f"the read head {GATE_HEAD[:8]} nor a head carrying its change"),
-            ("the same review, its head passed as carrying the read head's change", (normalized(OTHER),), {"same": (OTHER,)}, 0, "completed with no P0"),
+            ("the same review, its head passed as carrying the read head's change", (normalized(OTHER),), {"same": (OTHER,)}, 0, "no P0 or P1 finding"),
             ("a review that did not complete", (clean, normalized(GATE_HEAD, completed=False)), {}, 2,
              f"review file 2 of 2 (codex-review) of {GATE_HEAD[:8]} did not complete"),
             ("a malformed file is refused before any finding counts", (normalized(GATE_HEAD, [finding(1)]), b"{"), {}, 2, "review file 2 of 2 cannot be read as JSON"),
@@ -2030,8 +2059,8 @@ class CodexGateTests(unittest.TestCase):
             ("a short read head", (clean,), {"read": GATE_HEAD[:8]}, 2, "must be 40 lower-case hex digits"),
             ("a head after it that is not a commit", (clean,), {"same": ("abc",)}, 2, "must be 40 lower-case hex digits"),
             ("the alias alone", (follow_ups,), {"variables": {"CODEX_LOCAL_REVIEW": [0]}}, 0, "P2 findings 2, P3 findings 1"),
-            ("both variables: every file of both counts", (clean, claude), {"variables": {"LOCAL_REVIEWS": [0], "CODEX_LOCAL_REVIEW": [1]}}, 4,
-             "codex-review, claude-code-review of"),
+            ("both variables: every file of both counts", (clean, normalized(GATE_HEAD, [finding(1)])),
+             {"variables": {"LOCAL_REVIEWS": [0], "CODEX_LOCAL_REVIEW": [1]}}, 4, "codex-review, codex-review of 5e6f7a8b: patch is correct, P0 findings 0, P1 findings 1"),
             ("a file that does not exist", (), {"names": "{dir}/absent.json"}, 2, "review file 1 of 1 cannot be read as JSON"),
             ("separators and no name", (), {"names": "::"}, 2, "Local reviews: LOCAL_REVIEWS names no file"),
         ]
@@ -2053,8 +2082,13 @@ class CodexGateTests(unittest.TestCase):
             ("priority true", {**good, "findings": [finding(True)]}, "its finding 1"),
             ("priority 1.0", {**good, "findings": [finding(1.0)]}, "its finding 1"),
             ("priority null (Codex's rubric allows it, the struct does not)", {**good, "findings": [finding(None)]}, "its finding 1"),
-            ("an extra field", {**good, "overall_correctness": "patch is correct"}, "its fields are not reviewer"),
+            ("an extra field", {**good, "overall_explanation": "prose"}, "its fields are not those of a codex-review"),
             ("a missing field", {k: v for k, v in good.items() if k != "completed"}, "its fields are not reviewer"),
+            ("a codex-review without its verdict", {k: v for k, v in good.items() if k != "overall_correctness"}, "its fields are not those of a codex-review"),
+            ("a claude-code-review with a verdict", {**good, "reviewer": "claude-code-review"}, "its fields are not those of a claude-code-review"),
+            ("a verdict that is a number", {**good, "overall_correctness": 1}, "its overall_correctness is not text or null"),
+            ("a confidence as text", {**good, "overall_confidence_score": "high"}, "its overall_confidence_score is not a number"),
+            ("a confidence of true", {**good, "overall_confidence_score": True}, "its overall_confidence_score is not a number"),
             ("another reviewer", {**good, "reviewer": "someone-else"}, "its reviewer is not codex-review or claude-code-review"),
             ("an empty version", {**good, "reviewer_version": " "}, "its reviewer_version is empty"),
             ("a short head", {**good, "head_sha": GATE_HEAD[:12]}, "its head_sha is not 40 lower-case hex digits"),
@@ -3131,11 +3165,17 @@ class EndToEndTests(LandingCase):
             repo, calls = (UET_REPO, 2) if script.key == "uet" else (NAS_REPO, 3)
             cases = [
                 ("a completed review of the read head", {"LOCAL_REVIEWS": self.local_review(self.head, [p2])}, 0,
-                 f"Local reviews: codex-review of {self.head[:8]} completed with no P0 or P1 finding; P2 findings 1, P3 findings 0 (for the Follow-ups)", calls),
-                ("two reviewers, the second through the alias", {"LOCAL_REVIEWS": self.local_review(self.head),
-                                                                  "CODEX_LOCAL_REVIEW": self.local_review(self.head, reviewer="claude-code-review")}, 0,
-                 "codex-review, claude-code-review of", calls),
+                 f"Local reviews: codex-review of {self.head[:8]}: patch is correct, no P0 or P1 finding; P2 findings 1, P3 findings 0 (for the Follow-ups)", calls),
+                ("the advisory plugin arm through the alias", {"LOCAL_REVIEWS": self.local_review(self.head),
+                                                               "CODEX_LOCAL_REVIEW": self.local_review(self.head, [p1], reviewer="claude-code-review")}, 0,
+                 "advisory, not blocking: claude-code-review issues 1 (each scored 80 or more, code-review.md:26)", calls),
+                ("a missing plugin comment does not stop the landing",
+                 {"LOCAL_REVIEWS": ":".join([self.local_review(self.head), self.local_review(self.head, completed=False, reviewer="claude-code-review")])}, 0,
+                 "runs without a comment 1 (code-review.md:26, :11)", calls),
                 ("a P1 finding", {"LOCAL_REVIEWS": self.local_review(self.head, [p1, p2])}, 9, "P1 findings 1; a person decides", 1),
+                ("patch is incorrect with only a P2 finding", {"LOCAL_REVIEWS": self.local_review(self.head, [p2], correctness="patch is incorrect")}, 9,
+                 "patch is incorrect, P0 findings 0, P1 findings 0; a person decides", 1),
+                ("an unknown verdict", {"LOCAL_REVIEWS": self.local_review(self.head, correctness="looks fine")}, 9, "is not exactly patch is correct", 1),
                 ("a review of another change", {"LOCAL_REVIEWS": self.local_review(self.other)}, 9, f"names commit {self.other[:8]}", 1),
                 ("a review that did not complete", {"LOCAL_REVIEWS": self.local_review(self.head, completed=False)}, 9, "did not complete", 1),
                 ("a malformed file", {"LOCAL_REVIEWS": str(malformed)}, 9, "is not a normalized review: its fields are not", 1),
@@ -3297,13 +3337,18 @@ class ReviewNormalizeTests(unittest.TestCase):
             return self.run_cli(["codex-review", "--rollout", str(path), *extra])
 
     def assert_gate(self, review, code):
-        """The written file is a normalized review the gate reads with this outcome."""
+        """The written file is a normalized review the gate reads with this outcome; a plugin file (the advisory arm) is read beside a
+        clean codex-review of its head, the required arm. Returns the gate's line."""
         self.assertIsNone(self.gate.review_problem(review))
         with tempfile.TemporaryDirectory(prefix="local-reviews-") as scratch:
-            path = Path(scratch) / "review.json"
-            path.write_text(json.dumps(review), encoding="utf-8")
-            with local_reviews_env({"LOCAL_REVIEWS": str(path)}), contextlib.redirect_stdout(io.StringIO()):
+            paths = []
+            for number, item in enumerate([review] if review["reviewer"] == "codex-review" else [normalized(review["head_sha"]), review]):
+                paths.append(Path(scratch) / f"review-{number}.json")
+                paths[-1].write_text(json.dumps(item), encoding="utf-8")
+            out = io.StringIO()
+            with local_reviews_env({"LOCAL_REVIEWS": ":".join(map(str, paths))}), contextlib.redirect_stdout(out):
                 self.assertEqual(self.gate.main("o/r", "7", review["head_sha"]), code)
+            return out.getvalue().strip()
 
     # -- codex-review
     def test_a_codex_review_becomes_its_findings_without_bodies_relative_to_the_worktree(self):
@@ -3312,6 +3357,7 @@ class ReviewNormalizeTests(unittest.TestCase):
         code, line, written, mode, calls = self.codex(rollout(output=output))
         self.assertEqual((code, mode, calls), (0, 0o600, []))
         self.assertEqual(written, {"reviewer": "codex-review", "reviewer_version": "codex-cli 0.162.1", "head_sha": HEAD, "completed": True,
+                                   "overall_correctness": "patch is incorrect", "overall_confidence_score": 0.7,
                                    "findings": [{"priority": 1, "location": "tools/landing/nas_land.sh:40-44", "title": "[P1] A finding"},
                                                 {"priority": 2, "location": "README.md:3-3", "title": "[P2] Docs"},
                                                 {"priority": 3, "location": "x.py:1-2", "title": "[P3] Nit"}]})
@@ -3326,22 +3372,41 @@ class ReviewNormalizeTests(unittest.TestCase):
         self.assertIn("overall_correctness 'patch is correct'; findings P0 0, P1 0, P2 0, P3 0", line)
         self.assert_gate(written, 0)
         code, line, written, _, _ = self.codex(rollout(output=codex_output([codex_finding(f"{ROLLOUT_ROOT}/a.py", 2)], correctness="see /srv/x")))
-        self.assertEqual((code, written["completed"]), (0, True))
-        self.assertIn("overall_correctness of another form", line)
+        self.assertEqual((code, written["completed"], written["overall_correctness"]), (0, True, "see /srv/x"), "carried as Codex wrote it")
+        self.assertIn("overall_correctness of another form (the gate stops on it)", line)
         self.assertNotIn("/srv/x", line)
+        self.assertNotIn("/srv/x", self.assert_gate(written, 2), "the gate stops on it and prints no part of it")
+
+    def test_codex_s_verdict_blocks_whatever_the_findings_and_its_confidence_is_carried_when_present(self):
+        # The CC, 2026-10-13: rubric.md:85 fixes "patch is correct" | "patch is incorrect", the wire type is a free String (protocol.rs:3507).
+        # A review that calls the patch incorrect with only P2 and P3 findings passed the gate at a6c8bf7c (the verdict was not carried).
+        output = codex_output([codex_finding(f"{ROLLOUT_ROOT}/a.py", 2), codex_finding(f"{ROLLOUT_ROOT}/b.py", 3)], correctness="patch is incorrect")
+        code, line, written, _, _ = self.codex(rollout(output=output))
+        self.assertEqual((code, written["overall_correctness"], written["overall_confidence_score"]), (0, "patch is incorrect", 0.7), line)
+        self.assertIn("patch is incorrect, P0 findings 0, P1 findings 0; a person decides; P2 findings 1, P3 findings 1", self.assert_gate(written, 4))
+        without = {k: v for k, v in codex_output(correctness="patch is correct").items() if k != "overall_confidence_score"}
+        code, line, written, _, _ = self.codex(rollout(output=without))
+        self.assertEqual((code, "overall_confidence_score" in written), (0, False), line)
+        self.assert_gate(written, 0)
+        for score in ("high", True, None, [0.5]):
+            with self.subTest(score=score):
+                code, line, written, _, _ = self.codex(rollout(output={**codex_output(), "overall_confidence_score": score}))
+                self.assertEqual((code, written), (1, None), line)
+                self.assertIn("overall_confidence_score is not a finite number", line)
 
     def test_a_codex_review_without_a_structured_result_is_not_completed(self):
         # review_output null: interrupted (review.rs exit_review_mode(None)). Empty overall_correctness and no findings: the reviewer's JSON did
         # not parse, which review.rs:188-208 turns into findings [] (a finding without a priority does it: the rubric allows omitting it,
         # rubric.md:58 and :78, the struct requires it, protocol.rs:3525-3531). Either would pass as "no finding" if counted as completed.
-        for name, output, note in (("interrupted", None, "the review was interrupted (review_output null)"),
-                                   ("the parse fallback", {"findings": [], "overall_correctness": "", "overall_explanation": "{\"findings\": [...]}",
-                                                           "overall_confidence_score": 0.0}, "the reviewer's JSON did not parse")):
+        base = {"reviewer": "codex-review", "reviewer_version": "codex-cli 0.162.1", "head_sha": HEAD, "completed": False, "findings": []}
+        for name, output, note, carried in (("interrupted", None, "the review was interrupted (review_output null)", {"overall_correctness": None}),
+                                            ("the parse fallback", {"findings": [], "overall_correctness": "", "overall_explanation": "{\"findings\": [...]}",
+                                                                    "overall_confidence_score": 0.0}, "the reviewer's JSON did not parse",
+                                             {"overall_correctness": "", "overall_confidence_score": 0.0})):
             with self.subTest(case=name):
                 code, line, written, _, _ = self.codex(rollout(output=output))
-                self.assertEqual((code, written), (0, {"reviewer": "codex-review", "reviewer_version": "codex-cli 0.162.1", "head_sha": HEAD,
-                                                         "completed": False, "findings": []}), line)
-                self.assertIn(f"NOT completed (the gate refuses this file); {note}", line)
+                self.assertEqual((code, written), (0, {**base, **carried}), line)
+                self.assertIn(f"NOT completed (the gate stops on it); {note}", line)
                 self.assertIsNone(self.gate.review_problem(written))
                 with tempfile.TemporaryDirectory(prefix="local-reviews-") as scratch:
                     path = Path(scratch) / "r.json"
@@ -3409,16 +3474,18 @@ class ReviewNormalizeTests(unittest.TestCase):
                                "written to review.json")
         self.assertEqual(calls[0][5:], ["-f", f"query={self.normalize.COMMENTS}", "-f", "owner=native-agent-stack", "-f", "repo=native-agent-stack",
                                         "-F", "pr=1018"])
-        self.assert_gate(written, 4)
+        # the CC, 2026-10-13: the plugin arm is advisory until the review-replay addendum measures it: its two P1s are noted, not blocking
+        self.assertIn("advisory, not blocking: claude-code-review issues 2 (each scored 80 or more, code-review.md:26)", self.assert_gate(written, 0))
 
     def test_the_plugins_no_issues_comment_is_a_completed_review_without_findings(self):
         code, line, written, _, _ = self.plugin([plugin_comment(PLUGIN_CLEAN.replace("\n", "\r\n"))])
         self.assertEqual((code, written["completed"], written["findings"]), (0, True, []), line)
-        self.assert_gate(written, 0)
+        self.assertIn("claude-code-review issues 0", self.assert_gate(written, 0))
 
     def test_no_comment_of_this_run_is_a_review_that_did_not_complete(self):
         # The plugin posts nothing for a closed, draft, trivial or already reviewed pull request, nor when no issue scored 80
-        # (plugins/code-review/README.md:157-167): such a run gives completed false, which the gate refuses.
+        # (plugins/code-review/README.md:157-167; code-review.md:11, :26): such a run gives completed false, which the gate notes as advisory
+        # and does not stop on (the CC, 2026-10-13; at a6c8bf7c the gate stopped with 2).
         cases = [("no comment", []),
                  ("only a comment from before the run", [plugin_comment(PLUGIN_CLEAN, created="2026-10-13T00:59:59Z")]),
                  ("a comment by another account (anyone can post the format)", [plugin_comment(PLUGIN_CLEAN, author="someone-else")]),
@@ -3429,7 +3496,8 @@ class ReviewNormalizeTests(unittest.TestCase):
                 code, line, written, _, _ = self.plugin(comments)
                 self.assertEqual((code, written), (0, {"reviewer": "claude-code-review", "reviewer_version": written["reviewer_version"], "head_sha": HEAD,
                                                          "completed": False, "findings": []}), line)
-                self.assertIn("NOT completed (the gate refuses this file); no code-review comment by --author since --since", line)
+                self.assertIn("NOT completed (advisory: the gate notes it); no code-review comment by --author since --since", line)
+                self.assertIn("runs without a comment 1 (code-review.md:26, :11)", self.assert_gate(written, 0))
 
     def test_the_author_is_matched_without_regard_to_case_and_at_the_start_time(self):
         code, line, written, _, _ = self.plugin([plugin_comment(PLUGIN_CLEAN, author=PLUGIN_AUTHOR.upper(), created=PLUGIN_SINCE)])

@@ -26,11 +26,20 @@ Local reviews (2026-10-13, the owner's direction: reviews run locally, Codex thr
 connector cannot reach the organization's repository): when LOCAL_REVIEWS, or its alias CODEX_LOCAL_REVIEW, names normalized review
 files (colon-separated; tools/landing/review_normalize.py writes them; the schema is in the README, "Local reviews"), the gate decides
 from the files alone and calls nothing:
-  2  a file cannot be read, is not a normalized review, names a head that is neither the read head (the third argument) nor a head the
-     caller passed after it as carrying the read head's change (the landing scripts' lg_gate passes those), or did not complete;
-  4  otherwise, a finding of priority 0 or 1 exists: a person decides (the CC adjudicates);
+  2  a file cannot be read or is not a normalized review; a file names a head that is neither the read head (the third argument) nor a
+     head the caller passed after it as carrying the read head's change (the landing scripts' lg_gate passes those); a codex-review did not
+     complete, or its overall_correctness is not exactly "patch is correct" or "patch is incorrect" (fail closed); or no completed
+     codex-review is listed (the required arm);
+  4  otherwise, a codex-review says "patch is incorrect", whatever its findings' priorities, or has a finding of priority 0 or 1: a person
+     decides (the CC adjudicates);
   0  otherwise; the P2 and P3 findings are printed as counts, for the pull request's Follow-ups.
-A file is named in the output by its place in the list, never by its path, and no finding's text is printed.
+The verdict: openai/codex@rust-v0.162.1 codex-rs/prompts/templates/review/rubric.md:85 fixes "overall_correctness": "patch is correct" |
+"patch is incorrect", while the wire type is a free String (codex-rs/protocol/src/protocol.rs:3507); the mirror at 092d3acd6 holds the same
+bytes of both files. The claude-code-review arm (the /code-review plugin) is ADVISORY until the CC's review-replay addendum measures it
+(arms E and F): its issues are printed as a count, each scored 80 or more by the plugin's filter (the comment carries no score), and a run
+that posted no comment (completed false: below a score of 80 the plugin does not proceed to its comment, code-review.md:26, and it skips a
+pull request it already reviewed, :11) is noted with that citation; neither stops the gate. A malformed file, or one of another head,
+stops it whatever its reviewer. A file is named in the output by its place in the list, never by its path, and no finding's text is printed.
 
 Sources (the connector's own summary comment, read on uet#47 and nas#939 on 2026-10-09, and captured from nas#975 on 2026-10-11 in
 tests/fixtures/landing/codex-summary-comment.json, whose body has sha256 1236fe48…):
@@ -99,7 +108,13 @@ COMMENTS = ("query($owner: String!, $repo: String!, $pr: Int!, $endCursor: Strin
 # review_normalize.py writes for, and the normalized review's fields (README "Local reviews"); a finding carries no prose body.
 LOCAL = ("LOCAL_REVIEWS", "CODEX_LOCAL_REVIEW")
 REVIEWERS = ("codex-review", "claude-code-review")
+REQUIRED = "codex-review"  # the required arm; claude-code-review is advisory until the CC's review-replay addendum measures it (arms E, F)
 REVIEW_KEYS = frozenset({"reviewer", "reviewer_version", "head_sha", "completed", "findings"})
+# A codex-review also carries Codex's verdict (rubric.md:85; protocol.rs:3507 a free String, null when the review was interrupted) and may
+# carry its confidence (protocol.rs:3509 overall_confidence_score: f32).
+CODEX_KEYS = REVIEW_KEYS | {"overall_correctness"}
+CODEX_OPTIONAL = frozenset({"overall_confidence_score"})
+CORRECT, INCORRECT = "patch is correct", "patch is incorrect"
 FINDING_KEYS = frozenset({"priority", "location", "title"})
 SHA = re.compile(r"[0-9a-f]{40}")
 
@@ -185,10 +200,19 @@ def no_constant(name):
 
 def review_problem(review):
     """Why a parsed file is not a normalized review (README "Local reviews"), or None; the reasons are fixed text."""
-    if not isinstance(review, dict) or set(review) != REVIEW_KEYS:
+    if not isinstance(review, dict) or not REVIEW_KEYS <= set(review):
         return "its fields are not reviewer, reviewer_version, head_sha, completed and findings"
     if review["reviewer"] not in REVIEWERS:
         return "its reviewer is not codex-review or claude-code-review"
+    if review["reviewer"] == REQUIRED:
+        if not CODEX_KEYS <= set(review) <= CODEX_KEYS | CODEX_OPTIONAL:
+            return "its fields are not those of a codex-review: reviewer, reviewer_version, head_sha, completed, overall_correctness, findings"
+        if review["overall_correctness"] is not None and not isinstance(review["overall_correctness"], str):
+            return "its overall_correctness is not text or null"
+        if "overall_confidence_score" in review and type(review["overall_confidence_score"]) not in (int, float):
+            return "its overall_confidence_score is not a number"
+    elif set(review) != REVIEW_KEYS:
+        return "its fields are not those of a claude-code-review: reviewer, reviewer_version, head_sha, completed, findings"
     if not isinstance(review["reviewer_version"], str) or not review["reviewer_version"].strip():
         return "its reviewer_version is empty or not a string"
     if not isinstance(review["head_sha"], str) or not SHA.fullmatch(review["head_sha"]):
@@ -206,7 +230,9 @@ def review_problem(review):
 
 def local_gate(paths, read, heads):
     """The decision from the local review files alone (README "Local reviews"): one line, and 0, 2 or 4. Every file must be a normalized
-    review that completed, of the read head or of a head the caller passed as carrying its change; then a P0 or P1 finding is 4."""
+    review of the read head or of a head the caller passed as carrying its change; every codex-review must have completed with a verdict
+    of "patch is correct" or "patch is incorrect", and one must be listed. Then "patch is incorrect" or a P0 or P1 finding of a codex-review
+    is 4; the claude-code-review arm is advisory (its issues and a missing comment are noted, never blocking)."""
     if not paths:
         print("Local reviews: LOCAL_REVIEWS names no file; stop")
         return 2
@@ -230,17 +256,34 @@ def local_gate(paths, read, heads):
             print(f"Local reviews: {which} ({review['reviewer']}) names commit {review['head_sha'][:8]}, which is neither the read head "
                   f"{read[:8]} nor a head carrying its change; stop")
             return 2
-        if not review["completed"]:
+        if review["reviewer"] == REQUIRED and not review["completed"]:
             print(f"Local reviews: {which} ({review['reviewer']}) of {review['head_sha'][:8]} did not complete; stop")
             return 2
+        if review["reviewer"] == REQUIRED and review["overall_correctness"] not in (CORRECT, INCORRECT):
+            print(f"Local reviews: {which} (codex-review) of {review['head_sha'][:8]} has an overall_correctness that is not exactly "
+                  f"patch is correct or patch is incorrect (rubric.md:85); stop")
+            return 2
         reviews.append(review)
-    counts = Counter(finding["priority"] for review in reviews for finding in review["findings"])
-    names = ", ".join(review["reviewer"] for review in reviews)
+    required = [review for review in reviews if review["reviewer"] == REQUIRED]
+    advisory = [review for review in reviews if review["reviewer"] != REQUIRED]
+    if not required:
+        print("Local reviews: no completed codex-review is listed (the required arm; claude-code-review is advisory); stop")
+        return 2
+    counts = Counter(finding["priority"] for review in required for finding in review["findings"])
+    incorrect = sum(review["overall_correctness"] == INCORRECT for review in required)
+    verdict = CORRECT if not incorrect else INCORRECT if len(required) == 1 else f"{INCORRECT} in {incorrect} of {len(required)}"
+    names = ", ".join(review["reviewer"] for review in required)
     tail = f"P2 findings {counts[2]}, P3 findings {counts[3]} (for the Follow-ups)"
-    if counts[0] or counts[1]:
-        print(f"Local reviews: {names} of {read[:8]}: P0 findings {counts[0]}, P1 findings {counts[1]}; a person decides; {tail}")
+    notes = ""
+    if advisory:
+        issues = sum(len(review["findings"]) for review in advisory if review["completed"])
+        missing = sum(not review["completed"] for review in advisory)
+        notes = (f"; advisory, not blocking: claude-code-review issues {issues} (each scored 80 or more, code-review.md:26), "
+                 f"runs without a comment {missing} (code-review.md:26, :11)")
+    if incorrect or counts[0] or counts[1]:
+        print(f"Local reviews: {names} of {read[:8]}: {verdict}, P0 findings {counts[0]}, P1 findings {counts[1]}; a person decides; {tail}{notes}")
         return 4
-    print(f"Local reviews: {names} of {read[:8]} completed with no P0 or P1 finding; {tail}")
+    print(f"Local reviews: {names} of {read[:8]}: {verdict}, no P0 or P1 finding; {tail}{notes}")
     return 0
 
 

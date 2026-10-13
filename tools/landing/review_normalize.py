@@ -14,16 +14,20 @@ reviewers are read, each through its own supported output, and neither is change
                       plugins/code-review/commands/code-review.md), which posts ONE comment on the pull request in a fixed format
                       (:50-92): "### Code review", then "Found N issues:" with numbered issues, each followed by a link to the code at a full
                       commit SHA, or "No issues found. Checked for bugs and CLAUDE.md compliance." Every issue it posts passed its own
-                      confidence filter of 80 or more (:20-26), so each is priority 1 (a person decides); no finer priority is invented.
+                      confidence filter of 80 or more (:20-26), so each is priority 1; no finer priority is invented. The gate treats
+                      this arm as advisory until the CC's review-replay addendum measures it (arms E and F).
 
 The normalized review is one JSON object with exactly these fields; a finding carries no prose body:
   {"reviewer": "codex-review" | "claude-code-review", "reviewer_version": "<text>", "head_sha": "<40 lower-case hex digits>",
    "completed": true | false, "findings": [{"priority": 0 | 1 | 2 | 3, "location": "<path>:<start>-<end>" or "", "title": "<text>"}]}
+A codex-review also carries Codex's verdict, "overall_correctness", as Codex wrote it (rubric.md:85 fixes "patch is correct" | "patch is
+incorrect", the wire type is a free String, protocol.rs:3507; null when the review was interrupted), and "overall_confidence_score" when
+the result has one (protocol.rs:3509). The gate blocks on "patch is incorrect" and stops on any other value than those two.
 
 completed is false when the reviewer gave no structured result: a Codex review interrupted (review_output null) or whose JSON did not parse
 (Codex then keeps the text in overall_explanation and leaves findings empty and overall_correctness "", review.rs:188-208), or no plugin
 comment since the run started (the plugin posts none for a closed, draft, trivial or already reviewed pull request, nor when no issue scored
-80, README.md:157-167). The gate refuses such a file (2).
+80, README.md:157-167; code-review.md:11, :26). The gate stops on such a codex-review file (2) and notes such a plugin file as advisory.
 
 The plugin's head: "the PR head at the time of the comment" is the head the caller read before the run (--head), which must still be the pull
 request's head when the comment is read, the comment bound to the run by --since. Exit codes: 0 the file was written; 1 the input was refused
@@ -36,6 +40,7 @@ usage:
 """
 import argparse
 import json
+import math
 import os
 import re
 import subprocess
@@ -120,12 +125,19 @@ def codex_review(rollout, head=None):
     version = meta.get("cli_version")
     if not isinstance(version, str) or not re.fullmatch(r"[0-9A-Za-z.+-]{1,40}", version):
         raise Refused("the rollout's session_meta has no cli_version of the usual form")
-    review = {"reviewer": "codex-review", "reviewer_version": f"codex-cli {version}", "head_sha": commit, "completed": False, "findings": []}
+    review = {"reviewer": "codex-review", "reviewer_version": f"codex-cli {version}", "head_sha": commit, "completed": False,
+              "overall_correctness": None, "findings": []}
     output = exited[0].get("review_output")
     if output is None:
         return review, "the review was interrupted (review_output null)"
     if not isinstance(output, dict) or not isinstance(output.get("overall_correctness"), str) or not isinstance(output.get("findings"), list):
         raise Refused("the review result is not a review_output object")
+    review["overall_correctness"] = output["overall_correctness"]  # verbatim: the gate decides on exactly what Codex wrote
+    if "overall_confidence_score" in output:
+        score = output["overall_confidence_score"]
+        if type(score) not in (int, float) or not math.isfinite(score):
+            raise Refused("the review result's overall_confidence_score is not a finite number")
+        review["overall_confidence_score"] = score
     verdict = output["overall_correctness"].strip()
     if not verdict:
         return review, "the reviewer's JSON did not parse (empty overall_correctness, the fallback of review.rs:188-208)"
@@ -141,7 +153,8 @@ def codex_review(rollout, head=None):
         review["findings"].append({"priority": finding["priority"], "location":
                                    f"{where(location['absolute_file_path'], root)}:{lines['start']}-{lines['end']}", "title": finding["title"]})
     review["completed"] = True
-    return review, f"overall_correctness {verdict!r}" if verdict in VERDICTS else "overall_correctness of another form"
+    raw = output["overall_correctness"]
+    return review, f"overall_correctness {raw!r}" if raw in VERDICTS else "overall_correctness of another form (the gate stops on it)"
 
 
 def plugin_findings(body):
@@ -267,7 +280,8 @@ def main(argv=None):
         print(f"review_normalize: {args.reviewer}: refused: {type(error).__name__}, details withheld; nothing written")
         return 1
     counts = Counter(finding["priority"] for finding in review["findings"])
-    state = "completed" if review["completed"] else "NOT completed (the gate refuses this file)"
+    state = ("completed" if review["completed"] else "NOT completed (the gate stops on it)" if review["reviewer"] == "codex-review"
+             else "NOT completed (advisory: the gate notes it)")
     print(f"review_normalize: {review['reviewer']} of {review['head_sha'][:8]}: {state}; {note}; findings P0 {counts[0]}, P1 {counts[1]}, "
           f"P2 {counts[2]}, P3 {counts[3]}; written to {os.path.basename(args.out)}")
     return 0
