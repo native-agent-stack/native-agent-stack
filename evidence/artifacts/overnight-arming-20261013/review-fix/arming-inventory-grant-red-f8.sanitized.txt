@@ -1,0 +1,28 @@
+Running as unit: run-p481075-i163702556.scope; invocation ID: 0a22d48c95f94edebda0a564b97d6aca
+test_committed_repository_grants_match_current_git_inventory_paths (tests.test_local_pages_policy_grants.PolicyGrantDerivation.test_committed_repository_grants_match_current_git_inventory_paths) ... FAIL
+test_inventory_check_accepts_one_more_grant_without_changing_the_count (tests.test_local_pages_policy_grants.PolicyGrantDerivation.test_inventory_check_accepts_one_more_grant_without_changing_the_count) ... FAIL
+
+======================================================================
+FAIL: test_committed_repository_grants_match_current_git_inventory_paths (tests.test_local_pages_policy_grants.PolicyGrantDerivation.test_committed_repository_grants_match_current_git_inventory_paths)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_local_pages_policy_grants.py", line 110, in test_committed_repository_grants_match_current_git_inventory_paths
+    self.assertEqual(actual, expected, "Regenerate reviewed repository grants at the landing head; runtime discovery remains names-only.")
+AssertionError: Items in the second set but not the first:
+'scripts/published_preimages.py' : Regenerate reviewed repository grants at the landing head; runtime discovery remains names-only.
+
+======================================================================
+FAIL: test_inventory_check_accepts_one_more_grant_without_changing_the_count (tests.test_local_pages_policy_grants.PolicyGrantDerivation.test_inventory_check_accepts_one_more_grant_without_changing_the_count)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_local_pages_policy_grants.py", line 127, in test_inventory_check_accepts_one_more_grant_without_changing_the_count
+    self.test_committed_repository_grants_match_current_git_inventory_paths()
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_local_pages_policy_grants.py", line 110, in test_committed_repository_grants_match_current_git_inventory_paths
+    self.assertEqual(actual, expected, "Regenerate reviewed repository grants at the landing head; runtime discovery remains names-only.")
+AssertionError: Items in the second set but not the first:
+'scripts/published_preimages.py' : Regenerate reviewed repository grants at the landing head; runtime discovery remains names-only.
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.498s
+
+FAILED (failures=2)

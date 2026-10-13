@@ -13423,8 +13423,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/overnight-review-fix-validation.json",
-      "sha256": "927dbe2779f81b4a63a84dd8a9d7cb03f89004369709ab94fae22f97339289e9",
-      "bytes": 10877
+      "bytes": 14032,
+      "sha256": "8d8f7fabbf1ea3ca69ed89cdc7774913f29bdb4e066fcd070d311cea08d01dcd"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/overnight.py",
@@ -48272,6 +48272,16 @@
       "bytes": 3106
     },
     {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/arming-inventory-grant-green.sanitized.txt",
+      "bytes": 194,
+      "sha256": "5b81d6143ae257c7a89e12d5b9e40b27532586e7d106b4d4f6230c5897b4324b"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/arming-inventory-grant-red-f8.sanitized.txt",
+      "bytes": 2713,
+      "sha256": "cd9186e726d643db13c834976cbe65b412c336a44abfc9323aaa798c553cda3d"
+    },
+    {
       "path": "evidence/artifacts/overnight-arming-20261013/review-fix/privacy-red-exact-9cb-record-scope.sanitized.txt",
       "sha256": "3de81b2bee2c1d8c6690903786d14421de0f52f300be7ff8b3cafdd22e61e25b",
       "bytes": 3607
@@ -64068,8 +64078,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "d3bc37ce42a461b489146cc578cc2fb6121357ecab590b3534cb0d27ec5ecee1",
-      "bytes": 759968
+      "bytes": 760050,
+      "sha256": "db963c760f32f59969f7f064b2bc44d3f0262a14571352515f98067c8f2e0212"
     },
     {
       "path": "tools/omniroute/gateway_record.py",

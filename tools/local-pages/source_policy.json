@@ -2118,6 +2118,10 @@
     },
     {
       "root": "repo",
+      "path": "scripts/published_preimages.py"
+    },
+    {
+      "root": "repo",
       "path": "scripts/receipt_staleness.py"
     },
     {
