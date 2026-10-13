@@ -1799,7 +1799,9 @@ commands shows the false positives falling and no new refusal of a command that 
 
 **What changes.** Each item below is in `scripts/hooks/secret_path_guard.py` and in
 `GuardFalsePositiveRepairTests` of `tests/test_secret_path_guard.py`, whose rows fail on the guard at `6934527e`
-(37 failures and one error; the whole module there: 40 failures and 15 errors) and pass here.
+(43 failures and one error in its 9 tests; the whole module there: 46 failures and 15 errors in 99
+tests) and pass here. Earlier rounds measured 37 failures and one error (fix round 1, at `b7fc4819`'s tests) and 41
+failures and one error (fix round 2, at `59251ed6`'s).
 
 - **L2: more masked bodies** (`k4_code_bodies`). Besides form F, a here-document body leaves both base word readings
   when all of these hold. Its delimiter word is one quoted identifier and its operator is `<<`, not `<<-`. Bash reads
@@ -1861,11 +1863,12 @@ gone. Withdrawing the written-file exemption made one replayed command refuse an
 **Replay.** The landing condition's measurement: every Bash call in this host's Claude Code transcripts, subagents
 included, timestamped from 2026-10-11T00:00Z to 2026-10-13T00:00Z, extracted 2026-10-12T18:36Z: 55,469 calls, 54,207
 distinct commands, each read by `check()` of the guard at the merge base `6934527e` (sha256 `ce9027c56a7006317f52c6cfc2bcb9b267a4f37050269ccdbd001d1371f7d83a`, the same
-bytes as at `2f59d744` and at `703d588c`) and of this change, with the hook's size limit; rerun after the corrections.
+bytes as at `2f59d744` and at `703d588c`) and of this change (sha256 `097c724fa6921a78274c654a41b04b6c0cce8f0001a667513447046e76fd0cb2`, the bytes pinned in
+`adoption/hooks/claude/SHA256SUMS`), with the hook's size limit; rerun after each correction round.
 
 | Class | Main | This change |
 | --- | ---: | ---: |
-| `environment_dump` | 262 | 91 |
+| `environment_dump` | 262 | 100 |
 | `dotenv_read` | 24 | 24 |
 | `interpreter_environment_unclassified` | 17 | 18 |
 | `secret_name_search` | 14 | 14 |
@@ -1876,19 +1879,22 @@ bytes as at `2f59d744` and at `703d588c`) and of this change, with the hook's si
 | `process_environment` | 4 | 4 |
 | `secret_variable_reference` | 3 | 2 |
 | six other classes (one or two each) | 8 | 8 |
-| **All refusals** | **359** | **188** |
+| **All refusals** | **359** | **197** |
 
-No command that main allowed is refused. 171 commands main refused now pass: 161 here-document bodies (the `set`,
+No command that main allowed is refused. 162 commands main refused now pass: 152 here-document bodies (the `set`,
 `env` and `export` words of Python and JavaScript code read as shell commands), 9 `env --help` or `--version`
 calls, and one Python string literal naming the key runner's usage, with no invocation. One refusal changes reason,
 from `environment_dump` to `interpreter_environment_unclassified`. No command in the window was a literal pointer
 presence check; its two pointer checks name the pointer through a loop variable (`printenv $v`), which still
-refuses. The 91 remaining `environment_dump` refusals: 70 here-documents outside L2 and L3 (49 files a `cat` writes
-and 8 data-method literals, both withdrawn above, and 13 other shapes: interpreters named by a variable, unquoted
+refuses. The 100 remaining `environment_dump` refusals: 79 here-documents outside L2 and L3 (49 files a `cat` writes
+and 8 data-method literals, both withdrawn above, 9 whose interpreter or `timeout` the request could rebind or names
+by a path, condition (6), and 13 other shapes: interpreters named by a variable, unquoted
 delimiters, pipe filters outside F's list, literal shapes, an interpreter here-document inside a `-c` string and a
 standalone `env` literal), 15 `env` piped into a filter (the guard does not judge filters), two such loop checks, one
 `printenv` of a variable that is not a pointer, one `env -i` with assignments only, and two inline programs that print
-the environment. The first version's replay (refusals 359 to 131) counted the two withdrawn exemptions. The replay
+the environment. Earlier replays are history: the first version's (refusals 359 to 131) counted the two withdrawn
+exemptions, and fix round 1's (359 to 188, the guard at `b7fc4819`) came before condition (6); fix round 2's guard at
+`59251ed6` gave the same 197 as this change. The replay
 record keeps both guards' bytes, the corpus and every verdict with a SHA256SUMS; the commands stay with the lane's
 private records, since they hold command text.
 

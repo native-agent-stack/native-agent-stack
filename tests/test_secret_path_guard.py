@@ -5762,6 +5762,15 @@ REBOUND_DISPATCHER_REFUSED = [
     ("a=PA; b=TH; export \"$a$b=/tmp/w\"; python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
     ("v=PA; w=TH; declare -n r=\"$v$w\"; r=/tmp/w; python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
 ]
+# Astra's fix2 delta read of #1048 at 59251ed6 (P1; the read's verdict, a private record cited by name): an operator is read from its
+# unquoted source spelling, and a separator ends any pending redirection target, so the command after it is read. The first two rows
+# are the read's; each also runs through the real hook.
+QUOTED_OPERATOR_REFUSED = [
+    ("e=ev; echo '>'; ${e}al 'python3() { bash; }'; python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+    ("e=ev; echo '<'; ${e}al 'python3() { bash; }'; python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+    ("e=ev; echo \\>; ${e}al 'python3() { bash; }'; python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+    ("e=ev; echo \">\"\n${e}al 'python3() { bash; }'; python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+]
 # Controls: without a rebinding an L2 body is code; a rebinding only withdraws the exemption (a clean body stays allowed).
 REBOUND_DISPATCHER_CONTROLS = [
     ("true; python3 - <<'PY'\nenv = {'a': 1}\nprint(env)\nPY\necho done", None),
@@ -5769,6 +5778,8 @@ REBOUND_DISPATCHER_CONTROLS = [
     ("hash -p /usr/bin/python3 python3; python3 - <<'PY'\nprint(1)\nPY\necho done", None),
     ("export LC_ALL=C X=\"$HOME/x\"; python3 - <<'PY'\nenv = {'a': 1}\nprint(env)\nPY\necho done", None),
     ("git commit -m 'fix f()'; echo export; python3 - <<'PY'\nenv = {'a': 1}\nprint(env)\nPY\necho done", None),
+    ("echo '()'; python3 - <<'PY'\nenv = {'a': 1}\nprint(env)\nPY\necho done", None),
+    ("echo '>' '|' ';' \\( \\); python3 - <<'PY'\nenv = {'a': 1}\nprint(env)\nPY\necho done", None),
 ]
 # RESERVED stays off inside SHELL-LITERAL readings: Python's conditional expression `a if b else set()` in a literal of Python source
 # would read, after the call's `)`, as the reserved word `else` and the segment `set` (the replay's one such command, 2026-10-12).
@@ -5828,9 +5839,16 @@ class GuardFalsePositiveRepairTests(unittest.TestCase):
                 self.assertEqual(guard.check(command), reason)
 
     def test_a_rebindable_dispatcher_keeps_the_base_readings(self):
-        for command, reason in REBOUND_DISPATCHER_REFUSED + REBOUND_DISPATCHER_CONTROLS:
+        for command, reason in REBOUND_DISPATCHER_REFUSED + QUOTED_OPERATOR_REFUSED + REBOUND_DISPATCHER_CONTROLS:
             with self.subTest(command=command):
                 self.assertEqual(guard.check(command), reason)
+
+    def test_a_quoted_operator_hides_no_command_from_the_hook(self):
+        for command, reason in QUOTED_OPERATOR_REFUSED:
+            with self.subTest(command=command):
+                refused = run_hook({"tool_name": "Bash", "tool_input": {"command": command}})
+                self.assertEqual(refused.returncode, 2)
+                self.assertIn(f"blocked ({reason})", refused.stderr)
 
     def test_reserved_stays_off_inside_literal_readings(self):
         for command in RESERVED_OFF_IN_LITERALS:

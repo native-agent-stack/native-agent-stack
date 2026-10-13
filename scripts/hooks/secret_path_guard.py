@@ -3930,7 +3930,7 @@ K4_L2_LEADERS = frozenset({"!", "{", "}", "if", "then", "elif", "else", "fi", "w
 # Linear under search() too (the guard's no-backtracking test): a name starts only after a non-name character, and neither run gives
 # characters back.
 K4_L2_ASSIGNMENT = re.compile(r"(?<![A-Za-z0-9_])[A-Za-z_][A-Za-z0-9_]*+(?:\[[^\][]*+\])?\+?=")
-K4_L2_OPERATOR_CHARACTERS = frozenset(";&|()<>")
+K4_L2_OPERATOR_CHARACTERS = frozenset(";&|()<>\n")
 K4_L2_REBOUND_NAME = re.compile(r"(?<![A-Za-z0-9_])(?:PATH|BASH_CMDS|BASH_ALIASES)(?![A-Za-z0-9_])")
 K4_L2_PREFIX = re.compile(r"(?:[ \t]*(?:[A-Za-z_][A-Za-z0-9_]*=[A-Za-z0-9_./:,+@%~-]*|timeout[ \t]+[0-9]+(?:\.[0-9]+)?[smhd]?)(?=[ \t]))*")
 def k4_redirections_after(segment: str) -> str:
@@ -4029,21 +4029,26 @@ def k4_code_bodies(command: str) -> list[tuple[str, int, int]]:
         masked = list(command)
         for _language, body_start, body_end in bodies:
             masked[body_start:body_end] = " " * (body_end - body_start)
-        # A function definition's `()` is two operator characters (a quoted `()` defines nothing), and an assignment builtin at a
-        # command position rebinds only through a name built at run time or a nameref (`-n`): `export NAME=value` cannot, and a
-        # literal PATH, BASH_CMDS or BASH_ALIASES is caught by name.
+        # An operator is read from its unquoted source spelling, never from a quote-removed value, since quoting removes a
+        # metacharacter's special meaning (bash(1) 5.3.9, Ubuntu bash 5.3-2ubuntu1, QUOTING, lines 483 and 500 of the installed manual
+        # in the lane's upstream capture), and a separator ends any pending redirection target (Astra's fix2 delta read of #1048 at
+        # 59251ed6, P1, a private record cited by name). A function definition's `()` is two operator characters
+        # (a quoted `()` defines nothing), and an assignment builtin at a command position rebinds only through a name built at run
+        # time or a nameref (`-n`): `export NAME=value` cannot, and a literal PATH, BASH_CMDS or BASH_ALIASES is caught by name.
+        text = "".join(masked)
         at_command, target, options, assigner, previous = True, False, False, False, ""
-        for word in k4_shell_words("".join(masked)):
-            operator = word != "" and set(word) <= K4_L2_OPERATOR_CHARACTERS
+        for word in k4_shell_words(text):
+            raw = text[word.start:word.end]
+            operator = raw != "" and set(raw) <= K4_L2_OPERATOR_CHARACTERS
             if word in K4_L2_REBINDERS or K4_L2_REBOUND_NAME.search(word) \
-                    or (operator and ("()" in word or word.startswith(")") and previous.endswith("("))):
+                    or (operator and ("()" in raw or raw.startswith(")") and previous.endswith("("))):
                 return []
-            previous = word if operator else ""
+            previous = raw if operator else ""
             if operator:
-                if "<" in word or ">" in word:
+                if "<" in raw or ">" in raw:
                     target = True  # the redirection's target word is no command
-                else:
-                    at_command, options, assigner = True, False, False
+                else:  # a separator ends any pending redirection target
+                    at_command, target, options, assigner = True, False, False, False
                 continue
             if target or isinstance(word, K4Descriptor):
                 target = False
