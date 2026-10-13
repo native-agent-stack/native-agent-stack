@@ -5222,8 +5222,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "49d5eafef424f1315816dd64462053fa81deaccca286b629a6db143156a051d0",
-      "bytes": 43775
+      "sha256": "c2298315123147ec18ee56f7af0dafa1a55a39c0a2fb828adb0dee8b02bfb0c3",
+      "bytes": 45356
     },
     {
       "path": ".gitignore",
@@ -61523,8 +61523,8 @@
     },
     {
       "path": "scripts/validate.py",
-      "sha256": "0c8e2b5f9ad14b3632771ad69fcebf0230da5e771197eeb25f14a55a18a73a1d",
-      "bytes": 49112
+      "sha256": "a68c189c56bef41b0d3d8a5069920e15db45249818054c444988abad1e8f8477",
+      "bytes": 49157
     },
     {
       "path": "scripts/validate_catalogs.py",
@@ -63018,8 +63018,8 @@
     },
     {
       "path": "tests/test_registry_rows.py",
-      "sha256": "1e06f793e5bfd885a65273b386c61b96026f7bf0595587e435f431d0524ed55f",
-      "bytes": 16466
+      "sha256": "3340ea4838b9eff094cb7a91afac4abdf727f4f8fc8f850f14658623d9eaff92",
+      "bytes": 20860
     },
     {
       "path": "tests/test_release_pin_contents.py",

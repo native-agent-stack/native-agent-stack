@@ -208,6 +208,7 @@ class RegistryRowsTests(unittest.TestCase):
                 row[field] = "0" * 64 if field == "sha256" else row[field] + 1
                 manifest.write_text(json.dumps(document, indent=2) + "\n")
                 self.commit()
+
                 # Bare publication validation sees repaired working bytes; only
                 # the new committed-head rule can reject this fixture.
                 manifest.write_text(valid)
@@ -215,6 +216,14 @@ class RegistryRowsTests(unittest.TestCase):
                 with self.assertRaisesRegex(InvalidPublication, "mismatch at Git head"):
                     validate_registration_rows(self.root, self.base)
                 self.commit()
+
+    def test_invalid_current_manifest_keeps_its_commit_and_path_diagnostic(self):
+        manifest = self.root / "manifests/evidence.json"
+        manifest.write_text("invalid current JSON")
+        current = self.commit()
+        with self.assertRaisesRegex(
+                InvalidPublication, current + ":manifests/evidence.json: invalid current registration manifest"):
+            validate_registration_rows(self.root, self.base)
 
     def test_removing_the_continuity_rule_is_caught_by_the_existing_missing_row_case(self):
         from unittest import mock
@@ -233,6 +242,57 @@ class RegistryRowsTests(unittest.TestCase):
 
 
 class RegistryWorkflowTests(unittest.TestCase):
+    def test_private_history_fetch_authentication_is_command_scoped_and_never_persisted(self):
+        import base64
+        import hashlib
+        import shutil
+        from tests.test_workflow_policy import load_workflow
+
+        workflow = load_workflow((ROOT / ".github/workflows/validate.yml").read_text())
+        step = next(step for step in workflow["jobs"]["validate"]["steps"]
+                    if step.get("id") == "registry_history")
+        fake_token = "fixture-read-only-job-token"
+        expected = "AUTHORIZATION: basic " + base64.b64encode(
+            ("x-access-token:" + fake_token).encode()).decode()
+        with tempfile.TemporaryDirectory(dir="/var/tmp") as directory:
+            root = Path(directory)
+            real_git = shutil.which("git")
+            subprocess.run([real_git, "init", "-q", str(root)], check=True)
+            config = root / ".git/config"
+            original = hashlib.sha256(config.read_bytes()).hexdigest()
+            (root / "gh").write_text("#!/bin/bash\nprintf '%s\\n' '" + "a" * 40 + "'\n")
+            # Exercise actual Git's environment config reader under the stubbed
+            # fetch boundary; no real token, private repository or network.
+            (root / "git").write_text(
+                "#!" + sys.executable + "\n"
+                "import os, subprocess, sys\n"
+                "assert sys.argv[1:4] == ['fetch', '--no-tags', 'origin']\n"
+                "result = subprocess.run([" + repr(real_git) +
+                ", 'config', '--get', 'http.https://github.com/.extraheader'], "
+                "capture_output=True, text=True)\n"
+                "if result.returncode or result.stdout.strip() != " + repr(expected) + ":\n"
+                "    print('fixture private fetch refused unauthenticated request', file=sys.stderr)\n"
+                "    sys.exit(3)\n"
+                "assert os.environ['GIT_CONFIG_COUNT'] == '1'\n"
+                "assert all(" + repr(fake_token) + " not in arg for arg in sys.argv)\n")
+            for name in ("gh", "git"):
+                (root / name).chmod(0o700)
+            output = root / "output"
+            environment = {"PATH": str(root) + ":" + os.defpath,
+                           "GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_NOSYSTEM": "1",
+                           "GH_TOKEN": fake_token, "PR_HISTORY_REPOSITORY": "fixture/private",
+                           "PR_HISTORY_NUMBER": "1", "REGISTRATION_BEFORE": "",
+                           "GITHUB_OUTPUT": str(output)}
+            result = subprocess.run(["bash", "-e", "-c", step["run"]], cwd=root, env=environment,
+                                    capture_output=True, text=True, timeout=30)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertEqual(hashlib.sha256(config.read_bytes()).hexdigest(), original)
+            self.assertNotIn(fake_token, result.stdout + result.stderr + output.read_text())
+            probe = subprocess.run([real_git, "config", "--get", "http.https://github.com/.extraheader"],
+                                   cwd=root, env={"PATH": os.defpath, "GIT_CONFIG_GLOBAL": os.devnull,
+                                                  "GIT_CONFIG_NOSYSTEM": "1"}, capture_output=True)
+            self.assertEqual(probe.returncode, 1, "authentication leaked past the fetch command")
+
     def test_timeline_reads_have_only_the_needed_read_permissions(self):
         from tests.test_workflow_policy import load_workflow
 
@@ -280,12 +340,14 @@ class RegistryWorkflowTests(unittest.TestCase):
         step = next(step for step in workflow["jobs"]["validate"]["steps"]
                     if step.get("id") == "registry_history")
         before, first, second = "d" * 40, "a" * 40, "b" * 40
-        for mode in ("complete", "partial", "null", "git-failure"):
+        for mode in ("complete", "partial", "null", "empty-timeline", "trailing-null", "git-failure"):
             with self.subTest(mode=mode), tempfile.TemporaryDirectory(dir="/var/tmp") as directory:
                 root = Path(directory)
                 (root / "gh").write_text(
                     "#!/bin/bash\n"
-                    "if [[ $FIXTURE_MODE == null ]]; then echo null; exit 0; fi\n"
+                    "if [[ $FIXTURE_MODE == null ]]; then printf '\\n'; exit 0; fi\n"
+                    "if [[ $FIXTURE_MODE == empty-timeline ]]; then exit 0; fi\n"
+                    f"if [[ $FIXTURE_MODE == trailing-null ]]; then printf '%s\\n' '{first}' '' '{second}' ''; exit 0; fi\n"
                     f"printf '%s\\n' '{first}' '{second}'\n"
                     "if [[ $FIXTURE_MODE == partial ]]; then exit 2; fi\n")
                 (root / "git").write_text(
@@ -296,20 +358,24 @@ class RegistryWorkflowTests(unittest.TestCase):
                     (root / name).chmod(0o700)
                 output, fetches = root / "output", root / "fetches"
                 environment = {"PATH": str(root) + ":" + os.defpath,
+                               "GH_TOKEN": "fixture-read-only-job-token",
                                "PR_HISTORY_REPOSITORY": "fixture/repository", "PR_HISTORY_NUMBER": "1",
                                "REGISTRATION_BEFORE": before, "GITHUB_OUTPUT": str(output),
                                "FIXTURE_MODE": mode, "FIXTURE_FETCHES": str(fetches)}
                 result = subprocess.run(["bash", "-e", "-c", step["run"]], cwd=root,
                                         env=environment, capture_output=True, text=True, timeout=30)
-                if mode in ("complete", "null"):
+                if mode in ("complete", "null", "empty-timeline", "trailing-null"):
                     self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-                    expected = (before, first, second) if mode == "complete" else (before,)
+                    expected = (before, first, second) if mode in ("complete", "trailing-null") else (before,)
                     self.assertEqual(output.read_text(), "before_refs=" + " ".join(expected) + "\n")
                     self.assertEqual(fetches.read_text().splitlines(),
                                      [f"fetch --no-tags origin {ref}" for ref in expected])
-                    if mode == "null":
-                        self.assertIn("skipped inaccessible null historical timeline commit", result.stderr)
-                    self.assertIn("timeline nodes: " + ("2" if mode == "complete" else "1"), result.stdout)
+                    if mode in ("null", "trailing-null"):
+                        self.assertIn("skipped inaccessible empty historical timeline node", result.stderr)
+                    else:
+                        self.assertNotIn("skipped inaccessible empty historical timeline node", result.stderr)
+                    count = {"complete": 2, "null": 1, "empty-timeline": 0, "trailing-null": 4}[mode]
+                    self.assertIn("timeline nodes: " + str(count), result.stdout)
                 else:
                     self.assertNotEqual(result.returncode, 0)
                     self.assertFalse(output.exists(), "never publish partial registration inputs")

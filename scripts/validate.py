@@ -797,6 +797,8 @@ def validate_registration_rows(root: Path, base_ref: str, *, before_ref: str | N
                 errors.append(f"{name}: SHA-256 mismatch at Git head")
             if type(row.get("bytes")) is not int or row["bytes"] != len(raw):
                 errors.append(f"{name}: byte count mismatch at Git head")
+    except InvalidPublication:
+        raise
     except (OSError, subprocess.SubprocessError, ValueError, KeyError, TypeError):
         raise InvalidPublication("PR registration Git inputs unavailable or invalid") from None
     if errors:
