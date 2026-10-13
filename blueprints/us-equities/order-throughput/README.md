@@ -1,5 +1,10 @@
 # Paper execution-capacity harness
 
+The default-off [exploratory probe modes](probe-modes.md) add place-only and
+first-429 onset measurements. They remain paper-only, preserve ordinary defaults
+and are not capacity qualification or strategy trades. No native run of those
+new modes is claimed until its separately authorized account gap and receipts.
+
 This harness checks one thing: how many order actions per minute an Alpaca
 **paper** account can sustain under the broker's rate limit. Every order's state
 must also be observed on the `trade_updates` websocket, and the broker's own

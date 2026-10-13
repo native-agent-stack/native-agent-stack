@@ -38,7 +38,7 @@
   "blueprints/us-equities/adaptive-paper/simulation.py": "0119e0efe3b498be3c415eee9c1a0be922c9b5b17e3b774aa7528668c4eb0b30",
   "blueprints/us-equities/adaptive-paper/strategies.py": "2d488a4fdd21ad323ab07cf7fb147b3623fd6e38951abcf2fc59cf8094a1383e",
   "blueprints/us-equities/adaptive-paper/strategies_v1.py": "515b0aa581b418879736cf7467154000aebef63827c991147cfcd4ecb552f985",
-  "blueprints/us-equities/adaptive-paper/transport.py": "14f30b03548bde1bdb3330db95eeb8565b1970152967c7b0f877036f80a98257",
+  "blueprints/us-equities/adaptive-paper/transport.py": "7ed343e5b263500ddc2ac3160945598fa2400229a2b6a9373cff8a0657fe27a4",
   "tests/_credential_mutation_driver.py": "bfe35e69702016718452ed702aab20a0a33da5723e28a61de513b3c268849301",
   "tests/adaptive_paper_hermetic.py": "ee3fe5d3f97143e9361281f2c4d95076b758ec8d245a942bd7470412673558cd",
   "tests/fixtures/adaptive_paper_citations/asset-attributes.json": "89b5ac4e7cb4c9d040f80159bbe689c2ac98777cfafdacde57aa7f477a41784d",

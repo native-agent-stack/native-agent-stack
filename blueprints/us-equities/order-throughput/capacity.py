@@ -121,6 +121,8 @@ class CapacityConfig:
     target_actions_ratio: float = 0.85
     required_windows: int = 5
     base_url: str = PAPER_URL
+    place_only: bool = False
+    probe_limit: bool = False
 
     def validate(self):
         if self.base_url != PAPER_URL:
@@ -132,6 +134,8 @@ class CapacityConfig:
                   "max_consecutive_rejections": (1, 1000), "inflight": (1, 16),
                   "acknowledged_positions": (0, 1000), "acknowledged_open_orders": (0, 1000),
                   "required_windows": (1, 60)}
+        if self.place_only:
+            bounds["max_open_orders"] = (1, 300)
         for name, (low, high) in bounds.items():
             value = getattr(self, name)
             if type(value) is not int or not low <= value <= high:
@@ -147,16 +151,27 @@ class CapacityConfig:
                 raise HarnessRefusal(name + "_out_of_bounds")
         if self.burst is not None and (type(self.burst) is not int or not 1 <= self.burst <= 200):
             raise HarnessRefusal("burst_out_of_bounds")
-        for name in ("allow_extended_hours", "allow_cancel_all"):
+        for name in ("allow_extended_hours", "allow_cancel_all", "place_only", "probe_limit"):
             if type(getattr(self, name)) is not bool:
                 raise HarnessRefusal(name + "_must_be_boolean")
         order_cap = _positive_decimal(self.max_order_notional_usd, "max_order_notional_usd")
         open_cap = _positive_decimal(self.max_open_notional_usd, "max_open_notional_usd")
-        if order_cap > Decimal("10000") or open_cap > Decimal("100000") or order_cap > open_cap:
+        open_ceiling = Decimal("300000") if self.place_only else Decimal("100000")
+        if order_cap > Decimal("10000") or open_cap > open_ceiling or order_cap > open_cap:
             raise HarnessRefusal("notional_cap_out_of_bounds")
+        if self.place_only and (self.qty != 1 or self.acknowledged_positions or self.acknowledged_open_orders):
+            raise HarnessRefusal("place_only_requires_flat_one_share_probe")
+        if self.place_only and self.max_duration_seconds > 90:
+            raise HarnessRefusal("place_only_rung_duration_exceeds_90s")
+        if self.probe_limit and (self.configured_cap_per_minute > 250 or self.max_duration_seconds > 90 or self.qty != 1):
+            raise HarnessRefusal("probe_limit_exceeds_bounded_250_rung")
 
     def public(self):
-        return asdict(self)
+        result = asdict(self)
+        for flag in ("place_only", "probe_limit"):
+            if not result[flag]:
+                result.pop(flag)
+        return result
 
 
 @dataclass
@@ -231,10 +246,10 @@ def percentile(values, pct):
     return ordered[rank - 1]
 
 
-def _latency_summary(seconds):
+def _latency_summary(seconds, *, probe=False):
     millis = [value * 1000.0 for value in seconds]
     result = {"count": len(millis)}
-    for pct in (50, 95, 99):
+    for pct in ((50, 90, 95, 99) if probe else (50, 95, 99)):
         value = percentile(millis, pct)
         result["p%d_ms" % pct] = None if value is None else round(value, 3)
     result["max_ms"] = round(max(millis), 3) if millis else None
@@ -439,6 +454,7 @@ class CapacityRun:
         self._quote_future = None
         self._cancel_queue = []
         self._stop_reason = None
+        self._probe_first_429 = None
         self._health = set()
         self._stream_started = False
         self._broker_seen = set()
@@ -553,6 +569,8 @@ class CapacityRun:
             self._schedule_cancel(probe)
 
     def _schedule_cancel(self, probe):
+        if self.config.place_only and self.mode != "recover":
+            return
         if (probe.terminal or probe.order_id is None or probe.cancel_attempts >= MAX_CANCEL_ATTEMPTS
                 or probe.cancel_state in ("queued", "sent", "acknowledged")):
             return
@@ -565,6 +583,13 @@ class CapacityRun:
                                "headers": dict(response.headers or {}), "phase": phase})
         if response.origin == "trading" and not response.not_sent:
             self.governor.on_response(kind, response.status, response.headers, inflight=len(self._inflight))
+            if self.config.probe_limit and phase == "run" and response.status == 429 and self._probe_first_429 is None:
+                headers = {str(k).lower(): v for k, v in (response.headers or {}).items()}
+                safe = {k: str(headers[k]) for k in ("x-ratelimit-limit", "x-ratelimit-remaining", "x-ratelimit-reset", "retry-after")
+                        if k in headers and len(str(headers[k])) <= 128}
+                self._probe_first_429 = {"status": 429, "kind": kind, "phase": phase,
+                                         "at_monotonic": self.clock.monotonic(), "headers": safe}
+                self._stop_reason = "probe_first_http_429"
 
     def _timed(self, fn, *args):
         """Runs on a REST worker: the completion time is stamped there, not at collection."""
@@ -755,7 +780,8 @@ class CapacityRun:
         if not limits:
             raise HarnessRefusal("trading_rate_limit_header_unobserved")
         self.governor = RateGovernor(self.config.configured_cap_per_minute, headroom=self.config.headroom,
-                                     burst=self.config.burst, clock=self.clock.monotonic, wall=self.clock.time)
+                                     burst=self.config.burst, clock=self.clock.monotonic, wall=self.clock.time,
+                                     probe_limit=self.config.probe_limit and self.mode == "run")
         # The market-data origin reports its own, unrelated limit; only trading headers count.
         self.governor.observe_limit(limits[-1])
         self.governor.note_external_calls(len(trading))
@@ -866,6 +892,8 @@ class CapacityRun:
         return None
 
     def _may_submit(self):
+        if self.config.probe_limit and self._inflight:
+            return False
         if len(self.probes) >= self.config.max_orders or len(self._inflight) >= self.config.inflight:
             return False
         if len(self._live) >= self.config.max_open_orders:
@@ -912,7 +940,8 @@ class CapacityRun:
             progressed = False
             if self._cancel_queue:
                 # Cancels always take priority over new submits.
-                if len(self._inflight) < self.config.inflight and self.governor.try_acquire("cancel"):
+                maximum = 1 if self.config.probe_limit else self.config.inflight
+                if len(self._inflight) < maximum and self.governor.try_acquire("cancel"):
                     progressed = self._cancel_one()
             elif not self._health and self._may_submit() and self.governor.try_acquire("submit"):
                 self._submit_one()
@@ -1028,6 +1057,25 @@ class CapacityRun:
 
         step(self._wait_inflight, deadline)
         step(self._drain_events)
+        if self.config.probe_limit:
+            # Honour the broker's already recorded429 freeze; restore normal
+            # observed-header/headroom admission for every management request.
+            self.governor.probe_limit = False
+            self.governor.tokens = min(self.governor.tokens, self.governor.capacity)
+        if self.config.place_only and self.mode != "recover":
+            # One native DELETE /v2/orders, only after the existing complete
+            # prefix-ownership guard. No hidden individual-cancel fallback.
+            step(self._cancel_all_guarded, deadline, result)
+            step(self._settle_stream, deadline)
+            listing = step(self._list_open, deadline, "cleanup_verification")
+            orders, complete = listing if listing is not None else (None, False)
+            result.update(verification_rounds=1,
+                          open_listing_complete=orders is not None and bool(complete),
+                          open_harness_orders_after=None if orders is None else len(orders),
+                          verified_zero_open=orders is not None and bool(complete) and not orders,
+                          seconds=round(self.clock.monotonic() - start, 3))
+            self.cleanup = result
+            return
         # 0) Cancel-all only when enabled AND the guard proves no foreign open order exists.
         if self.config.allow_cancel_all and self._live and self.mode != "recover":
             step(self._cancel_all_guarded, deadline, result)
@@ -1213,6 +1261,18 @@ class CapacityRun:
         if self.journal is None:
             return
         try:
+            if self.config.place_only or self.config.probe_limit:
+                # Flagged measurement-only rows retain the samples needed to
+                # independently compute p90, without account/broker order IDs.
+                for probe in self.probes.values():
+                    sample = {"type": "probe_latency", "seq": probe.seq}
+                    for name, at in (("submit_rest_ack_ms", probe.rest_at),
+                                     ("submit_to_stream_ack_ms", probe.stream_ack_at),
+                                     ("submit_to_stream_terminal_ms", probe.terminal_at)):
+                        sample[name] = None if at is None or probe.sent_at is None else (at - probe.sent_at) * 1000.0
+                    self.journal.write(sample)
+                if self._probe_first_429:
+                    self.journal.write({"type": "probe_first_429", **self._probe_first_429})
             self.journal.write({"type": "end", "status": self.status,
                                 "verified_zero_open": bool(self.cleanup.get("verified_zero_open")),
                                 "probes": len(self.probes)}, sync=True)
@@ -1308,6 +1368,9 @@ class CapacityRun:
             index = int((action["t"] - self.t0) // 60)
             row = windows.setdefault(index, blank(index))
             kind = action["kind"]
+            if self.config.place_only and kind == "cancel_all":
+                row["cancel_all_requests"] = row.get("cancel_all_requests", 0) + 1
+                continue
             if kind == "read":
                 row["reads"] += 1
                 continue
@@ -1417,13 +1480,16 @@ class CapacityRun:
         if not acceptance["evidence_class_qualifies"]:
             blockers.append("evidence_class_not_native_paper")
         acceptance["passed"] = not blockers
+        if self.config.place_only or self.config.probe_limit:
+            blockers.append("exploratory_probe_not_capacity_qualification")
+            acceptance["passed"] = False
         acceptance["passed_blockers"] = blockers
         acceptance["passed_is_self_reported"] = True
         acceptance["independent_observation_required"] = (
             "Native acceptance also needs an observation by a separate method, e.g. the Alpaca dashboard or "
             "account-activity export for this prefix, checked against the receipt counts.")
         governor = self.governor.summary() if self.governor else None
-        return {
+        result = {
             "schema_version": 1,
             "harness": HARNESS_VERSION,
             "evidence_class": getattr(self.port, "evidence_class", "unknown"),
@@ -1466,9 +1532,9 @@ class CapacityRun:
                        "rest_rejections": dict(sorted(self.rejections.items())),
                        "cancel_requests": sum(p.cancel_attempts for p in self.probes.values()),
                        "unexpected_fill_qty": str(self.unexpected_fill_qty)},
-            "latency": {"submit_rest_ack": _latency_summary(rest_latency),
-                        "submit_to_stream_ack": _latency_summary(ack_latency),
-                        "submit_to_stream_terminal": _latency_summary(terminal_latency)},
+            "latency": {"submit_rest_ack": _latency_summary(rest_latency, probe=self.config.place_only or self.config.probe_limit),
+                        "submit_to_stream_ack": _latency_summary(ack_latency, probe=self.config.place_only or self.config.probe_limit),
+                        "submit_to_stream_terminal": _latency_summary(terminal_latency, probe=self.config.place_only or self.config.probe_limit)},
             "throughput": {"submission_phase_seconds": round(duration, 3),
                            "order_actions_in_phase": in_phase,
                            "order_actions_attempted_in_phase": len(phase_actions),
@@ -1486,6 +1552,14 @@ class CapacityRun:
             "reconciliation": self.reconciliation,
             "acceptance": acceptance,
         }
+        if self.config.place_only or self.config.probe_limit:
+            result["probe_modes"] = {"place_only": self.config.place_only,
+                                     "probe_limit": self.config.probe_limit,
+                                     "qualification": False,
+                                     "requested_requests_per_minute": self.config.configured_cap_per_minute,
+                                     "effective_trading_inflight": 1 if self.config.probe_limit else self.config.inflight,
+                                     "first_429": self._probe_first_429}
+        return result
 
 
 # -- CLI --------------------------------------------------------------------------
@@ -1540,6 +1614,10 @@ def build_parser():
     parser.add_argument("--no-extended-hours", action="store_true")
     parser.add_argument("--allow-cancel-all", action="store_true",
                         help="permit DELETE /v2/orders only when cancel_all_guard proves no foreign open orders")
+    parser.add_argument("--place-only", action="store_true",
+                        help="exploratory: retain probes until one guarded cancel-all at rung end")
+    parser.add_argument("--probe-limit", action="store_true",
+                        help="exploratory paper-only: target configured rate beyond header; stop at first429")
     parser.add_argument("--acknowledge-positions", type=int, default=0,
                         help="exact count of existing nonzero positions the operator accepts")
     parser.add_argument("--acknowledge-open-orders", type=int, default=0,
@@ -1559,7 +1637,7 @@ def config_from_args(args):
                           max_order_notional_usd=args.max_order_notional,
                           max_open_notional_usd=args.max_open_notional, inflight=args.inflight,
                           allow_extended_hours=not args.no_extended_hours,
-                          allow_cancel_all=args.allow_cancel_all,
+                          allow_cancel_all=args.allow_cancel_all, place_only=args.place_only, probe_limit=args.probe_limit,
                           acknowledged_positions=args.acknowledge_positions,
                           acknowledged_open_orders=args.acknowledge_open_orders,
                           required_windows=args.required_windows,
@@ -1580,6 +1658,8 @@ def main(argv=None):
     parser = build_parser()
     raw_argv = list(sys.argv[1:] if argv is None else argv)
     args = parser.parse_args(raw_argv)
+    if args.command in ("recover", "audit") and (args.place_only or args.probe_limit):
+        parser.error("exploratory flags are only for paper/offline rungs; recovery retains safe admission")
     config = config_from_args(args)
     from runner import save  # adaptive-paper: atomic 0600 JSON write
     if args.command == "offline":
@@ -1603,7 +1683,8 @@ def main(argv=None):
         if base is not None:
             config.base_url = base  # CapacityConfig.validate refuses it before any request
         from alpaca_capacity_port import AlpacaCapacityPort
-        port = AlpacaCapacityPort(key, secret, config.symbol, feed=args.feed, workers=config.inflight)
+        port = AlpacaCapacityPort(key, secret, config.symbol, feed=args.feed, workers=config.inflight,
+                                 place_only=config.place_only)
         journal = args.journal
         if args.command == "paper" and journal is None:
             journal = args.output.with_suffix(".journal.jsonl")

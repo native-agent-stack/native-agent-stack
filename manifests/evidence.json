@@ -16533,13 +16533,28 @@
     },
     {
       "path": "blueprints/us-equities/order-throughput/README.md",
-      "sha256": "2566538eb7fcdca0ed08f2177c8da75c1127c221a32e30498f7553ca3cd2fda1",
-      "bytes": 26070
+      "sha256": "81f4e6b14e2ea37421f141570a12f8e23fc8769d4d05f56232c7a8d0066a11e8",
+      "bytes": 26386
+    },
+    {
+      "path": "blueprints/us-equities/order-throughput/alpaca_capacity_port.py",
+      "sha256": "51980c152f19d0e9d2b889db56ca95d9854ffc913b2505d5cfbcfd24087e7d68",
+      "bytes": 15344
     },
     {
       "path": "blueprints/us-equities/order-throughput/capacity.py",
-      "sha256": "ae22572ba814f2c561ea7bd4ee8c13611881098932ad448100b0fd000136b3f5",
-      "bytes": 82333
+      "sha256": "7fe2d21e075539dc9b906b3885ceabaef29a73bfd97f2e3e34d61ddde0301ab1",
+      "bytes": 88251
+    },
+    {
+      "path": "blueprints/us-equities/order-throughput/probe-modes.md",
+      "sha256": "5616e6d4582be049dd4256d2b71702b3b447f6c1dafad7e8d8fdf5a3d6572bc9",
+      "bytes": 6585
+    },
+    {
+      "path": "blueprints/us-equities/order-throughput/rate_governor.py",
+      "sha256": "807827cc431e7f5c30a785d361d4a8651daedbb73e46242d33101df600a3211a",
+      "bytes": 12253
     },
     {
       "path": "blueprints/us-equities/order-throughput/rate_limit_evidence.py",
@@ -62195,6 +62210,11 @@
       "path": "tests/test_capability_gate.py",
       "sha256": "60252de360d48a773ce32165f8eb0ab2e8e9f166d052bce280db54b68b0102ae",
       "bytes": 38580
+    },
+    {
+      "path": "tests/test_capacity_probe_modes.py",
+      "sha256": "e866fa4ae8bf7d5ca5c531af6e3feaf6f9f021a5e5387945c13518eca03dc9d8",
+      "bytes": 12750
     },
     {
       "path": "tests/test_catalog_decisions.py",

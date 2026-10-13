@@ -67,7 +67,7 @@ def retry_after_seconds(value, now_wall):
 
 class RateGovernor:
     def __init__(self, configured_cap, *, headroom=0.9, burst=None, clock=time.monotonic,
-                 wall=time.time, max_backoff=60.0):
+                 wall=time.time, max_backoff=60.0, probe_limit=False):
         if type(configured_cap) is not int or not 1 <= configured_cap <= MAX_CONFIGURED_CAP:
             raise GovernorError("configured_cap_out_of_bounds")
         if (type(headroom) not in (int, float) or not math.isfinite(headroom)
@@ -78,6 +78,9 @@ class RateGovernor:
         if not 1.0 <= float(max_backoff) <= 600.0:
             raise GovernorError("max_backoff_out_of_bounds")
         self.configured_cap = configured_cap
+        if type(probe_limit) is not bool:
+            raise GovernorError("probe_limit_must_be_boolean")
+        self.probe_limit = probe_limit
         self.headroom = float(headroom)
         self.burst = burst
         self.clock, self.wall = clock, wall
@@ -102,14 +105,14 @@ class RateGovernor:
     def effective_limit(self):
         if self.observed_limit is None:
             return None
-        return min(self.configured_cap, self.observed_limit)
+        return self.configured_cap if self.probe_limit else min(self.configured_cap, self.observed_limit)
 
     @property
     def budget(self):
         limit = self.effective_limit
         if limit is None:
             return None
-        return max(1, math.floor(limit * self.headroom))
+        return limit if self.probe_limit else max(1, math.floor(limit * self.headroom))
 
     @property
     def reserve(self):
@@ -120,7 +123,7 @@ class RateGovernor:
     def capacity(self):
         if self.budget is None:
             return 0
-        return float(self.burst if self.burst is not None else max(1, self.budget // 20))
+        return 1.0 if self.probe_limit else float(self.burst if self.burst is not None else max(1, self.budget // 20))
 
     @property
     def rate_per_second(self):
@@ -165,6 +168,11 @@ class RateGovernor:
             self._sent.popleft()
 
     def _server_exhausted(self):
+        # Explicit exploratory admission only. Header observations/backoff are
+        # still recorded; the harness stops on the first429 and switches this
+        # flag off before cleanup. Ordinary callers never enter this branch.
+        if self.probe_limit:
+            return False
         if self.remaining is None or self.reset_wall is None:
             return False
         if self.wall() >= self.reset_wall:
