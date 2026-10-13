@@ -13417,6 +13417,11 @@
       "bytes": 15781
     },
     {
+      "path": "blueprints/us-equities/adaptive-paper/overnight-guard-pins-validation.json",
+      "sha256": "6c882ece5599fe809046124a6c0b29ce54abdcf8a42cac93f839dd47a97d87a5",
+      "bytes": 4831
+    },
+    {
       "path": "blueprints/us-equities/adaptive-paper/overnight.py",
       "sha256": "f52eabbf188b4cbd5f56ae139a2d916bddd1de142cf7a74eeba4b77cb30f63ba",
       "bytes": 8212
@@ -13513,8 +13518,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "0cfcb50d95eaebfe2c99784cbcba6d4ca01807e057e19c3919a438b02053c8eb",
-      "bytes": 10247
+      "sha256": "4f9d0ed81f9f7c46037dce620c3d064bc0b6e5aa16e37343e09a188f2fb57d53",
+      "bytes": 10370
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/strategies.py",
@@ -62000,6 +62005,11 @@
       "path": "tests/test_adaptive_paper_overnight_guard_mutations.py",
       "sha256": "ea526b0119708daa2047d16abaf1d8eb6cc37d06ae3ffeae3b687a3c3df3746d",
       "bytes": 11076
+    },
+    {
+      "path": "tests/test_adaptive_paper_overnight_guard_pins.py",
+      "sha256": "eaab736bb6bd9c6a6ffdd5dae076b4f71af5155808db77fecce12d4f0e316aad",
+      "bytes": 24003
     },
     {
       "path": "tests/test_adaptive_paper_overnight_order_contract.py",
