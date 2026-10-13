@@ -13087,6 +13087,11 @@
       "bytes": 14691
     },
     {
+      "path": "blueprints/us-equities/adaptive-paper/README-overnight-acceptance.md",
+      "sha256": "f62e17bcf5a31b28088921939f98a8aa1a2250a086bd4c5e211ec7f5af1bdd32",
+      "bytes": 3820
+    },
+    {
       "path": "blueprints/us-equities/adaptive-paper/README-overnight.md",
       "sha256": "2d3bd67ef05fcf9ba10f57a3bc97e03d7a10e0096d2489a4dc6fa1b2a3b30d0d",
       "bytes": 18813
@@ -19110,6 +19115,11 @@
       "path": "docs/decisions/2026-10-13-lane-a-frozen-field-continuity.md",
       "sha256": "4da74df3105b3e30d5408e17c15cc0b369c9feac2e7391f404b1e1669e55a073",
       "bytes": 5792
+    },
+    {
+      "path": "docs/decisions/2026-10-13-lane-a-overnight-acceptance.md",
+      "sha256": "a30d261737a42162da64c4fdc7c330e064e99954a18d9628a159fec59b55288a",
+      "bytes": 3159
     },
     {
       "path": "docs/decisions/2026-10-13-overnight-rest-arming.md",
@@ -37890,6 +37900,16 @@
       "path": "evidence/artifacts/landscape-sweep-20261009-pine/s7cret-backtest-engine.json",
       "sha256": "b49a2055540b21e281f5a8ee58ae422b10a86ac00895a511c9f22f72ad767567",
       "bytes": 1623
+    },
+    {
+      "path": "evidence/artifacts/lane-a-overnight-acceptance-20261013/alpaca-245-trading-excerpt.md",
+      "sha256": "b63371bfbb36cd5754bf1167bd1f7522f94b01ae994e63af123af52bc4586ffc",
+      "bytes": 1703
+    },
+    {
+      "path": "evidence/artifacts/lane-a-overnight-acceptance-20261013/validation.json",
+      "sha256": "dde50d08a954ff1944a3dd4855666382028a919d6aaf3f5fcde5808dc3bf2c89",
+      "bytes": 3379
     },
     {
       "path": "evidence/artifacts/layer-closure-assessment-20261001/README.md",
@@ -62270,6 +62290,11 @@
       "path": "tests/test_adaptive_paper_overnight.py",
       "sha256": "2985e2cfa01d743b418dad20f1c8440c76275f9b3121c78dcc917a8bb14c6846",
       "bytes": 19858
+    },
+    {
+      "path": "tests/test_adaptive_paper_overnight_acceptance.py",
+      "sha256": "7ec3a2d25b79b48678c8913a70cd691d4d49288167d1c35e41303b7b0de91799",
+      "bytes": 5870
     },
     {
       "path": "tests/test_adaptive_paper_overnight_arming.py",
