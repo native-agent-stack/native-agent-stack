@@ -1057,6 +1057,28 @@ def planned_result(**overrides):
     return value
 
 
+def planned_lens_result(refs=None):
+    """planned_result recorded with votes not_retained: each lane row's two lens votes, cited from the manifest's
+    lane_groupings row in the form derive_seed writes (#/<section>/<layer index>/candidates/<row>/...), refs
+    overridable by (row, lens)."""
+    refs = refs or {}
+    base = f"{PLANNED_MANIFEST_REF}#/lane_groupings/0/candidates"
+
+    def lens_votes(row, lens_refuted):
+        return [{"lens": lens, "vote": "refuted" if refuted else "not_refuted",
+                 "ref": refs.get((row, lens), f"{base}/{row}/adversarial_verification/votes/{lens}")}
+                for lens, refuted in enumerate(lens_refuted)]
+
+    value = planned_result()
+    fleet = value["layers"][0]
+    del fleet["discovery_ref"]
+    fleet.update(votes="not_retained", votes_note="per-vote returns not retained; votes are the manifest's lens flags",
+                 survived=[{"repo": FLEET_SURV, "source_review": PLANNED_REVIEW,
+                            "lens_votes": lens_votes(0, (False, False))}],
+                 refuted=[{"repo": FLEET_REF, "lens_votes": lens_votes(1, (False, True))}])
+    return value
+
+
 class PlannedLayerTests(FixtureCase):
     """The rows of catalogs/landscape/planned-layers.json in the scope, the report and the ledger: before this, a
     planned layer was 'not a layer in research-state.json', so no sweep could record it and scripts/final_stack.py's
@@ -1198,6 +1220,48 @@ class PlannedLayerTests(FixtureCase):
         # The lane_groupings row records FLEET_SURV as surviving, so the manifest refuses the record too.
         with self.assertRaisesRegex(sl.LedgerError, r"survival disagrees with the manifest"):
             sl.append(self.root, self.ledger(), hidden)
+
+    def test_a_planned_layers_lens_votes_bind_to_its_lane_groupings_row(self):
+        # Codex review of #1066 at 4b6019ca, P2: with votes not_retained, both lens votes cite the manifest, and a
+        # planned layer's lane rows sit in its lane_groupings row. LENS_POINTER named only the foundation and trading
+        # sections, so every such ref was "not a vote of this layer's manifest row" and --append refused the sweep.
+        ledger = self.appended(planned_lens_result())
+        self.assertEqual(sl.check_ledger(self.root, ledger), [])
+        fleet = ledger["sweeps"][0]["layers"][0]
+        self.assertEqual((fleet["planned"], fleet["votes"], fleet["known"], fleet["new"]),
+                         (True, "not_retained", [], [FLEET_SURV, FLEET_REF]))
+        # Exactly the form a lane row gives a lens vote; no other part of a grouping or the manifest.
+        for pointer in ("/lane_groupings/0/selected/0/adversarial_verification/votes/0",
+                        "/unmatched_lane_items/0/candidates/0/adversarial_verification/votes/0",
+                        "/lane_groupings/0/candidates/0/adversarial_verification/votes/0/refuted"):
+            self.assertIsNone(sl.LENS_POINTER.fullmatch(pointer), pointer)
+        # The forgery guards hold: a lens vote counts only in the row binding_layer locates, for the same lane and
+        # repository. Here a section row and another planned layer's row judge the same repositories in the same lane.
+        write(self.root, PLANNED_MANIFEST_REF, {
+            "checked_at": "2026-10-03", "trading": [],
+            "foundation": [{"layer": "alpha", "components": [],
+                            "candidates": [lane_candidate(FLEET_SURV, True), lane_candidate(FLEET_REF, False)]}],
+            "lane_groupings": [planned_grouping(), dict(planned_grouping(), layer="other")]})
+        register(self.root)
+        self.assertEqual(sl.check_ledger(self.root, self.appended(planned_lens_result())), [])
+        votes = f"{PLANNED_MANIFEST_REF}#/%s/candidates/%d/adversarial_verification/votes/0"
+        for name, ref, pattern in (
+                ("a section row", votes % ("foundation/0", 0), r"is not a vote of this layer's manifest row"),
+                ("another planned layer's row", votes % ("lane_groupings/1", 0),
+                 r"is not a vote of this layer's manifest row"),
+                ("another lane row of its own", votes % ("lane_groupings/0", 1),
+                 r"is a vote on a different candidate row")):
+            with self.subTest(case=name):
+                with self.assertRaisesRegex(sl.LedgerError, pattern):
+                    sl.append(self.root, self.ledger(), planned_lens_result({(0, 0): ref}))
+        # A landscape layer's lens vote never sits in a lane_groupings row, even one holding its own lane rows.
+        manifest = json.loads((self.root / MANIFEST).read_text(encoding="utf-8"))
+        manifest["lane_groupings"] = [planned_grouping(*manifest["foundation"][0]["candidates"])]
+        write(self.root, MANIFEST, manifest)
+        register(self.root)
+        with self.assertRaisesRegex(sl.LedgerError, r"is not a vote of this layer's manifest row"):
+            sl.append(self.root, self.ledger(), result(layers=[lens_layer(
+                {(0, 0): f"{MANIFEST}#/lane_groupings/0/candidates/0/adversarial_verification/votes/0"})]))
 
     def test_a_forged_planned_mark_without_a_lane_groupings_row_is_refused(self):
         # Claude review of #1066 at f6c4f475, F1 input B: --check validated only the mark's form, so a hand-written

@@ -1906,9 +1906,11 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
     for lane in lanes_doc.get("lanes", []):
         for layer in lane["result"].get("layers", []):
             reported_lanes[layer["layer_id"]].add(lane["lane"])
-    lane_grouping_layer_ids = sorted(
-        (set(cands) | set(gaps) | set(alts) | set(status_by_layer) | set(reported_lanes)) - known_layers
-    )
+    # The layers a lane item (candidate, gap, alternative or reviewed selection) names. Their rows are built from those
+    # items alone, byte for byte as before reported layers got rows; a gap names no lane, so a gap-only row keeps
+    # lane null. Only a reported layer with no item, a row these items never produced, names its reporting lanes.
+    item_layer_ids = set(cands) | set(gaps) | set(alts) | set(status_by_layer)
+    lane_grouping_layer_ids = sorted((item_layer_ids | set(reported_lanes)) - known_layers)
     for layer_id in lane_grouping_layer_ids:
         selected = []
         lane_names = set()
@@ -1948,7 +1950,7 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
             for item in source:
                 if item.get("lane"):
                     lane_names.add(item["lane"])
-        if not lane_names:  # an empty reported layer: name the lanes that reported it
+        if layer_id not in item_layer_ids:  # an empty reported layer: name the lanes that reported it
             lane_names = set(reported_lanes.get(layer_id, set()))
         manifest["lane_groupings"].append({
             "layer": layer_id,

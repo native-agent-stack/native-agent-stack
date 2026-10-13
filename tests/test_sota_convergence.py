@@ -5,6 +5,7 @@ package name) and skipped cleanly if a required stdlib module is unexpectedly
 absent from the interpreter under test.
 """
 import ast
+import hashlib
 import importlib.util
 import json
 import re
@@ -1474,6 +1475,55 @@ class LaneGroupingTests(unittest.TestCase):
         self.assertIn("layer-a", {r["layer"] for r in manifest["trading"]})
         # The non-empty groupings are unchanged by the empty one.
         self.assertEqual(groups["awesome-list-convergence"]["lane"], "beyond")
+
+    def test_a_non_empty_grouping_is_byte_identical_to_its_row_before_reported_layers_got_rows(self):
+        # GPT review of #1066 at 4b6019ca, P2: naming the reporting lanes whenever no item named a lane also changed an
+        # existing gap-only grouping (a gap names no lane) from lane null, contrary to the claim that non-empty
+        # groupings are byte-unchanged. Every kind of non-empty row, a gap-only row two lanes report included, must
+        # serialize as build_manifest.py at 1765a420, 4b6019ca's parent, wrote it.
+        def layer(layer_id, **items):
+            return {"layer_id": layer_id, "selected": [], "alternatives_keep_but_compare": [], "new_candidates": [],
+                    "open_gaps": [], **items}
+
+        def lane(name, *layers):
+            return {"lane": name, "result": {"calls": {}, "limits": [], "layers": list(layers)}, "proposals": []}
+
+        doc = {"critic": None, "lanes": [
+            lane("beyond",
+                 layer("gap-only", open_gaps=["needs evidence"]),
+                 layer("alternative-only", alternatives_keep_but_compare=[
+                     {"repository": "https://github.com/example/alt-only", "note": "compare"}]),
+                 layer("candidate-and-gap", open_gaps=["g"], new_candidates=[
+                     {"repository": "https://github.com/example/cand", "source": "s", "demonstrated_gap": "g",
+                      "proposed_label": "keep_but_compare", "comparison_that_would_overturn": "c", "evidence": []}]),
+                 layer("selected-only", selected=[{"repository": "https://github.com/example/sel",
+                                                   "status": "confirmed_default", "evidence": [], "note": None}])),
+            lane("second", layer("gap-only", open_gaps=["second lane gap"]))]}
+        self._lanes_doc = lambda: doc
+        expected = [
+            {"layer": "alternative-only", "lane": "beyond", "selected": [],
+             "alternatives_keep_but_compare": [{"repository": "https://github.com/example/alt-only", "note": "compare",
+                                                "lane": "beyond"}],
+             "candidates": [], "open_gaps": []},
+            {"layer": "candidate-and-gap", "lane": "beyond", "selected": [], "alternatives_keep_but_compare": [],
+             "candidates": [{"repository": "https://github.com/example/cand", "source": "s", "demonstrated_gap": "g",
+                             "proposed_label": "keep_but_compare", "comparison_that_would_overturn": "c",
+                             "evidence": [], "upstream_now": None,
+                             "adversarial_verification": {"survives": None, "votes": []},
+                             "disposition": "keep_but_compare_unverified", "lane": "beyond"}],
+             "open_gaps": ["g"]},
+            {"layer": "gap-only", "lane": None, "selected": [], "alternatives_keep_but_compare": [], "candidates": [],
+             "open_gaps": ["needs evidence", "second lane gap"]},
+            {"layer": "selected-only", "lane": "beyond",
+             "selected": [{"repository": "https://github.com/example/sel", "status": "confirmed_default",
+                           "evidence": [], "note": None, "review_lane": "beyond"}],
+             "alternatives_keep_but_compare": [], "candidates": [], "open_gaps": []},
+        ]
+        # The digest recorded from 1765a420's build_manifest on this fixture, of lane_groupings serialized as the CLI
+        # serializes the manifest (json.dumps, indent=1), so the literal stays that parent's output.
+        self.assertEqual(hashlib.sha256(json.dumps(expected, indent=1).encode()).hexdigest(),
+                         "337384cbd28b8d0a0b8e226a6c5db1d0c98d0beeb17601679c11f36a306c6c75")
+        self.assertEqual(json.dumps(self.build()["lane_groupings"], indent=1), json.dumps(expected, indent=1))
 
     def test_non_taxonomy_lane_layers_are_not_trading_rows(self):
         manifest = self.build()

@@ -104,6 +104,8 @@ VERDICT_NOTE = ("winners, alternatives and open_gaps are this layer's sealed ver
                 "a gap without an entry has no follow-up on record.")
 # The planned layers (saturation_ledger.PLANNED_LAYERS): an approved plan's layers that have no landscape row yet.
 PLANNED_LAYERS = "catalogs/landscape/planned-layers.json"
+# The manifest section with a planned layer's lane rows (saturation_ledger.LANE_GROUPINGS; grouping_rows).
+LANE_GROUPINGS = "lane_groupings"
 PLANNED_NOTE = ("a planned layer (catalogs/landscape/planned-layers.json, the row planned.ref names): an approved plan "
                 "names it and no verdict has recorded its landscape row yet. winners, alternatives, open_gaps and "
                 "components_vs_upstream are empty because there is no sealed verdict, not because nothing qualifies; "
@@ -154,6 +156,13 @@ UPSTREAM_FACT_FIELDS = ("latest_release", "released_at", "pushed_at", "archived"
 def rows_by_layer(manifest: dict | None, catalog: str) -> dict:
     section = MANIFEST_SECTION[catalog]
     return {row.get("layer"): row for row in ((manifest or {}).get(section) or []) if isinstance(row, dict)}
+
+
+def grouping_rows(manifest: dict | None) -> dict:
+    """{layer: row} of a manifest's lane_groupings rows. A planned layer has no row in its catalog's section:
+    build_manifest.py files its lane rows under lane_groupings, the row saturation_ledger.binding_layer computes a
+    planned record's known and new from, so that row is a planned layer's baseline."""
+    return {row.get("layer"): row for row in ((manifest or {}).get(LANE_GROUPINGS) or []) if isinstance(row, dict)}
 
 
 def sweep_modality(sweep: dict) -> str | None:
@@ -703,6 +712,7 @@ def build_layer_inputs(catalogs: dict, research_state: dict, scope: dict, freshn
                          f"projection reads a verdict row): {sorted(set(seeds) & set(planned_ids))}")
     seeds = check_seeds(seeds, built_ids)
     out, missing = [], []
+    planned_baseline = grouping_rows(baseline)
     for catalog, _ in CATALOG_FILES:
         baseline_rows, fresh_rows = rows_by_layer(baseline, catalog), rows_by_layer(freshness, catalog)
         for layer_index, layer in enumerate(catalogs[catalog]["layers"]):
@@ -768,8 +778,10 @@ def build_layer_inputs(catalogs: dict, research_state: dict, scope: dict, freshn
             requirement = (scope.get("requirement_sha256") or {}).get(f"{catalog}/{layer_id}")
             if not requirement:
                 missing.append(f"{catalog}/{layer_id}")
-            out.append(planned_input(planned_index, row, requirement, scope, freshness, baseline_rows.get(layer_id, {}),
-                                     previous.get((catalog, layer_id), {}), seeds.get(layer_id, [])))
+            # Its baseline row is the manifest's lane_groupings row: it has none in this catalog's section.
+            out.append(planned_input(planned_index, row, requirement, scope, freshness,
+                                     planned_baseline.get(layer_id, {}), previous.get((catalog, layer_id), {}),
+                                     seeds.get(layer_id, [])))
     if missing:
         raise ValueError(f"the frozen scope has no requirement_sha256 for {missing}; refreeze it with "
                          "saturation_ledger.py --scope")

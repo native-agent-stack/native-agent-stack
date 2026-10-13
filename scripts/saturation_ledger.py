@@ -121,8 +121,12 @@ SWEEP_FIELDS = ("sweep_id", "date", "workflow_run", "status", "manifest_ref", "m
 LAYER_FIELDS = ("catalog", "layer_id", "requirement_sha256", "platform_profiles_sha256", "planned", "votes",
                 "votes_note", "discovery_ref", "calls", "proposed", "known", "new", "survived", "refuted", "reopen")
 V2_LAYER_FIELDS = (*LAYER_FIELDS, "contract_version", "field_sha256", "source_field_sha256", "eligible_field", "pending")
-# A manifest lens-vote pointer: /<section>/<layer index>/candidates/<row>/adversarial_verification/votes/<k>
-LENS_POINTER = re.compile(r"/(foundation|trading)/(\d+)/candidates/(\d+)/adversarial_verification/votes/(\d+)")
+# A manifest lens-vote pointer: /<section>/<layer index>/candidates/<row>/adversarial_verification/votes/<k>. The
+# section is a catalog's (foundation or trading) or, for a planned layer, lane_groupings. check_votes requires the
+# section and index of the row binding_layer locates, so a planned layer's vote never sits in a section row, nor a
+# landscape layer's in a lane_groupings row.
+LENS_POINTER = re.compile(rf"/(foundation|trading|{LANE_GROUPINGS})/(\d+)/candidates/(\d+)"
+                          r"/adversarial_verification/votes/(\d+)")
 # planned is true only on the record of a layer that was a planned layer when --append recorded it.
 COMPUTED_LAYER_FIELDS = ("requirement_sha256", "platform_profiles_sha256", "planned", "known", "new")
 # Scope hashes a retained discovery return carries, frozen before the run (--scope).

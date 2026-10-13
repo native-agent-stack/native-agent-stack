@@ -698,6 +698,28 @@ class BuildInputsTests(unittest.TestCase):
         self.assertEqual(delta["previous_sweep"], {"sweep_id": "sw-3", "survived": ["https://github.com/o/d"],
                                                    "refuted": []})
 
+    def test_a_planned_layer_counts_its_baseline_lane_groupings_candidates_as_known(self):
+        # Codex review of #1066 at 4b6019ca, P2: a planned layer has no row in its catalog's section of the baseline
+        # manifest (build_manifest.py files its lane rows under lane_groupings), so its input read an empty baseline
+        # row and listed known_repositories [] after an earlier sweep had proposed candidates for it.
+        self.plan(self.PLANNED)
+        manifest = json.loads((self.repo / "catalogs/m1.json").read_text())
+
+        def grouping(layer_id, repository):
+            return {"layer": layer_id, "lane": "sw-1", "selected": [], "alternatives_keep_but_compare": [],
+                    "candidates": [{"repository": repository, "lane": "sw-1"}], "open_gaps": []}
+
+        # beta, a landscape layer, binds to its section row, so a lane_groupings row named beta is never its baseline.
+        manifest["lane_groupings"] = [grouping("beta", "https://github.com/o/not-beta"),
+                                      grouping("delta", "https://github.com/o/delta-known.git")]
+        write_json(self.repo / "catalogs/m1.json", manifest)
+        done = self.build()
+        self.assertEqual(done.returncode, 0, done.stderr)
+        inputs = {layer_id: json.loads((self.work / f"inputs/{layer_id}.json").read_text())["known_repositories"]
+                  for layer_id in ("alpha", "beta", "delta")}
+        self.assertEqual(inputs, {"alpha": ["cli/cli", "facebook/react", "sharkdp/bat", "tauri-apps/tauri"],
+                                  "beta": [], "delta": ["o/delta-known"]})
+
     def test_a_planned_layer_needs_its_frozen_scope_a_catalog_and_no_landscape_row(self):
         self.plan(self.PLANNED, scope=(("foundation", "alpha"), ("us-equities", "beta")))
         done = self.build()
