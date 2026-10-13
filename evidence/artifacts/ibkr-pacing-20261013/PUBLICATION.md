@@ -1,115 +1,107 @@
 # IBKR pacing publication boundary
 
-The approved sanitized trading-cc **revision 2** projection is retained unchanged
-at the canonical JSON, generator and verifier paths, replacing their revision 1
-bytes. Its `revision.supersedes` block names the three superseded hashes;
-revision 1 remains available in Git history. Its
-`headline_numbers` entries identify the receipt run labels; the handbook cites
-those entries and public field paths. Original broker receipts are private and
-are not copied or read by this documentation change.
+The canonical JSON, generator and verifier retain the approved trading-cc
+**revision 3** bytes unchanged. [V3-CHANGES.md](V3-CHANGES.md) is retained
+unchanged and supplies the correction table; it adds no new measurement.
+Revision-1 and revision-2 predecessors remain inspectable public files, so the
+document's superseded commitments have public preimages. Original receipts and
+internal probe helpers are not read or copied by this publication.
 
-| Approved artifact | SHA256 |
+| Active approved artifact | SHA256 |
 | --- | --- |
-| `ibkr-pacing-evidence-20261013.json` (v2 bytes) | `25ef71020a06e1781fac0360aa8b19c564d9d146b65ea3fc6b8cb0ab62ab0c15` |
-| `generate_ibkr_pacing_evidence.py` (v2 bytes) | `f44b595a13cf87b4ad555427000c7937cc62452076f0a3380f13338127147619` |
-| `verify_ibkr_pacing_evidence.py` (v2 bytes) | `cac1e764f429dc05575dfe8a692e74d4bcc04a8906e174e9e7b0178cf61494e3` |
-| `README.md` | `7890700134ce668c24ff1047b8e798157a3ffa3fe996e0bf9dcc4f7af90e7c86` |
+| `ibkr-pacing-evidence-20261013.json` (v3 bytes) | `180dd86e1848b8714ab7e5850d2989eb08217c1a0fb87f3af6493bc9006b8729` |
+| `generate_ibkr_pacing_evidence.py` (v3 bytes) | `933133afe24f128eb4226fb4c50230cb300d5e59ef8e663cc8dac0fb95a9100b` |
+| `verify_ibkr_pacing_evidence.py` (v3 bytes) | `c8872073cf71990e349ef77293dcef0e434b087e70091b26c6c2749cbce22630` |
+| `V3-CHANGES.md` | `edbb14013d15b8e9164685e024ed68b02ec676f8ea3d7f83e6591f3a843cc855` |
 | `ADDENDUM-01.txt` | `bbbb4d0096d0cab5577050f1b2ba31348fbc6cf5a1969b251bcb35649963b7f6` |
 | `ADDENDUM-02.txt` | `f1de0a311acc5bcd7d7eeddd51e7fef35196dcd76c4f878f1564424f4f834a9c` |
-| `ADDENDUM-03.txt` (re-sealed text) | `ac6adcea2551c8e9df26efd0fa434d5283dccdc74f8af17f32afba9c7bc9b324` |
-| [Historical v1 verifier](verify_ibkr_pacing_evidence.v1.py) | `0e9fb1376a59e34cf1e3b6ba2fea30d89aad5e09db28de0b4d59792a41207468` |
+| `ADDENDUM-03.txt` (re-sealed v2 text, unchanged) | `ac6adcea2551c8e9df26efd0fa434d5283dccdc74f8af17f32afba9c7bc9b324` |
 
-The generator and verifier require private inputs. They are preserved as producer
-methodology, not executed here. This change checks hashes, public-field
-consistency and the pinned upstream cancel-path source; those checks do not
-independently reproduce the broker measurements. The approved README also
-describes producer audit/locator files that are outside this public subset.
+The published README updates the rate definition and adapter peak definition
+from v3; it is no longer byte-identical to the original producer README.
+Its original source and the v1/v2 producer seals remain unchanged at the producer.
+Published file hashes, including the updated README, are registered natively in
+`manifests/evidence.json`. The retained change record's section 6 describes the
+producer's pre-publication status; the canonical PR paths now carry v3.
 
-## Revision 2 correction and regression evidence
+## Current definitions and correction table
 
-[ADDENDUM-03.txt](ADDENDUM-03.txt) records both failing-first probes: revision 1
-passed with a corrupted reconciliation headline and with rewritten missing-order
-journals; revision 2 fails each corresponding check. The producer reports
-82 passing checks and zero failures on the true revision 2 inputs. Those checks
-derive the missing-order kinds from journal events and venue text, compare the
-headline with recomputed counters, and check the third broker-count arithmetic.
-The per-ID ownership assertion in the sealed addendum is superseded by the
-verification limit below; aggregate classified-count equality does not enforce
-ownership in exactly one run.
-The internal probe scripts and output are not included in this publication.
+Source: [V3-CHANGES section 4](V3-CHANGES.md), the authoritative FAIL/HOLD table,
+and JSON `/facts/rate_window_conventions`, `/facts/peak_open_orders_definition`.
 
-The 38 missing orders now split into **35 duplicate-order-ID refusals (103),
-one cancel-target-not-found rejection (10147), and two never reaching the
-adapter**. The third broker count, 10,313, is transcript-derived and checked
-through arithmetic; it is not a new measurement by this documentation change.
-Sources: JSON `/reconciliation`, `/revision` and `ADDENDUM-03.txt`.
-
-The unchanged revision 1 README is historical methodology. Its 36-[103]
-classification and its statement that the cross-client rule was undocumented
-are superseded by revision 2 and [ADDENDUM-02.txt](ADDENDUM-02.txt), respectively.
-All measured rates, latencies and test counts remain unchanged.
-
-## Claim limits adjudicated on 2026-10-13
-
-These definitions govern the handbook and interpretation of the retained sealed
-projection, README, addendum and script assertion labels. The generator and
-verifier remain byte-identical to the approved v2 seal. Their wording and the
-copied metadata are historical producer text; a passing check supports only the
-measurement described here. No headline number is changed by these corrections.
-
-| Field or assertion | Supported claim at the sealed v2 head | Limit |
+| Field | Revision 3 meaning | Boundary |
 | --- | --- | --- |
-| Whole-run `max_1s`, including combined connection estimates | Maximum count in UTC-aligned one-second buckets, for each counted/refined/upper-bound series | A rolling-window maximum is unmeasured. |
-| `best_5s_mean` | Highest mean over five consecutive UTC-aligned buckets evaluated by the producer | Arbitrarily positioned five-second windows are unmeasured. |
-| `peak_open_orders` wherever reported in the linked projection | Reported submission/cancellation counter **including rejected orders**; the adapter increments on submission and decrements on cancellation without removing rejections | It does not establish broker-confirmed accepted open orders or exposure. |
-| Missing-ID ownership assertion | Aggregate classified-count equality with the missing total | **Per-ID ownership in exactly one run is not enforced**; omission and duplication can offset. |
+| Whole-run `max_1s` | Largest message count in sliding half-open one-second windows anchored at message timestamps | Counted and source-derived wire series remain separate. |
+| `best_5s_mean` | Largest sliding five-second count divided by five | Integer microseconds; start included, end excluded. |
+| `*_utc_buckets` | Retained revision-2 UTC-aligned values | These historical buckets are distinct from the current sliding maxima. |
+| Rung `counted_msgs_per_s_min/max` | Original receipt slot counters | Fixed slots; a slot maximum is a lower bound of the sliding maximum. |
+| Adapter `peak_open_orders` | Submitted orders through their first terminal order event, including rejected/filled/canceled terminals | A rejected cancel is not terminal; no terminal event leaves an order open in the journal counter. |
+| Official-client `peak_open_orders` | Original runtime counter, unchanged | A 103-refused order counts until the stale cancel is answered; not recomputable without private per-message records. |
+| Missing-ID ownership | V3 checks each missing ID against exactly one owner journal | Retained histogram: 0 missing owners, 38 single owners, 0 multiple owners. |
 
-The aligned-bucket definitions supersede the broader window wording in
-`README.md:38–39`, the two rate-estimate `headline_numbers[].unit` labels and
-the sealed generator/verifier's rate assertion labels. The peak qualification
-applies to all linked `peak_open_orders` fields and `README.md:37`. The ownership
-limit supersedes `ADDENDUM-03.txt:20` and the verifier's line 180 assertion label.
+The section-4 FAIL claims are replaced as follows:
 
-Primary sources at the unchanged v2 commit
-`2d433d4c3a66678305ea047cc6c11136b9724d78`:
+| Corrected claim | Sliding result |
+| --- | --- |
+| All adapter pairs at or below 50 wire messages/s | Upper bounds m1/m2/m3/m4: **53/47/40/52**, refined **52/47/40/47**; m1 and m4 fail the old upper-bound ceiling. |
+| Pair ceiling of 45/s | Upper-bound maximum **53**, with m4 also reaching **52**. |
+| B-r5 best five-second upper-bound mean at or below 50 | **51.2** refined and upper bound; B-r6 refined is **56.6**. |
+| B-r5 rung-50 slot counter 38 as peak rate | Sliding in-rung maximum **46 counted / 69 wire**. |
+| Whole-run B-r5/B-r6 maxima | Counted **46/53**, refined wire **69/78**, upper wire **69/83**, replacing bucket **37/48**, **57/66**, **57/71**. |
 
-- [Generator, UTC bucket and five-bucket calculations](https://github.com/native-agent-stack/native-agent-stack/blob/2d433d4c3a66678305ea047cc6c11136b9724d78/evidence/artifacts/ibkr-pacing-20261013/generate_ibkr_pacing_evidence.py#L129-L151).
-- [Verifier, independent aligned-bucket calculation](https://github.com/native-agent-stack/native-agent-stack/blob/2d433d4c3a66678305ea047cc6c11136b9724d78/evidence/artifacts/ibkr-pacing-20261013/verify_ibkr_pacing_evidence.py#L53-L75).
-- [Generator, submitted/canceled peak counter](https://github.com/native-agent-stack/native-agent-stack/blob/2d433d4c3a66678305ea047cc6c11136b9724d78/evidence/artifacts/ibkr-pacing-20261013/generate_ibkr_pacing_evidence.py#L159-L180).
-- [Verifier, missing-ID classification and aggregate comparison](https://github.com/native-agent-stack/native-agent-stack/blob/2d433d4c3a66678305ea047cc6c11136b9724d78/evidence/artifacts/ibkr-pacing-20261013/verify_ibkr_pacing_evidence.py#L161-L181).
+HOLD claims stay means/counts: official rung-50 mean 49.95 messages/s, 500 orders
+in 20 seconds, rate 1,500 orders/minute and 2,997 messages/minute; adapter rung-30
+means 44.95 refined / 45.0 upper wire messages/s. The rung-30 sliding maxima are
+63 refined / 64 upper wire messages; a mean is not a burst ceiling. Adapter
+`pacing_error_count`, code-100 lines and pacing-text lines remain zero; no
+disconnect occurred. Official-client receipt maxima are unchanged and its
+true rung-50 one-second maximum is at least 51, without recomputable message times.
 
-Rolling-window computation, rejected-order peak handling and explicit per-ID
-ownership enforcement are trading-cc v3 code follow-ups. They are not fixes
-implemented by this documentation correction.
+**Whether a sliding 1 s window above 50 wire messages is above the cap depends
+on how the Gateway counts, which this evidence does not establish.** Hidden
+requests remain source-derived and stamped with cancel-row timestamps. Per-rung
+window replay matches 38 of 40 receipt grids; two differ by one message. Sources:
+[V3-CHANGES sections 4–6](V3-CHANGES.md) and JSON `/facts/rate_window_conventions`.
+
+## Producer verification and predecessor custody
+
+[V3-CHANGES sections 1 and 5](V3-CHANGES.md) retain the producer's failing-first
+controls for per-ID ownership, sliding windows and terminal-event peaks.
+The producer reports **174 passing checks** with the pinned `core.rs` source
+check, or **169** without it. V2's 82 checks accepted the swapped-owner negative
+root; v3 rejects it. These are attributed producer results. This documentation
+change checks approved bytes and public consistency, without reading original
+private roots or independently replaying broker measurements.
+
+All six earlier producer preimages remain in this directory with versioned names:
+`generate_ibkr_pacing_evidence.v1.py`, `verify_ibkr_pacing_evidence.v1.py`,
+`ibkr-pacing-evidence-20261013.v1.json`, and their `.v2.py`/`.v2.json` counterparts.
+They are historical source, not the active verifier or current measurement schema.
+ADDENDUM-03 stays exactly at its re-sealed v2 text; its old aggregate-ownership
+statement is superseded by the v3 per-ID checks. ADDENDUM-02 corrects the earlier
+README's undocumented-rule statement. The 35/1/2 missing-order split and
+transcript-derived third broker count of 10,313 remain unchanged.
 
 ## Text commitment guard
 
-The re-sealed addendum omits the internal unpublished probe commitment. The
-historical v1 verifier is retained as inspectable public bytes so the addendum's
-predecessor reference resolves without an opaque file-digest exception. The
-generator and active verifier remain byte-identical to approved v2.
-
-The publication guard [scripts/check_text_digests.py](../../../scripts/check_text_digests.py)
-adapts trading-cc's named reference checker. Only Git-indexed regular files in
-the publication directory supply file preimages; untracked/ignored files and
-symlinks cannot justify a commitment. Full digests and 7+ character prefixes are
+The re-sealed addendum omits the internal unpublished probe commitment.
+[scripts/check_text_digests.py](../../../scripts/check_text_digests.py) admits file
+preimages only from indexed regular publication files. Untracked/ignored files
+and symlinks cannot justify commitments. Full and 7+ character prefixes are
 checked; decimal-only numeric labels are not treated as digest commitments.
-Audited [public references](text-digest-public-references.json) carry their public
-preimage class and source URL: Git commit identifiers, plus the vendor's image
-asset identifier bound to the indexed vendor Markdown that names the image. Findings report locations and lengths
-without printing unresolved values or prefixes.
+Findings print locations/lengths without unresolved values or prefixes.
 
-The focused CLI regression first reproduced acceptance of an untracked probe
-preimage by the reference's recursive filesystem enumeration. The adapted guard
-refuses that full commitment and its seven-character prefix, accepts indexed
-public preimages, and refuses a symlink to an unpublished preimage. A repository
-test checks every Markdown/text file in this packet and both handbook pages.
-These fixtures contain no real private probe bytes or commitments.
+Audited [public references](text-digest-public-references.json) carry their source
+URL and class: public Git commits and the image identifier named by the unchanged
+vendor Markdown. The latter must match both the indexed capture hash and its
+literal image-path witness; it is not claimed as an image content hash. No binary
+image is included in this text-only packet. The marker record's short commit
+resolves to an ancestor of public main; private operational contents stay excluded.
 
 ## Official source captures
 
-These unmodified Markdown responses were checked on 2026-10-13. They are current
-vendor documentation, with no version tag advertised in the captured bytes.
+These unchanged Markdown responses were checked on 2026-10-13. They have no
+advertised version tag in their bytes.
 
 | Capture | Official source | SHA256 |
 | --- | --- | --- |
@@ -117,19 +109,10 @@ vendor documentation, with no version tag advertised in the captured bytes.
 | [pacing-behavior.md](pacing-behavior.md) | <https://www.interactivebrokers.com/docs/tws-api/doc/pacing-limitations/pacing-behavior.md> | `608161d8d9ddfcdfba5d02a931fb5e082ae7c8a821a8d34851bbc4454c506d54` |
 | [small-bars.md](small-bars.md) | <https://www.interactivebrokers.com/docs/tws-api/doc/market-data-historical/historical-data-limitations/pacing-violations-for-small-bars-30-secs-or-less.md> | `fa12f6d99bd60939f181e451ecd79018ba6bdcdf9b77c26a21ec7cc43d6c27eb` |
 
-The image URL in the retained vendor Markdown contains a public asset identifier.
-It is classified as that URL identifier, not represented as a file digest. The
-binary image is not part of this text-only publication packet. The
-short commit in the historical marker-record name resolves to an ancestor of
-public main; its private operational contents remain excluded.
-
-The official legacy order-submission page was checked on 2026-10-13 for its
-explicit `reqAllOpenOrders` rule: subsequent order IDs must exceed the IDs
-returned by that request. It is cited only for that rule, not for current pacing
-numbers: <https://interactivebrokers.github.io/tws-api/order_submission.html>.
-
-The measured adapter source is `nautechsystems/nautilus_trader` at
-`01ced2a3e7b7d25ae7b2e5c0c077bcc46192eb25`,
+The official legacy order-submission page was checked for its `reqAllOpenOrders`
+rule on 2026-10-13; it is not used for current pacing numbers:
+<https://interactivebrokers.github.io/tws-api/order_submission.html>.
+The measured adapter remains `nautechsystems/nautilus_trader` at
+`01ced2a3e7b7d25ae7b2e5c0c077bcc46192eb25`, native cancel path
 `crates/adapters/interactive_brokers/src/execution/core.rs:381,2387,2417,2429,2624,2637`.
-It differs from the selected engine's rc5 pin. No engine re-pin, adapter patch,
-broker replay or new operational acceptance is made by this publication.
+This differs from selected rc5 and makes no engine re-pin or broker acceptance claim.

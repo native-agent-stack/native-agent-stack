@@ -34,9 +34,9 @@ cancel as two messages.
   reports), `wire_est_refined_msgs_per_s_mean` and `wire_est_upper_bound_msgs_per_s_mean` (add the adapter's hidden
   request, below), `orders_per_min_by_submits` (orders in the rung / seconds x 60, each with its cancel),
   `orders_per_min_by_counted_rate` (counted mean / 2 x 60), accept and cancel latency (`n`, p50, p90, max in ms, nearest
-  rank), `peak_open_orders`, `skipped_slots` (slots the window refused), `cancels_before_acceptance`.
-- `rate_estimates_whole_run`: for a whole run, the maximum over any single second and the best 5-second mean, counted /
-  refined / upper bound.
+  rank), `peak_open_orders` (adapter orders stop at their first terminal order event in revision 3), `skipped_slots` (slots the window refused), `cancels_before_acceptance`.
+- `rate_estimates_whole_run`: for a whole run, the maximum over sliding half-open one-second windows anchored at message timestamps and the best sliding five-second mean, counted /
+  refined / upper bound. Revision-2 UTC-aligned results remain in `max_1s_utc_buckets` and `best_5s_mean_utc_buckets`; receipt slot counters remain separate. See [V3-CHANGES section 4](V3-CHANGES.md).
 - `adapter_two_connection_pairs`: the lower-partition connection's first refusal (order index within its own run, seconds
   after the other connection's first order) and the combined rates of both connections.
 - `official_client_ladder`, `official_client_two_connection_tests`: orders, accepted, cancel-confirmed, `refused_103`,

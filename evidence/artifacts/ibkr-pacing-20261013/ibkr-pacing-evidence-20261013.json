@@ -26,15 +26,21 @@
    "rate_estimates_whole_run": {
     "counted_msgs_per_s": {
      "best_5s_mean": 0.4,
-     "max_1s": 1
+     "best_5s_mean_utc_buckets": 0.4,
+     "max_1s": 2,
+     "max_1s_utc_buckets": 1
     },
     "wire_est_refined_msgs_per_s": {
      "best_5s_mean": 0.6,
-     "max_1s": 2
+     "best_5s_mean_utc_buckets": 0.6,
+     "max_1s": 3,
+     "max_1s_utc_buckets": 2
     },
     "wire_est_upper_bound_msgs_per_s": {
      "best_5s_mean": 0.6,
-     "max_1s": 2
+     "best_5s_mean_utc_buckets": 0.6,
+     "max_1s": 3,
+     "max_1s_utc_buckets": 2
     }
    },
    "steps": {
@@ -87,15 +93,21 @@
    "rate_estimates_whole_run": {
     "counted_msgs_per_s": {
      "best_5s_mean": 1.0,
-     "max_1s": 3
+     "best_5s_mean_utc_buckets": 1.0,
+     "max_1s": 5,
+     "max_1s_utc_buckets": 3
     },
     "wire_est_refined_msgs_per_s": {
      "best_5s_mean": 1.2,
-     "max_1s": 4
+     "best_5s_mean_utc_buckets": 1.2,
+     "max_1s": 6,
+     "max_1s_utc_buckets": 4
     },
     "wire_est_upper_bound_msgs_per_s": {
      "best_5s_mean": 1.2,
-     "max_1s": 4
+     "best_5s_mean_utc_buckets": 1.2,
+     "max_1s": 6,
+     "max_1s_utc_buckets": 4
     }
    },
    "steps": {
@@ -159,15 +171,21 @@
    "rate_estimates_whole_run": {
     "counted_msgs_per_s": {
      "best_5s_mean": 1.0,
-     "max_1s": 3
+     "best_5s_mean_utc_buckets": 1.0,
+     "max_1s": 3,
+     "max_1s_utc_buckets": 3
     },
     "wire_est_refined_msgs_per_s": {
      "best_5s_mean": 1.2,
-     "max_1s": 4
+     "best_5s_mean_utc_buckets": 1.2,
+     "max_1s": 4,
+     "max_1s_utc_buckets": 4
     },
     "wire_est_upper_bound_msgs_per_s": {
      "best_5s_mean": 1.2,
-     "max_1s": 4
+     "best_5s_mean_utc_buckets": 1.2,
+     "max_1s": 4,
+     "max_1s_utc_buckets": 4
     }
    },
    "steps": {
@@ -231,15 +249,21 @@
    "rate_estimates_whole_run": {
     "counted_msgs_per_s": {
      "best_5s_mean": 1.0,
-     "max_1s": 3
+     "best_5s_mean_utc_buckets": 1.0,
+     "max_1s": 5,
+     "max_1s_utc_buckets": 3
     },
     "wire_est_refined_msgs_per_s": {
      "best_5s_mean": 1.2,
-     "max_1s": 3
+     "best_5s_mean_utc_buckets": 1.2,
+     "max_1s": 6,
+     "max_1s_utc_buckets": 3
     },
     "wire_est_upper_bound_msgs_per_s": {
      "best_5s_mean": 1.2,
-     "max_1s": 3
+     "best_5s_mean_utc_buckets": 1.2,
+     "max_1s": 6,
+     "max_1s_utc_buckets": 3
     }
    },
    "steps": {
@@ -303,15 +327,21 @@
    "rate_estimates_whole_run": {
     "counted_msgs_per_s": {
      "best_5s_mean": 1.0,
-     "max_1s": 5
+     "best_5s_mean_utc_buckets": 1.0,
+     "max_1s": 5,
+     "max_1s_utc_buckets": 5
     },
     "wire_est_refined_msgs_per_s": {
      "best_5s_mean": 1.2,
-     "max_1s": 6
+     "best_5s_mean_utc_buckets": 1.2,
+     "max_1s": 6,
+     "max_1s_utc_buckets": 6
     },
     "wire_est_upper_bound_msgs_per_s": {
      "best_5s_mean": 1.2,
-     "max_1s": 6
+     "best_5s_mean_utc_buckets": 1.2,
+     "max_1s": 6,
+     "max_1s_utc_buckets": 6
     }
    },
    "steps": {
@@ -375,15 +405,21 @@
    "rate_estimates_whole_run": {
     "counted_msgs_per_s": {
      "best_5s_mean": 1.0,
-     "max_1s": 5
+     "best_5s_mean_utc_buckets": 1.0,
+     "max_1s": 5,
+     "max_1s_utc_buckets": 5
     },
     "wire_est_refined_msgs_per_s": {
      "best_5s_mean": 1.2,
-     "max_1s": 6
+     "best_5s_mean_utc_buckets": 1.2,
+     "max_1s": 6,
+     "max_1s_utc_buckets": 6
     },
     "wire_est_upper_bound_msgs_per_s": {
      "best_5s_mean": 1.2,
-     "max_1s": 6
+     "best_5s_mean_utc_buckets": 1.2,
+     "max_1s": 6,
+     "max_1s_utc_buckets": 6
     }
    },
    "steps": {
@@ -460,16 +496,22 @@
    "phase": "B",
    "rate_estimates_whole_run": {
     "counted_msgs_per_s": {
-     "best_5s_mean": 13.4,
-     "max_1s": 18
+     "best_5s_mean": 13.6,
+     "best_5s_mean_utc_buckets": 13.4,
+     "max_1s": 18,
+     "max_1s_utc_buckets": 18
     },
     "wire_est_refined_msgs_per_s": {
-     "best_5s_mean": 20.0,
-     "max_1s": 26
+     "best_5s_mean": 20.6,
+     "best_5s_mean_utc_buckets": 20.0,
+     "max_1s": 26,
+     "max_1s_utc_buckets": 26
     },
     "wire_est_upper_bound_msgs_per_s": {
-     "best_5s_mean": 20.0,
-     "max_1s": 26
+     "best_5s_mean": 20.6,
+     "best_5s_mean_utc_buckets": 20.0,
+     "max_1s": 26,
+     "max_1s_utc_buckets": 26
     }
    },
    "rungs": [
@@ -492,10 +534,19 @@
      "counted_msgs_per_s_max": 6,
      "counted_msgs_per_s_mean": 5.0,
      "counted_msgs_per_s_min": 4,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 6,
+      "wire_est_refined": 9,
+      "wire_est_upper_bound": 9
+     },
      "orders": 50,
      "orders_per_min_by_counted_rate": 150,
      "orders_per_min_by_submits": 150,
      "peak_open_orders": 2,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
      "seconds": 20,
      "skipped_slots": 0,
      "target_msgs_per_s": 5,
@@ -521,10 +572,19 @@
      "counted_msgs_per_s_max": 10,
      "counted_msgs_per_s_mean": 9.95,
      "counted_msgs_per_s_min": 9,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 12,
+      "wire_est_refined": 19,
+      "wire_est_upper_bound": 19
+     },
      "orders": 100,
      "orders_per_min_by_counted_rate": 298,
      "orders_per_min_by_submits": 300,
      "peak_open_orders": 9,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
      "seconds": 20,
      "skipped_slots": 0,
      "target_msgs_per_s": 10,
@@ -550,10 +610,19 @@
      "counted_msgs_per_s_max": 17,
      "counted_msgs_per_s_mean": 12.9,
      "counted_msgs_per_s_min": 9,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 17,
+      "wire_est_refined": 25,
+      "wire_est_upper_bound": 25
+     },
      "orders": 129,
      "orders_per_min_by_counted_rate": 387,
      "orders_per_min_by_submits": 387,
      "peak_open_orders": 10,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
      "seconds": 20,
      "skipped_slots": 68,
      "target_msgs_per_s": 20,
@@ -579,10 +648,19 @@
      "counted_msgs_per_s_max": 15,
      "counted_msgs_per_s_mean": 12.6,
      "counted_msgs_per_s_min": 11,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 17,
+      "wire_est_refined": 26,
+      "wire_est_upper_bound": 26
+     },
      "orders": 33,
      "orders_per_min_by_counted_rate": 378,
      "orders_per_min_by_submits": 396,
      "peak_open_orders": 10,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
      "seconds": 5,
      "skipped_slots": 41,
      "target_msgs_per_s": 30,
@@ -654,16 +732,22 @@
    "phase": "B",
    "rate_estimates_whole_run": {
     "counted_msgs_per_s": {
-     "best_5s_mean": 30.2,
-     "max_1s": 31
+     "best_5s_mean": 30.6,
+     "best_5s_mean_utc_buckets": 30.2,
+     "max_1s": 35,
+     "max_1s_utc_buckets": 31
     },
     "wire_est_refined_msgs_per_s": {
-     "best_5s_mean": 45.4,
-     "max_1s": 47
+     "best_5s_mean": 46.2,
+     "best_5s_mean_utc_buckets": 45.4,
+     "max_1s": 54,
+     "max_1s_utc_buckets": 47
     },
     "wire_est_upper_bound_msgs_per_s": {
-     "best_5s_mean": 45.4,
-     "max_1s": 47
+     "best_5s_mean": 46.2,
+     "best_5s_mean_utc_buckets": 45.4,
+     "max_1s": 54,
+     "max_1s_utc_buckets": 47
     }
    },
    "rungs": [
@@ -686,10 +770,19 @@
      "counted_msgs_per_s_max": 6,
      "counted_msgs_per_s_mean": 5.0,
      "counted_msgs_per_s_min": 4,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 6,
+      "wire_est_refined": 9,
+      "wire_est_upper_bound": 9
+     },
      "orders": 50,
      "orders_per_min_by_counted_rate": 150,
      "orders_per_min_by_submits": 150,
      "peak_open_orders": 2,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
      "seconds": 20,
      "skipped_slots": 0,
      "target_msgs_per_s": 5,
@@ -715,10 +808,19 @@
      "counted_msgs_per_s_max": 11,
      "counted_msgs_per_s_mean": 9.95,
      "counted_msgs_per_s_min": 9,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 12,
+      "wire_est_refined": 19,
+      "wire_est_upper_bound": 19
+     },
      "orders": 100,
      "orders_per_min_by_counted_rate": 298,
      "orders_per_min_by_submits": 300,
      "peak_open_orders": 9,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
      "seconds": 20,
      "skipped_slots": 0,
      "target_msgs_per_s": 10,
@@ -744,10 +846,19 @@
      "counted_msgs_per_s_max": 22,
      "counted_msgs_per_s_mean": 19.9,
      "counted_msgs_per_s_min": 18,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 23,
+      "wire_est_refined": 36,
+      "wire_est_upper_bound": 36
+     },
      "orders": 200,
      "orders_per_min_by_counted_rate": 597,
      "orders_per_min_by_submits": 600,
      "peak_open_orders": 24,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
      "seconds": 20,
      "skipped_slots": 0,
      "target_msgs_per_s": 20,
@@ -773,10 +884,19 @@
      "counted_msgs_per_s_max": 31,
      "counted_msgs_per_s_mean": 29.636,
      "counted_msgs_per_s_min": 27,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 35,
+      "wire_est_refined": 54,
+      "wire_est_upper_bound": 54
+     },
      "orders": 180,
      "orders_per_min_by_counted_rate": 889,
      "orders_per_min_by_submits": 982,
      "peak_open_orders": 29,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
      "seconds": 11,
      "skipped_slots": 0,
      "target_msgs_per_s": 30,
@@ -848,16 +968,22 @@
    "phase": "B",
    "rate_estimates_whole_run": {
     "counted_msgs_per_s": {
-     "best_5s_mean": 20.2,
-     "max_1s": 21
+     "best_5s_mean": 20.8,
+     "best_5s_mean_utc_buckets": 20.2,
+     "max_1s": 24,
+     "max_1s_utc_buckets": 21
     },
     "wire_est_refined_msgs_per_s": {
-     "best_5s_mean": 30.4,
-     "max_1s": 32
+     "best_5s_mean": 31.4,
+     "best_5s_mean_utc_buckets": 30.4,
+     "max_1s": 37,
+     "max_1s_utc_buckets": 32
     },
     "wire_est_upper_bound_msgs_per_s": {
-     "best_5s_mean": 30.4,
-     "max_1s": 32
+     "best_5s_mean": 31.4,
+     "best_5s_mean_utc_buckets": 30.4,
+     "max_1s": 37,
+     "max_1s_utc_buckets": 32
     }
    },
    "rungs": [
@@ -880,10 +1006,19 @@
      "counted_msgs_per_s_max": 6,
      "counted_msgs_per_s_mean": 5.0,
      "counted_msgs_per_s_min": 4,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 6,
+      "wire_est_refined": 9,
+      "wire_est_upper_bound": 9
+     },
      "orders": 50,
      "orders_per_min_by_counted_rate": 150,
      "orders_per_min_by_submits": 150,
      "peak_open_orders": 2,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
      "seconds": 20,
      "skipped_slots": 0,
      "target_msgs_per_s": 5,
@@ -909,10 +1044,19 @@
      "counted_msgs_per_s_max": 11,
      "counted_msgs_per_s_mean": 9.85,
      "counted_msgs_per_s_min": 9,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 12,
+      "wire_est_refined": 19,
+      "wire_est_upper_bound": 19
+     },
      "orders": 100,
      "orders_per_min_by_counted_rate": 296,
      "orders_per_min_by_submits": 300,
      "peak_open_orders": 13,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
      "seconds": 20,
      "skipped_slots": 0,
      "target_msgs_per_s": 10,
@@ -938,10 +1082,19 @@
      "counted_msgs_per_s_max": 21,
      "counted_msgs_per_s_mean": 19.636,
      "counted_msgs_per_s_min": 16,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 24,
+      "wire_est_refined": 37,
+      "wire_est_upper_bound": 37
+     },
      "orders": 114,
      "orders_per_min_by_counted_rate": 589,
      "orders_per_min_by_submits": 622,
      "peak_open_orders": 19,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
      "seconds": 11,
      "skipped_slots": 0,
      "target_msgs_per_s": 20,
@@ -1014,16 +1167,22 @@
    "phase": "B",
    "rate_estimates_whole_run": {
     "counted_msgs_per_s": {
-     "best_5s_mean": 32.6,
-     "max_1s": 37
+     "best_5s_mean": 33.6,
+     "best_5s_mean_utc_buckets": 32.6,
+     "max_1s": 46,
+     "max_1s_utc_buckets": 37
     },
     "wire_est_refined_msgs_per_s": {
-     "best_5s_mean": 49.8,
-     "max_1s": 57
+     "best_5s_mean": 51.2,
+     "best_5s_mean_utc_buckets": 49.8,
+     "max_1s": 69,
+     "max_1s_utc_buckets": 57
     },
     "wire_est_upper_bound_msgs_per_s": {
-     "best_5s_mean": 49.8,
-     "max_1s": 57
+     "best_5s_mean": 51.2,
+     "best_5s_mean_utc_buckets": 49.8,
+     "max_1s": 69,
+     "max_1s_utc_buckets": 57
     }
    },
    "rungs": [
@@ -1046,10 +1205,19 @@
      "counted_msgs_per_s_max": 6,
      "counted_msgs_per_s_mean": 5.0,
      "counted_msgs_per_s_min": 4,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 7,
+      "wire_est_refined": 11,
+      "wire_est_upper_bound": 11
+     },
      "orders": 50,
      "orders_per_min_by_counted_rate": 150,
      "orders_per_min_by_submits": 150,
      "peak_open_orders": 2,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
      "seconds": 20,
      "skipped_slots": 0,
      "target_msgs_per_s": 5,
@@ -1075,10 +1243,19 @@
      "counted_msgs_per_s_max": 11,
      "counted_msgs_per_s_mean": 9.85,
      "counted_msgs_per_s_min": 9,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 12,
+      "wire_est_refined": 19,
+      "wire_est_upper_bound": 19
+     },
      "orders": 100,
      "orders_per_min_by_counted_rate": 296,
      "orders_per_min_by_submits": 300,
      "peak_open_orders": 11,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
      "seconds": 20,
      "skipped_slots": 0,
      "target_msgs_per_s": 10,
@@ -1104,10 +1281,19 @@
      "counted_msgs_per_s_max": 21,
      "counted_msgs_per_s_mean": 19.85,
      "counted_msgs_per_s_min": 17,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 23,
+      "wire_est_refined": 36,
+      "wire_est_upper_bound": 36
+     },
      "orders": 200,
      "orders_per_min_by_counted_rate": 596,
      "orders_per_min_by_submits": 600,
      "peak_open_orders": 24,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
      "seconds": 20,
      "skipped_slots": 0,
      "target_msgs_per_s": 20,
@@ -1133,10 +1319,19 @@
      "counted_msgs_per_s_max": 31,
      "counted_msgs_per_s_mean": 29.1,
      "counted_msgs_per_s_min": 22,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 36,
+      "wire_est_refined": 57,
+      "wire_est_upper_bound": 57
+     },
      "orders": 293,
      "orders_per_min_by_counted_rate": 873,
      "orders_per_min_by_submits": 879,
      "peak_open_orders": 30,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
      "seconds": 20,
      "skipped_slots": 7,
      "target_msgs_per_s": 30,
@@ -1162,10 +1357,19 @@
      "counted_msgs_per_s_max": 37,
      "counted_msgs_per_s_mean": 31.95,
      "counted_msgs_per_s_min": 29,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 42,
+      "wire_est_refined": 68,
+      "wire_est_upper_bound": 68
+     },
      "orders": 321,
      "orders_per_min_by_counted_rate": 958,
      "orders_per_min_by_submits": 963,
      "peak_open_orders": 30,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
      "seconds": 20,
      "skipped_slots": 79,
      "target_msgs_per_s": 40,
@@ -1191,10 +1395,19 @@
      "counted_msgs_per_s_max": 38,
      "counted_msgs_per_s_mean": 30.0,
      "counted_msgs_per_s_min": 13,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 46,
+      "wire_est_refined": 69,
+      "wire_est_upper_bound": 69
+     },
      "orders": 294,
      "orders_per_min_by_counted_rate": 900,
      "orders_per_min_by_submits": 882,
      "peak_open_orders": 30,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
      "seconds": 20,
      "skipped_slots": 205,
      "target_msgs_per_s": 50,
@@ -1266,16 +1479,22 @@
    "phase": "B",
    "rate_estimates_whole_run": {
     "counted_msgs_per_s": {
-     "best_5s_mean": 40.8,
-     "max_1s": 48
+     "best_5s_mean": 42.0,
+     "best_5s_mean_utc_buckets": 40.8,
+     "max_1s": 53,
+     "max_1s_utc_buckets": 48
     },
     "wire_est_refined_msgs_per_s": {
-     "best_5s_mean": 53.8,
-     "max_1s": 66
+     "best_5s_mean": 56.6,
+     "best_5s_mean_utc_buckets": 53.8,
+     "max_1s": 78,
+     "max_1s_utc_buckets": 66
     },
     "wire_est_upper_bound_msgs_per_s": {
-     "best_5s_mean": 60.8,
-     "max_1s": 71
+     "best_5s_mean": 63.4,
+     "best_5s_mean_utc_buckets": 60.8,
+     "max_1s": 83,
+     "max_1s_utc_buckets": 71
     }
    },
    "rungs": [
@@ -1298,10 +1517,19 @@
      "counted_msgs_per_s_max": 10,
      "counted_msgs_per_s_mean": 10.0,
      "counted_msgs_per_s_min": 10,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 12,
+      "wire_est_refined": 18,
+      "wire_est_upper_bound": 18
+     },
      "orders": 100,
      "orders_per_min_by_counted_rate": 300,
      "orders_per_min_by_submits": 300,
      "peak_open_orders": 2,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
      "seconds": 20,
      "skipped_slots": 0,
      "target_msgs_per_s": 10,
@@ -1327,10 +1555,19 @@
      "counted_msgs_per_s_max": 21,
      "counted_msgs_per_s_mean": 19.7,
      "counted_msgs_per_s_min": 17,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 25,
+      "wire_est_refined": 40,
+      "wire_est_upper_bound": 40
+     },
      "orders": 200,
      "orders_per_min_by_counted_rate": 591,
      "orders_per_min_by_submits": 600,
      "peak_open_orders": 24,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
      "seconds": 20,
      "skipped_slots": 0,
      "target_msgs_per_s": 20,
@@ -1356,10 +1593,19 @@
      "counted_msgs_per_s_max": 31,
      "counted_msgs_per_s_mean": 29.9,
      "counted_msgs_per_s_min": 27,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 40,
+      "wire_est_refined": 63,
+      "wire_est_upper_bound": 64
+     },
      "orders": 300,
      "orders_per_min_by_counted_rate": 897,
      "orders_per_min_by_submits": 900,
      "peak_open_orders": 33,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
      "seconds": 20,
      "skipped_slots": 0,
      "target_msgs_per_s": 30,
@@ -1385,10 +1631,19 @@
      "counted_msgs_per_s_max": 44,
      "counted_msgs_per_s_mean": 37.8,
      "counted_msgs_per_s_min": 30,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 47,
+      "wire_est_refined": 69,
+      "wire_est_upper_bound": 73
+     },
      "orders": 382,
      "orders_per_min_by_counted_rate": 1134,
      "orders_per_min_by_submits": 1146,
      "peak_open_orders": 50,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
      "seconds": 20,
      "skipped_slots": 18,
      "target_msgs_per_s": 40,
@@ -1414,10 +1669,19 @@
      "counted_msgs_per_s_max": 48,
      "counted_msgs_per_s_mean": 37.65,
      "counted_msgs_per_s_min": 21,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 53,
+      "wire_est_refined": 78,
+      "wire_est_upper_bound": 83
+     },
      "orders": 377,
      "orders_per_min_by_counted_rate": 1130,
      "orders_per_min_by_submits": 1131,
      "peak_open_orders": 50,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
      "seconds": 20,
      "skipped_slots": 123,
      "target_msgs_per_s": 50,
@@ -1457,16 +1721,22 @@
   {
    "combined_rate_estimates": {
     "counted_msgs_per_s": {
-     "best_5s_mean": 25.6,
-     "max_1s": 29
+     "best_5s_mean": 26.0,
+     "best_5s_mean_utc_buckets": 25.6,
+     "max_1s": 33,
+     "max_1s_utc_buckets": 29
     },
     "wire_est_refined_msgs_per_s": {
-     "best_5s_mean": 38.8,
-     "max_1s": 44
+     "best_5s_mean": 39.4,
+     "best_5s_mean_utc_buckets": 38.8,
+     "max_1s": 52,
+     "max_1s_utc_buckets": 44
     },
     "wire_est_upper_bound_msgs_per_s": {
-     "best_5s_mean": 38.8,
-     "max_1s": 45
+     "best_5s_mean": 39.6,
+     "best_5s_mean_utc_buckets": 38.8,
+     "max_1s": 53,
+     "max_1s_utc_buckets": 45
     }
    },
    "connections": {
@@ -1509,16 +1779,22 @@
      "phase": "L",
      "rate_estimates_whole_run": {
       "counted_msgs_per_s": {
-       "best_5s_mean": 25.6,
-       "max_1s": 29
+       "best_5s_mean": 26.0,
+       "best_5s_mean_utc_buckets": 25.6,
+       "max_1s": 33,
+       "max_1s_utc_buckets": 29
       },
       "wire_est_refined_msgs_per_s": {
-       "best_5s_mean": 38.8,
-       "max_1s": 44
+       "best_5s_mean": 39.4,
+       "best_5s_mean_utc_buckets": 38.8,
+       "max_1s": 52,
+       "max_1s_utc_buckets": 44
       },
       "wire_est_upper_bound_msgs_per_s": {
-       "best_5s_mean": 38.8,
-       "max_1s": 45
+       "best_5s_mean": 39.6,
+       "best_5s_mean_utc_buckets": 38.8,
+       "max_1s": 53,
+       "max_1s_utc_buckets": 45
       }
      },
      "rungs": [
@@ -1541,10 +1817,19 @@
        "counted_msgs_per_s_max": 12,
        "counted_msgs_per_s_mean": 9.95,
        "counted_msgs_per_s_min": 9,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 13,
+        "wire_est_refined": 21,
+        "wire_est_upper_bound": 21
+       },
        "orders": 100,
        "orders_per_min_by_counted_rate": 298,
        "orders_per_min_by_submits": 300,
        "peak_open_orders": 12,
+       "receipt_slots_replayed_from_journal": {
+        "equal": true,
+        "max_abs_slot_difference": 0
+       },
        "seconds": 20,
        "skipped_slots": 0,
        "target_msgs_per_s": 10,
@@ -1570,10 +1855,19 @@
        "counted_msgs_per_s_max": 19,
        "counted_msgs_per_s_mean": 14.85,
        "counted_msgs_per_s_min": 11,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 21,
+        "wire_est_refined": 33,
+        "wire_est_upper_bound": 34
+       },
        "orders": 150,
        "orders_per_min_by_counted_rate": 446,
        "orders_per_min_by_submits": 450,
        "peak_open_orders": 15,
+       "receipt_slots_replayed_from_journal": {
+        "equal": true,
+        "max_abs_slot_difference": 0
+       },
        "seconds": 20,
        "skipped_slots": 0,
        "target_msgs_per_s": 15,
@@ -1599,10 +1893,19 @@
        "counted_msgs_per_s_max": 23,
        "counted_msgs_per_s_mean": 19.5,
        "counted_msgs_per_s_min": 16,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 24,
+        "wire_est_refined": 37,
+        "wire_est_upper_bound": 37
+       },
        "orders": 197,
        "orders_per_min_by_counted_rate": 585,
        "orders_per_min_by_submits": 591,
        "peak_open_orders": 20,
+       "receipt_slots_replayed_from_journal": {
+        "equal": false,
+        "max_abs_slot_difference": 1
+       },
        "seconds": 20,
        "skipped_slots": 3,
        "target_msgs_per_s": 20,
@@ -1628,10 +1931,19 @@
        "counted_msgs_per_s_max": 29,
        "counted_msgs_per_s_mean": 24.8,
        "counted_msgs_per_s_min": 21,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 33,
+        "wire_est_refined": 52,
+        "wire_est_upper_bound": 53
+       },
        "orders": 248,
        "orders_per_min_by_counted_rate": 744,
        "orders_per_min_by_submits": 744,
        "peak_open_orders": 26,
+       "receipt_slots_replayed_from_journal": {
+        "equal": true,
+        "max_abs_slot_difference": 0
+       },
        "seconds": 20,
        "skipped_slots": 2,
        "target_msgs_per_s": 25,
@@ -1701,15 +2013,21 @@
      "rate_estimates_whole_run": {
       "counted_msgs_per_s": {
        "best_5s_mean": 3.4,
-       "max_1s": 8
+       "best_5s_mean_utc_buckets": 3.4,
+       "max_1s": 10,
+       "max_1s_utc_buckets": 8
       },
       "wire_est_refined_msgs_per_s": {
        "best_5s_mean": 3.6,
-       "max_1s": 8
+       "best_5s_mean_utc_buckets": 3.6,
+       "max_1s": 10,
+       "max_1s_utc_buckets": 8
       },
       "wire_est_upper_bound_msgs_per_s": {
        "best_5s_mean": 4.6,
-       "max_1s": 12
+       "best_5s_mean_utc_buckets": 4.6,
+       "max_1s": 15,
+       "max_1s_utc_buckets": 12
       }
      },
      "rungs": [
@@ -1732,10 +2050,19 @@
        "counted_msgs_per_s_max": 9,
        "counted_msgs_per_s_mean": 7.5,
        "counted_msgs_per_s_min": 6,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 9,
+        "wire_est_refined": 9,
+        "wire_est_upper_bound": 13
+       },
        "orders": 11,
        "orders_per_min_by_counted_rate": 225,
        "orders_per_min_by_submits": 330,
        "peak_open_orders": 10,
+       "receipt_slots_replayed_from_journal": {
+        "equal": true,
+        "max_abs_slot_difference": 0
+       },
        "seconds": 2,
        "skipped_slots": 0,
        "target_msgs_per_s": 10,
@@ -1775,16 +2102,22 @@
   {
    "combined_rate_estimates": {
     "counted_msgs_per_s": {
-     "best_5s_mean": 25.2,
-     "max_1s": 26
+     "best_5s_mean": 25.8,
+     "best_5s_mean_utc_buckets": 25.2,
+     "max_1s": 30,
+     "max_1s_utc_buckets": 26
     },
     "wire_est_refined_msgs_per_s": {
-     "best_5s_mean": 37.8,
-     "max_1s": 40
+     "best_5s_mean": 39.0,
+     "best_5s_mean_utc_buckets": 37.8,
+     "max_1s": 47,
+     "max_1s_utc_buckets": 40
     },
     "wire_est_upper_bound_msgs_per_s": {
-     "best_5s_mean": 37.8,
-     "max_1s": 40
+     "best_5s_mean": 39.0,
+     "best_5s_mean_utc_buckets": 37.8,
+     "max_1s": 47,
+     "max_1s_utc_buckets": 40
     }
    },
    "connections": {
@@ -1826,16 +2159,22 @@
      "phase": "L",
      "rate_estimates_whole_run": {
       "counted_msgs_per_s": {
-       "best_5s_mean": 25.2,
-       "max_1s": 26
+       "best_5s_mean": 25.8,
+       "best_5s_mean_utc_buckets": 25.2,
+       "max_1s": 30,
+       "max_1s_utc_buckets": 26
       },
       "wire_est_refined_msgs_per_s": {
-       "best_5s_mean": 37.8,
-       "max_1s": 40
+       "best_5s_mean": 39.0,
+       "best_5s_mean_utc_buckets": 37.8,
+       "max_1s": 47,
+       "max_1s_utc_buckets": 40
       },
       "wire_est_upper_bound_msgs_per_s": {
-       "best_5s_mean": 37.8,
-       "max_1s": 40
+       "best_5s_mean": 39.0,
+       "best_5s_mean_utc_buckets": 37.8,
+       "max_1s": 47,
+       "max_1s_utc_buckets": 40
       }
      },
      "rungs": [
@@ -1858,10 +2197,19 @@
        "counted_msgs_per_s_max": 11,
        "counted_msgs_per_s_mean": 9.9,
        "counted_msgs_per_s_min": 9,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 13,
+        "wire_est_refined": 21,
+        "wire_est_upper_bound": 21
+       },
        "orders": 100,
        "orders_per_min_by_counted_rate": 297,
        "orders_per_min_by_submits": 300,
        "peak_open_orders": 12,
+       "receipt_slots_replayed_from_journal": {
+        "equal": true,
+        "max_abs_slot_difference": 0
+       },
        "seconds": 20,
        "skipped_slots": 0,
        "target_msgs_per_s": 10,
@@ -1887,10 +2235,19 @@
        "counted_msgs_per_s_max": 16,
        "counted_msgs_per_s_mean": 15.0,
        "counted_msgs_per_s_min": 14,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 18,
+        "wire_est_refined": 29,
+        "wire_est_upper_bound": 29
+       },
        "orders": 150,
        "orders_per_min_by_counted_rate": 450,
        "orders_per_min_by_submits": 450,
        "peak_open_orders": 15,
+       "receipt_slots_replayed_from_journal": {
+        "equal": true,
+        "max_abs_slot_difference": 0
+       },
        "seconds": 20,
        "skipped_slots": 0,
        "target_msgs_per_s": 15,
@@ -1916,10 +2273,19 @@
        "counted_msgs_per_s_max": 21,
        "counted_msgs_per_s_mean": 19.75,
        "counted_msgs_per_s_min": 18,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 24,
+        "wire_est_refined": 38,
+        "wire_est_upper_bound": 38
+       },
        "orders": 199,
        "orders_per_min_by_counted_rate": 592,
        "orders_per_min_by_submits": 597,
        "peak_open_orders": 22,
+       "receipt_slots_replayed_from_journal": {
+        "equal": true,
+        "max_abs_slot_difference": 0
+       },
        "seconds": 20,
        "skipped_slots": 1,
        "target_msgs_per_s": 20,
@@ -1945,10 +2311,19 @@
        "counted_msgs_per_s_max": 27,
        "counted_msgs_per_s_mean": 25.0,
        "counted_msgs_per_s_min": 23,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 30,
+        "wire_est_refined": 47,
+        "wire_est_upper_bound": 47
+       },
        "orders": 250,
        "orders_per_min_by_counted_rate": 750,
        "orders_per_min_by_submits": 750,
        "peak_open_orders": 25,
+       "receipt_slots_replayed_from_journal": {
+        "equal": true,
+        "max_abs_slot_difference": 0
+       },
        "seconds": 20,
        "skipped_slots": 0,
        "target_msgs_per_s": 25,
@@ -2018,15 +2393,21 @@
      "rate_estimates_whole_run": {
       "counted_msgs_per_s": {
        "best_5s_mean": 1.8,
-       "max_1s": 5
+       "best_5s_mean_utc_buckets": 1.8,
+       "max_1s": 7,
+       "max_1s_utc_buckets": 5
       },
       "wire_est_refined_msgs_per_s": {
        "best_5s_mean": 2.2,
-       "max_1s": 7
+       "best_5s_mean_utc_buckets": 2.2,
+       "max_1s": 9,
+       "max_1s_utc_buckets": 7
       },
       "wire_est_upper_bound_msgs_per_s": {
        "best_5s_mean": 2.2,
-       "max_1s": 7
+       "best_5s_mean_utc_buckets": 2.2,
+       "max_1s": 9,
+       "max_1s_utc_buckets": 7
       }
      },
      "rungs": [
@@ -2049,10 +2430,19 @@
        "counted_msgs_per_s_max": 7,
        "counted_msgs_per_s_mean": 7.0,
        "counted_msgs_per_s_min": 7,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 7,
+        "wire_est_refined": 9,
+        "wire_est_upper_bound": 9
+       },
        "orders": 7,
        "orders_per_min_by_counted_rate": 210,
        "orders_per_min_by_submits": 420,
        "peak_open_orders": 5,
+       "receipt_slots_replayed_from_journal": {
+        "equal": true,
+        "max_abs_slot_difference": 0
+       },
        "seconds": 1,
        "skipped_slots": 0,
        "target_msgs_per_s": 10,
@@ -2092,16 +2482,22 @@
   {
    "combined_rate_estimates": {
     "counted_msgs_per_s": {
-     "best_5s_mean": 20.4,
-     "max_1s": 21
+     "best_5s_mean": 20.8,
+     "best_5s_mean_utc_buckets": 20.4,
+     "max_1s": 25,
+     "max_1s_utc_buckets": 21
     },
     "wire_est_refined_msgs_per_s": {
-     "best_5s_mean": 30.8,
-     "max_1s": 32
+     "best_5s_mean": 31.6,
+     "best_5s_mean_utc_buckets": 30.8,
+     "max_1s": 40,
+     "max_1s_utc_buckets": 32
     },
     "wire_est_upper_bound_msgs_per_s": {
-     "best_5s_mean": 30.8,
-     "max_1s": 32
+     "best_5s_mean": 31.6,
+     "best_5s_mean_utc_buckets": 30.8,
+     "max_1s": 40,
+     "max_1s_utc_buckets": 32
     }
    },
    "connections": {
@@ -2144,16 +2540,22 @@
      "phase": "L",
      "rate_estimates_whole_run": {
       "counted_msgs_per_s": {
-       "best_5s_mean": 20.4,
-       "max_1s": 21
+       "best_5s_mean": 20.8,
+       "best_5s_mean_utc_buckets": 20.4,
+       "max_1s": 25,
+       "max_1s_utc_buckets": 21
       },
       "wire_est_refined_msgs_per_s": {
-       "best_5s_mean": 30.8,
-       "max_1s": 32
+       "best_5s_mean": 31.6,
+       "best_5s_mean_utc_buckets": 30.8,
+       "max_1s": 40,
+       "max_1s_utc_buckets": 32
       },
       "wire_est_upper_bound_msgs_per_s": {
-       "best_5s_mean": 30.8,
-       "max_1s": 32
+       "best_5s_mean": 31.6,
+       "best_5s_mean_utc_buckets": 30.8,
+       "max_1s": 40,
+       "max_1s_utc_buckets": 32
       }
      },
      "rungs": [
@@ -2176,10 +2578,19 @@
        "counted_msgs_per_s_max": 11,
        "counted_msgs_per_s_mean": 9.9,
        "counted_msgs_per_s_min": 9,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 15,
+        "wire_est_refined": 24,
+        "wire_est_upper_bound": 24
+       },
        "orders": 100,
        "orders_per_min_by_counted_rate": 297,
        "orders_per_min_by_submits": 300,
        "peak_open_orders": 11,
+       "receipt_slots_replayed_from_journal": {
+        "equal": true,
+        "max_abs_slot_difference": 0
+       },
        "seconds": 20,
        "skipped_slots": 0,
        "target_msgs_per_s": 10,
@@ -2205,10 +2616,19 @@
        "counted_msgs_per_s_max": 16,
        "counted_msgs_per_s_mean": 14.7,
        "counted_msgs_per_s_min": 13,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 18,
+        "wire_est_refined": 28,
+        "wire_est_upper_bound": 28
+       },
        "orders": 148,
        "orders_per_min_by_counted_rate": 441,
        "orders_per_min_by_submits": 444,
        "peak_open_orders": 16,
+       "receipt_slots_replayed_from_journal": {
+        "equal": false,
+        "max_abs_slot_difference": 1
+       },
        "seconds": 20,
        "skipped_slots": 2,
        "target_msgs_per_s": 15,
@@ -2234,10 +2654,19 @@
        "counted_msgs_per_s_max": 23,
        "counted_msgs_per_s_mean": 20.0,
        "counted_msgs_per_s_min": 18,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 25,
+        "wire_est_refined": 40,
+        "wire_est_upper_bound": 40
+       },
        "orders": 126,
        "orders_per_min_by_counted_rate": 600,
        "orders_per_min_by_submits": 630,
        "peak_open_orders": 21,
+       "receipt_slots_replayed_from_journal": {
+        "equal": true,
+        "max_abs_slot_difference": 0
+       },
        "seconds": 12,
        "skipped_slots": 0,
        "target_msgs_per_s": 20,
@@ -2287,15 +2716,21 @@
      "rate_estimates_whole_run": {
       "counted_msgs_per_s": {
        "best_5s_mean": 0.0,
-       "max_1s": 0
+       "best_5s_mean_utc_buckets": 0.0,
+       "max_1s": 0,
+       "max_1s_utc_buckets": 0
       },
       "wire_est_refined_msgs_per_s": {
        "best_5s_mean": 0.0,
-       "max_1s": 0
+       "best_5s_mean_utc_buckets": 0.0,
+       "max_1s": 0,
+       "max_1s_utc_buckets": 0
       },
       "wire_est_upper_bound_msgs_per_s": {
        "best_5s_mean": 0.0,
-       "max_1s": 0
+       "best_5s_mean_utc_buckets": 0.0,
+       "max_1s": 0,
+       "max_1s_utc_buckets": 0
       }
      },
      "steps": {},
@@ -2319,16 +2754,22 @@
   {
    "combined_rate_estimates": {
     "counted_msgs_per_s": {
-     "best_5s_mean": 25.6,
-     "max_1s": 28
+     "best_5s_mean": 26.0,
+     "best_5s_mean_utc_buckets": 25.6,
+     "max_1s": 35,
+     "max_1s_utc_buckets": 28
     },
     "wire_est_refined_msgs_per_s": {
-     "best_5s_mean": 38.6,
-     "max_1s": 43
+     "best_5s_mean": 39.4,
+     "best_5s_mean_utc_buckets": 38.6,
+     "max_1s": 47,
+     "max_1s_utc_buckets": 43
     },
     "wire_est_upper_bound_msgs_per_s": {
-     "best_5s_mean": 38.6,
-     "max_1s": 43
+     "best_5s_mean": 39.4,
+     "best_5s_mean_utc_buckets": 38.6,
+     "max_1s": 52,
+     "max_1s_utc_buckets": 43
     }
    },
    "connections": {
@@ -2370,16 +2811,22 @@
      "phase": "L",
      "rate_estimates_whole_run": {
       "counted_msgs_per_s": {
-       "best_5s_mean": 25.6,
-       "max_1s": 28
+       "best_5s_mean": 26.0,
+       "best_5s_mean_utc_buckets": 25.6,
+       "max_1s": 30,
+       "max_1s_utc_buckets": 28
       },
       "wire_est_refined_msgs_per_s": {
-       "best_5s_mean": 38.6,
-       "max_1s": 43
+       "best_5s_mean": 39.4,
+       "best_5s_mean_utc_buckets": 38.6,
+       "max_1s": 47,
+       "max_1s_utc_buckets": 43
       },
       "wire_est_upper_bound_msgs_per_s": {
-       "best_5s_mean": 38.6,
-       "max_1s": 43
+       "best_5s_mean": 39.4,
+       "best_5s_mean_utc_buckets": 38.6,
+       "max_1s": 47,
+       "max_1s_utc_buckets": 43
       }
      },
      "rungs": [
@@ -2402,10 +2849,19 @@
        "counted_msgs_per_s_max": 16,
        "counted_msgs_per_s_mean": 14.75,
        "counted_msgs_per_s_min": 10,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 21,
+        "wire_est_refined": 31,
+        "wire_est_upper_bound": 34
+       },
        "orders": 150,
        "orders_per_min_by_counted_rate": 442,
        "orders_per_min_by_submits": 450,
        "peak_open_orders": 26,
+       "receipt_slots_replayed_from_journal": {
+        "equal": true,
+        "max_abs_slot_difference": 0
+       },
        "seconds": 20,
        "skipped_slots": 0,
        "target_msgs_per_s": 15,
@@ -2431,10 +2887,19 @@
        "counted_msgs_per_s_max": 20,
        "counted_msgs_per_s_mean": 19.9,
        "counted_msgs_per_s_min": 18,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 26,
+        "wire_est_refined": 41,
+        "wire_est_upper_bound": 41
+       },
        "orders": 200,
        "orders_per_min_by_counted_rate": 597,
        "orders_per_min_by_submits": 600,
        "peak_open_orders": 20,
+       "receipt_slots_replayed_from_journal": {
+        "equal": true,
+        "max_abs_slot_difference": 0
+       },
        "seconds": 20,
        "skipped_slots": 0,
        "target_msgs_per_s": 20,
@@ -2460,10 +2925,19 @@
        "counted_msgs_per_s_max": 26,
        "counted_msgs_per_s_mean": 24.9,
        "counted_msgs_per_s_min": 23,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 30,
+        "wire_est_refined": 47,
+        "wire_est_upper_bound": 47
+       },
        "orders": 250,
        "orders_per_min_by_counted_rate": 747,
        "orders_per_min_by_submits": 750,
        "peak_open_orders": 25,
+       "receipt_slots_replayed_from_journal": {
+        "equal": true,
+        "max_abs_slot_difference": 0
+       },
        "seconds": 20,
        "skipped_slots": 0,
        "target_msgs_per_s": 25,
@@ -2532,16 +3006,22 @@
      "phase": "L",
      "rate_estimates_whole_run": {
       "counted_msgs_per_s": {
-       "best_5s_mean": 18.0,
-       "max_1s": 20
+       "best_5s_mean": 19.2,
+       "best_5s_mean_utc_buckets": 18.0,
+       "max_1s": 23,
+       "max_1s_utc_buckets": 20
       },
       "wire_est_refined_msgs_per_s": {
-       "best_5s_mean": 27.0,
-       "max_1s": 30
+       "best_5s_mean": 27.2,
+       "best_5s_mean_utc_buckets": 27.0,
+       "max_1s": 36,
+       "max_1s_utc_buckets": 30
       },
       "wire_est_upper_bound_msgs_per_s": {
-       "best_5s_mean": 27.0,
-       "max_1s": 30
+       "best_5s_mean": 28.4,
+       "best_5s_mean_utc_buckets": 27.0,
+       "max_1s": 36,
+       "max_1s_utc_buckets": 30
       }
      },
      "rungs": [
@@ -2564,10 +3044,19 @@
        "counted_msgs_per_s_max": 20,
        "counted_msgs_per_s_mean": 14.85,
        "counted_msgs_per_s_min": 12,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 22,
+        "wire_est_refined": 36,
+        "wire_est_upper_bound": 36
+       },
        "orders": 150,
        "orders_per_min_by_counted_rate": 446,
        "orders_per_min_by_submits": 450,
        "peak_open_orders": 16,
+       "receipt_slots_replayed_from_journal": {
+        "equal": true,
+        "max_abs_slot_difference": 0
+       },
        "seconds": 20,
        "skipped_slots": 0,
        "target_msgs_per_s": 15,
@@ -2593,10 +3082,19 @@
        "counted_msgs_per_s_max": 23,
        "counted_msgs_per_s_mean": 18.25,
        "counted_msgs_per_s_min": 16,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 23,
+        "wire_est_refined": 36,
+        "wire_est_upper_bound": 36
+       },
        "orders": 50,
        "orders_per_min_by_counted_rate": 548,
        "orders_per_min_by_submits": 750,
        "peak_open_orders": 21,
+       "receipt_slots_replayed_from_journal": {
+        "equal": true,
+        "max_abs_slot_difference": 0
+       },
        "seconds": 4,
        "skipped_slots": 0,
        "target_msgs_per_s": 20,
@@ -2645,7 +3143,10 @@
   "The pair tests T1..T10 and the reqIds probe were placed after the second independent count; a third raw-protocol count (10,313) is transcript-derived and reconciles by arithmetic (ADDENDUM-01).",
   "Of the 38 journal orders absent at the broker, 35 carry the venue's [103] duplicate-order-id refusal, 1 a cancel-target-not-found rejection and 2 never reached the adapter (revision 2 corrects the v1 label of 36 as [103]).",
   "Latencies of the pair tests are single 14-30 second runs at 10 msgs/s per connection and are not a latency study.",
-  "Timing offsets compare two timestamps taken on one host clock."
+  "Timing offsets compare two timestamps taken on one host clock.",
+  "Per-second maxima (revision 3): whole-run, combined and per-rung-window `max_1s` / `best_5s_mean` are maxima over sliding windows anchored at a message; the revision-2 UTC-bucket values are kept as `*_utc_buckets` and are never above them.",
+  "The receipts' own per-rung `counted_msgs_per_s_min` / `counted_msgs_per_s_max` are fixed one-second slot counters, so they are bucket values and lower bounds of the sliding maximum; the official client's receipts hold no per-message times, so its per-second maxima cannot be recomputed under the sliding definition.",
+  "`peak_open_orders` of the adapter runs closes an order at its first terminal order event (revision 3); the official client's `peak_open_orders` is the probe's own run-time counter and is not recomputable from the receipts."
  ],
  "facts": {
   "develop_commits_ahead_of_pin": 26,
@@ -2681,6 +3182,107 @@
    "server_versions": [
     225
    ]
+  },
+  "peak_open_orders_definition": {
+   "derivation": "the journals' own `event` vocabulary intersected with the Nautilus terminal order events (filled, canceled, cancelled, expired, denied, rejected); order_cancel_rejected (a refused cancel) and order_pending_cancel are not terminal",
+   "journal_event_vocabulary": [
+    "abort",
+    "accept_latency",
+    "account_ready",
+    "cancel",
+    "cancel_all",
+    "cancel_rejected_wait",
+    "order_accepted",
+    "order_cancel_rejected",
+    "order_canceled",
+    "order_filled",
+    "order_initialized",
+    "order_pending_cancel",
+    "order_rejected",
+    "order_submitted",
+    "order_updated",
+    "request",
+    "rung_end",
+    "rung_start",
+    "s4_underrate",
+    "snapshot",
+    "start",
+    "step_enter",
+    "step_pass",
+    "stop_node",
+    "submit"
+   ],
+   "ladder_order_quantities": [
+    1
+   ],
+   "official_client_peak_open": "source-derived from the private probe script, not recomputable: the receipts' `peak_open_orders` of the official-client runs are the probe's own run-time counter (at each placement: the orders already placed and not marked done, plus the one being placed); the probe marks an order done only on a Cancelled / ApiCancelled / Inactive status, a 202 notice or a 10147 / 10148 error, so a [103]-refused order counts as open until its stale cancel is answered; these values are unchanged in revision 3",
+   "open_from": "the order's `submit` journal row",
+   "open_until": "the order's FIRST terminal order event; an order with no terminal event (an order_submitted with no later event, for one) stays open to the end of the journal",
+   "order_event_names_not_terminal": [
+    "order_accepted",
+    "order_cancel_rejected",
+    "order_initialized",
+    "order_pending_cancel",
+    "order_submitted",
+    "order_updated"
+   ],
+   "partial_fills": "every ladder order has quantity 1, so an order_filled event is a complete fill",
+   "peak": "the running count is updated at every submit and every terminal event of a rung's own orders and the rung's peak is the largest value reached; at equal timestamps terminal events are applied before submits",
+   "revision_2_defect": "revision 2 closed an order only at order_canceled, so a rejected, filled, expired or denied order stayed open for ever",
+   "scope": "adapter ladder orders (journal step S4), per rung of the receipt's ladder",
+   "terminal_event_names": [
+    "order_canceled",
+    "order_filled",
+    "order_rejected"
+   ],
+   "terminal_names_absent_from_the_journals": [
+    "order_cancelled",
+    "order_denied",
+    "order_expired"
+   ]
+  },
+  "rate_window_conventions": {
+   "anchor": "a window can always be shifted right to the first message it holds without losing one, so the maximum over every real start time equals the maximum over message-anchored windows",
+   "best_5s_mean": "the largest number of messages of the series in any half-open interval [t, t + 5 s) whose start t is the timestamp of a message of that series, divided by 5, rounded to 2 decimals",
+   "field_changes": {
+    "added": [
+     "max_1s_utc_buckets",
+     "best_5s_mean_utc_buckets",
+     "max_1s_sliding_in_rung_window",
+     "receipt_slots_replayed_from_journal",
+     "reconciliation.journal_orders_missing_by_number_of_owner_journals",
+     "facts.rate_window_conventions",
+     "facts.peak_open_orders_definition"
+    ],
+    "renamed": [
+     "max_1s -> max_1s_utc_buckets",
+     "best_5s_mean -> best_5s_mean_utc_buckets"
+    ],
+    "same_name_new_meaning": [
+     "max_1s",
+     "best_5s_mean"
+    ]
+   },
+   "interval": "half-open: a message exactly 1 s (5 s) after the start is outside the window; timestamps are compared as exact integer microseconds since the Unix epoch, never as floating-point seconds",
+   "max_1s": "the largest number of messages of the series in any half-open interval [t, t + 1 s) whose start t is the timestamp of a message of that series",
+   "official_client": "the official-client receipts hold no per-message times, so their per-second maxima cannot be recomputed under the sliding definition",
+   "parameters": {
+    "anchor": "message timestamp",
+    "best_5s_mean_window_us": 5000000,
+    "interval": "start inclusive, end exclusive",
+    "max_1s_window_us": 1000000,
+    "time_unit": "integer microseconds"
+   },
+   "receipt_slot_counters": "counted_msgs_per_s_min and counted_msgs_per_s_max of a rung are the receipts' own fixed one-second slot counters (from the rung start for the adapter, integer seconds of the probe's monotonic clock for the official client): bucket values, hence lower bounds of the sliding maximum; they are unchanged",
+   "rung_window": "max_1s_sliding_in_rung_window applies the same sliding maximum to the step-S4 submit and cancel rows inside a rung's window, which starts at the S4 step_enter row's timestamp plus (rung index x the frozen rung_s) and lasts the rung's recorded seconds; it is the harness's own per-second slot grid replayed from the journal",
+   "rung_window_replay": {
+    "largest_slot_difference_in_messages": 1,
+    "reading": "where the replay differs, one message was sent in the milliseconds between the nominal end of the previous rung and the harness tick that journalled the next rung's start; the harness does not count such a message (its slot index, 20, falls outside the finished rung's 20-slot row) and the replay counts it in the first slot of the new window",
+    "rungs": 40,
+    "slots_equal_to_the_receipts_per_second_counters": 38
+   },
+   "series": "counted = one message per submit row and per cancel row; wire_est_refined and wire_est_upper_bound add the adapter's hidden reqAllOpenOrders per cancel (refined: only for a cancel of an order that had been accepted), stamped with the cancel row's timestamp because the journal does not timestamp it",
+   "utc_buckets": "max_1s_utc_buckets and best_5s_mean_utc_buckets are the revision-2 numbers: messages per UTC second (the integer second of the timestamp), the largest bucket and the best mean of 5 consecutive buckets; a sliding maximum is never below its bucket value and exceeds it when a burst straddles a second boundary"
   },
   "source_citations_at_the_pin": {
    "blob_url_form": "https://github.com/nautechsystems/nautilus_trader/blob/01ced2a3e7b7d25ae7b2e5c0c077bcc46192eb25/crates/adapters/interactive_brokers/src/execution/core.rs#L<line>",
@@ -2825,34 +3427,46 @@
   {
    "id": "adapter_whole_run_rate_estimates",
    "source": "B-r5, B-r6 journals",
-   "unit": "msgs/s (max over any 1 s, best 5 s mean)",
+   "unit": "msgs/s (max over any sliding 1 s window anchored at a message, best sliding 5 s mean; `*_utc_buckets` keep the revision-2 values over UTC-second buckets)",
    "value": {
     "B-r5": {
      "counted": {
-      "best_5s_mean": 32.6,
-      "max_1s": 37
+      "best_5s_mean": 33.6,
+      "best_5s_mean_utc_buckets": 32.6,
+      "max_1s": 46,
+      "max_1s_utc_buckets": 37
      },
      "wire_refined": {
-      "best_5s_mean": 49.8,
-      "max_1s": 57
+      "best_5s_mean": 51.2,
+      "best_5s_mean_utc_buckets": 49.8,
+      "max_1s": 69,
+      "max_1s_utc_buckets": 57
      },
      "wire_upper_bound": {
-      "best_5s_mean": 49.8,
-      "max_1s": 57
+      "best_5s_mean": 51.2,
+      "best_5s_mean_utc_buckets": 49.8,
+      "max_1s": 69,
+      "max_1s_utc_buckets": 57
      }
     },
     "B-r6": {
      "counted": {
-      "best_5s_mean": 40.8,
-      "max_1s": 48
+      "best_5s_mean": 42.0,
+      "best_5s_mean_utc_buckets": 40.8,
+      "max_1s": 53,
+      "max_1s_utc_buckets": 48
      },
      "wire_refined": {
-      "best_5s_mean": 53.8,
-      "max_1s": 66
+      "best_5s_mean": 56.6,
+      "best_5s_mean_utc_buckets": 53.8,
+      "max_1s": 78,
+      "max_1s_utc_buckets": 66
      },
      "wire_upper_bound": {
-      "best_5s_mean": 60.8,
-      "max_1s": 71
+      "best_5s_mean": 63.4,
+      "best_5s_mean_utc_buckets": 60.8,
+      "max_1s": 83,
+      "max_1s_utc_buckets": 71
      }
     }
    }
@@ -2860,62 +3474,86 @@
   {
    "id": "adapter_two_connection_combined_rate_estimates",
    "source": "L0 + L1 journals",
-   "unit": "msgs/s (max over any 1 s, best 5 s mean)",
+   "unit": "msgs/s (max over any sliding 1 s window anchored at a message, best sliding 5 s mean; `*_utc_buckets` keep the revision-2 values over UTC-second buckets)",
    "value": {
     "m1": {
      "counted": {
-      "best_5s_mean": 25.6,
-      "max_1s": 29
+      "best_5s_mean": 26.0,
+      "best_5s_mean_utc_buckets": 25.6,
+      "max_1s": 33,
+      "max_1s_utc_buckets": 29
      },
      "wire_refined": {
-      "best_5s_mean": 38.8,
-      "max_1s": 44
+      "best_5s_mean": 39.4,
+      "best_5s_mean_utc_buckets": 38.8,
+      "max_1s": 52,
+      "max_1s_utc_buckets": 44
      },
      "wire_upper_bound": {
-      "best_5s_mean": 38.8,
-      "max_1s": 45
+      "best_5s_mean": 39.6,
+      "best_5s_mean_utc_buckets": 38.8,
+      "max_1s": 53,
+      "max_1s_utc_buckets": 45
      }
     },
     "m2": {
      "counted": {
-      "best_5s_mean": 25.2,
-      "max_1s": 26
+      "best_5s_mean": 25.8,
+      "best_5s_mean_utc_buckets": 25.2,
+      "max_1s": 30,
+      "max_1s_utc_buckets": 26
      },
      "wire_refined": {
-      "best_5s_mean": 37.8,
-      "max_1s": 40
+      "best_5s_mean": 39.0,
+      "best_5s_mean_utc_buckets": 37.8,
+      "max_1s": 47,
+      "max_1s_utc_buckets": 40
      },
      "wire_upper_bound": {
-      "best_5s_mean": 37.8,
-      "max_1s": 40
+      "best_5s_mean": 39.0,
+      "best_5s_mean_utc_buckets": 37.8,
+      "max_1s": 47,
+      "max_1s_utc_buckets": 40
      }
     },
     "m3": {
      "counted": {
-      "best_5s_mean": 20.4,
-      "max_1s": 21
+      "best_5s_mean": 20.8,
+      "best_5s_mean_utc_buckets": 20.4,
+      "max_1s": 25,
+      "max_1s_utc_buckets": 21
      },
      "wire_refined": {
-      "best_5s_mean": 30.8,
-      "max_1s": 32
+      "best_5s_mean": 31.6,
+      "best_5s_mean_utc_buckets": 30.8,
+      "max_1s": 40,
+      "max_1s_utc_buckets": 32
      },
      "wire_upper_bound": {
-      "best_5s_mean": 30.8,
-      "max_1s": 32
+      "best_5s_mean": 31.6,
+      "best_5s_mean_utc_buckets": 30.8,
+      "max_1s": 40,
+      "max_1s_utc_buckets": 32
      }
     },
     "m4": {
      "counted": {
-      "best_5s_mean": 25.6,
-      "max_1s": 28
+      "best_5s_mean": 26.0,
+      "best_5s_mean_utc_buckets": 25.6,
+      "max_1s": 35,
+      "max_1s_utc_buckets": 28
      },
      "wire_refined": {
-      "best_5s_mean": 38.6,
-      "max_1s": 43
+      "best_5s_mean": 39.4,
+      "best_5s_mean_utc_buckets": 38.6,
+      "max_1s": 47,
+      "max_1s_utc_buckets": 43
      },
      "wire_upper_bound": {
-      "best_5s_mean": 38.6,
-      "max_1s": 43
+      "best_5s_mean": 39.4,
+      "best_5s_mean_utc_buckets": 38.6,
+      "max_1s": 52,
+      "max_1s_utc_buckets": 43
      }
     }
    }
@@ -4472,6 +5110,11 @@
    "refused_by_the_venue_notice_103": 35,
    "rejected_cancel_target_not_found_10147": 1
   },
+  "journal_orders_missing_by_number_of_owner_journals": {
+   "0": 0,
+   "1": 38,
+   "2_or_more": 0
+  },
   "journal_submit_events_by_run": {
    "A-r1": 1,
    "A-r2": 4,
@@ -4512,15 +5155,25 @@
  },
  "revision": {
   "changes": [
-   "journal_orders_missing_by_kind: 36 rejected orders split into 35 [103] duplicate-order-id refusals and 1 cancel-target-not-found rejection (v1 labelled 36 as [103])",
-   "reconciliation: third transcript-derived broker count (10,313) with its arithmetic relation; the pair-test order key is renamed",
-   "caveats updated accordingly; every measured rate, latency and test count is unchanged"
+   "per-id ownership: reconciliation gains journal_orders_missing_by_number_of_owner_journals; the verifier checks that every missing order is found in exactly one run journal id by id (revision 2 compared counts)",
+   "rates: max_1s and best_5s_mean of every whole-run and combined rate block are maxima over sliding windows anchored at a message; the revision-2 UTC-bucket numbers are kept as max_1s_utc_buckets and best_5s_mean_utc_buckets; the headline unit text is corrected",
+   "rates: every adapter rung gains max_1s_sliding_in_rung_window and receipt_slots_replayed_from_journal (the receipts' own counted_msgs_per_s_min/max are bucket values and are unchanged)",
+   "peak_open_orders: an order stops being open at its first terminal order event, the terminal names being derived from the journals' own vocabulary (revision 2 closed an order only at order_canceled)",
+   "facts.rate_window_conventions, facts.peak_open_orders_definition and three caveats added; every other measured value, count, latency and test result is unchanged"
   ],
-  "number": 2,
+  "earlier_revisions": {
+   "1": {
+    "generator_sha256": "56463b2622501446a9a1640c6d3065920dbd449a622457ea61f392ce6166c5a1",
+    "json_sha256": "b492f42d335370e22f4349bf43db54f1adf4c77921b36a28300159b08c8e11fa",
+    "verifier_sha256": "0e9fb1376a59e34cf1e3b6ba2fea30d89aad5e09db28de0b4d59792a41207468"
+   }
+  },
+  "number": 3,
+  "sealed_files": "the revision-1 and revision-2 files stay sealed and unchanged; anything citing them by hash still resolves",
   "supersedes": {
-   "generator_sha256": "56463b2622501446a9a1640c6d3065920dbd449a622457ea61f392ce6166c5a1",
-   "json_sha256": "b492f42d335370e22f4349bf43db54f1adf4c77921b36a28300159b08c8e11fa",
-   "verifier_sha256": "0e9fb1376a59e34cf1e3b6ba2fea30d89aad5e09db28de0b4d59792a41207468"
+   "generator_sha256": "f44b595a13cf87b4ad555427000c7937cc62452076f0a3380f13338127147619",
+   "json_sha256": "25ef71020a06e1781fac0360aa8b19c564d9d146b65ea3fc6b8cb0ab62ab0c15",
+   "verifier_sha256": "cac1e764f429dc05575dfe8a692e74d4bcc04a8906e174e9e7b0178cf61494e3"
   }
  },
  "schema": "ibkr-pacing-evidence/1",

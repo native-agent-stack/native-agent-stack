@@ -1,7 +1,15 @@
 #!/usr/bin/env python3
-"""Recompute the headline numbers of ibkr-pacing-evidence/1 (revision 2) from the private receipts and compare them with the document.
+"""Recompute the headline numbers of ibkr-pacing-evidence/1 (revision 3) from the private receipts and compare them with the document.
 
-Revision 2 closes two defects found by a second reader in v1: (1) the `reconciliation` headline was never compared with the recomputed counters; (2) the kinds of the 38 missing orders
+Revision 3 closes three defects found by the co-op's review of revision 2: (1) "every missing id is found in exactly one run journal" compared COUNTS, so one id in no journal and another
+in two journals passed; it is now checked id by id (an id with no owner journal, with two or more, or repeated in the list is reported by its position and 8 hex digits of its sha256, never
+as text); (2) the per-second maxima were computed over UTC-second buckets; they are recomputed here over sliding windows anchored at a message, in exact integer microseconds, next to
+the revision-2 bucket values, for every run, every combined pair and every adapter rung; (3) `peak_open_orders` is recomputed per rung with a rule that closes an order at its first terminal
+order event (the document's terminal names are compared with the journals' own vocabulary), where revision 2 did not check it at all.
+The two cap statements revision 2 asserted as true (every pair at or below 50 wire msgs/s in any 1 s; B-r5 below 50 as a best 5 s mean) are replaced by comparisons of what the document
+says with what is recomputed, because under the sliding definition neither holds; V3-CHANGES.md reports the numbers.
+
+Revision 2 closed two defects found by a second reader in v1: (1) the `reconciliation` headline was never compared with the recomputed counters; (2) the kinds of the 38 missing orders
 were a literal, not derived from the journals. v2 derives them from each missing order's journal events and the venue's refusal text.
 
 Standard library only; deterministic; independent code path from the generator (it re-reads the receipts and journals and
@@ -10,30 +18,47 @@ Numbers that exist only as live broker reads in the session transcript (the two 
 cannot be recomputed from files: for them the verifier checks only that the document marks them transcript-derived and that
 the arithmetic relations between them and the file-derived numbers hold.
 
-usage: python3 verify_ibkr_pacing_evidence.py EVIDENCE.json RUN_ROOT [PIN_CORE_RS]
+usage: python3 verify_ibkr_pacing_evidence.v3.py EVIDENCE.json RUN_ROOT [PIN_CORE_RS]
        PIN_CORE_RS (optional): the file crates/adapters/interactive_brokers/src/execution/core.rs fetched at the pinned commit;
        when given, the cited line numbers are checked against its text.
 """
+import hashlib
 import json
 import re
 import sys
+from bisect import bisect_left, bisect_right
 from collections import Counter
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+EPOCH = datetime(1970, 1, 1, tzinfo=timezone.utc)
+SECOND_US = 1_000_000
+WINDOW_PARAMETERS = {"max_1s_window_us": 1_000_000, "best_5s_mean_window_us": 5_000_000, "interval": "start inclusive, end exclusive",
+                     "anchor": "message timestamp", "time_unit": "integer microseconds"}
+TERMINAL_NAME = re.compile(r"order_(filled|canceled|cancelled|expired|denied|rejected)")
+SUPERSEDED_V2 = {"json_sha256": "25ef71020a06e1781fac0360aa8b19c564d9d146b65ea3fc6b8cb0ab62ab0c15",
+                 "generator_sha256": "f44b595a13cf87b4ad555427000c7937cc62452076f0a3380f13338127147619",
+                 "verifier_sha256": "cac1e764f429dc05575dfe8a692e74d4bcc04a8906e174e9e7b0178cf61494e3"}
+SUPERSEDED_V1 = {"json_sha256": "b492f42d335370e22f4349bf43db54f1adf4c77921b36a28300159b08c8e11fa",
+                 "generator_sha256": "56463b2622501446a9a1640c6d3065920dbd449a622457ea61f392ce6166c5a1",
+                 "verifier_sha256": "0e9fb1376a59e34cf1e3b6ba2fea30d89aad5e09db28de0b4d59792a41207468"}
+
 failures = 0
+checks = 0
 
 
 def check(name, expected, got):
-    global failures
+    global failures, checks
     ok = expected == got
+    checks += 1
     failures += 0 if ok else 1
     print(("PASS " if ok else "FAIL ") + name + ("" if ok else f": document {expected!r} vs recomputed {got!r}"))
 
 
 def close(name, expected, got, tol=0.011):
-    global failures
+    global failures, checks
     ok = expected is not None and got is not None and abs(expected - got) <= tol
+    checks += 1
     failures += 0 if ok else 1
     print(("PASS " if ok else "FAIL ") + name + ("" if ok else f": document {expected!r} vs recomputed {got!r}"))
 
@@ -50,29 +75,110 @@ def headline(doc, ident):
     return next(h["value"] for h in doc["headline_numbers"] if h["id"] == ident)
 
 
-def seconds_of(row):
-    return int(datetime.fromisoformat(row["utc"]).timestamp())
+def us_of(row):
+    """Exact integer microseconds since the Unix epoch of a journal row's `utc` (never floating-point seconds)."""
+    return (datetime.fromisoformat(row["utc"]) - EPOCH) // timedelta(microseconds=1)
+
+
+def message_events(rows):
+    """{kind: [(microseconds, weight)]}: counted = submit + cancel; refined adds one scan per cancel of an accepted order;
+    upper adds one per cancel. The hidden scan carries its cancel row's timestamp (the journal does not timestamp it)."""
+    events = {"counted": [], "refined": [], "upper": []}
+    for row in rows:
+        if row["event"] == "submit":
+            t = us_of(row)
+            for series in events.values():
+                series.append((t, 1))
+        elif row["event"] == "cancel":
+            t = us_of(row)
+            events["counted"].append((t, 1))
+            events["upper"].append((t, 2))
+            events["refined"].append((t, 1 if row.get("reason") == "unaccepted_after_1s" else 2))
+    return events
+
+
+def sliding_best(events, width):
+    """Largest total weight inside any half-open [t, t + width) whose start t is an event time: prefix sums and bisect over the sorted events
+    (a different method from the generator's two pointers)."""
+    events = sorted(events)
+    times = [t for t, _ in events]
+    prefix = [0]
+    for _, weight in events:
+        prefix.append(prefix[-1] + weight)
+    best = 0
+    for t in times:
+        best = max(best, prefix[bisect_left(times, t + width)] - prefix[bisect_left(times, t)])
+    return best
 
 
 def whole_run_rates(rows):
-    """Independent recomputation: counted = submit + cancel; refined adds one scan per cancel of an accepted order;
-    upper adds one per cancel. Returns {kind: (max over any second, best 5-second mean)}."""
-    kinds = {"counted": Counter(), "refined": Counter(), "upper": Counter()}
-    for row in rows:
-        sec = seconds_of(row)
-        if row["event"] == "submit":
-            for counter in kinds.values():
-                counter[sec] += 1
-        elif row["event"] == "cancel":
-            kinds["counted"][sec] += 1
-            kinds["upper"][sec] += 2
-            kinds["refined"][sec] += 1 if row.get("reason") == "unaccepted_after_1s" else 2
+    """Independent recomputation of a rate block. Returns {kind: {max_1s, best_5s_mean}} over sliding windows anchored at a message,
+    plus the revision-2 values over UTC-second buckets as max_1s_utc_buckets / best_5s_mean_utc_buckets."""
     out = {}
-    for name, counter in kinds.items():
-        secs = sorted(counter)
-        best = max(sum(counter.get(s0 + k, 0) for k in range(5)) / 5 for s0 in secs)
-        out[name] = {"max_1s": max(counter.values()), "best_5s_mean": round(best, 2)}
+    for name, events in message_events(rows).items():
+        buckets = Counter()
+        for t, weight in events:
+            buckets[t // SECOND_US] += weight
+        best_bucket = max((sum(buckets.get(s0 + k, 0) for k in range(5)) / 5 for s0 in buckets), default=0.0)
+        out[name] = {"max_1s": sliding_best(events, SECOND_US), "best_5s_mean": round(sliding_best(events, 5 * SECOND_US) / 5, 2),
+                     "max_1s_utc_buckets": max(buckets.values(), default=0), "best_5s_mean_utc_buckets": round(best_bucket, 2)}
     return out
+
+
+def owner_map(missing, rows_by_label):
+    """{missing id: sorted run labels whose journal holds at least one row of that id}."""
+    wanted = set(missing)
+    owners = {coid: [] for coid in wanted}
+    for label, rows in rows_by_label.items():
+        for coid in {row.get("coid") for row in rows} & wanted:
+            owners[coid].append(label)
+    return {coid: sorted(labels) for coid, labels in owners.items()}
+
+
+def ownership_problems(missing, owners):
+    """One line per position of the missing list whose id has no owner journal, two or more, or repeats an earlier position.
+    The id itself is never printed: only its 0-based position, 8 hex digits of its sha256 and the owner run labels."""
+    problems, seen = [], set()
+    for position, coid in enumerate(missing):
+        digest = hashlib.sha256(coid.encode()).hexdigest()[:8]
+        labels = owners.get(coid, [])
+        if coid in seen:
+            problems.append(f"position {position} (sha256 {digest}) repeats an earlier position of the list")
+        seen.add(coid)
+        if len(labels) != 1:
+            problems.append(f"position {position} (sha256 {digest}) has {len(labels)} owner journals {labels}")
+    return problems
+
+
+def ladder_entries(rec, rows):
+    """For each ladder rung of the receipt that placed orders: (target, window start in microseconds, seconds, the receipt's per-second slots).
+    Rung j starts at the S4 step_enter row's timestamp plus j x the frozen rung_s and lasts the seconds the receipt recorded."""
+    rung_s = rec["frozen"]["s4"]["rung_s"]
+    enter = next(us_of(row) for row in rows if row["event"] == "step_enter" and row.get("step") == "S4")
+    return [(rung["target_msgs_per_s"], enter + index * rung_s * SECOND_US, len(rung["per_second_msgs"]), rung["per_second_msgs"])
+            for index, rung in enumerate(rec["ladder"]["rungs"]) if rung.get("submits")]
+
+
+def rung_peaks(rows, terminal):
+    """Peak open step-S4 orders per rung target. An order is open from its submit row to its first terminal event. With keys (microseconds, +1 submit / -1 terminal event,
+    rung), the count after an event e is (starts with key <= key_e) - (terminal events with key <= key_e), so terminal events sort before submits at equal times;
+    a rung's peak is the largest count at any event of its own orders."""
+    starts, first_end = {}, {}
+    for row in rows:
+        if row["event"] == "submit" and row.get("step") == "S4":
+            starts[row["coid"]] = (us_of(row), 1, row.get("rung"))
+    for row in rows:
+        coid = row.get("coid")
+        if row["event"] in terminal and coid in starts:
+            t = us_of(row)
+            first_end[coid] = min(t, first_end.get(coid, t))
+    start_keys = sorted(starts.values())
+    end_keys = sorted((first_end[coid], -1, starts[coid][2]) for coid in first_end)
+    peak = {}
+    for key in start_keys + end_keys:
+        live = bisect_right(start_keys, key) - bisect_right(end_keys, key)
+        peak[key[2]] = max(peak.get(key[2], 0), live)
+    return peak
 
 
 def main(argv):
@@ -81,6 +187,9 @@ def main(argv):
         return 2
     doc = json.loads(Path(argv[1]).read_text())
     root = Path(argv[2])
+    if doc.get("revision", {}).get("number") != 3:
+        print(f"FAIL the document is revision {doc.get('revision', {}).get('number')!r}; this verifier checks revision 3 (use the verifier named for the document's revision)")
+        return 1
 
     # 1. official client, rung 50: orders, seconds, rates
     r = receipt(root, "P-r1")
@@ -159,10 +268,11 @@ def main(argv):
           [rec["broker_completed_orders_after_official_client_runs"]["value"], rec["broker_completed_orders_after_official_client_runs"]["source"].startswith("transcript-derived")],
           [total - len(missing) + official, True])
     missing_set = set(missing)
+    rows_by_label = {label: journal(root, label) for label in labels}
     derived = Counter()
     for label in labels:
         events, reasons = {}, {}
-        for row in journal(root, label):
+        for row in rows_by_label[label]:
             if row.get("coid") in missing_set:
                 events.setdefault(row["coid"], set()).add(row["event"])
                 if row["event"] == "order_rejected":
@@ -177,7 +287,12 @@ def main(argv):
                 derived["journalled_but_never_reached_the_adapter"] += 1
             else:
                 derived["submitted_without_a_venue_answer"] += 1
-    check("every missing id is found in exactly one run journal (classified count equals the missing count)", len(missing), sum(derived.values()))
+    owners = owner_map(missing, rows_by_label)
+    check("every missing id has exactly one owner run journal (an id with none, with two or more, or repeated in the list is listed by position and sha256 prefix)",
+          [], ownership_problems(missing, owners))
+    owner_histogram = Counter(min(len(owners.get(coid, [])), 2) for coid in missing_set)
+    check("the missing ids by number of owner journals (0, 1, 2 or more)", rec["journal_orders_missing_by_number_of_owner_journals"],
+          {"0": owner_histogram[0], "1": owner_histogram[1], "2_or_more": owner_histogram[2]})
     check("the missing orders by kind, derived from the journals and the venue text", rec["journal_orders_missing_by_kind"], dict(sorted(derived.items())))
     check("headline `reconciliation` equals the five recomputed counters (journal submits, missing, found, official-client orders, broker count after)",
           headline(doc, "reconciliation"), [total, len(missing), total - len(missing), official, total - len(missing) + official])
@@ -191,22 +306,46 @@ def main(argv):
           [third["value"], third["source"].startswith("transcript-derived"), third["equals_second_count_plus_listed_pair_orders_plus_probe_order"]],
           [total - len(missing) + official + (pair_orders - pair_refused) + 1, True, True])
 
-    # 4b. whole-run and pair rate estimates (independent code path)
+    # 4b. whole-run and pair rate estimates (independent code path): sliding maxima next to the revision-2 UTC-bucket values
+    check("the window convention of the document equals the verifier's (1 s and 5 s windows, start inclusive and end exclusive, anchored at a message, integer microseconds)",
+          WINDOW_PARAMETERS, doc["facts"]["rate_window_conventions"]["parameters"])
+    kind_keys = (("counted", "counted_msgs_per_s"), ("refined", "wire_est_refined_msgs_per_s"), ("upper", "wire_est_upper_bound_msgs_per_s"))
+    headline_keys = (("counted", "counted"), ("refined", "wire_refined"), ("upper", "wire_upper_bound"))
     want = headline(doc, "adapter_whole_run_rate_estimates")
+    got_runs = {}
     for label in ("B-r5", "B-r6"):
-        got = whole_run_rates(journal(root, label))
-        for kind, key in (("counted", "counted"), ("refined", "wire_refined"), ("upper", "wire_upper_bound")):
-            check(f"{label} whole-run {key}: max 1 s and best 5 s mean", want[label][key], got[kind])
-    want = headline(doc, "adapter_two_connection_combined_rate_estimates")
+        got = got_runs[label] = whole_run_rates(rows_by_label[label])
+        for kind, key in headline_keys:
+            check(f"{label} whole-run {key}: sliding max 1 s and best 5 s mean, and the UTC-bucket values", want[label][key], got[kind])
+    want_pairs = headline(doc, "adapter_two_connection_combined_rate_estimates")
+    got_pairs = {}
     for pair in ("m1", "m2", "m3", "m4"):
-        got = whole_run_rates(journal(root, f"L0-{pair}") + journal(root, f"L1-{pair}"))
-        for kind, key in (("counted", "counted"), ("refined", "wire_refined"), ("upper", "wire_upper_bound")):
-            check(f"pair {pair} combined {key}: max 1 s and best 5 s mean", want[pair][key], got[kind])
-    check("every two-connection adapter pair stayed at or below 50 wire msgs/s (upper bound, any 1 s)", True,
-          all(want[m]["wire_upper_bound"]["max_1s"] <= 50 for m in want))
-    check("B-r6 whole run exceeded 50 wire msgs/s (refined best 5 s mean) and B-r5 did not (upper best 5 s mean < 50)", [True, True],
-          [headline(doc, "adapter_whole_run_rate_estimates")["B-r6"]["wire_refined"]["best_5s_mean"] > 50,
-           headline(doc, "adapter_whole_run_rate_estimates")["B-r5"]["wire_upper_bound"]["best_5s_mean"] < 50])
+        got = got_pairs[pair] = whole_run_rates(rows_by_label[f"L0-{pair}"] + rows_by_label[f"L1-{pair}"])
+        for kind, key in headline_keys:
+            check(f"pair {pair} combined {key}: sliding max 1 s and best 5 s mean, and the UTC-bucket values", want_pairs[pair][key], got[kind])
+    every_run = (list(doc["adapter_phase_a"]) + list(doc["adapter_single_connection_ladders"])
+                 + [run for pair in doc["adapter_two_connection_pairs"] for run in pair["connections"].values()])
+    below = []
+    for run in every_run:
+        got = whole_run_rates(rows_by_label[run["label"]])
+        check(f"{run['label']} rate_estimates_whole_run (counted, refined, upper bound: sliding and UTC-bucket values)", run["rate_estimates_whole_run"],
+              {key: got[kind] for kind, key in kind_keys})
+        below += [f"{run['label']}/{kind}" for kind, _ in kind_keys if got[kind]["max_1s"] < got[kind]["max_1s_utc_buckets"]
+                  or got[kind]["best_5s_mean"] < got[kind]["best_5s_mean_utc_buckets"]]
+    for pair in doc["adapter_two_connection_pairs"]:
+        got = whole_run_rates(rows_by_label[f"L0-{pair['label']}"] + rows_by_label[f"L1-{pair['label']}"])
+        check(f"pair {pair['label']} combined_rate_estimates (sliding and UTC-bucket values)", pair["combined_rate_estimates"], {key: got[kind] for kind, key in kind_keys})
+    check("a sliding maximum is never below its UTC-bucket value, in any recomputed run block", [], below)
+    # The 50 msgs/s cap relation is a statement about the numbers, so it is compared with what the document says, not asserted: the revision-2 verifier asserted
+    # "pairs at or below 50 (upper bound, any 1 s)" and "B-r5 below 50 as a best 5 s mean"; under the sliding definition neither holds (see V3-CHANGES.md).
+    over_doc = {m: sorted(k for k, _ in headline_keys if want_pairs[m][dict(headline_keys)[k]]["max_1s"] > 50) for m in want_pairs}
+    over_got = {m: sorted(k for k, _ in headline_keys if got_pairs[m][k]["max_1s"] > 50) for m in got_pairs}
+    check("two-connection pairs, series above 50 msgs/s in some sliding 1 s window: document numbers vs recomputed", over_doc, over_got)
+    over5_doc = {m: sorted(k for k, _ in headline_keys if want[m][dict(headline_keys)[k]]["best_5s_mean"] > 50) for m in want}
+    over5_got = {m: sorted(k for k, _ in headline_keys if got_runs[m][k]["best_5s_mean"] > 50) for m in got_runs}
+    check("B-r5, B-r6, series whose best sliding 5 s mean exceeded 50 msgs/s: document numbers vs recomputed", over5_doc, over5_got)
+    print("INFO pairs with a series above 50 msgs/s in some sliding 1 s window:", {m: v for m, v in over_got.items() if v})
+    print("INFO whole runs with a series whose best sliding 5 s mean exceeded 50 msgs/s:", {m: v for m, v in over5_got.items() if v})
 
     # 4c. cancel commands in the vendor logs: a cancel of an accepted order carries a PERM venue id, a cancel of an unaccepted order carries none
     perm_re = re.compile(r'\[CMD\]--> CancelOrder\(.*venue_order_id=Some\("PERM-[0-9]+"\)')
@@ -254,6 +393,62 @@ def main(argv):
     else:
         print("SKIP cited source lines (pass the pinned core.rs as the third argument to check them)")
 
+    # 4f. per-rung sliding windows, and the receipts' per-second slots replayed from the journal (which anchors the rung windows)
+    replay_rungs = replay_equal = replay_largest = 0
+    for run in every_run:
+        if "rungs" not in run:
+            continue
+        label, rows = run["label"], rows_by_label[run["label"]]
+        entries = ladder_entries(receipt(root, label), rows)
+        want_rungs = {item["target_msgs_per_s"]: item for item in run["rungs"]}
+        check(f"{label}: ladder rungs that placed orders = the document's rungs", sorted(target for target, _, _, _ in entries), sorted(want_rungs))
+        got_sliding, got_replay = {}, {}
+        for target, start, seconds, per in entries:
+            window = [r for r in rows if r["event"] in ("submit", "cancel") and r.get("step") == "S4" and start <= us_of(r) < start + seconds * SECOND_US]
+            events = message_events(window)
+            got_sliding[target] = {"counted": sliding_best(events["counted"], SECOND_US), "wire_est_refined": sliding_best(events["refined"], SECOND_US),
+                                   "wire_est_upper_bound": sliding_best(events["upper"], SECOND_US)}
+            slots = Counter((us_of(r) - start) // SECOND_US for r in window)
+            difference = max(abs(slots.get(k, 0) - per[k]) for k in range(seconds))
+            got_replay[target] = {"equal": difference == 0, "max_abs_slot_difference": difference}
+            replay_rungs += 1
+            replay_equal += 1 if difference == 0 else 0
+            replay_largest = max(replay_largest, difference)
+        check(f"{label}: max_1s_sliding_in_rung_window per rung (counted, refined, upper bound)",
+              {t: want_rungs[t]["max_1s_sliding_in_rung_window"] for t in sorted(want_rungs)}, got_sliding)
+        check(f"{label}: the receipt's per-second slots replayed from the journal, per rung",
+              {t: want_rungs[t]["receipt_slots_replayed_from_journal"] for t in sorted(want_rungs)}, got_replay)
+        check(f"{label}: the receipt's own per-second maximum is not above the sliding maximum, per rung", [],
+              [target for target, _, _, per in entries if max(per) > got_sliding[target]["counted"]])
+    replay_doc = doc["facts"]["rate_window_conventions"]["rung_window_replay"]
+    check("replay of the receipts' per-second slots from the journals: rungs, rungs equal, largest slot difference",
+          [replay_doc["rungs"], replay_doc["slots_equal_to_the_receipts_per_second_counters"], replay_doc["largest_slot_difference_in_messages"]],
+          [replay_rungs, replay_equal, replay_largest])
+
+    # 4g. peak_open_orders: the terminal names from the journals' own vocabulary, then the per-rung peaks (the revision-2 verifier did not check them)
+    vocabulary = sorted({row["event"] for rows in rows_by_label.values() for row in rows})
+    terminal = sorted(name for name in vocabulary if TERMINAL_NAME.fullmatch(name))
+    definition = doc["facts"]["peak_open_orders_definition"]
+    check("peak_open_orders: terminal event names = the journals' event names of the form order_(filled|canceled|cancelled|expired|denied|rejected)",
+          definition["terminal_event_names"], terminal)
+    check("peak_open_orders: the document lists the journals' whole event vocabulary", definition["journal_event_vocabulary"], vocabulary)
+    check("peak_open_orders: order events that are not terminal (a refused cancel and a pending cancel among them)",
+          definition["order_event_names_not_terminal"], sorted(name for name in vocabulary if name.startswith("order_") and name not in terminal))
+    check("peak_open_orders: every ladder order has quantity 1, so an order_filled is a complete fill", definition["ladder_order_quantities"],
+          sorted({row.get("qty") for rows in rows_by_label.values() for row in rows if row["event"] == "submit" and row.get("step") == "S4"}))
+    moved = []
+    for run in every_run:
+        if "rungs" in run:
+            peaks = rung_peaks(rows_by_label[run["label"]], terminal)
+            check(f"{run['label']}: peak_open_orders per rung (an order is open from its submit row to its first terminal order event)",
+                  {item["target_msgs_per_s"]: item["peak_open_orders"] for item in run["rungs"]},
+                  {item["target_msgs_per_s"]: peaks.get(item["target_msgs_per_s"]) for item in run["rungs"]})
+            old_rule = rung_peaks(rows_by_label[run["label"]], {"order_canceled"})
+            moved += [f"{run['label']}/{target}: {old_rule.get(target)} -> {peaks.get(target)}" for target in sorted(peaks) if old_rule.get(target) != peaks[target]]
+    print("INFO rungs whose peak differs between the revision-2 rule (only order_canceled closes an order) and the revision-3 rule:", moved or "none")
+    check("revision 3: the block names the revision-2 files it supersedes by hash and the revision-1 files before them",
+          [doc["revision"]["number"], doc["revision"]["supersedes"], doc["revision"]["earlier_revisions"]], [3, SUPERSEDED_V2, {"1": SUPERSEDED_V1}])
+
     # 5. document hygiene: no account-shaped token, no order reference shape, no 8+ digit integer outside version stamps
     text = Path(argv[1]).read_text()
     check("no account-code-shaped token in the document", 0, len(re.findall(r"\bDU[A-Z]?[0-9]{4,}\b", text)))
@@ -262,6 +457,7 @@ def main(argv):
     check("no dotted-quad address in the document", 0, len(re.findall(r"\b(?:\d{1,3}\.){3}\d{1,3}\b", text)))
     big = [m for m in re.findall(r"(?<![0-9a-fA-F.])[0-9]{8,}(?![0-9a-fA-F])", text)]
     check("8+ digit integers appear only inside version/date stamps", [], [b for b in big if not b.startswith("2026101")])
+    print(f"{checks} checks, {checks - failures} passed, {failures} failed")
     print(f"{'ALL PASS' if not failures else str(failures) + ' FAILED'}")
     return 1 if failures else 0
 

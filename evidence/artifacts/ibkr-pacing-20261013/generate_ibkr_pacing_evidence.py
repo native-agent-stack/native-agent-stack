@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Build the sanitized IBKR pacing evidence document (ibkr-pacing-evidence/1, revision 2) from the private run receipts.
+"""Build the sanitized IBKR pacing evidence document (ibkr-pacing-evidence/1, revision 3) from the private run receipts.
+
+Revision 3 (supersedes the sealed revision-2 generator/JSON/verifier named in the document's `revision` block) fixes three defects found by the co-op's review of revision 2:
+(1) the verifier compared COUNTS where every missing order must have exactly one owner journal (the fix is in the verifier; this generator adds the owner-count histogram to `reconciliation`);
+(2) "max over any 1 s" and "best 5 s mean" were computed over UTC-second buckets; they are now maxima over sliding windows anchored at a message, and the revision-2 bucket
+values are kept under `*_utc_buckets`; the same sliding maximum is added per adapter rung;
+(3) `peak_open_orders` kept a rejected order open for ever; an order now stops being open at its first terminal order event (the terminal names are derived from the journals' own vocabulary).
 
 Revision 2 (supersedes the sealed v1 generator/JSON/verifier named in the document's `revision` block): the 38 journal orders missing at the broker are classified by their journal
 events AND the venue's refusal text (35 [103] "Duplicate order id", 1 cancel-target-not-found rejection, 2 never reached the adapter), where v1 labelled all 36 rejections [103];
@@ -13,13 +19,13 @@ error-code counts, booleans and category words.
 Run root layout (private): runs/<LABEL>/receipt.json (+ journal.jsonl, vendor.log for the adapter runs), runs/marker-*.json,
 journal-submitted-ids.txt.missing (the journal-side order references the broker did not list; read for COUNTS only).
 
-usage: python3 generate_ibkr_pacing_evidence.py RUN_ROOT > ibkr-pacing-evidence-20261013.json
+usage: python3 generate_ibkr_pacing_evidence.v3.py RUN_ROOT > ibkr-pacing-evidence-20261013.v3.json
 """
 import json
 import re
 import sys
 from collections import Counter
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 SCHEMA = "ibkr-pacing-evidence/1"
@@ -72,6 +78,15 @@ VENDOR_COUNT_PATTERNS = {
     "pacing_text_lines": re.compile(r"pacing", re.I),
 }
 
+# Revision 3. Windows are measured in exact integer microseconds since the Unix epoch (the journal `utc` fields carry microseconds).
+EPOCH = datetime(1970, 1, 1, tzinfo=timezone.utc)
+US = 1_000_000
+# Order events that end an order's life (Nautilus OrderFilled / OrderCanceled / OrderExpired / OrderDenied / OrderRejected; both spellings of cancelled).
+# order_cancel_rejected and order_pending_cancel are NOT terminal. The set in force is this list intersected with the journals' own `event` vocabulary.
+TERMINAL_ORDER_EVENT_CANDIDATES = ("order_canceled", "order_cancelled", "order_denied", "order_expired", "order_filled", "order_rejected")
+RATE_UNIT = ("msgs/s (max over any sliding 1 s window anchored at a message, best sliding 5 s mean; `*_utc_buckets` keep the revision-2 "
+             "values over UTC-second buckets)")
+
 
 def load_json(path):
     return json.loads(Path(path).read_text())
@@ -79,6 +94,33 @@ def load_json(path):
 
 def ts(value):
     return datetime.fromisoformat(value).timestamp()
+
+
+def us(value):
+    """Exact integer microseconds since the Unix epoch of an ISO-8601 timestamp that carries an offset."""
+    delta = datetime.fromisoformat(value) - EPOCH
+    return (delta.days * 86400 + delta.seconds) * US + delta.microseconds
+
+
+def sliding_peak(times, width):
+    """Largest number of entries of `times` (integer microseconds) inside any half-open interval [t, t + width) whose start t is an entry (two pointers).
+    A window can always be shifted right to the first entry it holds without losing one, so this equals the maximum over every real start time."""
+    times = sorted(times)
+    best = reach = 0
+    for first, start in enumerate(times):
+        while reach < len(times) and times[reach] < start + width:
+            reach += 1
+        best = max(best, reach - first)
+    return best
+
+
+def sliding_stats(times):
+    return {"max_1s": sliding_peak(times, US), "best_5s_mean": round(sliding_peak(times, 5 * US) / 5, 2)}
+
+
+def terminal_events(rows):
+    """The terminal order event names that occur in these journal rows' own `event` vocabulary."""
+    return sorted({row["event"] for row in rows}.intersection(TERMINAL_ORDER_EVENT_CANDIDATES))
 
 
 def pct(values, q):
@@ -144,6 +186,7 @@ def per_second_wire(rows):
 
 
 def window_stats(per_second, width=5):
+    """The revision-2 numbers: the largest UTC-second bucket and the best mean of `width` consecutive UTC-second buckets (kept as `*_utc_buckets`)."""
     seconds = sorted(per_second)
     if not seconds:
         return {"max_1s": 0, "best_5s_mean": 0.0}
@@ -151,14 +194,42 @@ def window_stats(per_second, width=5):
     return {"max_1s": max(per_second.values()), "best_5s_mean": round(best, 2)}
 
 
+def message_times(rows):
+    """One microsecond timestamp per message of each series (counted, wire refined, wire upper bound). The adapter's hidden reqAllOpenOrders of a cancel is not
+    separately timestamped in the journal: it is placed at its cancel row's timestamp. Same message multiplicities as `per_second_wire`."""
+    counted, refined, upper = [], [], []
+    for row in rows:
+        if row["event"] == "submit":
+            t = us(row["utc"])
+            counted.append(t)
+            refined.append(t)
+            upper.append(t)
+        elif row["event"] == "cancel":
+            t = us(row["utc"])
+            counted.append(t)
+            upper.extend((t, t))
+            refined.extend((t,) if row.get("reason") in NO_VENUE_ID_REASONS else (t, t))
+    return counted, refined, upper
+
+
 def rate_block(rows):
-    counted, refined, upper = per_second_wire(rows)
-    return {"counted_msgs_per_s": window_stats(counted), "wire_est_refined_msgs_per_s": window_stats(refined), "wire_est_upper_bound_msgs_per_s": window_stats(upper)}
+    """Per series: `max_1s` and `best_5s_mean` are maxima over sliding windows anchored at a message (revision 3); `*_utc_buckets` are the revision-2 values."""
+    buckets = per_second_wire(rows)
+    times = message_times(rows)
+    out = {}
+    for name, per_second, series in zip(("counted_msgs_per_s", "wire_est_refined_msgs_per_s", "wire_est_upper_bound_msgs_per_s"), buckets, times):
+        bucket, sliding = window_stats(per_second), sliding_stats(series)
+        if sliding["max_1s"] < bucket["max_1s"] or sliding["best_5s_mean"] < bucket["best_5s_mean"]:
+            raise SystemExit(f"{name}: a sliding maximum is below its UTC-bucket value")
+        out[name] = {"max_1s": sliding["max_1s"], "best_5s_mean": sliding["best_5s_mean"],
+                     "max_1s_utc_buckets": bucket["max_1s"], "best_5s_mean_utc_buckets": bucket["best_5s_mean"]}
+    return out
 
 
 def ladder_rungs(receipt, rows):
     ladder = receipt.get("ladder") or {}
-    submit, accepted, cancel, canceled, rung_of, cancel_reason = {}, {}, {}, {}, {}, {}
+    terminal = terminal_events(rows)
+    submit, accepted, cancel, canceled, closed, rung_of, cancel_reason = {}, {}, {}, {}, {}, {}, {}
     for row in rows:
         coid = row.get("coid")
         if row["event"] == "submit" and row.get("step") == "S4":
@@ -171,13 +242,19 @@ def ladder_rungs(receipt, rows):
                 cancel_reason[coid] = row.get("reason")
         elif row["event"] == "order_canceled" and coid in submit:
             canceled[coid] = ts(row["utc"])
-    events = sorted([(submit[c], 1, rung_of[c]) for c in submit] + [(canceled[c], -1, rung_of[c]) for c in canceled if c in submit])
+        if row["event"] in terminal and coid in submit:
+            closed[coid] = min(closed.get(coid, float("inf")), ts(row["utc"]))
+    # an order is open from its submit row to its FIRST terminal event; at equal timestamps terminal events are applied before submits
+    events = sorted([(submit[c], 1, rung_of[c]) for c in submit] + [(closed[c], -1, rung_of[c]) for c in closed])
     live, peak = 0, {}
     for _, delta, rung in events:
         live += delta
         peak[rung] = max(peak.get(rung, 0), live)
+    # per-rung windows: rung j covers [S4 step_enter + j x rung_s, + the rung's recorded seconds), the harness's own per-second slots
+    rung_s = (receipt.get("frozen") or {}).get("s4", {}).get("rung_s")
+    s4_enter = next((us(row["utc"]) for row in rows if row["event"] == "step_enter" and row.get("step") == "S4"), None)
     out = []
-    for rung in ladder.get("rungs", []):
+    for index, rung in enumerate(ladder.get("rungs", [])):
         per = rung["per_second_msgs"]
         if not rung.get("submits"):
             continue
@@ -188,6 +265,16 @@ def ladder_rungs(receipt, rows):
         seconds = len(per)
         cancels = sum(1 for c in ids if c in cancel)
         known = sum(1 for c in ids if c in cancel and cancel_reason.get(c) not in NO_VENUE_ID_REASONS)
+        sliding = replay = None
+        if s4_enter is not None and rung_s is not None and seconds:
+            start = s4_enter + index * rung_s * US
+            window = [row for row in rows if row["event"] in ("submit", "cancel") and row.get("step") == "S4" and start <= us(row["utc"]) < start + seconds * US]
+            window_counted, window_refined, window_upper = message_times(window)
+            sliding = {"counted": sliding_peak(window_counted, US), "wire_est_refined": sliding_peak(window_refined, US),
+                       "wire_est_upper_bound": sliding_peak(window_upper, US)}
+            slots = Counter((t - start) // US for t in window_counted)
+            difference = max(abs(slots.get(k, 0) - per[k]) for k in range(seconds))
+            replay = {"equal": difference == 0, "max_abs_slot_difference": difference}
         out.append({
             "target_msgs_per_s": target,
             "seconds": seconds,
@@ -196,6 +283,8 @@ def ladder_rungs(receipt, rows):
             "counted_msgs_per_s_mean": rung["mean_msgs_per_s"],
             "counted_msgs_per_s_min": min(per) if per else None,
             "counted_msgs_per_s_max": max(per) if per else None,
+            "max_1s_sliding_in_rung_window": sliding,
+            "receipt_slots_replayed_from_journal": replay,
             "orders_per_min_by_submits": round(rung["submits"] / seconds * 60) if seconds else None,
             "orders_per_min_by_counted_rate": round(rung["mean_msgs_per_s"] / 2 * 60),
             "cancels_sent": cancels,
@@ -439,11 +528,13 @@ def reconciliation(root, adapter_runs):
     missing_text = (root / "journal-submitted-ids.txt.missing").read_text().split()
     missing = set(missing_text)
     kinds = Counter()
+    owners = {}
     for run in adapter_runs:
         events, reasons = {}, {}
         for row in journal(root / "runs" / run["label"]):
             if row.get("coid") in missing:
                 events.setdefault(row["coid"], set()).add(row["event"])
+                owners.setdefault(row["coid"], set()).add(run["label"])
                 if row["event"] == "order_rejected":
                     reasons[row["coid"]] = str(row.get("reason", ""))
         for coid, names in events.items():
@@ -468,11 +559,13 @@ def reconciliation(root, adapter_runs):
     third = TRANSCRIPT_DERIVED["broker_completed_orders_after_pair_tests"]
     second = TRANSCRIPT_DERIVED["broker_completed_orders_after_official_client_runs"]
     broker_harness = TRANSCRIPT_DERIVED["broker_completed_orders_after_harness_runs"]
+    owner_counts = Counter(min(len(owners.get(coid, ())), 2) for coid in missing)
     return {
         "journal_submit_events_total": totals["journal_submits"],
         "journal_submit_events_by_run": by_run,
         "journal_orders_missing_at_broker": len(missing),
         "journal_orders_missing_by_kind": dict(sorted(kinds.items())),
+        "journal_orders_missing_by_number_of_owner_journals": {"0": owner_counts[0], "1": owner_counts[1], "2_or_more": owner_counts[2]},
         "journal_orders_found_at_broker_by_arithmetic": totals["journal_submits"] - len(missing),
         "broker_completed_orders_after_harness_runs": {"value": broker_harness, "source": "transcript-derived (raw-protocol reqCompletedOrders read; no receipt file)",
                                                     "equals_journal_minus_missing": broker_harness == totals["journal_submits"] - len(missing)},
@@ -523,18 +616,84 @@ def headline(adapter_b, official, pairs, recon, conc):
         run["label"]: {"counted": run["rate_estimates_whole_run"]["counted_msgs_per_s"],
                        "wire_refined": run["rate_estimates_whole_run"]["wire_est_refined_msgs_per_s"],
                        "wire_upper_bound": run["rate_estimates_whole_run"]["wire_est_upper_bound_msgs_per_s"]}
-        for run in adapter_b if run["label"] in ("B-r5", "B-r6")}, "unit": "msgs/s (max over any 1 s, best 5 s mean)", "source": "B-r5, B-r6 journals"})
+        for run in adapter_b if run["label"] in ("B-r5", "B-r6")}, "unit": RATE_UNIT, "source": "B-r5, B-r6 journals"})
     out.append({"id": "adapter_two_connection_combined_rate_estimates", "value": {
         pair["label"]: {"counted": pair["combined_rate_estimates"]["counted_msgs_per_s"],
                         "wire_refined": pair["combined_rate_estimates"]["wire_est_refined_msgs_per_s"],
                         "wire_upper_bound": pair["combined_rate_estimates"]["wire_est_upper_bound_msgs_per_s"]} for pair in conc},
-        "unit": "msgs/s (max over any 1 s, best 5 s mean)", "source": "L0 + L1 journals"})
+        "unit": RATE_UNIT, "source": "L0 + L1 journals"})
     out.append({"id": "pair_tests_table", "value": [[p["test"], p["first_connection"]["orders_placed"], p["first_connection"]["refused_103"], p["second_connection"]["orders_placed"], p["second_connection"]["refused_103"]] for p in pairs],
                 "unit": "test, first orders, first refusals, second orders, second refusals", "source": "P-* receipts"})
     out.append({"id": "reconciliation", "value": [recon["journal_submit_events_total"], recon["journal_orders_missing_at_broker"], recon["journal_orders_found_at_broker_by_arithmetic"],
                                                  recon["official_client_orders_placed_before_second_count"], recon["broker_completed_orders_after_official_client_runs"]["value"]],
                 "unit": "journal submits, missing at broker, found, official-client orders, broker count after", "source": "journals + transcript-derived broker counts"})
     return out
+
+
+def journal_vocabulary(root, labels):
+    """Event names of the adapter journals and the quantities of their S4 ladder orders (facts behind the peak_open_orders rule)."""
+    vocabulary, quantities = set(), set()
+    for label in labels:
+        for row in journal(root / "runs" / label):
+            vocabulary.add(row["event"])
+            if row["event"] == "submit" and row.get("step") == "S4":
+                quantities.add(row.get("qty"))
+    return sorted(vocabulary), sorted(quantities)
+
+
+def peak_open_orders_definition(vocabulary, quantities):
+    terminal = sorted(set(vocabulary).intersection(TERMINAL_ORDER_EVENT_CANDIDATES))
+    return {
+        "scope": "adapter ladder orders (journal step S4), per rung of the receipt's ladder",
+        "open_from": "the order's `submit` journal row",
+        "open_until": "the order's FIRST terminal order event; an order with no terminal event (an order_submitted with no later event, for one) stays open to the end of the journal",
+        "peak": "the running count is updated at every submit and every terminal event of a rung's own orders and the rung's peak is the largest value reached; "
+                "at equal timestamps terminal events are applied before submits",
+        "terminal_event_names": terminal,
+        "order_event_names_not_terminal": sorted(name for name in vocabulary if name.startswith("order_") and name not in terminal),
+        "terminal_names_absent_from_the_journals": sorted(set(TERMINAL_ORDER_EVENT_CANDIDATES) - set(vocabulary)),
+        "journal_event_vocabulary": list(vocabulary),
+        "derivation": "the journals' own `event` vocabulary intersected with the Nautilus terminal order events (filled, canceled, cancelled, expired, denied, rejected); "
+                      "order_cancel_rejected (a refused cancel) and order_pending_cancel are not terminal",
+        "ladder_order_quantities": list(quantities),
+        "partial_fills": "every ladder order has quantity 1, so an order_filled event is a complete fill",
+        "revision_2_defect": "revision 2 closed an order only at order_canceled, so a rejected, filled, expired or denied order stayed open for ever",
+        "official_client_peak_open": "source-derived from the private probe script, not recomputable: the receipts' `peak_open_orders` of the official-client runs are the probe's own run-time counter "
+                                     "(at each placement: the orders already placed and not marked done, plus the one being placed); the probe marks an order done only on a Cancelled / ApiCancelled / "
+                                     "Inactive status, a 202 notice or a 10147 / 10148 error, so a [103]-refused order counts as open until its stale cancel is answered; these values are unchanged in revision 3",
+    }
+
+
+def rate_window_conventions(replays):
+    return {
+        "parameters": {"max_1s_window_us": US, "best_5s_mean_window_us": 5 * US, "interval": "start inclusive, end exclusive", "anchor": "message timestamp", "time_unit": "integer microseconds"},
+        "max_1s": "the largest number of messages of the series in any half-open interval [t, t + 1 s) whose start t is the timestamp of a message of that series",
+        "best_5s_mean": "the largest number of messages of the series in any half-open interval [t, t + 5 s) whose start t is the timestamp of a message of that series, divided by 5, rounded to 2 decimals",
+        "interval": "half-open: a message exactly 1 s (5 s) after the start is outside the window; timestamps are compared as exact integer microseconds since the Unix epoch, never as floating-point seconds",
+        "anchor": "a window can always be shifted right to the first message it holds without losing one, so the maximum over every real start time equals the maximum over message-anchored windows",
+        "series": "counted = one message per submit row and per cancel row; wire_est_refined and wire_est_upper_bound add the adapter's hidden reqAllOpenOrders per cancel "
+                  "(refined: only for a cancel of an order that had been accepted), stamped with the cancel row's timestamp because the journal does not timestamp it",
+        "utc_buckets": "max_1s_utc_buckets and best_5s_mean_utc_buckets are the revision-2 numbers: messages per UTC second (the integer second of the timestamp), the largest bucket and the best mean "
+                       "of 5 consecutive buckets; a sliding maximum is never below its bucket value and exceeds it when a burst straddles a second boundary",
+        "field_changes": {
+            "renamed": ["max_1s -> max_1s_utc_buckets", "best_5s_mean -> best_5s_mean_utc_buckets"],
+            "same_name_new_meaning": ["max_1s", "best_5s_mean"],
+            "added": ["max_1s_utc_buckets", "best_5s_mean_utc_buckets", "max_1s_sliding_in_rung_window", "receipt_slots_replayed_from_journal",
+                      "reconciliation.journal_orders_missing_by_number_of_owner_journals", "facts.rate_window_conventions", "facts.peak_open_orders_definition"],
+        },
+        "rung_window": "max_1s_sliding_in_rung_window applies the same sliding maximum to the step-S4 submit and cancel rows inside a rung's window, which starts at the S4 step_enter row's "
+                       "timestamp plus (rung index x the frozen rung_s) and lasts the rung's recorded seconds; it is the harness's own per-second slot grid replayed from the journal",
+        "rung_window_replay": {
+            "rungs": len(replays),
+            "slots_equal_to_the_receipts_per_second_counters": sum(1 for r in replays if r["equal"]),
+            "largest_slot_difference_in_messages": max((r["max_abs_slot_difference"] for r in replays), default=0),
+            "reading": "where the replay differs, one message was sent in the milliseconds between the nominal end of the previous rung and the harness tick that journalled the next rung's start; "
+                       "the harness does not count such a message (its slot index, 20, falls outside the finished rung's 20-slot row) and the replay counts it in the first slot of the new window",
+        },
+        "receipt_slot_counters": "counted_msgs_per_s_min and counted_msgs_per_s_max of a rung are the receipts' own fixed one-second slot counters (from the rung start for the adapter, integer seconds of "
+                                 "the probe's monotonic clock for the official client): bucket values, hence lower bounds of the sliding maximum; they are unchanged",
+        "official_client": "the official-client receipts hold no per-message times, so their per-second maxima cannot be recomputed under the sliding definition",
+    }
 
 
 def main(argv):
@@ -550,6 +709,8 @@ def main(argv):
     pairs = pair_tests(root)
     recon = reconciliation(root, adapter_a + adapter_b + l_runs)
     no_poll = [p for p in pairs if p["design_declared_by_runner"]["poll_all_open_orders"] == "none" and p["test"] != "T1"]
+    vocabulary, quantities = journal_vocabulary(root, [run["label"] for run in adapter_a + adapter_b + l_runs])
+    replays = [rung["receipt_slots_replayed_from_journal"] for run in adapter_b + l_runs for rung in run.get("rungs", []) if rung.get("receipt_slots_replayed_from_journal")]
     doc = {
         "schema": SCHEMA,
         "measured_on": "2026-10-13",
@@ -572,6 +733,8 @@ def main(argv):
                 "basis": "SOURCE-derived from the adapter's cancel path at the pin and cross-checked against the vendor logs' cancel commands; not captured on the wire",
                 "official_client_probe": "placeOrder + cancelOrder only (no per-cancel request): its wire rate equals its counted rate",
             },
+            "rate_window_conventions": rate_window_conventions(replays),
+            "peak_open_orders_definition": peak_open_orders_definition(vocabulary, quantities),
             "source_citations_at_the_pin": {
                 "repository": "nautechsystems/nautilus_trader",
                 "commit": "01ced2a3e7b7d25ae7b2e5c0c077bcc46192eb25",
@@ -610,10 +773,15 @@ def main(argv):
         "official_client_summary": summary_groups(pairs),
         "reqids_probe": {"source": "transcript-derived (probe output printed in the session; no receipt file)", **TRANSCRIPT_DERIVED["reqids_probe"]},
         "reconciliation": recon,
-        "revision": {"number": 2, "supersedes": {"json_sha256": "b492f42d335370e22f4349bf43db54f1adf4c77921b36a28300159b08c8e11fa", "generator_sha256": "56463b2622501446a9a1640c6d3065920dbd449a622457ea61f392ce6166c5a1", "verifier_sha256": "0e9fb1376a59e34cf1e3b6ba2fea30d89aad5e09db28de0b4d59792a41207468"},
-                     "changes": ["journal_orders_missing_by_kind: 36 rejected orders split into 35 [103] duplicate-order-id refusals and 1 cancel-target-not-found rejection (v1 labelled 36 as [103])",
-                                 "reconciliation: third transcript-derived broker count (10,313) with its arithmetic relation; the pair-test order key is renamed",
-                                 "caveats updated accordingly; every measured rate, latency and test count is unchanged"]},
+        "revision": {"number": 3,
+                     "supersedes": {"json_sha256": "25ef71020a06e1781fac0360aa8b19c564d9d146b65ea3fc6b8cb0ab62ab0c15", "generator_sha256": "f44b595a13cf87b4ad555427000c7937cc62452076f0a3380f13338127147619", "verifier_sha256": "cac1e764f429dc05575dfe8a692e74d4bcc04a8906e174e9e7b0178cf61494e3"},
+                     "earlier_revisions": {"1": {"json_sha256": "b492f42d335370e22f4349bf43db54f1adf4c77921b36a28300159b08c8e11fa", "generator_sha256": "56463b2622501446a9a1640c6d3065920dbd449a622457ea61f392ce6166c5a1", "verifier_sha256": "0e9fb1376a59e34cf1e3b6ba2fea30d89aad5e09db28de0b4d59792a41207468"}},
+                     "sealed_files": "the revision-1 and revision-2 files stay sealed and unchanged; anything citing them by hash still resolves",
+                     "changes": ["per-id ownership: reconciliation gains journal_orders_missing_by_number_of_owner_journals; the verifier checks that every missing order is found in exactly one run journal id by id (revision 2 compared counts)",
+                                 "rates: max_1s and best_5s_mean of every whole-run and combined rate block are maxima over sliding windows anchored at a message; the revision-2 UTC-bucket numbers are kept as max_1s_utc_buckets and best_5s_mean_utc_buckets; the headline unit text is corrected",
+                                 "rates: every adapter rung gains max_1s_sliding_in_rung_window and receipt_slots_replayed_from_journal (the receipts' own counted_msgs_per_s_min/max are bucket values and are unchanged)",
+                                 "peak_open_orders: an order stops being open at its first terminal order event, the terminal names being derived from the journals' own vocabulary (revision 2 closed an order only at order_canceled)",
+                                 "facts.rate_window_conventions, facts.peak_open_orders_definition and three caveats added; every other measured value, count, latency and test result is unchanged"]},
         "caveats": [
             "The 1,500 orders a minute with cancels at 50 msgs/s was measured over one 20-second rung, not a full minute.",
             "The third wire message per order (one reqAllOpenOrders per cancel) is derived from the adapter source at the pin; it was not captured on the wire.",
@@ -626,6 +794,10 @@ def main(argv):
             "Of the 38 journal orders absent at the broker, 35 carry the venue's [103] duplicate-order-id refusal, 1 a cancel-target-not-found rejection and 2 never reached the adapter (revision 2 corrects the v1 label of 36 as [103]).",
             "Latencies of the pair tests are single 14-30 second runs at 10 msgs/s per connection and are not a latency study.",
             "Timing offsets compare two timestamps taken on one host clock.",
+            "Per-second maxima (revision 3): whole-run, combined and per-rung-window `max_1s` / `best_5s_mean` are maxima over sliding windows anchored at a message; the revision-2 UTC-bucket values are kept as `*_utc_buckets` and are never above them.",
+            "The receipts' own per-rung `counted_msgs_per_s_min` / `counted_msgs_per_s_max` are fixed one-second slot counters, so they are bucket values and lower bounds of the sliding maximum; "
+            "the official client's receipts hold no per-message times, so its per-second maxima cannot be recomputed under the sliding definition.",
+            "`peak_open_orders` of the adapter runs closes an order at its first terminal order event (revision 3); the official client's `peak_open_orders` is the probe's own run-time counter and is not recomputable from the receipts.",
         ],
     }
     json.dump(doc, sys.stdout, sort_keys=True, indent=1, ensure_ascii=True)

@@ -54,7 +54,7 @@ state remains deterministic. Source: [paper trial and evidence contract][paper-p
 
 ## Measured throughput on 2026-10-13
 
-The [approved sanitized projection][measurement] records paper Gateway trials
+The [approved sanitized revision 3 projection][measurement] records paper Gateway trials
 using the official IB Python client **10.46.01** and NautilusTrader develop
 **2.0.0rc7.dev20261012**, commit
 `01ced2a3e7b7d25ae7b2e5c0c077bcc46192eb25`. These are measurements at those
@@ -65,7 +65,7 @@ projection `/facts/official_client`, `/facts/nautilus_trader_pin`,
 
 | Path and run | Observation or calculation | Boundary |
 | --- | --- | --- |
-| Official client, `P-r1`, target 50 messages/s | 500 orders with cancels in 20 seconds; mean 49.95 messages/s. Order rate: 1,500/minute. Mean message rate: 2,997/minute, approximately 3,000. | A rate from a 20-second rung, not a sustained full-minute result; one connection, no refusal or pacing error in the ladder; not tested above 50 messages/s. |
+| Official client, `P-r1`, target 50 messages/s | 500 orders with cancels in 20 seconds; mean 49.95 messages/s. Order rate: 1,500/minute. Mean message rate: 2,997/minute, approximately 3,000. | A rate from a 20-second rung, not a sustained full-minute result; one connection, no refusal or pacing error in the ladder; highest tested target 50 messages/s. |
 | Adapter, `B-r6`, target 30 counted messages/s | 900 orders/minute by submit count, 897/minute by the counted mean; refined wire estimate 44.95 messages/s. | Observed rung rates, approximately 45 wire messages/s. Wire estimates are source-derived, not a packet capture. |
 | Adapter budget at 50 wire messages/s | `50 × 60 / 3 = 1,000` orders/minute with cancels. | A computed bound assuming one placement, one cancel and one all-open-orders request per accepted order; not the measured rung rate. Other requests consume this budget too. |
 
@@ -89,27 +89,71 @@ Sources: projection `/facts/message_counting`, `/headline_numbers` entries
 `adapter_r6_rung40` and `adapter_r6_rung50`, `/caveats`, and
 [pinned cancel resolution][cancel-source].
 
-## Read the measurement limits with the figures
+## Revision 3: sliding maxima and receipt counters
 
-The projection's whole-run `max_1s` rates use **UTC-aligned one-second buckets**.
-Its `best_5s_mean` is computed from five consecutive aligned buckets. These
-statistics do not measure a rolling-window maximum or establish a cap for every
-possible interval. The rung-average headline rates above retain their stated
-20-second scope. Source: [publication claim limits and pinned producer source][publication].
+Revision 3 computes whole-run `max_1s` in **sliding one-second windows** and
+`best_5s_mean` in sliding five-second windows. Each window starts at a message
+timestamp and is half-open: the start is included and the end excluded. Integer
+microseconds avoid floating-point boundary comparisons. Historical UTC-aligned
+results remain in `max_1s_utc_buckets` and `best_5s_mean_utc_buckets`. The
+20-second rung means above are unchanged. Sources: projection
+`/facts/rate_window_conventions` and [V3-CHANGES, sections 2 and 4][v3-changes].
 
-The reported `peak_open_orders` **includes rejected orders**. The adapter's
-counter increments on submission and decrements on cancellation; rejection does
-not remove an entry. Read that field as the reported counter, rather than a
-broker-confirmed count of accepted open orders or a verified exposure maximum.
-This qualification accompanies every use of that field in the linked projection.
-Source: [publication claim limits and pinned counter][publication].
+The producer's section 4 corrects the earlier maximum-rate claims:
 
-The v2 verifier compares the aggregate classified missing-order count with the
-missing total. It **does not enforce per-ID ownership in exactly one run**;
-an omitted ID and a duplicated ID can balance in the aggregate. Its passing
-checks therefore do not establish that invariant. The headline figures remain
-the retained producer results with this verification limit. Source:
-[publication claim limits and pinned verifier][publication].
+| Combined adapter pair | Sliding 1 s refined wire estimate | Sliding 1 s upper bound |
+| --- | --- | --- |
+| m1 | 52 | 53 |
+| m2 | 47 | 47 |
+| m3 | 40 | 40 |
+| m4 | 47 | 52 |
+
+Thus m1 and m4 exceed 50 in the upper-bound series. The previous claim that
+every pair stayed at or below 50, and the broader ceiling of 45, do not hold
+under the sliding definition. Source: [V3-CHANGES section 4, items 1 and 3][v3-changes],
+projection `/headline_numbers` entry `adapter_two_connection_combined_rate_estimates`.
+
+| Whole run | Counted sliding 1 s maximum | Refined wire maximum | Upper-bound wire maximum |
+| --- | --- | --- | --- |
+| B-r5 | 46 (previous UTC bucket: 37) | 69 (57) | 69 (57) |
+| B-r6 | 53 (48) | 78 (66) | 83 (71) |
+
+B-r5's best sliding five-second wire mean is **51.2 messages/s** (refined and
+upper bound); the earlier 49.8 bucket mean cannot support a ceiling of 50.
+B-r6's refined best five-second mean is **56.6**, replacing 53.8. Sources:
+[V3-CHANGES section 4, items 2 and 5][v3-changes], projection `/headline_numbers`
+entry `adapter_whole_run_rate_estimates`.
+
+The B-r5 rung-50 value **38** is a receipt slot counter, not a sliding peak rate.
+The largest sliding one-second window within that rung contains **46 counted
+messages (69 wire)**. B-r6 rung-30's mean remains approximately 45 wire
+messages/s, while its in-rung sliding maximum is **63 refined / 64 upper-bound**
+wire messages. The official client's rung-50 slot maximum is 51; no per-message
+times were retained for recomputing its sliding maximum, which is therefore at
+least 51. Sources: [V3-CHANGES section 4, items 4, 8 and 10][v3-changes] and
+projection `/facts/rate_window_conventions`.
+
+No pacing text, code 100 or disconnect occurred in the retained adapter runs.
+**Whether a sliding 1 s window above 50 wire messages is above the cap depends
+on how the Gateway counts, which this evidence does not establish.** Hidden
+requests remain source-derived estimates stamped at the cancel-row time, not
+wire captures. Sources: [V3-CHANGES section 4, item 11 and final boundary][v3-changes],
+projection `/facts/message_counting` and `/facts/rate_window_conventions`.
+
+Adapter `peak_open_orders` now closes an order at its **first terminal order
+event**, including rejection or fill; a rejected cancel is not a terminal order
+event. The official-client peak field remains its separate runtime counter:
+a 103-refused order stays in that counter until its stale cancel is answered.
+Neither counter alone establishes broker-confirmed accepted exposure. Sources:
+projection `/facts/peak_open_orders_definition` and [V3-CHANGES sections 2 and 6][v3-changes].
+
+The v3 verifier enforces **each missing ID belonging to exactly one run**.
+The retained ownership histogram is zero with no owner, 38 with one owner,
+and zero with multiple owners. The producer's swapped-owner negative control
+passed v2's aggregate check and is rejected by v3. Sources: projection
+`/reconciliation/journal_orders_missing_by_number_of_owner_journals` and
+[V3-CHANGES sections 1 and 5][v3-changes]. This publication does not rerun the
+verifier against private receipts.
 
 ## Error 103 and the order-writing connection
 
@@ -149,9 +193,11 @@ multi-writer configuration or a general latency guarantee. Sources: projection
   reconciliation counts are explicitly transcript-derived; its sealed
   [addendum][measurement-addendum] extends that reconciliation without changing
   the original JSON. Revision 2 incorporates that third count and corrects the
-  missing-order classification; the [revision and regression addendum][revision]
-  and [documented order-ID-rule correction][order-rule-correction] supersede the
-  unchanged revision 1 README's corresponding statements. Neither a
+  missing-order classification. [V3-CHANGES][v3-changes] records the subsequent
+  sliding-window, terminal-event and per-ID corrections. The [re-sealed v2
+  addendum][revision] remains historical; the published README's rate definitions
+  are updated for v3, while [ADDENDUM-02][order-rule-correction] supplies its
+  documented order-ID-rule correction. Neither a
   source-derived wire estimate nor a marker is a fill witness.
   Sources: [projection scope and field definitions][measurement-guide],
   [authority versus execution evidence][paper-policy].
@@ -171,6 +217,7 @@ multi-writer configuration or a general latency guarantee. Sources: projection
 [measurement-addendum]: ../../evidence/artifacts/ibkr-pacing-20261013/ADDENDUM-01.txt
 [order-rule-correction]: ../../evidence/artifacts/ibkr-pacing-20261013/ADDENDUM-02.txt
 [revision]: ../../evidence/artifacts/ibkr-pacing-20261013/ADDENDUM-03.txt
+[v3-changes]: ../../evidence/artifacts/ibkr-pacing-20261013/V3-CHANGES.md
 [publication]: ../../evidence/artifacts/ibkr-pacing-20261013/PUBLICATION.md
 [order-ids]: https://interactivebrokers.github.io/tws-api/order_submission.html
 [selector-source]: https://github.com/nautechsystems/nautilus_trader/blob/01ced2a3e7b7d25ae7b2e5c0c077bcc46192eb25/crates/adapters/interactive_brokers/src/execution/core.rs#L381-L394
