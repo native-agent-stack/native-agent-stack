@@ -216,8 +216,9 @@ The transport now retains one shielded cancellation operation per owned client
 ID, including its actual concurrent future and final-state reconciliation. The
 controller's five-second timeout releases only its wait; another tick awaits
 that same transport operation instead of authorizing another DELETE. Its
-pending latch stays set until the actual operation resolves, including if a
-terminal stream observation arrives while the SDK call is still running. A late
+pending latch stays set while the actual operation is live and, after HTTP204,
+while the broker lookup is nonterminal. A terminal observation releases it only
+after the running SDK call completes; a definitive refusal/failure permits retry. A late
 completion still forwards the final broker observation. The owner tick remains
 nonblocking and continues cutoff, expiry and flatten decisions.
 
@@ -230,8 +231,8 @@ The copied ContextVar preserves the existing per-order budget identity. This
 joins existing work; it does not claim that a running HTTP request is interruptible.
 
 The adaptive strategy and mover book mirror the background operation's pending
-mark separately from their own engine cancellation mark. When the shared
-operation resolves, the next strategy pass clears only that mirrored mark;
+mark separately from their own engine cancellation mark. When a terminal broker
+outcome or definitive failure resolves the cancellation, the next strategy pass clears only that mirrored mark;
 failure therefore leaves timeout, halt, kill-switch and corporate-action cancel
 paths available before the carry cutoff. A pre-existing engine cancel mark is
 preserved. This closes the reader's q9 strand case under the CC's21:37Z ruling.
@@ -254,3 +255,29 @@ reader's q9 probe is measured separately at exact8f64 and the combined sources.
 Four CI-visible production-method controls cover both strategy mirrors and the
 preservation of unrelated engine cancels. This is deterministic fixture evidence,
 not an rc5 node or live-broker acceptance claim for that particular strand case.
+
+### Acknowledged cancellation finality
+
+The CC's23:16Z narrow correction separates SDK worker completion from broker
+cancellation completion. HTTP204 followed by `accepted`, `new` or `pending_cancel`
+keeps the shared controller and adaptive/mover marks pending. The callback retires
+the local operation but releases its pending mark only for `canceled`, `filled`,
+`expired`, `rejected`, or an explicit refusal/failure. The stream or a later lookup
+can confirm the terminal outcome; finishing a DELETE await alone cannot.
+
+Alpaca's primary [Orders page](https://docs.alpaca.markets/us/docs/orders-at-alpaca.md),
+L1560 says canceled orders receive "no further updates"; L1563 defines pending_cancel
+as "The order is waiting to be canceled." The maintained SDK's
+[OrderStatus enum](https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/alpaca/trading/enums.py#L148-L169)
+at0.44.0 distinguishes NEW/ACCEPTED/PENDING_CANCEL from its final statuses. These
+definitions were read first-hand; the test uses that actual enum and synchronous
+SDK cancellation method against synthetic HTTP.
+
+The three-tick regression covers each of those three nonterminal statuses and
+both terminal stream/later-lookup paths. At exact5b34905 each case sends DELETEs
+1/2/3 and drops all three marks; after the guard each sends1/1/1, reserves one
+cancel budget slot and holds all marks until confirmed terminal observation.
+Removing the guard reproduces the baseline failure. Earlier worker join,
+HTTP422 retry and strategy-strand checks are retained in the focused integration.
+Historical source and proof hashes retain exact published preimages. No actual
+credential, broker operation or paper acceptance is claimed.

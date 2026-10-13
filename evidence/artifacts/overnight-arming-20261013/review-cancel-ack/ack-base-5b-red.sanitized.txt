@@ -1,0 +1,211 @@
+test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal) ... ack_three_ticks accepted stream [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 3, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}]
+
+  test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal) (status='accepted', terminal_source='stream') ... FAIL
+ack_three_ticks accepted lookup [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 3, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}]
+  test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal) (status='accepted', terminal_source='lookup') ... FAIL
+ack_three_ticks new stream [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 3, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}]
+  test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal) (status='new', terminal_source='stream') ... FAIL
+ack_three_ticks new lookup [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 3, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}]
+  test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal) (status='new', terminal_source='lookup') ... FAIL
+ack_three_ticks pending_cancel stream [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 3, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}]
+  test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal) (status='pending_cancel', terminal_source='stream') ... FAIL
+ack_three_ticks pending_cancel lookup [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 3, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}]
+  test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal) (status='pending_cancel', terminal_source='lookup') ... FAIL
+
+======================================================================
+FAIL: test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal) (status='accepted', terminal_source='stream')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 40, in test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal
+    self._exercise(status, terminal_source)
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 155, in _exercise
+    asyncio.run(exercise())
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 129, in exercise
+    self.assertEqual([s['deletes'] for s in states], [1, 1, 1],
+AssertionError: Lists differ: [1, 2, 3] != [1, 1, 1]
+
+First differing element 1:
+2
+1
+
+- [1, 2, 3]
+?     ^  ^
+
++ [1, 1, 1]
+?     ^  ^
+ : an acknowledged live cancellation must not send another DELETE
+
+======================================================================
+FAIL: test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal) (status='accepted', terminal_source='lookup')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 40, in test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal
+    self._exercise(status, terminal_source)
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 155, in _exercise
+    asyncio.run(exercise())
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 129, in exercise
+    self.assertEqual([s['deletes'] for s in states], [1, 1, 1],
+AssertionError: Lists differ: [1, 2, 3] != [1, 1, 1]
+
+First differing element 1:
+2
+1
+
+- [1, 2, 3]
+?     ^  ^
+
++ [1, 1, 1]
+?     ^  ^
+ : an acknowledged live cancellation must not send another DELETE
+
+======================================================================
+FAIL: test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal) (status='new', terminal_source='stream')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 40, in test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal
+    self._exercise(status, terminal_source)
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 155, in _exercise
+    asyncio.run(exercise())
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 129, in exercise
+    self.assertEqual([s['deletes'] for s in states], [1, 1, 1],
+AssertionError: Lists differ: [1, 2, 3] != [1, 1, 1]
+
+First differing element 1:
+2
+1
+
+- [1, 2, 3]
+?     ^  ^
+
++ [1, 1, 1]
+?     ^  ^
+ : an acknowledged live cancellation must not send another DELETE
+
+======================================================================
+FAIL: test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal) (status='new', terminal_source='lookup')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 40, in test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal
+    self._exercise(status, terminal_source)
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 155, in _exercise
+    asyncio.run(exercise())
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 129, in exercise
+    self.assertEqual([s['deletes'] for s in states], [1, 1, 1],
+AssertionError: Lists differ: [1, 2, 3] != [1, 1, 1]
+
+First differing element 1:
+2
+1
+
+- [1, 2, 3]
+?     ^  ^
+
++ [1, 1, 1]
+?     ^  ^
+ : an acknowledged live cancellation must not send another DELETE
+
+======================================================================
+FAIL: test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal) (status='pending_cancel', terminal_source='stream')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 40, in test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal
+    self._exercise(status, terminal_source)
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 155, in _exercise
+    asyncio.run(exercise())
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 129, in exercise
+    self.assertEqual([s['deletes'] for s in states], [1, 1, 1],
+AssertionError: Lists differ: [1, 2, 3] != [1, 1, 1]
+
+First differing element 1:
+2
+1
+
+- [1, 2, 3]
+?     ^  ^
+
++ [1, 1, 1]
+?     ^  ^
+ : an acknowledged live cancellation must not send another DELETE
+
+======================================================================
+FAIL: test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal) (status='pending_cancel', terminal_source='lookup')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 40, in test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal
+    self._exercise(status, terminal_source)
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 155, in _exercise
+    asyncio.run(exercise())
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_acknowledgement.py", line 129, in exercise
+    self.assertEqual([s['deletes'] for s in states], [1, 1, 1],
+AssertionError: Lists differ: [1, 2, 3] != [1, 1, 1]
+
+First differing element 1:
+2
+1
+
+- [1, 2, 3]
+?     ^  ^
+
++ [1, 1, 1]
+?     ^  ^
+ : an acknowledged live cancellation must not send another DELETE
+
+----------------------------------------------------------------------
+Ran 1 test in 2.763s
+
+FAILED (failures=6)
+ASSERTION_FAILURES 6 ERRORS 0 SKIPS 0

@@ -1,0 +1,13 @@
+test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal) ... ack_three_ticks accepted stream [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks accepted lookup [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks new stream [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks new lookup [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks pending_cancel stream [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks pending_cancel lookup [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ok
+
+----------------------------------------------------------------------
+Ran 1 test in 3.402s
+
+OK
+ASSERTION_FAILURES 0 ERRORS 0 SKIPS 0

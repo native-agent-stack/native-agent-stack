@@ -17,7 +17,8 @@ RECEIPTS = ("blueprints/us-equities/adaptive-paper/overnight-arming-validation.j
             "blueprints/us-equities/adaptive-paper/overnight-review-round2-validation.json",
             "blueprints/us-equities/adaptive-paper/overnight-cancel-refusal-validation.json",
             "blueprints/us-equities/adaptive-paper/overnight-cancel-worker-validation.json",
-            "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/worker-only/validation.json")
+            "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/worker-only/validation.json",
+            "blueprints/us-equities/adaptive-paper/overnight-cancel-ack-validation.json")
 ARTIFACTS = "evidence/artifacts/overnight-arming-20261013"
 
 

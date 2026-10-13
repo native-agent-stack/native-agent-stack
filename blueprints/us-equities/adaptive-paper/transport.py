@@ -1925,10 +1925,14 @@ class AlpacaPaperTransport:
                     self._cancel_operations.pop(client_order_id)
                 self._cancel_started.discard(client_order_id)
                 pending = getattr(self, "overnight_cancel_pending", None)
-                if pending is not None:
+                failed = operation.cancelled() or operation.exception() is not None
+                # HTTP204 finishes the local worker, not broker cancellation.
+                # Keep an acknowledged live order pending until an observation
+                # confirms terminal state; explicit failures permit a retry.
+                resolved = failed or operation.result()["status"] in (
+                    "canceled", "filled", "expired", "rejected")
+                if pending is not None and resolved:
                     pending.discard(client_order_id)
-                if not operation.cancelled():
-                    operation.exception()  # Retrieve failures even after the caller timed out.
 
             task.add_done_callback(completed)
         return await asyncio.shield(task)

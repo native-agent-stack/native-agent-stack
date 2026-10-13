@@ -1,0 +1,194 @@
+{
+  "base_revision": "5b34905f99d20b9f8104df8340123c8b33a6e3c0",
+  "cases": {
+    "baseline_delete_counts": [
+      1,
+      2,
+      3
+    ],
+    "head_delete_counts": [
+      1,
+      1,
+      1
+    ],
+    "nonterminal_statuses": [
+      "accepted",
+      "new",
+      "pending_cancel"
+    ],
+    "terminal_observation_sources": [
+      "stream",
+      "lookup"
+    ],
+    "ticks": 3
+  },
+  "evidence_class": "synthetic",
+  "input_hashes": {
+    "blueprints/us-equities/adaptive-paper/mover.py": "d2663a99532925ddd071147297cd51bc44cbfd9b4c69c4f316f3bb4efb5a716d",
+    "blueprints/us-equities/adaptive-paper/native_strategy.py": "98f30ac68a71088c616965db840a022c4ed979fdb87e52e5e1a8a6efba812e3c",
+    "blueprints/us-equities/adaptive-paper/runner.py": "d1f305f57c2b6be8cdf0e4de996d9b6caaf7cc5eb6f623605879dad6743d067d",
+    "blueprints/us-equities/adaptive-paper/transport.py": "1e45e3c598d7719be84f5ffe782d2c7000694cff6fb2128ad5d0f362995b1288",
+    "docs/decisions/2026-10-13-overnight-rest-arming.md": "34a25c4dadfc9cd6667e4b61fe218dd7e2290f85cb8c04bbc9489630ad892062",
+    "tests/test_adaptive_paper_cancel_acknowledgement.py": "7a09f2b738b881a487eb7bee4f6ae46ae70ea03b9e64039c94160c81ae463fa2",
+    "tests/test_adaptive_paper_cancel_worker_ownership.py": "55f23fb4f52f6704ee2ac649392852f5aeeca3436d99bf91d06f9281efa6d694",
+    "tests/test_overnight_published_preimages.py": "ee5dc9b4aa4bb9fa17207c888b8fd0fae30b72f77ef487fa48f8752bab2c5b63"
+  },
+  "limitations": [
+    "Actual pinned SDK cancellation/getter, GuardedSession, Controller, ledger and request budget execute with synthetic HTTP.",
+    "Production adaptive/mover cancel methods run on protocol owners, not running native nodes in this acknowledgement regression.",
+    "No running SDK operation is abandoned; worker/shutdown and HTTP422/strategy-strand regressions pass in the focused native suite.",
+    "Prior receipt inputs remain bound to exact public5b34905 Git blobs; no historical execution receipt is retargeted.",
+    "Primary Orders page text was fetched/read; remaining earlier capture/lifecycle qualifications remain follow-ups.",
+    "No actual credential, broker call, paper acceptance or broker latency claim."
+  ],
+  "paper_acceptance": "NOT_RUN",
+  "runs": [
+    {
+      "assertion_failures": 6,
+      "command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- pinned-python <scratch>/ack-check.py base",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 2.763,
+      "errors": 0,
+      "exit_code": 1,
+      "output_bytes": 15280,
+      "output_sha256": "cde5a5fd67c2db4f63dc14094a77b9e6a4dd613d8237232599ec627120ebcd21",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-ack/ack-base-5b-red.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-ack/ack-base-5b-red.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-ack/ack-check.py.txt",
+      "python_argv": [
+        "<scratch>/ack-check.py",
+        "base"
+      ],
+      "runtime_read_lock": true,
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "tests_run": 1
+    },
+    {
+      "assertion_failures": 0,
+      "command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- pinned-python <scratch>/ack-check.py head",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 3.402,
+      "errors": 0,
+      "exit_code": 0,
+      "output_bytes": 2229,
+      "output_sha256": "b775d8350bc688a97b12343282bb6a31d9718ec41fa48955221b547178e4ac9c",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-ack/ack-head-green.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-ack/ack-head-green.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-ack/ack-check.py.txt",
+      "python_argv": [
+        "<scratch>/ack-check.py",
+        "head"
+      ],
+      "runtime_read_lock": true,
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "tests_run": 1
+    },
+    {
+      "assertion_failures": 6,
+      "command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- pinned-python <scratch>/ack-check.py unguarded",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 3.307,
+      "errors": 0,
+      "exit_code": 1,
+      "output_bytes": 15280,
+      "output_sha256": "b6a69c710a086fea16f4c38f701a456bb315b1e7813110d093d27e48021ba74a",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-ack/ack-guard-removal-red.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-ack/ack-guard-removal-red.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-ack/ack-check.py.txt",
+      "python_argv": [
+        "<scratch>/ack-check.py",
+        "unguarded"
+      ],
+      "runtime_read_lock": true,
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "tests_run": 1
+    },
+    {
+      "assertion_failures": 0,
+      "command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- pinned-python <scratch>/ack-related-suite.py native",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 39.807,
+      "errors": 0,
+      "exit_code": 0,
+      "output_bytes": 42210,
+      "output_sha256": "63880b25a9b024415533ec8ce1e0e51fd35a50e4f7f99f1fdd4648fb584be616",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-ack/ack-related-native.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-ack/ack-related-native.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-ack/ack-related-suite.py.txt",
+      "python_argv": [
+        "<scratch>/ack-related-suite.py",
+        "native"
+      ],
+      "runtime_read_lock": true,
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "tests_run": 218
+    },
+    {
+      "assertion_failures": 0,
+      "command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- pinned-python <scratch>/ack-related-suite.py ci",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 50.834,
+      "errors": 0,
+      "exit_code": 0,
+      "output_bytes": 44399,
+      "output_sha256": "3dbab5748693e2829659588db4fa6caeb4c0658f8236351036c19abe185e7697",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-ack/ack-related-ci.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-ack/ack-related-ci.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-ack/ack-related-suite.py.txt",
+      "python_argv": [
+        "<scratch>/ack-related-suite.py",
+        "ci"
+      ],
+      "runtime_read_lock": false,
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 93,
+      "tests_run": 218
+    }
+  ],
+  "schema_version": 1,
+  "scope": "CC23:16(a): preserve acknowledged nonterminal broker cancellation state after local SDK completion",
+  "sources": {
+    "alpaca_py_pin": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+    "canceled_definition": "The order has been canceled, and no further updates will occur for the order.",
+    "canceled_locator": "L1560",
+    "order_status_enum": "alpaca/trading/enums.py:148-169",
+    "orders_page": "https://docs.alpaca.markets/us/docs/orders-at-alpaca.md",
+    "pending_cancel_definition": "The order is waiting to be canceled.",
+    "pending_cancel_locator": "L1563"
+  },
+  "test_id": "CancelAcknowledgement.test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal"
+}
