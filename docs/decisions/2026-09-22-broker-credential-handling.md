@@ -271,8 +271,8 @@ python ... --credentials keychain-env` builds from the macOS login Keychain. The
 `blueprints/us-equities/adaptive-paper/credential_source.py`.
 
 2026-10-13 URL comparison correction: the strict shared normalizer now accepts
-the canonical paper authority with optional port 443 and an empty or `/v2`
-path, optionally ending in one slash. It retains fixed request-host pins and
+the canonical paper authority with no explicit port and paths empty, `/`,
+`/v2` or `/v2/`. It retains fixed request-host pins and
 refusal codes. See [the version-path correction and override-free unit bindings](2026-10-13-strict-paper-url-gates.md).
 
 **Why.** The operator's hosts now include macOS, and the operator's standing rule keeps API keys in the login

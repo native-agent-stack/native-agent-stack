@@ -18113,8 +18113,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-broker-credential-handling.md",
-      "sha256": "1b6324c5cb9cf9c825f038e0ff0334d6459622dc0211683f72d7b147af38edf9",
-      "bytes": 30730
+      "sha256": "8c47549b35dd808509f3f88024f30ecba28ee567dcb3aa1972feb3c8893d1452",
+      "bytes": 30708
     },
     {
       "path": "docs/decisions/2026-09-22-codeql-first-analysis.md",
