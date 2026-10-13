@@ -13493,8 +13493,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "3ce902532fd0fe5c8f59c62b7788090b6de921ca733eae4d6032ac90afdae0d6",
-      "bytes": 170735
+      "sha256": "9a90742580d1affb50b2683e44bf854dd9c14819659d31cefb53c5930a7ab68b",
+      "bytes": 170974
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runtime_lock.py",
@@ -13528,7 +13528,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "085dea92477a206e94bc14a83c07777e06240058a4fb93977028282ab766a53c",
+      "sha256": "3d50b17705fef29c0d6c41fe7816f973692ec6bf6daf1b3d11b43c1e4123826a",
       "bytes": 9996
     },
     {
@@ -13548,8 +13548,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/transport.py",
-      "sha256": "5cd9b1b31b1eae1ae0e75440401dec9a7a47d2c327ad0b582ef324c1e1d20890",
-      "bytes": 104825
+      "sha256": "fb7eed9bc69b6e37f4c097ed034d8e10fd2877a6feab8cd7a1cf7de90c35da6b",
+      "bytes": 106178
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/README.md",
@@ -19150,6 +19150,11 @@
       "path": "docs/decisions/2026-10-13-paper-configurable-risk-ceilings.md",
       "sha256": "4961225182a78eae3abf25aa120cd325ec0e5b335b766d79a0c38db6c1b12550",
       "bytes": 4526
+    },
+    {
+      "path": "docs/decisions/2026-10-13-paper-stream-backpressure.md",
+      "sha256": "5c0c4c72f967bbd0ac5474df17f4140b3735e451088739f68da83ab6b0d97e67",
+      "bytes": 4949
     },
     {
       "path": "docs/decisions/2026-10-13-plugin-skill-identity.md",
@@ -62310,6 +62315,11 @@
       "path": "tests/test_adaptive_paper_strategies.py",
       "sha256": "f0814b36909f2fc6b4c4213b4142ffc13339740f0397c99ad9c7c81982e2033a",
       "bytes": 28166
+    },
+    {
+      "path": "tests/test_adaptive_paper_stream_backpressure.py",
+      "sha256": "7303f2052c4327894cf34f2c46a97d06c0199c651da8188eada22df63ce82353",
+      "bytes": 8140
     },
     {
       "path": "tests/test_adaptive_paper_transport.py",

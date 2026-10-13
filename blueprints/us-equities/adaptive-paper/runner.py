@@ -2101,8 +2101,10 @@ def _stream_health(port):
 def _run_native_status(reconciliation, session_errors, native_fills, outcome, session_policy, now):
     """D1: status is decided by exactly one authority, factored out so it is
     directly testable without driving a full native node/port. A clean,
-    reconciled, flat end is "passed"/"completed_no_signals" regardless of
-    overnight_holds. Any other non-flat end is "held_overnight" only when
+    reconciled, flat end with no frozen terminal stream is
+    "passed"/"completed_no_signals" regardless of overnight_holds. A frozen
+    stream is "stream_frozen", sticky even after a successful recovery.
+    Any other non-flat end is "held_overnight" only when
     _honest_overnight_hold agrees it is a genuine, reconciled,
     error/halt-free session-boundary hold -- main() reuses this status for
     is_final_boundary (``_final_boundary_from_run_status``) instead of
@@ -2127,6 +2129,8 @@ def _run_native_status(reconciliation, session_errors, native_fills, outcome, se
     unconditionally, and never allowed to outrank a failed liquidation's
     real outcome.
     """
+    if (outcome.get("stream_health") or {}).get("frozen"):
+        return "stream_frozen"
     if reconciliation and reconciliation["positions"] == 0 and reconciliation["open_orders"] == 0 and not session_errors:
         return "passed" if native_fills else "completed_no_signals"
     if _honest_overnight_hold(outcome, session_policy, now):
@@ -2247,7 +2251,7 @@ def _finalize_status_and_financing(reconciliation, session_errors, native_fills,
 # uses "needs_attention", not "failed", but a future caller of
 # _apply_forced_recovery_outcome should not have to know that to stay
 # safe).
-_STICKY_FAILED_STATUSES = {"needs_attention", "failed"}
+_STICKY_FAILED_STATUSES = {"needs_attention", "failed", "stream_frozen"}
 
 
 def _apply_forced_recovery_outcome(outcome, recovery):
@@ -2263,7 +2267,7 @@ def _apply_forced_recovery_outcome(outcome, recovery):
     TWO-TIER rule, not a single severity ranking:
 
     1. If the pre-recovery status is already one of
-       _STICKY_FAILED_STATUSES ("needs_attention"/"failed" -- a real
+       _STICKY_FAILED_STATUSES ("needs_attention"/"failed"/"stream_frozen" -- a real
        mid-RTH error, halt, or reconciliation mismatch run_native itself
        already detected), it is STICKY: it survives regardless of how
        the forced liquidation that followed went, successful or not. A

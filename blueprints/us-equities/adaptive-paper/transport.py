@@ -1423,7 +1423,7 @@ class AlpacaPaperTransport:
             if (not all(self._auth.values()) or not all(self._acks.values())
                     or not self.health["fresh_quotes"] or self._order_events_pending()):
                 raise TransportError("streams are not ready for reconciliation acknowledgement")
-            if "queue_overflow" in self._reasons or "callback_failure" in self._reasons:
+            if self._reasons.intersection({"queue_overflow", "queue_enqueue_cancelled", "callback_failure"}):
                 raise TransportError("event loss requires a new transport and durable recovery")
             # Pending order-update timers survive a routine acknowledgement; they are
             # cleared only when the orders stream actually dropped, since only then can
@@ -1513,16 +1513,43 @@ class AlpacaPaperTransport:
             self.freeze_health("queue_overflow")
 
     async def _quote_callback(self, raw):
-        self._enqueue("quote", raw)
+        await self._enqueue_stream_event("quote", raw)
 
     async def _order_callback(self, raw):
-        self._enqueue("order", raw)
+        await self._enqueue_stream_event("order", raw)
 
     async def _status_callback(self, raw):
-        self._enqueue("status", raw)
+        await self._enqueue_stream_event("status", raw)
 
     async def _luld_callback(self, raw):
-        self._enqueue("luld", raw)
+        await self._enqueue_stream_event("luld", raw)
+
+    async def _enqueue_stream_event(self, kind, raw):
+        """Backpressure the SDK's awaited handler without blocking either loop.
+
+        alpaca-py 0.44.0 cc4cb3b7 data/live/websocket.py:367-368 awaits its
+        handler; trading/stream.py:182 awaits dispatch too. Keep this one
+        raw event while the bounded owner queue drains. Never coalesce or
+        discard an event on transient fullness. A consumer that never drains
+        still produces the existing explicit event-loss freeze, bounded by
+        start_timeout; stop can interrupt the wait without parking a thread.
+        """
+        deadline = time.monotonic() + self.start_timeout
+        try:
+            while not self._stopping:
+                try:
+                    self._events.put_nowait((kind, raw))
+                    return
+                except queue.Full:
+                    remaining = deadline - time.monotonic()
+                    if remaining <= 0:
+                        self.freeze_health("queue_overflow")
+                        return
+                    await asyncio.sleep(min(0.01, remaining))
+        except asyncio.CancelledError:
+            if not self._stopping:
+                self.freeze_health("queue_enqueue_cancelled")
+            raise
 
     async def _observe(self, order):
         async with self._observation_lock:
