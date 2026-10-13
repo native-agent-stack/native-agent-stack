@@ -105,6 +105,12 @@
 # local mirrors of the upstream repositories the text names, and the other two as commits of the GitHub repositories
 # named in this repository's own blob/ and tree/ links to them. The command center confirmed each fingerprint from that
 # value-free table (its confirmation record of 2026-10-13, cited by name).
+# Mechanism (gitleaks/gitleaks@v8.30.1, commit 83d9cd68, the CI's pinned version): AddFinding builds a git finding's
+# fingerprint as `commit:file:rule-id:start-line` and skips the finding when that fingerprint, or the commit-less
+# `file:rule-id:start-line`, is in the ignore set (detect/detect.go:711-733). AddGitleaksIgnore loads the set from this
+# file, skipping blank and `#` lines and normalizing the path part (detect/detect.go:153-193). The file is read from
+# the -i/--gitleaks-ignore-path directory, "." by default, and from the scanned source's root
+# (cmd/root.go:90, :311-318). A fingerprint therefore suppresses only its own commit, file, rule and line.
 
 # evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json (2026-10-13, merge commits 9b7a67b9 and 5cfed346)
 9b7a67b98eea708af7b495037c01b3f8f327d558:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:338
