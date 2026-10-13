@@ -1,4 +1,4 @@
-The tests of CPA-V-07 (tests/test_skills_manifest.py, tests/test_skills_status.py, tests/test_skill_usage_daily.py) against the sources of 3f1a921dd (the pull request's base; the manifest, scripts/skills_status.py, tools/skill-usage/skill_usage.py and the practice page as they stood; GITHUB_ACTIONS=true): 142 tests run, 22 of them fail or raise (FAIL: an assertion; ERROR: the sources lack what the test uses).
+The tests of CPA-V-07 (tests/test_skills_manifest.py, tests/test_skills_status.py, tests/test_skill_usage_daily.py) against the sources of 3f1a921dd (main before the landing rebase onto 993cc890b, the base of the first commit as it was written; the replay at the exact base of the opened head is receipts/fail-before-at-main-993cc890b.txt: the same 22 of 142; the manifest, scripts/skills_status.py, tools/skill-usage/skill_usage.py and the practice page as they stood; GITHUB_ACTIONS=true): 142 tests run, 22 of them fail or raise (FAIL: an assertion; ERROR: the sources lack what the test uses).
 
 test_skills_manifest: Ran 38 tests, FAILED (failures=3, errors=1), in 3 tests
   FAIL  test_every_row_a_plugin_delivers_names_the_listing_it_gets [1]

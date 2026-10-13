@@ -42,7 +42,7 @@ The three files that differ (a difflib summary; B is the bundled copy, P the plu
    replace bundled 1520 1520 plugin 1520 1520
        delete B: ' early-access' P: ''
 
-SKILL.md: the bundled one is inlined in the prompt the client expands for the skill (sha256 04a8a1c985a6515a0ef7b303ef996471ccbae5eb28ba9805b19af89aa2354ac7, 611 lines); the plugin's is the file (sha256 40537cca17c4aa86e4ce83ced39efcbfb1204905e3cf4c4ff98f2eab011e4b7f, 617 lines):
+SKILL.md: the bundled one is inlined in the prompt the client expands for the skill (611 lines; no digest of that prompt is published, because its first line names the folder the client unpacked the skill into on this host); the plugin's is the file (sha256 40537cca17c4aa86e4ce83ced39efcbfb1204905e3cf4c4ff98f2eab011e4b7f, the pinned bytes, 617 lines):
 == skill.txt lines 611 617 ratio 0.9886
    replace bundled 1 1 plugin 1 8
       B: Base directory for this skill: <the client's unpacked bundled claude-api folder>

@@ -39,15 +39,15 @@ class PluginUsageTests(unittest.TestCase):
 class TwinListingUsageTests(unittest.TestCase):
     """CPA-V-07: a skill that a plugin and another copy both deliver is listed under two names in the /skill-doctor table, and a use of either is a use of the skill."""
 
-    ROWS = {"typesafe:typesafe-ai": {"source": "plugin", "context_tokens": 100, "tokens_7d": None, "uses": 2, "last_used": "1d ago"},
-            "typesafe-ai": {"source": "userSettings", "context_tokens": 90, "tokens_7d": None, "uses": 3, "last_used": "3d ago"}}
+    ROWS = {"typesafe:typesafe-ai": {"source": "plugin", "context_tokens": 100, "tokens_7d": None, "uses": 2, "last_used": "1 day"},
+            "typesafe-ai": {"source": "userSettings", "context_tokens": 90, "tokens_7d": None, "uses": 3, "last_used": "3 days"}}
 
     def skill(self, **extra):
         return {"name": "typesafe-ai", "claude_plugin": "typesafe@typesafe-ai", "claude_skill_name": "typesafe:typesafe-ai", **extra}
 
     def test_both_listings_are_one_row_with_the_uses_added(self):
         row = usage.claude_row(self.skill(), self.ROWS)
-        self.assertEqual((row["uses"], row["context_tokens"], row["last_used"]), (5, 190, "1d ago"))
+        self.assertEqual((row["uses"], row["context_tokens"], row["last_used"]), (5, 190, "1 day"))
 
     def test_one_listing_is_that_row_and_none_is_none(self):
         self.assertEqual(usage.claude_row(self.skill(), {"typesafe-ai": self.ROWS["typesafe-ai"]}), self.ROWS["typesafe-ai"])
@@ -56,9 +56,38 @@ class TwinListingUsageTests(unittest.TestCase):
 
     def test_the_last_use_is_that_of_the_listing_that_was_used(self):
         rows = {name: dict(row, uses=0, last_used="never") for name, row in self.ROWS.items()}
-        rows["typesafe-ai"]["uses"], rows["typesafe-ai"]["last_used"] = 4, "2h ago"
-        self.assertEqual(usage.claude_row(self.skill(), rows)["last_used"], "2h ago")
+        rows["typesafe-ai"]["uses"], rows["typesafe-ai"]["last_used"] = 4, "today"
+        self.assertEqual(usage.claude_row(self.skill(), rows)["last_used"], "today")
         self.assertEqual(usage.claude_row(self.skill(), {name: dict(row, uses=0, last_used="never") for name, row in self.ROWS.items()})["last_used"], "never")
+
+    def test_the_combined_last_use_is_the_most_recent_of_the_listings_that_were_used_whichever_is_listed_first(self):
+        """Astra's read of 2dae9751 (P2): the combined row took the first used listing's date, the plugin's, so a plugin used 7 days ago and a personal copy used an hour ago reported 7 days ago. The cells say how long
+        ago (Claude Code 2.1.296 prints never, today and N day(s); older tables N days ago and N hours ago), so they are put in order; the most recent wins whichever listing carries it, for both kinds of twin."""
+        twins = (("a personal twin", self.skill(), "typesafe:typesafe-ai", "typesafe-ai"),
+                 ("a bundled twin", {"name": "claude-api", "native_plugin": "claude-api@market", "claude_skill_name": "claude-api:claude-api", "bundled_twin": "claude-api"}, "claude-api:claude-api", "claude-api"))
+        cases = ((("7 days ago", "1 hour ago"), "1 hour ago"), (("1 hour ago", "7 days ago"), "1 hour ago"), (("3 days", "1 day"), "1 day"), (("1 day", "3 days"), "1 day"), (("today", "2 days"), "today"),
+                 (("2 days", "today"), "today"), (("30 minutes ago", "2 hours ago"), "30 minutes ago"), (("1 week ago", "6 days ago"), "6 days ago"), (("2 days", "2 days"), "2 days"))
+        for label, skill, plugin_name, other_name in twins:
+            for (plugin_cell, other_cell), expected in cases:
+                with self.subTest(twin=label, plugin=plugin_cell, other=other_cell):
+                    rows = {plugin_name: {"source": "plugin", "context_tokens": 10, "tokens_7d": None, "uses": 2, "last_used": plugin_cell},
+                            other_name: {"source": "userSettings", "context_tokens": 10, "tokens_7d": None, "uses": 3, "last_used": other_cell}}
+                    self.assertEqual(usage.claude_row(skill, rows)["last_used"], expected)
+
+    def test_a_listing_that_was_not_used_does_not_count_and_one_that_cannot_be_put_in_order_makes_the_date_unknown(self):
+        rows = {name: dict(row) for name, row in self.ROWS.items()}
+        rows["typesafe:typesafe-ai"].update(uses=0, last_used="never")
+        self.assertEqual(usage.claude_row(self.skill(), rows)["last_used"], "3 days", "the listing never used is no use")
+        rows["typesafe:typesafe-ai"].update(uses=2, last_used="Oct 12")
+        self.assertIsNone(usage.claude_row(self.skill(), rows)["last_used"], "an absolute date cannot be compared with a relative one: unknown, not the plugin's date")
+        rows["typesafe:typesafe-ai"].update(last_used="2 months ago")
+        self.assertIsNone(usage.claude_row(self.skill(), rows)["last_used"], "a month has no fixed length")
+        rows["typesafe:typesafe-ai"].update(uses=0, last_used="never")
+        rows["typesafe-ai"].update(uses=3, last_used="Oct 12")
+        self.assertEqual(usage.claude_row(self.skill(), rows)["last_used"], "Oct 12", "one used listing: its own cell, whether or not it can be put in order")
+        rows["typesafe-ai"].update(uses=0, last_used="never")
+        self.assertEqual(usage.claude_row(self.skill(), rows)["last_used"], "never")
+        self.assertEqual([usage.last_used_age_seconds(cell) for cell in ("today", "1 day", "2 days ago", "3 hours", "1 week", "never", "Oct 12", "", None)], [0, 86400, 172800, 10800, 604800, None, None, None, None])
 
     def test_a_row_without_a_twin_ignores_a_same_name_row(self):
         skill = {"name": "typesafe-ai"}
@@ -66,7 +95,7 @@ class TwinListingUsageTests(unittest.TestCase):
 
     def test_a_listing_named_twice_is_one_listing(self):
         skill = {"name": "x", "claude_skill_name": "x", "bundled_twin": "x", "native_plugin": "x@m"}
-        rows = {"x": {"source": "plugin", "context_tokens": 7, "tokens_7d": None, "uses": 2, "last_used": "1d ago"}}
+        rows = {"x": {"source": "plugin", "context_tokens": 7, "tokens_7d": None, "uses": 2, "last_used": "1 day"}}
         self.assertEqual(usage.claude_row(skill, rows), rows["x"])
 
     def test_an_unknown_context_stays_unknown_and_a_window_the_rows_hold_is_dropped(self):
@@ -78,8 +107,8 @@ class TwinListingUsageTests(unittest.TestCase):
 
     def test_the_bundled_twin_of_a_native_plugin_row_is_added_too(self):
         skill = {"name": "claude-api", "native_plugin": "claude-api@market", "claude_skill_name": "claude-api:claude-api", "bundled_twin": "claude-api"}
-        rows = {"claude-api:claude-api": {"source": "plugin", "context_tokens": 50, "tokens_7d": None, "uses": 1, "last_used": "1d ago"},
-                "claude-api": {"source": "bundled", "context_tokens": 40, "tokens_7d": None, "uses": 6, "last_used": "5d ago"}}
+        rows = {"claude-api:claude-api": {"source": "plugin", "context_tokens": 50, "tokens_7d": None, "uses": 1, "last_used": "1 day"},
+                "claude-api": {"source": "bundled", "context_tokens": 40, "tokens_7d": None, "uses": 6, "last_used": "5 days"}}
         self.assertEqual(usage.claude_row(skill, rows)["uses"], 7)
 
     def test_the_report_counts_the_uses_of_both_listings(self):
