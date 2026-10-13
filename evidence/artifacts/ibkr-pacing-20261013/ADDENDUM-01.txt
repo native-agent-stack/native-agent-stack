@@ -1,0 +1,14 @@
+ADDENDUM 01 to ibkr-pacing-evidence-20261013.json (sealed): the third independent broker count (transcript-derived; counts only)
+
+Read at the tool clock 2026-10-13T15:55:11Z through a raw-protocol read-only client (reqCompletedOrders, protobuf id 299, apiOnly false and true):
+  completed orders listed by the broker: 10,313 (all sources) and 10,313 (api only);
+  of which carrying a harness order reference: 6,292 (unchanged: the official-client runs carry none).
+Expected from the receipts (arithmetic only):
+  8,494  broker count after the official-client single-connection runs (second count, in the JSON's reconciliation)
+ + 1,958 orders placed by the 22 official-client pair-test runs T1..T10 (receipts' orders_placed)
+ -   140 of those refused with [103] (T1 50, T4 26, T7 27, T9a 27, T10 10): the broker does not list a refused order as a completed order
+ +     1 order placed by the reqIds probe
+ = 10,313
+Difference to the broker count: 0. After the third count the account was flat with 0 open orders on any client (read-only flat check, same minute).
+
+This addendum adds no new measurement; it extends the reconciliation block by one count. The JSON, the generator and the verifier are unchanged.
