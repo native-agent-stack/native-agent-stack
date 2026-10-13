@@ -1,12 +1,10 @@
-tests/test_skill_usage_daily.py of round 5 against the sources of 322fe463d, the head that was read (tools/skill-usage and adoption/templates/systemd; the test module and the two probe receipts copied in; GITHUB_ACTIONS=true): Ran 83 tests, FAILED (failures=6, errors=20), counting subtests.
-Tests that fail or raise (14), by class:
-  DailyProjectionTests: 1
+tests/test_skill_usage_daily.py of round 5 against the sources of 322fe463d, the head that was read (tools/skill-usage and adoption/templates/systemd; the test module and the two probe receipts copied in; GITHUB_ACTIONS=true): Ran 83 tests, FAILED (failures=6, errors=19), counting subtests.
+Tests that fail or raise (13), by class:
   NativeManagerTests: 3
   ServiceSandboxTests: 5
   StubManagerTests: 5
 
 Tests, with FAIL (an assertion) or ERROR (the sources lack what the test uses: no marker in the units, no hidden_by_marker or LayoutRefused in the program):
-  ERROR DailyProjectionTests.test_native_user_unit_verification_needs_no_session_or_install [1]
   ERROR NativeManagerTests.test_a_marker_on_a_mount_point_that_does_not_exist_fails_closed [1]
   ERROR NativeManagerTests.test_the_rendered_directives_are_enforced_by_the_manager_or_the_manager_refuses_the_unit [1]
   ERROR NativeManagerTests.test_where_the_manager_cannot_make_the_namespace_only_the_marker_stops_the_unit [1]

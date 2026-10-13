@@ -548,6 +548,19 @@ class HalvesTests(unittest.TestCase):
         self.assertEqual([row["name"] for row in page["host"]], ["gh-fix-ci", "typesafe-ai"])
         self.assertEqual(len(page["lanes"]), 3)
 
+    def test_the_codex_lanes_come_first_so_the_fleet_readers_cut_of_the_lane_list_keeps_them(self):
+        """Review of #1043 at da4895b5 (the local codex review, P2): the combined record listed the Claude lanes first and the Fleet reader keeps only the first 200 (`_skill_usage`: `lanes[:200]`). The Claude half
+        alone held 564 lanes in the end-to-end run of 2026-10-13, so every Codex lane was cut although `measured.codex` was true. The single record that the split replaced emitted the Codex lanes first."""
+        daily = daily_module()
+        claude, codex = self.projected("claude"), self.projected("codex")
+        claude["lanes"] = [*claude["lanes"], *({"client": "claude", "lane": f"workflow:agent-{number}", "metric": "skill_calls", "skills": []} for number in range(564))]
+        combined = daily.merge_halves(claude, codex)
+        self.assertGreater(len(combined["lanes"]), 200)
+        self.assertEqual([lane["client"] for lane in combined["lanes"][:len(codex["lanes"])]], ["codex"] * len(codex["lanes"]), "the Codex lanes lead")
+        page = fleet_data._skill_usage(json.loads(json.dumps(combined)))
+        self.assertEqual(len(page["lanes"]), 200)
+        self.assertEqual({lane["lane"] for lane in page["lanes"] if lane["client"] == "codex"}, {lane["lane"] for lane in codex["lanes"]}, "every Codex lane survives the reader's cut")
+
     def test_a_missing_or_foreign_half_contributes_nothing_and_is_not_measured(self):
         daily = daily_module()
         only_claude = daily.merge_halves(self.projected("claude"), None)
@@ -864,6 +877,7 @@ class RefreshLockTests(unittest.TestCase):
 
 SANDBOX_KEYS = ("ProtectSystem", "ProtectHome", "ReadWritePaths", "PrivateTmp", "PrivateUsers", "TemporaryFileSystem")
 MARKER = "/srv:ro"
+ARGUMENT_REFUSAL_LINE = "daily skill usage refused: the command line has an argument this version does not take, or lacks one it needs; nothing was run\n"
 LAYOUT_MESSAGE = "the clone, the interpreter and node must be outside /srv, which the units' TemporaryFileSystem=/srv:ro hides from them"
 
 
@@ -976,7 +990,25 @@ class ServiceSandboxTests(unittest.TestCase):
         with contextlib.redirect_stderr(io.StringIO()) as errors, self.assertRaises(SystemExit) as caught:
             daily.main(["--refuse-writable", "/fixture/home"])
         self.assertEqual(caught.exception.code, 2)
-        self.assertIn("unrecognized arguments", errors.getvalue())
+        self.assertEqual(errors.getvalue(), ARGUMENT_REFUSAL_LINE, "a fixed line: argparse's own message would echo the value it could not use")
+
+    def test_replaying_the_retired_probe_option_refuses_without_the_account_or_a_path(self):
+        """Astra's read of #1043 at da4895b5 (fix4, P1): a unit rendered by an earlier version still passes `--refuse-writable <home> --refuse-writable <clone>`, and argparse printed `unrecognized arguments:` with both
+        values, the account's home path among them. Every way the old command line can be framed, and the other command lines the program cannot use, now end in the fixed line."""
+        daily = daily_module()
+        home, clone = str(Path.home()), str(Path.home() / "code" / "live-clone")
+        account = Path.home().name
+        framings = (["--refuse-writable", home, "--refuse-writable", clone, "--half", "claude"], [f"--refuse-writable={home}", "--half", "claude"], [f"--refuse-writable={clone}"],
+                    ["--half", "claude", "--refuse-writable", home], ["--half", "not-a-half"], ["--window", home], ["--no-such-option", home], [home])
+        for argv in framings:
+            with self.subTest(argv=[("<path>" if home in item or clone in item else item) for item in argv]):
+                output, errors = io.StringIO(), io.StringIO()
+                with contextlib.redirect_stdout(output), contextlib.redirect_stderr(errors), self.assertRaises(SystemExit) as caught:
+                    daily.main(argv)
+                self.assertEqual(caught.exception.code, 2)
+                self.assertEqual((output.getvalue(), errors.getvalue()), ("", ARGUMENT_REFUSAL_LINE))
+                self.assertNotIn(account, errors.getvalue())
+                self.assertNotIn(home, errors.getvalue())
 
     def test_the_native_analyzer_reads_the_directives_as_protection(self):
         analyze = shutil.which("systemd-analyze")
@@ -1033,19 +1065,28 @@ WRITABLE_TARGETS = ("records",)
 
 def observe(done):
     """One run through the manager as plain data: the exit status (None when the run never completed), whether the payload printed its first line, its mount namespace, its write attempts, whether the run printed
-    nothing at all, and the status the manager itself reported (its own words, `226/NAMESPACE`). A line that is not JSON, or a key that is absent, is a missing fact (None): nothing is guessed."""
+    nothing at all, and the status the manager itself reported (its own words, `226/NAMESPACE`). A key that is absent is a missing fact (None): nothing is guessed. The payload prints exactly a start line and then a
+    write map; output of any other shape (a line that is not JSON, a second start, a second write map, a frame of another kind) is not that payload's, and every fact that depended on it is missing (Astra's read of #1043
+    at da4895b5, P3: a later start replaced an earlier one, so a contradictory framing classified as enforced)."""
     if done is None or done.returncode is None:
         return {"rc": None, "started": False, "silent": True, "ns": None, "writes": None, "manager": None}
-    started, ns, writes = False, None, None
+    starts, maps, strays = [], [], 0
     for line in done.stdout.splitlines():
+        if not line.strip():
+            continue
         try:
             item = json.loads(line)
         except ValueError:
+            strays += 1
             continue
         if isinstance(item, dict) and item.get("started") is True and isinstance(item.get("ns"), str):
-            started, ns = True, item["ns"]
+            starts.append(item["ns"])
         elif isinstance(item, dict) and isinstance(item.get("writes"), dict):
-            writes = {str(key): str(value) for key, value in item["writes"].items()}
+            maps.append({str(key): str(value) for key, value in item["writes"].items()})
+        else:
+            strays += 1
+    framed = len(starts) <= 1 and len(maps) <= 1 and strays == 0 and not (maps and not starts)
+    started, ns, writes = (bool(starts), starts[0] if starts else None, maps[0] if maps else None) if framed else (False, None, None)
     reported = re.search(r"status=(\d+)(?:/([A-Z_]+))?", done.stderr or "")   # systemd 255 prints `code=exited/status=226`, 259 `code=exited, status=226/NAMESPACE`
     return {"rc": done.returncode, "started": started, "silent": not done.stdout.strip(), "ns": ns, "writes": writes,
             "manager": None if not reported else f"{reported.group(1)}/{reported.group(2)}" if reported.group(2) else reported.group(1)}
@@ -1096,13 +1137,15 @@ def unavailable(reason):
 
 # A stand-in for `systemd-run --user --wait --collect --pipe -p KEY=VALUE ... COMMAND`. It exercises the classifier and the observation, nothing about systemd: its modes are what a manager can do with the
 # directives, selected by STUB_MODE. "apply-none" accepts every property and applies none (the hosted runner's manager without the marker); "refuse" exits with STUB_STATUS before the payload runs; "refuse-after-start"
-# runs the payload and then exits with STUB_STATUS (a contradiction: a refusal that came too late).
+# runs the payload and then exits with STUB_STATUS (a contradiction: a refusal that came too late); "insist" refuses (STUB_STATUS) only a unit that carries TemporaryFileSystem= and applies none otherwise (the hosted
+# runner's manager with and without the marker); "refuse-user-namespace" refuses (STUB_STATUS, 217/USER) only a unit that carries PrivateUsers= and applies none otherwise (a host whose user manager cannot
+# create the user namespace).
 STUB_MANAGER = r"""
 import os
 import subprocess
 import sys
 
-arguments, environment, directory = sys.argv[1:], dict(os.environ), None
+arguments, environment, directory, marked, private = sys.argv[1:], dict(os.environ), None, False, False
 index = 0
 while index < len(arguments):
     if arguments[index] in ("--user", "--wait", "--collect", "--pipe", "-q"):
@@ -1114,10 +1157,18 @@ while index < len(arguments):
         elif key == "Environment":
             name, _, setting = value.partition("=")
             environment[name] = setting
+        elif key == "TemporaryFileSystem":
+            marked = True
+        elif key == "PrivateUsers":
+            private = True
         index += 2
     else:
         break
 mode = os.environ.get("STUB_MODE", "apply-none")
+if mode == "insist":
+    mode = "refuse" if marked else "apply-none"
+elif mode == "refuse-user-namespace":
+    mode = "refuse" if private else "apply-none"
 status = int(os.environ.get("STUB_STATUS", "0"))
 if mode == "refuse":
     sys.stderr.write("Finished with result: exit-code\nMain processes terminated with: code=exited, status=%d/%s\n" % (status, os.environ.get("STUB_NAME", "NAMESPACE")))
@@ -1170,6 +1221,16 @@ class ManagerProbes:
             if value.startswith("PYTHONDONTWRITEBYTECODE="):
                 out.append(f"Environment={value}")
         return out
+
+    def marker_comparison(self, fixture, control, results, env=None):
+        """The reason for the marker, shown by taking it away: where the manager refuses the marked units with the mount-namespace status (every half 226/NAMESPACE), the same unit without the marker is classified
+        and returned. None where the comparison does not apply: the manager enforces the directives (a capable manager enforces both), or it refuses for another reason. Review of #1043 at da4895b5 (the local
+        codex review, P2): on a host where PrivateUsers=true is refused with 217/USER the marked units fail closed, and the comparison was made for that result too; removing only the marker leaves PrivateUsers=true,
+        so the unmarked unit also failed closed with 217 and the assertion that it ran unconfined failed although the services behave as specified."""
+        if set(results.values()) != {("fails_closed", "226/NAMESPACE")}:
+            return None
+        without = [item for item in self.properties(self.units()["claude"], str(fixture / "records")) if not item.startswith("TemporaryFileSystem=")]
+        return classify(control, self.run_probe(without, fixture, env=env))
 
     def run_probe(self, properties, fixture, env=None):
         """The observation (observe) of the payload started through the manager with the KEY=VALUE `properties`."""
@@ -1314,6 +1375,26 @@ class ObserveTests(unittest.TestCase):
             with self.subTest(words=words):
                 self.assertEqual(observe(self.done("", 1, words + "\n"))["manager"], expected)
 
+    def test_output_that_is_not_the_payloads_two_lines_is_a_missing_observation(self):
+        """Astra's read of #1043 at da4895b5 (fix4, P3): a malformed line, a start in the manager's namespace, a second start in another namespace and a valid write map made `enforced` (the later start replaced the
+        earlier one). The reader takes the payload's output only as its start line and its write map, once each."""
+        start = lambda ns: json.dumps({"started": True, "ns": ns})
+        writes = json.dumps({"writes": {"clone": "EROFS", "other": "EROFS", "unrelated": "EROFS", "runtime": "EROFS", "records": "written"}})
+        control = {"rc": 0, "started": True, "silent": False, "ns": "mnt:[100]", "writes": ClassifierTests.WRITTEN, "manager": "0/SUCCESS"}
+        missing = {"started": False, "ns": None, "writes": None, "silent": False}
+        cases = (("the reviewer's framing", ["garbage", start("mnt:[100]"), start("mnt:[200]"), writes]), ("a second start", [start("mnt:[200]"), start("mnt:[300]"), writes]),
+                 ("a second write map", [start("mnt:[200]"), writes, writes]), ("a line that is not JSON between the two", [start("mnt:[200]"), "garbage", writes]),
+                 ("a frame of another kind", [start("mnt:[200]"), json.dumps({"other": 1}), writes]), ("a write map without a start", [writes]), ("a list", [start("mnt:[200]"), "[1]", writes]))
+        for label, lines in cases:
+            with self.subTest(framing=label):
+                seen = observe(self.done("\n".join(lines) + "\n"))
+                self.assertEqual({key: seen[key] for key in missing}, missing)
+                self.assertEqual(classify(control, seen), ("fail", "the observation of the run is incomplete"))
+        clean = observe(self.done(start("mnt:[200]") + "\n" + writes + "\n"))
+        self.assertEqual(classify(control, clean), ("enforced", ""), "the payload's own two lines, with a blank line around them, are still read")
+        self.assertEqual(observe(self.done("\n" + start("mnt:[200]") + "\n\n" + writes + "\n\n"))["ns"], "mnt:[200]")
+        self.assertEqual(observe(self.done(start("mnt:[200]") + "\n"))["writes"], None, "a start without a write map: the writes are missing, the start is not")
+
     def test_what_is_not_json_or_not_the_right_shape_is_a_missing_fact(self):
         for label, stdout in (("garbage", "garbage\n"), ("a list", "[1, 2]\n"), ("started as a string", json.dumps({"started": "yes", "ns": "x"}) + "\n"),
                               ("a namespace of the wrong type", json.dumps({"started": True, "ns": 5}) + "\n"), ("writes as a list", json.dumps({"writes": ["x"]}) + "\n")):
@@ -1380,6 +1461,34 @@ class StubManagerTests(ManagerProbes, unittest.TestCase):
             with self.subTest(status=status):
                 run = self.run_probe(self.properties(self.units()["claude"], str(fixture / "records")), fixture, env={"STUB_MODE": "refuse", "STUB_STATUS": str(status), "STUB_NAME": "OTHER"})
                 self.assertEqual(classify(control, run)[0], "fail")
+
+    def test_the_marker_comparison_is_made_only_where_the_manager_refuses_for_the_mount_namespace(self):
+        """Review of #1043 at da4895b5 (the local codex review, P2): see marker_comparison. The stand-in manager stands for the three managers a host can have: one that insists on the marker, one that refuses every
+        unit for the user namespace, and one that applies nothing."""
+        fixture = self.fixture()
+        control = self.run_probe([], fixture)
+
+        def marked(env):
+            return {half: classify(control, self.run_probe(self.properties(section, str(fixture / "records")), fixture, env=env)) for half, section in self.units().items()}
+
+        insist = {"STUB_MODE": "insist", "STUB_STATUS": "226", "STUB_NAME": "NAMESPACE"}
+        results = marked(insist)
+        self.assertEqual(set(results.values()), {("fails_closed", "226/NAMESPACE")})
+        self.assertEqual(self.marker_comparison(fixture, control, results, env=insist), ("fail", "the unit ran in the manager's own mount namespace: unconfined"), "the marker is what stops the unit")
+
+        user = {"STUB_MODE": "refuse-user-namespace", "STUB_STATUS": "217", "STUB_NAME": "USER"}
+        results = marked(user)
+        self.assertEqual(set(results.values()), {("fails_closed", "217/USER")})
+        self.assertIsNone(self.marker_comparison(fixture, control, results, env=user), "PrivateUsers=true stops the unit with or without the marker: nothing to compare")
+
+        results = marked({"STUB_MODE": "apply-none"})
+        self.assertEqual(set(results.values()), {("fail", "the unit ran in the manager's own mount namespace: unconfined")})
+        self.assertIsNone(self.marker_comparison(fixture, control, results), "a manager that applies nothing fails the primary test; the comparison does not apply")
+
+        every_unit = {"STUB_MODE": "refuse", "STUB_STATUS": "226", "STUB_NAME": "NAMESPACE"}
+        results = marked(every_unit)
+        outcome, _ = self.marker_comparison(fixture, control, results, env=every_unit)
+        self.assertEqual(outcome, "fails_closed", "a manager that refuses the unit without the marker too is not shown to be stopped by it: the native test fails there")
 
     def test_the_properties_handed_to_the_manager_carry_the_marker(self):
         """Muse P2-3(c): SANDBOX_KEYS lacked the marker, so a test built on it measured the unit without it and believed it measured the shipped unit."""
@@ -1466,12 +1575,11 @@ class NativeManagerTests(ManagerProbes, unittest.TestCase):
         """The reason for the marker: on the hosted runner the same directives without it ran unconfined (receipts/marker-probe-hosted-runner.json, set 'the shipped directives before round 5 (no marker)'). The comparison is made only on a manager that refuses the unit with the marker, and
         says so on stderr otherwise; a capable manager enforces both and the primary test above is the assertion."""
         fixture, control, results = self.classes()
-        if next(iter(results.values()))[0] != "fails_closed":
-            print("namespace-denied branch exercised: no (this manager makes the namespace)", file=sys.stderr)
+        compared = self.marker_comparison(fixture, control, results)
+        if compared is None:
+            print(f"namespace-denied branch exercised: no (the marked units gave {sorted(set(results.values()))}: a manager that makes the namespace, or that refuses for another reason)", file=sys.stderr)
             return
-        section = self.units()["claude"]
-        without = [item for item in self.properties(section, str(fixture / "records")) if not item.startswith("TemporaryFileSystem=")]
-        outcome, reason = classify(control, self.run_probe(without, fixture))
+        outcome, reason = compared
         self.assertEqual(outcome, "fail", "without the marker the manager that refuses it must have started the unit unconfined, or the marker is not what stops it")
         self.assertEqual(reason, "the unit ran in the manager's own mount namespace: unconfined")
         print("namespace-denied branch exercised: yes", file=sys.stderr)

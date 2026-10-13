@@ -303,7 +303,9 @@ def merge_halves(claude, codex):
     names = list(by_half["claude"]) + [name for name in by_half["codex"] if name not in by_half["claude"]]
     host = [{"name": name, **{field: row_field(by_half["claude"].get(name, {}), field) for field in CLAUDE_ROW_FIELDS},
              **{field: row_field(by_half["codex"].get(name, {}), field) for field in CODEX_ROW_FIELDS}} for name in names] if names else None
-    lanes = [lane for source, client in ((claude, "claude"), (codex, "codex")) for lane in (source or {}).get("lanes") or []
+    # Codex lanes first, as the single record emitted them before the split: the Fleet page reads only the first 200 lanes (tools/local-pages/fleet_data.py `_skill_usage`) and the Claude half alone
+    # holds more than that (564 on 2026-10-13), so lanes appended after the Claude ones would never be shown.
+    lanes = [lane for source, client in ((codex, "codex"), (claude, "claude")) for lane in (source or {}).get("lanes") or []
              if isinstance(lane, dict) and lane.get("client") == client]
     stamps = [skill_usage.parse_iso(record["generated_at"]) for record in (claude, codex) if record and isinstance(record.get("generated_at"), str)]
     present = claude or codex
@@ -397,8 +399,21 @@ def render_units(destination, repository, python, node):
         (destination / name).write_text(text)
 
 
+ARGUMENT_REFUSAL = "the command line has an argument this version does not take, or lacks one it needs; nothing was run"
+
+
+class FixedErrorParser(argparse.ArgumentParser):
+    """A command line this program cannot use ends in a fixed line and exit 2. argparse's own message echoes the values it could not use, and a unit's command line carries the account's paths: a service rendered by an
+    earlier version still passes the removed --refuse-writable with the home directory and the clone, and replaying it printed both. `error` is the hook for another behavior (python/cpython@cbc944f4bc59:
+    Lib/argparse.py L1925-L1932 joins the argv values it could not use into the message `unrecognized arguments: ...` and calls it; L2675-L2686 prints the message to stderr and exits 2, and says that an override "should
+    either exit or raise an exception"; Doc/library/argparse.rst L2124-L2127)."""
+
+    def error(self, message):
+        self.exit(2, f"daily skill usage refused: {ARGUMENT_REFUSAL}\n")
+
+
 def main(argv=None):
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = FixedErrorParser(description=__doc__)
     parser.add_argument("--half", choices=HALVES, help="the client half to collect (required unless report files are given): claude = /skill-doctor capture + Claude lanes sweep, codex = Codex rollout scan + lanes report")
     parser.add_argument("--codex-root", action="append", type=Path, default=[])
     parser.add_argument("--claude-root", action="append", type=Path, default=[])
