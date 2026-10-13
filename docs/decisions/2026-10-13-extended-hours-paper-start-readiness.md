@@ -1,4 +1,4 @@
-# Independent extended-hours paper start readiness
+# Extended-hours paper start readiness and stage-long benchmark liveness
 
 The CC approved an opt-in 30-second start window and five-second selected
 benchmark readiness threshold after October 13 POST runs failed or remained
@@ -27,7 +27,7 @@ approved SPY/QQQ config changes the regime-input mean, not the freshness rule.
 
 Official alpacahq/alpaca-py 0.44.0,
 [`cc4cb3b7ba50ae250e621983c2779047fb16bb28`](https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/alpaca/data/historical/stock.py#L163),
-stock.py:163-185 supplies get_stock_latest_quote with a symbol-list request.
+stock.py:163-182 supplies get_stock_latest_quote with a symbol-list request.
 The existing guarded read-only SDK clients, endpoint gate, request observer
 and authorizer remain in use; no HTTP client or broker adapter is replaced.
 data/live/websocket.py:121-128 takes the caller's websocket params; its
@@ -36,7 +36,10 @@ awaited handler at :367-368 remains unchanged.
 Native LiveNodeConfig's supported timeout_connection_secs is used through
 the existing native_adapter.build_node interface. Installed NautilusTrader
 2.0.0rc5 is the executable test runtime; maintained upstream source is
-[nautechsystems/nautilus_trader at 1b0a49d2792a9432a3aca3fcb617ce7a630d905e](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/nautilus_trader/live/config.py).
+[nautechsystems/nautilus_trader at 1b0a49d2792a9432a3aca3fcb617ce7a630d905e](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/live/src/python/config.rs#L1114):
+crates/live/src/python/config.rs:1114-1159 exposes the Python timeout;
+[crates/live/src/node/mod.rs:433-464](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/live/src/node/mod.rs#L433)
+shares its deadline across data and execution client connection.
 Source-review pin and installed runtime acceptance are distinct evidence.
 
 ## Scope and behavior
@@ -53,28 +56,41 @@ The only supported optional config is:
 Unknown/missing keys, null, booleans, floats or other values refuse at load.
 It requires the coordinated extended-hours session flags. It applies only
 to actual PRE/POST PAPER, never RTH, standalone preflight or recovery. Absent
-blocks preserve config bytes and all default call arguments. Recovery keeps
+blocks preserve config bytes and all default call arguments. The readiness
+block is excluded from lane A's next-trial frozen trading signature beside
+the session flags: opted PRE/POST and RTH trials continue the same journal
+without resetting fees, cash or risk state. Recovery binds exact bytes and keeps
 its existing separately registered owned-sell age semantics.
 
-Read-only preflight polls selected benchmarks through the native SDK, at most
-every two seconds within a monotonic 30-second window. Every GET uses the
+Read-only preflight polls selected benchmarks through the native SDK, no more
+often than every two seconds within a monotonic 30-second window. It reserves
+five GETs for the final snapshot; the cadence lengthens for larger universes
+to spread the remaining request slots across the window. Every GET uses the
 existing request authorization/observer and its 50-request ceiling; STOP or
 the deadline refuses. Once quotes qualify, re-read account, clock, positions
 and open orders, verify the same identity, then re-read benchmark quotes.
 Every existing cash/entitlement/clock/session/universe/flat check still runs
 on that refreshed observation. A still-stale final read refuses admission.
 Startup diagnostics record window, threshold, quote-read count and refreshed
-account-state proof; identifiers and credentials are not exported.
+account-state proof; identifiers and credentials are not exported. Assets are
+read once before the wait; they are not refreshed after polling. A request-bound
+SafetyError publishes not_started with zero submitted orders.
 
 The transport independently receives start_timeout 30 and selected-benchmark
-age 5. Only required benchmark quotes use that stream observation age;
+age 5 throughout the extended-hours stage, including health and the stale-quote
+watchdog. An opted PRE start refuses if duration plus cleanup plus the existing
+60-second allowance crosses 09:30 ET, using the broker-time session boundary.
+Only required benchmark quotes use that stream observation age;
 other symbol quotes retain quote_timeout 3. Health checks the vendor quote
 timestamp too, avoiding a second five-second grace period after receipt.
 The native outer connection timeout becomes 40 (30 + the existing 10-second
 connection allowance), so it does not cut off the inner startup wait. Only
 that registered extended-hours transport may select 40; defaults stay 10.
-This longer startup window does not change SDK ping settings or #1084's
-independent callback backpressure deadline.
+This longer startup window interacts with #1084's original callback deadline,
+which used start_timeout. Its ruled blocker commit caps that wait at eight
+seconds, below the ten-second ping timeout, independently of start_timeout.
+Whichever PR lands second must add a combined regression for the 30-second
+readiness window with that eight-second handler bound. SDK ping settings remain unchanged.
 
 Strategy feature freshness, RiskLimits and the final transport wire guard
 still require the shipped three-second order quote. A five-second benchmark
@@ -87,8 +103,9 @@ owned-sell exit_quote_max_age_seconds is neither added nor widened here.
 Evidence class: synthetic/local integration. Tests use official SDK request
 serialization with mocked HTTP, real guarded client callbacks and native
 configuration types; no broker, credential, GO, unit or account-state call.
-The final regression module is also run against the unchanged base as a
-fail-before control. It pins strict schema/default/RTH scope, a 4.05-second
+The nine-test pre-wiring module was run against the unchanged base as a
+fail-before control; the later tenth wiring test was not part of that control.
+The tests pin strict schema/default/RTH scope, a 4.05-second
 benchmark observation, request counts and refreshed cash proof, deadline and
 STOP, selected-only stream acceptance, vendor-time aging, native outer window
 and strict real final-wire refusals. Existing transport/credential/runner
@@ -117,6 +134,10 @@ acceptance is claimed by these synthetic tests.
   its branch is part of this PR.
 - Measure actual PRE interarrival/startup distributions and request use;
   replace these initial bounds only through a new evidenced record.
+- Extend refresh evidence to assets if required by a future operating protocol;
+  the current final snapshot refreshes only account, clock, positions, orders and benchmarks.
+- Extend branch coverage of malformed refresh responses and identity changes;
+  synthetic acceptance does not establish native feed availability.
 
 A stale executable price, default/RTH widening, old flat/account proof after
 waiting, budget bypass or unbounded poll overturns this implementation.

@@ -21,6 +21,14 @@ BLOCK={'window_seconds':30,'benchmark_quote_timeout_seconds':5}
 
 
 class StartReadiness(unittest.TestCase):
+    def sdk_imports(self):
+        enums=types.ModuleType('alpaca.data.enums');enums.DataFeed=lambda value:value
+        requests=types.ModuleType('alpaca.data.requests')
+        requests.StockLatestQuoteRequest=lambda **kwargs:types.SimpleNamespace(**kwargs)
+        return patch.dict(sys.modules,{'alpaca':types.ModuleType('alpaca'),
+            'alpaca.data':types.ModuleType('alpaca.data'),'alpaca.data.enums':enums,
+            'alpaca.data.requests':requests})
+
     def port(self,**changes):
         enums=types.ModuleType('alpaca.data.enums');enums.DataFeed=lambda value:value
         stubs={'alpaca':types.ModuleType('alpaca'),'alpaca.data':types.ModuleType('alpaca.data'),
@@ -185,7 +193,6 @@ class StartReadiness(unittest.TestCase):
         self.assertLessEqual(len(calls),50)
         self.assertNotIn('fixture-account-id',json.dumps(result))
 
-    @unittest.skipUnless(importlib.util.find_spec('alpaca'),'requires reviewed SDK; HTTP mocked')
     def test_readiness_deadline_and_stop_refuse_before_account_admission(self):
         from types import SimpleNamespace
         # Official client helper boundary is stubbed here; the previous test
@@ -202,13 +209,95 @@ class StartReadiness(unittest.TestCase):
         for stopped in (False,True):
             clock=[0.0]
             def advance(seconds):clock[0]+=seconds
-            with self.subTest(stopped=stopped),patch.object(transport,'_sdk_client',side_effect=client), \
+            with self.subTest(stopped=stopped),self.sdk_imports(),patch.object(transport,'_sdk_client',side_effect=client), \
                  patch.object(transport.time,'monotonic',side_effect=lambda:clock[0]), \
                  patch.object(transport.time,'sleep',side_effect=advance):
                 with self.assertRaisesRegex(transport.TransportError,'start_readiness_stopped' if stopped else 'benchmark_quotes_not_ready'):
                     transport.preflight('fixture-key','fixture-secret',['SPY'],before_request=lambda *a,**k:None,
                         start_readiness=BLOCK,benchmark_symbols=['SPY'],stop_requested=lambda:stopped)
             self.assertLessEqual(clock[0],30)
+
+    def test_pre_stage_cannot_cross_regular_open(self):
+        c,_,_=self.load(self.config())
+        fixture=mover_fixtures.MoverCommandSessionWiring();obs=fixture.observation(c['symbols'])
+        now=datetime(2026,10,14,13,29,tzinfo=timezone.utc).timestamp()
+        obs['clock'].update(timestamp_ns=int(now*1e9),received_at_ns=int(now*1e9))
+        for q in obs['quotes']:q['ts_ns']=int(now*1e9)
+        with patch.object(runner.time,'time',return_value=now),self.assertRaisesRegex(
+                runner.SafetyError,'start_readiness_pre_crosses_rth'):
+            runner.validate_preflight(obs,c,require_open=True,session_policy=runner.validate_session_policy(c),
+                                      benchmark_quote_timeout_seconds=5)
+
+    def test_stage_watchdog_freezes_after_five_seconds(self):
+        port=self.port(extended_hours_allowed=True,start_timeout=30,benchmark_quote_timeout_seconds=5)
+        port._ever_ready=True
+        port._quote_seen={'SPY':100.0};port._quote_values={'SPY':{'ts_ns':100_000_000_000}}
+        port._started=True;port._auth={'orders':True,'quotes':True};port._acks=dict(port._auth)
+        async def exercise():
+            for now,stale in ((104.99,False),(105.01,True)):
+                async def one_iteration(delay):port._stopping=True
+                port._stopping=False
+                with patch.object(transport.time,'monotonic',return_value=now), \
+                     patch.object(transport.time,'time_ns',return_value=int(now*1e9)), \
+                     patch.object(transport.asyncio,'sleep',side_effect=one_iteration):
+                    await port._watchdog()
+                self.assertEqual('quote_stale' in port.health['reasons'],stale)
+        asyncio.run(exercise())
+
+    def test_request_bound_writes_not_started_without_state(self):
+        with tempfile.TemporaryDirectory(dir='/var/tmp') as directory:
+            root=Path(directory);p=root/'config.json';p.write_text(json.dumps(self.config()))
+            argv=['runner.py','paper','--credentials','keychain-env','--config',str(p),
+                  '--state-root',str(root/'state'),'--output',str(root/'receipt.json'),'--trial','fixture']
+            def bounded(*args,**kwargs):
+                for _ in range(51):kwargs['before_request']('read')
+            with patch.object(sys,'argv',argv),patch.object(runner,'paper_credentials',return_value=('fixture-key','fixture-secret')), \
+                 patch.object(runner,'check_order_contract_boundary',return_value={}), \
+                 patch.object(runner,'preflight',side_effect=bounded):
+                self.assertEqual(runner.main(),2)
+            receipt=json.loads((root/'receipt.json').read_text())
+            self.assertEqual((receipt['status'],receipt['reason'],receipt['orders_submitted']),
+                             ('not_started','preflight_request_bound',0))
+            self.assertFalse((root/'state').exists())
+
+    def test_thirty_symbol_poll_reserves_final_snapshot_requests(self):
+        clock=[0.0];calls=[];snapshots={'account':0,'clock':0,'positions':0,'orders':0}
+        epoch=transport.timestamp_ns('2026-10-14T08:00:00Z')
+        symbols=['SPY']+['A'+chr(65+i//26)+chr(65+i%26) for i in range(29)]
+        def client(*args,**kwargs):
+            authorize=args[2];c=Mock()
+            def read(value,kind=None):
+                def call(*a,**k):
+                    authorize('read');calls.append(clock[0])
+                    if kind:snapshots[kind]+=1
+                    return value() if callable(value) else value
+                return call
+            c.get_account.side_effect=read(lambda:{'id':'fixture-account-id',
+                'cash':'10000' if snapshots['account']==1 else '9999','equity':'20000','buying_power':'20000'},'account')
+            c.get_clock.side_effect=read({'is_open':False,'timestamp':'2026-10-14T08:00:00Z',
+                'next_close':'2026-10-14T20:00:00Z','next_open':'2026-10-14T13:30:00Z'},'clock')
+            c.get_all_positions.side_effect=read([],'positions');c.get.side_effect=read([],'orders')
+            c.get_asset.side_effect=read({'symbol':'SPY','status':'active','tradable':True,'attributes':[]})
+            def quotes():
+                age=1 if clock[0]>=22 else 8
+                return {'SPY':{'bp':100,'ap':100.01,'bs':1,'as':1,
+                    't':datetime.fromtimestamp(epoch/1e9+clock[0]-age,timezone.utc)}}
+            c.get_stock_latest_quote.side_effect=read(quotes)
+            return c
+        def budget(*a,**k):
+            if len(calls)>=50:raise runner.SafetyError('preflight_request_bound')
+        def advance(seconds):clock[0]+=seconds
+        with self.sdk_imports(),patch.object(transport,'_sdk_client',side_effect=client), \
+             patch.object(transport.time,'monotonic',side_effect=lambda:clock[0]), \
+             patch.object(transport.time,'time_ns',side_effect=lambda:epoch+int(clock[0]*1e9)), \
+             patch.object(transport.time,'sleep',side_effect=advance):
+            result=transport.preflight('fixture-key','fixture-secret',symbols,before_request=budget,
+                                      start_readiness=BLOCK,benchmark_symbols=['SPY'])
+        self.assertTrue(result['start_readiness']['account_state_refreshed'])
+        self.assertEqual(result['account']['cash'],'9999')
+        self.assertEqual(snapshots,{'account':2,'clock':2,'positions':2,'orders':2})
+        self.assertLessEqual(len(calls),50)
+        self.assertGreaterEqual(clock[0],22);self.assertLess(clock[0],30)
 
 
 if __name__=='__main__':unittest.main()

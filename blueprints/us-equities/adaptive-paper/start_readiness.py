@@ -1,4 +1,4 @@
-"""Opt-in, exact registered extended-hours PAPER startup envelope.
+"""Opt-in PAPER start window and stage-long extended-hours benchmark liveness.
 
 This is an observation/readiness window, never an order-pricing permission.
 """

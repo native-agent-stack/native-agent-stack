@@ -380,7 +380,7 @@ def strategy_pool_and_selector(config, registry_entries, *, session="regular"):
 
 
 def frozen_trading_config_sha256(raw_config):
-    """Bind every config value except the three coordinated session flags.
+    """Bind every value except coordinated session flags and readiness bounds.
 
     README's same-ledger path must retain trading/risk fields. The session
     clock still validates each flag combination independently; this digest
@@ -389,6 +389,7 @@ def frozen_trading_config_sha256(raw_config):
     frozen=json.loads(json.dumps(raw_config))
     frozen.pop("regular_session_only",None)
     frozen.pop("extended_hours_enabled",None)
+    frozen.pop("extended_hours_start_readiness",None)
     if isinstance(frozen.get("sessions"),dict):
         frozen["sessions"].pop("extended_hours",None)
     return hashlib.sha256(json.dumps(frozen,sort_keys=True,separators=(",",":")).encode()).hexdigest()
@@ -823,6 +824,10 @@ def validate_preflight(observation, config, *, require_open, allow_existing=Fals
                 datetime.fromtimestamp(server, timezone.utc)).kind.value)
             if approved.get("benchmark_quote_timeout_seconds") != benchmark_quote_timeout_seconds:
                 raise SafetyError("invalid_start_readiness_scope")
+            info = session_at(datetime.fromtimestamp(server, timezone.utc))
+            if (info.kind == SessionKind.PRE
+                    and info.close.timestamp() - server < required_window):
+                raise SafetyError("start_readiness_pre_crosses_rth")
             benchmark_age = benchmark_quote_timeout_seconds
         quotes = {q["symbol"]: q for q in observation["quotes"]}
         if any(s not in quotes or not -.25 <= time.time() - quotes[s]["ts_ns"] / 1e9 <= benchmark_age
@@ -2457,7 +2462,9 @@ def main():
                                 include_margin=include_margin,
                                 **({"start_readiness": readiness, "benchmark_symbols": config["benchmarks"],
                                     "stop_requested": lambda: DEFAULT_STOP.exists()} if readiness else {}))
-    except TransportError as exc:
+    except (TransportError, SafetyError) as exc:
+        if isinstance(exc, SafetyError) and str(exc) != "preflight_request_bound":
+            raise
         result = {"status": "not_started", "stage": "preflight", "reason": str(exc),
                   "feed": config["feed"], "orders_submitted": 0, "http": responses,
                   "attempts": attempts}

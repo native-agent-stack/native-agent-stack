@@ -1065,6 +1065,13 @@ def preflight(api_key, secret_key, symbols, *, feed="iex", before_request, reque
             return data.get_stock_latest_quote(StockLatestQuoteRequest(symbol_or_symbols=list(names), feed=DataFeed(feed)))
         quotes = latest(symbols)
         if readiness:
+            # Initial account/clock/positions/orders/assets/quotes cost N+5.
+            # Reserve five GETs for the authoritative post-poll snapshot.
+            # Spread the remaining poll slots over the registered window,
+            # leaving one cadence interval for that final refresh.
+            poll_slots = 50 - (len(symbols) + 5) - 5
+            poll_interval = max(2, start_readiness["window_seconds"] / (poll_slots + 1))
+            polls = 0
             def benchmarks_ready():
                 for symbol in benchmarks:
                     try:
@@ -1081,10 +1088,13 @@ def preflight(api_key, secret_key, symbols, *, feed="iex", before_request, reque
                 remaining = deadline - time.monotonic()
                 if remaining <= 0:
                     raise TransportError("benchmark_quotes_not_ready")
-                time.sleep(min(2, remaining))
+                if polls >= poll_slots:
+                    raise TransportError("benchmark_quotes_not_ready")
+                time.sleep(min(poll_interval, remaining))
                 if time.monotonic() >= deadline:
                     raise TransportError("benchmark_quotes_not_ready")
                 quotes.update(latest(benchmarks))
+                polls += 1
             # Quotes may become usable after the initial flat/account reads.
             # Re-establish that proof; never admit against an earlier snapshot.
             refreshed = trading.get_account()

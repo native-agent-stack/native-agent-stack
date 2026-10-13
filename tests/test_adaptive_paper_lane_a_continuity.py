@@ -36,7 +36,7 @@ def tearDownModule():
 class LaneASessionContinuity(unittest.TestCase):
     def exercise(self,*,command="paper",change="session",phase="finished",cash="9999.75",halt=None,
                  unresolved=False,stored_binding=None,unknown_prior=False,second_trial=False,
-                 race=None,interrupted_then_recover=False):
+                 race=None,interrupted_then_recover=False,readiness=False):
         with tempfile.TemporaryDirectory(dir="/var/tmp") as directory:
             root=Path(directory)
             old_path=SOURCE/"config-leverage-1x.json"
@@ -67,6 +67,8 @@ class LaneASessionContinuity(unittest.TestCase):
             elif change=="nesting":
                 changed["notes"]={"text":changed["notes"]}
             config_path=root/"config.json"
+            if readiness:
+                changed["extended_hours_start_readiness"]={"window_seconds":30,"benchmark_quote_timeout_seconds":5}
             if change=="exact":
                 config_path.write_bytes(old_path.read_bytes())
             else:
@@ -247,6 +249,10 @@ class LaneASessionContinuity(unittest.TestCase):
 
     def test_next_trial_consumes_the_binding_written_by_the_previous_trial(self):
         latest=self.exercise(second_trial=True)
+        self.assertEqual(latest["trial_id"],"next-two")
+
+    def test_opted_extended_trial_then_rth_continues_same_ledger_and_fees(self):
+        latest=self.exercise(second_trial=True,readiness=True)
         self.assertEqual(latest["trial_id"],"next-two")
 
     def test_stored_binding_mismatch_refuses_even_when_legacy_bytes_match(self):

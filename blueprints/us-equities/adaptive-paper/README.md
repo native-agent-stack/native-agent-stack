@@ -79,8 +79,12 @@ Those exact integer values are the registered initial envelope; malformed or
 unsupported values refuse. It applies only to actual PRE/POST paper starts,
 with read-only benchmark polling and fresh account/clock/flat reads before
 admission. RTH, standalone preflight, recovery and omitted-block behavior
-retain their defaults. Required benchmark stream readiness uses five seconds;
-strategy features, ledger checks and the final order wire retain their shipped
+retain their defaults. Required benchmark health and its stale-quote watchdog
+use five seconds throughout the extended-hours stage. An opted PRE stage
+refuses if duration, cleanup and the existing 60-second allowance would cross
+09:30 ET. The readiness block is excluded from the next-trial frozen signature,
+so PRE/POST and RTH trials can retain one journal; recovery still binds exact bytes.
+Strategy features, ledger checks and the final order wire retain their shipped
 three-second bound. This grants no permission to price an order from stale data.
 See the [start-readiness decision](../../../docs/decisions/2026-10-13-extended-hours-paper-start-readiness.md).
 
