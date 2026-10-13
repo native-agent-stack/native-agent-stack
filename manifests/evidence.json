@@ -13417,6 +13417,11 @@
       "bytes": 86962
     },
     {
+      "path": "blueprints/us-equities/adaptive-paper/preset_sets.py",
+      "sha256": "ab7bc2d7d5aaea56641407b21797ff142951e6a387fdb653f2cbedbd1b83df9d",
+      "bytes": 15062
+    },
+    {
       "path": "blueprints/us-equities/adaptive-paper/receipt.json",
       "sha256": "9bd58237bd11890010855a7508d36cb03ad3c7500774a403aadb8891757f569c",
       "bytes": 63197
@@ -13473,8 +13478,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "8fd2878695e798dec791bf2c32f534b477d7ece7f05ac52e23b8f01f7f8ea730",
-      "bytes": 166611
+      "sha256": "000991de0f76db2eb529f8dd6546ee2f32fa2ff09b81ce9c88765932eaead9c9",
+      "bytes": 168138
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runtime_lock.py",
@@ -13508,8 +13513,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "d004a22d1667a4147c6b932b4ceb04a2cff36c4a514af8689049ac1fac7e7678",
-      "bytes": 9748
+      "sha256": "3675382b780f58041da2c499a9abd3f060753352209cf6e8a3b3b313f0c0b377",
+      "bytes": 10093
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/strategies.py",
@@ -19095,6 +19100,11 @@
       "path": "docs/decisions/2026-10-13-lane-a-frozen-field-continuity.md",
       "sha256": "4da74df3105b3e30d5408e17c15cc0b369c9feac2e7391f404b1e1669e55a073",
       "bytes": 5792
+    },
+    {
+      "path": "docs/decisions/2026-10-13-lane-b-acct-sized-v1.md",
+      "sha256": "14de12b3a772835dcbcb4b90ba1c80305f8a8577965dd723cef926e18e568b5b",
+      "bytes": 8564
     },
     {
       "path": "docs/decisions/2026-10-13-paper-configurable-risk-ceilings.md",
@@ -61887,6 +61897,11 @@
       "bytes": 304
     },
     {
+      "path": "tests/integration/paper_preset_output.py",
+      "sha256": "69b114c5fb47f5e1610f80b7770ec316a4a16e07b03109b7d4704a74ebcea416",
+      "bytes": 2807
+    },
+    {
       "path": "tests/local_pages_architecture_policy_fixture.py",
       "sha256": "903c8e73e8596f943a3073312539a7f721a5613b9d22a8c35e385677c27e9271",
       "bytes": 4506
@@ -63000,6 +63015,11 @@
       "path": "tests/test_paired_runs_results.py",
       "sha256": "1f152a8c62d7cedb4a7fdecb263cd80a1e3a8bae2db7741f7bdafc763d8ceac8",
       "bytes": 56366
+    },
+    {
+      "path": "tests/test_paper_preset_sets.py",
+      "sha256": "73724fbffc5489f8cc528121aaedbc62348d3eb46126486e6b939318227e0197",
+      "bytes": 13001
     },
     {
       "path": "tests/test_path_safety.py",

@@ -1712,7 +1712,16 @@ def _final_corporate_action_guard_summary(strategy, held_symbols, now):
 
 
 async def run_native(controller, policy_config, assets, trial_id, config, baseline_cash, *, account_fingerprint="simulation",
-                     log_directory=None, ca_refresh_state=None):
+                     log_directory=None, ca_refresh_state=None, broker_equity_usd=None,
+                     preset_set_version="control-v1", pass_id=None, pass_start_equity_usd=None):
+    if preset_set_version not in ("control-v1", "acct-sized-v1"):
+        raise ValueError("unknown_preset_set")
+    if preset_set_version == "acct-sized-v1" and (not pass_id or pass_start_equity_usd is None):
+        raise ValueError("acct_sized_pass_context_required")
+    equity_value = pass_start_equity_usd if pass_start_equity_usd is not None else broker_equity_usd
+    measured_equity = None if equity_value is None else Decimal(str(equity_value))
+    if measured_equity is not None and (not measured_equity.is_finite() or measured_equity <= 0):
+        raise ValueError("positive_broker_equity_required")
     from native_adapter import build_node
     from native_strategy import AdaptiveStrategy
     # R5: use the same registry entries load_config already validated (and
@@ -1800,8 +1809,8 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
     # is available. Only initialize the value when that tracking is used.
     last_session_kind = (session_at(datetime.fromtimestamp(time.time(), timezone.utc)).kind
                         if (session_policy["overnight_holds"] or session_policy["extended_hours"]) else None)
-    # G-e receipt tracking (only meaningful/consulted when leverage_policy is
-    # not None; harmless, unread overhead otherwise). peak_gross_exposure_usd
+    # Common exposure tracking applies even without leverage_policy.
+    # peak_gross_exposure_usd
     # observes the ledger's own accounted FILLED-position gross exposure
     # each tick -- EH-1 (2026-09-22 leverage fix round 1): the ledger's raw
     # `accounting().gross_exposure_usd` is `gross + pending`
@@ -1920,8 +1929,12 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
                             strategy.corporate_action_guard, ca_watch, ca_start, ca_end, now, ca_refresh_state)
                 strategy.cancel_expired(now, config["order_timeout_seconds"], all_entries=force_exit)
                 tick_decision = strategy.rebalance(now, force_exit=force_exit)
+                acct_now = controller.ledger.accounting()
+                filled_gross_exposure_usd = acct_now.gross_exposure_usd - acct_now.pending_buy_notional_usd
+                peak_gross_exposure_usd = max(peak_gross_exposure_usd, filled_gross_exposure_usd)
+                peak_pending_buy_notional_usd = max(peak_pending_buy_notional_usd,
+                                                    acct_now.pending_buy_notional_usd)
                 if leverage_policy is not None:
-                    acct_now = controller.ledger.accounting()
                     # EH-1: filled_gross_exposure_usd excludes every
                     # not-yet-filled buy intent's notional (acct_now.gross_
                     # exposure_usd includes it; acct_now.pending_buy_
@@ -1930,10 +1943,6 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
                     # achieved_leverage_now and broker_margin_used below only
                     # ever reflect capital actually deployed into a filled
                     # position, never a resting or partially-filled order.
-                    filled_gross_exposure_usd = acct_now.gross_exposure_usd - acct_now.pending_buy_notional_usd
-                    peak_gross_exposure_usd = max(peak_gross_exposure_usd, filled_gross_exposure_usd)
-                    peak_pending_buy_notional_usd = max(peak_pending_buy_notional_usd,
-                                                        acct_now.pending_buy_notional_usd)
                     current_ceiling = policy.last_leverage_ceiling
                     # F2: gross-to-equity, mark-to-market (equity moves with
                     # realized+unrealized pnl each tick) -- distinct from
@@ -2030,6 +2039,17 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
               # "held_overnight" while either is non-empty.
               "corporate_action_guard": _final_corporate_action_guard_summary(
                   strategy, held_symbols_now, time.time())}
+    outcome["preset_set_version"] = preset_set_version
+    outcome["pass_id"] = pass_id
+    outcome["exposure"] = {
+        "peak_filled_gross_usd": str(peak_gross_exposure_usd),
+        "peak_pending_buy_notional_usd": str(peak_pending_buy_notional_usd),
+        "account_equity_usd": None if measured_equity is None else str(measured_equity),
+        "equity_basis": ("pass_start" if pass_start_equity_usd is not None else
+                         "trial_preflight" if broker_equity_usd is not None else "unavailable"),
+        "peak_deployed_to_account_equity": (None if measured_equity is None else
+                                            str(peak_gross_exposure_usd / measured_equity)),
+        "sampling": "native owner-loop ticks; filled and pending separate"}
     if leverage_policy is not None:
         capital = Decimal(config["capital_usd"])
         peak_effective_leverage = (peak_gross_exposure_usd / capital) if capital else Decimal("0")
@@ -2695,7 +2715,8 @@ def main():
                     outcome = await run_native(controller, policy_config, observation["assets"], args.trial,
                                                config, metadata["baseline_cash"], account_fingerprint=fingerprint,
                                                log_directory=None if args.live_dir is None else args.live_dir / "nautilus",
-                                               ca_refresh_state=ca_refresh_state)
+                                               ca_refresh_state=ca_refresh_state,
+                                               broker_equity_usd=observation["account"]["equity"])
                 except Exception as exc:
                     outcome = {"status": "needs_attention", "flat": False, "native_fill_events": 0,
                                "error_type": type(exc).__name__}
