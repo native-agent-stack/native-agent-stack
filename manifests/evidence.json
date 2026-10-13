@@ -11488,8 +11488,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-read-deltas.json",
-      "sha256": "5bf4b8360b13da98b8e94dd77fc4a71108a808fe637d76ec4d6c7a73001eb0ae",
-      "bytes": 810
+      "sha256": "ca56f6daf8e577ab089d4898b06e0c93fd6d7d70e0575c628c803623418975e1",
+      "bytes": 925
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
@@ -11530,6 +11530,11 @@
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261013-pr1062-design-delta.json",
       "sha256": "24bc390103366a709f62f6b1c22e75f485e2feab3a8b14ba76e120c180647e6e",
       "bytes": 17279
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261013-pr1062-dotdot-delta.json",
+      "sha256": "126427e342993b0a890c71f59c25026fd09df89d635b87abbc2a873d839a9dd3",
+      "bytes": 17537
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261013-pr1070-delta.json",
@@ -19098,8 +19103,8 @@
     },
     {
       "path": "docs/decisions/2026-10-13-claude-agent-drift-check.md",
-      "sha256": "6812422590adf5c06bb699744c4fb0b2b6bf8e3ad3d8339b3cbbdef9b18e1680",
-      "bytes": 38379
+      "sha256": "069773373bf07ece21a52796c8e7c02b6810c8fe3c5405b06702ccb738a97529",
+      "bytes": 39516
     },
     {
       "path": "docs/decisions/2026-10-13-lane-a-frozen-field-continuity.md",
@@ -19963,8 +19968,8 @@
     },
     {
       "path": "evidence/artifacts/agent-drift-check-20261013/README.md",
-      "sha256": "b8745ff654decbea761537c16ef2735918cb46772d9e59a82ef6be3b8f3cfac9",
-      "bytes": 6820
+      "sha256": "302701e1b20bc09b2b544761941a311f6ee676bd284900885ff045c438a6fc7d",
+      "bytes": 7168
     },
     {
       "path": "evidence/artifacts/agent-drift-check-20261013/receipts/client-oracle.txt",

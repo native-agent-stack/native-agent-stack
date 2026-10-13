@@ -167,6 +167,8 @@ The local codex re-review of the head after the absolute-path commit said "patch
 
 The stand-in bun of the tests found its behavior file by `os.path.abspath(sys.argv[0])`, the same lexical mistake; it now uses the real path of the file that ran.
 
+**The push gate's advisory inventory gains one read.** Putting the caller's directory in front of a relative path is `os.getcwd()` (`scripts/adoption_status.py:1107`), which the OpenHands push gate's derivation counts as an unclassified read of a script; `os.path.abspath` made the same read inside the library and was not counted. The read is real and read-only (the caller's working directory, to say which file a relative selection names), so it is accounted, not written around: the delta `blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261013-pr1062-dotdot-delta.json` (352 reads, `scripts/adoption_status.py` 4 of the delta's added, classified as a user status observation with the scope "read-only client-wiring status; no worker execution authority"), appended to the index; `tests.test_runtime_worker_openhands_push_gate` derives its reads from the committed tree; it was run on the working tree before the commit, which is how the continuous integration came to find the read first. The earlier statement in the pull request description that this round added no read was wrong and is corrected there.
+
 ## Not covered
 
 - Project-scope definitions (`.claude/agents` of a checkout) and plugin-provided ones: the check reads the user scope, where the installer writes. The project scope is the repository's own files.
