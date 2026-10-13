@@ -1328,6 +1328,7 @@ class AlpacaPaperTransport:
         self.max_snapshot_pages = max_snapshot_pages
         self._events = queue.Queue(maxsize=queue_size)
         self._state_lock = threading.RLock()
+        self._pending_order_callbacks = 0
         self._reasons = set()
         self._dropped_quotes = {}
         self._dropped_by_symbol = {}
@@ -1433,11 +1434,17 @@ class AlpacaPaperTransport:
             self._reasons.clear()
 
     def _order_events_pending(self):
-        """True while an order event is still queued. Queued quotes, trading statuses and
-        LULD bands do not block a reconciliation acknowledgement: on SIP the quote queue
-        is rarely empty."""
-        with self._events.mutex:
-            return any(kind == "order" for kind, _ in self._events.queue)
+        """True while a received order waits for queue space or is still queued.
+
+        Quotes, trading statuses and LULD bands do not block acknowledgement:
+        on SIP the quote queue is rarely empty. The state lock protects the
+        callback-to-queue handoff against concurrent reconciliation.
+        """
+        with self._state_lock:
+            if self._pending_order_callbacks:
+                return True
+            with self._events.mutex:
+                return any(kind == "order" for kind, _ in self._events.queue)
 
     def _connection(self, channel, connected):
         with self._state_lock:
@@ -1516,7 +1523,16 @@ class AlpacaPaperTransport:
         await self._enqueue_stream_event("quote", raw)
 
     async def _order_callback(self, raw):
-        await self._enqueue_stream_event("order", raw)
+        # Visible before the first insertion attempt, until insertion succeeds
+        # or the callback ends. Once inserted, the queue itself guards the
+        # update; this overlapping handoff leaves no reconciliation gap.
+        with self._state_lock:
+            self._pending_order_callbacks += 1
+        try:
+            await self._enqueue_stream_event("order", raw)
+        finally:
+            with self._state_lock:
+                self._pending_order_callbacks -= 1
 
     async def _status_callback(self, raw):
         await self._enqueue_stream_event("status", raw)

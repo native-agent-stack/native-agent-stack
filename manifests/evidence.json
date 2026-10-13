@@ -13528,7 +13528,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "a284e1912bbccd71de78e1f5b935bd449b56a1aeccf0e16821da49aa8528f471",
+      "sha256": "99c507963d0fa3e532635567df32c1fe701124d2f3adfcbed04189432ad172ea",
       "bytes": 9996
     },
     {
@@ -13548,8 +13548,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/transport.py",
-      "sha256": "fb7eed9bc69b6e37f4c097ed034d8e10fd2877a6feab8cd7a1cf7de90c35da6b",
-      "bytes": 106178
+      "sha256": "d2d605e01b011c7503dba1e8477ce7e0336d0c30548474cca2d78ac7139e460f",
+      "bytes": 106868
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/README.md",
@@ -19153,8 +19153,8 @@
     },
     {
       "path": "docs/decisions/2026-10-13-paper-stream-backpressure.md",
-      "sha256": "31e5740d0f0ff4e58b0e62ab01fc05a17155c3fe9dadb8fecf69d8d444728a37",
-      "bytes": 5607
+      "sha256": "9f71055f5ce5775b24ad07349e9d3f6fd95a24f7b53413bbc211d3fd86f2960a",
+      "bytes": 6884
     },
     {
       "path": "docs/decisions/2026-10-13-plugin-skill-identity.md",
@@ -62318,8 +62318,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_stream_backpressure.py",
-      "sha256": "4dce317a3af63b5e5119b058d643a7ed980c2a804b9f522020480ed7ffd68851",
-      "bytes": 8509
+      "sha256": "5335a3434df4fd582e01a5c1fa28d4012ed4a99a9d49f0049b5e92a733e268d3",
+      "bytes": 11170
     },
     {
       "path": "tests/test_adaptive_paper_transport.py",

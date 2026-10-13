@@ -47,7 +47,8 @@ and attempts event 1025. Both require bounded backpressure and preservation
 of every quote after release, and fail on the old producer behavior.
 
 The exact synchronous frame causing each live stall is not measured here.
-The consumer is created before producer threads (transport.py:1581-1586).
+The consumer is created before producer threads (transport.py:1581-1586 at
+dbe7a8da; these are historical coordinates, not this patch's shifted lines).
 The proposed startup ledger adoption is overnight_holds-only
 (runner.py:1800), disabled in the RTH controls; halt seeding runs in a worker
 thread. Awaited REST snapshots also use workers. A synchronous native
@@ -57,7 +58,8 @@ and repair without claiming to profile a real broker run.
 
 ## Receipt and recovery semantics
 
-A terminal stream_health.frozen=true produces status stream_frozen, even
+On normally returned native outcomes, terminal stream_health.frozen=true
+produces status stream_frozen, even
 when reconciliation is clean, positions and orders are zero, and fills are
 zero. Preserve reasons, accounting, flat proof and any recovery outcome.
 The status is sticky through forced recovery, durable phase is
@@ -66,6 +68,9 @@ become a successful no-signal observation just because cleanup flattened it.
 Healthy flat no-fill runs retain completed_no_signals. The co-op's registry
 uses the same stream_frozen vocabulary; original operating receipts remain
 unchanged and can be classified by their terminal stream_health.
+Existing caught startup/reconciliation exceptions retain generic
+needs_attention/exit 3; extending the specific label to those paths is a
+separate exception-path follow-up, not a claim of this normal-return classifier.
 
 ## Verification boundary and follow-ups
 
@@ -86,10 +91,24 @@ Ledger/fake-port regression injects the reason after a snapshot: the old
 head submits an exit and reports passed; the correction submits no exit and
 returns needs_attention with recovery_observation_integrity_lost.
 
+The second local read reproduced a pending-order handoff gap: an order
+received while quotes fill the queue is held only by its awaiting callback,
+so a queue-only reconciliation guard could clear a stale freeze too early.
+The correction counts order callbacks under the existing state lock before
+insertion and retains that count until the callback ends. A successfully
+inserted event overlaps with its queued representation; there is no empty
+handoff interval. Reconciliation checks both callback-held and queued orders.
+Tests refuse acknowledgement while one or several order callbacks wait,
+while an inserted update remains queued, and until all updates are removed
+for processing. The exact status label remains stream_frozen.
+
 Follow-ups: measure owner-loop startup latency and queue occupancy on a
 new pinned paper run; distinguish synchronous startup from sink delay;
 measure sustained backpressure and SDK reconnect behavior. Raising the
 queue capacity alone or removing fail-closed overflow is not the correction.
+Retain unique-sequence FIFO evidence at the pinned SDK dispatch seam and
+measure actual stop/reconnect under pressure; a review's four-channel
+1025-event FIFO probe passed but is not a repository regression yet.
 Today's sealed operating pin stays unchanged; a new merged pin needs new
 series records and observed readiness. The separate account-sized $10000
 order-ceiling follow-up is not part of this stream correction.

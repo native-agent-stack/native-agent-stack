@@ -160,6 +160,61 @@ class StreamBackpressure(unittest.IsolatedAsyncioTestCase):
         with self.assertRaisesRegex(t.TransportError,'event loss requires'):
             port.mark_reconciled()
 
+    def reconciliable(self,port):
+        port._started=True
+        port._auth={kind:True for kind in ('orders','quotes')}
+        port._acks=dict(port._auth)
+        port._quote_seen={'SPY':time.monotonic()}
+
+    async def test_waiting_order_blocks_ack_until_it_is_enqueued_and_processed(self):
+        port=self.port(queue_size=1)
+        self.reconciliable(port)
+        port.freeze_health('quote_stale')
+        await port._quote_callback({'queued_quote':True})
+        task=asyncio.create_task(port._order_callback({'received_fill':True}))
+        try:
+            await asyncio.sleep(0.02)
+            self.assertFalse(task.done())
+            with self.assertRaisesRegex(t.TransportError,'not ready for reconciliation'):
+                port.mark_reconciled()
+            self.assertIn('quote_stale',port.health['reasons'])
+            self.assertFalse(port.ready)
+            self.assertEqual(port._events.get_nowait(),('quote',{'queued_quote':True}))
+            await asyncio.wait_for(task,2)
+            with self.assertRaises(t.TransportError):port.mark_reconciled()
+            self.assertEqual(port._events.get_nowait(),('order',{'received_fill':True}))
+            port.mark_reconciled()
+            self.assertTrue(port.ready)
+        finally:
+            port._stopping=True
+            await asyncio.gather(task,return_exceptions=True)
+
+    async def test_every_concurrent_waiting_order_remains_visible_after_one_enqueues(self):
+        port=self.port(queue_size=1)
+        self.reconciliable(port)
+        port.freeze_health('quote_stale')
+        await port._quote_callback({'queued_quote':True})
+        tasks=[asyncio.create_task(port._order_callback({'update':n})) for n in (1,2)]
+        try:
+            await asyncio.sleep(0.02)
+            with self.assertRaises(t.TransportError):port.mark_reconciled()
+            port._events.get_nowait()
+            async def first_enqueued():
+                while not any(t.done() for t in tasks):await asyncio.sleep(0.001)
+            await asyncio.wait_for(first_enqueued(),2)
+            self.assertEqual(sum(t.done() for t in tasks),1)
+            with self.assertRaises(t.TransportError):port.mark_reconciled()
+            port._events.get_nowait()
+            # The queue is empty now, but one received update still waits.
+            with self.assertRaises(t.TransportError):port.mark_reconciled()
+            await asyncio.wait_for(asyncio.gather(*tasks),2)
+            port._events.get_nowait()
+            port.mark_reconciled()
+            self.assertTrue(port.ready)
+        finally:
+            port._stopping=True
+            await asyncio.gather(*tasks,return_exceptions=True)
+
 
 class FrozenStreamReceipt(unittest.TestCase):
     def test_frozen_stream_is_distinct_from_no_signals_even_when_flat(self):
