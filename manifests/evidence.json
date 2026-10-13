@@ -19592,6 +19592,16 @@
       "bytes": 113512
     },
     {
+      "path": "docs/trading-handbook/boats-overnight-facts.md",
+      "sha256": "dec8c460d7ea417174ffef5e1175417f5f651c37db571bd1ef385521be463b9b",
+      "bytes": 6646
+    },
+    {
+      "path": "docs/trading-handbook/portfolio-sizing.md",
+      "sha256": "2b211c78251b7a71179fa08e9ebcc62a00c57c2958712e7d5e8f6414cc68d7ea",
+      "bytes": 7063
+    },
+    {
       "path": "docs/ultracode-token-routing-20260921.md",
       "sha256": "78853b6113e5837874ec960e72ed00fceaf6a869a29aa6a89007fc9cf0df75c6",
       "bytes": 31780
@@ -63385,6 +63395,11 @@
       "path": "tests/test_trading_gates_bindings.py",
       "sha256": "645bae30192a44f38495bceb1bd9ea659a4122f198fb4de0366f320f9f8eb272",
       "bytes": 14793
+    },
+    {
+      "path": "tests/test_trading_handbook_sizing.py",
+      "sha256": "4e8589283b4515616c7d458e775912e22ddf5272b1546d0a05d1849a72afbc03",
+      "bytes": 2930
     },
     {
       "path": "tests/test_tvly_keyring.py",
