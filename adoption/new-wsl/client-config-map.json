@@ -442,7 +442,7 @@
       "names": [
         "semble"
       ],
-      "source": "The code-search slot's interim install (definitive manifest, amendment 3): the uv tool's console script, SEMBLE_MODEL_NAME on the pinned model's local snapshot and Claude Code's own absolute SEMBLE_CACHE_LOCATION (wave-2 code-search ruling, changes 4 and 5). The entry is in adoption/new-wsl/templates/claude-user.mcp.additions.json, which only this tool reads, so install_claude_profile.py registers no semble server on another host."
+      "source": "The code-search slot's interim install (definitive manifest, amendment 3): the uv tool's console script, SEMBLE_MODEL_NAME on the pinned model's local snapshot and Claude Code's own absolute SEMBLE_CACHE_LOCATION (wave-2 code-search ruling, changes 4 and 5). The entry is in adoption/mcp/claude-code-navigation.json (the on-demand template; it left adoption/new-wsl/templates/claude-user.mcp.additions.json on 2026-10-12), which this tool renders as mcp-servers.on-demand.json, so install_claude_profile.py registers no semble server at user scope on any host."
     },
     {
       "match": [

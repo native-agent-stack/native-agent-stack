@@ -1824,7 +1824,8 @@ class PrintMcpConfigTests(unittest.TestCase):
         self.assertIn("--server needs --print-mcp-config", err)
 
     def test_the_render_error_names_the_file_being_rendered(self):
-        """Claude read of c1d798de (P3-7): the message always said claude-user.json, so a bad on-demand file was reported as the wrong file."""
+        """Claude read of c1d798de (P3-7): the message always said claude-user.json, so a bad on-demand file was reported as the wrong file. The previous implementation, at its repository pin: `raise InstallError(f"{MCP_TEMPLATE.name}:
+        cannot render ...")`, tools/adoption/install_claude_profile.py at 489b26328 L390."""
         with tempfile.TemporaryDirectory() as tmp:
             bad = Path(tmp) / "on-demand-copy.json"
             bad.write_text(json.dumps({"mcpServers": {"x": {"command": "${NOPE}/bin/x"}}}), encoding="utf-8")
@@ -1844,6 +1845,104 @@ class PrintMcpConfigTests(unittest.TestCase):
         text = (ROOT / "adoption" / "bootstrap.md").read_text(encoding="utf-8")
         self.assertIn('claude --mcp-config "$(python3 tools/adoption/install_claude_profile.py --print-mcp-config)"', text)
         self.assertEqual(icp.NAVIGATION_TEMPLATE, ROOT / "adoption" / "mcp" / "claude-code-navigation.json")
+
+
+class RollbackRoutesTests(unittest.TestCase):
+    """Review of #1051 at 682e752e (Astra P2): the record said `git revert` plus `--only mcp` "registers the four servers again from the restored user-scope template", and the installer reads only that template, which
+    never held semble (the new WSL distribution's additions file did, `489b26328`:adoption/new-wsl/templates/claude-user.mcp.additions.json). Each documented route is planned with --dry-run and compared with the record."""
+
+    RECORD = (ROOT / "docs" / "decisions" / "2026-10-12-code-navigation-on-demand.md").read_text(encoding="utf-8")
+    NUMBER = {3: "three", 4: "four"}
+
+    def plan(self, template):
+        out = io.StringIO()
+        with mock.patch.object(icp, "claude_mcp_get", return_value=None), mock.patch("sys.stdout", out):
+            results = icp.install_mcp_servers("claude", True, Path("/home/example"), Path("/e"), template=Path(template))
+        names = re.findall(r"mcp: would run: claude mcp add --scope user (?:--transport \w+ )?(\S+)", out.getvalue())
+        self.assertEqual(len(names), results.count("planned"))
+        return set(names)
+
+    def restored_template(self, directory):
+        """The user-scope template as `git revert` leaves it: today's servers plus the three entries that moved out of it unchanged (semble was not in it)."""
+        template = json.loads(icp.MCP_TEMPLATE.read_text(encoding="utf-8"))
+        moved = json.loads(icp.NAVIGATION_TEMPLATE.read_text(encoding="utf-8"))["mcpServers"]
+        template["mcpServers"].update({name: moved[name] for name in ("serena", "socraticode", "codebase-memory-mcp")})
+        path = Path(directory) / "claude-user.json"
+        path.write_text(json.dumps(template), encoding="utf-8")
+        return path
+
+    def test_without_reverting_the_on_demand_template_registers_all_four(self):
+        self.assertEqual(self.plan(icp.NAVIGATION_TEMPLATE), ON_DEMAND_SERVERS)
+        self.assertEqual(len(ON_DEMAND_SERVERS), 4)
+
+    def test_a_revert_brings_back_three_of_the_four_through_the_default_template_and_semble_is_not_one_of_them(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            restored = self.plan(self.restored_template(tmp))
+        back = restored - USER_SCOPE_SERVERS
+        self.assertEqual(back, {"serena", "socraticode", "codebase-memory-mcp"})
+        self.assertNotIn("semble", restored)
+        for template in (icp.MCP_TEMPLATE,):
+            self.assertNotIn("semble", json.loads(template.read_text(encoding="utf-8"))["mcpServers"], "the shared template never held semble")
+        additions = json.loads((ROOT / "adoption" / "new-wsl" / "templates" / "claude-user.mcp.additions.json").read_text(encoding="utf-8"))
+        self.assertNotIn("semble", additions.get("mcpServers", {}), "semble left the distribution's additions file for the on-demand file")
+        self.assertIn("semble", json.loads(icp.NAVIGATION_TEMPLATE.read_text(encoding="utf-8"))["mcpServers"])
+
+    def test_the_record_states_the_number_the_default_route_registers_and_names_the_distribution_route_for_semble(self):
+        text = " ".join(self.RECORD.split())
+        with tempfile.TemporaryDirectory() as tmp:
+            back = self.plan(self.restored_template(tmp)) - USER_SCOPE_SERVERS
+        self.assertIn(f"which registers the {self.NUMBER[len(back)]} servers the user-scope template held again", text)
+        self.assertNotIn("registers the four servers again from the restored user-scope template", text)
+        for needle in ("It does not register `semble`: the shared template never held it", "claude-user.mcp.additions.json", "new_wsl_client_config.py --render --host NAME --out DIR", "--mcp-template DIR/mcp-servers.json",
+                       "new_wsl_client_config.py --apply --host NAME", "--mcp-template DIR/mcp-servers.on-demand.json", "adoption/mcp/claude-code-navigation.json", "so there is nothing to restore"):
+            self.assertIn(needle, text, needle)
+
+    def test_the_options_the_rollback_names_exist(self):
+        parser = icp.build_parser()
+        self.assertTrue(parser.parse_args(["--only", "mcp", "--mcp-template", "x"]).mcp_template)
+        wsl = subprocess.run([sys.executable, "-I", str(ROOT / "tools" / "adoption" / "new_wsl_client_config.py"), "--help"], capture_output=True, text=True, timeout=60)
+        for option in ("--render", "--apply", "--host", "--out"):
+            self.assertIn(option, wsl.stdout)
+
+
+class CommandSubstitutionTests(unittest.TestCase):
+    """Review of #1051 at 682e752e (Astra P3-3): `claude --mcp-config "$(...)"` runs the outer command with an empty argument when the printer refuses; the guide gives the guarded form for a script."""
+
+    PRINTER = [sys.executable, "-I", str(ROOT / "tools" / "adoption" / "install_claude_profile.py"), "--print-mcp-config", "/no/such/template.json"]
+
+    def shell(self, command):
+        return subprocess.run(["sh", "-c", command], capture_output=True, text=True, timeout=60)
+
+    def test_an_unguarded_substitution_launches_after_a_refusal_and_the_guarded_form_does_not(self):
+        printer = " ".join(f"'{part}'" for part in self.PRINTER)
+        unguarded = self.shell(f'echo launched "$({printer})"')
+        self.assertIn("launched", unguarded.stdout, "the outer command runs although the printer refused")
+        guarded = self.shell(f'config="$({printer})" && echo launched "$config"')
+        self.assertNotEqual(guarded.returncode, 0)
+        self.assertNotIn("launched", guarded.stdout)
+        working = " ".join(f"'{part}'" for part in self.PRINTER[:-1])
+        ran = self.shell(f'config="$({working})" && printf "%s" "$config"')
+        self.assertEqual(ran.returncode, 0, ran.stderr)
+        self.assertEqual(set(json.loads(ran.stdout)["mcpServers"]), ON_DEMAND_SERVERS, "the same guarded form launches when the printer works")
+
+    def test_the_guide_gives_the_guarded_form(self):
+        text = (ROOT / "adoption" / "bootstrap.md").read_text(encoding="utf-8")
+        self.assertIn('config="$(python3 tools/adoption/install_claude_profile.py --print-mcp-config)" && claude --mcp-config "$config"', text)
+        self.assertIn("a command substitution does not stop the\n   outer command when the printer refuses", text)
+
+
+class StaleLocatorTests(unittest.TestCase):
+    """Review of #1051 at 682e752e (Astra P3-4): docs/token-efficiency-stack.json cited adoption/bootstrap.md:315 for the profile installer's registration; line 315 is the native sign-in step (it was at the base too)."""
+
+    def test_every_bootstrap_locator_in_the_serena_wiring_record_points_at_a_line_that_says_what_is_cited(self):
+        stack = (ROOT / "docs" / "token-efficiency-stack.json").read_text(encoding="utf-8")
+        wiring = next(line for line in stack.splitlines() if '"claude_wiring": "the Serena entry of adoption/mcp/claude-user.json' in line)
+        lines = (ROOT / "adoption" / "bootstrap.md").read_text(encoding="utf-8").splitlines()
+        cited = [int(number) for number in re.findall(r"adoption/bootstrap\.md:(\d+)", wiring)]
+        self.assertTrue(cited)
+        for number in cited:
+            self.assertIn("Claude user-scope profile", lines[number - 1], f"bootstrap.md:{number} is not the step that registers through the profile installer: {lines[number - 1][:60]!r}")
+        self.assertNotIn("bootstrap.md:315", wiring)
 
 
 class McpGetOutputTests(unittest.TestCase):

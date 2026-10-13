@@ -644,6 +644,11 @@ GitHub-hosted macOS runner; see
    python3 tools/adoption/new_wsl_client_config.py --render --host NAME --out DIR
    claude --mcp-config "$(python3 tools/adoption/install_claude_profile.py --print-mcp-config DIR/mcp-servers.on-demand.json)"
    ```
+   In a script, assign the JSON and test it before launching, because a command substitution does not stop the
+   outer command when the printer refuses (it exits 1 and prints nothing on standard output):
+   ```sh
+   config="$(python3 tools/adoption/install_claude_profile.py --print-mcp-config)" && claude --mcp-config "$config"
+   ```
    The subagents of that session inherit the servers, which is how the agents
    whose tool lists name them (`evidence-reviewer`, `isolated-builder`,
    `security-reviewer`, `stack-researcher`) get their Serena tools, and their

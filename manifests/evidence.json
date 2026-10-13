@@ -5372,8 +5372,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "590ba3639bfad8366c3306c2f258b399ae3bfb75efac5dcf3af49553b5ad1b74",
-      "bytes": 78681
+      "sha256": "f85db499d11923045d08633d51ea18f59caad064873883ee1c9741c80a73a57e",
+      "bytes": 79018
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -5527,8 +5527,8 @@
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
-      "sha256": "093af25173024a5bb3d70d2692f1a7ba9a9be6d581f929b8d44658f68fe9c8a0",
-      "bytes": 57829
+      "sha256": "3e6a89b9ccbaa3af529afe7b5f8bdcdb411829053a94619632e533cdba50972b",
+      "bytes": 57955
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
@@ -18993,8 +18993,8 @@
     },
     {
       "path": "docs/decisions/2026-10-12-code-navigation-on-demand.md",
-      "sha256": "02b1f37dcc60ea658d8c48a47edf18f3b7585d79093640d5475871d99f361976",
-      "bytes": 25887
+      "sha256": "9cd1aac67d1e0fe574053c7280de74b4402ddea0f7e17720a11da0dcbddc0318",
+      "bytes": 30544
     },
     {
       "path": "docs/decisions/2026-10-12-converged-candidates-only.md",
@@ -19483,8 +19483,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "a3538127b876c630f14bca9c795d7a7a2ede7c59f5b1a064ac6214c8452a92dc",
-      "bytes": 595605
+      "sha256": "9012210da5dd4fb8ba275a6a9a00b400fdb4fa7ed2d05c5ac526adaf2aeae29f",
+      "bytes": 595615
     },
     {
       "path": "docs/token-efficiency-stack.md",
@@ -62473,8 +62473,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "2a70e005733ece42de70692906d40c0f6c5e09ff74d63dc89c7b203d3958f9e3",
-      "bytes": 182031
+      "sha256": "9a3b7784e42e117da71075f08f2bf9512a7f08e099766afd21ec0a64fdbc5dac",
+      "bytes": 189545
     },
     {
       "path": "tests/test_install_skills.py",
@@ -62768,8 +62768,8 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "d2eb55428a23fcc55ed00811a5211f7f3c78c3f03b817adfb48b639422e322af",
-      "bytes": 356423
+      "sha256": "f2cbb2ee2663764ba4d91f0cd04dd8027a12602dd154f9034439df5f99dc93bf",
+      "bytes": 360256
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",

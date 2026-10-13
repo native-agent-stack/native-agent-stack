@@ -4181,6 +4181,51 @@ class OnDemandRenderTests(unittest.TestCase):
         self.assertEqual(sorted(json.loads(files[cfg.ON_DEMAND_FILE])["mcpServers"]), ["codebase-memory-mcp", "semble", "socraticode"])
 
 
+class RollbackOnADistributionHostTests(unittest.TestCase):
+    """Review of #1051 at 682e752e (Astra P2): on a distribution host the on-demand set comes back with the host's values through the rendered file, which `install_claude_profile.py --only mcp --mcp-template` registers."""
+
+    def plan(self, template):
+        out = io.StringIO()
+        with mock.patch.object(icp, "claude_mcp_get", return_value=None), mock.patch("sys.stdout", out):
+            icp.install_mcp_servers("claude", True, Path("/home/example"), Path("/opt/eco"), template=Path(template))
+        commands = [line.split("mcp: would run: ", 1)[1] for line in out.getvalue().splitlines() if "mcp: would run: claude mcp add" in line]
+        return {re.search(r"claude mcp add --scope user (?:--transport \w+ )?(\S+)", command).group(1): command for command in commands}
+
+    def test_the_rendered_on_demand_file_registers_the_four_with_the_hosts_values_and_the_user_scope_file_none_of_them(self):
+        host = render_config.load_host_values(EXAMPLE_HOST)
+        host.update(QDRANT_URL="127.0.0.1:21633", EMBED_URL="127.0.0.1:28231")
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(render_config, "load_host_values", return_value=host):
+            self.assertEqual(run_main("--render", "--host", EXAMPLE_HOST, "--out", tmp)[0], 0)
+            on_demand = self.plan(Path(tmp) / cfg.ON_DEMAND_FILE)
+            user_scope = self.plan(Path(tmp) / "mcp-servers.json")
+        self.assertEqual(set(on_demand), {"serena", "semble", "codebase-memory-mcp", "socraticode"})
+        self.assertTrue(set(on_demand).isdisjoint(user_scope), "--apply registers the user-scope file only")
+        self.assertIn("claude mcp add --scope user serena -- serena start-mcp-server", on_demand["serena"])
+        self.assertIn("/opt/eco/tools/socraticode-1.15.0/lib/node_modules/socraticode/dist/index.js", on_demand["socraticode"])
+        self.assertIn("QDRANT_URL=http://127.0.0.1:21633", on_demand["socraticode"])
+        self.assertIn("LMSTUDIO_URL=http://127.0.0.1:28231/v1", on_demand["socraticode"])
+        self.assertIn("SEMBLE_MODEL_NAME=/home/example/.local/share/semble/", on_demand["semble"])
+
+    def test_apply_stages_the_on_demand_file_but_neither_registers_nor_keeps_it(self):
+        """The boundary the record states: --apply installs and verifies the user-scope file only (step_claude_mcp, step_verify)."""
+        source = Path(cfg.__file__).read_text(encoding="utf-8")
+        body = source[source.index("    def step_claude_mcp(self)"):source.index("    def step_claude_settings(self)")]
+        self.assertIn('"mcp-servers.json"', body)
+        self.assertNotIn("ON_DEMAND_FILE", body)
+        self.assertNotIn("on-demand", body)
+        verify = source[source.index("    def step_verify(self)"):source.index("def launcher_bytes(")]
+        self.assertIn('"mcp-servers.json"', verify)
+        self.assertNotIn("ON_DEMAND_FILE", verify)
+
+    def test_the_semble_source_in_the_map_names_the_file_the_entry_is_in(self):
+        """Review of #1051 at 682e752e (Astra P3-4; Claude delta (b)): the provenance string still placed the entry in the distribution's additions file, which it left on 2026-10-12."""
+        entry = next(e for e in json.loads((ROOT / cfg.MAP_REL).read_text(encoding="utf-8"))["entries"] if e["match"] == ["claude/mcp-on-demand/server/semble"])
+        self.assertIn("adoption/mcp/claude-code-navigation.json", entry["source"])
+        self.assertIn("it left adoption/new-wsl/templates/claude-user.mcp.additions.json on 2026-10-12", entry["source"])
+        self.assertNotIn("The entry is in adoption/new-wsl/templates/claude-user.mcp.additions.json", entry["source"])
+        self.assertNotIn("semble", json.loads((ROOT / cfg.TEMPLATE_ADDITIONS["claude/mcp"]).read_text(encoding="utf-8")).get("mcpServers", {}))
+
+
 ONLY_CODEX_CONFIG = tuple(arg for step in cfg.STEPS if step != "codex-config" for arg in ("--skip", step))
 
 
