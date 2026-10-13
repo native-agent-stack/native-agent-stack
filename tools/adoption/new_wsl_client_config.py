@@ -34,8 +34,9 @@ requirement needs, so the shared templates stay what render_config.py and the bo
              A piece mapped to a slot that does not install is not wired, not an error: the manifest decides, and the
              piece is wired when the slot installs the owner the entry names.
   --render   --host NAME --out DIR [--with-authorization-settings]: settings.json (and the WSL overlay),
-             mcp-servers.json, codex.config.toml, codex.hooks.json and the two Codex profiles for that host value file,
-             with wired pieces only; the authorization settings (the ones that grant a permission or suppress a
+             mcp-servers.json (the user-scope servers), mcp-servers.on-demand.json (the servers a session loads for itself, with
+             this host's launch values; see install_claude_profile.py --print-mcp-config), codex.config.toml, codex.hooks.json
+             and the two Codex profiles for that host value file, with wired pieces only; the authorization settings (the ones that grant a permission or suppress a
              confirmation: Claude Code permissions.defaultMode, skipDangerousModePermissionPrompt and crossSessionInbound, Codex approval_policy
              and sandbox_mode, a Codex project's trust_level, and the tool approval mode of a Codex MCP server, which
              also needs its server wired) only with the option. Placeholders
@@ -131,6 +132,8 @@ TEMPLATES = {
     "claude/settings": "adoption/templates/claude.settings.template.json",
     "claude/overlay": "adoption/templates/claude.settings.linux-wsl2.overlay.json",
     "claude/mcp": "adoption/mcp/claude-user.json",
+    # The servers a session loads for itself (claude --mcp-config), not registered at user scope: the same entries a registered server has, so the map gives them the same host overrides.
+    "claude/mcp-on-demand": "adoption/mcp/claude-code-navigation.json",
     "codex/config": "adoption/templates/codex.config.template.toml",
     "codex/stack-worker": "adoption/templates/codex.stack-worker.config.toml",
     "codex/omniroute": "adoption/templates/codex.omniroute.config.toml",
@@ -145,6 +148,7 @@ TEMPLATE_ADDITIONS = {
     "claude/mcp": "adoption/new-wsl/templates/claude-user.mcp.additions.json",
     "codex/config": "adoption/new-wsl/templates/codex.config.additions.toml",
 }
+ON_DEMAND_FILE = "mcp-servers.on-demand.json"   # --render writes it beside mcp-servers.json: the on-demand servers with this host's launch values
 CLAUDE_AGENTS_REL = "adoption/agents/claude"
 CODEX_ROLES_REL = "adoption/agents/codex"
 CLAUDE_MD_PIECE = "claude/instructions/claude-md"
@@ -559,6 +563,9 @@ def collect_pieces(root: Path) -> list:
     for name, spec in template_data(root, "claude/mcp").get("mcpServers", {}).items():
         command = " ".join([spec.get("command") or spec.get("url", ""), *spec.get("args", [])])
         pieces.append(Piece(f"claude/mcp/server/{name}", "claude/mcp", ("mcpServers", name), spec, command))
+    for name, spec in template_data(root, "claude/mcp-on-demand").get("mcpServers", {}).items():
+        command = " ".join([spec.get("command") or spec.get("url", ""), *spec.get("args", [])])
+        pieces.append(Piece(f"claude/mcp-on-demand/server/{name}", "claude/mcp-on-demand", ("mcpServers", name), spec, command))
     pieces += [Piece(f"claude/profile/hook-file/{name}", "claude/profile", value=name) for name in icp.HOOKS]
     pieces += [Piece(f"claude/profile/agent/{path.name}", "claude/profile", value=path.name)
                for path in sorted((root / CLAUDE_AGENTS_REL).glob("*.md"))]
@@ -1156,19 +1163,25 @@ def render(root: Path, results: list, plan: dict, values: dict, manifest: dict |
     # The user-scope MCP servers: a wired server with the launch the entry gives it. ${HOME} and ${ECO_ROOT} stay for
     # install_claude_profile.py, which fills them when it registers the file; an override's other placeholders are host
     # values and are filled here (ai-memory's URL takes the host file's AI_MEMORY_URL, as the hooks and Codex do).
-    servers = {}
     host_only = {key: value for key, value in values.items() if key not in ("HOME", "ECO_ROOT")}
-    for name, spec in template_data(root, "claude/mcp").get("mcpServers", {}).items():
-        verdict = wired.get(f"claude/mcp/server/{name}")
-        if verdict:
-            override = json.loads(string.Template(json.dumps(verdict.entry.raw.get("override", {}))).safe_substitute(
-                host_only))
-            servers[name] = {**spec, **override}
-            if "env" in override:
-                # Native MCP env is a variable map (https://code.claude.com/docs/en/mcp). A host's partial override
-                # replaces those variables while retaining the pinned template's required provider/model settings.
-                servers[name]["env"] = {**spec.get("env", {}), **override["env"]}
-    files["mcp-servers.json"] = json.dumps({"mcpServers": servers}, indent=2, ensure_ascii=False) + "\n"
+
+    def launches(group: str) -> dict:
+        servers = {}
+        for name, spec in template_data(root, group).get("mcpServers", {}).items():
+            verdict = wired.get(f"{group}/server/{name}")
+            if verdict:
+                override = json.loads(string.Template(json.dumps(verdict.entry.raw.get("override", {}))).safe_substitute(
+                    host_only))
+                servers[name] = {**spec, **override}
+                if "env" in override:
+                    # Native MCP env is a variable map (https://code.claude.com/docs/en/mcp). A host's partial override
+                    # replaces those variables while retaining the pinned template's required provider/model settings.
+                    servers[name]["env"] = {**spec.get("env", {}), **override["env"]}
+        return servers
+    files["mcp-servers.json"] = json.dumps({"mcpServers": launches("claude/mcp")}, indent=2, ensure_ascii=False) + "\n"
+    # The on-demand servers, with the launch the entry gives each on this host (the version owner's entry point, the host's
+    # endpoints): what `claude --mcp-config "$(install_claude_profile.py --print-mcp-config <this file>)"` loads.
+    files[ON_DEMAND_FILE] = json.dumps({"mcpServers": launches("claude/mcp-on-demand")}, indent=2, ensure_ascii=False) + "\n"
     # Codex: the user config (placeholders filled), the hooks and the two profiles.
     keep, replaced = keep_of("codex/config")
     data = prune_toml(template_data(root, "codex/config"), keep, replaced)
@@ -1515,7 +1528,7 @@ def rendered_mcp_endpoint_errors(root: Path) -> list:
         after = render(root, results, plan, probe_values, manifest)
 
         def servers(files: dict) -> tuple:
-            return (json.loads(files["mcp-servers.json"])["mcpServers"],
+            return ({**json.loads(files["mcp-servers.json"])["mcpServers"], **json.loads(files[ON_DEMAND_FILE])["mcpServers"]},
                     tomllib.loads(files["codex.config.toml"]).get("mcp_servers", {}))
 
         def fields(spec: dict) -> dict:

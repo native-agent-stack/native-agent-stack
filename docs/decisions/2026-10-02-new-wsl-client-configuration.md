@@ -922,6 +922,10 @@ settings and the project agents' gaps) and the list of dropped units after them;
 
 | Project agent | MCP servers of its tools that are not wired | Skills the plan does not install |
 | --- | --- | --- |
+| `evidence-reviewer.md` | `serena`, `socraticode` | - |
+| `isolated-builder.md` | `serena`, `socraticode` | - |
+| `security-reviewer.md` | `serena`, `socraticode` | - |
+| `stack-researcher.md` | `serena` | - |
 
 `examples/claude-native/CLAUDE.md`, written to `adoption/new-wsl/claude-user-instructions.md` (0 unit(s) left out; 58 of 58 lines stay):
 
@@ -1345,5 +1349,21 @@ and the update check off). The code graph server's piece is `claude/mcp/server/c
 the vendor's documentation registers and the clients show, and its Codex tables carry the same key. No piece
 is unwired and no sentence of the instruction blocks changes. All earlier projections remain historical
 observations.
+
+Today: 403 pieces, 363 wired (211 practice, 152 through a slot), 24 not wired (0 through a slot that does not install, 24 by their own entry) and 16 authorization pieces
+
+## Addendum 2026-10-12: code navigation on demand
+
+The Claude user-scope profile stops registering `serena`, `socraticode`, `codebase-memory-mcp` and `semble`
+([decision](2026-10-12-code-navigation-on-demand.md)): their entries are in `adoption/mcp/claude-code-navigation.json`, which a session loads for itself
+with `claude --mcp-config`. The distribution renders that file as it renders the registered servers. Its four pieces are a group of their own,
+`claude/mcp-on-demand/server/<name>` (the template is `TEMPLATES["claude/mcp-on-demand"]`), and they keep the map entries the registered pieces had, under the
+new keys: Serena's command from the settings `PATH` (`serena`), SocratiCode's pinned entry point (`${ECO_ROOT}/tools/socraticode-1.15.0/lib/node_modules/socraticode/dist/index.js`, because the install
+plan's code-search row creates no `bin/socraticode` link) and the host's Qdrant and embedding endpoints, and the wiring of semble and the code graph server. `--render` writes the wired ones, with the host's values, to
+`mcp-servers.on-demand.json` beside `mcp-servers.json`, which holds the user-scope servers only; `--apply` registers only those, so nothing in the on-demand file reaches `~/.claude.json`. The host command is
+`python3 tools/adoption/install_claude_profile.py --print-mcp-config <the rendered file>` (see the decision's host steps). The host endpoint probe of `--check` compares the on-demand servers with the Codex render as it
+compared the registered ones, so SocratiCode's endpoints cannot differ between the two clients unseen. The Codex pieces, semble's two Claude allow rules (inert while the server is not loaded) and the instruction
+blocks are unchanged, because no instruction source names the four servers. The third table of "Pieces that are not wired" lists the four project agents whose tools name Serena and SocratiCode, which is the state
+of a session that has not loaded the on-demand file (`--check` prints the same four lines). All earlier projections remain historical observations.
 
 Today: 403 pieces, 363 wired (211 practice, 152 through a slot), 24 not wired (0 through a slot that does not install, 24 by their own entry) and 16 authorization pieces

@@ -30,6 +30,7 @@ import render_config  # noqa: E402
 SCRIPT = ROOT / "tools" / "adoption" / "mcp_template_drift.py"
 SENTINEL = "SENTINEL-must-never-be-printed"
 SOURCE = "adoption/new-wsl/client-config-map.json"   # any file of this repository: an acknowledgement's source must exist
+CLAUDE_FIXTURE = "headroom"   # a Claude user-scope server of the render with a command, arguments and an environment (the code-navigation servers left the render on 2026-10-12, FIX-3)
 
 
 class DriftTests(unittest.TestCase):
@@ -95,13 +96,18 @@ class DriftTests(unittest.TestCase):
 
     def test_templates_carry_the_live_names_of_the_two_reconciled_servers(self):
         """The reconciliation of 2026-10-12: promptfoo is wired for Claude Code (the Codex entry is a separate decision, acknowledged as live-only), and the code graph server is
-        registered under the vendor's name in both clients, not under a shortened one."""
+        registered under the vendor's name, not under a shortened one: in the Codex template, and (since FIX-3, docs/decisions/2026-10-12-code-navigation-on-demand.md) in the on-demand file
+        of Claude Code, which the user-scope render no longer carries."""
         codex = tomllib.loads(self.codex_text)["mcp_servers"]
         self.assertIn("promptfoo", self.claude)
         self.assertNotIn("promptfoo", codex)
-        for client, servers in (("claude", self.claude), ("codex", codex)):
+        on_demand = json.loads((ROOT / "adoption" / "mcp" / "claude-code-navigation.json").read_text(encoding="utf-8"))["mcpServers"]
+        for client, servers in (("claude on demand", on_demand), ("codex", codex)):
             self.assertIn("codebase-memory-mcp", servers, client)
             self.assertNotIn("codebase-memory", servers, client)
+        for name in ("serena", "socraticode", "codebase-memory-mcp", "semble"):
+            self.assertNotIn(name, self.claude, "the code-navigation servers are not registered at user scope")
+            self.assertIn(name, on_demand)
         spec = self.claude["promptfoo"]
         self.assertEqual((spec["command"], spec["args"]), (f"{self.eco}/bin/promptfoo", ["mcp", "--transport", "stdio"]))
         self.assertEqual(sorted(spec["env"]), ["PROMPTFOO_CONFIG_DIR", "PROMPTFOO_DISABLE_TELEMETRY", "PROMPTFOO_DISABLE_UPDATE"])
@@ -145,24 +151,24 @@ class DriftTests(unittest.TestCase):
         self.assertEqual((rows[("claude", "ai-memory")]["row"], rows[("claude", "ai-memory")]["fields"]), ("DIFFERS", ["url"]))
         self.assertEqual(rows[("claude", removed)]["row"], "TEMPLATE-ONLY")
         self.assertEqual(rows[("claude", "brand-new")]["row"], "LIVE-ONLY")
-        self.assertEqual(rows[("claude", "serena")]["row"], "SAME")
+        self.assertEqual(rows[("claude", CLAUDE_FIXTURE)]["row"], "SAME")
         self.assertTrue(all(r["row"] == "SAME" for k, r in rows.items() if k[0] == "codex"), "the Codex side is untouched")
 
     def test_an_env_wrapped_registration_is_the_same_server(self):
         servers = json.loads(json.dumps(self.claude))
-        spec = servers["semble"]
+        spec = servers[CLAUDE_FIXTURE]
         assert spec["env"], "the fixture server has an environment"
-        servers["semble"] = {"type": "stdio", "command": "env", "args": [f"{k}={v}" for k, v in spec["env"].items()] + [spec["command"], *spec["args"]]}
+        servers[CLAUDE_FIXTURE] = {"type": "stdio", "command": "env", "args": [f"{k}={v}" for k, v in spec["env"].items()] + [spec["command"], *spec["args"]]}
         claude_path, codex_path = self.live(servers)
         code, rows, _ = self.rows(claude_path, codex_path)
-        self.assertEqual((code, rows[("claude", "semble")]["row"]), (0, "SAME"))
+        self.assertEqual((code, rows[("claude", CLAUDE_FIXTURE)]["row"]), (0, "SAME"))
 
     def test_a_changed_env_value_is_a_difference_named_env(self):
         servers = json.loads(json.dumps(self.claude))
-        key = sorted(servers["semble"]["env"])[0]
-        servers["semble"]["env"][key] = "another value"
+        key = sorted(servers[CLAUDE_FIXTURE]["env"])[0]
+        servers[CLAUDE_FIXTURE]["env"][key] = "another value"
         code, rows, _ = self.rows(*self.live(servers))
-        self.assertEqual((code, rows[("claude", "semble")]["row"], rows[("claude", "semble")]["fields"]), (1, "DIFFERS", ["env"]))
+        self.assertEqual((code, rows[("claude", CLAUDE_FIXTURE)]["row"], rows[("claude", CLAUDE_FIXTURE)]["fields"]), (1, "DIFFERS", ["env"]))
 
     def test_codex_timeouts_compare_as_numbers_and_enabled_defaults_to_true(self):
         self.assertIn("startup_timeout_sec = 60\n", self.codex_text)
@@ -210,7 +216,7 @@ class DriftTests(unittest.TestCase):
 
     def test_values_of_env_headers_urls_and_arguments_never_reach_the_output(self):
         servers = json.loads(json.dumps(self.claude))
-        servers["semble"]["env"][sorted(servers["semble"]["env"])[0]] = SENTINEL
+        servers[CLAUDE_FIXTURE]["env"][sorted(servers[CLAUDE_FIXTURE]["env"])[0]] = SENTINEL
         servers["leaky-http"] = {"type": "http", "url": f"http://user:{SENTINEL}@127.0.0.1:1/mcp/{SENTINEL}?token={SENTINEL}", "headers": {"Authorization": f"Bearer {SENTINEL}"}}
         servers["leaky-stdio"] = {"type": "stdio", "command": f"/opt/{SENTINEL}/bin/leaky", "args": [f"API_TOKEN={SENTINEL}", SENTINEL + "A" * 40, "--plain"], "env": {"API_KEY": SENTINEL}}
         servers["plain-http"] = {"type": "http", "url": "http://127.0.0.1:1/mcp/path?x=1", "headers": {}}
@@ -235,7 +241,7 @@ class DriftTests(unittest.TestCase):
                 if client == "claude":
                     servers = json.loads(json.dumps(self.claude))
                     servers["only-live"] = {"type": "stdio", "command": "fixture", "args": list(arguments)}
-                    servers["semble"]["args"] = [*servers["semble"].get("args", []), *arguments]
+                    servers[CLAUDE_FIXTURE]["args"] = [*servers[CLAUDE_FIXTURE].get("args", []), *arguments]
                     paths = self.live(servers)
                 else:
                     def change(servers, arguments=arguments):
@@ -249,7 +255,7 @@ class DriftTests(unittest.TestCase):
                         for needle in needles:
                             self.assertNotIn(needle, out + err)
                         self.assertIn("only-live", out)
-                        self.assertIn("semble", out)
+                        self.assertIn(CLAUDE_FIXTURE if client == "claude" else "semble", out)
 
     def test_a_description_is_built_from_names_and_fixed_words_only(self):
         """Value-free by construction: for 300 seeded random values placed in the arguments, an environment value, a header value, the directory of the command, the username, password, port, path, query and fragment of
@@ -319,11 +325,11 @@ class DriftTests(unittest.TestCase):
         for label, field, bad in (("an environment that is a string", "env", "SENTINEL-value"), ("arguments that are a number", "args", 5)):
             with self.subTest(claude=label):
                 servers = json.loads(json.dumps(self.claude))
-                servers["semble"][field] = bad
+                servers[CLAUDE_FIXTURE][field] = bad
                 code, out, err = self.run_tool(*self.live(servers))
                 self.assertEqual((code, out), (2, ""))
                 self.assertNotIn("SENTINEL", err)
-                self.assertIn("semble", err)
+                self.assertIn(CLAUDE_FIXTURE, err)
 
     def test_names_that_do_not_look_like_names_are_withheld(self):
         """Server, variable and header names are keys, printed as they are while they have the shape of a name."""
@@ -402,7 +408,7 @@ class DriftTests(unittest.TestCase):
         """The CC's micro read, P3-2: `sorted(entry["fields"])` raised TypeError for a list that mixes types, and a list of lists, a string and a number passed the check."""
         for label, fields in (("mixed types", ["args", 1]), ("a list of lists", [["args"]]), ("a string", "args"), ("a number", 5), ("an empty list", []), ("a null", None)):
             with self.subTest(fields=label):
-                path = self.acknowledgements({**self.entry("claude", "semble", "DIFFERS"), "fields": fields})
+                path = self.acknowledgements({**self.entry("claude", CLAUDE_FIXTURE, "DIFFERS"), "fields": fields})
                 with self.assertRaises(drift.DriftError):
                     drift.load_acknowledged(path)
                 err = io.StringIO()
@@ -410,7 +416,7 @@ class DriftTests(unittest.TestCase):
                     code = drift.main(["--home", str(self.home), "--eco-root", str(self.eco), "--acknowledged", str(path)])
                 self.assertEqual(code, 2)
                 self.assertNotIn("Traceback", err.getvalue())
-        good = self.acknowledgements(self.entry("claude", "semble", "DIFFERS", fields=["args", "env"]))
+        good = self.acknowledgements(self.entry("claude", CLAUDE_FIXTURE, "DIFFERS", fields=["args", "env"]))
         self.assertEqual(len(drift.load_acknowledged(good)), 1)
 
     def test_a_credential_that_ends_the_authority_early_is_not_printed_as_a_host(self):
@@ -438,10 +444,10 @@ class DriftTests(unittest.TestCase):
     def test_a_registration_of_the_wrong_shape_ends_the_run_with_exit_two_and_names_the_server_only(self):
         """The same read, P3-b: a list given as text printed a count of its characters, and a Codex `mcp_servers` that is not a table ended in an uncaught AttributeError and exit 1."""
         sentinel = "Zq7secretpartK2 with spaces"
-        cases = (("args as a string", "claude", lambda servers: servers["semble"].update({"args": sentinel})), ("args holding a non-string", "claude", lambda servers: servers["semble"].update({"args": [1, sentinel]})),
-                 ("env as a list", "claude", lambda servers: servers["semble"].update({"env": [sentinel]})), ("headers as a string", "claude", lambda servers: servers["semble"].update({"headers": sentinel})),
-                 ("a registration that is a string", "claude", lambda servers: servers.update({"semble": sentinel})),
-                 ("env as a list of pairs", "claude", lambda servers: servers["semble"].update({"env": [[sentinel, "v"]]})), ("headers as a list of pairs", "claude", lambda servers: servers["semble"].update({"headers": [[sentinel, "v"]]})),
+        cases = (("args as a string", "claude", lambda servers: servers[CLAUDE_FIXTURE].update({"args": sentinel})), ("args holding a non-string", "claude", lambda servers: servers[CLAUDE_FIXTURE].update({"args": [1, sentinel]})),
+                 ("env as a list", "claude", lambda servers: servers[CLAUDE_FIXTURE].update({"env": [sentinel]})), ("headers as a string", "claude", lambda servers: servers[CLAUDE_FIXTURE].update({"headers": sentinel})),
+                 ("a registration that is a string", "claude", lambda servers: servers.update({CLAUDE_FIXTURE: sentinel})),
+                 ("env as a list of pairs", "claude", lambda servers: servers[CLAUDE_FIXTURE].update({"env": [[sentinel, "v"]]})), ("headers as a list of pairs", "claude", lambda servers: servers[CLAUDE_FIXTURE].update({"headers": [[sentinel, "v"]]})),
                  ("args as a string", "codex", lambda servers: servers["semble"].update({"args": sentinel})), ("env as a list", "codex", lambda servers: servers["semble"].update({"env": [sentinel]})),
                  ("env as a list of pairs", "codex", lambda servers: servers["semble"].update({"env": [[sentinel, "v"]]})), ("env_vars as a table", "codex", lambda servers: servers["semble"].update({"env_vars": {sentinel: "v"}})),
                  ("enabled_tools as a string", "codex", lambda servers: servers["semble"].update({"enabled_tools": sentinel})))
@@ -455,7 +461,7 @@ class DriftTests(unittest.TestCase):
                     paths = self.live(codex_text=self.codex_with(change))
                 code, out, err = self.run_tool(*paths)
                 self.assertEqual((code, out), (2, ""), err)
-                self.assertIn("semble", err)
+                self.assertIn(CLAUDE_FIXTURE if client == "claude" else "semble", err)
                 self.assertNotIn("Zq7secretpartK2", err)
         claude_path, codex_path = self.live()
         codex_path.write_text('[[mcp_servers]]\nname = "Zq7secretpartK2"\n', encoding="utf-8")
@@ -711,7 +717,7 @@ class DriftTests(unittest.TestCase):
             for client in ("claude", "codex"):
                 if client == "claude":
                     servers = json.loads(json.dumps(self.claude))
-                    servers["semble"]["command"] = value
+                    servers[CLAUDE_FIXTURE]["command"] = value
                     paths = self.live(servers)
                 else:
                     paths = self.live(codex_text=self.codex_with(lambda servers, value=value: servers["semble"].update(command=value)))
@@ -720,7 +726,7 @@ class DriftTests(unittest.TestCase):
                         code, out, err = self.run_tool(*paths, *extra)
                         self.assertEqual(code, 1, err)
                         self.assertNotIn(needle, out + err)
-                        self.assertIn("semble", out)
+                        self.assertIn(CLAUDE_FIXTURE if client == "claude" else "semble", out)
                         self.assertIn(drift.WITHHELD, out)
         self.assertEqual(drift.shown_command(90817263), drift.WITHHELD)
         self.assertEqual(drift.shown_command(None), "(no command)")

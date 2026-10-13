@@ -38,15 +38,24 @@ CARRIER_BLOCK_NAMES = ("token-lanes-block.builder.md", "token-lanes-block.main.m
                        "token-lanes-block.verifier.md")
 CODEX_TEMPLATE = ROOT / "adoption" / "templates" / "codex.config.template.toml"
 HOST_EXAMPLE = ROOT / "adoption" / "hosts" / "example.json"
-USER_SCOPE_SERVERS = {"ai-memory", "serena", "socraticode", "headroom", "codebase-memory-mcp", "qmd", "jcodemunch"}
+USER_SCOPE_SERVERS = {"ai-memory", "headroom", "qmd", "jcodemunch"}
+# The code-navigation servers that left the user-scope template on 2026-10-12 and sit in the on-demand file (docs/decisions/2026-10-12-code-navigation-on-demand.md). semble is the new WSL distribution's
+# interim code-search install: its Claude entry came from the distribution's additions, and its Codex entry is not in the Codex user template.
+ON_DEMAND_SERVERS = {"serena", "semble", "codebase-memory-mcp", "socraticode"}
 # A server the carrier names that the user-scope template leaves out, with each file and the phrase in it that keeps
-# it out. None now: jCodeMunch was the one (registered per project since the 2026-09-25 addendum of
+# it out. Since 2026-10-12: serena, socraticode and codebase-memory-mcp, which moved to the on-demand file
+# (docs/decisions/2026-10-12-code-navigation-on-demand.md). jCodeMunch was one from 2026-09-25 (the addendum of
 # docs/decisions/2026-09-23-claude-user-profile.md) until the user's directive of 2026-10-04 put it back at user scope
 # in both user templates (docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md).
-CARRIER_EXCEPTIONS: dict = {}
+CARRIER_EXCEPTIONS: dict = {
+    name: (("adoption/bootstrap.md", "`serena`, `socraticode` and `codebase-memory-mcp`"),
+           ("docs/decisions/2026-10-12-code-navigation-on-demand.md", "`serena`, `socraticode` and `codebase-memory-mcp`"))
+    for name in ("serena", "socraticode", "codebase-memory-mcp")}
 # A sourced exception as the mechanism takes it, for the controls below: a server the template leaves out, and a file
-# that holds the phrase that says why.
-SAMPLE_EXCEPTION = {"qmd": (("adoption/bootstrap.md", "jCodeMunch recipe"),)}
+# that holds the phrase that says why. Its file is none of the real exceptions' files, so a mutant that hides it
+# changes one error, not the real exceptions' too.
+SAMPLE_FILE = "adoption/lifecycle.md"
+SAMPLE_EXCEPTION = {"qmd": ((SAMPLE_FILE, "jCodeMunch recipe"),)}
 # Codex-side variables a Claude registration does not carry: the installer renders no ${HOST_PATH}, and serena's
 # entry has carried neither since 2026-09-23.
 CODEX_ONLY_ENV = {"PATH", "RTK_TELEMETRY_DISABLED"}
@@ -145,6 +154,10 @@ JCODEMUNCH_SPEC = {
 
 def template_server_names() -> list[str]:
     return list(json.loads(icp.MCP_TEMPLATE.read_text())["mcpServers"])
+
+
+def navigation_servers() -> dict:
+    return json.loads(icp.NAVIGATION_TEMPLATE.read_text())["mcpServers"]
 
 
 class GuardInstallTests(unittest.TestCase):
@@ -1485,7 +1498,34 @@ class McpTemplateShapeTests(unittest.TestCase):
             self.assertEqual(data["mcpServers"][name]["type"], "http")
         for name in USER_SCOPE_SERVERS - {"ai-memory", "qmd"}:
             self.assertEqual(data["mcpServers"][name]["type"], "stdio")
-        self.assertIn("--project-from-cwd", data["mcpServers"]["serena"]["args"])
+
+    def test_the_on_demand_set_holds_the_code_navigation_servers_the_user_scope_template_left(self):
+        servers = navigation_servers()
+        self.assertEqual(set(servers), ON_DEMAND_SERVERS)
+        self.assertFalse(set(servers) & set(template_server_names()), "a server is registered at user scope or on demand, not both")
+        self.assertTrue(all(spec["type"] == "stdio" for spec in servers.values()))
+        self.assertIn("--project-from-cwd", servers["serena"]["args"])
+        self.assertIn("claude-code", servers["serena"]["args"])
+        self.assertEqual(servers["codebase-memory-mcp"], {"type": "stdio", "command": "${ECO_ROOT}/bin/codebase-memory-mcp", "args": [], "env": {}})
+        self.assertEqual(servers["semble"]["command"], "semble")
+        self.assertEqual(set(servers["semble"]["env"]), {"SEMBLE_MODEL_NAME", "SEMBLE_CACHE_LOCATION"})
+        self.assertEqual(servers["socraticode"]["command"], "${ECO_ROOT}/bin/node")
+        self.assertEqual(servers["socraticode"]["args"], ["${ECO_ROOT}/bin/socraticode"])
+
+    def test_the_removed_servers_are_in_neither_user_scope_file_and_the_distribution_additions_keep_no_semble(self):
+        additions = json.loads((ROOT / "adoption" / "new-wsl" / "templates" / "claude-user.mcp.additions.json").read_text())["mcpServers"]
+        self.assertFalse(set(additions) & ON_DEMAND_SERVERS)
+        self.assertEqual(set(additions), {"chrome-devtools", "promptfoo"})
+        # the Claude allow rules for semble's two tools stay in the settings additions: inert while the server is not loaded, needed when the on-demand file loads it
+        settings = json.loads((ROOT / "adoption" / "new-wsl" / "templates" / "claude.settings.additions.json").read_text())
+        self.assertTrue({"mcp__semble__search", "mcp__semble__find_related"} <= set(settings["permissions"]["allow"]))
+
+    def test_the_on_demand_file_says_where_it_is_loaded_from_and_what_it_replaced(self):
+        comment = json.loads(icp.NAVIGATION_TEMPLATE.read_text())["_comment"]
+        for needle in ("--print-mcp-config", "--mcp-config", "claude mcp add --scope local", "2026-10-12", "docs/decisions/2026-10-12-code-navigation-on-demand.md", "jcodemunch is not here"):
+            self.assertIn(needle, comment)
+        for agent in ("evidence-reviewer", "isolated-builder", "security-reviewer", "stack-researcher", "codebase-memory-auditor", "codebase-memory-scout"):
+            self.assertIn(agent, comment)
 
     def test_every_jcodemunch_registration_keeps_savings_sharing_off(self):
         # The user-scope entry of the template carries JCODEMUNCH_SHARE_SAVINGS=0, the documented opt-out of upstream's
@@ -1552,19 +1592,30 @@ class McpCarrierCoverageTests(unittest.TestCase):
     def test_the_check_rejects_a_gap_a_stale_exception_and_a_redundant_one(self):
         carrier = carrier_blocks_text(self.BLOCKS)
         registered = set(template_server_names())
+        with_sample = {**CARRIER_EXCEPTIONS, **SAMPLE_EXCEPTION}  # the real exceptions stay, so each mutant below is the one error it names
         cases = {
             "a lane server left unregistered": (carrier, registered - {"qmd"}, CARRIER_EXCEPTIONS, self.read),
             "a new lane server": (carrier + "\nmcp__newserver__tool", registered, CARRIER_EXCEPTIONS, self.read),
-            "the exception's reason removed": (carrier, registered - {"qmd"}, SAMPLE_EXCEPTION,
+            "the exception's reason removed": (carrier, registered - {"qmd"}, with_sample,
                                                lambda path: (self.read(path) or "").replace("jCodeMunch recipe", "")),
-            "the exception's file missing": (carrier, registered - {"qmd"}, SAMPLE_EXCEPTION, lambda path: None),
-            "an exception for a registered server": (carrier, registered, SAMPLE_EXCEPTION, self.read),
+            "the exception's file missing": (carrier, registered - {"qmd"}, with_sample,
+                                             lambda path: None if path == SAMPLE_FILE else self.read(path)),
+            "an exception for a registered server": (carrier, registered, with_sample, self.read),
         }
         for label, args in cases.items():
             with self.subTest(mutant=label):
                 self.assertEqual(len(carrier_coverage_errors(*args)), 1)
         # Control: a sourced exception whose reason is written in its file excuses the server it names.
-        self.assertEqual(carrier_coverage_errors(carrier, registered - {"qmd"}, SAMPLE_EXCEPTION, self.read), [])
+        self.assertEqual(carrier_coverage_errors(carrier, registered - {"qmd"}, with_sample, self.read), [])
+
+    def test_the_exceptions_are_the_servers_that_left_the_user_scope_template_and_each_file_still_says_so(self):
+        # the carrier names these three; semble is named by no carrier block
+        self.assertEqual(set(CARRIER_EXCEPTIONS), {"serena", "socraticode", "codebase-memory-mcp"})
+        self.assertEqual(set(CARRIER_EXCEPTIONS) | USER_SCOPE_SERVERS, carrier_servers(carrier_blocks_text(self.BLOCKS)) | {"jcodemunch"})
+        for name, pairs in CARRIER_EXCEPTIONS.items():
+            self.assertEqual(len(pairs), 2, name)
+            for file, phrase in pairs:
+                self.assertIn(phrase, self.read(file) or "", f"{name}: {file}")
 
 
 class McpCodexParityTests(unittest.TestCase):
@@ -1576,7 +1627,10 @@ class McpCodexParityTests(unittest.TestCase):
 
     @staticmethod
     def claude() -> dict:
-        return json.loads(icp.MCP_TEMPLATE.read_text(encoding="utf-8"))["mcpServers"]
+        """Every Claude entry the Codex user template has a counterpart for: the user-scope file and the on-demand file less semble, which comes from the new WSL distribution's additions (no Codex user template entry)."""
+        servers = json.loads(icp.MCP_TEMPLATE.read_text(encoding="utf-8"))["mcpServers"]
+        servers.update({name: spec for name, spec in navigation_servers().items() if name != "semble"})
+        return servers
 
     @staticmethod
     def codex() -> dict:
@@ -1585,7 +1639,7 @@ class McpCodexParityTests(unittest.TestCase):
     def test_each_entry_matches_the_codex_user_template(self):
         self.assertEqual(codex_parity_errors(self.claude(), self.codex(), codex_host_values()), [])
 
-    def test_the_codex_user_template_has_no_other_server_but_the_plugin_one(self):
+    def test_the_claude_files_name_every_codex_user_template_server_but_the_plugin_one(self):
         # context-mode is bound per session on Codex and comes with its plugin on Claude.
         self.assertEqual(set(self.codex()) - set(self.claude()), {"context-mode"})
 
@@ -1609,7 +1663,7 @@ class McpCodexParityTests(unittest.TestCase):
     def test_codebase_memory_is_the_bare_frontend_of_the_shared_daemon(self):
         # Each session's codebase-memory-mcp is a frontend of one shared daemon, so the entry is the binary itself:
         # no wrapper (a bounded runner that stops its scope would take a daemon it started down with it), no args.
-        entry = self.claude()["codebase-memory-mcp"]
+        entry = navigation_servers()["codebase-memory-mcp"]
         self.assertEqual(entry["command"], "${ECO_ROOT}/bin/codebase-memory-mcp")
         self.assertEqual(entry.get("args", []), [])
         self.assertEqual(entry.get("env", {}), {})
@@ -1623,10 +1677,10 @@ class McpCodexParityTests(unittest.TestCase):
 
 class McpRenderAndCommandTests(unittest.TestCase):
     def test_placeholders_are_rendered_for_the_target_host(self):
-        servers = icp.render_servers(json.loads(icp.MCP_TEMPLATE.read_text()),
-                                     Path("/home/example"), Path("/opt/eco"))
-        self.assertEqual(servers["serena"]["command"], "/opt/eco/bin/serena")
-        self.assertNotIn("${", json.dumps(servers))
+        for template, name, command in ((icp.NAVIGATION_TEMPLATE, "serena", "/opt/eco/bin/serena"), (icp.MCP_TEMPLATE, "jcodemunch", "/opt/eco/bin/jcodemunch-mcp")):
+            servers = icp.render_servers(json.loads(template.read_text()), Path("/home/example"), Path("/opt/eco"))
+            self.assertEqual(servers[name]["command"], command)
+            self.assertNotIn("${", json.dumps(servers))
 
     def test_home_and_eco_root_are_rendered_in_command_and_env_values(self):
         servers = icp.render_servers({"mcpServers": {"jcodemunch": JCODEMUNCH_SPEC}},
@@ -1686,6 +1740,211 @@ class McpRenderAndCommandTests(unittest.TestCase):
         self.assertEqual(add[-2:], ["--", "/e/bin/jcodemunch-mcp"])
 
 
+class PrintMcpConfigTests(unittest.TestCase):
+    """`--print-mcp-config [TEMPLATE]`: the on-demand set rendered for this host as the JSON `claude --mcp-config` takes. It runs no step, registers nothing and writes nothing."""
+
+    def run_main(self, *argv):
+        out, err = io.StringIO(), io.StringIO()
+        with mock.patch("sys.stdout", out), mock.patch("sys.stderr", err):
+            try:
+                code = icp.main(list(argv))
+            except SystemExit as stop:
+                code = stop.code
+        return code, out.getvalue(), err.getvalue()
+
+    def test_the_default_prints_the_on_demand_servers_with_home_and_eco_root_rendered(self):
+        code, out, err = self.run_main("--print-mcp-config", "--home", "/home/example", "--eco-root", "/opt/eco")
+        self.assertEqual((code, err), (0, ""))
+        data = json.loads(out)
+        self.assertEqual(list(data), ["mcpServers"])
+        self.assertEqual(set(data["mcpServers"]), ON_DEMAND_SERVERS)
+        self.assertEqual(data["mcpServers"]["serena"]["command"], "/opt/eco/bin/serena")
+        self.assertEqual(data["mcpServers"]["socraticode"]["args"], ["/opt/eco/bin/socraticode"])
+        self.assertEqual(data["mcpServers"]["semble"]["env"]["SEMBLE_MODEL_NAME"], "/home/example/.local/share/semble/potion-code-16M-v2-e9d2a44c")
+        self.assertNotIn("${", out)
+        self.assertNotIn("_comment", data)
+
+    def test_it_equals_the_rendered_template_and_a_template_path_can_be_named(self):
+        _, out, _ = self.run_main("--print-mcp-config", "--home", "/h", "--eco-root", "/e")
+        self.assertEqual(json.loads(out)["mcpServers"], icp.render_servers(json.loads(icp.NAVIGATION_TEMPLATE.read_text()), Path("/h"), Path("/e")))
+        code, out, _ = self.run_main("--print-mcp-config", str(icp.MCP_TEMPLATE), "--home", "/h", "--eco-root", "/e")
+        self.assertEqual(code, 0)
+        self.assertEqual(set(json.loads(out)["mcpServers"]), USER_SCOPE_SERVERS)
+
+    def test_the_default_eco_root_follows_home_like_the_mcp_step(self):
+        with mock.patch.dict(icp.os.environ, {}, clear=False):
+            icp.os.environ.pop("ECO_INSTALL_ROOT", None)
+            _, out, _ = self.run_main("--print-mcp-config", "--home", "/home/example")
+        self.assertEqual(json.loads(out)["mcpServers"]["serena"]["command"], "/home/example/.local/share/codex-ecosystem/bin/serena")
+
+    def test_it_registers_nothing_writes_nothing_and_needs_no_client(self):
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(icp.subprocess, "run") as run:
+            code, out, err = self.run_main("--print-mcp-config", "--home", tmp, "--claude-bin", "/nonexistent/claude")
+            self.assertEqual((code, err), (0, ""))
+            self.assertTrue(out.strip())
+            self.assertEqual(list(Path(tmp).iterdir()), [])
+        run.assert_not_called()
+
+    def test_it_cannot_be_combined_with_a_step_or_a_registration_option(self):
+        for extra in (["--only", "mcp"], ["--hook", "effort-default-guard.py"], ["--agent", "source-scout"], ["--replace-mcp"], ["--remove-workflows"], ["--mcp-template", str(icp.MCP_TEMPLATE)], ["--dry-run"]):
+            with self.subTest(extra=extra):
+                code, out, err = self.run_main("--print-mcp-config", *extra)
+                self.assertEqual((code, out), (2, ""))
+                self.assertIn("--print-mcp-config runs no step", err)
+
+    def test_a_missing_unreadable_or_malformed_template_and_an_unknown_placeholder_fail_cleanly(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            bad = {"not-json.json": "{nope", "no-servers.json": json.dumps({"servers": {}}), "placeholder.json": json.dumps({"mcpServers": {"x": {"command": "${NOPE}/bin/x"}}})}
+            for name, text in bad.items():
+                (Path(tmp) / name).write_text(text, encoding="utf-8")
+            for name, reason in (("missing.json", "cannot read"), ("not-json.json", "is not JSON"), ("no-servers.json", "has no mcpServers table"), ("placeholder.json", "cannot render")):
+                with self.subTest(template=name):
+                    code, out, err = self.run_main("--print-mcp-config", str(Path(tmp) / name), "--home", "/h", "--eco-root", "/e")
+                    self.assertEqual((code, out), (1, ""))
+                    self.assertIn(reason, err)
+
+    def test_server_prints_only_the_named_servers_in_the_files_order_and_an_unknown_name_fails(self):
+        """Claude read of c1d798de (P2-4): --mcp-config replaces a same-named registered server (measured at 2.1.296), so a host must be able to leave out an entry that cannot start there."""
+        code, out, err = self.run_main("--print-mcp-config", "--server", "semble", "--server", "serena", "--home", "/h", "--eco-root", "/e")
+        self.assertEqual((code, err), (0, ""))
+        self.assertEqual(list(json.loads(out)["mcpServers"]), ["serena", "semble"], "the file's order, not the order asked for")
+        everything = json.loads(self.run_main("--print-mcp-config", "--home", "/h", "--eco-root", "/e")[1])["mcpServers"]
+        self.assertEqual(json.loads(out)["mcpServers"], {name: everything[name] for name in ("serena", "semble")}, "the entries are the file's entries, rendered")
+        self.assertNotIn("socraticode", out)
+        code, out, err = self.run_main("--print-mcp-config", "--server", "serena", "--server", "no-such", "--home", "/h", "--eco-root", "/e")
+        self.assertEqual((code, out), (1, ""))
+        self.assertIn("no server named no-such", err)
+        self.assertIn("claude-code-navigation.json", err)
+        code, out, err = self.run_main("--print-mcp-config", str(icp.MCP_TEMPLATE), "--server", "qmd", "--home", "/h", "--eco-root", "/e")
+        self.assertEqual((code, list(json.loads(out)["mcpServers"])), (0, ["qmd"]), "a named template is filtered too")
+
+    def test_server_needs_print_mcp_config_and_leaves_the_steps_alone(self):
+        code, out, err = self.run_main("--only", "mcp", "--server", "serena", "--dry-run")
+        self.assertEqual((code, out), (2, ""))
+        self.assertIn("--server needs --print-mcp-config", err)
+
+    def test_the_render_error_names_the_file_being_rendered(self):
+        """Claude read of c1d798de (P3-7): the message always said claude-user.json, so a bad on-demand file was reported as the wrong file. The previous implementation, at its repository pin: `raise InstallError(f"{MCP_TEMPLATE.name}:
+        cannot render ...")`, tools/adoption/install_claude_profile.py at 489b26328 L390."""
+        with tempfile.TemporaryDirectory() as tmp:
+            bad = Path(tmp) / "on-demand-copy.json"
+            bad.write_text(json.dumps({"mcpServers": {"x": {"command": "${NOPE}/bin/x"}}}), encoding="utf-8")
+            code, out, err = self.run_main("--print-mcp-config", str(bad), "--home", "/h", "--eco-root", "/e")
+            self.assertEqual((code, out), (1, ""))
+            self.assertIn("on-demand-copy.json: cannot render", err)
+            self.assertNotIn("claude-user.json", err)
+            code, out, err = self.run_main("--only", "mcp", "--mcp-template", str(bad), "--dry-run", "--home", tmp, "--eco-root", "/e")
+            self.assertNotEqual(code, 0)
+            self.assertIn("on-demand-copy.json: cannot render", err + out)
+            self.assertNotIn("claude-user.json", err + out)
+        with self.assertRaises(icp.InstallError) as default:
+            icp.render_servers({"mcpServers": {"x": {"command": "${NOPE}/bin/x"}}}, Path("/h"), Path("/e"))
+        self.assertIn("claude-user.json: cannot render", str(default.exception), "without a source the user-scope template is named, as before")
+
+    def test_the_command_in_the_bootstrap_guide_is_the_command_this_option_serves(self):
+        text = (ROOT / "adoption" / "bootstrap.md").read_text(encoding="utf-8")
+        self.assertIn('claude --mcp-config "$(python3 tools/adoption/install_claude_profile.py --print-mcp-config)"', text)
+        self.assertEqual(icp.NAVIGATION_TEMPLATE, ROOT / "adoption" / "mcp" / "claude-code-navigation.json")
+
+
+class RollbackRoutesTests(unittest.TestCase):
+    """Review of #1051 at 682e752e (Astra P2): the record said `git revert` plus `--only mcp` "registers the four servers again from the restored user-scope template", and the installer reads only that template, which
+    never held semble (the new WSL distribution's additions file did, `489b26328`:adoption/new-wsl/templates/claude-user.mcp.additions.json). Each documented route is planned with --dry-run and compared with the record."""
+
+    RECORD = (ROOT / "docs" / "decisions" / "2026-10-12-code-navigation-on-demand.md").read_text(encoding="utf-8")
+    NUMBER = {3: "three", 4: "four"}
+
+    def plan(self, template):
+        out = io.StringIO()
+        with mock.patch.object(icp, "claude_mcp_get", return_value=None), mock.patch("sys.stdout", out):
+            results = icp.install_mcp_servers("claude", True, Path("/home/example"), Path("/e"), template=Path(template))
+        names = re.findall(r"mcp: would run: claude mcp add --scope user (?:--transport \w+ )?(\S+)", out.getvalue())
+        self.assertEqual(len(names), results.count("planned"))
+        return set(names)
+
+    def restored_template(self, directory):
+        """The user-scope template as `git revert` leaves it: today's servers plus the three entries that moved out of it unchanged (semble was not in it)."""
+        template = json.loads(icp.MCP_TEMPLATE.read_text(encoding="utf-8"))
+        moved = json.loads(icp.NAVIGATION_TEMPLATE.read_text(encoding="utf-8"))["mcpServers"]
+        template["mcpServers"].update({name: moved[name] for name in ("serena", "socraticode", "codebase-memory-mcp")})
+        path = Path(directory) / "claude-user.json"
+        path.write_text(json.dumps(template), encoding="utf-8")
+        return path
+
+    def test_without_reverting_the_on_demand_template_registers_all_four(self):
+        self.assertEqual(self.plan(icp.NAVIGATION_TEMPLATE), ON_DEMAND_SERVERS)
+        self.assertEqual(len(ON_DEMAND_SERVERS), 4)
+
+    def test_a_revert_brings_back_three_of_the_four_through_the_default_template_and_semble_is_not_one_of_them(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            restored = self.plan(self.restored_template(tmp))
+        back = restored - USER_SCOPE_SERVERS
+        self.assertEqual(back, {"serena", "socraticode", "codebase-memory-mcp"})
+        self.assertNotIn("semble", restored)
+        for template in (icp.MCP_TEMPLATE,):
+            self.assertNotIn("semble", json.loads(template.read_text(encoding="utf-8"))["mcpServers"], "the shared template never held semble")
+        additions = json.loads((ROOT / "adoption" / "new-wsl" / "templates" / "claude-user.mcp.additions.json").read_text(encoding="utf-8"))
+        self.assertNotIn("semble", additions.get("mcpServers", {}), "semble left the distribution's additions file for the on-demand file")
+        self.assertIn("semble", json.loads(icp.NAVIGATION_TEMPLATE.read_text(encoding="utf-8"))["mcpServers"])
+
+    def test_the_record_states_the_number_the_default_route_registers_and_names_the_distribution_route_for_semble(self):
+        text = " ".join(self.RECORD.split())
+        with tempfile.TemporaryDirectory() as tmp:
+            back = self.plan(self.restored_template(tmp)) - USER_SCOPE_SERVERS
+        self.assertIn(f"which registers the {self.NUMBER[len(back)]} servers the user-scope template held again", text)
+        self.assertNotIn("registers the four servers again from the restored user-scope template", text)
+        for needle in ("It does not register `semble`: the shared template never held it", "claude-user.mcp.additions.json", "new_wsl_client_config.py --render --host NAME --out DIR", "--mcp-template DIR/mcp-servers.json",
+                       "new_wsl_client_config.py --apply --host NAME", "--mcp-template DIR/mcp-servers.on-demand.json", "adoption/mcp/claude-code-navigation.json", "so there is nothing to restore"):
+            self.assertIn(needle, text, needle)
+
+    def test_the_options_the_rollback_names_exist(self):
+        parser = icp.build_parser()
+        self.assertTrue(parser.parse_args(["--only", "mcp", "--mcp-template", "x"]).mcp_template)
+        wsl = subprocess.run([sys.executable, "-I", str(ROOT / "tools" / "adoption" / "new_wsl_client_config.py"), "--help"], capture_output=True, text=True, timeout=60)
+        for option in ("--render", "--apply", "--host", "--out"):
+            self.assertIn(option, wsl.stdout)
+
+
+class CommandSubstitutionTests(unittest.TestCase):
+    """Review of #1051 at 682e752e (Astra P3-3): `claude --mcp-config "$(...)"` runs the outer command with an empty argument when the printer refuses; the guide gives the guarded form for a script."""
+
+    PRINTER = [sys.executable, "-I", str(ROOT / "tools" / "adoption" / "install_claude_profile.py"), "--print-mcp-config", "/no/such/template.json"]
+
+    def shell(self, command):
+        return subprocess.run(["sh", "-c", command], capture_output=True, text=True, timeout=60)
+
+    def test_an_unguarded_substitution_launches_after_a_refusal_and_the_guarded_form_does_not(self):
+        printer = " ".join(f"'{part}'" for part in self.PRINTER)
+        unguarded = self.shell(f'echo launched "$({printer})"')
+        self.assertIn("launched", unguarded.stdout, "the outer command runs although the printer refused")
+        guarded = self.shell(f'config="$({printer})" && echo launched "$config"')
+        self.assertNotEqual(guarded.returncode, 0)
+        self.assertNotIn("launched", guarded.stdout)
+        working = " ".join(f"'{part}'" for part in self.PRINTER[:-1])
+        ran = self.shell(f'config="$({working})" && printf "%s" "$config"')
+        self.assertEqual(ran.returncode, 0, ran.stderr)
+        self.assertEqual(set(json.loads(ran.stdout)["mcpServers"]), ON_DEMAND_SERVERS, "the same guarded form launches when the printer works")
+
+    def test_the_guide_gives_the_guarded_form(self):
+        text = (ROOT / "adoption" / "bootstrap.md").read_text(encoding="utf-8")
+        self.assertIn('config="$(python3 tools/adoption/install_claude_profile.py --print-mcp-config)" && claude --mcp-config "$config"', text)
+        self.assertIn("a command substitution does not stop the\n   outer command when the printer refuses", text)
+
+
+class StaleLocatorTests(unittest.TestCase):
+    """Review of #1051 at 682e752e (Astra P3-4): docs/token-efficiency-stack.json cited adoption/bootstrap.md:315 for the profile installer's registration; line 315 is the native sign-in step (it was at the base too)."""
+
+    def test_every_bootstrap_locator_in_the_serena_wiring_record_points_at_a_line_that_says_what_is_cited(self):
+        stack = (ROOT / "docs" / "token-efficiency-stack.json").read_text(encoding="utf-8")
+        wiring = next(line for line in stack.splitlines() if '"claude_wiring": "the Serena entry of adoption/mcp/claude-user.json' in line)
+        lines = (ROOT / "adoption" / "bootstrap.md").read_text(encoding="utf-8").splitlines()
+        cited = [int(number) for number in re.findall(r"adoption/bootstrap\.md:(\d+)", wiring)]
+        self.assertTrue(cited)
+        for number in cited:
+            self.assertIn("Claude user-scope profile", lines[number - 1], f"bootstrap.md:{number} is not the step that registers through the profile installer: {lines[number - 1][:60]!r}")
+        self.assertNotIn("bootstrap.md:315", wiring)
+
+
 class McpGetOutputTests(unittest.TestCase):
     # SERENA_CONTEXT_20260923, JCODEMUNCH and AI_MEMORY were recorded from `claude mcp get` (claude
     # 2.1.280, 2026-09-23) with the home path replaced. That day's serena entry ran the recording
@@ -1721,8 +1980,11 @@ class McpGetOutputTests(unittest.TestCase):
     )
 
     def rendered(self):
-        return icp.render_servers(json.loads(icp.MCP_TEMPLATE.read_text()),
-                                  Path("/home/example"), Path("/home/example/.local/share/codex-ecosystem"))
+        """The user-scope entries and the on-demand ones: the tests below exercise how `claude mcp get` output is matched, whichever file holds the entry."""
+        servers = {}
+        for template in (icp.MCP_TEMPLATE, icp.NAVIGATION_TEMPLATE):
+            servers.update(icp.render_servers(json.loads(template.read_text()), Path("/home/example"), Path("/home/example/.local/share/codex-ecosystem")))
+        return servers
 
     def rendered_jcodemunch(self):
         return icp.render_servers({"mcpServers": {"jcodemunch": JCODEMUNCH_SPEC}}, Path("/home/example"),
@@ -1795,7 +2057,8 @@ class McpGetOutputTests(unittest.TestCase):
         with mock.patch.object(icp, "claude_mcp_get", return_value="x:\n  Scope: User config\n  Type: stdio\n  Command: /other\n"), \
              mock.patch("sys.stdout", new_callable=io.StringIO) as out:
             icp.install_mcp_servers("claude", True, Path("/home/example"), Path("/e"), replace=True)
-        self.assertIn("mcp remove serena -s user", out.getvalue())
+        self.assertIn("mcp remove ai-memory -s user", out.getvalue())
+        self.assertNotIn("serena", out.getvalue(), "serena is not a user-scope server any more")
 
     def test_default_eco_root_follows_home(self):
         with mock.patch.dict(icp.os.environ, {}, clear=False):
