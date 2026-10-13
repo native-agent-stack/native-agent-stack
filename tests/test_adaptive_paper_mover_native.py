@@ -242,6 +242,25 @@ class MoverNativeEndToEnd(unittest.TestCase):
         leg = self.legs(receipt)["AAA"]
         self.assertEqual((leg["exit_reason"], receipt["force_reason"]), ("hard_flatten", "hard_flatten"))
 
+    def test_quiet_extended_session_stale_only_is_not_stream_frozen(self):
+        class QuietPort(MoverSimulatedPort):
+            def stream_health(self):
+                return {'frozen':True,'reasons':self.health['reasons'],'fresh_quotes':False}
+            async def start(self,*args):
+                await super().start(*args)
+                self.ready=self.health['ready']=False
+                self.health.update(frozen=True,reasons=['quote_stale'],fresh_quotes=False)
+            async def stop(self):
+                self.ready=True  # allow the fixture's normal teardown to join its feed task
+                await super().stop()
+        with patch(__name__+'.MoverSimulatedPort',QuietPort):
+            receipt,port,held,unresolved=self.run_trial([row('AAA',1,'10.00')],
+                {'AAA':flat('10.00')},extended_hours=True,window=5,flatten=3)
+        self.assertEqual(port.payloads,[])
+        self.assertEqual((held,unresolved),({},0))
+        self.assertTrue(receipt['flat'])
+        self.assertEqual(receipt['status'],'completed_no_signals')
+
     def test_stop_file_stops_entries_and_flattens(self):
         rows = [row("AAA", 1, "10.00"), row("BBB", 2, "8.00")]
         points = {"AAA": flat("10.00"), "BBB": flat("8.00")}

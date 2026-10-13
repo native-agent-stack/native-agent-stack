@@ -136,6 +136,65 @@ class StreamBackpressure(unittest.IsolatedAsyncioTestCase):
         self.assertIn('queue_overflow',port._reasons)
         self.assertEqual(port._events.qsize(),1)
 
+    async def test_handler_wait_is_below_ping_timeout_and_is_counted_once(self):
+        port=self.port(queue_size=1,start_timeout=15)
+        await port._quote_callback({'first':True})
+        clock=[0.0]
+        async def advance(seconds):clock[0]+=seconds
+        with patch.object(t.time,'monotonic',side_effect=lambda:clock[0]), \
+             patch.object(t.asyncio,'sleep',side_effect=advance):
+            await port._quote_callback({'waiting':True})
+        self.assertLess(clock[0],10,'the SDK must resume receiving before ping_timeout')
+        self.assertIn('queue_overflow',port._reasons)
+        self.assertEqual(port.stream_health()['backpressure_waits'],1)
+
+    async def test_skipped_stale_quote_count_is_in_terminal_receipt(self):
+        port=self.port(quote_timeout=1)
+        port._on_quote=Mock()
+        raw={'S':'SPY','bp':'100.00','ap':'100.01','bs':1,'as':1,
+             't':datetime.fromtimestamp(time.time()-5,timezone.utc)}
+        await port._quote_callback(raw)
+        consumer=asyncio.create_task(port._consume_events())
+        try:
+            await asyncio.sleep(.02)
+            self.assertEqual(port.stream_health()['skipped_stale_quotes'],1)
+            port._on_quote.assert_not_called()
+        finally:
+            port._stopping=True
+            consumer.cancel()
+            await asyncio.gather(consumer,return_exceptions=True)
+
+    def test_native_wire_guard_refuses_event_loss_for_fresh_owned_sells(self):
+        port=self.port()
+        port._started=True
+        port._quote_values={'SPY':{'ts_ns':time.time_ns()}}
+        for reason in ('queue_enqueue_cancelled','queue_overflow','callback_failure'):
+            port._reasons={reason}
+            with self.subTest(reason=reason),self.assertRaisesRegex(t.SubmissionNotSent,'recovery_observation_integrity_lost'):
+                port._wire_guard({'symbol':'SPY','side':'sell'})
+        port._reasons={'quote_stale','quotes_disconnected'}
+        port._wire_guard({'symbol':'SPY','side':'sell'})  # fresh owned exit remains permitted
+
+    def test_quote_reconnect_signal_survives_reconciliation(self):
+        port=self.port()
+        self.reconciliable(port)
+        port._ever_acks={'orders':True,'quotes':True}
+        port._connection('quotes',False)
+        port._authorized('quotes')
+        port._ack('quotes',True)
+        port.mark_reconciled()
+        port.freeze_health('quote_stale')
+        self.assertEqual(port.stream_health()['quotes_reconnects'],1)
+
+    def test_duplicate_or_rejected_subscription_ack_is_not_a_reconnect(self):
+        port=self.port()
+        self.reconciliable(port)
+        port._ever_acks={'orders':True,'quotes':True}
+        port._ack('quotes',True)
+        port._ack('quotes',False)
+        port._ack('quotes',True)
+        self.assertEqual(port.stream_health()['quotes_reconnects'],0)
+
     async def test_stop_unblocks_a_backpressured_sdk_callback(self):
         port=self.port(queue_size=1)
         await port._quote_callback({'first':True})
@@ -216,7 +275,61 @@ class StreamBackpressure(unittest.IsolatedAsyncioTestCase):
             await asyncio.gather(*tasks,return_exceptions=True)
 
 
+    def wire_guard(self,reason,side):
+        port=self.port()
+        port._started=True
+        port._quote_values['SPY']={'ts_ns':time.time_ns()}
+        port.freeze_health(reason)
+        port._wire_guard({'symbol':'SPY','side':side})
+
+    def test_wire_guard_refuses_an_order_of_either_side_after_event_loss(self):
+        for reason in ('callback_failure','queue_enqueue_cancelled','queue_overflow'):
+            for side in ('sell','buy'):
+                with self.subTest(reason=reason,side=side):
+                    with self.assertRaises(t.SubmissionNotSent):
+                        self.wire_guard(reason,side)
+
+    def test_event_loss_reasons_are_the_ones_mark_reconciled_refuses(self):
+        self.assertEqual(t.EVENT_LOSS_REASONS,frozenset({'callback_failure','queue_enqueue_cancelled','queue_overflow'}))
+        port=self.port()
+        port._started=True
+        port._auth={kind:True for kind in ('orders','quotes')}
+        port._acks=dict(port._auth)
+        port._quote_seen={'SPY':time.monotonic()}
+        for reason in sorted(t.EVENT_LOSS_REASONS):
+            port._reasons={reason}
+            with self.assertRaisesRegex(t.TransportError,'event loss requires'):
+                port.mark_reconciled()
+
+    def test_wire_guard_keeps_admitting_an_owned_sell_under_stale_quote_and_reconnect_freezes(self):
+        for reason in ('quote_stale','quotes_disconnected','orders_disconnected','rate_limited'):
+            with self.subTest(reason=reason):
+                self.wire_guard(reason,'sell')
+                with self.assertRaises(t.SubmissionNotSent):
+                    self.wire_guard(reason,'buy')
+
+
 class FrozenStreamReceipt(unittest.TestCase):
+    def test_quote_stale_alone_does_not_claim_stream_failure(self):
+        for reason in ('quote_stale','quote_timestamp_stale'):
+            outcome={'stream_health':{'frozen':True,'reasons':[reason]}}
+            self.assertEqual(runner._run_native_status({'positions':0,'open_orders':0},[],0,
+                outcome,{'overnight_holds':False},0),'completed_no_signals')
+
+    def test_stale_after_sdk_reconnect_is_distinct_from_quiet_market(self):
+        outcome={'stream_health':{'frozen':True,'reasons':['quote_stale'],'quotes_reconnects':1}}
+        self.assertEqual(runner._run_native_status({'positions':0,'open_orders':0},[],0,
+            outcome,{'overnight_holds':False},0),'stream_frozen')
+
+    def test_nonstream_refusals_keep_needs_attention_label(self):
+        for reason in ('rate_limited','submission_ambiguous','cancellation_unresolved','snapshot_incomplete'):
+            with self.subTest(reason=reason):
+                self.assertEqual(runner._run_native_status({'positions':0,'open_orders':0},[],0,
+                    {'stream_health':{'frozen':True,'reasons':[reason]}},{'overnight_holds':False},0),'needs_attention')
+
+    def test_unexplained_frozen_flag_retains_generic_attention(self):
+        self.assertEqual(runner._run_native_status({'positions':0,'open_orders':0},[],0,
+            {'stream_health':{'frozen':True,'reasons':[]}},{'overnight_holds':False},0),'needs_attention')
     def test_frozen_stream_is_distinct_from_no_signals_even_when_flat(self):
         for native_fills in (0,1):
             outcome={'stream_health':{'frozen':True,'reasons':['queue_overflow']}}

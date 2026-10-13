@@ -26,6 +26,10 @@ from feeds import DATA_FEEDS, is_qualified_feed
 
 SDK_VERSION = "0.44.0"
 SDK_COMMIT = "cc4cb3b7ba50ae250e621983c2779047fb16bb28"
+WEBSOCKET_PING_TIMEOUT_SECONDS = 10
+EVENT_LOSS_REASONS = frozenset({"callback_failure", "queue_overflow", "queue_enqueue_cancelled"})
+OBSERVATION_INTEGRITY_LOSS_REASONS = EVENT_LOSS_REASONS | frozenset({
+    "client_id_collision", "snapshot_incomplete", "replay_unresolved"})
 PAPER_URL = "https://paper-api.alpaca.markets"
 DATA_URL = "https://data.alpaca.markets"
 PAPER_WS = "wss://paper-api.alpaca.markets/stream"
@@ -1329,6 +1333,10 @@ class AlpacaPaperTransport:
         self._events = queue.Queue(maxsize=queue_size)
         self._state_lock = threading.RLock()
         self._pending_order_callbacks = 0
+        self._backpressure_waits = 0
+        self._skipped_stale_quotes = 0
+        self._quotes_reconnects = 0
+        self._quote_reconnect_pending = False
         self._reasons = set()
         self._dropped_quotes = {}
         self._dropped_by_symbol = {}
@@ -1362,7 +1370,7 @@ class AlpacaPaperTransport:
         self._client._session.before_send = self._wire_guard
         Orders, Quotes = _stream_classes(self.data_ws)
         from alpaca.data.enums import DataFeed
-        parameters = {"ping_interval": 10, "ping_timeout": 10, "max_queue": queue_size,
+        parameters = {"ping_interval": 10, "ping_timeout": WEBSOCKET_PING_TIMEOUT_SECONDS, "max_queue": queue_size,
                       "open_timeout": 5, "close_timeout": 2}
         self._orders_stream = Orders(api_key, secret_key, paper=True, raw_data=True,
                                      url_override=PAPER_WS, websocket_params=dict(parameters,
@@ -1411,8 +1419,12 @@ class AlpacaPaperTransport:
         if self._terminal_stream_health is not None:
             return dict(self._terminal_stream_health)
         health = self.health
-        return {"frozen": health["frozen"], "reasons": health["reasons"],
-                "fresh_quotes": health["fresh_quotes"], "data_timeout_seconds": self.quote_data_timeout}
+        with self._state_lock:
+            return {"frozen": health["frozen"], "reasons": health["reasons"],
+                    "fresh_quotes": health["fresh_quotes"], "data_timeout_seconds": self.quote_data_timeout,
+                    "backpressure_waits": self._backpressure_waits,
+                    "skipped_stale_quotes": self._skipped_stale_quotes,
+                    "quotes_reconnects": self._quotes_reconnects}
 
     def freeze_health(self, reason):
         with self._state_lock:
@@ -1424,7 +1436,7 @@ class AlpacaPaperTransport:
             if (not all(self._auth.values()) or not all(self._acks.values())
                     or not self.health["fresh_quotes"] or self._order_events_pending()):
                 raise TransportError("streams are not ready for reconciliation acknowledgement")
-            if self._reasons.intersection({"queue_overflow", "queue_enqueue_cancelled", "callback_failure"}):
+            if self._reasons.intersection(EVENT_LOSS_REASONS):
                 raise TransportError("event loss requires a new transport and durable recovery")
             # Pending order-update timers survive a routine acknowledgement; they are
             # cleared only when the orders stream actually dropped, since only then can
@@ -1451,6 +1463,8 @@ class AlpacaPaperTransport:
             if not connected:
                 self._auth[channel] = self._acks[channel] = False
                 if self._ever_acks[channel] and not self._stopping:
+                    if channel == "quotes":
+                        self._quote_reconnect_pending = True
                     self.freeze_health(channel + "_disconnected")
 
     def _authorized(self, channel):
@@ -1459,6 +1473,10 @@ class AlpacaPaperTransport:
 
     def _ack(self, channel, accepted):
         with self._state_lock:
+            if (channel == "quotes" and accepted and self._auth[channel]
+                    and self._quote_reconnect_pending):
+                self._quotes_reconnects += 1
+                self._quote_reconnect_pending = False
             self._acks[channel] = bool(accepted and self._auth[channel])
             self._ever_acks[channel] |= self._acks[channel]
             if not self._acks[channel]:
@@ -1497,6 +1515,10 @@ class AlpacaPaperTransport:
 
     def _wire_guard(self, order):
         # Runs after a possibly delayed budget reservation, immediately before POST.
+        with self._state_lock:
+            integrity_lost = bool(self._reasons & OBSERVATION_INTEGRITY_LOSS_REASONS)
+        if integrity_lost:
+            raise SubmissionNotSent("recovery_observation_integrity_lost")
         quote = self._quote_values.get(order.get("symbol"))
         max_age_ns = (self.exit_quote_max_age_ns if order.get("side") == "sell"
                       else self.order_quote_max_age_ns)
@@ -1547,16 +1569,22 @@ class AlpacaPaperTransport:
         handler; trading/stream.py:182 awaits dispatch too. Keep this one
         raw event while the bounded owner queue drains. Never coalesce or
         discard an event on transient fullness. A consumer that never drains
-        still produces the existing explicit event-loss freeze, bounded by
-        start_timeout; stop can interrupt the wait without parking a thread.
+        still produces the existing explicit event-loss freeze. The wait is
+        bounded below the websocket ping timeout, with two seconds reserved
+        for keepalive progress; stop can interrupt it without parking a thread.
         """
-        deadline = time.monotonic() + self.start_timeout
+        deadline = time.monotonic() + min(self.start_timeout, WEBSOCKET_PING_TIMEOUT_SECONDS - 2)
+        counted_wait = False
         try:
             while not self._stopping:
                 try:
                     self._events.put_nowait((kind, raw))
                     return
                 except queue.Full:
+                    if not counted_wait:
+                        with self._state_lock:
+                            self._backpressure_waits += 1
+                        counted_wait = True
                     remaining = deadline - time.monotonic()
                     if remaining <= 0:
                         self.freeze_health("queue_overflow")
@@ -1626,6 +1654,8 @@ class AlpacaPaperTransport:
                     max_age = (self.benchmark_quote_timeout_seconds if self.benchmark_quote_timeout_seconds is not None
                                and quote["symbol"] in self.required_quote_symbols else self.quote_timeout)
                     if not -0.25 <= age <= max_age:
+                        with self._state_lock:
+                            self._skipped_stale_quotes += 1
                         if quote["symbol"] in self.required_quote_symbols:
                             self.freeze_health("quote_timestamp_stale")
                         continue

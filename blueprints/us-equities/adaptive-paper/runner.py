@@ -2129,8 +2129,21 @@ def _run_native_status(reconciliation, session_errors, native_fills, outcome, se
     unconditionally, and never allowed to outrank a failed liquidation's
     real outcome.
     """
-    if (outcome.get("stream_health") or {}).get("frozen"):
-        return "stream_frozen"
+    health = outcome.get("stream_health") or {}
+    if health.get("frozen"):
+        reasons = {str(reason) for reason in health.get("reasons", [])}
+        # Use the owner-loop distinction: stale quotes pause admissions but
+        # alone cannot tell a quiet subscription from a broken stream.
+        nonstale = {reason for reason in reasons if "stale" not in reason}
+        stream_reasons = {reason for reason in nonstale if reason.startswith(("orders_", "quotes_", "stream_"))
+                          or reason in {"queue_overflow", "queue_enqueue_cancelled", "callback_failure",
+                                        "client_id_collision", "replay_unresolved", "order_update_missing",
+                                        "owner_callback_timeout", "halt_status_subscription_rejected", "start_not_ready"}}
+        if (stream_reasons
+                or (reasons - nonstale and health.get("quotes_reconnects", 0) > 0)):
+            return "stream_frozen"
+        if not reasons or nonstale:
+            return "needs_attention"  # retain nonstream refusal diagnoses
     if reconciliation and reconciliation["positions"] == 0 and reconciliation["open_orders"] == 0 and not session_errors:
         return "passed" if native_fills else "completed_no_signals"
     if _honest_overnight_hold(outcome, session_policy, now):

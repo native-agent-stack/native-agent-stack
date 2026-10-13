@@ -844,6 +844,24 @@ class PerSymbolRecoveryExits(unittest.TestCase):
         self.assertEqual(result["errors"], ["recovery_quote_not_fresh"])
         self.assertEqual(result["stale_symbols"], ["PFSA"])
 
+    def test_event_loss_after_awaited_authorization_refuses_sell_without_blind_retry(self):
+        self.hold(TwoSymbolPort(self.controller))
+        original=None
+        async def authorize(kind,client_id=None):
+            self.assertEqual(self.ledger.request_budget(self.controller.clock(),kind,client_id=client_id),0)
+            await asyncio.sleep(0)
+            self.port.health['reasons']=['queue_enqueue_cancelled']
+        original=self.port.before_request=authorize
+        result=self.recover()
+        self.assertEqual(self.port.submissions,[])
+        self.assertEqual(result['status'],'needs_attention')
+        self.assertFalse(result['flat'])
+        self.assertEqual(result['errors'],['recovery_observation_integrity_lost'])
+        intent=self.ledger.intents()[-1]
+        self.assertEqual(intent.status,'not_sent')
+        self.assertTrue(intent.submit_attempted)
+        self.assertIs(self.port.before_request,original)
+
     def test_a_stale_symbol_is_exited_once_it_quotes_before_the_deadline(self):
         self.hold(TwoSymbolPort(self.controller, stale={"PFSA", "SRZN"}))
         clock = RecoveryClock()
@@ -932,6 +950,76 @@ class PerSymbolRecoveryExits(unittest.TestCase):
         self.assertEqual(result["stale_symbols"], [])
         self.assertEqual(result["positions"], [{"symbol": "PFSA", "qty": "1"}])
         self.assertEqual((result["status"], result["flat"]), ("needs_attention", False))
+
+
+    def event_loss_inside_authorization(self, reason):
+        port = TwoSymbolPort(self.controller)
+        port.SYMBOLS = ("PFSA",)
+        self.hold(port)
+        authorized = []
+
+        async def authorize(kind, client_id=None):
+            self.assertEqual(self.ledger.request_budget(self.controller.clock(), kind, client_id=client_id), 0)
+            await asyncio.sleep(0)
+            port.health["reasons"] = [reason]
+            authorized.append(client_id)
+
+        port.before_request = authorize
+        result = self.recover()
+        self.assertEqual(len(authorized), 1)
+        self.assertIs(port.before_request, authorize)
+        return port, result
+
+    def test_event_loss_inside_the_pre_wire_authorization_refuses_the_residual_sell(self):
+        """The integrity set is checked before port.submit(), then the authorization awaits. A
+        reason frozen inside that await (the delayed-authorization seam) must stop the sell, keep
+        its own diagnosis through the definitive-not-sent path and never retry blindly."""
+        reasons = ("queue_enqueue_cancelled", "callback_failure", "queue_overflow",
+                   "client_id_collision", "snapshot_incomplete", "replay_unresolved")
+        for index, reason in enumerate(reasons):
+            with self.subTest(reason=reason):
+                if index:
+                    self.tearDown()
+                    self.setUp()
+                port, result = self.event_loss_inside_authorization(reason)
+                self.assertEqual(port.submissions, [])
+                self.assertEqual(result["errors"], ["recovery_observation_integrity_lost"])
+                self.assertEqual((result["status"], result["flat"]), ("needs_attention", False))
+                self.assertEqual(len(result["exit_attempt_client_ids"]), 1)
+                self.assertEqual(result["unresolved_orders"], [])
+                last = self.ledger.intents()[-1]
+                self.assertEqual((last.status, last.submit_attempted), ("not_sent", True))
+
+    def test_stale_quote_and_reconnect_freezes_inside_the_authorization_still_admit_the_exit(self):
+        for index, reason in enumerate(("quote_stale", "quotes_disconnected", "orders_disconnected", "rate_limited")):
+            with self.subTest(reason=reason):
+                if index:
+                    self.tearDown()
+                    self.setUp()
+                port, result = self.event_loss_inside_authorization(reason)
+                self.assertEqual(len(port.submissions), 1)
+                self.assertEqual((result["status"], result["errors"], result["flat"]), ("passed", [], True))
+
+    def test_event_loss_before_the_authorization_starts_spends_no_budget(self):
+        class FreezeOnSubmit(TwoSymbolPort):
+            async def submit(self, payload):
+                # After recovery's last early check, before the authorization hook is called.
+                self.health["reasons"] = ["callback_failure"]
+                return await super().submit(payload)
+
+        port = FreezeOnSubmit(self.controller)
+        port.SYMBOLS = ("PFSA",)
+        self.hold(port)
+        authorized = []
+
+        async def authorize(kind, client_id=None):
+            authorized.append(client_id)
+
+        port.before_request = authorize
+        result = self.recover()
+        self.assertEqual(authorized, [])
+        self.assertEqual(port.submissions, [])
+        self.assertEqual(result["errors"], ["recovery_observation_integrity_lost"])
 
 
 if __name__ == "__main__":
