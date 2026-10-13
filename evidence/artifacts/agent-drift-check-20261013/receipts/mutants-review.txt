@@ -1,0 +1,52 @@
+The 49 mutants of the review fix: one exact change each to scripts/adoption_status.py, in place, then tests.test_adoption_status.ClientWiringTests; a mutant is killed when the run fails (the unmutated run passes first).
+
+killed   (failed) the key is missing from the claude group
+killed   (failed) drift does not block completeness
+killed   (failed) the checkout's source folder is ignored
+killed   (failed) the limitation text drops the folders below
+killed   (failed) a vendor definition is not listed (semble-search)
+killed   (failed) the vendor exemption is gone
+killed   (failed) a vendor name is exempt at any depth
+killed   (failed) a vendor file is exempt whatever it declares
+killed   (failed) the shipped names are not collected
+killed   (failed) an unreadable vendor file counts
+killed   (failed) a link in place of a vendor file is exempt
+killed   (failed) the quotes of a name are kept
+killed   (failed) a YAML comment is part of the name
+killed   (failed) the key must be in lower case
+killed   (failed) a hash inside quotes is a comment
+killed   (failed) the end of the block is not looked for
+killed   (failed) a text without an opening block is read
+killed   (failed) a space before the colon is not a name
+killed   (failed) no folder below the top is entered
+killed   (failed) hidden entries are skipped
+killed   (failed) a file that is not markdown counts
+killed   (failed) a nested file with a shipped name is the shipped one
+killed   (failed) the depth bound is gone
+killed   (failed) the depth bound is one too wide
+killed   (failed) the depth bound is one too narrow
+killed   (failed) the entry bound is gone
+killed   (failed) the entry bound is one too narrow
+killed   (failed) an unlistable folder is no drift
+killed   (failed) a link to a folder is not unknown
+killed   (failed) a link named *.md is not counted
+killed   (failed) another kind named *.md is not counted
+killed   (failed) a pipe named *.md is not counted
+killed   (failed) a vanished entry is not unknown
+killed   (failed) an unreadable folder is not unknown
+killed   (failed) an unreadable shipped copy is not unknown
+killed   (failed) a shipped copy over the limit is not unknown
+killed   (failed) a shipped copy is never present
+killed   (failed) equal length is taken for equal bytes
+killed   (failed) a link is followed (no O_NOFOLLOW)
+killed   (failed) an entry is opened by its name, not below its folder
+killed   (failed) a link is described by its target
+killed   (failed) the platform guard is gone
+killed   (failed) the read limit is not enforced
+killed   (failed) a folder is read as a file
+killed   (failed) a regular file is taken for any file
+killed   (failed) the Codex carriers are read by path again
+killed   (failed) a linked Codex agents folder is followed
+killed   (failed) an absent Codex agents folder is unknown
+killed   (failed) an absent Claude agents folder is no drift
+49 mutants, 49 killed, survivors: none

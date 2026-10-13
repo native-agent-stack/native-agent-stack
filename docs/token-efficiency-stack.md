@@ -183,14 +183,18 @@ clients. `client_wiring` checks three places:
   (`agent_teams_opt_in`, 0 or 1), because agent teams are an allowed dispatch mode
   since 2026-09-27. How many Claude agent definitions under the user home's `agents/`
   differ from this checkout's `adoption/agents/claude` is counted byte for byte
-  (`stack_agents_drift`): each shipped `*.md` whose installed copy is absent, a link, a folder or
-  not equal, and each other `*.md` at the top of the folder except the four vendor-installed
-  search definitions (`codebase-memory`, `codebase-memory-auditor`, `codebase-memory-scout`,
-  `semble-search`). The client serves a user-scope definition to every project that
-  does not define the name itself, so a stale or wider copy (an omitted `tools` field
-  means every tool) goes unseen until something reads it. The count must be 0 and is
-  part of the wiring rule; it is `null` when the checkout's source folder, the `agents/`
-  folder (a link, or not a folder) or a shipped definition's installed copy cannot be read;
+  (`stack_agents_drift`): each shipped `*.md` whose installed copy at the top of the folder is
+  absent, a link, a folder or not equal, and each other `*.md` at any depth (the client loads
+  that folder recursively), except the four vendor-installed search definitions at the top
+  (`codebase-memory`, `codebase-memory-auditor`, `codebase-memory-scout`, `semble-search`),
+  which count too when their front matter declares the name of a shipped definition. The client
+  serves a user-scope definition to every project that does not define the name itself, so a
+  stale or wider copy (an omitted `tools` field means every tool) goes unseen until something
+  reads it. The count must be 0 and is part of the wiring rule; it is `null` when the
+  checkout's source folder, the `agents/` folder (a link, or not a folder), a link below it that
+  leads to a folder, or a shipped definition's installed copy cannot be read, and on a platform
+  that cannot read without following a link. The folders are read through descriptors, never
+  through a link ([the decision](decisions/2026-10-13-claude-agent-drift-check.md));
 - `project`, this checkout: `.claude/settings.json` sets the depth and the cap, and
   a project `.codex/config.toml` names the Serena, SocratiCode and ai-memory servers
   (optional since 2026-09-25: those servers now live at Codex user scope, so a fresh

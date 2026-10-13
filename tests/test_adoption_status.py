@@ -1,5 +1,6 @@
 """Adoption preflight boundaries; no credentials, services, or model calls."""
 
+import builtins
 import contextlib
 from datetime import date, datetime, timezone
 import dis
@@ -15,6 +16,7 @@ import re
 import shutil
 from shutil import which as native_which
 import signal
+import socket
 import subprocess
 import sys
 import tempfile
@@ -1881,6 +1883,36 @@ class ProbeSignalDispositionTests(unittest.TestCase):
             self.assertIs(signal.getsignal(signum), theirs, signum.name)
 
 
+class Interleaving:
+    """Tries a replacement at every point between two steps of a read. ``run(call, action, target)`` runs ``call`` with the file-system functions the checks use wrapped, and performs ``action`` once, right after the
+    ``target``-th of their calls returns (target 0: never). It returns (the value of ``call``, whether the action ran, how many calls were made): a replacement that another process could make between two
+    syscalls of the check is made between exactly those two, with the real file system and no invented result."""
+
+    FUNCTIONS = ((os, "lstat"), (os, "stat"), (os, "open"), (os, "fstat"), (os, "listdir"), (os, "scandir"), (builtins, "open"))
+
+    def run(self, call, action, target):
+        self.count, self.fired, self.busy = 0, False, False
+
+        def wrapped(real):
+            def step(*args, **keywords):
+                result = real(*args, **keywords)
+                if not self.busy:
+                    self.count += 1
+                    if self.count == target and not self.fired:
+                        self.busy = self.fired = True
+                        try:
+                            action()
+                        finally:
+                            self.busy = False
+                return result
+            return step
+        with contextlib.ExitStack() as stack:
+            for module, name in self.FUNCTIONS:
+                stack.enter_context(patch.object(module, name, wrapped(getattr(module, name))))
+            value = call()
+        return value, self.fired, self.count
+
+
 class ClientWiringTests(unittest.TestCase):
     """--client-wiring on fake homes: fixed keys, booleans and counts only, never text from a file."""
 
@@ -2523,7 +2555,7 @@ class ClientWiringTests(unittest.TestCase):
         (agents / "another.md").unlink()
         self.assertEqual(self.drift(), 0)
 
-    def test_the_four_vendor_definitions_are_listed_and_files_the_client_does_not_load_are_ignored(self):
+    def test_the_four_vendor_definitions_are_listed_and_files_that_are_not_markdown_are_ignored(self):
         self.assertEqual(VENDOR_HOST_AGENTS, ("codebase-memory-auditor.md", "codebase-memory-scout.md", "codebase-memory.md", "semble-search.md"))
         self.assertFalse(set(VENDOR_HOST_AGENTS) & {path.name for path in STACK_AGENTS_SOURCE.glob("*.md")}, "a listed definition is one this checkout does not ship")
         self.wire()
@@ -2532,7 +2564,7 @@ class ClientWiringTests(unittest.TestCase):
         self.assertEqual(self.drift(), 0)
         self.write(".claude/agents/" + AGENT_FILES[0] + ".bak.20261005T005836Z", agent_bytes(AGENT_FILES[0]) + b"\n")  # a backup is not an agent file
         self.write(".claude/agents/notes.txt", "x")
-        self.write(".claude/agents/nested/deep.md", agent_bytes("deep.md"))  # below the top of the folder
+        self.write(".claude/agents/nested/notes.txt", "x")  # the client keeps names ending .md only
         self.assertEqual(self.drift(), 0)
         self.assertEqual(self.wiring()["complete"], True)
 
@@ -2633,9 +2665,336 @@ class ClientWiringTests(unittest.TestCase):
         self.assertTrue(shipped and all(name.endswith(".md") for name in shipped), "the source folder holds definitions only")
         self.assertEqual(report["stack_agents_drift"], len(shipped))  # nothing installed: every shipped definition is missing
 
+    def make_socket(self, directory, name):
+        """A socket file ``name`` in ``directory``, bound by its relative name from there so that the length limit of a socket path (104 bytes on macOS) never matters."""
+        server = socket.socket(socket.AF_UNIX)
+        self.addCleanup(server.close)
+        here = os.getcwd()
+        os.chdir(directory)
+        try:
+            server.bind(name)
+        finally:
+            os.chdir(here)
+
+    def test_a_definition_below_the_top_is_drift_at_any_depth(self):
+        """Review of #1062 at e70d2de0a (the Claude read, P1): the client loads the agents folder recursively (https://code.claude.com/docs/en/sub-agents.md L176-L182; its walker enters every folder and keeps names ending
+        .md), so a definition below the top is one it serves, and the check read the top only: `agents/old/stack-verifier.md` reported 0 and `complete: true`."""
+        self.wire()
+        agents = self.home / ".claude/agents"
+        self.write(".claude/agents/old/" + AGENT_FILES[0], agent_bytes(AGENT_FILES[0]))  # a shipped name, one folder down
+        self.assertEqual((self.drift(), self.wiring()["complete"]), (1, False))
+        self.write(".claude/agents/a/b/c/d/deep.md", agent_bytes("deep.md"))
+        self.assertEqual(self.drift(), 2)
+        self.write(".claude/agents/.hidden/dot.md", agent_bytes("dot.md"))  # the client lists hidden files too
+        self.write(".claude/agents/.dot-at-the-top.md", agent_bytes("dot-at-the-top.md"))
+        self.assertEqual(self.drift(), 4)
+        self.write(".claude/agents/a/notes.txt", "x")
+        (agents / "empty").mkdir()
+        (agents / "folder.md").mkdir()  # a folder whose name ends .md is a folder: entered, not counted
+        self.assertEqual(self.drift(), 4)
+        shutil.rmtree(agents / "old")
+        shutil.rmtree(agents / "a")
+        shutil.rmtree(agents / ".hidden")
+        (agents / ".dot-at-the-top.md").unlink()
+        self.assertEqual((self.drift(), self.wiring()["complete"]), (0, True))
+
+    def test_a_vendor_file_that_declares_the_name_of_a_shipped_definition_is_drift(self):
+        """Review of #1062 (the Claude read, P3): the four vendor names were exempt whatever they held, and the client keys a definition by its `name`: one that declares a shipped role's name can replace it unseen
+        (of two files declaring one name, one is chosen by file system read order)."""
+        self.wire()
+        vendor = self.home / ".claude/agents" / VENDOR_HOST_AGENTS[0]
+        cases = (("another name", "---\nname: vendors-own\ndescription: x\n---\nbody\n", 0),
+                 ("a shipped name", agent_bytes(AGENT_FILES[0]), 1),
+                 ("a shipped name in double quotes", '---\nname: "source-scout"\n---\n', 1),
+                 ("a shipped name in single quotes", "---\nname: 'stack-verifier'  \n---\n", 1),
+                 ("a shipped name spelt with spaces before the colon", "---\nname : evidence-reviewer\n---\n", 1),
+                 ("a shipped name followed by a YAML comment", "---\nname: evidence-reviewer # the verifier\n---\n", 1),
+                 ("a quoted shipped name followed by a YAML comment", '---\nname: "source-scout" # c\n---\n', 1),
+                 ("the key in capitals", "---\nNAME: stack-verifier\n---\n", 1),
+                 ("a quoted name that merely contains a hash", "---\nname: 'evidence-reviewer # not a comment'\n---\n", 0),
+                 ("the text of a shipped definition under a vendor's name with another name", agent_bytes("someone-else.md"), 0),
+                 ("no front matter at all", "name: evidence-reviewer\n", 0),
+                 ("a name line under no opening block", "intro\nname: evidence-reviewer\n", 0),
+                 ("the name after the block", "---\ndescription: x\n---\nname: evidence-reviewer\n", 0),
+                 ("an unterminated block", "---\ndescription: x\n", 0),
+                 ("bytes that are not text", b"\xff\xfe\x00", 0),
+                 ("an empty file", "", 0))
+        for label, content, expected in cases:
+            with self.subTest(case=label):
+                self.write(f".claude/agents/{VENDOR_HOST_AGENTS[0]}", content)
+                self.assertEqual(self.drift(), expected)
+        vendor.unlink()
+        self.assertEqual(self.drift(), 0)
+        for name in VENDOR_HOST_AGENTS:  # each of the four, with a shipped name
+            with self.subTest(vendor=name):
+                self.write(f".claude/agents/{name}", agent_bytes(AGENT_FILES[1]))
+                self.assertEqual(self.drift(), 1)
+                (self.home / ".claude/agents" / name).unlink()
+        self.assertEqual(self.drift(), 0)
+
+    @unittest.skipIf(hasattr(os, "geteuid") and os.geteuid() == 0, "root reads a file whatever its mode")
+    def test_a_vendor_file_that_cannot_be_read_is_not_drift_for_what_it_might_declare(self):
+        """The client runs as the same user and cannot read it either, so it loads no definition from it."""
+        self.wire()
+        vendor = self.home / ".claude/agents" / VENDOR_HOST_AGENTS[0]
+        vendor.write_bytes(agent_bytes(AGENT_FILES[0]))
+        vendor.chmod(0)
+        try:
+            self.assertEqual(self.drift(), 0)
+        finally:
+            vendor.chmod(0o644)
+        self.assertEqual(self.drift(), 1)
+
+    def test_a_folder_that_cannot_be_listed_after_it_was_opened_is_unknown(self):
+        self.wire()
+        real = os.listdir
+
+        def failing(path=None):
+            if isinstance(path, int):  # the agents folder is read by descriptor
+                raise PermissionError(errno.EACCES, "denied")
+            return real(path)
+        with patch.object(os, "listdir", failing):
+            self.assertIsNone(self.drift())
+        self.assertEqual(self.drift(), 0)
+
+    def test_a_vendor_name_below_the_top_or_as_a_link_is_not_the_vendors_own(self):
+        self.wire()
+        agents = self.home / ".claude/agents"
+        self.write(".claude/agents/sub/" + VENDOR_HOST_AGENTS[1], "vendor\n")  # the exemption is for the top, where the vendors' tools write
+        self.assertEqual(self.drift(), 1)
+        (agents / "sub" / VENDOR_HOST_AGENTS[1]).unlink()
+        self.assertEqual(self.drift(), 0)
+        elsewhere = self.write("elsewhere.md", "x")
+        (agents / VENDOR_HOST_AGENTS[2]).symlink_to(elsewhere)  # the client follows it and nothing here can say what it declares
+        self.assertEqual(self.drift(), 1)
+
+    def test_links_and_other_kinds_below_the_top_are_counted_or_unknown_never_followed(self):
+        self.wire()
+        agents = self.home / ".claude/agents"
+        target_file, target_folder = self.write("target-file.md", agent_bytes("target.md")), self.home / "target-folder"
+        target_folder.mkdir()
+        (target_folder / "inside.md").write_bytes(agent_bytes("inside.md"))
+        (agents / "sub").mkdir()
+        (agents / "sub" / "link.md").symlink_to(target_file)  # a link named *.md: a definition the client would load
+        self.assertEqual(self.drift(), 1)
+        (agents / "dangling.md").symlink_to(self.home / "missing.md")
+        self.assertEqual(self.drift(), 2)
+        (agents / "notes-link").symlink_to(target_file)  # a link to a file not named *.md: the client keeps names ending .md only
+        (agents / "dangling-notes").symlink_to(self.home / "missing-notes")
+        self.assertEqual(self.drift(), 2)
+        os.mkfifo(agents / "pipe.md")  # opened without blocking, and described by what was opened
+        self.assertEqual(self.drift(), 3)
+        os.mkfifo(agents / "pipe-notes")
+        self.assertEqual(self.drift(), 3)
+        self.make_socket(agents, "socket.md")
+        self.assertEqual(self.drift(), 4)
+        (agents / "pipe.md").unlink()
+        (agents / "socket.md").unlink()
+        (agents / "sub" / "link.md").unlink()
+        (agents / "dangling.md").unlink()
+        self.assertEqual(self.drift(), 0)
+        for where, name in ((agents, "linked-folder"), (agents, "linked-folder.md"), (agents / "sub", "deeper-link")):
+            with self.subTest(link=f"{where.name}/{name}"):
+                (where / name).symlink_to(target_folder)  # the client follows a link to a folder and loads what is in it: not known here
+                self.assertIsNone(self.drift())
+                self.assertEqual(self.wiring()["complete"], False)
+                (where / name).unlink()
+                self.assertEqual(self.drift(), 0)
+
+    def test_the_walk_is_bounded_and_a_tree_past_the_bound_is_unknown_not_a_count(self):
+        self.wire()
+        agents = self.home / ".claude/agents"
+        self.write(".claude/agents/one/two/three.md", agent_bytes("three.md"))
+        with patch.object(adoption_status, "AGENT_WALK_DEPTH", 2):
+            self.assertEqual(self.drift(), 1)  # the file sits two folders down: at the bound
+        with patch.object(adoption_status, "AGENT_WALK_DEPTH", 1):
+            self.assertIsNone(self.drift())
+        entries = len(AGENT_FILES) + 3  # the shipped files, one, two and three.md
+        with patch.object(adoption_status, "AGENT_WALK_ENTRIES", entries):
+            self.assertEqual(self.drift(), 1)
+        with patch.object(adoption_status, "AGENT_WALK_ENTRIES", entries - 1):
+            self.assertIsNone(self.drift())
+        self.assertEqual(adoption_status.AGENT_WALK_DEPTH, 8)
+        self.assertGreaterEqual(adoption_status.AGENT_WALK_ENTRIES, 1_000)
+
+    def test_the_folders_are_opened_below_a_descriptor_without_following_a_link(self):
+        """Review of #1062 (Astra, P1): the check inspected a path and opened it again, so a replacement between the two was read through. Every open below the Claude home is relative to the descriptor of its folder
+        and refuses a link; what is described is what the descriptor holds."""
+        self.wire()
+        self.write(".claude/agents/sub/extra.md", agent_bytes("extra.md"))
+        opens = []
+        real_open = os.open
+
+        def recording(path, flags, *rest, dir_fd=None, **keywords):
+            opens.append((str(path), flags, dir_fd))
+            return real_open(path, flags, *rest, dir_fd=dir_fd, **keywords)
+        with patch.object(os, "open", recording):
+            self.assertEqual(adoption_status.stack_agents_drift(self.home / ".claude", self.root / "adoption/agents/claude"), 1)
+        below = [entry for entry in opens if entry[2] is not None]
+        self.assertGreaterEqual(len(below), len(AGENT_FILES) + 3, "agents, every entry and the folder below")
+        for entry_path, flags, dir_fd in below:
+            self.assertTrue(flags & os.O_NOFOLLOW, entry_path)
+            self.assertEqual(os.sep in entry_path, False, "a name relative to its folder's descriptor, never a path")
+        self.assertTrue(any(flags & os.O_DIRECTORY for _, flags, _ in below))
+        self.assertEqual(len(opens) - len(below), len(AGENT_FILES) + 1, "the Claude home and the checkout's source files are the only opens by path")
+
+    def test_a_platform_that_cannot_refuse_links_reads_nothing(self):
+        self.wire()
+        self.assertEqual((self.drift(), self.roles()), (0, 2))
+        with patch.object(adoption_status, "NO_FOLLOW_READS", False):
+            result = self.wiring()
+            self.assertEqual((result["claude"]["stack_agents_drift"], result["codex"]["stack_roles_matching"], result["complete"]), (None, None, False))
+            self.assertIsNone(adoption_status.read_regular_bytes(self.home / ".claude/settings.json"), "no fallback to checking the path first")
+        self.assertEqual((self.drift(), self.roles(), self.wiring()["complete"]), (0, 2, True))
+
+    def test_read_regular_bytes_answers_for_every_kind_of_entry_without_following_a_link(self):
+        folder = self.home / "kinds"
+        folder.mkdir()
+        regular = self.write("kinds/regular.md", b"bytes")
+        (folder / "link-to-file").symlink_to(regular)
+        (folder / "dangling").symlink_to(folder / "missing")
+        (folder / "folder").mkdir()
+        os.mkfifo(folder / "pipe")
+        self.make_socket(folder, "socket")
+        (folder / "big").write_bytes(b"x" * 11)
+        read = adoption_status.read_regular_bytes
+        self.assertEqual(read(regular), b"bytes")
+        self.assertEqual(read(folder / "absent"), adoption_status.ABSENT)
+        for name in ("link-to-file", "dangling", "folder", "pipe", "socket"):
+            with self.subTest(entry=name):
+                self.assertEqual(read(folder / name), adoption_status.NOT_A_FILE)
+        self.assertIsNone(read(folder / "big", 10), "over the limit")
+        self.assertEqual(read(folder / "big", 11), b"x" * 11)
+        self.assertIsNone(read(regular / "below-a-file"), "a path through a file")
+        descriptor = os.open(folder, os.O_RDONLY | os.O_DIRECTORY)
+        self.addCleanup(os.close, descriptor)
+        self.assertEqual(read("regular.md", dir_fd=descriptor), b"bytes")
+        self.assertEqual(read("link-to-file", dir_fd=descriptor), adoption_status.NOT_A_FILE)
+
+    def interleave(self, build, call, action_for, allowed, minimum_points):
+        """Run ``call`` on a fresh fixture for every point at which ``action_for(fixture)`` can be made, and once with no action: every answer must be one of ``allowed``, and the points must be numerous."""
+        fixture = build()
+        value, fired, calls = Interleaving().run(lambda: call(fixture), lambda: None, 0)
+        self.assertFalse(fired)
+        self.assertIn(value, allowed, "no replacement: the answer the fixture gives")
+        answers = {}
+        for target in range(1, calls + 3):
+            fixture = build()
+            value, fired, _ = Interleaving().run(lambda: call(fixture), lambda: action_for(fixture), target)
+            if not fired:
+                break
+            answers[target] = value
+            self.assertIn(value, allowed, f"a replacement after step {target} changed the answer")
+        self.assertGreaterEqual(len(answers), minimum_points, "the replacement was tried at too few points to mean anything")
+        return answers
+
+    def race_fixture(self, kind):
+        """A Claude home whose first shipped definition is stale (drift 1 as it stands), a folder outside it that holds exact copies of everything (what a path read through a replacement would see), and the checkout's source folder."""
+        base = Path(tempfile.mkdtemp(prefix=f"race-{kind}-"))
+        self.addCleanup(shutil.rmtree, base, True)
+        source, home, outside = base / "source", base / "claude", base / "outside"
+        for folder in (source, home / "agents", outside / "agents"):
+            folder.mkdir(parents=True)
+        for name in AGENT_FILES:
+            for folder in (source, outside / "agents"):
+                (folder / name).write_bytes(agent_bytes(name))
+            (home / "agents" / name).write_bytes(agent_bytes(name))
+        (home / "agents" / AGENT_FILES[0]).write_bytes(agent_bytes(AGENT_FILES[0]) + b"stale\n")
+        return {"base": base, "source": source, "home": home, "agents": home / "agents", "outside": outside}
+
+    def test_a_replacement_of_a_shipped_file_at_any_point_is_never_read_through(self):
+        """Review of #1062 (Astra, P1): after the check looked at a shipped copy, the entry became a link to an outside file whose bytes equal the source, and the check read it: 0 and `complete: true`. A replacement is
+        made after every step of the read; the answer is the stale copy that was there (1) or unknown, never 0."""
+        def swap_in_a_link(fixture):
+            link = fixture["agents"] / ".swap"
+            os.symlink(fixture["outside"] / "agents" / AGENT_FILES[0], link)
+            os.replace(link, fixture["agents"] / AGENT_FILES[0])
+        answers = self.interleave(lambda: self.race_fixture("file"), lambda f: adoption_status.stack_agents_drift(f["home"], f["source"]), swap_in_a_link, {1, None}, 12)
+        self.assertIn(1, answers.values(), "a replacement after the file was opened reads the stale copy that was opened")
+
+    def test_a_replacement_of_the_agents_folder_at_any_point_is_never_read_through(self):
+        def swap_in_a_link(fixture):
+            os.rename(fixture["agents"], fixture["home"] / "agents-original")
+            os.symlink(fixture["outside"] / "agents", fixture["agents"])
+        answers = self.interleave(lambda: self.race_fixture("folder"), lambda f: adoption_status.stack_agents_drift(f["home"], f["source"]), swap_in_a_link, {1, None}, 12)
+        self.assertIn(None, answers.values(), "a link that is there when the folder is opened is refused")
+        self.assertIn(1, answers.values(), "a link that comes after the folder was opened leaves the opened folder as the one read")
+
+    def test_a_replacement_of_a_folder_below_the_top_at_any_point_is_never_read_through(self):
+        def build():
+            fixture = self.race_fixture("nested")
+            (fixture["agents"] / AGENT_FILES[0]).write_bytes(agent_bytes(AGENT_FILES[0]))
+            (fixture["agents"] / "nested").mkdir()
+            (fixture["agents"] / "nested" / "extra.md").write_bytes(agent_bytes("extra.md"))
+            (fixture["outside"] / "empty").mkdir()
+            return fixture
+
+        def swap_in_a_link(fixture):
+            os.rename(fixture["agents"] / "nested", fixture["agents"] / "nested-original")
+            os.symlink(fixture["outside"] / "empty", fixture["agents"] / "nested")
+        answers = self.interleave(build, lambda f: adoption_status.stack_agents_drift(f["home"], f["source"]), swap_in_a_link, {1, None}, 12)
+        self.assertNotIn(0, answers.values())
+
+    def roles_fixture(self):
+        """A Codex home whose first role carrier is stale (1 matches as it stands) and an outside folder with exact copies."""
+        base = Path(tempfile.mkdtemp(prefix="race-roles-"))
+        self.addCleanup(shutil.rmtree, base, True)
+        source, home, outside = base / "source", base / "codex", base / "outside"
+        for folder in (source, home / "agents", outside / "agents"):
+            folder.mkdir(parents=True)
+        for name in ROLE_FILES:
+            for folder in (source, home / "agents", outside / "agents"):
+                (folder / name).write_bytes(role_bytes(name))
+        (home / "agents" / ROLE_FILES[0]).write_bytes(role_bytes(ROLE_FILES[0]) + b"stale\n")
+        return {"base": base, "source": source, "home": home, "agents": home / "agents", "outside": outside}
+
+    def test_the_codex_role_count_is_never_read_through_a_replacement_either(self):
+        """The shared reader's other caller (Astra asked for it to be audited): the same two replacements, made after every step, with a count of 1 as it stands."""
+        def file_link(fixture):
+            link = fixture["agents"] / ".swap"
+            os.symlink(fixture["outside"] / "agents" / ROLE_FILES[0], link)
+            os.replace(link, fixture["agents"] / ROLE_FILES[0])
+
+        def folder_link(fixture):
+            os.rename(fixture["agents"], fixture["home"] / "agents-original")
+            os.symlink(fixture["outside"] / "agents", fixture["agents"])
+        for label, action in (("file", file_link), ("folder", folder_link)):
+            with self.subTest(replaced=label):
+                answers = self.interleave(self.roles_fixture, lambda f: adoption_status.stack_roles_matching(f["home"], f["source"]), action, {1, None}, 6)
+                self.assertNotIn(2, answers.values())
+
+    def test_an_installed_definition_over_the_size_limit_is_unknown_not_drift(self):
+        self.wire()
+        definition = self.home / ".claude/agents" / AGENT_FILES[0]
+        definition.write_bytes(b"x" * (adoption_status.CLIENT_FILE_LIMIT + 1))  # the client reads a file up to a limit too
+        self.assertIsNone(self.drift())
+        definition.write_bytes(b"x" * adoption_status.CLIENT_FILE_LIMIT)  # at the limit it is read, and it differs
+        self.assertEqual(self.drift(), 1)
+
+    @unittest.skipIf(hasattr(os, "geteuid") and os.geteuid() == 0, "root reads a folder whatever its mode")
+    def test_an_unreadable_folder_below_the_top_is_unknown(self):
+        self.wire()
+        locked = self.home / ".claude/agents/locked"
+        locked.mkdir()
+        locked.chmod(0)
+        try:
+            self.assertIsNone(self.drift())
+        finally:
+            locked.chmod(0o755)
+        self.assertEqual(self.drift(), 0)
+
+    def test_an_entry_that_vanishes_between_the_listing_and_its_opening_is_unknown(self):
+        """Not 0 and not a count that leaves it out: the entry was listed, so the folder changed while it was read, and what it held is not known."""
+        def vanish(fixture):
+            (fixture["agents"] / AGENT_FILES[1]).unlink()
+        answers = self.interleave(lambda: self.race_fixture("vanish"), lambda f: adoption_status.stack_agents_drift(f["home"], f["source"]), vanish, {1, 2, None}, 12)
+        self.assertIn(None, answers.values(), "a vanished entry is unknown")
+        self.assertIn(1, answers.values(), "after it was opened it is read as it was")
+        self.assertIn(2, answers.values(), "before the listing it is simply absent")
+
     def test_the_limitations_name_the_agent_folders_the_check_compares(self):
         text = CLIENT_WIRING_LIMITATIONS[0]
-        for needle in ("Claude agent definitions", "adoption/agents/claude", "must be 0"):
+        for needle in ("Claude agent definitions", "adoption/agents/claude", "must be 0", "any folder below it", "never through a link"):
             self.assertIn(needle, text)
 
     def test_a_text_value_can_never_leave_the_check(self):

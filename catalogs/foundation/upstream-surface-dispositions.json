@@ -2411,7 +2411,7 @@
    "key": "codex:host:RTK.md",
    "disposition": "declined",
    "reason": "Codex 0.160.0 loads only AGENTS.override.md or AGENTS.md text and expands no @-imports, so ~/.codex/RTK.md never reaches the model.",
-   "source": "scripts/adoption_status.py:510-517",
+   "source": "scripts/adoption_status.py:532-553",
    "carrier": null,
    "value": null,
    "scope": "NativeStack2604",
