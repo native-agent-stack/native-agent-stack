@@ -65,6 +65,7 @@
       "agents": ["claude-code"],
       "native_plugin": "claude-api@anthropic-agent-skills",
       "claude_skill_name": "claude-api:claude-api",
+      "bundled_twin": "claude-api",
       "added": "2026-10-10",
       "marketplace_entry": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/.claude-plugin/marketplace.json#L46"
     },
@@ -91,7 +92,9 @@
       "status": "kept",
       "gap": "Verdict winner (instructions-skills row): typed semantic judgments for evidence review; used by the semantic-evidence-reviewer role.",
       "claude_listing": "on",
-      "codex_enabled": true
+      "codex_enabled": true,
+      "claude_plugin": "typesafe@typesafe-ai",
+      "claude_skill_name": "typesafe:typesafe-ai"
     },
     {
       "name": "gh-fix-ci",

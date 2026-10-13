@@ -1,0 +1,4 @@
+code.claude.com/docs/en/skills.md, fetched 2026-10-13T10:29:20Z (107130 bytes, sha256 35fd2c11f870fbe1497a53796de31b2a6b760645e724bda58894525356d4602a); the lines that say plugin skills are outside skillOverrides:
+L333: * **Bundled skill**: set [`disableBundledSkills`](#bundled-skills) to `true` to turn off bundled skills, or set one skill to `"off"` in [`skillOverrides`](#override-skill-visibility-from-settings) to hide it.
+L909: Plugin skills are not affected by `skillOverrides`. Manage those through `/plugin` instead.
+L928: * **Skill that a plugin provides**: `skillOverrides` doesn't apply to plugin skills. Use [`claude plugin eval`](/docs/en/plugin-evals#the-no-plugin-baseline) instead, which repeats each run with no plugin loaded.

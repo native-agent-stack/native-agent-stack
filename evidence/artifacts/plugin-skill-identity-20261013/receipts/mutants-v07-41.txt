@@ -1,0 +1,44 @@
+The 41 mutants of CPA-V-07 (the manifest loader checks, the plugin registry and settings readers, the twin check and its states, the personal row's expected listing, the combined usage row): one exact change each to scripts/skills_status.py or tools/skill-usage/skill_usage.py, in a scratch copy, then tests.test_skills_manifest, tests.test_skills_status and tests.test_skill_usage_daily; a mutant is killed when the run fails (the unmutated run passes first).
+
+killed   (failed) a plugin id needs no marketplace
+killed   (failed) the plugin ids are not checked
+killed   (failed) a copy and a plugin row may coexist
+killed   (failed) a bundled twin may sit on any row
+killed   (failed) a bundled twin need not be a name
+killed   (failed) the listing name is not checked
+killed   (failed) the listing name drops the plugin
+killed   (failed) a plugin counts as enabled whatever its value
+killed   (failed) a plugin of another scope counts as installed
+killed   (failed) a registry entry in the object form is not read
+killed   (failed) an unreadable registry counts as installed
+killed   (failed) the twin plugin is the wrong one
+killed   (failed) the twin is always the row's name
+killed   (failed) the plugin is present when installed or enabled
+killed   (failed) the plugin is present when only enabled
+killed   (failed) the plugin is present when only installed
+killed   (failed) the plugin is never present
+killed   (failed) a hidden twin is a duplicate
+killed   (failed) any override hides the twin
+killed   (failed) a twin is never a duplicate
+killed   (failed) the personal copy is expected listed where the plugin is present
+killed   (failed) the personal copy is expected hidden without the plugin
+killed   (failed) a plugin row passes with a duplicate
+killed   (failed) a plugin row passes on its twin alone
+killed   (failed) a personal row reports no twin
+killed   (failed) a plugin row reports no twin
+killed   (failed) the text shows no twin
+killed   (failed) every row gets a twin entry
+killed   (failed) the personal listing of a copy is not counted
+killed   (failed) the bundled listing is not counted
+killed   (failed) the plugin listing is not counted
+killed   (failed) a listing named twice is counted twice
+killed   (failed) one listing is combined too
+killed   (failed) a missing listing is a row
+killed   (failed) the uses are the larger
+killed   (failed) the context is the first
+killed   (failed) the context is zero when unknown
+killed   (failed) the last use is the first listing's
+killed   (failed) a listing that was not used gives the last use
+killed   (failed) the combined row keeps a window it cannot know
+killed   (failed) the report does not use the combined row
+41 mutants, 41 killed, survivors: none

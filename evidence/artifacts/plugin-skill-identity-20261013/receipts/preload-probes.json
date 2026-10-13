@@ -1,0 +1,79 @@
+{
+ "client": "2.1.296",
+ "model": "claude-haiku-5-5",
+ "question": "the subagent is asked whether the full text of the typesafe skill is in its context and to quote the first heading of its body, answering only from its context (no tools but Read, told not to use it)",
+ "probes": [
+  {
+   "probe": "A-short-default",
+   "subagent": "probe-ts (skills: typesafe-ai)",
+   "settings_overlay": "no overlay",
+   "subagent_quoted_the_skills_first_body_heading": true,
+   "cost_usd": 0.0114
+  },
+  {
+   "probe": "B-short-personal-off",
+   "subagent": "probe-ts (skills: typesafe-ai)",
+   "settings_overlay": "{\"skillOverrides\":{\"typesafe-ai\":\"off\"}}",
+   "subagent_quoted_the_skills_first_body_heading": true,
+   "cost_usd": 0.0078
+  },
+  {
+   "probe": "B2-short-personal-off",
+   "subagent": "probe-ts (skills: typesafe-ai)",
+   "settings_overlay": "{\"skillOverrides\":{\"typesafe-ai\":\"off\"}}",
+   "subagent_quoted_the_skills_first_body_heading": true,
+   "cost_usd": 0.0067
+  },
+  {
+   "probe": "B3-short-personal-off",
+   "subagent": "probe-ts (skills: typesafe-ai)",
+   "settings_overlay": "{\"skillOverrides\":{\"typesafe-ai\":\"off\"}}",
+   "subagent_quoted_the_skills_first_body_heading": true,
+   "cost_usd": 0.0069
+  },
+  {
+   "probe": "C-qualified-default",
+   "subagent": "probe-tsq (skills: typesafe:typesafe-ai)",
+   "settings_overlay": "no overlay",
+   "subagent_quoted_the_skills_first_body_heading": true,
+   "cost_usd": 0.0081
+  },
+  {
+   "probe": "C2-qualified-default",
+   "subagent": "probe-tsq (skills: typesafe:typesafe-ai)",
+   "settings_overlay": "no overlay",
+   "subagent_quoted_the_skills_first_body_heading": true,
+   "cost_usd": 0.0067
+  },
+  {
+   "probe": "C3-qualified-default",
+   "subagent": "probe-tsq (skills: typesafe:typesafe-ai)",
+   "settings_overlay": "no overlay",
+   "subagent_quoted_the_skills_first_body_heading": true,
+   "cost_usd": 0.007
+  },
+  {
+   "probe": "D-qualified-personal-off",
+   "subagent": "probe-tsq (skills: typesafe:typesafe-ai)",
+   "settings_overlay": "{\"skillOverrides\":{\"typesafe-ai\":\"off\"}}",
+   "subagent_quoted_the_skills_first_body_heading": true,
+   "cost_usd": 0.0068
+  },
+  {
+   "probe": "D2-qualified-personal-off",
+   "subagent": "probe-tsq (skills: typesafe:typesafe-ai)",
+   "settings_overlay": "{\"skillOverrides\":{\"typesafe-ai\":\"off\"}}",
+   "subagent_quoted_the_skills_first_body_heading": true,
+   "cost_usd": 0.0069
+  },
+  {
+   "probe": "D3-qualified-personal-off",
+   "subagent": "probe-tsq (skills: typesafe:typesafe-ai)",
+   "settings_overlay": "{\"skillOverrides\":{\"typesafe-ai\":\"off\"}}",
+   "subagent_quoted_the_skills_first_body_heading": true,
+   "cost_usd": 0.0068
+  }
+ ],
+ "all_quoted": true,
+ "reading": "an agent that preloads the skill by its short name or by its qualified name gets the skill's body with the personal copy hidden (3 of 3 probes each for the short and the qualified name, and the two with default settings)"
+}

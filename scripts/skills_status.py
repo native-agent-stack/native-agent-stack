@@ -104,6 +104,7 @@ RUNTIME_ARTIFACT_DIRS = frozenset({"__pycache__", ".venv", "node_modules", ".pyt
                                    ".ruff_cache", ".mypy_cache"})
 
 NAME_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]*\Z")
+PLUGIN_ID_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]*@[A-Za-z0-9][A-Za-z0-9_.-]*\Z")
 SHA1_RE = re.compile(r"[0-9a-f]{40}\Z")
 SHA256_RE = re.compile(r"[0-9a-f]{64}\Z")
 REQUIRED_SKILL_KEYS = {"name", "tree_sha", "skill_md_sha256", "skill_md_bytes",
@@ -177,6 +178,17 @@ def load_manifest(path: Path) -> dict:
         require(isinstance(skill.get("copy", False), bool), f"{label}: copy must be a boolean")
         require(not skill.get("copy") or agents == ["claude-code"],
                 f"{label}: copy is supported for a Claude-Code-only entry")
+        # Claude Code lists a plugin's skill as <plugin>:<skill> whatever skillOverrides says (measured on 2.1.296), so a skill that
+        # a plugin delivers besides this repository's own copy (claude_plugin) or besides the client's bundled one (native_plugin
+        # with bundled_twin) is listed twice. The row names the plugin and the qualified listing name.
+        plugin, native, twin = skill.get("claude_plugin"), skill.get("native_plugin"), skill.get("bundled_twin")
+        for key, value in (("claude_plugin", plugin), ("native_plugin", native)):
+            require(value is None or (isinstance(value, str) and bool(PLUGIN_ID_RE.match(value))), f"{label}: {key} must be <plugin>@<marketplace>")
+        require(not (plugin and native), f"{label}: claude_plugin (a copy of this repository that a plugin also delivers) and native_plugin (the plugin is the row) exclude each other")
+        require(twin is None or (isinstance(twin, str) and bool(NAME_RE.match(twin)) and bool(native)), f"{label}: bundled_twin names the client's own skill and belongs on a native_plugin row")
+        if plugin or native:
+            require(skill.get("claude_skill_name") == f"{(plugin or native).split('@')[0]}:{name}",
+                    f"{label}: claude_skill_name must be <plugin>:<skill>, the name Claude Code lists the plugin's copy under")
     cli = data.get("cli")
     require(isinstance(cli, dict) and isinstance(cli.get("version"), str) and bool(cli["version"]),
             "cli.version must be a nonempty string")
@@ -443,6 +455,48 @@ def check_claude_link(link: Path, canonical: Path, parent_alias: bool = False) -
     return {"state": "not_a_symlink", "kind": "copy"}
 
 
+def load_enabled_plugins(path: Path) -> set:
+    """The plugin ids that settings.json enables (enabledPlugins true); an empty set for a missing, unreadable or malformed file. Only the ids ever leave this function."""
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return set()
+    plugins = data.get("enabledPlugins") if isinstance(data, dict) else None
+    return {key for key, value in plugins.items() if value is True and isinstance(key, str)} if isinstance(plugins, dict) else set()
+
+
+def plugin_installed(plugin_id: str, config: Path) -> bool:
+    """Whether the native user-plugin registry (installed_plugins.json, schema 2) holds a user-scope install of ``plugin_id``; never an installPath or a credential."""
+    try:
+        registry = json.loads((config / "plugins/installed_plugins.json").read_text(encoding="utf-8"))
+        entries = registry.get("plugins", {}).get(plugin_id, [])
+        entries = [entries] if isinstance(entries, dict) else entries
+        return any(isinstance(row, dict) and row.get("scope") == "user" for row in entries)
+    except (OSError, ValueError, TypeError, AttributeError):
+        return False
+
+
+def claude_twin_ids(skill: dict) -> str | None:
+    """The plugin id whose copy of this skill Claude Code lists beside another: ``claude_plugin`` for a skill this repository installs as a personal skill, ``native_plugin`` for a plugin row whose client-bundled twin
+    (``bundled_twin``) is listed under the bare name. None when the row has no twin."""
+    return skill.get("native_plugin") if skill.get("bundled_twin") else skill.get("claude_plugin")
+
+
+def check_claude_twin(skill: dict, overrides: dict, enabled: set, config: Path, plugin_ok: bool | None = None) -> dict:
+    """Claude Code lists a plugin's skill as ``<plugin>:<skill>`` and skillOverrides cannot hide it (measured on 2.1.296: docs/decisions/2026-10-13-plugin-skill-identity.md), so a skill that a plugin and the other copy
+    (a personal one, or the client's bundled one) both deliver is listed twice, and only the copy that is not the plugin's can be hidden. State "ok" for a row without a twin, for a host on which the plugin is not
+    enabled and installed (one copy), and for a host where the twin is hidden ("off"); "duplicate_listing" when the plugin is present and the twin is not hidden (also when skillOverrides has the wrong type, which hides
+    nothing). A settings.json that cannot be read lists no enabled plugin, so no plugin is present: the personal copy's own listing check reports the unreadable file."""
+    plugin = claude_twin_ids(skill)
+    if plugin is None:
+        return {"state": "ok", "twin": None, "plugin_present": None}
+    twin_name = skill["bundled_twin"] if skill.get("bundled_twin") else skill["name"]
+    present = (plugin_ok if plugin_ok is not None else plugin_installed(plugin, config)) and plugin in enabled
+    if not present:
+        return {"state": "ok", "twin": twin_name, "plugin_present": False}
+    return {"state": "ok" if overrides.get(twin_name) == "off" else "duplicate_listing", "twin": twin_name, "plugin_present": True}
+
+
 def check_claude_listing(overrides: dict, overrides_state: str, skill: dict) -> dict:
     if overrides_state != "ok":
         return {"state": "settings_unreadable", "actual": None}
@@ -653,20 +707,23 @@ def inspect(manifest: dict, home: Path, env=None, skills_bin: str | None = None)
     lock_file, lock_source = resolve_lock_path(home, env)
     lock_data, lock_state = load_lock(lock_file)
     overrides, overrides_state = load_skill_overrides(claude_settings_path(home, env))
+    enabled_plugins = load_enabled_plugins(claude_settings_path(home, env))
+    claude_config = claude_skills_dir(home, env).parent
     codex_config_file = codex_config_path(home, env)
     codex_config, codex_config_state = load_codex_config(codex_config_file)
 
     skills_report = []
     for skill in manifest["skills"]:
         name = skill["name"]
+        twin = check_claude_twin(skill, overrides, enabled_plugins, claude_config) if claude_twin_ids(skill) else None
         if skill.get("native_plugin"):
             plugin = native_plugin_status(skill, home, env)
-            skills_report.append({"name": name, "pass": plugin["state"] == "ok", "scope": "native Claude plugin",
+            skills_report.append({"name": name, "pass": plugin["state"] == "ok" and (twin is None or twin["state"] == "ok"), "scope": "native Claude plugin",
                                   "canonical": plugin, "lock": plugin,
                                   "claude_link": {"state": "ok", "kind": "native-plugin"},
                                   "claude_listing": {"state": "native-plugin", "actual": None},
                                   "codex_disable": {"state": "ok", "disable_entry_present": False},
-                                  "folder_tree": {"state": "native-plugin"}})
+                                  "folder_tree": {"state": "native-plugin"}, **({"claude_twin": twin} if twin else {})})
             continue
         if skill.get("status") == "held":
             # Not installed while held (tools/adoption/install_skills.py skips it); a folder left from an earlier
@@ -699,16 +756,19 @@ def inspect(manifest: dict, home: Path, env=None, skills_bin: str | None = None)
                                   "scope": "claude-code copy", **checks,
                                   "folder_tree": check_folder_tree(claude_skills, skill)})
             continue
+        # Where a plugin also delivers this skill, the personal copy is hidden (the host's skillOverrides), so the listing expected here is "off".
+        listing_row = {**skill, "claude_listing": "off"} if twin and twin["plugin_present"] else skill
         checks = {
             "canonical": check_canonical(agents_skills, skill),
             "lock": check_lock_entry(lock_data, lock_state, skill),
             "claude_link": check_claude_link(claude_skills / name, agents_skills / name, parent_alias=True),
-            "claude_listing": check_claude_listing(overrides, overrides_state, skill),
+            "claude_listing": check_claude_listing(overrides, overrides_state, listing_row),
             # skills 1.7.0 installs a global Codex skill only at this canonical folder (src/installer.ts L392-402),
             # which Codex loads from its $HOME/.agents/skills root (ext/skills/src/host_roots.rs L103-108).
             "codex_disable": check_codex_disable(codex_config, codex_config_state, skill,
                                                  skill_md=agents_skills / name / SKILL_MD, home=home,
                                                  config_dir=codex_config_file.parent),
+            **({"claude_twin": twin} if twin else {}),
         }
         skills_report.append({"name": name, "pass": all(item["state"] == "ok" for item in checks.values()),
                               **checks, "folder_tree": check_folder_tree(agents_skills, skill)})
@@ -746,7 +806,8 @@ def render_text(report: dict) -> str:
             f"{'ok' if skill['pass'] else 'fail':<5} {skill['name']:<32} "
             f"canonical={skill['canonical']['state']} lock={skill['lock']['state']} "
             f"link={link['state']}({link['kind']}) listing={listing['state']}({listing['actual']}) "
-            f"codex={skill['codex_disable']['state']} tree={skill['folder_tree']['state']}")
+            f"codex={skill['codex_disable']['state']} tree={skill['folder_tree']['state']}"
+            + (f" twin={skill['claude_twin']['state']}" if "claude_twin" in skill else ""))
     extra = report["extra_skills"]
     lines.append("extra skills not in manifest: " + (", ".join(
         f"{item['name']}(agents_dir={item['in_agents_dir']},lock={item['in_lock']})" for item in extra

@@ -36,6 +36,60 @@ class PluginUsageTests(unittest.TestCase):
         self.assertEqual(1, report["skills"][0]["age_days"])
 
 
+class TwinListingUsageTests(unittest.TestCase):
+    """CPA-V-07: a skill that a plugin and another copy both deliver is listed under two names in the /skill-doctor table, and a use of either is a use of the skill."""
+
+    ROWS = {"typesafe:typesafe-ai": {"source": "plugin", "context_tokens": 100, "tokens_7d": None, "uses": 2, "last_used": "1d ago"},
+            "typesafe-ai": {"source": "userSettings", "context_tokens": 90, "tokens_7d": None, "uses": 3, "last_used": "3d ago"}}
+
+    def skill(self, **extra):
+        return {"name": "typesafe-ai", "claude_plugin": "typesafe@typesafe-ai", "claude_skill_name": "typesafe:typesafe-ai", **extra}
+
+    def test_both_listings_are_one_row_with_the_uses_added(self):
+        row = usage.claude_row(self.skill(), self.ROWS)
+        self.assertEqual((row["uses"], row["context_tokens"], row["last_used"]), (5, 190, "1d ago"))
+
+    def test_one_listing_is_that_row_and_none_is_none(self):
+        self.assertEqual(usage.claude_row(self.skill(), {"typesafe-ai": self.ROWS["typesafe-ai"]}), self.ROWS["typesafe-ai"])
+        self.assertEqual(usage.claude_row(self.skill(), {"typesafe:typesafe-ai": self.ROWS["typesafe:typesafe-ai"]}), self.ROWS["typesafe:typesafe-ai"])
+        self.assertIsNone(usage.claude_row(self.skill(), {}))
+
+    def test_the_last_use_is_that_of_the_listing_that_was_used(self):
+        rows = {name: dict(row, uses=0, last_used="never") for name, row in self.ROWS.items()}
+        rows["typesafe-ai"]["uses"], rows["typesafe-ai"]["last_used"] = 4, "2h ago"
+        self.assertEqual(usage.claude_row(self.skill(), rows)["last_used"], "2h ago")
+        self.assertEqual(usage.claude_row(self.skill(), {name: dict(row, uses=0, last_used="never") for name, row in self.ROWS.items()})["last_used"], "never")
+
+    def test_a_row_without_a_twin_ignores_a_same_name_row(self):
+        skill = {"name": "typesafe-ai"}
+        self.assertEqual(usage.claude_row(skill, self.ROWS), self.ROWS["typesafe-ai"])
+
+    def test_a_listing_named_twice_is_one_listing(self):
+        skill = {"name": "x", "claude_skill_name": "x", "bundled_twin": "x", "native_plugin": "x@m"}
+        rows = {"x": {"source": "plugin", "context_tokens": 7, "tokens_7d": None, "uses": 2, "last_used": "1d ago"}}
+        self.assertEqual(usage.claude_row(skill, rows), rows["x"])
+
+    def test_an_unknown_context_stays_unknown_and_a_window_the_rows_hold_is_dropped(self):
+        rows = {name: dict(row, context_tokens=None, tokens_7d=5) for name, row in self.ROWS.items()}
+        combined = usage.claude_row(self.skill(), rows)
+        self.assertIsNone(combined["context_tokens"])
+        self.assertIsNone(combined["tokens_7d"])
+        self.assertEqual(combined["uses"], 5)
+
+    def test_the_bundled_twin_of_a_native_plugin_row_is_added_too(self):
+        skill = {"name": "claude-api", "native_plugin": "claude-api@market", "claude_skill_name": "claude-api:claude-api", "bundled_twin": "claude-api"}
+        rows = {"claude-api:claude-api": {"source": "plugin", "context_tokens": 50, "tokens_7d": None, "uses": 1, "last_used": "1d ago"},
+                "claude-api": {"source": "bundled", "context_tokens": 40, "tokens_7d": None, "uses": 6, "last_used": "5d ago"}}
+        self.assertEqual(usage.claude_row(skill, rows)["uses"], 7)
+
+    def test_the_report_counts_the_uses_of_both_listings(self):
+        manifest = usage.load_manifest(ROOT / "tests/fixtures/skill_usage/manifest.json")
+        manifest["skills"] = [dict(manifest["skills"][0], **self.skill(), codex_enabled=False)]
+        report = usage.build_report(manifest, claude={"rows": self.ROWS}, codex_scan=usage.scan_codex_roots([], ["typesafe-ai"], now=usage.parse_iso("2026-10-11T00:00:00Z"), windows=[7]),
+                                    lock_installed_at={"typesafe-ai": "2026-10-10T00:00:00Z"}, now=usage.parse_iso("2026-10-11T00:00:00Z"), windows=[7])
+        self.assertEqual(report["skills"][0]["claude"]["uses"], 5)
+
+
 class CodexUseTests(unittest.TestCase):
     def test_duplicate_rollout_parts_share_one_session_skill_use(self):
         now = usage.parse_iso("2026-10-10T00:00:00Z")

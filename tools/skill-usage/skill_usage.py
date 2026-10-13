@@ -617,7 +617,7 @@ def build_report(manifest: dict, *, claude: dict | None, codex_scan: dict,
             claude_evaluated = False
         else:
             # Native plugin:skill identity; see Claude skills docs, "Where skills live".
-            row = claude["rows"].get(skill.get("claude_skill_name", name))
+            row = claude_row(skill, claude["rows"])
             if row is None:
                 # Absent from this capture is unmeasured, never a fabricated zero -- the same
                 # "never scanned reads as unmeasured" rule applied to Codex windows above. This
@@ -2522,6 +2522,24 @@ def ledger_path_issue(path) -> str | None:
     if os.path.lexists(path):
         return "refusing an existing path (the ledger is created, never written over)"
     return None
+
+
+def claude_row(skill: dict, rows: dict) -> dict | None:
+    """The /skill-doctor row that stands for a manifest skill. Its own listing is ``claude_skill_name`` (the plugin's <plugin>:<skill> for a plugin row, or the name); a skill that a plugin delivers besides this repository's
+    copy (``claude_plugin``) or besides the client's bundled one (``bundled_twin``) is listed under both names, and a use of either is a use of the skill: the rows are combined (uses and context added; the last-used
+    of the first row that was used, the plugin's before the other, since a relative time cannot be compared). None when none of the names is in the table."""
+    names = [skill.get("claude_skill_name", skill["name"])]
+    if skill.get("claude_plugin"):
+        names.append(skill["name"])
+    if skill.get("bundled_twin"):
+        names.append(skill["bundled_twin"])
+    found = [rows[name] for name in dict.fromkeys(names) if name in rows]
+    if len(found) < 2:
+        return found[0] if found else None
+    contexts = [row["context_tokens"] for row in found if row["context_tokens"] is not None]
+    used = [row for row in found if row["uses"] > 0]
+    return {"source": found[0]["source"], "context_tokens": sum(contexts) if contexts else None, "tokens_7d": None,
+            "uses": sum(row["uses"] for row in found), "last_used": (used or found)[0]["last_used"]}
 
 
 def write_private_ledger(path, records: list) -> None:
