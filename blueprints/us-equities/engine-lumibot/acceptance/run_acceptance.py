@@ -27,7 +27,8 @@ def main():
     output.mkdir(mode=0o700,parents=True,exist_ok=True)
     if output.is_symlink() or output.resolve().is_relative_to(root):
         raise SystemExit("acceptance_output_must_be_outside_worktree")
-    environment={"PATH":os.defpath,"HOME":str(output),"TMPDIR":"/var/tmp",
+    environment={"PATH":os.defpath,"HOME":str(Path.home()),"TMPDIR":"/var/tmp",
+                 "ENGINE_QUAL_EXPECTED_HOME":str(Path.home()),
                  "PYTHONPATH":str(args.offline_hook),"PYTHONDONTWRITEBYTECODE":"1",
                  "LUMIBOT_DISABLE_DOTENV":"1","LUMIBOT_DISABLE_DOTENV_LOCAL":"1",
                  "PYTHON_DOTENV_DISABLED":"1","LUMIBOT_LAZY_CREDENTIALS":"1",
@@ -35,6 +36,13 @@ def main():
                  "LUMIBOT_TELEMETRY":"0","ENGINE_QUAL_OFFLINE":"1",
                  "BACKTESTING_DATA_SOURCE":"none"}
     start=datetime.now(timezone.utc).isoformat()
+    sources=[*root.joinpath("blueprints/us-equities/engine-lumibot").glob("*.py"),
+             *Path(__file__).resolve().parent.glob("*.py"),
+             root/"blueprints/us-equities/engine-lumibot/caps-a6-diagnostic.json",
+             root/"blueprints/us-equities/engine-lumibot/write-boundaries.json",
+             root/"tests/test_engine_lumibot_governor.py",root/"tests/test_engine_lumibot_native.py",
+             args.offline_hook/"sitecustomize.py"]
+    input_hashes=[{"role":p.name,"sha256":sha(p)} for p in sources]
     commands=[]
     for module in ("test_engine_lumibot_governor","test_engine_lumibot_native"):
         log=output/(module+".log")
@@ -48,13 +56,11 @@ def main():
         commands.append({"command":["<ISOLATED_PYTHON>",*command[1:]],
                          "exit_code":result.returncode,
                          "raw_output":{"role":module+"_private_log","sha256":sha(log)}})
-    sources=[*root.joinpath("blueprints/us-equities/engine-lumibot").glob("*.py"),
-             root/"blueprints/us-equities/engine-lumibot/caps-a6-diagnostic.json",
-             root/"tests/test_engine_lumibot_governor.py",root/"tests/test_engine_lumibot_native.py",
-             args.offline_hook/"sitecustomize.py"]
+    if input_hashes!=[{"role":p.name,"sha256":sha(p)} for p in sources]:
+        raise SystemExit("acceptance_sources_changed_during_run")
     receipt={"evidence_class":"synthetic","started_at":start,
              "finished_at":datetime.now(timezone.utc).isoformat(),
-             "commands":commands,"input_hashes":[{"role":p.name,"sha256":sha(p)} for p in sources],
+             "commands":commands,"input_hashes":input_hashes,
              "paper_orders":0,"designation":"none","property_seed":260413,
              "note":"Raw receipt is private; exported result must omit identity-bearing raw-log fingerprints"}
     path=output/"receipt.private.json"

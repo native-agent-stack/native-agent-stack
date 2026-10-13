@@ -175,6 +175,10 @@ class NativeCase(CoreCase):
         self.assertFalse(any(value is self.sdk for value in vars(broker).values()))
         for name in ("api_key","api_secret","oauth_token"):self.assertFalse(getattr(broker,name))
         self.assertIsInstance(broker.api,GuardedApi)
+        for value in vars(broker).values():
+            if isinstance(value,dict):
+                for key in ("API_KEY","API_SECRET","OAUTH_TOKEN"):
+                    self.assertFalse(value.get(key),"No populated credential field in broker dictionaries")
 
     def test_A5_actual_sdk_constructor_resolves_paper_without_any_request(self):
         from alpaca.trading.client import TradingClient
@@ -188,14 +192,18 @@ class NativeCase(CoreCase):
         broker=self.make_broker();_,Strategy=load_classes()
         inbox=self.root/"inbox.jsonl"
         inbox.write_text('{"symbol":"SYN","side":"buy","sizing":"entry"}\n')
-        # The real vendor class is used; avoid its unrelated setup/account
-        # queries by exercising the committed initialized lifecycle directly.
-        strategy=Strategy.__new__(Strategy);strategy.broker=broker
-        strategy.initialize(inbox=inbox,governor=self.gov,
-                            snapshot=lambda symbol:(self.quote,self.account),clock=lambda:NOW)
+        strategy=Strategy(broker=broker,name="SyntheticInbox",budget=1000,risk_free_rate=0,
+                          benchmark_asset=None,analyze_backtest=False,
+                          synchronize_broker_on_start=False,
+                          should_backup_variables_to_database=False,
+                          should_send_summary_to_discord=False,
+                          parameters={"inbox":inbox,"governor":self.gov,
+                                      "snapshot":lambda symbol:(self.quote,self.account),"clock":lambda:NOW})
+        strategy._executor._initialize()
         strategy.on_trading_iteration()
         self.assertEqual(self.sdk.writes[-1][1]["qty"],"20")
         with self.assertRaisesRegex(GuardRefusal,"^agent_runtime$"):strategy.agents
+        with self.assertRaisesRegex(GuardRefusal,"^agent_runtime$"):strategy.agents=object()
         self.assertIsNone(strategy.on_trading_iteration())
 
     def test_A7_audit_guard_blocks_second_sdk_and_secret_open(self):
@@ -205,9 +213,17 @@ class NativeCase(CoreCase):
             socket.getaddrinfo("localhost",443)
         with self.assertRaisesRegex(RuntimeError,"ENGINE_QUAL_CREDENTIAL_FILE_DENIED"):
             open(self.root/".env","rb")
+        # The hook must protect the actual HOME-derived store, not a private
+        # output directory. Audit refusal occurs before any file is read.
+        import pwd
+        expected_home=Path(os.environ.get("ENGINE_QUAL_EXPECTED_HOME",pwd.getpwuid(os.getuid()).pw_dir))
+        self.assertEqual(Path.home(),expected_home)
+        self.assertIn(expected_home/".aws"/"credentials",sitecustomize.PROTECTED_FILES)
+        with self.assertRaisesRegex(RuntimeError,"ENGINE_QUAL_CREDENTIAL_FILE_DENIED"):
+            open(Path.home()/".aws"/"credentials","rb")
         from alpaca.trading.client import TradingClient
         client=TradingClient("synthetic-placeholder","synthetic-placeholder",paper=True)
-        with self.assertRaises(RuntimeError):client.get_account()
+        with self.assertRaisesRegex(RuntimeError,"^ENGINE_QUAL_(NETWORK|CREDENTIAL_FILE)_DENIED$"):client.get_account()
 
 
 def load_tests(loader, tests, pattern):

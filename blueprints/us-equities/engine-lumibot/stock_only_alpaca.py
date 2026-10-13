@@ -68,9 +68,10 @@ def load_classes():
             # these after the isolated parent-side SDK client is encapsulated.
             for name in ("api_key", "api_secret", "oauth_token"):
                 setattr(self, name, "")
-            if isinstance(getattr(self, "config", None), dict):
-                self.config = {key: value for key, value in self.config.items()
-                               if key not in ("API_KEY", "API_SECRET", "OAUTH_TOKEN")}
+            for name,value in tuple(vars(self).items()):
+                if isinstance(value,dict):
+                    setattr(self,name,{key:item for key,item in value.items()
+                                       if key not in ("API_KEY","API_SECRET","OAUTH_TOKEN")})
             self._guard_installed = True
 
         @property
@@ -125,13 +126,21 @@ def load_classes():
 
     class IntentStrategy(Strategy):
         """Trusted fixed strategy. There is no agent object/network-tool runtime."""
-        def initialize(self, *, inbox, governor, snapshot, clock):
+        def initialize(self, inbox, governor, snapshot, clock):
             self._closed_intents = iter(read_inbox(inbox))
             self._governor, self._snapshot, self._clock = governor, snapshot, clock
 
         @property
         def agents(self):
-            self._governor.reject("agent_runtime")
+            self.broker.governor.reject("agent_runtime")
+
+        @agents.setter
+        def agents(self, value):
+            # Lumibot assigns its lazy agent component during construction.
+            # Discard it without ever exposing/instantiating an AgentManager.
+            from lumibot.strategies._strategy import _LazyStrategyComponent
+            if not isinstance(value,_LazyStrategyComponent):
+                self.broker.governor.reject("agent_runtime")
 
         def on_trading_iteration(self):
             intent = next(self._closed_intents, None)

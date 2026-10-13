@@ -271,11 +271,11 @@ class Governor:
         equity, bid, ask = dec(account.equity), dec(quote.bid), dec(quote.ask)
         if equity <= 0 or bid <= 0 or ask < bid:
             raise GuardRefusal("quote_account")
-        if not dec(self.caps["ask_min_usd"]) <= ask <= dec(self.caps["ask_max_usd"]):
+        if intent.side == "buy" and not dec(self.caps["ask_min_usd"]) <= ask <= dec(self.caps["ask_max_usd"]):
             raise GuardRefusal("ask_band")
         mid = (bid + ask) / 2
         spread = (ask - bid) / mid * 10000
-        if spread > dec(self.caps["max_spread_bps"]):
+        if intent.side == "buy" and spread > dec(self.caps["max_spread_bps"]):
             raise GuardRefusal("spread")
         positions = {symbol: dec(qty) for symbol, qty in account.positions.items()}
         if any(qty < 0 or qty != qty.to_integral_value() for qty in positions.values()):
@@ -288,13 +288,13 @@ class Governor:
                 raise GuardRefusal("existing_position")
         price = rounded(ask if intent.side == "buy" else bid, intent.side)
         collar = dec(self.caps["collar"]["regular_bps"]) if quote.session == "RTH" else spread + dec(self.caps["collar"]["extended_bps_over_spread"])
-        if price <= 0 or abs(price - mid) / mid * 10000 > collar:
+        if price <= 0 or (intent.side == "buy" and abs(price - mid) / mid * 10000 > collar):
             raise GuardRefusal("collar")
         limit = min(dec(self.caps["max_notional_usd_per_name"]), equity)
         qty = int((limit / price).to_integral_value(rounding=ROUND_FLOOR)) if intent.side == "buy" else int(positions.get(intent.symbol, 0))
         if qty <= 0:
             raise GuardRefusal("quantity")
-        if qty * price > limit:
+        if intent.side == "buy" and qty * price > limit:
             raise GuardRefusal("notional_cap")
         if intent.side == "sell" and qty > positions.get(intent.symbol, 0):
             raise GuardRefusal("short_sale")

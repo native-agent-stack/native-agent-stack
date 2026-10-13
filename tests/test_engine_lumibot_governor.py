@@ -18,7 +18,8 @@ ROOT = Path(__file__).resolve().parents[1]
 CODE = Path(os.environ.get("ENGINE_LUMIBOT_ROOT", ROOT / "blueprints/us-equities/engine-lumibot"))
 sys.path.insert(0, str(CODE))
 from governor import (AccountState, Decision, Governor, GuardRefusal, Intent, Journal,
-                      QuoteSnapshot, Refusal, encode, rounded)
+                      QuoteSnapshot, Refusal, dec, encode, rounded)
+import governor as governor_module
 from guarded_api import GuardedApi
 
 NOW = 100_000_000_000
@@ -67,6 +68,7 @@ class CoreCase(unittest.TestCase):
                                  kwargs.get("account", self.account), kwargs.get("now", NOW))
         self.assertEqual(result, Refusal(code))
         self.assertFalse(self.sdk.writes)
+        self.assertTrue(self.journal.rows,"A refusal must be journaled")
         self.assertEqual(self.journal.rows[-1]["reason"], code)
 
     def test_A1_payload_equals_decision_and_one_use(self):
@@ -123,8 +125,9 @@ class CoreCase(unittest.TestCase):
         self.refuse("position", account=replace(self.account, positions={"X":-1}))
         self.refuse("quantity", account=replace(self.account, equity=D("1")))
         self.refuse("quantity", intent=Intent("SYN","sell","exit_all"))
-        self.refuse("notional_cap", intent=Intent("SYN","sell","exit_all"),
-                    account=replace(self.account, positions={"SYN":21}))
+        result=self.gov.decide(Intent("SYN","sell","exit_all"),self.quote,
+                               replace(self.account,positions={"SYN":21}),NOW)
+        self.assertIsInstance(result,Decision);self.assertEqual(result.qty,21)
 
     def test_A2_payload_refusals_exact(self):
         decision = self.decision()
@@ -132,6 +135,7 @@ class CoreCase(unittest.TestCase):
         cases += [("time_in_force", x, "time_in_force") for x in ("gtc","ioc","fok","opg","cls")]
         cases += [("side", x, "side") for x in ("sell_short","buy_to_cover")]
         cases += [("qty", x, "quantity") for x in ("0","-1","1.5",1,True,"01")]
+        cases += [("symbol","ZZZZ","reservation"),("qty","7","reservation"),("side","sell","reservation")]
         cases += [("limit_price", "10.01", "price_equality"),
                   ("extended_hours", True, "session_flag"),
                   ("extended_hours", "false", "session_flag"),
@@ -285,7 +289,8 @@ class CoreCase(unittest.TestCase):
             self.assertGreaterEqual(fsync.call_count,4)
             return SimpleNamespace(id="synthetic-order")
         self.sdk.submit_order=observed
-        self.api.submit_order(order_data=OrderData(**decision.payload()))
+        try:self.api.submit_order(order_data=OrderData(**decision.payload()))
+        except GuardRefusal as error:self.fail("Durable pre-submit observations must permit SDK success: "+str(error))
         self.assertTrue(all(x["caps_sha256"]==self.gov.caps_hash for x in self.journal.rows))
         self.assertEqual(self.journal.rows[-1]["outcome"],"accepted_response")
 
@@ -308,6 +313,152 @@ class CoreCase(unittest.TestCase):
         self.assertEqual({row["id"] for row in inventory["boundaries"]},expected)
         for row in inventory["boundaries"]:
             self.assertIn(row["layer"],("L0","L1","L2","process")); self.assertTrue(row["test"])
+
+
+class ReviewerAdditions(CoreCase):
+    """R1-R12 from the authenticated trading-cc proposal, with exact codes."""
+    def submit(self, decision):
+        self.api.submit_order(order_data=OrderData(**decision.payload()))
+
+    def test_R1_journal_write_failure_refuses_and_nothing_is_admitted(self):
+        with patch.object(governor_module.os,"write",side_effect=OSError("disk full")):
+            with self.assertRaisesRegex(GuardRefusal,"^journal_write$"):
+                self.gov.decide(self.intent,self.quote,self.account,NOW)
+        self.assertEqual(self.gov.reservations,{})
+        self.assertFalse(self.sdk.writes)
+
+    def test_R2_second_decision_waits_for_the_first_outcome_to_be_reconciled(self):
+        first=self.decision();self.submit(first)
+        self.assertEqual(self.gov.decide(Intent("OTHER","buy"),self.quote,self.account,NOW),Refusal("pending_outcome"))
+        self.gov.reconcile(first.client_order_id,terminal="filled",account=self.account)
+        self.assertIsInstance(self.gov.decide(Intent("OTHER","buy"),self.quote,self.account,NOW),Decision)
+
+    def test_R3_reconcile_needs_terminal_reconciled_account_and_known_order(self):
+        decision=self.decision();self.submit(decision);cid=decision.client_order_id
+        for terminal,account,key in [("bogus",self.account,cid),("filled",replace(self.account,reconciled=False),cid),
+                                     ("filled",replace(self.account,open_orders=("working",)),cid),
+                                     ("filled",self.account,"a6-unknown")]:
+            with self.subTest(terminal=terminal,known=key==cid),self.assertRaisesRegex(GuardRefusal,"^reconciliation_required$"):
+                self.gov.reconcile(key,terminal=terminal,account=account)
+        self.assertIn(cid,self.gov.outstanding)
+
+    def test_R4_dec_refuses_float_bool_none_text_and_non_finite(self):
+        for bad in (1.5,True,None,"abc","NaN","Infinity","-Infinity",[1]):
+            with self.subTest(bad=repr(bad)),self.assertRaisesRegex(GuardRefusal,"^number$"):dec(bad)
+
+    def test_R5_journal_group_world_permissions_refuse(self):
+        loose=self.root/"loose.jsonl";loose.write_bytes(b"");os.chmod(loose,0o644)
+        with self.assertRaisesRegex(GuardRefusal,"^journal$"):Journal(loose)
+
+    def test_R6_exit_above_entry_cap_admitted(self):
+        for bid,ask in [("10.04","10.05"),("10.40","10.41"),("11.00","11.01")]:
+            with self.subTest(bid=bid):
+                result=self.gov.decide(Intent("SYN","sell","exit_all"),replace(self.quote,bid=D(bid),ask=D(ask)),
+                                       replace(self.account,positions={"SYN":20}),NOW)
+                self.assertIsInstance(result,Decision)
+                self.gov.reconcile(result.client_order_id,terminal="not_sent",account=self.account)
+
+    def test_R7_failed_cancel_unknown_outcome_blocks_admission(self):
+        decision=self.decision();self.submit(decision)
+        def broken(key):raise RuntimeError("network")
+        self.sdk.cancel_order_by_id=broken
+        try:self.api.cancel_order_by_id("synthetic-order")
+        except Exception as error:
+            self.assertIsInstance(error,GuardRefusal)
+            self.assertEqual(str(error),"unknown_outcome")
+        else:self.fail("Failed cancel must produce an unknown-outcome refusal")
+        self.assertTrue(self.gov.recovery_required)
+        self.assertEqual(self.journal.rows[-1]["outcome"],"unknown")
+
+    def test_R8_session_flag_is_actual_bool(self):
+        decision=self.decision()
+        with self.assertRaisesRegex(GuardRefusal,"^session_flag$"):
+            self.api.submit_order(order_data=OrderData(**dict(decision.payload(),extended_hours=0)))
+        self.assertFalse(self.sdk.writes)
+
+    def test_R9_refused_native_bridge_does_not_wedge_later_submits(self):
+        def native(decision):
+            row=decision.payload();row.pop("extended_hours");row.pop("client_order_id");return row
+        first=self.decision();self.api.bind(first);self.gov.requests=[NOW]*197
+        with self.assertRaisesRegex(GuardRefusal,"^request_budget$"):
+            self.api.submit_order(order_data=OrderData(**native(first)))
+        self.gov.requests=[];self.gov.reconcile(first.client_order_id,terminal="not_sent",account=self.account)
+        second=self.decision();self.api.bind(second)
+        self.api.submit_order(order_data=OrderData(**native(second)))
+        self.assertEqual(len(self.sdk.writes),1)
+
+    def test_R10_sdk_serialization_cannot_add_foreign_class_fields(self):
+        sent=[]
+        class Sneaky(OrderData):
+            def to_request_fields(self):return dict(self.__dict__,order_class="bracket",take_profit={"limit_price":1.0})
+        self.sdk.submit_order=lambda *,order_data:(sent.append(order_data.to_request_fields()),SimpleNamespace(id="synthetic-order"))[1]
+        decision=self.decision()
+        try:self.api.submit_order(order_data=Sneaky(**decision.payload()))
+        except GuardRefusal:return
+        self.assertEqual(sent,[decision.payload()])
+
+    def test_R11_symlinked_inbox_refused(self):
+        from stock_only_alpaca import read_inbox
+        target=self.root/"real-inbox.jsonl";target.write_text('{"symbol":"SYN","side":"buy","sizing":"entry"}\n')
+        link=self.root/"inbox-link.jsonl";link.symlink_to(target)
+        with self.assertRaisesRegex(GuardRefusal,"^inbox$"):read_inbox(link)
+
+    def test_R12_nonhermetic_environment_refused(self):
+        from stock_only_alpaca import load_classes
+        from types import ModuleType
+        package=ModuleType("lumibot");package.__path__=[]
+        brokers=ModuleType("lumibot.brokers");brokers.Alpaca=object
+        strategies=ModuleType("lumibot.strategies");strategies.Strategy=object
+        entities=ModuleType("lumibot.entities");entities.Order=object;entities.Asset=object
+        with patch.dict(sys.modules,{"lumibot":package,"lumibot.brokers":brokers,
+                                     "lumibot.strategies":strategies,"lumibot.entities":entities}), \
+             patch.dict(os.environ,{"LUMIBOT_TELEMETRY":"1"}):
+            with self.assertRaisesRegex(GuardRefusal,"^environment$"):load_classes()
+
+
+class ExitPolicyMatrix(CoreCase):
+    """CC B1 ruling: six admitted exit cases across all four sessions."""
+    SESSIONS=("RTH","PRE","POST","OVERNIGHT")
+    EXIT_CASES=(("10.04","10.05",20),("11.00","11.01",20),("4.97","4.98",20),
+                ("209.00","209.50",1),("9.50","10.00",20),("10.00","10.60",21))
+
+    def test_E1_exit_at_touch_in_every_session(self):
+        for session in self.SESSIONS:
+            for bid,ask,qty in self.EXIT_CASES:
+                with self.subTest(session=session,bid=bid,ask=ask,qty=qty):
+                    result=self.gov.decide(Intent("SYN","sell","exit_all"),
+                                           replace(self.quote,bid=D(bid),ask=D(ask),session=session),
+                                           replace(self.account,positions={"SYN":qty}),NOW)
+                    self.assertIsInstance(result,Decision)
+                    self.assertEqual((result.side,result.qty,result.limit_price),("sell",qty,D(bid)))
+                    self.assertIs(result.extended_hours,session!="RTH")
+                    self.gov.reconcile(result.client_order_id,terminal="not_sent",account=self.account)
+
+    def test_E2_entry_keeps_ask_band_and_spread_refusals(self):
+        for session in self.SESSIONS:
+            for bid,ask,code in [("4.97","4.98","ask_band"),("209.00","209.50","ask_band"),("9.50","10.00","spread")]:
+                with self.subTest(session=session,code=code):
+                    result=self.gov.decide(self.intent,replace(self.quote,bid=D(bid),ask=D(ask),session=session),self.account,NOW)
+                    self.assertEqual(result,Refusal(code))
+
+    def test_E3_entry_whole_size_remains_inside_notional_cap(self):
+        for session in self.SESSIONS:
+            result=self.gov.decide(self.intent,replace(self.quote,bid=D("10.04"),ask=D("10.05"),session=session),self.account,NOW)
+            self.assertIsInstance(result,Decision);self.assertLessEqual(result.qty*result.limit_price,D("200"))
+            self.gov.reconcile(result.client_order_id,terminal="not_sent",account=self.account)
+
+    def test_E4_exit_still_requires_long_position_and_fresh_quote(self):
+        quote=replace(self.quote,bid=D("10.04"),ask=D("10.05"))
+        self.assertEqual(self.gov.decide(Intent("SYN","sell","exit_all"),quote,self.account,NOW),Refusal("quantity"))
+        self.assertEqual(self.gov.decide(Intent("SYN","sell","exit_all"),replace(quote,quote_ns=NOW-60_000_000_001),
+                                        replace(self.account,positions={"SYN":20}),NOW),Refusal("stale_quote"))
+
+
+def load_tests(loader,tests,pattern):
+    suite=unittest.TestSuite()
+    for cls in (CoreCase,ReviewerAdditions,ExitPolicyMatrix):
+        suite.addTests(cls(name) for name in vars(cls) if name.startswith("test_"))
+    return suite
 
 
 if __name__ == "__main__": unittest.main()

@@ -13,6 +13,15 @@ READS = frozenset({"get_clock", "get_account", "get_open_position", "get_all_pos
 RAW_READ_PATHS = frozenset({"/clock", "/account", "/positions", "/orders", "/account/portfolio/history"})
 
 
+class ReservedOrderData:
+    """Proxy-owned serialization, never dispatch to a caller-supplied class."""
+    def __init__(self, payload):
+        self.__dict__.update(payload)
+
+    def to_request_fields(self):
+        return dict(self.__dict__)
+
+
 class GuardedApi:
     __slots__ = ("_invoke",)
 
@@ -30,6 +39,9 @@ class GuardedApi:
         def invoke(name, *args, **kwargs):
             with governor.lock:
                 if name == "bind":
+                    for stale in tuple(bridge):
+                        if stale not in governor.reservations:
+                            bridge.pop(stale)
                     decision = args[0]
                     expected = governor.reservations.get(decision.reservation)
                     if expected is None or expected != decision.payload():
@@ -80,11 +92,14 @@ class GuardedApi:
                     payload["limit_price"] = expected["limit_price"]
                     if payload != expected:
                         governor.reject("reservation")
-                    governor.budget(clock(), submit=True, units=units)
-                    governor.consume(payload, token, clock())
-                    bridge.pop(token, None)
-                    # Preserve Lumibot OrderData's supported request converter.
-                    safe_order = type(order)(**payload)
+                    try:
+                        governor.budget(clock(), submit=True, units=units)
+                        governor.consume(payload, token, clock())
+                    finally:
+                        bridge.pop(token, None)
+                    # alpaca-py consumes to_request_fields(), not vars(). Use
+                    # only our own serializer of the checked reserved fields.
+                    safe_order = ReservedOrderData(payload)
                     try:
                         response = real_client.submit_order(order_data=safe_order)
                     except Exception:
