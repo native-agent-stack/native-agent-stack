@@ -23,6 +23,25 @@ def exprs(board):
 
 
 class Ns2604DashboardTests(unittest.TestCase):
+    def test_trading_lanes_board_has_each_receipt_lane_and_broker_wire_thresholds(self):
+        board = G.dashboards().get("grafana-trading-lanes.json")
+        self.assertIsNotNone(board, "The provisioned dashboard set must contain Trading lanes")
+        self.assertEqual(("trading-lanes", "Trading lanes"), (board["uid"], board["title"]))
+        self.assertFalse(board["editable"])
+        rows = [p["title"] for p in board["panels"] if p["type"] == "row"]
+        self.assertEqual(["A", "B", "C", "lanea", "laneb", "IBKR", "I-llm"], rows)
+        expressions = exprs(board)
+        for lane in rows:
+            for metric in ("orders_per_min", "fills_per_min", "cancels_per_min", "cash_use_ratio",
+                           "open_positions", "realized_pnl_usd", "status_code", "ended_by_code"):
+                self.assertTrue(any(f'lane="{lane}"' in expression and f"unwrap {metric} " in expression
+                                    for expression in expressions), (lane, metric))
+        self.assertTrue(all("[10m]" in expression for expression in expressions))
+        wire = next(p for p in board["panels"] if p["title"] == "IBKR wire messages/s")
+        self.assertEqual([45, 50], [x["value"] for x in wire["fieldConfig"]["defaults"]["thresholds"]["steps"]
+                                    if x["value"] is not None])
+        self.assertNotRegex(json.dumps(board), r"/home/|account_id|client_order_id|events\\.jsonl")
+
     def test_committed_plan_dashboards_match_a_fresh_render(self):
         result = subprocess.run([sys.executable, str(ROOT / "observability/ns2604_dashboards.py"), "--check"],
                                 capture_output=True, text=True)

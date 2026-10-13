@@ -19182,6 +19182,11 @@
       "bytes": 6429
     },
     {
+      "path": "docs/decisions/2026-10-13-trading-lanes-dashboard.md",
+      "sha256": "14d585f0be1eb3ca40459239859229610ecfcc4e14d41151d94b6478f749e788",
+      "bytes": 7912
+    },
+    {
       "path": "docs/decisions/2026-10-14-muse-file-fence.md",
       "sha256": "ef5d8f35105989034cbe3e8e590011c27887ee94b99717de6c1cbcedcf85fafc",
       "bytes": 21836
@@ -44007,6 +44012,11 @@
       "bytes": 37593
     },
     {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/grafana-trading-lanes.json",
+      "sha256": "3bf07c6d190f97f74e9519e45a2d7bd2fbaee703030bea265a6fc698cfc661a6",
+      "bytes": 106717
+    },
+    {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/grafana.ini",
       "sha256": "d0e6e66a4ca4e11b02b119903e1e0904737facb13414be7363f8fbd03b47b08f",
       "bytes": 1142
@@ -44053,8 +44063,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/ns2604-research-progress.service",
-      "sha256": "f6f8702b5b86578830e3b7febfddc280f6bc8a5e921fdd4f25ac3e5aa5421d72",
-      "bytes": 1563
+      "sha256": "7677aa4e2ebf27c1de1b4ffe5c0ece2e598cb4f3e4414aaaba8b35702f371f8a",
+      "bytes": 1689
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/ns2604-research-progress.timer",
@@ -44063,8 +44073,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/observability_config.py",
-      "sha256": "04e745c909490b7cd1b401850342f8e8b86b4288cb83380d633ccbe7c97e9e93",
-      "bytes": 22459
+      "sha256": "3c88e67e8f396edfde4c7ecf5954dea04a273db47f73ea1d0752c3857226b13c",
+      "bytes": 22580
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/ollama.env.example",
@@ -61963,8 +61973,8 @@
     },
     {
       "path": "observability/ns2604_dashboards.py",
-      "sha256": "3aa7722922e4ce2b3993310fad0ca1b436c7942c0d3198a8b1b5e9d1da1a7edd",
-      "bytes": 7930
+      "sha256": "cfb4cdc222042fb6c73f05676ffacc2f8a18f519fa76a57b640e7742bec684bd",
+      "bytes": 8044
     },
     {
       "path": "observability/receipt.json",
@@ -61980,6 +61990,31 @@
       "path": "observability/session-e2e.md",
       "sha256": "843e8f4dff03e7f81d260b060ed3f140c2f6574555680beb84f3f7c0b2888712",
       "bytes": 7704
+    },
+    {
+      "path": "observability/trading-collector.yaml",
+      "sha256": "3a09623ab05df9d3a7aa8eeda44e60320e51bf3e399e848586d0aff13a1fcb70",
+      "bytes": 1490
+    },
+    {
+      "path": "observability/trading-lanes-collector.conf.example",
+      "sha256": "d83d556579a31c3960c69350ffe58eabd7dc96bb2ce60d5efcdfa1c6650718fb",
+      "bytes": 210
+    },
+    {
+      "path": "observability/trading-lanes-observer.conf.example",
+      "sha256": "619692afccc6e4ec04d00bef2a61f9930627d46403c21ab051d5c2598b3ccbe2",
+      "bytes": 281
+    },
+    {
+      "path": "observability/trading_dashboard.py",
+      "sha256": "2e9967b1b9386b60bd4ad527c0eb6631845adf076b0d7a52d4e8126f3b1aaecd",
+      "bytes": 6278
+    },
+    {
+      "path": "observability/trading_receipts.py",
+      "sha256": "75da94a964d487f4ae606ade3437259f6a1490887c62af26f4460de1257a999c",
+      "bytes": 12514
     },
     {
       "path": "recipes/README.md",
@@ -63658,8 +63693,8 @@
     },
     {
       "path": "tests/test_ns2604_dashboards.py",
-      "sha256": "532511cde87dda19d719bf2ad5c162f1daa2e7e3fbdf3c5a55d373e307a5b77a",
-      "bytes": 23961
+      "sha256": "bf6e36733e367f11b7fe224f9bd6eecc75d722253356e257e5e478e3f4b28bfc",
+      "bytes": 25399
     },
     {
       "path": "tests/test_ns_movers_decision_display.py",
@@ -64200,6 +64235,11 @@
       "path": "tests/test_trading_handbook_sizing.py",
       "sha256": "4e8589283b4515616c7d458e775912e22ddf5272b1546d0a05d1849a72afbc03",
       "bytes": 2930
+    },
+    {
+      "path": "tests/test_trading_receipts.py",
+      "sha256": "66a85f84bdc55d3ab587eebd705aa8b6651fe782af0b971b3b3a861f0cc16315",
+      "bytes": 4871
     },
     {
       "path": "tests/test_tvly_keyring.py",

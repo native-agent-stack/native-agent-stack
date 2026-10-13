@@ -128,6 +128,7 @@ def dashboards():
         'grafana-native-foundation-data.json': retarget(foundation),
         'grafana-lanes.json': lanes,
         'grafana-command-center.json': retarget(command_center),
+        'grafana-trading-lanes.json': module('observability/trading_dashboard.py', 'trading_render').dashboard(),
     }
 
 

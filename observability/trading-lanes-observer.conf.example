@@ -1,0 +1,4 @@
+# Acceptance drop-in for the EXISTING research-progress oneshot.
+# Remove after its provisioned base unit contains the same observer command.
+[Service]
+ExecStart=/usr/bin/python3 -B @REPO_ROOT@/observability/trading_receipts.py --spool @DATA_ROOT@/trading-lanes/observations.jsonl

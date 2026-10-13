@@ -1,0 +1,36 @@
+# Merge only these components into the existing Collector0.162.0 configuration.
+# Tails the sanitized projection; never points the Collector at raw trading receipts.
+receivers:
+  file_log/trading_lanes:
+    include: ["${env:NS2604_OBSERVABILITY_DATA}/trading-lanes/observations.jsonl"]
+    start_at: beginning
+    storage: file_storage
+    include_file_name: false
+    include_file_path: false
+    retry_on_failure:
+      enabled: true
+      max_elapsed_time: 0s
+    operators:
+      - type: json_parser
+        on_error: drop_quiet
+        parse_from: body
+        parse_to: attributes
+processors:
+  transform/trading_projection:
+    error_mode: propagate
+    log_statements:
+      - context: log
+        statements:
+          - keep_keys(resource.attributes, [])
+          - set(resource.attributes["service.name"], "trading-lanes")
+          - keep_keys(instrumentation_scope.attributes, [])
+          - set(instrumentation_scope.name, "trading-lanes")
+          - set(instrumentation_scope.version, "")
+          - keep_keys(attributes, ["lane", "observed_unix", "source_unix", "orders_per_min", "fills_per_min", "cancels_per_min", "cash_use_ratio", "open_positions", "realized_pnl_usd", "status_code", "ended_by_code", "wire_mean_per_s", "wire_peak_per_s"])
+          - set(body, attributes)
+service:
+  pipelines:
+    logs/trading_lanes:
+      receivers: [file_log/trading_lanes]
+      processors: [memory_limiter, transform/trading_projection, batch]
+      exporters: [otlphttp/loki]

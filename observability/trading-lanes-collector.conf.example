@@ -1,0 +1,4 @@
+# Additive drop-in for the EXISTING collector service. Render paths locally.
+[Service]
+ExecStart=
+ExecStart=@OTELCOL_BINARY@ --config=@EXISTING_CONFIG@ --config=@REPO_ROOT@/observability/trading-collector.yaml
