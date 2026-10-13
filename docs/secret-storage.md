@@ -461,7 +461,11 @@ The command opens a new terminal window: Windows Terminal on WSL2 (or a console 
   removes that link, and a second one would keep the key where custody cannot see it. A failed file operation never
   names a path. Before the key is stored, nothing moves and the downloaded file stays; after it, the tool reports the
   key stored and the source cleanup incomplete (exit 3), and you remove the downloaded file yourself (Astra's first
-  read of #1057, findings 1 and 2). Neither the hidden prompt nor `--from-env` accepts a key-file entry, so no
+  read of #1057, findings 1 and 2). The same state is reported when a link made during the removal keeps the file (the
+  open file's link count after the removal is not 0) or when the run is interrupted after the key is stored, and the
+  stored key typed as its own source changes nothing (Astra's delta read at `60fbe1c6`). The steps are CPython
+  v3.13.16's (`cbc944f4`) `os.replace` (`Doc/library/os.rst:2754`), `os.fsync` (`:1108`), `os.lstat` (`:2412`) and
+  `st_nlink` (`:3125`). Neither the hidden prompt nor `--from-env` accepts a key-file entry, so no
   `export` line is ever written to a key file.
 - **Paper rate limit:** `tools/credentials/alpaca_rate_limit_probe.py` sends one read-only `GET /v2/account` to the fixed paper host. It follows no redirect, reads no response body and places no order. It saves only the HTTP status and the `x-ratelimit-*` headers, under `${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/rate-limit/`, where a later session can read them. `x-ratelimit-limit` is Alpaca's own per-account calls-per-minute figure (200 on the standard tier), so measuring it never needs order traffic. Agents may run it with `--env-file "$PAPER_ENV_FILE"`.
 
@@ -487,7 +491,12 @@ Every later session, whether yours or an agent's, then uses the existing
 recipes unchanged. For example:
 `python3 runner.py preflight --env-file "$PAPER_ENV_FILE" ...`. Commands pass a
 pointer and never spell out the store path, so the guard hook can block any
-command that does spell it out.
+command that does spell it out. The review App's key-file pointer is stricter: a
+reader, a copy or a key tool on `$GITHUB_REVIEW_APP_KEY_PATH` is refused, and so is
+interpreter code that looks it up from its environment (`os.environ`, `os.getenv`,
+`process.env`, `ENV`), since such code reads the key without a shell expansion
+(Astra's delta read of #1057 at `60fbe1c6`, finding 1). `stat`, `ls` and `test -f`
+on the pointer stay allowed, and a loader reads it inside its own program file.
 
 Five consumers still read the Alpaca pair only from environment variables:
 `alpaca-paper/paper_runner.py`, `alpaca-historical/collect.py`,

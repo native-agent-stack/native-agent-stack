@@ -558,6 +558,64 @@ class FileCustodyTests(unittest.TestCase):
         self.assertNotIn(str(self.downloads), output)
         self.assert_nothing_of(data, output)
 
+    def test_a_link_made_after_the_last_check_is_reported_and_kept(self):
+        # Astra's delta read of #1057 at 60fbe1c6 (finding 2): a link made between the final check and the removal
+        # keeps the inode; the open source descriptor shows it, so custody reports itself incomplete.
+        source = self.make_key()
+        data = source.read_bytes()
+        later = self.downloads / "made-after-the-check.pem"
+        real = store_mod.os.lstat
+
+        def check_then_link(path, *args, **kwargs):
+            result = real(path, *args, **kwargs)
+            if not kwargs and str(path) == str(source) and not later.exists():
+                os.link(source, later)
+            return result
+
+        with mock.patch.object(store_mod.os, "lstat", side_effect=check_then_link):
+            code, output = self.custody(source)
+        self.assertEqual(code, store_mod.CLEANUP_INCOMPLETE)
+        self.assertIn("source cleanup incomplete", output)
+        self.assertNotIn("was removed", output)
+        self.assertEqual((self.store / "github-review-app.pem").read_bytes(), data)
+        self.assertTrue(later.exists())  # never removed by custody: an unknown name
+        self.assertNotIn(str(self.downloads), output)
+        self.assert_nothing_of(data, output)
+
+    def test_an_interrupt_after_the_key_is_stored_reports_that_state(self):
+        # Astra's delta read of #1057 at 60fbe1c6 (P3 1): the directory fsync comes after the replace.
+        source = self.make_key()
+        data = source.read_bytes()
+        real, calls = store_mod.os.fsync, []
+
+        def interrupted_second(fd):
+            calls.append(fd)
+            if len(calls) == 2:
+                raise KeyboardInterrupt
+            return real(fd)
+
+        with mock.patch.object(store_mod.os, "fsync", side_effect=interrupted_second):
+            code, output = self.custody(source)
+        self.assertEqual(code, store_mod.CLEANUP_INCOMPLETE)
+        self.assertIn("source cleanup incomplete", output)
+        self.assertNotIn("nothing written", output)
+        self.assertEqual((self.store / "github-review-app.pem").read_bytes(), data)
+        self.assertTrue(source.exists())
+        self.assert_nothing_of(data, output)
+
+    def test_the_stored_key_given_as_its_own_source_changes_nothing(self):
+        # Astra's delta read of #1057 at 60fbe1c6 (P3 2).
+        source = self.make_key()
+        self.assertEqual(self.custody(source)[0], 0)
+        stored = self.store / "github-review-app.pem"
+        before = os.lstat(stored)
+        code, output = self.custody(stored, answers=("replace",))
+        self.assertEqual(code, 1)
+        self.assertIn("is the stored key itself", output)
+        after = os.lstat(stored)
+        self.assertEqual((after.st_ino, after.st_mtime_ns), (before.st_ino, before.st_mtime_ns))
+        self.assertEqual([q.name for q in self.store.iterdir()], ["github-review-app.pem"])
+
     def test_a_failed_source_check_or_removal_after_storing_reports_cleanup_incomplete_without_the_path(self):
         for call in ("lstat", "unlink"):
             with self.subTest(failing=call):

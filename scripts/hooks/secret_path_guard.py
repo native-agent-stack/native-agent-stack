@@ -262,6 +262,12 @@ SECRET_LOOKUP = re.compile(r"(?:environ|getenv|process\.env|ENV\[)[^;\n]{0,40}\b
 POINTER_VARIABLE = re.compile(
     r"\$\{?(?:PAPER_ENV_FILE|ENV_FILE|SEC_CONTACT_ENV|PIT_ALPACA_ENV_PATH|PIT_SEC_ENV_PATH|HF_TOKEN_PATH"
     r"|GITHUB_REVIEW_APP_KEY_PATH)(?:_(?:[0-9]+|[A-Z]))?\b")
+# The review App's key-file pointer looked up by interpreter code (Astra's delta read of #1057 at 60fbe1c6, finding 1): code that holds
+# the path reads the private key without a shell expansion of the pointer (CPython v3.13.16 Doc/library/os.rst:184 `environ`, :311
+# `getenv`). Any such lookup is refused: a metadata check stays a shell `stat`, `ls` or `test -f` on the pointer, and a loader reads the
+# pointer inside its own program file. Bounded like SECRET_LOOKUP.
+KEY_FILE_POINTER_LOOKUP = re.compile(
+    r"(?:environ|getenv|process\.env|ENV[\[{])[^;\n]{0,40}\bGITHUB_REVIEW_APP_KEY_PATH(?:_(?:[0-9]+|[A-Z]))?\b")
 # The Hugging Face home itself (or everything in it) as a reader's operand: a recursive search or a
 # copy of it includes both token files. Its subdirectories such as hub/ stay readable.
 HF_HOME_ROOT = re.compile(r"(?:(?:\.cache|XDG_CACHE_HOME)\}?/huggingface\}?|^\$\{?HF_HOME\}?)(?:/\**)?$")
@@ -2486,6 +2492,8 @@ def read_command(command: str, top: bool = True) -> str | None:
         reason = base_text_reason(texts)
         if reason:
             return reason
+        if any(KEY_FILE_POINTER_LOOKUP.search(text) for text in texts):
+            return "credential_file_read"
         form = k4_form_f(command) if top else None
         if form is None:
             word_text, word_texts = joined, texts

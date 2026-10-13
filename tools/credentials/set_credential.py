@@ -123,7 +123,8 @@ def load_file_entry(entry_id: str, root: Path = ROOT, env=None) -> dict:
 def open_source(source: str, uid: int) -> tuple[int, os.stat_result]:
     """The downloaded file, opened without following a symlink: a regular, nonempty file of at most
     MAX_KEY_FILE_BYTES, owned by the operator and with exactly one link. Custody removes that link; a second link would
-    keep the key, with whatever mode it has, where custody cannot see it (Astra's first read of #1057, finding 1). Its
+    keep the key, with whatever mode it has, where custody cannot see it (Astra's first read of #1057, finding 1; the link
+    count is st_nlink, CPython v3.13.16 cbc944f4 Doc/library/os.rst:3125). Its
     mode is not checked: a Windows drive mounted in WSL reports invented mode bits, and the one link is removed once
     the stored copy passes its check."""
     if not source or "\0" in source:
@@ -175,7 +176,10 @@ def run_from_file(entry_id: str, *, env=None, uid=None, ask=None, prompt=getpass
     `openssl pkey -noout`, and only then remove the original. Every refusal comes before the stored name changes; a
     copy that fails the check is removed and the original stays. The output names the entry, never contents or a path:
     a failed file operation before the key is stored is a refusal with fixed text (nothing moved), and one after it
-    returns CLEANUP_INCOMPLETE with the state of both files (Astra's first read of #1057, finding 2)."""
+    returns CLEANUP_INCOMPLETE with the state of both files (Astra's first read of #1057, finding 2), as does an interrupt
+    after it. The stored key given as its own source changes nothing. The steps are CPython v3.13.16 (cbc944f4) os.replace
+    (Doc/library/os.rst:2754), os.fsync (:1108) and os.lstat (:2412); a removal leaves the inode while another link names
+    it, which the open descriptor's st_nlink (:3125) shows."""
     env = os.environ if env is None else env
     uid = os.getuid() if uid is None else uid
     ask = input if ask is None else ask  # both looked up per call, not bound when the module loads
@@ -193,6 +197,13 @@ def run_from_file(entry_id: str, *, env=None, uid=None, ask=None, prompt=getpass
     try:
         dfd = open_store(path.parent, uid)
         try:
+            try:
+                held = os.stat(path.name, dir_fd=dfd, follow_symlinks=False)
+            except FileNotFoundError:
+                held = None
+            if held is not None and (held.st_dev, held.st_ino) == (src_info.st_dev, src_info.st_ino):
+                print(f"{entry_id}: the path given is the stored key itself; nothing changed", file=out)
+                return 1
             if existing(dfd, path.name, uid):
                 answer = prompt(f"{entry_id}: a stored key exists. Type 'replace' to rotate it (hidden): ")
                 if answer.strip() != "replace":
@@ -239,6 +250,12 @@ def run_from_file(entry_id: str, *, env=None, uid=None, ask=None, prompt=getpass
                   "removed: remove every copy of it yourself", file=out)
             return CLEANUP_INCOMPLETE
         os.unlink(source)
+        # A link made after that check keeps the inode: the open descriptor's link count says whether the removal was
+        # the last one (Astra's delta read of #1057 at 60fbe1c6, finding 2).
+        if os.fstat(src_fd).st_nlink != 0:
+            print(f"stored {entry_id} -> {entry['store']['path_template']} (0600); key check passed; source cleanup "
+                  "incomplete: the downloaded file still has another link: remove every copy of it yourself", file=out)
+            return CLEANUP_INCOMPLETE
     except OSError:
         # The exception text is never shown: it would name the source path.
         if stored:
@@ -246,6 +263,12 @@ def run_from_file(entry_id: str, *, env=None, uid=None, ask=None, prompt=getpass
                   "incomplete: the downloaded file could not be checked or removed: remove it yourself", file=out)
             return CLEANUP_INCOMPLETE
         raise Refused("a file operation failed; nothing moved, the downloaded file stays where it is") from None
+    except KeyboardInterrupt:
+        if stored:
+            print(f"stored {entry_id} -> {entry['store']['path_template']} (0600); key check passed; cancelled before "
+                  "the downloaded file was removed: source cleanup incomplete: remove it yourself", file=out)
+            return CLEANUP_INCOMPLETE
+        raise
     finally:
         os.close(src_fd)
     print(f"stored {entry_id} -> {entry['store']['path_template']} (0600); key check passed; the downloaded file "
