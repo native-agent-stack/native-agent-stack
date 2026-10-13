@@ -16,7 +16,8 @@ are not copied or read by this documentation change.
 | `README.md` | `7890700134ce668c24ff1047b8e798157a3ffa3fe996e0bf9dcc4f7af90e7c86` |
 | `ADDENDUM-01.txt` | `bbbb4d0096d0cab5577050f1b2ba31348fbc6cf5a1969b251bcb35649963b7f6` |
 | `ADDENDUM-02.txt` | `f1de0a311acc5bcd7d7eeddd51e7fef35196dcd76c4f878f1564424f4f834a9c` |
-| `ADDENDUM-03.txt` | `4f0a0abb7f644ab148e0cfaeb618a405b3171b41862a75639251eacdd52637b5` |
+| `ADDENDUM-03.txt` (re-sealed text) | `ac6adcea2551c8e9df26efd0fa434d5283dccdc74f8af17f32afba9c7bc9b324` |
+| [Historical v1 verifier](verify_ibkr_pacing_evidence.v1.py) | `0e9fb1376a59e34cf1e3b6ba2fea30d89aad5e09db28de0b4d59792a41207468` |
 
 The generator and verifier require private inputs. They are preserved as producer
 methodology, not executed here. This change checks hashes, public-field
@@ -81,6 +82,30 @@ Rolling-window computation, rejected-order peak handling and explicit per-ID
 ownership enforcement are trading-cc v3 code follow-ups. They are not fixes
 implemented by this documentation correction.
 
+## Text commitment guard
+
+The re-sealed addendum omits the internal unpublished probe commitment. The
+historical v1 verifier is retained as inspectable public bytes so the addendum's
+predecessor reference resolves without an opaque file-digest exception. The
+generator and active verifier remain byte-identical to approved v2.
+
+The publication guard [scripts/check_text_digests.py](../../../scripts/check_text_digests.py)
+adapts trading-cc's named reference checker. Only Git-indexed regular files in
+the publication directory supply file preimages; untracked/ignored files and
+symlinks cannot justify a commitment. Full digests and 7+ character prefixes are
+checked; decimal-only numeric labels are not treated as digest commitments.
+Audited [public references](text-digest-public-references.json) carry their public
+preimage class and source URL: Git commit identifiers, plus the vendor's image
+asset identifier bound to the indexed vendor Markdown that names the image. Findings report locations and lengths
+without printing unresolved values or prefixes.
+
+The focused CLI regression first reproduced acceptance of an untracked probe
+preimage by the reference's recursive filesystem enumeration. The adapted guard
+refuses that full commitment and its seven-character prefix, accepts indexed
+public preimages, and refuses a symlink to an unpublished preimage. A repository
+test checks every Markdown/text file in this packet and both handbook pages.
+These fixtures contain no real private probe bytes or commitments.
+
 ## Official source captures
 
 These unmodified Markdown responses were checked on 2026-10-13. They are current
@@ -88,9 +113,15 @@ vendor documentation, with no version tag advertised in the captured bytes.
 
 | Capture | Official source | SHA256 |
 | --- | --- | --- |
-| `pacing-introduction.md` | <https://www.interactivebrokers.com/docs/tws-api/doc/pacing-limitations/introduction.md> | `f85d35eccd35c267ff7cba983d057082ddb0936490a988122c93715e00641d2d` |
-| `pacing-behavior.md` | <https://www.interactivebrokers.com/docs/tws-api/doc/pacing-limitations/pacing-behavior.md> | `608161d8d9ddfcdfba5d02a931fb5e082ae7c8a821a8d34851bbc4454c506d54` |
-| `small-bars.md` | <https://www.interactivebrokers.com/docs/tws-api/doc/market-data-historical/historical-data-limitations/pacing-violations-for-small-bars-30-secs-or-less.md> | `fa12f6d99bd60939f181e451ecd79018ba6bdcdf9b77c26a21ec7cc43d6c27eb` |
+| [pacing-introduction.md](pacing-introduction.md) | <https://www.interactivebrokers.com/docs/tws-api/doc/pacing-limitations/introduction.md> | `f85d35eccd35c267ff7cba983d057082ddb0936490a988122c93715e00641d2d` |
+| [pacing-behavior.md](pacing-behavior.md) | <https://www.interactivebrokers.com/docs/tws-api/doc/pacing-limitations/pacing-behavior.md> | `608161d8d9ddfcdfba5d02a931fb5e082ae7c8a821a8d34851bbc4454c506d54` |
+| [small-bars.md](small-bars.md) | <https://www.interactivebrokers.com/docs/tws-api/doc/market-data-historical/historical-data-limitations/pacing-violations-for-small-bars-30-secs-or-less.md> | `fa12f6d99bd60939f181e451ecd79018ba6bdcdf9b77c26a21ec7cc43d6c27eb` |
+
+The image URL in the retained vendor Markdown contains a public asset identifier.
+It is classified as that URL identifier, not represented as a file digest. The
+binary image is not part of this text-only publication packet. The
+short commit in the historical marker-record name resolves to an ancestor of
+public main; its private operational contents remain excluded.
 
 The official legacy order-submission page was checked on 2026-10-13 for its
 explicit `reqAllOpenOrders` rule: subsequent order IDs must exceed the IDs
