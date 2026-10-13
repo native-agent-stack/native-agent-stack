@@ -63377,6 +63377,11 @@
       "bytes": 14793
     },
     {
+      "path": "tests/test_trading_handbook_sizing.py",
+      "sha256": "4e8589283b4515616c7d458e775912e22ddf5272b1546d0a05d1849a72afbc03",
+      "bytes": 2930
+    },
+    {
       "path": "tests/test_tvly_keyring.py",
       "sha256": "4879ed6cccb7be2f9dd7db5cfcd087e1884428cdcb97b16f7d17aef827ec5763",
       "bytes": 12126
