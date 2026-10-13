@@ -35,10 +35,11 @@ import sys
 _HERE = str(Path(__file__).resolve().parent)
 if _HERE not in sys.path:
     sys.path.insert(0, _HERE)
-from feeds import require_qualified_stream  # noqa: E402
+from feeds import require_qualified_quote_source  # noqa: E402
 from leverage import validate_leverage_policy  # noqa: E402
 from safety import RiskLimits, SafetyError, symbol_name, risk_ceiling_kwargs  # noqa: E402
-from sessions import NY, _rth_close_time, is_trading_day, validate_session_policy  # noqa: E402
+from sessions import (NY, SessionKind, _rth_close_time, is_trading_day, session_at,
+                      validate_session_policy)  # noqa: E402
 
 D = Decimal
 ZERO = D(0)
@@ -346,7 +347,7 @@ def load_mover_config(path):
         raise ValueError("unqualified_mover_configuration")
     if "symbols" in config:
         raise ValueError("mover_universe_comes_from_scan")
-    require_qualified_stream(config.get("feed"))
+    require_qualified_quote_source(config.get("feed"), config.get("quote_source", "stream"))
     leverage_block = "leverage_policy" in config
     max_leverage = parse_decimal(str(_require_key(config, "max_leverage")))
     if (config.get("endpoint") != PAPER_ENDPOINT or config.get("catalyst_orders_enabled") is not False
@@ -840,6 +841,8 @@ def plan_timing(settings, limits, *, t0, session_date):
         raise MoverRefusal("mover_window_too_short")
     x1_at = None
     if "X1" in settings.exit_rule:
+        if session_at(datetime.fromtimestamp(t0, timezone.utc)).kind == SessionKind.OVERNIGHT:
+            raise MoverRefusal("mover_x1_overnight_refused")
         # C26: the study's close is the session's regular close (13:00 on early closes); X1 fires two
         # minutes before it, and a plan whose hard flatten comes first can never reach X1.
         day = date.fromisoformat(session_date) if isinstance(session_date, str) else session_date
@@ -1115,11 +1118,13 @@ class MoverBook:
     """
 
     def __init__(self, plan, *, positions, quote, limits, trial_id, existing_client_ids=(), event_sink=None,
-                 halted=None):
+                 halted=None, reprice_allowed=None, cancel_pending=None):
         self.plan = plan
         self._positions = positions
         self._quote = quote
         self._halted = halted or (lambda symbol: bool(getattr(self._quote(symbol), "halted", False)))
+        self._reprice_allowed = reprice_allowed or (lambda symbol, now: True)
+        self._cancel_pending = cancel_pending or (lambda client_id: False)
         self.limits = limits
         self.prefix = f"mvr-{trial_id}-"
         self.sequence = max((int(cid[len(self.prefix):]) for cid in existing_client_ids
@@ -1174,7 +1179,11 @@ class MoverBook:
         if leg is not None and record.side == "buy":
             if leg.first_fill_at is None:
                 leg.first_fill_at = at
+            previous_high = leg.running_high
             leg.running_high = price if leg.running_high is None else max(leg.running_high, price)
+            if leg.running_high != previous_high:
+                self.events({"type": "trail_high", "symbol": record.symbol, "high_bid": str(leg.running_high),
+                             "basis": "entry_fill", "at": at})
         if record.filled_qty >= record.qty:
             self.on_terminal(client_id, "filled")
 
@@ -1279,7 +1288,11 @@ class MoverBook:
         held = position.qty if position is not None and position.qty > 0 else ZERO
         if held > 0 and leg.first_fill_at is not None and fresh:
             bid = D(quote.bid)
+            previous_high = leg.running_high
             leg.running_high = bid if leg.running_high is None else max(leg.running_high, bid)
+            if leg.running_high != previous_high:
+                self.events({"type": "trail_high", "symbol": symbol, "high_bid": str(leg.running_high),
+                             "quote_timestamp": quote.timestamp, "at": now})
         actions += self._cancels(leg, symbol, now, force)
         if held > 0:
             if leg.exit_reason is None:
@@ -1360,6 +1373,9 @@ class MoverBook:
         actions = []
         halted = self._halted(symbol)
         for record in self.open_orders(symbol):
+            if self._cancel_pending(record.client_id):
+                record.cancel_requested = True
+                continue
             if record.cancel_requested:
                 continue
             why = None
@@ -1370,7 +1386,8 @@ class MoverBook:
                     why = "exit_triggered"
                 elif now - record.created >= self.plan.timing.entry_timeout_seconds:
                     why = "entry_timeout"
-            elif now - record.created >= self.plan.timing.exit_timeout_seconds and not halted:
+            elif (now - record.created >= self.plan.timing.exit_timeout_seconds and not halted
+                  and self._reprice_allowed(symbol, now)):
                 why = "exit_reprice"
             if why is not None:
                 record.cancel_requested, record.cancel_reason = True, why

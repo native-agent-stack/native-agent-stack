@@ -40,3 +40,11 @@ def require_qualified_stream(value):
         raise ValueError("unqualified_data_feed")
     if value not in STREAM_FEEDS:
         raise ValueError(f"{value}_stream_unqualified_sdk")
+
+
+def require_qualified_quote_source(value, mode="stream"):
+    """Admit BOATS only through the reviewed SDK REST path, explicitly chosen."""
+    if mode == "stream":
+        require_qualified_stream(value)
+    elif mode != "boats_rest" or type(value) is not str or value != "boats":
+        raise ValueError("unqualified_quote_source")

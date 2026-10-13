@@ -1,8 +1,10 @@
 # T15 overnight session and status checks
 
-Paper acceptance: **NOT_RUN**. This implementation changes the pure market
-clock, feed vocabulary and deterministic submission checks. It does not arm an
-overnight lane, change frozen N2 sources/configuration, or qualify a broker run.
+Paper acceptance: **NOT_RUN**. The staged native overnight adapter includes
+explicit BOATS REST polling, refreshed asset status, admission and lifecycle
+guards for a bounded diagnostic. Hermetic/native fixture execution qualifies
+these code paths only; the owning lane's retained broker acceptance is pending.
+Frozen N2 sources/configuration remain the run owner's separate input.
 
 `sessions.session_at` now reports OVERNIGHT for 20:00–04:00 Eastern, Sunday
 evening through Friday morning. The interval is half-open: 20:00 is OVERNIGHT
@@ -35,7 +37,9 @@ before reserving any BUY or SELL intent. `before_request("submit")` repeats the
 check after reservation, before the wire budget and POST. OVERNIGHT requires
 explicit `overnight_tradable=True` and `overnight_halted=False`, plus no separate
 standing trading halt. Missing, unknown, stale and future carrier observations
-refuse; the conservative status age bound is the port's existing quote timeout.
+refuse; the explicit REST port bounds carrier age by the smaller of its quote
+timeout and the risk entry-quote age bound, including movers with a 30-second
+transport timeout. Asset refresh uses this same stricter bound.
 Out-of-order asset resumes cannot clear a newer halt; restrictive eligibility,
 unknown status and halts win timestamp ties in either arrival order.
 These guards apply to recovery's transport submission path as well as native
@@ -46,7 +50,8 @@ them the runner's controller window (`runner._controller_session`) opens only
 in those three sessions. The order-throughput capacity harness (`capacity.py`)
 refuses every other session as `market_session_closed`, so it never runs
 OVERNIGHT as regular hours. Native
-dispatch and exit plans still refuse/flag OVERNIGHT. The helper for a proposed
+dispatch and exit plans refuse/flag OVERNIGHT unless the explicit REST diagnostic
+configuration below and all dispatch-time guards pass. The helper for a proposed
 overnight order sets `extended_hours=True` and bounds its DAY window at the
 upcoming trade date's 20:00; this pure mapping grants no submission authority.
 Held-book financing and prior-RTH-close capture retain the completed RTH date
@@ -55,19 +60,104 @@ keeps its existing `overnight_holds` disposition; faults and attention do not
 become successful holds. The corporate-action lookahead remains conservative:
 OVERNIGHT's upcoming trade date and the following trading session are checked.
 
-## Remaining acceptance
+## Staged overnight adapter
+
+An explicit configuration selects `feed: "boats"`, `quote_source: "boats_rest"`,
+`overnight: {"enabled": true, "flatten_minutes_before_pre": 10}` and extended
+hours with `overnight_holds: false`. It admits the actual XNYS OVERNIGHT window
+for entries. Default flatten is 03:50 ET, configurable one to sixty minutes before
+04:00. A residual keeps an exit-only PRE/RTH/POST path under the CC's P1-B ruling:
+native sell factories set `reduce_only=True`; existing ledger guards bound every
+sell to held unreserved quantity. PRE/POST exits are extended-hours LIMIT DAY;
+RTH exits are LIMIT DAY with `extended_hours=False`. New entries remain refused
+outside OVERNIGHT. Explicit bounded recovery retains its existing journal and
+risk history; the active trial's cleanup deadline is never extended automatically.
+Quote symbols are bounded to five total,
+including any required benchmark. The issuer owns the separate universe scan.
+No shipped or frozen diagnostic configuration is changed here.
+
+`BoatsQuoteSource` uses the existing SDK `StockLatestQuoteRequest(feed=DataFeed.BOATS)`
+and `StockHistoricalDataClient.get_stock_latest_quote` for each requested symbol.
+At most five workers sweep concurrently on a one-second target cadence; each
+asset refreshes at least once per strict carrier timeout. Outside OVERNIGHT the
+same supported REST request selects SIP for residual exits; ordinary active/tradable
+asset state, fresh quotes and standing halt guards are required. SIP entitlement
+and broker execution remain owning-lane acceptance, **NOT_RUN**. Each worker owns its SDK
+Sessions. Reads use existing guarded HTTP paths, finite SDK request timeouts and
+bounded owner callbacks. Shutdown joins the source's workers before closing
+their Sessions. A 429 backs off the symbol (2–30 seconds), retaining observations
+and order state. Retained quotes/status age naturally and lose admission when
+stale; a retry never stamps cached state fresh. The SDK's trading-order stream
+remains the supported fill/status path. No BOATS market-data socket is built.
+
+The Controller binds `overnight_check` to the transport and checks quote/carrier
+age at reservation, native dispatch, wire-budget admission and immediately before
+POST. It refuses missing, unknown, stale and future observations; the carrier
+must be broker assets with explicit eligibility and no halt. Native dispatch
+retains `entry_dispatch_session_unavailable`/`exit_dispatch_session_unavailable`
+when a precondition is missing. Only the explicit REST adapter and complete fresh
+inputs admit OVERNIGHT. Plain/streamed BOATS configurations still fail before
+credential selection. Delayed `overnight` is never admitted as a fresh feed.
+
+The final carrier
+check at the SDK wire boundary returns to the owner loop through the existing
+`_on_owner` hook. The journal records that boundary's midpoint and clock before
+HTTP, not the earlier reservation midpoint. Execution receipts retain source
+execution time, local observation time, latency and signed midpoint slippage;
+the execution identity deduplicates replay durably. A missing execution clock
+keeps latency unknown. No measured broker timing is inferred from these fixtures.
+
+Broker orders are simple extended-hours LIMIT DAY/GTC; other types, TIFs,
+brackets and OCOs are refused. GTC requires the explicit overnight transport
+opt-in through normalization, order envelope and SDK request; other transports
+retain DAY-only behavior. Client-side trail/time/force exits use marketable LIMIT
+sells priced at or below the bid. X1 remains regular-session only and refuses an
+overnight plan. A resting exit reprices only after its timeout with fresh quotes
+and status; a halt/unknown/stale observation preserves it. Broker stop and
+trailing-stop orders are never used overnight.
+
+Before any overnight POST, the ledger persists the carry cutoff, 04:00 boundary
+and broker DAY expiry (20:00 of the upcoming trade date). Only a ledger admitting
+overnight orders moves to schema 4; older engines refuse it. Reopening the same
+ledger retains deadlines and accepted/resting state. A broker `accepted` is never
+a fill. The independent owner-loop lifecycle cancels held entries on a halt or
+cutoff, regardless of repricing exemptions, and forces flatten at the cutoff.
+Held exits in a halt stay resting. Residuals at 04:00 or DAY expiry are flagged,
+journaled/notified and frozen for handoff. A successfully flat new trial clears
+old carry clocks, while an unresolved trial cannot do so.
+
+`tests/fixtures/adaptive_paper_overnight_cutoff.json` is the third D6 fixture:
+accepted entries with halted and unknown status at the cutoff. Tests exercise
+real temporary SQLite close/reopen, cancellation, held exits, expiry notification
+and freeze. A CI-visible test executes the committed native dispatch method's
+AST against protocol fixtures without importing NautilusTrader/alpaca-py; the
+native queued-BUY tripwire also exercises OVERNIGHT admission and retained refusal
+with the actual pinned engine. These are synthetic guards.
+
+`test_adaptive_paper_overnight_guard_mutations.py` deletes targeted guards in
+memory, never modifying a production file. It credits explicit assertion
+failures and restores the exact original module/class identities before the
+next case. Two deliberately failed peer configuration contexts also produce
+secondary test-context errors; those counts are retained separately. The
+restored ordinary test modules must still pass.
+
+## Remaining broker acceptance
 
 The installed alpaca-py 0.44.0 exposes the BOATS enum but its `StockDataStream`
 constructor accepts only IEX/SIP. The native transport therefore refuses a
 BOATS construction as `boats_stream_unqualified_sdk` before constructing a
 client. `runner.load_config` and `mover.load_mover_config` both use
-`feeds.require_qualified_stream` to refuse a `boats` configuration with the same
-reason before credential selection, broker requests or trial-state writes.
+`feeds.require_qualified_quote_source` (`feeds.py:47-50`): default `stream` mode
+delegates to `require_qualified_stream` and refuses `boats`; explicit `boats_rest`
+admits plain `boats` subject to the overnight configuration guards. Both loaders
+check before credential selection, broker requests or trial-state writes.
 This guard covers the pinned SDK's stream-feed restriction; the transport
 refusal remains the backstop. It does not substitute another feed, fork the SDK or rebuild its
-stream. A supported native BOATS path, authenticated real-time parsing,
-per-paper-account entitlement/linkage, refreshed status delivery and the
-owning T15 overnight paper/journal run are still required.
+stream. A supported SDK REST path and refreshed carrier delivery are staged above.
+Authenticated fresh BOATS parsing, per-paper-account entitlement/linkage,
+actual poll-sweep wall time and request p50/p99, and the owning T15 overnight
+paper/journal run still require retained native acceptance receipts. A one-second
+target cadence is not a measured latency or delivery guarantee.
 
 The PR that removes the native OVERNIGHT
 `entry_dispatch_session_unavailable` refusal must include the staged overnight
@@ -97,9 +187,9 @@ stream-owner claim supplied by this slice.
 
 The committed admission tripwire is
 `IntegratedRunner.test_native_queued_buy_rechecks_dispatch_session_and_preserves_supported_sessions`
-in `tests/test_adaptive_paper_runner.py`. Its `CLOSED`-labelled case dispatches
+in `tests/test_adaptive_paper_runner.py`. Its unqualified `OVERNIGHT_REFUSED` case dispatches
 at `2026-03-11T00:00:00Z`, which the current classifier identifies as 20:00
-Eastern OVERNIGHT. The native BUY LIMIT/DAY must be denied with
+Eastern OVERNIGHT. The unqualified native BUY LIMIT/DAY is denied with
 `entry_dispatch_session_unavailable`, with no submission to the synthetic
 broker port, fill or reserved intent. Paper acceptance remains **NOT_RUN** until its actual run
 and retained receipt.
@@ -164,7 +254,7 @@ equality. These checks use no network or private files in CI.
   [us-equities-trading at 586171951a1595cfd0811cfb8b9c012897eb9543](https://github.com/seathatflowsinourveins/us-equities-trading/blob/586171951a1595cfd0811cfb8b9c012897eb9543/docs/decisions/2026-10-09-equities-intraday-scope.md),
   D6 and T15. This is owner policy; broker/venue facts above remain primary.
 
-The comparison that would replace the current native refusal is a maintained
-vendor-supported BOATS stream at an authenticated pin, followed by the same
-synthetic guards and the owner's native paper acceptance. The recorded enum
-and REST endpoint alone are insufficient.
+The stream comparison remains a maintained vendor-supported BOATS stream at an
+authenticated SDK pin, followed by the same guards and the owner's native paper
+acceptance. The accepted REST path uses the held pinned SDK, while its cadence,
+entitlement/linkage and paper execution remain measured acceptance work.

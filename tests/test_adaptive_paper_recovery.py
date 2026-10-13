@@ -256,6 +256,65 @@ class TwoSymbolPort(FakePort):
 
 
 class RecoveryTests(unittest.TestCase):
+    def test_overnight_recovery_outside_overnight_exits_owned_position(self, moment=None, expected_extended_hours=True):
+        from datetime import datetime, timezone
+        from runner import Controller as OwnerController, _controller_session
+        from overnight import overnight_bounds
+        now = datetime(2026, 3, 11, 8, 0, 1, tzinfo=timezone.utc).timestamp() if moment is None else moment
+        self.start = datetime(2026, 3, 11, 7, tzinfo=timezone.utc).timestamp()
+        self.ledger.close()
+        self.ledger = Ledger(Path(self.temp.name) / "pre-ledger.sqlite", RiskLimits(cleanup_seconds=3))
+        self.ledger.start_trial(self.start)
+        self.controller.ledger = self.ledger
+        self.config.update(regular_session_only=False, extended_hours_enabled=True,
+                           feed="boats", quote_source="boats_rest",
+                           overnight={"enabled": True}, sessions={"extended_hours": True, "overnight_holds": False})
+        entry = self.original_buy(observed=True)
+        self.ledger.record_overnight_window(entry.client_id, overnight_bounds(self.start))
+        self.controller = OwnerController(self.ledger, now, market_open=False, clock=lambda: now)
+        self.controller.close, self.controller.market_open = _controller_session(now, now,
+            {"extended_hours": True, "overnight_enabled": True, "flatten_minutes_before_pre": 10})
+        old_port = self.port
+        class GuardedExitPort(FakePort):
+            async def submit(port, payload):
+                port.publish_quote()
+                # FakePort already reserves this sell before its simulated HTTP;
+                # wrap that existing guard rather than reserve it twice.
+                reserve = port.c.ledger.reserve_intent
+                def guarded_reserve(*args, **kwargs):
+                    port.c._check_overnight_admission("SPY", now, "sell")
+                    intent = reserve(*args, **kwargs)
+                    port.c.ledger.record_overnight_window(intent.client_id,
+                        port.c.ledger.overnight_windows()[entry.client_id])
+                    port.c.port.overnight_before_wire(payload)
+                    return intent
+                with patch.object(port.c.ledger, "reserve_intent", side_effect=guarded_reserve):
+                    return await super().submit(payload)
+        self.port = GuardedExitPort(self.controller)
+        self.port.rows, self.port.qty, self.port.cash = old_port.rows, old_port.qty, old_port.cash
+        self.port.overnight_enabled, self.port.extended_hours_allowed = True, True
+        self.port.feed, self.port.quote_source_mode = "boats", "boats_rest"
+        self.port.flatten_minutes_before_pre, self.port.quote_timeout = 10, 3
+        self.controller.port = self.controller.bind(self.port)
+        self.controller.trading_status({"symbol": "SPY", "source": "alpaca_assets", "ts_ns": int(now * 1e9),
+            "overnight_tradable": False, "overnight_halted": False, "tradable": True, "asset_status": "active"})
+        result = self.recover()
+        self.assertEqual(result["status"], "passed", result["errors"])
+        self.assertTrue(result["flat"])
+        self.assertEqual(len(self.port.submissions), 1)
+        self.assertIs(self.port.submissions[0]["extended_hours"], expected_extended_hours)
+        self.assertIs(self.port.submissions[0]["reduce_only"], True)
+
+    def test_overnight_recovery_in_rth_exits_owned_position(self):
+        from datetime import datetime, timezone
+        self.test_overnight_recovery_outside_overnight_exits_owned_position(
+            datetime(2026, 3, 11, 14, tzinfo=timezone.utc).timestamp(), expected_extended_hours=False)
+
+    def test_overnight_recovery_in_post_exits_owned_position(self):
+        from datetime import datetime, timezone
+        self.test_overnight_recovery_outside_overnight_exits_owned_position(
+            datetime(2026, 3, 11, 21, tzinfo=timezone.utc).timestamp())
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         # Time budgets sized for slow CI runners: the fake port publishes one quote at start,

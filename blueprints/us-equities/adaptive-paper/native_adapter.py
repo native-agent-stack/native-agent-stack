@@ -754,7 +754,9 @@ class AlpacaExecutionClient(ExecutionClient):
         if self.session.errors:
             self.generate_order_denied(order, "adapter_frozen")
             return
-        if (order.order_type != OrderType.LIMIT or order.time_in_force != TimeInForce.DAY
+        allowed_tif = ((TimeInForce.DAY, TimeInForce.GTC)
+                       if getattr(self.session.port, "overnight_enabled", False) is True else (TimeInForce.DAY,))
+        if (order.order_type != OrderType.LIMIT or order.time_in_force not in allowed_tif
                 or str(order.instrument_id.symbol) not in self.session.instruments):
             self.generate_order_denied(order, "only_USD_equity_limit_DAY_supported")
             return
@@ -774,20 +776,30 @@ class AlpacaExecutionClient(ExecutionClient):
             except ValueError:
                 refusal = prefix + "_dispatch_session_classification_failed"
             else:
-                refusal = (None if dispatch_session in (SessionKind.RTH, SessionKind.PRE, SessionKind.POST)
-                           else prefix + "_dispatch_session_unavailable")
+                from overnight import overnight_dispatch_refusal
+                refusal = overnight_dispatch_refusal(self.session.port,
+                    str(order.instrument_id.symbol), now.timestamp(), self.session.session_policy,
+                    "sell" if order.side == OrderSide.SELL else "buy",
+                    reduce_only=getattr(order, "is_reduce_only", False))
             if refusal is not None:
                 self.generate_order_denied(order, refusal)
-                # Retain the held residual in reconciliation and surface an
-                # operator-visible fault rather than a successful overnight hold.
-                self.session.fail(refusal + ":" + cid)
+                # A transient ENTRY refusal is an order denial, not a portfolio
+                # fault. Only a refused EXIT leaves an owned residual for handoff.
+                # NT rc5 1b0a49d2: ExecutionClient.generate_order_denied queues
+                # its order event; NativeSession.fail explicitly stops the node.
+                if order.side == OrderSide.SELL:
+                    self.session.fail(refusal + ":" + cid)
                 return
         self.orders[cid] = order
         extended_hours = order_extended_hours_flag(now, self.session.session_policy)
         payload = {"client_order_id": cid, "symbol": str(order.instrument_id.symbol),
             "side": str(order.side).lower(), "qty": str(order.quantity), "limit_price": str(order.price),
-            "type": "limit", "time_in_force": "day", "extended_hours": extended_hours,
+            "type": "limit", "time_in_force": "gtc" if order.time_in_force == TimeInForce.GTC else "day",
+            "extended_hours": extended_hours,
             "tags": tags, "strategy": str(order.strategy_id)}
+        if (getattr(self.session.port, "overnight_enabled", False) is True and order.side == OrderSide.SELL
+                and getattr(order, "is_reduce_only", False) is True):
+            payload["reduce_only"] = True
         for tag in tags:
             if tag.startswith("reason="):
                 payload["reason"] = tag.split("=", 1)[1]
