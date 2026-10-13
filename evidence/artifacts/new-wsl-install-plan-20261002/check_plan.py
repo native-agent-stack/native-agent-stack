@@ -689,6 +689,9 @@ def main():
             copied.add("grafana-lanes.json")
         else:
             bad("observability", "grafana: the Lanes source must render to grafana-dashboards/lanes.json")
+        # The command center's god view (cc-god-view) is rendered the same way, into the Ecosystem provider.
+        if ("grafana-command-center.json", "ecosystem-grafana-dashboards/command-center.json") in rendered_assets:
+            copied.add("grafana-command-center.json")
     # Empty public roster is an operator-populated example, never an install operand.
     operator_examples = set()
     if "lanes-registry.json" in config:
@@ -711,7 +714,10 @@ def main():
         # The ported foundation dashboard links this host's UIs; the research emitter pushes to Loki.
         "grafana-native-foundation-data.json": {9749, 21080, 21090, 21093, 21128, 29374},
         "grafana-lanes.json": {21128},
-        "ns2604-research-progress.service": {21300},
+        # The god view links agentsview's session UI (21808) and the gateway's usage page.
+        "grafana-command-center.json": {21128, 21808},
+        # Loki push plus the hcom bridge's freshness gauge to the Collector's OTLP/HTTP receiver.
+        "ns2604-research-progress.service": {21300, 21318},
     }
     for r in rows:
         if (r.get("service") or {}).get("port") is not None:

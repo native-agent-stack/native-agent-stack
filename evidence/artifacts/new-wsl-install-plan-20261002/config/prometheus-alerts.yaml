@@ -19,3 +19,17 @@ groups:
           scope: synthetic-acceptance
         annotations:
           summary: 'Controlled local acceptance target is unavailable'
+  # hcom status snapshots (observability/grand-dashboard/hcom_status.py) reach Loki directly; after each published
+  # snapshot the bridge sends the OTLP gauge agent_stack_lanes.records to the Collector, whose Prometheus exporter drops
+  # the series 5m after its last point (opentelemetry-collector-contrib v0.162.0 exporter/prometheusexporter/README.md:29).
+  # absent_over_time: prometheus/prometheus@v3.15.0:docs/querying/functions.md:40-51.
+  - name: nativestack2604-lanes
+    rules:
+      - alert: HcomStatusSnapshotsAbsent
+        expr: absent_over_time(agent_stack_lanes_records{job="agent-stack-lanes"}[1m])
+        for: 4m
+        labels:
+          severity: warning
+          scope: local-ecosystem
+        annotations:
+          summary: 'No hcom status snapshot for about 10 minutes; command center hcom columns, State and STUCK are stale'

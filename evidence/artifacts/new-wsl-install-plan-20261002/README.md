@@ -288,7 +288,10 @@ soak permits retirement; see the A30 custody record in the followup receipt.
 
 **Observation front door (2026-10-06).** The `grafana` row also provisions, in an
 Ecosystem folder, the workstation's `research-grand`, `ecosystem-native` and
-`native-foundation-data` dashboards. `observability/ns2604_dashboards.py` renders
+`native-foundation-data` dashboards, and (2026-10-13) the command center's god view
+`cc-god-view` (`ecosystem-grafana-dashboards/command-center.json`, rendered by
+`observability/command_center_dashboard.py` from the other two boards; record:
+`docs/decisions/2026-10-13-command-center-god-view.md`). `observability/ns2604_dashboards.py` renders
 them into `config/` with this host's datasource UIDs and metric names (this
 collector's Prometheus exporter sets no `namespace`, so there is no `ecosystem_`
 prefix; opentelemetry-collector-contrib v0.162.0 `exporter/prometheusexporter/README.md:27`);
@@ -321,7 +324,7 @@ bash accept.sh --only grafana --stage post_install
 bash accept.sh --only grafana --stage service_health
 ```
 
-Read back: `/api/search` lists the four dashboards, `/d/research-grand` opens
+Read back: `/api/search` lists the provisioned dashboards (including `cc-lanes` and `cc-god-view`), `/d/research-grand` opens
 with no sign-in and its "Native workflow history" table lists the three DAGs.
 Service acceptance checks a nonzero oneshot exit timestamp and independently
 reads all three DAGs without `--cache` (no Loki push), rejecting failed native
