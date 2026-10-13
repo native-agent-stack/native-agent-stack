@@ -1076,11 +1076,14 @@ UNREADABLE = _Unreadable()   # a definition whose name cannot be told here (its 
 
 def agent_front_matter(data: bytes):
     """The block of front matter that the client hands to its YAML parser: the text decoded as the client reads a file (invalid bytes become U+FFFD), a leading byte order mark dropped, and what the client's pattern captures
-    between the opening line and the first "---" after it. None when the client finds no front matter. (The client first checks that "---" occurs after the first three characters; the pattern cannot match without that, as
-    its closing "---" starts after the opening line, so the check is left out.)"""
+    between the opening line and the first "---" after it. None when the client finds no front matter. The client first checks that "---" occurs after the first three characters (its `oi`, Claude Code 2.1.296, bytes
+    211908840-211910460: `e.indexOf("---",3)<0?null:e.match(RE)`). The check changes no result, as the closing "---" starts after the opening line, but it bounds the work: the pattern backtracks quadratically over the
+    whitespace after the opening "---" when no closing line follows (a 64 KiB file of newlines took 18 s), and a file may be 1 MiB."""
     text = data.decode("utf-8", errors="replace")
     if text[:1] == chr(0xFEFF):
         text = text[1:]
+    if text.find("---", 3) < 0:
+        return None
     match = AGENT_FRONT_MATTER.match(text)
     return None if match is None else match.group(1)
 

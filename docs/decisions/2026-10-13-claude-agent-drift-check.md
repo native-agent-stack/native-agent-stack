@@ -85,6 +85,7 @@ Sources read for the review (the first record of this change cited none of them)
 | The OpenHands push gate's advisory read inventory accounts for the descriptor opens | local_integration | `blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261013-pr1062-delta.json`; `tests.test_runtime_worker_openhands_push_gate` (127 tests: two failures at `e22358e46`, none now) |
 | The mutation counts that this record and the README quote are the receipts' | local_integration | `tests/test_agent_drift_record.py` (it fails on the record of `e22358e46`, which quoted 46 of 46 for a receipt of 49) |
 | The design round's code and tests (the parser call, its failure modes, the extraction): every mutant of the list is caught | local_integration | `receipts/mutants-design.txt` (38 of 38 killed) |
+| A vendor-named file that is one long unterminated block (`---` and then whitespace) is read in linear time, as the client's own delimiter precheck makes it | local_integration; measured | `receipts/fail-before-precheck.txt` (19 s, 6 s, 9 s and 19 s on the sources of `2723f8fd`, 0.1 s here); `receipts/mutants-precheck.txt` (4 of 4 killed) |
 | A replacement of a shipped file, of the agents folder or of a folder below it, made after every step of the read, is never read through: the answer is the stale copy that was opened (1) or `null`, never 0; the Codex role count the same | local_integration | `ClientWiringTests` `test_a_replacement_of_...` (each tries the replacement at every point between two file-system calls of the read); `receipts/fail-before-review.txt` |
 | The host's 11 installed definitions equal the checkout's, with the four vendor ones listed and a backup file ignored | native_proven | `python3 scripts/adoption_status.py --profile token-efficiency --client-wiring --json` on the first host, 2026-10-13, with the round-2 commit: `stack_agents_drift` 0 and `complete` true (`receipts/host-run.json`) |
 
@@ -133,6 +134,16 @@ The command center's round-2 read found one P1 that it reproduced at 07:24Z, of 
 
 The behavior changes to know: on a host whose bun is not the pinned version (the first host's mise has 1.4.2), `stack_agents_drift` is `null` and the wiring is incomplete until bun 1.4.3 is installed or named in
 `AGENT_FRONTMATTER_BUN`; a vendor-named file whose front matter the first parse throws on (a description with a colon and a space, say) is unknown; and a vendor-named file without front matter is read by nothing.
+
+## Review of `2723f8fd`: the local codex review, one P2, one scope-locked commit
+
+The local codex review of the rebased head said "patch is incorrect" (one P2) and the lander blocks on a completed review; the command center ruled one bounded round, scope-locked to it.
+
+| Finding | Fix | Test (fails before the fix) |
+| --- | --- | --- |
+| P2, `scripts/adoption_status.py:1084`: the extraction matched the front matter pattern without the client's delimiter precheck. A vendor-named file of `---` followed by many whitespace bytes and no closing line makes the pattern backtrack quadratically (reproduced: 64 KiB of newlines took 18.9 s, 32 Ki pairs of a space and a newline 10.7 s; a file may be 1 MiB), and the extraction runs before bun, so no timeout of bun bounds it | `agent_front_matter` returns none when `"---"` does not occur after the first three characters: the check of the client's own `oi` (Claude Code 2.1.296, bytes 211908840-211910460: `e.indexOf("---",3)<0?null:e.match(RE)`). It changes no result, as the closing line starts after the opening line, and it removes the backtracking: the pattern is tried only on a text that has a closing line, where it succeeds at the first candidate | `ExtractionTests.test_an_unterminated_block_of_whitespace_is_refused_in_linear_time` (five fillers of 64 KiB under a second), `ExtractionTests.test_a_closing_line_far_below_a_long_run_of_whitespace_is_still_found_in_linear_time` (a control), `ClientWiringTests.test_a_vendor_file_that_is_one_long_unterminated_block_is_read_in_linear_time` (the whole call under ten seconds, no bun asked); the first and the third fail on the sources of `2723f8fd` |
+
+The design round had taken this check out as one that "changes nothing": it changes no result and bounds the work, which that round did not measure. Receipts: `receipts/fail-before-precheck.txt`, `receipts/mutants-precheck.txt` (4 of 4 killed).
 
 ## Not covered
 

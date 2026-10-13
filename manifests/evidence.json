@@ -19098,8 +19098,8 @@
     },
     {
       "path": "docs/decisions/2026-10-13-claude-agent-drift-check.md",
-      "sha256": "2cca198d600da49542b967570fa1c87462d867e69823cda97a5ed5f1672396f5",
-      "bytes": 30340
+      "sha256": "8ca4e4fe9042e72e252d7e7ca0ae31ec86383f9d63dac784cdc65de49e75d988",
+      "bytes": 32587
     },
     {
       "path": "docs/decisions/2026-10-13-lane-a-frozen-field-continuity.md",
@@ -19963,8 +19963,8 @@
     },
     {
       "path": "evidence/artifacts/agent-drift-check-20261013/README.md",
-      "sha256": "132ea5cbfbb304d79b50ff8aaa7e5789682b687dccf4be6d2bf8bf8ec996d108",
-      "bytes": 4756
+      "sha256": "cce060d3ef9f8faf22a73ef1f1be4d24a7e9575bb79dee86c48c3cc1cb2c5044",
+      "bytes": 5215
     },
     {
       "path": "evidence/artifacts/agent-drift-check-20261013/receipts/client-oracle.txt",
@@ -19975,6 +19975,11 @@
       "path": "evidence/artifacts/agent-drift-check-20261013/receipts/fail-before-design.txt",
       "sha256": "94174a9cada19a56e64be7b139b992cb632364c4af06dc42057ffc144f73cff5",
       "bytes": 4858
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/fail-before-precheck.txt",
+      "sha256": "e2b3fee16a0a44bf59470bc01b688bcd555ab5ab02a5257410ccd3f2d58af88c",
+      "bytes": 1506
     },
     {
       "path": "evidence/artifacts/agent-drift-check-20261013/receipts/fail-before-review.txt",
@@ -20010,6 +20015,11 @@
       "path": "evidence/artifacts/agent-drift-check-20261013/receipts/mutants-design.txt",
       "sha256": "7bcb4aa202b2820640473722d3cdaa3d4869bca535fe023b1b28f1bf45637e00",
       "bytes": 2588
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/mutants-precheck.txt",
+      "sha256": "6c2499c5d409205375aa893760c572b3e5c93c98d43e00f5f7526a1dda9b3e81",
+      "bytes": 680
     },
     {
       "path": "evidence/artifacts/agent-drift-check-20261013/receipts/mutants-review.txt",
@@ -61433,8 +61443,8 @@
     },
     {
       "path": "scripts/adoption_status.py",
-      "sha256": "a70447ec93651598806789f552133ab00315506a09b57c0ec4a5ab718fea22d5",
-      "bytes": 120476
+      "sha256": "f6d9d78d03556ad2964c1a1d326b72fb0502ef92b64d7f229cacb20b29b42888",
+      "bytes": 120792
     },
     {
       "path": "scripts/build_ecosystem.py",
@@ -62143,8 +62153,8 @@
     },
     {
       "path": "tests/test_adoption_status.py",
-      "sha256": "0ab4f9e0f7e26bf79f7842e54ed3e1ac941e74b62e4ca8e31d9e5e7cc40d4819",
-      "bytes": 237955
+      "sha256": "33b10784a1d39f6070eb8805c707ad02a7cfe1c04b8aed7b00b7357f87d9b8af",
+      "bytes": 240249
     },
     {
       "path": "tests/test_adoption_version_probes.py",

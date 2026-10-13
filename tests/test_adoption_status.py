@@ -2010,7 +2010,7 @@ BOM, REPLACEMENT = chr(0xFEFF), chr(0xFFFD)
 
 class ExtractionTests(unittest.TestCase):
     """agent_front_matter: the block the client hands to its YAML parser, extracted as the loader scan does (oi in the 2.1.296 binary: the text read as UTF-8, a leading byte order mark dropped, and what
-    /^---\\s*\\n([\\s\\S]*?)---\\s*\\n?/ captures; the client's check that "---" occurs after the first three characters changes nothing, the pattern cannot match without it). Pure text; no bun."""
+    /^---\\s*\\n([\\s\\S]*?)---\\s*\\n?/ captures; the client's check that "---" occurs after the first three characters changes no result, as the pattern cannot match without it, and bounds the work: see the timing test). Pure text; no bun."""
 
     ROWS = (
         ("a plain block", b"---\nname: x\n---\nbody\n", "name: x\n"),
@@ -2037,6 +2037,23 @@ class ExtractionTests(unittest.TestCase):
         for label, data, expected in self.ROWS:
             with self.subTest(case=label):
                 self.assertEqual(adoption_status.agent_front_matter(data), expected)
+
+    def test_an_unterminated_block_of_whitespace_is_refused_in_linear_time(self):
+        """Review of #1062 at 2723f8fd (the local codex review, P2): the pattern backtracks quadratically over the whitespace after the opening "---" when no closing line follows (a 64 KiB file of newlines took 18 s,
+        and a file may be 1 MiB), and the extraction runs before bun, so no timeout of bun bounds it. The client checks that "---" occurs after the first three characters before it matches (its `oi`, Claude Code
+        2.1.296: `e.indexOf("---",3)<0?null:e.match(RE)`)."""
+        for label, filler in (("newlines", b"\n"), ("a space and a newline", b" \n"), ("a carriage return and a newline", b"\r\n"), ("a tab and a newline", b"\t\n"),
+                              ("a vertical tab, a form feed and a newline", b"\x0b\x0c\n")):
+            with self.subTest(filler=label):
+                started = time.monotonic()
+                self.assertIsNone(adoption_status.agent_front_matter(b"---" + filler * (65536 // len(filler))))
+                self.assertLess(time.monotonic() - started, 1.0, "the extraction of an unterminated block took more than a second")
+
+    def test_a_closing_line_far_below_a_long_run_of_whitespace_is_still_found_in_linear_time(self):
+        started = time.monotonic()
+        self.assertEqual(adoption_status.agent_front_matter(b"---" + b"\n" * 65536 + b"---\n"), "")
+        self.assertEqual(adoption_status.agent_front_matter(b"---" + b" " * 65536 + b"---\n"), None, "the opening line must end in a newline: spaces and a dash are no opening")
+        self.assertLess(time.monotonic() - started, 1.0)
 
 
 class AgentNamesTests(unittest.TestCase):
@@ -3254,6 +3271,15 @@ class ClientWiringTests(unittest.TestCase):
         report = self.wiring()
         self.assertIsNone(report["claude"]["stack_agents_drift"])
         self.assertFalse(report["complete"])
+
+    def test_a_vendor_file_that_is_one_long_unterminated_block_is_read_in_linear_time(self):
+        """Review of #1062 at 2723f8fd (the local codex review, P2): a 64 KiB fixture of this shape kept the whole client_wiring call past five seconds; the file declares nothing, so it needs no bun and is not drift."""
+        self.wire()
+        self.write(f".claude/agents/{VENDOR_HOST_AGENTS[0]}", b"---" + b"\n" * 65536)
+        started = time.monotonic()
+        report = self.wiring()
+        self.assertLess(time.monotonic() - started, 10.0)
+        self.assertEqual(report["claude"]["stack_agents_drift"], 0)
 
     @unittest.skipIf(hasattr(os, "geteuid") and os.geteuid() == 0, "root reads a file whatever its mode")
     def test_a_vendor_file_that_cannot_be_read_is_not_drift_for_what_it_might_declare(self):
