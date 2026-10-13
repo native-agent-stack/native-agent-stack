@@ -530,6 +530,9 @@
      },
      "cancels_before_acceptance": 0,
      "cancels_sent": 50,
+     "cancels_sent_in_other_rung_window": 0,
+     "cancels_sent_in_own_window": 50,
+     "cancels_sent_outside_rung_windows": 0,
      "cancels_with_known_venue_id": 50,
      "counted_msgs_per_s_max": 6,
      "counted_msgs_per_s_mean": 5.0,
@@ -551,7 +554,9 @@
      "skipped_slots": 0,
      "target_msgs_per_s": 5,
      "wire_est_refined_msgs_per_s_mean": 7.5,
-     "wire_est_upper_bound_msgs_per_s_mean": 7.5
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 7.5,
+     "wire_est_upper_bound_msgs_per_s_mean": 7.5,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 7.5
     },
     {
      "accept_ms": {
@@ -568,6 +573,9 @@
      },
      "cancels_before_acceptance": 0,
      "cancels_sent": 100,
+     "cancels_sent_in_other_rung_window": 1,
+     "cancels_sent_in_own_window": 99,
+     "cancels_sent_outside_rung_windows": 0,
      "cancels_with_known_venue_id": 100,
      "counted_msgs_per_s_max": 10,
      "counted_msgs_per_s_mean": 9.95,
@@ -588,8 +596,10 @@
      "seconds": 20,
      "skipped_slots": 0,
      "target_msgs_per_s": 10,
-     "wire_est_refined_msgs_per_s_mean": 15.0,
-     "wire_est_upper_bound_msgs_per_s_mean": 15.0
+     "wire_est_refined_msgs_per_s_mean": 14.9,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 15.0,
+     "wire_est_upper_bound_msgs_per_s_mean": 14.9,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 15.0
     },
     {
      "accept_ms": {
@@ -606,6 +616,9 @@
      },
      "cancels_before_acceptance": 0,
      "cancels_sent": 129,
+     "cancels_sent_in_other_rung_window": 1,
+     "cancels_sent_in_own_window": 128,
+     "cancels_sent_outside_rung_windows": 0,
      "cancels_with_known_venue_id": 129,
      "counted_msgs_per_s_max": 17,
      "counted_msgs_per_s_mean": 12.9,
@@ -627,7 +640,9 @@
      "skipped_slots": 68,
      "target_msgs_per_s": 20,
      "wire_est_refined_msgs_per_s_mean": 19.35,
-     "wire_est_upper_bound_msgs_per_s_mean": 19.35
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 19.35,
+     "wire_est_upper_bound_msgs_per_s_mean": 19.35,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 19.35
     },
     {
      "accept_ms": {
@@ -644,6 +659,9 @@
      },
      "cancels_before_acceptance": 0,
      "cancels_sent": 29,
+     "cancels_sent_in_other_rung_window": 0,
+     "cancels_sent_in_own_window": 29,
+     "cancels_sent_outside_rung_windows": 0,
      "cancels_with_known_venue_id": 29,
      "counted_msgs_per_s_max": 15,
      "counted_msgs_per_s_mean": 12.6,
@@ -664,8 +682,10 @@
      "seconds": 5,
      "skipped_slots": 41,
      "target_msgs_per_s": 30,
-     "wire_est_refined_msgs_per_s_mean": 18.2,
-     "wire_est_upper_bound_msgs_per_s_mean": 18.2
+     "wire_est_refined_msgs_per_s_mean": 18.6,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 18.2,
+     "wire_est_upper_bound_msgs_per_s_mean": 18.6,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 18.2
     }
    ],
    "steps": {
@@ -766,6 +786,9 @@
      },
      "cancels_before_acceptance": 0,
      "cancels_sent": 50,
+     "cancels_sent_in_other_rung_window": 0,
+     "cancels_sent_in_own_window": 50,
+     "cancels_sent_outside_rung_windows": 0,
      "cancels_with_known_venue_id": 50,
      "counted_msgs_per_s_max": 6,
      "counted_msgs_per_s_mean": 5.0,
@@ -787,7 +810,9 @@
      "skipped_slots": 0,
      "target_msgs_per_s": 5,
      "wire_est_refined_msgs_per_s_mean": 7.5,
-     "wire_est_upper_bound_msgs_per_s_mean": 7.5
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 7.5,
+     "wire_est_upper_bound_msgs_per_s_mean": 7.5,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 7.5
     },
     {
      "accept_ms": {
@@ -804,6 +829,9 @@
      },
      "cancels_before_acceptance": 0,
      "cancels_sent": 100,
+     "cancels_sent_in_other_rung_window": 1,
+     "cancels_sent_in_own_window": 99,
+     "cancels_sent_outside_rung_windows": 0,
      "cancels_with_known_venue_id": 100,
      "counted_msgs_per_s_max": 11,
      "counted_msgs_per_s_mean": 9.95,
@@ -824,8 +852,10 @@
      "seconds": 20,
      "skipped_slots": 0,
      "target_msgs_per_s": 10,
-     "wire_est_refined_msgs_per_s_mean": 15.0,
-     "wire_est_upper_bound_msgs_per_s_mean": 15.0
+     "wire_est_refined_msgs_per_s_mean": 14.9,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 15.0,
+     "wire_est_upper_bound_msgs_per_s_mean": 14.9,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 15.0
     },
     {
      "accept_ms": {
@@ -842,6 +872,9 @@
      },
      "cancels_before_acceptance": 0,
      "cancels_sent": 200,
+     "cancels_sent_in_other_rung_window": 3,
+     "cancels_sent_in_own_window": 197,
+     "cancels_sent_outside_rung_windows": 0,
      "cancels_with_known_venue_id": 200,
      "counted_msgs_per_s_max": 22,
      "counted_msgs_per_s_mean": 19.9,
@@ -862,8 +895,10 @@
      "seconds": 20,
      "skipped_slots": 0,
      "target_msgs_per_s": 20,
-     "wire_est_refined_msgs_per_s_mean": 30.0,
-     "wire_est_upper_bound_msgs_per_s_mean": 30.0
+     "wire_est_refined_msgs_per_s_mean": 29.8,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 30.0,
+     "wire_est_upper_bound_msgs_per_s_mean": 29.8,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 30.0
     },
     {
      "accept_ms": {
@@ -880,6 +915,9 @@
      },
      "cancels_before_acceptance": 0,
      "cancels_sent": 170,
+     "cancels_sent_in_other_rung_window": 0,
+     "cancels_sent_in_own_window": 158,
+     "cancels_sent_outside_rung_windows": 12,
      "cancels_with_known_venue_id": 170,
      "counted_msgs_per_s_max": 31,
      "counted_msgs_per_s_mean": 29.636,
@@ -900,8 +938,10 @@
      "seconds": 11,
      "skipped_slots": 0,
      "target_msgs_per_s": 30,
-     "wire_est_refined_msgs_per_s_mean": 47.27,
-     "wire_est_upper_bound_msgs_per_s_mean": 47.27
+     "wire_est_refined_msgs_per_s_mean": 44.27,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 47.27,
+     "wire_est_upper_bound_msgs_per_s_mean": 44.27,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 47.27
     }
    ],
    "steps": {
@@ -1002,6 +1042,9 @@
      },
      "cancels_before_acceptance": 0,
      "cancels_sent": 50,
+     "cancels_sent_in_other_rung_window": 0,
+     "cancels_sent_in_own_window": 50,
+     "cancels_sent_outside_rung_windows": 0,
      "cancels_with_known_venue_id": 50,
      "counted_msgs_per_s_max": 6,
      "counted_msgs_per_s_mean": 5.0,
@@ -1023,7 +1066,9 @@
      "skipped_slots": 0,
      "target_msgs_per_s": 5,
      "wire_est_refined_msgs_per_s_mean": 7.5,
-     "wire_est_upper_bound_msgs_per_s_mean": 7.5
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 7.5,
+     "wire_est_upper_bound_msgs_per_s_mean": 7.5,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 7.5
     },
     {
      "accept_ms": {
@@ -1040,6 +1085,9 @@
      },
      "cancels_before_acceptance": 0,
      "cancels_sent": 100,
+     "cancels_sent_in_other_rung_window": 3,
+     "cancels_sent_in_own_window": 97,
+     "cancels_sent_outside_rung_windows": 0,
      "cancels_with_known_venue_id": 100,
      "counted_msgs_per_s_max": 11,
      "counted_msgs_per_s_mean": 9.85,
@@ -1060,8 +1108,10 @@
      "seconds": 20,
      "skipped_slots": 0,
      "target_msgs_per_s": 10,
-     "wire_est_refined_msgs_per_s_mean": 15.0,
-     "wire_est_upper_bound_msgs_per_s_mean": 15.0
+     "wire_est_refined_msgs_per_s_mean": 14.7,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 15.0,
+     "wire_est_upper_bound_msgs_per_s_mean": 14.7,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 15.0
     },
     {
      "accept_ms": {
@@ -1078,6 +1128,9 @@
      },
      "cancels_before_acceptance": 0,
      "cancels_sent": 110,
+     "cancels_sent_in_other_rung_window": 0,
+     "cancels_sent_in_own_window": 103,
+     "cancels_sent_outside_rung_windows": 7,
      "cancels_with_known_venue_id": 110,
      "counted_msgs_per_s_max": 21,
      "counted_msgs_per_s_mean": 19.636,
@@ -1098,8 +1151,10 @@
      "seconds": 11,
      "skipped_slots": 0,
      "target_msgs_per_s": 20,
-     "wire_est_refined_msgs_per_s_mean": 30.36,
-     "wire_est_upper_bound_msgs_per_s_mean": 30.36
+     "wire_est_refined_msgs_per_s_mean": 29.27,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 30.36,
+     "wire_est_upper_bound_msgs_per_s_mean": 29.27,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 30.36
     }
    ],
    "steps": {
@@ -1201,6 +1256,9 @@
      },
      "cancels_before_acceptance": 0,
      "cancels_sent": 50,
+     "cancels_sent_in_other_rung_window": 0,
+     "cancels_sent_in_own_window": 50,
+     "cancels_sent_outside_rung_windows": 0,
      "cancels_with_known_venue_id": 50,
      "counted_msgs_per_s_max": 6,
      "counted_msgs_per_s_mean": 5.0,
@@ -1222,7 +1280,9 @@
      "skipped_slots": 0,
      "target_msgs_per_s": 5,
      "wire_est_refined_msgs_per_s_mean": 7.5,
-     "wire_est_upper_bound_msgs_per_s_mean": 7.5
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 7.5,
+     "wire_est_upper_bound_msgs_per_s_mean": 7.5,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 7.5
     },
     {
      "accept_ms": {
@@ -1239,6 +1299,9 @@
      },
      "cancels_before_acceptance": 0,
      "cancels_sent": 100,
+     "cancels_sent_in_other_rung_window": 3,
+     "cancels_sent_in_own_window": 97,
+     "cancels_sent_outside_rung_windows": 0,
      "cancels_with_known_venue_id": 100,
      "counted_msgs_per_s_max": 11,
      "counted_msgs_per_s_mean": 9.85,
@@ -1259,8 +1322,10 @@
      "seconds": 20,
      "skipped_slots": 0,
      "target_msgs_per_s": 10,
-     "wire_est_refined_msgs_per_s_mean": 15.0,
-     "wire_est_upper_bound_msgs_per_s_mean": 15.0
+     "wire_est_refined_msgs_per_s_mean": 14.7,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 15.0,
+     "wire_est_upper_bound_msgs_per_s_mean": 14.7,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 15.0
     },
     {
      "accept_ms": {
@@ -1277,6 +1342,9 @@
      },
      "cancels_before_acceptance": 0,
      "cancels_sent": 200,
+     "cancels_sent_in_other_rung_window": 6,
+     "cancels_sent_in_own_window": 194,
+     "cancels_sent_outside_rung_windows": 0,
      "cancels_with_known_venue_id": 200,
      "counted_msgs_per_s_max": 21,
      "counted_msgs_per_s_mean": 19.85,
@@ -1297,8 +1365,10 @@
      "seconds": 20,
      "skipped_slots": 0,
      "target_msgs_per_s": 20,
-     "wire_est_refined_msgs_per_s_mean": 30.0,
-     "wire_est_upper_bound_msgs_per_s_mean": 30.0
+     "wire_est_refined_msgs_per_s_mean": 29.7,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 30.0,
+     "wire_est_upper_bound_msgs_per_s_mean": 29.7,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 30.0
     },
     {
      "accept_ms": {
@@ -1315,6 +1385,9 @@
      },
      "cancels_before_acceptance": 4,
      "cancels_sent": 293,
+     "cancels_sent_in_other_rung_window": 10,
+     "cancels_sent_in_own_window": 283,
+     "cancels_sent_outside_rung_windows": 0,
      "cancels_with_known_venue_id": 289,
      "counted_msgs_per_s_max": 31,
      "counted_msgs_per_s_mean": 29.1,
@@ -1335,8 +1408,10 @@
      "seconds": 20,
      "skipped_slots": 7,
      "target_msgs_per_s": 30,
-     "wire_est_refined_msgs_per_s_mean": 43.75,
-     "wire_est_upper_bound_msgs_per_s_mean": 43.95
+     "wire_est_refined_msgs_per_s_mean": 43.35,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 43.75,
+     "wire_est_upper_bound_msgs_per_s_mean": 43.55,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 43.95
     },
     {
      "accept_ms": {
@@ -1353,6 +1428,9 @@
      },
      "cancels_before_acceptance": 0,
      "cancels_sent": 321,
+     "cancels_sent_in_other_rung_window": 14,
+     "cancels_sent_in_own_window": 307,
+     "cancels_sent_outside_rung_windows": 0,
      "cancels_with_known_venue_id": 321,
      "counted_msgs_per_s_max": 37,
      "counted_msgs_per_s_mean": 31.95,
@@ -1373,8 +1451,10 @@
      "seconds": 20,
      "skipped_slots": 79,
      "target_msgs_per_s": 40,
-     "wire_est_refined_msgs_per_s_mean": 48.15,
-     "wire_est_upper_bound_msgs_per_s_mean": 48.15
+     "wire_est_refined_msgs_per_s_mean": 47.85,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 48.15,
+     "wire_est_upper_bound_msgs_per_s_mean": 47.85,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 48.15
     },
     {
      "accept_ms": {
@@ -1391,6 +1471,9 @@
      },
      "cancels_before_acceptance": 2,
      "cancels_sent": 294,
+     "cancels_sent_in_other_rung_window": 0,
+     "cancels_sent_in_own_window": 290,
+     "cancels_sent_outside_rung_windows": 4,
      "cancels_with_known_venue_id": 292,
      "counted_msgs_per_s_max": 38,
      "counted_msgs_per_s_mean": 30.0,
@@ -1411,8 +1494,10 @@
      "seconds": 20,
      "skipped_slots": 205,
      "target_msgs_per_s": 50,
-     "wire_est_refined_msgs_per_s_mean": 44.0,
-     "wire_est_upper_bound_msgs_per_s_mean": 44.1
+     "wire_est_refined_msgs_per_s_mean": 45.25,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 44.0,
+     "wire_est_upper_bound_msgs_per_s_mean": 45.3,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 44.1
     }
    ],
    "steps": {
@@ -1513,6 +1598,9 @@
      },
      "cancels_before_acceptance": 0,
      "cancels_sent": 100,
+     "cancels_sent_in_other_rung_window": 0,
+     "cancels_sent_in_own_window": 100,
+     "cancels_sent_outside_rung_windows": 0,
      "cancels_with_known_venue_id": 100,
      "counted_msgs_per_s_max": 10,
      "counted_msgs_per_s_mean": 10.0,
@@ -1534,7 +1622,9 @@
      "skipped_slots": 0,
      "target_msgs_per_s": 10,
      "wire_est_refined_msgs_per_s_mean": 15.0,
-     "wire_est_upper_bound_msgs_per_s_mean": 15.0
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 15.0,
+     "wire_est_upper_bound_msgs_per_s_mean": 15.0,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 15.0
     },
     {
      "accept_ms": {
@@ -1551,6 +1641,9 @@
      },
      "cancels_before_acceptance": 0,
      "cancels_sent": 200,
+     "cancels_sent_in_other_rung_window": 6,
+     "cancels_sent_in_own_window": 194,
+     "cancels_sent_outside_rung_windows": 0,
      "cancels_with_known_venue_id": 200,
      "counted_msgs_per_s_max": 21,
      "counted_msgs_per_s_mean": 19.7,
@@ -1571,8 +1664,10 @@
      "seconds": 20,
      "skipped_slots": 0,
      "target_msgs_per_s": 20,
-     "wire_est_refined_msgs_per_s_mean": 30.0,
-     "wire_est_upper_bound_msgs_per_s_mean": 30.0
+     "wire_est_refined_msgs_per_s_mean": 29.4,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 30.0,
+     "wire_est_upper_bound_msgs_per_s_mean": 29.4,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 30.0
     },
     {
      "accept_ms": {
@@ -1589,6 +1684,9 @@
      },
      "cancels_before_acceptance": 1,
      "cancels_sent": 300,
+     "cancels_sent_in_other_rung_window": 8,
+     "cancels_sent_in_own_window": 292,
+     "cancels_sent_outside_rung_windows": 0,
      "cancels_with_known_venue_id": 299,
      "counted_msgs_per_s_max": 31,
      "counted_msgs_per_s_mean": 29.9,
@@ -1609,8 +1707,10 @@
      "seconds": 20,
      "skipped_slots": 0,
      "target_msgs_per_s": 30,
-     "wire_est_refined_msgs_per_s_mean": 44.95,
-     "wire_est_upper_bound_msgs_per_s_mean": 45.0
+     "wire_est_refined_msgs_per_s_mean": 44.75,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 44.95,
+     "wire_est_upper_bound_msgs_per_s_mean": 44.8,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 45.0
     },
     {
      "accept_ms": {
@@ -1627,6 +1727,9 @@
      },
      "cancels_before_acceptance": 113,
      "cancels_sent": 382,
+     "cancels_sent_in_other_rung_window": 16,
+     "cancels_sent_in_own_window": 366,
+     "cancels_sent_outside_rung_windows": 0,
      "cancels_with_known_venue_id": 269,
      "counted_msgs_per_s_max": 44,
      "counted_msgs_per_s_mean": 37.8,
@@ -1647,8 +1750,10 @@
      "seconds": 20,
      "skipped_slots": 18,
      "target_msgs_per_s": 40,
-     "wire_est_refined_msgs_per_s_mean": 51.65,
-     "wire_est_upper_bound_msgs_per_s_mean": 57.3
+     "wire_est_refined_msgs_per_s_mean": 51.3,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 51.65,
+     "wire_est_upper_bound_msgs_per_s_mean": 56.5,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 57.3
     },
     {
      "accept_ms": {
@@ -1665,6 +1770,9 @@
      },
      "cancels_before_acceptance": 144,
      "cancels_sent": 377,
+     "cancels_sent_in_other_rung_window": 0,
+     "cancels_sent_in_own_window": 360,
+     "cancels_sent_outside_rung_windows": 17,
      "cancels_with_known_venue_id": 233,
      "counted_msgs_per_s_max": 48,
      "counted_msgs_per_s_mean": 37.65,
@@ -1685,8 +1793,10 @@
      "seconds": 20,
      "skipped_slots": 123,
      "target_msgs_per_s": 50,
-     "wire_est_refined_msgs_per_s_mean": 49.35,
-     "wire_est_upper_bound_msgs_per_s_mean": 56.55
+     "wire_est_refined_msgs_per_s_mean": 49.05,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 49.35,
+     "wire_est_upper_bound_msgs_per_s_mean": 56.45,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 56.55
     }
    ],
    "steps": {
@@ -1813,6 +1923,9 @@
        },
        "cancels_before_acceptance": 0,
        "cancels_sent": 100,
+       "cancels_sent_in_other_rung_window": 1,
+       "cancels_sent_in_own_window": 99,
+       "cancels_sent_outside_rung_windows": 0,
        "cancels_with_known_venue_id": 100,
        "counted_msgs_per_s_max": 12,
        "counted_msgs_per_s_mean": 9.95,
@@ -1833,8 +1946,10 @@
        "seconds": 20,
        "skipped_slots": 0,
        "target_msgs_per_s": 10,
-       "wire_est_refined_msgs_per_s_mean": 15.0,
-       "wire_est_upper_bound_msgs_per_s_mean": 15.0
+       "wire_est_refined_msgs_per_s_mean": 14.9,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 15.0,
+       "wire_est_upper_bound_msgs_per_s_mean": 14.9,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 15.0
       },
       {
        "accept_ms": {
@@ -1851,6 +1966,9 @@
        },
        "cancels_before_acceptance": 1,
        "cancels_sent": 150,
+       "cancels_sent_in_other_rung_window": 4,
+       "cancels_sent_in_own_window": 146,
+       "cancels_sent_outside_rung_windows": 0,
        "cancels_with_known_venue_id": 149,
        "counted_msgs_per_s_max": 19,
        "counted_msgs_per_s_mean": 14.85,
@@ -1871,8 +1989,10 @@
        "seconds": 20,
        "skipped_slots": 0,
        "target_msgs_per_s": 15,
-       "wire_est_refined_msgs_per_s_mean": 22.45,
-       "wire_est_upper_bound_msgs_per_s_mean": 22.5
+       "wire_est_refined_msgs_per_s_mean": 22.15,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 22.45,
+       "wire_est_upper_bound_msgs_per_s_mean": 22.2,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 22.5
       },
       {
        "accept_ms": {
@@ -1889,6 +2009,9 @@
        },
        "cancels_before_acceptance": 0,
        "cancels_sent": 197,
+       "cancels_sent_in_other_rung_window": 7,
+       "cancels_sent_in_own_window": 190,
+       "cancels_sent_outside_rung_windows": 0,
        "cancels_with_known_venue_id": 197,
        "counted_msgs_per_s_max": 23,
        "counted_msgs_per_s_mean": 19.5,
@@ -1909,8 +2032,10 @@
        "seconds": 20,
        "skipped_slots": 3,
        "target_msgs_per_s": 20,
-       "wire_est_refined_msgs_per_s_mean": 29.55,
-       "wire_est_upper_bound_msgs_per_s_mean": 29.55
+       "wire_est_refined_msgs_per_s_mean": 29.25,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 29.55,
+       "wire_est_upper_bound_msgs_per_s_mean": 29.25,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 29.55
       },
       {
        "accept_ms": {
@@ -1927,6 +2052,9 @@
        },
        "cancels_before_acceptance": 2,
        "cancels_sent": 248,
+       "cancels_sent_in_other_rung_window": 0,
+       "cancels_sent_in_own_window": 239,
+       "cancels_sent_outside_rung_windows": 9,
        "cancels_with_known_venue_id": 246,
        "counted_msgs_per_s_max": 29,
        "counted_msgs_per_s_mean": 24.8,
@@ -1947,8 +2075,10 @@
        "seconds": 20,
        "skipped_slots": 2,
        "target_msgs_per_s": 25,
-       "wire_est_refined_msgs_per_s_mean": 37.1,
-       "wire_est_upper_bound_msgs_per_s_mean": 37.2
+       "wire_est_refined_msgs_per_s_mean": 37.15,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 37.1,
+       "wire_est_upper_bound_msgs_per_s_mean": 37.2,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 37.2
       }
      ],
      "steps": {
@@ -2046,6 +2176,9 @@
        },
        "cancels_before_acceptance": 5,
        "cancels_sent": 6,
+       "cancels_sent_in_other_rung_window": 0,
+       "cancels_sent_in_own_window": 5,
+       "cancels_sent_outside_rung_windows": 1,
        "cancels_with_known_venue_id": 1,
        "counted_msgs_per_s_max": 9,
        "counted_msgs_per_s_mean": 7.5,
@@ -2066,8 +2199,10 @@
        "seconds": 2,
        "skipped_slots": 0,
        "target_msgs_per_s": 10,
-       "wire_est_refined_msgs_per_s_mean": 9.0,
-       "wire_est_upper_bound_msgs_per_s_mean": 11.5
+       "wire_est_refined_msgs_per_s_mean": 8.0,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 9.0,
+       "wire_est_upper_bound_msgs_per_s_mean": 10.0,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 11.5
       }
      ],
      "steps": {
@@ -2193,6 +2328,9 @@
        },
        "cancels_before_acceptance": 0,
        "cancels_sent": 100,
+       "cancels_sent_in_other_rung_window": 2,
+       "cancels_sent_in_own_window": 98,
+       "cancels_sent_outside_rung_windows": 0,
        "cancels_with_known_venue_id": 100,
        "counted_msgs_per_s_max": 11,
        "counted_msgs_per_s_mean": 9.9,
@@ -2213,8 +2351,10 @@
        "seconds": 20,
        "skipped_slots": 0,
        "target_msgs_per_s": 10,
-       "wire_est_refined_msgs_per_s_mean": 15.0,
-       "wire_est_upper_bound_msgs_per_s_mean": 15.0
+       "wire_est_refined_msgs_per_s_mean": 14.8,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 15.0,
+       "wire_est_upper_bound_msgs_per_s_mean": 14.8,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 15.0
       },
       {
        "accept_ms": {
@@ -2231,6 +2371,9 @@
        },
        "cancels_before_acceptance": 0,
        "cancels_sent": 150,
+       "cancels_sent_in_other_rung_window": 2,
+       "cancels_sent_in_own_window": 148,
+       "cancels_sent_outside_rung_windows": 0,
        "cancels_with_known_venue_id": 150,
        "counted_msgs_per_s_max": 16,
        "counted_msgs_per_s_mean": 15.0,
@@ -2252,7 +2395,9 @@
        "skipped_slots": 0,
        "target_msgs_per_s": 15,
        "wire_est_refined_msgs_per_s_mean": 22.5,
-       "wire_est_upper_bound_msgs_per_s_mean": 22.5
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 22.5,
+       "wire_est_upper_bound_msgs_per_s_mean": 22.5,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 22.5
       },
       {
        "accept_ms": {
@@ -2269,6 +2414,9 @@
        },
        "cancels_before_acceptance": 0,
        "cancels_sent": 199,
+       "cancels_sent_in_other_rung_window": 5,
+       "cancels_sent_in_own_window": 194,
+       "cancels_sent_outside_rung_windows": 0,
        "cancels_with_known_venue_id": 199,
        "counted_msgs_per_s_max": 21,
        "counted_msgs_per_s_mean": 19.75,
@@ -2289,8 +2437,10 @@
        "seconds": 20,
        "skipped_slots": 1,
        "target_msgs_per_s": 20,
-       "wire_est_refined_msgs_per_s_mean": 29.85,
-       "wire_est_upper_bound_msgs_per_s_mean": 29.85
+       "wire_est_refined_msgs_per_s_mean": 29.55,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 29.85,
+       "wire_est_upper_bound_msgs_per_s_mean": 29.55,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 29.85
       },
       {
        "accept_ms": {
@@ -2307,6 +2457,9 @@
        },
        "cancels_before_acceptance": 0,
        "cancels_sent": 250,
+       "cancels_sent_in_other_rung_window": 0,
+       "cancels_sent_in_own_window": 245,
+       "cancels_sent_outside_rung_windows": 5,
        "cancels_with_known_venue_id": 250,
        "counted_msgs_per_s_max": 27,
        "counted_msgs_per_s_mean": 25.0,
@@ -2328,7 +2481,9 @@
        "skipped_slots": 0,
        "target_msgs_per_s": 25,
        "wire_est_refined_msgs_per_s_mean": 37.5,
-       "wire_est_upper_bound_msgs_per_s_mean": 37.5
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 37.5,
+       "wire_est_upper_bound_msgs_per_s_mean": 37.5,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 37.5
       }
      ],
      "steps": {
@@ -2426,6 +2581,9 @@
        },
        "cancels_before_acceptance": 0,
        "cancels_sent": 2,
+       "cancels_sent_in_other_rung_window": 0,
+       "cancels_sent_in_own_window": 2,
+       "cancels_sent_outside_rung_windows": 0,
        "cancels_with_known_venue_id": 2,
        "counted_msgs_per_s_max": 7,
        "counted_msgs_per_s_mean": 7.0,
@@ -2446,8 +2604,10 @@
        "seconds": 1,
        "skipped_slots": 0,
        "target_msgs_per_s": 10,
-       "wire_est_refined_msgs_per_s_mean": 11.0,
-       "wire_est_upper_bound_msgs_per_s_mean": 11.0
+       "wire_est_refined_msgs_per_s_mean": 9.0,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 11.0,
+       "wire_est_upper_bound_msgs_per_s_mean": 9.0,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 11.0
       }
      ],
      "steps": {
@@ -2574,6 +2734,9 @@
        },
        "cancels_before_acceptance": 0,
        "cancels_sent": 100,
+       "cancels_sent_in_other_rung_window": 2,
+       "cancels_sent_in_own_window": 98,
+       "cancels_sent_outside_rung_windows": 0,
        "cancels_with_known_venue_id": 100,
        "counted_msgs_per_s_max": 11,
        "counted_msgs_per_s_mean": 9.9,
@@ -2594,8 +2757,10 @@
        "seconds": 20,
        "skipped_slots": 0,
        "target_msgs_per_s": 10,
-       "wire_est_refined_msgs_per_s_mean": 15.0,
-       "wire_est_upper_bound_msgs_per_s_mean": 15.0
+       "wire_est_refined_msgs_per_s_mean": 14.8,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 15.0,
+       "wire_est_upper_bound_msgs_per_s_mean": 14.8,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 15.0
       },
       {
        "accept_ms": {
@@ -2612,6 +2777,9 @@
        },
        "cancels_before_acceptance": 0,
        "cancels_sent": 148,
+       "cancels_sent_in_other_rung_window": 3,
+       "cancels_sent_in_own_window": 145,
+       "cancels_sent_outside_rung_windows": 0,
        "cancels_with_known_venue_id": 148,
        "counted_msgs_per_s_max": 16,
        "counted_msgs_per_s_mean": 14.7,
@@ -2632,8 +2800,10 @@
        "seconds": 20,
        "skipped_slots": 2,
        "target_msgs_per_s": 15,
-       "wire_est_refined_msgs_per_s_mean": 22.2,
-       "wire_est_upper_bound_msgs_per_s_mean": 22.2
+       "wire_est_refined_msgs_per_s_mean": 22.1,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 22.2,
+       "wire_est_upper_bound_msgs_per_s_mean": 22.1,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 22.2
       },
       {
        "accept_ms": {
@@ -2650,6 +2820,9 @@
        },
        "cancels_before_acceptance": 0,
        "cancels_sent": 119,
+       "cancels_sent_in_other_rung_window": 0,
+       "cancels_sent_in_own_window": 115,
+       "cancels_sent_outside_rung_windows": 4,
        "cancels_with_known_venue_id": 119,
        "counted_msgs_per_s_max": 23,
        "counted_msgs_per_s_mean": 20.0,
@@ -2670,8 +2843,10 @@
        "seconds": 12,
        "skipped_slots": 0,
        "target_msgs_per_s": 20,
-       "wire_est_refined_msgs_per_s_mean": 30.33,
-       "wire_est_upper_bound_msgs_per_s_mean": 30.33
+       "wire_est_refined_msgs_per_s_mean": 30.0,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 30.33,
+       "wire_est_upper_bound_msgs_per_s_mean": 30.0,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 30.33
       }
      ],
      "steps": {
@@ -2845,6 +3020,9 @@
        },
        "cancels_before_acceptance": 23,
        "cancels_sent": 150,
+       "cancels_sent_in_other_rung_window": 5,
+       "cancels_sent_in_own_window": 145,
+       "cancels_sent_outside_rung_windows": 0,
        "cancels_with_known_venue_id": 127,
        "counted_msgs_per_s_max": 16,
        "counted_msgs_per_s_mean": 14.75,
@@ -2865,8 +3043,10 @@
        "seconds": 20,
        "skipped_slots": 0,
        "target_msgs_per_s": 15,
-       "wire_est_refined_msgs_per_s_mean": 21.35,
-       "wire_est_upper_bound_msgs_per_s_mean": 22.5
+       "wire_est_refined_msgs_per_s_mean": 20.85,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 21.35,
+       "wire_est_upper_bound_msgs_per_s_mean": 22.0,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 22.5
       },
       {
        "accept_ms": {
@@ -2883,6 +3063,9 @@
        },
        "cancels_before_acceptance": 0,
        "cancels_sent": 200,
+       "cancels_sent_in_other_rung_window": 7,
+       "cancels_sent_in_own_window": 193,
+       "cancels_sent_outside_rung_windows": 0,
        "cancels_with_known_venue_id": 200,
        "counted_msgs_per_s_max": 20,
        "counted_msgs_per_s_mean": 19.9,
@@ -2903,8 +3086,10 @@
        "seconds": 20,
        "skipped_slots": 0,
        "target_msgs_per_s": 20,
-       "wire_est_refined_msgs_per_s_mean": 30.0,
-       "wire_est_upper_bound_msgs_per_s_mean": 30.0
+       "wire_est_refined_msgs_per_s_mean": 29.8,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 30.0,
+       "wire_est_upper_bound_msgs_per_s_mean": 29.8,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 30.0
       },
       {
        "accept_ms": {
@@ -2921,6 +3106,9 @@
        },
        "cancels_before_acceptance": 0,
        "cancels_sent": 250,
+       "cancels_sent_in_other_rung_window": 0,
+       "cancels_sent_in_own_window": 241,
+       "cancels_sent_outside_rung_windows": 9,
        "cancels_with_known_venue_id": 250,
        "counted_msgs_per_s_max": 26,
        "counted_msgs_per_s_mean": 24.9,
@@ -2941,8 +3129,10 @@
        "seconds": 20,
        "skipped_slots": 0,
        "target_msgs_per_s": 25,
-       "wire_est_refined_msgs_per_s_mean": 37.5,
-       "wire_est_upper_bound_msgs_per_s_mean": 37.5
+       "wire_est_refined_msgs_per_s_mean": 37.3,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 37.5,
+       "wire_est_upper_bound_msgs_per_s_mean": 37.3,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 37.5
       }
      ],
      "steps": {
@@ -3040,6 +3230,9 @@
        },
        "cancels_before_acceptance": 0,
        "cancels_sent": 150,
+       "cancels_sent_in_other_rung_window": 3,
+       "cancels_sent_in_own_window": 147,
+       "cancels_sent_outside_rung_windows": 0,
        "cancels_with_known_venue_id": 150,
        "counted_msgs_per_s_max": 20,
        "counted_msgs_per_s_mean": 14.85,
@@ -3060,8 +3253,10 @@
        "seconds": 20,
        "skipped_slots": 0,
        "target_msgs_per_s": 15,
-       "wire_est_refined_msgs_per_s_mean": 22.5,
-       "wire_est_upper_bound_msgs_per_s_mean": 22.5
+       "wire_est_refined_msgs_per_s_mean": 22.2,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 22.5,
+       "wire_est_upper_bound_msgs_per_s_mean": 22.2,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 22.5
       },
       {
        "accept_ms": {
@@ -3078,6 +3273,9 @@
        },
        "cancels_before_acceptance": 11,
        "cancels_sent": 40,
+       "cancels_sent_in_other_rung_window": 0,
+       "cancels_sent_in_own_window": 30,
+       "cancels_sent_outside_rung_windows": 10,
        "cancels_with_known_venue_id": 29,
        "counted_msgs_per_s_max": 23,
        "counted_msgs_per_s_mean": 18.25,
@@ -3098,8 +3296,10 @@
        "seconds": 4,
        "skipped_slots": 0,
        "target_msgs_per_s": 20,
-       "wire_est_refined_msgs_per_s_mean": 29.75,
-       "wire_est_upper_bound_msgs_per_s_mean": 32.5
+       "wire_est_refined_msgs_per_s_mean": 26.25,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 29.75,
+       "wire_est_upper_bound_msgs_per_s_mean": 26.5,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 32.5
       }
      ],
      "steps": {
@@ -3146,7 +3346,8 @@
   "Timing offsets compare two timestamps taken on one host clock.",
   "Per-second maxima (revision 3): whole-run, combined and per-rung-window `max_1s` / `best_5s_mean` are maxima over sliding windows anchored at a message; the revision-2 UTC-bucket values are kept as `*_utc_buckets` and are never above them.",
   "The receipts' own per-rung `counted_msgs_per_s_min` / `counted_msgs_per_s_max` are fixed one-second slot counters, so they are bucket values and lower bounds of the sliding maximum; the official client's receipts hold no per-message times, so its per-second maxima cannot be recomputed under the sliding definition.",
-  "`peak_open_orders` of the adapter runs closes an order at its first terminal order event (revision 3); the official client's `peak_open_orders` is the probe's own run-time counter and is not recomputable from the receipts."
+  "`peak_open_orders` of the adapter runs closes an order at its first terminal order event (revision 3); the official client's `peak_open_orders` is the probe's own run-time counter and is not recomputable from the receipts.",
+  "Per-rung wire means (revision 4) are the wire-series messages inside the rung's own window divided by its recorded seconds: they include the cancels of other rungs' orders sent in the window and exclude the cancels of the rung's own orders sent outside it, and for a rung stopped part-way they cover only its recorded seconds; the order-attributed values of revisions 1 to 3 are kept as `*_by_order_rung`."
  ],
  "facts": {
   "develop_commits_ahead_of_pin": 26,
@@ -3215,7 +3416,7 @@
    "ladder_order_quantities": [
     1
    ],
-   "official_client_peak_open": "source-derived from the private probe script, not recomputable: the receipts' `peak_open_orders` of the official-client runs are the probe's own run-time counter (at each placement: the orders already placed and not marked done, plus the one being placed); the probe marks an order done only on a Cancelled / ApiCancelled / Inactive status, a 202 notice or a 10147 / 10148 error, so a [103]-refused order counts as open until its stale cancel is answered; these values are unchanged in revision 3",
+   "official_client_peak_open": "source-derived from the private probe script, not recomputable: the receipts' `peak_open_orders` of the official-client runs are the probe's own run-time counter (at each placement: the orders already placed and not marked done, plus the one being placed); the probe marks an order done only on a Cancelled / ApiCancelled / Inactive status, a 202 notice or a 10147 / 10148 error, so a [103]-refused order counts as open until its stale cancel is answered; these values are unchanged in revisions 3 and 4",
    "open_from": "the order's `submit` journal row",
    "open_until": "the order's FIRST terminal order event; an order with no terminal event (an order_submitted with no later event, for one) stays open to the end of the journal",
    "order_event_names_not_terminal": [
@@ -3244,7 +3445,7 @@
   "rate_window_conventions": {
    "anchor": "a window can always be shifted right to the first message it holds without losing one, so the maximum over every real start time equals the maximum over message-anchored windows",
    "best_5s_mean": "the largest number of messages of the series in any half-open interval [t, t + 5 s) whose start t is the timestamp of a message of that series, divided by 5, rounded to 2 decimals",
-   "field_changes": {
+   "field_changes_in_revision_3": {
     "added": [
      "max_1s_utc_buckets",
      "best_5s_mean_utc_buckets",
@@ -3261,6 +3462,27 @@
     "same_name_new_meaning": [
      "max_1s",
      "best_5s_mean"
+    ]
+   },
+   "field_changes_in_revision_4": {
+    "added": [
+     "cancels_sent_in_own_window",
+     "cancels_sent_in_other_rung_window",
+     "cancels_sent_outside_rung_windows",
+     "facts.rate_window_conventions.rung_wire_means",
+     "facts.rate_window_conventions.field_changes_in_revision_4",
+     "revision.reason"
+    ],
+    "key_renamed_in_this_block": [
+     "field_changes -> field_changes_in_revision_3"
+    ],
+    "renamed": [
+     "the revision-3 value of wire_est_refined_msgs_per_s_mean -> wire_est_refined_msgs_per_s_mean_by_order_rung",
+     "the revision-3 value of wire_est_upper_bound_msgs_per_s_mean -> wire_est_upper_bound_msgs_per_s_mean_by_order_rung"
+    ],
+    "same_name_new_meaning": [
+     "wire_est_refined_msgs_per_s_mean",
+     "wire_est_upper_bound_msgs_per_s_mean (every adapter rung, and the adapter_r6_rung30/40/50 headline entries)"
     ]
    },
    "interval": "half-open: a message exactly 1 s (5 s) after the start is outside the window; timestamps are compared as exact integer microseconds since the Unix epoch, never as floating-point seconds",
@@ -3281,6 +3503,7 @@
     "rungs": 40,
     "slots_equal_to_the_receipts_per_second_counters": 38
    },
+   "rung_wire_means": "wire_est_refined_msgs_per_s_mean and wire_est_upper_bound_msgs_per_s_mean of an adapter rung (and of the adapter_r6_rung30/40/50 headline entries) are the number of messages of that series whose journal time lies inside the rung's own window, divided by the rung's recorded seconds and rounded to 2 decimals: the same window rows and message series as max_1s_sliding_in_rung_window, the hidden reqAllOpenOrders counted as in `series`. They include the cancels of other rungs' orders that were sent inside the window and exclude the cancels (and, for a rung stopped part-way, the submits after its recorded seconds) of the rung's own orders that were sent outside it. Revisions 1 to 3 published (submits + cancels + known) / seconds with cancels and known counted over the orders the rung SUBMITTED wherever they were sent; those values are kept as wire_est_refined_msgs_per_s_mean_by_order_rung and wire_est_upper_bound_msgs_per_s_mean_by_order_rung. cancels_sent, cancels_with_known_venue_id and cancels_before_acceptance stay order-attributed (the first cancel row of each order the rung submitted); cancels_sent_in_own_window, cancels_sent_in_other_rung_window and cancels_sent_outside_rung_windows classify those same first cancel rows by journal time against every rung window of the run and sum to cancels_sent",
    "series": "counted = one message per submit row and per cancel row; wire_est_refined and wire_est_upper_bound add the adapter's hidden reqAllOpenOrders per cancel (refined: only for a cancel of an order that had been accepted), stamped with the cancel row's timestamp because the journal does not timestamp it",
    "utc_buckets": "max_1s_utc_buckets and best_5s_mean_utc_buckets are the revision-2 numbers: messages per UTC second (the integer second of the timestamp), the largest bucket and the best mean of 5 consecutive buckets; a sliding maximum is never below its bucket value and exceeds it when a burst straddles a second boundary"
   },
@@ -3394,8 +3617,10 @@
     "counted_times_1_5": 44.85,
     "orders_per_min_by_counted_rate": 897,
     "orders_per_min_by_submits": 900,
-    "wire_est_refined_msgs_per_s_mean": 44.95,
-    "wire_est_upper_bound_msgs_per_s_mean": 45.0
+    "wire_est_refined_msgs_per_s_mean": 44.75,
+    "wire_est_refined_msgs_per_s_mean_by_order_rung": 44.95,
+    "wire_est_upper_bound_msgs_per_s_mean": 44.8,
+    "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 45.0
    }
   },
   {
@@ -3407,8 +3632,10 @@
     "counted_times_1_5": 56.7,
     "orders_per_min_by_counted_rate": 1134,
     "orders_per_min_by_submits": 1146,
-    "wire_est_refined_msgs_per_s_mean": 51.65,
-    "wire_est_upper_bound_msgs_per_s_mean": 57.3
+    "wire_est_refined_msgs_per_s_mean": 51.3,
+    "wire_est_refined_msgs_per_s_mean_by_order_rung": 51.65,
+    "wire_est_upper_bound_msgs_per_s_mean": 56.5,
+    "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 57.3
    }
   },
   {
@@ -3420,8 +3647,10 @@
     "counted_times_1_5": 56.47,
     "orders_per_min_by_counted_rate": 1130,
     "orders_per_min_by_submits": 1131,
-    "wire_est_refined_msgs_per_s_mean": 49.35,
-    "wire_est_upper_bound_msgs_per_s_mean": 56.55
+    "wire_est_refined_msgs_per_s_mean": 49.05,
+    "wire_est_refined_msgs_per_s_mean_by_order_rung": 49.35,
+    "wire_est_upper_bound_msgs_per_s_mean": 56.45,
+    "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 56.55
    }
   },
   {
@@ -5155,25 +5384,30 @@
  },
  "revision": {
   "changes": [
-   "per-id ownership: reconciliation gains journal_orders_missing_by_number_of_owner_journals; the verifier checks that every missing order is found in exactly one run journal id by id (revision 2 compared counts)",
-   "rates: max_1s and best_5s_mean of every whole-run and combined rate block are maxima over sliding windows anchored at a message; the revision-2 UTC-bucket numbers are kept as max_1s_utc_buckets and best_5s_mean_utc_buckets; the headline unit text is corrected",
-   "rates: every adapter rung gains max_1s_sliding_in_rung_window and receipt_slots_replayed_from_journal (the receipts' own counted_msgs_per_s_min/max are bucket values and are unchanged)",
-   "peak_open_orders: an order stops being open at its first terminal order event, the terminal names being derived from the journals' own vocabulary (revision 2 closed an order only at order_canceled)",
-   "facts.rate_window_conventions, facts.peak_open_orders_definition and three caveats added; every other measured value, count, latency and test result is unchanged"
+   "rung wire means: wire_est_refined_msgs_per_s_mean and wire_est_upper_bound_msgs_per_s_mean of every adapter rung and of the adapter_r6_rung30/40/50 headline entries are now the messages inside the rung's own window divided by its recorded seconds; the revision-3 order-attributed values are kept as wire_est_refined_msgs_per_s_mean_by_order_rung and wire_est_upper_bound_msgs_per_s_mean_by_order_rung",
+   "each adapter rung gains cancels_sent_in_own_window, cancels_sent_in_other_rung_window and cancels_sent_outside_rung_windows, which sum to cancels_sent (cancels_sent, cancels_with_known_venue_id and cancels_before_acceptance are unchanged and order-attributed)",
+   "the generator stops with a message for a rung that placed orders but has no window, instead of publishing a null mean",
+   "facts.rate_window_conventions gains rung_wire_means and field_changes_in_revision_4 (its field_changes key is renamed field_changes_in_revision_3) and one caveat is added; every other measured value, count, latency, sliding maximum, peak and test result is unchanged"
   ],
   "earlier_revisions": {
    "1": {
     "generator_sha256": "56463b2622501446a9a1640c6d3065920dbd449a622457ea61f392ce6166c5a1",
     "json_sha256": "b492f42d335370e22f4349bf43db54f1adf4c77921b36a28300159b08c8e11fa",
     "verifier_sha256": "0e9fb1376a59e34cf1e3b6ba2fea30d89aad5e09db28de0b4d59792a41207468"
+   },
+   "2": {
+    "generator_sha256": "f44b595a13cf87b4ad555427000c7937cc62452076f0a3380f13338127147619",
+    "json_sha256": "25ef71020a06e1781fac0360aa8b19c564d9d146b65ea3fc6b8cb0ab62ab0c15",
+    "verifier_sha256": "cac1e764f429dc05575dfe8a692e74d4bcc04a8906e174e9e7b0178cf61494e3"
    }
   },
-  "number": 3,
-  "sealed_files": "the revision-1 and revision-2 files stay sealed and unchanged; anything citing them by hash still resolves",
+  "number": 4,
+  "reason": "A co-op question on nas#1083 showed that the per-rung wire means of revisions 1 to 3 charged each rung with the cancels of the orders it SUBMITTED, wherever those cancels were sent, over the rung's own recorded seconds: a cancel sent in the next rung's window, or after the ladder, was counted in the submission rung, and for a rung stopped part-way the submits after its recorded seconds were counted too, so a rung's mean was not the rate of messages inside its window. The per-message series (max_1s_sliding_in_rung_window, the whole-run and combined rate blocks) and the official-client figures were already window or message based and are unchanged.",
+  "sealed_files": "the revision-1, revision-2 and revision-3 files stay sealed and unchanged; anything citing them by hash still resolves",
   "supersedes": {
-   "generator_sha256": "f44b595a13cf87b4ad555427000c7937cc62452076f0a3380f13338127147619",
-   "json_sha256": "25ef71020a06e1781fac0360aa8b19c564d9d146b65ea3fc6b8cb0ab62ab0c15",
-   "verifier_sha256": "cac1e764f429dc05575dfe8a692e74d4bcc04a8906e174e9e7b0178cf61494e3"
+   "generator_sha256": "933133afe24f128eb4226fb4c50230cb300d5e59ef8e663cc8dac0fb95a9100b",
+   "json_sha256": "180dd86e1848b8714ab7e5850d2989eb08217c1a0fb87f3af6493bc9006b8729",
+   "verifier_sha256": "c8872073cf71990e349ef77293dcef0e434b087e70091b26c6c2749cbce22630"
   }
  },
  "schema": "ibkr-pacing-evidence/1",

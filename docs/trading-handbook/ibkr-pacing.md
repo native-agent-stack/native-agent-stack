@@ -54,7 +54,7 @@ state remains deterministic. Source: [paper trial and evidence contract][paper-p
 
 ## Measured throughput on 2026-10-13
 
-The [approved sanitized revision 3 projection][measurement] records paper Gateway trials
+The [approved sanitized revision 4 projection][measurement] records paper Gateway trials
 using the official IB Python client **10.46.01** and NautilusTrader develop
 **2.0.0rc7.dev20261012**, commit
 `01ced2a3e7b7d25ae7b2e5c0c077bcc46192eb25`. These are measurements at those
@@ -66,7 +66,7 @@ projection `/facts/official_client`, `/facts/nautilus_trader_pin`,
 | Path and run | Observation or calculation | Boundary |
 | --- | --- | --- |
 | Official client, `P-r1`, target 50 messages/s | 500 orders with cancels in 20 seconds; mean 49.95 messages/s. Order rate: 1,500/minute. Mean message rate: 2,997/minute, approximately 3,000. | A rate from a 20-second rung, not a sustained full-minute result; one connection, no refusal or pacing error in the ladder; highest tested target 50 messages/s. |
-| Adapter, `B-r6`, target 30 counted messages/s | 900 orders/minute by submit count, 897/minute by the counted mean; refined wire estimate 44.95 messages/s. | Observed rung rates, approximately 45 wire messages/s. Wire estimates are source-derived, not a packet capture. |
+| Adapter, `B-r6`, target 30 counted messages/s | 900 orders/minute by submit count, 897/minute by the counted mean; refined/upper wire means 44.75/44.8 messages/s. | Wire messages within the rung's own 20-second window, approximately 45/s; source-derived, not a packet capture. |
 | Adapter budget at 50 wire messages/s | `50 × 60 / 3 = 1,000` orders/minute with cancels. | A computed bound assuming one placement, one cancel and one all-open-orders request per accepted order; not the measured rung rate. Other requests consume this budget too. |
 
 Table locators in the projection: `/official_client_ladder`, and
@@ -81,9 +81,12 @@ Budget **wire messages**, including the adapter's extra request. The harness's
 counted rate includes `placeOrder` and `cancelOrder`; the adapter resolves an
 accepted order's permanent venue ID through `reqAllOpenOrders` before canceling.
 The refined estimate adds this request for accepted-order cancels; the upper
-bound adds it for every cancel. At `B-r6` target 40, the refined estimate was
-**51.65 messages/s**, about 3% above 50; at target 50 it was **49.35**. The
-earlier upper-bound estimates of 57.3 and 56.55 are not refined wire measurements.
+bound adds it for every cancel. Revision 4 counts messages inside each rung's
+own evaluated window and divides by its recorded seconds. At `B-r6` target 40,
+the refined/upper means are **51.3/56.5 messages/s**; at target 50 they are
+**49.05/56.45**. Three of those four estimates exceed 50; their side of that
+threshold is unchanged. Earlier order-attributed values remain labelled
+`*_by_order_rung`. Source: [V4-CHANGES section 4][v4-changes].
 Absence of error 100 or disconnection does not establish cap compliance.
 Sources: projection `/facts/message_counting`, `/headline_numbers` entries
 `adapter_r6_rung40` and `adapter_r6_rung50`, `/caveats`, and
@@ -96,10 +99,12 @@ Revision 3 computes whole-run `max_1s` in **sliding one-second windows** and
 timestamp and is half-open: the start is included and the end excluded. Integer
 microseconds avoid floating-point boundary comparisons. Historical UTC-aligned
 results remain in `max_1s_utc_buckets` and `best_5s_mean_utc_buckets`. The
-20-second rung means above are unchanged. Sources: projection
+20-second rung wire means above incorporate the revision-4 window attribution;
+counts and whole-run maxima are unchanged. Sources: projection
 `/facts/rate_window_conventions` and [V3-CHANGES, sections 2 and 4][v3-changes].
 
-The producer's section 4 corrects the earlier maximum-rate claims:
+The producer's [V3 section 4][v3-changes] corrects the earlier maximum-rate claims;
+[V4-CHANGES][v4-changes] leaves those sliding maxima unchanged:
 
 | Combined adapter pair | Sliding 1 s refined wire estimate | Sliding 1 s upper bound |
 | --- | --- | --- |
@@ -147,7 +152,8 @@ a 103-refused order stays in that counter until its stale cancel is answered.
 Neither counter alone establishes broker-confirmed accepted exposure. Sources:
 projection `/facts/peak_open_orders_definition` and [V3-CHANGES sections 2 and 6][v3-changes].
 
-The v3 verifier enforces **each missing ID belonging to exactly one run**.
+The active v4 verifier retains **each missing ID belonging to exactly one run**
+enforcement introduced in v3.
 The retained ownership histogram is zero with no owner, 38 with one owner,
 and zero with multiple owners. The producer's swapped-owner negative control
 passed v2's aggregate check and is rejected by v3. Sources: projection
@@ -194,9 +200,10 @@ multi-writer configuration or a general latency guarantee. Sources: projection
   [addendum][measurement-addendum] extends that reconciliation without changing
   the original JSON. Revision 2 incorporates that third count and corrects the
   missing-order classification. [V3-CHANGES][v3-changes] records the subsequent
-  sliding-window, terminal-event and per-ID corrections. The [re-sealed v2
+  sliding-window, terminal-event and per-ID corrections; [V4-CHANGES][v4-changes]
+  corrects the per-rung wire means and preserves sliding maxima. The [re-sealed v2
   addendum][revision] remains historical; the published README's rate definitions
-  are updated for v3, while [ADDENDUM-02][order-rule-correction] supplies its
+  and its rung sentence are updated for v4, while [ADDENDUM-02][order-rule-correction] supplies its
   documented order-ID-rule correction. Neither a
   source-derived wire estimate nor a marker is a fill witness.
   Sources: [projection scope and field definitions][measurement-guide],
@@ -218,6 +225,7 @@ multi-writer configuration or a general latency guarantee. Sources: projection
 [order-rule-correction]: ../../evidence/artifacts/ibkr-pacing-20261013/ADDENDUM-02.txt
 [revision]: ../../evidence/artifacts/ibkr-pacing-20261013/ADDENDUM-03.txt
 [v3-changes]: ../../evidence/artifacts/ibkr-pacing-20261013/V3-CHANGES.md
+[v4-changes]: ../../evidence/artifacts/ibkr-pacing-20261013/V4-CHANGES.md
 [publication]: ../../evidence/artifacts/ibkr-pacing-20261013/PUBLICATION.md
 [order-ids]: https://interactivebrokers.github.io/tws-api/order_submission.html
 [selector-source]: https://github.com/nautechsystems/nautilus_trader/blob/01ced2a3e7b7d25ae7b2e5c0c077bcc46192eb25/crates/adapters/interactive_brokers/src/execution/core.rs#L381-L394

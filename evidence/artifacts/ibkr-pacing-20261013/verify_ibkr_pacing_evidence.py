@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-"""Recompute the headline numbers of ibkr-pacing-evidence/1 (revision 3) from the private receipts and compare them with the document.
+"""Recompute the headline numbers of ibkr-pacing-evidence/1 (revision 4) from the private receipts and compare them with the document.
+
+Revision 4 closes one defect found by the co-op's question on nas#1083: the per-rung wire means of revisions 1 to 3 were (submits + cancels + known) / seconds over the orders a rung
+SUBMITTED, wherever their cancels were sent, so a cancel sent in the next rung's window or after the ladder was charged to the submission rung. They are now the wire messages whose journal
+time lies inside the rung's own window divided by its recorded seconds. This verifier derives, for EVERY rung of EVERY adapter run (revision 3 checked B-r6 rungs 30, 40 and 50 only), the
+two window means, the order-attributed values kept as `*_by_order_rung`, the cancels sent / with a known venue id / before acceptance, and where the first cancel of each rung order was
+sent (own window, another rung's window, outside every window); the B-r6 headline entries are compared with the same derivation, and the revision block must say 4.
+The order-attributed derivation uses the FIRST cancel row of each order (revision 3's B-r6 code kept the last row's reason in a dict, which differs for the orders that were cancelled twice).
 
 Revision 3 closes three defects found by the co-op's review of revision 2: (1) "every missing id is found in exactly one run journal" compared COUNTS, so one id in no journal and another
 in two journals passed; it is now checked id by id (an id with no owner journal, with two or more, or repeated in the list is reported by its position and 8 hex digits of its sha256, never
@@ -18,7 +25,7 @@ Numbers that exist only as live broker reads in the session transcript (the two 
 cannot be recomputed from files: for them the verifier checks only that the document marks them transcript-derived and that
 the arithmetic relations between them and the file-derived numbers hold.
 
-usage: python3 verify_ibkr_pacing_evidence.v3.py EVIDENCE.json RUN_ROOT [PIN_CORE_RS]
+usage: python3 verify_ibkr_pacing_evidence.v4.py EVIDENCE.json RUN_ROOT [PIN_CORE_RS]
        PIN_CORE_RS (optional): the file crates/adapters/interactive_brokers/src/execution/core.rs fetched at the pinned commit;
        when given, the cited line numbers are checked against its text.
 """
@@ -36,6 +43,9 @@ SECOND_US = 1_000_000
 WINDOW_PARAMETERS = {"max_1s_window_us": 1_000_000, "best_5s_mean_window_us": 5_000_000, "interval": "start inclusive, end exclusive",
                      "anchor": "message timestamp", "time_unit": "integer microseconds"}
 TERMINAL_NAME = re.compile(r"order_(filled|canceled|cancelled|expired|denied|rejected)")
+SUPERSEDED_V3 = {"json_sha256": "180dd86e1848b8714ab7e5850d2989eb08217c1a0fb87f3af6493bc9006b8729",
+                 "generator_sha256": "933133afe24f128eb4226fb4c50230cb300d5e59ef8e663cc8dac0fb95a9100b",
+                 "verifier_sha256": "c8872073cf71990e349ef77293dcef0e434b087e70091b26c6c2749cbce22630"}
 SUPERSEDED_V2 = {"json_sha256": "25ef71020a06e1781fac0360aa8b19c564d9d146b65ea3fc6b8cb0ab62ab0c15",
                  "generator_sha256": "f44b595a13cf87b4ad555427000c7937cc62452076f0a3380f13338127147619",
                  "verifier_sha256": "cac1e764f429dc05575dfe8a692e74d4bcc04a8906e174e9e7b0178cf61494e3"}
@@ -159,6 +169,16 @@ def ladder_entries(rec, rows):
             for index, rung in enumerate(rec["ladder"]["rungs"]) if rung.get("submits")]
 
 
+def rung_table(rec, rows):
+    """Every ladder rung of the receipt that recorded seconds: {target: (index, window start, window stop in microseconds, the receipt's per-second slots, the receipt's submits)}.
+    Rung j starts at the S4 step_enter row's timestamp plus j x the frozen rung_s and lasts the seconds the receipt recorded; a rung with no recorded second has no window."""
+    rung_s = rec["frozen"]["s4"]["rung_s"]
+    enter = next(us_of(row) for row in rows if row["event"] == "step_enter" and row.get("step") == "S4")
+    return {rung["target_msgs_per_s"]: (index, enter + index * rung_s * SECOND_US, enter + (index * rung_s + len(rung["per_second_msgs"])) * SECOND_US,
+                                        rung["per_second_msgs"], rung.get("submits"))
+            for index, rung in enumerate(rec["ladder"]["rungs"]) if rung["per_second_msgs"]}
+
+
 def rung_peaks(rows, terminal):
     """Peak open step-S4 orders per rung target. An order is open from its submit row to its first terminal event. With keys (microseconds, +1 submit / -1 terminal event,
     rung), the count after an event e is (starts with key <= key_e) - (terminal events with key <= key_e), so terminal events sort before submits at equal times;
@@ -187,8 +207,8 @@ def main(argv):
         return 2
     doc = json.loads(Path(argv[1]).read_text())
     root = Path(argv[2])
-    if doc.get("revision", {}).get("number") != 3:
-        print(f"FAIL the document is revision {doc.get('revision', {}).get('number')!r}; this verifier checks revision 3 (use the verifier named for the document's revision)")
+    if doc.get("revision", {}).get("number") != 4:
+        print(f"FAIL the document is revision {doc.get('revision', {}).get('number')!r}; this verifier checks revision 4 (use the verifier named for the document's revision)")
         return 1
 
     # 1. official client, rung 50: orders, seconds, rates
@@ -205,29 +225,44 @@ def main(argv):
     check("official ladder: no refusal and no pacing code (only informational codes)", True,
           set(r["error_code_counts"]) <= {"202", "2104", "2107", "2158"} and r["stop_reason"] is None)
 
-    # 2. adapter r6: rung 30/40/50 from the journal
+    # 2. adapter r6: rung 30/40/50 from the journal. The two wire means are the messages inside the rung's own window over its recorded seconds (revision 4);
+    #    the *_by_order_rung values keep the order attribution of revisions 1 to 3 (the first cancel row of each order the rung submitted, wherever it was sent).
     rows = journal(root, "B-r6")
     rec6 = receipt(root, "B-r6")
+    table6 = rung_table(rec6, rows)
     for target in (30, 40, 50):
         ids = {x["coid"] for x in rows if x["event"] == "submit" and x.get("step") == "S4" and x.get("rung") == target}
-        cancels = {x["coid"]: x.get("reason") for x in rows if x["event"] == "cancel" and x.get("coid") in ids}
-        known = sum(1 for reason in cancels.values() if reason in ("accepted", "s3b_cancel"))
+        first_cancel = {}
+        for x in rows:
+            if x["event"] == "cancel" and x.get("coid") in ids and x["coid"] not in first_cancel:
+                first_cancel[x["coid"]] = x.get("reason")
+        known = sum(1 for reason in first_cancel.values() if reason != "unaccepted_after_1s")
         starts = [x["utc"] for x in rows if x["event"] == "rung_start" and x.get("rung") == target]
         ends = [x["utc"] for x in rows if x["event"] == "rung_end" and x.get("rung") == target]
         from datetime import datetime
         seconds = round(datetime.fromisoformat(ends[0]).timestamp() - datetime.fromisoformat(starts[0]).timestamp())
         item = next(x for x in rec6["ladder"]["rungs"] if x["target_msgs_per_s"] == target)
+        _, w_start, w_stop, w_per, _ = table6[target]
+        w_events = message_events([x for x in rows if x["event"] in ("submit", "cancel") and x.get("step") == "S4" and w_start <= us_of(x) < w_stop])
         got = {
             "counted_msgs_per_s_mean": item["mean_msgs_per_s"],
             "orders_per_min_by_submits": round(len(ids) / seconds * 60),
             "orders_per_min_by_counted_rate": round(item["mean_msgs_per_s"] / 2 * 60),
-            "wire_est_refined_msgs_per_s_mean": round((len(ids) + len(cancels) + known) / seconds, 2),
-            "wire_est_upper_bound_msgs_per_s_mean": round((len(ids) + 2 * len(cancels)) / seconds, 2),
+            "wire_est_refined_msgs_per_s_mean": round(sum(w for _, w in w_events["refined"]) / len(w_per), 2),
+            "wire_est_upper_bound_msgs_per_s_mean": round(sum(w for _, w in w_events["upper"]) / len(w_per), 2),
+            "wire_est_refined_msgs_per_s_mean_by_order_rung": round((len(ids) + len(first_cancel) + known) / len(w_per), 2),
+            "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": round((len(ids) + 2 * len(first_cancel)) / len(w_per), 2),
             "counted_times_1_5": round(item["mean_msgs_per_s"] * 1.5, 2),
         }
         want = headline(doc, f"adapter_r6_rung{target}")
         for key in got:
-            close(f"adapter r6 rung {target} {key}", want[key], got[key])
+            if key.startswith("wire_est"):
+                check(f"adapter r6 rung {target} {key} (exact)", want.get(key), got[key])
+            else:
+                close(f"adapter r6 rung {target} {key}", want.get(key), got[key])
+    above_50 = [f"rung {t} {kind}" for t in (40, 50) for kind in ("refined", "upper_bound")
+                if headline(doc, f"adapter_r6_rung{t}")[f"wire_est_{kind}_msgs_per_s_mean"] > 50]
+    print(f"INFO B-r6 rung 40 and rung 50 wire means above 50 msgs/s: {len(above_50)} of 4 ({'; '.join(above_50)})")
     check("adapter r6 rung 30: orders/min by submits = 900 and by counted rate = 897", [900, 897],
           [headline(doc, "adapter_r6_rung30")["orders_per_min_by_submits"], headline(doc, "adapter_r6_rung30")["orders_per_min_by_counted_rate"]])
     check("adapter r6 completed with no abort, no pacing finding", [None, 0, 0],
@@ -446,8 +481,48 @@ def main(argv):
             old_rule = rung_peaks(rows_by_label[run["label"]], {"order_canceled"})
             moved += [f"{run['label']}/{target}: {old_rule.get(target)} -> {peaks.get(target)}" for target in sorted(peaks) if old_rule.get(target) != peaks[target]]
     print("INFO rungs whose peak differs between the revision-2 rule (only order_canceled closes an order) and the revision-3 rule:", moved or "none")
-    check("revision 3: the block names the revision-2 files it supersedes by hash and the revision-1 files before them",
-          [doc["revision"]["number"], doc["revision"]["supersedes"], doc["revision"]["earlier_revisions"]], [3, SUPERSEDED_V2, {"1": SUPERSEDED_V1}])
+
+    # 4h. per-rung wire means over the rung's own window, the order-attributed values, and where the first cancel of each of the rung's orders was sent (revision 4)
+    for run in every_run:
+        if "rungs" not in run:
+            continue
+        label, rows = run["label"], rows_by_label[run["label"]]
+        table = rung_table(receipt(root, label), rows)
+        want_rungs = {item["target_msgs_per_s"]: item for item in run["rungs"]}
+        submit_rung, first_cancel = {}, {}
+        for row in rows:
+            coid = row.get("coid")
+            if row["event"] == "submit" and row.get("step") == "S4":
+                submit_rung[coid] = row.get("rung")
+            elif row["event"] == "cancel" and coid in submit_rung and coid not in first_cancel:
+                first_cancel[coid] = row
+        got_means, got_order, got_class = {}, {}, {}
+        for target in sorted(want_rungs):
+            index, start, stop, per, _ = table[target]
+            seconds = len(per)
+            weights = message_events([r for r in rows if r["event"] in ("submit", "cancel") and r.get("step") == "S4" and start <= us_of(r) < stop])
+            got_means[target] = [round(sum(w for _, w in weights["refined"]) / seconds, 2), round(sum(w for _, w in weights["upper"]) / seconds, 2)]
+            ids = [coid for coid, rung_target in submit_rung.items() if rung_target == target]
+            sent = [first_cancel[coid] for coid in ids if coid in first_cancel]
+            known = sum(1 for r in sent if r.get("reason") != "unaccepted_after_1s")
+            got_order[target] = [round((len(ids) + len(sent) + known) / seconds, 2), round((len(ids) + 2 * len(sent)) / seconds, 2), len(sent), known, len(sent) - known]
+            others = [(lo, hi) for j, lo, hi, _, _ in table.values() if j != index]
+            own = sum(1 for r in sent if start <= us_of(r) < stop)
+            other = sum(1 for r in sent if not start <= us_of(r) < stop and any(lo <= us_of(r) < hi for lo, hi in others))
+            outside = sum(1 for r in sent if not start <= us_of(r) < stop and not any(lo <= us_of(r) < hi for lo, hi in others))
+            got_class[target] = [own, other, outside]
+        check(f"{label}: per-rung wire means over the rung's own window (refined, upper bound)",
+              {t: [want_rungs[t]["wire_est_refined_msgs_per_s_mean"], want_rungs[t]["wire_est_upper_bound_msgs_per_s_mean"]] for t in sorted(want_rungs)}, got_means)
+        check(f"{label}: order-attributed means and the cancels sent / with a known venue id / before acceptance, per rung",
+              {t: [want_rungs[t]["wire_est_refined_msgs_per_s_mean_by_order_rung"], want_rungs[t]["wire_est_upper_bound_msgs_per_s_mean_by_order_rung"], want_rungs[t]["cancels_sent"],
+                   want_rungs[t]["cancels_with_known_venue_id"], want_rungs[t]["cancels_before_acceptance"]] for t in sorted(want_rungs)}, got_order)
+        check(f"{label}: where the first cancel of each rung order was sent (own window, another rung's window, outside every window), per rung",
+              {t: [want_rungs[t]["cancels_sent_in_own_window"], want_rungs[t]["cancels_sent_in_other_rung_window"], want_rungs[t]["cancels_sent_outside_rung_windows"]]
+               for t in sorted(want_rungs)}, got_class)
+        check(f"{label}: the three cancel classifications sum to cancels_sent, per rung", [],
+              [t for t in sorted(want_rungs) if sum(got_class[t]) != got_order[t][2]])
+    check("revision 4: the block names the revision-3 files it supersedes by hash and the revisions 1 and 2 before them",
+          [doc["revision"]["number"], doc["revision"]["supersedes"], doc["revision"]["earlier_revisions"]], [4, SUPERSEDED_V3, {"1": SUPERSEDED_V1, "2": SUPERSEDED_V2}])
 
     # 5. document hygiene: no account-shaped token, no order reference shape, no 8+ digit integer outside version stamps
     text = Path(argv[1]).read_text()

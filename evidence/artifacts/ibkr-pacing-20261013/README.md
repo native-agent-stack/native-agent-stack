@@ -71,10 +71,9 @@ cancel as two messages.
 
 1. One official-client connection sustained 49.95 msgs/s at rung 50 (500 orders in 20 s, 1,500 orders a minute with
    cancels, 2,997 messages a minute) with flat latency and no refusal.
-2. One adapter connection sustained about 900 orders a minute with cancels (rung 30: 897-900, wire estimate about 45 msgs/s)
-   with accept p50 0.61 s. At rung 40 its wire estimate was 51.7 (refined) to 57.3 (upper bound) msgs/s and at rung 50
-   49.4 to 56.6, the window filled (50 open) and latency rose (accept p50 0.90-0.93 s); three of those four estimates are
-   above the 50 cap.
+2. One adapter connection sustained about 900 orders a minute with cancels (rung 30: 897-900, wire estimate 44.75 (refined) to 44.8 (upper bound) msgs/s, about 45) with accept p50 0.61 s. At rung 40
+   its wire estimate was 51.3 (refined) to 56.5 (upper bound) msgs/s and at rung 50 49.05 to 56.45, the window filled (50 open) and latency rose (accept p50 0.90-0.93 s); three of those four estimates
+   are above the 50 cap. (Each estimate is the wire messages inside the rung's own 20 s window divided by 20 s.)
 3. Two order-writing adapter connections on one account: the connection with the lower client-id partition is refused with
    `[103] Duplicate order id` within about 0.3-3 s of the other connection's first order (m1, m2, m4).
 4. The refusal reproduces with the official client (13 two-connection tests): it appeared in T4, T7, T9a and T10, where

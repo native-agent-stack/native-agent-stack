@@ -1,39 +1,44 @@
 # IBKR pacing publication boundary
 
 The canonical JSON, generator and verifier retain the approved trading-cc
-**revision 3** bytes unchanged. [V3-CHANGES.md](V3-CHANGES.md) is retained
-unchanged and supplies the correction table; it adds no new measurement.
-Revision-1 and revision-2 predecessors remain inspectable public files, so the
+**revision 4** bytes unchanged. [V4-CHANGES.md](V4-CHANGES.md) is retained
+unchanged and supplies the per-rung correction; [V3-CHANGES.md](V3-CHANGES.md)
+retains the earlier sliding/peak/ownership correction. Neither adds a measurement.
+Revision-1 through revision-3 predecessors remain inspectable public files, so the
 document's superseded commitments have public preimages. Original receipts and
 internal probe helpers are not read or copied by this publication.
 
 | Active approved artifact | SHA256 |
 | --- | --- |
-| `ibkr-pacing-evidence-20261013.json` (v3 bytes) | `180dd86e1848b8714ab7e5850d2989eb08217c1a0fb87f3af6493bc9006b8729` |
-| `generate_ibkr_pacing_evidence.py` (v3 bytes) | `933133afe24f128eb4226fb4c50230cb300d5e59ef8e663cc8dac0fb95a9100b` |
-| `verify_ibkr_pacing_evidence.py` (v3 bytes) | `c8872073cf71990e349ef77293dcef0e434b087e70091b26c6c2749cbce22630` |
+| `ibkr-pacing-evidence-20261013.json` (v4 bytes) | `841ec5965caa6fa6d1b7d7ed5ddfa34af8ca38ba26028bf6226847fcad368900` |
+| `generate_ibkr_pacing_evidence.py` (v4 bytes) | `d14fb1e81fabe1055d4e2a155f2fe76fbe0401dbe7bc30234ca8558d0e308f68` |
+| `verify_ibkr_pacing_evidence.py` (v4 bytes) | `b72e5a341915d3f1d863f8aaef9de953c690efd273ee00f1d322d1112eca7913` |
+| `V4-CHANGES.md` | `61e93447bad4421d85f3b678b5ed61e1c206d43f92326b88f78ba15cd666a29a` |
 | `V3-CHANGES.md` | `edbb14013d15b8e9164685e024ed68b02ec676f8ea3d7f83e6591f3a843cc855` |
 | `ADDENDUM-01.txt` | `bbbb4d0096d0cab5577050f1b2ba31348fbc6cf5a1969b251bcb35649963b7f6` |
 | `ADDENDUM-02.txt` | `f1de0a311acc5bcd7d7eeddd51e7fef35196dcd76c4f878f1564424f4f834a9c` |
 | `ADDENDUM-03.txt` (re-sealed v2 text, unchanged) | `ac6adcea2551c8e9df26efd0fa434d5283dccdc74f8af17f32afba9c7bc9b324` |
 
 The published README updates the rate definition and adapter peak definition
-from v3; it is no longer byte-identical to the original producer README.
-Its original source and the v1/v2 producer seals remain unchanged at the producer.
+from v3 and the exact corrected rung sentence from V4-CHANGES section 4; it is
+no longer byte-identical to the original producer README.
+Its original source and the v1-v3 producer seals remain unchanged at the producer.
 Published file hashes, including the updated README, are registered natively in
-`manifests/evidence.json`. The retained change record's section 6 describes the
-producer's pre-publication status; the canonical PR paths now carry v3.
+`manifests/evidence.json`. The retained change records' section 6 describes the
+producer's pre-publication status; the canonical PR paths now carry v4.
 
 ## Current definitions and correction table
 
-Source: [V3-CHANGES section 4](V3-CHANGES.md), the authoritative FAIL/HOLD table,
-and JSON `/facts/rate_window_conventions`, `/facts/peak_open_orders_definition`.
+Sources: [V3-CHANGES section 4](V3-CHANGES.md) for sliding/peak corrections,
+[V4-CHANGES section 4](V4-CHANGES.md) for the superseding rung means, and JSON
+`/facts/rate_window_conventions`, `/facts/peak_open_orders_definition`.
 
-| Field | Revision 3 meaning | Boundary |
+| Field | Current meaning | Boundary |
 | --- | --- | --- |
 | Whole-run `max_1s` | Largest message count in sliding half-open one-second windows anchored at message timestamps | Counted and source-derived wire series remain separate. |
 | `best_5s_mean` | Largest sliding five-second count divided by five | Integer microseconds; start included, end excluded. |
 | `*_utc_buckets` | Retained revision-2 UTC-aligned values | These historical buckets are distinct from the current sliding maxima. |
+| Rung `wire_est_*_msgs_per_s_mean` | Messages inside the rung's own window divided by its recorded seconds | Includes other rungs' cancels sent inside; excludes its orders' cancels sent outside. Earlier means remain `*_by_order_rung`. |
 | Rung `counted_msgs_per_s_min/max` | Original receipt slot counters | Fixed slots; a slot maximum is a lower bound of the sliding maximum. |
 | Adapter `peak_open_orders` | Submitted orders through their first terminal order event, including rejected/filled/canceled terminals | A rejected cancel is not terminal; no terminal event leaves an order open in the journal counter. |
 | Official-client `peak_open_orders` | Original runtime counter, unchanged | A 103-refused order counts until the stale cancel is answered; not recomputable without private per-message records. |
@@ -49,9 +54,11 @@ The section-4 FAIL claims are replaced as follows:
 | B-r5 rung-50 slot counter 38 as peak rate | Sliding in-rung maximum **46 counted / 69 wire**. |
 | Whole-run B-r5/B-r6 maxima | Counted **46/53**, refined wire **69/78**, upper wire **69/83**, replacing bucket **37/48**, **57/66**, **57/71**. |
 
-HOLD claims stay means/counts: official rung-50 mean 49.95 messages/s, 500 orders
+Unchanged counts and official means: official rung-50 mean 49.95 messages/s, 500 orders
 in 20 seconds, rate 1,500 orders/minute and 2,997 messages/minute; adapter rung-30
-means 44.95 refined / 45.0 upper wire messages/s. The rung-30 sliding maxima are
+means now **44.75 refined / 44.8 upper** wire messages/s. Rung40 means are
+**51.3/56.5** and rung50 **49.05/56.45**; three of those four remain above50.
+Source: [V4-CHANGES section 4](V4-CHANGES.md). The rung-30 sliding maxima are
 63 refined / 64 upper wire messages; a mean is not a burst ceiling. Adapter
 `pacing_error_count`, code-100 lines and pacing-text lines remain zero; no
 disconnect occurred. Official-client receipt maxima are unchanged and its
@@ -73,9 +80,16 @@ root; v3 rejects it. These are attributed producer results. This documentation
 change checks approved bytes and public consistency, without reading original
 private roots or independently replaying broker measurements.
 
-All six earlier producer preimages remain in this directory with versioned names:
+V4's [verification record](V4-CHANGES.md) reports **223 checks without** the
+pinned source check, **228 with** it, and byte-reproducible generation across
+three Python versions. Per-rung means are independently window-derived; mutation
+controls reject changed means and cancel-window classifications. These remain
+producer-attributed results, not an author private-input replay.
+
+All nine earlier producer preimages remain in this directory with versioned names:
 `generate_ibkr_pacing_evidence.v1.py`, `verify_ibkr_pacing_evidence.v1.py`,
-`ibkr-pacing-evidence-20261013.v1.json`, and their `.v2.py`/`.v2.json` counterparts.
+`ibkr-pacing-evidence-20261013.v1.json`, and their `.v2.py`/`.v2.json` and
+`.v3.py`/`.v3.json` counterparts.
 They are historical source, not the active verifier or current measurement schema.
 ADDENDUM-03 stays exactly at its re-sealed v2 text; its old aggregate-ownership
 statement is superseded by the v3 per-ID checks. ADDENDUM-02 corrects the earlier

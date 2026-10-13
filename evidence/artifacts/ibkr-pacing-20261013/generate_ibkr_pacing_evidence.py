@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Build the sanitized IBKR pacing evidence document (ibkr-pacing-evidence/1, revision 3) from the private run receipts.
+"""Build the sanitized IBKR pacing evidence document (ibkr-pacing-evidence/1, revision 4) from the private run receipts.
+
+Revision 4 (supersedes the sealed revision-3 generator/JSON/verifier named in the document's `revision` block) fixes one defect found by the co-op's question on nas#1083: the per-rung
+`wire_est_refined_msgs_per_s_mean` and `wire_est_upper_bound_msgs_per_s_mean` of revisions 1 to 3 were (submits + cancels + known) / seconds, where the cancels belong to the orders the rung
+SUBMITTED wherever they were sent, so a cancel sent in the next rung's window, or after the ladder, was charged to the submission rung while the denominator is the rung's own seconds.
+They are now the wire messages whose journal time lies inside the rung's own window, divided by the rung's recorded seconds (the same window rows and series as
+`max_1s_sliding_in_rung_window`); the order-attributed values stay under `*_by_order_rung`, and each rung reports where the cancels of its orders were sent.
 
 Revision 3 (supersedes the sealed revision-2 generator/JSON/verifier named in the document's `revision` block) fixes three defects found by the co-op's review of revision 2:
 (1) the verifier compared COUNTS where every missing order must have exactly one owner journal (the fix is in the verifier; this generator adds the owner-count histogram to `reconciliation`);
@@ -19,7 +25,7 @@ error-code counts, booleans and category words.
 Run root layout (private): runs/<LABEL>/receipt.json (+ journal.jsonl, vendor.log for the adapter runs), runs/marker-*.json,
 journal-submitted-ids.txt.missing (the journal-side order references the broker did not list; read for COUNTS only).
 
-usage: python3 generate_ibkr_pacing_evidence.v3.py RUN_ROOT > ibkr-pacing-evidence-20261013.v3.json
+usage: python3 generate_ibkr_pacing_evidence.v4.py RUN_ROOT > ibkr-pacing-evidence-20261013.v4.json
 """
 import json
 import re
@@ -230,6 +236,7 @@ def ladder_rungs(receipt, rows):
     ladder = receipt.get("ladder") or {}
     terminal = terminal_events(rows)
     submit, accepted, cancel, canceled, closed, rung_of, cancel_reason = {}, {}, {}, {}, {}, {}, {}
+    cancel_us = {}
     for row in rows:
         coid = row.get("coid")
         if row["event"] == "submit" and row.get("step") == "S4":
@@ -239,6 +246,7 @@ def ladder_rungs(receipt, rows):
         elif row["event"] == "cancel" and coid in submit:
             if coid not in cancel:
                 cancel[coid] = ts(row["utc"])
+                cancel_us[coid] = us(row["utc"])
                 cancel_reason[coid] = row.get("reason")
         elif row["event"] == "order_canceled" and coid in submit:
             canceled[coid] = ts(row["utc"])
@@ -253,28 +261,42 @@ def ladder_rungs(receipt, rows):
     # per-rung windows: rung j covers [S4 step_enter + j x rung_s, + the rung's recorded seconds), the harness's own per-second slots
     rung_s = (receipt.get("frozen") or {}).get("s4", {}).get("rung_s")
     s4_enter = next((us(row["utc"]) for row in rows if row["event"] == "step_enter" and row.get("step") == "S4"), None)
+    windows = {}
+    if s4_enter is not None and rung_s is not None:
+        for index, rung in enumerate(ladder.get("rungs", [])):
+            if rung["per_second_msgs"]:
+                start = s4_enter + index * rung_s * US
+                windows[index] = (start, start + len(rung["per_second_msgs"]) * US)
     out = []
     for index, rung in enumerate(ladder.get("rungs", [])):
         per = rung["per_second_msgs"]
         if not rung.get("submits"):
             continue
         target = rung["target_msgs_per_s"]
+        if index not in windows:
+            raise SystemExit(f"adapter rung {target}: orders were placed but the journal gives no window "
+                             "(the S4 step_enter row, the frozen rung_s and the recorded seconds are all required)")
+        start, stop = windows[index]
         ids = [c for c, v in rung_of.items() if v == target]
         acc = [(accepted[c] - submit[c]) * 1000 for c in ids if c in accepted]
         can = [(canceled[c] - cancel[c]) * 1000 for c in ids if c in canceled and c in cancel]
         seconds = len(per)
         cancels = sum(1 for c in ids if c in cancel)
         known = sum(1 for c in ids if c in cancel and cancel_reason.get(c) not in NO_VENUE_ID_REASONS)
-        sliding = replay = None
-        if s4_enter is not None and rung_s is not None and seconds:
-            start = s4_enter + index * rung_s * US
-            window = [row for row in rows if row["event"] in ("submit", "cancel") and row.get("step") == "S4" and start <= us(row["utc"]) < start + seconds * US]
-            window_counted, window_refined, window_upper = message_times(window)
-            sliding = {"counted": sliding_peak(window_counted, US), "wire_est_refined": sliding_peak(window_refined, US),
-                       "wire_est_upper_bound": sliding_peak(window_upper, US)}
-            slots = Counter((t - start) // US for t in window_counted)
-            difference = max(abs(slots.get(k, 0) - per[k]) for k in range(seconds))
-            replay = {"equal": difference == 0, "max_abs_slot_difference": difference}
+        # where the first cancel row of each of the rung's orders was sent: its own window, another rung's window, or outside every rung window
+        in_own = sum(1 for c in ids if c in cancel_us and start <= cancel_us[c] < stop)
+        in_other = sum(1 for c in ids if c in cancel_us and not start <= cancel_us[c] < stop
+                       and any(lo <= cancel_us[c] < hi for j, (lo, hi) in windows.items() if j != index))
+        outside = sum(1 for c in ids if c in cancel_us and not any(lo <= cancel_us[c] < hi for lo, hi in windows.values()))
+        if in_own + in_other + outside != cancels:
+            raise SystemExit(f"adapter rung {target}: the cancel classification {in_own} + {in_other} + {outside} does not sum to {cancels}")
+        window = [row for row in rows if row["event"] in ("submit", "cancel") and row.get("step") == "S4" and start <= us(row["utc"]) < stop]
+        window_counted, window_refined, window_upper = message_times(window)
+        sliding = {"counted": sliding_peak(window_counted, US), "wire_est_refined": sliding_peak(window_refined, US),
+                   "wire_est_upper_bound": sliding_peak(window_upper, US)}
+        slots = Counter((t - start) // US for t in window_counted)
+        difference = max(abs(slots.get(k, 0) - per[k]) for k in range(seconds))
+        replay = {"equal": difference == 0, "max_abs_slot_difference": difference}
         out.append({
             "target_msgs_per_s": target,
             "seconds": seconds,
@@ -290,8 +312,13 @@ def ladder_rungs(receipt, rows):
             "cancels_sent": cancels,
             "cancels_with_known_venue_id": known,
             "cancels_before_acceptance": cancels - known,
-            "wire_est_refined_msgs_per_s_mean": round((rung["submits"] + cancels + known) / seconds, 2) if seconds else None,
-            "wire_est_upper_bound_msgs_per_s_mean": round((rung["submits"] + 2 * cancels) / seconds, 2) if seconds else None,
+            "cancels_sent_in_own_window": in_own,
+            "cancels_sent_in_other_rung_window": in_other,
+            "cancels_sent_outside_rung_windows": outside,
+            "wire_est_refined_msgs_per_s_mean": round(len(window_refined) / seconds, 2),
+            "wire_est_upper_bound_msgs_per_s_mean": round(len(window_upper) / seconds, 2),
+            "wire_est_refined_msgs_per_s_mean_by_order_rung": round((rung["submits"] + cancels + known) / seconds, 2),
+            "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": round((rung["submits"] + 2 * cancels) / seconds, 2),
             "accept_ms": lat(acc),
             "cancel_ms": lat(can),
             "peak_open_orders": peak.get(target),
@@ -610,7 +637,10 @@ def headline(adapter_b, official, pairs, recon, conc):
         out.append({"id": f"adapter_r6_rung{target}", "value": {
             "counted_msgs_per_s_mean": x["counted_msgs_per_s_mean"], "orders_per_min_by_submits": x["orders_per_min_by_submits"],
             "orders_per_min_by_counted_rate": x["orders_per_min_by_counted_rate"], "wire_est_refined_msgs_per_s_mean": x["wire_est_refined_msgs_per_s_mean"],
-            "wire_est_upper_bound_msgs_per_s_mean": x["wire_est_upper_bound_msgs_per_s_mean"], "counted_times_1_5": round(x["counted_msgs_per_s_mean"] * 1.5, 2)},
+            "wire_est_upper_bound_msgs_per_s_mean": x["wire_est_upper_bound_msgs_per_s_mean"],
+            "wire_est_refined_msgs_per_s_mean_by_order_rung": x["wire_est_refined_msgs_per_s_mean_by_order_rung"],
+            "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": x["wire_est_upper_bound_msgs_per_s_mean_by_order_rung"],
+            "counted_times_1_5": round(x["counted_msgs_per_s_mean"] * 1.5, 2)},
             "unit": "mixed", "source": "B-r6 receipt + journal"})
     out.append({"id": "adapter_whole_run_rate_estimates", "value": {
         run["label"]: {"counted": run["rate_estimates_whole_run"]["counted_msgs_per_s"],
@@ -660,7 +690,7 @@ def peak_open_orders_definition(vocabulary, quantities):
         "revision_2_defect": "revision 2 closed an order only at order_canceled, so a rejected, filled, expired or denied order stayed open for ever",
         "official_client_peak_open": "source-derived from the private probe script, not recomputable: the receipts' `peak_open_orders` of the official-client runs are the probe's own run-time counter "
                                      "(at each placement: the orders already placed and not marked done, plus the one being placed); the probe marks an order done only on a Cancelled / ApiCancelled / "
-                                     "Inactive status, a 202 notice or a 10147 / 10148 error, so a [103]-refused order counts as open until its stale cancel is answered; these values are unchanged in revision 3",
+                                     "Inactive status, a 202 notice or a 10147 / 10148 error, so a [103]-refused order counts as open until its stale cancel is answered; these values are unchanged in revisions 3 and 4",
     }
 
 
@@ -675,14 +705,30 @@ def rate_window_conventions(replays):
                   "(refined: only for a cancel of an order that had been accepted), stamped with the cancel row's timestamp because the journal does not timestamp it",
         "utc_buckets": "max_1s_utc_buckets and best_5s_mean_utc_buckets are the revision-2 numbers: messages per UTC second (the integer second of the timestamp), the largest bucket and the best mean "
                        "of 5 consecutive buckets; a sliding maximum is never below its bucket value and exceeds it when a burst straddles a second boundary",
-        "field_changes": {
+        "field_changes_in_revision_3": {
             "renamed": ["max_1s -> max_1s_utc_buckets", "best_5s_mean -> best_5s_mean_utc_buckets"],
             "same_name_new_meaning": ["max_1s", "best_5s_mean"],
             "added": ["max_1s_utc_buckets", "best_5s_mean_utc_buckets", "max_1s_sliding_in_rung_window", "receipt_slots_replayed_from_journal",
                       "reconciliation.journal_orders_missing_by_number_of_owner_journals", "facts.rate_window_conventions", "facts.peak_open_orders_definition"],
         },
+        "field_changes_in_revision_4": {
+            "key_renamed_in_this_block": ["field_changes -> field_changes_in_revision_3"],
+            "same_name_new_meaning": ["wire_est_refined_msgs_per_s_mean", "wire_est_upper_bound_msgs_per_s_mean (every adapter rung, and the adapter_r6_rung30/40/50 headline entries)"],
+            "renamed": ["the revision-3 value of wire_est_refined_msgs_per_s_mean -> wire_est_refined_msgs_per_s_mean_by_order_rung",
+                        "the revision-3 value of wire_est_upper_bound_msgs_per_s_mean -> wire_est_upper_bound_msgs_per_s_mean_by_order_rung"],
+            "added": ["cancels_sent_in_own_window", "cancels_sent_in_other_rung_window", "cancels_sent_outside_rung_windows", "facts.rate_window_conventions.rung_wire_means",
+                      "facts.rate_window_conventions.field_changes_in_revision_4", "revision.reason"],
+        },
         "rung_window": "max_1s_sliding_in_rung_window applies the same sliding maximum to the step-S4 submit and cancel rows inside a rung's window, which starts at the S4 step_enter row's "
                        "timestamp plus (rung index x the frozen rung_s) and lasts the rung's recorded seconds; it is the harness's own per-second slot grid replayed from the journal",
+        "rung_wire_means": "wire_est_refined_msgs_per_s_mean and wire_est_upper_bound_msgs_per_s_mean of an adapter rung (and of the adapter_r6_rung30/40/50 headline entries) are the number of "
+                           "messages of that series whose journal time lies inside the rung's own window, divided by the rung's recorded seconds and rounded to 2 decimals: the same window rows "
+                           "and message series as max_1s_sliding_in_rung_window, the hidden reqAllOpenOrders counted as in `series`. They include the cancels of other rungs' orders that were sent "
+                           "inside the window and exclude the cancels (and, for a rung stopped part-way, the submits after its recorded seconds) of the rung's own orders that were sent outside it. "
+                           "Revisions 1 to 3 published (submits + cancels + known) / seconds with cancels and known counted over the orders the rung SUBMITTED wherever they were sent; those values "
+                           "are kept as wire_est_refined_msgs_per_s_mean_by_order_rung and wire_est_upper_bound_msgs_per_s_mean_by_order_rung. cancels_sent, cancels_with_known_venue_id and "
+                           "cancels_before_acceptance stay order-attributed (the first cancel row of each order the rung submitted); cancels_sent_in_own_window, cancels_sent_in_other_rung_window and "
+                           "cancels_sent_outside_rung_windows classify those same first cancel rows by journal time against every rung window of the run and sum to cancels_sent",
         "rung_window_replay": {
             "rungs": len(replays),
             "slots_equal_to_the_receipts_per_second_counters": sum(1 for r in replays if r["equal"]),
@@ -773,15 +819,19 @@ def main(argv):
         "official_client_summary": summary_groups(pairs),
         "reqids_probe": {"source": "transcript-derived (probe output printed in the session; no receipt file)", **TRANSCRIPT_DERIVED["reqids_probe"]},
         "reconciliation": recon,
-        "revision": {"number": 3,
-                     "supersedes": {"json_sha256": "25ef71020a06e1781fac0360aa8b19c564d9d146b65ea3fc6b8cb0ab62ab0c15", "generator_sha256": "f44b595a13cf87b4ad555427000c7937cc62452076f0a3380f13338127147619", "verifier_sha256": "cac1e764f429dc05575dfe8a692e74d4bcc04a8906e174e9e7b0178cf61494e3"},
-                     "earlier_revisions": {"1": {"json_sha256": "b492f42d335370e22f4349bf43db54f1adf4c77921b36a28300159b08c8e11fa", "generator_sha256": "56463b2622501446a9a1640c6d3065920dbd449a622457ea61f392ce6166c5a1", "verifier_sha256": "0e9fb1376a59e34cf1e3b6ba2fea30d89aad5e09db28de0b4d59792a41207468"}},
-                     "sealed_files": "the revision-1 and revision-2 files stay sealed and unchanged; anything citing them by hash still resolves",
-                     "changes": ["per-id ownership: reconciliation gains journal_orders_missing_by_number_of_owner_journals; the verifier checks that every missing order is found in exactly one run journal id by id (revision 2 compared counts)",
-                                 "rates: max_1s and best_5s_mean of every whole-run and combined rate block are maxima over sliding windows anchored at a message; the revision-2 UTC-bucket numbers are kept as max_1s_utc_buckets and best_5s_mean_utc_buckets; the headline unit text is corrected",
-                                 "rates: every adapter rung gains max_1s_sliding_in_rung_window and receipt_slots_replayed_from_journal (the receipts' own counted_msgs_per_s_min/max are bucket values and are unchanged)",
-                                 "peak_open_orders: an order stops being open at its first terminal order event, the terminal names being derived from the journals' own vocabulary (revision 2 closed an order only at order_canceled)",
-                                 "facts.rate_window_conventions, facts.peak_open_orders_definition and three caveats added; every other measured value, count, latency and test result is unchanged"]},
+        "revision": {"number": 4,
+                     "supersedes": {"json_sha256": "180dd86e1848b8714ab7e5850d2989eb08217c1a0fb87f3af6493bc9006b8729", "generator_sha256": "933133afe24f128eb4226fb4c50230cb300d5e59ef8e663cc8dac0fb95a9100b", "verifier_sha256": "c8872073cf71990e349ef77293dcef0e434b087e70091b26c6c2749cbce22630"},
+                     "earlier_revisions": {"1": {"json_sha256": "b492f42d335370e22f4349bf43db54f1adf4c77921b36a28300159b08c8e11fa", "generator_sha256": "56463b2622501446a9a1640c6d3065920dbd449a622457ea61f392ce6166c5a1", "verifier_sha256": "0e9fb1376a59e34cf1e3b6ba2fea30d89aad5e09db28de0b4d59792a41207468"},
+                                           "2": {"json_sha256": "25ef71020a06e1781fac0360aa8b19c564d9d146b65ea3fc6b8cb0ab62ab0c15", "generator_sha256": "f44b595a13cf87b4ad555427000c7937cc62452076f0a3380f13338127147619", "verifier_sha256": "cac1e764f429dc05575dfe8a692e74d4bcc04a8906e174e9e7b0178cf61494e3"}},
+                     "sealed_files": "the revision-1, revision-2 and revision-3 files stay sealed and unchanged; anything citing them by hash still resolves",
+                     "reason": "A co-op question on nas#1083 showed that the per-rung wire means of revisions 1 to 3 charged each rung with the cancels of the orders it SUBMITTED, wherever those cancels were sent, "
+                               "over the rung's own recorded seconds: a cancel sent in the next rung's window, or after the ladder, was counted in the submission rung, and for a rung stopped part-way the submits "
+                               "after its recorded seconds were counted too, so a rung's mean was not the rate of messages inside its window. The per-message series (max_1s_sliding_in_rung_window, the "
+                               "whole-run and combined rate blocks) and the official-client figures were already window or message based and are unchanged.",
+                     "changes": ["rung wire means: wire_est_refined_msgs_per_s_mean and wire_est_upper_bound_msgs_per_s_mean of every adapter rung and of the adapter_r6_rung30/40/50 headline entries are now the messages inside the rung's own window divided by its recorded seconds; the revision-3 order-attributed values are kept as wire_est_refined_msgs_per_s_mean_by_order_rung and wire_est_upper_bound_msgs_per_s_mean_by_order_rung",
+                                 "each adapter rung gains cancels_sent_in_own_window, cancels_sent_in_other_rung_window and cancels_sent_outside_rung_windows, which sum to cancels_sent (cancels_sent, cancels_with_known_venue_id and cancels_before_acceptance are unchanged and order-attributed)",
+                                 "the generator stops with a message for a rung that placed orders but has no window, instead of publishing a null mean",
+                                 "facts.rate_window_conventions gains rung_wire_means and field_changes_in_revision_4 (its field_changes key is renamed field_changes_in_revision_3) and one caveat is added; every other measured value, count, latency, sliding maximum, peak and test result is unchanged"]},
         "caveats": [
             "The 1,500 orders a minute with cancels at 50 msgs/s was measured over one 20-second rung, not a full minute.",
             "The third wire message per order (one reqAllOpenOrders per cancel) is derived from the adapter source at the pin; it was not captured on the wire.",
@@ -798,6 +848,8 @@ def main(argv):
             "The receipts' own per-rung `counted_msgs_per_s_min` / `counted_msgs_per_s_max` are fixed one-second slot counters, so they are bucket values and lower bounds of the sliding maximum; "
             "the official client's receipts hold no per-message times, so its per-second maxima cannot be recomputed under the sliding definition.",
             "`peak_open_orders` of the adapter runs closes an order at its first terminal order event (revision 3); the official client's `peak_open_orders` is the probe's own run-time counter and is not recomputable from the receipts.",
+            "Per-rung wire means (revision 4) are the wire-series messages inside the rung's own window divided by its recorded seconds: they include the cancels of other rungs' orders sent in the window "
+            "and exclude the cancels of the rung's own orders sent outside it, and for a rung stopped part-way they cover only its recorded seconds; the order-attributed values of revisions 1 to 3 are kept as `*_by_order_rung`.",
         ],
     }
     json.dump(doc, sys.stdout, sort_keys=True, indent=1, ensure_ascii=True)
