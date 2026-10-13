@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "count_method": "raw only",
+  "crosscheck_only": true,
+  "completed_at": "2026-10-13T03:01:48Z",
+  "threshold": 0.95,
+  "status": "ready_for_canonicalization",
+  "lists": [
+    {"repository":"Shubhamsaboo/awesome-llm-apps","commit":{"identifier_id":"I00003"},"set_identity":"normalized requested owner/repo, before canonical API resolution","raw_set_size":3,"html_set_size":3,"intersection_size":3,"union_size":3,"jaccard":1.0,"raw_only":[],"html_only":[],"compared_files":["README.md"],"not_rendered_files":[],"status":"measured"},
+    {"repository":"avelino/awesome-go","commit":{"identifier_id":"I00007"},"set_identity":"normalized requested owner/repo, before canonical API resolution","raw_set_size":2936,"html_set_size":2933,"intersection_size":2933,"union_size":2936,"jaccard":0.9989782016348774,"raw_only":["pkg/errors","pkg/errors.","unit-io/unitd"],"html_only":[],"compared_files":["README.md","CONTRIBUTING.md","COVERAGE.md",".github/PULL_REQUEST_TEMPLATE.md"],"not_rendered_files":[],"status":"measured"},
+    {"repository":"awesome-selfhosted/awesome-selfhosted","commit":{"identifier_id":"I00020"},"set_identity":"normalized requested owner/repo, before canonical API resolution","raw_set_size":1165,"html_set_size":1165,"intersection_size":1165,"union_size":1165,"jaccard":1.0,"raw_only":[],"html_only":[],"compared_files":["README.md","non-free.md"],"not_rendered_files":[],"status":"measured"},
+    {"repository":"e2b-dev/awesome-ai-agents","commit":{"identifier_id":"I00001"},"set_identity":"normalized requested owner/repo, before canonical API resolution","raw_set_size":109,"html_set_size":109,"intersection_size":109,"union_size":109,"jaccard":1.0,"raw_only":[],"html_only":[],"compared_files":["README.md"],"not_rendered_files":[],"status":"measured"},
+    {"repository":"hesreallyhim/awesome-claude-code","commit":{"identifier_id":"I00030"},"set_identity":"normalized requested owner/repo, before canonical API resolution","raw_set_size":226,"html_set_size":226,"intersection_size":226,"union_size":226,"jaccard":1.0,"raw_only":[],"html_only":[],"compared_files":["README.md"],"not_rendered_files":[],"status":"measured"},
+    {"repository":"ichangyou/awesome-codex","commit":{"identifier_id":"I00034"},"set_identity":"normalized requested owner/repo, before canonical API resolution","raw_set_size":53,"html_set_size":53,"intersection_size":53,"union_size":53,"jaccard":1.0,"raw_only":[],"html_only":[],"compared_files":["README.md","OPERATIONS.md","CONTRIBUTING.md","CHANGELOG.md"],"not_rendered_files":[],"status":"measured"},
+    {"repository":"kyrolabs/awesome-agents","commit":{"identifier_id":"I00047"},"set_identity":"normalized requested owner/repo, before canonical API resolution","raw_set_size":186,"html_set_size":185,"intersection_size":185,"union_size":186,"jaccard":0.9946236559139785,"raw_only":["frontman-ai/frontman"],"html_only":[],"compared_files":["README.md"],"not_rendered_files":[],"status":"measured"},
+    {"repository":"punkpeye/awesome-mcp-servers","commit":{"identifier_id":"I00051"},"set_identity":"normalized requested owner/repo, before canonical API resolution","raw_set_size":0,"html_set_size":0,"intersection_size":0,"union_size":0,"jaccard":null,"raw_only":[],"html_only":[],"compared_files":[],"not_rendered_files":["README.md"],"status":"not_available"},
+    {"repository":"sindresorhus/awesome","commit":{"identifier_id":"I00052"},"set_identity":"normalized requested owner/repo, before canonical API resolution","raw_set_size":673,"html_set_size":673,"intersection_size":673,"union_size":673,"jaccard":1.0,"raw_only":[],"html_only":[],"compared_files":["readme.md"],"not_rendered_files":[],"status":"measured"},
+    {"repository":"vinta/awesome-python","commit":{"identifier_id":"I00053"},"set_identity":"normalized requested owner/repo, before canonical API resolution","raw_set_size":509,"html_set_size":509,"intersection_size":509,"union_size":509,"jaccard":1.0,"raw_only":[],"html_only":[],"compared_files":["README.md","SPONSORSHIP.md","CONTRIBUTING.md"],"not_rendered_files":[],"status":"measured"}
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "recorded_at": "2026-10-13T04:01:49Z",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_awesome_convergence",
+        "-v"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr_summary": "----------------------------------------------------------------------\nRan 30 tests in 0.523s\n\nOK",
+      "scope": "Locally authored synthetic fixtures, upstream CPython unittest runner; not an upstream counter test suite."
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/awesome_convergence.py",
+        "check",
+        "--directory",
+        "evidence/artifacts/q4-awesome-convergence-20261013"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"status\": \"checked\", \"lists\": 10, \"rows\": 10311, \"unresolved\": 29, \"repositories_per_category\": {\"agent-orchestration\": 1, \"agent-observability\": 0, \"coding-agent-harnesses\": 0, \"agent-memory\": 0, \"mcp-code-navigation\": 0, \"evaluation-harnesses\": 0}}",
+      "stderr": "",
+      "discriminating_control": "attempts.json retains the same command's exit 1 with a planted incorrect count."
+    }
+  ],
+  "independent_tally": {
+    "method": "Dictionary-of-sets tally over retained mapped rows without calling count_rows",
+    "all_category_membership_counts_agree": true,
+    "scope": "Count arithmetic only; not independent source classification or capability acceptance."
+  },
+  "privacy_check": {
+    "native_tool": "Betterleaks 1.9.0 through host_name_scan repository framing",
+    "new_files_and_body": 20,
+    "private_names_checked": 7,
+    "findings": 0,
+    "manifest_added_lines_findings": 0,
+    "scope": "New task files, PR body and added manifest lines. A whole-manifest diagnostic found eighteen unchanged baseline locations; no baseline files or rules changed."
+  },
+  "full_validation": {
+    "argv": [
+      "python3",
+      "scripts/validate.py"
+    ],
+    "exit_code": 0,
+    "returned_stdout": "{\"components\": 71, \"hashed_files\": 11879, \"profiles\": 4, \"receipts\": 240, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution."
+  },
+  "staged_gitleaks": {
+    "version": "8.30.1",
+    "exit_code": 0,
+    "findings": 0,
+    "bytes_scanned": 16434523,
+    "elapsed_seconds": 3.06,
+    "method": "staged native scan after structural publication split; scanner/ignore files unchanged"
+  },
+  "model_calls_by_counter": 0,
+  "coordinator_provider_usage": null,
+  "publication_references": {
+    "lists": 10,
+    "documents": 19,
+    "identifiers": 80,
+    "all_receipt_round_trips_agree": true,
+    "count_files_contain_forty_hex": false,
+    "pin_registry_contains_repository_namespace": false,
+    "unclassified_opaque_values_relocated": false
+  }
+}

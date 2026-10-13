@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "evidence_class": "source_review",
+  "read_at": "2026-10-13T02:42:48Z",
+  "repository": "https://github.com/punkpeye/awesome-mcp-servers",
+  "pin": {"identifier_id":"I00051"},
+  "path": "README.md",
+  "blob_sha": {"identifier_id":"I00067"},
+  "size_bytes": 1433054,
+  "returned_encoding": "none",
+  "status": "not_rendered",
+  "reason": "Exceeds the GitHub Contents html media-type supported 1 MB source-file limit.",
+  "command": [
+    "gh",
+    "api",
+    {"string_parts":["repos/punkpeye/awesome-mcp-servers/readme?ref=",{"identifier_id":"I00051"},""]},
+    "--jq",
+    "{path,size,sha,encoding}"
+  ],
+  "returned_output": {"string_parts":["{\"encoding\":\"none\",\"path\":\"README.md\",\"sha\":\"",{"identifier_id":"I00067"},"\",\"size\":1433054}"]},
+  "exit_code": 0,
+  "observation_boundary": "Independent metadata probe after the collection failure. The failed collector did not preserve the failed file's pin; this exact pin is the independent probe, not reconstructed failure provenance.",
+  "native_source": {"kind":"url","url":"https://docs.github.com/en/rest/repos/contents#get-repository-content","read_at":"2026-10-13T02:41:51Z"},
+  "renderer_action": "No HTML GET requested for this oversized file. No raw-content parsing, local parser adoption or POST /markdown retry.",
+  "pending": "Coordination ruling on how to carry the named oversized list in the Q4 corpus."
+}

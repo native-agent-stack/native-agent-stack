@@ -19007,6 +19007,11 @@
       "bytes": 19447
     },
     {
+      "path": "docs/decisions/2026-10-13-awesome-list-a3-evidence.md",
+      "sha256": "0381e5729e3cf578223eed7164096008af4cf7ec60d64f0377c5b3359d193c6d",
+      "bytes": 13066
+    },
+    {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
       "sha256": "f646835af1648cfab7798f64626141c3964dfba4799d780dc728ea27f91f7f6c",
       "bytes": 15393
@@ -50692,6 +50697,86 @@
       "bytes": 10521
     },
     {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/OVERLAP.md",
+      "sha256": "827a08a4c95a9875a25062a16a53e75b3e27cf52c45e6f5a64f687382da7e74f",
+      "bytes": 4095
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/SUMMARY.md",
+      "sha256": "8c2636676f6a03b7076254b32acf227038550e7df8eaf4022a72eca28171f6df",
+      "bytes": 1547
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/a3.json",
+      "sha256": "9c62693586056be3e3a7fde883070935de5f1fc37e1855367c7cb7827e8dbf82",
+      "bytes": 6565452
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/attempts.json",
+      "sha256": "20b63610ef582a385b9d938f57f3983d92c018e2fe5f0f7c2310ce3865f3dac0",
+      "bytes": 21431
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/checks.json",
+      "sha256": "a2041c20aea431f02007dd6608a5f12e119aca2672f6ff9d2a3b177fce0842e0",
+      "bytes": 2826
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/corpus.json",
+      "sha256": "cdcf8c28ffc4786166e0d54db656c82d6f3db9eff5573f10ceb97611ed214ae3",
+      "bytes": 5663575
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/identifiers.json",
+      "sha256": "e7f2f2e814d1a5ed800c251bfcd3505f704585f46b4a77ad0d395f425884d4a3",
+      "bytes": 6793
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/mapping.json",
+      "sha256": "dbf653c691374bb37945b7fac5a4d181b91c1573392d4622dc05691899649071",
+      "bytes": 5091
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/not-rendered.json",
+      "sha256": "c0ce29afafd3063a6cfcc602f44324664eea86eced6ae3ae36607120d4fc06fe",
+      "bytes": 1410
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/overlap-before-heading-fix.json",
+      "sha256": "9defb70f5e502474c403d44c2531aa1cd26bbf4cfd26995fba094b80123adf15",
+      "bytes": 4444
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/overlap.json",
+      "sha256": "948d2153cc877bf1dabc388346d5c783d281328ca524cd21118a2b113df901b8",
+      "bytes": 4103
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/progress.json",
+      "sha256": "66929700053ef4383611876ab17f3b3f5eec972567a5b8c5b4c99df53ab2c323",
+      "bytes": 1005750
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/raw-before-heading-fix.json",
+      "sha256": "bb05593b75acbb622da35897e3026ead033e2bd65b3bf4cb671e77675045b429",
+      "bytes": 2878497
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/selection.json",
+      "sha256": "475d2b117a51b0246f206902cc173edab6e5442f9a21c87deaeb17861160f779",
+      "bytes": 174493
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/sources.json",
+      "sha256": "474dfd9ccd20b74aec866af5386ded5927d88534a40f0bf051a234a9b1cf5afd",
+      "bytes": 4120
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/upstream-check.json",
+      "sha256": "43f27dd60674a4c435d6baa8f2a4cfed5ac487cbc25244010248a8814d9fd6f7",
+      "bytes": 5475
+    },
+    {
       "path": "evidence/artifacts/qmd-lexical-catalog-instructions-20261006/catalog-lookup-supersession.json",
       "sha256": "3a56f1cca99bdc105f163cefa57ae0d2527a9d6d4da60873086dae9c353ccb87",
       "bytes": 1245
@@ -61267,6 +61352,11 @@
       "bytes": 98120
     },
     {
+      "path": "scripts/awesome_convergence.py",
+      "sha256": "65c644b2f165a9a23483fa434cd10ccb0584dfd0ff9015d98fb85ce48eef3117",
+      "bytes": 51780
+    },
+    {
       "path": "scripts/build_ecosystem.py",
       "sha256": "acf147bdaf28b0dd837ff4cc776cb897fdc6edfc203966f7d51c3f18798344df",
       "bytes": 89670
@@ -62015,6 +62105,11 @@
       "path": "tests/test_architecture_pin_source.py",
       "sha256": "55e47ac074cef878414ca7ec2e95d69888f245c7f334c3982dffac30dfa2b475",
       "bytes": 12924
+    },
+    {
+      "path": "tests/test_awesome_convergence.py",
+      "sha256": "50d8be682d49682c3901d0d553eb85dcf53d92920a759b9e38628d6c0008a7e6",
+      "bytes": 17718
     },
     {
       "path": "tests/test_backtesting_gap_burndown.py",

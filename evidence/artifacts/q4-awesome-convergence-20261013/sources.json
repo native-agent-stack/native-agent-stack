@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "lists": [
+    {"id":"L0001","repository":"Shubhamsaboo/awesome-llm-apps","commit":{"identifier_id":"I00003"},"url":"https://github.com/Shubhamsaboo/awesome-llm-apps"},
+    {"id":"L0002","repository":"avelino/awesome-go","commit":{"identifier_id":"I00007"},"url":"https://github.com/avelino/awesome-go"},
+    {"id":"L0003","repository":"awesome-selfhosted/awesome-selfhosted","commit":{"identifier_id":"I00020"},"url":"https://github.com/awesome-selfhosted/awesome-selfhosted"},
+    {"id":"L0004","repository":"e2b-dev/awesome-ai-agents","commit":{"identifier_id":"I00001"},"url":"https://github.com/e2b-dev/awesome-ai-agents"},
+    {"id":"L0005","repository":"hesreallyhim/awesome-claude-code","commit":{"identifier_id":"I00030"},"url":"https://github.com/hesreallyhim/awesome-claude-code"},
+    {"id":"L0006","repository":"ichangyou/awesome-codex","commit":{"identifier_id":"I00034"},"url":"https://github.com/ichangyou/awesome-codex"},
+    {"id":"L0007","repository":"kyrolabs/awesome-agents","commit":{"identifier_id":"I00047"},"url":"https://github.com/kyrolabs/awesome-agents"},
+    {"id":"L0008","repository":"punkpeye/awesome-mcp-servers","commit":{"identifier_id":"I00051"},"url":"https://github.com/punkpeye/awesome-mcp-servers"},
+    {"id":"L0009","repository":"sindresorhus/awesome","commit":{"identifier_id":"I00052"},"url":"https://github.com/sindresorhus/awesome"},
+    {"id":"L0010","repository":"vinta/awesome-python","commit":{"identifier_id":"I00053"},"url":"https://github.com/vinta/awesome-python"}
+  ],
+  "documents": [
+    {"id":"D0001","list_id":"L0001","path":"README.md","blob_sha":{"identifier_id":"I00004"},"sha256":{"identifier_id":"I00005"}},
+    {"id":"D0002","list_id":"L0002","path":"README.md","blob_sha":{"identifier_id":"I00008"},"sha256":{"identifier_id":"I00009"}},
+    {"id":"D0003","list_id":"L0002","path":"CONTRIBUTING.md","blob_sha":{"identifier_id":"I00011"},"sha256":{"identifier_id":"I00012"}},
+    {"id":"D0004","list_id":"L0002","path":"COVERAGE.md","blob_sha":{"identifier_id":"I00014"},"sha256":{"identifier_id":"I00015"}},
+    {"id":"D0005","list_id":"L0002","path":".github/PULL_REQUEST_TEMPLATE.md","blob_sha":{"identifier_id":"I00017"},"sha256":{"identifier_id":"I00018"}},
+    {"id":"D0006","list_id":"L0003","path":"README.md","blob_sha":{"identifier_id":"I00021"},"sha256":{"identifier_id":"I00022"}},
+    {"id":"D0007","list_id":"L0003","path":"non-free.md","blob_sha":{"identifier_id":"I00024"},"sha256":{"identifier_id":"I00025"}},
+    {"id":"D0008","list_id":"L0004","path":"README.md","blob_sha":{"identifier_id":"I00027"},"sha256":{"identifier_id":"I00028"}},
+    {"id":"D0009","list_id":"L0005","path":"README.md","blob_sha":{"identifier_id":"I00031"},"sha256":{"identifier_id":"I00032"}},
+    {"id":"D0010","list_id":"L0006","path":"README.md","blob_sha":{"identifier_id":"I00035"},"sha256":{"identifier_id":"I00036"}},
+    {"id":"D0011","list_id":"L0006","path":"OPERATIONS.md","blob_sha":{"identifier_id":"I00038"},"sha256":{"identifier_id":"I00039"}},
+    {"id":"D0012","list_id":"L0006","path":"CONTRIBUTING.md","blob_sha":{"identifier_id":"I00041"},"sha256":{"identifier_id":"I00042"}},
+    {"id":"D0013","list_id":"L0006","path":"CHANGELOG.md","blob_sha":{"identifier_id":"I00044"},"sha256":{"identifier_id":"I00045"}},
+    {"id":"D0014","list_id":"L0007","path":"README.md","blob_sha":{"identifier_id":"I00048"},"sha256":{"identifier_id":"I00049"}},
+    {"id":"D0015","list_id":"L0008","path":"README.md","blob_sha":{"identifier_id":"I00067"},"sha256":{"identifier_id":"I00068"}},
+    {"id":"D0016","list_id":"L0009","path":"readme.md","blob_sha":{"identifier_id":"I00069"},"sha256":{"identifier_id":"I00070"}},
+    {"id":"D0017","list_id":"L0010","path":"README.md","blob_sha":{"identifier_id":"I00072"},"sha256":{"identifier_id":"I00073"}},
+    {"id":"D0018","list_id":"L0010","path":"SPONSORSHIP.md","blob_sha":{"identifier_id":"I00075"},"sha256":{"identifier_id":"I00076"}},
+    {"id":"D0019","list_id":"L0010","path":"CONTRIBUTING.md","blob_sha":{"identifier_id":"I00078"},"sha256":{"identifier_id":"I00079"}}
+  ]
+}
