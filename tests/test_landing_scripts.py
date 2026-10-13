@@ -567,6 +567,7 @@ PUBLIC_COMMITS = {
     "993cc890b3ff3fc95fa7cdba51edd726565f9ace": "native-agent-stack/native-agent-stack: the base of the adjudication change (#1068's merge)",
     "25a9b48efc6be09b9447a8265b8379191ec2b81d": "native-agent-stack/native-agent-stack: #1075's first commit",
     "ca6f880b57f3011d799260161c6b4580ecf7b4d8": "native-agent-stack/native-agent-stack: #1075's second commit",
+    "f3f1cabe8235d082c39d817db452378598dc55de": "native-agent-stack/native-agent-stack: #1075's third commit",
     "cbc944f4bc59639a444dd971c737788ba2283a91": "python/cpython: v3.13.16, the upstream mirror",
     "b2b4370b5bf021b98ee7adc92233e8de3f2de792": "KokaKiwi/rust-hex: v0.4.3",
     "58b1e0c00b39b9e46c24dc4a0ba6a2669c90e9c1": "github/rest-api-description",
@@ -4405,6 +4406,44 @@ class EndToEndTests(LandingCase):
                 self.assertEqual((code, self.merge_calls(log)), (7, []), out)
                 self.assertIn(f"#{PR} SQUASH_BODY_FILE {why} (path withheld): stop, nothing merged", out)
                 self.assertNotIn(str(self.dir), out)
+
+    def latin1_locale(self):
+        """An ISO-8859-1 locale compiled with localedef into a scratch directory, as {"LOCPATH": …, "LC_ALL": …} (glibc reads locale data from
+        LOCPATH, locale(7)), or None when it cannot be built here or Python does not take it as its stdout encoding."""
+        localedef = shutil.which("localedef")
+        if localedef is None:
+            return None
+        root = self.dir / f"locale-{next(self.counter)}"
+        root.mkdir()
+        subprocess.run([localedef, "-i", "en_US", "-f", "ISO-8859-1", str(root / "en_US.ISO-8859-1")], capture_output=True, timeout=120)
+        settings = {"LOCPATH": str(root), "LC_ALL": "en_US.ISO-8859-1"}
+        probe = subprocess.run([sys.executable, "-I", "-c", "import sys; print(sys.stdout.encoding)"], capture_output=True, text=True, timeout=30,
+                               env={"PATH": os.environ["PATH"], **settings})
+        return settings if probe.returncode == 0 and probe.stdout.strip() == "iso8859-1" else None
+
+    def test_the_body_reader_writes_the_files_bytes_under_a_non_utf8_locale(self):
+        # The co-op's re-review at f3f1cabe (P2 at nas_land.sh:95, the CC's adjudication: fix in this landing): the reader wrote the decoded
+        # text through sys.stdout, whose encoding is the locale's (cpython v3.13.16 Doc/library/sys.rst:1838-1839), so under an ISO-8859-1
+        # locale "é" came out as the one byte e9, and a character outside it ("€") ended the reader with nothing written (UnicodeEncodeError,
+        # exit 1), while every check passed. LC_ALL=C does not show it: Python turns on its UTF-8 Mode for the C or POSIX locale
+        # (Doc/library/os.rst:142-144; measured: utf8_mode 1, stdout utf-8), so the test compiles an ISO-8859-1 locale into a scratch
+        # LOCPATH. At f3f1cabe the locale's cases and the landing failed; the C.UTF-8 cases are the control.
+        settings = self.latin1_locale()
+        if settings is None:
+            self.skipTest("no ISO-8859-1 locale can be compiled here (localedef, the en_US source and the ISO-8859-1 charmap)")
+        reader = re.search(r"^SB_READER='(.*)'$", self.nas.text, re.M).group(1)
+        files = {"é": "Café claim.\r\n\n".encode("utf-8"), "€": "Euro € sign.\n".encode("utf-8")}
+        for (name, content), (where, locale) in itertools.product(files.items(), (("ISO-8859-1", settings), ("C.UTF-8", {"LC_ALL": "C.UTF-8"}))):
+            with self.subTest(text=name, locale=where):
+                path = self.write("body.md", content)
+                done = subprocess.run([sys.executable, "-I", "-c", reader, str(path), "65536"], capture_output=True, timeout=30,
+                                      env={"PATH": os.environ["PATH"], **locale})
+                self.assertEqual((done.returncode, done.stdout), (0, content.rstrip(b"\r\n")), "the file's bytes, its trailing line ends dropped")
+        with self.subTest(case="a landing under the ISO-8859-1 locale, beside the waiver"):
+            path = self.write("body.md", files["€"])
+            code, out, log = self.land(self.nas, SQUASH_BODY_FILE=str(path), **settings)
+            self.assertEqual((code, self.merge_calls(log)), (0, [self.body_merge(
+                f"Euro € sign.\\n\\nWaiver: local reviews for #{PR} at {self.head[:8]} (LOCAL_REVIEW_WAIVER)")]), out)
 
     def test_the_squash_body_reads_the_waiver_or_the_adjudication_again_when_it_is_built(self):
         # The CC on the co-op's codex review: the line the squash body records is read and checked again when the body is built, not taken

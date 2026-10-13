@@ -155,10 +155,14 @@ default body, which is what the file is there to prevent (#1061 P1 was the same 
 
 The file's content is checked, not only its metadata (#1075: Astra's P2-1 and the co-op's codex review, P2 at `nas_land.sh:585-586`, at
 ca6f880b, where bytes that are not UTF-8, 1 MiB, a NUL byte alone beside the waiver and a file emptied after the start all merged). One
-bounded reader (`SB_READER`, `nas_land.sh:85-106`) reads at most 64 KiB and one byte, and refuses a NUL byte, more than 64 KiB, anything but
-strict UTF-8 (Python's decoder; glibc's iconv 2.43 took code points above U+10FFFF, measured) and a file that holds no text; it prints the
-text with its trailing line ends dropped. It reads the file three times: before the lock and any call (exit 2), when the squash body is built
-(exit 7, nothing merged), and at the final gate (`nas_land.sh:574-579`; exit 7, also when the text changed after the body was built). The
+bounded reader (`SB_READER`, `nas_land.sh:89-113`) reads at most 64 KiB and one byte, and refuses a NUL byte, more than 64 KiB, anything but
+strict UTF-8 (Python's decoder; glibc's iconv 2.43 took code points above U+10FFFF, measured) and a file that holds no text; it writes the
+file's bytes, their trailing CR and LF bytes dropped, through `sys.stdout.buffer`, so the locale's encoding never touches them (#1075, the
+co-op's re-review at f3f1cabe, P2 at `nas_land.sh:95`: it wrote the decoded text through `sys.stdout`, whose encoding is the locale's,
+`python/cpython@v3.13.16` `Doc/library/sys.rst:1838-1839`, and under an ISO-8859-1 locale "é" came out as one byte and "€" ended it with
+nothing written; under `LC_ALL=C` Python turns on its UTF-8 Mode, `Doc/library/os.rst:142-144`, so the test compiles an ISO-8859-1 locale
+into a scratch `LOCPATH`, which glibc reads, `locale(7)`). It reads the file three times: before the lock and any call (exit 2), when the squash body is built
+(exit 7, nothing merged), and at the final gate (`nas_land.sh:581-586`; exit 7, also when the text changed after the body was built). The
 merge takes the text of the second read as `--body`, whether the file is the whole body or comes before a waiver's or an adjudication's line,
 because `--body-file` would read the file again when the merge call starts (`merge.go:146-153`), after the final gate. This differs from
 the live copy, which passes `--body-file`. The bound: the body is one argument to `gh`, and Linux bounds one argument at `MAX_ARG_STRLEN`,
@@ -169,7 +173,7 @@ Beside a waiver or an adjudication the body is the file's text, a blank line and
 takes `--body` or `--body-file`, never both ("specify only one of `--body` or `--body-file`", `merge.go:138-143`). The waiver and the
 adjudication never meet: the waiver is read only without a local review set, the adjudication only with one (`nas_land.sh` refuses an
 adjudication set without one, below). When the body is built, the waiver or the adjudication is read and checked again too (`waiver_check`,
-`adjudication_check`; the CC on the co-op's codex review), so the line is never taken from an earlier read (`nas_land.sh:653-675`).
+`adjudication_check`; the CC on the co-op's codex review), so the line is never taken from an earlier read (`nas_land.sh:660-682`).
 
 **A nas input in a uet landing (#1075, the CC's read).** `LOCAL_REVIEW_ADJUDICATION` and `SQUASH_BODY_FILE` are `nas_land.sh`'s inputs
 alone. `codex_gate.py`, which `uet_land.sh` runs too, decides with the adjudication wherever it is set, while `uet_land.sh` would neither
@@ -492,14 +496,14 @@ no `codex-review` says `patch is incorrect` decides nothing and gives 4 too, so 
 no squash body records a record that no gate checked. The gate reads the record once per call, and only for an incorrect review with a
 finding; the dispositions it prints are counted a line each.
 
-`nas_land.sh` reads it as it reads the waiver (`verdict_gate` and `adjudication_check`, `nas_land.sh:408-443`): once at each check
-(`nas_read`, `:385-397`, which also tells a NUL byte: exit 2), after the lock and before `update-branch` and `ready`, when the squash body is
+`nas_land.sh` reads it as it reads the waiver (`verdict_gate` and `adjudication_check`, `nas_land.sh:415-450`): once at each check
+(`nas_read`, `:392-404`, which also tells a NUL byte: exit 2), after the lock and before `update-branch` and `ready`, when the squash body is
 built, and again at the final gate. Its last `Adjudication:` line must read exactly as above for the pull request and the read head, with
 the sha256 of a file that `LOCAL_REVIEWS` or `CODEX_LOCAL_REVIEW` names (each hashed once), and after the first read the sha256 that read
-named, which it gives the gate as `LG_ADJUDICATION_SHA256` (unset at the start, `:107-111`, so never the caller's); otherwise exit 2, the
+named, which it gives the gate as `LG_ADJUDICATION_SHA256` (unset at the start, `:114-118`, so never the caller's); otherwise exit 2, the
 record named by its file name only. The squash body then records it as it records a waiver: the body GitHub offers, a blank line and
 `Adjudication: local review <sha256> for #<pr> at <head8> (LOCAL_REVIEW_ADJUDICATION)` ("The squash body", above). With no local review set
-(the waiver path), a set `LOCAL_REVIEW_ADJUDICATION`, an empty value included, stops with exit 2 before any call (`:74-77`; the Claude read's
+(the waiver path), a set `LOCAL_REVIEW_ADJUDICATION`, an empty value included, stops with exit 2 before any call (`:77-80`; the Claude read's
 P3-4: nothing would read it). The record of one review is written from its normalized file, each disposition then set by the CC (the
 commands below).
 
@@ -638,7 +642,7 @@ scripts that is neither a tracked file's, a named public artifact's nor a named 
 | File | As committed |
 | --- | --- |
 | `uet_land.sh` | `95a4e1634b6a53b14d7736d2d40a3f0058a15aec9c9178e528ca44cfb74324ce` (441 lines) |
-| `nas_land.sh` | `34a2b5a011737ac741c738b9b209221d6c25733b938864e42178c9ff336556c0` (683 lines) |
+| `nas_land.sh` | `1ca0dabc6c535a08fb45f6956cf4549cc956ca6b25e798bb60c6a95cd398f511` (690 lines) |
 | `codex_gate.py` | `7afaa831c0763dd14c584d76b17465fa50993656cd63eec9fd0c4412fddb74b2` (559 lines) |
 | `review_normalize.py` | `b553d9cb67ca196bd587e980e01295e28e8ea0e2bcb3d0015fc5d040735a1594` (348 lines) |
 
@@ -919,6 +923,12 @@ errors):
     wait (exit 9) on the gate's binding check (measured against a mutant whose binding check returns nothing: the gate's case gave 0, and
     end to end the recorded-digest check stopped it with another reason, so both cases fail), an adjudicated landing through
     `CODEX_LOCAL_REVIEW`, a title holding `(` and `)`, and a record and a body file of mode 000.
+- #1075's fourth commit (the co-op's re-review at f3f1cabe, its one P2, adjudicated fix in this landing) adds, failing at f3f1cabe (measured
+  as above against its `tools/landing`: 3 failures, all in this test): the body reader under an ISO-8859-1 locale compiled into a scratch
+  `LOCPATH`, whose output must be the file's bytes, its trailing line ends dropped ("é" came out as the one byte `e9`, and "€" ended the
+  reader with nothing written, exit 1), the same under `C.UTF-8` as the control (it passed at f3f1cabe too), and a landing under that
+  locale whose merge call carries the body's UTF-8 bytes (it stopped with 2 at f3f1cabe). Where no ISO-8859-1 locale can be compiled, the
+  test is skipped and says why.
 
 ## Upstream sources for the #975 corrections
 

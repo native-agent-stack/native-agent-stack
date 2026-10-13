@@ -9,13 +9,15 @@
 # Codex gate, the check runs, origin/main) -> the squash merge pinned to the head -> its author.
 # Exit codes: 2 verdict gate (a verdict file, GATES_DONE or trading-cc-read; a file, record or status that cannot be read included; also,
 # before any call, a LANDING_REPO that is not of the owner/name shape, neither local review variable nor LOCAL_REVIEW_WAIVER set,
-# LOCAL_REVIEW_ADJUDICATION set with neither local review variable set, and a SQUASH_BODY_FILE that is not a readable, non-empty regular file;
-# a waiver that does not name the pull request at the read head; and an adjudication that is missing, unreadable or holds a NUL byte, does
-# not name the pull request at the read head and a listed review file, or names another file than at its first read; each read again when
-# the squash body is built), 3 head
+# LOCAL_REVIEW_ADJUDICATION set with neither local review variable set, and a SQUASH_BODY_FILE that is "-", is not a readable, non-empty
+# regular file (an empty value included) or whose content holds a NUL byte, is not UTF-8, is longer than 64 KiB or holds no text; a waiver
+# that does not name the pull request at the read head; and an adjudication that is missing, unreadable or holds a NUL byte, does not name
+# the pull request at the read head and a listed review file, or names another file than at its first read; each read again when the
+# squash body is built), 3 head
 # moved, 4 change differs (after update-branch, or at the final gate) or update-branch refused, 5 CI failing (at the final gate also: no
 # longer complete and green), 6 timeout, 7 merge failed (also: the squash body of a waiver or an adjudication could not be read, or
-# SQUASH_BODY_FILE, read again when the body is built, cannot be read, holds a NUL byte or holds no text; nothing merged), 8 blocked by
+# SQUASH_BODY_FILE's content, read again when the body is built and at the final gate, cannot be read, holds a NUL byte, is not UTF-8, is
+# longer than 64 KiB or holds no text, or changed after the body was built; nothing merged), 8 blocked by
 # policy, 9 the Codex gate (codex_gate.py) gave neither 0 nor 5 (a 5
 # proceeds here): a review running or not finished since its latest trigger (its 3, after the 20-minute wait, before the validation or at
 # the final gate), a review that ended other than Completed or a summary last edited by another account (its 4), a gate that failed or is
@@ -38,10 +40,11 @@
 # The CC's ruling of 2026-10-13: after a pull request's bounded rounds, a local re-review that says "patch is incorrect" with only P2 and P3
 # findings is decided by the CC. LOCAL_REVIEW_ADJUDICATION names the CC's record, which codex_gate.py reads to decide it (README, Local
 # reviews); verdict_gate binds it to the pull request, the read head and a listed review file, and the squash body records it.
-# SQUASH_BODY_FILE (the CC, 2026-10-12): when set, the squash commit's body is that file (gh pr merge --body-file), for a PR whose commit
-# messages carry a claim corrected after review (the repository's squash default is COMMIT_MESSAGES). A value that is not a readable,
-# non-empty regular file stops with exit 2 before the lock and any call. With a waiver or an adjudication, the body is the file's text and
-# then that line (below).
+# SQUASH_BODY_FILE (the CC, 2026-10-12): when set, the squash commit's body is that file's text, for a PR whose commit messages carry a
+# claim corrected after review (the repository's squash default is COMMIT_MESSAGES). "-", a value that is not a readable, non-empty regular
+# file and content that is not text the reader takes (below) stop with exit 2 before the lock and any call. The file is read again when the
+# body is built and at the final gate (exit 7), and the merge passes the checked bytes as gh pr merge --body (the CC's copy passed
+# --body-file, which gh reads only when the merge call starts), alone or before a waiver's or an adjudication's line (below).
 set -u
 # Parsed whole before it runs: an edit while a landing runs cannot shift what the running copy executes (2026-10-09).
 {
@@ -76,10 +79,11 @@ RO=${R%%/*}
 [ -n "${LOCAL_REVIEWS+x}${CODEX_LOCAL_REVIEW+x}" ] || [ -z "${LOCAL_REVIEW_ADJUDICATION+x}" ] \
   || { echo "#$N LOCAL_REVIEW_ADJUDICATION is set, but no local review is: an adjudication decides a local review (LOCAL_REVIEWS), never a waived landing: stop, nothing merged"; exit 2; }
 VF=("$@")  # #975 round 4: the verdict files, kept for final_gate (the CI loop's `set --` replaces the positional parameters)
-# gh reads the body file when the merge call starts, and "-" would make it read standard input (cli v2.102.0 pkg/cmd/pr/merge/merge.go:146-153,
-# :177; pkg/cmdutil/file_input.go:8-15), so "-" is refused with every other value that is not a readable, non-empty regular file. The path is
-# not printed. A set but empty value is refused too (the CC's copy took it for unset, and the merge fell back to the default body: as #1061
-# P1, an empty LOCAL_REVIEWS that fell back to the connector).
+# "-" is refused, as the CC's copy refuses it: to gh pr merge --body-file it means standard input
+# (cli v2.102.0 pkg/cmd/pr/merge/merge.go:146-153, :177; pkg/cmdutil/file_input.go:8-15), while the reader here, which opens the name it is
+# given, would take a file called "-" in the working directory instead; the variable must name a body file. Every other value that is not a
+# readable, non-empty regular file is refused too, and the path is not printed. A set but empty value is refused as well (the CC's copy took
+# it for unset, and the merge fell back to the default body: as #1061 P1, an empty LOCAL_REVIEWS that fell back to the connector).
 [ -z "${SQUASH_BODY_FILE+x}" ] || { [ "$SQUASH_BODY_FILE" != - ] && [ -f "$SQUASH_BODY_FILE" ] && [ -r "$SQUASH_BODY_FILE" ] && [ -s "$SQUASH_BODY_FILE" ]; } \
   || { echo "#$N SQUASH_BODY_FILE is set but is not a readable, non-empty file (path withheld): stop, nothing merged"; exit 2; }
 # #1075 (Astra's P2-1 and the co-op's codex review, P2 at nas_land.sh:585-586): the check above reads metadata only, so the file's CONTENT is
@@ -87,13 +91,16 @@ VF=("$@")  # #975 round 4: the verdict files, kept for final_gate (the CI loop's
 # final gate (exit 7, and also when it changed after the body was built); the merge takes the body built from the second read. SB_READER reads
 # at most SB_MAX + 1 bytes and exits 3 for a NUL byte, 5 for more than SB_MAX bytes, 4 for anything but strict UTF-8 (Python's decoder, as
 # codex_gate.py decodes a record: the bytes it cannot decode come back as U+DC80-U+DCFF under surrogateescape; glibc's iconv 2.43 took code
-# points above U+10FFFF, measured) and 6 for no text; a file it cannot open is 1. It prints the text, its trailing line ends dropped. The body
+# points above U+10FFFF, measured) and 6 for no text; a file it cannot open is 1. It writes the file's BYTES, their trailing CR and LF
+# bytes dropped, through sys.stdout.buffer, so the locale's encoding never touches them (#1075, the co-op's re-review P2 at f3f1cabe: the
+# text went through sys.stdout, whose encoding is the locale's, and under an ISO-8859-1 locale "é" came out as one byte and a character
+# outside it ended the reader with nothing written, while every check passed; measured with a compiled ISO-8859-1 locale). The body
 # is one argument to gh, and Linux bounds one argument at MAX_ARG_STRLEN, "(PAGE_SIZE * 32)" (torvalds/linux v6.18
 # include/uapi/linux/binfmts.h:15): 131072 bytes on this host's 4 KiB pages with the terminating NUL (measured: 131071 passed, 131072 did
 # not), so SB_MAX, 64 KiB, leaves room for the waiver's or adjudication's line.
 SB_MAX=65536
-SB_READER='import sys; m = int(sys.argv[2]); b = open(sys.argv[1], "rb").read(m + 1); t = b.decode("utf-8", "surrogateescape"); c = 3 if bytes(1) in b else 5 if len(b) > m else 4 if any(56448 <= ord(x) <= 56575 for x in t) else 6 if not t.strip() else 0; c or sys.stdout.write(t.rstrip(chr(13) + chr(10))); sys.exit(c)'
-squash_body_read() {  # : prints SQUASH_BODY_FILE's text; rc 0, or SB_READER's code (nothing printed then)
+SB_READER='import sys; m = int(sys.argv[2]); b = open(sys.argv[1], "rb").read(m + 1); t = b.decode("utf-8", "surrogateescape"); c = 3 if bytes(1) in b else 5 if len(b) > m else 4 if any(56448 <= ord(x) <= 56575 for x in t) else 6 if not t.strip() else 0; c or sys.stdout.buffer.write(b.rstrip(bytes((13, 10)))); sys.exit(c)'
+squash_body_read() {  # : writes SQUASH_BODY_FILE's bytes, trailing line ends dropped; rc 0, or SB_READER's code (nothing written then)
   python3 -I -c "$SB_READER" "$SQUASH_BODY_FILE" "$SB_MAX" 2>/dev/null
 }
 sb_why() {  # <SB_READER's code> : the reason, in fixed words
