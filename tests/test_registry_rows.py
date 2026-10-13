@@ -9,6 +9,7 @@ import tempfile
 import unittest
 
 from scripts.host_receipts import register_file
+from scripts.validate import InvalidPublication, validate_registration_rows
 from tests import test_validate
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -174,8 +175,88 @@ class RegistryRowsTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
         self.assertIn("evidence file is not hash-listed", result.stdout)
 
+    def test_repaired_historical_invalid_manifests_warn_and_do_not_poison_the_pr(self):
+        manifest = self.root / "manifests/evidence.json"
+        valid = manifest.read_text()
+        for bad in ("not JSON", '{"files":[],"files":[]}',
+                    json.dumps({"files": [{"path": AGENT}, {"path": AGENT}]})):
+            with self.subTest(kind=bad[:12]):
+                manifest.write_text(bad)
+                bad_head = self.commit()
+                manifest.write_text(valid)
+                self.commit()
+                result = self.check(before=bad_head)
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertIn(bad_head + ":manifests/evidence.json", result.stderr)
+                self.assertIn("skipped invalid historical manifest", result.stderr)
+
+    def test_an_accidental_historical_manifest_self_row_can_be_removed(self):
+        register_file(self.root, "manifests/evidence.json")
+        accidental = self.commit()
+        self.drop("manifests/evidence.json")
+        self.commit()
+        result = self.check(before=accidental)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_direct_rule_rejects_stale_committed_hash_and_bytes(self):
+        for field in ("sha256", "bytes"):
+            with self.subTest(field=field):
+                manifest = self.root / "manifests/evidence.json"
+                valid = manifest.read_text()
+                document = json.loads(valid)
+                row = next(row for row in document["files"] if row["path"] == AGENT)
+                row[field] = "0" * 64 if field == "sha256" else row[field] + 1
+                manifest.write_text(json.dumps(document, indent=2) + "\n")
+                self.commit()
+                # Bare publication validation sees repaired working bytes; only
+                # the new committed-head rule can reject this fixture.
+                manifest.write_text(valid)
+                test_validate.validate(self.root)
+                with self.assertRaisesRegex(InvalidPublication, "mismatch at Git head"):
+                    validate_registration_rows(self.root, self.base)
+                self.commit()
+
+    def test_removing_the_continuity_rule_is_caught_by_the_existing_missing_row_case(self):
+        from unittest import mock
+        from scripts import validate as validator_module
+
+        self.fixture.write(AGENT, "Changed registered agent.\n")
+        self.drop(AGENT)
+        self.commit()
+        test_validate.validate(self.root)  # Existing integrity checks accept it.
+        with self.assertRaisesRegex(InvalidPublication, "required registration row missing"):
+            validate_registration_rows(self.root, self.base)
+        with mock.patch.object(validator_module, "validate_registration_rows", return_value=None):
+            with self.assertRaises(AssertionError):
+                with self.assertRaises(InvalidPublication):
+                    validator_module.validate_registration_rows(self.root, self.base)
+
 
 class RegistryWorkflowTests(unittest.TestCase):
+    def test_timeline_reads_have_only_the_needed_read_permissions(self):
+        from tests.test_workflow_policy import load_workflow
+
+        job = load_workflow((ROOT / ".github/workflows/validate.yml").read_text())["jobs"]["validate"]
+        self.assertEqual(job["permissions"], {"contents": "read", "pull-requests": "read"})
+
+    def test_graphql_variables_are_literal_without_shellcheck_single_quote_warning(self):
+        from tests.test_workflow_policy import load_workflow
+
+        workflow = load_workflow((ROOT / ".github/workflows/validate.yml").read_text())
+        step = next(step for step in workflow["jobs"]["validate"]["steps"]
+                    if step.get("id") == "registry_history")
+        self.assertNotIn("-f query='query($", step["run"])
+        self.assertIn('-f query="query(\\$owner:', step["run"])
+
+    def test_force_push_count_uses_only_the_filtered_nodes(self):
+        from tests.test_workflow_policy import load_workflow
+
+        job = load_workflow((ROOT / ".github/workflows/validate.yml").read_text())["jobs"]["validate"]
+        step = next(step for step in job["steps"] if step.get("id") == "registry_history")
+        self.assertNotIn("totalCount", step["run"])
+        self.assertIn("timeline_count", step["run"])
+        self.assertIn("timeline nodes: %s", step["run"])
+
     def test_prior_heads_are_scoped_to_the_validator_step_and_paginated(self):
         from tests.test_workflow_policy import load_workflow
 
@@ -220,11 +301,15 @@ class RegistryWorkflowTests(unittest.TestCase):
                                "FIXTURE_MODE": mode, "FIXTURE_FETCHES": str(fetches)}
                 result = subprocess.run(["bash", "-e", "-c", step["run"]], cwd=root,
                                         env=environment, capture_output=True, text=True, timeout=30)
-                if mode == "complete":
+                if mode in ("complete", "null"):
                     self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-                    self.assertEqual(output.read_text(), f"before_refs={before} {first} {second}\n")
+                    expected = (before, first, second) if mode == "complete" else (before,)
+                    self.assertEqual(output.read_text(), "before_refs=" + " ".join(expected) + "\n")
                     self.assertEqual(fetches.read_text().splitlines(),
-                                     [f"fetch --no-tags origin {ref}" for ref in (before, first, second)])
+                                     [f"fetch --no-tags origin {ref}" for ref in expected])
+                    if mode == "null":
+                        self.assertIn("skipped inaccessible null historical timeline commit", result.stderr)
+                    self.assertIn("timeline nodes: " + ("2" if mode == "complete" else "1"), result.stdout)
                 else:
                     self.assertNotEqual(result.returncode, 0)
                     self.assertFalse(output.exists(), "never publish partial registration inputs")

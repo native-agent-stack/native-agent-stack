@@ -42,6 +42,7 @@ jobs:
     timeout-minutes: 60
     permissions:
       contents: read # the checkout, and the read-only token zizmor's online audits use
+      pull-requests: read # native PR force-push timeline; docs/decisions/2026-10-04-ci-least-privilege.md
     steps:
       - name: Harden the runner (audit-only network egress)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -126,11 +127,20 @@ jobs:
           previous=$(gh api graphql --paginate \
             -F owner="${PR_HISTORY_REPOSITORY%/*}" -F name="${PR_HISTORY_REPOSITORY#*/}" \
             -F number="$PR_HISTORY_NUMBER" \
-            -f query='query($owner: String!, $name: String!, $number: Int!, $endCursor: String) { repository(owner: $owner, name: $name) { pullRequest(number: $number) { timelineItems(first: 100, after: $endCursor, itemTypes: [HEAD_REF_FORCE_PUSHED_EVENT]) { nodes { ... on HeadRefForcePushedEvent { beforeCommit { oid } } } pageInfo { hasNextPage endCursor } } } } }' \
+            -f query="query(\$owner: String!, \$name: String!, \$number: Int!, \$endCursor: String) { repository(owner: \$owner, name: \$name) { pullRequest(number: \$number) { timelineItems(first: 100, after: \$endCursor, itemTypes: [HEAD_REF_FORCE_PUSHED_EVENT]) { nodes { ... on HeadRefForcePushedEvent { beforeCommit { oid } } } pageInfo { hasNextPage endCursor } } } } }" \
             --jq '.data.repository.pullRequest.timelineItems.nodes[].beforeCommit.oid')
+          timeline_count=0
+          while IFS= read -r timeline_ref; do
+            if [[ -n "$timeline_ref" ]]; then timeline_count=$((timeline_count + 1)); fi
+          done <<< "$previous"
+          printf 'PR registration timeline nodes: %s\n' "$timeline_count"
           refs=()
           while IFS= read -r ref; do
             [[ -z "$ref" ]] && continue
+            if [[ "$ref" == null ]]; then
+              echo 'PR registration: skipped inaccessible null historical timeline commit' >&2
+              continue
+            fi
             [[ "$ref" =~ ^[0-9a-f]{40}$ ]] || exit 1
             git fetch --no-tags origin "$ref"
             refs+=("$ref")

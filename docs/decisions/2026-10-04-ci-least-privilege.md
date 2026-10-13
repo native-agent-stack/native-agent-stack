@@ -188,7 +188,7 @@ inventories.
 | `sota-sources-gate.yml` | `{}` | `sota-sources`: `pull-requests: read` (PR #706) | `none` | none (reusable) | current PR body read through REST |
 | `supply-chain.yml` | `{}` | `contents: read` | `none` | kept | |
 | `token-report.yml` | `{}` | `contents: read` | `none` | kept | |
-| `validate.yml` | `{}` | `contents: read` on all 4 jobs | `none` | kept | metadata gates move to `pr-metadata.yml` in PR #706 |
+| `validate.yml` | `{}` | `contents: read`; `validate` additionally `pull-requests: read` | `none` | kept | metadata gates moved to `pr-metadata.yml` in PR #706; #1070 reads the PR's persistent force-push timeline for registry continuity, with no write scope |
 
 Tests changed to follow the new layout, without loosening any assertion: `tests/test_workflow_hardening.py` (top-level
 `{}` instead of `contents: read` in five classes, and `{}` accepted as the one inline permissions form),

@@ -588,7 +588,7 @@ class ValidateZizmorGateTests(unittest.TestCase):
         # audits use is the validate job's own read-only grant.
         self.assertEqual(scopes(text.split("\njobs:\n", 1)[0]), [])
         self.assertRegex(text.split("\njobs:\n", 1)[0], NO_SCOPE)
-        self.assertEqual(scopes(jobs(text)["validate"]), [{"contents": "read"}])
+        self.assertEqual(scopes(jobs(text)["validate"]), [{"contents": "read", "pull-requests": "read"}])
 
     def test_findings_fail_the_required_check(self):
         command = uncommented(self.step)

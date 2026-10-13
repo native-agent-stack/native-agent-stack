@@ -733,17 +733,30 @@ def validate_registration_rows(root: Path, base_ref: str, *, before_ref: str | N
     def revision(ref):
         return git("rev-parse", "--verify", "--end-of-options", ref + "^{commit}").decode().strip()
 
-    def rows(ref):
-        document = json.loads(git("show", ref + ":manifests/evidence.json"),
-                              object_pairs_hook=_json_without_duplicates)
-        records = document["files"]
-        if not isinstance(records, list) or any(not isinstance(row, dict)
-                or not isinstance(row.get("path"), str) for row in records):
-            raise ValueError("invalid registration rows")
-        result = {row["path"]: row for row in records}
-        if len(result) != len(records):
-            raise ValueError("duplicate registration path")
-        return result
+    def rows(ref, *, historical=False):
+        try:
+            document = json.loads(git("show", ref + ":manifests/evidence.json"),
+                                  object_pairs_hook=_json_without_duplicates)
+            records = document["files"]
+            if not isinstance(records, list) or any(not isinstance(row, dict)
+                    or not isinstance(row.get("path"), str) for row in records):
+                raise ValueError("invalid registration rows")
+            result = {row["path"]: row for row in records}
+            if len(result) != len(records):
+                raise ValueError("duplicate registration path")
+            # A malformed historical row cannot create permanent registration
+            # intent. The current manifest is still strictly validated below.
+            return {path: row for path, row in result.items()
+                    if path != "manifests/evidence.json" and (not historical or
+                       (isinstance(row.get("sha256"), str)
+                        and re.fullmatch(r"[0-9a-f]{64}", row["sha256"])
+                        and type(row.get("bytes")) is int and row["bytes"] >= 0))}
+        except (subprocess.CalledProcessError, ValueError, KeyError, TypeError):
+            if not historical:
+                raise InvalidPublication(f"{ref}:manifests/evidence.json: invalid current registration manifest") from None
+            print(f"PR registration: skipped invalid historical manifest {ref}:manifests/evidence.json",
+                  file=sys.stderr)
+            return {}
 
     def names(*arguments):
         output = git(*arguments)
@@ -755,7 +768,7 @@ def validate_registration_rows(root: Path, base_ref: str, *, before_ref: str | N
         if Path(os.fsdecode(git("rev-parse", "--show-toplevel")).rstrip("\r\n")).resolve() != root:
             raise ValueError("not the exact Git root")
         base, head = revision(base_ref), revision(head_ref)
-        baseline, current = rows(base), rows(head)
+        baseline, current = rows(base, historical=True), rows(head)
         tracked = names("ls-tree", "-r", "--name-only", "-z", head)
         changed = names("diff", "--no-renames", "--diff-filter=AMT", "--name-only", "-z", base, head, "--")
         required = changed & baseline.keys()
@@ -767,11 +780,11 @@ def validate_registration_rows(root: Path, base_ref: str, *, before_ref: str | N
         history = {head, *(revision(ref) for ref in (before_ref or "").split())}
         for tip in sorted(history):
             old_base = git("merge-base", base, tip).decode().strip()
-            previous_base = rows(old_base)
+            previous_base = rows(old_base, historical=True)
             commits = git("rev-list", "--full-history", tip, "^" + old_base,
                           "--", "manifests/evidence.json").decode().splitlines()
             for commit in commits:
-                required |= {name for name, row in rows(commit).items()
+                required |= {name for name, row in rows(commit, historical=True).items()
                              if row != previous_base.get(name) and name in tracked}
         errors = []
         for name in sorted(required):
