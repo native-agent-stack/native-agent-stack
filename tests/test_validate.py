@@ -1,6 +1,7 @@
 """Regression cases use synthetic receipts, never private execution logs."""
 
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -18,6 +19,11 @@ from scripts.validate import PRIVATE_CONTENT, InvalidPublication, scan_file_for_
 
 ROOT = Path(__file__).resolve().parents[1]
 VALIDATE_SCRIPT = ROOT / "scripts/validate.py"
+
+
+def address(local, domain):
+    """Fixtures join at run time, so this file holds no contiguous address for the email rule."""
+    return local + "@" + domain
 
 
 class PublicationValidationTests(unittest.TestCase):
@@ -162,6 +168,95 @@ class PublicationValidationTests(unittest.TestCase):
                 self.save()
                 with patch.dict(validator_module.PUBLIC_VENDOR_UUID_SNAPSHOTS, {relative: digest}):
                     self.assert_invalid(label)
+
+    def add(self, relative, content):
+        self.write(relative, content)
+        raw = content.encode()
+        self.evidence["files"].append({"path": relative, "sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)})
+        self.save()
+
+    def test_an_address_in_evidence_is_refused_without_echoing_it(self):
+        value = address("first.last", "mail-host.com")
+        self.add("evidence/artifacts/session-notes.txt", f"author: {value}\n")
+        with self.assertRaises(InvalidPublication) as refused:
+            validate(self.root)
+        self.assertIn("evidence/artifacts/session-notes.txt: contains possible email address", str(refused.exception))
+        self.assertNotIn(value, str(refused.exception))
+
+    def test_a_reviewed_match_waives_the_email_rule_only(self):
+        from scripts import validate as validator_module
+        relative = "evidence/artifacts/upstream-page.html"
+        reviewed = {address("press", "upstream-vendor.com"): "fixture: an upstream page's contact"}
+        self.add(relative, "contact " + address("press", "Upstream-Vendor.com") + "\n")  # DNS names ignore case
+        with patch.dict(validator_module.PUBLIC_EMAIL_MATCHES, reviewed):
+            self.assertEqual(validate(self.root)["hashed_files"], 3)
+        self.evidence["files"].pop()
+        self.add(relative, "contact " + address("press", "upstream-vendor.com") + "\n/" + "home/fixture/file\n")
+        with patch.dict(validator_module.PUBLIC_EMAIL_MATCHES, reviewed):
+            self.assert_invalid("personal home path")
+
+    def test_a_reviewed_address_glued_to_a_longer_local_part_is_refused(self):
+        # The co-op's GPT read at e0862d8d (P1): the rule's local part leaves out dot-atom characters such as "!", so
+        # in private!<listed> it matched only the listed tail, and the waiver passed a different address.
+        from scripts import validate as validator_module
+        listed = address("press", "upstream-vendor.com")
+        reviewed = {listed: "fixture: an upstream page's contact"}
+        with patch.dict(validator_module.PUBLIC_EMAIL_MATCHES, reviewed):
+            # The command center's read at e0862d8d: all 15 atext characters the class left out (RFC 5322 3.2.3).
+            for glue in "!#$&'*/=?^`{|}~":
+                with self.subTest(glue=glue):
+                    text = "x private" + glue + listed + " y"
+                    match = dict(PRIVATE_CONTENT)["email address"].search(text)
+                    self.assertEqual(match.group(0), "private" + glue + listed)
+                    self.assertTrue(validator_module.unreviewed_email(text))
+            for case, text in {"plain": "contact " + listed, "angle brackets": "<" + listed + ">",
+                               "mailto": "mailto:" + listed, "double quotes": '"' + listed + '"'}.items():
+                with self.subTest(case=case):
+                    self.assertFalse(validator_module.unreviewed_email(text))
+        relative = "evidence/artifacts/upstream-page.html"
+        self.add(relative, "contact private!" + listed + "\n")
+        with patch.dict(validator_module.PUBLIC_EMAIL_MATCHES, reviewed):
+            with self.assertRaises(InvalidPublication) as refused:
+                validate(self.root)
+        self.assertIn(relative + ": contains possible email address", str(refused.exception))
+
+    def test_the_noreply_exemption_keeps_the_local_part_case(self):
+        # Codex's thread at 6aaa204a: the noreply trailer exemption folded the local part's case (RFC 5321 2.4 makes
+        # NoReply another mailbox); only the domain is compared without case.
+        rule = dict(PRIVATE_CONTENT)["email address"]
+        for local, domain, exempt in (("noreply", "anthropic.com", True), ("noreply", "GITHUB.com", True),
+                                      ("NoReply", "anthropic.com", False), ("NOREPLY", "github.com", False)):
+            with self.subTest(local=local, domain=domain):
+                self.assertEqual(rule.search("trailer <" + address(local, domain) + ">") is None, exempt)
+
+    def test_a_local_part_case_variant_is_not_waived(self):
+        # The co-op's GPT read at 51f45b5d (P2) and Codex's thread: the waiver lowered the whole match, so a local part
+        # differing only in case passed as the reviewed address. RFC 5321 2.4: "the local-part of a mailbox MUST BE
+        # treated as case sensitive"; only the domain is compared without case.
+        from scripts import validate as validator_module
+        relative = "evidence/artifacts/upstream-page.html"
+        reviewed = {address("press", "upstream-vendor.com"): "fixture: an upstream page's contact"}
+        with patch.dict(validator_module.PUBLIC_EMAIL_MATCHES, reviewed):
+            self.assertTrue(validator_module.unreviewed_email("contact " + address("Press", "upstream-vendor.com")))
+            self.assertFalse(validator_module.unreviewed_email("contact " + address("press", "UPSTREAM-VENDOR.COM")))
+        self.add(relative, "contact " + address("Press", "upstream-vendor.com") + "\n")
+        with patch.dict(validator_module.PUBLIC_EMAIL_MATCHES, reviewed):
+            with self.assertRaises(InvalidPublication) as refused:
+                validate(self.root)
+        self.assertIn(relative + ": contains possible email address", str(refused.exception))
+
+    def test_an_unreviewed_address_beside_a_reviewed_one_is_refused(self):
+        # Codex's review of 308033f6: a reviewed file no longer waives a later address added to it.
+        from scripts import validate as validator_module
+        relative = "evidence/artifacts/upstream-page.html"
+        operator = address("first.last", "mail-host.com")
+        self.add(relative, "contact " + address("press", "upstream-vendor.com") + "\nsigned in as " + operator + "\n")
+        with patch.dict(validator_module.PUBLIC_EMAIL_MATCHES,
+                        {address("press", "upstream-vendor.com"): "fixture: an upstream page's contact"}):
+            with self.assertRaises(InvalidPublication) as refused:
+                validate(self.root)
+        self.assertIn(relative + ": contains possible email address", str(refused.exception))
+        self.assertNotIn(operator, str(refused.exception))
 
     def test_changed_artifact_fails_hash_even_when_length_unchanged(self):
         self.write("evidence/artifacts/output.txt", "example 9.0.0\n")
@@ -998,6 +1093,161 @@ class ScanFileForPrivateContentTests(unittest.TestCase):
         self.assertNotIn("findings", report)
         self.assertEqual(report["source"], "synthetic")
         self.assertNotIn(name, result.stdout + result.stderr)
+
+
+class EmailAddressRuleTests(unittest.TestCase):
+    """The repository scan refuses an email address outside a reviewed public path. Claude Code puts the account's
+    address in every session's context, so a session can carry it into a public evidence file."""
+
+    FLAGGED = {
+        "plain": address("first.last", "mail-host.com"),
+        "angle brackets": "Name <" + address("first.last", "mail-host.com") + ">",
+        "mailto": "mailto:" + address("someone", "mail-host.com"),
+        "upper case": address("FIRST", "MAIL-HOST.COM"),
+        "plus tag": address("first+tag", "mail-host.com"),
+        "subdomain": address("someone", "dept.uni.edu"),
+        "JSON value": '{"email": "' + address("someone", "mail-host.org") + '"}',
+        "glued to a JSON escape": '"\\n' + address("someone", "mail-host.org") + '"',
+        "a prefix of an exempt address": address("xnoreply", "anthropic.com"),
+        "an exempt address as a subdomain": address("noreply", "anthropic.com.mail-host.org"),
+        "example as a subdomain label": address("someone", "example.com.mail-host.org"),
+        "example.com under a letters-only domain": address("someone", "example.com.mailhost.org"),
+        "example under a letters-only second level": address("someone", "example.mailhost.com"),
+        "a subdomain of that": address("someone", "dept.example.mailhost.com"),
+        "example under a country code": address("someone", "example.co.uk"),
+        "a .target address (a TLD as well as a unit type)": address("someone", "corp.target"),
+        "a decorator call after an escaped newline (a reviewed entry where public)": "\\n" + "@" + "app.get(",
+        "a delimiter glued before an address": "`" + address("first.last", "mail-host.com"),
+        "example as a word part": address("someone", "notexample.com"),
+        "noreply domain as a subdomain": address("1+someone", "users.noreply.github.com.mail-host.org"),
+        "a unit type as a domain label": address("someone", "tty1.service.com"),
+        "git as a local-part prefix": address("gitlab-user", "mail-host.com"),
+        "a Moldovan domain": address("someone", "mail-host.md"),
+        "an address before a parenthesized note": address("first.last", "mail-host.com") + "(primary)",
+        "an escaped newline, an address, then a parenthesis": "\\n" + address("someone", "mail-host.com") + "(x)",
+        "git at a company host": address("git", "private-company.com"),
+        "git SSH user of a public host": "ssh -T " + address("git", "github.com"),
+        "an IDNA top-level domain": address("someone", "company.xn--p1ai"),
+        "an IDNA top-level domain, upper case": address("SOMEONE", "COMPANY.XN--P1AI"),
+        "an IDNA label of 59 characters": address("someone", "host.xn--" + "a" * 59),
+        "an import after an escaped newline": "\\n" + "@" + "RTK.md",
+    }
+    EXEMPT = {
+        "GitHub noreply": address("123+someone", "users.noreply.github.com"),
+        "GitHub noreply, upper case": address("SOMEONE", "USERS.NOREPLY.GITHUB.COM"),
+        "Anthropic commit trailer": "<" + address("noreply", "anthropic.com") + ">",
+        "GitHub web-flow committer": address("noreply", "github.com"),
+        "example.com": address("someone", "example.com"),
+        "example.org subdomain": address("someone", "mail.example.org"),
+        ".test": address("someone", "host.test"),
+        ".example": address("someone", "host.example"),
+        ".invalid": address("someone", "host.invalid"),
+        ".localhost": address("someone", "a.localhost"),
+        "an IDNA label of 60 characters": address("someone", "host.xn--" + "a" * 60),
+        "an IDNA label ending in a hyphen": address("someone", "host.xn--p1ai-"),
+        "systemd getty instance": address("getty", "tty1.service"),
+        "systemd user manager": address("user", "1000.service"),
+        "systemd timer instance": address("job", "daily.timer"),
+        "Claude Code import": "\n" + "@" + "RTK.md",
+        "a code span of an import": "`" + "@" + "AGENTS.md`",
+        "a quoted import": "'" + "@" + "RTK.md'",
+        "no TLD": address("someone", "localhost"),
+        "numeric last label": address("package", "1.2.3"),
+    }
+
+    def rule(self):
+        rules = dict(PRIVATE_CONTENT)
+        self.assertIn("email address", rules, "scripts/validate.py has no email-address rule")
+        return rules["email address"]
+
+    def test_an_address_is_refused(self):
+        rule = self.rule()
+        for case, text in self.FLAGGED.items():
+            with self.subTest(case=case):
+                self.assertIsNotNone(rule.search(text))
+
+    def test_reserved_noreply_and_non_address_forms_pass(self):
+        rule = self.rule()
+        for case, text in self.EXEMPT.items():
+            with self.subTest(case=case):
+                self.assertIsNone(rule.search(text))
+
+    def test_the_finding_names_the_rule_and_never_the_address(self):
+        self.rule()
+        with tempfile.TemporaryDirectory() as temporary:
+            target = Path(temporary) / "page.html"
+            value = address("first.last", "mail-host.com")
+            target.write_text(f"<p>{value}</p>", encoding="utf-8")
+            findings = scan_file_for_private_content(target)
+        self.assertEqual(len(findings), 1)
+        self.assertIn("email address", findings[0])
+        self.assertNotIn(value, findings[0])
+
+    def test_a_copy_without_the_data_file_waives_nothing(self):
+        # The landscape sweep loads a selected checkout's validate.py, which may come without its data file.
+        with tempfile.TemporaryDirectory() as temporary:
+            copy = Path(temporary) / "validate.py"
+            shutil.copyfile(VALIDATE_SCRIPT, copy)
+            spec = importlib.util.spec_from_file_location("validate_copy", copy)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+        self.assertEqual(module.PUBLIC_EMAIL_MATCHES, {})
+        self.assertIn("email address", dict(module.PRIVATE_CONTENT))
+
+    def test_an_entry_has_a_lower_case_domain_and_is_listed_once(self):
+        # The local part keeps its case (RFC 5321 2.4), so an entry is the reviewed spelling; its domain is lower case.
+        from scripts.validate import load_public_email_matches
+        with tempfile.TemporaryDirectory() as temporary:
+            data = Path(temporary) / "public_email_matches.json"
+            groups = [{"reason": "r", "matches": [address("Press", "vendor.com"), address("press", "vendor.com")]}]
+            data.write_text(json.dumps({"schema_version": 2, "groups": groups}), encoding="utf-8")
+            self.assertEqual(set(load_public_email_matches(data)),
+                             {address("Press", "vendor.com"), address("press", "vendor.com")})
+            for groups in ([{"reason": "r", "matches": [address("press", "Vendor.com")]}],
+                           [{"reason": "r", "matches": [address("press", "vendor.com")]},
+                            {"reason": "s", "matches": [address("press", "vendor.com")]}]):
+                with self.subTest(groups=len(groups)):
+                    data.write_text(json.dumps({"schema_version": 2, "groups": groups}), encoding="utf-8")
+                    with self.assertRaises(ValueError):
+                        load_public_email_matches(data)
+
+    def test_every_reviewed_match_still_occurs_outside_the_registry(self):
+        # An entry no tracked file but the registry carries is dead and would waive a later address unreviewed; the
+        # publication scan already refuses any match the list lacks, so together the list and the tree agree exactly.
+        from scripts.validate import PUBLIC_EMAIL_MATCHES, PUBLIC_EMAIL_REGISTRY, unoccurring_email_matches
+        listing = subprocess.run(["git", "ls-files", "-z"], cwd=ROOT, capture_output=True, check=False)
+        if listing.returncode:
+            self.skipTest("not a Git checkout")
+        texts = {}
+        for relative in filter(None, listing.stdout.decode().split("\0")):
+            try:
+                raw = (ROOT / relative).read_bytes()
+            except OSError:
+                continue
+            if b"@" in raw:
+                texts[relative] = raw.decode("utf-8", "replace")
+        self.assertIn(PUBLIC_EMAIL_REGISTRY, texts)  # it is tracked, and it is left out below
+        for reason in PUBLIC_EMAIL_MATCHES.values():
+            self.assertTrue(reason.strip())
+        self.assertEqual(unoccurring_email_matches(texts, PUBLIC_EMAIL_MATCHES), [],
+                         "listed matches no tracked file but the registry carries")
+
+    def test_an_entry_found_only_in_the_registry_is_dead(self):
+        # The co-op's GPT read at e0862d8d (P2): the coverage check scanned the registry too, so every entry supplied
+        # its own occurrence and an orphan passed.
+        from scripts.validate import PUBLIC_EMAIL_REGISTRY, unoccurring_email_matches
+        listed = {address("press", "upstream-vendor.com"): "fixture: an upstream page's contact"}
+        registry = json.dumps({"schema_version": 2, "groups": [{"reason": "r", "matches": list(listed)}]})
+        self.assertEqual(unoccurring_email_matches({PUBLIC_EMAIL_REGISTRY: registry}, listed), list(listed))
+        page = "contact " + address("press", "upstream-vendor.com") + "\n"
+        self.assertEqual(unoccurring_email_matches({PUBLIC_EMAIL_REGISTRY: registry,
+                                                    "evidence/artifacts/page.html": page}, listed), [])
+        # A spelling that differs in the local part's case is a different match; one in the domain's case is not.
+        for local, domain, dead in (("Press", "upstream-vendor.com", True), ("press", "Upstream-Vendor.COM", False)):
+            with self.subTest(local=local, domain=domain):
+                page = "contact " + address(local, domain) + "\n"
+                self.assertEqual(unoccurring_email_matches({"evidence/artifacts/page.html": page}, listed),
+                                 list(listed) if dead else [])
 
 
 if __name__ == "__main__":

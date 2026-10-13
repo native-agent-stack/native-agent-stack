@@ -412,6 +412,782 @@ class NativeTokenCIContracts(unittest.TestCase):
         work.mkdir()
         return ci.Run(output, work)
 
+    def test_redactions_copy_scripts_validate(self):
+        # Codex's review of nas#1002: each copy in REDACTIONS stays equal to its scripts/validate.py original.
+        spec = importlib.util.spec_from_file_location("validate_for_redactions", SCRIPT.parent / "validate.py")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        rules = dict(module.PRIVATE_CONTENT)
+        self.assertIn("email address", [name for name, _, _ in ci.REDACTIONS])
+        for name, pattern, _ in ci.REDACTIONS:
+            with self.subTest(rule=name):
+                self.assertEqual((pattern.pattern, pattern.flags), (rules[name].pattern, rules[name].flags))
+
+    def test_clean_redacts_email_addresses(self):
+        # Codex's review of nas#1002: a measured CLI that prints the signed-in account no longer publishes it.
+        operator = "@".join(("operator", "company.com"))
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            for value, expected in ((f"signed in as {operator}", "signed in as <EMAIL>"),
+                                    (f"<{operator.upper()}>", "<<EMAIL>>"),
+                                    ("Co-Authored-By: <" + "@".join(("noreply", "anthropic.com")) + ">",
+                                     "Co-Authored-By: <" + "@".join(("noreply", "anthropic.com")) + ">"),
+                                    ("package@1.2.3", "package@1.2.3")):
+                with self.subTest(expected=expected.replace("<EMAIL>", "<redacted>")):
+                    self.assertEqual(run.clean(value), expected)
+
+    def test_clean_redacts_an_address_before_a_parenthesis(self):
+        # The co-op's GPT read at e0862d8d (P1): a "(" after an address exempted it from the rule, so clean() kept it.
+        operator = "@".join(("first.last", "mail-host.com"))
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            self.assertEqual(run.clean(f"signed in as {operator}(primary)"), "signed in as <EMAIL>(primary)")
+            self.assertEqual(run.clean("x private!" + operator), "x <EMAIL>")  # the whole dot-atom, not its tail
+
+    def test_no_published_digest_confirms_what_clean_removed(self):
+        # The co-op's GPT read at e0862d8d (P1, under correction #161): raw_sha256, stdout_raw_sha256 and
+        # stderr_raw_sha256 hashed the bytes before clean(), so a guess at a removed address could be confirmed.
+        operator = "@".join(("first.last", "mail-host.com"))
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            run.command("prints-an-address", [sys.executable, "-c", f"import sys; print({operator!r}); "
+                                              f"print({operator!r}, file=sys.stderr)"])
+            source = Path(directory) / "work" / "page.txt"
+            source.write_text(f"contact {operator}\n")
+            run.artifact("page.txt", source)
+            server = Path(directory) / "server.py"
+            server.write_text("import json, sys\n"
+                              "for line in sys.stdin:\n"
+                              "    message = json.loads(line)\n"
+                              "    if 'id' in message:\n"
+                              f"        print(json.dumps({{'jsonrpc': '2.0', 'id': message['id'], "
+                              f"'result': {{'owner': {operator!r}}}}}), flush=True)\n")
+            ci.mcp_stdio_session(run, "mcp-prints-an-address", [sys.executable, str(server)],
+                                 [("initialize", {}), ("tools/list", {})], timeout=30)
+            published = (Path(directory) / "result" / "receipt.json").read_text()
+            retained = (Path(directory) / "result" / "page.txt").read_text()
+        self.assertNotIn(operator, published + retained)
+        guesses = {operator, operator + "\n", f"contact {operator}\n"}
+        guesses |= {json.dumps({"jsonrpc": "2.0", "id": number, "result": {"owner": operator}}) + "\n"
+                    for number in (1, 2)}
+        digests = set(re.findall(r"[0-9a-f]{64}", published))
+        for guess in guesses:
+            with self.subTest(guess=guess.replace(operator, "<operator>")):
+                self.assertNotIn(hashlib.sha256(guess.encode()).hexdigest(), digests)
+        self.assertNotIn("raw_sha256", published)
+
+    def test_a_json_escaped_address_is_removed_from_every_published_form(self):
+        # The co-op's GPT read at 51f45b5d (P1): clean() read text only, so an address whose "@" a JSON escape hid
+        # (\u0040) was published, and a reader's json.loads gave it back. Each published JSON value is now judged as
+        # decoded, nested JSON in a string value too, and each digest is of the published bytes.
+        operator = "@".join(("first.last", "mail-host.com"))
+        escaped = json.dumps({"email": operator}).replace("@", "\\u0040")
+        nested = json.dumps({"text": escaped})  # a JSON string holding JSON whose "@" is escaped
+        lines = [escaped, nested]
+
+        def decoded(text, depth=0):
+            """Every string a reader can get back from text by decoding JSON, nested JSON included."""
+            found = [text]
+            if depth >= 4:
+                return found
+            for document in [text] + text.splitlines():
+                try:
+                    node = json.loads(document)
+                except ValueError:
+                    continue
+                stack = [node]
+                while stack:
+                    item = stack.pop()
+                    if isinstance(item, dict):
+                        stack.extend(list(item) + list(item.values()))
+                    elif isinstance(item, list):
+                        stack.extend(item)
+                    elif isinstance(item, str):
+                        found.extend(decoded(item, depth + 1))
+            return found
+
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            # The child reads the text from a file: an argv holding the escaped address would itself be published.
+            text_file = Path(directory) / "work" / "lines.txt"
+            text_file.write_text("\n".join(lines) + "\n")
+            program = "import sys; data = open(sys.argv[1]).read(); sys.stdout.write(data); sys.stderr.write(data)"
+            run.command("prints-an-escaped-address", [sys.executable, "-c", program, str(text_file)])
+            source = Path(directory) / "work" / "page.json"
+            source.write_text("\n".join(lines) + "\n")
+            run.artifact("page.json", source)
+            server = Path(directory) / "server.py"
+            server.write_text("import json, sys\n"
+                              "for line in sys.stdin:\n"
+                              "    message = json.loads(line)\n"
+                              "    if 'id' in message:\n"
+                              "        answer = json.dumps({'jsonrpc': '2.0', 'id': message['id'], "
+                              f"'result': {{'owner': {operator!r}, 'text': {escaped!r}}}}})\n"
+                              "        print(answer.replace('@', '\\\\u0040'), flush=True)\n")
+            ci.mcp_stdio_session(run, "mcp-prints-an-escaped-address", [sys.executable, str(server)],
+                                 [("initialize", {}), ("tools/list", {})], timeout=30)
+            published = (Path(directory) / "result" / "receipt.json").read_text()
+            retained = (Path(directory) / "result" / "page.json").read_bytes()
+        texts = decoded(published) + decoded(retained.decode())
+        self.assertGreater(len(texts), 10)
+        self.assertFalse(any(operator in text for text in texts), "a published value decodes to the address")
+        receipt = json.loads(published)
+        self.assertEqual(receipt["artifacts"]["page.json"]["retained_sha256"], hashlib.sha256(retained).hexdigest())
+        for entry in receipt["commands"]:
+            with self.subTest(command=entry["label"]):
+                for stream in ("stdout", "stderr"):
+                    self.assertEqual(entry[stream + "_sha256"], hashlib.sha256(entry[stream].encode()).hexdigest())
+        guesses = {"\n".join(lines) + "\n"} | {line + "\n" for line in lines}
+        guesses |= {json.dumps({"jsonrpc": "2.0", "id": number, "result": {"owner": operator, "text": escaped}}
+                               ).replace("@", "\\u0040") + "\n" for number in (1, 2)}
+        digests = set(re.findall(r"[0-9a-f]{64}", published))
+        for guess in guesses:
+            with self.subTest(guess=guess.replace("\\u0040", "<at>")[:40]):
+                self.assertNotIn(hashlib.sha256(guess.encode()).hexdigest(), digests)
+
+    def test_a_json_line_holding_a_unicode_line_break_is_still_decoded(self):
+        # The command center's micro at 4c916e14 (B1): str.splitlines() also breaks at U+2028, U+2029 and U+0085, which
+        # RFC 8259 7 allows raw inside a string (rfc8259.txt:428-431), so such a JSON line was never decoded and its
+        # escaped address was published. A line ends only at a line feed.
+        operator = "@".join(("first.last", "mail-host.com"))
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            for separator in ("\u2028", "\u2029", "\x85"):
+                line = json.dumps({"note": "a" + separator + "b", "email": operator}, ensure_ascii=False)
+                line = line.replace("@", "\\u0040")
+                for text in (line, line + "\n", "plain\n" + line + "\r\n"):
+                    with self.subTest(separator=hex(ord(separator)), text=len(text)):
+                        published = run.publish(text)
+                        decoded = [json.loads(part) for part in published.split("\n") if part.strip().startswith("{")]
+                        self.assertTrue(decoded)
+                        self.assertNotIn(operator, json.dumps(decoded, ensure_ascii=False))
+                        self.assertIn(separator, published)  # the line keeps its own characters
+
+    def test_json_nested_deeper_than_the_decode_depth_is_refused(self):
+        # The command center's micro at 4c916e14 (B2): JSON text nested in string values more than four levels deep
+        # was passed through, so its escaped address was published. publish() now refuses it with a fixed message and
+        # publishes nothing; four levels are still decoded and cleaned. Real receipts nest at most two.
+        operator = "@".join(("first.last", "mail-host.com"))
+
+        def nested(levels, key=False):
+            text = json.dumps({operator: 1} if key else {"email": operator}).replace("@", "\\u0040")
+            for _ in range(levels - 1):
+                text = json.dumps({"text": text})
+            return text
+
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            for levels in (1, 2, 4):
+                for key in (False, True):
+                    with self.subTest(levels=levels, key=key):
+                        self.assertNotIn("u0040", run.publish(nested(levels, key)))
+            for levels in (5, 6, 7):
+                for key in (False, True):
+                    for text in (nested(levels, key), "plain\n" + nested(levels, key) + "\n"):
+                        with self.subTest(levels=levels, key=key, lines=text.count("\n")):
+                            with self.assertRaises(AssertionError) as refused:
+                                run.publish(text)
+                            self.assertEqual(str(refused.exception), ci.PUBLISH_REFUSED)
+            source = Path(directory) / "work" / "deep.json"
+            source.write_text(nested(5) + "\n")
+            with self.assertRaises(AssertionError):
+                run.artifact("deep.json", source)
+            with self.assertRaises(AssertionError):
+                run.command("prints-deep-json", [sys.executable, "-c", "print(" + repr(nested(6)) + ")"])
+            self.assertFalse((Path(directory) / "result" / "deep.json").exists())
+            published = (Path(directory) / "result" / "receipt.json").read_text()
+        self.assertNotIn("prints-deep-json", published)
+        self.assertNotIn("first.last", published)
+
+    def test_an_object_with_a_duplicate_name_is_refused(self):
+        # Astra's read at 4c916e14 (P1-2) and the command center's addendum 01: json.loads keeps only the last member of
+        # a duplicate name, so an earlier member's escaped address was never inspected and went out as written. RFC 8259
+        # 4: names SHOULD be unique. publish() refuses such an object with PUBLISH_REFUSED and publishes nothing.
+        operator = "@".join(("first.last", "mail-host.com"))
+        escaped = operator.replace("@", "\\u0040")
+        duplicate = '{"email": "' + escaped + '", "email": "x"}'
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            for text in (duplicate, "plain\n" + duplicate + "\n", json.dumps({"text": duplicate}),
+                         '[{"a": 1}, {"b": {"c": "' + escaped + '", "c": 2}}]'):
+                with self.subTest(text=text[:16]):
+                    with self.assertRaises(AssertionError) as refused:
+                        run.publish(text)
+                    self.assertEqual(str(refused.exception), ci.PUBLISH_REFUSED)
+            source = Path(directory) / "work" / "duplicate.json"
+            source.write_text(duplicate + "\n")
+            with self.assertRaises(AssertionError):
+                run.artifact("duplicate.json", source)
+            with self.assertRaises(AssertionError):
+                run.command("prints-a-duplicate-name", [sys.executable, "-c", "print(" + repr(duplicate) + ")"])
+            server = Path(directory) / "server.py"
+            server.write_text("import json, sys\n"
+                              "for line in sys.stdin:\n"
+                              "    message = json.loads(line)\n"
+                              "    if 'id' in message:\n"
+                              "        print('{\"jsonrpc\": \"2.0\", \"id\": %d, \"result\": {\"owner\": \"%s\", '\n"
+                              "              '\"owner\": \"x\"}}' % (message['id'], " + repr(escaped) + "), flush=True)\n")
+            with self.assertRaises(AssertionError):
+                ci.mcp_stdio_session(run, "mcp-answers-a-duplicate-name", [sys.executable, str(server)],
+                                     [("initialize", {}), ("tools/list", {})], timeout=30)
+            self.assertFalse((Path(directory) / "result" / "duplicate.json").exists())
+            published = (Path(directory) / "result" / "receipt.json").read_text()
+        for label in ("prints-a-duplicate-name", "mcp-answers-a-duplicate-name"):
+            self.assertNotIn(label, published)
+        self.assertNotIn("mail-host", published)
+
+    def test_unique_name_json_is_published_byte_for_byte(self):
+        # The control for the refusal above: JSON whose names are unique, and whose values clean() leaves alone, keeps
+        # every byte, compact or indented, alone or among other lines, through publish(), an artifact and a command.
+        texts = ['{"a": 1, "b": [true, null, "x"], "c": {"d": "e"}}', json.dumps({"a": {"b": {"c": [1, 2]}}}, indent=2) + "\n",
+                 'note\n{"a": 1}\n{"a": 2, "b": "' + "\\u00e9" + '"}\r\n', json.dumps({"text": json.dumps({"k": "v"})})]
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            for index, text in enumerate(texts):
+                with self.subTest(text=text[:16]):
+                    self.assertEqual(run.publish(text), text)
+                    source = Path(directory) / "work" / f"unique-{index}.json"
+                    source.write_bytes(text.encode())
+                    run.artifact(f"unique-{index}.json", source)
+                    self.assertEqual((Path(directory) / "result" / f"unique-{index}.json").read_bytes(), text.encode())
+            run.command("prints-unique-json", [sys.executable, "-c", "import sys; sys.stdout.write(" + repr(texts[0]) + ")"])
+            self.assertEqual(run.last_command()["stdout"], texts[0])
+
+    def test_output_a_reader_splits_differently_is_refused(self):
+        # The command center's micro at adc2adb2 (N1, addendum 02): splitting only at line feeds left JSON beside a lone
+        # CR, or after RS, FF, VT, FS, GS, U+0085, U+2028 or U+2029, undecoded, while universal newlines (Lib/_pyio.py
+        # :153-154), str.splitlines() and jq read the escaped address back. publish() now verifies its own output under
+        # each of those readers and refuses (PUBLISH_REFUSED, nothing published) when one recovers an address. The
+        # micro's N2, a number past CPython's 4300-digit limit beside the address, is read the same way.
+        operator = "@".join(("first.last", "mail-host.com"))
+        leak = json.dumps({"email": operator}).replace("@", "\\u0040")
+        clean = '{"a": 1}'
+        shapes = {
+            "JSON left of a lone CR": leak + "\rprogress 50%",
+            "a lone CR, then JSON": "progress 50%\r" + leak,
+            "CR line ends": clean + "\r" + leak + "\r",
+            "a string holding a CR, then JSON": json.dumps({"text": "progress\r" + leak}),
+            "a JSON text sequence": "\x1e" + clean + "\n\x1e" + leak + "\n",
+            "a long number beside the address": json.dumps({"n": 0, "email": operator}).replace("@", "\\u0040").replace(
+                "0", "9" * 4401, 1),
+            "a long number, as a second line": clean + "\n" + '{"n": ' + "9" * 4401 + ', "email": "' + operator.replace(
+                "@", "\\u0040") + '"}',
+        }
+        for name, separator in (("RS", "\x1e"), ("FF", "\x0c"), ("VT", "\x0b"), ("FS", "\x1c"), ("GS", "\x1d"),
+                                ("NEL", "\x85"), ("LS", "\u2028"), ("PS", "\u2029")):
+            shapes[name + " between two values"] = clean + separator + leak
+            shapes[name + " between two values, the address first"] = leak + separator + clean
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            for name, text in shapes.items():
+                with self.subTest(shape=name):
+                    with self.assertRaises(AssertionError) as refused:
+                        run.publish(text)
+                    self.assertEqual(str(refused.exception), ci.PUBLISH_REFUSED)
+            for index, name in enumerate(("a lone CR, then JSON", "NEL between two values", "a JSON text sequence")):
+                with self.subTest(artifact=name):
+                    source = Path(directory) / "work" / f"split-{index}.json"
+                    source.write_bytes(shapes[name].encode())
+                    with self.assertRaises(AssertionError):
+                        run.artifact(f"split-{index}.json", source)
+                    self.assertFalse((Path(directory) / "result" / f"split-{index}.json").exists())
+                with self.subTest(command=name):
+                    argv = [sys.executable, "-c", "import sys; sys.stdout.buffer.write(open(sys.argv[1], 'rb').read())", str(source)]
+                    for arg in argv:  # the argv is published, so the refusal below is the output's
+                        run.publish(arg)
+                    with self.assertRaises(AssertionError):
+                        run.command(f"prints-split-{index}", argv)
+            server = Path(directory) / "server.py"
+            server.write_text("import json, sys\n"
+                              "for line in sys.stdin:\n"
+                              "    message = json.loads(line)\n"
+                              "    if 'id' in message:\n"
+                              "        text = 'progress' + chr(13) + " + repr(leak) + "\n"
+                              "        print(json.dumps({'jsonrpc': '2.0', 'id': message['id'], 'result': {'text': text}}), "
+                              "flush=True)\n")
+            with self.assertRaises(AssertionError):
+                ci.mcp_stdio_session(run, "mcp-answers-split-json", [sys.executable, str(server)],
+                                     [("initialize", {}), ("tools/list", {})], timeout=30)
+            published = (Path(directory) / "result" / "receipt.json").read_text()
+        self.assertNotIn("mail-host", published)
+        for label in ("prints-split-0", "prints-split-1", "prints-split-2", "mcp-answers-split-json"):
+            self.assertNotIn(label, published)
+
+    def test_clean_output_under_every_reader_is_published_byte_for_byte(self):
+        # The micro's controls: verification refuses only what a reader recovers; everything else keeps every byte.
+        controls = ['{"a": 1, "b": "x"}', '{"a": 1}\n{"b": 2}\n', '{"a": 1}\r\n{"b": 2}\r\n',
+                    json.dumps({"k": "\\u00e9"}, indent=2), "plain text\n", "progress 10%\rprogress 50%\rdone\n",
+                    json.dumps({"note": "a\u2028b"}, ensure_ascii=False), '{"a": 1}\r', "\n\n{}\n\n",
+                    '{"email": "user\\u0040example.com"}', '{"trailer": "noreply\\u0040anthropic.com"}',
+                    json.dumps({"t": json.dumps({"t": json.dumps({"t": json.dumps({"k": "v"})})})}),
+                    "\x1e" + '{"a": 1}' + "\n\x1e" + '{"b": 2}' + "\n", '{"n": ' + "9" * 4401 + "}"]
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            for index, text in enumerate(controls):
+                with self.subTest(control=index):
+                    self.assertEqual(run.publish(text), text)
+                    source = Path(directory) / "work" / f"control-{index}.txt"
+                    source.write_bytes(text.encode())
+                    run.artifact(f"control-{index}.txt", source)
+                    self.assertEqual((Path(directory) / "result" / f"control-{index}.txt").read_bytes(), text.encode())
+
+    def test_an_escaped_address_is_refused_whatever_frames_it(self):
+        # The command center's addendum 03 (a shadow review, reproduced by the co-op at 66036a74): the verifier decoded
+        # JSON texts under a few framings, so a pretty-printed object after a lone CR, or behind RS framing (RFC 7464),
+        # was never decoded, while readline-then-json.load and jq --seq read the address back. The verifier now also
+        # decodes every RFC 8259 7 string escape across the whole output, framing aside, up to PUBLISH_DEPTH times.
+        operator = "@".join(("first.last", "mail-host.com"))
+        pretty = json.dumps({"email": operator, "n": 1}, indent=2).replace("@", "\\u0040")
+        shapes = {
+            "CR_MULTILINE": "progress 50%\r" + pretty + "\n",
+            "JSONSEQ_RECOVERY": "\x1e!\n\x1e" + pretty + "\n",
+            "a doubly escaped address": '{"email": "' + operator.replace("@", "\\\\u0040") + '"}',
+            "a surrogate-escaped neighbour": '{"note": "\\ud83d\\ude00", "email": "' + operator.replace("@", "\\u0040")
+                                            + '"}\r' + "tail",
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            for name, text in shapes.items():
+                with self.subTest(shape=name):
+                    with self.assertRaises(AssertionError) as refused:
+                        run.publish(text)
+                    self.assertEqual(str(refused.exception), ci.PUBLISH_REFUSED)
+            for index, name in enumerate(("CR_MULTILINE", "JSONSEQ_RECOVERY")):
+                with self.subTest(artifact=name):
+                    source = Path(directory) / "work" / f"framed-{index}.json"
+                    source.write_bytes(shapes[name].encode())
+                    with self.assertRaises(AssertionError):
+                        run.artifact(f"framed-{index}.json", source)
+                    self.assertFalse((Path(directory) / "result" / f"framed-{index}.json").exists())
+                with self.subTest(command=name):
+                    argv = [sys.executable, "-c", "import sys; sys.stdout.buffer.write(open(sys.argv[1], 'rb').read())", str(source)]
+                    for arg in argv:  # the argv is published, so the refusal below is the output's
+                        run.publish(arg)
+                    with self.assertRaises(AssertionError):
+                        run.command(f"prints-framed-{index}", argv)
+                with self.subTest(mcp=name):
+                    server = Path(directory) / f"server-{index}.py"
+                    server.write_text("import json, sys\n"
+                                      "for line in sys.stdin:\n"
+                                      "    message = json.loads(line)\n"
+                                      "    if 'id' in message:\n"
+                                      "        print(json.dumps({'jsonrpc': '2.0', 'id': message['id'], 'result': {'text': "
+                                      + repr(shapes[name]) + "}}), flush=True)\n")
+                    with self.assertRaises(AssertionError):
+                        ci.mcp_stdio_session(run, f"mcp-answers-framed-{index}", [sys.executable, str(server)],
+                                             [("initialize", {}), ("tools/list", {})], timeout=30)
+            published = (Path(directory) / "result" / "receipt.json").read_text()
+        self.assertNotIn("mail-host", published)
+        for label in ("prints-framed-0", "prints-framed-1", "mcp-answers-framed-0", "mcp-answers-framed-1"):
+            self.assertNotIn(label, published)
+
+    def test_a_one_line_duplicate_is_refused_after_rs_a_long_number_or_a_lone_cr(self):
+        # The same addendum (P2): an RS-framed duplicate object, and duplicates after a number past CPython's
+        # 4300-digit limit, went out unchanged, though duplicate names are refused. The verifier's own decoder, which
+        # reads RS framing and keeps numbers as text, now refuses them too.
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            for name, text in (("DUPLICATE_RS", '\x1e{"k": 1, "k": 2}\n'),
+                               ("DUPLICATE_LONG_NUMBER", '{"n": ' + "9" * 4401 + ', "k": 1, "k": 2}'),
+                               ("a duplicate after a lone CR", 'progress\r{"k": 1, "k": 2}')):
+                with self.subTest(shape=name):
+                    with self.assertRaises(AssertionError) as refused:
+                        run.publish(text)
+                    self.assertEqual(str(refused.exception), ci.PUBLISH_REFUSED)
+
+    def test_escaped_text_without_private_content_is_published_byte_for_byte(self):
+        # Controls for the escape projection: escapes that decode to nothing private keep every byte.
+        controls = ['{"k": "\\u00e9\\n\\t\\"x\\"\\\\"}', "a literal \\u0041 in prose, and C:\\temp\\n",
+                    '{"path": "\\/srv\\/data"}', "\\ud800 a lone high surrogate escape, and \\udc00 a low one",
+                    '{"email": "user\\u0040example.com"}', "progress 10%\r" + json.dumps({"a": [1, 2]}, indent=2) + "\n",
+                    "\x1e" + '{"a": 1}' + "\n", '{"n": ' + "9" * 4401 + ', "k": "v"}',
+                    "progress\n" + json.dumps({"a": [1, 2], "b": {"c": "\\u00e9"}}, indent=2) + "\n",
+                    "\ufeff" + '{"a": 1}', "progress\r" + json.dumps({"t": json.dumps({"t": json.dumps({"k": "v"})})},
+                                                                         indent=2)]
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            for index, text in enumerate(controls):
+                with self.subTest(control=index):
+                    self.assertEqual(run.publish(text), text)
+
+    def test_escaping_or_nesting_past_the_bound_is_refused_behind_a_cr_or_rs_framing(self):
+        # The GPT read at 6aaa204a (P1-1): the escape projection stopped after PUBLISH_DEPTH passes and certified what
+        # was left, so an address escaped five or more times, or JSON nested four or more times behind a lone CR or RS
+        # framing, went out while a reader recovered it. The shared views (publication_views()) now refuse when
+        # a further pass would still decode something, and read RS and lone-CR records whole.
+        operator = "@".join(("first.last", "mail-host.com"))
+        shapes = {}
+        for levels in range(5, 8):
+            payload = operator.replace("@", "\\u0040")
+            for _ in range(levels - 1):
+                payload = payload.replace("\\", "\\\\")
+            for frame, prefix in (("CR", "progress\r"), ("RS", "\x1e!\n\x1e")):
+                shapes[f"escaped {levels} times, {frame}"] = prefix + '{\n  "email": "' + payload + '"\n}\n'
+        for levels in range(4, 7):
+            nested = '{"email":"' + operator.replace("@", "\\u0040") + '"}'
+            plain = '{"k":"v"}'
+            for _ in range(levels):
+                nested = json.dumps({"nested": nested}, indent=2)
+                plain = json.dumps({"nested": plain}, indent=2)
+            for frame, prefix in (("CR", "progress\r"), ("RS", "\x1e!\n\x1e")):
+                shapes[f"JSON in a string {levels} times, {frame}"] = prefix + nested + "\n"
+            # The CC's micro at 6aaa204a (D5): an ordinary document whose levels below are CR-framed, and the same
+            # depth with nothing private, which is refused too in these framings (the micro at 167eb00a, FC1: behind a
+            # prefix on the same line, or pretty after a form feed, a vertical tab, U+0085, U+2028 or U+2029, clean text
+            # nested deeper is not
+            # read as JSON; an escaped address there is still refused, by the escape bound).
+            shapes[f"JSON in a string {levels + 1} times, CR-framed under a document"] = json.dumps(
+                {"log": "progress\r" + nested}, indent=2)
+            shapes[f"JSON in a string {levels + 1} times, nothing private, CR"] = "progress\r" + json.dumps(
+                {"nested": plain}, indent=2)
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            for name, text in shapes.items():
+                with self.subTest(shape=name):
+                    with self.assertRaises(AssertionError) as refused:
+                        run.publish(text)
+                    self.assertEqual(str(refused.exception), ci.PUBLISH_REFUSED)
+            four = shapes["JSON in a string 4 times, CR"]
+            source = Path(directory) / "work" / "nested.json"
+            source.write_bytes(four.encode())
+            with self.assertRaises(AssertionError):
+                run.artifact("nested.json", source)
+            argv = [sys.executable, "-c", "import sys; sys.stdout.buffer.write(open(sys.argv[1], 'rb').read())", str(source)]
+            for arg in argv:  # the argv is published, so the refusal below is the output's
+                run.publish(arg)
+            with self.assertRaises(AssertionError):
+                run.command("prints-nested", argv)
+            server = Path(directory) / "server.py"
+            server.write_text("import json, sys\n"
+                              "text = open(sys.argv[1]).read()\n"
+                              "for line in sys.stdin:\n"
+                              "    message = json.loads(line)\n"
+                              "    if 'id' in message:\n"
+                              "        print(json.dumps({'jsonrpc': '2.0', 'id': message['id'], 'result': {'text': text}}), "
+                              "flush=True)\n")
+            with self.assertRaises(AssertionError):
+                ci.mcp_stdio_session(run, "mcp-answers-nested", [sys.executable, str(server), str(source)],
+                                     [("initialize", {}), ("tools/list", {})], timeout=30)
+            self.assertFalse((Path(directory) / "result" / "nested.json").exists())
+            published = (Path(directory) / "result" / "receipt.json").read_text()
+        self.assertNotIn("mail-host", published)
+        for label in ("prints-nested", "mcp-answers-nested"):
+            self.assertNotIn(label, published)
+
+    def test_a_duplicate_after_a_record_boundary_a_line_or_a_byte_order_mark_is_refused(self):
+        # The same read (P2-3): the views split a multiline object into lines after a lone CR or an RS resync, so its
+        # duplicate name went unread while jq --seq read the object (jqlang/jq@4467af70 src/jv_parse.c:785-807). The
+        # CC's micro at 6aaa204a (F1) adds a byte order mark (jq ignores it; RFC 8259 8.1 allows that), a duplicate
+        # nested under a CR-framed object, and a long number; and readline-then-json.load reads an object after a line.
+        pretty = '{\n "k": 1,\n "k": 2\n}'
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            for name, text in (("after a lone CR", "progress\r" + pretty),
+                               ("after a malformed RS record", "\x1e!\n\x1e" + pretty),
+                               ("after a malformed RS record on the same line", "!\x1e" + '{"k": 1, "k": 2}'),
+                               ("after malformed text and an RS on the same line, pretty", "garbage\x1e" + pretty),
+                               ("after a byte order mark", "\ufeff" + '{"k": 1, "k": 2}'),
+                               ("after a line", "progress\n" + pretty),
+                               # The read across lines decodes growing slices (the GPT read at 171b0811): a text past the
+                               # first slice, a long string included, is read whole.
+                               ("after a line, past the first slice",
+                                "progress\n{\n \"k\": \"" + "a" * 300 + "\",\n \"k\": 2\n}"),
+                               ("nested under a CR-framed object",
+                                "progress\r" + json.dumps({"inner": '{"k": 1, "k": 2}'}, indent=2)),
+                               ("beside a long number, after a lone CR",
+                                'progress\r{\n "n": ' + "9" * 4401 + ',\n "k": 1,\n "k": 2\n}')):
+                with self.subTest(shape=name):
+                    with self.assertRaises(AssertionError) as refused:
+                        run.publish(text)
+                    self.assertEqual(str(refused.exception), ci.PUBLISH_REFUSED)
+
+    def test_json_too_deep_to_decode_is_refused(self):
+        # The CC's micro at 6aaa204a (P3): JSON nested past what Python's decoder reads raised RecursionError, failing
+        # closed but uncontrolled. It is refused with the fixed message now, alone and as a member.
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            for levels in (20000, 100000):
+                for name, text in (("alone", "[" * levels + "]" * levels),
+                                   ("a member", '{"a": ' + "[" * levels + "]" * levels + "}"),
+                                   ("after a lone CR", "progress\r" + "[" * 100000 + "]" * 100000)):
+                    with self.subTest(levels=levels, shape=name):
+                        with self.assertRaises(AssertionError) as refused:
+                            run.publish(text)
+                        self.assertEqual(str(refused.exception), ci.PUBLISH_REFUSED)
+
+    def test_every_string_of_the_receipt_is_verified_before_it_is_written(self):
+        # The command center's micro at 167eb00a (N1) and Codex's thread 4247416401: observe() recorded the names a tool
+        # wrote under its state directory through clean() alone, so a file name that is JSON holding an escaped address
+        # reached receipt.json, and json.load of the receipt, then json.loads of the name, gave the address back. The
+        # same held for every field recorded through clean() alone. flush() now verifies each string of the receipt.
+        operator = "@".join(("first.last", "mail-host.com"))
+        hostile = '{"email": "' + operator.replace("@", "\\u0040") + '"}'
+        deep = '{"k":"v"}'
+        for _ in range(5):
+            deep = json.dumps({"nested": deep})
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            receipt = Path(directory) / "result" / "receipt.json"
+            before = receipt.read_text()
+            run.flush()
+            self.assertEqual(receipt.read_text(), before)  # a clean receipt keeps every byte
+            state = Path(directory) / "work" / "tool-state"
+            state.mkdir()
+            (state / hostile).write_text("x")
+            (state / "plain.txt").write_text("x")
+            run.observe("tool-state", state)
+            names = json.loads(receipt.read_text())["state_observations"]["tool-state"]
+            self.assertEqual(sorted(names), sorted(["plain.txt", ci.PUBLISH_REFUSED]))
+            recorded = json.loads(receipt.read_text())
+            self.assertIn({"component": "receipt", "error": ci.PUBLISH_REFUSED}, recorded["failures"])
+            run.report["context_mode_doctor_failures"] = [run.clean("[FAIL] " + hostile)]
+            run.report["failures"].append({"component": "tool", "error": run.clean(hostile)})
+            run.report["environment"]["EXTRA"] = run.clean(hostile)
+            run.report["state_observations"][run.clean(hostile)] = [run.clean(deep)]
+            run.report["status"] = "passed"
+            run.flush()
+            published = receipt.read_text()
+            recorded = json.loads(published)
+        self.assertNotIn("mail-host", published)
+        self.assertEqual(recorded["status"], "failed")
+        self.assertEqual(recorded["context_mode_doctor_failures"], [ci.PUBLISH_REFUSED])
+        self.assertEqual(recorded["environment"]["EXTRA"], ci.PUBLISH_REFUSED)
+        self.assertEqual(recorded["state_observations"][ci.PUBLISH_REFUSED], [ci.PUBLISH_REFUSED])
+        self.assertIn({"component": "tool", "error": ci.PUBLISH_REFUSED}, recorded["failures"])
+
+    def test_an_address_right_after_a_json_escape_leaves_the_document_json(self):
+        # Codex's thread 4247416418 at 167eb00a: clean() works on the text as written, so an address right after a
+        # JSON escape took the escape's last character, and the document went out as invalid JSON. Such a document
+        # is now read as it was written, and its decoded values are cleaned.
+        operator = "@".join(("first.last", "mail-host.com"))
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            for escape in ("n", "t", "r", "b", "f", "/", "u0041"):
+                document = '{"k": "x\\' + escape + operator + '", "n": 1}'
+                for name, text in (("a document", document), ("a JSON Lines line", '{"a": 1}\n' + document + "\n"),
+                                   ("a CRLF line", document + "\r\n" + '{"a": 1}' + "\r\n")):
+                    with self.subTest(escape=escape, shape=name):
+                        published = run.publish(text)
+                        self.assertNotIn("mail-host", published)
+                        values = [json.loads(line) for line in published.splitlines() if line]
+                        self.assertIn("<EMAIL>", [value["k"][-7:] for value in values if "k" in value])
+            # The same in JSON a string value holds: each level is read as it was written.
+            nested = run.publish(json.dumps({"outer": json.dumps({"inner": '{"k": "x\\n' + operator + '"}'})}))
+            self.assertEqual(json.loads(json.loads(json.loads(nested)["outer"])["inner"])["k"], "x\n<EMAIL>")
+            # Past the depth bound such a document is JSON as it was written, so it is refused like any other there.
+            deep = '{"k": "x\\n' + operator + '"}'
+            for _ in range(4):
+                deep = json.dumps({"nested": deep})
+            with self.assertRaises(AssertionError) as refused:
+                run.publish(deep)
+            self.assertEqual(str(refused.exception), ci.PUBLISH_REFUSED)
+            # A match clean() makes that no decoded value holds leaves nothing to rewrite: refused, never corrupted.
+            with self.assertRaises(AssertionError) as refused:
+                run.publish('{"k": "\\f1234567' + "-89ab" + "-cdef-0123-" + "456789abcdef" + '"}')
+            self.assertEqual(str(refused.exception), ci.PUBLISH_REFUSED)
+
+    def test_a_rewrite_holding_a_lone_surrogate_is_refused(self):
+        # Codex's thread 4247416409 at 167eb00a: a lone surrogate's escape beside a value that needs cleaning made
+        # publish() return text that cannot be encoded, so a command or an artifact raised UnicodeEncodeError. The
+        # rewrite is refused; with nothing to clean, the document keeps every byte.
+        operator = "@".join(("first.last", "mail-host.com"))
+        escaped = operator.replace("@", "\\u0040")
+        lone = "\\ud800"
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            for name, text in (("beside an escaped address", '{"note": "' + lone + '", "email": "' + escaped + '"}'),
+                               ("in a nested document", json.dumps({"inner": '{"note": "' + lone + '", "email": "'
+                                                                    + escaped + '"}'}))):
+                with self.subTest(shape=name):
+                    with self.assertRaises(AssertionError) as refused:
+                        run.publish(text)
+                    self.assertEqual(str(refused.exception), ci.PUBLISH_REFUSED)
+            source = Path(directory) / "work" / "lone.json"
+            source.write_text('{"note": "' + lone + '", "email": "' + escaped + '"}')
+            with self.assertRaises(AssertionError):
+                run.artifact("lone.json", source)
+            kept = '{"note": "' + lone + '", "k": "v"}'
+            self.assertEqual(run.publish(kept), kept)
+
+    def test_unclosed_json_is_reread_a_bounded_number_of_times(self):
+        # The command center's micro at 167eb00a (FC2): a JSON text left unclosed was read again, to the end, from each
+        # later line that opens another one inside it, so 300 such lines in 1.1 MB took 19 s. Past RESCANS times the
+        # text's length of such re-reading it is refused. Ordinary unclosed output stays well inside the bound.
+        unclosed = lambda count: "".join("[\n" + "1,\n" * 200 for _ in range(count))  # noqa: E731
+        dump = "[\n" + "  {\n    name: 'a',\n  },\n" * 500 + "]\n"
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            # An unterminated string is scanned to the end too, though the decoder reports it at its start.
+            for name, text in (("forty unclosed arrays", unclosed(40)),
+                               ("unclosed arrays before an unterminated string", "[\n" * 40 + '"' + "a" * 20000)):
+                with self.subTest(shape=name):
+                    with self.assertRaises(AssertionError) as refused:
+                        run.publish(text)
+                    self.assertEqual(str(refused.exception), ci.PUBLISH_REFUSED)
+            for name, text in (("ten unclosed arrays", unclosed(10)), ("an object dump that is not JSON", dump),
+                               ("a truncated pretty document", json.dumps([[{"a": [1, 2, {"b": "c"}]}] * 40] * 3,
+                                                                          indent=2)[:-200])):
+                with self.subTest(control=name):
+                    self.assertEqual(run.publish(text), text)
+
+    def test_the_text_decoded_to_read_unclosed_json_is_bounded_by_its_length(self):
+        # The GPT read at 171b0811 (P2): every failed decode builds a JSONDecodeError that counts the line breaks from
+        # the start of what it decodes (python/cpython@cbc944f4 Lib/json/decoder.py:31-32), and the views decoded the
+        # whole piece from each line that ends inside a JSON text, so short unclosed lines cost the piece's length
+        # each: 16,000 of them scanned 512,000,000 characters. Each decode now takes a slice that starts where the text
+        # does, and the slices' lengths count against the bound. Measured as characters handed to the decoder, so the
+        # test does not depend on time.
+        decoded = ci.decoded
+        handed = []
+
+        def counting(text, index):
+            handed.append(len(text) - index)
+            return decoded(text, index)
+
+        for name, piece in (("short unclosed lines", "[\nx\n" * 4000),
+                            ("unclosed objects in a dump that is not JSON",
+                             "[\n" + "  {\n    name: 'a',\n  },\n" * 2000),
+                            ("pretty JSON after progress lines",
+                             "progress\n" * 200 + json.dumps([{"a": [1, 2]}] * 2000, indent=2))):
+            with self.subTest(shape=name):
+                handed.clear()
+                with patch.object(ci, "decoded", counting):
+                    try:
+                        ci.json_texts(piece)
+                    except ci.Unverifiable:
+                        pass
+                lines = piece.count("\n") + 1
+                self.assertLessEqual(sum(handed), (ci.RESCANS + 1) * len(piece) + lines, name)
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            text = "[\nx\n" * 4000
+            self.assertEqual(run.publish(text), text)  # clean text is still published as it is
+
+    def test_refused_names_keep_every_member(self):
+        # The same read (P3-3): two refused names in one object both became the refusal text, and one member was lost;
+        # and the report's own names were not verified. Each refused name is now kept, numbered after the first.
+        operator = "@".join(("first.last", "mail-host.com"))
+        hostile = ['{"email": "' + operator.replace("@", "\\u0040") + '", "n": %d}' % n for n in range(3)]
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            run.report["state_observations"]["tool"] = {name: [name] for name in hostile}
+            run.report[hostile[0]] = "a report field named by a tool"
+            run.flush()
+            published = (Path(directory) / "result" / "receipt.json").read_text()
+            recorded = json.loads(published)
+        self.assertNotIn("mail-host", published)
+        self.assertEqual(sorted(recorded["state_observations"]["tool"]),
+                         [ci.PUBLISH_REFUSED, ci.PUBLISH_REFUSED + " (2)", ci.PUBLISH_REFUSED + " (3)"])
+        self.assertEqual(recorded[ci.PUBLISH_REFUSED], "a report field named by a tool")
+
+    def test_a_document_holding_nan_that_clean_changes_is_published_cleaned(self):
+        # The CC's Claude micro at 171b0811 (P3-2): two parses of a document holding NaN never compared equal, so a
+        # document clean() changed was refused although clean()'s text read as the same document.
+        operator = "@".join(("first.last", "mail-host.com"))
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            published = run.publish('{"n": NaN, "email": "' + operator + '"}')
+        self.assertEqual(published, '{"n": NaN, "email": "<EMAIL>"}')
+
+    def test_a_raw_string_of_the_report_is_verified_even_beside_its_published_form(self):
+        # The same micro (P3-5): flush() skips a string publish() verified. A string publish() was given, recorded in
+        # the report as it was given, and a refused string the report holds at its top level are each refused.
+        operator = "@".join(("first.last", "mail-host.com"))
+        hostile = '{"email": "' + operator.replace("@", "\\u0040") + '"}'
+        raw = '{"email": "' + operator + '"}'
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            self.assertNotIn("mail-host", run.publish(raw))
+            run.report["as_given"] = raw
+            run.report["note"] = hostile
+            run.flush()
+            published = (Path(directory) / "result" / "receipt.json").read_text()
+        self.assertNotIn("mail-host", published)
+        self.assertEqual(json.loads(published)["note"], ci.PUBLISH_REFUSED)
+        self.assertEqual(json.loads(published)["as_given"], ci.PUBLISH_REFUSED)
+
+    def test_an_mcp_session_closes_its_pipes(self):
+        # The GPT read at 6aaa204a (P3-7): Popen closes its pipes only in __exit__ (python/cpython@cbc944f4
+        # Lib/subprocess.py:1106-1113), so the session closes the parent's ends once its readers finish.
+        started = []
+        real = subprocess.Popen
+
+        def recording(*args, **kwargs):
+            started.append(real(*args, **kwargs))
+            return started[-1]
+
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            server = Path(directory) / "server.py"
+            server.write_text("import json, sys\n"
+                              "for line in sys.stdin:\n"
+                              "    message = json.loads(line)\n"
+                              "    if 'id' in message:\n"
+                              "        print(json.dumps({'jsonrpc': '2.0', 'id': message['id'], 'result': {}}), "
+                              "flush=True)\n")
+            with patch.object(ci.subprocess, "Popen", recording):
+                ci.mcp_stdio_session(run, "mcp-closes-pipes", [sys.executable, str(server)],
+                                     [("initialize", {}), ("tools/list", {})], timeout=30)
+        self.assertEqual(len(started), 1)
+        self.assertTrue(started[0].stdout.closed)
+        self.assertTrue(started[0].stderr.closed)
+
+    def test_names_that_cleaning_would_merge_are_refused(self):
+        # The same read (P2-4) and Codex's thread: an escaped address key and a literal "<EMAIL>" key are two members,
+        # and cleaning made them one, dropping a member. Such a rewrite is refused, in either order and nested.
+        operator = "@".join(("first.last", "mail-host.com"))
+        escaped = operator.replace("@", "\\u0040")
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            for name, text in (("escaped first", '{"' + escaped + '": 1, "<EMAIL>": 2}'),
+                               ("literal first", '{"<EMAIL>": 2, "' + escaped + '": 1}'),
+                               ("nested", '{"outer": {"' + escaped + '": 1, "<EMAIL>": 2}}')):
+                with self.subTest(shape=name):
+                    with self.assertRaises(AssertionError) as refused:
+                        run.publish(text)
+                    self.assertEqual(str(refused.exception), ci.PUBLISH_REFUSED)
+
+    def test_a_rewrite_that_would_change_a_number_is_refused(self):
+        # The same read (P2-5) and Codex's thread: rewriting a document to clean one string re-serialized its numbers,
+        # so 1e400 became Infinity (not JSON), a long decimal lost digits and -0 became 0. Such a rewrite is refused;
+        # with nothing to clean, the document keeps every byte.
+        operator = "@".join(("first.last", "mail-host.com"))
+        escaped = operator.replace("@", "\\u0040")
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            for number in ("1e400", "0.12345678901234567890123456789", "-0", "NaN"):
+                for name, text in (("flat", '{"n": ' + number + ', "email": "' + escaped + '"}'),
+                                   ("nested", '{"o": {"n": [' + number + ']}, "email": "' + escaped + '"}')):
+                    with self.subTest(number=number, shape=name):
+                        with self.assertRaises(AssertionError) as refused:
+                            run.publish(text)
+                        self.assertEqual(str(refused.exception), ci.PUBLISH_REFUSED)
+                with self.subTest(number=number, shape="nothing to clean"):
+                    text = '{"n": ' + number + ', "k": "v"}'
+                    self.assertEqual(run.publish(text), text)
+            self.assertEqual(json.loads(run.publish('{"n": 1.5, "m": -2, "email": "' + escaped + '"}')),
+                             {"n": 1.5, "m": -2, "email": "<EMAIL>"})
+
+    def test_a_noreply_local_part_in_another_case_is_redacted(self):
+        # Codex's thread at 6aaa204a: the noreply exemption folded the local part's case, so NoReply@ passed though RFC
+        # 5321 2.4 makes it another mailbox. Only the domain is compared without case.
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            for local, domain, kept in (("noreply", "anthropic.com", True), ("noreply", "GitHub.COM", True),
+                                        ("NoReply", "anthropic.com", False), ("NOREPLY", "github.com", False)):
+                text = "trailer <" + "@".join((local, domain)) + ">"
+                with self.subTest(local=local, domain=domain):
+                    self.assertEqual(run.clean(text) == text, kept)
+
+    def test_publish_leaves_plain_and_clean_json_text_as_clean_gives_it(self):
+        # Retained output keeps its bytes unless a decoded value hides something clean() removes.
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            for text in ('{"a": 1,\n  "b": "x\\u00e9"}\n', '{"a": 1}\n{"b": [true, null]}\n', "plain text, no JSON\n",
+                         "not json {\n", '"just a string"'):
+                with self.subTest(text=text[:20]):
+                    self.assertEqual(run.publish(text), run.clean(text))
+
     def test_clean_redacts_uuid_text(self):
         # Source: scripts/validate.py:PRIVATE_CONTENT, including case and embedded matches.
         # Assemble fabricated identifiers so the test source contains no private-content match.

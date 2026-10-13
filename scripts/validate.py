@@ -35,6 +35,37 @@ PUBLIC_VENDOR_UUID_SNAPSHOTS = {
     "evidence/artifacts/claude-federation-docs-20261010/platform.claude.com_workload-identity-federation.md":
         "d929e36810bcfdcc7a9bf5de39df8b08fbfde60a6d4c138b097f0940feb13bb7",
 }
+# The email rule's matches reviewed when the rule was added (2026-10-11), each with why it is public: an upstream
+# or vendor address, or text the rule reads as one, never an operator's. A file passes the email rule only when
+# every match in it is listed, so an unreviewed address beside a listed one is still refused; a new public match
+# needs its own reviewed entry. This waives only the email rule, never another private-content pattern. The list
+# is data beside this script, so its entries are not string literals here. A copy of this script without the
+# file (a tool loading a selected checkout's rules) waives nothing, so the rule applies everywhere.
+
+
+def load_public_email_matches(path: Path) -> dict[str, str]:
+    try:
+        groups = json.loads(path.read_text(encoding="utf-8"))["groups"]
+    except FileNotFoundError:
+        return {}
+    matches: dict[str, str] = {}
+    for group in groups:
+        for entry in group["matches"]:
+            if entry != email_key(entry) or entry in matches:
+                raise ValueError(f"{path.name}: each entry is its reviewed spelling with a lower-case domain, listed once")
+            matches[entry] = group["reason"]
+    return matches
+
+
+def email_key(match: str) -> str:
+    """A match as the registry lists it: the local part as written, since RFC 5321 2.4 says "the local-part of a
+    mailbox MUST BE treated as case sensitive", and the domain in lower case, since DNS names ignore case (RFC 4343)."""
+    local, _, domain = match.rpartition("@")
+    return local + "@" + domain.lower()
+
+
+PUBLIC_EMAIL_REGISTRY = "scripts/public_email_matches.json"
+PUBLIC_EMAIL_MATCHES = load_public_email_matches(Path(__file__).resolve().parent / "public_email_matches.json")
 PRIVATE_CONTENT = (
     # Historical prose can glue a UUID to a word; word boundaries miss it.
     ("local session identifier", re.compile(r"[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}", re.I)),
@@ -58,7 +89,44 @@ PRIVATE_CONTENT = (
     ("API secret", re.compile(r"\bsk-(?:proj-|ant-)?[A-Za-z0-9_-]{24,}\b")),
     ("private key", re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----")),
     ("bearer credential", re.compile(r"\bBearer\s+[A-Za-z0-9._~-]{30,}", re.I)),
+    # An addr-spec (RFC 5322 3.4.1) whose local part is a dot-atom: every atext character (3.2.3) and ".", so a match
+    # never starts inside a longer local part, and the left boundary refuses the same characters. A local part needs a
+    # letter or a digit (the command center's ruling, 2026-10-12): local parts made only of RFC 5322 atext symbols are
+    # not detected, though they are valid (CPython 3.13.16's email parser accepts them); no observed instance is
+    # identity-bearing (at main 900835c6 this rule without the guard, over every tracked blob, finds 125 in 76 files,
+    # each a backtick, quote or slash before an `@`-name such as `@AGENTS.md`; none is an address). Exempt: GitHub's
+    # users.noreply.github.com addresses, the noreply commit trailers of Anthropic and GitHub (the local part as written,
+    # RFC 5321 2.4), the RFC 2606 reserved names exactly (example.com, example.net, example.org and their subdomains,
+    # and the .test, .example, .invalid and .localhost TLDs), and a systemd instance unit (systemd.unit(5):
+    # name@instance.service, the suffix a unit type that is not also a TLD; target is one, IANA list 2026101001). A "("
+    # after a match exempts nothing. The last label
+    # is letters or an IDNA A-label (RFC 5890 2.3.2.1: "xn--" and at most 59 more characters), as every TLD in the IANA
+    # list is. DNS names ignore case (RFC 4343), so the rule does; Python lookbehinds are fixed-width.
+    ("email address", re.compile(
+        r"(?<![\w.!#$%&'*+/=?^`{|}~-])(?![.!#$%&'*+/=?^_`{|}~-]*@)(?!(?-i:noreply)@(?:anthropic|github)\.com(?![\w-]|\.\w))"
+        r"[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@"
+        r"(?!(?:[A-Za-z0-9-]+\.)*(?:users\.noreply\.github\.com|example\.(?:com|net|org)"
+        r"|[A-Za-z0-9-]+\.(?:test|example|invalid|localhost))(?![\w-]|\.\w))"
+        r"(?:[A-Za-z0-9-]+\.)+(?!(?:service|socket|device|mount|automount|swap|path|timer|slice|scope)"
+        r"(?![\w-]|\.\w))(?:[A-Za-z]{2,}|xn--[A-Za-z0-9-]{0,58}[A-Za-z0-9])(?![\w-]|\.\w)", re.I)),
 )
+
+
+def unoccurring_email_matches(texts: dict, listed) -> list:
+    """The listed matches that no text but the registry's own carries ({relative path: text}). The registry names every
+    entry, so it never counts: an entry found only there is dead and would waive a later address unreviewed."""
+    rule = dict(PRIVATE_CONTENT)["email address"]
+    found = {email_key(match.group(0)) for relative, text in texts.items() if relative != PUBLIC_EMAIL_REGISTRY
+             for match in rule.finditer(text)}
+    return sorted(set(listed) - found)
+
+
+def unreviewed_email(content: str) -> bool:
+    """Whether the email rule matches anything in content that PUBLIC_EMAIL_MATCHES does not list. A match is a whole
+    dot-atom local part (the rule's class is every atext character), so a listed address glued to the end of a longer
+    local part (private!<listed>) is a different, unlisted match, and so is one whose local part differs in case."""
+    rule = dict(PRIVATE_CONTENT)["email address"]
+    return any(email_key(match.group(0)) not in PUBLIC_EMAIL_MATCHES for match in rule.finditer(content))
 
 
 class InvalidPublication(ValueError):
@@ -562,6 +630,8 @@ class Validator:
                     if (description == "local session identifier" and name in files
                         and files[name].get("sha256") == digest
                         and PUBLIC_VENDOR_UUID_SNAPSHOTS.get(name) == digest):
+                        continue
+                    if description == "email address" and not unreviewed_email(content):
                         continue
                     # Never echo matched credentials or personal paths.
                     self.error(f"{relative}: contains possible {description}")

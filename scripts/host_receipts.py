@@ -33,11 +33,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 try:
-    from .validate import PRIVATE_CONTENT
+    from .validate import PRIVATE_CONTENT, unreviewed_email
     from .catalog_decisions import InvalidDecisionIndex, safe_file, unique_json
+    from .native_token_ci import Unverifiable, publication_views
 except ImportError:  # running as a plain script, not a package
-    from validate import PRIVATE_CONTENT
+    from validate import PRIVATE_CONTENT, unreviewed_email
     from catalog_decisions import InvalidDecisionIndex, safe_file, unique_json
+    from native_token_ci import Unverifiable, publication_views
 
 
 SCHEMA_RELATIVE_PATH = "adoption/host-receipt.schema.json"
@@ -1431,17 +1433,29 @@ def validate_receipt_cross_references(root: Path, host_dir_name: str, path: Path
         content = path.read_text(encoding="utf-8")
     except UnicodeError:
         content = path.read_bytes().decode("latin-1")
-    for description, pattern in PRIVATE_CONTENT:
-        if pattern.search(content):
-            errors.append(f"{label}: contains possible {description}")
+    def private(text: str) -> list[str]:
+        # validate.py's reviewed public matches waive its email rule only, as its publication scan does; each text is
+        # judged on its own, so an address a JSON escape hides is not waived by the raw bytes.
+        return [description for description, pattern in PRIVATE_CONTENT if pattern.search(text)
+                and not (description == "email address" and not unreviewed_email(text))]
+
+    for description in private(content):
+        errors.append(f"{label}: contains possible {description}")
     # The raw-text scan above misses content a JSON escape hides (for example / in
-    # place of a literal '/', or \/ ): scan every decoded string value AND every key,
-    # recursively, from the parsed receipt as well.
-    if isinstance(receipt, dict):
-        for decoded_string in iter_receipt_strings(receipt):
-            for description, pattern in PRIVATE_CONTENT:
-                if pattern.search(decoded_string):
-                    errors.append(f"{label}: contains possible {description} (decoded JSON value or key)")
+    # place of a literal '/', or \/ ), JSON held in a string value (a command's output
+    # excerpt), and any framing a reader may use: judge every view
+    # native_token_ci.publication_views() gives, the views Run.publish's verifier reads
+    # too (the command center's addendum 04, from the reads at 6aaa204a), and refuse a receipt whose
+    # views cannot be finished within their bound.
+    found = []
+    try:
+        for view in publication_views(content):
+            if view is not content:
+                found += [description for description in private(view) if description not in found]
+    except Unverifiable as refused:
+        errors.append(f"{label}: content the publication views cannot finish ({refused})")
+    for description in found:
+        errors.append(f"{label}: contains possible {description} (decoded JSON value or key)")
 
 
 def grandfather_file_expected(root: Path, relative_path: str) -> bool:

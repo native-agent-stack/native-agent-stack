@@ -35,6 +35,7 @@ import argparse
 from datetime import datetime, timezone
 import hashlib
 from html.parser import HTMLParser
+import io
 import json
 import os
 from pathlib import Path
@@ -53,6 +54,221 @@ import xml.etree.ElementTree as ET
 
 
 ROOT = Path(__file__).resolve().parents[1]
+# Run.clean's redactions: scripts/validate.py's PRIVATE_CONTENT rules by name, each with its placeholder. The copies
+# stay here so this script runs without importing validate.py; tests/test_native_token_ci.py holds each one equal to
+# its original, pattern and flags.
+REDACTIONS = (
+    ("local session identifier", re.compile(r"[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}", re.I), "<UUID>"),
+    ("personal home path", re.compile(r"/(?:home|Users)/(?!example(?:/|\b))[A-Za-z0-9_.-]+(?:/|\b)"),
+     "<HOME-EXAMPLE>"),
+    # Like its original, it leaves out local parts made only of RFC 5322 atext symbols (not detected; no observed
+    # instance is identity-bearing).
+    ("email address", re.compile(
+        r"(?<![\w.!#$%&'*+/=?^`{|}~-])(?![.!#$%&'*+/=?^_`{|}~-]*@)(?!(?-i:noreply)@(?:anthropic|github)\.com(?![\w-]|\.\w))"
+        r"[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@"
+        r"(?!(?:[A-Za-z0-9-]+\.)*(?:users\.noreply\.github\.com|example\.(?:com|net|org)"
+        r"|[A-Za-z0-9-]+\.(?:test|example|invalid|localhost))(?![\w-]|\.\w))"
+        r"(?:[A-Za-z0-9-]+\.)+(?!(?:service|socket|device|mount|automount|swap|path|timer|slice|scope)"
+        r"(?![\w-]|\.\w))(?:[A-Za-z]{2,}|xn--[A-Za-z0-9-]{0,58}[A-Za-z0-9])(?![\w-]|\.\w)", re.I), "<EMAIL>"),
+)
+# Run.publish decodes JSON text nested in string values this many levels deep, and publication_views() decodes string
+# escapes this many passes over. Escaping still undone after that is refused in every framing; JSON nested deeper is
+# refused in the framings the views read (reader_pieces and json_texts: behind a prefix on the same line, or pretty
+# text after a form feed, a vertical tab, U+0085, U+2028 or U+2029, clean text nested deeper is not read as JSON); JSON
+# too deep for Python's
+# decoder is refused. Each gets this fixed message, and nothing is published (the command center's micro at 4c916e14,
+# addendum 04, and the micro at 167eb00a). Committed native-token streams need at most two passes, and committed host
+# receipts at most three.
+PUBLISH_DEPTH = 4
+PUBLISH_REFUSED = ("publish: output a reader could decode to private content (JSON nested in string values deeper than "
+                   "4 levels or escaped more than 4 times over, an object with a duplicate name, or JSON a reader "
+                   "splits differently) is refused; nothing is published")
+
+
+def unique_members(pairs: list) -> dict:
+    """Run.publish's object_pairs_hook: json.loads keeps only the last member of a duplicate name, so an earlier one
+    would go out uninspected; such an object is refused (RFC 8259 4: names SHOULD be unique; the command center's
+    addendum 01 at 4c916e14)."""
+    require(len({name for name, _ in pairs}) == len(pairs), PUBLISH_REFUSED)
+    return dict(pairs)
+
+
+class Unverifiable(ValueError):
+    """Text publication_views() cannot finish within PUBLISH_DEPTH, or JSON with a duplicate name: refused, never
+    certified."""
+
+
+class JsonNumber(str):
+    """A JSON number kept as its text, so a reader's view of it has no length limit (CPython's int() refuses more than
+    4300 digits: Objects/longobject.c:2957 at cbc944f4)."""
+
+
+def unique_pairs(pairs: list) -> list:
+    """publication_views()' object_pairs_hook: json.loads keeps only the last member of a duplicate name, so an
+    earlier one would go unread; such an object is refused (RFC 8259 4: names SHOULD be unique), and every member is
+    kept for reading."""
+    if len({name for name, _ in pairs}) != len(pairs):
+        raise Unverifiable("an object with a duplicate name")
+    return pairs
+
+
+VERIFY_DECODER = json.JSONDecoder(object_pairs_hook=unique_pairs, parse_int=JsonNumber, parse_float=JsonNumber,
+                                  parse_constant=JsonNumber)
+# RFC 8259 7 string escapes (rfc8259.txt:455-475): a surrogate pair (:455-459), a code unit, or one of the eight
+# short forms (:461-475).
+JSON_ESCAPE = re.compile(r"\\(?:u([dD][89abAB][0-9a-fA-F]{2})\\u([dD][c-fC-F][0-9a-fA-F]{2})|u([0-9a-fA-F]{4})|([\"\\/bfnrt]))")
+SHORT_ESCAPES = {'"': '"', "\\": "\\", "/": "/", "b": "\b", "f": "\f", "n": "\n", "r": "\r", "t": "\t"}
+
+
+def unescaped(text: str) -> str:
+    """One pass of RFC 8259 7's string escapes over the whole text, whatever frames it: a surrogate pair becomes its
+    character, a lone surrogate's escape is left as it is."""
+    def one(match: re.Match) -> str:
+        high, low, unit, short = match.groups()
+        if high:
+            return chr(0x10000 + ((int(high, 16) - 0xD800) << 10) + (int(low, 16) - 0xDC00))
+        if unit:
+            return match.group(0) if 0xD800 <= int(unit, 16) <= 0xDFFF else chr(int(unit, 16))
+        return SHORT_ESCAPES[short]
+    return JSON_ESCAPE.sub(one, text)
+
+
+def reader_pieces(text: str) -> set:
+    """The text as each reader frames it: whole; at line feeds; at str.splitlines() breaks; under universal newlines
+    (Lib/_pyio.py:153-154 at cbc944f4); and as records split at RS (RFC 7464 2; a parser SHOULD continue after a
+    malformed record, rfc7464.txt:153-155, as jq does, jqlang/jq@4467af70 src/jv_parse.c:785-807), each record whole
+    across its line breaks, so a pretty-printed object after malformed text and an RS on one line is read complete.
+    A lone CR is a line break where json_texts() resumes, so a pretty-printed object after a progress line is too."""
+    return {text, *text.split("\n"), *text.splitlines(), *io.StringIO(text, newline=None), *text.split("\x1e")}
+
+
+LINE_BREAK = re.compile("[\r\n]")
+# json_texts() reads a JSON text left unclosed again from each later line that opens another one inside it. Once that
+# re-reading has covered this many times the piece's length, the piece is refused (the command center's micro at
+# 167eb00a, FC2: 300 such lines in 1.1 MB took 19 s).
+RESCANS = 16
+# A JSON text read across lines is decoded in a slice of the piece that starts where it does: the line's rest and this
+# many characters more, doubled while the text runs past the slice's end. Every failed decode builds a JSONDecodeError
+# that counts the line breaks from the start of what it decodes (python/cpython@cbc944f4 Lib/json/decoder.py:31-32,
+# raised by the C scanner too, Modules/_json.c:299-312), so decoding the whole piece from each line cost the piece's
+# length per line (the GPT read at 171b0811: 16,000 short unclosed lines scanned 512,000,000 characters). Each slice's
+# length counts against RESCANS.
+SLICE = 32
+# A decode that fails this close to a slice's end may have failed because the slice cut the text (a literal, an escape
+# or a surrogate pair cut in two is at most 12 characters); it is retried on a longer slice.
+CUT = 16
+BETWEEN_TEXTS = " \t\x1e\ufeff"  # within a line; the line breaks end it
+
+
+def decoded(text: str, index: int):
+    """VERIFY_DECODER.raw_decode, with JSON too deep for Python's decoder raised as Unverifiable."""
+    try:
+        return VERIFY_DECODER.raw_decode(text, index)
+    except RecursionError as error:
+        raise Unverifiable("JSON too deep to decode") from error
+
+
+def json_texts(piece: str) -> list:
+    """The JSON texts a reader takes from piece, in order: JSON whitespace, the RS record separator and a byte order
+    mark before a text are skipped (RFC 8259 8.1 lets a parser ignore one at the beginning of a text,
+    rfc8259.txt:494-498, and jq 1.8.1 skips a leading one; skipping one before any text reads more than jq does); where
+    no JSON text starts, reading resumes at the next line, as a reader that reads a line and then parses the rest does
+    (readline, then json.load). Each line is decoded alone first, so a failure costs that line's length (a
+    JSONDecodeError counts lines up to its position); the rest of piece is read only when the line ends inside a JSON
+    text, where a text that fails inside the line fails the same way across lines. That read decodes slices that start
+    where the text does (SLICE, doubled while the text runs past one), and every slice's length, which bounds the
+    decoding and the error's line count in it, is charged; past RESCANS times the piece's length the piece is
+    Unverifiable. So the decoding work is bounded by a multiple of the piece's length plus its lines' lengths."""
+    texts, start, reread = [], 0, 0
+    while start < len(piece):
+        following = LINE_BREAK.search(piece, start)
+        line, index = piece[start:following.start() if following else len(piece)], 0
+        resumed = None
+        while True:
+            while index < len(line) and line[index] in BETWEEN_TEXTS:
+                index += 1
+            if index >= len(line):
+                break
+            try:
+                node, index = decoded(line, index)
+            except json.JSONDecodeError as error:
+                if error.pos < len(line):
+                    break
+                # The line ends inside a JSON text: read it across the lines that follow, in growing slices.
+                offset, size = start + index, len(line) - index + SLICE
+                while True:
+                    stop = min(len(piece), offset + size)
+                    chunk = piece[offset:stop]
+                    reread += len(chunk)
+                    if reread > RESCANS * len(piece):
+                        raise Unverifiable("more unclosed JSON text than the views re-read")
+                    try:
+                        node, end = decoded(chunk, 0)
+                    except json.JSONDecodeError as unclosed:
+                        # The decoder reports an unterminated string at its start, having scanned to the slice's end
+                        # (python/cpython@cbc944f4 Modules/_json.c:417, :433; Lib/json/decoder.py:86, :107).
+                        if stop < len(piece) and (unclosed.msg.startswith("Unterminated string")
+                                                  or unclosed.pos >= len(chunk) - CUT):
+                            size *= 2
+                            continue
+                        break
+                    texts.append(node)
+                    resumed = offset + end
+                    break
+                break
+            texts.append(node)
+        if resumed is not None:
+            start = resumed
+        else:
+            start = following.end() if following else len(piece)
+    return texts
+
+
+def publication_views(text: str, depth: int = 0):
+    """Every view a reader can take of text this repository publishes, for its publication checks: Run.publish here
+    and the receipt scan in scripts/host_receipts.py (the command center's addendum 04, from the reads at 6aaa204a: one
+    shared verifier for every published surface, failing closed). Yields the text itself; the text with every RFC 8259
+    7 string escape decoded, framing aside, pass after pass; and every key and string value of every JSON text a reader
+    can decode from it under the framings these functions read (reader_pieces and json_texts), nested JSON in a string
+    value too. A check that cannot finish within its bounds raises Unverifiable, so an incomplete check never
+    certifies text: escaping still undone after PUBLISH_DEPTH passes, JSON nested deeper than PUBLISH_DEPTH levels, an
+    object with a duplicate name, a JSON text too deep to decode, or more unclosed JSON text than RESCANS allows.
+    Standard library only, so this file still runs without scripts/validate.py."""
+    yield text
+    projected = text
+    for passes in range(PUBLISH_DEPTH + 1):
+        following = unescaped(projected)
+        if following == projected:
+            break
+        if passes == PUBLISH_DEPTH:
+            raise Unverifiable("escaping deeper than the bound")
+        projected = following
+        yield projected
+    for piece in reader_pieces(text):
+        for node in json_texts(piece):
+            if isinstance(node, (JsonNumber, bool, type(None))):
+                continue
+            if depth >= PUBLISH_DEPTH:
+                raise Unverifiable("JSON nested deeper than the bound")
+            stack = [node]
+            while stack:
+                item = stack.pop()
+                if isinstance(item, (list, tuple)):
+                    stack.extend(item)
+                elif isinstance(item, str) and not isinstance(item, JsonNumber):
+                    yield from publication_views(item, depth + 1)
+
+
+def unpublishable(text: str) -> bool:
+    """Whether a reader could decode private content from text, or the views cannot finish it within their bounds:
+    REDACTIONS over every view publication_views() gives. Run.publish judges its output with it, and Run.flush every
+    string of the receipt."""
+    try:
+        return any(pattern.search(view) for view in publication_views(text) for _, pattern, _ in REDACTIONS)
+    except Unverifiable:
+        return True
+
+
 # Serena declares 2.0.0.dev0 for every commit, so its manifest version names the commit after " @ "
 # and the commit is its identity (adoption/pins-linux-x86_64.json, kind uv-tool-from-git).
 SERENA_COMMIT = "c6fbd1c5932df2494ffa0020af5a9fbe80b82143"
@@ -602,7 +818,14 @@ class Run:
                        "RTK counters are fixture-local estimates, not provider savings",
                        "ccusage reads a committed synthetic usage log, not account history",
                        "No token-saving requirement: fidelity may need the larger representation",
-                       "Retained text replaces local paths; raw byte hashes precede sanitization"],
+                       "Retained text replaces local paths and private content, in JSON and JSON Lines values as "
+                       "decoded too (JSON text nested in strings up to four levels; deeper, or an object with a "
+                       "duplicate name, is refused, and a line ends only at a line feed); the output is then read back "
+                       "under line feeds, splitlines, universal newlines, RS and lone-CR records and line resumption, "
+                       "and with every JSON string escape decoded across it up to four passes, and refused if one of "
+                       "these JSON readings recovers private content or cannot be finished within those bounds; "
+                       "command, artifact and MCP digests are of the published text, while the RTK exactness and "
+                       "Serena parity digests are of fixture output before sanitization"],
         }
         # A fresh allowlist excludes tokens, provider routing and inherited tool-state overrides.
         self.env = {key: os.environ[key] for key in ("PATH", "HOME") if key in os.environ}
@@ -655,6 +878,7 @@ class Run:
         # reading editor/client MCP configs, which it otherwise imports by default.
         self.mcporter_config = work / "config/mcporter/mcporter.json"
         self.mcporter_config.write_text(json.dumps({"mcpServers": {}, "imports": []}) + "\n")
+        self.verified = set()  # strings flush() or publish() has verified
         self.report["state_observations"] = {}
         self.report["environment"] = {key: self.clean(value) for key, value in self.env.items()
                                       if key not in {"HOME", "PATH"}}
@@ -675,14 +899,175 @@ class Run:
             replacements.append((os.environ["HOME"], "<NATIVE_HOME>"))
         for source, target in sorted(replacements, key=lambda item: len(item[0]), reverse=True):
             value = value.replace(source, target)
-        # Source: scripts/validate.py:PRIVATE_CONTENT. Keep these two patterns and
-        # their flags in sync if that tuple changes.
-        value = re.sub(r"[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}", "<UUID>", value, flags=re.I)
-        value = re.sub(r"/(?:home|Users)/(?!example(?:/|\b))[A-Za-z0-9_.-]+(?:/|\b)",
-                       "<HOME-EXAMPLE>", value)
+        for _, pattern, placeholder in REDACTIONS:
+            value = pattern.sub(placeholder, value)
         return value
 
+    def publish(self, value: str, depth: int = 0) -> str:
+        """clean() for text this run publishes, and for JSON or JSON Lines text also each decoded key and string value,
+        so what a JSON escape hides (\\u0040 for "@", RFC 8259 7) is removed too; a string value that is itself
+        JSON is read the same way, PUBLISH_DEPTH levels deep, and JSON text nested deeper is refused (PUBLISH_REFUSED),
+        never passed through, as is an object with a duplicate name. A JSON Lines line ends only at a line feed (a
+        trailing carriage return is kept): RFC 8259 7 allows U+2028, U+2029 and U+0085 raw in a string. Text whose
+        decoded values clean() leaves alone is returned as clean() gives it; otherwise the document is written again
+        from the cleaned values, and refused instead when that would merge two names, change a number as written (the
+        GPT read at 6aaa204a: 1e400, -0 and long decimals) or hold a lone surrogate, which cannot be encoded (Codex's
+        thread 4247416409). clean() works on the text as written, so a match right after a JSON escape takes the
+        escape's last character and leaves text that is no longer JSON (Codex's thread 4247416418: an address after
+        a line-feed escape); such a document is read as it was written and its decoded values are cleaned instead.
+        Finally the output itself is verified with every view publication_views() gives (the text, its RFC 8259 7
+        escapes decoded framing aside, and every key and string value of every JSON text under each framing
+        reader_pieces() and json_texts() read, nested JSON too; the views scripts/host_receipts.py judges too, the
+        command center's addendum 04), and refused if any recovers private content or cannot be finished within the
+        bounds (unpublishable()). JSON too deep for Python's decoder is refused too."""
+        cleaned = self.clean(value)
+
+        def parsed(text: str):
+            try:
+                node = json.loads(text, object_pairs_hook=unique_members)
+            except ValueError:
+                return None
+            return node if isinstance(node, (dict, list, str)) else None
+
+        if depth >= PUBLISH_DEPTH:
+            require(all(parsed(part) is None for part in [cleaned, *cleaned.split("\n"), value, *value.split("\n")]),
+                    PUBLISH_REFUSED)
+            return cleaned
+
+        def walk(node):
+            if isinstance(node, str):
+                return self.publish(node, depth + 1)
+            if isinstance(node, list):
+                return [walk(item) for item in node]
+            if isinstance(node, dict):
+                pairs = [(walk(key), walk(item)) for key, item in node.items()]
+                # Two names that cleaning makes equal would merge, and one member would be lost: refuse instead.
+                require(len({key for key, _ in pairs}) == len(pairs), PUBLISH_REFUSED)
+                return dict(pairs)
+            return node
+
+        def document(text: str, written: str) -> str:
+            """text, clean()'s output for written, with its decoded values cleaned too when it is a JSON document."""
+            def read(source: str) -> tuple:
+                lossy = []
+
+                def number(kind):
+                    def parse(lexeme: str):
+                        value = kind(lexeme)
+                        if json.dumps(value) != lexeme:  # json.dumps would not write this number back as it is written
+                            lossy.append(lexeme)
+                        return value
+                    return parse
+
+                def constant(name: str):
+                    lossy.append(name)  # Infinity, -Infinity and NaN are not JSON (RFC 8259 6)
+                    return float(name)
+
+                try:
+                    node = json.loads(source, object_pairs_hook=unique_members, parse_int=number(int),
+                                      parse_float=number(float), parse_constant=constant)
+                except ValueError:
+                    return None, lossy
+                return (node if isinstance(node, (dict, list, str)) else None), lossy
+
+            node, lossy = read(text)
+            source = text
+            if written != text:
+                # clean() changed the text as written. Where that is a JSON document, clean its decoded values and
+                # keep clean()'s text only if it reads as the same document: a match right after an escape cuts the
+                # escape in two (Codex's thread 4247416418), at this level or in JSON a string value holds.
+                as_written, written_lossy = read(written)
+                if as_written is not None:
+                    walked = walk(as_written)
+                    # Two parses compare by their JSON: NaN, a non-JSON constant a parse gives, never equals itself.
+                    if node == walked or (node is not None and json.dumps(node) == json.dumps(walked)):
+                        return text
+                    source, lossy = written, written_lossy
+            if source is text:
+                if node is None:
+                    return text
+                walked = walk(node)
+                if walked == node:
+                    return text
+            require(not lossy, PUBLISH_REFUSED)
+            rewritten = json.dumps(walked, ensure_ascii=False, indent=2 if "\n" in source.strip() else None)
+            try:  # UTF-8 has no encoding for a surrogate code point (RFC 3629 3, rfc3629.txt:231-234)
+                rewritten.encode("utf-8")
+            except UnicodeEncodeError:  # a lone surrogate's escape, decoded, cannot be written back
+                require(False, PUBLISH_REFUSED)
+            return rewritten
+
+        def line_end(line: str) -> tuple:
+            return (line[:-1], "\r") if line.endswith("\r") else (line, "")
+
+        try:
+            whole = document(cleaned, value)
+            if whole is not cleaned:
+                published = whole + "\n" * (len(cleaned) - len(cleaned.rstrip("\n")))
+            else:
+                lines, written = cleaned.split("\n"), value.split("\n")
+                if len(written) != len(lines):  # a redaction joined two lines: no line of clean()'s has one as written
+                    written = lines
+                published = "\n".join(document(line_end(line)[0], line_end(raw)[0]) + line_end(line)[1]
+                                      for line, raw in zip(lines, written))
+        except RecursionError:  # JSON too deep for Python's decoder (the CC's micro at 6aaa204a): refused, not raised
+            require(False, PUBLISH_REFUSED)
+        # Verify the output, not the input (the command center's addendum 02): refuse when any reader recovers what
+        # clean() removes, or when the views cannot be finished within their bound.
+        if depth == 0:
+            require(not unpublishable(published), PUBLISH_REFUSED)
+            self.verified.add(published)
+        return published
+
     def flush(self) -> None:
+        """Write the receipt. Each string in it, names and values, is first verified as publish() verifies its output,
+        once per distinct string (the command center's micro at 167eb00a, N1, and Codex's thread 4247416401: a field
+        recorded through clean() alone, such as a name a tool wrote under its state directory, an error message, a
+        doctor line or an environment value, reached the receipt unverified). One a reader could decode to private
+        content, or that the views cannot finish, is replaced by the fixed PUBLISH_REFUSED text, and the run fails."""
+        refused = []
+
+        def verified(node):
+            if isinstance(node, str):
+                if node in self.verified:
+                    return node
+                if unpublishable(node):
+                    refused.append(node)
+                    return PUBLISH_REFUSED
+                self.verified.add(node)
+            elif isinstance(node, (list, tuple)):
+                return [verified(item) for item in node]
+            elif isinstance(node, dict):
+                return members(node)
+            return node
+
+        def members(node: dict) -> dict:
+            # A refused name becomes the refusal text, numbered when several are refused, so no member is lost (the
+            # GPT read at 171b0811).
+            out = {}
+            for key, item in node.items():
+                name = verified(key)
+                if name == PUBLISH_REFUSED and key != PUBLISH_REFUSED:
+                    count = sum(1 for other in out if other.startswith(PUBLISH_REFUSED))
+                    name = PUBLISH_REFUSED if not count else f"{PUBLISH_REFUSED} ({count + 1})"
+                out[name] = verified(item)
+            return out
+
+        checked = members(self.report)
+        for (key, current), item in zip(list(self.report.items()), checked.values()):
+            if isinstance(current, (list, dict)) and item != current:  # in place, as other code holds these
+                current.clear()
+                current.extend(item) if isinstance(current, list) else current.update(item)
+            elif item != current:
+                self.report[key] = item
+        if list(checked) != list(self.report):  # a refused name of the report's own, renamed in place
+            values = list(self.report.values())
+            self.report.clear()
+            self.report.update(zip(checked, values))
+        if refused:
+            self.report["failures"].append({"component": "receipt", "error": PUBLISH_REFUSED})
+            if "status" in self.report:
+                self.report["status"] = "failed"
         (self.output / "receipt.json").write_text(json.dumps(self.report, indent=2) + "\n")
 
     def environment(self, overrides: dict[str, str | None] | None = None) -> dict[str, str]:
@@ -715,16 +1100,19 @@ class Run:
             except subprocess.TimeoutExpired:
                 signal_group(process, signal.SIGKILL)
                 stdout, stderr = process.communicate()
-        entry = {"label": label, "argv": [self.clean(arg) for arg in argv],
+        entry = {"label": label, "argv": [self.publish(arg) for arg in argv],
                  "cwd": self.clean(str(cwd or self.work)), "exit_code": process.returncode,
                  "expected_exit": "any" if nonzero is None else "nonzero" if nonzero else "zero",
                  "timed_out": timed_out,
                  "elapsed_seconds": round(time.monotonic() - start, 3),
-                 "stdout_raw_sha256": digest(stdout), "stderr_raw_sha256": digest(stderr),
-                 "stdout": self.clean(stdout.decode("utf-8", errors="replace")),
-                 "stderr": self.clean(stderr.decode("utf-8", errors="replace"))}
+                 "stdout": self.publish(stdout.decode("utf-8", errors="replace")),
+                 "stderr": self.publish(stderr.decode("utf-8", errors="replace"))}
+        # Digests of the published (sanitized) text only: a digest of the raw output would confirm what clean() took
+        # out to anyone who can guess it.
+        entry["stdout_sha256"] = digest(entry["stdout"].encode())
+        entry["stderr_sha256"] = digest(entry["stderr"].encode())
         if env:
-            entry["env_overrides"] = {key: None if value is None else self.clean(value) for key, value in env.items()}
+            entry["env_overrides"] = {key: None if value is None else self.publish(value) for key, value in env.items()}
         self.report["commands"].append(entry)
         self.flush()
         require(not timed_out, f"{label}: timed out")
@@ -744,10 +1132,9 @@ class Run:
 
     def artifact(self, name: str, source: Path) -> None:
         raw = source.read_bytes()
-        public = self.clean(raw.decode("utf-8")).encode()
+        public = self.publish(raw.decode("utf-8")).encode()
         (self.output / name).write_bytes(public)
-        self.report["artifacts"][name] = {"raw_sha256": digest(raw),
-                                           "retained_sha256": digest(public)}
+        self.report["artifacts"][name] = {"retained_sha256": digest(public)}  # never a digest of the raw bytes
 
     def install(self, name: str) -> str:
         prefix = self.work / "install" / name
@@ -1299,8 +1686,8 @@ def mcp_stdio_session(run: Run, label: str, argv: list[str], requests: list[tupl
     basic/transports#stdio): newline-delimited JSON-RPC on the server's stdin and stdout, the
     `initialize` answer awaited before `notifications/initialized` is sent, then each request
     awaited before the next. Returns the server's response lines exactly as it wrote them,
-    initialize first. The session is recorded like a command, with each request and the raw hash
-    of its answer. MCPorter is not used here: its 0.14.1 client first sends a `server/discover`
+    initialize first. The session is recorded like a command, with each request and the hash of
+    its sanitized answer. MCPorter is not used here: its 0.14.1 client first sends a `server/discover`
     probe that ai-memory's server rejects by exiting, and its answers are re-serialized."""
     start = time.monotonic()
     process = subprocess.Popen(argv, cwd=cwd or run.work, env=run.environment(env),
@@ -1342,7 +1729,8 @@ def mcp_stdio_session(run: Run, label: str, argv: list[str], requests: list[tupl
                         "result" in message or "error" in message):
                     break
             responses.append(line)
-            exchange.append({"request": run.clean(json.dumps(request)), "response_raw_sha256": digest(line)})
+            exchange.append({"request": run.publish(json.dumps(request)),
+                             "response_sha256": digest(run.publish(line.decode("utf-8", errors="replace")).encode())})
             if number == 1:
                 process.stdin.write(b'{"jsonrpc": "2.0", "method": "notifications/initialized"}\n')
                 process.stdin.flush()
@@ -1366,15 +1754,21 @@ def mcp_stdio_session(run: Run, label: str, argv: list[str], requests: list[tupl
                 process.wait()
         for reader in readers:
             reader.join(timeout=5)
-        entry = {"label": label, "argv": [run.clean(arg) for arg in argv], "cwd": run.clean(str(cwd or run.work)),
+        # The readers are done: close the parent's pipe ends. Popen closes them only in __exit__
+        # (python/cpython@cbc944f4 Lib/subprocess.py:1106-1113), and this session does not use it as a context manager.
+        if not any(reader.is_alive() for reader in readers):
+            for pipe in (process.stdout, process.stderr):
+                pipe.close()
+        entry = {"label": label, "argv": [run.publish(arg) for arg in argv], "cwd": run.clean(str(cwd or run.work)),
                  "exit_code": process.returncode, "expected_exit": "any",
                  "timed_out": failure == "timed out waiting for an answer",
                  "elapsed_seconds": round(time.monotonic() - start, 3), "mcp_exchange": exchange,
-                 "stdout_raw_sha256": digest(bytes(stdout)), "stderr_raw_sha256": digest(bytes(stderr)),
-                 "stdout": run.clean(bytes(stdout).decode("utf-8", errors="replace")),
-                 "stderr": run.clean(bytes(stderr).decode("utf-8", errors="replace"))}
+                 "stdout": run.publish(bytes(stdout).decode("utf-8", errors="replace")),
+                 "stderr": run.publish(bytes(stderr).decode("utf-8", errors="replace"))}
+        entry["stdout_sha256"] = digest(entry["stdout"].encode())
+        entry["stderr_sha256"] = digest(entry["stderr"].encode())
         if env:
-            entry["env_overrides"] = {key: None if value is None else run.clean(value) for key, value in env.items()}
+            entry["env_overrides"] = {key: None if value is None else run.publish(value) for key, value in env.items()}
         run.report["commands"].append(entry)
         run.flush()
     require(failure is None, f"{label}: {failure}")
