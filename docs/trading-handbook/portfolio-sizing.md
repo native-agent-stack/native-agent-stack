@@ -62,9 +62,14 @@ proposal cannot bypass these checks.
 Reservation and transmission are separate steps. The documented ledger
 interface requires revalidation after waits and immediately before submission;
 a duplicate intent does not authorize a second order. Quantity, price, quote
-freshness, session, loss and cleanup bounds still apply to risk-reducing exits,
+freshness, session and cleanup bounds still apply to risk-reducing exits,
 and a finite limit-order mechanism cannot guarantee a flat finish.
 [Reservation/revalidation contract](https://github.com/seathatflowsinourveins/native-agent-stack/blob/993cc890b3ff3fc95fa7cdba51edd726565f9ace/blueprints/us-equities/adaptive-paper/README-safety.md#L17-L56).
+
+Loss and drawdown halts block new entries; owned-position exits remain
+permitted subject to the quantity, price, quote, session and cleanup checks.
+[Reservation entry/exit split](https://github.com/seathatflowsinourveins/native-agent-stack/blob/993cc890b3ff3fc95fa7cdba51edd726565f9ace/blueprints/us-equities/adaptive-paper/safety.py#L1003-L1034),
+[final-validation entry/exit split](https://github.com/seathatflowsinourveins/native-agent-stack/blob/993cc890b3ff3fc95fa7cdba51edd726565f9ace/blueprints/us-equities/adaptive-paper/safety.py#L1065-L1092).
 
 ## Read a ceiling as a ceiling
 
