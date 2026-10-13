@@ -2651,6 +2651,8 @@ def main():
                             "phase": "starting"}
                 if exploratory:
                     metadata.update(engine_kind="adaptive", **RECEIPT_LABELS)
+                else:
+                    metadata["frozen_trading_config_sha256"]=frozen_trading_config_sha256(raw_config)
                 if resumable_hold:
                     held_resume_matches_ledger(ledger, observation)
                     ledger.resume_held_trial(now, args.trial)

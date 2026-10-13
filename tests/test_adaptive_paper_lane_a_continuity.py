@@ -36,7 +36,7 @@ def tearDownModule():
 class LaneASessionContinuity(unittest.TestCase):
     def exercise(self,*,command="paper",change="session",phase="finished",cash="9999.75",halt=None,
                  unresolved=False,stored_binding=None,unknown_prior=False,second_trial=False,
-                 race=None):
+                 race=None,interrupted_then_recover=False):
         with tempfile.TemporaryDirectory(dir="/var/tmp") as directory:
             root=Path(directory)
             old_path=SOURCE/"config-leverage-1x.json"
@@ -75,6 +75,7 @@ class LaneASessionContinuity(unittest.TestCase):
             config,limits,pc=runner.load_config(config_path)
             real_load=runner.load_config
             executions=[]
+            recovery_calls=0
             def load_with_path_edit(path,**kwargs):
                 if race:
                     edited=json.loads(Path(path).read_bytes())
@@ -113,9 +114,21 @@ class LaneASessionContinuity(unittest.TestCase):
             observe={"account_identity_sha256":"0"*64,"account":{"cash":cash},"assets":[]}
             async def native(*args,**kwargs):
                 executions.append((args[4],args[1]))
+                if interrupted_then_recover and len(executions)==2:
+                    args[0].ledger.reserve_intent("interrupted-synthetic","SPY","buy","1","100.02",
+                        quote=Quote("SPY","100","100.01",now+2),now=now+2,
+                        market_open=True,session_close=now+3600)
+                    return {"status":"needs_attention","flat":False,"native_fill_events":0}
                 return {"status":"completed_no_signals","flat":True,"native_fill_events":0}
             async def recover(*args,**kwargs):
+                nonlocal recovery_calls
+                recovery_calls+=1
                 executions.append((args[2],None))
+                if interrupted_then_recover:
+                    if recovery_calls==1:
+                        raise SafetyError("synthetic_forced_recovery_failure")
+                    args[0].ledger.record_order("interrupted-synthetic","synthetic-broker-order",
+                                               "canceled","0",None,timestamp=now+2)
                 return {"status":"passed","flat":True,"positions":[],"unresolved_orders":[],
                         "reconciliation":{"positions":0,"open_orders":0}}
             with patch.object(sys,"argv",argv), \
@@ -132,6 +145,30 @@ class LaneASessionContinuity(unittest.TestCase):
                  patch.object(runner,"run_native",side_effect=native), \
                  patch.object(runner.time,"time",return_value=now+2):
                 rc=runner.main()
+                if interrupted_then_recover:
+                    self.assertEqual(rc,0)
+                    first=json.loads((state/"trial.json").read_text())
+                    self.assertEqual(first["frozen_trading_config_sha256"],ONE_X_FROZEN_SHA256)
+                    self.assertFalse(any(hashlib.sha256(p.read_bytes()).hexdigest()==first["config_sha256"]
+                                         for p in SOURCE.glob("config*.json")))
+                    argv[argv.index("--trial")+1]="interrupted"
+                    with self.assertRaisesRegex(SafetyError,"^synthetic_forced_recovery_failure$"):
+                        runner.main()
+                    interrupted=json.loads((state/"trial.json").read_text())
+                    self.assertEqual(interrupted["phase"],"starting")
+                    self.assertEqual(interrupted["config_sha256"],hashlib.sha256(admitted_bytes).hexdigest())
+                    argv[1]="recover"
+                    self.assertEqual(runner.main(),0)
+                    recovered=json.loads((state/"trial.json").read_text())
+                    self.assertEqual(recovered["phase"],"finished")
+                    self.assertEqual(recovered["config_sha256"],hashlib.sha256(admitted_bytes).hexdigest())
+                    config_path.write_bytes(old_path.read_bytes())
+                    argv[1]="paper"
+                    argv[argv.index("--trial")+1]="after-recovery"
+                    rc=runner.main()
+                    self.assertEqual(interrupted["frozen_trading_config_sha256"],ONE_X_FROZEN_SHA256)
+                    self.assertEqual(recovered["frozen_trading_config_sha256"],ONE_X_FROZEN_SHA256)
+                    self.assertEqual(recovery_calls,2)
                 if second_trial:
                     self.assertEqual(rc,0)
                     first=json.loads((state/"trial.json").read_text())
@@ -160,6 +197,8 @@ class LaneASessionContinuity(unittest.TestCase):
             self.assertEqual(latest["config_sha256"],hashlib.sha256(expected_bytes).hexdigest())
             if command=="paper":
                 self.assertEqual(latest["frozen_trading_config_sha256"],ONE_X_FROZEN_SHA256)
+            elif stored_binding is not None:
+                self.assertEqual(latest["frozen_trading_config_sha256"],stored_binding)
             with closing(Ledger(state/"ledger.sqlite3",limits)) as ledger:
                 self.assertEqual(ledger.accounting().cash_delta_usd,Decimal("-0.25"))
                 self.assertEqual(len(ledger.fees()),1)
@@ -177,7 +216,7 @@ class LaneASessionContinuity(unittest.TestCase):
     def test_path_edit_cannot_change_recovery_execution_or_raw_provenance(self):
         for race in ("stop","universe"):
             with self.subTest(race=race):
-                self.exercise(command="recover",change="exact",race=race)
+                self.exercise(command="recover",change="exact",race=race,stored_binding=ONE_X_FROZEN_SHA256)
 
     def test_session_fields_only_recovery_refuses_changed_trial_bytes(self):
         with self.assertRaisesRegex(SafetyError,"^recovery_config_differs_from_frozen_trial$"):
@@ -199,8 +238,12 @@ class LaneASessionContinuity(unittest.TestCase):
         self.assertNotIn("frozen_trading_config_sha256",latest)
 
     def test_recovery_preserves_the_existing_next_trial_binding(self):
-        latest=self.exercise(command="recover",change="exact",stored_binding=ONE_X_FROZEN_SHA256)
-        self.assertEqual(latest["frozen_trading_config_sha256"],ONE_X_FROZEN_SHA256)
+        latest=self.exercise(command="recover",change="exact",stored_binding="e"*64)
+        self.assertEqual(latest["frozen_trading_config_sha256"],"e"*64)
+
+    def test_interrupted_unshipped_trial_recovers_exact_bytes_then_admits_rth(self):
+        latest=self.exercise(interrupted_then_recover=True)
+        self.assertEqual(latest["trial_id"],"after-recovery")
 
     def test_next_trial_consumes_the_binding_written_by_the_previous_trial(self):
         latest=self.exercise(second_trial=True)

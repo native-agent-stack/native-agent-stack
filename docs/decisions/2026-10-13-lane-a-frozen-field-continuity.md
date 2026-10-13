@@ -21,8 +21,10 @@ Feed, universe, exits, duration, order/request/loss/drawdown caps and every
 other session policy field remain bound. Rung changes still need their own
 fresh-intended series; they cannot change the stored journal limits.
 
-Each completed lane-A trial retains its raw config_sha256 for provenance and
-adds frozen_trading_config_sha256 for the next continuity comparison. Legacy
+Each admitted lane-A paper trial records its raw config_sha256 and verified
+frozen_trading_config_sha256 in starting metadata before execution. Interrupted
+execution or forced recovery therefore retains the next-trial signature;
+exact-byte recovery preserves it. Legacy
 journals lacking the new signature resolve the old raw digest ONLY against
 retained nonsymlink shipped config bytes with that exact digest. Unknown
 legacy configs stay refused; current RiskLimits alone cannot reconstruct
@@ -54,7 +56,8 @@ The fail-before paper fixture at the branch base reproduces session-only
 NEXT-trial admission refusing the raw config digest. The review regression
 fails at 76a8a6b0 because recovery admits changed session flags; with the fix,
 changed session flags and a non-risk timeout change refuse while exact-byte
-recovery passes without adding or replacing a frozen signature.
+recovery passes without adding a missing signature or replacing an existing
+signature (the preservation test seeds an unrelated "e" repeated 64 times).
 The fixed fixtures preserve original
 fee-window/cash baseline and durable request history. Changed risk/rung/stop/
 universe still refuse, as do unfinished state, cash drift, a latched halt and
@@ -64,10 +67,18 @@ an invalid stored signature, unknown legacy digest, combined session/risk
 change, added/removed key, type change and nesting change all refuse.
 Race regressions replace stop_bps with 2500 or remove a symbol immediately
 before the real loader: both paper and exact-byte recovery execute the captured
-25-bps stop and original universe, and retain its raw/frozen provenance.
-These tests fail at 76a8a6b0. The scalar-leaf matrix covers every shipped value
+25-bps stop and original universe. Paper asserts the captured raw/frozen
+provenance; recovery asserts the captured raw digest and unchanged seeded
+frozen signature. These tests fail at 76a8a6b0. The scalar-leaf matrix covers
+all 98 scalar leaves of config-leverage-1x.json
 under both legacy and retained-signature comparison; only the three declared
 session leaves compare equal after mutation.
+The round-2 regression starts a successful unshipped PRE/POST trial, then an
+identical-config trial whose forced recovery raises. It recovers with those
+exact bytes and admits the next shipped 1x RTH trial in the same journal.
+Starting/recovered signatures, raw provenance, fee window, baseline cash,
+fees and durable requests are asserted. At af646784, recovery succeeds but
+the next RTH trial refuses next_trial_config_differs_from_frozen_limits.
 Synthetic fixtures are not paper acceptance or an observed account transition.
 Tests/commands/exit codes are recorded in the staged lane report.
 

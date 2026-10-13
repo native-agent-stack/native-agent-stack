@@ -80,8 +80,9 @@ refuses with `next_trial_config_differs_from_frozen_limits`. Lane A permits
 only the coordinated regular_session_only, extended_hours_enabled and
 sessions.extended_hours flags to change for the next trial, with all other
 config values frozen. The loader and actual-session checks still validate
-the new scope. Completed paper trial metadata retains both the actual raw
-config digest and frozen_trading_config_sha256; recovery preserves the
+the new scope. Starting paper trial metadata records both the actual raw
+config digest and frozen_trading_config_sha256 before execution, so an
+interruption retains the verified next-trial signature; recovery preserves the
 trial's original bindings. A legacy journal can compare a changed session
 only when its old raw digest resolves to exact retained shipped config bytes;
 otherwise it refuses. No risk/history reset is implied.
