@@ -55,6 +55,7 @@ the combined record holds a lock, so two halves that finish together (both timer
 are `Persistent=true`) leave a record built from the newest record of each.
 The record is written through one closed-schema check (`render_record`: only the schema's keys, and leaves that are null, a boolean, a count, a time, a name of the allowed pattern or a fixed word), to the standard
 output and to the file alike, and the diagnostics of both command lines are fixed text that names no value (review round 9 of the record).
+The native collector's `main` is its public boundary (review round 10): an exception below the argument parser ends in one fixed line and exit 2, and the values of a refused capture that a diagnostic or the report carries come from closed sets.
 Live scheduled collection, and rendering, refuse a clone that is not at a
 commit of origin/main (`git merge-base --is-ancestor HEAD origin/main`): the
 live clone is a detached worktree of origin/main, so a branch name cannot be

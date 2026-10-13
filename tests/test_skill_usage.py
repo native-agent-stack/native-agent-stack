@@ -3919,12 +3919,137 @@ class NativeCliDiagnosticTests(unittest.TestCase):
                     done = self.run_cli(arguments, temp)
                     self.assertEqual((done.returncode, done.stderr), (2, line))
 
-    def test_a_refused_capture_names_a_word_or_a_number_and_never_the_value(self):
-        """The reason of a capture that the program refuses is part of its report (`claude.reason`) and of its diagnostic: a boolean, a finite number or a short word may stand in it, anything else is `other`."""
-        for value, shown in ((True, "True"), (0, "0"), (1.5, "1.5"), ("error_max_turns", "'error_max_turns'"), (f"/fixture/{self.MARK}/x", "other"), ("a" * 41, "other"), ([1], "other"), ({"a": 1}, "other"),
-                             (None, "other"), (float("inf"), "other"), (float("nan"), "other")):
-            with self.subTest(value=repr(value)[:40]):
-                self.assertEqual(S.safe_scalar(value), shown)
+    def test_a_refused_capture_carries_only_closed_words_numbers_and_flags(self):
+        """Round 10 (the fix8 verdict, blocker 1): the character filter of round 9 let a bare name through, and the bare name of an account has that shape. The values of a capture that a diagnostic or the
+        report may carry now come from closed sets: the subtype one of the words the SDK documents for a result, a flag the boolean it is, a count a finite number that is not a boolean."""
+        names = ("success", "error_max_turns", "error_during_execution", "error_max_budget_usd")
+        for value in names:
+            with self.subTest(subtype=value):
+                self.assertEqual(S.closed_word(value), value)
+        for value in ("account", "Root9", "a" * 40, "error_made_up", "SUCCESS", "", f"/fixture/{self.MARK}/x", True, 0, None, ["success"], {"a": 1}):
+            with self.subTest(subtype=repr(value)[:30]):
+                self.assertEqual(S.closed_word(value), "other")
+        self.assertEqual((S.closed_flag(True), S.closed_flag(False)), ("true", "false"))
+        for value in ("account", "false", 0, 1, None, [True], {"a": True}):
+            with self.subTest(flag=repr(value)[:30]):
+                self.assertEqual(S.closed_flag(value), "other")
+        for value, number, shown in ((0, 0, "0"), (3, 3, "3"), (0.5, 0.5, "0.5"), (-1, -1, "-1")):
+            with self.subTest(count=value):
+                self.assertEqual((S.closed_number(value), S.closed_text(value)), (number, shown))
+        for value in ("0", "account", True, False, None, [0], {"a": 0}, float("inf"), float("-inf"), float("nan")):
+            with self.subTest(count=repr(value)[:30]):
+                self.assertEqual((S.closed_number(value), S.closed_text(value)), (None, "other"))
+
+    def test_a_bare_name_in_any_field_of_a_capture_reaches_no_stream_and_no_file(self):
+        """The fix8 verdict's blocker 1, through the command line: each of the four fields holds, in turn, a bare name with no separator in it; neither stream, nor the JSON report written with --out, may
+        carry it; the clean controls keep their diagnostic and their numbers."""
+        clean = {"type": "result", "subtype": "success", "is_error": False, "total_cost_usd": 0, "num_turns": 0, "result": ""}
+        name = "Account9marker"
+        with tempfile.TemporaryDirectory() as temp:
+            work = Path(temp)
+            for field in ("subtype", "is_error", "total_cost_usd", "num_turns"):
+                with self.subTest(field=field):
+                    capture = work / f"capture-{field}.json"
+                    capture.write_text(json.dumps({**clean, field: name}))
+                    out = work / f"report-{field}.json"
+                    done = self.run_cli(["--claude-skill-doctor", str(capture), "--json", "--out", str(out), "--now", "2026-10-12T10:00:00+00:00"], work)
+                    self.assertEqual(done.returncode, 0, done.stderr[-300:])
+                    for label, content in (("stdout", done.stdout), ("stderr", done.stderr), ("the --out file", out.read_text(encoding="utf-8"))):
+                        self.assertNotIn(name, content, f"{field}: {label}")
+                    report = json.loads(out.read_text(encoding="utf-8"))["claude"]
+                    self.assertEqual((report["measured"], report["refused"]), (False, True))
+                    self.assertIn("refusing", report["reason"])
+                    self.assertIn(report["total_cost_usd"], (None, 0))
+                    self.assertIn(report["num_turns"], (None, 0))
+            for label, capture_value, expected in (
+                    ("a documented error subtype", {**clean, "subtype": "error_max_turns", "is_error": True, "total_cost_usd": 0.12, "num_turns": 5},
+                     "refusing an error result (subtype=error_max_turns, is_error=true)"),
+                    ("a nonzero cost", {**clean, "total_cost_usd": 0.5, "num_turns": 3}, "refusing a nonzero-cost result (total_cost_usd=0.5, num_turns=3)"),
+                    ("an unknown subtype", {**clean, "subtype": "error_made_up"}, "refusing an error result (subtype=other, is_error=false)")):
+                with self.subTest(control=label):
+                    capture = work / "control.json"
+                    capture.write_text(json.dumps(capture_value))
+                    done = self.run_cli(["--claude-skill-doctor", str(capture), "--now", "2026-10-12T10:00:00+00:00"], work)
+                    self.assertEqual(done.returncode, 0)
+                    self.assertIn(expected, done.stderr)
+            capture = work / "clean.json"
+            capture.write_text(json.dumps(clean))
+            done = self.run_cli(["--claude-skill-doctor", str(capture), "--json", "--now", "2026-10-12T10:00:00+00:00"], work)
+            self.assertEqual(done.returncode, 0)
+            self.assertEqual(json.loads(done.stdout)["claude"]["measured"], True)
+            self.assertEqual((json.loads(done.stdout)["claude"]["total_cost_usd"], json.loads(done.stdout)["claude"]["num_turns"]), (0, 0))
+
+
+class NativeBoundaryTests(unittest.TestCase):
+    """Round 10 (the fix8 verdict, blocker 2): the program's public boundary. A reader, a decoder or a processing step below the argument parser may raise what it likes (a decoder's RecursionError is not a
+    ValueError): the program ends in one fixed line and exit 2, with no exception text, no value, no path and no traceback, and a capture that cannot be decoded is a refused capture."""
+
+    def run_cli(self, arguments, cwd):
+        return subprocess.run([sys.executable, "-B", str(ROOT / "tools/skill-usage/skill_usage.py"), *arguments], capture_output=True, text=True, timeout=180, cwd=cwd)
+
+    def test_an_exception_below_the_parser_ends_in_the_fixed_line_whatever_it_is_and_holds_its_text_back(self):
+        marker = "PRIVATE-MARKER-9"
+        errors = (KeyError(marker), RecursionError(marker), UnicodeDecodeError("utf-8", b"\xff", 0, 1, marker), TypeError(marker), RuntimeError(marker), MemoryError(marker), OSError(2, marker, f"/fixture/{marker}"))
+        for error in errors:
+            with self.subTest(error=type(error).__name__):
+                out, err = io.StringIO(), io.StringIO()
+                with mock.patch.object(S, "run", side_effect=error), contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+                    code = S.main(["--now", "2026-10-12T10:00:00+00:00"])
+                self.assertEqual((code, out.getvalue(), err.getvalue()), (2, "", S.PROCESSING_REFUSAL + "\n"))
+        with mock.patch.object(S, "run", side_effect=SystemExit(0)):
+            with self.assertRaises(SystemExit):
+                S.main([])
+        with mock.patch.object(S, "run", side_effect=KeyboardInterrupt):
+            with self.assertRaises(KeyboardInterrupt):
+                S.main([])
+
+    def test_a_manifest_and_a_capture_that_the_decoder_cannot_read_end_without_a_traceback(self):
+        """The two readers of the fix8 verdict's blocker 2, with ordinary malformed JSON and clean controls: a manifest ends in the fixed line and exit 2; a capture that is JSON but cannot be decoded is a
+        refused capture, never a successful one."""
+        deep = "[" * 10000 + "0" + "]" * 10000
+        long_integer = "1" * 5000
+        with tempfile.TemporaryDirectory() as temp:
+            work = Path(temp)
+            marker_dir = work.name
+            cases = {}
+            for label, content in (("deeply nested", deep), ("an integer beyond the digit limit", long_integer)):
+                path = work / f"{label.split()[0]}.json"
+                path.write_text(content)
+                cases[label] = path
+            undecodable = work / "undecodable.json"
+            undecodable.write_bytes(b"\xff\xfe{}")
+            for label, path in cases.items():
+                with self.subTest(reader="manifest", input=label):
+                    done = self.run_cli(["--manifest", str(path)], work)
+                    self.assertEqual((done.returncode, done.stdout), (2, ""))
+                    self.assertNotIn("Traceback", done.stderr)
+                    self.assertNotIn(marker_dir, done.stderr)
+                    self.assertEqual(len(done.stderr.strip().splitlines()), 1, done.stderr[-200:])
+                with self.subTest(reader="capture", input=label):
+                    done = self.run_cli(["--claude-skill-doctor", str(path), "--json", "--now", "2026-10-12T10:00:00+00:00"], work)
+                    self.assertEqual(done.returncode, 0, done.stderr[-300:])
+                    self.assertNotIn("Traceback", done.stderr)
+                    self.assertNotIn(marker_dir, done.stderr + done.stdout)
+                    claude = json.loads(done.stdout)["claude"]
+                    self.assertEqual((claude["measured"], claude["refused"]), (False, True))
+            for reader, arguments in (("manifest", ["--manifest", str(undecodable)]), ("capture", ["--claude-skill-doctor", str(undecodable)])):
+                with self.subTest(reader=reader, input="not UTF-8"):
+                    done = self.run_cli(arguments, work)
+                    self.assertEqual((done.returncode, done.stdout), (2, ""))
+                    self.assertNotIn("Traceback", done.stderr)
+                    self.assertNotIn(marker_dir, done.stderr)
+            # the clean controls and the ordinary malformed JSON keep their routes
+            clean = work / "clean.json"
+            clean.write_text(json.dumps({"type": "result", "subtype": "success", "is_error": False, "total_cost_usd": 0, "num_turns": 0, "result": ""}))
+            done = self.run_cli(["--claude-skill-doctor", str(clean), "--json", "--now", "2026-10-12T10:00:00+00:00"], work)
+            self.assertEqual((done.returncode, json.loads(done.stdout)["claude"]["measured"]), (0, True))
+            malformed = work / "malformed.json"
+            malformed.write_text("{not json at all")
+            done = self.run_cli(["--claude-skill-doctor", str(malformed), "--json", "--now", "2026-10-12T10:00:00+00:00"], work)
+            self.assertEqual(done.returncode, 0)
+            self.assertEqual(json.loads(done.stdout)["claude"]["format"], "text", "text that is not JSON is still the plain-text table's route")
+            done = self.run_cli(["--manifest", str(malformed)], work)
+            self.assertEqual((done.returncode, done.stderr), (2, "skill_usage: invalid manifest (JSONDecodeError)\n"))
 
 
 if __name__ == "__main__":

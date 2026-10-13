@@ -1,0 +1,31 @@
+Round 10 of #1043 (Astra's fix8 verdict, blockers 1 and 2, and the command center's adjudication: one final commit): the tests of the round against the sources of cb42f789c, the head that was read, and against this head, and the reviewer's commands as counts. A test is listed once with the number of its failing subtests.
+
+== cb42f789c, the head that was read (its sources, this test module)
+   test_skill_usage.NativeCliDiagnosticTests: Ran 4, FAILED (failures=6, errors=17)
+      NativeCliDiagnosticTests.test_a_bare_name_in_any_field_of_a_capture_reaches_no_stream_and_no_file: 6 failing subtests, e.g. field='subtype'
+      NativeCliDiagnosticTests.test_a_refused_capture_carries_only_closed_words_numbers_and_flags: 17 failing subtests, e.g. subtype='success'
+   test_skill_usage.NativeBoundaryTests: Ran 2, FAILED (failures=4, errors=8)
+      NativeBoundaryTests.test_a_manifest_and_a_capture_that_the_decoder_cannot_read_end_without_a_traceback: 4 failing subtests, e.g. reader='manifest', input='deeply nested'
+      NativeBoundaryTests.test_an_exception_below_the_parser_ends_in_the_fixed_line_whatever_it_is_and_holds_its_text_back: 8 failing subtests, e.g. error='KeyError'
+== this head
+   test_skill_usage.NativeCliDiagnosticTests: Ran 4, OK
+   test_skill_usage.NativeBoundaryTests: Ran 2, OK
+== the reviewer's commands (the fix8 verdict, blockers 1 and 2), as counts of the account's name per stream and of the traceback; the real account name is used and never written here
+-- blocker 1 at cb42f789c
+   subtype: rc 0, the account name in stdout 1, in stderr 1, in the --out file 1
+   is_error: rc 0, the account name in stdout 1, in stderr 1, in the --out file 1
+   total_cost_usd: rc 0, the account name in stdout 2, in stderr 1, in the --out file 2
+   num_turns: rc 0, the account name in stdout 2, in stderr 1, in the --out file 2
+-- blocker 2 at cb42f789c
+   --manifest of a 20,001-byte nested input: rc 1, stdout 0 bytes, Traceback present, the account name in stderr 3, stderr lines 18
+   --claude-skill-doctor of a 20,001-byte nested input: rc 1, stdout 0 bytes, Traceback present, the account name in stderr 3, stderr lines 18
+-- blocker 1 at this head
+   subtype: rc 0, the account name in stdout 0, in stderr 0, in the --out file 0
+   is_error: rc 0, the account name in stdout 0, in stderr 0, in the --out file 0
+   total_cost_usd: rc 0, the account name in stdout 0, in stderr 0, in the --out file 0
+   num_turns: rc 0, the account name in stdout 0, in stderr 0, in the --out file 0
+-- blocker 2 at this head
+   --manifest of a 20,001-byte nested input: rc 2, stdout 0 bytes, Traceback absent, the account name in stderr 0, stderr lines 1
+   --claude-skill-doctor of a 20,001-byte nested input: rc 0, stdout 4680 bytes, Traceback absent, the account name in stderr 0, stderr lines 1
+
+Tests that fail or raise on cb42f789c: 4 (the round's new tests; the rest of both classes holds at both heads).

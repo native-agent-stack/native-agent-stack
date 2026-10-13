@@ -172,7 +172,7 @@ def parse_claude_output(raw: str) -> dict:
     plain-text capture: there is no cost signal to check, because there is no result event.
     """
     try:
-        events = json.loads(raw)
+        events = decode_capture(raw)
     except json.JSONDecodeError:
         return {"format": "text", "rows": parse_skill_doctor_text(raw),
                 "total_cost_usd": None, "num_turns": None}
@@ -191,19 +191,19 @@ def parse_claude_output(raw: str) -> dict:
     # pin above), and is_error can be true while subtype is "success" (an API error, types.py:1358-1360),
     # so only a result that is both "success" and not is_error carries a /skill-doctor table.
     if result_event.get("subtype") != "success" or result_event.get("is_error") is not False:
-        return {"format": "json", "rows": {}, "total_cost_usd": total_cost_usd, "num_turns": num_turns,
-                "error": f"refusing an error result (subtype={safe_scalar(result_event.get('subtype'))}, "
-                         f"is_error={safe_scalar(result_event.get('is_error'))})"}
+        return {"format": "json", "rows": {}, "total_cost_usd": closed_number(total_cost_usd), "num_turns": closed_number(num_turns),
+                "error": f"refusing an error result (subtype={closed_word(result_event.get('subtype'))}, "
+                         f"is_error={closed_flag(result_event.get('is_error'))})"}
     if not evaluate_cost(total_cost_usd, num_turns):
-        return {"format": "json", "rows": {}, "total_cost_usd": total_cost_usd, "num_turns": num_turns,
-                "error": f"refusing a nonzero-cost result (total_cost_usd={safe_scalar(total_cost_usd)}, "
-                         f"num_turns={safe_scalar(num_turns)}); a native /skill-doctor run is zero-cost"}
+        return {"format": "json", "rows": {}, "total_cost_usd": closed_number(total_cost_usd), "num_turns": closed_number(num_turns),
+                "error": f"refusing a nonzero-cost result (total_cost_usd={closed_text(total_cost_usd)}, "
+                         f"num_turns={closed_text(num_turns)}); a native /skill-doctor run is zero-cost"}
     text = result_event.get("result")
     if not isinstance(text, str):
-        return {"format": "json", "rows": {}, "total_cost_usd": total_cost_usd, "num_turns": num_turns,
+        return {"format": "json", "rows": {}, "total_cost_usd": closed_number(total_cost_usd), "num_turns": closed_number(num_turns),
                 "error": "result event has no string 'result' field"}
     return {"format": "json", "rows": parse_skill_doctor_text(text),
-            "total_cost_usd": total_cost_usd, "num_turns": num_turns}
+            "total_cost_usd": closed_number(total_cost_usd), "num_turns": closed_number(num_turns)}
 
 
 # /skill-doctor is a local command (0 turns, $0), so these fences change nothing while the client recognises it:
@@ -2403,7 +2403,7 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main(argv=None) -> int:
+def run(argv=None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
 
@@ -2680,13 +2680,59 @@ class FixedErrorParser(argparse.ArgumentParser):
         self.exit(2, ARGUMENT_REFUSAL + "\n")
 
 
-def safe_scalar(value) -> str:
-    """A value of a captured result as a diagnostic may carry it: a boolean, a finite number or a short word of letters, digits and `_.-`; any other value (a longer text, a path, a container) is `other`."""
-    if isinstance(value, (bool, int)) or (isinstance(value, float) and value == value and abs(value) != float("inf")):
-        return repr(value)
-    if isinstance(value, str) and re.fullmatch(r"[A-Za-z0-9_.-]{1,40}", value):
-        return repr(value)
-    return "other"
+# What a captured result may put into a diagnostic or into the report (review round 10, the fix8 verdict's blocker 1): a value of the capture is never copied through a character filter, which a bare name of an
+# account passes. A subtype is one of the words the SDK documents for a result (anthropics/claude-agent-sdk-python@f7529348747235da34af3ed202251228ff31db08 src/claude_agent_sdk/_errors.py:71 and :78-80 and
+# src/claude_agent_sdk/types.py:2057-2060 name success, error_max_turns, error_during_execution and error_max_budget_usd; ResultMessage.subtype is an open `str`, types.py:1343, so any other word is `other`), a
+# flag is the boolean it is, a count is a finite number that is not a boolean, and everything else is `other` (diagnostic) or null (report).
+RESULT_SUBTYPES = frozenset({"success", "error_max_turns", "error_during_execution", "error_max_budget_usd"})
+
+
+def closed_word(value) -> str:
+    """The subtype of a result as a diagnostic may carry it: one of RESULT_SUBTYPES, else `other`."""
+    return value if isinstance(value, str) and value in RESULT_SUBTYPES else "other"
+
+
+def closed_flag(value) -> str:
+    """A flag of a result as a diagnostic may carry it: `true` or `false` for a boolean, else `other`."""
+    return {True: "true", False: "false"}.get(value, "other") if isinstance(value, bool) else "other"
+
+
+def closed_number(value):
+    """A count of a result as the report may carry it: a finite number that is not a boolean, else None."""
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return None
+    return value if value == value and abs(value) != float("inf") else None
+
+
+def closed_text(value) -> str:
+    """A count of a result as a diagnostic may carry it: the number's text, else `other`."""
+    number = closed_number(value)
+    return "other" if number is None else repr(number)
+
+
+def decode_capture(raw: str):
+    """json.loads of a capture, where a text that is JSON but cannot be decoded (nested beyond the decoder's limit: python/cpython@cbc944f4bc59639a444dd971c737788ba2283a91 Modules/_json.c L1031-L1046
+    raises RecursionError, and Lib/json/decoder.py L360-L363 translates only StopIteration; an integer beyond the digit limit raises ValueError) is None, which parse_claude_output refuses. A text that is not
+    JSON at all is still a JSONDecodeError, the plain-text table's route."""
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        raise
+    except (RecursionError, ValueError):
+        return None
+
+
+PROCESSING_REFUSAL = "skill_usage: an input could not be read or processed; the program stopped (exit 2)"
+
+
+def main(argv=None) -> int:
+    """The program's public boundary: an exception that no check below names (a reader, a decoder, a processing step) ends in one fixed line and exit 2, with no exception text, no value and no traceback; a
+    command line that argparse refuses ends in its own fixed line (FixedErrorParser) and SystemExit."""
+    try:
+        return run(argv)
+    except Exception:  # noqa: BLE001 - the boundary: nothing below it may print what it was given
+        print(PROCESSING_REFUSAL, file=sys.stderr)
+        return 2
 
 
 if __name__ == "__main__":
