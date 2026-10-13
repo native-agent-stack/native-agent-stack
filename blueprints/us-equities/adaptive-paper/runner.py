@@ -48,7 +48,7 @@ from feeds import require_qualified_stream
 from exploration import (active_trial_metadata, apply_exit_preset, config_digest, is_exploratory,
                          publish_trial_projection, receipt_labels, validate_exploratory_paths)
 from leverage import LeveragePolicyError, next_lower_rung_ceiling, validate_leverage_policy
-from safety import (Ledger, Quote, RiskLimits, SafetyError, account_lock_fingerprint, DEFAULT_STOP,
+from safety import (Ledger, Quote, RiskLimits, SafetyError, account_lock_fingerprint, DEFAULT_STOP, risk_ceiling_kwargs,
                     execution_from_observation)
 from sessions import (DEFAULT_SESSION_POLICY, SessionKind, boundary_receipt, extended_session_close,
                      must_end_flat, next_trading_day, session_at, validate_session_policy)
@@ -505,6 +505,7 @@ def load_config(path, *, registry_path=None, config_bytes=None):
                       exit_quote_max_age_seconds=c.get("exit_quote_max_age_seconds"),
                       cleanup_seconds=c["cleanup_seconds"], min_entry_close_seconds=c["min_entry_close_seconds"],
                       overnight_gross_multiple=session_policy["overnight_gross_multiple"],
+                      **risk_ceiling_kwargs(c),
                       **({"leverage": leverage} if leverage is not None else {}))
     policy = PolicyConfig(symbols=tuple(c["symbols"]), benchmarks=tuple(c["benchmarks"]),
                           max_positions=c["max_held_symbols"], capital=float(c["capital_usd"]),
@@ -523,6 +524,7 @@ def load_config(path, *, registry_path=None, config_bytes=None):
                           warmup_samples=c["warmup_samples"], warmup_seconds=c["warmup_seconds"],
                           minimum_edge_bps=c["minimum_edge_bps"], quote_age_seconds=c["quote_max_age_seconds"],
                           exit_quote_age_seconds=risk.effective_exit_quote_max_age_seconds,
+                          max_shares_ceiling=risk.order_quantity_ceiling,
                           min_hold_seconds=c["min_hold_seconds"], max_hold_seconds=c["max_hold_seconds"],
                           stop_bps=c["stop_bps"], take_profit_bps=c["take_profit_bps"], trailing_bps=c["trailing_bps"],
                           **({k: c[k] for k in ("vol_stop_multiplier", "vol_reference_bps", "stop_min_bps",
