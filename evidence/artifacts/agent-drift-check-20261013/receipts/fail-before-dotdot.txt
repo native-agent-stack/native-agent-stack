@@ -1,0 +1,16 @@
+The tests of the second local codex re-review round of #1062 (CPA-V-10; a relative bun made absolute without normalizing it: a '..' after a link, a link to the bun) against the sources of 9720257e7, the head that the review read, and against this head (GITHUB_ACTIONS=true, the bun 1.4.3 named in AGENT_FRONTMATTER_BUN, which the real-bun test turns into a relative path itself).
+
+== 9720257e7, the head that was reviewed (its sources, this test file)
+   test_a_dot_dot_after_a_link_keeps_the_meaning_the_file_system_gives_it: Ran 1, FAILED (failures=3)
+      AssertionError: False is not true : the components are kept as they were written
+   test_a_link_to_the_bun_is_kept_by_its_name_since_an_executable_can_be_known_by_it: Ran 1, OK
+   test_a_dot_dot_after_a_link_reaches_the_real_bun_the_kernel_finds: Ran 1, FAILED (errors=1)
+      scripts.adoption_status.Unknown
+== this head
+   test_a_dot_dot_after_a_link_keeps_the_meaning_the_file_system_gives_it: Ran 1, OK
+   test_a_link_to_the_bun_is_kept_by_its_name_since_an_executable_can_be_known_by_it: Ran 1, OK
+   test_a_dot_dot_after_a_link_reaches_the_real_bun_the_kernel_finds: Ran 1, OK
+
+The reviewer's scenario, a '..' after a link:
+agent_names at 9720257e7, AGENT_FRONTMATTER_BUN=current/../bun (current -> actual/subdir, actual/bun the real bun 1.4.3, the bun beside current a script that says 1.4.2): Unknown
+agent_names at this head, AGENT_FRONTMATTER_BUN=current/../bun (current -> actual/subdir, actual/bun the real bun 1.4.3, the bun beside current a script that says 1.4.2): ['reviewer-case']

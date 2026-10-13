@@ -1092,15 +1092,19 @@ def find_bun(environ=None):
     """The bun to run, as an absolute path: the one BUN_ENV names, else the first on PATH. Both launches run in a scratch directory (cwd=scratch), and subprocess looks for a relative executable relative to cwd
     (python/cpython@cbc944f4bc59639a444dd971c737788ba2283a91 Doc/library/subprocess.rst L572-L576; Lib/subprocess.py L1912-L1919: a name with no directory is joined to each directory of the exec path as it stands,
     a relative one included). So a relative value of the variable (`bin/bun`, `./bun`) or a relative entry of PATH (`./bin`, an empty entry) named a file of the caller's directory and was searched for in the scratch
-    one: a bun that parses from its absolute path gave Unknown from a relative one (reproduced with bun 1.4.3). A value with no directory is a name, looked up on PATH as a shell does. A caller whose own directory is
-    gone cannot make a relative path absolute: None, which is Unknown."""
+    one: a bun that parses from its absolute path gave Unknown from a relative one (reproduced with bun 1.4.3). A value with no directory is a name, looked up on PATH as a shell does. A relative path is made absolute by
+    putting the caller's directory in front of it and nothing else: os.path.abspath would also remove each ".." lexically, before the file system resolves the link in front of it, and `current/../bun` with `current` a
+    link to `actual/subdir` (the file `actual/bun`) would become the `bun` beside `current`; and a link is not resolved either, since an executable can be known by its name (the mise shim is a link to mise). A caller
+    whose own directory is gone cannot make a relative path absolute: None, which is Unknown."""
     environ = os.environ if environ is None else environ
     named = environ.get(BUN_ENV)
     chosen = named if named and os.sep in named else shutil.which(named or "bun", path=environ.get("PATH"))
     if not chosen:
         return None
+    if os.path.isabs(chosen):
+        return chosen
     try:
-        return os.path.abspath(chosen)
+        return os.path.join(os.getcwd(), chosen)
     except OSError:
         return None
 

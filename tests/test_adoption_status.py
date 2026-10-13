@@ -1953,7 +1953,7 @@ def real_bun():
 FAKE_BUN = r'''#!{python}
 import json, os, sys, time
 
-here = os.path.dirname(os.path.abspath(sys.argv[0]))
+here = os.path.dirname(os.path.realpath(sys.argv[0]))   # the file the kernel ran, as a path with a '..' after a link names it
 behavior = json.load(open(os.path.join(here, "behavior.json")))
 args = sys.argv[1:]
 config = [item[len("--config="):] for item in args if item.startswith("--config=")]
@@ -2147,6 +2147,35 @@ class AgentNamesTests(unittest.TestCase):
                 self.assertEqual(adoption_status.agent_names([b"---\nname: a\n---\n"], environ=environ), ["a"])
                 self.assertEqual([call["call"] for call in fake_calls(bin_directory)], ["version", "parse"], "both launches ran the stand-in")
 
+    def test_a_dot_dot_after_a_link_keeps_the_meaning_the_file_system_gives_it(self):
+        """The local codex re-review of 9720257e (P2): os.path.abspath removes each ".." lexically, before the file system resolves the link in front of it, so `current/../bun` with `current` a link to `actual/subdir`
+        (the file `actual/bun`) became the `bun` beside `current` and the check said Unknown on healthy wiring. The caller's directory is put in front of the path and nothing is normalized. The bun beside
+        `current` here is a stand-in of another version, so that taking it is Unknown."""
+        (self.directory / "actual/subdir").mkdir(parents=True)
+        make_fake_bun(self.directory / "actual", version="1.4.3")
+        make_fake_bun(self.directory, version="1.4.2")   # the decoy beside the link
+        (self.directory / "current").symlink_to("actual/subdir")
+        blob = [b"---\nname: a\n---\n"]
+        with contextlib.chdir(self.directory):
+            for label, environ in (("a relative value of the variable", {"PATH": "/usr/bin:/bin", adoption_status.BUN_ENV: "current/../bun"}), ("a relative PATH entry", {"PATH": "current/.."}),
+                                   ("an absolute value that goes through the link", {"PATH": "/usr/bin:/bin", adoption_status.BUN_ENV: str(self.directory / "current/../bun")})):
+                with self.subTest(case=label):
+                    found = adoption_status.find_bun(environ)
+                    self.assertTrue(os.path.isabs(found) and found.endswith("current/../bun"), "the components are kept as they were written")
+                    self.assertEqual(os.path.realpath(found), os.path.realpath(self.directory / "actual/bun"), "the file the kernel finds through the link")
+                    self.assertEqual(adoption_status.agent_names(blob, environ=environ), ["a"])
+
+    def test_a_link_to_the_bun_is_kept_by_its_name_since_an_executable_can_be_known_by_it(self):
+        """The mise shim is a link to mise and behaves as bun because it is started as bun: the final component is never resolved."""
+        (self.directory / "actual").mkdir()
+        make_fake_bun(self.directory / "actual", version="1.4.3")
+        (self.directory / "links").mkdir()
+        (self.directory / "links/bun").symlink_to("../actual/bun")
+        with contextlib.chdir(self.directory):
+            found = adoption_status.find_bun({"PATH": "/usr/bin:/bin", adoption_status.BUN_ENV: "links/bun"})
+        self.assertTrue(os.path.islink(found) and os.path.basename(found) == "bun" and found.endswith("links/bun"), found)
+        self.assertEqual(adoption_status.find_bun({"PATH": "/usr/bin:/bin", adoption_status.BUN_ENV: str(self.directory / "links/bun")}), str(self.directory / "links/bun"), "an absolute path is passed as it is")
+
     def test_a_value_with_no_directory_is_a_name_looked_up_on_path_and_never_in_the_callers_directory(self):
         bun = make_fake_bun(self.directory)
         variable = adoption_status.BUN_ENV
@@ -2262,6 +2291,20 @@ class RealBunTests(unittest.TestCase):
         for label, environ in (("a relative value of the variable", {"PATH": "/usr/bin:/bin", adoption_status.BUN_ENV: "./" + bun.name}), ("a relative PATH entry", {"PATH": ".", adoption_status.BUN_ENV: bun.name})):
             with self.subTest(case=label), contextlib.chdir(bun.parent):   # from the bun's own directory, where nothing of the scratch directory's can answer
                 self.assertEqual(adoption_status.agent_names([b"---\nname: a\n---\n"], environ=environ), ["a"])
+
+    def test_a_dot_dot_after_a_link_reaches_the_real_bun_the_kernel_finds(self):
+        """The case of the local codex re-review of 9720257e (P2), with the real binary: `current/../bun` with `current` a link to `actual/subdir` is `actual/bun`, here a link to the real bun; the file beside `current`
+        is a script that answers another version, so that taking it (os.path.abspath removes the ".." lexically) is Unknown."""
+        bun = Path(real_bun())
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "actual/subdir").mkdir(parents=True)
+            (root / "actual/bun").symlink_to(bun)
+            (root / "bun").write_text("#!/bin/sh\necho 1.4.2\n")
+            (root / "bun").chmod(0o755)
+            (root / "current").symlink_to("actual/subdir")
+            with contextlib.chdir(root):
+                self.assertEqual(adoption_status.agent_names([b"---\nname: a\n---\n"], environ={"PATH": "/usr/bin:/bin", adoption_status.BUN_ENV: "current/../bun"}), ["a"])
 
     def test_a_bunfig_in_the_working_directory_is_not_read(self):
         """bun reads a bunfig.toml of its working directory and runs its preload (measured with 1.4.3); the call runs in an empty directory, so a caller's directory cannot change what it does."""
