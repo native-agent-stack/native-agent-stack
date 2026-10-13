@@ -12,18 +12,20 @@ index 66a19b8..5b34894 100644
    </ItemGroup>
    <ItemGroup>
 diff --git a/Messaging/QuantConnect.Messaging.csproj b/Messaging/QuantConnect.Messaging.csproj
-index 5a4cee2..3cec5cf 100644
+index 5a4cee2..af20277 100644
 --- a/Messaging/QuantConnect.Messaging.csproj
 +++ b/Messaging/QuantConnect.Messaging.csproj
-@@ -29,7 +29,7 @@
+@@ -29,8 +29,9 @@
      <Message Text="SelectedOptimization $(SelectedOptimization)" Importance="high" />
    </Target>
    <ItemGroup>
 -    <PackageReference Include="NetMQ" Version="4.0.1.6" />
 +    <PackageReference Include="NetMQ" Version="4.0.4.3" />
      <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
++    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.13" />
    </ItemGroup>
    <ItemGroup>
+     <Compile Include="..\Common\Properties\SharedAssemblyInfo.cs" Link="Properties\SharedAssemblyInfo.cs" />
 diff --git a/Tests/QuantConnect.Tests.csproj b/Tests/QuantConnect.Tests.csproj
 index 53842e0..49dce7c 100644
 --- a/Tests/QuantConnect.Tests.csproj
