@@ -1572,6 +1572,8 @@ class PrepareTests(unittest.TestCase):
             (locked / "old.txt").write_text("old\n")
             if entry == "trees":
                 (root / "trees" / "base" / "stray.txt").write_text("the old tree\n")
+            else:
+                (root / "config" / "promptfooconfig.yaml").write_text("the old config\n")   # a file staged afresh would not say this
             locked.chmod(0o500)      # its entries cannot be removed
 
             def unlock(locked=locked):
@@ -1588,7 +1590,8 @@ class PrepareTests(unittest.TestCase):
                 self.assertEqual((root / "settings.json").read_bytes(), settings)
                 self.assertEqual((locked / "old.txt").read_text(), "old\n")
                 if entry == "config":
-                    self.assertFalse((root / "config" / "promptfooconfig.yaml").exists(), "nothing was staged into the config that could not be cleared")
+                    staged = root / "config" / "promptfooconfig.yaml"       # whether the removal reached it before the locked directory depends on the order the file system lists them
+                    self.assertTrue(not staged.exists() or staged.read_text() == "the old config\n", "nothing was staged into the config that could not be cleared")
                 else:
                     base = root / "trees" / "base"
                     self.assertTrue(not base.exists() or (base / "stray.txt").exists(), "no tree was built into the trees/ that could not be cleared (an old tree is either gone or still the old one)")
