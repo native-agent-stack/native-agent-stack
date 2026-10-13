@@ -49,7 +49,8 @@ class Ns2604DashboardTests(unittest.TestCase):
     def test_plan_dashboards_target_this_host_only(self):
         for name, uid in (("grafana-research-grand.json", "research-grand"),
                           ("grafana-ecosystem-native.json", "ecosystem-native"),
-                          ("grafana-native-foundation-data.json", "native-foundation-data")):
+                          ("grafana-native-foundation-data.json", "native-foundation-data"),
+                          ("grafana-command-center.json", "cc-god-view")):
             with self.subTest(name=name):
                 text = (PLAN / "config" / name).read_text()
                 board = json.loads(text)
@@ -63,6 +64,41 @@ class Ns2604DashboardTests(unittest.TestCase):
         self.assertEqual("Native workflow history · " + ", ".join(G.DAGS), table["title"])
         unit = (PLAN / "config/ns2604-research-progress.service").read_text()
         self.assertEqual(list(G.DAGS), re.findall(r"--dagu-dag (\S+)", unit))
+
+    def test_command_center_reuses_source_panels_with_identical_queries(self):
+        """Reused panels keep their source queries byte for byte; the board is a view, not a fork."""
+        board = json.loads((PLAN / "config/grafana-command-center.json").read_text())
+        sources = {"ecosystem-native": json.loads((PLAN / "config/grafana-ecosystem-native.json").read_text()),
+                   "cc-lanes": json.loads((PLAN / "config/grafana-lanes.json").read_text())}
+        reused = 0
+        for panel in board["panels"]:
+            match = re.search(r"Reused unchanged from the (ecosystem-native|cc-lanes) dashboard", panel.get("description", ""))
+            if not match:
+                continue
+            source = next(p for p in sources[match.group(1)]["panels"] if p["title"] == panel["title"])
+            self.assertEqual([t.get("expr") for t in source["targets"]], [t.get("expr") for t in panel["targets"]])
+            self.assertEqual(source.get("datasource"), panel.get("datasource"))
+            reused += 1
+        self.assertGreaterEqual(reused, 13)
+
+    def test_command_center_covers_the_six_rows_links_agentsview_and_keeps_input_text_out(self):
+        text = (PLAN / "config/grafana-command-center.json").read_text()
+        board = json.loads(text)
+        self.assertEqual(("cc-god-view", "Command center"), (board["uid"], board["title"]))
+        self.assertEqual(["Lane roster", "Progress", "Invoke rates", "Errors", "Gateway", "Coverage"],
+                         [p["title"].split(" · ")[0] for p in board["panels"] if p["type"] == "row"])
+        self.assertIn("http://127.0.0.1:21808", [link["url"] for link in board["links"]])
+        self.assertEqual(len(board["panels"]), len({p["id"] for p in board["panels"]}))
+        coverage = next(p for p in board["panels"] if p["title"].startswith("Runtime coverage"))
+        for runtime in ("Codex", "Claude Code", "pi", "OpenCode", "goose", "Qwen Code", "oh-my-pi", "Hermes",
+                        "Cline", "Muse Code"):
+            self.assertIn(f"| {runtime} ", coverage["options"]["content"])
+        stuck = next(p for p in board["panels"] if p["title"].startswith("STUCK"))
+        self.assertTrue(any("unread_count" in t["expr"] and "prompt_has_text" in t["expr"] for t in stuck["targets"]))
+        self.assertNotIn("input_text", json.dumps([t["expr"] for p in board["panels"] for t in p.get("targets", [])]))
+        roster = next(p for p in board["panels"] if p["type"] == "table" and p["title"].startswith("Lane roster"))
+        self.assertIn('"unattributed"', "\n".join(t["expr"] for t in roster["targets"]))
+        self.assertNotRegex(text, r"input_text|\$__range|:1[0-9]{4}\b")
 
     def grafana_health_lines(self):
         plan = json.loads((PLAN / "install-plan.json").read_text())
@@ -123,6 +159,8 @@ class Ns2604DashboardTests(unittest.TestCase):
             config = root / "config"
             for uid in ("research-grand", "ecosystem-native", "native-foundation-data"):
                 self.assertEqual(uid, json.loads((config / f"ecosystem-grafana-dashboards/{uid}.json").read_text())["uid"])
+            command_center = config / "ecosystem-grafana-dashboards/command-center.json"
+            self.assertEqual("cc-god-view", json.loads(command_center.read_text())["uid"])
             lanes = config / "grafana-dashboards/lanes.json"
             self.assertEqual("cc-lanes", json.loads(lanes.read_text())["uid"])
             self.assertFalse((config / "ecosystem-grafana-dashboards/lanes.json").exists())

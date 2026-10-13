@@ -689,6 +689,9 @@ def main():
             copied.add("grafana-lanes.json")
         else:
             bad("observability", "grafana: the Lanes source must render to grafana-dashboards/lanes.json")
+        # The command center's god view (cc-god-view) is rendered the same way, into the Ecosystem provider.
+        if ("grafana-command-center.json", "ecosystem-grafana-dashboards/command-center.json") in rendered_assets:
+            copied.add("grafana-command-center.json")
     # Empty public roster is an operator-populated example, never an install operand.
     operator_examples = set()
     if "lanes-registry.json" in config:

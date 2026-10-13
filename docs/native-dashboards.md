@@ -38,7 +38,7 @@ only `token-layer`.
 
 | Upstream interface | NativeStack2604 URL | Scope |
 | --- | --- | --- |
-| Grafana | http://127.0.0.1:21301/d/research-grand | Anonymous Viewer, no sign-in path (plan `config/grafana.ini`). Also `/d/ecosystem-native`, `/d/native-foundation-data` and `/d/token-layer`. The research dashboard shows Dagu run history without a Dagu login |
+| Grafana | http://127.0.0.1:21301/d/research-grand | Anonymous Viewer, no sign-in path (plan `config/grafana.ini`). Also `/d/ecosystem-native`, `/d/native-foundation-data`, `/d/token-layer`, `/d/cc-lanes` and the command center's god view `/d/cc-god-view` ([coverage and gaps](decisions/2026-10-13-command-center-god-view.md)). The research dashboard shows Dagu run history without a Dagu login |
 | Dagu | http://127.0.0.1:21080/ | Operator UI with its builtin login (Dagu 2.18.2's default when `auth.mode` is unset); `/api/v1/dags` answers 401 without it |
 | Prometheus | http://127.0.0.1:21090/query | No password challenge |
 | Alertmanager | http://127.0.0.1:21093/ | No password challenge; Telegram receiver |

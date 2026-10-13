@@ -116,14 +116,18 @@ def dashboards():
     )
     foundation = module('observability/native-data/render.py', 'native_render').dashboard(
         header=NATIVE_DATA_HEADER, omit=NATIVE_DATA_OMIT)
-    lanes = module('observability/lanes_dashboard.py', 'lanes_render').dashboard()
+    lanes = retarget(module('observability/lanes_dashboard.py', 'lanes_render').dashboard())
+    # The command center copies panels from the two rendered boards above, so its reused queries stay identical.
+    command_center = module('observability/command_center_dashboard.py', 'command_center_render').dashboard(
+        native, lanes)
     token_layer = json.loads((PLAN / 'config/grafana-token-layer.json').read_text())
     return {
         'grafana-token-layer.json': retarget(token_layer),
         'grafana-research-grand.json': retarget(research),
         'grafana-ecosystem-native.json': native,
         'grafana-native-foundation-data.json': retarget(foundation),
-        'grafana-lanes.json': retarget(lanes),
+        'grafana-lanes.json': lanes,
+        'grafana-command-center.json': retarget(command_center),
     }
 
 

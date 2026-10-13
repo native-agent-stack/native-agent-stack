@@ -5,6 +5,24 @@ Sources: aannoo/hcom v0.7.27 (2c5f343b), src/commands/list.rs:355;
 grafana/loki v3.7.8, docs/sources/reference/loki-http-api.md (JSON push).
 This is metadata glue, not a transcript reader or agent runner. Private registry
 input may be the native census's canonical_roots and parent map; no paths leave.
+
+Identity: `hcom list` needs no hcom identity. An explicit `--name` takes hcom's
+error-propagating path, so a name with no live instance exits 1 with "Instance
+'<name>' not found" (aannoo/hcom@b2a7c192, the v0.7.28 mirror,
+src/bootstrap.rs:25-30, src/identity.rs:58), while an omitted name falls back to
+an optional lookup (src/commands/list.rs:213-234). The bridge therefore passes
+`--name` only when the caller supplies one.
+
+Prompt state (the command center's STUCK signal): `hcom term --json` prints one
+JSON object per PTY instance with `name`, `ready`, `prompt_empty`, `input_text`
+and the screen `lines` (src/commands/help.rs:803, src/commands/term.rs:211).
+Only the `prompt_empty` boolean is read, and it leaves as `prompt_has_text` 0/1.
+Screen lines and input text can hold owner keystrokes; they are never exported.
+Gate contexts such as `tui:prompt-has-text` are hcom's listening-gate states
+(src/instance_lifecycle.rs:588-600, src/delivery.rs:2147). `hcom list` reports the
+tagged display name as `name` and the instance name as `base_name`
+(src/commands/list.rs:353,370); `hcom term` and the lanes' OTel `ecosystem.lane`
+use the instance name, so prompt state joins on `base_name`.
 """
 import argparse
 import json
@@ -18,7 +36,7 @@ from progress import loki_push_url
 
 IDENTIFIER = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.:-]{0,63}")
 THREAD = re.compile(r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}")
-CONTEXT = re.compile(r"(?:tool:[A-Za-z0-9_.:-]{1,64}|startup|resume|idle|waiting|)")
+CONTEXT = re.compile(r"(?:tool:[A-Za-z0-9_.:-]{1,64}|tui:[a-z0-9-]{1,40}|startup|resume|idle|waiting|)")
 
 
 def text(value, pattern=IDENTIFIER, fallback="unknown"):
@@ -29,18 +47,45 @@ def natural(value):
     return value if type(value) is int and 0 <= value <= 2**53 else None
 
 
-def snapshot(native, registry=None):
+def prompt_states(output):
+    """Map hcom name -> prompt_has_text (1/0) from `hcom term --json` output; only booleans are kept."""
+    decoder = json.JSONDecoder()
+    states = {}
+    index = 0
+    while index < len(output):
+        while index < len(output) and output[index].isspace():
+            index += 1
+        if index >= len(output):
+            break
+        try:
+            item, index = decoder.raw_decode(output, index)
+        except ValueError:
+            # Stop at the first undecodable object; its text is never echoed.
+            break
+        if not isinstance(item, dict):
+            continue
+        name = text(item.get("name"), fallback="")
+        empty = item.get("prompt_empty")
+        if name and type(empty) is bool:
+            states[name] = 0 if empty else 1
+    return states
+
+
+def snapshot(native, registry=None, prompts=None):
     if not isinstance(native, list):
         raise ValueError("hcom list must return a JSON array")
+    prompts = prompts or {}
     roots = (registry or {}).get("canonical_roots", [])
     known = {}
     for root in roots:
         identity = text(root.get("root_id"), THREAD)
         if identity != "unknown":
             known[identity] = {"identity": identity, "lane": text(root.get("lane")),
-                               "name": text(root.get("name")), "client": "codex",
+                               "name": text(root.get("name")), "base_name": text(root.get("name")),
+                               "client": "codex",
                                "status": "unknown", "status_context": "",
                                "status_age_seconds": None, "unread_count": None,
+                               "tag": None, "prompt_has_text": None,
                                "registered_root": True}
     for row in native:
         if not isinstance(row, dict):
@@ -50,13 +95,16 @@ def snapshot(native, registry=None):
             continue
         previous = known.get(identity, {})
         name = text(row.get("name"))
-        known[identity] = dict(previous, identity=identity, name=name,
+        base_name = text(row.get("base_name"), fallback=name)
+        known[identity] = dict(previous, identity=identity, name=name, base_name=base_name,
                                lane=previous.get("lane", name),
                                client=text(row.get("tool")),
                                status=text(row.get("status")),
                                status_context=text(row.get("status_context"), CONTEXT, "omitted"),
                                status_age_seconds=natural(row.get("status_age_seconds")),
                                unread_count=natural(row.get("unread_count")),
+                               tag=text(row.get("tag"), fallback=None),
+                               prompt_has_text=prompts.get(base_name),
                                registered_root=previous.get("registered_root", False))
     return sorted(known.values(), key=lambda row: (row["lane"], row["identity"]))
 
@@ -72,20 +120,34 @@ def payload(rows, now_ns):
         for i, row in enumerate(rows)]}
 
 
+def identity_args(name):
+    return ["--name", name] if name else []
+
+
+def read_prompts(hcom_bin, name):
+    """Prompt booleans, or {} when hcom has no PTY view; list status still publishes."""
+    try:
+        result = subprocess.run([hcom_bin, "term", "--json", *identity_args(name)],
+                                capture_output=True, text=True, timeout=10)
+    except (OSError, subprocess.TimeoutExpired):
+        return {}
+    return prompt_states(result.stdout) if result.returncode == 0 else {}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--hcom-bin", default="hcom")
-    parser.add_argument("--name", default="gore")
+    parser.add_argument("--name", help="optional hcom identity; listing needs none, and an unknown name fails hcom")
     parser.add_argument("--registry", type=Path,
                         help="private canonical-roots JSON; absent registration is not inferred")
     parser.add_argument("--loki-url", default="http://127.0.0.1:21300/loki/api/v1/push")
     parser.add_argument("--push", action="store_true")
     args = parser.parse_args()
     url = loki_push_url(args.loki_url)
-    result = subprocess.run([args.hcom_bin, "list", "--json", "--name", args.name],
+    result = subprocess.run([args.hcom_bin, "list", "--json", *identity_args(args.name)],
                             capture_output=True, text=True, timeout=10, check=True)
     registry = json.loads(args.registry.read_text()) if args.registry and args.registry.is_file() else None
-    rows = snapshot(json.loads(result.stdout), registry)
+    rows = snapshot(json.loads(result.stdout), registry, read_prompts(args.hcom_bin, args.name))
     if args.push:
         request = urllib.request.Request(url, json.dumps(payload(rows, time.time_ns())).encode(),
                                          {"Content-Type": "application/json"})

@@ -1,0 +1,2729 @@
+{
+  "uid": "cc-god-view",
+  "title": "Command center",
+  "editable": false,
+  "tags": [
+    "native",
+    "command-center",
+    "lanes"
+  ],
+  "timezone": "utc",
+  "refresh": "1m",
+  "schemaVersion": 39,
+  "version": 1,
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "description": "Every lane and worker on one board: roster, progress, invoke rates, errors, gateway routing and telemetry coverage, from Loki, Prometheus, hcom records and OmniRoute spans.",
+  "links": [
+    {
+      "type": "link",
+      "title": "agentsview sessions",
+      "url": "http://127.0.0.1:21808",
+      "targetBlank": true
+    },
+    {
+      "type": "link",
+      "title": "Lanes",
+      "url": "/d/cc-lanes",
+      "targetBlank": false
+    },
+    {
+      "type": "link",
+      "title": "Native agent ecosystem",
+      "url": "/d/ecosystem-native",
+      "targetBlank": false
+    },
+    {
+      "type": "link",
+      "title": "Gateway usage",
+      "url": "http://127.0.0.1:21128/dashboard/analytics",
+      "targetBlank": true
+    }
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "window",
+        "label": "Count window",
+        "type": "custom",
+        "query": "1h,24h",
+        "current": {
+          "text": "1h",
+          "value": "1h"
+        },
+        "options": [
+          {
+            "text": "1h",
+            "value": "1h",
+            "selected": true
+          },
+          {
+            "text": "24h",
+            "value": "24h",
+            "selected": false
+          }
+        ]
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "text",
+      "title": "Command center",
+      "options": {
+        "mode": "markdown",
+        "content": "One view of every lane and worker from the platforms' own data: Codex lanes and Claude sessions (OTel Collector to Loki and Prometheus), hcom status records, runtime workers that export OTLP, and OmniRoute routing spans. **No data** or **\u2014** means the source sent nothing in the window, never zero use. Claude sessions without `ecosystem.lane` show as **unattributed**; peer Claude sessions and subagents that share a coordinator's writer appear only through `query_source` and `subagent_type`.\n\nSession level: [agentsview](http://127.0.0.1:21808) (`/sessions/<agent>/<session id>`) \u00b7 [Lanes](/d/cc-lanes) \u00b7 [Native agent ecosystem](/d/ecosystem-native) \u00b7 [Token layer](/d/token-layer) \u00b7 [Gateway usage](http://127.0.0.1:21128/dashboard/analytics) \u00b7 [Coverage and gaps](https://github.com/native-agent-stack/native-agent-stack/blob/main/docs/decisions/2026-10-13-command-center-god-view.md)"
+      },
+      "id": 1,
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 4
+      }
+    },
+    {
+      "type": "row",
+      "title": "Lane roster",
+      "collapsed": false,
+      "panels": [],
+      "id": 2,
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 24,
+        "h": 1
+      }
+    },
+    {
+      "type": "table",
+      "title": "Lane roster \u00b7 kind, lane, model, last event and state",
+      "description": "One row per lane, plus one unattributed row per client kind (a lane with a second model in the window shows a second row). Last event, model and sessions: Codex and Claude events in the last hour, runtime and SDK workers in the last 24 h (low volume). State joins hcom with telemetry: STALE = hcom status active* and no Codex or Claude event for the lane in 20 min; ACTIVE = hcom active* with events; LISTENING = hcom listening (idle, waiting for messages); \"no hcom record\" = no hcom snapshot for the lane in 2 min. The join key is the hcom instance name (base_name), which is what a lane exports as ecosystem.lane. Role: no recorded role source exists in telemetry or hcom, so the column stays blank; the hcom tag recorded at launch is shown beside it. Kinds come from service.name: codex-* = Codex lane (the Codex SDK worker runs codex app-server and shows here), claude-code = Claude session (the Claude Agent SDK too), codex_sdk_ts = SDK worker, other OTLP runtimes = runtime worker.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "((max by (kind, lane, role) (max_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs|claude-code\"} | label_format kind=`{{ if eq .service_name \"claude-code\" }}Claude session{{ else }}Codex lane{{ end }}`, lane=`{{ or .ecosystem_lane \"unattributed\" }}`, role=\" \" | label_format last_unix=`{{ __timestamp__ | unixEpoch }}` | unwrap last_unix | __error__=\"\" [1h]))) or (max by (kind, lane, role) (max_over_time({service_name=~\"pi|opencode|goose|qwen-code|oh-my-pi|ns-opencode-.+|ns-pi-.+|codex_sdk_ts\"} | label_format kind=`{{ if eq .service_name \"codex_sdk_ts\" }}SDK worker{{ else }}runtime worker{{ end }}`, lane=`{{ or .ecosystem_lane .service_name }}`, role=\" \" | label_format last_unix=`{{ __timestamp__ | unixEpoch }}` | unwrap last_unix | __error__=\"\" [24h])))) * 1000",
+          "queryType": "instant",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          },
+          "legendFormat": "Last event"
+        },
+        {
+          "refId": "B",
+          "expr": "(sum by (kind, lane, model) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs|claude-code\"} | model!=\"\" | label_format kind=`{{ if eq .service_name \"claude-code\" }}Claude session{{ else }}Codex lane{{ end }}`, lane=`{{ or .ecosystem_lane \"unattributed\" }}` [1h]))) or (sum by (kind, lane, model) (count_over_time({service_name=~\"pi|opencode|goose|qwen-code|oh-my-pi|ns-opencode-.+|ns-pi-.+|codex_sdk_ts\"} | model!=\"\" | label_format kind=`{{ if eq .service_name \"codex_sdk_ts\" }}SDK worker{{ else }}runtime worker{{ end }}`, lane=`{{ or .ecosystem_lane .service_name }}` [24h])))",
+          "queryType": "instant",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          },
+          "legendFormat": "Model events"
+        },
+        {
+          "refId": "C",
+          "expr": "count by (kind, lane) (sum by (kind, lane, sid) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs|claude-code\"} | label_format kind=`{{ if eq .service_name \"claude-code\" }}Claude session{{ else }}Codex lane{{ end }}`, lane=`{{ or .ecosystem_lane \"unattributed\" }}`, sid=`{{ or .conversation_id .session_id }}` | sid!=\"\" [1h])))",
+          "queryType": "instant",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          },
+          "legendFormat": "Sessions (1 h)"
+        },
+        {
+          "refId": "D",
+          "expr": "(sum by (kind, lane) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs|claude-code\"} | label_format kind=`{{ if eq .service_name \"claude-code\" }}Claude session{{ else }}Codex lane{{ end }}`, lane=`{{ or .ecosystem_lane \"unattributed\" }}` [20m]))) or (sum by (kind, lane) (count_over_time({service_name=~\"pi|opencode|goose|qwen-code|oh-my-pi|ns-opencode-.+|ns-pi-.+|codex_sdk_ts\"} | label_format kind=`{{ if eq .service_name \"codex_sdk_ts\" }}SDK worker{{ else }}runtime worker{{ end }}`, lane=`{{ or .ecosystem_lane .service_name }}` [20m])))",
+          "queryType": "instant",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          },
+          "legendFormat": "Events (20 min)"
+        },
+        {
+          "refId": "E",
+          "expr": "max by (lane, hcom_status, tag) (max_over_time({service_name=\"agent-stack-lanes\",record_kind=\"hcom\"} | json | label_format lane=\"{{ or .base_name .name }}\", hcom_status=\"{{.status}}\" | unwrap status_age_seconds | __error__=\"\" [1m]))",
+          "queryType": "instant",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          },
+          "legendFormat": "hcom status age"
+        },
+        {
+          "refId": "F",
+          "expr": "((max by (lane) (count_over_time({service_name=\"agent-stack-lanes\",record_kind=\"hcom\"} | json | label_format lane=\"{{ or .base_name .name }}\" | status=~\"active.*\" [2m])) unless on (lane) max by (lane) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs|claude-code\"} | ecosystem_lane!=\"\" | label_format lane=\"{{.ecosystem_lane}}\" [20m]))) * 0 + 3) or (max by (lane) (count_over_time({service_name=\"agent-stack-lanes\",record_kind=\"hcom\"} | json | label_format lane=\"{{ or .base_name .name }}\" | status=~\"active.*\" [2m])) * 0 + 2) or (max by (lane) (count_over_time({service_name=\"agent-stack-lanes\",record_kind=\"hcom\"} | json | label_format lane=\"{{ or .base_name .name }}\" | status=\"listening\" [2m])) * 0 + 1) or (max by (lane) (count_over_time({service_name=\"agent-stack-lanes\",record_kind=\"hcom\"} | json | label_format lane=\"{{ or .base_name .name }}\" [2m])) * 0)",
+          "queryType": "instant",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          },
+          "legendFormat": "State"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            }
+          }
+        },
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "role": "Role",
+              "tag": "Tag (hcom)",
+              "hcom_status": "hcom status",
+              "model": "Model",
+              "Value #A": "Last event",
+              "Value #B": "Model events",
+              "Value #C": "Sessions (1 h)",
+              "Value #D": "Events (20 min)",
+              "Value #E": "hcom status age",
+              "Value #F": "State"
+            },
+            "indexByName": {
+              "kind": 0,
+              "lane": 1,
+              "role": 2,
+              "tag": 3,
+              "model": 4,
+              "Value #B": 5,
+              "Value #A": 6,
+              "Value #C": 7,
+              "Value #D": 8,
+              "hcom_status": 9,
+              "Value #E": 10,
+              "Value #F": 11
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "\u2014",
+          "custom": {
+            "minWidth": 60
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Last event"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dateTimeFromNow"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "hcom status age"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Events (20 min)"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "special",
+                    "options": {
+                      "match": "null",
+                      "result": {
+                        "text": "none \u00b7 idle \u2265 20 min",
+                        "color": "orange",
+                        "index": 0
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "State"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "0": {
+                        "text": "OTHER (hcom)",
+                        "color": "blue",
+                        "index": 0
+                      },
+                      "1": {
+                        "text": "LISTENING",
+                        "color": "green",
+                        "index": 1
+                      },
+                      "2": {
+                        "text": "ACTIVE",
+                        "color": "green",
+                        "index": 2
+                      },
+                      "3": {
+                        "text": "STALE",
+                        "color": "red",
+                        "index": 3
+                      }
+                    }
+                  },
+                  {
+                    "type": "special",
+                    "options": {
+                      "match": "null",
+                      "result": {
+                        "text": "no hcom record",
+                        "color": "transparent",
+                        "index": 4
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 3,
+      "gridPos": {
+        "x": 0,
+        "y": 5,
+        "w": 24,
+        "h": 11
+      }
+    },
+    {
+      "id": 4,
+      "title": "Latest recorded hcom status and root-name lookup",
+      "type": "table",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 12,
+        "h": 9
+      },
+      "description": "Recorded status JSON from hcom list; registry roots missing from hcom remain unknown. The latest complete JSON row per identity supplies every field, including null age/unread. Observation time and native status age are separate. Inspect observation time: an old active record is historical, not live liveness. Automatic freshness masking remains open. Reused unchanged from the cc-lanes dashboard. Command center adds base_name (the instance name that ecosystem.lane uses), the recorded hcom tag and the prompt_has_text boolean (hcom term prompt_empty, never the input text).",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{service_name=\"agent-stack-lanes\",record_kind=\"hcom\"} | json",
+          "queryType": "range",
+          "legendFormat": "Status",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "transformations": [
+        {
+          "id": "extractFields",
+          "options": {
+            "source": "Line",
+            "format": "json",
+            "replace": true,
+            "keepTime": true
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Time",
+                "desc": false
+              }
+            ]
+          }
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "identity": {
+                "operation": "groupby"
+              },
+              "Time": {
+                "operation": "aggregate",
+                "aggregations": [
+                  "last"
+                ]
+              },
+              "lane": {
+                "operation": "aggregate",
+                "aggregations": [
+                  "last"
+                ]
+              },
+              "name": {
+                "operation": "aggregate",
+                "aggregations": [
+                  "last"
+                ]
+              },
+              "client": {
+                "operation": "aggregate",
+                "aggregations": [
+                  "last"
+                ]
+              },
+              "status": {
+                "operation": "aggregate",
+                "aggregations": [
+                  "last"
+                ]
+              },
+              "status_context": {
+                "operation": "aggregate",
+                "aggregations": [
+                  "last"
+                ]
+              },
+              "status_age_seconds": {
+                "operation": "aggregate",
+                "aggregations": [
+                  "last"
+                ]
+              },
+              "unread_count": {
+                "operation": "aggregate",
+                "aggregations": [
+                  "last"
+                ]
+              },
+              "observed_unix": {
+                "operation": "aggregate",
+                "aggregations": [
+                  "last"
+                ]
+              },
+              "base_name": {
+                "operation": "aggregate",
+                "aggregations": [
+                  "last"
+                ]
+              },
+              "tag": {
+                "operation": "aggregate",
+                "aggregations": [
+                  "last"
+                ]
+              },
+              "prompt_has_text": {
+                "operation": "aggregate",
+                "aggregations": [
+                  "last"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "title": "STUCK lanes \u00b7 undelivered messages behind prompt text (10 min)",
+      "description": "A lane is STUCK when, in every hcom snapshot of the last 10 minutes (at least 15 of the 30-second snapshots), unread_count > 0 and its PTY prompt holds text: hcom term reports prompt_empty=false or hcom list reports the listening gate context tui:prompt-has-text. Queued messages then wait behind uncommitted keystrokes. Only booleans and counts leave hcom; input text never does. Unread and prompt columns are the last minute. No data: the hcom snapshot did not reach Loki in the window.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "max by (lane) (max_over_time({service_name=\"agent-stack-lanes\",record_kind=\"hcom\"} | json | label_format lane=\"{{ or .base_name .name }}\" | unwrap unread_count | __error__=\"\" [1m]))",
+          "queryType": "instant",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          },
+          "legendFormat": "Unread"
+        },
+        {
+          "refId": "B",
+          "expr": "max by (lane) (max_over_time({service_name=\"agent-stack-lanes\",record_kind=\"hcom\"} | json | label_format lane=\"{{ or .base_name .name }}\", prompt_flag=`{{ if (or (eq .prompt_has_text \"1\") (eq .status_context \"tui:prompt-has-text\")) }}1{{ else }}0{{ end }}` | unwrap prompt_flag | __error__=\"\" [1m]))",
+          "queryType": "instant",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          },
+          "legendFormat": "Prompt has text"
+        },
+        {
+          "refId": "C",
+          "expr": "max by (lane, status_context) (max_over_time({service_name=\"agent-stack-lanes\",record_kind=\"hcom\"} | json | label_format lane=\"{{ or .base_name .name }}\" | unwrap status_age_seconds | __error__=\"\" [1m]))",
+          "queryType": "instant",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          },
+          "legendFormat": "Status age"
+        },
+        {
+          "refId": "D",
+          "expr": "(min by (lane) (min_over_time({service_name=\"agent-stack-lanes\",record_kind=\"hcom\"} | json | label_format lane=\"{{ or .base_name .name }}\", stuck=`{{ if and (ne .unread_count \"\") (ne .unread_count \"0\") (or (eq .prompt_has_text \"1\") (eq .status_context \"tui:prompt-has-text\")) }}1{{ else }}0{{ end }}` | unwrap stuck | __error__=\"\" [10m])) == 1) and on (lane) (sum by (lane) (count_over_time({service_name=\"agent-stack-lanes\",record_kind=\"hcom\"} | json | label_format lane=\"{{ or .base_name .name }}\" [10m])) >= 15)",
+          "queryType": "instant",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          },
+          "legendFormat": "Stuck \u2265 10 min"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            }
+          }
+        },
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "status_context": "hcom gate context",
+              "Value #A": "Unread",
+              "Value #B": "Prompt has text",
+              "Value #C": "Status age",
+              "Value #D": "Stuck \u2265 10 min"
+            },
+            "indexByName": {
+              "lane": 0,
+              "Value #A": 1,
+              "Value #B": 2,
+              "status_context": 3,
+              "Value #C": 4,
+              "Value #D": 5
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Unread",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "\u2014",
+          "custom": {
+            "minWidth": 60
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Status age"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Unread"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": []
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "transparent",
+                      "value": null
+                    },
+                    {
+                      "color": "orange",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Prompt has text"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "0": {
+                        "text": "empty",
+                        "color": "transparent",
+                        "index": 0
+                      },
+                      "1": {
+                        "text": "text in prompt",
+                        "color": "orange",
+                        "index": 1
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Stuck \u2265 10 min"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "1": {
+                        "text": "STUCK",
+                        "color": "red",
+                        "index": 0
+                      }
+                    }
+                  },
+                  {
+                    "type": "special",
+                    "options": {
+                      "match": "null",
+                      "result": {
+                        "text": "",
+                        "color": "transparent",
+                        "index": 1
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 5,
+      "gridPos": {
+        "x": 12,
+        "y": 16,
+        "w": 12,
+        "h": 9
+      }
+    },
+    {
+      "type": "row",
+      "title": "Progress \u00b7 last hour",
+      "collapsed": false,
+      "panels": [],
+      "id": 6,
+      "gridPos": {
+        "x": 0,
+        "y": 25,
+        "w": 24,
+        "h": 1
+      }
+    },
+    {
+      "type": "table",
+      "title": "Turns and tool calls per lane (1 h)",
+      "description": "Started user turns (user_prompt and codex.user_prompt events, the cc-lanes contract; completed Codex turns per minute are in the next panel) and tool calls (tool_result and codex.tool_result events, without Codex code-mode wrappers whose inner calls are counted).",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (kind, lane) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs|claude-code\"} | event_name=~\"user_prompt|codex.user_prompt\" | label_format kind=`{{ if eq .service_name \"claude-code\" }}Claude session{{ else }}Codex lane{{ end }}`, lane=`{{ or .ecosystem_lane \"unattributed\" }}` [1h]))",
+          "queryType": "instant",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          },
+          "legendFormat": "Started turns"
+        },
+        {
+          "refId": "B",
+          "expr": "sum by (kind, lane) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs|claude-code\"} | event_name=~\"tool_result|codex.tool_result\" | tool_family!=\"code_mode\" | label_format kind=`{{ if eq .service_name \"claude-code\" }}Claude session{{ else }}Codex lane{{ end }}`, lane=`{{ or .ecosystem_lane \"unattributed\" }}` [1h]))",
+          "queryType": "instant",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          },
+          "legendFormat": "Tool calls"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            }
+          }
+        },
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "Value #A": "Started turns",
+              "Value #B": "Tool calls"
+            },
+            "indexByName": {
+              "kind": 0,
+              "lane": 1,
+              "Value #A": 2,
+              "Value #B": 3
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Tool calls",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "\u2014",
+          "custom": {
+            "minWidth": 60
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Started turns"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Tool calls"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 7,
+      "gridPos": {
+        "x": 0,
+        "y": 26,
+        "w": 8,
+        "h": 9
+      }
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "Codex turns per minute by lane",
+      "description": "Completed Codex turns per minute by lane, from the native turn timer codex.turn.e2e_duration_ms, which records each turn when it ends (openai/codex rust-v0.160.0, codex-rs/core/src/tasks/mod.rs:404-406). codex.conversation.turn.count is not used: Codex records it once, at session shutdown. ecosystem_lane is the lane name that a lane's launch exports in OTEL_RESOURCE_ATTRIBUTES (ecosystem.lane=<lane>); the Collector keeps it and makes it a label. unattributed is a Codex process started without it. Writers without a launcher identity (instance=\"unscoped\") are included: a shared Codex delta stream undercounts, it does not inflate. Turns show activity, not outcomes; the lane board counts outcomes. Reused unchanged from the ecosystem-native dashboard.",
+      "gridPos": {
+        "x": 8,
+        "y": 26,
+        "w": 6,
+        "h": 9
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ns2604-prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "label_replace(60 * sum by (ecosystem_lane) (rate(codex_turn_e2e_duration_ms_milliseconds_count[$__rate_interval])), \"ecosystem_lane\", \"unattributed\", \"ecosystem_lane\", \"\")",
+          "legendFormat": "{{ecosystem_lane}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 2,
+          "custom": {
+            "axisLabel": "turns/min"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 9,
+      "title": "Per-lane native tool-result rate",
+      "type": "timeseries",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 14,
+        "y": 26,
+        "w": 6,
+        "h": 9
+      },
+      "description": "Result records per second over 5m, using the native ecosystem_lane resource label. Includes failed results and outer code-mode tool rows; this is not an MCP-call count. Missing lane labels or records remain UNKNOWN. Root/child ownership uses the lookup above. Reused unchanged from the cc-lanes dashboard.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (ecosystem_lane) (rate({service_name=~\"codex-app-server|codex_exec|codex_cli_rs\"} | event_name=\"codex.tool_result\" | ecosystem_lane!=\"\" [5m]))",
+          "queryType": "range",
+          "legendFormat": "{{ecosystem_lane}} \u00b7 Codex",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        },
+        {
+          "refId": "B",
+          "expr": "sum by (ecosystem_lane) (rate({service_name=\"claude-code\"} | event_name=\"tool_result\" | ecosystem_lane!=\"\" [5m]))",
+          "queryType": "range",
+          "legendFormat": "{{ecosystem_lane}} \u00b7 Claude",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN",
+          "unit": "ops",
+          "custom": {
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "last"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "type": "table",
+      "title": "Runtime worker tool calls (24 h)",
+      "description": "Execute-tool spans (gen_ai.tool.name set) that pi, OpenCode, goose, Qwen Code and oh-my-pi export themselves, counted by the Collector spanmetrics connector; their logs carry no ecosystem.lane, so service.name is the lane.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ns2604-prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (service_name) (increase(traces_span_metrics_calls_total{service_name=~\"pi|opencode|goose|qwen-code|oh-my-pi\",gen_ai_tool_name!=\"\"}[24h]))",
+          "instant": true,
+          "range": false,
+          "format": "table",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ns2604-prometheus"
+          },
+          "legendFormat": "Tool calls"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            }
+          }
+        },
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "service_name": "Runtime worker",
+              "Value #A": "Tool calls",
+              "Value": "Tool calls"
+            },
+            "indexByName": {
+              "service_name": 0,
+              "Value #A": 1
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Tool calls",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "\u2014",
+          "custom": {
+            "minWidth": 60
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Tool calls"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 10,
+      "gridPos": {
+        "x": 20,
+        "y": 26,
+        "w": 4,
+        "h": 9
+      }
+    },
+    {
+      "type": "row",
+      "title": "Invoke rates \u00b7 skills, MCP and subagents per lane",
+      "collapsed": false,
+      "panels": [],
+      "id": 11,
+      "gridPos": {
+        "x": 0,
+        "y": 35,
+        "w": 24,
+        "h": 1
+      }
+    },
+    {
+      "type": "table",
+      "title": "Skills, MCP and subagent calls per lane (1 h) \u00b7 zero = wiring gap",
+      "description": "MCP: tool results whose family is mcp (Claude needs OTEL_LOG_TOOL_DETAILS=1 for server names). Claude skills: skill_activated events (Codex skills are the next panel). Subagents: accepted Claude Agent/Task decisions and Codex spawn messages. A zero row is a lane with tool results and no such call in the hour: flagged as a wiring gap, which proves non-use only once exposure and a full window are qualified.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "(sum by (kind, lane) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs|claude-code\"} | event_name=~\"tool_result|codex.tool_result\" | tool_family!=\"code_mode\" | tool_family=\"mcp\" | label_format kind=`{{ if eq .service_name \"claude-code\" }}Claude session{{ else }}Codex lane{{ end }}`, lane=`{{ or .ecosystem_lane \"unattributed\" }}` [1h]))) or (0 * sum by (kind, lane) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs|claude-code\"} | event_name=~\"tool_result|codex.tool_result\" | tool_family!=\"code_mode\" | label_format kind=`{{ if eq .service_name \"claude-code\" }}Claude session{{ else }}Codex lane{{ end }}`, lane=`{{ or .ecosystem_lane \"unattributed\" }}` [1h])))",
+          "queryType": "instant",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          },
+          "legendFormat": "MCP calls"
+        },
+        {
+          "refId": "B",
+          "expr": "(sum by (kind, lane) (count_over_time({service_name=\"claude-code\"} | event_name=\"skill_activated\" | label_format kind=\"Claude session\", lane=`{{ or .ecosystem_lane \"unattributed\" }}` [1h]))) or (0 * sum by (kind, lane) (count_over_time({service_name=\"claude-code\"} | event_name=\"tool_result\" | label_format kind=\"Claude session\", lane=`{{ or .ecosystem_lane \"unattributed\" }}` [1h])))",
+          "queryType": "instant",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          },
+          "legendFormat": "Claude skills"
+        },
+        {
+          "refId": "C",
+          "expr": "(sum by (kind, lane) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs|claude-code\"} | (event_name=\"tool_decision\" and decision=\"accept\" and tool_name=~\"Agent|Task\") or (event_name=\"codex.agent_communication\" and kind=\"spawn\" and state=\"send\") | label_format kind=`{{ if eq .service_name \"claude-code\" }}Claude session{{ else }}Codex lane{{ end }}`, lane=`{{ or .ecosystem_lane \"unattributed\" }}` [1h]))) or (0 * sum by (kind, lane) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs|claude-code\"} | event_name=~\"tool_result|codex.tool_result\" | tool_family!=\"code_mode\" | label_format kind=`{{ if eq .service_name \"claude-code\" }}Claude session{{ else }}Codex lane{{ end }}`, lane=`{{ or .ecosystem_lane \"unattributed\" }}` [1h])))",
+          "queryType": "instant",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          },
+          "legendFormat": "Subagent launches"
+        },
+        {
+          "refId": "D",
+          "expr": "sum by (kind, lane) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs|claude-code\"} | event_name=~\"tool_result|codex.tool_result\" | tool_family!=\"code_mode\" | label_format kind=`{{ if eq .service_name \"claude-code\" }}Claude session{{ else }}Codex lane{{ end }}`, lane=`{{ or .ecosystem_lane \"unattributed\" }}` [1h]))",
+          "queryType": "instant",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          },
+          "legendFormat": "Tool calls"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            }
+          }
+        },
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "Value #A": "MCP calls",
+              "Value #B": "Claude skills",
+              "Value #C": "Subagent launches",
+              "Value #D": "Tool calls"
+            },
+            "indexByName": {
+              "kind": 0,
+              "lane": 1,
+              "Value #D": 2,
+              "Value #A": 3,
+              "Value #B": 4,
+              "Value #C": 5
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Tool calls",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "\u2014",
+          "custom": {
+            "minWidth": 60
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "MCP calls"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "0": {
+                        "text": "0 \u00b7 wiring gap",
+                        "color": "red",
+                        "index": 0
+                      }
+                    }
+                  },
+                  {
+                    "type": "special",
+                    "options": {
+                      "match": "null",
+                      "result": {
+                        "text": "\u2014",
+                        "color": "transparent",
+                        "index": 1
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Claude skills"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "0": {
+                        "text": "0 \u00b7 wiring gap",
+                        "color": "red",
+                        "index": 0
+                      }
+                    }
+                  },
+                  {
+                    "type": "special",
+                    "options": {
+                      "match": "null",
+                      "result": {
+                        "text": "\u2014",
+                        "color": "transparent",
+                        "index": 1
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Subagent launches"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "0": {
+                        "text": "0 \u00b7 wiring gap",
+                        "color": "red",
+                        "index": 0
+                      }
+                    }
+                  },
+                  {
+                    "type": "special",
+                    "options": {
+                      "match": "null",
+                      "result": {
+                        "text": "\u2014",
+                        "color": "transparent",
+                        "index": 1
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 12,
+      "gridPos": {
+        "x": 0,
+        "y": 36,
+        "w": 12,
+        "h": 9
+      }
+    },
+    {
+      "type": "table",
+      "title": "Codex skill injections per lane (1 h) \u00b7 zero = wiring gap",
+      "description": "codex.skill.injected counters (openai/codex rust-v0.162.1 core/src/skills.rs:66-72), with a zero row for each Codex lane that completed a turn in the hour. A zero row is a lane with tool results and no such call in the hour: flagged as a wiring gap, which proves non-use only once exposure and a full window are qualified.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ns2604-prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "(label_replace(sum by (lane) (label_replace(label_replace(increase(codex_skill_injected_total[1h]), \"lane\", \"$1\", \"ecosystem_lane\", \"(.+)\"), \"lane\", \"unattributed\", \"ecosystem_lane\", \"\")), \"kind\", \"Codex lane\", \"\", \"\")) or (0 * label_replace(sum by (lane) (label_replace(label_replace(increase(codex_turn_e2e_duration_ms_milliseconds_count[1h]), \"lane\", \"$1\", \"ecosystem_lane\", \"(.+)\"), \"lane\", \"unattributed\", \"ecosystem_lane\", \"\")), \"kind\", \"Codex lane\", \"\", \"\"))",
+          "instant": true,
+          "range": false,
+          "format": "table",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ns2604-prometheus"
+          },
+          "legendFormat": "Codex skills"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            }
+          }
+        },
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "lane": "Codex lane",
+              "Value #A": "Codex skills",
+              "Value": "Codex skills"
+            },
+            "indexByName": {
+              "lane": 0,
+              "Value #A": 1
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "\u2014",
+          "custom": {
+            "minWidth": 60
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Codex skills"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "0": {
+                        "text": "0 \u00b7 wiring gap",
+                        "color": "red",
+                        "index": 0
+                      }
+                    }
+                  },
+                  {
+                    "type": "special",
+                    "options": {
+                      "match": "null",
+                      "result": {
+                        "text": "\u2014",
+                        "color": "transparent",
+                        "index": 1
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "kind"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 13,
+      "gridPos": {
+        "x": 12,
+        "y": 36,
+        "w": 4,
+        "h": 9
+      }
+    },
+    {
+      "type": "table",
+      "title": "MCP calls per lane and server (1 h)",
+      "description": "Native MCP server names per lane, Codex and Claude. A Claude row without a server name is a session started without OTEL_LOG_TOOL_DETAILS=1 (see the integrity panel below).",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (kind, lane, mcp_server_name) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs|claude-code\"} | event_name=~\"tool_result|codex.tool_result\" | tool_family!=\"code_mode\" | tool_family=\"mcp\" | label_format kind=`{{ if eq .service_name \"claude-code\" }}Claude session{{ else }}Codex lane{{ end }}`, lane=`{{ or .ecosystem_lane \"unattributed\" }}` [1h]))",
+          "queryType": "instant",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          },
+          "legendFormat": "MCP calls"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            }
+          }
+        },
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "mcp_server_name": "MCP server",
+              "Value #A": "MCP calls",
+              "Value": "MCP calls"
+            },
+            "indexByName": {
+              "kind": 0,
+              "lane": 1,
+              "mcp_server_name": 2,
+              "Value #A": 3
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "MCP calls",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "\u2014",
+          "custom": {
+            "minWidth": 60
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 14,
+      "gridPos": {
+        "x": 16,
+        "y": 36,
+        "w": 8,
+        "h": 9
+      }
+    },
+    {
+      "id": 15,
+      "type": "timeseries",
+      "title": "MCP calls per minute by client and server",
+      "description": "MCP tool results per minute by client and server. Claude names come from tool_parameters (OTEL_LOG_TOOL_DETAILS=1); Codex names come from its native mcp_server field. Every Codex app-server front-end reports service.name codex-app-server, so client uses the thread's originator there. One app-server process gives new threads the originator of the first client that initialized it. A series without a server name is a Claude session without tool details. Names are Loki structured metadata written by the Collector's transform/tool_names; no label is added. Claude MCP server names and subagent types need OTEL_LOG_TOOL_DETAILS=1 in Claude Code; sessions started without it show an empty name (see the integrity panel). Agent types outside Claude Code's built-in agents show as custom. client is the Codex originator for codex-app-server front-ends, else the service name. Reused unchanged from the ecosystem-native dashboard.",
+      "gridPos": {
+        "x": 0,
+        "y": 45,
+        "w": 8,
+        "h": 8
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "60 * sum by (client, mcp_server_name) (rate({service_name=~\".+\"} | event_name=~\"tool_result|codex.tool_result\" | tool_family=\"mcp\" | keep client, mcp_server_name [$__auto]))",
+          "queryType": "range",
+          "legendFormat": "{{client}} \u00b7 {{mcp_server_name}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 2,
+          "custom": {
+            "axisLabel": "calls/min"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "mean",
+            "max"
+          ]
+        }
+      }
+    },
+    {
+      "id": 16,
+      "type": "timeseries",
+      "title": "Skill activations per minute by name",
+      "description": "Claude Code skill_activated events: model-invoked (claude-proactive, nested-skill) and /skill (user-slash). User-defined skills are named custom_skill unless OTEL_LOG_TOOL_DETAILS=1. Codex loads skills as instructions and emits no skill event. Names are Loki structured metadata written by the Collector's transform/tool_names; no label is added. Claude MCP server names and subagent types need OTEL_LOG_TOOL_DETAILS=1 in Claude Code; sessions started without it show an empty name (see the integrity panel). Agent types outside Claude Code's built-in agents show as custom. client is the Codex originator for codex-app-server front-ends, else the service name. Reused unchanged from the ecosystem-native dashboard.",
+      "gridPos": {
+        "x": 8,
+        "y": 45,
+        "w": 8,
+        "h": 8
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "60 * sum by (skill_name, invocation_trigger) (rate({service_name=~\"claude-code.*\"} | event_name=\"skill_activated\" | keep skill_name, invocation_trigger [$__auto]))",
+          "queryType": "range",
+          "legendFormat": "{{skill_name}} \u00b7 {{invocation_trigger}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 2,
+          "custom": {
+            "axisLabel": "calls/min"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "mean",
+            "max"
+          ]
+        }
+      }
+    },
+    {
+      "id": 17,
+      "type": "timeseries",
+      "title": "Subagent and workflow launches per minute",
+      "description": "Launches, counted when they start. Claude: accepted tool_decision events for Agent/Task (by subagent_type) and Workflow, which Claude Code logs before the tool runs; an Agent call's tool_result arrives only when its subagent finishes, and a rejected call never launches. Codex: spawn messages (codex.agent_communication kind=spawn, state=send), which carry no originator, so app-server front-ends share one series; sender and receiver thread ids stay as structured metadata for drill-down. Names are Loki structured metadata written by the Collector's transform/tool_names; no label is added. Claude MCP server names and subagent types need OTEL_LOG_TOOL_DETAILS=1 in Claude Code; sessions started without it show an empty name (see the integrity panel). Agent types outside Claude Code's built-in agents show as custom. client is the Codex originator for codex-app-server front-ends, else the service name. Reused unchanged from the ecosystem-native dashboard.",
+      "gridPos": {
+        "x": 16,
+        "y": 45,
+        "w": 8,
+        "h": 8
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "60 * sum by (subagent_type) (rate({service_name=~\"claude-code.*\"} | event_name=\"tool_decision\" | decision=\"accept\" | tool_name=~\"Agent|Task\" | keep subagent_type [$__auto]))",
+          "queryType": "range",
+          "legendFormat": "Claude Agent launches \u00b7 {{subagent_type}}"
+        },
+        {
+          "refId": "B",
+          "expr": "60 * sum by (service_name) (rate({service_name=~\"claude-code.*\"} | event_name=\"tool_decision\" | decision=\"accept\" | tool_name=\"Workflow\" | keep service_name [$__auto]))",
+          "queryType": "range",
+          "legendFormat": "Claude Workflow launches"
+        },
+        {
+          "refId": "C",
+          "expr": "60 * sum by (service_name) (rate({service_name=~\".+\"} | event_name=\"codex.agent_communication\" | kind=\"spawn\" | state=\"send\" | keep service_name [$__auto]))",
+          "queryType": "range",
+          "legendFormat": "{{service_name}} sub-agent spawns"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 2,
+          "custom": {
+            "axisLabel": "calls/min"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "mean",
+            "max"
+          ]
+        }
+      }
+    },
+    {
+      "id": 18,
+      "type": "stat",
+      "title": "Invoke-rate telemetry integrity (selected range)",
+      "description": "All three should be 0. MCP calls without a server name come from Claude sessions started without OTEL_LOG_TOOL_DETAILS=1. Unparsed: tool_parameters that were not a JSON object (names lost, content still deleted). Replaced names failed the Collector's name pattern (for example text with spaces) and are exported as other. Agent types outside Claude Code's built-in agents are custom by design and are not counted here. Reused unchanged from the ecosystem-native dashboard.",
+      "gridPos": {
+        "x": 0,
+        "y": 53,
+        "w": 24,
+        "h": 5
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(count_over_time({service_name=~\"claude-code.*\"} | event_name=\"tool_result\" | tool_family=\"mcp\" | mcp_server_name=\"\" | keep service_name [$__auto])) or vector(0)",
+          "queryType": "instant",
+          "legendFormat": "Claude MCP calls without a server name"
+        },
+        {
+          "refId": "B",
+          "expr": "sum(count_over_time({service_name=~\".+\"} | tool_details=\"unparsed\" | keep service_name [$__auto])) or vector(0)",
+          "queryType": "instant",
+          "legendFormat": "Unparsed tool_parameters"
+        },
+        {
+          "refId": "C",
+          "expr": "sum(count_over_time({service_name=~\".+\"} | mcp_server_name=\"other\" or mcp_tool_name=\"other\" or skill_name=\"other\" or originator=\"other\" or client=\"other\" | keep service_name [$__auto])) or vector(0)",
+          "queryType": "instant",
+          "legendFormat": "Names replaced by the name pattern"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "noValue": "no calls",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "blue"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "value_and_name",
+        "colorMode": "value",
+        "graphMode": "none"
+      }
+    },
+    {
+      "type": "row",
+      "title": "Errors \u00b7 tool and MCP failures, gateway status, usage limits",
+      "collapsed": false,
+      "panels": [],
+      "id": 19,
+      "gridPos": {
+        "x": 0,
+        "y": 58,
+        "w": 24,
+        "h": 1
+      }
+    },
+    {
+      "id": 20,
+      "type": "timeseries",
+      "title": "Codex tool-call failure share by lane (1 h)",
+      "description": "Share of Codex tool calls (codex.tool.call) that failed (success=\"false\") over the trailing hour, by lane. The red line is the CodexLaneToolErrorBurst threshold: the alert fires when more than 10% of at least 30 calls fail in the hour, for 15 minutes. A lane without failures shows 0. Reused unchanged from the ecosystem-native dashboard.",
+      "gridPos": {
+        "x": 0,
+        "y": 59,
+        "w": 8,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ns2604-prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "label_replace((sum by (ecosystem_lane) (increase(codex_tool_call_total{success=\"false\"}[1h])) or 0 * sum by (ecosystem_lane) (increase(codex_tool_call_total[1h]))) / sum by (ecosystem_lane) (increase(codex_tool_call_total[1h])), \"ecosystem_lane\", \"unattributed\", \"ecosystem_lane\", \"\")",
+          "legendFormat": "{{ecosystem_lane}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 0.1
+              }
+            ]
+          },
+          "custom": {
+            "axisLabel": "failed share",
+            "thresholdsStyle": {
+              "mode": "line"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 21,
+      "type": "timeseries",
+      "title": "Codex MCP error share by lane (1 h)",
+      "description": "Share of Codex MCP calls that returned an error (codex.mcp.call.error over codex.mcp.call) over the trailing hour, by lane. The red line is the CodexLaneMcpErrorRatio threshold: the alert fires when more than 10% of at least 20 calls fail in the hour, for 15 minutes. A lane without errors shows 0. The series also carry a tool label naming the MCP tool. Reused unchanged from the ecosystem-native dashboard.",
+      "gridPos": {
+        "x": 8,
+        "y": 59,
+        "w": 8,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ns2604-prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "label_replace((sum by (ecosystem_lane) (increase(codex_mcp_call_error_total[1h])) or 0 * sum by (ecosystem_lane) (increase(codex_mcp_call_total[1h]))) / sum by (ecosystem_lane) (increase(codex_mcp_call_total[1h])), \"ecosystem_lane\", \"unattributed\", \"ecosystem_lane\", \"\")",
+          "legendFormat": "{{ecosystem_lane}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 0.1
+              }
+            ]
+          },
+          "custom": {
+            "axisLabel": "error share",
+            "thresholdsStyle": {
+              "mode": "line"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "type": "bargauge",
+      "title": "Claude tool failure share by lane (1 h)",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "description": "Claude tool_result events with success=false over all tool results in the hour, by lane. The red step matches the Codex lane alert threshold (10%).",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "(sum by (lane) (count_over_time({service_name=\"claude-code\"} | event_name=\"tool_result\" | success=\"false\" | label_format kind=\"Claude session\", lane=`{{ or .ecosystem_lane \"unattributed\" }}` [1h])) or (0 * sum by (lane) (count_over_time({service_name=\"claude-code\"} | event_name=\"tool_result\" | label_format kind=\"Claude session\", lane=`{{ or .ecosystem_lane \"unattributed\" }}` [1h])))) / sum by (lane) (count_over_time({service_name=\"claude-code\"} | event_name=\"tool_result\" | label_format kind=\"Claude session\", lane=`{{ or .ecosystem_lane \"unattributed\" }}` [1h]))",
+          "queryType": "instant",
+          "legendFormat": "{{lane}}",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1,
+          "noValue": "no data",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 0.1
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "basic",
+        "showUnfilled": true,
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        }
+      },
+      "id": 22,
+      "gridPos": {
+        "x": 16,
+        "y": 59,
+        "w": 8,
+        "h": 8
+      }
+    },
+    {
+      "id": 23,
+      "type": "timeseries",
+      "title": "Codex goal blocked and usage-limited events by lane (15 min)",
+      "description": "Goal events over the trailing 15 minutes, the windows of the CodexLaneGoalBlocked (warning) and CodexLaneUsageLimited (critical) alerts. These counters reach Prometheus as delta points, and their series leave the Collector's exporter 5 minutes after the last export, so a line shows for about 15 minutes after an event and then ends; the alerts keep firing 30 minutes longer. increase() extrapolates, so one event can read slightly above 1. The lane board shows the current goal state. Reused unchanged from the ecosystem-native dashboard.",
+      "gridPos": {
+        "x": 0,
+        "y": 67,
+        "w": 6,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ns2604-prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "label_replace(sum by (ecosystem_lane) (increase(codex_goal_blocked_total[15m])), \"ecosystem_lane\", \"unattributed\", \"ecosystem_lane\", \"\")",
+          "legendFormat": "{{ecosystem_lane}} blocked"
+        },
+        {
+          "refId": "B",
+          "expr": "label_replace(sum by (ecosystem_lane) (increase(codex_goal_usage_limited_total[15m])), \"ecosystem_lane\", \"unattributed\", \"ecosystem_lane\", \"\")",
+          "legendFormat": "{{ecosystem_lane}} usage-limited"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "min": 0,
+          "custom": {
+            "axisLabel": "events"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 24,
+      "title": "Native API errors and rate limits",
+      "type": "table",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 67,
+        "w": 6,
+        "h": 8
+      },
+      "description": "Native error records only. Missing rate-limit headroom is UNKNOWN; client status-line configuration is owned by the command center. Reused unchanged from the cc-lanes dashboard.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (status_code,error_type) (count_over_time({service_name=\"claude-code\"} | event_name=\"api_error\" [${window}]))",
+          "queryType": "instant",
+          "legendFormat": "Claude errors",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        },
+        {
+          "refId": "B",
+          "expr": "sum by (tool_name) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs\"} | event_name=\"codex.tool_result\" | success=\"false\" [${window}]))",
+          "queryType": "instant",
+          "legendFormat": "Codex failed tool results",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "identity",
+            "mode": "outer"
+          }
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "title": "Gateway 4xx and 5xx by provider (1 h)",
+      "description": "OmniRoute routing spans with a 4xx or 5xx omniroute.routing.status: 429 is a usage limit, 499 a client cancel, 502 an upstream failure. The gateway does not set span status, so the vendor status attribute is used, not status_code.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ns2604-prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (gen_ai_provider_name, omniroute_routing_status) (increase(traces_span_metrics_calls_total{service_name=\"omniroute\",omniroute_routing_status=~\"[45]..\"}[1h]))",
+          "instant": true,
+          "range": false,
+          "format": "table",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ns2604-prometheus"
+          },
+          "legendFormat": "Requests"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            }
+          }
+        },
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "gen_ai_provider_name": "Provider",
+              "omniroute_routing_status": "HTTP status",
+              "Value #A": "Requests",
+              "Value": "Requests"
+            },
+            "indexByName": {
+              "gen_ai_provider_name": 0,
+              "omniroute_routing_status": 1,
+              "Value #A": 2
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Requests",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "\u2014",
+          "custom": {
+            "minWidth": 60
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Requests"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 25,
+      "gridPos": {
+        "x": 12,
+        "y": 67,
+        "w": 6,
+        "h": 8
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Gateway 4xx and 5xx share of routed requests (1 h)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ns2604-prometheus"
+      },
+      "description": "Share of all OmniRoute-routed requests in the hour whose routing status was 4xx (usage limits included) or 5xx.",
+      "targets": [
+        {
+          "refId": "4xx",
+          "expr": "sum(increase(traces_span_metrics_calls_total{service_name=\"omniroute\",omniroute_routing_status=~\"4..\"}[1h])) / sum(increase(traces_span_metrics_calls_total{service_name=\"omniroute\"}[1h]))",
+          "instant": true,
+          "range": false,
+          "legendFormat": "4xx share",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ns2604-prometheus"
+          }
+        },
+        {
+          "refId": "5xx",
+          "expr": "sum(increase(traces_span_metrics_calls_total{service_name=\"omniroute\",omniroute_routing_status=~\"5..\"}[1h])) / sum(increase(traces_span_metrics_calls_total{service_name=\"omniroute\"}[1h]))",
+          "instant": true,
+          "range": false,
+          "legendFormat": "5xx share",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ns2604-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 1,
+          "noValue": "no data",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 0.05
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "textMode": "value_and_name",
+        "colorMode": "background"
+      },
+      "id": 26,
+      "gridPos": {
+        "x": 18,
+        "y": 67,
+        "w": 6,
+        "h": 8
+      }
+    },
+    {
+      "type": "row",
+      "title": "Gateway \u00b7 provider and model (GPT, Muse, Claude)",
+      "collapsed": false,
+      "panels": [],
+      "id": 27,
+      "gridPos": {
+        "x": 0,
+        "y": 75,
+        "w": 24,
+        "h": 1
+      }
+    },
+    {
+      "type": "table",
+      "title": "Gateway requests by family, provider and model (1 h)",
+      "description": "OmniRoute routing spans per requested model, grouped into GPT, Muse and Claude by model name. The muse-code provider is the Muse Code route; Muse Code itself exports no OTLP and is not in agentsview (coverage row below). Gateway spans carry no lane, so these totals are not assigned to lanes.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ns2604-prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (family, gen_ai_provider_name, gen_ai_request_model) (label_replace(label_replace(label_replace(label_replace(increase(traces_span_metrics_calls_total{service_name=\"omniroute\"}[1h]), \"family\", \"GPT\", \"gen_ai_request_model\", \"(?i).*gpt.*\"), \"family\", \"Muse\", \"gen_ai_request_model\", \"(?i).*muse.*\"), \"family\", \"Claude\", \"gen_ai_request_model\", \"(?i).*claude.*\"), \"family\", \"other\", \"family\", \"\"))",
+          "instant": true,
+          "range": false,
+          "format": "table",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ns2604-prometheus"
+          },
+          "legendFormat": "Requests"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            }
+          }
+        },
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "family": "Family",
+              "gen_ai_provider_name": "Provider",
+              "gen_ai_request_model": "Model",
+              "Value #A": "Requests",
+              "Value": "Requests"
+            },
+            "indexByName": {
+              "family": 0,
+              "gen_ai_provider_name": 1,
+              "gen_ai_request_model": 2,
+              "Value #A": 3
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Requests",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "\u2014",
+          "custom": {
+            "minWidth": 60
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Requests"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 28,
+      "gridPos": {
+        "x": 0,
+        "y": 76,
+        "w": 8,
+        "h": 9
+      }
+    },
+    {
+      "id": 29,
+      "title": "Gateway routing rate by provider and model",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 76,
+        "w": 8,
+        "h": 9
+      },
+      "description": "Routing events per second after the CC enables native OmniRoute OTLP and applies the collector source. Native gateway spans have no lane/session parentage, so these provider/model totals are not assigned to lanes or added to client request rates. No received routing series remains UNKNOWN. Reused unchanged from the cc-lanes dashboard.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (gen_ai_provider_name,gen_ai_request_model) (rate(traces_span_metrics_calls_total{service_name=\"omniroute\"}[5m]))",
+          "legendFormat": "{{gen_ai_provider_name}} \u00b7 {{gen_ai_request_model}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ns2604-prometheus"
+          },
+          "instant": false,
+          "range": true,
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN",
+          "unit": "ops",
+          "custom": {
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "last"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 30,
+      "title": "Gateway routing rate by outcome and HTTP status",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 76,
+        "w": 8,
+        "h": 9
+      },
+      "description": "Uses vendor omniroute.routing.outcome/status dimensions, not OTel status.code: the gateway does not set span status. Native status 0 means unknown, not success. The existing metrics/spans export guard preserves these dimensions. Deployment and received-event coverage remain the CC host read-back. Reused unchanged from the cc-lanes dashboard.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (gen_ai_provider_name,omniroute_routing_outcome,omniroute_routing_status) (rate(traces_span_metrics_calls_total{service_name=\"omniroute\"}[5m]))",
+          "legendFormat": "{{gen_ai_provider_name}} \u00b7 {{omniroute_routing_outcome}} \u00b7 HTTP {{omniroute_routing_status}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ns2604-prometheus"
+          },
+          "instant": false,
+          "range": true,
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN",
+          "unit": "ops",
+          "custom": {
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "last"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "type": "row",
+      "title": "Coverage \u00b7 which runtimes reach this board",
+      "collapsed": false,
+      "panels": [],
+      "id": 31,
+      "gridPos": {
+        "x": 0,
+        "y": 85,
+        "w": 24,
+        "h": 1
+      }
+    },
+    {
+      "type": "table",
+      "title": "OTLP log records per service (live)",
+      "description": "What reached the Collector as logs: 24 h for the low-volume runtimes and SDK, 1 h for Codex and Claude. A runtime missing here and in the span table sends no OTLP to this host; see the coverage table for agentsview and the vendor options.",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (service_name) (count_over_time({service_name=~\"pi|opencode|goose|qwen-code|oh-my-pi|ns-opencode-.+|ns-pi-.+|codex_sdk_ts\"} [24h]))",
+          "queryType": "instant",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          },
+          "legendFormat": "Log records (24 h)"
+        },
+        {
+          "refId": "B",
+          "expr": "sum by (service_name) (count_over_time({service_name=~\"codex-app-server|codex_exec|codex_cli_rs|claude-code\"} [1h]))",
+          "queryType": "instant",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          },
+          "legendFormat": "Log records (1 h)"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            }
+          }
+        },
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "service_name": "service.name",
+              "Value #A": "Log records (24 h)",
+              "Value #B": "Log records (1 h)"
+            },
+            "indexByName": {
+              "service_name": 0,
+              "Value #B": 1,
+              "Value #A": 2
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "\u2014",
+          "custom": {
+            "minWidth": 60
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Log records (1 h)"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Log records (24 h)"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 32,
+      "gridPos": {
+        "x": 0,
+        "y": 86,
+        "w": 7,
+        "h": 12
+      }
+    },
+    {
+      "type": "table",
+      "title": "OTLP span calls per service (24 h)",
+      "description": "Spans that reached the Collector and its spanmetrics connector, per service.name, in 24 h.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ns2604-prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (service_name) (increase(traces_span_metrics_calls_total[24h]))",
+          "instant": true,
+          "range": false,
+          "format": "table",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ns2604-prometheus"
+          },
+          "legendFormat": "Span calls"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            }
+          }
+        },
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "service_name": "service.name",
+              "Value #A": "Span calls",
+              "Value": "Span calls"
+            },
+            "indexByName": {
+              "service_name": 0,
+              "Value #A": 1
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Span calls",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "\u2014",
+          "custom": {
+            "minWidth": 60
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Span calls"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 33,
+      "gridPos": {
+        "x": 7,
+        "y": 86,
+        "w": 4,
+        "h": 12
+      }
+    },
+    {
+      "type": "text",
+      "title": "Runtime coverage \u00b7 recorded 2026-10-13",
+      "options": {
+        "mode": "markdown",
+        "content": "| Runtime (installed) | OTLP on this host | agentsview sessions (with children) | Vendor telemetry option |\n|---|---|---|---|\n| Codex 0.162.1 | yes: codex_exec, codex_cli_rs, codex-app-server, codex_sdk_ts | 3299 | `[otel]` exporter in config.toml ([otel README](https://github.com/openai/codex/blob/092d3acd/codex-rs/otel/README.md)) |\n| Claude Code | yes: claude-code | 6482 | `CLAUDE_CODE_ENABLE_TELEMETRY` + OTLP env ([monitoring](https://code.claude.com/docs/en/monitoring-usage)) |\n| pi 1.1.0 | yes: pi (through the pi-otel extension) | 1 | no built-in exporter; adapter API ([telemetry README](https://github.com/earendil-works/pi/blob/04566631/packages/telemetry/README.md)) |\n| OpenCode 2.0.27 | yes: opencode, ns-opencode-claude/gpt/muse | 6 | OTLP endpoint and resource env ([otlp.ts](https://github.com/anomalyco/opencode/blob/a3496182/packages/util/src/observability/otlp.ts)) |\n| goose 1.54.0 | yes: goose | 1 | `OTEL_EXPORTER_OTLP_ENDPOINT` ([env vars](https://github.com/aaif-goose/goose/blob/4617040c/documentation/docs/guides/environment-variables.md)) |\n| Qwen Code 0.25.1 | yes: qwen-code | 1 | `telemetry.otlpEndpoint` ([telemetry](https://github.com/QwenLM/qwen-code/blob/aaf97b86/docs/developers/development/telemetry.md)) |\n| oh-my-pi 18.10.2 | yes: oh-my-pi | 1 | `OTEL_EXPORTER_OTLP_ENDPOINT` ([env vars \u00a711](https://github.com/can1357/oh-my-pi/blob/5d0aaffa/docs/environment-variables.md)) |\n| Hermes 0.21.7 | **no**: agentsview only | 1 | gateway-daemon health only (`monitoring.export.otlp`), no per-run export ([gateway monitoring](https://github.com/NousResearch/hermes-agent/blob/3569e846/website/docs/developer-guide/gateway-monitoring.md)) |\n| Cline 3.0.70 | **no**: agentsview only | 3 | `CLINE_OTEL_TELEMETRY_ENABLED` + `CLINE_OTEL_EXPORTER_OTLP_ENDPOINT` ([override](https://github.com/cline/cline/blob/8eba11b2/docs/enterprise-solutions/monitoring/opentelemetry_override.mdx)) |\n| Kilo | **no**: agentsview only | 2 | not checked (no mirror, not installed) |\n| Muse Code 1.4.6 | **no**: neither (only the gateway route `muse-code`) | 0 | not documented: no OTLP option in `muse --help`; local traces only (`muse trace inspect`) |\n| OmniRoute 3.8.51 | yes: routing spans (omniroute) | \u2014 | built-in GenAI OTLP trace sink |\n\nGaps and the follow-ups (Claude `OTEL_RESOURCE_ATTRIBUTES=ecosystem.lane=<name>`, the hcom unit re-render,\nagentsview `pg push`) are in the decision note. No exporter is hand-rolled here."
+      },
+      "id": 34,
+      "gridPos": {
+        "x": 11,
+        "y": 86,
+        "w": 13,
+        "h": 14
+      }
+    }
+  ]
+}
