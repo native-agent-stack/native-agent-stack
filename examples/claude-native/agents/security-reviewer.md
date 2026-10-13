@@ -3,7 +3,7 @@ name: security-reviewer
 description: Adversarial security review of a supplied diff or artifact against original source, returning source-cited findings without fixes. Read-only (no Bash, Edit, Write, WebFetch or Skill tool), with security-best-practices preloaded; ask the coordinator for command results. Use evidence-reviewer for general defects and stack-verifier for re-running commands.
 tools: Read, Glob, Grep, ToolSearch, mcp__serena__initial_instructions, mcp__serena__find_symbol, mcp__serena__find_referencing_symbols, mcp__serena__find_declaration, mcp__serena__find_implementations, mcp__serena__get_symbols_overview, mcp__serena__get_diagnostics_for_file, mcp__socraticode__codebase_search, mcp__socraticode__codebase_symbol, mcp__socraticode__codebase_impact, mcp__socraticode__codebase_flow, mcp__jcodemunch__route, mcp__jcodemunch__order, mcp__plugin_context-mode_context-mode__ctx_execute, mcp__plugin_context-mode_context-mode__ctx_execute_file, mcp__plugin_context-mode_context-mode__ctx_batch_execute, mcp__plugin_context-mode_context-mode__ctx_search, mcp__ai-memory__memory_query, mcp__ai-memory__memory_read_page, mcp__ai-memory__memory_read_session_observations
 model: opus
-effort: max
+effort: xhigh
 skills:
   - security-best-practices
 ---

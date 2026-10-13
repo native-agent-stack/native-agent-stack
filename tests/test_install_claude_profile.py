@@ -1022,10 +1022,26 @@ class AgentsInstallTests(unittest.TestCase):
 
 
 class ShippedAgentEffortTests(unittest.TestCase):
-    """Every shipped agent runs at effort max beside its task-matched model
-    (docs/decisions/2026-09-23-max-effort-default.md): an agent's frontmatter effort
-    is what a stage without its own effort runs at, and a second, lower effort line
-    must not hide behind the first."""
+    """Every shipped agent carries the model and effort of the command center's routing table (source-scout's
+    Sonnet/medium is this decision's disclosed departure from the table's Haiku/low row)
+    (docs/decisions/2026-10-12-model-effort-routing.md, superseding 2026-09-23-max-effort-default.md for
+    effort): on Claude Code 2.1.296 a named child (a teammate spawn) drops a per-launch effort and runs at its
+    definition's, so the definition is where the level is set. The blind roles and the landscape sweep keep
+    their protocol's max, and a second effort line must not hide behind the first."""
+
+    ROUTED = {
+        "blind-adjudicator": ("opus", "max"),
+        "blind-judge": ("opus", "max"),
+        "blind-lane-reviewer": ("opus", "max"),
+        "evidence-reviewer": ("opus", "xhigh"),
+        "isolated-builder": ("opus", "high"),
+        "landscape-sweep-worker": ("opus", "max"),
+        "security-reviewer": ("opus", "xhigh"),
+        "semantic-evidence-reviewer": ("opus", "xhigh"),
+        "source-scout": ("sonnet", "medium"),
+        "stack-researcher": ("sonnet", "high"),
+        "stack-verifier": ("sonnet", "medium"),
+    }
 
     @staticmethod
     def frontmatter(path: Path) -> list[str]:
@@ -1034,30 +1050,65 @@ class ShippedAgentEffortTests(unittest.TestCase):
             return []
         return lines[1:lines.index("---", 1)]
 
-    def test_each_shipped_agent_has_exactly_one_effort_max_line(self):
-        agents = sorted(icp.AGENTS_SRC_DIR.glob("*.md"))
-        self.assertTrue(agents)
-        for path in agents:
-            with self.subTest(agent=path.name):
-                effort_lines = [line for line in self.frontmatter(path) if line.startswith("effort:")]
-                self.assertEqual(effort_lines, ["effort: max"])
+    def routed(self, path: Path, model: str, effort: str) -> bool:
+        """The check every shipped definition must pass: exactly one effort line, its routed one, and its routed model."""
+        front = self.frontmatter(path)
+        return ([line for line in front if line.startswith("effort:")] == ["effort: " + effort]
+                and [line for line in front if line.startswith("model:")] == ["model: " + model])
 
-    def test_the_check_rejects_a_lower_or_repeated_effort(self):
+    def test_each_shipped_agent_has_its_routed_model_and_one_effort_line(self):
+        agents = sorted(icp.AGENTS_SRC_DIR.glob("*.md"))
+        self.assertEqual(sorted(path.stem for path in agents), sorted(self.ROUTED))
+        for path in agents:
+            model, effort = self.ROUTED[path.stem]
+            with self.subTest(agent=path.name):
+                self.assertTrue(self.routed(path, model, effort))
+
+    def test_the_check_rejects_another_or_a_repeated_effort(self):
+        # A definition routed to Opus/high: a lower or higher effort, a second effort line behind the routed one, an
+        # effort outside the frontmatter and another model all fail; the routed definition passes.
         with tempfile.TemporaryDirectory() as tmp:
-            for body in ("---\nname: a\nmodel: opus\neffort: high\n---\nx\n",
-                         "---\nname: a\nmodel: opus\neffort: max\neffort: high\n---\nx\n",
-                         "---\nname: a\nmodel: opus\n---\neffort: max\n"):
-                path = Path(tmp) / "a.md"
+            path = Path(tmp) / "a.md"
+            for body, expected in (("---\nname: a\nmodel: opus\neffort: high\n---\nx\n", True),
+                                   ("---\nname: a\nmodel: opus\neffort: medium\n---\nx\n", False),
+                                   ("---\nname: a\nmodel: opus\neffort: max\n---\nx\n", False),
+                                   ("---\nname: a\nmodel: opus\neffort: high\neffort: low\n---\nx\n", False),
+                                   ("---\nname: a\nmodel: opus\n---\neffort: high\n", False),
+                                   ("---\nname: a\nmodel: sonnet\neffort: high\n---\nx\n", False)):
                 path.write_text(body, encoding="utf-8")
                 with self.subTest(body=body):
-                    effort_lines = [line for line in self.frontmatter(path) if line.startswith("effort:")]
-                    self.assertNotEqual(effort_lines, ["effort: max"])
+                    self.assertEqual(self.routed(path, "opus", "high"), expected)
+
+    def test_every_routed_definition_and_the_routing_record_are_registered(self):
+        # A lowered definition, in each shipped copy, and the routing record are evidence of this routing: each keeps a manifest
+        # row with its current bytes. A rebase onto a moved main once dropped four of them (Astra's registry read of #1045 at
+        # 6c8348d2, P2), and validate.py checks only the rows that exist.
+        import hashlib
+        import json
+        rows = {row["path"]: row for row in json.loads((ROOT / "manifests/evidence.json").read_text(encoding="utf-8"))["files"]
+                if isinstance(row, dict)}
+        paths = ["docs/decisions/2026-10-12-model-effort-routing.md"]
+        for directory in ("adoption/agents/claude", ".claude/agents", "examples/claude-native/agents"):
+            paths += [f"{directory}/{name}.md" for name, (_, effort) in sorted(self.ROUTED.items())
+                      if effort != "max" and (ROOT / directory / f"{name}.md").is_file()]
+        unregistered = []
+        for path in paths:
+            data = (ROOT / path).read_bytes()
+            row = rows.get(path)
+            if row is None or row.get("sha256") != hashlib.sha256(data).hexdigest() or row.get("bytes") != len(data):
+                unregistered.append(path)
+        self.assertEqual(unregistered, [])
+
+    def test_only_the_protocol_roles_keep_max(self):
+        # The routing table lowers every role but the blind protocol roles and the landscape sweep's workers.
+        self.assertEqual(sorted(name for name, (_, effort) in self.ROUTED.items() if effort == "max"),
+                         ["blind-adjudicator", "blind-judge", "blind-lane-reviewer", "landscape-sweep-worker"])
 
 
 class ShippedAgentFrontmatterTests(unittest.TestCase):
     """Every shipped agent's frontmatter parses as a YAML mapping, uses only documented subagent
     fields with documented types and values, and names an explicit model beside its effort (the
-    repository rule: effort max with an explicit model).
+    repository rule: an explicit model and effort, the routed levels of ShippedAgentEffortTests).
 
     Source: the "Frontmatter reference" table and "Subagent files Claude Code skips" section of
     https://code.claude.com/docs/en/sub-agents, read 2026-09-26 against Claude Code 2.1.283. Claude

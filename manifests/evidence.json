@@ -4917,23 +4917,38 @@
   "files": [
     {
       "path": ".claude/agents/evidence-reviewer.md",
-      "sha256": "84e7ec7b433fc6ef3506a2488c5641b9ed8d88bae8f296b197b182964fa31399",
-      "bytes": 2825
+      "sha256": "91d7d2c9d06a47ef2b6cf34bb212e8f48cc8ded2eeab71656b42123b73b6b26f",
+      "bytes": 2827
     },
     {
       "path": ".claude/agents/isolated-builder.md",
-      "sha256": "e22c8f8d5d5239ddce211aad69e695b2952951bab7142998f0c12445cd399096",
-      "bytes": 3881
+      "sha256": "49ad19746d8e35e88c60fb3af4ef29aab6a5877b7949b9f51fbb7db1c711c28c",
+      "bytes": 3882
     },
     {
       "path": ".claude/agents/security-reviewer.md",
-      "sha256": "fc51df098f4e5fb3a0ccde3b13700814151d3391d112bee49f7030a834da5770",
-      "bytes": 3891
+      "sha256": "8beabfa7e80ce1e0411cf60dc3eda40c27251052c833b38865c79201c144a4e0",
+      "bytes": 3893
+    },
+    {
+      "path": ".claude/agents/semantic-evidence-reviewer.md",
+      "sha256": "794dae4340a438f5d03184923f2545743b42f4a8a903e480126058f6c0ec2a71",
+      "bytes": 2305
+    },
+    {
+      "path": ".claude/agents/source-scout.md",
+      "sha256": "13c472e5db39499805c0e9edbc65bf60ac50c1b36c3dbb62ee4c2fa067b8126d",
+      "bytes": 3069
     },
     {
       "path": ".claude/agents/stack-researcher.md",
-      "sha256": "5fea67ac0e615b420871b6302558dbce3025e052259545e9eeb0020991e55240",
-      "bytes": 4711
+      "sha256": "3335189f47ce227222b294c46be2d0632de9051d52509dadb13ec4676625629c",
+      "bytes": 4714
+    },
+    {
+      "path": ".claude/agents/stack-verifier.md",
+      "sha256": "12c0e5b94817265dd5af72000fcc67a814a11248f97370272cf0ad7f7cbdbb73",
+      "bytes": 3804
     },
     {
       "path": ".claude/rules/trading.md",
@@ -5287,13 +5302,13 @@
     },
     {
       "path": "adoption/agents/claude/evidence-reviewer.md",
-      "sha256": "84e7ec7b433fc6ef3506a2488c5641b9ed8d88bae8f296b197b182964fa31399",
-      "bytes": 2825
+      "sha256": "91d7d2c9d06a47ef2b6cf34bb212e8f48cc8ded2eeab71656b42123b73b6b26f",
+      "bytes": 2827
     },
     {
       "path": "adoption/agents/claude/isolated-builder.md",
-      "sha256": "e22c8f8d5d5239ddce211aad69e695b2952951bab7142998f0c12445cd399096",
-      "bytes": 3881
+      "sha256": "49ad19746d8e35e88c60fb3af4ef29aab6a5877b7949b9f51fbb7db1c711c28c",
+      "bytes": 3882
     },
     {
       "path": "adoption/agents/claude/landscape-sweep-worker.md",
@@ -5302,28 +5317,28 @@
     },
     {
       "path": "adoption/agents/claude/security-reviewer.md",
-      "sha256": "fc51df098f4e5fb3a0ccde3b13700814151d3391d112bee49f7030a834da5770",
-      "bytes": 3891
+      "sha256": "8beabfa7e80ce1e0411cf60dc3eda40c27251052c833b38865c79201c144a4e0",
+      "bytes": 3893
     },
     {
       "path": "adoption/agents/claude/semantic-evidence-reviewer.md",
-      "sha256": "c1cb4882dc104b306e5fd07c52d0a444674b26ffa71f5577710aa03bacd22853",
-      "bytes": 2303
+      "sha256": "794dae4340a438f5d03184923f2545743b42f4a8a903e480126058f6c0ec2a71",
+      "bytes": 2305
     },
     {
       "path": "adoption/agents/claude/source-scout.md",
-      "sha256": "f79cead4a3f9c14986bb28815d046eacf8bf79c92fe923094f66f97a64c06341",
-      "bytes": 3066
+      "sha256": "13c472e5db39499805c0e9edbc65bf60ac50c1b36c3dbb62ee4c2fa067b8126d",
+      "bytes": 3069
     },
     {
       "path": "adoption/agents/claude/stack-researcher.md",
-      "sha256": "5fea67ac0e615b420871b6302558dbce3025e052259545e9eeb0020991e55240",
-      "bytes": 4711
+      "sha256": "3335189f47ce227222b294c46be2d0632de9051d52509dadb13ec4676625629c",
+      "bytes": 4714
     },
     {
       "path": "adoption/agents/claude/stack-verifier.md",
-      "sha256": "a4cc7f5024af7fdea544a0963d8ff6f712c9eb460812582fd93368870eeeabcc",
-      "bytes": 3799
+      "sha256": "12c0e5b94817265dd5af72000fcc67a814a11248f97370272cf0ad7f7cbdbb73",
+      "bytes": 3804
     },
     {
       "path": "adoption/agents/codex/SHA256SUMS",
@@ -17333,8 +17348,8 @@
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "sha256": "89091ead1eecd0cf5f030f75ef721fe750b34023705f770539923180b7e87163",
-      "bytes": 140288
+      "sha256": "ea9ea339a2fda04b779f3782930ef234c9e39f79ec7a6c4f79156e49a4240107",
+      "bytes": 140670
     },
     {
       "path": "catalogs/foundation/latest-models.json",
@@ -17393,7 +17408,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "92d03dd0a126364707b8aaa4104b4b2d4e389a708a85d59f48e4042f7f4f94d6",
+      "sha256": "7ffbbacca1721baeee78d1c9ad8f86a20037eee660f254973ae50557381e6e5d",
       "bytes": 190328
     },
     {
@@ -18108,8 +18123,8 @@
     },
     {
       "path": "docs/decisions/2026-09-23-max-effort-default.md",
-      "sha256": "5df52d0fa2440419a8bd31db737fe33c4bb95e724737aaeb5ef147fea75b9449",
-      "bytes": 23193
+      "sha256": "01116afbc92303559f13e716a80d8651bf4248c2be4a2a7ca4b05cf48dfc915f",
+      "bytes": 23555
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
@@ -18338,8 +18353,8 @@
     },
     {
       "path": "docs/decisions/2026-09-30-task-model-routing.md",
-      "sha256": "69caa36500e10cd027eda388d754adba8397939d15e7f74805ad6440f6c353b3",
-      "bytes": 45902
+      "sha256": "eb3b44b811222ddbea0dee58df629241f314041ab68ef54855844c1346fd4353",
+      "bytes": 46749
     },
     {
       "path": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md",
@@ -19055,6 +19070,11 @@
       "path": "docs/decisions/2026-10-12-mcp-template-live-reconciliation.md",
       "sha256": "a796423cb4464f5e74f538808c598b782e6d9bf05ad6035536796c0736ae68f1",
       "bytes": 13096
+    },
+    {
+      "path": "docs/decisions/2026-10-12-model-effort-routing.md",
+      "sha256": "fc889cf0005b619d69268bd5bec8b5b94307bd606481a9ba4926664c4dba8fb4",
+      "bytes": 11192
     },
     {
       "path": "docs/decisions/2026-10-12-skills-installer-foreign-content.md",
@@ -56413,8 +56433,8 @@
     },
     {
       "path": "evidence/artifacts/token-adoption-e2e-20260926/README.md",
-      "sha256": "a729db863c7c6ba549543f7ed91ff8a502ed118d166e6e5eb1e28d4f2c2e1e32",
-      "bytes": 78655
+      "sha256": "5444aac42af5130367fa1a65b20c155dc80ad58096aedaee6d893ac7117e37bf",
+      "bytes": 80633
     },
     {
       "path": "evidence/artifacts/token-adoption-e2e-20260926/RUNBOOK.md",
@@ -60313,38 +60333,38 @@
     },
     {
       "path": "examples/claude-native/agents/evidence-reviewer.md",
-      "sha256": "84e7ec7b433fc6ef3506a2488c5641b9ed8d88bae8f296b197b182964fa31399",
-      "bytes": 2825
+      "sha256": "91d7d2c9d06a47ef2b6cf34bb212e8f48cc8ded2eeab71656b42123b73b6b26f",
+      "bytes": 2827
     },
     {
       "path": "examples/claude-native/agents/isolated-builder.md",
-      "sha256": "e22c8f8d5d5239ddce211aad69e695b2952951bab7142998f0c12445cd399096",
-      "bytes": 3881
+      "sha256": "49ad19746d8e35e88c60fb3af4ef29aab6a5877b7949b9f51fbb7db1c711c28c",
+      "bytes": 3882
     },
     {
       "path": "examples/claude-native/agents/security-reviewer.md",
-      "sha256": "fc51df098f4e5fb3a0ccde3b13700814151d3391d112bee49f7030a834da5770",
-      "bytes": 3891
+      "sha256": "8beabfa7e80ce1e0411cf60dc3eda40c27251052c833b38865c79201c144a4e0",
+      "bytes": 3893
     },
     {
       "path": "examples/claude-native/agents/semantic-evidence-reviewer.md",
-      "sha256": "c1cb4882dc104b306e5fd07c52d0a444674b26ffa71f5577710aa03bacd22853",
-      "bytes": 2303
+      "sha256": "794dae4340a438f5d03184923f2545743b42f4a8a903e480126058f6c0ec2a71",
+      "bytes": 2305
     },
     {
       "path": "examples/claude-native/agents/source-scout.md",
-      "sha256": "f79cead4a3f9c14986bb28815d046eacf8bf79c92fe923094f66f97a64c06341",
-      "bytes": 3066
+      "sha256": "13c472e5db39499805c0e9edbc65bf60ac50c1b36c3dbb62ee4c2fa067b8126d",
+      "bytes": 3069
     },
     {
       "path": "examples/claude-native/agents/stack-researcher.md",
-      "sha256": "5fea67ac0e615b420871b6302558dbce3025e052259545e9eeb0020991e55240",
-      "bytes": 4711
+      "sha256": "3335189f47ce227222b294c46be2d0632de9051d52509dadb13ec4676625629c",
+      "bytes": 4714
     },
     {
       "path": "examples/claude-native/agents/stack-verifier.md",
-      "sha256": "a4cc7f5024af7fdea544a0963d8ff6f712c9eb460812582fd93368870eeeabcc",
-      "bytes": 3799
+      "sha256": "12c0e5b94817265dd5af72000fcc67a814a11248f97370272cf0ad7f7cbdbb73",
+      "bytes": 3804
     },
     {
       "path": "examples/claude-native/ultracode.settings.json",
@@ -60358,12 +60378,12 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "b85e83f514dd7baf5902dde96ed1dde0b2d1e270c758a110d3acf3c65e2081ef",
-      "bytes": 113734
+      "sha256": "dcf56c4346c1c11bb134549db548a129e5ced28537d7361b8d31ac41136a8501",
+      "bytes": 116291
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
-      "sha256": "6b4da12d9fa4ec192238d366d4b9238ece9f9994949271452bf9d3946bc5fcc0",
+      "sha256": "32dea17c27507e4bb645aac7211d2939b91605b00c5e62bae6e536f15e52e803",
       "bytes": 1217
     },
     {
@@ -60413,13 +60433,13 @@
     },
     {
       "path": "examples/claude-native/workflows/test-contract-mutations.mjs",
-      "sha256": "2867a2c7ae3a313d346c34338f13ecb23699045d6533013889285cc87f4c7625",
-      "bytes": 22586
+      "sha256": "1989ce290ee0b0b9f7c887d98c571c401917881c676509a14e44c9d3a99b846d",
+      "bytes": 24187
     },
     {
       "path": "examples/claude-native/workflows/test-envelope.mjs",
-      "sha256": "07a7402e23cd8ea6aa1be5d23b0238a87b99d8c91f65ca1140ff8ffaa14e3516",
-      "bytes": 57413
+      "sha256": "e0b640da73ceb36bad225db5c1ad00839c124547f0a0809cf9c18a90b4322f67",
+      "bytes": 59705
     },
     {
       "path": "examples/claude-native/workflows/test-usage-receipts.mjs",
@@ -62533,8 +62553,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "31aa607901be251aa8bc89df9fdcb02f2604ffc4f87b50c555d378d0470721cb",
-      "bytes": 169116
+      "sha256": "dd3256ecc09f7fb0d451fe74b0630cde59dd2acd6de04e78f38dc5f37e44febc",
+      "bytes": 172637
     },
     {
       "path": "tests/test_install_skills.py",
@@ -63278,8 +63298,8 @@
     },
     {
       "path": "tests/test_task_model_routing.py",
-      "sha256": "bdbdb66eb4efd8a39b3c57ebd02e42ce869aa75996fa27f4d56da1ae259c7a2b",
-      "bytes": 24608
+      "sha256": "f046be0d43c2c35dcc95a691e52b34803017fa3207f4d9768250f558b95c0153",
+      "bytes": 24994
     },
     {
       "path": "tests/test_token_e2e_grader.py",
@@ -63288,8 +63308,8 @@
     },
     {
       "path": "tests/test_token_e2e_preregistration.py",
-      "sha256": "efeda300bf452c5c323541554505a21af2264b4336f16cda67801d96195ab8db",
-      "bytes": 55914
+      "sha256": "6973400b4f91d16d1d45cacf47da89c4e4e389113c555fb212081848575b5c72",
+      "bytes": 56939
     },
     {
       "path": "tests/test_token_e2e_receipt_checks.py",
