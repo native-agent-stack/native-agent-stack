@@ -19662,9 +19662,19 @@
       "bytes": 6646
     },
     {
+      "path": "docs/trading-handbook/buying-power-rotation.md",
+      "sha256": "03191722a794c00f2f2a572481250a1313992a8cd0e81e14da8736d83ce8b210",
+      "bytes": 5521
+    },
+    {
       "path": "docs/trading-handbook/ibkr-pacing.md",
       "sha256": "62d28f0a53850eb44721da242c6f68cc7ff22a6627a96dd5860f50b6b4769a6f",
       "bytes": 16063
+    },
+    {
+      "path": "docs/trading-handbook/luld-halt-sizing.md",
+      "sha256": "fab54e45fb787be65750bdddd1cc5c0a0638e9bbf88b27f68e44ab358dc1a287",
+      "bytes": 8486
     },
     {
       "path": "docs/trading-handbook/paper-marker.md",
@@ -19675,6 +19685,11 @@
       "path": "docs/trading-handbook/portfolio-sizing.md",
       "sha256": "2b211c78251b7a71179fa08e9ebcc62a00c57c2958712e7d5e8f6414cc68d7ea",
       "bytes": 7063
+    },
+    {
+      "path": "docs/trading-handbook/sources/luld-bp-20261013.json",
+      "sha256": "80782a71b5f52401cf3dc841afbb4bf908d66bde63f2660b99381f7204e68e34",
+      "bytes": 10252
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -57815,6 +57830,16 @@
       "path": "evidence/artifacts/trading-convergence-20260926/papers-strategy.md",
       "sha256": "189a1b80b559e74fc12d0b7e73f6415e4829041bfe8f03d89ca5a18fb11be4f5",
       "bytes": 30252
+    },
+    {
+      "path": "evidence/artifacts/trading-handbook-20261013/alpaca-buying-power-passages-20261013.md",
+      "sha256": "e97314bf91f3fde5caaf1eb3f92c8e3cd18626f1454d936d426f286e4871ba23",
+      "bytes": 2578
+    },
+    {
+      "path": "evidence/artifacts/trading-handbook-20261013/luld-public-passages-20261013.md",
+      "sha256": "747a32db018a3c3bd6ae76762781d8adc0649ef2d133f0f5837992eeed08e97f",
+      "bytes": 5968
     },
     {
       "path": "evidence/artifacts/trading-runtime-2604-20261004/build-constraint-proof.json",

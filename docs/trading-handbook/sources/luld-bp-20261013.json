@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-13",
+  "scope": "Public primary-source captures plus a byte-identical publication-approved calculator projection. Policy facts are source_review of that projection; observations retain its scope and are not new execution by this documentation task.",
+  "public_captures": [
+    {
+      "id": "luld-overview",
+      "url": "https://www.luldplan.com/",
+      "artifact_name": "luld-home.html",
+      "bytes": 30771,
+      "sha256": "b55070d97cbed50cab844c95dac70a825b31c06a5cb9820a2e941b53ab44f4c3",
+      "version": "Unversioned official web overview captured in the stated window",
+      "locators": [
+        "Overview",
+        "Calculation of Price Bands",
+        "Operation of Price Bands"
+      ],
+      "mineru_locator": "doc:b55070d/tier:flash/page:1",
+      "capture_window_utc": {
+        "started": "2026-10-13T15:33:14Z",
+        "finished": "2026-10-13T15:35:26Z"
+      },
+      "evidence_class": "source_review",
+      "retention": "Raw public capture retained privately; URL plus SHA256 binds the captured bytes. Only the bounded cited text is published. No broker observation.",
+      "published_excerpt": "evidence/artifacts/trading-handbook-20261013/luld-public-passages-20261013.md"
+    },
+    {
+      "id": "luld-plan-index",
+      "url": "https://www.luldplan.com/plans",
+      "artifact_name": "luld-plans.html",
+      "bytes": 14927,
+      "sha256": "bb82d87c12fab1f6d0d20babbf968f416e9ba642b56c72b3961896fdb31764fa",
+      "version": "Unversioned official document index captured in the stated window",
+      "locators": [
+        "LULD Plans"
+      ],
+      "capture_window_utc": {
+        "started": "2026-10-13T15:33:14Z",
+        "finished": "2026-10-13T15:35:26Z"
+      },
+      "evidence_class": "source_review",
+      "retention": "Raw public capture retained privately; URL plus SHA256 binds the captured bytes. Only the bounded cited text is published. No broker observation.",
+      "published_excerpt": "evidence/artifacts/trading-handbook-20261013/luld-public-passages-20261013.md"
+    },
+    {
+      "id": "luld-plan-20",
+      "url": "https://cdn.luldplan.com/plans/LULD-Plan-Amendment-20.pdf",
+      "artifact_name": "luld-plan-amendment20.pdf",
+      "bytes": 594425,
+      "sha256": "81315450525e7f98077d4054c7125d5f69b8800a628b6c6ba677f1fb726d4ac0",
+      "version": "20th Amendment Version, posted May 5, 2020; historical consolidated document, not a complete later-amendment certification",
+      "locators": [
+        "Cover page",
+        "Sections V-VII, PDF pages 11-17"
+      ],
+      "mineru_locator": "doc:8131545/tier:flash/page:11",
+      "capture_window_utc": {
+        "started": "2026-10-13T15:33:14Z",
+        "finished": "2026-10-13T15:35:26Z"
+      },
+      "evidence_class": "source_review",
+      "retention": "Historical public PDF retained privately and cited by URL, edition and raw SHA256; raw document is not included in the public publication packet. Overview excerpts establish the chapter's cited band/limit-state mechanism."
+    },
+    {
+      "id": "luld-plan-2026",
+      "url": "https://cdn.luldplan.com/plans/LULD-Plan-specifies-data-points-for-inclusion-in-Overnight-Trading-2026.docx",
+      "artifact_name": "luld-plan-2026.docx",
+      "bytes": 260698,
+      "sha256": "efe6c32d7ef2366c8ec01ef595d5bc62a2576887c7006c2e4942e6c84441c6d4",
+      "version": "Official index label identifies a 2026 document; cover marks proposed additions/deletions. Effective amendment status not established by this capture",
+      "locators": [
+        "Exhibit A cover"
+      ],
+      "mineru_locator": "doc:efe6c32/tier:flash/page:1",
+      "capture_window_utc": {
+        "started": "2026-10-13T15:33:14Z",
+        "finished": "2026-10-13T15:35:26Z"
+      },
+      "evidence_class": "source_review",
+      "retention": "Raw public capture retained privately; URL plus SHA256 binds the captured bytes. Only the bounded cited cover text is published. No broker observation.",
+      "published_excerpt": "evidence/artifacts/trading-handbook-20261013/luld-public-passages-20261013.md"
+    },
+    {
+      "id": "alpaca-orders",
+      "url": "https://docs.alpaca.markets/us/docs/orders-at-alpaca",
+      "artifact_name": "alpaca-orders.html",
+      "bytes": 700254,
+      "sha256": "55a1ef1b94844fc248d7833535570d19a4bd865ddf303baf857246b44710acac",
+      "version": "Unversioned official web documentation snapshot captured in the stated window",
+      "locators": [
+        "Buying Power",
+        "Order Lifecycle"
+      ],
+      "mineru_locator": "doc:55a1ef1/tier:flash/page:1",
+      "capture_window_utc": {
+        "started": "2026-10-13T15:33:14Z",
+        "finished": "2026-10-13T15:35:26Z"
+      },
+      "evidence_class": "source_review",
+      "retention": "Raw HTML retained privately and never published. Only cited Buying Power paragraphs and Order Lifecycle rows are published as extracted text; the raw SHA256 remains labelled as a public-page capture.",
+      "published_excerpt": "evidence/artifacts/trading-handbook-20261013/alpaca-buying-power-passages-20261013.md"
+    },
+    {
+      "id": "alpaca-client",
+      "url": "https://raw.githubusercontent.com/alpacahq/alpaca-py/cc4cb3b7ba50ae250e621983c2779047fb16bb28/alpaca/trading/client.py",
+      "artifact_name": "alpaca-trading-client.py",
+      "bytes": 25722,
+      "sha256": "03f806b3ce6b4fabcc92f9e8eedf5f3ded817b7ec988bc8a854aa9268ea595de",
+      "version": "alpaca-py v0.44.0 source commit cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+      "locators": [
+        "submit_order:90-105",
+        "get_orders/get_order_by_id:107-160"
+      ],
+      "capture_window_utc": {
+        "started": "2026-10-13T15:51:14Z",
+        "finished": "2026-10-13T15:51:15Z"
+      },
+      "evidence_class": "source_review",
+      "retention": "Exact public source bytes retained privately; HTTP bytes equal the maintained mirror's pinned Git blob. Public citations use the immutable upstream Git URL."
+    },
+    {
+      "id": "nautilus-strategies",
+      "url": "https://raw.githubusercontent.com/nautechsystems/nautilus_trader/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/docs/concepts/strategies.md",
+      "artifact_name": "nautilus-strategies.md",
+      "bytes": 39571,
+      "sha256": "302a4daef347164ba8add1fd736aef70782235cff49ea914d726b8c13eab3275",
+      "version": "NautilusTrader v2.0.0rc5 source commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "locators": [
+        "Managed stop and closing positions:716-745"
+      ],
+      "capture_window_utc": {
+        "started": "2026-10-13T15:51:14Z",
+        "finished": "2026-10-13T15:51:15Z"
+      },
+      "evidence_class": "source_review",
+      "retention": "Exact public source bytes retained privately; HTTP bytes equal the maintained mirror's pinned Git blob. Public citations use the immutable upstream Git URL."
+    }
+  ],
+  "trial_policy_gaps": [
+    {
+      "id": "halt-sizing-contract-details",
+      "status": "awaiting_additional_projection",
+      "evidence_class": "unestablished",
+      "missing": [
+        "quantity rounding and cost details",
+        "timestamp/tier-data binding",
+        "holiday and early-close handling",
+        "prior-close below $0.75 proxy handling"
+      ],
+      "observed_execution": null
+    },
+    {
+      "id": "halt-sizing-execution",
+      "status": "awaiting_native_receipt_projection",
+      "evidence_class": "unestablished",
+      "missing": [
+        "source-bound native receipt for this sizing/exit rule",
+        "as-known band observations",
+        "orders, fills and final exposure"
+      ],
+      "observed_execution": null
+    },
+    {
+      "id": "rotation-contract-details",
+      "status": "awaiting_additional_projection",
+      "evidence_class": "unestablished",
+      "missing": [
+        "equal-progress tie-break",
+        "refusal and reservation taxonomy",
+        "partial-fill and re-admission timing details"
+      ],
+      "observed_execution": null
+    },
+    {
+      "id": "rotation-execution",
+      "status": "awaiting_native_receipt_projection",
+      "evidence_class": "unestablished",
+      "missing": [
+        "native refusal and reservation evidence",
+        "completed disposal fills and reconciled state",
+        "fresh buying power and replacement disposition"
+      ],
+      "observed_execution": null
+    }
+  ],
+  "public_contract": {
+    "repository": "native-agent-stack/native-agent-stack",
+    "commit": "df3a477c84aafed82757d120268ac58dea1fbd30",
+    "path": "docs/paper-lane-policy.md"
+  },
+  "parser": {
+    "name": "MinerU",
+    "version": "4.0.10",
+    "tier": "flash",
+    "mode": "local"
+  },
+  "upstream_engine": {
+    "repository": "nautechsystems/nautilus_trader",
+    "version": "2.0.0rc5",
+    "commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e"
+  },
+  "execution": "Documentation only; no orders, data acquisition or runtime qualification",
+  "approved_projection": {
+    "name": "account-c-calc-contracts-20261013.md",
+    "path": "evidence/artifacts/trading-handbook-20261013/account-c-calc-contracts-20261013.md",
+    "bytes": 5585,
+    "sha256": "0b4aeac7f2714006ce0c7e647417109b19357a64d0fb711a237f998597dc7fcc",
+    "status": "sealed_publication_approved",
+    "evidence_class": "source_review",
+    "scope": "CC-prepared projection of its calculator source and receipts. This handbook does not access private state or independently repeat execution."
+  },
+  "trial_policy_facts": {
+    "evidence_class": "source_review",
+    "source_ref": "evidence/artifacts/trading-handbook-20261013/account-c-calc-contracts-20261013.md",
+    "gap_budget": {
+      "fraction_of_equity": 0.06,
+      "equation": "sum(held_halt_prone_notional * assumed_band_fraction) <= 0.06 * equity",
+      "band_proxy_above_3": 0.1,
+      "band_proxy_0_75_through_3": 0.2,
+      "tier_membership_available": false
+    },
+    "halt_exit_start": {
+      "local_time": "15:25",
+      "timezone": "America/New_York",
+      "scope": "stated regular-session trial policy"
+    },
+    "rotation": {
+      "confidence_min": 0.3,
+      "max_names_marked_for_exit": 1,
+      "candidate": "held name ineligible in the current round with the least high_water_mark / entry",
+      "reentry": false
+    },
+    "execution_repeated": false
+  }
+}
