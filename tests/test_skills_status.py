@@ -365,6 +365,50 @@ class SkillsStatusTests(unittest.TestCase):
         self.change_settings(env={"SOME_OTHER_SETTING": "x"})
         self.assertEqual(ss.inspect(manifest, self.home, {**self.env, name: "1"})["skills"][0]["claude_twin"]["state"], "ok", "an env entry for another variable leaves the environment's")
 
+    def test_a_number_or_an_array_in_an_env_entry_is_the_text_javascript_makes_of_it(self):
+        """The local review of the rebased head (P2-1, `skills_status.py` env_text): the client reads a settings env value as JavaScript's String() of it, so 1.0 and 1e0 are 1 and an array is its elements joined
+        by commas. Measured on 2.1.296 (receipts/numeric-env-init-records.json, 28 init-record runs): 61 skills listed, the bundled claude-api gone, with 1, 1.0, 1e0, 10e-1, 0.1e1, 1E0, 1.00, true, "1", [1], ["1"],
+        [true] and [[1]]; 77 with 0, 0.0, 2, 1.5, -0, null, [], an object, [1, 2], ["1", "x"], [null], [null, 1] and [1, true]; the skill's own switch reads 1.0 and 1e0 the same way."""
+        manifest = self.build_manifest([self.native_twin_row(hidden=False)])
+        settings = self.home / ".claude/settings.json"
+        base = json.loads(settings.read_text())
+        name = "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS"
+        for raw, hidden in (("1", True), ("1.0", True), ("1e0", True), ("10e-1", True), ("0.1e1", True), ("1E0", True), ("1.00", True), ("true", True), ('"1"', True), ("[1]", True), ('["1"]', True),
+                            ("[true]", True), ("[[1]]", True), ("0", False), ("0.0", False), ("2", False), ("1.5", False), ("-0", False), ("null", False), ("[]", False), ('{"a": 1}', False), ('"0"', False),
+                            ("[1, 2]", False), ('["1", "x"]', False), ("[null]", False), ("[null, 1]", False), ("[1, true]", False)):
+            with self.subTest(env_value=raw):
+                settings.write_text(json.dumps({**base, "env": {name: "@@RAW@@"}}).replace('"@@RAW@@"', raw))
+                self.assertEqual(ss.bundled_skills_disabled(settings, self.env), hidden)
+                self.assertEqual(ss.inspect(manifest, self.home, self.env)["skills"][0]["claude_twin"]["state"], "ok" if hidden else "duplicate_listing")
+        skill_switch = "CLAUDE_CODE_DISABLE_CLAUDE_API_SKILL"
+        for raw in ("1.0", "1e0", "[1]"):
+            with self.subTest(skill_switch=raw):
+                settings.write_text(json.dumps({**base, "env": {skill_switch: "@@RAW@@"}}).replace('"@@RAW@@"', raw))
+                self.assertTrue(ss.bundled_skill_disabled(settings, self.env, "claude-api"))
+                self.assertFalse(ss.bundled_skills_disabled(settings, self.env), "the skill's own switch hides that skill only")
+        deep = []
+        for _ in range(5000):
+            deep = [deep]
+        self.assertFalse(ss.env_switch({name: deep}, {}, name), "an array nested beyond the interpreter's depth is no switch and no crash")
+
+    def test_a_missing_settings_file_is_empty_settings_and_the_environment_switch_still_counts(self):
+        """The local review of the rebased head (P2-2, `skills_status.py` read_switches): with no settings.json the client starts with empty settings and reads its environment, so
+        CLAUDE_CODE_DISABLE_BUNDLED_SKILLS=1 still hides the bundled copy; the plugin is not enabled either (no settings), so no route lists the skill and the row fails. A file that exists and cannot be read
+        still disables nothing."""
+        manifest = self.build_manifest([self.native_twin_row(hidden=False)])
+        settings = self.home / ".claude/settings.json"
+        settings.unlink()
+        switched = {**self.env, "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS": "1"}
+        self.assertTrue(ss.bundled_skills_disabled(settings, switched))
+        self.assertTrue(ss.bundled_skill_disabled(settings, {**self.env, "CLAUDE_CODE_DISABLE_CLAUDE_API_SKILL": "1"}, "claude-api"))
+        self.assertFalse(ss.bundled_skills_disabled(settings, self.env), "no file and no variable: nothing is hidden")
+        entry = ss.inspect(manifest, self.home, switched)["skills"][0]
+        self.assertEqual(entry["claude_twin"]["state"], "not_listed", "the bundled copy is hidden by the environment and no plugin is enabled: no route lists the skill")
+        self.assertFalse(entry["pass"])
+        self.assertEqual(ss.inspect(manifest, self.home, self.env)["skills"][0]["claude_twin"]["state"], "ok", "without the variable the bundled copy is the one listed")
+        settings.write_text("{not json")
+        self.assertFalse(ss.bundled_skills_disabled(settings, switched), "a file that exists and cannot be read disables nothing")
+
     def test_disabling_bundled_skills_hides_no_personal_copy_and_an_unreadable_settings_file_disables_nothing(self):
         """The personal twin is not a bundled skill: it stays listed, so it stays a duplicate until skillOverrides hides it. Settings that cannot be read disable nothing (the personal row then fails on its listing)."""
         skill = self.twin_row()

@@ -477,11 +477,29 @@ ENV_TRUE_WORDS = frozenset({"1", "true", "yes", "on"})
 
 
 def env_text(value):
-    """The text Claude Code makes of an ``env`` value of settings.json (measured on 2.1.296: a string as it is, the number 1 and the boolean true as JavaScript's String() writes them; Python's str() of the boolean is
-    "True", which the reader lower-cases); None for anything else."""
-    if isinstance(value, (bool, int)):
+    """The text Claude Code makes of an ``env`` value of settings.json: JavaScript's String() of the parsed JSON value, so that a switch spelled 1.0, 1e0, [1] or [true] is set as 1 and true are (measured on
+    2.1.296 for CLAUDE_CODE_DISABLE_BUNDLED_SKILLS and for CLAUDE_CODE_DISABLE_CLAUDE_API_SKILL, receipts/numeric-env-init-records.json: 77 skills listed with none; 61 with 1, 1.0, 1e0, 10e-1, 0.1e1, 1E0, 1.00,
+    true, "1", [1], ["1"], [true] or [[1]]; 77 with 0, 0.0, 2, 1.5, -0, null, [], an object, [1, 2], ["1", "x"], [null], [null, 1] or [1, true]). A string is as it is; a boolean is true or false; a number is its integral value without a point or an exponent below 1e21
+    (JavaScript writes 1.0 as 1), else Python's repr, which is never a word the switch reads; null is "null"; an array is its elements joined by commas, a null element empty; an object is "[object Object]"."""
+    if isinstance(value, str):
+        return value
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, int):
         return str(value)
-    return value if isinstance(value, str) else None
+    if isinstance(value, float):
+        if value != value:
+            return "NaN"
+        if value in (float("inf"), float("-inf")):
+            return "Infinity" if value > 0 else "-Infinity"
+        return str(int(value)) if value == int(value) and abs(value) < 1e21 else repr(value)
+    if value is None:
+        return "null"
+    if isinstance(value, list):
+        return ",".join("" if item is None else (env_text(item) or "") for item in value)
+    if isinstance(value, dict):
+        return "[object Object]"
+    return None
 
 
 # The client's own switch for one bundled skill, beside the all-bundled one: `registerClaudeApiSkill({disabled: env.CLAUDE_CODE_DISABLE_CLAUDE_API_SKILL === true})` in the installed 2.1.296 binary (the function that
@@ -491,17 +509,23 @@ BUNDLED_SKILL_SWITCHES = {"claude-api": "CLAUDE_CODE_DISABLE_CLAUDE_API_SKILL"}
 
 
 def env_switch(settings_env: dict, env, name: str) -> bool:
-    """Whether the variable ``name`` reads as set for the client: the settings ``env`` entry (a string, number or boolean) when there is one, else the process environment; 1, true, yes and on in any case, padded
-    or not (measured on 2.1.296 for both switches: 0, 2, false and an empty value do not)."""
-    value = env_text(settings_env[name]) if name in settings_env else env_text(env.get(name))
+    """Whether the variable ``name`` reads as set for the client: the settings ``env`` entry (any JSON value, as env_text reads it) when there is one, else the process environment; 1, true, yes and on in any case,
+    padded or not (measured on 2.1.296 for both switches: 0, 2, false and an empty value do not)."""
+    try:
+        value = env_text(settings_env[name]) if name in settings_env else env_text(env.get(name))
+    except RecursionError:   # an array nested beyond the interpreter's depth is no switch
+        return False
     return value is not None and value.strip().lower() in ENV_TRUE_WORDS
 
 
 def read_switches(path: Path):
-    """(disableBundledSkills is the JSON boolean true, the settings ``env`` mapping) of the settings file; None when it cannot be read (the switches then disable nothing: the personal copy's own listing check reports
-    the unreadable file, as for the all-bundled switch before)."""
+    """(disableBundledSkills is the JSON boolean true, the settings ``env`` mapping) of the settings file; a file that does not exist is empty settings, so the process environment's switches still count (the client
+    starts with none and reads its environment); None when the file exists and cannot be read (the switches then disable nothing: the personal copy's own listing check reports the unreadable file, as for the
+    all-bundled switch before)."""
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return False, {}
     except (OSError, ValueError):
         return None
     data = data if isinstance(data, dict) else {}
@@ -526,8 +550,8 @@ def bundled_skills_disabled(path: Path, env) -> bool:
     variable as equivalent to the setting (code.claude.com/docs/en/env-vars, fetched 2026-10-13: the variable's row; skills.md L29 and L333; anthropics/claude-code@3deb873687379f0c199a69fdaccc65f0865f7a29
     CHANGELOG.md L4500, 2.1.169). Measured on 2.1.296 (receipts/global-disable-init-records.json): the client lists 77 skills, and 61 with either, the bundled ``claude-api`` gone and the plugin's ``claude-api:claude-api``
     kept; only the boolean true counts in the setting (the string "true", the number 1 and null disable nothing); the variable counts as 1, true, TRUE, yes, on and a padded " 1" (not 0, 2 or an empty value); the
-    settings ``env`` entry, a string, number or boolean, overrides the process environment (1 in the environment and 0 in the entry: not disabled); the setting and the variable each disable alone. The environment passed
-    here stands for the client's, which a launcher may set otherwise. A settings file that cannot be read disables nothing: the personal copy's own listing check reports it."""
+    settings ``env`` entry, any JSON value (JavaScript's String() of it, env_text), overrides the process environment (1 in the environment and 0 in the entry: not disabled); the setting and the variable each disable alone. The environment passed
+    here stands for the client's, which a launcher may set otherwise. A settings file that does not exist is empty settings (the variable still counts); one that exists and cannot be read disables nothing: the personal copy's own listing check reports it."""
     return bundled_skill_disabled(path, env, None)
 
 

@@ -101,6 +101,19 @@ Dispositions of the rest of the read, none changing code in this round: item 4 (
 
 The cases were reproduced on `f7e0cd70` and pass on this head (`receipts/fail-before-round2.txt`); the mutants of this round are killed (`receipts/mutants-round2.txt`). Declined, with the reason: Astra's P3 5 (a regression for abbreviated digests): a fixture that names a prefix of the removed digest would publish that prefix, which is what the rule forbids; the receipt test holds every 64-hex value and the removed digest's absence is checked by the reviewer's scan, not by a value in the tree.
 
+## Review round 3 (the local review of the rebased head: two P2; the command center's ruling (a): one final bounded commit with the registry-only rebase)
+
+The local review of the rebased head found two states in which the checker said `ok` or `duplicate_listing` where the client's listing is otherwise; the command center ruled a checker that reports a wrong state a
+gate defect and bounded the fix to one commit.
+
+| Finding | Fix | Test (fails before the fix) |
+| --- | --- | --- |
+| P2-1, `scripts/skills_status.py:482-484`: `env_text` read a number only when it is a Python `int`, so a JSON `1.0` or `1e0` (a Python float) was no text and the switch was reported unset, where the client sets it | `env_text` is JavaScript's `String()` of the JSON value, as the client reads an `env` entry (measured on 2.1.296, `receipts/numeric-env-init-records.json`, 28 init-record runs: 61 skills listed with 1, 1.0, 1e0, 10e-1, 0.1e1, 1E0, 1.00, true, "1", [1], ["1"], [true] and [[1]]; 77 with 0, 0.0, 2, 1.5, -0, null, [], an object, [1, 2], ["1", "x"], [null], [null, 1] and [1, true]; the skill's own switch the same for 1.0 and 1e0): a number is its integral value without a point or an exponent below 1e21, an array its elements joined by commas, an object "[object Object]"; an array nested beyond the interpreter's depth is no switch | `test_a_number_or_an_array_in_an_env_entry_is_the_text_javascript_makes_of_it` (27 subtests of raw settings text, each through the reader and the row's twin state; three for the skill's own switch; the deep array) |
+| P2-2, `scripts/skills_status.py:514-516`: `read_switches` returned None for a settings file that does not exist, which the callers read as "disables nothing", so a process environment's `CLAUDE_CODE_DISABLE_BUNDLED_SKILLS=1` was ignored and a host with no settings file and the switch set was reported with its bundled copy listed, where the client lists neither copy | a file that does not exist is empty settings (`(False, {})`), so the process environment's switches count; a file that exists and cannot be read still disables nothing (the personal copy's own listing check reports it). With no settings file no plugin is enabled either, so a hidden bundled copy and no plugin is `not_listed` and the row fails | `test_a_missing_settings_file_is_empty_settings_and_the_environment_switch_still_counts` (the reader, the skill's own switch, the `not_listed` row, the control, the unreadable file) |
+
+The cases were reproduced on `7c7d667f1` and pass on this head (`receipts/fail-before-round3.txt`); 12 of 12 mutants of the round's change are killed (`receipts/mutants-round3-12.txt`). The push gate's read inventory
+is not changed by this commit (the module passes on the committed tree); the rebase re-derived the delta of the round-1 commit over main's tree (347 reads).
+
 ## Alternatives
 
 - **Disable the plugins, keep the personal copy and the bundled one:** `/plugin` is the documented way to turn a plugin skill off, but the typesafe plugin is the vendor's Claude Code route and the `claude-api` plugin is the pinned trial row; disabling them

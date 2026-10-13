@@ -1,0 +1,10 @@
+The tests of round 3 of #1074 (CPA-V-07: the local review of the rebased head, two P2, one bounded commit) against the sources and receipts of 7c7d667f1, the head that was read, and against this head. A test is listed once, with the number of its failing subtests and the first message.
+
+== 7c7d667f1, the head that was read (its sources and receipts, this test file)
+   tests.test_skills_status: Ran 102, FAILED (failures=14)
+      test_a_missing_settings_file_is_empty_settings_and_the_environment_switch_still_counts: 1 failing | False is not true
+      test_a_number_or_an_array_in_an_env_entry_is_the_text_javascript_makes_of_it: 13 failing, e.g. env_value='1.0' | False != True
+== this head
+   tests.test_skills_status: Ran 102, OK
+
+Tests that fail or raise on 7c7d667f1: 2 (test_skills_status): the number or array in an env entry (P2-1) and the missing settings file (P2-2). The other tests of the module hold at both heads, among them the unreadable settings file that disables nothing.

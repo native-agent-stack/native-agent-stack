@@ -19128,8 +19128,8 @@
     },
     {
       "path": "docs/decisions/2026-10-13-plugin-skill-identity.md",
-      "sha256": "a65a539db28739f3c57e8be7a99b7f55cf0b889f516b1b67f617e80240b19512",
-      "bytes": 23469
+      "sha256": "b4887a13c1ae27bfbec85ad51ffe8e96b73c6200279f7d6b437d10a5295c6f6f",
+      "bytes": 26299
     },
     {
       "path": "docs/decisions/2026-10-13-strict-paper-url-gates.md",
@@ -48288,8 +48288,8 @@
     },
     {
       "path": "evidence/artifacts/plugin-skill-identity-20261013/README.md",
-      "sha256": "1476b5d2ea5cbc99a198dbb121ae4e7757202d5500a26cdd744e061b4c8e9a60",
-      "bytes": 6028
+      "sha256": "b6afce8e7008ad7470041bcd52d3d1829a8e4e2f110e20e53ba4c5f66496910f",
+      "bytes": 6792
     },
     {
       "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/claude-api-currency.txt",
@@ -48322,6 +48322,11 @@
       "bytes": 1137
     },
     {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/fail-before-round3.txt",
+      "sha256": "d1607e353c3f9dd25edbb6a6b10b3f42fbd7e2b40ea56fee7ce83975b6459acb",
+      "bytes": 996
+    },
+    {
       "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/fail-before.txt",
       "sha256": "2ec026093bc4ffb7ef4e95d0ad69779457fcfd66f71d9d276d95f7ace2de92df",
       "bytes": 2540
@@ -48352,9 +48357,19 @@
       "bytes": 1608
     },
     {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/mutants-round3-12.txt",
+      "sha256": "f410f1d804c5c45c5f6eee002dd9326b49035816241ad4eab2e41ce948c4c1cc",
+      "bytes": 1342
+    },
+    {
       "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/mutants-v07-41.txt",
       "sha256": "980780b95b4036ade1fab15df573421f0d7a2b2459b554157b0cf2e58d09ebc9",
       "bytes": 2735
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/numeric-env-init-records.json",
+      "sha256": "fe7d1413f1c4fa4a234fb619e21caf306a1bdc62fc72896c06d2570cdd18df19",
+      "bytes": 6314
     },
     {
       "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/preload-probes.json",
@@ -61758,8 +61773,8 @@
     },
     {
       "path": "scripts/skills_status.py",
-      "sha256": "1de81b9f9082a6d9ff697e3280e0fbfe49b2024e6c90d6e67e5b5a3b6e7cab9b",
-      "bytes": 59529
+      "sha256": "70c1232390f99cc5b0cb3aaf23abef56ef9f6c69011981762c26aa03ff09aaa8",
+      "bytes": 61214
     },
     {
       "path": "scripts/starred_convergence.py",
@@ -63528,8 +63543,8 @@
     },
     {
       "path": "tests/test_skills_status.py",
-      "sha256": "d0344357b85a694d0cade755a76cfe9fc76fcd1d4114cf61451c1d73bd9d6222",
-      "bytes": 114006
+      "sha256": "c4cf2a7fa2539ed1c1c452441ae36d3d24e0ed4691ca30f8aed3dcc51bd1cfec",
+      "bytes": 118297
     },
     {
       "path": "tests/test_sota_convergence.py",
