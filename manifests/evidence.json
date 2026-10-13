@@ -16548,8 +16548,13 @@
     },
     {
       "path": "blueprints/us-equities/order-throughput/README.md",
-      "sha256": "2566538eb7fcdca0ed08f2177c8da75c1127c221a32e30498f7553ca3cd2fda1",
-      "bytes": 26070
+      "sha256": "b4ab67f74df772695f107baa58259cf025db6360613a1b30b527459386f09284",
+      "bytes": 26626
+    },
+    {
+      "path": "blueprints/us-equities/order-throughput/evidence/observe-capacity-20261013.py",
+      "sha256": "e2d0563e8103872654299513eec6bdd245997fd9e0819f94167123f5566edf45",
+      "bytes": 3409
     },
     {
       "path": "blueprints/us-equities/order-throughput/capacity.py",
@@ -62330,6 +62335,11 @@
       "path": "tests/test_capability_gate.py",
       "sha256": "60252de360d48a773ce32165f8eb0ab2e8e9f166d052bce280db54b68b0102ae",
       "bytes": 38580
+    },
+    {
+      "path": "tests/test_capacity_observer.py",
+      "sha256": "5e74f5493a64b03165b7fc692bb0905f4d900080d36f83a70fcd58484ce6cf64",
+      "bytes": 8065
     },
     {
       "path": "tests/test_catalog_decisions.py",
