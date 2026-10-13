@@ -9,20 +9,20 @@ STOP, account locking and foreign-order checks still apply.
 
 `--place-only` is recognized and recorded, but refuses before credential loading,
 SDK client creation, preflight, streaming, account locking or submission. The
-refusal is `place_only_requires_qualified_flat_recovery` for valid configuration;
-invalid arguments retain their own configuration refusals. A refusal receipt is
+refusal is `place_only_requires_qualified_flat_recovery`. Configuration checks
+that run earlier can refuse first; later notional/probe bounds are not evaluated
+after place-only refusal. A refusal receipt is
 written with zero submitted probes. A combined `--place-only --probe-limit`
 cannot bypass this boundary. There is no place-only native measurement claim.
 
 The earlier implementation returned after a single bulk cleanup and suppressed
-ordinary individual cancellation. Synthetic controls reproduced five owned
-open orders after partial 207, failed bulk cancellation, incomplete listing or
-late foreign arrival; moving the market also left five filled shares (2.5 in
-the new partial-fill control). That is unsafe even when labelled needs_attention.
+ordinary individual cancellation. It could leave residual orders or positions
+after failed cancellation or a market movement. That is unsafe even when labelled
+needs_attention.
 The corrected implementation chooses pre-submission refusal, removes the
 cancellation suppression/early cleanup branch, and removes the unused native
-bulk capability. These are controls of the real state machine, not observations
-from a paper account. Existing foreign orders remain untouched by refusal.
+bulk capability. The tests assert refusal before every broker operation; they
+do not simulate cleanup or fills. Existing foreign orders remain untouched.
 
 Primary source: alpacahq/alpaca-py0.44.0 at
 `cc4cb3b7ba50ae250e621983c2779047fb16bb28:alpaca/trading/client.py:203-215`
@@ -41,15 +41,18 @@ backoff and foreign-order cases, before admitting its first probe.
 `--probe-limit` lifts the observed-limit/headroom ceiling for one bounded
 experiment. The existing governor still paces at the configured request rate;
 its remaining-header guard is bypassed only during the experimental phase.
-There is one trading request in flight. The first observed 429 stops new
-admission and records its status, operation, time, x-ratelimit-limit,
+There is one trading request in flight. The first 429 from a request sent during
+the running stage stops new admission without overwriting an earlier STOP or
+signal reason. Cleanup-only 429s are not probe onset. The receipt records status,
+operation, completion seconds from the run start, x-ratelimit-limit,
 x-ratelimit-remaining, x-ratelimit-reset and Retry-After. Cleanup restores normal
 observed-limit/headroom admission and honors broker backoff, using the existing
 bounded prefix-owned individual cancellation and complete verification sweeps.
 The flags are refused on `recover`/`audit` before credential loading.
 
 Bounds are 90 seconds, 250 requests/minute, and one share per probe. Stock,
-notional and buying-power guards remain unchanged; requesting a rate does not
+and notional guards remain unchanged; there is no buying-power guard in this
+harness. Requesting a rate does not
 prove it reached the broker. Probe-limit retains the ordinary fast cancellation
 path. Its exposure controls do not promise that an arbitrary market movement
 can never fill a limit order.
@@ -84,6 +87,11 @@ limit onset or simultaneous three-account independence is claimed by fixtures.
 ## Receipts and follow-ups
 
 `probe_modes` records requested modes/rate, concurrency and first 429.
+The `rate` summary is snapshotted before switching to safe cleanup admission;
+`cleanup_rate` is the final management governor summary. A requested250 probe
+therefore records250 effective budget/headroom1.0, with cleanup180/headroom0.9
+when the observed limit is200. The completion-time onset is independent of a
+lagged future's later collection time.
 Exploratory `acceptance.passed` remains false. The receipt cancellation plan
 states when place-only was refused rather than describing unexecuted individual
 cancellation. Probe-limit journals retain numeric per-sequence latency samples

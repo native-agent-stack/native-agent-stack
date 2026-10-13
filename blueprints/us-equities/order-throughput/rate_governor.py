@@ -277,7 +277,7 @@ class RateGovernor:
     def summary(self):
         return {"configured_cap_per_minute": self.configured_cap,
                 "observed_limit": self.observed_limit, "effective_limit": self.effective_limit,
-                "headroom": self.headroom, "budget_per_minute": self.budget,
+                "headroom": 1.0 if self.probe_limit else self.headroom, "budget_per_minute": self.budget,
                 "reserve_per_minute": self.reserve, "bucket_capacity": self.capacity,
                 "admitted": dict(self.stats["admitted"]), "http_429": self.stats["http_429"],
                 "backoff_seconds": round(self.stats["backoff_seconds"], 3),

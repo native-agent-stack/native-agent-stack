@@ -455,6 +455,7 @@ class CapacityRun:
         self._cancel_queue = []
         self._stop_reason = None
         self._probe_first_429 = None
+        self._probe_rate = None
         self._health = set()
         self._stream_started = False
         self._broker_seen = set()
@@ -576,7 +577,7 @@ class CapacityRun:
         self._cancel_queue.append(probe.client_order_id)
 
     # -- REST -------------------------------------------------------------------
-    def _record(self, kind, response, phase):
+    def _record(self, kind, response, phase, done_at=None):
         self.responses.append({"kind": kind, "status": response.status, "origin": response.origin,
                                "headers": dict(response.headers or {}), "phase": phase})
         if response.origin == "trading" and not response.not_sent:
@@ -585,9 +586,14 @@ class CapacityRun:
                 headers = {str(k).lower(): v for k, v in (response.headers or {}).items()}
                 safe = {k: str(headers[k]) for k in ("x-ratelimit-limit", "x-ratelimit-remaining", "x-ratelimit-reset", "retry-after")
                         if k in headers and len(str(headers[k])) <= 128}
+                completed = self.clock.monotonic() if done_at is None else done_at
                 self._probe_first_429 = {"status": 429, "kind": kind, "phase": phase,
-                                         "at_monotonic": self.clock.monotonic(), "headers": safe}
-                self._stop_reason = "probe_first_http_429"
+                                         "seconds_from_start": completed - self.t0, "headers": safe}
+                # STOP may have arrived during this worker's request, before
+                # the loop observes it. Preserve it, or an earlier signal.
+                if self._stop_present():
+                    self.request_stop("stop_file_present")
+                self.request_stop("probe_first_http_429")
 
     def _timed(self, fn, *args):
         """Runs on a REST worker: the completion time is stamped there, not at collection."""
@@ -609,13 +615,14 @@ class CapacityRun:
     def _dispatch(self, kind, fn, *args, key):
         action = {"t": self.clock.monotonic(), "kind": kind, "ok": None}
         self.actions.append(action)
+        send_stage = self.stage  # capture BEFORE an InlineExecutor calls the port
         future = self.executor.submit(self._timed, fn, *args)
-        self._inflight[future] = (kind, key, action)
+        self._inflight[future] = (kind, key, action, send_stage)
 
     def _collect(self):
         """Handle every finished REST call. Never raises: a failed future is recorded."""
         for future in [future for future in self._inflight if future.done()]:
-            kind, key, action = self._inflight.pop(future)
+            kind, key, action, send_stage = self._inflight.pop(future)
             probe = self.probes[key]
             try:
                 response, done_at = future.result()
@@ -635,7 +642,7 @@ class CapacityRun:
                         self._schedule_cancel(probe)
                 continue
             action["ok"] = self._ok(response)
-            self._record(kind, response, "run")
+            self._record(kind, response, "run" if send_stage == "running" else send_stage, done_at)
             if kind == "submit":
                 self._on_submit(probe, response, done_at)
             else:
@@ -1058,6 +1065,7 @@ class CapacityRun:
         if self.config.probe_limit:
             # Honour the broker's already recorded429 freeze; restore normal
             # observed-header/headroom admission for every management request.
+            self._probe_rate = self.governor.summary()
             self.governor.probe_limit = False
             self.governor.tokens = min(self.governor.tokens, self.governor.capacity)
         # 0) Cancel-all only when enabled AND the guard proves no foreign open order exists.
@@ -1352,9 +1360,6 @@ class CapacityRun:
             index = int((action["t"] - self.t0) // 60)
             row = windows.setdefault(index, blank(index))
             kind = action["kind"]
-            if self.config.place_only and kind == "cancel_all":
-                row["cancel_all_requests"] = row.get("cancel_all_requests", 0) + 1
-                continue
             if kind == "read":
                 row["reads"] += 1
                 continue
@@ -1502,7 +1507,7 @@ class CapacityRun:
                                        else "individual DELETE /v2/orders/{order_id}"),
                            "client_order_id_prefix": self.prefix},
             "preflight": self.preflight_summary,
-            "rate": governor,
+            "rate": self._probe_rate if self._probe_rate is not None else governor,
             "rate_limit_changes": [{"seconds_from_start": None if self.t0 is None else round(item["at_monotonic"] - self.t0, 3),
                                     "limit": item["limit"], "effective_limit": item["effective_limit"],
                                     "budget": item["budget"]}
@@ -1544,6 +1549,7 @@ class CapacityRun:
                                      "requested_requests_per_minute": self.config.configured_cap_per_minute,
                                      "effective_trading_inflight": 1 if self.config.probe_limit else self.config.inflight,
                                      "first_429": self._probe_first_429}
+            result["cleanup_rate"] = governor
         return result
 
 

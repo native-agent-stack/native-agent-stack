@@ -44,9 +44,10 @@ class ProbeModeTests(unittest.TestCase):
         self.assertEqual(receipt['probe_modes']['first_429']['headers']['x-ratelimit-limit'], '200')
         self.assertIn('x-ratelimit-reset', receipt['probe_modes']['first_429']['headers'])
         self.assertTrue(receipt['cleanup']['verified_zero_open'])
-        self.assertEqual(receipt['rate']['budget_per_minute'], 180)
+        self.assertEqual(receipt['rate']['budget_per_minute'], 250)
+        self.assertEqual(receipt['cleanup_rate']['budget_per_minute'], 180)
         self.assertFalse(receipt['acceptance']['passed'])
-        self.assertFalse(any(a['t'] > receipt['probe_modes']['first_429']['at_monotonic']
+        self.assertFalse(any(a['t'] > run.t0 + receipt['probe_modes']['first_429']['seconds_from_start']
                              and a['kind'] == 'submit' for a in run.actions))
 
     def test_bulk_capability_is_not_exposed_by_the_native_port(self):
