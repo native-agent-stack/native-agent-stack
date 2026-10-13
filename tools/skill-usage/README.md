@@ -43,7 +43,12 @@ read-only for it (the live clone and the client's own state included),
 (the half's record, the combined record and its lock; create it with `mkdir -m 0700 -p`
 before enabling the timers, because a missing path fails the unit), and
 `PYTHONDONTWRITEBYTECODE=1` keeps every interpreter from writing bytecode
-(docs/decisions/2026-10-12-skill-invoke-rate-timer.md, decision 7). The refresh of
+(docs/decisions/2026-10-12-skill-invoke-rate-timer.md, decision 7). systemd starts a unit without these
+directives, and says nothing, when its manager cannot create the file system namespace (it ran the probe
+unconfined on the GitHub-hosted runner), so each service passes `--refuse-writable` for the home directory
+and the clone: the program tries to create a file there before any work and exits 2 if it can
+(`PrivateUsers=true` makes the one case that systemd can see, a user namespace that cannot be created, fail
+the unit). The refresh of
 the combined record holds a lock, so two halves that finish together (both timers
 are `Persistent=true`) leave a record built from the newest record of each.
 Live scheduled collection, and rendering, refuse a clone that is not at a

@@ -1,55 +1,130 @@
 {
  "systemd": "systemd 259 (259.5-0ubuntu3.4)",
- "control_without_the_directives": {
-  "clone": "written",
-  "other": "written",
-  "unrelated": "written",
-  "records": "written",
-  "pycache": true,
-  "helper": 7
- },
- "confined_claude": {
-  "directives": {
-   "ProtectSystem": [
-    "strict"
-   ],
-   "ProtectHome": [
-    "read-only"
-   ],
-   "PrivateTmp": [
-    "true"
-   ],
-   "ReadWritePaths": "<the record directory>"
-  },
-  "attempts": {
-   "clone": "EROFS",
-   "other": "EROFS",
-   "unrelated": "EROFS",
+ "check_exit": "0 accepted, 3 refused (require_confined over the clone, a sibling directory and the home directory, run under the manager)",
+ "native_manager": {
+  "control_without_the_directives": {
+   "clone": "written",
+   "other": "written",
+   "unrelated": "written",
    "records": "written",
-   "pycache": false,
-   "helper": 7
+   "pycache": true,
+   "helper": 7,
+   "check_exit": 3
+  },
+  "confined_claude": {
+   "directives": {
+    "ProtectSystem": [
+     "strict"
+    ],
+    "ProtectHome": [
+     "read-only"
+    ],
+    "ReadWritePaths": "<the record directory>",
+    "PrivateTmp": [
+     "true"
+    ],
+    "PrivateUsers": [
+     "true"
+    ]
+   },
+   "attempts": {
+    "clone": "EROFS",
+    "other": "EROFS",
+    "unrelated": "EROFS",
+    "records": "written",
+    "pycache": false,
+    "helper": 7
+   },
+   "check_exit": 0
+  },
+  "confined_codex": {
+   "directives": {
+    "ProtectSystem": [
+     "strict"
+    ],
+    "ProtectHome": [
+     "read-only"
+    ],
+    "ReadWritePaths": "<the record directory>",
+    "PrivateTmp": [
+     "true"
+    ],
+    "PrivateUsers": [
+     "true"
+    ]
+   },
+   "attempts": {
+    "clone": "EROFS",
+    "other": "EROFS",
+    "unrelated": "EROFS",
+    "records": "written",
+    "pycache": false,
+    "helper": 7
+   },
+   "check_exit": 0
   }
  },
- "confined_codex": {
-  "directives": {
-   "ProtectSystem": [
-    "strict"
-   ],
-   "ProtectHome": [
-    "read-only"
-   ],
-   "PrivateTmp": [
-    "true"
-   ],
-   "ReadWritePaths": "<the record directory>"
-  },
-  "attempts": {
-   "clone": "EROFS",
-   "other": "EROFS",
-   "unrelated": "EROFS",
+ "stand_in_manager": {
+  "control_without_the_directives": {
+   "clone": "written",
+   "other": "written",
+   "unrelated": "written",
    "records": "written",
-   "pycache": false,
-   "helper": 7
+   "pycache": true,
+   "helper": 7,
+   "check_exit": 3
+  },
+  "confined_claude": {
+   "directives": {
+    "ProtectSystem": [
+     "strict"
+    ],
+    "ProtectHome": [
+     "read-only"
+    ],
+    "ReadWritePaths": "<the record directory>",
+    "PrivateTmp": [
+     "true"
+    ],
+    "PrivateUsers": [
+     "true"
+    ]
+   },
+   "attempts": {
+    "clone": "written",
+    "other": "written",
+    "unrelated": "written",
+    "records": "written",
+    "pycache": false,
+    "helper": 7
+   },
+   "check_exit": 3
+  },
+  "confined_codex": {
+   "directives": {
+    "ProtectSystem": [
+     "strict"
+    ],
+    "ProtectHome": [
+     "read-only"
+    ],
+    "ReadWritePaths": "<the record directory>",
+    "PrivateTmp": [
+     "true"
+    ],
+    "PrivateUsers": [
+     "true"
+    ]
+   },
+   "attempts": {
+    "clone": "written",
+    "other": "written",
+    "unrelated": "written",
+    "records": "written",
+    "pycache": false,
+    "helper": 7
+   },
+   "check_exit": 3
   }
  }
 }

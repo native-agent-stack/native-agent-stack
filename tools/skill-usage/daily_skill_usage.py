@@ -19,9 +19,15 @@ Scheduled collection runs from a clone that is at a commit of origin/main: the
 live clone is a detached worktree of origin/main (docs/decisions/2026-10-09-claude-review-worker.md),
 so a branch name cannot be the test. A clone on a feature branch, or with
 commits of its own, is refused, and so is rendering the units for one.
+
+The service units confine the process (ProtectSystem=, ProtectHome=, ReadWritePaths=, PrivateTmp=, PrivateUsers=), but systemd starts a unit without the file system namespace, and says nothing, when its
+manager cannot create one (systemd/systemd-stable@387a14a7b67b, v255.4: src/core/exec-invoke.c L3212-L3237 and src/core/namespace.c L2488-L2497; man/systemd.exec.xml of systemd/systemd@e846bbad,
+"gracefully turned off"; seen on the GitHub-hosted runner, docs/decisions/2026-10-12-skill-invoke-rate-timer.md). A unit that started therefore proves nothing about confinement. `--refuse-writable DIR` (repeatable; the units
+pass the home directory and the clone) makes the program check first, before any work: it creates a file in each DIR and refuses (exit 2, a fixed message) if it could.
 """
 import argparse
 import contextlib
+import errno
 from datetime import timedelta
 import json
 import os
@@ -70,29 +76,37 @@ def counts(value):
             if isinstance(name, str) and NAME.fullmatch(name) and count(number) is not None]
 
 
+def table(value):
+    """`value` when it is a JSON object, else an empty one. A native report is JSON that another process wrote: a field holds an array, a string or a number where the projection reads an object (`json.loads` gives
+    an array as a list and an object as a dict, python/cpython@cbc944f4bc59 Doc/library/json.rst L385-L387), and calling `.get` on it raises. Every container the projection reads goes through here, so a field of
+    the wrong shape reads as absent: the half is then unmeasured, and nothing is published as measured."""
+    return value if isinstance(value, dict) else {}
+
+
 def project_reports(host, codex, claude, *, now, window, half="all"):
     """Project native aggregates, preserving client/group and measurement meaning. `half` names the client halves the record is for (HALF_KEYS): `measured` holds only their keys, so a half is not
-    unmeasured for want of the other half's report."""
-    use_groups = host.get("codex_use_groups", {}).get(str(window), {}) if isinstance(host, dict) and isinstance(host.get("codex_use_groups"), dict) else {}
-    codex_state = host.get("codex", {}) if isinstance(host, dict) else {}
-    codex_measured = (isinstance(codex, dict) and codex.get("kind") == KINDS[1] and bool(use_groups)
-                      and isinstance(codex_state, dict) and codex_state.get("measured") is True
+    unmeasured for want of the other half's report. Every container of a native report is read through `table`, so a report of the wrong shape cannot raise here."""
+    host_t, codex_t, claude_t = table(host), table(codex), table(claude)
+    use_groups = table(table(host_t.get("codex_use_groups")).get(str(window)))
+    codex_state = table(host_t.get("codex"))
+    codex_measured = (codex_t.get("kind") == KINDS[1] and bool(use_groups)
+                      and codex_state.get("measured") is True
                       and (count(codex_state.get("roots_count")) or 0) > 0
                       and (count(codex_state.get("files_scanned")) or 0) > 0)
     host_rows = None
     baseline = json.loads((ROOT / "adoption/skills/claude-routing/trigger-baseline.json").read_text())
     wiring = {row["name"]: row for row in baseline.get("skills", [])}
-    if isinstance(host, dict) and host.get("kind") == KINDS[0] and isinstance(host.get("skills"), list):
+    if host_t.get("kind") == KINDS[0] and isinstance(host_t.get("skills"), list):
         host_rows = []
-        for row in host["skills"]:
+        for row in host_t["skills"]:
             if not isinstance(row, dict) or not isinstance(row.get("name"), str) or not NAME.fullmatch(row["name"]):
                 continue
-            c = row.get("claude") if isinstance(row.get("claude"), dict) else {}
-            x = row.get("codex") if isinstance(row.get("codex"), dict) else {}
-            days = x.get("counts", {}).get(str(window), {})
+            c = table(row.get("claude"))
+            x = table(row.get("codex"))
+            days = table(table(x.get("counts")).get(str(window)))
             host_rows.append({"name": row["name"], "claude_uses_lifetime": count(c.get("uses")),
                               "wiring": wiring.get(row["name"], {}).get("status"),
-                              "codex_use": count(x.get("use_counts", {}).get(str(window))) if codex_measured else None,
+                              "codex_use": count(table(x.get("use_counts")).get(str(window))) if codex_measured else None,
                               "codex_skill_md_reads": count(days.get("skill_md_reads")) if codex_measured else None,
                               "codex_name_mentions": count(days.get("name_mentions")) if codex_measured else None})
     lanes = []
@@ -100,42 +114,74 @@ def project_reports(host, codex, claude, *, now, window, half="all"):
         if NAME.fullmatch(name) and isinstance(aggregate, dict):
             rows = counts(aggregate.get(field))
             if client == "codex":
-                if not codex_measured:
-                    use = None
+                if not codex_measured or not isinstance(use, dict):
+                    use = None      # unknown stays unknown (a count of None), never zero
                 raw = {row["name"]: row["count"] for row in rows}
                 rows = [{"name": skill, "count": count(use.get(skill, 0)) if isinstance(use, dict) else None,
                          "raw_reads": raw.get(skill, 0)} for skill in sorted(set(raw) | set(use or {}))
                         if isinstance(skill, str) and NAME.fullmatch(skill)]
             lanes.append({"client": client, "lane": name, "skills": rows,
                           "metric": "use" if client == "codex" else "skill_calls"})
-    if isinstance(codex, dict) and codex.get("kind") == KINDS[1]:
-        groups = codex.get("groups", {})
+    if codex_t.get("kind") == KINDS[1]:
+        groups = table(codex_t.get("groups"))
         for name in ("workers", "negative_controls", "unclassified"):
             if name in groups:
                 lane("codex", name, groups[name], "skill_md_reads", use_groups.get(name))
-        for name, group in groups.get("workers_by_role", {}).items():
-            lane("codex", "role:" + name, group, "skill_md_reads", use_groups.get("workers_by_role", {}).get(name))
-        for name, group in groups.get("workers_by_kind", {}).items():
-            lane("codex", "kind:" + name, group, "skill_md_reads", use_groups.get("workers_by_kind", {}).get(name))
-    if isinstance(claude, dict) and claude.get("kind") == KINDS[2]:
-        for spawn, agents in claude.get("groups", {}).get("by_spawn_and_agent_type", {}).items():
-            for name, group in agents.items():
+        for name, group in table(groups.get("workers_by_role")).items():
+            lane("codex", "role:" + name, group, "skill_md_reads", table(use_groups.get("workers_by_role")).get(name))
+        for name, group in table(groups.get("workers_by_kind")).items():
+            lane("codex", "kind:" + name, group, "skill_md_reads", table(use_groups.get("workers_by_kind")).get(name))
+    if claude_t.get("kind") == KINDS[2]:
+        for spawn, agents in table(table(claude_t.get("groups")).get("by_spawn_and_agent_type")).items():
+            for name, group in table(agents).items():
                 lane("claude", spawn + ":" + name, group, "skill_calls")
-        if isinstance(claude.get("main"), dict):
-            lane("claude", "main", claude["main"], "skill_calls")
-    measured = {"host": host_rows is not None and host.get("claude", {}).get("measured") is True,
+        if isinstance(claude_t.get("main"), dict):
+            lane("claude", "main", claude_t["main"], "skill_calls")
+    measured = {"host": host_rows is not None and table(host_t.get("claude")).get("measured") is True,
                 "codex": codex_measured,
-                "claude": isinstance(claude, dict) and claude.get("kind") == KINDS[2]}
+                "claude": claude_t.get("kind") == KINDS[2]}
     return {"schema": SCHEMA, "half": half, "generated_at": now, "window_days": window,
             "host": host_rows, "lanes": lanes if codex is not None or claude is not None else None,
             "zero_use": {"codex": [row["name"] for row in host_rows or [] if row["codex_use"] == 0],
                          "claude_host_lifetime": [row["name"] for row in host_rows or [] if row["claude_uses_lifetime"] == 0]},
-            "codex_bulk_scan_limit": host.get("codex_use_policy", {}).get("max_distinct_skill_reads") if isinstance(host, dict) and isinstance(host.get("codex_use_policy"), dict) else None,
+            "codex_bulk_scan_limit": table(host_t.get("codex_use_policy")).get("max_distinct_skill_reads"),
             "measured": {key: measured[key] for key in HALF_KEYS[half]}}
 
 
-class CloneRefused(ValueError):
+class Refused(ValueError):
+    """A refusal to run. The message is fixed text, safe to print: it names no path, no account and no exception text."""
+
+
+class CloneRefused(Refused):
     """The clone is not at a commit of origin/main. The message is fixed text, safe to print."""
+
+
+class Unconfined(Refused):
+    """The process can write where its service unit forbids it. The message is fixed text, safe to print."""
+
+
+# A refused write is what a confined process sees: EROFS from a read-only mount (ProtectSystem=, ProtectHome=), EACCES or EPERM where the mode or a policy forbids it. Anything else (a directory that is not there,
+# an I/O error) says nothing about confinement.
+WRITE_REFUSED = (errno.EROFS, errno.EACCES, errno.EPERM)
+
+
+def require_confined(directories, *, opener=os.open, remover=os.unlink):
+    """Refuse (Unconfined) unless a file cannot be created in any of `directories`. systemd starts a unit without the file system namespace, and says nothing, when its manager cannot create one, so a unit
+    that started does not prove that ProtectSystem=, ProtectHome= and ReadWritePaths= are in effect (systemd/systemd-stable@387a14a7b67b, v255.4: src/core/exec-invoke.c L3212-L3237, src/core/namespace.c
+    L2488-L2497). The check asks the file system instead. A probe file that could be created is removed again. A directory that cannot be probed (absent, an I/O error) is a ValueError: the run is refused
+    because nothing is known."""
+    for directory in directories:
+        probe = os.path.join(str(directory), f".skill-usage-confinement-probe-{os.getpid()}")
+        try:
+            descriptor = opener(probe, os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0), 0o600)
+        except OSError as error:
+            if error.errno in WRITE_REFUSED:
+                continue
+            raise ValueError("a directory that must be read-only cannot be probed") from None
+        os.close(descriptor)
+        with contextlib.suppress(OSError):
+            remover(probe)
+        raise Unconfined("this process can write where its service unit forbids it, so the unit's file system directives are not in effect and it did not run")
 
 
 def on_reviewed_main(root=ROOT):
@@ -341,8 +387,12 @@ def main(argv=None):
     parser.add_argument("--render-units", type=Path)
     parser.add_argument("--repository", type=Path, default=ROOT)
     parser.add_argument("--python", type=Path, default=Path(sys.executable))
+    parser.add_argument("--refuse-writable", action="append", type=Path, default=[], metavar="DIR",
+                        help="refuse to run (exit 2) if a file can be created in DIR; the service units pass the home directory and the clone, which their directives make read-only")
     args = parser.parse_args(argv)
     try:
+        if args.refuse_writable and not args.render_units:
+            require_confined(args.refuse_writable)   # before any work: a unit that started proves nothing about the file system it sees
         if args.render_units:
             node = shutil.which(args.node)
             if not node:
@@ -375,10 +425,10 @@ def main(argv=None):
         if args.combined_out and args.half and not refresh_combined(args.combined_out, report, args.other_record):
             print("daily skill usage: the combined record was not refreshed", file=sys.stderr)
         return 0 if all(report["measured"].values()) else 1
-    except CloneRefused as error:
+    except Refused as error:
         print(f"daily skill usage refused: {error}", file=sys.stderr)
         return 2
-    except (OSError, ValueError, subprocess.SubprocessError):
+    except (OSError, ValueError, TypeError, AttributeError, KeyError, subprocess.SubprocessError):   # never the exception's text or a traceback: both name the account's home
         print("daily skill usage unavailable; inspect the native collector separately", file=sys.stderr)
         return 2
 

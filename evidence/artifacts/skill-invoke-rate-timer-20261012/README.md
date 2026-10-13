@@ -12,11 +12,16 @@ decision's tables had no receipts in the repository; what has none is listed at 
 | `receipts/capture-timings/` | the `/skill-doctor` capture, 8 quiet runs (17.2 to 20.1 s) in the unit's environment and the interactive one, and 2 at three runnable threads per CPU (61.9 s, 57.7 s) |
 | `receipts/unsandboxed-halves-end-to-end.txt` | the rendered units of the split, one after the other, before the sandbox: Claude 2 min 43.9 s, Codex 28 min 3.6 s, both exit 0 |
 | `receipts/sandboxed-halves-end-to-end.txt` | the same units with the sandbox of decision 7, from a scratch live clone: Claude 3 min 7.5 s, Codex 33 min 58.1 s (the host was loaded by other work), both exit 0; the records they wrote (modes, `measured`, counts) and the untouched clone |
-| `receipts/sandbox-probe.json` | the probe of `ServiceSandboxRuntimeTests` for both services and for the control without the directives: writes to the clone, a sibling directory and the home are `EROFS` under the directives, `written` without them; the record directory is written; bytecode appears only in the control |
-| `receipts/analyze-security.txt` | `systemd-analyze security --offline=yes --user --json=short` rows for `ProtectSystem=`, `ProtectHome=`, `PrivateTmp=` and `PrivateUsers=` of the rendered services, on the sources of `6c4bbd0db` and after this change |
+| `receipts/sandbox-probe.json` | the probe of `NativeManagerTests` (round 3 rebuilt the runtime tests; the manager of this host applies the directives) and of `StubManagerTests` (a stand-in that accepts every property and applies none), for both services and for the control without the directives: writes to the clone, a sibling directory and the home are `EROFS` under the directives through this host's manager and `written` without them or through the stand-in; the record directory is written; bytecode appears only in the control; `check_exit` is the program's own check (`require_confined`): 0 accepted under the applied directives, 3 refused in every other case |
+| `receipts/analyze-security.txt` | `systemd-analyze security --offline=yes --user --json=short` rows for `ProtectSystem=`, `ProtectHome=`, `PrivateTmp=` and `PrivateUsers=` of the rendered services, on the sources of `6c4bbd0db`, after round 2, and after round 3 (which adds `PrivateUsers=true`) |
 | `receipts/mutants-split-34.txt` | the 34 mutants of the split, run on the code and tests of round 2 (the anchors that round 2 rewrote were moved to the new code): 34 of 34 killed |
 | `receipts/mutants-round2-26.txt` | the 26 mutants of round 2 (the other half's record, the refresh lock, the unit templates): 26 of 26 killed (a mutant that hangs counts as killed) |
 | `receipts/fail-before-round2.txt` | the round-2 test file against the sources of `6c4bbd0db`: `FAILED (failures=25, errors=9)` of 41 tests |
+| `receipts/ci-runner-unconfined-20261013.txt` | round 3: the failed shard of the pull request at `68d4f4343` on a GitHub-hosted runner (run 38325995828, job 115064673607): the manager accepted the rendered directives and the probe wrote to the clone, a sibling directory and the home directory; the runner image and the systemd version it lists |
+| `receipts/fail-before-round3.txt` | the round-3 test file against the sources of `68d4f4343`: `FAILED (failures=11, errors=39)` of 59 tests, in 20 tests |
+| `receipts/mutants-round3-35.txt` | the 35 mutants of round 3 (the native-report shapes, the confinement check and its option, the unit templates): 35 of 35 killed |
+
+The mutation driver of round 3 (`daily_mutants_r3.py`) and the receipts builder are scripts of the author's private record; the mutants are listed in `receipts/mutants-round3-35.txt` by label, one change each.
 
 ## Claims of the decision record without a receipt here
 
