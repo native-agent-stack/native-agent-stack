@@ -522,6 +522,106 @@ class FileCustodyTests(unittest.TestCase):
             store_mod.run_from_env("github-review-app", env=env, isolated_start=True)
         self.assertFalse((self.store / "github-review-app.pem").exists())
 
+    # Astra's first read of #1057 at d9a7199d (findings 1 and 2, the read's verdict, a private record cited by name).
+    def test_a_source_with_another_hard_link_is_refused_and_every_link_stays(self):
+        source = self.make_key()
+        os.chmod(source, 0o644)
+        other = self.downloads / "other-name.pem"
+        os.link(source, other)
+        with self.assertRaisesRegex(store_mod.Refused, "another hard link"):
+            self.custody(source)
+        self.assertTrue(source.exists() and other.exists())
+        self.assertFalse((self.store / "github-review-app.pem").exists())
+
+    def test_a_source_owned_by_another_user_is_refused(self):
+        source = self.make_key()
+        with self.assertRaisesRegex(store_mod.Refused, "source is not owned by you"):
+            self.custody(source, uid=os.getuid() + 1)
+        self.assertTrue(source.exists())
+        self.assertFalse(self.store.exists())  # refused before the store is touched
+
+    def test_a_link_made_during_the_copy_keeps_the_source_and_reports_cleanup_incomplete(self):
+        source = self.make_key()
+        data = source.read_bytes()
+        real = store_mod.key_file_valid
+
+        def valid_then_linked(*args):
+            os.link(source, self.downloads / "made-during-copy.pem")
+            return real(*args)
+
+        with mock.patch.object(store_mod, "key_file_valid", side_effect=valid_then_linked):
+            code, output = self.custody(source)
+        self.assertEqual(code, store_mod.CLEANUP_INCOMPLETE)
+        self.assertIn("source cleanup incomplete", output)
+        self.assertEqual((self.store / "github-review-app.pem").read_bytes(), data)
+        self.assertTrue(source.exists())
+        self.assertNotIn(str(self.downloads), output)
+        self.assert_nothing_of(data, output)
+
+    def test_a_failed_source_check_or_removal_after_storing_reports_cleanup_incomplete_without_the_path(self):
+        for call in ("lstat", "unlink"):
+            with self.subTest(failing=call):
+                source = self.make_key(f"{call}.pem")
+                data = source.read_bytes()
+                real = getattr(store_mod.os, call)
+
+                def failing(path, *args, real=real, source=source, **kwargs):
+                    if not kwargs and str(path) == str(source):
+                        raise PermissionError(13, "Permission denied", str(path))
+                    return real(path, *args, **kwargs)
+
+                with mock.patch.object(store_mod.os, call, side_effect=failing):
+                    code, output = self.custody(source)
+                self.assertEqual(code, store_mod.CLEANUP_INCOMPLETE)
+                self.assertIn("source cleanup incomplete", output)
+                self.assertEqual((self.store / "github-review-app.pem").read_bytes(), data)
+                self.assertTrue(source.exists())
+                self.assertNotIn(str(self.downloads), output)
+                self.assert_nothing_of(data, output)
+                (self.store / "github-review-app.pem").unlink()
+                source.unlink()
+
+    def test_a_failed_store_write_keeps_the_source_and_names_no_path(self):
+        for call in ("fsync", "replace"):
+            with self.subTest(failing=call):
+                source = self.make_key(f"{call}.pem")
+                data = source.read_bytes()
+
+                def failing(*args, **kwargs):
+                    raise OSError(5, "Input/output error", str(source))
+
+                with mock.patch.object(store_mod.os, call, side_effect=failing), \
+                        self.assertRaisesRegex(store_mod.Refused, "nothing moved") as raised:
+                    self.custody(source)
+                self.assertNotIn(str(self.downloads), str(raised.exception))
+                self.assertIsNone(raised.exception.__cause__)
+                self.assertTrue(raised.exception.__suppress_context__)
+                self.assertEqual(source.read_bytes(), data)
+                self.assertEqual([q.name for q in self.store.iterdir()], [])  # no key and no temporary file
+                source.unlink()
+
+    def test_the_cli_reports_cleanup_incomplete_without_a_traceback_or_the_path(self):
+        source = self.make_key()
+        real = store_mod.os.unlink
+
+        def failing(path, *args, **kwargs):
+            if not kwargs and str(path) == str(source):
+                raise PermissionError(13, "Permission denied", str(path))
+            return real(path, *args, **kwargs)
+
+        out, err = io.StringIO(), io.StringIO()
+        with mock.patch.dict(os.environ, self.env), mock.patch.object(store_mod.os, "unlink", side_effect=failing), \
+                mock.patch("builtins.input", return_value=str(source)), \
+                mock.patch.object(sys.stdin, "isatty", return_value=True), \
+                mock.patch.object(out, "isatty", return_value=True, create=True), \
+                mock.patch.object(sys, "stdout", out), mock.patch.object(sys, "stderr", err):
+            code = store_mod.main(["github-review-app", "--from-file"])
+        self.assertEqual(code, store_mod.CLEANUP_INCOMPLETE)
+        self.assertIn("source cleanup incomplete", out.getvalue() + err.getvalue())
+        self.assertNotIn("Traceback", err.getvalue())
+        self.assertNotIn(str(self.downloads), out.getvalue() + err.getvalue())
+        self.assertTrue(source.exists() and (self.store / "github-review-app.pem").exists())
+
     def test_cli_refuses_both_modes_together(self):
         with mock.patch.object(sys, "stderr", io.StringIO()) as err:
             self.assertEqual(store_mod.main(["github-review-app", "--from-env", "--from-file"]), 2)

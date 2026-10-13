@@ -72,6 +72,7 @@ KEY_PREFIX_HINT = {"alpaca-paper": "PK", "alpaca-paper-2": "PK", "alpaca-paper-c
 KEY_FILE_CLASSES = {"github_app_private_key"}
 MAX_KEY_FILE_BYTES = 64 * 1024
 OPENSSL_SECONDS = 30
+CLEANUP_INCOMPLETE = 3  # the key is stored and checked, but the downloaded file was not removed
 
 
 class Refused(Exception):
@@ -119,9 +120,12 @@ def load_file_entry(entry_id: str, root: Path = ROOT, env=None) -> dict:
     return entry
 
 
-def open_source(source: str) -> tuple[int, os.stat_result]:
+def open_source(source: str, uid: int) -> tuple[int, os.stat_result]:
     """The downloaded file, opened without following a symlink: a regular, nonempty file of at most
-    MAX_KEY_FILE_BYTES. Its mode is not checked (a Windows drive mounted in WSL reports invented mode bits)."""
+    MAX_KEY_FILE_BYTES, owned by the operator and with exactly one link. Custody removes that link; a second link would
+    keep the key, with whatever mode it has, where custody cannot see it (Astra's first read of #1057, finding 1). Its
+    mode is not checked: a Windows drive mounted in WSL reports invented mode bits, and the one link is removed once
+    the stored copy passes its check."""
     if not source or "\0" in source:
         raise Refused("no source path given")
     try:
@@ -137,6 +141,13 @@ def open_source(source: str) -> tuple[int, os.stat_result]:
     if info.st_size == 0 or info.st_size > MAX_KEY_FILE_BYTES:
         os.close(fd)
         raise Refused(f"source size is not that of a key file (1 to {MAX_KEY_FILE_BYTES} bytes)")
+    if info.st_uid != uid:
+        os.close(fd)
+        raise Refused("source is not owned by you; nothing moved")
+    if info.st_nlink != 1:
+        os.close(fd)
+        raise Refused("source has another hard link; nothing moved: remove its other links first, so that custody "
+                      "leaves no copy behind")
     return fd, info
 
 
@@ -158,13 +169,17 @@ def key_file_valid(dfd: int, name: str, openssl: str) -> bool:
     return done.returncode == 0
 
 
-def run_from_file(entry_id: str, *, env=None, uid=None, ask=input, prompt=getpass.getpass, out=sys.stdout,
+def run_from_file(entry_id: str, *, env=None, uid=None, ask=None, prompt=getpass.getpass, out=None,
                   root: Path = ROOT, openssl: str | None = None) -> int:
     """Take custody of a downloaded key file: copy it into the store as a new 0600 file, check the copy with
     `openssl pkey -noout`, and only then remove the original. Every refusal comes before the stored name changes; a
-    copy that fails the check is removed and the original stays. The output names the entry, never contents."""
+    copy that fails the check is removed and the original stays. The output names the entry, never contents or a path:
+    a failed file operation before the key is stored is a refusal with fixed text (nothing moved), and one after it
+    returns CLEANUP_INCOMPLETE with the state of both files (Astra's first read of #1057, finding 2)."""
     env = os.environ if env is None else env
     uid = os.getuid() if uid is None else uid
+    ask = input if ask is None else ask  # both looked up per call, not bound when the module loads
+    out = sys.stdout if out is None else out
     entry = load_file_entry(entry_id, root, env)
     openssl = openssl or shutil.which("openssl")
     if not openssl:
@@ -173,7 +188,8 @@ def run_from_file(entry_id: str, *, env=None, uid=None, ask=input, prompt=getpas
     print(f"{entry['label']}: give the path of the downloaded file (it is moved into the store and removed "
           "from where it is).", file=out)
     source = ask("  path: ").strip()
-    src_fd, src_info = open_source(source)
+    src_fd, src_info = open_source(source, uid)
+    stored = False
     try:
         dfd = open_store(path.parent, uid)
         try:
@@ -202,6 +218,7 @@ def run_from_file(entry_id: str, *, env=None, uid=None, ask=input, prompt=getpas
                     raise Refused("the file is not a private key openssl can read without a passphrase; "
                                   "nothing moved, the downloaded file stays where it is")
                 os.replace(tmp, path.name, src_dir_fd=dfd, dst_dir_fd=dfd)
+                stored = True
                 os.fsync(dfd)
             except BaseException:
                 if fd >= 0:
@@ -214,13 +231,21 @@ def run_from_file(entry_id: str, *, env=None, uid=None, ask=input, prompt=getpas
         finally:
             os.close(dfd)
         # The stored copy is in place and checked: remove the original, but only if the typed path still names the
-        # file that was copied (same device and inode).
+        # file that was copied (same device and inode) and that file still has one link.
         now = os.lstat(source)
-        if (now.st_dev, now.st_ino) != (src_info.st_dev, src_info.st_ino):
-            print(f"stored {entry_id} -> {entry['store']['path_template']} (0600); the downloaded file changed "
-                  "while it was copied, so it was not removed: remove it yourself", file=out)
-            return 0
+        if (now.st_dev, now.st_ino) != (src_info.st_dev, src_info.st_ino) or now.st_nlink != 1:
+            print(f"stored {entry_id} -> {entry['store']['path_template']} (0600); key check passed; source cleanup "
+                  "incomplete: the downloaded file changed or gained a link while it was copied, so it was not "
+                  "removed: remove every copy of it yourself", file=out)
+            return CLEANUP_INCOMPLETE
         os.unlink(source)
+    except OSError:
+        # The exception text is never shown: it would name the source path.
+        if stored:
+            print(f"stored {entry_id} -> {entry['store']['path_template']} (0600); key check passed; source cleanup "
+                  "incomplete: the downloaded file could not be checked or removed: remove it yourself", file=out)
+            return CLEANUP_INCOMPLETE
+        raise Refused("a file operation failed; nothing moved, the downloaded file stays where it is") from None
     finally:
         os.close(src_fd)
     print(f"stored {entry_id} -> {entry['store']['path_template']} (0600); key check passed; the downloaded file "
@@ -441,6 +466,10 @@ def main(argv=None) -> int:
     except (KeyboardInterrupt, EOFError):
         print("\ncancelled; nothing written", file=sys.stderr)
         return 130
+    except Exception as error:  # no traceback: it could quote a path or whatever was being handled
+        print(f"failed: unexpected {type(error).__name__}; no path or value was printed; "
+              "check with python3 scripts/credential_status.py", file=sys.stderr)
+        return 1
 
 
 if __name__ == "__main__":

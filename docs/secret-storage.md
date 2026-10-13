@@ -457,8 +457,12 @@ The command opens a new terminal window: Windows Terminal on WSL2 (or a console 
   status (a passphrase-protected key fails instead of prompting). If the check fails, the copy is removed and the
   downloaded file stays where it was. If it passes, the copy takes the final name (an existing key needs `replace` at
   the hidden prompt first) and only then is the downloaded file removed, provided the typed path still names the file
-  that was copied. Neither the hidden prompt nor `--from-env` accepts a key-file entry, so no `export` line is ever
-  written to a key file.
+  that was copied and it still has one link. The downloaded file must be yours and have exactly one link: custody
+  removes that link, and a second one would keep the key where custody cannot see it. A failed file operation never
+  names a path. Before the key is stored, nothing moves and the downloaded file stays; after it, the tool reports the
+  key stored and the source cleanup incomplete (exit 3), and you remove the downloaded file yourself (Astra's first
+  read of #1057, findings 1 and 2). Neither the hidden prompt nor `--from-env` accepts a key-file entry, so no
+  `export` line is ever written to a key file.
 - **Paper rate limit:** `tools/credentials/alpaca_rate_limit_probe.py` sends one read-only `GET /v2/account` to the fixed paper host. It follows no redirect, reads no response body and places no order. It saves only the HTTP status and the `x-ratelimit-*` headers, under `${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/rate-limit/`, where a later session can read them. `x-ratelimit-limit` is Alpaca's own per-account calls-per-minute figure (200 on the standard tier), so measuring it never needs order traffic. Agents may run it with `--env-file "$PAPER_ENV_FILE"`.
 
 Live broker keys are out of scope for this repository. Live trading is handled outside it, and no tool here accepts a live endpoint.

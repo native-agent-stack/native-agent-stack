@@ -11423,8 +11423,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-read-deltas.json",
-      "sha256": "71680301005e030ac0371d175ccbe8eba365a55560f71299c71d09fc4ffca625",
-      "bytes": 371
+      "sha256": "7dd64219a5f523c1fe653c2148089bc3e27c91821d81c5678e275fb2b639f590",
+      "bytes": 479
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
@@ -11450,6 +11450,11 @@
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261012-pr949-delta.json",
       "sha256": "f2f79a45d92e6be9d953ecc42a5623e78860d593ac36e38a173ae17c2b1502dc",
       "bytes": 6482
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261013-pr1057-delta.json",
+      "sha256": "59772b7af0a432d1f90151381993bf667c39a25da2152cc83975090493f46123",
+      "bytes": 12295
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unit-pass.txt",
@@ -17338,7 +17343,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "d4acb2eaede7ecad6bc73be2f009454d10892995aa48f06c706fdc04038423c2",
+      "sha256": "b36e4314b3b29f212800e466d57c289e5fcd0f0d0958902dcde444365b118dc5",
       "bytes": 190328
     },
     {
@@ -19413,8 +19418,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "e23b442799b5306b6e3313c45d10fabd468ef6057e26b57a5ff6f7e20b24b406",
-      "bytes": 206369
+      "sha256": "2102263a18d2378d6633ed1bc98f057eb3f304aa2df18603a238d66771745f95",
+      "bytes": 206850
     },
     {
       "path": "docs/stack.md",
@@ -62248,8 +62253,8 @@
     },
     {
       "path": "tests/test_credential_tools.py",
-      "sha256": "a30284babe967f17c1bb4fa6094da108ba0d012b8d80ced1277ae81971e01ed2",
-      "bytes": 43324
+      "sha256": "bcb0817342cf406051f660228c06669c42deb998daed7d93d6c95d822d4cffc9",
+      "bytes": 48687
     },
     {
       "path": "tests/test_currency_due.py",
@@ -63628,8 +63633,8 @@
     },
     {
       "path": "tools/credentials/set_credential.py",
-      "sha256": "2927c7ea67c4b899a8da9914ea6763fb8d1972c655fd45b21b3bece0bbea172d",
-      "bytes": 22504
+      "sha256": "d24e1ae730341ae0fbd80b8b7d8899fc8d7f7a52a5891ad75f425f92beeab2a8",
+      "bytes": 24599
     },
     {
       "path": "tools/invocation-monitoring/README.md",
