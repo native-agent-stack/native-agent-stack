@@ -1,0 +1,145 @@
+"""Synthetic lane-A session-only continuity; no broker or account state."""
+import asyncio
+import contextlib
+from contextlib import closing
+from decimal import Decimal
+import hashlib
+import json
+from pathlib import Path
+import sys
+import tempfile
+import unittest
+from uuid import UUID
+from unittest.mock import AsyncMock, Mock, patch
+
+SOURCE=Path(__file__).resolve().parents[1]/"blueprints/us-equities/adaptive-paper"
+sys.path.insert(0,str(SOURCE))
+import runner
+from safety import Ledger, SafetyError
+from tests.adaptive_paper_hermetic import patch_default_stop, restore_default_stop
+
+TOKEN=None
+
+
+def setUpModule():
+    global TOKEN
+    TOKEN=patch_default_stop()
+
+
+def tearDownModule():
+    restore_default_stop(TOKEN)
+
+
+class LaneASessionContinuity(unittest.TestCase):
+    def exercise(self,*,command="paper",change="session",phase="finished",cash="9999.75",halt=None):
+        with tempfile.TemporaryDirectory(dir="/var/tmp") as directory:
+            root=Path(directory)
+            old_path=SOURCE/"config-leverage-1x.json"
+            original=json.loads(old_path.read_text())
+            changed=json.loads(old_path.read_text())
+            if change=="session":
+                changed["regular_session_only"]=False
+                changed["extended_hours_enabled"]=True
+                changed["sessions"]["extended_hours"]=True
+            elif change=="stop":
+                changed["stop_bps"]+=1
+            elif change=="universe":
+                changed["symbols"]=changed["symbols"][:-1]
+            elif change=="rung":
+                changed=json.loads((SOURCE/"config-leverage-2x.json").read_text())
+            config_path=root/"config.json"
+            config_path.write_text(json.dumps(changed))
+            config,limits,pc=runner.load_config(config_path)
+            _,old_limits,_=runner.load_config(old_path)
+            state_root=root/"account-state"
+            state=state_root/("0"*64)/"adaptive"
+            state.mkdir(parents=True)
+            now=1800000000.
+            old_meta={"trial_id":"prior","phase":phase,"config_sha256":hashlib.sha256(old_path.read_bytes()).hexdigest(),
+                      "started_at":now,"fee_window_start":now,"baseline_cash":"10000"}
+            with closing(Ledger(state/"ledger.sqlite3",old_limits)) as ledger:
+                ledger.begin_next_trial(now,"prior")
+                ledger.request_budget(now,"read")
+                ledger.record_fees([{"id":"1800000000::"+str(UUID(int=2)),
+                    "date":"2027-01-15","net_amount":"-0.25","sub_type":"REG"}],now+1)
+                if halt:
+                    ledger.freeze(halt)
+            (state/"trial.json").write_text(json.dumps(old_meta))
+            output=root/"receipt.json"
+            argv=["runner.py",command,"--credentials","keychain-env","--config",str(config_path),
+                  "--output",str(output),"--trial","next","--state-root",str(state_root)]
+            observe={"account_identity_sha256":"0"*64,"account":{"cash":cash},"assets":[]}
+            async def native(*args,**kwargs):
+                return {"status":"completed_no_signals","flat":True,"native_fill_events":0}
+            async def recover(*args,**kwargs):
+                return {"status":"passed","flat":True,"positions":[],"unresolved_orders":[],
+                        "reconciliation":{"positions":0,"open_orders":0}}
+            with patch.object(sys,"argv",argv), \
+                 patch.object(runner,"load_config",return_value=(config,limits,pc)), \
+                 patch.object(runner,"check_order_contract_boundary",return_value={}), \
+                 patch.object(runner,"paper_credentials",return_value=(None,None)), \
+                 patch.object(runner,"preflight",return_value=observe), \
+                 patch.object(runner,"public_preflight",return_value={}), \
+                 patch.object(runner,"validate_preflight",return_value=now+3600), \
+                 patch.object(runner,"account_lock_fingerprint",return_value=contextlib.nullcontext()), \
+                 patch.object(runner,"fee_activities",return_value=[]), \
+                 patch.object(runner,"AlpacaPaperTransport",return_value=Mock()), \
+                 patch("recovery.recover",side_effect=recover), \
+                 patch.object(runner,"run_native",side_effect=native), \
+                 patch.object(runner.time,"time",return_value=now+2):
+                rc=runner.main()
+            self.assertEqual(rc,0)
+            latest=json.loads((state/"trial.json").read_text())
+            self.assertEqual(latest["fee_window_start"],now)
+            self.assertEqual(latest["baseline_cash"],"10000")
+            self.assertEqual(latest["config_sha256"],hashlib.sha256(config_path.read_bytes()).hexdigest())
+            with closing(Ledger(state/"ledger.sqlite3",limits)) as ledger:
+                self.assertEqual(ledger.accounting().cash_delta_usd,Decimal("-0.25"))
+                self.assertEqual(len(ledger.fees()),1)
+                self.assertGreaterEqual(ledger.db.execute("SELECT COUNT(*) FROM requests").fetchone()[0],1)
+            return latest
+
+    def test_session_fields_only_start_continues_existing_risk_and_cash_lineage(self):
+        self.exercise()
+
+    def test_session_fields_only_recovery_is_bound_to_the_same_trading_envelope(self):
+        self.exercise(command="recover")
+
+    def test_trading_fields_and_rung_changes_still_refuse(self):
+        for change,reason in (("stop","next_trial_config_differs_from_frozen_limits"),
+                              ("universe","next_trial_config_differs_from_frozen_limits"),
+                              ("rung","persisted_risk_limits_differ")):
+            with self.subTest(change=change),self.assertRaisesRegex(SafetyError,"^"+reason+"$"):
+                self.exercise(change=change)
+
+    def test_unfinished_cash_drift_and_latched_halt_cannot_be_evaded_by_a_session_change(self):
+        for kwargs,reason in (({"phase":"starting"},"existing_trial_requires_explicit_recovery"),
+                              ({"cash":"10001"},"next_trial_cash_mismatch"),
+                              ({"halt":"drawdown_cap_reached"},"next_trial_cannot_clear_risk_halt")):
+            with self.subTest(kwargs=kwargs),self.assertRaisesRegex(SafetyError,"^"+reason+"$"):
+                self.exercise(**kwargs)
+
+    def test_new_binding_is_deterministic_and_freezes_every_other_field(self):
+        raw=json.loads((SOURCE/"config-leverage-1x.json").read_text())
+        old=runner.frozen_trading_config_sha256(raw)
+        changed=json.loads(json.dumps(raw))
+        changed.update(regular_session_only=False,extended_hours_enabled=True)
+        changed["sessions"]["extended_hours"]=True
+        self.assertEqual(runner.frozen_trading_config_sha256(changed),old)
+        self.assertEqual(runner.frozen_trading_config_sha256(dict(reversed(list(raw.items())))),old)
+        for key,value in (("feed","iex"),("stop_bps",26),("max_order_notional_usd","999"),
+                          ("max_gross_loss_usd","24"),("max_api_requests_per_minute",199),
+                          ("duration_seconds",301)):
+            with self.subTest(key=key):
+                self.assertNotEqual(runner.frozen_trading_config_sha256({**changed,key:value}),old)
+        changed["sessions"]["overnight_holds"]=True
+        self.assertNotEqual(runner.frozen_trading_config_sha256(changed),old)
+
+    def test_unknown_legacy_config_cannot_infer_or_replace_its_original_envelope(self):
+        raw=json.loads((SOURCE/"config-leverage-1x.json").read_text())
+        self.assertFalse(runner.lane_a_config_continues({"config_sha256":"f"*64},raw))
+        digest=runner.frozen_trading_config_sha256(raw)
+        self.assertTrue(runner.lane_a_config_continues(
+            {"config_sha256":"f"*64,"frozen_trading_config_sha256":digest},raw))
+        self.assertFalse(runner.lane_a_config_continues(
+            {"config_sha256":"f"*64,"frozen_trading_config_sha256":"e"*64},raw))

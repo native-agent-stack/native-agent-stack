@@ -378,6 +378,42 @@ def strategy_pool_and_selector(config, registry_entries, *, session="regular"):
     return pool, selector
 
 
+def frozen_trading_config_sha256(raw_config):
+    """Bind every config value except the three coordinated session flags.
+
+    README's same-ledger path must retain trading/risk fields. The session
+    clock still validates each flag combination independently; this digest
+    never grants admission, clears a halt or changes persisted RiskLimits.
+    """
+    frozen=json.loads(json.dumps(raw_config))
+    frozen.pop("regular_session_only",None)
+    frozen.pop("extended_hours_enabled",None)
+    if isinstance(frozen.get("sessions"),dict):
+        frozen["sessions"].pop("extended_hours",None)
+    return hashlib.sha256(json.dumps(frozen,sort_keys=True,separators=(",",":")).encode()).hexdigest()
+
+
+def lane_a_config_continues(metadata, raw_config):
+    """Require the stored frozen signature, or exact retained shipped bytes.
+
+    Legacy trial.json records only a raw digest. Resolve it solely against a
+    retained nonsymlink config whose bytes equal that digest; never infer the
+    previous settings from current limits or a new supplied config.
+    """
+    current=frozen_trading_config_sha256(raw_config)
+    stored=metadata.get("frozen_trading_config_sha256")
+    if stored is not None:
+        return stored==current
+    prior=metadata.get("config_sha256")
+    for path in sorted(SOURCE.glob("config*.json")):
+        if path.is_symlink() or not path.is_file():
+            continue
+        raw=path.read_bytes()
+        if hashlib.sha256(raw).hexdigest()==prior:
+            return frozen_trading_config_sha256(json.loads(raw))==current
+    return False
+
+
 def load_config(path, *, registry_path=None):
     c = json.loads(Path(path).read_text())
     is_exploratory(c)
@@ -2547,7 +2583,8 @@ def main():
                      "stop_file": str(_safety.DEFAULT_STOP)}) + "\n")
             if args.command == "recover":
                 metadata = previous_metadata
-                if metadata["config_sha256"] != summary["config_sha256"]:
+                if metadata["config_sha256"] != summary["config_sha256"] and (
+                        exploratory or not lane_a_config_continues(metadata,raw_config)):
                     raise SafetyError("recovery_config_differs_from_frozen_trial")
             else:
                 fee_start = (previous_metadata.get("fee_window_start", previous_metadata["started_at"])
@@ -2575,7 +2612,8 @@ def main():
                     now = time.time()
                 if previous_metadata:
                     if previous_metadata["config_sha256"] != summary["config_sha256"] and (
-                            not exploratory or resumable_hold):
+                            (not exploratory and not lane_a_config_continues(previous_metadata,raw_config))
+                            or resumable_hold):
                         raise SafetyError("next_trial_config_differs_from_frozen_limits")
                     if (ledger.positions() or ledger.unresolved()) and not resumable_hold:
                         raise SafetyError("next_trial_requires_recovery")
@@ -2708,6 +2746,9 @@ def main():
             phase, exit_code = trial_phase_and_exit_code(result)
             metadata["phase"] = phase
             metadata["status"] = result["status"]
+            if not exploratory:
+                metadata["config_sha256"]=summary["config_sha256"]
+                metadata["frozen_trading_config_sha256"]=frozen_trading_config_sha256(raw_config)
             publish_trial_projection(ledger,metadata_path,metadata,save)
             save(args.output, result)
             print(json.dumps({k: result.get(k) for k in ("status", "flat", "native_fill_events")}, default=str))

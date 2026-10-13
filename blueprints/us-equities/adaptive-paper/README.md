@@ -76,7 +76,14 @@ and request history. That path is currently refused: continuity is pinned to the
 config file's bytes, not to its trading fields, so
 `next_trial_config_differs_from_frozen_limits` still fires even though
 `config-sip.json` changes only the feed. Comparing the frozen trading fields
-instead of the file hash would unblock it; that change is not made here.
+instead of the file hash would unblock it. Lane A now permits changes only to
+the coordinated regular_session_only, extended_hours_enabled and
+sessions.extended_hours flags, with all other config values frozen. The
+loader and actual-session checks still validate the new scope. A feed change
+remains refused. Completed trial metadata retains both the actual raw config
+digest and frozen_trading_config_sha256. A legacy journal can compare a
+changed session only when its old raw digest resolves to exact retained
+shipped config bytes; otherwise it refuses. No risk/history reset is implied.
 
 A separate `--state-root` is the remaining option and is not a neutral switch. It
 creates a second, fully independent durable ledger
