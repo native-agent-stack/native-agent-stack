@@ -384,6 +384,15 @@ reproduced the same counts. Its stdout is kept as
 `evidence/observe-capacity-20260924.stdout.json`, with the hashes, the redacted argv and
 the exit code in `independent-observation-20260924.json`.
 
+For a new independent count, use `evidence/observe-capacity-20261013.py`
+with `--env-file` and `--receipt`. It reuses adaptive-paper's guarded
+`runner.credentials` reader for the inventory's `export NAME=value` format,
+plain assignments, quoted values and comments; it prints counts only and
+uses a separate read-only alpaca-py `TradingClient(paper=True)`. The September
+script and captured results above remain retained as written. The new
+version's env-format compatibility is fixture-tested; no new broker
+observation is claimed by this source update.
+
 **Finding and fix.** Paper cancel confirmations lagged about 16 s on
 `trade_updates` during the opening auction. That is longer than the 10 s
 stream timeout, so the harness froze. The fix is a `--stream-timeout` flag
