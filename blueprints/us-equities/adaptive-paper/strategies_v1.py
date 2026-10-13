@@ -148,8 +148,15 @@ class PolicyConfig:
     # runner supplies the validated effective RiskLimits value; direct default
     # callers and older config-shaped fixtures fall back to the entry bound.
     exit_quote_age_seconds: int | None = None
+    # Only an explicit quantity ceiling overrides the legacy 10-share baseline
+    # / 100-share canonical-policy ceiling. Dollar-only overrides do not widen it.
+    max_shares_ceiling: int | None = None
 
     def __post_init__(self):
+        if self.max_shares_ceiling is not None and (
+                type(self.max_shares_ceiling) is not int
+                or not 1 <= self.max_shares_ceiling <= 1000000000):
+            raise ValueError("invalid_policy_bounds")
         if self.exit_quote_age_seconds is not None and (
                 type(self.exit_quote_age_seconds) is not int
                 or not 1 <= self.exit_quote_age_seconds <= 30):
@@ -203,6 +210,8 @@ class PolicyConfig:
         # change their runtime behavior; only a hypothetical no-policy
         # config with max_order_quantity in [11, 100] is affected.
         _max_shares_bound = 100 if self.leverage_policy_id == LEVERAGE_POLICY_VERSION else 10
+        if self.max_shares_ceiling is not None:
+            _max_shares_bound = self.max_shares_ceiling
         if (self.warmup_samples < 4 or self.history < self.warmup_samples
                 or self.max_leverage > _max_leverage_bound or self.gross_cap > self.capital * self.max_leverage
                 # F2: matches safety.RiskLimits' own max_order_qty<=100 bound

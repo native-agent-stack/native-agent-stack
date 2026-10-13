@@ -155,6 +155,24 @@ def symbol_name(value):
     return value
 
 
+def risk_ceiling_kwargs(config):
+    """Translate an optional strict lane-config block into frozen risk fields.
+
+    Missing keys preserve the small-trial defaults; unknown keys and explicit
+    null refuse rather than silently granting a different envelope.
+    RiskLimits performs the numeric validation, including the 1e9 parser bound.
+    """
+    if "risk_ceilings" not in config:
+        return {}
+    block = config["risk_ceilings"]
+    names = {"capital_usd": "capital_ceiling_usd",
+             "max_order_notional_usd": "order_notional_ceiling_usd",
+             "max_order_quantity": "order_quantity_ceiling"}
+    if type(block) is not dict or set(block) - names.keys() or any(v is None for v in block.values()):
+        raise SafetyError("invalid_risk_ceilings")
+    return {names[key]: value for key, value in block.items()}
+
+
 @dataclass(frozen=True)
 class RiskLimits:
     capital_usd: Decimal = D("10000")
@@ -196,8 +214,20 @@ class RiskLimits:
     # Optional owned-sell freshness: omitted means the entry bound. The 30 s
     # ceiling is the largest age threshold measured by the 2026-10-11 pull.
     exit_quote_max_age_seconds: int | None = None
+    # Explicit per-lane envelope overrides. None preserves the original ceiling
+    # and is omitted from frozen_json, so CONTROL journal bytes are unchanged.
+    capital_ceiling_usd: Decimal | None = None
+    order_notional_ceiling_usd: Decimal | None = None
+    order_quantity_ceiling: int | None = None
 
     def __post_init__(self):
+        for field in ("capital_ceiling_usd", "order_notional_ceiling_usd"):
+            if getattr(self, field) is not None:
+                object.__setattr__(self, field, decimal(getattr(self, field)))
+        if self.order_quantity_ceiling is not None and (
+                type(self.order_quantity_ceiling) is not int
+                or not 1 <= self.order_quantity_ceiling <= 1000000000):
+            raise SafetyError("invalid_order_quantity_ceiling")
         for field in ("capital_usd", "max_gross_exposure_usd", "max_order_notional_usd",
                       "max_order_qty", "max_gross_loss_usd", "max_drawdown_usd", "max_spread_bps",
                       "overnight_gross_multiple"):
@@ -205,9 +235,11 @@ class RiskLimits:
         if self.leverage is not None and not isinstance(self.leverage, LeveragePolicy):
             raise SafetyError("risk_limit_out_of_bounds")
         leverage_multiple = self.leverage.max_leverage if self.leverage is not None else D("1")
-        if (self.capital_usd > D("1000000") or self.max_gross_exposure_usd > self.capital_usd * leverage_multiple
-                or self.max_order_notional_usd > min(self.max_gross_exposure_usd, D("10000"))
-                or self.max_order_qty > 100 or self.max_order_qty != self.max_order_qty.to_integral_value()
+        if (self.capital_usd > (self.capital_ceiling_usd if self.capital_ceiling_usd is not None else D("1000000"))
+                or self.max_gross_exposure_usd > self.capital_usd * leverage_multiple
+                or self.max_order_notional_usd > min(self.max_gross_exposure_usd, self.effective_order_notional_ceiling)
+                or self.max_order_qty > self.effective_order_quantity_ceiling
+                or self.max_order_qty != self.max_order_qty.to_integral_value()
                 or self.max_gross_loss_usd > self.capital_usd / 10
                 or self.max_drawdown_usd > self.capital_usd / 10 or self.max_spread_bps > 100
                 # D6 (round 5): "self.overnight_gross_multiple <= 0" was
@@ -246,10 +278,10 @@ class RiskLimits:
         consulted at all.
 
         "notional" mode (D6, round 2; D4, round 3): min(max_order_qty,
-        floor(max_order_notional_usd / reference_price), 100) -- the
+        floor(max_order_notional_usd / reference_price), quantity_ceiling) -- the
         *smallest* of the operator's own configured `max_order_qty`, the
         notional cap expressed as a share count at `reference_price`, and
-        the hard 100-share ceiling. The pre-round-2 version discarded the
+        registered share ceiling (100 by default). The pre-round-2 version discarded the
         operator's configured max_order_qty entirely in notional mode, so
         an explicit operator cap (set for a reason -- e.g. a deliberately
         conservative per-order size even though the notional budget would
@@ -277,7 +309,15 @@ class RiskLimits:
         if self.max_order_qty_mode == "fixed":
             return self.max_order_qty
         notional_implied = (self.max_order_notional_usd / reference_price).to_integral_value(rounding="ROUND_FLOOR")
-        return min(self.max_order_qty, notional_implied, D("100"))
+        return min(self.max_order_qty, notional_implied, D(self.effective_order_quantity_ceiling))
+
+    @property
+    def effective_order_notional_ceiling(self):
+        return self.order_notional_ceiling_usd if self.order_notional_ceiling_usd is not None else D("10000")
+
+    @property
+    def effective_order_quantity_ceiling(self):
+        return self.order_quantity_ceiling if self.order_quantity_ceiling is not None else 100
 
     def overnight_gross_exposure_cap_usd(self):
         """The gross-exposure ceiling that applies to a position carried
@@ -294,7 +334,7 @@ class RiskLimits:
     def frozen_json(self):
         """The exact bytes persisted to `meta.limits` (see Ledger.__init__)
         and compared byte-for-byte against a mismatched reopen. Absent
-        optional leverage and exit-age values are omitted, preserving old
+        optional leverage, exit-age and ceiling values are omitted, preserving old
         ledger bytes for unchanged defaults. An explicit exit-age value is
         frozen and requires the same limits when the default ledger is reopened.
         Explicit lane-B journals retain those bytes until a reconciled next-trial
@@ -304,6 +344,9 @@ class RiskLimits:
             del d["leverage"]
         if d["exit_quote_max_age_seconds"] is None:
             del d["exit_quote_max_age_seconds"]
+        for field in ("capital_ceiling_usd", "order_notional_ceiling_usd", "order_quantity_ceiling"):
+            if d[field] is None:
+                del d[field]
         return json.dumps(d, default=str, sort_keys=True)
 
 

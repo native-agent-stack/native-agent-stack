@@ -37,7 +37,7 @@ if _HERE not in sys.path:
     sys.path.insert(0, _HERE)
 from feeds import require_qualified_stream  # noqa: E402
 from leverage import validate_leverage_policy  # noqa: E402
-from safety import RiskLimits, SafetyError, symbol_name  # noqa: E402
+from safety import RiskLimits, SafetyError, symbol_name, risk_ceiling_kwargs  # noqa: E402
 from sessions import NY, _rth_close_time, is_trading_day, validate_session_policy  # noqa: E402
 
 D = Decimal
@@ -380,6 +380,7 @@ def load_mover_config(path):
                         trial_seconds=config["duration_seconds"], cleanup_seconds=config["cleanup_seconds"],
                         min_entry_close_seconds=config["min_entry_close_seconds"],
                         overnight_gross_multiple=session_policy["overnight_gross_multiple"],
+                        **risk_ceiling_kwargs(config),
                         **({"leverage": leverage} if leverage is not None else {}))
     if limits.max_order_qty_mode != "notional":
         # recovery.recover sizes each exit within the ledger's effective_max_order_qty. Only

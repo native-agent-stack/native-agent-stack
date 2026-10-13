@@ -61,6 +61,18 @@ has been separately confirmed; the single `feed` value drives both the REST
 quote/snapshot requests and the quote stream endpoint. No SIP run has been
 executed, so nothing here qualifies SIP data quality, entitlement or cost.
 
+Optional `risk_ceilings` in adaptive or mover lane config sets the validation
+envelope: `capital_usd`, `max_order_notional_usd` (positive decimal text or
+integers), and `max_order_quantity` (positive integer). Missing keys keep the
+original ceilings of $1,000,000, $10,000 and 100 shares. These ceilings only
+bound the separately configured capital/order limits; they do not set sizes.
+An explicit quantity ceiling also reaches the adaptive policy and notional
+share-cap calculation. With no quantity override, the policy retains its
+10-share baseline / 100-share canonical leverage-policy bound. Explicit
+ceilings are frozen in the journal and config; they cannot bypass continuity,
+loss budgets, leverage, request limits, STOP or reconciliation. See the
+[D6-b decision](../../../docs/decisions/2026-10-13-paper-configurable-risk-ceilings.md).
+
 Each trial records the SHA-256 of its selected config file as `config_sha256`
 in the state directory's `trial.json`. Recovery requires those exact bytes,
 including session flags, formatting and notes, and refuses every change with
