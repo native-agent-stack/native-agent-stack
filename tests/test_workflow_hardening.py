@@ -30,6 +30,7 @@ import tests
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOWS = ROOT / ".github/workflows"
 HARDEN = "step-security/harden-runner@"
+GITHUB_ONLY_REPORT_JOBS = {"source-citations-report.yml:source-citations"}
 UPLOAD_SARIF = "github/codeql-action/upload-sarif@"
 # Workflows whose exact bytes are pinned by retained evidence; editing them would detach that
 # evidence from the file, so their jobs stay unhardened until the evidence is re-run. Each maps
@@ -139,11 +140,31 @@ class HardenRunnerTests(unittest.TestCase):
                     continue
                 if path.name in HASH_FROZEN:
                     continue
+                if name in GITHUB_ONLY_REPORT_JOBS:
+                    # W1b's explicit GitHub-owned-actions constraint excludes
+                    # the third-party network observer for this exact read-only
+                    # job. Its base checkout and token boundary are tested below.
+                    continue
                 step = first_step(job_text)
                 if HARDEN not in step or "egress-policy: audit" not in step:
                     missing.append(name)
         self.assertEqual(unclassified, [], "jobs whose runner is neither a literal ubuntu nor macos label")
         self.assertEqual(missing, [], "ubuntu/macos jobs without a first-step harden-runner audit")
+
+    def test_github_only_report_exception_has_the_exact_read_only_boundary(self):
+        self.assertEqual(GITHUB_ONLY_REPORT_JOBS, {"source-citations-report.yml:source-citations"})
+        text = (WORKFLOWS / "source-citations-report.yml").read_text(encoding="utf-8")
+        job_map = jobs(text)
+        self.assertEqual(set(job_map), {"source-citations"})
+        job = job_map["source-citations"]
+        actions = re.findall(r"(?m)^\s+uses:\s+([^\s]+)", job)
+        self.assertEqual(len(actions), 1)
+        self.assertRegex(actions[0], r"\Aactions/checkout@[a-f0-9]{40}\Z")
+        self.assertIn("ref: ${{ github.event.pull_request.base.sha }}", first_step(job))
+        self.assertIn("persist-credentials: false", first_step(job))
+        self.assertRegex(text, NO_SCOPE)
+        self.assertEqual(permission_blocks(text), [{"contents": "read", "pull-requests": "read"}])
+        self.assertIn("continue-on-error: true", job.split("\n    steps:\n", 1)[0])
 
 
     def test_hardware_profile_smoke_linux_job_stays_checked_despite_the_macos_job_exemption(self):

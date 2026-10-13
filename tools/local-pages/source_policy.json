@@ -1874,6 +1874,10 @@
     },
     {
       "root": "repo",
+      "path": ".github/workflows/source-citations-report.yml"
+    },
+    {
+      "root": "repo",
       "path": ".github/workflows/runtime-worker-skills-freshness.yml"
     },
     {

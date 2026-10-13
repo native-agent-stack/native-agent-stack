@@ -51,12 +51,12 @@
     },
     {
       "id": "codex",
-      "version": "0.160.0",
+      "version": "0.162.1",
       "kind": "npm",
       "ignore_scripts": true,
-      "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.160.0.tgz",
-      "sha256": "373517768e912eeb5054024ae9215e2c90a1420957b66fe134ef745a00948d4a",
-      "install_note": "npm registry tarball for @openai/codex@0.160.0 (thin wrapper package, 4,902 bytes); the downloaded bytes match npm dist.integrity sha512-kEtVGzjRAYAMOwJxN39bGcna7LT3IDQgq64NNJ/dDTfu4OzZaocJcyNb5/gGJ/IVF/Vj7oK7E2m3nmTan7lpjg== and this row's SHA256. Registry signature and attestation metadata are present, but verification was not recorded for this promotion. A private-prefix npm install selected @openai/codex@0.160.0-linux-x64; its native binary SHA256 is 12eb3e81114588aca3b7998f4f19e8997b056aca08e57a7ca7c8a3ec8c652aad, matching the SDK's bundled binary. The coordinator recorded strict-hash SDK/CLI 0.160.0 installation facts and completed native-account SDK, gateway SDK and gateway CLI marker canaries (evidence/artifacts/runtime-sdk-20261003/receipt.json). The upstream scripts/install/install.sh and app-server-daemon/README.md at rust-v0.160.0, commit a956835d020762cb2b570053af06f643a11c0ecc, are unchanged from rust-v0.159.3. The portable Linux bootstrap supports `npm install --global --prefix tools/codex-0.160.0 <verified codex-0.160.0.tgz>` and relinks its bin entry; applying that bootstrap to an existing identity wrapper needs the host's serialized launcher ownership. The shared host launcher, daemon and production prefix still run 0.159.3 until a coordinated switch. The host's existing daemon_auto_start is enabled and its 0.159.3 daemon updater is disabled and pinned; adoption/templates/codex.config.template.toml remains an opt-in portable baseline with daemon_auto_start false. The earlier queue and Hindsight receipts qualify only 0.159.3; this 0.160.0 evidence is a same-host compatibility attempt with retained outputs and discriminating controls; original SDK invocation/source and process timing evidence is incomplete, so native_cli_e2e, new-host and model-quality acceptance remain unestablished. bootstrap-linux.sh verifies the platform_dependency archive by SHA-256/SHA-512 before npm install. ignore_scripts=true keeps lifecycle scripts disabled: the 0.160.0 wrapper and platform package have no scripts or dependencies. It requires the installed wrapper optionalDependencies alias to equal the pin, rejects unexpected nested/global packages, replaces only the contained Node-resolved package or a new contained alias, and checks package identity/version and the installed executable SHA-256. A fresh versioned tree is atomically published; failed unpublished trees are cleaned up and successful publication clears migration recovery before pruning. Pins that allow a rebuild must retain the complete verified platform tree byte for byte. A mismatch fails closed before publication.",
+      "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.162.1.tgz",
+      "sha256": "0b4b2e33a65883e4f69c903484d8dd7770b3cb8b324f520068b6fd85d42b65ea",
+      "install_note": "Reconciled on 2026-10-12 from 0.160.0 to the already observed host version 0.162.1; upstream release https://github.com/openai/codex/releases/tag/rust-v0.162.1, source 092d3acd6bec3e3a14bdc7e7a2810ab628ab759d. The vendor archive was downloaded under /var/tmp and rehashed; evidence/receipts/runtime-six-pin-alignment-20261012.json records the independent vendor checks and host version observation. This record establishes version/archive identity, with no host cutover or full new-host/lifecycle acceptance. Existing dated receipts and held versions retain their original scope. The wrapper and platform package have no lifecycle scripts; preserve ignore_scripts and the complete verified platform tree. The existing Linux bootstrap still verifies the optional-dependency alias, package identity/version and native executable digest before publication. The separately pinned Python SDK/worker and existing account/settings/daemon ownership are unchanged.",
       "version_probe": {
         "method": "exec",
         "command": "codex",
@@ -67,14 +67,14 @@
       "platform_dependency": {
         "name": "@openai/codex-linux-x64",
         "resolved_package": "@openai/codex",
-        "version": "0.160.0-linux-x64",
-        "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.160.0-linux-x64.tgz",
-        "sha256": "37a41d61c3399182b8c727b77090cc7a1566bd849d0f09070a0bbc6fec4c58dc",
-        "integrity": "sha512-KI/73OqGrHmR18s7ya7E1NqV6rT0y3lxr0s8S1qR2m6zU6QRF/HlR529jALLh5vjdUnsRT4Ahoxt0axb4kY99g==",
-        "checksum_ref": "npm view @openai/codex@0.160.0 optionalDependencies maps this alias to npm:@openai/codex@0.160.0-linux-x64; evidence/artifacts/runtime-sdk-20261003/npm-dist-linux-x64.json retains the registry URL and integrity (2026-10-03). The coordinator downloaded 163273896 bytes and independently matched SHA-256 and SHA-512; the archive executable SHA-256 matches the recorded installed and bundled CLI.",
+        "version": "0.162.1-linux-x64",
+        "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.162.1-linux-x64.tgz",
+        "sha256": "7417711678b464eee70664126e39e88bb3c84c2928da0e71f14b56e04ff5c09f",
+        "integrity": "sha512-cjK2mdHIfEepZ1lQ1MX3aTQC+8ncIsvnacl/6vI2dIIcfP8/MrhTQ2+qRlkXFNDzJSj1d36quIszP+3/4CUJWQ==",
+        "checksum_ref": "The 0.162.1 wrapper optionalDependencies maps @openai/codex-linux-x64 to npm:@openai/codex@0.162.1-linux-x64. Downloaded 165453522-byte platform archive matches registry SHA512 and SHA1; measured SHA256 and archive binary identity are retained in evidence/receipts/runtime-six-pin-alignment-20261012.json.",
         "installed_binary_check": {
           "path": "vendor/x86_64-unknown-linux-musl/bin/codex",
-          "sha256": "12eb3e81114588aca3b7998f4f19e8997b056aca08e57a7ca7c8a3ec8c652aad"
+          "sha256": "628e35487d888a28f0427fc37501da529dd3d81fcbad7a2c3421c1e8670d92e1"
         }
       },
       "holds": [
@@ -99,7 +99,10 @@
             }
           }
         }
-      ]
+      ],
+      "commit": "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d",
+      "checksum_source": "npm_registry_integrity_crosscheck",
+      "checksum_ref": "npm dist.integrity sha512-NWZdi/kxyjv/8EUGFupziGU38YyleugZRM4JXgY5XFH7FUmaFA33NZS2Bmq0HPazf7S3jJQQWsZ/jAK9jsrV3Q== and dist.shasum 7ff2553e71795a314e75a24a56607149d754d487 independently match the downloaded 4904-byte archive; recorded in evidence/receipts/runtime-six-pin-alignment-20261012.json."
     },
     {
       "id": "claude-code",
@@ -153,18 +156,19 @@
     },
     {
       "id": "ai-memory",
-      "version": "2.4.1",
+      "version": "2.6.3",
       "kind": "tarball",
-      "url": "https://github.com/akitaonrails/ai-memory/releases/download/v2.4.1/ai-memory-linux-x86_64.tar.gz",
-      "sha256": "15cafdc48eabc0305c164ccc8e884b260275f5a88b4f26e8456c2e42156375e4",
-      "install_note": "Verified 2026-09-25 against three upstream values that agree (by the qualification run at 22:43Z and its independent verifier at 23:10Z): the v2.4.1 release's ai-memory-linux-x86_64.tar.gz.sha256 sidecar, the GitHub API asset digest (16,026,020 bytes) and the checksum list in the release body; the API digest was re-checked on 2026-09-26 before the cutover; the archive's ai-memory binary has sha256 dec065a82478bec92a0c34323662af7e7ad616b222586356814b4875053aa8dd, and the release has no artifact attestation (HTTP 404), an unsigned tag and is not immutable. Matches recipes/README.md's ai-memory row (official akitaonrails/ai-memory v2.4.1 archive, tag commit 433a19f3d54dea287571b1423591db2a89965fa9). On nativestack-5975wx-20260925, 2.4.0 replaced 2.3.2 on 2026-09-25 and 2.4.1 replaced 2.4.0 on 2026-09-26, each after a rehearsal on restored copies and a cold-copy cutover (evidence/receipts/ai-memory-240-qualification-20260925.json and ai-memory-241-qualification-20260925.json); that is one host's state, not evidence about any other Linux host. Migrations are forward-only: 2.4.1 migrates a 2.3.2 store V64 -> V67 and a 2.4.0 store V66 -> V67 when `serve` first opens it, an older binary then refuses that store, and no automatic pre-migration archive is written for a 2.x store. On a host with an existing store, stop the service and take an at-rest copy of the data directory before the service restarts on this binary, then re-run `ai-memory install-hooks --apply` for each client (the hook commands name the versioned prefix).",
+      "url": "https://github.com/akitaonrails/ai-memory/releases/download/v2.6.3/ai-memory-linux-x86_64.tar.gz",
+      "sha256": "933be9bb8fe6930336933f0b8adf0695007e644f945898f9f030fd312326f0f3",
+      "install_note": "Reconciled on 2026-10-12 from 2.4.1 to the already observed host version 2.6.3; upstream release https://github.com/akitaonrails/ai-memory/releases/tag/v2.6.3, source 385b81ea95f7b73ede7146d0ae606c4caa7b43c1. The vendor archive was downloaded under /var/tmp and rehashed; evidence/receipts/runtime-six-pin-alignment-20261012.json records the independent vendor checks and host version observation. This record establishes version/archive identity, with no host cutover or full new-host/lifecycle acceptance. Existing dated receipts and held versions retain their original scope. Release asset digest and published release-body SHA256 match the archive; its binary hash matches the running host launcher. Existing-store migrations require the owning memory lane's native backup/cutover procedure before any installation.",
       "version_probe": {
         "method": "exec",
         "command": "ai-memory",
         "args": [
           "--version"
         ]
-      }
+      },
+      "commit": "385b81ea95f7b73ede7146d0ae606c4caa7b43c1"
     },
     {
       "id": "mcporter",
@@ -350,18 +354,19 @@
     },
     {
       "id": "socraticode",
-      "version": "1.15.0",
+      "version": "1.16.0",
       "kind": "npm",
       "ignore_scripts": true,
-      "url": "https://registry.npmjs.org/socraticode/-/socraticode-1.15.0.tgz",
-      "sha256": "f1ec039e58013863c6e736d1c17876386b9fec1daf9abf72960fcc51c3e364d1",
+      "url": "https://registry.npmjs.org/socraticode/-/socraticode-1.16.0.tgz",
+      "sha256": "3cb602cf2f50f863ef79dde56923d65b7ce840e2cc26070efa41743d2b4aaafe",
       "checksum_source": "npm_registry_integrity_crosscheck",
-      "checksum_ref": "npm view socraticode@1.15.0 dist.integrity (sha512-vfz1G5NDepksPjZNnr/rVU5tTK91ghO/izGQQXMaZhP7Py+1hP1k+ptL/ZsYCMhB5NLj5K0XGmcNmygbE1rIWQ==) and dist.shasum read 2026-09-27; the tarball was downloaded to a scratch directory and independently sha256-, sha512- and sha1-hashed, all matching (evidence/receipts/socraticode-1150-qualification-20260927.json). adoption/pins-macos-arm64.json keeps 1.14.0 until a Mac qualifies 1.15.0",
-      "install_note": "Moved from 1.14.0 on 2026-09-27 (docs/decisions/2026-09-25-workstation-sota-refresh.md, the cutover update; evidence/receipts/socraticode-1150-qualification-20260927.json). AGPL-3.0-only; upstream commercial alternative. recipes/README.md's recipe is `npm install --global --prefix tools/socraticode-1.15.0 --ignore-scripts --before=2026-09-24T12:00:00Z socraticode@1.15.0`: `--before` reproduces the qualified dependency tree, because the package ships no shrinkwrap and later releases inside its dependency ranges (undici 6.29.0, @lumis-sh/wasm-eex 0.26.2) resolve without it. The bootstrap's `install_npm` installs this pin's verified tarball with `--ignore-scripts` (this pin's own `ignore_scripts: true` field) but passes no `--before`, so its dependency tree can differ from the qualified one. Only a reviewed archive hash, not a claim of a working native codebase-index handshake on a new host.",
+      "checksum_ref": "npm dist.integrity sha512-Lsei32zdHES3fCIRROn7kb1FY7sia0Oe2ZZMRUShZy8AytaqUB2F7/fF2+2dDLNNZxNAURP2Sb0doSpHv8JbMA== and dist.shasum 44a18caf99a4f4f466e3d618860143dec51bfd71 independently match the downloaded 1065187-byte archive; recorded in evidence/receipts/runtime-six-pin-alignment-20261012.json.",
+      "install_note": "Reconciled on 2026-10-12 from 1.15.0 to the already observed host version 1.16.0; upstream release https://github.com/giancarloerra/SocratiCode/releases/tag/v1.16.0, source 3d3a4a4d427cb0f29de4f5dd1360da52896f62df. The vendor archive was downloaded under /var/tmp and rehashed; evidence/receipts/runtime-six-pin-alignment-20261012.json records the independent vendor checks and host version observation. This record establishes version/archive identity, with no host cutover or full new-host/lifecycle acceptance. Existing dated receipts and held versions retain their original scope. Installed plugin and package metadata both read 1.16.0. The upstream plugin update/install paths remain the vendor mechanisms; no MCP server was started for this metadata check. Dependency tree/runtime indexing acceptance is unmeasured, and the macOS pin stays at its separately qualified version.",
       "version_probe": {
         "method": "npm-metadata",
-        "note": "No argument parsing at all: every invocation, --help and --version included, starts its MCP stdio server (dist/index.js never reads process.argv; observed 2026-09-25 with socraticode 1.14.0, matching the macOS pin's own note, and 1.15.0's dist/index.js still reads none), so the package version is read from npm metadata instead. Never run `socraticode --version` or with no arguments on a real install -- it starts the server."
-      }
+        "note": "Read the installed package/plugin metadata for the 1.16.0 version check. Server startup is a separate MCP operation, so this probe does not launch socraticode with --version or with no arguments. The October 12 receipt records the matching installed plugin and package metadata; current indexing acceptance remains separate."
+      },
+      "commit": "3d3a4a4d427cb0f29de4f5dd1360da52896f62df"
     }
   ]
 }

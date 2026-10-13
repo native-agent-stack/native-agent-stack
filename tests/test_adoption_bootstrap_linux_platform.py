@@ -47,12 +47,12 @@ class LinuxPlatformPinTests(unittest.TestCase):
         self.assertEqual(dep["url"],
                          f"https://registry.npmjs.org/@openai/codex/-/codex-{dep['version']}.tgz")
         self.assertEqual(dep["sha256"],
-                         "37a41d61c3399182b8c727b77090cc7a1566bd849d0f09070a0bbc6fec4c58dc")
+                         "7417711678b464eee70664126e39e88bb3c84c2928da0e71f14b56e04ff5c09f")
         self.assertEqual(dep["integrity"],
-                         "sha512-KI/73OqGrHmR18s7ya7E1NqV6rT0y3lxr0s8S1qR2m6zU6QRF/HlR529jALLh5vjdUnsRT4Ahoxt0axb4kY99g==")
+                         "sha512-cjK2mdHIfEepZ1lQ1MX3aTQC+8ncIsvnacl/6vI2dIIcfP8/MrhTQ2+qRlkXFNDzJSj1d36quIszP+3/4CUJWQ==")
         self.assertEqual(dep["installed_binary_check"], {
             "path": BINARY_PATH,
-            "sha256": "12eb3e81114588aca3b7998f4f19e8997b056aca08e57a7ca7c8a3ec8c652aad",
+            "sha256": "628e35487d888a28f0427fc37501da529dd3d81fcbad7a2c3421c1e8670d92e1",
         })
 
 
