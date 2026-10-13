@@ -231,7 +231,7 @@ class CapacityRunTests(unittest.TestCase):
         self.assertEqual(receipt["orders"]["submit_attempts"], 0)
 
     def test_cli_refuses_live_base_url_from_env_file_without_network(self):
-        with tempfile.TemporaryDirectory(dir="/tmp") as private:
+        with tempfile.TemporaryDirectory(dir="/var/tmp") as private:
             env = Path(private) / "paper.env"
             env.write_text("APCA_API_KEY_ID=fixturekey\nAPCA_API_SECRET_KEY=fixturesecret\n"
                            "APCA_API_BASE_URL=https://api.alpaca.markets\n")
@@ -544,6 +544,90 @@ class CapacityRunTests(unittest.TestCase):
                        {"symbol": "spy"}, {"max_order_notional_usd": "0"}, {"allow_cancel_all": 1}):
             with self.assertRaises(c.HarnessRefusal):
                 c.CapacityConfig(**change).validate()
+
+
+class PaperEnvURLTests(unittest.TestCase):
+    """Fake-key env files exercise the URL gate; no broker or network calls."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory(dir="/var/tmp", prefix="capacity-url-")
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        self.env = self.root / "paper.env"
+
+    def write_env(self, url):
+        self.env.write_text("APCA_API_KEY_ID=fixturekey\nAPCA_API_SECRET_KEY=fixturesecret\n"
+                            f"APCA_API_BASE_URL='{url}'\n")
+        self.env.chmod(0o600)
+
+    def validate_env(self, url):
+        from runner import credentials
+
+        self.write_env(url)
+        credentials(self.env)  # Real ownership/mode/outside-Git gate, fake keys only.
+        base = c.env_base_url(self.env)
+        config = c.CapacityConfig()
+        if base is not None:
+            config.base_url = base
+        config.validate()
+        return config.base_url
+
+    def test_paper_host_forms_normalize_to_the_pinned_request_host(self):
+        for port in ("", ":443"):
+            for path in ("", "/", "/v2", "/v2/"):
+                url = "https://paper-api.alpaca.markets" + port + path
+                with self.subTest(url=url):
+                    self.assertEqual(self.validate_env(url), c.PAPER_URL)
+
+    def test_other_origins_and_url_components_still_refuse(self):
+        for url in (
+                "https://api.alpaca.markets",
+                "https://paper-api.alpaca.markets.example.com",
+                "https://paper-api-alpaca.markets",
+                "https://paper-api.alpaca.markets/v1",
+                "https://paper-api.alpaca.markets/v2/extra",
+                "http://paper-api.alpaca.markets/v2",
+                "https://paper-api.alpaca.markets:8443/v2",
+                "https://user:pass@paper-api.alpaca.markets/v2",
+                "https://@paper-api.alpaca.markets/v2",
+                "https://paper-api.alpaca.markets/v2?x=1",
+                "https://paper-api.alpaca.markets/v2?",
+                "https://paper-api.alpaca.markets/v2#fragment",
+                "https://paper-api.alpaca.markets/v2#",
+                "https://paper-api.alpaca.markets//",
+                "https://paper-api.alpaca.markets:/v2",
+                "https://paper-api.alpaca.markets:invalid/v2",
+                "https://paper-api.alpaca.markets/v\t2",
+                "https://paper-api.alpaca.markets/v2 "):
+            with self.subTest(url=url):
+                with self.assertRaisesRegex(c.HarnessRefusal, "^non_paper_base_url$"):
+                    self.validate_env(url)
+
+    def test_cli_accepts_v2_and_keeps_the_pinned_host_without_a_broker_call(self):
+        import alpaca_capacity_port as native
+
+        self.write_env("https://paper-api.alpaca.markets/v2")
+        stop = self.root / "STOP"
+        stop.touch()
+        broker = fx.FakeBroker(fx.FakeClock())
+        out = self.root / "receipt.json"
+        handlers = {sig: signal.getsignal(sig) for sig in (signal.SIGINT, signal.SIGTERM)}
+        try:
+            with patch.object(native, "AlpacaCapacityPort", return_value=broker), \
+                    patch.object(c, "DEFAULT_STOP", stop), \
+                    patch.object(c, "_paper_scope", return_value=contextlib.nullcontext()), \
+                    patch("socket.create_connection", side_effect=AssertionError("network forbidden")), \
+                    contextlib.redirect_stdout(io.StringIO()):
+                code = c.main(["paper", "--env-file", str(self.env), "--output", str(out)])
+        finally:
+            for sig, handler in handlers.items():
+                signal.signal(sig, handler)
+        receipt = json.loads(out.read_text())
+        self.assertEqual(code, 2)
+        # Reaching the separate STOP gate proves the URL was accepted first.
+        self.assertEqual(receipt["refusal_reason"], "stop_file_present")
+        self.assertEqual(receipt["config"]["base_url"], c.PAPER_URL)
+        self.assertEqual(broker.call_log, [])
 
 
 class NativePortLogicTests(unittest.TestCase):

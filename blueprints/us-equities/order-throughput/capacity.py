@@ -35,6 +35,7 @@ import signal
 import subprocess
 import sys
 import time
+from urllib.parse import urlsplit
 
 HERE = Path(__file__).resolve().parent
 ADAPTIVE = HERE.parent / "adaptive-paper"
@@ -273,18 +274,39 @@ def new_prefix(now_wall):
 
 
 def env_base_url(path):
-    """Return APCA_API_BASE_URL from the env file if present (else None).
+    """Return the pinned paper host for an accepted env URL (else "" or None).
 
     Call only after adaptive-paper ``runner.credentials`` accepted the file's
-    ownership, mode and location. Only this one key is read here."""
+    ownership, mode and location. Only this one key is read here. An invalid
+    value returns "" so CapacityConfig.validate emits non_paper_base_url.
+    alpaca-py@cc4cb3b common/enums.py:9 pins the host; common/rest.py:36,64,109
+    appends v2 separately. The env's version path never becomes a request path."""
     for line in Path(path).read_text().splitlines():
         line = line.strip()
         if not line or line.startswith("#") or "=" not in line:
             continue
         name, value = line.removeprefix("export ").split("=", 1)
         if name.strip() == "APCA_API_BASE_URL":
-            values = shlex.split(value, comments=True)
-            return values[0] if len(values) == 1 else ""
+            try:
+                values = shlex.split(value, comments=True)
+                if len(values) != 1:
+                    return ""
+                base = values[0]
+                # urlsplit removes some raw controls; reject them before parsing.
+                # Empty query/fragment delimiters also represent forbidden components.
+                if any(char.isspace() or ord(char) < 32 or ord(char) == 127 for char in base) \
+                        or "?" in base or "#" in base:
+                    return ""
+                parsed = urlsplit(base)
+                if (parsed.scheme == "https" and parsed.hostname == "paper-api.alpaca.markets"
+                        and parsed.port in (None, 443) and not parsed.netloc.endswith(":")
+                        and parsed.username is None and parsed.password is None
+                        and not parsed.query and not parsed.fragment
+                        and parsed.path in ("", "/", "/v2", "/v2/")):
+                    return PAPER_URL
+            except ValueError:
+                pass
+            return ""
     return None
 
 
@@ -1590,7 +1612,7 @@ def main(argv=None):
         from runner import credentials  # adaptive-paper: 0600, owner, outside-Git checks
         key, secret = credentials(args.env_file)
         base = env_base_url(args.env_file)
-        if base is not None and base.rstrip("/") != PAPER_URL:
+        if base is not None:
             config.base_url = base  # CapacityConfig.validate refuses it before any request
         from alpaca_capacity_port import AlpacaCapacityPort
         port = AlpacaCapacityPort(key, secret, config.symbol, feed=args.feed, workers=config.inflight)
