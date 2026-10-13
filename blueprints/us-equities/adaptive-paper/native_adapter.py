@@ -966,7 +966,7 @@ def logger_config(log_directory=None):
 
 def build_node(port, symbols, strategies, *, account_id="ALPACA-PAPER", trader_id="ADAPTIVE-001",
                max_order_submit_rate="180/00:01:00", account_type=AccountType.CASH, session_policy=None,
-               log_directory=None, builtin_strategies=()):
+               log_directory=None, builtin_strategies=(), connection_timeout_seconds=10):
     """Build the guarded node, optionally registering unchanged upstream builtins.
 
     ``builtin_strategies`` contains (name, config) pairs for LiveNode's supported
@@ -979,6 +979,12 @@ def build_node(port, symbols, strategies, *, account_id="ALPACA-PAPER", trader_i
         raise ValueError("unqualified_native_version")
     if not account_id.startswith("ALPACA-"):
         raise ValueError("account_identity_must_be_ALPACA_scoped")
+    if (type(connection_timeout_seconds) is not int or connection_timeout_seconds not in (10, 40)
+            or (connection_timeout_seconds == 40 and (
+                not (session_policy or {}).get("extended_hours")
+                or getattr(port, "benchmark_quote_timeout_seconds", None) != 5
+                or getattr(port, "start_timeout", None) != 30))):
+        raise ValueError("invalid_native_start_readiness_window")
     builtin_strategies = tuple(builtin_strategies)
     for _, builtin_config in builtin_strategies:
         if getattr(builtin_config, "dry_run", None) is not True:
@@ -998,7 +1004,7 @@ def build_node(port, symbols, strategies, *, account_id="ALPACA-PAPER", trader_i
 
     config = LiveNodeConfig(environment=Environment.SANDBOX, trader_id=TraderId(trader_id),
         load_state=False, save_state=False, shutdown_on_error=True,
-        logging=logger_config(log_directory), timeout_connection_secs=10,
+        logging=logger_config(log_directory), timeout_connection_secs=connection_timeout_seconds,
         timeout_reconciliation_secs=10, timeout_portfolio_secs=10, timeout_disconnection_secs=10,
         delay_post_stop_secs=0.2, timeout_shutdown_secs=10,
         risk_engine=LiveRiskEngineConfig(bypass=False, max_order_submit_rate=max_order_submit_rate,

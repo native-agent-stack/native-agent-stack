@@ -13138,8 +13138,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README.md",
-      "sha256": "8f378de13a436e29c59788940472022478caf6d7b6262b82460c0dcace207495",
-      "bytes": 22107
+      "sha256": "ccc3631cd4c975943c6d45e4ecf2d16b1867251ef830d98590d00d993160345e",
+      "bytes": 22890
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/adaptive_policy_v1.receipt.json",
@@ -13423,8 +13423,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native_adapter.py",
-      "sha256": "39db1894ac5a26805908a56cd1db6f5b90147935342dc5684b061cbd9fe73fea",
-      "bytes": 56001
+      "sha256": "56e680e18bf1a4054f59a4a91468dddd77fec04a58b82381d64420b2aeeae97b",
+      "bytes": 56485
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native_strategy.py",
@@ -13488,8 +13488,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "8fd2878695e798dec791bf2c32f534b477d7ece7f05ac52e23b8f01f7f8ea730",
-      "bytes": 166611
+      "sha256": "415b4c0e8b7523f118f861fc20de7ad2fb69f8aaf4f324e5eec11c6bd6774eb9",
+      "bytes": 168373
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runtime_lock.py",
@@ -13523,8 +13523,13 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "d004a22d1667a4147c6b932b4ceb04a2cff36c4a514af8689049ac1fac7e7678",
-      "bytes": 9748
+      "sha256": "fd1f7e6ead8c1e085891252af7f8ed3f00e778263deed93386c993ff86d8acc4",
+      "bytes": 9996
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/start_readiness.py",
+      "sha256": "714719913b21dda33abf2ad849fae21e08f89f7b565f8f630bab85d7cb1c9d31",
+      "bytes": 1101
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/strategies.py",
@@ -13538,8 +13543,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/transport.py",
-      "sha256": "14f30b03548bde1bdb3330db95eeb8565b1970152967c7b0f877036f80a98257",
-      "bytes": 99384
+      "sha256": "f588db92b0f18380b673b518b56e2705b19bdd95cbcf9be5d6448e1cfcf042ed",
+      "bytes": 104219
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/README.md",
@@ -19110,6 +19115,11 @@
       "path": "docs/decisions/2026-10-13-claude-agent-drift-check.md",
       "sha256": "b1f4cf2a44669cd12ffe04bf4f3255270774032291a5ffa42c8e0082b725689c",
       "bytes": 41530
+    },
+    {
+      "path": "docs/decisions/2026-10-13-extended-hours-paper-start-readiness.md",
+      "sha256": "2c23c9887509ab664f0d70e5d111b2cf30e3a00193780ba685518eb17880aa86",
+      "bytes": 7046
     },
     {
       "path": "docs/decisions/2026-10-13-lane-a-frozen-field-continuity.md",
@@ -62165,6 +62175,11 @@
       "path": "tests/test_adaptive_paper_source_hashes_manifest.py",
       "sha256": "04b687b922073349f6038978cf219ea33b2c9ec0b59fe441646dd961a4807905",
       "bytes": 6061
+    },
+    {
+      "path": "tests/test_adaptive_paper_start_readiness.py",
+      "sha256": "6d247f6926fe739b1b4c597e56c0f3e2b82b14bd3e4dfe6b068ecf098b1af68f",
+      "bytes": 13909
     },
     {
       "path": "tests/test_adaptive_paper_strategies.py",
