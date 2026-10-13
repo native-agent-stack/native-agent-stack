@@ -64,6 +64,7 @@ class FamilyStrategy(Strategy):
         fault_sink=None,
         post_cutoff_fill_sink=None,
         notice_sink=None,
+        halted=None,
     ):
         # The rc5 PyO3 allocator accepts only its native config argument;
         # Python-only injected dependencies belong to this subclass's __init__.
@@ -77,6 +78,7 @@ class FamilyStrategy(Strategy):
         fault_sink=None,
         post_cutoff_fill_sink=None,
         notice_sink=None,
+        halted=None,
     ):
         self.spec = spec
         self.preset = preset_for(
@@ -133,6 +135,8 @@ class FamilyStrategy(Strategy):
         # the complete native post-fill account view, applies T14 state and
         # installs that state before returning; no account figures are logged.
         self.post_cutoff_fill_sink = post_cutoff_fill_sink
+        self.halted = halted
+        self.allow_entries = True
         self._durable_ledger_supplied = ledger is not None
         self.ledger = (
             ledger
@@ -563,7 +567,7 @@ class FamilyStrategy(Strategy):
                 and (self.pending_role == "entry" or self.exit_reason != "time_exit")
             )
             entry_blocked = self.pending_role == "entry" and (
-                halted
+                halted or not getattr(self, "allow_entries", True)
                 or (
                     self.spec.entry_deadline_ns is not None
                     and now >= self.spec.entry_deadline_ns
@@ -611,6 +615,11 @@ class FamilyStrategy(Strategy):
             self._enter(now, session)
 
     def _halt_reason(self, now):
+        # The account writer owns startup-seed expiry and explicit resumes.
+        # Its independent veto must survive a seed delivered after startup.
+        halted = getattr(self, "halted", None)
+        if halted is not None and halted(str(self.instrument_id.symbol)):
+            return "held_halted"
         # t22-factors-v1 is this class's named synthetic halt producer. Its
         # explicit validity also gates exits; a native status halt is an
         # independent veto, never a substitute for an absent/expired producer.
@@ -747,6 +756,8 @@ class FamilyStrategy(Strategy):
         self._clear_halt_hold()
 
     def _entry_allowed(self, now, session):
+        if not getattr(self, "allow_entries", True):
+            return False
         snapshot = self.snapshot
         if not snapshot.cohort_member or now > snapshot.valid_until_ns:
             return False
@@ -958,6 +969,8 @@ class FamilyStrategy(Strategy):
 
     def _submit(self, side, quantity, price, role, reason):
         if self.faulted or not self.enabled:
+            return
+        if role == "entry" and not getattr(self, "allow_entries", True):
             return
         now = self.clock.timestamp_ns()
         halt_reason = self._halt_reason(now)

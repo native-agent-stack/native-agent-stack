@@ -13042,6 +13042,11 @@
       "bytes": 38751
     },
     {
+      "path": "blueprints/us-equities/adaptive-paper/README-t22-dispatch.md",
+      "sha256": "d6bdfd83dde1814eac43df5162b675646e08a0eeed00608df62acafe9d4e7752",
+      "bytes": 12429
+    },
+    {
       "path": "blueprints/us-equities/adaptive-paper/README-transport.md",
       "sha256": "80a9974e005c0552ec56d6b223c2b62a9722fca6a80e9e00763abf2dff087667",
       "bytes": 20940
@@ -13333,8 +13338,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native_adapter.py",
-      "sha256": "39db1894ac5a26805908a56cd1db6f5b90147935342dc5684b061cbd9fe73fea",
-      "bytes": 56001
+      "sha256": "e93b5adba3603e31e759e2b6297ca69b37dbf8f2778e60b0452ebe9057ed6491",
+      "bytes": 58131
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native_strategy.py",
@@ -13398,8 +13403,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "b41dbaefcf5e80af3bedf8e2180813513b154585d63fb756b50f2ee30d361a9f",
-      "bytes": 164279
+      "sha256": "418ea945ae6b2a0672ae49449fe44404a627284f90a095fa360257eedf0c020f",
+      "bytes": 165109
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runtime_lock.py",
@@ -13433,8 +13438,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "488bb599340bfb4f2251530ede8f48d8eee3fa62233c3f9f39f55870afc6e5e4",
-      "bytes": 9504
+      "sha256": "b797d190e94e46675c28615ce5c8f1f65199e8061cb84a5437a7d2ba807b8eee",
+      "bytes": 9994
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/strategies.py",
@@ -13447,9 +13452,24 @@
       "bytes": 29255
     },
     {
+      "path": "blueprints/us-equities/adaptive-paper/t22-producers.json",
+      "sha256": "1f3152855f0a0b61d61be4ab85699ee03ef8c09029609f204023a101acfb0fed",
+      "bytes": 252
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/t22_dispatch.py",
+      "sha256": "387a1d4752c9316e99d113936a8cf3c9489c4d19a90d493891d2355c5350f641",
+      "bytes": 19605
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/t22_producer.py",
+      "sha256": "39b14e9d942ad861b328c3683a8c3ab5c6d26905a21b4663c405c56aebca9c1d",
+      "bytes": 1415
+    },
+    {
       "path": "blueprints/us-equities/adaptive-paper/transport.py",
-      "sha256": "14f30b03548bde1bdb3330db95eeb8565b1970152967c7b0f877036f80a98257",
-      "bytes": 99384
+      "sha256": "c331f785dff36be759c4e5f67ac75a08b4e6874e9fe5abe77e926f366eb6cb4c",
+      "bytes": 100402
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/README.md",
@@ -17067,6 +17087,16 @@
       "bytes": 3951
     },
     {
+      "path": "blueprints/us-equities/strategies/contracts.py",
+      "sha256": "3958767e53ee15a5d01f0ef449fd39510308c29657566335e27f97a860a6ec99",
+      "bytes": 9728
+    },
+    {
+      "path": "blueprints/us-equities/strategies/families.py",
+      "sha256": "0add8f54e775bb9a78f1591512b95e2c0d76cf2f2552bad3b5f1a45a8df08f8f",
+      "bytes": 52838
+    },
+    {
       "path": "blueprints/us-equities/supply-chain/README.md",
       "sha256": "2ff8bb2f328a1a37121552c88fa1e0771b2bf86200aadb9d95dae62b143a5975",
       "bytes": 11530
@@ -18978,8 +19008,8 @@
     },
     {
       "path": "docs/decisions/2026-10-11-sell-only-quote-freshness.md",
-      "sha256": "f547857a970ef0e3b5585be294db9d3edc52c25615079c7900ed38552d0a8731",
-      "bytes": 8417
+      "sha256": "a6bb7423d0e68ce886e1a248172ac37b8db4a1729a4e435cdb5e96d0662c5d50",
+      "bytes": 8593
     },
     {
       "path": "docs/decisions/2026-10-11-starred-finalization.md",
@@ -63200,6 +63230,11 @@
       "path": "tests/test_supply_chain_scan.py",
       "sha256": "a4e3e5a6f40a7f3b4e679b21dc56f443a27ccdd9f097423bdf64d9e41eef19f8",
       "bytes": 6838
+    },
+    {
+      "path": "tests/test_t22_paper_dispatch.py",
+      "sha256": "01b3114633faa715894ba0d8f38f8fc150e9d4f08454c689c793d91b3c7950c0",
+      "bytes": 76082
     },
     {
       "path": "tests/test_task_model_routing.py",

@@ -77,7 +77,7 @@ class FactorSnapshot:
             nanos(value)
         if not self.ts_event <= self.ts_init <= self.valid_until_ns:
             raise ValueError("snapshot_availability_order_invalid")
-        if self.evidence_class not in {"synthetic", "development"}:
+        if self.evidence_class not in {"synthetic", "development", "exploratory"}:
             raise ValueError("development_or_synthetic_only")
         if (
             self.evidence_class == "development"
@@ -175,7 +175,7 @@ class StrategySpec:
             raise ValueError("stable_instance_id_required")
         if not SHA256.fullmatch(self.cohort_sha256):
             raise ValueError("cohort_hash_required")
-        if self.evidence_class not in {"synthetic", "development"}:
+        if self.evidence_class not in {"synthetic", "development", "exploratory"}:
             raise ValueError("development_or_synthetic_only")
         if self.execution_profile not in {"code-managed-limit-v1", "native-target-v1"}:
             raise ValueError("unregistered_execution_profile")

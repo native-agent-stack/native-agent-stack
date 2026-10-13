@@ -44,7 +44,7 @@ from nautilus_trader.config import LiveExecutionEngineConfig, LiveRiskEngineConf
 from nautilus_trader.live import LiveNode
 from nautilus_trader.live.clients import MarketDataClient, ExecutionClient, DataClientFactory, ExecutionClientFactory
 from nautilus_trader.model import (AccountBalance, AccountId, AccountType, ClientOrderId,
-    Currency, Equity, FillReport, InstrumentId, LiquiditySide, Money, OmsType,
+    Currency, Equity, FillReport, InstrumentId, InstrumentStatus, MarketStatusAction, LiquiditySide, Money, OmsType,
     OrderSide, OrderStatus, OrderStatusReport, OrderType, PositionSide,
     PositionStatusReport, Price, Quantity, QuoteTick, Symbol, TimeInForce,
     TradeId, TraderId, Venue, VenueOrderId)
@@ -216,6 +216,9 @@ class NativeSession:
         self.started = self.stopped = False
         self._start_lock = self._stop_lock = None
         self.quotes = {}
+        self.status_subscriptions = set()
+        self.statuses = {}
+        self.status_fences = {}
         self.observations = []
         self.unresolved_orders = {}
         self.snapshot_state = None
@@ -298,6 +301,34 @@ class NativeSession:
                 self.unresolved_orders[row["client_order_id"]] = dict(row)
             self.fail("order_" + error_code(error))
 
+    def on_status(self, row):
+        """Deliver only the transport's explicit halt/resume, never metadata.
+
+        rc5@1b0a49d2 crates/live/src/python/client/mod.rs:1773 accepts
+        InstrumentStatus through the client's supported _handle_data boundary.
+        """
+        try:
+            if row.get("halted") is None:
+                return
+            sym = row["symbol"]
+            if type(row["halted"]) is not bool or type(row["ts_ns"]) is not int or row["ts_ns"] <= 0:
+                raise ValueError("invalid_instrument_status")
+            ins = self.instruments[sym]
+            now_ns = self.data.clock.timestamp_ns()
+            previous_event, previous_init = self.status_fences.get(sym, (0, 0))
+            if not row["halted"] and (row["ts_ns"] > now_ns or row["ts_ns"] <= previous_event
+                                      or now_ns < previous_init):
+                return  # A future/older resume cannot clear an observed halt.
+            status = InstrumentStatus(ins.id,
+                MarketStatusAction.HALT if row["halted"] else MarketStatusAction.TRADING,
+                row["ts_ns"], now_ns, is_trading=not row["halted"])
+            self.status_fences[sym] = (max(previous_event, row["ts_ns"]), max(previous_init, now_ns))
+            self.statuses[sym] = status
+            if sym in self.status_subscriptions:
+                self.data._handle_data(status)
+        except Exception as error:
+            self.fail("status_" + error_code(error))
+
     async def run_async(self):
         try:
             await self.node.run_async()
@@ -334,6 +365,17 @@ class AlpacaDataClient(MarketDataClient):
 
     async def _unsubscribe_quotes(self, command):
         self.subscriptions.discard(str(command.instrument_id.symbol))
+
+    async def _subscribe_instrument_status(self, command):
+        sym = str(command.instrument_id.symbol)
+        if sym not in self.session.instruments:
+            raise ValueError("unknown_instrument")
+        self.session.status_subscriptions.add(sym)
+        if sym in self.session.statuses:
+            self._handle_data(self.session.statuses[sym])
+
+    async def _unsubscribe_instrument_status(self, command):
+        self.session.status_subscriptions.discard(str(command.instrument_id.symbol))
 
 
 class AlpacaExecutionClient(ExecutionClient):

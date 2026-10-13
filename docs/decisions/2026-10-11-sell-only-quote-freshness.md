@@ -98,7 +98,8 @@ A sell quote within the sell age may refresh the ledger's mark when it is newer
 than the stored mark. It keeps its own timestamp, so it never makes a mark fresh
 for an entry, and entry admission is unchanged. It may move unrealized P&L, the
 peak and drawdown, and latch a risk halt (which sets force_exit,
-runner.py:1776-1778) on a quote up to the sell age old.
+[runner.py:1776-1778 at d8f7e205](https://github.com/seathatflowsinourveins/native-agent-stack/blob/d8f7e2051b61bde6361a85b64f41413798015353/blueprints/us-equities/adaptive-paper/runner.py#L1776))
+on a quote up to the sell age old.
 
 The CC's B1 ruling switches the armed RTH gap-risk stop trigger from the entry
 age to `sell_quote_age_seconds(self.policy.config)`: **SWITCHED**. This closes
