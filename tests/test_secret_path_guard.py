@@ -408,6 +408,11 @@ BLOCKED = {
     ". \"$PAPER_ENV_FILE_C\"; declare -p APCA_API_KEY_ID": "environment_dump_after_source",
     # (Not the os.environ dump of the account-2 rows: K4's INLINE-ENV already refuses it as environment_dump.)
     ". \"$PAPER_ENV_FILE_C\"; perl -e 'print %ENV'": "environment_dump_after_source",
+    # The GitHub review App's key file pointer (2026-10-12): a reader, a copy or a key tool on it reads the private key.
+    "cat \"$GITHUB_REVIEW_APP_KEY_PATH\"": "credential_file_read",
+    "cat \"${GITHUB_REVIEW_APP_KEY_PATH}\"": "credential_file_read",
+    "openssl pkey -in \"$GITHUB_REVIEW_APP_KEY_PATH\"": "credential_file_read",
+    "cp \"$GITHUB_REVIEW_APP_KEY_PATH\" /tmp/app.pem": "credential_file_read",
     # Shell tracing or verbose mode while sourcing a credential file prints its assignments.
     "set -x; . \"$PAPER_ENV_FILE\"": "trace_while_sourcing",
     "set -euxo pipefail; set -a; . \"$SEC_CONTACT_ENV\"; set +a": "trace_while_sourcing",
@@ -1056,6 +1061,9 @@ ALLOWED = [
     "python3 -I tools/credentials/alpaca_rate_limit_probe.py --env-file \"$PAPER_ENV_FILE_C\" --out rate-limit.json",
     "wc -c \"$PAPER_ENV_FILE_C\"",
     "stat -c '%a %U' \"$PAPER_ENV_FILE_C\"",
+    # The review App's key file: its mode and size are checked without reading it.
+    "stat -c '%a %U %s' \"$GITHUB_REVIEW_APP_KEY_PATH\"",
+    "ls -l \"$GITHUB_REVIEW_APP_KEY_PATH\"",
     # The trading lane's loader path (2026-09-29): a unit started with systemd-run --user whose bash -ic hands the pointer to a
     # loader as --env-file. It must keep passing for every account, so closing the numbered-pointer hole never blocks a unit.
     "systemd-run --user --unit=overnight-volume-watch --collect /bin/bash -ic "

@@ -260,7 +260,8 @@ SECRET_LOOKUP = re.compile(r"(?:environ|getenv|process\.env|ENV\[)[^;\n]{0,40}\b
 # PAPER_ENV_FILE_2 (a further paper account) or PAPER_ENV_FILE_C (paper account C). `_` is a word character (CPython Doc/library/re.rst, `\b`),
 # so without the group (until 2026-09-29) or with digits only (until 2026-10-11) a reader or a `source` on such a pointer passed the guard.
 POINTER_VARIABLE = re.compile(
-    r"\$\{?(?:PAPER_ENV_FILE|ENV_FILE|SEC_CONTACT_ENV|PIT_ALPACA_ENV_PATH|PIT_SEC_ENV_PATH|HF_TOKEN_PATH)(?:_(?:[0-9]+|[A-Z]))?\b")
+    r"\$\{?(?:PAPER_ENV_FILE|ENV_FILE|SEC_CONTACT_ENV|PIT_ALPACA_ENV_PATH|PIT_SEC_ENV_PATH|HF_TOKEN_PATH"
+    r"|GITHUB_REVIEW_APP_KEY_PATH)(?:_(?:[0-9]+|[A-Z]))?\b")
 # The Hugging Face home itself (or everything in it) as a reader's operand: a recursive search or a
 # copy of it includes both token files. Its subdirectories such as hub/ stay readable.
 HF_HOME_ROOT = re.compile(r"(?:(?:\.cache|XDG_CACHE_HOME)\}?/huggingface\}?|^\$\{?HF_HOME\}?)(?:/\**)?$")

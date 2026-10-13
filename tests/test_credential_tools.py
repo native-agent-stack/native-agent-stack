@@ -24,6 +24,7 @@ TOOLS = ROOT / "tools" / "credentials"
 sys.path.insert(0, str(TOOLS))
 import alpaca_rate_limit_probe as probe_mod  # noqa: E402
 import set_credential as store_mod  # noqa: E402
+import shutil  # noqa: E402
 
 
 def fake_token(prefix: str = "") -> str:
@@ -405,6 +406,286 @@ class StoreFromEnvTests(unittest.TestCase):
                 self.assert_never_echoed(result.stdout + result.stderr)
 
 
+@unittest.skipUnless(shutil.which("openssl"), "openssl is needed to generate and check the synthetic keys")
+class FileCustodyTests(unittest.TestCase):
+    """set_credential.py --from-file (2026-10-12): a downloaded key file moves into the store as a new 0600 file, the
+    stored copy passes `openssl pkey -noout`, and only then is the original removed. Every key is generated per test."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        base = Path(self.tmp.name)
+        self.env = {"HOME": str(base / "home"), "XDG_CONFIG_HOME": str(base / "cfg")}
+        self.store = base / "cfg" / "native-agent-stack"
+        self.downloads = base / "Downloads"
+        self.downloads.mkdir()
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def make_key(self, name="app.2026-10-12.private-key.pem", *extra) -> Path:
+        path = self.downloads / name
+        subprocess.run(["openssl", "genpkey", "-algorithm", "RSA", "-pkeyopt", "rsa_keygen_bits:2048", *extra,
+                        "-out", str(path)], check=True, capture_output=True, timeout=60)
+        return path
+
+    def custody(self, source, answers=("replace",), **kwargs):
+        answers = iter(answers)
+        out = io.StringIO()
+        code = store_mod.run_from_file("github-review-app", env=self.env, ask=lambda _p: str(source),
+                                       prompt=lambda _p: next(answers), out=out, **kwargs)
+        return code, out.getvalue()
+
+    def assert_nothing_of(self, data: bytes, output: str):
+        self.assertNotIn("PRIVATE KEY", output)
+        self.assertNotIn("BEGIN", output)
+        for line in data.decode("ascii").splitlines()[1:-1]:
+            self.assertNotIn(line, output)
+
+    def test_moves_a_key_into_a_new_private_file_and_removes_the_original(self):
+        source = self.make_key()
+        data = source.read_bytes()
+        code, output = self.custody(source)
+        self.assertEqual(code, 0)
+        stored = self.store / "github-review-app.pem"
+        self.assertEqual(stored.read_bytes(), data)
+        self.assertEqual(stat.S_IMODE(os.lstat(stored).st_mode), 0o600)
+        self.assertEqual(stat.S_IMODE(os.lstat(self.store).st_mode), 0o700)
+        self.assertFalse(source.exists())
+        self.assertEqual([p.name for p in self.store.iterdir()], ["github-review-app.pem"])  # no temporary left
+        self.assertIn("key check passed", output)
+        self.assert_nothing_of(data, output)
+
+    def test_a_file_that_is_not_a_readable_key_is_refused_and_kept(self):
+        for name, writer in (("random.pem", lambda p: p.write_bytes(os.urandom(1200))),
+                             ("protected.pem", None)):
+            with self.subTest(source=name):
+                if writer is None:
+                    source = self.make_key(name, "-aes256", "-pass", "pass:" + fake_token())
+                else:
+                    source = self.downloads / name
+                    writer(source)
+                data = source.read_bytes()
+                with self.assertRaisesRegex(store_mod.Refused, "not a private key openssl can read"):
+                    self.custody(source)
+                self.assertEqual(source.read_bytes(), data)  # the original stays, unchanged
+                self.assertFalse((self.store / "github-review-app.pem").exists())
+                self.assertEqual(list(self.store.iterdir()), [])  # the failed copy is removed
+
+    def test_refuses_a_symlink_a_missing_an_empty_or_an_oversized_source(self):
+        key = self.make_key()
+        link = self.downloads / "link.pem"
+        link.symlink_to(key)
+        empty = self.downloads / "empty.pem"
+        empty.write_bytes(b"")
+        big = self.downloads / "big.pem"
+        big.write_bytes(b"x" * (store_mod.MAX_KEY_FILE_BYTES + 1))
+        for source in (link, self.downloads / "missing.pem", empty, big, self.downloads):
+            with self.subTest(source=source.name), self.assertRaises(store_mod.Refused):
+                self.custody(source)
+        self.assertTrue(key.exists() and link.is_symlink() and empty.exists() and big.exists())
+        self.assertFalse((self.store / "github-review-app.pem").exists())
+
+    def test_an_existing_key_is_replaced_only_after_the_hidden_word_replace(self):
+        first = self.make_key("first.pem")
+        first_data = first.read_bytes()
+        self.assertEqual(self.custody(first)[0], 0)
+        second = self.make_key("second.pem")
+        code, output = self.custody(second, answers=("no",))
+        self.assertEqual(code, 1)
+        self.assertIn("unchanged", output)
+        self.assertTrue(second.exists())
+        self.assertEqual((self.store / "github-review-app.pem").read_bytes(), first_data)
+        second_data = second.read_bytes()
+        self.assertEqual(self.custody(second, answers=("replace",))[0], 0)
+        self.assertEqual((self.store / "github-review-app.pem").read_bytes(), second_data)
+        self.assertFalse(second.exists())
+
+    def test_without_openssl_nothing_moves(self):
+        source = self.make_key()
+        with mock.patch.object(store_mod.shutil, "which", return_value=None), \
+                self.assertRaisesRegex(store_mod.Refused, "openssl not found"):
+            self.custody(source)
+        self.assertTrue(source.exists())
+        self.assertFalse(self.store.exists() and any(self.store.iterdir()))
+
+    def test_only_a_key_file_entry_and_never_through_the_value_modes(self):
+        # --from-file takes only a private key file entry; the hidden prompt and --from-env refuse the key file entry,
+        # so neither ever writes an export line to it.
+        for entry in ("alpaca-paper", "nativestack-generation-key", "claude-native", "no-such-entry"):
+            with self.subTest(entry=entry), self.assertRaises(store_mod.Refused):
+                store_mod.load_file_entry(entry, env=self.env)
+        self.assertEqual(store_mod.load_file_entry("github-review-app", env=self.env)["id"], "github-review-app")
+        with self.assertRaisesRegex(store_mod.Refused, "not an operator-supplied stored entry"):
+            store_mod.load_entry("github-review-app", env=self.env)
+        env = dict(self.env, GITHUB_REVIEW_APP_ID="123456")
+        with self.assertRaises(store_mod.Refused):
+            store_mod.run_from_env("github-review-app", env=env, isolated_start=True)
+        self.assertFalse((self.store / "github-review-app.pem").exists())
+
+    # Astra's first read of #1057 at d9a7199d (findings 1 and 2, the read's verdict, a private record cited by name).
+    def test_a_source_with_another_hard_link_is_refused_and_every_link_stays(self):
+        source = self.make_key()
+        os.chmod(source, 0o644)
+        other = self.downloads / "other-name.pem"
+        os.link(source, other)
+        with self.assertRaisesRegex(store_mod.Refused, "another hard link"):
+            self.custody(source)
+        self.assertTrue(source.exists() and other.exists())
+        self.assertFalse((self.store / "github-review-app.pem").exists())
+
+    def test_a_source_owned_by_another_user_is_refused(self):
+        source = self.make_key()
+        with self.assertRaisesRegex(store_mod.Refused, "source is not owned by you"):
+            self.custody(source, uid=os.getuid() + 1)
+        self.assertTrue(source.exists())
+        self.assertFalse(self.store.exists())  # refused before the store is touched
+
+    def test_a_link_made_during_the_copy_keeps_the_source_and_reports_cleanup_incomplete(self):
+        source = self.make_key()
+        data = source.read_bytes()
+        real = store_mod.key_file_valid
+
+        def valid_then_linked(*args):
+            os.link(source, self.downloads / "made-during-copy.pem")
+            return real(*args)
+
+        with mock.patch.object(store_mod, "key_file_valid", side_effect=valid_then_linked):
+            code, output = self.custody(source)
+        self.assertEqual(code, store_mod.CLEANUP_INCOMPLETE)
+        self.assertIn("source cleanup incomplete", output)
+        self.assertEqual((self.store / "github-review-app.pem").read_bytes(), data)
+        self.assertTrue(source.exists())
+        self.assertNotIn(str(self.downloads), output)
+        self.assert_nothing_of(data, output)
+
+    def test_a_link_made_after_the_last_check_is_reported_and_kept(self):
+        # Astra's delta read of #1057 at 60fbe1c6 (finding 2): a link made between the final check and the removal
+        # keeps the inode; the open source descriptor shows it, so custody reports itself incomplete.
+        source = self.make_key()
+        data = source.read_bytes()
+        later = self.downloads / "made-after-the-check.pem"
+        real = store_mod.os.lstat
+
+        def check_then_link(path, *args, **kwargs):
+            result = real(path, *args, **kwargs)
+            if not kwargs and str(path) == str(source) and not later.exists():
+                os.link(source, later)
+            return result
+
+        with mock.patch.object(store_mod.os, "lstat", side_effect=check_then_link):
+            code, output = self.custody(source)
+        self.assertEqual(code, store_mod.CLEANUP_INCOMPLETE)
+        self.assertIn("source cleanup incomplete", output)
+        self.assertNotIn("was removed", output)
+        self.assertEqual((self.store / "github-review-app.pem").read_bytes(), data)
+        self.assertTrue(later.exists())  # never removed by custody: an unknown name
+        self.assertNotIn(str(self.downloads), output)
+        self.assert_nothing_of(data, output)
+
+    def test_an_interrupt_after_the_key_is_stored_reports_that_state(self):
+        # Astra's delta read of #1057 at 60fbe1c6 (P3 1): the directory fsync comes after the replace.
+        source = self.make_key()
+        data = source.read_bytes()
+        real, calls = store_mod.os.fsync, []
+
+        def interrupted_second(fd):
+            calls.append(fd)
+            if len(calls) == 2:
+                raise KeyboardInterrupt
+            return real(fd)
+
+        with mock.patch.object(store_mod.os, "fsync", side_effect=interrupted_second):
+            code, output = self.custody(source)
+        self.assertEqual(code, store_mod.CLEANUP_INCOMPLETE)
+        self.assertIn("source cleanup incomplete", output)
+        self.assertNotIn("nothing written", output)
+        self.assertEqual((self.store / "github-review-app.pem").read_bytes(), data)
+        self.assertTrue(source.exists())
+        self.assert_nothing_of(data, output)
+
+    def test_the_stored_key_given_as_its_own_source_changes_nothing(self):
+        # Astra's delta read of #1057 at 60fbe1c6 (P3 2).
+        source = self.make_key()
+        self.assertEqual(self.custody(source)[0], 0)
+        stored = self.store / "github-review-app.pem"
+        before = os.lstat(stored)
+        code, output = self.custody(stored, answers=("replace",))
+        self.assertEqual(code, 1)
+        self.assertIn("is the stored key itself", output)
+        after = os.lstat(stored)
+        self.assertEqual((after.st_ino, after.st_mtime_ns), (before.st_ino, before.st_mtime_ns))
+        self.assertEqual([q.name for q in self.store.iterdir()], ["github-review-app.pem"])
+
+    def test_a_failed_source_check_or_removal_after_storing_reports_cleanup_incomplete_without_the_path(self):
+        for call in ("lstat", "unlink"):
+            with self.subTest(failing=call):
+                source = self.make_key(f"{call}.pem")
+                data = source.read_bytes()
+                real = getattr(store_mod.os, call)
+
+                def failing(path, *args, real=real, source=source, **kwargs):
+                    if not kwargs and str(path) == str(source):
+                        raise PermissionError(13, "Permission denied", str(path))
+                    return real(path, *args, **kwargs)
+
+                with mock.patch.object(store_mod.os, call, side_effect=failing):
+                    code, output = self.custody(source)
+                self.assertEqual(code, store_mod.CLEANUP_INCOMPLETE)
+                self.assertIn("source cleanup incomplete", output)
+                self.assertEqual((self.store / "github-review-app.pem").read_bytes(), data)
+                self.assertTrue(source.exists())
+                self.assertNotIn(str(self.downloads), output)
+                self.assert_nothing_of(data, output)
+                (self.store / "github-review-app.pem").unlink()
+                source.unlink()
+
+    def test_a_failed_store_write_keeps_the_source_and_names_no_path(self):
+        for call in ("fsync", "replace"):
+            with self.subTest(failing=call):
+                source = self.make_key(f"{call}.pem")
+                data = source.read_bytes()
+
+                def failing(*args, **kwargs):
+                    raise OSError(5, "Input/output error", str(source))
+
+                with mock.patch.object(store_mod.os, call, side_effect=failing), \
+                        self.assertRaisesRegex(store_mod.Refused, "nothing moved") as raised:
+                    self.custody(source)
+                self.assertNotIn(str(self.downloads), str(raised.exception))
+                self.assertIsNone(raised.exception.__cause__)
+                self.assertTrue(raised.exception.__suppress_context__)
+                self.assertEqual(source.read_bytes(), data)
+                self.assertEqual([q.name for q in self.store.iterdir()], [])  # no key and no temporary file
+                source.unlink()
+
+    def test_the_cli_reports_cleanup_incomplete_without_a_traceback_or_the_path(self):
+        source = self.make_key()
+        real = store_mod.os.unlink
+
+        def failing(path, *args, **kwargs):
+            if not kwargs and str(path) == str(source):
+                raise PermissionError(13, "Permission denied", str(path))
+            return real(path, *args, **kwargs)
+
+        out, err = io.StringIO(), io.StringIO()
+        with mock.patch.dict(os.environ, self.env), mock.patch.object(store_mod.os, "unlink", side_effect=failing), \
+                mock.patch("builtins.input", return_value=str(source)), \
+                mock.patch.object(sys.stdin, "isatty", return_value=True), \
+                mock.patch.object(out, "isatty", return_value=True, create=True), \
+                mock.patch.object(sys, "stdout", out), mock.patch.object(sys, "stderr", err):
+            code = store_mod.main(["github-review-app", "--from-file"])
+        self.assertEqual(code, store_mod.CLEANUP_INCOMPLETE)
+        self.assertIn("source cleanup incomplete", out.getvalue() + err.getvalue())
+        self.assertNotIn("Traceback", err.getvalue())
+        self.assertNotIn(str(self.downloads), out.getvalue() + err.getvalue())
+        self.assertTrue(source.exists() and (self.store / "github-review-app.pem").exists())
+
+    def test_cli_refuses_both_modes_together(self):
+        with mock.patch.object(sys, "stderr", io.StringIO()) as err:
+            self.assertEqual(store_mod.main(["github-review-app", "--from-env", "--from-file"]), 2)
+        self.assertIn("separate modes", err.getvalue())
+
+
 class _Response:
     def __init__(self, status, headers):
         self.status, self.headers = status, headers
@@ -656,6 +937,17 @@ class LauncherTests(unittest.TestCase):
             sessions = Path(tmp) / "native-agent-stack" / "credential-sessions"
             self.assertEqual(stat.S_IMODE(os.lstat(sessions).st_mode), 0o700)
             self.assertEqual(list(sessions.iterdir()), [])
+
+    def test_file_custody_mode_dry_run(self):
+        # --from-file (2026-10-12): the window runs set_credential.py --from-file; the path is typed there, never written
+        # into the session script.
+        with tempfile.TemporaryDirectory() as tmp:
+            result = self.run_launcher("github-review-app", "--from-file", "--dry-run", state=Path(tmp))
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("mode: file custody github-review-app", result.stdout)
+            self.assertIn("python3 -I tools/credentials/set_credential.py github-review-app --from-file", result.stdout)
+            self.assertNotIn("Downloads", result.stdout)
+            self.assertEqual(self.run_launcher("alpaca-paper", "--probe", "--from-file", state=Path(tmp)).returncode, 2)
 
     def test_rejects_bad_arguments_and_unsafe_paths(self):
         with tempfile.TemporaryDirectory() as tmp:

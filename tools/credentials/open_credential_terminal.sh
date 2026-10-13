@@ -5,6 +5,8 @@
 #   tools/credentials/open_credential_terminal.sh <entry-id>        # store or rotate a stored key
 #   tools/credentials/open_credential_terminal.sh alpaca-paper --probe
 #                                   # store the paper pair, then probe its rate limit
+#   tools/credentials/open_credential_terminal.sh github-review-app --from-file
+#                                   # move a downloaded key file (a GitHub App's .pem) into the store
 #   ... --dry-run                   # print the plan and the generated session script; open nothing
 #
 # Live broker keys are out of scope for this repository and are never handled here.
@@ -15,13 +17,14 @@
 # uncommitted changes, so the code you type into is the committed code.
 set -euo pipefail
 
-usage="usage: open_credential_terminal.sh <entry-id> [--probe] [--dry-run]"
+usage="usage: open_credential_terminal.sh <entry-id> [--probe | --from-file] [--dry-run]"
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 root="$(cd "$here/../.." && pwd)"
-entry=""; probe=0; dry_run=0
+entry=""; probe=0; dry_run=0; from_file=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --probe) probe=1; shift ;;
+    --from-file) from_file=1; shift ;;
     --dry-run) dry_run=1; shift ;;
     -*) echo "$usage" >&2; exit 2 ;;
     *) [ -z "$entry" ] || { echo "$usage" >&2; exit 2; }; entry="$1"; shift ;;
@@ -29,6 +32,7 @@ while [ $# -gt 0 ]; do
 done
 [[ "$entry" =~ ^[a-z0-9-]+$ ]] || { echo "$usage" >&2; exit 2; }
 [ "$probe" -eq 0 ] || [ "$entry" = alpaca-paper ] || { echo "--probe applies only to alpaca-paper" >&2; exit 2; }
+[ "$probe" -eq 0 ] || [ "$from_file" -eq 0 ] || { echo "$usage" >&2; exit 2; }
 
 safe_path='^[A-Za-z0-9._/-]+$'
 state="${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack"
@@ -61,7 +65,12 @@ umask 077
   echo '  echo "Prefer running from a clone of the default branch."'
   echo 'fi'
   echo 'echo'
-  echo "python3 -I tools/credentials/set_credential.py $entry"
+  if [ "$from_file" -eq 1 ]; then
+    # The path is typed in the window at the prompt, never written into this script or passed on a command line.
+    echo "python3 -I tools/credentials/set_credential.py $entry --from-file"
+  else
+    echo "python3 -I tools/credentials/set_credential.py $entry"
+  fi
   if [ "$probe" -eq 1 ]; then
     echo 'if [ $? -eq 0 ]; then'
     echo '  echo; echo "Read-only paper rate-limit probe (one GET /v2/account; no orders):"'
@@ -100,7 +109,7 @@ elif [ -n "${DISPLAY:-}${WAYLAND_DISPLAY:-}" ]; then
 fi
 
 if [ "$dry_run" -eq 1 ]; then
-  echo "mode: store $entry$([ "$probe" -eq 1 ] && echo ' + paper rate-limit probe')"
+  echo "mode: $([ "$from_file" -eq 1 ] && echo 'file custody' || echo store) $entry$([ "$probe" -eq 1 ] && echo ' + paper rate-limit probe')"
   echo "session script: $session"
   [ -z "$result" ] || echo "probe result: $result"
   if [ ${#launch[@]} -gt 0 ]; then printf 'would launch:'; printf ' %q' "${launch[@]}"; echo; else echo "would print: bash $session"; fi
