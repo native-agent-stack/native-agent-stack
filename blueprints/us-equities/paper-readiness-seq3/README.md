@@ -2,16 +2,18 @@
 
 The seq2 launcher and eight unit touch hooks wrote the operator's host-wide
 STOP at every stage end. A flat recover then removed it. This interrupted other
-lanes. Sequencing v3 owns only `alpaca-paper/lane-b/STOP`; the host-wide file
-remains a read-only operator abort.
+lanes. Recovery now treats BOTH `alpaca-paper/lane-b/STOP` and host STOP as
+read-only operator paths. Automatic cleanup owns only a private per-trial
+`.stage-hook-latch` in the already-private instance directory.
 
 The deterministic recutter verifies the original strict bundle inventory and
 the exact retained launcher/issuer source bytes, copies the frozen runtime and
 eight CONFIGs unchanged, and changes only:
 
-- launch.py: both latches block admission, stop-mark creates only the lane file,
+- launch.py: operator paths and outstanding private markers block admission;
+  stop-mark creates only a private per-trial machine marker,
   repeated hooks retain original ownership, and exact-CONFIG flat recovery
-  clears only a file with the same trial, inode/device, modification/change
+  clears only that private marker with the same trial, inode/device, modification/change
   clocks, size and body hash as the creating hook;
 - issue_go.py: both latches block readiness issuance;
 - lane_latch.py: ownership and unchanged-file checks shared by the hooks;
@@ -37,8 +39,12 @@ at 8c95a50d10bd2db0b59058c6827275917ce35aa3 (`runner.Controller.stop_requested`,
 remains the supported path/service and ExecStopPost lifecycle; no
 calendar timer or new scheduler is introduced.
 
-The old launcher and issuer are retained as non-executable `.txt` test fixtures
-so their pinned byte hashes and failing behavior are inspectable. The test
+The issuer and a sanitized historical launcher are non-executable `.txt`
+fixtures. The launcher's historical private predecessor literal is replaced
+with a hash of a published SYN byte string; its lifecycle behavior is retained.
+Actual recuts verify the private expected manifest digest supplied as an input
+and derive the launcher pin from that verified manifest. No digest committing
+to non-public packet bytes is hard-coded in the public source. The test
 harness redirects every state/latch/config root under `/var/tmp`, stubs native
 recover with labelled SYN proof, and tripwires keyed execution and credential
 pointer access. The first seven tests failed against the old launcher (three
@@ -56,7 +62,9 @@ systemd-run --user --scope -p CPUWeight=idle --quiet -- env TMPDIR=/var/tmp \
 ```
 
 Re-cut into a NEW directory with `recut.py --source SEALED_SEQ2 --output NEW_SEQ3
---source-commit LANDED_FIX_COMMIT`. The strict manifest covers runtime inputs;
+--source-commit LANDED_FIX_COMMIT --predecessor-sha256 EXPECTED_PRIVATE_DIGEST`.
+The expected digest comes from the sealed private binding; omission refuses.
+The strict manifest covers runtime inputs AND all five replay sources;
 the GO-BINDING-REQUEST is a separate hashed envelope because it binds that
 manifest's digest. The record retains predecessor state and config bindings.
 No service is installed or started by the recutter; it writes no GO, STOP or
@@ -75,8 +83,11 @@ The evaluator sets dont_write_bytecode before imports, rejects existing caches
 or foreign cached bundle modules, and refuses a receipt destination anywhere
 inside the bundle after canonicalization. Its simulated retirement check is
 SYN only and cannot substitute for the live retirement/CC approval below.
-Lane latch creation/stat/unlink use O_NOFOLLOW directory descriptors and dir_fd;
-a renamed lane directory cannot redirect a stage hook to a different STOP.
+Private marker creation/stat/unlink use O_NOFOLLOW directory descriptors and
+dir_fd; a renamed instance directory cannot redirect cleanup to an operator
+STOP. No cleanup operation uses a basename named STOP. A replacement/touch at
+the final unlink boundary affects only an operator path that cleanup never
+deletes. Operators must never write private machine-marker paths.
 
 The copied source can live anywhere: the recutter derives and validates the
 common absolute root embedded in the unit bytes, then relocates WorkingDirectory
@@ -107,14 +118,15 @@ systemctl --user show --property=Id,LoadState,ActiveState,UnitFileState paper-re
 Send the retirement output proving every old path disabled/inactive, the empty
 active directory/no GO and inactive services to the CC. **WAIT for the CC's
 install approval after it reads that proof.** Only then install/verify exactly
-22 seq3 files, reload, enable/arm the 11 seq3 paths with zero active trials and
+22 seq3 files, materialize the operator lane directory at mode 0700 without
+creating any STOP, reload, enable/arm the 11 seq3 paths with zero active trials and
 no GO, and report states. The co-op then restarts its issuer on the new binding.
 The new issuer refuses when any old path is enabled or active or its inventory
 is unavailable; one GO must never reach both generations. Recutter/dry-run tools
 perform none of these service mutations. STOP/HOLD/writer state are untouched.
 
-PREDECESSOR_BUNDLE now binds d268be92 (actual seq2), replacing c738f143 as the
-immediate predecessor. This preserves genuine same-state/config receipts without
+PREDECESSOR_BUNDLE binds the immediate predecessor from the supplied private
+manifest digest. This preserves genuine same-state/config receipts without
 relabeling or resetting them. A non-flat lane B recovery holds the lane latch
 and stops its chain; it no longer creates an operator abort for every lane.
 A lane file blocks new admission, but the unchanged running native engine still

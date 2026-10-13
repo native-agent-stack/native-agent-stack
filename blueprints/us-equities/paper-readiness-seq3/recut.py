@@ -9,13 +9,13 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 
-LAUNCH_SHA = "7ee83afc6f9197abc5e02181524449fce3be9947f75cb8f750eb4396a96275e4"
 ISSUER_SHA = "8fb23913da2e17831c0fff67cb88c3e6310705467a5ae437974c7d7e645e9c2b"
-PREDECESSOR = "d268be9228d21520c5bba7947471f3ea6e49873df3b75a05dc8a93c93f87a1c1"
 VERSION = "readiness-sequencing-v3-lane-latch"
+REPLAY_SOURCES = ("test_wiring.py", "test_go_issuer.py", "test_sequencing.py", "test_unit_contracts.py", "test_data_wiring.py")
 
 
 def sha(raw):
@@ -28,14 +28,18 @@ def once(text, old, new):
     return text.replace(old, new)
 
 
-def rewrite_launch(text):
-    if sha(text.encode()) != LAUNCH_SHA:
+def rewrite_launch(text, predecessor_sha256=None, launcher_sha256=None):
+    if not isinstance(predecessor_sha256, str) or not re.fullmatch("[0-9a-f]{64}", predecessor_sha256):
+        raise ValueError("predecessor_digest_required")
+    if not isinstance(launcher_sha256, str) or not re.fullmatch("[0-9a-f]{64}", launcher_sha256):
+        raise ValueError("launcher_digest_required")
+    if sha(text.encode()) != launcher_sha256:
         raise ValueError("seq2_launcher_pin_mismatch")
     text = once(text, "STOP = Path.home() / '.local/state/native-agent-stack/alpaca-paper/STOP'",
         "HOST_STOP = Path.home() / '.local/state/native-agent-stack/alpaca-paper/STOP'\n"
         "STOP = HOST_STOP.parent / 'lane-b/STOP'\n"
         "from lane_latch import pending as latch_pending, mark as latch_mark, clear as latch_clear\n\n"
-        "def stop_present():\n    return latch_pending(STOP, HOST_STOP)\n\n"
+        "def stop_present():\n    return latch_pending(STOP, HOST_STOP, STATE / 'instances')\n\n"
         "def assert_seq2_watchers_retired():\n"
         "    from seq2_retirement import assert_retired\n"
         "    try:\n        return assert_retired()\n"
@@ -43,8 +47,13 @@ def rewrite_launch(text):
     if text.count("if STOP.exists() or STOP.is_symlink():") != 2:
         raise ValueError("seq2_stop_admission_shape")
     text = text.replace("if STOP.exists() or STOP.is_symlink():", "if stop_present():")
-    text = once(text, "PREDECESSOR_BUNDLE = 'c738f1439a3267dc19f99c2800ec85ff7c568bfcb1f345b1e237dfa002e95fec'",
-                "PREDECESSOR_BUNDLE = '" + PREDECESSOR + "'")
+    assignments = [node for node in ast.parse(text).body if isinstance(node, ast.Assign)
+                   and len(node.targets) == 1 and isinstance(node.targets[0], ast.Name)
+                   and node.targets[0].id == "PREDECESSOR_BUNDLE"]
+    if len(assignments) != 1:
+        raise ValueError("predecessor_assignment_shape")
+    text = once(text, ast.get_source_segment(text, assignments[0]),
+                "PREDECESSOR_BUNDLE = " + repr(predecessor_sha256))
     start, end = text.index("def stop_mark(stage):"), text.index("def recover_stage(stage):")
     replacement = '''def stop_mark(stage):
     active_path = STATE / 'active' / (stage + '.json')
@@ -55,10 +64,15 @@ def rewrite_launch(text):
     # A repeated stop/recover hook cannot overwrite the original ownership.
     if receipt.exists() or receipt.is_symlink():
         prior = safe_json(receipt)
-        if prior.get('version') != 'lane-b-stage-latch-v1' or prior.get('trial') != active['trial']:
+        if prior.get('version') != 'private-stage-hook-v2' or prior.get('trial') != active['trial']:
             raise Refused('lane_stop_ownership_mismatch')
         return 0
-    save(receipt, latch_mark(STOP, HOST_STOP, active['trial']))
+    # Human lane/host STOPs are read-only, even if replaced at cleanup time.
+    if STOP.exists() or STOP.is_symlink() or HOST_STOP.exists() or HOST_STOP.is_symlink():
+        proof = {'version':'private-stage-hook-v2','trial':active['trial'],'created_by_hook':False}
+    else:
+        proof = latch_mark(Path(active['instance']) / '.stage-hook-latch', active['trial'])
+    save(receipt, proof)
     return 0
 
 '''
@@ -67,7 +81,7 @@ def rewrite_launch(text):
     start = text.index("            after = STOP.stat(follow_symlinks=False)")
     end = text.index("            save(STATE/'completed'", start)
     text = text[:start] + "            owned = safe_json(instance / 'stop-hook.json')\n" + \
-        "            receipt['stop_cleared'] = latch_clear(STOP, HOST_STOP, owned, active['trial'])\n" + text[end:]
+        "            receipt['stop_cleared'] = latch_clear(instance / '.stage-hook-latch', owned, active['trial'])\n" + text[end:]
     ast.parse(text)
     return text
 
@@ -133,12 +147,15 @@ Only then install/verify the 22 seq3 files and enable/arm their 11 paths, with
 zero active trials and no GO. Co-op restarts its issuer against the new binding.
 
 Stage end calls stop-mark then recover only; there is NO touch hook. Host STOP
-is read-only. A human lane STOP is preserved. seq2 retirement is mandatory:
+and lane-b/STOP are read-only. Only a private per-trial .stage-hook-latch in
+the mode0700 instance directory may be automatically created/cleared. Admission
+honors both operator paths and every outstanding private marker. seq2 retirement is mandatory:
 both generations otherwise watch the same GO files and can start together.
 
-PREDECESSOR_BUNDLE is re-pinned to the actual seq2 manifest (d268be92) so genuine
-same-state-root receipts carry forward without relabeling; c738f143 is not the
-immediate predecessor of this version. Runtime and CONFIG bytes are compared.
+PREDECESSOR_BUNDLE is re-pinned to the expected immediate predecessor supplied
+from its sealed private binding, so genuine same-state-root receipts carry
+forward without relabeling. No private digest is hard-coded in public source.
+Runtime and CONFIG bytes are compared, and every replay source is inventoried.
 
 prepare_units.py is deliberately removed; it generated obsolete HOST touches.
 Retained test/proof inputs are non-runtime SYN/historical evidence, never
@@ -166,17 +183,23 @@ def write(path, raw):
     path.chmod(0o400)
 
 
-def recut(source, output, source_commit):
+def recut(source, output, source_commit, *, predecessor_sha256=None):
+    if not isinstance(predecessor_sha256, str) or not re.fullmatch("[0-9a-f]{64}", predecessor_sha256):
+        raise ValueError("predecessor_digest_required")
     source, output = Path(source).resolve(), Path(output).resolve()
     if output.exists() or output.is_symlink() or output.is_relative_to(source):
         raise ValueError("new_bundle_destination_required")
     inventory = (source / "SHA256SUMS").read_bytes()
-    if sha(inventory) != PREDECESSOR:
+    if sha(inventory) != predecessor_sha256:
         raise ValueError("seq2_bundle_pin_mismatch")
     check = subprocess.run(["sha256sum", "--check", "--strict", "--quiet", "SHA256SUMS"], cwd=source)
     if check.returncode:
         raise ValueError("seq2_manifest_refused")
-    launch = rewrite_launch((source / "launch.py").read_text())
+    launcher_entries = [line.split("  ", 1)[0] for line in inventory.decode().splitlines()
+                        if line.endswith("  launch.py")]
+    if len(launcher_entries) != 1:
+        raise ValueError("launcher_inventory_binding_missing")
+    launch = rewrite_launch((source / "launch.py").read_text(), predecessor_sha256, launcher_entries[0])
     issuer = rewrite_issuer((source / "issue_go.py").read_text())
     old_root = embedded_unit_root(source / "units")
     # Reuse the frozen archive. Never mutate the original, even on failure.
@@ -225,18 +248,23 @@ def recut(source, output, source_commit):
     names = [n for n in names if n != "prepare_units.py" and "__pycache__" not in Path(n).parts and not n.endswith((".pyc", ".pyo"))]
     names = [n.replace("-seq2", "-seq3") if n.startswith("units/") else n for n in names]
     names.extend(["lane_latch.py", "seq2_retirement.py"])
+    for name in REPLAY_SOURCES:
+        if not (output / name).is_file() or (output / name).is_symlink():
+            raise ValueError("replay_source_missing")
+        if name not in names:
+            names.append(name)
     sums = "\n".join(sha((output / n).read_bytes()) + "  " + n for n in sorted(names)) + "\n"
     write(output / "SHA256SUMS", sums.encode())
     bundle_sha = sha(sums.encode())
     request = json.loads((source / "GO-BINDING-REQUEST.json").read_text())
     request.update(bundle_sha256=bundle_sha, deployment_glue_version=VERSION,
-                   deployment_glue_commit=source_commit, predecessor_bundle_sha256=PREDECESSOR,
+                   deployment_glue_commit=source_commit, predecessor_bundle_sha256=predecessor_sha256,
                    lane_stop="alpaca-paper/lane-b/STOP", host_stop="read-only operator kill switch",
                    runtime_and_config_bytes="identical to predecessor", unchanged_comparison=comparison,
                    unit_files=unit_names,
                    start_until_GO=False)
     write(output / "GO-BINDING-REQUEST.json", (json.dumps(request, indent=2, sort_keys=True) + "\n").encode())
-    result = {"version": VERSION, "bundle_sha256": bundle_sha, "predecessor_bundle_sha256": PREDECESSOR,
+    result = {"version": VERSION, "bundle_sha256": bundle_sha, "predecessor_bundle_sha256": predecessor_sha256,
               "source_commit": source_commit, "files": len(names), "units": unit_names,
               "removed_global_touch_hooks": removed, "runtime_and_configs_unchanged": comparison["equal"],
               "unchanged_comparison": comparison,
@@ -252,8 +280,10 @@ def main():
     parser.add_argument("--source", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--source-commit", required=True)
+    parser.add_argument("--predecessor-sha256", required=True, help="expected digest from the sealed private binding")
     args = parser.parse_args()
-    print(json.dumps(recut(args.source, args.output, args.source_commit), sort_keys=True))
+    print(json.dumps(recut(args.source, args.output, args.source_commit,
+                           predecessor_sha256=args.predecessor_sha256), sort_keys=True))
 
 
 if __name__ == "__main__":

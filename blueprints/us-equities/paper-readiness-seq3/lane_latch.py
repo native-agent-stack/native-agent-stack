@@ -1,18 +1,19 @@
-"""Owned lane B lifecycle latch. The operator host STOP is read-only here."""
-import hashlib
+"""Operator STOP paths are read-only; auto-cleanup owns a private trial marker."""
 from contextlib import contextmanager
+import hashlib
 import json
 import os
 from pathlib import Path
 import secrets
 import stat
 
-VERSION = "lane-b-stage-latch-v1"
+VERSION = "private-stage-hook-v2"
+MARKER = ".stage-hook-latch"
 
 
-def pending(lane, host):
+def pending(lane, host, instances):
     try:
-        if Path(lane).parent.is_symlink():
+        if Path(lane).parent.is_symlink() or Path(instances).is_symlink():
             return True
         for path in (lane, host):
             try:
@@ -20,6 +21,14 @@ def pending(lane, host):
             except FileNotFoundError:
                 continue
             return True
+        root = Path(instances)
+        if root.exists():
+            for instance in root.iterdir():
+                if instance.is_symlink():
+                    return True
+                marker = instance / MARKER
+                if marker.exists() or marker.is_symlink():
+                    return True
         return False
     except OSError:
         return True
@@ -29,79 +38,63 @@ def identity(info):
     return [info.st_dev, info.st_ino, info.st_mtime_ns, info.st_ctime_ns, info.st_size]
 
 
-def lane_path(lane, host):
-    lane, host = Path(lane), Path(host)
-    if lane != host.parent / "lane-b/STOP" or lane == host:
-        raise ValueError("lane_latch_path_mismatch")
-    if lane.parent.is_symlink() or host.parent.is_symlink():
-        raise ValueError("lane_latch_directory_symlink")
-    return lane
-
-
 @contextmanager
-def lane_directory(lane, host, *, create):
-    lane = lane_path(lane, host)
-    parent = os.open(Path(host).parent, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
-    directory = None
+def machine_directory(latch, owner):
+    latch = Path(latch)
+    if latch.name != MARKER or latch.parent.name != owner:
+        raise ValueError("private_latch_path_mismatch")
+    fd = os.open(latch.parent, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
     try:
-        if create:
-            try:
-                os.mkdir("lane-b", 0o700, dir_fd=parent)
-            except FileExistsError:
-                pass
-        directory = os.open("lane-b", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=parent)
-        info = os.fstat(directory)
-        if not stat.S_ISDIR(info.st_mode) or info.st_uid != os.geteuid():
-            raise ValueError("unsafe_lane_latch_directory")
-        yield parent, directory
+        info = os.fstat(fd)
+        if not stat.S_ISDIR(info.st_mode) or info.st_uid != os.geteuid() or info.st_mode & 0o077:
+            raise ValueError("private_latch_directory_required")
+        yield fd
     finally:
-        if directory is not None:
-            os.close(directory)
-        os.close(parent)
+        os.close(fd)
 
 
-def directory_current(parent, directory):
+def directory_current(latch, fd):
     try:
-        current = os.stat("lane-b", dir_fd=parent, follow_symlinks=False)
+        current = Path(latch).parent.stat(follow_symlinks=False)
     except OSError:
         return False
-    opened = os.fstat(directory)
+    opened = os.fstat(fd)
     return stat.S_ISDIR(current.st_mode) and (current.st_dev, current.st_ino) == (opened.st_dev, opened.st_ino)
 
 
-def mark(lane, host, owner):
+def mark(latch, owner):
     body = (json.dumps({"version": VERSION, "trial": owner, "nonce": secrets.token_hex(16)},
                        sort_keys=True) + "\n").encode()
-    with lane_directory(lane, host, create=True) as (parent, directory):
+    with machine_directory(latch, owner) as directory:
         try:
-            fd = os.open("STOP", os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600, dir_fd=directory)
+            fd = os.open(MARKER, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600, dir_fd=directory)
         except FileExistsError:
             return {"version": VERSION, "trial": owner, "created_by_hook": False}
         with os.fdopen(fd, "wb") as stream:
-            stream.write(body)
-            stream.flush()
-            os.fsync(stream.fileno())
+            stream.write(body);stream.flush();os.fsync(stream.fileno())
             info = os.fstat(stream.fileno())
-        if not directory_current(parent, directory):
-            raise ValueError("lane_latch_directory_changed")
+        if not directory_current(latch, directory):
+            raise ValueError("private_latch_directory_changed")
         opened = os.fstat(directory)
         return {"version": VERSION, "trial": owner, "created_by_hook": True,
                 "identity": identity(info), "directory_identity": [opened.st_dev, opened.st_ino],
                 "sha256": hashlib.sha256(body).hexdigest()}
 
 
-def clear(lane, host, proof, owner):
-    """Called only after the exact-CONFIG flat recovery is durably recorded."""
-    lane = lane_path(lane, host)
-    if (proof.get("version") != VERSION or proof.get("trial") != owner
-            or proof.get("created_by_hook") is not True):
+def clear(latch, proof, owner):
+    """Clear only our private marker after durable exact-CONFIG flat proof.
+
+    Operators write lane-b/STOP or host STOP; neither pathname is ever a
+    cleanup target, including at the final unlink boundary.
+    """
+    if proof.get("version") != VERSION or proof.get("trial") != owner or proof.get("created_by_hook") is not True:
         return False
     try:
-        with lane_directory(lane, host, create=False) as (parent, directory):
+        with machine_directory(latch, owner) as directory:
             opened = os.fstat(directory)
-            if proof.get("directory_identity") != [opened.st_dev, opened.st_ino] or not directory_current(parent, directory):
+            if proof.get("directory_identity") != [opened.st_dev, opened.st_ino] or not directory_current(latch, directory):
                 return False
-            fd = os.open("STOP", os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=directory)
+            fd = os.open(MARKER, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=directory)
             with os.fdopen(fd, "rb") as stream:
                 info = os.fstat(stream.fileno())
                 if not stat.S_ISREG(info.st_mode) or info.st_uid != os.geteuid() or info.st_size > 1024:
@@ -109,10 +102,12 @@ def clear(lane, host, proof, owner):
                 body = stream.read(1025)
                 if identity(info) != proof.get("identity") or hashlib.sha256(body).hexdigest() != proof.get("sha256"):
                     return False
-                current = os.stat("STOP", dir_fd=directory, follow_symlinks=False)
-                if identity(current) != identity(info) or not stat.S_ISREG(current.st_mode) or not directory_current(parent, directory):
+                current = os.stat(MARKER, dir_fd=directory, follow_symlinks=False)
+                if identity(current) != identity(info) or not stat.S_ISREG(current.st_mode) or not directory_current(latch, directory):
                     return False
-                os.unlink("STOP", dir_fd=directory)
+                # A descriptor-relative, private machine-only basename. No
+                # operator-replaceable STOP pathname is unlinked here.
+                os.unlink(MARKER, dir_fd=directory)
             return True
     except OSError:
         return False

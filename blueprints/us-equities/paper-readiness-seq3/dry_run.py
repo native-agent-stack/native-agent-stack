@@ -25,6 +25,10 @@ def run(bundle):
     strict = subprocess.run(["sha256sum", "--check", "--strict", "--quiet", "SHA256SUMS"], cwd=bundle)
     if strict.returncode:
         raise ValueError("strict_manifest_refused")
+    inventoried = {line.split("  ", 1)[1] for line in (bundle / "SHA256SUMS").read_text().splitlines()}
+    required = {name + ".py" for name in ("test_wiring", "test_go_issuer", "test_sequencing", "test_unit_contracts", "test_data_wiring")}
+    if not required <= inventoried:
+        raise ValueError("replay_sources_not_in_manifest")
     for name in ("launch", "lane_latch", "seq2_retirement", "issue_go", "launch_data", "data_worker"):
         existing = sys.modules.get(name)
         if existing is not None and (not getattr(existing, "__file__", None)
@@ -65,6 +69,19 @@ def run(bundle):
                                 "self.assertNotIn('touch','\\n'.join(hooks))")
             text = text.replace("hooks[2].endswith", "hooks[1].endswith")
             adaptations.append(name + ": seq3 names and two hooks/no touch")
+        if name in ("test_wiring", "test_sequencing"):
+            method = ("test_nonflat_recovery_does_not_clear_stop_or_publish_completed"
+                      if name == "test_wiring" else "test_failed_pre_recover_cannot_be_skipped_or_start_sip")
+            start = text.index("    def " + method)
+            end = text.find("\n    def ", start + 1)
+            end = len(text) if end < 0 else end
+            body = text[start:end]
+            if body.count("self.assertTrue(self.stop.exists())") != 1:
+                raise ValueError("private_marker_replay_assertion_shape")
+            body = body.replace("self.assertTrue(self.stop.exists())",
+                                "self.assertTrue((self.state/'instances/fixture-pre/.stage-hook-latch').exists())")
+            text = text[:start] + body + text[end:]
+            adaptations.append(name + ": failed recovery retains private marker; human actions unchanged")
         module = types.ModuleType(name)
         module.__file__ = str(path)
         sys.modules[name] = module

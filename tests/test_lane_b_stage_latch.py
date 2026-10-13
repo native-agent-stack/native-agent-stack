@@ -1,6 +1,7 @@
 """SYN replay of the actual seq2 launcher; keyed commands are tripwired."""
 from contextlib import nullcontext
 import hashlib
+import inspect
 import json
 import os
 from pathlib import Path
@@ -22,7 +23,11 @@ def launcher(root):
     except ImportError:
         text = BASE
     else:
-        text = rewrite_launch(BASE)
+        if "predecessor_sha256" in inspect.signature(rewrite_launch).parameters:
+            text = rewrite_launch(BASE, hashlib.sha256(b"SYN predecessor manifest").hexdigest(),
+                                  hashlib.sha256(BASE.encode()).hexdigest())
+        else:
+            text = rewrite_launch(BASE)
     module = types.ModuleType("launch")
     module.__file__ = str(root / "launch.py")
     exec(compile(text, module.__file__, "exec"), module.__dict__)
@@ -41,7 +46,7 @@ def launcher(root):
     (root / "configs/pre.json").write_text("{}")
     (root / "SHA256SUMS").write_text("SYN bundle\n")
     instance = module.STATE / "instances/syn-trial"
-    instance.mkdir(parents=True)
+    instance.mkdir(parents=True, mode=0o700)
     active = {"trial": "syn-trial", "stage": "pre", "instance": str(instance),
               "session_date": "2026-10-13", "config_sha256": module.sha(module.config("pre")),
               "bundle_sha256": module.sha(root / "SHA256SUMS"), "go_sha256": "a" * 64}
@@ -62,13 +67,32 @@ class StageLatch(unittest.TestCase):
         self.root = Path(self.scratch.name)
         self.launch, self.instance = launcher(self.root)
 
+    def marker(self):
+        import lane_latch
+        return self.instance / ".stage-hook-latch" if lane_latch.VERSION == "private-stage-hook-v2" else self.launch.STOP
+
+    def direct_mark(self):
+        import lane_latch
+        if lane_latch.VERSION == "private-stage-hook-v2":
+            return lane_latch.mark(self.marker(), "syn-trial")
+        return lane_latch.mark(self.marker(), self.launch.HOST_STOP, "syn-trial")
+
+    def direct_clear(self, proof):
+        import lane_latch
+        if lane_latch.VERSION == "private-stage-hook-v2":
+            return lane_latch.clear(self.marker(), proof, "syn-trial")
+        return lane_latch.clear(self.marker(), self.launch.HOST_STOP, proof, "syn-trial")
+
     def test_stage_end_never_creates_a_host_stop(self):
         self.launch.stop_mark("pre")
         self.assertFalse(self.launch.HOST_STOP.exists())
-        self.assertTrue((self.root / "alpaca-paper/lane-b/STOP").exists())
+        self.assertFalse(self.launch.STOP.exists())
+        self.assertTrue(self.marker().exists())
+        self.assertTrue(self.launch.stop_present())
         self.launch.recover_stage("pre")
         self.assertFalse(self.launch.HOST_STOP.exists())
         self.assertFalse(self.launch.STOP.exists())
+        self.assertFalse(self.marker().exists())
 
     def test_operator_host_stop_blocks_lane_b_and_is_untouched_by_recover(self):
         host = self.launch.HOST_STOP
@@ -99,7 +123,7 @@ class StageLatch(unittest.TestCase):
 
     def test_replaced_owned_latch_is_not_cleared(self):
         self.launch.stop_mark("pre")
-        lane = self.launch.STOP
+        lane = self.marker()
         replacement = lane.with_name("SYN-replacement")
         replacement.write_text("SYN human replacement\n")
         replacement.replace(lane)
@@ -108,9 +132,9 @@ class StageLatch(unittest.TestCase):
 
     def test_modified_owned_latch_is_not_cleared(self):
         self.launch.stop_mark("pre")
-        self.launch.STOP.write_text("SYN human modification\n")
+        self.marker().write_text("SYN human modification\n")
         self.launch.recover_stage("pre")
-        self.assertTrue(self.launch.STOP.exists())
+        self.assertTrue(self.marker().exists())
 
     def test_failed_recover_preserves_owned_lane_latch(self):
         self.launch.stop_mark("pre")
@@ -121,7 +145,7 @@ class StageLatch(unittest.TestCase):
         self.launch.native_recover = failed
         with self.assertRaisesRegex(self.launch.Refused, "recovery_not_flat"):
             self.launch.recover_stage("pre")
-        self.assertTrue(self.launch.STOP.exists())
+        self.assertTrue(self.marker().exists())
 
     def test_GO_admission_and_issuer_refuse_both_lane_and_host_latches(self):
         from recut import rewrite_issuer
@@ -173,6 +197,8 @@ class StageLatch(unittest.TestCase):
         (source / "launch.py").write_text(BASE)
         (source / "issue_go.py").write_bytes((ROOT / "tests/fixtures/seq2-issue-go.txt").read_bytes())
         (source / "GO-BINDING-REQUEST.json").write_text("{}")
+        for name in ("test_wiring.py", "test_go_issuer.py", "test_sequencing.py", "test_unit_contracts.py", "test_data_wiring.py"):
+            (source / name).write_text("# SYN replay source\n")
         units = source / "units"
         units.mkdir()
         for stage in ("record", "scan", "pre", "pre-skip", "sip", "lev1", "lev2", "lev4", "edge2", "edge8", "iex"):
@@ -189,8 +215,12 @@ class StageLatch(unittest.TestCase):
         inventory = ("\n".join(entries) + "\n").encode()
         (source / "SHA256SUMS").write_bytes(inventory)
         units.chmod(0o500)
-        with patch.object(recut, "PREDECESSOR", hashlib.sha256(inventory).hexdigest()):
-            result = recut.recut(source, self.root / "SYN-new-bundle", "SYN-source-pin")
+        pin = hashlib.sha256(inventory).hexdigest()
+        if "predecessor_sha256" in inspect.signature(recut.recut).parameters:
+            result = recut.recut(source, self.root / "SYN-new-bundle", "SYN-source-pin", predecessor_sha256=pin)
+        else:
+            with patch.object(recut, "PREDECESSOR", pin):
+                result = recut.recut(source, self.root / "SYN-new-bundle", "SYN-source-pin")
         self.assertEqual(result["removed_global_touch_hooks"], 8)
         self.assertEqual(len(result["units"]), 22)
         self.assertEqual((source / "launch.py").read_text(), BASE)
@@ -198,33 +228,34 @@ class StageLatch(unittest.TestCase):
 
     def test_replaced_lane_directory_cannot_redirect_mark_to_another_directory(self):
         import lane_latch
-        lane = self.root / "alpaca-paper/lane-b/STOP"
-        lane.parent.mkdir()
+        lane = self.marker()
+        if not lane.parent.exists():
+            lane.parent.mkdir(mode=0o700)
         foreign = self.root / "SYN-foreign"; foreign.mkdir()
         saved = self.root / "SYN-original-directory"
         real_open = os.open
         replaced = False
         def replace_before_open(path, *args, **kwargs):
             nonlocal replaced
-            if not replaced and (Path(path) == lane or (str(path) == "STOP" and "dir_fd" in kwargs)):
+            if not replaced and (Path(path) == lane or (str(path) in ("STOP", ".stage-hook-latch") and "dir_fd" in kwargs)):
                 lane.parent.rename(saved)
                 lane.parent.symlink_to(foreign, target_is_directory=True)
                 replaced = True
             return real_open(path, *args, **kwargs)
         with patch.object(lane_latch.os, "open", side_effect=replace_before_open):
             try:
-                lane_latch.mark(lane, self.launch.HOST_STOP, "syn-trial")
+                self.direct_mark()
             except ValueError:
                 pass  # A directory swap may refuse; it must not write outside.
         self.assertTrue(replaced)
-        self.assertFalse((foreign / "STOP").exists())
+        self.assertFalse((foreign / lane.name).exists())
 
     def test_replaced_lane_directory_cannot_redirect_clear_to_a_human_stop(self):
         import lane_latch
-        lane = self.root / "alpaca-paper/lane-b/STOP"
-        proof = lane_latch.mark(lane, self.launch.HOST_STOP, "syn-trial")
+        lane = self.marker()
+        proof = self.direct_mark()
         foreign = self.root / "SYN-foreign";foreign.mkdir()
-        human = foreign / "STOP";human.write_text("SYN human unchanged\n")
+        human = foreign / lane.name;human.write_text("SYN human unchanged\n")
         saved = self.root / "SYN-original-directory"
         real_unlink = os.unlink
         def replace_before_unlink(path, *args, **kwargs):
@@ -232,8 +263,63 @@ class StageLatch(unittest.TestCase):
             lane.parent.symlink_to(foreign, target_is_directory=True)
             return real_unlink(path, *args, **kwargs)
         with patch.object(lane_latch.os, "unlink", side_effect=replace_before_unlink):
-            lane_latch.clear(lane, self.launch.HOST_STOP, proof, "syn-trial")
+            self.direct_clear(proof)
         self.assertEqual(human.read_text(), "SYN human unchanged\n")
+
+    def test_operator_replacement_at_unlink_boundary_survives(self):
+        self.launch.stop_mark("pre")
+        real_unlink = os.unlink
+        called = False
+        def operator_replaces(path, *args, **kwargs):
+            nonlocal called
+            if not called:
+                self.launch.STOP.parent.mkdir(exist_ok=True, mode=0o700)
+                new = self.launch.STOP.with_name("SYN-operator-new")
+                new.write_text("SYN operator replacement preserved\n")
+                new.replace(self.launch.STOP)
+                called = True
+            return real_unlink(path, *args, **kwargs)
+        with patch("os.unlink", side_effect=operator_replaces):
+            self.launch.recover_stage("pre")
+        self.assertTrue(called)
+        self.assertEqual(self.launch.STOP.read_text(), "SYN operator replacement preserved\n")
+
+    def test_operator_modification_at_unlink_boundary_survives(self):
+        self.launch.stop_mark("pre")
+        real_unlink = os.unlink
+        called = False
+        def operator_modifies(path, *args, **kwargs):
+            nonlocal called
+            if not called:
+                self.launch.STOP.parent.mkdir(exist_ok=True, mode=0o700)
+                self.launch.STOP.write_text("SYN operator modification preserved\n")
+                called = True
+            return real_unlink(path, *args, **kwargs)
+        with patch("os.unlink", side_effect=operator_modifies):
+            self.launch.recover_stage("pre")
+        self.assertTrue(called)
+        self.assertEqual(self.launch.STOP.read_text(), "SYN operator modification preserved\n")
+
+    def test_invalid_version_trial_or_ownership_cannot_clear_private_marker(self):
+        proof = self.direct_mark()
+        for field, value in (("version", "invalid-version"), ("trial", "other-trial"), ("created_by_hook", False)):
+            with self.subTest(field=field):
+                altered = {**proof, field: value}
+                self.assertFalse(self.direct_clear(altered))
+                self.assertTrue(self.marker().exists())
+
+    def test_durable_flat_proof_precedes_private_cleanup(self):
+        self.launch.stop_mark("pre")
+        real_unlink = os.unlink
+        seen = []
+        def checked(path, *args, **kwargs):
+            result = self.launch.safe_json(self.instance / "recover-validation.json")
+            self.assertTrue(result["flat"])
+            seen.append(str(path))
+            return real_unlink(path, *args, **kwargs)
+        with patch("os.unlink", side_effect=checked):
+            self.launch.recover_stage("pre")
+        self.assertEqual(seen, [".stage-hook-latch"])
 
 
 if __name__ == "__main__":

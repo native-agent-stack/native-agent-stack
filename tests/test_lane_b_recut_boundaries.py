@@ -1,5 +1,7 @@
 """SYN public re-cut/dry-run regression boundaries, never host unit mutations."""
 import hashlib
+import ast
+import inspect
 import json
 import os
 from pathlib import Path
@@ -28,6 +30,8 @@ def sealed_fixture(root, *, embedded=None):
     (source / "GO-PROCEDURE.md").write_text("OLD seq2 touch HOST STOP\n")
     (source / "DEPLOYMENT.md").write_text("OLD seq2\n")
     (source / "test_unit_contracts.py").write_text("self.assertEqual(len(hooks),3)\nself.assertIn('touch --no-dereference',hooks[1])\nself.assertTrue(hooks[2].endswith('recover'))\n")
+    for name in ("test_wiring.py", "test_go_issuer.py", "test_sequencing.py", "test_data_wiring.py"):
+        (source / name).write_text("# SYN replay source\n")
     (source / "frozen").mkdir()
     (source / "frozen/native.txt").write_text("SYN frozen bytes\n")
     (source / "configs").mkdir()
@@ -53,6 +57,8 @@ class RecutBoundaries(unittest.TestCase):
         self.root = Path(self.scratch.name)
 
     def build(self, source, pin, output):
+        if "predecessor_sha256" in inspect.signature(recut.recut).parameters:
+            return recut.recut(source, output, "SYN-fix-pin", predecessor_sha256=pin)
         with patch.object(recut, "PREDECESSOR", pin):
             return recut.recut(source, output, "SYN-fix-pin")
 
@@ -118,11 +124,35 @@ class RecutBoundaries(unittest.TestCase):
         self.assertIn("CC", text)
         self.assertIn("11", text)
 
+    def test_predecessor_digest_is_required_from_the_private_binding_input(self):
+        source, pin = sealed_fixture(self.root)
+        with patch.object(recut, "PREDECESSOR", pin, create=True):
+            with self.assertRaisesRegex(ValueError, "predecessor_digest_required"):
+                recut.recut(source, self.root / "SYN-no-authority", "SYN-fix-pin")
+
+    def test_public_recutter_has_no_private_bundle_digest_constant(self):
+        self.assertFalse(hasattr(recut, "PREDECESSOR"))
+
+    def test_public_python_and_text_digest_literals_resolve_to_published_bytes(self):
+        import re
+        paths = list(SOURCE.glob("*.py")) + [ROOT / "tests/fixtures/seq2-launch.txt", ROOT / "tests/fixtures/seq2-issue-go.txt"]
+        published = {hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
+        for path in paths:
+            for node in ast.walk(ast.parse(path.read_text())):
+                if isinstance(node, ast.Constant) and isinstance(node.value, str) and re.fullmatch("[0-9a-f]{64}", node.value):
+                    self.assertIn(node.value, published, path.name)
+
     def test_active_or_enabled_seq2_watchers_refuse_an_otherwise_ready_GO(self):
         source, _ = sealed_fixture(self.root)
         launch = types.ModuleType("launch")
         launch.__file__ = str(source / "launch.py")
-        exec(compile(recut.rewrite_launch((source / "launch.py").read_text()), launch.__file__, "exec"), launch.__dict__)
+        text = (source / "launch.py").read_text()
+        if "predecessor_sha256" in inspect.signature(recut.rewrite_launch).parameters:
+            text = recut.rewrite_launch(text, hashlib.sha256(b"SYN predecessor manifest").hexdigest(),
+                                      hashlib.sha256(text.encode()).hexdigest())
+        else:
+            text = recut.rewrite_launch(text)
+        exec(compile(text, launch.__file__, "exec"), launch.__dict__)
         launch.ROOT = source; launch.STATE = self.root / "SYN-state"; launch.STATE.mkdir()
         launch.HOST_STOP = self.root / "alpaca-paper/STOP"
         launch.STOP = launch.HOST_STOP.parent / "lane-b/STOP"
@@ -153,6 +183,10 @@ def dry_fixture(root):
             text += "# self.stop=self.root/'STOP'\n# ('STOP',self.stop)\n"
         if name == "test_wiring":
             text += "    def finish_fixture(self):\n        self.stop.touch()  # Actual native unit's touch, scratch latch only.\n        pass\n"
+        if name in ("test_wiring", "test_sequencing"):
+            method = ("test_nonflat_recovery_does_not_clear_stop_or_publish_completed" if name == "test_wiring"
+                      else "test_failed_pre_recover_cannot_be_skipped_or_start_sip")
+            text += "    def " + method + "(self):\n        # self.assertTrue(self.stop.exists())\n        pass\n"
         (bundle / (name + ".py")).write_text(text)
     sums = "\n".join(hashlib.sha256(p.read_bytes()).hexdigest() + "  " + p.name for p in sorted(bundle.iterdir())) + "\n"
     (bundle / "SHA256SUMS").write_text(sums)
@@ -196,6 +230,15 @@ class DryRunBoundaries(unittest.TestCase):
         with patch.dict(sys.modules, {"launch": foreign}):
             with self.assertRaisesRegex(ValueError, "foreign_bundle_module"):
                 dry_run.run(self.bundle)
+
+    def test_uninventoried_replay_module_cannot_reduce_the_checks_and_still_pass(self):
+        sums = (self.bundle / "SHA256SUMS").read_text()
+        (self.bundle / "SHA256SUMS").write_text("\n".join(line for line in sums.splitlines()
+            if not line.endswith("  test_data_wiring.py")) + "\n")
+        (self.bundle / "test_data_wiring.py").write_text("")
+        result = self.command(self.root / "receipt.json")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("replay_sources_not_in_manifest", result.stderr)
 
 
 if __name__ == "__main__":

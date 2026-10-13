@@ -25,7 +25,7 @@ STOP = Path.home() / '.local/state/native-agent-stack/alpaca-paper/STOP'
 STAGES = ['pre', 'sip', 'lev1', 'lev2', 'lev4', 'edge2', 'edge8', 'iex']
 CONFIGS = {'pre': 'pre.json', 'sip': 'sip.json', 'lev1': 'lev1.json', 'lev2': 'lev2.json',
            'lev4': 'lev4.json', 'edge2': 'edge2.json', 'edge8': 'edge8.json', 'iex': 'iex.json'}
-PREDECESSOR_BUNDLE = 'c738f1439a3267dc19f99c2800ec85ff7c568bfcb1f345b1e237dfa002e95fec'
+PREDECESSOR_BUNDLE = hashlib.sha256(b'SYN predecessor manifest').hexdigest()
 SKIP_REASONS = ('pre_window_passed', 'scanner_failed', 'record_failed')
 
 class Refused(Exception):
