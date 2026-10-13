@@ -72,6 +72,7 @@
   "tests/test_adaptive_paper_overnight.py": "2985e2cfa01d743b418dad20f1c8440c76275f9b3121c78dcc917a8bb14c6846",
   "tests/test_adaptive_paper_overnight_arming.py": "5d2fa0071940b2dc910fd9f61c0a09a3d89ef43216c4a6b8099453c13420d7d8",
   "tests/test_adaptive_paper_overnight_guard_mutations.py": "ea526b0119708daa2047d16abaf1d8eb6cc37d06ae3ffeae3b687a3c3df3746d",
+  "tests/test_adaptive_paper_overnight_guard_pins.py": "eaab736bb6bd9c6a6ffdd5dae076b4f71af5155808db77fecce12d4f0e316aad",
   "tests/test_adaptive_paper_overnight_order_contract.py": "34c25443c8e56a25772fe9db39a0c52f75554351306407dd466377bd0d987789",
   "tests/test_adaptive_paper_recovery.py": "ca1bb1dabb164fcb67ab249197192b78e376d4f03935b3e2b9d5a8504d5926c6",
   "tests/test_adaptive_paper_runner.py": "fbf8e7ec9b044526952aba9f790a0e2519bd60313fce642a32fde1059d0b1f3c",
