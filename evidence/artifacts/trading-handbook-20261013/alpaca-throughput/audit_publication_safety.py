@@ -3,8 +3,22 @@ Classes: account_number_9plus_digits (digit runs of 9+ outside 40/64-hex digests
 home_dir_literal, var_tmp_literal, run_user_literal, state_dir_literal, caller-supplied literals (--literal, matched case-insensitively), client_order_id_prefix_shape.
 Exit 0 only when every file has zero matches for every class (--allow CLASS=N relaxes one class to at most N for named raw inputs).
 usage: python3 audit_publication_safety.py [--literal TOKEN]... [--allow CLASS=N]... FILE [FILE...]"""
+import json
 import re
 import sys
+from pathlib import Path
+
+# Published capacity.py blobs at these ancestor revisions, verified with
+# git show <revision>:blueprints/us-equities/order-throughput/capacity.py.
+# These bind this dated projection only; new source bindings need verification.
+PUBLIC_CODE_BINDINGS = {
+    ("facts", "capacity_py_sha256", "a1"):
+        "91563bd337a50416584cc12e95eebbcc1b19cfdf34a428cdce71b2470b274f69",
+    ("facts", "capacity_py_sha256", "a2"):
+        "024797332ff367b76560c5c4495750d32b08143d5d4d824839eee333d3643567",
+    ("facts", "harness_revision_a1"): "dbe7a8da1bb497570471e2b9d0dcfe56bbdc56e9",
+    ("facts", "harness_revision_a2"): "d6056831b4e7324436f0ace2517066f708f86bf5",
+}
 
 HEX_DIGEST = re.compile(r"\b(?:[0-9a-fA-F]{64}|[0-9a-fA-F]{40})\b")
 LONG_RUN = re.compile(r"(?<![0-9.])[0-9]{9,}(?![0-9])")
@@ -24,6 +38,34 @@ CLASSES = {
 }
 
 
+def projection_publication_errors(document):
+    """#1090 blocker 1: private sources are name-only, never fingerprinted.
+
+    Existing facts bindings identify published code, not receipts. All other
+    seven-or-more-hex tokens are refused without values in diagnostics.
+    """
+    errors = []
+    receipts = document.get("provenance", {}).get("private_receipts", [])
+    if not isinstance(receipts, list) or any(
+            not isinstance(row, dict) or set(row) != {"name"}
+            or not isinstance(row.get("name"), str) for row in receipts):
+        errors.append("private receipt citations must contain names only")
+
+    def visit(value, path=()):
+        if isinstance(value, dict):
+            for key, child in value.items():
+                visit(child, (*path, key))
+        elif isinstance(value, list):
+            for index, child in enumerate(value):
+                visit(child, (*path, str(index)))
+        elif isinstance(value, str) and re.search(r"[0-9a-fA-F]{7,}", value):
+            if PUBLIC_CODE_BINDINGS.get(path) != value:
+                errors.append("unpublished fingerprint in projection field")
+
+    visit(document)
+    return errors
+
+
 def main(argv):
     literals, allow, files = [], {}, []
     i = 0
@@ -40,8 +82,14 @@ def main(argv):
             i += 1
     failed = False
     for path in files:
-        text = open(path, "rb").read().decode("utf-8", errors="replace")
+        text = Path(path).read_bytes().decode("utf-8", errors="replace")
         row = {}
+        try:
+            document = json.loads(text)
+        except ValueError:
+            document = None
+        if isinstance(document, dict) and str(document.get("schema", "")).startswith("alpaca-throughput-evidence/"):
+            row["projection_publication_policy"] = len(projection_publication_errors(document))
         for name, pattern in CLASSES.items():
             row[name] = len(pattern.findall(text))
         runs = LONG_RUN.findall(HEX_DIGEST.sub(" ", text))

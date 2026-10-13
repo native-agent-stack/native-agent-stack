@@ -57838,28 +57838,28 @@
     },
     {
       "path": "evidence/artifacts/trading-handbook-20261013/alpaca-throughput/README.md",
-      "sha256": "f3e1657a60dc2b3e0be3a688c8801bc7008bdfffc9bb5baef3040366a9837a34",
-      "bytes": 6656
+      "sha256": "813d59d45e9f70e1d7232d17218e445d18acb6e946f9d17da81fb6d6ecef018e",
+      "bytes": 7908
     },
     {
       "path": "evidence/artifacts/trading-handbook-20261013/alpaca-throughput/alpaca-throughput-evidence-20261013.json",
-      "sha256": "2ce94530f7d05ec4b35685a6c977a568c81f6c6888e9dfb61d9426b6fcc6a213",
-      "bytes": 22269
+      "sha256": "321f294f127e212d9c45f90fc0bb0246305c8bf6643556aa6ee43779ab4a3092",
+      "bytes": 20614
     },
     {
       "path": "evidence/artifacts/trading-handbook-20261013/alpaca-throughput/audit_publication_safety.py",
-      "sha256": "4b33444df0eebce7ad3ff850160d9ab8745668777472217e156348c9d4547801",
-      "bytes": 3308
+      "sha256": "885a4ce7e711454950438015926d1122262acd1a733720a9536b5fc8c5c93204",
+      "bytes": 5496
     },
     {
       "path": "evidence/artifacts/trading-handbook-20261013/alpaca-throughput/generate_alpaca_throughput_evidence.py",
-      "sha256": "c0507caf0403c361647b5b609a12101dac1c544fe98b2a220f8b66a82a7bbe2b",
-      "bytes": 30548
+      "sha256": "faf6bcb6bfa6dc3b1b51e642f1e76291702956800fcf55f344fdc6ccfb1698f2",
+      "bytes": 31394
     },
     {
       "path": "evidence/artifacts/trading-handbook-20261013/alpaca-throughput/verify_alpaca_throughput_evidence.py",
-      "sha256": "e401d1aec433fba9d8aa84d9b9f6f9d2ef42c6a291193498d58937c6cfa3d680",
-      "bytes": 16150
+      "sha256": "f8222eeb6e445c1c79d89d5c6497bcd0d77b29442f1a1a65b7617f28a732217b",
+      "bytes": 16031
     },
     {
       "path": "evidence/artifacts/trading-runtime-2604-20261004/build-constraint-proof.json",
@@ -62635,6 +62635,11 @@
       "path": "tests/test_alpaca_paper.py",
       "sha256": "50051999c4c878dc2c934050fddc0a6b1c36b63c98c627da8637d2a2ac0eadeb",
       "bytes": 22270
+    },
+    {
+      "path": "tests/test_alpaca_throughput_publication.py",
+      "sha256": "edcc57ec13406b91e4b9397a6d32eaf5643fdc0f6e2dc6121c3cee452b6339f8",
+      "bytes": 9173
     },
     {
       "path": "tests/test_anthropic_key_health.py",

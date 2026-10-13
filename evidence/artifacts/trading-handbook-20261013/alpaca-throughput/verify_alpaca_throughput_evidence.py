@@ -8,7 +8,6 @@ Stdlib only; no network, no credential, no clock, no environment.
 usage: python3 verify_alpaca_throughput_evidence.py --evidence FILE --capacity-dir DIR --header-receipts-dir DIR --observer-receipt FILE
 """
 import argparse
-import hashlib
 import json
 import math
 import re
@@ -16,6 +15,7 @@ import sys
 from datetime import datetime
 from decimal import Decimal, ROUND_HALF_EVEN
 from pathlib import Path
+from audit_publication_safety import projection_publication_errors
 
 RESULTS = []
 
@@ -43,6 +43,9 @@ def main(argv=None):
     args = ap.parse_args(argv)
 
     ev = json.loads(Path(args.evidence).read_bytes())
+    if projection_publication_errors(ev):
+        print("FAIL publication policy: private receipts must be name-only; no values disclosed")
+        return 1
     cap = Path(args.capacity_dir)
     a2 = json.loads((cap / "capacity-200-pre-a2.json").read_bytes())
     a1 = json.loads((cap / "capacity-200-pre-a1.json").read_bytes())
@@ -143,6 +146,18 @@ def main(argv=None):
           q(Decimal(sum(x["order_actions"] for x in full)) / Decimal(len(full)) / 2, 3))
     check("headline: sustained seconds", hl["sustained_seconds"], a2["throughput"]["submission_phase_seconds"])
     check("headline: 429 total", hl["http_429_total"], a2["http_429"]["total"])
+    counts = a2["observed_rate_limit_headers"]["counts_by_origin_and_limit"]
+    responses = sum(v for k, v in st.items() if k.startswith("trading:"))
+    observations = sum(v for k, v in counts.items() if k.startswith("trading:"))
+    writes = st["trading:submit:200"] + st["trading:cancel:204"]
+    other_reads = st["trading:read:200"] - counts.get("trading:1000", 0)
+    write_limit = (200 if observations == responses
+                   and counts.get("trading:200", 0) == writes + other_reads
+                   and 1000 in a2["preflight"]["trading_limit_headers_seen"] else "UNKNOWN")
+    check("headline: submit/cancel response limit", write_limit,
+          hl["limit_reported_on_submit_and_cancel_responses_during_run"])
+    check("headline: p90 is not recorded", "NOT_RECORDED", hl["p90_latency"])
+    check("headline: place-only capacity is not measured", "NOT_MEASURED", hl["place_only_capacity"])
     stderr_file = cap / "a2.stderr"
     check("stderr stream restart notices", run["counts"]["stderr_stream_restart_notices"],
           sum(1 for line in stderr_file.read_text(errors="replace").splitlines() if "restarting" in line) if stderr_file.is_file() else None)
@@ -181,21 +196,6 @@ def main(argv=None):
           {k: v for k, v in a1["config"].items() if k != "base_url"} == {k: v for k, v in a2["config"].items() if k != "base_url"})
     check("capacity.py hash differs between a1 and a2", True,
           a1["provenance"]["source_sha256"]["order-throughput/capacity.py"] != a2["provenance"]["source_sha256"]["order-throughput/capacity.py"])
-
-    # -- digests of the private receipts listed in the projection --
-    listed = {r["name"]: r for r in ev["provenance"]["private_receipts"]}
-    for fname in ("capacity-200-pre-a2.json", "capacity-200-pre-a2.journal.jsonl", "capacity-200-pre-a1.json"):
-        data = (cap / fname).read_bytes()
-        check(f"digest {fname}", (listed[fname]["bytes"], listed[fname]["sha256"]), (len(data), hashlib.sha256(data).hexdigest()))
-    data = Path(args.observer_receipt).read_bytes()
-    check("digest observer receipt", (listed["order-count observer receipt (a2)"]["bytes"], listed["order-count observer receipt (a2)"]["sha256"]),
-          (len(data), hashlib.sha256(data).hexdigest()))
-    for (version, who), rec in sorted(hdr.items()):
-        for entry in Path(args.header_receipts_dir).iterdir():
-            if entry.name.startswith(f"readonly-limits{'2' if version == 'v2' else ''}-") and rec["label"] == json.loads((entry / "receipt.json").read_bytes())["label"]:
-                data = (entry / "receipt.json").read_bytes()
-                row = listed[f"header receipt {version} {who}"]
-                check(f"digest header receipt {version} {who}", (row["bytes"], row["sha256"]), (len(data), hashlib.sha256(data).hexdigest()))
 
     # -- sanitization of the projection text itself --
     text = Path(args.evidence).read_text(encoding="utf-8")

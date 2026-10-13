@@ -9,16 +9,17 @@ Every number is either copied from a receipt field (named in `provenance.number_
 Account identifiers, credentials, client order ids, prices, symbols and file-system paths are never read into the output.
 
 usage: python3 generate_alpaca_throughput_evidence.py --capacity-dir DIR --header-receipts-dir DIR --observer-receipt FILE [--out FILE]
+Public re-export: --public-evidence FILE [--out FILE] reads only an approved projection, never its private inputs.
 """
 import argparse
-import hashlib
 import json
 import re
 import sys
 from decimal import Decimal, ROUND_HALF_EVEN
 from pathlib import Path
+from audit_publication_safety import projection_publication_errors
 
-SCHEMA = "alpaca-throughput-evidence/1"
+SCHEMA = "alpaca-throughput-evidence/2"
 ACCOUNT_LABELS = (("lane-a", "lane_a"), ("lane-b", "lane_b"), ("acct-c", "account_c"))
 HEADER_DIR_NAME = re.compile(r"^readonly-limits2?-[a-z0-9-]+-20261013$")
 JOURNAL_INTENT_KEYS = ["client_order_id", "extended_hours", "limit_price", "qty", "seq", "type"]
@@ -28,9 +29,23 @@ def load_json(path):
     return json.loads(Path(path).read_bytes())
 
 
-def digest(path):
-    data = Path(path).read_bytes()
-    return {"bytes": len(data), "sha256": hashlib.sha256(data).hexdigest()}
+def public_document(document):
+    """#1090 blocker 1: export approved fields with name-only private citations.
+
+    Re-export an approved projection without reopening private sources; then
+    refuse fingerprints outside the retained published-code bindings.
+    """
+    document = json.loads(json.dumps(document))
+    document["schema"] = SCHEMA
+    provenance = document["provenance"]
+    provenance["private_receipts"] = [{"name": row["name"]}
+                                      for row in provenance["private_receipts"]]
+    provenance["digest_policy"] = ("Private receipts are cited by name only. Their bytes, sizes and digests are not published. "
+                                   "The remaining facts bindings identify retained published code; "
+                                   "public integrity is the native registration of this sanitized projection.")
+    if projection_publication_errors(document):
+        raise ValueError("publication policy refused projection metadata")
+    return document
 
 
 def fixed(value, places=6):
@@ -364,13 +379,12 @@ def build(args):
     inputs = capacity.pop("_derived_inputs")
     derived = derived_section(inputs)
     a2_name, journal_name, a1_name = "capacity-200-pre-a2.json", "capacity-200-pre-a2.journal.jsonl", "capacity-200-pre-a1.json"
-    capacity_dir = Path(args.capacity_dir)
     header_dir = Path(args.header_receipts_dir)
     receipts = [
-        {"name": a2_name, "role": "the 200-cap capacity run receipt (a2)", **digest(capacity_dir / a2_name)},
-        {"name": journal_name, "role": "write-ahead journal of the a2 run: one start, 496 intents, one end", **digest(capacity_dir / journal_name)},
-        {"name": a1_name, "role": "the superseded refused attempt (a1)", **digest(capacity_dir / a1_name)},
-        {"name": "order-count observer receipt (a2)", "role": "separate post-run order-count observation", **digest(args.observer_receipt)},
+        {"name": a2_name},
+        {"name": journal_name},
+        {"name": a1_name},
+        {"name": "order-count observer receipt (a2)"},
     ]
     for entry in sorted(header_dir.iterdir()):
         receipt = entry / "receipt.json"
@@ -378,7 +392,7 @@ def build(args):
             data = load_json(receipt)
             label = next(name for prefix, name in ACCOUNT_LABELS if str(data["label"]).startswith(prefix))
             version = "v2" if data["kind"].endswith("_v2") else "v1"
-            receipts.append({"name": f"header receipt {version} {label}", "role": "read-only rate-limit header probe", **digest(receipt)})
+            receipts.append({"name": f"header receipt {version} {label}"})
     number_map = {
         "limit_200_on_account_order_position_reads": "header receipts v2: limit_and_remaining_in_request_order (path, limit, remaining) x 3 accounts",
         "limit_1000_on_clock_read": "header receipts v1 and v2: the /v2/clock row",
@@ -438,21 +452,29 @@ def build(args):
         "provenance": {
             "private_receipts": receipts,
             "number_to_receipt_field": number_map,
-            "digest_policy": ("digests are of receipt files whose bytes were audited to hold no account identifier, credential, user name or "
-                              "file-system path; the order-count observer's and the harness's stderr/stdout helper files are not listed"),
         },
     }
-    return document
+    return public_document(document)
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    parser.add_argument("--capacity-dir", required=True)
-    parser.add_argument("--header-receipts-dir", required=True)
-    parser.add_argument("--observer-receipt", required=True)
+    parser.add_argument("--capacity-dir")
+    parser.add_argument("--header-receipts-dir")
+    parser.add_argument("--observer-receipt")
+    parser.add_argument("--public-evidence", help="re-export an approved projection without private input reads")
     parser.add_argument("--out")
     args = parser.parse_args(argv)
-    text = json.dumps(build(args), indent=2, sort_keys=True, ensure_ascii=True) + "\n"
+    private_inputs = (args.capacity_dir, args.header_receipts_dir, args.observer_receipt)
+    if args.public_evidence:
+        if any(private_inputs):
+            parser.error("public re-export cannot be combined with private inputs")
+        document = public_document(load_json(args.public_evidence))
+    else:
+        if not all(private_inputs):
+            parser.error("provide --public-evidence or all three private input paths")
+        document = build(args)
+    text = json.dumps(document, indent=2, sort_keys=True, ensure_ascii=True) + "\n"
     if args.out:
         Path(args.out).write_text(text, encoding="ascii")
     else:

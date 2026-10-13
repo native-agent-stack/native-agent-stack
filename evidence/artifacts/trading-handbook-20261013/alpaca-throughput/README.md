@@ -8,10 +8,10 @@ can reproduce. It contains no account identifier, credential, client order id, p
 
 | File | What it is |
 | --- | --- |
-| `alpaca-throughput-evidence-20261013.json` | The projection: one deterministic JSON document (schema `alpaca-throughput-evidence/1`). |
+| `alpaca-throughput-evidence-20261013.json` | The projection: one deterministic JSON document (schema `alpaca-throughput-evidence/2`). |
 | `generate_alpaca_throughput_evidence.py` | Builds the JSON from the private receipts. Stdlib only; no network, clock or environment. |
 | `verify_alpaca_throughput_evidence.py` | Recomputes every headline number from the raw receipts and prints PASS/FAIL per number (exit 0 only if all pass). |
-| `audit_publication_safety.py` | Counts identifier-shaped and path-shaped tokens in files; used for the sanitization audit. |
+| `audit_publication_safety.py` | Counts identifier/path shapes and enforces name-only private citations for this projection. Only its verified published-code bindings may carry fingerprints. |
 
 ## What was measured
 
@@ -71,8 +71,22 @@ The governed budget of 180 gave the measured 90 orders with cancel per minute.
 | refused attempt | `a1` capacity receipt: `status`, `stage`, `refusal_reason`, `config` |
 | 89.999455, 90.181272, 90.000, 89.784430 per minute | computed in the projection; formulas in `derived_units.formulas` |
 
-The JSON lists the byte size and SHA-256 of each private receipt file; each was audited to hold no identifier, credential,
-user name or path before its digest was listed.
+Private receipt citations contain names only. Their contents, byte sizes and digests are not published. The native evidence
+registration binds the sanitized public projection itself. The remaining code-source bindings resolve to published
+`capacity.py` blobs, verified at the recorded ancestor revisions; they do not bind a private receipt or certify its audit.
+
+Correction for #1090 blocker 1: schema v1 incorrectly included private-receipt fingerprints and asserted an unavailable
+raw-input audit. Schema v2 removes that metadata and its assurance. The source receipt observations remain unreproduced
+without access to the private inputs; arithmetic checks on this public projection do not establish original measurements.
+
+An approved projection can be re-exported without reopening any private receipt:
+
+```
+python3 generate_alpaca_throughput_evidence.py --public-evidence approved-projection.json --out public-projection.json
+```
+
+Both private-input generation and public re-export pass through the same publication boundary. It emits receipt names only
+and refuses other fingerprints, including alternate values in the four frozen published-code binding fields.
 
 ## Verify
 
@@ -82,8 +96,9 @@ python3 verify_alpaca_throughput_evidence.py --evidence alpaca-throughput-eviden
     --observer-receipt <observer receipt file>
 ```
 
-The verifier is independent of the generator, so it also catches a generator error. The private receipts are not published; the
-verifier is for holders of the private state.
+Numeric checks are independent of the generator. Both tools share the explicit publication policy. The verifier checks
+the write-response limit and the `NOT_RECORDED` p90 / `NOT_MEASURED` place-only sentinels as well as the existing numeric
+fields. Private inputs are never identified by a digest in its output; the verifier is for holders of the private state.
 
 ## Caveats
 

@@ -368,7 +368,7 @@
   ],
   "privacy_statement": "Account labels are lane labels whose mapping to real accounts is private. No account identifier, credential, client order id, price, symbol or file-system path appears here. Each number is a receipt field or arithmetic on receipt fields.",
   "provenance": {
-    "digest_policy": "digests are of receipt files whose bytes were audited to hold no account identifier, credential, user name or file-system path; the order-count observer's and the harness's stderr/stdout helper files are not listed",
+    "digest_policy": "Private receipts are cited by name only. Their bytes, sizes and digests are not published. The remaining facts bindings identify retained published code; public integrity is the native registration of this sanitized projection.",
     "number_to_receipt_field": {
       "a1_refusal": "a1: status, stage, refusal_reason, config.base_url, http_status_counts",
       "derived_units": "computed in this projection from the fields above by the formulas in derived_units.formulas",
@@ -388,64 +388,34 @@
     },
     "private_receipts": [
       {
-        "bytes": 9403,
-        "name": "capacity-200-pre-a2.json",
-        "role": "the 200-cap capacity run receipt (a2)",
-        "sha256": "f428f8c070470478ab5a10153df9eeaa5a67433c702e23ee3ffeadd03f531e4a"
+        "name": "capacity-200-pre-a2.json"
       },
       {
-        "bytes": 73277,
-        "name": "capacity-200-pre-a2.journal.jsonl",
-        "role": "write-ahead journal of the a2 run: one start, 496 intents, one end",
-        "sha256": "0cef505b15228378d7726ce6e74b51ec5e11722af813565ac88c2448706e9626"
+        "name": "capacity-200-pre-a2.journal.jsonl"
       },
       {
-        "bytes": 5742,
-        "name": "capacity-200-pre-a1.json",
-        "role": "the superseded refused attempt (a1)",
-        "sha256": "1d52f7ba7ba45c2a6a007df837ca52bd2d7cc7f2f1cbbf5edc7d57ce0d862cbd"
+        "name": "capacity-200-pre-a1.json"
       },
       {
-        "bytes": 1980,
-        "name": "order-count observer receipt (a2)",
-        "role": "separate post-run order-count observation",
-        "sha256": "b6a40f149e3fe15f7ec71f4d37f72ffd4dc3d0affc211f70133a1b64db8790b9"
+        "name": "order-count observer receipt (a2)"
       },
       {
-        "bytes": 1174,
-        "name": "header receipt v1 account_c",
-        "role": "read-only rate-limit header probe",
-        "sha256": "636607cfa5fc342a5a2b83f9e318ebaac5a935e161915dcd5d9d237e28e48230"
+        "name": "header receipt v1 account_c"
       },
       {
-        "bytes": 1173,
-        "name": "header receipt v1 lane_a",
-        "role": "read-only rate-limit header probe",
-        "sha256": "b615aba3602831a300234ed5fe5d2bd0ed83c06d2a8035c9c74f2b7c4e9bcf93"
+        "name": "header receipt v1 lane_a"
       },
       {
-        "bytes": 1171,
-        "name": "header receipt v1 lane_b",
-        "role": "read-only rate-limit header probe",
-        "sha256": "2c1a2d7b77e7f5787dbef1a0620ea2b23e8de851a93f6e8d955b1b02a8fa4988"
+        "name": "header receipt v1 lane_b"
       },
       {
-        "bytes": 2575,
-        "name": "header receipt v2 account_c",
-        "role": "read-only rate-limit header probe",
-        "sha256": "48665e734a9e0c43dbc921b445ee11f68c0e288a8f35da84135c70f628106f55"
+        "name": "header receipt v2 account_c"
       },
       {
-        "bytes": 2571,
-        "name": "header receipt v2 lane_a",
-        "role": "read-only rate-limit header probe",
-        "sha256": "cd13e503274ceb99bb79d988cd617c8a63b940702417095c079247078097dd5c"
+        "name": "header receipt v2 lane_a"
       },
       {
-        "bytes": 2569,
-        "name": "header receipt v2 lane_b",
-        "role": "read-only rate-limit header probe",
-        "sha256": "ff70740904607808d67b2c1f02a40471798882198427f753eacd358b2bcbee2f"
+        "name": "header receipt v2 lane_b"
       }
     ]
   },
@@ -569,7 +539,7 @@
       "v1_receipts_agree_with_v2": true
     }
   },
-  "schema": "alpaca-throughput-evidence/1",
+  "schema": "alpaca-throughput-evidence/2",
   "superseded_attempt": {
     "a2_base_url_spelling": "https://paper-api.alpaca.markets",
     "base_url_spelling": "https://paper-api.alpaca.markets/v2",
