@@ -19007,6 +19007,11 @@
       "bytes": 19447
     },
     {
+      "path": "docs/decisions/2026-10-13-awesome-list-a3-evidence.md",
+      "sha256": "f00e2fe3a73afc4a62d14eb9546634fe58ccc44bec57fa097f34520b19073bf6",
+      "bytes": 18507
+    },
+    {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
       "sha256": "f646835af1648cfab7798f64626141c3964dfba4799d780dc728ea27f91f7f6c",
       "bytes": 15393
@@ -50692,6 +50697,171 @@
       "bytes": 10521
     },
     {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/OVERLAP.md",
+      "sha256": "827a08a4c95a9875a25062a16a53e75b3e27cf52c45e6f5a64f687382da7e74f",
+      "bytes": 4095
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/STATUS.md",
+      "sha256": "94f430fd93a3a1fd602fef954012396e182405a2169aa62ca829d8ac3afb6437",
+      "bytes": 538
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/SUMMARY.md",
+      "sha256": "8c2636676f6a03b7076254b32acf227038550e7df8eaf4022a72eca28171f6df",
+      "bytes": 1547
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/a3.json",
+      "sha256": "9c62693586056be3e3a7fde883070935de5f1fc37e1855367c7cb7827e8dbf82",
+      "bytes": 6565452
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/attempts.json",
+      "sha256": "20b63610ef582a385b9d938f57f3983d92c018e2fe5f0f7c2310ce3865f3dac0",
+      "bytes": 21431
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/checks.json",
+      "sha256": "a2041c20aea431f02007dd6608a5f12e119aca2672f6ff9d2a3b177fce0842e0",
+      "bytes": 2826
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/corpus.json",
+      "sha256": "cdcf8c28ffc4786166e0d54db656c82d6f3db9eff5573f10ceb97611ed214ae3",
+      "bytes": 5663575
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/identifiers.json",
+      "sha256": "e7f2f2e814d1a5ed800c251bfcd3505f704585f46b4a77ad0d395f425884d4a3",
+      "bytes": 6793
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/mapping.json",
+      "sha256": "dbf653c691374bb37945b7fac5a4d181b91c1573392d4622dc05691899649071",
+      "bytes": 5091
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/not-rendered.json",
+      "sha256": "c0ce29afafd3063a6cfcc602f44324664eea86eced6ae3ae36607120d4fc06fe",
+      "bytes": 1410
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/overlap-before-heading-fix.json",
+      "sha256": "9defb70f5e502474c403d44c2531aa1cd26bbf4cfd26995fba094b80123adf15",
+      "bytes": 4444
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/overlap.json",
+      "sha256": "948d2153cc877bf1dabc388346d5c783d281328ca524cd21118a2b113df901b8",
+      "bytes": 4103
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/progress.json",
+      "sha256": "66929700053ef4383611876ab17f3b3f5eec972567a5b8c5b4c99df53ab2c323",
+      "bytes": 1005750
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/raw-before-heading-fix.json",
+      "sha256": "bb05593b75acbb622da35897e3026ead033e2bd65b3bf4cb671e77675045b429",
+      "bytes": 2878497
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/selection.json",
+      "sha256": "475d2b117a51b0246f206902cc173edab6e5442f9a21c87deaeb17861160f779",
+      "bytes": 174493
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/sources.json",
+      "sha256": "474dfd9ccd20b74aec866af5386ded5927d88534a40f0bf051a234a9b1cf5afd",
+      "bytes": 4120
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-20261013/upstream-check.json",
+      "sha256": "43f27dd60674a4c435d6baa8f2a4cfed5ac487cbc25244010248a8814d9fd6f7",
+      "bytes": 5475
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/OVERLAP.md",
+      "sha256": "51f2ea8dd91ac92f6e1abee2cf0240890d843180eb552a8117baccda42ccb34e",
+      "bytes": 3400
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/SUMMARY.md",
+      "sha256": "927f2708122670799347dc7252b771cd8ab0952b743705def20e9c88d88f3499",
+      "bytes": 4950
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/a3.json",
+      "sha256": "050f155e2f5cca07e9f6c3023df7441937904e92005879f4f0aba76d29b88934",
+      "bytes": 5502378
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/attempts.json",
+      "sha256": "56e37fc39a004aab1a00597496d26c30420ac2aa09a2671c8b560c5e25b83103",
+      "bytes": 3194
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/canonicalization-progress.json",
+      "sha256": "db50d7a59765cda71b0c72b3800d2153d4d1d0b1e5fde53a1aa0400d4312c83d",
+      "bytes": 1478578
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/checks.json",
+      "sha256": "9ef91219ed6615ad62daa66540eb72a6c8cde9ff1ed760f26ef163d43d93ffb5",
+      "bytes": 2481
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/corpus.json",
+      "sha256": "c4bb011d20930464d0036726f07a823cdefb0c4050134f467f02691de79fb436",
+      "bytes": 5149429
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/identifiers.json",
+      "sha256": "fc7222970109a269fe9df1c04826e1f211a123613a80c591d802e524cf419cd5",
+      "bytes": 88177
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/mapping.json",
+      "sha256": "b87b8c9e6402a7e96ffbdec8df5384ad8e7246cf0cc906dac0d63b60b08d5160",
+      "bytes": 5390
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/overlap-before-reference-fix.json",
+      "sha256": "c0d417b6a2b375f857f26b59d33a546c51bd00d68a0df4dbc53ac2b80d535659",
+      "bytes": 19898
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/overlap.json",
+      "sha256": "df449ea1a0c3cbc19a771b86f1efba236d7742db05a02bb2c5ceddee1610b01e",
+      "bytes": 19787
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/raw-before-reference-fix.json",
+      "sha256": "f1e906743af4329a1a55aaa0858aa2b00912ae94bef1b4ebfcd206078656949f",
+      "bytes": 3563402
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/raw-progress.json",
+      "sha256": "6784f626cd50ad2e87357646d107e8b27aea6e50bd823176a20d63d8fadc7786",
+      "bytes": 3670743
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/remeasure-progress.json",
+      "sha256": "2cdb3a92e42386be8871d2ad5dbd2a9a7e4c1d05a6bc50d4970a9af957885037",
+      "bytes": 3670630
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/selection.json",
+      "sha256": "9066479cb934d2c181a2eba34913b72037935538297541eab339999fcbb69af3",
+      "bytes": 505147
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/sources.json",
+      "sha256": "e0e120e98919535aa5610ac90b88fc896d788571ad4162c77db1970666ce89e4",
+      "bytes": 55704
+    },
+    {
       "path": "evidence/artifacts/qmd-lexical-catalog-instructions-20261006/catalog-lookup-supersession.json",
       "sha256": "3a56f1cca99bdc105f163cefa57ae0d2527a9d6d4da60873086dae9c353ccb87",
       "bytes": 1245
@@ -61267,6 +61437,11 @@
       "bytes": 98120
     },
     {
+      "path": "scripts/awesome_convergence.py",
+      "sha256": "7069746cf413c1464d00417ab4214af0cfec9a2ea1c07af21563b3ae245fc42d",
+      "bytes": 60670
+    },
+    {
       "path": "scripts/build_ecosystem.py",
       "sha256": "acf147bdaf28b0dd837ff4cc776cb897fdc6edfc203966f7d51c3f18798344df",
       "bytes": 89670
@@ -62015,6 +62190,11 @@
       "path": "tests/test_architecture_pin_source.py",
       "sha256": "55e47ac074cef878414ca7ec2e95d69888f245c7f334c3982dffac30dfa2b475",
       "bytes": 12924
+    },
+    {
+      "path": "tests/test_awesome_convergence.py",
+      "sha256": "7526077a42876dbde14bb3c3018da028900d6dbbe951e582a0c1b0747d08a23b",
+      "bytes": 21461
     },
     {
       "path": "tests/test_backtesting_gap_burndown.py",

@@ -1,0 +1,544 @@
+{
+  "schema_version": 1,
+  "status": "publication_ready",
+  "recorded_at": "2026-10-13T04:01:49Z",
+  "attempts": [
+    {
+      "kind": "synthetic_fixture_tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_awesome_convergence",
+        "-v"
+      ],
+      "exit_code": 1,
+      "returned_summary": "Ran 11 tests in 0.007s\nFAILED (failures=1, errors=6)",
+      "findings": [
+        "Fixture owner 'new' is a reserved GitHub surface and correctly returned no repository; six fixtures used that invalid owner.",
+        "Hierarchy fixture expected section offsets without accounting for the preamble, producing one failure."
+      ],
+      "correction": "Fixture owner replaced by 'renamed'; section assertions account for preamble. Corrected tests have not yet been rerun."
+    },
+    {
+      "kind": "live_public_source_collection",
+      "command": [
+        "python3",
+        "scripts/awesome_convergence.py",
+        "collect",
+        "--directory",
+        "evidence/artifacts/q4-awesome-convergence-20261013",
+        "--workers",
+        "4"
+      ],
+      "exit_code": 1,
+      "returned_stdout": "{\"list\": \"Shubhamsaboo/awesome-llm-apps\", \"documents\": 1, \"unique_link_targets_so_far\": 3}",
+      "returned_error": "GithubError: GitHub API failed (HTTP 403)",
+      "failed_operation": "POST /markdown on the next selected pinned list",
+      "http_status": 403,
+      "x_ratelimit_headers": null,
+      "retry_after": null,
+      "request_size_bytes": null,
+      "missing_diagnostics_reason": "The original call did not request response headers or persist the POST body/request byte count. These cannot be recovered as observed evidence. POST was not retried.",
+      "completion_boundary": "Selection searches executed and one list reached rendered-link extraction. The collector did not return a corpus; canonicalization, final counts, A3 artifact and PR remain incomplete.",
+      "sanitization": "Only native returned progress and final exception are retained; traceback host paths are omitted. No authentication diagnostic or credential was inspected.",
+      "retry": "No retry or API bypass after the 403; coordination question posted under the brief's stop rule."
+    },
+    {
+      "kind": "synthetic_fixture_tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_awesome_convergence",
+        "-v"
+      ],
+      "exit_code": 0,
+      "returned_summary": "Ran 11 tests in 0.004s\nOK",
+      "completed_at": "2026-10-13T02:41:37Z",
+      "scope": "Reserved-owner and preamble-offset corrections pass. Three subsequently added GET/media-type/size/header controls remain unrun at the new blocker."
+    },
+    {
+      "kind": "live_public_source_collection_native_get",
+      "command": [
+        "python3",
+        "scripts/awesome_convergence.py",
+        "collect",
+        "--directory",
+        "evidence/artifacts/q4-awesome-convergence-20261013",
+        "--workers",
+        "4"
+      ],
+      "exit_code": 1,
+      "returned_progress": [
+        {
+          "list": "Shubhamsaboo/awesome-llm-apps",
+          "documents": 1,
+          "unique_link_targets_so_far": 3
+        },
+        {
+          "list": "avelino/awesome-go",
+          "documents": 4,
+          "unique_link_targets_so_far": 2936
+        },
+        {
+          "list": "awesome-selfhosted/awesome-selfhosted",
+          "documents": 2,
+          "unique_link_targets_so_far": 4076
+        },
+        {
+          "list": "e2b-dev/awesome-ai-agents",
+          "documents": 1,
+          "unique_link_targets_so_far": 4170
+        },
+        {
+          "list": "hesreallyhim/awesome-claude-code",
+          "documents": 1,
+          "unique_link_targets_so_far": 4396
+        },
+        {
+          "list": "ichangyou/awesome-codex",
+          "documents": 4,
+          "unique_link_targets_so_far": 4446
+        },
+        {
+          "list": "kyrolabs/awesome-agents",
+          "documents": 1,
+          "unique_link_targets_so_far": 4612
+        }
+      ],
+      "returned_error": "ValueError: document unavailable through the supported Contents API",
+      "retained_partial_source": "evidence/artifacts/q4-awesome-convergence-20261013/progress.json",
+      "correction": "Check source size before expecting base64 content: GitHub returns encoding=none for oversized source files. No rendering attempted for the oversized file.",
+      "independent_metadata": "evidence/artifacts/q4-awesome-convergence-20261013/not-rendered.json",
+      "completion_boundary": "Seven lists and fourteen documents retained. Three lists remain pending; per-link canonicalization and final count have not begun.",
+      "sanitization": "Native progress and final exception retained; private traceback paths omitted."
+    },
+    {
+      "kind": "synthetic_fixture_tests_uniform_raw",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_awesome_convergence",
+        "-v"
+      ],
+      "exit_code": 0,
+      "returned_summary": "Ran 18 tests in 0.006s\nOK",
+      "completed_at": "2026-10-13T02:52:12Z",
+      "scope": "Includes native GET interface controls and raw extraction fixtures for comments, fences, reference links and setext headings."
+    },
+    {
+      "kind": "live_public_uniform_raw_collection_and_html_crosscheck",
+      "command": [
+        "python3",
+        "scripts/awesome_convergence.py",
+        "collect-raw",
+        "--directory",
+        "evidence/artifacts/q4-awesome-convergence-20261013"
+      ],
+      "exit_code": 2,
+      "completed_at": "2026-10-13T02:52:35Z",
+      "returned_condition": "awaiting_overlap_review",
+      "retained_source": "evidence/artifacts/q4-awesome-convergence-20261013/raw-before-heading-fix.json",
+      "retained_measurement": "evidence/artifacts/q4-awesome-convergence-20261013/overlap-before-heading-fix.json",
+      "disputed_list": "e2b-dev/awesome-ai-agents",
+      "disputed_pin": {
+        "identifier_id": "I00001"
+      },
+      "raw_set_size": 109,
+      "html_set_size": 94,
+      "intersection_size": 94,
+      "union_size": 109,
+      "jaccard": 0.8623853211009175,
+      "raw_only_count": 15,
+      "html_only_count": 0,
+      "completion_boundary": "All ten selected lists fetched through the uniform raw route; HTML cross-check reused for seven lists and added for the remaining small lists. The prescribed 0.95 threshold triggered a question before canonicalization and counting. No method tuning."
+    },
+    {
+      "kind": "synthetic_heading_controls_fail_before",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_awesome_convergence",
+        "-v"
+      ],
+      "exit_code": 1,
+      "completed_at": "2026-10-13T03:00:33Z",
+      "returned_summary": "Ran 20 tests in 0.008s\nFAILED (failures=2)",
+      "failed_controls": [
+        "test_html_crosscheck_collects_heading_entries_and_skips_permalink",
+        "test_raw_heading_entry_uses_parent_section_and_retains_entry"
+      ],
+      "returned_mismatch": "HTML emitted '#aider' instead of the repository anchor; raw emitted the Aider entry heading instead of Coding Agents as the section."
+    },
+    {
+      "kind": "synthetic_heading_controls_after_fix",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_awesome_convergence",
+        "-v"
+      ],
+      "exit_code": 0,
+      "completed_at": "2026-10-13T03:01:27Z",
+      "returned_summary": "Ran 20 tests in 0.008s\nOK"
+    },
+    {
+      "kind": "live_public_source_heading_diagnosis",
+      "repository": "https://github.com/e2b-dev/awesome-ai-agents",
+      "pin": {
+        "identifier_id": "I00001"
+      },
+      "path": "README.md",
+      "read_at": "2026-10-13T03:01:30Z",
+      "media_type": "application/vnd.github.html+json",
+      "exit_code": 0,
+      "returned_sha256": {
+        "identifier_id": "I00002"
+      },
+      "observation": "Native HTML places the Aider repository anchor inside h2 and a separate class=anchor permalink outside it.",
+      "earlier_source_probe": {
+        "read_at": "2026-10-13T03:00:36Z",
+        "exit_code": 0,
+        "result": "Exact wrapper regex matched nothing because it omitted the native dir attributes; a locator-based extraction then found the anchor. No counter method was changed by this probe."
+      }
+    },
+    {
+      "kind": "live_uniform_raw_and_html_remeasurement",
+      "command": [
+        "python3",
+        "scripts/awesome_convergence.py",
+        "remeasure",
+        "--directory",
+        "evidence/artifacts/q4-awesome-convergence-20261013"
+      ],
+      "exit_code": 0,
+      "completed_at": "2026-10-13T03:01:48Z",
+      "returned_result": "All nine measured HTML overlaps >=0.95; e2b=109/109=1.0; MCP HTML unavailable. All pinned raw SHA256 values and repository URL sets agreed with the original read.",
+      "receipt": "evidence/artifacts/q4-awesome-convergence-20261013/overlap.json",
+      "raw_refinement": "Heading-entry rows retain entry_heading and use the preceding higher-level parent as section."
+    },
+    {
+      "kind": "live_canonical_api_smoke_with_independent_rest",
+      "read_at": "2026-10-13T03:04:12Z",
+      "interface": "gh api graphql, two repository aliases; independent gh api repos/<requested>",
+      "returned_identities": [
+        {
+          "requested": "jeremylongshore/claude-code-plugins-plus-skills",
+          "repository": "jeremylongshore/tons-of-skills-marketplace",
+          "repository_id": 1073337396,
+          "rest_agrees": true
+        },
+        {
+          "requested": "openai/codex",
+          "repository": "openai/codex",
+          "repository_id": 965415649,
+          "rest_agrees": true
+        }
+      ],
+      "returned_graphql_rate_headers": {
+        "x-ratelimit-limit": "5000",
+        "x-ratelimit-remaining": "4543",
+        "x-ratelimit-resource": "graphql",
+        "x-ratelimit-used": "457",
+        "x-ratelimit-reset": "1791861390"
+      }
+    },
+    {
+      "kind": "synthetic_membership_threshold_fail_before",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_awesome_convergence.AwesomeConvergenceTests.test_three_list_threshold_uses_repository_membership_and_retains_category_support",
+        "-v"
+      ],
+      "exit_code": 1,
+      "returned_summary": "Ran 1 test in 0.001s\nFAILED (errors=1)",
+      "returned_error": "IndexError: list index out of range",
+      "correction": "Threshold follows global distinct canonical-repository membership; category-support list count is separate."
+    },
+    {
+      "kind": "live_canonicalization",
+      "command": [
+        "python3",
+        "scripts/awesome_convergence.py",
+        "canonicalize",
+        "--directory",
+        "evidence/artifacts/q4-awesome-convergence-20261013",
+        "--workers",
+        "4"
+      ],
+      "exit_code": 0,
+      "completed_at": "2026-10-13T03:07:20Z",
+      "returned_final_progress": "{\"canonicalized\": 9969, \"targets\": 9969}",
+      "unresolvable_targets": 29,
+      "batch_size": 40,
+      "receipt": "evidence/artifacts/q4-awesome-convergence-20261013/corpus.json"
+    },
+    {
+      "kind": "offline_count_build_and_independent_tally",
+      "command": [
+        "python3",
+        "scripts/awesome_convergence.py",
+        "build",
+        "--directory",
+        "evidence/artifacts/q4-awesome-convergence-20261013"
+      ],
+      "exit_code": 0,
+      "returned_result": {
+        "status": "built",
+        "lists": 10,
+        "rows": 10311,
+        "unresolved": 29,
+        "repositories_per_category": {
+          "agent-orchestration": 1,
+          "agent-observability": 0,
+          "coding-agent-harnesses": 0,
+          "agent-memory": 0,
+          "mcp-code-navigation": 0,
+          "evaluation-harnesses": 0
+        }
+      },
+      "independent_observation": "An independent dictionary-of-sets tally over retained mapped rows agreed for every category and distinct-list count; it does not independently certify extraction or target capabilities."
+    },
+    {
+      "kind": "discriminating_offline_count_control",
+      "command": [
+        "python3",
+        "scripts/awesome_convergence.py",
+        "check",
+        "--directory",
+        "evidence/artifacts/q4-awesome-convergence-20261013"
+      ],
+      "condition_absent": "Qualifying repository's stored count changed from 3 to 4; restored after the negative run.",
+      "exit_code": 1,
+      "completed_at": "2026-10-13T03:12:56Z",
+      "returned_error": "ValueError: committed counts or summary differ from the retained corpus/mapping"
+    },
+    {
+      "kind": "native_privacy_interface_attempt",
+      "interface": "host_name_scan.scan_paths(..., reject_email=True)",
+      "returned_error": "PublicationEntryTooLarge: publication entry too large",
+      "correction": "The reject_email route is for bounded serialized JSON publication entries, not whole source/evidence files. Use the supported repository-framing mode for these files; no checker bypass or rule change."
+    },
+    {
+      "kind": "full_publication_validation_before_url_minimization",
+      "command": [
+        "python3",
+        "scripts/validate.py"
+      ],
+      "exit_code": 1,
+      "returned_error": "Four generated JSON files contained possible local session identifier shapes.",
+      "diagnosis": "Public asset suffixes in captured link locations matched the UUID heuristic; ancillary non-repository rendered locations were unnecessary for repository-set evidence.",
+      "diagnostic_correction": "An initial diagnostic surfaced an unnecessary signed-image URL fragment; it is not retained in this receipt. Later diagnostics emit only field locations or counts, and publication stores repository identities only.",
+      "correction": "Minimize published repository links to owner/repo and discard non-repository HTML locations; retain source hashes, pins and file/line provenance. No validation exemption."
+    },
+    {
+      "kind": "synthetic_url_minimization_fail_before",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_awesome_convergence.AwesomeConvergenceTests.test_raw_published_url_is_repository_identity_only",
+        "tests.test_awesome_convergence.AwesomeConvergenceTests.test_html_crosscheck_drops_ancillary_urls_and_asset_suffixes",
+        "-v"
+      ],
+      "exit_code": 1,
+      "returned_summary": "Ran 2 tests in 0.002s\nFAILED (failures=2)"
+    },
+    {
+      "kind": "receipt_sanitization_and_compact_serialization",
+      "command": [
+        "python3",
+        "scripts/awesome_convergence.py",
+        "sanitize",
+        "--directory",
+        "evidence/artifacts/q4-awesome-convergence-20261013"
+      ],
+      "exit_code": 0,
+      "returned_result": {
+        "status": "sanitized",
+        "files": 3,
+        "before_bytes": 17965804,
+        "after_bytes": 9921378,
+        "repository_sets_unchanged": true
+      },
+      "scope": "Combined URL payload minimization and JSON record formatting; exact file-byte comparison, not provider usage or token savings. Counts and overlap sets unchanged."
+    },
+    {
+      "kind": "final_synthetic_suite_and_offline_reproduction",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_awesome_convergence",
+        "-v"
+      ],
+      "exit_code": 0,
+      "completed_at": "2026-10-13T03:21:41Z",
+      "returned_summary": "Ran 25 tests in 0.011s\nOK",
+      "offline_check_exit_code": 0,
+      "returned_offline_result": {
+        "status": "checked",
+        "lists": 10,
+        "rows": 10311,
+        "unresolved": 29,
+        "repositories_per_category": {
+          "agent-orchestration": 1,
+          "agent-observability": 0,
+          "coding-agent-harnesses": 0,
+          "agent-memory": 0,
+          "mcp-code-navigation": 0,
+          "evaluation-harnesses": 0
+        }
+      }
+    },
+    {
+      "kind": "full_publication_validation_after_url_minimization",
+      "command": [
+        "python3",
+        "scripts/validate.py"
+      ],
+      "exit_code": 0,
+      "returned_stdout": "{\"components\": 71, \"hashed_files\": 11877, \"profiles\": 4, \"receipts\": 240, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution."
+    },
+    {
+      "kind": "native_staged_secret_scan",
+      "command": [
+        "gitleaks",
+        "git",
+        "--pre-commit",
+        "--staged",
+        "--redact",
+        "--no-banner"
+      ],
+      "exit_code": 1,
+      "returned_summary": "0 commits scanned; scanned ~17601272 bytes (17.60 MB) in 6.53s; leaks found: 15343",
+      "redacted_report_metadata": {
+        "sourcegraph-access-token": 10580,
+        "generic-api-key": 4763
+      },
+      "diagnosis": "Sourcegraph rule locations point to public Git commit/pin/blob metadata. Generic rule locations accompany unnecessary GraphQL global node IDs; those global IDs were removed while retaining canonical names and numeric repository IDs. No matched values were printed in this diagnosis."
+    },
+    {
+      "kind": "native_staged_secret_scan_without_global_node_ids",
+      "command": [
+        "gitleaks",
+        "git",
+        "--pre-commit",
+        "--staged",
+        "--redact",
+        "--no-banner"
+      ],
+      "exit_code": 1,
+      "returned_summary": "0 commits scanned; scanned ~17236852 bytes (17.24 MB) in 3.75s; leaks found: 10580",
+      "redacted_report_metadata": {
+        "sourcegraph-access-token": 10580
+      },
+      "file_counts": {
+        "progress.json": 35,
+        "raw-before-heading-fix.json": 106,
+        "corpus.json": 125,
+        "a3.json": 10314
+      },
+      "boundary": "The repository's existing native reviewed-hash allowances are scoped to older evidence paths. Q4's public 40-hex Git object metadata needs the owning review/classification path; no scanner configuration or ignore rule was changed."
+    },
+    {
+      "kind": "synthetic_publication_shape_fail_before",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_awesome_convergence.AwesomeConvergenceTests.test_published_count_files_contain_no_forty_hex_string",
+        "tests.test_awesome_convergence.AwesomeConvergenceTests.test_pin_file_contains_no_repository_name",
+        "-v"
+      ],
+      "exit_code": 1,
+      "returned_summary": "Ran 2 tests in 0.002s\nFAILED (failures=2)"
+    },
+    {
+      "kind": "structural_publication_references",
+      "command": [
+        "python3",
+        "scripts/awesome_convergence.py",
+        "publish",
+        "--directory",
+        "evidence/artifacts/q4-awesome-convergence-20261013"
+      ],
+      "exit_code": 0,
+      "returned_result": {
+        "status": "published-references",
+        "named_files": 12,
+        "lists": 10,
+        "documents": 19,
+        "identifiers": 80,
+        "round_trips_agree": true
+      },
+      "scope": "Typed pins/digests in a repository-name-free registry; named receipts use identifier references and count rows use list/document IDs. Unknown opaque values are not relocated."
+    },
+    {
+      "kind": "structural_synthetic_suite_and_offline_check",
+      "exit_code": 0,
+      "completed_at": "2026-10-13T03:52:15Z",
+      "returned_summary": "Ran 30 tests in 0.523s\nOK",
+      "offline_check_exit_code": 0,
+      "returned_offline_result": {
+        "status": "checked",
+        "lists": 10,
+        "rows": 10311,
+        "unresolved": 29,
+        "repositories_per_category": {
+          "agent-orchestration": 1,
+          "agent-observability": 0,
+          "coding-agent-harnesses": 0,
+          "agent-memory": 0,
+          "mcp-code-navigation": 0,
+          "evaluation-harnesses": 0
+        }
+      }
+    },
+    {
+      "kind": "native_staged_secret_scan_after_structural_split",
+      "command": [
+        "gitleaks",
+        "git",
+        "--pre-commit",
+        "--staged",
+        "--redact",
+        "--no-banner"
+      ],
+      "version": "8.30.1",
+      "exit_code": 0,
+      "returned_summary": "0 commits scanned; scanned ~16425730 bytes (16.43 MB) in 2.89s; no leaks found",
+      "scanner_configuration_changes": false,
+      "ignore_configuration_changes": false
+    },
+    {
+      "kind": "final_structural_validation_and_staged_scan",
+      "validation_exit_code": 0,
+      "returned_validation_stdout": "{\"components\": 71, \"hashed_files\": 11879, \"profiles\": 4, \"receipts\": 240, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.",
+      "gitleaks_exit_code": 0,
+      "returned_gitleaks_summary": "0 commits scanned; scanned ~16434523 bytes (16.43 MB) in 3.06s; no leaks found",
+      "privacy_new_files_and_body": 20,
+      "private_names_checked": 7,
+      "privacy_findings": 0,
+      "manifest_added_lines_findings": 0,
+      "baseline_diagnostic": "Whole-manifest scan found eighteen existing locations; the new PR delta has none. No unrelated baseline edits."
+    }
+  ],
+  "unperformed": [
+    "Commit",
+    "Push",
+    "Pull request"
+  ],
+  "working_copy_policy": "Transient progress copies are preserved outside publication. The final corpus, original HTML cache, failed raw snapshot, before/after overlaps and actual attempt results remain committed evidence inputs.",
+  "execution_lane": "Codex",
+  "requested_service_tier": "fast",
+  "observed_service_tier": null,
+  "model_calls_by_counter": 0,
+  "coordinator_provider_usage": null
+}

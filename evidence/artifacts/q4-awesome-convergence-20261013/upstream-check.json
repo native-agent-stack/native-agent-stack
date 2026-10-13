@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "kind": "bounded-upstream-counter-screen",
+  "evidence_class": "source_review",
+  "started_at": "2026-10-13T02:26:39Z",
+  "completed_at": "2026-10-13T02:29:53Z",
+  "elapsed_seconds": 194,
+  "result": "none fits",
+  "requirement": "Maintained tool with per-repository distinct awesome-list membership counts, canonical repository redirects, pinned source files and section headings, unresolved-link retention, through gh only.",
+  "github_repository_queries": [
+    "awesome cross-list counter",
+    "awesome list membership",
+    "awesome list overlap",
+    "awesome intersection",
+    "awesome aggregation tool",
+    "awesome list canonicalize",
+    "awesome lists aggregator",
+    "awesome lists search engine",
+    "awesome list parser",
+    "awesome list deduplicate",
+    "awesome list intersection in:readme",
+    "awesome lists membership count in:readme",
+    "awesome-list counter in:name,description",
+    "awesome list analyzer in:name,description",
+    "awesome lists deduplication in:readme pushed:>=2026-07-15"
+  ],
+  "github_search_interface": "gh api --method GET search/repositories; sort=stars; bounded discovery windows of 5 or 6 results per query",
+  "web_channels": [
+    {"url":"https://www.google.com/search?q=awesome+list+cross+list+repository+membership+counter","result":"unusable redirect/help page; excluded from negative evidence"},
+    {"url":"https://www.bing.com/search?q=%22awesome+lists%22+%22overlap%22+tool","result":"irrelevant results; excluded from negative evidence"},
+    {"url":"https://duckduckgo.com/html/?q=awesome+list+membership+counter+github","result":"discovered subev/awesome-stars"},
+    {"url":"https://duckduckgo.com/html/?q=%22awesome+lists%22+%22cross-list%22","result":"one prose index, no executable counter"}
+  ],
+  "candidates": [
+    {"repository":"subev/awesome-stars","pin":{"identifier_id":"I00054"},"last_push":"2026-10-13T00:59:33Z","stars":7,"license":"MIT","per_repository_cross_list_counts":false,"maintained":true,"review":"38 JS/TS source files screened. Canonical list members are stored, but neither crawler/status CLI nor assets expose per-repository distinct-list counts. Uses direct GraphQL, drops unresolved members, lacks heading/category provenance.","paths":["scripts/crawl.ts:440","app/lib/repoIndex.server.ts:23","scripts/build-stars-assets.ts:58","scripts/crawl-status.ts:46"]},
+    {"repository":"digipres/awesome-indexer","pin":{"identifier_id":"I00055"},"last_push":"2026-06-05T10:48:52Z","stars":3,"license":null,"per_repository_cross_list_counts":false,"review":"Source/heading-aware records; collect_index_records concatenates records, without GitHub canonicalization or per-repository counts.","paths":["awindex/awelist.py:33","awindex/cli.py:53"]},
+    {"repository":"Arbaba/awesomelibs-parser","pin":{"identifier_id":"I00056"},"last_push":"2022-02-02T16:21:45Z","stars":0,"license":null,"per_repository_cross_list_counts":false,"review":"Stale Markdown parser/aggregator, not a maintained canonical counter.","paths":["Readme.md"]},
+    {"repository":"hpoul/awesum-one","pin":{"identifier_id":"I00057"},"last_push":"2017-07-15T16:06:36Z","stars":1,"license":null,"per_repository_cross_list_counts":false,"review":"README declares no implementation.","paths":["README.md"]},
+    {"repository":"MaximPro/awesome-mcp-servers-meta","pin":{"identifier_id":"I00058"},"last_push":"2025-11-22T13:17:41Z","stars":1,"license":"MIT","per_repository_cross_list_counts":false,"review":"Prose meta-index; no executable counter.","paths":["README.md"]},
+    {"repository":"sindresorhus/awesome-lint","pin":{"identifier_id":"I00059"},"last_push":"2026-07-05T23:46:45Z","stars":844,"license":"MIT","per_repository_cross_list_counts":false,"review":"Awesome-list linter, not a cross-list counter.","paths":["readme.md"]},
+    {"repository":"dkhamsing/awesome_bot","pin":{"identifier_id":"I00060"},"last_push":"2023-04-20T20:56:27Z","stars":898,"license":"MIT","per_repository_cross_list_counts":false,"review":"Stale duplicate/redirect link checker, not counts.","paths":["README.md"]},
+    {"repository":"awesome-selfhosted/awesome-selfhosted-data","pin":{"identifier_id":"I00061"},"last_push":"2026-10-12T21:09:18Z","stars":1166,"license":"NOASSERTION","per_repository_cross_list_counts":false,"review":"Single-list data/generation repository.","paths":["README.md"]}
+  ],
+  "unresolvable_leads": [
+    {"repository":"mfeatherston/awesome-list","http_status":404}
+  ],
+  "reference_implementation": {"repository":"https://github.com/subev/awesome-stars","pin":{"identifier_id":"I00054"},"path":"scripts/crawl.ts","line":440},
+  "native_interface_reference": {"repository":"https://github.com/cli/cli","pin":{"identifier_id":"I00062"},"path":"pkg/cmd/api/api.go","line":373,"version":"2.102.0"},
+  "angle_layout_reference": {"repository":"https://github.com/native-agent-stack/native-agent-stack","pin":{"identifier_id":"I00063"},"path":"catalogs/landscape/angles/README.md","pull_request":1058,"status_at_read":"OPEN"},
+  "completeness_critic": "Bounded name/README searches can miss differently named tools. No matching installed skill or MCP description surfaced. No candidate was installed or executed, and source review is not upstream acceptance. The closest source supplies membership provenance but not the absent counter. Reopen if a maintained executable with the full contract is discovered.",
+  "model_research_calls": 0,
+  "coordinator_provider_usage": null
+}

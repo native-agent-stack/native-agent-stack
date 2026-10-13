@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "kind": "awesome-convergence-v2-attempts",
+  "upstream_check_ref": "evidence/artifacts/q4-awesome-convergence-20261013/upstream-check.json",
+  "historical_attempts_ref": "evidence/artifacts/q4-awesome-convergence-20261013/attempts.json",
+  "attempts": [
+    {"kind":"source_review","command":["python3","scripts/awesome_convergence.py","select","--directory","evidence/artifacts/q4-awesome-convergence-v2-20261013"],"exit_code":0,"returned":{"candidate_count":671,"complete_pages":7,"list_count":15},"shortfalls":{"agent-observability":1,"mcp-code-navigation":0},"receipt":"selection.json"},
+    {"kind":"source_review","command":["python3","scripts/awesome_convergence.py","collect-raw","--directory","evidence/artifacts/q4-awesome-convergence-v2-20261013"],"exit_code":2,"condition":"raw/HTML overlap gate","list":"VoltAgent/awesome-claude-code-subagents","jaccard":0.8461538461538461,"raw_set_size":13,"html_set_size":11,"raw_only":["user-attachments/assets","voltagent/awesome-codex-subagents"],"html_only":[],"receipt":"overlap-before-reference-fix.json","completion_boundary":"All fifteen lists read; target canonicalization and counting not begun."},
+    {"kind":"synthetic","command":["python3","-m","unittest","tests.test_awesome_convergence.AwesomeConvergenceTests.test_reserved_owner_image_asset_is_not_repository","tests.test_awesome_convergence.AwesomeConvergenceTests.test_unused_reference_is_audited_outside_counted_rows","tests.test_awesome_convergence.AwesomeConvergenceTests.test_collapsed_shortcut_and_code_only_references","-v"],"phase":"before_correction","exit_code":1,"native_summary":"Ran 3 tests in 0.003s; FAILED (failures=3)","failures":["user-attachments/assets incorrectly returned as repository","unused definition incorrectly supplies counted row","code-only and image-only references incorrectly supply counted rows"]},
+    {"kind":"synthetic","phase":"after_correction_same_three_tests","exit_code":0,"native_summary":"Ran 3 tests in 0.002s; OK"},
+    {"kind":"source_review","command":["python3","scripts/awesome_convergence.py","remeasure","--directory","evidence/artifacts/q4-awesome-convergence-v2-20261013"],"exit_code":0,"completed_at":"2026-10-13T04:47:23Z","native_results":{"subagents_jaccard":1.0,"supported_comparisons":14,"below_threshold":0,"unsupported_html_comparisons":1,"unused_reference_definitions":2},"source_digests_match":true,"receipt":"overlap.json"}
+  ],
+  "additional_attempts": [
+    {"kind":"synthetic","command":["python3","-m","unittest","tests.test_awesome_convergence","-v"],"exit_code":1,"native_summary":"Ran 36 tests in 1.222s; FAILED (failures=1)","condition":"Historical all-definitions fixture did not use its reference label. Under the revised rule the expected definition is excluded.","correction":"Add a visible reference use to the existing included-definition fixture; preserve the separate unused-definition exclusion controls. No production-method or corpus change."}
+  ],
+  "counter_model_calls": 0,
+  "coordinator_provider_usage": "unknown",
+  "classification_boundary": "Locally authored synthetic controls and actual public source reads, not unchanged upstream counter acceptance."
+}
