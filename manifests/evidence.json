@@ -11488,8 +11488,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-read-deltas.json",
-      "sha256": "ca56f6daf8e577ab089d4898b06e0c93fd6d7d70e0575c628c803623418975e1",
-      "bytes": 925
+      "sha256": "f1fc89bb64f6094398b679cea33f05df077706dd663de0c156fe71baeb5d8332",
+      "bytes": 1033
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
@@ -11540,6 +11540,11 @@
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261013-pr1070-delta.json",
       "sha256": "8c5503bd3eba5b6ae2bb770e06121b68f49ad5d015d8d7bc80f8b9d7c6f1fe17",
       "bytes": 12645
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261013-pr1074-delta.json",
+      "sha256": "b1c9a6f590066a80876670bef8e439c9b4d163b18a6197ec9c3028ef1d0edde9",
+      "bytes": 15771
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unit-pass.txt",
@@ -19123,8 +19128,8 @@
     },
     {
       "path": "docs/decisions/2026-10-13-plugin-skill-identity.md",
-      "sha256": "0f6397a4b4f1351df4e1f086359325644d158e31fbeed12f644e2f9b2f578633",
-      "bytes": 18460
+      "sha256": "180fedde625337935ac92b152b21b13dce3eddcb3ce276c57119ec821a9454bf",
+      "bytes": 19508
     },
     {
       "path": "docs/decisions/2026-10-13-strict-paper-url-gates.md",
@@ -48283,8 +48288,8 @@
     },
     {
       "path": "evidence/artifacts/plugin-skill-identity-20261013/README.md",
-      "sha256": "6de925aec610bb3dfdbdfd8beb2c4b1ad584cb67b3b43c0cbf89946eb16d688f",
-      "bytes": 4929
+      "sha256": "08135075e51f90e5f088641a370b4665d65ccdf3a9ff10d1464c64dafddb740c",
+      "bytes": 5227
     },
     {
       "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/claude-api-currency.txt",

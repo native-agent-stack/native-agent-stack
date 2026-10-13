@@ -17,6 +17,7 @@ Nothing here holds an account name, a host name, a home path, a key or a transcr
 | `receipts/fail-before-round1.txt` | round 1 against the sources of `2dae97511`: 14 tests fail or raise (the global switch, the replacement plugin, the registry folder, the copied row, the last use, the digest of the private prompt) and pass on this head |
 | `receipts/fail-before-at-main-993cc890b.txt` | the fail-first tests of the first commit replayed at the exact base of its head (main `993cc890b`): 22 of 142 fail or raise, the count `receipts/fail-before.txt` gave against the pre-rebase base |
 | `receipts/mutants-round1-30.txt` | the 30 mutants of round 1 (the global switch, the plugin validation, the registry folder, the copied skill, the ordering of the last use, the private digest): 30 of 30 killed |
+| (the advisory delta) | `blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261013-pr1074-delta.json` and its index entry: round 1 removes two reads of `scripts/skills_status.py` (346 reads), derived with the native `GitTree` and `derive_ci_protected` at the committed head |
 
 The mutation driver, the listing capture scripts and the probe project (two subagents) are scripts and files of the author's private record; the method is in the record and in each receipt.
 
