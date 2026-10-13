@@ -15743,8 +15743,8 @@
     },
     {
       "path": "blueprints/us-equities/engine/patches/lean-dependencies.patch",
-      "sha256": "8770d14bf99d130e6fa9ecc460096edb8a7b3728349f8de2dba54b6a5961a058",
-      "bytes": 1892
+      "sha256": "06c89e172db63e949ceeab65966d6f3ec5d2dbfd1f2c35dbf2bde0bb3a0eefaf",
+      "bytes": 2089
     },
     {
       "path": "blueprints/us-equities/engine/patches/lean-locks/Algorithm.CSharp/packages.lock.json",
@@ -15808,8 +15808,8 @@
     },
     {
       "path": "blueprints/us-equities/engine/patches/lean-locks/Launcher/packages.lock.json",
-      "sha256": "9e02f713cf490d5916f014e62312d03f4253f075b529a57ef85a30bdc411904d",
-      "bytes": 26156
+      "sha256": "6319dd03ac1633195b9442a1d8b87163be36c6d36d46cfad91be82f1511f6a57",
+      "bytes": 26217
     },
     {
       "path": "blueprints/us-equities/engine/patches/lean-locks/Logging/packages.lock.json",
@@ -15818,8 +15818,8 @@
     },
     {
       "path": "blueprints/us-equities/engine/patches/lean-locks/Messaging/packages.lock.json",
-      "sha256": "17251bbb64c71724b3bf3c55af42217faa6cf220daa02825de8ddf0fa2b31bd5",
-      "bytes": 7445
+      "sha256": "4ff8c8dc0a2b6193df652252ca9b752e98f2c8f97229a8a84312daa8a199da08",
+      "bytes": 7477
     },
     {
       "path": "blueprints/us-equities/engine/patches/lean-locks/Optimizer.Launcher/packages.lock.json",
@@ -15838,8 +15838,8 @@
     },
     {
       "path": "blueprints/us-equities/engine/patches/lean-locks/Report/packages.lock.json",
-      "sha256": "a67125134ac7f1de0c426c73c248f0d5df2659d1122e7f7a7b2398470dae8387",
-      "bytes": 14623
+      "sha256": "d116becc8cb07dcdea04c4882df2a645e8c58e103c76d683f3c56d2875a99c42",
+      "bytes": 14684
     },
     {
       "path": "blueprints/us-equities/engine/patches/lean-locks/Research/packages.lock.json",
@@ -15848,8 +15848,8 @@
     },
     {
       "path": "blueprints/us-equities/engine/patches/lean-locks/Tests/packages.lock.json",
-      "sha256": "e2cebe0422f87419371ea2bda6e491f1658cc997e7c34b14275729527b27fd99",
-      "bytes": 32030
+      "sha256": "9c814cb42401ce0273533e7357137085213c51491e799c5398eee86f3bba3e29",
+      "bytes": 32091
     },
     {
       "path": "blueprints/us-equities/engine/patches/lean-locks/ToolBox/packages.lock.json",
@@ -15868,8 +15868,8 @@
     },
     {
       "path": "blueprints/us-equities/engine/resolution.md",
-      "sha256": "aa46db23be0c20b279026e24f1727e0bd3120df3349bb244cfa30f66725bc4ad",
-      "bytes": 10783
+      "sha256": "bcfa70fc2a53716fc48eaeb56133eda3c66de9ef4d0b7188975f1c9c33c03bde",
+      "bytes": 12078
     },
     {
       "path": "blueprints/us-equities/event-anchored-ranking/R2-COMPARISON.json",
