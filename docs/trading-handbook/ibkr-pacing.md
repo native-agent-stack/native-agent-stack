@@ -126,7 +126,11 @@ multi-writer configuration or a general latency guarantee. Sources: projection
   trials or the verifier against private receipts. The projection's broker
   reconciliation counts are explicitly transcript-derived; its sealed
   [addendum][measurement-addendum] extends that reconciliation without changing
-  the JSON. Neither a source-derived wire estimate nor a marker is a fill witness.
+  the original JSON. Revision 2 incorporates that third count and corrects the
+  missing-order classification; the [revision and regression addendum][revision]
+  and [documented order-ID-rule correction][order-rule-correction] supersede the
+  unchanged revision 1 README's corresponding statements. Neither a
+  source-derived wire estimate nor a marker is a fill witness.
   Sources: [projection scope and field definitions][measurement-guide],
   [authority versus execution evidence][paper-policy].
 - Lumibot remains a separate comparator path; this page neither selects a
@@ -143,6 +147,8 @@ multi-writer configuration or a general latency guarantee. Sources: projection
 [measurement]: ../../evidence/artifacts/ibkr-pacing-20261013/ibkr-pacing-evidence-20261013.json
 [measurement-guide]: ../../evidence/artifacts/ibkr-pacing-20261013/README.md
 [measurement-addendum]: ../../evidence/artifacts/ibkr-pacing-20261013/ADDENDUM-01.txt
+[order-rule-correction]: ../../evidence/artifacts/ibkr-pacing-20261013/ADDENDUM-02.txt
+[revision]: ../../evidence/artifacts/ibkr-pacing-20261013/ADDENDUM-03.txt
 [publication]: ../../evidence/artifacts/ibkr-pacing-20261013/PUBLICATION.md
 [order-ids]: https://interactivebrokers.github.io/tws-api/order_submission.html
 [selector-source]: https://github.com/nautechsystems/nautilus_trader/blob/01ced2a3e7b7d25ae7b2e5c0c077bcc46192eb25/crates/adapters/interactive_brokers/src/execution/core.rs#L381-L394

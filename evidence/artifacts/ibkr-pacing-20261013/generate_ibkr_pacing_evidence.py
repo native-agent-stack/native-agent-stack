@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Build the sanitized IBKR pacing evidence document (ibkr-pacing-evidence/1) from the private run receipts.
+"""Build the sanitized IBKR pacing evidence document (ibkr-pacing-evidence/1, revision 2) from the private run receipts.
+
+Revision 2 (supersedes the sealed v1 generator/JSON/verifier named in the document's `revision` block): the 38 journal orders missing at the broker are classified by their journal
+events AND the venue's refusal text (35 [103] "Duplicate order id", 1 cancel-target-not-found rejection, 2 never reached the adapter), where v1 labelled all 36 rejections [103];
+the third independent broker count (after the pair tests) is added as a transcript-derived value with its arithmetic relation.
 
 Standard library only; deterministic (no clock, no environment, no randomness); it reads files under the run root passed
 as the single argument and prints one JSON document (sorted keys, 1-space indent) to stdout. It never emits account
@@ -29,6 +33,7 @@ TRANSCRIPT_DERIVED = {
     "broker_completed_orders_after_harness_runs": 6292,
     "broker_completed_orders_all_sources_equals_api_only": True,
     "broker_completed_orders_after_official_client_runs": 8494,
+    "broker_completed_orders_after_pair_tests": 10313,
     "reqids_probe": {
         "a_next_valid_at_connect": 1,
         "a_reqIds_before_other_connection_order": 1,
@@ -435,13 +440,21 @@ def reconciliation(root, adapter_runs):
     missing = set(missing_text)
     kinds = Counter()
     for run in adapter_runs:
-        events = {}
+        events, reasons = {}, {}
         for row in journal(root / "runs" / run["label"]):
             if row.get("coid") in missing:
                 events.setdefault(row["coid"], set()).add(row["event"])
-        for names in events.values():
+                if row["event"] == "order_rejected":
+                    reasons[row["coid"]] = str(row.get("reason", ""))
+        for coid, names in events.items():
             if "order_rejected" in names:
-                kinds["refused_by_the_venue_notice_103"] += 1
+                text = reasons.get(coid, "")
+                if text.startswith("Duplicate order id"):
+                    kinds["refused_by_the_venue_notice_103"] += 1
+                elif "that needs to be cancelled is not found" in text:
+                    kinds["rejected_cancel_target_not_found_10147"] += 1
+                else:
+                    kinds["rejected_other"] += 1
             elif "order_submitted" not in names:
                 kinds["journalled_but_never_reached_the_adapter"] += 1
             else:
@@ -450,6 +463,10 @@ def reconciliation(root, adapter_runs):
                           for name in ("P-t1", "P-e1-a", "P-e1-b", "P-e2-a", "P-e2-b", "P-r1"))
     diag_orders = sum(load_json(root / "runs" / f"P-{t.lower()}-{s}" / "receipt.json")["orders_placed"]
                       for t in PAIR_TESTS if t not in ("E1", "E2") for s in ("a", "b"))
+    diag_refused = sum(load_json(root / "runs" / f"P-{t.lower()}-{s}" / "receipt.json")["refused_103"]["count"]
+                       for t in PAIR_TESTS if t not in ("E1", "E2") for s in ("a", "b"))
+    third = TRANSCRIPT_DERIVED["broker_completed_orders_after_pair_tests"]
+    second = TRANSCRIPT_DERIVED["broker_completed_orders_after_official_client_runs"]
     broker_harness = TRANSCRIPT_DERIVED["broker_completed_orders_after_harness_runs"]
     return {
         "journal_submit_events_total": totals["journal_submits"],
@@ -463,7 +480,11 @@ def reconciliation(root, adapter_runs):
         "broker_completed_orders_after_official_client_runs": {"value": TRANSCRIPT_DERIVED["broker_completed_orders_after_official_client_runs"],
                                                                "source": "transcript-derived (raw-protocol reqCompletedOrders read; no receipt file)",
                                                                "equals_first_count_plus_official_orders": TRANSCRIPT_DERIVED["broker_completed_orders_after_official_client_runs"] == broker_harness + official_orders},
-        "diagnostic_pair_test_orders_placed_after_second_count_not_yet_independently_counted": diag_orders,
+        "diagnostic_pair_test_orders_placed_after_second_count": diag_orders,
+        "diagnostic_pair_test_orders_refused_103": diag_refused,
+        "diagnostic_pair_test_orders_expected_listed_as_completed": diag_orders - diag_refused,
+        "broker_completed_orders_after_pair_tests": {"value": third, "source": "transcript-derived (raw-protocol reqCompletedOrders read; no receipt file)",
+                                                     "equals_second_count_plus_listed_pair_orders_plus_probe_order": third == second + (diag_orders - diag_refused) + 1},
         "reqids_probe_orders_placed_after_second_count": {"value": 1, "source": "transcript-derived (one order, cancelled and confirmed)"},
     }
 
@@ -589,6 +610,10 @@ def main(argv):
         "official_client_summary": summary_groups(pairs),
         "reqids_probe": {"source": "transcript-derived (probe output printed in the session; no receipt file)", **TRANSCRIPT_DERIVED["reqids_probe"]},
         "reconciliation": recon,
+        "revision": {"number": 2, "supersedes": {"json_sha256": "b492f42d335370e22f4349bf43db54f1adf4c77921b36a28300159b08c8e11fa", "generator_sha256": "56463b2622501446a9a1640c6d3065920dbd449a622457ea61f392ce6166c5a1", "verifier_sha256": "0e9fb1376a59e34cf1e3b6ba2fea30d89aad5e09db28de0b4d59792a41207468"},
+                     "changes": ["journal_orders_missing_by_kind: 36 rejected orders split into 35 [103] duplicate-order-id refusals and 1 cancel-target-not-found rejection (v1 labelled 36 as [103])",
+                                 "reconciliation: third transcript-derived broker count (10,313) with its arithmetic relation; the pair-test order key is renamed",
+                                 "caveats updated accordingly; every measured rate, latency and test count is unchanged"]},
         "caveats": [
             "The 1,500 orders a minute with cancels at 50 msgs/s was measured over one 20-second rung, not a full minute.",
             "The third wire message per order (one reqAllOpenOrders per cancel) is derived from the adapter source at the pin; it was not captured on the wire.",
@@ -597,7 +622,8 @@ def main(argv):
             "The counted rate excludes the hidden request; the wire estimate is the cap-relevant figure.",
             "Broker-side completed-order counts (6,292 and 8,494) are live raw-protocol reads recorded in the session transcript, not receipt files.",
             "A first count attempt through a Nautilus node returned zero orders and is not used as evidence.",
-            "The diagnostic pair tests T1..T10 were placed after the second independent count and have not been counted independently yet.",
+            "The pair tests T1..T10 and the reqIds probe were placed after the second independent count; a third raw-protocol count (10,313) is transcript-derived and reconciles by arithmetic (ADDENDUM-01).",
+            "Of the 38 journal orders absent at the broker, 35 carry the venue's [103] duplicate-order-id refusal, 1 a cancel-target-not-found rejection and 2 never reached the adapter (revision 2 corrects the v1 label of 36 as [103]).",
             "Latencies of the pair tests are single 14-30 second runs at 10 msgs/s per connection and are not a latency study.",
             "Timing offsets compare two timestamps taken on one host clock.",
         ],

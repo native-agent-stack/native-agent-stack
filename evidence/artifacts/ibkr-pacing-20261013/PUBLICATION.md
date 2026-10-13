@@ -1,23 +1,49 @@
 # IBKR pacing publication boundary
 
-The approved sanitized trading-cc projection is retained unchanged. Its
+The approved sanitized trading-cc **revision 2** projection is retained unchanged
+at the canonical JSON, generator and verifier paths, replacing their revision 1
+bytes. Its `revision.supersedes` block names the three superseded hashes;
+revision 1 remains available in Git history. Its
 `headline_numbers` entries identify the receipt run labels; the handbook cites
 those entries and public field paths. Original broker receipts are private and
 are not copied or read by this documentation change.
 
 | Approved artifact | SHA256 |
 | --- | --- |
-| `ibkr-pacing-evidence-20261013.json` | `b492f42d335370e22f4349bf43db54f1adf4c77921b36a28300159b08c8e11fa` |
-| `generate_ibkr_pacing_evidence.py` | `56463b2622501446a9a1640c6d3065920dbd449a622457ea61f392ce6166c5a1` |
-| `verify_ibkr_pacing_evidence.py` | `0e9fb1376a59e34cf1e3b6ba2fea30d89aad5e09db28de0b4d59792a41207468` |
+| `ibkr-pacing-evidence-20261013.json` (v2 bytes) | `25ef71020a06e1781fac0360aa8b19c564d9d146b65ea3fc6b8cb0ab62ab0c15` |
+| `generate_ibkr_pacing_evidence.py` (v2 bytes) | `f44b595a13cf87b4ad555427000c7937cc62452076f0a3380f13338127147619` |
+| `verify_ibkr_pacing_evidence.py` (v2 bytes) | `cac1e764f429dc05575dfe8a692e74d4bcc04a8906e174e9e7b0178cf61494e3` |
 | `README.md` | `7890700134ce668c24ff1047b8e798157a3ffa3fe996e0bf9dcc4f7af90e7c86` |
 | `ADDENDUM-01.txt` | `bbbb4d0096d0cab5577050f1b2ba31348fbc6cf5a1969b251bcb35649963b7f6` |
+| `ADDENDUM-02.txt` | `f1de0a311acc5bcd7d7eeddd51e7fef35196dcd76c4f878f1564424f4f834a9c` |
+| `ADDENDUM-03.txt` | `4f0a0abb7f644ab148e0cfaeb618a405b3171b41862a75639251eacdd52637b5` |
 
 The generator and verifier require private inputs. They are preserved as producer
 methodology, not executed here. This change checks hashes, public-field
 consistency and the pinned upstream cancel-path source; those checks do not
 independently reproduce the broker measurements. The approved README also
 describes producer audit/locator files that are outside this public subset.
+
+## Revision 2 correction and regression evidence
+
+[ADDENDUM-03.txt](ADDENDUM-03.txt) records both failing-first probes: revision 1
+passed with a corrupted reconciliation headline and with rewritten missing-order
+journals; revision 2 fails each corresponding check. The producer reports
+82 passing checks and zero failures on the true revision 2 inputs. Those checks
+derive the missing-order kinds from journal events and venue text, compare the
+headline with recomputed counters, and check the third broker-count arithmetic.
+The internal probe scripts and output are not included in this publication.
+
+The 38 missing orders now split into **35 duplicate-order-ID refusals (103),
+one cancel-target-not-found rejection (10147), and two never reaching the
+adapter**. The third broker count, 10,313, is transcript-derived and checked
+through arithmetic; it is not a new measurement by this documentation change.
+Sources: JSON `/reconciliation`, `/revision` and `ADDENDUM-03.txt`.
+
+The unchanged revision 1 README is historical methodology. Its 36-[103]
+classification and its statement that the cross-client rule was undocumented
+are superseded by revision 2 and [ADDENDUM-02.txt](ADDENDUM-02.txt), respectively.
+All measured rates, latencies and test counts remain unchanged.
 
 ## Official source captures
 

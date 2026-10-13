@@ -1,0 +1,23 @@
+ADDENDUM 03 to ibkr-pacing-evidence-20261013.json (sealed v1): revision 2 of the generator, verifier and document (a correction, not a new measurement)
+
+What was wrong in v1 (found by a second reader, the co-op's local review of demo's #1083, and by my re-derivation):
+  1. verify_ibkr_pacing_evidence.py (v1, sha256 0e9fb1376a59e34cf1e3b6ba2fea30d89aad5e09db28de0b4d59792a41207468) never compared the document's `reconciliation` HEADLINE with the recomputed
+     counters: replacing it with [1, 1, 1, 1, 1] left all 77 checks passing.
+  2. It compared `reconciliation.journal_orders_missing_by_kind` with a LITERAL (36 refusals, 2 never sent), not with values derived from the receipts: journals rewritten so that every missing
+     order was rejected still passed 77 of 77.
+  3. The literal was itself slightly wrong, and the v1 generator and document carried the same label: of the 36 journal orders the venue rejected, 35 carry the [103] "Duplicate order id"
+     refusal and 1 carries a cancel-target-not-found rejection (10147); 2 more never reached the adapter. v1 called all 36 [103] refusals.
+What revision 2 is (all new files; the v1 files stay sealed and unchanged, and anything citing them by hash still resolves):
+  generate_ibkr_pacing_evidence.v2.py   sha256 f44b595a13cf87b4ad555427000c7937cc62452076f0a3380f13338127147619
+  verify_ibkr_pacing_evidence.v2.py     sha256 cac1e764f429dc05575dfe8a692e74d4bcc04a8906e174e9e7b0178cf61494e3
+  ibkr-pacing-evidence-20261013.v2.json sha256 25ef71020a06e1781fac0360aa8b19c564d9d146b65ea3fc6b8cb0ab62ab0c15
+  probes_v2.py                          sha256 ec3d0600f144c9387d661821fee3f7b701ab581dea5cf34d1d360d17666414aa   (output retained as probes_v2.output.txt)
+Changes to the document (key-level diff against v1): `journal_orders_missing_by_kind` is now {refused_by_the_venue_notice_103: 35, rejected_cancel_target_not_found_10147: 1,
+journalled_but_never_reached_the_adapter: 2}; `reconciliation` gains the third independent broker count (10,313, transcript-derived, with its arithmetic relation to the second count, the 1,818 pair-test
+orders listed as completed, the 140 refused with [103] and the one probe order; see ADDENDUM-01) and the pair-test order key is renamed; `caveats` are updated; a `revision` block names the three
+superseded files by hash. Every measured rate, latency, test count and headline figure is unchanged.
+Changes to the verifier: (a) the `reconciliation` headline is compared with the five recomputed counters; (b) the kinds are DERIVED from each missing order's journal events and the venue's
+refusal text, and every missing id must be found in exactly one run journal; (c) the pair-test orders, refusals and the third count are recomputed from the receipts; (d) the revision block is checked.
+Failing-first evidence (probes_v2.py, output retained): on the untouched inputs v1 passes 77 of 77 and v2 passes 82 of 82; with the headline changed v1 still passes 77 of 77, v2 FAILS the headline check;
+with journals rewritten so all missing orders were [103]-refused v1 still passes 77 of 77, v2 FAILS the kinds check.
+Citation guidance: cite the v2 files; where a page cites the v1 document, nothing it states changes except the count "36 [103] refusals", which v1 stated only inside `reconciliation`.

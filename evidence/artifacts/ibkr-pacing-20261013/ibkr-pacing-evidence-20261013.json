@@ -2642,7 +2642,8 @@
   "The counted rate excludes the hidden request; the wire estimate is the cap-relevant figure.",
   "Broker-side completed-order counts (6,292 and 8,494) are live raw-protocol reads recorded in the session transcript, not receipt files.",
   "A first count attempt through a Nautilus node returned zero orders and is not used as evidence.",
-  "The diagnostic pair tests T1..T10 were placed after the second independent count and have not been counted independently yet.",
+  "The pair tests T1..T10 and the reqIds probe were placed after the second independent count; a third raw-protocol count (10,313) is transcript-derived and reconciles by arithmetic (ADDENDUM-01).",
+  "Of the 38 journal orders absent at the broker, 35 carry the venue's [103] duplicate-order-id refusal, 1 a cancel-target-not-found rejection and 2 never reached the adapter (revision 2 corrects the v1 label of 36 as [103]).",
   "Latencies of the pair tests are single 14-30 second runs at 10 msgs/s per connection and are not a latency study.",
   "Timing offsets compare two timestamps taken on one host clock."
  ],
@@ -4456,12 +4457,20 @@
    "source": "transcript-derived (raw-protocol reqCompletedOrders read; no receipt file)",
    "value": 8494
   },
-  "diagnostic_pair_test_orders_placed_after_second_count_not_yet_independently_counted": 1958,
+  "broker_completed_orders_after_pair_tests": {
+   "equals_second_count_plus_listed_pair_orders_plus_probe_order": true,
+   "source": "transcript-derived (raw-protocol reqCompletedOrders read; no receipt file)",
+   "value": 10313
+  },
+  "diagnostic_pair_test_orders_expected_listed_as_completed": 1818,
+  "diagnostic_pair_test_orders_placed_after_second_count": 1958,
+  "diagnostic_pair_test_orders_refused_103": 140,
   "journal_orders_found_at_broker_by_arithmetic": 6292,
   "journal_orders_missing_at_broker": 38,
   "journal_orders_missing_by_kind": {
    "journalled_but_never_reached_the_adapter": 2,
-   "refused_by_the_venue_notice_103": 36
+   "refused_by_the_venue_notice_103": 35,
+   "rejected_cancel_target_not_found_10147": 1
   },
   "journal_submit_events_by_run": {
    "A-r1": 1,
@@ -4500,6 +4509,19 @@
   "other_connection_order_status_after_cancel": "Cancelled",
   "other_connection_order_status_while_open": "Submitted",
   "source": "transcript-derived (probe output printed in the session; no receipt file)"
+ },
+ "revision": {
+  "changes": [
+   "journal_orders_missing_by_kind: 36 rejected orders split into 35 [103] duplicate-order-id refusals and 1 cancel-target-not-found rejection (v1 labelled 36 as [103])",
+   "reconciliation: third transcript-derived broker count (10,313) with its arithmetic relation; the pair-test order key is renamed",
+   "caveats updated accordingly; every measured rate, latency and test count is unchanged"
+  ],
+  "number": 2,
+  "supersedes": {
+   "generator_sha256": "56463b2622501446a9a1640c6d3065920dbd449a622457ea61f392ce6166c5a1",
+   "json_sha256": "b492f42d335370e22f4349bf43db54f1adf4c77921b36a28300159b08c8e11fa",
+   "verifier_sha256": "0e9fb1376a59e34cf1e3b6ba2fea30d89aad5e09db28de0b4d59792a41207468"
+  }
  },
  "schema": "ibkr-pacing-evidence/1",
  "scope": "IBKR paper Gateway, one account; 1-share SPY BUY limit orders far below the bid, placed and cancelled: the ladders and pair tests filled nothing; the phase A step S2 is a one-share filled round trip (flat afterwards)"

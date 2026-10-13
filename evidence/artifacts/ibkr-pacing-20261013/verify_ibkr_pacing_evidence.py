@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Recompute the headline numbers of ibkr-pacing-evidence/1 from the private receipts and compare them with the document.
+"""Recompute the headline numbers of ibkr-pacing-evidence/1 (revision 2) from the private receipts and compare them with the document.
+
+Revision 2 closes two defects found by a second reader in v1: (1) the `reconciliation` headline was never compared with the recomputed counters; (2) the kinds of the 38 missing orders
+were a literal, not derived from the journals. v2 derives them from each missing order's journal events and the venue's refusal text.
 
 Standard library only; deterministic; independent code path from the generator (it re-reads the receipts and journals and
 re-derives each number with its own arithmetic). Prints one PASS/FAIL line per number and exits 1 if any FAIL.
@@ -151,11 +154,42 @@ def main(argv):
           [rec["broker_completed_orders_after_harness_runs"]["value"], rec["broker_completed_orders_after_harness_runs"]["source"].startswith("transcript-derived")],
           [total - len(missing), True])
     check("official-client orders placed before the second count = 2202", rec["official_client_orders_placed_before_second_count"], official)
+    check("the revision block names the three superseded sealed files", sorted(doc["revision"]["supersedes"]), ["generator_sha256", "json_sha256", "verifier_sha256"])
     check("transcript-derived broker count after the official-client runs = 6292 + 2202 = 8494 (8494)",
           [rec["broker_completed_orders_after_official_client_runs"]["value"], rec["broker_completed_orders_after_official_client_runs"]["source"].startswith("transcript-derived")],
           [total - len(missing) + official, True])
-    kinds = {"refused_by_the_venue_notice_103": 36, "journalled_but_never_reached_the_adapter": 2}
-    check("the 38 missing are 36 venue refusals ([103]) and 2 never sent", rec["journal_orders_missing_by_kind"], kinds)
+    missing_set = set(missing)
+    derived = Counter()
+    for label in labels:
+        events, reasons = {}, {}
+        for row in journal(root, label):
+            if row.get("coid") in missing_set:
+                events.setdefault(row["coid"], set()).add(row["event"])
+                if row["event"] == "order_rejected":
+                    reasons[row["coid"]] = str(row.get("reason", ""))
+        for coid, event_names in events.items():
+            if "order_rejected" in event_names:
+                text = reasons.get(coid, "")
+                derived["refused_by_the_venue_notice_103" if text.startswith("Duplicate order id")
+                        else "rejected_cancel_target_not_found_10147" if "that needs to be cancelled is not found" in text
+                        else "rejected_other"] += 1
+            elif "order_submitted" not in event_names:
+                derived["journalled_but_never_reached_the_adapter"] += 1
+            else:
+                derived["submitted_without_a_venue_answer"] += 1
+    check("every missing id is found in exactly one run journal (classified count equals the missing count)", len(missing), sum(derived.values()))
+    check("the missing orders by kind, derived from the journals and the venue text", rec["journal_orders_missing_by_kind"], dict(sorted(derived.items())))
+    check("headline `reconciliation` equals the five recomputed counters (journal submits, missing, found, official-client orders, broker count after)",
+          headline(doc, "reconciliation"), [total, len(missing), total - len(missing), official, total - len(missing) + official])
+    pair_orders = sum(receipt(root, f"P-{t.lower()}-{s}")["orders_placed"] for t in ("T1", "T1b", "T2", "T3", "T4", "T6", "T7", "T8", "T9a", "T9b", "T10") for s in ("a", "b"))
+    pair_refused = sum(receipt(root, f"P-{t.lower()}-{s}")["refused_103"]["count"] for t in ("T1", "T1b", "T2", "T3", "T4", "T6", "T7", "T8", "T9a", "T9b", "T10") for s in ("a", "b"))
+    third = rec["broker_completed_orders_after_pair_tests"]
+    check("pair-test orders placed, refused with [103], and expected listed (receipts)",
+          [rec["diagnostic_pair_test_orders_placed_after_second_count"], rec["diagnostic_pair_test_orders_refused_103"], rec["diagnostic_pair_test_orders_expected_listed_as_completed"]],
+          [pair_orders, pair_refused, pair_orders - pair_refused])
+    check("transcript-derived third broker count = second count + listed pair-test orders + 1 probe order (10313)",
+          [third["value"], third["source"].startswith("transcript-derived"), third["equals_second_count_plus_listed_pair_orders_plus_probe_order"]],
+          [total - len(missing) + official + (pair_orders - pair_refused) + 1, True, True])
 
     # 4b. whole-run and pair rate estimates (independent code path)
     want = headline(doc, "adapter_whole_run_rate_estimates")
