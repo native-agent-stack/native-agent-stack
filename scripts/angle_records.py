@@ -163,6 +163,13 @@ def validate_record(record: dict, schema: dict, *, label: str, sources=None) -> 
         neutral = ("trial_permitted", "final_eligible", "basis")
         if any(k in candidate for k in neutral) and not all(k in candidate for k in neutral):
             raise AngleRecordError(f"{label}: neutral trial metadata requires all three fields")
+        metadata_sources = list((candidate.get("entitlement") or {}).get("sources") or [])
+        licence_source = (candidate.get("licence_note") or {}).get("source")
+        if licence_source:
+            metadata_sources.append(licence_source)
+        for source in metadata_sources:
+            if sources is not None and source["kind"] == "receipt":
+                sources.read_bytes(source["path"])
     bound = [entry["candidate_id"] for entry in record["final_evidence"]]
     if len(bound) != len(set(bound)) or any(ident not in identities for ident in bound):
         raise AngleRecordError(f"{label}: FINAL evidence has a duplicate or unknown candidate")

@@ -141,6 +141,9 @@ class FinalFix1Tests(FixtureTestCase):
         root, _, _ = self.measured()
         ledger = json.loads((root / fs.LEDGER).read_bytes())
         later = _sweep("changed", "2026-09-23", [("foundation", "layer-a")])
+        change_ref = "evidence/artifacts/fixture/retained-change.json"
+        _write_json(root / change_ref, {"changed_pin": "1.1.0"})
+        later["layers"][0]["reopen"] = [{"trigger": "pin_moved", "ref": change_ref}]
         ledger["sweeps"].append(later)
         _write_json(root / fs.LEDGER, ledger)
         _write_json(root / later["manifest_ref"], {"checked_at": later["date"]})

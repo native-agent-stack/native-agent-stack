@@ -134,7 +134,8 @@ DEFINITIONS = (
      "no-winner (the verdict is pending_lanes or no_selection, or there are no winners); reopened (a completed sweep "
      "covering the layer is dated after the verdict's checked_at, component_matrix layer_state recorded_reopened); "
      "converged (layer_state confirmed_current and the matrix converged count equals its in_use count, which is "
-     "above 0); current (otherwise)."),
+     "above 0); current (otherwise). For an explicit FINAL claim, a later sweep reopens only with a named, "
+     "retained change reference; a date-only matrix reopening does not revoke FINAL."),
     ("verdict.next_review",
      "The verdict's checked_at plus policy.review_days, for a recorded or no_selection verdict; null for pending "
      "lanes and planned layers. It is a date, never a staleness: --check --today D flags a layer when D is past it."),
@@ -164,7 +165,9 @@ DEFINITIONS = (
      "a later survival or missing-vote-only re-proposal; surviving: an unresolved survival or missing-vote proposal dated after the "
      "verdict; trialled: landscape rows "
      "with measured_comparison evidence or a measured_tradeoff disposition; adopted: winners with a run pin."),
-    ("survivors", "The unresolved repositories of the funnel, with their latest survival or the missing-vote-only sweep and date that opened or reopened them."),
+    ("survivors", "The unresolved repositories of the funnel, with their latest survival or the missing-vote-only sweep and date that opened or reopened them. "
+     "For explicit FINAL claims, replay the cumulative set without a verdict-date filter: only retained substantive "
+     "refutation or an explicit retained verdict disposition settles a survivor, never age or omission."),
     ("index",
      "by_repository (normalized) and by_component_id (winners) map to every layer and role (winner, alternate, "
      "survivor, candidate) that names them."),
@@ -597,6 +600,103 @@ def terminal_state(row: dict, angle: dict) -> str | None:
     return claims[0] if claims else None
 
 
+def retained_final_reference(sources: Sources, ref, reason: str):
+    """A FINAL lifecycle decision must point at retained, hash-bound evidence."""
+    try:
+        if not isinstance(ref, str) or not ref:
+            raise ValueError
+        path, _, pointer = ref.partition("#")
+        value = (saturation_ledger.resolve_pointer(sources.json(path), pointer) if pointer
+                 else sources.read_bytes(path))
+        if not value:
+            raise ValueError
+        return value
+    except (FinalStackError, saturation_ledger.LedgerError, TypeError, ValueError):
+        raise FinalStackError(reason) from None
+
+
+def final_reopened_by(sources: Sources, key: tuple[str, str], later: list[dict]) -> list[dict]:
+    """A later date is matrix staleness; FINAL needs a sweep's retained change."""
+    reopened = []
+    for sweep in later:
+        changed = False
+        for row in sweep["record"]["layers"]:
+            if (row["catalog"], row["layer_id"]) != key:
+                continue
+            markers = row.get("reopen") or []
+            if not isinstance(markers, list):
+                raise FinalStackError("FINAL reopening requires retained change evidence")
+            for marker in markers:
+                if not isinstance(marker, dict) or marker.get("trigger") not in saturation_ledger.REOPEN_TRIGGERS:
+                    raise FinalStackError("FINAL reopening requires retained change evidence")
+                retained_final_reference(sources, marker.get("ref"),
+                                         "FINAL reopening requires retained change evidence")
+                changed = True
+        if changed:
+            reopened.append({"sweep_id": sweep["sweep_id"], "date": sweep["date"]})
+    return reopened
+
+
+def final_unresolved_survivors(sources: Sources, row: dict, covering: list[dict], verdict_day) -> list[dict]:
+    """Replay all survivor history; age, omission and a missing vote never settle it."""
+    pending = {}
+
+    def retained_merit(entry) -> bool:
+        if "lens_votes" in entry:
+            votes = entry.get("lens_votes") or []
+        else:
+            votes = [entry.get(role) for role in saturation_ledger.ROLES]
+        for vote in votes:
+            if not isinstance(vote, dict) or vote.get("vote") != "refuted":
+                continue
+            try:
+                target = saturation_ledger.ref_resolver(sources.json)(vote.get("ref"))
+            except (FinalStackError, saturation_ledger.LedgerError, TypeError, ValueError):
+                continue
+            if saturation_ledger.refutes_on_merit(target) is True:
+                return True
+        return False
+
+    for sweep in covering:
+        for layer in sweep["record"]["layers"]:
+            if (layer["catalog"], layer["layer_id"]) != (row["catalog"], row["layer_id"]):
+                continue
+            answered = {host_receipts.normalize_repository(candidate.get("repo"))
+                        for field in ("survived", "refuted") for candidate in _dicts(layer.get(field))}
+            for proposal in layer.get("proposed") or []:
+                repo = host_receipts.normalize_repository(proposal)
+                if repo and repo not in answered:
+                    pending[repo] = {"repository": repo, "sweep_id": sweep["sweep_id"], "date": sweep["date"]}
+            for candidate in _dicts(layer.get("survived")):
+                repo = host_receipts.normalize_repository(candidate.get("repo"))
+                if repo:
+                    pending[repo] = {"repository": repo, "sweep_id": sweep["sweep_id"], "date": sweep["date"]}
+            for candidate in _dicts(layer.get("refuted")):
+                repo = host_receipts.normalize_repository(candidate.get("repo"))
+                if not repo:
+                    continue
+                if retained_merit(candidate):
+                    pending.pop(repo, None)
+                else:
+                    pending[repo] = {"repository": repo, "sweep_id": sweep["sweep_id"], "date": sweep["date"]}
+    settled = set()
+    for winner in _dicts(row.get("winners")):
+        settled.add(host_receipts.normalize_repository(winner.get("repository")))
+    for alternative in _dicts(row.get("alternatives")):
+        refs = alternative.get("evidence_refs")
+        if (alternative.get("disposition") not in {"observed_failure", "measured_tradeoff", "overlap", "out_of_scope",
+                                                    "unqualified", "conditional"}
+            or not isinstance(alternative.get("why_not_default"), str) or not alternative["why_not_default"].strip()
+            or not isinstance(refs, list) or not refs):
+            continue
+        for ref in refs:
+            retained_final_reference(sources, ref, "FINAL survivor disposition requires retained evidence")
+        settled.add(host_receipts.normalize_repository(alternative.get("repository")))
+    return sorted((survivor for repo, survivor in pending.items() if not (
+        repo in settled and verdict_day is not None and date.fromisoformat(survivor["date"]) <= verdict_day)),
+        key=lambda survivor: survivor["repository"])
+
+
 def complete_final_pin(text, run: dict) -> bool:
     """FINAL uses the complete recorded run identity, not shared-field drift matching.
 
@@ -632,6 +732,8 @@ def enforce_final(sources: Sources, layers: list[dict], runs: list[dict], angle_
 
         if layer["status"] == "reopened":
             fail("reopened sweep delta must be adjudicated before FINAL")
+        if layer["survivors"]:
+            fail("cumulative unresolved survivors require retained dispositions before FINAL")
         entry = angle_inputs.get(key)
         if entry is None or not layer["winners"]:
             fail("requires winners and a CONVERGED angle record")
@@ -779,6 +881,12 @@ def build_document(root: Path) -> dict:
                 raise FinalStackError(f"{MATRIX} is stale for {layer_key(*key)}: layer_state {recorded[0]!r}, "
                                       f"reopened by {recorded[1]!r}; the ledger gives {state!r}, {reopened_by!r}. "
                                       "Run python3 scripts/component_matrix.py --write first")
+            if resolved_terminal == "FINAL":
+                # Preserve the matrix's ordinary dated metric, then apply the
+                # protocol's stricter changed-evidence rule to settled FINAL.
+                reopened_by = final_reopened_by(sources, key, later)
+                if state == "recorded_reopened" and not reopened_by:
+                    state = "confirmed_current"
         held = isinstance(row.get("current_adoption_status"), str) and row["current_adoption_status"].startswith("held")
         winners = [build_winner(winner, matrix_row, runs_by_repository, runs_by_id, held)
                    for winner in _dicts(row.get("winners"))] if is_landscape else []
@@ -787,6 +895,8 @@ def build_document(root: Path) -> dict:
                             for repository, (outcome, sweep_id, day) in layer_outcomes["latest"].items()
                             if outcome == "survived" and (verdict_day is None or date.fromisoformat(day) > verdict_day)),
                            key=lambda survivor: survivor["repository"])
+        if resolved_terminal == "FINAL":
+            survivors = final_unresolved_survivors(sources, {**row, "catalog": catalog}, covering, verdict_day)
         recorded_repositories = {host_receipts.normalize_repository(item.get("repository"))
                                  for role in ("winners", "alternatives", "candidates") for item in _dicts(row.get(role))}
         layers.append({

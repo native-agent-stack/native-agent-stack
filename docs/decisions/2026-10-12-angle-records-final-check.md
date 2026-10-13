@@ -1,5 +1,62 @@
 # Decision: sourced angle records and explicit FINAL checks
 
+## Bounded integrity correction (2026-10-13)
+
+Recorded at 2026-10-13T08:33:29Z, against `8b336b80`. This amendment handles
+four FINAL-evidence cases through the existing source, sweep and verdict
+pipeline. It does not change scoring, candidate selection or a recorded winner.
+
+For an explicit FINAL claim, a later sweep date alone no longer revokes closure.
+The ordinary component-matrix metric still records dated staleness, and the
+final-stack builder verifies that matrix before applying FINAL's changed-evidence
+rule. A covering sweep must name a supported `reopen` trigger and retained
+reference. The referenced file/pointer is read and hash-bound; missing or empty
+evidence fails closed. An actual retained change still requires adjudication
+before FINAL. A no-change sweep leaves the FINAL projection current.
+
+The builder reconstructs FINAL's cumulative survivor set across all completed
+covering sweeps, including older and same-day observations. Later omission or
+missing returns/votes cannot settle it. A returned substantive refutation can
+settle the candidate; alternatively, the catalog verdict must explicitly select
+it or retain its disposition, reason and evidence references. A disposition
+cannot settle a newer post-verdict proposal. Any remaining survivor prevents
+FINAL with a specific refusal. These lifecycle checks supplement each winner's
+existing convergence, complete-pin, E2E and invocation requirements.
+
+Receipt references in entitlement and licence metadata now use the same
+read/hash contract as angle receipt references. An absent metadata receipt
+prevents generation, and its later edit invalidates `--check` through the source
+hash. Licence metadata remains separate from derivation and arm selection.
+
+The review gate and architecture projection now preserve recorded semantics
+for the FINAL verdict alias. Review still recomputes status from sealed lane
+evidence and checks the selected winner/alternatives/adjudication; a FINAL label
+cannot make pending evidence recorded. Architecture maps FINAL to adopted and
+keeps the desk's winner projection. The base copy of the review gate remains
+the CI trust source, so this compatibility is available after that gate lands.
+
+Before production changes, nine named synthetic controls produced thirteen
+assertion/subtest failures and zero errors at `8b336b80`, covering all four
+cases. The correction adds missing-return/empty-disposition controls and
+retained-change, retained-disposition and substantive-refutation positive
+controls. These are fixture tests, not candidate qualification. The final
+[check receipt](../../evidence/artifacts/angle-records-20261012/fix3-checks.json)
+records bounded verification and source-hash boundaries.
+
+Primary mechanism references at `8b336b80`:
+
+- [Layer resolution protocol:50](https://github.com/native-agent-stack/native-agent-stack/blob/8b336b80c345444f073cca74281c725fd5e0d4b9/docs/decisions/2026-10-11-layer-resolution-protocol.md#L50),
+  cumulative unresolved survivors, and `:62` / `:74`, changed-evidence
+  reopening and terminal dispositions.
+- [scripts/saturation_ledger.py:657](https://github.com/native-agent-stack/native-agent-stack/blob/8b336b80c345444f073cca74281c725fd5e0d4b9/scripts/saturation_ledger.py#L657),
+  native reference resolver; `:625`, returned merit versus missing vote;
+  `:86`, supported reopen triggers. The builder reuses these helpers.
+- [scripts/final_stack.py:195](https://github.com/native-agent-stack/native-agent-stack/blob/8b336b80c345444f073cca74281c725fd5e0d4b9/scripts/final_stack.py#L195),
+  existing confined read/hash contract;
+  [scripts/landscape.py:33](https://github.com/native-agent-stack/native-agent-stack/blob/8b336b80c345444f073cca74281c725fd5e0d4b9/scripts/landscape.py#L33),
+  shared recorded-verdict statuses. The existing unittest and JSON Schema
+  sources below remain the validation harness; no replacement is introduced.
+
 ## Fix round 2: file citations, URI validation and the FINAL alias
 
 Recorded at 2026-10-13T04:14:45Z. This amendment corrects the remaining

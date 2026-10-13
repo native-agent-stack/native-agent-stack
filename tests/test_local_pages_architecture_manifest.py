@@ -151,6 +151,15 @@ class ManifestProjectionTests(ManifestFixture):
                          ["built", "planned", "planned", "planned", "unreported"])
         self.assertEqual([MANIFEST.plan_status(value) for value in (True, False, None)], ["adopted", "planned", "unreported"])
 
+    def test_final_alias_preserves_adopted_matrix_and_desk_projection(self):
+        before = self.build()
+        self.records["matrix"]["rows"][1]["verdict_status"] = "FINAL"
+        self.write_records(self.records)
+        after = self.build()
+        self.assertEqual(MANIFEST.layer_status("FINAL"), "adopted")
+        self.assertEqual(after["views"]["matrix"]["rows"][1]["status"], "adopted")
+        self.assertEqual(after["views"]["desk"], before["views"]["desk"])
+
     def test_absent_records_leave_views_unreported_without_reading(self):
         for relative in PATHS.values():
             (self.root / relative).unlink()

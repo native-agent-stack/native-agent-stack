@@ -136,7 +136,7 @@
   },
   "definitions": [
     {
-      "definition": "First rule that matches, in this order: unswept (no completed sweep in catalogs/saturation/ledger.json covers the layer); no-winner (the verdict is pending_lanes or no_selection, or there are no winners); reopened (a completed sweep covering the layer is dated after the verdict's checked_at, component_matrix layer_state recorded_reopened); converged (layer_state confirmed_current and the matrix converged count equals its in_use count, which is above 0); current (otherwise).",
+      "definition": "First rule that matches, in this order: unswept (no completed sweep in catalogs/saturation/ledger.json covers the layer); no-winner (the verdict is pending_lanes or no_selection, or there are no winners); reopened (a completed sweep covering the layer is dated after the verdict's checked_at, component_matrix layer_state recorded_reopened); converged (layer_state confirmed_current and the matrix converged count equals its in_use count, which is above 0); current (otherwise). For an explicit FINAL claim, a later sweep reopens only with a named, retained change reference; a date-only matrix reopening does not revoke FINAL.",
       "term": "status"
     },
     {
@@ -168,7 +168,7 @@
       "term": "funnel"
     },
     {
-      "definition": "The unresolved repositories of the funnel, with their latest survival or the missing-vote-only sweep and date that opened or reopened them.",
+      "definition": "The unresolved repositories of the funnel, with their latest survival or the missing-vote-only sweep and date that opened or reopened them. For explicit FINAL claims, replay the cumulative set without a verdict-date filter: only retained substantive refutation or an explicit retained verdict disposition settles a survivor, never age or omission.",
       "term": "survivors"
     },
     {

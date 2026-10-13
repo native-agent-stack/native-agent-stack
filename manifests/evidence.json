@@ -17478,8 +17478,8 @@
     },
     {
       "path": "catalogs/landscape/angles/README.md",
-      "sha256": "80531891939dd7b8543f6e0b85ed6a9553ff6731244e04ac14aabc0046ea5a88",
-      "bytes": 12960
+      "sha256": "2929dc8267bad519b3c3eaff33578b024ca61c25c812c7d6615c69f8176cbc5e",
+      "bytes": 13465
     },
     {
       "path": "catalogs/landscape/angles/foundation-agent-sdks.json",
@@ -17528,8 +17528,8 @@
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "0d6871170544fcd54e39f7c1b85dd5ea2f8a1292672ceb22d87ff526c0d794d7",
-      "bytes": 338539
+      "sha256": "e482c30346bbe97fc06a8909a43e86d8d69a93983a443747f92ad7d3d8b9d46d",
+      "bytes": 338896
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -19148,8 +19148,8 @@
     },
     {
       "path": "docs/decisions/2026-10-12-angle-records-final-check.md",
-      "sha256": "44a4e1e8cf7ab08e0e3927f0badf2333cbede8fad40fece0d9af78c4b3d374f8",
-      "bytes": 19998
+      "sha256": "ccc714ce335d8fe2eb28e6a05f1ff11d5d594972560d7983c4a648e3780a7181",
+      "bytes": 23902
     },
     {
       "path": "docs/decisions/2026-10-12-converged-candidates-only.md",
@@ -20330,6 +20330,11 @@
       "path": "evidence/artifacts/angle-records-20261012/fix2-source-reads.json",
       "sha256": "cffd0ae6aaafec073bf9cc7b8ada57cf62ebd1b24f8586cd53a539b984eb2e6c",
       "bytes": 2470
+    },
+    {
+      "path": "evidence/artifacts/angle-records-20261012/fix3-checks.json",
+      "sha256": "b1d3d392f2d034e6396c83beeca6bf423db5af5701350c78ff71ad1d79acae46",
+      "bytes": 4310
     },
     {
       "path": "evidence/artifacts/angle-records-20261012/muse-install-sanitized.json",
@@ -62158,8 +62163,8 @@
     },
     {
       "path": "scripts/angle_records.py",
-      "sha256": "0ef8d8a55329aa11b56c4bd19772aa6e588eb7388e657f0fd5b08a87dc1b0b98",
-      "bytes": 12489
+      "sha256": "4bfcd7f540ebe4d3984bf99e2ff7130d1b97c432630c17a90171ed699e4815b4",
+      "bytes": 12895
     },
     {
       "path": "scripts/build_ecosystem.py",
@@ -62218,8 +62223,8 @@
     },
     {
       "path": "scripts/final_stack.py",
-      "sha256": "59ea7485ba2a44bafc738f869c32e5780982a36a50e399092c695c769b257920",
-      "bytes": 67577
+      "sha256": "184da8c2aa5d9132ef25c93bc43d97f194bd8eab70e24fde224d286e55c50772",
+      "bytes": 73733
     },
     {
       "path": "scripts/freshness_propose.py",
@@ -62393,8 +62398,8 @@
     },
     {
       "path": "scripts/verdict_review_gate.py",
-      "sha256": "ef83007ad614136d753493a2441d5b3e9b66f51342302f9c6ee7b38e49f31887",
-      "bytes": 100287
+      "sha256": "e93527dc1ecb9a67c90254d5f6a21293e36e7aa5a1e1dee45b7e42a4eaba5db7",
+      "bytes": 100431
     },
     {
       "path": "scripts/verify_nautilus_ci.py",
@@ -62968,8 +62973,13 @@
     },
     {
       "path": "tests/test_angle_records_fix1.py",
-      "sha256": "d9a8be5eac1270287da45fd3dc2ee5f6b79da32ef69af179ae25c2f3f7a0c3c4",
-      "bytes": 19172
+      "sha256": "bd9036393845e8feef844ba435ca8df6e875e14088077f73f313746974d4f099",
+      "bytes": 19393
+    },
+    {
+      "path": "tests/test_angle_records_fix3.py",
+      "sha256": "7fbb8568a654c41190f7c1490143e52e7d6e2e443aa1e24ff6c73b52510684ea",
+      "bytes": 8910
     },
     {
       "path": "tests/test_anthropic_key_health.py",
@@ -63568,8 +63578,8 @@
     },
     {
       "path": "tests/test_local_pages_architecture_manifest.py",
-      "sha256": "01f029c7a4df222113f2715624049fe46fd046a4f7fc29aca6165b5d7f2d65ed",
-      "bytes": 27970
+      "sha256": "67d6cc2dd8b6908336f68faad0c994410fd1f1ecfafa89261e753d27f47bda28",
+      "bytes": 28443
     },
     {
       "path": "tests/test_local_pages_architecture_sources.py",
@@ -64363,8 +64373,8 @@
     },
     {
       "path": "tests/test_verdict_review_gate.py",
-      "sha256": "0b829e33823d3d9f3e94295836f63b97342c8cedc7b92ed0d08e3c40553b894b",
-      "bytes": 116272
+      "sha256": "eb913c5acab3ad0d2065e4784f8d1b0666b1484e988e03269ebb50978843bde7",
+      "bytes": 116950
     },
     {
       "path": "tests/test_verify_sources.py",
@@ -64758,8 +64768,8 @@
     },
     {
       "path": "tools/local-pages/architecture_manifest.py",
-      "sha256": "1d102f9c6a521257a6678d21f264c98c1ba49f2432407a36d1ba4bddcdd55b28",
-      "bytes": 53564
+      "sha256": "ea4d5a1bed9771cd6da92bb3a2f55aadb52a5acc08721cae32500379905b43f7",
+      "bytes": 53582
     },
     {
       "path": "tools/local-pages/architecture_mapping.json",

@@ -116,11 +116,18 @@ can explicitly carry `terminal_state: FINAL`; a landscape `verdict_status:
 FINAL` is also recognized. An explicit marker cannot bypass verification.
 
 Explicit terminal-state claims are reconciled before enforcement; conflicting
-claims are refused. A matrix-reopened layer must have its sweep delta
-adjudicated and leave reopened before FINAL. The landscape validator, matrix
-generator, verdict narrative and final-stack generator share recorded-verdict
+claims are refused. Ordinary matrix staleness remains date-based; an explicit
+FINAL layer reopens only when a covering sweep names retained change evidence.
+A later no-change sweep leaves FINAL intact. Its cumulative unresolved survivor
+set needs retained substantive refutation or explicit retained verdict
+dispositions; age, later omission and missing returns do not settle candidates.
+The landscape validator, matrix generator, review gate, architecture views,
+verdict narrative and final-stack generator share recorded-verdict
 semantics for the FINAL alias, including sealed winner binding, matrix winner
 factors and dated review metadata. The alias still needs every FINAL condition.
+Entitlement and licence receipt references are read and hash-bound through the
+same source reader as angle receipts. Licence metadata still never participates
+in scoring, rejection or arm selection.
 
 For every FINAL winner the generator requires:
 

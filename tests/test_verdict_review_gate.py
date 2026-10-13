@@ -1130,6 +1130,18 @@ class StatusDerivationTests(GateFixture):
     """Third review of #123, finding 1: verdict_status is the one record_verdicts.py writes for the
     sealed evidence, so a recorded verdict cannot be withdrawn by relabelling its row."""
 
+    def test_final_alias_preserves_sealed_recorded_verdict_checks(self):
+        row = self.record()
+        row["verdict_status"] = "FINAL"
+        self.assertPasses(self.report())
+        row["winners"][0]["component_id"] = "not-the-sealed-winner"
+        self.assertFails(self.report(), "lane's winner_keys resolved through the sealed packet")
+
+    def test_final_alias_cannot_promote_pending_sealed_evidence(self):
+        row = self.record(claude_keys=("c1",), codex_keys=("c2",), status="pending_lanes", winners=[])
+        row["verdict_status"] = "FINAL"
+        self.assertFails(self.report(), "verdict_status is 'FINAL' but record_verdicts.py writes 'pending_lanes'")
+
     def withdraw(self, row, status, open_gaps=()):
         row.update(verdict_status=status, winners=[], alternatives=[], verdict_overturn_when="",
                    open_gaps=list(open_gaps))
