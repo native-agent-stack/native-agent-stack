@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Runs .github/workflows/security-scan.yml's own "Scan every listed lockfile and manifest" step, extracted from
+# the tree's workflow file and run the way the runner runs `shell: bash` (bash --noprofile --norc -eo pipefail)
+# for a pull_request event (WRITE_SARIF=false) in UTC, then that step's ordinary OSV invocation alone, so the
+# scanner's findings stay visible when the step's unittest preflight stops it first.
+# Adapted from native-stack@738fdf70:
+# blueprints/runtime-workers/openhands/evidence/relock-2026-10-05-fsspec.osv-scan-step.sh.txt; that copy named the
+# retired .github/osv-scanner-frozen-macos.toml, and the frozen group is now reported by the non-required
+# frozen-evidence-risk.yml, so only the required ordinary group is scanned here.
+# Usage: bash <script> <runner-temp> <tree> <out-prefix> <rtk-binary>
+#   <runner-temp>/osv-scanner/osv-scanner is the workflow's pinned OSV-Scanner 2.6.0, sha256-checked as its
+#   install step does.
+# Script exit 0 means both native exits were captured, not that both passed.
+set -u
+rt=$1; tree=$2; out=$3; RTK=$4
+cd "$tree" || exit 2
+"$RTK" proxy python3 -c 'import sys, yaml; steps = yaml.safe_load(open(".github/workflows/security-scan.yml"))["jobs"]["osv-scanner"]["steps"]; run = [s["run"] for s in steps if s.get("name", "").startswith("Scan every listed lockfile and manifest")]; assert len(run) == 1; sys.stdout.write(run[0])' > "$out.step.sh" || exit 2
+"$RTK" sha256sum .github/workflows/security-scan.yml "$out.step.sh"
+TZ=UTC RUNNER_TEMP=$rt WRITE_SARIF=false "$RTK" proxy bash --noprofile --norc -eo pipefail "$out.step.sh" > "$out.step.txt" 2>&1
+step=$?
+echo "workflow scan step exit: $step"
+mapfile -t lockfiles < <("$RTK" proxy jq -r '.lockfiles[] | select(has("config") | not) | "--lockfile=\(.parser // ""):\(.path)"' .github/osv-scanner-lockfiles.json)
+echo "ordinary entries ${#lockfiles[@]}"
+TZ=UTC "$RTK" proxy "$rt/osv-scanner/osv-scanner" scan source --config .github/osv-scanner.toml --no-resolve "${lockfiles[@]}" > "$out.ordinary.txt" 2>&1
+ordinary=$?
+echo "ordinary scan exit: $ordinary"
+"$RTK" sed -i -e "s#$tree#<scan-root>#g" "$out.step.txt" "$out.ordinary.txt"
+"$RTK" proxy grep -h -E '^Total [0-9]+ package|^\| https://osv.dev/|No issues found|OSV primary exit code|^(FAIL|ERROR):|^Ran |^OK|^FAILED' "$out.step.txt" "$out.ordinary.txt" || true
+"$RTK" sha256sum "$out.step.txt" "$out.ordinary.txt"
+exit 0

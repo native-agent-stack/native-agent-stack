@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# Repeats section J of relock-2026-09-30.txt on the real recipe lock, as research.md and #518 planned for the
+# oauthlib 4.0.0 relock: requests-oauthlib 2.0.0's own unit tests (unchanged upstream test code from the sdist
+# whose sha256 the lock lists) and the requests_oauthlib / google_auth_oauthlib.flow imports.
+# The venv holds the tree's hashed requirements.lock (install-container.sh flags). The test-only extras
+# (pytest, requests-mock, mock and their dependencies) are installed against a constraint file frozen from that
+# venv, so no locked version can move; the freeze diff below shows additions only.
+# Run once on the base tree (oauthlib 3.3.1) and once on the relocked tree (oauthlib 4.0.0).
+# Sources: native-stack@738fdf70:blueprints/runtime-workers/openhands/evidence/relock-2026-09-30.builder.sh.txt
+# (section J) and relock-2026-10-13-oauthlib.install-check.sh.txt.
+# Usage: bash <script> <owned-scratch> <tree> <rtk-binary> <uv-binary> <label>
+set -uo pipefail
+R=$1; W=$2; RTK=$3; UV=$4; L=$5
+OH=$W/blueprints/runtime-workers/openhands; V=$R/ro/venv-$L; S=$R/ro/sdist
+RO_SHA=b3dffaebd884d8cd778494369603a9e7b58d29111bf6b41bdc2dcd87203af4e9
+export UV_CACHE_DIR=$R/uv-cache UV_PYTHON_DOWNLOADS=never UV_NO_CONFIG=1 TMPDIR=$R/tmp
+"$RTK" mkdir -p "$TMPDIR" "$R/ro"
+if [ ! -d "$S/src" ]; then
+  "$RTK" mkdir -p "$S/src"
+  url=$("$RTK" proxy curl -fsS --max-time 30 https://pypi.org/pypi/requests-oauthlib/2.0.0/json | "$RTK" proxy jq -r --arg sha "$RO_SHA" '.urls[] | select(.digests.sha256 == $sha) | .url')
+  "$RTK" proxy curl -fsS --max-time 60 -o "$S/ro-2.0.0.tar.gz" "$url" || exit 2
+  printf '%s  %s\n' "$RO_SHA" "$S/ro-2.0.0.tar.gz" | "$RTK" proxy sha256sum --check || exit 2
+  "$RTK" tar -xzf "$S/ro-2.0.0.tar.gz" --strip-components=1 -C "$S/src" || exit 2
+fi
+echo "### $L tree"
+echo "requests-oauthlib 2.0.0 sdist sha256 $RO_SHA appears $("$RTK" proxy grep -c "$RO_SHA" "$OH/requirements.lock") time(s) in the tree's requirements.lock"
+"$RTK" rm -rf "$V"
+"$RTK" "$UV" venv --python 3.13 "$V" > /dev/null 2>&1 || exit 2
+"$RTK" proxy "$UV" pip install --python "$V/bin/python" --require-hashes --no-deps --only-binary :all: --index-url https://pypi.org/simple -r "$OH/build-requirements.lock" > "$V.install.log" 2>&1 || exit 2
+"$RTK" proxy "$UV" pip install --python "$V/bin/python" --require-hashes --no-deps --no-build-isolation --index-url https://pypi.org/simple -r "$OH/requirements.lock" >> "$V.install.log" 2>&1 || exit 2
+"$RTK" proxy "$UV" pip freeze --python "$V/bin/python" > "$V.freeze-lock.txt" 2>/dev/null
+"$RTK" proxy "$UV" pip install --python "$V/bin/python" --index-url https://pypi.org/simple -c "$V.freeze-lock.txt" pytest requests-mock mock >> "$V.install.log" 2>&1 || exit 2
+"$RTK" proxy "$UV" pip freeze --python "$V/bin/python" > "$V.freeze-test.txt" 2>/dev/null
+echo '$ diff <freeze after the lock install> <freeze after the test extras>     # additions only'
+"$RTK" proxy diff "$V.freeze-lock.txt" "$V.freeze-test.txt"
+echo '$ uv pip list | grep -E "^(oauthlib|requests-oauthlib|google-auth-oauthlib|requests|requests-mock|mock|pytest|pyjwt|cryptography) "'
+"$RTK" proxy "$UV" pip list --python "$V/bin/python" 2>/dev/null | "$RTK" proxy grep -E '^(oauthlib|requests-oauthlib|google-auth-oauthlib|requests|requests-mock|mock|pytest|pyjwt|cryptography) '
+echo '$ python -c "import requests_oauthlib, google_auth_oauthlib.flow; print('"'"'imports OK'"'"')"'
+"$V/bin/python" -c "import requests_oauthlib, google_auth_oauthlib.flow; print('imports OK')" 2>&1 | "$RTK" tail -2
+# The recipe lock's libtmux 0.53.0 registers a pytest11 plugin (libtmux = libtmux.pytest_plugin) that aborts
+# pytest 9.1.1 at startup ("Marks cannot be applied to fixtures") under either oauthlib; the first run of this
+# script is retained as that failed attempt. `-p no:libtmux` blocks that one plugin by its entry-point name;
+# these tests use requests_mock as a library (requests_mock.Mocker), not as a pytest plugin.
+echo '$ python -m pytest -q -rf --tb=line -p no:cacheprovider -p no:libtmux tests/test_compliance_fixes.py tests/test_core.py tests/test_oauth1_session.py tests/test_oauth2_auth.py tests/test_oauth2_session.py     # in the sdist tree; full output'
+(cd "$S/src" && "$V/bin/python" -m pytest -q -rf --tb=line -p no:cacheprovider -p no:libtmux tests/test_compliance_fixes.py tests/test_core.py tests/test_oauth1_session.py tests/test_oauth2_auth.py tests/test_oauth2_session.py > "$V.pytest.out" 2>&1; echo "$?" > "$V.pytest.rc")
+"$RTK" proxy cat "$V.pytest.out"
+echo "exit: $(cat "$V.pytest.rc")"

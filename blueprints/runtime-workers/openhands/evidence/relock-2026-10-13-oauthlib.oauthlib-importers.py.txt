@@ -1,0 +1,45 @@
+"""Static text search of a relocked recipe venv: which installed packages import oauthlib, and does any of them import
+the server-side parts that oauthlib 4.0.0's two breaking changes touch (the token revocation endpoint's JSONP support,
+#951, and client authentication across grant types, #919/#920)?
+
+Reads every .py file under <site-packages> outside oauthlib itself; records `from oauthlib... import ...` and
+`import oauthlib...` statements (single-line forms), flags any whose module path names endpoints, grant_types or servers
+or whose imported names end in Server, Endpoint or Grant (or are RequestValidator), and any file that mentions
+enable_jsonp or create_revocation_response. A text search, not a runtime trace: a multi-line import, an attribute access
+through `import oauthlib`, or a dynamic import would be missed.
+Usage: python3 -I <this-script> <site-packages>
+"""
+import os
+import re
+import sys
+
+site = sys.argv[1]
+statement = re.compile(r"^\s*(?:from\s+(oauthlib[\w.]*)\s+import\s+(.+)|import\s+(oauthlib[\w.]*))", re.M)
+server_names = re.compile(r"\b(\w*Server|\w*Endpoint|\w*Grant|RequestValidator|enable_jsonp|create_revocation_response)\b")
+importers, hits, searched = {}, [], 0
+for root, _dirs, names in os.walk(site):
+    top = os.path.relpath(root, site).split(os.sep)[0]
+    if top.startswith("oauthlib"):
+        continue
+    for name in names:
+        if not name.endswith(".py"):
+            continue
+        path = os.path.join(root, name)
+        searched += 1
+        try:
+            text = open(path, encoding="utf-8", errors="replace").read()
+        except OSError:
+            continue
+        if "oauthlib" not in text:
+            continue
+        for match in statement.finditer(text):
+            module = match.group(1) or match.group(3)
+            imported = match.group(2) or ""
+            importers.setdefault(top, set()).add(module)
+            if re.search(r"endpoints|grant_types|servers?\b", module) or server_names.search(imported):
+                hits.append((os.path.relpath(path, site), match.group(0).strip()[:140]))
+        if re.search(r"enable_jsonp|create_revocation_response", text):
+            hits.append((os.path.relpath(path, site), "mentions enable_jsonp or create_revocation_response"))
+print("py files searched outside oauthlib:", searched)
+print("top-level distributions importing oauthlib:", {key: sorted(value) for key, value in sorted(importers.items())})
+print("imports of oauthlib endpoints, grant types or servers outside oauthlib:", hits or "none")

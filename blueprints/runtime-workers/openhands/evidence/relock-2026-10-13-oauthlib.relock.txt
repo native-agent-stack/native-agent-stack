@@ -1,0 +1,76 @@
+[2026-10-13T00:29:37Z] uv 0.12.22 (x86_64-unknown-linux-gnu)
+base archive and lock hashes:
+2d3006de86eaec690a82e497fcd4459816637afe6e53f7da87783183792148a8  <scratch-relock>/sdk-fcc102a.tar.gz
+2837036a2bb832958e2daad6094811610d1fd605a315dacd9a0616841e9e2401  <scratch-relock>/u3/base.lock
+[2026-10-13T00:29:39Z] control uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 --upgrade-package pyjwt==2.15.0 --upgrade-package urllib3==2.8.0 --upgrade-package litellm==1.93.2 --upgrade-package fsspec==2026.6.0 --upgrade-package multidict==6.9.1
+lock exit: 0
+check exit: 0
+export exit: 0
+Resolved 412 packages in 2.21s
+Updated anyio v4.11.0 -> v4.14.2
+Updated click v8.1.8 -> v8.5.0
+Updated cryptography v48.0.1, v50.0.0 -> v50.0.0
+Removed cython v3.1.4
+Updated fsspec v2025.9.0 -> v2026.6.0
+Updated litellm v1.93.0 -> v1.93.2
+Removed macholib v1.16.3
+Updated multidict v6.7.0 -> v6.9.1
+Removed pefile v2023.2.7
+Updated pyjwt v2.13.0 -> v2.15.0
+Removed pyobjc-framework-pubsub v11.1
+Updated pypdf v6.14.2 -> v6.19.0
+Removed pywin32 v311
+Removed pywin32-ctypes v0.2.3
+Updated soupsieve v2.8.4 -> v2.9.2
+Updated urllib3 v2.7.0 -> v2.8.0
+f355421b055151b75f488ffd6415078f17ccee6926f6ba9c2d3501c2cf7769ef  <scratch-relock>/u3/control/uv.lock
+2837036a2bb832958e2daad6094811610d1fd605a315dacd9a0616841e9e2401  <scratch-relock>/u3/control/requirements.lock.repro
+[2026-10-13T00:29:43Z] new uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 --upgrade-package pyjwt==2.15.0 --upgrade-package urllib3==2.8.0 --upgrade-package litellm==1.93.2 --upgrade-package fsspec==2026.6.0 --upgrade-package multidict==6.9.1 --upgrade-package oauthlib==4.0.0
+lock exit: 0
+check exit: 0
+export exit: 0
+Resolved 412 packages in 730ms
+Updated anyio v4.11.0 -> v4.14.2
+Updated click v8.1.8 -> v8.5.0
+Updated cryptography v48.0.1, v50.0.0 -> v50.0.0
+Removed cython v3.1.4
+Updated fsspec v2025.9.0 -> v2026.6.0
+Updated litellm v1.93.0 -> v1.93.2
+Removed macholib v1.16.3
+Updated multidict v6.7.0 -> v6.9.1
+Updated oauthlib v3.3.1 -> v4.0.0
+Removed pefile v2023.2.7
+Updated pyjwt v2.13.0 -> v2.15.0
+Removed pyobjc-framework-pubsub v11.1
+Updated pypdf v6.14.2 -> v6.19.0
+Removed pywin32 v311
+Removed pywin32-ctypes v0.2.3
+Updated soupsieve v2.8.4 -> v2.9.2
+Updated urllib3 v2.7.0 -> v2.8.0
+17295c3e23d9b832b637254ab91fce64a37b96e8c3d11f4233143082d901a111  <scratch-relock>/u3/new/uv.lock
+32bc153428aaef2018adcdca53337e4a74b464ca94a96b9905e1bc6174503400  <scratch-relock>/u3/new/requirements.lock.repro
+control reproduces the committed lock byte for byte
+$ diff control/requirements.lock.repro new/requirements.lock.repro
+389,391c389,391
+< oauthlib==3.3.1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+<     --hash=sha256:0f0f8aa759826a193cf66c12ea1af1637f87b9b4622d46e866952bb022e538c9 \
+<     --hash=sha256:88119c938d2b8fb88561af5f6ee0eec8cc8d552b7bb1f712743136eb7523b7a1
+---
+> oauthlib==4.0.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+>     --hash=sha256:624c28c13a0a59cabf9747dfa52af63be3e512a7f2714df16e91b5b3a145e6cd \
+>     --hash=sha256:efb274799819440f95b4ab3b818869f1ce9ae26c5beacba0201d1a1b76b54f86
+$ diff control/uv.lock new/uv.lock
+1925c1925
+< version = "3.3.1"
+---
+> version = "4.0.0"
+1927c1927
+< sdist = { url = "https://files.pythonhosted.org/packages/0b/5f/19930f824ffeb0ad4372da4812c50edbd1434f678c90c2733e1188edfc63/oauthlib-3.3.1.tar.gz", hash = "sha256:0f0f8aa759826a193cf66c12ea1af1637f87b9b4622d46e866952bb022e538c9", size = 185918, upload-time = "2025-06-19T22:48:08.269Z" }
+---
+> sdist = { url = "https://files.pythonhosted.org/packages/7a/d8/a1bcc8ba112a627f8ffbdc212a78ce18d3ac07e91a5ca65d27918eee25a1/oauthlib-4.0.0.tar.gz", hash = "sha256:efb274799819440f95b4ab3b818869f1ce9ae26c5beacba0201d1a1b76b54f86", size = 187232, upload-time = "2026-09-28T06:01:18.77Z" }
+1929c1929
+<     { url = "https://files.pythonhosted.org/packages/be/9c/92789c596b8df838baa98fa71844d84283302f7604ed565dafe5a6b5041a/oauthlib-3.3.1-py3-none-any.whl", hash = "sha256:88119c938d2b8fb88561af5f6ee0eec8cc8d552b7bb1f712743136eb7523b7a1", size = 160065, upload-time = "2025-06-19T22:48:06.508Z" },
+---
+>     { url = "https://files.pythonhosted.org/packages/d9/f4/78229a1066068ca14fc60fb26cf7381cabe4382261392b90e5f9552722d4/oauthlib-4.0.0-py3-none-any.whl", hash = "sha256:624c28c13a0a59cabf9747dfa52af63be3e512a7f2714df16e91b5b3a145e6cd", size = 159715, upload-time = "2026-09-28T06:01:17.008Z" },
+[2026-10-13T00:29:46Z] new paired lock generated; inspect every pin delta before adoption
+relock script exit: 0

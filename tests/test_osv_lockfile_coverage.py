@@ -72,20 +72,11 @@ IGNORE_SCOPES = {
     # nltk: no patched release, so every version is affected.
     "GHSA-8mgp-746c-j5xp": {"package": "nltk", "fixed": None},
     "GHSA-h35f-9h28-mq5c": {"package": "setuptools", "fixed": (83, 0, 0)},
-    # oauthlib 4.0.0 fixes both oauthlib advisories (GitHub and OSV records, 2026-09-29).
-    "GHSA-hj66-6f7g-4r5v": {"package": "oauthlib", "fixed": (4, 0, 0)},
-    "GHSA-xpv3-w29h-x7cv": {"package": "oauthlib", "fixed": (4, 0, 0)},
 }
-IGNORE_ALLOWED_LOCKS = {
-    # Live recipe lock; the 2026-10-05 relock changes only fsspec and multidict
-    # and carries the existing oauthlib review forward at the new exact digest.
-    # No fsspec ignore is granted; moving oauthlib to 4.0.0 removes this entry.
-    "blueprints/runtime-workers/openhands/requirements.lock": {
-        "advisories": ["GHSA-hj66-6f7g-4r5v", "GHSA-xpv3-w29h-x7cv"],
-        "sha256": "2837036a2bb832958e2daad6094811610d1fd605a315dacd9a0616841e9e2401",
-        "evidence": "evidence/receipts/osv-openhands-fsspec-relock-20261005.json",
-    },
-}
+# Empty since 2026-10-13: the OpenHands recipe lock's entry (the two oauthlib advisories) went with its relock onto
+# oauthlib 4.0.0, together with those ignores and their IGNORE_SCOPES rows
+# (evidence/receipts/osv-openhands-oauthlib-relock-20261013.json).
+IGNORE_ALLOWED_LOCKS = {}
 # OSV's explicit config has invocation-wide scope (v2.6.0 docs/configuration.md and Manager.Get).
 # FROZEN_LOCKS binds the independent, unsuppressed report to reviewed bytes and an inactive disposition.
 # The historical advisory IDs prevent their exceptions leaking into production; they grant no suppression.
