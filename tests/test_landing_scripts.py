@@ -548,6 +548,7 @@ PUBLIC_COMMITS = {
     "c999eee50e7ef1a4be45cee3f90e417e72868148": "native-agent-stack/native-agent-stack: #1061's second commit",
     "974090cfdccc284741a26147d306ef4a0e1debdd": "native-agent-stack/native-agent-stack: #1061's third commit",
     "993cc890b3ff3fc95fa7cdba51edd726565f9ace": "native-agent-stack/native-agent-stack: the base of the adjudication change (#1068's merge)",
+    "25a9b48efc6be09b9447a8265b8379191ec2b81d": "native-agent-stack/native-agent-stack: #1075's first commit",
     "58b1e0c00b39b9e46c24dc4a0ba6a2669c90e9c1": "github/rest-api-description",
     "be38ec5d78e24172587e61b3c6ff40ace1865c71": "github/docs",
     "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d": "openai/codex: the upstream mirror of 2026-10-09",
@@ -822,22 +823,34 @@ class ScriptTextTests(LandingCase):
             with self.subTest(text=name):
                 self.assertNotIn("LOCAL_REVIEW_WAIVER", text)
 
-    def test_squash_body_file_and_the_adjudication_are_nas_inputs_outside_the_shared_block_and_cite_their_sources(self):
+    def test_squash_body_file_and_the_adjudication_are_nas_inputs_that_uet_refuses_before_the_lock(self):
         # The CC's ruling of 2026-10-13 and the CC's copy's SQUASH_BODY_FILE: nas_land.sh reads both outside the shared block, which uet_land.sh
         # carries too; the body file is checked before the shared block and the lock; codex_gate.py alone decides with the adjudication.
-        # At 993cc890 neither variable was read anywhere.
+        # At 993cc890 neither variable was read anywhere. The CC's read of #1075: codex_gate.py decides with the adjudication wherever it is
+        # set, so uet_land.sh refuses both when they are SET, before the shared block, the lock and any call, and reads them nowhere else
+        # (at 25a9b48e it did not mention them, and a uet landing merged on an inherited record).
+        lock = 'lg_lock "${LANDING_LOCK_DIR:-$COORD/command-center/landing-locks}" || exit 14'
         lines, nas = self.nas.lines, self.nas.text
         check = ('[ -z "${SQUASH_BODY_FILE+x}" ] || { [ "$SQUASH_BODY_FILE" != - ] && [ -f "$SQUASH_BODY_FILE" ] && [ -r "$SQUASH_BODY_FILE" ] '
                  '&& [ -s "$SQUASH_BODY_FILE" ]; } \\')
         self.assertEqual(lines.count(check), 1)
         self.assertLess(lines.index(check), lines.index("# >>> land-gate-fns"))
-        self.assertLess(lines.index(check), lines.index('lg_lock "${LANDING_LOCK_DIR:-$COORD/command-center/landing-locks}" || exit 14'))
+        self.assertLess(lines.index(check), lines.index(lock))
         self.assertIn("LOCAL_REVIEW_ADJUDICATION", nas[nas.index("verdict_gate() {"):])
         self.assertIn('ADJUDICATION = "LOCAL_REVIEW_ADJUDICATION"', (LANDING / "codex_gate.py").read_text(encoding="utf-8"))
-        for name, text in (("the shared block", self.nas.block), ("uet_land.sh", self.uet.text)):
-            for variable in ("LOCAL_REVIEW_ADJUDICATION", "SQUASH_BODY_FILE"):
-                with self.subTest(text=name, variable=variable):
-                    self.assertNotIn(variable, text)
+        uet = self.uet.lines
+        for variable in ("LOCAL_REVIEW_ADJUDICATION", "SQUASH_BODY_FILE"):
+            refusal = (f'[ -z "${{{variable}+x}}" ] || {{ echo "#$N {variable} is set, but it is nas-only (a nas_land.sh input): stop, nothing '
+                       'merged"; exit 2; }')
+            with self.subTest(script="uet", variable=variable):
+                self.assertEqual(uet.count(refusal), 1)
+                self.assertLess(uet.index("N=${1:?pr}; E=${2:?read head}"), uet.index(refusal), "the refusal names the pull request")
+                self.assertLess(uet.index(refusal), uet.index("# >>> land-gate-fns"))
+                self.assertLess(uet.index(refusal), uet.index(lock))
+                self.assertEqual([line for line in uet if variable in line and not line.lstrip().startswith("#")], [refusal],
+                                 "uet_land.sh reads the variable nowhere else")
+            with self.subTest(text="the shared block", variable=variable):
+                self.assertNotIn(variable, self.nas.block)
         for cited in ("cli v2.102.0 pkg/cmd/pr/merge/merge.go:146-153", "pkg/cmdutil/file_input.go:8-15", "merge.go:138-143"):
             with self.subTest(cited=cited):
                 self.assertIn(cited, nas)
@@ -4147,6 +4160,42 @@ class EndToEndTests(LandingCase):
             fcntl.flock(held, fcntl.LOCK_EX | fcntl.LOCK_NB)
             code, out, log = self.land(self.nas, SQUASH_BODY_FILE="-")
         self.assertEqual((code, out, log), (2, stop, []), "the check comes before the lock")
+
+    def test_uet_refuses_the_nas_only_variables_when_set_before_the_lock_and_any_call(self):
+        # The CC's read of #1075: codex_gate.py decides with LOCAL_REVIEW_ADJUDICATION wherever it is set, and uet_land.sh runs it too, without
+        # nas's binding check or a squash body that records it; either variable can be inherited, for example from a nas landing in the same
+        # shell. uet_land.sh stops on each when it is SET, an empty value included (${VAR+x}), before the lock and any call. At 25a9b48e each
+        # of these landings merged: the valid record on the gate's adjudicated 0, the others with the variable unread.
+        import fcntl
+        p2 = finding(2, "[P2] Cite the source", "change.txt:1-1")
+        review = self.local_review(self.head, [p2], correctness="patch is incorrect")
+        record, _ = self.adjudication(review, findings=[p2])
+        body = self.dir / f"squash-body-{next(self.counter)}.md"
+        body.write_text("Land the change.\n", encoding="utf-8")
+
+        def stop(variable):
+            return f"#{PR} {variable} is set, but it is nas-only (a nas_land.sh input): stop, nothing merged"
+        cases = [
+            ("a valid adjudication record, with the local review it decides", "LOCAL_REVIEW_ADJUDICATION",
+             {"LOCAL_REVIEWS": review, "LOCAL_REVIEW_ADJUDICATION": record, "FAKE_REAL_PYTHON": sys.executable}),
+            ("an empty adjudication value", "LOCAL_REVIEW_ADJUDICATION", {"LOCAL_REVIEW_ADJUDICATION": ""}),
+            ("a valid body file", "SQUASH_BODY_FILE", {"SQUASH_BODY_FILE": str(body)}),
+            ("an empty body file value", "SQUASH_BODY_FILE", {"SQUASH_BODY_FILE": ""}),
+        ]
+        for name, variable, extra in cases:
+            with self.subTest(case=name):
+                code, out, log = self.land(self.uet, draft=True, merge_state="BEHIND", **extra)
+                self.assertEqual((code, out, log), (2, stop(variable), []), "one line, and no call of any kind")
+        with self.subTest(case="the landing lock held"):
+            path = self.lock_path(self.uet)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            with open(path, "a", encoding="utf-8") as held:
+                fcntl.flock(held, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                code, out, log = self.land(self.uet, SQUASH_BODY_FILE="")
+            self.assertEqual((code, out, log), (2, stop("SQUASH_BODY_FILE"), []), "the refusal comes before the lock")
+        with self.subTest(case="the control: neither set, the same uet landing merges"):
+            code, out, log = self.land(self.uet)
+            self.assertEqual((code, len(self.merge_calls(log))), (0, 1), out)
 
 
 # ---------------------------------------------------------------------------------------------- 8. review_normalize.py

@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 # CC landing for us-equities-trading (private, owned by one account, no merge queue; strict up-to-date + linear + squash).
 # usage: [VERDICT_FILES="…"] [GATES_DONE=<receipt>] [GPT_VERDICT=<verdict>] uet_land.sh <pr> <read-head-sha-prefix>
-# Order (#975 round 4): the landing lock -> early refusals (trading-cc-read, the verdict files, the head carries the read head's change) ->
+# Order (#975 round 4): nas_land.sh's inputs refused, before any call (#1075) -> the landing lock -> early refusals (trading-cc-read, the
+# verdict files, the head carries the read head's change) ->
 # slow steps (ready, the Codex wait, update-branch --rebase and the change check, the CI wait, the author address) -> final_gate, fast reads
 # only (the head and its change, the verdict files, trading-cc-read, the Codex gate, CI) -> the squash merge pinned to the head -> its author.
 # The PR's change must equal the read head's change (git patch-id of the whole diff; hunk offsets and context may differ after a rebase).
 # The current head may already be a rebase of the read head (an earlier update-branch); the change check decides.
-# Exit codes: 2 verdict gate (a verdict file, GATES_DONE or trading-cc-read; a file, record or status that cannot be read included), 3 head
+# Exit codes: 2 verdict gate (a verdict file, GATES_DONE or trading-cc-read; a file, record or status that cannot be read included; also,
+# before any call, LOCAL_REVIEW_ADJUDICATION or SQUASH_BODY_FILE set, an empty value included: they are nas_land.sh's alone), 3 head
 # moved, 4 change differs, 5 CI failed (at the final gate also: no longer complete and green), 6 timeout, 7 merge failed, 8 blocked,
 # 9 the Codex gate (codex_gate.py) gave neither 0 nor 5: a review running or not finished since its latest trigger (its 3, after the
 # 20-minute wait or at the final gate), a review that ended other than Completed or a summary last edited by another account (its 4), a
@@ -29,6 +31,13 @@ R=seathatflowsinourveins/us-equities-trading
 # CC correction #198: the merging account, whose no-reply address authors the squash merge (lg_author_email); the same account as nas_land.sh's.
 LG_AUTHOR_LOGIN=${LG_AUTHOR_LOGIN:-seathatflowsinourveins}
 N=${1:?pr}; E=${2:?read head}
+# #1075 (the CC's read): LOCAL_REVIEW_ADJUDICATION and SQUASH_BODY_FILE are nas_land.sh's inputs alone. codex_gate.py, which this script runs
+# too, decides with LOCAL_REVIEW_ADJUDICATION wherever it is set, and nothing here would bind it to the pull request and the head or record it
+# in the squash body, nor read a body file; either can be inherited, for example from a nas landing in the same shell. So a SET variable, an
+# empty value included, stops here, before the lock and any call (exit 2). ${VAR+x} is empty only for an unset VAR (bash(1), Parameter
+# Expansion: "Omitting the colon tests only for a parameter that is unset", bash 5.3), the test lg_gate makes (#1061 P1).
+[ -z "${LOCAL_REVIEW_ADJUDICATION+x}" ] || { echo "#$N LOCAL_REVIEW_ADJUDICATION is set, but it is nas-only (a nas_land.sh input): stop, nothing merged"; exit 2; }
+[ -z "${SQUASH_BODY_FILE+x}" ] || { echo "#$N SQUASH_BODY_FILE is set, but it is nas-only (a nas_land.sh input): stop, nothing merged"; exit 2; }
 U=${LANDING_UET_REPO:-$HOME/code/us-equities-trading}; COORD=${LANDING_COORD:-${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/coordination}
 LG_GIT="git -C $U"
 # >>> land-gate-fns

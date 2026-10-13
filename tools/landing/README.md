@@ -8,7 +8,8 @@ their tests.
 ## What each does
 
 **`uet_land.sh <pr> <read-head-prefix>`** lands a pull request of `seathatflowsinourveins/us-equities-trading` by squash
-merge. In order: the landing lock of the repository (exit 14 when another landing holds it; below); the `trading-cc-read` commit
+merge. In order: `nas_land.sh`'s two inputs refused when either is set (exit 2 before any call; "A nas input in a uet landing", below);
+the landing lock of the repository (exit 14 when another landing holds it; below); the `trading-cc-read` commit
 status and its record (below); each file in `VERDICT_FILES` (and `GATES_DONE` when such a file states a landing gate); the head is
 the read head or a pure rebase of it; a draft is marked ready and `codex_gate.py` must report the latest review finished (polled for
 up to 20 minutes); when Codex reports its usage limit, `GPT_VERDICT` (the co-op's verdict naming the read head) stands in for it; the
@@ -157,6 +158,12 @@ the offered body is not read, because `gh` takes `--body` or `--body-file`, neve
 `merge.go:138-143`). The waiver and the adjudication never meet: the waiver is read only without a local review set, the adjudication only
 with one.
 
+**A nas input in a uet landing (#1075, the CC's read).** `LOCAL_REVIEW_ADJUDICATION` and `SQUASH_BODY_FILE` are `nas_land.sh`'s inputs
+alone. `codex_gate.py`, which `uet_land.sh` runs too, decides with the adjudication wherever it is set, while `uet_land.sh` would neither
+bind it to the pull request and the head nor record it in a squash body, nor read a body file; and either variable can be inherited, for
+example from a nas landing in the same shell. So `uet_land.sh` stops with exit 2 when either is set, an empty value included (`${VAR+x}`,
+the #1061 P1 test), before the lock and any call, and prints one line that names the variable as nas-only (`uet_land.sh:34-40`).
+
 **The CI gate (#975 P2-3).** A completed check fails unless its conclusion is success, neutral or skipped; any other conclusion, null
 included, stops a landing with exit 5 even when the aggregate check (`ci-gate` in `uet_land.sh`, `validate` in `nas_land.sh`)
 succeeded. The rule is an allow-list, which fails closed on a conclusion it does not know, because the sources disagree on the list:
@@ -284,8 +291,8 @@ expected head:
 | `LOCAL_REVIEWS` | none | both, through `codex_gate.py` | colon-separated normalized review files; when set (an empty value included), the Codex gate decides from them alone ("Local reviews"); `nas_land.sh` requires it or the waiver |
 | `CODEX_LOCAL_REVIEW` | none | both, through `codex_gate.py` | an alias of `LOCAL_REVIEWS`: its files are added to the set |
 | `LOCAL_REVIEW_WAIVER` | none | `nas_land.sh` | with neither variable above set, a waiver file whose last `Waiver:` line reads `Waiver: local reviews for #<pr> at <head8>` (the read head); the landing then asks the connector, and its squash body records the waiver (#1061 round 2) |
-| `LOCAL_REVIEW_ADJUDICATION` | none | `nas_land.sh`, through `codex_gate.py` | with a local review set, the CC's adjudication record: it decides a `codex-review` that says `patch is incorrect` with only P2 and P3 findings, its last `Adjudication:` line bound to that file's sha256, the pull request and the read head, each finding listed with its disposition ("Local reviews"); set where no review says `patch is incorrect`, the gate gives 4; the squash body records it (the CC's ruling of 2026-10-13); an empty value is none, and `uet_land.sh` does not read it (Known gaps) |
-| `SQUASH_BODY_FILE` | none | `nas_land.sh` | the squash commit's body (`gh pr merge --body-file`); when set, a readable, non-empty regular file other than `-`, or exit 2 before any call; beside a waiver or an adjudication, its text and then that line ("The squash body") |
+| `LOCAL_REVIEW_ADJUDICATION` | none | `nas_land.sh`, through `codex_gate.py`; refused by `uet_land.sh` | with a local review set, the CC's adjudication record: it decides a `codex-review` that says `patch is incorrect` with only P2 and P3 findings, its last `Adjudication:` line bound to that file's sha256, the pull request and the read head, each finding listed with its disposition ("Local reviews"); set where no review says `patch is incorrect`, the gate gives 4; the squash body records it (the CC's ruling of 2026-10-13); in `nas_land.sh` an empty value is none; `uet_land.sh` stops with exit 2 before any call when it is set, an empty value included ("A nas input in a uet landing", above) |
+| `SQUASH_BODY_FILE` | none | `nas_land.sh`; refused by `uet_land.sh` | the squash commit's body (`gh pr merge --body-file`); when set, a readable, non-empty regular file other than `-`, or exit 2 before any call; beside a waiver or an adjudication, its text and then that line ("The squash body"); `uet_land.sh` stops with exit 2 before any call when it is set, an empty value included |
 | `LANDING_COORD` | `${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/coordination` | both | coordination tree; a status description `PASS: trading-cc/reads/<record>.md` names `$LANDING_COORD/trading-cc/reads/<record>.md` |
 | `LANDING_GATE` | `codex_gate.py` in the directory of the script, symlinks resolved (`readlink -f "$0"`) | both | the Codex gate; it works through a symlink or a wrapper that `exec`s the real path, and not when the script is read from a pipe or a process substitution (set this variable then) |
 | `LANDING_LOCK_DIR` | `$LANDING_COORD/command-center/landing-locks` | both | where the landing lock of each repository is kept (`us-equities-trading.lock`, `native-agent-stack.lock`); created when missing, and outside every worktree |
@@ -305,7 +312,8 @@ one, and the script then reports exit 10, "does not merge cleanly".
 ## Exit codes
 
 From the script headers. `uet_land.sh`: 2 verdict gate (a verdict file, `GATES_DONE` or `trading-cc-read`, also when a file, record or
-status cannot be read), 3 head moved, 4 change differs, 5 CI failed (at the final gate also: no longer complete and green), 6 timeout,
+status cannot be read; and, before any call, `LOCAL_REVIEW_ADJUDICATION` or `SQUASH_BODY_FILE` set, an empty value included, since both
+are `nas_land.sh`'s alone; #1075), 3 head moved, 4 change differs, 5 CI failed (at the final gate also: no longer complete and green), 6 timeout,
 7 merge failed, 8 blocked, 9 the Codex gate gave neither 0 nor 5: a review running or not finished since its latest trigger (its 3, after
 the 20-minute wait or at the final gate), a review that ended other than Completed or a summary last edited by another account (its
 4), a gate that failed or is missing; or a 5 without an accepted `GPT_VERDICT` (#975 P3-7 at 761810d7: the header named only some of
@@ -377,8 +385,9 @@ request's commit messages, read once before the author lookup; exit 7 when the r
 for #<pr> at <head8> (LOCAL_REVIEW_WAIVER)`. That is how gh's own "edit the commit message" step starts (cli v2.102.0
 `pkg/cmd/pr/merge/merge.go:721-735`, `http.go:121-158`), and `--body` sets the body in place of the default (`merge.go:146-147`, `:176`;
 `http.go:72-75`). With either variable set the waiver is not read, and the merge names a body only for an adjudication (below) or
-`SQUASH_BODY_FILE` ("The squash body", above). `uet_land.sh` keeps the connector path; the requirement and the waiver are in neither the
-shared block nor `codex_gate.py`, which uet uses too.
+`SQUASH_BODY_FILE` ("The squash body", above). `uet_land.sh` keeps the connector path and refuses the adjudication and `SQUASH_BODY_FILE`
+("A nas input in a uet landing", above); the requirement and the waiver are in neither the shared block nor `codex_gate.py`, which uet
+uses too.
 
 **The normalized review** is one JSON object with exactly these fields; a finding carries no prose body, and another field, a repeated
 key or `NaN` is refused:
@@ -581,7 +590,7 @@ scripts that is neither a tracked file's, a named public artifact's nor a named 
 
 | File | As committed |
 | --- | --- |
-| `uet_land.sh` | `4bb70e7540c72d91ed7cf7edeb481ddc71ac98f459ebb386c4d2bf4b4c3cb2b6` (432 lines) |
+| `uet_land.sh` | `95a4e1634b6a53b14d7736d2d40a3f0058a15aec9c9178e528ca44cfb74324ce` (441 lines) |
 | `nas_land.sh` | `a14152842347e9cb3bb66bd5682e91522236da5510606f9612cffa61ad675bbe` (605 lines) |
 | `codex_gate.py` | `32c3769ecca05ff7aa048af5aad8aac6bfe86ebfe4dd5b500bad833dc323b8ed` (530 lines) |
 | `review_normalize.py` | `b553d9cb67ca196bd587e980e01295e28e8ea0e2bcb3d0015fc5d040735a1594` (348 lines) |
@@ -607,7 +616,8 @@ call), the gate error (P2: exit 4 and one fixed line, no traceback), the commit-
 checks every prohibited identity), round 3 (above: the completion bound to the latest request, the gates read again before the merge,
 typed values, no local diagnostics, the base re-read) and round 4 (above: the lock, the final gate, one read per file, the gate's
 snapshot), and since 2026-10-13 #198 (the merging account), #200 (a stale running review) and the CC's ruling on local reviews that
-say `patch is incorrect` with only P2 and P3 findings (the adjudication, and `SQUASH_BODY_FILE` from the CC's copy). The block is
+say `patch is incorrect` with only P2 and P3 findings (the adjudication, and `SQUASH_BODY_FILE` from the CC's copy, both of which
+`uet_land.sh` refuses: #1075). The block is
 identical in both scripts, apart from `lg_ci_state`, which only `uet_land.sh` has.
 
 ## Known gaps, left as they were
@@ -657,12 +667,6 @@ and 4). These stay until a change with its own tests fixes them:
   - The files are read at every gate call, each once, so a file rewritten between two calls is decided on its new text at the later one.
   - A Legacy rollout is refused (fail closed, above), so a review whose `codex exec` fell back to Legacy history gives no file; it has to
     be run again where the server serves paginated threads.
-  - The adjudication (the CC's ruling of 2026-10-13) is `nas_land.sh`'s input, but the gate that decides with it is `codex_gate.py`,
-    which `uet_land.sh` runs too and which reads it wherever it is set. `uet_land.sh` does not read it: a uet landing with a local review
-    set and a record bound to its review would merge on the gate's 0 without `verdict_gate`'s early check and without a squash body that
-    records it (its merge names no body). A record set by mistake cannot pass there (its sha256, pull request and head bind it to one
-    review, and a record where no review says `patch is incorrect` gives 4); until `uet_land.sh` refuses or records it, it is set for nas
-    landings only. This change leaves `uet_land.sh` as it was.
   - The record is matched a line at a time, so a finding whose location or title holds a newline cannot be listed, and its review stays 4
     (fail closed).
 - The digest guard (Tests, below; #1061 round 2): a bare hex word of digits alone or of letters alone is not checked, since dates,
@@ -831,7 +835,15 @@ errors):
   - `SQUASH_BODY_FILE`: alone as `--body-file`; beside the waiver and beside an adjudication as the file's text and the line, the offered
     body not read; a file gone when the body is built (exit 7); `-`, a missing file, an empty file, a directory and an empty value
     stopping with 2 before any call, a held lock included; the check before the shared block and the lock, both variables outside the
-    shared block and `uet_land.sh`, and the `gh` sources cited.
+    shared block, and the `gh` sources cited.
+- The CC's read of #1075 adds, each failing at 25a9b48e (#1075's first commit; measured as above against its `tools/landing`: 7 failures,
+  all in these 2 tests):
+  - `uet_land.sh` with `LOCAL_REVIEW_ADJUDICATION` set, to a valid record beside the local review it decides and to an empty value, and
+    with `SQUASH_BODY_FILE` set, to a body file and to an empty value: one line naming the variable as nas-only and exit 2, with no call
+    of any kind, a held lock included (each landing merged at 25a9b48e, the valid record on the gate's adjudicated 0); and a control, the
+    same landing with neither set, which merges;
+  - the script text: each refusal once, after the arguments and before the shared block and the lock, and neither variable read anywhere
+    else in `uet_land.sh` (this replaced the check that `uet_land.sh` did not mention them).
 
 ## Upstream sources for the #975 corrections
 
