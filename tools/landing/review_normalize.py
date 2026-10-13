@@ -21,8 +21,12 @@ The normalized review is one JSON object with exactly these fields; a finding ca
   {"reviewer": "codex-review" | "claude-code-review", "reviewer_version": "<text>", "head_sha": "<40 lower-case hex digits>",
    "completed": true | false, "findings": [{"priority": 0 | 1 | 2 | 3, "location": "<path>:<start>-<end>" or "", "title": "<text>"}]}
 A codex-review also carries Codex's verdict, "overall_correctness", as Codex wrote it (rubric.md:85 fixes "patch is correct" | "patch is
-incorrect", the wire type is a free String, protocol.rs:3507; null when the review was interrupted), and "overall_confidence_score" when
-the result has one (protocol.rs:3509). The gate blocks on "patch is incorrect" and stops on any other value than those two.
+incorrect", the wire type is a free String, protocol.rs:3507; null when the review was interrupted), "overall_confidence_score" when the
+result has one (protocol.rs:3509), and "base_sha", the merge base its request named (#1061 P1: "The merge base commit for this comparison
+is <sha>", review_request.rs:21), which lg_gate requires to be git merge-base <head_sha> origin/main. The gate blocks on "patch is
+incorrect" and stops on any other value than those two. A Legacy rollout (exited_review_mode events, not item_completed items) is refused:
+codex exec writes one only when the server refuses paginated threads (exec/src/lib.rs:1425-1432; rollout/src/policy.rs:141-155). A plugin
+comment whose links to the code name another commit than --head is refused (#1061, the probe's finding 9).
 
 completed is false when the reviewer gave no structured result: a Codex review interrupted (review_output null) or whose JSON did not parse
 (Codex then keeps the text in overall_explanation and leaves findings empty and overall_correctness "", review.rs:188-208), or no plugin
@@ -31,7 +35,8 @@ comment since the run started (the plugin posts none for a closed, draft, trivia
 
 The plugin's head: "the PR head at the time of the comment" is the head the caller read before the run (--head), which must still be the pull
 request's head when the comment is read, the comment bound to the run by --since. Exit codes: 0 the file was written; 1 the input was refused
-and nothing was written (the reason is printed, never a path, a body or a title); 2 usage.
+and nothing was written, and an older file at --out was removed, so a failed retry leaves no earlier review for the gate (the reason is
+printed, never a path, a body or a title); 2 usage.
 
 usage:
   review_normalize.py codex-review --rollout <rollout.jsonl> [--head <sha>] --out <file>
@@ -54,10 +59,19 @@ SHA = re.compile(r"[0-9a-f]{40}")
 LOGIN = re.compile(r"[A-Za-z0-9](-?[A-Za-z0-9])*")  # GitHub's login shape, at most 39 characters (README sources)
 REPO = re.compile(r"[A-Za-z0-9](-?[A-Za-z0-9])*/[A-Za-z0-9._-]+")
 VERDICTS = ("patch is correct", "patch is incorrect")  # the rubric's overall_correctness (codex-rs/prompts/templates/review/rubric.md:85)
+# #1061 P1: the base-branch review request names the merge base of HEAD with its base branch (openai/codex@rust-v0.162.1
+# codex-rs/prompts/src/review_request.rs:21, :62-70; merge_base_with_head "mirrors `git merge-base HEAD <branch>`",
+# codex-rs/git-utils/src/branch.rs:13-15). Without a merge base Codex uses a prompt that names none (:20), which is refused.
+BASE_PROMPT = re.compile(r"Review the code changes against the base branch '(?P<branch>[^']*)'\. The merge base commit for this comparison is "
+                         r"(?P<sha>[0-9a-f]{40})\. Run `git diff (?P=sha)` to inspect the changes relative to (?P=branch)\.")
+# A Legacy rollout's review events (codex exec falls back to Legacy history when the server refuses paginated threads,
+# codex-rs/exec/src/lib.rs:1425-1432; only Legacy rollouts persist these, codex-rs/rollout/src/policy.rs:141-155)
+LEGACY = ("entered_review_mode", "exited_review_mode")
 HEADING = "### Code review"
 FOUND = re.compile(r"Found (\d+) issues?:")
 ITEM = re.compile(r"(\d+)\. (\S.*)")
-LINK = re.compile(r"https://github\.com/[A-Za-z0-9-]+/[A-Za-z0-9._-]+/blob/[0-9a-f]{40}/([^\s#<>()\[\]]+)(?:#L(\d+)(?:-L(\d+))?)?")
+LINK = re.compile(r"https://github\.com/(?P<owner>[A-Za-z0-9-]+)/(?P<name>[A-Za-z0-9._-]+)/blob/(?P<sha>[0-9a-f]{40})/"
+                  r"(?P<path>[^\s#<>()\[\]]+)(?:#L(?P<start>\d+)(?:-L(?P<end>\d+))?)?")
 # The plugin's comment and the pull request's head in one snapshot (every page: gh api --paginate needs $endCursor and pageInfo).
 COMMENTS = ("query($owner: String!, $repo: String!, $pr: Int!, $endCursor: String) { repository(owner: $owner, name: $repo) { pullRequest(number: $pr) { "
             "headRefOid comments(first: 100, after: $endCursor) { pageInfo { hasNextPage endCursor } nodes { fullDatabaseId author { login } createdAt "
@@ -88,7 +102,7 @@ def where(path, root):
 
 def codex_review(rollout, head=None):
     """The normalized review of one `codex review` session rollout, and a note for the summary line."""
-    meta, entered, exited = None, [], []
+    meta, entered, exited, prompts, legacy = None, [], [], [], 0
     with open(rollout, "rb") as handle:
         for number, raw in enumerate(handle, 1):
             if not raw.strip():
@@ -102,21 +116,39 @@ def codex_review(rollout, head=None):
                 continue
             if line.get("type") == "session_meta" and meta is None:
                 meta = payload
+            if line.get("type") == "event_msg" and payload.get("type") in LEGACY:
+                legacy += 1
             item = payload.get("item")
             if line.get("type") == "event_msg" and payload.get("type") == "item_completed" and isinstance(item, dict):
                 if item.get("type") == "EnteredReviewMode":
-                    entered.append(item)
+                    entered.append((number, item))
                 elif item.get("type") == "ExitedReviewMode":
-                    exited.append(item)
+                    exited.append((number, item))
+                elif item.get("type") == "UserMessage":
+                    prompts.append((number, item))
     if meta is None:
         raise Refused("the rollout has no session_meta line")
+    if legacy:  # fail closed: the shape of a Legacy rollout's review result is not the one read here
+        raise Refused("it is a Legacy rollout (entered_review_mode and exited_review_mode events, policy.rs:141-155), which codex exec writes "
+                      "when the server refuses paginated threads (exec/src/lib.rs:1425-1432); not read")
     if len(entered) != 1 or len(exited) != 1:
         raise Refused(f"the rollout holds {len(entered)} review requests and {len(exited)} review results; one review is needed")
-    target = entered[0].get("target")
+    (first, request), (last, result) = entered[0], exited[0]
+    target = request.get("target")
     kind = target.get("type") if isinstance(target, dict) else None
     if kind != "baseBranch":
         shown = kind if isinstance(kind, str) and re.fullmatch(r"[A-Za-z]{1,40}", kind) else "of another form"
         raise Refused(f"the review's target is {shown}, not baseBranch (the pull request's whole change against its base)")
+    # #1061 P1: the merge base the review compared HEAD with, from the request's prompt between the request and the result
+    bases = []
+    for number, item in prompts:
+        texts = [part["text"] for part in item.get("content") or [] if isinstance(part, dict) and isinstance(part.get("text"), str)]
+        bases += [match for text in texts for match in [BASE_PROMPT.search(text)] if match and first < number < last]
+    if len(bases) != 1:
+        raise Refused(f"the review request names {len(bases)} merge bases, not one (review_request.rs:21; without one Codex uses the prompt "
+                      "of :20, which names none)")
+    if bases[0]["branch"] != target.get("branch"):
+        raise Refused("the review request's base branch is not the one its target names")
     commit = (meta.get("git") or {}).get("commit_hash") if isinstance(meta.get("git") or {}, dict) else None
     if not isinstance(commit, str) or not SHA.fullmatch(commit):
         raise Refused("the rollout names no commit (session_meta git.commit_hash)")
@@ -125,9 +157,9 @@ def codex_review(rollout, head=None):
     version = meta.get("cli_version")
     if not isinstance(version, str) or not re.fullmatch(r"[0-9A-Za-z.+-]{1,40}", version):
         raise Refused("the rollout's session_meta has no cli_version of the usual form")
-    review = {"reviewer": "codex-review", "reviewer_version": f"codex-cli {version}", "head_sha": commit, "completed": False,
-              "overall_correctness": None, "findings": []}
-    output = exited[0].get("review_output")
+    review = {"reviewer": "codex-review", "reviewer_version": f"codex-cli {version}", "head_sha": commit, "base_sha": bases[0]["sha"],
+              "completed": False, "overall_correctness": None, "findings": []}
+    output = result.get("review_output")
     if output is None:
         return review, "the review was interrupted (review_output null)"
     if not isinstance(output, dict) or not isinstance(output.get("overall_correctness"), str) or not isinstance(output.get("findings"), list):
@@ -157,11 +189,18 @@ def codex_review(rollout, head=None):
     return review, f"overall_correctness {raw!r}" if raw in VERDICTS else "overall_correctness of another form (the gate stops on it)"
 
 
-def plugin_findings(body):
-    """The findings of the plugin's comment (code-review.md:50-92): each issue is priority 1, located by its first link to the code."""
+def plugin_findings(body, repo, head):
+    """The findings of the plugin's comment (code-review.md:50-92): each issue is priority 1, located by its first link to the code.
+    #1061 (the probe's finding 9): every link to the code of --repo must name --head's full SHA (the plugin links with the full SHA,
+    code-review.md:86-92), so the comment of a run that read an earlier head is not taken for this head's; a list of issues must link to
+    --repo at least once."""
     lines = [line.strip() for line in body.replace("\r\n", "\n").split("\n") if line.strip()]
     if not lines or lines[0] != HEADING:
         raise Refused("the comment does not start with the plugin's heading")
+    links = [match for line in lines for match in LINK.finditer(line) if f"{match['owner']}/{match['name']}".lower() == repo.lower()]
+    stray = sorted({match["sha"] for match in links if match["sha"] != head})
+    if stray:
+        raise Refused(f"the comment links to commit {stray[0][:8]}, not --head {head[:8]} (the run read another head)")
     if len(lines) > 1 and lines[1].startswith("No issues found"):
         return []
     found = FOUND.fullmatch(lines[1]) if len(lines) > 1 else None
@@ -171,18 +210,21 @@ def plugin_findings(body):
     for line in lines[2:]:
         item = ITEM.fullmatch(line)
         if item and int(item.group(1)) == len(items) + 1:
-            items.append({"title": item.group(2), "own": LINK.findall(item.group(2)), "after": []})
+            items.append({"title": item.group(2), "own": list(LINK.finditer(item.group(2))), "after": []})
         elif items:
-            items[-1]["after"] += LINK.findall(line)
+            items[-1]["after"] += list(LINK.finditer(line))
     if len(items) != int(found.group(1)) or not items:
         raise Refused(f"the comment announces {found.group(1)} issues and lists {len(items)}")
+    if not links:
+        raise Refused("the comment's issues link to no commit of --repo, so the comment is not bound to --head")
     findings = []
     for item in items:
         links = item["after"] or item["own"]
         location = ""
         if links:
-            path, start, end = links[0]
-            location = urllib.parse.unquote(path) + (f":{start}-{end}" if start and end else f":{start}" if start else "")
+            match = links[0]
+            start, end = match["start"], match["end"]
+            location = urllib.parse.unquote(match["path"]) + (f":{start}-{end}" if start and end else f":{start}" if start else "")
         findings.append({"priority": 1, "location": location, "title": item["title"]})
     return findings
 
@@ -215,7 +257,7 @@ def claude_review(repo, pr, head, since, author, version):
         raise Refused(f"{len(mine)} code-review comments by --author since --since; one run posts one")
     if mine[0].get("lastEditedAt") is not None:
         raise Refused("the code-review comment was edited after it was posted")
-    review["findings"] = plugin_findings(mine[0].get("body") or "")
+    review["findings"] = plugin_findings(mine[0].get("body") or "", repo, head)
     review["completed"] = True
     return review, f"comment {mine[0].get('fullDatabaseId')}" if re.fullmatch(r"[0-9]{1,20}", str(mine[0].get("fullDatabaseId"))) else "comment"
 
@@ -265,6 +307,18 @@ def arguments(argv):
     return args
 
 
+def discard(out):
+    """#1061 (Astra's follow-up 1): a refused run removes an older file at --out, so a retry that fails cannot leave the previous run's
+    review for the gate; returns the note for the summary line."""
+    if os.path.isfile(out) or os.path.islink(out):
+        try:
+            os.unlink(out)
+        except OSError:
+            return "; an older file at --out could not be removed"
+        return "; the older file at --out was removed"
+    return ""
+
+
 def main(argv=None):
     args = arguments(argv)
     try:
@@ -274,10 +328,10 @@ def main(argv=None):
             review, note = claude_review(args.repo, args.pr, args.head, args.since, args.author, args.reviewer_version)
         write(review, args.out)
     except Refused as why:
-        print(f"review_normalize: {args.reviewer}: refused: {why}; nothing written")
+        print(f"review_normalize: {args.reviewer}: refused: {why}; nothing written{discard(args.out)}")
         return 1
     except Exception as error:  # an unreadable file or a failure of this script: one line with the class alone (a traceback names paths)
-        print(f"review_normalize: {args.reviewer}: refused: {type(error).__name__}, details withheld; nothing written")
+        print(f"review_normalize: {args.reviewer}: refused: {type(error).__name__}, details withheld; nothing written{discard(args.out)}")
         return 1
     counts = Counter(finding["priority"] for finding in review["findings"])
     state = ("completed" if review["completed"] else "NOT completed (the gate stops on it)" if review["reviewer"] == "codex-review"

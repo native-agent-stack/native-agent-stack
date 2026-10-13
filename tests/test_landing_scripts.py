@@ -64,6 +64,7 @@ PR = str(90000000 + os.getpid())  # per process: the nas script makes /var/tmp/n
 UET_REPO = "seathatflowsinourveins/us-equities-trading"
 NAS_REPO = "native-agent-stack/native-agent-stack"  # 2026-10-13: the repository moved to the organization; nas_land.sh's default R
 MERGING_ACCOUNT = "seathatflowsinourveins"  # CC correction #198: LG_AUTHOR_LOGIN's default, whose no-reply address authors both scripts' merges
+USER_JQ = '--jq select(.type == "User") | .id'  # #1061 P3: the author lookup as the fake gh logs it (an organization gives no id)
 # #975 P2-3: GitHub's CheckConclusionState as captured from its published GraphQL schema, with the REST description's check-run enum
 CONCLUSIONS = ROOT / "tests/fixtures/landing/check-conclusion-state.json"
 PASSING_CONCLUSIONS = ("SUCCESS", "NEUTRAL", "SKIPPED")  # the scripts' allow-list; any other completed conclusion, null included, fails
@@ -143,7 +144,8 @@ case "$1 $2" in
       *"/commits/"*) printf '{"commit":{"author":{"email":"%s"}}}' "${FAKE_COMMIT_EMAIL-4242424+seathatflowsinourveins@users.noreply.github.com}" | jq -r "$prog" ;;
       *) exit 1 ;;
     esac ;;
-  "api users/"*) [ "${FAKE_USER_RC:-0}" = 0 ] || exit "$FAKE_USER_RC"; echo "${FAKE_USER_ID-4242424}"; exit 0 ;;
+  "api users/"*) [ "${FAKE_USER_RC:-0}" = 0 ] || exit "$FAKE_USER_RC"  # #1061: the users API answers for organizations too (type)
+                 printf '{"id": %s, "type": "%s"}\n' "${FAKE_USER_ID-4242424}" "${FAKE_USER_TYPE-User}" | jq -r "$prog"; exit 0 ;;
   "api graphql") [[ "$*" == *reviewThreads* ]] || exit 1; echo "${FAKE_OPEN_THREADS:-0}"; exit 0 ;;
   "pr view")
     if [ -n "${FAKE_HEADS:-}" ] && [[ "$*" == *headRefOid* ]]; then
@@ -446,6 +448,87 @@ def legacy_findings(root):
     return [path.name for path in sorted(root.iterdir()) if path.is_file() and pattern.findall(path.read_text(encoding="utf-8"))]
 
 
+# #1061 P1-3 (Astra at c999eee5; correction #161's custody rule): a published digest binds published bytes. Each digest the README cites is
+# a tracked file's (a file under tools/landing or tests/fixtures/landing, the files the README documents, hashed here as they are now, so
+# the guard needs no registry and no earlier check), the captured summary comment's body, or one of these named public artifacts; a digest
+# of a host-only file, such as the CC's live copies, is an offline oracle for a guessed path and may not be published, in full or as a prefix.
+PUBLIC_DIGESTS = {
+    "4ce5cdb31c15dad95e0a7e18e6d0f0c49a07603cea0d5f4e08bc51f530a5d7e1": "cli/cli@v2.102.0:internal/ghcmd/cmd.go",
+    "030eda84dcfdb52e3bba2cadfc0243a7b47d3098b64f8c12c665550733d72ca1": "cli/cli@v2.102.0:pkg/cmd/api/api.go",
+    "04d1e28080aaa4f19f9113dfc3da97541158483a220efda9a52275fed54e3b98": "uutils/coreutils@0.10.0:src/uu/mktemp/src/mktemp.rs",
+    "0833b527913f974ace9dff19e4dd8640e73da2cab6967c8dfca5e7dc9889abc9": "uutils/coreutils@0.10.0:Cargo.lock",
+    "d182721b62c126916b73bb4865ced5d3637bd1a4a77d27ea9e9708973e5f9493": "Stebalien/tempfile@v3.27.0:src/lib.rs",
+    "b6752b11a575021eeab87cb8b5b6914aaff86ad8d49a9678a8f4c95b5a21ef81": "Stebalien/tempfile@v3.27.0:src/file/mod.rs",
+    "cc39f94cb6cb87b36cf7603a75429d64ecc4ad1a2076a765e5aba2b11771d0f7": "Stebalien/tempfile@v3.27.0:src/file/imp/unix.rs",
+    "0f4b8b370a7f0d2e8ff93f2e224b2c7e54f64bfb808e5f50242f83b725e950a8": "python/cpython@v3.13.16:Doc/library/pwd.rst",
+    "11841fe008240d3ffb955d0c700da1d96c07f18679ab09b93b16c3c81707a261": "python/cpython@v3.13.16:Modules/pwdmodule.c",
+    "e52ea266b79f3b4a83388093f387540ff36d51ff306dcbb6ca6de081cd28e718": "python/cpython@v3.13.16:Lib/getpass.py",
+    "0530b4186ec5845e000bedf5817ff1ac970b9a39a6891ba6789a1776abdea42b": "python/cpython@v3.13.16:Lib/pathlib/_local.py",
+    "75e6bc728013d11446126d535f92b8907fb6dae7404df3d0268ac7b6865a2090": "python/cpython@v3.13.16:Lib/pathlib/_abc.py",
+    "491b233e8d87a2ab73964afff029717177d53ad8def328ed9b00575db983da27": "python/cpython@v3.13.16:Lib/urllib/parse.py",
+    "a80fc2454f7a0ad644f02259184de5b52084392ddb8b41c1ce372e50a09f3993": "python/cpython@v3.13.16:Lib/base64.py",
+    "fd5e3799c5a70a7560460badf84a1a3e14c5b8b40a40352840477e267019cf20": "python/cpython@v3.13.16:Objects/bytesobject.c",
+    "455ed7abc1d74b6af12c9205e76af0873bbb9d4297f73c8a2d6306a7ec658042": "python/cpython@v3.13.16:Doc/library/re.rst",
+    "ca3849b4d224ac0384bcc90102f77bd0612e2c0ba67fc1ee44bb48abe87c5942": "cli/cli@v2.102.0:pkg/cmd/pr/merge/merge.go",
+    "b21ef4350f050611af8a268632579c019c2dcb33feea7c0abffd4ca2b2520f0b": "https://cli.github.com/manual/gh_pr_merge (fetched 2026-10-11)",
+    "9739be01b44da924ebec94ee658d5c080627ee65a2cd7d711fd83d6a081ba4da": "git/git@v2.53.0:Documentation/git-ls-remote.adoc",
+    "da3d22e417611cca9a4131dceea89d4d61c3be021b0917f32d9e4422e4fe60f1": "github/rest-api-description@58b1e0c00b39:descriptions/api.github.com/api.github.com.json",
+    "3835ec561d9f4052783c79541d86d16e644f7d8d0b8fb1bd1d3067ad021c38a7": "git/git@v2.53.0:Documentation/revisions.adoc",
+    "9507f8a42e30531ed11721339f32a2e2b5d02e721e4c166414fa574269fd19e7": "python/cpython@v3.13.16:Modules/main.c",
+    "91825c95030c506eb3840249a9f7bc12a0ff7eeb2f66b980608d5bc5d1cdb568": "python/cpython@v3.13.16:Doc/library/sys.rst",
+    "d878ba9b46081d1e902cafeddc35d368ad3d9eaf5cb5c5c99ab4ea692c7054f6": "git/git@v2.53.0:usage.c",
+    "38a4ba0d8cbd440e1cdde96c0c6384d8ee60bf844b7c934ab1516d9206669922": "github/docs@be38ec5d:content/actions/reference/workflows-and-actions/variables.md",
+    "13befe29fb26539e05251a6352d08984f54ea82c02ba5166173909038cfb6e97": "util-linux/util-linux@v2.41.3:sys-utils/flock.1.adoc",
+    "f303ab0c5c14299e3d0891f5b9731317e87081546c1b0b2e2e1bf6d7613c224b": "util-linux/util-linux@v2.41.3:sys-utils/flock.c",
+    "f7dda45536864b701aa5eca8e32462e319cf068181f642b4e4a053d9556847bf": "git/git@v2.53.0:builtin/fetch.c",
+    "bc3403bcc124da68d945ab2f4306c5ca673ba317bd3852b4bbf7789966f35cb2": "git/git@v2.53.0:run-command.c",
+    "9b33422c7d0c5948a470db5a340992816aedf04dabaf0da6d57e3b004471d775": "git/git@v2.53.0:builtin/gc.c",
+    "06c1942188bc86d1a1691eb97a66d0ee278c1057661a62112bf1ecbc0776b3ec": "git/git@v2.53.0:setup.c",
+    "809b79c7ff781871874e92c186908cac332fc4b0fa0dff2fb9624856e2a9fa79": "git/git@v2.53.0:Documentation/config/maintenance.adoc",
+    "e0eb9a084b0a8ed4f07a11dbfb0d6c31006235815481cfcd8876d48ff42b5f75": "jqlang/jq@jq-1.8.1:docs/content/manual/v1.8/manual.yml",
+    "9b510dff29fede9f5e9d6a61d59b5d0d69419fc74a2bf684331295d0200829e8": "jqlang/jq@jq-1.8.1:src/jv_aux.c",
+    "e835ca2a7a11b54e3db93221466928c887ef9529a9b34b475d746888e43af410": "git/git@v2.53.0:Documentation/git-patch-id.adoc",
+    "0565f3040ed1843875732e5df5dbc50fdbc90bb3b45685eabfd83c133b4c79b0": "cli/cli@v2.102.0:pkg/cmd/api/pagination.go",
+    "115bc54638dc4fa5a72da79d9f87fca699ee5b1fc7e21ea9314a517fb18fb40b": "cli/cli@v2.102.0:go.mod",
+    "418bdf281d74a89c7dabedc4af53a6f7b286f2416e7670d9cc71453db08d8640": "github/docs@be38ec5d:content/rest/using-the-rest-api/using-pagination-in-the-rest-api.md",
+    "57f0a021883f869390a022e41bdbe77267d5ebbdbf59849d2891380f5e363247": "github/docs@be38ec5d:src/rest/data/fpt-2022-11-28/commits.json",
+    "3ed095654b22b1a8e7a88af36af2b28cb6d9613da332e9c57303e30476958d42": "https://docs.github.com/public/fpt/schema.docs.graphql (fetched 2026-10-11 and 2026-10-13)",
+    "ed316b3fff6ecc09247826cb872df41beeab9088eeeaccbdb73703fedbfcf8ae": "github/docs@be38ec5d:content/repositories/creating-and-managing-repositories/transferring-a-repository.md",
+    "fbbf1c5f700d977f8672462859621f9412e65531a57790fa779e191a4d1c0949": "github/docs@be38ec5d:content/account-and-profile/reference/email-addresses-reference.md",
+    "591df6bd88afa6f28a4f0d030331821dfbef256187da3834cece6d13b4468ef4": "github/docs@be38ec5d: the IAM configuration reference's username-considerations-for-external-authentication.md",
+    "499bd1fd429418778d26998c48da2a5a22fe2965f4684e69fdf99e6b4c7e4330": "openai/codex@rust-v0.162.1:codex-rs/protocol/src/protocol.rs",
+    "5ca7f804a77dc8f132bb1eda4045e693d2d9b595cf70fc0877ca0cc98c5b621c": "openai/codex@rust-v0.162.1:codex-rs/protocol/src/items.rs",
+    "4961b4deff8f665501b3bd5ad9fd386c9651999df8a7cf757bf8567b380eab52": "openai/codex@rust-v0.162.1:codex-rs/core/src/tasks/review.rs",
+    "ac6c17fda98ecc6377132ac9a34fb4771e902632b943decc94261961891a3598": "openai/codex@rust-v0.162.1:codex-rs/history/src/rollout_payload.rs",
+    "ec60e7f36a1d1c2679ce095c0205ecc56f7dd8fb57707a13ef362072390f219f": "openai/codex@rust-v0.162.1:codex-rs/prompts/templates/review/rubric.md",
+    "f4896d6746c3508aa08b72ce15ce143f9041015da9da37b044cdaf4f6f838fc0": "openai/codex@rust-v0.162.1:codex-rs/prompts/src/review_request.rs",
+    "86774c34df2bcb4b55ff5340bc2ef644bf64a94d14b122dbb29004ef01b370c5": "openai/codex@rust-v0.162.1:codex-rs/git-utils/src/branch.rs",
+    "51b62cef4893c6d07b51753fc2716fc05985cdc9de6673f2fa2d974779454d4b": "openai/codex@rust-v0.162.1:codex-rs/exec/src/lib.rs",
+    "65ce50e843547719295fd884b651552c1227085e8d0acfef2161b4ec3111dcbc": "openai/codex@rust-v0.162.1:codex-rs/rollout/src/policy.rs",
+    "7d5a0bc9a41babad32a387152f9680316997bc4ad376928827d670b1760cc890": "anthropics/claude-plugins-official@f359d43b:plugins/code-review/commands/code-review.md",
+    "1fca74bab6969b609519927ae49112760e15d8113eef6bbcf9b9a96c49d73c89": "anthropics/claude-plugins-official@f359d43b:plugins/code-review/README.md",
+    "72459eb4e2e6d3b1a143f3c40860b7dd65fb061cdec3b18470ed8867382d8552": "https://developers.openai.com/codex/llms.txt (fetched 2026-10-13)",
+    "c18b2fe184104facf5d044631ee151b2394baab1c44218be8b9d60c7dbd33020": "https://learn.chatgpt.com/docs/code-review.md (fetched 2026-10-13)",
+    "1ab502138a121ac571faa37f161bf79224e1e23cdc0e70f7a0be835f2c2d3c9f": "https://learn.chatgpt.com/docs/third-party/github.md (fetched 2026-10-13)",
+}
+
+
+def readme_digest_custody(readme, root=ROOT):
+    """The digests the README cites that are neither a tracked file's nor a named public artifact's: (64-hex values, prefixes written
+    `<hex>…`), each as its first 8 hex digits only, so a failure prints no full digest."""
+    known = dict(PUBLIC_DIGESTS)
+    for directory in ("tools/landing", "tests/fixtures/landing"):
+        for path in sorted((root / directory).iterdir()):
+            if path.is_file():
+                known[hashlib.sha256(path.read_bytes()).hexdigest()] = str(path.relative_to(root))
+    body = json.loads((root / "tests/fixtures/landing/codex-summary-comment.json").read_text(encoding="utf-8"))["graphql"]["node"]["body"]
+    known[hashlib.sha256(body.encode("utf-8")).hexdigest()] = "the captured summary comment's body"
+    full = set(re.findall(r"(?<![0-9a-f])[0-9a-f]{64}(?![0-9a-f])", readme))
+    prefixes = set(re.findall(r"(?<![0-9a-f])([0-9a-f]{6,63})…", readme))
+    return (sorted(digest[:8] for digest in full if digest not in known),
+            sorted(prefix[:8] for prefix in prefixes if not any(digest.startswith(prefix) for digest in known)))
+
+
 class ScriptTextTests(LandingCase):
     def test_no_home_literal_or_user_name_in_tools_landing(self):
         self.assertEqual(identity_findings(LANDING, account_name(), prohibited_names()), [],
@@ -626,8 +709,15 @@ class ScriptTextTests(LandingCase):
                 self.assertEqual(script.text.count("lg_gate \"$GATE\""), calls)
                 self.assertIn(f'g=$(lg_gate "$GATE" "$R" "$N" "{read}"); gr=$?', script.final)
                 self.assertEqual(script.text.count("python3 -I"), 1)
-                # 2026-10-13: the heads that carry the read head's change follow it, only with a local review set (empty otherwise)
-                self.assertIn('g=$(python3 -I "$1" "$2" "$3" "$4" ${same[@]+"${same[@]}"} 2>&1)', script.block)
+                # 2026-10-13: with a local review set, "<head>:<merge base>" for the read head and each head with its change follow it
+                # (#1061 P1); none otherwise
+                self.assertIn('g=$(python3 -I "$1" "$2" "$3" "$4" ${facts[@]+"${facts[@]}"} 2>&1)', script.block)
+                # #1061 P1: a SET variable selects local mode, an empty one included
+                self.assertIn('if [ -n "${LOCAL_REVIEWS+x}${CODEX_LOCAL_REVIEW+x}" ]; then', script.block)
+                # #1061 P3: every -R is quoted, and the quoted word ends where the next argument begins
+                self.assertNotIn("-R $R ", script.text)
+                self.assertEqual(re.findall(r'-R "\$R"(?! )', script.text), [])
+                self.assertGreater(script.text.count('-R "$R" '), 5)
                 self.assertEqual(len(re.findall(r"^GATE=", script.text, re.M)), 1)
 
     def test_every_child_that_waits_or_detaches_runs_without_the_lock_descriptor(self):
@@ -679,6 +769,16 @@ class ScriptTextTests(LandingCase):
                 data = (LANDING / name).read_bytes()
                 self.assertEqual((cell.group(1), int(cell.group(2))), (hashlib.sha256(data).hexdigest(), data.count(b"\n")))
 
+    def test_every_digest_in_the_readme_binds_published_bytes(self):
+        # #1061 P1-3 (Astra at c999eee5): the README published the sha256 of the CC's live copies, which carry the host's paths, in six full
+        # digests of the provenance table (and a seventh of the live gate) and in four prefixes; a digest of a host-only file is an offline
+        # oracle for a guessed path (correction #161). At c999eee5 this found 7 full digests and 4 prefixes.
+        self.assertEqual(readme_digest_custody((LANDING / "README.md").read_text(encoding="utf-8")), ([], []))
+        planted = (f"a live copy `{hashlib.sha256(b'host-only bytes').hexdigest()}`, a prefix `{hashlib.sha256(b'more').hexdigest()[:8]}…`, "
+                   f"a tracked file's prefix `{next(iter(PUBLIC_DIGESTS))[:8]}…`")
+        found = readme_digest_custody(planted)
+        self.assertEqual((len(found[0]), len(found[1])), (1, 1), "the rule finds a planted digest and prefix, and passes a public one")
+
     def test_readme_states_the_failed_merge_message_the_gate_error_the_gh_rule_and_the_privacy_scan(self):
         # #975 (review of the P2 fix commit): the README said the failed-merge message names the file's path (it names the file only), listed
         # no exit 4 for a failing gate, and did not say which accounts skip the name scan or why. #975 (GPT micro on 754a194f): it stated
@@ -697,6 +797,20 @@ class ScriptTextTests(LandingCase):
         self.assertNotIn("fewer than 4 characters", flat)
         self.assertNotIn("The account-name scan is skipped", flat)
         self.assertIn("`GENERIC_ACCOUNTS`", flat)
+
+    def test_the_stale_value_is_one_constant_and_the_readme_states_its_basis(self):
+        # #1061 (the probe's finding 4): #200's 90 minutes cited no source. OpenAI's Codex docs state no review time limit, so the README says
+        # so and records the measured basis (nas#1056), and the value is the one constant STALE_RUNNING_MINUTES.
+        import ast
+        tree = ast.parse((LANDING / "codex_gate.py").read_text(encoding="utf-8"))
+        nineties = [node for node in ast.walk(tree) if isinstance(node, ast.Constant) and node.value == 90 and type(node.value) is int]
+        self.assertEqual(len(nineties), 1)
+        assigned = [node for node in ast.walk(tree) if isinstance(node, ast.Assign) and node.value in nineties]
+        self.assertEqual([target.id for node in assigned for target in node.targets], ["STALE_RUNNING_MINUTES"])
+        flat = " ".join((LANDING / "README.md").read_text(encoding="utf-8").split())
+        self.assertIn("OpenAI's Codex docs state no review time limit and no behaviour for a stalled review", flat)
+        self.assertIn("The basis is nas#1056", flat)
+        self.assertIn("The value is the one constant `STALE_RUNNING_MINUTES`", flat)
 
     def evaluate(self, lines, names, arg0="landing.sh", **extra):
         script = "set -u\n" + "\n".join(lines) + "\n" + "".join(f'printf "%s\\n" "${name}"\n' for name in names)
@@ -780,7 +894,16 @@ class ScriptTextTests(LandingCase):
                     if login is None:
                         self.assertEqual((code, out, calls), (1, "", []), "refused before any call, nothing printed")
                     else:
-                        self.assertEqual((code, out, calls), (0, f"4242424+{login}@users.noreply.github.com", [f"gh api users/{login} --jq .id"]))
+                        self.assertEqual((code, out, calls), (0, f"4242424+{login}@users.noreply.github.com", [f"gh api users/{login} {USER_JQ}"]))
+            # #1061 P3 (the Claude read): users/<login> answers for an organization too, whose address then failed at the merge (exit 7, as in
+            # #198); only an account of type User gives an id now (at c999eee5 this printed an address)
+            for kind in ("Organization", "Bot", ""):
+                with self.subTest(script=script.key, case=f"an account of type {kind or 'none'}"):
+                    log = self.write("author.log", "")
+                    code, out = self.bash(f"R={NAS_REPO}; LG_AUTHOR_LOGIN=native-agent-stack\nN=1\n{script.block}\n", 'lg_author_email "$R"',
+                                          FAKE_LOG=str(log), FAKE_USER_TYPE=kind)
+                    self.assertEqual((code, out), (1, ""))
+                    self.assertEqual(log.read_text(encoding="utf-8").splitlines(), [f"gh api users/native-agent-stack {USER_JQ}"])
 
 
 # ---------------------------------------------------------------------------------------------- 2. verdict files
@@ -1595,6 +1718,7 @@ def limit_notice(when):
 
 
 LOCAL_VARIABLES = ("LOCAL_REVIEWS", "CODEX_LOCAL_REVIEW")  # 2026-10-13: the gate's local review set and its alias
+SHA_RE = re.compile(r"[0-9a-f]{40}")
 LOCAL_LINE = re.compile(r"Local reviews: [A-Za-z0-9 :;,.()_+'-]*")  # what lg_gate echoes (its status-line characters)
 
 
@@ -1610,14 +1734,16 @@ def local_reviews_env(values=None):
 
 
 VERDICT_DEFAULT = object()  # normalized(): "patch is correct" for a completed codex-review, null for one that did not complete
+GATE_BASE = "0a1b2c3d4e5f60718293a4b5c6d7e8f901234567"  # synthetic: the merge base of the gate tests' heads with origin/main (#1061 P1)
 
 
 def normalized(head, findings=(), completed=True, reviewer="codex-review", version="codex-cli 0.162.1", correctness=VERDICT_DEFAULT,
-               confidence=None):
+               confidence=None, base=GATE_BASE):
     """A normalized review (README "Local reviews"; review_normalize.py writes them). A codex-review carries Codex's verdict
-    (rubric.md:85) and, when given, its confidence; a claude-code-review carries neither."""
+    (rubric.md:85), the merge base its request named (#1061 P1) and, when given, its confidence; a claude-code-review carries none."""
     review = {"reviewer": reviewer, "reviewer_version": version, "head_sha": head, "completed": completed, "findings": list(findings)}
     if reviewer == "codex-review":
+        review["base_sha"] = base
         review["overall_correctness"] = (("patch is correct" if completed else None) if correctness is VERDICT_DEFAULT else correctness)
         if confidence is not None:
             review["overall_confidence_score"] = confidence
@@ -1677,9 +1803,13 @@ class CodexGateTests(unittest.TestCase):
             code = self.gate.main("o/r", "7", *([read] if read else []))
         return code, out.getvalue().strip()
 
-    def run_local(self, *reviews, read=GATE_HEAD, same=(), variables=None, names=None):
+    def run_local(self, *reviews, read=GATE_HEAD, same=(), variables=None, names=None, facts=None):
         """The gate with a local review set: each review (a dict, or the file's bytes) in a file of its own, LOCAL_REVIEWS naming them in
-        order unless `variables` maps the variables to lists of review numbers (or `names` gives the value as is). No command may run."""
+        order unless `variables` maps the variables to lists of review numbers (or `names` gives the value as is). After the read head come
+        the facts lg_gate passes, "<head>:<merge base>": by default the read head's and each head of `same`, all with GATE_BASE (or
+        `facts` as given). No command may run."""
+        if facts is None:
+            facts = [f"{head}:{GATE_BASE}" for head in ([read] if read and SHA_RE.fullmatch(read) else []) + list(same)]
         with tempfile.TemporaryDirectory(prefix="local-reviews-") as scratch:
             paths = []
             for number, review in enumerate(reviews):
@@ -1695,7 +1825,7 @@ class CodexGateTests(unittest.TestCase):
 
             out = io.StringIO()
             with local_reviews_env(values), mock.patch.object(self.gate.subprocess, "run", no_command), contextlib.redirect_stdout(out):
-                code = self.gate.main("o/r", "7", *([read] if read else []), *same)
+                code = self.gate.main("o/r", "7", *([read] if read else []), *facts)
             line = out.getvalue().strip()
             self.assertNotIn(scratch, line, "a file is named by its place, never by its path")
             return code, line
@@ -2017,6 +2147,51 @@ class CodexGateTests(unittest.TestCase):
                 got, line = self.run_gate(**kwargs)
                 self.assertEqual((got, text in line), (code, True), line)
 
+    def test_a_trigger_after_a_stall_gets_the_start_grace_and_a_failed_review_of_our_head_outranks_the_stale_5(self):
+        # #1061 (the CC's /code-review probe, finding 1): the age ran from the last activity only, so an "@codex review" posted after a stalled
+        # row gave 5 at once (14:00:30 below gave 5 at c999eee5); now the age runs from the later of the last activity and the latest trigger,
+        # and a trigger that comes after the review had already gone stale gets NOSTART_MINUTES, the grace a first trigger gets.
+        start = "2026-10-10T12:03:00Z"
+        stalled = summary(row("Running since", start))
+        retrigger = comment("someone", "2026-10-10T14:00:00Z", "@codex review")
+        live = comment("someone", "2026-10-10T12:30:00Z", "@codex review")  # a trigger while the review was not yet stale
+
+        def eyes(at):
+            return {"user": {"login": BOT}, "content": "eyes", "created_at": at}
+
+        # #1061 P2 (the Claude read): a stale row of another commit beside a review of the read head that ended other than Completed after the
+        # trigger gave 5 (nas proceeds); the 4 ("a person decides") comes first now. Row 2 is our head's review: Running since 12:10:20, then
+        # Cancelled at 12:20; row 1, of another commit, has been Running since 12:03.
+        other_row = row("Running since", start, review=1, commit=OTHER[:7])
+        ours_cancelled = row("Cancelled", "2026-10-10T12:20:00Z", review=2)
+        mixed = summary(other_row, ours_cancelled, history=[summary_body(other_row, row("Running since", "2026-10-10T12:10:20Z", review=2))])
+        trigger = comment("someone", "2026-10-10T12:10:00Z", "@codex review")
+        ours_completed = summary(other_row, row("Completed", "2026-10-10T12:20:00Z", review=2),
+                                 history=[summary_body(other_row, row("Running since", "2026-10-10T12:10:20Z", review=2))])
+        cases = [
+            ("a new trigger after the stall, 30 s later", dict(comments=[stalled, retrigger], now="2026-10-10T14:00:30Z"), 3, f"running since {start}"),
+            ("the same, 9:59 later", dict(comments=[stalled, retrigger], now="2026-10-10T14:09:59Z"), 3, "running since"),
+            ("the same, 10 minutes later: unavailable, as NOSTART", dict(comments=[stalled, retrigger], now="2026-10-10T14:10:00Z"), 5,
+             "has had no connector activity since the latest trigger 2026-10-10T14:00:00Z (10 min; stale)"),
+            ("a trigger while the review was live gets the full window from the trigger", dict(comments=[stalled, live], now="2026-10-10T13:59:59Z"),
+             3, "running since"),
+            ("the same, 90 minutes after that trigger", dict(comments=[stalled, live], now="2026-10-10T14:00:00Z"), 5,
+             "since the latest trigger 2026-10-10T12:30:00Z (90 min; stale)"),
+            # #1061 P3: the connector's eyes reaction with no Running row is the same running review, bounded the same way (3 for ever before)
+            ("an eyes reaction with no Running row, 89:59", dict(reactions=[eyes(start)], now="2026-10-10T13:32:59Z"), 3, "eyes reaction is on the pull request"),
+            ("an eyes reaction with no Running row, 90 minutes", dict(reactions=[eyes(start)], now="2026-10-10T13:33:00Z"), 5,
+             f"the connector's eyes reaction since {start}, with no Running row, has had no connector activity since {start} (90 min; stale)"),
+            ("a stale row of another commit and our head's review Cancelled", dict(comments=[mixed, trigger], now="2026-10-10T13:45:00Z"), 4,
+             "Codex review ended 'Cancelled' at 2026-10-10T12:20:00Z; not Completed"),
+            ("the same before it is stale still waits", dict(comments=[mixed, trigger], now="2026-10-10T13:00:00Z"), 3, f"running since {start}"),
+            ("the same with our head's review Completed is the stale 5 (as before)", dict(comments=[ours_completed, trigger], now="2026-10-10T13:45:00Z"),
+             5, "stale"),
+        ]
+        for name, kwargs, code, text in cases:
+            with self.subTest(case=name):
+                got, line = self.run_gate(**kwargs)
+                self.assertEqual((got, text in line), (code, True), line)
+
     # ------------------------------------------------------------------------------------------ local reviews (2026-10-13)
     def test_a_local_review_set_decides_from_the_files_alone(self):
         # The owner's direction: reviews run locally (the connector cannot reach the organization's repository). The gate reads the files and
@@ -2052,17 +2227,32 @@ class CodexGateTests(unittest.TestCase):
             ("a review of another head", (normalized(OTHER),), {}, 2, f"review file 1 of 1 (codex-review) names commit {OTHER[:8]}, which is neither "
                                                                        f"the read head {GATE_HEAD[:8]} nor a head carrying its change"),
             ("the same review, its head passed as carrying the read head's change", (normalized(OTHER),), {"same": (OTHER,)}, 0, "no P0 or P1 finding"),
+            ("a codex-review without a base", ({k: v for k, v in normalized(GATE_HEAD).items() if k != "base_sha"},), {}, 2,
+             "its fields are not those of a codex-review"),
+            ("a base that is not a commit", (normalized(GATE_HEAD, base=GATE_BASE[:12]),), {}, 2, "its base_sha is not 40 lower-case hex digits"),
             ("a review that did not complete", (clean, normalized(GATE_HEAD, completed=False)), {}, 2,
              f"review file 2 of 2 (codex-review) of {GATE_HEAD[:8]} did not complete"),
             ("a malformed file is refused before any finding counts", (normalized(GATE_HEAD, [finding(1)]), b"{"), {}, 2, "review file 2 of 2 cannot be read as JSON"),
-            ("no read head", (clean,), {"read": None}, 2, "the read head and each head after it must be 40 lower-case hex digits"),
+            ("no read head", (clean,), {"read": None}, 2, "the read head must be 40 lower-case hex digits"),
             ("a short read head", (clean,), {"read": GATE_HEAD[:8]}, 2, "must be 40 lower-case hex digits"),
             ("a head after it that is not a commit", (clean,), {"same": ("abc",)}, 2, "must be 40 lower-case hex digits"),
             ("the alias alone", (follow_ups,), {"variables": {"CODEX_LOCAL_REVIEW": [0]}}, 0, "P2 findings 2, P3 findings 1"),
             ("both variables: every file of both counts", (clean, normalized(GATE_HEAD, [finding(1)])),
              {"variables": {"LOCAL_REVIEWS": [0], "CODEX_LOCAL_REVIEW": [1]}}, 4, "codex-review, codex-review of 5e6f7a8b: patch is correct, P0 findings 0, P1 findings 1"),
             ("a file that does not exist", (), {"names": "{dir}/absent.json"}, 2, "review file 1 of 1 cannot be read as JSON"),
-            ("separators and no name", (), {"names": "::"}, 2, "Local reviews: LOCAL_REVIEWS names no file"),
+            ("separators and no name", (), {"names": "::"}, 2, "Local reviews: LOCAL_REVIEWS or CODEX_LOCAL_REVIEW is set but names no file"),
+            # #1061 P1: a codex-review must have been reviewed against its head's merge base with origin/main, which lg_gate passes
+            ("a review against another base", (normalized(GATE_HEAD, base=OTHER),), {}, 2,
+             f"review file 1 of 1 (codex-review) was reviewed against {OTHER[:8]}, not {GATE_BASE[:8]}, the merge base of its head "
+             f"{GATE_HEAD[:8]} with main"),
+            ("a review against its own head", (normalized(GATE_HEAD, base=GATE_HEAD),), {}, 2, f"was reviewed against {GATE_HEAD[:8]}, not"),
+            ("a merge base lg_gate could not compute", (clean,), {"facts": [f"{GATE_HEAD}:"]}, 2,
+             f"the merge base of its head {GATE_HEAD[:8]} with main is unknown"),
+            ("no merge base given at all (the gate run by hand)", (clean,), {"facts": []}, 2, "is unknown (lg_gate gives it)"),
+            ("a rebased head's own merge base", (normalized(OTHER, base=GATE_HEAD),), {"facts": [f"{GATE_HEAD}:{GATE_BASE}", f"{OTHER}:{GATE_HEAD}"]}, 0,
+             "no P0 or P1 finding"),
+            ("a fact that is not head:base", (clean,), {"facts": [f"{GATE_HEAD}:{GATE_BASE}", "head:base"]}, 2, "each argument after it a head and its merge base"),
+            ("the advisory arm has no base to check", (clean, normalized(GATE_HEAD, reviewer="claude-code-review")), {}, 0, "advisory, not blocking"),
         ]
         for name, reviews, kwargs, code, text in cases:
             with self.subTest(case=name):
@@ -2087,8 +2277,8 @@ class CodexGateTests(unittest.TestCase):
             ("a codex-review without its verdict", {k: v for k, v in good.items() if k != "overall_correctness"}, "its fields are not those of a codex-review"),
             ("a claude-code-review with a verdict", {**good, "reviewer": "claude-code-review"}, "its fields are not those of a claude-code-review"),
             ("a verdict that is a number", {**good, "overall_correctness": 1}, "its overall_correctness is not text or null"),
-            ("a confidence as text", {**good, "overall_confidence_score": "high"}, "its overall_confidence_score is not a number"),
-            ("a confidence of true", {**good, "overall_confidence_score": True}, "its overall_confidence_score is not a number"),
+            ("a confidence as text", {**good, "overall_confidence_score": "high"}, "its overall_confidence_score is not a finite number"),
+            ("a confidence of true", {**good, "overall_confidence_score": True}, "its overall_confidence_score is not a finite number"),
             ("another reviewer", {**good, "reviewer": "someone-else"}, "its reviewer is not codex-review or claude-code-review"),
             ("an empty version", {**good, "reviewer_version": " "}, "its reviewer_version is empty"),
             ("a short head", {**good, "head_sha": GATE_HEAD[:12]}, "its head_sha is not 40 lower-case hex digits"),
@@ -2100,6 +2290,9 @@ class CodexGateTests(unittest.TestCase):
         raw = [("a repeated key (the later completed would win)", b'{"reviewer": "codex-review", "reviewer_version": "v", "head_sha": "' + GATE_HEAD.encode()
                 + b'", "completed": false, "completed": true, "findings": []}', "cannot be read as JSON"),
                ("NaN", json.dumps(good).replace('"findings": [', '"findings": [NaN, ').encode(), "cannot be read as JSON"),
+               # #1061 (Astra's follow-up 2): an exponent that overflows parses as inf, which passed the type check at c999eee5
+               ("a confidence of 1e999", json.dumps({**good, "overall_confidence_score": 0.5}).replace("0.5", "1e999").encode(),
+                "its overall_confidence_score is not a finite number"),
                ("not UTF-8", b"\xff\xfe{}", "cannot be read as JSON")]
         for name, review, text in [(n, json.dumps(r).encode("utf-8"), t) for n, r, t in variants] + raw:
             with self.subTest(case=name):
@@ -2107,14 +2300,23 @@ class CodexGateTests(unittest.TestCase):
                 self.assertEqual((got, text in line), (2, True), line)
                 self.assertTrue(LOCAL_LINE.fullmatch(line), line)
 
-    def test_without_a_local_review_set_the_connector_decides_as_before(self):
-        # Unset or empty variables leave the connector path as it was (us-equities-trading still uses it): the gate reads GitHub.
+    def test_unset_variables_leave_the_connector_and_a_set_empty_one_stops(self):
+        # Unset variables leave the connector path as it was (us-equities-trading still uses it): the gate reads GitHub. #1061 P1 (the
+        # Claude read at c999eee5): an EMPTY variable was taken for unset, so LOCAL_REVIEWS="$f" with f unset fell back to the connector,
+        # which cannot reach the organization's repository, and nas proceeds on its 5 (no review at all). A set variable now selects
+        # local mode, and naming no file stops (2).
         completed = summary(row("Completed", "2026-10-10T12:01:00Z"))
-        for values in ({}, {"LOCAL_REVIEWS": "", "CODEX_LOCAL_REVIEW": ""}):
+        with local_reviews_env({}):
+            self.assertIsNone(self.gate.local_review_files())
+        self.assertEqual(self.run_gate(comments=[completed])[0], 0)
+        for values in ({"LOCAL_REVIEWS": ""}, {"CODEX_LOCAL_REVIEW": ""}, {"LOCAL_REVIEWS": "", "CODEX_LOCAL_REVIEW": ""}, {"LOCAL_REVIEWS": ":"}):
             with self.subTest(values=values):
                 with local_reviews_env(values):
-                    self.assertIsNone(self.gate.local_review_files())
-                self.assertEqual(self.run_gate(comments=[completed])[0], 0)
+                    self.assertEqual(self.gate.local_review_files(), [])
+                    out = io.StringIO()
+                    with mock.patch.object(self.gate.subprocess, "run", side_effect=AssertionError("no command")), contextlib.redirect_stdout(out):
+                        self.assertEqual(self.gate.main("o/r", "7", GATE_HEAD, f"{GATE_HEAD}:{GATE_BASE}"), 2)
+                self.assertEqual(out.getvalue().strip(), "Local reviews: LOCAL_REVIEWS or CODEX_LOCAL_REVIEW is set but names no file; stop")
 
     def test_command_line_needs_two_or_three_arguments(self):
         # #975 round 4: the third is the read head (the scripts pass it), whose review counts as well as the current head's. 2026-10-13: with
@@ -2129,7 +2331,8 @@ class CodexGateTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="local-reviews-") as scratch:
             review = Path(scratch) / "review.json"
             review.write_text(json.dumps(normalized(OTHER)), encoding="utf-8")
-            for argv, code in ((["o/r", "7", GATE_HEAD, OTHER], 0), (["o/r", "7", GATE_HEAD], 2), (["o/r", "7"], 2), (["o/r"], 1)):
+            for argv, code in ((["o/r", "7", GATE_HEAD, f"{GATE_HEAD}:{GATE_BASE}", f"{OTHER}:{GATE_BASE}"], 0),
+                               (["o/r", "7", GATE_HEAD, OTHER], 2), (["o/r", "7", GATE_HEAD], 2), (["o/r", "7"], 2), (["o/r"], 1)):
                 with self.subTest(argv=argv, local=True):
                     done = subprocess.run([sys.executable, "-I", str(LANDING / "codex_gate.py"), *argv], capture_output=True, text=True, timeout=30,
                                           env={**environment, "LOCAL_REVIEWS": str(review)})
@@ -2158,6 +2361,11 @@ class EndToEndTests(LandingCase):
         git(cls.repo, "commit", "-q", "-m", "the change")
         cls.head = git(cls.repo, "rev-parse", "HEAD")
         git(cls.repo, "push", "-q", "origin", f"pr:refs/pull/{PR}/head")
+        git(cls.repo, "checkout", "-q", "-b", "two-commits", "pr")  # #1061 P1: a change of two commits, whose head^ is not the merge base
+        (cls.repo / "change-2.txt").write_text("the second commit\n")
+        git(cls.repo, "add", "--", "change-2.txt")
+        git(cls.repo, "commit", "-q", "-m", "the change, second commit")
+        cls.two = git(cls.repo, "rev-parse", "HEAD")
         git(cls.repo, "checkout", "-q", "-b", "other", "main")
         (cls.repo / "other.txt").write_text("another change\n")
         git(cls.repo, "add", "--", "other.txt")
@@ -2791,8 +2999,10 @@ class EndToEndTests(LandingCase):
                 kind = "change"
             elif re.fullmatch(rf"gh api repos/{repo}/commits/[0-9a-f]{{40}}/status\?per_page=100 --paginate --slurp", line):
                 kind = "trading-cc-read"  # #975 (Codex P1 at nas:234): the combined status, every page
-            elif line.startswith("python3 -I ") and line.endswith(f"/codex_gate.py {repo} {PR} {self.head}"):
-                kind = "codex"
+            elif line.startswith("python3 -I ") and re.search(rf"/codex_gate\.py {re.escape(repo)} {PR} {self.head}( [0-9a-f]{{40}}:[0-9a-f]{{0,40}})*$", line):
+                kind = "codex"  # #1061 P1: with a local review set, the facts "<head>:<merge base>" follow the read head
+            elif re.fullmatch(r"git -C \S+ cat-file -e [0-9a-f]{40}\^\{commit\}", line):
+                kind = "have"  # lg_have: a local read (it fetches only a commit the clone lacks)
             elif script.key == "uet" and re.match(r"gh pr view \S+ -R \S+ --json headRefOid,statusCheckRollup,mergeStateStatus ", line):
                 kind = "ci"
             elif script.key == "nas" and re.fullmatch(rf"gh api repos/{repo}/commits/[0-9a-f]{{40}}/check-runs\?filter=latest&per_page=100 --paginate --slurp", line):
@@ -3130,7 +3340,7 @@ class EndToEndTests(LandingCase):
                 code, out, log = self.land(self.nas, **extra)
                 self.assertEqual(code, 0, out)
                 self.assertEqual(self.merge_calls(log), [f"gh pr merge {PR} -R {repo} --squash --match-head-commit {self.head} -A {NOREPLY}"])
-                self.assertEqual([line for line in log if line.startswith("gh api users/")], [f"gh api users/{MERGING_ACCOUNT} --jq .id"])
+                self.assertEqual([line for line in log if line.startswith("gh api users/")], [f"gh api users/{MERGING_ACCOUNT} {USER_JQ}"])
                 scoped = [line for line in log if line.startswith("gh ") and (" -R " in line or " repos/" in line)]
                 self.assertTrue(scoped)
                 self.assertEqual([line for line in scoped if f" -R {repo}" not in line and f" repos/{repo}/" not in line], [])
@@ -3143,15 +3353,19 @@ class EndToEndTests(LandingCase):
                 address = "4242424+another-lander@users.noreply.github.com"
                 code, out, log = self.land(script, LG_AUTHOR_LOGIN="another-lander", FAKE_COMMIT_EMAIL=address)
                 self.assertEqual(code, 0, out)
-                self.assertEqual([line for line in log if line.startswith("gh api users/")], ["gh api users/another-lander --jq .id"])
+                self.assertEqual([line for line in log if line.startswith("gh api users/")], [f"gh api users/another-lander {USER_JQ}"])
                 self.assertTrue(self.merge_calls(log)[0].endswith(f" -A {address}"))
                 code, out, log = self.land(script, LG_AUTHOR_LOGIN="not/a/login")
                 self.assertEqual((code, self.merge_calls(log)), (11, []), out)
                 self.assertEqual([line for line in log if line.startswith("gh api users/")], [], "refused before any call")
 
-    def local_review(self, head, findings=(), **kwargs):
+    def merge_base(self, head):
+        return git(self.repo, "merge-base", head, "origin/main")
+
+    def local_review(self, head, findings=(), base=None, **kwargs):
+        """A normalized review file of `head`; a codex-review names the merge base of `head` with origin/main unless `base` is given."""
         path = self.dir / f"review-{next(self.counter)}.json"
-        path.write_text(json.dumps(normalized(head, findings, **kwargs)), encoding="utf-8")
+        path.write_text(json.dumps(normalized(head, findings, base=base or self.merge_base(head), **kwargs)), encoding="utf-8")
         return str(path)
 
     def test_a_local_review_set_decides_the_codex_gate_through_the_real_gate_in_both_scripts(self):
@@ -3200,16 +3414,18 @@ class EndToEndTests(LandingCase):
         gate = f"{os.path.realpath(LANDING)}/codex_gate.py"
         for script in (self.uet, self.nas):
             repo, calls = (UET_REPO, 2) if script.key == "uet" else (NAS_REPO, 3)
+            # #1061 P1: each head goes to the gate with its merge base with origin/main, the read head's first
+            facts = f"{self.head}:{self.merge_base(self.head)} {self.rebased}:{self.merge_base(self.rebased)}"
             with self.subTest(script=script.key):
                 code, out, log = self.land(script, FAKE_REAL_PYTHON=sys.executable, LOCAL_REVIEWS=self.local_review(self.rebased))
                 self.assertEqual(code, 0, out)
-                self.assertEqual(self.gate_calls(log), [f"python3 -I {gate} {repo} {PR} {self.head} {self.rebased}"] * calls)
+                self.assertEqual(self.gate_calls(log), [f"python3 -I {gate} {repo} {PR} {self.head} {facts}"] * calls)
             with self.subTest(script=script.key, case="the same rebase in two files, and another change"):
                 files = ":".join([self.local_review(self.rebased), self.local_review(self.rebased, reviewer="claude-code-review"),
                                   self.local_review(self.other)])
                 code, out, log = self.land(script, FAKE_REAL_PYTHON=sys.executable, LOCAL_REVIEWS=files)
                 self.assertEqual((code, self.merge_calls(log)), (9, []), out)
-                self.assertEqual(self.gate_calls(log), [f"python3 -I {gate} {repo} {PR} {self.head} {self.rebased}"],
+                self.assertEqual(self.gate_calls(log), [f"python3 -I {gate} {repo} {PR} {self.head} {facts}"],
                                  "the rebase is passed once, the other change not at all")
                 self.assertIn(f"review file 3 of 3 (codex-review) names commit {self.other[:8]}", out)
 
@@ -3230,35 +3446,112 @@ class EndToEndTests(LandingCase):
                 with open(lock, "a", encoding="utf-8") as handle:
                     fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)  # BlockingIOError if the lock outlived the landing
 
-    def test_with_a_local_review_of_the_read_head_the_final_gate_reads_the_same_calls(self):
-        # The advisor's pin of the local path's call shape: a review of the read head adds no call to the final gate (lg_gate reads the file
-        # with jq, which is not logged, and fetches nothing), so the final gate's reads are those of the connector path.
-        expected = {"uet": ["head", "change", "trading-cc-read", "codex", "ci"], "nas": ["head", "change", "trading-cc-read", "codex", "ci", "main"]}
+    def test_with_a_local_review_of_the_read_head_the_final_gate_also_reads_its_merge_base(self):
+        # The advisor's pin of the local path's call shape: lg_gate reads the file with jq (not logged) and, #1061 P1, reads the read head's
+        # merge base with origin/main (lg_have's cat-file, then git merge-base: local reads, no fetch) before the gate, which calls nothing.
+        expected = {"uet": ["head", "change", "trading-cc-read", "have", "change", "codex", "ci"],
+                    "nas": ["head", "change", "trading-cc-read", "have", "change", "codex", "ci", "main"]}
         for script in (self.uet, self.nas):
             with self.subTest(script=script.key):
                 code, out, log = self.land(script, FAKE_REAL_PYTHON=sys.executable, LOCAL_REVIEWS=self.local_review(self.head))
                 self.assertEqual((code, len(self.merge_calls(log))), (0, 1), out)
                 self.assertEqual(self.final_reads(script, log), expected[script.key])
 
+    # ------------------------------------------------------------------------------------------ #1061 at c999eee5 (the Claude read, the probe)
+    def land_two(self, script, **extra):
+        """A landing of the two-commit change (self.two), its verdict naming it."""
+        verdict = self.dir / f"verdict-two-{next(self.counter)}.md"
+        verdict.write_text(f"# Read\n\nVerdict: PASS at {self.two[:8]}\n", encoding="utf-8")
+        return self.land(script, head=self.two, args=[PR, self.two[:12]] + ([str(verdict)] if script.key == "nas" else []), **extra)
+
+    def test_a_codex_review_against_another_base_stops_both_scripts(self):
+        # P1: Codex reviews HEAD against the merge base of its base branch (codex-rs/prompts/src/review_request.rs:21, :62-70), so a review run
+        # with its base at the head reviews nothing and one at head^ only the last commit; at c999eee5 the file carried no base and both landed.
+        merge_base, parent = self.merge_base(self.two), git(self.repo, "rev-parse", f"{self.two}^")
+        self.assertNotEqual(parent, merge_base, "a change of two commits: head^ is a commit of the branch")
+        for script in (self.uet, self.nas):
+            for name, base, code, text in (("base = head", self.two, 9, f"was reviewed against {self.two[:8]}, not {merge_base[:8]}, the merge base"),
+                                           ("base = head^", parent, 9, f"was reviewed against {parent[:8]}, not {merge_base[:8]}, the merge base"),
+                                           ("base = the merge base with origin/main", merge_base, 0, "no P0 or P1 finding")):
+                with self.subTest(script=script.key, case=name):
+                    code_, out, log = self.land_two(script, FAKE_REAL_PYTHON=sys.executable, LOCAL_REVIEWS=self.local_review(self.two, base=base))
+                    self.assertEqual((code_, len(self.merge_calls(log))), (code, 1 if code == 0 else 0), out)
+                    self.assertIn(text, out)
+
+    def test_a_set_but_empty_local_review_variable_stops_instead_of_asking_the_connector(self):
+        # P1: at c999eee5 an empty value was taken for unset and the connector was asked; here the fake gh cannot answer it (exit 9 through the
+        # gate's error), and on the organization's repository the connector gives 5, on which nas proceeds without any review.
+        for script in (self.uet, self.nas):
+            for variable in LOCAL_VARIABLES:
+                with self.subTest(script=script.key, variable=variable):
+                    code, out, log = self.land(script, FAKE_REAL_PYTHON=sys.executable, **{variable: ""})
+                    self.assertEqual((code, self.merge_calls(log)), (9, []), out)
+                    self.assertIn("Local reviews: LOCAL_REVIEWS or CODEX_LOCAL_REVIEW is set but names no file; stop", out)
+                    self.assertEqual([line for line in log if line.startswith("gh api graphql") or "/issues/" in line], [], "the connector is not asked")
+
+    def test_codex_wait_says_what_to_do_on_a_local_2(self):
+        # The probe's finding 8: codex_wait answered a wrong local review file with "land after Codex finishes"
+        for script in (self.uet, self.nas):
+            with self.subTest(script=script.key):
+                code, out, log = self.land(script, FAKE_REAL_PYTHON=sys.executable, LOCAL_REVIEWS=self.local_review(self.other))
+                self.assertEqual(code, 9, out)
+                self.assertIn(": stop, correct the local review files or write them again (LOCAL_REVIEWS)", out)
+                self.assertNotIn("land after Codex finishes", out)
+
+    def test_landing_repo_must_have_the_owner_name_shape(self):
+        # P3: R came from LANDING_REPO unchecked and was expanded unquoted (-R $R), so whitespace split it into extra gh arguments
+        for value in ("o/r x", "a b/c", "owner", "o/", "/r", "-o/r", "o--x/r", "o/..", "o/.", "o/r/x", "x" * 40 + "/r", "o/r;x"):
+            with self.subTest(value=value):
+                code, out, log = self.land(self.nas, LANDING_REPO=value)
+                self.assertEqual((code, log), (2, []), out)
+                self.assertIn("LANDING_REPO is not of the owner/name shape: stop, nothing merged", out)
+        code, out, log = self.land(self.nas, LANDING_REPO="o-x/" + "r" * 100)
+        self.assertEqual(code, 0, out)
+
+    def test_an_organization_login_stops_before_the_merge_with_11(self):
+        # P3: users/<login> answers for an organization too; its address failed only at the merge (exit 7, as in #198)
+        for script in (self.uet, self.nas):
+            with self.subTest(script=script.key):
+                code, out, log = self.land(script, FAKE_USER_TYPE="Organization")
+                self.assertEqual((code, self.merge_calls(log)), (11, []), out)
+                self.assertIn("cannot form the no-reply author address", out)
+
 
 # ---------------------------------------------------------------------------------------------- 8. review_normalize.py
 ROLLOUT_ROOT = "/srv/review-example/cr-1/wt"  # synthetic: the worktree a codex review ran in (session_meta cwd)
 
 
-def rollout(*, output, target=None, commit=HEAD, version="0.162.1", cwd=ROLLOUT_ROOT, reviews=1, git=True, before=(), after=()):
+ROLLOUT_BASE = "7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f"  # synthetic: the merge base the review request names (#1061 P1)
+
+
+def review_prompt(branch="vendor-review/base-1", base=ROLLOUT_BASE):
+    """The base-branch review request's prompt (openai/codex@rust-v0.162.1 codex-rs/prompts/src/review_request.rs:21)."""
+    return (f"Review the code changes against the base branch '{branch}'. The merge base commit for this comparison is {base}. "
+            f"Run `git diff {base}` to inspect the changes relative to {branch}. Provide prioritized, actionable findings.")
+
+
+def prompt_line(text):
+    """The prompt as the rollout holds it: an item_completed UserMessage (measured on the 6 local baseBranch rollouts on 2026-10-13)."""
+    return {"timestamp": "2026-10-13T01:00:01Z", "type": "event_msg", "payload": {"type": "item_completed", "thread_id": "t-1", "turn_id": "1",
+            "item": {"type": "UserMessage", "id": "u-1", "content": [{"type": "text", "text": text, "text_elements": []}]}}}
+
+
+def rollout(*, output, target=None, commit=HEAD, version="0.162.1", cwd=ROLLOUT_ROOT, reviews=1, git=True, before=(), after=(), prompts=None):
     """A `codex review` session rollout as codex-cli 0.162.1 writes it (measured on 15 local rollouts on 2026-10-13: the first line is
-    session_meta, the request and the result are event_msg item_completed lines; openai/codex@rust-v0.162.1
-    codex-rs/history/src/rollout_payload.rs:32-33, codex-rs/protocol/src/items.rs:173-183)."""
+    session_meta, the request, its prompt and the result are event_msg item_completed lines; openai/codex@rust-v0.162.1
+    codex-rs/history/src/rollout_payload.rs:32-33, codex-rs/protocol/src/items.rs:173-183). `prompts` are the prompt texts between the
+    request and the result (by default the one base-branch prompt)."""
     meta = {"id": "t-1", "timestamp": "2026-10-13T01:00:00Z", "cwd": cwd, "originator": "codex_exec", "cli_version": version}
     if git:
         meta["git"] = {"commit_hash": commit, "branch": None}
     lines = [{"timestamp": "2026-10-13T01:00:00Z", "type": "session_meta", "payload": meta}, *before]
     for _ in range(reviews):
-        for item in ({"type": "EnteredReviewMode", "id": "e-1", "target": target or {"type": "baseBranch", "branch": "vendor-review/base-1"},
-                      "user_facing_hint": "changes against vendor-review/base-1"},
-                     {"type": "ExitedReviewMode", "id": "x-1", "review_output": output}):
-            lines.append({"timestamp": "2026-10-13T01:05:00Z", "type": "event_msg",
-                          "payload": {"type": "item_completed", "thread_id": "t-1", "turn_id": "1", "item": item}})
+        lines.append({"timestamp": "2026-10-13T01:00:00Z", "type": "event_msg", "payload": {"type": "item_completed", "thread_id": "t-1",
+                      "turn_id": "1", "item": {"type": "EnteredReviewMode", "id": "e-1", "target": target or {"type": "baseBranch",
+                      "branch": "vendor-review/base-1"}, "user_facing_hint": "changes against vendor-review/base-1"}}})
+        lines += [prompt_line(text) for text in ([review_prompt()] if prompts is None else prompts)]
+        lines.append({"timestamp": "2026-10-13T01:05:00Z", "type": "event_msg", "payload": {"type": "item_completed", "thread_id": "t-1",
+                      "turn_id": "1", "item": {"type": "ExitedReviewMode", "id": "x-1", "review_output": output}}})
     return "".join(json.dumps(line) + "\n" for line in [*lines, *after])
 
 
@@ -3340,14 +3633,16 @@ class ReviewNormalizeTests(unittest.TestCase):
         """The written file is a normalized review the gate reads with this outcome; a plugin file (the advisory arm) is read beside a
         clean codex-review of its head, the required arm. Returns the gate's line."""
         self.assertIsNone(self.gate.review_problem(review))
+        files = [review] if review["reviewer"] == "codex-review" else [normalized(review["head_sha"], base=GATE_BASE), review]
+        fact = f"{review['head_sha']}:{files[0]['base_sha']}"  # what lg_gate passes: the head's merge base (#1061 P1), here the file's own
         with tempfile.TemporaryDirectory(prefix="local-reviews-") as scratch:
             paths = []
-            for number, item in enumerate([review] if review["reviewer"] == "codex-review" else [normalized(review["head_sha"]), review]):
+            for number, item in enumerate(files):
                 paths.append(Path(scratch) / f"review-{number}.json")
                 paths[-1].write_text(json.dumps(item), encoding="utf-8")
             out = io.StringIO()
             with local_reviews_env({"LOCAL_REVIEWS": ":".join(map(str, paths))}), contextlib.redirect_stdout(out):
-                self.assertEqual(self.gate.main("o/r", "7", review["head_sha"]), code)
+                self.assertEqual(self.gate.main("o/r", "7", review["head_sha"], fact), code)
             return out.getvalue().strip()
 
     # -- codex-review
@@ -3356,8 +3651,8 @@ class ReviewNormalizeTests(unittest.TestCase):
                                codex_finding(f"{ROLLOUT_ROOT}/README.md", 2, 3, 3, "[P2] Docs"), codex_finding(f"{ROLLOUT_ROOT}/x.py", 3, 1, 2, "[P3] Nit")])
         code, line, written, mode, calls = self.codex(rollout(output=output))
         self.assertEqual((code, mode, calls), (0, 0o600, []))
-        self.assertEqual(written, {"reviewer": "codex-review", "reviewer_version": "codex-cli 0.162.1", "head_sha": HEAD, "completed": True,
-                                   "overall_correctness": "patch is incorrect", "overall_confidence_score": 0.7,
+        self.assertEqual(written, {"reviewer": "codex-review", "reviewer_version": "codex-cli 0.162.1", "head_sha": HEAD, "base_sha": ROLLOUT_BASE,
+                                   "completed": True, "overall_correctness": "patch is incorrect", "overall_confidence_score": 0.7,
                                    "findings": [{"priority": 1, "location": "tools/landing/nas_land.sh:40-44", "title": "[P1] A finding"},
                                                 {"priority": 2, "location": "README.md:3-3", "title": "[P2] Docs"},
                                                 {"priority": 3, "location": "x.py:1-2", "title": "[P3] Nit"}]})
@@ -3398,7 +3693,8 @@ class ReviewNormalizeTests(unittest.TestCase):
         # review_output null: interrupted (review.rs exit_review_mode(None)). Empty overall_correctness and no findings: the reviewer's JSON did
         # not parse, which review.rs:188-208 turns into findings [] (a finding without a priority does it: the rubric allows omitting it,
         # rubric.md:58 and :78, the struct requires it, protocol.rs:3525-3531). Either would pass as "no finding" if counted as completed.
-        base = {"reviewer": "codex-review", "reviewer_version": "codex-cli 0.162.1", "head_sha": HEAD, "completed": False, "findings": []}
+        base = {"reviewer": "codex-review", "reviewer_version": "codex-cli 0.162.1", "head_sha": HEAD, "base_sha": ROLLOUT_BASE, "completed": False,
+                "findings": []}
         for name, output, note, carried in (("interrupted", None, "the review was interrupted (review_output null)", {"overall_correctness": None}),
                                             ("the parse fallback", {"findings": [], "overall_correctness": "", "overall_explanation": "{\"findings\": [...]}",
                                                                     "overall_confidence_score": 0.0}, "the reviewer's JSON did not parse",
@@ -3411,8 +3707,10 @@ class ReviewNormalizeTests(unittest.TestCase):
                 with tempfile.TemporaryDirectory(prefix="local-reviews-") as scratch:
                     path = Path(scratch) / "r.json"
                     path.write_text(json.dumps(written), encoding="utf-8")
-                    with local_reviews_env({"LOCAL_REVIEWS": str(path)}), contextlib.redirect_stdout(io.StringIO()):
-                        self.assertEqual(self.gate.main("o/r", "7", HEAD), 2)
+                    out = io.StringIO()
+                    with local_reviews_env({"LOCAL_REVIEWS": str(path)}), contextlib.redirect_stdout(out):
+                        self.assertEqual(self.gate.main("o/r", "7", HEAD, f"{HEAD}:{ROLLOUT_BASE}"), 2)
+                    self.assertIn("did not complete", out.getvalue())
 
     def test_a_codex_rollout_that_cannot_give_one_review_of_the_pull_requests_change_is_refused(self):
         good = codex_output([codex_finding(f"{ROLLOUT_ROOT}/a.py", 1)])
@@ -3424,7 +3722,23 @@ class ReviewNormalizeTests(unittest.TestCase):
             ("a target of another form", rollout(output=good, target={"type": "a/../b"}), "the review's target is of another form"),
             ("two reviews in one rollout", rollout(output=good, reviews=2), "2 review requests and 2 review results"),
             ("no review", rollout(output=good, reviews=0), "0 review requests and 0 review results"),
-            ("a line that is not JSON", rollout(output=good) + "{\"truncated\n", "line 4 of the rollout is not JSON"),
+            ("a line that is not JSON", rollout(output=good) + "{\"truncated\n", "line 5 of the rollout is not JSON"),
+            # #1061 P1: the base the review compared HEAD with comes from the one request prompt between the request and the result
+            ("no prompt", rollout(output=good, prompts=[]), "the review request names 0 merge bases, not one"),
+            ("the fallback prompt, which names no merge base (review_request.rs:20)",
+             rollout(output=good, prompts=["Review the code changes against the base branch 'vendor-review/base-1'. Start by finding the merge diff "
+                                           "between the current branch and vendor-review/base-1's upstream"]), "names 0 merge bases"),
+            ("two prompts", rollout(output=good, prompts=[review_prompt(), review_prompt(base=OTHER)]), "names 2 merge bases"),
+            ("a prompt of another base branch", rollout(output=good, prompts=[review_prompt(branch="main")]),
+             "the review request's base branch is not the one its target names"),
+            ("a target without its branch (Astra's P1-2 regressions)", rollout(output=good, target={"type": "baseBranch"}),
+             "the review request's base branch is not the one its target names"),
+            ("a prompt after the result", rollout(output=good, prompts=[], after=[prompt_line(review_prompt())]), "names 0 merge bases"),
+            # #1061 P3: a Legacy rollout (codex exec without paginated history) holds exited_review_mode events; it is refused, fail closed
+            ("a Legacy rollout", rollout(output=good, reviews=0, after=[
+                {"timestamp": "2026-10-13T01:00:00Z", "type": "event_msg", "payload": {"type": "entered_review_mode", "target": {"type": "baseBranch"}}},
+                {"timestamp": "2026-10-13T01:05:00Z", "type": "event_msg", "payload": {"type": "exited_review_mode", "review_output": good}}]),
+             "it is a Legacy rollout (entered_review_mode and exited_review_mode events, policy.rs:141-155)"),
             ("no session_meta", rollout(output=good).split("\n", 1)[1], "no session_meta line"),
             ("no commit in session_meta", rollout(output=good, git=False), "names no commit"),
             ("a short commit", rollout(output=good, commit=HEAD[:12]), "names no commit"),
@@ -3499,6 +3813,14 @@ class ReviewNormalizeTests(unittest.TestCase):
                 self.assertIn("NOT completed (advisory: the gate notes it); no code-review comment by --author since --since", line)
                 self.assertIn("runs without a comment 1 (code-review.md:26, :11)", self.assert_gate(written, 0))
 
+    def test_links_to_another_repository_do_not_bind_and_the_repository_matches_in_any_case(self):
+        # Only links to the code of --repo bind the comment (a citation of another repository's file at its own commit does not count against
+        # it), and GitHub's owner and repository names match in any case.
+        body = plugin_found(HEAD, repo="Native-Agent-Stack/Native-Agent-Stack").replace(
+            "\U0001f916", f"See also https://github.com/other-org/other/blob/{OTHER}/doc.md#L1-L2\n\n\U0001f916")
+        code, line, written, _, _ = self.plugin([plugin_comment(body)])
+        self.assertEqual((code, written["completed"], len(written["findings"])), (0, True, 2), line)
+
     def test_the_author_is_matched_without_regard_to_case_and_at_the_start_time(self):
         code, line, written, _, _ = self.plugin([plugin_comment(PLUGIN_CLEAN, author=PLUGIN_AUTHOR.upper(), created=PLUGIN_SINCE)])
         self.assertEqual((code, written["completed"]), (0, True), line)
@@ -3518,6 +3840,11 @@ class ReviewNormalizeTests(unittest.TestCase):
             ("another format", dict(comments=[plugin_comment("### Code review\n\nLooks fine to me.")]), "neither the plugin's found-issues list"),
             ("only the heading", dict(comments=[plugin_comment("### Code review")]), "neither the plugin's found-issues list"),
             ("gh fails", dict(comments=[], gh_rc=1), "gh api graphql exited 1 (its output withheld)"),
+            # #1061 (the probe's finding 9): the comment is bound to --head by its full-SHA links, not by time alone
+            ("links at another commit (a run that read an earlier head)", dict(comments=[plugin_comment(plugin_found(OTHER))]),
+             f"the comment links to commit {OTHER[:8]}, not --head {HEAD[:8]}"),
+            ("issues that link only to another repository", dict(comments=[plugin_comment(plugin_found(HEAD, repo="other-org/other"))]),
+             "the comment's issues link to no commit of --repo"),
         ]
         for name, kwargs, phrase in cases:
             with self.subTest(case=name):
@@ -3556,6 +3883,21 @@ class ReviewNormalizeTests(unittest.TestCase):
         with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit) as raised:
             self.run_cli(["codex-review", "--rollout", "{dir}/r.jsonl", "--head", "abc"])
         self.assertEqual(raised.exception.code, 2)
+
+    def test_a_refused_retry_removes_the_earlier_file_at_out(self):
+        # #1061 (Astra's follow-up 1): at c999eee5 a refused run left an earlier run's completed review at --out, which the gate then read (0)
+        with tempfile.TemporaryDirectory(prefix="normalize-retry-") as scratch:
+            rollout_file, out_file = Path(scratch) / "rollout.jsonl", Path(scratch) / "review.json"
+            for name, text, code in (("a good review", rollout(output=codex_output(correctness="patch is correct")), 0),
+                                     ("a retry with a commit target", rollout(output=codex_output(), target={"type": "commit", "sha": HEAD}), 1)):
+                with self.subTest(case=name):
+                    rollout_file.write_text(text, encoding="utf-8")
+                    out = io.StringIO()
+                    with contextlib.redirect_stdout(out):
+                        got = self.normalize.main(["codex-review", "--rollout", str(rollout_file), "--out", str(out_file)])
+                    self.assertEqual((got, out_file.exists()), (code, code == 0), out.getvalue())
+            self.assertTrue(out.getvalue().strip().endswith("; nothing written; the older file at --out was removed"), out.getvalue())
+            self.assertNotIn(scratch, out.getvalue())
 
     def test_an_unreadable_rollout_prints_one_line_with_the_error_class_and_no_path(self):
         code, line, written, _, _ = self.run_cli(["codex-review", "--rollout", "{dir}/absent.jsonl"])

@@ -61,7 +61,22 @@ with exit 9 after its 20-minute wait). A row shown running with no connector act
 now gives 5, "Codex unavailable", never 0. Activity is a connector comment other than a summary, a connector reaction, or an edit of a
 summary; the start itself writes a summary edit and the 👀 reaction within seconds, so the age runs from the last activity. `nas_land.sh`
 proceeds on a 5 and `uet_land.sh` needs `GPT_VERDICT`, as for every 5. The block is the CC's operational patch of 2026-10-13T00:47Z,
-ported alone and byte for byte.
+ported alone and byte for byte. #1061 (the Claude read and the CC's `/code-review` probe at c999eee5) refined it:
+
+- the age runs from the later of the last activity and the latest trigger, and a trigger that came after the review had already gone
+  stale gets `NOSTART_MINUTES` (10), the grace a first trigger gets (before, an `@codex review` after a stall gave 5 at once);
+- the connector's 👀 with no Running row is the same running review, under the same rule (before, 3 for ever);
+- when the running review is stale, a review of the read head or the current head that ended other than Completed since the trigger gives
+  4 before the 5 (before, the stale 5 hid it, and nas proceeded).
+
+The value is a measured bound, not an upstream one: OpenAI's Codex docs state no review time limit and no behaviour for a stalled
+review. Their index (`developers.openai.com/codex/llms.txt`, sha256 `72459eb4…`) points code review to `learn.chatgpt.com/docs/code-review.md`
+(sha256 `c18b2fe1…`: "Use the review chat to stop a running review", :129) and `docs/third-party/github.md` (sha256 `1ab50213…`: "Wait for
+Codex to react (👀) and post a review", :52; "Codex reacts while the review is running", :170; for "If Codex doesn't react or post a
+review", :196, only settings to check, among them "Confirm the pull request belongs to a GitHub repository connected to Codex", :199),
+all read on 2026-10-13. The basis is nas#1056: its row went Running at 2026-10-12T22:56:31Z, the connector's last activity was its 👀 at
+22:56:34Z, and it was still silent 250 minutes later (read 2026-10-13T03:06Z); the CC set 90 when the silence had lasted 111 minutes. The
+value is the one constant `STALE_RUNNING_MINUTES`.
 
 **Which review a completion belongs to (#975, Codex P1 at af9d1901).** A review that was running when the latest trigger came and
 finished after it is not the requested review, but its completion time alone passed the gate, so a landing could merge in the gap
@@ -102,13 +117,17 @@ formed from its name was refused at the merge (GraphQL "Invalid email address"):
 `content/account-and-profile/reference/email-addresses-reference.md:47`). `lg_author_email` now takes the login from `LG_AUTHOR_LOGIN`,
 the merging account (default `seathatflowsinourveins` in both scripts), and from the repository's owner only when that is unset (the
 shared block on its own). A login of another shape than GitHub's, at most 39 alphanumerics and single inner dashes, is refused before any
-call (exit 11). The address form and the check after the merge are unchanged.
+call (exit 11). `users/<login>` answers for an organization too, so only a reply of `type` `User` gives the id (#1061 P3: an organization's
+address failed only at the merge, exit 7); otherwise exit 11. The address form and the check after the merge are unchanged.
 
 **The repository (2026-10-13).** This repository moved to the organization on 2026-10-12, and `nas_land.sh` takes `R` from
 `LANDING_REPO`, default `native-agent-stack/native-agent-stack` (before, a literal of the old slug). GitHub redirects the old slug ("All
 links to the previous repository location are automatically redirected to the new location", `transferring-a-repository.md:62`; the CC
 measured REST, GraphQL and `gh -R` on the moved repository), but a repository created at the old location deletes those redirects for good
 (`:68-69`), so the default is the new slug. The landing lock keeps its name (`native-agent-stack.lock`). The trading repository did not move.
+`R` must have GitHub's owner/name shape (an owner of at most 39 alphanumerics and single inner dashes, a name of letters, digits, `.`, `_`
+and `-` other than `.` and `..`), or the landing stops with exit 2 before any call, and every `-R "$R"` is quoted (#1061 P3: a value with
+whitespace was split into extra `gh` arguments).
 
 **The CI gate (#975 P2-3).** A completed check fails unless its conclusion is success, neutral or skipped; any other conclusion, null
 included, stops a landing with exit 5 even when the aggregate check (`ci-gate` in `uet_land.sh`, `validate` in `nas_land.sh`)
@@ -232,9 +251,9 @@ expected head:
 | --- | --- | --- | --- |
 | `LANDING_UET_REPO` | `$HOME/code/us-equities-trading` | `uet_land.sh` | clone of the trading repository: fetches, `rev-parse`, change identity (the path must not contain whitespace) |
 | `LANDING_NAS_REPO` | `$HOME/code/native-agent-stack` | `nas_land.sh` | clone of this repository, used the same way (no whitespace) |
-| `LANDING_REPO` | `native-agent-stack/native-agent-stack` | `nas_land.sh` | the repository's `owner/name` on GitHub (2026-10-13; "The repository", above) |
+| `LANDING_REPO` | `native-agent-stack/native-agent-stack` | `nas_land.sh` | the repository's `owner/name` on GitHub, of that shape or exit 2 (2026-10-13; "The repository", above) |
 | `LG_AUTHOR_LOGIN` | `seathatflowsinourveins` | both | the merging account, whose no-reply address authors the squash merge (CC correction #198) |
-| `LOCAL_REVIEWS` | none | both, through `codex_gate.py` | colon-separated normalized review files; when set, the Codex gate decides from them alone ("Local reviews") |
+| `LOCAL_REVIEWS` | none | both, through `codex_gate.py` | colon-separated normalized review files; when set (an empty value included), the Codex gate decides from them alone ("Local reviews") |
 | `CODEX_LOCAL_REVIEW` | none | both, through `codex_gate.py` | an alias of `LOCAL_REVIEWS`: its files are added to the set |
 | `LANDING_COORD` | `${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/coordination` | both | coordination tree; a status description `PASS: trading-cc/reads/<record>.md` names `$LANDING_COORD/trading-cc/reads/<record>.md` |
 | `LANDING_GATE` | `codex_gate.py` in the directory of the script, symlinks resolved (`readlink -f "$0"`) | both | the Codex gate; it works through a symlink or a wrapper that `exec`s the real path, and not when the script is read from a pipe or a process substitution (set this variable then) |
@@ -259,7 +278,8 @@ status cannot be read), 3 head moved, 4 change differs, 5 CI failed (at the fina
 7 merge failed, 8 blocked, 9 the Codex gate gave neither 0 nor 5: a review running or not finished since its latest trigger (its 3, after
 the 20-minute wait or at the final gate), a review that ended other than Completed or a summary last edited by another account (its
 4), a gate that failed or is missing; or a 5 without an accepted `GPT_VERDICT` (#975 P3-7 at 761810d7: the header named only some of
-these). `nas_land.sh`: 2 as above, 3 head moved, 4 `update-branch` refused or the change differs after it or at the final gate, 5 CI
+these). `nas_land.sh`: 2 as above, and a `LANDING_REPO` that is not of the owner/name shape (before any call; #1061 P3), 3 head moved,
+4 `update-branch` refused or the change differs after it or at the final gate, 5 CI
 failing (also at the final gate), 6 timeout, 7 merge failed, 8 blocked by policy, 9 as above, but a 5 proceeds, and a 3 before the
 validation stops too, 10 the merge onto current `origin/main` fails `scripts/validate.py` or does not merge cleanly, 13 origin/main moved
 after each of three validations, moved after the last validation (read at the final gate) or could not be read, so nothing is merged
@@ -268,9 +288,9 @@ merge landed but its commit's author is not that address or the commit could not
 landing of the same repository holds the landing lock or the lock cannot be opened or taken (nothing has run; #975 round 4).
 `codex_gate.py`: 0, 3, 4 and 5 as above; a gate that fails itself exits 4, which both scripts stop on with 9. With a local review set
 ("Local reviews"): 0 (every file a review of the read head or of a head with its change, every `codex-review` completed with `patch is
-correct` and no P0 or P1 finding), 2 (a file unreadable, malformed or of another head, a `codex-review` not completed or with another
-verdict, or no completed `codex-review`) and 4 (`patch is incorrect`, or a P0 or P1 finding of a `codex-review`); the advisory plugin arm
-never stops it; both scripts stop with 9 on its 2 and its 4.
+correct` and no P0 or P1 finding), 2 (no file named; a file unreadable, malformed or of another head; a `codex-review` against another
+base than its head's merge base with `origin/main`, not completed or with another verdict; or no completed `codex-review`) and 4 (`patch is
+incorrect`, or a P0 or P1 finding of a `codex-review`); the advisory plugin arm never stops it; both scripts stop with 9 on its 2 and its 4.
 `review_normalize.py`: 0 the file was written, 1 the input was refused (nothing written), 2 usage.
 
 ## The record convention
@@ -292,15 +312,16 @@ CHANGES_REQUESTED on line 1 or as that last word rejects, and a PASS or ACK anyw
 The owner's direction of 2026-10-13: Codex reviews run locally, through the OmniRoute gateway on the subscription pool, not through the
 ChatGPT connector, which cannot reach the organization's repository; the review set also takes Anthropic's official `/code-review`
 plugin. `LOCAL_REVIEWS=<file>[:<file>...]`, and its alias `CODEX_LOCAL_REVIEW` (its files are added to the set), name normalized review
-files. When either is set and not empty, `codex_gate.py` decides from the files alone and calls nothing; unset or empty, the connector
-path is as before (`us-equities-trading` still uses it). A file name cannot hold `:` or a newline.
+files. When either is set, an empty value included, `codex_gate.py` decides from the files and calls nothing; a set variable that names no
+file stops (2: #1061 P1, an empty value fell back to the connector, which cannot answer for the organization's repository, and nas proceeds
+on its 5). Unset, the connector path is as before (`us-equities-trading` still uses it). A file name cannot hold `:` or a newline.
 
 **The normalized review** is one JSON object with exactly these fields; a finding carries no prose body, and another field, a repeated
 key or `NaN` is refused:
 
 ```json
-{"reviewer": "codex-review", "reviewer_version": "codex-cli 0.162.1", "head_sha": "<40 lower-case hex digits>", "completed": true,
- "overall_correctness": "patch is correct", "overall_confidence_score": 0.8,
+{"reviewer": "codex-review", "reviewer_version": "codex-cli 0.162.1", "head_sha": "<40 lower-case hex digits>",
+ "base_sha": "<40 lower-case hex digits>", "completed": true, "overall_correctness": "patch is correct", "overall_confidence_score": 0.8,
  "findings": [{"priority": 2, "location": "tools/landing/nas_land.sh:40-44", "title": "[P2] ..."}]}
 ```
 
@@ -310,17 +331,30 @@ empty) and a `title`. A `codex-review` also carries Codex's verdict, `overall_co
 interrupted), and `overall_confidence_score` when the result has one. The rubric fixes the verdict, `"overall_correctness": "patch is
 correct" | "patch is incorrect"` (`codex-rs/prompts/templates/review/rubric.md:85`), while its wire type is a free `String`
 (`codex-rs/protocol/src/protocol.rs:3507`; the score is `f32`, `:3509`): both files are the same bytes at `rust-v0.162.1`, the installed
-version, and in the upstream mirror at `092d3acd6` (2026-10-09). A `claude-code-review` carries neither field.
+version, and in the upstream mirror at `092d3acd6` (2026-10-09). A `codex-review` also carries `base_sha`, the merge base its review
+request named (#1061 P1, below). A `claude-code-review` carries none of these fields.
 
 **The required arm and the advisory arm (the CC, 2026-10-13).** `codex review` is the required local arm. The `/code-review` plugin's arm
 is ADVISORY until the CC's review-replay addendum measures it (arms E and F): below a score of 80 the plugin does not proceed to its comment
 (`code-review.md:26`, "If there are no issues that meet this criteria, do not proceed"), and it skips a pull request it already reviewed
 (`:11`), so a missing comment says nothing about the head.
 
+**The base (#1061 P1, the Claude read and the probe's finding 3 at c999eee5).** Codex reviews HEAD against the merge base of its base
+branch: the request's prompt reads "The merge base commit for this comparison is <sha>" (`codex-rs/prompts/src/review_request.rs:21`,
+used when `merge_base_with_head` finds one, `:62-70`; that function "mirrors `git merge-base HEAD <branch>`",
+`codex-rs/git-utils/src/branch.rs:13-15`). So a review run with its base at the head reviews nothing, and one with its base at a commit of
+the pull request's own branch reviews part of the change, and either completed as "patch is correct". The normalizer records that SHA as
+`base_sha`; `lg_gate` passes the gate, for the read head and each head that carries its change, `<head>:<git merge-base <head>
+origin/main>`, and the gate requires each `codex-review`'s `base_sha` to be its head's. Measured on the 6 local `baseBranch` reviews
+(read only): 3 named the merge base of their head with `origin/main`; the other 3 were delta reviews against a commit of the pull
+request's own branch (not on `main`), each covering 1, 1 and 2 commits and leaving out 1, 5 and 1, which the gate now refuses.
+
 **The gate** requires every listed file to be such a review, of the read head or of a head that carries the read head's change. It gives
 2 for the first file that cannot be read, is not a normalized review or names another head, whatever its reviewer; for a `codex-review`
-that did not complete or whose `overall_correctness` is not exactly `patch is correct` or `patch is incorrect` (fail closed); and when no
-completed `codex-review` is listed. Otherwise it gives 4 when a `codex-review` says `patch is incorrect`, whatever its findings'
+reviewed against another base than its head's merge base with `origin/main`, or that did not complete, or whose `overall_correctness` is not
+exactly `patch is correct` or `patch is incorrect` (fail closed); and when no completed `codex-review` is listed. In `codex_wait`, a 2
+says to correct or write again the local review files, not to wait for Codex (the probe's finding 8). Otherwise it gives 4 when a
+`codex-review` says `patch is incorrect`, whatever its findings'
 priorities, or has a finding of priority 0 or 1 ("a person decides": the CC adjudicates); otherwise 0. The P2 and P3 findings are printed as
 counts, for the pull request's Follow-ups. The plugin's arm never stops the gate: its issues are printed as a count, each scored 80 or more
 by the plugin's filter (its comment carries no score), and a run without a comment (`completed` false) is counted with the citation above,
@@ -332,7 +366,8 @@ in the list, never by its path, and no finding's text. Both scripts stop with ex
 so they must stay in place for the whole landing.
 
 **`review_normalize.py`** (stdlib only) writes the file from each reviewer's own output and changes neither reviewer; it writes the file
-whole (a new 0600 file, renamed over the target) and prints one line, never a path, a body or a title.
+whole (a new 0600 file, renamed over the target) and prints one line, never a path, a body or a title. A refused run writes nothing and
+removes an older file at `--out` (Astra's follow-up 1 at c999eee5: a failed retry left the previous run's review for the gate).
 
 - `codex-review --rollout <rollout.jsonl> [--head <sha>] --out <file>` reads the session rollout of one `codex review` (codex-cli
   0.162.1). Its lines are `{"timestamp", "type", "payload"}` (`openai/codex@rust-v0.162.1` `codex-rs/history/src/rollout_payload.rs:32-33`);
@@ -341,7 +376,12 @@ whole (a new 0600 file, renamed over the target) and prints one line, never a pa
   (`codex-rs/protocol/src/items.rs:173-183`), whose `review_output` holds the findings, each with `priority` and `code_location`, and
   `overall_correctness` (`protocol.rs:3503-3545`). The rollout must hold exactly one review, of target `baseBranch`: the pull request's
   change against its base, the wrapper's default. A `--commit` review covers one commit and is refused, as are `uncommittedChanges` and
-  `custom`. `head_sha` is the rollout's commit (`--head` must agree), `reviewer_version` is `codex-cli <cli_version>`, each location is
+  `custom`. `base_sha` comes from the one request prompt between the request and the result (an `item_completed` `UserMessage`, measured
+  on the 6 local `baseBranch` rollouts), whose base branch must be the target's; a prompt without a merge base (`:20`), none or two is
+  refused. A Legacy rollout is refused too, fail closed: `codex exec` writes one only when the server refuses paginated threads
+  (`codex-rs/exec/src/lib.rs:1425-1432`; paginated is the default, `:1461`), and only Legacy rollouts persist the
+  `entered_review_mode` and `exited_review_mode` events (`codex-rs/rollout/src/policy.rs:141-155`).
+  `head_sha` is the rollout's commit (`--head` must agree), `reviewer_version` is `codex-cli <cli_version>`, each location is
   relative to the worktree, the bodies are dropped, and `overall_correctness` is carried verbatim, with `overall_confidence_score` when
   present (a finite number, or the input is refused). `completed` is false when `review_output` is null (an interrupted review,
   `review.rs:94-95`) or `overall_correctness` is empty: when the reviewer's JSON does not parse, Codex keeps the text in
@@ -359,13 +399,16 @@ whole (a new 0600 file, renamed over the target) and prints one line, never a pa
   by `--author` (the account that ran the plugin; anyone can post the format) created at or after `--since`, whose first line is the
   heading and which was never edited (`lastEditedAt` null). No such comment gives `completed` false, which the gate notes as advisory: the
   plugin posts nothing for a closed, draft, trivial or already reviewed pull request, nor when no issue scored 80 (its `README.md:157-167`;
-  `code-review.md:11`, `:26`). Two such comments, an edit, a head that moved or a count that does not match the list is refused.
+  `code-review.md:11`, `:26`). Two such comments, an edit, a head that moved or a count that does not match the list is refused. Every
+  link to the code of `--repo` must name `--head`'s full SHA, and a list of issues must have one (#1061, the probe's finding 9: the
+  comment of a run that read an earlier head is not taken for this head's; links to other repositories do not count).
 
 Running each reviewer headless (commands only; neither was run by this change, and running the plugin posts a comment on the pull request):
 
 ```
-# codex review, through the co-op's wrapper codex_review_read.sh (a detached worktree at the head; <base sha> is the pull request's base)
-codex_review_read.sh <clone> <pr> <head sha> <base sha> <out dir>
+# codex review, through the co-op's wrapper codex_review_read.sh (a detached worktree at the head), against the head's merge base with
+# origin/main, the base the gate requires (#1061 P1)
+codex_review_read.sh <clone> <pr> <head sha> "$(git -C <clone> merge-base <head sha> origin/main)" <out dir>
 python3 -I tools/landing/review_normalize.py codex-review --head <head sha> --out <codex file> \
   --rollout "$(find ~/.codex/sessions -name "*$(jq -r .session <out dir>/run.json).jsonl")"
 
@@ -383,7 +426,7 @@ LOCAL_REVIEWS=<codex file>:<claude file> nas_land.sh <pr> <read head prefix> <ve
 Measured on 2026-10-13 (read only): of the 15 local rollouts with an `ExitedReviewMode` item (codex-cli 0.160.0 to 0.162.1), every one had
 it and its `EnteredReviewMode` at `payload.item` of `event_msg` `item_completed` lines; their targets were `baseBranch` 6, `commit` 4,
 `uncommittedChanges` 3 and `custom` 2; one `review_output` was null; and one completed review said "patch is incorrect" with a single P2
-finding (a `custom` review); a `baseBranch` review like it passed the gate at a6c8bf7c and is blocked now (4). `review_normalize.py` gave,
+finding (a `custom` review); a `baseBranch` review like it passed the gate at a6c8bf7c and is now blocked by its verdict (4). `review_normalize.py` gave,
 on the first `baseBranch` review, "codex-review of 8eb4b532: completed; overall_correctness 'patch is
 correct'; findings P0 0, P1 0, P2 0, P3 0" (exit 0, mode 0600), and refused the "patch is incorrect" review and the null one on their
 targets (`custom`, `uncommittedChanges`; exit 1). `python3 -I` keeps the environment, so the variables reach the gate (measured with
@@ -395,7 +438,8 @@ The files were moved from the CC's tools directory on 2026-10-10 and synced on 2
 00:02Z (the head-following function of uet#58 and correction #148); #975's fix commit then took the CC's live patch of
 2026-10-11T03:37Z (P2-3 and P2-2, above). At the sync the shell scripts were the live copies with only host paths changed: the three
 lines of the move (the repository default and `COORD` on one line, the record path, the gate path), the same line counts, and
-`codex_gate.py` byte for byte. Expanding the three expressions to the CC host's paths gave the digests of the "after #148" column.
+`codex_gate.py` byte for byte. The live copies carry the CC host's paths in those expressions, so no digest of a live copy is
+published here (#1061 P1-3, Astra at c999eee5: a digest of a host-specific file is an offline oracle for a guessed path, correction #161).
 The patched live copies also differ in the merge-failure line, whose file the CC keeps in its own tools directory until it takes
 this line's `${TMPDIR:-/tmp}` after review (2026-10-11). The review of that fix commit then led to two more changes, made here and
 not yet in the live copies: `codex_gate.py` catches any exception and exits 4 with one fixed line (#975 P2), and `lg_ci_state` in
@@ -418,24 +462,26 @@ activity rules (above). The CC's adjudication of 5b8ba3b2 added the final fix: t
 trigger-window wording (P3-a, P3-d); Codex's change-identity finding is a declared gap (below) and its sandboxing of the validation a
 follow-up. The CC's Claude micro at 3e6e7e46 (A1) and Codex's P2 at nas:289 added one more correction to nas's check runs: a failing
 run stands unless a run of its name started and completed after it, and every page is read (above); in the same commit, for Codex's P1
-at nas:234, both scripts read `trading-cc-read` from the combined status, every page of it (above). The live copies were last
-changed at 2026-10-11T05:03:28Z (the CC's patch that took the status-gate failure line); the "Live copy" column is their sha256 (`sha256sum`) and line count as read at 2026-10-11T13:59Z, which replace the digests of the
-CC's 03:37Z patch recorded here before (`1bc1f53b…` and `287f2e7e…`, #975 P3-2). The "Here" column is each file as committed: its
-sha256 and line count.
+at nas:234, both scripts read `trading-cc-read` from the combined status, every page of it (above). The live copies were then last
+changed at 2026-10-11T05:03:28Z (the CC's patch that took the status-gate failure line). The table gives each file as committed: its
+sha256 and line count. Before correction #136 the live scripts had 115 (uet) and 135 (nas) lines; after #148, 232 and 243; since
+2026-10-11T05:03:28Z, 233 and 246; the live `codex_gate.py` had 108 lines after #148. Their digests, published here until #1061, were
+removed (P1-3), and `tests/test_landing_scripts.py` now refuses any sha256 or digest prefix in this README that is neither a tracked
+file's nor a named public artifact's.
 
-| File | Before correction #136 | Live copy, after #148 | Live copy, since 2026-10-11T05:03:28Z | Here |
-| --- | --- | --- | --- | --- |
-| `uet_land.sh` | `b794e3a46772c0a598dff9eee972ad449e5d63f0c81b60b9db1d5cb4944747bb` (115 lines) | `301fb5b07274b28fde0f2061356bf9682883eca352c8bcb7a3119e8934920c7d` (232 lines) | `bfe664bcc00fd99cbe2a0afe7a76c483d8d7896e44f665eac066972cdec2ed7a` (233 lines) | `62ea1ce42fd500be55168c80a826b0bc84098409f6b6a0147bf1a44350fc1de2` (416 lines) |
-| `nas_land.sh` | `2fefe070b95229de3dcad14052cf5c031b70c202bf4a34f4452e6e0cb5832936` (135 lines) | `96144670bc301036604fc39e57e3ab4e4a2e43a6b9d6b8b645ef7b02482f4017` (243 lines) | `842b85b7f53048e9df027ca537ea99b6208e616e0f239ca30bb1748a5bc1f2ad` (246 lines) | `77e667a336653a3302bc1a4949eb40a459dbf08c06f29d0dde667d42475f7d9f` (479 lines) |
-| `codex_gate.py` | (unchanged) | `31524d2871cde79ecb2c5b9bc56b6175ce9fafab9ad4d2e2e3eb3594e1cb2422` (108 lines) | the same | `d3cbc950e9be7af9a5def4c7e687d91c3fdec8b1cc0a793824d5236caddd0c63` (396 lines) |
-| `review_normalize.py` | (none) | (none) | (none) | `19db14a40e7022590ff48db62a92052967bb14516e5af9328e0af2cd0622322c` (291 lines) |
+| File | As committed |
+| --- | --- |
+| `uet_land.sh` | `887084a91e86168b7b908e997a455c092a7e1886a80dd22ebb0c3de70daa110d` (428 lines) |
+| `nas_land.sh` | `1f817b196a07ffe7ee181c23a2b4969a616b36e9ed9fc165104409581dc2a70c` (498 lines) |
+| `codex_gate.py` | `d5db338ec272d91f16fdca216b0504f56c595258c0b371fe84baa16452758ed7` (446 lines) |
+| `review_normalize.py` | `003a82cd87ccb76b0955d6077a8504c2234d53fec3fddc278616b17c9df7a373` (345 lines) |
 
 On 2026-10-13 three fixes the CC had made in its live copies were ported here alone: the repository slug and the merging account in
 `nas_land.sh` (CC correction #198; here also `LANDING_REPO`, the login check, and `uet_land.sh`, whose block is shared), and the stale
 running review in `codex_gate.py` (CC correction #200, its block and constant byte for byte). The live copies' other local differences
 (`SQUASH_BODY_FILE`, correction #176's currency checks, the host paths) were not taken. Read at 2026-10-13T01:50Z, the live copies were
-`nas_land.sh` `5134973a…` (474 lines, changed 2026-10-12T23:07:56Z) and `codex_gate.py` `7170d2dd…` (241 lines, changed
-2026-10-13T00:47:19Z). The local review set, `lg_gate`'s heads with the read head's change and `review_normalize.py` are new here.
+`nas_land.sh` (474 lines, changed 2026-10-12T23:07:56Z) and `codex_gate.py` (241 lines, changed 2026-10-13T00:47:19Z); no digest of
+them is published. The local review set, `lg_gate`'s heads with the read head's change and `review_normalize.py` are new here.
 
 Corrections the scripts carry: #118 (every gate before the merge, in order), #121 (a verdict file that states a landing gate needs
 a receipt), #122 and #123 (a Codex review must have finished; uet#40 and uet#47 merged while one was running), #136
@@ -489,8 +535,10 @@ and 4). These stay until a change with its own tests fixes them:
   - The normalizer accepts only a `baseBranch` review, the pull request's whole change against its base: a review the wrapper runs with
     `--commit` covers one commit and is refused, so the required arm must be run in the wrapper's default mode.
   - The plugin's arm is advisory (above): until the review-replay addendum measures it, its issues and a run without a comment are noted
-    and never stop a landing. Its head is the caller's two reads: a head that moved away and back during the run is not seen.
+    and never stop a landing. Its head is the caller's two reads and its links: a head that moved away and back during the run is not seen.
   - The files are read at every gate call, each once, so a file rewritten between two calls is decided on its new text at the later one.
+  - A Legacy rollout is refused (fail closed, above), so a review whose `codex exec` fell back to Legacy history gives no file; it has to
+    be run again where the server serves paginated threads.
 
 ## Tests
 
@@ -505,7 +553,7 @@ through both CI gates (exit 5 before any merge unless success, neutral or skippe
 state outside it and none through `uet_land.sh` (SUCCESS merges, PENDING and EXPECTED wait, the rest exit 5), a failed merge (exit
 7 with a class and no gh output, which stays in a 0600 file), a `trading-cc-read` status whose description carries an address
 (exit 2, only its state printed), each `gh` call failing in turn with an address on stderr and, for `gh api`, on stdout (the step's
-own exit code, nothing printed; #975 P2-2), a check that the "Here" digests above are those of the committed files, and a scan of
+own exit code, nothing printed; #975 P2-2), a check that the digests in the table above are those of the committed files, and a scan of
 every file under `tools/landing`, bytecode excepted, for home paths and for the identities that must not appear (#975 P2-1, below).
 Round 3 adds, each failing at af9d1901: a review that started before the latest trigger and finished after it (exit 3, not 0), the
 gate giving 0 then 5 in `uet_land.sh` without, with a wrong and with an accepted `GPT_VERDICT`, a status or record that changes during
@@ -596,6 +644,26 @@ errors):
     not a finite number refused;
   - the plugin's issues and a run without a comment noted as advisory, never stopping the gate or a landing; the plugin's arm alone is
     no review (2); a plugin file of another head still stops (2).
+- #1061 (the Claude read and the CC's `/code-review` probe at c999eee5) adds, each failing at c999eee5 (measured as above against that
+  commit's `tools/landing`; the count is in the pull request):
+  - the base: a review against its own head or against `head^` of a two-commit change stops both scripts (2, then exit 9), and one
+    against the merge base lands; in the gate, another base, an unknown one, no fact at all and a fact of another shape stop; the
+    normalizer takes the base from the one request prompt and refuses none, two, the fallback prompt, another branch and a prompt
+    after the result;
+  - a set but empty variable, either of them, stops (2, then exit 9) without asking the connector (it replaced the test that pinned an
+    empty value as unset);
+  - a stale row of another commit beside our head's review that ended Cancelled gives 4, not 5;
+  - a trigger after a stall waits 10 minutes (3) and then gives 5, and a trigger while the review was live gets the full window;
+  - the connector's 👀 without a Running row gives 5 after 90 minutes;
+  - a `LANDING_REPO` of another shape stops before any call (exit 2); every `-R "$R"` is quoted;
+  - an account of type Organization, Bot or none gives no address (exit 11);
+  - a Legacy rollout is refused with its own reason;
+  - a local 2 tells the operator to correct the review files, not to wait for Codex;
+  - a plugin comment whose links name another commit, or whose issues link only to another repository, is refused;
+  - Astra's P1-3: every sha256 and every digest prefix in this README is a tracked file's or a named public artifact's (at c999eee5,
+    seven full digests and four prefixes of host-only files were not); a planted one is found;
+  - Astra's follow-ups 1 and 2: a refused retry removes the earlier file at `--out`, and a confidence that overflows to infinity
+    (`1e999`) stops the gate (2).
 
 ## Upstream sources for the #975 corrections
 
@@ -665,4 +733,8 @@ above still hold; the schema's bytes are unchanged, sha256 `3ed09565…`); insta
 | The `/code-review` plugin | `anthropics/claude-plugins-official@f359d43b406057f1a8cdbc4ea93b827642c162e6` (committed 2026-10-11T02:41:21Z): `plugins/code-review/commands/code-review.md` `7d5a0bc9a41babad32a387152f9680316997bc4ad376928827d670b1760cc890`, `plugins/code-review/README.md` `1fca74bab6969b609519927ae49112760e15d8113eef6bbcf9b9a96c49d73c89` | `code-review.md:2` its `allowed-tools`; `:11` it does not proceed on a closed, draft or trivial pull request or one that "already has a code review from you from earlier"; `:20-26` each issue is scored from 0 to 100 and those under 80 are filtered out, `:26` "If there are no issues that meet this criteria, do not proceed" (why its arm is advisory and a missing comment does not stop the gate); `:28` it comments with `gh`; `:50-84` the comment's two forms; `:86-92` a link names the full SHA and `#L<start>-L<end>`; `README.md:157-167` "No review comment posted", among its causes "No issues scored ≥80 (no comment needed)" |
 | The comment's fields | the GraphQL schema, `3ed09565…` | `:21203` `type IssueComment`, `:21215` `author: Actor` (nullable), `:21225` `body: String!`, `:21240` `createdAt: DateTime!`, `:21260` `fullDatabaseId: BigInt`, `:21287-21290` "The moment the editor made the last edit", `lastEditedAt: DateTime` (nullable); `:44787` `PullRequest.headRefOid: GitObjectID!` |
 | Codex's verdict (the CC's follow-up) | `openai/codex@rust-v0.162.1` (installed: codex-cli 0.162.1) `codex-rs/prompts/templates/review/rubric.md` `ec60e7f3…` and `codex-rs/protocol/src/protocol.rs` `499bd1fd…`; the upstream mirror at `092d3acd6bec3e3a14bdc7e7a2810ab628ab759d` (2026-10-09) holds the same bytes of both | `rubric.md:85` `"overall_correctness": "patch is correct" \| "patch is incorrect"`; `protocol.rs:3507` `pub overall_correctness: String` (free text on the wire, so the gate stops on any other value), `:3509` `pub overall_confidence_score: f32` |
+| The review's base (#1061 P1) | `openai/codex@rust-v0.162.1`: `codex-rs/prompts/src/review_request.rs` `f4896d6746c3508aa08b72ce15ce143f9041015da9da37b044cdaf4f6f838fc0`, `codex-rs/git-utils/src/branch.rs` `86774c34df2bcb4b55ff5340bc2ef644bf64a94d14b122dbb29004ef01b370c5` (the mirror at `092d3acd6` holds the same bytes of `branch.rs`) | `review_request.rs:21` the base-branch prompt, "The merge base commit for this comparison is {{merge_base_sha}}. Run `git diff {{merge_base_sha}}` to inspect the changes relative to {{base_branch}}", `:20` the fallback prompt that names no SHA, `:62-70` the merge base from `merge_base_with_head(cwd, branch)`, else the fallback; `branch.rs:13` it "mirrors `git merge-base HEAD <branch>`", `:15` its definition. Measured on 2026-10-13, read only: on the 6 local `baseBranch` rollouts the prompt is an `item_completed` `UserMessage` after the request, and 3 named the merge base of the head with `origin/main`, while 3 named a commit of the pull request's own branch |
+| A Legacy rollout (#1061 P3) | `openai/codex@rust-v0.162.1`: `codex-rs/exec/src/lib.rs` `51b62cef4893c6d07b51753fc2716fc05985cdc9de6673f2fa2d974779454d4b`, `codex-rs/rollout/src/policy.rs` `65ce50e843547719295fd884b651552c1227085e8d0acfef2161b4ec3111dcbc` | `lib.rs:1425-1432` on the server's error "paginated threads require thread/turns/list and thread/items/list support" the thread starts again with `history_mode = None` (`:1431`), `:1461` paginated by default unless ephemeral; `policy.rs:141-142` "Only persist these legacy events when the thread's history mode is Legacy. New, paginated rollouts persist ItemCompleted events with TurnItems.", `:143-155` among them `EnteredReviewMode` and `ExitedReviewMode`, `:228-282` the paginated `ItemCompleted` path |
+| No upstream review time limit (#200's value) | `developers.openai.com/codex/llms.txt` `72459eb4e2e6d3b1a143f3c40860b7dd65fb061cdec3b18470ed8867382d8552`; `learn.chatgpt.com/docs/code-review.md` `c18b2fe184104facf5d044631ee151b2394baab1c44218be8b9d60c7dbd33020`; `learn.chatgpt.com/docs/third-party/github.md` `1ab502138a121ac571faa37f161bf79224e1e23cdc0e70f7a0be835f2c2d3c9f` (fetched 2026-10-13) | the index's "Code review" entry points to `code-review.md`, which has "Use the review chat to stop a running review" (:129) and no time; `github.md:52` "Wait for Codex to react (👀) and post a review", `:170` "Codex reacts while the review is running", `:196-205` for "If Codex doesn't react or post a review" settings only (`:199` "Confirm the pull request belongs to a GitHub repository connected to Codex"); no page states a limit |
+| #200's measured basis | the gate's own query, read only, on nas#1056 at 2026-10-13T03:06Z | the summary's row Running since 2026-10-12T22:56:31Z, its last edit 22:56:32Z, the connector's 👀 at 22:56:34Z, and no connector activity after it (250 minutes); the CC set 90 at 111 minutes |
 | The variables reach the gate under `-I` | measured with Python 3.13.16 | `LOCAL_REVIEWS=x python3 -I -c 'import os; print(os.environ.get("LOCAL_REVIEWS"))'` printed `x`: isolated mode ignores the `PYTHON*` variables, not the environment |

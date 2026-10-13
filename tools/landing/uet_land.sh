@@ -166,11 +166,12 @@ lg_follow_head() {  # <read head> <new head> <follows so far>
 # transfer R's owner was an organization, and the squash merge failed with GraphQL "Invalid email address": the no-reply form belongs to a
 # user account, "ID+USERNAME@users.noreply.github.com" (github/docs@be38ec5d email-addresses-reference.md:47). A login of another shape than
 # GitHub's (at most 39 alphanumerics and single inner dashes, username-considerations-for-external-authentication.md:94, :103, :126-127)
-# is refused before any call.
+# is refused before any call. #1061 P3: users/<login> answers for an organization too, whose address then failed at the merge (exit 7, as
+# in #198); only an account of type User gives an id (otherwise exit 11, nothing merged).
 lg_author_email() {  # <owner/repo> : the account's no-reply address; rc 1 and nothing printed when the login or the id is not well formed
   local login=${LG_AUTHOR_LOGIN:-${1%%/*}} id
   [[ "$login" =~ ^[A-Za-z0-9](-?[A-Za-z0-9])*$ ]] && [ "${#login}" -le 39 ] || return 1
-  id=$(gh api "users/$login" --jq .id 2>/dev/null) || return 1
+  id=$(gh api "users/$login" --jq 'select(.type == "User") | .id' 2>/dev/null) || return 1
   case "$id" in ''|*[!0-9]*) return 1 ;; esac
   printf '%s+%s@users.noreply.github.com\n' "$id" "$login"
 }
@@ -200,24 +201,33 @@ lg_have() {  # <commit>
 # and exits 1 (:437-441, :118-123; Doc/library/sys.rst:394-399). The read head goes to the gate, which counts only a review of it or of
 # the current head (#975 round 4).
 # Local reviews (2026-10-13, the owner's direction: reviews run locally, the connector cannot reach the organization's repository): when
-# LOCAL_REVIEWS or its alias CODEX_LOCAL_REVIEW names normalized review files (colon-separated), the gate decides from the files alone. A
-# file whose head_sha is not the read head counts only when that head carries the read head's change, by this block's change identity
-# (lg_same_change); each such head is passed to the gate after the read head (the first call fetches a head the clone lacks, lg_have). The
-# gate's 2 (a file malformed, incomplete or of another head) is echoed when it is one of its "Local reviews: " lines; python3's own 2 is not.
+# LOCAL_REVIEWS or its alias CODEX_LOCAL_REVIEW is set (an empty value included, #1061 P1: it fell back to the connector, which cannot
+# answer), the gate decides from the normalized review files they name (colon-separated). A file whose head_sha is not the read head counts
+# only when that head carries the read head's change, by this block's change identity (lg_same_change). The read head and each such head
+# go to the gate after the read head as "<head>:<git merge-base <head> origin/main>" (#1061 P1: a codex-review must have been reviewed
+# against that merge base; the first call fetches a head the clone lacks, lg_have). The gate's 2 (no file, a file malformed, incomplete,
+# of another head or of another base) is echoed when it is one of its "Local reviews: " lines; python3's own 2 is not.
 lg_gate() {  # <gate> <owner/repo> <pr> <read head> : prints one line; returns 0, 2, 3, 4 or 5
-  local g gr q="'" re part f h files=() more=() same=()
+  local g gr q="'" re part f h mb files=() more=() heads=() facts=()
   re="^(Codex review |Codex unavailable: |no Codex review |Codex gate error: |Local reviews: )[A-Za-z0-9 :;,.()_+${q}-]*\$"
-  for part in "${LOCAL_REVIEWS:-}" "${CODEX_LOCAL_REVIEW:-}"; do
-    [ -n "$part" ] || continue
-    IFS=: read -r -a more <<< "$part"; files+=(${more[@]+"${more[@]}"})
-  done
-  for f in ${files[@]+"${files[@]}"}; do
-    [ -n "$f" ] || continue
-    h=$({ jq -r 'if type == "object" and (.head_sha | type) == "string" then .head_sha else empty end' < "$f"; } 2>/dev/null)
-    lg_hex40 "$h" && [ "$h" != "$4" ] && [[ " ${same[*]-} " != *" $h "* ]] || continue
-    lg_have "$h" && lg_same_change "$4" "$h" && same+=("$h")
-  done
-  g=$(python3 -I "$1" "$2" "$3" "$4" ${same[@]+"${same[@]}"} 2>&1); gr=$?
+  if [ -n "${LOCAL_REVIEWS+x}${CODEX_LOCAL_REVIEW+x}" ]; then
+    for part in "${LOCAL_REVIEWS-}" "${CODEX_LOCAL_REVIEW-}"; do
+      [ -n "$part" ] || continue
+      IFS=: read -r -a more <<< "$part"; files+=(${more[@]+"${more[@]}"})
+    done
+    heads=("$4")
+    for f in ${files[@]+"${files[@]}"}; do
+      [ -n "$f" ] || continue
+      h=$({ jq -r 'if type == "object" and (.head_sha | type) == "string" then .head_sha else empty end' < "$f"; } 2>/dev/null)
+      lg_hex40 "$h" && [[ " ${heads[*]} " != *" $h "* ]] || continue
+      lg_have "$h" && lg_same_change "$4" "$h" && heads+=("$h")
+    done
+    for h in "${heads[@]}"; do
+      lg_have "$h"; mb=$(${LG_GIT:-git} merge-base "$h" origin/main 2>/dev/null); lg_hex40 "$mb" || mb=
+      facts+=("$h:$mb")
+    done
+  fi
+  g=$(python3 -I "$1" "$2" "$3" "$4" ${facts[@]+"${facts[@]}"} 2>&1); gr=$?
   case "$gr" in
     0|3|4|5) ;;
     2) [[ "$g" == "Local reviews: "* ]] || { echo "Codex gate failed with exit 2; details withheld"; return 4; } ;;
@@ -242,7 +252,7 @@ lg_keep() {  # <file name prefix> <text>
 # GraphQL StatusState has ERROR, EXPECTED, FAILURE, PENDING and SUCCESS; schema.docs.graphql sha256 3ed09565…, lines 65267-65292). A rollup
 # entry of any other type counts as running (fail closed). ci-gate is matched on CheckRuns only.
 lg_ci_state() {  # <pr>
-  gh pr view "$1" -R $R --json headRefOid,statusCheckRollup,mergeStateStatus --jq '[.headRefOid, ([.statusCheckRollup[]|select((.__typename=="CheckRun" and .status!="COMPLETED") or (.__typename=="StatusContext" and (.state=="PENDING" or .state=="EXPECTED")) or (.__typename!="CheckRun" and .__typename!="StatusContext"))]|length), ([.statusCheckRollup[]|select((.__typename=="CheckRun" and .status=="COMPLETED" and ((.conclusion=="SUCCESS" or .conclusion=="NEUTRAL" or .conclusion=="SKIPPED")|not)) or (.__typename=="StatusContext" and ((.state=="SUCCESS" or .state=="PENDING" or .state=="EXPECTED")|not)))]|length), (.statusCheckRollup|length), ([.statusCheckRollup[]|select(.__typename=="CheckRun" and .name=="ci-gate" and .conclusion=="SUCCESS")]|length), .mergeStateStatus]|@tsv' 2>/dev/null
+  gh pr view "$1" -R "$R" --json headRefOid,statusCheckRollup,mergeStateStatus --jq '[.headRefOid, ([.statusCheckRollup[]|select((.__typename=="CheckRun" and .status!="COMPLETED") or (.__typename=="StatusContext" and (.state=="PENDING" or .state=="EXPECTED")) or (.__typename!="CheckRun" and .__typename!="StatusContext"))]|length), ([.statusCheckRollup[]|select((.__typename=="CheckRun" and .status=="COMPLETED" and ((.conclusion=="SUCCESS" or .conclusion=="NEUTRAL" or .conclusion=="SKIPPED")|not)) or (.__typename=="StatusContext" and ((.state=="SUCCESS" or .state=="PENDING" or .state=="EXPECTED")|not)))]|length), (.statusCheckRollup|length), ([.statusCheckRollup[]|select(.__typename=="CheckRun" and .name=="ci-gate" and .conclusion=="SUCCESS")]|length), .mergeStateStatus]|@tsv' 2>/dev/null
 }
 # <<< land-gate-fns
 lg_lock "${LANDING_LOCK_DIR:-$COORD/command-center/landing-locks}" || exit 14
@@ -306,7 +316,7 @@ verdict_gate
 # Correction #136: the identity of a change is git patch-id (verbatim, -U0, --binary) of its whole diff against its own merge base; an empty change is refused.
 change() { lg_change_id "$1"; }
 same_change() { lg_same_change "$1" "$2"; }
-cur=$(gh pr view "$N" -R $R --json headRefOid --jq .headRefOid 2>/dev/null); lg_hex40 "$cur" || cur=
+cur=$(gh pr view "$N" -R "$R" --json headRefOid --jq .headRefOid 2>/dev/null); lg_hex40 "$cur" || cur=
 lg_have "$cur"
 if [ "$cur" != "$E" ]; then
   same_change "$E" "$cur" || { echo "#$N head ${cur:-?} is neither the read head nor a pure rebase of it"; exit 3; }
@@ -334,6 +344,8 @@ codex_wait() {
     g=$(lg_gate "$GATE" "$R" "$N" "$E"); gr=$?
     { [ $gr = 0 ] || [ $gr = 5 ]; } && { echo "#$N $g"; [ $gr = 0 ] || gpt_substitute; return 0; }
     [ $gr = 3 ] && [ $j -lt 21 ] && { sleep 60; continue; }
+    # #1061 (the probe's finding 8): a 2 is a local review file that is wrong, not a review still to come
+    [ $gr = 2 ] && { echo "#$N $g: stop, correct the local review files or write them again (LOCAL_REVIEWS)"; exit 9; }
     echo "#$N $g: stop, land after Codex finishes"; exit 9
   done
 }
@@ -347,7 +359,7 @@ GATE=${LANDING_GATE:-$(dirname "$(readlink -f -- "$0")")/codex_gate.py}
 # that gate's exit code. What the reads cannot close is in the README ("What the final gate can and cannot close").
 final_gate() {  # <pinned head>
   local hd s g gr open
-  hd=$(gh pr view "$N" -R $R --json headRefOid --jq .headRefOid 2>/dev/null); lg_hex40 "$hd" || hd=
+  hd=$(gh pr view "$N" -R "$R" --json headRefOid --jq .headRefOid 2>/dev/null); lg_hex40 "$hd" || hd=
   [ "$hd" = "$1" ] || { echo "#$N head moved to ${hd:-?} at the final gate: stop"; exit 3; }
   same_change "$E" "$hd" || { echo "#$N CHANGE DIFFERS between read head ${E:0:8} and head ${hd:0:8} at the final gate: stop"; exit 4; }
   verdict_gate
@@ -368,15 +380,15 @@ final_gate() {  # <pinned head>
   echo "#$N final gate at ${hd:0:8}: head, change, verdict files, trading-cc-read, Codex and CI read again (CI $4 ok)"
 }
 # Slow steps: ready, the Codex wait, update-branch, the CI wait, the author address.
-if [ "$(gh pr view "$N" -R $R --json isDraft --jq .isDraft 2>/dev/null)" = true ]; then
-  gh pr ready "$N" -R $R >/dev/null 2>&1 || { echo "#$N could not be marked ready"; exit 7; }
+if [ "$(gh pr view "$N" -R "$R" --json isDraft --jq .isDraft 2>/dev/null)" = true ]; then
+  gh pr ready "$N" -R "$R" >/dev/null 2>&1 || { echo "#$N could not be marked ready"; exit 7; }
   echo "#$N marked ready at $(date -u +%FT%TZ)"; sleep 20
 fi
 codex_wait
-gh pr update-branch "$N" -R $R --rebase >/dev/null 2>&1 || true
+gh pr update-branch "$N" -R "$R" --rebase >/dev/null 2>&1 || true
 sleep 6
 git -C $U fetch -q origin main "pull/$N/head" 2>/dev/null
-H=$(gh pr view "$N" -R $R --json headRefOid --jq .headRefOid 2>/dev/null); lg_hex40 "$H" || H=
+H=$(gh pr view "$N" -R "$R" --json headRefOid --jq .headRefOid 2>/dev/null); lg_hex40 "$H" || H=
 lg_have "$H"
 same_change "$E" "$H" || { echo "#$N CHANGE DIFFERS between read head ${E:0:8} and head ${H:0:8}: stop"; exit 4; }
 echo "#$N read ${E:0:12} -> head ${H:0:12}: same change (file set and per-file changed lines)"
@@ -408,9 +420,9 @@ done
 [ -n "$ci" ] || { echo "#$N CI timeout"; exit 6; }
 ae=$(lg_author_email "$R") || { echo "#$N cannot form the no-reply author address (correction #148): stop, nothing merged"; exit 11; }
 final_gate "$H"
-out=$(gh pr merge "$N" -R $R --squash --match-head-commit "$H" -A "$ae" 2>&1) || { cls=$(printf '%s' "$out" | grep -o -i -E 'not mergeable|head branch was modified|required status check|review|draft|merge conflict|protected branch|rate limit|authentication|not found' | head -1 | tr 'A-Z ' 'a-z_'); mf=$(lg_keep merge-fail "$out") && kept="gh output kept only in local file $mf in the temp directory (0600), never echoed" || kept="gh output could not be kept, and is not echoed"; echo "#$N merge failed (class: ${cls:-other}); $kept (#975 P2-2)"; exit 7; }
+out=$(gh pr merge "$N" -R "$R" --squash --match-head-commit "$H" -A "$ae" 2>&1) || { cls=$(printf '%s' "$out" | grep -o -i -E 'not mergeable|head branch was modified|required status check|review|draft|merge conflict|protected branch|rate limit|authentication|not found' | head -1 | tr 'A-Z ' 'a-z_'); mf=$(lg_keep merge-fail "$out") && kept="gh output kept only in local file $mf in the temp directory (0600), never echoed" || kept="gh output could not be kept, and is not echoed"; echo "#$N merge failed (class: ${cls:-other}); $kept (#975 P2-2)"; exit 7; }
 sleep 4
-echo "#$N $(gh pr view "$N" -R $R --json state,mergeCommit,mergedAt --jq '"\(.state) \(.mergeCommit.oid) \(.mergedAt)"' 2>/dev/null) (CI $ci ok)"
+echo "#$N $(gh pr view "$N" -R "$R" --json state,mergeCommit,mergedAt --jq '"\(.state) \(.mergeCommit.oid) \(.mergedAt)"' 2>/dev/null) (CI $ci ok)"
 lg_author_check "$R" "$N" "$ae" || exit 12
 exit 0
 }
