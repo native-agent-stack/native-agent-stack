@@ -303,7 +303,7 @@ with patch.object(runner,'paper_credentials',boundary):
         if str(e)!='fixture_credential_boundary_reached': raise
         print('fixture_boundary_reached')
 """
-            probe = subprocess.run([sys.executable, "-E", "-s", "-B", "-c", driver,
+            probe = subprocess.run([sys.executable, "-E", "-B", "-c", driver,
                 str(SOURCE), str(path), str(root / "receipt.json"), str(root / "state")], cwd=Path(temporary),
                 capture_output=True, text=True, timeout=15)
             self.assertEqual(probe.returncode, 0, probe.stderr)
