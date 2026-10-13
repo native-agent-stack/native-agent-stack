@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "judgment": "Heading-to-category mapping only. Repository identities, list selection and counts are mechanical. Match a section or ancestor heading, constrained by the heading path where specified; unmatched rows stay uncategorized. For a URL on an ATX/setext entry heading, use the nearest preceding higher-level parent section and retain the entry line separately. No repository-level model classification.",
-  "threshold_basis": "Three or more distinct lists per canonical repository across the selected corpus. A category requires at least one mapped supporting row; report the number of category-supporting lists separately from the total membership count.",
+  "judgment": "Nearest-section heading-to-category mapping only. Match heading_regex against the nearest section heading; context_regex can disambiguate domain from the retained ancestor path. Never inherit a category match from a tutorial/chapter ancestor. Repository identities and list membership counts are mechanical.",
+  "threshold_basis": "Three or more distinct list MEMBERSHIPS per canonical repository across eligible source links, not category-specific endorsement. Category labels require one nearest-section support; category-supporting list count stays separate. Images and canonical self-links are excluded.",
   "heading_entry_refinement_recorded_at": "2026-10-13T03:00:05Z",
   "stated_at": "2026-10-13T02:32:14Z",
   "categories": [
@@ -13,24 +13,60 @@
     "evaluation-harnesses"
   ],
   "rules": [
-    {"id":"orchestration-explicit","category":"agent-orchestration","heading_regex":"orchestrat|multi[ -]agent|agentic? (framework|platform|workflow)|agent (framework|platform|workflow)"},
-    {"id":"agent-framework-context","category":"agent-orchestration","heading_regex":"^frameworks?$|^frameworks? and libraries$","context_regex":"agents?|agentic"},
-    {"id":"observability-agent-context","category":"agent-observability","heading_regex":"observability|monitoring|tracing","context_regex":"agents?|agentic|LLM|MCP"},
-    {"id":"coding-harness-explicit","category":"coding-agent-harnesses","heading_regex":"coding[ -]agents?|coding[ -]assistants?|coding[ -]agent harness|agent[ -]harness|CLI[ -]agents?|terminal[ -]agents?"},
-    {"id":"memory-agent-context","category":"agent-memory","heading_regex":"memory|long[ -]term (knowledge|context)","context_regex":"agents?|agentic|LLM|MCP|AI[ -]memory"},
-    {"id":"mcp-navigation-context","category":"mcp-code-navigation","heading_regex":"code[ -]navigation|code[ -]search|codebase|code[ -]analysis|code[ -]understanding|source[ -]code","context_regex":"MCP|Model Context Protocol"},
-    {"id":"evaluation-agent-context","category":"evaluation-harnesses","heading_regex":"evaluations?|benchmarks?|benchmarking|eval (framework|harness)","context_regex":"agents?|agentic|LLM|language model|AI"}
+    {
+      "id": "orchestration-explicit",
+      "category": "agent-orchestration",
+      "heading_regex": "orchestrat|multi[ -]agent|agentic? (framework|platform|workflow)|agent (framework|platform|workflow)"
+    },
+    {
+      "id": "agent-framework-context",
+      "category": "agent-orchestration",
+      "heading_regex": "^frameworks?$|^frameworks? and libraries$",
+      "context_regex": "agents?|agentic"
+    },
+    {
+      "id": "observability-agent-context",
+      "category": "agent-observability",
+      "heading_regex": "observability|monitoring|tracing",
+      "context_regex": "agents?|agentic|LLM|MCP"
+    },
+    {
+      "id": "coding-harness-explicit",
+      "category": "coding-agent-harnesses",
+      "heading_regex": "coding[ -]agents?|coding[ -]assistants?|coding[ -]agent harness|agent[ -]harness|CLI[ -]agents?|terminal[ -]agents?"
+    },
+    {
+      "id": "memory-agent-context",
+      "category": "agent-memory",
+      "heading_regex": "memory|long[ -]term (knowledge|context)",
+      "context_regex": "agents?|agentic|LLM|MCP|AI[ -]memory"
+    },
+    {
+      "id": "mcp-navigation-context",
+      "category": "mcp-code-navigation",
+      "heading_regex": "code[ -]navigation|code[ -]search|codebase|code[ -]analysis|code[ -]understanding|source[ -]code",
+      "context_regex": "MCP|Model Context Protocol"
+    },
+    {
+      "id": "evaluation-agent-context",
+      "category": "evaluation-harnesses",
+      "heading_regex": "evaluations?|benchmarks?|benchmarking|eval (framework|harness)",
+      "context_regex": "agents?|agentic|LLM|language model|AI"
+    }
   ],
   "limitations": [
     "This is a dated community-list proxy for A3, not independent consensus, a quality ranking, net usage, an acceptance run, a layer verdict or a default selection.",
-    "Heading-based categories are coarse. A repository can have multiple mapped categories, and broad benchmark/framework sections can contain papers or auxiliary projects. No link-target capability is inferred or verified.",
+    "Nearest-heading categories are coarse labels, not target capability validation or category endorsement. Ancestor headings supply only explicit domain context and cannot assign a category. A repository can have multiple mapped labels and broad sections can contain auxiliary projects.",
     "Unmatched headings remain uncategorized even when a human might recognize a relevant repository. Zero qualifying repositories means none in this mapped corpus, not absence in the ecosystem.",
     "Nine mandatory lists are unconditional. Extensions select the top two starred awesome-named repositories whose own description/topics match the recorded specific-category predicates, at least 1000 stars and a push within 90 days; no awesome-list topic restriction. Complete discovery search pages are retained. Shortfalls are explicit and never filled by general lists.",
-    "Distinct lists are counted by canonical list repository, across all fetched files. Multiple occurrences, files, aliases, and category-extension selection reasons cannot add votes to the same list. The threshold applies to total repository membership, with category-supporting list counts reported separately.",
+    "Distinct list MEMBERSHIPS are counted by canonical list repository across all fetched files and eligible sections, not category endorsement. Multiple occurrences/files/aliases/reasons cannot add votes. Image source rows and canonical self-links cannot vote. Threshold applies to total membership; category-support list counts are reported separately.",
     "Pinned READMEs and recursively linked same-repository Markdown files are included. Directory links, external category sites, non-Markdown files, and translated READMEs are outside this retrieval contract; unavailable pinned files and unresolvable repository links remain explicit.",
     "Every list uses the supported application/vnd.github.raw media type at a pinned ref. The deterministic extractor removes HTML comments and fenced code blocks, excludes reserved GitHub owner surfaces, and records ATX/setext sections. Reference definitions count only when a visible full, collapsed or shortcut reference link uses the label, and are categorized at their definition location. Unused definitions are audited separately per list outside counted rows. Native HTML comparisons check the lexical extraction boundary.",
     "Native Contents HTML is a cross-check only. Its server implementation is not version-pinned, and the oversized MCP README has no supported HTML cross-check. Blob/SHA256, media types, refs and before/after repository-set differences are retained. Literal URL extraction can include punctuation-bearing targets; unresolved targets are retained without guessed normalization. Published links retain repository identity only; ancillary HTML URLs and asset/query suffixes are omitted, while original source pins, hashes and row locations preserve provenance.",
     "Only public GitHub API operations through gh are performed. The deterministic counter invokes no model. Fixture tests are synthetic; actual source reads are source_review and offline reproduction is local_integration. Provider usage for coordinator work is unknown and is not claimed as zero."
   ],
-  "reference_refinement_recorded_at": "2026-10-13T04:43:37Z"
+  "reference_refinement_recorded_at": "2026-10-13T04:43:37Z",
+  "method_version": 2,
+  "heading_match": "nearest section only; ancestor path supplies domain context, never the category label",
+  "round1_refinement_recorded_at": "2026-10-13T06:58:29Z"
 }

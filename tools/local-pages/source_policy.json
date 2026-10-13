@@ -2010,6 +2010,10 @@
     },
     {
       "root": "repo",
+      "path": "scripts/awesome_convergence.py"
+    },
+    {
+      "root": "repo",
       "path": "scripts/build_ecosystem.py"
     },
     {

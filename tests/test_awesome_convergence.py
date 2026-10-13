@@ -131,10 +131,26 @@ class AwesomeConvergenceTests(unittest.TestCase):
         self.assertIsNone(unresolved[0]["canonical_repository"])
         self.assertEqual(unresolved[0]["mapping_categories"], [])
 
-    def test_images_and_self_links_do_not_vote(self):
-        self.corpus["lists"][0]["documents"][0]["links"][0]["kind"] = "image"
-        self.corpus["lists"][0]["documents"][0]["links"][1]["kind"] = "image"
+    def test_raw_images_cannot_supply_third_list_vote(self):
+        self.mapping["method_version"] = 2
+        parsed = counter.parse_raw('# AI Agents\n## Agent Memory\n![logo](https://github.com/renamed/memory/blob/main/logo.svg)\n<img src="https://github.com/old/memory/logo.svg">\n')
+        self.corpus["lists"][0]["documents"][0].update({"sections": parsed["sections"], "links": parsed["links"]})
         self.assertEqual(counter.count_rows(counter.mapped_rows(self.corpus, self.mapping))["agent-memory"], [])
+
+    def test_canonical_self_link_cannot_supply_third_list_vote(self):
+        self.mapping["method_version"] = 2
+        self.corpus["lists"][0]["repository"] = "renamed/memory"
+        self.corpus["lists"][0]["repository_id"] = 100
+        parsed = counter.parse_raw('# AI Agents\n## Agent Memory\n[Self through old name](https://github.com/old/memory)\n')
+        self.corpus["lists"][0]["documents"][0].update({"sections": parsed["sections"], "links": parsed["links"]})
+        self.assertEqual(counter.count_rows(counter.mapped_rows(self.corpus, self.mapping))["agent-memory"], [])
+
+    def test_tutorial_ancestor_cannot_classify_nearest_section(self):
+        self.mapping["method_version"] = 2
+        self.mapping["rules"] = [{"id": "coding", "category": "coding-agent-harnesses", "heading_regex": "coding[ -]agents?"}]
+        parsed = counter.parse_raw('# AI Agents\n## Coding agents tutorial\n### Related observability tools\n[Tool](https://github.com/renamed/memory)\n')
+        self.corpus["lists"][0]["documents"][0].update({"sections": parsed["sections"], "links": parsed["links"]})
+        self.assertEqual(counter.count_rows(counter.mapped_rows(self.corpus, self.mapping))["coding-agent-harnesses"], [])
 
     def test_repository_urls_and_non_repository_surfaces(self):
         self.assertEqual(counter.repository_link("https://github.com/Org/Repo.git/tree/main?x=1#readme"), "Org/Repo")

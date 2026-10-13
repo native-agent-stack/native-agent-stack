@@ -135,8 +135,14 @@ def strip_comments_and_fences(text: str) -> str:
 def parse_raw(text: str) -> dict:
     cleaned = strip_comments_and_fences(text)
     suppressed, unused = visible_reference_definitions(cleaned)
+    # Image locations retain repository identity for extraction auditing, but
+    # cannot cast a list-membership vote. Keep offsets stable when hiding code.
+    markup = re.sub(r"(`+).*?\1", lambda m: " " * len(m.group()), cleaned, flags=re.S)
+    images = [m.span() for m in re.finditer(r"(?<!\\)!\[[^\]\n]*\]\([ \t]*<?[^\s)>]+[^\n)]*\)|<img\b[^>]*>", markup, re.I)]
+    source_lines = cleaned.splitlines(keepends=True)
     lines = cleaned.splitlines()
     heading_at = {}
+    offset = 0
     for index, line in enumerate(lines):
         atx = ATX.match(line)
         if atx:
@@ -175,7 +181,9 @@ def parse_raw(text: str) -> dict:
                 links.append({"url": url, "requested_repository": slug,
                               "section_id": section_id, "section": section["heading"],
                               "entry_heading": entry_heading, "line": index + 1,
-                              "occurrence": len(links) + 1, "kind": "link"})
+                              "occurrence": len(links) + 1,
+                              "kind": "image" if any(start <= offset + match.start() < end for start, end in images) else "link"})
+        offset += len(source_lines[index])
     visible = "\n".join(line if index + 1 not in suppressed else "" for index, line in enumerate(lines))
     local_links = re.findall(r"\]\(\s*<?([^\s)>]+)", visible)
     local_links += re.findall(r"^ {0,3}\[[^\]]+\]:\s*<?([^\s>]+)", visible, flags=re.M)
@@ -346,7 +354,7 @@ def read_json(path: Path) -> dict:
     refs = publication_references(path.parent)
     if refs and path.name not in {"identifiers.json", "sources.json"}:
         value = refs.unpack(value)
-        if path.name == "a3.json":
+        if path.name in {"a3.json", "a3-before-round1.json"}:
             value = refs.restore_count(value)
     return value
 
@@ -355,7 +363,7 @@ def write_json(path: Path, value: dict) -> None:
     refs = publication_references(path.parent)
     if refs and path.name not in {"identifiers.json", "sources.json"}:
         approved = set(refs.by_value) | metadata_identifiers(value)
-        if path.name == "a3.json":
+        if path.name in {"a3.json", "a3-before-round1.json"}:
             value = refs.count_references(value)
         value = refs.pack(value, approved)
         if LONG_HEX.search(json.dumps(value)):
@@ -927,6 +935,7 @@ def mapped_rows(corpus: dict, mapping: dict) -> list[dict]:
     rules = mapping["rules"]
     compiled = [(r, re.compile(r["heading_regex"], re.I),
                  re.compile(r.get("context_regex", ".*"), re.I)) for r in rules]
+    current_method = mapping.get("method_version", 2) >= 2
     canonical = {r["requested"].lower(): r for r in corpus["canonicalization"]}
     rows = []
     for listing in corpus["lists"]:
@@ -936,9 +945,13 @@ def mapped_rows(corpus: dict, mapping: dict) -> list[dict]:
                 resolution = canonical[link["requested_repository"].lower()]
                 section = sections[link["section_id"]]
                 matches = [r for r, heading, context in compiled
-                           if any(heading.search(h) for h in section["headings"])
+                           if (heading.search(section["heading"]) if current_method else
+                               any(heading.search(h) for h in section["headings"]))
                            and context.search(" / ".join(section["headings"]))]
                 eligible = resolution["status"] == "resolved" and link["kind"] == "link"
+                if current_method and eligible:
+                    eligible = (resolution["repository"].casefold() != listing["repository"].casefold()
+                                and resolution.get("repository_id") != listing["repository_id"])
                 categories = sorted({r["category"] for r in matches}) if eligible else []
                 if any(c not in CATEGORIES for c in categories):
                     raise ValueError("unknown mapping category")
@@ -981,7 +994,10 @@ def count_rows(rows: list[dict], threshold: int = 3) -> dict:
 def build(corpus: dict, mapping: dict, corpus_ref: str, mapping_ref: str) -> dict:
     if corpus.get("kind") != "awesome-list-raw-corpus" or corpus.get("status") != "complete":
         raise ValueError("only the completed uniform raw corpus can supply a count")
-    rows = mapped_rows(corpus, mapping)
+    # Superseded v1 is a frozen historical replay. Current v2 and direct row
+    # mapping use nearest-heading/image/self-link rules by default.
+    count_mapping = mapping if corpus.get("selection_version") == 2 else {**mapping, "method_version": 1}
+    rows = mapped_rows(corpus, count_mapping)
     artifact = {"schema_version": 1, "kind": "awesome-list-community-evidence", "angle": "A3",
         "angle_protocol": "angle-convergence/2", "evidence_class": "source_review",
         "read_at": corpus["completed_at"], "threshold": 3,
@@ -1000,6 +1016,10 @@ def build(corpus: dict, mapping: dict, corpus_ref: str, mapping_ref: str) -> dic
              "definitions": [{"file": row["path"], **{k: v for k, v in row.items() if k != "path"}}
                              for row in listing["unused_reference_definitions"]["definitions"]]}
             for listing in corpus["lists"]]
+    if mapping.get("method_version", 1) >= 2:
+        artifact["count_method_version"] = mapping["method_version"]
+        artifact["count_semantics"] = "Distinct-list MEMBERSHIP across any eligible section, not category-specific endorsement. Categories are nearest-section labels; category-support list counts are separate. Images and canonical self-links cannot vote."
+        artifact["eligible_link_occurrences"] = sum(row["eligible"] for row in rows)
     return artifact
 
 
@@ -1012,6 +1032,9 @@ def summary(artifact: dict) -> str:
     for category, results in artifact["category_results"].items():
         text = ", ".join(f"[{r['repository']}](https://github.com/{r['repository']}) ({r['distinct_list_count']} lists; {r['category_support_distinct_list_count']} supports this category)" for r in results) or "None in this mapped corpus"
         lines.append(f"| {category} | {text} |")
+    if artifact.get("count_method_version", 1) >= 2:
+        lines[4] = "A3 counts distinct-list MEMBERSHIP across eligible sections, not category-specific endorsement. A nearest-section label assigns a category; the number of mapped supporting lists is reported separately. Image URLs and canonical self-links cannot vote."
+        lines[7] = "| Nearest-section category label | Repositories present in at least three lists across any eligible section |"
     lines += ["", "`a3.json` references lists/documents by ID; `sources.json` maps those IDs to repository/path metadata, and `identifiers.json` holds the full pins and digests without repository names. `corpus.json` retains source rows and canonical identities. The script resolves references for offline verification.", ""]
     if artifact.get("selection_version") == 2:
         lines += ["V2 supersedes the earlier broad-list selection. Nine mandatory lists are included unconditionally; extensions use specific-category description/topics eligibility and top-two star order. Short categories have no substitute.", "",
@@ -1024,15 +1047,51 @@ def summary(artifact: dict) -> str:
     return "\n".join(lines) + "\n"
 
 
+def reclassify_images(github: Github, directory: Path, workers: int) -> None:
+    """Refine row kinds from exact pinned raw bytes; reuse canonical identities."""
+    corpus = read_json(directory / "corpus.json")
+    if corpus.get("selection_version") != 2 or (directory / "corpus-before-round1.json").exists():
+        raise ValueError("round-1 reclassification requires the original v2 corpus")
+    write_json(directory / "corpus-before-round1.json", corpus)
+    write_json(directory / "a3-before-round1.json", read_json(directory / "a3.json"))
+    (directory / "SUMMARY-before-round1.md").write_bytes((directory / "SUMMARY.md").read_bytes())
+    tasks = [(listing, doc) for listing in corpus["lists"] for doc in listing["documents"]]
+
+    def refine(task):
+        listing, doc = task
+        read_at = utc()
+        raw = github.api(f"repos/{listing['repository']}/contents/{doc['path']}",
+                         fields={"ref": listing["commit"]}, accept="application/vnd.github.raw", raw=True)
+        if digest(raw.encode()) != doc["sha256"]:
+            raise ValueError("row-kind refinement source differs at the frozen pin")
+        links = parse_raw(raw)["links"]
+        without_kind = lambda rows: [{k: v for k, v in row.items() if k != "kind"} for row in rows]
+        if without_kind(links) != without_kind(doc["links"]):
+            raise ValueError("row-kind refinement changed source rows beyond kind")
+        doc["links"] = links
+        doc["row_kind_refinement_read_at"] = read_at
+
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        for index, _ in enumerate(pool.map(refine, tasks), 1):
+            if index % 40 == 0 or index == len(tasks):
+                print(json.dumps({"documents_reclassified": index, "total": len(tasks)}), flush=True)
+    corpus["row_kind_refinement_completed_at"] = utc()
+    corpus["row_kind_refinement"] = "Pinned source digests and every non-kind row field unchanged. Markdown and HTML image source rows labelled image; canonicalization and raw/HTML repository sets reused unchanged."
+    write_json(directory / "corpus.json", corpus)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=["select", "freeze-selection", "collect-raw", "remeasure", "canonicalize", "sanitize", "publish", "build", "check"])
+    parser.add_argument("action", choices=["select", "freeze-selection", "collect-raw", "remeasure", "canonicalize", "sanitize", "publish", "reclassify-images", "build", "check"])
     parser.add_argument("--directory", type=Path, required=True)
     parser.add_argument("--workers", type=int, default=4)
     args = parser.parse_args()
     directory = args.directory
     if not 1 <= args.workers <= 8:
         parser.error("workers must be between 1 and 8")
+    if args.action == "reclassify-images":
+        reclassify_images(Github(), directory, args.workers)
+        return
     if args.action == "publish":
         publish_references(directory)
         return

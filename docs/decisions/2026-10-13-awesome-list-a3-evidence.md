@@ -6,6 +6,48 @@ failed attempts and reproducible counts. The current artifacts are in
 `evidence/artifacts/q4-awesome-convergence-v2-20261013/`. The historical
 selection and diagnostic narrative below describe v1 where explicitly noted.
 
+## Round-1 correction after both full reads
+
+**A3 counts list MEMBERSHIP, not category-specific endorsement.** The
+three-list threshold uses eligible memberships across any section. Categories
+are nearest-section labels with a separate mapped-supporting-list count;
+three memberships do not imply three category endorsements.
+
+The current method matches each category regex only against the nearest
+section heading. Ancestor paths may supply explicit domain context but never
+the category match. This removes tutorial/chapter inheritance. Raw extraction
+labels Markdown/HTML image source rows, and eligibility excludes those images
+and links to the canonical list itself, including renamed aliases. The exact
+Architecture inventory grant for the new script is added through the existing
+policy format; its exact-set guard remains unchanged.
+
+Three raw-path/tutorial controls fail against the reviewed counter and pass
+after correction. The policy's two exact-inventory controls fail before its
+grant and the full 25-test module passes on prepared bytes. Every v2 document
+was re-read at its frozen pin to classify image positions; all original source
+digests and every non-kind row field match. Canonical identities, selection,
+pins and raw/HTML repository sets are unchanged, so existing passing overlap
+evidence is reused without a new HTML-render claim.
+
+The 7,835 source occurrences comprise 7,797 links and 38 images. There are
+56 canonical self-link rows; the corrected artifact has **7,693 eligible
+occurrences**. Results change from **14/0/12/4/0/1 to 12/0/2/2/0/1** in the
+six recorded category labels. Orchestration loses anthropics/claude-code and
+letta-ai/letta; memory loses letta-ai/letta and vshulcz/deja-vu. Coding-agent
+labels lose Aider-AI/aider, Arize-ai/phoenix, NousResearch/hermes-agent,
+anomalyco/opencode, anthropics/claude-code, anthropics/claude-code-action,
+anthropics/claude-plugins-official, modelcontextprotocol/servers,
+obra/superpowers and openai/codex. Only earendil-works/pi and
+sipyourdrink-ltd/bernstein retain coding-agent labels. No category entry is
+added. Surviving entries' global membership counts stay unchanged; five
+category-support counts decrease as recorded in `round1-changes.json`.
+
+Original v2 corpus, A3, summary and checks are retained in before-round1
+snapshots. The current summary/A3 use method version 2. V1 remains a frozen
+historical replay and does not contribute votes to v2. An independent
+dictionary/set replay from corpus sections, nearest-heading rules and API
+identities agrees with all current labels, memberships and support counts.
+
 This change supplies a deterministic source artifact for community evidence.
 It changes no catalog winner, score, runtime, installation or FINAL state.
 The counter invokes no model. Coordinator provider usage is unknown.
@@ -51,8 +93,9 @@ exact-name results, with no mandatory star/push threshold. Three additional
 unconditional lists are ccplugins/awesome-claude-code-plugins,
 jqueryscript/awesome-claude-code and VoltAgent/awesome-claude-code-subagents.
 Selection yields fifteen distinct lists. All fifteen receive fresh pins and
-raw source reads. The heading rules and distinct-list count method remain
-unchanged from v1. Mandatory inclusion, extension eligibility and threshold
+raw source reads. The initial v2 read retained v1's heading rules and count
+method; round 1 refines nearest-section matching and row eligibility above.
+Mandatory inclusion, extension eligibility and threshold
 counting are separate rules.
 
 After the first v2 source read, the mandatory subagents list compared 11/13
@@ -68,7 +111,7 @@ preserving v1's historical source rows and counts. Three fixtures failed
 before the correction and passed afterward. Every v2 list is remeasured at
 the same frozen pin; OVERLAP.md retains both measurements and the diagnosis.
 
-The completed v2 read has fifteen lists, 328 Markdown documents, 6,149 unique
+Before round 1, the completed v2 read had fifteen lists, 328 Markdown documents, 6,149 unique
 requested repository targets, 7,835 link occurrences and 45 unresolved
 targets. Fourteen supported raw/HTML comparisons pass 0.95; the oversized
 MCP README is raw-only. Subagents reaches 1.0 and two unused definitions
@@ -165,6 +208,9 @@ fail-before control. `OVERLAP.md` retains every list's before/after overlap.
 
 | Mistake | Primary evidence and correction | Regression |
 | --- | --- | --- |
+| Failing to grant a new tracked top-level script its exact Architecture inventory entry | The native inventory selector selects the counter; add its exact policy entry and refresh the policy binding | Two existing exact-set tests fail before; the full policy module passes with the grant |
+| Inheriting categories from a tutorial/chapter ancestor | Match the nearest section heading only; retain ancestors for explicit domain context | Tutorial-path fixture fails against the reviewed counter and passes after correction |
+| Claiming image/self-link protection without testing raw parsing | Label raw image sources and exclude canonical self-links, including old-name redirects | Raw image and renamed-self third-vote fixtures fail before and pass after correction |
 | Treating a GitHub user-attachments asset as a repository | V2 subagents README line 2 at its frozen pin is an image asset; exclude the reserved first path segment | Reserved-owner fixture fails before correction and passes afterward |
 | Counting a reference definition that no visible link uses | V2 subagents README line 514 has an unused codex-link definition; count used full/collapsed/shortcut references and audit unused definitions separately | Two reference-visibility controls fail before correction and pass afterward |
 | Assuming heading elements contain only category text | e2b's pinned rendered Aider entry contains its repository anchor inside h2; include it in the HTML set and omit permalink anchors | Heading-anchor fixture failed before correction and passes afterward |

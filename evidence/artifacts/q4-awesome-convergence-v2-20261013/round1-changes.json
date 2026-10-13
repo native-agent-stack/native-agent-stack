@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "kind": "awesome-convergence-round1-correction",
+  "review_head": "7a0c7fef",
+  "count_semantics": "A3 counts list MEMBERSHIP across any eligible section, not category-specific endorsement. Categories are nearest-section labels; supporting-list counts remain separate.",
+  "corrections": [
+    "Add the exact Architecture inventory grant and refresh its evidence binding.",
+    "Match category regexes only against the nearest section; ancestor paths supply domain context, never the category label.",
+    "Label Markdown and HTML image source rows in raw extraction; exclude images and canonical self-links from eligible memberships."
+  ],
+  "before_snapshot_refs": ["a3-before-round1.json", "corpus-before-round1.json", "SUMMARY-before-round1.md", "checks-before-round1.json"],
+  "same_pinned_source_reclassification": {"documents":328,"source_digests_match":true,"every_non_kind_row_field_unchanged":true,"canonical_resolutions_unchanged":true,"selection_and_pins_unchanged":true,"raw_html_repository_sets_unchanged":true,"native_html_not_rerendered":true},
+  "source_rows": {"total":7835,"links":7797,"images":38,"canonical_self_link_rows":56,"eligible_after":7693,"unresolved_targets":45},
+  "category_changes": [
+    {"category":"agent-orchestration","before":14,"after":12,"removed":["anthropics/claude-code","letta-ai/letta"],"added":[],"support_changes":[{"repository":"crewAIInc/crewAI","before":3,"after":2},{"repository":"huggingface/smolagents","before":2,"after":1},{"repository":"microsoft/autogen","before":3,"after":2},{"repository":"strands-agents/harness-sdk","before":3,"after":2}]},
+    {"category":"agent-observability","before":0,"after":0,"removed":[],"added":[]},
+    {"category":"coding-agent-harnesses","before":12,"after":2,"removed":["Aider-AI/aider","Arize-ai/phoenix","NousResearch/hermes-agent","anomalyco/opencode","anthropics/claude-code","anthropics/claude-code-action","anthropics/claude-plugins-official","modelcontextprotocol/servers","obra/superpowers","openai/codex"],"added":[],"remaining":["earendil-works/pi","sipyourdrink-ltd/bernstein"]},
+    {"category":"agent-memory","before":4,"after":2,"removed":["letta-ai/letta","vshulcz/deja-vu"],"added":[],"support_changes":[{"repository":"mem0ai/mem0","before":2,"after":1}]},
+    {"category":"mcp-code-navigation","before":0,"after":0,"removed":[],"added":[]},
+    {"category":"evaluation-harnesses","before":1,"after":1,"removed":[],"added":[]}
+  ],
+  "movement_cause": "Nearest-section labeling removes inherited tutorial/chapter categories. No new category entry appears. Global membership counts of surviving category entries stay unchanged. Images and self-links cannot vote; their removal does not change these surviving category memberships.",
+  "fail_before_controls": [
+    {"finding":"Astra P2 exact grant","tests":2,"failures":2,"exit_code":1,"native_summary":"Ran 2 tests in 0.396s; FAILED (failures=2)"},
+    {"finding":"Claude P2 nearest section / raw images / canonical self-links","tests":3,"failures":3,"exit_code":1,"native_summary":"Ran 3 tests in 0.006s; FAILED (failures=3)","after_fix":"Ran 3 tests in 0.002s; OK"}
+  ],
+  "independent_replay": "Dictionary/set arithmetic re-derived category labels directly from corpus sections and nearest-heading regexes, then global canonical memberships and category-support sets. Every result and eligible occurrence count agrees, without calling mapped_rows or count_rows.",
+  "legacy_v1": "Original SUPERSEDED v1 files and counts remain unchanged; build explicitly selects its historical replay method. Current v2 and direct mapped_rows default to the corrected method."
+}

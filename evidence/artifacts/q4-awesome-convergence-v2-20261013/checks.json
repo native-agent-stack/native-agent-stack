@@ -1,13 +1,111 @@
 {
   "schema_version": 1,
-  "kind": "awesome-convergence-v2-local-checks",
+  "kind": "awesome-convergence-round1-local-checks",
+  "historical_checks_ref": "checks-before-round1.json",
+  "count_semantics": "A3 counts list MEMBERSHIP across eligible sections, not category-specific endorsement. Nearest-section labels and category-support list counts are separate.",
   "checks": [
-    {"evidence_class":"synthetic","command":["python3","-m","unittest","tests.test_awesome_convergence","-v"],"exit_code":0,"native_summary":"Ran 36 tests in 1.170s; OK","boundary":"Locally authored controls through upstream CPython unittest, including both published corpus shapes; not an unchanged upstream counter suite."},
-    {"evidence_class":"local_integration","command":["python3","scripts/awesome_convergence.py","check","--directory","evidence/artifacts/q4-awesome-convergence-v2-20261013"],"exit_code":0,"native_result":{"status":"checked","lists":15,"rows":7835,"unresolved":45,"repositories_per_category":{"agent-orchestration":14,"agent-observability":0,"coding-agent-harnesses":12,"agent-memory":4,"mcp-code-navigation":0,"evaluation-harnesses":1}}},
-    {"evidence_class":"local_integration","command":["python3","scripts/awesome_convergence.py","check","--directory","evidence/artifacts/q4-awesome-convergence-20261013"],"exit_code":0,"native_result":{"status":"checked","lists":10,"rows":10311,"unresolved":29},"boundary":"SUPERSEDED v1 remains reproducible from its original corpus and mapping."},
-    {"evidence_class":"local_integration","method":"Independent dictionary/set tally from canonical API identities and corpus links; compare every result, global list membership, category-support list count and returned membership list set against a3.json. Category assignment uses the frozen recorded row mapping, not an independent capability judgment.","result":"agrees","list_count":15,"document_count":328,"unique_requested_targets":6149,"counted_link_occurrences":7835,"unresolved_targets":45,"heading_rules_equal_v1":true},
-    {"evidence_class":"local_integration","command":["python3","scripts/awesome_convergence.py","publish","--directory","evidence/artifacts/q4-awesome-convergence-v2-20261013"],"exit_code":0,"native_result":{"status":"published-references","named_files":11,"lists":15,"documents":328,"identifiers":1004,"round_trips_agree":true},"boundary":"Typed public pin/digest relocation only; no unknown opaque string relocation."}
+    {
+      "evidence_class": "synthetic",
+      "command": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "tests.test_awesome_convergence"
+      ],
+      "exit_code": 0,
+      "native_summary": "Ran 38 tests in 1.720s; OK",
+      "boundary": "Locally authored controls through CPython unittest. Includes fail-before raw images, canonical self-links and tutorial ancestry; not unchanged upstream counter acceptance."
+    },
+    {
+      "evidence_class": "synthetic",
+      "command": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "tests.test_local_pages_policy_grants"
+      ],
+      "exit_code": 0,
+      "native_summary": "Ran 25 tests in 4.485s; OK",
+      "boundary": "Prepared policy preflight in the genuine owned worktree. Required actual correction-head run is reported in the final PR handoff."
+    },
+    {
+      "evidence_class": "local_integration",
+      "command": [
+        "python3",
+        "-B",
+        "scripts/awesome_convergence.py",
+        "check",
+        "--directory",
+        "evidence/artifacts/q4-awesome-convergence-v2-20261013"
+      ],
+      "exit_code": 0,
+      "native_result": {
+        "status": "checked",
+        "lists": 15,
+        "rows": 7835,
+        "eligible_link_occurrences": 7693,
+        "unresolved": 45,
+        "repositories_per_category": {
+          "agent-orchestration": 12,
+          "agent-observability": 0,
+          "coding-agent-harnesses": 2,
+          "agent-memory": 2,
+          "mcp-code-navigation": 0,
+          "evaluation-harnesses": 1
+        }
+      }
+    },
+    {
+      "evidence_class": "local_integration",
+      "command": [
+        "python3",
+        "-B",
+        "scripts/awesome_convergence.py",
+        "check",
+        "--directory",
+        "evidence/artifacts/q4-awesome-convergence-20261013"
+      ],
+      "exit_code": 0,
+      "native_result": {
+        "status": "checked",
+        "lists": 10,
+        "rows": 10311,
+        "unresolved": 29
+      },
+      "boundary": "SUPERSEDED original v1 historical method replay; no votes mixed into current v2."
+    },
+    {
+      "evidence_class": "source_review",
+      "command": [
+        "python3",
+        "-B",
+        "scripts/awesome_convergence.py",
+        "reclassify-images",
+        "--directory",
+        "evidence/artifacts/q4-awesome-convergence-v2-20261013",
+        "--workers",
+        "4"
+      ],
+      "exit_code": 0,
+      "documents": 328,
+      "source_digests_match": true,
+      "non_kind_fields_unchanged": true,
+      "selection_pins_canonical_resolutions_and_overlap_sets_unchanged": true,
+      "boundary": "Pinned raw bytes re-read for image classification. Existing native HTML measurements reused; no new HTML-render claim."
+    },
+    {
+      "evidence_class": "local_integration",
+      "method": "Independent dictionary/set replay derives nearest-section labels directly from corpus section records and recorded regexes, then global canonical membership sets and category-support sets. No mapped_rows/count_rows invocation.",
+      "result": "agrees",
+      "source_link_occurrences": 7835,
+      "eligible_link_occurrences": 7693,
+      "image_occurrences": 38,
+      "canonical_self_link_occurrences": 56,
+      "unresolved_targets": 45
+    }
   ],
-  "validation_and_publication_boundary":"Full repository validation and native staged/range scanners are reported with actual final results in the PR handoff; this file records the completed fixture/offline/arithmetic checks.",
-  "model_usage":"Counter invokes no model. Coordinator provider usage remains unknown."
+  "final_publication_boundary": "Full validation, final scanner results and the actual committed-head policy-module run are reported in the final PR handoff.",
+  "model_usage": "Counter invokes no model. Coordinator provider usage unknown."
 }

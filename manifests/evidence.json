@@ -19008,8 +19008,8 @@
     },
     {
       "path": "docs/decisions/2026-10-13-awesome-list-a3-evidence.md",
-      "sha256": "f00e2fe3a73afc4a62d14eb9546634fe58ccc44bec57fa097f34520b19073bf6",
-      "bytes": 18507
+      "sha256": "32a394689c58ed5619dca99e53152545b944c722e2c4cdbac56b17599370e512",
+      "bytes": 21952
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -50783,18 +50783,28 @@
     },
     {
       "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/OVERLAP.md",
-      "sha256": "51f2ea8dd91ac92f6e1abee2cf0240890d843180eb552a8117baccda42ccb34e",
-      "bytes": 3400
+      "sha256": "2c7f8885d0dbb3ca3579ceb486a9d80ab328b1f9c98f1d8dabdb9c94a859e332",
+      "bytes": 4090
     },
     {
-      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/SUMMARY.md",
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/SUMMARY-before-round1.md",
       "sha256": "927f2708122670799347dc7252b771cd8ab0952b743705def20e9c88d88f3499",
       "bytes": 4950
     },
     {
-      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/a3.json",
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/SUMMARY.md",
+      "sha256": "34a01b92f2488402d76c1ffb29ac57a9e7bd8ea0365c111cfbbb1cd49baaffbf",
+      "bytes": 3659
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/a3-before-round1.json",
       "sha256": "050f155e2f5cca07e9f6c3023df7441937904e92005879f4f0aba76d29b88934",
       "bytes": 5502378
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/a3.json",
+      "sha256": "1fff857f9136fa9258743f75ff18521ff779fba7d1b0b0971838b5eae5fe966e",
+      "bytes": 5383940
     },
     {
       "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/attempts.json",
@@ -50807,24 +50817,34 @@
       "bytes": 1478578
     },
     {
-      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/checks.json",
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/checks-before-round1.json",
       "sha256": "9ef91219ed6615ad62daa66540eb72a6c8cde9ff1ed760f26ef163d43d93ffb5",
       "bytes": 2481
     },
     {
-      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/corpus.json",
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/checks.json",
+      "sha256": "96582ddc17e9bc5c1958bae09b0487c994afea1832f1d087fbc2482187dee9ed",
+      "bytes": 3853
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/corpus-before-round1.json",
       "sha256": "c4bb011d20930464d0036726f07a823cdefb0c4050134f467f02691de79fb436",
       "bytes": 5149429
     },
     {
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/corpus.json",
+      "sha256": "35cf2a1bb5005cdf485d2fb6b4530b729b7d5d2b94108ab60609712dba200d0f",
+      "bytes": 5167119
+    },
+    {
       "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/identifiers.json",
-      "sha256": "fc7222970109a269fe9df1c04826e1f211a123613a80c591d802e524cf419cd5",
-      "bytes": 88177
+      "sha256": "7b67de22dcedda7ace4f1cf773b8725d7d12b5e1a986cc9477f1e4870b26b9a2",
+      "bytes": 88369
     },
     {
       "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/mapping.json",
-      "sha256": "b87b8c9e6402a7e96ffbdec8df5384ad8e7246cf0cc906dac0d63b60b08d5160",
-      "bytes": 5390
+      "sha256": "f93c3b952154a7ecef8f8f6d4705d8ca15cf938cc0f78ccd60a60efda66daf39",
+      "bytes": 5889
     },
     {
       "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/overlap-before-reference-fix.json",
@@ -50850,6 +50870,11 @@
       "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/remeasure-progress.json",
       "sha256": "2cdb3a92e42386be8871d2ad5dbd2a9a7e4c1d05a6bc50d4970a9af957885037",
       "bytes": 3670630
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/round1-changes.json",
+      "sha256": "1a5a07bf7a8ce92ee5e43c3b8c35d5f306de3c0c84399c9ae4316180ab955fba",
+      "bytes": 3652
     },
     {
       "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/selection.json",
@@ -61438,8 +61463,8 @@
     },
     {
       "path": "scripts/awesome_convergence.py",
-      "sha256": "7069746cf413c1464d00417ab4214af0cfec9a2ea1c07af21563b3ae245fc42d",
-      "bytes": 60670
+      "sha256": "76f12f5b34be456d3a86c507cab1ddd74f6b3df374ddb145a1b56e1266846239",
+      "bytes": 65131
     },
     {
       "path": "scripts/build_ecosystem.py",
@@ -62193,8 +62218,8 @@
     },
     {
       "path": "tests/test_awesome_convergence.py",
-      "sha256": "7526077a42876dbde14bb3c3018da028900d6dbbe951e582a0c1b0747d08a23b",
-      "bytes": 21461
+      "sha256": "d6beeac1f18c50953c9ec344fca5f66faabf2d0255e43f2a4e9aa4f03247cc8f",
+      "bytes": 22875
     },
     {
       "path": "tests/test_backtesting_gap_burndown.py",
@@ -63873,8 +63898,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "9d0c0a4ba2c87c63a55caa0f86515090328a02772e067239744f3a265d41b0d2",
-      "bytes": 759847
+      "sha256": "0f62a3ecf38e5007e68afceb1dbf07fec02816285b5f6b2d15a84fc51e2f4853",
+      "bytes": 759929
     },
     {
       "path": "tools/omniroute/gateway_record.py",
