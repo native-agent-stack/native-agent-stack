@@ -164,6 +164,36 @@ class StageLatch(unittest.TestCase):
         self.assertTrue(self.launch.STOP.is_symlink())
         self.assertEqual(target.read_text(), "SYN preserved\n")
 
+    def test_complete_recut_handles_read_only_units_and_preserves_source(self):
+        import recut
+        source = self.root / "SYN-source"
+        source.mkdir()
+        (source / "launch.py").write_text(BASE)
+        (source / "issue_go.py").write_bytes((ROOT / "tests/fixtures/seq2-issue-go.txt").read_bytes())
+        (source / "GO-BINDING-REQUEST.json").write_text("{}")
+        units = source / "units"
+        units.mkdir()
+        for stage in ("record", "scan", "pre", "pre-skip", "sip", "lev1", "lev2", "lev4", "edge2", "edge8", "iex"):
+            for extension in ("path", "service"):
+                body = "# SYN unit\nExecStart=" + str(source) + "/launch.py\n"
+                if extension == "service" and stage not in ("record", "scan", "pre-skip"):
+                    body += "ExecStopPost=/usr/bin/bash -c '/usr/bin/touch /SYN/alpaca-paper/STOP'\n"
+                path = units / ("paper-ready-" + stage + "-8c95a50d-seq2." + extension)
+                path.write_text(body)
+                path.chmod(0o400)
+        entries = []
+        for path in sorted(p for p in source.rglob("*") if p.is_file() and p.name != "GO-BINDING-REQUEST.json"):
+            entries.append(hashlib.sha256(path.read_bytes()).hexdigest() + "  " + path.relative_to(source).as_posix())
+        inventory = ("\n".join(entries) + "\n").encode()
+        (source / "SHA256SUMS").write_bytes(inventory)
+        units.chmod(0o500)
+        with patch.object(recut, "PREDECESSOR", hashlib.sha256(inventory).hexdigest()):
+            result = recut.recut(source, self.root / "SYN-new-bundle", "SYN-source-pin")
+        self.assertEqual(result["removed_global_touch_hooks"], 8)
+        self.assertEqual(len(result["units"]), 22)
+        self.assertEqual((source / "launch.py").read_text(), BASE)
+        self.assertEqual((source / "SHA256SUMS").read_bytes(), inventory)
+
 
 if __name__ == "__main__":
     unittest.main()

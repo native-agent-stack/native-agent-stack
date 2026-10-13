@@ -108,6 +108,9 @@ def recut(source, output, source_commit):
     issuer = rewrite_issuer((source / "issue_go.py").read_text())
     # Reuse the frozen archive. Never mutate the original, even on failure.
     shutil.copytree(source, output, symlinks=False)
+    # The predecessor is read-only. Only our newly copied unit directory needs
+    # write permission to relocate filenames; restore it before returning.
+    (output / "units").chmod(0o700)
     write(output / "launch.py", launch.encode())
     write(output / "issue_go.py", issuer.encode())
     helper = Path(__file__).with_name("lane_latch.py")
@@ -124,6 +127,7 @@ def recut(source, output, source_commit):
         unit_names.append(renamed.name)
     if removed != 8 or len(unit_names) != 22:
         raise ValueError("seq2_unit_inventory_changed")
+    (output / "units").chmod(0o500)
     # Preserve the strict runtime inventory scope, add the latch helper and
     # relocate all renamed units. The binding request is a separate envelope.
     names = [line.split("  ", 1)[1] for line in inventory.decode().splitlines()]
