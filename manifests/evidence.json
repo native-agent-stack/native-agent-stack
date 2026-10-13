@@ -62213,13 +62213,13 @@
     },
     {
       "path": "tests/test_capacity_place_only_refusal.py",
-      "sha256": "c53e4766e3df11715ae8ab860bde2e1785f612ec4ef3e8a7a957199d4f58fe77",
-      "bytes": 5819
+      "sha256": "985f3d57bac089ab958eafbce13b314c9c8cf419050fd6d1296297c7f1f37691",
+      "bytes": 6080
     },
     {
       "path": "tests/test_capacity_probe_modes.py",
-      "sha256": "08b4aee7318692b03ad3fcb626461a461e05db033ff12dc296a28f258e9a4860",
-      "bytes": 9361
+      "sha256": "37d498c7370eb05638430f03a6e821e4483c25016a40c1c6d35895ec790f81a3",
+      "bytes": 9695
     },
     {
       "path": "tests/test_catalog_decisions.py",

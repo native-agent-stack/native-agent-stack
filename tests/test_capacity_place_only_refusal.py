@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import sys
 import tempfile
+import signal
 import unittest
 from unittest import mock
 
@@ -107,9 +108,14 @@ class PlaceOnlyRefusalTests(unittest.TestCase):
     def test_paper_cli_refuses_before_credential_loader_and_writes_receipt(self):
         with tempfile.TemporaryDirectory(dir='/var/tmp') as td:
             output = Path(td) / 'receipt.json'
-            with mock.patch.object(runner, 'credentials', side_effect=AssertionError('loader called')) as loader:
-                code = c.main(['paper', '--place-only', '--duration', '10', '--env-file', '/fixture/never-read.env',
-                               '--output', str(output)])
+            handlers = {sig: signal.getsignal(sig) for sig in (signal.SIGINT, signal.SIGTERM)}
+            try:
+                with mock.patch.object(runner, 'credentials', side_effect=AssertionError('loader called')) as loader:
+                    code = c.main(['paper', '--place-only', '--duration', '10', '--env-file', '/fixture/never-read.env',
+                                   '--output', str(output)])
+            finally:
+                for sig, handler in handlers.items():
+                    signal.signal(sig, handler)
             loader.assert_not_called()
             receipt = json.loads(output.read_text())
             self.assertEqual(code, 2)

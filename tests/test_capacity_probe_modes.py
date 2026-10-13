@@ -58,7 +58,11 @@ class ProbeModeTests(unittest.TestCase):
                 native.AlpacaCapacityPort('fixture', 'fixture', 'SPY', place_only=True)
 
     def test_native_sdk_cancel_all_is_denied_before_http_send(self):
-        import requests
+        try:
+            import requests
+            from alpaca.trading.requests import LimitOrderRequest  # noqa: F401
+        except ImportError:
+            self.skipTest('requires isolated reviewed alpaca-py runtime')
         client = transport._sdk_client('fixture', 'fixture', lambda *a, **k: None)
         with mock.patch.object(requests.Session, 'request') as wire:
             with self.assertRaises(transport.TransportError): client.cancel_orders()
@@ -125,7 +129,10 @@ class ProbeModeTests(unittest.TestCase):
                     loader.assert_not_called()
 
     def test_bulk_delete_is_denied_on_paper_readonly_and_data_sessions(self):
-        import requests
+        try:
+            import requests
+        except ImportError:
+            self.skipTest('requires Requests in the isolated reviewed alpaca-py runtime')
         for origin, readonly in ((transport.PAPER_URL, False), (transport.PAPER_URL, True),
                                  (transport.DATA_URL, False)):
             with self.subTest(origin=origin, readonly=readonly):
