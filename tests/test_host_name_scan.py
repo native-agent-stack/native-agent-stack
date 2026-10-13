@@ -164,6 +164,45 @@ class HostNameSourceTests(unittest.TestCase):
                     else ("fixtureagent", hostname, "fixturecomputer")
                 self.assertEqual(host_name_scan.host_names(Path.cwd()), expected)
 
+    def test_a_public_hostname_is_excluded_on_any_host_only_from_the_hostname_source(self):
+        # #1027 round 3 (the GPT family's blocker 3 at 37e242c0): the landing scripts' squash-body scan declares the host's own name
+        # public with NATIVE_AGENT_PUBLIC_HOSTNAME=1 on a host that is not WSL, as the distro rule does on WSL; the account, profile and
+        # email sources keep a name of the same spelling. Any other value leaves the hostname source in.
+        hostname = "fixture-private-host"
+        for setting, identity, email, expected in (
+                ("1", "fixtureagent", "fixturemail@example.invalid", ("fixtureagent", "fixturemail")),
+                ("1", hostname, "", (hostname,)),
+                ("1", "fixtureagent", hostname + "@example.invalid", ("fixtureagent", hostname)),
+                ("0", "fixtureagent", "", ("fixtureagent", hostname)),
+                ("", "fixtureagent", "", ("fixtureagent", hostname))):
+            results = [subprocess.CompletedProcess([], 0, identity + "\n", ""),
+                       subprocess.CompletedProcess([], 0, hostname + "\n", ""),
+                       subprocess.CompletedProcess([], 0 if email else 1, email + "\n" if email else "", "")]
+            with self.subTest(setting=setting, identity=identity, email=email), \
+                    mock.patch.dict(os.environ, {"NATIVE_AGENT_PUBLIC_HOSTNAME": setting}), \
+                    mock.patch.object(host_name_scan, "PROFILE_ROOT") as profiles, \
+                    mock.patch.object(host_name_scan, "_command", side_effect=results):
+                profiles.iterdir.return_value = []
+                self.assertEqual(host_name_scan.host_names(Path.cwd()), expected)
+        # On WSL the Linux hostname is by default the Windows computer name: with the opt-in that source is the same host name when it
+        # has the hostname's spelling, and stays when it has another; a profile of that spelling stays, and so does all of it without.
+        for setting, computer, profile, expected in (
+                ("1", "FIXTURE-PRIVATE-HOST", "fixtureprofile", ("fixtureagent", "fixtureprofile")),
+                ("1", "fixturecomputer", "fixtureprofile", ("fixtureagent", "fixturecomputer", "fixtureprofile")),
+                ("1", hostname, hostname, ("fixtureagent", hostname)),
+                ("", hostname, "fixtureprofile", ("fixtureagent", hostname, "fixtureprofile"))):
+            results = [subprocess.CompletedProcess([], 0, "fixtureagent\n", ""),
+                       subprocess.CompletedProcess([], 0, hostname + "\n", ""),
+                       subprocess.CompletedProcess([], 0, json.dumps({"computer": computer, "profiles": [profile]}), ""),
+                       subprocess.CompletedProcess([], 1, "", "")]
+            with self.subTest(setting=setting, computer=computer, profile=profile), \
+                    mock.patch.dict(os.environ, {"NATIVE_AGENT_PUBLIC_HOSTNAME": setting}), \
+                    mock.patch.object(host_name_scan.shutil, "which", return_value="powershell.exe"), \
+                    mock.patch.object(host_name_scan, "PROFILE_ROOT") as profiles, \
+                    mock.patch.object(host_name_scan, "_command", side_effect=results):
+                profiles.iterdir.side_effect = FileNotFoundError()
+                self.assertEqual(host_name_scan.host_names(Path.cwd()), expected)
+
     def test_public_distro_does_not_filter_coincident_private_identity_sources(self):
         results = [subprocess.CompletedProcess([], 0, "fixture-distro\n", ""),
                    subprocess.CompletedProcess([], 0, "fixture-distro\n", ""),

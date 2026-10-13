@@ -1,19 +1,26 @@
 #!/usr/bin/env bash
 # CC landing for native-agent-stack (correction #118): the merge runs only after every gate passes, in this order.
-# usage: nas_land.sh <pr> <read-head-sha-prefix> <verdict-file> [<verdict-file> ...]
+# usage: [SQUASH_BODY_FILE=<file>] nas_land.sh <pr> <read-head-sha-prefix> <verdict-file> [<verdict-file> ...]
 # Order (#975 round 4): the landing lock -> early refusals (the head carries the read head's change, trading-cc-read, the verdict files) ->
 # slow steps (update-branch when BEHIND, ready, the Codex wait, the CI wait, the Codex gate before the validation, the merge onto the current
 # origin/main validated (again while main moves), the author address) -> final_gate, fast reads only (the head and its change, the verdict
 # files, trading-cc-read, the Codex gate, the check runs, origin/main) -> the squash merge pinned to the head -> its author.
-# Exit codes: 2 verdict gate (a verdict file, GATES_DONE or trading-cc-read; a file, record or status that cannot be read included), 3 head
+# Exit codes: 2 verdict gate (a verdict file, GATES_DONE or trading-cc-read; a file, record or status that cannot be read included), or a
+# SQUASH_BODY_FILE that is unreadable, empty, refused by the publication scan or not scannable (all before any gh or git call), 3 head
 # moved, 4 change differs (after update-branch, or at the final gate) or update-branch refused, 5 CI failing (at the final gate also: no
 # longer complete and green), 6 timeout, 7 merge failed, 8 blocked by policy, 9 the Codex gate (codex_gate.py) gave neither 0 nor 5 (a 5
 # proceeds here): a review running or not finished since its latest trigger (its 3, after the 20-minute wait, before the validation or at
 # the final gate), a review that ended other than Completed or a summary last edited by another account (its 4), a gate that failed or is
-# missing, 10 the merge onto CURRENT origin/main fails scripts/validate.py or does not merge cleanly (2026-10-10).
+# missing, 10 the merge onto CURRENT origin/main fails scripts/validate.py or does not merge cleanly (2026-10-10), or fails one of
+# the shard-0 currency checks of its own validate.yml (CC correction #176, 2026-10-12; read from the merge since #1027 round 3).
 # 11 the no-reply author address could not be formed (nothing merged), 12 merged, but the merge commit's author is not that address (correction #148).
 # 13 origin/main moved after each of three validations, moved after the last validation (final gate) or is unreadable (nothing merged; #975).
 # 14 another landing of this repository holds the landing lock, or the lock cannot be taken (nothing merged; #975 round 4).
+# SQUASH_BODY_FILE (the CC, 2026-10-12): when set, the squash commit's body is that file (gh pr merge --body-file), for a PR whose commit
+# messages carry a claim corrected after review (the repository's squash default is COMMIT_MESSAGES). A value that is not a readable,
+# non-empty regular file stops with exit 2 before the lock and any call. The file is copied once to a private snapshot, the snapshot is
+# scanned for text that must not reach main's history (lg_body_snapshot; #1027) and the merge is given that snapshot, not the file: a
+# match, or a scanner or names file that is missing or fails, stops with exit 2 too (nothing printed but one fixed line).
 # Correction #136 (2026-10-10): verdict/record acceptance and change identity use the lg_* functions below (land-patches-20261010).
 # #975 P2-2 (2026-10-11): no text from gh or its API is printed. Every gh call drops its stderr, a failure ends in its step's fixed message and exit code, and gh api
 # writes an error response's body to stdout (cli v2.102.0 pkg/cmd/api/api.go:538-539 and :546), so a value read from it is shown only as a state word or a count.
@@ -29,6 +36,10 @@ R=seathatflowsinourveins/native-agent-stack
 N=${1:?pr}; E=${2:?read head}; shift 2
 [ $# -ge 1 ] || { echo "#$N no verdict file given: stop"; exit 2; }
 VF=("$@")  # #975 round 4: the verdict files, kept for final_gate (the CI loop's `set --` replaces the positional parameters)
+# gh reads the body file when the merge call starts, and "-" would make it read standard input (cli v2.102.0 pkg/cmd/pr/merge/merge.go:146-153,
+# pkg/cmdutil/file_input.go:8-15), so "-" is refused with every other value that is not a readable, non-empty regular file. The path is not printed.
+[ -z "${SQUASH_BODY_FILE:-}" ] || { [ "$SQUASH_BODY_FILE" != - ] && [ -f "$SQUASH_BODY_FILE" ] && [ -r "$SQUASH_BODY_FILE" ] && [ -s "$SQUASH_BODY_FILE" ]; } \
+  || { echo "#$N SQUASH_BODY_FILE is set but is not a readable, non-empty file (path withheld): stop, nothing merged"; exit 2; }
 # 2026-10-10: same-change tolerance (as uet_land.sh). A head that is a pure rebase or merge-update of the read head
 # (per-file changed lines identical, manifests/evidence.json excluded; CI arbitrates the registry) keeps the reads, and
 # a BEHIND branch is updated server-side (gh pr update-branch, merge method) instead of waiting for a lane push.
@@ -213,7 +224,60 @@ lg_keep() {  # <file name prefix> <text>
   { printf '%s\n' "$2" > "$f"; } 2>/dev/null || { rm -f -- "$f" 2>/dev/null; return 1; }
   echo "${f##*/}"
 }
+# SQUASH_BODY_FILE (the CC, 2026-10-12; the scan is the P1 of #1027 at d6be1b02, Astra). The file becomes the squash commit's message in main's
+# history for good, and gh sends the bytes it holds when the merge call starts (cli v2.102.0 pkg/cmd/pr/merge/merge.go:146-153 reads the file,
+# :292-293 and http.go:72-75 send it as CommitBody; pkg/cmdutil/file_input.go:8-16), minutes after any check made here. So the file is copied
+# once to a snapshot (mktemp under TMPDIR, mode 0600; the EXIT trap removes it on every exit, SIGTERM, SIGHUP and SIGINT included: measured,
+# README; SIGKILL, which no trap catches, leaves it, and the README says how to remove it), the snapshot is scanned, and the merge is given
+# the snapshot, never the file. Two scans, both of the snapshot: squash_body_scan.py (the repository's
+# PRIVATE_CONTENT table, a WSL UNC home path, an address that is no no-reply one, a name of the names file; the file is parsed there, never
+# sourced) and scripts/validate.py --scan-file (PRIVATE_CONTENT and the runtime host-local names, the scan the pre-push hook runs; its answer
+# counts only when it says source "host", never the synthetic override's; it runs with NATIVE_AGENT_PUBLIC_HOSTNAME=1, which drops the
+# host's own name only (the hostname source, scripts/host_name_scan.py), so that name is a warning on any host and an identity of the same spelling
+# still refuses: #1027 round 3, the GPT family's blocker 3 at 37e242c0). Both run with -E -s -B, as merge_validate runs validate.py: with -I
+# the script's directory is off sys.path and validate.py cannot import host_name_scan.py (measured 2026-10-12: exit 2). Fail closed: a match,
+# a copy that fails, a scanner or names file that is missing or unreadable, and any answer but a scan's own clean line stop the landing with
+# exit 2 and one fixed line. No path, name, text or scanner output is printed, but one count: a name of the names file that is the host's own
+# name is a warning, not a refusal (the CC's ruling of 2026-10-12); squash_body_scan.py counts it, and the count is printed as a number.
+# Defaults: the scanner beside this script, validate.py in the clone of this repository (LANDING_NAS_REPO), the names file in the coordination tree.
+lg_body_snapshot() {  # <file> : sets SB to the scanned snapshot and returns 0 only when both scans pass; else prints one fixed line and returns 2
+  local here scan val names o r w why=cannot
+  local clean_scan='^squash body scan: clean \(names_checked=[0-9]+(, warnings=([0-9]+))?\)$'
+  local clean_cli='^\{"matching_locations": 0, "scanned_files": [0-9]+, "source": "host", "status": "passed"\}$'
+  here=$(dirname "$(readlink -f -- "$0")")
+  scan=${LANDING_BODY_SCAN:-$here/squash_body_scan.py}
+  val=${LANDING_SCANNER:-${LANDING_NAS_REPO:-$HOME/code/native-agent-stack}/scripts/validate.py}
+  names=${LANDING_NAMES_FILE:-$COORD/command-center/cc-tools/landing-prohibited-names.env}
+  SB=$(mktemp "${TMPDIR:-/tmp}/squash-body-XXXXXX" 2>/dev/null) || SB=
+  [ -n "$SB" ] || { echo "#$N SQUASH_BODY_FILE cannot be copied to a private snapshot (path withheld): stop, nothing merged"; return 2; }
+  trap 'rm -f -- "$SB"' EXIT
+  { cp -- "$1" "$SB" && chmod 600 -- "$SB" && [ -s "$SB" ]; } 2>/dev/null \
+    || { echo "#$N SQUASH_BODY_FILE cannot be copied to a private snapshot (path withheld): stop, nothing merged"; return 2; }
+  if [ -f "$scan" ] && [ -f "$val" ]; then
+    o=$(python3 -E -s -B "$scan" "$SB" "$val" "$names" 2>/dev/null); r=$?
+    if [ "$r" = 0 ] && [[ "$o" =~ $clean_scan ]]; then
+      w=${BASH_REMATCH[2]:-0}
+      o=$(NATIVE_AGENT_PUBLIC_HOSTNAME=1 python3 -E -s -B "$val" --scan-file "$SB" 2>/dev/null); r=$?
+      if [ "$r" = 0 ] && [[ "$o" =~ $clean_cli ]]; then
+        [ "$w" = 0 ] || echo "#$N SQUASH_BODY_FILE names this host's own name $w time(s): a warning, not a refusal (the name is not printed)"
+        return 0
+      fi
+      [ "$r" = 1 ] && why=refused
+    elif [ "$r" = 1 ] && [[ "$o" == "squash body scan: refused: "* ]]; then
+      why=refused
+    fi
+  fi
+  if [ "$why" = refused ]; then
+    echo "#$N SQUASH_BODY_FILE holds text the publication scan refuses (details withheld; squash_body_scan.py names the classes and lines): stop, nothing merged"
+  else
+    echo "#$N SQUASH_BODY_FILE could not be scanned: a scanner or the names file is missing, unreadable or failed (details withheld): stop, nothing merged"
+  fi
+  return 2
+}
 # <<< land-gate-fns
+# SQUASH_BODY_FILE: the snapshot and both scans (exit 2) come after the readability check above and before the lock and every git and gh call.
+SB=
+[ -z "${SQUASH_BODY_FILE:-}" ] || lg_body_snapshot "$SQUASH_BODY_FILE" || exit 2
 lg_lock "${LANDING_LOCK_DIR:-$COORD/command-center/landing-locks}" || exit 14
 $G fetch -q origin main "pull/$N/head" 2>/dev/null
 EF=$($G rev-parse --verify -q "$E^{commit}" 2>/dev/null) || { $G fetch -q origin "$E" 2>/dev/null; EF=$($G rev-parse --verify -q "$E^{commit}" 2>/dev/null); }
@@ -343,8 +407,41 @@ codex_wait() {
 # #975 (Codex P2 and GPT P2-C at af9d1901, 2026-10-11): validate.py's output is free text, so it is not printed. It goes to a file that mktemp
 # makes under TMPDIR (mode 0600), outside the worktree, so it outlives the worktree's removal, and exit 10 names that file and the exit code.
 # VBASE is the main the validation ran on.
+# CC correction #176 (2026-10-12): two PRs, each green on its own base, left main red when one changed a source of a generated artifact
+# that the other had bound (#1018 after #1007: final-stack.json), and validate.py does not run that check. After validate.py, the merge
+# runs validate.yml's shard-0 currency checks in the workflow's order: every shard-0 step that runs a Python script with --check, the
+# gap-wave ledger's included (the CC's ruling of 2026-10-12; #176 had left it out). A failing check is exit 10 as well, named by its
+# command, its output kept as validate.py's is.
+# #1027 round 3 (the Codex connector's thread on nas:430 at e203d014, reproduced at 37e242c0): the checks are read from the merge's own
+# .github/workflows/validate.yml, the file main's CI runs once the merge lands, so a merge is validated with the steps it adds or
+# changes and not with a list fixed in the script that lands it. shard0_checks prints them, in the workflow's order: each step with
+# `if: matrix.shard == 0` whose run, on one line or as a folded `>-` block (whose lines YAML joins with spaces), is exactly
+# `python3 <script>.py [arguments] --check`. Fail closed: a validate.yml in which it finds none, and a step whose words are not plain
+# ones (letters, digits and _ . / = : , + -; a script path that is relative and has no `..`), stop the landing with exit 10; the
+# step's text is not printed. A merge with no validate.yml has no check to run.
+shard0_checks() {  # <workflow file> : one command per line, without `python3 `
+  local line shard=0 run= have=0 folded=0 fold='^          [^[:space:]]' check='^python3 ([^[:space:]]+\.py( .+)? --check)$'
+  while IFS= read -r line || [ -n "$line" ]; do
+    if [[ $line == "      - "* ]]; then
+      [ $shard = 1 ] && [[ $run =~ $check ]] && printf '%s\n' "${BASH_REMATCH[1]}"
+      shard=0 run= have=0 folded=0
+    fi
+    if [ $folded = 1 ] && [[ $line =~ $fold ]]; then
+      line=${line#"${line%%[![:space:]]*}"}; line=${line%"${line##*[![:space:]]}"}
+      run=${run:+$run }$line; continue
+    fi
+    folded=0
+    if [[ $line == "        if: matrix.shard == 0" ]]; then shard=1
+    elif [ $have = 0 ] && [[ $line == "        run: >-" ]]; then have=1 folded=1
+    elif [ $have = 0 ] && [[ $line == "        run: "[!\>\|]* ]]; then have=1 run=${line:13}
+    fi
+  done < "$1"
+  [ $shard = 1 ] && [[ $run =~ $check ]] && printf '%s\n' "${BASH_REMATCH[1]}"
+  return 0
+}
 merge_validate() {
-  local wt rc err
+  local wt rc err chk stop= what=validate.py plain='^[A-Za-z0-9_][A-Za-z0-9_./-]*\.py( [A-Za-z0-9_./=:,+-]+)*$'
+  local -a checks=() argv=()
   VBASE=
   $G fetch -q origin main "pull/$N/head" 2>/dev/null || { echo "#$N fetch failed: stop"; return 1; }
   wt=$(mktemp -d /var/tmp/nas-land-$N-XXXXXX 2>/dev/null) || { echo "#$N no temporary directory for the validation worktree: stop"; return 1; }
@@ -356,13 +453,31 @@ merge_validate() {
   fi
   err=$(mktemp "${TMPDIR:-/tmp}/nas-validate-XXXXXX" 2>/dev/null) || err=/dev/null
   (cd "$wt" 2>/dev/null && python3 -E -s -B scripts/validate.py >"$err" 2>&1); rc=$?
+  if [ "$rc" = 0 ] && [ -f "$wt/.github/workflows/validate.yml" ]; then
+    mapfile -t checks < <(shard0_checks "$wt/.github/workflows/validate.yml" 2>/dev/null)
+    [ "${#checks[@]}" -gt 0 ] || { stop="no shard-0 currency check could be read from the merge's validate.yml"; rc=1; }
+    for chk in "${checks[@]}"; do  # every check is judged before the first one runs
+      [[ $chk =~ $plain ]] && [[ ${chk%% *} != *..* ]] && continue
+      stop="a shard-0 currency check of the merge's validate.yml is not one this script can run as written (its text is not printed)"; rc=1; break
+    done
+    [ -n "$stop" ] || for chk in "${checks[@]}"; do
+      what="the currency check $chk"
+      read -r -a argv <<< "$chk"
+      (cd "$wt" 2>/dev/null && python3 -E -s -B "${argv[@]}" >"$err" 2>&1); rc=$?
+      [ "$rc" = 0 ] || break
+    done
+  fi
   git -C "$wt" merge --abort >/dev/null 2>&1; $G worktree remove --force "$wt" >/dev/null 2>&1
+  if [ -n "$stop" ]; then
+    [ "$err" = /dev/null ] || rm -f -- "$err"
+    echo "#$N $stop: stop"; return 1
+  fi
   if [ "$rc" != 0 ]; then
-    [ "$err" = /dev/null ] && { echo "#$N validate.py on the merge with current main exited $rc; its output could not be kept, and is not echoed: stop"; return 1; }
-    echo "#$N validate.py on the merge with current main exited $rc; its output is kept only in local file ${err##*/} in the temp directory (0600), never echoed: stop"; return 1
+    [ "$err" = /dev/null ] && { echo "#$N $what on the merge with current main exited $rc; its output could not be kept, and is not echoed: stop"; return 1; }
+    echo "#$N $what on the merge with current main exited $rc; its output is kept only in local file ${err##*/} in the temp directory (0600), never echoed: stop"; return 1
   fi
   [ "$err" = /dev/null ] || rm -f -- "$err"
-  echo "#$N the merge onto current main validates (rc 0)"; return 0
+  echo "#$N the merge onto current main validates (rc 0: validate.py and the ${#checks[@]} shard-0 currency check(s) of its validate.yml)"; return 0
 }
 # #975 round 4 (the CC's micro at 761810d7: each gate could change between its last read and the merge, and each round-3 fix left the next
 # gap): after every slow step, final_gate reads every gate again, fast reads only and in this order, and nothing but the merge follows it:
@@ -439,7 +554,7 @@ for v in 1 2 3; do
 done
 ae=$(lg_author_email "$R") || { echo "#$N cannot form the no-reply author address (correction #148): stop, nothing merged"; exit 11; }
 final_gate "$cur"
-out=$(gh pr merge "$N" -R $R --squash --match-head-commit "$cur" -A "$ae" 2>&1) || { cls=$(printf '%s' "$out" | grep -o -i -E 'not mergeable|head branch was modified|required status check|review|draft|merge conflict|protected branch|rate limit|authentication|not found' | head -1 | tr 'A-Z ' 'a-z_'); mf=$(lg_keep merge-fail "$out") && kept="gh output kept only in local file $mf in the temp directory (0600), never echoed" || kept="gh output could not be kept, and is not echoed"; echo "#$N merge failed (class: ${cls:-other}); $kept (#975 P2-2)"; exit 7; }
+out=$(gh pr merge "$N" -R $R --squash --match-head-commit "$cur" -A "$ae" ${SB:+--body-file "$SB"} 2>&1) || { cls=$(printf '%s' "$out" | grep -o -i -E 'not mergeable|head branch was modified|required status check|review|draft|merge conflict|protected branch|rate limit|authentication|not found' | head -1 | tr 'A-Z ' 'a-z_'); mf=$(lg_keep merge-fail "$out") && kept="gh output kept only in local file $mf in the temp directory (0600), never echoed" || kept="gh output could not be kept, and is not echoed"; echo "#$N merge failed (class: ${cls:-other}); $kept (#975 P2-2)"; exit 7; }
 sleep 4
 echo "#$N $(gh pr view "$N" -R $R --json state,mergeCommit,mergedAt --jq '"\(.state) \(.mergeCommit.oid) \(.mergedAt)"' 2>/dev/null) (CI $ci ok)"
 lg_author_check "$R" "$N" "$ae" || exit 12

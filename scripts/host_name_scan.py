@@ -19,6 +19,7 @@ from pathlib import Path
 
 
 OVERRIDE = "NATIVE_AGENT_HOST_NAMES_JSON"
+PUBLIC_HOSTNAME = "NATIVE_AGENT_PUBLIC_HOSTNAME"
 PROFILE_ROOT = Path("/mnt/c/Users")
 PIN = "1.9.0"
 PUBLICATION_ENTRY_LIMIT = 25000  # Betterleaks@81aff7a6 sources/common.go:20; short reads are allowed.
@@ -64,7 +65,13 @@ def host_names(root: Path) -> tuple[str, ...]:
         names = [identity.stdout.strip()]
         # WSL can expose its public distro/project label as the Linux hostname.
         # Exclude that hostname source only; coincident private sources remain.
-        if hostname.stdout.strip().casefold() != os.environ.get("WSL_DISTRO_NAME", "").casefold():
+        # PUBLIC_HOSTNAME=1 excludes it the same way on any host: the landing
+        # scripts set it for their squash-body scan, where the host's own name
+        # is a warning and never a refusal (the CC's ruling of 2026-10-12, #1027).
+        # A Windows computer name spelled as the hostname is that same name.
+        public_hostname = os.environ.get(PUBLIC_HOSTNAME) == "1"
+        if not public_hostname and \
+                hostname.stdout.strip().casefold() != os.environ.get("WSL_DISTRO_NAME", "").casefold():
             names.append(hostname.stdout.strip())
         windows = shutil.which("powershell.exe")
         if windows is None and "WSL_DISTRO_NAME" in os.environ:
@@ -90,7 +97,10 @@ def host_names(root: Path) -> tuple[str, ...]:
                 if not isinstance(windows_profiles, list) or \
                         any(not isinstance(name, str) for name in windows_profiles):
                     raise ValueError
-                names.append(result["computer"])
+                computer = result["computer"]
+                if not (public_hostname and isinstance(computer, str)
+                        and computer.casefold() == hostname.stdout.strip().casefold()):
+                    names.append(computer)
             except (ValueError, TypeError, KeyError):
                 raise HostNameScanError("host-name source unavailable") from None
         elif "WSL_DISTRO_NAME" in os.environ:

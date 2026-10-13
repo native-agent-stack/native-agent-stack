@@ -8,7 +8,11 @@ scanner source is `betterleaks/betterleaks` at
 is absent, the native Windows `Win32_UserProfile` source supplies profile names.
 If the Linux hostname equals `WSL_DISTRO_NAME` ignoring case, that public distro identifier is
 excluded from the hostname source only; coincident private identity, profile and
-email sources remain. Windows source commands request UTF-8 console output and
+email sources remain. `NATIVE_AGENT_PUBLIC_HOSTNAME=1` excludes the hostname source in the
+same way on any host, and a Windows computer name of the same spelling with it; only the
+CC's landing scripts set it, for their squash-body scan, where the host's own name is a
+warning and never a refusal (the CC's ruling of 2026-10-12, #1027 round 3). Windows
+source commands request UTF-8 console output and
 have a 30-second subprocess timeout. Email values without `@` remain private
 literal sources.
 GitHub's documented `users.noreply.github.com` identities are public commit

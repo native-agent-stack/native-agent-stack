@@ -18903,8 +18903,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-host-name-scan.md",
-      "sha256": "d2f67df8d99a136ec14594a2979a4468296ee0073f3184a4240d00b58eb14066",
-      "bytes": 16996
+      "sha256": "9b9579a73c5c9c1fb286cb09a42216b473c653babcf38791edddde4e2dc0887e",
+      "bytes": 17318
     },
     {
       "path": "docs/decisions/2026-10-09-mcp-surfaces-trials.md",
@@ -61408,8 +61408,8 @@
     },
     {
       "path": "scripts/host_name_scan.py",
-      "sha256": "a09a351de8fcd334938c7dd3f938e01b4e54cfd535c4f965e8ebe8b96f2c24ec",
-      "bytes": 21365
+      "sha256": "b1db0f8e54bc79be26277ba1d226c4761cdce27e09dc6d1e9042fedc658b9d89",
+      "bytes": 22036
     },
     {
       "path": "scripts/host_receipts.py",
@@ -62488,8 +62488,8 @@
     },
     {
       "path": "tests/test_host_name_scan.py",
-      "sha256": "0dbe4b3dd42e9a6c5b3dc53111fa9fda0a960d0ca723fed9d331d6394c2488f8",
-      "bytes": 27564
+      "sha256": "727bfdda27956319d49835c21ea81becd0ea64d5b6afc1ff839c5a1a208d56bc",
+      "bytes": 30935
     },
     {
       "path": "tests/test_host_receipts.py",
@@ -62558,8 +62558,8 @@
     },
     {
       "path": "tests/test_landing_scripts.py",
-      "sha256": "721f53ca409dd56cea5556bf992a5e027b4ee80e1b8c1f4ebd9fed330d6a8d90",
-      "bytes": 216127
+      "sha256": "bbf7c6804dcd70fc2bc1cf37b1f552b86d3317050f60bc37fe15ff172d984ebf",
+      "bytes": 319936
     },
     {
       "path": "tests/test_landscape.py",
@@ -63708,8 +63708,8 @@
     },
     {
       "path": "tools/landing/README.md",
-      "sha256": "a7228491c0bf156da7fd6f5f3919c56daf8721d0d71d233f035ce55cec456acb",
-      "bytes": 66181
+      "sha256": "ccc1873fa86003ccd09abd59b1242392e1f14773dde7f449f1fb0e5ea24cff43",
+      "bytes": 118939
     },
     {
       "path": "tools/landing/codex_gate.py",
@@ -63718,13 +63718,18 @@
     },
     {
       "path": "tools/landing/nas_land.sh",
-      "sha256": "d46729d6628f9d4f5e636bd1c7501d8cb812b612dfc86b929dc2c5a18032b727",
-      "bytes": 38779
+      "sha256": "e96c14a94a2f45823dd1b8901719f0636b82159519fb9782fd2404566cfc4e0a",
+      "bytes": 48545
+    },
+    {
+      "path": "tools/landing/squash_body_scan.py",
+      "sha256": "3f2e6577824bc6de9219dacfc053fb42591290fd66e9b06ac96f966b7d1bdd1a",
+      "bytes": 25429
     },
     {
       "path": "tools/landing/uet_land.sh",
-      "sha256": "b479987f7be4f1bfb50d80f96cd851b95496ceb92d1117e8bf01aec70d4f5fb6",
-      "bytes": 32586
+      "sha256": "d0626aa2177be3994b2b815e24979156a4aa2c0cd6cb290bc5acb1927086810a",
+      "bytes": 38643
     },
     {
       "path": "tools/local-pages/README.md",
