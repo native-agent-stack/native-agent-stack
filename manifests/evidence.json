@@ -5122,8 +5122,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "a14d8db2e433c25020d80a0ebeabfa4914f63f5c40ffb3c4dc1083c8066e0b54",
-      "bytes": 27157
+      "sha256": "fe15308e810b3e0534c6cbbda9fdf237ec7941549a9d06277ecefb8733f37349",
+      "bytes": 27298
     },
     {
       "path": ".github/workflows/dependency-review.yml",
@@ -63403,8 +63403,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "29379052d7cb2c51e33948175f28956d995f29ed74b936c29b9238d10aab70a8",
-      "bytes": 150255
+      "sha256": "ef20da705e997c8dbfe893678ee19162ca7c6a08571a2c5fe7155e1b9febdbd0",
+      "bytes": 152153
     },
     {
       "path": "tests/test_workflow_policy.py",
