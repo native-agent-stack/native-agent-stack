@@ -1,0 +1,28 @@
+{
+  "schema_version": 2,
+  "paper_lane": "B",
+  "evidence_class": "synthetic",
+  "pr": 1042,
+  "historical_source_commit": "de4e92eb59f515457d7723c8f76d6b0946382f44",
+  "native_execution": "NOT_RUN",
+  "boundary": "Isolated SYN roots and account locks; broker, credential pointer and dispatch seams intercepted. No installed unit or production state action.",
+  "historical_named_checks": [
+    {"modules": ["tests.test_paper_deployment", "tests.test_paper_deployment_guards", "tests.test_adaptive_paper_source_hashes_manifest"], "rc": 0, "tests": 73, "skips": 0},
+    {"modules": ["tests.test_paper_deployment", "tests.test_paper_deployment_guards", "tests.test_adaptive_paper_mover", "tests.test_adaptive_paper_runner"], "rc": 0, "tests": 332, "note": "Before final additional historical SYN cases; not a current correction run."}
+  ],
+  "historical_fail_first": {"tests": 40, "assertion_failures": 11, "api_shape_errors": 10, "already_passing": 19, "note": "Author-reported retained local results, not portable raw output. API errors are distinct from behavioural assertion regressions. No blanket all-fail claim."},
+  "historical_censuses": [
+    {"mode": "guards", "rc": 0, "baseline_tests": 52, "killed": 131, "survived": 0},
+    {"mode": "calls", "rc": 0, "baseline_tests": 52, "killed": 22, "survived": 0},
+    {"mode": "flat", "rc": 0, "baseline_tests": 52, "killed": 12, "survived": 0},
+    {"mode": "group", "rc": 0, "baseline_tests": 52, "killed": 1, "survived": 0},
+    {"mode": "operands", "rc": 0, "baseline_tests": 51, "killed": 94, "survived": 62, "note": "Earlier unpublished-source coverage probe, author reported. Not independently portable or certified equivalent; not current-source evidence."}
+  ],
+  "reproduce_command": "systemd-run --user --scope -p CPUWeight=idle env TMPDIR=/var/tmp PY -E -s -B -m tests.paper_deployment_guard_census --mode MODE --start 0 --count COUNT --output OUTPUT",
+  "limitations": [
+    "Private native/raw failure logs and timed census outputs remain private. This record deliberately contains no digest, truncated prefix or commitment to those bytes.",
+    "Historical counts are not evidence that the current correction has the same sensitivity. Wiring defects demonstrate that deletion sensitivity is not a universal safety proof.",
+    "Run the checked-in negative tests and census on the desired published source pin to obtain fresh results, first proving the unmodified selected baseline green.",
+    "No broker acceptance, host-unit activation, production account observation or qualification evidence is established."
+  ]
+}
