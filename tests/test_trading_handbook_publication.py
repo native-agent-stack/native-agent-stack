@@ -39,7 +39,6 @@ def publication_findings(root: Path) -> tuple[list[str], list[str]]:
     """Inspect public files and their registrations; never dereference private inputs."""
     files = handbook_files(root)
     texts = {path.relative_to(root).as_posix(): path.read_text(encoding="utf-8") for path in files}
-    labels = [relative for relative, text in texts.items() if SLOT.search(text.replace(PRIVATE_NAME, ""))]
     inventory = json.loads((root / INVENTORY).read_text())
     public_digests = {hashlib.sha256(path.read_bytes()).hexdigest() for path in files
                       if path.name != PRIVATE_NAME}
@@ -63,6 +62,7 @@ def publication_findings(root: Path) -> tuple[list[str], list[str]]:
             relative = row.get("path", "")
             if relative.startswith((DOCS + "/", ARTIFACTS + "/")):
                 texts["manifest registration for " + relative] = json.dumps(row)
+    labels = [relative for relative, text in texts.items() if SLOT.search(text.replace(PRIVATE_NAME, ""))]
     allowed = public_digests | public_pins
     unresolved = []
     for relative, text in texts.items():
@@ -101,6 +101,21 @@ class HandbookPublicationTests(unittest.TestCase):
             root = Path(temporary)
             self.fixture(root, "Policy {public}; public-page capture {capture}; provenance " + PRIVATE_NAME)
             self.assertEqual(publication_findings(root), ([], []))
+
+    def test_registered_publication_applies_the_same_privacy_boundary(self):
+        # Synthetic publication only; no private source or identity is read.
+        with tempfile.TemporaryDirectory(dir="/var/tmp") as temporary:
+            root = Path(temporary)
+            self.fixture(root, "Neutral public policy.")
+            relative = DOCS + "/account-" + chr(90).lower() + ".md"
+            (root / DOCS / "page.md").rename(root / relative)
+            raw = (root / relative).read_bytes()
+            (root / "manifests").mkdir()
+            (root / "manifests/evidence.json").write_text(json.dumps({"files": [{
+                "path": relative, "bytes": len(raw),
+                "sha256": hashlib.sha256(raw).hexdigest()}]}))
+            self.assertEqual(publication_findings(root),
+                             (["manifest registration for " + relative], []))
 
     def test_slot_labels_and_private_digest_prefixes_are_refused(self):
         # Synthetic values only; no private source file is read or hashed.
