@@ -51,13 +51,23 @@ class RoutingReadmeTests(unittest.TestCase):
         self.assertIn("Fisher two-sided p=0.008", self.record.replace("\n", " "))
 
     def test_the_readme_quotes_the_baseline_snapshot_as_the_file_holds_it(self):
+        """The values, and the label: the counts are the file's BEFORE snapshot, not the retained AFTER measurement, and the README says so (the review of the first head found that the values alone passed on the
+        README before the correction, which did not name the snapshot)."""
         baseline = json.loads(BASELINE.read_text(encoding="utf-8"))
         audit = next(row for row in baseline["skills"] if row["name"] == "security-audit")
-        self.assertIn(f"{audit['invoked']}/{audit['runs']} with {audit['invoked_in_first_turn']}/{audit['runs']} in turn one", self.readme)
+        quoted = f"{audit['invoked']}/{audit['runs']} with {audit['invoked_in_first_turn']}/{audit['runs']} in turn one"
+        self.assertIn(quoted, self.readme)
         for row in baseline["skills"]:
             if row["name"] != "security-audit":
                 self.assertEqual((row["invoked"], row["runs"], row["status"]), (3, 3, "wired"), row["name"])
         self.assertIn("six targets at 3/3", self.readme)
+        # the label: the file calls its runs BEFORE runs, the sentence that quotes the counts is about those runs, and the sentence that names the file calls its content that snapshot
+        self.assertIn("BEFORE", baseline["measurement"], "the file labels its counts as the BEFORE runs")
+        holders = [sentence for sentence in re.split(r"(?<=[.])\s+", self.readme) if quoted in sentence]
+        self.assertEqual(len(holders), 1, "one sentence of the README quotes the audit's counts")
+        self.assertIn("BEFORE runs", holders[0], "that sentence says that they are the BEFORE runs")
+        self.assertIn("six targets at 3/3", holders[0])
+        self.assertIn("`trigger-baseline.json` records the names/counts of that BEFORE snapshot", self.readme, "the file is named as the BEFORE snapshot")
 
     def test_the_vendor_suite_is_kept_as_an_optional_rerun(self):
         self.assertIn("## Optional re-run with the vendor harness", README.read_text(encoding="utf-8"))

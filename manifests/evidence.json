@@ -51338,18 +51338,23 @@
     },
     {
       "path": "evidence/artifacts/routing-readme-20261013/README.md",
-      "sha256": "61e54f718b2854c656249f702a53be7711a814ddc6ed832707930b31bf4fac87",
-      "bytes": 891
+      "sha256": "fbd50210e9104822bc251844e8810cf8ffde725593859c6258f6abbe35826065",
+      "bytes": 1384
     },
     {
       "path": "evidence/artifacts/routing-readme-20261013/receipts/fail-before.txt",
-      "sha256": "6edcc8cb626b9f8706099355159222a7a9f8d92700bcea50839b27d522b0b2ce",
-      "bytes": 1029
+      "sha256": "8b679e0d2f781fdcc09afaeaecc885adad945de20c066fdc7e2ce32e83289618",
+      "bytes": 1578
     },
     {
       "path": "evidence/artifacts/routing-readme-20261013/receipts/mutants-14.txt",
       "sha256": "85dc167a39e096d9674a8e6c654e00d626a3561c463d4d4461ae500424d598d5",
       "bytes": 1332
+    },
+    {
+      "path": "evidence/artifacts/routing-readme-20261013/receipts/mutants-round1-17.txt",
+      "sha256": "62cae99ba509b87c546d1d983aa94654423823e4d5831c412c5d3a3853a1ce05",
+      "bytes": 1874
     },
     {
       "path": "evidence/artifacts/row70-codex-binding-20261008/ci-citation-repair.json",
@@ -63723,8 +63728,8 @@
     },
     {
       "path": "tests/test_routing_readme.py",
-      "sha256": "bf4f509890567280bf9c2bebc4aecece1a718102cf45647100dccec264501d2f",
-      "bytes": 5106
+      "sha256": "c803935fe66ae440ca042472c23507bd727afb0e771868f1754065ae109f4d2b",
+      "bytes": 6222
     },
     {
       "path": "tests/test_rtk_receipt_locators.py",
