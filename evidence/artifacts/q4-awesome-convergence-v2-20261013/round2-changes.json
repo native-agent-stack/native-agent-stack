@@ -1,0 +1,266 @@
+{
+  "schema_version": 1,
+  "kind": "awesome-convergence-round2-correction",
+  "review_head": "cee8de4f",
+  "condition": "Nested image descriptions can contain links or images; the first-closing-bracket image regex incorrectly labelled those outer destinations as links.",
+  "source": {
+    "kind": "repo",
+    "repository": "https://github.com/github/cmark-gfm",
+    "pin": {
+      "identifier_id": "I01008"
+    },
+    "path": "test/spec.txt",
+    "line": 8779,
+    "additional_locators": [
+      "test/spec.txt:8806-8815",
+      "src/inlines.c:1136-1176"
+    ]
+  },
+  "correction": "Track nested image/link bracket openers and the balanced inline destination. Image-description URLs are image content; a genuine enclosing link keeps its separate destination. No parser/library replacement.",
+  "regressions": {
+    "fail_before": {
+      "tests": 2,
+      "subcase_failures": 5,
+      "exit_code": 1,
+      "native_summary": "Ran 2 tests in 0.003s; FAILED (failures=5)"
+    },
+    "pass_after": {
+      "tests": 2,
+      "exit_code": 0,
+      "native_summary": "Ran 2 tests in 0.002s; OK"
+    },
+    "coverage": [
+      "Nested link in image description",
+      "Nested image in image description",
+      "Repository URL in an image description's nested link",
+      "Escaped brackets in nested description",
+      "Genuine repository link enclosing a nested-description image"
+    ]
+  },
+  "reclassification": {
+    "documents": 328,
+    "frozen_source_digests_match": true,
+    "all_non_kind_source_row_fields_unchanged": true,
+    "kind_changes": 0,
+    "canonical_resolutions_selection_pins_and_overlap_sets_unchanged": true,
+    "new_html_render_claim": false
+  },
+  "source_occurrences": {
+    "before": 7835,
+    "after": 7835,
+    "images_before": 38,
+    "images_after": 38,
+    "eligible_before": 7693,
+    "eligible_after": 7693,
+    "unresolved_targets": 45
+  },
+  "category_counts_before": [
+    12,
+    0,
+    2,
+    2,
+    0,
+    1
+  ],
+  "category_counts_after": [
+    12,
+    0,
+    2,
+    2,
+    0,
+    1
+  ],
+  "repository_movements": [],
+  "category_results_equal_previous_head": true,
+  "before_snapshot_refs": [
+    "corpus-before-round2.json",
+    "a3-before-round2.json",
+    "SUMMARY-before-round2.md",
+    "checks-before-round2.json"
+  ],
+  "publication_correction": "Publish every >=3-membership repository in membership_results and the primary SUMMARY table, with labels possibly empty. Category results remain secondary.",
+  "membership_table": {
+    "threshold": 3,
+    "total_repositories": 44,
+    "with_labels": 16,
+    "without_labels": 28,
+    "category_results_unchanged": true,
+    "membership_counts_unchanged": true
+  },
+  "newly_visible_unlabelled_repositories": [
+    {
+      "repository": "Aider-AI/aider",
+      "distinct_list_count": 4,
+      "labels": []
+    },
+    {
+      "repository": "DeusData/codebase-memory-mcp",
+      "distinct_list_count": 3,
+      "labels": []
+    },
+    {
+      "repository": "NeoLabHQ/context-engineering-kit",
+      "distinct_list_count": 3,
+      "labels": []
+    },
+    {
+      "repository": "OpenHands/OpenHands",
+      "distinct_list_count": 4,
+      "labels": []
+    },
+    {
+      "repository": "PleasePrompto/notebooklm-skill",
+      "distinct_list_count": 3,
+      "labels": []
+    },
+    {
+      "repository": "SWE-agent/SWE-agent",
+      "distinct_list_count": 3,
+      "labels": []
+    },
+    {
+      "repository": "affaan-m/ECC",
+      "distinct_list_count": 3,
+      "labels": []
+    },
+    {
+      "repository": "anomalyco/opencode",
+      "distinct_list_count": 4,
+      "labels": []
+    },
+    {
+      "repository": "anthropics/claude-code",
+      "distinct_list_count": 3,
+      "labels": []
+    },
+    {
+      "repository": "anthropics/claude-code-action",
+      "distinct_list_count": 3,
+      "labels": []
+    },
+    {
+      "repository": "anthropics/claude-cookbooks",
+      "distinct_list_count": 3,
+      "labels": []
+    },
+    {
+      "repository": "anthropics/claude-plugins-official",
+      "distinct_list_count": 3,
+      "labels": []
+    },
+    {
+      "repository": "anthropics/skills",
+      "distinct_list_count": 4,
+      "labels": []
+    },
+    {
+      "repository": "assafelovic/gpt-researcher",
+      "distinct_list_count": 3,
+      "labels": []
+    },
+    {
+      "repository": "conorbronsdon/avoid-ai-writing",
+      "distinct_list_count": 3,
+      "labels": []
+    },
+    {
+      "repository": "getagentseal/codeburn",
+      "distinct_list_count": 3,
+      "labels": []
+    },
+    {
+      "repository": "letta-ai/letta",
+      "distinct_list_count": 4,
+      "labels": []
+    },
+    {
+      "repository": "microsoft/playwright-mcp",
+      "distinct_list_count": 3,
+      "labels": []
+    },
+    {
+      "repository": "modelcontextprotocol/servers",
+      "distinct_list_count": 3,
+      "labels": []
+    },
+    {
+      "repository": "obra/superpowers",
+      "distinct_list_count": 5,
+      "labels": []
+    },
+    {
+      "repository": "oomol-lab/open-connector",
+      "distinct_list_count": 3,
+      "labels": []
+    },
+    {
+      "repository": "openai/codex",
+      "distinct_list_count": 3,
+      "labels": []
+    },
+    {
+      "repository": "shareAI-lab/learn-claude-code",
+      "distinct_list_count": 3,
+      "labels": []
+    },
+    {
+      "repository": "trailofbits/skills",
+      "distinct_list_count": 3,
+      "labels": []
+    },
+    {
+      "repository": "upstash/context7",
+      "distinct_list_count": 3,
+      "labels": []
+    },
+    {
+      "repository": "vshulcz/deja-vu",
+      "distinct_list_count": 3,
+      "labels": []
+    },
+    {
+      "repository": "wondelai/skills",
+      "distinct_list_count": 3,
+      "labels": []
+    },
+    {
+      "repository": "ykdojo/claude-code-tips",
+      "distinct_list_count": 3,
+      "labels": []
+    }
+  ],
+  "visibility_restored_after_round1": [
+    "Aider-AI/aider",
+    "anomalyco/opencode",
+    "letta-ai/letta",
+    "anthropics/claude-code",
+    "openai/codex",
+    "anthropics/claude-code-action",
+    "anthropics/claude-plugins-official",
+    "modelcontextprotocol/servers",
+    "obra/superpowers",
+    "vshulcz/deja-vu"
+  ],
+  "membership_publication_regression": {
+    "fail_before": {
+      "tests": 1,
+      "failures": 1,
+      "exit_code": 1,
+      "native_summary": "Ran 1 test in 0.001s; FAILED (failures=1)"
+    },
+    "pass_after": {
+      "tests": 1,
+      "exit_code": 0,
+      "native_summary": "Ran 1 test in 0.001s; OK"
+    }
+  },
+  "independent_replay": "All 44 primary membership rows, optional labels, global membership counts, full membership lists and category-support counts agree with direct corpus/API dictionary/set replay. Every threshold repository appears in the summary.",
+  "proxy_disclosures": [
+    "VoltAgent/voltagent's three-list count includes VoltAgent-owned list banner links; no owner-independence claim or new same-owner vote rule.",
+    "earendil-works/pi's sole coding-agent label comes from a nearest WenyuChiou cookbook chapter heading; no capability/endorsement claim."
+  ],
+  "mapping_snapshot_refs": [
+    "mapping-before-round1.json",
+    "mapping-before-round2.json"
+  ]
+}

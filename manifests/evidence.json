@@ -19008,8 +19008,8 @@
     },
     {
       "path": "docs/decisions/2026-10-13-awesome-list-a3-evidence.md",
-      "sha256": "32a394689c58ed5619dca99e53152545b944c722e2c4cdbac56b17599370e512",
-      "bytes": 21952
+      "sha256": "7e2e920652977a950beb122208602ddf77410ac4f4dc24746f5a92d7e924f452",
+      "bytes": 26935
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -50792,9 +50792,14 @@
       "bytes": 4950
     },
     {
-      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/SUMMARY.md",
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/SUMMARY-before-round2.md",
       "sha256": "34a01b92f2488402d76c1ffb29ac57a9e7bd8ea0365c111cfbbb1cd49baaffbf",
       "bytes": 3659
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/SUMMARY.md",
+      "sha256": "060ab4db9a512f91bcb77d1b1c62b4e37a6a3f120ad0aa2bc8f4f4ddb7bfa300",
+      "bytes": 7848
     },
     {
       "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/a3-before-round1.json",
@@ -50802,9 +50807,14 @@
       "bytes": 5502378
     },
     {
-      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/a3.json",
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/a3-before-round2.json",
       "sha256": "1fff857f9136fa9258743f75ff18521ff779fba7d1b0b0971838b5eae5fe966e",
       "bytes": 5383940
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/a3.json",
+      "sha256": "e3314c451e0d1569fe21a438d6e7b3d0c0094d322b840f3aa5fd776e14cee433",
+      "bytes": 5582007
     },
     {
       "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/attempts.json",
@@ -50822,9 +50832,14 @@
       "bytes": 2481
     },
     {
-      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/checks.json",
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/checks-before-round2.json",
       "sha256": "96582ddc17e9bc5c1958bae09b0487c994afea1832f1d087fbc2482187dee9ed",
       "bytes": 3853
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/checks.json",
+      "sha256": "a2d0de7c710bebb25b5d6abcee5c10cb6051ef922e712a5727ac4136b5fb8731",
+      "bytes": 4583
     },
     {
       "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/corpus-before-round1.json",
@@ -50832,14 +50847,29 @@
       "bytes": 5149429
     },
     {
-      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/corpus.json",
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/corpus-before-round2.json",
       "sha256": "35cf2a1bb5005cdf485d2fb6b4530b729b7d5d2b94108ab60609712dba200d0f",
       "bytes": 5167119
     },
     {
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/corpus.json",
+      "sha256": "88488f52b8db82068ce209865e49111cadfb9d56e066c4d0558c1c9f7eff146a",
+      "bytes": 5167119
+    },
+    {
       "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/identifiers.json",
-      "sha256": "7b67de22dcedda7ace4f1cf773b8725d7d12b5e1a986cc9477f1e4870b26b9a2",
-      "bytes": 88369
+      "sha256": "3c1e109f5e70995eac25d987f97ec641dc4e02ac6d04e32beb894bf535004280",
+      "bytes": 88537
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/mapping-before-round1.json",
+      "sha256": "b87b8c9e6402a7e96ffbdec8df5384ad8e7246cf0cc906dac0d63b60b08d5160",
+      "bytes": 5390
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/mapping-before-round2.json",
+      "sha256": "f93c3b952154a7ecef8f8f6d4705d8ca15cf938cc0f78ccd60a60efda66daf39",
+      "bytes": 5889
     },
     {
       "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/mapping.json",
@@ -50875,6 +50905,11 @@
       "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/round1-changes.json",
       "sha256": "1a5a07bf7a8ce92ee5e43c3b8c35d5f306de3c0c84399c9ae4316180ab955fba",
       "bytes": 3652
+    },
+    {
+      "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/round2-changes.json",
+      "sha256": "15792f02aeedda490cbb7df5c98dedbf81d08464d02f06f7066c56b3f01a7c17",
+      "bytes": 7107
     },
     {
       "path": "evidence/artifacts/q4-awesome-convergence-v2-20261013/selection.json",
@@ -61463,8 +61498,8 @@
     },
     {
       "path": "scripts/awesome_convergence.py",
-      "sha256": "76f12f5b34be456d3a86c507cab1ddd74f6b3df374ddb145a1b56e1266846239",
-      "bytes": 65131
+      "sha256": "033d7fa39e74d3c73b143bc867b2d765c5b2c6195d3aa5c0af231d592d35c4bd",
+      "bytes": 69342
     },
     {
       "path": "scripts/build_ecosystem.py",
@@ -62218,8 +62253,8 @@
     },
     {
       "path": "tests/test_awesome_convergence.py",
-      "sha256": "d6beeac1f18c50953c9ec344fca5f66faabf2d0255e43f2a4e9aa4f03247cc8f",
-      "bytes": 22875
+      "sha256": "b1c05e849bb0e8ae5f8a2da962cbe4927eff21fc9ec94fb28acc034bd6301ff9",
+      "bytes": 25313
     },
     {
       "path": "tests/test_backtesting_gap_burndown.py",

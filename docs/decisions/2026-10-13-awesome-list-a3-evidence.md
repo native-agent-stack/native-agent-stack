@@ -8,6 +8,59 @@ selection and diagnostic narrative below describe v1 where explicitly noted.
 
 ## Round-1 correction after both full reads
 
+Round 1's single-level image classifier was incomplete for nested image
+descriptions. Round 2's prepared repair follows
+github/cmark-gfm@587a12bb54d95ac37241377e6ddc93ea0e45439b
+(0.29.0.gfm.13), `test/spec.txt:8779-8787,8806-8815` and
+`src/inlines.c:1136-1176`. Image descriptions may contain links or images;
+those destinations are alt content, while a genuine outer link around an
+image retains its separate destination. A bracket stack tracks the matching
+image opener and balanced destination instead of treating the first closing
+bracket as the end of the image description. Two upstream-derived controls
+fail against the reviewed round-1 code (five failing subcases), then pass
+after the repair. The final round-2 correction combines both families' delta
+findings under the CC's 2026-10-13T10:54Z release.
+
+The prepared repair re-read all 328 frozen raw documents and verified every
+original digest and every non-kind row field. No real row changes kind under
+the nested-description repair. All category results, memberships and support
+counts remain exactly equal to round 1: 12/0/2/2/0/1, with 7,835 source rows,
+38 images and 7,693 eligible rows. No membership or label moves. Before-round2
+snapshots preserve the reviewed corpus/A3/summary/checks; both historical
+mapping snapshots are now committed so their A3 mapping digests resolve.
+
+The CC's delta also found that the label-only summary hid repositories with
+three memberships but no label. The primary `membership_results` and summary
+now publish **all 44 repositories**, with membership counts and a labels
+column that may be empty. Sixteen have at least one label and 28 have none.
+The category view remains secondary. A three-membership/unlabelled control
+fails against the reviewed counter's publication, then passes with the full
+membership table. No threshold, vote, row eligibility or category mapping
+changes in this display correction. All 44 repositories and every support
+count agree with independent dictionary/set replay from the corpus.
+
+The ten repositories that lost all published labels in round 1 are visible
+again: Aider-AI/aider (4), anomalyco/opencode (4), letta-ai/letta (4),
+anthropics/claude-code (3), openai/codex (3), anthropics/claude-code-action (3),
+anthropics/claude-plugins-official (3), modelcontextprotocol/servers (3),
+obra/superpowers (5) and vshulcz/deja-vu (3). Eighteen additional unlabelled
+repositories omitted by the earlier label-only tables are also visible;
+`round2-changes.json` enumerates all 28 with counts. None gains a category
+label merely by appearing in the primary membership table.
+
+Community-proxy boundaries remain: VoltAgent/voltagent's three-list standing
+includes banner links from VoltAgent-owned lists, and earendil-works/pi's
+sole coding-agent label comes from the nearest heading of a WenyuChiou
+cookbook chapter. Neither constitutes independent endorsement or capability
+verification. No same-owner or banner-exclusion vote rule is silently added.
+
+The inventory correction's exact native sources are
+native-agent-stack/native-agent-stack@c63c83a822f2687c3e7aed2d3b3ede0413119c9b,
+`scripts/local_pages_policy_grants.py:46-66` and
+`tests/test_local_pages_policy_grants.py:99-124`. The nearest-section change
+implements the dated CC full-read correction relayed 2026-10-13T06:56Z,
+finding P2-2. That is a recorded category policy, not a GFM capability claim.
+
 **A3 counts list MEMBERSHIP, not category-specific endorsement.** The
 three-list threshold uses eligible memberships across any section. Categories
 are nearest-section labels with a separate mapped-supporting-list count;
@@ -208,6 +261,8 @@ fail-before control. `OVERLAP.md` retains every list's before/after overlap.
 
 | Mistake | Primary evidence and correction | Regression |
 | --- | --- | --- |
+| Omitting unlabelled repositories from a membership-defined evidence table | The CC's 2026-10-13T10:54Z N1 correction requires every threshold membership in the primary summary, labels optional; preserve categories as a secondary view | Unlabelled-three-list publication control fails against cee8de4f and passes with the complete membership table |
+| Ending an image description at its first closing bracket | github/cmark-gfm@587a12bb54d95ac37241377e6ddc93ea0e45439b test/spec.txt:8779-8787,8806-8815 and src/inlines.c:1136-1176 permit nested links/images; track the matching image opener and destination | Upstream-derived nested-description third-vote and genuine outer-link controls fail at round 1 and pass after repair |
 | Failing to grant a new tracked top-level script its exact Architecture inventory entry | The native inventory selector selects the counter; add its exact policy entry and refresh the policy binding | Two existing exact-set tests fail before; the full policy module passes with the grant |
 | Inheriting categories from a tutorial/chapter ancestor | Match the nearest section heading only; retain ancestors for explicit domain context | Tutorial-path fixture fails against the reviewed counter and passes after correction |
 | Claiming image/self-link protection without testing raw parsing | Label raw image sources and exclude canonical self-links, including old-name redirects | Raw image and renamed-self third-vote fixtures fail before and pass after correction |
@@ -305,6 +360,9 @@ read/rule version rather than tuning the frozen corpus to yield more hits.
 These counts supply weak A3 evidence and alone cannot select a default.
 
 ## SOTA sources
+
+- [github/cmark-gfm@587a12bb54d95ac37241377e6ddc93ea0e45439b, specification](https://github.com/github/cmark-gfm/blob/587a12bb54d95ac37241377e6ddc93ea0e45439b/test/spec.txt#L8779), nested image descriptions and examples at 8806/8813; [bracket handling](https://github.com/github/cmark-gfm/blob/587a12bb54d95ac37241377e6ddc93ea0e45439b/src/inlines.c#L1136), image opener semantics. Local pinned mirror read; no replacement parser or library adoption.
+- [Native exact inventory selector at the PR base](https://github.com/native-agent-stack/native-agent-stack/blob/c63c83a822f2687c3e7aed2d3b3ede0413119c9b/scripts/local_pages_policy_grants.py#L46) and [exact-set regression guard](https://github.com/native-agent-stack/native-agent-stack/blob/c63c83a822f2687c3e7aed2d3b3ede0413119c9b/tests/test_local_pages_policy_grants.py#L99), exact Architecture grant correction.
 
 - [cli/cli@fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd](https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/pkg/cmd/api/api.go#L373), installed gh 2.102.0: native API request and GraphQL query interface.
 - [subev/awesome-stars@2a86cfbbc9a8eb8de49135c1ddbee4a9e3064bdf](https://github.com/subev/awesome-stars/blob/2a86cfbbc9a8eb8de49135c1ddbee4a9e3064bdf/app/lib/graphql.server.ts#L97), `buildRepoQuery`, requested-name mapping, NOT_FOUND handling and 40-item batches; [crawl.ts:440](https://github.com/subev/awesome-stars/blob/2a86cfbbc9a8eb8de49135c1ddbee4a9e3064bdf/scripts/crawl.ts#L440), canonical membership per list.

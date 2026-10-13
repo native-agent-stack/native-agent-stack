@@ -137,6 +137,25 @@ class AwesomeConvergenceTests(unittest.TestCase):
         self.corpus["lists"][0]["documents"][0].update({"sections": parsed["sections"], "links": parsed["links"]})
         self.assertEqual(counter.count_rows(counter.mapped_rows(self.corpus, self.mapping))["agent-memory"], [])
 
+    def test_gfm_nested_image_description_cannot_supply_third_list_vote(self):
+        # github/cmark-gfm@587a12bb test/spec.txt:8813-8815: descriptions
+        # may contain links, but the resulting node is one image, no anchor.
+        self.mapping["method_version"] = 2
+        for description in ['foo [bar](/url)', 'foo ![bar](/url)',
+                            'foo [bar](https://github.com/old/memory)',
+                            'foo \\[literal\\] [bar](/url)']:
+            with self.subTest(description=description):
+                parsed = counter.parse_raw('# AI Agents\n## Agent Memory\n![' + description + '](https://github.com/renamed/memory/logo.svg)\n')
+                self.corpus["lists"][0]["documents"][0].update({"sections": parsed["sections"], "links": parsed["links"]})
+                self.assertTrue(parsed["links"])
+                self.assertTrue(all(row["kind"] == "image" for row in parsed["links"]))
+                self.assertFalse(counter.count_rows(counter.mapped_rows(self.corpus, self.mapping))["agent-memory"])
+
+    def test_gfm_linked_nested_image_preserves_outer_repository_link(self):
+        parsed = counter.parse_raw('[![foo [bar](/url)](https://github.com/org/image/logo.svg)](https://github.com/org/project)\n')
+        self.assertEqual([(r["requested_repository"], r["kind"]) for r in parsed["links"]],
+                         [("org/image", "image"), ("org/project", "link")])
+
     def test_canonical_self_link_cannot_supply_third_list_vote(self):
         self.mapping["method_version"] = 2
         self.corpus["lists"][0]["repository"] = "renamed/memory"
@@ -178,6 +197,21 @@ class AwesomeConvergenceTests(unittest.TestCase):
         self.mapping["rules"] = []
         self.assertTrue(all(not r["mapping_categories"] for r in counter.mapped_rows(self.corpus, self.mapping)))
         self.assertTrue(all(not v for v in counter.count_rows(counter.mapped_rows(self.corpus, self.mapping)).values()))
+
+    def test_unlabelled_three_list_membership_is_published_in_summary(self):
+        self.mapping.update({"method_version": 2, "rules": []})
+        self.corpus.update({"kind": "awesome-list-raw-corpus", "status": "complete",
+                            "selection_version": 2, "extension_shortfalls": []})
+        for listing in self.corpus["lists"]:
+            listing["unused_reference_definitions"] = {"count": 0, "definitions": []}
+        artifact = counter.build(self.corpus, self.mapping, "corpus.json", "mapping.json")
+        self.assertIn("renamed/memory", counter.summary(artifact))
+        self.assertEqual(len(artifact["membership_results"]), 1)
+        result = artifact["membership_results"][0]
+        self.assertEqual((result["repository"], result["distinct_list_count"], result["labels"]),
+                         ("renamed/memory", 3, []))
+        self.assertEqual(len(result["memberships"]), 3)
+        self.assertTrue(all(not rows for rows in artifact["category_results"].values()))
 
     def test_render_uses_get_html_media_type_and_exact_pin(self):
         response = subprocess.CompletedProcess([], 0, stdout='<h1>AI Agents</h1>', stderr='')

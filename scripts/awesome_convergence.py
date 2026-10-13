@@ -132,13 +132,74 @@ def strip_comments_and_fences(text: str) -> str:
     return "".join(result)
 
 
+def raw_image_spans(markup: str) -> list[tuple[int, int]]:
+    """Locate image nodes with nested descriptions, keeping source offsets.
+
+    github/cmark-gfm@587a12bb54d95ac37241377e6ddc93ea0e45439b:
+    test/spec.txt:8779-8787,8806-8815; src/inlines.c:1136-1176.
+    A bracket stack distinguishes an image opener from inner link openers.
+    URLs anywhere in image descriptions are alt content, never anchor votes;
+    an outer link around an image retains its separate destination.
+    """
+    spans = [match.span() for match in re.finditer(r"<img\b[^>]*>", markup, re.I)]
+    brackets = []
+    index = 0
+    while index < len(markup):
+        char = markup[index]
+        if char == "\\":
+            index += 2
+            continue
+        if char == "[":
+            image = index > 0 and markup[index - 1] == "!"
+            # An escaped exclamation mark is literal text before a link.
+            if image:
+                slashes = 0
+                cursor = index - 2
+                while cursor >= 0 and markup[cursor] == "\\":
+                    slashes += 1
+                    cursor -= 1
+                image = slashes % 2 == 0
+            brackets.append((index - 1 if image else index, image))
+        elif char == "]" and brackets:
+            start, image = brackets.pop()
+            if index + 1 < len(markup) and markup[index + 1] == "(":
+                cursor, depth, quote, angle = index + 2, 1, None, False
+                while cursor < len(markup):
+                    token = markup[cursor]
+                    if token == "\\":
+                        cursor += 2
+                        continue
+                    if quote:
+                        if token == quote:
+                            quote = None
+                    elif angle:
+                        if token == ">":
+                            angle = False
+                    elif token == "<":
+                        angle = True
+                    elif token in {'"', "'"} and markup[cursor - 1].isspace():
+                        quote = token
+                    elif token == "(":
+                        depth += 1
+                    elif token == ")":
+                        depth -= 1
+                        if depth == 0:
+                            if image:
+                                spans.append((start, cursor + 1))
+                            index = cursor
+                            break
+                    cursor += 1
+        index += 1
+    return spans
+
+
 def parse_raw(text: str) -> dict:
     cleaned = strip_comments_and_fences(text)
     suppressed, unused = visible_reference_definitions(cleaned)
     # Image locations retain repository identity for extraction auditing, but
     # cannot cast a list-membership vote. Keep offsets stable when hiding code.
     markup = re.sub(r"(`+).*?\1", lambda m: " " * len(m.group()), cleaned, flags=re.S)
-    images = [m.span() for m in re.finditer(r"(?<!\\)!\[[^\]\n]*\]\([ \t]*<?[^\s)>]+[^\n)]*\)|<img\b[^>]*>", markup, re.I)]
+    images = raw_image_spans(markup)
     source_lines = cleaned.splitlines(keepends=True)
     lines = cleaned.splitlines()
     heading_at = {}
@@ -354,7 +415,7 @@ def read_json(path: Path) -> dict:
     refs = publication_references(path.parent)
     if refs and path.name not in {"identifiers.json", "sources.json"}:
         value = refs.unpack(value)
-        if path.name in {"a3.json", "a3-before-round1.json"}:
+        if path.name in {"a3.json", "a3-before-round1.json", "a3-before-round2.json"}:
             value = refs.restore_count(value)
     return value
 
@@ -363,7 +424,7 @@ def write_json(path: Path, value: dict) -> None:
     refs = publication_references(path.parent)
     if refs and path.name not in {"identifiers.json", "sources.json"}:
         approved = set(refs.by_value) | metadata_identifiers(value)
-        if path.name in {"a3.json", "a3-before-round1.json"}:
+        if path.name in {"a3.json", "a3-before-round1.json", "a3-before-round2.json"}:
             value = refs.count_references(value)
         value = refs.pack(value, approved)
         if LONG_HEX.search(json.dumps(value)):
@@ -966,20 +1027,20 @@ def mapped_rows(corpus: dict, mapping: dict) -> list[dict]:
     return rows
 
 
-def count_rows(rows: list[dict], threshold: int = 3) -> dict:
+def count_memberships(rows: list[dict], threshold: int = 3) -> list[dict]:
     if threshold < 1:
         raise ValueError("positive threshold required")
     grouped = defaultdict(lambda: defaultdict(list))
     for row in rows:
         if row["eligible"]:
             grouped[row["canonical_repository"]][row["list_repository"]].append(row)
-    result = {category: [] for category in CATEGORIES}
+    result = []
     for repository, memberships in sorted(grouped.items()):
         if len(memberships) >= threshold:
             categories = sorted({c for links in memberships.values() for r in links for c in r["mapping_categories"]})
-            for category in categories:
-                result[category].append({"repository": repository, "distinct_list_count": len(memberships),
-                "category_support_distinct_list_count": sum(any(category in r["mapping_categories"] for r in links) for links in memberships.values()),
+            result.append({"repository": repository, "distinct_list_count": len(memberships),
+                "labels": categories,
+                "category_support_distinct_list_counts": {category: sum(any(category in r["mapping_categories"] for r in links) for links in memberships.values()) for category in categories},
                 "memberships": [{"list_repository": name, "list_commit": links[0]["list_commit"],
                     "list_url": links[0]["list_url"],
                     "headings": [{"file": r["file"], "section_heading": r["section_heading"],
@@ -988,6 +1049,18 @@ def count_rows(rows: list[dict], threshold: int = 3) -> dict:
                         "section": r.get("section", r["section_heading"]), "line": r.get("line"),
                         "url": r["url"], "occurrence": r["occurrence"]} for r in links]}
                     for name, links in sorted(memberships.items())]})
+    return result
+
+
+def count_rows(rows: list[dict], threshold: int = 3) -> dict:
+    """Secondary labelled view; unlabelled memberships remain in the primary view."""
+    result = {category: [] for category in CATEGORIES}
+    for member in count_memberships(rows, threshold):
+        for category in member["labels"]:
+            result[category].append({"repository": member["repository"],
+                                    "distinct_list_count": member["distinct_list_count"],
+                                    "category_support_distinct_list_count": member["category_support_distinct_list_counts"][category],
+                                    "memberships": member["memberships"]})
     return result
 
 
@@ -1020,6 +1093,7 @@ def build(corpus: dict, mapping: dict, corpus_ref: str, mapping_ref: str) -> dic
         artifact["count_method_version"] = mapping["method_version"]
         artifact["count_semantics"] = "Distinct-list MEMBERSHIP across any eligible section, not category-specific endorsement. Categories are nearest-section labels; category-support list counts are separate. Images and canonical self-links cannot vote."
         artifact["eligible_link_occurrences"] = sum(row["eligible"] for row in rows)
+        artifact["membership_results"] = count_memberships(rows)
     return artifact
 
 
@@ -1035,6 +1109,14 @@ def summary(artifact: dict) -> str:
     if artifact.get("count_method_version", 1) >= 2:
         lines[4] = "A3 counts distinct-list MEMBERSHIP across eligible sections, not category-specific endorsement. A nearest-section label assigns a category; the number of mapped supporting lists is reported separately. Image URLs and canonical self-links cannot vote."
         lines[7] = "| Nearest-section category label | Repositories present in at least three lists across any eligible section |"
+    if "membership_results" in artifact:
+        primary = [f"All {len(artifact['membership_results'])} repositories meeting the membership threshold are listed below. A missing label does not remove a repository's memberships.", "",
+                   "| Canonical repository | Distinct list memberships | Nearest-section labels (supporting lists) |",
+                   "| --- | ---: | --- |"]
+        for row in artifact["membership_results"]:
+            labels = ", ".join(f"{category} ({row['category_support_distinct_list_counts'][category]})" for category in row["labels"]) or "None"
+            primary.append(f"| [{row['repository']}](https://github.com/{row['repository']}) | {row['distinct_list_count']} | {labels} |")
+        lines[7:7] = primary + ["", "Secondary view by nearest-section label:", ""]
     lines += ["", "`a3.json` references lists/documents by ID; `sources.json` maps those IDs to repository/path metadata, and `identifiers.json` holds the full pins and digests without repository names. `corpus.json` retains source rows and canonical identities. The script resolves references for offline verification.", ""]
     if artifact.get("selection_version") == 2:
         lines += ["V2 supersedes the earlier broad-list selection. Nine mandatory lists are included unconditionally; extensions use specific-category description/topics eligibility and top-two star order. Short categories have no substitute.", "",
@@ -1047,14 +1129,15 @@ def summary(artifact: dict) -> str:
     return "\n".join(lines) + "\n"
 
 
-def reclassify_images(github: Github, directory: Path, workers: int) -> None:
+def reclassify_images(github: Github, directory: Path, workers: int, snapshot_round: int = 1) -> None:
     """Refine row kinds from exact pinned raw bytes; reuse canonical identities."""
     corpus = read_json(directory / "corpus.json")
-    if corpus.get("selection_version") != 2 or (directory / "corpus-before-round1.json").exists():
-        raise ValueError("round-1 reclassification requires the original v2 corpus")
-    write_json(directory / "corpus-before-round1.json", corpus)
-    write_json(directory / "a3-before-round1.json", read_json(directory / "a3.json"))
-    (directory / "SUMMARY-before-round1.md").write_bytes((directory / "SUMMARY.md").read_bytes())
+    suffix = f"before-round{snapshot_round}"
+    if snapshot_round not in {1, 2} or corpus.get("selection_version") != 2 or (directory / f"corpus-{suffix}.json").exists():
+        raise ValueError("reclassification requires an unused bounded round snapshot")
+    write_json(directory / f"corpus-{suffix}.json", corpus)
+    write_json(directory / f"a3-{suffix}.json", read_json(directory / "a3.json"))
+    (directory / f"SUMMARY-{suffix}.md").write_bytes((directory / "SUMMARY.md").read_bytes())
     tasks = [(listing, doc) for listing in corpus["lists"] for doc in listing["documents"]]
 
     def refine(task):
@@ -1085,12 +1168,13 @@ def main() -> None:
     parser.add_argument("action", choices=["select", "freeze-selection", "collect-raw", "remeasure", "canonicalize", "sanitize", "publish", "reclassify-images", "build", "check"])
     parser.add_argument("--directory", type=Path, required=True)
     parser.add_argument("--workers", type=int, default=4)
+    parser.add_argument("--snapshot-round", type=int, choices=[1, 2], default=1)
     args = parser.parse_args()
     directory = args.directory
     if not 1 <= args.workers <= 8:
         parser.error("workers must be between 1 and 8")
     if args.action == "reclassify-images":
-        reclassify_images(Github(), directory, args.workers)
+        reclassify_images(Github(), directory, args.workers, args.snapshot_round)
         return
     if args.action == "publish":
         publish_references(directory)
