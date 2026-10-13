@@ -226,14 +226,20 @@ class Rule:
     news: str
 
 
-def parse_rule(value):
+def overnight_minute(at):
+    """Monotonic wall-clock order within 20:00-04:00 ET, from the CC spec."""
+    return (at.hour * 60 + at.minute - 1200) % 1440
+
+
+def parse_rule(value, *, overnight=False):
     if type(value) is not str:
         raise ValueError("invalid_mover_rule")
     match = _RULE.fullmatch(value)
     if match is None or int(match["hh"]) > 23:
         raise ValueError("invalid_mover_rule")
     at = dtime(int(match["hh"]), int(match["mm"]))
-    if not PRE_MARKET_OPEN_ET <= at < POST_CLOSE_ET:
+    if (not 0 <= overnight_minute(at) < 480 if overnight else
+            not PRE_MARKET_OPEN_ET <= at < POST_CLOSE_ET):
         raise ValueError("invalid_mover_rule")
     volume = D(match["volume"]) * _VOLUME_SUFFIX[match["suffix"]]
     return Rule(value, at, D(match["gain"]), volume, match["news"])
@@ -621,10 +627,17 @@ def load_scan(raw, settings, *, now):
     if age > settings.max_scan_age_seconds:
         raise MoverRefusal("scan_stale")
     local = moment.astimezone(NY)
-    session_date = local.date()
+    if settings.session_scope == "overnight_only":
+        info = session_at(moment)
+        if info.kind != SessionKind.OVERNIGHT:
+            raise MoverRefusal("scan_outside_overnight_session")
+        session_date = info.session_date
+    else:
+        session_date = local.date()
     if "session_date" in data and data["session_date"] != session_date.isoformat():
         raise MoverRefusal("scan_session_date_mismatch")
-    if local.time() < settings.rule.at_et:
+    if (overnight_minute(local.time()) < overnight_minute(settings.rule.at_et)
+            if settings.session_scope == "overnight_only" else local.time() < settings.rule.at_et):
         raise MoverRefusal("scan_precedes_rule_time")
     factor, source, inputs = regime_factor(data.get("regime"))
     rows = data.get("symbols")

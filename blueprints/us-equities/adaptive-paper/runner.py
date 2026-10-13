@@ -80,6 +80,8 @@ def receipt_scope(function):
 # E4: how long entries wait at startup for the halt seed read (one halts feed request run
 # while the node connects) before the stream alone decides.
 HALT_SEED_WAIT_SECONDS = 3.0
+# Keep a cancellation's budget wait and broker I/O off the owner tick.
+OVERNIGHT_CANCEL_TIMEOUT_SECONDS = 5.0
 # Nasdaq Rule 4120(b)(4)(A)(i)c permits repeated LULD pause extensions.
 # As in transport.active_halts, only an authoritative resumption clears a seed;
 # elapsed time without one leaves the symbol halted.
@@ -947,6 +949,7 @@ class Controller:
         self._halt_seed_task = None
         self._halt_seed_deadline = 0.0
         self._overnight_cancel_pending = set()
+        self._overnight_cancel_tasks = {}
         self._overnight_handoff = None
 
     def stop_requested(self):
@@ -1064,7 +1067,7 @@ class Controller:
         self.ledger.record_order(order["client_order_id"], order["id"], order["status"], order["filled_qty"],
                                  order.get("filled_avg_price"), timestamp=order["updated_at_ns"] / 1e9,
                                  execution=execution_from_observation(order))
-        if order["status"] in ("filled", "canceled", "expired", "rejected") or order.get("event") == "cancel_rejected":
+        if order["status"] in ("filled", "canceled", "expired", "rejected") or order.get("event") == "order_cancel_rejected":
             self._overnight_cancel_pending.discard(order["client_order_id"])
         basis = (self.ledger.overnight_submission_basis(order["client_order_id"])
                  if getattr(self.port, "overnight_enabled", False) is True else None)
@@ -1143,21 +1146,41 @@ class Controller:
             force |= now >= window["flatten_at"]
             if (intent is not None and intent.side == "buy"
                     and (self.is_halted(intent.symbol) or now >= window["flatten_at"])):
-                if cid not in self._overnight_cancel_pending:
+                if cid not in self._overnight_cancel_pending and cid not in self._overnight_cancel_tasks:
                     self._overnight_cancel_pending.add(cid)
-                    try:
-                        await self.port.cancel(cid)
-                    except Exception:
-                        self._overnight_cancel_pending.discard(cid)
-                        self.events.append({"type": "overnight_cancel_refused", "client_id": cid,
-                                            "at": now})
-                    else:
-                        self.events.append({"type": "overnight_entry_cancel", "client_id": cid,
-                                            "reason": "halt" if self.is_halted(intent.symbol) else "carry_cutoff",
-                                            "at": now})
+                    reason = "halt" if self.is_halted(intent.symbol) else "carry_cutoff"
+                    self._overnight_cancel_tasks[cid] = asyncio.create_task(
+                        self._cancel_overnight_entry(cid, reason, now))
             if now >= window["day_expiry"] and self.ledger.positions():
                 self._overnight_freeze("overnight_day_expiry")
         return force
+
+    async def _cancel_overnight_entry(self, cid, reason, now):
+        try:
+            async with asyncio.timeout(OVERNIGHT_CANCEL_TIMEOUT_SECONDS):
+                await self.port.cancel(cid)
+        except asyncio.CancelledError:
+            self._overnight_cancel_pending.discard(cid)
+            raise
+        except Exception:
+            self._overnight_cancel_pending.discard(cid)
+            self.events.append({"type": "overnight_cancel_refused", "client_id": cid, "at": now})
+        else:
+            self.events.append({"type": "overnight_entry_cancel", "client_id": cid,
+                                "reason": reason, "at": now})
+        finally:
+            self._overnight_cancel_tasks.pop(cid, None)
+
+    async def stop_overnight_cancels(self):
+        """Join this controller's bounded cancellation tasks before stopping the port."""
+        tasks = list(self._overnight_cancel_tasks.items())
+        for cid, task in tasks:
+            task.cancel()
+        await asyncio.gather(*(task for cid, task in tasks), return_exceptions=True)
+        for cid, task in tasks:
+            if self._overnight_cancel_tasks.get(cid) is task:
+                self._overnight_cancel_tasks.pop(cid)
+            self._overnight_cancel_pending.discard(cid)
 
     def overnight_reprice_allowed(self, symbol, now):
         if getattr(self.port, "overnight_enabled", False) is not True:
@@ -1445,6 +1468,7 @@ class Controller:
         self._expire_seeded_halts()
         return (symbol in self.halted_symbols
                 or (getattr(self.port, "overnight_enabled", False) is True
+                    and session_at(datetime.fromtimestamp(self.clock(), timezone.utc)).kind == SessionKind.OVERNIGHT
                     and self.overnight_states.get(symbol, {}).get("overnight_halted") is True))
 
     def halt_summary(self):
@@ -2184,6 +2208,7 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
         # nested `finally` guarantees this regardless of what happens
         # above it.
         try:
+            await controller.stop_overnight_cancels()
             await controller.stop_halt_seed()
             session.stop()
             try:

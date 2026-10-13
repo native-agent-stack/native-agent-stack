@@ -160,6 +160,8 @@ class OvernightTransition(unittest.TestCase):
                 with self.assertRaisesRegex(RuntimeError,"overnight_halted"):
                     c.port.overnight_check("SPY",now,"buy")
                 await c.overnight_tick(now)
+                # The owner tick dispatches the cancel without waiting for broker I/O.
+                await asyncio.sleep(0)
                 self.assertEqual(cancels,["entry"])
                 self.assertEqual(source.retry_at["SPY"],3 if rate_limited else 2)
                 held,held_clock,held_cancels,bounds,_=fixtures.OvernightArming._controller(self,held=True)

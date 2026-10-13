@@ -1,0 +1,279 @@
+{
+  "base_revision": "448db5669675cb15a89a0cee15598c57bb7cab1c",
+  "evidence_class": "synthetic",
+  "input_hashes": {
+    "blueprints/us-equities/adaptive-paper/mover.py": "94ce6735ccb3cf1d0884a1c988e67b3f15d649b864ba1ece36ec20b9bb63b802",
+    "blueprints/us-equities/adaptive-paper/mover_runner.py": "22542292fe2e3f18bee55fad845d48caf97487eedc4ef83e346a451de1345988",
+    "blueprints/us-equities/adaptive-paper/runner.py": "d531b494e2c125b663e62512771460704b69877ae07badbdf544a42ad67450a1",
+    "docs/decisions/2026-10-13-overnight-rest-arming.md": "0417bbb15d5d4ac3825101680ab2ec692ffcc8395d18372ff56d4f7eb50524cb",
+    "scripts/published_preimages.py": "9fd7d490721d9396f53e4395483cbdcb643c70f91189ec98e409d6baa6ebba73",
+    "tests/test_adaptive_paper_overnight_round2.py": "7a853843bb7c81955f7d1106fca681e495b19ec17dd68dc67d9ac64c63e9bfdd",
+    "tests/test_adaptive_paper_overnight_transition.py": "064698851d24eafbfafd6b747214168d3ae5cbf6cd323fb86f745e526fff3f08",
+    "tests/test_overnight_published_preimages.py": "09a2a13f176e962d54e44ec3e5d0fbca3e68a91b332f183adc54b8aefa4c1853"
+  },
+  "limitations": [
+    "Synthetic fixture and repository-integrity results only; no broker or native paper acceptance.",
+    "The original related726 run failed two old assertions expecting synchronous cancel completion; that owned fixture now yields one event-loop turn for its immediate synthetic callback.",
+    "Earlier malformed fixture/collection attempts are retained locally and receive no regression credit.",
+    "Only shared mover scan/rule primitives move into arming; full configuration and command timing remain in the separate mover child.",
+    "The coroutine timeout does not prove interruption of blocking SDK I/O; existing transport teardown owns SDK workers.",
+    "Historical public input blobs are published; derived registry hashes are validated separately, not execution inputs.",
+    "Correction216 preserves published history. Current-tree prefix audit takes the six old values only as private runtime inputs, never a public blacklist."
+  ],
+  "mutations": {
+    "assertion_failures": 11,
+    "errors": 0,
+    "killed": 8,
+    "plans": 8,
+    "survived": 0
+  },
+  "paper_acceptance": "NOT_RUN",
+  "runs": [
+    {
+      "assertion_failures": 15,
+      "command": "CPUWeight=idle; native runtime lock where applicable; round2-base-seven-final.log",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 2.594,
+      "errors": 0,
+      "exit_code": 1,
+      "output_bytes": 22683,
+      "output_sha256": "b7c29c82b9a58f351f16d1690b6b1618b19735e0e4275c2a80604998e5f497ba",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-round2/round2-base-seven-final.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-round2/round2-base-seven-final.sanitized.txt",
+      "python_argv": [
+        "-c",
+        "import sys,unittest; sys.path.insert(0,\"blueprints/us-equities/adaptive-paper\"); import runtime_lock\nwith runtime_lock.runtime_read_lock():\n r=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromName(\"tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo\"))\n sys.exit(not r.wasSuccessful())"
+      ],
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "test_selection": [
+        "unittest",
+        "tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo",
+        "-v"
+      ],
+      "tests_run": 7
+    },
+    {
+      "assertion_failures": 1,
+      "command": "CPUWeight=idle; native runtime lock where applicable; round2-prefix-red.log",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 0.0,
+      "errors": 0,
+      "exit_code": 1,
+      "output_bytes": 1192,
+      "output_sha256": "6218a4d598c9b8b34729217238b1198221399de7df7a3f2013c88a0b275d8ccf",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-round2/round2-prefix-red.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-round2/round2-prefix-red.sanitized.txt",
+      "python_argv": [
+        "-m",
+        "unittest",
+        "tests.test_overnight_published_preimages.PublishedPreimages.test_seven_character_private_prefixes_fail_without_a_public_blacklist",
+        "-v"
+      ],
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "test_selection": [
+        "unittest",
+        "tests.test_overnight_published_preimages.PublishedPreimages.test_seven_character_private_prefixes_fail_without_a_public_blacklist",
+        "-v"
+      ],
+      "tests_run": 1
+    },
+    {
+      "assertion_failures": 2,
+      "command": "CPUWeight=idle; native runtime lock where applicable; round2-related-native.log",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 313.623,
+      "errors": 0,
+      "exit_code": 1,
+      "output_bytes": 11262,
+      "output_sha256": "7b11bcef0a97edfacd49094c68f1309387ce5c5fe1b4a5c58c4550497cb2f136",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-round2/round2-related-native.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-round2/round2-related-native.sanitized.txt",
+      "python_argv": [
+        "-c",
+        "import sys,unittest; sys.path.insert(0,\"blueprints/us-equities/adaptive-paper\"); import runtime_lock\nnames=[\"tests.test_adaptive_paper_runner\",\"tests.test_adaptive_paper_mover\",\"tests.test_adaptive_paper_mover_native\",\"tests.test_adaptive_paper_transport\",\"tests.test_adaptive_paper_recovery\",\"tests.test_adaptive_paper_overnight_arming\",\"tests.test_adaptive_paper_overnight_transition\",\"tests.test_adaptive_paper_overnight_guard_pins\",\"tests.test_adaptive_paper_overnight_guard_mutations\",\"tests.test_adaptive_paper_overnight_order_contract\",\"tests.test_adaptive_paper_sessions\",\"tests.test_adaptive_paper_overnight_round2\"]\nwith runtime_lock.runtime_read_lock():\n r=unittest.TextTestRunner(verbosity=1).run(unittest.defaultTestLoader.loadTestsFromNames(names))\n sys.exit(not r.wasSuccessful())"
+      ],
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "test_selection": [
+        "unittest",
+        "tests.test_adaptive_paper_runner",
+        "tests.test_adaptive_paper_mover",
+        "tests.test_adaptive_paper_mover_native",
+        "tests.test_adaptive_paper_transport",
+        "tests.test_adaptive_paper_recovery",
+        "tests.test_adaptive_paper_overnight_arming",
+        "tests.test_adaptive_paper_overnight_transition",
+        "tests.test_adaptive_paper_overnight_guard_pins",
+        "tests.test_adaptive_paper_overnight_guard_mutations",
+        "tests.test_adaptive_paper_overnight_order_contract",
+        "tests.test_adaptive_paper_sessions",
+        "tests.test_adaptive_paper_overnight_round2"
+      ],
+      "tests_run": 726
+    },
+    {
+      "assertion_failures": 0,
+      "command": "CPUWeight=idle; native runtime lock where applicable; round2-transition-prefix-final-green.log",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 18.102,
+      "errors": 0,
+      "exit_code": 0,
+      "output_bytes": 1221,
+      "output_sha256": "05d1ba89d1ebb109598de6c448f3b092c4896af0f4f1a633bf728a3df4fe3db4",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-round2/round2-transition-prefix-final-green.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-round2/round2-transition-prefix-final-green.sanitized.txt",
+      "python_argv": [
+        "-c",
+        "import sys,unittest; sys.path.insert(0,\"blueprints/us-equities/adaptive-paper\"); import runtime_lock\nwith runtime_lock.runtime_read_lock():\n r=unittest.TextTestRunner(verbosity=1).run(unittest.defaultTestLoader.loadTestsFromNames([\"tests.test_adaptive_paper_overnight_transition\",\"tests.test_adaptive_paper_overnight_round2\",\"tests.test_overnight_published_preimages.PublishedPreimages.test_seven_character_private_prefixes_fail_without_a_public_blacklist\"]))\n sys.exit(not r.wasSuccessful())"
+      ],
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "test_selection": [
+        "unittest",
+        "tests.test_adaptive_paper_overnight_transition",
+        "tests.test_adaptive_paper_overnight_round2",
+        "tests.test_overnight_published_preimages.PublishedPreimages.test_seven_character_private_prefixes_fail_without_a_public_blacklist"
+      ],
+      "tests_run": 17
+    },
+    {
+      "assertion_failures": 0,
+      "command": "CPUWeight=idle; native runtime lock where applicable; round2-related-ci.log",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 97.362,
+      "errors": 0,
+      "exit_code": 0,
+      "output_bytes": 8330,
+      "output_sha256": "7b7aa9d94739c0f199a5281ee3a7d3f24d2b3f75c0b27a602ae3c2cf2e8c56ca",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-round2/round2-related-ci.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-round2/round2-related-ci.sanitized.txt",
+      "python_argv": [
+        "-m",
+        "unittest",
+        "tests.test_adaptive_paper_runner",
+        "tests.test_adaptive_paper_mover",
+        "tests.test_adaptive_paper_mover_native",
+        "tests.test_adaptive_paper_transport",
+        "tests.test_adaptive_paper_recovery",
+        "tests.test_adaptive_paper_overnight_arming",
+        "tests.test_adaptive_paper_overnight_transition",
+        "tests.test_adaptive_paper_overnight_guard_pins",
+        "tests.test_adaptive_paper_overnight_guard_mutations",
+        "tests.test_adaptive_paper_overnight_order_contract",
+        "tests.test_adaptive_paper_sessions",
+        "tests.test_adaptive_paper_overnight_round2",
+        "-q"
+      ],
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 220,
+      "test_selection": [
+        "unittest",
+        "tests.test_adaptive_paper_runner",
+        "tests.test_adaptive_paper_mover",
+        "tests.test_adaptive_paper_mover_native",
+        "tests.test_adaptive_paper_transport",
+        "tests.test_adaptive_paper_recovery",
+        "tests.test_adaptive_paper_overnight_arming",
+        "tests.test_adaptive_paper_overnight_transition",
+        "tests.test_adaptive_paper_overnight_guard_pins",
+        "tests.test_adaptive_paper_overnight_guard_mutations",
+        "tests.test_adaptive_paper_overnight_order_contract",
+        "tests.test_adaptive_paper_sessions",
+        "tests.test_adaptive_paper_overnight_round2",
+        "-q"
+      ],
+      "tests_run": 726
+    },
+    {
+      "assertion_failures": 0,
+      "command": "CPUWeight=idle; native runtime lock where applicable; round2-related-native-repeat.log",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 313.415,
+      "errors": 0,
+      "exit_code": 0,
+      "output_bytes": 8458,
+      "output_sha256": "9a2cccac8adfc445327d3f1126c452c13966c95cc9005055f52a3cd4ee1cce19",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-round2/round2-related-native-repeat.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-round2/round2-related-native-repeat.sanitized.txt",
+      "python_argv": [
+        "-c",
+        "import sys,unittest; sys.path.insert(0,\"blueprints/us-equities/adaptive-paper\"); import runtime_lock\nnames=[\"tests.test_adaptive_paper_runner\",\"tests.test_adaptive_paper_mover\",\"tests.test_adaptive_paper_mover_native\",\"tests.test_adaptive_paper_transport\",\"tests.test_adaptive_paper_recovery\",\"tests.test_adaptive_paper_overnight_arming\",\"tests.test_adaptive_paper_overnight_transition\",\"tests.test_adaptive_paper_overnight_guard_pins\",\"tests.test_adaptive_paper_overnight_guard_mutations\",\"tests.test_adaptive_paper_overnight_order_contract\",\"tests.test_adaptive_paper_sessions\",\"tests.test_adaptive_paper_overnight_round2\"]\nwith runtime_lock.runtime_read_lock():\n r=unittest.TextTestRunner(verbosity=1).run(unittest.defaultTestLoader.loadTestsFromNames(names))\n sys.exit(not r.wasSuccessful())"
+      ],
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "test_selection": [
+        "unittest",
+        "tests.test_adaptive_paper_runner",
+        "tests.test_adaptive_paper_mover",
+        "tests.test_adaptive_paper_mover_native",
+        "tests.test_adaptive_paper_transport",
+        "tests.test_adaptive_paper_recovery",
+        "tests.test_adaptive_paper_overnight_arming",
+        "tests.test_adaptive_paper_overnight_transition",
+        "tests.test_adaptive_paper_overnight_guard_pins",
+        "tests.test_adaptive_paper_overnight_guard_mutations",
+        "tests.test_adaptive_paper_overnight_order_contract",
+        "tests.test_adaptive_paper_sessions",
+        "tests.test_adaptive_paper_overnight_round2"
+      ],
+      "tests_run": 726
+    }
+  ],
+  "schema_version": 1,
+  "scope": "CC correction216: one normal FF; event identity, venue scope, scan primitives and nonblocking bounded cancellation tasks",
+  "sources": {
+    "alpaca_py_pin": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+    "alpaca_streaming_docs_blob": "debd52142a228986dc35b8bbf797de40ef09ae47",
+    "alpaca_streaming_docs_commit": "07f9c20b57f8e7a9162251e2edbe446094c15ef7",
+    "asyncio_api": "asyncio.timeout and Task.cancel/gather",
+    "python_version": "3.12.3"
+  },
+  "test_ids": [
+    "tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_cancel_budget_expires_without_blocking_tick_and_allows_retry",
+    "tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_actual_trade_update_cancel_rejection_retries_live_entry",
+    "tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_cancel_shutdown_joins_waiter_and_suppresses_duplicate_delete",
+    "tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds",
+    "tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_overnight_scan_uses_trade_date_and_cross_midnight_rule_order",
+    "tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_daytime_owned_exit_ignores_venue_halt_but_keeps_standing_halt",
+    "tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_owner_tick_reaches_cutoff_and_expiry_while_cancel_waits",
+    "tests.test_adaptive_paper_overnight_round2.RoundTwoMutants.test_round_two_guards_fail_by_assertion_when_removed"
+  ]
+}

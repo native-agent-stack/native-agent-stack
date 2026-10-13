@@ -141,3 +141,41 @@ each decision and trail-high changes are journal events; the one-second target
 cadence is not a measured delivery guarantee. The order stream retains its
 existing ownership; no BOATS market-data stream owner is claimed. No strategy
 performance, live authority or change to frozen N2 is supplied by these tests.
+
+## Review round two: event identity, venue scope and owner scheduling
+
+The cancellation latch consumes Alpaca's actual `order_cancel_rejected` event,
+including its `trade_updates` envelope and still-live nested order. The official
+[Alpaca streaming source at 07f9c20b](https://github.com/alpacahq/alpaca-docs/blob/07f9c20b57f8e7a9162251e2edbe446094c15ef7/content/api-references/trading-api/streaming.md)
+names that event; the source is dated 2022-04-20, and direct access to the current
+documentation returned HTTP403 during this correction. The installed alpaca-py
+v0.44.0 at the pin above accepts `Union[TradeEvent, str]` in
+`alpaca/trading/models.py:633-646`. A synthetic real-shape stream test reaches
+the production consumer and Controller rather than substituting a renamed event.
+
+An asset's `overnight_halted` flag applies only in the real calendar's OVERNIGHT
+session. Standing trading-status and seeded halts remain effective in every
+admitted session. Fresh active/tradable carriers permit owned daytime residual
+sells even if the overnight venue flag remains set; stale and missing carriers
+still refuse. The scan contract adopts the already-reviewed mover child's
+`overnight_minute`, opt-in rule parsing and calendar trade-date primitives.
+Full mover configuration, command timing and overnight diagnostic enablement
+remain with that separate child; PRE parsing and scans retain their defaults.
+
+The owner tick schedules one tracked cancellation per live entry and returns
+its cutoff/expiry decision without waiting for request budget or DELETE I/O.
+The supported [Python3.12 asyncio.timeout](https://docs.python.org/3.12/library/asyncio-task.html#asyncio.timeout)
+context bounds each coroutine to five seconds; timeout or broker refusal
+releases its retry latch. Both native runners cancel and join these tasks before
+stopping their port. This is a synthetic owner-loop guarantee, not measured
+broker latency or proof that cancelling an asyncio wrapper interrupts SDK I/O.
+The transport's existing worker and HTTP teardown still owns that I/O.
+
+CC correction216 at 18:29Z withdraws correction215's proposed history rewrite.
+This correction is a normal fast-forward child of448db566 and preserves published
+history. Current-tree and PR-body prefix checks accept the six historical values
+only as private audit inputs; the public regression derives synthetic values and
+contains no blacklist. Historical public input source blobs are retained as
+published preimages. Derived registry hashes are checked by their owning listing
+contract rather than treated as execution inputs in the older fix receipt.
+The historical SHAs remain viewable; no purge or broker acceptance is claimed.
