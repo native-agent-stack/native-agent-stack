@@ -20,15 +20,13 @@ live clone is a detached worktree of origin/main (docs/decisions/2026-10-09-clau
 so a branch name cannot be the test. A clone on a feature branch, or with
 commits of its own, is refused, and so is rendering the units for one.
 
-The service units confine the process (ProtectSystem=, ProtectHome=, ReadWritePaths=, PrivateTmp=, PrivateUsers=), but systemd starts a unit without the file system namespace, and says nothing, when its
-manager cannot create one (systemd/systemd-stable@387a14a7b67b, v255.4: src/core/exec-invoke.c L3212-L3237 and src/core/namespace.c L2488-L2497; man/systemd.exec.xml of systemd/systemd@e846bbad,
-"gracefully turned off"; seen on the GitHub-hosted runner, docs/decisions/2026-10-12-skill-invoke-rate-timer.md). A unit that started therefore proves nothing about confinement. `--refuse-writable DIR` (repeatable; the units
-pass the home directory and the clone) makes the program check first, before any work: it tries to create a file in each DIR and goes on only if the file system answers EROFS, the answer of the read-only mounts
-the directives make; it refuses (exit 2, a fixed message) when the file could be created and when a mode or a policy refused it (EACCES, EPERM), which says nothing about the directives.
+The service units confine the process (ProtectSystem=, ProtectHome=, ReadWritePaths=, PrivateTmp=, PrivateUsers=) and carry the marker TemporaryFileSystem=/srv:ro. A manager that cannot create the mount namespace
+starts a unit without those directives and says nothing, unless the unit asks for something it cannot run without; the marker is that ask, so the manager stops the unit (status 226/NAMESPACE) instead
+(systemd/systemd-stable@387a14a7b67b, v255.4: src/core/exec-invoke.c L2849-L2888 and L3212-L3237; docs/decisions/2026-10-12-skill-invoke-rate-timer.md, review round 5). The enforcement is the manager's: this program asks
+the file system nothing, and run outside such a unit it is not confined. The marker hides /srv inside the unit, so rendering refuses a clone or an interpreter at or below /srv.
 """
 import argparse
 import contextlib
-import errno
 from datetime import timedelta
 import json
 import os
@@ -196,44 +194,21 @@ class CloneRefused(Refused):
     """The clone is not at a commit of origin/main. The message is fixed text, safe to print."""
 
 
-class Unconfined(Refused):
-    """The process can write where its service unit forbids it. The message is fixed text, safe to print."""
+class LayoutRefused(Refused):
+    """A path the units need is where their marker hides it. The message is fixed text, safe to print."""
 
 
-class Unverified(Refused):
-    """The write was refused, but not by a read-only file system. The message is fixed text, safe to print."""
+# The directory that the units' TemporaryFileSystem=/srv:ro hides. The marker exists only to make the manager insist on the mount namespace (see the units); a clone or an interpreter below it would be invisible to the
+# unit and fail after the namespace was made, every day.
+MARKER_DIRECTORY = "/srv"
 
 
-# What the directives leave behind. ProtectSystem=strict and ProtectHome=read-only make the file system hierarchy read-only by setting MS_RDONLY on its mounts (systemd/systemd-stable@387a14a7b67b, v255.4:
-# src/core/namespace.c make_read_only L1708-L1754; man/systemd.exec.xml L1381-L1382, and L1630-L1632 for the paths a unit may only read: "writing will be refused even if the usual file access controls would
-# permit this"), and the kernel answers a write on a read-only file system with EROFS (open(2), man-pages 6.19: "path refers to a file on a read-only filesystem and write access was requested"). EACCES and
-# EPERM are the other thing: the usual file access controls ("the requested access to the file is not allowed ... or write access to the parent directory is not allowed"), which refuse on a host whose
-# directives were never applied. Only EROFS is evidence of the mechanism.
-READ_ONLY_REFUSAL = errno.EROFS
-ACCESS_REFUSALS = (errno.EACCES, errno.EPERM)
-
-
-def require_confined(directories, *, opener=os.open, remover=os.unlink):
-    """Go on only if the file system answers EROFS (READ_ONLY_REFUSAL, the answer of the read-only mounts the unit's directives make) to the creation of a file in each of `directories`. systemd starts a unit
-    without the file system namespace, and says nothing, when its manager cannot create one, so a unit that started does not prove that ProtectSystem=, ProtectHome= and ReadWritePaths= are in effect
-    (systemd/systemd-stable@387a14a7b67b, v255.4: src/core/exec-invoke.c L3212-L3237, src/core/namespace.c L2488-L2497). Unconfined when the file could be created (it is removed again); Unverified when the
-    usual file access controls refused it (EACCES, EPERM), which a host without the directives also does; a ValueError for any other answer (an absent directory, an I/O error): nothing is known.
-    The limits: it probes the top of each directory, once, when it runs. It does not show that every path under the home is read-only, and it is no boundary against a mount or a permission change after it ran:
-    the directives are the boundary, and this tells a unit that was started without them from one that was started with them."""
-    for directory in directories:
-        probe = os.path.join(str(directory), f".skill-usage-confinement-probe-{os.getpid()}")
-        try:
-            descriptor = opener(probe, os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0), 0o600)
-        except OSError as error:
-            if error.errno == READ_ONLY_REFUSAL:
-                continue
-            if error.errno in ACCESS_REFUSALS:
-                raise Unverified("a directory that the unit's directives make read-only refused the write by a mode or a policy and not as a read-only file system does, so the directives are not shown to be in effect and it did not run") from None
-            raise ValueError("a directory that must be read-only cannot be probed") from None
-        os.close(descriptor)
-        with contextlib.suppress(OSError):
-            remover(probe)
-        raise Unconfined("this process can write where its service unit forbids it, so the unit's file system directives are not in effect and it did not run")
+def hidden_by_marker(path):
+    """Whether `path`, or the file it resolves to, is at or below MARKER_DIRECTORY (a path with `..` or a doubled slash is read as the file system reads it)."""
+    for candidate in (os.path.normpath(path), os.path.realpath(path)):
+        if [part for part in candidate.split("/") if part][:1] == [MARKER_DIRECTORY.strip("/")]:
+            return True
+    return False
 
 
 def on_reviewed_main(root=ROOT):
@@ -413,6 +388,8 @@ def render_units(destination, repository, python, node):
     for value in values.values():
         if not Path(value).is_absolute() or any(char in value for char in ('\n', '\r', '"', '\\')):
             raise ValueError("unit values must be absolute paths without unit quoting characters")
+        if hidden_by_marker(value):
+            raise LayoutRefused("the clone, the interpreter and node must be outside /srv, which the units' TemporaryFileSystem=/srv:ro hides from them")
     for name in UNIT_FILES:
         text = (ROOT / "adoption/templates/systemd" / name).read_text()
         for key, value in values.items():
@@ -439,12 +416,8 @@ def main(argv=None):
     parser.add_argument("--render-units", type=Path)
     parser.add_argument("--repository", type=Path, default=ROOT)
     parser.add_argument("--python", type=Path, default=Path(sys.executable))
-    parser.add_argument("--refuse-writable", action="append", type=Path, default=[], metavar="DIR",
-                        help="refuse to run (exit 2) if a file can be created in DIR; the service units pass the home directory and the clone, which their directives make read-only")
     args = parser.parse_args(argv)
     try:
-        if args.refuse_writable and not args.render_units:
-            require_confined(args.refuse_writable)   # before any work: a unit that started proves nothing about the file system it sees
         if args.render_units:
             node = shutil.which(args.node)
             if not node:

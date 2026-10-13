@@ -44,12 +44,13 @@ read-only for it (the live clone and the client's own state included),
 before enabling the timers, because a missing path fails the unit), and
 `PYTHONDONTWRITEBYTECODE=1` keeps every interpreter from writing bytecode
 (docs/decisions/2026-10-12-skill-invoke-rate-timer.md, decision 7). systemd starts a unit without these
-directives, and says nothing, when its manager cannot create the file system namespace (it ran the probe
-unconfined on the GitHub-hosted runner), so each service passes `--refuse-writable` for the home directory
-and the clone: the program tries to create a file there before any work and goes on only if the file system answers EROFS, the answer of the read-only mounts the directives make (it exits 2 if the file can be created, and
-if a mode or a policy refused it: EACCES and EPERM are the usual file access controls, which refuse on a host without the directives too)
-(`PrivateUsers=true` makes the one case that systemd can see, a user namespace that cannot be created, fail
-the unit). The refresh of
+directives, and says nothing, when its manager cannot create the mount namespace (it ran the probe
+unconfined on the GitHub-hosted runner), unless the unit also carries a directive that the manager insists on:
+each service carries `TemporaryFileSystem=/srv:ro` for that, so the manager stops the unit (status
+226/NAMESPACE) instead, and `PrivateUsers=true` does the same for the user namespace (217/USER). The program
+asks the file system nothing: the confinement is the manager's, and a run started any other way is not
+confined. The marker hides `/srv` from the unit, so rendering refuses a clone, an interpreter or node at or
+below it (review round 5 of the record). The refresh of
 the combined record holds a lock, so two halves that finish together (both timers
 are `Persistent=true`) leave a record built from the newest record of each.
 Live scheduled collection, and rendering, refuse a clone that is not at a

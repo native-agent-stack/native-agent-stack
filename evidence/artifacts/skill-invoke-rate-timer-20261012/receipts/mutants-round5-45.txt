@@ -1,0 +1,48 @@
+The 45 mutants of round 5 (route B: the layout refusal of the program, the marker and the directives of the units, the classifier and the observation of the native tests, the skip that must fail under Actions): one change each, in a scratch copy of the minimal tree, with GITHUB_ACTIONS=true; a mutant is killed when tests.test_skill_usage_daily fails (the unmutated copy runs first and passes).
+
+killed    daily_skill_usage.py               the directory the check refuses is not the one the marker hides  
+killed    daily_skill_usage.py               a link into the hidden directory is not followed  
+killed    daily_skill_usage.py               only the hidden directory itself is refused, not what is below it  
+killed    daily_skill_usage.py               the leading slash makes no path hidden  
+killed    daily_skill_usage.py               rendering does not check the paths  
+killed    daily_skill_usage.py               the layout refusal is a plain value error  
+killed    daily_skill_usage.py               the layout refusal is not a refusal of the program  
+killed    daily_skill_usage.py               the layout refusal message is another text  
+killed    skill-invoke-rate-claude.service   the Claude unit has no marker  
+killed    skill-invoke-rate-codex.service    the Codex unit has no marker  
+killed    skill-invoke-rate-claude.service   the Claude marker is a writable tmpfs  
+killed    skill-invoke-rate-codex.service    the Codex marker is a writable tmpfs  
+killed    skill-invoke-rate-claude.service   the Claude marker is an identity bind the manager does not insist on  
+killed    skill-invoke-rate-codex.service    the Codex marker is a root directory  
+killed    skill-invoke-rate-claude.service   the Claude unit does not ask for the user namespace  
+killed    skill-invoke-rate-codex.service    the Codex unit does not ask for the user namespace  
+killed    skill-invoke-rate-claude.service   the Claude unit passes the removed probe option  
+killed    skill-invoke-rate-codex.service    the Codex unit passes the removed probe option  
+killed    skill-invoke-rate-claude.service   the Claude unit comment does not name the mechanism  
+killed    skill-invoke-rate-codex.service    the Codex unit comment does not quote the manual  
+killed    test_skill_usage_daily.py          217/USER is not a refusal  
+killed    test_skill_usage_daily.py          226/NAMESPACE is not a refusal  
+killed    test_skill_usage_daily.py          a refusal is told by the silence only  
+killed    test_skill_usage_daily.py          a refusal that printed something not started is accepted  
+killed    test_skill_usage_daily.py          a refusal after the payload started is fails closed  
+killed    test_skill_usage_daily.py          the manager's own words are not compared  
+killed    test_skill_usage_daily.py          the manager's words are accepted only when absent  
+killed    test_skill_usage_daily.py          another status is not refused  
+killed    test_skill_usage_daily.py          the control may have failed  
+killed    test_skill_usage_daily.py          the control may have no namespace  
+killed    test_skill_usage_daily.py          the control's writes need not succeed  
+killed    test_skill_usage_daily.py          the control may lack a target  
+killed    test_skill_usage_daily.py          the run may lack a target  
+killed    test_skill_usage_daily.py          the run may have no namespace  
+killed    test_skill_usage_daily.py          a unit in the manager's own namespace is enforced  
+killed    test_skill_usage_daily.py          the record directory must be read-only too  
+killed    test_skill_usage_daily.py          a protected write may succeed  
+killed    test_skill_usage_daily.py          no target is writable  
+killed    test_skill_usage_daily.py          a run that did not complete is not told  
+killed    test_skill_usage_daily.py          a run without a return code is observed  
+killed    test_skill_usage_daily.py          the run is always silent  
+killed    test_skill_usage_daily.py          the manager's words are read from stdout  
+killed    test_skill_usage_daily.py          a start without a namespace is a start  
+killed    test_skill_usage_daily.py          the manager's status name is dropped  
+killed    test_skill_usage_daily.py          an unavailable native test skips under Actions  
+45 mutants, 45 killed, survivors: none

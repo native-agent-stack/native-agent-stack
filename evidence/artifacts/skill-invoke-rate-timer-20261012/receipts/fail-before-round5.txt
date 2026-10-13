@@ -1,0 +1,24 @@
+tests/test_skill_usage_daily.py of round 5 against the sources of 322fe463d, the head that was read (tools/skill-usage and adoption/templates/systemd; the test module and the two probe receipts copied in; GITHUB_ACTIONS=true): Ran 83 tests, FAILED (failures=6, errors=20), counting subtests.
+Tests that fail or raise (14), by class:
+  DailyProjectionTests: 1
+  NativeManagerTests: 3
+  ServiceSandboxTests: 5
+  StubManagerTests: 5
+
+Tests, with FAIL (an assertion) or ERROR (the sources lack what the test uses: no marker in the units, no hidden_by_marker or LayoutRefused in the program):
+  ERROR DailyProjectionTests.test_native_user_unit_verification_needs_no_session_or_install [1]
+  ERROR NativeManagerTests.test_a_marker_on_a_mount_point_that_does_not_exist_fails_closed [1]
+  ERROR NativeManagerTests.test_the_rendered_directives_are_enforced_by_the_manager_or_the_manager_refuses_the_unit [1]
+  ERROR NativeManagerTests.test_where_the_manager_cannot_make_the_namespace_only_the_marker_stops_the_unit [1]
+  FAIL  ServiceSandboxTests.test_each_service_carries_the_marker_that_makes_the_manager_insist_and_asks_nothing_of_the_program [2]
+  ERROR ServiceSandboxTests.test_rendering_refuses_a_path_that_the_marker_hides [6]
+  FAIL  ServiceSandboxTests.test_the_command_line_refuses_to_render_for_a_path_that_the_marker_hides [1]
+  FAIL  ServiceSandboxTests.test_the_marker_is_a_directive_the_manager_insists_on [2]
+  FAIL  ServiceSandboxTests.test_the_program_has_no_confinement_probe_option [1]
+  ERROR StubManagerTests.test_a_manager_that_accepts_the_directives_and_applies_none_is_a_failure_even_with_the_marker [2]
+  ERROR StubManagerTests.test_a_manager_that_refuses_the_unit_before_the_payload_is_fails_closed [2]
+  ERROR StubManagerTests.test_a_refusal_that_came_after_the_payload_ran_is_a_failure [1]
+  ERROR StubManagerTests.test_any_other_status_is_a_failure_through_the_whole_path [3]
+  ERROR StubManagerTests.test_the_properties_handed_to_the_manager_carry_the_marker [2]
+
+At the round-5 head the same module runs OK (receipts/mutants-round5-45.txt names the mutants it kills).

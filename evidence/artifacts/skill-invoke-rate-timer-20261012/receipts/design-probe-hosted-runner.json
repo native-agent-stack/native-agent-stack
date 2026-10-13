@@ -1,0 +1,480 @@
+[
+ {
+  "control_write_in_the_runtime_dir_from_the_starter": "written",
+  "environment": {
+   "os": "Ubuntu 24.04.5 LTS",
+   "kernel": "6.17.0-1022-azure",
+   "systemd": "systemd 255 (255.4-1ubuntu8.17)",
+   "image": {
+    "ImageOS": "ubuntu24",
+    "ImageVersion": "20261004.327.1"
+   },
+   "apparmor_restrict_unprivileged_userns": "1",
+   "unprivileged_userns_clone": "1",
+   "max_user_namespaces": "63838",
+   "unshare_user_mount_rc": 1,
+   "unshare_user_mount_stderr": "unshare: write failed /proc/self/uid_map: Operation not permitted",
+   "own_mnt_ns": "mnt:[4026531832]"
+  },
+  "user_manager_mnt_ns_equals_the_starter": null,
+  "sets": [
+   {
+    "set": "S0 the units as shipped (ProtectSystem=strict, ProtectHome=read-only, PrivateTmp, PrivateUsers=true, ReadWritePaths=records)",
+    "directives": [
+     "ProtectSystem",
+     "ProtectHome",
+     "PrivateTmp",
+     "PrivateUsers",
+     "ReadWritePaths"
+    ],
+    "rc": 0,
+    "manager_says": [
+     "Finished with result: success",
+     "Main processes terminated with: code=exited/status=0"
+    ],
+    "child_mnt_ns_differs_from_the_starter": false,
+    "child_mnt_ns_differs_from_the_user_manager": null,
+    "corroboration_write_below_home": "written",
+    "corroboration_write_in_a_bind_destination": "written",
+    "corroboration_write_in_the_record_directory": "written",
+    "corroboration_write_in_the_runtime_dir_a_tmpfs_that_exists_before_the_unit": "written"
+   },
+   {
+    "set": "S1 S0 + TemporaryFileSystem= on an existing directory",
+    "directives": [
+     "ProtectSystem",
+     "ProtectHome",
+     "PrivateTmp",
+     "PrivateUsers",
+     "ReadWritePaths",
+     "TemporaryFileSystem"
+    ],
+    "rc": 226,
+    "manager_says": [
+     "Finished with result: exit-code",
+     "Main processes terminated with: code=exited/status=226"
+    ],
+    "child_mnt_ns_differs_from_the_starter": null,
+    "child_mnt_ns_differs_from_the_user_manager": null,
+    "corroboration_write_below_home": null,
+    "corroboration_write_in_a_bind_destination": null,
+    "corroboration_write_in_the_record_directory": null,
+    "corroboration_write_in_the_runtime_dir_a_tmpfs_that_exists_before_the_unit": null
+   },
+   {
+    "set": "S2 S0 + BindReadOnlyPaths= that does not map onto itself",
+    "directives": [
+     "ProtectSystem",
+     "ProtectHome",
+     "PrivateTmp",
+     "PrivateUsers",
+     "ReadWritePaths",
+     "BindReadOnlyPaths"
+    ],
+    "rc": 226,
+    "manager_says": [
+     "Finished with result: exit-code",
+     "Main processes terminated with: code=exited/status=226"
+    ],
+    "child_mnt_ns_differs_from_the_starter": null,
+    "child_mnt_ns_differs_from_the_user_manager": null,
+    "corroboration_write_below_home": null,
+    "corroboration_write_in_a_bind_destination": null,
+    "corroboration_write_in_the_record_directory": null,
+    "corroboration_write_in_the_runtime_dir_a_tmpfs_that_exists_before_the_unit": null
+   },
+   {
+    "set": "S3 S0 + BindPaths= that does not map onto itself",
+    "directives": [
+     "ProtectSystem",
+     "ProtectHome",
+     "PrivateTmp",
+     "PrivateUsers",
+     "ReadWritePaths",
+     "BindPaths"
+    ],
+    "rc": 226,
+    "manager_says": [
+     "Finished with result: exit-code",
+     "Main processes terminated with: code=exited/status=226"
+    ],
+    "child_mnt_ns_differs_from_the_starter": null,
+    "child_mnt_ns_differs_from_the_user_manager": null,
+    "corroboration_write_below_home": null,
+    "corroboration_write_in_a_bind_destination": null,
+    "corroboration_write_in_the_record_directory": null,
+    "corroboration_write_in_the_runtime_dir_a_tmpfs_that_exists_before_the_unit": null
+   },
+   {
+    "set": "S4 S0 + BindReadOnlyPaths= onto itself (identity)",
+    "directives": [
+     "ProtectSystem",
+     "ProtectHome",
+     "PrivateTmp",
+     "PrivateUsers",
+     "ReadWritePaths",
+     "BindReadOnlyPaths"
+    ],
+    "rc": 0,
+    "manager_says": [
+     "Finished with result: success",
+     "Main processes terminated with: code=exited/status=0"
+    ],
+    "child_mnt_ns_differs_from_the_starter": false,
+    "child_mnt_ns_differs_from_the_user_manager": null,
+    "corroboration_write_below_home": "written",
+    "corroboration_write_in_a_bind_destination": "written",
+    "corroboration_write_in_the_record_directory": "written",
+    "corroboration_write_in_the_runtime_dir_a_tmpfs_that_exists_before_the_unit": "written"
+   },
+   {
+    "set": "S5 S1 without PrivateUsers=true",
+    "directives": [
+     "ProtectSystem",
+     "ProtectHome",
+     "PrivateTmp",
+     "ReadWritePaths",
+     "TemporaryFileSystem"
+    ],
+    "rc": 226,
+    "manager_says": [
+     "Finished with result: exit-code",
+     "Main processes terminated with: code=exited/status=226"
+    ],
+    "child_mnt_ns_differs_from_the_starter": null,
+    "child_mnt_ns_differs_from_the_user_manager": null,
+    "corroboration_write_below_home": null,
+    "corroboration_write_in_a_bind_destination": null,
+    "corroboration_write_in_the_record_directory": null,
+    "corroboration_write_in_the_runtime_dir_a_tmpfs_that_exists_before_the_unit": null
+   },
+   {
+    "set": "S6 S0 + RootDirectory=/",
+    "directives": [
+     "ProtectSystem",
+     "ProtectHome",
+     "PrivateTmp",
+     "PrivateUsers",
+     "ReadWritePaths",
+     "RootDirectory"
+    ],
+    "rc": 226,
+    "manager_says": [
+     "Finished with result: exit-code",
+     "Main processes terminated with: code=exited/status=226"
+    ],
+    "child_mnt_ns_differs_from_the_starter": null,
+    "child_mnt_ns_differs_from_the_user_manager": null,
+    "corroboration_write_below_home": null,
+    "corroboration_write_in_a_bind_destination": null,
+    "corroboration_write_in_the_record_directory": null,
+    "corroboration_write_in_the_runtime_dir_a_tmpfs_that_exists_before_the_unit": null
+   },
+   {
+    "set": "S7 S0 + PrivateMounts=yes (a control: not on the list that makes the manager insist)",
+    "directives": [
+     "ProtectSystem",
+     "ProtectHome",
+     "PrivateTmp",
+     "PrivateUsers",
+     "ReadWritePaths",
+     "PrivateMounts"
+    ],
+    "rc": 0,
+    "manager_says": [
+     "Finished with result: success",
+     "Main processes terminated with: code=exited/status=0"
+    ],
+    "child_mnt_ns_differs_from_the_starter": false,
+    "child_mnt_ns_differs_from_the_user_manager": null,
+    "corroboration_write_below_home": "written",
+    "corroboration_write_in_a_bind_destination": "written",
+    "corroboration_write_in_the_record_directory": "written",
+    "corroboration_write_in_the_runtime_dir_a_tmpfs_that_exists_before_the_unit": "written"
+   },
+   {
+    "set": "S8 S0 + PrivateDevices=yes (a control)",
+    "directives": [
+     "ProtectSystem",
+     "ProtectHome",
+     "PrivateTmp",
+     "PrivateUsers",
+     "ReadWritePaths",
+     "PrivateDevices"
+    ],
+    "rc": 218,
+    "manager_says": [
+     "Finished with result: exit-code",
+     "Main processes terminated with: code=exited/status=218"
+    ],
+    "child_mnt_ns_differs_from_the_starter": null,
+    "child_mnt_ns_differs_from_the_user_manager": null,
+    "corroboration_write_below_home": null,
+    "corroboration_write_in_a_bind_destination": null,
+    "corroboration_write_in_the_record_directory": null,
+    "corroboration_write_in_the_runtime_dir_a_tmpfs_that_exists_before_the_unit": null
+   },
+   {
+    "set": "S9 S0 + a writable BindPaths= submount that does not map onto itself (is a submount below the protected hierarchy made read-only?)",
+    "directives": [
+     "ProtectSystem",
+     "ProtectHome",
+     "PrivateTmp",
+     "PrivateUsers",
+     "ReadWritePaths",
+     "BindPaths"
+    ],
+    "rc": 226,
+    "manager_says": [
+     "Finished with result: exit-code",
+     "Main processes terminated with: code=exited/status=226"
+    ],
+    "child_mnt_ns_differs_from_the_starter": null,
+    "child_mnt_ns_differs_from_the_user_manager": null,
+    "corroboration_write_below_home": null,
+    "corroboration_write_in_a_bind_destination": null,
+    "corroboration_write_in_the_record_directory": null,
+    "corroboration_write_in_the_runtime_dir_a_tmpfs_that_exists_before_the_unit": null
+   }
+  ]
+ },
+ {
+  "control_write_in_the_runtime_dir_from_the_starter": "written",
+  "environment": {
+   "os": "Ubuntu 24.04.5 LTS",
+   "kernel": "6.17.0-1022-azure",
+   "systemd": "systemd 255 (255.4-1ubuntu8.17)",
+   "image": {
+    "ImageOS": "ubuntu24",
+    "ImageVersion": "20261004.327.1"
+   },
+   "apparmor_restrict_unprivileged_userns": "1",
+   "unprivileged_userns_clone": "1",
+   "max_user_namespaces": "63838",
+   "unshare_user_mount_rc": 1,
+   "unshare_user_mount_stderr": "unshare: write failed /proc/self/uid_map: Operation not permitted",
+   "own_mnt_ns": "mnt:[4026531832]"
+  },
+  "user_manager_mnt_ns_equals_the_starter": null,
+  "sets": [
+   {
+    "set": "S0 the units as shipped (ProtectSystem=strict, ProtectHome=read-only, PrivateTmp, PrivateUsers=true, ReadWritePaths=records)",
+    "directives": [
+     "ProtectSystem",
+     "ProtectHome",
+     "PrivateTmp",
+     "PrivateUsers",
+     "ReadWritePaths"
+    ],
+    "rc": 0,
+    "manager_says": [
+     "Finished with result: success",
+     "Main processes terminated with: code=exited/status=0"
+    ],
+    "child_mnt_ns_differs_from_the_starter": false,
+    "child_mnt_ns_differs_from_the_user_manager": null,
+    "corroboration_write_below_home": "written",
+    "corroboration_write_in_a_bind_destination": "written",
+    "corroboration_write_in_the_record_directory": "written",
+    "corroboration_write_in_the_runtime_dir_a_tmpfs_that_exists_before_the_unit": "written"
+   },
+   {
+    "set": "S1 S0 + TemporaryFileSystem= on an existing directory",
+    "directives": [
+     "ProtectSystem",
+     "ProtectHome",
+     "PrivateTmp",
+     "PrivateUsers",
+     "ReadWritePaths",
+     "TemporaryFileSystem"
+    ],
+    "rc": 226,
+    "manager_says": [
+     "Finished with result: exit-code",
+     "Main processes terminated with: code=exited/status=226"
+    ],
+    "child_mnt_ns_differs_from_the_starter": null,
+    "child_mnt_ns_differs_from_the_user_manager": null,
+    "corroboration_write_below_home": null,
+    "corroboration_write_in_a_bind_destination": null,
+    "corroboration_write_in_the_record_directory": null,
+    "corroboration_write_in_the_runtime_dir_a_tmpfs_that_exists_before_the_unit": null
+   },
+   {
+    "set": "S2 S0 + BindReadOnlyPaths= that does not map onto itself",
+    "directives": [
+     "ProtectSystem",
+     "ProtectHome",
+     "PrivateTmp",
+     "PrivateUsers",
+     "ReadWritePaths",
+     "BindReadOnlyPaths"
+    ],
+    "rc": 226,
+    "manager_says": [
+     "Finished with result: exit-code",
+     "Main processes terminated with: code=exited/status=226"
+    ],
+    "child_mnt_ns_differs_from_the_starter": null,
+    "child_mnt_ns_differs_from_the_user_manager": null,
+    "corroboration_write_below_home": null,
+    "corroboration_write_in_a_bind_destination": null,
+    "corroboration_write_in_the_record_directory": null,
+    "corroboration_write_in_the_runtime_dir_a_tmpfs_that_exists_before_the_unit": null
+   },
+   {
+    "set": "S3 S0 + BindPaths= that does not map onto itself",
+    "directives": [
+     "ProtectSystem",
+     "ProtectHome",
+     "PrivateTmp",
+     "PrivateUsers",
+     "ReadWritePaths",
+     "BindPaths"
+    ],
+    "rc": 226,
+    "manager_says": [
+     "Finished with result: exit-code",
+     "Main processes terminated with: code=exited/status=226"
+    ],
+    "child_mnt_ns_differs_from_the_starter": null,
+    "child_mnt_ns_differs_from_the_user_manager": null,
+    "corroboration_write_below_home": null,
+    "corroboration_write_in_a_bind_destination": null,
+    "corroboration_write_in_the_record_directory": null,
+    "corroboration_write_in_the_runtime_dir_a_tmpfs_that_exists_before_the_unit": null
+   },
+   {
+    "set": "S4 S0 + BindReadOnlyPaths= onto itself (identity)",
+    "directives": [
+     "ProtectSystem",
+     "ProtectHome",
+     "PrivateTmp",
+     "PrivateUsers",
+     "ReadWritePaths",
+     "BindReadOnlyPaths"
+    ],
+    "rc": 0,
+    "manager_says": [
+     "Finished with result: success",
+     "Main processes terminated with: code=exited/status=0"
+    ],
+    "child_mnt_ns_differs_from_the_starter": false,
+    "child_mnt_ns_differs_from_the_user_manager": null,
+    "corroboration_write_below_home": "written",
+    "corroboration_write_in_a_bind_destination": "written",
+    "corroboration_write_in_the_record_directory": "written",
+    "corroboration_write_in_the_runtime_dir_a_tmpfs_that_exists_before_the_unit": "written"
+   },
+   {
+    "set": "S5 S1 without PrivateUsers=true",
+    "directives": [
+     "ProtectSystem",
+     "ProtectHome",
+     "PrivateTmp",
+     "ReadWritePaths",
+     "TemporaryFileSystem"
+    ],
+    "rc": 226,
+    "manager_says": [
+     "Finished with result: exit-code",
+     "Main processes terminated with: code=exited/status=226"
+    ],
+    "child_mnt_ns_differs_from_the_starter": null,
+    "child_mnt_ns_differs_from_the_user_manager": null,
+    "corroboration_write_below_home": null,
+    "corroboration_write_in_a_bind_destination": null,
+    "corroboration_write_in_the_record_directory": null,
+    "corroboration_write_in_the_runtime_dir_a_tmpfs_that_exists_before_the_unit": null
+   },
+   {
+    "set": "S6 S0 + RootDirectory=/",
+    "directives": [
+     "ProtectSystem",
+     "ProtectHome",
+     "PrivateTmp",
+     "PrivateUsers",
+     "ReadWritePaths",
+     "RootDirectory"
+    ],
+    "rc": 226,
+    "manager_says": [
+     "Finished with result: exit-code",
+     "Main processes terminated with: code=exited/status=226"
+    ],
+    "child_mnt_ns_differs_from_the_starter": null,
+    "child_mnt_ns_differs_from_the_user_manager": null,
+    "corroboration_write_below_home": null,
+    "corroboration_write_in_a_bind_destination": null,
+    "corroboration_write_in_the_record_directory": null,
+    "corroboration_write_in_the_runtime_dir_a_tmpfs_that_exists_before_the_unit": null
+   },
+   {
+    "set": "S7 S0 + PrivateMounts=yes (a control: not on the list that makes the manager insist)",
+    "directives": [
+     "ProtectSystem",
+     "ProtectHome",
+     "PrivateTmp",
+     "PrivateUsers",
+     "ReadWritePaths",
+     "PrivateMounts"
+    ],
+    "rc": 0,
+    "manager_says": [
+     "Finished with result: success",
+     "Main processes terminated with: code=exited/status=0"
+    ],
+    "child_mnt_ns_differs_from_the_starter": false,
+    "child_mnt_ns_differs_from_the_user_manager": null,
+    "corroboration_write_below_home": "written",
+    "corroboration_write_in_a_bind_destination": "written",
+    "corroboration_write_in_the_record_directory": "written",
+    "corroboration_write_in_the_runtime_dir_a_tmpfs_that_exists_before_the_unit": "written"
+   },
+   {
+    "set": "S8 S0 + PrivateDevices=yes (a control)",
+    "directives": [
+     "ProtectSystem",
+     "ProtectHome",
+     "PrivateTmp",
+     "PrivateUsers",
+     "ReadWritePaths",
+     "PrivateDevices"
+    ],
+    "rc": 218,
+    "manager_says": [
+     "Finished with result: exit-code",
+     "Main processes terminated with: code=exited/status=218"
+    ],
+    "child_mnt_ns_differs_from_the_starter": null,
+    "child_mnt_ns_differs_from_the_user_manager": null,
+    "corroboration_write_below_home": null,
+    "corroboration_write_in_a_bind_destination": null,
+    "corroboration_write_in_the_record_directory": null,
+    "corroboration_write_in_the_runtime_dir_a_tmpfs_that_exists_before_the_unit": null
+   },
+   {
+    "set": "S9 S0 + a writable BindPaths= submount that does not map onto itself (is a submount below the protected hierarchy made read-only?)",
+    "directives": [
+     "ProtectSystem",
+     "ProtectHome",
+     "PrivateTmp",
+     "PrivateUsers",
+     "ReadWritePaths",
+     "BindPaths"
+    ],
+    "rc": 226,
+    "manager_says": [
+     "Finished with result: exit-code",
+     "Main processes terminated with: code=exited/status=226"
+    ],
+    "child_mnt_ns_differs_from_the_starter": null,
+    "child_mnt_ns_differs_from_the_user_manager": null,
+    "corroboration_write_below_home": null,
+    "corroboration_write_in_a_bind_destination": null,
+    "corroboration_write_in_the_record_directory": null,
+    "corroboration_write_in_the_runtime_dir_a_tmpfs_that_exists_before_the_unit": null
+   }
+  ]
+ }
+]

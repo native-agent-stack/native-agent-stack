@@ -14,22 +14,25 @@ Type=oneshot
 WorkingDirectory=@REPOSITORY@
 UMask=0077
 Nice=10
-# Writes: the record directory below and nothing else (the half's own record, the combined record the Fleet page reads, and the lock that serialises the combined refresh; both halves write the same directory).
+# Writes: the record directory below and nothing else that the directives make read-only (the half's own record, the combined record the Fleet page reads, and the lock that serialises the combined refresh; both halves write the same directory).
 # ProtectSystem=strict mounts the whole file hierarchy read-only, ProtectHome=read-only does the same for the home directory (the live clone and the client's own state included), and ReadWritePaths= opens the one
-# directory that is written (systemd.exec(5), systemd 259.5). In a user service these need unprivileged user namespaces, which the user manager enables itself when PrivateUsers= is not set; PrivateUsers=true asks for
-# them, so that a manager that cannot create the user namespace fails the unit (status 217/USER) instead of ignoring it (systemd/systemd-stable@387a14a7b67b, v255.4, src/core/exec-invoke.c L4595-L4609). That is the
-# only case it covers. A manager that creates the user namespace but cannot create the mount namespace in it, or runs where a container or a security module denies it, starts the unit without ProtectSystem= and
-# the others and says nothing (exec-invoke.c L3212-L3237, src/core/namespace.c L2488-L2497; the manual calls these features "gracefully turned off", systemd/systemd@e846bbad man/systemd.exec.xml L1476; measured on the
-# GitHub-hosted runner, docs/decisions/2026-10-12-skill-invoke-rate-timer.md), so the program asks the file system first: --refuse-writable makes it try to create a file in the home directory and in the clone,
-# and it exits 2 before any work unless the file system answers EROFS, the answer of the read-only mounts these directives make; a refusal by a mode or a policy (EACCES, EPERM) shows nothing about them. It
-# probes the top of each directory once, when it starts: the directives are the boundary and this tells a unit started without them from one started with them. The directory must exist before the unit starts (mkdir -m 0700 -p): ReadWritePaths= without a leading "-" fails closed on a missing path.
-# PYTHONDONTWRITEBYTECODE=1 reaches every interpreter the service starts (-B on the parent alone would not), and PrivateTmp=true gives the client its own temporary directory under ProtectSystem=strict.
+# directory that is written (systemd.exec(5), systemd 259.5). PrivateTmp=true gives the client its own /tmp under ProtectSystem=strict; /dev, /proc and /sys keep rules of their own (man/systemd.exec.xml L1381-L1384).
+# These need a mount namespace, and a manager that cannot create one starts the unit without these directives and says nothing, unless the unit also asks for something it cannot run without (systemd/systemd-stable@387a14a7b67b,
+# v255.4: src/core/exec-invoke.c L3212-L3237 and src/core/namespace.c L2488-L2497; the manual calls them "gracefully turned off", man/systemd.exec.xml L1359-L1364; the GitHub-hosted runner's manager does exactly that,
+# docs/decisions/2026-10-12-skill-invoke-rate-timer.md, review round 5). TemporaryFileSystem=/srv:ro is that ask: insist_on_sandboxing() (exec-invoke.c L2849-L2888, called at L3217-L3233) is true for it, so a manager that
+# cannot make the mount namespace stops the unit with status 226/NAMESPACE (exec_invoke, exec-invoke.c L4655-L4664; man/systemd.exec.xml L4356-L4358) instead of running it unconfined. It exists only for that: it hides /srv,
+# which nothing in this unit reads (the clone, the interpreters and the records are under the home, and rendering refuses a path under /srv). PrivateUsers=true asks for the user namespace in the same way (status 217/USER,
+# exec_invoke, L4595-L4609; man L4316-L4317), and in a user service the file system directives work in conjunction with it (man L1366-L1370). So the unit runs in the mount namespace these directives describe or it does not
+# start (226 or 217). That is no boundary for what is started outside systemd, against a later change of the host's mounts by a privileged process, or on a platform without systemd, and a mount the unit asks for itself (an
+# explicit bind) is exempt from the recursion. The directory must exist before the unit starts (mkdir -m 0700 -p): ReadWritePaths= without a leading "-" fails closed on a missing path. PYTHONDONTWRITEBYTECODE=1 reaches every
+# interpreter the service starts (-B on the parent alone would not).
 ProtectSystem=strict
 ProtectHome=read-only
 ReadWritePaths=%h/.local/state/native-agent-stack/coordination/command-center/skills
 PrivateTmp=true
 PrivateUsers=true
+TemporaryFileSystem=/srv:ro
 Environment=PYTHONDONTWRITEBYTECODE=1
 Environment=PATH=%h/.local/bin:%h/.local/share/mise/shims:/usr/local/bin:/usr/bin:/bin
 TimeoutStartSec=17min
-ExecStart="@PYTHON@" "@REPOSITORY@/tools/skill-usage/daily_skill_usage.py" --refuse-writable %h --refuse-writable "@REPOSITORY@" --half claude --node "@NODE@" --claude-root %h/.claude/projects --window 7 --out %h/.local/state/native-agent-stack/coordination/command-center/skills/skill-invoke-rate-claude-latest.json --combined-out %h/.local/state/native-agent-stack/coordination/command-center/skills/skill-invoke-rate-latest.json --other-record %h/.local/state/native-agent-stack/coordination/command-center/skills/skill-invoke-rate-codex-latest.json
+ExecStart="@PYTHON@" "@REPOSITORY@/tools/skill-usage/daily_skill_usage.py" --half claude --node "@NODE@" --claude-root %h/.claude/projects --window 7 --out %h/.local/state/native-agent-stack/coordination/command-center/skills/skill-invoke-rate-claude-latest.json --combined-out %h/.local/state/native-agent-stack/coordination/command-center/skills/skill-invoke-rate-latest.json --other-record %h/.local/state/native-agent-stack/coordination/command-center/skills/skill-invoke-rate-codex-latest.json

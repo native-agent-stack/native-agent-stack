@@ -1,6 +1,5 @@
 """Counts-only daily native reports and rendered timer, with no live clients."""
 import contextlib
-import errno
 import getpass
 import importlib.util
 import io
@@ -8,7 +7,6 @@ import json
 import os
 from pathlib import Path
 import re
-import shlex
 import stat
 import shutil
 import subprocess
@@ -864,7 +862,9 @@ class RefreshLockTests(unittest.TestCase):
                 self.assertEqual(json.loads(self.combined.read_text())["measured"], {"host": True, "codex": True, "claude": True})
 
 
-SANDBOX_KEYS = ("ProtectSystem", "ProtectHome", "ReadWritePaths", "PrivateTmp", "PrivateUsers")
+SANDBOX_KEYS = ("ProtectSystem", "ProtectHome", "ReadWritePaths", "PrivateTmp", "PrivateUsers", "TemporaryFileSystem")
+MARKER = "/srv:ro"
+LAYOUT_MESSAGE = "the clone, the interpreter and node must be outside /srv, which the units' TemporaryFileSystem=/srv:ro hides from them"
 
 
 def service_section(text):
@@ -883,7 +883,8 @@ def service_section(text):
 class ServiceSandboxTests(unittest.TestCase):
     """Astra's read of 6c4bbd0d (P1-1): UMask= restricts the mode of what a service creates, not where it can write, and neither service established a read-only file system or a write allow-list, so ordinary Python start-up
     wrote a __pycache__ into the live clone. systemd.exec(5) (systemd 259.5 installed; systemd/systemd@e846bbad man/systemd.exec.xml L1497 ProtectSystem=, L1526 ProtectHome=, L1809 ReadWritePaths=, L1919 PrivateTmp=):
-    ProtectSystem=strict mounts the hierarchy read-only, ProtectHome=read-only does the same for the home directory, ReadWritePaths= allow-lists the one directory that is written."""
+    ProtectSystem=strict mounts the hierarchy read-only, ProtectHome=read-only does the same for the home directory, ReadWritePaths= allow-lists the one directory that is written. Round 5 (route B, the command center's
+    ruling of 2026-10-13): the units also carry the marker TemporaryFileSystem=/srv:ro, which makes a manager that cannot make the mount namespace stop the unit instead of starting it without the directives."""
 
     def render(self, directory):
         daily = daily_module()
@@ -911,23 +912,78 @@ class ServiceSandboxTests(unittest.TestCase):
                     for protected in ("/fixture/live", "%h/.claude", "%h/.codex"):
                         self.assertFalse(writable[0] == protected or writable[0].startswith(protected + "/") or protected.startswith(writable[0] + "/"), f"{protected} is read-only")
 
-    def test_each_service_asks_the_file_system_before_any_work_whether_it_is_confined(self):
-        """Review of #1043 at 68d4f4343 (blocker 1, the CI job of the same head): systemd starts a unit without the file system namespace, and says nothing, when its manager cannot create one
-        (systemd/systemd-stable@387a14a7b67b, v255.4, src/core/exec-invoke.c L3212-L3237), so the program checks."""
+    def test_each_service_carries_the_marker_that_makes_the_manager_insist_and_asks_nothing_of_the_program(self):
+        """Route B (ruling-pr1043-route-b-20261013): the enforcement is the manager's. TemporaryFileSystem= is a member of insist_on_sandboxing() (systemd/systemd-stable@387a14a7b67b, v255.4, src/core/exec-invoke.c
+        L2849-L2888), so a manager that cannot make the mount namespace stops the unit (226/NAMESPACE, exec_invoke L4655-L4664) instead of starting it without the directives (L3212-L3237). The program no longer
+        probes the file system: no option of it is in the command line."""
         with tempfile.TemporaryDirectory() as temp:
             daily, services = self.render(Path(temp))
             for half, service in services.items():
-                tokens = shlex.split(service_section(service.read_text())["ExecStart"][0])
-                flags = [tokens[i + 1] for i, token in enumerate(tokens) if token == "--refuse-writable"]
+                text = service.read_text()
+                section = service_section(text)
                 with self.subTest(half=half):
-                    self.assertEqual(flags, ["%h", "/fixture/live"], "the home directory (the client's state is under it) and the clone")
-                    self.assertLess(tokens.index("--refuse-writable"), tokens.index("--half"), "the check is the first option, ahead of every one that starts work")
+                    self.assertEqual(section.get("TemporaryFileSystem"), [MARKER], "one mount point, read-only: it hides /srv, which nothing in the unit reads, and exists only to make the manager insist")
+                    self.assertNotIn("--refuse-writable", section["ExecStart"][0], "the inside probe was removed in round 5")
+                    self.assertEqual(section.get("PrivateUsers"), ["true"])
+                    comment = "\n".join(line for line in text.splitlines() if line.startswith("#"))
+                    for needle in ("insist_on_sandboxing", "226/NAMESPACE", "217/USER", "no boundary", "gracefully turned off", "exec_invoke"):
+                        self.assertIn(needle, comment, "the comment says what the marker is for and what the guarantee is not")
 
-    @unittest.skipUnless(shutil.which("systemd-analyze"), "native systemd analyzer unavailable")
+    def test_the_marker_is_a_directive_the_manager_insists_on(self):
+        """The members of insist_on_sandboxing() that the units could carry (exec-invoke.c L2849-L2888 at v255.4; the development head e846bbad L3527-L3566 has the same membership for these). The marker must be one of them,
+        and the other sandbox directives of the units must not be, since those are the ones that are 'gracefully turned off'."""
+        insisting = {"TemporaryFileSystem", "RootDirectory", "RootImage", "MountImages", "DynamicUser", "ExtensionImages", "ExtensionDirectories", "BindPaths", "BindReadOnlyPaths", "LogNamespace"}
+        quiet = {"ProtectSystem", "ProtectHome", "ReadWritePaths", "PrivateTmp"}
+        self.assertIn("TemporaryFileSystem", insisting)
+        self.assertFalse(insisting & quiet)
+        with tempfile.TemporaryDirectory() as temp:
+            daily, services = self.render(Path(temp))
+            for half, service in services.items():
+                with self.subTest(half=half):
+                    carried = {key for key in service_section(service.read_text()) if key in insisting}
+                    self.assertEqual(carried, {"TemporaryFileSystem"}, "exactly the marker, no bind or root directive that would change the unit's view")
+
+    def test_rendering_refuses_a_path_that_the_marker_hides(self):
+        daily = daily_module()
+        with tempfile.TemporaryDirectory() as temp:
+            link = Path(temp) / "node-link"
+            link.symlink_to("/srv/tools/node")
+            cases = (("the clone", dict(repository="/srv/clone")), ("the clone below a doubled slash", dict(repository="//srv/clone")), ("the clone through dot-dot", dict(repository="/fixture/../srv/clone")),
+                     ("the interpreter", dict(python="/srv/bin/python3")), ("node through a link", dict(node=str(link))), ("the directory itself", dict(repository="/srv")))
+            for label, override in cases:
+                values = dict(repository="/fixture/live", python=sys.executable, node="/fixture/bin/node") | override
+                with self.subTest(case=label):
+                    with self.assertRaises(daily.LayoutRefused) as caught:
+                        daily.render_units(Path(temp) / "units", Path(values["repository"]), Path(values["python"]), Path(values["node"]))
+                    self.assertEqual(str(caught.exception), LAYOUT_MESSAGE, "the message is fixed text and names no path")
+                    self.assertIsInstance(caught.exception, daily.Refused)
+            for fine in ("/serve/clone", "/srvx/clone", "/fixture/dir/srv/clone", "/fixture/srv"):
+                with self.subTest(allowed=fine):
+                    daily.render_units(Path(temp) / "ok", Path(fine), Path(sys.executable), Path("/fixture/bin/node"))
+
+    def test_the_command_line_refuses_to_render_for_a_path_that_the_marker_hides(self):
+        daily = daily_module()
+        with tempfile.TemporaryDirectory() as temp, mock.patch.object(daily, "require_reviewed_main"), contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()) as errors:
+            code = daily.main(["--render-units", str(Path(temp) / "units"), "--repository", "/srv/clone", "--node", sys.executable])
+        self.assertEqual(code, 2)
+        self.assertEqual(errors.getvalue(), f"daily skill usage refused: {LAYOUT_MESSAGE}\n")
+
+    def test_the_program_has_no_confinement_probe_option(self):
+        """Route B removed the inside probe (require_confined, --refuse-writable): five rounds of fixes each found another way to satisfy it without the sandbox (the corpus of the design record)."""
+        daily = daily_module()
+        for name in ("require_confined", "Unconfined", "Unverified", "READ_ONLY_REFUSAL", "ACCESS_REFUSALS"):
+            self.assertFalse(hasattr(daily, name), name)
+        with contextlib.redirect_stderr(io.StringIO()) as errors, self.assertRaises(SystemExit) as caught:
+            daily.main(["--refuse-writable", "/fixture/home"])
+        self.assertEqual(caught.exception.code, 2)
+        self.assertIn("unrecognized arguments", errors.getvalue())
+
     def test_the_native_analyzer_reads_the_directives_as_protection(self):
         analyze = shutil.which("systemd-analyze")
+        if not analyze:
+            unavailable("native systemd analyzer unavailable")
         if "--offline" not in subprocess.run([analyze, "security", "--help"], capture_output=True, text=True, timeout=30).stdout:
-            self.skipTest("this systemd-analyze has no `security --offline`")
+            unavailable("this systemd-analyze has no `security --offline`")
 
         def rows(unit):
             done = subprocess.run([analyze, "security", "--offline=yes", "--user", "--json=short", str(unit)], capture_output=True, text=True, timeout=60)
@@ -947,40 +1003,100 @@ class ServiceSandboxTests(unittest.TestCase):
                     self.assertIn("read-only", protected["ProtectHome"]["description"])
 
 
-PROBE = r"""
+# What a unit's directives do to a process, observed through the manager that starts it (route B, ruling-pr1043-route-b-20261013). The payload prints a first line the moment it starts (so a unit that was refused is
+# known by its silence), then tries to create a file at each target. The control is the same payload started by the same manager with no directive at all: it is in the manager's own mount namespace, which is the
+# reference a sandboxed unit's namespace is compared with (never the namespace of the process that started the test: a manager may live in a namespace of its own, as the first host's does), and every write of it must succeed.
+PROBE_CHILD = r"""
 import errno, json, os, sys
-from pathlib import Path
-clone, other, records, unrelated = (Path(arg) for arg in sys.argv[1:5])
+print(json.dumps({"started": True, "ns": os.readlink("/proc/self/ns/mnt")}), flush=True)
 
 
-def attempt(target):
+def attempt(path):
     try:
-        target.write_text("x")
-        target.unlink()
+        with open(path, "w"):
+            pass
+        os.unlink(path)
         return "written"
     except OSError as error:
-        return errno.errorcode.get(error.errno, "?")
+        return errno.errorcode.get(error.errno, "errno-%d" % error.errno)
 
 
-sys.path.insert(0, str(clone))
-import helper_module
-print(json.dumps({"clone": attempt(clone / "probe.txt"), "other": attempt(other / "probe.txt"), "unrelated": attempt(unrelated), "records": attempt(records / "probe.txt"),
-                  "pycache": (clone / "__pycache__").exists(), "helper": helper_module.VALUE}))
+print(json.dumps({"writes": {name: attempt(path) for name, path in json.loads(sys.argv[1]).items()}}), flush=True)
 """
 
-# What the program does first under a unit: ask the file system (daily_skill_usage.require_confined) about the clone, a sibling directory and the home directory. Exit 3 when it refuses.
-CHECK = r"""
-import sys
-sys.path.insert(0, sys.argv[1])
-import daily_skill_usage as daily
-try:
-    daily.require_confined(sys.argv[2:])
-except daily.Refused:
-    sys.exit(3)
-"""
+# The statuses with which a manager refuses a unit before its payload runs, because the namespaces its directives ask for cannot be made: EXIT_NAMESPACE (man/systemd.exec.xml L4356-L4358, systemd-stable@387a14a7b67b
+# v255.4; exec_invoke L4655-L4664) for the mount namespace, and EXIT_USER (L4316-L4317; exec_invoke L4595-L4609) for the user namespace that PrivateUsers=true asks for. Any other status is not a refusal of the directives.
+REFUSAL_STATUSES = {226: "NAMESPACE", 217: "USER"}
+PROTECTED_TARGETS = ("clone", "other", "unrelated", "runtime")
+WRITABLE_TARGETS = ("records",)
 
-# A stand-in for `systemd-run --user --wait --collect --pipe -q -p KEY=VALUE ... COMMAND`: it accepts every property, applies WorkingDirectory= and Environment=, and applies none of the sandboxing ones, as a
-# user manager does when it cannot create the mount namespace (systemd/systemd-stable@387a14a7b67b, v255.4: src/core/exec-invoke.c L3212-L3237, src/core/namespace.c L2488-L2497).
+
+def observe(done):
+    """One run through the manager as plain data: the exit status (None when the run never completed), whether the payload printed its first line, its mount namespace, its write attempts, whether the run printed
+    nothing at all, and the status the manager itself reported (its own words, `226/NAMESPACE`). A line that is not JSON, or a key that is absent, is a missing fact (None): nothing is guessed."""
+    if done is None or done.returncode is None:
+        return {"rc": None, "started": False, "silent": True, "ns": None, "writes": None, "manager": None}
+    started, ns, writes = False, None, None
+    for line in done.stdout.splitlines():
+        try:
+            item = json.loads(line)
+        except ValueError:
+            continue
+        if isinstance(item, dict) and item.get("started") is True and isinstance(item.get("ns"), str):
+            started, ns = True, item["ns"]
+        elif isinstance(item, dict) and isinstance(item.get("writes"), dict):
+            writes = {str(key): str(value) for key, value in item["writes"].items()}
+    reported = re.search(r"status=(\d+)(?:/([A-Z_]+))?", done.stderr or "")   # systemd 255 prints `code=exited/status=226`, 259 `code=exited, status=226/NAMESPACE`
+    return {"rc": done.returncode, "started": started, "silent": not done.stdout.strip(), "ns": ns, "writes": writes,
+            "manager": None if not reported else f"{reported.group(1)}/{reported.group(2)}" if reported.group(2) else reported.group(1)}
+
+
+def classify(control, run):
+    """What the manager did with the directives, from two observations taken through the same manager: `control` (no directive) and `run` (the unit's directives). Returns (class, reason):
+
+    "enforced"      the unit ran (status 0) in a mount namespace other than the control's (the manager's own), every protected write was refused by a read-only file system (EROFS) where the control's succeeded,
+                    and the record directory was written;
+    "fails_closed"  the manager refused the unit with 226/NAMESPACE or 217/USER (REFUSAL_STATUSES) and the payload never printed anything;
+    "fail"          anything else, with the reason: it ran in the control's namespace (unconfined), there is no usable reference namespace, an observation is missing or malformed or timed out, a refusal was not EROFS,
+                    a status is not one of the two, or the payload started although the manager reported a refusal. There is no skip and no tolerated middle class."""
+    status = run.get("rc")
+    if status is None:
+        return "fail", "the run did not complete"
+    if status in REFUSAL_STATUSES:
+        if run.get("started") or not run.get("silent"):
+            return "fail", "the payload started although the manager reported a refusal"
+        if run.get("manager") not in (None, str(status), f"{status}/{REFUSAL_STATUSES[status]}"):
+            return "fail", "the manager's own words do not match the status"
+        return "fails_closed", f"{status}/{REFUSAL_STATUSES[status]}"
+    if status != 0:
+        return "fail", f"status {status} is not a refusal of the namespaces"
+    if control.get("rc") != 0 or not control.get("ns") or not isinstance(control.get("writes"), dict):
+        return "fail", "the control gave no reference namespace"
+    expected = set(control["writes"])
+    if not {"clone", "other", "unrelated", "records"} <= expected or any(value != "written" for value in control["writes"].values()):
+        return "fail", "the control could not write where the unit must be refused"
+    if not run.get("started") or not run.get("ns") or not isinstance(run.get("writes"), dict) or set(run["writes"]) != expected:
+        return "fail", "the observation of the run is incomplete"
+    if run["ns"] == control["ns"]:
+        return "fail", "the unit ran in the manager's own mount namespace: unconfined"
+    for name in sorted(expected):
+        wanted = "written" if name in WRITABLE_TARGETS else "EROFS"
+        if run["writes"][name] != wanted:
+            return "fail", f"the write to {name} gave {run['writes'][name]}, not {wanted}"
+    return "enforced", ""
+
+
+def unavailable(reason):
+    """A native test that cannot run: a skip on a developer's machine, a failure under GitHub Actions, so that a green run there means something was asserted (the pattern of
+    tests/test_token_full_save_evidence.py metadata_lines, which reads GITHUB_ACTIONS on every call so a control can patch the environment). The hosted runner has a user manager (receipts)."""
+    if os.environ.get("GITHUB_ACTIONS") == "true":
+        raise AssertionError(f"{reason}; the GitHub-hosted runner has a user manager, so a native test that cannot run there is a defect")
+    raise unittest.SkipTest(reason)
+
+
+# A stand-in for `systemd-run --user --wait --collect --pipe -p KEY=VALUE ... COMMAND`. It exercises the classifier and the observation, nothing about systemd: its modes are what a manager can do with the
+# directives, selected by STUB_MODE. "apply-none" accepts every property and applies none (the hosted runner's manager without the marker); "refuse" exits with STUB_STATUS before the payload runs; "refuse-after-start"
+# runs the payload and then exits with STUB_STATUS (a contradiction: a refusal that came too late).
 STUB_MANAGER = r"""
 import os
 import subprocess
@@ -1001,16 +1117,21 @@ while index < len(arguments):
         index += 2
     else:
         break
-sys.exit(subprocess.run(arguments[index:], cwd=directory, env=environment).returncode)
+mode = os.environ.get("STUB_MODE", "apply-none")
+status = int(os.environ.get("STUB_STATUS", "0"))
+if mode == "refuse":
+    sys.stderr.write("Finished with result: exit-code\nMain processes terminated with: code=exited, status=%d/%s\n" % (status, os.environ.get("STUB_NAME", "NAMESPACE")))
+    sys.exit(status)
+done = subprocess.run(arguments[index:], cwd=directory, env=environment).returncode
+if mode == "refuse-after-start":
+    sys.stderr.write("Finished with result: exit-code\nMain processes terminated with: code=exited, status=%d/NAMESPACE\n" % status)
+    sys.exit(status)
+sys.exit(done)
 """
-
-UNCONFINED_MESSAGE = "daily skill usage refused: this process can write where its service unit forbids it, so the unit's file system directives are not in effect and it did not run\n"
-UNVERIFIED_MESSAGE = ("daily skill usage refused: a directory that the unit's directives make read-only refused the write by a mode or a policy and not as a read-only file system does, "
-                      "so the directives are not shown to be in effect and it did not run\n")
 
 
 class ManagerProbes:
-    """What a service unit's directives do to a process, asked through `self.manager`: an argv prefix that behaves like `systemd-run --user --wait --collect --pipe -q` (the real one, or STUB_MANAGER)."""
+    """What a service unit's directives do to a process, asked through `self.manager`: an argv prefix that behaves like `systemd-run --user --wait --collect --pipe` (the real one, or STUB_MANAGER)."""
     manager = None
 
     def units(self):
@@ -1023,48 +1144,198 @@ class ManagerProbes:
         try:
             fixture = Path(tempfile.mkdtemp(prefix=".skill-sandbox-", dir=Path.home()))
         except OSError:
-            self.skipTest("the home directory is not writable")
+            unavailable("the home directory is not writable")
         self.addCleanup(shutil.rmtree, fixture, True)
         for name in ("clone", "other", "records"):
             (fixture / name).mkdir()
-        (fixture / "clone" / "helper_module.py").write_text("VALUE = 7\n")
-        shutil.copytree(ROOT / "tools/skill-usage", fixture / "tool", ignore=shutil.ignore_patterns("__pycache__"))   # the program, where a unit with a private /var/tmp can still read it
         return fixture
 
+    def targets(self, fixture):
+        """Where the payload tries to create a file: the clone and a sibling directory (below the home, read-only under the directives), a file in the home itself, the pre-existing runtime tmpfs below /run (a submount
+        of a protected tree that exists before the unit starts), and the record directory (the one that must stay writable)."""
+        found = {"clone": fixture / "clone" / "probe.txt", "other": fixture / "other" / "probe.txt", "records": fixture / "records" / "probe.txt", "unrelated": Path.home() / f".skill-sandbox-probe-{os.getpid()}"}
+        if os.environ.get("XDG_RUNTIME_DIR"):
+            found["runtime"] = Path(os.environ["XDG_RUNTIME_DIR"]) / f"skill-sandbox-probe-{os.getpid()}"
+        return found
+
     def properties(self, section, records):
+        """The sandbox properties of a rendered unit as KEY=VALUE strings, with the record directory moved to the fixture: the marker is in them."""
         home = str(Path.home())
         out = []
         for key in SANDBOX_KEYS:
             for value in section[key]:
                 value = records if key == "ReadWritePaths" else value
-                out += ["-p", f"{key}={value.replace('%h', home)}"]
+                out.append(f"{key}={value.replace('%h', home)}")
         for value in section["Environment"]:
             if value.startswith("PYTHONDONTWRITEBYTECODE="):
-                out += ["-p", f"Environment={value}"]
+                out.append(f"Environment={value}")
         return out
 
-    def under_manager(self, extra, fixture, command):
-        return subprocess.run([*self.manager, "-p", f"WorkingDirectory={fixture / 'clone'}", *extra, *command], capture_output=True, text=True, timeout=120)
+    def run_probe(self, properties, fixture, env=None):
+        """The observation (observe) of the payload started through the manager with the KEY=VALUE `properties`."""
+        targets = {name: str(path) for name, path in self.targets(fixture).items()}
+        for path in targets.values():
+            self.addCleanup(lambda path=path: Path(path).unlink(missing_ok=True))
+        flags = [item for prop in properties for item in ("-p", prop)]
+        argv = [*self.manager, "-p", f"WorkingDirectory={fixture / 'clone'}", *flags, sys.executable, "-B", "-c", PROBE_CHILD, json.dumps(targets)]
+        try:
+            done = subprocess.run(argv, capture_output=True, text=True, timeout=120, env={**os.environ, **(env or {})})
+        except (OSError, subprocess.SubprocessError):
+            done = None
+        return observe(done)
 
-    def probe(self, extra, fixture):
-        clone, other, records = fixture / "clone", fixture / "other", fixture / "records"
-        unrelated = Path.home() / f".skill-sandbox-probe-{os.getpid()}"
-        self.addCleanup(lambda: unrelated.unlink(missing_ok=True))
-        done = self.under_manager(extra, fixture, [sys.executable, "-c", PROBE, str(clone), str(other), str(records), str(unrelated)])
-        self.assertEqual(done.returncode, 0, done.stderr)
-        return json.loads(done.stdout)
 
-    def check(self, extra, fixture):
-        """The exit status of `require_confined` over the clone, the sibling directory and the home directory, run under the manager: 0 accepted, 3 refused."""
-        done = self.under_manager(extra, fixture, [sys.executable, "-B", "-c", CHECK, str(fixture / "tool"), str(fixture / "clone"), str(fixture / "other"), str(Path.home())])
-        self.assertIn(done.returncode, (0, 3), done.stderr)
-        return done.returncode
+class ClassifierTests(unittest.TestCase):
+    """classify() on observations written out by hand: the decision logic of the native test, which no host class can exercise all of. Review of the design record of #1043 (Astra P2, Muse P2-3, the command
+    center's Claude read P1-1): a child whose namespace differs from the test process's is not necessarily in a namespace the manager made for the unit, and a skip or a tolerated 'ran and unenforced' class lets
+    a manager that stopped insisting pass."""
+
+    WRITTEN = {"clone": "written", "other": "written", "unrelated": "written", "runtime": "written", "records": "written"}
+    CONTROL = {"rc": 0, "started": True, "silent": False, "ns": "mnt:[100]", "writes": WRITTEN, "manager": "0/SUCCESS"}
+    ENFORCED = {"rc": 0, "started": True, "silent": False, "ns": "mnt:[200]", "manager": "0/SUCCESS",
+                "writes": {"clone": "EROFS", "other": "EROFS", "unrelated": "EROFS", "runtime": "EROFS", "records": "written"}}
+    REFUSED = {"rc": 226, "started": False, "silent": True, "ns": None, "writes": None, "manager": "226/NAMESPACE"}
+
+    def run_with(self, **changes):
+        return {**self.ENFORCED, **changes}
+
+    def test_a_unit_in_a_namespace_the_manager_made_with_every_protected_write_refused_is_enforced(self):
+        self.assertEqual(classify(self.CONTROL, self.ENFORCED), ("enforced", ""))
+
+    def test_a_unit_that_ran_in_the_managers_own_namespace_is_a_failure_whatever_else_it_shows(self):
+        """The hosted runner's manager without the marker: status 0, every write succeeded (receipts/marker-probe-hosted-runner.json, set 'the shipped directives before round 5 (no marker)')."""
+        unconfined = self.run_with(ns=self.CONTROL["ns"], writes=self.WRITTEN)
+        self.assertEqual(classify(self.CONTROL, unconfined), ("fail", "the unit ran in the manager's own mount namespace: unconfined"))
+        refused_but_inherited = self.run_with(ns=self.CONTROL["ns"])
+        self.assertEqual(classify(self.CONTROL, refused_but_inherited)[0], "fail", "refusals do not make a namespace: the Astra counterexample, a child that inherited the manager's namespace")
+
+    def test_the_namespace_of_the_process_that_started_the_test_is_not_an_input(self):
+        """Astra P2: on the first host the manager's namespace differs from the starter's, so 'differs from the starter' holds for a child that merely inherited the manager's. The reference is the control's."""
+        starter = "mnt:[1]"
+        child_equal_to_the_manager = self.run_with(ns="mnt:[100]")
+        self.assertNotEqual(child_equal_to_the_manager["ns"], starter)
+        self.assertEqual(classify(self.CONTROL, child_equal_to_the_manager)[0], "fail")
+
+    def test_an_unknown_reference_cannot_pass_the_successful_branch(self):
+        for label, control in (("no namespace", {**self.CONTROL, "ns": None}), ("an empty namespace", {**self.CONTROL, "ns": ""}), ("the control did not complete", {**self.CONTROL, "rc": None}),
+                               ("the control failed", {**self.CONTROL, "rc": 1}), ("no writes", {**self.CONTROL, "writes": None}), ("not an object", {**self.CONTROL, "writes": []})):
+            with self.subTest(control=label):
+                self.assertEqual(classify(control, self.ENFORCED), ("fail", "the control gave no reference namespace"))
+
+    def test_the_control_must_be_able_to_write_where_the_unit_is_refused(self):
+        """A control that was itself refused somewhere shows nothing about what the directives refuse."""
+        for target in ("clone", "other", "unrelated", "runtime", "records"):
+            with self.subTest(refused_in_the_control=target):
+                control = {**self.CONTROL, "writes": {**self.WRITTEN, target: "EROFS"}}
+                self.assertEqual(classify(control, self.ENFORCED), ("fail", "the control could not write where the unit must be refused"))
+
+    def test_a_control_that_lacks_a_target_shows_nothing_about_that_target(self):
+        for target in ("clone", "other", "unrelated", "records"):
+            with self.subTest(missing_in_the_control=target):
+                control = {**self.CONTROL, "writes": {key: value for key, value in self.WRITTEN.items() if key != target}}
+                self.assertEqual(classify(control, self.ENFORCED), ("fail", "the control could not write where the unit must be refused"))
+
+    def test_every_protected_write_must_be_refused_by_a_read_only_file_system_and_the_records_written(self):
+        for target in PROTECTED_TARGETS:
+            for answer in ("written", "EACCES", "EPERM", "ENOENT", "EIO"):
+                with self.subTest(target=target, answer=answer):
+                    writes = {**self.ENFORCED["writes"], target: answer}
+                    outcome, reason = classify(self.CONTROL, self.run_with(writes=writes))
+                    self.assertEqual(outcome, "fail")
+                    self.assertIn(target, reason)
+        for answer in ("EROFS", "EACCES", "ENOENT"):
+            with self.subTest(records=answer):
+                outcome, reason = classify(self.CONTROL, self.run_with(writes={**self.ENFORCED["writes"], "records": answer}))
+                self.assertEqual((outcome, "records" in reason), ("fail", True))
+
+    def test_a_missing_malformed_or_incomplete_observation_of_a_run_that_started_is_a_failure(self):
+        for label, changes in (("never started", dict(started=False)), ("no namespace", dict(ns=None)), ("no writes", dict(writes=None)), ("writes of the wrong type", dict(writes=[])),
+                               ("a target missing", dict(writes={key: value for key, value in self.ENFORCED["writes"].items() if key != "runtime"})),
+                               ("a target more", dict(writes={**self.ENFORCED["writes"], "extra": "EROFS"}))):
+            with self.subTest(run=label):
+                self.assertEqual(classify(self.CONTROL, self.run_with(**changes))[0], "fail")
+
+    def test_a_run_that_did_not_complete_is_a_failure_never_a_skip(self):
+        self.assertEqual(classify(self.CONTROL, {**self.ENFORCED, "rc": None}), ("fail", "the run did not complete"))
+        self.assertEqual(classify(self.CONTROL, observe(None)), ("fail", "the run did not complete"))
+
+    def test_the_two_refusals_of_the_namespaces_are_fails_closed_when_the_payload_never_ran(self):
+        for status, name in ((226, "NAMESPACE"), (217, "USER")):
+            with self.subTest(status=status):
+                self.assertEqual(classify(self.CONTROL, {**self.REFUSED, "rc": status, "manager": f"{status}/{name}"}), ("fails_closed", f"{status}/{name}"))
+                self.assertEqual(classify(self.CONTROL, {**self.REFUSED, "rc": status, "manager": None})[0], "fails_closed", "the manager's words are optional, the status is not")
+        broken_control = {**self.CONTROL, "rc": 1, "ns": None, "writes": None}
+        self.assertEqual(classify(broken_control, self.REFUSED)[0], "fails_closed", "a refusal needs no reference namespace")
+
+    def test_a_refusal_with_any_sign_that_the_payload_ran_is_a_failure(self):
+        for label, changes in (("it printed its first line", dict(started=True, ns="mnt:[200]")), ("it printed something", dict(silent=False)),
+                               ("it wrote", dict(writes={"records": "written"}, started=True, silent=False))):
+            with self.subTest(run=label):
+                self.assertEqual(classify(self.CONTROL, {**self.REFUSED, **changes}), ("fail", "the payload started although the manager reported a refusal"))
+
+    def test_the_managers_own_words_must_match_the_status(self):
+        self.assertEqual(classify(self.CONTROL, {**self.REFUSED, "manager": "226/USER"}), ("fail", "the manager's own words do not match the status"))
+        self.assertEqual(classify(self.CONTROL, {**self.REFUSED, "rc": 217, "manager": "217/NAMESPACE"})[0], "fail")
+        self.assertEqual(classify(self.CONTROL, {**self.REFUSED, "manager": "217"})[0], "fail", "the number alone must match too")
+        self.assertEqual(classify(self.CONTROL, {**self.REFUSED, "manager": "226"})[0], "fails_closed", "systemd 255 prints the number without its name")
+
+    def test_every_other_status_is_a_failure(self):
+        """The statuses the unit set could end in besides the two refusals (man/systemd.exec.xml): the working directory (200), exec (203), capabilities (218), network (225), the cgroup (219), a plain 1, a signal."""
+        for status in (1, 2, 200, 203, 205, 218, 219, 225, 227, 255, 143):
+            with self.subTest(status=status):
+                outcome, reason = classify(self.CONTROL, {**self.REFUSED, "rc": status, "manager": f"{status}/X"})
+                self.assertEqual((outcome, reason), ("fail", f"status {status} is not a refusal of the namespaces"))
+
+    def test_the_classifier_never_skips_and_has_exactly_three_classes(self):
+        seen = set()
+        for run in (self.ENFORCED, self.REFUSED, {**self.REFUSED, "rc": 1}, {"rc": None}, {}):
+            outcome, _ = classify(self.CONTROL, run)
+            seen.add(outcome)
+        self.assertEqual(seen, {"enforced", "fails_closed", "fail"})
+
+
+class ObserveTests(unittest.TestCase):
+    def done(self, stdout, returncode=0, stderr=""):
+        return subprocess.CompletedProcess(["manager"], returncode, stdout, stderr)
+
+    def test_the_two_lines_of_the_payload_and_the_managers_words_are_read(self):
+        stdout = json.dumps({"started": True, "ns": "mnt:[7]"}) + "\n" + json.dumps({"writes": {"clone": "EROFS", "records": "written"}}) + "\n"
+        seen = observe(self.done(stdout, stderr="Finished with result: success\nMain processes terminated with: code=exited, status=0/SUCCESS\n"))
+        self.assertEqual(seen, {"rc": 0, "started": True, "silent": False, "ns": "mnt:[7]", "writes": {"clone": "EROFS", "records": "written"}, "manager": "0/SUCCESS"})
+
+    def test_a_silent_refusal_has_nothing_but_the_status(self):
+        seen = observe(self.done("", 226, "Finished with result: exit-code\nMain processes terminated with: code=exited, status=226/NAMESPACE\n"))
+        self.assertEqual(seen, {"rc": 226, "started": False, "silent": True, "ns": None, "writes": None, "manager": "226/NAMESPACE"})
+
+    def test_the_managers_words_are_read_in_the_forms_of_both_host_classes(self):
+        """systemd 259 (the first host) prints `code=exited, status=226/NAMESPACE`; systemd 255 (the hosted runner) prints `code=exited/status=226` (receipts/marker-probe-hosted-runner.json)."""
+        for words, expected in (("Main processes terminated with: code=exited, status=226/NAMESPACE", "226/NAMESPACE"), ("Main processes terminated with: code=exited/status=226", "226"),
+                                ("Main processes terminated with: code=exited/status=0", "0"), ("Main processes terminated with: code=exited, status=0/SUCCESS", "0/SUCCESS"), ("nothing about a status", None)):
+            with self.subTest(words=words):
+                self.assertEqual(observe(self.done("", 1, words + "\n"))["manager"], expected)
+
+    def test_what_is_not_json_or_not_the_right_shape_is_a_missing_fact(self):
+        for label, stdout in (("garbage", "garbage\n"), ("a list", "[1, 2]\n"), ("started as a string", json.dumps({"started": "yes", "ns": "x"}) + "\n"),
+                              ("a namespace of the wrong type", json.dumps({"started": True, "ns": 5}) + "\n"), ("writes as a list", json.dumps({"writes": ["x"]}) + "\n")):
+            with self.subTest(output=label):
+                seen = observe(self.done(stdout))
+                self.assertFalse(seen["started"] and seen["ns"] is not None and isinstance(seen["writes"], dict))
+                self.assertFalse(seen["silent"])
+
+    def test_a_run_that_did_not_complete_is_observed_as_no_status(self):
+        self.assertEqual(observe(None)["rc"], None)
+        self.assertEqual(observe(self.done("", None))["rc"], None)
+        printed = json.dumps({"started": True, "ns": "mnt:[7]"}) + "\n"
+        self.assertEqual(observe(self.done(printed, None)), {"rc": None, "started": False, "silent": True, "ns": None, "writes": None, "manager": None}, "nothing that an unfinished run printed is trusted")
+
+    def test_a_start_without_a_namespace_is_not_a_start(self):
+        seen = observe(self.done(json.dumps({"started": True}) + "\n"))
+        self.assertEqual((seen["started"], seen["ns"], seen["silent"]), (False, None, False))
 
 
 class StubManagerTests(ManagerProbes, unittest.TestCase):
-    """Review of #1043 at 68d4f4343 (blocker 1, and the failed shard of the same head on the GitHub-hosted runner: ubuntu-24.04 image 20261004.327.1, systemd 255.4-1ubuntu8.17, job 115064673607 of run
-    38325995828): the rendered directives were accepted, the probe ran, and it wrote to the clone, the sibling directory and the home directory ({clone: written, other: written, unrelated: written, records:
-    written, pycache: False, helper: 7}). The first version of the runtime test assumed the manager applies what it accepts. The stand-in manager reproduces that manager on every host, with or without systemd."""
+    """The classifier driven through a stand-in manager, with real processes, so that the whole path (the properties handed over, the payload, the observation, the class) runs on every host with or without systemd.
+    The stand-in exercises the decision logic only: it says nothing about what any real manager does (the hosted runner's is in the retained receipts and the native tests)."""
 
     @classmethod
     def setUpClass(cls):
@@ -1074,278 +1345,182 @@ class StubManagerTests(ManagerProbes, unittest.TestCase):
         stub.write_text(STUB_MANAGER)
         cls.manager = [sys.executable, str(stub)]
 
-    def test_a_manager_that_applies_none_of_the_directives_gives_the_probe_the_whole_home(self):
+    def test_a_manager_that_accepts_the_directives_and_applies_none_is_a_failure_even_with_the_marker(self):
+        """Review of #1043 at 68d4f4343 (blocker 1, the failed shard on the GitHub-hosted runner: ubuntu-24.04 image 20261004.327.1, systemd 255.4-1ubuntu8.17, job 115064673607 of run 38325995828): the manager accepted the
+        directives, started the probe, and every write succeeded. Before round 5 that was a skip or a 'ran and unenforced' class; now it is the failure that a manager which stopped insisting must be."""
         fixture = self.fixture()
-        control = self.probe(["-p", "Environment=PYTHONDONTWRITEBYTECODE="], fixture)
-        self.assertEqual(control, {"clone": "written", "other": "written", "unrelated": "written", "records": "written", "pycache": True, "helper": 7})
-        shutil.rmtree(fixture / "clone" / "__pycache__")
+        control = self.run_probe([], fixture)
+        self.assertEqual((control["rc"], set(control["writes"].values())), (0, {"written"}))
         for half, section in self.units().items():
             with self.subTest(half=half):
-                confined = self.probe(self.properties(section, str(fixture / "records")), fixture)
-                self.assertEqual(confined, {"clone": "written", "other": "written", "unrelated": "written", "records": "written", "pycache": False, "helper": 7},
-                                 "the stand-in does what the runner's manager did: the environment is applied and the sandboxing is not")
+                run = self.run_probe(self.properties(section, str(fixture / "records")), fixture)
+                self.assertEqual(run["ns"], control["ns"])
+                self.assertEqual(classify(control, run), ("fail", "the unit ran in the manager's own mount namespace: unconfined"))
 
-    def test_the_program_refuses_to_run_under_a_manager_that_applies_none_of_the_directives(self):
+    def test_a_manager_that_refuses_the_unit_before_the_payload_is_fails_closed(self):
         fixture = self.fixture()
-        self.assertEqual(self.check(["-p", "Environment=PYTHONDONTWRITEBYTECODE="], fixture), 3, "without the directives the program is refused")
+        control = self.run_probe([], fixture)
+        for status, name in ((226, "NAMESPACE"), (217, "USER")):
+            with self.subTest(status=status):
+                run = self.run_probe(self.properties(self.units()["claude"], str(fixture / "records")), fixture, env={"STUB_MODE": "refuse", "STUB_STATUS": str(status), "STUB_NAME": name})
+                self.assertEqual((run["rc"], run["started"], run["silent"], run["manager"]), (status, False, True, f"{status}/{name}"))
+                self.assertEqual(classify(control, run), ("fails_closed", f"{status}/{name}"))
+
+    def test_a_refusal_that_came_after_the_payload_ran_is_a_failure(self):
+        fixture = self.fixture()
+        control = self.run_probe([], fixture)
+        run = self.run_probe(self.properties(self.units()["codex"], str(fixture / "records")), fixture, env={"STUB_MODE": "refuse-after-start", "STUB_STATUS": "226"})
+        self.assertEqual((run["rc"], run["started"]), (226, True))
+        self.assertEqual(classify(control, run), ("fail", "the payload started although the manager reported a refusal"))
+
+    def test_any_other_status_is_a_failure_through_the_whole_path(self):
+        fixture = self.fixture()
+        control = self.run_probe([], fixture)
+        for status in (1, 203, 218):
+            with self.subTest(status=status):
+                run = self.run_probe(self.properties(self.units()["claude"], str(fixture / "records")), fixture, env={"STUB_MODE": "refuse", "STUB_STATUS": str(status), "STUB_NAME": "OTHER"})
+                self.assertEqual(classify(control, run)[0], "fail")
+
+    def test_the_properties_handed_to_the_manager_carry_the_marker(self):
+        """Muse P2-3(c): SANDBOX_KEYS lacked the marker, so a test built on it measured the unit without it and believed it measured the shipped unit."""
+        fixture = self.fixture()
         for half, section in self.units().items():
             with self.subTest(half=half):
-                self.assertEqual(self.check(self.properties(section, str(fixture / "records")), fixture), 3, "with the directives accepted and not applied it is refused too")
-        self.assertEqual(sorted(path.name for folder in (fixture / "clone", fixture / "other", Path.home()) for path in folder.iterdir() if path.name.startswith(".skill-usage-confinement")), [],
-                         "the probing leaves no file behind")
+                properties = self.properties(section, str(fixture / "records"))
+                self.assertIn(f"TemporaryFileSystem={MARKER}", properties)
+                self.assertIn("PrivateUsers=true", properties)
+                self.assertEqual([item for item in properties if item.startswith("ReadWritePaths=")], [f"ReadWritePaths={fixture / 'records'}"])
 
-    def test_a_permission_refusal_does_not_pass_for_a_process_the_manager_left_unconfined(self):
-        """Review of #1043 at 9caafa601 (P1), the reviewer's reproduction: a home and a clone of mode 0500 refuse a new entry by their mode, a writable directory sits below the home, and the manager applied no
-        directive. The check accepted the refusals; the process then created a directory and a marker below the home, outside any record directory. It must stop first."""
-        base = Path(tempfile.mkdtemp(prefix="skill-two-roots-"))
-        self.addCleanup(shutil.rmtree, base, True)
-        home, clone = base / "home", base / "clone"
-        (home / "client-state").mkdir(parents=True)
-        clone.mkdir()
-        shutil.copytree(ROOT / "tools/skill-usage", base / "tool", ignore=shutil.ignore_patterns("__pycache__"))
-        home.chmod(0o500)
-        clone.chmod(0o500)
-        self.addCleanup(lambda: [path.chmod(0o700) for path in (home, clone)])
-        marker = home / "client-state" / "marker"
-        script = CHECK + f"\nopen({str(marker)!r}, 'w').write('written')\n"
-        done = subprocess.run([*self.manager, "-p", f"WorkingDirectory={base}", "-p", "Environment=PYTHONDONTWRITEBYTECODE=1", sys.executable, "-B", "-c", script, str(base / "tool"), str(home), str(clone)],
-                              capture_output=True, text=True, timeout=120)
-        self.assertEqual(done.returncode, 3, done.stderr)
-        self.assertFalse(marker.exists(), "the process must not get past the check")
 
-    def test_the_rendered_command_line_stops_before_any_work_when_the_manager_applied_nothing(self):
-        """The service-level negative control: the unit's own command line, under a manager that ignores the sandbox, exits 2 with the fixed message and writes no record."""
-        daily = daily_module()
-        fixture = self.fixture()
-        home = fixture / "home"
-        home.mkdir()
-        with tempfile.TemporaryDirectory() as temp:
-            daily.render_units(Path(temp), ROOT, Path(sys.executable), Path("/fixture/bin/node"))
-            for half in daily.HALVES:
-                section = service_section((Path(temp) / f"skill-invoke-rate-{half}.service").read_text())
-                command = [token.replace("%h", str(home)) for token in shlex.split(section["ExecStart"][0])]
-                with self.subTest(half=half):
-                    done = self.under_manager(["-p", "Environment=PYTHONDONTWRITEBYTECODE=1"], fixture, command)
-                    self.assertEqual((done.returncode, done.stdout, done.stderr), (2, "", UNCONFINED_MESSAGE))
-                    self.assertEqual(list(home.rglob("*")), [], "no record, no lock, no directory was written")
+class UnavailableTests(unittest.TestCase):
+    """A native test that cannot run must not be a green one under GitHub Actions (the command center's ruling, point 4; the pattern of tests/test_token_full_save_evidence.py)."""
+
+    def outcome(self, reason):
+        try:
+            unavailable(reason)
+        except unittest.SkipTest as skipped:
+            return "skip", str(skipped)
+        except AssertionError as failed:
+            return "fail", str(failed)
+        return "returned", ""
+
+    def test_it_skips_on_a_developers_machine_and_fails_under_github_actions(self):
+        for ci, expected in (("unset", "skip"), ("true", "fail"), ("false", "skip")):
+            with self.subTest(GITHUB_ACTIONS=ci), mock.patch.dict(os.environ):
+                os.environ.pop("GITHUB_ACTIONS", None)
+                if ci != "unset":
+                    os.environ["GITHUB_ACTIONS"] = ci
+                kind, message = self.outcome("no user manager can be reached")
+                self.assertEqual(kind, expected)
+                self.assertIn("no user manager can be reached", message)
 
 
 class NativeManagerTests(ManagerProbes, unittest.TestCase):
-    """The rendered service's own directives, applied by the user manager of the host to a probe. A manager has three outcomes on a host: it applies the directives (`enforced`: writes to the clone and to the
-    rest of the home are refused, the record directory is written, no bytecode is written), it accepts them and applies none (`unenforced`: the GitHub-hosted runner, and the program must refuse), or it will not
-    start the unit with them (the suite skips: systemd itself failed closed)."""
+    """The rendered service's own directives, applied by the user manager of the host to a payload (route B). A manager has two acceptable outcomes: it makes the mount namespace and the unit runs in it (`enforced`:
+    a namespace other than the manager's own, every protected write refused as a read-only file system, the record directory written), or it refuses the unit (`fails_closed`: 226/NAMESPACE or 217/USER, nothing
+    printed). Everything else fails, a manager that accepts the directives and applies none included. The test skips only where there is no user manager at all, and under GitHub Actions even that fails."""
 
     @classmethod
     def setUpClass(cls):
         systemd_run = shutil.which("systemd-run")
         if not systemd_run:
-            raise unittest.SkipTest("systemd-run is unavailable")
+            unavailable("systemd-run is unavailable")
         if sys.executable.startswith(("/tmp/", "/var/tmp/")):
-            raise unittest.SkipTest("the interpreter lives where PrivateTmp= hides it")
-        cls.manager = [systemd_run, "--user", "--wait", "--collect", "--pipe", "-q"]
+            unavailable("the interpreter lives where PrivateTmp= hides it")
+        cls.manager = [systemd_run, "--user", "--wait", "--collect", "--pipe"]
         try:
-            done = subprocess.run([*cls.manager, "-p", "ProtectSystem=strict", "-p", "ProtectHome=read-only", "-p", "PrivateTmp=true", "-p", "PrivateUsers=true", "/bin/true"],
-                                  capture_output=True, text=True, timeout=60)
+            done = subprocess.run([*cls.manager, "-q", "/bin/true"], capture_output=True, text=True, timeout=60)
         except (OSError, subprocess.SubprocessError):
-            raise unittest.SkipTest("the user manager cannot be reached") from None
+            unavailable("the user manager cannot be reached")
         if done.returncode != 0:
-            raise unittest.SkipTest("this user manager cannot be reached, or will not start a unit with the file system namespaces and the user namespace the services use (it fails closed)")
-        try:
-            fixture = Path(tempfile.mkdtemp(prefix=".skill-sandbox-", dir=Path.home()))
-        except OSError:
-            raise unittest.SkipTest("the home directory is not writable") from None
-        try:
-            (fixture / "clone").mkdir()
-            for name in ("other", "records"):
-                (fixture / name).mkdir()
-            probe = subprocess.run([*cls.manager, "-p", f"WorkingDirectory={fixture / 'clone'}", "-p", "ProtectSystem=strict", "-p", "ProtectHome=read-only", "-p", "PrivateTmp=true",
-                                    "-p", "PrivateUsers=true", "-p", f"ReadWritePaths={fixture / 'records'}", sys.executable, "-B", "-c",
-                                    "import pathlib, sys\ntry:\n    pathlib.Path(sys.argv[1]).write_text('x')\nexcept OSError:\n    print('refused')\nelse:\n    print('written')", str(fixture / "clone" / "probe.txt")],
-                                   capture_output=True, text=True, timeout=60)
-        finally:
-            shutil.rmtree(fixture, ignore_errors=True)
-        cls.enforced = probe.stdout.strip() == "refused"
-        print(f"manager class: {'enforced' if cls.enforced else 'unenforced'}", file=sys.stderr)
+            unavailable("the user manager cannot be reached, or will not start a plain unit")
 
-    def test_the_rendered_directives_refuse_writes_to_the_clone_and_the_home_and_allow_the_records(self):
-        if not self.enforced:
-            self.skipTest("this manager accepts the directives and applies none (the GitHub-hosted runner): the program refuses instead, see the next test")
+    def classes(self):
         fixture = self.fixture()
-        control = self.probe(["-p", "Environment=PYTHONDONTWRITEBYTECODE="], fixture)
-        self.assertEqual(control, {"clone": "written", "other": "written", "unrelated": "written", "records": "written", "pycache": True, "helper": 7},
-                         "without the directives the probe writes everywhere and the interpreter writes bytecode into the clone: the probe sees what the sandbox must stop")
-        shutil.rmtree(fixture / "clone" / "__pycache__")
-        for half, section in self.units().items():
+        control = self.run_probe([], fixture)
+        results = {half: classify(control, self.run_probe(self.properties(section, str(fixture / "records")), fixture)) for half, section in self.units().items()}
+        return fixture, control, results
+
+    def test_the_rendered_directives_are_enforced_by_the_manager_or_the_manager_refuses_the_unit(self):
+        fixture, control, results = self.classes()
+        self.assertEqual(control["rc"], 0, "the control (no directive) must run, or the manager cannot be asked")
+        for half, (outcome, reason) in results.items():
             with self.subTest(half=half):
-                confined = self.probe(self.properties(section, str(fixture / "records")), fixture)
-                self.assertEqual(confined, {"clone": "EROFS", "other": "EROFS", "unrelated": "EROFS", "records": "written", "pycache": False, "helper": 7})
+                self.assertNotEqual(outcome, "fail", reason)
+        self.assertEqual(len({outcome for outcome, _ in results.values()}), 1, "both halves carry the same directives and meet the same manager")
+        print(f"manager class: {next(iter(results.values()))[0]}", file=sys.stderr)
 
-    def test_the_programs_check_agrees_with_what_the_manager_did(self):
-        """Refused exactly when the probe could write: accepted under directives that were applied, refused under directives that were not, refused without them."""
+    def test_a_marker_on_a_mount_point_that_does_not_exist_fails_closed(self):
+        """The marker's failure mode on a host without /srv (Muse P2-1, Astra P3-1): mount_tmpfs creates the mount point and ignores that result, then mounts (src/core/namespace.c L1284-L1289 at v255.4), so for an
+        unprivileged unit a missing top-level directory ends in the refusal and never in a unit that runs without the directives. Measured: receipts/marker-probe-*.json, set 'a marker on a missing mount point'."""
         fixture = self.fixture()
-        self.assertEqual(self.check(["-p", "Environment=PYTHONDONTWRITEBYTECODE="], fixture), 3, "without the directives the program is refused")
-        for half, section in self.units().items():
-            with self.subTest(half=half, enforced=self.enforced):
-                properties = self.properties(section, str(fixture / "records"))
-                wrote = self.probe(properties, fixture)["clone"] == "written"
-                self.assertEqual(wrote, not self.enforced)
-                self.assertEqual(self.check(properties, fixture), 3 if wrote else 0, "the check says what the file system does")
+        control = self.run_probe([], fixture)
+        absent = f"/skill-marker-absent-{os.getpid()}"
+        self.assertFalse(os.path.lexists(absent))
+        section = self.units()["claude"]
+        properties = [item for item in self.properties(section, str(fixture / "records")) if not item.startswith("TemporaryFileSystem=")] + [f"TemporaryFileSystem={absent}:ro"]
+        outcome, reason = classify(control, self.run_probe(properties, fixture))
+        self.assertEqual(outcome, "fails_closed", reason)
+
+    def test_where_the_manager_cannot_make_the_namespace_only_the_marker_stops_the_unit(self):
+        """The reason for the marker: on the hosted runner the same directives without it ran unconfined (receipts/marker-probe-hosted-runner.json, set 'the shipped directives before round 5 (no marker)'). The comparison is made only on a manager that refuses the unit with the marker, and
+        says so on stderr otherwise; a capable manager enforces both and the primary test above is the assertion."""
+        fixture, control, results = self.classes()
+        if next(iter(results.values()))[0] != "fails_closed":
+            print("namespace-denied branch exercised: no (this manager makes the namespace)", file=sys.stderr)
+            return
+        section = self.units()["claude"]
+        without = [item for item in self.properties(section, str(fixture / "records")) if not item.startswith("TemporaryFileSystem=")]
+        outcome, reason = classify(control, self.run_probe(without, fixture))
+        self.assertEqual(outcome, "fail", "without the marker the manager that refuses it must have started the unit unconfined, or the marker is not what stops it")
+        self.assertEqual(reason, "the unit ran in the manager's own mount namespace: unconfined")
+        print("namespace-denied branch exercised: yes", file=sys.stderr)
 
 
-class RequireConfinedTests(unittest.TestCase):
-    """daily_skill_usage.require_confined without a service manager: the file system is asked, and only a refused write passes."""
-
-    def setUp(self):
-        self.daily = daily_module()
-        self._tmp = tempfile.TemporaryDirectory(prefix="skill-confined-")
-        self.addCleanup(self._tmp.cleanup)
-        self.directory = Path(self._tmp.name)
-
-    @staticmethod
-    def refusing(number):
-        def opener(path, flags, mode=0o777):
-            raise OSError(number, os.strerror(number))
-        return opener
-
-    def test_a_directory_where_a_file_can_be_created_refuses_the_run_and_the_probe_is_removed(self):
-        with self.assertRaises(self.daily.Unconfined) as caught:
-            self.daily.require_confined([self.directory])
-        self.assertEqual(list(self.directory.iterdir()), [])
-        self.assertEqual(str(caught.exception), UNCONFINED_MESSAGE[len("daily skill usage refused: "):-1])
-        self.assertNotIn(str(self.directory), str(caught.exception))
-        self.assertIsInstance(caught.exception, self.daily.Refused)
-
-    def test_a_read_only_file_system_is_what_confinement_looks_like(self):
-        """Review of #1043 at 9caafa601 (P1): EACCES and EPERM were accepted too. The directives set MS_RDONLY on the mounts (systemd-stable@387a14a7b67b v255.4 src/core/namespace.c make_read_only L1708-L1754;
-        man/systemd.exec.xml L1630-L1632: "writing will be refused even if the usual file access controls would permit this") and the kernel answers a write there with EROFS (open(2), man-pages 6.19)."""
-        self.assertEqual(self.daily.READ_ONLY_REFUSAL, errno.EROFS)
-        self.assertIsNone(self.daily.require_confined([self.directory], opener=self.refusing(errno.EROFS)))
-        self.assertEqual(list(self.directory.iterdir()), [], "nothing was created")
-
-    def test_a_refusal_by_a_mode_or_a_policy_is_not_confinement(self):
-        for number in (errno.EACCES, errno.EPERM):
-            with self.subTest(errno=errno.errorcode[number]):
-                with self.assertRaises(self.daily.Unverified) as caught:
-                    self.daily.require_confined([self.directory], opener=self.refusing(number))
-                self.assertIsInstance(caught.exception, self.daily.Refused)
-                self.assertEqual(str(caught.exception), UNVERIFIED_MESSAGE[len("daily skill usage refused: "):-1])
-                self.assertNotIn(str(self.directory), str(caught.exception))
-        self.assertNotIsInstance(self.daily.Unverified("x"), self.daily.Unconfined)
-
-    @unittest.skipIf(os.geteuid() == 0, "root can create a file in a directory whose mode forbids it")
-    def test_a_directory_whose_mode_forbids_the_write_is_not_confined(self):
-        self.directory.chmod(0o500)
-        self.addCleanup(self.directory.chmod, 0o700)
-        with self.assertRaises(self.daily.Unverified):
-            self.daily.require_confined([self.directory])
-
-    def test_an_error_that_says_nothing_about_confinement_refuses_the_run_without_naming_the_path(self):
-        for number in (errno.ENOENT, errno.EIO, errno.ENOSPC, errno.EEXIST):
-            with self.subTest(errno=errno.errorcode[number]):
-                with self.assertRaises(ValueError) as caught:
-                    self.daily.require_confined([self.directory], opener=self.refusing(number))
-                self.assertNotIsInstance(caught.exception, self.daily.Refused)
-                self.assertNotIn(str(self.directory), str(caught.exception))
-        with self.assertRaises(ValueError):
-            self.daily.require_confined([self.directory / "absent"])
-
-    def test_a_file_that_already_has_the_probes_name_is_left_alone(self):
-        for existing in ("regular", "link"):
-            folder = self.directory / existing
-            folder.mkdir()
-            probe = folder / f".skill-usage-confinement-probe-{os.getpid()}"
-            if existing == "regular":
-                probe.write_text("not ours\n")
-            else:
-                (folder / "target").write_text("not ours\n")
-                probe.symlink_to(folder / "target")
-            with self.subTest(existing=existing):
-                with self.assertRaises(ValueError) as caught:
-                    self.daily.require_confined([folder])
-                self.assertNotIsInstance(caught.exception, self.daily.Refused)
-                self.assertTrue(probe.is_symlink() or probe.read_text() == "not ours\n")
-                self.assertEqual((folder / "target").read_text() if existing == "link" else probe.read_text(), "not ours\n")
-
-    def test_every_directory_is_asked_and_the_first_one_that_can_be_written_refuses(self):
-        confined, open_dir = self.directory / "a", self.directory / "b"
-        confined.mkdir()
-        open_dir.mkdir()
-
-        def opener(path, flags, mode=0o777):
-            if str(path).startswith(str(confined)):
-                raise OSError(errno.EROFS, "read-only")
-            return os.open(path, flags, mode)
-        with self.assertRaises(self.daily.Unconfined):
-            self.daily.require_confined([confined, open_dir], opener=opener)
-        self.assertEqual(list(open_dir.iterdir()), [])
-        self.assertIsNone(self.daily.require_confined([confined], opener=opener))
-        self.assertIsNone(self.daily.require_confined([]), "nothing to ask")
-
-    def test_one_directory_that_is_not_read_only_is_enough_to_refuse(self):
-        read_only, mode_only = self.directory / "a", self.directory / "b"
-        read_only.mkdir()
-        mode_only.mkdir()
-
-        def opener(path, flags, mode=0o777):
-            raise OSError(errno.EROFS if str(path).startswith(str(read_only)) else errno.EACCES, "refused")
-        with self.assertRaises(self.daily.Unverified):
-            self.daily.require_confined([read_only, mode_only], opener=opener)
+RECEIPTS = ROOT / "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts"
 
 
-class ConfinementOptionTests(unittest.TestCase):
-    """--refuse-writable: the check comes first, a refusal publishes nothing, and rendering the units (which writes by design) is not subject to it."""
+class RetainedReceiptTests(unittest.TestCase):
+    """The probes that were run on both host classes before round 5 (the first host, systemd 259.5; the GitHub-hosted runner, systemd 255.4) hold the observations classify() reads. The expected class of each set
+    is written here, by hand, from the manager's own words in the receipt: the classifier must read the retained observations the way the record states them."""
 
-    def setUp(self):
-        self.daily = daily_module()
-        self._tmp = tempfile.TemporaryDirectory(prefix="skill-confined-option-")
-        self.addCleanup(self._tmp.cleanup)
-        self.directory = Path(self._tmp.name)
+    EXPECTED = {
+        "marker-probe-first-host.json": {"the shipped directives before round 5 (no marker)": "enforced", "the Claude unit's directives": "enforced",
+                                         "the Codex unit's directives": "enforced", "a marker on a missing mount point": "fails_closed"},
+        "marker-probe-hosted-runner.json": {"the shipped directives before round 5 (no marker)": "fail", "the Claude unit's directives": "fails_closed",
+                                            "the Codex unit's directives": "fails_closed", "a marker on a missing mount point": "fails_closed"},
+    }
 
-    def run_main(self, *argv, **patches):
-        errors, calls = io.StringIO(), []
+    def test_the_classifier_reads_every_retained_observation_as_the_record_states_it(self):
+        for name, expected in self.EXPECTED.items():
+            report = json.loads((RECEIPTS / name).read_text(encoding="utf-8"))
+            with self.subTest(receipt=name):
+                self.assertEqual({item["set"] for item in report["sets"]}, set(expected))
+                for item in report["sets"]:
+                    with self.subTest(receipt=name, set=item["set"]):
+                        outcome, reason = classify(report["control"], item["observation"])
+                        self.assertEqual(outcome, expected[item["set"]], reason)
+                        self.assertEqual([outcome, reason], item["class"], "the class recorded when the probe ran")
 
-        def work(*args, **kwargs):
-            calls.append("work")
-            raise AssertionError("work started")
-        with mock.patch.object(self.daily, "require_reviewed_main", side_effect=work), mock.patch.object(self.daily, "collect_half", side_effect=work), \
-                contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(errors):
-            code = self.daily.main(list(argv))
-        return code, errors.getvalue(), calls
+    def test_the_hosted_runners_unit_without_the_marker_is_the_failure_that_the_marker_removes(self):
+        report = json.loads((RECEIPTS / "marker-probe-hosted-runner.json").read_text(encoding="utf-8"))
+        before = next(item for item in report["sets"] if item["set"].startswith("the shipped directives before round 5"))
+        self.assertEqual(before["observation"]["rc"], 0)
+        self.assertEqual(before["observation"]["ns"], report["control"]["ns"], "the unit ran in the manager's own namespace")
+        self.assertEqual(set(before["observation"]["writes"].values()), {"written"})
+        for item in report["sets"]:
+            if item["set"] in ("the Claude unit's directives", "the Codex unit's directives"):
+                # the manager's own words on systemd 255 are `code=exited/status=226`, without the name that 259 prints (`status=226/NAMESPACE`)
+                self.assertEqual((item["observation"]["rc"], item["observation"]["manager"], item["observation"]["started"]), (226, "226", False))
 
-    def test_an_unconfined_process_is_refused_before_any_work_and_publishes_nothing(self):
-        out = self.directory / "claude.json"
-        code, stderr, calls = self.run_main("--half", "claude", "--claude-root", "/fixture/root", "--now", NOW, "--out", str(out), "--refuse-writable", str(self.directory))
-        self.assertEqual((code, stderr, calls), (2, UNCONFINED_MESSAGE, []))
-        self.assertFalse(out.exists())
-        self.assertEqual(sorted(path.name for path in self.directory.iterdir()), [], "the probe was removed")
-
-    @unittest.skipIf(os.geteuid() == 0, "root can create a file in a directory whose mode forbids it")
-    def test_a_directory_that_only_its_mode_protects_stops_the_run_before_any_work(self):
-        """Review of #1043 at 9caafa601 (P1): a mode-only refusal passed the guard and the process then wrote elsewhere under the protected home."""
-        self.directory.chmod(0o500)
-        self.addCleanup(self.directory.chmod, 0o700)
-        out = Path(tempfile.mkdtemp(prefix="skill-unverified-")) / "claude.json"
-        self.addCleanup(shutil.rmtree, out.parent, True)
-        code, stderr, calls = self.run_main("--half", "claude", "--claude-root", "/fixture/root", "--now", NOW, "--out", str(out), "--refuse-writable", str(self.directory))
-        self.assertEqual((code, stderr, calls), (2, UNVERIFIED_MESSAGE, []))
-        self.assertFalse(out.exists())
-
-    def test_a_confined_process_goes_on_to_the_work_and_each_directory_is_asked_first(self):
-        order = []
-        with mock.patch.object(self.daily, "require_confined", side_effect=lambda directories: order.append(("asked", [str(d) for d in directories]))), \
-                mock.patch.object(self.daily, "require_reviewed_main", side_effect=lambda *a, **k: order.append(("reviewed", None))), \
-                mock.patch.object(self.daily, "collect_half", return_value=claude_reports()), contextlib.redirect_stdout(io.StringIO()):
-            code = self.daily.main(["--half", "claude", "--claude-root", "/fixture/root", "--now", NOW, "--out", str(self.directory / "claude.json"),
-                                    "--refuse-writable", "/fixture/home", "--refuse-writable", "/fixture/clone"])
-        self.assertEqual(code, 0)
-        self.assertEqual(order, [("asked", ["/fixture/home", "/fixture/clone"]), ("reviewed", None)])
-
-    def test_rendering_the_units_is_not_subject_to_the_check(self):
-        destination = self.directory / "units"
-        with mock.patch.object(self.daily, "require_reviewed_main"), contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
-            code = self.daily.main(["--render-units", str(destination), "--repository", str(ROOT), "--refuse-writable", str(self.directory), "--node", sys.executable])
-        self.assertEqual(code, 0)
-        self.assertEqual(sorted(path.name for path in destination.iterdir()), sorted(self.daily.UNIT_FILES))
+    def test_the_receipts_name_the_two_host_classes(self):
+        classes = {name: json.loads((RECEIPTS / name).read_text(encoding="utf-8"))["environment"] for name in self.EXPECTED}
+        first, runner = classes["marker-probe-first-host.json"], classes["marker-probe-hosted-runner.json"]
+        self.assertRegex(first["systemd"], r"systemd 259")
+        self.assertRegex(runner["systemd"], r"systemd 255")
+        self.assertEqual(runner["image"]["ImageOS"], "ubuntu24")
+        self.assertEqual(first["unshare_user_mount_rc"], 0)
+        self.assertNotEqual(runner["unshare_user_mount_rc"], 0)
 
 
 class CaptureTimeoutTests(unittest.TestCase):

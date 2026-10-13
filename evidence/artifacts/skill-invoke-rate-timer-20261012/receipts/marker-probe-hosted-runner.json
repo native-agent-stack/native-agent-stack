@@ -1,0 +1,161 @@
+{
+ "environment": {
+  "os": "Ubuntu 24.04.5 LTS",
+  "kernel": "6.17.0-1022-azure",
+  "systemd": "systemd 255 (255.4-1ubuntu8.17)",
+  "image": {
+   "ImageOS": "ubuntu24",
+   "ImageVersion": "20261004.327.1"
+  },
+  "apparmor_restrict_unprivileged_userns": "1",
+  "unprivileged_userns_clone": "1",
+  "max_user_namespaces": "63838",
+  "unshare_user_mount_rc": 1,
+  "unshare_user_mount_stderr": "unshare: write failed /proc/self/uid_map: Operation not permitted",
+  "srv": {
+   "exists": true,
+   "is_symlink": false,
+   "entries": 0
+  },
+  "runtime_dir_fstype": "tmpfs",
+  "starter_mnt_ns": "mnt:[4026531832]",
+  "user_manager_mnt_ns": null
+ },
+ "control": {
+  "rc": 0,
+  "started": true,
+  "silent": false,
+  "ns": "mnt:[4026531832]",
+  "writes": {
+   "clone": "written",
+   "other": "written",
+   "records": "written",
+   "unrelated": "written",
+   "runtime": "written"
+  },
+  "manager": "0"
+ },
+ "control_manager_says": [
+  "Finished with result: success",
+  "Main processes terminated with: code=exited/status=0"
+ ],
+ "sets": [
+  {
+   "set": "the shipped directives before round 5 (no marker)",
+   "properties": [
+    "ProtectSystem=strict",
+    "ProtectHome=read-only",
+    "ReadWritePaths=<fixture>/records",
+    "PrivateTmp=true",
+    "PrivateUsers=true",
+    "Environment=PYTHONDONTWRITEBYTECODE=1"
+   ],
+   "manager_says": [
+    "Finished with result: success",
+    "Main processes terminated with: code=exited/status=0"
+   ],
+   "observation": {
+    "rc": 0,
+    "started": true,
+    "silent": false,
+    "ns": "mnt:[4026531832]",
+    "writes": {
+     "clone": "written",
+     "other": "written",
+     "records": "written",
+     "unrelated": "written",
+     "runtime": "written"
+    },
+    "manager": "0"
+   },
+   "class": [
+    "fail",
+    "the unit ran in the manager's own mount namespace: unconfined"
+   ]
+  },
+  {
+   "set": "the Claude unit's directives",
+   "properties": [
+    "ProtectSystem=strict",
+    "ProtectHome=read-only",
+    "ReadWritePaths=<fixture>/records",
+    "PrivateTmp=true",
+    "PrivateUsers=true",
+    "TemporaryFileSystem=/srv:ro",
+    "Environment=PYTHONDONTWRITEBYTECODE=1"
+   ],
+   "manager_says": [
+    "Finished with result: exit-code",
+    "Main processes terminated with: code=exited/status=226"
+   ],
+   "observation": {
+    "rc": 226,
+    "started": false,
+    "silent": true,
+    "ns": null,
+    "writes": null,
+    "manager": "226"
+   },
+   "class": [
+    "fails_closed",
+    "226/NAMESPACE"
+   ]
+  },
+  {
+   "set": "the Codex unit's directives",
+   "properties": [
+    "ProtectSystem=strict",
+    "ProtectHome=read-only",
+    "ReadWritePaths=<fixture>/records",
+    "PrivateTmp=true",
+    "PrivateUsers=true",
+    "TemporaryFileSystem=/srv:ro",
+    "Environment=PYTHONDONTWRITEBYTECODE=1"
+   ],
+   "manager_says": [
+    "Finished with result: exit-code",
+    "Main processes terminated with: code=exited/status=226"
+   ],
+   "observation": {
+    "rc": 226,
+    "started": false,
+    "silent": true,
+    "ns": null,
+    "writes": null,
+    "manager": "226"
+   },
+   "class": [
+    "fails_closed",
+    "226/NAMESPACE"
+   ]
+  },
+  {
+   "set": "a marker on a missing mount point",
+   "properties": [
+    "ProtectSystem=strict",
+    "ProtectHome=read-only",
+    "ReadWritePaths=<fixture>/records",
+    "PrivateTmp=true",
+    "PrivateUsers=true",
+    "Environment=PYTHONDONTWRITEBYTECODE=1",
+    "TemporaryFileSystem=/skill-marker-absent-<pid>:ro"
+   ],
+   "manager_says": [
+    "Finished with result: exit-code",
+    "Main processes terminated with: code=exited/status=226"
+   ],
+   "observation": {
+    "rc": 226,
+    "started": false,
+    "silent": true,
+    "ns": null,
+    "writes": null,
+    "manager": "226"
+   },
+   "class": [
+    "fails_closed",
+    "226/NAMESPACE"
+   ]
+  }
+ ]
+}
