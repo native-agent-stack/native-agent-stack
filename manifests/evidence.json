@@ -16533,23 +16533,23 @@
     },
     {
       "path": "blueprints/us-equities/order-throughput/README.md",
-      "sha256": "81f4e6b14e2ea37421f141570a12f8e23fc8769d4d05f56232c7a8d0066a11e8",
-      "bytes": 26386
+      "sha256": "cd3d75b611199d495bfa4b0243d84956261f6a370a68e24d8f6b2188cd673de2",
+      "bytes": 26448
     },
     {
       "path": "blueprints/us-equities/order-throughput/alpaca_capacity_port.py",
-      "sha256": "51980c152f19d0e9d2b889db56ca95d9854ffc913b2505d5cfbcfd24087e7d68",
-      "bytes": 15344
+      "sha256": "447ca17e9c86ea7518d23a1f4b42bf042108473e5a99ff47f52388b44b4b6961",
+      "bytes": 14882
     },
     {
       "path": "blueprints/us-equities/order-throughput/capacity.py",
-      "sha256": "7fe2d21e075539dc9b906b3885ceabaef29a73bfd97f2e3e34d61ddde0301ab1",
-      "bytes": 88251
+      "sha256": "c60673bb49123e04084b3af029a8efd20616f180cb287f64a605e23ee7b91bc1",
+      "bytes": 87571
     },
     {
       "path": "blueprints/us-equities/order-throughput/probe-modes.md",
-      "sha256": "5616e6d4582be049dd4256d2b71702b3b447f6c1dafad7e8d8fdf5a3d6572bc9",
-      "bytes": 6585
+      "sha256": "915cb9478847a7cc54239d656435791d5e2fbe02e403967cdab6c41830b9578f",
+      "bytes": 5741
     },
     {
       "path": "blueprints/us-equities/order-throughput/rate_governor.py",
@@ -62212,9 +62212,14 @@
       "bytes": 38580
     },
     {
+      "path": "tests/test_capacity_place_only_refusal.py",
+      "sha256": "c53e4766e3df11715ae8ab860bde2e1785f612ec4ef3e8a7a957199d4f58fe77",
+      "bytes": 5819
+    },
+    {
       "path": "tests/test_capacity_probe_modes.py",
-      "sha256": "e866fa4ae8bf7d5ca5c531af6e3feaf6f9f021a5e5387945c13518eca03dc9d8",
-      "bytes": 12750
+      "sha256": "08b4aee7318692b03ad3fcb626461a461e05db033ff12dc296a28f258e9a4860",
+      "bytes": 9361
     },
     {
       "path": "tests/test_catalog_decisions.py",

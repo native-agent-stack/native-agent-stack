@@ -871,8 +871,7 @@ def normalize_intent(order, symbols, *, allow_extended_hours=False):
 class GuardedSession:
     """The SDK's sole HTTP boundary, including budget and response observation."""
 
-    def __init__(self, *, origin, before_request, observer=None, read_only=False, lock=None, before_send=None,
-                 allow_cancel_all=False):
+    def __init__(self, *, origin, before_request, observer=None, read_only=False, lock=None, before_send=None):
         import requests
         self._session = requests.Session()
         self._session.trust_env = False
@@ -885,9 +884,6 @@ class GuardedSession:
         self.read_only = read_only
         self.lock = lock or threading.Lock()
         self.before_send = before_send
-        if type(allow_cancel_all) is not bool or (allow_cancel_all and (read_only or origin != PAPER_URL)):
-            raise TransportError("cancel-all requires explicit writable paper session")
-        self.allow_cancel_all = allow_cancel_all
         # Every order POST must carry a body equal to an envelope registered by
         # submit_enveloped for that client id (order-contract boundary).
         self._envelopes = {}
@@ -950,8 +946,7 @@ class GuardedSession:
                           or (path == ACTIVITY_FEE_PATH and _fee_activity_params(kwargs.get("params"))))
             allowed = ((method == "GET" and (path in reads or asset or order_id or activities))
                        or (not self.read_only and method == "POST" and path == "/v2/orders")
-                       or (not self.read_only and method == "DELETE" and order_id)
-                       or (self.allow_cancel_all and method == "DELETE" and path == "/v2/orders"))
+                       or (not self.read_only and method == "DELETE" and order_id))
             kind = "submit" if method == "POST" else "cancel" if method == "DELETE" else "read"
         if not allowed:
             raise TransportError("HTTP method/path rejected")
@@ -990,8 +985,7 @@ class GuardedSession:
         self._session.close()
 
 
-def _sdk_client(api_key, secret_key, before_request, observer=None, *, data=False, read_only=False, lock=None,
-                allow_cancel_all=False):
+def _sdk_client(api_key, secret_key, before_request, observer=None, *, data=False, read_only=False, lock=None):
     from importlib.metadata import version
     if version("alpaca-py") != SDK_VERSION:
         raise TransportError("alpaca-py version differs from reviewed pin")
@@ -1008,7 +1002,7 @@ def _sdk_client(api_key, secret_key, before_request, observer=None, *, data=Fals
     client._session.close()
     client._session = GuardedSession(origin=DATA_URL if data else PAPER_URL,
                                     before_request=before_request, observer=observer,
-                                    read_only=read_only, lock=lock, allow_cancel_all=allow_cancel_all)
+                                    read_only=read_only, lock=lock)
     return client
 
 

@@ -1,107 +1,99 @@
-# Exploratory rate-limit and place-only modes
+# Exploratory rate-limit probe and place-only refusal
 
-Both flags are off by default. This is a paper transport probe, never a
-strategy or capacity promotion. Ordinary admission, receipt fields and cleanup
-remain unchanged when neither flag is set. Native account locking, fixed paper
-origins, non-marketable whole-share limits, fresh quotes, STOP checks and foreign
-order refusals still apply. No credential, live URL or other lane's state is
-added to this protocol.
+Flags default off. Ordinary admission, individual cancellation and receipt
+behavior remain unchanged without them. Probes are paper transport research,
+not strategy trades or capacity promotion. Fixed paper origins, fresh quotes,
+STOP, account locking and foreign-order checks still apply.
 
-`--place-only` suppresses individual cancels during the rung, accumulating
-resting one-share probes. Cleanup performs **one** native cancel-all request
-after the existing complete prefix-ownership listing proves every open order
-belongs to this run and preflight was flat. It then requires a complete listing
-with zero open orders. A foreign order, unsupported bulk port, partial bulk
-result or verification failure is not paper success. There is no hidden
-individual-cancel fallback in that mode: a failed cleanup stays `needs_attention`
-and uses the already documented separate `recover` path under the owning lane.
-The bulk207 status is not interpreted as proof that every order was cancelled.
+## Place-only is unavailable until flat recovery is qualified
 
-The native Alpaca port calls `TradingClient.cancel_orders()`,
-`alpacahq/alpaca-py@cc4cb3b7ba50ae250e621983c2779047fb16bb28` (installed0.44.0),
-`alpaca/trading/client.py:203-215`. Only its explicit place-only session admits
-DELETE `/v2/orders`. Ordinary sessions, read-only sessions, data origins and
-live origins do not gain this capability. SDK retries stay disabled; a native
-bulk request is attempted at most once by the rung, then verified.
+`--place-only` is recognized and recorded, but refuses before credential loading,
+SDK client creation, preflight, streaming, account locking or submission. The
+refusal is `place_only_requires_qualified_flat_recovery` for valid configuration;
+invalid arguments retain their own configuration refusals. A refusal receipt is
+written with zero submitted probes. A combined `--place-only --probe-limit`
+cannot bypass this boundary. There is no place-only native measurement claim.
 
-`--probe-limit` deliberately permits the requested experimental request rate
-instead of `min(configured, observed) * headroom`. The **existing** governor
-retains token/rolling-window pacing at that requested rate and records the real
-observed header separately. Its remaining-header admission guard is bypassed
-only during this explicit experiment. One trading request may be in flight,
-so the first observed429 stops new submits/cancels before another admission.
-The receipt records that first status/kind/time and the whitelisted remaining,
-limit, reset and Retry-After headers. Broker backoff is honored; cleanup restores
-normal observed-limit/headroom admission. The flag never applies to `recover`
-or `audit` and the CLI refuses those combinations before loading credentials.
+The earlier implementation returned after a single bulk cleanup and suppressed
+ordinary individual cancellation. Synthetic controls reproduced five owned
+open orders after partial 207, failed bulk cancellation, incomplete listing or
+late foreign arrival; moving the market also left five filled shares (2.5 in
+the new partial-fill control). That is unsafe even when labelled needs_attention.
+The corrected implementation chooses pre-submission refusal, removes the
+cancellation suppression/early cleanup branch, and removes the unused native
+bulk capability. These are controls of the real state machine, not observations
+from a paper account. Existing foreign orders remain untouched by refusal.
 
-This scoped lift answers the owner's explicitly authorized probe; it does not
-change any live cap or normal paper policy. Alpaca Support documents the Trading
-API as200 requests/minute **per account** and a429 above it:
-<https://alpaca.markets/support/usage-limit-api-calls>. The pinned SDK's
-`alpaca/common/rest.py:195-207` reacts to configured retry statuses;
-`alpaca/common/constants.py:11-13` sets429/504 defaults. The existing guarded
-transport observes x-ratelimit-limit/remaining/reset and Retry-After; no new
-SDK polling or replacement order/rate implementation is introduced.
+Primary source: alpacahq/alpaca-py0.44.0 at
+`cc4cb3b7ba50ae250e621983c2779047fb16bb28:alpaca/trading/client.py:203-215`
+returns individual cancellation statuses from `cancel_orders()`; 207 cannot
+prove zero open orders. At `:296-324`, `close_position()` places another order,
+which is not itself evidence of a flat position. The current guarded port and
+prefix recovery have no qualified bounded position-recovery path. No new
+liquidation permission or writer is added to make an unsupported flat claim.
+The selected SDK remains unchanged. A future place-only implementation must
+qualify recovery under the same account lock and prove complete zero-owned-order
+listing and independent flat-position reread, including partial fill, broker
+backoff and foreign-order cases, before admitting its first probe.
 
-## Explicit rung bounds and proposed invocation
+## Rate-limit probing with ordinary cancels
 
-Each flagged rung is at most90s; `--probe-limit` is at most250 requests/minute
-and one share per probe. Ordinary stock/notional limits and defaults are
-unchanged. A place-only operator may **explicitly** provision up to300 open
-probes and300,000 USD notional for the bounded rung; these are hard ceilings,
-not automatically raised defaults. If the default10-open-order or10,000 USD
-notional cap binds first, a missing429 is recorded as no observed onset, not
-evidence that the requested load reached the broker. Native buying-power,
-collar, unexpected-fill and quote guards remain real failure boundaries.
+`--probe-limit` lifts the observed-limit/headroom ceiling for one bounded
+experiment. The existing governor still paces at the configured request rate;
+its remaining-header guard is bypassed only during the experimental phase.
+There is one trading request in flight. The first observed 429 stops new
+admission and records its status, operation, time, x-ratelimit-limit,
+x-ratelimit-remaining, x-ratelimit-reset and Retry-After. Cleanup restores normal
+observed-limit/headroom admission and honors broker backoff, using the existing
+bounded prefix-owned individual cancellation and complete verification sweeps.
+The flags are refused on `recover`/`audit` before credential loading.
 
-The following are unexecuted owning-lane examples, through the documented paper
-loader, in a clean checked-out reviewed source tree. The coordinator supplies
-a between-series account gap and flat/idle reads before and after each release.
-The experiment does not overlap lane A's series and never uses lane B's account.
+Bounds are 90 seconds, 250 requests/minute, and one share per probe. Stock,
+notional and buying-power guards remain unchanged; requesting a rate does not
+prove it reached the broker. Probe-limit retains the ordinary fast cancellation
+path. Its exposure controls do not promise that an arbitrary market movement
+can never fill a limit order.
+
+Alpaca's cited support reference is
+<https://alpaca.markets/support/usage-limit-api-calls> (200 requests/minute per
+account); retained response bytes and digest are a custody follow-up, so that
+unmirrored page is not newly independently verified here. Native rate headers
+and onset measurements are separate evidence. SDK sources at the same pin,
+`alpaca/common/rest.py:195-207` and `alpaca/common/constants.py:11-13`, document
+retry handling/defaults; the existing guarded transport keeps SDK retries off.
+
+## Reviewed-head measurement trigger
+
+Only the reviewed source may run, through the documented paper loader, in a
+fresh worktree and a coordinator-granted gap with independent flat-and-idle
+reads before and after. It remains one writer and uses the released account;
+it never overlaps another series or bypasses STOP or lane-state conflicts.
+
+Unexecuted with-cancels example, `R` in 150, 200, 225, 250:
 
 ```sh
-# R is one of150,200,225,250; credentials are supplied only to the existing loader.
 python -B blueprints/us-equities/order-throughput/capacity.py paper \
   --env-file "$PAPER_LOADER_POINTER" --feed sip --cap "$R" \
   --probe-limit --duration 70 --required-windows 1 --max-orders 350 \
   --output "$OWNED_RUNG_DIR/with-cancels.json"
-
-python -B blueprints/us-equities/order-throughput/capacity.py paper \
-  --env-file "$PAPER_LOADER_POINTER" --feed sip --cap "$R" \
-  --place-only --probe-limit --duration 70 --required-windows 1 --max-orders 350 \
-  --max-open-orders 300 --max-open-notional 300000 \
-  --output "$OWNED_RUNG_DIR/place-only.json"
 ```
 
-Keep paths private and never copy an env file or its values into a packet.
-Do not set `--acknowledge-positions`, `--acknowledge-open-orders`,
-`--accept-adaptive-lane-conflict` or custom paper STOP flags. A current paper
-state conflict is refused, not bypassed. An absent onset or a price/buying-power
-refusal remains a retained non-measurement of that rung's intended request load.
+A standalone place-only rung remains unavailable and unmeasured. No native
+limit onset or simultaneous three-account independence is claimed by fixtures.
 
-## Receipt and journal evidence
+## Receipts and follow-ups
 
-Flagged receipts include `probe_modes` with place-only/probe-limit booleans,
-requested experimental rate, effective trading concurrency, first429 and an
-explicit qualification-false marker. `acceptance.passed` remains false for
-exploratory modes even if cleanup succeeds. The existing CLI process exit code
-continues to distinguish refusal/needs-attention/criteria, so a completed
-short rung can exit1 without inventing a capacity pass.
+`probe_modes` records requested modes/rate, concurrency and first 429.
+Exploratory `acceptance.passed` remains false. The receipt cancellation plan
+states when place-only was refused rather than describing unexecuted individual
+cancellation. Probe-limit journals retain numeric per-sequence latency samples
+and p90 alongside p50/p95/p99; recovery parsing remains compatible. Order and
+account identifiers are not added to measurement rows. With-cancels terminal
+latency is not cancel REST RTT.
 
-Flagged latency summaries addp90 to the existing p50/p95/p99. The journal adds
-per-sequence numeric latency samples and a first429 row before its end record;
-the existing recovery parser ignores those additional measurement row types.
-No broker order/account identifier is added to the measurement rows. A bulk
-cancel is counted separately as one cleanup request, not as one individual
-cancelled-order action. Submit-only throughput excludes the cleanup request.
-Latencies are submission-to-REST-ack, submission-to-stream-ack and
-submission-to-stream-terminal; terminal latency in place-only includes the
-deliberate hold until rung cleanup and is not cancel-REST RTT.
-
-Fixture controls prove default-off behavior, first429 stop and safe cleanup
-reset, exactly one guarded bulk request, foreign/partial/STOP cases, numeric
-p90 recomputation, recovery parsing and paper-only capability fences. They
-are synthetic/native-SDK-boundary evidence. No actual Alpaca limit onset,
-place-only native rate or three-account aggregate throughput has been measured
-by this change. Those runs wait for both reviews and the coordinator's gap.
+Nonblocking test follow-ups: held-future serialization and single-token bucket
+mutation controls. Exact-boolean and otherwise-valid recovery CLI refusal
+controls are now pinned; the unused bulk forwarding paths were removed.
+Source custody follow-up: retain support-page bytes with observation time/hash.
+The protocol is an explicit experimental extension; no private owner text is
+published as a vendor claim or quoted instruction.

@@ -134,8 +134,6 @@ class CapacityConfig:
                   "max_consecutive_rejections": (1, 1000), "inflight": (1, 16),
                   "acknowledged_positions": (0, 1000), "acknowledged_open_orders": (0, 1000),
                   "required_windows": (1, 60)}
-        if self.place_only:
-            bounds["max_open_orders"] = (1, 300)
         for name, (low, high) in bounds.items():
             value = getattr(self, name)
             if type(value) is not int or not low <= value <= high:
@@ -154,15 +152,17 @@ class CapacityConfig:
         for name in ("allow_extended_hours", "allow_cancel_all", "place_only", "probe_limit"):
             if type(getattr(self, name)) is not bool:
                 raise HarnessRefusal(name + "_must_be_boolean")
+        if self.place_only:
+            # alpaca-py@cc4cb3b7 client.py:203-215 returns per-order bulk status;
+            # :296-324 closes a position by placing another order, not a flat
+            # proof. This port has no qualified bounded position recovery.
+            # Refuse before creating any resting exposure (review #1082 P1s).
+            raise HarnessRefusal("place_only_requires_qualified_flat_recovery")
         order_cap = _positive_decimal(self.max_order_notional_usd, "max_order_notional_usd")
         open_cap = _positive_decimal(self.max_open_notional_usd, "max_open_notional_usd")
-        open_ceiling = Decimal("300000") if self.place_only else Decimal("100000")
+        open_ceiling = Decimal("100000")
         if order_cap > Decimal("10000") or open_cap > open_ceiling or order_cap > open_cap:
             raise HarnessRefusal("notional_cap_out_of_bounds")
-        if self.place_only and (self.qty != 1 or self.acknowledged_positions or self.acknowledged_open_orders):
-            raise HarnessRefusal("place_only_requires_flat_one_share_probe")
-        if self.place_only and self.max_duration_seconds > 90:
-            raise HarnessRefusal("place_only_rung_duration_exceeds_90s")
         if self.probe_limit and (self.configured_cap_per_minute > 250 or self.max_duration_seconds > 90 or self.qty != 1):
             raise HarnessRefusal("probe_limit_exceeds_bounded_250_rung")
 
@@ -569,8 +569,6 @@ class CapacityRun:
             self._schedule_cancel(probe)
 
     def _schedule_cancel(self, probe):
-        if self.config.place_only and self.mode != "recover":
-            return
         if (probe.terminal or probe.order_id is None or probe.cancel_attempts >= MAX_CANCEL_ATTEMPTS
                 or probe.cancel_state in ("queued", "sent", "acknowledged")):
             return
@@ -1062,20 +1060,6 @@ class CapacityRun:
             # observed-header/headroom admission for every management request.
             self.governor.probe_limit = False
             self.governor.tokens = min(self.governor.tokens, self.governor.capacity)
-        if self.config.place_only and self.mode != "recover":
-            # One native DELETE /v2/orders, only after the existing complete
-            # prefix-ownership guard. No hidden individual-cancel fallback.
-            step(self._cancel_all_guarded, deadline, result)
-            step(self._settle_stream, deadline)
-            listing = step(self._list_open, deadline, "cleanup_verification")
-            orders, complete = listing if listing is not None else (None, False)
-            result.update(verification_rounds=1,
-                          open_listing_complete=orders is not None and bool(complete),
-                          open_harness_orders_after=None if orders is None else len(orders),
-                          verified_zero_open=orders is not None and bool(complete) and not orders,
-                          seconds=round(self.clock.monotonic() - start, 3))
-            self.cleanup = result
-            return
         # 0) Cancel-all only when enabled AND the guard proves no foreign open order exists.
         if self.config.allow_cancel_all and self._live and self.mode != "recover":
             step(self._cancel_all_guarded, deadline, result)
@@ -1514,7 +1498,8 @@ class CapacityRun:
             "probe_plan": {"side": "buy", "type": "limit", "time_in_force": "day", "marketable": False,
                            "band_bps_below_bid": self.config.band_bps,
                            "limit_price": None if self.limit_price is None else str(self.limit_price),
-                           "cancel": "individual DELETE /v2/orders/{order_id}",
+                            "cancel": ("not attempted: place-only refused before broker access" if self.config.place_only
+                                       else "individual DELETE /v2/orders/{order_id}"),
                            "client_order_id_prefix": self.prefix},
             "preflight": self.preflight_summary,
             "rate": governor,
@@ -1615,7 +1600,7 @@ def build_parser():
     parser.add_argument("--allow-cancel-all", action="store_true",
                         help="permit DELETE /v2/orders only when cancel_all_guard proves no foreign open orders")
     parser.add_argument("--place-only", action="store_true",
-                        help="exploratory: retain probes until one guarded cancel-all at rung end")
+                        help="unavailable: refused before broker access until flat recovery is qualified")
     parser.add_argument("--probe-limit", action="store_true",
                         help="exploratory paper-only: target configured rate beyond header; stop at first429")
     parser.add_argument("--acknowledge-positions", type=int, default=0,
@@ -1662,7 +1647,11 @@ def main(argv=None):
         parser.error("exploratory flags are only for paper/offline rungs; recovery retains safe admission")
     config = config_from_args(args)
     from runner import save  # adaptive-paper: atomic 0600 JSON write
-    if args.command == "offline":
+    if config.place_only:
+        # Produce the normal refusal receipt with no port, credential load,
+        # account preflight, stream, account lock or order request.
+        run = CapacityRun(None, config, argv=raw_argv)
+    elif args.command == "offline":
         if args.journal is not None:
             parser.error("--journal is for paper, recover and audit")
         from capacity_fixture import FakeBroker, FakeClock

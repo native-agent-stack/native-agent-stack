@@ -6,9 +6,8 @@ Everything that touches the network is reused read-only from
 * ``_sdk_client`` builds a ``TradingClient(paper=True)`` whose HTTP session is
   ``GuardedSession``: origin pinned to https://paper-api.alpaca.markets, SDK
   retries set to zero, redirects rejected, and only GET reads, POST /v2/orders
-  and DELETE /v2/orders/{uuid} admitted. DELETE /v2/orders (cancel-all) remains
-  denied by default; only the explicit place-only profile admits the vendor
-  cancel_orders() path for one prefix-guarded end-of-rung cleanup.
+  and DELETE /v2/orders/{uuid} admitted. DELETE /v2/orders (cancel-all) is not
+  an admitted path. Place-only is refused until flat recovery is qualified.
 * ``GuardedSession``'s observer supplies status and the x-ratelimit-limit,
   x-ratelimit-remaining, x-ratelimit-reset and retry-after headers per call.
 * ``preflight`` performs the read-only account/clock/positions/open-orders/
@@ -57,12 +56,13 @@ class AlpacaCapacityPort:
     supports_cancel_all = False
 
     def __init__(self, api_key, secret_key, symbol, *, feed="iex", workers=4, stop_file=None, place_only=False):
+        if type(place_only) is not bool:
+            raise transport.TransportError("place-only must be explicit boolean")
+        if place_only:
+            raise transport.TransportError("place-only requires qualified flat recovery")
         if not api_key or not secret_key:
             raise transport.TransportError("explicit credentials required")
         self._key, self._secret = api_key, secret_key
-        if type(place_only) is not bool:
-            raise transport.TransportError("place-only must be explicit boolean")
-        self.supports_cancel_all = place_only
         self.symbol = symbol
         self.feed = transport.data_feed(feed)
         self.workers = int(workers)
@@ -93,8 +93,7 @@ class AlpacaCapacityPort:
             self._pool = queue.Queue()
             for _ in range(self.workers):
                 client = transport._sdk_client(self._key, self._secret, self._before_request,
-                                               self._observe, lock=threading.Lock(),
-                                               allow_cancel_all=self.supports_cancel_all)
+                                               self._observe, lock=threading.Lock())
                 self._clients.append(client)
                 self._pool.put(client)
         return self._pool
@@ -204,13 +203,7 @@ class AlpacaCapacityPort:
         return response
 
     def cancel_all(self):
-        if not self.supports_cancel_all:
-            raise transport.TransportError("cancel-all is not an admitted GuardedSession path")
-        # alpacahq/alpaca-py0.44.0@cc4cb3b7:alpaca/trading/client.py:203-215.
-        # Native207 response and all per-order statuses remain vendor-owned;
-        # the harness always verifies complete zero-open state afterwards.
-        response, _ = self._call(lambda client: client.cancel_orders())
-        return response
+        raise transport.TransportError("cancel-all is not an admitted GuardedSession path")
 
     def list_orders(self, status, after_wall, admit=None):
         """Paged listing. The caller admitted the first page; ``admit()`` must
