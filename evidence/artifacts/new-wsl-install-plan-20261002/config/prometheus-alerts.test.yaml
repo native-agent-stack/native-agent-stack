@@ -32,3 +32,20 @@ tests:
       - eval_time: 20s
         alertname: EcosystemAcceptanceTargetDown
         exp_alerts: []
+  # The bridge published every 30s until 4m30s, then stopped: absent from 5m30s, firing once pending for 4m.
+  - interval: 30s
+    input_series:
+      - series: 'agent_stack_lanes_records{job="agent-stack-lanes",instance="hcom-status"}'
+        values: '19+0x9'
+    alert_rule_test:
+      - eval_time: 5m
+        alertname: HcomStatusSnapshotsAbsent
+        exp_alerts: []
+      - eval_time: 9m20s
+        alertname: HcomStatusSnapshotsAbsent
+        exp_alerts: []
+      - eval_time: 10m
+        alertname: HcomStatusSnapshotsAbsent
+        exp_alerts:
+          - exp_labels: {job: agent-stack-lanes, severity: warning, scope: local-ecosystem}
+            exp_annotations: {summary: 'No hcom status snapshot for about 10 minutes; command center hcom columns, State and STUCK are stale'}

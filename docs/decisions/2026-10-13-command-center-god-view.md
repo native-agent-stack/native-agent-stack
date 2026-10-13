@@ -52,7 +52,9 @@ Keys and flags:
 - **STUCK** (command center request, 2026-10-13): in every hcom snapshot of the last 10 minutes,
   at least 15 of the 30-second snapshots, `unread_count > 0` and the PTY prompt holds text
   (`hcom term` `prompt_empty=false`, or the listening gate context `tui:prompt-has-text`). The
-  bridge exports only `prompt_has_text` as 0/1; `input_text` and screen lines never leave hcom.
+  bridge exports only `prompt_has_text` as `true`, `false` or `"unknown"`; `input_text` and screen
+  lines never leave hcom. An unknown prompt (no PTY, or no answer to `hcom term`) leaves no value,
+  shown as —, and never counts toward STUCK.
 
 ## Coverage
 
@@ -100,6 +102,63 @@ The join also changed: hcom `name` is the tagged display name (`angle-records-be
 `base_name` the instance name (`benu`) that `hcom term` and `ecosystem.lane` use
 (`list.rs:353,370`); the bridge exports `base_name` and keys prompt state on it.
 
+## Correction: unknown prompt state shown as "empty" (review of c8f1d114)
+
+Both reads of `c8f1d114` found it (the CC's Claude read, P2; Astra's follow-up 1). `hcom term --json`
+prints `[<name>] not responding (port N)` on stdout for a silent instance, even with `--json`, and
+still exits 0 when any instance answered (`aannoo/hcom@b2a7c192:src/commands/term.rs:365-384`). The
+bridge stopped decoding at that line, so every PTY after it lost its state, and a missing state left
+as JSON null, which Loki's json parser renders as `""` (`grafana/loki@09e6ce2f:pkg/logql/log/parser.go:251-262`);
+the STUCK table then mapped it to 0, "empty". The bridge now decodes each compact object on its own
+line and skips the rest, `prompt_has_text` has three states (`true`, `false`, `"unknown"`), a failed
+`hcom term` is reported on stderr, and target B keeps only known states (Loki label filters match
+the whole value: `pkg/logql/log/label_filter.go:360-377` with Prometheus matchers,
+`vendor/github.com/prometheus/prometheus/model/labels/regexp.go:76`). A registry-only row now takes
+the bare instance name, stripping its lane prefix from the display name `{tag}-{name}`
+(`src/identity.rs:107-113`). Regression tests fail before the fix: the bridge module (7 failures, 1
+error against `c8f1d114`) and the board module (4 failures: unknown prompt filter, gateway share
+zero, runtime selector, install-plan registration).
+
+Measured after the fix, 2026-10-13T04:24Z: three snapshots of the corrected bridge put 54 records
+with `prompt_has_text` `false` and 3 with `"unknown"` into Loki (18 PTY lanes and one without a
+PTY), and target B returned 18 series, none for the unknown lane. In the 6 hours before 04:19Z,
+under the earlier encoding, Loki held 792 records with a known value (`0`) and 272 null ones.
+
+## Freshness alert
+
+Prometheus cannot read Loki streams and the plan's Loki has no ruler, so the bridge now sends one
+OTLP gauge, `agent_stack_lanes.records`, to the Collector's OTLP/HTTP receiver (`--otlp-url
+http://127.0.0.1:21318/v1/metrics`) after each published snapshot, in the JSON Protobuf Encoding
+(open-telemetry/opentelemetry-proto v1.7.0 `docs/specification.md`). The Collector's Prometheus
+exporter drops a series five minutes after its last point
+(opentelemetry-collector-contrib v0.162.0 `exporter/prometheusexporter/README.md:29`), so
+`HcomStatusSnapshotsAbsent` in `config/prometheus-alerts.yaml` is
+`absent_over_time(agent_stack_lanes_records{job="agent-stack-lanes"}[1m])` for 4 minutes
+(prometheus/prometheus v3.15.0 `docs/querying/functions.md:40-51`): it fires about 10 minutes after
+the last snapshot, including when the progress publisher before it fails. Measured: a pushed point
+reached Prometheus as `agent_stack_lanes_records{job="agent-stack-lanes",instance="hcom-status"}`;
+`promtool check rules` finds 3 rules and `promtool test rules` passes, and the new test case fails
+against the previous rules file.
+
+## Review dispositions (c8f1d114)
+
+- CC Claude read: the P2 and all five P3s are fixed in this record's second commit: the alert
+  above; `install-plan.json` lists the new source and published path in the grafana
+  `config_paths`, adds `cc-god-view` to the `service_health` UID loop (and `accept.sh`), and records
+  `command_center_dashboard_provisioning` with its rollback, and `check_plan.py`'s port scan now
+  covers the file (21128, 21808) and the unit (21300, 21318); the gateway share stat counts an hour
+  without errors as 0 (`or vector(0)` on the numerator; an hour without routed requests stays no
+  data); registry-only rows use the bare name; the runtime selector includes `ns-opencode-*` and
+  `ns-pi-*`.
+- CC verification gaps: `codex_skill_injected_total` exists (14 series over 7 days on the lanes
+  coop, hone, razu, vano and vire, 12 skills, status `ok`), so panel 13's zeros are hours without
+  injections, not a missing metric. Live PTY-lane records with a known prompt state are measured
+  above.
+- Astra follow-up 1 is the correction above. Follow-up 2 (coverage link owner): the repository moved;
+  `gh repo view seathatflowsinourveins/native-agent-stack` resolves to
+  `native-agent-stack/native-agent-stack`, the remote this record links, so the link stays.
+  Follow-ups 3 and 4 are listed below.
+
 ## Apply and rollback
 
 Before merge, only `ecosystem-grafana-dashboards/command-center.json` was published to the live
@@ -125,13 +184,27 @@ Untested boundary: no lane met the STUCK rule during the read-back, so the rule'
 tests only.
 
 After merge the CC applies from the main checkout: `bash install.sh --only grafana`, which
-re-renders and installs the research-progress unit without `--name`; then
-`python3 config/observability_config.py grafana-check --config-root <config root> --installed-units`.
+re-renders and installs the research-progress unit without `--name` and with the freshness gauge;
+then `python3 config/observability_config.py grafana-check --config-root <config root> --installed-units`.
+`bash install.sh --only alerting` publishes the new rule; Prometheus loads rule files at start or
+reload, and the alerting delivery receipt binds the hash of `alertmanager.yaml`, `prometheus.yaml`
+and `prometheus-alerts.yaml`, so its acceptance is re-run after the change.
 Until then the installed unit still exits 1 on every hcom snapshot, so the hcom-based columns,
 State and STUCK go empty once the seeded window ends. Rollback: as for the other Ecosystem
 dashboards in the plan README, remove `command-center.json`, set `disableDeletion: false` on
 `nativestack2604-ecosystem` for one Grafana restart, verify `/api/dashboards/uid/cc-god-view`
 returns 404, then restore `disableDeletion: true`.
+
+## Known limits
+
+- A Claude lane registered in hcom reads STALE while active, because Claude telemetry carries no
+  lane until follow-up 1 lands.
+- Lanes launched with the identity launcher's own `ECOSYSTEM_LANE` value
+  (`observability/collector/codex-identity-launcher.sh.example:15-17`) join hcom only when that value
+  equals the hcom instance name.
+- `ecosystem_lane` is a lane label, not authoritative identity
+  (`docs/decisions/2026-10-06-native-lane-invocation-observability.md:126-128`); the roster joins by
+  name and keeps session identity in agentsview.
 
 ## Follow-ups
 
@@ -150,3 +223,11 @@ returns 404, then restore `disableDeletion: true`.
    to screen, not adopted: it adds a database service and a datasource.
 7. **Role** needs a recorded source (for example a launch-time attribute) before the column can
    fill; none exists today.
+8. **Hostname hygiene** (Astra follow-up 3, non-blocking): the changed files repeat the host's
+   installation name, mostly in existing text; replacing it with a generic name means regenerating
+   the affected bytes and hashes, a separate change.
+9. **Native acceptance of the hcom path** (Astra follow-up 4): exercise a fresh start, a
+   progress-publisher failure (the bridge is the unit's second `ExecStart`), a partially responsive
+   hcom, recovery, and a positive STUCK sequence in the existing acceptance route, and settle the
+   intended elapsed-time behaviour (the timer is `OnUnitInactiveSec=30` with `AccuracySec=5`, not
+   an exact grid) before changing the 15-snapshot rule.

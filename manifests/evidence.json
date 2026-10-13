@@ -43393,13 +43393,13 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
-      "sha256": "f292b06ab4d1fd18db2875d10d1e125c48da74a6e2f65f51ed349889ac515ff6",
-      "bytes": 199902
+      "sha256": "b3029e985878e72939512c2b348fd4fbeb2609d0c6850c6e691d481c52686527",
+      "bytes": 199914
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
-      "sha256": "948395556f0b5a5991ffda6c0f45bb2d808044e68a4a932b6a8b91772f02e0c6",
-      "bytes": 51884
+      "sha256": "4fd428d643b3539253001225b7ff2f76ea0fc3abe557006612575dc741f8499b",
+      "bytes": 52135
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/acceptance-execution-instructions.txt",
@@ -43518,8 +43518,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/grafana-command-center.json",
-      "sha256": "4da286011069534a57b383978fefab0f43f95dd88f9001a69b2d09b5a1640364",
-      "bytes": 90598
+      "sha256": "6a5eb0001526fa1af064c9715e23e3f152fc734db7b215d32b6a91f243034f96",
+      "bytes": 91242
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/grafana-dashboards.yaml",
@@ -43603,8 +43603,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/ns2604-research-progress.service",
-      "sha256": "700a1f9e57fb06981f3e6912ba376d051b2982854a664992205a0d7a15eb11df",
-      "bytes": 1518
+      "sha256": "f6f8702b5b86578830e3b7febfddc280f6bc8a5e921fdd4f25ac3e5aa5421d72",
+      "bytes": 1563
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/ns2604-research-progress.timer",
@@ -43698,13 +43698,13 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/prometheus-alerts.test.yaml",
-      "sha256": "ef748a5c0ee3284ec73335826b857c321b091509d992f85c9d0adb4887303352",
-      "bytes": 1457
+      "sha256": "521fc971b2beb6a5e51e9c15c432864239d1fa0189b77ce07842ee94804d5a2a",
+      "bytes": 2246
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/prometheus-alerts.yaml",
-      "sha256": "bae729f6545d7adcb1620921f37f2975d3e683b77a21e06b30cfb62496647fdd",
-      "bytes": 801
+      "sha256": "c93ac12976b03948c96e71ca77be8244a8c353340daa630bdf261e3465bd7ca9",
+      "bytes": 1654
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/prometheus.yaml",
@@ -43833,8 +43833,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "d050b78949bfba8eb6eee37d9e065bcfb239fef2324f8d75165d168bcff8c5e7",
-      "bytes": 488749
+      "sha256": "78b5eac4bb5d693f0db7e8d853344b9983d9acd6ced9cc31530785e0140dc46a",
+      "bytes": 490527
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
@@ -61123,8 +61123,8 @@
     },
     {
       "path": "observability/grand-dashboard/hcom_status.py",
-      "sha256": "efe1a2ba38cfe18986f756310a84e5b8c127fcde9c704a437b98e80924b0234f",
-      "bytes": 7691
+      "sha256": "16a3cc2b60b536ce601e7dc4e5c94142f203e0f693ed71dd8794a26075be4697",
+      "bytes": 10498
     },
     {
       "path": "observability/grand-dashboard/install.py",
@@ -62473,8 +62473,8 @@
     },
     {
       "path": "tests/test_hcom_status.py",
-      "sha256": "88d2cdde95672f14a672d7dc66840289940dd23026102171d37c2771aa074a55",
-      "bytes": 7946
+      "sha256": "ae5a5c77da7e4b1de38a71fde9fc5df7b3d70ac2b2765bb966af4702cef6e341",
+      "bytes": 11024
     },
     {
       "path": "tests/test_historical_comparison.py",
@@ -62838,8 +62838,8 @@
     },
     {
       "path": "tests/test_ns2604_dashboards.py",
-      "sha256": "75c50376cc529d1498f94520c8d755f19c1279d63d3040db2e088a12e326a727",
-      "bytes": 21051
+      "sha256": "532511cde87dda19d719bf2ad5c162f1daa2e7e3fbdf3c5a55d373e307a5b77a",
+      "bytes": 23961
     },
     {
       "path": "tests/test_ns_movers_decision_display.py",

@@ -505,7 +505,7 @@
     {
       "type": "table",
       "title": "STUCK lanes \u00b7 undelivered messages behind prompt text (10 min)",
-      "description": "A lane is STUCK when, in every hcom snapshot of the last 10 minutes (at least 15 of the 30-second snapshots), unread_count > 0 and its PTY prompt holds text: hcom term reports prompt_empty=false or hcom list reports the listening gate context tui:prompt-has-text. Queued messages then wait behind uncommitted keystrokes. Only booleans and counts leave hcom; input text never does. Unread and prompt columns are the last minute. No data: the hcom snapshot did not reach Loki in the window.",
+      "description": "A lane is STUCK when, in every hcom snapshot of the last 10 minutes (at least 15 of the 30-second snapshots), unread_count > 0 and its PTY prompt holds text: hcom term reports prompt_empty=false or hcom list reports the listening gate context tui:prompt-has-text. Queued messages then wait behind uncommitted keystrokes. Only booleans and counts leave hcom; input text never does. Unread and prompt columns are the last minute; a prompt shows \u2014 when its state is unknown (no PTY, or the instance did not answer hcom term), and an unknown snapshot never counts toward STUCK. No data: the hcom snapshot did not reach Loki in the window.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -523,7 +523,7 @@
         },
         {
           "refId": "B",
-          "expr": "max by (lane) (max_over_time({service_name=\"agent-stack-lanes\",record_kind=\"hcom\"} | json | label_format lane=\"{{ or .base_name .name }}\", prompt_flag=`{{ if (or (eq .prompt_has_text \"1\") (eq .status_context \"tui:prompt-has-text\")) }}1{{ else }}0{{ end }}` | unwrap prompt_flag | __error__=\"\" [1m]))",
+          "expr": "max by (lane) (max_over_time({service_name=\"agent-stack-lanes\",record_kind=\"hcom\"} | json | prompt_has_text=~\"true|false\" or status_context=\"tui:prompt-has-text\" | label_format lane=\"{{ or .base_name .name }}\", prompt_flag=`{{ if (or (eq .prompt_has_text \"true\") (eq .status_context \"tui:prompt-has-text\")) }}1{{ else }}0{{ end }}` | unwrap prompt_flag | __error__=\"\" [1m]))",
           "queryType": "instant",
           "datasource": {
             "type": "loki",
@@ -543,7 +543,7 @@
         },
         {
           "refId": "D",
-          "expr": "(min by (lane) (min_over_time({service_name=\"agent-stack-lanes\",record_kind=\"hcom\"} | json | label_format lane=\"{{ or .base_name .name }}\", stuck=`{{ if and (ne .unread_count \"\") (ne .unread_count \"0\") (or (eq .prompt_has_text \"1\") (eq .status_context \"tui:prompt-has-text\")) }}1{{ else }}0{{ end }}` | unwrap stuck | __error__=\"\" [10m])) == 1) and on (lane) (sum by (lane) (count_over_time({service_name=\"agent-stack-lanes\",record_kind=\"hcom\"} | json | label_format lane=\"{{ or .base_name .name }}\" [10m])) >= 15)",
+          "expr": "(min by (lane) (min_over_time({service_name=\"agent-stack-lanes\",record_kind=\"hcom\"} | json | label_format lane=\"{{ or .base_name .name }}\", stuck=`{{ if and (ne .unread_count \"\") (ne .unread_count \"0\") (or (eq .prompt_has_text \"true\") (eq .status_context \"tui:prompt-has-text\")) }}1{{ else }}0{{ end }}` | unwrap stuck | __error__=\"\" [10m])) == 1) and on (lane) (sum by (lane) (count_over_time({service_name=\"agent-stack-lanes\",record_kind=\"hcom\"} | json | label_format lane=\"{{ or .base_name .name }}\" [10m])) >= 15)",
           "queryType": "instant",
           "datasource": {
             "type": "loki",
@@ -678,6 +678,17 @@
                         "text": "text in prompt",
                         "color": "orange",
                         "index": 1
+                      }
+                    }
+                  },
+                  {
+                    "type": "special",
+                    "options": {
+                      "match": "null",
+                      "result": {
+                        "text": "\u2014",
+                        "color": "transparent",
+                        "index": 2
                       }
                     }
                   }
@@ -985,7 +996,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (service_name) (increase(traces_span_metrics_calls_total{service_name=~\"pi|opencode|goose|qwen-code|oh-my-pi\",gen_ai_tool_name!=\"\"}[24h]))",
+          "expr": "sum by (service_name) (increase(traces_span_metrics_calls_total{service_name=~\"pi|opencode|goose|qwen-code|oh-my-pi|ns-opencode-.+|ns-pi-.+\",gen_ai_tool_name!=\"\"}[24h]))",
           "instant": true,
           "range": false,
           "format": "table",
@@ -2215,7 +2226,7 @@
       "targets": [
         {
           "refId": "4xx",
-          "expr": "sum(increase(traces_span_metrics_calls_total{service_name=\"omniroute\",omniroute_routing_status=~\"4..\"}[1h])) / sum(increase(traces_span_metrics_calls_total{service_name=\"omniroute\"}[1h]))",
+          "expr": "(sum(increase(traces_span_metrics_calls_total{service_name=\"omniroute\",omniroute_routing_status=~\"4..\"}[1h])) or vector(0)) / sum(increase(traces_span_metrics_calls_total{service_name=\"omniroute\"}[1h]))",
           "instant": true,
           "range": false,
           "legendFormat": "4xx share",
@@ -2226,7 +2237,7 @@
         },
         {
           "refId": "5xx",
-          "expr": "sum(increase(traces_span_metrics_calls_total{service_name=\"omniroute\",omniroute_routing_status=~\"5..\"}[1h])) / sum(increase(traces_span_metrics_calls_total{service_name=\"omniroute\"}[1h]))",
+          "expr": "(sum(increase(traces_span_metrics_calls_total{service_name=\"omniroute\",omniroute_routing_status=~\"5..\"}[1h])) or vector(0)) / sum(increase(traces_span_metrics_calls_total{service_name=\"omniroute\"}[1h]))",
           "instant": true,
           "range": false,
           "legendFormat": "5xx share",

@@ -37,7 +37,7 @@ CLIENTS = '{service_name=~"codex-app-server|codex_exec|codex_cli_rs|claude-code"
 CLAUDE = '{service_name="claude-code"}'
 RUNTIMES = '{service_name=~"pi|opencode|goose|qwen-code|oh-my-pi|ns-opencode-.+|ns-pi-.+|codex_sdk_ts"}'
 HCOM = '{service_name="agent-stack-lanes",record_kind="hcom"}'
-RUNTIME_JOBS = 'pi|opencode|goose|qwen-code|oh-my-pi'
+RUNTIME_JOBS = 'pi|opencode|goose|qwen-code|oh-my-pi|ns-opencode-.+|ns-pi-.+'
 TOOL_EVENTS = '| event_name=~"tool_result|codex.tool_result" | tool_family!="code_mode"'
 CLIENT_KEY = ('| label_format kind=`{{ if eq .service_name "claude-code" }}Claude session'
               '{{ else }}Codex lane{{ end }}`, lane=`{{ or .ecosystem_lane "unattributed" }}`')
@@ -45,7 +45,11 @@ RUNTIME_KEY = ('| label_format kind=`{{ if eq .service_name "codex_sdk_ts" }}SDK
                '{{ else }}runtime worker{{ end }}`, lane=`{{ or .ecosystem_lane .service_name }}`')
 CLAUDE_KEY = '| label_format kind="Claude session", lane=`{{ or .ecosystem_lane "unattributed" }}`'
 HCOM_KEY = '| json | label_format lane="{{ or .base_name .name }}"'
-PROMPT = '(or (eq .prompt_has_text "1") (eq .status_context "tui:prompt-has-text"))'
+# The bridge exports prompt_has_text as true, false or "unknown"; Loki's json parser renders JSON booleans as
+# "true"/"false" and null as "" (grafana/loki v3.7.8 pkg/logql/log/parser.go:251-262). Only a known state, or the
+# listening gate context, becomes a sample; anything else leaves no value, shown as "—", never as "empty".
+PROMPT = '(or (eq .prompt_has_text "true") (eq .status_context "tui:prompt-has-text"))'
+PROMPT_KNOWN = '| prompt_has_text=~"true|false" or status_context="tui:prompt-has-text"'
 STUCK = f'{{{{ if and (ne .unread_count "") (ne .unread_count "0") {PROMPT} }}}}1{{{{ else }}}}0{{{{ end }}}}'
 PROMPT_FLAG = f'{{{{ if {PROMPT} }}}}1{{{{ else }}}}0{{{{ end }}}}'
 LAST_EVENT = '| label_format last_unix=`{{ __timestamp__ | unixEpoch }}` | unwrap last_unix | __error__=""'
@@ -215,8 +219,9 @@ def dashboard(native, lanes):
     stuck = [
         loki(f'max by (lane) (max_over_time({HCOM} {HCOM_KEY} | unwrap unread_count | __error__="" [1m]))',
              "Unread", "A"),
-        loki(f'max by (lane) (max_over_time({HCOM} {HCOM_KEY}, prompt_flag=`{PROMPT_FLAG}` '
-             '| unwrap prompt_flag | __error__="" [1m]))', "Prompt has text", "B"),
+        loki(f'max by (lane) (max_over_time({HCOM} | json {PROMPT_KNOWN} | label_format '
+             f'lane="{{{{ or .base_name .name }}}}", prompt_flag=`{PROMPT_FLAG}` | unwrap prompt_flag | __error__="" '
+             '[1m]))', "Prompt has text", "B"),
         loki(f'max by (lane, status_context) (max_over_time({HCOM} {HCOM_KEY} | unwrap status_age_seconds '
              '| __error__="" [1m]))', "Status age", "C"),
         loki(f'(min by (lane) (min_over_time({HCOM} {HCOM_KEY}, stuck=`{STUCK}` | unwrap stuck | __error__="" '
@@ -228,7 +233,9 @@ def dashboard(native, lanes):
         'snapshots), unread_count > 0 and its PTY prompt holds text: hcom term reports prompt_empty=false or '
         'hcom list reports the listening gate context tui:prompt-has-text. Queued messages then wait behind '
         'uncommitted keystrokes. Only booleans and counts leave hcom; input text never does. Unread and prompt '
-        'columns are the last minute. No data: the hcom snapshot did not reach Loki in the window.',
+        'columns are the last minute; a prompt shows — when its state is unknown (no PTY, or the instance did '
+        'not answer hcom term), and an unknown snapshot never counts toward STUCK. No data: the hcom snapshot '
+        'did not reach Loki in the window.',
         stuck,
         layout(["lane", "Unread", "Prompt has text", "status_context", "Status age", "Stuck ≥ 10 min"],
                {"status_context": "hcom gate context"}, "Unread"),
@@ -237,7 +244,9 @@ def dashboard(native, lanes):
          color_cells("Unread", [], [{"color": "transparent", "value": None}, {"color": "orange", "value": 1}]),
          color_cells("Prompt has text", [{"type": "value", "options": {
              "0": {"text": "empty", "color": "transparent", "index": 0},
-             "1": {"text": "text in prompt", "color": "orange", "index": 1}}}]),
+             "1": {"text": "text in prompt", "color": "orange", "index": 1}}},
+             {"type": "special", "options": {"match": "null", "result": {
+                 "text": "—", "color": "transparent", "index": 2}}}]),
          color_cells("Stuck ≥ 10 min", [{"type": "value", "options": {
              "1": {"text": "STUCK", "color": "red", "index": 0}}},
              {"type": "special", "options": {"match": "null", "result": {
@@ -338,7 +347,8 @@ def dashboard(native, lanes):
     gateway = 'traces_span_metrics_calls_total{service_name="omniroute"'
 
     def share(cls):
-        return (f'sum(increase({gateway},omniroute_routing_status=~"{cls}.."}}[1h])) / '
+        # A routed hour without errors is 0; an hour without routed requests stays no data.
+        return (f'(sum(increase({gateway},omniroute_routing_status=~"{cls}.."}}[1h])) or vector(0)) / '
                 f'sum(increase({gateway}}}[1h]))')
     table(
         "Gateway 4xx and 5xx by provider (1 h)",
