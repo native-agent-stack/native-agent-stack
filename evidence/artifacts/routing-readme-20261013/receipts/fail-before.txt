@@ -1,0 +1,12 @@
+The test of CPA-V-12 (the routing README states the measurement that the decision record retains) against the README on main when the change was written, and against this head.
+
+== 04f64a056, main when the change was written (its README, this test module)
+   tests.test_routing_readme: Ran 5, FAILED (failures=7)
+      test_the_readme_does_not_call_the_after_measurement_outstanding_or_the_demand_absent: 4 failing, e.g. phrase='AFTER measurement remains'
+      test_the_readme_links_the_section_of_the_record_that_exists: 1 failing
+      test_the_readme_quotes_the_retained_ablation_as_the_record_holds_it: 1 failing
+      test_the_vendor_suite_is_kept_as_an_optional_rerun: 1 failing
+== this head
+   tests.test_routing_readme: Ran 5, OK
+
+On main the README says that the native AFTER measurement remains to be done and that the six skills have no baseline demand, while the record holds the completed ablation and says that zero observed calls do not establish absence of demand: the audit's fail-first docs check fails there.
