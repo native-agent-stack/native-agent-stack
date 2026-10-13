@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-13",
+  "evidence_class": "source_review",
+  "scope": "Public source bytes supporting handbook part 1. No market data, private operational record, raw response or engine execution is retained by this documentation inventory.",
+  "sources": [
+    {
+      "repository": "native-agent-stack/native-agent-stack",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "path": "blueprints/us-equities/AGENTS.md",
+      "sha256": "4a1d3f125f3e8c77484b736e592777fa887991d6dc1cd43d941b4cd621f68719"
+    },
+    {
+      "repository": "native-agent-stack/native-agent-stack",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "path": "blueprints/us-equities/north-star.md",
+      "sha256": "0934019e9dcce0e792dbcdca1f6e1ce5e48f8848a6d92381d7046cf1d7c3a9b7"
+    },
+    {
+      "repository": "native-agent-stack/native-agent-stack",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "path": "catalogs/us-equities/runtime-target.json",
+      "sha256": "bd318252b220d2e611fa9baa21031359f0fbb8d07e1a7bb6a65f67c9cb02eb41"
+    },
+    {
+      "repository": "native-agent-stack/native-agent-stack",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "path": "docs/paper-lane-policy.md",
+      "sha256": "a9fef28df97bf6318119b0d2e55e502d47301ec07ea217106f3886402a43b77a"
+    },
+    {
+      "repository": "native-agent-stack/native-agent-stack",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "path": "docs/decisions/2026-10-11-layer-resolution-protocol.md",
+      "sha256": "a3bab6504f8c3a1ec800998b81f562496e85a1b5d1ca0de070a51352c06936b7"
+    },
+    {
+      "repository": "native-agent-stack/native-agent-stack",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "path": "docs/landscape-continuation.md",
+      "sha256": "73b0fb9cbdbcbcda1920efcd01411e31cccc813f721a0ef7a1b1409c49f5f3ef"
+    },
+    {
+      "repository": "native-agent-stack/native-agent-stack",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "path": "blueprints/us-equities/order-contract/README.md",
+      "sha256": "61652ef6f9b6954c8a0ca897a79309085bef5db838b72a0c04e89d3a0379bff2"
+    },
+    {
+      "repository": "native-agent-stack/native-agent-stack",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/README.md",
+      "sha256": "a3577615445282f3c613a1179e0caa0811584908deb0743b5fd35169cc6f559c"
+    },
+    {
+      "repository": "nautechsystems/nautilus_trader",
+      "commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "path": "docs/concepts/instruments/equity.md",
+      "sha256": "b2bb259314a6e9f83453d08da103a583df40e8d5d845675f787cb36087f35db8"
+    },
+    {
+      "repository": "nautechsystems/nautilus_trader",
+      "commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "path": "docs/concepts/backtesting/apis-and-runs.md",
+      "sha256": "ad2adab0862cebf2c0ca5c45bc29b807b62418ee7d6205beffeb14ad0f5175b5"
+    },
+    {
+      "repository": "nautechsystems/nautilus_trader",
+      "commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "path": "docs/concepts/strategies.md",
+      "sha256": "302a4daef347164ba8add1fd736aef70782235cff49ea914d726b8c13eab3275"
+    },
+    {
+      "repository": "alpacahq/alpaca-py",
+      "commit": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+      "path": "alpaca/trading/models.py",
+      "sha256": "0a4296847ea46c434de3fe08ef6bb82519d9442705e59b4671127ffffad3855f"
+    },
+    {
+      "repository": "Lumiwealth/lumibot",
+      "commit": "862504052407df2586122b752a645f88ce87afa1",
+      "path": "lumibot/backtesting/pandas_backtesting.py",
+      "sha256": "9be36f4f8a3ec054236997ede935d42f379906bb243bfed9fa37f2f40224c806"
+    },
+    {
+      "repository": "Lumiwealth/lumibot",
+      "commit": "862504052407df2586122b752a645f88ce87afa1",
+      "path": "lumibot/strategies/strategy.py",
+      "sha256": "6f560f433438ead7162dddaa29981b9a5c4527664fcabf2d0cb4839a2791ff4e"
+    }
+  ]
+}
