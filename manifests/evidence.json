@@ -13238,13 +13238,13 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/mover.py",
-      "sha256": "d6ba7eadadf342adbedea605bce24bc6e2252cc78895345981d400b0787b3be8",
-      "bytes": 76979
+      "bytes": 77613,
+      "sha256": "94ce6735ccb3cf1d0884a1c988e67b3f15d649b864ba1ece36ec20b9bb63b802"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/mover_runner.py",
-      "sha256": "3a60cd304a04424ca61bba9da79629f5664bbea1266d9332323a4aa9016c352f",
-      "bytes": 72199
+      "bytes": 72253,
+      "sha256": "22542292fe2e3f18bee55fad845d48caf97487eedc4ef83e346a451de1345988"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/mover_simulation.py",
@@ -13423,8 +13423,13 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/overnight-review-fix-validation.json",
-      "bytes": 14032,
-      "sha256": "8d8f7fabbf1ea3ca69ed89cdc7774913f29bdb4e066fcd070d311cea08d01dcd"
+      "bytes": 14061,
+      "sha256": "d94414dabc24c5d307e83a82a350af60b50d444224644a8e65d727a405913856"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/overnight-review-round2-validation.json",
+      "bytes": 14948,
+      "sha256": "8207b6c10543bb706003a93301cc29445515d7c8a2be35cb17e57210b09b1fc4"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/overnight.py",
@@ -13488,8 +13493,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "e708e8275c63c8a0cda226c7575916045642fb2c3de3ba393be482a8e92fbdbe",
-      "bytes": 179178
+      "bytes": 180421,
+      "sha256": "d531b494e2c125b663e62512771460704b69877ae07badbdf544a42ad67450a1"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runtime_lock.py",
@@ -13523,8 +13528,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "3f835b3bb6b3a394907241a76c02d7be1547c49c4aa480569f56382eab4461eb",
-      "bytes": 10610
+      "bytes": 10729,
+      "sha256": "9716edd2344ea7c2b61bfa675c01673467514334427a5b75e1c0bdc3d45500fe"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/strategies.py",
@@ -19108,8 +19113,8 @@
     },
     {
       "path": "docs/decisions/2026-10-13-overnight-rest-arming.md",
-      "sha256": "52c1734c321f31a9968a232919fdbd712eddf3c8a32740beae70d195076722cd",
-      "bytes": 9645
+      "bytes": 12339,
+      "sha256": "0417bbb15d5d4ac3825101680ab2ec692ffcc8395d18372ff56d4f7eb50524cb"
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -48347,6 +48352,66 @@
       "bytes": 193
     },
     {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-round2/historical/mover.py.txt",
+      "bytes": 76979,
+      "sha256": "d6ba7eadadf342adbedea605bce24bc6e2252cc78895345981d400b0787b3be8"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-round2/historical/mover_runner.py.txt",
+      "bytes": 72199,
+      "sha256": "3a60cd304a04424ca61bba9da79629f5664bbea1266d9332323a4aa9016c352f"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-round2/historical/published_preimages.py.txt",
+      "bytes": 942,
+      "sha256": "86f47a20e287fc433f901c1c9ee71e1bad58ce22cb42e391e2747b8e08987e59"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-round2/historical/runner.py.txt",
+      "bytes": 179178,
+      "sha256": "e708e8275c63c8a0cda226c7575916045642fb2c3de3ba393be482a8e92fbdbe"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-round2/historical/test_adaptive_paper_overnight_transition.py.txt",
+      "bytes": 16350,
+      "sha256": "2dbd14ff97713792e6c2d3a501ff214960aaff0577957fb03686a01cdb941003"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-round2/historical/test_overnight_published_preimages.py.txt",
+      "bytes": 4654,
+      "sha256": "920f59dcd3b84f3be965cebd784d17f11111bd51103172171ba1645ca5e062c7"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-round2/round2-base-seven-final.sanitized.txt",
+      "bytes": 22683,
+      "sha256": "b7c29c82b9a58f351f16d1690b6b1618b19735e0e4275c2a80604998e5f497ba"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-round2/round2-prefix-red.sanitized.txt",
+      "bytes": 1192,
+      "sha256": "6218a4d598c9b8b34729217238b1198221399de7df7a3f2013c88a0b275d8ccf"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-round2/round2-related-ci.sanitized.txt",
+      "bytes": 8330,
+      "sha256": "7b7aa9d94739c0f199a5281ee3a7d3f24d2b3f75c0b27a602ae3c2cf2e8c56ca"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-round2/round2-related-native-repeat.sanitized.txt",
+      "bytes": 8458,
+      "sha256": "9a2cccac8adfc445327d3f1126c452c13966c95cc9005055f52a3cd4ee1cce19"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-round2/round2-related-native.sanitized.txt",
+      "bytes": 11262,
+      "sha256": "7b11bcef0a97edfacd49094c68f1309387ce5c5fe1b4a5c58c4550497cb2f136"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-round2/round2-transition-prefix-final-green.sanitized.txt",
+      "bytes": 1221,
+      "sha256": "05d1ba89d1ebb109598de6c448f3b092c4896af0f4f1a633bf728a3df4fe3db4"
+    },
+    {
       "path": "evidence/artifacts/portable-claude-native-qualification-20260921/angle1-upstream.json",
       "sha256": "d9d5d282a45d2b7e39b7cffeddaf73e50f07d24344cd77cff0484a33041cc756",
       "bytes": 80969
@@ -61713,8 +61778,8 @@
     },
     {
       "path": "scripts/published_preimages.py",
-      "sha256": "86f47a20e287fc433f901c1c9ee71e1bad58ce22cb42e391e2747b8e08987e59",
-      "bytes": 942
+      "bytes": 1662,
+      "sha256": "9fd7d490721d9396f53e4395483cbdcb643c70f91189ec98e409d6baa6ebba73"
     },
     {
       "path": "scripts/receipt_staleness.py",
@@ -62227,9 +62292,14 @@
       "bytes": 28233
     },
     {
+      "path": "tests/test_adaptive_paper_overnight_round2.py",
+      "bytes": 14316,
+      "sha256": "7a853843bb7c81955f7d1106fca681e495b19ec17dd68dc67d9ac64c63e9bfdd"
+    },
+    {
       "path": "tests/test_adaptive_paper_overnight_transition.py",
-      "sha256": "2dbd14ff97713792e6c2d3a501ff214960aaff0577957fb03686a01cdb941003",
-      "bytes": 16350
+      "bytes": 16476,
+      "sha256": "064698851d24eafbfafd6b747214168d3ae5cbf6cd323fb86f745e526fff3f08"
     },
     {
       "path": "tests/test_adaptive_paper_recovery.py",
@@ -63223,8 +63293,8 @@
     },
     {
       "path": "tests/test_overnight_published_preimages.py",
-      "sha256": "920f59dcd3b84f3be965cebd784d17f11111bd51103172171ba1645ca5e062c7",
-      "bytes": 4654
+      "bytes": 5568,
+      "sha256": "09a2a13f176e962d54e44ec3e5d0fbca3e68a91b332f183adc54b8aefa4c1853"
     },
     {
       "path": "tests/test_paired_runs_results.py",

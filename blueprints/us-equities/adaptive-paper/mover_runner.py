@@ -404,6 +404,7 @@ async def run_mover(controller, plan, config, baseline_cash, *, account_fingerpr
             strategy.enabled = False
             strategy.suspended = True
             controller.stop = True
+            await controller.stop_overnight_cancels()
             await controller.stop_halt_seed()
             session.stop()
             try:

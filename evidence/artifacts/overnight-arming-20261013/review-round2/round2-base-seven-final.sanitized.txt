@@ -1,0 +1,254 @@
+Running as unit: run-p636684-i168040627.scope; invocation ID: c03fcd0396fb4f9984f73c1452d3c5a6
+test_actual_trade_update_cancel_rejection_retries_live_entry (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_actual_trade_update_cancel_rejection_retries_live_entry) ... FAIL
+test_cancel_budget_expires_without_blocking_tick_and_allows_retry (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_cancel_budget_expires_without_blocking_tick_and_allows_retry) ... FAIL
+test_cancel_shutdown_joins_waiter_and_suppresses_duplicate_delete (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_cancel_shutdown_joins_waiter_and_suppresses_duplicate_delete) ... FAIL
+test_daytime_owned_exit_ignores_venue_halt_but_keeps_standing_halt (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_daytime_owned_exit_ignores_venue_halt_but_keeps_standing_halt) ...
+  test_daytime_owned_exit_ignores_venue_halt_but_keeps_standing_halt (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_daytime_owned_exit_ignores_venue_halt_but_keeps_standing_halt) (utc_hour=8) ... FAIL
+  test_daytime_owned_exit_ignores_venue_halt_but_keeps_standing_halt (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_daytime_owned_exit_ignores_venue_halt_but_keeps_standing_halt) (utc_hour=15) ... FAIL
+  test_daytime_owned_exit_ignores_venue_halt_but_keeps_standing_halt (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_daytime_owned_exit_ignores_venue_halt_but_keeps_standing_halt) (utc_hour=21) ... FAIL
+test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds) ...
+  test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds) (allowed='20:00') ... FAIL
+  test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds) (allowed='23:59') ... FAIL
+  test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds) (allowed='00:00') ... FAIL
+  test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds) (allowed='03:59') ... FAIL
+  test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds) (refused='04:00') ... FAIL
+  test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds) (refused='19:59') ... FAIL
+test_overnight_scan_uses_trade_date_and_cross_midnight_rule_order (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_overnight_scan_uses_trade_date_and_cross_midnight_rule_order) ...
+  test_overnight_scan_uses_trade_date_and_cross_midnight_rule_order (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_overnight_scan_uses_trade_date_and_cross_midnight_rule_order) (scan_time='2026-03-11T00:30:05Z') ... FAIL
+  test_overnight_scan_uses_trade_date_and_cross_midnight_rule_order (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_overnight_scan_uses_trade_date_and_cross_midnight_rule_order) (scan_time='2026-03-11T05:00:05Z') ... FAIL
+test_owner_tick_reaches_cutoff_and_expiry_while_cancel_waits (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_owner_tick_reaches_cutoff_and_expiry_while_cancel_waits) ... FAIL
+
+======================================================================
+FAIL: test_actual_trade_update_cancel_rejection_retries_live_entry (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_actual_trade_update_cancel_rejection_retries_live_entry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-round2-base-448db566/tests/test_adaptive_paper_overnight_round2.py", line 102, in test_actual_trade_update_cancel_rejection_retries_live_entry
+    asyncio.run(exercise())
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-round2-base-448db566/tests/test_adaptive_paper_overnight_round2.py", line 95, in exercise
+    self.assertNotIn('entry',c._overnight_cancel_pending,
+AssertionError: 'entry' unexpectedly found in {'entry'} : actual Alpaca cancel rejection must release retry latch
+
+======================================================================
+FAIL: test_cancel_budget_expires_without_blocking_tick_and_allows_retry (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_cancel_budget_expires_without_blocking_tick_and_allows_retry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-round2-base-448db566/tests/test_adaptive_paper_overnight_round2.py", line 66, in test_cancel_budget_expires_without_blocking_tick_and_allows_retry
+    asyncio.run(exercise())
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-round2-base-448db566/tests/test_adaptive_paper_overnight_round2.py", line 49, in exercise
+    self.assertTrue(tick.done(),'cancel budget must run outside the owner tick')
+AssertionError: False is not true : cancel budget must run outside the owner tick
+
+======================================================================
+FAIL: test_cancel_shutdown_joins_waiter_and_suppresses_duplicate_delete (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_cancel_shutdown_joins_waiter_and_suppresses_duplicate_delete)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-round2-base-448db566/tests/test_adaptive_paper_overnight_round2.py", line 137, in test_cancel_shutdown_joins_waiter_and_suppresses_duplicate_delete
+    asyncio.run(exercise())
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-round2-base-448db566/tests/test_adaptive_paper_overnight_round2.py", line 122, in exercise
+    self.assertTrue(tick.done(),'tick must not wait for the tracked DELETE task')
+AssertionError: False is not true : tick must not wait for the tracked DELETE task
+
+======================================================================
+FAIL: test_daytime_owned_exit_ignores_venue_halt_but_keeps_standing_halt (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_daytime_owned_exit_ignores_venue_halt_but_keeps_standing_halt) (utc_hour=8)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-round2-base-448db566/tests/test_adaptive_paper_overnight_round2.py", line 186, in test_daytime_owned_exit_ignores_venue_halt_but_keeps_standing_halt
+    self.assertFalse(c.is_halted('SPY'),'overnight venue halt must not block daytime residual')
+AssertionError: True is not false : overnight venue halt must not block daytime residual
+
+======================================================================
+FAIL: test_daytime_owned_exit_ignores_venue_halt_but_keeps_standing_halt (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_daytime_owned_exit_ignores_venue_halt_but_keeps_standing_halt) (utc_hour=15)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-round2-base-448db566/tests/test_adaptive_paper_overnight_round2.py", line 186, in test_daytime_owned_exit_ignores_venue_halt_but_keeps_standing_halt
+    self.assertFalse(c.is_halted('SPY'),'overnight venue halt must not block daytime residual')
+AssertionError: True is not false : overnight venue halt must not block daytime residual
+
+======================================================================
+FAIL: test_daytime_owned_exit_ignores_venue_halt_but_keeps_standing_halt (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_daytime_owned_exit_ignores_venue_halt_but_keeps_standing_halt) (utc_hour=21)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-round2-base-448db566/tests/test_adaptive_paper_overnight_round2.py", line 186, in test_daytime_owned_exit_ignores_venue_halt_but_keeps_standing_halt
+    self.assertFalse(c.is_halted('SPY'),'overnight venue halt must not block daytime residual')
+AssertionError: True is not false : overnight venue halt must not block daytime residual
+
+======================================================================
+FAIL: test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds) (allowed='20:00')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-round2-base-448db566/tests/test_adaptive_paper_overnight_round2.py", line 144, in test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds
+    parsed=mover.parse_rule(hhmm+'|G20|V1000000|any',overnight=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: parse_rule() got an unexpected keyword argument 'overnight'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-round2-base-448db566/tests/test_adaptive_paper_overnight_round2.py", line 146, in test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds
+    self.fail('overnight rule opt-in refused: '+str(exc))
+AssertionError: overnight rule opt-in refused: parse_rule() got an unexpected keyword argument 'overnight'
+
+======================================================================
+FAIL: test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds) (allowed='23:59')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-round2-base-448db566/tests/test_adaptive_paper_overnight_round2.py", line 144, in test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds
+    parsed=mover.parse_rule(hhmm+'|G20|V1000000|any',overnight=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: parse_rule() got an unexpected keyword argument 'overnight'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-round2-base-448db566/tests/test_adaptive_paper_overnight_round2.py", line 146, in test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds
+    self.fail('overnight rule opt-in refused: '+str(exc))
+AssertionError: overnight rule opt-in refused: parse_rule() got an unexpected keyword argument 'overnight'
+
+======================================================================
+FAIL: test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds) (allowed='00:00')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-round2-base-448db566/tests/test_adaptive_paper_overnight_round2.py", line 144, in test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds
+    parsed=mover.parse_rule(hhmm+'|G20|V1000000|any',overnight=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: parse_rule() got an unexpected keyword argument 'overnight'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-round2-base-448db566/tests/test_adaptive_paper_overnight_round2.py", line 146, in test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds
+    self.fail('overnight rule opt-in refused: '+str(exc))
+AssertionError: overnight rule opt-in refused: parse_rule() got an unexpected keyword argument 'overnight'
+
+======================================================================
+FAIL: test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds) (allowed='03:59')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-round2-base-448db566/tests/test_adaptive_paper_overnight_round2.py", line 144, in test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds
+    parsed=mover.parse_rule(hhmm+'|G20|V1000000|any',overnight=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: parse_rule() got an unexpected keyword argument 'overnight'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-round2-base-448db566/tests/test_adaptive_paper_overnight_round2.py", line 146, in test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds
+    self.fail('overnight rule opt-in refused: '+str(exc))
+AssertionError: overnight rule opt-in refused: parse_rule() got an unexpected keyword argument 'overnight'
+
+======================================================================
+FAIL: test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds) (refused='04:00')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-round2-base-448db566/tests/test_adaptive_paper_overnight_round2.py", line 151, in test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds
+    mover.parse_rule(hhmm+'|G20|V1000000|any',overnight=True)
+TypeError: parse_rule() got an unexpected keyword argument 'overnight'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-round2-base-448db566/tests/test_adaptive_paper_overnight_round2.py", line 153, in test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds
+    self.fail('overnight rule opt-in unavailable: '+str(exc))
+AssertionError: overnight rule opt-in unavailable: parse_rule() got an unexpected keyword argument 'overnight'
+
+======================================================================
+FAIL: test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds) (refused='19:59')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-round2-base-448db566/tests/test_adaptive_paper_overnight_round2.py", line 151, in test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds
+    mover.parse_rule(hhmm+'|G20|V1000000|any',overnight=True)
+TypeError: parse_rule() got an unexpected keyword argument 'overnight'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-round2-base-448db566/tests/test_adaptive_paper_overnight_round2.py", line 153, in test_overnight_rule_opt_in_keeps_daytime_default_and_window_bounds
+    self.fail('overnight rule opt-in unavailable: '+str(exc))
+AssertionError: overnight rule opt-in unavailable: parse_rule() got an unexpected keyword argument 'overnight'
+
+======================================================================
+FAIL: test_overnight_scan_uses_trade_date_and_cross_midnight_rule_order (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_overnight_scan_uses_trade_date_and_cross_midnight_rule_order) (scan_time='2026-03-11T00:30:05Z')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-round2-base-448db566/tests/test_adaptive_paper_overnight_round2.py", line 172, in test_overnight_scan_uses_trade_date_and_cross_midnight_rule_order
+    scan=mover.load_scan(raw,settings,now=now)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-round2-base-448db566/blueprints/us-equities/adaptive-paper/mover.py", line 625, in load_scan
+    raise MoverRefusal("scan_session_date_mismatch")
+mover.MoverRefusal: scan_session_date_mismatch
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-round2-base-448db566/tests/test_adaptive_paper_overnight_round2.py", line 174, in test_overnight_scan_uses_trade_date_and_cross_midnight_rule_order
+    self.fail('valid overnight scan refused: '+str(exc))
+AssertionError: valid overnight scan refused: scan_session_date_mismatch
+
+======================================================================
+FAIL: test_overnight_scan_uses_trade_date_and_cross_midnight_rule_order (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_overnight_scan_uses_trade_date_and_cross_midnight_rule_order) (scan_time='2026-03-11T05:00:05Z')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-round2-base-448db566/tests/test_adaptive_paper_overnight_round2.py", line 172, in test_overnight_scan_uses_trade_date_and_cross_midnight_rule_order
+    scan=mover.load_scan(raw,settings,now=now)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-round2-base-448db566/blueprints/us-equities/adaptive-paper/mover.py", line 627, in load_scan
+    raise MoverRefusal("scan_precedes_rule_time")
+mover.MoverRefusal: scan_precedes_rule_time
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-round2-base-448db566/tests/test_adaptive_paper_overnight_round2.py", line 174, in test_overnight_scan_uses_trade_date_and_cross_midnight_rule_order
+    self.fail('valid overnight scan refused: '+str(exc))
+AssertionError: valid overnight scan refused: scan_precedes_rule_time
+
+======================================================================
+FAIL: test_owner_tick_reaches_cutoff_and_expiry_while_cancel_waits (tests.test_adaptive_paper_overnight_round2.OvernightRoundTwo.test_owner_tick_reaches_cutoff_and_expiry_while_cancel_waits)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-round2-base-448db566/tests/test_adaptive_paper_overnight_round2.py", line 223, in test_owner_tick_reaches_cutoff_and_expiry_while_cancel_waits
+    asyncio.run(exercise())
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-round2-base-448db566/tests/test_adaptive_paper_overnight_round2.py", line 212, in exercise
+    self.assertTrue(tick.done(),'owner tick must return while broker cancellation is still blocked')
+AssertionError: False is not true : owner tick must return while broker cancellation is still blocked
+
+----------------------------------------------------------------------
+Ran 7 tests in 2.594s
+
+FAILED (failures=15)

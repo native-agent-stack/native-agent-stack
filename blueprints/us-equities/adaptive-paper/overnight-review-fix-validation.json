@@ -28,7 +28,6 @@
     "blueprints/us-equities/adaptive-paper/overnight.py": "fa3917d5a423bd873dd6f64805bd4755c1b0da6de132911906f7267476a22c1d",
     "blueprints/us-equities/adaptive-paper/recovery.py": "7eb26ce910f35e9e820c8320a7e806c9932ad04eab7093ed2c71a4307de6381a",
     "blueprints/us-equities/adaptive-paper/runner.py": "e708e8275c63c8a0cda226c7575916045642fb2c3de3ba393be482a8e92fbdbe",
-    "blueprints/us-equities/adaptive-paper/source-hashes.json": "3f835b3bb6b3a394907241a76c02d7be1547c49c4aa480569f56382eab4461eb",
     "blueprints/us-equities/adaptive-paper/transport.py": "76af68629b6792801f2bd07c514e470d77cbd32eb52e666ac7177cdd35469bf3",
     "scripts/local_pages_policy_grants.py": "a949412f75ee3b6c6f502557fc4df3d2c12f2bea69b4b4ca7d8fe86b76cac16b",
     "scripts/published_preimages.py": "86f47a20e287fc433f901c1c9ee71e1bad58ce22cb42e391e2747b8e08987e59",
@@ -110,6 +109,7 @@
     "raw_private_digest_values_retained": false,
     "redactor": "scripts/host_receipts.py:sanitize; home-prefix and old private-digest-prefix purging"
   },
+  "registry_input_scope": "source-hashes is a derived listing, verified through its owning contract; historical execution inputs retain exact public preimages",
   "runs": [
     {
       "command": "idle scope pinned native/runtime read lock: affected+related modules",

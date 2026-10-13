@@ -13,11 +13,23 @@ policy = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(policy)
 RECEIPTS = ("blueprints/us-equities/adaptive-paper/overnight-arming-validation.json",
             "blueprints/us-equities/adaptive-paper/overnight-guard-pins-validation.json",
-            "blueprints/us-equities/adaptive-paper/overnight-review-fix-validation.json")
+            "blueprints/us-equities/adaptive-paper/overnight-review-fix-validation.json",
+            "blueprints/us-equities/adaptive-paper/overnight-review-round2-validation.json")
 ARTIFACTS = "evidence/artifacts/overnight-arming-20261013"
 
 
 class PublishedPreimages(unittest.TestCase):
+    def test_seven_character_private_prefixes_fail_without_a_public_blacklist(self):
+        private=hashlib.sha256(b'synthetic unpublished account fixture bytes').hexdigest()
+        check=getattr(policy,'private_digest_prefix_locations',None)
+        self.assertTrue(callable(check),'publication guard must detect shortened private digests')
+        for width in (7,8,64):
+            with self.subTest(width=width):
+                self.assertEqual(check({'record.txt':private[:width].encode()},[private]),[('record.txt',1)])
+                self.assertEqual(check({'record.txt':private[:width].upper().encode()},[private]),[('record.txt',1)])
+        self.assertEqual(check({'record.txt':private[:6].encode()},[private]),[])
+        self.assertEqual(check({'record.txt':b'published sanitized output'},[private]),[])
+
     def test_absent_preimage_fails_even_when_its_private_bytes_can_be_found(self):
         private = b"trace from /home/" + b"fixture-person" + b"/runtime with duration 1.23"
         public = b"trace from ~/runtime with duration 1.23"

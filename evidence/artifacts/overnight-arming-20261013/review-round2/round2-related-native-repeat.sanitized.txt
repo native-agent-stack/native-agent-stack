@@ -1,0 +1,69 @@
+Running as unit: run-p1463282-i168866194.scope; invocation ID: 26bc037c252240bc92e6ecc607add9f0
+........................................[1m2026-10-13T18:56:37.386157313Z[0m [1;31m[ERROR] ADAPTIVE-001.nautilus_live::node: Error disconnecting clients: Failed to disconnect data clients: Failed to disconnect data clients: RuntimeError: port.stop() itself fails; failed to disconnect execution clients: Failed to disconnect execution clients: RuntimeError: port.stop() itself fails[0m
+[1m2026-10-13T18:56:47.370888445Z[0m [1;31m[ERROR] ADAPTIVE-001.nautilus_live::node: Timed out (10s) waiting for engines to disconnect
+DataEngine.check_disconnected() == false
+ExecEngine.check_disconnected() == false[0m
+[1m2026-10-13T18:56:47.373127047Z[0m [1;31m[ERROR] ADAPTIVE-001.nautilus_live::python::node: Hosted run failed: Failed to disconnect data clients: Failed to disconnect data clients: RuntimeError: port.stop() itself fails; failed to disconnect execution clients: Failed to disconnect execution clients: RuntimeError: port.stop() itself fails; failed while awaiting engine disconnection: disconnect readiness timeout while waiting for engine disconnections[0m
+........................................................................................................................................................................................................................................................................Executing <Task pending name='Task-634' coro=<AsyncTransport.test_a_named_cancel_uses_the_default_owner_deadline_and_freeze() running at /var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_transport.py:678> wait_for=<Future pending cb=[_chain_future.<locals>._call_check_cancel() at ~/projects/us-eq [long line omitted from published excerpt]
+.....Executing <Task pending name='Task-667' coro=<AsyncTransport.test_b2_fallback_never_rolls_back_or_freezes_either_arrival_order() running at /var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_transport.py:1051> wait_for=<Future pending cb=[Task.task_wakeup()] created at ~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py:449> cb=[_run_until_complete_cb() at ~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py:182] created at ~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py:100> took 0.347 seconds
+Executing <Task pending name='Task-667' coro=<AsyncTransport.test_b2_fallback_never_rolls_back_or_freezes_either_arrival_order() running at /var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_transport.py:1051> wait_for=<Future pending cb=[Task.task_wakeup()] created at ~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py:449> cb=[_run_until_complete_cb() at ~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py:182] created at ~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py:100> took 0.291 seconds
+..............................................Executing <Task pending name='Task-1028' coro=<AsyncTransport.test_stream_fill_time_reaches_ledger_losslessly() running at /var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_transport.py:1001> wait_for=<Future pending cb=[Task.task_wakeup()] created at ~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py:449> cb=[_run_until_complete_cb() at ~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py:182] created at ~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py:100> took 0.274 seconds
+...................................................................................................................................................................................................................................................................................................................................................................................
+----------------------------------------------------------------------
+Ran 726 tests in 313.415s
+
+OK
+{"status": "not_started", "reason": "promotion_gate_failed_check", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_missing", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_missing", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_failed", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_mismatch", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_empty", "orders_submitted": 0}
+{"status": "not_started", "reason": "account_not_ready", "orders_submitted": 0}
+{"status": "ready", "orders_submitted": 0}
+{"status": "ready", "orders_submitted": 0}
+{"status": "not_started", "stage": "order_contract", "reason": "order_contract_boundary_inactive:invalid_sentinel_accepted", "orders_submitted": 0}
+{"status": "not_started", "stage": "order_contract", "reason": "order_contract_boundary_inactive:invalid_sentinel_accepted", "orders_submitted": 0}
+{"status": "not_started", "stage": "order_contract", "reason": "order_contract_boundary_inactive:invalid_sentinel_accepted", "orders_submitted": 0}
+{"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}
+{"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}
+{"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}
+{"status": "not_started", "stage": "validation", "reason": "scan_stale", "orders_submitted": 0}
+{"status": "not_started", "stage": "validation", "reason": "scan_empty", "orders_submitted": 0}
+{"status": "not_started", "stage": "validation", "reason": "scan_from_future", "orders_submitted": 0}
+transition_mutant reserve-current-close assertion_failures 1 errors 0
+transition_mutant pending-current-close assertion_failures 1 errors 0
+transition_mutant recovery-current-close assertion_failures 1 errors 0
+transition_mutant residual-reprice-admission assertion_failures 9 errors 0
+transition_mutant independent-asset-delivery assertion_failures 2 errors 0
+transition_mutant independent-quote-delivery assertion_failures 1 errors 0
+transition_mutant per-symbol-reschedule assertion_failures 1 errors 0
+followup_mutant M2-reserve assertion_failures 1 errors 0
+followup_mutant M3-wire assertion_failures 1 errors 0
+followup_mutant M4-admission assertion_failures 1 errors 0
+followup_mutant M6-emitter assertion_failures 1 errors 0
+followup_mutant M8-active assertion_failures 1 errors 0
+followup_mutant M8-tradable assertion_failures 1 errors 0
+followup_mutant M9-halt assertion_failures 1 errors 0
+followup_mutant M10-window assertion_failures 1 errors 0
+followup_mutant M11-normalize assertion_failures 1 errors 0
+followup_mutant M15-preflight assertion_failures 3 errors 0
+followup_mutant F1-adaptive-direct assertion_failures 1 errors 0
+followup_mutant F1-adaptive-replacement assertion_failures 1 errors 0
+followup_mutant F3-admission-side assertion_failures 1 errors 0
+followup_mutant F3-admission-owned assertion_failures 1 errors 0
+followup_mutant F3-admission-calendar assertion_failures 1 errors 0
+followup_mutant M2-reserve+M3-wire assertion_failures 2 errors 0
+followup_mutant M2-reserve+M4-admission assertion_failures 2 errors 0
+followup_mutant M3-wire+M4-admission assertion_failures 2 errors 0
+followup_mutant M2-reserve+M3-wire+M4-admission assertion_failures 3 errors 0
+followup_mutants_killed 19 survived 0
+overnight_guard_mutations 37 killed_by_assertions 118 secondary_errors 2
+round_two_mutant actual-cancel-event assertion_failures 1 errors 0
+round_two_mutant venue-session assertion_failures 3 errors 0
+round_two_mutant owner-cancel-task assertion_failures 1 errors 0
+round_two_mutant cancel-budget assertion_failures 1 errors 0
+round_two_mutant cancel-shutdown assertion_failures 1 errors 0
+round_two_mutant scan-trade-date assertion_failures 1 errors 0
+round_two_mutant scan-rule-order assertion_failures 1 errors 0
+round_two_mutant rule-window assertion_failures 2 errors 0
