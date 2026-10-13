@@ -8,11 +8,14 @@ Mechanism: CPython v3.13.16 Doc/library/hashlib.rst:39-49 documents SHA256 over
 the supplied bytes; scripts/host_receipts.py:1012-1029 at df3a477c applies that
 same public-bytes boundary. Retained public vendor captures are the explicit
 source-review exception, identified by their public URL and capture row.
+Calendar validation reuses CPython v3.13.16's date constructor; the installed
+upstream reference is Lib/_pydatetime.py:535-546.
 """
 from __future__ import annotations
 
 import hashlib
 import json
+from datetime import date
 from pathlib import Path
 import re
 import tempfile
@@ -27,12 +30,28 @@ INVENTORY = DOCS + "/sources/luld-bp-20261013.json"
 PRIVATE_NAME = "account-c-calc-contracts-20261013.md"  # name-only provenance
 SLOT = re.compile(r"\b(?:account|slot)[\s_-]+[a-z0-9]\b", re.IGNORECASE)
 HEX = re.compile(r"(?<![a-z0-9])[0-9a-f]{7,64}(?![a-z0-9])", re.IGNORECASE)
+DATED_REFERENCE = re.compile(
+    r"(?<![\w-])[A-Za-z][A-Za-z0-9_.-]*[-_](?P<date>[0-9]{8})"
+    r"(?=(?:\.[A-Za-z][A-Za-z0-9]*\b)|/)")
 PUBLIC_HOSTS = {"www.luldplan.com", "cdn.luldplan.com", "docs.alpaca.markets", "raw.githubusercontent.com"}
 
 
 def handbook_files(root: Path) -> list[Path]:
     return sorted(path for directory in (root / DOCS, root / ARTIFACTS)
                   if directory.is_dir() for path in directory.rglob("*") if path.is_file())
+
+
+def dated_reference_spans(text: str) -> set[tuple[int, int]]:
+    """Recognize calendar dates in dated file/directory references, not bare numbers."""
+    spans = set()
+    for match in DATED_REFERENCE.finditer(text):
+        value = match.group("date")
+        try:
+            date(int(value[:4]), int(value[4:6]), int(value[6:]))
+        except ValueError:
+            continue
+        spans.add(match.span("date"))
+    return spans
 
 
 def publication_findings(root: Path) -> tuple[list[str], list[str]]:
@@ -66,9 +85,10 @@ def publication_findings(root: Path) -> tuple[list[str], list[str]]:
     allowed = public_digests | public_pins
     unresolved = []
     for relative, text in texts.items():
-        # Date components are not digest claims. All other 7+ hex tokens,
+        # Calendar dates in dated references are not digest claims. Other 7+ hex tokens,
         # including shortened pins and MinerU locators, need a public binding.
-        tokens = {token.lower() for token in HEX.findall(text) if not token.isdecimal()}
+        dates = dated_reference_spans(text)
+        tokens = {match.group().lower() for match in HEX.finditer(text) if match.span() not in dates}
         if any(not any(digest.startswith(token) for digest in allowed) for token in tokens):
             unresolved.append(relative)
     return sorted(labels), sorted(unresolved)
@@ -131,6 +151,27 @@ class HandbookPublicationTests(unittest.TestCase):
                 root = Path(temporary)
                 self.fixture(root, "Unpublished input " + private[:length])
                 self.assertEqual(publication_findings(root)[1], [DOCS + "/page.md"])
+
+    def test_scoped_review_regression_refuses_unbound_numeric_prefix(self):
+        # Deterministic synthetic data; no private file is read or hashed.
+        candidates = (hashlib.sha256(("Synthetic unpublished input " + str(i)).encode()).hexdigest()
+                      for i in range(1024))
+        private = next(value for value in candidates
+                       if value[:7].isdecimal() and not value[:8].isdecimal())
+        for length in (7, 8):
+            with self.subTest(prefix_length=length), tempfile.TemporaryDirectory(dir="/var/tmp") as temporary:
+                root = Path(temporary)
+                self.fixture(root, "Unpublished input " + private[:length])
+                self.assertEqual(publication_findings(root)[1], [DOCS + "/page.md"])
+
+    def test_calendar_reference_exception_is_context_bound(self):
+        cases = [("policy-20261013.md", False), ("trading-handbook-20261013/policy.md", False),
+                 ("Unpublished input 20261013", True), ("policy-20261340.md", True)]
+        for text, refused in cases:
+            with self.subTest(context=text), tempfile.TemporaryDirectory(dir="/var/tmp") as temporary:
+                root = Path(temporary)
+                self.fixture(root, text)
+                self.assertEqual(publication_findings(root)[1], [DOCS + "/page.md"] if refused else [])
 
 
 if __name__ == "__main__":

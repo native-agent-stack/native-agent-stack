@@ -63918,8 +63918,8 @@
     },
     {
       "path": "tests/test_trading_handbook_publication.py",
-      "sha256": "c07ec99a3326f73645ed91bbffc9d09f75f4a5a0f437acf662f2cd3aa5b6d426",
-      "bytes": 7261
+      "sha256": "200bd1be0eacd51564fdb89568567107ac4e2a644ca4f97cc6cf14d3d0e2e0e2",
+      "bytes": 9402
     },
     {
       "path": "tests/test_trading_handbook_sizing.py",
