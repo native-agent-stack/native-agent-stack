@@ -1,0 +1,67 @@
+{
+ "what": "One call of claude-haiku-5-5 per arm, asked to call WebSearch once (the prompt is in the driver of the author's record); the stream is reduced to counts and classes: no search text, no answer text, no host path is kept.",
+ "client": "2.1.296",
+ "captured_utc": "2026-10-13T15:27Z to 15:36Z",
+ "websearch_arms": [
+  {
+   "arm": "control-no-settings",
+   "websearch_listed_at_init": true,
+   "websearch_calls_by_the_model": 1,
+   "websearch_results_that_were_errors": 0,
+   "permission_denials_reported": 0,
+   "answer": "DONE",
+   "error_class": "none"
+  },
+  {
+   "arm": "hook-runner-crashes",
+   "websearch_listed_at_init": true,
+   "websearch_calls_by_the_model": 1,
+   "websearch_results_that_were_errors": 0,
+   "permission_denials_reported": 0,
+   "answer": "DONE",
+   "error_class": "none"
+  },
+  {
+   "arm": "hook-runner-missing",
+   "websearch_listed_at_init": true,
+   "websearch_calls_by_the_model": 1,
+   "websearch_results_that_were_errors": 1,
+   "permission_denials_reported": 1,
+   "answer": "UNAVAILABLE",
+   "error_class": "PreToolUse hook error (blocking: the runner file is missing, python3 exits 2)"
+  },
+  {
+   "arm": "overlay-and-crashing-runner",
+   "websearch_listed_at_init": false,
+   "websearch_calls_by_the_model": 0,
+   "websearch_results_that_were_errors": 0,
+   "permission_denials_reported": 0,
+   "answer": "UNAVAILABLE",
+   "error_class": "none"
+  },
+  {
+   "arm": "overlay-and-missing-runner",
+   "websearch_listed_at_init": false,
+   "websearch_calls_by_the_model": 0,
+   "websearch_results_that_were_errors": 0,
+   "permission_denials_reported": 0,
+   "answer": "UNAVAILABLE",
+   "error_class": "none"
+  }
+ ],
+ "user_prompt_submit_arms": [
+  {
+   "arm": "UserPromptSubmit hook, runner missing (python3 /nonexistent/guard.py)",
+   "result": "the prompt is blocked: 'UserPromptSubmit operation blocked by hook', 0 turns"
+  },
+  {
+   "arm": "UserPromptSubmit hook, existence-checked registration, same missing file",
+   "result": "the prompt runs: reply 'ok', 1 turn"
+  }
+ ],
+ "reading": [
+  "The hook alone does not enforce: a runner that exits 1 (a crash, or a timeout) lets the marked call through, as the unmarked control; a runner whose file is missing exits 2 and blocks the call in every session, marked or not.",
+  "The overlay removes WebSearch from the model's tools: the model made no WebSearch call in either overlay arm, whatever the runner did.",
+  "A missing file under a bare `python3 <file>` registration blocks the user's prompt itself (UserPromptSubmit exit 2); the existence-checked registration does not."
+ ]
+}

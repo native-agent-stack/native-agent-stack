@@ -1,0 +1,19 @@
+Pages of code.claude.com fetched 2026-10-13 (the sha256 of each is of the page bytes as served; the pages are public at the URL):
+
+code.claude.com/docs/en/permissions.md, fetched 2026-10-13T15:34Z (81879 bytes, sha256 68ba41f2910e92c9450761a411a1c4b196762496457371f8d233077f6de5d30e):
+L62: Rules are evaluated in order: deny, then ask, then allow. The first match in that order determines the outcome, and rule specificity doesn't change the order.
+L66: Deny rules behave differently depending on whether they name a tool or scope a pattern within one. A bare tool name like `Bash` removes the tool from Claude's context entirely, so Claude never sees it. [...]
+
+code.claude.com/docs/en/permissions.md, the same page, "Settings precedence" L697-L703: "If a tool is denied at any level, no other level can allow it. [...] The same holds across settings scopes: if user settings allow a permission and project settings deny it, the deny rule blocks it. [...] deny rules from any scope are evaluated before allow rules."
+
+code.claude.com/docs/en/settings-reference.md, fetched 2026-10-13T15:36Z (421502 bytes, sha256 4bec5505c7f33da3284848047b7e0c90148d777daf90b4cfda9da0a64878de08), "permissions.deny" L1566-L1576: "* **Scope**: Any file. [...] * **Per-session overrides**: `--disallowedTools` adds deny rules for one session alongside this key".
+
+code.claude.com/docs/en/cli-reference.md, fetched 2026-10-13T15:34Z (47769 bytes, sha256 0acf910e96c4a9f4488d9f40befecc1077fdd58598276a8436e8ef54408ecace):
+L87: | `--disallowedTools`, `--disallowed-tools` | Deny rules. A bare tool name removes the matching tools from Claude's context: `"Edit"` removes Edit, `"*"` removes every tool, and `"mcp__*"` removes every MCP tool. [...]
+
+code.claude.com/docs/en/hooks.md, fetched 2026-10-13T15:34Z (268811 bytes, sha256 31754d5adce5052af35acf85dc2ed207bb082b7dbf87f25218047b10a024a073):
+L786: * **Non-blocking error**: your hook exits with any other code, or fails in some other way, such as not starting or printing invalid JSON. The action goes ahead, [...] If you want a failed hook to block the action, set `onFailure: "block"`.
+L790-L794: the table of stdout against exit code: exit 2 with JSON that passes validation, with unparseable JSON, or with plain text or nothing is a blocking error; any other exit code is a non-blocking error.
+L800: * **`Stop`, `SubagentStop`, `TaskCompleted`, and a plugin's `UserPromptSubmit` hook**: when your hook exits 2 with nothing on stdout and its stderr says a file is missing, such as `No such file or directory`, Claude Code treats the run as a non-blocking error. (A user's UserPromptSubmit hook and a PreToolUse hook are not in this list: measured, a missing file blocks them.)
+
+anthropics/claude-code@3deb873687379f0c199a69fdaccc65f0865f7a29 CHANGELOG.md L5878: "Fixed `permissions.deny` rules not overriding a PreToolUse hook's `permissionDecision: "ask"` - previously the hook could downgrade a deny into a prompt" (a deny that holds against a hook).

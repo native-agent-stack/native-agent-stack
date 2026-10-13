@@ -1,0 +1,49 @@
+{
+ "what": "Headless init records of Claude Code 2.1.296 (the tools the client lists), started in an empty directory with the arguments of each arm and killed at the init record; booleans only (the host's tool names are not kept).",
+ "client": "2.1.296",
+ "captured_utc": "2026-10-13T13:25Z to 15:30Z",
+ "arms": [
+  {
+   "arm": "baseline",
+   "what": "no settings, no deny",
+   "websearch_listed": true,
+   "webfetch_listed": true,
+   "permission_mode": "bypassPermissions"
+  },
+  {
+   "arm": "disallowed",
+   "what": "--disallowedTools WebSearch",
+   "websearch_listed": false,
+   "webfetch_listed": true,
+   "permission_mode": "bypassPermissions"
+  },
+  {
+   "arm": "settings-deny",
+   "what": "--settings with permissions.deny [WebSearch] (the overlay)",
+   "websearch_listed": false,
+   "webfetch_listed": true,
+   "permission_mode": "bypassPermissions"
+  },
+  {
+   "arm": "settings-deny-bypass",
+   "what": "the overlay with --permission-mode bypassPermissions",
+   "websearch_listed": false,
+   "webfetch_listed": true,
+   "permission_mode": "bypassPermissions"
+  },
+  {
+   "arm": "hook-missing-runner-only",
+   "what": "a PreToolUse hook entry whose runner file does not exist, no deny",
+   "websearch_listed": true,
+   "webfetch_listed": true,
+   "permission_mode": "bypassPermissions"
+  },
+  {
+   "arm": "deny-and-missing-runner",
+   "what": "the overlay and the same missing runner",
+   "websearch_listed": false,
+   "webfetch_listed": true,
+   "permission_mode": "bypassPermissions"
+  }
+ ]
+}

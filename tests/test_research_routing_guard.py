@@ -74,22 +74,26 @@ class ResearchRoutingGuardTests(unittest.TestCase):
                 self.assertIsNone(self.run_guard(self.fetch(**changes), env=env))
                 self.assertFalse(self.state_root.exists())
 
-    def test_both_coordinator_roles_receive_native_websearch_deny_and_redirect(self):
+    def test_both_coordinator_roles_receive_the_websearch_redirect_as_advice_and_no_decision(self):
+        """CPA-V-03: the denial of WebSearch is the launch's (permissions.deny in the coordinator's overlay), so this hook only advises: the redirect hint to the research runtime, never a permission decision."""
         for role in ["command-center", "co-op"]:
             with self.subTest(role=role):
                 result = self.run_guard(self.event(), env={**self.env, "NAS_RESEARCH_COORDINATOR_ROLE": role})
                 fields = result["hookSpecificOutput"]
                 self.assertEqual(fields["hookEventName"], "PreToolUse")
-                self.assertEqual(fields["permissionDecision"], "deny")
-                self.assertIn("tools/research/dispatch --question", fields["permissionDecisionReason"])
+                self.assertNotIn("permissionDecision", fields)
+                self.assertNotIn("permissionDecisionReason", fields)
+                self.assertIn("tools/research/dispatch --question", fields["additionalContext"])
+                self.assertIn("not blocked here", fields["additionalContext"])
                 self.assertNotIn("decision", result)
                 self.assertNotIn("updatedInput", fields)
                 self.assertFalse(self.state_root.exists())
 
-    def test_search_denial_does_not_depend_on_writable_state(self):
+    def test_the_websearch_advice_does_not_depend_on_writable_state(self):
         self.state_root.write_text("not a directory")
         result = self.run_guard(self.event())
-        self.assertEqual(result["hookSpecificOutput"]["permissionDecision"], "deny")
+        self.assertIn("tools/research/dispatch --question", result["hookSpecificOutput"]["additionalContext"])
+        self.assertNotIn("permissionDecision", result["hookSpecificOutput"])
 
     def test_targeted_webfetch_logs_claim_without_granting_permission(self):
         self.assertIsNone(self.run_guard(self.fetch()))

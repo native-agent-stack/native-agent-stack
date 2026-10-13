@@ -96,19 +96,35 @@ SHIPPED_CARRIER_COMMANDS = (
 )
 
 
-def carrier_frames() -> tuple:
+# The hook commands this repository shipped and has since replaced by another command (not held out: wired, and re-wired). merge_hooks de-duplicates by command, so a replaced command left in
+# the host's settings would run beside its replacement: the research guard of docs/decisions/2026-10-08-coordinator-research-routing.md was registered as a bare `python3 <file>`, and a missing
+# file made that exit 2, which blocks a prompt or a tool call (docs/decisions/2026-10-13-coordinator-search-native-deny.md). The same exact-match rule as the carriers applies (no
+# trimming, HOME as written or as another spelling of the settings file's own home), and a command is retired only when the incoming template does not run it. A new replaced
+# shape is added here, with its source, in the commit that replaces it.
+SUPERSEDED_HOOK_COMMANDS = (
+    ('python3 "${HOME}/.claude/hooks/research-routing-guard.py"',
+     "adoption/templates/claude.settings.template.json, 618dd6c05 (#868); replaced by the existence-checked wrapper of CPA-V-03"),
+)
+
+
+def command_frames(commands) -> tuple:
     """What each shipped command has before and after the text that stands for HOME: the command with a NUL where the placeholder
     is, split there (the same one-pass string.Template substitution that renders it)."""
     frames = []
-    for command, _ in SHIPPED_CARRIER_COMMANDS:
+    for command, _ in commands:
         before, hole, after = string.Template(command).substitute(HOME="\0").partition("\0")
         if not hole or "\0" in after:
-            raise ValueError(f"a shipped carrier command must name HOME exactly once: {command!r}")
+            raise ValueError(f"a shipped hook command must name HOME exactly once: {command!r}")
         frames.append((before, after))
     return tuple(dict.fromkeys(frames))
 
 
+def carrier_frames() -> tuple:
+    return command_frames(SHIPPED_CARRIER_COMMANDS)
+
+
 CARRIER_FRAMES = carrier_frames()
+SUPERSEDED_FRAMES = command_frames(SUPERSEDED_HOOK_COMMANDS)
 
 
 def carrier_commands(home: str | None) -> frozenset:
@@ -140,6 +156,19 @@ def names_home(text: str, home: str) -> bool:
         return False
 
 
+def runs_superseded_hook(entry: dict, home: str | None = None) -> bool:
+    """True when a hooks-array entry's command is a replaced command this repository shipped (SUPERSEDED_HOOK_COMMANDS), as shipped or rendered for
+    ``home`` or with another spelling of ``home`` where the template says HOME: the matching of runs_held_out_hook, over the other list. Without a known ``home`` nothing is retired."""
+    cmd = hook_command(entry)
+    if cmd is None or not home or not os.path.isabs(home):
+        return False
+    shipped = [command for command, _ in SUPERSEDED_HOOK_COMMANDS]
+    if cmd in shipped or cmd in [string.Template(command).substitute(HOME=os.path.normpath(home)) for command in shipped]:
+        return True
+    return any(len(cmd) > len(before) + len(after) and cmd.startswith(before) and cmd.endswith(after)
+               and names_home(cmd[len(before):len(cmd) - len(after)], home) for before, after in SUPERSEDED_FRAMES)
+
+
 def runs_held_out_hook(entry: dict, home: str | None = None) -> bool:
     """True when a hooks-array entry's command is a carrier command this repository shipped: exactly a SHIPPED_CARRIER_COMMANDS
     string, as shipped or rendered for ``home``, or one of them whose home text is another spelling of ``home`` (names_home). No
@@ -153,10 +182,11 @@ def runs_held_out_hook(entry: dict, home: str | None = None) -> bool:
                and names_home(cmd[len(before):len(cmd) - len(after)], home) for before, after in CARRIER_FRAMES)
 
 
-def retire_held_out_hooks(base_hooks, incoming_hooks, home: str | None = None):
-    """`base_hooks` without the hook objects that run a held-out carrier file, unless the incoming template runs the
-    same command. A group left with no hook is dropped, and so is an event left with no group; every other group,
-    hook object and key keeps its value and order."""
+def retire_held_out_hooks(base_hooks, incoming_hooks, home: str | None = None, runs=None):
+    """`base_hooks` without the hook objects that run a held-out carrier file (``runs``: the predicate, runs_held_out_hook by default;
+    retire_superseded_hooks passes runs_superseded_hook), unless the incoming template runs the same command. A group left with no
+    hook is dropped, and so is an event left with no group; every other group, hook object and key keeps its value and order."""
+    runs = runs or runs_held_out_hook
     if not isinstance(base_hooks, dict):
         return base_hooks
     wanted = set()
@@ -178,7 +208,7 @@ def retire_held_out_hooks(base_hooks, incoming_hooks, home: str | None = None):
                 kept_groups.append(copy.deepcopy(group))
                 continue
             kept = [hook for hook in group["hooks"]
-                    if not (runs_held_out_hook(hook, home) and command_key(hook_command(hook)) not in wanted)]
+                    if not (runs(hook, home) and command_key(hook_command(hook)) not in wanted)]
             if len(kept) == len(group["hooks"]):
                 kept_groups.append(copy.deepcopy(group))
             elif kept:
@@ -186,6 +216,12 @@ def retire_held_out_hooks(base_hooks, incoming_hooks, home: str | None = None):
         if kept_groups:
             retired[event] = kept_groups
     return retired
+
+
+def retire_superseded_hooks(base_hooks, incoming_hooks, home: str | None = None):
+    """`base_hooks` without the hook objects that run a replaced command (SUPERSEDED_HOOK_COMMANDS), unless the incoming template runs
+    the same command: retire_held_out_hooks over the other list."""
+    return retire_held_out_hooks(base_hooks, incoming_hooks, home, runs=runs_superseded_hook)
 
 
 def separate_template_hook_groups(base_groups: list, incoming_groups: list) -> list:
@@ -336,6 +372,7 @@ def merge_settings(base: dict, template: dict, keep_held_out: bool = False, home
     merged = deep_merge_dict(base, {k: v for k, v in template.items() if k != "hooks"})
     if hooks is not None:
         live = base.get("hooks") if keep_held_out else retire_held_out_hooks(base.get("hooks"), hooks, home)
+        live = retire_superseded_hooks(live, hooks, home)   # a replaced command is retired whether or not the host keeps its held-out carriers
         merged["hooks"] = merge_hooks(live, hooks)
     return merged
 

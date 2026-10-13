@@ -1857,7 +1857,8 @@ class RenderTests(unittest.TestCase):
         settings = json.loads(self.files["settings.json"])
         self.assertNotIn("NAS_RESEARCH_COORDINATOR_ROLE", settings["env"])
         self.assertNotIn("NAS_RESEARCH_COORDINATOR_SESSION_ID", settings["env"])
-        command = 'python3 "/home/example/.claude/hooks/research-routing-guard.py"'
+        # CPA-V-03: registered with an existence check, so that a missing file cannot exit 2 (which blocks a prompt or a tool call); advisory, so it fails open.
+        command = 'f="/home/example/.claude/hooks/research-routing-guard.py"; [ -f "$f" ] && exec python3 "$f"; true'
         groups = [group for group in settings["hooks"]["PreToolUse"]
                   if any(hook["command"] == command for hook in group["hooks"])]
         self.assertEqual(len(groups), 1)
