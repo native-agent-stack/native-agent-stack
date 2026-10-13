@@ -98,6 +98,23 @@ class LayerVerdictFixture(unittest.TestCase):
 
 
 class BuildVerdictsTests(LayerVerdictFixture):
+    def test_final_alias_renders_the_recorded_winner_narrative(self):
+        row = v2_row(verdict_status="recorded", layer_id="layer-a", title="Alias",
+                     winners=[{"component_id": "widget", "pin": "1.0.0", "why_selected": "Fixture evidence"}],
+                     alternatives=[{"name": "Other", "disposition": "unqualified", "why_not_default": "Fixture gap"}],
+                     verdict_overturn_when="python3 fixture-test")
+        recorded = build_verdicts.render_row_narrative(row)
+        self.assertIn("widget @ 1.0.0", recorded)
+        self.assertEqual(build_verdicts.render_row_narrative({**row, "verdict_status": "FINAL"}), recorded)
+        source = "catalogs/landscape/foundation.json"
+        catalog = json.loads((self.root / source).read_bytes())
+        catalog["layers"][0].update(row, verdict_status="FINAL")
+        self.write(source, catalog)
+        document = build_verdicts.build_document(self.root, "2026-09-22")
+        counts = document["counts"]["foundation"]
+        self.assertEqual(counts["by_status"].get("FINAL"), 1)
+        self.assertEqual(sum(counts["by_status"].values()), counts["layers"])
+
     def test_check_fails_before_the_output_exists(self):
         exit_code = build_verdicts.main(["--check", "--root", str(self.root)])
         self.assertEqual(exit_code, 1)

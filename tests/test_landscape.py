@@ -548,6 +548,24 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
         with self.assertRaisesRegex(ValueError, "verdict_status is unknown"):
             self.build()
 
+    def test_final_alias_passes_the_recorded_verdict_contract(self):
+        self.seal_claude_run()
+        self.layer.update(self.recorded_fields(verdict_status="FINAL"))
+        data = self.build()
+        self.assertEqual(data["layers"][0]["verdict_status"], "FINAL")
+        self.assertEqual(data["layers"][0]["winners"][0]["component_id"], "selected")
+        self.layer["winners"] = []
+        with self.assertRaisesRegex(ValueError, "needs at least one winner"):
+            self.build()
+
+    def test_new_wave_final_alias_keeps_its_sealed_winner_binding(self):
+        lanes = self.seal_new_wave()
+        self.layer.update(self.recorded_fields(verdict_status="FINAL", lanes=lanes))
+        self.build()
+        self.layer["winners"][0]["component_id"] = "wrong-component"
+        with self.assertRaisesRegex(ValueError, "sealed winner set"):
+            self.build()
+
     def test_recorded_verdict_needs_at_least_one_winner_and_one_alternative(self):
         self.seal_claude_run()
         self.layer.update(self.recorded_fields(winners=[]))

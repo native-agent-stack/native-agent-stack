@@ -96,7 +96,8 @@ EVIDENCE_KINDS = {
 DECISIONS = {"retain", "adjust", "keep_but_compare"}
 
 # Layer-verdict schema v2 (catalogs/landscape/{foundation,us-equities}.json).
-VERDICT_STATUSES = {"pending_lanes", "recorded", "no_selection"}
+RECORDED_VERDICT_STATUSES = {"recorded", "FINAL"}
+VERDICT_STATUSES = {"pending_lanes", "no_selection"} | RECORDED_VERDICT_STATUSES
 WINNER_EVIDENCE_CLASSES = {
     "native_proven", "local_integration", "synthetic", "source_review", "measured_comparison",
 }
@@ -1154,7 +1155,7 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
     verdict_overturn_when = row.get("verdict_overturn_when", "")
     status = row["verdict_status"]
     chosen_lane = None
-    if status == "recorded":
+    if status in RECORDED_VERDICT_STATUSES:
         require(bool(winners), str(key) + " recorded verdict needs at least one winner")
         require(bool(alternatives), str(key) + " recorded verdict needs at least one alternative")
         for winner in winners:
@@ -1208,7 +1209,7 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
         verify_new_wave_row(row, key, root=root, sealed_base=sealed_base, wave=wave, lanes_field=lanes_field,
                             parsed_returns=parsed_returns, retained_packet=retained_packet,
                             packet_sha256=packet_sha256, winners=winners,
-                            chosen_lane=chosen_lane if status == "recorded" else None, wave_refs=wave_refs)
+                            chosen_lane=chosen_lane if status in RECORDED_VERDICT_STATUSES else None, wave_refs=wave_refs)
 
 
 def verify_new_wave_row(row, key, *, root, sealed_base, wave, lanes_field, parsed_returns, retained_packet,

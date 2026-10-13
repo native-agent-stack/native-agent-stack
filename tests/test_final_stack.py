@@ -1154,21 +1154,30 @@ class AngleEnforcementTests(FixtureTestCase):
         self.assertEqual(document["summary"]["angles"]["missing"], 1)
 
     def test_final_rejects_receipts_for_another_pin_or_synthetic_execution(self):
-        for field, mutation in (("e2e_receipt", {"pin": COMMIT_B}),
-                                ("e2e_receipt", {"evidence_class": "synthetic"}),
-                                ("invoke_receipt", {"calls": 0}),
-                                ("invoke_receipt", {"calls": True}),
-                                ("invoke_receipt", {"window_end": "2026-10-12T21:32:22Z"})):
+        native_binding = "condition 3 receipt must bind native evidence to repository and complete FINAL pin identity"
+        invoke_window = "condition 4 requires positive invocation calls in a measured window"
+        for field, mutation, reason in (("e2e_receipt", {"pin": COMMIT_B}, native_binding),
+                                        ("e2e_receipt", {"evidence_class": "synthetic"}, native_binding),
+                                        ("invoke_receipt", {"calls": 0}, invoke_window),
+                                        ("invoke_receipt", {"calls": True}, invoke_window),
+                                        ("invoke_receipt", {"window_end": "2026-10-12T21:32:22Z"}, invoke_window)):
             with self.subTest(field=field, mutation=mutation):
                 root, _, record = self.prepare(final=True)
-                _write(root / fs.OUTPUT, fs.serialize(fs.build_document(root)))
                 path = root / record["final_evidence"][0][field]
                 receipt = json.loads(path.read_bytes())
                 receipt.update(mutation)
                 _write_json(path, receipt)
+                # If a guard is removed, refresh the output so source drift
+                # cannot stand in for the intended receipt rejection.
+                try:
+                    document = fs.build_document(root)
+                except fs.FinalStackError:
+                    pass
+                else:
+                    _write(root / fs.OUTPUT, fs.serialize(document))
                 code, output = self.run_main(root, "--check")
                 self.assertEqual(code, 1, output)
-                self.assertIn("FINAL", output)
+                self.assertIn(reason, output)
 
     def test_nonfinal_pin_and_review_flags_remain_report_only(self):
         root = self.root()

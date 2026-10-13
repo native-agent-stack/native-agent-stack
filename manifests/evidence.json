@@ -5112,8 +5112,8 @@
     },
     {
       "path": ".github/requirements-ci.txt",
-      "sha256": "6c12191c6bd1274e1f33a029a07753b4e622c8fdc251706b8163883086eebe51",
-      "bytes": 12770
+      "sha256": "70284e31eff0b705be1fd2c2770bcce068fa8c787d02a700f50fe77f76aa150a",
+      "bytes": 13346
     },
     {
       "path": ".github/requirements-validation.txt",
@@ -17478,8 +17478,8 @@
     },
     {
       "path": "catalogs/landscape/angles/README.md",
-      "sha256": "6a3878e2d45ff751fd8974dc94327c075f52ca43587a555101e54b404971e7c6",
-      "bytes": 12605
+      "sha256": "80531891939dd7b8543f6e0b85ed6a9553ff6731244e04ac14aabc0046ea5a88",
+      "bytes": 12960
     },
     {
       "path": "catalogs/landscape/angles/foundation-agent-sdks.json",
@@ -17488,8 +17488,8 @@
     },
     {
       "path": "catalogs/landscape/angles/foundation-model-routes.json",
-      "sha256": "a436b92909f6673ad802ffb7c66fc9b5c6c81839e4155ff41dd3b66fbf8391f3",
-      "bytes": 60958
+      "sha256": "f71c92983ce1a7ebcf47574793509213c465fc719f194e5fcdc3fae915a1506e",
+      "bytes": 60813
     },
     {
       "path": "catalogs/landscape/angles/foundation-native-clients.json",
@@ -17503,8 +17503,8 @@
     },
     {
       "path": "catalogs/landscape/angles/schema.json",
-      "sha256": "e63c3101c2d806edde66aae242c20cfd7ff43c59963ee4b5be0a21c4e9ca851b",
-      "bytes": 11928
+      "sha256": "0b8c2ef46b20ec8c62b8acb9479780b1044ca79abc44c4a3099842a074c399ff",
+      "bytes": 12048
     },
     {
       "path": "catalogs/landscape/blind-convergence.json",
@@ -17523,12 +17523,12 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "7c68cc6e9e0001e4953ad08c6dec86cca462a5ca9787e5d1035a90f515f27885",
-      "bytes": 315225
+      "sha256": "095f424be1ad5f1ce539d31531575b1e37e072b2aed983e566c4c2f8e50ee410",
+      "bytes": 315354
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "95b39f68768a4e8a038725e91de8cd5e6a5ed6645e3e58142a9d5a5399e1b28a",
+      "sha256": "0d6871170544fcd54e39f7c1b85dd5ea2f8a1292672ceb22d87ff526c0d794d7",
       "bytes": 338539
     },
     {
@@ -18158,8 +18158,8 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "0fad007a8e9568b4271e2ac2b1996a57dd1fa52883f902b8c784eeca07e968a7",
-      "bytes": 32981
+      "sha256": "44b800aaf8f418defafb186ffeee24a099a72fb7020c9605f01ebc02d6214b5b",
+      "bytes": 33110
     },
     {
       "path": "docs/contributing-evidence.md",
@@ -19148,8 +19148,8 @@
     },
     {
       "path": "docs/decisions/2026-10-12-angle-records-final-check.md",
-      "sha256": "5a41fdfd9bb7be371cdf866eaca712d6fb89695e0838a0d4e1fad549764a0b0c",
-      "bytes": 15318
+      "sha256": "44a4e1e8cf7ab08e0e3927f0badf2333cbede8fad40fece0d9af78c4b3d374f8",
+      "bytes": 19998
     },
     {
       "path": "docs/decisions/2026-10-12-converged-candidates-only.md",
@@ -20322,6 +20322,16 @@
       "bytes": 13186
     },
     {
+      "path": "evidence/artifacts/angle-records-20261012/fix2-checks.json",
+      "sha256": "9343d24865d8645791102c2734949471e1ebe247e03eb825dbd8b3d1801d994e",
+      "bytes": 3483
+    },
+    {
+      "path": "evidence/artifacts/angle-records-20261012/fix2-source-reads.json",
+      "sha256": "cffd0ae6aaafec073bf9cc7b8ada57cf62ebd1b24f8586cd53a539b984eb2e6c",
+      "bytes": 2470
+    },
+    {
       "path": "evidence/artifacts/angle-records-20261012/muse-install-sanitized.json",
       "sha256": "7b707ebbdbe2230b912c3d6496e2d60d0a6dbb60c7cdffd7f36177555682faef",
       "bytes": 2009
@@ -20360,6 +20370,11 @@
       "path": "evidence/artifacts/angle-records-20261012/source-captures/openrouter-apps.txt",
       "sha256": "89ae6a0d60810ea87d4e5f96f48e3f00eb349b1d4beeaec31d54aabc91c81f57",
       "bytes": 961
+    },
+    {
+      "path": "evidence/artifacts/angle-records-20261012/source-captures/rfc3986-validator.txt",
+      "sha256": "23d5c660ea081ffed96910d9f8cc293a2c6cfd9e054771a37fdd3d7958ac1153",
+      "bytes": 763
     },
     {
       "path": "evidence/artifacts/angle-records-20261012/supplemental-source-reads.json",
@@ -62143,8 +62158,8 @@
     },
     {
       "path": "scripts/angle_records.py",
-      "sha256": "ae77ce9932b161eb47d8a30199acfeb32a033cba9df88e61c7e780659266ada3",
-      "bytes": 12391
+      "sha256": "0ef8d8a55329aa11b56c4bd19772aa6e588eb7388e657f0fd5b08a87dc1b0b98",
+      "bytes": 12489
     },
     {
       "path": "scripts/build_ecosystem.py",
@@ -62178,8 +62193,8 @@
     },
     {
       "path": "scripts/component_matrix.py",
-      "sha256": "98f998864e9e9b12f354eb76efb1646a3c940bc4c2f2ba1c46736050b9936f37",
-      "bytes": 80924
+      "sha256": "e873e55c26ffc0b4319f7c9fb3bea861aab838625221b589c358273ad546c016",
+      "bytes": 81157
     },
     {
       "path": "scripts/credential_boot_receipt.py",
@@ -62203,8 +62218,8 @@
     },
     {
       "path": "scripts/final_stack.py",
-      "sha256": "66a397ff2ea1b3f6699ab656757b892c74de7af7977fe094e525a84cbb36f03c",
-      "bytes": 67694
+      "sha256": "59ea7485ba2a44bafc738f869c32e5780982a36a50e399092c695c769b257920",
+      "bytes": 67577
     },
     {
       "path": "scripts/freshness_propose.py",
@@ -62253,8 +62268,8 @@
     },
     {
       "path": "scripts/landscape.py",
-      "sha256": "8410c7c7184f770e1af255f3a7f7413de286deac9a1440150572884aabda39cc",
-      "bytes": 110592
+      "sha256": "55d29d7550c84afa13a61b413bfea5e5ada8582730ba65912d581245b221c687",
+      "bytes": 110688
     },
     {
       "path": "scripts/native_token_ci.py",
@@ -62953,8 +62968,8 @@
     },
     {
       "path": "tests/test_angle_records_fix1.py",
-      "sha256": "6c8aa6b9e5fb1fec4817c7e31ffe4e21237c9dcf6350c93d2a3155112967ac34",
-      "bytes": 13079
+      "sha256": "d9a8be5eac1270287da45fd3dc2ee5f6b79da32ef69af179ae25c2f3f7a0c3c4",
+      "bytes": 19172
     },
     {
       "path": "tests/test_anthropic_key_health.py",
@@ -63188,8 +63203,8 @@
     },
     {
       "path": "tests/test_component_matrix.py",
-      "sha256": "da4fe0a1c18baeaeaf65675b21f5ab0ed748f2d9eaab1a1675ea89144851a166",
-      "bytes": 84487
+      "sha256": "8f2978b1ab3e8d0b5ef905568662b3db7f4625a8573ff8dbe9f178e29d13f12c",
+      "bytes": 85270
     },
     {
       "path": "tests/test_context_mode_practice_docs.py",
@@ -63273,8 +63288,8 @@
     },
     {
       "path": "tests/test_final_stack.py",
-      "sha256": "34be6666cee68c4e6d831b22ca4dca8de447dc0f35b379a0a3dcb8b5e73a1f4c",
-      "bytes": 78359
+      "sha256": "7c67ed5e7597b89be1b940db0ecde10708f229f07237e8269e8f1d86783a3ccd",
+      "bytes": 78989
     },
     {
       "path": "tests/test_financial_data.py",
@@ -63493,8 +63508,8 @@
     },
     {
       "path": "tests/test_landscape.py",
-      "sha256": "3d6f9fd29aa451a0054109b8c0eaabf40d91657eb32a5f95d40bfcd2e7b67d05",
-      "bytes": 86746
+      "sha256": "f401ca99b1873bfb636babf4e785bfef5f9ffe6083d3e06df09502b7c4a2279e",
+      "bytes": 87623
     },
     {
       "path": "tests/test_landscape_postrun.py",
@@ -63523,8 +63538,8 @@
     },
     {
       "path": "tests/test_layer_verdicts.py",
-      "sha256": "7ef43644d36e2a685f56d7fcffeb5ecc0172bfabd151ef157de54b3a7395a013",
-      "bytes": 31532
+      "sha256": "6742efe4ee5ed5af3c6f2bd06f5f7507efcb61c4b1ee9a211694c1e5dd500ca0",
+      "bytes": 32684
     },
     {
       "path": "tests/test_lifecycle_capture.py",
@@ -64898,8 +64913,8 @@
     },
     {
       "path": "tools/sota-convergence/build_verdicts.py",
-      "sha256": "507b393aca9482ee5ccaa299f8e1770e11c3b5ddfd5e9e89dc93d66a7ce648f1",
-      "bytes": 27765
+      "sha256": "dcefeadb78dc2f26a8e46712d5f70a72b90ef750fb0cb37a51518ce72e43041f",
+      "bytes": 28095
     },
     {
       "path": "tools/sota-convergence/codex_lane.py",

@@ -1415,7 +1415,7 @@
               "read_at": "2026-10-12T21:53:40Z"
             }
           ],
-          "note": "No terms conflict is evidenced for this comparison route because the check was waived rather than completed. Route capability and entitlement remain unverified. Neutral trial permission does not make this route FINAL eligible."
+          "note": "Route capability and entitlement remain unverified. Neutral trial permission does not make this route FINAL eligible."
         },
         "A2": {
           "score": "U",
@@ -1477,7 +1477,7 @@
             "read_at": "2026-10-12T21:53:40Z"
           }
         ],
-        "note": "unverified (check waived by operator decision)"
+        "note": "unverified"
       },
       "licence_note": {
         "spdx_id": null,

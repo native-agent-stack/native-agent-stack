@@ -771,8 +771,7 @@ def build_document(root: Path) -> dict:
         if is_landscape:
             # component_matrix.build_layer_convergence's rule: a sweep on the verdict's own date is not after it.
             later = [sweep for sweep in covering if verdict_day is None or sweep["day"] > verdict_day]
-            state_row = {**row, "verdict_status": "recorded"} if row.get("verdict_status") == "FINAL" else row
-            state = component_matrix.classify_layer_state(state_row, later)
+            state = component_matrix.classify_layer_state(row, later)
             reopened_by = ([{"sweep_id": sweep["sweep_id"], "date": sweep["date"]} for sweep in later]
                            if state == "recorded_reopened" else [])
             recorded = (convergence.get("layer_state"), convergence.get("reopened_by") or [])

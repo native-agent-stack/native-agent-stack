@@ -13,6 +13,7 @@ import re
 from urllib.parse import urlsplit
 
 from jsonschema import Draft202012Validator, FormatChecker
+from rfc3986_validator import validate_rfc3986
 
 DIRECTORY = "catalogs/landscape/angles"
 SCHEMA = DIRECTORY + "/schema.json"
@@ -42,7 +43,8 @@ def timestamp(value: str) -> datetime:
 
 def validate_https_url(value) -> None:
     try:
-        if not isinstance(value, str) or any(c.isspace() or ord(c) < 32 for c in value):
+        if (not isinstance(value, str) or any(c.isspace() or ord(c) < 32 for c in value)
+            or not validate_rfc3986(value, rule="URI")):
             raise ValueError
         parsed = urlsplit(value)
         if (parsed.scheme != "https" or not parsed.hostname or parsed.username is not None
@@ -54,7 +56,7 @@ def validate_https_url(value) -> None:
 
 
 def validate_reads(value, stated: datetime) -> None:
-    """Explicit formats and chronology do not depend on optional jsonschema extras."""
+    """Explicit checks do not depend on optional FormatChecker registrations."""
     if isinstance(value, dict):
         for key, child in value.items():
             if key == "read_at" and stated >= timestamp(child):

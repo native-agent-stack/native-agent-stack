@@ -1,5 +1,71 @@
 # Decision: sourced angle records and explicit FINAL checks
 
+## Fix round 2: file citations, URI validation and the FINAL alias
+
+Recorded at 2026-10-13T04:14:45Z. This amendment corrects the remaining
+source-locator and parser-only claims at `fe640793`. It records validation
+and synthetic controls; no candidate is installed, invoked or made FINAL.
+
+An upstream E2E citation must name a safe relative file. The shared path
+pattern now requires the entire string to match; the E2E source-file contract
+also refuses directory aliases and trailing separators. Repeated dot-only
+paths, `src/.`, `src/` and a trailing newline no longer satisfy condition 3.
+Ordinary files, including `./README.md` and `.github/workflows/test.yml`, remain
+accepted. This verifies locator syntax; it does not establish that a cited
+upstream file exists or that a source page is authentic.
+
+`urlsplit` parses URLs and does not validate URI syntax. HTTPS sources now
+first pass `rfc3986-validator==0.1.1`, the URI validator used by pinned
+jsonschema's supported `format-nongpl` extra. That dependency is pinned
+directly with public package hashes in the CI requirements and imported
+directly by the record validator. This makes URI validation required even
+when optional `FormatChecker` registrations are absent. CPython then checks
+the scheme, hostname, userinfo and port. Malformed escapes and backslashes
+are refused with a constant error; a valid encoded HTTPS URL still passes.
+The earlier parser-only wording below is corrected to describe this path.
+
+The FINAL verdict alias now follows recorded-verdict semantics through the
+landscape validator, component-matrix generator, verdict narrative and
+final-stack generator. It retains the ordinary verdict contract, sealed
+new-wave winner binding, winner factors, reopening and dated review metadata.
+FINAL enforcement still checks the terminal conditions separately. The
+positive control regenerates its matrix after setting the alias, eliminating
+the fixture's previously stale recorded-status matrix.
+
+The two committed neutral route rows are pinned by a data regression test.
+An otherwise fully measured synthetic winner with the pool row's metadata
+separately exercises `final_eligible: false` and `entitlement: unverified`.
+The generic entitlement control covers both pending and unverified status.
+Receipt refusals assert their binding or invocation reason and rebuild output
+if a guard is absent, so source drift cannot substitute for the intended check.
+The route and decision use neutral `unverified` wording.
+
+Before the corresponding production corrections, the new directory/URI
+controls failed in nine subtests; the affected mechanisms were unchanged from
+`fe640793`. The regenerated alias controls failed at the landscape, matrix and
+final-stack boundaries, and its narrative control rendered a pending row.
+The [round-2 check receipt](../../evidence/artifacts/angle-records-20261012/fix2-checks.json)
+retains the final bounded verification and its limits.
+
+Primary correction sources, read at 2026-10-13T04:08:24Z:
+
+- [python-jsonschema/jsonschema@a7277432b0f7bcd0551f6e589d30457017125df4:jsonschema/_keywords.py:215](https://github.com/python-jsonschema/jsonschema/blob/a7277432b0f7bcd0551f6e589d30457017125df4/jsonschema/_keywords.py#L215)
+  uses `re.search` for schema patterns.
+- [python/cpython@cbc944f4bc59639a444dd971c737788ba2283a91:Doc/library/re.rst:826](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Doc/library/re.rst#L826)
+  documents the final-newline behavior of `$`;
+  [Doc/library/urllib.parse.rst:416](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Doc/library/urllib.parse.rst#L416)
+  states that the URL parsers do not validate inputs.
+- Pinned jsonschema's [jsonschema/_format.py:307](https://github.com/python-jsonschema/jsonschema/blob/a7277432b0f7bcd0551f6e589d30457017125df4/jsonschema/_format.py#L307)
+  calls `validate_rfc3986(..., rule="URI")`; its
+  [pyproject.toml:64](https://github.com/python-jsonschema/jsonschema/blob/a7277432b0f7bcd0551f6e589d30457017125df4/pyproject.toml#L64)
+  names the supported dependency.
+- [Public package metadata](https://pypi.org/pypi/rfc3986-validator/0.1.1/json),
+  and the retained [read receipt](../../evidence/artifacts/angle-records-20261012/fix2-source-reads.json).
+  The package repository is UNMIRRORED; its public wheel's exported validator
+  was read at 2026-10-13T04:11:01Z and retained as a readable excerpt. The
+  repository's existing validators, registration helper and unittest fixtures
+  supply the alias and evidence paths; no replacement pipeline is introduced.
+
 ## Fix round 1: exact FINAL identity and measured convergence
 
 Recorded at 2026-10-13T02:59:11Z. The original PR commit was replayed onto
@@ -24,18 +90,19 @@ strings, safe relative source paths and positive integer line numbers.
 Malformed list members are rejected before phase counting.
 
 Screened A1 pins use allowed resolved identity forms rather than a sentinel
-denylist. UTC and HTTPS formats are explicitly checked using CPython's
-supported parsers, independent of optional jsonschema format extras; rejected
-values are never echoed. The weight statement must strictly precede every
+denylist. UTC timestamps are explicitly checked using CPython's datetime parser.
+HTTPS URLs require the pinned upstream RFC 3986 validator before CPython's URL
+parser checks their authority; optional checker registrations do not disable
+this direct validation. Rejected values are never echoed. The weight statement must strictly precede every
 angle, URL, entitlement and compliance read time.
 
 The two neutral trial rows have `trial_permitted: true`, `final_eligible:
 false`, and `basis: "operator decision, recorded privately"`. These fields
 do not change derivation or the arm list. The Meta foreign-harness subscription
 remains REJECTED with an evidenced terms conflict. The OpenAI non-Codex pool
-route remains INSUFFICIENT with entitlement `unverified (check waived by
-operator decision)`; no terms conflict is inferred. Either row's explicit
-ineligibility, or any unverified entitlement, prevents FINAL.
+route remains INSUFFICIENT with entitlement `unverified`; no terms conflict
+is inferred. Either row's explicit ineligibility, or any unverified entitlement,
+prevents FINAL.
 
 The sanitized Muse installation observation retains client 1.4.6-R6000.1,
 installer exit 0 and the Full model identifier muse-wonder-full-1.0. It is A1

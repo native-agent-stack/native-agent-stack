@@ -1,4 +1,4 @@
-"""Specific production-path controls for the first angle-record review round.
+"""Specific production-path controls for the angle-record review rounds.
 
 All receipts here are synthetic fixtures. Fresh-output controls distinguish
 an evidence rejection from the unrelated source-drift rejection.
@@ -11,6 +11,7 @@ import unittest
 from unittest import mock
 
 from scripts import angle_records as ar
+from scripts import component_matrix as cm
 from scripts import final_stack as fs
 from tests import test_final_stack as helpers
 from tests.test_final_stack import (
@@ -110,6 +111,24 @@ class FinalFix1Tests(FixtureTestCase):
                 _write_json(path, record)
                 self.fresh_reject(root, "conflicting terminal-state claims")
 
+    def test_directory_aliases_and_newline_are_not_upstream_file_citations(self):
+        for value in ("././", "././.", "./././", "src/.", "src/", "README.md\n"):
+            with self.subTest(path=value):
+                root, _, record = self.measured()
+                self.edit_receipt(root, record, "e2e_receipt",
+                                  lambda r: r["upstream_sources"][0].update(path=value))
+                self.fresh_reject(root, "condition 3 receipt has invalid commands or citations")
+
+    def test_safe_relative_upstream_file_citations_still_pass(self):
+        for value in ("README.md", "./README.md", "src/./module.py", ".github/workflows/test.yml"):
+            with self.subTest(path=value):
+                root, _, record = self.measured()
+                self.edit_receipt(root, record, "e2e_receipt",
+                                  lambda r: r["upstream_sources"][0].update(path=value))
+                _write(root / fs.OUTPUT, fs.serialize(fs.build_document(root)))
+                code, output = self.run_main(root, "--check")
+                self.assertEqual(code, 0, output)
+
     def test_final_requires_non_provisional_measured_convergence(self):
         root, path, record = self.prepare(final=True)
         c = record["candidates"][0]
@@ -147,12 +166,36 @@ class FinalFix1Tests(FixtureTestCase):
         self.fresh_reject(root, "final_eligible is false")
 
     def test_unverified_entitlement_cannot_be_final(self):
+        for status in ("pending", "unverified"):
+            with self.subTest(status=status):
+                root, path, record = self.measured()
+                record["candidates"][0]["entitlement"] = {"status": status,
+                    "sources": record["candidates"][0]["angles"]["A1"]["sources"],
+                    "note": "Synthetic unverified entitlement."}
+                _write_json(path, record)
+                self.fresh_reject(root, "entitlement remains unverified")
+
+    def test_pool_trial_metadata_blocks_final_even_with_measured_evidence(self):
+        committed = json.loads((REPO_ROOT / "catalogs/landscape/angles/foundation-model-routes.json").read_bytes())
+        pool = next(c for c in committed["candidates"] if c["id"] == "openai-pool-foreign-harness")
         root, path, record = self.measured()
-        record["candidates"][0]["entitlement"] = {"status": "pending",
-            "sources": record["candidates"][0]["angles"]["A1"]["sources"],
-            "note": "Synthetic unverified entitlement."}
+        # Transplant only the committed trial/entitlement metadata into an
+        # otherwise fully measured synthetic winner. Neither existing missing
+        # scores nor a rejected verdict may mask either FINAL guard.
+        candidate = record["candidates"][0]
+        candidate.update({field: copy.deepcopy(pool[field]) for field in
+                          ("id", "trial_permitted", "final_eligible", "basis", "entitlement")})
+        record["final_evidence"][0]["candidate_id"] = pool["id"]
+        _write_json(path, record)
+        self.fresh_reject(root, "final_eligible is false")
+        candidate["final_eligible"] = True
         _write_json(path, record)
         self.fresh_reject(root, "entitlement remains unverified")
+        candidate["entitlement"]["status"] = "documented"
+        _write_json(path, record)
+        _write(root / fs.OUTPUT, fs.serialize(fs.build_document(root)))
+        code, output = self.run_main(root, "--check")
+        self.assertEqual(code, 0, output)
 
     def test_final_alias_obtains_the_recorded_review_date(self):
         root, _, _ = self.measured()
@@ -160,8 +203,17 @@ class FinalFix1Tests(FixtureTestCase):
         doc = json.loads(source.read_bytes())
         doc["layers"][0]["verdict_status"] = "FINAL"
         _write_json(source, doc)
+        # Use the production matrix generator after setting the alias; a
+        # matrix built from the earlier "recorded" row hides the broken path.
+        _write(root / "adoption/host-receipt.schema.json",
+               (REPO_ROOT / "adoption/host-receipt.schema.json").read_text())
+        matrix, violations = cm.build_document(root)
+        self.assertEqual(violations, [])
+        _write_json(root / fs.MATRIX, matrix)
         document = fs.build_document(root)
-        self.assertEqual(self.layer(document, "layer-a")["verdict"]["next_review"], "2026-10-22")
+        layer = self.layer(document, "layer-a")
+        self.assertEqual(layer["terminal_state"], "FINAL")
+        self.assertEqual(layer["verdict"]["next_review"], "2026-10-22")
         _write(root / fs.OUTPUT, fs.serialize(document))
         code, output = self.run_main(root, "--check")
         self.assertEqual(code, 0, output)
@@ -169,6 +221,29 @@ class FinalFix1Tests(FixtureTestCase):
 
 class RecordFix1Tests(FixtureTestCase):
     prepare = helpers.AngleEnforcementTests.prepare
+
+    def test_committed_trial_routes_pin_neutral_values_and_verdicts(self):
+        record = json.loads((REPO_ROOT / "catalogs/landscape/angles/foundation-model-routes.json").read_bytes())
+        expected = {
+            "muse-subscription-foreign-harness": ("REJECTED", "missing_capability", "conflict"),
+            "openai-pool-foreign-harness": ("INSUFFICIENT", None, "unverified"),
+        }
+        rows = {c["id"]: c for c in record["candidates"] if c["id"] in expected}
+        self.assertEqual(set(rows), set(expected))
+        for ident, (verdict, disqualifier, entitlement) in expected.items():
+            with self.subTest(candidate=ident):
+                candidate = rows[ident]
+                self.assertIs(candidate["trial_permitted"], True)
+                self.assertIs(candidate["final_eligible"], False)
+                self.assertEqual(candidate["basis"], "operator decision, recorded privately")
+                self.assertEqual(candidate["entitlement"]["status"], entitlement)
+                self.assertEqual(candidate["disqualifier"], disqualifier)
+                self.assertEqual(candidate["verdict"], verdict)
+                self.assertEqual(ar.derive(record, candidate)["verdict"], verdict)
+        pool = rows["openai-pool-foreign-harness"]
+        self.assertIs(pool["a1_screened"], False)
+        self.assertEqual(pool["angles"]["A1"]["score"], "U")
+        self.assertEqual(pool["entitlement"]["note"], "unverified")
 
     def test_neutral_trial_fields_do_not_change_derivation_or_arm_list(self):
         record = _angle_fixture()
@@ -181,6 +256,34 @@ class RecordFix1Tests(FixtureTestCase):
         ar.validate_record(record, schema, label="synthetic")
         self.assertEqual(ar.derive(record, candidate), before)
         self.assertEqual([c["id"] for c in record["candidates"]], ids)
+
+    def test_malformed_https_uris_are_refused_without_format_registrations(self):
+        for value in ("https://%ZZ", "https://bad\\host", "https://example.org/%0"):
+            with self.subTest(url=value):
+                root, path, record = self.prepare()
+                record["candidates"][0]["angles"]["A1"]["sources"][0]["url"] = value
+                _write_json(path, record)
+                with mock.patch.dict(ar.FormatChecker.checkers, {}, clear=True):
+                    try:
+                        document = fs.build_document(root)
+                    except fs.FinalStackError:
+                        pass
+                    else:
+                        _write(root / fs.OUTPUT, fs.serialize(document))
+                    code, output = self.run_main(root, "--check")
+                self.assertEqual(code, 1, output)
+                self.assertIn("invalid HTTPS source URL", output)
+                self.assertNotIn(value, output)
+
+    def test_valid_https_uri_passes_without_format_registrations(self):
+        root, path, record = self.prepare()
+        record["candidates"][0]["angles"]["A1"]["sources"][0]["url"] = (
+            "https://example.org/fixture?q=encoded%20value#valid")
+        _write_json(path, record)
+        with mock.patch.dict(ar.FormatChecker.checkers, {}, clear=True):
+            _write(root / fs.OUTPUT, fs.serialize(fs.build_document(root)))
+            code, output = self.run_main(root, "--check")
+        self.assertEqual(code, 0, output)
 
     def test_screened_unknown_whitespace_and_malformed_pins_are_rejected(self):
         for pin in ("UNKNOWN", "   ", "deadbeef", "1.0 @ not-a-commit", "HEAD"):

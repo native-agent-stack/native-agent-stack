@@ -23,10 +23,12 @@ sum exactly to one, and `weights_stated_at` must strictly precede every angle's
 `read_at`. A URL's source read must not follow its assessment.
 
 Every URL, entitlement and compliance read must also strictly follow the
-weight statement. UTC timestamps and HTTPS source URLs are validated in code
-using CPython's supported datetime and URL parsers, with clean errors that
-never echo a rejected value. Optional jsonschema format packages are not
-required for these checks. A screened candidate needs a resolved full commit
+weight statement. UTC timestamps use CPython's datetime parser. HTTPS source
+URLs first pass jsonschema's supported RFC 3986 validator, pinned as the required
+`rfc3986-validator==0.1.1` dependency in `.github/requirements-ci.txt`, then
+CPython's URL parser checks the scheme, host, userinfo and port. Direct URI
+validation remains active when optional `FormatChecker` registrations are
+absent; clean errors never echo a rejected value. A screened candidate needs a resolved full commit
 or release identity; unknown, whitespace and malformed pins cannot qualify A1.
 
 | Angle | Meaning | Default weight |
@@ -115,8 +117,10 @@ FINAL` is also recognized. An explicit marker cannot bypass verification.
 
 Explicit terminal-state claims are reconciled before enforcement; conflicting
 claims are refused. A matrix-reopened layer must have its sweep delta
-adjudicated and leave reopened before FINAL. The FINAL verdict alias receives
-the same dated review metadata as an ordinary recorded verdict.
+adjudicated and leave reopened before FINAL. The landscape validator, matrix
+generator, verdict narrative and final-stack generator share recorded-verdict
+semantics for the FINAL alias, including sealed winner binding, matrix winner
+factors and dated review metadata. The alias still needs every FINAL condition.
 
 For every FINAL winner the generator requires:
 
