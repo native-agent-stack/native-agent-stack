@@ -61,29 +61,30 @@ has been separately confirmed; the single `feed` value drives both the REST
 quote/snapshot requests and the quote stream endpoint. No SIP run has been
 executed, so nothing here qualifies SIP data quality, entitlement or cost.
 
-Trial continuity is keyed by the SHA-256 of the selected config file, recorded
-as `config_sha256` in the state directory's `trial.json`. `config.json` and
-`config-sip.json` hash differently even though only the feed differs, so
-pointing `--config` at `config-sip.json` under a state directory created for
-`config.json` refuses with `next_trial_config_differs_from_frozen_limits`, and
-`recover` refuses with `recovery_config_differs_from_frozen_trial`. A new
-`--trial` identifier does not avoid this, because the state directory is keyed
-by the account fingerprint alone.
+Each trial records the SHA-256 of its selected config file as `config_sha256`
+in the state directory's `trial.json`. Recovery requires those exact bytes,
+including session flags, formatting and notes, and refuses every change with
+`recovery_config_differs_from_frozen_trial` (the 2026-10-04 decision in
+[README-mover.md](README-mover.md), "Frozen recovery config"
+still applies). The NEXT lane-A trial compares frozen config values, with only
+the three session flags below exempted. A new `--trial` identifier cannot
+avoid continuity checks: the state directory is keyed by the account fingerprint.
+The runner captures config bytes once; validation, executable policy and both
+provenance digests use that same snapshot even if the supplied pathname changes.
 
 The preferred path is to finish or recover the open IEX trial and start the SIP
 trial in the same state root, so one durable ledger keeps the account-level risk
-and request history. That path is currently refused: continuity is pinned to the
-config file's bytes, not to its trading fields, so
-`next_trial_config_differs_from_frozen_limits` still fires even though
-`config-sip.json` changes only the feed. Comparing the frozen trading fields
-instead of the file hash would unblock it. Lane A now permits changes only to
-the coordinated regular_session_only, extended_hours_enabled and
-sessions.extended_hours flags, with all other config values frozen. The
-loader and actual-session checks still validate the new scope. A feed change
-remains refused. Completed trial metadata retains both the actual raw config
-digest and frozen_trading_config_sha256. A legacy journal can compare a
-changed session only when its old raw digest resolves to exact retained
-shipped config bytes; otherwise it refuses. No risk/history reset is implied.
+and request history. A feed change remains outside the permitted exception:
+`config-sip.json` under a state directory created for `config.json` still
+refuses with `next_trial_config_differs_from_frozen_limits`. Lane A permits
+only the coordinated regular_session_only, extended_hours_enabled and
+sessions.extended_hours flags to change for the next trial, with all other
+config values frozen. The loader and actual-session checks still validate
+the new scope. Completed paper trial metadata retains both the actual raw
+config digest and frozen_trading_config_sha256; recovery preserves the
+trial's original bindings. A legacy journal can compare a changed session
+only when its old raw digest resolves to exact retained shipped config bytes;
+otherwise it refuses. No risk/history reset is implied.
 
 A separate `--state-root` is the remaining option and is not a neutral switch. It
 creates a second, fully independent durable ledger

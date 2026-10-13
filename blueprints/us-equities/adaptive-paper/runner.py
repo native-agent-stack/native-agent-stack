@@ -414,8 +414,9 @@ def lane_a_config_continues(metadata, raw_config):
     return False
 
 
-def load_config(path, *, registry_path=None):
-    c = json.loads(Path(path).read_text())
+def load_config(path, *, registry_path=None, config_bytes=None):
+    # main captures immutable bytes once. Standalone callers retain the path API.
+    c = json.loads(config_bytes if config_bytes is not None else Path(path).read_text())
     is_exploratory(c)
     apply_exit_preset(c, "adaptive")
     require_qualified_stream(c["feed"])
@@ -2390,7 +2391,8 @@ def main():
         parser.error(problem)
     if not re.fullmatch(r"[a-z0-9-]{1,24}", args.trial):
         raise ValueError("invalid_trial_id")
-    raw_config = json.loads(args.config.read_text())
+    config_bytes = args.config.read_bytes()
+    raw_config = json.loads(config_bytes)
     exploratory = is_exploratory(raw_config)
     RECEIPT_LABELS = receipt_labels(raw_config)
     validate_exploratory_paths(raw_config, args.state_root, args.output, live_dir=args.live_dir)
@@ -2399,7 +2401,7 @@ def main():
         raise SafetyError("exploratory_qualification_forbidden")
     if exploratory and args.command == "paper" and DEFAULT_STOP.exists():
         raise SafetyError("global_stop_latched")
-    config, limits, policy_config = load_config(args.config)
+    config, limits, policy_config = load_config(args.config, config_bytes=config_bytes)
     RECEIPT_LABELS = receipt_labels(config)
     session_policy = validate_session_policy(config)
     try:
@@ -2446,9 +2448,9 @@ def main():
     summary.update(RECEIPT_LABELS)
     summary["http"] = responses
     summary["order_contract"] = contract_status
-    summary["config_sha256"] = config_digest(config, args.config.read_bytes(), limits=limits)
+    summary["config_sha256"] = config_digest(config, config_bytes, limits=limits)
     if exploratory:
-        summary["raw_config_sha256"] = hashlib.sha256(args.config.read_bytes()).hexdigest()
+        summary["raw_config_sha256"] = hashlib.sha256(config_bytes).hexdigest()
     if args.command == "preflight":
         try:
             validate_preflight(observation, config, require_open=True, session_policy=session_policy)
@@ -2583,8 +2585,7 @@ def main():
                      "stop_file": str(_safety.DEFAULT_STOP)}) + "\n")
             if args.command == "recover":
                 metadata = previous_metadata
-                if metadata["config_sha256"] != summary["config_sha256"] and (
-                        exploratory or not lane_a_config_continues(metadata,raw_config)):
+                if metadata["config_sha256"] != summary["config_sha256"]:
                     raise SafetyError("recovery_config_differs_from_frozen_trial")
             else:
                 fee_start = (previous_metadata.get("fee_window_start", previous_metadata["started_at"])
@@ -2746,7 +2747,7 @@ def main():
             phase, exit_code = trial_phase_and_exit_code(result)
             metadata["phase"] = phase
             metadata["status"] = result["status"]
-            if not exploratory:
+            if not exploratory and args.command == "paper":
                 metadata["config_sha256"]=summary["config_sha256"]
                 metadata["frozen_trading_config_sha256"]=frozen_trading_config_sha256(raw_config)
             publish_trial_projection(ledger,metadata_path,metadata,save)
