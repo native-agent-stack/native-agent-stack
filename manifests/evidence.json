@@ -62918,8 +62918,8 @@
     },
     {
       "path": "tests/test_order_throughput.py",
-      "sha256": "e8f12c0151b327b0846b7cc35494b33fe6027bd545242b1e3b9fc9b3aad6d729",
-      "bytes": 75595
+      "sha256": "5c85734ed8e7915a540c7c1a5ebc058fa35d10efef29c97988e3b3b40b52b189",
+      "bytes": 79596
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
