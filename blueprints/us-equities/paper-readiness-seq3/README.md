@@ -33,7 +33,8 @@ writer. The selected NautilusTrader 2.0.0rc5 source at
 cleanup semantics. Native account STOP enforcement is the existing NAS engine
 at 8c95a50d10bd2db0b59058c6827275917ce35aa3 (`runner.Controller.stop_requested`,
 `safety.DEFAULT_STOP`). Systemd v260 at
-54b24a38 remains the supported path/service and ExecStopPost lifecycle; no
+54b24a3855de37e5e19235c44acd113eb6ce6830, `man/systemd.service.xml:585-606`,
+remains the supported path/service and ExecStopPost lifecycle; no
 calendar timer or new scheduler is introduced.
 
 The old launcher and issuer are retained as non-executable `.txt` test fixtures
@@ -41,8 +42,11 @@ so their pinned byte hashes and failing behavior are inspectable. The test
 harness redirects every state/latch/config root under `/var/tmp`, stubs native
 recover with labelled SYN proof, and tripwires keyed execution and credential
 pointer access. The first seven tests failed against the old launcher (three
-failures, one error); the final ten pass, including dual-latch issuer refusal,
-unit touch removal and preservation of a human symlink target.
+failures, one error); eleven now pass, including dual-latch issuer refusal,
+unit touch removal, preservation of a human symlink target and re-cutting a
+predecessor with a read-only units directory. Only the NEW unit directory gets
+temporary write permission for filename relocation; its permissions are
+restored read-only before the bundle is returned.
 
 ```sh
 systemd-run --user --scope -p CPUWeight=idle --quiet -- env TMPDIR=/var/tmp \
@@ -55,6 +59,16 @@ the GO-BINDING-REQUEST is a separate hashed envelope because it binds that
 manifest's digest. The record retains predecessor state and config bindings.
 No service is installed or started by the recutter; it writes no GO, STOP or
 HOLD and makes no broker/credential call.
+
+`dry_run.py --bundle NEW_SEQ3 --receipt SYN_RECEIPT` replays all five retained
+wiring modules without changing their files. It adapts only SYN host/lane roots,
+removes finish()'s simulation of the deleted shell touch hook, and checks the
+new seq3 names/two hooks. Human-stop test actions remain intact. The real
+credential-pointer function is replaced before the tests execute. The full
+drill passed 49 invocations, zero failures/errors/skips; this count includes
+inherited Wiring cases discovered again by the sequencing module. An initial
+drill retained the obsolete simulated touch and failed ownership checks; the
+harness was corrected, not the ownership guard. No service or broker call ran.
 
 After the PR lands: pin its commit, re-cut/strict-check the full bundle, rerun
 complete SYN wiring, send the new manifest/request/receipts to the co-op, and
