@@ -13,6 +13,7 @@ commits, counts and file names only. Nothing here holds an account name, a host 
 | `receipts/observed-registry.json` | the first host's installed commits and versions of the three plugins, from its registry (no install path) |
 | `receipts/fail-before.txt` | the test against main at the time of writing, where no record exists, and against this head |
 | `receipts/mutants-17.txt` | the 17 mutants of the record, the templates, the guide and the receipts: 17 of 17 killed |
+| `receipts/mutants-round1-29.txt` | review round 1: the six mutants of the round (a plugin enabled by a list, by an empty list, in the additions template; a built-in of another marketplace; the pinned commit under a look-alike header and under the repository listed next) over the pushed head's test module (all survive) and this head's (all killed); five controls the client does not enable (green in both); the 17 mutants of the first head (still killed); and the sha predicate on a 41-character value |
 
 The capture script and the mutation driver are scripts of the author's private record; the commands are the receipts' own (`git ls-remote`, `gh api repos/<repo>/compare/<base>...<head>`, `git show`).
 The measurements are the author's, taken on one host with one client version; nothing here is a measurement by an independent party.

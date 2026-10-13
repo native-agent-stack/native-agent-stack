@@ -11,4 +11,4 @@
 | `pin` | `tag`: the template's `ref` resolves to `sha`; `exception`: the template cannot name the reviewed commit, and `exception` says why and what is checked instead; `builtin`: a built-in mod of the client |
 | `sha` | the reviewed commit, a full 40-character lowercase SHA |
 
-`tests/test_plugin_pins.py` holds the record to the templates and to the revision check of `adoption/bootstrap.md` step 4a. A template that enables a plugin with no entry here fails it.
+`tests/test_plugin_pins.py` holds the record to the templates and to the revision check of `adoption/bootstrap.md` step 4a. A template that enables a plugin (an `enabledPlugins` value of `true` or a list, which is what Claude Code 2.1.296 counts as enabled) with no entry here fails it; a `builtin` entry is of the `builtin` marketplace only.

@@ -1,0 +1,32 @@
+Review round 1 of #1092 (the command center's read of e9a75c5d: P2-1, P3-2, P3-3). Each mutant is one or more exact changes to the files the tests read, in a scratch copy of the tree; two modules run over each copy: the test module as the pushed head e9a75c5d had it ("old") and this head's ("new"). The mutants of the round must survive the old module (the defect the round fixes went undetected) and be killed by the new one; the controls (values the client does not enable) must leave both green; the 17 mutants of the first head must still be killed by the new module. A line begins with `ok` when it is as required.
+
+ok  [round 1] old module: survived new module: killed   a template enables a plugin by a list and the record has no entry (P2-1)
+ok  [round 1] old module: survived new module: killed   a template enables a plugin by an empty list and the record has no entry (P2-1)
+ok  [round 1] old module: survived new module: killed   the additions template enables a plugin by a list and the record has no entry (P2-1)
+ok  [round 1] old module: survived new module: killed   a built-in entry of another marketplace (P3-2)
+ok  [round 1] old module: survived new module: killed   the pinned commit stands under a look-alike header and not under the plugin's own repository (P3-3)
+ok  [round 1] old module: survived new module: killed   the pinned commit stands under the repository listed next (P3-3)
+ok  [controls] old module: green    new module: green    control: a plugin with the value false is not enabled
+ok  [controls] old module: green    new module: green    control: a plugin with the value a string is not enabled
+ok  [controls] old module: green    new module: green    control: a plugin with the value a number is not enabled
+ok  [controls] old module: green    new module: green    control: a plugin with the value null is not enabled
+ok  [controls] old module: green    new module: green    control: a plugin with the value an object is not enabled
+ok  [first head] old module: killed   new module: killed   an enabled plugin has no entry
+ok  [first head] old module: killed   new module: killed   an entry is stale (no template enables it)
+ok  [first head] old module: killed   new module: killed   a tag pin names another commit
+ok  [first head] old module: killed   new module: killed   a sha is not a full commit
+ok  [first head] old module: killed   new module: killed   an exception has no reason
+ok  [first head] old module: killed   new module: killed   an exception names no content rule
+ok  [first head] old module: killed   new module: killed   a builtin has no reason
+ok  [first head] old module: killed   new module: killed   the record's source differs from the template's
+ok  [first head] old module: killed   new module: killed   the template enables a plugin the record lacks
+ok  [first head] old module: killed   new module: killed   the record carries a sha in a marketplace source
+ok  [first head] old module: killed   new module: killed   the template drops the context-mode marketplace
+ok  [first head] old module: killed   new module: killed   the template moves a tag
+ok  [first head] old module: killed   new module: killed   the additions template enables another plugin
+ok  [first head] old module: killed   new module: killed   the guide's reviewed commit differs
+ok  [first head] old module: killed   new module: killed   the captured tag resolves to another commit
+ok  [first head] old module: killed   new module: killed   the compare shows more than the stats file
+ok  [first head] old module: killed   new module: killed   the docs excerpt no longer shows the marketplace source without sha
+ok  [P3-3, the sha check] a 41-character value: the old assertion (search) accepts it: True; the new one (fullmatch) accepts it: False
+6 round mutants (old module: survived, new: killed), 5 controls (green in both), 17 earlier mutants (killed by the new module); departures from that: none

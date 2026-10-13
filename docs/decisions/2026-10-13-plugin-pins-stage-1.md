@@ -60,6 +60,32 @@ On the first host, with the client at 2.1.296 (`receipts/`):
 - Tags are mutable on the publisher's side; the record's commit is what was reviewed, and the tag resolution is a capture of 2026-10-13, not a guarantee. A pin that the client enforces is stage 2.
 - The two guards that read `adoption/bootstrap.md` and the receipts are text readers of a guide's code block and of captured files; a reformatting of either fails the test loudly rather than passing.
 
+## Review round 1 (the command center's read of `e9a75c5d`: no P1, one P2 in the diff, one P2 outside it, six P3; one commit with the leased registry-only rebase)
+
+The read is the command center's record `pr1092-claude-read-e9a75c5d.md` (2026-10-13T22:35Z): a read-only evidence reviewer that checked client behaviour against the installed 2.1.296 binary by byte offset and
+re-fetched every reproducible receipt (all matched); privacy clean. The ruling: one commit by this lane, in one push with the registry-only rebase onto main; P2-1, P3-2 and P3-3 are fixed here, and the rest
+are follow-ups below.
+
+| Finding | Fix | Test (fails before the fix) |
+| --- | --- | --- |
+| P2-1, `tests/test_plugin_pins.py:28-29`: a plugin counted as enabled only when its value was `true`; the client also enables a list: `function lM(e){return e===!0||Array.isArray(e)}` and `aet`, which builds the enabled set with it (2.1.296, bytes 215984845 and 215984892 of the binary, read here; the schema at 208959019 and 208925317), so a list-enabled plugin with no entry passed all seven tests and `adoption/plugins/README.md` was untrue for that format | `enabled_plugins` mirrors the client: `true` or a list (an empty list included); `false`, a string, a number, `null` and an object enable nothing; the README sentence says so | `test_a_plugin_is_enabled_as_the_client_reads_the_value_true_or_a_list`; the mutants "a template enables a plugin by a list", "... by an empty list" and the same in the additions template survive the pushed head's module and are killed by this one; five controls (false, a string, a number, null, an object) stay green in both |
+| P3-2: a `builtin` pin was accepted for any marketplace | a `builtin` entry requires the `builtin` marketplace | the mutant "a built-in entry of another marketplace" (survives the pushed head's module, killed now) |
+| P3-3: the tag-resolution parse took the first text that ends with the repository's name, and read to the next blank line although the capture lists its repositories one after another (so the rows of the repository listed next were read too); the sha check used `search`, which accepts a longer text that contains a commit | `tag_commit` reads the rows below the repository's own header line, up to the next header or a blank line; `is_sha` uses `fullmatch` | `test_the_tag_resolution_is_read_under_exactly_the_plugins_repository` and `test_a_sha_is_forty_lowercase_hex_characters_and_nothing_else`; the mutants "the pinned commit stands under a look-alike header" and "... under the repository listed next" survive the pushed head's module and are killed now; the old assertion accepts a 41-character value and the new one does not (in the receipt) |
+
+The receipt is `evidence/artifacts/plugin-pins-20261013/receipts/mutants-round1-29.txt`: each mutant over a scratch copy of the files the tests read, run against the pushed head's module and this one: the six
+of the round survive the old module and are killed by the new one; the five controls are green in both; the 17 mutants of the first head are still killed. A mutant of the plugin-side defects needs consistent changes in
+several files for the old module to miss it (a 41-character commit changes the record, the capture and the guide together, and the guide's own pattern then catches it), so the predicate is shown directly.
+
+### Follow-ups of the read (none changing code in this round)
+
+- **P2-2, outside the diff and jointly with #1074's identical follow-up**: the registry reader in `adoption/bootstrap.md` (step 4a, the lines that read the plugin registry under `CLAUDE_CONFIG_DIR`) must honour
+  `CLAUDE_CODE_PLUGIN_CACHE_DIR` and the cowork mode as the client resolves the plugin folder (bytes 219447724, 211876595 and 211876415 of the 2.1.296 binary). It is the same class as the plugin folder
+  resolution in `scripts/skills_status.py`: one installer-side fix for both readers, after both pull requests land.
+- P3-1: the record names step 4a as the host check without saying which checks it makes; qualify it at the next edit of that paragraph.
+- P3-4: no test reads `receipts/observed-registry.json`; add one when the host check compares the installed commits with it.
+- P3-5: the default branch's tip is captured and not compared with the reviewed commit; compare it at the next capture.
+- P3-6: one claim is uncited ("no ref installs the default branch's tip"): cite the documentation lines (L156 and L380 of the marketplace reference) and the schema byte 208867701 at the next edit.
+
 ## Overturn conditions
 
 - A client release that gives a marketplace source a `sha`: the template can then name the commit directly and the exception for `context-mode` ends.
