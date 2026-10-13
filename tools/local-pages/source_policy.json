@@ -2010,6 +2010,10 @@
     },
     {
       "root": "repo",
+      "path": "scripts/angle_records.py"
+    },
+    {
+      "root": "repo",
       "path": "scripts/build_ecosystem.py"
     },
     {

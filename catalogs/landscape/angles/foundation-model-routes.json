@@ -24,7 +24,8 @@
     "No comparative A6 on these subscription routes is retained.",
     "No source-based row establishes FINAL without a matching run pin, upstream E2E receipt and invocation evidence or recorded reason.",
     "The Facebook subscription-terms page did not yield readable terms in the public fetch. Meta's readable Model API Terms section 3.2 and subscription documentation establish the coding-harness credential restriction.",
-    "The supported OpenAI gateway documentation establishes a per-user ChatGPT sign-in mechanism. Entitlement of a specific pooled gateway configuration is unverified, so that deployment boundary remains pending."
+    "The supported OpenAI gateway documentation establishes a per-user ChatGPT sign-in mechanism. Entitlement of a specific pooled gateway configuration is unverified, so that deployment boundary remains pending.",
+    "Neutral trial metadata does not change convergence: the Muse foreign-harness subscription remains rejected, while the OpenAI non-Codex pool route is unverified and not FINAL eligible."
   ],
   "final_evidence": [],
   "candidates": [
@@ -32,7 +33,7 @@
       "id": "muse-code-wonder-full",
       "name": "Muse Code + Muse Wonder Full",
       "repository": "https://dev.meta.ai/docs/muse-code",
-      "pin": "vendor-variant:Muse Wonder Full",
+      "pin": "muse-wonder-full-1.0",
       "role": "Muse Code Power Usage subscription; Muse Wonder Full at max effort",
       "a1_screened": false,
       "a6_comparative": false,
@@ -43,7 +44,7 @@
       "angles": {
         "A1": {
           "score": "+",
-          "read_at": "2026-10-12T21:53:41Z",
+          "read_at": "2026-10-13T02:53:22Z",
           "sources": [
             {
               "kind": "url",
@@ -68,15 +69,19 @@
             {
               "kind": "url",
               "url": "https://dev.meta.ai/docs/muse-code/subscriptions",
-              "read_at": "2026-10-12T21:53:40Z"
+              "read_at": "2026-10-13T02:53:02Z"
             },
             {
               "kind": "url",
               "url": "https://dev.meta.ai/docs/muse-code/configuration",
-              "read_at": "2026-10-12T21:53:40Z"
+              "read_at": "2026-10-13T02:53:02Z"
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/angle-records-20261012/muse-install-sanitized.json"
             }
           ],
-          "note": "Muse Wonder Full is available only in Muse Code, on Power Usage and Maximum Usage plans. Setting max on Model API muse-wonder-1.0 does not select Full. The intended native route uses Power Usage and max effort; exact install pin and Full selection receipt remain pending. Standard mode is intended; Contributor mode is enabled by default for subscribers and must be checked explicitly."
+          "note": "Muse Wonder Full is available only in Muse Code, on Power Usage and Maximum Usage plans. Setting max on Model API muse-wonder-1.0 does not select Full. The intended native route uses Power Usage and max effort; exact install pin and Full selection receipt remain pending. Standard mode is intended; Contributor mode is enabled by default for subscribers and must be checked explicitly. The sanitized installed-client observation identifies Muse Code 1.4.6-R6000.1 and the full model ID muse-wonder-full-1.0; no successful Full-model invocation or complete route screen is claimed."
         },
         "A2": {
           "score": "U",
@@ -130,7 +135,7 @@
           {
             "kind": "url",
             "url": "https://dev.meta.ai/docs/muse-code/subscriptions",
-            "read_at": "2026-10-12T21:53:40Z"
+            "read_at": "2026-10-13T02:53:02Z"
           }
         ],
         "note": "Vendor terms section 3.2 confines the subscription credential to its coding harness. Muse Code is that harness. Subscription availability is documented; this record does not verify an account or its settings."
@@ -233,7 +238,7 @@
           {
             "kind": "url",
             "url": "https://dev.meta.ai/docs/muse-code/subscriptions",
-            "read_at": "2026-10-12T21:53:40Z"
+            "read_at": "2026-10-13T02:53:02Z"
           }
         ],
         "note": "A separately entitled pay-as-you-go API route is required. The Muse Code subscription credential is not an entitlement for an API comparison arm."
@@ -336,7 +341,7 @@
           {
             "kind": "url",
             "url": "https://dev.meta.ai/docs/muse-code/subscriptions",
-            "read_at": "2026-10-12T21:53:40Z"
+            "read_at": "2026-10-13T02:53:02Z"
           }
         ],
         "note": "A separately entitled pay-as-you-go API route is required. The Muse Code subscription credential is not an entitlement for an API comparison arm."
@@ -439,7 +444,7 @@
           {
             "kind": "url",
             "url": "https://dev.meta.ai/docs/muse-code/subscriptions",
-            "read_at": "2026-10-12T21:53:40Z"
+            "read_at": "2026-10-13T02:53:02Z"
           }
         ],
         "note": "A separately entitled pay-as-you-go API route is required. The Muse Code subscription credential is not an entitlement for an API comparison arm."
@@ -542,7 +547,7 @@
           {
             "kind": "url",
             "url": "https://dev.meta.ai/docs/muse-code/subscriptions",
-            "read_at": "2026-10-12T21:53:40Z"
+            "read_at": "2026-10-13T02:53:02Z"
           }
         ],
         "note": "A separately entitled pay-as-you-go API route is required. The Muse Code subscription credential is not an entitlement for an API comparison arm."
@@ -639,7 +644,7 @@
           {
             "kind": "url",
             "url": "https://dev.meta.ai/docs/muse-code/subscriptions",
-            "read_at": "2026-10-12T21:53:40Z"
+            "read_at": "2026-10-13T02:53:02Z"
           }
         ],
         "note": "A separately entitled pay-as-you-go API route is required. The Muse Code subscription credential is not an entitlement for an API comparison arm."
@@ -670,7 +675,7 @@
       "angles": {
         "A1": {
           "score": "-",
-          "read_at": "2026-10-12T21:53:41Z",
+          "read_at": "2026-10-13T02:53:22Z",
           "sources": [
             {
               "kind": "url",
@@ -680,7 +685,7 @@
             {
               "kind": "url",
               "url": "https://dev.meta.ai/docs/muse-code/subscriptions",
-              "read_at": "2026-10-12T21:53:40Z"
+              "read_at": "2026-10-13T02:53:02Z"
             }
           ],
           "note": "Terms section 3.2 prohibits using the coding-harness subscription credential outside its coding harness. This route lacks the required entitlement; any earlier smoke cannot qualify a Model API route."
@@ -731,10 +736,10 @@
           {
             "kind": "url",
             "url": "https://dev.meta.ai/docs/muse-code/subscriptions",
-            "read_at": "2026-10-12T21:53:40Z"
+            "read_at": "2026-10-13T02:53:02Z"
           }
         ],
-        "note": "The intended route conflicts with the explicit coding-harness-only subscription restriction."
+        "note": "conflict (vendor subscription terms). The vendor's coding-harness-only subscription restriction remains evidenced; neutral trial permission does not change the REJECTED verdict."
       },
       "licence_note": {
         "spdx_id": null,
@@ -745,7 +750,10 @@
         },
         "read_at": "2026-10-12T21:53:40Z",
         "note": "No SPDX identifier established for this vendor product. Vendor terms are retained as a compliance source; this note does not score, reject or select a comparison arm. Route entitlement is checked separately."
-      }
+      },
+      "trial_permitted": true,
+      "final_eligible": false,
+      "basis": "operator decision, recorded privately"
     },
     {
       "id": "codex-gpt-6-1-sol",
@@ -1373,6 +1381,117 @@
         "read_at": "2026-10-12T21:53:40Z",
         "note": "No SPDX identifier established for this vendor product. Vendor terms are retained as a compliance source; this note does not score, reject or select a comparison arm. Route entitlement is checked separately."
       }
+    },
+    {
+      "id": "openai-pool-foreign-harness",
+      "name": "OpenAI subscription pool in non-Codex clients",
+      "repository": "https://developers.openai.com/codex/models",
+      "pin": "gpt-6.1-sol",
+      "role": "Non-Codex comparison route with an unverified entitlement check",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "adoption_status": "COMPARISON_ARM",
+      "confounds": [
+        "Vendor availability and published benchmark evidence do not establish route operation, subscription entitlement of a configured deployment, or model quality on this workload."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-12T21:53:41Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://developers.openai.com/codex/models",
+              "read_at": "2026-10-12T21:53:40Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://developers.openai.com/api/docs/models/gpt-6.1-sol",
+              "read_at": "2026-10-12T21:53:40Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://developers.openai.com/codex/auth",
+              "read_at": "2026-10-12T21:53:40Z"
+            }
+          ],
+          "note": "No terms conflict is evidenced for this comparison route because the check was waived rather than completed. Route capability and entitlement remain unverified. Neutral trial permission does not make this route FINAL eligible."
+        },
+        "A2": {
+          "score": "U",
+          "read_at": "2026-10-12T21:53:41Z",
+          "sources": [],
+          "note": "Pending route-specific sourced evidence."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-12T21:53:41Z",
+          "sources": [],
+          "note": "Pending route-specific sourced evidence."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-12T21:53:41Z",
+          "sources": [],
+          "note": "Pending route-specific sourced evidence."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-12T21:53:41Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://www.tbench.ai/leaderboard",
+              "read_at": "2026-10-12T21:44:03Z"
+            }
+          ],
+          "note": "Codex model-evaluation rows do not qualify a different harness/pool route."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-12T21:53:41Z",
+          "sources": [],
+          "note": "No comparative measured receipt."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Resolve the capability and entitlement evidence gaps; this route is not FINAL eligible.",
+      "entitlement": {
+        "status": "unverified",
+        "sources": [
+          {
+            "kind": "url",
+            "url": "https://openai.com/policies/terms-of-use/",
+            "read_at": "2026-10-12T21:53:40Z"
+          },
+          {
+            "kind": "url",
+            "url": "https://developers.openai.com/codex/auth",
+            "read_at": "2026-10-12T21:53:40Z"
+          },
+          {
+            "kind": "url",
+            "url": "https://learn.chatgpt.com/docs/enterprise/sign-in-with-chatgpt-through-a-gateway",
+            "read_at": "2026-10-12T21:53:40Z"
+          }
+        ],
+        "note": "unverified (check waived by operator decision)"
+      },
+      "licence_note": {
+        "spdx_id": null,
+        "source": {
+          "kind": "url",
+          "url": "https://openai.com/policies/terms-of-use/",
+          "read_at": "2026-10-12T21:53:40Z"
+        },
+        "read_at": "2026-10-12T21:53:40Z",
+        "note": "No SPDX identifier established for this vendor product. Vendor terms are retained as a compliance source; this note does not score, reject or select a comparison arm. Route entitlement is checked separately."
+      },
+      "trial_permitted": true,
+      "final_eligible": false,
+      "basis": "operator decision, recorded privately"
     }
   ]
 }

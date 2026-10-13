@@ -111,7 +111,7 @@
         },
         "A4": {
           "score": "+",
-          "read_at": "2026-10-12T21:47:43Z",
+          "read_at": "2026-10-13T02:53:22Z",
           "sources": [
             {
               "kind": "url",
@@ -121,7 +121,7 @@
             {
               "kind": "url",
               "url": "https://openrouter.ai/apps",
-              "read_at": "2026-10-12T21:41:48Z"
+              "read_at": "2026-10-13T02:53:02Z"
             }
           ],
           "note": "npm's published last-week fields: {\"downloads\":12502712,\"start\":\"2026-10-05\",\"end\":\"2026-10-11\",\"package\":\"@anthropic-ai/claude-code\"}. OpenRouter app rankings are opt-in traffic; package downloads include CI and non-agent use. These are different populations, not a measured share of all usage."
@@ -247,7 +247,7 @@
         },
         "A4": {
           "score": "+",
-          "read_at": "2026-10-12T21:47:43Z",
+          "read_at": "2026-10-13T02:53:22Z",
           "sources": [
             {
               "kind": "url",
@@ -257,7 +257,7 @@
             {
               "kind": "url",
               "url": "https://openrouter.ai/apps",
-              "read_at": "2026-10-12T21:41:48Z"
+              "read_at": "2026-10-13T02:53:02Z"
             }
           ],
           "note": "npm's published last-week fields: {\"downloads\":23862567,\"start\":\"2026-10-05\",\"end\":\"2026-10-11\",\"package\":\"@openai/codex\"}. OpenRouter app rankings are opt-in traffic; package downloads include CI and non-agent use. These are different populations, not a measured share of all usage."
@@ -397,7 +397,7 @@
         },
         "A4": {
           "score": "+",
-          "read_at": "2026-10-12T21:47:43Z",
+          "read_at": "2026-10-13T02:53:22Z",
           "sources": [
             {
               "kind": "url",
@@ -407,7 +407,7 @@
             {
               "kind": "url",
               "url": "https://openrouter.ai/apps",
-              "read_at": "2026-10-12T21:41:48Z"
+              "read_at": "2026-10-13T02:53:02Z"
             }
           ],
           "note": "npm's published last-week fields: {\"downloads\":4156854,\"start\":\"2026-10-05\",\"end\":\"2026-10-11\",\"package\":\"@earendil-works/pi-coding-agent\"}. OpenRouter app rankings are opt-in traffic; package downloads include CI and non-agent use. These are different populations, not a measured share of all usage."
@@ -512,7 +512,7 @@
         },
         "A4": {
           "score": "+",
-          "read_at": "2026-10-12T21:47:43Z",
+          "read_at": "2026-10-13T02:53:22Z",
           "sources": [
             {
               "kind": "url",
@@ -522,7 +522,7 @@
             {
               "kind": "url",
               "url": "https://openrouter.ai/apps",
-              "read_at": "2026-10-12T21:41:48Z"
+              "read_at": "2026-10-13T02:53:02Z"
             }
           ],
           "note": "npm's published last-week fields: {\"downloads\":196149,\"start\":\"2026-10-05\",\"end\":\"2026-10-11\",\"package\":\"@oh-my-pi/pi-coding-agent\"}. OpenRouter app rankings are opt-in traffic; package downloads include CI and non-agent use. These are different populations, not a measured share of all usage."
@@ -627,7 +627,7 @@
         },
         "A4": {
           "score": "+",
-          "read_at": "2026-10-12T21:47:43Z",
+          "read_at": "2026-10-13T02:53:22Z",
           "sources": [
             {
               "kind": "url",
@@ -637,7 +637,7 @@
             {
               "kind": "url",
               "url": "https://openrouter.ai/apps",
-              "read_at": "2026-10-12T21:41:48Z"
+              "read_at": "2026-10-13T02:53:02Z"
             }
           ],
           "note": "npm's published last-week fields: {\"downloads\":2988524,\"start\":\"2026-10-05\",\"end\":\"2026-10-11\",\"package\":\"opencode-ai\"}. OpenRouter app rankings are opt-in traffic; package downloads include CI and non-agent use. These are different populations, not a measured share of all usage."
@@ -742,7 +742,7 @@
         },
         "A4": {
           "score": "0",
-          "read_at": "2026-10-12T21:47:43Z",
+          "read_at": "2026-10-13T02:53:22Z",
           "sources": [
             {
               "kind": "url",
@@ -752,7 +752,7 @@
             {
               "kind": "url",
               "url": "https://openrouter.ai/apps",
-              "read_at": "2026-10-12T21:41:48Z"
+              "read_at": "2026-10-13T02:53:02Z"
             }
           ],
           "note": "npm's published last-week fields: {\"downloads\":197075,\"start\":\"2026-10-05\",\"end\":\"2026-10-11\",\"package\":\"@opencode/cli\"}. OpenRouter app rankings are opt-in traffic; package downloads include CI and non-agent use. These are different populations, not a measured share of all usage."
@@ -857,12 +857,12 @@
         },
         "A4": {
           "score": "U",
-          "read_at": "2026-10-12T21:47:43Z",
+          "read_at": "2026-10-13T02:53:22Z",
           "sources": [
             {
               "kind": "url",
               "url": "https://openrouter.ai/apps",
-              "read_at": "2026-10-12T21:41:48Z"
+              "read_at": "2026-10-13T02:53:02Z"
             }
           ],
           "note": "No registry-specific download row was verified for this candidate. The official OpenRouter app page was read; absence is not zero usage."
@@ -967,12 +967,12 @@
         },
         "A4": {
           "score": "U",
-          "read_at": "2026-10-12T21:47:43Z",
+          "read_at": "2026-10-13T02:53:22Z",
           "sources": [
             {
               "kind": "url",
               "url": "https://openrouter.ai/apps",
-              "read_at": "2026-10-12T21:41:48Z"
+              "read_at": "2026-10-13T02:53:02Z"
             }
           ],
           "note": "No registry-specific download row was verified for this candidate. The official OpenRouter app page was read; absence is not zero usage."
@@ -1077,7 +1077,7 @@
         },
         "A4": {
           "score": "+",
-          "read_at": "2026-10-12T21:47:43Z",
+          "read_at": "2026-10-13T02:53:22Z",
           "sources": [
             {
               "kind": "url",
@@ -1087,7 +1087,7 @@
             {
               "kind": "url",
               "url": "https://openrouter.ai/apps",
-              "read_at": "2026-10-12T21:41:48Z"
+              "read_at": "2026-10-13T02:53:02Z"
             }
           ],
           "note": "npm's published last-week fields: {\"downloads\":65829,\"start\":\"2026-10-05\",\"end\":\"2026-10-11\",\"package\":\"cline\"}. OpenRouter app rankings are opt-in traffic; package downloads include CI and non-agent use. These are different populations, not a measured share of all usage."
@@ -1192,7 +1192,7 @@
         },
         "A4": {
           "score": "0",
-          "read_at": "2026-10-12T21:47:43Z",
+          "read_at": "2026-10-13T02:53:22Z",
           "sources": [
             {
               "kind": "url",
@@ -1202,7 +1202,7 @@
             {
               "kind": "url",
               "url": "https://openrouter.ai/apps",
-              "read_at": "2026-10-12T21:41:48Z"
+              "read_at": "2026-10-13T02:53:02Z"
             }
           ],
           "note": "npm's published last-week fields: {\"downloads\":66107,\"start\":\"2026-10-05\",\"end\":\"2026-10-11\",\"package\":\"@qwen-code/qwen-code\"}. OpenRouter app rankings are opt-in traffic; package downloads include CI and non-agent use. These are different populations, not a measured share of all usage."
@@ -1307,7 +1307,7 @@
         },
         "A4": {
           "score": "0",
-          "read_at": "2026-10-12T21:47:43Z",
+          "read_at": "2026-10-13T02:53:22Z",
           "sources": [
             {
               "kind": "url",
@@ -1317,7 +1317,7 @@
             {
               "kind": "url",
               "url": "https://openrouter.ai/apps",
-              "read_at": "2026-10-12T21:41:48Z"
+              "read_at": "2026-10-13T02:53:02Z"
             }
           ],
           "note": "npm's published last-week fields: {\"downloads\":6,\"start\":\"2026-10-05\",\"end\":\"2026-10-11\",\"package\":\"jcode\"}. OpenRouter app rankings are opt-in traffic; package downloads include CI and non-agent use. These are different populations, not a measured share of all usage."
@@ -1422,7 +1422,7 @@
         },
         "A4": {
           "score": "U",
-          "read_at": "2026-10-12T21:47:43Z",
+          "read_at": "2026-10-13T02:53:22Z",
           "sources": [
             {
               "kind": "url",
@@ -1432,7 +1432,7 @@
             {
               "kind": "url",
               "url": "https://openrouter.ai/apps",
-              "read_at": "2026-10-12T21:41:48Z"
+              "read_at": "2026-10-13T02:53:02Z"
             }
           ],
           "note": "No registry-specific download row was verified for this candidate. The official OpenRouter app page was read; absence is not zero usage."
@@ -1490,13 +1490,7 @@
         "A1": {
           "score": "U",
           "read_at": "2026-10-12T21:47:43Z",
-          "sources": [
-            {
-              "kind": "url",
-              "url": "https://github.com/Kilo-Org/kilocode",
-              "read_at": "2026-10-12T21:47:43Z"
-            }
-          ],
+          "sources": [],
           "note": "A formal capability screen at an exact pin is pending. UNMIRRORED candidates retain that gap. OpenCode 2.x is not screened using the mirror's 1.x/HEAD row."
         },
         "A2": {
@@ -1535,7 +1529,7 @@
         },
         "A4": {
           "score": "+",
-          "read_at": "2026-10-12T21:47:43Z",
+          "read_at": "2026-10-13T02:53:22Z",
           "sources": [
             {
               "kind": "url",
@@ -1545,7 +1539,7 @@
             {
               "kind": "url",
               "url": "https://openrouter.ai/apps",
-              "read_at": "2026-10-12T21:41:48Z"
+              "read_at": "2026-10-13T02:53:02Z"
             }
           ],
           "note": "npm's published last-week fields: {\"downloads\":28342,\"start\":\"2026-10-05\",\"end\":\"2026-10-11\",\"package\":\"@kilocode/cli\"}. OpenRouter app rankings are opt-in traffic; package downloads include CI and non-agent use. These are different populations, not a measured share of all usage."
@@ -1603,13 +1597,7 @@
         "A1": {
           "score": "U",
           "read_at": "2026-10-12T21:47:43Z",
-          "sources": [
-            {
-              "kind": "url",
-              "url": "https://github.com/openclaw/openclaw",
-              "read_at": "2026-10-12T21:47:43Z"
-            }
-          ],
+          "sources": [],
           "note": "A formal capability screen at an exact pin is pending. UNMIRRORED candidates retain that gap. OpenCode 2.x is not screened using the mirror's 1.x/HEAD row."
         },
         "A2": {
@@ -1648,7 +1636,7 @@
         },
         "A4": {
           "score": "+",
-          "read_at": "2026-10-12T21:47:43Z",
+          "read_at": "2026-10-13T02:53:22Z",
           "sources": [
             {
               "kind": "url",
@@ -1658,7 +1646,7 @@
             {
               "kind": "url",
               "url": "https://openrouter.ai/apps",
-              "read_at": "2026-10-12T21:41:48Z"
+              "read_at": "2026-10-13T02:53:02Z"
             }
           ],
           "note": "npm's published last-week fields: {\"downloads\":3946280,\"start\":\"2026-10-05\",\"end\":\"2026-10-11\",\"package\":\"openclaw\"}. OpenRouter app rankings are opt-in traffic; package downloads include CI and non-agent use. These are different populations, not a measured share of all usage."
@@ -1716,18 +1704,12 @@
         "A1": {
           "score": "U",
           "read_at": "2026-10-12T21:47:43Z",
-          "sources": [
-            {
-              "kind": "url",
-              "url": "https://github.com/OpenHands/OpenHands-CLI",
-              "read_at": "2026-10-12T21:47:43Z"
-            }
-          ],
+          "sources": [],
           "note": "A formal capability screen at an exact pin is pending. UNMIRRORED candidates retain that gap. OpenCode 2.x is not screened using the mirror's 1.x/HEAD row."
         },
         "A2": {
           "score": "-",
-          "read_at": "2026-10-12T21:47:43Z",
+          "read_at": "2026-10-13T02:53:22Z",
           "sources": [
             {
               "kind": "url",
@@ -1747,7 +1729,7 @@
             {
               "kind": "url",
               "url": "https://raw.githubusercontent.com/OpenHands/OpenHands-CLI/main/README.md",
-              "read_at": "2026-10-12T21:47:42Z"
+              "read_at": "2026-10-13T02:53:02Z"
             }
           ],
           "note": "UNMIRRORED. The current upstream README states that this project is no longer actively maintained; the role is rejected as abandoned. This is a public URL read, not a pinned implementation claim."
@@ -1766,12 +1748,12 @@
         },
         "A4": {
           "score": "U",
-          "read_at": "2026-10-12T21:47:43Z",
+          "read_at": "2026-10-13T02:53:22Z",
           "sources": [
             {
               "kind": "url",
               "url": "https://openrouter.ai/apps",
-              "read_at": "2026-10-12T21:41:48Z"
+              "read_at": "2026-10-13T02:53:02Z"
             }
           ],
           "note": "No registry-specific download row was verified for this candidate. The official OpenRouter app page was read; absence is not zero usage."
@@ -1829,13 +1811,7 @@
         "A1": {
           "score": "U",
           "read_at": "2026-10-12T21:47:43Z",
-          "sources": [
-            {
-              "kind": "url",
-              "url": "https://github.com/CodebuffAI/freebuff",
-              "read_at": "2026-10-12T21:47:43Z"
-            }
-          ],
+          "sources": [],
           "note": "A formal capability screen at an exact pin is pending. UNMIRRORED candidates retain that gap. OpenCode 2.x is not screened using the mirror's 1.x/HEAD row."
         },
         "A2": {
@@ -1874,7 +1850,7 @@
         },
         "A4": {
           "score": "+",
-          "read_at": "2026-10-12T21:47:43Z",
+          "read_at": "2026-10-13T02:53:22Z",
           "sources": [
             {
               "kind": "url",
@@ -1884,7 +1860,7 @@
             {
               "kind": "url",
               "url": "https://openrouter.ai/apps",
-              "read_at": "2026-10-12T21:41:48Z"
+              "read_at": "2026-10-13T02:53:02Z"
             }
           ],
           "note": "npm's published last-week fields: {\"downloads\":23218,\"start\":\"2026-10-05\",\"end\":\"2026-10-11\",\"package\":\"freebuff\"}. OpenRouter app rankings are opt-in traffic; package downloads include CI and non-agent use. These are different populations, not a measured share of all usage."
@@ -1928,7 +1904,7 @@
       "id": "muse-code",
       "name": "Muse Code",
       "repository": "https://dev.meta.ai/docs/muse-code",
-      "pin": "UNVERIFIED",
+      "pin": "1.4.6-R6000.1",
       "role": "Meta subscription native harness, entering the pinned capability screen",
       "a1_screened": false,
       "a6_comparative": false,
@@ -1940,25 +1916,29 @@
       "angles": {
         "A1": {
           "score": "+",
-          "read_at": "2026-10-12T21:47:43Z",
+          "read_at": "2026-10-13T02:53:22Z",
           "sources": [
             {
               "kind": "url",
               "url": "https://dev.meta.ai/docs/muse-code",
-              "read_at": "2026-10-12T21:41:48Z"
+              "read_at": "2026-10-13T02:53:02Z"
             },
             {
               "kind": "url",
               "url": "https://dev.meta.ai/docs/muse-code/configuration",
-              "read_at": "2026-10-12T21:41:48Z"
+              "read_at": "2026-10-13T02:53:02Z"
             },
             {
               "kind": "url",
               "url": "https://dev.meta.ai/docs/muse-code/extending",
-              "read_at": "2026-10-12T21:43:28Z"
+              "read_at": "2026-10-13T02:53:02Z"
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/angle-records-20261012/muse-install-sanitized.json"
             }
           ],
-          "note": "Vendor docs cover Linux, headless muse exec --json, MCP, lifecycle hooks, skills, trusted AGENTS.md/CLAUDE.md context, and per-child worktree isolation. The isolation flag alone does not isolate every child. Exact install pin and measured operation remain pending."
+          "note": "Vendor docs cover Linux, headless muse exec --json, MCP, lifecycle hooks, skills, trusted AGENTS.md/CLAUDE.md context, and per-child worktree isolation. A sanitized installation observation records Muse Code 1.4.6-R6000.1 and installer exit 0; it is A1 only. The complete role screen, Full-model invocation and Standard-mode confirmation remain pending; installation does not qualify the route for FINAL."
         },
         "A2": {
           "score": "U",
@@ -1994,14 +1974,14 @@
       "disqualifier": null,
       "verdict": "INSUFFICIENT",
       "provisional": false,
-      "measure_next": "Retain a sanitized install receipt and its exact pin, complete the screen, and resolve the pending independent angles.",
+      "measure_next": "Complete the role-specific screen and retain native Full-model/Standard-mode invocation evidence, then resolve the independent angle gaps.",
       "entitlement": {
         "status": "documented",
         "sources": [
           {
             "kind": "url",
             "url": "https://dev.meta.ai/docs/muse-code/subscriptions",
-            "read_at": "2026-10-12T21:41:48Z"
+            "read_at": "2026-10-13T02:53:02Z"
           }
         ],
         "note": "Muse subscriptions serve Muse Code only; Power Usage permits Muse Wonder Full. Credential-bearing inputs are not published."
@@ -2011,9 +1991,9 @@
         "source": {
           "kind": "url",
           "url": "https://dev.meta.ai/docs/muse-code/subscriptions",
-          "read_at": "2026-10-12T21:41:48Z"
+          "read_at": "2026-10-13T02:53:02Z"
         },
-        "read_at": "2026-10-12T21:41:48Z",
+        "read_at": "2026-10-13T02:53:02Z",
         "note": "No SPDX identifier established for this vendor product. Vendor terms are retained as a compliance source; this note does not score, reject or select a comparison arm. Route entitlement is checked separately."
       }
     }

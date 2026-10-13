@@ -98,12 +98,12 @@
         },
         "A4": {
           "score": "U",
-          "read_at": "2026-10-12T21:47:43Z",
+          "read_at": "2026-10-13T02:53:22Z",
           "sources": [
             {
               "kind": "url",
               "url": "https://openrouter.ai/apps",
-              "read_at": "2026-10-12T21:41:48Z"
+              "read_at": "2026-10-13T02:53:02Z"
             }
           ],
           "note": "No registry-specific download row was verified for this candidate. The official OpenRouter app page was read; absence is not zero usage."
@@ -208,12 +208,12 @@
         },
         "A4": {
           "score": "U",
-          "read_at": "2026-10-12T21:47:43Z",
+          "read_at": "2026-10-13T02:53:22Z",
           "sources": [
             {
               "kind": "url",
               "url": "https://openrouter.ai/apps",
-              "read_at": "2026-10-12T21:41:48Z"
+              "read_at": "2026-10-13T02:53:02Z"
             }
           ],
           "note": "No registry-specific download row was verified for this candidate. The official OpenRouter app page was read; absence is not zero usage."

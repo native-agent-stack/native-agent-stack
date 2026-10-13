@@ -17478,33 +17478,33 @@
     },
     {
       "path": "catalogs/landscape/angles/README.md",
-      "sha256": "b8a453e206c3bcc435e7f3f5a50fb079ad4536a6ac188eda98b1c6a8f4537f14",
-      "bytes": 9324
+      "sha256": "6a3878e2d45ff751fd8974dc94327c075f52ca43587a555101e54b404971e7c6",
+      "bytes": 12605
     },
     {
       "path": "catalogs/landscape/angles/foundation-agent-sdks.json",
-      "sha256": "0ae55b7c7d95305b85203d6df686cffaad1b33e75c673790ed7b0ebb95f38adc",
+      "sha256": "2ca80cb4cbf9ab3abc3ad8c561b76334eba91125d0ab41e5702de354b8435cde",
       "bytes": 12401
     },
     {
       "path": "catalogs/landscape/angles/foundation-model-routes.json",
-      "sha256": "9f9517f9c07515e25978aac8c63948e1b6ef880ee673426f30aab9daf99948f8",
-      "bytes": 56075
+      "sha256": "a436b92909f6673ad802ffb7c66fc9b5c6c81839e4155ff41dd3b66fbf8391f3",
+      "bytes": 60958
     },
     {
       "path": "catalogs/landscape/angles/foundation-native-clients.json",
-      "sha256": "5177c30702940de6123c59d96e8aed1dd570d3530cd54699b286df7a2ece6aa9",
-      "bytes": 93282
+      "sha256": "8827bc6e64e88ce7400958c0ade129b0bd29d138b55d298a7366f02a449ec86c",
+      "bytes": 92885
     },
     {
       "path": "catalogs/landscape/angles/foundation-workers.json",
-      "sha256": "2ba4db7cd86fb47d0f8da027615a2ede92416f90918dc4bc8b4c2defb8dd3936",
+      "sha256": "9bf004fd463a910b6325ba28965cd8a59374e2b4c5dc3339a532d996fdcd9e0c",
       "bytes": 13079
     },
     {
       "path": "catalogs/landscape/angles/schema.json",
-      "sha256": "0352746b23b1b3b17751fad57be23846d697011ff46df37c23d2930939fc8328",
-      "bytes": 9296
+      "sha256": "e63c3101c2d806edde66aae242c20cfd7ff43c59963ee4b5be0a21c4e9ca851b",
+      "bytes": 11928
     },
     {
       "path": "catalogs/landscape/blind-convergence.json",
@@ -17528,8 +17528,8 @@
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "8ff6f3b1f217f8a2c808aa00113a4e6d067896ed05675ca7cfb276858b951fcb",
-      "bytes": 337501
+      "sha256": "95b39f68768a4e8a038725e91de8cd5e6a5ed6645e3e58142a9d5a5399e1b28a",
+      "bytes": 338539
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -19148,8 +19148,8 @@
     },
     {
       "path": "docs/decisions/2026-10-12-angle-records-final-check.md",
-      "sha256": "a97c78b035de06137c37227bd0c8b57018958e85af3e0db5aa752316afa82ff6",
-      "bytes": 8943
+      "sha256": "5a41fdfd9bb7be371cdf866eaca712d6fb89695e0838a0d4e1fad549764a0b0c",
+      "bytes": 15318
     },
     {
       "path": "docs/decisions/2026-10-12-converged-candidates-only.md",
@@ -20317,9 +20317,54 @@
       "bytes": 10415
     },
     {
+      "path": "evidence/artifacts/angle-records-20261012/fix1-checks.json",
+      "sha256": "e2a40cd4e6c768b899c9b29a8273b40f0b9c0ef2b088da4fca823102afb3480a",
+      "bytes": 13186
+    },
+    {
+      "path": "evidence/artifacts/angle-records-20261012/muse-install-sanitized.json",
+      "sha256": "7b707ebbdbe2230b912c3d6496e2d60d0a6dbb60c7cdffd7f36177555682faef",
+      "bytes": 2009
+    },
+    {
       "path": "evidence/artifacts/angle-records-20261012/public-source-reads.json",
       "sha256": "3a2edc9cb07c885782f7537fe2c2b3a88fa9e576812754eda8887edbba9c4340",
       "bytes": 67543
+    },
+    {
+      "path": "evidence/artifacts/angle-records-20261012/source-captures/muse-configuration.txt",
+      "sha256": "6cfa7d25dc6dd5f6c50980b96c6383e6bf8e7cc977810f336660e793e66d6a5f",
+      "bytes": 5814
+    },
+    {
+      "path": "evidence/artifacts/angle-records-20261012/source-captures/muse-extending.txt",
+      "sha256": "6a5585c800aeed184297d129134d8904c68ab9ccdd874135ee4d0bec4ca413f5",
+      "bytes": 11103
+    },
+    {
+      "path": "evidence/artifacts/angle-records-20261012/source-captures/muse-overview.txt",
+      "sha256": "6f6e6ba50b42a7e5afdcb3c2703c217185044a99e32003063578304be49970b1",
+      "bytes": 2760
+    },
+    {
+      "path": "evidence/artifacts/angle-records-20261012/source-captures/muse-subscriptions.txt",
+      "sha256": "800d79510bf482ade31b88dd0d991a2e9e3bbfe55a6f59b6b9d8d844c9ea159e",
+      "bytes": 2598
+    },
+    {
+      "path": "evidence/artifacts/angle-records-20261012/source-captures/openhands-cli-readme.txt",
+      "sha256": "0f487d0ffd17d2094f826084548e9069e9d8f59659bd6f4a5cf39f93cf28a2bf",
+      "bytes": 761
+    },
+    {
+      "path": "evidence/artifacts/angle-records-20261012/source-captures/openrouter-apps.txt",
+      "sha256": "89ae6a0d60810ea87d4e5f96f48e3f00eb349b1d4beeaec31d54aabc91c81f57",
+      "bytes": 961
+    },
+    {
+      "path": "evidence/artifacts/angle-records-20261012/supplemental-source-reads.json",
+      "sha256": "85efb092abba64849108fe0a9d7355911ab441ea8bd043d114c927a5360e3b34",
+      "bytes": 2216
     },
     {
       "path": "evidence/artifacts/angle-records-20261012/vendor-source-reads.json",
@@ -62098,8 +62143,8 @@
     },
     {
       "path": "scripts/angle_records.py",
-      "sha256": "a8a54dfa16a3462d314742f137d80f37f59ea94fdfc33d33050d181b208a0597",
-      "bytes": 9828
+      "sha256": "ae77ce9932b161eb47d8a30199acfeb32a033cba9df88e61c7e780659266ada3",
+      "bytes": 12391
     },
     {
       "path": "scripts/build_ecosystem.py",
@@ -62158,8 +62203,8 @@
     },
     {
       "path": "scripts/final_stack.py",
-      "sha256": "56c04dd09af55b73654e65d976472ba2a3c8d199ccb7d6e8444766221a1176e5",
-      "bytes": 65337
+      "sha256": "66a397ff2ea1b3f6699ab656757b892c74de7af7977fe094e525a84cbb36f03c",
+      "bytes": 67694
     },
     {
       "path": "scripts/freshness_propose.py",
@@ -62907,6 +62952,11 @@
       "bytes": 6897
     },
     {
+      "path": "tests/test_angle_records_fix1.py",
+      "sha256": "6c8aa6b9e5fb1fec4817c7e31ffe4e21237c9dcf6350c93d2a3155112967ac34",
+      "bytes": 13079
+    },
+    {
       "path": "tests/test_anthropic_key_health.py",
       "sha256": "e938aefc8708c94dd8bc450a9705a4ade5a4bac031ceccec1d9398847a823bc1",
       "bytes": 29484
@@ -63223,8 +63273,8 @@
     },
     {
       "path": "tests/test_final_stack.py",
-      "sha256": "c5cccf6e971e4eec657af3bd5dbf33a10731463f76e4613e512bef24ec6b6e82",
-      "bytes": 77044
+      "sha256": "34be6666cee68c4e6d831b22ca4dca8de447dc0f35b379a0a3dcb8b5e73a1f4c",
+      "bytes": 78359
     },
     {
       "path": "tests/test_financial_data.py",
@@ -64718,8 +64768,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "c0a3b27807acaf179a86563285ff762107d60ad7c5441364f1f7367690f31dfc",
-      "bytes": 763564
+      "sha256": "5a08bcb1ec18415d9c63841ef5a4293a02fe628df9fddbf37d2c7da3de541631",
+      "bytes": 763640
     },
     {
       "path": "tools/muse_file_fence.py",

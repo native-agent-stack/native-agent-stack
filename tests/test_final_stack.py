@@ -1042,6 +1042,19 @@ class AngleEnforcementTests(FixtureTestCase):
                          "version": "1.0.0", "source_pin": COMMIT_A}] if run else [],
                  sweeps=[_sweep("fixture", "2026-09-22", [("foundation", "layer-a")])])
         record = _angle_fixture()
+        if final:
+            c = record["candidates"][0]
+            c.update(a6_comparative=True, provisional=False)
+            paired = "evidence/artifacts/fixture/paired.json"
+            c["angles"]["A6"].update(score="+", sources=[{"kind": "receipt", "path": paired}])
+            arms = []
+            for ident in ("a", "b"):
+                native = f"evidence/artifacts/fixture/arm-{ident}.txt"
+                _write(root / native, "Synthetic native result stand-in.\n")
+                arms.append({"id": ident, "native_output": native})
+            _write_json(root / paired, {"kind": "comparative", "evidence_class": "native_proven",
+                "completed": True, "harness": "paired", "repository": c["repository"], "pin": c["pin"],
+                "confounds": ["Synthetic policy control, not a real measured comparison."], "arms": arms})
         wave_path = "catalogs/sota-convergence/layer-verdicts-20260922.json"
         _write_json(root / wave_path, {"layers": [{"layer_id": "layer-a", "fixture": True}]})
         _write_json(root / "catalogs/sota-convergence/layer-verdict-waves.json", {"waves": [{
@@ -1071,32 +1084,33 @@ class AngleEnforcementTests(FixtureTestCase):
         _write_json(path, record)
         return root, path, record
 
-    def assert_check_rejects(self, mutate, *, final=False, run=True):
+    def assert_check_rejects(self, mutate, reason, *, final=False, run=True):
         root, path, record = self.prepare(final=final, run=run)
         _write(root / fs.OUTPUT, fs.serialize(fs.build_document(root)))
         mutate(record, root)
         _write_json(path, record)
         code, output = self.run_main(root, "--check")
         self.assertEqual(code, 1, output)
+        self.assertIn(reason, output)
 
     def test_check_rejects_weight_sum(self):
-        self.assert_check_rejects(lambda r, _: r["weights"].update(A1=.30))
+        self.assert_check_rejects(lambda r, _: r["weights"].update(A1=.30), "weight sum must equal 1")
 
     def test_check_rejects_weights_stated_after_scoring(self):
-        self.assert_check_rejects(lambda r, _: r.update(weights_stated_at="2026-10-12T21:34:47Z"))
+        self.assert_check_rejects(lambda r, _: r.update(weights_stated_at="2026-10-12T21:34:47Z"), "before scoring")
 
     def test_check_rejects_score_without_source(self):
-        self.assert_check_rejects(lambda r, _: r["candidates"][0]["angles"]["A3"].update(sources=[]))
+        self.assert_check_rejects(lambda r, _: r["candidates"][0]["angles"]["A3"].update(sources=[]), "score without source")
 
     def test_check_rejects_verdict_that_does_not_rederive(self):
-        self.assert_check_rejects(lambda r, _: r["candidates"][0].update(verdict="REJECTED"))
+        self.assert_check_rejects(lambda r, _: r["candidates"][0].update(verdict="REJECTED"), "stated verdict does not re-derive")
 
     def test_final_rejects_winner_without_convergence(self):
         def mutate(record, _):
             candidate = record["candidates"][0]
             candidate["angles"]["A3"]["score"] = "-"
             candidate.update(verdict="DISAGREE", provisional=False, measure_next="Compare the disagreement.")
-        self.assert_check_rejects(mutate, final=True)
+        self.assert_check_rejects(mutate, "winner requires one CONVERGED angle verdict", final=True)
 
     def test_final_rejects_missing_evidence_class(self):
         root, path, record = self.prepare(final=True)
@@ -1107,19 +1121,21 @@ class AngleEnforcementTests(FixtureTestCase):
         _write_json(source, doc)
         code, output = self.run_main(root, "--check")
         self.assertEqual(code, 1, output)
-        self.assertIn("FINAL", output)
+        self.assertIn("condition 1 winner has no evidence class", output)
 
     def test_final_rejects_missing_run_pin(self):
         root, _, _ = self.prepare(final=True, run=False)
         code, output = self.run_main(root, "--check")
         self.assertEqual(code, 1, output)
-        self.assertIn("FINAL", output)
+        self.assertIn("condition 2 winner requires a matching run pin", output)
 
     def test_final_rejects_missing_e2e_receipt(self):
-        self.assert_check_rejects(lambda r, _: r["final_evidence"][0].update(e2e_receipt=None), final=True)
+        self.assert_check_rejects(lambda r, _: r["final_evidence"][0].update(e2e_receipt=None),
+                                  "condition 3 requires e2e_receipt", final=True)
 
     def test_final_rejects_missing_invoke_evidence_and_reason(self):
-        self.assert_check_rejects(lambda r, _: r["final_evidence"][0].update(invoke_receipt=None), final=True)
+        self.assert_check_rejects(lambda r, _: r["final_evidence"][0].update(invoke_receipt=None),
+                                  "condition 4 requires invoke evidence or a recorded non-invocation reason", final=True)
 
     def test_final_accepts_bound_receipts_and_recorded_non_invocation_reason(self):
         for reason in (None, "The role is retained for recovery; it was not needed in this measured window."):

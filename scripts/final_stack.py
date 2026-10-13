@@ -92,7 +92,7 @@ PIN_DRIFT_VALUES = ("same", "differs", "unknown")
 # Reason codes of is_definitive, closest to definitive first.
 NOT_DEFINITIVE_REASONS = ("stale", "reopened", "no-winner", "unswept", "not-winner", "untracked")
 # A verdict that was recorded (a winner set or an explicit no selection) is reviewed; pending lanes have none yet.
-REVIEWED_VERDICTS = ("recorded", "no_selection")
+REVIEWED_VERDICTS = ("recorded", "no_selection", "FINAL")
 # Landscape rows that count as trialled until W5's comparison ledger exists: measured_comparison evidence
 # (scripts/landscape.py WINNER_EVIDENCE_CLASSES, EVIDENCE_KINDS) or a measured_tradeoff disposition.
 MEASURED_EVIDENCE = (("evidence_class", "measured_comparison"), ("evidence_kind", "measured_comparison"),
@@ -589,6 +589,32 @@ def layer_status(covered: bool, state: str | None, convergence: dict) -> str:
     return "current"
 
 
+def terminal_state(row: dict, angle: dict) -> str | None:
+    claims = [state for state in (row.get("terminal_state"), angle.get("terminal_state"),
+                                 "FINAL" if row.get("verdict_status") == "FINAL" else None) if state]
+    if len(set(claims)) > 1:
+        raise FinalStackError("conflicting terminal-state claims")
+    return claims[0] if claims else None
+
+
+def complete_final_pin(text, run: dict) -> bool:
+    """FINAL uses the complete recorded run identity, not shared-field drift matching.
+
+    A supplied commit must be present in runs[]. A receipt cannot drop a
+    recorded commit and rely on a matching release name instead.
+    """
+    parsed = parse_pin(text).get("pin_parsed")
+    canonical = run.get("pin_parsed")
+    if not parsed or not canonical:
+        return False
+    if canonical.get("commit"):
+        if parsed.get("commit") != canonical["commit"]:
+            return False
+    elif parsed.get("commit"):
+        return False
+    return all(canonical.get(key) == value for key, value in parsed.items() if value is not None)
+
+
 def enforce_final(sources: Sources, layers: list[dict], runs: list[dict], angle_inputs: dict) -> None:
     """Protocol conditions 1–4 apply only to explicitly FINAL layers.
 
@@ -604,6 +630,8 @@ def enforce_final(sources: Sources, layers: list[dict], runs: list[dict], angle_
         def fail(reason):
             raise FinalStackError(f"FINAL {layer_key(*key)}: {reason}")
 
+        if layer["status"] == "reopened":
+            fail("reopened sweep delta must be adjudicated before FINAL")
         entry = angle_inputs.get(key)
         if entry is None or not layer["winners"]:
             fail("requires winners and a CONVERGED angle record")
@@ -626,15 +654,25 @@ def enforce_final(sources: Sources, layers: list[dict], runs: list[dict], angle_
                 fail("condition 1 winner has no evidence class")
             if run is None or not run.get("pin") or winner["pin_drift"] != "same":
                 fail("condition 2 winner requires a matching run pin in runs[]")
+            if not complete_final_pin(winner["verdict_pin"], run):
+                fail("condition 2 requires a complete FINAL pin identity in runs[]")
             candidates = [c for c in record["candidates"]
                           if host_receipts.normalize_repository(c["repository"]) == repository
-                          and compare_pins(parse_pin(c["pin"]), run) == "same"]
-            if len(candidates) != 1 or candidates[0]["verdict"] != "CONVERGED":
-                fail("winner requires one CONVERGED angle verdict at its run pin")
+                          and complete_final_pin(c["pin"], run)]
+            if len(candidates) != 1:
+                fail("winner requires one CONVERGED angle verdict at its complete FINAL pin identity")
             candidate = candidates[0]
+            if candidate.get("final_eligible") is False:
+                fail("final_eligible is false for this winner")
+            if (candidate.get("entitlement") or {}).get("status") in ("pending", "unverified"):
+                fail("entitlement remains unverified for this winner")
+            if candidate["verdict"] != "CONVERGED":
+                fail("winner requires one CONVERGED angle verdict at its run pin")
+            if candidate["provisional"] or not candidate["a6_comparative"]:
+                fail("winner requires NON-provisional CONVERGED evidence with comparative A6")
             evidence = bound.get(candidate["id"]) or {}
-            if compare_pins(parse_pin(evidence.get("run_pin")), run) != "same":
-                fail("FINAL evidence must bind the same run pin")
+            if not complete_final_pin(evidence.get("run_pin"), run):
+                fail("FINAL evidence requires the complete FINAL pin identity")
 
             def receipt(field, condition):
                 path = evidence.get(field)
@@ -646,17 +684,23 @@ def enforce_final(sources: Sources, layers: list[dict], runs: list[dict], angle_
                     fail(f"condition {condition} receipt is unavailable")
                 if (not isinstance(value, dict) or value.get("evidence_class") != "native_proven"
                     or host_receipts.normalize_repository(value.get("repository")) != repository
-                    or compare_pins(parse_pin(value.get("pin")), run) != "same"):
-                    fail(f"condition {condition} receipt must bind native evidence to repository and run pin")
+                    or not complete_final_pin(value.get("pin"), run)):
+                    fail(f"condition {condition} receipt must bind native evidence to repository and complete FINAL pin identity")
                 return value
 
             e2e = receipt("e2e_receipt", 3)
+            schema = sources.json(angle_records.SCHEMA)
+            contract = {"$schema": schema["$schema"], "$defs": schema["$defs"],
+                        "$ref": "#/$defs/upstream_e2e"}
+            validator = angle_records.Draft202012Validator(contract)
+            if next(validator.iter_errors(e2e), None) is not None:
+                fail("condition 3 receipt has invalid commands or citations")
             phases = {c.get("phase") for c in _dicts(e2e.get("commands"))
                       if c.get("command") and type(c.get("exit_code")) is int and c["exit_code"] == 0}
             cited = e2e.get("upstream_sources") or []
             upstream = [s for s in _dicts(cited) if s.get("kind") == "repo" and s.get("path") and s.get("line")
                         and host_receipts.normalize_repository(s.get("repository")) == repository
-                        and compare_pins(parse_pin(s.get("pin")), run) == "same"]
+                        and complete_final_pin(s.get("pin"), run)]
             if (e2e.get("kind") != "upstream_e2e" or e2e.get("success") is not True
                 or not {"install", "test"}.issubset(phases) or not upstream
                 or any(c.get("exit_code") != 0 for c in _dicts(e2e.get("commands")))):
@@ -718,6 +762,7 @@ def build_document(root: Path) -> dict:
             "row": {"title": layer_id, "candidates": []}, "source": angle_inputs[key]["path"]}
         row = entry["row"]
         is_landscape = key in landscape
+        resolved_terminal = terminal_state(row, (angle_inputs.get(key) or {}).get("record") or {})
         matrix_row = matrix_rows.get(key) or {}
         convergence = matrix_row.get("convergence") or {}
         covering = [sweep for sweep in sweeps if key in sweep["covers"]]
@@ -726,7 +771,8 @@ def build_document(root: Path) -> dict:
         if is_landscape:
             # component_matrix.build_layer_convergence's rule: a sweep on the verdict's own date is not after it.
             later = [sweep for sweep in covering if verdict_day is None or sweep["day"] > verdict_day]
-            state = component_matrix.classify_layer_state(row, later)
+            state_row = {**row, "verdict_status": "recorded"} if row.get("verdict_status") == "FINAL" else row
+            state = component_matrix.classify_layer_state(state_row, later)
             reopened_by = ([{"sweep_id": sweep["sweep_id"], "date": sweep["date"]} for sweep in later]
                            if state == "recorded_reopened" else [])
             recorded = (convergence.get("layer_state"), convergence.get("reopened_by") or [])
@@ -750,8 +796,7 @@ def build_document(root: Path) -> dict:
             "title": row.get("title"),
             "source": entry["source"],
             "status": layer_status(bool(covering), state if is_landscape else None, convergence),
-            "terminal_state": row.get("terminal_state") or (angle_inputs.get(key, {}).get("record") or {}).get("terminal_state")
-                              or ("FINAL" if row.get("verdict_status") == "FINAL" else None),
+            "terminal_state": resolved_terminal,
             "angles": angle_records.summary(angle_inputs.get(key)),
             "verdict": build_verdict(row, matrix_row, registry, reopened_by, root=root) if is_landscape else None,
             "winners": winners,

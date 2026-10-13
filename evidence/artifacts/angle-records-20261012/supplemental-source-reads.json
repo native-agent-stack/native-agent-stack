@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "evidence_class": "source_review",
+  "recorded_at": "2026-10-13T02:55:52Z",
+  "scope": "Fresh retained readable source excerpts for previously missing URL locators. Original public API fields remain extracted snapshots; raw originals are not reconstructed or asserted.",
+  "reads": [
+    {
+      "url": "https://openrouter.ai/apps",
+      "read_at": "2026-10-13T02:53:02Z",
+      "status": 200,
+      "capture_path": "evidence/artifacts/angle-records-20261012/source-captures/openrouter-apps.txt"
+    },
+    {
+      "url": "https://dev.meta.ai/docs/muse-code",
+      "read_at": "2026-10-13T02:53:02Z",
+      "status": 200,
+      "capture_path": "evidence/artifacts/angle-records-20261012/source-captures/muse-overview.txt"
+    },
+    {
+      "url": "https://dev.meta.ai/docs/muse-code/configuration",
+      "read_at": "2026-10-13T02:53:02Z",
+      "status": 200,
+      "capture_path": "evidence/artifacts/angle-records-20261012/source-captures/muse-configuration.txt"
+    },
+    {
+      "url": "https://dev.meta.ai/docs/muse-code/extending",
+      "read_at": "2026-10-13T02:53:02Z",
+      "status": 200,
+      "capture_path": "evidence/artifacts/angle-records-20261012/source-captures/muse-extending.txt"
+    },
+    {
+      "url": "https://dev.meta.ai/docs/muse-code/subscriptions",
+      "read_at": "2026-10-13T02:53:02Z",
+      "status": 200,
+      "capture_path": "evidence/artifacts/angle-records-20261012/source-captures/muse-subscriptions.txt"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/OpenHands/OpenHands-CLI/main/README.md",
+      "read_at": "2026-10-13T02:53:02Z",
+      "status": 200,
+      "capture_path": "evidence/artifacts/angle-records-20261012/source-captures/openhands-cli-readme.txt"
+    }
+  ],
+  "limitations": [
+    "These source excerpts were re-read during the fix round; their UTC times supersede mismatched or uncaptured live-page citation times in the current records.",
+    "The initial full responses for the older API/page reads were not retained. Their published field extracts support those reported fields only, not independent raw-response verification.",
+    "No new scoring metric, model call or credential access was performed."
+  ]
+}

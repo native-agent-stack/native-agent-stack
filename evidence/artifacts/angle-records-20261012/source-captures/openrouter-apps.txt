@@ -1,0 +1,14 @@
+Public source: https://openrouter.ai/apps
+Read at: 2026-10-13T02:53:02Z
+HTTP status: 200
+Capture: selected readable source text; embedded scripts/styles omitted.
+
+Hermes Agent
+Hermes Agent is an open-source, self-improving AI agent by Nous Research that runs persistently with memory across sessions, and builds reusable skills from experience. It comes with 40+ built-in tools, including web search, browser automation, and vision, plus scheduled automations and subagents.
+52.1T tokensClaude Code
+Claude Code is Anthropic's agentic coding tool that reads your entire codebase, plans and executes changes across files, runs tests, and iterates on failures, all from natural language prompts.
+Fastest growing this weekClaude Code9.82T+35%Freebuff3.03T+63%OpenClaw2.28T+57%StepCode695B+100%Codex3.31T+17%OpenHands1.03T+35%Strix570B+41%Lemonade539B+37%
+Claude Code
+Today1.Hermes Agent
+Personal AgentsCLI Agents1.99Ttokens2.Claude Code
+CLI Agents287Btokens9.Codex

@@ -9,6 +9,8 @@ from __future__ import annotations
 
 from datetime import datetime
 from decimal import Decimal
+import re
+from urllib.parse import urlsplit
 
 from jsonschema import Draft202012Validator, FormatChecker
 
@@ -19,6 +21,10 @@ ANGLES = ("A1", "A2", "A3", "A4", "A5", "A6")
 DEFAULT_WEIGHTS = dict(zip(ANGLES, (.20, .20, .15, .15, .20, .10)))
 SIGNS = {"+": 1, "0": 0, "-": -1}
 DISQUALIFIERS = (None, "missing_capability", "abandoned")
+RESOLVED_PIN = re.compile(
+    r"(?:[0-9a-f]{40}|v?\d+(?:\.\d+)+(?:[A-Za-z][0-9A-Za-z]*)?(?:[-.+~][0-9A-Za-z]+)*"
+    r"(?:(?: @ |; source )[0-9a-f]{40})?)")
+UTC_TIMESTAMP = re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z")
 
 
 class AngleRecordError(ValueError):
@@ -26,7 +32,41 @@ class AngleRecordError(ValueError):
 
 
 def timestamp(value: str) -> datetime:
-    return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    if not isinstance(value, str) or not UTC_TIMESTAMP.fullmatch(value):
+        raise AngleRecordError("invalid UTC timestamp")
+    try:
+        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        raise AngleRecordError("invalid UTC timestamp") from None
+
+
+def validate_https_url(value) -> None:
+    try:
+        if not isinstance(value, str) or any(c.isspace() or ord(c) < 32 for c in value):
+            raise ValueError
+        parsed = urlsplit(value)
+        if (parsed.scheme != "https" or not parsed.hostname or parsed.username is not None
+            or parsed.password is not None or not parsed.netloc):
+            raise ValueError
+        parsed.port
+    except (TypeError, ValueError):
+        raise AngleRecordError("invalid HTTPS source URL") from None
+
+
+def validate_reads(value, stated: datetime) -> None:
+    """Explicit formats and chronology do not depend on optional jsonschema extras."""
+    if isinstance(value, dict):
+        for key, child in value.items():
+            if key == "read_at" and stated >= timestamp(child):
+                if "score" in value and "sources" in value:
+                    raise AngleRecordError("weights must be stated before scoring")
+                raise AngleRecordError("weights must precede every read time")
+            if key in ("url", "repository"):
+                validate_https_url(child)
+            validate_reads(child, stated)
+    elif isinstance(value, list):
+        for child in value:
+            validate_reads(child, stated)
 
 
 def effective_weights(record: dict) -> dict[str, Decimal]:
@@ -65,6 +105,14 @@ def derive(record: dict, candidate: dict) -> dict:
 
 
 def validate_record(record: dict, schema: dict, *, label: str, sources=None) -> None:
+    if isinstance(record, dict) and isinstance(record.get("candidates"), list):
+        for candidate in record["candidates"]:
+            if isinstance(candidate, dict) and candidate.get("a1_screened") is True:
+                pin = candidate.get("pin")
+                if not isinstance(pin, str) or not RESOLVED_PIN.fullmatch(pin):
+                    raise AngleRecordError(f"{label}: A1 screen requires a resolved pin identity")
+        stated = timestamp(record.get("weights_stated_at"))
+        validate_reads(record, stated)
     validator = Draft202012Validator(schema, format_checker=FormatChecker())
     error = next(validator.iter_errors(record), None)
     if error is not None:
@@ -79,8 +127,7 @@ def validate_record(record: dict, schema: dict, *, label: str, sources=None) -> 
         if ident in identities:
             raise AngleRecordError(f"{label}: duplicate candidate id")
         identities.add(ident)
-        if candidate["a1_screened"] and (candidate["pin"] in ("UNVERIFIED", "UNMIRRORED")
-                                         or candidate["angles"]["A1"]["score"] == "U"):
+        if candidate["a1_screened"] and candidate["angles"]["A1"]["score"] == "U":
             raise AngleRecordError(f"{label}: A1 screen requires a known pin and a sourced score")
         for angle, cell in candidate["angles"].items():
             if stated >= timestamp(cell["read_at"]):
@@ -111,6 +158,9 @@ def validate_record(record: dict, schema: dict, *, label: str, sources=None) -> 
             raise AngleRecordError(f"{label}: DISAGREE requires measure_next")
         if candidate["disqualifier"] and not any(candidate["angles"][a]["sources"] for a in ("A1", "A2")):
             raise AngleRecordError(f"{label}: hard disqualifier requires A1 or A2 source evidence")
+        neutral = ("trial_permitted", "final_eligible", "basis")
+        if any(k in candidate for k in neutral) and not all(k in candidate for k in neutral):
+            raise AngleRecordError(f"{label}: neutral trial metadata requires all three fields")
     bound = [entry["candidate_id"] for entry in record["final_evidence"]]
     if len(bound) != len(set(bound)) or any(ident not in identities for ident in bound):
         raise AngleRecordError(f"{label}: FINAL evidence has a duplicate or unknown candidate")
@@ -172,4 +222,6 @@ def summary(entry: dict | None) -> dict:
             "weights_stated_at": record["weights_stated_at"], "disclosure": record["disclosure"],
             "gaps": record["gaps"], "candidates": [{"id": c["id"], "repository": c["repository"],
                 "pin": c["pin"], "disqualifier": c["disqualifier"],
-                "adoption_status": c.get("adoption_status"), **derive(record, c)} for c in record["candidates"]]}
+                "adoption_status": c.get("adoption_status"),
+                **{k: c[k] for k in ("trial_permitted", "final_eligible", "basis") if k in c},
+                **derive(record, c)} for c in record["candidates"]]}

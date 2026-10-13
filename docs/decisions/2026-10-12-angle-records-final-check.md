@@ -1,5 +1,100 @@
 # Decision: sourced angle records and explicit FINAL checks
 
+## Fix round 1: exact FINAL identity and measured convergence
+
+Recorded at 2026-10-13T02:59:11Z. The original PR commit was replayed onto
+main `c63c83a822f2687c3e7aed2d3b3ede0413119c9b`, where
+[the converged-candidates rule](https://github.com/seathatflowsinourveins/native-agent-stack/blob/c63c83a822f2687c3e7aed2d3b3ede0413119c9b/docs/decisions/2026-10-12-converged-candidates-only.md#how-the-rule-applies-every-layer-the-freeze-and-the-north-star)
+is now retained. The original decision below records the first head's
+behavior. This amendment supersedes its acceptance of provisional FINAL
+evidence and its shared-field pin comparison.
+
+FINAL now requires a NON-provisional CONVERGED candidate with comparative A6.
+A reopened matrix layer must have its sweep delta adjudicated and leave
+reopened before FINAL. All explicit terminal-state inputs are reconciled;
+a truthy landscape state cannot hide an angle-record or verdict FINAL claim.
+The FINAL verdict alias receives ordinary recorded review metadata.
+
+Winner, angle candidate, final-evidence binding, execution receipts and
+upstream citations must agree with the complete run identity. A version-only
+run cannot bridge two different commits, and a receipt cannot drop a recorded
+commit and rely on a release-name match. Upstream E2E receipts use the native
+JSON Schema validator with strict command/source contracts: nonblank command
+strings, safe relative source paths and positive integer line numbers.
+Malformed list members are rejected before phase counting.
+
+Screened A1 pins use allowed resolved identity forms rather than a sentinel
+denylist. UTC and HTTPS formats are explicitly checked using CPython's
+supported parsers, independent of optional jsonschema format extras; rejected
+values are never echoed. The weight statement must strictly precede every
+angle, URL, entitlement and compliance read time.
+
+The two neutral trial rows have `trial_permitted: true`, `final_eligible:
+false`, and `basis: "operator decision, recorded privately"`. These fields
+do not change derivation or the arm list. The Meta foreign-harness subscription
+remains REJECTED with an evidenced terms conflict. The OpenAI non-Codex pool
+route remains INSUFFICIENT with entitlement `unverified (check waived by
+operator decision)`; no terms conflict is inferred. Either row's explicit
+ineligibility, or any unverified entitlement, prevents FINAL.
+
+The sanitized Muse installation observation retains client 1.4.6-R6000.1,
+installer exit 0 and the Full model identifier muse-wonder-full-1.0. It is A1
+installation evidence only. Complete screening, Standard-mode confirmation
+and successful Full-model invocation remain gaps. No candidate is installed
+or invoked by this fix-round lane.
+
+Fresh readable source captures now retain the OpenRouter app page, Muse
+overview/configuration/extensions/subscription pages and the deprecation
+README. Their current citation times match the retained captures. Non-read
+generic README URLs are removed from unverified cells. Every current
+URL/read-time pair has a receipt locator. Older API/page receipts remain
+extracted snapshots; absent historical raw responses are not reconstructed
+or described as independently verified.
+
+The genuine-worktree repository grant proposal at replayed head
+`c7dbb078dabe2d1b226eddc409e0133e6c3e7e37` added exactly one selected inventory
+path, `scripts/angle_records.py`. That exact path was reviewed and added to
+the static architecture-inventory grant. No runtime discovery, receipt role
+or user grant was broadened. The existing two inventory controls failed
+before the update and the 25-test grant module then passed.
+
+The fix controls reproduce the reported paths before changing production
+checks and assert specific refusal reasons. Tests that previously relied on
+source drift now fail when each of five targeted guards is removed, including
+weight sum, source presence, convergence, E2E receipt and invocation reason.
+The updated implementation passed 75 bounded controls before final full
+affected-module verification; the final receipt retains the actual counts.
+
+Primary correction references:
+
+- [python/cpython@cbc944f4bc59639a444dd971c737788ba2283a91:Lib/_pydatetime.py:1862](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Lib/_pydatetime.py#L1862),
+  v3.13.16, `fromisoformat` and its value-bearing exceptions;
+  [Lib/urllib/parse.py:472](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Lib/urllib/parse.py#L472),
+  `urlsplit`, hostname, userinfo and port properties. These sources were read
+  from their registered exact mirrors with lazy fetching disabled.
+- [python-jsonschema/jsonschema@a7277432b0f7bcd0551f6e589d30457017125df4:jsonschema/_format.py:307](https://github.com/python-jsonschema/jsonschema/blob/a7277432b0f7bcd0551f6e589d30457017125df4/jsonschema/_format.py#L307)
+  and `:396` show optional URI/date-time registration; its native
+  `Draft202012Validator` owns strict receipt type/required/path validation.
+- [Source-capture receipt](../../evidence/artifacts/angle-records-20261012/supplemental-source-reads.json)
+  and [sanitized installation receipt](../../evidence/artifacts/angle-records-20261012/muse-install-sanitized.json).
+- The repository's existing `local_pages_policy_grants.py` proposal mechanism,
+  `host_receipts.register_file` registry helper and synthetic unittest harness
+  are reused; this correction introduces no metric or replacement runtime.
+
+### Follow-ups
+
+The evidence behind the four-angle acceptance policy remains a retained
+research question. JSON Schema and Scorecard validate the mechanism and
+source APIs, not that acceptance policy. It is outside this bounded fix round.
+Historical line locators remain bound to their original revisions rather than
+being rewritten after registry movement. Pre-existing machine-name text in
+the shared evidence registry is not introduced by this change and is retained
+for its separate hygiene follow-up. Full raw captures of the initial public
+responses remain unavailable; current readable excerpts and field snapshots
+are the explicitly bounded evidence.
+
+## Original record
+
 The freeze generator now reads versioned per-layer angle records, re-derives
 their verdicts and enforces the protocol's four conditions on explicitly FINAL
 layers. Missing records remain visible gaps. No initial layer is declared FINAL.
@@ -36,7 +131,9 @@ cannot be re-established from the bounded current primary sources, the current
 angle remains mixed or unverified instead of copying its source label.
 
 JSON Schema draft 2020-12 and the installed python-jsonschema 4.26.0 validator
-own structural validation and format checks. Decimal sums enforce the exact
+own structural validation. Explicit CPython datetime/URL validation supplies
+the format checks, independent of optional jsonschema extras, and rejects
+invalid values with constant diagnostics. Decimal sums enforce the exact
 weight invariant. The repository code supplies only the schema, ordered policy
 derivation and evidence checks. It does not replace Scorecard, deps.dev,
 registry statistics or published evaluations with a new metric.
@@ -135,7 +232,8 @@ Primary implementation references:
   read at 2026-10-12T21:34:46Z.
 - [Retained public runtime fields](../../evidence/artifacts/angle-records-20261012/public-source-reads.json)
   and [vendor fields](../../evidence/artifacts/angle-records-20261012/vendor-source-reads.json)
-  bind the actual source URLs, pins and read times. No private input digest or
+  retain extracted source fields, URLs, pins and read times. These historical
+  extracts are not full raw-response captures. No private input digest or
   attribution is published.
 - [Layer resolution protocol](2026-10-11-layer-resolution-protocol.md), the
   retained four FINAL conditions and delta-only reopening rule.

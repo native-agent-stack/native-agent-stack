@@ -8,7 +8,9 @@ summary in `catalogs/landscape/final-stack.json`.
 
 The four initial records cover native clients, workers, agent SDKs and model
 routes. They retain the twenty runtime candidates plus Muse Code and thirteen
-model-route rows. A record adds evidence without selecting a catalog winner.
+model-route rows in the original record, plus the unverified OpenAI non-Codex
+pool comparison row in fix round 1. A record adds evidence without selecting
+a catalog winner.
 The model-routes row has no catalog verdict or sweep at this base; the generator
 shows that initial evidence as an unswept row with no winner. Every other layer
 has an explicit missing-record gap.
@@ -19,6 +21,13 @@ has an explicit missing-record gap.
 `+`, `0`, `-`, or `U` (unverified). A scored angle needs a source. Weights must
 sum exactly to one, and `weights_stated_at` must strictly precede every angle's
 `read_at`. A URL's source read must not follow its assessment.
+
+Every URL, entitlement and compliance read must also strictly follow the
+weight statement. UTC timestamps and HTTPS source URLs are validated in code
+using CPython's supported datetime and URL parsers, with clean errors that
+never echo a rejected value. Optional jsonschema format packages are not
+required for these checks. A screened candidate needs a resolved full commit
+or release identity; unknown, whitespace and malformed pins cannot qualify A1.
 
 | Angle | Meaning | Default weight |
 | --- | --- | --- |
@@ -46,6 +55,13 @@ Licence is a separate `licence_note` with `spdx_id` (or null when unknown),
 source, UTC `read_at`, and a compliance note. It never changes a score,
 derived verdict or arm list. Entitlement/terms conflicts continue to be
 missing capability; changing a licence note alone cannot change derivation.
+
+Neutral trial metadata is `trial_permitted`, `final_eligible`, and the fixed
+`basis: "operator decision, recorded privately"`. All three fields are
+required together when present and do not affect derivation or the arm list.
+A candidate with `final_eligible: false` cannot be FINAL. A route whose
+entitlement is pending or unverified also cannot be FINAL; lack of a completed
+check is not evidence of a terms conflict.
 
 The weighted score and coverage are sums over sourced, active angles. They
 remain reported values; this sign rule does not introduce a numerical
@@ -97,13 +113,19 @@ distinct from the protocol's `FINAL`. A landscape row or its angle record
 can explicitly carry `terminal_state: FINAL`; a landscape `verdict_status:
 FINAL` is also recognized. An explicit marker cannot bypass verification.
 
+Explicit terminal-state claims are reconciled before enforcement; conflicting
+claims are refused. A matrix-reopened layer must have its sweep delta
+adjudicated and leave reopened before FINAL. The FINAL verdict alias receives
+the same dated review metadata as an ordinary recorded verdict.
+
 For every FINAL winner the generator requires:
 
 1. A recorded verdict, evidence class, retained and hash-bound verdict wave,
    and `next_review`.
 2. A matching winner/run pin in `runs[]`.
-3. Exactly one CONVERGED angle candidate at that repository and run pin, with
-   a bound `final_evidence` entry and an upstream E2E receipt.
+3. Exactly one NON-provisional CONVERGED angle candidate, with comparative A6,
+   at that repository and complete run identity, with a bound `final_evidence`
+   entry and an upstream E2E receipt.
 4. A bound invocation receipt with positive calls in a measured window, or
    a nonempty recorded reason for non-invocation.
 
@@ -114,6 +136,14 @@ matching repository/pin, pinned upstream source citations, and successful
 `install` and `test` command phases. The invocation JSON receipt must have
 `kind: invocation`, native evidence at the matching repository/pin, positive
 integer `calls`, and ordered `window_start`/`window_end` timestamps.
+
+FINAL pin matching uses the complete identity recorded in `runs[]`. Each
+winner, candidate, binding, execution receipt and source citation must retain
+its recorded commit; a version-only run cannot bridge conflicting commits.
+Receipt commands must be nonblank strings and source paths must be safe
+relative paths with positive integer line numbers. Malformed entries are
+refused instead of filtered out. This uses the same JSON Schema contracts as
+angle sources.
 Installation is not invocation. Fixture receipts exercise these checks but
 are not published candidate qualification.
 
@@ -126,6 +156,14 @@ terms. Its separately entitled API arms are NOT ADOPTED in the
 subscription-oriented foundation; Muse Code with Muse Wonder Full remains
 TRIAL. Report-only pin-drift and review-age flags stay report-only on other
 layers.
+
+The sanitized Muse installation receipt now records client 1.4.6-R6000.1 and
+the Full model identifier muse-wonder-full-1.0. It is A1 installation evidence;
+the complete screen, Standard-mode confirmation and model invocation remain
+pending. The two neutral trial rows retain their rule-derived dispositions:
+the Meta subscription outside Muse Code stays REJECTED for an evidenced
+terms conflict; the OpenAI non-Codex pool route remains unverified and
+INSUFFICIENT. Both are explicitly ineligible for FINAL.
 
 ## Refresh and validation
 
@@ -151,6 +189,11 @@ check, the privacy scans and independent review.
   (v4.26.0), `check_schema`, `iter_errors` at line 349 and `Draft202012Validator`
   at line 812; [_format.py:21](https://github.com/python-jsonschema/jsonschema/blob/a7277432b0f7bcd0551f6e589d30457017125df4/jsonschema/_format.py#L21),
   `FormatChecker`.
+- [python/cpython@cbc944f4bc59639a444dd971c737788ba2283a91:Lib/_pydatetime.py:1862](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Lib/_pydatetime.py#L1862)
+  (v3.13.16), `fromisoformat` and its value-bearing errors; the check wraps
+  them with constant diagnostics. [Lib/urllib/parse.py:472](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Lib/urllib/parse.py#L472),
+  `urlsplit` and hostname/port properties. JSON Schema's optional format
+  registration is at jsonschema's pinned `_format.py:307` and `:396`.
 - [JSON Schema draft 2020-12 validation](https://json-schema.org/draft/2020-12/json-schema-validation),
   read at 2026-10-12T21:34:46Z; object constraints and format validation.
 - [ossf/scorecard@c395761df6afe1a69e476bc60a013a94bcbc153f:README.md:188](https://github.com/ossf/scorecard/blob/c395761df6afe1a69e476bc60a013a94bcbc153f/README.md#L188),
@@ -160,5 +203,10 @@ check, the privacy scans and independent review.
   in the layer record or its public source receipt.
 - [Public runtime source fields](../../../evidence/artifacts/angle-records-20261012/public-source-reads.json)
   and [vendor source fields](../../../evidence/artifacts/angle-records-20261012/vendor-source-reads.json).
+- [Fix-round source captures](../../../evidence/artifacts/angle-records-20261012/supplemental-source-reads.json)
+  retain readable excerpts for the refreshed OpenRouter/Muse/README reads.
+  The older receipts retain extracted fields rather than full raw responses;
+  no independent raw-response verification is asserted for those historical
+  reads. Every current URL/read-time pair has a retained receipt locator.
 - [Layer resolution protocol](../../../docs/decisions/2026-10-11-layer-resolution-protocol.md)
   and [implementation decision](../../../docs/decisions/2026-10-12-angle-records-final-check.md).
