@@ -1,0 +1,120 @@
+{
+ "schema": "trading-freshness/1",
+ "checked_at": "2026-10-13",
+ "dormancy_threshold_days": 180,
+ "dormancy_rule": "dormant when the newest of the latest GitHub release's published_at, the selected release-stream publication and the default-branch head commit date is at least threshold_days before checked_at; pushed_at stands in only when the head commit date is unknown (it also moves on non-default-branch pushes, so it can only shorten the idle span); null when the run has no reliable upstream data for the repository",
+ "counts": {
+  "entries": 3,
+  "catalog_card": 0,
+  "pin_source": 3,
+  "pin_behind_upstream": 3,
+  "dormant": 0,
+  "dormancy_unknown": 0,
+  "archived": 0
+ },
+ "entries": [
+  {
+   "id": "alpaca-mcp-server",
+   "source": "pin_source",
+   "pin_source": {
+    "path": "docs/decisions/2026-10-05-official-upstream-never-rebuild.md",
+    "section": "Official sources and current releases",
+    "status": "historical_source_review_only_not_adopted"
+   },
+   "layers": [
+    "execution-broker"
+   ],
+   "repository": "https://github.com/alpacahq/alpaca-mcp-server",
+   "pin": "2.3.2",
+   "upstream": {
+    "latest": "v2.4.0",
+    "released_at": "2026-10-12",
+    "prerelease": false,
+    "pushed_at": "2026-10-12",
+    "stars": 1019,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared",
+   "dormancy": {
+    "dormant": false,
+    "days_since_activity": 1,
+    "last_activity_at": "2026-10-12",
+    "last_release_at": "2026-10-12",
+    "last_commit_at": "2026-10-12",
+    "basis": "release_or_default_branch_commit",
+    "threshold_days": 180
+   }
+  },
+  {
+   "id": "lumibot",
+   "source": "pin_source",
+   "pin_source": {
+    "path": "catalogs/us-equities/catalog-engine-refresh-20261009.json",
+    "pointer": "/entries/2/version"
+   },
+   "layers": [
+    "backtesting-engine"
+   ],
+   "repository": "https://github.com/Lumiwealth/lumibot",
+   "pin": "4.6.11",
+   "upstream": {
+    "latest": "v4.6.18",
+    "released_at": "2026-10-10",
+    "prerelease": false,
+    "pushed_at": "2026-10-13",
+    "stars": 2119,
+    "license": "GPL-3.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared",
+   "dormancy": {
+    "dormant": false,
+    "days_since_activity": 3,
+    "last_activity_at": "2026-10-10",
+    "last_release_at": "2026-10-10",
+    "last_commit_at": "2026-10-10",
+    "basis": "release_or_default_branch_commit",
+    "threshold_days": 180
+   }
+  },
+  {
+   "id": "nautilustrader",
+   "source": "pin_source",
+   "pin_source": {
+    "path": "catalogs/us-equities/runtime-target.json",
+    "pointer": "/engine/requested_version"
+   },
+   "layers": [
+    "backtesting-engine"
+   ],
+   "repository": "https://github.com/nautechsystems/nautilus_trader",
+   "pin": "2.0.0rc5",
+   "upstream": {
+    "latest": "v2.0.0rc6",
+    "released_at": "2026-10-05",
+    "prerelease": true,
+    "pushed_at": "2026-10-13",
+    "stars": 29921,
+    "license": "LGPL-3.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared",
+   "dormancy": {
+    "dormant": false,
+    "days_since_activity": 0,
+    "last_activity_at": "2026-10-13",
+    "last_release_at": "2026-10-05",
+    "last_commit_at": "2026-10-13",
+    "basis": "release_or_default_branch_commit",
+    "threshold_days": 180
+   }
+  }
+ ]
+}

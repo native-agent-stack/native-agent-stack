@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "scope": "Evidence integrity and native currency fixtures; no engine installation or trial.",
+  "native_module": {
+    "command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- python3 -m unittest tests.test_catalog_freshness_trading -q",
+    "tests": 49,
+    "exit_code": 0,
+    "phase": "Before adding the dated evidence; producer and fixture sources unchanged afterward."
+  },
+  "offline_record_integrity": {
+    "exit_code": 0,
+    "native_report_rederives_byte_for_byte": true,
+    "comparisons": 3,
+    "behind": 3,
+    "native_fetch_errors": 0,
+    "native_fetch_partial_errors": 0,
+    "nautilus_release_list_pages": 2,
+    "nautilus_published_release_records": 142,
+    "nautilus_release_list_truncated": false,
+    "source_files_checked_against_bytes_sha256_and_git_blob": 35,
+    "retained_excerpts_checked_against_source_lines": 20,
+    "repository_inputs_checked_against_pinned_git_bytes": 31,
+    "cargo_toml_rc5_and_rc6_ibapi": "=3.3.0",
+    "cargo_toml_frozen_develop_ibapi": "=5.0.0",
+    "runtime_target_stack_layer_catalog_and_ledger_unchanged": true,
+    "native_report_leak_gate": "clear"
+  },
+  "fail_before": "No new producer defect was reproduced; the existing rc6 fixture is already green. This evidence addition does not claim a new failing runtime regression. The retained Lumibot 4.6.1 failure is a separate future qualification input and was not rerun.",
+  "unrun": [
+    "Candidate package installation and upstream test execution",
+    "Any engine replay or strategy comparison",
+    "Any broker, provider, market-data or model call",
+    "Any adoption, pin change or layer adjudication"
+  ]
+}

@@ -1,0 +1,25 @@
+{
+ "entries": [
+  {
+   "id": "nautilustrader",
+   "layer": "backtesting-engine",
+   "repository": "https://github.com/nautechsystems/nautilus_trader",
+   "pin": "2.0.0rc5",
+   "pin_source": {"path": "catalogs/us-equities/runtime-target.json", "pointer": "/engine/requested_version"}
+  },
+  {
+   "id": "lumibot",
+   "layer": "backtesting-engine",
+   "repository": "https://github.com/Lumiwealth/lumibot",
+   "pin": "4.6.11",
+   "pin_source": {"path": "catalogs/us-equities/catalog-engine-refresh-20261009.json", "pointer": "/entries/2/version"}
+  },
+  {
+   "id": "alpaca-mcp-server",
+   "layer": "execution-broker",
+   "repository": "https://github.com/alpacahq/alpaca-mcp-server",
+   "pin": "2.3.2",
+   "pin_source": {"path": "docs/decisions/2026-10-05-official-upstream-never-rebuild.md", "section": "Official sources and current releases", "status": "historical_source_review_only_not_adopted"}
+  }
+ ]
+}

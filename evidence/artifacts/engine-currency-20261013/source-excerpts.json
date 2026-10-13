@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "excerpts": [
+    {
+      "key": "nautilus-rc5",
+      "path": "Cargo.toml",
+      "commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "file_sha256": "e5338bb3f4f918147dbc92cfbffeaa8b3f8586bcbf8af2e3785ec4ce6f806130",
+      "first_line": 339,
+      "last_line": 348,
+      "text": "databento = { version = \"0.61.0\" }\ndydx-proto = { version = \"0.4.0\", default-features = false }\nfallible-streaming-iterator = \"0.1.9\"\nflate2 = \"1.1.10\"\nhypersync-client = { version = \"1.4.1\" }\nibapi = \"=3.3.0\"\nryu = \"1.0.23\"\nserde_repr = \"0.1.21\"\ntime = { version = \"0.3.55\", default-features = false, features = [\n  \"macros\","
+    },
+    {
+      "key": "nautilus-rc6",
+      "path": "Cargo.toml",
+      "commit": "7b766f8825b2539c5b2ac1375e9d97b41c509edb",
+      "file_sha256": "5de96db3a0ef9c34e301caf8df965f9499765f1ec7fbd75c8bfe990c2ff36353",
+      "first_line": 340,
+      "last_line": 349,
+      "text": "databento = { version = \"0.62.0\" }\ndydx-proto = { version = \"0.4.0\", default-features = false }\nfallible-streaming-iterator = \"0.1.9\"\nflate2 = \"1.1.10\"\nhypersync-client = { version = \"1.4.1\" }\nibapi = \"=3.3.0\"\nryu = \"1.0.23\"\nserde_repr = \"0.1.21\"\ntime = { version = \"0.3.55\", default-features = false, features = [\n  \"macros\","
+    },
+    {
+      "key": "nautilus-develop",
+      "path": "Cargo.toml",
+      "commit": "ca478e42f434d2ce185493f2bb42d112a88d1ffe",
+      "file_sha256": "21a31f7ecce746b14311d25fd1eb2aaf5d7fd6db629af38876371529b2aa7b56",
+      "first_line": 342,
+      "last_line": 351,
+      "text": "databento = { version = \"0.63.0\" }\ndydx-proto = { version = \"0.4.0\", default-features = false }\nfallible-streaming-iterator = \"0.1.9\"\nflate2 = \"1.1.10\"\nhypersync-client = { version = \"1.4.1\" }\nibapi = \"=5.0.0\"\nryu = \"1.0.23\"\nserde_repr = \"0.1.21\"\ntime = { version = \"0.3.55\", default-features = false, features = [\n  \"macros\","
+    },
+    {
+      "key": "nautilus-develop",
+      "path": "Cargo.toml",
+      "commit": "ca478e42f434d2ce185493f2bb42d112a88d1ffe",
+      "file_sha256": "21a31f7ecce746b14311d25fd1eb2aaf5d7fd6db629af38876371529b2aa7b56",
+      "first_line": 417,
+      "last_line": 426,
+      "text": "# `exclude-newer` for Cargo. Enforced by scripts/check-cargo-cooldown.sh.\n[workspace.metadata.cooldown]\ndays = 3\ntrusted-base = \"origin/develop\"\n\n[workspace.metadata.cooldown.allow]\nibapi = \"5.0.0\"\n\n# -----------------------------------------------------------------------------\n# Profiles"
+    },
+    {
+      "key": "nautilus-develop",
+      "path": "docs/integrations/interactive_brokers.md",
+      "commit": "ca478e42f434d2ce185493f2bb42d112a88d1ffe",
+      "file_sha256": "26e223a86869fbd21cd8861482e8e2d8ab04c739f7c2ff9ad7ae415ea6e9e080",
+      "first_line": 16,
+      "last_line": 24,
+      "text": "| ----------- | ------------- | ------------ |\n| TWS         | `7497`        | `7496`       |\n| IB Gateway  | `4002`        | `4001`       |\n\nThe pinned `ibapi 4.0.1` transport requires TWS or IB Gateway server protocol version **213 or newer**.\nThis is the API protocol version, not the application's release number. Older servers are unsupported\neven when their TCP port accepts connections. [Issue #4796](https://github.com/nautechsystems/nautilus_trader/issues/4796)\nreports this failure with protocol 187 on Gateway 10.41. Upgrade TWS or IB Gateway before connecting.\nThe transport rejects an older version before sending `StartApi` when the server completes the initial"
+    },
+    {
+      "key": "nautilus-develop",
+      "path": "docs/integrations/interactive_brokers.md",
+      "commit": "ca478e42f434d2ce185493f2bb42d112a88d1ffe",
+      "file_sha256": "26e223a86869fbd21cd8861482e8e2d8ab04c739f7c2ff9ad7ae415ea6e9e080",
+      "first_line": 191,
+      "last_line": 200,
+      "text": "### Reconnect and resubscribe\n\nThe `ibapi` transport reconnects the socket with Fibonacci backoff up to a bounded attempt\ncount, then establishes a complete session; a TCP connection followed by a transient handshake\nor startup error consumes an attempt and retries instead of ending recovery. A successful\nreconnect resets open subscription channels by delivering a connection-reset error to each; on\nexhaustion the transport shuts down and the adapter reports disconnected. Each data stream then\nwaits for the transport, subscribes again, and retries failed resubscriptions with a delay. One\ngeneric stream driver owns this lifecycle policy for every stream type, so recovery behavior\ncannot drift between quotes, trades, depth, bars, greeks, and index prices. Market-data farm"
+    },
+    {
+      "key": "nautilus-rc6",
+      "path": "docs/concepts/live.md",
+      "commit": "7b766f8825b2539c5b2ac1375e9d97b41c509edb",
+      "file_sha256": "5cbc79241be1f242d126face8d58b4001cd92cf935edc00f5d1a131780398449",
+      "first_line": 95,
+      "last_line": 103,
+      "text": "### Submission recovery at shutdown\n\nRust `LiveNode::stop`, `run`, and `run_with_mode`, and Python `run_async()` use the same submission\nrecovery boundary. During `delay_post_stop`, the node continues processing venue evidence and native\nmanaged-exit timers without starting new reconciliation queries. At the end of that window, any\nretained submission without a native outcome or venue confirmation makes shutdown return an error\nlisting the unresolved client order IDs. Clients disconnect and the kernel stops even when recovery\nis incomplete. Evidence drained after this boundary cannot change the recorded shutdown result.\n"
+    },
+    {
+      "key": "nautilus-rc6",
+      "path": "docs/concepts/live.md",
+      "commit": "7b766f8825b2539c5b2ac1375e9d97b41c509edb",
+      "file_sha256": "5cbc79241be1f242d126face8d58b4001cd92cf935edc00f5d1a131780398449",
+      "first_line": 464,
+      "last_line": 481,
+      "text": "\n| Transport event or condition        | Publication                                            |\n| ----------------------------------- | ------------------------------------------------------ |\n| TCP or WebSocket becomes available. | `Connected`.                                           |\n| Active transport is lost.           | `Disconnected`.                                        |\n| Connection or retry attempt fails.  | No event.                                              |\n| Deliberate shutdown.                | No disconnect event.                                   |\n| Reconnect attempts are exhausted.   | No additional event after the reported transport loss. |\n\n`Connected` reports **transport availability**. It does not mean that authentication, subscription\nreplay, or adapter recovery has completed.\n\n:::warning\nSocket state is operational evidence, not an execution-command outcome. A disconnect by itself does\nnot reject, cancel, or resolve an in-flight command; stream updates, queries, or reconciliation\nprovide that evidence under the\n[command outcome policy](execution/policies.md#command-outcomes).\n:::"
+    },
+    {
+      "key": "nautilus-rc6",
+      "path": "docs/getting_started/installation.md",
+      "commit": "7b766f8825b2539c5b2ac1375e9d97b41c509edb",
+      "file_sha256": "cd877f8a313330e7665b28a6aa98c519c7052bbdc282ebe938b46dfc8633d61a",
+      "first_line": 123,
+      "last_line": 145,
+      "text": "### Development wheels\n\nThe main package index publishes development wheels from both the `nightly` and `develop`\nbranches, allowing users to test features and fixes ahead of stable releases.\n\nThis process also helps preserve compute resources and provides easy access to the exact binaries tested in CI pipelines,\nwhile adhering to [PEP-440](https://peps.python.org/pep-0440/) versioning standards:\n\n- `develop` wheels use the version suffix `.devYYYYMMDD+run`.\n- `nightly` wheels use `.devYYYYMMDD` when the base version is already a pre-release, and\n  `aYYYYMMDD` otherwise.\n\n| Platform           | Develop | Nightly |\n| :----------------- | :------ | :------ |\n| `Linux (x86_64)`   | \u2713       | \u2713       |\n| `Linux (ARM64)`    | -       | \u2713       |\n| `macOS (ARM64)`    | -       | \u2713       |\n| `Windows (x86_64)` | -       | \u2713       |\n\n:::warning\nWe do not recommend using development wheels in production environments, such as live trading\ncontrolling real capital.\n:::"
+    },
+    {
+      "key": "lumibot-4618",
+      "path": "docs/investigations/2026-10-10_ibkr-routed-qualification.md",
+      "commit": "730d5608f3ee625f0a30dc15e8cc512205dd2a2b",
+      "file_sha256": "08fb6044d6cfdc3684f311d70cd383ca85de37b06eeb982665b07c331f67d72a",
+      "first_line": 1,
+      "last_line": 73,
+      "text": "# Routed IBKR qualification corrections\n\nThe deployed integration qualification exposed gaps not covered by a direct-adapter\nreplay. A saved-data fixture that returned its entire corpus also masked insufficient\nrequest windows. The fixture now enforces start/end bounds, and the stock and futures\nledger oracles run against both direct IBKR and the routed adapter.\n\nConfirmed failures before correction:\n\n- A three-day daily stock lookback beginning after a weekend returned one trading bar.\n- The routed slow path applied ThetaData calendar-day reshaping to native IBKR daily\n  closes. MGC returned 50 of 51 requested completed bars at a futures session opening,\n  while a subsequent fast read could return 51. A daily stock fill following a holiday\n  could use the prior session's open. Neither behavior is a provider entitlement limit.\n- Prefetched simulation coverage prevented a later, larger indicator lookback from\n  extending the series.\n- Routed futures valuation used a prior daily candle instead of the current intraday\n  price; direct final reporting could ask for a mark after the simulation endpoint.\n- A no-benchmark backtest with a real fill omitted its trades artifact when plotting\n  was enabled. Artifact verification correctly rejected the incomplete result.\n\nThe repair keeps IBKR native daily rows on the normal Data slicing path, counts\nequity lookback bars through cached exchange-session bounds, and preserves original\nsimulation endpoints. Futures position valuation uses native minute data and known\nclosed-session marks, never unknown-gap forward fills as proof of complete data.\nThe existing required-data failure remains sticky when any actual decision lacks\nrequired history.\n\nPermanent qualification includes bounded provider fixtures, 250-session SPY/AAPL\nand TQQQ SMA200 independent signal/fill/cash/equity checks, MES/GC/MGC/NG futures\naccounting, long/short held-contract roll tests with fees, MGC 51-close cold/warm\nparity, and no-benchmark artifact export. The prior replay results remain evidence\nfor the direct adapter; they did not establish routed-adapter equivalence.\n\nA historical five-minute regression previously allowed an underfilled 250-bar\nlookback with two initial provider probes. Its stronger assertion now requires all\n250 bars, permits the necessary extra initial history page, and requires zero new\nprovider calls on every subsequent simulated step. This is an accuracy correction,\nnot permission to repeat downloads.\n\nLicensed live-cache and end-to-end integration artifacts remain in the private\ndeployment evidence store. Passing portable tests alone does not establish a\nsuccessful deployed customer path.\n\nThe bounded real intraday comparison also exposed a direct-IBKR fast-fill bug:\nTrades cache files include bid/ask derived from a candle's close. The optimized\nbroker path used those values while the minute was still forming, unlike the\nnormal quote path, which uses its open. The regression now supplies that actual\ncache schema to both direct and routed engines and asserts every fill against the\nsource minute open. The fast path follows the existing Data quote convention;\nnon-derived bid/ask and timestamp freshness checks are retained.\n\nAdditional explicit boundaries: final futures valuation is capped at the actual\nsimulation endpoint; Friday's known-closed mark expires at the exact Sunday\nreopening. Complete stock corporate-action frames can be reused across the whole\nsimulation, but a missing action column is not evidence of no actions. Future\ndividends are indexed once and credited only on their actual ex-date.\n\nThe stock intraday oracle checks equity at every decision as well as fills. This\ncaught a separate routed snapshot leak: Data snapshots exposed the forming\nminute's final close to portfolio valuation. Routed IBKR stock/index snapshots\nnow use the point-in-time last-price reader. Direct IBKR intraday marks also\nretain a completed close through verified market closures and expire at reopening;\nan unknown missing tail remains unavailable. Earlier hypotheses about the\nfinal-equity difference are superseded by this recorded first-divergence trace.\n\nExact daily session counting also replaces generic calendar-day padding rather\nthan retaining the earlier padded start. A bounded 250-session regression supplies\nonly the required warmup and fails if the same complete frame reloads. On the\nsaved TQQQ SMA200 corpus this reduces routed history helper reads from 19 to one\n(and direct reads from two to one). All sixteen saved-data replays retain identical\nbars, decisions, fills, cash, quantities and equity after this optimization. These\ncounts measure eliminated history reads, not a claimed engine CPU speedup."
+    },
+    {
+      "key": "lumibot-4618",
+      "path": "lumibot/backtesting/backtesting_broker.py",
+      "commit": "730d5608f3ee625f0a30dc15e8cc512205dd2a2b",
+      "file_sha256": "60a25d2dc593472098b9d3da485b52603aeb9ffe5015b18a5256cfcfb1e1f5ca",
+      "first_line": 3698,
+      "last_line": 3706,
+      "text": "\n        Safety:\n        - This is best-effort. On any failure, it returns (None, None) and callers must fall back\n          to the canonical `get_quote()` path to preserve broker-specific semantics.\n        - Currently scoped to IBKR REST backtesting only (explicit perf target).\n        \"\"\"\n        data_source = getattr(self, \"data_source\", None)\n        if data_source is None or data_source.__class__.__name__ != \"InteractiveBrokersRESTBacktesting\":\n            return None, None"
+    },
+    {
+      "key": "lumibot-4618",
+      "path": "lumibot/backtesting/backtesting_broker.py",
+      "commit": "730d5608f3ee625f0a30dc15e8cc512205dd2a2b",
+      "file_sha256": "60a25d2dc593472098b9d3da485b52603aeb9ffe5015b18a5256cfcfb1e1f5ca",
+      "first_line": 3813,
+      "last_line": 3824,
+      "text": "            bid = bid_line.dataline[i]\n            ask = ask_line.dataline[i]\n            # Trades history may synthesize both quote sides from the bar close.\n            # Match Data.get_quote: that close is unknown while the bar forms.\n            # Keep genuine bid/ask values, but price derived quotes at its open.\n            if data_obj._intraday_state_at(i, now) == \"forming\":\n                close_line = data_obj.datalines.get(\"close\")\n                open_line = data_obj.datalines.get(\"open\")\n                if close_line is not None and open_line is not None:\n                    close = close_line.dataline[i]\n                    if bid == close and ask == close:\n                        bid = ask = open_line.dataline[i]"
+    },
+    {
+      "key": "lumibot-4618",
+      "path": "tests/backtest/test_ibkr_frozen_replay.py",
+      "commit": "730d5608f3ee625f0a30dc15e8cc512205dd2a2b",
+      "file_sha256": "0203d1ba3cbd70cfc07d2c80881765c77a7e97622fdcdc04dd27dc0c16689184",
+      "first_line": 81,
+      "last_line": 103,
+      "text": "@pytest.mark.acceptance_backtest\n@pytest.mark.usefixtures(\"disable_datasource_override\")\n@pytest.mark.parametrize(\"symbol,lookback\", [(\"SPY\", 3), (\"AAPL\", 20), (\"TQQQ\", 200)])\n@pytest.mark.parametrize(\"routed\", [False, True], ids=[\"direct\", \"botspot-auto\"])\ndef test_250_session_daily_replay_matches_independent_signal_and_ledger(monkeypatch, symbol, lookback, routed):\n    import pandas_market_calendars as mcal\n\n    monkeypatch.setenv(\"LUMIBOT_CACHE_BACKEND\", \"local\")\n    monkeypatch.setenv(\"DATADOWNLOADER_BASE_URL\", \"http://localhost:8080\")\n    schedule = mcal.get_calendar(\"NYSE\").schedule(\"2024-01-01\", \"2026-02-13\")\n    index = pd.DatetimeIndex(schedule.market_close).tz_convert(\"America/New_York\")\n    opens = [100. + (i % 41) * .25 for i in range(len(index))]\n    frame = _prices(index, opens).tail(lookback + 250)\n    # Supply exactly the required warmup, not an unbounded fixture that masks\n    # repeated requests for unnecessary calendar padding before the corpus.\n    first = index[-250].normalize().to_pydatetime()\n    end = (index[-1].normalize() + pd.Timedelta(days=1)).to_pydatetime()\n    result = run_engine_replay(frame, symbol=symbol, start=first, end=end, lookback=lookback, routed=routed)\n    assert len(result[\"signals\"]) == 250\n    assert len(result[\"fills\"]) >= 10\n    assert len(result[\"history_requests\"]) == 1, \"Complete frozen history should load once\"\n    _assert_stock_oracle(result, frame, lookback)\n"
+    },
+    {
+      "key": "lumibot-4618",
+      "path": "tests/backtest/test_ibkr_frozen_replay.py",
+      "commit": "730d5608f3ee625f0a30dc15e8cc512205dd2a2b",
+      "file_sha256": "0203d1ba3cbd70cfc07d2c80881765c77a7e97622fdcdc04dd27dc0c16689184",
+      "first_line": 141,
+      "last_line": 164,
+      "text": "@pytest.mark.acceptance_backtest\n@pytest.mark.usefixtures(\"disable_datasource_override\")\ndef test_intraday_replay_never_uses_forming_close_and_fills_at_bar_open(monkeypatch):\n    monkeypatch.setenv(\"LUMIBOT_CACHE_BACKEND\", \"local\")\n    monkeypatch.setenv(\"DATADOWNLOADER_BASE_URL\", \"http://localhost:8080\")\n    index = pd.DatetimeIndex([])\n    for session_date in [\"2026-02-06\", \"2026-02-09\", \"2026-02-10\"]:\n        session = pd.date_range(f\"{session_date} 09:30\", periods=390, freq=\"min\", tz=\"America/New_York\")\n        index = session if index.empty else index.append(session)\n    frame = _prices(index, [100. + (i % 47) * .1 for i in range(len(index))])\n    daily = _prices(pd.date_range(\"2026-02-02 16:00\", periods=7, freq=\"B\", tz=\"America/New_York\"), [100.] * 7)\n    result = run_engine_replay(frame, symbol=\"SPY\", start=datetime(2026, 2, 9), end=datetime(2026, 2, 11),\n                               timestep=\"minute\", auxiliary_frames={\"day\": daily})\n    assert len(result[\"signals\"]) >= 20\n    assert len(result[\"fills\"]) >= 2\n    minute_requests = [request for request in result[\"history_requests\"] if request[\"timestep\"] == \"minute\"]\n    assert len(minute_requests) == 1, \"A complete historical series must be reused across strategy iterations\"\n    for signal in result[\"signals\"]:\n        when = pd.Timestamp(signal[\"time\"])\n        completed = frame.loc[frame.index + pd.Timedelta(minutes=1) <= when].tail(3)\n        assert [bar[\"close\"] for bar in signal[\"input_bars\"]] == completed.close.tolist()\n        assert signal[\"signal\"] == int(completed.close.iloc[-1] > completed.close.iloc[:-1].mean())\n    for fill in result[\"fills\"]:\n        assert float(fill[\"price\"]) == float(frame.loc[pd.Timestamp(fill[\"time\"]), \"open\"])"
+    },
+    {
+      "key": "lumibot-4618",
+      "path": "tests/test_stock_split_accounting.py",
+      "commit": "730d5608f3ee625f0a30dc15e8cc512205dd2a2b",
+      "file_sha256": "576c8cd36339eb601d96772ed9b04af6bca62d26e79219428d121cff86ff3d6d",
+      "first_line": 487,
+      "last_line": 498,
+      "text": "def test_preloaded_future_dividend_is_paid_on_ex_date_without_history_fetch(monkeypatch):\n    _, broker, asset = _strategy_with_position(1)\n    source = broker.data_source\n    dates = pd.DatetimeIndex([source.datetime_start, source._datetime, source.datetime_end])\n    frame = pd.DataFrame({\"close\": [100., 100., 100.], \"dividend\": [0., .75, 0.],\n                          \"stock_splits\": 0.}, index=dates)\n    monkeypatch.setattr(source, \"_get_backtest_daily_corporate_action_frame\", lambda *a, **k: frame)\n    monkeypatch.setattr(source, \"get_bars\", lambda *a, **k: pytest.fail(\"Complete actions must reuse loaded data\"))\n    source._datetime = source.datetime_start\n    assert source.get_yesterday_dividends([asset])[asset] == 0\n    source._datetime = dates[1].to_pydatetime()\n    assert source.get_yesterday_dividends([asset])[asset] == .75"
+    },
+    {
+      "key": "alpaca-mcp-240",
+      "path": "src/alpaca_mcp_server/overrides.py",
+      "commit": "2a973a046607c42742bf141184b71f1990fa1809",
+      "file_sha256": "548d83643943bf7ffeb854d608b9f9bc1e0684f943cd56a856259b01498679ad",
+      "first_line": 258,
+      "last_line": 270,
+      "text": "    async def place_option_order(\n        qty: str,\n        type: str = \"market\",\n        time_in_force: str = \"day\",\n        symbol: Optional[str] = None,\n        side: Optional[str] = None,\n        position_intent: Optional[str] = None,\n        limit_price: Optional[str] = None,\n        stop_price: Optional[str] = None,\n        client_order_id: Optional[str] = None,\n        order_class: Optional[str] = None,\n        legs: Optional[list[dict]] = None,\n    ) -> dict:"
+    },
+    {
+      "key": "alpaca-mcp-240",
+      "path": "src/alpaca_mcp_server/overrides.py",
+      "commit": "2a973a046607c42742bf141184b71f1990fa1809",
+      "file_sha256": "548d83643943bf7ffeb854d608b9f9bc1e0684f943cd56a856259b01498679ad",
+      "first_line": 333,
+      "last_line": 341,
+      "text": "        if position_intent is not None:\n            body[\"position_intent\"] = position_intent\n        if limit_price is not None:\n            body[\"limit_price\"] = limit_price\n        if stop_price is not None:\n            body[\"stop_price\"] = stop_price\n        if client_order_id is not None:\n            body[\"client_order_id\"] = client_order_id\n        if order_class is not None:"
+    },
+    {
+      "key": "alpaca-mcp-240",
+      "path": "tests/test_server_construction.py",
+      "commit": "2a973a046607c42742bf141184b71f1990fa1809",
+      "file_sha256": "d020907373fbafd417ae4d73b900ec7c17de13ecebff27f202f89d2cf618af4a",
+      "first_line": 690,
+      "last_line": 725,
+      "text": "async def test_place_option_order_sends_stop_price():\n    \"\"\"Options support stop and stop_limit, so stop_price must reach the API.\"\"\"\n    body = await _capture_order_body(\n        \"place_option_order\",\n        {\n            \"symbol\": \"AAPL250321C00150000\",\n            \"side\": \"buy\",\n            \"qty\": \"1\",\n            \"type\": \"stop_limit\",\n            \"time_in_force\": \"gtc\",\n            \"limit_price\": \"1.50\",\n            \"stop_price\": \"1.25\",\n        },\n    )\n    assert body[\"stop_price\"] == \"1.25\"\n    assert body[\"type\"] == \"stop_limit\"\n    assert body[\"time_in_force\"] == \"gtc\"\n\n\nasync def test_place_option_order_omits_stop_price_when_unset():\n    \"\"\"stop_price must not be sent for plain market orders.\"\"\"\n    body = await _capture_order_body(\n        \"place_option_order\",\n        {\"symbol\": \"AAPL250321C00150000\", \"side\": \"buy\", \"qty\": \"1\"},\n    )\n    assert \"stop_price\" not in body\n\n\nasync def test_toolset_filtering():\n    \"\"\"ALPACA_TOOLSETS should limit which tools are exposed.\"\"\"\n    tools = await _list_tools({**DUMMY_ENV, \"ALPACA_TOOLSETS\": \"account\"})\n    names = {t.name for t in tools}\n    assert \"get_account_info\" in names\n    assert \"place_stock_order\" not in names\n    assert \"get_stock_bars\" not in names\n    assert README_DOC_TOOL_NAMES <= names"
+    },
+    {
+      "key": "alpaca-mcp-240",
+      "path": "README.md",
+      "commit": "2a973a046607c42742bf141184b71f1990fa1809",
+      "file_sha256": "0f52cb9f51a74d0fad1438a7c2e212889a41a487ec59a82bd19526ebce7fc100",
+      "first_line": 497,
+      "last_line": 502,
+      "text": "**Locates (Short Selling)** \u2014 not available in paper trading\n\n- `get_locates` \u2014 List locate requests filtered by status, symbol, or date range\n- `create_locate` \u2014 Create a locate request for a short sale\n- `get_locate` \u2014 Get a single locate request by ID\n- `get_locate_quotes` \u2014 Get locate availability and pricing for symbols"
+    },
+    {
+      "key": "alpaca-mcp-240",
+      "path": "src/alpaca_mcp_server/server.py",
+      "commit": "2a973a046607c42742bf141184b71f1990fa1809",
+      "file_sha256": "c19963b6d923de9f341f80fc1d604cadcbc8ffe9d70d99f0c0a11ffa364bb736",
+      "first_line": 113,
+      "last_line": 118,
+      "text": "    return headers\n\n\ndef _get_trading_base_url() -> str:\n    paper = os.environ.get(\"ALPACA_PAPER_TRADE\", \"true\").lower() in (\"true\", \"1\", \"yes\")\n    return TRADING_API_BASE_URLS[\"paper\" if paper else \"live\"]"
+    }
+  ]
+}

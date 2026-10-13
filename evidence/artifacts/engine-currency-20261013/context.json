@@ -1,0 +1,555 @@
+{
+  "schema_version": 1,
+  "base_commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+  "evidence_class": "source_review",
+  "scope": "Bounded currency delta only; no new survey, layer disposition, install, engine trial, broker/provider call, market-data acquisition or adoption.",
+  "inputs": [
+    {
+      "path": "AGENTS.md",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "sha256": "badc1a93731095641e71ae1bf1d5ae5d5021e522c1da62926ddc65268f5c10a1",
+      "bytes": 4320
+    },
+    {
+      "path": "blueprints/us-equities/AGENTS.md",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "sha256": "4a1d3f125f3e8c77484b736e592777fa887991d6dc1cd43d941b4cd621f68719",
+      "bytes": 5941
+    },
+    {
+      "path": "blueprints/us-equities/north-star.md",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "sha256": "0934019e9dcce0e792dbcdca1f6e1ce5e48f8848a6d92381d7046cf1d7c3a9b7",
+      "bytes": 14643
+    },
+    {
+      "path": "blueprints/us-equities/architecture/README.md",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "sha256": "707a152bd800b87bed9374952e428b5844abfdb1432f0d373dfb96b1d9388db7",
+      "bytes": 17055
+    },
+    {
+      "path": "catalogs/us-equities/architecture/trading.json",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "sha256": "68f0a20ae8d62bdf39e66ea736c8535cc5347c212803d5a89ae4730000bdade6",
+      "bytes": 69941
+    },
+    {
+      "path": "catalogs/us-equities/runtime-target.json",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "sha256": "bd318252b220d2e611fa9baa21031359f0fbb8d07e1a7bb6a65f67c9cb02eb41",
+      "bytes": 29756
+    },
+    {
+      "path": "manifests/stack.json",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "sha256": "2bfa2d4784a73ecdbc9b3c7d5deea7a422a81abd083d071c22fe5414c28be178",
+      "bytes": 132533
+    },
+    {
+      "path": "catalogs/us-equities/engines-strategies.json",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "sha256": "048967637d3bd0e7f429d564ad1b9da0d070b49d0ca81e2404a9a4584b66f118",
+      "bytes": 113507
+    },
+    {
+      "path": "catalogs/us-equities/catalog-engine-refresh-20261009.json",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "sha256": "be3c6a7716007d395ab53473432163d1994ae87a3412ae1e55b9a2e5ae36bd24",
+      "bytes": 9792
+    },
+    {
+      "path": "catalogs/landscape/us-equities.json",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "sha256": "6aff6411e711dcf3f0a487f343bb0e45c319a0a9235763a54eae9316e1597b0e",
+      "bytes": 457364
+    },
+    {
+      "path": "catalogs/saturation/ledger.json",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "sha256": "b6ca3220516a515bd6dec13f122f48acdd8ef738565f9c0145839d99dd0c21f2",
+      "bytes": 413173
+    },
+    {
+      "path": "catalogs/sota-convergence/layer-verdict-waves.json",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "sha256": "7f7056066fec1d5ea6e6cc5e243a668e509b1d74add94ec3d74cbd3025ebc756",
+      "bytes": 651
+    },
+    {
+      "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "sha256": "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de",
+      "bytes": 609126
+    },
+    {
+      "path": "docs/decisions/2026-10-11-layer-resolution-protocol.md",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "sha256": "a3bab6504f8c3a1ec800998b81f562496e85a1b5d1ca0de070a51352c06936b7",
+      "bytes": 9899
+    },
+    {
+      "path": "docs/decisions/2026-10-10-layer15-nautilus-adjustment-claim.md",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "sha256": "c7954d586f61a231dd2c6527aa7a1a8ba1b2ac8481d4c87a27314af262ff1689",
+      "bytes": 14592
+    },
+    {
+      "path": "docs/decisions/2026-10-05-official-upstream-never-rebuild.md",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "sha256": "70175d112640c178f658fa54babeac510aafdfc94e68e0b18c63f1bc3d644c07",
+      "bytes": 20078
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/README.md",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "sha256": "a3577615445282f3c613a1179e0caa0811584908deb0743b5fd35169cc6f559c",
+      "bytes": 19404
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/preregistration.json",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "sha256": "73ea82e9007d92e1b00feb86ba190d5fb8842b7d14962c651b0caf74b8522b38",
+      "bytes": 78464
+    },
+    {
+      "path": "tools/sota-convergence/extract_layers.py",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "sha256": "4be73f7d3b09fa9ea88ecb238d998e43b648c7c16bb56b8853e8672ca883bb2a",
+      "bytes": 46061
+    },
+    {
+      "path": "tools/sota-convergence/github_freshness.py",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "sha256": "4bc8cf58a7c9dc5346b79b4dc6a2a6082e9c06cc11535cad75120d8e00c3aa44",
+      "bytes": 34972
+    },
+    {
+      "path": "tools/sota-convergence/build_manifest.py",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "sha256": "4529b138b7ea110bafc6db472c43aa152a3e2ed50db812bf365730d3d063c957",
+      "bytes": 125546
+    },
+    {
+      "path": "tests/test_catalog_freshness_trading.py",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "sha256": "5de4a7a8de9d860c541e1649b005e55bccca18b76ba8bdffbcd61474c644d4ea",
+      "bytes": 35494
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260923.json",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "sha256": "304d75dd0dabb02ba46191161732c17d234c3608a194f538c6bee6b64b8069c8",
+      "bytes": 1118651
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260926.json",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "sha256": "a72177d162f84ba827028a7bff5ebc78ea9195c7a99ed2b411c75f7869b20e0e",
+      "bytes": 1548502
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "sha256": "ea7e8ed285639a247df91d0c64d9378e080bc820170e9fc773434488397f4600",
+      "bytes": 3114964
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20261009.json",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "sha256": "3f061eeb261a91e8eec0f586bc135179e56bacd6216adcf9ddfa526877879153",
+      "bytes": 269693
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json",
+      "commit": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "sha256": "8b91d1acc81d71d8a911916cd1869a4d0a5742f95bb529c76d321c9793e2f961",
+      "bytes": 253490
+    },
+    {
+      "path": "catalogs/saturation/ledger.json",
+      "commit": "a049170124469c7cdbdff532135ea1fe46401b81",
+      "sha256": "8b8778103f64e5278e96f5659da70fffa2e49841e51100227ddf3149892241ef",
+      "bytes": 433814
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20261013.json",
+      "commit": "a049170124469c7cdbdff532135ea1fe46401b81",
+      "sha256": "35cdc4e2f13a1d4c10111747ebf01c59bae37af23e4aa1980fd1dbff38bea479",
+      "bytes": 377680
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json",
+      "commit": "a049170124469c7cdbdff532135ea1fe46401b81",
+      "sha256": "ca2cceac93b694b597f2fd5d190d23fb6c6564eee6b6cab493e192ebf651779a",
+      "bytes": 217927
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261013-backtesting-engine/returns.json",
+      "commit": "a049170124469c7cdbdff532135ea1fe46401b81",
+      "sha256": "aa75c9524a848c75e5aef67df0964f181f7ea677768daef48de601b35aa8ef5c",
+      "bytes": 211860
+    }
+  ],
+  "prior_layer_sweeps": [
+    {
+      "sweep_id": "landscape-sweep-20260923",
+      "manifest_ref": "catalogs/sota-convergence/manifest-20260923.json",
+      "returns_ref": null,
+      "layers": [
+        {
+          "layer_id": "backtesting-engine",
+          "survived": [],
+          "reopen": [],
+          "votes_note": "discovery return not retained; the manifest has no lane rows for this layer, so an empty proposal set cannot be verified"
+        },
+        {
+          "layer_id": "execution-broker",
+          "survived": [],
+          "reopen": [],
+          "votes_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags"
+        }
+      ]
+    },
+    {
+      "sweep_id": "landscape-sweep-20260926",
+      "manifest_ref": "catalogs/sota-convergence/manifest-20260926.json",
+      "returns_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+      "layers": [
+        {
+          "layer_id": "backtesting-engine",
+          "survived": [],
+          "reopen": [
+            {
+              "trigger": "retained_failure",
+              "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/backtesting-engine"
+            }
+          ],
+          "votes_note": null
+        },
+        {
+          "layer_id": "execution-broker",
+          "survived": [
+            {
+              "repo": "https://github.com/ib-api-reloaded/ib_async",
+              "facts": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/execution-broker/0/facts"
+              },
+              "fit": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/execution-broker/0/fit"
+              },
+              "source_review": "evidence/artifacts/landscape-sweep-20260926/ib-api-reloaded-ib-async.json"
+            },
+            {
+              "repo": "https://github.com/csingley/ibflex",
+              "facts": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/execution-broker/1/facts"
+              },
+              "fit": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/execution-broker/1/fit"
+              },
+              "source_review": "evidence/artifacts/landscape-sweep-20260926/csingley-ibflex.json"
+            },
+            {
+              "repo": "https://github.com/wboayue/rust-ibapi",
+              "facts": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/execution-broker/2/facts"
+              },
+              "fit": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/execution-broker/2/fit"
+              },
+              "source_review": "evidence/artifacts/landscape-sweep-20260926/wboayue-rust-ibapi.json"
+            },
+            {
+              "repo": "https://github.com/nautechsystems/nautilus_ibapi",
+              "facts": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/execution-broker/3/facts"
+              },
+              "fit": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/execution-broker/3/fit"
+              },
+              "source_review": "evidence/artifacts/landscape-sweep-20260926/nautechsystems-nautilus-ibapi.json"
+            },
+            {
+              "repo": "https://github.com/gnzsnz/ib-gateway-docker",
+              "facts": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/execution-broker/4/facts"
+              },
+              "fit": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/execution-broker/4/fit"
+              },
+              "source_review": "evidence/artifacts/landscape-sweep-20260926/gnzsnz-ib-gateway-docker.json"
+            },
+            {
+              "repo": "https://github.com/ibcalpha/ibc",
+              "facts": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/execution-broker/7/facts"
+              },
+              "fit": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/execution-broker/7/fit"
+              },
+              "source_review": "evidence/artifacts/landscape-sweep-20260926/ibcalpha-ibc.json"
+            },
+            {
+              "repo": "https://github.com/extrange/ibkr-docker",
+              "facts": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/execution-broker/8/facts"
+              },
+              "fit": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/execution-broker/8/fit"
+              },
+              "source_review": "evidence/artifacts/landscape-sweep-20260926/extrange-ibkr-docker.json"
+            },
+            {
+              "repo": "https://github.com/nautechsystems/nautilus_trader",
+              "facts": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/execution-broker/9/facts"
+              },
+              "fit": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/execution-broker/9/fit"
+              },
+              "source_review": "evidence/artifacts/landscape-sweep-20260926/nautechsystems-nautilus-trader.json"
+            },
+            {
+              "repo": "https://github.com/falk-brauer/kumo-nautilus-alpaca-adapter",
+              "facts": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/execution-broker/12/facts"
+              },
+              "fit": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/execution-broker/12/fit"
+              },
+              "source_review": "evidence/artifacts/landscape-sweep-20260926/falk-brauer-kumo-nautilus-alpaca-adapter.json"
+            }
+          ],
+          "reopen": [
+            {
+              "trigger": "retained_failure",
+              "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/execution-broker"
+            }
+          ],
+          "votes_note": null
+        }
+      ]
+    },
+    {
+      "sweep_id": "landscape-sweep-20261009-pine",
+      "manifest_ref": "catalogs/sota-convergence/manifest-20261009.json",
+      "returns_ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json",
+      "layers": [
+        {
+          "layer_id": "backtesting-engine",
+          "survived": [
+            {
+              "repo": "https://github.com/luxalgo/pinets",
+              "facts": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/0/facts"
+              },
+              "fit": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/0/fit"
+              },
+              "source_review": "evidence/artifacts/landscape-sweep-20261009-pine/luxalgo-pinets.json"
+            },
+            {
+              "repo": "https://github.com/pineforge-4pass/pineforge-codegen-oss",
+              "facts": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/2/facts"
+              },
+              "fit": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/2/fit"
+              },
+              "source_review": "evidence/artifacts/landscape-sweep-20261009-pine/pineforge-4pass-pineforge-codegen-oss.json"
+            },
+            {
+              "repo": "https://github.com/pynesys/pynecore",
+              "facts": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/3/facts"
+              },
+              "fit": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/3/fit"
+              },
+              "source_review": "evidence/artifacts/landscape-sweep-20261009-pine/pynesys-pynecore.json"
+            },
+            {
+              "repo": "https://github.com/elbakramer/pynescript",
+              "facts": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/6/facts"
+              },
+              "fit": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/6/fit"
+              },
+              "source_review": "evidence/artifacts/landscape-sweep-20261009-pine/elbakramer-pynescript.json"
+            },
+            {
+              "repo": "https://github.com/folknor/pine-oracle",
+              "facts": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/10/facts"
+              },
+              "fit": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/10/fit"
+              },
+              "source_review": "evidence/artifacts/landscape-sweep-20261009-pine/folknor-pine-oracle.json"
+            },
+            {
+              "repo": "https://github.com/s7cret/backtest_engine",
+              "facts": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/13/facts"
+              },
+              "fit": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/13/fit"
+              },
+              "source_review": "evidence/artifacts/landscape-sweep-20261009-pine/s7cret-backtest-engine.json"
+            },
+            {
+              "repo": "https://github.com/arose26/pinescript-langium",
+              "facts": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/14/facts"
+              },
+              "fit": {
+                "vote": "not_refuted",
+                "ref": "evidence/artifacts/landscape-sweep-20261009-pine/returns.json#/votes/backtesting-engine/14/fit"
+              },
+              "source_review": "evidence/artifacts/landscape-sweep-20261009-pine/arose26-pinescript-langium.json"
+            }
+          ],
+          "reopen": [],
+          "votes_note": null
+        }
+      ]
+    }
+  ],
+  "latest_completed_sweeps": [
+    {
+      "sweep_id": "landscape-sweep-20261013-execution-broker",
+      "publication_pr": 1073,
+      "publication_pending_on_base": true,
+      "manifest_ref": {
+        "path": "catalogs/sota-convergence/manifest-20261013.json",
+        "commit": "a049170124469c7cdbdff532135ea1fe46401b81",
+        "sha256": "35cdc4e2f13a1d4c10111747ebf01c59bae37af23e4aa1980fd1dbff38bea479",
+        "bytes": 377680
+      },
+      "returns_ref": {
+        "path": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json",
+        "commit": "a049170124469c7cdbdff532135ea1fe46401b81",
+        "sha256": "ca2cceac93b694b597f2fd5d190d23fb6c6564eee6b6cab493e192ebf651779a",
+        "bytes": 217927
+      },
+      "layer_id": "execution-broker",
+      "survived": [
+        "https://github.com/nautechsystems/nautilus_trader",
+        "https://github.com/gnzsnz/ib-gateway-docker",
+        "https://github.com/ib-api-reloaded/ib_async",
+        "https://github.com/quantconnect/ibautomater",
+        "https://github.com/ibcalpha/ibc",
+        "https://github.com/shopify/toxiproxy"
+      ],
+      "reopen": [
+        {
+          "trigger": "platform_profile_changed",
+          "ref": "adoption/manifest.json#/platform_profiles"
+        }
+      ],
+      "targeted_votes": [
+        {
+          "repository": "https://github.com/nautechsystems/nautilus_trader",
+          "facts_refuted": false,
+          "fit_refuted": false,
+          "ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json#/votes/execution-broker/0"
+        },
+        {
+          "repository": "https://github.com/lumiwealth/lumibot",
+          "facts_refuted": false,
+          "fit_refuted": true,
+          "ref": "evidence/artifacts/landscape-sweep-20261013-execution-broker/returns.json#/votes/execution-broker/3"
+        }
+      ]
+    },
+    {
+      "sweep_id": "landscape-sweep-20261013-backtesting-engine",
+      "publication_pr": 1073,
+      "publication_pending_on_base": true,
+      "manifest_ref": {
+        "path": "catalogs/sota-convergence/manifest-20261013.json",
+        "commit": "a049170124469c7cdbdff532135ea1fe46401b81",
+        "sha256": "35cdc4e2f13a1d4c10111747ebf01c59bae37af23e4aa1980fd1dbff38bea479",
+        "bytes": 377680
+      },
+      "returns_ref": {
+        "path": "evidence/artifacts/landscape-sweep-20261013-backtesting-engine/returns.json",
+        "commit": "a049170124469c7cdbdff532135ea1fe46401b81",
+        "sha256": "aa75c9524a848c75e5aef67df0964f181f7ea677768daef48de601b35aa8ef5c",
+        "bytes": 211860
+      },
+      "layer_id": "backtesting-engine",
+      "survived": [
+        "https://github.com/nautechsystems/nautilus_trader",
+        "https://github.com/shopify/toxiproxy",
+        "https://github.com/cli/cli",
+        "https://github.com/slsa-framework/slsa-verifier"
+      ],
+      "reopen": [
+        {
+          "trigger": "platform_profile_changed",
+          "ref": "adoption/manifest.json#/platform_profiles"
+        },
+        {
+          "trigger": "pin_moved",
+          "ref": "receipt_staleness:linux-wsl2-x86_64/nautilustrader"
+        }
+      ],
+      "targeted_votes": [
+        {
+          "repository": "https://github.com/lumiwealth/lumibot",
+          "facts_refuted": true,
+          "fit_refuted": true,
+          "ref": "evidence/artifacts/landscape-sweep-20261013-backtesting-engine/returns.json#/votes/backtesting-engine/0"
+        },
+        {
+          "repository": "https://github.com/nautechsystems/nautilus_trader",
+          "facts_refuted": false,
+          "fit_refuted": false,
+          "ref": "evidence/artifacts/landscape-sweep-20261013-backtesting-engine/returns.json#/votes/backtesting-engine/2"
+        }
+      ]
+    }
+  ],
+  "unresolved_survivor_policy": "Prior survivors omitted by later sweeps remain unresolved; later substantive votes retain their scoped meaning. This currency delta disposes none of them and does not claim FINAL or saturation.",
+  "verdict_scope": "backtesting-engine recorded/keep_but_compare; execution-broker pending_lanes. Historical verdicts and source-review candidates are distinct from native acceptance.",
+  "pin_semantics": {
+    "nautilustrader": "Selected destination 2.0.0rc5, not changed.",
+    "lumibot": "4.6.11 is the reviewed candidate baseline, not an installed or accepted engine pin; retained 4.6.1 native trial failed.",
+    "alpaca-mcp-server": "2.3.2 is the historical official-source review baseline, not an adopted runtime pin. MCP is optional only when a needed role is screened."
+  },
+  "data_boundary": "Repository/source/metadata inputs only. Frozen historical trial references are reused for their limits; no market-data bytes are acquired or replayed."
+}
