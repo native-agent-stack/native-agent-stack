@@ -52,8 +52,18 @@
     "test_engine_lumibot_governor.ExitPolicyMatrix.test_E1_exit_at_touch_in_every_session",
     "test_engine_lumibot_governor.ExitPolicyMatrix.test_E2_entry_keeps_ask_band_and_spread_refusals",
     "test_engine_lumibot_governor.ExitPolicyMatrix.test_E3_entry_whole_size_remains_inside_notional_cap",
-    "test_engine_lumibot_governor.ExitPolicyMatrix.test_E4_exit_still_requires_long_position_and_fresh_quote"
+    "test_engine_lumibot_governor.ExitPolicyMatrix.test_E4_exit_still_requires_long_position_and_fresh_quote",
+    "test_engine_lumibot_governor.RestageAdditions.test_R13_str_subclass_values_never_reach_the_sdk_or_the_journal",
+    "test_engine_lumibot_governor.RestageAdditions.test_R13b_the_admitted_body_holds_only_plain_values_equal_to_the_reservation",
+    "test_engine_lumibot_governor.RestageAdditions.test_R14_environment_overrides_of_the_real_constructor_refuse",
+    "test_engine_lumibot_governor.RestageAdditions.test_E5_an_exit_needs_a_fresh_quote_not_a_recent_trade",
+    "test_engine_lumibot_governor.RestageAdditions.test_E5b_an_exits_reservation_deadline_comes_from_the_quote",
+    "test_engine_lumibot_governor.RestageAdditions.test_E6_an_exit_needs_an_integral_quantity_only_for_its_own_symbol",
+    "test_engine_lumibot_governor.RestageAdditions.test_E7_after_a_restart_the_old_working_order_can_be_cancelled_and_the_exit_proceeds",
+    "test_engine_lumibot_governor.RestageAdditions.test_E7b_an_unreadable_order_list_after_a_restart_fails_closed",
+    "test_engine_lumibot_governor.RestageAdditions.test_E7c_open_order_ownership_requires_both_prefix_and_journal_submission",
+    "test_engine_lumibot_governor.RestageAdditions.test_E8_a_failed_cancel_wedges_the_arm_only_while_its_order_is_outstanding"
   ],
-  "tests": 38,
-  "wall_seconds": "3.115"
+  "tests": 48,
+  "wall_seconds": "1.709"
 }

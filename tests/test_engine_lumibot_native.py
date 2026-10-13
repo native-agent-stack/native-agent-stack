@@ -216,7 +216,7 @@ class NativeCase(CoreCase):
         # The hook must protect the actual HOME-derived store, not a private
         # output directory. Audit refusal occurs before any file is read.
         import pwd
-        expected_home=Path(os.environ.get("ENGINE_QUAL_EXPECTED_HOME",pwd.getpwuid(os.getuid()).pw_dir))
+        expected_home=Path(pwd.getpwuid(os.getuid()).pw_dir)
         self.assertEqual(Path.home(),expected_home)
         self.assertIn(expected_home/".aws"/"credentials",sitecustomize.PROTECTED_FILES)
         with self.assertRaisesRegex(RuntimeError,"ENGINE_QUAL_CREDENTIAL_FILE_DENIED"):

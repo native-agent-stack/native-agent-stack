@@ -16,7 +16,7 @@ MUTANTS = [
  ("intent", "governor.py", 'intent.side not in ("buy", "sell")', 'False', 'test_A2_assets_and_closed_intent'),
  ("session", "governor.py", 'quote.session not in self.caps["sessions"]', 'False', 'test_A2_quote_clocks_and_session'),
  ("clock_age", "governor.py", 'not 0 <= now - value <= age', 'False', 'test_A2_quote_clocks_and_session'),
- ("account", "governor.py", 'if account.reconciled is not True or account.open_orders:', 'if account.open_orders:', 'test_A2_caps_account_and_short_refusals'),
+ ("account", "governor.py", 'if account.reconciled is not True or (intent.side == "buy" and account.open_orders):', 'if intent.side == "buy" and account.open_orders:', 'test_A2_caps_account_and_short_refusals'),
  ("ask_band", "governor.py", 'not dec(self.caps["ask_min_usd"]) <= ask <= dec(self.caps["ask_max_usd"])', 'False', 'test_A2_caps_account_and_short_refusals'),
  ("spread", "governor.py", 'spread > dec(self.caps["max_spread_bps"])', 'False', 'test_A2_caps_account_and_short_refusals'),
  ("name_cap", "governor.py", 'len(names) >= self.caps["max_names"]', 'False', 'test_A2_caps_account_and_short_refusals'),
@@ -67,6 +67,30 @@ MUTANTS += [
  ("payload_serializer", "guarded_api.py", 'safe_order = ReservedOrderData(payload)', 'safe_order = type(order)(**payload)', 'test_R10_sdk_serialization_cannot_add_foreign_class_fields'),
 ]
 EXTRA_SITES = {"payload_pair":[("guarded_api.py",'if payload != expected:', 'if False:')]}
+MUTANTS += [
+ ("reserved_values", "guarded_api.py", 'payload = dict(expected)', 'pass', 'test_R13_str_subclass_values_never_reach_the_sdk_or_the_journal'),
+ ("reserved_token", "guarded_api.py", 'token = payload["client_order_id"]      # the reservation\'s key', 'pass      # the reservation\'s key', 'test_R13_str_subclass_values_never_reach_the_sdk_or_the_journal'),
+ ("exit_trade_age", "governor.py", 'if intent.side == "buy":      # CC ruling', 'if True:      # CC ruling', 'test_E5_an_exit_needs_a_fresh_quote_not_a_recent_trade'),
+ ("exit_quote_deadline", "governor.py", 'quote_deadline if intent.side == "sell" else min(', 'min(', 'test_E5b_an_exits_reservation_deadline_comes_from_the_quote'),
+ ("exit_own_quantity", "governor.py", 'held = positions if intent.side == "buy" else {intent.symbol: positions.get(intent.symbol, D(0))}', 'held = positions', 'test_E6_an_exit_needs_an_integral_quantity_only_for_its_own_symbol'),
+ ("restart_orders_unreadable", "guarded_api.py", 'governor.reject("restart_orders_unreadable")', 'pass', 'test_E7b_an_unreadable_order_list_after_a_restart_fails_closed'),
+ ("is_ours_prefix", "governor.py", 'cid.startswith(CLIENT_ID_PREFIX)', 'True', 'test_E7c_open_order_ownership_requires_both_prefix_and_journal_submission'),
+ ("is_ours_submission", "governor.py", 'cid in self.submitted', 'True', 'test_E7c_open_order_ownership_requires_both_prefix_and_journal_submission'),
+ ("owned_prefix", "guarded_api.py", 'cid.startswith(CLIENT_ID_PREFIX)', 'True', 'test_E7c_open_order_ownership_requires_both_prefix_and_journal_submission'),
+ ("owned_submission", "guarded_api.py", 'cid in submitted', 'True', 'test_E7c_open_order_ownership_requires_both_prefix_and_journal_submission'),
+ ("restored_submissions", "governor.py", 'self.submitted.add(key)', 'pass', 'test_E7_after_a_restart_the_old_working_order_can_be_cancelled_and_the_exit_proceeds'),
+ ("current_submissions", "governor.py", 'self.submitted.add(token)', 'pass', 'test_E7c_open_order_ownership_requires_both_prefix_and_journal_submission'),
+ ("cancel_terminal_recovery", "guarded_api.py", 'if owned.get(str(args[0])) in governor.outstanding:', 'if True:', 'test_E8_a_failed_cancel_wedges_the_arm_only_while_its_order_is_outstanding'),
+ ("cancel_outstanding_recovery", "guarded_api.py", 'if owned.get(str(args[0])) in governor.outstanding:', 'if False:', 'test_E8_a_failed_cancel_wedges_the_arm_only_while_its_order_is_outstanding'),
+ ("unknown_orders_entry", "governor.py", '(intent.side == "buy" and account.open_orders)', 'False', 'test_E7_after_a_restart_the_old_working_order_can_be_cancelled_and_the_exit_proceeds'),
+ ("unknown_orders_reconcile", "governor.py", 'any(self.is_ours(entry) for entry in account.open_orders)', 'bool(account.open_orders)', 'test_E7_after_a_restart_the_old_working_order_can_be_cancelled_and_the_exit_proceeds'),
+]
+OVERRIDE_NAMES = ("LUMIBOT_STRATEGY_PARAMETERS", "BACKTESTING_PARAMETERS", "LUMIWEALTH_API_KEY",
+                  "DISCORD_WEBHOOK_URL", "LISTENER_WRITE_URL")
+override_tuple = '(' + ', '.join('"'+name+'"' for name in OVERRIDE_NAMES) + ')'
+MUTANTS += [("override_"+name.lower(), "stock_only_alpaca.py", override_tuple,
+             '(' + ', '.join('"'+other+'"' for other in OVERRIDE_NAMES if other != name) + ')',
+             'test_R14_environment_overrides_of_the_real_constructor_refuse') for name in OVERRIDE_NAMES]
 MUTANTS += [("seam_"+name,"stock_only_alpaca.py",name+" = _deny",
              name+" = lambda self, *a, **k: None","test_A2_each_committed_seam_override_independently")
             for name in ("_submit_orders","_submit_multileg_order","_modify_order",
@@ -88,7 +112,8 @@ def main():
     check_hashes={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in check_sources}
     results=[]
     for name, file, old, new, test in MUTANTS:
-        module = ("test_engine_lumibot_governor.ReviewerAdditions" if test.startswith("test_R")
+        module = ("test_engine_lumibot_governor.RestageAdditions" if test.startswith(("test_R13", "test_R14", "test_E"))
+                  else "test_engine_lumibot_governor.ReviewerAdditions" if test.startswith("test_R")
                   else "test_engine_lumibot_native.SeamCI" if file=="stock_only_alpaca.py"
                   else "test_engine_lumibot_governor.CoreCase")
         command=[args.python,"-B","-m","unittest",module+"."+test,"-q"]

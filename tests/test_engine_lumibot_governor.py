@@ -10,7 +10,7 @@ from pathlib import Path
 import random
 import sys
 import tempfile
-from types import SimpleNamespace
+from types import ModuleType, SimpleNamespace
 import unittest
 from unittest.mock import patch
 
@@ -336,11 +336,14 @@ class ReviewerAdditions(CoreCase):
     def test_R3_reconcile_needs_terminal_reconciled_account_and_known_order(self):
         decision=self.decision();self.submit(decision);cid=decision.client_order_id
         for terminal,account,key in [("bogus",self.account,cid),("filled",replace(self.account,reconciled=False),cid),
-                                     ("filled",replace(self.account,open_orders=("working",)),cid),
+                                     ("filled",replace(self.account,open_orders=(cid,)),cid),
                                      ("filled",self.account,"a6-unknown")]:
             with self.subTest(terminal=terminal,known=key==cid),self.assertRaisesRegex(GuardRefusal,"^reconciliation_required$"):
                 self.gov.reconcile(key,terminal=terminal,account=account)
         self.assertIn(cid,self.gov.outstanding)
+        # CC ruling 2026-10-13 12:30Z (c): an UNKNOWN open order (no arm prefix, not in the journal) never blocks the reconcile of our own order
+        self.gov.reconcile(cid,terminal="filled",account=replace(self.account,open_orders=("working",)))
+        self.assertNotIn(cid,self.gov.outstanding)
 
     def test_R4_dec_refuses_float_bool_none_text_and_non_finite(self):
         for bad in (1.5,True,None,"abc","NaN","Infinity","-Infinity",[1]):
@@ -416,6 +419,219 @@ class ReviewerAdditions(CoreCase):
             with self.assertRaisesRegex(GuardRefusal,"^environment$"):load_classes()
 
 
+class Lying(str):
+    def __eq__(self, other):
+        return True
+
+    def __ne__(self, other):
+        return False
+
+    __hash__ = str.__hash__
+
+
+HERMETIC = {"LUMIBOT_DISABLE_DOTENV": "1", "LUMIBOT_DISABLE_DOTENV_LOCAL": "1", "LUMIBOT_LAZY_CREDENTIALS": "1",
+            "LUMIBOT_CONNECT_STREAM": "false", "LUMIBOT_START_ORDERS_THREAD": "false", "LUMIBOT_TELEMETRY": "0"}
+OVERRIDES = ("LUMIBOT_STRATEGY_PARAMETERS", "BACKTESTING_PARAMETERS", "LUMIWEALTH_API_KEY", "DISCORD_WEBHOOK_URL", "LISTENER_WRITE_URL")
+
+
+class RestageAdditions(CoreCase):
+    def test_R13_str_subclass_values_never_reach_the_sdk_or_the_journal(self):
+        """Either outcome is acceptable (a refusal, or an admission that sends the reservation's own text); a forged value in the body or in the journal is not."""
+        for field, forged in (("symbol", "ZZZZ"), ("qty", "999"), ("side", "sell"), ("type", "market"), ("time_in_force", "gtc"), ("client_order_id", "a6-FORGED")):
+            with self.subTest(field=field):
+                decision = self.decision()
+                payload = decision.payload()
+                if field == "client_order_id":
+                    token_hash = hash(decision.client_order_id)
+
+                    class LyingId(Lying):
+                        def __hash__(self):
+                            return token_hash
+                    payload[field] = LyingId(forged)
+                else:
+                    payload[field] = Lying(forged)
+                before = len(self.sdk.writes)
+                try:
+                    self.api.submit_order(order_data=OrderData(**payload))
+                except GuardRefusal:
+                    pass
+                for _, body in self.sdk.writes[before:]:
+                    self.assertEqual(json.dumps(body, sort_keys=True), json.dumps(decision.payload(), sort_keys=True), "the body must be the reservation's own text")
+                self.assertNotIn(forged, json.dumps(self.journal.rows, default=str), "the forged text must not be journaled either")
+                try:
+                    self.gov.reconcile(decision.client_order_id, terminal="not_sent", account=self.account)
+                except GuardRefusal:
+                    pass
+
+    def test_R13b_the_admitted_body_holds_only_plain_values_equal_to_the_reservation(self):
+        decision = self.decision()
+        self.api.submit_order(order_data=OrderData(**decision.payload()))
+        body = self.sdk.writes[-1][1]
+        self.assertEqual({key: type(value) for key, value in body.items()},
+                         {"symbol": str, "qty": str, "side": str, "type": str, "time_in_force": str, "limit_price": str, "extended_hours": bool, "client_order_id": str})
+        self.assertEqual(json.dumps(body, sort_keys=True), json.dumps(decision.payload(), sort_keys=True))
+
+    def test_R14_environment_overrides_of_the_real_constructor_refuse(self):
+        from stock_only_alpaca import load_classes
+        package = ModuleType("lumibot"); package.__path__ = []
+        brokers = ModuleType("lumibot.brokers"); brokers.Alpaca = object
+        strategies = ModuleType("lumibot.strategies"); strategies.Strategy = object
+        entities = ModuleType("lumibot.entities"); entities.Order = object; entities.Asset = object
+        stubs = {"lumibot": package, "lumibot.brokers": brokers, "lumibot.strategies": strategies, "lumibot.entities": entities}
+        for name in OVERRIDES:
+            with self.subTest(variable=name), patch.dict(sys.modules, stubs), patch.dict(os.environ, {**HERMETIC, name: "x"}):
+                with self.assertRaisesRegex(GuardRefusal, "^environment$"):
+                    load_classes()
+        with self.subTest(control="hermetic environment without any override"), patch.dict(sys.modules, stubs), patch.dict(os.environ, HERMETIC):
+            for name in OVERRIDES:
+                os.environ.pop(name, None)
+            try:
+                load_classes()
+            except GuardRefusal as error:
+                self.fail(f"the control must not be refused: {error}")
+            except Exception:
+                pass      # the stubs are too thin to build the classes; only the environment gate is under test
+
+    # ---------------------------------------------------------------- the CC's exit rulings
+    def exit_quote(self, **changes):
+        return replace(self.quote, bid=D("10.04"), ask=D("10.05"), **changes)
+
+    def sell(self, positions, quote=None, now=NOW):
+        return self.gov.decide(Intent("SYN", "sell", "exit_all"), quote or self.exit_quote(), replace(self.account, positions=positions), now)
+
+    def test_E5_an_exit_needs_a_fresh_quote_not_a_recent_trade(self):
+        for session in ("RTH", "PRE", "POST", "OVERNIGHT"):
+            for age_s in (121, 600, 3600):
+                with self.subTest(session=session, last_trade_age_s=age_s):
+                    result = self.sell({"SYN": 20}, self.exit_quote(session=session, trade_ns=NOW - age_s * 10**9))
+                    self.assertIsInstance(result, Decision, result)
+                    self.assertEqual((result.side, result.qty, result.limit_price), ("sell", 20, D("10.04")))
+                    self.gov.reconcile(result.client_order_id, terminal="not_sent", account=self.account)
+        # controls: a stale QUOTE still refuses an exit; an entry still needs a recent trade
+        self.refuse("stale_quote", intent=Intent("SYN", "sell", "exit_all"), quote=self.exit_quote(quote_ns=NOW - 61 * 10**9), account=replace(self.account, positions={"SYN": 20}))
+        self.refuse("stale_trade", quote=replace(self.quote, trade_ns=NOW - 121 * 10**9))
+
+    def test_E5b_an_exits_reservation_deadline_comes_from_the_quote(self):
+        old_print = self.exit_quote(trade_ns=NOW - 3600 * 10**9)
+        first = self.sell({"SYN": 20}, old_print)
+        self.assertIsInstance(first, Decision, first)
+        self.assertEqual(self.gov.deadlines[first.client_order_id], NOW + 60 * 10**9)
+        self.gov.consume(first.payload(), first.client_order_id, NOW + 60 * 10**9)      # exactly at the quote's deadline: allowed
+        self.gov.reconcile(first.client_order_id, terminal="filled", account=self.account)
+        second = self.sell({"SYN": 20}, old_print, now=NOW + 1)
+        self.assertIsInstance(second, Decision, second)
+        with self.assertRaisesRegex(GuardRefusal, "^reservation_expired$"):
+            self.gov.consume(second.payload(), second.client_order_id, NOW + 60 * 10**9 + 2)
+
+    def test_E6_an_exit_needs_an_integral_quantity_only_for_its_own_symbol(self):
+        result = self.sell({"SYN": 20, "OTHER": D("0.5")})
+        self.assertIsInstance(result, Decision, result)
+        self.assertEqual(result.qty, 20)
+        self.gov.reconcile(result.client_order_id, terminal="not_sent", account=self.account)
+        self.refuse("position", intent=Intent("SYN", "sell", "exit_all"), quote=self.exit_quote(), account=replace(self.account, positions={"SYN": D("20.5")}))
+        self.refuse("position", quote=self.quote, account=replace(self.account, positions={"OTHER": D("0.5")}))      # an entry keeps the account-wide check
+
+    def restarted(self, listed):
+        """Close the journal, reopen it as a new process would, and build a new Governor and a new proxy over an SDK that lists `listed` as open orders."""
+        self.journal.close()
+        self.journal = Journal(self.root / "journal.jsonl")
+        governor = Governor(CODE / "caps-a6-diagnostic.json", self.journal)
+        sdk = FakeSDK()
+        sdk.get_orders = lambda *args, **kwargs: list(listed)
+        return governor, sdk
+
+    def test_E7_after_a_restart_the_old_working_order_can_be_cancelled_and_the_exit_proceeds(self):
+        decision = self.decision()
+        self.api.submit_order(order_data=OrderData(**decision.payload()))
+        cid = decision.client_order_id
+        later = NOW + 5 * 10**9
+        governor, sdk = self.restarted([{"id": "synthetic-order", "client_order_id": cid, "status": "new"},
+                                        {"id": "foreign-9", "client_order_id": "manual-1", "status": "new"},
+                                        {"id": "spoof-3", "client_order_id": "a6-000000000999", "status": "new"}])
+        self.assertTrue(governor.recovery_required)
+        self.assertIn(cid, governor.outstanding)
+        api = GuardedApi(sdk, governor, lambda: later)
+        for foreign in ("foreign-9", "spoof-3", "never-listed"):
+            with self.subTest(order=foreign), self.assertRaisesRegex(GuardRefusal, "^cancel_ownership$"):
+                api.cancel_order_by_id(foreign)      # not in the journal: never ours to cancel
+        api.cancel_order_by_id("synthetic-order")      # re-derived from the journal and the broker's open orders
+        self.assertEqual(sdk.writes[-1], ("cancel", "synthetic-order"))
+        account = AccountState(D("1000"), {"SYN": 20}, ("manual-1",), True)      # the foreign order is still open
+        self.assertTrue(governor.is_ours(cid))
+        self.assertFalse(governor.is_ours("manual-1"))
+        try:
+            governor.reconcile(cid, terminal="canceled", account=account)
+        except GuardRefusal as error:
+            self.fail(f"an unknown order must not block reconciliation: {error}")
+        self.assertFalse(governor.recovery_required)
+        quote = QuoteSnapshot(D("10.04"), D("10.05"), later, later, "RTH", later)
+        exit_result = governor.decide(Intent("SYN", "sell", "exit_all"), quote, account, later)
+        self.assertIsInstance(exit_result, Decision, exit_result)
+        self.assertEqual((exit_result.side, exit_result.qty), ("sell", 20))
+        governor.reconcile(exit_result.client_order_id, terminal="not_sent", account=account)
+        self.assertEqual(governor.decide(Intent("SYN", "buy"), QuoteSnapshot(D("9.99"), D("10"), later, later, "RTH", later), replace(account, positions={}), later),
+                         Refusal("account_reconciliation"))      # an unknown open order still refuses an ENTRY
+
+    def test_E7b_an_unreadable_order_list_after_a_restart_fails_closed(self):
+        decision = self.decision()
+        self.api.submit_order(order_data=OrderData(**decision.payload()))
+        governor, sdk = self.restarted([])
+
+        def unreadable(*args, **kwargs):
+            raise RuntimeError("network")
+        sdk.get_orders = unreadable
+        try:
+            GuardedApi(sdk, governor, lambda: NOW + 5 * 10**9)
+        except Exception as error:
+            self.assertIs(type(error), GuardRefusal)
+            self.assertEqual(str(error), "restart_orders_unreadable")
+        else:
+            self.fail("an unreadable restart order list must refuse")
+
+    def test_E7c_open_order_ownership_requires_both_prefix_and_journal_submission(self):
+        decision = self.decision()
+        self.api.submit_order(order_data=OrderData(**decision.payload()))
+        # Synthetic legacy submit: the journal alone is insufficient without
+        # the current arm prefix. A prefix alone is insufficient too.
+        legacy = "manual-1"
+        self.gov.record("submit", client_order_id=legacy,
+                        payload=dict(decision.payload(), client_order_id=legacy))
+        self.gov.submitted.add(legacy)
+        self.sdk.get_orders = lambda: [
+            {"id": "legacy-order", "client_order_id": legacy},
+            {"id": "lookalike-order", "client_order_id": "a6-unlisted"},
+            {"id": "synthetic-order", "client_order_id": decision.client_order_id}]
+        api = GuardedApi(self.sdk, self.gov, lambda: NOW)
+        for entry in (legacy, {"client_order_id": legacy},
+                      SimpleNamespace(client_order_id=legacy), "a6-unlisted"):
+            with self.subTest(entry=type(entry).__name__):
+                self.assertFalse(self.gov.is_ours(entry))
+        self.assertTrue(self.gov.is_ours(decision.client_order_id))
+        for order in ("legacy-order", "lookalike-order"):
+            with self.subTest(order=order), self.assertRaisesRegex(GuardRefusal, "^cancel_ownership$"):
+                api.cancel_order_by_id(order)
+        api.cancel_order_by_id("synthetic-order")
+        self.assertEqual(self.sdk.writes[-1], ("cancel", "synthetic-order"))
+
+    def test_E8_a_failed_cancel_wedges_the_arm_only_while_its_order_is_outstanding(self):
+        def failing_cancel(key):
+            raise RuntimeError("order is already terminal")
+        self.sdk.cancel_order_by_id = failing_cancel
+        first = self.decision()
+        self.api.submit_order(order_data=OrderData(**first.payload()))
+        self.gov.reconcile(first.client_order_id, terminal="filled", account=self.account)
+        with self.assertRaisesRegex(GuardRefusal, "^unknown_outcome$"):
+            self.api.cancel_order_by_id("synthetic-order")      # its order is already reconciled
+        self.assertFalse(self.gov.recovery_required, "a terminal order must not wedge the arm")
+        second = self.decision()      # the arm still admits
+        self.api.submit_order(order_data=OrderData(**second.payload()))
+        with self.assertRaisesRegex(GuardRefusal, "^unknown_outcome$"):
+            self.api.cancel_order_by_id("synthetic-order")      # same broker id in the fake, now mapped to the outstanding second order
+        self.assertTrue(self.gov.recovery_required)
+        self.gov.reconcile(second.client_order_id, terminal="canceled", account=self.account)
+        self.assertFalse(self.gov.recovery_required)
+
+
 class ExitPolicyMatrix(CoreCase):
     """CC B1 ruling: six admitted exit cases across all four sessions."""
     SESSIONS=("RTH","PRE","POST","OVERNIGHT")
@@ -456,7 +672,7 @@ class ExitPolicyMatrix(CoreCase):
 
 def load_tests(loader,tests,pattern):
     suite=unittest.TestSuite()
-    for cls in (CoreCase,ReviewerAdditions,ExitPolicyMatrix):
+    for cls in (CoreCase,ReviewerAdditions,ExitPolicyMatrix,RestageAdditions):
         suite.addTests(cls(name) for name in vars(cls) if name.startswith("test_"))
     return suite
 

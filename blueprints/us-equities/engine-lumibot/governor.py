@@ -14,6 +14,7 @@ import re
 import threading
 
 D = Decimal
+CLIENT_ID_PREFIX = "a6-"      # every client order id this arm creates; the restart re-derivation and the open-order classification use it
 PAYLOAD_KEYS = frozenset({"symbol", "qty", "side", "type", "time_in_force",
                           "limit_price", "extended_hours", "client_order_id"})
 
@@ -166,12 +167,15 @@ class Governor:
         self.submits = []
         self.last_now = -1
         self.serial = len(journal.rows)
+        self.submitted = set()
         for row in journal.rows:
             if row.get("caps_sha256") != self.caps_hash:
                 raise GuardRefusal("journal_caps_binding")
             key = row.get("client_order_id")
             if row.get("event") in ("decision", "submit") and key:
                 self.outstanding[key] = row.get("payload", self.outstanding.get(key, {}))
+            if row.get("event") == "submit" and key:
+                self.submitted.add(key)
             if row.get("event") == "reconciled" and key:
                 self.outstanding.pop(key, None)
             if row.get("event") == "budget":
@@ -259,12 +263,15 @@ class Governor:
         if quote.session not in self.caps["sessions"]:
             raise GuardRefusal("session")
         self._time(now)
-        for value, age, reason in [(quote.clock_ns, 250_000_000, "clock"),
-                                   (quote.quote_ns, self.caps["quote_max_age_seconds"] * 10**9, "stale_quote"),
-                                   (quote.trade_ns, self.caps["trade_max_age_seconds"] * 10**9, "stale_trade")]:
+        checks = [(quote.clock_ns, 250_000_000, "clock"),
+                  (quote.quote_ns, self.caps["quote_max_age_seconds"] * 10**9, "stale_quote")]
+        if intent.side == "buy":      # CC ruling 2026-10-13 12:30Z (a): an exit needs a fresh two-sided quote, not a recent print
+            checks.append((quote.trade_ns, self.caps["trade_max_age_seconds"] * 10**9, "stale_trade"))
+        for value, age, reason in checks:
             if type(value) is not int or not 0 <= now - value <= age:
                 raise GuardRefusal(reason)
-        if account.reconciled is not True or account.open_orders:
+        # CC ruling (c): an unknown open order refuses entries but never the exit of a held position; our own working order is covered by `outstanding` and `recovery_required`
+        if account.reconciled is not True or (intent.side == "buy" and account.open_orders):
             raise GuardRefusal("account_reconciliation")
         if self.outstanding:
             raise GuardRefusal("pending_outcome")
@@ -278,7 +285,8 @@ class Governor:
         if intent.side == "buy" and spread > dec(self.caps["max_spread_bps"]):
             raise GuardRefusal("spread")
         positions = {symbol: dec(qty) for symbol, qty in account.positions.items()}
-        if any(qty < 0 or qty != qty.to_integral_value() for qty in positions.values()):
+        held = positions if intent.side == "buy" else {intent.symbol: positions.get(intent.symbol, D(0))}      # CC ruling (b): an exit needs an integral quantity only for the symbol it sells
+        if any(qty < 0 or qty != qty.to_integral_value() for qty in held.values()):
             raise GuardRefusal("position")
         if intent.side == "buy":
             names = {symbol for symbol, qty in positions.items() if qty}
@@ -299,13 +307,14 @@ class Governor:
         if intent.side == "sell" and qty > positions.get(intent.symbol, 0):
             raise GuardRefusal("short_sale")
         self.serial += 1
-        cid = "a6-" + str(self.serial).zfill(12)
+        cid = CLIENT_ID_PREFIX + str(self.serial).zfill(12)
         decision = Decision(intent.symbol, intent.side, qty, price,
                             self.caps["sessions"][quote.session], cid, cid)
         self.record("decision", client_order_id=cid, payload=decision.payload(), reason="allowed")
         self.reservations[cid] = decision.payload()
-        self.deadlines[cid] = min(quote.quote_ns+self.caps["quote_max_age_seconds"]*10**9,
-                                  quote.trade_ns+self.caps["trade_max_age_seconds"]*10**9)
+        quote_deadline = quote.quote_ns + self.caps["quote_max_age_seconds"] * 10**9
+        self.deadlines[cid] = quote_deadline if intent.side == "sell" else min(
+            quote_deadline, quote.trade_ns + self.caps["trade_max_age_seconds"] * 10**9)      # CC ruling (a): an exit's deadline comes from the quote alone
         self.outstanding[cid] = decision.payload()
         return decision
 
@@ -318,6 +327,7 @@ class Governor:
         del self.reservations[token]
         self.deadlines.pop(token,None)
         self.record("submit", client_order_id=token, payload=payload, outcome="pending")
+        self.submitted.add(token)
 
     def outcome(self, token, result):
         self.record("outcome", client_order_id=token, outcome=result)
@@ -325,10 +335,15 @@ class Governor:
         if result == "unknown":
             self.recovery_required = True
 
+    def is_ours(self, entry):
+        """An open order is ours when its client order id carries the arm prefix and appears in the journal's submit rows."""
+        cid = entry.get("client_order_id") if isinstance(entry, dict) else getattr(entry, "client_order_id", entry)
+        return isinstance(cid, str) and cid.startswith(CLIENT_ID_PREFIX) and cid in self.submitted
+
     def reconcile(self, client_order_id, *, terminal, account):
         with self.lock:
             if (terminal not in ("filled", "canceled", "rejected", "expired", "not_sent")
-                    or account.reconciled is not True or account.open_orders
+                    or account.reconciled is not True or any(self.is_ours(entry) for entry in account.open_orders)
                     or client_order_id not in self.outstanding):
                 self.reject("reconciliation_required")
             self.record("reconciled", client_order_id=client_order_id, outcome=terminal)

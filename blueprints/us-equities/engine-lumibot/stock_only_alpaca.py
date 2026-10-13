@@ -35,6 +35,8 @@ def load_classes():
                 "LUMIBOT_START_ORDERS_THREAD": "false", "LUMIBOT_TELEMETRY": "0"}
     if any(os.environ.get(key) != value for key, value in required.items()):
         raise GuardRefusal("environment")
+    if any(os.environ.get(key) for key in ("LUMIBOT_STRATEGY_PARAMETERS", "BACKTESTING_PARAMETERS", "LUMIWEALTH_API_KEY", "DISCORD_WEBHOOK_URL", "LISTENER_WRITE_URL")):
+        raise GuardRefusal("environment")      # these override the closed inbox or send positions to a third party
     from lumibot.brokers import Alpaca
     from lumibot.strategies import Strategy
     from lumibot.entities import Order, Asset

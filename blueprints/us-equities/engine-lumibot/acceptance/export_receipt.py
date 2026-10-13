@@ -44,7 +44,7 @@ def main():
         tests=re.findall(r"^(test_[A-Za-z0-9_]+) \(([^)]+)\) \.\.\. (ok|skipped[^\n]*)",raw,re.M)
         # A7's warning/log output may break the one-line result; list every
         # actual test start separately and retain the measured runner total.
-        starts=re.findall(r"^(test_[A-Za-z0-9_]+) \(([^)]+)\) \.\.\.",raw,re.M)
+        starts=re.findall(r"^(test_[A-Za-z0-9_]+) \(([^)]+)\)(?: \.\.\.|$)",raw,re.M)
         if len(starts)!=int(count[1]) or "skipped" in raw:
             raise SystemExit("acceptance_skipped_or_count_mismatch")
         summary={"evidence_class":"synthetic","command":command["command"],
@@ -76,6 +76,7 @@ def main():
              "spec_sha256":"8eb20e2e1f3c38a416a364a9f87fef62fcd5bdaa515bf60d78621cde7eff2dc3",
              "addendum_sha256":"cf63eb570cc65e51c24444b6d752ad73825008a0a626e210ae061005f0544805",
              "exit_policy_ruling_sha256":"6e2cb83ef947e05b0d640d344b92e8a093acc2b4cb0ca854efa94f1ed29fc582",
+             "round2_read_and_exit_rulings_sha256":"cfe28395347bc7d69b993b7db35f4e9b1abcc6d18c93863d543b8d4171d437ea",
              "input_hashes":[{"path":p.relative_to(root).as_posix(),"sha256":digest(p)} for p in sources],
              "external_code_inputs":[row for row in private["input_hashes"] if row["role"]=="sitecustomize.py"],
              "outputs":results,"mutation_killed":mutations["killed"],"mutation_survived":0,

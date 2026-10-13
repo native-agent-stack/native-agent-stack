@@ -6,7 +6,7 @@ Python reflection is not an isolation boundary: acceptance's process audit
 hook separately prevents a second client from reaching the network.
 """
 import re
-from governor import GuardRefusal, PAYLOAD_KEYS, dec
+from governor import GuardRefusal, PAYLOAD_KEYS, CLIENT_ID_PREFIX, dec
 
 READS = frozenset({"get_clock", "get_account", "get_open_position", "get_all_positions",
                    "get_order_by_id", "get_orders", "get_portfolio_history", "get"})
@@ -33,8 +33,22 @@ class GuardedApi:
         if type(retries) is not int or not 0 <= retries <= 3:
             governor.reject("retry_cap")
         units = retries + 1
-        owned = set()
+        owned = {}      # broker order id -> our client order id
         bridge = {}
+        # CC ruling 2026-10-13 12:30Z (c): after a restart `owned` is re-derived from the journal's submit rows joined with the broker's open orders that carry the arm prefix
+        submitted = {row["client_order_id"] for row in governor.journal.rows if row.get("event") == "submit" and row.get("client_order_id")}
+        if submitted:
+            with governor.lock:
+                governor.budget(clock(), units=units)
+                try:
+                    listed = real_client.get_orders()
+                except Exception:
+                    governor.reject("restart_orders_unreadable")
+                for item in listed if isinstance(listed, (list, tuple)) else ():
+                    cid = item.get("client_order_id") if isinstance(item, dict) else getattr(item, "client_order_id", None)
+                    oid = item.get("id") if isinstance(item, dict) else getattr(item, "id", None)
+                    if isinstance(cid, str) and cid.startswith(CLIENT_ID_PREFIX) and cid in submitted and oid is not None:
+                        owned[str(oid)] = cid
 
         def invoke(name, *args, **kwargs):
             with governor.lock:
@@ -92,6 +106,8 @@ class GuardedApi:
                     payload["limit_price"] = expected["limit_price"]
                     if payload != expected:
                         governor.reject("reservation")
+                    payload = dict(expected)      # forward and journal ONLY the reservation's own values, never the caller's objects (a str subclass may lie in __eq__)
+                    token = payload["client_order_id"]      # the reservation's key, not a caller object that merely hashes and compares equal to it
                     try:
                         governor.budget(clock(), submit=True, units=units)
                         governor.consume(payload, token, clock())
@@ -107,7 +123,7 @@ class GuardedApi:
                         raise GuardRefusal("unknown_outcome") from None
                     governor.outcome(token, "accepted_response")
                     if getattr(response, "id", None) is not None:
-                        owned.add(str(response.id))
+                        owned[str(response.id)] = token
                     return response
                 if name == "cancel_order_by_id":
                     if kwargs or len(args) != 1 or str(args[0]) not in owned:
@@ -118,7 +134,8 @@ class GuardedApi:
                         result = real_client.cancel_order_by_id(args[0])
                     except Exception:
                         governor.record("cancel", outcome="unknown")
-                        governor.recovery_required = True
+                        if owned.get(str(args[0])) in governor.outstanding:      # only an order that is still outstanding needs a re-reconcile; a terminal one must not wedge the arm
+                            governor.recovery_required = True
                         raise GuardRefusal("unknown_outcome") from None
                     governor.record("cancel", outcome="accepted_response")
                     return result
