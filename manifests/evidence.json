@@ -5237,8 +5237,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "fb9e28b9012d90a12f85bbe7562b8b153d4791eba8f42871125ae72f985e0bb5",
-      "bytes": 41377
+      "sha256": "c2298315123147ec18ee56f7af0dafa1a55a39c0a2fb828adb0dee8b02bfb0c3",
+      "bytes": 45356
     },
     {
       "path": ".gitignore",
@@ -11488,8 +11488,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-read-deltas.json",
-      "sha256": "7dd64219a5f523c1fe653c2148089bc3e27c91821d81c5678e275fb2b639f590",
-      "bytes": 479
+      "sha256": "9350bfd9b61a0f26fb3d159d2d9ccf54836d6054e55ae8a77fb306695a97f9b4",
+      "bytes": 587
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
@@ -11520,6 +11520,11 @@
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261013-pr1057-delta.json",
       "sha256": "59772b7af0a432d1f90151381993bf667c39a25da2152cc83975090493f46123",
       "bytes": 12295
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261013-pr1070-delta.json",
+      "sha256": "8c5503bd3eba5b6ae2bb770e06121b68f49ad5d015d8d7bc80f8b9d7c6f1fe17",
+      "bytes": 12645
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unit-pass.txt",
@@ -18523,8 +18528,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-ci-least-privilege.md",
-      "sha256": "b1aed62ea4b01699000e59017881479c1850aba255acfc3300a19e3d78e6137e",
-      "bytes": 44256
+      "sha256": "01ff8c7f2913e77733d69942c6a3c469e17257165ef0d7e9cfb492a00759754b",
+      "bytes": 44388
     },
     {
       "path": "docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md",
@@ -61543,8 +61548,8 @@
     },
     {
       "path": "scripts/validate.py",
-      "sha256": "3f916684e81286af40aba000b8519cc54e6c5851e27f21f3d6115ffff2a3b882",
-      "bytes": 43199
+      "sha256": "a68c189c56bef41b0d3d8a5069920e15db45249818054c444988abad1e8f8477",
+      "bytes": 49157
     },
     {
       "path": "scripts/validate_catalogs.py",
@@ -63042,6 +63047,11 @@
       "bytes": 24084
     },
     {
+      "path": "tests/test_registry_rows.py",
+      "sha256": "3340ea4838b9eff094cb7a91afac4abdf727f4f8fc8f850f14658623d9eaff92",
+      "bytes": 20860
+    },
+    {
       "path": "tests/test_release_pin_contents.py",
       "sha256": "cc79f9bf73b53f5304fe0b14059bcd8c089040d93960df8bba4ed51aa8157d8f",
       "bytes": 15007
@@ -63448,8 +63458,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "ef20da705e997c8dbfe893678ee19162ca7c6a08571a2c5fe7155e1b9febdbd0",
-      "bytes": 152153
+      "sha256": "5e87651b314dde9cb62b4caecf1d06df89ac567e1dbca0947158381dc3bd4cae",
+      "bytes": 152178
     },
     {
       "path": "tests/test_workflow_policy.py",

@@ -713,10 +713,107 @@ def validate(root: Path, *, today: date | None = None) -> dict[str, int]:
     return Validator(root, today=today).validate()
 
 
+def validate_registration_rows(root: Path, base_ref: str, *, before_ref: str | None = None,
+                               head_ref: str = "HEAD") -> None:
+    """Enforce docs/lanes.md:119-126 on committed Git trees.
+
+    A synchronize event's previous head preserves the PR's own new-file
+    registrations across a rebase; the new base alone cannot recover them.
+    GitHub's webhook-pull-request-synchronize schema requires before/after
+    (github/rest-api-description@58b1e0c0). No private packet is an input.
+    """
+    root = root.resolve()
+    environment = {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
+
+    def git(*arguments):
+        return subprocess.run(
+            ["git", "--no-optional-locks", "-C", str(root), *arguments],
+            env=environment, capture_output=True, check=True, timeout=30).stdout
+
+    def revision(ref):
+        return git("rev-parse", "--verify", "--end-of-options", ref + "^{commit}").decode().strip()
+
+    def rows(ref, *, historical=False):
+        try:
+            document = json.loads(git("show", ref + ":manifests/evidence.json"),
+                                  object_pairs_hook=_json_without_duplicates)
+            records = document["files"]
+            if not isinstance(records, list) or any(not isinstance(row, dict)
+                    or not isinstance(row.get("path"), str) for row in records):
+                raise ValueError("invalid registration rows")
+            result = {row["path"]: row for row in records}
+            if len(result) != len(records):
+                raise ValueError("duplicate registration path")
+            # A malformed historical row cannot create permanent registration
+            # intent. The current manifest is still strictly validated below.
+            return {path: row for path, row in result.items()
+                    if path != "manifests/evidence.json" and (not historical or
+                       (isinstance(row.get("sha256"), str)
+                        and re.fullmatch(r"[0-9a-f]{64}", row["sha256"])
+                        and type(row.get("bytes")) is int and row["bytes"] >= 0))}
+        except (subprocess.CalledProcessError, ValueError, KeyError, TypeError):
+            if not historical:
+                raise InvalidPublication(f"{ref}:manifests/evidence.json: invalid current registration manifest") from None
+            print(f"PR registration: skipped invalid historical manifest {ref}:manifests/evidence.json",
+                  file=sys.stderr)
+            return {}
+
+    def names(*arguments):
+        output = git(*arguments)
+        if output and not output.endswith(b"\0"):
+            raise ValueError("unterminated Git path listing")
+        return {os.fsdecode(name) for name in output.split(b"\0") if name}
+
+    try:
+        if Path(os.fsdecode(git("rev-parse", "--show-toplevel")).rstrip("\r\n")).resolve() != root:
+            raise ValueError("not the exact Git root")
+        base, head = revision(base_ref), revision(head_ref)
+        baseline, current = rows(base, historical=True), rows(head)
+        tracked = names("ls-tree", "-r", "--name-only", "-z", head)
+        changed = names("diff", "--no-renames", "--diff-filter=AMT", "--name-only", "-z", base, head, "--")
+        required = changed & baseline.keys()
+        # Removing only a row must not erase an unchanged, still-tracked file.
+        required |= (baseline.keys() - current.keys()) & tracked
+        required |= {name for name in changed if name.startswith("evidence/")}
+        # Include every registry-bearing ancestor and prior force-pushed head.
+        # A later push after an already-bad head must not forget earlier intent.
+        history = {head, *(revision(ref) for ref in (before_ref or "").split())}
+        for tip in sorted(history):
+            old_base = git("merge-base", base, tip).decode().strip()
+            previous_base = rows(old_base, historical=True)
+            commits = git("rev-list", "--full-history", tip, "^" + old_base,
+                          "--", "manifests/evidence.json").decode().splitlines()
+            for commit in commits:
+                required |= {name for name, row in rows(commit, historical=True).items()
+                             if row != previous_base.get(name) and name in tracked}
+        errors = []
+        for name in sorted(required):
+            row = current.get(name)
+            if row is None:
+                errors.append(f"{name}: required registration row missing")
+                continue
+            raw = git("show", head + ":" + name)
+            if row.get("sha256") != hashlib.sha256(raw).hexdigest():
+                errors.append(f"{name}: SHA-256 mismatch at Git head")
+            if type(row.get("bytes")) is not int or row["bytes"] != len(raw):
+                errors.append(f"{name}: byte count mismatch at Git head")
+    except InvalidPublication:
+        raise
+    except (OSError, subprocess.SubprocessError, ValueError, KeyError, TypeError):
+        raise InvalidPublication("PR registration Git inputs unavailable or invalid") from None
+    if errors:
+        raise InvalidPublication("\n".join(errors))
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
     parser.add_argument("--today", type=date.fromisoformat, help="Model currency UTC date YYYY-MM-DD; default is today's UTC date")
+    parser.add_argument("--registration-base", default=os.environ.get("NATIVE_AGENT_REGISTRATION_BASE"),
+                        help="Verify PR-owned registrations against this Git base (or NATIVE_AGENT_REGISTRATION_BASE)")
+    parser.add_argument("--registration-before", default=os.environ.get("NATIVE_AGENT_REGISTRATION_BEFORE"),
+                        help="Space-separated previous PR heads, including force-push history "
+                             "(or NATIVE_AGENT_REGISTRATION_BEFORE)")
     parser.add_argument(
         "--scan-file", action="append", default=[], type=Path, metavar="PATH",
         help="Scan an arbitrary file (repeatable) for PRIVATE_CONTENT patterns and "
@@ -780,6 +877,11 @@ def main() -> int:
         return 1 if locators else 0
     try:
         summary = validate(args.root, today=args.today)
+        if args.registration_base:
+            validate_registration_rows(args.root, args.registration_base,
+                                       before_ref=args.registration_before)
+        elif args.registration_before:
+            raise InvalidPublication("PR registration previous head requires a base")
     except InvalidPublication as error:
         print(f"Publication validation failed:\n{error}")
         return 1

@@ -42,6 +42,7 @@ jobs:
     timeout-minutes: 60
     permissions:
       contents: read # the checkout, and the read-only token zizmor's online audits use
+      pull-requests: read # native PR force-push timeline; docs/decisions/2026-10-04-ci-least-privilege.md
     steps:
       - name: Harden the runner (audit-only network egress)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -111,8 +112,69 @@ jobs:
           tar -xzf "$RUNNER_TEMP/actionlint/archive.tar.gz" -C "$RUNNER_TEMP/actionlint" actionlint
           "$RUNNER_TEMP/actionlint/actionlint" -version
           "$RUNNER_TEMP/actionlint/actionlint" -color
+      - name: Fetch prior PR heads for registration continuity
+        id: registry_history
+        # github/docs@be38ec5d78e24172587e61b3c6ff40ace1865c71,
+        # src/graphql/data/fpt/schema-pulls.json:7189-7222: filteredCount, nodes,
+        # pageInfo and totalCount are separate fields; use projected nodes/pageInfo.
+        if: matrix.shard == 0 && github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_HISTORY_REPOSITORY: ${{ github.repository }}
+          PR_HISTORY_NUMBER: ${{ github.event.pull_request.number }}
+          REGISTRATION_BEFORE: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          # Native gh pagination and GitHub's persistent force-push timeline retain
+          # intent even after a second push whose immediate predecessor lost rows.
+          # github/docs@be38ec5d78e24172587e61b3c6ff40ace1865c71:
+          # src/graphql/data/fpt/schema-pulls.json:2153,2181-2185 defines
+          # HeadRefForcePushedEvent.beforeCommit; :7196-7214 defines nodes/pageInfo.
+          # cli/cli@fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd (gh v2.102.0):
+          # pkg/cmd/api/api.go:134-137 requires endCursor/pageInfo for --paginate.
+          # Count projected nodes below, never the unfiltered aggregate count.
+          previous=$(gh api graphql --paginate \
+            -F owner="${PR_HISTORY_REPOSITORY%/*}" -F name="${PR_HISTORY_REPOSITORY#*/}" \
+            -F number="$PR_HISTORY_NUMBER" \
+            -f query="query(\$owner: String!, \$name: String!, \$number: Int!, \$endCursor: String) { repository(owner: \$owner, name: \$name) { pullRequest(number: \$number) { timelineItems(first: 100, after: \$endCursor, itemTypes: [HEAD_REF_FORCE_PUSHED_EVENT]) { nodes { ... on HeadRefForcePushedEvent { beforeCommit { oid } } } pageInfo { hasNextPage endCursor } } } } }" \
+            --jq '.data.repository.pullRequest.timelineItems.nodes[].beforeCommit.oid' && printf '.')
+          # cli/go-gh@v2.16.1 pkg/jq/jq.go:84-85,109-110 renders JSON null as
+          # an empty output line (gh v2.102.0 go.mod:21). The success sentinel
+          # preserves trailing empty node lines stripped by command substitution.
+          previous=${previous%.}
+          timeline_count=0
+          while IFS= read -r _timeline_ref; do
+            timeline_count=$((timeline_count + 1))
+          done < <(printf '%s' "$previous")
+          printf 'PR registration timeline nodes: %s\n' "$timeline_count"
+          # Same transient auth form as catalog-freshness.yml's supported push:
+          # Git v2.53.0@67ad42147a7acc2af6074753ebd03d904476118f,
+          # Documentation/git-config.adoc:479-492 and config/http.adoc:98-103.
+          # Environment config applies only to each fetch, never .git/config.
+          basic_auth="$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          echo "::add-mask::$basic_auth"
+          refs=()
+          while IFS= read -r ref; do
+            if [[ -z "$ref" ]]; then
+              echo 'PR registration: skipped inaccessible empty historical timeline node' >&2
+              continue
+            fi
+            [[ "$ref" =~ ^[0-9a-f]{40}$ ]] || exit 1
+            GIT_CONFIG_COUNT=1 \
+            GIT_CONFIG_KEY_0="http.https://github.com/.extraheader" \
+            GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $basic_auth" \
+            git fetch --no-tags origin "$ref"
+            refs+=("$ref")
+          done < <(
+            if [[ -n "$REGISTRATION_BEFORE" ]]; then printf '%s\n' "$REGISTRATION_BEFORE"; fi
+            printf '%s' "$previous"
+          )
+          printf 'before_refs=%s\n' "${refs[*]}" >> "$GITHUB_OUTPUT"
       - name: Validate manifests and evidence integrity
         if: matrix.shard == 0
+        env:
+          NATIVE_AGENT_REGISTRATION_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          NATIVE_AGENT_REGISTRATION_BEFORE: ${{ steps.registry_history.outputs.before_refs }}
         run: python3 scripts/validate.py
       - name: Validate host evidence contribution receipts
         if: matrix.shard == 0
