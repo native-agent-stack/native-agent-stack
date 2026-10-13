@@ -88,14 +88,19 @@ def now_utc() -> datetime:
 
 
 def parse_iso(text: str) -> datetime:
-    """Parse an ISO-8601 timestamp (accepting a trailing 'Z') as a tz-aware UTC datetime."""
+    """Parse an ISO-8601 timestamp (accepting a trailing 'Z') as a tz-aware UTC datetime. A timestamp that is valid but whose conversion to UTC leaves the supported range (0001-01-01T00:00:00+01:00 and
+    9999-12-31T23:59:59-01:00 do) is a ValueError like any other unusable timestamp, with no value in its text: the conversion raises OverflowError, which the callers' handlers of ValueError did not cover
+    (python/cpython@cbc944f4bc59639a444dd971c737788ba2283a91: Modules/_datetimemodule.c L6510-L6515 (astimezone subtracts the offset and returns its failure) and L805-L808 (a date outside the supported range sets OverflowError "date value out of range"); Lib/_pydatetime.py L2034 and L2230 the same in the pure-Python implementation)."""
     value = text.strip()
     if value.endswith("Z"):
         value = value[:-1] + "+00:00"
     parsed = datetime.fromisoformat(value)
     if parsed.tzinfo is None:
         parsed = parsed.replace(tzinfo=timezone.utc)
-    return parsed.astimezone(timezone.utc)
+    try:
+        return parsed.astimezone(timezone.utc)
+    except OverflowError:
+        raise ValueError("timestamp is out of range") from None
 
 
 def parse_approx_count(raw: str) -> int | None:

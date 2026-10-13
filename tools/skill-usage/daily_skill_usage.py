@@ -201,14 +201,27 @@ class LayoutRefused(Refused):
 # The directory that the units' TemporaryFileSystem=/srv:ro hides. The marker exists only to make the manager insist on the mount namespace (see the units); a clone or an interpreter below it would be invisible to the
 # unit and fail after the namespace was made, every day.
 MARKER_DIRECTORY = "/srv"
+PRIVATE_TMP_DIRECTORIES = ("/tmp", "/var/tmp")   # PrivateTmp=true gives the service its own /tmp and /var/tmp (systemd/systemd@b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a man/systemd.exec.xml L1865-L1870)
+
+
+def hidden_below(path, directories):
+    """Whether `path`, or the file it resolves to, is at or below one of `directories` (a path with `..` or a doubled slash is read as the file system reads it)."""
+    hidden = [[part for part in directory.split("/") if part] for directory in directories]
+    for candidate in (os.path.normpath(path), os.path.realpath(path)):
+        parts = [part for part in candidate.split("/") if part]
+        if any(parts[:len(directory)] == directory for directory in hidden):
+            return True
+    return False
 
 
 def hidden_by_marker(path):
-    """Whether `path`, or the file it resolves to, is at or below MARKER_DIRECTORY (a path with `..` or a doubled slash is read as the file system reads it)."""
-    for candidate in (os.path.normpath(path), os.path.realpath(path)):
-        if [part for part in candidate.split("/") if part][:1] == [MARKER_DIRECTORY.strip("/")]:
-            return True
-    return False
+    """Whether `path`, or the file it resolves to, is at or below MARKER_DIRECTORY."""
+    return hidden_below(path, (MARKER_DIRECTORY,))
+
+
+def hidden_by_private_tmp(path):
+    """Whether `path`, or the file it resolves to, is at or below /tmp or /var/tmp, which PrivateTmp=true replaces in the service's namespace."""
+    return hidden_below(path, PRIVATE_TMP_DIRECTORIES)
 
 
 def on_reviewed_main(root=ROOT):
@@ -265,8 +278,8 @@ def collect_half(half, roots, *, window, now, node="node", runner=subprocess.run
             result = runner(command, cwd=ROOT, stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=timeout)
             report = json.loads(result.stdout) if result.returncode == 0 else None
             reports[slot] = report if isinstance(report, dict) and report.get("kind") == kind else None
-        except (OSError, subprocess.TimeoutExpired, ValueError, RecursionError):
-            pass  # Native errors and transcript text never become page content. An output nested beyond the decoder's limit raises RecursionError, not ValueError (python/cpython@cbc944f4bc59639a444dd971c737788ba2283a91 Modules/_json.c L1031-L1046, Lib/json/decoder.py L360-L363), and is an unusable report.
+        except Exception:  # noqa: BLE001 - whatever a command or its output does, the slot is unmeasured: native errors and transcript text never become page content. The handler was an enumeration, and the class kept growing (an output nested beyond the decoder's limit raises RecursionError, not ValueError: python/cpython@cbc944f4bc59639a444dd971c737788ba2283a91 Modules/_json.c L1031-L1046, Lib/json/decoder.py L360-L363); an exception that was not foreseen is an unusable report too.
+            pass
     return reports["host"], reports["codex"], reports["claude"]
 
 
@@ -286,7 +299,7 @@ def half_record(value, half):
     if stamp is not None:
         try:
             skill_usage.parse_iso(stamp)
-        except (AttributeError, TypeError, ValueError):
+        except Exception:  # noqa: BLE001 - a stamp that cannot be read as a time, of whatever kind (parse_iso raises ValueError for an out-of-range one), is an invalid record
             return None
     return value
 
@@ -299,10 +312,34 @@ def row_field(row, field):
     return count(value)
 
 
+def lane_record(lane, client):
+    """A lane of a half's record as the combined record carries it, rebuilt from the fields `project_reports` writes and nothing else: the client, the lane name, the skills with their counts (a Codex skill
+    also its raw reads) and the metric. A stored record is a file another process wrote: a lane or a skill with a `prompt` or a `path`, or a count that is not a count, must not cross into a published record
+    that is counts only. None for a lane that is not a lane of this client."""
+    name, skills = lane.get("lane"), lane.get("skills")
+    if lane.get("client") != client or not (isinstance(name, str) and NAME.fullmatch(name)) or not isinstance(skills, list):
+        return None
+    rows = []
+    for row in skills:
+        if isinstance(row, dict) and isinstance(row.get("name"), str) and NAME.fullmatch(row["name"]):
+            rows.append({"name": row["name"], "count": count(row.get("count")), **({"raw_reads": count(row.get("raw_reads"))} if client == "codex" else {})})
+    return {"client": client, "lane": name, "skills": rows, "metric": "use" if client == "codex" else "skill_calls"}
+
+
+def later_half(claude, codex):
+    """"codex" when the Codex record was generated after the Claude one, else "claude" (also when either time is missing)."""
+    stamps = [record.get("generated_at") if isinstance(record.get("generated_at"), str) else None for record in (claude, codex)]
+    return "codex" if None not in stamps and skill_usage.parse_iso(stamps[1]) > skill_usage.parse_iso(stamps[0]) else "claude"
+
+
 def merge_halves(claude, codex):
     """The record the Fleet page reads (schema skill-invoke-rate-daily/1, no `half`) from the newest record of each half. A half that is absent, or is not a record of its half, contributes nothing and is not
-    measured. The Claude half owns the Claude fields of a skill and its wiring, the Codex half the Codex ones; `generated_at` is the older of the two, so the page never shows a stale half as fresh."""
+    measured. The Claude half owns the Claude fields of a skill and its wiring, the Codex half the Codex ones; `generated_at` is the older of the two, so the page never shows a stale half as fresh. The record has one
+    `window_days`, which the page uses to label every windowed count: two halves of different windows (a Codex run of `--window 30` beside a stored Claude half of 7) cannot be merged under either, so the later record
+    stands and the other half is absent, unmeasured. Lanes and their skills are rebuilt from the fields the projection writes (lane_record)."""
     claude, codex = half_record(claude, "claude"), half_record(codex, "codex")
+    if claude and codex and claude.get("window_days") != codex.get("window_days"):
+        claude, codex = (claude, None) if later_half(claude, codex) == "claude" else (None, codex)
     by_half = {"claude": {row["name"]: row for row in (claude or {}).get("host") or [] if isinstance(row, dict) and isinstance(row.get("name"), str) and NAME.fullmatch(row["name"])},
                "codex": {row["name"]: row for row in (codex or {}).get("host") or [] if isinstance(row, dict) and isinstance(row.get("name"), str) and NAME.fullmatch(row["name"])}}
     names = list(by_half["claude"]) + [name for name in by_half["codex"] if name not in by_half["claude"]]
@@ -310,8 +347,8 @@ def merge_halves(claude, codex):
              **{field: row_field(by_half["codex"].get(name, {}), field) for field in CODEX_ROW_FIELDS}} for name in names] if names else None
     # Codex lanes first, as the single record emitted them before the split: the Fleet page reads only the first 200 lanes (tools/local-pages/fleet_data.py `_skill_usage`) and the Claude half alone
     # holds more than that (564 on 2026-10-13), so lanes appended after the Claude ones would never be shown.
-    lanes = [lane for source, client in ((codex, "codex"), (claude, "claude")) for lane in (source or {}).get("lanes") or []
-             if isinstance(lane, dict) and lane.get("client") == client]
+    lanes = [record for source, client in ((codex, "codex"), (claude, "claude")) for lane in (source or {}).get("lanes") or []
+             if isinstance(lane, dict) for record in (lane_record(lane, client),) if record is not None]
     stamps = [skill_usage.parse_iso(record["generated_at"]) for record in (claude, codex) if record and isinstance(record.get("generated_at"), str)]
     present = claude or codex
     measured = {"host": bool(claude and claude.get("measured", {}).get("host") is True), "codex": bool(codex and codex.get("measured", {}).get("codex") is True),
@@ -360,7 +397,7 @@ def refresh_combined(combined, own, other, wait=LOCK_WAIT):
         with refresh_lock(destination.with_name(destination.name + ".lock"), wait):
             try:
                 newest = json.loads(other.read_text()) if other else None
-            except (OSError, ValueError):
+            except Exception:  # noqa: BLE001 - a record that cannot be read, of whatever kind (text that is not JSON, nested beyond the decoder's limit), is an absent half
                 newest = None
             records = {own.get("half"): own}
             records.setdefault("claude" if own.get("half") == "codex" else "codex", newest)
@@ -389,6 +426,9 @@ def publish(path, report):
             os.unlink(temp)
 
 
+TMP_LAYOUT_MESSAGE = "the clone, the interpreter and node must be outside /tmp and /var/tmp, which the units' PrivateTmp=true replaces with directories of their own"
+
+
 def render_units(destination, repository, python, node):
     destination.mkdir(parents=True, exist_ok=True)
     values = {"@REPOSITORY@": str(repository), "@PYTHON@": str(python), "@NODE@": str(node)}
@@ -397,6 +437,8 @@ def render_units(destination, repository, python, node):
             raise ValueError("unit values must be absolute paths without unit quoting characters")
         if hidden_by_marker(value):
             raise LayoutRefused("the clone, the interpreter and node must be outside /srv, which the units' TemporaryFileSystem=/srv:ro hides from them")
+        if hidden_by_private_tmp(value):
+            raise LayoutRefused(TMP_LAYOUT_MESSAGE)
     for name in UNIT_FILES:
         text = (ROOT / "adoption/templates/systemd" / name).read_text()
         for key, value in values.items():
@@ -475,7 +517,7 @@ def main(argv=None):
     except Refused as error:
         print(f"daily skill usage refused: {error}", file=sys.stderr)
         return 2
-    except (OSError, ValueError, TypeError, AttributeError, KeyError, RecursionError, subprocess.SubprocessError):   # never the exception's text or a traceback: both name the account's home; RecursionError is what json.loads raises for a report file nested beyond the decoder's limit (see collect_half)
+    except Exception:  # noqa: BLE001 - never the exception's text or a traceback: both name the account's home. The handler was an enumeration (ValueError, then RecursionError for a report nested beyond the decoder's limit, then OverflowError for a --now whose conversion to UTC overflows: three reads of this boundary found three classes), so it is the class that is closed
         print("daily skill usage unavailable; inspect the native collector separately", file=sys.stderr)
         return 2
 

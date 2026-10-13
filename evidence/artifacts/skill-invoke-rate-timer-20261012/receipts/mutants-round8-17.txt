@@ -1,0 +1,20 @@
+The 17 mutants of the round-8 changes of #1043 (the three P2 of the local codex re-review of 0383243e, Astra's P1 of the read of the same head and the command center's route decision to close the class): parse_iso's ValueError for an out-of-range timestamp (let through, or with the timestamp in its text), the four handlers that catch Exception (each listing its exceptions again), the lanes rebuilt from the allowed fields (a lane, a skill, a lane name, a count crossing as it is), the window rule (not made, the Claude half always standing, the earlier record standing) and the layout rule (/var/tmp and /tmp not hidden, rendering not refusing, a link not followed). Each is one exact change in a scratch copy of the minimal tree, then the whole test module with GITHUB_ACTIONS=true; a mutant is killed when the run fails (the unmutated copy passes first).
+
+killed    skill_usage.py                     parse_iso lets the OverflowError through
+killed    skill_usage.py                     parse_iso puts the timestamp in the error's text
+killed    daily_skill_usage.py               collect_half lists its exceptions again
+killed    daily_skill_usage.py               main lists its exceptions again
+killed    daily_skill_usage.py               the stored record's reader lists its exceptions again
+killed    daily_skill_usage.py               half_record no longer treats an unusable time as an invalid record
+killed    daily_skill_usage.py               a lane crosses with its own fields
+killed    daily_skill_usage.py               a skill crosses with its own fields
+killed    daily_skill_usage.py               a lane name that is not a name crosses
+killed    daily_skill_usage.py               a count that is not a count crosses
+killed    daily_skill_usage.py               halves of different windows are merged
+killed    daily_skill_usage.py               the Claude half always stands
+killed    daily_skill_usage.py               the earlier record stands
+killed    daily_skill_usage.py               /var/tmp is not hidden
+killed    daily_skill_usage.py               /tmp is not hidden
+killed    daily_skill_usage.py               rendering does not refuse a path that PrivateTmp hides
+killed    daily_skill_usage.py               a link into a hidden directory is not followed
+17 mutants, 17 killed, 0 survived; unexpected: none

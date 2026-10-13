@@ -49,8 +49,8 @@ unconfined on the GitHub-hosted runner), unless the unit also carries a directiv
 each service carries `TemporaryFileSystem=/srv:ro` for that, so the manager stops the unit (status
 226/NAMESPACE) instead, and `PrivateUsers=true` does the same for the user namespace (217/USER). The program
 asks the file system nothing: the confinement is the manager's, and a run started any other way is not
-confined. The marker hides `/srv` from the unit, so rendering refuses a clone, an interpreter or node at or
-below it (review round 5 of the record). The refresh of
+confined. The marker hides `/srv` from the unit and `PrivateTmp=true` replaces `/tmp` and `/var/tmp`, so rendering refuses a
+clone, an interpreter or node at or below any of them (review rounds 5 and 8 of the record). The refresh of
 the combined record holds a lock, so two halves that finish together (both timers
 are `Persistent=true`) leave a record built from the newest record of each.
 Live scheduled collection, and rendering, refuse a clone that is not at a

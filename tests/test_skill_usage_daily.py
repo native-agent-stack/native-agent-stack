@@ -257,7 +257,8 @@ class DailyProjectionTests(unittest.TestCase):
             root = Path(temp)
             runtime = root / "runtime"
             runtime.mkdir(mode=0o700)
-            daily.render_units(root, ROOT, Path(sys.executable), Path(shutil.which("node")))
+            with mock.patch.object(daily, "hidden_by_private_tmp", return_value=False):   # systemd's parser is what is verified; a checkout in a temporary directory is refused by the layout rule, which has its own tests
+                daily.render_units(root, ROOT, Path(sys.executable), Path(shutil.which("node")))
             result = subprocess.run([shutil.which("systemd-analyze"), "--user", "--man=no", "verify", *[str(root / name) for name in daily.UNIT_FILES]],
                                     env={"HOME": str(root), "PATH": os.defpath, "XDG_RUNTIME_DIR": str(runtime)},
                                     capture_output=True, text=True, timeout=30)
@@ -502,6 +503,135 @@ class NativeReportShapeTests(unittest.TestCase):
                         self.assertNotIn(account, stream)
                         self.assertNotIn(home, stream)
                         self.assertNotIn(str(files), stream, "the path of the supplied file is not echoed")
+
+    FIXED_UNAVAILABLE = "daily skill usage unavailable; inspect the native collector separately\n"
+    FIXED_ARGUMENT = "daily skill usage refused: the command line has an argument this version does not take, or lacks one it needs; nothing was run\n"
+
+    def hostile_inputs(self):
+        """The inputs of the daily command line that another process or a person chooses, one entry per surface: (label, extra arguments, report text or None, report option, expected exit status or None for any,
+        expected stderr or None for 'only lines of the program's own'). The two --now values are the reviewers' (Astra's read of 0383243e, P1); the deeply nested arrays are the read of c56121e4."""
+        fixed, argument = self.FIXED_UNAVAILABLE, self.FIXED_ARGUMENT
+        deep, deep_objects, big_int = "[" * 10000 + "0" + "]" * 10000 + "\n", '{"a":' * 5000 + "0" + "}" * 5000, "1" + "0" * 5000
+        now = ["--now", NOW]
+        cases = [(f"--now {value!r}", ["--now", value], "{}", "--host-report", code, expected_stderr) for value, code, expected_stderr in (
+            ("0001-01-01T00:00:00+01:00", 2, fixed), ("9999-12-31T23:59:59-01:00", 2, fixed), ("2026-13-45T99:99:99", 2, fixed), ("tomorrow", 2, fixed), ("2026-10-12T10:00:00+25:00", 2, fixed),
+            ("2026-10-12", None, None), ("", None, None))]
+        cases += [(f"--window {value}", ["--window", value, *now], "{}", "--host-report", 2, expected) for value, expected in
+                  (("0", fixed), ("-1", fixed), ("367", fixed), ("99999999999999999999999999", fixed), ("x", argument))]
+        cases += [(f"--claude-timeout {value}", ["--claude-timeout", value, "--half", "claude", "--claude-root", "/fixture/root", *now], "{}", "--host-report", 2, fixed) for value in ("0", "-5", "3601", "99999999999999999999")]
+        for label, report in (("deeply nested arrays", deep), ("deeply nested objects", deep_objects), ("a big integer", '{"skills":[{"name":"gh-fix-ci","claude":{"uses":' + big_int + "}}]}"),
+                              ("infinity", '{"window_days": 1e999}'), ("NaN", '{"window_days": NaN}'), ("a long string", '{"kind":"' + "x" * 200_000 + '"}'), ("not JSON", "[\n"), ("empty", ""),
+                              ("a lone surrogate", '{"kind":"\\ud800"}')):
+            for option in ("--host-report", "--codex-lanes-report", "--claude-lanes-report"):
+                unreadable = label in ("deeply nested arrays", "a big integer", "not JSON", "empty")
+                cases.append((f"{option}: {label}", list(now), report, option, 2 if unreadable else None, fixed if unreadable else None))
+        return cases
+
+    def test_no_input_of_the_command_line_ends_in_a_traceback_or_names_the_account(self):
+        """The class, not the instance (the command center's route decision on #1043, 2026-10-13): three reads of this boundary found three exception classes that the handler's enumeration did not list
+        (ValueError, then RecursionError, then OverflowError). Every option and the three report options are driven with hostile values, from a copy of the program under the home directory, where a traceback names
+        the account: a refusal is the fixed line and exit 2, and nothing ends in a traceback."""
+        copy = self.copied_tool()
+        program = copy / "tools/skill-usage/daily_skill_usage.py"
+        account, home = getpass.getuser(), str(Path.home())
+        files = Path(tempfile.mkdtemp(prefix="skill-hostile-"))
+        self.addCleanup(shutil.rmtree, files, True)
+        report = files / "report.json"
+        cases = self.hostile_inputs()
+        self.assertEqual(len(cases), 43, "every surface of the list is driven")
+        for label, extra, text, option, code, expected_stderr in cases:
+            argv = [sys.executable, "-B", str(program), *extra]
+            if text is not None:
+                report.write_text(text, encoding="utf-8", errors="surrogatepass")
+                argv += [option, str(report)]
+            with self.subTest(case=label):
+                done = subprocess.run(argv, capture_output=True, text=True, timeout=120)
+                self.assertNotIn("Traceback", done.stderr)
+                for stream in (done.stdout, done.stderr):
+                    self.assertNotIn(account, stream)
+                    self.assertNotIn(home, stream)
+                    self.assertNotIn(str(files), stream)
+                if code is not None:
+                    self.assertEqual(done.returncode, code, done.stderr[:200])
+                if expected_stderr is not None:
+                    self.assertEqual(done.stderr, expected_stderr)
+                for line in done.stderr.splitlines():
+                    self.assertTrue(line.startswith("daily skill usage"), "only the program's own lines: " + line[:60])
+
+    def test_a_timestamp_whose_conversion_to_utc_overflows_is_a_fixed_diagnostic_and_a_value_error(self):
+        """Astra's read of 0383243e (P1): datetime.astimezone subtracts the offset and raises OverflowError for 0001-01-01T00:00:00+01:00 and 9999-12-31T23:59:59-01:00 (python/cpython@cbc944f4bc59639a444dd971c737788ba2283a91
+        Modules/_datetimemodule.c L6510-L6515 and L805-L808; Lib/_pydatetime.py L2034 and L2230). parse_iso reports it as the ValueError of any unusable timestamp, with no value in its text."""
+        for value in ("0001-01-01T00:00:00+01:00", "9999-12-31T23:59:59-01:00", "0001-01-01T00:00:00+23:59", "9999-12-31T23:59:59.999999-23:59"):
+            with self.subTest(value=value):
+                with self.assertRaises(ValueError) as caught:
+                    usage.parse_iso(value)
+                self.assertNotIsInstance(caught.exception, OverflowError)
+                self.assertNotIn(value[:10], str(caught.exception), "the text of the error holds no part of the argument")
+        for value in ("2026-10-12T10:00:00Z", "2026-10-12T10:00:00+00:00", "0001-01-01T00:00:00+00:00", "9999-12-31T23:59:59-00:00", "0001-01-01T00:00:00", "9999-12-31T23:59:59"):
+            with self.subTest(still_valid=value):
+                self.assertIsNotNone(usage.parse_iso(value))
+        daily = daily_module()
+        errors = io.StringIO()
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(errors):
+            code = daily.main(["--host-report", "/dev/null", "--now", "0001-01-01T00:00:00+01:00"])
+        self.assertEqual((code, errors.getvalue()), (2, self.FIXED_UNAVAILABLE))
+
+    def test_a_stored_half_whose_time_is_out_of_range_is_an_invalid_record(self):
+        daily = daily_module()
+        for stamp in ("0001-01-01T00:00:00+01:00", "9999-12-31T23:59:59-01:00"):
+            record = projected("codex")
+            record["generated_at"] = stamp
+            with self.subTest(stamp=stamp):
+                self.assertIsNone(daily.half_record(record, "codex"))
+                merged = daily.merge_halves(projected("claude"), record)
+                self.assertEqual(merged["measured"], {"host": True, "codex": False, "claude": True})
+                self.assertIsNone(merged["halves"]["codex"])
+
+    def test_an_exception_nobody_listed_is_the_fixed_diagnostic_at_both_boundaries(self):
+        """The handlers were enumerations. Any Exception a collaborator raises, of any class, is the fixed line without its text and a traceback (main) or an unmeasured slot (collect_half)."""
+        daily = daily_module()
+
+        class Unforeseen(Exception):
+            pass
+        out = Path(tempfile.mkdtemp(prefix="skill-unforeseen-")) / "never.json"
+        self.addCleanup(shutil.rmtree, out.parent, True)
+        for error in (Unforeseen("SENTINEL-TEXT"), RuntimeError("SENTINEL-TEXT"), OverflowError("SENTINEL-TEXT"), ZeroDivisionError("SENTINEL-TEXT"), UnicodeEncodeError("ascii", "x", 0, 1, "SENTINEL-TEXT"),
+                      MemoryError("SENTINEL-TEXT"), RecursionError("SENTINEL-TEXT")):
+            errors = io.StringIO()
+            with self.subTest(error=type(error).__name__), mock.patch.object(daily, "require_reviewed_main"), mock.patch.object(daily, "collect_half", return_value=claude_reports()), \
+                    mock.patch.object(daily, "project_reports", side_effect=error), contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(errors):
+                code = daily.main(["--half", "claude", "--claude-root", "/fixture/root", "--now", NOW, "--out", str(out)])
+            self.assertEqual((code, errors.getvalue()), (2, self.FIXED_UNAVAILABLE))
+            self.assertFalse(out.exists())
+        now = usage.parse_iso("2026-10-12T10:00:00Z")
+        host, _, lanes = claude_reports()
+        for error in (Unforeseen("SENTINEL-TEXT"), RuntimeError("SENTINEL-TEXT"), OverflowError("SENTINEL-TEXT"), KeyError("SENTINEL-TEXT")):
+            calls = []
+
+            def runner(command, **kwargs):
+                calls.append(command)
+                if len(calls) == 1:
+                    raise error
+                return subprocess.CompletedProcess(command, 0, json.dumps(lanes), "")
+            with self.subTest(collect_half_error=type(error).__name__):
+                reports = daily.collect_half("claude", [Path("/fixture/claude")], window=7, now=now, runner=runner)
+                self.assertEqual(len(calls), 2, "the second command still runs")
+                self.assertIsNone(reports[0], "the slot of the command that raised is unmeasured")
+                self.assertIsInstance(reports[2], dict, "the other command's report is kept")
+
+    def test_a_stored_other_record_nested_beyond_the_decoders_limit_is_an_absent_half_not_a_failed_refresh(self):
+        """The follow-up that round 7 recorded, closed with the class: a stored record that cannot be read, of whatever kind, is an absent half and the combined record is published, as for text that is not JSON."""
+        daily = daily_module()
+        with tempfile.TemporaryDirectory() as temp:
+            directory = Path(temp)
+            stored = directory / "codex.json"
+            for label, content in (("nested arrays", "[" * 10000 + "0" + "]" * 10000), ("nested objects", '{"a":' * 5000 + "0" + "}" * 5000), ("text that is not JSON", "[\n")):
+                stored.write_text(content)
+                combined = directory / "combined.json"
+                combined.unlink(missing_ok=True)
+                with self.subTest(record=label):
+                    self.assertTrue(daily.refresh_combined(combined, projected("claude"), stored))
+                    self.assertEqual(json.loads(combined.read_text())["measured"], {"host": True, "codex": False, "claude": True})
 
     def test_a_native_output_nested_beyond_the_decoders_limit_leaves_only_its_own_slot_unmeasured(self):
         """The same defect at the other place a report is decoded: `collect_half` read each native command's output with `json.loads` and caught ValueError, so the deep output of one command raised out of the
@@ -819,6 +949,77 @@ class OtherRecordTests(unittest.TestCase):
         self.assertIsNone(rows["typesafe-ai"]["codex_use"])
         self.assertEqual(merged["zero_use"]["codex"], [], "a boolean is not a count of zero")
 
+    def test_a_stored_half_cannot_carry_extra_fields_into_the_combined_record(self):
+        """The local codex re-review of 0383243e (P2): a stored half is a file another process wrote, and its lanes were copied whole, so a `prompt` or a `path` in a lane or a skill, and counts that are not
+        counts, reached the published combined record, which is names and counts only. Lanes and skills are rebuilt from the fields the projection writes."""
+        daily = daily_module()
+        codex, claude = projected("codex"), projected("claude")
+        for record, client in ((codex, "codex"), (claude, "claude")):
+            lane = record["lanes"][0]
+            lane.update(prompt="MARKER-PROMPT", path="/fixture/transcript.jsonl", extra={"text": "MARKER-NESTED"})
+            lane["skills"][0].update(prompt="MARKER-SKILL-PROMPT", path="/fixture/skill", count="many")
+            lane["skills"] += [{"name": "x y", "count": 1, "text": "MARKER-NOT-A-NAME"}, "not an object"]
+            record["lanes"] += [{"client": client, "lane": "MARKER lane name!", "skills": []}, {"client": client, "lane": "no-skills", "skills": "MARKER-TEXT"}, {"client": "other", "lane": "foreign", "skills": []}]
+        merged = daily.merge_halves(claude, codex)
+        published = json.dumps(merged)
+        for marker in ("MARKER", "/fixture/transcript.jsonl", "/fixture/skill", "no-skills", "foreign"):
+            self.assertNotIn(marker, published)
+        self.assertTrue(merged["lanes"])
+        for lane in merged["lanes"]:
+            self.assertEqual(sorted(lane), ["client", "lane", "metric", "skills"])
+            self.assertEqual(lane["metric"], "use" if lane["client"] == "codex" else "skill_calls")
+            for skill in lane["skills"]:
+                self.assertLessEqual(set(skill), {"name", "count", "raw_reads"})
+                self.assertTrue(skill["count"] is None or (isinstance(skill["count"], int) and not isinstance(skill["count"], bool) and skill["count"] >= 0))
+        self.assertIsNone([lane for lane in merged["lanes"] if lane["client"] == "codex"][0]["skills"][0]["count"], "a count that is not a count is unknown")
+        self.assertEqual(daily.merge_halves(projected("claude"), projected("codex"))["lanes"], projected("codex")["lanes"] + projected("claude")["lanes"], "a record the halves write themselves crosses unchanged")
+
+    def test_a_stored_half_with_extra_fields_publishes_a_counts_only_combined_file(self):
+        daily = daily_module()
+        with tempfile.TemporaryDirectory() as temp:
+            directory = Path(temp)
+            stored = projected("codex")
+            stored["lanes"][0].update(prompt="MARKER-PROMPT")
+            (directory / "codex.json").write_text(json.dumps(stored))
+            self.assertTrue(daily.refresh_combined(directory / "combined.json", projected("claude"), directory / "codex.json"))
+            published = (directory / "combined.json").read_text()
+            self.assertNotIn("MARKER-PROMPT", published)
+            self.assertEqual(json.loads(published)["measured"], {"host": True, "codex": True, "claude": True})
+
+    def test_halves_of_different_windows_are_never_merged_under_one_window(self):
+        """The local codex re-review of 0383243e (P2): the combined record has one `window_days`, which the Fleet page uses to label every windowed count, and it took the Claude half's, so a Codex run of
+        `--window 30` beside a stored Claude half of 7 days published 30-day counts as seven-day counts. The later record stands and the other half is absent, unmeasured."""
+        daily = daily_module()
+        for label, claude_window, codex_window, claude_at, codex_at, expected in (
+                ("a later Codex half of 30 beside a Claude half of 7", 7, 30, "2026-10-12T10:00:00+00:00", "2026-10-12T10:05:00+00:00", (30, {"host": False, "codex": True, "claude": False})),
+                ("a later Claude half of 7 beside a Codex half of 30", 7, 30, "2026-10-12T10:05:00+00:00", "2026-10-12T10:00:00+00:00", (7, {"host": True, "codex": False, "claude": True})),
+                ("the same window", 30, 30, "2026-10-12T10:05:00+00:00", "2026-10-12T10:00:00+00:00", (30, {"host": True, "codex": True, "claude": True})),
+                ("no window on the Claude half", None, 7, "2026-10-12T10:00:00+00:00", "2026-10-12T10:05:00+00:00", (7, {"host": False, "codex": True, "claude": False})),
+                ("the same time", 7, 30, "2026-10-12T10:00:00+00:00", "2026-10-12T10:00:00+00:00", (7, {"host": True, "codex": False, "claude": True}))):
+            claude, codex = projected("claude"), projected("codex")
+            claude.update(window_days=claude_window, generated_at=claude_at)
+            codex.update(window_days=codex_window, generated_at=codex_at)
+            with self.subTest(case=label):
+                merged = daily.merge_halves(claude, codex)
+                self.assertEqual((merged["window_days"], merged["measured"]), expected)
+                dropped = "codex" if expected[1]["codex"] is False else "claude" if expected[1]["claude"] is False else None
+                if dropped:
+                    self.assertIsNone(merged["halves"][dropped])
+                    self.assertFalse([lane for lane in merged["lanes"] or [] if lane["client"] == dropped], "nothing of the dropped half crosses")
+
+    def test_a_refresh_does_not_merge_a_stored_half_of_another_window(self):
+        daily = daily_module()
+        with tempfile.TemporaryDirectory() as temp:
+            directory = Path(temp)
+            stored = projected("claude")
+            stored.update(window_days=7, generated_at="2026-10-12T09:00:00+00:00")
+            (directory / "claude.json").write_text(json.dumps(stored))
+            own = projected("codex")
+            own.update(window_days=30, generated_at="2026-10-12T10:00:00+00:00")
+            self.assertTrue(daily.refresh_combined(directory / "combined.json", own, directory / "claude.json"))
+            published = json.loads((directory / "combined.json").read_text())
+            self.assertEqual((published["window_days"], published["measured"]), (30, {"host": False, "codex": True, "claude": False}), "the half just written stands; the stored one is another window")
+
     def test_a_malformed_other_record_leaves_the_halfs_exit_status_and_prints_no_traceback(self):
         for name, record in self.malformed().items():
             with self.subTest(record=name), tempfile.TemporaryDirectory() as temp:
@@ -942,6 +1143,7 @@ SANDBOX_KEYS = ("ProtectSystem", "ProtectHome", "ReadWritePaths", "PrivateTmp", 
 MARKER = "/srv:ro"
 ARGUMENT_REFUSAL_LINE = "daily skill usage refused: the command line has an argument this version does not take, or lacks one it needs; nothing was run\n"
 LAYOUT_MESSAGE = "the clone, the interpreter and node must be outside /srv, which the units' TemporaryFileSystem=/srv:ro hides from them"
+TMP_LAYOUT_MESSAGE = "the clone, the interpreter and node must be outside /tmp and /var/tmp, which the units' PrivateTmp=true replaces with directories of their own"
 
 
 def service_section(text):
@@ -1037,6 +1239,42 @@ class ServiceSandboxTests(unittest.TestCase):
             for fine in ("/serve/clone", "/srvx/clone", "/fixture/dir/srv/clone", "/fixture/srv"):
                 with self.subTest(allowed=fine):
                     daily.render_units(Path(temp) / "ok", Path(fine), Path(sys.executable), Path("/fixture/bin/node"))
+
+    def test_rendering_refuses_a_path_that_private_tmp_hides(self):
+        """The local codex re-review of 0383243e (P2): the check excluded only /srv, but both services enable PrivateTmp=true, which gives them a /tmp and a /var/tmp of their own (systemd/systemd@b3d8fc43e9cb
+        man/systemd.exec.xml L1865-L1870), so a clone, an interpreter or a node under those directories rendered and the units failed on every run."""
+        daily = daily_module()
+        with tempfile.TemporaryDirectory() as temp:
+            cases = (("the clone in /tmp", dict(repository="/tmp/clone")), ("the clone in /var/tmp", dict(repository="/var/tmp/clone")), ("the clone below a doubled slash", dict(repository="//tmp/clone")),
+                     ("the clone through dot-dot", dict(repository="/fixture/../var/tmp/clone")), ("the interpreter", dict(python="/tmp/venv/bin/python3")), ("node", dict(node="/var/tmp/tools/node")),
+                     ("the directory itself", dict(repository="/tmp")))
+            for label, override in cases:
+                values = dict(repository="/fixture/live", python=sys.executable, node="/fixture/bin/node") | override
+                with self.subTest(case=label):
+                    with self.assertRaises(daily.LayoutRefused) as caught:
+                        daily.render_units(Path(temp) / "units", Path(values["repository"]), Path(values["python"]), Path(values["node"]))
+                    self.assertEqual(str(caught.exception), TMP_LAYOUT_MESSAGE, "the message is fixed text and names no path")
+            for fine in ("/tmpx/clone", "/var/tmpfile/x", "/var/lib/tmp/x", "/fixture/tmp/clone", "/fixture/var/tmp"):
+                with self.subTest(allowed=fine):
+                    daily.render_units(Path(temp) / "ok", Path(fine), Path(sys.executable), Path("/fixture/bin/node"))
+
+    def test_a_path_that_resolves_into_a_hidden_directory_is_hidden_whatever_its_own_name(self):
+        """A link is judged by where it leads, for both directories the units hide (the resolution is made up here, so that the test does not depend on where the checkout lives)."""
+        daily = daily_module()
+        with mock.patch.object(daily.os.path, "realpath", return_value="/var/tmp/tools/node"):
+            self.assertTrue(daily.hidden_by_private_tmp("/fixture/node-link"))
+            self.assertFalse(daily.hidden_by_marker("/fixture/node-link"))
+        with mock.patch.object(daily.os.path, "realpath", return_value="/srv/tools/node"):
+            self.assertTrue(daily.hidden_by_marker("/fixture/node-link"))
+            self.assertFalse(daily.hidden_by_private_tmp("/fixture/node-link"))
+        self.assertFalse(daily.hidden_by_private_tmp("/fixture/bin/node"))
+
+    def test_the_command_line_refuses_to_render_for_a_path_that_private_tmp_hides(self):
+        daily = daily_module()
+        with tempfile.TemporaryDirectory() as temp, mock.patch.object(daily, "require_reviewed_main"), contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()) as errors:
+            code = daily.main(["--render-units", str(Path(temp) / "units"), "--repository", "/var/tmp/clone", "--node", sys.executable])
+        self.assertEqual(code, 2)
+        self.assertEqual(errors.getvalue(), f"daily skill usage refused: {TMP_LAYOUT_MESSAGE}\n")
 
     def test_the_command_line_refuses_to_render_for_a_path_that_the_marker_hides(self):
         daily = daily_module()
@@ -1862,14 +2100,16 @@ class ReviewedMainCloneTests(unittest.TestCase):
         destination = self.root / "units"
         argv = ["--render-units", str(destination), "--repository", str(self.clone), "--python", python, "--node", python]
         self.git("switch", "-q", "--detach", "origin/main", cwd=self.clone)
-        self.assertEqual(daily.main(argv), 0)
-        for name in daily.UNIT_FILES:
-            self.assertIn(str(self.clone) if name.endswith(".service") else "OnCalendar", (destination / name).read_text())
-        shutil.rmtree(destination)
-        self.git("switch", "-q", "-c", "feature", cwd=self.clone)
-        self.commit_in_clone()
-        with contextlib.redirect_stderr(io.StringIO()) as errors:
-            self.assertEqual(daily.main(argv), 2)
+        # the fixture clone is in a temporary directory, which the layout rule refuses (PrivateTmp=true hides it from the service): this test is about which clones are accepted, the rule has its own
+        with mock.patch.object(daily, "hidden_by_private_tmp", return_value=False):
+            self.assertEqual(daily.main(argv), 0)
+            for name in daily.UNIT_FILES:
+                self.assertIn(str(self.clone) if name.endswith(".service") else "OnCalendar", (destination / name).read_text())
+            shutil.rmtree(destination)
+            self.git("switch", "-q", "-c", "feature", cwd=self.clone)
+            self.commit_in_clone()
+            with contextlib.redirect_stderr(io.StringIO()) as errors:
+                self.assertEqual(daily.main(argv), 2)
         self.assertFalse(destination.exists(), "nothing is rendered for a clone that the run would refuse every day")
         self.assertIn("not at a commit of origin/main", errors.getvalue())
 

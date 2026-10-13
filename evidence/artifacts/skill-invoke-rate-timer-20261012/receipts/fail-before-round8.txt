@@ -1,0 +1,27 @@
+Round 8 of #1043 (the three P2 of the local codex re-review of 0383243e: lanes rebuilt from allowed fields, halves of different windows, paths hidden by PrivateTmp; Astra's P1 of the read of the same head: an OverflowError from --now; and the command center's route decision of 2026-10-13: close the class, with a corpus of hostile inputs over every option) against the sources of 0383243e. A test is listed once, with the number of its failing subtests and the first message (GITHUB_ACTIONS=true).
+
+== 0383243e, the head that was read (its sources, this test module): Ran 103, FAILED (failures=18, errors=12)
+   DailyProjectionTests.test_native_user_unit_verification_needs_no_session_or_install: 1 failing | <module 'daily_skill_usage' from '/var/tmp/ccnp-tests/skillrec-r8-old/tools/skill-usage/daily_skill_
+   NativeReportShapeTests.test_a_stored_half_whose_time_is_out_of_range_is_an_invalid_record: 2 failing, e.g. stamp='0001-01-01T00:00:00+01:00' | date value out of range
+   NativeReportShapeTests.test_a_stored_other_record_nested_beyond_the_decoders_limit_is_an_absent_half_not_a_failed_refresh: 1 failing, e.g. record='nested arrays' | False is not true
+   NativeReportShapeTests.test_a_timestamp_whose_conversion_to_utc_overflows_is_a_fixed_diagnostic_and_a_value_error: 5 failing, e.g. value='0001-01-01T00:00:00+01:00' | date value out of range
+   NativeReportShapeTests.test_an_exception_nobody_listed_is_the_fixed_diagnostic_at_both_boundaries: 2 failing, e.g. error='Unforeseen'
+   NativeReportShapeTests.test_no_input_of_the_command_line_ends_in_a_traceback_or_names_the_account: 2 failing, e.g. case="--now '0001-01-01T00:00:00+01:00'" | 'Traceback' unexpectedly found in 'Traceback (most recent call last):\n  File "<home>/.skill-shape-f
+   OtherRecordTests.test_a_refresh_does_not_merge_a_stored_half_of_another_window: 1 failing | Tuples differ: (7, {'claude': True, 'codex': True, 'host': True}) != (30, {'host': False, 'codex': T
+   OtherRecordTests.test_a_stored_half_cannot_carry_extra_fields_into_the_combined_record: 1 failing | 'MARKER' unexpectedly found in '{"schema": "skill-invoke-rate-daily/1", "half": "all", "generated_at
+   OtherRecordTests.test_a_stored_half_with_extra_fields_publishes_a_counts_only_combined_file: 1 failing | 'MARKER-PROMPT' unexpectedly found in '{\n  "codex_bulk_scan_limit": null,\n  "generated_at": "2026-
+   OtherRecordTests.test_halves_of_different_windows_are_never_merged_under_one_window: 4 failing, e.g. case='a later Codex half of 30 beside a Claude half of 7' | Tuples differ: (7, {'host': True, 'codex': True, 'claude': True}) != (30, {'host': False, 'codex': T
+   ReviewedMainCloneTests.test_the_units_are_rendered_only_for_a_clone_the_run_accepts: 1 failing | <module 'daily_skill_usage' from '/var/tmp/ccnp-tests/skillrec-r8-old/tools/skill-usage/daily_skill_
+   ServiceSandboxTests.test_a_path_that_resolves_into_a_hidden_directory_is_hidden_whatever_its_own_name: 1 failing | module 'daily_skill_usage' has no attribute 'hidden_by_private_tmp'
+   ServiceSandboxTests.test_rendering_refuses_a_path_that_private_tmp_hides: 7 failing, e.g. case='the clone in /tmp' | LayoutRefused not raised
+   ServiceSandboxTests.test_the_command_line_refuses_to_render_for_a_path_that_private_tmp_hides: 1 failing | 0 != 2
+== this head: Ran 103, OK
+== the reviewer's command (Astra's read of 0383243e, P1): --host-report /dev/null --now <value>
+   --now 0001-01-01T00:00:00+01:00 at 0383243e: rc 1, stdout 0 bytes, Traceback present, the account name 0 times; last stderr line: OverflowError: date value out of range
+   --now 0001-01-01T00:00:00+01:00 at this head: rc 2, stdout 0 bytes, Traceback absent, the account name 0 times; last stderr line: daily skill usage unavailable; inspect the native collector separately
+   --now 9999-12-31T23:59:59-01:00 at 0383243e: rc 1, stdout 0 bytes, Traceback present, the account name 0 times; last stderr line: OverflowError: date value out of range
+   --now 9999-12-31T23:59:59-01:00 at this head: rc 2, stdout 0 bytes, Traceback absent, the account name 0 times; last stderr line: daily skill usage unavailable; inspect the native collector separately
+   --now 2026-10-12T10:00:00+00:00 at 0383243e: rc 2, stdout 0 bytes, Traceback absent, the account name 0 times; last stderr line: daily skill usage unavailable; inspect the native collector separately
+   --now 2026-10-12T10:00:00+00:00 at this head: rc 2, stdout 0 bytes, Traceback absent, the account name 0 times; last stderr line: daily skill usage unavailable; inspect the native collector separately
+
+Tests that fail or raise on 0383243e: 14. Two of them, DailyProjectionTests.test_native_user_unit_verification_needs_no_session_or_install and ReviewedMainCloneTests.test_the_units_are_rendered_only_for_a_clone_the_run_accepts, fail there only because they patch hidden_by_private_tmp, which the old program lacks (their fixture paths are in a temporary directory, which the new layout rule refuses): they hold the old behavior at both heads and are not claims of this round. The tests that hold at both heads are the guards (controls: a valid empty report, ordinary malformed text, a record the halves write themselves, the clean window, a path that merely resembles a hidden directory).
