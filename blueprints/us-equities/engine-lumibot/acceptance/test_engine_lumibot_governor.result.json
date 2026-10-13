@@ -64,6 +64,9 @@
     "test_engine_lumibot_governor.RestageAdditions.test_E7b_an_unreadable_order_list_after_a_restart_fails_closed",
     "test_engine_lumibot_governor.RestageAdditions.test_E7c_open_order_ownership_requires_both_prefix_and_journal_submission",
     "test_engine_lumibot_governor.RestageAdditions.test_E8_a_failed_cancel_wedges_the_arm_only_while_its_order_is_outstanding",
+    "test_engine_lumibot_governor.ReviewRecovery.test_J10_concurrent_refusals_reopen_with_distinct_sequences",
+    "test_engine_lumibot_governor.ReviewRecovery.test_J11_journal_parent_directory_sync_precedes_admission",
+    "test_engine_lumibot_governor.ReviewRecovery.test_J12_directory_sync_failure_refuses_and_releases_lock",
     "test_engine_lumibot_governor.ReviewRecovery.test_J8_nonmapping_journal_refuses_and_repaired_open_succeeds",
     "test_engine_lumibot_governor.ReviewRecovery.test_J9_every_failed_initialization_releases_writer_lock",
     "test_engine_lumibot_governor.ReviewRecovery.test_J7_malformed_final_prices_are_journaled_before_refusal",
@@ -74,6 +77,6 @@
     "test_engine_lumibot_governor.ReviewRecovery.test_J6_runtime_pins_and_package_sources_are_required",
     "test_engine_lumibot_governor.ReviewRecovery.test_J5_export_refuses_a_different_acceptance_runtime"
   ],
-  "tests": 58,
-  "wall_seconds": "7.617"
+  "tests": 61,
+  "wall_seconds": "7.185"
 }

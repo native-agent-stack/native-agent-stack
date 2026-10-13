@@ -633,6 +633,77 @@ class RestageAdditions(CoreCase):
 
 
 class ReviewRecovery(CoreCase):
+    def test_J10_concurrent_refusals_reopen_with_distinct_sequences(self):
+        import threading
+        import governor
+        class ObservedLock:
+            def __init__(self):self.actual=threading.RLock();self.local=threading.local()
+            def __enter__(self):
+                self.actual.acquire();self.local.depth=getattr(self.local,"depth",0)+1
+                return self
+            def __exit__(self,*args):self.local.depth-=1;self.actual.release()
+            def owned(self):return bool(getattr(self.local,"depth",0))
+        lock=ObservedLock();self.gov.lock=lock
+        barrier=threading.Barrier(2);real_encode=governor.encode
+        def simultaneous_unlocked_rows(row):
+            raw=real_encode(row)
+            if row.get("event")=="refusal" and not lock.owned():
+                barrier.wait(timeout=5)
+            return raw
+        failures=[]
+        def refuse(code):
+            try:self.gov.reject(code)
+            except GuardRefusal as error:
+                if str(error)!=code:failures.append(type(error).__name__)
+            except BaseException as error:failures.append(type(error).__name__)
+            else:failures.append("missing_refusal")
+        with patch("governor.encode",side_effect=simultaneous_unlocked_rows):
+            threads=[threading.Thread(target=refuse,args=(code,)) for code in ("left","right")]
+            for thread in threads:thread.start()
+            for thread in threads:thread.join(timeout=10)
+        self.assertFalse(any(thread.is_alive() for thread in threads))
+        self.assertFalse(failures)
+        path=self.journal.path;self.journal.close()
+        try:self.journal=Journal(path)
+        except GuardRefusal as error:
+            self.journal=Journal(self.root/"cleanup-only.jsonl")
+            self.fail(f"concurrent refusal chain must reopen: {error}")
+        self.assertEqual(len(self.journal.rows),2)
+        self.assertEqual([row["sequence"] for row in self.journal.rows],[1,2])
+        self.assertEqual({row["reason"] for row in self.journal.rows},{"left","right"})
+
+    def test_J11_journal_parent_directory_sync_precedes_admission(self):
+        import stat
+        calls=[];real_sync=os.fsync
+        def observe(fd):
+            calls.append("directory" if stat.S_ISDIR(os.fstat(fd).st_mode) else "file")
+            return real_sync(fd)
+        with patch("governor.os.fsync",side_effect=observe):
+            journal=Journal(self.root/"created-durably.jsonl")
+            try:
+                self.assertIn("directory",calls)
+                journal.append({"event":"synthetic_first_admission"})
+                self.assertEqual(calls[0],"directory")
+                self.assertIn("file",calls[1:])
+            finally:journal.close()
+
+    def test_J12_directory_sync_failure_refuses_and_releases_lock(self):
+        import stat
+        path=self.root/"directory-sync-failure.jsonl"
+        real_sync=os.fsync;opened=[]
+        def failing_sync(fd):
+            if stat.S_ISDIR(os.fstat(fd).st_mode):raise OSError("synthetic_directory_sync")
+            return real_sync(fd)
+        try:
+            with patch("governor.os.fsync",side_effect=failing_sync):
+                with self.assertRaisesRegex(GuardRefusal,"^journal$"):
+                    opened.append(Journal(path))
+        finally:
+            for journal in opened:journal.close()
+        recovered=Journal(path)
+        try:recovered.append({"event":"synthetic_recovered_init"})
+        finally:recovered.close()
+
     def check_refused_journal_reopens(self,raw,error_type=GuardRefusal,decode_error=None):
         path=self.root/"repairable.jsonl"
         path.write_bytes(raw);path.chmod(0o600)

@@ -108,7 +108,10 @@ MUTANTS += [
  ("native_strategy_identity", "stock_only_alpaca.py", 'Order(strategy, Asset(decision.symbol', 'Order("closed-inbox", Asset(decision.symbol', 'test_A1_closed_inbox_native_strategy_routes_only_governor_decision'),
  ("journal_row_mapping", "governor.py", 'if not isinstance(row, Mapping):', 'if False:', 'test_J8_nonmapping_journal_refuses_and_repaired_open_succeeds'),
  ("journal_init_cleanup", "governor.py", 'if not initialized and hasattr(self, "fd"):', 'if False:', 'test_J9_every_failed_initialization_releases_writer_lock'),
+ ("refusal_serialization_pair", "governor.py", 'def record(self, event, **fields):\n        with self.lock:\n            self.journal.append(dict(event=event, caps_sha256=self.caps_hash, **fields))', 'def record(self, event, **fields):\n        self.journal.append(dict(event=event, caps_sha256=self.caps_hash, **fields))', 'test_J10_concurrent_refusals_reopen_with_distinct_sequences'),
+ ("journal_directory_sync", "governor.py", 'os.fsync(parent_fd)', 'pass', 'test_J11_journal_parent_directory_sync_precedes_admission'),
 ]
+EXTRA_SITES["refusal_serialization_pair"]=[("governor.py",'def reject(self, code):\n        with self.lock:\n            self.refuse(code)\n            raise GuardRefusal(code)', 'def reject(self, code):\n        self.refuse(code)\n        raise GuardRefusal(code)')]
 MUTANTS += [("seam_"+name,"stock_only_alpaca.py",name+" = _deny",
              name+" = lambda self, *a, **k: None","test_A2_each_committed_seam_override_independently")
             for name in ("_submit_orders","_submit_multileg_order","_modify_order",

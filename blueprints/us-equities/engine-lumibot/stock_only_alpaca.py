@@ -92,7 +92,8 @@ def load_classes():
             return super()._create_trading_client()
 
         def _deny(self, *args, **kwargs):
-            self.governor.reject("broker_seam")
+            with self.governor.lock:
+                self.governor.reject("broker_seam")
 
         _submit_orders = _deny
         _submit_multileg_order = _deny

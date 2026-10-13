@@ -120,6 +120,13 @@ class Journal:
                 raise GuardRefusal("journal_lock_platform")
             import fcntl
             fcntl.flock(self.fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            # Sync even an existing entry: a previous failed creation attempt
+            # may have left it present without confirming directory durability.
+            parent_fd = os.open(self.path.parent, os.O_RDONLY | os.O_DIRECTORY)
+            try:
+                os.fsync(parent_fd)
+            finally:
+                os.close(parent_fd)
             with os.fdopen(self.fd, "rb", closefd=False) as stream:
                 raw = stream.read()
             self.rows, self.previous = [], "0" * 64
@@ -219,15 +226,17 @@ class Governor:
             raise GuardRefusal("caps")
 
     def record(self, event, **fields):
-        self.journal.append(dict(event=event, caps_sha256=self.caps_hash, **fields))
+        with self.lock:
+            self.journal.append(dict(event=event, caps_sha256=self.caps_hash, **fields))
 
     def refuse(self, code):
         self.record("refusal", reason=code)
         return Refusal(code)
 
     def reject(self, code):
-        self.refuse(code)
-        raise GuardRefusal(code)
+        with self.lock:
+            self.refuse(code)
+            raise GuardRefusal(code)
 
     def _time(self, now):
         if type(now) is not int or now < 0 or now < self.last_now:

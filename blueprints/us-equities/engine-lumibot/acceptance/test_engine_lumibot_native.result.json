@@ -30,5 +30,5 @@
     "test_engine_lumibot_native.NativeCase.test_A7_audit_guard_blocks_second_sdk_and_secret_open"
   ],
   "tests": 13,
-  "wall_seconds": "2.147"
+  "wall_seconds": "4.969"
 }
