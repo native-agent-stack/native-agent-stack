@@ -19098,8 +19098,8 @@
     },
     {
       "path": "docs/decisions/2026-10-13-claude-agent-drift-check.md",
-      "sha256": "27165e93b1525950740127b3b963d0b4b98e34cc4a4132a050c8b3b0de64ec09",
-      "bytes": 29227
+      "sha256": "2cca198d600da49542b967570fa1c87462d867e69823cda97a5ed5f1672396f5",
+      "bytes": 30340
     },
     {
       "path": "docs/decisions/2026-10-13-lane-a-frozen-field-continuity.md",
