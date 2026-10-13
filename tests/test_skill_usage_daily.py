@@ -271,6 +271,13 @@ FLEET.loader.exec_module(fleet_data)
 NOW = "2026-10-12T10:00:00+00:00"
 
 
+def deep_report():
+    """The input of Astra's read of c56121e4 (P1): one valid JSON value, 10,000 arrays nested around a 0, and a newline (20,002 bytes). `json.loads` raises RecursionError for it, which is neither a ValueError nor an
+    OSError: the C scanner enters the recursion guard for every object and array it opens and propagates its error, and the Python decoder translates only StopIteration (python/cpython@cbc944f4bc59639a444dd971c737788ba2283a91,
+    Modules/_json.c L1031-L1046, Lib/json/decoder.py L360-L363)."""
+    return "[" * 10000 + "0" + "]" * 10000 + "\n"
+
+
 def claude_reports():
     host = {"kind": "skill_invoke_rate_report", "claude": {"measured": True}, "codex": {"measured": False, "roots_count": 0, "files_scanned": 0},
             "skills": [{"name": "gh-fix-ci", "claude": {"uses": 2}, "codex": {}}, {"name": "typesafe-ai", "claude": {"uses": 0}, "codex": {}}], "codex_use_groups": {}}
@@ -467,6 +474,62 @@ class NativeReportShapeTests(unittest.TestCase):
                 code = daily.main(["--half", "claude", "--claude-root", "/fixture/root", "--now", NOW, "--out", str(out)])
             self.assertEqual((code, errors.getvalue()), (2, "daily skill usage unavailable; inspect the native collector separately\n"))
             self.assertFalse(out.exists(), "nothing was published")
+
+    def test_a_report_file_nested_beyond_the_decoders_limit_is_a_fixed_diagnostic_and_names_nothing(self):
+        """Astra's read of c56121e4 (P1): the handler of `main` listed ValueError and OSError, and the decoder's RecursionError is neither, so `--host-report` of a 20,002-byte file ended in a traceback with six
+        occurrences of the account's name. The same fixed line as any other report the program cannot read, whichever of the three report options carries the file; a valid empty report and an ordinary malformed
+        one are the controls."""
+        deep = deep_report()
+        with self.assertRaises(RecursionError):
+            json.loads(deep)   # the fixture is deeper than this interpreter's limit; an interpreter that decodes it needs a deeper one
+        copy = self.copied_tool()
+        daily_path = copy / "tools/skill-usage/daily_skill_usage.py"
+        account, home = getpass.getuser(), str(Path.home())
+        files = Path(tempfile.mkdtemp(prefix="skill-deep-"))
+        self.addCleanup(shutil.rmtree, files, True)
+        fixed = "daily skill usage unavailable; inspect the native collector separately\n"
+        for name, text, expected in (("nested beyond the limit", deep, (2, "", fixed)), ("malformed text", "[\n", (2, "", fixed)), ("a valid empty report", "{}\n", (1, None, ""))):
+            report = files / "report.json"
+            report.write_text(text)
+            for option in ("--host-report", "--codex-lanes-report", "--claude-lanes-report"):
+                with self.subTest(report=name, option=option):
+                    done = subprocess.run([sys.executable, "-B", str(daily_path), option, str(report), "--now", NOW], capture_output=True, text=True, timeout=60)
+                    self.assertEqual((done.returncode, done.stderr), (expected[0], expected[2]), done.stdout[:200])
+                    if expected[1] is not None:
+                        self.assertEqual(done.stdout, expected[1], "nothing is published or printed for a report that cannot be read")
+                    for stream in (done.stdout, done.stderr):
+                        self.assertNotIn("Traceback", stream)
+                        self.assertNotIn(account, stream)
+                        self.assertNotIn(home, stream)
+                        self.assertNotIn(str(files), stream, "the path of the supplied file is not echoed")
+
+    def test_a_native_output_nested_beyond_the_decoders_limit_leaves_only_its_own_slot_unmeasured(self):
+        """The same defect at the other place a report is decoded: `collect_half` read each native command's output with `json.loads` and caught ValueError, so the deep output of one command raised out of the
+        collection and the half had no record at all. It is an unusable report: that slot is None (unmeasured) and the other command's report is kept. A valid empty object and ordinary malformed text are the controls."""
+        daily = daily_module()
+        now = usage.parse_iso("2026-10-12T10:00:00Z")
+        host, _, lanes = claude_reports()
+        codex_host, codex_lanes, _ = codex_reports()
+        deep = deep_report()
+        with self.assertRaises(RecursionError):
+            json.loads(deep)
+        for half, roots in (("claude", [Path("/fixture/claude")]), ("codex", [Path("/fixture/codex")])):
+            plan = daily.half_plan(half, roots, window=7, now=now)
+            slots = [slot for slot, _, _, _ in plan]
+            self.assertEqual(len(slots), 2)
+            for name, text in (("nested beyond the limit", deep), ("malformed text", "[\n"), ("a valid empty object", "{}\n")):
+                calls = []
+
+                def runner(command, **kwargs):
+                    key = next((flag for flag in ("--run-skill-doctor", "--lanes-sweep", "--lanes") if flag in command), None)
+                    payload = {"--run-skill-doctor": host, "--lanes-sweep": lanes, "--lanes": codex_lanes}.get(key, codex_host)
+                    calls.append(command)
+                    return subprocess.CompletedProcess(command, 0, text if len(calls) == 1 else json.dumps(payload), "")
+                with self.subTest(half=half, first_command_answers=name):
+                    reports = dict(zip(("host", "codex", "claude"), daily.collect_half(half, roots, window=7, now=now, runner=runner)))
+                    self.assertEqual(len(calls), 2, "the second command still runs")
+                    self.assertIsNone(reports[slots[0]], "an output that cannot be used leaves its slot unmeasured")
+                    self.assertIsInstance(reports[slots[1]], dict, "the other command's report is kept")
 
 
 class HalvesTests(unittest.TestCase):
@@ -1017,12 +1080,20 @@ class ServiceSandboxTests(unittest.TestCase):
         if "--offline" not in subprocess.run([analyze, "security", "--help"], capture_output=True, text=True, timeout=30).stdout:
             unavailable("this systemd-analyze has no `security --offline`")
 
-        def rows(unit):
-            done = subprocess.run([analyze, "security", "--offline=yes", "--user", "--json=short", str(unit)], capture_output=True, text=True, timeout=60)
-            self.assertEqual(done.returncode, 0, done.stderr)
-            return {row["json_field"]: row for row in json.loads(done.stdout) if row.get("json_field") in ("ProtectSystem", "ProtectHome", "PrivateTmp")}
         with tempfile.TemporaryDirectory() as temp:
             directory = Path(temp)
+            runtime = directory / "runtime"
+            runtime.mkdir(mode=0o700)
+            # `--user` builds a user manager, and its runtime directory is $XDG_RUNTIME_DIR and nothing else: sd_path_lookup(SD_PATH_USER_RUNTIME) returns -ENXIO when the variable is not set to an absolute path
+            # (systemd/systemd@b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a, tag v259.5, the installed 259.5: src/libsystemd/sd-path/sd-path.c L20-L39 and L244-L245; src/core/manager.c L708-L742,
+            # called from manager_new at L960; src/analyze/analyze-security.c L2708-L2710; man/sd_path_lookup.xml L186-L194). A caller without the variable (a non-login shell, a container) therefore
+            # stopped at "Failed to lookup RuntimeDirectory path: No such device or address". The call gets its own HOME and runtime directory, as the native verification test above does.
+            environment = {"HOME": str(directory), "PATH": os.defpath, "XDG_RUNTIME_DIR": str(runtime)}
+
+            def rows(unit):
+                done = subprocess.run([analyze, "security", "--offline=yes", "--user", "--json=short", str(unit)], capture_output=True, text=True, timeout=60, env=environment)
+                self.assertEqual(done.returncode, 0, done.stderr)
+                return {row["json_field"]: row for row in json.loads(done.stdout) if row.get("json_field") in ("ProtectSystem", "ProtectHome", "PrivateTmp")}
             daily, services = self.render(directory)
             for half, service in services.items():
                 bare = directory / f"bare-{half}.service"
@@ -1684,7 +1755,9 @@ class CaptureTimeoutTests(unittest.TestCase):
 
 class ReviewedMainCloneTests(unittest.TestCase):
     """The live clone is a detached worktree of origin/main (docs/decisions/2026-10-09-claude-review-worker.md), so `git branch --show-current` is empty there and the old check (`branch == main`) refused the
-    one clone the unit renders for: the daily run exited 2 every day. The question is whether HEAD is a commit of origin/main."""
+    one clone the unit renders for: the daily run exited 2 every day. The question is whether HEAD is a commit of origin/main, and it is answered by the exit status of `git merge-base --is-ancestor`: 0 for an
+    ancestor, 1 for a commit that is not, another non-zero status for an error (git/git@67ad42147a7acc2af6074753ebd03d904476118f, tag v2.53.0, the installed Git: Documentation/git-merge-base.adoc L55-L58;
+    builtin/merge-base.c L108-L124 and L44-L56, where a name that does not resolve dies; usage.c L82-L87, where die exits 128)."""
 
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
@@ -1737,6 +1810,34 @@ class ReviewedMainCloneTests(unittest.TestCase):
         self.git("remote", "remove", "origin", cwd=self.clone)
         with self.assertRaises(daily.CloneRefused):
             daily.on_reviewed_main(self.clone)
+
+    def test_the_statuses_the_clone_test_reads_are_the_ones_git_documents(self):
+        """Measured on the installed Git, which is the version of the pin (2.53.0): an ancestor exits 0, a commit that is not exits 1, and a name that does not resolve exits 128, which is neither; the helper reads
+        the first two as answers and the third as a clone that cannot be judged."""
+        daily = daily_module()
+
+        def status():
+            return subprocess.run(["git", "merge-base", "--is-ancestor", "HEAD", "origin/main"], cwd=self.clone, env=self.env, capture_output=True).returncode
+        self.assertEqual(status(), 0)
+        self.assertTrue(daily.on_reviewed_main(self.clone))
+        self.commit_in_clone()
+        self.assertEqual(status(), 1)
+        self.assertFalse(daily.on_reviewed_main(self.clone))
+        self.git("remote", "remove", "origin", cwd=self.clone)
+        self.assertEqual(status(), 128)
+        with self.assertRaises(daily.CloneRefused):
+            daily.on_reviewed_main(self.clone)
+
+    def test_the_clone_test_cites_the_pinned_git_source_where_it_relies_on_it(self):
+        """The local review of c56121e4 (P2): the helper, these tests and the decision record cited only the deployment decision, and a correction needs the upstream source at the pinned version. Each of the three
+        carries the pin and the locations of the documented contract and of the code that implements it."""
+        daily = daily_module()
+        record = (ROOT / "docs/decisions/2026-10-12-skill-invoke-rate-timer.md").read_text(encoding="utf-8")
+        needles = ("git/git@67ad42147a7acc2af6074753ebd03d904476118f", "Documentation/git-merge-base.adoc L55-L58", "builtin/merge-base.c L108-L124", "L44-L56", "usage.c L82-L87")
+        for place, text in (("the helper", daily.on_reviewed_main.__doc__), ("these tests", type(self).__doc__), ("the decision record", record)):
+            for needle in needles:
+                with self.subTest(place=place, needle=needle):
+                    self.assertIn(needle, text)
 
     def test_the_daily_run_collects_from_the_live_clone_and_refuses_a_feature_branch(self):
         daily = daily_module()

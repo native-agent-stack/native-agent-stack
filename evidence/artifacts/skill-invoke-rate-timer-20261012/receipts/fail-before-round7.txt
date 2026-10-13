@@ -1,0 +1,28 @@
+The round-7 changes of #1043 (the two P2 of the local codex re-review of c56121e4: an isolated XDG_RUNTIME_DIR for the offline analyzer test and the pinned Git citation of the clone test; and Astra's P1 of the read of c56121e4: a report nested beyond the JSON decoder's limit) against c56121e4. 'bare' is the caller's environment of the reviewer's case: HOME and PATH, no XDG_RUNTIME_DIR; the host's systemd-analyze is 259.5.
+
+== the reviewer's command (Astra's read of c56121e4, P1) on the program of c56121e4
+   --host-report of the 20,002-byte fixture: rc 1, stdout 0 bytes, the account name 3 times in stderr, Traceback present
+      last stderr line: RecursionError: maximum recursion depth exceeded while decoding a JSON array from a unicode string
+== c56121e4, the head that was read (its own test module and sources)
+   test_the_native_analyzer_reads_the_directives_as_protection [bare environment]: Ran 1, FAILED (failures=1)
+      AssertionError: 1 != 0 : Failed to lookup RuntimeDirectory path: No such device or address
+   test_the_native_analyzer_reads_the_directives_as_protection [ambient environment]: Ran 1, OK
+== the round-7 test module on the sources of c56121e4 (the program, the unit files and the record are c56121e4's)
+   test_the_native_analyzer_reads_the_directives_as_protection [bare environment]: Ran 1, OK
+   test_the_clone_test_cites_the_pinned_git_source_where_it_relies_on_it [ambient environment]: Ran 1, FAILED (failures=10)
+      AssertionError: 'Documentation/git-merge-base.adoc L55-L58' not found in "Whether the clone's HEAD is origin/main or one of its ancestors: true for the live clone (a detached worktree of
+   test_the_statuses_the_clone_test_reads_are_the_ones_git_documents [ambient environment]: Ran 1, OK
+   test_a_report_file_nested_beyond_the_decoders_limit_is_a_fixed_diagnostic_and_names_nothing [ambient environment]: Ran 1, FAILED (failures=3)
+      AssertionError: Tuples differ: (1, 'Traceback (most recent call last):\n [1388 chars]g\n') != (2, 'daily skill usage unavailable; inspec[32 chars]y\n')
+   test_a_native_output_nested_beyond_the_decoders_limit_leaves_only_its_own_slot_unmeasured [ambient environment]: Ran 1, FAILED (errors=2)
+== this head
+   --host-report of the 20,002-byte fixture: rc 2, stdout 0 bytes, the account name 0 times in stderr, Traceback absent
+      last stderr line: daily skill usage unavailable; inspect the native collector separately
+   test_the_native_analyzer_reads_the_directives_as_protection [bare environment]: Ran 1, OK
+   test_the_native_analyzer_reads_the_directives_as_protection [ambient environment]: Ran 1, OK
+   test_the_clone_test_cites_the_pinned_git_source_where_it_relies_on_it [ambient environment]: Ran 1, OK
+   test_the_statuses_the_clone_test_reads_are_the_ones_git_documents [ambient environment]: Ran 1, OK
+   test_a_report_file_nested_beyond_the_decoders_limit_is_a_fixed_diagnostic_and_names_nothing [ambient environment]: Ran 1, OK
+   test_a_native_output_nested_beyond_the_decoders_limit_leaves_only_its_own_slot_unmeasured [ambient environment]: Ran 1, OK
+
+The analyzer test lives in the test module, so the sources of c56121e4 cannot fail it: its evidence is the reviewer's case on c56121e4's own module (the first block) and the same module passing at this head in the same bare environment. The citation test fails on c56121e4's sources (the helper and the record carry no pin); the contract test measures the installed Git and holds at both heads (it adds evidence, it is not a fail-before). The two report-decoding tests fail on the program of c56121e4 (the CLI test with the traceback of the reviewer's command, the collection test with the RecursionError that escapes collect_half) and pass here.

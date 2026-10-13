@@ -1,0 +1,15 @@
+The 12 mutants of the round-7 changes of #1043 (the local codex re-review of c56121e4 and Astra's read of the same head): the environment of the offline analyzer call (the runtime directory dropped, the caller's environment inherited, the directory not created), the pinned Git citation in the helper, the test class and the record (a commit, two line ranges and one range in each of the others), the reading of the statuses of git merge-base --is-ancestor (128 read as an answer, 1 read as an error) and the two handlers of the decoder's RecursionError. The analyzer mutants run the one analyzer test in the reviewer's caller environment (HOME and PATH only, no XDG_RUNTIME_DIR); the others run the whole test module in an ambient environment. The unmutated copy passed in both first. Every mutant is expected to be killed.
+
+killed    test_skill_usage_daily.py          the analyzer's environment has no XDG_RUNTIME_DIR  [bare run]
+killed    test_skill_usage_daily.py          the analyzer inherits the caller's environment  [bare run]
+killed    test_skill_usage_daily.py          the runtime directory is never created (the analyzer fails to create its subdirectory in a path that is absent)  [bare run]
+killed    daily_skill_usage.py               the helper cites another commit  [module run]
+killed    daily_skill_usage.py               the helper cites another range of handle_is_ancestor  [module run]
+killed    daily_skill_usage.py               the helper cites another range of die_builtin  [module run]
+killed    test_skill_usage_daily.py          the tests cite another range of get_commit_reference  [module run]
+killed    2026-10-12-skill-invoke-rate-timer.md the record cites another range of the documentation  [module run]
+killed    daily_skill_usage.py               a failed comparison (128) is read as an answer  [module run]
+killed    daily_skill_usage.py               a commit that is not an ancestor (1) is read as an error  [module run]
+killed    daily_skill_usage.py               collect_half does not catch the decoder's RecursionError  [module run]
+killed    daily_skill_usage.py               main does not catch the decoder's RecursionError  [module run]
+12 mutants, 12 killed, 0 survived; unexpected: none

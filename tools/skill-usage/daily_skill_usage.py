@@ -213,7 +213,12 @@ def hidden_by_marker(path):
 
 def on_reviewed_main(root=ROOT):
     """Whether the clone's HEAD is origin/main or one of its ancestors: true for the live clone (a detached worktree of origin/main) and for a clone on branch main, false for a feature branch and for any
-    commit of the clone's own. A clone without an origin/main cannot be judged and is refused."""
+    commit of the clone's own. A clone without an origin/main cannot be judged and is refused.
+
+    The answer is the exit status of `git merge-base --is-ancestor HEAD origin/main`: 0 for an ancestor, 1 for a commit that is not, and "errors are signaled by a non-zero status that is not 1" (git/git@67ad42147a7acc2af6074753ebd03d904476118f,
+    tag v2.53.0, the installed Git: Documentation/git-merge-base.adoc L55-L58). The program does as the page says: handle_is_ancestor returns 0 or 1 and exits 128 when the merge-base computation fails (builtin/merge-base.c L108-L124),
+    and a name that does not resolve, such as origin/main in a clone without that remote, dies in get_commit_reference (L44-L56) with the status 128 of die_builtin (usage.c L82-L87). So 0 and 1 are answers and any other status is a
+    clone that cannot be judged."""
     try:
         done = subprocess.run(["git", "merge-base", "--is-ancestor", "HEAD", "origin/main"], cwd=root, capture_output=True, timeout=60)
     except (OSError, subprocess.SubprocessError) as error:
@@ -260,8 +265,8 @@ def collect_half(half, roots, *, window, now, node="node", runner=subprocess.run
             result = runner(command, cwd=ROOT, stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=timeout)
             report = json.loads(result.stdout) if result.returncode == 0 else None
             reports[slot] = report if isinstance(report, dict) and report.get("kind") == kind else None
-        except (OSError, subprocess.TimeoutExpired, ValueError):
-            pass  # Native errors and transcript text never become page content.
+        except (OSError, subprocess.TimeoutExpired, ValueError, RecursionError):
+            pass  # Native errors and transcript text never become page content. An output nested beyond the decoder's limit raises RecursionError, not ValueError (python/cpython@cbc944f4bc59639a444dd971c737788ba2283a91 Modules/_json.c L1031-L1046, Lib/json/decoder.py L360-L363), and is an unusable report.
     return reports["host"], reports["codex"], reports["claude"]
 
 
@@ -470,7 +475,7 @@ def main(argv=None):
     except Refused as error:
         print(f"daily skill usage refused: {error}", file=sys.stderr)
         return 2
-    except (OSError, ValueError, TypeError, AttributeError, KeyError, subprocess.SubprocessError):   # never the exception's text or a traceback: both name the account's home
+    except (OSError, ValueError, TypeError, AttributeError, KeyError, RecursionError, subprocess.SubprocessError):   # never the exception's text or a traceback: both name the account's home; RecursionError is what json.loads raises for a report file nested beyond the decoder's limit (see collect_half)
         print("daily skill usage unavailable; inspect the native collector separately", file=sys.stderr)
         return 2
 
