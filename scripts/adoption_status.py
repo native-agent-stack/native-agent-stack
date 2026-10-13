@@ -73,7 +73,10 @@ CLIENT_WIRING_LIMITATIONS = [
     "AGENTS.override.md, AGENTS.md and RTK.md, and this checkout's .claude/settings.json and .codex/config.toml whole "
     "and in-process, and emits no value from them: fixed booleans and hook-event counts only. It also compares the two "
     "Codex role files under the Codex home's agents/ with this checkout's adoption/agents/codex copies byte for byte "
-    "and reports how many are equal, a count and never a name or text. It opens no credential "
+    "and reports how many are equal, a count and never a name or text; and it compares the Claude agent definitions "
+    "under the Claude home's agents/ with this checkout's adoption/agents/claude copies byte for byte and reports "
+    "how many differ, are missing or are not shipped here (four vendor-installed search definitions are listed, "
+    "not counted), a count that must be 0 for the wiring to be complete. It opens no credential "
     "store (~/.claude.json, ~/.claude/.credentials.json, ~/.codex/auth.json), network endpoint or running process; "
     "environment variables only locate the client homes, and two opt-ins are checked by name.",
     "Configured wiring is not activation: managed, project or local Claude settings, and Codex profiles, project "
@@ -231,7 +234,7 @@ REGEX_SUBSET_MAX_DEPTH = 64
 CLIENT_FILE_LIMIT = 1_048_576
 CLIENT_WIRING_KEYS = {
     "claude": ("rtk_hook", "ai_memory_hook_events", "context_mode_plugin_enabled", "subagent_spawn_depth_1",
-               "workflow_concurrency_set", "effort_level_env_unset", "agent_teams_opt_in"),
+               "workflow_concurrency_set", "effort_level_env_unset", "agent_teams_opt_in", "stack_agents_drift"),
     "project": ("settings_depth_and_concurrency", "codex_mcp_servers_present"),
     "codex": ("rtk_instructions", "context_mode_plugin_enabled", "mcp_servers_present", "hooks_feature_enabled",
               "ai_memory_hook_events", "ai_memory_hook_events_trusted", "stack_roles_matching"),
@@ -240,6 +243,12 @@ CLIENT_WIRING_KEYS = {
 # this checkout ships in adoption/agents/codex, whose SHA256SUMS names exactly these two files.
 STACK_ROLE_FILES = ("stack-researcher.toml", "stack-verifier.toml")
 STACK_ROLES_SOURCE = Path(__file__).resolve().parents[1] / "adoption" / "agents" / "codex"
+# The Claude agent definitions this checkout ships (every *.md in adoption/agents/claude), which tools/adoption/install_claude_profile.py copies verbatim to <Claude home>/agents. The client serves a user-scope definition to
+# every project that does not define the name itself, and a copy that is stale or wider than the source goes unseen until something reads it (an omitted `tools` field means every tool: anthropics/claude-code@3deb8736
+# plugins/plugin-dev/skills/agent-development/SKILL.md L152-L154). Four more definitions sit in that folder on a host, installed by the tools they route to and not shipped here (tools/local-pages/architecture_mapping.json
+# names them as the search roles of code navigation and semantic retrieval): they are listed, so they are not drift. Any other *.md at the top of the folder is.
+STACK_AGENTS_SOURCE = Path(__file__).resolve().parents[1] / "adoption" / "agents" / "claude"
+VENDOR_HOST_AGENTS = ("codebase-memory-auditor.md", "codebase-memory-scout.md", "codebase-memory.md", "semble-search.md")
 ABSENT, NOT_A_FILE = "absent", "not_a_file"
 
 
@@ -460,7 +469,7 @@ def mcp_servers_present(config) -> dict:
             for name in WIRED_MCP_SERVERS}
 
 
-def claude_wiring(claude_dir: Path, env) -> dict:
+def claude_wiring(claude_dir: Path, env, *, agents_source: Path | None = None) -> dict:
     settings = read_client_file(claude_dir / "settings.json", "json")
     if settings is None:
         return dict.fromkeys(CLIENT_WIRING_KEYS["claude"])
@@ -484,6 +493,8 @@ def claude_wiring(claude_dir: Path, env) -> dict:
         # (user instructions 2026-09-27; https://code.claude.com/docs/en/agent-teams). A 0/1 count, not a bool,
         # so the all-booleans completeness rule never counts it and the output stays flags and counts only.
         "agent_teams_opt_in": int(AGENT_TEAMS_VARIABLE in names or AGENT_TEAMS_VARIABLE in env),
+        # Drift between the installed definitions and this checkout's: a count that must be 0 (wiring_complete). A caller that passes no source gets this repository's own.
+        "stack_agents_drift": stack_agents_drift(claude_dir, STACK_AGENTS_SOURCE if agents_source is None else agents_source),
     }
 
 
@@ -937,6 +948,47 @@ def stack_roles_matching(codex_dir: Path, roles_source: Path) -> int | None:
     return matching
 
 
+def stack_agents_drift(claude_dir: Path, agents_source: Path) -> int | None:
+    """How many Claude agent definitions under ``claude_dir``/agents are not what this checkout ships in ``agents_source``: a count, 0 for none, never a name or text.
+
+    Counted: each *.md of ``agents_source`` whose installed copy is absent, a link, a folder or another kind of file, or not byte for byte the source (a stale copy and a wider one, a ``tools`` field gone or longer, are both
+    bytes that differ); and each *.md at the top of the installed folder that is neither a source file nor one of VENDOR_HOST_AGENTS (a definition nothing here ships is a definition nothing here checks). An absent agents folder
+    counts every source file. None when the comparison cannot be made: the source folder has no *.md or one of them cannot be read, the agents path is a link or not a folder (what the client loads through a link is not known
+    here), or the folder or an installed file that has a source cannot be read."""
+    try:
+        names = sorted(entry for entry in os.listdir(agents_source) if entry.endswith(".md"))
+    except OSError:
+        return None
+    expected = {}
+    for name in names:
+        data = read_regular_bytes(agents_source / name)
+        if not isinstance(data, bytes):
+            return None
+        expected[name] = data
+    if not expected:
+        return None
+    agents = claude_dir / "agents"
+    try:
+        mode = os.lstat(agents).st_mode
+    except FileNotFoundError:
+        return len(expected)
+    except OSError:
+        return None
+    if not stat.S_ISDIR(mode):
+        return None
+    try:
+        installed = os.listdir(agents)
+    except OSError:
+        return None
+    drift = 0
+    for name, wanted in expected.items():
+        found = read_regular_bytes(agents / name)
+        if found is None:
+            return None
+        drift += not (isinstance(found, bytes) and found == wanted)
+    return drift + sum(1 for name in installed if name.endswith(".md") and name not in expected and name not in VENDOR_HOST_AGENTS)
+
+
 def codex_wiring(codex_dir: Path, key_root: str | None = None, *, roles_source: Path | None = None) -> dict:
     """``key_root`` is the Codex home as Codex spells it in hook keys (client_wiring passes it); ``roles_source`` is the
     directory holding the two role carriers to compare with (client_wiring passes the checkout's, and a caller that passes
@@ -1006,14 +1058,17 @@ def wiring_complete(groups: dict) -> bool:
     true with each Codex server named in the user or the project config.toml, both hook counts above zero, and
     every Codex event that runs ai-memory trusted, so Codex actually runs its hook. The count of matching role files
     (stack_roles_matching) is information: a number, 0 included, never blocks completeness, but its None (a file, the folder
-    or a source copy that cannot be read) does, like every other null."""
+    or a source copy that cannot be read) does, like every other null. The count of Claude agent definitions that differ from
+    this checkout's (stack_agents_drift) is part of the rule: it must be 0, so a stale, missing or unlisted definition makes
+    ``complete`` false, and its None does like every other null."""
     if None in leaves(groups):
         return False
     claude, project, codex = groups["claude"], groups["project"], groups["codex"]
     servers = all(codex["mcp_servers_present"][name] or project["codex_mcp_servers_present"][name]
                   for name in WIRED_MCP_SERVERS)
     flags = all(value for group in groups.values() for value in group.values() if isinstance(value, bool))
-    return (servers and flags and claude["ai_memory_hook_events"] > 0 and codex["ai_memory_hook_events"] > 0
+    return (servers and flags and claude["ai_memory_hook_events"] > 0 and claude["stack_agents_drift"] == 0
+            and codex["ai_memory_hook_events"] > 0
             and codex["ai_memory_hook_events_trusted"] == codex["ai_memory_hook_events"])
 
 
@@ -1029,7 +1084,8 @@ def client_wiring(root: Path, env=None) -> dict:
     # Codex's own spelling of its home in hook keys: a set CODEX_HOME canonicalized, else $HOME/.codex as is
     # (codex-rs/utils/home-dir find_codex_home).
     key_root = os.path.realpath(codex_home) if codex_home else os.path.normpath(f"{home}/.codex")
-    groups = {"claude": claude_wiring(Path(env.get("CLAUDE_CONFIG_DIR") or f"{home}/.claude"), env),
+    groups = {"claude": claude_wiring(Path(env.get("CLAUDE_CONFIG_DIR") or f"{home}/.claude"), env,
+                                      agents_source=root / "adoption" / "agents" / "claude"),
               "project": project_wiring(root),
               "codex": codex_wiring(Path(codex_home or f"{home}/.codex"), key_root,
                                     roles_source=root / "adoption" / "agents" / "codex")}

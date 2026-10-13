@@ -24,7 +24,7 @@ import unittest
 from unittest.mock import patch
 
 from scripts import adoption_status
-from scripts.adoption_status import (CLIENT_WIRING_KEYS, CLIENT_WIRING_LIMITATIONS, LAUNCHER_LOGIN_PATH,
+from scripts.adoption_status import (CLIENT_WIRING_KEYS, CLIENT_WIRING_LIMITATIONS, LAUNCHER_LOGIN_PATH, STACK_AGENTS_SOURCE, VENDOR_HOST_AGENTS,
                                      LAUNCHER_RESOLUTION_KEYS, LAUNCHER_RESOLUTION_LIMITATIONS, LOGIN_FILE_STATES,
                                      LOGIN_SHELL_FILES, LOGIN_SHELL_KEYS, LOGIN_SHELL_LIMITATIONS, NO_CLIENT_STATE,
                                      NO_PINNED_VERSION, PINNED_VERSION_LIMITATIONS, client_wiring,
@@ -68,10 +68,20 @@ def role_bytes(name: str) -> bytes:
     return f"# {name}\n# {PRIVATE}\nname = \"{name[:-len('.toml')]}\"\n".encode("utf-8")
 
 
+# Three Claude agent definitions standing for adoption/agents/claude (it ships 11; the check compares every *.md of the folder). Each text holds PRIVATE, so a test proves the check compares bytes and
+# lets no file text into its report.
+AGENT_FILES = ("evidence-reviewer.md", "source-scout.md", "stack-verifier.md")
+AGENT_TOOLS = "tools: Read, Grep, Glob"
+
+
+def agent_bytes(name: str) -> bytes:
+    return f"---\nname: {name[:-len('.md')]}\ndescription: {PRIVATE}\n{AGENT_TOOLS}\n---\n{PRIVATE}\n".encode("utf-8")
+
+
 WIRED = {
     "claude": {"rtk_hook": True, "ai_memory_hook_events": 8, "context_mode_plugin_enabled": True,
                "subagent_spawn_depth_1": True, "workflow_concurrency_set": True,
-               "effort_level_env_unset": True, "agent_teams_opt_in": 0},
+               "effort_level_env_unset": True, "agent_teams_opt_in": 0, "stack_agents_drift": 0},
     "project": {"settings_depth_and_concurrency": True, "codex_mcp_servers_present": dict.fromkeys(SERVERS, True)},
     "codex": {"rtk_instructions": True, "context_mode_plugin_enabled": True,
               "mcp_servers_present": dict.fromkeys(SERVERS, True), "hooks_feature_enabled": True,
@@ -1884,6 +1894,8 @@ class ClientWiringTests(unittest.TestCase):
         self.env = {"HOME": str(self.home)}
         for name in ROLE_FILES:  # the checkout's copies of the two Codex role carriers, which the count compares with
             self.write(f"adoption/agents/codex/{name}", role_bytes(name), self.root)
+        for name in AGENT_FILES:  # the checkout's Claude agent definitions, which the drift count compares with
+            self.write(f"adoption/agents/claude/{name}", agent_bytes(name), self.root)
 
     def write(self, relative: str, content, base: Path | None = None) -> Path:
         path = (base or self.home) / relative
@@ -1915,6 +1927,8 @@ class ClientWiringTests(unittest.TestCase):
                    {"name": PRIVATE})
         for name in ROLE_FILES:  # the role carriers the Codex worker lane installs under the Codex home
             self.write(f".codex/agents/{name}", role_bytes(name))
+        for name in AGENT_FILES:  # the Claude definitions the profile installer copies under the Claude home
+            self.write(f".claude/agents/{name}", agent_bytes(name))
         self.write(".claude/settings.json", {"env": {"CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS": "8",
                                                      "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"}}, self.root)
         self.write(".codex/config.toml", CODEX_CONFIG, self.root)
@@ -1948,7 +1962,7 @@ class ClientWiringTests(unittest.TestCase):
         self.assertEqual(self.wiring(), {
             "claude": {"rtk_hook": False, "ai_memory_hook_events": 0, "context_mode_plugin_enabled": False,
                        "subagent_spawn_depth_1": False, "workflow_concurrency_set": False,
-                       "effort_level_env_unset": True, "agent_teams_opt_in": 0},
+                       "effort_level_env_unset": True, "agent_teams_opt_in": 0, "stack_agents_drift": len(AGENT_FILES)},
             "project": {"settings_depth_and_concurrency": False,
                         "codex_mcp_servers_present": dict.fromkeys(SERVERS, False)},
             # Without a config.toml Codex keeps its default: hooks on.
@@ -2007,7 +2021,7 @@ class ClientWiringTests(unittest.TestCase):
         self.assertEqual(result["claude"], {"rtk_hook": False, "ai_memory_hook_events": 0,
                                             "context_mode_plugin_enabled": False, "subagent_spawn_depth_1": False,
                                             "workflow_concurrency_set": False, "effort_level_env_unset": True,
-                                            "agent_teams_opt_in": 0})
+                                            "agent_teams_opt_in": 0, "stack_agents_drift": len(AGENT_FILES)})
         self.assertFalse(result["project"]["settings_depth_and_concurrency"])
         self.assertEqual(result["codex"], {"rtk_instructions": False, "context_mode_plugin_enabled": False,
                                            "mcp_servers_present": dict.fromkeys(SERVERS, False),
@@ -2459,6 +2473,169 @@ class ClientWiringTests(unittest.TestCase):
     def test_the_limitations_name_the_role_files_the_check_compares(self):
         text = CLIENT_WIRING_LIMITATIONS[0]
         for needle in ("agents/", "adoption/agents/codex", "byte for byte"):
+            self.assertIn(needle, text)
+
+    # -- stack_agents_drift (CPA-V-10 of the Claude-family practice audit): the Claude agent definitions under <Claude home>/agents against the checkout's
+    # adoption/agents/claude. A count that must be 0; never a name, a path or text.
+
+    def drift(self, env=None):
+        """claude.stack_agents_drift of the fake home. The key is asserted first, so a base without it fails on that."""
+        claude = self.wiring(env)["claude"]
+        self.assertIn("stack_agents_drift", claude)
+        return claude["stack_agents_drift"]
+
+    def test_the_drift_key_is_the_last_claude_key_and_a_count(self):
+        self.assertEqual(CLIENT_WIRING_KEYS["claude"][-1], "stack_agents_drift")
+        self.wire()
+        self.assertIs(type(self.wiring()["claude"]["stack_agents_drift"]), int)  # a number: a boolean would not say how many
+
+    def test_a_stale_or_wider_user_agent_makes_the_wiring_incomplete(self):
+        """The fail-first of CPA-V-10: a fixture with one stale user agent reported `complete: true`, because nothing compared the agent files with adoption/agents/claude."""
+        self.wire()
+        self.assertEqual((self.drift(), self.wiring()["complete"]), (0, True))
+        agent = self.home / ".claude/agents" / AGENT_FILES[0]
+        agent.write_bytes(agent.read_bytes().replace(AGENT_TOOLS.encode(), b"tools: Read, Grep, Glob, Bash"))  # a wider copy: more tools than the source gives
+        result = self.wiring()
+        self.assertEqual((result["claude"]["stack_agents_drift"], result["complete"]), (1, False))
+        others = {key: value for key, value in result["claude"].items() if key != "stack_agents_drift"}
+        self.assertEqual(others, {key: value for key, value in WIRED["claude"].items() if key != "stack_agents_drift"}, "the drift alone turned completeness off")
+        agent.write_bytes(agent.read_bytes().replace(b"tools: Read, Grep, Glob, Bash\n", b"\n"))  # the `tools` field gone: an omitted field means every tool
+        self.assertEqual((self.drift(), self.wiring()["complete"]), (1, False))
+        agent.write_bytes(agent_bytes(AGENT_FILES[0]))
+        self.assertEqual((self.drift(), self.wiring()["complete"]), (0, True))
+
+    def test_drift_counts_each_changed_missing_and_unlisted_definition(self):
+        self.wire()
+        agents = self.home / ".claude/agents"
+        flipped = bytearray((agents / AGENT_FILES[0]).read_bytes())
+        flipped[0] ^= 1  # the same size, one bit different: equal length is not equal bytes
+        (agents / AGENT_FILES[0]).write_bytes(bytes(flipped))
+        self.assertEqual(self.drift(), 1)
+        (agents / AGENT_FILES[1]).unlink()  # absent
+        self.assertEqual(self.drift(), 2)
+        self.write(".claude/agents/not-shipped-here.md", agent_bytes("not-shipped-here.md"))  # a definition the client serves and nothing here checks
+        self.assertEqual(self.drift(), 3)
+        self.write(".claude/agents/another.md", b"")
+        self.assertEqual(self.drift(), 4)
+        (agents / AGENT_FILES[0]).write_bytes(agent_bytes(AGENT_FILES[0]))
+        (agents / AGENT_FILES[1]).write_bytes(agent_bytes(AGENT_FILES[1]))
+        (agents / "not-shipped-here.md").unlink()
+        (agents / "another.md").unlink()
+        self.assertEqual(self.drift(), 0)
+
+    def test_the_four_vendor_definitions_are_listed_and_files_the_client_does_not_load_are_ignored(self):
+        self.assertEqual(VENDOR_HOST_AGENTS, ("codebase-memory-auditor.md", "codebase-memory-scout.md", "codebase-memory.md", "semble-search.md"))
+        self.assertFalse(set(VENDOR_HOST_AGENTS) & {path.name for path in STACK_AGENTS_SOURCE.glob("*.md")}, "a listed definition is one this checkout does not ship")
+        self.wire()
+        for name in VENDOR_HOST_AGENTS:  # whatever their text: they are the vendors' own
+            self.write(f".claude/agents/{name}", f"vendor {PRIVATE}\n")
+        self.assertEqual(self.drift(), 0)
+        self.write(".claude/agents/" + AGENT_FILES[0] + ".bak.20261005T005836Z", agent_bytes(AGENT_FILES[0]) + b"\n")  # a backup is not an agent file
+        self.write(".claude/agents/notes.txt", "x")
+        self.write(".claude/agents/nested/deep.md", agent_bytes("deep.md"))  # below the top of the folder
+        self.assertEqual(self.drift(), 0)
+        self.assertEqual(self.wiring()["complete"], True)
+
+    def test_a_link_or_a_folder_in_place_of_a_definition_is_drift(self):
+        self.wire()
+        agents = self.home / ".claude/agents"
+        identical = self.write("identical-copy.md", agent_bytes(AGENT_FILES[0]))
+        (agents / AGENT_FILES[0]).unlink()
+        (agents / AGENT_FILES[0]).symlink_to(identical)  # the bytes are equal, but the client's file is a link
+        self.assertEqual(self.drift(), 1)
+        (agents / AGENT_FILES[1]).unlink()
+        (agents / AGENT_FILES[1]).mkdir()  # a folder where a file belongs
+        self.assertEqual(self.drift(), 2)
+        self.write(".claude/agents/linked-extra.md", "x")
+        (agents / "linked-extra.md").unlink()
+        (agents / "linked-extra.md").symlink_to(identical)  # a link the client would load, and nothing here ships it
+        self.assertEqual(self.drift(), 3)
+
+    def test_an_absent_agents_folder_counts_every_definition_of_the_checkout(self):
+        self.write(".claude/settings.json", {})
+        self.assertEqual(self.drift(), len(AGENT_FILES))
+
+    def test_the_drift_follows_claude_config_dir(self):
+        self.wire()
+        moved = self.home / "elsewhere"
+        (self.home / ".claude").rename(moved)
+        self.assertEqual(self.drift(), len(AGENT_FILES))  # the default home has no agents folder any more
+        env = {**self.env, "CLAUDE_CONFIG_DIR": str(moved)}
+        self.assertEqual(self.drift(env), 0)
+        (moved / "agents" / AGENT_FILES[2]).write_bytes(b"stale")
+        self.assertEqual(self.drift(env), 1)
+
+    def test_the_drift_is_null_when_a_source_or_the_folder_cannot_be_compared(self):
+        self.wire()
+        agents = self.home / ".claude/agents"
+        source = self.root / "adoption/agents/claude"
+        kept = (source / AGENT_FILES[0]).read_bytes()
+        (source / AGENT_FILES[0]).unlink()
+        self.assertEqual(self.drift(), 1, "a definition the checkout no longer ships, and that is not one of the vendors', is drift")
+        (source / AGENT_FILES[0]).write_bytes(kept)
+        shutil.rmtree(source)  # no source folder: nothing to compare with, even where the agents are installed
+        self.assertIsNone(self.drift())
+        source.mkdir(parents=True)
+        self.assertIsNone(self.drift(), "a source folder with no definition")
+        for name in AGENT_FILES:
+            (source / name).write_bytes(agent_bytes(name))
+        self.assertEqual(self.drift(), 0)
+        (source / "folder.md").mkdir()  # a source entry that is not a file cannot be compared with
+        self.assertIsNone(self.drift())
+        (source / "folder.md").rmdir()
+        self.assertEqual(self.drift(), 0)
+        shutil.rmtree(agents)
+        agents.write_text("a file where the folder belongs", encoding="utf-8")
+        self.assertIsNone(self.drift())
+        agents.unlink()
+        (self.home / "linked-agents").mkdir()
+        agents.symlink_to(self.home / "linked-agents")  # a linked folder: what the client loads through it is not known here
+        self.assertIsNone(self.drift())
+
+    @unittest.skipIf(hasattr(os, "geteuid") and os.geteuid() == 0, "root reads a file whatever its mode")
+    def test_the_drift_is_null_for_an_unreadable_folder_or_definition(self):
+        self.wire()
+        agents = self.home / ".claude/agents"
+        definition = agents / AGENT_FILES[0]
+        definition.chmod(0)
+        try:
+            self.assertIsNone(self.drift())
+        finally:
+            definition.chmod(0o644)
+        shipped = self.root / "adoption/agents/claude" / AGENT_FILES[1]
+        shipped.chmod(0)  # a source copy that cannot be read: nothing to compare with
+        try:
+            self.assertIsNone(self.drift())
+        finally:
+            shipped.chmod(0o644)
+        agents.chmod(0)
+        try:
+            self.assertIsNone(self.drift())
+        finally:
+            agents.chmod(0o755)
+        self.assertEqual(self.drift(), 0)
+
+    def test_a_null_drift_makes_complete_false_like_every_other_null(self):
+        self.wire()
+        shutil.rmtree(self.root / "adoption/agents/claude")
+        result = self.wiring()
+        self.assertEqual((result["claude"]["stack_agents_drift"], result["complete"]), (None, False))
+        others = {key: value for key, value in result["claude"].items() if key != "stack_agents_drift"}
+        self.assertEqual(others, {key: value for key, value in WIRED["claude"].items() if key != "stack_agents_drift"})
+
+    def test_the_two_argument_form_of_claude_wiring_compares_with_this_repositorys_own_definitions(self):
+        claude_dir = self.home / ".claude"
+        claude_dir.mkdir()
+        (claude_dir / "settings.json").write_text("{}", encoding="utf-8")
+        report = adoption_status.claude_wiring(claude_dir, self.env)
+        self.assertIn("stack_agents_drift", report)
+        shipped = sorted(path.name for path in STACK_AGENTS_SOURCE.iterdir())
+        self.assertTrue(shipped and all(name.endswith(".md") for name in shipped), "the source folder holds definitions only")
+        self.assertEqual(report["stack_agents_drift"], len(shipped))  # nothing installed: every shipped definition is missing
+
+    def test_the_limitations_name_the_agent_folders_the_check_compares(self):
+        text = CLIENT_WIRING_LIMITATIONS[0]
+        for needle in ("Claude agent definitions", "adoption/agents/claude", "must be 0"):
             self.assertIn(needle, text)
 
     def test_a_text_value_can_never_leave_the_check(self):

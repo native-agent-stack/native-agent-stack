@@ -1,0 +1,17 @@
+{
+ "command": "python3 scripts/adoption_status.py --profile token-efficiency --client-wiring --json",
+ "captured_utc": "2026-10-13T02:30Z",
+ "checkout": "the change under review, on the first host",
+ "client_wiring.claude": {
+  "rtk_hook": true,
+  "ai_memory_hook_events": 9,
+  "context_mode_plugin_enabled": true,
+  "subagent_spawn_depth_1": true,
+  "workflow_concurrency_set": true,
+  "effort_level_env_unset": true,
+  "agent_teams_opt_in": 1,
+  "stack_agents_drift": 0
+ },
+ "client_wiring.complete": true,
+ "note": "counts and flags only; the installed definitions are the 11 of adoption/agents/claude plus the four listed vendor ones (and a backup file that is not an agent file)"
+}

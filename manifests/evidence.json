@@ -19563,8 +19563,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.md",
-      "sha256": "91160fc24641c22d8321f45d94ce0736db24b1ed066f2a7e5edd01fbff5a8982",
-      "bytes": 33891
+      "sha256": "5f49b0ec80eb7863a570e019992ac562a535edffde8f5ac93aa60091b8c16c90",
+      "bytes": 34882
     },
     {
       "path": "docs/token-native-saturation.md",
@@ -19945,6 +19945,26 @@
       "path": "evidence/artifacts/agent-browser-lna-20260930/run.sh.txt",
       "sha256": "d115d6b622752b7bd57f3529e5b7f4fd7ac7d56995989dc26b4a822482196b4d",
       "bytes": 1340
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/README.md",
+      "sha256": "ce5e670ecc009192285c78759f689902e12b49f3c80fe5491655747c9857738b",
+      "bytes": 1317
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/fail-before.txt",
+      "sha256": "2eedb1737eadde92d6e6a6c47b48bc6342317f4332ac02db6c57aa91b7d4c6ed",
+      "bytes": 1334
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/host-run.json",
+      "sha256": "b06c4b32c976ffe8260ac99b1301d4b6ab9d51464576b9ee08fe9bacc0cddcb4",
+      "bytes": 687
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/mutants-20.txt",
+      "sha256": "67d078ee076d4e57a66003bb0c482b1574c1689212a70e54edc5eeb949d34188",
+      "bytes": 1418
     },
     {
       "path": "evidence/artifacts/agentsview-044-qualification-20260927/README.md",
@@ -61358,8 +61378,8 @@
     },
     {
       "path": "scripts/adoption_status.py",
-      "sha256": "c5ea86bd324e9baf3263ac7f6edd107c736e3fa5c62c6395161d3319b4458998",
-      "bytes": 98120
+      "sha256": "25475c864f2f19e8396e768fe5be22b92d313ade4154509e84876bfa79e41dc5",
+      "bytes": 102316
     },
     {
       "path": "scripts/build_ecosystem.py",
@@ -62063,8 +62083,8 @@
     },
     {
       "path": "tests/test_adoption_status.py",
-      "sha256": "ff9bd18c08199728ba70eeb8bc4e107c017fc96cbbac5b64a8d2076cc6de19a2",
-      "bytes": 161018
+      "sha256": "4fdc1c406c119baa8c60d788a7ba4b833561d53606e4361b58482bbb269b1b36",
+      "bytes": 171716
     },
     {
       "path": "tests/test_adoption_version_probes.py",
