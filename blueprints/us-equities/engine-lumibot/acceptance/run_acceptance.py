@@ -66,7 +66,7 @@ def main():
              "finished_at":datetime.now(timezone.utc).isoformat(),
              "commands":commands,"input_hashes":input_hashes,
              "runtime_binding":runtime_binding,"runtime_environment":environment,
-             "strategy_version":"stock-only-acceptance-v1-review4",
+             "strategy_version":"stock-only-acceptance-v1-review5",
              "config_sha256":sha(root/"blueprints/us-equities/engine-lumibot/caps-a6-diagnostic.json"),
              "paper_orders":0,"designation":"none","property_seed":260413,
              "note":"Raw receipt is private; exported result must omit identity-bearing raw-log fingerprints"}

@@ -11,7 +11,7 @@
       "sha256": "817348bda90c4e2152e57576b78dd458aeca1becad4a2fa10b31cdd49f837100"
     }
   ],
-  "finished_at": "2026-10-13T17:42:07.151405+00:00",
+  "finished_at": "2026-10-13T18:22:50.620884+00:00",
   "input_hashes": [
     {
       "path": "blueprints/us-equities/engine-lumibot/stock_only_alpaca.py",
@@ -19,7 +19,7 @@
     },
     {
       "path": "blueprints/us-equities/engine-lumibot/governor.py",
-      "sha256": "6931e1a539b68a3b72620bad690908e9afe185083c6b5af4110b8b1769630f19"
+      "sha256": "0540e504aac7d03254e77f7fb0cb59d9ece48e82b5106379aaab84ebf3b69685"
     },
     {
       "path": "blueprints/us-equities/engine-lumibot/guarded_api.py",
@@ -27,7 +27,7 @@
     },
     {
       "path": "blueprints/us-equities/engine-lumibot/acceptance/mutate_guards.py",
-      "sha256": "e0a79ab2e5c3bd87c6e3cb153b8757ae87312328d2297b68b453e8ac6749a672"
+      "sha256": "0e4ed1ca6fd2ea5096b5eb64f88dce5d452591843728242a280f92b9be84e456"
     },
     {
       "path": "blueprints/us-equities/engine-lumibot/acceptance/refresh_sources.py",
@@ -35,7 +35,7 @@
     },
     {
       "path": "blueprints/us-equities/engine-lumibot/acceptance/run_acceptance.py",
-      "sha256": "a9dd33a551754a2f7081b0dfef1111f147238210cc46c0b0efd9b940ffcfdbec"
+      "sha256": "b9918d3b805d4afa32be2b9e13d492c513af2395868c5a30f9af90355231cb18"
     },
     {
       "path": "blueprints/us-equities/engine-lumibot/acceptance/runtime_snapshot.py",
@@ -55,7 +55,7 @@
     },
     {
       "path": "tests/test_engine_lumibot_governor.py",
-      "sha256": "1c078e3f688a25d2cd4193c8f8dbb145e83f3fefdbc4a6c2514a4906009b1c02"
+      "sha256": "64b42d361e18134c1170938f8d99d999facba7f7e03fa5d73be8f8440c1dd0b1"
     },
     {
       "path": "tests/test_engine_lumibot_native.py",
@@ -63,21 +63,21 @@
     }
   ],
   "lumibot_pin": "862504052407df2586122b752a645f88ce87afa1",
-  "mutation_killed": 88,
+  "mutation_killed": 90,
   "mutation_survived": 0,
   "note": "Pure/proxy fake SDK tests and native class construction; actual broker interaction unqualified",
   "outputs": [
     {
       "path": "blueprints/us-equities/engine-lumibot/acceptance/test_engine_lumibot_governor.result.json",
-      "sha256": "ce9532683701095472246999dbbe0865bcd07c91a55e145817c6eed3778b41aa"
+      "sha256": "6af69450b2ac22f44692e8f5c0066481dc2333564bd399b8872be2334e6fbbc5"
     },
     {
       "path": "blueprints/us-equities/engine-lumibot/acceptance/test_engine_lumibot_native.result.json",
-      "sha256": "72861bed3d34972f75521cadb11d18a6fbe7ac1c00953d46f92ceb7750df505b"
+      "sha256": "5b88d543bb91431e4793a9f7742227d33c1428ee458e7afeb5b9fcd038151a8a"
     },
     {
       "path": "blueprints/us-equities/engine-lumibot/acceptance/mutation-results.json",
-      "sha256": "64a10aa1d1771b2623a25e8e3a92117b69d78c53fb98af7ea3fea7297f33a57c"
+      "sha256": "a324aeb60a044bea2c5a56ba26a636ba92d7b25b029a61828fedecf630034d4a"
     },
     {
       "path": "blueprints/us-equities/engine-lumibot/acceptance/runtime-distributions.json",
@@ -110,7 +110,7 @@
   ],
   "schema_version": 1,
   "spec_sha256": "8eb20e2e1f3c38a416a364a9f87fef62fcd5bdaa515bf60d78621cde7eff2dc3",
-  "started_at": "2026-10-13T17:41:48.582125+00:00",
+  "started_at": "2026-10-13T18:22:37.896032+00:00",
   "status": "passed",
-  "strategy_version": "stock-only-acceptance-v1-review4"
+  "strategy_version": "stock-only-acceptance-v1-review5"
 }

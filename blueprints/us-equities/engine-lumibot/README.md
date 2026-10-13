@@ -109,6 +109,12 @@ no later append or order admission can proceed, even if the OS error clears.
 Recovery requires closing it and validating retained bytes on reopen; a partial
 or corrupt chain refuses. Consumption validates the monotone clock again, so
 a rollback between request-budget and consumption cannot revive an expired quote.
+Decoded journal rows must be mappings. Initialization owns one descriptor and
+closes it on every failed initialization, including unexpected exceptions, so
+a repaired journal can open under the exclusive writer lock in the same process.
+The read wrapper uses os.fdopen(closefd=False) and the descriptor's owner closes
+it in finally on failure ([CPython3.12 os.fdopen](https://docs.python.org/3.12/library/os.html#os.fdopen)
+and [open/closefd](https://docs.python.org/3.12/library/functions.html#open)).
 Any unknown outcome or restored unresolved decision blocks admission until a
 trusted operator provides reconciled terminal state. No automatic resubmit or
 retry exists. Restart refuses changed caps and preserves request consumption.
@@ -175,7 +181,7 @@ call, keeping the reservation and recording the bounded number reason.
 
 ## Observed evidence and limits
 
-The current acceptance run records 56 L0/L1 cases and 13 native/stub seam cases passing
+The current acceptance run records 58 L0/L1 cases and 13 native/stub seam cases passing
 in the isolated runtime, zero skips, including 500 seeded model-hint invariance
 cases (seed 260413). The 500-case numerical test suppresses only repeated fsync
 calls; the separate A6 durability test observes real fsync before the SDK.
@@ -183,7 +189,7 @@ Stdlib-only CI executes the three seam tests and explicitly skips10native
 cases; those skips are not native acceptance. Tests are unittest-discovered,
 not silently collected through pytest alone.
 
-A8: 88 selected exact-site mutants killed, 0 survived, 0 not-applied, 0 invalid-runs,
+A8: 90 selected exact-site mutants killed, 0 survived, 0 not-applied, 0 invalid-runs,
 0 baseline-failures, including a paired removal of both final-payload equality
 checks. Each probe first runs its unmutated named case successfully, then must
 execute that same case with AssertionError and that test's id in the output.

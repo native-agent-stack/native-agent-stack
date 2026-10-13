@@ -106,6 +106,8 @@ MUTANTS += [
  ("runtime_sources", "acceptance/runtime_snapshot.py", 'if not rows:raise SystemExit("runtime_sources_missing")', 'pass', 'test_J6_runtime_pins_and_package_sources_are_required'),
  ("malformed_price_journal", "guarded_api.py", 'governor.reject(str(error))', 'raise', 'test_J7_malformed_final_prices_are_journaled_before_refusal'),
  ("native_strategy_identity", "stock_only_alpaca.py", 'Order(strategy, Asset(decision.symbol', 'Order("closed-inbox", Asset(decision.symbol', 'test_A1_closed_inbox_native_strategy_routes_only_governor_decision'),
+ ("journal_row_mapping", "governor.py", 'if not isinstance(row, Mapping):', 'if False:', 'test_J8_nonmapping_journal_refuses_and_repaired_open_succeeds'),
+ ("journal_init_cleanup", "governor.py", 'if not initialized and hasattr(self, "fd"):', 'if False:', 'test_J9_every_failed_initialization_releases_writer_lock'),
 ]
 MUTANTS += [("seam_"+name,"stock_only_alpaca.py",name+" = _deny",
              name+" = lambda self, *a, **k: None","test_A2_each_committed_seam_override_independently")

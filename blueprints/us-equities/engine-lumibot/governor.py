@@ -5,6 +5,7 @@ CPython Decimal.quantize directional rounding. Budget checks are admission
 ceilings, never a replacement for the engine/vendor transport pacing.
 """
 from dataclasses import dataclass, field
+from collections.abc import Mapping
 from decimal import Decimal, InvalidOperation, ROUND_FLOOR, ROUND_CEILING
 import hashlib
 import json
@@ -110,6 +111,7 @@ class Journal:
         if self.path.is_symlink():
             raise GuardRefusal("journal")
         flags = os.O_RDWR | os.O_APPEND | os.O_CREAT | getattr(os, "O_NOFOLLOW", 0)
+        initialized = False
         try:
             self.fd = os.open(self.path, flags, 0o600)
             if os.fstat(self.fd).st_mode & 0o077:
@@ -118,21 +120,25 @@ class Journal:
                 raise GuardRefusal("journal_lock_platform")
             import fcntl
             fcntl.flock(self.fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            with os.fdopen(os.dup(self.fd), "rb") as stream:
+            with os.fdopen(self.fd, "rb", closefd=False) as stream:
                 raw = stream.read()
             self.rows, self.previous = [], "0" * 64
             for line in raw.splitlines(keepends=True):
                 row = json.loads(line)
+                if not isinstance(row, Mapping):
+                    raise GuardRefusal("journal_chain")
                 if line != encode(row) or row.get("previous") != self.previous:
                     raise GuardRefusal("journal_chain")
                 self.rows.append(row)
                 self.previous = hashlib.sha256(line).hexdigest()
             if raw and not raw.endswith(b"\n"):
                 raise GuardRefusal("journal_chain")
+            initialized = True
         except (OSError, ValueError):
-            if hasattr(self, "fd"):
-                os.close(self.fd)
             raise GuardRefusal("journal") from None
+        finally:
+            if not initialized and hasattr(self, "fd"):
+                os.close(self.fd)
 
     def append(self, event):
         if self.unusable:

@@ -633,6 +633,47 @@ class RestageAdditions(CoreCase):
 
 
 class ReviewRecovery(CoreCase):
+    def check_refused_journal_reopens(self,raw,error_type=GuardRefusal,decode_error=None):
+        path=self.root/"repairable.jsonl"
+        path.write_bytes(raw);path.chmod(0o600)
+        opened=[];real_open=os.open
+        def track_open(*args,**kwargs):
+            fd=real_open(*args,**kwargs);opened.append(fd);return fd
+        try:
+            with patch("governor.os.open",side_effect=track_open):
+                try:
+                    if decode_error is None:Journal(path)
+                    else:
+                        with patch("governor.json.loads",side_effect=decode_error):Journal(path)
+                except BaseException as error:refused=error
+                else:self.fail("invalid initialization must refuse")
+            # Retained bytes are repaired on the same inode, so any leaked
+            # flock prevents this second open in this very process.
+            path.write_bytes(b"")
+            try:repaired=Journal(path)
+            except GuardRefusal as error:self.fail(f"writer lock leaked after refused open: {error}")
+            try:
+                repaired.append({"event":"synthetic_recovery"})
+                self.assertEqual(len(repaired.rows),1)
+                self.assertIsInstance(refused,error_type)
+            finally:repaired.close()
+        finally:
+            # Only clean an intentionally leaked old-code probe descriptor;
+            # the fixed initializer has already closed it.
+            for fd in opened:
+                try:os.fstat(fd)
+                except OSError:continue
+                os.close(fd)
+
+    def test_J8_nonmapping_journal_refuses_and_repaired_open_succeeds(self):
+        for raw in (b"[]\n",b"null\n",b'"text"\n',b"1\n",b"true\n"):
+            with self.subTest(shape=raw):self.check_refused_journal_reopens(raw)
+
+    def test_J9_every_failed_initialization_releases_writer_lock(self):
+        for error in (RuntimeError("synthetic"),MemoryError("synthetic"),KeyboardInterrupt()):
+            with self.subTest(error=type(error).__name__):
+                self.check_refused_journal_reopens(b"{}\n",type(error),error)
+
     def test_J7_malformed_final_prices_are_journaled_before_refusal(self):
         for value,code in [("NaN","number"),("text","number"),(None,"number")]:
             with self.subTest(value=value):
