@@ -105,6 +105,7 @@ class Journal:
     operator supplies reconciled terminal facts; no automatic retry exists.
     """
     def __init__(self, path):
+        self.unusable = False
         self.path = Path(path)
         if self.path.is_symlink():
             raise GuardRefusal("journal")
@@ -134,6 +135,8 @@ class Journal:
             raise GuardRefusal("journal") from None
 
     def append(self, event):
+        if self.unusable:
+            raise GuardRefusal("journal_write")
         row = dict(event, previous=self.previous, sequence=len(self.rows) + 1)
         raw = encode(row)
         try:
@@ -141,6 +144,7 @@ class Journal:
                 raise OSError("short append")
             os.fsync(self.fd)
         except OSError:
+            self.unusable = True
             raise GuardRefusal("journal_write") from None
         self.rows.append(row)
         self.previous = hashlib.sha256(raw).hexdigest()
@@ -276,7 +280,8 @@ class Governor:
         if self.outstanding:
             raise GuardRefusal("pending_outcome")
         equity, bid, ask = dec(account.equity), dec(quote.bid), dec(quote.ask)
-        if equity <= 0 or bid <= 0 or ask < bid:
+        # Astra B1 (ca52c176): an exit is sized from the held quantity and priced from the bid, so account equity gates entries only (a long position stays exitable at zero or negative equity)
+        if bid <= 0 or ask < bid or (intent.side == "buy" and equity <= 0):
             raise GuardRefusal("quote_account")
         if intent.side == "buy" and not dec(self.caps["ask_min_usd"]) <= ask <= dec(self.caps["ask_max_usd"]):
             raise GuardRefusal("ask_band")
@@ -298,8 +303,11 @@ class Governor:
         collar = dec(self.caps["collar"]["regular_bps"]) if quote.session == "RTH" else spread + dec(self.caps["collar"]["extended_bps_over_spread"])
         if price <= 0 or (intent.side == "buy" and abs(price - mid) / mid * 10000 > collar):
             raise GuardRefusal("collar")
-        limit = min(dec(self.caps["max_notional_usd_per_name"]), equity)
-        qty = int((limit / price).to_integral_value(rounding=ROUND_FLOOR)) if intent.side == "buy" else int(positions.get(intent.symbol, 0))
+        if intent.side == "buy":
+            limit = min(dec(self.caps["max_notional_usd_per_name"]), equity)
+            qty = int((limit / price).to_integral_value(rounding=ROUND_FLOOR))
+        else:
+            qty = int(positions.get(intent.symbol, 0))
         if qty <= 0:
             raise GuardRefusal("quantity")
         if intent.side == "buy" and qty * price > limit:
@@ -319,6 +327,7 @@ class Governor:
         return decision
 
     def consume(self, payload, token, now):
+        self._time(now)
         if type(now) is not int or now > self.deadlines.get(token, -1):
             self.reject("reservation_expired")
         expected = self.reservations.get(token)

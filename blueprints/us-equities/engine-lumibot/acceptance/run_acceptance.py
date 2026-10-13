@@ -11,6 +11,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+from runtime_snapshot import capture, verify
 
 
 def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -36,6 +37,8 @@ def main():
                  "LUMIBOT_TELEMETRY":"0","ENGINE_QUAL_OFFLINE":"1",
                  "BACKTESTING_DATA_SOURCE":"none"}
     start=datetime.now(timezone.utc).isoformat()
+    runtime_binding=capture(args.python,environment)
+    verify(runtime_binding,runtime_binding)
     sources=[*root.joinpath("blueprints/us-equities/engine-lumibot").glob("*.py"),
              *Path(__file__).resolve().parent.glob("*.py"),
              root/"blueprints/us-equities/engine-lumibot/caps-a6-diagnostic.json",
@@ -58,9 +61,13 @@ def main():
                          "raw_output":{"role":module+"_private_log","sha256":sha(log)}})
     if input_hashes!=[{"role":p.name,"sha256":sha(p)} for p in sources]:
         raise SystemExit("acceptance_sources_changed_during_run")
+    verify(runtime_binding,capture(args.python,environment))
     receipt={"evidence_class":"synthetic","started_at":start,
              "finished_at":datetime.now(timezone.utc).isoformat(),
              "commands":commands,"input_hashes":input_hashes,
+             "runtime_binding":runtime_binding,"runtime_environment":environment,
+             "strategy_version":"stock-only-acceptance-v1-review3",
+             "config_sha256":sha(root/"blueprints/us-equities/engine-lumibot/caps-a6-diagnostic.json"),
              "paper_orders":0,"designation":"none","property_seed":260413,
              "note":"Raw receipt is private; exported result must omit identity-bearing raw-log fingerprints"}
     path=output/"receipt.private.json"

@@ -52,6 +52,7 @@
     "test_engine_lumibot_governor.ExitPolicyMatrix.test_E1_exit_at_touch_in_every_session",
     "test_engine_lumibot_governor.ExitPolicyMatrix.test_E2_entry_keeps_ask_band_and_spread_refusals",
     "test_engine_lumibot_governor.ExitPolicyMatrix.test_E3_entry_whole_size_remains_inside_notional_cap",
+    "test_engine_lumibot_governor.ExitPolicyMatrix.test_E4b_exit_does_not_depend_on_account_equity_in_any_session",
     "test_engine_lumibot_governor.ExitPolicyMatrix.test_E4_exit_still_requires_long_position_and_fresh_quote",
     "test_engine_lumibot_governor.RestageAdditions.test_R13_str_subclass_values_never_reach_the_sdk_or_the_journal",
     "test_engine_lumibot_governor.RestageAdditions.test_R13b_the_admitted_body_holds_only_plain_values_equal_to_the_reservation",
@@ -62,8 +63,14 @@
     "test_engine_lumibot_governor.RestageAdditions.test_E7_after_a_restart_the_old_working_order_can_be_cancelled_and_the_exit_proceeds",
     "test_engine_lumibot_governor.RestageAdditions.test_E7b_an_unreadable_order_list_after_a_restart_fails_closed",
     "test_engine_lumibot_governor.RestageAdditions.test_E7c_open_order_ownership_requires_both_prefix_and_journal_submission",
-    "test_engine_lumibot_governor.RestageAdditions.test_E8_a_failed_cancel_wedges_the_arm_only_while_its_order_is_outstanding"
+    "test_engine_lumibot_governor.RestageAdditions.test_E8_a_failed_cancel_wedges_the_arm_only_while_its_order_is_outstanding",
+    "test_engine_lumibot_governor.ReviewRecovery.test_J1_journal_failure_latches_and_prevents_later_submit",
+    "test_engine_lumibot_governor.ReviewRecovery.test_J2_consume_refuses_clock_rollback_before_sdk",
+    "test_engine_lumibot_governor.ReviewRecovery.test_J3_restart_finds_owned_order_beyond_default_page",
+    "test_engine_lumibot_governor.ReviewRecovery.test_J4_restart_direct_lookup_fails_closed",
+    "test_engine_lumibot_governor.ReviewRecovery.test_J6_runtime_pins_and_package_sources_are_required",
+    "test_engine_lumibot_governor.ReviewRecovery.test_J5_export_refuses_a_different_acceptance_runtime"
   ],
-  "tests": 48,
-  "wall_seconds": "1.709"
+  "tests": 55,
+  "wall_seconds": "8.506"
 }

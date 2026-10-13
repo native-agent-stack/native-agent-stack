@@ -49,6 +49,20 @@ class GuardedApi:
                     oid = item.get("id") if isinstance(item, dict) else getattr(item, "id", None)
                     if isinstance(cid, str) and cid.startswith(CLIENT_ID_PREFIX) and cid in submitted and oid is not None:
                         owned[str(oid)] = cid
+                # GetOrdersRequest defaults to only the newest 50. Query each
+                # unresolved journal submit missing from that page directly
+                # (alpaca-py cc4cb3b7 trading/client.py:157-176), not by inference.
+                for cid in sorted(submitted.intersection(governor.outstanding)-set(owned.values())):
+                    governor.budget(clock(), units=units)
+                    try:
+                        item = real_client.get_order_by_client_id(cid)
+                    except Exception:
+                        governor.reject("restart_orders_unreadable")
+                    actual = item.get("client_order_id") if isinstance(item, dict) else getattr(item,"client_order_id",None)
+                    oid = item.get("id") if isinstance(item, dict) else getattr(item,"id",None)
+                    if actual != cid or not cid.startswith(CLIENT_ID_PREFIX) or oid is None:
+                        governor.reject("restart_orders_unreadable")
+                    owned[str(oid)] = cid
 
         def invoke(name, *args, **kwargs):
             with governor.lock:

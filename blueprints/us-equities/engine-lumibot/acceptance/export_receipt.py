@@ -4,6 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 import re
+from runtime_snapshot import capture, verify
 
 
 def digest(path):return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -18,6 +19,8 @@ def main():
     root=Path(__file__).resolve().parents[4]
     output=Path(__file__).resolve().parent
     private=json.loads((args.private_run/"receipt.private.json").read_text())
+    binding=capture(args.runtime_python,private["runtime_environment"])
+    verify(private["runtime_binding"],binding)
     sources=[*root.joinpath("blueprints/us-equities/engine-lumibot").glob("*.py"),
              *output.glob("*.py"),root/"blueprints/us-equities/engine-lumibot/caps-a6-diagnostic.json",
              root/"blueprints/us-equities/engine-lumibot/write-boundaries.json",
@@ -59,13 +62,9 @@ def main():
             {"path":name,"sha256":value} for name,value in public_mutations.pop(key).items()]
     path=output/"mutation-results.json";path.write_text(json.dumps(public_mutations,sort_keys=True,indent=2)+"\n")
     results.append({"path":path.relative_to(root).as_posix(),"sha256":digest(path)})
-    import subprocess
-    probe="import sys,importlib.metadata,json;print(json.dumps({'python':sys.version.split()[0],'lumibot':importlib.metadata.version('lumibot'),'alpaca-py':importlib.metadata.version('alpaca-py')}))"
-    runtime=json.loads(subprocess.check_output([str(args.runtime_python),"-B","-c",probe],text=True))
-    assert runtime=={"python":"3.12.4","lumibot":"4.6.11","alpaca-py":"0.44.0"}
+    runtime=binding["runtime"]
     # A distribution lock projection, no host paths or identities.
-    probe="import importlib.metadata,json;print(json.dumps(sorted((d.metadata['Name'],d.version) for d in importlib.metadata.distributions())))"
-    lock=json.loads(subprocess.check_output([str(args.runtime_python),"-B","-c",probe],text=True))
+    lock=binding["distributions"]
     lockpath=output/"runtime-distributions.json";lockpath.write_text(json.dumps(lock,indent=2)+"\n")
     results.append({"path":lockpath.relative_to(root).as_posix(),"sha256":digest(lockpath)})
     receipt={"schema_version":1,"evidence_class":"synthetic","status":"passed",
@@ -73,6 +72,9 @@ def main():
              "lumibot_pin":"862504052407df2586122b752a645f88ce87afa1",
              "alpaca_py_pin":"cc4cb3b7ba50ae250e621983c2779047fb16bb28",
              "runtime":runtime,"runtime_distributions":len(lock),
+             "runtime_interpreter_sha256":binding["interpreter_sha256"],
+             "runtime_package_sources":binding["package_sources"],
+             "strategy_version":private["strategy_version"],"config_sha256":private["config_sha256"],
              "spec_sha256":"8eb20e2e1f3c38a416a364a9f87fef62fcd5bdaa515bf60d78621cde7eff2dc3",
              "addendum_sha256":"cf63eb570cc65e51c24444b6d752ad73825008a0a626e210ae061005f0544805",
              "exit_policy_ruling_sha256":"6e2cb83ef947e05b0d640d344b92e8a093acc2b4cb0ca854efa94f1ed29fc582",

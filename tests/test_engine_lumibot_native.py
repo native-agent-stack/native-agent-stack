@@ -11,7 +11,10 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-from test_engine_lumibot_governor import CODE, CoreCase, FakeSDK, NOW, OrderData
+try:      # Astra B2: both supported forms import the shared fixtures: tests/ on sys.path (the acceptance runner, discovery) and `python -m unittest tests.test_engine_lumibot_native` from the repository root
+    from test_engine_lumibot_governor import CODE, CoreCase, FakeSDK, NOW, OrderData
+except ModuleNotFoundError:
+    from tests.test_engine_lumibot_governor import CODE, CoreCase, FakeSDK, NOW, OrderData
 from governor import Decision, GuardRefusal, Intent
 from guarded_api import GuardedApi
 from stock_only_alpaca import load_classes, read_inbox

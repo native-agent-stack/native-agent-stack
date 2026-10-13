@@ -31,6 +31,8 @@ broker order. CC designation and a flat-and-idle account rotation are separate.
 - [alpacahq/alpaca-py0.44.0](https://github.com/alpacahq/alpaca-py/tree/cc4cb3b7ba50ae250e621983c2779047fb16bb28),
   `alpaca/trading/client.py:53–105` chooses the actual URL and consumes
   `to_request_fields`; `alpaca/common/rest.py:127–135,:195–202` retry behavior.
+  `alpaca/trading/requests.py:196–206` documents the default 50-order page;
+  `trading/client.py:157–176` supplies direct lookup by client order id.
 - CPython3.12 Decimal.quantize, ROUND_FLOOR/ROUND_CEILING and integer arithmetic
   implement D4 direction/whole-share rules; json.dumps with sorted keys and
   allow_nan=False implements deterministic journal bytes. No numeric model
@@ -44,7 +46,8 @@ never raw hints. At most 2 names, 200 USD/name, spread 50 bps, ask 5–200,
 quote 60 s, entry trade 120 s. Unset/malformed caps refuse. Notional, ask band, spread and collar
 apply only to buys. Exit_all sells the held whole quantity at the directionally
 rounded bid in every session; it still needs fresh valid two-sided quotes,
-reconciled long positions and LIMIT/DAY. An exit keeps quote freshness only;
+reconciled long positions and LIMIT/DAY. Account equity gates entries only: an exit stays
+possible at zero or negative equity. An exit keeps quote freshness only;
 its reservation deadline is quote_ns plus the quote limit. Integrality and
 nonnegative quantity are checked for the exited symbol; entries retain the
 account-wide position check.
@@ -101,12 +104,20 @@ Journal files are0600, single-writer locked, append-only canonical JSONL with
 previous-line hashes, caps hash and monotonically assigned local order keys.
 Every decision/refusal and pre-SDK budget/submit/outcome is recorded; fsync is
 observed before the SDK call. A response does not prove a fill/position snapshot.
+Any write, short-write or fsync failure latches that journal object unusable;
+no later append or order admission can proceed, even if the OS error clears.
+Recovery requires closing it and validating retained bytes on reopen; a partial
+or corrupt chain refuses. Consumption validates the monotone clock again, so
+a rollback between request-budget and consumption cannot revive an expired quote.
 Any unknown outcome or restored unresolved decision blocks admission until a
 trusted operator provides reconciled terminal state. No automatic resubmit or
 retry exists. Restart refuses changed caps and preserves request consumption.
 At proxy construction, cancellation ownership is re-derived from journal submit
 rows joined with the broker's open orders: the client id must carry the arm's
 a6- prefix and appear in the journal. An unreadable restart order list refuses.
+The default page is not treated as complete: every unresolved journal submit
+missing from it is retrieved through the SDK's client-id lookup, with request
+budget reserved per lookup. Missing, foreign or unreadable lookup results refuse.
 Unknown open orders refuse entries but do not block a held-position exit or
 reconciliation. Our unresolved orders still require reconciliation. A failed
 cancel sets recovery only while its order is outstanding; after cancellation
@@ -146,10 +157,16 @@ interim run is retained outside the tree.
 The runner snapshots code, caps, inventory, harness and test hashes before the
 run and rechecks them afterward. Export refuses changed run-time inputs or logs,
 and mismatched mutation source/test hashes, before publishing results.
+Before and after testing, runtime_snapshot captures the actual interpreter hash,
+Python/engine/SDK versions, complete distribution projection and hashes of the
+installed Lumibot/alpaca Python source inventories. Export captures the requested
+runtime under the same sanitized environment and requires exact equality with
+the observed acceptance snapshot before publishing. Runtime paths stay private.
+Every receipt names the strategy version and caps-file configuration hash.
 
 ## Observed evidence and limits
 
-The current receipt records 48 L0/L1 cases and 13 native/stub seam cases passing
+The current receipt records 55 L0/L1 cases and 13 native/stub seam cases passing
 in the isolated runtime, zero skips, including 500 seeded model-hint invariance
 cases (seed 260413). The 500-case numerical test suppresses only repeated fsync
 calls; the separate A6 durability test observes real fsync before the SDK.
@@ -157,7 +174,7 @@ Stdlib-only CI executes the three seam tests and explicitly skips10native
 cases; those skips are not native acceptance. Tests are unittest-discovered,
 not silently collected through pytest alone.
 
-A8: 74 selected exact-site mutants killed, 0 survived, 0 not-applied, 0 invalid-runs,
+A8: 86 selected exact-site mutants killed, 0 survived, 0 not-applied, 0 invalid-runs,
 0 baseline-failures, including a paired removal of both final-payload equality
 checks. Each probe first runs its unmutated named case successfully, then must
 execute that same case with AssertionError and that test's id in the output.
@@ -172,6 +189,12 @@ control that passes both). Their guard mutants cover canonical values/tokens,
 each override variable, quote-only deadline, own-symbol integrality and the
 journal/prefix ownership and recovery operands, including an independent
 synthetic legacy-client-id test. No broker observation is credited.
+The pushed-head review adds eight zero/negative-equity exit cases and fail-before
+journal-latch, complete restart lookup, consumption rollback and runtime-binding
+cases against ca52c176. Both unittest-by-module from the root and focused discovery
+run; the native test imports shared fixtures in either package form. The deadline
+test advances its clock monotonically after consumption, retaining inclusive
+expiry and strictly expired controls.
 Early sweep28found2masked survivors and1ambiguous site; tests/site targeting
 were corrected without weakening expected reasons.
 Initial native fixtures exposed the SIMPLE default and invalid compound/crypto

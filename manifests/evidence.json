@@ -15013,28 +15013,28 @@
     },
     {
       "path": "blueprints/us-equities/engine-lumibot/README.md",
-      "sha256": "554a40f4603b8eaaafde08c3a9ca86dcd228041ff11c5fa4411329d9111a2730",
-      "bytes": 11996
+      "sha256": "7fb239baeeb5243f2d24d50a00bccfbcf938a89507ae4591be1f68747990ee8a",
+      "bytes": 13785
     },
     {
       "path": "blueprints/us-equities/engine-lumibot/acceptance/export_receipt.py",
-      "sha256": "258a0441c7f557d2eaf5de3a3b7f0347e84da40cf6add2209b35fed4684959de",
-      "bytes": 6462
+      "sha256": "e8a2e737750eab8cecdcd22a060f94558870fe3cecf30aba3f18c5def01a758b",
+      "bytes": 6285
     },
     {
       "path": "blueprints/us-equities/engine-lumibot/acceptance/mutate_guards.py",
-      "sha256": "9574f239ca7cea3cc5b636b6759cc67476aaf1ad7cc40f0df04f84afca0573a6",
-      "bytes": 15921
+      "sha256": "7c0aab0520efb3d4a34397536411d814b4153ea28b1d0017ca2d7cd86f344f6b",
+      "bytes": 19079
     },
     {
       "path": "blueprints/us-equities/engine-lumibot/acceptance/mutation-results.json",
-      "sha256": "32b79e62fb0ceb62cd0fc89b5b04143382a74c32bbe2e040084d0a5af896a008",
-      "bytes": 21422
+      "sha256": "3e1aedac6a18b45bb10d12d29f5927b1e7c093a7877a8442c60a138feef5a6e1",
+      "bytes": 25209
     },
     {
       "path": "blueprints/us-equities/engine-lumibot/acceptance/receipt.json",
-      "sha256": "89070e9ad3888e9a7bffbdc2299f0dc599607e3c266bf8010fc2c7867b4db7bd",
-      "bytes": 3997
+      "sha256": "0dda574894fbe201f322a1fca2c2e37d8a0ca11376d99a67b1abe0d02cd8530f",
+      "bytes": 4748
     },
     {
       "path": "blueprints/us-equities/engine-lumibot/acceptance/refresh_sources.py",
@@ -15043,8 +15043,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-lumibot/acceptance/run_acceptance.py",
-      "sha256": "fa09aa6463b4b334f574b576070c3ef660fd3c41a5a1cec56615ad8b9f72ba18",
-      "bytes": 3984
+      "sha256": "6ff24ccd0aee1827005cff8c63d1f04c4266d0493db7ffa774f5b06f12e0c699",
+      "bytes": 4441
     },
     {
       "path": "blueprints/us-equities/engine-lumibot/acceptance/runtime-distributions.json",
@@ -15052,13 +15052,18 @@
       "bytes": 10852
     },
     {
+      "path": "blueprints/us-equities/engine-lumibot/acceptance/runtime_snapshot.py",
+      "sha256": "886c2f56cd6924e3aabf05e05f082fc9e0ac9ba07d987269a14aad179fb0707b",
+      "bytes": 1800
+    },
+    {
       "path": "blueprints/us-equities/engine-lumibot/acceptance/test_engine_lumibot_governor.result.json",
-      "sha256": "85fe851f0e6b2efd7014485a74e80b49a1718a54dd399961c71a197c5bb15c60",
-      "bytes": 5119
+      "sha256": "ab6455636c0ede8dc52efa3cea48b02c0c1a66e2fd1829ec0a2ed9f637701383",
+      "bytes": 5854
     },
     {
       "path": "blueprints/us-equities/engine-lumibot/acceptance/test_engine_lumibot_native.result.json",
-      "sha256": "4d1261f35916dd7942eee792821c2d100407ba4a7401955501283158dba5b2c2",
+      "sha256": "6eea9a24238f44671e60590cdd95b4d13b887a5ce27f83418fa631fd7e23fa59",
       "bytes": 1473
     },
     {
@@ -15073,13 +15078,13 @@
     },
     {
       "path": "blueprints/us-equities/engine-lumibot/governor.py",
-      "sha256": "fac0dbc065b12d70f486bb0abc3af5b1d9ff30e2e72ae195e7fdc9b4264aec69",
-      "bytes": 16156
+      "sha256": "6931e1a539b68a3b72620bad690908e9afe185083c6b5af4110b8b1769630f19",
+      "bytes": 16581
     },
     {
       "path": "blueprints/us-equities/engine-lumibot/guarded_api.py",
-      "sha256": "c8ee46a98e9d89c42f5bbebed940d8871e214194ea2056649cab2a8ed1582ad0",
-      "bytes": 9156
+      "sha256": "6109729a83c189e41021702067bde39b7af1696b6cfe2735b86fe53f889ba3cc",
+      "bytes": 10181
     },
     {
       "path": "blueprints/us-equities/engine-lumibot/stock_only_alpaca.py",
@@ -62433,13 +62438,13 @@
     },
     {
       "path": "tests/test_engine_lumibot_governor.py",
-      "sha256": "c780c5b32fbc73dc12f89fc2e0ae0290b0a7b2a3a6e6ecd5aca24eae6b01310c",
-      "bytes": 41032
+      "sha256": "226ac1477a6acf25a9a6eecd436052697f5a192d0da79ee99f6cdd0471688fd5",
+      "bytes": 50350
     },
     {
       "path": "tests/test_engine_lumibot_native.py",
-      "sha256": "d287a380c2f6853d79fe6fdcc13c0d0909f004cb5009c0aec77767833bc34134",
-      "bytes": 13631
+      "sha256": "84a1ddb5ace4253739a3438c51d6e3bf3a6401328748061e786093e98a9c08e5",
+      "bytes": 13962
     },
     {
       "path": "tests/test_env_freshness.py",

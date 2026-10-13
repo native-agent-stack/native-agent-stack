@@ -518,7 +518,7 @@ class RestageAdditions(CoreCase):
         self.assertEqual(self.gov.deadlines[first.client_order_id], NOW + 60 * 10**9)
         self.gov.consume(first.payload(), first.client_order_id, NOW + 60 * 10**9)      # exactly at the quote's deadline: allowed
         self.gov.reconcile(first.client_order_id, terminal="filled", account=self.account)
-        second = self.sell({"SYN": 20}, old_print, now=NOW + 1)
+        second = self.sell({"SYN": 20}, replace(old_print,clock_ns=NOW + 60*10**9), now=NOW + 60*10**9)
         self.assertIsInstance(second, Decision, second)
         with self.assertRaisesRegex(GuardRefusal, "^reservation_expired$"):
             self.gov.consume(second.payload(), second.client_order_id, NOW + 60 * 10**9 + 2)
@@ -632,6 +632,132 @@ class RestageAdditions(CoreCase):
         self.assertFalse(self.gov.recovery_required)
 
 
+class ReviewRecovery(CoreCase):
+    def test_J1_journal_failure_latches_and_prevents_later_submit(self):
+        for mode in ("fsync", "short", "write"):
+            with self.subTest(mode=mode):
+                journal=Journal(self.root/(mode+".jsonl"))
+                try:
+                    gov=Governor(CODE/"caps-a6-diagnostic.json",journal)
+                    sdk=FakeSDK();api=GuardedApi(sdk,gov,lambda:NOW)
+                    write=os.write
+                    def short(fd,raw):return write(fd,raw[:max(1,len(raw)//2)])
+                    target="governor.os.fsync" if mode=="fsync" else "governor.os.write"
+                    with patch(target,side_effect=OSError("synthetic")) if mode!="short" else patch(target,side_effect=short):
+                        with self.assertRaisesRegex(GuardRefusal,"^journal_write$"):
+                            gov.decide(self.intent,self.quote,self.account,NOW)
+                    before=journal.path.read_bytes()
+                    with self.assertRaisesRegex(GuardRefusal,"^journal_write$"):
+                        result=gov.decide(self.intent,self.quote,self.account,NOW)
+                        if isinstance(result,Decision):api.submit_order(order_data=OrderData(**result.payload()))
+                    self.assertEqual(journal.path.read_bytes(),before)
+                    self.assertFalse(sdk.writes)
+                finally:journal.close()
+
+    def test_J2_consume_refuses_clock_rollback_before_sdk(self):
+        decision=self.decision()
+        times=iter((NOW+61*10**9,NOW+59*10**9))
+        api=GuardedApi(self.sdk,self.gov,lambda:next(times))
+        with self.assertRaisesRegex(GuardRefusal,"^clock$"):
+            api.submit_order(order_data=OrderData(**decision.payload()))
+        self.assertFalse(self.sdk.writes)
+        self.assertFalse(any(r["event"]=="submit" for r in self.journal.rows))
+        self.assertIn(decision.reservation,self.gov.reservations)
+
+    def test_J3_restart_finds_owned_order_beyond_default_page(self):
+        decision=self.decision();self.api.submit_order(order_data=OrderData(**decision.payload()))
+        self.journal.close();self.journal=Journal(self.root/"journal.jsonl")
+        gov=Governor(CODE/"caps-a6-diagnostic.json",self.journal)
+        sdk=FakeSDK();sdk.get_orders=lambda:[{"id":str(i),"client_order_id":"foreign-"+str(i)} for i in range(50)]
+        looked=[]
+        def lookup(cid):
+            looked.append(cid)
+            return SimpleNamespace(id="old-owned",client_order_id=cid,status="new")
+        sdk.get_order_by_client_id=lookup
+        before=len(gov.requests)
+        api=GuardedApi(sdk,gov,lambda:NOW)
+        try:api.cancel_order_by_id("old-owned")
+        except GuardRefusal as error:self.fail(f"retained owned order must remain cancellable: {error}")
+        self.assertEqual(looked,[decision.client_order_id])
+        self.assertEqual(sdk.writes,[("cancel","old-owned")])
+        self.assertEqual(len(gov.requests)-before,12)  # list + direct lookup + cancel
+
+    def test_J4_restart_direct_lookup_fails_closed(self):
+        decision=self.decision();self.api.submit_order(order_data=OrderData(**decision.payload()))
+        for result in (None,SimpleNamespace(id="bad",client_order_id="foreign"),RuntimeError("unreadable")):
+            with self.subTest(shape=type(result).__name__):
+                sdk=FakeSDK();sdk.get_orders=lambda:[]
+                def lookup(cid):
+                    if isinstance(result,Exception):raise result
+                    return result
+                sdk.get_order_by_client_id=lookup
+                try:GuardedApi(sdk,self.gov,lambda:NOW)
+                except Exception as error:
+                    self.assertIs(type(error),GuardRefusal)
+                    self.assertEqual(str(error),"restart_orders_unreadable")
+                else:self.fail("missing/foreign/unreadable direct order must refuse")
+
+    def test_J6_runtime_pins_and_package_sources_are_required(self):
+        import importlib.util
+        spec=importlib.util.spec_from_file_location("review_runtime",CODE/"acceptance/runtime_snapshot.py")
+        module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        current={"runtime":{"python":"3.12.4","lumibot":"4.6.11","alpaca-py":"0.44.0"}}
+        module.verify(current,current)
+        bad={"runtime":dict(current["runtime"],lumibot="4.6.18")}
+        with self.assertRaisesRegex(SystemExit,"^acceptance_runtime_pin_mismatch$"):
+            module.verify(bad,bad)
+        class EmptyDistribution:
+            files=[]
+        with patch.object(module.metadata,"distributions",return_value=[]), \
+             patch.object(module.metadata,"distribution",return_value=EmptyDistribution()):
+            try:module.observe()
+            except BaseException as error:
+                self.assertIs(type(error),SystemExit)
+                self.assertEqual(str(error),"runtime_sources_missing")
+            else:self.fail("empty installed source inventory must refuse")
+
+    def test_J5_export_refuses_a_different_acceptance_runtime(self):
+        import importlib.util
+        import hashlib
+        import copy
+        import subprocess
+        current_acceptance=Path(__file__).resolve().parents[1]/"blueprints/us-equities/engine-lumibot/acceptance"
+        with patch.object(sys,"path",[str(CODE/"acceptance"),str(current_acceptance),*sys.path]):
+            spec=importlib.util.spec_from_file_location("review_export",CODE/"acceptance/export_receipt.py")
+            module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        expected={"runtime":{"python":"3.12.4","lumibot":"4.6.11","alpaca-py":"0.44.0"},
+                  "interpreter_sha256":"1"*64,"distributions":[["lumibot","4.6.11"]],
+                  "package_sources":[{"package":"lumibot","sha256":"2"*64,"files":1}]}
+        root=CODE.parents[2];out=CODE/"acceptance"
+        sources=[*CODE.glob("*.py"),*out.glob("*.py"),CODE/"caps-a6-diagnostic.json",CODE/"write-boundaries.json",
+                 root/"tests/test_engine_lumibot_governor.py",root/"tests/test_engine_lumibot_native.py"]
+        inputs=[{"role":p.name,"sha256":hashlib.sha256(p.read_bytes()).hexdigest()} for p in sources]
+        log=b"test_synthetic (synthetic.Case.test_synthetic) ... ok\n\nRan 1 test in 0.001s\n\nOK\n"
+        (self.root/"synthetic.log").write_bytes(log)
+        receipt={"input_hashes":inputs,"runtime_binding":expected,"runtime_environment":{},
+                 "started_at":"synthetic","finished_at":"synthetic","commands":[{
+                 "command":["synthetic"],"exit_code":0,"raw_output":{"role":"synthetic_private_log",
+                 "sha256":hashlib.sha256(log).hexdigest()}}]}
+        summary={"survived":0,"not_applied":0,"invalid_runs":0,"baseline_failures":0,"killed":0,
+                 "source_sha256":{},"check_source_sha256":{}}
+        (self.root/"summary.json").write_text(json.dumps(summary))
+        args=SimpleNamespace(private_run=self.root,mutations=self.root,runtime_python=Path("synthetic-python"))
+        for component in ("runtime","interpreter_sha256","distributions","package_sources"):
+            with self.subTest(component=component):
+                observed=copy.deepcopy(expected)
+                if component=="runtime":observed[component]["python"]="3.12.3"
+                else:observed[component]="changed"
+                (self.root/"receipt.private.json").write_text(json.dumps(receipt))
+                with patch.object(module.argparse.ArgumentParser,"parse_args",return_value=args), \
+                     patch.object(module,"capture",return_value=observed,create=True), \
+                     patch.object(subprocess,"check_output",side_effect=[json.dumps(expected["runtime"]),"[]"]):
+                    try:module.main()
+                    except BaseException as error:
+                        self.assertIs(type(error),SystemExit)
+                        self.assertEqual(str(error),"acceptance_runtime_mismatch")
+                    else:self.fail("different runtime must refuse before export")
+
+
 class ExitPolicyMatrix(CoreCase):
     """CC B1 ruling: six admitted exit cases across all four sessions."""
     SESSIONS=("RTH","PRE","POST","OVERNIGHT")
@@ -663,6 +789,20 @@ class ExitPolicyMatrix(CoreCase):
             self.assertIsInstance(result,Decision);self.assertLessEqual(result.qty*result.limit_price,D("200"))
             self.gov.reconcile(result.client_order_id,terminal="not_sent",account=self.account)
 
+    def test_E4b_exit_does_not_depend_on_account_equity_in_any_session(self):
+        # Astra B1 at ca52c176: a reconciled long position stays exitable at zero or negative equity in every session; an entry at the same equity is still refused
+        for session in self.SESSIONS:
+            for equity in ("0", "-1"):
+                with self.subTest(session=session, equity=equity):
+                    account = replace(self.account, equity=D(equity), positions={"SYN": 20})
+                    quote = replace(self.quote, bid=D("10.00"), ask=D("10.01"), session=session)
+                    result = self.gov.decide(Intent("SYN", "sell", "exit_all"), quote, account, NOW)
+                    self.assertIsInstance(result, Decision)
+                    self.assertEqual((result.side, result.qty, result.limit_price), ("sell", 20, D("10.00")))
+                    self.assertIs(result.extended_hours, session != "RTH")
+                    self.gov.reconcile(result.client_order_id, terminal="not_sent", account=account)
+                    self.assertEqual(self.gov.decide(self.intent, replace(self.quote, session=session), replace(self.account, equity=D(equity)), NOW), Refusal("quote_account"))
+
     def test_E4_exit_still_requires_long_position_and_fresh_quote(self):
         quote=replace(self.quote,bid=D("10.04"),ask=D("10.05"))
         self.assertEqual(self.gov.decide(Intent("SYN","sell","exit_all"),quote,self.account,NOW),Refusal("quantity"))
@@ -672,7 +812,7 @@ class ExitPolicyMatrix(CoreCase):
 
 def load_tests(loader,tests,pattern):
     suite=unittest.TestSuite()
-    for cls in (CoreCase,ReviewerAdditions,ExitPolicyMatrix,RestageAdditions):
+    for cls in (CoreCase,ReviewerAdditions,ExitPolicyMatrix,RestageAdditions,ReviewRecovery):
         suite.addTests(cls(name) for name in vars(cls) if name.startswith("test_"))
     return suite
 

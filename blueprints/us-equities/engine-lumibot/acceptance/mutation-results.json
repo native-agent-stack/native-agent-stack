@@ -2,22 +2,34 @@
   "baseline_failures": 0,
   "check_source_hashes": [
     {
+      "path": "export_receipt.py",
+      "sha256": "e8a2e737750eab8cecdcd22a060f94558870fe3cecf30aba3f18c5def01a758b"
+    },
+    {
       "path": "mutate_guards.py",
-      "sha256": "9574f239ca7cea3cc5b636b6759cc67476aaf1ad7cc40f0df04f84afca0573a6"
+      "sha256": "7c0aab0520efb3d4a34397536411d814b4153ea28b1d0017ca2d7cd86f344f6b"
+    },
+    {
+      "path": "run_acceptance.py",
+      "sha256": "6ff24ccd0aee1827005cff8c63d1f04c4266d0493db7ffa774f5b06f12e0c699"
+    },
+    {
+      "path": "runtime_snapshot.py",
+      "sha256": "886c2f56cd6924e3aabf05e05f082fc9e0ac9ba07d987269a14aad179fb0707b"
     },
     {
       "path": "test_engine_lumibot_governor.py",
-      "sha256": "c780c5b32fbc73dc12f89fc2e0ae0290b0a7b2a3a6e6ecd5aca24eae6b01310c"
+      "sha256": "226ac1477a6acf25a9a6eecd436052697f5a192d0da79ee99f6cdd0471688fd5"
     },
     {
       "path": "test_engine_lumibot_native.py",
-      "sha256": "d287a380c2f6853d79fe6fdcc13c0d0909f004cb5009c0aec77767833bc34134"
+      "sha256": "84a1ddb5ace4253739a3438c51d6e3bf3a6401328748061e786093e98a9c08e5"
     }
   ],
   "coverage": "listed exact-site probes and one layered payload-equality pair; not an exhaustive every-refusal census",
   "evidence_class": "synthetic",
   "invalid_runs": 0,
-  "killed": 74,
+  "killed": 86,
   "mutants": [
     {
       "baseline_exit_code": 0,
@@ -431,6 +443,22 @@
       "baseline_exit_code": 0,
       "exit_code": 1,
       "matching_assertion_failed": true,
+      "name": "exit_equity",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.ExitPolicyMatrix.test_E4b_exit_does_not_depend_on_account_equity_in_any_session"
+    },
+    {
+      "baseline_exit_code": 0,
+      "exit_code": 1,
+      "matching_assertion_failed": true,
+      "name": "entry_equity",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.ExitPolicyMatrix.test_E4b_exit_does_not_depend_on_account_equity_in_any_session"
+    },
+    {
+      "baseline_exit_code": 0,
+      "exit_code": 1,
+      "matching_assertion_failed": true,
       "name": "exit_own_quantity",
       "status": "KILLED",
       "test": "test_engine_lumibot_governor.RestageAdditions.test_E6_an_exit_needs_an_integral_quantity_only_for_its_own_symbol"
@@ -567,6 +595,86 @@
       "baseline_exit_code": 0,
       "exit_code": 1,
       "matching_assertion_failed": true,
+      "name": "journal_latch_set",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.ReviewRecovery.test_J1_journal_failure_latches_and_prevents_later_submit"
+    },
+    {
+      "baseline_exit_code": 0,
+      "exit_code": 1,
+      "matching_assertion_failed": true,
+      "name": "journal_latch_check",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.ReviewRecovery.test_J1_journal_failure_latches_and_prevents_later_submit"
+    },
+    {
+      "baseline_exit_code": 0,
+      "exit_code": 1,
+      "matching_assertion_failed": true,
+      "name": "consume_monotonic",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.ReviewRecovery.test_J2_consume_refuses_clock_rollback_before_sdk"
+    },
+    {
+      "baseline_exit_code": 0,
+      "exit_code": 1,
+      "matching_assertion_failed": true,
+      "name": "restore_direct_coverage",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.ReviewRecovery.test_J3_restart_finds_owned_order_beyond_default_page"
+    },
+    {
+      "baseline_exit_code": 0,
+      "exit_code": 1,
+      "matching_assertion_failed": true,
+      "name": "restore_direct_identity",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.ReviewRecovery.test_J4_restart_direct_lookup_fails_closed"
+    },
+    {
+      "baseline_exit_code": 0,
+      "exit_code": 1,
+      "matching_assertion_failed": true,
+      "name": "restore_direct_failure",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.ReviewRecovery.test_J4_restart_direct_lookup_fails_closed"
+    },
+    {
+      "baseline_exit_code": 0,
+      "exit_code": 1,
+      "matching_assertion_failed": true,
+      "name": "runtime_export_binding",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.ReviewRecovery.test_J5_export_refuses_a_different_acceptance_runtime"
+    },
+    {
+      "baseline_exit_code": 0,
+      "exit_code": 1,
+      "matching_assertion_failed": true,
+      "name": "runtime_identity",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.ReviewRecovery.test_J5_export_refuses_a_different_acceptance_runtime"
+    },
+    {
+      "baseline_exit_code": 0,
+      "exit_code": 1,
+      "matching_assertion_failed": true,
+      "name": "runtime_pin",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.ReviewRecovery.test_J6_runtime_pins_and_package_sources_are_required"
+    },
+    {
+      "baseline_exit_code": 0,
+      "exit_code": 1,
+      "matching_assertion_failed": true,
+      "name": "runtime_sources",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.ReviewRecovery.test_J6_runtime_pins_and_package_sources_are_required"
+    },
+    {
+      "baseline_exit_code": 0,
+      "exit_code": 1,
+      "matching_assertion_failed": true,
       "name": "seam__submit_orders",
       "status": "KILLED",
       "test": "test_engine_lumibot_native.SeamCI.test_A2_each_committed_seam_override_independently"
@@ -616,11 +724,11 @@
   "source_hashes": [
     {
       "path": "governor.py",
-      "sha256": "fac0dbc065b12d70f486bb0abc3af5b1d9ff30e2e72ae195e7fdc9b4264aec69"
+      "sha256": "6931e1a539b68a3b72620bad690908e9afe185083c6b5af4110b8b1769630f19"
     },
     {
       "path": "guarded_api.py",
-      "sha256": "c8ee46a98e9d89c42f5bbebed940d8871e214194ea2056649cab2a8ed1582ad0"
+      "sha256": "6109729a83c189e41021702067bde39b7af1696b6cfe2735b86fe53f889ba3cc"
     },
     {
       "path": "stock_only_alpaca.py",

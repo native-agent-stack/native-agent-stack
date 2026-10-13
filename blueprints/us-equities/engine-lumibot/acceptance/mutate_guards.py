@@ -72,11 +72,13 @@ MUTANTS += [
  ("reserved_token", "guarded_api.py", 'token = payload["client_order_id"]      # the reservation\'s key', 'pass      # the reservation\'s key', 'test_R13_str_subclass_values_never_reach_the_sdk_or_the_journal'),
  ("exit_trade_age", "governor.py", 'if intent.side == "buy":      # CC ruling', 'if True:      # CC ruling', 'test_E5_an_exit_needs_a_fresh_quote_not_a_recent_trade'),
  ("exit_quote_deadline", "governor.py", 'quote_deadline if intent.side == "sell" else min(', 'min(', 'test_E5b_an_exits_reservation_deadline_comes_from_the_quote'),
+ ("exit_equity", "governor.py", '(intent.side == "buy" and equity <= 0)', '(equity <= 0)', 'test_E4b_exit_does_not_depend_on_account_equity_in_any_session'),
+ ("entry_equity", "governor.py", '(intent.side == "buy" and equity <= 0)', 'False', 'test_E4b_exit_does_not_depend_on_account_equity_in_any_session'),
  ("exit_own_quantity", "governor.py", 'held = positions if intent.side == "buy" else {intent.symbol: positions.get(intent.symbol, D(0))}', 'held = positions', 'test_E6_an_exit_needs_an_integral_quantity_only_for_its_own_symbol'),
- ("restart_orders_unreadable", "guarded_api.py", 'governor.reject("restart_orders_unreadable")', 'pass', 'test_E7b_an_unreadable_order_list_after_a_restart_fails_closed'),
+ ("restart_orders_unreadable", "guarded_api.py", 'listed = real_client.get_orders()\n                except Exception:\n                    governor.reject("restart_orders_unreadable")', 'listed = real_client.get_orders()\n                except Exception:\n                    pass', 'test_E7b_an_unreadable_order_list_after_a_restart_fails_closed'),
  ("is_ours_prefix", "governor.py", 'cid.startswith(CLIENT_ID_PREFIX)', 'True', 'test_E7c_open_order_ownership_requires_both_prefix_and_journal_submission'),
  ("is_ours_submission", "governor.py", 'cid in self.submitted', 'True', 'test_E7c_open_order_ownership_requires_both_prefix_and_journal_submission'),
- ("owned_prefix", "guarded_api.py", 'cid.startswith(CLIENT_ID_PREFIX)', 'True', 'test_E7c_open_order_ownership_requires_both_prefix_and_journal_submission'),
+ ("owned_prefix", "guarded_api.py", 'isinstance(cid, str) and cid.startswith(CLIENT_ID_PREFIX) and cid in submitted', 'isinstance(cid, str) and cid in submitted', 'test_E7c_open_order_ownership_requires_both_prefix_and_journal_submission'),
  ("owned_submission", "guarded_api.py", 'cid in submitted', 'True', 'test_E7c_open_order_ownership_requires_both_prefix_and_journal_submission'),
  ("restored_submissions", "governor.py", 'self.submitted.add(key)', 'pass', 'test_E7_after_a_restart_the_old_working_order_can_be_cancelled_and_the_exit_proceeds'),
  ("current_submissions", "governor.py", 'self.submitted.add(token)', 'pass', 'test_E7c_open_order_ownership_requires_both_prefix_and_journal_submission'),
@@ -91,6 +93,18 @@ override_tuple = '(' + ', '.join('"'+name+'"' for name in OVERRIDE_NAMES) + ')'
 MUTANTS += [("override_"+name.lower(), "stock_only_alpaca.py", override_tuple,
              '(' + ', '.join('"'+other+'"' for other in OVERRIDE_NAMES if other != name) + ')',
              'test_R14_environment_overrides_of_the_real_constructor_refuse') for name in OVERRIDE_NAMES]
+MUTANTS += [
+ ("journal_latch_set", "governor.py", 'self.unusable = True', 'pass', 'test_J1_journal_failure_latches_and_prevents_later_submit'),
+ ("journal_latch_check", "governor.py", 'if self.unusable:', 'if False:', 'test_J1_journal_failure_latches_and_prevents_later_submit'),
+ ("consume_monotonic", "governor.py", 'def consume(self, payload, token, now):\n        self._time(now)', 'def consume(self, payload, token, now):\n        pass', 'test_J2_consume_refuses_clock_rollback_before_sdk'),
+ ("restore_direct_coverage", "guarded_api.py", 'sorted(submitted.intersection(governor.outstanding)-set(owned.values()))', '[]', 'test_J3_restart_finds_owned_order_beyond_default_page'),
+ ("restore_direct_identity", "guarded_api.py", 'if actual != cid or not cid.startswith(CLIENT_ID_PREFIX) or oid is None:', 'if False:', 'test_J4_restart_direct_lookup_fails_closed'),
+ ("restore_direct_failure", "guarded_api.py", 'item = real_client.get_order_by_client_id(cid)\n                    except Exception:\n                        governor.reject("restart_orders_unreadable")', 'item = real_client.get_order_by_client_id(cid)\n                    except Exception:\n                        pass', 'test_J4_restart_direct_lookup_fails_closed'),
+ ("runtime_export_binding", "acceptance/export_receipt.py", 'verify(private["runtime_binding"],binding)', 'pass', 'test_J5_export_refuses_a_different_acceptance_runtime'),
+ ("runtime_identity", "acceptance/runtime_snapshot.py", 'if recorded != observed:', 'if False:', 'test_J5_export_refuses_a_different_acceptance_runtime'),
+ ("runtime_pin", "acceptance/runtime_snapshot.py", 'if observed["runtime"] != {"python":"3.12.4","lumibot":"4.6.11","alpaca-py":"0.44.0"}:', 'if False:', 'test_J6_runtime_pins_and_package_sources_are_required'),
+ ("runtime_sources", "acceptance/runtime_snapshot.py", 'if not rows:raise SystemExit("runtime_sources_missing")', 'pass', 'test_J6_runtime_pins_and_package_sources_are_required'),
+]
 MUTANTS += [("seam_"+name,"stock_only_alpaca.py",name+" = _deny",
              name+" = lambda self, *a, **k: None","test_A2_each_committed_seam_override_independently")
             for name in ("_submit_orders","_submit_multileg_order","_modify_order",
@@ -108,11 +122,14 @@ def main():
     args.output.mkdir(parents=True,exist_ok=True,mode=0o700)
     before={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in code.glob("*.py")}
     check_sources=[Path(__file__).resolve(),tests/"test_engine_lumibot_governor.py",
-                   tests/"test_engine_lumibot_native.py"]
+                   tests/"test_engine_lumibot_native.py",code/"acceptance/export_receipt.py",
+                   code/"acceptance/runtime_snapshot.py",code/"acceptance/run_acceptance.py"]
     check_hashes={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in check_sources}
     results=[]
     for name, file, old, new, test in MUTANTS:
-        module = ("test_engine_lumibot_governor.RestageAdditions" if test.startswith(("test_R13", "test_R14", "test_E"))
+        module = ("test_engine_lumibot_governor.ReviewRecovery" if test.startswith("test_J")
+                  else "test_engine_lumibot_governor.ExitPolicyMatrix" if test.startswith("test_E4b")
+                  else "test_engine_lumibot_governor.RestageAdditions" if test.startswith(("test_R13", "test_R14", "test_E"))
                   else "test_engine_lumibot_governor.ReviewerAdditions" if test.startswith("test_R")
                   else "test_engine_lumibot_native.SeamCI" if file=="stock_only_alpaca.py"
                   else "test_engine_lumibot_governor.CoreCase")
@@ -124,7 +141,11 @@ def main():
             results.append({"name":name,"status":"BASELINE_FAILED","exit_code":baseline.returncode,"test":module+"."+test})
             continue
         with tempfile.TemporaryDirectory(prefix="lumibot-mutant-",dir="/var/tmp") as temporary:
-            target=Path(temporary)/"code";shutil.copytree(code,target)
+            scratch_root=Path(temporary)/"repo"
+            target=scratch_root/"blueprints/us-equities/engine-lumibot";shutil.copytree(code,target)
+            (scratch_root/"tests").mkdir()
+            for filename in ("test_engine_lumibot_governor.py","test_engine_lumibot_native.py"):
+                shutil.copyfile(tests/filename,scratch_root/"tests"/filename)
             source=(target/file).read_text()
             if source.count(old)!=1:
                 results.append({"name":name,"status":"NOT_APPLIED","site_count":source.count(old)})
