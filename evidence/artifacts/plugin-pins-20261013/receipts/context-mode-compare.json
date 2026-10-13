@@ -1,0 +1,49 @@
+{
+  "what": "GitHub's compare API for mksglu/context-mode (the files list is capped by GitHub at 300; every list here is shorter)",
+  "taken": "2026-10-13T19:42Z",
+  "comparisons": [
+    {
+      "what": "the reviewed commit against the commit the first host installed (the by-content rule of adoption/bootstrap.md step 4a)",
+      "base": "6f0cc6841c687e754059f36714a11233fda1a02b",
+      "head": "9f3ecc8b0aafd25d3592ffc31e4b02b1767f6089",
+      "result": {
+        "ahead_by": 21,
+        "behind_by": 0,
+        "files": [
+          "stats.json"
+        ],
+        "status": "ahead"
+      }
+    },
+    {
+      "what": "the commit of tag v1.0.169 against the reviewed commit",
+      "base": "589d8214d56740a28b5f7bf63167743d586b0b40",
+      "head": "6f0cc6841c687e754059f36714a11233fda1a02b",
+      "result": {
+        "ahead_by": 133,
+        "behind_by": 0,
+        "files": [
+          "cli.bundle.mjs",
+          "server.bundle.mjs",
+          "stats.json"
+        ],
+        "status": "ahead"
+      }
+    },
+    {
+      "what": "the commit of tag v1.0.169 against the commit the first host installed",
+      "base": "589d8214d56740a28b5f7bf63167743d586b0b40",
+      "head": "9f3ecc8b0aafd25d3592ffc31e4b02b1767f6089",
+      "result": {
+        "ahead_by": 154,
+        "behind_by": 0,
+        "files": [
+          "cli.bundle.mjs",
+          "server.bundle.mjs",
+          "stats.json"
+        ],
+        "status": "ahead"
+      }
+    }
+  ]
+}

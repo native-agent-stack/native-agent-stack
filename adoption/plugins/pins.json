@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "kind": "claude_plugin_pins",
+  "stage": 1,
+  "purpose": "The reviewed commit of every plugin that a profile template enables, one entry each: the tag it resolves to where the template names a tag, and a recorded exception where it cannot be held to one. Claude Code applies a commit pin only from a plugin entry of a marketplace.json, never from a marketplace source (stage 2 lifts these entries into a catalog-owned marketplace whose plugin entries carry the sha); until then this record is what the template test and adoption/bootstrap.md step 4a hold the templates and the host to.",
+  "client": "2.1.296",
+  "verified_at": "2026-10-13T19:42Z",
+  "evidence": "evidence/artifacts/plugin-pins-20261013/",
+  "templates": [
+    "adoption/templates/claude.settings.template.json",
+    "adoption/new-wsl/templates/claude.settings.additions.json"
+  ],
+  "plugins": [
+    {
+      "id": "claude-hud@claude-hud",
+      "marketplace": "claude-hud",
+      "marketplace_source": {"source": "github", "repo": "jarrodwatts/claude-hud", "ref": "v0.10.0"},
+      "version": "0.10.0",
+      "pin": "tag",
+      "sha": "75683c6de1ac07f6bbef00d739001679dba0740c",
+      "tag_resolution": "receipts/tag-resolution.txt: refs/tags/v0.10.0^{} of jarrodwatts/claude-hud (an annotated tag; its peeled commit)"
+    },
+    {
+      "id": "codex@openai-codex",
+      "marketplace": "openai-codex",
+      "marketplace_source": {"source": "github", "repo": "openai/codex-plugin-cc", "ref": "v1.0.6"},
+      "version": "1.0.6",
+      "pin": "tag",
+      "sha": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+      "tag_resolution": "receipts/tag-resolution.txt: refs/tags/v1.0.6 of openai/codex-plugin-cc (a lightweight tag; the commit)"
+    },
+    {
+      "id": "context-mode@context-mode",
+      "marketplace": "context-mode",
+      "marketplace_source": {"source": "github", "repo": "mksglu/context-mode"},
+      "version": "1.0.169",
+      "pin": "exception",
+      "sha": "6f0cc6841c687e754059f36714a11233fda1a02b",
+      "exception": {
+        "reason": "The marketplace source names no ref, so Claude Code installs the tip of the default branch. The reviewed commit is on no tag: the newest tag of the plugin's version, v1.0.169, resolves to a commit 133 commits older, with different bundled files, so naming that tag would change the content. A marketplace source takes a ref and never a sha, so the commit can be held only by a plugin entry of a marketplace.json that the catalog owns (stage 2).",
+        "content_rule": "adoption/bootstrap.md step 4a: an installed commit passes when GitHub's compare reports it ahead of the reviewed commit with stats.json as the only changed file",
+        "compare_receipt": "receipts/context-mode-compare.json"
+      }
+    },
+    {
+      "id": "cc-plugin-you-should-know@builtin",
+      "marketplace": "builtin",
+      "pin": "builtin",
+      "reason": "A built-in mod of the client (adoption/new-wsl/client-config-map.json cites its page): it is versioned with the client, which the profile pins by version, and has no marketplace source to pin."
+    }
+  ],
+  "sources": [
+    {
+      "claim": "A plugin entry of a marketplace.json carries ref and sha (github, url and git-subdir sources); sha is a full 40-character lowercase commit and is checked out when both are set",
+      "reference": "code.claude.com/docs/en/plugins/marketplace-reference.md L143-L145 and L157 (receipts/docs-excerpts.txt)"
+    },
+    {
+      "claim": "A marketplace source (extraKnownMarketplaces, strictKnownMarketplaces) carries repo, ref, path and sparsePaths, and no sha",
+      "reference": "code.claude.com/docs/en/plugins/marketplace-reference.md L351-L352 (receipts/docs-excerpts.txt)"
+    },
+    {
+      "claim": "Pinning a plugin to a commit is a client feature since the changelog's pinning entry",
+      "reference": "anthropics/claude-code@3deb873687379f0c199a69fdaccc65f0865f7a29 CHANGELOG.md:7353 (receipts/changelog-excerpts.txt)"
+    },
+    {
+      "claim": "The vendor's own marketplace sets sha on every external plugin entry",
+      "reference": "anthropics/claude-plugins-official@f359d43b406057f1a8cdbc4ea93b827642c162e6 .claude-plugin/marketplace.json: 262 of 262 external entries (receipts/official-marketplace-pins.txt)"
+    }
+  ]
+}

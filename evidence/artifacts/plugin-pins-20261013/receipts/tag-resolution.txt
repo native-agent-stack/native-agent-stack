@@ -1,0 +1,11 @@
+git ls-remote of the three marketplaces' repositories, taken 2026-10-13T19:42Z (a tag that is annotated lists its object and its peeled commit; a lightweight tag lists the commit):
+
+mksglu/context-mode:
+  5869f4fa7d631c72a0a9d9e9021c84191ebd98f6	HEAD
+  442f1eb6c7cdad3f0cb2411d00756f9e5cf2b587	refs/tags/v1.0.169
+  589d8214d56740a28b5f7bf63167743d586b0b40	refs/tags/v1.0.169^{}
+jarrodwatts/claude-hud:
+  801f75c6ca5332b7937a181e9d904bc4013974aa	refs/tags/v0.10.0
+  75683c6de1ac07f6bbef00d739001679dba0740c	refs/tags/v0.10.0^{}
+openai/codex-plugin-cc:
+  db52e28f4d9ded852ab3942cea316258ae4ef346	refs/tags/v1.0.6

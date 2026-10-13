@@ -1,0 +1,10 @@
+The test of CPA-V-11 stage 1 (the plugin pin record and its template test) against the sources of main when the change was written, where adoption/plugins/pins.json does not exist, and against this head.
+
+== 04f64a056, main when the change was written (its sources, this test module)
+   tests.test_plugin_pins: Ran 0, FAILED (errors=1)
+      ERROR: setUpClass
+      FileNotFoundError: [Errno 2] No such file or directory: '<tree>/adoption/plugins/pins.json'
+== this head
+   tests.test_plugin_pins: Ran 7, OK
+
+On main there is no record for the template's three marketplace plugins and the built-in mod to resolve to: the audit's fail-first test (every enabledPlugins entry resolves to a sha-pinned entry or a recorded exception) fails there.

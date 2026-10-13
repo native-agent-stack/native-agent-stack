@@ -1,0 +1,6 @@
+anthropics/claude-plugins-official@f359d43b406057f1a8cdbc4ea93b827642c162e6 .claude-plugin/marketplace.json: 315 plugin entries by the kind of their source:
+
+   164  url, sha set, ref absent
+    97  git-subdir, sha set, ref set
+    53  relative path
+     1  git-subdir, sha set, ref absent

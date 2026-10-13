@@ -1,0 +1,24 @@
+{
+  "what": "installed_plugins.json of the first host, commits and versions only (no install path)",
+  "taken": "2026-10-13T19:42Z",
+  "plugins": {
+    "context-mode@context-mode": [
+      {
+        "version": "1.0.169",
+        "gitCommitSha": "9f3ecc8b0aafd25d3592ffc31e4b02b1767f6089"
+      }
+    ],
+    "claude-hud@claude-hud": [
+      {
+        "version": "0.10.0",
+        "gitCommitSha": "75683c6de1ac07f6bbef00d739001679dba0740c"
+      }
+    ],
+    "codex@openai-codex": [
+      {
+        "version": "1.0.6",
+        "gitCommitSha": "db52e28f4d9ded852ab3942cea316258ae4ef346"
+      }
+    ]
+  }
+}
