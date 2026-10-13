@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "evidence_class": "source_review",
+  "source_url": "https://alpaca.markets/support/usage-limit-api-calls",
+  "title": "Is there a usage limit for the number of API calls per second?",
+  "source_displayed_date": "December 2022",
+  "read_date": "2026-10-13",
+  "excerpt": "Please note that the API is throttled, currently 200 requests per minute, per account.",
+  "excerpt_method": "Exact complete visible sentence from the official support page; the following documentation link is omitted.",
+  "scope": "Published account-level request rate; not an observed order rate, fill rate, aggregate multi-account rate or historical-data entitlement."
+}

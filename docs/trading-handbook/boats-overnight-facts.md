@@ -42,7 +42,28 @@ an exchange session rather than jumping over a holiday to a later date.
 These are source-reviewed vendor facts and calendar behavior, not broker
 acceptance observations.
 [Window/calendar record](https://github.com/seathatflowsinourveins/native-agent-stack/blob/993cc890b3ff3fc95fa7cdba51edd726565f9ace/blueprints/us-equities/adaptive-paper/README-overnight.md#L7-L15),
-[retained primary-source provenance](https://github.com/seathatflowsinourveins/native-agent-stack/blob/993cc890b3ff3fc95fa7cdba51edd726565f9ace/blueprints/us-equities/adaptive-paper/README-overnight.md#L132-L143).
+[historical primary-source provenance](https://github.com/seathatflowsinourveins/native-agent-stack/blob/993cc890b3ff3fc95fa7cdba51edd726565f9ace/blueprints/us-equities/adaptive-paper/README-overnight.md#L132-L143).
+
+## Order lifetime and buying power
+
+Only limit orders are supported overnight. An overnight DAY order can carry
+through premarket, regular and after-hours sessions until **20:00 ET of the
+trade date**, when it is canceled if still unfilled. Day Trading Buying Power
+does not apply overnight; the vendor specifies a **2x maximum** margin
+buying-power multiplier. A postmarket order that relied on day-trading buying
+power can therefore be rejected at the overnight boundary if its remaining
+buying power is insufficient. These are vendor rules, not an observed order,
+account entitlement or paper-acceptance result.
+[Alpaca 24/5 Trading: order types/TIF and margin/buying power](https://docs.alpaca.markets/us/docs/245-trading).
+
+This coverage uses the vendor's Markdown page re-captured on 2026-10-13,
+whose reported update time is 2026-10-12T06:43:44Z. The
+[retained vendor bytes](../../tests/fixtures/adaptive_paper_citations/us_docs_245-trading_20261013.md)
+and [capture provenance](../../tests/fixtures/adaptive_paper_citations/245-trading-20261013-source.json)
+identify that observation. The earlier source record remains historical;
+its digest does not describe the newer live page. Current vendor coverage
+supersedes that page observation without changing the pinned implementation's
+acceptance state.
 
 ## Eligibility and halt status
 

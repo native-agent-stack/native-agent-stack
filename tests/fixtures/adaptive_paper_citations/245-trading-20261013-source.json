@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "url": "https://docs.alpaca.markets/us/docs/245-trading.md",
+  "vendor_page": "https://docs.alpaca.markets/us/docs/245-trading",
+  "captured_at_utc": "2026-10-13T19:18:10Z",
+  "vendor_updated_at_utc": "2026-10-12T06:43:44.000Z",
+  "capture": "us_docs_245-trading_20261013.md",
+  "sha256": "81680a1a283dfcf4cf32d9222059c73dd033dff7ee75dab691f8881550961d20",
+  "bytes": 21740,
+  "capture_method": "Byte-for-byte HTTP GET of the vendor-supported Markdown endpoint; no content extraction or edits.",
+  "historical_record": "blueprints/us-equities/adaptive-paper/README-overnight.md#primary-sources",
+  "supersession_scope": "Current handbook coverage only. The historical 2026-10-10 source observation remains unchanged; its digest does not identify the live page or this newer capture.",
+  "sections": [
+    "What order types and time-in-force (TIF) options are supported?",
+    "Are there restrictions on margin or buying power during the overnight session?",
+    "What happens to an order that is not filled during the overnight session?"
+  ],
+  "evidence_class": "source_review",
+  "broker_acceptance": "NOT_RUN"
+}
