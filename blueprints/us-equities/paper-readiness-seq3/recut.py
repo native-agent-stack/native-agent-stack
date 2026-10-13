@@ -91,7 +91,11 @@ def rewrite_issuer(text):
         raise ValueError("seq2_issuer_pin_mismatch")
     text = once(text, "if launch.STOP.exists() or launch.STOP.is_symlink():", "if launch.stop_present():")
     return once(text, "def build(kind,trial,skip_reason=None):\n",
-                "def build(kind,trial,skip_reason=None):\n    launch.assert_seq2_watchers_retired()\n")
+                "def build(kind,trial,skip_reason=None):\n"
+                "    from lane_latch import assert_issuer_python\n"
+                "    try:\n        assert_issuer_python()\n"
+                "    except ValueError:\n        raise launch.Refused('issuer_python_3_12_required') from None\n"
+                "    launch.assert_seq2_watchers_retired()\n")
 
 
 def embedded_unit_root(units):
@@ -199,12 +203,20 @@ def recut(source, output, source_commit, *, predecessor_sha256=None):
                         if line.endswith("  launch.py")]
     if len(launcher_entries) != 1:
         raise ValueError("launcher_inventory_binding_missing")
-    launch = rewrite_launch((source / "launch.py").read_text(), predecessor_sha256, launcher_entries[0])
-    issuer = rewrite_issuer((source / "issue_go.py").read_text())
-    old_root = embedded_unit_root(source / "units")
     # Reuse the frozen archive. Never mutate the original, even on failure.
     shutil.copytree(source, output, symlinks=False,
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc", "*.pyo"))
+    # Source verification is not a use-time binding. Adopt the reader's
+    # verified fix: authenticate every copied row against the inventory
+    # captured above, before rewriting or certifying any destination bytes.
+    for line in inventory.decode().splitlines():
+        digest, name = line.split("  ", 1)
+        copied = output / name
+        if copied.is_symlink() or not copied.is_file() or sha(copied.read_bytes()) != digest:
+            raise ValueError("copied_bytes_not_in_sealed_inventory")
+    launch = rewrite_launch((output / "launch.py").read_text(), predecessor_sha256, launcher_entries[0])
+    issuer = rewrite_issuer((output / "issue_go.py").read_text())
+    old_root = embedded_unit_root(output / "units")
     output.chmod(0o700)
     # The predecessor is read-only. Only our newly copied unit directory needs
     # write permission to relocate filenames; restore it before returning.
@@ -256,9 +268,11 @@ def recut(source, output, source_commit, *, predecessor_sha256=None):
     sums = "\n".join(sha((output / n).read_bytes()) + "  " + n for n in sorted(names)) + "\n"
     write(output / "SHA256SUMS", sums.encode())
     bundle_sha = sha(sums.encode())
-    request = json.loads((source / "GO-BINDING-REQUEST.json").read_text())
+    request = json.loads((output / "GO-BINDING-REQUEST.json").read_text())
     request.update(bundle_sha256=bundle_sha, deployment_glue_version=VERSION,
                    deployment_glue_commit=source_commit, predecessor_bundle_sha256=predecessor_sha256,
+                   issuer_python={"implementation": "CPython", "version": [3, 12],
+                                  "asserted_before": "readiness or GO writing"},
                    lane_stop="alpaca-paper/lane-b/STOP", host_stop="read-only operator kill switch",
                    runtime_and_config_bytes="identical to predecessor", unchanged_comparison=comparison,
                    unit_files=unit_names,
@@ -282,8 +296,9 @@ def main():
     parser.add_argument("--source-commit", required=True)
     parser.add_argument("--predecessor-sha256", required=True, help="expected digest from the sealed private binding")
     args = parser.parse_args()
-    print(json.dumps(recut(args.source, args.output, args.source_commit,
-                           predecessor_sha256=args.predecessor_sha256), sort_keys=True))
+    result = recut(args.source, args.output, args.source_commit,
+                   predecessor_sha256=args.predecessor_sha256)
+    print(json.dumps({k: v for k, v in result.items() if k != "predecessor_bundle_sha256"}, sort_keys=True))
 
 
 if __name__ == "__main__":

@@ -13,8 +13,10 @@ import io
 import json
 from pathlib import Path
 import subprocess
+import tempfile
 import types
 import unittest
+from unittest.mock import patch
 
 
 def run(bundle):
@@ -44,6 +46,56 @@ def run(bundle):
         pointer_calls.append("SYN-placeholder")
         return Path("/SYN/never-opened-paper.env")
     launch.credential_pointer = fixture_pointer
+    attempts = {"keyed": 0, "subprocess": 0, "verification_processes_started": 0}
+    real_run, real_popen = subprocess.run, subprocess.Popen
+    def manifest_check(command, kwargs):
+        # Retain the launcher's real bundle-tamper check in SYN roots.
+        # This sole process exception is keyless and cannot run a broker,
+        # credential loader or systemd command. Its inventory must stay
+        # inside its scratch cwd; absolute/escaping/symlink inputs refuse.
+        if command != ['/usr/bin/sha256sum', '--strict', '--quiet', '-c', 'SHA256SUMS']:
+            return False
+        if kwargs.get('shell') or any(k in kwargs for k in ('executable', 'preexec_fn', 'env')):
+            return False
+        root = Path(kwargs.get('cwd', '/')).resolve()
+        if not root.is_relative_to(Path(tempfile.gettempdir()).resolve()):
+            return False
+        manifest = root / 'SHA256SUMS'
+        if manifest.is_symlink() or not manifest.is_file():
+            return False
+        for row in manifest.read_text().splitlines():
+            if '  ' not in row:
+                return False
+            name = Path(row.split('  ', 1)[1])
+            target = root / name
+            if name.is_absolute() or '..' in name.parts or target.is_symlink() or not target.resolve().is_relative_to(root):
+                return False
+        return True
+    def blocked_keyed(*args, **kwargs):
+        attempts["keyed"] += 1
+        raise AssertionError("dry_run_keyed_forbidden")
+    def blocked_process(command, *args, **kwargs):
+        if manifest_check(command, kwargs):
+            return real_run(command, *args, **kwargs)
+        attempts["subprocess"] += 1
+        raise AssertionError("dry_run_subprocess_forbidden")
+    def blocked_popen(command, *args, **kwargs):
+        if manifest_check(command, kwargs):
+            process = real_popen(command, *args, **kwargs)
+            attempts['verification_processes_started'] += 1
+            return process
+        attempts['subprocess'] += 1
+        raise AssertionError('dry_run_subprocess_forbidden')
+    # Bound replay source can still contain a missed stub. Never let that
+    # omission reach the credential runner or an external process. Install
+    # before executing replay-module imports, and restore on every exit.
+    with patch.object(launch, "keyed", blocked_keyed, create=True), \
+         patch.object(subprocess, "run", blocked_process), \
+         patch.object(subprocess, "Popen", blocked_popen):
+        return replay(bundle, launch, pointer_calls, attempts)
+
+
+def replay(bundle, launch, pointer_calls, attempts):
     modules = []
     adaptations = []
     for name in ("test_wiring", "test_go_issuer", "test_sequencing", "test_unit_contracts", "test_data_wiring"):
@@ -94,12 +146,16 @@ def run(bundle):
     receipt = {"schema_version": 1, "paper_lane": "B", "evidence_class": "synthetic",
         "deployment_version": "readiness-sequencing-v3-lane-latch",
         "bundle_sha256": hashlib.sha256((bundle / "SHA256SUMS").read_bytes()).hexdigest(),
-        "status": "passed" if result.wasSuccessful() else "failed", "cases": result.testsRun,
+        "status": "passed" if result.wasSuccessful() and not (attempts['keyed'] or attempts['subprocess']) else "failed", "cases": result.testsRun,
         "failures": len(result.failures), "errors": len(result.errors), "skips": len(result.skipped),
         "fixture_adaptations": adaptations, "credential_pointer": "real implementation replaced before tests",
         "seq2_retirement": "SYN fixture only; live retirement proof required before installation",
-        "placeholder_calls": len(pointer_calls), "services_started": 0, "broker_execution": "NOT_RUN"}
-    if not result.wasSuccessful():
+        "placeholder_calls": len(pointer_calls), "keyed_tripwire_hits": attempts["keyed"],
+        "subprocess_tripwire_hits": attempts["subprocess"],
+        "verification_processes_started": attempts['verification_processes_started'],
+        "execution_boundary": "keyed and subprocess run/Popen guarded before replay imports; only scratch-contained sha256sum checks may execute; any tripwire hit fails the drill",
+        "services_started": 0, "broker_execution": "NOT_RUN"}
+    if receipt["status"] != "passed":
         # SYN traceback only; no credential pointer/broker call is reachable.
         print(log.getvalue(), file=sys.stderr)
     return receipt

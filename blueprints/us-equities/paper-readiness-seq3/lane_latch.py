@@ -6,14 +6,21 @@ import os
 from pathlib import Path
 import secrets
 import stat
+import sys
 
 VERSION = "private-stage-hook-v2"
 MARKER = ".stage-hook-latch"
+ISSUER_PYTHON = (3, 12)
+
+
+def assert_issuer_python():
+    if sys.implementation.name != "cpython" or sys.version_info[:2] != ISSUER_PYTHON:
+        raise ValueError("issuer_python_3_12_required")
 
 
 def pending(lane, host, instances):
     try:
-        if Path(lane).parent.is_symlink() or Path(instances).is_symlink():
+        if Path(lane).parent.is_symlink():
             return True
         for path in (lane, host):
             try:
@@ -22,13 +29,20 @@ def pending(lane, host, instances):
                 continue
             return True
         root = Path(instances)
-        if root.exists():
-            for instance in root.iterdir():
-                if instance.is_symlink():
-                    return True
-                marker = instance / MARKER
-                if marker.exists() or marker.is_symlink():
-                    return True
+        try:
+            info = os.lstat(root)
+        except FileNotFoundError:
+            return False
+        if not stat.S_ISDIR(info.st_mode):
+            return True
+        for instance in root.iterdir():
+            if not stat.S_ISDIR(os.lstat(instance).st_mode):
+                return True
+            try:
+                os.lstat(instance / MARKER)
+            except FileNotFoundError:
+                continue
+            return True
         return False
     except OSError:
         return True

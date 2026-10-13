@@ -94,6 +94,57 @@ class StageLatch(unittest.TestCase):
         self.assertFalse(self.launch.STOP.exists())
         self.assertFalse(self.marker().exists())
 
+    def test_pending_refuses_permission_errors_even_when_pathlib_says_absent(self):
+        import lane_latch
+        marker = self.marker()
+        real_lstat, real_exists, real_symlink = os.lstat, Path.exists, Path.is_symlink
+        def denied(path, *args, **kwargs):
+            if Path(path) == marker:
+                raise PermissionError("SYN unreadable instance")
+            return real_lstat(path, *args, **kwargs)
+        # CPython3.14 maps this permission failure to False in both probes.
+        # The issuer's pinned3.12 is tested separately with a real directory.
+        with patch.object(Path, "exists", lambda p: False if p == marker else real_exists(p)), \
+             patch.object(Path, "is_symlink", lambda p: False if p == marker else real_symlink(p)), \
+             patch.object(os, "lstat", side_effect=denied):
+            self.assertTrue(lane_latch.pending(self.launch.STOP, self.launch.HOST_STOP,
+                                              self.launch.STATE / "instances"))
+
+    def test_issuer_refuses_wrong_python_before_readiness(self):
+        import lane_latch
+        from recut import rewrite_issuer
+        issuer = types.ModuleType("issue_go")
+        with patch.dict(sys.modules, {"launch": self.launch}):
+            exec(compile(rewrite_issuer((ROOT / "tests/fixtures/seq2-issue-go.txt").read_text()),
+                         "SYN-issue-go", "exec"), issuer.__dict__)
+        self.launch.assert_seq2_watchers_retired = lambda: (_ for _ in ()).throw(
+            AssertionError("readiness reached before interpreter guard"))
+        with patch.object(sys, "version_info", (3, 14, 4)):
+            with self.assertRaisesRegex(self.launch.Refused, "issuer_python_3_12_required"):
+                issuer.build("sip", "SYN-never-issued")
+
+    def test_pending_on_the_asserted_issuer_python_with_an_unreadable_instance(self):
+        import subprocess
+        script = """import os,sys
+from pathlib import Path
+sys.path.insert(0,sys.argv[1])
+from lane_latch import assert_issuer_python,pending,MARKER
+assert_issuer_python()
+assert sys.version_info[:2] == (3,12)
+root=Path(sys.argv[2]); instance=root/'instances'/'SYN-trial'
+instance.mkdir(parents=True); (instance/MARKER).write_text('SYN pending')
+instance.chmod(0)
+try:
+    assert pending(root/'lane/STOP',root/'STOP',root/'instances') is True
+finally:
+    instance.chmod(0o700)
+print('issuer_python=3.12 pending_unreadable=true')
+"""
+        result = subprocess.run([sys.executable, "-E", "-s", "-B", "-c", script,
+            str(SOURCE), str(self.root / "SYN-runtime")], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("issuer_python=3.12 pending_unreadable=true", result.stdout)
+
     def test_operator_host_stop_blocks_lane_b_and_is_untouched_by_recover(self):
         host = self.launch.HOST_STOP
         host.write_text("SYN operator abort\n")

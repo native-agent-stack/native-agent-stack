@@ -73,6 +73,43 @@ class RecutBoundaries(unittest.TestCase):
             self.assertIn("ExecStart=" + str(output) + "/launch.py", text)
             self.assertNotIn(str(embedded), text)
 
+    def test_source_bytes_changed_after_the_checks_are_refused(self):
+        # Adopt trading-cc's validated reproduction: the old source check
+        # does not authenticate bytes read later by copytree.
+        source, pin = sealed_fixture(self.root)
+        real_copytree, fired = shutil.copytree, []
+        def change_then_copy(src, dst, *args, **kwargs):
+            if not fired and Path(src) == source.resolve():
+                fired.append(1)
+                (source / "frozen/native.txt").write_text("SYN bytes changed after the checks\n")
+            return real_copytree(src, dst, *args, **kwargs)
+        output = self.root / "SYN-window"
+        with patch.object(recut.shutil, "copytree", side_effect=change_then_copy):
+            with self.assertRaisesRegex(ValueError, "copied_bytes_not_in_sealed_inventory"):
+                self.build(source, pin, output)
+        self.assertTrue(fired)
+        if output.exists():
+            self.assertFalse((output / "RECUT-RECEIPT.json").exists())
+
+    def test_recutter_stdout_omits_the_private_predecessor_digest(self):
+        source, pin = sealed_fixture(self.root)
+        output = self.root / "SYN-new"
+        result = subprocess.run([sys.executable, "-E", "-s", "-B", str(SOURCE / "recut.py"),
+            "--source", str(source), "--output", str(output), "--source-commit", "SYN-fix-pin",
+            "--predecessor-sha256", pin], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertNotIn(pin, result.stdout)
+        self.assertNotIn("predecessor_bundle_sha256", json.loads(result.stdout))
+        private = json.loads((output / "RECUT-RECEIPT.json").read_text())
+        self.assertEqual(private["predecessor_bundle_sha256"], pin)
+
+    def test_runbook_names_systemd_259_and_the_33_case_review_baseline(self):
+        text = (SOURCE / "README.md").read_text()
+        self.assertIn("systemd 259", text)
+        self.assertNotIn("Systemd v260", text)
+        self.assertIn("33", text)
+        self.assertNotIn("eleven now pass", text)
+
     def test_symlink_ancestor_cannot_place_output_inside_the_source(self):
         source, pin = sealed_fixture(self.root)
         alias = self.root / "SYN-alias"
@@ -204,6 +241,67 @@ class DryRunBoundaries(unittest.TestCase):
         # Deliberately no -B: the public runner must enforce its own isolation.
         return subprocess.run([sys.executable, "-E", "-s", str(SOURCE / "dry_run.py"),
             "--bundle", str(self.bundle), "--receipt", str(receipt)], capture_output=True, text=True)
+
+    def add_replay_case(self, text):
+        target = self.bundle / "test_data_wiring.py"
+        target.write_text(target.read_text() + text)
+        sums = "\n".join(hashlib.sha256(p.read_bytes()).hexdigest() + "  " + p.name
+            for p in sorted(self.bundle.iterdir()) if p.name != "SHA256SUMS") + "\n"
+        (self.bundle / "SHA256SUMS").write_text(sums)
+
+    def test_keyless_replay_reports_measured_tripwire_counts(self):
+        result = self.command(self.root / "receipt.json")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        receipt = json.loads(result.stdout)
+        self.assertEqual(receipt["keyed_tripwire_hits"], 0)
+        self.assertEqual(receipt["subprocess_tripwire_hits"], 0)
+        self.assertEqual(receipt["broker_execution"], "NOT_RUN")
+
+    def test_unstubbed_keyed_call_is_blocked_and_invalidates_even_a_passing_test(self):
+        self.add_replay_case("""
+    def test_unstubbed_keyed_probe(self):
+        import launch
+        with self.assertRaisesRegex(AssertionError,'dry_run_keyed_forbidden'):
+            launch.keyed([],timeout=1)
+""")
+        result = self.command(self.root / "receipt.json")
+        self.assertEqual(result.returncode, 1, result.stderr)
+        receipt = json.loads(result.stdout)
+        self.assertEqual(receipt["keyed_tripwire_hits"], 1)
+        self.assertEqual(receipt["status"], "failed")
+        self.assertEqual(receipt["errors"], 0)
+        self.assertEqual(receipt["failures"], 0)
+
+    def test_replay_cannot_spawn_an_external_process(self):
+        self.add_replay_case("""
+    def test_external_process_probe(self):
+        import subprocess
+        with self.assertRaisesRegex(AssertionError,'dry_run_subprocess_forbidden'):
+            subprocess.run(['SYN-must-not-spawn'])
+""")
+        result = self.command(self.root / "receipt.json")
+        self.assertEqual(result.returncode, 1, result.stderr)
+        receipt = json.loads(result.stdout)
+        self.assertEqual(receipt["subprocess_tripwire_hits"], 1)
+        self.assertEqual(receipt["services_started"], 0)
+        self.assertEqual(receipt["errors"], 0)
+        self.assertEqual(receipt["failures"], 0)
+
+    def test_replay_measures_only_keyless_scratch_manifest_processes(self):
+        self.add_replay_case("""
+    def test_manifest_process_probe(self):
+        import launch,subprocess
+        from pathlib import Path
+        result=subprocess.run(['/usr/bin/sha256sum','--strict','--quiet','-c','SHA256SUMS'],
+                              cwd=Path(launch.__file__).parent,capture_output=True,text=True)
+        self.assertEqual(result.returncode,0)
+""")
+        result = self.command(self.root / "receipt.json")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        receipt = json.loads(result.stdout)
+        self.assertEqual(receipt["verification_processes_started"], 1)
+        self.assertEqual(receipt["subprocess_tripwire_hits"], 0)
+        self.assertEqual(receipt["services_started"], 0)
 
     def test_dry_run_never_adds_bytecode_to_the_bundle(self):
         result = self.command(self.root / "receipt.json")
