@@ -182,6 +182,8 @@ jobs:
         run: >-
           python3 scripts/validate_convergence.py
           --all-recorded --root . --json
+      - name: Install the native runtime-name scanner for synthetic validation tests
+        uses: $/.github/actions/setup-host-name-scanner
       - name: Run project test suite
         # --durations 50 lists the 50 slowest tests at the end of the run (Python 3.12+; this job sets up 3.13). GNU
         # timeout sends SIGABRT at 55 minutes, five under the job's limit, and SIGKILL 60 s later; with

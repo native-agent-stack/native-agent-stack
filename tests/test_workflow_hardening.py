@@ -1120,6 +1120,40 @@ class WholeSuiteJobsCheckOutFullHistory(unittest.TestCase):
         self.assertEqual(unittest_invocations(wrapped), [["-v", "--durations", "50"]])
 
 
+class PublicationScannerTestPrerequisites(unittest.TestCase):
+    """Serial suites and module shards require the native publication scanner.
+
+    Catalog freshness runs 38031821231, 38118948272 and 38216023021 failed
+    because this prerequisite was absent from the suite's runner environment.
+    """
+
+    def test_scanner_install_precedes_every_project_suite_or_shard(self):
+        from tests.test_workflow_policy import load_workflow
+
+        suite_jobs = []
+        for path in sorted(WORKFLOWS.glob("*.yml")):
+            document = load_workflow(path.read_text(encoding="utf-8"))
+            for job_id, job in document["jobs"].items():
+                steps = job.get("steps", [])
+                suite_steps = [index for index, step in enumerate(steps)
+                               if runs_project_tests(step.get("run", ""))]
+                if not suite_steps:
+                    continue
+                suite_jobs.append(f"{path.name}:{job_id}")
+                with self.subTest(job=suite_jobs[-1]):
+                    installs = [index for index, step in enumerate(steps)
+                                if step.get("uses") == "$/.github/actions/setup-host-name-scanner"]
+                    self.assertEqual(len(installs), 1, "provision the pinned native scanner exactly once")
+                    install_index = installs[0]
+                    install = steps[install_index]
+                    self.assertNotIn("if", install, "the scanner is required in every suite mode")
+                    self.assertNotIn("continue-on-error", install, "scanner installation must fail closed")
+                    for suite_index in suite_steps:
+                        self.assertLess(install_index, suite_index, "install the scanner before running tests")
+        self.assertIn("catalog-freshness.yml:freshness", suite_jobs)
+        self.assertIn("validate.yml:validate", suite_jobs)
+
+
 class SessionCalendarTestPrerequisites(unittest.TestCase):
     """The additional serial-suite interpreter installs the pinned calendar before testing."""
 
