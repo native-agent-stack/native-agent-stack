@@ -316,7 +316,7 @@ class NativeSession:
             ins = self.instruments[sym]
             now_ns = self.data.clock.timestamp_ns()
             previous_event, previous_init = self.status_fences.get(sym, (0, 0))
-            if not row["halted"] and (row["ts_ns"] > now_ns or row["ts_ns"] < previous_event
+            if not row["halted"] and (row["ts_ns"] > now_ns or row["ts_ns"] <= previous_event
                                       or now_ns < previous_init):
                 return  # A future/older resume cannot clear an observed halt.
             status = InstrumentStatus(ins.id,

@@ -381,13 +381,13 @@ def strategy_pool_and_selector(config, registry_entries, *, session="regular"):
 T22_PAPER_DISPATCH_VERSION = "t22-exploratory-v1"
 
 
-def load_config(path, *, registry_path=None):
+def load_config(path, *, registry_path=None, require_t22_packet=True):
     c = json.loads(Path(path).read_text())
     is_exploratory(c)
     apply_exit_preset(c, "adaptive")
     if "t22" in c:
         from t22_dispatch import load_dispatch
-        c["_t22"] = load_dispatch(c, path)
+        c["_t22"] = load_dispatch(c, path, read_packet=require_t22_packet)
     require_qualified_stream(c["feed"])
     # G-e: leverage above 1x is refused exactly as before UNLESS a
     # "leverage_policy" block is present, in which case it is deferred to
@@ -711,6 +711,12 @@ def validate_preflight(observation, config, *, require_open, allow_existing=Fals
     four guards enforced exactly as for a normal fresh start. Defaults to ``allow_existing`` when not given, so recovery's
     existing behaviour is unchanged."""
     check_order_contract_boundary(config.get("symbols", ()))
+    if "_t22" in config and not allow_existing:
+        from t22_dispatch import validate_stage
+        try:
+            validate_stage(config["_t22"], config, time.time_ns())
+        except ValueError as error:
+            raise SafetyError(str(error)) from None
     if mode == "paper":
         _check_promotion_gate(gate_result_path, snapshot_path)
     if allow_existing_positions is None:
@@ -2373,7 +2379,8 @@ def main():
         raise SafetyError("exploratory_qualification_forbidden")
     if exploratory and args.command == "paper" and DEFAULT_STOP.exists():
         raise SafetyError("global_stop_latched")
-    config, limits, policy_config = load_config(args.config)
+    config, limits, policy_config = (load_config(args.config, require_t22_packet=False)
+                                    if args.command == "recover" else load_config(args.config))
     RECEIPT_LABELS = receipt_labels(config)
     session_policy = validate_session_policy(config)
     try:

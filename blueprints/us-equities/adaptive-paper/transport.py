@@ -1200,10 +1200,12 @@ class AlpacaPaperTransport:
                  order_update_timeout=10.0, request_observer=None, history_start=None,
                  max_snapshot_pages=20, required_quote_symbols=None, feed="iex",
                  extended_hours_allowed=False, include_margin=False, sink_status=None,
-                 fee_history_start=None, order_quote_max_age_seconds=3, exit_quote_max_age_seconds=None):
+                 fee_history_start=None, order_quote_max_age_seconds=3, exit_quote_max_age_seconds=None,
+                 before_wire=None):
         # sink_status receives every normalized trading status message of a subscribed
         # symbol (normalize_trading_status) on the owning loop, like sink_observation.
         self.sink_status = sink_status
+        self.before_wire = before_wire
         self.extended_hours_allowed = bool(extended_hours_allowed)
         # G-e: forwarded to normalize_account on every snapshot() call.
         # False (every default construction) keeps snapshot()'s account
@@ -1405,6 +1407,20 @@ class AlpacaPaperTransport:
 
     def _wire_guard(self, order):
         # Runs after a possibly delayed budget reservation, immediately before POST.
+        # The optional policy gate runs on the owning loop, not the SDK thread.
+        # Its immutable window is rechecked HERE after that callback returns.
+        # alpaca-py@cc4cb3b7 common/rest.py:195 delegates each HTTP attempt to
+        # this existing GuardedSession boundary (request(): before_send).
+        callback = getattr(self, "before_wire", None)
+        if callback is not None:
+            try:
+                window = self._on_owner(callback, dict(order), _owner_timeout=.25, _freeze_timeout=False)
+            except Exception:
+                raise SubmissionNotSent("policy gate prevented final submission") from None
+            if (type(window) is not tuple or len(window) != 2
+                    or any(type(value) is not int or value < 0 for value in window)
+                    or not window[0] <= time.time_ns() <= window[1]):
+                raise SubmissionNotSent("policy validity changed before submission")
         quote = self._quote_values.get(order.get("symbol"))
         max_age_ns = (self.exit_quote_max_age_ns if order.get("side") == "sell"
                       else self.order_quote_max_age_ns)

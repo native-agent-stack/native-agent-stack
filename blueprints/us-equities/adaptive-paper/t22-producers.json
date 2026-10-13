@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "producers": {
+    "t22-source-normalizer-v1": {
+      "code_path": "blueprints/us-equities/adaptive-paper/t22_producer.py",
+      "code_sha256": "39b14e9d942ad861b328c3683a8c3ab5c6d26905a21b4663c405c56aebca9c1d"
+    }
+  }
+}
