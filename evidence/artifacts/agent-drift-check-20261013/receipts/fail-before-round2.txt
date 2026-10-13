@@ -1,0 +1,17 @@
+tests/test_adoption_status.py of the round-2 commit of #1062 (CPA-V-10) against scripts/adoption_status.py at e22358e46, the head that was read. Nothing was added to the old sources.
+Ran 178 tests, FAILED (failures=42, errors=62), counting subtests.
+Tests that fail on behavior (7; subtests that fail in brackets):
+  test_a_link_is_told_by_the_answer_of_the_open_and_not_by_a_later_look [1]
+  test_a_link_to_a_file_is_counted_and_what_the_clients_walker_skips_is_not [1]
+  test_a_shipped_definition_whose_name_cannot_be_read_makes_the_count_unknown [1]
+  test_a_vendor_file_over_the_clients_size_limit_is_unknown [1]
+  test_a_vendor_file_that_declares_the_name_of_a_shipped_definition_is_drift [10]
+  test_a_vendor_file_whose_name_is_spelt_in_a_way_the_reader_does_not_take_is_unknown_and_incomplete [27]
+  test_the_limitations_name_the_agent_folders_the_check_compares [1]
+Tests that raise because the name reader does not exist in the old sources (2; AttributeError on agent_identity, subtests in brackets):
+  test_every_shipped_definition_declares_a_name_the_reader_takes [11]
+  test_the_name_reader_gives_what_the_clients_parser_reads_or_says_unknown [51]
+
+Every other test of the module passes there: they describe behavior the round keeps. The vendor tests fail on the reviewer's defect: a vendor-named file that declares a shipped name through a quoted key, a block scalar,
+an escape sequence or a byte order mark gave a count of 0 with complete wiring, and a name that the client reads differently (a literal block scalar keeps its line break) gave a count the client's name does not imply;
+the round gives unknown (null, complete false) or the count the client's name implies. The 2 tests that raise are the name reader's own tests.

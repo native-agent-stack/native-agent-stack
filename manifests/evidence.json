@@ -11488,8 +11488,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-read-deltas.json",
-      "sha256": "9350bfd9b61a0f26fb3d159d2d9ccf54836d6054e55ae8a77fb306695a97f9b4",
-      "bytes": 587
+      "sha256": "a5b2be12901e3d7cf128d7c03597e3762699239baa6cb74420d31ec7b784c3ad",
+      "bytes": 695
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
@@ -11520,6 +11520,11 @@
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261013-pr1057-delta.json",
       "sha256": "59772b7af0a432d1f90151381993bf667c39a25da2152cc83975090493f46123",
       "bytes": 12295
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261013-pr1062-delta.json",
+      "sha256": "c10ba5cde317db1cc69fd5be13769ba29383dcf7f796b16fc176aaea2377dffe",
+      "bytes": 17036
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261013-pr1070-delta.json",
@@ -19088,8 +19093,8 @@
     },
     {
       "path": "docs/decisions/2026-10-13-claude-agent-drift-check.md",
-      "sha256": "eb411e0d8bde5a08b26b5b3b83607c54829bce46fd03a00afa4e889d01a42df7",
-      "bytes": 13937
+      "sha256": "540effa0263ba0cb883152515caa8603e9fc2f3236d12dac83318e81e90bc9b8",
+      "bytes": 23473
     },
     {
       "path": "docs/decisions/2026-10-13-lane-a-frozen-field-continuity.md",
@@ -19568,8 +19573,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.md",
-      "sha256": "ee4a34644e7596d6aa3b34f86d7acb013a5a3e09d3774def872702bf4d6de95d",
-      "bytes": 35274
+      "sha256": "bfb889b76658e07d8cd5e2094884c5cb1956e2bc1358cee56bc4acf67d1358a3",
+      "bytes": 35379
     },
     {
       "path": "docs/token-native-saturation.md",
@@ -19953,13 +19958,18 @@
     },
     {
       "path": "evidence/artifacts/agent-drift-check-20261013/README.md",
-      "sha256": "1f7874933079ac7ae31e96eee681c058c4e87c898b644ca229183b438635b290",
-      "bytes": 1939
+      "sha256": "e9ad53be5e94273c1d3a6ebd3fadb2604491a2cc7ba25a315009429b54a83926",
+      "bytes": 2810
     },
     {
       "path": "evidence/artifacts/agent-drift-check-20261013/receipts/fail-before-review.txt",
       "sha256": "9ddc3eaffb8dfb98e148b10d51942d97b84402281247e18d03bf787accae3e27",
       "bytes": 2055
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/fail-before-round2.txt",
+      "sha256": "3cf8db4d0ab3d125a7ca20a393182b9e95aa07eb44b839fb7004d9a30a651ec9",
+      "bytes": 1742
     },
     {
       "path": "evidence/artifacts/agent-drift-check-20261013/receipts/fail-before.txt",
@@ -19968,8 +19978,13 @@
     },
     {
       "path": "evidence/artifacts/agent-drift-check-20261013/receipts/host-run.json",
-      "sha256": "1ef0f7dab08d5bbd943ad7086b0a57a1fa2912670d9149da0a49bc8d47369de0",
-      "bytes": 775
+      "sha256": "fc403481d2ddb553250b6ac0e8da35c979f12016f343f082797c01ad3d6d2013",
+      "bytes": 891
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/identity-oracle.txt",
+      "sha256": "e2ece90be35d989731de19cb8b01400358e3c9a5f0523ff9d99c8150eee9f801",
+      "bytes": 4709
     },
     {
       "path": "evidence/artifacts/agent-drift-check-20261013/receipts/mutants-20.txt",
@@ -19980,6 +19995,11 @@
       "path": "evidence/artifacts/agent-drift-check-20261013/receipts/mutants-review.txt",
       "sha256": "4b2b4d17927720ab201e4b2083dc6584b426a6125a9a27a8f4659a4ad2563b43",
       "bytes": 2927
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/mutants-round2.txt",
+      "sha256": "f2c51880037d7f6819e5e6bc4b078819198dc3e05351cc66ea7611a2458134d9",
+      "bytes": 5505
     },
     {
       "path": "evidence/artifacts/agentsview-044-qualification-20260927/README.md",
@@ -61393,8 +61413,8 @@
     },
     {
       "path": "scripts/adoption_status.py",
-      "sha256": "9bcfe31d7939e7d62547d7bed86b038eea20b500dc75d3220c4b35741d694956",
-      "bytes": 112469
+      "sha256": "1a9471de3f194e352ef7ec9926659b7dea91a9e24bb101aa95d2e70b609998f6",
+      "bytes": 122046
     },
     {
       "path": "scripts/build_ecosystem.py",
@@ -62098,13 +62118,18 @@
     },
     {
       "path": "tests/test_adoption_status.py",
-      "sha256": "9b0ad45661966167aa83944f8e9ab7925cf5839d8206a35a59278224695fd9b2",
-      "bytes": 194313
+      "sha256": "b335f47857e2fe4fad0db5ce2173a27d6fb33f4add1cfa2b6ef8021c34a8dbb0",
+      "bytes": 213722
     },
     {
       "path": "tests/test_adoption_version_probes.py",
       "sha256": "36de5b9442ea76c735ef789599dfcf2b7d903d34f69d844f22423501bbde5054",
       "bytes": 23447
+    },
+    {
+      "path": "tests/test_agent_drift_record.py",
+      "sha256": "1194a22b1ad4f5d1442d473d88c27e29b55e05cfd8a873adfb1c52e696a58340",
+      "bytes": 2176
     },
     {
       "path": "tests/test_agentsview_qualification.py",
@@ -63573,8 +63598,8 @@
     },
     {
       "path": "tools/adoption/host-baseline.md",
-      "sha256": "e7527052bd6c4f36bc7449185a978406bc796acf0f30c328f9ee6ec495a75a86",
-      "bytes": 16770
+      "sha256": "eb128ec84b91dcc9b34ed56ed5ec09228a421bf5e656ce20ae5d4de25ed2a000",
+      "bytes": 16827
     },
     {
       "path": "tools/adoption/host_baseline_probe.py",

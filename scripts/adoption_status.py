@@ -36,6 +36,7 @@ from __future__ import annotations
 import argparse
 import contextlib
 import datetime
+import errno
 import hashlib
 import json
 import os
@@ -79,8 +80,8 @@ CLIENT_WIRING_LIMITATIONS = [
     "under the Claude home's agents/ with this checkout's adoption/agents/claude copies byte for byte and reports "
     "how many differ, are missing or are not shipped here, in that folder and in any folder below it as the client "
     "loads them (four vendor-installed search definitions are listed, not counted unless their front matter declares "
-    "a shipped name), a count that must be 0 for the wiring to be complete. It reads those folders through "
-    "descriptors and never through a link. It opens no credential "
+    "a shipped name, and unknown where the name they declare cannot be told), a count that must be 0 for the wiring "
+    "to be complete. It reads those folders through descriptors and never through a link. It opens no credential "
     "store (~/.claude.json, ~/.claude/.credentials.json, ~/.codex/auth.json), network endpoint or running process; "
     "environment variables only locate the client homes, and two opt-ins are checked by name.",
     "Configured wiring is not activation: managed, project or local Claude settings, and Codex profiles, project "
@@ -253,7 +254,7 @@ STACK_ROLES_SOURCE = Path(__file__).resolve().parents[1] / "adoption" / "agents"
 # two files that declare one name only one is loaded, chosen by file system read order (https://code.claude.com/docs/en/sub-agents.md L176-L182, read 2026-10-13; the installed 2.1.296 client's loader walks the same way: its
 # JS walker enters every folder and keeps names ending .md, its ripgrep path is `--files --hidden --follow --no-ignore --glob *.md`, and its definitions are merged by name, a later one replacing an earlier). Four more
 # definitions sit at the top of that folder on a host, installed by the tools they route to and not shipped here (tools/local-pages/architecture_mapping.json names them as the search roles of code navigation and semantic
-# retrieval): they are listed, so they are not drift unless their front matter declares the name of a shipped definition. Any other *.md, at any depth, is.
+# retrieval): they are listed, so they are not drift unless their front matter declares the name of a shipped definition, and the count is unknown when the name they declare cannot be read (agent_identity). Any other *.md, at any depth, is.
 STACK_AGENTS_SOURCE = Path(__file__).resolve().parents[1] / "adoption" / "agents" / "claude"
 VENDOR_HOST_AGENTS = ("codebase-memory-auditor.md", "codebase-memory-scout.md", "codebase-memory.md", "semble-search.md")
 AGENT_WALK_DEPTH, AGENT_WALK_ENTRIES = 8, 5_000  # a tree deeper, or with more entries, than any agents folder is unknown, not a count
@@ -912,6 +913,7 @@ NO_FOLLOW_READS = (hasattr(os, "O_NOFOLLOW") and hasattr(os, "O_DIRECTORY") and 
                    and os.stat in os.supports_dir_fd and os.listdir in os.supports_fd)
 READ_FLAGS = (os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0) | getattr(os, "O_NOCTTY", 0)
               | getattr(os, "O_CLOEXEC", 0))
+LINK_ERRNOS = frozenset({errno.ELOOP, getattr(errno, "EMLINK", errno.ELOOP)})  # open(2) with O_NOFOLLOW on a link: ELOOP on Linux (measured on the first host, 6.18); EMLINK is accepted too
 
 
 class Unknown(Exception):
@@ -939,16 +941,22 @@ def open_below(name, dir_fd=None, extra: int = 0):
     """(kind, descriptor, mode) of what is at ``name``, relative to the folder descriptor ``dir_fd`` when there is
     one, opened for reading without following a link at the last component. kind "open" carries a descriptor, which
     the caller closes, and the mode of the object that descriptor holds (fstat of it, so what is described is what
-    will be read). The other kinds carry neither: "absent", "link" (O_NOFOLLOW is refused with ELOOP, or with
-    ENOTDIR under O_DIRECTORY), "folder" and "other" (not opened; described by lstat), "unreadable". A platform
-    that cannot refuse links gives "unreadable" for everything."""
+    will be read). The other kinds carry neither: "absent", "link" (the open itself was refused with ELOOP, which is how
+    O_NOFOLLOW meets a symbolic link, so a link is told by the answer of the open and not by a later look that a
+    replacement could have changed), "other" (ENXIO: a socket), "folder" and the rest (not opened; described by lstat,
+    and so also what ENOTDIR leaves under O_DIRECTORY), "unreadable". A platform that cannot refuse links gives
+    "unreadable" for everything."""
     if not NO_FOLLOW_READS:
         return "unreadable", None, 0
     try:
         descriptor = os.open(name, READ_FLAGS | extra, dir_fd=dir_fd)
     except FileNotFoundError:
         return "absent", None, 0
-    except OSError:
+    except OSError as error:
+        if error.errno in LINK_ERRNOS:
+            return "link", None, 0
+        if error.errno == errno.ENXIO:
+            return "other", None, 0
         return describe_entry(name, dir_fd), None, 0
     try:
         return "open", descriptor, os.fstat(descriptor).st_mode
@@ -1032,37 +1040,173 @@ def stack_roles_matching(codex_dir: Path, roles_source: Path) -> int | None:
         os.close(home)
 
 
-def frontmatter_name(data: bytes):
-    """The ``name`` an agent definition declares: a top-level ``name:`` (any case) between the ``---`` line that opens the
-    text and the one that closes the block, quotes dropped and a trailing YAML comment cut; None when there is none. The
-    client reads the block with a YAML parser; this reads the one shape a definition has, and errs towards finding a name."""
-    try:
-        lines = data.decode("utf-8").splitlines()
-    except UnicodeError:
-        return None
-    if not lines or lines[0].strip() != "---":
-        return None
-    for line in lines[1:]:
-        if line.strip() == "---":
-            return None
-        match = re.match(r"name[ \t]*:[ \t]*(.*?)[ \t]*$", line, re.IGNORECASE)
-        if match:
-            value = match.group(1)
-            if value[:1] in ("'", '"'):  # quoted: up to the closing quote, whatever follows it
-                end = value.find(value[0], 1)
-                value = value[1:end] if end > 0 else value[1:]
-            else:  # plain: a ` #` starts a YAML comment
-                value = re.split(r"[ \t]#", value, maxsplit=1)[0].strip()
-            return value or None
-    return None
+# What the client takes a definition's identity from (Claude Code 2.1.296, read from the installed binary's bundled parser, whose loader scan calls oi(text, path, {normalizeKeys: true}) on each file): a leading byte order mark is
+# dropped; the front matter is what /^---\s*\n([\s\S]*?)---\s*\n?/ captures, so the block ends at the first --- after the opener, wherever it stands on a line; Bun.YAML.parse reads the block (once more, with the values that
+# hold YAML-special characters quoted, if that throws); the definition's name is the string at the top-level key `name` (a key is exact: `Name` is another key), and a file with no front matter, no name or a block that does not
+# parse is not loaded. This module carries no YAML parser and takes none as a dependency: agent_identity reads the plain shapes a definition has and raises Unknown for every other spelling of the block, so that a spelling it
+# cannot read is an unknown identity and never a different one.
+JS_SPACE = re.escape("".join(map(chr, (9, 10, 11, 12, 13, 32, 0xA0, 0x1680, *range(0x2000, 0x200B), 0x2028, 0x2029, 0x202F, 0x205F, 0x3000, 0xFEFF))))  # what \s matches in a JavaScript regular expression
+AGENT_FRONT_MATTER = re.compile(f"---[{JS_SPACE}]*\\n(.*?)---[{JS_SPACE}]*\\n?", re.DOTALL)
+UNREADABLE_BLOCK = re.compile("[^\n -~" + chr(0xA0) + "-" + chr(0x2027) + chr(0x202A) + "-" + chr(0xFEFE) + chr(0xFF00) + "-" + chr(0xFFFD)
+                              + chr(0x10000) + "-" + chr(0x10FFFF) + "]")  # a tab, a control character, a lone CR, a line separator YAML 1.1 knows, a byte order mark
+PLAIN_KEY_LINE = re.compile(r"([A-Za-z_][A-Za-z0-9_-]*) *:(?: +(.*))?\Z")
+BLOCK_SCALAR_HEADER = re.compile(r"([|>])(-?)(?: +#.*)?\Z")  # no indentation indicator and no keep: those are Unknown
+FLOW_ONE_LINE = re.compile(r"(?:\[[A-Za-z0-9_.@/ ,:-]*\]|\{[A-Za-z0-9_.@/ ,:-]*\})(?: +#.*)?\Z")
+YAML_INDICATORS = ",[]{}#&*!|>%@`"  # none of these starts a plain scalar
 
 
-def linked_folder(name, dir_fd) -> bool:
-    """Whether the link ``name`` of the folder ``dir_fd`` leads to a folder: its type only, nothing is read through it."""
+def quoted_scalar(value: str, escapes_ok: bool) -> str:
+    """The text of the quoted scalar that ``value`` starts with, which must close on the same line and be followed by nothing but a comment. Unknown for a scalar over several lines, text after the closing quote, and (unless
+    ``escapes_ok``) a backslash in a double-quoted one, whose escape sequences are not decoded here."""
+    quote, out, index = value[0], [], 1
+    while index < len(value):
+        char = value[index]
+        if char == quote:
+            if quote == "'" and value[index + 1:index + 2] == "'":
+                out.append(char)
+                index += 2
+                continue
+            break
+        if quote == '"' and char == chr(92):
+            if not escapes_ok or index + 1 >= len(value):
+                raise Unknown
+            out.append(value[index:index + 2])
+            index += 2
+            continue
+        out.append(char)
+        index += 1
+    else:
+        raise Unknown
+    rest = value[index + 1:]
+    if rest.strip(" ") and not (rest[0] == " " and rest.lstrip(" ").startswith("#")):
+        raise Unknown
+    return "".join(out)
+
+
+def plain_scalar(value: str, name: bool = False) -> str:
+    """The text of the plain scalar that ``value`` starts with (it is not empty and not a comment): cut at a ` #` comment, without the spaces before it. Unknown when it starts with a character that makes it something else
+    (an indicator, an anchor, alias or tag, a flow or block opener, a sequence or mapping mark) and, for a name, when it holds ``: `` or ends with a colon (a parser reads a mapping there)."""
+    if value[0] in YAML_INDICATORS or (value[0] in "-?:" and value[1:2] in ("", " ")):
+        raise Unknown
+    text = value.split(" #", 1)[0].rstrip(" ")
+    if name and (": " in text or text.endswith(":")):
+        raise Unknown
+    return text
+
+
+def lines_below(below: list) -> list:
+    """The lines under a key that can belong to its value: up to the first line that holds text at the left margin."""
+    inside = []
+    for line in below:
+        if line.strip(" ") and line[0] != " ":
+            break
+        inside.append(line)
+    return inside
+
+
+def value_lines(below: list) -> list:
+    """The lines under a key that carry its value or more of it: indented, and neither blank nor a comment."""
+    return [line for line in lines_below(below) if line.strip(" ") and not line.lstrip(" ").startswith("#")]
+
+
+def block_scalar_name(strip: bool, below: list):
+    """The name a ``|`` or ``>`` block scalar holds when it is one line of text: that line, and a newline after it unless the header chomps (``-``). None when it is empty. Unknown for several lines or a blank line before the text."""
+    inside = lines_below(below)
+    while inside and not inside[-1].strip(" "):
+        inside.pop()
+    if not inside:
+        return None
+    if not inside[0].strip(" ") or sum(1 for line in inside if line.strip(" ")) > 1:
+        raise Unknown
+    text = inside[0].lstrip(" ")
+    if text != text.rstrip(" "):
+        raise Unknown
+    return text if strip else text + "\n"
+
+
+def name_value(value: str, below: list):
+    """The string the ``name`` key declares, from the rest of its line and the lines under it; None when it declares nothing (no value, or an empty one). Unknown for a value this does not read: a block scalar with an indentation
+    or keep indicator, a flow collection, an anchor, alias or tag, an escape sequence, a value over several lines."""
+    value = value.rstrip(" ")
+    if value.startswith("#"):
+        value = ""
+    if value:
+        header = BLOCK_SCALAR_HEADER.match(value)
+        if header:
+            return block_scalar_name(header.group(2) == "-", below)
+        text = quoted_scalar(value, False) if value[0] in ("'", '"') else plain_scalar(value, True)
+        if value_lines(below):
+            raise Unknown
+        return text or None
+    nodes = value_lines(below)
+    if not nodes:
+        return None
+    if len(nodes) > 1:
+        raise Unknown
+    node = nodes[0].strip(" ")
+    text = quoted_scalar(node, False) if node[0] in ("'", '"') else plain_scalar(node, True)
+    return text or None
+
+
+def other_value(value: str) -> None:
+    """Checks the value of a key other than ``name``: it must end where its line ends or continue only on indented lines, so that no line at the left margin can be a part of it. Unknown otherwise (an unclosed quote, a
+    flow collection over several lines, an anchor, alias or tag)."""
+    value = value.rstrip(" ")
+    if not value or value.startswith("#") or BLOCK_SCALAR_HEADER.match(value) or FLOW_ONE_LINE.match(value):
+        return
+    if value[0] in ("'", '"'):
+        quoted_scalar(value, True)
+    else:
+        plain_scalar(value)
+
+
+def agent_identity(data: bytes):
+    """The name an agent definition declares, which is the identity the client serves it under: a string; None when the client would not load a definition from the text (no front matter, no ``name``, an empty one). Raises
+    Unknown when the front matter is not read by this module (a character YAML does not take as text, a key or value spelled other than as a plain top-level ``key: value`` line with a plain, single-quoted or double-quoted
+    value without escapes, a block scalar of one line for ``name``): the identity cannot be told, which is not the same as telling that it is another. The text is decoded as the client does (invalid bytes become U+FFFD)."""
+    text = data.decode("utf-8", errors="replace")
+    match = AGENT_FRONT_MATTER.match(text[1:] if text[:1] == chr(0xFEFF) else text)
+    if match is None:
+        return None
+    block = match.group(1).replace("\r\n", "\n")
+    if UNREADABLE_BLOCK.search(block):
+        raise Unknown
+    lines, found, started, open_key = block.split("\n"), [], False, False
+    for index, line in enumerate(lines):
+        if not line.strip(" ") or line.lstrip(" ").startswith("#"):
+            continue
+        if line[0] == " ":  # the value of the key above, or a block that is indented as a whole
+            if not started:
+                raise Unknown
+            continue
+        if open_key and (line == "-" or line.startswith("- ")):  # a sequence at the left margin is the value of the key above
+            other_value(line[2:])
+            continue
+        entry = PLAIN_KEY_LINE.match(line.rstrip(" "))
+        if entry is None:
+            raise Unknown
+        started = True
+        value = entry.group(2) or ""
+        open_key = not value or value.startswith("#")
+        if entry.group(1) == "name":
+            found.append(name_value(value, lines[index + 1:]))
+        else:
+            other_value(value)
+    if len(found) > 1:
+        raise Unknown
+    return found[0] if found else None
+
+
+def link_target(name, dir_fd) -> str:
+    """What the link ``name`` of the folder ``dir_fd`` leads to, as the client's walker would find it by following it
+    (it stats the target): "folder", "file" (a regular file) or "nothing" (a dangling link, a pipe, a socket, a device,
+    or a target whose type cannot be had: the walker keeps regular files only). Its type only; nothing is read through
+    the link."""
     try:
-        return stat.S_ISDIR(os.stat(name, dir_fd=dir_fd).st_mode)
+        mode = os.stat(name, dir_fd=dir_fd).st_mode
     except OSError:
-        return False
+        return "nothing"
+    return "folder" if stat.S_ISDIR(mode) else "file" if stat.S_ISREG(mode) else "nothing"
 
 
 def agent_drift_below(agents_fd: int, expected: dict, declared: set) -> int:
@@ -1090,19 +1234,20 @@ def agent_drift_below(agents_fd: int, expected: dict, declared: set) -> int:
                 if kind in ("absent", "folder"):  # listed and gone before it was opened, or a folder that cannot be searched
                     raise Unknown
                 if kind == "link":
-                    if linked_folder(name, folder_fd):  # the client follows it; what is below is not known here
+                    target = link_target(name, folder_fd)
+                    if target == "folder":  # the client follows it; what is below is not known here
                         raise Unknown
-                    drift += int(markdown and not shipped)
-                elif kind == "other":
-                    drift += int(markdown and not shipped)
+                    drift += int(markdown and target == "file" and not shipped)  # a link to nothing is not loaded
+                elif kind == "other":  # a socket: the client's walker keeps regular files only
+                    pass
                 elif kind == "unreadable":
                     if shipped:
                         raise Unknown
                     drift += int(markdown and not (top and name in VENDOR_HOST_AGENTS))
                 elif stat.S_ISDIR(mode):
                     visit(descriptor, depth + 1)
-                elif not stat.S_ISREG(mode):
-                    drift += int(markdown and not shipped)
+                elif not stat.S_ISREG(mode):  # a pipe or a device: not loaded either
+                    pass
                 elif shipped:
                     data = read_descriptor(descriptor, CLIENT_FILE_LIMIT)
                     if data is None:
@@ -1110,7 +1255,10 @@ def agent_drift_below(agents_fd: int, expected: dict, declared: set) -> int:
                     present.add(name)
                     drift += int(data != expected[name])
                 elif top and name in VENDOR_HOST_AGENTS:  # the vendors' own, unless one takes the name of a shipped role
-                    drift += int(frontmatter_name(read_descriptor(descriptor, CLIENT_FILE_LIMIT) or b"") in declared)
+                    data = read_descriptor(descriptor, CLIENT_FILE_LIMIT)
+                    if data is None:
+                        raise Unknown
+                    drift += int(agent_identity(data) in declared)  # Unknown when the name it declares cannot be read
                 else:
                     drift += int(markdown)
             finally:
@@ -1128,15 +1276,20 @@ def stack_agents_drift(claude_dir: Path, agents_source: Path) -> int | None:
     Counted: each *.md of ``agents_source`` whose installed copy at the top of the folder is absent, a link, a folder or
     another kind of file, or not byte for byte the source (a stale copy and a wider one, a ``tools`` field gone or longer,
     are both bytes that differ); and every other *.md in the installed folder at any depth that is not one of
-    VENDOR_HOST_AGENTS at the top (a definition nothing here ships is a definition nothing here checks; a link named *.md
-    counts too). The client loads the folder recursively, so a copy below the top is a definition it serves, and a
+    VENDOR_HOST_AGENTS at the top (a definition nothing here ships is a definition nothing here checks; a link to a file
+    named *.md counts too). Apart from the vendor names it reads no front matter of a file it does not ship, so a *.md
+    with no ``name`` (which the client skips) counts as well: it is one line from being a definition, and the way out is to remove
+    or rename it. Not counted, because the client's walker keeps regular files only: a pipe, a socket, a device, and a
+    link to nothing. The client loads the folder recursively, so a copy below the top is a definition it serves, and a
     vendor-named file at the top whose front matter declares the name of a shipped definition is counted as well: one
     name, one definition wins (code.claude.com/docs/en/sub-agents.md L176-L182). An absent agents folder counts every
     source file. None when the comparison cannot be made: the source folder has no *.md or one of them cannot be read,
     the agents path is a link or not a folder, a link below leads to a folder (what the client loads through a link is
     not known here), a folder, an entry or a shipped copy cannot be read or vanishes while it is read, the tree is deeper
-    than AGENT_WALK_DEPTH or holds more than AGENT_WALK_ENTRIES entries, or the platform cannot read without following
-    a link (NO_FOLLOW_READS). The folder is read through descriptors (open_below)."""
+    than AGENT_WALK_DEPTH or holds more than AGENT_WALK_ENTRIES entries, the platform cannot read without following
+    a link (NO_FOLLOW_READS), or the name a vendor-named file declares cannot be told (agent_identity raises Unknown for a
+    spelling it does not take: a quoted key, an escape, a flow mapping, a value over several lines, an unreadable or
+    oversized file). The folder is read through descriptors (open_below)."""
     try:
         names = sorted(entry for entry in os.listdir(agents_source) if entry.endswith(".md"))
     except OSError:
@@ -1149,7 +1302,10 @@ def stack_agents_drift(claude_dir: Path, agents_source: Path) -> int | None:
         expected[name] = data
     if not expected or not NO_FOLLOW_READS:
         return None
-    declared = {frontmatter_name(data) for data in expected.values()} - {None}
+    try:
+        declared = {agent_identity(data) for data in expected.values()} - {None}
+    except Unknown:  # a shipped definition whose name this cannot read: nothing to hold the vendors' files against
+        return None
     try:
         home = os.open(claude_dir, os.O_RDONLY | os.O_DIRECTORY | getattr(os, "O_CLOEXEC", 0))
     except FileNotFoundError:

@@ -1,0 +1,35 @@
+Differential measurement of agent_identity (scripts/adoption_status.py) against the front matter parser of the installed Claude Code client.
+Method: the parser functions of the client's bundle (the loader scan calls oi(text, path, {normalizeKeys: true}) on each agent file) are copied unchanged out of the binary by byte interval and run by Bun on each text of a
+generated corpus (the spellings of the key and of the value, openers and closers, neighbouring keys, line endings, a seeded fuzz of realistic front matter) and on the 11 shipped definitions and the host's installed ones; the
+reader's answer is set against the client's name. The only property asserted is one-sided: wherever the client reads a name, the reader returns that name or unknown, never none and never another name (a MISS).
+An over-report is the reader returning a text where the client reads no string name (a number, YAML null, a parse error): the safe direction. The script is part of the author's private record; the corpus is generated from
+its fixed seed. Nothing here holds the text of a definition.
+Five further seeds (1 to 5, 30000 fuzzed texts each, 34556 texts per run): 0 misses in each.
+
+bun runtime for the oracle: 1.4.2 | bun embedded in the client binary: Bun v1.4.3
+functions copied unchanged from the client binary (zero-based byte intervals, end exclusive):
+  function WS(e)                     211904331-211904390
+  function BL(e)                     211907194-211907234
+  var Ore=30                         211908706-211908840
+  function oi(e,n,r)                 211908840-211910460
+  function C(e)                      211910610-211910687
+  function I(e)                      211907318-211907782
+  var N= (the retry pattern)         211907290-211907318
+reader: agent_identity | cases: 8582 | seed: 20261013 | fuzz: 4000
+family                                      agree           agree-none          over-report              unknown                 MISS         oracle-error  client-reads-a-name client-reads-no-name
+astra                                           3                    0                    0                    2                    0                    0                    5                    0
+crlf                                          102                   27                   15                  256                    0                    0                  182                  218
+fuzz                                         1858                  109                  312                 1721                    0                    0                 2216                 1784
+key-x-value                                    92                  134                   21                 1164                    0                    0                  443                  968
+lone-cr                                         0                  150                    0                    0                    0                    0                    0                  150
+neighbours                                    634                   46                   68                 1368                    0                    0                 1154                  962
+neighbours-name-last                           25                    1                    1                   19                    0                    0                   34                   12
+neighbours-name-quoted-key                      0                    1                    0                   45                    0                    0                   34                   12
+neighbours-no-name                              0                   27                    0                   19                    0                    0                    0                   46
+opener-closer                                 160                  136                    0                   40                    0                    0                  160                  176
+real-files                                     26                    0                    0                    0                    0                    0                   26                    0
+TOTAL                                        2900                  631                  417                 4634                    0                    0                 4254                 4328
+
+where the client reads a name: 4254 texts: the reader returned that name in 2900 and said unknown in 1354
+where the client reads none (no front matter, no name, a non-string name or a parse error): 4328 texts: the reader returned none in 631 , a text (an over-report, the safe direction) in 417 and said unknown in 3280
+misses: 0
