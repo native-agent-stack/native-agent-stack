@@ -5717,7 +5717,7 @@ RESERVED_REFUSED = [
     ("{ cat .env; }", "dotenv_read"),
     ("if grep -r GH_TOKEN .; then :; fi", "secret_name_search"),
 ]
-# Astra's full read of #1048 at d2fcf5b5 (VERDICT.md, sha256 03cceb03..., both P1s): the head of that read allowed each of these, which
+# Astra's full read of #1048 at d2fcf5b5 (the read's verdict, a private record cited by name; both P1s): the head of that read allowed each of these, which
 # the merge base refused with the reason given. A written file's body can be run by a later command of the same request, and a method
 # name does not prove its receiver inert (an attribute can hold any callable: CPython v3.13.16 Doc/library/types.rst, SimpleNamespace).
 WRITTEN_AND_METHOD_REFUSED = [
@@ -5735,6 +5735,40 @@ WRITTEN_AND_METHOD_REFUSED = [
      "x.get('systemctl --user show-environment')\nPY", "service_manager_environment"),
     ("python3 - <<'PY'\nimport os\nfrom types import SimpleNamespace\nx = SimpleNamespace(get=os.system)\nx.get('cat ~/.ssh/id_rsa')\nPY",
      "credential_file_read"),
+]
+# A request that can rebind the interpreter or `timeout` (a function, `function`, alias, `hash`, `enable`, BASH_CMDS or BASH_ALIASES,
+# PATH, a run-time variable name, eval, source, `.`, trap, a command named by an expansion) or names the interpreter by a path keeps both
+# base readings of every body. The first five rows are Astra's delta read of #1048 at b7fc4819 (P1, the read's verdict, a private record
+# cited by name); the rest are the other routes of the bash manual's "COMMAND EXECUTION" and BASH_CMDS/BASH_ALIASES entries.
+REBOUND_DISPATCHER_REFUSED = [
+    ("python3() { bash; }; python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+    ("python3() { bash; }\npython3 - <<'PY'\ncat .env\nPY\necho done", "dotenv_read"),
+    ("timeout() { shift; bash; }; timeout 1 python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+    ("python3() { bash; }; python3 - <<'PY'\nsystemctl --user show-environment\nPY\necho done", "service_manager_environment"),
+    ("python3() { bash; }; python3 - <<'PY'\ncat ~/.ssh/id_rsa\nPY\necho done", "credential_file_read"),
+    ("python3 ( ) { bash; }; python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+    ("function python3 { bash; }; python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+    ("shopt -s expand_aliases; alias python3=bash\npython3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+    ("hash -p /bin/bash python3; python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+    ("BASH_CMDS[python3]=/bin/bash; python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+    ("a=BAS; b=H_CMDS; printf -v \"$a$b[python3]\" %s /bin/bash; python3 - <<'PY'\nprintenv\nPY\necho done",
+     "environment_dump"),
+    ("ln -s /bin/bash /tmp/w/python3 && PATH=/tmp/w python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+    ("ln -s /bin/bash ./python3 && ./python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+    ("x='python3() { bash; }'; eval \"$x\"; python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+    ("e=ev; ${e}al \"python3() { bash; }\"; python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+    (". ./defs.sh; python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+    ("for i in 1 2; do python3 - <<'PY'\nprintenv\nPY\nfunction python3 { bash; }; done", "environment_dump"),
+    ("a=PA; b=TH; export \"$a$b=/tmp/w\"; python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+    ("v=PA; w=TH; declare -n r=\"$v$w\"; r=/tmp/w; python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+]
+# Controls: without a rebinding an L2 body is code; a rebinding only withdraws the exemption (a clean body stays allowed).
+REBOUND_DISPATCHER_CONTROLS = [
+    ("true; python3 - <<'PY'\nenv = {'a': 1}\nprint(env)\nPY\necho done", None),
+    ("cd /tmp && timeout 5 python3 - <<'PY'\nenv = {'a': 1}\nprint(env)\nPY\necho done", None),
+    ("hash -p /usr/bin/python3 python3; python3 - <<'PY'\nprint(1)\nPY\necho done", None),
+    ("export LC_ALL=C X=\"$HOME/x\"; python3 - <<'PY'\nenv = {'a': 1}\nprint(env)\nPY\necho done", None),
+    ("git commit -m 'fix f()'; echo export; python3 - <<'PY'\nenv = {'a': 1}\nprint(env)\nPY\necho done", None),
 ]
 # RESERVED stays off inside SHELL-LITERAL readings: Python's conditional expression `a if b else set()` in a literal of Python source
 # would read, after the call's `)`, as the reserved word `else` and the segment `set` (the replay's one such command, 2026-10-12).
@@ -5790,6 +5824,11 @@ class GuardFalsePositiveRepairTests(unittest.TestCase):
 
     def test_a_written_body_and_a_method_argument_keep_their_refusals(self):
         for command, reason in WRITTEN_AND_METHOD_REFUSED:
+            with self.subTest(command=command):
+                self.assertEqual(guard.check(command), reason)
+
+    def test_a_rebindable_dispatcher_keeps_the_base_readings(self):
+        for command, reason in REBOUND_DISPATCHER_REFUSED + REBOUND_DISPATCHER_CONTROLS:
             with self.subTest(command=command):
                 self.assertEqual(guard.check(command), reason)
 

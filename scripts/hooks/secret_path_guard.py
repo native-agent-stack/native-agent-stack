@@ -3923,6 +3923,15 @@ def k4_form_f(command: str) -> K4Form | None:
 
 # L2's prefixes before the interpreter: assignments with a plain value and `timeout DURATION` (GNU coreutils timeout(1): it runs the command
 # with the same standard input). No launcher that could hand stdin to another program (env -S, sudo -s, a shell) is in it.
+K4_L2_REBINDERS = frozenset({"alias", "enable", "eval", "function", "getopts", "hash", "mapfile", "printf", "read", "readarray", "source",
+                             "trap"})
+K4_L2_ASSIGNERS = frozenset({"declare", "export", "local", "readonly", "typeset"})
+K4_L2_LEADERS = frozenset({"!", "{", "}", "if", "then", "elif", "else", "fi", "while", "until", "do", "done", "time", "command", "builtin"})
+# Linear under search() too (the guard's no-backtracking test): a name starts only after a non-name character, and neither run gives
+# characters back.
+K4_L2_ASSIGNMENT = re.compile(r"(?<![A-Za-z0-9_])[A-Za-z_][A-Za-z0-9_]*+(?:\[[^\][]*+\])?\+?=")
+K4_L2_OPERATOR_CHARACTERS = frozenset(";&|()<>")
+K4_L2_REBOUND_NAME = re.compile(r"(?<![A-Za-z0-9_])(?:PATH|BASH_CMDS|BASH_ALIASES)(?![A-Za-z0-9_])")
 K4_L2_PREFIX = re.compile(r"(?:[ \t]*(?:[A-Za-z_][A-Za-z0-9_]*=[A-Za-z0-9_./:,+@%~-]*|timeout[ \t]+[0-9]+(?:\.[0-9]+)?[smhd]?)(?=[ \t]))*")
 def k4_redirections_after(segment: str) -> str:
     """segment with the output redirections that stand right before its one `<<` moved after the quoted delimiter word, for k4_f_header:
@@ -3959,7 +3968,14 @@ def k4_code_bodies(command: str) -> list[tuple[str, int, int]]:
     (4) after the line's last `;`, `&&` or `||` (or from its start), the command is an F operator line (k4_f_header: a Python or Node program
         on stdin, F's arguments, output redirections and filters only). A file a `cat` writes keeps both readings of its body: a later
         command of the same request can run it (Astra's full read of #1048 at d2fcf5b5, P1, 2026-10-12), so it is no L2 body;
-    (5) a later line equals the delimiter exactly (the terminator).
+    (5) a later line equals the delimiter exactly (the terminator);
+    (6) the interpreter is named without a slash, and nothing in the request outside the bodies can rebind it or `timeout`: no function
+        definition (`name ()` or `function`), no alias, `hash`, `enable`, BASH_CMDS, BASH_ALIASES or PATH, no builtin that can assign
+        a variable named at run time (read, printf, mapfile, readarray, getopts anywhere; declare, typeset, local, export or readonly
+        at a command position with a name built from an expansion or a nameref `-n`), nothing that runs text as commands (eval,
+        source, `.`, trap) and no command named by an expansion. Bash runs a slash-free name as a function,
+        then a builtin, then through its hash table and PATH (bash(1) 5.3, "COMMAND EXECUTION"), and a path names any file, so either
+        could make bash run the body (Astra's delta read of #1048 at b7fc4819, P1, 2026-10-12). Any of these withdraws every L2 body.
     What stands before the command on its line, the terminator line and all text after it stay in both base readings, and TAIL-READ reads
     the text after the terminator again. The CODE rules read every masked body as its language's code (k4_code_units reads it as the
     interpreter region it is), and the whole-text
@@ -4000,7 +4016,7 @@ def k4_code_bodies(command: str) -> list[tuple[str, int, int]]:
         prefix = K4_L2_PREFIX.match(segment)
         segment = segment[prefix.end():]
         header = k4_f_header(segment) or k4_f_header(k4_redirections_after(segment))
-        if header is None:
+        if header is None or any("/" in word and K4_F_EXEC.match(word) for word in k4_shell_words(segment[:segment.find("<<")])):
             continue
         language, delimiter = header
         terminator_end = command.find("\n", region.body_end)
@@ -4008,6 +4024,42 @@ def k4_code_bodies(command: str) -> list[tuple[str, int, int]]:
                 or region.body_end < region.body_start:
             continue
         bodies.append((language, region.body_start, region.body_end))
+    if bodies:
+        # (6): the request outside the bodies, word by word, as bash splits it.
+        masked = list(command)
+        for _language, body_start, body_end in bodies:
+            masked[body_start:body_end] = " " * (body_end - body_start)
+        # A function definition's `()` is two operator characters (a quoted `()` defines nothing), and an assignment builtin at a
+        # command position rebinds only through a name built at run time or a nameref (`-n`): `export NAME=value` cannot, and a
+        # literal PATH, BASH_CMDS or BASH_ALIASES is caught by name.
+        at_command, target, options, assigner, previous = True, False, False, False, ""
+        for word in k4_shell_words("".join(masked)):
+            operator = word != "" and set(word) <= K4_L2_OPERATOR_CHARACTERS
+            if word in K4_L2_REBINDERS or K4_L2_REBOUND_NAME.search(word) \
+                    or (operator and ("()" in word or word.startswith(")") and previous.endswith("("))):
+                return []
+            previous = word if operator else ""
+            if operator:
+                if "<" in word or ">" in word:
+                    target = True  # the redirection's target word is no command
+                else:
+                    at_command, options, assigner = True, False, False
+                continue
+            if target or isinstance(word, K4Descriptor):
+                target = False
+                continue
+            if assigner:
+                if word.startswith("-") and "n" in word[1:] or not word.startswith("-") and set("$`") & set(word.split("=", 1)[0]):
+                    return []
+                continue
+            if not at_command:
+                continue
+            if word in K4_L2_LEADERS or K4_L2_ASSIGNMENT.match(word) or (options and word.startswith("-")):
+                options = word in {"time", "command", "builtin"} or (options and word.startswith("-"))
+                continue
+            if word == "." or not word.literal:
+                return []
+            at_command, assigner = False, word in K4_L2_ASSIGNERS
     return bodies
 
 
