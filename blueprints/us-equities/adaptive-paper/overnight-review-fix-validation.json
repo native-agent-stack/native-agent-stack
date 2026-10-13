@@ -30,11 +30,13 @@
     "blueprints/us-equities/adaptive-paper/runner.py": "e708e8275c63c8a0cda226c7575916045642fb2c3de3ba393be482a8e92fbdbe",
     "blueprints/us-equities/adaptive-paper/source-hashes.json": "3f835b3bb6b3a394907241a76c02d7be1547c49c4aa480569f56382eab4461eb",
     "blueprints/us-equities/adaptive-paper/transport.py": "76af68629b6792801f2bd07c514e470d77cbd32eb52e666ac7177cdd35469bf3",
+    "scripts/local_pages_policy_grants.py": "a949412f75ee3b6c6f502557fc4df3d2c12f2bea69b4b4ca7d8fe86b76cac16b",
     "scripts/published_preimages.py": "86f47a20e287fc433f901c1c9ee71e1bad58ce22cb42e391e2747b8e08987e59",
     "tests/test_adaptive_paper_overnight_guard_pins.py": "eaab736bb6bd9c6a6ffdd5dae076b4f71af5155808db77fecce12d4f0e316aad",
     "tests/test_adaptive_paper_overnight_transition.py": "2dbd14ff97713792e6c2d3a501ff214960aaff0577957fb03686a01cdb941003",
     "tests/test_gitleaks_config.py": "3802dff4c595d1d2531c58e43233728d1f71241fa3ee4852b8cf767e39719314",
-    "tests/test_overnight_published_preimages.py": "920f59dcd3b84f3be965cebd784d17f11111bd51103172171ba1645ca5e062c7"
+    "tests/test_overnight_published_preimages.py": "920f59dcd3b84f3be965cebd784d17f11111bd51103172171ba1645ca5e062c7",
+    "tools/local-pages/source_policy.json": "db963c760f32f59969f7f064b2bc44d3f0262a14571352515f98067c8f2e0212"
   },
   "isolated_timing_checks": [
     {
@@ -78,6 +80,19 @@
     "transition_plans": 7
   },
   "paper_acceptance": "NOT_RUN",
+  "post_push_inventory_followup": {
+    "added_exact_repository_grant": "scripts/published_preimages.py",
+    "generator_source_pin": "f8d11a6eb76d67bd929c87974b9c73c1517e5c66",
+    "observed_utc": "2026-10-13T17:35:17Z",
+    "parent": "f8d11a6eb76d67bd929c87974b9c73c1517e5c66",
+    "red_test_ids": [
+      "tests.test_local_pages_policy_grants.PolicyGrantDerivation.test_committed_repository_grants_match_current_git_inventory_paths",
+      "tests.test_local_pages_policy_grants.PolicyGrantDerivation.test_inventory_check_accepts_one_more_grant_without_changing_the_count"
+    ],
+    "removed_grants": [],
+    "scope": "Only the missing static repo inventory grant and its evidence bindings; original functional runs and source inputs remain historical",
+    "source": "scripts/local_pages_policy_grants.py:proposal/inventory_paths"
+  },
   "privacy_fail_before": {
     "assertion_failures": 2,
     "base": "9cb7c0d3338af2689ca7e489ac06e95873bf3848",
@@ -191,6 +206,59 @@
       "published_log": "evidence/artifacts/overnight-arming-20261013/review-fix/review-gitleaks-config-full.sanitized.txt",
       "skipped": 0,
       "tests_run": 31
+    },
+    {
+      "command": "idle env-i CPython3.12.3 inventory regression red at exact f8d11a6",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 0.498,
+      "exit_code": 1,
+      "failures": 2,
+      "output_bytes": 2713,
+      "output_sha256": "cd9186e726d643db13c834976cbe65b412c336a44abfc9323aaa798c553cda3d",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/arming-inventory-grant-red-f8.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-fix/arming-inventory-grant-red-f8.sanitized.txt",
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "test_argv": [
+        "unittest",
+        "tests.test_local_pages_policy_grants.PolicyGrantDerivation.test_committed_repository_grants_match_current_git_inventory_paths",
+        "tests.test_local_pages_policy_grants.PolicyGrantDerivation.test_inventory_check_accepts_one_more_grant_without_changing_the_count",
+        "-v"
+      ],
+      "tests_run": 2
+    },
+    {
+      "command": "idle env-i CPython3.12.3 inventory regression green after generated single exact grant",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 20.852,
+      "exit_code": 0,
+      "failures": 0,
+      "output_bytes": 194,
+      "output_sha256": "5b81d6143ae257c7a89e12d5b9e40b27532586e7d106b4d4f6230c5897b4324b",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/arming-inventory-grant-green.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-fix/arming-inventory-grant-green.sanitized.txt",
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "test_argv": [
+        "unittest",
+        "tests.test_local_pages_policy_grants",
+        "tests.test_local_pages_source_policy",
+        "tests.test_local_pages_architecture_policy",
+        "-q"
+      ],
+      "tests_run": 60
     }
   ],
   "schema_version": 1,
