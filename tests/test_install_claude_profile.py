@@ -1079,6 +1079,26 @@ class ShippedAgentEffortTests(unittest.TestCase):
                 with self.subTest(body=body):
                     self.assertEqual(self.routed(path, "opus", "high"), expected)
 
+    def test_every_routed_definition_and_the_routing_record_are_registered(self):
+        # A lowered definition, in each shipped copy, and the routing record are evidence of this routing: each keeps a manifest
+        # row with its current bytes. A rebase onto a moved main once dropped four of them (Astra's registry read of #1045 at
+        # 6c8348d2, P2), and validate.py checks only the rows that exist.
+        import hashlib
+        import json
+        rows = {row["path"]: row for row in json.loads((ROOT / "manifests/evidence.json").read_text(encoding="utf-8"))["files"]
+                if isinstance(row, dict)}
+        paths = ["docs/decisions/2026-10-12-model-effort-routing.md"]
+        for directory in ("adoption/agents/claude", ".claude/agents", "examples/claude-native/agents"):
+            paths += [f"{directory}/{name}.md" for name, (_, effort) in sorted(self.ROUTED.items())
+                      if effort != "max" and (ROOT / directory / f"{name}.md").is_file()]
+        unregistered = []
+        for path in paths:
+            data = (ROOT / path).read_bytes()
+            row = rows.get(path)
+            if row is None or row.get("sha256") != hashlib.sha256(data).hexdigest() or row.get("bytes") != len(data):
+                unregistered.append(path)
+        self.assertEqual(unregistered, [])
+
     def test_only_the_protocol_roles_keep_max(self):
         # The routing table lowers every role but the blind protocol roles and the landscape sweep's workers.
         self.assertEqual(sorted(name for name, (_, effort) in self.ROUTED.items() if effort == "max"),

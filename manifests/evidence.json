@@ -19073,8 +19073,8 @@
     },
     {
       "path": "docs/decisions/2026-10-12-model-effort-routing.md",
-      "sha256": "9cf7463ab3454fe49247668276afc01e9b89131999c19d2fe59cb9bdf781766e",
-      "bytes": 10947
+      "sha256": "fc889cf0005b619d69268bd5bec8b5b94307bd606481a9ba4926664c4dba8fb4",
+      "bytes": 11192
     },
     {
       "path": "docs/decisions/2026-10-12-skills-installer-foreign-content.md",
@@ -62553,8 +62553,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "13b79a321574571fef64d2d87a982dbd15e2d90bddde5d0ceaa809ebcc337706",
-      "bytes": 171313
+      "sha256": "dd3256ecc09f7fb0d451fe74b0630cde59dd2acd6de04e78f38dc5f37e44febc",
+      "bytes": 172637
     },
     {
       "path": "tests/test_install_skills.py",
