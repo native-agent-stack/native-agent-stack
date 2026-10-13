@@ -5402,18 +5402,18 @@
     },
     {
       "path": "adoption/hooks/claude/README.md",
-      "sha256": "3b816a3f8f9539f89e7b0c7d1df562ed6cd72e730de42921393b0b7a289b53b7",
-      "bytes": 4343
+      "sha256": "9b1477adbb6baa2925bf2994bbad1b5e9f9baf3f9c48c794000dd07d8e6d50b2",
+      "bytes": 5031
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "3a8fc99486012f8f80d5525651a550467285442ec9df3c4bc849db25645c7fee",
+      "sha256": "6c05d6c7ce672224b11ced0c52ee00d26304aaf57bab020a867de01c15ac7a8c",
       "bytes": 1229
     },
     {
       "path": "adoption/hooks/claude/research-routing-guard.py",
-      "sha256": "43f95fb0ff59954680c780b3bf015cbc7548285f57d5956313b704d5de280bac",
-      "bytes": 10391
+      "sha256": "30524d1b8326e23603dc410e58f7747947bb860872821d0a7a56e6291563e7ca",
+      "bytes": 11572
     },
     {
       "path": "adoption/hooks/claude/token-lanes-block.builder.md",
@@ -5537,8 +5537,8 @@
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
-      "sha256": "c395763f94d5bb335584d22ca4903dc977544d0e50fc6027f36e0fa64ee3a2af",
-      "bytes": 57789
+      "sha256": "7baca08fa2e31cfb7ebaff2aee75f3bac39e7935aa2777d5f2ba8d927141098f",
+      "bytes": 58144
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
@@ -5776,14 +5776,19 @@
       "bytes": 64651
     },
     {
+      "path": "adoption/templates/claude.coordinator.settings.template.json",
+      "sha256": "2fafedf25637be6de67f9707603fdc64374f750b561e62d413af0f96762e0fc5",
+      "bytes": 65
+    },
+    {
       "path": "adoption/templates/claude.settings.linux-wsl2.overlay.json",
       "sha256": "cb60aed603faeff7624be7d5c213406a8d983078e5b21902c0a017be590db0dc",
       "bytes": 572
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "7c83c567e7fadbae5cc67008fb508d71727579c3f23a6a712bce222afe63a92e",
-      "bytes": 13856
+      "sha256": "e9c5f673596fefc5dbfe680c932398c2fc1fd1ab260f8365758a44e0932c5bd9",
+      "bytes": 13926
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -19137,6 +19142,11 @@
       "bytes": 41530
     },
     {
+      "path": "docs/decisions/2026-10-13-coordinator-search-native-deny.md",
+      "sha256": "83af8b8ab454a8c18923f7dcd569dfe2084bb8010258e6f72c89682d64d77b1d",
+      "bytes": 12278
+    },
+    {
       "path": "docs/decisions/2026-10-13-engine-currency.md",
       "sha256": "b4d36592a4029145c54a6c18bf87f85b7e2f8b0387db737b04e3b5078e7c9293",
       "bytes": 13625
@@ -22235,6 +22245,46 @@
       "path": "evidence/artifacts/context-mode-codex-binding-20260926/upstream-resolver-tests.txt",
       "sha256": "b849a10dea3bd5741faa9828be0ee934a36214819056de3012cbcf028c652e6a",
       "bytes": 14197
+    },
+    {
+      "path": "evidence/artifacts/coordinator-search-native-deny-20261013/README.md",
+      "sha256": "f0978f9abb1e95c3b9868fec1971b18c149a20baff75cfb68988abf61397e1f4",
+      "bytes": 3725
+    },
+    {
+      "path": "evidence/artifacts/coordinator-search-native-deny-20261013/receipts/behavior-probe.json",
+      "sha256": "bbbbf476b4c3a591eca3b9321d07b50a205fd416884c002253e69d138738275f",
+      "bytes": 2578
+    },
+    {
+      "path": "evidence/artifacts/coordinator-search-native-deny-20261013/receipts/docs-excerpts.txt",
+      "sha256": "6a5516a985923e61091ac468883c32c221a753250a3a5d24913dcf9b996fb86d",
+      "bytes": 2990
+    },
+    {
+      "path": "evidence/artifacts/coordinator-search-native-deny-20261013/receipts/fail-before-round1.txt",
+      "sha256": "774297fa621a0cd66da33a9f891d2cf9ea67a56bc31b5de85741081ebc45f5d0",
+      "bytes": 1245
+    },
+    {
+      "path": "evidence/artifacts/coordinator-search-native-deny-20261013/receipts/fail-before.txt",
+      "sha256": "f336999578ea5d1b4b2b9eed5cebf7f868a7f2cd8290e888ee592de3b9a17145",
+      "bytes": 3118
+    },
+    {
+      "path": "evidence/artifacts/coordinator-search-native-deny-20261013/receipts/mutants-round1.txt",
+      "sha256": "840b12e09892f1ae392613df3a57e50df4db53ca6c3504dcfee51fbd42bf936e",
+      "bytes": 1880
+    },
+    {
+      "path": "evidence/artifacts/coordinator-search-native-deny-20261013/receipts/mutants-v03.txt",
+      "sha256": "7bd987b0f5c464a5cc68cfee99aca548da2319c09e32375f080af813335cc952",
+      "bytes": 1969
+    },
+    {
+      "path": "evidence/artifacts/coordinator-search-native-deny-20261013/receipts/tool-lists.json",
+      "sha256": "bea5209ff729b032f5ef1009c792b7efb805952eaf735120b29f18253ed0d20c",
+      "bytes": 1503
     },
     {
       "path": "evidence/artifacts/currency-wave-w1-20261003/judgments/move-hold-judges.json",
@@ -62922,6 +62972,11 @@
       "bytes": 20810
     },
     {
+      "path": "tests/test_coordinator_search_native_deny.py",
+      "sha256": "8ffd68c4e55050fd03ed2cbbdf512b52296ef7b6008d271dd7483f1344c21a63",
+      "bytes": 23004
+    },
+    {
       "path": "tests/test_corporate_action_readiness.py",
       "sha256": "23146f72baddc05093fe234ced1e74c0a23aa5d23763a6c1138508911842b406",
       "bytes": 4471
@@ -63458,8 +63513,8 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "4dde6cfcb82636cad926dc412b9e0a587e53f98454b80b01b821b76bf579f6b6",
-      "bytes": 345950
+      "sha256": "04dafdce71d05922a889ea10740b5a0964de134e03da87d4048e0b194822ed76",
+      "bytes": 350444
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
@@ -63688,8 +63743,8 @@
     },
     {
       "path": "tests/test_research_routing_guard.py",
-      "sha256": "c6765e7b41d75984e903a4401d01781ee4261f5cab73cc1fcabd159e2470d303",
-      "bytes": 12393
+      "sha256": "cfd1f5781b1404289c668f6ee56b632afac339c7a8cded24f6238fc678cb2fd9",
+      "bytes": 12862
     },
     {
       "path": "tests/test_research_workflow.py",
@@ -64123,8 +64178,8 @@
     },
     {
       "path": "tools/adoption/apply_claude_settings.py",
-      "sha256": "c3b01736e08a247ee52f6be53a881fb03768acad15c4520401c9023a4350e9de",
-      "bytes": 22818
+      "sha256": "07ca4349e177bba6f55fa4f9a4181c724abb49ece9d9332443f6b2a16023107d",
+      "bytes": 25607
     },
     {
       "path": "tools/adoption/apply_codex_lane.py",
@@ -64183,8 +64238,8 @@
     },
     {
       "path": "tools/adoption/new_wsl_client_config.py",
-      "sha256": "39e0117f266941b660dc4819891c18012a4935dcc4fb9624c5e56272e91d64b6",
-      "bytes": 166110
+      "sha256": "445ea358c27efe8bf5d224e015f84e6f98cecdaec779de4da82116d21ac95341",
+      "bytes": 166447
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",

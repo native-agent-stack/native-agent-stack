@@ -1,0 +1,18 @@
+The 15 mutants of review round 1 of #1089 (the command center's read of 74afed4eb: the two registrations without `exec`, the new-WSL tool's recovery preflight, and the probe's reader). Each is one exact change to one file (the registrations: to both entries) in place, restored after each run; then tests.test_coordinator_search_native_deny, tests.test_research_routing_guard and tests.test_new_wsl_client_config run with GITHUB_ACTIONS=true; a mutant is killed when the run fails. The unmutated tree passes first. The first run of this set killed 13 of 15: "the group is not signalled, only the leader" and "a record of another type is returned" survived. The first is now killed by `test_the_whole_process_group_is_ended_not_only_the_child` (a grandchild in the child's group must be gone) and the second by an answering child that prints a hook record and a JSON value that is no record before the init record. The lines below are the run with those tests.
+
+killed   (failed) the registrations hand the shell to the runner again (the first form)
+killed   (failed) the closing true is dropped
+killed   (failed) the wrapper exits 1 at the end
+killed   (failed) the runner is started without the existence check
+killed   (failed) the registrations are the bare command again
+killed   (failed) the runner's status is the last word and exits 2 on failure
+killed   (failed) the preflight merge passes no home again
+killed   (failed) the preflight merge passes another home
+killed   (failed) the read has no deadline
+killed   (failed) a stalled line is waited for to its end
+killed   (failed) the child is never signalled
+killed   (failed) SIGKILL never follows the grace
+killed   (failed) the group is not signalled, only the leader
+killed   (failed) a record of another type is returned
+killed   (failed) a line that is not JSON ends the read
+15 mutants, 15 killed, survivors: none

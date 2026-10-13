@@ -2240,7 +2240,9 @@ class Apply:
                 found[verdict.piece.key] = "added"
         # Keep the configured listing fraction under the 2026-09-30 directive.
         # An omitted host key stays through main's ordinary settings merge.
-        merged = file_io.merge_settings(current, wanted)
+        # The same retirement semantics as the applier's own merge (apply_claude_settings.apply passes host_home(target)): a preflight without the home removes nothing, so a file that holds both the replaced
+        # command and its replacement would be reported current and the applier would never run.
+        merged = file_io.merge_settings(current, wanted, home=file_io.host_home(target))
         if target.is_file() and merged == current:
             self.record("claude-settings", "current", f"{target} already holds the wired settings")
         elif self.dry:

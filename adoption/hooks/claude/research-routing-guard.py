@@ -4,8 +4,8 @@
 CPA-V-03 (2026-10-13, docs/decisions/2026-10-13-coordinator-search-native-deny.md): the WebSearch denial is not this hook's. A marked coordinator is launched with
 `permissions.deny: ["WebSearch"]` in its own --settings overlay (adoption/templates/claude.coordinator.settings.template.json) or `--disallowedTools WebSearch`, which needs no
 runner and holds in every permission mode, so a runner that is missing, late or crashing cannot let the call through. This hook is advisory and may fail open: for a marked
-session it keeps the redirect hint to tools/research/dispatch and the fetch-URL log. Its registration is wrapped in an existence check (a missing file cannot exit 2, which
-blocks a prompt or a tool call).
+session it keeps the redirect hint to tools/research/dispatch and the fetch-URL log. Its registration is wrapped so that the shell stays in control (an existence check, no exec, a closing true): a missing or
+unreadable file and a runner that exits 2 all end the command with status 0, never the status 2 that blocks a prompt or a tool call.
 
 Claude Code 2.1.294 hook protocol: https://code.claude.com/docs/en/hooks
 (`PreToolUse` input/decision control and `UserPromptSubmit` input/decision control;

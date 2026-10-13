@@ -176,7 +176,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "f=\"${HOME}/.claude/hooks/research-routing-guard.py\"; [ -f \"$$f\" ] && exec python3 \"$$f\"; true",
+            "command": "f=\"${HOME}/.claude/hooks/research-routing-guard.py\"; [ -f \"$$f\" ] && python3 \"$$f\"; true",
             "timeout": 5
           }
         ]
@@ -203,7 +203,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "f=\"${HOME}/.claude/hooks/research-routing-guard.py\"; [ -f \"$$f\" ] && exec python3 \"$$f\"; true",
+            "command": "f=\"${HOME}/.claude/hooks/research-routing-guard.py\"; [ -f \"$$f\" ] && python3 \"$$f\"; true",
             "timeout": 5
           }
         ]

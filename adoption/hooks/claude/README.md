@@ -23,9 +23,9 @@ with `--settings` set to `adoption/templates/claude.coordinator.settings.templat
 mode. This hook is advisory: in a marked session it keeps the
 `tools/research/dispatch --question '<question>'` redirect hint, and targeted WebFetch and
 context-mode fetches retain normal permissions and record requested verification
-URLs; UserPromptSubmit resets the turn counter. Its two registrations are existence-checked
-(a missing file cannot exit 2, which blocks a prompt or a tool call), and the settings applier
-retires the earlier bare registration. These are hook-protocol fixtures until the CC applies
+URLs; UserPromptSubmit resets the turn counter. Its two registrations keep the shell in control
+(`[ -f "$f" ] && python3 "$f"; true`: a missing or unreadable file and a runner that exits 2 end the command with
+status 0, never the 2 that blocks a prompt or a tool call), and the settings applier retires the earlier bare registration. These are hook-protocol fixtures until the CC applies
 the launch step and runs the fresh-session acceptance after landing.
 
 ## Held out of the default: the token-lane carriers

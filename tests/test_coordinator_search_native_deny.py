@@ -9,12 +9,14 @@ client's own listing of its tools.
 import copy
 import json
 import os
+import queue
 import shutil
 import signal
 import string
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 import unittest
 from pathlib import Path
@@ -97,6 +99,31 @@ class RegistrationTests(unittest.TestCase):
                     self.assertIn("tools/research/dispatch --question", fields["additionalContext"])
                     self.assertNotIn("permissionDecision", fields)
 
+    def test_an_unreadable_guard_file_and_a_runner_that_exits_2_never_end_in_status_2_on_either_event(self):
+        """Round 1 of the review (blocker 1): `[ -f "$f" ] && exec python3 "$f"; true` handed the shell to Python, so the closing `true` never ran: an existing file that cannot be read (Python exits 2) and a runner
+        that exits 2 both ended in 2, which blocks a prompt (UserPromptSubmit) or the tool call (PreToolUse). The registered command keeps the shell in control and ends in true."""
+        cases = (("absent", None, None), ("unreadable", "print('never read')\n", 0o000), ("exits 2", "import sys\nsys.exit(2)\n", 0o600), ("raises", "raise RuntimeError('x')\n", 0o600),
+                 ("empty", "", 0o600))
+        for command in self.commands():
+            for label, source, mode in cases:
+                if label == "unreadable" and os.geteuid() == 0:
+                    continue   # root reads any file
+                with self.subTest(command=command[:40], case=label), tempfile.TemporaryDirectory() as temp:
+                    home = Path(temp)
+                    if source is not None:
+                        runner = home / ".claude/hooks" / GUARD_NAME
+                        runner.parent.mkdir(parents=True)
+                        runner.write_text(source, encoding="utf-8")
+                        runner.chmod(mode)
+                    done = self.run_command(command, home, stdin=json.dumps({"session_id": SESSION, "hook_event_name": "PreToolUse", "tool_name": "WebSearch", "tool_input": {}}))
+                    self.assertEqual(done.returncode, 0, f"{label}: {done.stderr[-200:]}")
+                    self.assertEqual(done.stdout, "")
+                    if source is not None and label in ("unreadable", "exits 2"):
+                        # the control that makes the case mean something: the same command with exec, the first form of this change, ends in 2
+                        old = command.replace('&& python3 "$$f"', '&& exec python3 "$$f"')
+                        self.assertNotEqual(old, command, "the control rewrites the wrapped command")
+                        self.assertEqual(self.run_command(old, home).returncode, 2, f"{label}: the exec form blocks")
+
     def test_the_registered_commands_keep_the_file_name_the_map_and_the_installer_look_for(self):
         for command in self.commands():
             self.assertIn(".claude/hooks/research-routing-guard.py", command)
@@ -175,6 +202,160 @@ class ApplierRetirementTests(unittest.TestCase):
         self.assertEqual([command for command, _ in acs.SUPERSEDED_HOOK_COMMANDS], [OLD_COMMAND])
 
 
+def read_init_record(command, cwd, deadline=90.0, grace=30.0):
+    """The system init record that a headless client prints on its standard output, or None when none arrives within `deadline` seconds (the client is silent, stalls in the middle of a line, or ends without
+    one). The read has a deadline of its own, a reader thread and a timed queue read, because `for line in process.stdout` blocks until a whole line or the end of the stream, before any elapsed-time check; the
+    process group is ended (SIGTERM, then SIGKILL after `grace`) and reaped on every path."""
+    process = subprocess.Popen(command, cwd=cwd, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True, start_new_session=True)
+    found = queue.Queue()
+
+    def reader():
+        try:
+            for line in process.stdout:
+                try:
+                    record = json.loads(line)
+                except ValueError:
+                    continue
+                if isinstance(record, dict) and record.get("type") == "system" and record.get("subtype") == "init":
+                    found.put(record)
+                    return
+        except (OSError, ValueError):
+            pass
+        found.put(None)
+
+    thread = threading.Thread(target=reader, daemon=True)
+    thread.start()
+    try:
+        return found.get(timeout=deadline)
+    except queue.Empty:
+        return None
+    finally:
+        try:
+            os.killpg(process.pid, signal.SIGTERM)
+        except ProcessLookupError:
+            pass
+        try:
+            process.wait(timeout=grace)
+        except subprocess.TimeoutExpired:
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            process.wait()
+        thread.join(timeout=5)
+        if not thread.is_alive():
+            process.stdout.close()
+
+
+class InitRecordReaderTests(unittest.TestCase):
+    """Round 1 of the review (item 4, and the local review's P2): the probe's deadline must bound a client that stays silent. Synthetic children, no native model call and no client."""
+
+    CHILD = ("import os, sys, time\n"
+             "open(sys.argv[1], 'w').write(str(os.getpid()))\n"
+             "{body}\n"
+             "sys.stdout.flush()\n"
+             "time.sleep(120)\n")
+
+    def run_child(self, body, deadline, grace=10):
+        with tempfile.TemporaryDirectory() as temp:
+            pid_file = Path(temp) / "pid"
+            started = time.monotonic()
+            record = read_init_record([sys.executable, "-c", self.CHILD.format(body=body), str(pid_file)], temp, deadline=deadline, grace=grace)
+            elapsed = time.monotonic() - started
+            pid = int(pid_file.read_text())
+            gone = False
+            for _ in range(50):
+                try:
+                    os.kill(pid, 0)
+                except ProcessLookupError:
+                    gone = True
+                    break
+                time.sleep(0.1)
+        return record, elapsed, gone
+
+    def test_the_former_loop_was_not_bounded_by_its_own_deadline_and_the_reader_is(self):
+        """The control that gives the three tests their meaning: the loop the probe used before round 1 (`for line in process.stdout` with an elapsed-time check inside it) stays blocked on a silent child past
+        its own deadline, where read_init_record returns at it."""
+        command = [sys.executable, "-c", "import time; time.sleep(120)"]
+        holder = {}
+
+        def former():
+            process = subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True, start_new_session=True)
+            holder["process"] = process
+            started = time.monotonic()
+            for line in process.stdout:
+                if time.monotonic() - started > 1:
+                    break
+
+        thread = threading.Thread(target=former, daemon=True)
+        thread.start()
+        thread.join(timeout=4)
+        try:
+            self.assertTrue(thread.is_alive(), "the former loop is still blocked 3 s past its deadline of 1 s")
+        finally:
+            process = holder.get("process")
+            if process is not None:
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                process.wait()
+            thread.join(timeout=5)
+            if process is not None:
+                process.stdout.close()
+        started = time.monotonic()
+        self.assertIsNone(read_init_record(command, None, deadline=1.0, grace=10))
+        self.assertLess(time.monotonic() - started, 10)
+
+    def test_a_silent_client_returns_none_at_the_deadline_and_is_ended(self):
+        record, elapsed, gone = self.run_child("pass", deadline=1.5)
+        self.assertIsNone(record)
+        self.assertLess(elapsed, 15, "the deadline bounds the read")
+        self.assertTrue(gone, "the child is ended and reaped")
+
+    def test_a_client_that_stalls_in_the_middle_of_a_line_is_bounded_too(self):
+        record, elapsed, gone = self.run_child("sys.stdout.write('{\"type\": \"system\", \"subt')", deadline=1.5)
+        self.assertIsNone(record)
+        self.assertLess(elapsed, 15)
+        self.assertTrue(gone)
+
+    def test_a_client_that_ignores_sigterm_is_killed_when_the_grace_ends(self):
+        record, elapsed, gone = self.run_child("import signal; signal.signal(signal.SIGTERM, signal.SIG_IGN)", deadline=1.5, grace=2)
+        self.assertIsNone(record)
+        self.assertLess(elapsed, 15, "SIGKILL follows the grace")
+        self.assertTrue(gone)
+
+    def test_the_whole_process_group_is_ended_not_only_the_child(self):
+        # a client's own children (its hooks, its tool processes) share its group and its standard output; a leader-only signal leaves them running and the pipe open
+        with tempfile.TemporaryDirectory() as temp:
+            pid_file = Path(temp) / "pid"
+            grandchild_file = Path(temp) / "grandchild"
+            body = ("import subprocess\n"
+                    "g = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(120)'])\n"
+                    f"open({str(grandchild_file)!r}, 'w').write(str(g.pid))")
+            record = read_init_record([sys.executable, "-c", self.CHILD.format(body=body), str(pid_file)], temp, deadline=2.0, grace=10)
+            self.assertIsNone(record)
+            grandchild = int(grandchild_file.read_text())
+            gone = False
+            for _ in range(50):
+                try:
+                    os.kill(grandchild, 0)
+                except ProcessLookupError:
+                    gone = True
+                    break
+                time.sleep(0.1)
+            self.assertTrue(gone, "the grandchild in the child's process group is ended too")
+
+    def test_a_client_that_answers_is_read_promptly_and_ended(self):
+        # not JSON, other records of the stream (a hook event, a JSON value that is no record), then the init record: only the init record is the answer
+        body = ("print('not json'); print('{\"type\": \"system\", \"subtype\": \"hook_started\"}'); print('[1, 2]'); "
+                "print('{\"type\": \"system\", \"subtype\": \"init\", \"tools\": [\"Bash\"]}')")
+        record, elapsed, gone = self.run_child(body, deadline=30)
+        self.assertEqual(record, {"type": "system", "subtype": "init", "tools": ["Bash"]})
+        self.assertLess(elapsed, 20)
+        self.assertTrue(gone)
+
+
 @unittest.skipUnless(os.environ.get("NAS_NATIVE_CLAUDE_PROBE") == "1" and shutil.which("claude"),
                      "opt-in native probe: set NAS_NATIVE_CLAUDE_PROBE=1 with the claude client on PATH (it starts the client, runs its session hooks and reads its init record; no model call is waited for)")
 class NativeClientProbeTests(unittest.TestCase):
@@ -183,25 +364,7 @@ class NativeClientProbeTests(unittest.TestCase):
     def tools(self, *arguments):
         with tempfile.TemporaryDirectory(prefix="coordinator-deny-") as scratch:
             command = ["claude", "-p", "Reply with the single word ok.", "--output-format", "stream-json", "--verbose", "--max-turns", "1", "--no-session-persistence", *arguments]
-            process = subprocess.Popen(command, cwd=scratch, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True, start_new_session=True)
-            started, init = time.monotonic(), None
-            try:
-                for line in process.stdout:
-                    try:
-                        record = json.loads(line)
-                    except ValueError:
-                        continue
-                    if record.get("type") == "system" and record.get("subtype") == "init":
-                        init = record
-                        break
-                    if time.monotonic() - started > 90:
-                        break
-            finally:
-                try:
-                    os.killpg(process.pid, signal.SIGTERM)
-                except ProcessLookupError:
-                    pass
-                process.wait(timeout=30)
+            init = read_init_record(command, scratch, deadline=90.0)
         self.assertIsNotNone(init, "no init record within 90 s")
         return set(init.get("tools") or [])
 
@@ -214,7 +377,7 @@ class NativeClientProbeTests(unittest.TestCase):
         missing_runner = {"hooks": {"PreToolUse": [{"matcher": "WebSearch", "hooks": [{"type": "command", "command": "python3 /nonexistent/guard.py", "timeout": 5}]}]}}
         with tempfile.TemporaryDirectory() as temp:
             hook_only = self.settings_file(temp, missing_runner)
-            self.assertIn("WebSearch", self.tools("--settings", hook_only), "the hook entry alone, runner missing: the call goes through (the finding)")
+            self.assertIn("WebSearch", self.tools("--settings", hook_only), "the hook entry alone, runner missing: WebSearch is listed to the model (and the attempted call is blocked, receipts/behavior-probe.json)")
             overlay = json.loads(OVERLAY.read_text(encoding="utf-8"))
             both = self.settings_file(temp, {**overlay, **missing_runner})
             self.assertNotIn("WebSearch", self.tools("--settings", both), "the overlay with the same missing runner")

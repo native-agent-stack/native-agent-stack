@@ -1,4 +1,4 @@
-# A marked coordinator's WebSearch is denied natively at launch; the shared hook is advisory and cannot exit 2, 2026-10-13
+# A marked coordinator's WebSearch is denied natively at launch; the shared hook is advisory and its registrations cannot end in status 2, 2026-10-13
 
 CPA-V-03 of the Claude-family practice audit (`claude-practice-audit-converged-20261012`, P2, source-only in the audit, measured here). The research-routing guard that denied WebSearch for marked coordinators
 ([2026-10-08-coordinator-research-routing.md](2026-10-08-coordinator-research-routing.md), correction #76) was a PreToolUse hook with a 5 s timeout and no `onFailure`, run as a bare `python3 <file>`. The audit's
@@ -25,7 +25,7 @@ Claude Code 2.1.296, headless sessions in an empty directory, the host's profile
 | the PreToolUse hook entry alone, runner file missing (`python3` exits 2) | yes | **blocked, in every session** (a hook error and a permission denial) |
 | the overlay and a missing runner, or the overlay and a crashing runner | no | none made |
 | UserPromptSubmit entry, runner file missing | - | **the prompt itself is blocked** (0 turns) |
-| UserPromptSubmit entry, existence-checked registration, same missing file | - | the prompt runs |
+| UserPromptSubmit entry, existence-checked registration, same missing file | - | the prompt runs (an unreadable file and a runner that exits 2 are shell-level cases, below) |
 
 So the hook cannot be the enforcement: a runner that fails with any status but 2 lets a marked coordinator's search through, and one that is missing blocks everyone's prompt and WebSearch (the exit-2 trap that the
 audit's Claude read named). The native deny needs no runner and holds under `bypassPermissions` (`docs/en/permissions.md` L62-L66: a bare tool name in a deny rule "removes the tool from Claude's context
@@ -39,14 +39,31 @@ entirely"; `docs/en/cli-reference.md` L87; `permissions.md` "Settings precedence
    carry it, so an unmarked session keeps WebSearch.
 2. **The hook is advisory.** For a marked session `research-routing-guard.py` keeps the redirect hint to `tools/research/dispatch --question '<question>'` (now `additionalContext`, never a permission decision) and
    the bounded fetch-URL log; both may fail open. A WebSearch call that reaches it came from a session launched without the overlay, and is not blocked there.
-3. **Both registrations are existence-checked**, as the secret-path guard's is: `f="${HOME}/.claude/hooks/research-routing-guard.py"; [ -f "$f" ] && exec python3 "$f"; true`. A missing file cannot exit 2, so
-   it cannot block a prompt or a tool call; an advisory hook that is not there is silent. (The secret-path guard keeps its own fail-closed form: it is the one that must refuse.)
+3. **Both registrations keep the shell in control**: `f="${HOME}/.claude/hooks/research-routing-guard.py"; [ -f "$f" ] && python3 "$f"; true`. The existence check makes an absent file silent, and the
+   closing `true` makes every other failure of the runner (an existing file that cannot be read, a runner that exits 2 or raises, a file that disappears after the check) end the command with status 0, never the
+   2 that blocks a prompt or a tool call; the runner's own output still passes through. Round 1 of the review found that the first form, `... && exec python3 "$f"; true`, kept the shell out of the way: with
+   `exec` the closing `true` never ran, so an unreadable file (Python cannot open it) and a runner that exits 2 both ended in 2 on both events (the verdict file of the read of `74afed4eb`, blocker 1). An
+   additional `-r` test alone would not cover the race between the check and the open or a runner that exits 2. (The secret-path guard keeps its own fail-closed form: it is the one that must refuse.)
 4. **The settings applier retires the replaced command.** `merge_hooks` de-duplicates by command, so the bare `python3 "<home>/.claude/hooks/research-routing-guard.py"` already on a host would have run beside
    its wrapped replacement (the fetch log counting every URL twice). `tools/adoption/apply_claude_settings.py` gains `SUPERSEDED_HOOK_COMMANDS`, a finite allowlist matched as the held-out carriers are (exact
    string, HOME as written or another spelling of the settings file's own home, nothing else parsed), retired unless the incoming template runs the same command, whether or not the host keeps its held-out carriers.
 5. **Host step, the command center's act** (this change writes no host configuration): add `--settings <path to the overlay>` to the launch of each marked coordinator (the two launchers that set
-   `NAS_RESEARCH_COORDINATOR_ROLE`), and re-apply the profile template (`apply_claude_settings.py`) so that the two registrations become the existence-checked ones. Until the first is made the marked
+   `NAS_RESEARCH_COORDINATOR_ROLE`), and re-apply the profile template (`apply_claude_settings.py`, or the new-WSL tool's apply) so that the two registrations become the wrapped ones. Until the first is made the marked
    coordinators are as they were: the hook (now advisory) no longer denies them, so the launch step is what restores enforcement; do it in the same act.
+
+## Review round 1 (Astra's read of `74afed4eb`: two P1 and three P3; the local review: one P2; one commit)
+
+The verdict file is `full1-pr1089-74afed4eb/GPT-VERDICT-74afed4eb.md` (sha256 `ba0552fa13909e25f1796a000de914fd0e393064c9c5862db65460f2bd9241d2`). Each fix has a test that fails on `74afed4eb` (`receipts/fail-before-round1.txt`).
+
+| Finding | Fix | Test (fails before the fix) |
+| --- | --- | --- |
+| Blocker 1, `claude.settings.template.json:179` and `:206`: an existing but unreadable runner, or a runner that exits 2, ended the command with status 2 on both events (`exec` replaced the shell, so the closing `true` never ran); the record's "cannot exit 2" was contradicted | the registrations drop `exec`: `[ -f "$f" ] && python3 "$f"; true` (decision 3); the hook's docstring, the hooks README and the record say what is true | `RegistrationTests.test_an_unreadable_guard_file_and_a_runner_that_exits_2_never_end_in_status_2_on_either_event` (absent, unreadable, exit 2, raises, empty; both events) |
+| Blocker 2, `new_wsl_client_config.py:2243-2244`: the recovery step's preflight merge passed no home, so the retirement removed nothing, a settings file that held both the replaced bare command and its replacement was reported current and the applier never ran (four registrations, one fetch logged twice) | the preflight merge passes the settings file's home, as the applier's own merge does (`home=file_io.host_home(target)`); the only other product caller of `merge_settings`, the one that builds `wanted` in the same step, merges the stage's template with the overlay (no host file, nothing to retire) | `ResearchSupersessionRecoveryTests` in `tests/test_new_wsl_client_config.py`: through `--apply` with the legacy and the current registrations already installed: a real apply, one registration per event, one fetch-log record, then a no-op apply |
+| P3 4 (and the local review's P2), `test_coordinator_search_native_deny.py:189`: the opt-in probe's 90 s deadline did not bound a client that stays silent (`for line in process.stdout` blocks before the check); and a failure message said the call "goes through" where the receipt records it listed and blocked | the read has a deadline of its own (a reader thread and a timed queue read) and the process group is ended and reaped on every path; the message names what the assertion checks | `InitRecordReaderTests` (a silent child, a child that stalls in the middle of a line, a child that answers after other records, a child that ignores SIGTERM, a grandchild of the child's process group, and the former loop as the control that stays blocked past its own deadline) |
+
+Follow-ups of the read (none changing code): the four documentation pages cited in `receipts/docs-excerpts.txt` (`permissions.md`, `settings-reference.md`, `cli-reference.md`, `hooks.md`) were not in
+the review's mirror. The author's captures of the exact bytes are held in the private research record (their sizes and sha256 are those of the receipt; they are not added here, about 0.8 MB of vendor text),
+and a live fetch no longer has to return the same bytes: attach the captures to the next read's packet, or record a supersession with new hashes and locators; three historical hostname substrings of `manifests/evidence.json` (inherited, none added) wait for the registry cleanup. The verdict's research item 6 is queued, not decided here: which supported native launch and resume contract preserves the coordinator overlay while separately authorized research sessions keep their intended tool policy; the record's "What is not covered" (a resume through a route that omits `--settings`; a subagent that shares the marked session's tool list) is its starting point, and a different candidate waits for that measurement.
 
 ## Alternatives
 

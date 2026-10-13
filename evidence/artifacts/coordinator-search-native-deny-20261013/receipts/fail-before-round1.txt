@@ -1,0 +1,14 @@
+Round 1 of #1089 (Astra's blockers 1 and 2 and item 4 of the read of 74afed4eb, and the local review's P2) against the sources of the head that was read and against this head. A test is listed once, with the number of its failing subtests.
+
+== 74afed4eb, the head that was read (its sources, these test modules)
+   test_coordinator_search_native_deny: Ran 20, FAILED (failures=6, skipped=1)
+      RegistrationTests.test_an_unreadable_guard_file_and_a_runner_that_exits_2_never_end_in_status_2_on_either_event: 6 failing, e.g. command='f="${HOME}/.claude/hooks/research-routin', case='unreadable'
+   test_new_wsl_client_config.ResearchSupersessionRecoveryTests: Ran 1, FAILED (failures=1)
+      ResearchSupersessionRecoveryTests.test_a_settings_file_that_holds_the_legacy_and_the_current_registrations_is_superseded_by_a_real_apply_and_the_next_apply_is_a_no_op: 1 failing
+== this head
+   test_coordinator_search_native_deny: Ran 20, OK
+   test_new_wsl_client_config.ResearchSupersessionRecoveryTests: Ran 1, OK
+== the probe's pre-fix read of a silent child, deadline 2 s, external timeout 8 s
+   still blocked at the 8 s external timeout although the loop's own deadline is 2 s (killed by the harness)
+
+Tests that fail or raise on 74afed4eb: 2.
