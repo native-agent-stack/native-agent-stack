@@ -1,0 +1,186 @@
+"""Validated CC/co-op GO issuance at actual readiness; no credentials/orders.
+
+Only invoke --issue under authorization for this exact bundle. --check writes
+nothing. Issuer roles are CC/co-op; this tool never changes a sealed CONFIG.
+"""
+import argparse
+from datetime import datetime,timezone
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+import time
+
+import launch
+
+LEGACY=('paper-pre-*.service','paper-ext-*.service','paper-n2-open-*.service',
+        'paper-n2-ctl-*.service','paper-recover-a2-*.service')
+
+def writer_units():
+    result=subprocess.run(['systemctl','--user','list-units','--all','--type=service',
+                           '--no-legend','--plain',*LEGACY],capture_output=True,text=True)
+    if result.returncode:
+        raise launch.Refused('lane_A_writer_unit_inventory_unavailable')
+    rows=[]
+    for line in result.stdout.splitlines():
+        pieces=line.split()
+        if len(pieces)>=4:
+            name,loaded,active,sub=pieces[:4]
+            if active in ('active','activating','deactivating'):
+                raise launch.Refused('lane_A_or_other_paper_writer_active')
+            rows.append({'unit':name,'active':active,'sub':sub})
+    return rows
+
+def verify_previous(stage,date):
+    prior_index=launch.STAGES.index(stage)-1
+    if prior_index<0:
+        return None,None
+    path,previous,native_path=launch.verify_handoff(launch.STAGES[prior_index],date)
+    return launch.sha(path),{'handoff_receipt':str(path),'native_receipt':str(native_path)}
+
+def build(kind,trial,skip_reason=None):
+    if kind not in launch.STAGES+['record','scan','pre-skip'] or not re.fullmatch(r'[a-z0-9-]{1,24}',trial):
+        raise launch.Refused('invalid_issue_stage_or_trial')
+    launch.verify_bundle()
+    launch.verify_runtime()
+    request=json.loads((launch.ROOT/'GO-BINDING-REQUEST.json').read_text())
+    if request.get('bundle_sha256')!=launch.sha(launch.ROOT/'SHA256SUMS'):
+        raise launch.Refused('request_bundle_binding_mismatch')
+    if request.get('issuer')!='CC through co-op':
+        raise launch.Refused('unexpected_issuer_route')
+    session,date=launch.session_now()
+    wanted='PRE' if kind in ('pre','record','scan') else 'RTH'
+    if (session not in ('PRE','RTH') if kind=='pre-skip' else session!=wanted):
+        raise launch.Refused('venue_session_not_ready')
+    check={'bundle_sha256':request['bundle_sha256'],'session_kind':session,'session_date':date,
+           'lane_A_writer_units':writer_units(),'inventory_id':'alpaca-paper'}
+    previous=None
+    config=launch.config('pre' if kind in ('record','scan','pre-skip') else kind)
+    expected=request['config_hashes']['pre' if kind in ('record','scan','pre-skip') else kind]
+    if launch.sha(config)!=expected:
+        raise launch.Refused('request_config_binding_mismatch')
+    if any((launch.STATE/'active').glob('*.json')):
+        raise launch.Refused('active_experiment_requires_recovery')
+    if kind in launch.STAGES:
+        if launch.STOP.exists() or launch.STOP.is_symlink():
+            raise launch.Refused('STOP_present')
+        previous,location=verify_previous(kind,date)
+        check['previous_recover']=location
+        if kind=='sip':
+            check['record_window']=launch.record_window_drained(date)
+    if kind=='pre-skip':
+        if skip_reason not in launch.SKIP_REASONS:
+            raise launch.Refused('unknown_skip_reason')
+        launch.skip_available(date)
+        if skip_reason=='pre_window_passed' and session=='PRE':
+            sys.path.insert(0,str(launch.FROZEN/'blueprints/us-equities/adaptive-paper'))
+            from mover import load_mover_config
+            from sessions import NY
+            _,_,settings=load_mover_config(config)
+            if datetime.now(timezone.utc).astimezone(NY).time().replace(tzinfo=None)<settings.trial_end_et:
+                raise launch.Refused('PRE_window_not_passed')
+    elif skip_reason is not None:
+        raise launch.Refused('unexpected_skip_reason')
+    if kind in ('pre','scan'):
+        sys.path.insert(0,str(launch.FROZEN/'blueprints/us-equities/adaptive-paper'))
+        from mover import load_mover_config
+        from sessions import NY
+        _,_,settings=load_mover_config(config)
+        now=datetime.now(timezone.utc).astimezone(NY)
+        if now.time().replace(tzinfo=None)<settings.rule.at_et or now.time().replace(tzinfo=None)>=settings.trial_end_et:
+            raise launch.Refused('mover_rule_or_trial_window_not_ready')
+    issued=datetime.now(timezone.utc).isoformat()
+    if kind=='pre-skip':
+        value={'schema_version':1,'purpose':'GET_ONLY_PRE_SKIP','bundle_sha256':request['bundle_sha256'],
+               'config_sha256':expected,'trial':trial,'session_kind':session,'session_date':date,
+               'issued_at_utc':issued,'state_root':str(launch.STATE/'instances'/trial/'native-state'),
+               'skip_reason':skip_reason}
+    elif kind in ('record','scan'):
+        value={'schema_version':1,'purpose':'GET_ONLY_'+kind.upper(),
+               'bundle_sha256':request['bundle_sha256'],'config_sha256':expected,
+               'trial':trial,'session_kind':session,'session_date':date,'issued_at_utc':issued}
+    else:
+        scan_sha=None
+        if kind=='pre':
+            from mover import load_scan
+            slot=launch.STATE/'ready/pre'
+            ready=launch.safe_json(slot/'SCAN-READY.json')
+            _,_,settings=load_mover_config(config)
+            load_scan((slot/'scan.json').read_bytes(),settings,now=time.time())
+            scan_sha=launch.sha(slot/'scan.json')
+            if ready.get('engine_scan_sha256')!=scan_sha or ready.get('config_sha256')!=expected:
+                raise launch.Refused('fresh_SCAN_READY_binding_mismatch')
+            reference=launch.safe_json(launch.STATE/'reference-trading-last.json')
+            if reference.get('boot_id')!=launch.boot_id() or time.monotonic()-reference['finished_monotonic']<60:
+                raise launch.Refused('scanner_reference_request_window_not_drained')
+            check['scan_ready_receipt']=str(slot/'SCAN-READY.json')
+            check['scan_sha256']=scan_sha
+        value={'schema_version':1,'bundle_sha256':request['bundle_sha256'],'config_sha256':expected,
+               'stage':kind,'trial':trial,'session_kind':session,'session_date':date,
+               'issued_at_utc':issued,'state_root':str(launch.STATE/'instances'/trial/'native-state'),
+               'scan_sha256':scan_sha,'previous_recover_sha256':previous}
+    if (launch.STATE/'instances'/trial).exists() or (launch.STATE/'data'/kind/trial).exists():
+        raise launch.Refused('trial_reuse')
+    slot=launch.STATE/'ready'/kind
+    if (slot/'GO.sha256').exists() or (slot/(trial+'.GO.used.sha256')).exists():
+        raise launch.Refused('ready_or_used_GO_exists')
+    return value,check
+
+def issue(kind,trial,authorization,expected_auth,check_only,skip_reason=None):
+    if launch.sha(authorization)!=expected_auth:
+        raise launch.Refused('CC_authorization_hash_mismatch')
+    # The exact GO request must be named in the new authorization. A predecessor
+    # authority for another manifest cannot silently authorize this source.
+    text=authorization.read_text()
+    if launch.sha(launch.ROOT/'SHA256SUMS') not in text:
+        raise launch.Refused('CC_authorization_does_not_bind_current_bundle')
+    if check_only:
+        value,check=build(kind,trial,skip_reason)
+        return {'status':'ready_check_passed','writes':0,'conditions':check,'GO_schema':value}
+    with launch.writer():
+        value,check=build(kind,trial,skip_reason)
+        slot=launch.STATE/'ready'/kind
+        slot.mkdir(parents=True,mode=0o700,exist_ok=True)
+        os.chmod(slot,0o700)
+        launch.save(slot/'GO.json',value)
+        digest=launch.sha(slot/'GO.json')
+        # Issued digest is the trigger and is written LAST, after payload fsync.
+        launch.save(slot/('issue-'+trial+'.json'),{'issuer':'CC through co-op',
+                     'authorization_sha256':expected_auth,'go_sha256':digest,'conditions':check,
+                     'issued_at_utc':value['issued_at_utc']})
+        temp=slot/'GO.digest.tmp'
+        with temp.open('x') as stream:
+            stream.write(digest+'\n');stream.flush();os.fsync(stream.fileno())
+        os.chmod(temp,0o600)
+        os.replace(temp,slot/'GO.sha256')
+        directory=os.open(slot,os.O_RDONLY|os.O_DIRECTORY)
+        try:os.fsync(directory)
+        finally:os.close(directory)
+        return {'status':'GO_issued','GO_path':str(slot/'GO.json'),'trigger_path':str(slot/'GO.sha256'),
+                'go_sha256':digest,'stage':kind,'trial':trial,'issued_at_utc':value['issued_at_utc']}
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('stage',choices=launch.STAGES+['record','scan','pre-skip'])
+    parser.add_argument('--skip-reason',choices=launch.SKIP_REASONS)
+    parser.add_argument('--trial',required=True)
+    parser.add_argument('--authorization',type=Path,required=True)
+    parser.add_argument('--authorization-sha256',required=True)
+    mode=parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument('--check',action='store_true');mode.add_argument('--issue',action='store_true')
+    args=parser.parse_args()
+    try:
+        result=issue(args.stage,args.trial,args.authorization,args.authorization_sha256,args.check,args.skip_reason)
+        print(json.dumps(result,indent=2));return 0
+    except launch.Refused as exc:
+        print(json.dumps({'status':'refused','reason':str(exc),'writes':0}));return 2
+    except Exception as exc:
+        print(json.dumps({'status':'refused','error_class':type(exc).__name__,'writes':0}));return 2
+
+if __name__=='__main__':
+    sys.path.insert(0,str(launch.FROZEN/'blueprints/us-equities/adaptive-paper'))
+    from runtime_lock import runtime_read_lock
+    with runtime_read_lock():raise SystemExit(main())
