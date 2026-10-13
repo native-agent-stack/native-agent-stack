@@ -5776,6 +5776,11 @@
       "bytes": 64651
     },
     {
+      "path": "adoption/templates/claude.sandbox-readdeny.settings.template.json",
+      "sha256": "ce7ffb5771b5215e1d27984dcdffeca602d9ee8cb2f412fef699291f15a5f0eb",
+      "bytes": 1892
+    },
+    {
       "path": "adoption/templates/claude.settings.linux-wsl2.overlay.json",
       "sha256": "cb60aed603faeff7624be7d5c213406a8d983078e5b21902c0a017be590db0dc",
       "bytes": 572
@@ -19160,6 +19165,11 @@
       "path": "docs/decisions/2026-10-13-plugin-skill-identity.md",
       "sha256": "b4887a13c1ae27bfbec85ad51ffe8e96b73c6200279f7d6b437d10a5295c6f6f",
       "bytes": 26299
+    },
+    {
+      "path": "docs/decisions/2026-10-13-sandbox-readdeny-credentials.md",
+      "sha256": "743f7bcc6fa847836dbf7e412ab94b3430f13e46e250407bf27235b02e6c8afb",
+      "bytes": 8403
     },
     {
       "path": "docs/decisions/2026-10-13-strict-paper-url-gates.md",
@@ -51967,6 +51977,31 @@
       "bytes": 11884
     },
     {
+      "path": "evidence/artifacts/sandbox-readdeny-20261013/README.md",
+      "sha256": "b78aacc544fd474352e75e486a23cfbbf0ae486dc0f608fed0558dca960215cd",
+      "bytes": 2333
+    },
+    {
+      "path": "evidence/artifacts/sandbox-readdeny-20261013/receipts/arms-research.json",
+      "sha256": "c197a9083aebed2389a0358d7005e685e8bd3eac19915dffa3db6be7ea75fc51",
+      "bytes": 6370
+    },
+    {
+      "path": "evidence/artifacts/sandbox-readdeny-20261013/receipts/arms.json",
+      "sha256": "02546956a7a74530895dd43c3c898c362458ea0b202bec0a92b680ef2be3da40",
+      "bytes": 9917
+    },
+    {
+      "path": "evidence/artifacts/sandbox-readdeny-20261013/receipts/docs-excerpts.txt",
+      "sha256": "f82662f9038d812320725da6e0abb87c437f3f747d8f98e7c063932513f3d73c",
+      "bytes": 3381
+    },
+    {
+      "path": "evidence/artifacts/sandbox-readdeny-20261013/receipts/mutants-18.txt",
+      "sha256": "330565d867f020ae6a200f613aea51420fd737bb49e42cb231d856178fb8e1fa",
+      "bytes": 1703
+    },
+    {
       "path": "evidence/artifacts/sdk-runtime-adoption-20261008/decisions.json",
       "sha256": "108903768a1239ec7d078121d47e3b154efe8934b97876ac1084e03e4f9d1c42",
       "bytes": 121681
@@ -63772,6 +63807,11 @@
       "bytes": 24392
     },
     {
+      "path": "tests/test_sandbox_readdeny.py",
+      "sha256": "2d6942c7fe6b5c8f96767d4d160819dd1c79b42e0c71b523ba1227d0cb8d6627",
+      "bytes": 10735
+    },
+    {
       "path": "tests/test_saturation_ledger.py",
       "sha256": "c0311178a40acd4f233bbce29540f6f591f3878e855242f85f71b8dc49a3cbb3",
       "bytes": 112415
@@ -64480,6 +64520,21 @@
       "path": "tools/runtime-worker-evidence/test_gateway_observer.py",
       "sha256": "7ba28e15181fe15a259f3140862d53506e589b0bf56a31d0202efc3da529b93d",
       "bytes": 5277
+    },
+    {
+      "path": "tools/sandbox-probe/mock_messages_api.py",
+      "sha256": "493ec333bab3bdb9fdcdbd5962f33db9c25f11533147abcf2b66dc76c5271d75",
+      "bytes": 6510
+    },
+    {
+      "path": "tools/sandbox-probe/readdeny_probe.py",
+      "sha256": "cc477d75cf84f480a6826796e9b02c49e2742563d6e8211c90ff9933017054a1",
+      "bytes": 10857
+    },
+    {
+      "path": "tools/sandbox-probe/summarize.py",
+      "sha256": "f493bec2443a329ae868f1b414a726224444c106116c8f8ac1dfb8ae26a19edf",
+      "bytes": 2680
     },
     {
       "path": "tools/skill-usage/README.md",

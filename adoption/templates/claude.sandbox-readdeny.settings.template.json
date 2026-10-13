@@ -1,0 +1,63 @@
+{
+  "sandbox": {
+    "enabled": true,
+    "failIfUnavailable": true,
+    "allowUnsandboxedCommands": false,
+    "filesystem": {
+      "denyRead": [
+        "~/.config/native-agent-stack",
+        "~/.config/ecosystem-observability",
+        "~/.config/nativestack",
+        "~/.claude/.credentials.json",
+        "~/.codex/auth.json",
+        "~/.config/gh/hosts.yml",
+        "~/.cache/huggingface/token",
+        "~/.cache/huggingface/stored_tokens",
+        "~/.ssh",
+        "~/.gnupg",
+        "~/.aws",
+        "~/.azure",
+        "~/.kube",
+        "~/.docker/config.json",
+        "~/.git-credentials",
+        "~/.netrc",
+        "~/.npmrc",
+        "~/.pypirc",
+        "~/.omniroute",
+        "~/.config/omniroute",
+        "~/.local/share/omniroute",
+        "~/.local/share/omniroute-fw",
+        "~/.codex/shell_snapshots",
+        "~/.local/state/native-agent-stack/runtime-workers/openhands/secrets"
+      ]
+    }
+  },
+  "permissions": {
+    "deny": [
+      "Read(~/.config/native-agent-stack/**)",
+      "Read(~/.config/ecosystem-observability/*.env)",
+      "Read(~/.config/nativestack/*.key)",
+      "Read(~/.claude/.credentials.json)",
+      "Read(~/.codex/auth.json)",
+      "Read(~/.config/gh/hosts.yml)",
+      "Read(~/.cache/huggingface/token)",
+      "Read(~/.cache/huggingface/stored_tokens)",
+      "Read(~/.ssh/**)",
+      "Read(~/.gnupg/**)",
+      "Read(~/.aws/**)",
+      "Read(~/.azure/**)",
+      "Read(~/.kube/**)",
+      "Read(~/.docker/config.json)",
+      "Read(~/.git-credentials)",
+      "Read(~/.netrc)",
+      "Read(~/.npmrc)",
+      "Read(~/.pypirc)",
+      "Read(~/.omniroute/**)",
+      "Read(~/.config/omniroute/**)",
+      "Read(~/.local/share/omniroute/**)",
+      "Read(~/.local/share/omniroute-fw/**)",
+      "Read(~/.codex/shell_snapshots/**)",
+      "Read(~/.local/state/native-agent-stack/runtime-workers/openhands/secrets/**)"
+    ]
+  }
+}

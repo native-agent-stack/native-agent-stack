@@ -1,0 +1,17 @@
+Pages of code.claude.com fetched 2026-10-13T23:06Z (the sha256 of each is of the page bytes as served; the pages are public at the URL). Lines are quoted whole.
+
+code.claude.com/docs/en/sandboxing.md (94190 bytes, sha256 f3feed627e09b91db74255475a605fd692a80e48b6b05be20b0b0b3efbfb378e):
+  L32: | Reads | Most of the machine, including credential files such as `~/.ssh` and `~/.aws/credentials` | [`filesystem.denyRead`](/docs/en/settings-reference#sandbox-filesystem-denyread), [`credentials`](#protect-credentials) |
+  L42: * **Built-in file and web tools**: tools such as Read, Edit, Write, WebFetch, and WebSearch follow [permission rules](/docs/en/permissions) instead. A `denyRead` entry doesn't stop the Read tool, and `allowedDomains` doesn't limit WebFetch
+  L274: If you exclude a source with [`--setting-sources`](/docs/en/cli-reference) on the CLI or [`settingSources`](/docs/en/agent-sdk/claude-code-features#control-filesystem-settings-with-settingsources) in the Agent SDK, Claude Code ignores its `sandbox.filesystem` entries, its `Edit` permission rules, and its `Read` deny rules when building the sandbox configuration. Requires Claude Code v2.1.246 or later.
+  L280: You can also deny write or read access using `sandbox.filesystem.denyWrite` and `sandbox.filesystem.denyRead`, and re-allow specific paths within a denied region using `sandbox.filesystem.allowRead`. When read rules overlap, the rule with the narrower path applies:
+  L284: | `"denyRead": ["~/"]` with `"allowRead": ["~/projects"]` | `~/projects` is readable and the rest of the home directory stays blocked. The narrower allow re-opens that part of the denied region |
+  L285: | `"allowRead": ["~/"]` with `"denyRead": ["~/.env"]` | `~/.env` stays blocked and the rest of the home directory is readable. The deny holds inside a wider allow, so a broad allow can't silently re-expose a secret |
+  L383: | `filesystem.denyRead` and [`credentials.files`](#protect-credentials) `deny` read blocks | Not enforced. The filesystem layer applies both |
+
+code.claude.com/docs/en/settings-reference.md (421502 bytes, sha256 4bec5505c7f33da3284848047b7e0c90148d777daf90b4cfda9da0a64878de08):
+  L764: | [`sandbox.filesystem.denyRead`](#sandbox-filesystem-denyread) | Block [sandboxed](/docs/en/sandboxing) commands from reading specific paths | Sandbox settings | Any file |
+  L1779: When managed settings set a Boolean key such as `enabled` or `failIfUnavailable`, that value overrides anything a developer sets. Claude Code merges array keys across the settings scopes the session loads, so a developer can append entries; see [Keep developers from widening the policy](/docs/en/sandboxing#keep-developers-from-widening-the-policy) for the managed-only locks. To require the sandbox for an organization, see [Enforce sandboxing with managed settings](/docs/en/sandboxing#enforce-sandboxing-with-managed-settings).
+
+code.claude.com/docs/en/cli-reference.md (47769 bytes, sha256 0acf910e96c4a9f4488d9f40befecc1077fdd58598276a8436e8ef54408ecace):
+  L129: | `--setting-sources` | Comma-separated list of setting sources to load (`user`, `project`, `local`). See [agent view](/docs/en/agent-view#what-carries-over-when-you-background) and [agent teams](/docs/en/agent-teams#context-and-communication) for the sessions you start from this one that inherit the list | `claude --setting-sources user,project` |

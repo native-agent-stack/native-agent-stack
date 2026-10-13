@@ -1,0 +1,315 @@
+{
+ "schema_version": 1,
+ "kind": "sandbox_readdeny_arms",
+ "arms": [
+  {
+   "repeat": 1,
+   "arm": "sandbox-template-allowread-environ",
+   "client_rc": 0,
+   "tool_results": 21,
+   "shell": {
+    "DENIED": 14
+   },
+   "python": {
+    "DENIED": 14
+   },
+   "symlink": "DENIED",
+   "copy": "NOT-COPIED",
+   "listing_counts": {
+    ".ssh": "0",
+    ".aws": "0",
+    ".config/native-agent-stack": "0",
+    ".config/gh": "2"
+   },
+   "decoys_readable": [
+    ".config/gh/config.yml",
+    "notes.txt"
+   ],
+   "ordinary_commands_ok": true,
+   "read_tool_fixture": "REFUSED",
+   "read_tool_decoy": "READABLE",
+   "tool_errors": 1,
+   "bwrap_proc_errors": 1
+  },
+  {
+   "repeat": 1,
+   "arm": "sandbox-template-allowread-proc",
+   "client_rc": 0,
+   "tool_results": 21,
+   "shell": {
+    "DENIED": 14
+   },
+   "python": {
+    "DENIED": 14
+   },
+   "symlink": null,
+   "copy": "NOT-COPIED",
+   "listing_counts": {},
+   "decoys_readable": [
+    ".config/gh/config.yml",
+    "notes.txt"
+   ],
+   "ordinary_commands_ok": true,
+   "read_tool_fixture": "REFUSED",
+   "read_tool_decoy": "READABLE",
+   "tool_errors": 7,
+   "bwrap_proc_errors": 7
+  },
+  {
+   "repeat": 1,
+   "arm": "sandbox-template-noproc",
+   "client_rc": 0,
+   "tool_results": 21,
+   "shell": {
+    "DENIED": 14
+   },
+   "python": {
+    "DENIED": 14
+   },
+   "symlink": "DENIED",
+   "copy": "NOT-COPIED",
+   "listing_counts": {
+    ".ssh": "0",
+    ".aws": "0",
+    ".config/native-agent-stack": "0",
+    ".config/gh": "2"
+   },
+   "decoys_readable": [
+    ".config/gh/config.yml",
+    "notes.txt"
+   ],
+   "ordinary_commands_ok": true,
+   "read_tool_fixture": "REFUSED",
+   "read_tool_decoy": "READABLE",
+   "tool_errors": 0,
+   "bwrap_proc_errors": 0
+  },
+  {
+   "repeat": 1,
+   "arm": "sandbox-template",
+   "client_rc": 0,
+   "tool_results": 21,
+   "shell": {},
+   "python": {},
+   "symlink": null,
+   "copy": "NOT-COPIED",
+   "listing_counts": {
+    ".ssh": "0",
+    ".aws": "0",
+    ".config/native-agent-stack": "0",
+    ".config/gh": "2"
+   },
+   "decoys_readable": [],
+   "ordinary_commands_ok": true,
+   "read_tool_fixture": "REFUSED",
+   "read_tool_decoy": "READABLE",
+   "tool_errors": 9,
+   "bwrap_proc_errors": 9
+  },
+  {
+   "repeat": 2,
+   "arm": "sandbox-template-allowread-environ",
+   "client_rc": 0,
+   "tool_results": 21,
+   "shell": {
+    "DENIED": 14
+   },
+   "python": {
+    "DENIED": 14
+   },
+   "symlink": "DENIED",
+   "copy": "NOT-COPIED",
+   "listing_counts": {
+    ".ssh": "0",
+    ".aws": "0",
+    ".config/native-agent-stack": "0",
+    ".config/gh": "2"
+   },
+   "decoys_readable": [
+    ".config/gh/config.yml",
+    "notes.txt"
+   ],
+   "ordinary_commands_ok": false,
+   "read_tool_fixture": "REFUSED",
+   "read_tool_decoy": "READABLE",
+   "tool_errors": 3,
+   "bwrap_proc_errors": 3
+  },
+  {
+   "repeat": 2,
+   "arm": "sandbox-template-allowread-proc",
+   "client_rc": 0,
+   "tool_results": 21,
+   "shell": {},
+   "python": {},
+   "symlink": null,
+   "copy": "NOT-COPIED",
+   "listing_counts": {
+    ".ssh": "0",
+    ".aws": "0",
+    ".config/native-agent-stack": "0",
+    ".config/gh": "2"
+   },
+   "decoys_readable": [],
+   "ordinary_commands_ok": false,
+   "read_tool_fixture": "REFUSED",
+   "read_tool_decoy": "READABLE",
+   "tool_errors": 12,
+   "bwrap_proc_errors": 12
+  },
+  {
+   "repeat": 2,
+   "arm": "sandbox-template-noproc",
+   "client_rc": 0,
+   "tool_results": 21,
+   "shell": {
+    "DENIED": 14
+   },
+   "python": {
+    "DENIED": 14
+   },
+   "symlink": "DENIED",
+   "copy": "NOT-COPIED",
+   "listing_counts": {
+    ".ssh": "0",
+    ".aws": "0",
+    ".config/native-agent-stack": "0",
+    ".config/gh": "2"
+   },
+   "decoys_readable": [
+    ".config/gh/config.yml",
+    "notes.txt"
+   ],
+   "ordinary_commands_ok": true,
+   "read_tool_fixture": "REFUSED",
+   "read_tool_decoy": "READABLE",
+   "tool_errors": 0,
+   "bwrap_proc_errors": 0
+  },
+  {
+   "repeat": 2,
+   "arm": "sandbox-template",
+   "client_rc": 0,
+   "tool_results": 21,
+   "shell": {
+    "DENIED": 14
+   },
+   "python": {
+    "DENIED": 14
+   },
+   "symlink": null,
+   "copy": "NOT-COPIED",
+   "listing_counts": {
+    ".ssh": "0",
+    ".aws": "0",
+    ".config/native-agent-stack": "0",
+    ".config/gh": "2"
+   },
+   "decoys_readable": [
+    ".config/gh/config.yml",
+    "notes.txt"
+   ],
+   "ordinary_commands_ok": true,
+   "read_tool_fixture": "REFUSED",
+   "read_tool_decoy": "READABLE",
+   "tool_errors": 5,
+   "bwrap_proc_errors": 5
+  },
+  {
+   "repeat": 3,
+   "arm": "sandbox-template-allowread-environ",
+   "client_rc": 0,
+   "tool_results": 21,
+   "shell": {
+    "DENIED": 14
+   },
+   "python": {},
+   "symlink": null,
+   "copy": "NOT-COPIED",
+   "listing_counts": {},
+   "decoys_readable": [
+    ".config/gh/config.yml",
+    "notes.txt"
+   ],
+   "ordinary_commands_ok": false,
+   "read_tool_fixture": "REFUSED",
+   "read_tool_decoy": "READABLE",
+   "tool_errors": 5,
+   "bwrap_proc_errors": 5
+  },
+  {
+   "repeat": 3,
+   "arm": "sandbox-template-allowread-proc",
+   "client_rc": 0,
+   "tool_results": 21,
+   "shell": {
+    "DENIED": 14
+   },
+   "python": {
+    "DENIED": 14
+   },
+   "symlink": null,
+   "copy": null,
+   "listing_counts": {},
+   "decoys_readable": [],
+   "ordinary_commands_ok": false,
+   "read_tool_fixture": "REFUSED",
+   "read_tool_decoy": "READABLE",
+   "tool_errors": 14,
+   "bwrap_proc_errors": 14
+  },
+  {
+   "repeat": 3,
+   "arm": "sandbox-template-noproc",
+   "client_rc": 0,
+   "tool_results": 21,
+   "shell": {
+    "DENIED": 14
+   },
+   "python": {
+    "DENIED": 14
+   },
+   "symlink": "DENIED",
+   "copy": "NOT-COPIED",
+   "listing_counts": {
+    ".ssh": "0",
+    ".aws": "0",
+    ".config/native-agent-stack": "0",
+    ".config/gh": "2"
+   },
+   "decoys_readable": [
+    ".config/gh/config.yml",
+    "notes.txt"
+   ],
+   "ordinary_commands_ok": true,
+   "read_tool_fixture": "REFUSED",
+   "read_tool_decoy": "READABLE",
+   "tool_errors": 0,
+   "bwrap_proc_errors": 0
+  },
+  {
+   "repeat": 3,
+   "arm": "sandbox-template",
+   "client_rc": 0,
+   "tool_results": 21,
+   "shell": {},
+   "python": {
+    "DENIED": 14
+   },
+   "symlink": "DENIED",
+   "copy": null,
+   "listing_counts": {
+    ".ssh": "0",
+    ".aws": "0",
+    ".config/native-agent-stack": "0",
+    ".config/gh": "2"
+   },
+   "decoys_readable": [],
+   "ordinary_commands_ok": true,
+   "read_tool_fixture": "REFUSED",
+   "read_tool_decoy": "READABLE",
+   "tool_errors": 9,
+   "bwrap_proc_errors": 9
+  }
+ ]
+}
