@@ -19577,6 +19577,16 @@
       "bytes": 113512
     },
     {
+      "path": "docs/trading-handbook/boats-overnight-facts.md",
+      "sha256": "dec8c460d7ea417174ffef5e1175417f5f651c37db571bd1ef385521be463b9b",
+      "bytes": 6646
+    },
+    {
+      "path": "docs/trading-handbook/portfolio-sizing.md",
+      "sha256": "97afcab45f4b14bf5aa65be03b8447d8688176fb4d00d153306a456eafa15042",
+      "bytes": 6515
+    },
+    {
       "path": "docs/ultracode-token-routing-20260921.md",
       "sha256": "78853b6113e5837874ec960e72ed00fceaf6a869a29aa6a89007fc9cf0df75c6",
       "bytes": 31780
