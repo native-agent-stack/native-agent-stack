@@ -1,13 +1,18 @@
 #!/usr/bin/env bash
 # CC landing for native-agent-stack (correction #118): the merge runs only after every gate passes, in this order.
 # usage: nas_land.sh <pr> <read-head-sha-prefix> <verdict-file> [<verdict-file> ...]
-# Order (#975 round 4): the landing lock -> early refusals (the head carries the read head's change, trading-cc-read, the verdict files) ->
-# slow steps (update-branch when BEHIND, ready, the Codex wait, the CI wait, the Codex gate before the validation, the merge onto the current
-# origin/main validated (again while main moves), the author address) -> final_gate, fast reads only (the head and its change, the verdict
-# files, trading-cc-read, the Codex gate, the check runs, origin/main) -> the squash merge pinned to the head -> its author.
-# Exit codes: 2 verdict gate (a verdict file, GATES_DONE or trading-cc-read; a file, record or status that cannot be read included), 3 head
+# Order (#975 round 4): the repository's shape and the local reviews (#1061 round 2), before any call -> the landing lock -> early refusals
+# (the head carries the read head's change, trading-cc-read, the verdict files and the local review waiver) -> slow steps (update-branch
+# when BEHIND, ready, the Codex wait, the CI wait, the Codex gate before the validation, the merge onto the current origin/main validated
+# (again while main moves), a waiver's squash body, the author address) -> final_gate, fast reads only (the head and its change, the
+# verdict files and the waiver, trading-cc-read, the Codex gate, the check runs, origin/main) -> the squash merge pinned to the head -> its
+# author.
+# Exit codes: 2 verdict gate (a verdict file, GATES_DONE or trading-cc-read; a file, record or status that cannot be read included; also,
+# before any call, a LANDING_REPO that is not of the owner/name shape and neither local review variable nor LOCAL_REVIEW_WAIVER set; and a
+# waiver that does not name the pull request at the read head), 3 head
 # moved, 4 change differs (after update-branch, or at the final gate) or update-branch refused, 5 CI failing (at the final gate also: no
-# longer complete and green), 6 timeout, 7 merge failed, 8 blocked by policy, 9 the Codex gate (codex_gate.py) gave neither 0 nor 5 (a 5
+# longer complete and green), 6 timeout, 7 merge failed (also: a waiver's squash body could not be read, nothing merged), 8 blocked by
+# policy, 9 the Codex gate (codex_gate.py) gave neither 0 nor 5 (a 5
 # proceeds here): a review running or not finished since its latest trigger (its 3, after the 20-minute wait, before the validation or at
 # the final gate), a review that ended other than Completed or a summary last edited by another account (its 4), a gate that failed or is
 # missing, 10 the merge onto CURRENT origin/main fails scripts/validate.py or does not merge cleanly (2026-10-10).
@@ -22,12 +27,39 @@
 # when it is one of its own status lines (lg_gate).
 # #975 round 4 (2026-10-11, the CC's micro and Codex P1 at 761810d7): one landing per repository at a time (lg_lock), and one final_gate
 # after every slow step that reads each gate again, with nothing but the merge after it; a failed trading-cc-read read stops (exit 2).
+# 2026-10-13 (CC corrections #198 and #200, and the owner's direction for local reviews): R comes from LANDING_REPO, the no-reply author from
+# LG_AUTHOR_LOGIN, and when LOCAL_REVIEWS (or CODEX_LOCAL_REVIEW) names review files the Codex gate decides from them alone (README).
+# #1061 round 2 (the CC's ruling at 974090cf): local reviews are required here, and only a waiver bound to the pull request and the read
+# head lets a landing on without them (LOCAL_REVIEW_WAIVER; below, verdict_gate and the squash body).
 set -u
 # Parsed whole before it runs: an edit while a landing runs cannot shift what the running copy executes (2026-10-09).
 {
-R=seathatflowsinourveins/native-agent-stack
+# The repository moved to the organization on 2026-10-12. GitHub redirects the old slug ("All links to the previous repository location are
+# automatically redirected to the new location", github/docs@be38ec5d transferring-a-repository.md:62; the CC measured REST, GraphQL and
+# gh -R on the moved repository), but a new repository at the old location deletes the redirects (:68-69), so the default is the new slug.
+R=${LANDING_REPO:-native-agent-stack/native-agent-stack}
+# CC correction #198: the merging account, whose no-reply address authors the squash merge (lg_author_email); R's owner is an organization now.
+LG_AUTHOR_LOGIN=${LG_AUTHOR_LOGIN:-seathatflowsinourveins}
 N=${1:?pr}; E=${2:?read head}; shift 2
+# #1061 P3: R names the repository of every gh call, so it must have GitHub's owner/name shape: an owner of at most 39 alphanumerics and
+# single inner dashes (username-considerations-for-external-authentication.md:94, :103, :126-127) and a repository name of letters, digits,
+# ".", "_" and "-" other than "." and ".."; a value with whitespace would split into extra arguments (every use is quoted besides).
+# The REST API takes the two as the path parameters owner and repo, "The account owner of the repository" and "The name of the repository
+# without the `.git` extension", both "not case sensitive" (github/rest-api-description@58b1e0c0 api.github.com.json:344898-344915); a
+# name "must not exceed 100 characters, and can only contain ASCII letters, digits, and the characters `.`, `-`, and `_`"
+# (github/docs@be38ec5d data/reusables/repositories/repo-name.md:1), and "." and ".." would be dot-segments of the API's path (RFC 3986 3.3).
+RO=${R%%/*}
+[[ "$R" =~ ^[A-Za-z0-9](-?[A-Za-z0-9])*/[A-Za-z0-9._-]{1,100}$ ]] && [ "${#RO}" -le 39 ] && [ "${R#*/}" != . ] && [ "${R#*/}" != .. ] \
+  || { echo "#$N LANDING_REPO is not of the owner/name shape: stop, nothing merged"; exit 2; }
 [ $# -ge 1 ] || { echo "#$N no verdict file given: stop"; exit 2; }
+# #1061 round 2 (the CC's ruling on its Claude delta at 974090cf): local reviews are required here. With LOCAL_REVIEWS and CODEX_LOCAL_REVIEW
+# both unset, the Codex gate asks the connector, which cannot reach the organization's repository, and its 5 (unavailable) merged with no
+# Codex verdict; in local mode the gate gives only 0, 2 or 4, so a landing passes only on a completed codex-review. The one exception is
+# LOCAL_REVIEW_WAIVER, a waiver file that verdict_gate reads, bound to the pull request and the read head. This stop comes before any
+# call: before the lock, update-branch and ready. ${VAR+x} is empty only for an unset VAR (bash(1), Parameter Expansion: "Omitting the
+# colon tests only for a parameter that is unset", bash 5.3), the test lg_gate makes; an empty waiver is no waiver.
+[ -n "${LOCAL_REVIEWS+x}${CODEX_LOCAL_REVIEW+x}" ] || [ -n "${LOCAL_REVIEW_WAIVER:-}" ] \
+  || { echo "#$N local reviews are required: set LOCAL_REVIEWS=<review file>[:<review file>...], or LOCAL_REVIEW_WAIVER=<waiver file> (README, Local reviews): stop, nothing merged"; exit 2; }
 VF=("$@")  # #975 round 4: the verdict files, kept for final_gate (the CI loop's `set --` replaces the positional parameters)
 # 2026-10-10: same-change tolerance (as uet_land.sh). A head that is a pure rebase or merge-update of the read head
 # (per-file changed lines identical, manifests/evidence.json excluded; CI arbitrates the registry) keeps the reads, and
@@ -165,9 +197,19 @@ lg_follow_head() {  # <read head> <new head> <follows so far>
 # Correction #148 (2026-10-10): GitHub authors a squash merge with the account's primary email unless the merge names one, so every landing
 # published the owner's personal address. The merge names the no-reply form <id>+<login>@users.noreply.github.com (`gh pr merge -A`, gh 2.102.0);
 # the id comes from the public users API, because `gh api user` is refused by the secret-path guard. No stored address is ever printed.
-lg_author_email() {  # <owner/repo> : the account's no-reply address; rc 1 and nothing printed when the id is not a number
-  local login=${1%%/*} id
-  id=$(gh api "users/$login" --jq .id 2>/dev/null) || return 1
+# CC correction #198 (2026-10-13): the login is the merging account, LG_AUTHOR_LOGIN, and R's owner only when that is unset. After the
+# transfer R's owner was an organization, and the squash merge failed with GraphQL "Invalid email address": the no-reply form belongs to a
+# user account, "ID+USERNAME@users.noreply.github.com" (github/docs@be38ec5d email-addresses-reference.md:47). A login of another shape than
+# GitHub's (at most 39 alphanumerics and single inner dashes, username-considerations-for-external-authentication.md:94, :103, :126-127)
+# is refused before any call. #1061 P3: users/<login> answers for an organization too, whose address then failed at the merge (exit 7, as
+# in #198); only an account of type User gives an id (otherwise exit 11, nothing merged). GET /users/{username} returns the private or the
+# public user schema (github/rest-api-description@58b1e0c0 api.github.com.json:88612-88614), whose `type` is a free string, "User" in the
+# example (:126248-126250, :160055-160058), while an organization's account reads "Organization" (the example at :311038); the check
+# takes the literal "User" alone, so another value or none gives no id.
+lg_author_email() {  # <owner/repo> : the account's no-reply address; rc 1 and nothing printed when the login or the id is not well formed
+  local login=${LG_AUTHOR_LOGIN:-${1%%/*}} id
+  [[ "$login" =~ ^[A-Za-z0-9](-?[A-Za-z0-9])*$ ]] && [ "${#login}" -le 39 ] || return 1
+  id=$(gh api "users/$login" --jq 'select(.type == "User") | .id' 2>/dev/null) || return 1
   case "$id" in ''|*[!0-9]*) return 1 ;; esac
   printf '%s+%s@users.noreply.github.com\n' "$id" "$login"
 }
@@ -196,11 +238,40 @@ lg_have() {  # <commit>
 # (CPython v3.13.16 Modules/main.c:403-410), and an exception outside the gate's handler, such as a syntax error, prints a traceback
 # and exits 1 (:437-441, :118-123; Doc/library/sys.rst:394-399). The read head goes to the gate, which counts only a review of it or of
 # the current head (#975 round 4).
-lg_gate() {  # <gate> <owner/repo> <pr> <read head> : prints one line; returns 0, 3, 4 or 5
-  local g gr q="'" re
-  re="^(Codex review |Codex unavailable: |no Codex review |Codex gate error: )[A-Za-z0-9 :;,.()_+${q}-]*\$"
-  g=$(python3 -I "$1" "$2" "$3" "$4" 2>&1); gr=$?
-  case "$gr" in 0|3|4|5) ;; *) echo "Codex gate failed with exit $gr; details withheld"; return 4 ;; esac
+# Local reviews (2026-10-13, the owner's direction: reviews run locally, the connector cannot reach the organization's repository): when
+# LOCAL_REVIEWS or its alias CODEX_LOCAL_REVIEW is set (an empty value included, #1061 P1: it fell back to the connector, which cannot
+# answer; ${VAR+x} is empty only for an unset VAR, bash(1) Parameter Expansion: "Omitting the colon tests only for a parameter that is
+# unset", bash 5.3), the gate decides from the normalized review files they name (colon-separated). A file whose head_sha is not the read
+# head counts only when that head carries the read head's change, by this block's change identity (lg_same_change). The read head and each such head
+# go to the gate after the read head as "<head>:<git merge-base <head> origin/main>" (#1061 P1: a codex-review must have been reviewed
+# against that merge base; the first call fetches a head the clone lacks, lg_have). The gate's 2 (no file, a file malformed, incomplete,
+# of another head or of another base) is echoed when it is one of its "Local reviews: " lines; python3's own 2 is not.
+lg_gate() {  # <gate> <owner/repo> <pr> <read head> : prints one line; returns 0, 2, 3, 4 or 5
+  local g gr q="'" re part f h mb files=() more=() heads=() facts=()
+  re="^(Codex review |Codex unavailable: |no Codex review |Codex gate error: |Local reviews: )[A-Za-z0-9 :;,.()_+${q}-]*\$"
+  if [ -n "${LOCAL_REVIEWS+x}${CODEX_LOCAL_REVIEW+x}" ]; then
+    for part in "${LOCAL_REVIEWS-}" "${CODEX_LOCAL_REVIEW-}"; do
+      [ -n "$part" ] || continue
+      IFS=: read -r -a more <<< "$part"; files+=(${more[@]+"${more[@]}"})
+    done
+    heads=("$4")
+    for f in ${files[@]+"${files[@]}"}; do
+      [ -n "$f" ] || continue
+      h=$({ jq -r 'if type == "object" and (.head_sha | type) == "string" then .head_sha else empty end' < "$f"; } 2>/dev/null)
+      lg_hex40 "$h" && [[ " ${heads[*]} " != *" $h "* ]] || continue
+      lg_have "$h" && lg_same_change "$4" "$h" && heads+=("$h")
+    done
+    for h in "${heads[@]}"; do
+      lg_have "$h"; mb=$(${LG_GIT:-git} merge-base "$h" origin/main 2>/dev/null); lg_hex40 "$mb" || mb=
+      facts+=("$h:$mb")
+    done
+  fi
+  g=$(python3 -I "$1" "$2" "$3" "$4" ${facts[@]+"${facts[@]}"} 2>&1); gr=$?
+  case "$gr" in
+    0|3|4|5) ;;
+    2) [[ "$g" == "Local reviews: "* ]] || { echo "Codex gate failed with exit 2; details withheld"; return 4; } ;;
+    *) echo "Codex gate failed with exit $gr; details withheld"; return 4 ;;
+  esac
   [[ "$g" =~ $re ]] || { echo "Codex gate printed no status line of its own; details withheld"; return 4; }
   echo "$g"; return "$gr"
 }
@@ -256,8 +327,13 @@ tcc_read_gate() {
   echo "#$N trading-cc-read success at ${1:0:8}; record verified"
 }
 # The verdict files (VF). #975 round 4 (Codex P1 at 761810d7): the files are mutable, so final_gate runs this again.
+# #1061 round 2 (the CC's ruling at 974090cf): with neither local review variable set, the local review waiver too (LOCAL_REVIEW_WAIVER,
+# required at the top). It is read once (lg_text), and its LAST line that starts with "Waiver:" must read exactly "Waiver: local reviews
+# for #<pr> at <the read head's first 8 hex digits>", bound to the pull request and the head as uet_land.sh binds GPT_VERDICT; a waiver
+# for another pull request or head, a revoked one (a later Waiver line) and a missing or unreadable one stop. With either variable set
+# it is not read: the gate decides from the review files alone.
 verdict_gate() {
-  local v t why re='landing gate|path to pass|before landing|landing condition'
+  local v t w why re='landing gate|path to pass|before landing|landing condition'
   for v in "${VF[@]}"; do
     # #975 P2-C: a verdict file is named by its file name only (its directory can be under a home directory).
     [ -f "$v" ] || { echo "#$N verdict file missing: ${v##*/}"; exit 2; }
@@ -273,6 +349,14 @@ verdict_gate() {
         || { echo "#$N verdict ${v##*/} states a landing gate: set GATES_DONE=<receipt naming ${EF:0:8}> after running it"; exit 2; }
     fi
   done
+  [ -z "${LOCAL_REVIEWS+x}${CODEX_LOCAL_REVIEW+x}" ] || return 0
+  v=${LOCAL_REVIEW_WAIVER:-}
+  [ -f "$v" ] || { echo "#$N local review waiver missing: ${v##*/}"; exit 2; }
+  t=$(lg_text "$v") || { echo "#$N local review waiver ${v##*/} is unreadable: stop"; exit 2; }
+  w=$(printf '%s\n' "$t" | grep -E '^Waiver:' | tail -n 1); w=${w%$'\r'}
+  [ "$w" = "Waiver: local reviews for #$N at ${EF:0:8}" ] \
+    || { echo "#$N local review waiver ${v##*/} does not waive #$N at ${EF:0:8} (its last Waiver line must read 'Waiver: local reviews for #$N at ${EF:0:8}'): stop"; exit 2; }
+  echo "#$N local reviews waived at ${EF:0:8} by ${v##*/}: the Codex gate reads the connector"
 }
 # The check runs at a head as one tab-separated line: incomplete, failing, total, validate successes.
 # 2026-10-10: the aggregate `validate` check must have SUCCEEDED at this head. A DIRTY PR runs only CodeQL and Socket,
@@ -311,7 +395,7 @@ nas_checks() {  # <head>
   echo "$c"
 }
 # Early refusals, cheap first reads: the head, the trading-cc-read gate, the verdict files.
-cur=$(gh pr view "$N" -R $R --json headRefOid --jq .headRefOid 2>/dev/null); lg_hex40 "$cur" || cur=
+cur=$(gh pr view "$N" -R "$R" --json headRefOid --jq .headRefOid 2>/dev/null); lg_hex40 "$cur" || cur=
 lg_have "$cur"
 if [ "$cur" != "$EF" ]; then
   same_change "$EF" "$cur" || { echo "#$N head ${cur:0:8} is neither the read head ${EF:0:8} nor the same change: stop"; exit 3; }
@@ -331,6 +415,8 @@ codex_wait() {
     g=$(lg_gate "$GATE" "$R" "$N" "$EF"); gr=$?
     { [ $gr = 0 ] || [ $gr = 5 ]; } && { echo "#$N $g"; return 0; }
     [ $gr = 3 ] && [ $j -lt 21 ] && { sleep 60; continue; }
+    # #1061 (the probe's finding 8): a 2 is a local review file that is wrong, not a review still to come
+    [ $gr = 2 ] && { echo "#$N $g: stop, correct the local review files or write them again (LOCAL_REVIEWS)"; exit 9; }
     echo "#$N $g: stop, land after Codex finishes"; exit 9
   done
 }
@@ -372,7 +458,7 @@ merge_validate() {
 # gate's exit code. What the reads cannot close is in the README ("What the final gate can and cannot close").
 final_gate() {  # <pinned head>
   local hd c g gr now
-  hd=$(gh pr view "$N" -R $R --json headRefOid --jq .headRefOid 2>/dev/null); lg_hex40 "$hd" || hd=
+  hd=$(gh pr view "$N" -R "$R" --json headRefOid --jq .headRefOid 2>/dev/null); lg_hex40 "$hd" || hd=
   [ "$hd" = "$1" ] || { echo "#$N head moved to ${hd:-?} at the final gate: stop"; exit 3; }
   same_change "$EF" "$hd" || { echo "#$N CHANGE DIFFERS between read head ${EF:0:8} and head ${hd:0:8} at the final gate: stop"; exit 4; }
   verdict_gate
@@ -389,15 +475,15 @@ final_gate() {  # <pinned head>
   echo "#$N final gate at ${hd:0:8}: head, change, verdict files, trading-cc-read, Codex, check runs and origin/main read again (CI $3 ok)"
 }
 # Slow steps: update-branch, ready, the Codex wait, the CI wait, the validations, the author address.
-if [ "$(gh pr view "$N" -R $R --json mergeStateStatus --jq .mergeStateStatus 2>/dev/null)" = BEHIND ]; then
-  gh pr update-branch "$N" -R $R >/dev/null 2>&1 || { echo "#$N update-branch refused (conflict?): a native rebase is needed: stop"; exit 4; }
+if [ "$(gh pr view "$N" -R "$R" --json mergeStateStatus --jq .mergeStateStatus 2>/dev/null)" = BEHIND ]; then
+  gh pr update-branch "$N" -R "$R" >/dev/null 2>&1 || { echo "#$N update-branch refused (conflict?): a native rebase is needed: stop"; exit 4; }
   sleep 8; $G fetch -q origin main "pull/$N/head" 2>/dev/null
-  cur=$(gh pr view "$N" -R $R --json headRefOid --jq .headRefOid 2>/dev/null); lg_hex40 "$cur" || cur=; lg_have "$cur"
+  cur=$(gh pr view "$N" -R "$R" --json headRefOid --jq .headRefOid 2>/dev/null); lg_hex40 "$cur" || cur=; lg_have "$cur"
   same_change "$EF" "$cur" || { echo "#$N CHANGE DIFFERS after update-branch (${cur:0:8}): stop"; exit 4; }
   echo "#$N updated to ${cur:0:8} on main (same change)"
 fi
-if [ "$(gh pr view "$N" -R $R --json isDraft --jq .isDraft 2>/dev/null)" = true ]; then
-  gh pr ready "$N" -R $R >/dev/null 2>&1 || { echo "#$N could not be marked ready"; exit 7; }
+if [ "$(gh pr view "$N" -R "$R" --json isDraft --jq .isDraft 2>/dev/null)" = true ]; then
+  gh pr ready "$N" -R "$R" >/dev/null 2>&1 || { echo "#$N could not be marked ready"; exit 7; }
   echo "#$N marked ready at $(date -u +%FT%TZ)"; sleep 20
 fi
 codex_wait
@@ -405,8 +491,8 @@ follows=0; ci=
 for i in $(seq 1 25); do
   # Judge the LATEST completed check run per name at this head: superseded runs (concurrency-cancelled duplicates) must not
   # count as failures (2026-10-09 #886: 10 CANCELLED plus 1 FAILURE from a superseded run while mergeState was CLEAN).
-  hd=$(gh pr view "$N" -R $R --json headRefOid --jq .headRefOid 2>/dev/null); lg_hex40 "$hd" || hd=
-  ms=$(gh pr view "$N" -R $R --json mergeStateStatus --jq .mergeStateStatus 2>/dev/null); [[ "$ms" =~ ^[A-Z_]+$ ]] || ms=
+  hd=$(gh pr view "$N" -R "$R" --json headRefOid --jq .headRefOid 2>/dev/null); lg_hex40 "$hd" || hd=
+  ms=$(gh pr view "$N" -R "$R" --json mergeStateStatus --jq .mergeStateStatus 2>/dev/null); [[ "$ms" =~ ^[A-Z_]+$ ]] || ms=
   c=$(nas_checks "$hd")
   set -- "$hd" $c "$ms"
   vok=${5:-0}; ms=${6:-}; set -- "$1" "$2" "$3" "$4" "$ms"
@@ -437,11 +523,24 @@ for v in 1 2 3; do
   [ "$v" -lt 3 ] || { echo "#$N origin/main moved after each of 3 validations: stop, nothing merged"; exit 13; }
   echo "#$N origin/main moved after the validation on ${VBASE:0:8}: validating again on the current main"
 done
+# #1061 round 2: a waived landing records its waiver in the squash merge's body, after the body GitHub offers the merging account for a
+# squash (viewerMergeBodyText(mergeType: SQUASH), String!; schema.docs.graphql :45597-45605; here the pull request's commit messages),
+# which is where gh's own "edit the commit message" step starts (cli v2.102.0 pkg/cmd/pr/merge/merge.go:721-735, http.go:121-158).
+# --body sets the body in place of that default (merge.go:146-147, :176; http.go:72-75; MergePullRequestInput.commitBody, "if omitted, a
+# default message will be used", schema :26079-26082). A failed read stops (exit 7, nothing merged); without a waiver nothing is read.
+MERGE_BODY=()
+if [ -z "${LOCAL_REVIEWS+x}${CODEX_LOCAL_REVIEW+x}" ]; then
+  mb=$(gh api graphql -f query='query($owner: String!, $name: String!, $number: Int!) { repository(owner: $owner, name: $name) { pullRequest(number: $number) { viewerMergeBodyText(mergeType: SQUASH) } } }' \
+    -f owner="${R%%/*}" -f name="${R#*/}" -F number="$N" --jq '.data.repository.pullRequest.viewerMergeBodyText | strings | "body:" + .' 2>/dev/null) \
+    && [[ "$mb" == body:* ]] || { echo "#$N the squash body for the local review waiver could not be read (output withheld): stop, nothing merged"; exit 7; }
+  mb=${mb#body:}; nl=$'\n'
+  MERGE_BODY=(--body "${mb:+$mb$nl$nl}Waiver: local reviews for #$N at ${EF:0:8} (LOCAL_REVIEW_WAIVER)")
+fi
 ae=$(lg_author_email "$R") || { echo "#$N cannot form the no-reply author address (correction #148): stop, nothing merged"; exit 11; }
 final_gate "$cur"
-out=$(gh pr merge "$N" -R $R --squash --match-head-commit "$cur" -A "$ae" 2>&1) || { cls=$(printf '%s' "$out" | grep -o -i -E 'not mergeable|head branch was modified|required status check|review|draft|merge conflict|protected branch|rate limit|authentication|not found' | head -1 | tr 'A-Z ' 'a-z_'); mf=$(lg_keep merge-fail "$out") && kept="gh output kept only in local file $mf in the temp directory (0600), never echoed" || kept="gh output could not be kept, and is not echoed"; echo "#$N merge failed (class: ${cls:-other}); $kept (#975 P2-2)"; exit 7; }
+out=$(gh pr merge "$N" -R "$R" --squash ${MERGE_BODY[@]+"${MERGE_BODY[@]}"} --match-head-commit "$cur" -A "$ae" 2>&1) || { cls=$(printf '%s' "$out" | grep -o -i -E 'not mergeable|head branch was modified|required status check|review|draft|merge conflict|protected branch|rate limit|authentication|not found' | head -1 | tr 'A-Z ' 'a-z_'); mf=$(lg_keep merge-fail "$out") && kept="gh output kept only in local file $mf in the temp directory (0600), never echoed" || kept="gh output could not be kept, and is not echoed"; echo "#$N merge failed (class: ${cls:-other}); $kept (#975 P2-2)"; exit 7; }
 sleep 4
-echo "#$N $(gh pr view "$N" -R $R --json state,mergeCommit,mergedAt --jq '"\(.state) \(.mergeCommit.oid) \(.mergedAt)"' 2>/dev/null) (CI $ci ok)"
+echo "#$N $(gh pr view "$N" -R "$R" --json state,mergeCommit,mergedAt --jq '"\(.state) \(.mergeCommit.oid) \(.mergedAt)"' 2>/dev/null) (CI $ci ok)"
 lg_author_check "$R" "$N" "$ae" || exit 12
 exit 0
 }
