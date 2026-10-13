@@ -1,0 +1,51 @@
+{
+  "client": "2.1.296 (Claude Code)",
+  "arms": [
+    {
+      "arm": "A no CLAUDE_CONFIG_DIR",
+      "init_record": true,
+      "zz_agents": [
+        "zz-home"
+      ],
+      "agents_total": 6
+    },
+    {
+      "arm": "B CLAUDE_CONFIG_DIR set",
+      "init_record": true,
+      "zz_agents": [
+        "zz-cfg"
+      ],
+      "agents_total": 6
+    },
+    {
+      "arm": "C link to a file",
+      "init_record": true,
+      "zz_agents": [
+        "zz-target"
+      ],
+      "agents_total": 6
+    },
+    {
+      "arm": "D link to nothing",
+      "init_record": true,
+      "zz_agents": [],
+      "agents_total": 5
+    },
+    {
+      "arm": "E CLAUDE_CONFIG_DIR empty",
+      "init_record": true,
+      "zz_agents": [
+        "zz-cwd"
+      ],
+      "agents_total": 6
+    },
+    {
+      "arm": "F CLAUDE_CONFIG_DIR relative",
+      "init_record": true,
+      "zz_agents": [
+        "zz-rel"
+      ],
+      "agents_total": 6
+    }
+  ]
+}

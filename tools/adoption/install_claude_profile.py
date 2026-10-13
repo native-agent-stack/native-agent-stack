@@ -12,7 +12,9 @@
              repository's own adaptation and are held out of the default
              (docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md):
              they stay checksum-pinned and install only when `--hook NAME` names them
-  agents  -- verbatim copies of adoption/agents/claude/*.md to ~/.claude/agents/
+  agents  -- verbatim copies of adoption/agents/claude/*.md to ~/.claude/agents/ (to $CLAUDE_CONFIG_DIR/agents/ when
+             that is set to an absolute path and no --home is given: the folder the client then reads); a link at a
+             shipped name is replaced by a regular copy, never written through, and a folder there is refused
   workflows -- opt-in (--only workflows), checksum-checked, create-only copies of
              the three reviewed scripts in examples/claude-native/workflows/ to
              ~/.claude/workflows/; matching files are reused, conflicting files
@@ -55,6 +57,7 @@ import string
 import subprocess
 import sys
 import tempfile
+import unicodedata
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -163,10 +166,35 @@ def install_guards(home: Path, dry_run: bool, names: list[str] | None = None) ->
     return {name: install_guard(home, dry_run, name) for name in selected}
 
 
-def install_agents(home: Path, dry_run: bool, names: list[str] | None = None) -> list[str]:
+def claude_config_dir(environ, home: Path) -> Path:
+    """The folder the client reads user-scope definitions from. Measured on Claude Code 2.1.296 (docs/decisions/2026-10-13-installer-agent-links-and-config-dir.md): with CLAUDE_CONFIG_DIR set the client
+    lists the definitions under its agents/ and none under <home>/.claude/agents; an empty value is read as the client's working directory and a relative one is resolved against it, which no installer run
+    can match. So a set, absolute value is used (NFC-normalized and made absolute as the client does), an empty one is read as unset (as scripts/adoption_status.py reads it) and a relative one is refused."""
+    value = environ.get("CLAUDE_CONFIG_DIR")
+    if not value:
+        return home / ".claude"
+    if not os.path.isabs(value):
+        raise InstallError(f"CLAUDE_CONFIG_DIR is not an absolute path ({value!r}): the client resolves it against its own working directory, "
+                           "so set an absolute path (or pass --home to install under that home's own .claude)")
+    return Path(os.path.abspath(unicodedata.normalize("NFC", value)))
+
+
+def write_regular_copy(source: Path, dest: Path) -> None:
+    """A regular file at `dest` with the bytes of `source`, written beside it and renamed over it, so that a link at `dest` (to a file, to nothing, to a folder) is replaced and never written through."""
+    temporary = dest.with_name(f".{dest.name}.{os.getpid()}.tmp")
+    try:
+        shutil.copy2(source, temporary)
+        os.replace(temporary, dest)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+def install_agents(home: Path, dry_run: bool, names: list[str] | None = None, claude_dir: Path | None = None) -> list[str]:
+    """Copy the shipped definitions to <claude_dir or home/.claude>/agents as regular files. A link at a shipped name is replaced by a copy (what it pointed at is not written through, and
+    the drift check counts a link); a folder at a shipped name is refused before anything is copied."""
     if not AGENTS_SRC_DIR.is_dir():
         raise InstallError(f"missing source directory: {AGENTS_SRC_DIR}")
-    dest_dir = home / ".claude" / "agents"
+    dest_dir = (claude_dir if claude_dir is not None else home / ".claude") / "agents"
     results = []
     sources = sorted(AGENTS_SRC_DIR.glob("*.md"))
     if names is not None:
@@ -174,19 +202,23 @@ def install_agents(home: Path, dry_run: bool, names: list[str] | None = None) ->
         if unknown:
             raise InstallError(f"no such agent file in {AGENTS_SRC_DIR}: {', '.join(unknown)}")
         sources = [src for src in sources if src.name in names]
+    folders = [dest_dir / src.name for src in sources if (dest_dir / src.name).is_dir() and not (dest_dir / src.name).is_symlink()]
+    if folders:
+        raise InstallError(f"agents: a folder stands at the shipped name {', '.join(str(folder) for folder in folders)}; preserved, nothing copied")
     for src in sources:
         dest = dest_dir / src.name
-        if dest.is_file() and dest.read_bytes() == src.read_bytes():
+        linked = dest.is_symlink()
+        if not linked and dest.is_file() and dest.read_bytes() == src.read_bytes():
             print(f"agents: {dest} already matches; skipped")
             results.append("skipped")
             continue
         if dry_run:
-            print(f"agents: would install {dest}")
+            print(f"agents: would replace the link at {dest} with a copy" if linked else f"agents: would install {dest}")
             results.append("planned")
             continue
         dest_dir.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(src, dest)
-        print(f"agents: installed {dest}")
+        write_regular_copy(src, dest)
+        print(f"agents: replaced the link at {dest} with a copy" if linked else f"agents: installed {dest}")
         results.append("installed")
     return results
 
@@ -459,7 +491,9 @@ def install_mcp_servers(claude_bin: str, dry_run: bool, home: Path, eco_root: Pa
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--home", default=str(Path.home()), help="Target $HOME (default: current user's)")
+    parser.add_argument("--home", default=None,
+                        help="Target $HOME (default: the current user's; without --home the agents step also follows $CLAUDE_CONFIG_DIR when it is set, "
+                             "as the client does, and with --home it installs under that home's own .claude)")
     parser.add_argument("--claude-bin", default="claude", help="claude executable to use for MCP registration")
     parser.add_argument("--eco-root", default=None,
                          help="Ecosystem prefix for ${ECO_ROOT} (default: $ECO_INSTALL_ROOT or <home>/.local/share/codex-ecosystem)")
@@ -488,12 +522,16 @@ def main(argv: list[str] | None = None) -> int:
     if args.remove_workflows and (args.only != ["workflows"] or args.replace_mcp):
         parser.error("--remove-workflows requires exactly --only workflows and cannot use --replace-mcp")
     steps = args.only or ["guard", "agents", "skills", "mcp"]
-    home = Path(args.home)
+    home = Path(args.home) if args.home is not None else Path.home()
     try:
+        claude_dir = claude_config_dir(os.environ, home) if args.home is None and "agents" in steps else None
         if "guard" in steps:
             install_guards(home, args.dry_run, args.hook)
         if "agents" in steps:
-            install_agents(home, args.dry_run, args.agent)
+            if claude_dir is None:   # an explicit --home: that home's own .claude
+                install_agents(home, args.dry_run, args.agent)
+            else:
+                install_agents(home, args.dry_run, args.agent, claude_dir)
         if "skills" in steps:
             install_routing_skill(home, args.dry_run)
         if "workflows" in steps:

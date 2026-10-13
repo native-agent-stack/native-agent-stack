@@ -1,0 +1,12 @@
+Pages of code.claude.com fetched 2026-10-13T20:49Z (the sha256 of each is of the page bytes as served; the pages are public at the URL):
+
+code.claude.com/docs/en/env-vars.md (169068 bytes, sha256 83dcafe4cb6a4f1ec9aa29163cf76a70c4e68878cd77a28c1242ffec57b444e3), the CLAUDE_CONFIG_DIR row at L430:
+  "`CLAUDE_CONFIG_DIR` | Override the configuration directory (default: `~/.claude`). All settings, session history, and plugins are stored under this path. For credentials, see [where Claude Code stores credentials](/docs/en/authentication#credential-management). Useful for running multiple accounts side by side: for example, `alias claude-work='CLAUDE_CONFIG_DIR=~/.claude-work claude'`. Set it in your shell, user settings, or managed settings. In a settings file, write the [absolute path](#in-settings-files). Ignore..."
+  (the same row goes on: "Set it in your shell, user settings, or managed settings. In a settings file, write the absolute path. Ignored in project and local settings")
+
+code.claude.com/docs/en/sub-agents.md (108551 bytes, sha256 dd3f22aa021a3525f48227321c34eab28b322d7ab77cb3d5fc01ddd048e8f6ea), L176-L178:
+  "**User subagents** (`~/.claude/agents/`) are personal subagents available in all your projects."
+  "Claude Code scans `.claude/agents/` and `~/.claude/agents/` recursively, so you can organize definitions into subfolders such as `agents/review/` or `agents/research/`. The subdirectory path doesn't affect how a subagent is identified or invoked, because identity comes only from the `name` frontmatter field."
+
+The documentation names the folder (`~/.claude/agents/`) and the variable ("All settings, session history, and plugins are stored under this path") but does not say that the definitions move with it:
+that is measured, in client-agents-probe.json.

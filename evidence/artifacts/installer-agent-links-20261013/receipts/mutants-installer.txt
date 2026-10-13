@@ -1,0 +1,22 @@
+The 15 mutants of the installer's agents step (the link and folder handling, the temporary copy, the variable's reading and normalization). Each is one exact change to tools/adoption/install_claude_profile.py in a
+scratch worktree at the base 329985de1 with this change; tests.test_install_claude_profile runs with GITHUB_ACTIONS=true and a mutant is killed when the run fails. The unmutated tree passes first.
+The first run of this set killed 14 of 15. The survivor, "the value is not made absolute and lexically normalized", changed nothing a test could see: a value with a dot-dot component named a folder that
+the install itself created on the way (the walk through `config/..` made `config`), so the file landed in the same place. The test now asserts that the folder the dot-dot walks through is not made, as
+path.resolve (which the client applies) collapses it without the file system. The lines below are the run with that assertion.
+
+killed   (failed) a link whose bytes equal the source is skipped again
+killed   (failed) the copy is written through a link
+killed   (failed) the copy is not renamed into place but written in place
+killed   (failed) a folder at a shipped name is not checked
+killed   (failed) a link to a folder counts as a folder
+killed   (failed) the temporary copy is left behind when the rename fails
+killed   (failed) a dry run on a link says it would install
+killed   (failed) CLAUDE_CONFIG_DIR is not followed
+killed   (failed) an explicit home still follows the variable
+killed   (failed) the variable is read for every step
+killed   (failed) an empty value is a path
+killed   (failed) a relative value is accepted
+killed   (failed) the value is not normalized to NFC
+killed   (failed) the value is not made absolute and lexically normalized
+killed   (failed) the claude_dir argument is ignored
+15 mutants, 15 killed, survivors: none

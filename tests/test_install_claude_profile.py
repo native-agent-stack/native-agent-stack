@@ -7,6 +7,7 @@ binary itself is never invoked here; MCP idempotency is tested against
 placeholder rendering and `claude mcp add` argument order are tested as data.
 """
 
+import contextlib
 import io
 import json
 import os
@@ -1019,6 +1020,176 @@ class AgentsInstallTests(unittest.TestCase):
             icp.install_agents(home, dry_run=False)
             results = icp.install_agents(home, dry_run=False)
             self.assertTrue(all(r == "skipped" for r in results))
+
+    # CPA-V-10 follow-up (docs/decisions/2026-10-13-installer-agent-links-and-config-dir.md): the installer is the recovery for a drifted link and
+    # for a moved Claude home, where the drift check (scripts/adoption_status.py) counts both.
+    SHIPPED = "stack-verifier.md"
+
+    def source_bytes(self):
+        return (icp.AGENTS_SRC_DIR / self.SHIPPED).read_bytes()
+
+    def test_a_link_at_a_shipped_name_is_replaced_by_a_regular_copy_and_what_it_points_at_is_untouched(self):
+        # equal bytes behind the link: the equality test followed it and skipped, so the drift check kept counting the link;
+        # other bytes behind it: the copy wrote through the link and changed a file outside the folder
+        for label, target_bytes in (("equal", None), ("different", b"not an agent definition\n")):
+            with self.subTest(target=label), tempfile.TemporaryDirectory() as tmp:
+                home = Path(tmp) / "home"
+                outside = Path(tmp) / "outside.md"
+                content = self.source_bytes() if target_bytes is None else target_bytes
+                outside.write_bytes(content)
+                dest_dir = home / ".claude" / "agents"
+                dest_dir.mkdir(parents=True)
+                dest = dest_dir / self.SHIPPED
+                dest.symlink_to(outside)
+                results = icp.install_agents(home, dry_run=False, names=[self.SHIPPED])
+                self.assertEqual(results, ["installed"])
+                self.assertFalse(dest.is_symlink(), "a regular file now stands at the shipped name")
+                self.assertEqual(dest.read_bytes(), self.source_bytes())
+                self.assertEqual(outside.read_bytes(), content, "the link's target is not written through")
+
+    def test_a_link_to_nothing_is_replaced_and_no_file_is_created_where_it_pointed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp) / "home"
+            outside = Path(tmp) / "created-through-the-link.md"
+            dest_dir = home / ".claude" / "agents"
+            dest_dir.mkdir(parents=True)
+            dest = dest_dir / self.SHIPPED
+            dest.symlink_to(outside)
+            self.assertEqual(icp.install_agents(home, dry_run=False, names=[self.SHIPPED]), ["installed"])
+            self.assertFalse(dest.is_symlink())
+            self.assertEqual(dest.read_bytes(), self.source_bytes())
+            self.assertFalse(outside.exists(), "nothing is created through the dangling link")
+
+    def test_a_link_to_a_folder_is_replaced_and_the_folder_is_untouched(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp) / "home"
+            elsewhere = Path(tmp) / "elsewhere"
+            elsewhere.mkdir()
+            (elsewhere / "keep.txt").write_text("kept\n", encoding="utf-8")
+            dest_dir = home / ".claude" / "agents"
+            dest_dir.mkdir(parents=True)
+            dest = dest_dir / self.SHIPPED
+            dest.symlink_to(elsewhere, target_is_directory=True)
+            self.assertEqual(icp.install_agents(home, dry_run=False, names=[self.SHIPPED]), ["installed"])
+            self.assertFalse(dest.is_symlink())
+            self.assertEqual(sorted(path.name for path in elsewhere.iterdir()), ["keep.txt"], "nothing is copied into the linked folder")
+
+    def test_a_folder_at_a_shipped_name_is_refused_before_anything_is_copied(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            dest_dir = home / ".claude" / "agents"
+            (dest_dir / self.SHIPPED).mkdir(parents=True)
+            with self.assertRaises(icp.InstallError) as caught:
+                icp.install_agents(home, dry_run=False)
+            self.assertIn("folder", str(caught.exception))
+            self.assertEqual(list((dest_dir / self.SHIPPED).iterdir()), [], "nothing is copied into the folder")
+            self.assertEqual(sorted(path.name for path in dest_dir.iterdir()), [self.SHIPPED], "no other definition is written either")
+
+    def test_a_dry_run_names_the_link_it_would_replace_and_changes_nothing(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp) / "home"
+            outside = Path(tmp) / "outside.md"
+            outside.write_bytes(self.source_bytes())
+            dest_dir = home / ".claude" / "agents"
+            dest_dir.mkdir(parents=True)
+            dest = dest_dir / self.SHIPPED
+            dest.symlink_to(outside)
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                results = icp.install_agents(home, dry_run=True, names=[self.SHIPPED])
+            self.assertEqual(results, ["planned"])
+            self.assertIn("link", out.getvalue())
+            self.assertTrue(dest.is_symlink())
+
+    def test_a_copy_that_cannot_be_renamed_into_place_leaves_no_temporary_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp) / "agents"
+            target = folder / self.SHIPPED
+            (target / "occupied").mkdir(parents=True)   # a non-empty folder: the rename fails
+            with self.assertRaises(OSError):
+                icp.write_regular_copy(icp.AGENTS_SRC_DIR / self.SHIPPED, target)
+            self.assertEqual(sorted(path.name for path in folder.iterdir()), [self.SHIPPED], "the temporary copy is removed")
+
+    def test_no_temporary_file_is_left_beside_the_definitions(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            icp.install_agents(home, dry_run=False)
+            listed = sorted(path.name for path in (home / ".claude" / "agents").iterdir())
+            self.assertEqual(listed, sorted(path.name for path in icp.AGENTS_SRC_DIR.glob("*.md")))
+
+
+class AgentsConfigDirTests(unittest.TestCase):
+    """Measured on 2.1.296 (zero model spend, the client killed at its init record): with CLAUDE_CONFIG_DIR set the client lists the definitions under that folder's agents/ and none under
+    <home>/.claude/agents; an empty value is read as the working directory; a relative value is resolved against it. The installer follows a set, absolute value for the current user's own
+    install (no --home), reads an empty value as unset and refuses a relative one."""
+
+    NAME = "stack-verifier.md"
+
+    def run_main(self, argv, **env):
+        out, err = io.StringIO(), io.StringIO()
+        with mock.patch.dict(os.environ, env), contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            os.environ.pop("CLAUDE_CONFIG_DIR", None) if "CLAUDE_CONFIG_DIR" not in env else None
+            code = icp.main(argv)
+        return code, out.getvalue(), err.getvalue()
+
+    def test_the_current_users_install_follows_claude_config_dir(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home, config = Path(tmp) / "home", Path(tmp) / "config"
+            home.mkdir()
+            code, _, err = self.run_main(["--only", "agents", "--agent", self.NAME], HOME=str(home), CLAUDE_CONFIG_DIR=str(config))
+            self.assertEqual(code, 0, err)
+            self.assertEqual((config / "agents" / self.NAME).read_bytes(), (icp.AGENTS_SRC_DIR / self.NAME).read_bytes())
+            self.assertFalse((home / ".claude").exists(), "nothing under the home's own .claude")
+
+    def test_an_explicit_home_is_the_target_whatever_the_environment_names(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            target, config = Path(tmp) / "target", Path(tmp) / "config"
+            target.mkdir()
+            code, _, err = self.run_main(["--home", str(target), "--only", "agents", "--agent", self.NAME], CLAUDE_CONFIG_DIR=str(config))
+            self.assertEqual(code, 0, err)
+            self.assertTrue((target / ".claude" / "agents" / self.NAME).is_file())
+            self.assertFalse(config.exists())
+
+    def test_an_unset_or_empty_value_is_the_homes_own_dot_claude(self):
+        for label, env in (("unset", {}), ("empty", {"CLAUDE_CONFIG_DIR": ""})):
+            with self.subTest(value=label), tempfile.TemporaryDirectory() as tmp:
+                home = Path(tmp) / "home"
+                home.mkdir()
+                code, _, err = self.run_main(["--only", "agents", "--agent", self.NAME], HOME=str(home), **env)
+                self.assertEqual(code, 0, err)
+                self.assertTrue((home / ".claude" / "agents" / self.NAME).is_file())
+
+    def test_a_set_value_is_made_absolute_and_normalized_as_the_client_does(self):
+        # the client's folder is path.resolve of the value, NFC-normalized (scripts/skills_status.py claude_settings_path reads the same bundle code)
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp) / "home"
+            home.mkdir()
+            decomposed = "cafe\u0301"
+            composed = "caf\u00e9"
+            cases = (("dot-dot", f"{tmp}/config/../moved", Path(tmp) / "moved"), ("nfc", f"{tmp}/{decomposed}", Path(tmp) / composed))
+            for label, value, expected in cases:
+                with self.subTest(value=label):
+                    code, _, err = self.run_main(["--only", "agents", "--agent", self.NAME], HOME=str(home), CLAUDE_CONFIG_DIR=value)
+                    self.assertEqual(code, 0, err)
+                    self.assertTrue((expected / "agents" / self.NAME).is_file(), f"installed under {expected.name}")
+                    if label == "dot-dot":
+                        self.assertFalse((Path(tmp) / "config").exists(), "the dot-dot is collapsed lexically, as path.resolve does, not walked through a folder made for it")
+
+    def test_a_relative_value_is_refused_and_nothing_is_written(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp) / "home"
+            home.mkdir()
+            code, _, err = self.run_main(["--only", "agents", "--agent", self.NAME], HOME=str(home), CLAUDE_CONFIG_DIR="relative/config")
+            self.assertEqual(code, 1)
+            self.assertIn("CLAUDE_CONFIG_DIR", err)
+            self.assertEqual(list(home.iterdir()), [])
+
+    def test_a_relative_value_does_not_stop_a_step_that_does_not_read_it(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp) / "home"
+            home.mkdir()
+            code, _, err = self.run_main(["--only", "guard", "--hook", "currency-due-notice.py", "--dry-run"], HOME=str(home), CLAUDE_CONFIG_DIR="relative/config")
+            self.assertEqual(code, 0, err)
 
 
 class ShippedAgentEffortTests(unittest.TestCase):
