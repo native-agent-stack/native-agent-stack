@@ -255,6 +255,22 @@ jobs:
             blueprints/us-equities/data/requirements.lock
           echo "PROMOTION_GATE_PYTHON=$RUNNER_TEMP/promotion-gate-venv/bin/python3" >> "$GITHUB_ENV"
           echo "REQUIRE_PROMOTION_GATE_VENV=1" >> "$GITHUB_ENV"
+      - name: Provision the Bun that Claude Code 2.1.296 embeds, for the agent front matter tests
+        env:
+          BUN_VERSION: '1.4.3'
+          # https://github.com/oven-sh/bun/releases/download/bun-v1.4.3/SHASUMS256.txt, the line of bun-linux-x64.zip
+          BUN_SHA256: 3e730528d89775f03f87f05c06787c4df4099d0a37f3f252e7b829cb23816e18
+        # scripts/adoption_status.py reads agent front matter with Bun.YAML.parse at this version (CLIENT_BUN_VERSION), and the tests that need it fail under GitHub Actions rather than skip
+        # (tests/test_adoption_status.py unavailable()). The release build is 1.4.3+c6da4a4d3; the client embeds 1.4.3+eecfd55de, which is not a public commit: docs/decisions/2026-10-13-claude-agent-drift-check.md.
+        run: |
+          mkdir -p "$RUNNER_TEMP/bun"
+          curl --fail --silent --show-error --location --retry 3 \
+            "https://github.com/oven-sh/bun/releases/download/bun-v${BUN_VERSION}/bun-linux-x64.zip" \
+            --output "$RUNNER_TEMP/bun/archive.zip"
+          printf '%s  %s\n' "$BUN_SHA256" "$RUNNER_TEMP/bun/archive.zip" | sha256sum --check
+          unzip -q "$RUNNER_TEMP/bun/archive.zip" -d "$RUNNER_TEMP/bun"
+          "$RUNNER_TEMP/bun/bun-linux-x64/bun" --version
+          echo "AGENT_FRONTMATTER_BUN=$RUNNER_TEMP/bun/bun-linux-x64/bun" >> "$GITHUB_ENV"
       - name: Provision the pinned tree-sitter-bash parser for the token-measurement lane tests
         # examples/claude-native/workflows/shell-parser.pin.json pins web-tree-sitter and tree-sitter-bash (npm
         # integrity values, the sha256 of the six files child-usage.mjs reads) and records the install command.

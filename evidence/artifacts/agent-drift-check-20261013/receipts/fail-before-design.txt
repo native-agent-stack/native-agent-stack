@@ -1,0 +1,52 @@
+tests/test_adoption_status.py of the design round of #1062 (CPA-V-10) against scripts/adoption_status.py at e7260fd3, the head that was read (the test file, the fixture and the workflow copied in; the bun 1.4.3 named in AGENT_FRONTMATTER_BUN).
+Ran 196 tests, FAILED (failures=1, errors=58), counting subtests. The same file runs 203 tests at this head: the 7 tests of RealBunTests do not run at e7260fd3, because the class setup raises AttributeError
+(find_bun does not exist there) and counts as one of the errors.
+Tests that fail on behavior (1):
+  ClientWiringTests.test_the_limitations_name_the_agent_folders_the_check_compares [1]
+Tests that raise AttributeError because what they test does not exist at e7260fd3 (find_bun, agent_names, agent_front_matter, BUN_ENV, UNREADABLE, CLIENT_BUN_VERSION; 24 tests, subtests in brackets):
+  AgentNamesTests.test_a_batch_is_one_call_and_the_blocks_are_data_on_stdin [1]
+  AgentNamesTests.test_a_bun_that_does_not_answer_in_time_is_unknown [1]
+  AgentNamesTests.test_a_bun_that_is_not_the_version_the_client_embeds_is_unknown [7]
+  AgentNamesTests.test_a_missing_bun_is_unknown [1]
+  AgentNamesTests.test_a_scratch_directory_that_cannot_be_made_is_unknown [1]
+  AgentNamesTests.test_a_vendor_file_that_declares_no_name_is_not_drift_even_when_a_shipped_definition_declares_none [1]
+  AgentNamesTests.test_bun_runs_in_an_empty_directory_with_an_empty_configuration_and_no_home [1]
+  AgentNamesTests.test_every_way_the_answer_can_fail_is_unknown [8]
+  AgentNamesTests.test_nothing_is_asked_of_bun_when_no_text_has_front_matter [1]
+  AgentNamesTests.test_the_answers_of_the_parser_are_a_name_none_or_unreadable_in_the_order_of_the_texts [1]
+  AgentNamesTests.test_the_named_bun_wins_over_the_one_on_path_and_a_named_one_that_is_missing_is_not_replaced [1]
+  ClientWiringTests.test_a_bun_that_fails_in_any_way_makes_the_count_unknown [1]
+  ClientWiringTests.test_a_parse_that_throws_for_a_vendor_file_or_for_a_shipped_definition_makes_the_count_unknown [1]
+  ClientWiringTests.test_a_vendor_file_that_cannot_be_read_is_not_drift_for_what_it_might_declare [1]
+  ClientWiringTests.test_a_vendor_file_that_declares_the_name_of_a_shipped_definition_is_drift [1]
+  ClientWiringTests.test_a_vendor_file_without_front_matter_needs_no_bun [1]
+  ClientWiringTests.test_every_shipped_definition_is_settled_by_the_parser_before_a_vendor_file_is_held_against_it [1]
+  ClientWiringTests.test_the_vendor_definitions_of_this_host_shape_are_not_drift [1]
+  ClientWiringTests.test_the_wiring_hands_one_batch_with_the_shipped_definitions_and_the_vendor_files_to_the_parser [1]
+  ClientWiringTests.test_without_the_pinned_bun_a_vendor_file_with_front_matter_makes_the_count_unknown_never_zero [1]
+  ExtractionTests.test_the_block_is_what_the_client_hands_to_its_parser [18]
+  NeedsBunTests.test_a_bun_of_another_version_skips_locally_and_fails_under_github_actions [2]
+  NeedsBunTests.test_a_missing_bun_skips_locally_and_fails_under_github_actions [3]
+  WorkflowPinTests.test_the_validation_workflow_installs_the_bun_the_check_requires [1]
+
+The rows of the vendor tests are errors at that head because the check had no API for the parser; the reviews' counterexamples are shown by behavior through the check's public entry (client_wiring) in the fully wired fixture of the
+test class (v10_counterexample_run.py of the author's private record):
+
+== e7260fd3, the head that was read
+drift=0     complete=True  the command center's case: a comment at the left margin between `name:` and its indented value
+drift=0     complete=True  Astra's case: the same with the comment `# comment`
+drift=1     complete=False the `name: # c` variant
+drift=1     complete=False the plain control
+== this head, bun 1.4.3 named in AGENT_FRONTMATTER_BUN
+drift=1     complete=False the command center's case: a comment at the left margin between `name:` and its indented value
+drift=1     complete=False Astra's case: the same with the comment `# comment`
+drift=1     complete=False the `name: # c` variant
+drift=1     complete=False the plain control
+== this head, the default bun on PATH (1.4.2 on the first host)
+drift=None  complete=False the command center's case: a comment at the left margin between `name:` and its indented value
+drift=None  complete=False Astra's case: the same with the comment `# comment`
+drift=None  complete=False the `name: # c` variant
+drift=None  complete=False the plain control
+
+The first two cases are the P1 of the command center's read (reproduced 2026-10-13T07:24Z) and the P2 of Astra's (07:56Z): a comment line at the left margin between `name:` and its indented value gave drift 0 and complete true at
+e7260fd3; the client reads the name (receipts/client-oracle.txt). With the bun at the pin the same text is counted and the wiring is incomplete; with a bun that is not the pin the count is unknown (null), never 0.

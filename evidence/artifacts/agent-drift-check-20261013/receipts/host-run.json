@@ -1,17 +1,32 @@
 {
  "command": "python3 scripts/adoption_status.py --profile token-efficiency --client-wiring --json",
- "captured_utc": "2026-10-13T06:33Z",
- "checkout": "the round-2 commit of #1062, on the first host",
- "client_wiring.claude": {
-  "rtk_hook": true,
-  "ai_memory_hook_events": 9,
-  "context_mode_plugin_enabled": true,
-  "subagent_spawn_depth_1": true,
-  "workflow_concurrency_set": true,
-  "effort_level_env_unset": true,
-  "agent_teams_opt_in": 1,
-  "stack_agents_drift": 0
+ "captured_utc": "2026-10-13T08:36:47Z",
+ "checkout": "the design round of #1062, on the first host",
+ "with the bun at the pin (1.4.3) named in AGENT_FRONTMATTER_BUN": {
+  "client_wiring.claude": {
+   "rtk_hook": true,
+   "ai_memory_hook_events": 9,
+   "context_mode_plugin_enabled": true,
+   "subagent_spawn_depth_1": true,
+   "workflow_concurrency_set": true,
+   "effort_level_env_unset": true,
+   "agent_teams_opt_in": 1,
+   "stack_agents_drift": 0
+  },
+  "client_wiring.complete": true
  },
- "client_wiring.complete": true,
- "note": "counts and flags only; the installed folder holds the 11 definitions of adoption/agents/claude plus the four listed vendor ones (and a backup file that is not an agent file), and no subfolder; the command's own status line is prerequisites_missing (exit 2) on this host, as it is on the head that was read, and the same run on that head gave the same wiring counts"
+ "with the default bun on PATH (mise: 1.4.2)": {
+  "client_wiring.claude": {
+   "rtk_hook": true,
+   "ai_memory_hook_events": 9,
+   "context_mode_plugin_enabled": true,
+   "subagent_spawn_depth_1": true,
+   "workflow_concurrency_set": true,
+   "effort_level_env_unset": true,
+   "agent_teams_opt_in": 1,
+   "stack_agents_drift": null
+  },
+  "client_wiring.complete": false
+ },
+ "note": "counts and flags only; the installed folder holds the 11 definitions of adoption/agents/claude plus the four listed vendor ones (and a backup file that is not an agent file) and no subfolder; the four vendor-installed definitions have front matter, so the check needs the client's parser: with the bun at the pin it counts 0 and the wiring is complete, with the first host's default bun (1.4.2) the count is null and the wiring is incomplete until bun 1.4.3 is installed by its supported path or named in AGENT_FRONTMATTER_BUN; the command's own status line is prerequisites_missing (exit 2) on this host, as before"
 }

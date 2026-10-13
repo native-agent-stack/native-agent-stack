@@ -80,7 +80,8 @@ CLIENT_WIRING_LIMITATIONS = [
     "under the Claude home's agents/ with this checkout's adoption/agents/claude copies byte for byte and reports "
     "how many differ, are missing or are not shipped here, in that folder and in any folder below it as the client "
     "loads them (four vendor-installed search definitions are listed, not counted unless their front matter declares "
-    "a shipped name, and unknown where the name they declare cannot be told), a count that must be 0 for the wiring "
+    "a shipped name, which Bun.YAML.parse reads as the client's own parser does, run by a bun of the version the client "
+    "embeds, and unknown where that cannot be done or the name cannot be told), a count that must be 0 for the wiring "
     "to be complete. It reads those folders through descriptors and never through a link. It opens no credential "
     "store (~/.claude.json, ~/.claude/.credentials.json, ~/.codex/auth.json), network endpoint or running process; "
     "environment variables only locate the client homes, and two opt-ins are checked by name.",
@@ -254,7 +255,7 @@ STACK_ROLES_SOURCE = Path(__file__).resolve().parents[1] / "adoption" / "agents"
 # two files that declare one name only one is loaded, chosen by file system read order (https://code.claude.com/docs/en/sub-agents.md L176-L182, read 2026-10-13; the installed 2.1.296 client's loader walks the same way: its
 # JS walker enters every folder and keeps names ending .md, its ripgrep path is `--files --hidden --follow --no-ignore --glob *.md`, and its definitions are merged by name, a later one replacing an earlier). Four more
 # definitions sit at the top of that folder on a host, installed by the tools they route to and not shipped here (tools/local-pages/architecture_mapping.json names them as the search roles of code navigation and semantic
-# retrieval): they are listed, so they are not drift unless their front matter declares the name of a shipped definition, and the count is unknown when the name they declare cannot be read (agent_identity). Any other *.md, at any depth, is.
+# retrieval): they are listed, so they are not drift unless their front matter declares the name of a shipped definition, and the count is unknown when the names cannot be told with the client's own parser (agent_names). Any other *.md, at any depth, is.
 STACK_AGENTS_SOURCE = Path(__file__).resolve().parents[1] / "adoption" / "agents" / "claude"
 VENDOR_HOST_AGENTS = ("codebase-memory-auditor.md", "codebase-memory-scout.md", "codebase-memory.md", "semble-search.md")
 AGENT_WALK_DEPTH, AGENT_WALK_ENTRIES = 8, 5_000  # a tree deeper, or with more entries, than any agents folder is unknown, not a count
@@ -503,7 +504,7 @@ def claude_wiring(claude_dir: Path, env, *, agents_source: Path | None = None) -
         # so the all-booleans completeness rule never counts it and the output stays flags and counts only.
         "agent_teams_opt_in": int(AGENT_TEAMS_VARIABLE in names or AGENT_TEAMS_VARIABLE in env),
         # Drift between the installed definitions and this checkout's: a count that must be 0 (wiring_complete). A caller that passes no source gets this repository's own.
-        "stack_agents_drift": stack_agents_drift(claude_dir, STACK_AGENTS_SOURCE if agents_source is None else agents_source),
+        "stack_agents_drift": stack_agents_drift(claude_dir, STACK_AGENTS_SOURCE if agents_source is None else agents_source, env),
     }
 
 
@@ -1040,161 +1041,106 @@ def stack_roles_matching(codex_dir: Path, roles_source: Path) -> int | None:
         os.close(home)
 
 
-# What the client takes a definition's identity from (Claude Code 2.1.296, read from the installed binary's bundled parser, whose loader scan calls oi(text, path, {normalizeKeys: true}) on each file): a leading byte order mark is
-# dropped; the front matter is what /^---\s*\n([\s\S]*?)---\s*\n?/ captures, so the block ends at the first --- after the opener, wherever it stands on a line; Bun.YAML.parse reads the block (once more, with the values that
-# hold YAML-special characters quoted, if that throws); the definition's name is the string at the top-level key `name` (a key is exact: `Name` is another key), and a file with no front matter, no name or a block that does not
-# parse is not loaded. This module carries no YAML parser and takes none as a dependency: agent_identity reads the plain shapes a definition has and raises Unknown for every other spelling of the block, so that a spelling it
-# cannot read is an unknown identity and never a different one.
+# What a definition declares is whatever the client's own YAML parser reads from its front matter, and the only way to know that is to ask the same parser. Claude Code 2.1.296 parses each agent file with Bun.YAML.parse
+# (its loader scan calls oi(text, path, {normalizeKeys: true}): a leading byte order mark is dropped, the block is what /^---\s*\n([\s\S]*?)---\s*\n?/ captures, the block goes to
+# Bun.YAML.parse, and a second attempt is made on a rewrite of the text when the first throws), keeps the result when it is a mapping, and serves the agent under the raw `name` of that mapping (Iwt: a string, not empty,
+# not starting with "-", at most 256 characters, with no ":" after NFKC normalization, and a `description` that is a non-empty string); it skips a file over 1 MiB (Vk). Three rounds of a reader written here each missed a
+# spelling that this parser reads (a quoted key, a block scalar, a comment line at the left margin), because the spellings of YAML are not a list. So this module reads no YAML: it extracts the block the way the client does and
+# hands it to Bun.YAML.parse, run with the Bun that the client embeds, and every case it cannot settle is Unknown: no bun, another version of it, a parse that throws (the client's second attempt is not reproduced here), a bun
+# that does not answer.
+CLIENT_BUN_VERSION = "1.4.3"   # "Bun v1.4.3" inside the 2.1.296 binary; its build (eecfd55de) is not a public commit, the 1.4.3 release is c6da4a4d3: docs/decisions/2026-10-13-claude-agent-drift-check.md, "The parser"
+BUN_ENV = "AGENT_FRONTMATTER_BUN"   # the bun to use, when it is not the first on PATH
+BUN_TIMEOUT_SECONDS = 30
 JS_SPACE = re.escape("".join(map(chr, (9, 10, 11, 12, 13, 32, 0xA0, 0x1680, *range(0x2000, 0x200B), 0x2028, 0x2029, 0x202F, 0x205F, 0x3000, 0xFEFF))))  # what \s matches in a JavaScript regular expression
 AGENT_FRONT_MATTER = re.compile(f"---[{JS_SPACE}]*\\n(.*?)---[{JS_SPACE}]*\\n?", re.DOTALL)
-UNREADABLE_BLOCK = re.compile("[^\n -~" + chr(0xA0) + "-" + chr(0x2027) + chr(0x202A) + "-" + chr(0xFEFE) + chr(0xFF00) + "-" + chr(0xFFFD)
-                              + chr(0x10000) + "-" + chr(0x10FFFF) + "]")  # a tab, a control character, a lone CR, a line separator YAML 1.1 knows, a byte order mark
-PLAIN_KEY_LINE = re.compile(r"([A-Za-z_][A-Za-z0-9_-]*) *:(?: +(.*))?\Z")
-BLOCK_SCALAR_HEADER = re.compile(r"([|>])(-?)(?: +#.*)?\Z")  # no indentation indicator and no keep: those are Unknown
-FLOW_ONE_LINE = re.compile(r"(?:\[[A-Za-z0-9_.@/ ,:-]*\]|\{[A-Za-z0-9_.@/ ,:-]*\})(?: +#.*)?\Z")
-YAML_INDICATORS = ",[]{}#&*!|>%@`"  # none of these starts a plain scalar
+# One call parses the whole batch. A block is data on stdin, never a command-line argument or a file that bun runs.
+BUN_PARSER = """const blocks = JSON.parse(await Bun.stdin.text());
+console.log(JSON.stringify(blocks.map((block) => {
+  try {
+    const value = Bun.YAML.parse(block);
+    if (value === null || typeof value !== "object") return {state: "none"};
+    return typeof value.name === "string" ? {state: "name", name: value.name} : {state: "none"};
+  } catch (error) {
+    return {state: "throws"};
+  }
+})));"""
 
 
-def quoted_scalar(value: str, escapes_ok: bool) -> str:
-    """The text of the quoted scalar that ``value`` starts with, which must close on the same line and be followed by nothing but a comment. Unknown for a scalar over several lines, text after the closing quote, and (unless
-    ``escapes_ok``) a backslash in a double-quoted one, whose escape sequences are not decoded here."""
-    quote, out, index = value[0], [], 1
-    while index < len(value):
-        char = value[index]
-        if char == quote:
-            if quote == "'" and value[index + 1:index + 2] == "'":
-                out.append(char)
-                index += 2
-                continue
-            break
-        if quote == '"' and char == chr(92):
-            if not escapes_ok or index + 1 >= len(value):
-                raise Unknown
-            out.append(value[index:index + 2])
-            index += 2
-            continue
-        out.append(char)
-        index += 1
-    else:
-        raise Unknown
-    rest = value[index + 1:]
-    if rest.strip(" ") and not (rest[0] == " " and rest.lstrip(" ").startswith("#")):
-        raise Unknown
-    return "".join(out)
+class _Unreadable:
+    def __repr__(self):
+        return "UNREADABLE"
 
 
-def plain_scalar(value: str, name: bool = False) -> str:
-    """The text of the plain scalar that ``value`` starts with (it is not empty and not a comment): cut at a ` #` comment, without the spaces before it. Unknown when it starts with a character that makes it something else
-    (an indicator, an anchor, alias or tag, a flow or block opener, a sequence or mapping mark) and, for a name, when it holds ``: `` or ends with a colon (a parser reads a mapping there)."""
-    if value[0] in YAML_INDICATORS or (value[0] in "-?:" and value[1:2] in ("", " ")):
-        raise Unknown
-    text = value.split(" #", 1)[0].rstrip(" ")
-    if name and (": " in text or text.endswith(":")):
-        raise Unknown
-    return text
+UNREADABLE = _Unreadable()   # a definition whose name cannot be told here (its parse throws)
 
 
-def lines_below(below: list) -> list:
-    """The lines under a key that can belong to its value: up to the first line that holds text at the left margin."""
-    inside = []
-    for line in below:
-        if line.strip(" ") and line[0] != " ":
-            break
-        inside.append(line)
-    return inside
-
-
-def value_lines(below: list) -> list:
-    """The lines under a key that carry its value or more of it: indented, and neither blank nor a comment."""
-    return [line for line in lines_below(below) if line.strip(" ") and not line.lstrip(" ").startswith("#")]
-
-
-def block_scalar_name(strip: bool, below: list):
-    """The name a ``|`` or ``>`` block scalar holds when it is one line of text: that line, and a newline after it unless the header chomps (``-``). None when it is empty. Unknown for several lines or a blank line before the text."""
-    inside = lines_below(below)
-    while inside and not inside[-1].strip(" "):
-        inside.pop()
-    if not inside:
-        return None
-    if not inside[0].strip(" ") or sum(1 for line in inside if line.strip(" ")) > 1:
-        raise Unknown
-    text = inside[0].lstrip(" ")
-    if text != text.rstrip(" "):
-        raise Unknown
-    return text if strip else text + "\n"
-
-
-def name_value(value: str, below: list):
-    """The string the ``name`` key declares, from the rest of its line and the lines under it; None when it declares nothing (no value, or an empty one). Unknown for a value this does not read: a block scalar with an indentation
-    or keep indicator, a flow collection, an anchor, alias or tag, an escape sequence, a value over several lines."""
-    value = value.rstrip(" ")
-    if value.startswith("#"):
-        value = ""
-    if value:
-        header = BLOCK_SCALAR_HEADER.match(value)
-        if header:
-            return block_scalar_name(header.group(2) == "-", below)
-        text = quoted_scalar(value, False) if value[0] in ("'", '"') else plain_scalar(value, True)
-        if value_lines(below):
-            raise Unknown
-        return text or None
-    nodes = value_lines(below)
-    if not nodes:
-        return None
-    if len(nodes) > 1:
-        raise Unknown
-    node = nodes[0].strip(" ")
-    text = quoted_scalar(node, False) if node[0] in ("'", '"') else plain_scalar(node, True)
-    return text or None
-
-
-def other_value(value: str) -> None:
-    """Checks the value of a key other than ``name``: it must end where its line ends or continue only on indented lines, so that no line at the left margin can be a part of it. Unknown otherwise (an unclosed quote, a
-    flow collection over several lines, an anchor, alias or tag)."""
-    value = value.rstrip(" ")
-    if not value or value.startswith("#") or BLOCK_SCALAR_HEADER.match(value) or FLOW_ONE_LINE.match(value):
-        return
-    if value[0] in ("'", '"'):
-        quoted_scalar(value, True)
-    else:
-        plain_scalar(value)
-
-
-def agent_identity(data: bytes):
-    """The name an agent definition declares, which is the identity the client serves it under: a string; None when the client would not load a definition from the text (no front matter, no ``name``, an empty one). Raises
-    Unknown when the front matter is not read by this module (a character YAML does not take as text, a key or value spelled other than as a plain top-level ``key: value`` line with a plain, single-quoted or double-quoted
-    value without escapes, a block scalar of one line for ``name``): the identity cannot be told, which is not the same as telling that it is another. The text is decoded as the client does (invalid bytes become U+FFFD)."""
+def agent_front_matter(data: bytes):
+    """The block of front matter that the client hands to its YAML parser: the text decoded as the client reads a file (invalid bytes become U+FFFD), a leading byte order mark dropped, and what the client's pattern captures
+    between the opening line and the first "---" after it. None when the client finds no front matter. (The client first checks that "---" occurs after the first three characters; the pattern cannot match without that, as
+    its closing "---" starts after the opening line, so the check is left out.)"""
     text = data.decode("utf-8", errors="replace")
-    match = AGENT_FRONT_MATTER.match(text[1:] if text[:1] == chr(0xFEFF) else text)
-    if match is None:
-        return None
-    block = match.group(1).replace("\r\n", "\n")
-    if UNREADABLE_BLOCK.search(block):
+    if text[:1] == chr(0xFEFF):
+        text = text[1:]
+    match = AGENT_FRONT_MATTER.match(text)
+    return None if match is None else match.group(1)
+
+
+def find_bun(environ=None):
+    environ = os.environ if environ is None else environ
+    return environ.get(BUN_ENV) or shutil.which("bun", path=environ.get("PATH"))
+
+
+def agent_names(blobs, *, environ=None):
+    """The name the client serves each of the definitions ``blobs`` (bytes) under, read with Bun.YAML.parse at CLIENT_BUN_VERSION in one call: a string; None when the client loads no name from the text (no front matter, not a
+    mapping, no string name, an empty one); UNREADABLE when the parse throws, which the client answers with a second attempt that this does not reproduce. Raises Unknown for the whole batch when there is no bun, its version is
+    not CLIENT_BUN_VERSION, or it does not answer in time. Run in an empty directory with an empty configuration and home, so that no bunfig.toml of the caller's directory or home (a preload runs code) is read. Names never
+    leave the caller: only the comparison does."""
+    blocks = [agent_front_matter(data) for data in blobs]
+    if not any(block is not None for block in blocks):
+        return [None] * len(blocks)
+    bun = find_bun(environ)
+    if not bun:
         raise Unknown
-    lines, found, started, open_key = block.split("\n"), [], False, False
-    for index, line in enumerate(lines):
-        if not line.strip(" ") or line.lstrip(" ").startswith("#"):
-            continue
-        if line[0] == " ":  # the value of the key above, or a block that is indented as a whole
-            if not started:
+    try:
+        scratch_directory = tempfile.TemporaryDirectory(prefix="agent-names-")
+    except OSError:
+        raise Unknown from None
+    with scratch_directory as scratch:
+        base = {"PATH": (os.environ if environ is None else environ).get("PATH", ""), "HOME": scratch, "LANG": "C.UTF-8"}
+        try:
+            config = Path(scratch) / "bunfig.toml"
+            config.write_bytes(b"")
+            version = subprocess.run([bun, f"--config={config}", "--version"], capture_output=True, text=True, encoding="utf-8", timeout=BUN_TIMEOUT_SECONDS, cwd=scratch, env=base)
+            if version.returncode != 0 or version.stdout.strip() != CLIENT_BUN_VERSION:
                 raise Unknown
-            continue
-        if open_key and (line == "-" or line.startswith("- ")):  # a sequence at the left margin is the value of the key above
-            other_value(line[2:])
-            continue
-        entry = PLAIN_KEY_LINE.match(line.rstrip(" "))
-        if entry is None:
-            raise Unknown
-        started = True
-        value = entry.group(2) or ""
-        open_key = not value or value.startswith("#")
-        if entry.group(1) == "name":
-            found.append(name_value(value, lines[index + 1:]))
-        else:
-            other_value(value)
-    if len(found) > 1:
+            done = subprocess.run([bun, f"--config={config}", "-e", BUN_PARSER], input=json.dumps([block for block in blocks if block is not None]), capture_output=True, text=True, encoding="utf-8",
+                                  timeout=BUN_TIMEOUT_SECONDS, cwd=scratch, env=base)
+        except (OSError, subprocess.SubprocessError, ValueError):
+            raise Unknown from None
+    if done.returncode != 0:
         raise Unknown
-    return found[0] if found else None
+    try:
+        answers = json.loads(done.stdout)
+    except ValueError:
+        raise Unknown from None
+    if not isinstance(answers, list) or len(answers) != sum(block is not None for block in blocks):
+        raise Unknown
+    names, position = [], 0
+    for block in blocks:
+        if block is None:
+            names.append(None)
+            continue
+        answer, position = answers[position], position + 1
+        state = answer.get("state") if isinstance(answer, dict) else None
+        if state == "name" and isinstance(answer.get("name"), str):
+            names.append(answer["name"] or None)
+        elif state == "none":
+            names.append(None)
+        elif state == "throws":
+            names.append(UNREADABLE)
+        else:
+            raise Unknown
+    return names
 
 
 def link_target(name, dir_fd) -> str:
@@ -1209,11 +1155,12 @@ def link_target(name, dir_fd) -> str:
     return "folder" if stat.S_ISDIR(mode) else "file" if stat.S_ISREG(mode) else "nothing"
 
 
-def agent_drift_below(agents_fd: int, expected: dict, declared: set) -> int:
+def agent_drift_below(agents_fd: int, expected: dict, environ=None) -> int:
     """The drift count for the agents folder held open as ``agents_fd`` (see stack_agents_drift); raises Unknown when
-    a folder, an entry or a shipped copy cannot be compared with. Every entry is opened below the descriptor of its
-    folder, and what is described and read is what was opened."""
-    drift, present, seen = 0, set(), [0]
+    a folder, an entry or a shipped copy cannot be compared with, or when the name of a vendor-named file cannot be told
+    (agent_names). Every entry is opened below the descriptor of its folder, and what is described and read is what was
+    opened."""
+    drift, present, seen, vendors = 0, set(), [0], []
 
     def visit(folder_fd: int, depth: int) -> None:
         nonlocal drift
@@ -1258,7 +1205,7 @@ def agent_drift_below(agents_fd: int, expected: dict, declared: set) -> int:
                     data = read_descriptor(descriptor, CLIENT_FILE_LIMIT)
                     if data is None:
                         raise Unknown
-                    drift += int(agent_identity(data) in declared)  # Unknown when the name it declares cannot be read
+                    vendors.append(data)   # settled below, with the shipped names, in one call to the parser
                 else:
                     drift += int(markdown)
             finally:
@@ -1266,10 +1213,18 @@ def agent_drift_below(agents_fd: int, expected: dict, declared: set) -> int:
                     os.close(descriptor)
 
     visit(agents_fd, 0)
+    declaring = [data for data in vendors if agent_front_matter(data) is not None]   # a file with no front matter declares nothing and needs no parser
+    if declaring:
+        shipped = list(expected.values())
+        names = agent_names([*shipped, *declaring], environ=environ)
+        if any(name is UNREADABLE for name in names):   # a shipped definition or a vendor's own that the parser throws on: no comparison can be made
+            raise Unknown
+        declared = {name for name in names[:len(shipped)] if name}
+        drift += sum(1 for name in names[len(shipped):] if name in declared)
     return drift + len(expected) - len(present)
 
 
-def stack_agents_drift(claude_dir: Path, agents_source: Path) -> int | None:
+def stack_agents_drift(claude_dir: Path, agents_source: Path, environ=None) -> int | None:
     """How many Claude agent definitions under ``claude_dir``/agents are not what this checkout ships in ``agents_source``:
     a count, 0 for none, never a name or text.
 
@@ -1287,9 +1242,9 @@ def stack_agents_drift(claude_dir: Path, agents_source: Path) -> int | None:
     the agents path is a link or not a folder, a link below leads to a folder (what the client loads through a link is
     not known here), a folder, an entry or a shipped copy cannot be read or vanishes while it is read, the tree is deeper
     than AGENT_WALK_DEPTH or holds more than AGENT_WALK_ENTRIES entries, the platform cannot read without following
-    a link (NO_FOLLOW_READS), or the name a vendor-named file declares cannot be told (agent_identity raises Unknown for a
-    spelling it does not take: a quoted key, an escape, a flow mapping, a value over several lines, an unreadable or
-    oversized file). The folder is read through descriptors (open_below)."""
+    a link (NO_FOLLOW_READS), or, when the folder holds a vendor-named file, the names of the definitions cannot be told
+    with the client's own parser (agent_names: no bun, a bun that is not CLIENT_BUN_VERSION, a parse that throws, a
+    vendor-named file over the limit). The folder is read through descriptors (open_below)."""
     try:
         names = sorted(entry for entry in os.listdir(agents_source) if entry.endswith(".md"))
     except OSError:
@@ -1301,10 +1256,6 @@ def stack_agents_drift(claude_dir: Path, agents_source: Path) -> int | None:
             return None
         expected[name] = data
     if not expected or not NO_FOLLOW_READS:
-        return None
-    try:
-        declared = {agent_identity(data) for data in expected.values()} - {None}
-    except Unknown:  # a shipped definition whose name this cannot read: nothing to hold the vendors' files against
         return None
     try:
         home = os.open(claude_dir, os.O_RDONLY | os.O_DIRECTORY | getattr(os, "O_CLOEXEC", 0))
@@ -1319,7 +1270,7 @@ def stack_agents_drift(claude_dir: Path, agents_source: Path) -> int | None:
         if kind != "open":  # a link, a file, or a folder that cannot be searched
             return None
         try:
-            return agent_drift_below(agents, expected, declared)
+            return agent_drift_below(agents, expected, environ)
         except Unknown:
             return None
         finally:

@@ -1,6 +1,7 @@
 """Adoption preflight boundaries; no credentials, services, or model calls."""
 
 import builtins
+from collections import Counter
 import contextlib
 from datetime import date, datetime, timezone
 import dis
@@ -23,6 +24,7 @@ import tempfile
 import threading
 import time
 import unittest
+from unittest import mock
 from unittest.mock import patch
 
 from scripts import adoption_status
@@ -1919,6 +1921,368 @@ class Interleaving:
         return value, self.fired, self.count
 
 
+ROOT = Path(__file__).resolve().parents[1]
+
+UNAVAILABLE_NOTE = "the workflow installs it"
+
+
+def unavailable(reason):
+    """A test that needs a tool this machine lacks: a skip on a developer's machine, a failure under GitHub Actions, where the workflow installs it and a green run has to mean something was asserted (the pattern of
+    tests/test_token_full_save_evidence.py metadata_lines, which reads GITHUB_ACTIONS on every call so that a control can patch the environment)."""
+    if os.environ.get("GITHUB_ACTIONS") == "true":
+        raise AssertionError(f"{reason}; {UNAVAILABLE_NOTE}, so its absence there is a defect")
+    raise unittest.SkipTest(reason)
+
+
+def real_bun():
+    """The bun that reads agent front matter as the client does: the one named by AGENT_FRONTMATTER_BUN or else the first on PATH, when it is CLIENT_BUN_VERSION; unavailable otherwise."""
+    path = adoption_status.find_bun()
+    if not path:
+        unavailable(f"bun {adoption_status.CLIENT_BUN_VERSION} is not installed")
+    try:
+        version = subprocess.run([path, "--version"], capture_output=True, text=True, timeout=30).stdout.strip()
+    except (OSError, subprocess.SubprocessError):
+        version = None
+    if version != adoption_status.CLIENT_BUN_VERSION:
+        unavailable(f"the bun at hand is {version}, not {adoption_status.CLIENT_BUN_VERSION}, the version the client embeds")
+    return path
+
+
+# A stand-in for bun that answers the protocol of agent_names as it is told to (behavior.json beside it) and logs how it was called (calls.jsonl). It exercises the plumbing, never YAML: the tests that depend on what
+# the client's parser reads run the real bun.
+FAKE_BUN = r'''#!{python}
+import json, os, sys, time
+
+here = os.path.dirname(os.path.abspath(sys.argv[0]))
+behavior = json.load(open(os.path.join(here, "behavior.json")))
+args = sys.argv[1:]
+config = [item[len("--config="):] for item in args if item.startswith("--config=")]
+entry = {"cwd": os.getcwd(), "home": os.environ.get("HOME"), "environment": sorted(os.environ), "config_empty": bool(config) and os.path.getsize(config[0]) == 0,
+         "config_in_cwd": bool(config) and os.path.dirname(os.path.abspath(config[0])) == os.getcwd(), "dash_e": "-e" in args}
+if "--version" in args:
+    entry["call"] = "version"
+    open(os.path.join(here, "calls.jsonl"), "a").write(json.dumps(entry) + "\n")
+    print(behavior.get("version", "1.4.3"))
+    sys.exit(behavior.get("version_status", 0))
+stdin = sys.stdin.read()
+blocks = json.loads(stdin)
+entry.update(call="parse", blocks=len(blocks), argv_holds_a_block=any(block and block in " ".join(args) for block in blocks))
+open(os.path.join(here, "calls.jsonl"), "a").write(json.dumps(entry) + "\n")
+mode = behavior.get("parse", "echo")
+if mode == "exit":
+    sys.exit(behavior.get("status", 3))
+if mode == "hang":
+    time.sleep(60)
+if mode == "garbage":
+    print("not json")
+elif mode == "answers":
+    print(json.dumps(behavior["answers"]))
+elif mode == "short":
+    print(json.dumps([{"state": "none"}] * (len(blocks) - 1)))
+else:
+    answers = []
+    for block in blocks:
+        lines = [line for line in block.split("\n") if line.startswith("name:")]
+        answers.append({"state": "name", "name": lines[0][len("name:"):].strip()} if lines else {"state": "none"})
+    print(json.dumps(answers))
+sys.exit(behavior.get("exit_after", 0))
+'''
+
+
+def make_fake_bun(directory, **behavior):
+    script = Path(directory) / "bun"
+    script.write_text(FAKE_BUN.replace("{python}", sys.executable), encoding="utf-8")
+    script.chmod(0o755)
+    (Path(directory) / "behavior.json").write_text(json.dumps(behavior), encoding="utf-8")
+    return script
+
+
+def fake_calls(directory):
+    path = Path(directory) / "calls.jsonl"
+    return [json.loads(line) for line in path.read_text().splitlines()] if path.exists() else []
+
+
+ORACLE = ROOT / "tests" / "fixtures" / "agent_frontmatter" / "client-oracle.json"
+
+
+BOM, REPLACEMENT = chr(0xFEFF), chr(0xFFFD)
+
+
+class ExtractionTests(unittest.TestCase):
+    """agent_front_matter: the block the client hands to its YAML parser, extracted as the loader scan does (oi in the 2.1.296 binary: the text read as UTF-8, a leading byte order mark dropped, and what
+    /^---\\s*\\n([\\s\\S]*?)---\\s*\\n?/ captures; the client's check that "---" occurs after the first three characters changes nothing, the pattern cannot match without it). Pure text; no bun."""
+
+    ROWS = (
+        ("a plain block", b"---\nname: x\n---\nbody\n", "name: x\n"),
+        ("a byte order mark", (BOM + "---\nname: x\n---\n").encode("utf-8"), "name: x\n"),
+        ("only the first byte order mark", (BOM + BOM + "---\nname: x\n---\n").encode("utf-8"), None),
+        ("CRLF line endings", b"---\r\nname: x\r\n---\r\n", "name: x\r\n"),
+        ("spaces and blank lines after the opener", b"---   \n\nname: x\n---\n", "name: x\n"),
+        ("a tab after the opener", b"---\t\nname: x\n---\n", "name: x\n"),
+        ("no closing line", b"---\nname: x\n", None),
+        ("an empty block", b"---\n---\nname: x\n", ""),
+        ("the first --- after the opener ends the block, wherever it stands on a line", b"---\ndescription: a --- b\nname: x\n---\n", "description: a "),
+        ("four dashes", b"----\nname: x\n---\n", None),
+        ("text before the opener", b"text\n---\nname: x\n---\n", None),
+        ("a space before the opener", b" ---\nname: x\n---\n", None),
+        ("a blank line before the opener", b"\n---\nname: x\n---\n", None),
+        ("only three characters", b"---", None),
+        ("no front matter", b"name: x\n", None),
+        ("an empty file", b"", None),
+        ("a lone CR is no line end", b"---\rname: x\r---\r", None),
+        ("an invalid byte is read as U+FFFD", b"---\nname: x\xff\n---\n", "name: x" + REPLACEMENT + "\n"),
+    )
+
+    def test_the_block_is_what_the_client_hands_to_its_parser(self):
+        for label, data, expected in self.ROWS:
+            with self.subTest(case=label):
+                self.assertEqual(adoption_status.agent_front_matter(data), expected)
+
+
+class AgentNamesTests(unittest.TestCase):
+    """agent_names with a stand-in bun: how the parser is found, checked, called and answered, and that every failure is Unknown. Review of #1062 at e7260fd3 (the command center's Claude read, P1; its adjudication of
+    2026-10-13): the reader written here was replaced by the client's own YAML parser, so the case the parser cannot settle is not read as 'no name'."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory(prefix="fake-bun-")
+        self.addCleanup(self._tmp.cleanup)
+        self.directory = Path(self._tmp.name)
+
+    def names(self, blobs, **behavior):
+        bun = make_fake_bun(self.directory, **behavior)
+        return adoption_status.agent_names(blobs, environ={"PATH": "/usr/bin:/bin", adoption_status.BUN_ENV: str(bun)})
+
+    def test_the_answers_of_the_parser_are_a_name_none_or_unreadable_in_the_order_of_the_texts(self):
+        blobs = [b"---\nname: a\n---\n", b"no front matter", b"---\nname: b\n---\n", b"---\nname: c\n---\n", b"---\nx: y\n---\n"]
+        answers = [{"state": "name", "name": "a"}, {"state": "name", "name": ""}, {"state": "throws"}, {"state": "none"}]
+        names = self.names(blobs, parse="answers", answers=answers)
+        self.assertEqual(names[:3], ["a", None, None], "a name, a text with no front matter (never sent), an empty name")
+        self.assertIs(names[3], adoption_status.UNREADABLE)
+        self.assertEqual(names[4:], [None])
+        self.assertEqual(len(fake_calls(self.directory)), 2, "one call for the version and one for the whole batch")
+
+    def test_a_batch_is_one_call_and_the_blocks_are_data_on_stdin(self):
+        blobs = [f"---\nname: n{index}\n---\n".encode() for index in range(7)]
+        names = self.names(blobs)
+        self.assertEqual(names, [f"n{index}" for index in range(7)])
+        calls = fake_calls(self.directory)
+        self.assertEqual([call["call"] for call in calls], ["version", "parse"])
+        self.assertEqual((calls[1]["blocks"], calls[1]["argv_holds_a_block"], calls[1]["dash_e"]), (7, False, True))
+
+    def test_bun_runs_in_an_empty_directory_with_an_empty_configuration_and_no_home(self):
+        """A bunfig.toml in the caller's directory or home is read by bun, and a preload in it runs code (measured: a preload that is not found stops bun)."""
+        self.names([b"---\nname: a\n---\n"])
+        caller = os.getcwd()
+        for call in fake_calls(self.directory):
+            with self.subTest(call=call["call"]):
+                self.assertNotEqual(call["cwd"], caller)
+                self.assertTrue(call["config_empty"] and call["config_in_cwd"], "an explicit empty configuration in the working directory")
+                self.assertEqual(call["home"], call["cwd"], "the home is the scratch directory")
+                self.assertEqual(set(call["environment"]) - {"PWD", "SHLVL", "_", "LC_CTYPE"}, {"PATH", "HOME", "LANG"}, "nothing else of the caller's environment reaches bun")
+
+    def test_nothing_is_asked_of_bun_when_no_text_has_front_matter(self):
+        names = adoption_status.agent_names([b"no front matter", b"# notes", b""], environ={"PATH": "/nonexistent", adoption_status.BUN_ENV: "/nonexistent/bun"})
+        self.assertEqual(names, [None, None, None])
+        self.assertEqual(adoption_status.agent_names([], environ={}), [])
+
+    def test_a_scratch_directory_that_cannot_be_made_is_unknown(self):
+        with mock.patch.object(adoption_status.tempfile, "TemporaryDirectory", side_effect=PermissionError(errno.EACCES, "denied")):
+            with self.assertRaises(adoption_status.Unknown):
+                self.names([b"---\nname: a\n---\n"])
+
+    def test_a_missing_bun_is_unknown(self):
+        blobs = [b"---\nname: a\n---\n"]
+        with self.assertRaises(adoption_status.Unknown):
+            adoption_status.agent_names(blobs, environ={"PATH": "/nonexistent"})
+        with self.assertRaises(adoption_status.Unknown):
+            adoption_status.agent_names(blobs, environ={"PATH": "/usr/bin:/bin", adoption_status.BUN_ENV: str(self.directory / "absent")})
+
+    def test_the_named_bun_wins_over_the_one_on_path_and_a_named_one_that_is_missing_is_not_replaced(self):
+        named = make_fake_bun(self.directory, version="1.4.3")
+        self.assertEqual(adoption_status.find_bun({"PATH": "/usr/bin", adoption_status.BUN_ENV: str(named)}), str(named))
+        other = self.directory / "other"
+        other.mkdir()
+        shutil.copy(named, other / "bun")
+        self.assertEqual(adoption_status.find_bun({"PATH": str(other)}), str(other / "bun"))
+        self.assertEqual(adoption_status.find_bun({"PATH": str(other), adoption_status.BUN_ENV: "/nonexistent/bun"}), "/nonexistent/bun")
+        self.assertIsNone(adoption_status.find_bun({"PATH": "/nonexistent"}))
+
+    def test_a_bun_that_is_not_the_version_the_client_embeds_is_unknown(self):
+        for version in ("1.4.2", "1.4.4", "1.4", "1.4.3-canary", "", "bun 1.4.3"):
+            with self.subTest(version=version):
+                with self.assertRaises(adoption_status.Unknown):
+                    self.names([b"---\nname: a\n---\n"], version=version)
+        with self.assertRaises(adoption_status.Unknown):
+            self.names([b"---\nname: a\n---\n"], version="1.4.3", version_status=1)
+        self.assertEqual(self.names([b"---\nname: a\n---\n"], version=adoption_status.CLIENT_BUN_VERSION), ["a"])
+
+    def test_every_way_the_answer_can_fail_is_unknown(self):
+        blobs = [b"---\nname: a\n---\n", b"---\nname: b\n---\n"]
+        cases = (("a non-zero status", dict(parse="exit", status=3)), ("an answer that is not JSON", dict(parse="garbage")), ("an answer of the right shape from a bun that fails", dict(parse="echo", exit_after=3)), ("one answer too few", dict(parse="short")),
+                 ("an answer that is not a list", dict(parse="answers", answers={"state": "none"})), ("an item of an unknown state", dict(parse="answers", answers=[{"state": "name", "name": "a"}, {"state": "maybe"}])),
+                 ("a name that is not a string", dict(parse="answers", answers=[{"state": "name", "name": 5}, {"state": "none"}])), ("an item that is not an object", dict(parse="answers", answers=["x", "y"])))
+        for label, behavior in cases:
+            with self.subTest(failure=label):
+                with self.assertRaises(adoption_status.Unknown):
+                    self.names(blobs, **behavior)
+
+    def test_a_vendor_file_that_declares_no_name_is_not_drift_even_when_a_shipped_definition_declares_none(self):
+        """A definition with no name is served under none (the client skips it), so two of them do not collide: the shipped names that a vendor could take are the names that are there."""
+        with tempfile.TemporaryDirectory() as tree:
+            source, home = Path(tree) / "source", Path(tree) / "home"
+            (home / "agents").mkdir(parents=True)
+            source.mkdir()
+            nameless = b"---\ndescription: x\n---\nbody\n"
+            (source / "stack-a.md").write_bytes(nameless)
+            (home / "agents" / "stack-a.md").write_bytes(nameless)
+            (home / "agents" / adoption_status.VENDOR_HOST_AGENTS[0]).write_bytes(b"---\ndescription: y\n---\nbody\n")
+            environ = {"PATH": "/usr/bin:/bin", adoption_status.BUN_ENV: str(make_fake_bun(self.directory))}
+            self.assertEqual(adoption_status.stack_agents_drift(home, source, environ=environ), 0)
+            (home / "agents" / adoption_status.VENDOR_HOST_AGENTS[0]).write_bytes(b"---\nname: stack-a\ndescription: y\n---\nbody\n")
+            (source / "stack-a.md").write_bytes(b"---\nname: stack-a\ndescription: x\n---\nbody\n")
+            (home / "agents" / "stack-a.md").write_bytes(b"---\nname: stack-a\ndescription: x\n---\nbody\n")
+            self.assertEqual(adoption_status.stack_agents_drift(home, source, environ=environ), 1, "the same name in a vendor file is the drift")
+
+    def test_a_bun_that_does_not_answer_in_time_is_unknown(self):
+        with mock.patch.object(adoption_status, "BUN_TIMEOUT_SECONDS", 1):
+            with self.assertRaises(adoption_status.Unknown):
+                self.names([b"---\nname: a\n---\n"], parse="hang")
+
+
+class RealBunTests(unittest.TestCase):
+    """agent_names with the real bun at CLIENT_BUN_VERSION, against what the client itself served (tests/fixtures/agent_frontmatter/client-oracle.json: the installed Claude Code 2.1.296 was started on each text as a
+    project agent and its init record read, by the author's private client_oracle.py). They skip on a developer's machine without that bun and fail under GitHub Actions, where the workflow installs it."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.environ = {"PATH": os.environ.get("PATH", ""), adoption_status.BUN_ENV: real_bun()}
+
+    def names(self, *texts):
+        return adoption_status.agent_names([text.encode("utf-8") if isinstance(text, str) else text for text in texts], environ=self.environ)
+
+    def test_the_pipeline_never_reads_a_name_other_than_the_one_the_client_served(self):
+        """The one-sided property that no reader written here could keep (three rounds missed a spelling): wherever the client served an agent under a name, the pipeline answers that name or says it cannot tell,
+        never none and never another name. Where the client served none (no description, an invalid name, a text that fails both of its attempts) a name from the pipeline is an over-report, the safe direction."""
+        oracle = json.loads(ORACLE.read_text(encoding="utf-8"))
+        entries = oracle["entries"]
+        self.assertGreater(len(entries), 2500)
+        answers = []
+        for start in range(0, len(entries), 500):
+            answers += self.names(*[text for _, text, _ in entries[start:start + 500]])
+        counts, misses = Counter(), []
+        for index, ((family, text, served), answer) in enumerate(zip(entries, answers)):
+            if served is None:
+                counts["over-report" if isinstance(answer, str) else "unreadable-where-none" if answer is adoption_status.UNREADABLE else "agree-none"] += 1
+            elif answer == served:
+                counts["agree"] += 1
+            elif answer is adoption_status.UNREADABLE:
+                counts["unreadable"] += 1
+            else:
+                counts["MISS"] += 1
+                misses.append((family, index))
+        self.assertEqual(misses, [])
+        served_count = sum(1 for _, _, served in entries if served is not None)
+        self.assertEqual(counts["agree"] + counts["unreadable"], served_count)
+        self.assertGreaterEqual(counts["agree"], int(served_count * 0.9), "most of what the client served is read, not merely not-misread")
+
+    def test_the_counterexample_of_the_command_centers_read_and_its_variants_are_read_as_the_client_reads_them(self):
+        """The P1 of #1062 at e7260fd3: a comment line at the left margin between `name:` and its indented value made the hand-written reader answer none (drift 0, complete: true)."""
+        name = "stack-verifier"
+        for label, text in (("a comment at the left margin", f"---\nname:\n# role\n  {name}\ndescription: x\n---\n"), ("a comment on the key line", f"---\nname: # c\n  {name}\ndescription: x\n---\n"),
+                            ("a left-margin comment and a blank line", f"---\nname:\n# role\n\n  {name}\ndescription: x\n---\n"), ("an indented comment", f"---\nname:\n  # role\n  {name}\ndescription: x\n---\n")):
+            with self.subTest(case=label):
+                self.assertEqual(self.names(text), [name])
+
+    def test_a_bunfig_in_the_working_directory_is_not_read(self):
+        """bun reads a bunfig.toml of its working directory and runs its preload (measured with 1.4.3); the call runs in an empty directory, so a caller's directory cannot change what it does."""
+        with tempfile.TemporaryDirectory() as directory:
+            marker = Path(directory) / "ran"
+            (Path(directory) / "preload.js").write_text(f"require('fs').writeFileSync({str(marker)!r}, 'x')\n")
+            (Path(directory) / "bunfig.toml").write_text('preload = ["./preload.js"]\n')
+            before = os.getcwd()
+            os.chdir(directory)
+            try:
+                names = self.names("---\nname: a\n---\n")
+            finally:
+                os.chdir(before)
+            self.assertEqual(names, ["a"])
+            self.assertFalse(marker.exists(), "the preload of the caller's directory ran")
+
+    def test_a_name_with_characters_beyond_ascii_comes_back_exact_whatever_the_locale_of_the_caller(self):
+        name = "caf" + chr(0xE9) + "-" + chr(0x4E2D) + chr(0x6587)
+        self.assertEqual(self.names(f"---\nname: {name}\ndescription: x\n---\n".encode("utf-8")), [name])
+
+    def test_every_shipped_definition_has_a_name_the_parser_reads_on_the_first_attempt(self):
+        blobs = [path.read_bytes() for path in sorted(STACK_AGENTS_SOURCE.glob("*.md"))]
+        names = self.names(*blobs)
+        self.assertTrue(all(isinstance(name, str) and name for name in names), names)
+        self.assertEqual(len(set(names)), len(names), "one name per shipped definition")
+        self.assertEqual(names, [path.stem for path in sorted(STACK_AGENTS_SOURCE.glob("*.md"))], "a shipped definition is named by its file")
+
+    def test_a_name_that_is_not_a_string_is_no_name_as_the_client_serves_none(self):
+        """Iwt serves an agent only under a string name: a number, a boolean, a null, an empty value, a list or a mapping is no name, and what String() would make of one (123, true, null) must not come back as a name."""
+        for label, value in (("a number", "123"), ("a boolean", "true"), ("a null", "null"), ("an empty value", ""), ("a list", "[a, b]"), ("a mapping", "{a: b}"), ("an array of the document", None)):
+            with self.subTest(case=label):
+                text = "---\n- a\n- b\n---\n" if value is None else f"---\nname: {value}\ndescription: x\n---\n"
+                self.assertEqual(self.names(text), [None])
+        self.assertEqual(self.names('---\nname: "123"\ndescription: x\n---\n', "---\nname: 'true'\ndescription: x\n---\n"), ["123", "true"], "a quoted number or boolean is a string")
+
+    def test_a_text_the_parser_throws_on_is_unreadable_where_the_client_goes_on_with_a_second_attempt(self):
+        """The client answers a throw with a rewrite of the text and a second parse (W9t); that is not reproduced here, so the definition is Unknown, never none."""
+        for label, text in (("a description with a colon and a space", "---\nname: a\ndescription: Use when: a thing\n---\n"), ("an unterminated flow sequence", "---\nname: a\ntools: [a, b\n---\n"),
+                            ("text after a closing quote", '---\nname: "a"x\ndescription: x\n---\n')):
+            with self.subTest(case=label):
+                self.assertIs(self.names(text)[0], adoption_status.UNREADABLE)
+
+
+class WorkflowPinTests(unittest.TestCase):
+    """The workflow installs the bun that the check and its tests require, at the release's version and checksum (the repository's pattern for a tool the tests need: the uv step of the same job)."""
+
+    def test_the_validation_workflow_installs_the_bun_the_check_requires(self):
+        text = (ROOT / ".github/workflows/validate.yml").read_text(encoding="utf-8")
+        self.assertIn(f"BUN_VERSION: '{adoption_status.CLIENT_BUN_VERSION}'", text)
+        self.assertIsNotNone(re.search(r"BUN_SHA256: ([0-9a-f]{64})\n", text), "the release's checksum is written in the step")
+        step = text[text.index("BUN_VERSION:"):text.index("Provision the pinned tree-sitter-bash parser")]
+        for needle in ("releases/download/bun-v${BUN_VERSION}/bun-linux-x64.zip", "sha256sum --check", f'echo "{adoption_status.BUN_ENV}=', "bun-linux-x64/bun"):
+            self.assertIn(needle, step)
+        self.assertLess(step.index("sha256sum --check"), step.index("unzip"), "the archive is checked before it is unpacked")
+
+
+class NeedsBunTests(unittest.TestCase):
+    """The tests that need the real bun skip on a developer's machine and fail under GitHub Actions (the command center's adjudication of 2026-10-13, point 4; the pattern of tests/test_token_full_save_evidence.py)."""
+
+    def outcome(self):
+        try:
+            real_bun()
+        except unittest.SkipTest as skipped:
+            return "skip", str(skipped)
+        except AssertionError as failed:
+            return "fail", str(failed)
+        return "returned", ""
+
+    def test_a_missing_bun_skips_locally_and_fails_under_github_actions(self):
+        for ci, expected in (("unset", "skip"), ("true", "fail"), ("false", "skip")):
+            with self.subTest(GITHUB_ACTIONS=ci), mock.patch.dict(os.environ), mock.patch.object(adoption_status, "find_bun", return_value=None):
+                os.environ.pop("GITHUB_ACTIONS", None)
+                if ci != "unset":
+                    os.environ["GITHUB_ACTIONS"] = ci
+                kind, message = self.outcome()
+                self.assertEqual(kind, expected)
+                self.assertIn("is not installed", message)
+
+    def test_a_bun_of_another_version_skips_locally_and_fails_under_github_actions(self):
+        with tempfile.TemporaryDirectory() as directory:
+            bun = make_fake_bun(directory, version="1.4.2")
+            for ci, expected in (("unset", "skip"), ("true", "fail")):
+                with self.subTest(GITHUB_ACTIONS=ci), mock.patch.dict(os.environ), mock.patch.object(adoption_status, "find_bun", return_value=str(bun)):
+                    os.environ.pop("GITHUB_ACTIONS", None)
+                    if ci != "unset":
+                        os.environ["GITHUB_ACTIONS"] = ci
+                    kind, message = self.outcome()
+                    self.assertEqual(kind, expected)
+                    self.assertIn("1.4.2", message)
+
+
 class ClientWiringTests(unittest.TestCase):
     """--client-wiring on fake homes: fixed keys, booleans and counts only, never text from a file."""
 
@@ -2704,189 +3068,182 @@ class ClientWiringTests(unittest.TestCase):
         (agents / ".dot-at-the-top.md").unlink()
         self.assertEqual((self.drift(), self.wiring()["complete"]), (0, True))
 
+    # The rows of the vendor-collision test: (case, the text of a vendor-named file, what the check does). Each row was also given to the installed client (as a project agent with its own name token): the verdict
+    # in the comment is the client's against this check's, see tests/fixtures/agent_frontmatter/client-oracle.json for the corpus. "agree": the check reads the name the client served; "agree-none": the client
+    # served none and the check reads none; "over-report": the client serves nothing from the text (no description, an invalid name) and the check counts a name anyway, the safe direction; "unreadable": the
+    # parse throws and the client goes on with a second attempt that the check does not reproduce, so the count is unknown.
+    COLLISION_ROWS = (
+        ('a comment at the left margin between the key and its indented value', '---\nname:\n# role\n  stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('a comment on the key line, the value below', '---\nname: # c\n  stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('a comment at the left margin, then a blank line, then the value', '---\nname:\n# role\n\n  stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('an indented comment between the key and the value', '---\nname:\n  # role\n  stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('a comment at the left margin after a block scalar header', '---\nname: >-\n# role\n  stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'unknown'),  # unreadable-where-none
+        ('a comment at the left margin after the value', '---\nname:\n  stack-verifier\n# role\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('a quoted value below a comment at the left margin', '---\nname:\n# role\n  "stack-verifier"\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('the plain name', '---\nname: stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('a quoted key', '---\n"name": stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('a single-quoted key', "---\n'name': stack-verifier\ndescription: A fixture.\n---\nBody.\n", 'drift'),  # agree
+        ('a folded block scalar that strips', '---\nname: >-\n  stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('a folded block scalar that clips', '---\nname: >\n  stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'no drift'),  # agree
+        ('a literal block scalar that strips', '---\nname: |-\n  stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('a literal block scalar that clips', '---\nname: |\n  stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'no drift'),  # agree
+        ('an escape sequence in a double-quoted value', '---\nname: "stack-\\u0076erifier"\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('a hexadecimal escape', '---\nname: "stack-\\x76erifier"\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('a byte order mark before the opener', '\ufeff---\nname: stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('CRLF line endings', '---\r\nname: stack-verifier\r\ndescription: A fixture.\r\n---\r\nBody.\r\n', 'drift'),  # agree
+        ('the name in single quotes', "---\nname: 'stack-verifier'\ndescription: A fixture.\n---\nBody.\n", 'drift'),  # agree
+        ('the name in double quotes', '---\nname: "stack-verifier"\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('the name and a comment', '---\nname: stack-verifier # c\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('a hash that starts no comment', '---\nname: stack-verifier#x\ndescription: A fixture.\n---\nBody.\n', 'no drift'),  # agree
+        ('the name with trailing spaces', '---\nname: stack-verifier   \ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('the value on the next line', '---\nname:\n  stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('an anchor on the name', '---\nname: &a stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('a tag on the name', '---\nname: !!str stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('a complex key', '---\n? name\n: stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('the name twice, the last winning', '---\nname: other\nname: stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ("the name twice, the first one's value kept in a first-wins reader", '---\nname: stack-verifier\nname: other\ndescription: A fixture.\n---\nBody.\n', 'no drift'),  # over-report
+        ('a block indented as a whole', '---\n  name: stack-verifier\n  description: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('a flow mapping as the whole block', '---\n{name: stack-verifier, description: x}\n---\nBody.\n', 'drift'),  # agree
+        ('the key in capitals', '---\nName: stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'no drift'),  # agree-none
+        ('a tab inside another value', '---\nname: stack-verifier\ndescription: a\tb\n---\nBody.\n', 'drift'),  # agree
+        ('a name nested under another key', '---\nmeta:\n  name: stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'no drift'),  # agree-none
+        ('a name inside a literal block of another key', '---\nnotes: |\n  name: stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'no drift'),  # agree-none
+        ('a sequence at the left margin before the name', '---\ntools:\n- Read\n- Grep\nname: stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('a flow sequence over two lines in another key', '---\ntools: [a,\n  b]\nname: stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'drift'),  # agree
+        ('an anchor on another key', '---\ndescription: &d x\nname: stack-verifier\n---\nBody.\n', 'drift'),  # agree
+        ('a number as the name', '---\nname: 123\ndescription: A fixture.\n---\nBody.\n', 'no drift'),  # agree-none
+        ('null as the name', '---\nname: null\ndescription: A fixture.\n---\nBody.\n', 'no drift'),  # agree-none
+        ('an empty name', '---\nname:\ndescription: A fixture.\n---\nBody.\n', 'no drift'),  # agree-none
+        ('an empty quoted name', "---\nname: ''\ndescription: A fixture.\n---\nBody.\n", 'no drift'),  # agree-none
+        ('no description', '---\nname: stack-verifier\n---\nBody.\n', 'drift'),  # over-report
+        ('a description that is not a string', '---\nname: stack-verifier\ndescription: [a, b]\n---\nBody.\n', 'drift'),  # over-report
+        ('a flow sequence as the whole block', '---\n[a, b]\n---\nBody.\n', 'no drift'),  # agree-none
+        ('a scalar as the whole block', '---\nname\n---\nBody.\n', 'no drift'),  # agree-none
+        ('a name that starts with a dash', '---\nname: -stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'no drift'),  # over-report
+        ('a name with a colon after normalization', '---\nname: "a:stack-verifier"\ndescription: A fixture.\n---\nBody.\n', 'no drift'),  # over-report
+        ('text after a closing quote', '---\nname: "stack-verifier"x\ndescription: A fixture.\n---\nBody.\n', 'unknown'),  # unreadable-where-none
+        ('an unclosed double quote', '---\nname: "stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'unknown'),  # unreadable-where-none
+        ('a mapping where a name was meant', '---\nname: a: stack-verifier\ndescription: A fixture.\n---\nBody.\n', 'unknown'),  # unreadable-where-none
+        ('a trailing colon', '---\nname: stack-verifier:\ndescription: A fixture.\n---\nBody.\n', 'unknown'),  # unreadable-where-none
+        ('a description with a colon and a space', '---\nname: stack-verifier\ndescription: Use when: a thing\n---\nBody.\n', 'unknown'),  # unreadable
+        ('a stray line at the left margin', '---\nname: stack-verifier\nstray line\ndescription: A fixture.\n---\nBody.\n', 'unknown'),  # unreadable-where-none
+        ('an unterminated flow sequence', '---\nname: stack-verifier\ntools: [a, b\ndescription: A fixture.\n---\nBody.\n', 'unknown'),  # unreadable
+        ('no front matter', 'name: stack-verifier\n', 'no drift'),  # agree-none
+        ('an unterminated block', '---\nname: stack-verifier\n', 'no drift'),  # agree-none
+        ('an empty block', '---\n---\nname: stack-verifier\n', 'no drift'),  # agree-none
+        ('the block ends at the first --- after the opener', '---\ndescription: a --- b\nname: stack-verifier\n---\nBody.\n', 'no drift'),  # agree-none
+        ('an opener followed by spaces and blank lines', '---   \n\nname: stack-verifier\ndescription: x\n---\nBody.\n', 'drift'),  # agree
+        ('an opener with a tab after it', '---\t\nname: stack-verifier\ndescription: x\n---\nBody.\n', 'drift'),  # agree
+        ('a closer with trailing text', '---\nname: stack-verifier\ndescription: x\n--- y\nBody.\n', 'drift'),  # agree
+        ('four dashes', '----\nname: stack-verifier\ndescription: x\n---\nBody.\n', 'no drift'),  # agree-none
+        ('text before the opener', 'text\n---\nname: stack-verifier\ndescription: x\n---\nBody.\n', 'no drift'),  # agree-none
+        ('a space before the opener', ' ---\nname: stack-verifier\ndescription: x\n---\nBody.\n', 'no drift'),  # agree-none
+        ('a blank line before the opener', '\n---\nname: stack-verifier\ndescription: x\n---\nBody.\n', 'no drift'),  # agree-none
+        ('a lone CR line ending', '---\rname: stack-verifier\rdescription: A fixture.\r---\rBody.\r', 'no drift'),  # agree-none
+        ('a line separator in a value', '---\nname: stack-verifier\ndescription: a\u2028b\n---\nBody.\n', 'drift'),  # agree
+    )
+
+    def real_env(self):
+        """The environment of the wiring check with the pinned bun named in it; unavailable (a skip, or a failure under GitHub Actions) where that bun is not installed."""
+        return {**self.env, adoption_status.BUN_ENV: real_bun()}
+
+    def fake_env(self, **behavior):
+        directory = Path(tempfile.mkdtemp(prefix="fake-bun-"))
+        self.addCleanup(shutil.rmtree, directory, True)
+        return {**self.env, adoption_status.BUN_ENV: str(make_fake_bun(directory, **behavior))}, directory
+
     def test_a_vendor_file_that_declares_the_name_of_a_shipped_definition_is_drift(self):
         """Review of #1062 (the Claude read, P3): the four vendor names were exempt whatever they held, and the client keys a definition by its `name`: one that declares a shipped role's name can replace it unseen
-        (of two files declaring one name, one is chosen by file system read order). Review at e22358e46 (the GPT read, P2): the name is read the way the client's parser reads it (the byte order mark, a block scalar), and
-        the count is zero only when the file declares another name; a spelling that is not read is in the test below. Each row's name is what the client's own parser reads from the text (receipts/identity-oracle.txt of the evidence folder agent-drift-check-20261013)."""
+        (of two files that declare one name, one is chosen by file system read order). Rounds 1 and 2 read the name with a reader written here; each missed a spelling that the client's parser reads (a quoted key, a
+        block scalar, a comment line at the left margin). The design round (the command center's adjudication of 2026-10-13) reads it with the client's own parser: every row below is what the client serves."""
         self.wire()
-        vendor = self.home / ".claude/agents" / VENDOR_HOST_AGENTS[0]
-        bom = chr(0xFEFF)
-        sample = ("---\nname: vendors-own\ndescription: A fixture with the shapes of a vendor file.\ntools:\n  - mcp__x__a\n  - mcp__x__b\nmcpServers: [x-mcp]\npermissionMode: dontAsk\n"
-                  "skills: [y-skill]\neffort: low\n---\nbody\n")
-        cases = (("another name", "---\nname: vendors-own\ndescription: x\n---\nbody\n", 0),
-                 ("the shapes of a real vendor file", sample, 0),
-                 ("a shipped name", agent_bytes(AGENT_FILES[0]), 1),
-                 ("a shipped name in double quotes", '---\nname: "source-scout"\n---\n', 1),
-                 ("a shipped name in single quotes", "---\nname: 'stack-verifier'  \n---\n", 1),
-                 ("a shipped name spelt with spaces before the colon", "---\nname : evidence-reviewer\n---\n", 1),
-                 ("a shipped name followed by a YAML comment", "---\nname: evidence-reviewer # the verifier\n---\n", 1),
-                 ("a quoted shipped name followed by a YAML comment", '---\nname: "source-scout" # c\n---\n', 1),
-                 ("the key in capitals is another key: the client reads no name from it", "---\nNAME: stack-verifier\n---\n", 0),
-                 ("a quoted name that merely contains a hash", "---\nname: 'evidence-reviewer # not a comment'\n---\n", 0),
-                 ("the text of a shipped definition under a vendor's name with another name", agent_bytes("someone-else.md"), 0),
-                 ("no front matter at all", "name: evidence-reviewer\n", 0),
-                 ("a name line under no opening block", "intro\nname: evidence-reviewer\n", 0),
-                 ("the name on the next line", "---\nname:\n  evidence-reviewer\n---\n", 1),
-                 ("a folded block scalar", "---\nname: >-\n  source-scout\n---\n", 1),
-                 ("a literal block scalar keeps its line break, so the name it holds is another one", "---\nname: |\n  stack-verifier\n---\n", 0),
-                 ("a stripped literal block scalar", "---\nname: |-\n  stack-verifier\n---\n", 1),
-                 ("a quoted name on the next line", '---\nname:\n  "evidence-reviewer"\n---\n', 1),
-                 ("a comment line before the value", "---\nname:\n  # the role\n  evidence-reviewer\n---\n", 1),
-                 ("a line at the left margin that is no key line is not read", "---\nname:\nevidence-reviewer\n---\n", None),
-                 ("an empty name", "---\nname:\ndescription: x\n---\n", 0),
-                 ("the block ends before any value", "---\nname:\n---\nevidence-reviewer\n", 0),
-                 ("the name after the block", "---\ndescription: x\n---\nname: evidence-reviewer\n", 0),
-                 ("an unterminated block", "---\ndescription: x\n", 0),
-                 ("bytes that are not text", b"\xff\xfe\x00", 0),
-                 ("an invalid byte in the body is read as the client reads it", b"---\nname: stack-verifier\n---\n\xff body\n", 1),
-                 ("an empty file", "", 0),
-                 ("a byte order mark before the opening line", bom + "---\nname: stack-verifier\ndescription: x\n---\nbody\n", 1),
-                 ("CRLF line endings", "---\r\nname: stack-verifier\r\ndescription: x\r\n---\r\nbody\r\n", 1),
-                 ("a sequence at the left margin before the name", "---\ntools:\n- Read\n- Grep\nname: stack-verifier\n---\n", 1),
-                 ("the name after a folded block of another key", "---\ndescription: >\n  folded\nname: stack-verifier\n---\n", 1),
-                 ("a name-like line inside a literal block of another key is not the name", "---\nnotes: |\n  name: stack-verifier\n---\n", 0),
-                 ("a name nested under another key is not the name", "---\nmeta:\n  name: stack-verifier\n---\n", 0),
-                 ("the front matter ends at the first --- after the opener, wherever it stands, so what follows it is the body", "---\ndescription: a --- b\nname: stack-verifier\n---\n", 0))
-        for label, content, expected in cases:
+        env = self.real_env()
+        for label, content, expectation in self.COLLISION_ROWS:
             with self.subTest(case=label):
                 self.write(f".claude/agents/{VENDOR_HOST_AGENTS[0]}", content)
-                report = self.wiring()
-                self.assertEqual(report["claude"]["stack_agents_drift"], expected)
-                self.assertEqual(report["complete"], expected == 0, "a count that is not zero, or unknown, is never complete wiring")
-        vendor.unlink()
-        self.assertEqual(self.drift(), 0)
+                report = self.wiring(env)
+                self.assertEqual(report["claude"]["stack_agents_drift"], {"drift": 1, "no drift": 0, "unknown": None}[expectation])
+                self.assertEqual(report["complete"], expectation == "no drift", "a count that is not zero, or unknown, is never complete wiring")
+        (self.home / ".claude/agents" / VENDOR_HOST_AGENTS[0]).unlink()
+        self.assertEqual(self.drift(env), 0)
         for name in VENDOR_HOST_AGENTS:  # each of the four, with a shipped name
             with self.subTest(vendor=name):
                 self.write(f".claude/agents/{name}", agent_bytes(AGENT_FILES[1]))
-                self.assertEqual(self.drift(), 1)
+                self.assertEqual(self.drift(env), 1)
                 (self.home / ".claude/agents" / name).unlink()
-        self.assertEqual(self.drift(), 0)
+        self.assertEqual(self.drift(env), 0)
 
-    def test_a_vendor_file_whose_name_is_spelt_in_a_way_the_reader_does_not_take_is_unknown_and_incomplete(self):
-        """Review of #1062 at e22358e46 (the GPT read, P2): the client's parser reads `name` from spellings the first reader missed, so a vendor-named file that declared a shipped name through one of them gave a count of zero and
-        complete wiring. A spelling this reader does not take is unknown (no count, the wiring incomplete), never a zero. The first group reads the shipped name in the client's own parser (receipts/identity-oracle.txt of the evidence folder agent-drift-check-20261013); the second reads
-        another name or none there, and is unknown here as a precaution."""
+    def test_the_vendor_definitions_of_this_host_shape_are_not_drift(self):
+        """The shapes of the four vendor-installed definitions on the first host (a `tools` list over many lines, flow lists for `mcpServers` and `skills`, a permission mode): another name, so no drift."""
         self.wire()
-        bs, tab, nul = chr(92), chr(9), chr(0)
-        reads_the_shipped_name = (
-            ("a quoted key", '---\n"name": stack-verifier\ndescription: x\n---\nbody\n'),
-            ("a single-quoted key", "---\n'name': stack-verifier\ndescription: x\n---\nbody\n"),
-            ("an escape sequence in a double-quoted value", '---\nname: "stack-' + bs + 'u0076erifier"\ndescription: x\n---\nbody\n'),
-            ("a hexadecimal escape", '---\nname: "stack-' + bs + 'x76erifier"\ndescription: x\n---\n'),
-            ("an escape in a quoted key", '---\n"n' + bs + 'u0061me": stack-verifier\ndescription: x\n---\n'),
-            ("a flow mapping", "---\n{name: stack-verifier, description: x}\n---\n"),
-            ("an anchor on the name", "---\nname: &a stack-verifier\ndescription: x\n---\n"),
-            ("a tag on the name", "---\nname: !!str stack-verifier\ndescription: x\n---\n"),
-            ("a complex key", "---\n? name\n: stack-verifier\ndescription: x\n---\n"),
-            ("the name twice, the last winning", "---\nname: other\nname: stack-verifier\ndescription: x\n---\n"),
-            ("a block indented as a whole", "---\n  name: stack-verifier\n  description: x\n---\n"),
-            ("a tab inside a value", "---\nname: stack-verifier\ndescription: a" + tab + "b\n---\n"),
-            ("a control character inside a value", "---\nname: stack-verifier\ndescription: a" + nul + "b\n---\n"),
-            ("a flow sequence over several lines in another key", "---\ntools: [a,\n  b]\nname: stack-verifier\ndescription: x\n---\n"),
-            ("an anchor on another key", "---\ndescription: &d x\nname: stack-verifier\n---\n"),
-            ("an unclosed quote in a sequence entry that could swallow the name line", '---\ntools:\n- "Bash\nname: stack-verifier"\n---\n'),
-            ("a sequence entry after a key that has a value", "---\ndescription: x\n- stray\nname: stack-verifier\n---\n"))
-        reads_another_name_or_none = (
-            ("a value over two lines", "---\nname: stack-\n  verifier\ndescription: x\n---\n"),
-            ("a quoted value over two lines", '---\nname: "stack-\n  verifier"\ndescription: x\n---\n'),
-            ("a block scalar over two lines", "---\nname: >-\n  stack-\n  verifier\n---\n"),
-            ("a block scalar with trailing spaces", "---\nname: >-\n  stack-verifier  \n---\n"),
-            ("a block scalar with an indentation indicator", "---\nname: >2-\n   stack-verifier\ndescription: x\n---\n"),
-            ("a block scalar with a blank line before the text", "---\nname: >-\n\n  stack-verifier\ndescription: x\n---\n"),
-            ("a value on the next line over two lines", "---\nname:\n  stack-\n  verifier\n---\n"),
-            ("the name twice, the first winning in a first-wins reader", "---\nname: stack-verifier\nname: other\ndescription: x\n---\n"),
-            ("an unclosed quote that swallows the name line", '---\ndescription: "unclosed\nname: stack-verifier"\n---\n'),
-            ("a stray line at the left margin", "---\nname: stack-verifier\nstray line\ndescription: x\n---\n"))
-        for group, cases in (("the client reads the shipped name", reads_the_shipped_name), ("the client reads another name or none", reads_another_name_or_none)):
-            for label, content in cases:
-                with self.subTest(group=group, case=label):
-                    self.write(f".claude/agents/{VENDOR_HOST_AGENTS[0]}", content)
-                    report = self.wiring()
-                    self.assertIsNone(report["claude"]["stack_agents_drift"])
-                    self.assertFalse(report["complete"])
+        vendor = ("---\nname: vendors-own\ndescription: A search role of a code index.\ntools:\n  - mcp__x__a\n  - mcp__x__b\nmcpServers: [x-mcp]\npermissionMode: dontAsk\nskills: [y-skill]\neffort: low\n---\nbody\n")
+        self.write(f".claude/agents/{VENDOR_HOST_AGENTS[0]}", vendor)
+        report = self.wiring(self.real_env())
+        self.assertEqual((report["claude"]["stack_agents_drift"], report["complete"]), (0, True))
 
-    def test_the_name_reader_gives_what_the_clients_parser_reads_or_says_unknown(self):
-        """agent_identity against values measured with the client's own parser (Claude Code 2.1.296, the loader's oi(text, path, {normalizeKeys: true}); receipts/identity-oracle.txt): the name, None where the client loads
-        nothing, and Unknown for a spelling that is not taken. A number or YAML null is text here: the client reads no string there, and the safe side is a name that matches nothing."""
-        unknown = object()
-        bom = chr(0xFEFF)
-        rows = (
-            ("a plain name", "---\nname: stack-verifier\ndescription: x\n---\nbody\n", "stack-verifier"),
-            ("a name and a comment", "---\nname: stack-verifier # c\n---\n", "stack-verifier"),
-            ("a hash that starts no comment", "---\nname: stack-verifier#x\n---\n", "stack-verifier#x"),
-            ("trailing spaces", "---\nname: stack-verifier  \n---\n", "stack-verifier"),
-            ("single quotes", "---\nname: 'stack-verifier'\n---\n", "stack-verifier"),
-            ("double quotes", '---\nname: "stack-verifier"\n---\n', "stack-verifier"),
-            ("double quotes and a comment", '---\nname: "stack-verifier" # c\n---\n', "stack-verifier"),
-            ("a doubled single quote", "---\nname: 'it''s'\n---\n", "it's"),
-            ("an empty single-quoted name", "---\nname: ''\n---\n", None),
-            ("an empty double-quoted name", '---\nname: ""\n---\n', None),
-            ("a folded scalar that strips", "---\nname: >-\n  stack-verifier\n---\n", "stack-verifier"),
-            ("a folded scalar that clips", "---\nname: >\n  stack-verifier\n---\n", "stack-verifier\n"),
-            ("a literal scalar that strips", "---\nname: |-\n  stack-verifier\n---\n", "stack-verifier"),
-            ("a literal scalar that clips", "---\nname: |\n  stack-verifier\n---\n", "stack-verifier\n"),
-            ("a block scalar header with a comment", "---\nname: >- # c\n  stack-verifier\n---\n", "stack-verifier"),
-            ("a block scalar with trailing blank lines", "---\nname: >-\n  stack-verifier\n\n\n---\n", "stack-verifier"),
-            ("an empty block scalar", "---\nname: >-\n---\n", None),
-            ("no value", "---\nname:\ndescription: x\n---\n", None),
-            ("the value on the next line", "---\nname:\n  stack-verifier\n---\n", "stack-verifier"),
-            ("the value on the next line after a comment", "---\nname: # c\n  stack-verifier\n---\n", "stack-verifier"),
-            ("a quoted value on the next line", "---\nname:\n  'stack-verifier'\n---\n", "stack-verifier"),
-            ("a number is text here", "---\nname: 123\n---\n", "123"),
-            ("YAML null is text here", "---\nname: null\n---\n", "null"),
-            ("the key in capitals", "---\nName: stack-verifier\n---\n", None),
-            ("no front matter", "name: stack-verifier\n", None),
-            ("an unterminated block", "---\nname: stack-verifier\n", None),
-            ("an empty block", "---\n---\nname: stack-verifier\n", None),
-            ("the block ends at the first --- after the opener", "---\ndescription: a --- b\nname: stack-verifier\n---\n", None),
-            ("the name only below another key", "---\nmeta:\n  name: stack-verifier\n---\n", None),
-            ("the name only in a literal block", "---\nnotes: |\n  name: stack-verifier\n---\n", None),
-            ("a byte order mark", bom + "---\nname: stack-verifier\n---\n", "stack-verifier"),
-            ("CRLF line endings", "---\r\nname: stack-verifier\r\n---\r\n", "stack-verifier"),
-            ("an opener followed by spaces and blank lines", "---   \n\nname: stack-verifier\n---\n", "stack-verifier"),
-            ("a sequence at the left margin before the name", "---\ntools:\n- Read\nname: stack-verifier\n---\n", "stack-verifier"),
-            ("a comment and a blank line between keys", "---\n# c\n\nname: stack-verifier\n---\n", "stack-verifier"),
-            ("a space before the colon", "---\nname : stack-verifier\n---\n", "stack-verifier"),
-            ("text after a closing quote", '---\nname: "stack-verifier"x\n---\n', unknown),
-            ("an unclosed double quote", '---\nname: "stack-verifier\n---\n', unknown),
-            ("an unclosed single quote", "---\nname: 'stack-verifier\n---\n", unknown),
-            ("a mapping where a name was meant", "---\nname: a: stack-verifier\n---\n", unknown),
-            ("a trailing colon", "---\nname: stack-verifier:\n---\n", unknown),
-            ("a sequence where a name was meant", "---\nname:\n  - stack-verifier\n---\n", unknown),
-            ("a quoted key", '---\n"name": stack-verifier\n---\n', unknown),
-            ("an indicator that starts no plain scalar", "---\nname: @stack-verifier\n---\n", unknown),
-            ("a block scalar header with a keep indicator", "---\nname: |+\n  stack-verifier\n---\n", unknown),
-            ("no space after the colon", "---\nname:stack-verifier\ndescription: x\n---\n", unknown),
-            ("a comment with no space after the closing quote", '---\nname: "stack-verifier"# c\n---\n', unknown),
-            ("a plain value continued on an indented line", "---\nname: stack-verifier\n  more\n---\n", unknown),
-            ("a block scalar followed by another key", "---\nname: >-\n  stack-verifier\ndescription: x\n---\n", "stack-verifier"),
-            ("a flow sequence of one line in another key is read", "---\nskills: [a, b]\nname: stack-verifier\n---\n", "stack-verifier"),
-            ("a flow mapping of one line in another key is read", "---\nmcpServers: {x: y}\nname: stack-verifier\n---\n", "stack-verifier"))
-        for label, text, expected in rows:
+    def test_a_vendor_file_without_front_matter_needs_no_bun(self):
+        """Nothing is declared where there is no front matter, so a host without the pinned bun still has a count for the folders that hold such files (the ordinary fixtures of this class)."""
+        self.wire()
+        env = {**self.env, adoption_status.BUN_ENV: "/nonexistent/bun"}
+        for content in (b"", b"# notes\n", b"vendor text\n", b"name: stack-verifier\n"):
+            with self.subTest(content=content[:20]):
+                self.write(f".claude/agents/{VENDOR_HOST_AGENTS[0]}", content)
+                self.assertEqual(self.drift(env), 0)
+
+    def test_without_the_pinned_bun_a_vendor_file_with_front_matter_makes_the_count_unknown_never_zero(self):
+        self.wire()
+        self.write(f".claude/agents/{VENDOR_HOST_AGENTS[0]}", "---\nname: vendors-own\ndescription: x\n---\nbody\n")
+        absent = {**self.env, adoption_status.BUN_ENV: "/nonexistent/bun"}
+        wrong, _ = self.fake_env(version="1.4.2")
+        for label, env in (("no bun at the named path", absent), ("a bun of another version", wrong)):
             with self.subTest(case=label):
-                try:
-                    got = adoption_status.agent_identity(text.encode("utf-8"))
-                except adoption_status.Unknown:
-                    got = unknown
-                self.assertEqual(got, expected)
+                report = self.wiring(env)
+                self.assertIsNone(report["claude"]["stack_agents_drift"])
+                self.assertFalse(report["complete"])
 
-    def test_every_shipped_definition_declares_a_name_the_reader_takes(self):
-        """Nothing to hold a vendor's file against is a count that cannot be made: the checkout's own definitions must be readable."""
-        shipped = sorted(STACK_AGENTS_SOURCE.glob("*.md"))
-        self.assertTrue(shipped)
-        for path in shipped:
-            with self.subTest(definition=path.name):
-                name = adoption_status.agent_identity(path.read_bytes())
-                self.assertIsInstance(name, str)
-                self.assertTrue(name)
-
-    def test_a_shipped_definition_whose_name_cannot_be_read_makes_the_count_unknown(self):
-        """The set of shipped names is what a vendor's file is held against: where one cannot be read, no comparison is made (the first reader dropped it and counted zero for an identical copy)."""
+    def test_the_wiring_hands_one_batch_with_the_shipped_definitions_and_the_vendor_files_to_the_parser(self):
         self.wire()
-        text = '---\n"name": source-scout\ndescription: x\n---\nbody\n'
-        self.write("adoption/agents/claude/" + AGENT_FILES[1], text, self.root)
-        self.write(".claude/agents/" + AGENT_FILES[1], text)
-        report = self.wiring()
+        for name in VENDOR_HOST_AGENTS:
+            self.write(f".claude/agents/{name}", f"---\nname: {name[:-3]}\ndescription: x\n---\nbody\n")
+        env, directory = self.fake_env()
+        self.assertEqual(self.drift(env), 0)
+        calls = fake_calls(directory)
+        self.assertEqual([call["call"] for call in calls], ["version", "parse"], "one process for the whole check")
+        self.assertEqual(calls[1]["blocks"], len(AGENT_FILES) + len(VENDOR_HOST_AGENTS))
+        self.write(f".claude/agents/{VENDOR_HOST_AGENTS[2]}", f"---\nname: {AGENT_FILES[0][:-3]}\ndescription: x\n---\nbody\n")
+        self.assertEqual(self.drift(env), 1, "the stand-in reads `name:` plainly; the vendor file declares a shipped name")
+
+    def test_a_parse_that_throws_for_a_vendor_file_or_for_a_shipped_definition_makes_the_count_unknown(self):
+        self.wire()
+        self.write(f".claude/agents/{VENDOR_HOST_AGENTS[0]}", "---\nname: vendors-own\ndescription: x\n---\nbody\n")
+        shipped = len(AGENT_FILES)
+        for label, position in (("a shipped definition", 0), ("the vendor's own file", shipped)):
+            answers = [{"state": "name", "name": "n"}] * (shipped + 1)
+            answers[position] = {"state": "throws"}
+            env, _ = self.fake_env(parse="answers", answers=answers)
+            with self.subTest(throws=label):
+                report = self.wiring(env)
+                self.assertIsNone(report["claude"]["stack_agents_drift"])
+                self.assertFalse(report["complete"])
+
+    def test_a_bun_that_fails_in_any_way_makes_the_count_unknown(self):
+        self.wire()
+        self.write(f".claude/agents/{VENDOR_HOST_AGENTS[0]}", "---\nname: vendors-own\ndescription: x\n---\nbody\n")
+        for label, behavior in (("a bun that exits with an error", dict(parse="exit", status=1)), ("an answer that is not JSON", dict(parse="garbage")), ("too few answers", dict(parse="short"))):
+            env, _ = self.fake_env(**behavior)
+            with self.subTest(case=label):
+                report = self.wiring(env)
+                self.assertIsNone(report["claude"]["stack_agents_drift"])
+                self.assertFalse(report["complete"])
+
+    def test_every_shipped_definition_is_settled_by_the_parser_before_a_vendor_file_is_held_against_it(self):
+        """A shipped source whose front matter the parser throws on (a description with a colon and a space) leaves nothing to compare the vendors' files with: unknown, as the client's second attempt is not reproduced."""
+        self.wire()
+        source = self.root / "adoption/agents/claude" / AGENT_FILES[0]
+        source.write_bytes(source.read_bytes().replace(b"description: ", b"description: Use when: ", 1))
+        (self.home / ".claude/agents" / AGENT_FILES[0]).write_bytes(source.read_bytes())
+        self.write(f".claude/agents/{VENDOR_HOST_AGENTS[0]}", "---\nname: vendors-own\ndescription: x\n---\nbody\n")
+        report = self.wiring(self.real_env())
         self.assertIsNone(report["claude"]["stack_agents_drift"])
         self.assertFalse(report["complete"])
 
@@ -2909,7 +3266,7 @@ class ClientWiringTests(unittest.TestCase):
             self.assertEqual(self.drift(), 0)
         finally:
             vendor.chmod(0o644)
-        self.assertEqual(self.drift(), 1)
+        self.assertEqual(self.drift(self.real_env()), 1)
 
     def test_a_folder_that_cannot_be_listed_after_it_was_opened_is_unknown(self):
         self.wire()
@@ -3209,7 +3566,7 @@ class ClientWiringTests(unittest.TestCase):
 
     def test_the_limitations_name_the_agent_folders_the_check_compares(self):
         text = CLIENT_WIRING_LIMITATIONS[0]
-        for needle in ("Claude agent definitions", "adoption/agents/claude", "must be 0", "any folder below it", "never through a link", "cannot be told"):
+        for needle in ("Claude agent definitions", "adoption/agents/claude", "must be 0", "any folder below it", "never through a link", "cannot be told", "Bun.YAML.parse"):
             self.assertIn(needle, text)
 
     def test_a_text_value_can_never_leave_the_check(self):

@@ -187,8 +187,10 @@ clients. `client_wiring` checks three places:
   absent, a link, a folder or not equal, and each other `*.md` at any depth (the client loads
   that folder recursively), except the four vendor-installed search definitions at the top
   (`codebase-memory`, `codebase-memory-auditor`, `codebase-memory-scout`, `semble-search`),
-  which count too when their front matter declares the name of a shipped definition (read as
-  the client's parser reads it; the count is `null` where the name they declare cannot be told).
+  which count too when their front matter declares the name of a shipped definition (read by the
+  client's own YAML parser, `Bun.YAML.parse`, run by a `bun` of the version the client embeds, 1.4.3,
+  on `PATH` or named in `AGENT_FRONTMATTER_BUN`; the count is `null` where there is no such bun or
+  the name they declare cannot be told).
   The client serves a user-scope definition to every project that does not define the name itself, so a
   stale or wider copy (an omitted `tools` field means every tool) goes unseen until something
   reads it. The count must be 0 and is part of the wiring rule; it is `null` when the

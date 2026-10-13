@@ -13,6 +13,24 @@ DOCUMENTS = (ROOT / "docs/decisions/2026-10-13-claude-agent-drift-check.md", EVI
 SUMMARY = re.compile(r"^(\d+) mutants, (\d+) killed, survivors: none$", re.MULTILINE)
 
 
+TEST_NAME = re.compile(r"`(test_[a-z0-9_]+)`")
+DEFINED = re.compile(r"^\s*def (test_[a-z0-9_]+)\(", re.MULTILINE)
+
+
+class CitedTestTests(unittest.TestCase):
+    """Review of #1062 at e7260fd3 (the command center's Claude read, P3): the record cited a test that a round had renamed. Every test the record or the receipts README names exists in the test files."""
+
+    def test_every_test_the_record_and_the_readme_cite_exists(self):
+        defined = set()
+        for path in sorted((ROOT / "tests").glob("test_*.py")):
+            defined.update(DEFINED.findall(path.read_text(encoding="utf-8", errors="replace")))
+        for document in DOCUMENTS:
+            cited = sorted(set(TEST_NAME.findall(document.read_text(encoding="utf-8"))))
+            with self.subTest(document=document.name):
+                self.assertTrue(cited, "the document cites no test")
+                self.assertEqual([name for name in cited if name not in defined], [])
+
+
 class MutationCountTests(unittest.TestCase):
     def receipts(self):
         found = sorted((EVIDENCE / "receipts").glob("mutants-*.txt"))
