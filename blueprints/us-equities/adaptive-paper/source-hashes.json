@@ -77,6 +77,7 @@
   "tests/test_adaptive_paper_start_readiness.py": "41fa8789dd6bb9e7f23a3ea3be1a0fc7c3019acf5b8d2c90478bfb706d4b2852",
   "tests/test_adaptive_paper_strategies.py": "f0814b36909f2fc6b4c4213b4142ffc13339740f0397c99ad9c7c81982e2033a",
   "tests/test_adaptive_paper_stream_backpressure.py": "cd2c849bd0381034bb1f6679d05bc33bda94f3a0ce6e95985bd92c68c7a90d25",
+  "tests/test_adaptive_paper_readiness_backpressure.py": "5a26dbf2ecb02e32a7dac4ab19584138969f757ab4511b38d66716473b1252b4",
   "tests/test_adaptive_paper_transport.py": "31858d27903478559830f4e4bb098243c9a096e44712767b4beadb77aaf4aabe",
   "tests/test_alpaca_admission_regressions.py": "eda6f09d15346c4162619ee390e6eff4f4cce447b91bbb00e789258b44640442",
   "tests/test_mover_exit_chain.py": "74d91bd14ffb76ab2a499072a756d0b4bfdf9af70ac88905ac075bcdd9028e7a",
