@@ -57848,8 +57848,8 @@
     },
     {
       "path": "evidence/artifacts/trading-handbook-20261013/alpaca-throughput/audit_publication_safety.py",
-      "sha256": "885a4ce7e711454950438015926d1122262acd1a733720a9536b5fc8c5c93204",
-      "bytes": 5496
+      "sha256": "11faefdfa5036c95b6b2aa2368e13d66ce23ab46e0ea2da72a54e7d7a8bc5d20",
+      "bytes": 6525
     },
     {
       "path": "evidence/artifacts/trading-handbook-20261013/alpaca-throughput/generate_alpaca_throughput_evidence.py",
@@ -57858,8 +57858,8 @@
     },
     {
       "path": "evidence/artifacts/trading-handbook-20261013/alpaca-throughput/verify_alpaca_throughput_evidence.py",
-      "sha256": "f8222eeb6e445c1c79d89d5c6497bcd0d77b29442f1a1a65b7617f28a732217b",
-      "bytes": 16031
+      "sha256": "f32cf09ea87740b810a7171763286386ffe99c759b34958aa0af7bcc18a74e06",
+      "bytes": 17344
     },
     {
       "path": "evidence/artifacts/trading-runtime-2604-20261004/build-constraint-proof.json",
@@ -62638,8 +62638,8 @@
     },
     {
       "path": "tests/test_alpaca_throughput_publication.py",
-      "sha256": "edcc57ec13406b91e4b9397a6d32eaf5643fdc0f6e2dc6121c3cee452b6339f8",
-      "bytes": 9173
+      "sha256": "caf4a5e9bdc6e95ff9e7f17458de6ab217198b72a580a17d77849ca678a01b46",
+      "bytes": 14757
     },
     {
       "path": "tests/test_anthropic_key_health.py",

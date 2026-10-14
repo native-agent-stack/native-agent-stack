@@ -50,7 +50,8 @@ def main(argv=None):
     a2 = json.loads((cap / "capacity-200-pre-a2.json").read_bytes())
     a1 = json.loads((cap / "capacity-200-pre-a1.json").read_bytes())
     journal = [json.loads(line) for line in (cap / "capacity-200-pre-a2.journal.jsonl").read_bytes().splitlines()]
-    obs = json.loads(Path(args.observer_receipt).read_bytes())["summary"]
+    observer_receipt = json.loads(Path(args.observer_receipt).read_bytes())
+    obs = observer_receipt["summary"]
     run = ev["capacity_run"]
 
     # -- header probes (three accounts) --
@@ -90,6 +91,9 @@ def main(argv=None):
     # -- windows and phase totals --
     w = a2["throughput"]["windows"]
     full = [x for x in w if x["full"]]
+    check("recorded block A", [{key: row[key] for key in
+                                ("index", "full", "submits", "cancels", "order_actions", "reads")}
+                               for row in w], run["throughput"]["windows"])
     check("full windows count", run["throughput"]["full_windows"], len(full))
     check("five full windows, each 180 order actions", [180] * 5, [x["order_actions"] for x in full])
     check("submits + cancels per window equals order_actions (all windows)", True, all(x["submits"] + x["cancels"] == x["order_actions"] for x in w))
@@ -177,6 +181,18 @@ def main(argv=None):
 
     # -- independent observer --
     io = ev["independent_observer"]
+    for field in ("orders_listed_in_window", "status_counts", "submits", "cancels_recorded",
+                  "actions_total", "filled_qty_total", "span_seconds", "full_windows",
+                  "min_actions_full_window", "max_actions_full_window", "min_submits_full_window", "matches"):
+        check("recorded block B: " + field, obs[field], io[field])
+    check("recorded block B: prefix totals", (obs["with_prefix"], obs["without_prefix"]),
+          (io["orders_with_prefix"], io["orders_without_prefix"]))
+    check("recorded block B: observations", observer_receipt["http_statuses"], io["http_statuses"])
+    check("recorded block B: kind", observer_receipt["kind"], io["kind"])
+    check("recorded block B: observed time", observer_receipt["started_utc"][:19] + "Z", io["observed_at_utc"])
+    check("recorded block B: entries", [{key: row[key] for key in
+                                        ("index", "full", "submits", "cancels", "actions")}
+                                       for row in obs["windows"]], io["windows"])
     check("observer: orders listed", io["orders_listed_in_window"], obs["orders_listed_in_window"])
     check("observer: 496 listed, 496 canceled, 0 filled", (496, {"canceled": 496}, 0.0),
           (obs["orders_listed_in_window"], obs["status_counts"], obs["filled_qty_total"]))

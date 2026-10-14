@@ -12,6 +12,7 @@ import io
 import json
 from pathlib import Path
 import sys
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -129,7 +130,13 @@ class ThroughputPublicationTests(unittest.TestCase):
         (cap / "capacity-200-pre-a2.journal.jsonl").write_text(
             "".join(json.dumps(row) + "\n" for row in journal))
         observer = scratch / "observer.json"
-        observer.write_text(json.dumps({"summary": document["independent_observer"]}))
+        summary = copy.deepcopy(document["independent_observer"])
+        summary["with_prefix"] = summary["orders_with_prefix"]
+        summary["without_prefix"] = summary["orders_without_prefix"]
+        observer.write_text(json.dumps({"summary": summary,
+                                       "kind": document["independent_observer"]["kind"],
+                                       "started_utc": document["independent_observer"]["observed_at_utc"],
+                                       "http_statuses": document["independent_observer"]["http_statuses"]}))
         prefixes = {"lane_a": "lane-a", "lane_b": "lane-b", "account_c": "acct-c"}
         for name, rows in document["rate_limit_headers"]["accounts"].items():
             for version in ("v1", "v2"):
@@ -162,6 +169,99 @@ class ThroughputPublicationTests(unittest.TestCase):
                     with contextlib.redirect_stdout(io.StringIO()):
                         code = self.verifier.main(["--evidence", str(path), *arguments])
                     self.assertEqual(code, 1 if field else 0)
+
+    def publication_entrypoints(self, root, document, arguments, *, spelling=0):
+        path = root / "candidate.json"
+        text = json.dumps(document, indent=2, sort_keys=True) + "\n"
+        if spelling:
+            text = text.replace(chr(64), "\\u0040")
+        path.write_text(text)
+        output = root / "export.json"
+        output.unlink(missing_ok=True)
+        commands = [
+            ["generate_alpaca_throughput_evidence.py", "--public-evidence", str(path), "--out", str(output)],
+            ["audit_publication_safety.py", str(path)],
+            ["verify_alpaca_throughput_evidence.py", "--evidence", str(path), *arguments],
+        ]
+        return [subprocess.run([sys.executable, str(ARTIFACTS / command[0]), *command[1:]],
+                               capture_output=True, timeout=20).returncode
+                for command in commands]
+
+    def test_verdict_line_13(self):
+        with tempfile.TemporaryDirectory() as scratch:
+            root = Path(scratch)
+            document, arguments = self.synthetic_inputs(root)
+            self.assertEqual(self.publication_entrypoints(root, document, arguments), [0, 0, 0])
+            self.assertEqual((root / "export.json").read_bytes(), EVIDENCE.read_bytes())
+            value = hashlib.sha256(b"synthetic restricted fixture").hexdigest()
+            for index, item in enumerate((value, value[:8])):
+                candidate = copy.deepcopy(document)
+                candidate["additional"] = {item: "receipt"}
+                codes = self.publication_entrypoints(root, candidate, arguments)
+                for operation, code in enumerate(codes):
+                    with self.subTest(case=index, operation=operation):
+                        self.assertNotEqual(code, 0)
+
+    def test_verdict_line_25(self):
+        with tempfile.TemporaryDirectory() as scratch:
+            root = Path(scratch)
+            document, arguments = self.synthetic_inputs(root)
+            self.assertEqual(self.publication_entrypoints(root, document, arguments), [0, 0, 0])
+            value = "probe" + chr(64) + "example" + ".invalid"
+            for placement in range(2):
+                for spelling in range(2):
+                    candidate = copy.deepcopy(document)
+                    if placement:
+                        candidate["additional"] = {value: "receipt"}
+                    else:
+                        candidate["provenance"]["private_receipts"][0]["name"] = value
+                    codes = self.publication_entrypoints(root, candidate, arguments, spelling=spelling)
+                    for operation, code in enumerate(codes):
+                        with self.subTest(case=placement, variant=spelling, operation=operation):
+                            self.assertNotEqual(code, 0)
+
+    def test_local_review_finding_2(self):
+        with tempfile.TemporaryDirectory() as scratch:
+            root = Path(scratch)
+            document, arguments = self.synthetic_inputs(root)
+            cases = [
+                ("independent_observer", "status_counts", {"filled": 496}),
+                ("independent_observer", "filled_qty_total", 496),
+                ("independent_observer", "submits", 1),
+                ("independent_observer", "cancels_recorded", 1),
+                ("independent_observer", "actions_total", 0),
+                ("independent_observer", "orders_with_prefix", 0),
+                ("independent_observer", "orders_without_prefix", 496),
+                ("independent_observer", "matches", {"no_fills": False}),
+            ]
+            candidates = [copy.deepcopy(document)]
+            for block, field, value in cases:
+                candidate = copy.deepcopy(document)
+                candidate[block][field] = value
+                candidates.append(candidate)
+            for field, value in [("index", 99), ("full", False), ("submits", 1),
+                                 ("cancels", 1), ("order_actions", 4), ("reads", 1)]:
+                candidate = copy.deepcopy(document)
+                candidate["capacity_run"]["throughput"]["windows"][0][field] = value
+                candidates.append(candidate)
+            for operation in range(3):
+                candidate = copy.deepcopy(document)
+                windows = candidate["capacity_run"]["throughput"]["windows"]
+                if operation == 0:
+                    windows.pop()
+                elif operation == 1:
+                    windows.append(copy.deepcopy(windows[-1]))
+                else:
+                    windows[0], windows[1] = windows[1], windows[0]
+                candidates.append(candidate)
+            path = root / "candidate.json"
+            for index, candidate in enumerate(candidates):
+                with self.subTest(case=index):
+                    path.write_text(json.dumps(candidate))
+                    self.verifier.RESULTS.clear()
+                    with contextlib.redirect_stdout(io.StringIO()):
+                        code = self.verifier.main(["--evidence", str(path), *arguments])
+                    self.assertEqual(code, 0 if index == 0 else 1)
 
 
 if __name__ == "__main__":

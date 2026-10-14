@@ -38,13 +38,38 @@ CLASSES = {
 }
 
 
+def json_identifier_errors(document):
+    errors = []
+
+    def inspect(text):
+        if any(pattern.search(text) for pattern in CLASSES.values()):
+            errors.append("publication policy refused text")
+        runs = LONG_RUN.findall(HEX_DIGEST.sub(" ", text))
+        if any(not EPOCH_SECONDS.match(run) for run in runs):
+            errors.append("publication policy refused text")
+
+    def visit(value):
+        if isinstance(value, dict):
+            for key, child in value.items():
+                inspect(key)
+                visit(child)
+        elif isinstance(value, list):
+            for child in value:
+                visit(child)
+        elif isinstance(value, str):
+            inspect(value)
+
+    visit(document)
+    return errors
+
+
 def projection_publication_errors(document):
     """#1090 blocker 1: private sources are name-only, never fingerprinted.
 
     Existing facts bindings identify published code, not receipts. All other
     seven-or-more-hex tokens are refused without values in diagnostics.
     """
-    errors = []
+    errors = json_identifier_errors(document)
     receipts = document.get("provenance", {}).get("private_receipts", [])
     if not isinstance(receipts, list) or any(
             not isinstance(row, dict) or set(row) != {"name"}
@@ -54,6 +79,8 @@ def projection_publication_errors(document):
     def visit(value, path=()):
         if isinstance(value, dict):
             for key, child in value.items():
+                if re.search(r"[0-9a-fA-F]{7,}", key):
+                    errors.append("publication policy refused field")
                 visit(child, (*path, key))
         elif isinstance(value, list):
             for index, child in enumerate(value):
@@ -88,6 +115,8 @@ def main(argv):
             document = json.loads(text)
         except ValueError:
             document = None
+        if document is not None:
+            row["decoded_json_identifiers"] = len(json_identifier_errors(document))
         if isinstance(document, dict) and str(document.get("schema", "")).startswith("alpaca-throughput-evidence/"):
             row["projection_publication_policy"] = len(projection_publication_errors(document))
         for name, pattern in CLASSES.items():
