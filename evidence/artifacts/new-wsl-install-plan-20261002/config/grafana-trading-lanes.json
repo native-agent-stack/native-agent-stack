@@ -595,12 +595,13 @@
       "fieldConfig": {
         "defaults": {
           "unit": "dateTimeAsIso",
+          "noValue": "Not recorded",
           "mappings": [
             {
               "type": "value",
               "options": {
                 "-1000": {
-                  "text": "No receipt / not live"
+                  "text": "Not recorded"
                 }
               }
             }
@@ -1190,12 +1191,13 @@
       "fieldConfig": {
         "defaults": {
           "unit": "dateTimeAsIso",
+          "noValue": "Not recorded",
           "mappings": [
             {
               "type": "value",
               "options": {
                 "-1000": {
-                  "text": "No receipt / not live"
+                  "text": "Not recorded"
                 }
               }
             }
@@ -1785,12 +1787,13 @@
       "fieldConfig": {
         "defaults": {
           "unit": "dateTimeAsIso",
+          "noValue": "Not recorded",
           "mappings": [
             {
               "type": "value",
               "options": {
                 "-1000": {
-                  "text": "No receipt / not live"
+                  "text": "Not recorded"
                 }
               }
             }
@@ -2380,12 +2383,13 @@
       "fieldConfig": {
         "defaults": {
           "unit": "dateTimeAsIso",
+          "noValue": "Not recorded",
           "mappings": [
             {
               "type": "value",
               "options": {
                 "-1000": {
-                  "text": "No receipt / not live"
+                  "text": "Not recorded"
                 }
               }
             }
@@ -2975,12 +2979,13 @@
       "fieldConfig": {
         "defaults": {
           "unit": "dateTimeAsIso",
+          "noValue": "Not recorded",
           "mappings": [
             {
               "type": "value",
               "options": {
                 "-1000": {
-                  "text": "No receipt / not live"
+                  "text": "Not recorded"
                 }
               }
             }
@@ -3570,12 +3575,13 @@
       "fieldConfig": {
         "defaults": {
           "unit": "dateTimeAsIso",
+          "noValue": "Not recorded",
           "mappings": [
             {
               "type": "value",
               "options": {
                 "-1000": {
-                  "text": "No receipt / not live"
+                  "text": "Not recorded"
                 }
               }
             }
@@ -4234,12 +4240,13 @@
       "fieldConfig": {
         "defaults": {
           "unit": "dateTimeAsIso",
+          "noValue": "Not recorded",
           "mappings": [
             {
               "type": "value",
               "options": {
                 "-1000": {
-                  "text": "No receipt / not live"
+                  "text": "Not recorded"
                 }
               }
             }

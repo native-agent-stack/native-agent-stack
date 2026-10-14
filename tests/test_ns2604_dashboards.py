@@ -64,6 +64,13 @@ class Ns2604DashboardTests(unittest.TestCase):
             self.assertNotIn("e", key.lower(), "Missing-value mapping must survive native decimal LogQL output")
             self.assertEqual("Not recorded", value["text"])
 
+    def test_unstarted_lane_last_receipt_stat_has_explicit_not_recorded_fallback(self):
+        board = G.dashboards()["grafana-trading-lanes.json"]
+        panel = next(p for p in board["panels"] if p["title"] == "I-llm · Last receipt time")
+        defaults = panel["fieldConfig"]["defaults"]
+        self.assertEqual("Not recorded", defaults.get("noValue"))
+        self.assertEqual("Not recorded", defaults["mappings"][0]["options"]["-1000"]["text"])
+
     def test_retarget_changes_only_datasources_and_prometheus_metric_names(self):
         board = {"panels": [
             {"id": 1, "datasource": {"type": "prometheus", "uid": "ecosystem-prometheus"}, "targets": [

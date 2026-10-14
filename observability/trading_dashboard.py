@@ -52,7 +52,7 @@ def dashboard():
         panels.append({"id": identifier, "type": "stat", "title": lane + (" · No session since / last receipt" if lane == "IBKR" else " · Last receipt time"),
                        "description": "IBKR: no session since this receipt time. Other lanes: source timestamp, not observation time.",
                        "datasource": SOURCE, "gridPos": {"x": 0, "y": y + 5, "w": 24, "h": 2},
-                       "fieldConfig": {"defaults": {"unit": "dateTimeAsIso", "mappings": [{"type": "value", "options": {"-1000": {"text": "No receipt / not live"}}}]}, "overrides": []},
+                       "fieldConfig": {"defaults": {"unit": "dateTimeAsIso", "noValue": "Not recorded", "mappings": [{"type": "value", "options": {"-1000": {"text": "Not recorded"}}}]}, "overrides": []},
                        "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": False}, "graphMode": "none"},
                        "targets": [{"refId": "A", "expr": expression(lane, "source_unix") + " * 1000", "queryType": "instant"}]})
         identifier += 1
