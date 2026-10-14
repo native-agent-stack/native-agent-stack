@@ -5237,8 +5237,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "a026b23a199814534e94acd948dc11b01ac53bfbd90b292d9ab3c73032eadd9a",
-      "bytes": 46696
+      "sha256": "2625973cbe8b5aa17d84a9e2309ce90bdd06872afddcd005b58b40bd5b786fb4",
+      "bytes": 50453
     },
     {
       "path": ".gitignore",
@@ -11488,8 +11488,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-read-deltas.json",
-      "sha256": "f1fc89bb64f6094398b679cea33f05df077706dd663de0c156fe71baeb5d8332",
-      "bytes": 1033
+      "sha256": "1d617390cb65971935836b0a5732155ca7748f9ff79fe1223bbb9480d512fad8",
+      "bytes": 1256
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
@@ -11545,6 +11545,16 @@
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261013-pr1074-delta.json",
       "sha256": "b1c9a6f590066a80876670bef8e439c9b4d163b18a6197ec9c3028ef1d0edde9",
       "bytes": 15771
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261014-pr1094-delta.json",
+      "sha256": "ae9c8fb12471d462a8cda9659ba1106d7279776f80a52cbed205fdbcc97fab74",
+      "bytes": 13535
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261014-pr1094-rebase-delta.json",
+      "sha256": "5f81fe355c0fc06bff935047a6ea27ef16588917a9a537710d7692a0e1ec5872",
+      "bytes": 16981
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unit-pass.txt",
@@ -62102,6 +62112,11 @@
       "bytes": 14662
     },
     {
+      "path": "scripts/run_integration_tests.py",
+      "sha256": "5c2752e9faf8bb7640245fcfbbccf4ac2783e09b24c215b1e500078259db87cb",
+      "bytes": 1404
+    },
+    {
       "path": "scripts/saturation_ledger.py",
       "sha256": "611b5640c92b3985675f3405770405cdc2a9552a8b5e6bc3b3f7a868168f6b76",
       "bytes": 110935
@@ -63220,6 +63235,11 @@
       "path": "tests/test_install_skills.py",
       "sha256": "6d939894cbcde3839bcbb373a4a985d37387704d5badff69718c2bb32e279682",
       "bytes": 233774
+    },
+    {
+      "path": "tests/test_integration_ci.py",
+      "sha256": "650c049b9b5d14f6644987a80665a813cadb0b070ef14ad7eccac7d2ba78350d",
+      "bytes": 9315
     },
     {
       "path": "tests/test_j775_panel_contracts.py",
@@ -64493,8 +64513,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "85bcad7c52f8402a30558e3da35e5436a4aefa6eed7ecee7187b198eecdb95f7",
-      "bytes": 760049
+      "sha256": "41d52366891119047d9b609f49efc5ab5fdb8470293227e157833962895b9caa",
+      "bytes": 760133
     },
     {
       "path": "tools/omniroute/gateway_record.py",
