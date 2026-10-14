@@ -16553,13 +16553,28 @@
     },
     {
       "path": "blueprints/us-equities/order-throughput/README.md",
-      "sha256": "2566538eb7fcdca0ed08f2177c8da75c1127c221a32e30498f7553ca3cd2fda1",
-      "bytes": 26070
+      "sha256": "cd3d75b611199d495bfa4b0243d84956261f6a370a68e24d8f6b2188cd673de2",
+      "bytes": 26448
+    },
+    {
+      "path": "blueprints/us-equities/order-throughput/alpaca_capacity_port.py",
+      "sha256": "447ca17e9c86ea7518d23a1f4b42bf042108473e5a99ff47f52388b44b4b6961",
+      "bytes": 14882
     },
     {
       "path": "blueprints/us-equities/order-throughput/capacity.py",
-      "sha256": "ae22572ba814f2c561ea7bd4ee8c13611881098932ad448100b0fd000136b3f5",
-      "bytes": 82333
+      "sha256": "4560b9f964408986e789a81dd78507b2832219ad1eb461759a3cca495e853bd4",
+      "bytes": 88096
+    },
+    {
+      "path": "blueprints/us-equities/order-throughput/probe-modes.md",
+      "sha256": "5a7e1a9f69e544d56b15b4a6e77031285ad827e7c153826d54ccccde56c27c8e",
+      "bytes": 6201
+    },
+    {
+      "path": "blueprints/us-equities/order-throughput/rate_governor.py",
+      "sha256": "915ff5d83ce61e1c19d76d17448885a8d0c994bc1d7563252ec057160681d1cf",
+      "bytes": 12282
     },
     {
       "path": "blueprints/us-equities/order-throughput/rate_limit_evidence.py",
@@ -62440,6 +62455,21 @@
       "path": "tests/test_capability_gate.py",
       "sha256": "60252de360d48a773ce32165f8eb0ab2e8e9f166d052bce280db54b68b0102ae",
       "bytes": 38580
+    },
+    {
+      "path": "tests/test_capacity_place_only_refusal.py",
+      "sha256": "ff67b129f91bb86720406d445be1239326d790c4316b3a0a419fefe8325c51c1",
+      "bytes": 3519
+    },
+    {
+      "path": "tests/test_capacity_probe_modes.py",
+      "sha256": "70fd6815bed7288ec372f4b06a29f59cac408a4a9823c5543c4c7c21234aaf63",
+      "bytes": 9786
+    },
+    {
+      "path": "tests/test_capacity_probe_stop_stage.py",
+      "sha256": "407a0487dffdd818fbeb5cb80b19bb6540a0334efad55f4f673042a89b48efd9",
+      "bytes": 4777
     },
     {
       "path": "tests/test_catalog_decisions.py",

@@ -7,7 +7,7 @@ Everything that touches the network is reused read-only from
   ``GuardedSession``: origin pinned to https://paper-api.alpaca.markets, SDK
   retries set to zero, redirects rejected, and only GET reads, POST /v2/orders
   and DELETE /v2/orders/{uuid} admitted. DELETE /v2/orders (cancel-all) is not
-  an admitted path, so ``supports_cancel_all`` is False here.
+  an admitted path. Place-only is refused until flat recovery is qualified.
 * ``GuardedSession``'s observer supplies status and the x-ratelimit-limit,
   x-ratelimit-remaining, x-ratelimit-reset and retry-after headers per call.
 * ``preflight`` performs the read-only account/clock/positions/open-orders/
@@ -55,7 +55,11 @@ class AlpacaCapacityPort:
     evidence_class = "native_paper"
     supports_cancel_all = False
 
-    def __init__(self, api_key, secret_key, symbol, *, feed="iex", workers=4, stop_file=None):
+    def __init__(self, api_key, secret_key, symbol, *, feed="iex", workers=4, stop_file=None, place_only=False):
+        if type(place_only) is not bool:
+            raise transport.TransportError("place-only must be explicit boolean")
+        if place_only:
+            raise transport.TransportError("place-only requires qualified flat recovery")
         if not api_key or not secret_key:
             raise transport.TransportError("explicit credentials required")
         self._key, self._secret = api_key, secret_key
