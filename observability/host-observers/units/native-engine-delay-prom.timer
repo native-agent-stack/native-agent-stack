@@ -1,0 +1,10 @@
+[Unit]
+Description=Native engine delay sidecar, every 30 seconds
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=30s
+AccuracySec=2s
+
+[Install]
+WantedBy=timers.target

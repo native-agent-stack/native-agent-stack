@@ -1,0 +1,14 @@
+[Unit]
+Description=Native network probe: DNS and TCP checks of two public resolvers and the system resolver, as node exporter textfile metrics (idle class)
+Documentation=file:%h/.local/share/native-agent-stack/host-observers/README.md
+# Inverse: systemctl --user disable --now native-net-probe.timer; remove this file and the timer; remove net-probe.prom from the textfile directory.
+# Command center YES of 2026-10-14 (the active probe that keeps a quiet weekend from false-firing the eth0 silence alert). It sends one DNS query and one TCP connect to each of 1.1.1.1 and 9.9.9.9
+# and resolves one name through the system resolver; no credential, no payload beyond a standard query, once a minute.
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 -I %h/.local/share/native-agent-stack/host-observers/net_probe.py %h/.config/native-agent-stack/monitoring/textfile/net-probe.prom --resolvers 1.1.1.1,9.9.9.9 --name api.anthropic.com --timeout 2
+Nice=19
+CPUWeight=idle
+IOSchedulingClass=idle
+TimeoutStartSec=20

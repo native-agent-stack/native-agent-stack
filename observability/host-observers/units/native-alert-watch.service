@@ -1,0 +1,19 @@
+[Unit]
+Description=Native alert watch: one journal line per state change of the Grafana alert rules labelled notify=cc (read-only, idle class)
+Documentation=file:%h/.local/share/native-agent-stack/host-observers/README.md
+# Inverse: systemctl --user disable --now native-alert-watch.service; remove this file. Its journal lines stay in the journal.
+# The command center reads it with Monitor: journalctl --user -u native-alert-watch.service -f -o cat
+# Command center request, 2026-10-14 (route the eth0-silent alert to the CC socket). It reads Grafana's rule state without a sign-in and holds no credential.
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 -I %h/.local/share/native-agent-stack/host-observers/alert_watch.py --grafana http://127.0.0.1:21301 --label notify=cc --interval 15 --blind-after 120
+Nice=19
+CPUWeight=idle
+IOSchedulingClass=idle
+MemoryMax=64M
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=default.target
