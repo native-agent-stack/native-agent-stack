@@ -284,9 +284,12 @@ jobs:
       # below is the actual data-safety guard for that case, not this concurrency group.
       group: ${{ github.workflow }}-propose-${{ inputs.open_pr == true && 'manual' || 'scheduled' }}
       cancel-in-progress: false
+    # The push and the PR use the nas-catalog-propose App's installation token (the step "Mint the nas-catalog-propose
+    # App installation token" below), so this job's GITHUB_TOKEN needs no write scope and the org setting "Allow GitHub
+    # Actions to create and approve pull requests" stays off (docs/decisions/2026-09-23-bot-pr-dispatch.md,
+    # "App installation token (2026-10-14)").
     permissions:
-      contents: write # push the automation/catalog-freshness evidence branch (--force-with-lease); this job only
-      pull-requests: write # open the human-reviewable proposal PR; this job only
+      contents: read # check out only
     steps:
       - name: Harden the runner (audit-only network egress)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -370,13 +373,28 @@ jobs:
           fi
           git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
             commit -m "Catalog freshness: report-only drift evidence ($(date -u +%Y-%m-%d))"
-      - name: Push the evidence branch with the workflow token (never persisted to disk)
+      - name: Mint the nas-catalog-propose App installation token
+        id: app-token
+        # GitHub's GITHUB_TOKEN page: "If you need workflow runs from workflow-created pull requests to execute without
+        # requiring approval, use a GitHub App installation access token or a personal access token instead of
+        # `GITHUB_TOKEN` when creating or updating the pull request" (https://docs.github.com/en/actions/concepts/security/github_token).
+        # With owner and repositories unset the token covers only this repository (actions/create-github-app-token
+        # README), and it is limited to the two permissions below. The action's post step revokes it when the job ends.
+        # v3.2.0 rather than v3.3.0: the newer release was 2 days old on 2026-10-14, inside the repository's 7-day
+        # cooldown (.github/dependabot.yml); v3.2.0's action.yml already declares both permission inputs.
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.CATALOG_PROPOSE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.CATALOG_PROPOSE_APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+      - name: Push the evidence branch with the App token (never persisted to disk)
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          APP_TOKEN: ${{ steps.app-token.outputs.token }}
           OBSERVED_SHA: ${{ steps.branch.outputs.observed_sha }}
         run: |
           set -euo pipefail
-          basic_auth="$(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 -w0)"
+          basic_auth="$(printf 'x-access-token:%s' "$APP_TOKEN" | base64 -w0)"
           echo "::add-mask::$basic_auth"
           GIT_CONFIG_COUNT=1 \
           GIT_CONFIG_KEY_0="http.https://github.com/.extraheader" \
@@ -386,7 +404,7 @@ jobs:
       - name: Open or update the evidence PR
         id: pr
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           set -euo pipefail
           # The description is deliberately run-independent: it points at the evidence the
@@ -444,38 +462,17 @@ jobs:
           fi
           pr_url="$(gh pr view automation/catalog-freshness --json url --jq '.url')"
           echo "pr_url=$pr_url" >> "$GITHUB_OUTPUT"
-      - name: Note that this PR's own checks need write-access approval
+      - name: Record the evidence PR
         env:
           PR_URL: ${{ steps.pr.outputs.pr_url }}
         run: |
-          # This PR was opened with the workflow's own GITHUB_TOKEN, so GitHub puts its
-          # pull_request-triggered runs (validate, token-report, secret-scan, ...) into an
-          # approval-required state rather than running them automatically -- "events
-          # triggered by the GITHUB_TOKEN will not create a new workflow run, with the following exceptions:
-          # ... pull_request events with the opened, synchronize, or reopened activity types: when a
-          # workflow using GITHUB_TOKEN creates or updates a pull request, the resulting pull_request
-          # event creates workflow runs in an approval-required state"
-          # (https://docs.github.com/en/actions/concepts/security/github_token).
-          # This job deliberately does not call `gh workflow run` to work around that: a
-          # workflow_dispatch run's checks do not satisfy a required status check on this
-          # PR at all
-          # (https://docs.github.com/en/pull-requests/how-tos/merge-and-close-pull-requests/troubleshooting-required-status-checks),
-          # so dispatching would add a green-looking but not-actually-required run instead
-          # of the real one. See docs/github-automation.md for the exact approval steps and
-          # docs/decisions/2026-09-23-bot-pr-dispatch.md for the full evidence.
+          # The App's token opened or updated this PR, so its pull_request runs (validate, token-report, secret-scan, ...)
+          # start without a write-access approval. Only a GITHUB_TOKEN-created PR gets approval-required runs
+          # (https://docs.github.com/en/actions/concepts/security/github_token); docs/decisions/2026-09-23-bot-pr-dispatch.md records the earlier approval flow.
           {
             echo "## Catalog freshness evidence PR opened"
             echo ""
             echo "$PR_URL"
             echo ""
-            echo "A repository collaborator with write access must approve this PR's pending checks"
-            echo "before validate, token-report and secret-scan actually run on it: open the PR,"
-            echo "use the approval banner in the PR's merge box and select \"Approve workflows to run\""
-            echo "(GITHUB_TOKEN docs). A run left awaiting approval for"
-            echo "more than 30 days is automatically deleted. See docs/github-automation.md."
-            echo ""
-            echo "For an existing PR whose old body lacked SOTA sources, the preceding push may"
-            echo "have captured that old body. If the approved source gate fails, make a genuine"
-            echo "human-authenticated body edit retaining the source section; rerunning the old"
-            echo "event keeps its old payload. GITHUB_TOKEN body edits do not trigger new runs."
+            echo "Opened with the nas-catalog-propose App's installation token, so its checks run without approval."
           } >> "$GITHUB_STEP_SUMMARY"

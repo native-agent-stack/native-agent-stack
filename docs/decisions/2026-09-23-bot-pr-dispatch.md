@@ -414,3 +414,37 @@ GitHub has one toggle for both halves: "Allow GitHub Actions to create and appro
   - No non-comment line runs `gh pr review`, `--approve`, a `pulls/<n>/reviews` call, `APPROVE` or an auto-approve action.
   - `permissions: write-all`, any inline `permissions:` form and any `permissions:` key the block parser did not parse fail the test, so a grant cannot slip past it.
 - **Overturn.** Before `required_approving_review_count` rises above 0, move `propose` to a GitHub App installation token (`actions/create-github-app-token`, pinned by SHA), then turn the setting off. Turning it off first breaks `gh pr create`. An App token also lets the bot PR's own `pull_request` checks run without the manual approval step ([GITHUB_TOKEN](https://docs.github.com/en/actions/concepts/security/github_token)).
+
+## App installation token (2026-10-14)
+
+This section supersedes "Approval guard (2026-09-25)" by taking its own Overturn step.
+
+- **Change.** `propose` pushes the evidence branch and opens or updates its PR with an installation token of the
+  `nas-catalog-propose` GitHub App (App ID 5311261; contents write, pull requests write, metadata read; installed on
+  `native-agent-stack/native-agent-stack` only).
+  - The command center created the App through GitHub's manifest flow, and the owner installed it, on 2026-10-14.
+  - `actions/create-github-app-token` v3.2.0, pinned by its tag commit, mints the token from the variable
+    `CATALOG_PROPOSE_APP_CLIENT_ID` and the secret `CATALOG_PROPOSE_APP_PRIVATE_KEY`. With no `owner` or `repositories`
+    input, the token covers this repository only; the action's post step revokes it.
+  - The job's `GITHUB_TOKEN` drops to `contents: read`.
+- **Why.** The organization's "Allow GitHub Actions to create and approve pull requests" is off: GitHub's default for a new
+  organization, and the repository reads `can_approve_pull_request_reviews: false`. Turning it on would also let every
+  workflow's `GITHUB_TOKEN` approve pull requests.
+  - The App token needs no such setting.
+  - It also removes the approval step this record documented: GitHub's `GITHUB_TOKEN` page now says "If you need workflow
+    runs from workflow-created pull requests to execute without requiring approval, use a GitHub App installation access
+    token or a personal access token instead of `GITHUB_TOKEN` when creating or updating the pull request"
+    (https://docs.github.com/en/actions/concepts/security/github_token, read 2026-10-14).
+- **Pin.** v3.2.0 rather than v3.3.0: v3.3.0 was published 2026-10-12, inside this repository's 7-day Dependabot cooldown,
+  and v3.2.0's `action.yml` already declares `permission-contents` and `permission-pull-requests`. Dependabot proposes the
+  newer release after the cooldown.
+- **Guard.**
+  - `tests/test_catalog_freshness_propose.py` pins the App token step: SHA pin, the variable and the secret, exactly the
+    two permission inputs, and no `owner`, `repositories` or `skip-token-revoke`.
+  - The same test pins that the push and `gh pr` steps use only that step's output, and that `github.token` appears
+    nowhere in the job.
+  - `tests/test_workflow_hardening.py` allows `pull-requests: write` in no workflow.
+  - `tests/test_workflow_policy.py`'s reviewed write-grant inventory no longer lists `propose`.
+- **Acceptance, pending.** The first manual `open_pr=true` dispatch on main after landing. Its PR's checks must start
+  without an approval, and the PR's author must be the App's bot. Until then, this repository has no run of the App path.
+- **Overturn.** A propose run whose PR's checks still wait for approval, or a token mint that the installation refuses.

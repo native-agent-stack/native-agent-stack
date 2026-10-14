@@ -960,13 +960,13 @@ class CatalogFreshnessWorkflowTextTests(unittest.TestCase):
         normalized = " ".join(line.strip() for line in match.group(1).splitlines() if line.strip())
         self.assertEqual(normalized, EXPECTED_PROPOSE_IF)
 
-    def test_propose_job_permissions_are_scoped_to_exactly_contents_and_pull_requests(self):
-        # This is the one job in this workflow allowed to write (docs/decisions/
-        # 2026-09-23-bot-pr-dispatch.md): it only ever touches evidence/artifacts/*,
-        # evidence/receipts/* and manifests/evidence.json's registration (enforced by
-        # ApplyIntegrationTests.test_apply_never_touches_catalog_selection_files above),
-        # then opens a human-reviewable PR. It no longer dispatches other workflows
-        # (removed per the 2026-09-23 fix round), so it needs no `actions: write`.
+    def test_propose_job_permissions_are_read_only(self):
+        # The job writes through the nas-catalog-propose App's token only (docs/decisions/
+        # 2026-09-23-bot-pr-dispatch.md, "App installation token (2026-10-14)"); its GITHUB_TOKEN
+        # only checks out. It only ever touches evidence/artifacts/*, evidence/receipts/* and
+        # manifests/evidence.json's registration (enforced by
+        # ApplyIntegrationTests.test_apply_never_touches_catalog_selection_files above), then opens a
+        # human-reviewable PR. It does not dispatch other workflows, so it needs no `actions: write`.
         body = self._job_body("propose")
         permission_match = re.search(r"(?m)^    permissions:\n((?:      [^\n]*\n)+)", body)
         self.assertIsNotNone(permission_match, "propose job needs its own permissions block")
@@ -976,8 +976,34 @@ class CatalogFreshnessWorkflowTextTests(unittest.TestCase):
                 continue
             key, value = line.strip().split(":", 1)
             entries[key.strip()] = value.split("#", 1)[0].strip()
-        self.assertEqual(entries, {"contents": "write", "pull-requests": "write"})
+        self.assertEqual(entries, {"contents": "read"})
         self.assertNotIn("actions: write", body)
+
+    def test_propose_job_pushes_and_opens_the_pr_with_the_app_token_only(self):
+        # The workflow token would open the PR with approval-required checks and needs the org setting that also lets
+        # GITHUB_TOKEN approve PRs. The App's installation token does neither (the GITHUB_TOKEN page's note).
+        body = self._job_body("propose")
+        self.assertNotIn("github.token", body)
+        self.assertNotIn("secrets.GITHUB_TOKEN", body)
+        mint = re.search(r"(?ms)^      - name: Mint the nas-catalog-propose App installation token\n.*?(?=^      - name:)", body)
+        self.assertIsNotNone(mint, "the App token step")
+        step = mint.group(0)
+        self.assertRegex(step, r"(?m)^        id: app-token$")
+        self.assertRegex(step, r"(?m)^        uses: actions/create-github-app-token@[0-9a-f]{40} # v\d+\.\d+\.\d+$")
+        self.assertIn("client-id: ${{ vars.CATALOG_PROPOSE_APP_CLIENT_ID }}", step)
+        self.assertIn("private-key: ${{ secrets.CATALOG_PROPOSE_APP_PRIVATE_KEY }}", step)
+        inputs = sorted(re.findall(r"(?m)^          ([a-z-]+):", step))
+        self.assertEqual(inputs, ["client-id", "permission-contents", "permission-pull-requests", "private-key"],
+                         "no owner or repositories (this repository only) and no skip-token-revoke")
+        self.assertRegex(step, r"(?m)^          permission-contents: write$")
+        self.assertRegex(step, r"(?m)^          permission-pull-requests: write$")
+        push = body[body.index("- name: Push the evidence branch"):body.index("- name: Open or update the evidence PR")]
+        self.assertIn("APP_TOKEN: ${{ steps.app-token.outputs.token }}", push)
+        self.assertIn('printf \'x-access-token:%s\' "$APP_TOKEN"', push)
+        pr = body[body.index("- name: Open or update the evidence PR"):body.index("- name: Record the evidence PR")]
+        self.assertIn("GH_TOKEN: ${{ steps.app-token.outputs.token }}", pr)
+        self.assertLess(body.index("- name: Commit the evidence branch"), mint.start(),
+                        "the token is minted after the build, just before the push")
 
     def test_top_level_permissions_stay_read_only(self):
         # The workflow grants no scope (docs/decisions/2026-10-04-ci-least-privilege.md); freshness reads only.
@@ -1003,7 +1029,6 @@ class CatalogFreshnessWorkflowTextTests(unittest.TestCase):
             if "gh workflow run" in line and not line.strip().startswith("#")
         ]
         self.assertEqual(invocations, [])
-        self.assertIn("approval-required", body)
         self.assertIn("https://docs.github.com/en/actions/concepts/security/github_token", body)
 
     def test_pr_description_is_run_independent(self):
@@ -1012,7 +1037,7 @@ class CatalogFreshnessWorkflowTextTests(unittest.TestCase):
         embeds no run-specific report or receipt, so overlapping runs cannot leave it
         describing an older commit than the branch holds."""
         body = self._job_body("propose")
-        pr_step = body[body.index("- name: Open or update the evidence PR"):body.index("- name: Note that this PR")]
+        pr_step = body[body.index("- name: Open or update the evidence PR"):body.index("- name: Record the evidence PR")]
         self.assertNotIn('cat "$RUNNER_TEMP/freshness/drift.md"', pr_step)
         self.assertNotIn("RECEIPT_PATH", pr_step)
         self.assertNotIn("current_sha", pr_step)
@@ -1033,7 +1058,7 @@ class CatalogFreshnessWorkflowTextTests(unittest.TestCase):
     def _run_pr_metadata(self, lanes="", existing=True, race=False):
         """Execute the actual metadata shell with a synthetic gh; no network calls."""
         job = self._job_body("propose")
-        step = job[job.index("- name: Open or update the evidence PR"):job.index("- name: Note that this PR")]
+        step = job[job.index("- name: Open or update the evidence PR"):job.index("- name: Record the evidence PR")]
         script = step.split("        run: |\n", 1)[1]
         script = "\n".join(line[10:] for line in script.splitlines())
         stub = r'''
@@ -1105,23 +1130,18 @@ gh() {
         self.assertIn("a pin change on such a row is still", report)
         self.assertNotIn("are excluded from the drift count above", report)
 
-    def test_propose_job_states_the_correct_approval_ui_path(self):
-        # N3: approval happens on the PR itself -- the GITHUB_TOKEN page's banner in the
-        # PR's merge box, selecting "Approve workflows to run" -- not via the Actions tab.
+    def test_propose_job_states_that_the_app_token_pr_needs_no_approval(self):
+        # Supersedes the 2026-09-25 approval-UI test: under the App's token the PR's checks start on their own, so the
+        # summary no longer sends a reviewer to the approval banner.
         body = self._job_body("propose")
-        self.assertIn("approval banner", body)
-        self.assertIn("Approve workflows to run", body)
-        self.assertIn("merge box", body)
-        self.assertNotIn("Approve and run workflow", body)
-        self.assertIn("30 days", body)
+        record = body[body.index("- name: Record the evidence PR"):]
+        self.assertIn("its checks run without approval", record)
+        self.assertNotIn("Approve workflows to run", record)
 
-    def test_propose_job_cites_the_current_github_token_exception_wording(self):
-        # N3: the older paraphrase ("with the exception of workflow_dispatch and
-        # repository_dispatch, will not create") must not reappear; the current
-        # docs phrase it as "... will not create a new workflow run, with the
-        # following exceptions: ...".
+    def test_propose_job_cites_the_github_token_note_on_app_tokens(self):
+        # The current GITHUB_TOKEN page's note, quoted where the token is minted.
         body = self._job_body("propose")
-        self.assertIn("with the following exceptions", body)
+        self.assertIn("If you need workflow runs from workflow-created pull requests to execute without", body)
         outdated = [line for line in body.splitlines() if "with the exception of" in line]
         self.assertEqual(outdated, [])
 

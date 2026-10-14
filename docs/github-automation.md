@@ -64,9 +64,9 @@ The Actions allow-list below was checked against live settings and pinned source
 - **Actions.** Every `uses:` is pinned to a full commit SHA, which the repository also requires. The allow-list is
   GitHub-owned actions plus the two external patterns `step-security/harden-runner@*` and `ossf/scorecard-action@*`;
   verified-publisher actions are not separately allowed. The Claude action's two patterns left with its workflows
-  (2026-10-10). Only the catalog-freshness `propose` job holds
-  `pull-requests: write`, and no workflow reviews or approves a pull
-  request (`test_pull_requests_write_is_granted_only_to_the_propose_job`,
+  (2026-10-10). No workflow holds `pull-requests: write`: the catalog-freshness `propose` job opens its PR with the
+  nas-catalog-propose App's installation token (2026-10-14), and no workflow reviews or approves a pull
+  request (`test_no_workflow_grants_pull_requests_write`,
   `test_no_workflow_reviews_or_approves_a_pull_request`).
 - **Claude review inside GitHub: retired (2026-10-10).** The owner decided that AI reviews run on the local host and
   GitHub enforces the gates ([decision](decisions/2026-10-10-retire-in-github-claude-review.md)). The three workflows that ran
@@ -1018,22 +1018,19 @@ call) or the repository Settings -> Secrets and variables -> Actions ->
 Variables UI -- this is separate from a repository *secret* and separate from
 the ordinary Dependabot/ruleset settings already documented above.
 
-**One-time repository setting.** By default, GitHub Actions workflows using
-the automatic `GITHUB_TOKEN` cannot open pull requests at all; the repository
-setting **"Allow GitHub Actions to create and approve pull requests"**
-(Settings -> Actions -> General -> Workflow permissions) must be enabled once
-before `propose`'s `gh pr create` step can succeed, matching
-[GitHub's own documentation for this restriction](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#preventing-github-actions-from-creating-or-approving-pull-requests).
-This is a coordinator-only, one-time action, the same way the ruleset
-application above is. The same toggle also lets any workflow's `GITHUB_TOKEN`
-approve a pull request, so it stays on only with a guard (2026-09-25):
-`tests/test_workflow_hardening.py`'s `NoWorkflowApprovesPullRequestsTests`
-allows `pull-requests: write` only on `catalog-freshness.yml:propose`, no
-`actions: write` anywhere, and no `gh pr review`, `--approve`, `pulls/<n>/reviews`,
-`APPROVE` or auto-approve action in any workflow. Before the ruleset requires
-approving reviews, move `propose` to a GitHub App installation token and then turn
-the setting off ([record](decisions/2026-09-23-bot-pr-dispatch.md),
-"Approval guard (2026-09-25)").
+**The App token (2026-10-14).** `propose` pushes the evidence branch and opens or updates its PR with an installation
+token of the `nas-catalog-propose` GitHub App (contents and pull requests write, installed on this repository only).
+`actions/create-github-app-token` mints the token just before the push, from the repository variable
+`CATALOG_PROPOSE_APP_CLIENT_ID` and the secret `CATALOG_PROPOSE_APP_PRIVATE_KEY`, and revokes it when the job ends. The
+job's own `GITHUB_TOKEN` only checks out (`contents: read`). The setting **"Allow GitHub Actions to create and approve pull
+requests"** is therefore not needed and stays off. A PR opened with an App token also runs its checks without a
+write-access approval: GitHub's [`GITHUB_TOKEN` page](https://docs.github.com/en/actions/concepts/security/github_token) says "If you need workflow runs from workflow-created pull
+requests to execute without requiring approval, use a GitHub App installation access token or a personal access token
+instead of `GITHUB_TOKEN` when creating or updating the pull request". `tests/test_workflow_hardening.py`'s
+`NoWorkflowApprovesPullRequestsTests` allows `pull-requests: write` nowhere and no `actions: write` anywhere, and refuses
+any `gh pr review`, `--approve`, `pulls/<n>/reviews`, `APPROVE` or auto-approve action in any workflow
+([record](decisions/2026-09-23-bot-pr-dispatch.md), "App installation token (2026-10-14)", which supersedes "Approval
+guard (2026-09-25)").
 
 **What the bot PR actually contains.** `propose` downloads `freshness`'s own
 artifact (`catalog-freshness-${{ github.run_id }}`, same run), force-creates
@@ -1168,8 +1165,9 @@ produced a green-looking run that the branch ruleset simply ignores. This
 is recorded as a corrected claim, not silently dropped, in
 [the decision record](decisions/2026-09-23-bot-pr-dispatch.md).
 
-Instead, the job relies on the PR's own `pull_request`-triggered runs, and
-tells the reader they need one extra step: because this PR is opened with
+Instead, the job relies on the PR's own `pull_request`-triggered runs. Since 2026-10-14 the App token opens the PR, so
+those runs start on their own; the approval step described next applied to PRs the workflow token opened before then.
+Until 2026-10-14 the job told the reader they needed one extra step: because the PR was opened with
 the workflow's own `GITHUB_TOKEN`, [GitHub's `GITHUB_TOKEN` reference](https://docs.github.com/en/actions/concepts/security/github_token)
 states that "events triggered by the `GITHUB_TOKEN` will not create a new
 workflow run, with the following exceptions" -- one of which is: "`pull_request`
