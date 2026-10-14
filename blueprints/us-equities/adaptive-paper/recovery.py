@@ -10,6 +10,7 @@ import time
 
 from safety import SafetyError
 from sessions import order_extended_hours_flag, validate_session_policy
+from transport import OBSERVATION_INTEGRITY_LOSS_REASONS
 
 
 def _payload(intent, extended_hours=False):
@@ -113,6 +114,7 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
     whole_exit = 2 * float(config["order_timeout_seconds"])
     held = []
     budget_error = None
+    integrity_error = None
     before_request = getattr(port, "before_request", None)
 
     def quote(row):
@@ -177,13 +179,14 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
             float(configured_age), ledger.limits.effective_exit_quote_max_age_seconds)
 
     def guard_observation_integrity():
+        nonlocal integrity_error
         # Reconnect/stale-quote admission freezes can coexist with an owned exit
         # using a fresh quote. Event loss/identity conflicts cannot: a stream sink
         # may detect these before invoking our order callback.
         reasons = set(getattr(port, "health", {}).get("reasons", []))
-        if reasons & {"callback_failure", "queue_overflow", "client_id_collision",
-                      "snapshot_incomplete", "replay_unresolved"}:
-            raise SafetyError("recovery_observation_integrity_lost")
+        if reasons & OBSERVATION_INTEGRITY_LOSS_REASONS:
+            integrity_error = "recovery_observation_integrity_lost"
+            raise SafetyError(integrity_error)
 
     def guard_exit_budget():
         nonlocal budget_error
@@ -198,11 +201,13 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
         # The native transport invokes this hook immediately before its HTTP
         # guard. Authorization (including durable budget writes) can take time.
         if kind == "submit":
+            guard_observation_integrity()
             guard_exit_budget()
         result = before_request(kind, *args, **kwargs)
         if inspect.isawaitable(result):
             result = await result
         if kind == "submit":
+            guard_observation_integrity()
             guard_exit_budget()
         return result
 
@@ -303,6 +308,9 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
                         ledger.mark_not_sent(client_id, "recovery_definitive_refusal")
                     # The transport sanitizes hook failures into SubmissionNotSent.
                     # Retain the recovery decision after its pre-wire guarantee.
+                    guard_observation_integrity()
+                    if integrity_error is not None:
+                        raise SafetyError(integrity_error) from None
                     if budget_error is not None:
                         raise SafetyError(budget_error) from None
                 raise

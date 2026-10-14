@@ -1475,6 +1475,18 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
             upstream.assert_not_awaited()
 
 
+    async def test_delayed_budget_rechecks_event_loss_before_wire(self):
+        # The sell passed every earlier check; event loss becomes visible while the authorization runs.
+        def budget(kind, client_id=None):
+            self.port.freeze_health("callback_failure")
+        self.port.before_request = budget
+        with patch.object(self.port._client._session._session, "request",
+                          return_value=response(order(side="sell"))) as request:
+            with self.assertRaises(t.SubmissionNotSent):
+                await self.port.submit(intent(side="sell"))
+        request.assert_not_called()
+
+
 class DataFeedSelection(unittest.TestCase):
     """One configured feed derives the quote stream endpoint; nothing else does."""
 
@@ -1576,7 +1588,8 @@ class QuoteStreamDataTimeout(unittest.TestCase):
         asyncio.run(port.stop())
         port.freeze_health("stream_stop_timeout")  # teardown's own freeze, after the view was taken
         self.assertEqual(port.stream_health(), {"frozen": True, "reasons": ["quote_stale"], "fresh_quotes": False,
-                                                "data_timeout_seconds": None})
+                                                "data_timeout_seconds": None, "backpressure_waits": 0,
+                                                "skipped_stale_quotes": 0, "quotes_reconnects": 0})
 
     @unittest.skipUnless(HAS_SDK, "requires isolated reviewed alpaca-py runtime")
     def test_the_pinned_sdk_default_is_off(self):

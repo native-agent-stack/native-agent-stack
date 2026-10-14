@@ -90,6 +90,8 @@ class SellQuoteAgeRegressionTests(unittest.TestCase):
     def wire_port(self, age_ns):
         port = object.__new__(transport.AlpacaPaperTransport)
         port._stopping, port._started = False, True
+        import threading
+        port._reasons, port._state_lock = set(), threading.RLock()
         port._quote_values = {"SPY": {"ts_ns": 1_000_000_000_000-age_ns}}
         port.order_quote_max_age_ns = 3_000_000_000
         port.exit_quote_max_age_ns = 30_000_000_000

@@ -56,6 +56,8 @@ recorded by ``safety.py``/``runner.py``:
   ``not_started``, ``not_ready``, ``ready``, ``failed``). Exported only when
   ``trial.json`` has a ``status`` field (absent before a trial's first
   completed run).
+  Other observed status strings, including ``stream_frozen``, are included
+  dynamically alongside these known labels by the exporter.
 * ``paper_order_state_divergence_total`` -- count of ``events`` rows with
   ``kind='risk_halt'`` whose JSON payload has ``reason == "external_order_detected"``.
   That is the one order-state divergence `safety.Ledger.freeze` durably
