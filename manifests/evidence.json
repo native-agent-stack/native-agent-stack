@@ -19632,6 +19632,16 @@
       "bytes": 6646
     },
     {
+      "path": "docs/trading-handbook/ibkr-pacing.md",
+      "sha256": "62d28f0a53850eb44721da242c6f68cc7ff22a6627a96dd5860f50b6b4769a6f",
+      "bytes": 16063
+    },
+    {
+      "path": "docs/trading-handbook/paper-marker.md",
+      "sha256": "1565bd1d7a5104e05ee85e5c9d30c99a4da7a1a08614d885e1e4149922c9209b",
+      "bytes": 6596
+    },
+    {
       "path": "docs/trading-handbook/portfolio-sizing.md",
       "sha256": "2b211c78251b7a71179fa08e9ebcc62a00c57c2958712e7d5e8f6414cc68d7ea",
       "bytes": 7063
@@ -37075,6 +37085,121 @@
       "path": "evidence/artifacts/hw-profiles/wsl-authoring-20260923/profile.json",
       "sha256": "c3926e64aa7bc852dd3ab2034aafb41486192584818b7303e8f0aa2508a9d51c",
       "bytes": 2065
+    },
+    {
+      "path": "evidence/artifacts/ibkr-pacing-20261013/ADDENDUM-01.txt",
+      "sha256": "bbbb4d0096d0cab5577050f1b2ba31348fbc6cf5a1969b251bcb35649963b7f6",
+      "bytes": 1209
+    },
+    {
+      "path": "evidence/artifacts/ibkr-pacing-20261013/ADDENDUM-02.txt",
+      "sha256": "f1de0a311acc5bcd7d7eeddd51e7fef35196dcd76c4f878f1564424f4f834a9c",
+      "bytes": 1632
+    },
+    {
+      "path": "evidence/artifacts/ibkr-pacing-20261013/ADDENDUM-03.txt",
+      "sha256": "ac6adcea2551c8e9df26efd0fa434d5283dccdc74f8af17f32afba9c7bc9b324",
+      "bytes": 3691
+    },
+    {
+      "path": "evidence/artifacts/ibkr-pacing-20261013/PUBLICATION.md",
+      "sha256": "32113b737962e9f3267405fd333d2d6ec556cfafa2553ea7a31c722729786483",
+      "bytes": 9577
+    },
+    {
+      "path": "evidence/artifacts/ibkr-pacing-20261013/README.md",
+      "sha256": "1f1fd65f00f5e84ebff3db033ff019d2b2da788b863304241f6b00c80a57c391",
+      "bytes": 10166
+    },
+    {
+      "path": "evidence/artifacts/ibkr-pacing-20261013/V3-CHANGES.md",
+      "sha256": "edbb14013d15b8e9164685e024ed68b02ec676f8ea3d7f83e6591f3a843cc855",
+      "bytes": 24168
+    },
+    {
+      "path": "evidence/artifacts/ibkr-pacing-20261013/V4-CHANGES.md",
+      "sha256": "61e93447bad4421d85f3b678b5ed61e1c206d43f92326b88f78ba15cd666a29a",
+      "bytes": 18907
+    },
+    {
+      "path": "evidence/artifacts/ibkr-pacing-20261013/generate_ibkr_pacing_evidence.py",
+      "sha256": "d14fb1e81fabe1055d4e2a155f2fe76fbe0401dbe7bc30234ca8558d0e308f68",
+      "bytes": 62868
+    },
+    {
+      "path": "evidence/artifacts/ibkr-pacing-20261013/generate_ibkr_pacing_evidence.v1.py",
+      "sha256": "56463b2622501446a9a1640c6d3065920dbd449a622457ea61f392ce6166c5a1",
+      "bytes": 37836
+    },
+    {
+      "path": "evidence/artifacts/ibkr-pacing-20261013/generate_ibkr_pacing_evidence.v2.py",
+      "sha256": "f44b595a13cf87b4ad555427000c7937cc62452076f0a3380f13338127147619",
+      "bytes": 40776
+    },
+    {
+      "path": "evidence/artifacts/ibkr-pacing-20261013/generate_ibkr_pacing_evidence.v3.py",
+      "sha256": "933133afe24f128eb4226fb4c50230cb300d5e59ef8e663cc8dac0fb95a9100b",
+      "bytes": 56179
+    },
+    {
+      "path": "evidence/artifacts/ibkr-pacing-20261013/ibkr-pacing-evidence-20261013.json",
+      "sha256": "841ec5965caa6fa6d1b7d7ed5ddfa34af8ca38ba26028bf6226847fcad368900",
+      "bytes": 151357
+    },
+    {
+      "path": "evidence/artifacts/ibkr-pacing-20261013/ibkr-pacing-evidence-20261013.v1.json",
+      "sha256": "b492f42d335370e22f4349bf43db54f1adf4c77921b36a28300159b08c8e11fa",
+      "bytes": 111016
+    },
+    {
+      "path": "evidence/artifacts/ibkr-pacing-20261013/ibkr-pacing-evidence-20261013.v2.json",
+      "sha256": "25ef71020a06e1781fac0360aa8b19c564d9d146b65ea3fc6b8cb0ab62ab0c15",
+      "bytes": 112421
+    },
+    {
+      "path": "evidence/artifacts/ibkr-pacing-20261013/ibkr-pacing-evidence-20261013.v3.json",
+      "sha256": "180dd86e1848b8714ab7e5850d2989eb08217c1a0fb87f3af6493bc9006b8729",
+      "bytes": 136922
+    },
+    {
+      "path": "evidence/artifacts/ibkr-pacing-20261013/pacing-behavior.md",
+      "sha256": "608161d8d9ddfcdfba5d02a931fb5e082ae7c8a821a8d34851bbc4454c506d54",
+      "bytes": 1136
+    },
+    {
+      "path": "evidence/artifacts/ibkr-pacing-20261013/pacing-introduction.md",
+      "sha256": "f85d35eccd35c267ff7cba983d057082ddb0936490a988122c93715e00641d2d",
+      "bytes": 1715
+    },
+    {
+      "path": "evidence/artifacts/ibkr-pacing-20261013/small-bars.md",
+      "sha256": "fa12f6d99bd60939f181e451ecd79018ba6bdcdf9b77c26a21ec7cc43d6c27eb",
+      "bytes": 1218
+    },
+    {
+      "path": "evidence/artifacts/ibkr-pacing-20261013/text-digest-public-references.json",
+      "sha256": "0a0e15c0f81c411c9c8639930c34574af8453ac806bd22a3473588fa5eddee30",
+      "bytes": 2758
+    },
+    {
+      "path": "evidence/artifacts/ibkr-pacing-20261013/verify_ibkr_pacing_evidence.py",
+      "sha256": "b72e5a341915d3f1d863f8aaef9de953c690efd273ee00f1d322d1112eca7913",
+      "bytes": 40772
+    },
+    {
+      "path": "evidence/artifacts/ibkr-pacing-20261013/verify_ibkr_pacing_evidence.v1.py",
+      "sha256": "0e9fb1376a59e34cf1e3b6ba2fea30d89aad5e09db28de0b4d59792a41207468",
+      "bytes": 15636
+    },
+    {
+      "path": "evidence/artifacts/ibkr-pacing-20261013/verify_ibkr_pacing_evidence.v2.py",
+      "sha256": "cac1e764f429dc05575dfe8a692e74d4bcc04a8906e174e9e7b0178cf61494e3",
+      "bytes": 18645
+    },
+    {
+      "path": "evidence/artifacts/ibkr-pacing-20261013/verify_ibkr_pacing_evidence.v3.py",
+      "sha256": "c8872073cf71990e349ef77293dcef0e434b087e70091b26c6c2749cbce22630",
+      "bytes": 33702
     },
     {
       "path": "evidence/artifacts/jcodemunch-route-args-20260927/README.md",
@@ -61637,6 +61762,11 @@
       "bytes": 14769
     },
     {
+      "path": "scripts/check_text_digests.py",
+      "sha256": "ce752e2f51b9ed9338f0ae608fb2a98f758bdea9dc17676c7d5ae41c13aea06f",
+      "bytes": 4891
+    },
+    {
       "path": "scripts/ci_secret_scan_range.py",
       "sha256": "a3f6ad6cbc9cac0e48f3713c4d6ec10db0a17e9d58de0d2154d4c3ae8a9b19f7",
       "bytes": 7976
@@ -62832,6 +62962,11 @@
       "bytes": 100958
     },
     {
+      "path": "tests/test_ibkr_pacing_rung_windows.py",
+      "sha256": "e7b1ed5a1ecebbbd75fef9844ff778eac672af73665c35136d0f3dae59d97796",
+      "bytes": 4913
+    },
+    {
       "path": "tests/test_ibkr_paper_orders.py",
       "sha256": "787be818d3b4e5693597979da34fa09683697275de146520ccc438c3b897afc6",
       "bytes": 67010
@@ -63602,6 +63737,11 @@
       "bytes": 24994
     },
     {
+      "path": "tests/test_text_digest_publication.py",
+      "sha256": "143b293113efdd32aceb2b0006f37f7076e258a193802aa561d52ff80d57f34b",
+      "bytes": 5460
+    },
+    {
       "path": "tests/test_token_e2e_grader.py",
       "sha256": "42708be8476b880f4288f8cfc44622123ea18e8ae8198ca0c98a379460932cd3",
       "bytes": 524375
@@ -64108,8 +64248,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "d3bc37ce42a461b489146cc578cc2fb6121357ecab590b3534cb0d27ec5ecee1",
-      "bytes": 759968
+      "sha256": "85bcad7c52f8402a30558e3da35e5436a4aefa6eed7ecee7187b198eecdb95f7",
+      "bytes": 760049
     },
     {
       "path": "tools/omniroute/gateway_record.py",
