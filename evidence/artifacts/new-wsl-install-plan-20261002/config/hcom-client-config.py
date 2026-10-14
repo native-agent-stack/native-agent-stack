@@ -49,19 +49,19 @@ def main():
     manifest = cfg.load_manifest(root)["agent-messaging"]
     if not cfg.installs(manifest) or "hcom 0.7.27" not in cfg.installed_default(manifest):
         raise ValueError("agent-messaging must install its adopted hcom 0.7.27 owner")
-    # Check the shared mapper's authorization classification only. This adapter
-    # never writes crossSessionInbound; only the shared mapper's --apply with
-    # --with-authorization-settings may write that authorization setting.
+    # This adapter never writes crossSessionInbound. Since 2026-10-14 no template carries it
+    # (docs/decisions/2026-10-14-cross-session-inbound-per-launcher.md): Claude <-> Claude
+    # messaging uses the client's default, which delivers between two bypass-mode sessions, and
+    # a -p worker that must take messages unattended gets "accept" from its own --settings.
+    # hcom's own transport does not use the setting. If a template brings the key back, the
+    # shared mapper must still class it authorization.
     key = "claude/settings/setting/crossSessionInbound"
-    entry = next(e for e in cfg.load_map(root)
-                 if any(fnmatch.fnmatchcase(key, p) for p in e.match))
-    if not entry.wiring.startswith("authorization:"):
+    entry = next((e for e in cfg.load_map(root)
+                  if any(fnmatch.fnmatchcase(key, p) for p in e.match)), None)
+    if entry is not None and not entry.wiring.startswith("authorization:"):
         raise ValueError("crossSessionInbound must retain the mapper's authorization classification")
-    inbound = entry.raw.get("override", cfg.template_data(root, "claude/settings")["crossSessionInbound"])
-    if inbound != "accept":
-        raise ValueError("the converged native messaging configuration is incomplete")
     if args.check_map:
-        print("agent-messaging: map and native inbound setting present")
+        print("agent-messaging: map present; the native inbound setting is left to the client's default")
         return 0
 
     claude_home = Path(os.environ.get("CLAUDE_CONFIG_DIR", Path.home() / ".claude"))
@@ -98,8 +98,8 @@ def main():
     if args.check:
         settings_bytes = original(claude_home / "settings.json")
         settings = json.loads(settings_bytes) if settings_bytes is not None else {}
-        if "crossSessionInbound" in settings and settings["crossSessionInbound"] != inbound:
-            print("agent-messaging: Claude crossSessionInbound differs; the user's authorization choice is retained")
+        if "crossSessionInbound" in settings:
+            print("agent-messaging: Claude crossSessionInbound is set; the user's authorization choice is retained")
 
     block = f"{BEGIN}\n{spec['peer_instructions'].strip()}\n{END}\n"
     for target in (claude_home / "CLAUDE.md", codex_home / "AGENTS.md"):

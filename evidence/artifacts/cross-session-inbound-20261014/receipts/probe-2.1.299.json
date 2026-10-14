@@ -1,0 +1,175 @@
+{
+ "binary_version": "2.1.299",
+ "measured_at": [
+  "2026-10-14T05:37:03Z",
+  "2026-10-14T05:40:11Z"
+ ],
+ "arms": [
+  {
+   "arm": "A1-dontask-to-bypass-unset",
+   "sender_mode": "dontAsk",
+   "receiver_mode": "bypassPermissions",
+   "receiver_settings_flag": null,
+   "user_scope": null,
+   "project_scope": null,
+   "receiver_first_turn": [
+    "result:success"
+   ],
+   "sender_exit": 0,
+   "sender_tool_results": [
+    "{\"success\":true,\"message\":\"\u201cprobe\u201d \u2192 probe-recv-a1- (another Claude session on this machine; in that session's inbox, not yet read by its Claude \u2014 a [Cross-session delivery notice] follows if that session holds it (usually a different permission mode) or refuses it)\",\"msg_id\":\"<msg-id>\"}"
+   ],
+   "receiver_events_after_send": [
+    "system:peer_message_hold"
+   ],
+   "receiver_model_requests_with_marker": 0,
+   "delivered": false,
+   "receiver_stderr_tail": ""
+  },
+  {
+   "arm": "A2-bypass-to-bypass-unset",
+   "sender_mode": "bypassPermissions",
+   "receiver_mode": "bypassPermissions",
+   "receiver_settings_flag": null,
+   "user_scope": null,
+   "project_scope": null,
+   "receiver_first_turn": [
+    "result:success"
+   ],
+   "sender_exit": 0,
+   "sender_tool_results": [
+    "{\"success\":true,\"message\":\"\u201cprobe\u201d \u2192 probe-recv-a2- (another Claude session on this machine; in that session's inbox, not yet read by its Claude \u2014 a [Cross-session delivery notice] follows if that session holds it (usually a different permission mode) or refuses it)\",\"msg_id\":\"<msg-id>\"}"
+   ],
+   "receiver_events_after_send": [
+    "command_lifecycle"
+   ],
+   "receiver_model_requests_with_marker": 1,
+   "delivered": true,
+   "receiver_stderr_tail": ""
+  },
+  {
+   "arm": "A3-bypass-to-dontask-flag-accept",
+   "sender_mode": "bypassPermissions",
+   "receiver_mode": "dontAsk",
+   "receiver_settings_flag": "{\"crossSessionInbound\":\"accept\"}",
+   "user_scope": null,
+   "project_scope": null,
+   "receiver_first_turn": [
+    "result:success"
+   ],
+   "sender_exit": 0,
+   "sender_tool_results": [
+    "{\"success\":true,\"message\":\"\u201cprobe\u201d \u2192 probe-recv-a3- (another Claude session on this machine; in that session's inbox, not yet read by its Claude \u2014 a [Cross-session delivery notice] follows if that session holds it (usually a different permission mode) or refuses it)\",\"msg_id\":\"<msg-id>\"}"
+   ],
+   "receiver_events_after_send": [
+    "command_lifecycle"
+   ],
+   "receiver_model_requests_with_marker": 1,
+   "delivered": true,
+   "receiver_stderr_tail": ""
+  },
+  {
+   "arm": "A3c-bypass-to-dontask-unset",
+   "sender_mode": "bypassPermissions",
+   "receiver_mode": "dontAsk",
+   "receiver_settings_flag": null,
+   "user_scope": null,
+   "project_scope": null,
+   "receiver_first_turn": [
+    "result:success"
+   ],
+   "sender_exit": 0,
+   "sender_tool_results": [
+    "{\"success\":true,\"message\":\"\u201cprobe\u201d \u2192 probe-recv-a3c (another Claude session on this machine; in that session's inbox, not yet read by its Claude \u2014 a [Cross-session delivery notice] follows if that session holds it (usually a different permission mode) or refuses it)\",\"msg_id\":\"<msg-id>\"}"
+   ],
+   "receiver_events_after_send": [
+    "system:peer_message_hold"
+   ],
+   "receiver_model_requests_with_marker": 0,
+   "delivered": false,
+   "receiver_stderr_tail": ""
+  },
+  {
+   "arm": "A4-dontask-to-bypass-user-accept",
+   "sender_mode": "dontAsk",
+   "receiver_mode": "bypassPermissions",
+   "receiver_settings_flag": null,
+   "user_scope": "accept",
+   "project_scope": null,
+   "receiver_first_turn": [
+    "result:success"
+   ],
+   "sender_exit": 0,
+   "sender_tool_results": [
+    "{\"success\":true,\"message\":\"\u201cprobe\u201d \u2192 probe-recv-a4- (another Claude session on this machine; in that session's inbox, not yet read by its Claude \u2014 a [Cross-session delivery notice] follows if that session holds it (usually a different permission mode) or refuses it)\",\"msg_id\":\"<msg-id>\"}"
+   ],
+   "receiver_events_after_send": [
+    "command_lifecycle"
+   ],
+   "receiver_model_requests_with_marker": 1,
+   "delivered": true,
+   "receiver_stderr_tail": ""
+  },
+  {
+   "arm": "A5-dontask-to-bypass-project-accept",
+   "sender_mode": "dontAsk",
+   "receiver_mode": "bypassPermissions",
+   "receiver_settings_flag": null,
+   "user_scope": null,
+   "project_scope": "accept",
+   "receiver_first_turn": [
+    "result:success"
+   ],
+   "sender_exit": 0,
+   "sender_tool_results": [
+    "{\"success\":true,\"message\":\"\u201cprobe\u201d \u2192 probe-recv-a5- (another Claude session on this machine; in that session's inbox, not yet read by its Claude \u2014 a [Cross-session delivery notice] follows if that session holds it (usually a different permission mode) or refuses it)\",\"msg_id\":\"<msg-id>\"}"
+   ],
+   "receiver_events_after_send": [
+    "system:peer_message_hold"
+   ],
+   "receiver_model_requests_with_marker": 0,
+   "delivered": false,
+   "receiver_stderr_tail": ""
+  },
+  {
+   "arm": "A6-bypass-to-trader-flag-accept",
+   "sender_mode": "bypassPermissions",
+   "receiver_mode": "dontAsk (trader shape: -p, prompt on stdin, --tools Bash,Read)",
+   "receiver_settings_flag": "{\"crossSessionInbound\":\"accept\"}",
+   "user_scope": null,
+   "project_scope": null,
+   "sender_exit": 0,
+   "sender_tool_results": [
+    "{\"success\":true,\"message\":\"\u201cprobe\u201d \u2192 probe-recv-a6- (another Claude session on this machine; in that session's inbox, not yet read by its Claude \u2014 a [Cross-session delivery notice] follows if that session holds it (usually a different permission mode) or refuses it)\",\"msg_id\":\"<msg-id>\"}"
+   ],
+   "receiver_events_after_send": [
+    "result:success"
+   ],
+   "receiver_exit": 0,
+   "receiver_model_requests_with_marker": 1,
+   "delivered": true,
+   "receiver_stderr_tail": ""
+  },
+  {
+   "arm": "A6c-bypass-to-trader-unset",
+   "sender_mode": "bypassPermissions",
+   "receiver_mode": "dontAsk (trader shape: -p, prompt on stdin, --tools Bash,Read)",
+   "receiver_settings_flag": null,
+   "user_scope": null,
+   "project_scope": null,
+   "sender_exit": 0,
+   "sender_tool_results": [
+    "{\"success\":true,\"message\":\"\u201cprobe\u201d \u2192 probe-recv-a6c (another Claude session on this machine; in that session's inbox, not yet read by its Claude \u2014 a [Cross-session delivery notice] follows if that session holds it (usually a different permission mode) or refuses it)\",\"msg_id\":\"<msg-id>\"}"
+   ],
+   "receiver_events_after_send": [
+    "system:peer_message_hold",
+    "result:success",
+    "system:peer_message_hold"
+   ],
+   "receiver_exit": 0,
+   "receiver_model_requests_with_marker": 0,
+   "delivered": false,
+   "receiver_stderr_tail": ""
+  }
+ ]
+}

@@ -1,0 +1,6 @@
+tests/test_cross_session_inbound.py with the additions template, the client-configuration map and recipes/claude-native-profile.md as on main at 943d5ba27:
+FAIL: test_no_settings_template_sets_the_inbound_value
+FAIL: test_the_headless_recipes_name_the_per_launcher_value
+FAIL: test_the_map_has_no_entry_for_it_and_the_tool_still_classes_it_authorization
+Ran 8 tests in 0.003s
+FAILED (failures=3)

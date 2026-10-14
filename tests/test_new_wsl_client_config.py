@@ -3102,10 +3102,10 @@ class AuthorizationTests(ApplyCase):
     alone, the main checkout's Codex trust grant, and the tool approval modes and allow rules tied to the slot that wires
     their server."""
 
+    # crossSessionInbound left the set on 2026-10-14: no template carries it any more
+    # (docs/decisions/2026-10-14-cross-session-inbound-per-launcher.md); the tool still classes it authorization.
     STANDALONE = ("claude/settings/setting/permissions.defaultMode", "claude/settings/setting/skipDangerousModePermissionPrompt",
-                  "codex/config/approval_policy", "codex/config/sandbox_mode",
-                  # the user's directive of 2026-10-04 (the wave-2 messaging ruling left it unset)
-                  "claude/settings/setting/crossSessionInbound")
+                  "codex/config/approval_policy", "codex/config/sandbox_mode")
     # The coordinator's decision of 2026-10-04: the main checkout is trusted, and Codex looks a linked worktree's trust
     # up under it (codex-rs/git-utils/src/trust.rs at rust-v0.160.0); every other project still asks.
     TRUST = ('codex/config/projects."${PROJECT_ROOT}".trust_level',)
@@ -3132,8 +3132,8 @@ class AuthorizationTests(ApplyCase):
     WAITING = APPROVAL[6:]                        # the same two negative-control owners, after Chrome's insertion
     WRITTEN = STANDALONE + TRUST + APPROVAL + ALLOW     # what the option writes today
     OPTION = "--with-authorization-settings"
-    DEFAULT_LINE = ("authorization settings: left to the clients' own defaults (Claude Code permissions.defaultMode, "
-                    "skipDangerousModePermissionPrompt and crossSessionInbound, Codex approval_policy and sandbox_mode, the trust_level of the wired "
+    DEFAULT_LINE = ("authorization settings: left to the clients' own defaults (Claude Code permissions.defaultMode "
+                    "and skipDangerousModePermissionPrompt, Codex approval_policy and sandbox_mode, the trust_level of the wired "
                     "Codex projects, and the tool approval modes and allow rules of the wired MCP servers are not written, "
                     "and a value of theirs that a file has is not touched; --with-authorization-settings adds the ones a "
                     "file lacks, except existing create-only profile files)")
@@ -3209,7 +3209,7 @@ class AuthorizationTests(ApplyCase):
         settings_on, codex_on = self.render(self.OPTION)
         self.assertEqual(settings_on["permissions"]["defaultMode"], "bypassPermissions")
         self.assertIs(settings_on["skipDangerousModePermissionPrompt"], True)
-        self.assertEqual(settings_on["crossSessionInbound"], "accept")
+        self.assertNotIn("crossSessionInbound", settings_on)   # since 2026-10-14 a -p worker's own --settings carries it
         self.assertEqual(settings_on["permissions"]["allow"], ["mcp__semble__search", "mcp__semble__find_related"])
         self.assertEqual((codex_on["approval_policy"], codex_on["sandbox_mode"]), ("never", "danger-full-access"))
         self.assertEqual({name: server["default_tools_approval_mode"] for name, server in codex_on["mcp_servers"].items()
@@ -3223,8 +3223,7 @@ class AuthorizationTests(ApplyCase):
         # The two renders differ in those keys and in nothing else; the deny list is in both.
         for off, on in ((settings, settings_on), (codex, codex_on)):
             self.assertEqual(sorted(set(leaves(on)) - set(leaves(off))), sorted(
-                [("permissions", "defaultMode"), ("skipDangerousModePermissionPrompt",), ("crossSessionInbound",),
-                 ("permissions", "allow")]
+                [("permissions", "defaultMode"), ("skipDangerousModePermissionPrompt",), ("permissions", "allow")]
                 if on is settings_on else
                 [("approval_policy",), ("sandbox_mode",), ("mcp_servers", "ai-memory", "default_tools_approval_mode"),
                  ("mcp_servers", "semble", "default_tools_approval_mode"),
@@ -3239,8 +3238,7 @@ class AuthorizationTests(ApplyCase):
 
     # In the order of the pieces: the additions (semble's allow rules and server) merge after the shared template's keys.
     ALLOW_LABELS = "Claude Code allow rule mcp__semble__search, Claude Code allow rule mcp__semble__find_related"
-    ADDED_CLAUDE = (f"added: Claude Code permissions.defaultMode, {ALLOW_LABELS}, Claude Code skipDangerousModePermissionPrompt, "
-                    "Claude Code crossSessionInbound")
+    ADDED_CLAUDE = f"added: Claude Code permissions.defaultMode, {ALLOW_LABELS}, Claude Code skipDangerousModePermissionPrompt"
     CODEX_CONFIG = ("Codex approval_policy, Codex sandbox_mode, Codex mcp_servers.ai-memory.default_tools_approval_mode, "
                     "Codex mcp_servers.context-mode.default_tools_approval_mode, "
                     "Codex mcp_servers.jcodemunch.default_tools_approval_mode, "
@@ -3554,7 +3552,7 @@ class AuthorizationTests(ApplyCase):
         self.assertEqual(code, 0, out[-600:])
         self.assertEqual(self.authorization_line(out), (
             "authorization settings: not applied (--with-authorization-settings; kept your value: Claude Code "
-            f"permissions.defaultMode, Claude Code skipDangerousModePermissionPrompt, Claude Code crossSessionInbound; "
+            f"permissions.defaultMode, Claude Code skipDangerousModePermissionPrompt; "
             f"already the same: {self.ALLOW_LABELS}; "
             f"not reached, its step codex-config was skipped: {self.CODEX_CONFIG}; not reached, its step codex-files was "
             f"skipped: {self.STACK_WORKER})"))

@@ -1082,7 +1082,6 @@ After the refresh onto main 9e9553277, which carries wave 5's four browser-regis
 | `claude/settings/permission/allow/mcp__semble__search` | `"mcp__semble__search"` | no | an allow rule lets Claude Code call the tool without asking outside bypass mode; the rules name each tool exactly, so an upstream upgrade cannot add an allowed tool silently (wave-2 code-search ruling, change 3) | slot `code-search` installing `semble` |
 | `claude/settings/permission/allow/mcp__semble__find_related` | `"mcp__semble__find_related"` | no | an allow rule lets Claude Code call the tool without asking outside bypass mode; the rules name each tool exactly, so an upstream upgrade cannot add an allowed tool silently (wave-2 code-search ruling, change 3) | slot `code-search` installing `semble` |
 | `claude/settings/setting/skipDangerousModePermissionPrompt` | `true` | no | they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has | - |
-| `claude/settings/setting/crossSessionInbound` | `"accept"` | no | "accept" delivers messages from the user's other sessions to Claude without the approval hold that otherwise applies to a sender that is not in bypass mode, so it is written only with --with-authorization-settings and never over a value the file already has | - |
 | `codex/config/approval_policy` | `"never"` | no | they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has | - |
 | `codex/config/sandbox_mode` | `"danger-full-access"` | no | they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has | - |
 | `codex/config/mcp_servers.ai-memory.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `memory-owner` installing `ai-memory` |
@@ -1347,3 +1346,22 @@ is unwired and no sentence of the instruction blocks changes. All earlier projec
 observations.
 
 Today: 403 pieces, 363 wired (211 practice, 152 through a slot), 24 not wired (0 through a slot that does not install, 24 by their own entry) and 16 authorization pieces
+
+## Addendum 2026-10-14: crossSessionInbound leaves the templates
+
+`crossSessionInbound = "accept"` no longer stands in the new WSL distribution's additions
+([decision](2026-10-14-cross-session-inbound-per-launcher.md)), and its map entry and the agent-messaging slot's
+`claude_inbound_piece` key go with it. A user-scope `accept` applies to every session the user runs. The client's
+default (mode parity) delivers between two bypass-mode sessions. A `-p` worker that must take messages unattended
+starts with `--settings '{"crossSessionInbound":"accept"}'`, as the client's documentation says. The tool keeps the key in
+`AUTHORIZATION_PIECES`, so a template that brings it back is classed authorization. This supersedes the 2026-10-04
+classing of the piece above; Decision 14 now counts `authorization: 15`, and 24 pieces are not wired. The last table of
+pieces above is regenerated without the row; the earlier copy stays as it was printed then. All earlier projections
+remain historical observations.
+
+Declared test changes in `tests/test_new_wsl_client_config.py`:
+- `AuthorizationTests.STANDALONE` drops the piece; every count derived from it follows.
+- The default and option renders, the authorization lines and `ADDED_CLAUDE` no longer name it.
+- The option render asserts that the key is absent.
+
+Today: 402 pieces, 363 wired (211 practice, 152 through a slot), 24 not wired (0 through a slot that does not install, 24 by their own entry) and 15 authorization pieces
