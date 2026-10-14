@@ -189,6 +189,37 @@ class VerifiedBuildBytes(unittest.TestCase):
         self.assertTrue(fired)
         self.assertFalse((self.output / "RECUT-RECEIPT.json").exists())
 
+    def test_final_check_uses_captured_inventory_bytes(self):
+        native_run = recut.subprocess.run
+        checked = []
+        def inspect_expected(command, *args, **kwargs):
+            if kwargs.get("cwd") == self.output and command[0] == "sha256sum":
+                self.assertEqual(command[-1], "-")
+                self.assertEqual(kwargs.get("input"), (self.output / "SHA256SUMS").read_bytes())
+                checked.append(True)
+            return native_run(command, *args, **kwargs)
+        with patch.object(recut.subprocess, "run", inspect_expected):
+            recut.recut(self.source, self.output, "SYN-reviewed-builder", predecessor_sha256=self.pin)
+        self.assertEqual(checked, [True])
+
+    def test_success_requires_emitted_inventory_identity(self):
+        native_run = recut.subprocess.run
+        checked = []
+        def finish_check(command, *args, **kwargs):
+            result = native_run(command, *args, **kwargs)
+            if kwargs.get("cwd") == self.output and command[0] == "sha256sum":
+                self.assertEqual(result.returncode, 0)
+                checked.append(True)
+                inventory = self.output / "SHA256SUMS"
+                inventory.chmod(0o600)
+                inventory.write_bytes(b"# SYN inventory identity boundary\n")
+            return result
+        with patch.object(recut.subprocess, "run", finish_check):
+            with self.assertRaisesRegex(ValueError, "generated_bundle_manifest_refused"):
+                recut.recut(self.source, self.output, "SYN-reviewed-builder", predecessor_sha256=self.pin)
+        self.assertEqual(checked, [True])
+        self.assertFalse((self.output / "RECUT-RECEIPT.json").exists())
+
 
 if __name__ == "__main__":
     unittest.main()

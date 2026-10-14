@@ -140,6 +140,15 @@ explicit type, and `Documentation/revisions.adoc:217-225` defines the
 reimplementing object decoding. The new regression module is
 `tests.test_seq3_replay_inventory`; all construction and handoff proofs in it
 use SYN scratch state and make no operational recut claim.
+Final verification feeds the captured inventory bytes to the native checksum
+process on stdin and separately requires the emitted manifest to equal those
+same bytes before success. The reported bundle digest uses that one inventory.
+Primary sources: uutils coreutils 0.10.0 at
+28b6856d7b215bf844b4223589cb54ade84f5223,
+`src/uucore/src/lib/features/checksum/validate.rs:862-866` selects stdin for
+the checksum inventory named `-`; the installed sha256sum reports 0.10.0.
+CPython 3.12.3 at f6650f9ad73359051f3e558c2431a109bc016664,
+`Lib/subprocess.py:536-550` passes the supplied input through a pipe to the child.
 The strict manifest covers runtime inputs AND all five replay sources;
 the GO-BINDING-REQUEST is a separate hashed envelope because it binds that
 manifest's digest. The record retains predecessor state and config bindings.

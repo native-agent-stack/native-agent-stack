@@ -357,14 +357,15 @@ def recut(source, output, source_commit, *, predecessor_sha256=None,
         emit("REPLAY-INVENTORY.md", record_raw)
     names = sorted(payloads)
     sums = "\n".join(sha(payloads[name]) + "  " + name for name in names) + "\n"
-    write(output / "SHA256SUMS", sums.encode())
+    expected_inventory = sums.encode()
+    write(output / "SHA256SUMS", expected_inventory)
     # Re-reading is verification only: changed output can never become the
     # preimage of a newly certified digest. Refuse before any success receipt.
-    final_check = subprocess.run(["sha256sum", "--check", "--strict", "--quiet", "SHA256SUMS"],
-                                 cwd=output, capture_output=True)
-    if final_check.returncode:
+    final_check = subprocess.run(["sha256sum", "--check", "--strict", "--quiet", "-"],
+                                 cwd=output, capture_output=True, input=expected_inventory)
+    if final_check.returncode or (output / "SHA256SUMS").read_bytes() != expected_inventory:
         raise ValueError("generated_bundle_manifest_refused")
-    bundle_sha = sha(sums.encode())
+    bundle_sha = sha(expected_inventory)
     request = json.loads(request_raw)
     request.update(bundle_sha256=bundle_sha, deployment_glue_version=VERSION,
                    deployment_glue_commit=source_commit,
