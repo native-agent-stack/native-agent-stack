@@ -372,9 +372,11 @@ def profile_environment(profile: str, state: Path, role_scope: str | None = None
 def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: list[Path],
            pi_bin: Path, opencode_bin: Path, rtk_source: Path, wsl=False, role_scope=None,
            auxiliary_root: Path | None = None, tier1_input: Path | None = None,
-           skills_bin: Path | None = None):
+           skills_bin: Path | None = None, no_mcp=False):
     if profile not in PROFILES:
         raise ProfileError("unknown profile")
+    if no_mcp and role_scope not in ROLE_SCOPES:
+        raise ProfileError("no MCP requires an explicit role scope")
     tier1 = None
     if tier1_input:
         tier1 = json.loads(tier1_input.read_text())
@@ -399,10 +401,10 @@ def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: 
             if name in servers and spec != servers[name]:
                 raise ProfileError("explicit overlay conflicts with rendered MCP source")
             servers[name] = spec
-        if "context-mode" not in servers:
+        if not no_mcp and "context-mode" not in servers:
             raise ProfileError("canonical templates must include Context Mode")
     else:
-        servers = canonical_servers(home, eco_root, templates)
+        servers = canonical_servers(home, eco_root, templates, require_token_layer=not no_mcp)
     # CC 05:54:08Z: these require a committed route/pin or a separate bank
     # grant. A live overlay is research evidence, not configuration authority.
     excluded_servers = {}
@@ -410,11 +412,19 @@ def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: 
         if name in servers:
             excluded_servers[name] = "awaiting committed route/pin or lane grant"
             servers.pop(name)
+    if no_mcp:
+        # Role-profile generation policy, not a native permission evaluator.
+        # Pi04566631 docs/cli.md:198-199 supplies --no-mcp at launch;
+        # OpenCode53d1eabb src/mcp/index.ts:496,504-522 enumerates only
+        # configured servers, so the generated empty mcp object supplies none.
+        excluded_servers.update({name: "explicit no-MCP role profile" for name in servers})
+        servers = {}
     token_environment = profile_environment(profile, state, role_scope)
-    servers["context-mode"] = {**servers["context-mode"],
-        "args": [str(context_mode_package(destination) / "start.mjs")],
-        "env": {**servers["context-mode"].get("env", {}), **context_mode_environment(profile, state, role_scope)}}
-    if runtime == "opencode":
+    if not no_mcp:
+        servers["context-mode"] = {**servers["context-mode"],
+            "args": [str(context_mode_package(destination) / "start.mjs")],
+            "env": {**servers["context-mode"].get("env", {}), **context_mode_environment(profile, state, role_scope)}}
+    if runtime == "opencode" and not no_mcp:
         # Context Mode1.0.169 server.ts:167-180 checks legacy opencode.json
         # from cwd before real HOME/.config/opencode. Start it beside this
         # profile's native config, while project attribution comes from the
@@ -427,6 +437,12 @@ def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: 
     for name in ROLES:
         metadata, prompt = role_source(name)
         preloads = role_preloads(metadata, home, destination)
+        if no_mcp:
+            # Filter Claude's explicit MCP grants before native translation;
+            # every other grant, role text and preload stays as imported.
+            raw = metadata.get("tools", "")
+            grants = raw if isinstance(raw, list) else [tool.strip() for tool in raw.split(",")]
+            metadata = {**metadata, "tools": [tool for tool in grants if not tool.startswith("mcp__")]}
         tools, omitted = granted_tools(metadata, runtime)
         roles[name] = {"tools": tools, "omitted_unmapped_tools": omitted,
                        "preloads": preloads,
@@ -513,6 +529,8 @@ def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: 
                 "canonical_mcp_sources": [str(p.relative_to(ROOT)) if p.is_relative_to(ROOT) else str(p)
                                           for p in templates], "mcp_server_names": sorted(servers)}
     metadata["excluded_mcp_servers"] = excluded_servers
+    if no_mcp:
+        metadata["no_mcp"] = True
     metadata["auxiliary_root"] = str(auxiliary_root) if auxiliary_root else None
     metadata["tier1_input"] = str(tier1_input) if tier1_input else None
     metadata["tier1_slots"] = [s["layer_id"] for s in tier1["slots"]] if tier1 else []
@@ -1143,6 +1161,8 @@ def parser():
                          help="render canonical MCP through new_wsl_client_config's WSL map first")
     prepare.add_argument("--role-scoped", action=argparse.BooleanOptionalAction, default=True,
                          help="also install vendor role sets into separate native role profile roots")
+    prepare.add_argument("--no-mcp-role", choices=ROLE_SCOPES, action="append", default=[],
+                         help="generate the named role scope with no MCP servers or grants; repeat for another scope")
     prepare.add_argument("--auxiliary-root", type=Path,
                          help="owned vendor-install prefix for Tavily, agent-browser and OpenResearch; no installer duplication")
     prepare.add_argument("--tier1-input", type=Path,
@@ -1178,6 +1198,8 @@ def main(argv=None):
     args = parser().parse_args(argv)
     try:
         if args.command == "prepare":
+            if args.no_mcp_role and not args.role_scoped:
+                raise ProfileError("no-MCP role option requires role-scoped preparation")
             for profile in PROFILES:
                 for scope in [None, *ROLE_SCOPES] if args.role_scoped else [None]:
                     print(json.dumps(render(profile, state=args.state_root, home=args.home,
@@ -1185,7 +1207,7 @@ def main(argv=None):
                                             pi_bin=args.pi_bin, opencode_bin=args.opencode_bin,
                                             rtk_source=args.rtk_source, wsl=args.wsl_render, role_scope=scope,
                                             auxiliary_root=args.auxiliary_root, tier1_input=args.tier1_input,
-                                            skills_bin=args.skills_bin)))
+                                            skills_bin=args.skills_bin, no_mcp=scope in args.no_mcp_role)))
             return 0
         if args.command == "install-launchers":
             install_launchers(args)

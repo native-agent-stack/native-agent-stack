@@ -61078,8 +61078,8 @@
     },
     {
       "path": "notes/runtime-profiles-20261012/README.md",
-      "sha256": "e9d042df68520c9bcae0118dbad02eee8442c93c9876b20fed2334db88388370",
-      "bytes": 23522
+      "sha256": "a0fdc465cd5e26eff09e4986548265886065d670df6c479f1e984fdcc32bedd0",
+      "bytes": 28113
     },
     {
       "path": "notes/runtime-profiles-20261012/REPLAY-SOURCES.md",
@@ -62040,6 +62040,11 @@
       "path": "tests/fixtures/opencode-permission-53d1eabb.ts",
       "sha256": "deddb980639a9d3220fd77fbe6868b5700beecaef1386a6212e34b9d6dae35fa",
       "bytes": 3014
+    },
+    {
+      "path": "tests/fixtures/runtime_profiles_703d588c.py",
+      "sha256": "e5b3201d4ffb40f63718302f5cdc2167f2801187801480dc9ae204b81ad3c830",
+      "bytes": 71677
     },
     {
       "path": "tests/fixtures/skill_usage/codex_lanes/rollout-2026-10-19T04-00-00-lanes-before.jsonl.fixture",
@@ -63402,6 +63407,11 @@
       "bytes": 10655
     },
     {
+      "path": "tests/test_runtime_nomcp.py",
+      "sha256": "b8ac5b12efb0862d41a505379f653d6cad3bb5a3755d24fe359faa6cd2153a0c",
+      "bytes": 14112
+    },
+    {
       "path": "tests/test_runtime_opencode_native.py",
       "sha256": "72c3f3ef5027aeb36b6f0581c3eb8e7c08bad29c5a4ef4d395e324927f386e6c",
       "bytes": 17037
@@ -63873,13 +63883,13 @@
     },
     {
       "path": "tools/adoption/runtime_acceptance.py",
-      "sha256": "08357b897d4c200e8044dddc91277f25e653792986b7864a14201c1a37e48024",
-      "bytes": 11835
+      "sha256": "0de983c2c88c4dc27f623debee383207dcc2790427fb48c2e0fcd4f7bd493ebd",
+      "bytes": 12557
     },
     {
       "path": "tools/adoption/runtime_profiles.py",
-      "sha256": "e5b3201d4ffb40f63718302f5cdc2167f2801187801480dc9ae204b81ad3c830",
-      "bytes": 71677
+      "sha256": "924c47101141c6ff97bf57f692ef067e0821f69cd7b89054528f07f0799b99a2",
+      "bytes": 73185
     },
     {
       "path": "tools/adoption/runtime_skill_freshness.py",

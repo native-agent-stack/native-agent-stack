@@ -155,7 +155,10 @@ def check(args, profile):
     if runtime == "pi":
         mcp_facts["all_connected"] = False
         try:
-            servers = json.loads(mcp_output).get("servers", [])
+            payload = json.loads(mcp_output)
+            if not isinstance(payload, dict) or not isinstance(payload.get("servers"), (list, dict)):
+                raise ValueError("native MCP server list absent or invalid")
+            servers = payload["servers"]
             if isinstance(servers, dict):
                 servers = [{"name": name, **entry} for name, entry in servers.items()]
             mcp_facts["servers"] = [{"name": s["name"], "state": s.get("state"),
@@ -163,9 +166,17 @@ def check(args, profile):
                                       if s.get("name") in descriptor["mcp_server_names"]]
             found = mcp_facts["servers"]
             expected = descriptor["mcp_server_names"]
-            mcp_facts["all_connected"] = (mcp_code == 0 and bool(expected)
-                and len(found) == len(expected) and {s["name"] for s in found} == set(expected)
-                and all(s["state"] == "connected" for s in found))
+            if descriptor.get("no_mcp") is True:
+                # Pi04566631 docs/cli.md:198-199: an explicitly disabled
+                # built-in MCP surface has no servers. Check the COMPLETE
+                # native list, not the expected-name-filtered receipt above.
+                mcp_facts["native_server_count"] = len(servers)
+                mcp_facts["all_connected"] = (mcp_code == 0 and expected == []
+                    and servers == [] and payload.get("errors", []) == [])
+            else:
+                mcp_facts["all_connected"] = (mcp_code == 0 and bool(expected)
+                    and len(found) == len(expected) and {s["name"] for s in found} == set(expected)
+                    and all(s["state"] == "connected" for s in found))
         except (ValueError, KeyError, TypeError):
             mcp_facts["readback"] = "unreadable"
     else:

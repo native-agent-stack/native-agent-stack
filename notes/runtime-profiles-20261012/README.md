@@ -347,3 +347,76 @@ did not preserve eighteen reasons; a bounded skip-only replay selects the
 same nineteen cases and records each reason in the PR description. Skips do
 not establish readiness. The new native DB test also skips without an explicit
 installed OpenCode binary; the author supplied it for the passing native run.
+# Role-level no-MCP generation (W6 prerequisite)
+
+`prepare --no-mcp-role reviewer` generates the reviewer-scoped profile with
+zero MCP servers and removes every imported MCP grant before native role
+translation. Repeat the option for another scope. Unscoped and other scoped
+profiles retain the required Context Mode server; `--no-role-scoped` with this
+option is refused before writes. Native read/find/grep (OpenCode: read/glob/grep),
+role text, models, effort and package/skill preloads remain unchanged. Existing
+profile files are not edited; prepare into a fresh state root.
+
+Pi's resulting role launch uses its native `--no-mcp`, documented at
+`earendil-works/pi@04566631:packages/coding-agent/docs/cli.md:198-199` (built-in
+MCP support). OpenCode receives `mcp: {}`; its source enumerates configured
+servers at `anomalyco/opencode@53d1eabb:packages/opencode/src/mcp/index.ts:496,
+505-522`, matching `packages/web/src/content/docs/mcp-servers.mdx:24-26`.
+Vendor skill-package preparation is unchanged; optional here means the server
+configuration is not required for that flagged role profile. This generated
+configuration test does not replace the post-landing zero-spend wire checks.
+
+Guard controls in `tests/test_runtime_nomcp.py`:
+
+- Removing server clearing or MCP-grant filtering fails
+  `test_flag_removes_servers_and_every_mcp_grant_preserving_native_tools_and_prompt`.
+- Relaxing the ordinary Context Mode requirement fails
+  `test_context_mode_stays_required_without_flag_for_every_scope_and_runtime`.
+- Dropping native Read fails the same preservation test; native Pi argv is also
+  covered by `test_pi_launch_uses_native_no_mcp_with_the_unchanged_review_builtins`.
+- `test_no_mcp_role_accepts_templates_without_context_mode` exercises the
+  explicit role-only exception; `test_unscoped_no_mcp_is_refused_without_writes`
+  keeps the exception scoped, and the CLI test covers all 20 generated profiles.
+
+This option is a CC-approved W6 prerequisite, separate from the frozen A and
+D-SDK arms and #1054's deferred environment/lifecycle fixes. B/C and D-Pi are
+reprepared only after this generator change lands and the co-op relays LANDED.
+No comparison case, oracle or CORPUS is opened by these synthetic tests.
+
+### First-read corrections for the no-MCP option
+
+Unflagged generation emits no new descriptor field: every generated file for
+all four profiles and five scopes is compared byte for byte with the published
+703d588c generator source in `tests/fixtures/runtime_profiles_703d588c.py`.
+That immutable test-only baseline has Git blob `43a8847d44e448fac384d7d481566fba2ab403af`;
+it is never a production generator. Both generators render at the same scratch
+path, with the same controlled inputs and vendor installer effects. The
+compatibility test fails at2214ba0c because it adds `no_mcp: false` to all20
+descriptors. Only explicitly flagged profiles now emit `no_mcp: true`.
+
+Pi discovery acceptance recognizes that explicit marker and requires the
+expected list and the complete native server list to be empty, the native
+command to succeed, and no reported native errors. Unexpected native servers
+cannot be hidden by filtering to an empty expected set. Absent markers keep
+the existing mandatory-server checks. Both Console and GPT routes have
+positive empty-list and negative unexpected/disabled/dictionary/malformed/error
+controls. This is native-command fixture acceptance, not model or boot readiness.
+
+The Context Mode contract test now covers both the new flagged-role exception
+and the unchanged unflagged requirement. It fails at703d588c because that
+role-level exception is absent; the earlier requirement-only test was a
+base-passing invariant and a deleted-guard control, not a fail-before result.
+
+### Follow-ups retained from the first read
+
+- Full runtime readiness remains separate from generated configuration and
+  zero-model discovery; interrupted preparation and retry remain #1054's
+  lifecycle scope. Post-landing B/C/D-Pi prepare and native wire checks remain
+  required before any W6 dispatch.
+- The reader packet must include the three cited upstream Pi/OpenCode source
+  captures and their published-preimage hashes. Their exact pinned objects were
+  read locally; the first-read packet did not contain the captures. The preserved
+  Context Mode source citation was not independently verified by that reader.
+  This is a packet packaging gap, not native consumer qualification.
+- Existing hostname occurrences in unchanged evidence-manifest rows remain a
+  separate hygiene item. This fix adds none and does not rewrite historical rows.
