@@ -40,6 +40,17 @@ separate extreme sentinel for P&L, where -1 is a legitimate result).
 Unknown status/reason text becomes a fixed Other code. No producer text
 is copied into labels or log bodies.
 
+The co-op's03:10Z browser acceptance passed at the initial render, with zero
+panel errors, no No-data panels and only a WebGL console warning. The three
+notes are corrected before the first PR read wave: rate units use explicit
+per-minute suffixes, A/B rate titles say last stage (IBKR says last session),
+and missing P&L uses a bounded exact-integer sentinel with Not recorded value
+mapping and fallback. The prior extreme exponent was the sole exceptional
+API value, in I-llm realized P&L; it is retained as a historical mapping only.
+The four assertions for these notes fail at fd43ba43 before the correction.
+The subsequent lane-health feature is a separate follow-up under landing/PRE
+priority; it is not claimed by this dashboard acceptance.
+
 ## Existing collector and refresh
 
 `observability/trading_receipts.py` is an additional oneshot command of

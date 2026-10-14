@@ -47,6 +47,23 @@ class Ns2604DashboardTests(unittest.TestCase):
                                 capture_output=True, text=True)
         self.assertEqual(0, result.returncode, result.stderr)
 
+    def test_trading_rates_name_their_minute_basis_and_missing_pnl_has_a_bounded_mapping(self):
+        board = G.dashboards()["grafana-trading-lanes.json"]
+        rates = [p for p in board["panels"] if p.get("type") == "stat" and "/min" in p["title"]]
+        self.assertEqual(21, len(rates))
+        with self.subTest(note="minute units"):
+            self.assertTrue(all(p["fieldConfig"]["defaults"]["unit"].startswith("suffix:") for p in rates))
+        with self.subTest(note="historical stage basis"):
+            self.assertTrue(all("(last stage)" in p["title"] for p in rates if p["title"].startswith(("A ·", "B ·"))))
+        pnl = next(p for p in board["panels"] if p["title"] == "I-llm · Realized P&L")
+        defaults = pnl["fieldConfig"]["defaults"]
+        key, value = next(iter(defaults["mappings"][0]["options"].items()))
+        with self.subTest(note="empty value fallback"):
+            self.assertEqual("Not recorded", defaults.get("noValue"))
+        with self.subTest(note="missing mapping transport"):
+            self.assertNotIn("e", key.lower(), "Missing-value mapping must survive native decimal LogQL output")
+            self.assertEqual("Not recorded", value["text"])
+
     def test_retarget_changes_only_datasources_and_prometheus_metric_names(self):
         board = {"panels": [
             {"id": 1, "datasource": {"type": "prometheus", "uid": "ecosystem-prometheus"}, "targets": [

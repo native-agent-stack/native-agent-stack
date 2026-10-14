@@ -16,7 +16,7 @@ import re
 import time
 
 LANES = ("A", "B", "C", "lanea", "laneb", "IBKR", "I-llm")
-UNKNOWN_PNL = -1e100
+UNKNOWN_PNL = -9007199254740991
 EXPORTED_FIELDS = ("lane", "observed_unix", "source_unix", "orders_per_min", "fills_per_min",
                    "cancels_per_min", "cash_use_ratio", "open_positions", "realized_pnl_usd",
                    "status_code", "ended_by_code", "wire_mean_per_s", "wire_peak_per_s")

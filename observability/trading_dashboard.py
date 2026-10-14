@@ -22,8 +22,8 @@ def dashboard():
                  "recorded events. Submissions are not fills. **Unavailable** means the source does not record the metric. "
                  "Receipt time and status expose stale/ended runs; a fresh observation does not make a prior session live. "
                  "IBKR has no session tonight; its last session is retained. I-llm stays not live until wired."}}]
-    specs = (("orders_per_min", "Orders/min", "ops"), ("fills_per_min", "Fills/min", "ops"),
-             ("cancels_per_min", "Cancels/min", "ops"), ("cash_use_ratio", "Cash use / equity", "percentunit"),
+    specs = (("orders_per_min", "Orders/min", "suffix:orders/min"), ("fills_per_min", "Fills/min", "suffix:fills/min"),
+             ("cancels_per_min", "Cancels/min", "suffix:cancels/min"), ("cash_use_ratio", "Cash use / equity", "percentunit"),
              ("open_positions", "Open positions", "short"), ("realized_pnl_usd", "Realized P&L", "currencyUSD"),
              ("status_code", "Status", "short"), ("ended_by_code", "Ended by", "short"))
     y, identifier = 3, 2
@@ -36,11 +36,14 @@ def dashboard():
             mappings = [{"type": "value", "options": {str(value): {"text": text} for value, text in values.items()}}]
             if field == "realized_pnl_usd":
                 # Real P&L can equal -1; availability uses a separate impossible sentinel.
-                mappings = [{"type": "value", "options": {"-1e+100": {"text": "Unavailable"}}}]
+                mappings = [{"type": "value", "options": {"-9007199254740991": {"text": "Not recorded"},
+                             "-1e+100": {"text": "Not recorded"}}}]
+            if field in ("orders_per_min", "fills_per_min", "cancels_per_min"):
+                title += " (last stage)" if lane in ("A", "B") else " (last session)" if lane == "IBKR" else " (last minute)"
             panels.append({"id": identifier, "type": "stat", "title": lane + " · " + title,
                            "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
                            "datasource": SOURCE, "gridPos": {"x": index * 3, "y": y + 1, "w": 3, "h": 4},
-                           "fieldConfig": {"defaults": {"unit": unit, "mappings": mappings,
+                           "fieldConfig": {"defaults": {"unit": unit, "mappings": mappings, "noValue": "Not recorded",
                               "thresholds": {"mode": "absolute", "steps": [{"color": "blue", "value": None}]}}, "overrides": []},
                            "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": False},
                                        "colorMode": "value", "graphMode": "none", "textMode": "auto"},
