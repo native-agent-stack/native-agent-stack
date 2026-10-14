@@ -1,0 +1,26 @@
+"""Run the acknowledgement test under the pinned read lock, or remove its guard."""
+from pathlib import Path
+import subprocess
+import sys
+import types
+import unittest
+ROOT = Path('/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013')
+sys.path[:0] = [str(ROOT), str(ROOT / 'blueprints/us-equities/adaptive-paper')]
+from runtime_lock import runtime_read_lock
+with runtime_read_lock():
+    if sys.argv[1] == 'base':
+        source = subprocess.check_output(['git', 'show', '35dfd01e:blueprints/us-equities/adaptive-paper/transport.py'], cwd=ROOT).decode()
+    else:
+        source = (ROOT / 'blueprints/us-equities/adaptive-paper/transport.py').read_text()
+    if sys.argv[1] == 'unguarded':
+        source = source.replace('if pending is not None and resolved:', 'if pending is not None:')
+    if sys.argv[1] == 'drop-refusal':
+        source = source.replace('or refused or operation.result()', 'or operation.result()')
+    module = types.ModuleType('transport')
+    module.__file__ = str(ROOT / 'blueprints/us-equities/adaptive-paper/transport.py')
+    sys.modules['transport'] = module
+    exec(compile(source, module.__file__, 'exec'), module.__dict__)
+    suite = unittest.defaultTestLoader.loadTestsFromName('tests.test_adaptive_paper_cancel_acknowledgement')
+    result = unittest.TextTestRunner(verbosity=2).run(suite)
+    print('ASSERTION_FAILURES', len(result.failures), 'ERRORS', len(result.errors), 'SKIPS', len(result.skipped))
+sys.exit(not result.wasSuccessful())

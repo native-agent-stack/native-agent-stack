@@ -1,0 +1,54 @@
+Running as unit: run-p771121-i155625177.scope; invocation ID: 147b8064eb4f4e41ab45f43f545cdf8c
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpq7bigypz'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpzhpbg8eh'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpcudv4_3m'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpcwj8_ehr'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmp10cd6mkx'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmp540epkj4'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmp35qx427b'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmp9cu8qy1j'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpt8_ox179'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmp98umim0p'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpa09iooq9'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpgdl839nz'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmp21h0zlpz'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpigwqf1ca'>
+  _warnings.warn(warn_message, ResourceWarning)
+----------------------------------------------------------------------
+Ran 127 tests in 35.316s
+
+OK
+followup_mutant M2-reserve assertion_failures 1 errors 0
+followup_mutant M3-wire assertion_failures 1 errors 0
+followup_mutant M4-admission assertion_failures 1 errors 0
+followup_mutant M6-emitter assertion_failures 1 errors 0
+followup_mutant M8-active assertion_failures 1 errors 0
+followup_mutant M8-tradable assertion_failures 1 errors 0
+followup_mutant M9-halt assertion_failures 1 errors 0
+followup_mutant M10-window assertion_failures 1 errors 0
+followup_mutant M11-normalize assertion_failures 1 errors 0
+followup_mutant M15-preflight assertion_failures 3 errors 0
+followup_mutant F1-adaptive-direct assertion_failures 1 errors 0
+followup_mutant F1-adaptive-replacement assertion_failures 1 errors 0
+followup_mutant F3-admission-side assertion_failures 1 errors 0
+followup_mutant F3-admission-owned assertion_failures 1 errors 0
+followup_mutant F3-admission-calendar assertion_failures 1 errors 0
+followup_mutant M2-reserve+M3-wire assertion_failures 2 errors 0
+followup_mutant M2-reserve+M4-admission assertion_failures 2 errors 0
+followup_mutant M3-wire+M4-admission assertion_failures 2 errors 0
+followup_mutant M2-reserve+M3-wire+M4-admission assertion_failures 3 errors 0
+followup_mutants_killed 19 survived 0
+overnight_guard_mutations 37 killed_by_assertions 118 secondary_errors 2

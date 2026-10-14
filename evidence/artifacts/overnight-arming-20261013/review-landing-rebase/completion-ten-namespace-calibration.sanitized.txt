@@ -1,0 +1,677 @@
+{"alpaca_py": "0.44.0", "elapsed_seconds": 128.09028463900904, "errors": 4, "failures": 2, "head": "0c65ee7fd7333635a447b6b7b65a2872211a9a8b", "modules": ["tests.test_adaptive_paper_cancel_acknowledgement", "tests.test_adaptive_paper_cancel_liveness", "tests.test_adaptive_paper_cancel_worker_ownership", "tests.test_adaptive_paper_transport", "tests.test_overnight_published_preimages", "tests.test_adaptive_paper_overnight", "tests.test_adaptive_paper_recovery", "tests.test_adaptive_paper_runner", "tests.test_adaptive_paper_native", "tests.test_adaptive_paper_source_hashes_manifest"], "nautilus_trader": "2.0.0rc5", "network": "bwrap --unshare-net; synthetic local HTTP only", "python": "3.12.3", "rc": 1, "requests": "2.34.2", "skipped": 0, "started_utc": "2026-10-14T05:22:52Z", "tests": 474}
+test_cutoff_held_entry_reconciles_then_owned_position_flattens (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_cutoff_held_entry_reconciles_then_owned_position_flattens) ... ack_three_ticks accepted stream refusal True [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+cancel_stage_end {"held_unattributed_refusals": 1, "lookup_confirmed_retries": 1}
+ok
+test_held_cancel_reconciles_on_a_fixed_bound_before_any_retry (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_held_cancel_reconciles_on_a_fixed_bound_before_any_retry) ... ack_three_ticks accepted stream refusal True [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+cancel_stage_end {"held_unattributed_refusals": 1, "lookup_confirmed_retries": 0}
+ack_three_ticks accepted stream refusal True [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+cancel_stage_end {"held_unattributed_refusals": 1, "lookup_confirmed_retries": 1}
+ack_three_ticks accepted stream refusal True [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+cancel_stage_end {"held_unattributed_refusals": 1, "lookup_confirmed_retries": 0}
+ok
+test_http_acknowledgement_survives_a_failed_followup_lookup (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_http_acknowledgement_survives_a_failed_followup_lookup) ... ack_three_ticks accepted stream refusal False [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ok
+test_old_refusal_never_releases_a_newer_acknowledged_cancel (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_old_refusal_never_releases_a_newer_acknowledged_cancel) ... ack_three_ticks accepted stream refusal True [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks accepted stream refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks accepted stream refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks accepted stream refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks accepted stream refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks accepted stream refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks accepted stream refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks accepted stream refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks accepted stream refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ok
+test_rejection_during_lookup_releases_pending_and_allows_one_retry (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_rejection_during_lookup_releases_pending_and_allows_one_retry) ... ack_three_ticks accepted stream refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks accepted lookup refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks new stream refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks new lookup refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks pending_cancel stream refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks pending_cancel lookup refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ok
+test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal) ... ack_three_ticks accepted stream refusal False [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks accepted lookup refusal False [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks new stream refusal False [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks new lookup refusal False [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks pending_cancel stream refusal False [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks pending_cancel lookup refusal False [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ok
+test_held_recovery_cancel_releases_on_terminal_lookup_without_second_delete (tests.test_adaptive_paper_cancel_liveness.CancelLiveness.test_held_recovery_cancel_releases_on_terminal_lookup_without_second_delete) ... held_sell_recovery True flat True deletes 1 counters {'held_unattributed_refusals': 1, 'lookup_confirmed_retries': 0}
+ok
+test_held_sell_cancel_at_cutoff_retries_once_then_recovery_reaches_flat (tests.test_adaptive_paper_cancel_liveness.CancelLiveness.test_held_sell_cancel_at_cutoff_retries_once_then_recovery_reaches_flat) ... held_sell_recovery False flat True deletes 2 counters {'held_unattributed_refusals': 1, 'lookup_confirmed_retries': 1}
+ok
+test_budget_wait_retains_one_operation_and_shutdown_joins_it (tests.test_adaptive_paper_cancel_worker_ownership.CancelWorkerOwnership.test_budget_wait_retains_one_operation_and_shutdown_joins_it) ... ok
+test_failed_halt_delete_clears_strategy_mark_and_retries_before_flatten (tests.test_adaptive_paper_cancel_worker_ownership.CancelWorkerOwnership.test_failed_halt_delete_clears_strategy_mark_and_retries_before_flatten) ... ok
+test_late_completion_cannot_launch_a_duplicate_delete (tests.test_adaptive_paper_cancel_worker_ownership.CancelWorkerOwnership.test_late_completion_cannot_launch_a_duplicate_delete) ... ok
+test_recover_joins_cancel_past_its_former_ten_second_stop_timeout (tests.test_adaptive_paper_cancel_worker_ownership.CancelWorkerOwnership.test_recover_joins_cancel_past_its_former_ten_second_stop_timeout) ... ok
+test_sdk_delete_survives_timeout_and_is_joined_before_session_close (tests.test_adaptive_paper_cancel_worker_ownership.CancelWorkerOwnership.test_sdk_delete_survives_timeout_and_is_joined_before_session_close) ... ok
+test_shutdown_cancels_an_operation_still_waiting_for_the_owner_lock (tests.test_adaptive_paper_cancel_worker_ownership.CancelWorkerOwnership.test_shutdown_cancels_an_operation_still_waiting_for_the_owner_lock) ... ok
+test_403_rejection_requires_absence_lookup_and_never_retries (tests.test_adaptive_paper_transport.AsyncTransport.test_403_rejection_requires_absence_lookup_and_never_retries) ... ok
+test_422_duplicate_resolves_existing_order_or_stays_ambiguous (tests.test_adaptive_paper_transport.AsyncTransport.test_422_duplicate_resolves_existing_order_or_stays_ambiguous) ... ok
+test_a_named_cancel_keeps_the_waiting_budget_path (tests.test_adaptive_paper_transport.AsyncTransport.test_a_named_cancel_keeps_the_waiting_budget_path) ... ok
+test_a_named_cancel_uses_the_default_owner_deadline_and_freeze (tests.test_adaptive_paper_transport.AsyncTransport.test_a_named_cancel_uses_the_default_owner_deadline_and_freeze) ... ok
+test_ambiguous_post_resolves_by_id_without_retry_and_stays_frozen (tests.test_adaptive_paper_transport.AsyncTransport.test_ambiguous_post_resolves_by_id_without_retry_and_stays_frozen) ... ok
+test_ambiguous_post_then_404_does_not_resubmit (tests.test_adaptive_paper_transport.AsyncTransport.test_ambiguous_post_then_404_does_not_resubmit) ... ok
+test_an_exit_without_its_own_fresh_quote_is_refused_before_the_wire_as_not_sent (tests.test_adaptive_paper_transport.AsyncTransport.test_an_exit_without_its_own_fresh_quote_is_refused_before_the_wire_as_not_sent) ... ok
+test_an_iex_quote_ack_needs_no_halt_channels (tests.test_adaptive_paper_transport.AsyncTransport.test_an_iex_quote_ack_needs_no_halt_channels) ... ok
+test_b2_fallback_never_rolls_back_or_freezes_either_arrival_order (tests.test_adaptive_paper_transport.AsyncTransport.test_b2_fallback_never_rolls_back_or_freezes_either_arrival_order) ... ok
+test_cancel_404_with_terminal_final_is_data (tests.test_adaptive_paper_transport.AsyncTransport.test_cancel_404_with_terminal_final_is_data) ... ok
+test_cancel_ack_is_not_terminal_and_every_attempt_counted (tests.test_adaptive_paper_transport.AsyncTransport.test_cancel_ack_is_not_terminal_and_every_attempt_counted) ... ok
+test_cancel_again_sends_delete_and_takes_422_as_data (tests.test_adaptive_paper_transport.AsyncTransport.test_cancel_again_sends_delete_and_takes_422_as_data) ... ok
+test_cancel_refusal_for_still_working_order_freezes (tests.test_adaptive_paper_transport.AsyncTransport.test_cancel_refusal_for_still_working_order_freezes) ... ok
+test_cancel_server_error_stays_unresolved (tests.test_adaptive_paper_transport.AsyncTransport.test_cancel_server_error_stays_unresolved) ... ok
+test_crossed_streamed_quote_is_dropped_and_counted_not_fatal (tests.test_adaptive_paper_transport.AsyncTransport.test_crossed_streamed_quote_is_dropped_and_counted_not_fatal) ... ok
+test_delayed_budget_rechecks_quote_before_wire (tests.test_adaptive_paper_transport.AsyncTransport.test_delayed_budget_rechecks_quote_before_wire) ... ok
+test_disconnect_requires_explicit_reconciliation (tests.test_adaptive_paper_transport.AsyncTransport.test_disconnect_requires_explicit_reconciliation) ... ok
+test_documented_sub_penny_422_is_definitive_once_absent (tests.test_adaptive_paper_transport.AsyncTransport.test_documented_sub_penny_422_is_definitive_once_absent) ... ok
+test_dropped_quote_keeps_the_last_valid_quote_and_its_age (tests.test_adaptive_paper_transport.AsyncTransport.test_dropped_quote_keeps_the_last_valid_quote_and_its_age) ... ok
+test_fill_activities_page_through_the_guarded_session_and_tile_one_order (tests.test_adaptive_paper_transport.AsyncTransport.test_fill_activities_page_through_the_guarded_session_and_tile_one_order) ... ok
+test_fill_activities_that_do_not_describe_one_complete_order_are_refused (tests.test_adaptive_paper_transport.AsyncTransport.test_fill_activities_that_do_not_describe_one_complete_order_are_refused) ... ok
+test_halted_or_unsubscribed_invalid_quote_fails_closed (tests.test_adaptive_paper_transport.AsyncTransport.test_halted_or_unsubscribed_invalid_quote_fails_closed) ... ok
+test_invalid_envelope_never_reaches_the_fake_broker (tests.test_adaptive_paper_transport.AsyncTransport.test_invalid_envelope_never_reaches_the_fake_broker) ... ok
+test_known_partial_then_invisible_order_still_cancels_known_id (tests.test_adaptive_paper_transport.AsyncTransport.test_known_partial_then_invisible_order_still_cancels_known_id) ... ok
+test_late_event_cannot_undo_cumulative_fill (tests.test_adaptive_paper_transport.AsyncTransport.test_late_event_cannot_undo_cumulative_fill) ... ok
+test_luld_bands_are_kept_for_receipts_and_never_freeze (tests.test_adaptive_paper_transport.AsyncTransport.test_luld_bands_are_kept_for_receipts_and_never_freeze) ... ok
+test_malformed_streamed_quote_still_fails_the_transport (tests.test_adaptive_paper_transport.AsyncTransport.test_malformed_streamed_quote_still_fails_the_transport) ... ok
+test_metadata_journaled_not_sent_and_replay_has_one_post (tests.test_adaptive_paper_transport.AsyncTransport.test_metadata_journaled_not_sent_and_replay_has_one_post) ... ok
+test_minimum_price_variance_matches_the_ledger (tests.test_adaptive_paper_transport.AsyncTransport.test_minimum_price_variance_matches_the_ledger) ... ok
+test_missing_order_update_freezes (tests.test_adaptive_paper_transport.AsyncTransport.test_missing_order_update_freezes) ... ok
+test_native_stream_threads_start_and_join (tests.test_adaptive_paper_transport.AsyncTransport.test_native_stream_threads_start_and_join) ... ok
+test_other_422_stays_ambiguous (tests.test_adaptive_paper_transport.AsyncTransport.test_other_422_stays_ambiguous) ... ok
+test_owned_exit_with_a_fresh_quote_reaches_the_wire_under_an_admission_freeze (tests.test_adaptive_paper_transport.AsyncTransport.test_owned_exit_with_a_fresh_quote_reaches_the_wire_under_an_admission_freeze) ... ok
+test_proven_not_sent_intent_does_not_break_flat_snapshot (tests.test_adaptive_paper_transport.AsyncTransport.test_proven_not_sent_intent_does_not_break_flat_snapshot) ... ok
+test_queue_overflow_cannot_be_silently_thawed (tests.test_adaptive_paper_transport.AsyncTransport.test_queue_overflow_cannot_be_silently_thawed) ... ok
+test_queued_quotes_do_not_block_reconciliation_but_order_events_do (tests.test_adaptive_paper_transport.AsyncTransport.test_queued_quotes_do_not_block_reconciliation_but_order_events_do) ... ok
+test_queued_statuses_and_lulds_do_not_block_reconciliation (tests.test_adaptive_paper_transport.AsyncTransport.test_queued_statuses_and_lulds_do_not_block_reconciliation) ... ok
+test_quiet_unrequired_symbol_does_not_halt_benchmark_readiness (tests.test_adaptive_paper_transport.AsyncTransport.test_quiet_unrequired_symbol_does_not_halt_benchmark_readiness) ... ok
+test_quote_subscription_ack_requires_statuses_and_lulds_for_every_symbol_on_sip (tests.test_adaptive_paper_transport.AsyncTransport.test_quote_subscription_ack_requires_statuses_and_lulds_for_every_symbol_on_sip) ... ok
+test_replayed_id_cannot_change_intent (tests.test_adaptive_paper_transport.AsyncTransport.test_replayed_id_cannot_change_intent) ... ok
+test_required_benchmark_stale_blocks_entry (tests.test_adaptive_paper_transport.AsyncTransport.test_required_benchmark_stale_blocks_entry) ... ok
+test_reviewed_native_dispatch_observes_control_ack (tests.test_adaptive_paper_transport.AsyncTransport.test_reviewed_native_dispatch_observes_control_ack) ... ok
+test_routine_acknowledgement_keeps_pending_order_update_timers (tests.test_adaptive_paper_transport.AsyncTransport.test_routine_acknowledgement_keeps_pending_order_update_timers) ... ok
+test_sleeping_submit_budget_cannot_starve_owned_cancel (tests.test_adaptive_paper_transport.AsyncTransport.test_sleeping_submit_budget_cannot_starve_owned_cancel) ... ok
+test_snapshot_bound_is_failure_not_partial_success (tests.test_adaptive_paper_transport.AsyncTransport.test_snapshot_bound_is_failure_not_partial_success) ... ok
+test_snapshot_failure_keeps_the_foreign_read_out_of_tracebacks (tests.test_adaptive_paper_transport.AsyncTransport.test_snapshot_failure_keeps_the_foreign_read_out_of_tracebacks) ... ok
+test_snapshot_paginates_and_rejects_nonadvancing_page (tests.test_adaptive_paper_transport.AsyncTransport.test_snapshot_paginates_and_rejects_nonadvancing_page) ... ok
+test_snapshot_refuses_non_list_positions_in_success_response (tests.test_adaptive_paper_transport.AsyncTransport.test_snapshot_refuses_non_list_positions_in_success_response) ... ok
+test_snapshot_refuses_tuple_and_list_subclass_positions_from_sdk (tests.test_adaptive_paper_transport.AsyncTransport.test_snapshot_refuses_tuple_and_list_subclass_positions_from_sdk) ... ok
+test_start_on_iex_subscribes_quotes_only (tests.test_adaptive_paper_transport.AsyncTransport.test_start_on_iex_subscribes_quotes_only) ... ok
+test_start_subscribes_statuses_and_lulds_on_the_sip_quote_connection (tests.test_adaptive_paper_transport.AsyncTransport.test_start_subscribes_statuses_and_lulds_on_the_sip_quote_connection) ... ok
+test_start_waits_on_the_required_basket_only (tests.test_adaptive_paper_transport.AsyncTransport.test_start_waits_on_the_required_basket_only) ... ok
+test_startup_staggered_quotes_do_not_freeze_before_first_ready (tests.test_adaptive_paper_transport.AsyncTransport.test_startup_staggered_quotes_do_not_freeze_before_first_ready) ... ok
+test_stream_execution_is_forwarded_after_a_rest_read_advanced_past_it (tests.test_adaptive_paper_transport.AsyncTransport.test_stream_execution_is_forwarded_after_a_rest_read_advanced_past_it) ... ok
+test_stream_fill_time_reaches_ledger_losslessly (tests.test_adaptive_paper_transport.AsyncTransport.test_stream_fill_time_reaches_ledger_losslessly) ... ok
+test_sub_penny_422_with_visible_order_is_not_a_refusal (tests.test_adaptive_paper_transport.AsyncTransport.test_sub_penny_422_with_visible_order_is_not_a_refusal) ... ok
+test_subscription_ack_not_running_flag_controls_ready (tests.test_adaptive_paper_transport.AsyncTransport.test_subscription_ack_not_running_flag_controls_ready) ... ok
+test_task_cancellation_preserves_worker_cancel_identity (tests.test_adaptive_paper_transport.AsyncTransport.test_task_cancellation_preserves_worker_cancel_identity) ... ok
+test_trading_status_messages_reach_the_status_sink_and_are_counted (tests.test_adaptive_paper_transport.AsyncTransport.test_trading_status_messages_reach_the_status_sink_and_are_counted) ... ok
+test_valid_submit_posts_exactly_its_envelope (tests.test_adaptive_paper_transport.AsyncTransport.test_valid_submit_posts_exactly_its_envelope) ... ok
+test_websocket_redirect_rejected_before_sdk_authentication (tests.test_adaptive_paper_transport.AsyncTransport.test_websocket_redirect_rejected_before_sdk_authentication) ... ok
+test_wire_future_quote_tolerance_matches_risk_layer (tests.test_adaptive_paper_transport.AsyncTransport.test_wire_future_quote_tolerance_matches_risk_layer) ... ok
+test_default_transport_feed_remains_the_frozen_iex_lane (tests.test_adaptive_paper_transport.ConfiguredQuoteFeed.test_default_transport_feed_remains_the_frozen_iex_lane) ... ok
+test_extended_hours_quote_stream_keeps_the_sdk_default_data_timeout (tests.test_adaptive_paper_transport.ConfiguredQuoteFeed.test_extended_hours_quote_stream_keeps_the_sdk_default_data_timeout) ... ok
+test_iex_feed_keeps_the_frozen_quote_stream (tests.test_adaptive_paper_transport.ConfiguredQuoteFeed.test_iex_feed_keeps_the_frozen_quote_stream) ... ok
+test_regular_session_quote_stream_keeps_the_data_timeout_watchdog (tests.test_adaptive_paper_transport.ConfiguredQuoteFeed.test_regular_session_quote_stream_keeps_the_data_timeout_watchdog) ... ok
+test_sdk_enum_member_is_refused_by_the_transport_and_by_preflight (tests.test_adaptive_paper_transport.ConfiguredQuoteFeed.test_sdk_enum_member_is_refused_by_the_transport_and_by_preflight) ... ok
+test_sip_feed_selects_the_sip_quote_stream (tests.test_adaptive_paper_transport.ConfiguredQuoteFeed.test_sip_feed_selects_the_sip_quote_stream) ... ok
+test_unqualified_feed_refused_before_any_stream_is_constructed (tests.test_adaptive_paper_transport.ConfiguredQuoteFeed.test_unqualified_feed_refused_before_any_stream_is_constructed) ... ok
+test_a_str_subclass_naming_a_feed_is_still_refused (tests.test_adaptive_paper_transport.DataFeedSelection.test_a_str_subclass_naming_a_feed_is_still_refused) ... ok
+test_configured_feed_selects_the_matching_quote_stream (tests.test_adaptive_paper_transport.DataFeedSelection.test_configured_feed_selects_the_matching_quote_stream) ... ok
+test_quote_stream_connect_guard_follows_the_configured_feed (tests.test_adaptive_paper_transport.DataFeedSelection.test_quote_stream_connect_guard_follows_the_configured_feed) ... ok
+test_sdk_enum_members_are_refused_rather_than_formatted_into_the_url (tests.test_adaptive_paper_transport.DataFeedSelection.test_sdk_enum_members_are_refused_rather_than_formatted_into_the_url) ... ok
+test_unqualified_feed_is_refused_before_any_endpoint_is_derived (tests.test_adaptive_paper_transport.DataFeedSelection.test_unqualified_feed_is_refused_before_any_endpoint_is_derived) ... ok
+test_cancel_budget_names_only_the_announced_order (tests.test_adaptive_paper_transport.HTTPBoundary.test_cancel_budget_names_only_the_announced_order) ... ok
+test_closed_preflight_preserves_clock_with_invalid_and_missing_quotes (tests.test_adaptive_paper_transport.HTTPBoundary.test_closed_preflight_preserves_clock_with_invalid_and_missing_quotes) ... ok
+test_every_attempt_budgeted_timeouts_and_headers_sanitized (tests.test_adaptive_paper_transport.HTTPBoundary.test_every_attempt_budgeted_timeouts_and_headers_sanitized) ... ok
+test_fill_activities_read_is_allowed_only_filtered_by_one_order (tests.test_adaptive_paper_transport.HTTPBoundary.test_fill_activities_read_is_allowed_only_filtered_by_one_order) ... ok
+test_positive_submission_delay_is_deferred_without_sending (tests.test_adaptive_paper_transport.HTTPBoundary.test_positive_submission_delay_is_deferred_without_sending) ... ok
+test_preflight_is_read_only_and_hashes_identity (tests.test_adaptive_paper_transport.HTTPBoundary.test_preflight_is_read_only_and_hashes_identity) ... ok
+test_preflight_refuses_an_unqualified_feed_before_any_request (tests.test_adaptive_paper_transport.HTTPBoundary.test_preflight_refuses_an_unqualified_feed_before_any_request) ... ok
+test_preflight_refuses_non_list_orders_in_success_response (tests.test_adaptive_paper_transport.HTTPBoundary.test_preflight_refuses_non_list_orders_in_success_response) ... ok
+test_preflight_refuses_non_list_positions_in_success_response (tests.test_adaptive_paper_transport.HTTPBoundary.test_preflight_refuses_non_list_positions_in_success_response) ... ok
+test_preflight_sends_the_configured_feed_on_the_quote_request (tests.test_adaptive_paper_transport.HTTPBoundary.test_preflight_sends_the_configured_feed_on_the_quote_request) ... ok
+test_restricts_origin_method_path_and_redirects (tests.test_adaptive_paper_transport.HTTPBoundary.test_restricts_origin_method_path_and_redirects) ... ok
+test_sdk_serialization_of_an_envelope_passes_the_wire_gate (tests.test_adaptive_paper_transport.HTTPBoundary.test_sdk_serialization_of_an_envelope_passes_the_wire_gate) ... ok
+test_sdk_zero_retry_applied_after_constructor (tests.test_adaptive_paper_transport.HTTPBoundary.test_sdk_zero_retry_applied_after_constructor) ... ok
+test_unvalidated_order_body_is_refused_before_budget_and_http (tests.test_adaptive_paper_transport.HTTPBoundary.test_unvalidated_order_body_is_refused_before_budget_and_http) ... ok
+test_a_dripping_loopback_server_is_cut_off_at_the_deadline_by_the_real_http_stack (tests.test_adaptive_paper_transport.HaltFeedSeed.test_a_dripping_loopback_server_is_cut_off_at_the_deadline_by_the_real_http_stack) ... ok
+test_a_dripping_server_cannot_hold_the_read_past_its_deadline (tests.test_adaptive_paper_transport.HaltFeedSeed.test_a_dripping_server_cannot_hold_the_read_past_its_deadline) ... ok
+test_active_halts_are_the_latest_unresumed_halt_of_each_wanted_symbol (tests.test_adaptive_paper_transport.HaltFeedSeed.test_active_halts_are_the_latest_unresumed_halt_of_each_wanted_symbol) ... ok
+test_eastern_times_convert_across_daylight_saving (tests.test_adaptive_paper_transport.HaltFeedSeed.test_eastern_times_convert_across_daylight_saving) ... ok
+test_one_bounded_get_of_the_one_url_without_redirects (tests.test_adaptive_paper_transport.HaltFeedSeed.test_one_bounded_get_of_the_one_url_without_redirects) ... ok
+test_the_feed_is_requested_uncompressed_and_an_encoded_body_is_refused (tests.test_adaptive_paper_transport.HaltFeedSeed.test_the_feed_is_requested_uncompressed_and_an_encoded_body_is_refused) ... ok
+test_the_feed_parses_to_rows_of_the_documented_fields (tests.test_adaptive_paper_transport.HaltFeedSeed.test_the_feed_parses_to_rows_of_the_documented_fields) ... ok
+test_the_seed_records_its_source_digest_and_active_halts (tests.test_adaptive_paper_transport.HaltFeedSeed.test_the_seed_records_its_source_digest_and_active_halts) ... ok
+test_current_alpaca_schema_normalizes_without_legacy_fields (tests.test_adaptive_paper_transport.LeverageNormalizeAccountTests.test_current_alpaca_schema_normalizes_without_legacy_fields) ... ok
+test_default_returns_exact_pre_change_key_set (tests.test_adaptive_paper_transport.LeverageNormalizeAccountTests.test_default_returns_exact_pre_change_key_set) ... ok
+test_include_margin_true_adds_margin_keys (tests.test_adaptive_paper_transport.LeverageNormalizeAccountTests.test_include_margin_true_adds_margin_keys) ... ok
+test_include_margin_true_missing_fields_omitted_not_erroring (tests.test_adaptive_paper_transport.LeverageNormalizeAccountTests.test_include_margin_true_missing_fields_omitted_not_erroring) ... ok
+test_crossed_and_one_sided_quotes_are_untradable_not_corrupt (tests.test_adaptive_paper_transport.Normalization.test_crossed_and_one_sided_quotes_are_untradable_not_corrupt) ... ok
+test_cumulative_fill_cannot_exceed_order (tests.test_adaptive_paper_transport.Normalization.test_cumulative_fill_cannot_exceed_order) ... ok
+test_fractional_exit_is_preserved_but_entry_rejected (tests.test_adaptive_paper_transport.Normalization.test_fractional_exit_is_preserved_but_entry_rejected) ... ok
+test_manual_quote_correction_preserves_explicit_and_stream_halts (tests.test_adaptive_paper_transport.Normalization.test_manual_quote_correction_preserves_explicit_and_stream_halts) ... ok
+test_nonfinite_and_advanced_orders_rejected (tests.test_adaptive_paper_transport.Normalization.test_nonfinite_and_advanced_orders_rejected) ... ok
+test_timestamp_accepts_lowercase_z (tests.test_adaptive_paper_transport.Normalization.test_timestamp_accepts_lowercase_z) ... ok
+test_timestamp_preserves_nanoseconds (tests.test_adaptive_paper_transport.Normalization.test_timestamp_preserves_nanoseconds) ... ok
+test_timestamp_rfc3339_offsets_and_zero_to_nine_fraction_digits (tests.test_adaptive_paper_transport.Normalization.test_timestamp_rfc3339_offsets_and_zero_to_nine_fraction_digits) ... ok
+test_timestamp_truncates_subnanosecond_fraction (tests.test_adaptive_paper_transport.Normalization.test_timestamp_truncates_subnanosecond_fraction) ... ok
+test_untradable_utp_manual_quote_uses_ordinary_invalid_quote (tests.test_adaptive_paper_transport.Normalization.test_untradable_utp_manual_quote_uses_ordinary_invalid_quote) ... ok
+test_utp_manual_bid_and_ask_quote_is_not_halted (tests.test_adaptive_paper_transport.Normalization.test_utp_manual_bid_and_ask_quote_is_not_halted) ... ok
+test_wire_decimals_are_exact_fixed_point_for_risk_parser (tests.test_adaptive_paper_transport.Normalization.test_wire_decimals_are_exact_fixed_point_for_risk_parser) ... ok
+test_boundary_status_is_active_and_fails_closed (tests.test_adaptive_paper_transport.OrderContractBoundary.test_boundary_status_is_active_and_fails_closed) ... ok
+test_contract_refusals_are_local_not_broker_refusals (tests.test_adaptive_paper_transport.OrderContractBoundary.test_contract_refusals_are_local_not_broker_refusals) ... ok
+test_engine_semantics_kept_fractional_sell_and_allowed_extended_hours (tests.test_adaptive_paper_transport.OrderContractBoundary.test_engine_semantics_kept_fractional_sell_and_allowed_extended_hours) ... ok
+test_envelope_validates_the_sdk_bound_projection_only (tests.test_adaptive_paper_transport.OrderContractBoundary.test_envelope_validates_the_sdk_bound_projection_only) ... ok
+test_float_that_loses_the_exact_decimal_is_refused (tests.test_adaptive_paper_transport.OrderContractBoundary.test_float_that_loses_the_exact_decimal_is_refused) ... ok
+test_wire_gate_requires_the_exact_validated_body (tests.test_adaptive_paper_transport.OrderContractBoundary.test_wire_gate_requires_the_exact_validated_body) ... ok
+test_extended_hours_keep_the_sdk_default (tests.test_adaptive_paper_transport.QuoteStreamDataTimeout.test_extended_hours_keep_the_sdk_default) ... ok
+test_regular_session_opts_into_the_watchdog_at_the_quote_timeout (tests.test_adaptive_paper_transport.QuoteStreamDataTimeout.test_regular_session_opts_into_the_watchdog_at_the_quote_timeout) ... ok
+test_stream_health_keeps_the_view_taken_as_stop_began (tests.test_adaptive_paper_transport.QuoteStreamDataTimeout.test_stream_health_keeps_the_view_taken_as_stop_began) ... ok
+test_the_constructor_passes_the_policy_to_the_quote_stream (tests.test_adaptive_paper_transport.QuoteStreamDataTimeout.test_the_constructor_passes_the_policy_to_the_quote_stream) ... ok
+test_the_pinned_sdk_default_is_off (tests.test_adaptive_paper_transport.QuoteStreamDataTimeout.test_the_pinned_sdk_default_is_off) ... ok
+test_an_unrecognized_tape_reads_both_tables_so_a_documented_resume_still_resumes (tests.test_adaptive_paper_transport.TradingStatusParsing.test_an_unrecognized_tape_reads_both_tables_so_a_documented_resume_still_resumes) ... ok
+test_cta_halt_with_reason_m_is_a_luld_pause_and_e_or_f_never_changes_the_state (tests.test_adaptive_paper_transport.TradingStatusParsing.test_cta_halt_with_reason_m_is_a_luld_pause_and_e_or_f_never_changes_the_state) ... ok
+test_cta_price_indication_halts_and_trading_range_indication_does_not (tests.test_adaptive_paper_transport.TradingStatusParsing.test_cta_price_indication_halts_and_trading_range_indication_does_not) ... ok
+test_documented_luld_band_parses_and_malformed_bands_raise (tests.test_adaptive_paper_transport.TradingStatusParsing.test_documented_luld_band_parses_and_malformed_bands_raise) ... ok
+test_every_documented_status_code_maps_to_one_effect (tests.test_adaptive_paper_transport.TradingStatusParsing.test_every_documented_status_code_maps_to_one_effect) ... ok
+test_halt_statuses_ride_only_the_sip_feed (tests.test_adaptive_paper_transport.TradingStatusParsing.test_halt_statuses_ride_only_the_sip_feed) ... ok
+test_market_wide_circuit_breakers_halt_and_mwcq_resumes (tests.test_adaptive_paper_transport.TradingStatusParsing.test_market_wide_circuit_breakers_halt_and_mwcq_resumes) ... ok
+test_unknown_or_cross_tape_codes_fail_closed_and_malformed_messages_raise (tests.test_adaptive_paper_transport.TradingStatusParsing.test_unknown_or_cross_tape_codes_fail_closed_and_malformed_messages_raise) ... ok
+test_absent_preimage_fails_even_when_its_private_bytes_can_be_found (tests.test_overnight_published_preimages.PublishedPreimages.test_absent_preimage_fails_even_when_its_private_bytes_can_be_found) ... ok
+test_all_overnight_receipt_digests_resolve_to_published_bytes (tests.test_overnight_published_preimages.PublishedPreimages.test_all_overnight_receipt_digests_resolve_to_published_bytes) ... ok
+test_published_logs_are_sanitized_and_named_inside_publication (tests.test_overnight_published_preimages.PublishedPreimages.test_published_logs_are_sanitized_and_named_inside_publication) ... ok
+test_seven_character_private_prefixes_fail_without_a_public_blacklist (tests.test_overnight_published_preimages.PublishedPreimages.test_seven_character_private_prefixes_fail_without_a_public_blacklist) ... ok
+test_a_boats_port_is_checked_without_the_extended_hours_flag_and_a_plain_port_keeps_its_path (tests.test_adaptive_paper_overnight.OvernightAdmissionTests.test_a_boats_port_is_checked_without_the_extended_hours_flag_and_a_plain_port_keeps_its_path) ... ok
+test_a_standing_trading_halt_refuses_even_with_an_eligible_carrier (tests.test_adaptive_paper_overnight.OvernightAdmissionTests.test_a_standing_trading_halt_refuses_even_with_an_eligible_carrier) ... ok
+test_an_unclassifiable_clock_refuses_instead_of_skipping_the_check (tests.test_adaptive_paper_overnight.OvernightAdmissionTests.test_an_unclassifiable_clock_refuses_instead_of_skipping_the_check) ... ok
+test_explicit_eligible_unhalted_carrier_allows_the_existing_guard_to_run (tests.test_adaptive_paper_overnight.OvernightAdmissionTests.test_explicit_eligible_unhalted_carrier_allows_the_existing_guard_to_run) ... ok
+test_halted_unknown_and_ineligible_status_refuse_both_order_sides_before_reservation (tests.test_adaptive_paper_overnight.OvernightAdmissionTests.test_halted_unknown_and_ineligible_status_refuse_both_order_sides_before_reservation) ... ok
+test_invalid_carrier_timestamp_cannot_leave_a_prior_clear_state (tests.test_adaptive_paper_overnight.OvernightAdmissionTests.test_invalid_carrier_timestamp_cannot_leave_a_prior_clear_state) ... ok
+test_missing_status_cannot_be_cleared_by_a_fresh_manual_quote (tests.test_adaptive_paper_overnight.OvernightAdmissionTests.test_missing_status_cannot_be_cleared_by_a_fresh_manual_quote) ... ok
+test_restrictive_eligibility_and_halt_state_win_timestamp_ties (tests.test_adaptive_paper_overnight.OvernightAdmissionTests.test_restrictive_eligibility_and_halt_state_win_timestamp_ties) ... ok
+test_stale_and_future_status_refuse_and_stale_resumes_do_not_clear_halts (tests.test_adaptive_paper_overnight.OvernightAdmissionTests.test_stale_and_future_status_refuse_and_stale_resumes_do_not_clear_halts) ... ok
+test_status_is_rechecked_after_reservation_before_http_submit_for_both_sides (tests.test_adaptive_paper_overnight.OvernightAdmissionTests.test_status_is_rechecked_after_reservation_before_http_submit_for_both_sides) ... ok
+test_extended_policy_does_not_admit_the_new_market_session (tests.test_adaptive_paper_overnight.OvernightCallerTests.test_extended_policy_does_not_admit_the_new_market_session) ... ok
+test_held_book_financing_keeps_the_completed_rth_date_across_overnight (tests.test_adaptive_paper_overnight.OvernightCallerTests.test_held_book_financing_keeps_the_completed_rth_date_across_overnight) ... ok
+test_asset_attributes_claim_cites_the_matching_vendor_capture (tests.test_adaptive_paper_overnight.OvernightCitationCorrections.test_asset_attributes_claim_cites_the_matching_vendor_capture) ... ok
+test_delayed_feed_claim_cites_the_matching_vendor_capture (tests.test_adaptive_paper_overnight.OvernightCitationCorrections.test_delayed_feed_claim_cites_the_matching_vendor_capture) ... ok
+test_f1_names_the_landed_pin_and_retained_source (tests.test_adaptive_paper_overnight.OvernightCitationCorrections.test_f1_names_the_landed_pin_and_retained_source) ... ok
+test_boats_is_the_explicit_feed_and_uses_the_vendor_beta_endpoint (tests.test_adaptive_paper_overnight.OvernightFeedTests.test_boats_is_the_explicit_feed_and_uses_the_vendor_beta_endpoint) ... ok
+test_unqualified_sdk_boats_stream_refuses_before_any_client_construction (tests.test_adaptive_paper_overnight.OvernightFeedTests.test_unqualified_sdk_boats_stream_refuses_before_any_client_construction) ... ok
+test_closed_next_open_names_sunday_overnight_not_monday_pre (tests.test_adaptive_paper_overnight.OvernightSessionTests.test_closed_next_open_names_sunday_overnight_not_monday_pre) ... ok
+test_order_flag_and_window_cover_overnight (tests.test_adaptive_paper_overnight.OvernightSessionTests.test_order_flag_and_window_cover_overnight) ... ok
+test_overnight_hands_off_to_pre_at_0400 (tests.test_adaptive_paper_overnight.OvernightSessionTests.test_overnight_hands_off_to_pre_at_0400) ... ok
+test_post_hands_off_at_2000_to_next_trade_date (tests.test_adaptive_paper_overnight.OvernightSessionTests.test_post_hands_off_at_2000_to_next_trade_date) ... ok
+test_sunday_start_and_friday_end (tests.test_adaptive_paper_overnight.OvernightSessionTests.test_sunday_start_and_friday_end) ... ok
+test_upcoming_trade_date_controls_holidays_and_half_days (tests.test_adaptive_paper_overnight.OvernightSessionTests.test_upcoming_trade_date_controls_holidays_and_half_days) ... ok
+test_an_invalid_symbol_or_observation_time_refuses_the_carrier (tests.test_adaptive_paper_overnight.OvernightStatusCarrierTests.test_an_invalid_symbol_or_observation_time_refuses_the_carrier) ... ok
+test_malformed_attribute_lists_carry_unknown_instead_of_a_resume (tests.test_adaptive_paper_overnight.OvernightStatusCarrierTests.test_malformed_attribute_lists_carry_unknown_instead_of_a_resume) ... ok
+test_status_comes_from_asset_attributes_not_quote_conditions_or_top_level_flags (tests.test_adaptive_paper_overnight.OvernightStatusCarrierTests.test_status_comes_from_asset_attributes_not_quote_conditions_or_top_level_flags) ... ok
+test_tradable_and_halted_remain_independent_status_checks (tests.test_adaptive_paper_overnight.OvernightStatusCarrierTests.test_tradable_and_halted_remain_independent_status_checks) ... ok
+test_a_quote_too_late_for_a_whole_exit_does_not_start_one (tests.test_adaptive_paper_recovery.PerSymbolRecoveryExits.test_a_quote_too_late_for_a_whole_exit_does_not_start_one) ... ok
+test_a_stale_symbol_does_not_hold_back_a_fresh_symbols_exit (tests.test_adaptive_paper_recovery.PerSymbolRecoveryExits.test_a_stale_symbol_does_not_hold_back_a_fresh_symbols_exit) ... ok
+test_a_stale_symbol_is_exited_once_it_quotes_before_the_deadline (tests.test_adaptive_paper_recovery.PerSymbolRecoveryExits.test_a_stale_symbol_is_exited_once_it_quotes_before_the_deadline) ... ok
+test_every_symbol_stale_is_retried_until_the_deadline_and_never_sent (tests.test_adaptive_paper_recovery.PerSymbolRecoveryExits.test_every_symbol_stale_is_retried_until_the_deadline_and_never_sent) ... ok
+test_no_exit_starts_once_a_whole_exit_no_longer_fits (tests.test_adaptive_paper_recovery.PerSymbolRecoveryExits.test_no_exit_starts_once_a_whole_exit_no_longer_fits) ... ok
+test_position_preparation_cannot_spend_the_whole_exit_budget (tests.test_adaptive_paper_recovery.PerSymbolRecoveryExits.test_position_preparation_cannot_spend_the_whole_exit_budget) ... ok
+test_pre_wire_authorization_cannot_spend_the_whole_exit_budget (tests.test_adaptive_paper_recovery.PerSymbolRecoveryExits.test_pre_wire_authorization_cannot_spend_the_whole_exit_budget) ... ok
+test_pre_wire_authorization_preserves_the_unquoted_error (tests.test_adaptive_paper_recovery.PerSymbolRecoveryExits.test_pre_wire_authorization_preserves_the_unquoted_error) ... ok
+test_a_clean_recovery_has_no_error_details (tests.test_adaptive_paper_recovery.RecoveryTests.test_a_clean_recovery_has_no_error_details) ... ok
+test_a_home_path_and_a_long_token_cannot_shorten_each_other (tests.test_adaptive_paper_recovery.RecoveryTests.test_a_home_path_and_a_long_token_cannot_shorten_each_other) ... ok
+test_admission_freeze_does_not_block_confirmed_owned_exit (tests.test_adaptive_paper_recovery.RecoveryTests.test_admission_freeze_does_not_block_confirmed_owned_exit) ... ok
+test_ambiguous_exit_is_retained_never_retried_or_rejected (tests.test_adaptive_paper_recovery.RecoveryTests.test_ambiguous_exit_is_retained_never_retried_or_rejected) ... ok
+test_cancellation_then_teardown_failure_keeps_both_details (tests.test_adaptive_paper_recovery.RecoveryTests.test_cancellation_then_teardown_failure_keeps_both_details) ... ok
+test_cleanup_client_id_advances_past_prior_durable_cleanup (tests.test_adaptive_paper_recovery.RecoveryTests.test_cleanup_client_id_advances_past_prior_durable_cleanup) ... ok
+test_closed_market_does_not_send_exit (tests.test_adaptive_paper_recovery.RecoveryTests.test_closed_market_does_not_send_exit) ... ok
+test_crash_after_post_reconciles_original_id_without_resubmitting (tests.test_adaptive_paper_recovery.RecoveryTests.test_crash_after_post_reconciles_original_id_without_resubmitting) ... ok
+test_deadline_stops_without_claiming_snapshot_or_flatness (tests.test_adaptive_paper_recovery.RecoveryTests.test_deadline_stops_without_claiming_snapshot_or_flatness) ... ok
+test_engine_authored_context_is_kept_and_redacted (tests.test_adaptive_paper_recovery.RecoveryTests.test_engine_authored_context_is_kept_and_redacted) ... ok
+test_engine_codes_stay_and_other_long_tokens_are_redacted (tests.test_adaptive_paper_recovery.RecoveryTests.test_engine_codes_stay_and_other_long_tokens_are_redacted) ... ok
+test_existing_stop_request_still_allows_owned_exit (tests.test_adaptive_paper_recovery.RecoveryTests.test_existing_stop_request_still_allows_owned_exit) ... ok
+test_explicit_pre_wire_refusal_can_release_pending_intent (tests.test_adaptive_paper_recovery.RecoveryTests.test_explicit_pre_wire_refusal_can_release_pending_intent) ... ok
+test_external_order_stops_before_cancel (tests.test_adaptive_paper_recovery.RecoveryTests.test_external_order_stops_before_cancel) ... ok
+test_external_position_stops_without_liquidating_owned_or_external (tests.test_adaptive_paper_recovery.RecoveryTests.test_external_position_stops_without_liquidating_owned_or_external) ... ok
+test_http_definitive_refusal_is_not_mislabeled_as_never_sent (tests.test_adaptive_paper_recovery.RecoveryTests.test_http_definitive_refusal_is_not_mislabeled_as_never_sent) ... ok
+test_missing_attempted_order_never_becomes_not_sent (tests.test_adaptive_paper_recovery.RecoveryTests.test_missing_attempted_order_never_becomes_not_sent) ... ok
+test_notional_mode_exit_uses_whole_shares_within_the_ledger_cap (tests.test_adaptive_paper_recovery.RecoveryTests.test_notional_mode_exit_uses_whole_shares_within_the_ledger_cap)
+In "notional" max_order_qty_mode the ledger caps a sell at floor(notional cap / bid) ... ok
+test_overnight_recovery_in_post_exits_owned_position (tests.test_adaptive_paper_recovery.RecoveryTests.test_overnight_recovery_in_post_exits_owned_position) ... ok
+test_overnight_recovery_in_rth_exits_owned_position (tests.test_adaptive_paper_recovery.RecoveryTests.test_overnight_recovery_in_rth_exits_owned_position) ... ok
+test_overnight_recovery_outside_overnight_exits_owned_position (tests.test_adaptive_paper_recovery.RecoveryTests.test_overnight_recovery_outside_overnight_exits_owned_position) ... ok
+test_partial_buy_cancel_then_exact_nine_decimal_exit_after_expired_trial (tests.test_adaptive_paper_recovery.RecoveryTests.test_partial_buy_cancel_then_exact_nine_decimal_exit_after_expired_trial) ... ok
+test_pending_cancel_cannot_authorize_sell (tests.test_adaptive_paper_recovery.RecoveryTests.test_pending_cancel_cannot_authorize_sell) ... ok
+test_proven_unsent_reservation_is_retired_without_lookup_or_submit (tests.test_adaptive_paper_recovery.RecoveryTests.test_proven_unsent_reservation_is_retired_without_lookup_or_submit) ... ok
+test_random_texts_match_a_character_mask_oracle (tests.test_adaptive_paper_recovery.RecoveryTests.test_random_texts_match_a_character_mask_oracle) ... ok
+test_readiness_failure_keeps_each_subscription_reason (tests.test_adaptive_paper_recovery.RecoveryTests.test_readiness_failure_keeps_each_subscription_reason) ... ok
+test_receipt_carries_the_message_and_its_context (tests.test_adaptive_paper_recovery.RecoveryTests.test_receipt_carries_the_message_and_its_context) ... ok
+test_redaction_runs_before_the_length_cap (tests.test_adaptive_paper_recovery.RecoveryTests.test_redaction_runs_before_the_length_cap) ... ok
+test_retained_broker_refusal_does_not_block_owned_residual_exit (tests.test_adaptive_paper_recovery.RecoveryTests.test_retained_broker_refusal_does_not_block_owned_residual_exit) ... ok
+test_shared_request_budget_prevents_unbudgeted_exit (tests.test_adaptive_paper_recovery.RecoveryTests.test_shared_request_budget_prevents_unbudgeted_exit) ... ok
+test_stale_quote_does_not_send_exit (tests.test_adaptive_paper_recovery.RecoveryTests.test_stale_quote_does_not_send_exit) ... ok
+test_stream_observation_failure_prevents_residual_exit (tests.test_adaptive_paper_recovery.RecoveryTests.test_stream_observation_failure_prevents_residual_exit) ... ok
+test_task_cancellation_stops_transport_and_retains_ambiguity (tests.test_adaptive_paper_recovery.RecoveryTests.test_task_cancellation_stops_transport_and_retains_ambiguity) ... ok
+test_unfilled_exit_is_canceled_and_not_blindly_repriced (tests.test_adaptive_paper_recovery.RecoveryTests.test_unfilled_exit_is_canceled_and_not_blindly_repriced) ... ok
+test_a_single_first_tick_above_the_cap_records_no_time_and_does_not_satisfy (tests.test_adaptive_paper_runner.AchievedLeverageGateTraceTests.test_a_single_first_tick_above_the_cap_records_no_time_and_does_not_satisfy) ... ok
+test_trial_that_exceeds_the_lower_cap_satisfies_the_rung (tests.test_adaptive_paper_runner.AchievedLeverageGateTraceTests.test_trial_that_exceeds_the_lower_cap_satisfies_the_rung) ... ok
+test_trial_that_never_exceeds_the_lower_cap_does_not_satisfy_the_rung (tests.test_adaptive_paper_runner.AchievedLeverageGateTraceTests.test_trial_that_never_exceeds_the_lower_cap_does_not_satisfy_the_rung) ... ok
+test_2x_rung_next_lower_ceiling_is_the_1x_rung (tests.test_adaptive_paper_runner.AchievedLeverageReceiptIntegrationTests.test_2x_rung_next_lower_ceiling_is_the_1x_rung) ... ok
+test_ceiling_change_regime_comes_from_the_same_tick_decision (tests.test_adaptive_paper_runner.AchievedLeverageReceiptIntegrationTests.test_ceiling_change_regime_comes_from_the_same_tick_decision) ... ok
+test_default_path_outcome_has_no_leverage_key (tests.test_adaptive_paper_runner.AchievedLeverageReceiptIntegrationTests.test_default_path_outcome_has_no_leverage_key)
+The absence half of this task's acceptance: a run with no ... ok
+test_leveraged_run_records_the_achieved_leverage_receipt_fields (tests.test_adaptive_paper_runner.AchievedLeverageReceiptIntegrationTests.test_leveraged_run_records_the_achieved_leverage_receipt_fields) ... ok
+test_resting_unfilled_buy_orders_do_not_count_as_achieved_leverage (tests.test_adaptive_paper_runner.AchievedLeverageReceiptIntegrationTests.test_resting_unfilled_buy_orders_do_not_count_as_achieved_leverage)
+EH-3 (round 2, second half): the guarantee runner.py's EH-1 fix ... ok
+test_exactly_at_next_lower_ceiling_does_not_count_as_above (tests.test_adaptive_paper_runner.AchievedLeverageReceiptStepTests.test_exactly_at_next_lower_ceiling_does_not_count_as_above) ... ok
+test_first_tick_records_peak_and_ceiling_with_no_time_above_yet (tests.test_adaptive_paper_runner.AchievedLeverageReceiptStepTests.test_first_tick_records_peak_and_ceiling_with_no_time_above_yet) ... ok
+test_no_next_lower_ceiling_never_accumulates (tests.test_adaptive_paper_runner.AchievedLeverageReceiptStepTests.test_no_next_lower_ceiling_never_accumulates)
+A None threshold (leverage.next_lower_rung_ceiling for a value ... ok
+test_nonpositive_dt_never_accumulates (tests.test_adaptive_paper_runner.AchievedLeverageReceiptStepTests.test_nonpositive_dt_never_accumulates) ... ok
+test_peak_and_its_ceiling_snapshot_never_move_backward (tests.test_adaptive_paper_runner.AchievedLeverageReceiptStepTests.test_peak_and_its_ceiling_snapshot_never_move_backward) ... ok
+test_time_accumulates_only_while_above_next_lower_ceiling (tests.test_adaptive_paper_runner.AchievedLeverageReceiptStepTests.test_time_accumulates_only_while_above_next_lower_ceiling) ... ok
+test_begin_attempt_generation_survives_a_shutdown_before_the_worker_even_runs (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_begin_attempt_generation_survives_a_shutdown_before_the_worker_even_runs)
+HIGH finding (fix round 5): reproduces an independent review's ... ok
+test_cancellation_of_a_routine_refresh_does_not_degrade_a_clean_cached_result (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_cancellation_of_a_routine_refresh_does_not_degrade_a_clean_cached_result)
+LOW finding (fix round 5, Claude's review): cancellation (an ... ok
+test_fetch_window_is_wide_not_narrow (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_fetch_window_is_wide_not_narrow)
+CRITICAL finding 1: the fetch window sent to the source must be ... ok
+test_final_summary_fails_closed_when_the_calendar_itself_cannot_classify_now (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_final_summary_fails_closed_when_the_calendar_itself_cannot_classify_now)
+finding 6 (round 3)/H11 (fix round 5): when `session_at(now)` ... ok
+test_final_summary_is_clear_when_the_guard_is_actually_clear (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_final_summary_is_clear_when_the_guard_is_actually_clear)
+The mirror case: a guard reporting a genuinely clear state for ... ok
+test_final_summary_uses_the_guards_current_state_not_a_stale_strategy_snapshot (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_final_summary_uses_the_guards_current_state_not_a_stale_strategy_snapshot)
+MEDIUM finding 3 (fix round 4): reproduces the independent ... ok
+test_guard_wired_only_when_overnight_holds_enabled (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_guard_wired_only_when_overnight_holds_enabled)
+MEDIUM finding 8: the guard is only ever handed to the strategy ... ok
+test_hung_refresh_does_not_delay_process_exit (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_hung_refresh_does_not_delay_process_exit)
+LOW finding 6 (fix round 4): `asyncio.run()`'s own cleanup joins ... ok
+test_in_flight_is_reset_even_if_starting_the_worker_thread_itself_raises (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_in_flight_is_reset_even_if_starting_the_worker_thread_itself_raises)
+LOW finding (fix round 5): `Thread.start()` must sit INSIDE the ... ok
+test_outcome_pending_must_flatten_reflects_the_guards_final_state (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_outcome_pending_must_flatten_reflects_the_guards_final_state)
+fix round 3 (mutations F5a/F5b), fix round 4 (finding 3): the ... ok
+test_preflight_corporate_action_refresh_is_a_noop_when_guard_not_wired (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_preflight_corporate_action_refresh_is_a_noop_when_guard_not_wired)
+finding 8: the preflight fetch must never even attempt a call ... ok
+test_preflight_corporate_action_refresh_uses_the_wide_window (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_preflight_corporate_action_refresh_uses_the_wide_window)
+HIGH finding 2 (fix round 3, mutation F1b: 'preflight call site ... ok
+test_real_monitor_generation_drops_a_superseded_late_write (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_real_monitor_generation_drops_a_superseded_late_write)
+HIGH finding 1 (fix round 3): reproduces the reviewer's own ... ok
+test_resolve_does_not_crash_when_the_future_is_already_cancelled (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_resolve_does_not_crash_when_the_future_is_already_cancelled)
+H14 (fix round 5): `asyncio.wait_for` cancels the future it is ... ok
+test_run_native_actually_cancels_a_hanging_refresh_at_its_own_shutdown (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_run_native_actually_cancels_a_hanging_refresh_at_its_own_shutdown)
+G6 (fix round 4): run_native's OWN finally block must actually ... ok
+test_run_native_actually_schedules_a_refresh_when_overnight_holds_is_enabled (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_run_native_actually_schedules_a_refresh_when_overnight_holds_is_enabled)
+Runner-level test of BOTH the wiring (finding 8) and the refresh ... ok
+test_run_native_refuses_the_hold_when_a_refresh_degrades_after_the_final_rebalance (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_run_native_refuses_the_hold_when_a_refresh_degrades_after_the_final_rebalance)
+HIGH finding (fix round 5, Codex 4b): the existing hold/summary ... ok
+test_run_native_shutdown_cleanup_hook_fires_before_return (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_run_native_shutdown_cleanup_hook_fires_before_return)
+MEDIUM finding (fix round 5, Codex 4a): the shutdown test above ... ok
+test_scheduled_refresh_cancellation_invalidates_not_degrades_with_the_real_monitor (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_scheduled_refresh_cancellation_invalidates_not_degrades_with_the_real_monitor)
+HIGH/LOW finding (fix round 5): end-to-end through ... ok
+test_scheduled_refresh_no_op_when_already_in_flight (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_scheduled_refresh_no_op_when_already_in_flight)
+HIGH finding 2 (mutation F2c: the tick-loop in_flight check ... ok
+test_scheduled_refresh_runs_off_the_event_loop_and_clears_in_flight (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_scheduled_refresh_runs_off_the_event_loop_and_clears_in_flight)
+HIGH finding 2: the fetch runs in a worker thread (never blocks ... ok
+test_scheduled_refresh_timeout_flags_the_symbol_and_retries_after_60s_not_900s (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_scheduled_refresh_timeout_flags_the_symbol_and_retries_after_60s_not_900s)
+LOW finding (fix round 6, test gap): mutation G4 (drop the ... ok
+test_scheduled_refresh_times_out_and_still_clears_in_flight (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_scheduled_refresh_times_out_and_still_clears_in_flight)
+HIGH finding 1/2 (fix round 3): a refresh() call that runs ... ok
+test_scheduler_calls_begin_attempt_before_launching_the_worker_thread (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_scheduler_calls_begin_attempt_before_launching_the_worker_thread)
+HIGH finding (fix round 5): `_schedule_corporate_action_refresh` ... ok
+test_second_preflight_on_an_already_warmed_monitor_does_not_raise (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_second_preflight_on_an_already_warmed_monitor_does_not_raise)
+NIT (fix round 6): reproduces an independent review's own probe ... ok
+test_shutdown_cancels_and_joins_pending_corporate_action_tasks (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_shutdown_cancels_and_joins_pending_corporate_action_tasks)
+HIGH finding 1 (fix round 3, 'keep the task and join or cancel it ... ok
+test_shutdown_cleanup_still_runs_when_port_stop_raises (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_shutdown_cleanup_still_runs_when_port_stop_raises)
+LOW finding 7 (fix round 4)/H13 (fix round 5): `_shutdown_ ... ok
+test_shutdown_is_a_noop_with_no_tasks (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_shutdown_is_a_noop_with_no_tasks) ... ok
+test_thread_start_failure_still_resolves_the_real_monitors_attempt (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_thread_start_failure_still_resolves_the_real_monitors_attempt)
+LOW finding (fix round 6): reproduces an independent review's ... ok
+test_tick_loop_never_overlaps_refresh_calls (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_tick_loop_never_overlaps_refresh_calls)
+HIGH finding 2 (fix round 3, mutation F2c: the tick-loop ... ok
+test_worker_swallows_runtimeerror_when_the_loop_is_already_closed (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_worker_swallows_runtimeerror_when_the_loop_is_already_closed)
+LOW finding 5 (fix round 4)/H15 (fix round 5): once asyncio.run() ... ok
+test_worker_thread_is_a_daemon (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_worker_thread_is_a_daemon)
+LOW finding (fix round 5): the worker thread that runs the ... ok
+test_0700_and_0755_owned_parent_directories_still_pass (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_0700_and_0755_owned_parent_directories_still_pass) ... 
+  test_0700_and_0755_owned_parent_directories_still_pass (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_0700_and_0755_owned_parent_directories_still_pass) (mode='0o700') ... ERROR
+  test_0700_and_0755_owned_parent_directories_still_pass (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_0700_and_0755_owned_parent_directories_still_pass) (mode='0o755') ... ERROR
+test_error_never_includes_file_contents (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_error_never_includes_file_contents) ... ok
+test_error_never_includes_path_or_basename (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_error_never_includes_path_or_basename) ... ok
+test_fifo_is_rejected_and_does_not_hang (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_fifo_is_rejected_and_does_not_hang) ... ok
+test_group_or_other_readable_mode_is_rejected (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_group_or_other_readable_mode_is_rejected) ... ok
+test_group_writable_parent_directory_is_rejected (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_group_writable_parent_directory_is_rejected) ... ok
+test_hard_link_is_rejected (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_hard_link_is_rejected) ... ok
+test_inside_git_worktree_is_rejected (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_inside_git_worktree_is_rejected) ... ok
+test_missing_file_is_rejected (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_missing_file_is_rejected) ... ok
+test_non_ascii_content_is_rejected (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_non_ascii_content_is_rejected) ... FAIL
+test_oversized_file_is_rejected_not_silently_truncated_and_accepted (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_oversized_file_is_rejected_not_silently_truncated_and_accepted) ... FAIL
+test_passing_case_outside_worktree_mode_0600_own_uid_returns_credentials (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_passing_case_outside_worktree_mode_0600_own_uid_returns_credentials) ... ERROR
+test_symlink_to_a_valid_target_is_resolved_and_accepted (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_symlink_to_a_valid_target_is_resolved_and_accepted) ... ERROR
+test_world_writable_parent_directory_is_rejected (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_world_writable_parent_directory_is_rejected) ... ok
+test_wrong_mode_is_rejected (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_wrong_mode_is_rejected) ... ok
+test_wrong_owner_is_rejected (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_wrong_owner_is_rejected) ... ok
+test_a_halted_symbol_gets_no_order_and_its_resting_exit_is_not_repriced (tests.test_adaptive_paper_runner.IntegratedRunner.test_a_halted_symbol_gets_no_order_and_its_resting_exit_is_not_repriced)
+E4: while halted (runner.Controller.is_halted), a symbol gets no entry and no exit ... ok
+test_a_seeded_halt_keeps_its_symbol_out_of_run_native_entries (tests.test_adaptive_paper_runner.IntegratedRunner.test_a_seeded_halt_keeps_its_symbol_out_of_run_native_entries)
+E4 startup state through run_native: the halt seed (a halts-feed result in the ... ok
+test_activity_recovery_persists_fills_before_native_callbacks (tests.test_adaptive_paper_runner.IntegratedRunner.test_activity_recovery_persists_fills_before_native_callbacks)
+Alpaca FILL activities can advance beyond the REST snapshot that opened a gap. ... ok
+test_an_order_callback_exception_ends_the_run_needs_attention_and_routes_to_recovery (tests.test_adaptive_paper_runner.IntegratedRunner.test_an_order_callback_exception_ends_the_run_needs_attention_and_routes_to_recovery)
+E3 through run_native: an exception raised beneath the guard of on_order_filled ... ok
+test_boats_feed_is_refused_at_config_load_until_the_stream_is_qualified (tests.test_adaptive_paper_runner.IntegratedRunner.test_boats_feed_is_refused_at_config_load_until_the_stream_is_qualified) ... ok
+test_cancel_requests_name_their_order_without_touching_the_durable_budget (tests.test_adaptive_paper_runner.IntegratedRunner.test_cancel_requests_name_their_order_without_touching_the_durable_budget) ... ok
+test_controller_session_does_not_admit_overnight_or_a_closed_market (tests.test_adaptive_paper_runner.IntegratedRunner.test_controller_session_does_not_admit_overnight_or_a_closed_market) ... ok
+test_default_config_is_bounded (tests.test_adaptive_paper_runner.IntegratedRunner.test_default_config_is_bounded) ... ok
+test_default_policy_run_native_never_calls_session_at_and_survives_2028 (tests.test_adaptive_paper_runner.IntegratedRunner.test_default_policy_run_native_never_calls_session_at_and_survives_2028)
+S3 regression: last_session_kind used to be computed ... ok
+test_documented_sub_penny_refusal_is_recorded_through_the_controller (tests.test_adaptive_paper_runner.IntegratedRunner.test_documented_sub_penny_refusal_is_recorded_through_the_controller) ... ok
+test_failed_pre_status_stays_sticky_even_when_recovery_also_fails (tests.test_adaptive_paper_runner.IntegratedRunner.test_failed_pre_status_stays_sticky_even_when_recovery_also_fails)
+D6 (round 8): both tiers of the sticky rule are exercised by a ... ok
+test_failed_recovery_downgrades_an_optimistic_pre_status (tests.test_adaptive_paper_runner.IntegratedRunner.test_failed_recovery_downgrades_an_optimistic_pre_status)
+The mirror (already covered in round 6, re-asserted under the ... ok
+test_finalize_status_and_financing_adds_no_key_when_overnight_holds_false (tests.test_adaptive_paper_runner.IntegratedRunner.test_finalize_status_and_financing_adds_no_key_when_overnight_holds_false)
+Financing: outcome["modeled_financing"] is added only when the ... ok
+test_forced_recovery_that_fails_to_flatten_cannot_report_held_overnight_or_exit_0 (tests.test_adaptive_paper_runner.IntegratedRunner.test_forced_recovery_that_fails_to_flatten_cannot_report_held_overnight_or_exit_0)
+D4 (round 6): main()'s forced-recovery branch used to set ... ok
+test_forced_recovery_that_succeeds_from_an_equally_good_pre_status_reports_passed_and_exit_0 (tests.test_adaptive_paper_runner.IntegratedRunner.test_forced_recovery_that_succeeds_from_an_equally_good_pre_status_reports_passed_and_exit_0)
+A forced liquidation that DOES actually flatten the account, ... ok
+test_frozen_sip_config_matches_the_iex_lane_except_the_feed (tests.test_adaptive_paper_runner.IntegratedRunner.test_frozen_sip_config_matches_the_iex_lane_except_the_feed) ... ok
+test_gap_arising_during_the_periodic_snapshot_stops_instead_of_thawing (tests.test_adaptive_paper_runner.IntegratedRunner.test_gap_arising_during_the_periodic_snapshot_stops_instead_of_thawing) ... ok
+test_held_overnight_native_reduce_only_exit_routes_in_pre (tests.test_adaptive_paper_runner.IntegratedRunner.test_held_overnight_native_reduce_only_exit_routes_in_pre) ... ok
+test_held_overnight_pre_status_does_not_survive_a_successful_flatten (tests.test_adaptive_paper_runner.IntegratedRunner.test_held_overnight_pre_status_does_not_survive_a_successful_flatten)
+D6 (round 8): the exact bug in round 7's severity table -- ... ok
+test_honest_overnight_hold_false_for_mid_rth_unreconciled_error_or_halt (tests.test_adaptive_paper_runner.IntegratedRunner.test_honest_overnight_hold_false_for_mid_rth_unreconciled_error_or_halt) ... ok
+test_honest_overnight_hold_false_when_a_held_symbol_was_never_verified_clear (tests.test_adaptive_paper_runner.IntegratedRunner.test_honest_overnight_hold_false_when_a_held_symbol_was_never_verified_clear)
+MEDIUM finding 4 (fix round 3): a held symbol whose ... ok
+test_honest_overnight_hold_false_when_corporate_action_guard_still_pending (tests.test_adaptive_paper_runner.IntegratedRunner.test_honest_overnight_hold_false_when_corporate_action_guard_still_pending)
+MEDIUM finding 5 (2026-09-24 fix round): a held symbol still ... ok
+test_honest_overnight_hold_is_true_at_an_overnight_boundary (tests.test_adaptive_paper_runner.IntegratedRunner.test_honest_overnight_hold_is_true_at_an_overnight_boundary) ... ok
+test_honest_overnight_hold_true_only_for_a_genuine_reconciled_boundary_end (tests.test_adaptive_paper_runner.IntegratedRunner.test_honest_overnight_hold_true_only_for_a_genuine_reconciled_boundary_end)
+S1: a non-flat end under overnight_holds must only be treated as ... ok
+test_luld_pause_beyond_twelve_minutes_protects_exits_until_resume (tests.test_adaptive_paper_runner.IntegratedRunner.test_luld_pause_beyond_twelve_minutes_protects_exits_until_resume)
+Nasdaq Rule 4120 allows continuing pauses: elapsed time cannot release an exit. ... ok
+test_main_preserves_extended_session_window_at_controller_construction (tests.test_adaptive_paper_runner.IntegratedRunner.test_main_preserves_extended_session_window_at_controller_construction) ... ok
+test_native_adaptive_policy_reaches_ledger_and_flat_reconciliation (tests.test_adaptive_paper_runner.IntegratedRunner.test_native_adaptive_policy_reaches_ledger_and_flat_reconciliation) ... ok
+test_native_cleanup_reports_an_unchanged_exit_attention_reason_once (tests.test_adaptive_paper_runner.IntegratedRunner.test_native_cleanup_reports_an_unchanged_exit_attention_reason_once)
+Repeated native cleanup ticks preserve the hold without journal spam. ... ok
+test_native_post_cleanup_keeps_halt_attention_after_quotes_become_fresh (tests.test_adaptive_paper_runner.IntegratedRunner.test_native_post_cleanup_keeps_halt_attention_after_quotes_become_fresh)
+A final fresh quote cannot turn a halted forced exit into an honest hold. ... ok
+test_native_queued_buy_rechecks_dispatch_session_and_preserves_supported_sessions (tests.test_adaptive_paper_runner.IntegratedRunner.test_native_queued_buy_rechecks_dispatch_session_and_preserves_supported_sessions)
+Defensive native admission; the supplied long close is not an R9-bypass proof. ... ok
+test_native_sell_dispatch_crossing_post_close_never_reaches_the_broker (tests.test_adaptive_paper_runner.IntegratedRunner.test_native_sell_dispatch_crossing_post_close_never_reaches_the_broker)
+A POST owner tick cannot authorize a sell dispatched after 20:00. ... ok
+test_native_strategy_operational_status_recovery_only_is_reconciled_false_not_a_risk_halt (tests.test_adaptive_paper_runner.IntegratedRunner.test_native_strategy_operational_status_recovery_only_is_reconciled_false_not_a_risk_halt)
+D7/D8: the recovery_only branch of _operational_status was ... ok
+test_native_strategy_operational_status_reflects_real_stop_file_ledger_halt_and_transport_health (tests.test_adaptive_paper_runner.IntegratedRunner.test_native_strategy_operational_status_reflects_real_stop_file_ledger_halt_and_transport_health)
+Gap-closing wiring: native_strategy.AdaptiveStrategy._operational_status ... ok
+test_non_sticky_pre_status_always_defers_to_recoverys_own_status (tests.test_adaptive_paper_runner.IntegratedRunner.test_non_sticky_pre_status_always_defers_to_recoverys_own_status)
+D6 (round 8): the single severity table (round 7) is replaced ... ok
+test_operational_status_against_simulated_port_health_never_keyerrors (tests.test_adaptive_paper_runner.IntegratedRunner.test_operational_status_against_simulated_port_health_never_keyerrors)
+R2 regression: _operational_status used to read ... ok
+test_order_contract_refusal_is_local_not_sent_and_never_reaches_the_fake_broker (tests.test_adaptive_paper_runner.IntegratedRunner.test_order_contract_refusal_is_local_not_sent_and_never_reaches_the_fake_broker)
+Controller.bind over the real AlpacaPaperTransport: a symbol the ledger and ... ok
+test_proven_broker_refusal_is_retained_without_poisoning_flat_reconciliation (tests.test_adaptive_paper_runner.IntegratedRunner.test_proven_broker_refusal_is_retained_without_poisoning_flat_reconciliation) ... ok
+test_public_preflight_identifies_the_selected_feed (tests.test_adaptive_paper_runner.IntegratedRunner.test_public_preflight_identifies_the_selected_feed) ... ok
+test_reconcile_rejects_external_position_and_cash_gap (tests.test_adaptive_paper_runner.IntegratedRunner.test_reconcile_rejects_external_position_and_cash_gap) ... ok
+test_recovery_preflight_does_not_require_entry_cash_or_unrelated_quotes (tests.test_adaptive_paper_runner.IntegratedRunner.test_recovery_preflight_does_not_require_entry_cash_or_unrelated_quotes) ... ok
+test_restart_ids_use_highest_reserved_sequence_and_native_config (tests.test_adaptive_paper_runner.IntegratedRunner.test_restart_ids_use_highest_reserved_sequence_and_native_config) ... ok
+test_run_native_extended_simulated_port_flags_a_closed_session_exit (tests.test_adaptive_paper_runner.IntegratedRunner.test_run_native_extended_simulated_port_flags_a_closed_session_exit)
+The validated runner policy governs exits for every transport. ... ok
+test_run_native_status_mid_rth_non_flat_end_is_needs_attention_not_held_overnight (tests.test_adaptive_paper_runner.IntegratedRunner.test_run_native_status_mid_rth_non_flat_end_is_needs_attention_not_held_overnight)
+D1: run_native's own status computation used to set ... ok
+test_run_native_uses_the_load_config_validated_registry_not_the_default (tests.test_adaptive_paper_runner.IntegratedRunner.test_run_native_uses_the_load_config_validated_registry_not_the_default)
+R5 regression: run_native used to reload SOURCE/registry.json ... ok
+test_run_output_records_dropped_quote_counts_from_the_transport (tests.test_adaptive_paper_runner.IntegratedRunner.test_run_output_records_dropped_quote_counts_from_the_transport) ... ok
+test_selector_liquidation_cancels_only_resting_entries_not_resting_sells (tests.test_adaptive_paper_runner.IntegratedRunner.test_selector_liquidation_cancels_only_resting_entries_not_resting_sells)
+R1 regression: rebalance()'s liquidating branch used to call ... ok
+test_selector_liquidation_cancels_resting_entry_and_tags_the_exit_rotation_flatten (tests.test_adaptive_paper_runner.IntegratedRunner.test_selector_liquidation_cancels_resting_entry_and_tags_the_exit_rotation_flatten)
+D3: a liquidating selector decision must propagate into ... ok
+test_simulated_ports_name_the_cancelled_order (tests.test_adaptive_paper_runner.IntegratedRunner.test_simulated_ports_name_the_cancelled_order) ... ok
+test_stale_overnight_entry_keeps_native_node_and_other_position_alive (tests.test_adaptive_paper_runner.IntegratedRunner.test_stale_overnight_entry_keeps_native_node_and_other_position_alive) ... ok
+test_submission_rate_defers_without_waiting_or_selling_held_positions (tests.test_adaptive_paper_runner.IntegratedRunner.test_submission_rate_defers_without_waiting_or_selling_held_positions) ... ok
+test_successful_recovery_does_not_upgrade_a_genuinely_failed_pre_status (tests.test_adaptive_paper_runner.IntegratedRunner.test_successful_recovery_does_not_upgrade_a_genuinely_failed_pre_status)
+The exact bug D1 fixes: round 6's unconditional overwrite let a ... ok
+test_unqualified_feed_is_refused_at_config_load (tests.test_adaptive_paper_runner.IntegratedRunner.test_unqualified_feed_is_refused_at_config_load) ... ok
+test_default_configs_unaffected (tests.test_adaptive_paper_runner.LeverageLoadConfigTests.test_default_configs_unaffected) ... ok
+test_invalid_block_raises_specific_leverage_policy_error_code (tests.test_adaptive_paper_runner.LeverageLoadConfigTests.test_invalid_block_raises_specific_leverage_policy_error_code) ... ok
+test_max_leverage_2_without_block_still_refused (tests.test_adaptive_paper_runner.LeverageLoadConfigTests.test_max_leverage_2_without_block_still_refused) ... ok
+test_valid_2x_and_4x_blocks_load (tests.test_adaptive_paper_runner.LeverageLoadConfigTests.test_valid_2x_and_4x_blocks_load) ... ok
+test_bound_is_required_and_applies_to_the_legacy_field_too (tests.test_adaptive_paper_runner.LeverageMarginEntitlementTests.test_bound_is_required_and_applies_to_the_legacy_field_too) ... ok
+test_buying_power_is_bounded_by_current_equity (tests.test_adaptive_paper_runner.LeverageMarginEntitlementTests.test_buying_power_is_bounded_by_current_equity) ... ok
+test_current_alpaca_schema_insufficient_buying_power_refused (tests.test_adaptive_paper_runner.LeverageMarginEntitlementTests.test_current_alpaca_schema_insufficient_buying_power_refused) ... ok
+test_current_alpaca_schema_uses_buying_power (tests.test_adaptive_paper_runner.LeverageMarginEntitlementTests.test_current_alpaca_schema_uses_buying_power) ... ok
+test_daytrading_buying_power_insufficient_refused (tests.test_adaptive_paper_runner.LeverageMarginEntitlementTests.test_daytrading_buying_power_insufficient_refused) ... ok
+test_missing_margin_fields_refused (tests.test_adaptive_paper_runner.LeverageMarginEntitlementTests.test_missing_margin_fields_refused) ... ok
+test_multiplier_below_requested_refused (tests.test_adaptive_paper_runner.LeverageMarginEntitlementTests.test_multiplier_below_requested_refused) ... ok
+test_no_intraday_buying_power_field_is_missing (tests.test_adaptive_paper_runner.LeverageMarginEntitlementTests.test_no_intraday_buying_power_field_is_missing) ... ok
+test_pdt_with_low_equity_refused (tests.test_adaptive_paper_runner.LeverageMarginEntitlementTests.test_pdt_with_low_equity_refused) ... ok
+test_regt_buying_power_insufficient_refused_when_overnight_holds (tests.test_adaptive_paper_runner.LeverageMarginEntitlementTests.test_regt_buying_power_insufficient_refused_when_overnight_holds) ... ok
+test_sufficient_account_returns_multiplier (tests.test_adaptive_paper_runner.LeverageMarginEntitlementTests.test_sufficient_account_returns_multiplier) ... ok
+test_allow_existing_recovery_skips_margin_entitlement_even_when_missing (tests.test_adaptive_paper_runner.LeveragePreflightIntegrationTests.test_allow_existing_recovery_skips_margin_entitlement_even_when_missing)
+LEV-RI-1: --command recover only ever submits sells ... ok
+test_allow_existing_recovery_still_enforces_pdt_equity_floor_removal (tests.test_adaptive_paper_runner.LeveragePreflightIntegrationTests.test_allow_existing_recovery_still_enforces_pdt_equity_floor_removal)
+The ordinary account-restriction check (status/blocked flags, ... ok
+test_default_config_with_margin_less_account_still_ready (tests.test_adaptive_paper_runner.LeveragePreflightIntegrationTests.test_default_config_with_margin_less_account_still_ready) ... ok
+test_under_policy_missing_margin_fields_refused_before_other_config_state (tests.test_adaptive_paper_runner.LeveragePreflightIntegrationTests.test_under_policy_missing_margin_fields_refused_before_other_config_state) ... ok
+test_under_policy_sufficient_account_sets_account_multiplier (tests.test_adaptive_paper_runner.LeveragePreflightIntegrationTests.test_under_policy_sufficient_account_sets_account_multiplier) ... ok
+test_leverage_policy_blocks_identical_across_rungs (tests.test_adaptive_paper_runner.LeverageRungConfigConsistencyTests.test_leverage_policy_blocks_identical_across_rungs) ... ok
+test_policy_config_accepts_the_widened_100_share_ceiling_under_leverage_policy (tests.test_adaptive_paper_runner.LeverageRungConfigConsistencyTests.test_policy_config_accepts_the_widened_100_share_ceiling_under_leverage_policy)
+F2: strategies_v1.PolicyConfig must allow max_shares up to 100 ... ok
+test_policy_config_keeps_the_10_share_bound_without_leverage_policy (tests.test_adaptive_paper_runner.LeverageRungConfigConsistencyTests.test_policy_config_keeps_the_10_share_bound_without_leverage_policy)
+N1-0 (round 2): a config with no leverage_policy block (the ... ok
+test_rung_loss_cap_absorbs_full_gross_spread_cost_with_ladder_room (tests.test_adaptive_paper_runner.LeverageRungConfigConsistencyTests.test_rung_loss_cap_absorbs_full_gross_spread_cost_with_ladder_room)
+F2 (round 2): the scaled max_drawdown_usd must leave the ... ok
+test_rung_max_order_quantity_matches_engine_share_ceiling (tests.test_adaptive_paper_runner.LeverageRungConfigConsistencyTests.test_rung_max_order_quantity_matches_engine_share_ceiling)
+F2: max_order_quantity must not undercut max_order_qty_mode ... ok
+test_rung_numeric_relationships (tests.test_adaptive_paper_runner.LeverageRungConfigConsistencyTests.test_rung_numeric_relationships) ... ok
+test_rung_policy_config_max_order_notional_matches_configured_value (tests.test_adaptive_paper_runner.LeverageRungConfigConsistencyTests.test_rung_policy_config_max_order_notional_matches_configured_value)
+CX-P2 (2026-09-22 leverage fix round 1): PolicyConfig.max_order_notional ... ok
+test_rungs_differ_only_in_allowed_keys (tests.test_adaptive_paper_runner.LeverageRungConfigConsistencyTests.test_rungs_differ_only_in_allowed_keys) ... ok
+test_main_preserves_extended_session_window_at_controller_construction (tests.test_adaptive_paper_runner.MainCommandGateWiring.test_main_preserves_extended_session_window_at_controller_construction) ... ok
+test_paper_with_a_failed_check_in_gate_result_is_blocked (tests.test_adaptive_paper_runner.MainCommandGateWiring.test_paper_with_a_failed_check_in_gate_result_is_blocked)
+Regression (finding 3): a gate result with top-level status ... {"status": "not_started", "reason": "promotion_gate_failed_check", "orders_submitted": 0}
+ok
+test_paper_with_either_gate_argument_alone_requires_the_complete_pair (tests.test_adaptive_paper_runner.MainCommandGateWiring.test_paper_with_either_gate_argument_alone_requires_the_complete_pair) ... {"status": "not_started", "reason": "promotion_gate_missing", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_missing", "orders_submitted": 0}
+ok
+test_paper_with_failing_gate_result_is_blocked_before_execution_continues (tests.test_adaptive_paper_runner.MainCommandGateWiring.test_paper_with_failing_gate_result_is_blocked_before_execution_continues) ... {"status": "not_started", "reason": "promotion_gate_failed", "orders_submitted": 0}
+ok
+test_paper_with_mismatched_snapshot_hash_is_blocked (tests.test_adaptive_paper_runner.MainCommandGateWiring.test_paper_with_mismatched_snapshot_hash_is_blocked) ... {"status": "not_started", "reason": "promotion_gate_mismatch", "orders_submitted": 0}
+ok
+test_paper_with_passing_matched_gate_reaches_post_gate_execution (tests.test_adaptive_paper_runner.MainCommandGateWiring.test_paper_with_passing_matched_gate_reaches_post_gate_execution) ... ok
+test_paper_with_zero_row_count_gate_result_is_blocked (tests.test_adaptive_paper_runner.MainCommandGateWiring.test_paper_with_zero_row_count_gate_result_is_blocked)
+Regression (finding 3): a gate result with top-level status "pass" ... {"status": "not_started", "reason": "promotion_gate_empty", "orders_submitted": 0}
+ok
+test_paper_without_gate_arguments_reaches_post_gate_execution (tests.test_adaptive_paper_runner.MainCommandGateWiring.test_paper_without_gate_arguments_reaches_post_gate_execution) ... ok
+test_paper_without_gate_arguments_still_requires_ready_account (tests.test_adaptive_paper_runner.MainCommandGateWiring.test_paper_without_gate_arguments_still_requires_ready_account) ... {"status": "not_started", "reason": "account_not_ready", "orders_submitted": 0}
+ok
+test_preflight_command_is_unaffected_by_missing_gate_arguments (tests.test_adaptive_paper_runner.MainCommandGateWiring.test_preflight_command_is_unaffected_by_missing_gate_arguments) ... {"status": "ready", "orders_submitted": 0}
+ok
+test_recover_command_is_unaffected_by_missing_gate_arguments (tests.test_adaptive_paper_runner.MainCommandGateWiring.test_recover_command_is_unaffected_by_missing_gate_arguments)
+`recover` resumes a trial already admitted by an earlier `paper` ... ok
+test_active_boundary_is_checked_and_recorded_in_the_preflight_summary (tests.test_adaptive_paper_runner.OrderContractPreflight.test_active_boundary_is_checked_and_recorded_in_the_preflight_summary) ... {"status": "ready", "orders_submitted": 0}
+ok
+test_inactive_boundary_refuses_before_credentials_or_any_request (tests.test_adaptive_paper_runner.OrderContractPreflight.test_inactive_boundary_refuses_before_credentials_or_any_request) ... {"status": "not_started", "stage": "order_contract", "reason": "order_contract_boundary_inactive:invalid_sentinel_accepted", "orders_submitted": 0}
+{"status": "not_started", "stage": "order_contract", "reason": "order_contract_boundary_inactive:invalid_sentinel_accepted", "orders_submitted": 0}
+{"status": "not_started", "stage": "order_contract", "reason": "order_contract_boundary_inactive:invalid_sentinel_accepted", "orders_submitted": 0}
+ok
+test_validate_preflight_requires_the_boundary_and_admissible_symbols (tests.test_adaptive_paper_runner.OrderContractPreflight.test_validate_preflight_requires_the_boundary_and_admissible_symbols) ... ok
+test_first_trial_with_foreign_position_is_refused_even_under_overnight_holds (tests.test_adaptive_paper_runner.OvernightHoldPreflightScope.test_first_trial_with_foreign_position_is_refused_even_under_overnight_holds) ... {"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}
+ok
+test_held_resume_accepts_exactly_the_ledger_holdings (tests.test_adaptive_paper_runner.OvernightHoldPreflightScope.test_held_resume_accepts_exactly_the_ledger_holdings) ... ok
+test_held_resume_refuses_a_foreign_or_changed_position (tests.test_adaptive_paper_runner.OvernightHoldPreflightScope.test_held_resume_refuses_a_foreign_or_changed_position) ... ok
+test_held_resume_refuses_an_order_the_ledger_does_not_own (tests.test_adaptive_paper_runner.OvernightHoldPreflightScope.test_held_resume_refuses_an_order_the_ledger_does_not_own) ... ok
+test_hold_appearing_between_preflight_and_lock_is_refused (tests.test_adaptive_paper_runner.OvernightHoldPreflightScope.test_hold_appearing_between_preflight_and_lock_is_refused) ... ok
+test_hold_disappearing_between_preflight_and_lock_is_refused (tests.test_adaptive_paper_runner.OvernightHoldPreflightScope.test_hold_disappearing_between_preflight_and_lock_is_refused) ... ok
+test_main_refuses_held_resume_when_broker_holds_what_the_ledger_does_not (tests.test_adaptive_paper_runner.OvernightHoldPreflightScope.test_main_refuses_held_resume_when_broker_holds_what_the_ledger_does_not)
+Wiring: the persisted held trial's ledger is empty while the broker ... ok
+test_main_reuses_run_native_hold_decision (tests.test_adaptive_paper_runner.OvernightHoldPreflightScope.test_main_reuses_run_native_hold_decision) ... ok
+test_non_object_state_file_keeps_the_flat_gate (tests.test_adaptive_paper_runner.OvernightHoldPreflightScope.test_non_object_state_file_keeps_the_flat_gate) ... {"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}
+ok
+test_other_prior_phase_does_not_relax_the_flat_gate (tests.test_adaptive_paper_runner.OvernightHoldPreflightScope.test_other_prior_phase_does_not_relax_the_flat_gate) ... {"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}
+ok
+test_prior_held_overnight_phase_allows_the_non_flat_resume (tests.test_adaptive_paper_runner.OvernightHoldPreflightScope.test_prior_held_overnight_phase_allows_the_non_flat_resume) ... ok
+test_complete_gate_result_is_accepted (tests.test_adaptive_paper_runner.PromotionGatePreflight.test_complete_gate_result_is_accepted) ... ok
+test_csv_row_count_must_match_the_snapshot_rows (tests.test_adaptive_paper_runner.PromotionGatePreflight.test_csv_row_count_must_match_the_snapshot_rows) ... ok
+test_failing_gate_status_raises_promotion_gate_failed (tests.test_adaptive_paper_runner.PromotionGatePreflight.test_failing_gate_status_raises_promotion_gate_failed) ... ok
+test_gate_result_missing_one_named_check_is_incomplete (tests.test_adaptive_paper_runner.PromotionGatePreflight.test_gate_result_missing_one_named_check_is_incomplete) ... ok
+test_gate_result_missing_required_keys_raises_promotion_gate_incomplete (tests.test_adaptive_paper_runner.PromotionGatePreflight.test_gate_result_missing_required_keys_raises_promotion_gate_incomplete) ... ok
+test_gate_result_with_a_failed_check_raises_promotion_gate_failed_check (tests.test_adaptive_paper_runner.PromotionGatePreflight.test_gate_result_with_a_failed_check_raises_promotion_gate_failed_check)
+The other review-finding scenario: top-level status "pass", hash ... ok
+test_gate_result_with_duplicate_or_unknown_check_is_incomplete (tests.test_adaptive_paper_runner.PromotionGatePreflight.test_gate_result_with_duplicate_or_unknown_check_is_incomplete) ... ok
+test_gate_result_with_empty_checks_list_raises_promotion_gate_incomplete (tests.test_adaptive_paper_runner.PromotionGatePreflight.test_gate_result_with_empty_checks_list_raises_promotion_gate_incomplete) ... ok
+test_gate_result_with_zero_row_count_raises_promotion_gate_empty (tests.test_adaptive_paper_runner.PromotionGatePreflight.test_gate_result_with_zero_row_count_raises_promotion_gate_empty)
+The exact review-finding scenario: top-level status "pass", hash ... ok
+test_gate_result_without_the_named_checks_is_incomplete (tests.test_adaptive_paper_runner.PromotionGatePreflight.test_gate_result_without_the_named_checks_is_incomplete) ... ok
+test_mismatched_hash_raises_promotion_gate_mismatch (tests.test_adaptive_paper_runner.PromotionGatePreflight.test_mismatched_hash_raises_promotion_gate_mismatch) ... ok
+test_missing_gate_result_path_raises_promotion_gate_missing (tests.test_adaptive_paper_runner.PromotionGatePreflight.test_missing_gate_result_path_raises_promotion_gate_missing) ... ok
+test_missing_snapshot_path_raises_promotion_gate_missing (tests.test_adaptive_paper_runner.PromotionGatePreflight.test_missing_snapshot_path_raises_promotion_gate_missing) ... ok
+test_mode_none_is_unaffected_by_missing_gate_arguments (tests.test_adaptive_paper_runner.PromotionGatePreflight.test_mode_none_is_unaffected_by_missing_gate_arguments) ... ok
+test_naive_or_date_only_checked_at_and_empty_versions_are_incomplete (tests.test_adaptive_paper_runner.PromotionGatePreflight.test_naive_or_date_only_checked_at_and_empty_versions_are_incomplete) ... ok
+test_non_string_check_name_is_refused_cleanly (tests.test_adaptive_paper_runner.PromotionGatePreflight.test_non_string_check_name_is_refused_cleanly) ... ok
+test_nonexistent_gate_result_file_raises_promotion_gate_missing (tests.test_adaptive_paper_runner.PromotionGatePreflight.test_nonexistent_gate_result_file_raises_promotion_gate_missing) ... ok
+test_null_or_empty_versions_and_checked_at_are_incomplete (tests.test_adaptive_paper_runner.PromotionGatePreflight.test_null_or_empty_versions_and_checked_at_are_incomplete) ... ok
+test_passing_gate_still_enforces_ordinary_account_checks (tests.test_adaptive_paper_runner.PromotionGatePreflight.test_passing_gate_still_enforces_ordinary_account_checks) ... ok
+test_passing_matched_gate_allows_preflight_to_proceed (tests.test_adaptive_paper_runner.PromotionGatePreflight.test_passing_matched_gate_allows_preflight_to_proceed) ... ok
+test_runner_check_names_match_the_gate_module (tests.test_adaptive_paper_runner.PromotionGatePreflight.test_runner_check_names_match_the_gate_module) ... ok
+test_snapshot_path_that_is_a_directory_raises_promotion_gate_missing (tests.test_adaptive_paper_runner.PromotionGatePreflight.test_snapshot_path_that_is_a_directory_raises_promotion_gate_missing) ... ok
+test_snapshot_with_unaccepted_extension_raises_promotion_gate_missing (tests.test_adaptive_paper_runner.PromotionGatePreflight.test_snapshot_with_unaccepted_extension_raises_promotion_gate_missing)
+`--snapshot` must reference a file the gate itself could accept ... ok
+test_unmapped_failures_entry_is_reported_as_such (tests.test_adaptive_paper_runner.PromotionGatePreflight.test_unmapped_failures_entry_is_reported_as_such) ... ok
+test_unparseable_gate_result_file_raises_promotion_gate_missing (tests.test_adaptive_paper_runner.PromotionGatePreflight.test_unparseable_gate_result_file_raises_promotion_gate_missing) ... ok
+test_both_loaders_share_the_same_guard_function (tests.test_adaptive_paper_runner.SharedCredentialGuardParity.test_both_loaders_share_the_same_guard_function) ... ok
+test_wrong_mode_rejected_by_both_loaders (tests.test_adaptive_paper_runner.SharedCredentialGuardParity.test_wrong_mode_rejected_by_both_loaders) ... ok
+test_a_failing_freeze_still_stops_the_session (tests.test_adaptive_paper_native.AdaptiveCallbackGuard.test_a_failing_freeze_still_stops_the_session) ... ok
+test_an_exception_in_any_order_handler_freezes_stops_submits_and_stops_the_session (tests.test_adaptive_paper_native.AdaptiveCallbackGuard.test_an_exception_in_any_order_handler_freezes_stops_submits_and_stops_the_session) ... ok
+test_every_order_and_position_handler_is_guarded (tests.test_adaptive_paper_native.CallbackGuardCoverage.test_every_order_and_position_handler_is_guarded) ... ok
+test_the_scan_reports_an_unguarded_handler (tests.test_adaptive_paper_native.CallbackGuardCoverage.test_the_scan_reports_an_unguarded_handler) ... ok
+test_leverage_inputs_carries_account_multiplier (tests.test_adaptive_paper_native.LeverageStrategyTests.test_leverage_inputs_carries_account_multiplier) ... ok
+test_leverage_inputs_kill_switch_from_halted_reason (tests.test_adaptive_paper_native.LeverageStrategyTests.test_leverage_inputs_kill_switch_from_halted_reason) ... ok
+test_leverage_inputs_kill_switch_from_stop_file (tests.test_adaptive_paper_native.LeverageStrategyTests.test_leverage_inputs_kill_switch_from_stop_file) ... ok
+test_leverage_inputs_reports_rth_session_and_zero_drawdown (tests.test_adaptive_paper_native.LeverageStrategyTests.test_leverage_inputs_reports_rth_session_and_zero_drawdown) ... ok
+test_rebalance_decision_event_has_leverage_ceiling_under_policy (tests.test_adaptive_paper_native.LeverageStrategyTests.test_rebalance_decision_event_has_leverage_ceiling_under_policy) ... ok
+test_rebalance_decision_event_has_no_leverage_key_by_default (tests.test_adaptive_paper_native.LeverageStrategyTests.test_rebalance_decision_event_has_no_leverage_key_by_default) ... ok
+test_stop_file_gives_decided_ceiling_of_zero (tests.test_adaptive_paper_native.LeverageStrategyTests.test_stop_file_gives_decided_ceiling_of_zero) ... ok
+test_activity_recovery_persists_through_transport_observation_hook (tests.test_adaptive_paper_native.NativeIntegration.test_activity_recovery_persists_through_transport_observation_hook)
+Use AlpacaPaperTransport's callback shape, without SimulatedPort.controller. ... ok
+test_ambiguous_submit_stops_without_fake_rejection_or_retry (tests.test_adaptive_paper_native.NativeIntegration.test_ambiguous_submit_stops_without_fake_rejection_or_retry) ... ok
+test_definitive_risk_refusal_produces_native_rejection (tests.test_adaptive_paper_native.NativeIntegration.test_definitive_risk_refusal_produces_native_rejection) ... ok
+test_fractional_broker_fill_freezes_and_retains_actual_residual (tests.test_adaptive_paper_native.NativeIntegration.test_fractional_broker_fill_freezes_and_retains_actual_residual) ... ok
+test_native_equity_model_does_not_claim_fractional_precision (tests.test_adaptive_paper_native.NativeIntegration.test_native_equity_model_does_not_claim_fractional_precision) ... ok
+test_native_quote_precision_preserves_normalized_and_subpenny_values (tests.test_adaptive_paper_native.NativeIntegration.test_native_quote_precision_preserves_normalized_and_subpenny_values) ... ok
+test_real_native_cancel_confirmation_deduplicated (tests.test_adaptive_paper_native.NativeIntegration.test_real_native_cancel_confirmation_deduplicated) ... ok
+test_real_native_roundtrip_partial_and_duplicate_events (tests.test_adaptive_paper_native.NativeIntegration.test_real_native_roundtrip_partial_and_duplicate_events) ... ok
+test_startup_refuses_preexisting_orders_or_positions (tests.test_adaptive_paper_native.NativeIntegration.test_startup_refuses_preexisting_orders_or_positions) ... ok
+test_uuid_broker_ids_fill_without_trade_id_overflow (tests.test_adaptive_paper_native.NativeIntegration.test_uuid_broker_ids_fill_without_trade_id_overflow) ... ok
+test_a_cumulative_average_that_disagrees_with_the_executions_is_recorded_not_frozen (tests.test_adaptive_paper_native.PerExecutionBooking.test_a_cumulative_average_that_disagrees_with_the_executions_is_recorded_not_frozen) ... ok
+test_a_failing_activities_read_freezes_with_its_error (tests.test_adaptive_paper_native.PerExecutionBooking.test_a_failing_activities_read_freezes_with_its_error) ... ok
+test_a_fill_after_the_native_terminal_event_still_freezes (tests.test_adaptive_paper_native.PerExecutionBooking.test_a_fill_after_the_native_terminal_event_still_freezes) ... ok
+test_a_gap_on_a_port_without_activities_freezes (tests.test_adaptive_paper_native.PerExecutionBooking.test_a_gap_on_a_port_without_activities_freezes) ... ok
+test_a_gap_opened_during_another_gaps_grace_gets_its_own_grace (tests.test_adaptive_paper_native.PerExecutionBooking.test_a_gap_opened_during_another_gaps_grace_gets_its_own_grace) ... ok
+test_a_gap_still_open_when_the_session_stops_is_a_named_adapter_error (tests.test_adaptive_paper_native.PerExecutionBooking.test_a_gap_still_open_when_the_session_stops_is_a_named_adapter_error) ... ok
+test_a_gap_the_activities_leave_open_freezes (tests.test_adaptive_paper_native.PerExecutionBooking.test_a_gap_the_activities_leave_open_freezes) ... ok
+test_a_quantity_reported_during_the_activities_read_is_a_new_gap_not_a_failure (tests.test_adaptive_paper_native.PerExecutionBooking.test_a_quantity_reported_during_the_activities_read_is_a_new_gap_not_a_failure) ... ok
+test_a_stream_execution_above_a_rest_cancel_freezes_before_the_cancels_fills_are_booked (tests.test_adaptive_paper_native.PerExecutionBooking.test_a_stream_execution_above_a_rest_cancel_freezes_before_the_cancels_fills_are_booked) ... ok
+test_activities_above_a_rest_cancel_freeze (tests.test_adaptive_paper_native.PerExecutionBooking.test_activities_above_a_rest_cancel_freeze) ... ok
+test_activity_trade_ids_are_the_36_character_uuid_of_the_activity_id (tests.test_adaptive_paper_native.PerExecutionBooking.test_activity_trade_ids_are_the_36_character_uuid_of_the_activity_id) ... ok
+test_an_undocumented_trade_event_freezes_the_adapter (tests.test_adaptive_paper_native.PerExecutionBooking.test_an_undocumented_trade_event_freezes_the_adapter) ... ok
+test_apus_replay_books_three_exact_executions_without_a_freeze (tests.test_adaptive_paper_native.PerExecutionBooking.test_apus_replay_books_three_exact_executions_without_a_freeze) ... ok
+test_every_documented_trade_updates_event_has_exactly_one_handling (tests.test_adaptive_paper_native.PerExecutionBooking.test_every_documented_trade_updates_event_has_exactly_one_handling) ... ok
+test_fill_events_without_execution_fields_are_booked_from_activities (tests.test_adaptive_paper_native.PerExecutionBooking.test_fill_events_without_execution_fields_are_booked_from_activities) ... ok
+test_incomplete_activity_tiling_is_refused_before_observation_or_native_booking (tests.test_adaptive_paper_native.PerExecutionBooking.test_incomplete_activity_tiling_is_refused_before_observation_or_native_booking) ... ok
+test_rest_cancel_before_the_stream_fill_defers_the_cancel_until_the_fill (tests.test_adaptive_paper_native.PerExecutionBooking.test_rest_cancel_before_the_stream_fill_defers_the_cancel_until_the_fill) ... ok
+test_rest_cancel_whose_stream_fill_never_arrives_closes_from_the_activity (tests.test_adaptive_paper_native.PerExecutionBooking.test_rest_cancel_whose_stream_fill_never_arrives_closes_from_the_activity) ... ok
+test_same_quantity_with_a_changed_average_still_freezes (tests.test_adaptive_paper_native.PerExecutionBooking.test_same_quantity_with_a_changed_average_still_freezes) ... ok
+test_shuffled_duplicated_and_dropped_executions_close_from_activities_without_double_booking (tests.test_adaptive_paper_native.PerExecutionBooking.test_shuffled_duplicated_and_dropped_executions_close_from_activities_without_double_booking) ... ok
+test_fresh_snapshot_adoption_records_history_without_rebooking_positions (tests.test_adaptive_paper_native.StartupFillDurability.test_fresh_snapshot_adoption_records_history_without_rebooking_positions) ... ok
+test_restart_does_not_double_book_previously_recorded_startup_fills (tests.test_adaptive_paper_native.StartupFillDurability.test_restart_does_not_double_book_previously_recorded_startup_fills) ... ok
+test_startup_awaits_async_observation_sink (tests.test_adaptive_paper_native.StartupFillDurability.test_startup_awaits_async_observation_sink) ... ok
+test_startup_execution_times_are_durable_before_any_later_observation (tests.test_adaptive_paper_native.StartupFillDurability.test_startup_execution_times_are_durable_before_any_later_observation) ... ok
+test_startup_redelivery_keeps_untimed_executions_in_journal_positions (tests.test_adaptive_paper_native.StartupFillDurability.test_startup_redelivery_keeps_untimed_executions_in_journal_positions) ... ok
+test_startup_report_quantities_and_prices_match_durable_executions (tests.test_adaptive_paper_native.StartupFillDurability.test_startup_report_quantities_and_prices_match_durable_executions) ... ok
+test_startup_reports_survive_reopen_without_later_observation (tests.test_adaptive_paper_native.StartupFillDurability.test_startup_reports_survive_reopen_without_later_observation) ... ok
+test_startup_sink_failure_aborts_reports_and_retry_is_idempotent (tests.test_adaptive_paper_native.StartupFillDurability.test_startup_sink_failure_aborts_reports_and_retry_is_idempotent) ... ok
+test_stream_and_rest_redelivery_after_startup_is_idempotent (tests.test_adaptive_paper_native.StartupFillDurability.test_stream_and_rest_redelivery_after_startup_is_idempotent) ... ok
+test_an_adopted_partly_filled_order_books_one_native_fill_per_execution_through_rc5_startup (tests.test_adaptive_paper_native.StartupFillReports.test_an_adopted_partly_filled_order_books_one_native_fill_per_execution_through_rc5_startup) ... ok
+test_incomplete_or_missing_activities_refuse_the_restart (tests.test_adaptive_paper_native.StartupFillReports.test_incomplete_or_missing_activities_refuse_the_restart) ... ok
+test_restart_with_fills_reports_each_execution_from_the_activities (tests.test_adaptive_paper_native.StartupFillReports.test_restart_with_fills_reports_each_execution_from_the_activities) ... ok
+test_rc5_livenode_discards_an_unguarded_order_callback_exception (tests.test_adaptive_paper_native.UpstreamCallbackLoss.test_rc5_livenode_discards_an_unguarded_order_callback_exception) ... ok
+test_dot_and_dotdot_segments_are_refused (tests.test_adaptive_paper_source_hashes_manifest.KeyShapeRejectsDotSegments.test_dot_and_dotdot_segments_are_refused) ... ok
+test_ordinary_repo_paths_are_accepted (tests.test_adaptive_paper_source_hashes_manifest.KeyShapeRejectsDotSegments.test_ordinary_repo_paths_are_accepted) ... ok
+test_engine_lock_is_registered_without_extending_the_privacy_allowlist (tests.test_adaptive_paper_source_hashes_manifest.SourceHashesManifestIsHonest.test_engine_lock_is_registered_without_extending_the_privacy_allowlist) ... ok
+test_every_entry_is_the_named_files_actual_sha256 (tests.test_adaptive_paper_source_hashes_manifest.SourceHashesManifestIsHonest.test_every_entry_is_the_named_files_actual_sha256) ... ok
+test_every_key_is_a_real_repo_path_under_adaptive_paper_or_tests (tests.test_adaptive_paper_source_hashes_manifest.SourceHashesManifestIsHonest.test_every_key_is_a_real_repo_path_under_adaptive_paper_or_tests) ... ok
+test_every_value_is_exactly_64_lowercase_hex (tests.test_adaptive_paper_source_hashes_manifest.SourceHashesManifestIsHonest.test_every_value_is_exactly_64_lowercase_hex) ... ok
+test_manifest_has_no_duplicate_keys (tests.test_adaptive_paper_source_hashes_manifest.SourceHashesManifestIsHonest.test_manifest_has_no_duplicate_keys) ... ok
+test_manifest_is_a_flat_string_to_string_object (tests.test_adaptive_paper_source_hashes_manifest.SourceHashesManifestIsHonest.test_manifest_is_a_flat_string_to_string_object) ... ok
+
+======================================================================
+ERROR: test_0700_and_0755_owned_parent_directories_still_pass (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_0700_and_0755_owned_parent_directories_still_pass) (mode='0o700')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<ARM_WORKTREE>/tests/test_adaptive_paper_runner.py", line 2864, in test_0700_and_0755_owned_parent_directories_still_pass
+    self.assertEqual(credentials(path), ("fixture-key", "fixture-secret"))
+                     ^^^^^^^^^^^^^^^^^
+  File "<ARM_WORKTREE>/blueprints/us-equities/adaptive-paper/runner.py", line 154, in credentials
+    raise SafetyError(str(error)) from None
+safety.SafetyError: credential_file_permissions:ancestor
+
+======================================================================
+ERROR: test_0700_and_0755_owned_parent_directories_still_pass (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_0700_and_0755_owned_parent_directories_still_pass) (mode='0o755')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<ARM_WORKTREE>/tests/test_adaptive_paper_runner.py", line 2864, in test_0700_and_0755_owned_parent_directories_still_pass
+    self.assertEqual(credentials(path), ("fixture-key", "fixture-secret"))
+                     ^^^^^^^^^^^^^^^^^
+  File "<ARM_WORKTREE>/blueprints/us-equities/adaptive-paper/runner.py", line 154, in credentials
+    raise SafetyError(str(error)) from None
+safety.SafetyError: credential_file_permissions:ancestor
+
+======================================================================
+ERROR: test_passing_case_outside_worktree_mode_0600_own_uid_returns_credentials (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_passing_case_outside_worktree_mode_0600_own_uid_returns_credentials)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<ARM_WORKTREE>/tests/test_adaptive_paper_runner.py", line 2868, in test_passing_case_outside_worktree_mode_0600_own_uid_returns_credentials
+    self.assertEqual(credentials(path), ("fixture-key", "fixture-secret"))
+                     ^^^^^^^^^^^^^^^^^
+  File "<ARM_WORKTREE>/blueprints/us-equities/adaptive-paper/runner.py", line 154, in credentials
+    raise SafetyError(str(error)) from None
+safety.SafetyError: credential_file_permissions:ancestor
+
+======================================================================
+ERROR: test_symlink_to_a_valid_target_is_resolved_and_accepted (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_symlink_to_a_valid_target_is_resolved_and_accepted)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<ARM_WORKTREE>/tests/test_adaptive_paper_runner.py", line 2809, in test_symlink_to_a_valid_target_is_resolved_and_accepted
+    self.assertEqual(credentials(link), ("fixture-key", "fixture-secret"))
+                     ^^^^^^^^^^^^^^^^^
+  File "<ARM_WORKTREE>/blueprints/us-equities/adaptive-paper/runner.py", line 154, in credentials
+    raise SafetyError(str(error)) from None
+safety.SafetyError: credential_file_permissions:ancestor
+
+======================================================================
+FAIL: test_non_ascii_content_is_rejected (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_non_ascii_content_is_rejected)
+----------------------------------------------------------------------
+safety.SafetyError: credential_file_permissions:ancestor
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<ARM_WORKTREE>/tests/test_adaptive_paper_runner.py", line 2888, in test_non_ascii_content_is_rejected
+    with self.assertRaisesRegex(SafetyErrorAlways, "credential_file_permissions:encoding") as ctx:
+AssertionError: "credential_file_permissions:encoding" does not match "credential_file_permissions:ancestor"
+
+======================================================================
+FAIL: test_oversized_file_is_rejected_not_silently_truncated_and_accepted (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_oversized_file_is_rejected_not_silently_truncated_and_accepted)
+----------------------------------------------------------------------
+safety.SafetyError: credential_file_permissions:ancestor
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<ARM_WORKTREE>/tests/test_adaptive_paper_runner.py", line 2919, in test_oversized_file_is_rejected_not_silently_truncated_and_accepted
+    with self.assertRaisesRegex(SafetyErrorAlways, "credential_file_permissions:size"):
+AssertionError: "credential_file_permissions:size" does not match "credential_file_permissions:ancestor"
+
+----------------------------------------------------------------------
+Ran 474 tests in 127.075s
+
+FAILED (failures=2, errors=4)

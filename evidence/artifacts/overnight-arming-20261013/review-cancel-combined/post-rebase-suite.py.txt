@@ -1,0 +1,30 @@
+"""Post-rebase integration checks; synthetic broker I/O only."""
+import os
+import sys
+import unittest
+from contextlib import nullcontext
+from pathlib import Path
+
+ROOT = Path('/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013')
+sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / 'blueprints/us-equities/adaptive-paper'))
+modules = [
+    'runner', 'mover', 'mover_native', 'transport', 'recovery',
+    'overnight_arming', 'overnight_transition', 'overnight_guard_pins',
+    'overnight_guard_mutations', 'overnight_order_contract', 'sessions',
+    'overnight_round2', 'overnight_cancel_refusal', 'credential_source',
+    'cancel_worker_ownership', 'overnight_cancel_marks',
+]
+if sys.argv[1] == 'native':
+    from runtime_lock import runtime_read_lock
+    lock = runtime_read_lock()
+else:
+    lock = nullcontext()
+print('CGROUP=' + Path('/proc/self/cgroup').read_text().strip(), flush=True)
+with lock:
+    import mover
+    print('MOVER_IMPORT_OK', flush=True)
+    suite = unittest.defaultTestLoader.loadTestsFromNames(
+        ['tests.test_adaptive_paper_' + name for name in modules])
+    result = unittest.TextTestRunner(verbosity=2).run(suite)
+sys.exit(0 if result.wasSuccessful() else 1)

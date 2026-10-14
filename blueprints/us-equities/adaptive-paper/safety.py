@@ -567,7 +567,7 @@ class Ledger:
                 if exploratory:
                     self._set("paper_lane", "B")
                 version = self._get("schema_version")
-                if version not in (None, "1", "2", "3"):
+                if version not in (None, "1", "2", "3", "4"):
                     raise SafetyError("unsupported_ledger_schema")
                 if version in (None, "1"):
                     # Old `at` is the observation's floating-point order.updated_at,
@@ -580,7 +580,7 @@ class Ledger:
                 self.db.execute("CREATE TABLE IF NOT EXISTS fees(activity_id TEXT PRIMARY KEY, "
                                 "date TEXT NOT NULL, net_amount TEXT NOT NULL, sub_type TEXT NOT NULL, "
                                 "recorded_at REAL NOT NULL)")
-                self._set("schema_version", "3")
+                self._set("schema_version", "4" if version == "4" else "3")
                 self.db.execute("CREATE INDEX IF NOT EXISTS intents_symbol ON intents(symbol,client_id)")
                 self.db.execute("CREATE INDEX IF NOT EXISTS events_client_kind ON events(client_id,kind,id)")
                 self.db.execute("CREATE INDEX IF NOT EXISTS events_adopted_symbol ON "
@@ -631,6 +631,60 @@ class Ledger:
                         (kind, client_id, json.dumps(data, default=str, sort_keys=True, allow_nan=False)))
 
     _PRIOR_RTH_CLOSE_PREFIX = "prior_rth_close:"
+
+    def record_overnight_window(self, client_id, window):
+        """Persist BEFORE wire admission. Old engines refuse this schema."""
+        if set(window) != {"flatten_at", "boundary_at", "day_expiry"}:
+            raise SafetyError("invalid_overnight_window")
+        values = {key: instant(value) for key, value in window.items()}
+        if not values["flatten_at"] < values["boundary_at"] < values["day_expiry"]:
+            raise SafetyError("invalid_overnight_window")
+        with self._transaction():
+            if not self.db.execute("SELECT 1 FROM intents WHERE client_id=?", (client_id,)).fetchone():
+                raise SafetyError("overnight_window_without_intent")
+            key = "overnight_window:" + client_id
+            encoded = json.dumps(values, sort_keys=True, allow_nan=False)
+            prior = self._get(key)
+            if prior is not None and prior != encoded:
+                raise SafetyError("overnight_window_changed")
+            self._set(key, encoded)
+            self._set("schema_version", "4")
+
+    def overnight_windows(self):
+        with self._lock:
+            return {row[0].removeprefix("overnight_window:"): json.loads(row[1]) for row in
+                    self.db.execute("SELECT key,value FROM meta WHERE key LIKE 'overnight_window:%'")}
+
+    def record_overnight_submission(self, client_id, midpoint, sent_at):
+        """Durable midpoint/clock at the owner-checked wire boundary, not reservation."""
+        midpoint, sent_at = decimal(midpoint), instant(sent_at)
+        with self._transaction():
+            if self._get("overnight_window:" + client_id) is None:
+                raise SafetyError("overnight_submission_without_window")
+            key = "overnight_submit:" + client_id
+            if self._get(key) is not None:
+                raise SafetyError("overnight_submission_already_recorded")
+            row = {"midpoint": str(midpoint), "sent_at": sent_at}
+            self._set(key, json.dumps(row, sort_keys=True, allow_nan=False))
+            self._event("overnight_wire_submit", client_id, **row)
+
+    def overnight_submission_basis(self, client_id):
+        with self._lock:
+            value = self._get("overnight_submit:" + client_id)
+            return json.loads(value) if value is not None else None
+
+    def record_overnight_execution_receipt(self, client_id, receipt):
+        execution_id = receipt.get("execution_id")
+        if type(execution_id) is not str or not EXECUTION_ID.fullmatch(execution_id):
+            raise SafetyError("invalid_overnight_execution_receipt")
+        with self._transaction():
+            key = "overnight_execution_receipt:" + client_id + ":" + execution_id
+            if self._get(key) is not None:
+                return False
+            self._set(key, json.dumps(receipt, sort_keys=True, allow_nan=False))
+            self._event("overnight_execution_receipt", client_id,
+                        **{key: value for key, value in receipt.items() if key != "client_id"})
+            return True
 
     def record_prior_rth_close(self, symbol, price, session_date, ts_ns):
         """S5 (+ D3, round 4): persist the RTH-close price captured for
@@ -838,6 +892,9 @@ class Ledger:
                 raise SafetyError("trial_clock_moved_backward")
             if require_flat and (self._positions() or any(not i.terminal for i in self.intents())):
                 raise SafetyError("next_trial_requires_flat_and_terminal")
+            if require_flat:
+                # A successfully flat new trial cannot inherit an old carry clock.
+                self.db.execute("DELETE FROM meta WHERE key LIKE 'overnight_window:%'")
             state = self._state()
             if state.halted_reason not in (None, "recovery_only"):
                 raise SafetyError("next_trial_cannot_clear_risk_halt")

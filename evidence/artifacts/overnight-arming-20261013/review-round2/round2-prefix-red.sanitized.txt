@@ -1,0 +1,15 @@
+Running as unit: run-p996994-i168400947.scope; invocation ID: b20d08650b774334927e02b4756e3ac0
+test_seven_character_private_prefixes_fail_without_a_public_blacklist (tests.test_overnight_published_preimages.PublishedPreimages.test_seven_character_private_prefixes_fail_without_a_public_blacklist) ... FAIL
+
+======================================================================
+FAIL: test_seven_character_private_prefixes_fail_without_a_public_blacklist (tests.test_overnight_published_preimages.PublishedPreimages.test_seven_character_private_prefixes_fail_without_a_public_blacklist)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_overnight_published_preimages.py", line 24, in test_seven_character_private_prefixes_fail_without_a_public_blacklist
+    self.assertTrue(callable(check),'publication guard must detect shortened private digests')
+AssertionError: False is not true : publication guard must detect shortened private digests
+
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+FAILED (failures=1)

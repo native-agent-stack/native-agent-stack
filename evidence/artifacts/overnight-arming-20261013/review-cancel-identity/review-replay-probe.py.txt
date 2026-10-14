@@ -1,0 +1,51 @@
+"""Replay the identical first-operation refusal during the retry lookup.
+
+Only the synthetic HTTP boundary of the shipped regression is changed. All
+production methods and expected single-refusal DELETE counts stay unchanged.
+"""
+from pathlib import Path
+import sys,types,unittest,fcntl,os
+from unittest.mock import patch
+ROOT=Path(__file__).resolve().parent
+sys.path[:0]=[str(ROOT/'tree'),str(ROOT/'tree/blueprints/us-equities/adaptive-paper')]
+path=ROOT/'tree/tests/test_adaptive_paper_cancel_acknowledgement.py'
+code=path.read_text()
+old="if method == 'GET' and reject_first and not rejections:"
+assert code.count(old)==1
+mode=sys.argv[1] if len(sys.argv)>1 else 'replay'
+delivery='asyncio.run_coroutine_threadsafe(port._observe(observation), port._loop).result(3)'
+if mode=='twice_same_operation':
+    code=code.replace(delivery,delivery+'; '+delivery)
+elif mode in ('after_lookup','after_completion'):
+    code=code.replace(delivery,'pass  # Synthetic delivery is moved to immediately after the lookup')
+elif mode=='delayed':
+    code=code.replace(old,"if method == 'GET' and reject_first and not rejections and sum(m == 'DELETE' for m, _ in calls) == 2:")
+    code=code.replace("response.status_code = 204 if method == 'DELETE' else 200", "response.status_code = (422 if sum(m == 'DELETE' for m, _ in calls) == 1 else 204) if method == 'DELETE' else 200")
+    code=code.replace("response._content = b'' if method == 'DELETE' else json.dumps(payload).encode()", "response._content = json.dumps({'message':'synthetic cancellation refused','code':42210000}).encode() if response.status_code == 422 else (b'' if method == 'DELETE' else json.dumps(payload).encode())")
+else:
+    code=code.replace(old,"if method == 'GET' and reject_first and len(rejections) < 2:")
+module=types.ModuleType('tests.review_replay');module.__file__=str(path);module.__package__='tests'
+sys.modules[module.__name__]=module
+exec(compile(code,str(path),'exec'),module.__dict__)
+fd=os.open(Path.home()/'projects/.us-equities-runtime.lock',os.O_RDONLY|os.O_NOFOLLOW)
+try:
+    fcntl.flock(fd,fcntl.LOCK_SH|fcntl.LOCK_NB)
+    suite=unittest.defaultTestLoader.loadTestsFromName('CancelAcknowledgement.test_rejection_during_lookup_releases_pending_and_allows_one_retry',module)
+    if mode in ('after_lookup','after_completion'):
+        from transport import AlpacaPaperTransport
+        method='_lookup' if mode=='after_lookup' else 'cancel'
+        original=getattr(AlpacaPaperTransport,method)
+        async def after_lookup(port,cid):
+            result=await original(port,cid)
+            if not getattr(port,'_review_refusal_delivered',False):
+                port._review_refusal_delivered=True
+                event=dict(result,event='order_cancel_rejected')
+                await port._observe(event)
+            return result
+        with patch.object(AlpacaPaperTransport,method,after_lookup):
+            result=unittest.TextTestRunner().run(suite)
+    else:
+        result=unittest.TextTestRunner().run(suite)
+    raise SystemExit(not result.wasSuccessful())
+finally:
+    os.close(fd)

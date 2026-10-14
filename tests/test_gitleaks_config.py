@@ -640,6 +640,28 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
 
     SOURCE_HASHES_PATH = "blueprints/us-equities/adaptive-paper/source-hashes.json"
 
+    def test_reviewed_historical_source_hash_paths_keep_key_and_line_guards(self):
+        roots = (
+            "evidence/artifacts/overnight-arming-20261013/historical/44c08b7cd391a090fcb7deb925924692e966169a8d7528d00f2c31f53369542a/source-hashes.json.txt",
+            "evidence/artifacts/overnight-arming-20261013/historical/4f9d0ed81f9f7c46037dce620c3d064bc0b6e5aa16e37343e09a188f2fb57d53/source-hashes.json.txt",
+        )
+        with tempfile.TemporaryDirectory(dir="/var/tmp") as tmp:
+            target=Path(tmp)
+            for path in roots:
+                self._source_hashes_fixture(target,path,{
+                    "blueprints/us-equities/adaptive-paper/credential_guard.py":HEX64,
+                    "api_key":HEX64[::-1],
+                })
+            other=roots[0].replace("44c08b7c","04c08b7c")
+            self._source_hashes_fixture(target,other,{
+                "blueprints/us-equities/adaptive-paper/credential_guard.py":HEX64})
+            findings=[f for f in self._scan(target) if f["RuleID"]=="generic-api-key"]
+            for path in roots:
+                own=[f for f in findings if f["File"]==path]
+                self.assertEqual(_finding_fields(own),{"api_key"})
+            self.assertTrue(any(f["File"]==other for f in findings),
+                            "another historical path must remain scanned")
+
     def _source_hashes_fixture(self, target: Path, relative: str, obj: dict, *, compact: bool = False) -> None:
         """The shape of blueprints/us-equities/adaptive-paper/source-hashes.json: a flat
         map of repo file paths (several containing the word "credential",

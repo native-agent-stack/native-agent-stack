@@ -1,0 +1,73 @@
+test_budget_wait_retains_one_operation_and_shutdown_joins_it (tests.test_adaptive_paper_cancel_worker_ownership.CancelWorkerOwnership.test_budget_wait_retains_one_operation_and_shutdown_joins_it) ... FAIL
+test_late_completion_cannot_launch_a_duplicate_delete (tests.test_adaptive_paper_cancel_worker_ownership.CancelWorkerOwnership.test_late_completion_cannot_launch_a_duplicate_delete) ... FAIL
+test_sdk_delete_survives_timeout_and_is_joined_before_session_close (tests.test_adaptive_paper_cancel_worker_ownership.CancelWorkerOwnership.test_sdk_delete_survives_timeout_and_is_joined_before_session_close) ... FAIL
+test_shutdown_cancels_an_operation_still_waiting_for_the_owner_lock (tests.test_adaptive_paper_cancel_worker_ownership.CancelWorkerOwnership.test_shutdown_cancels_an_operation_still_waiting_for_the_owner_lock) ... ok
+
+======================================================================
+FAIL: test_budget_wait_retains_one_operation_and_shutdown_joins_it (tests.test_adaptive_paper_cancel_worker_ownership.CancelWorkerOwnership.test_budget_wait_retains_one_operation_and_shutdown_joins_it)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_worker_ownership.py", line 39, in test_budget_wait_retains_one_operation_and_shutdown_joins_it
+    self._exercise('budget', .05)
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_worker_ownership.py", line 193, in _exercise
+    asyncio.run(exercise())
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_worker_ownership.py", line 157, in exercise
+    self.assertEqual(len(worker_calls), 1,
+AssertionError: 2 != 1 : one in-flight SDK DELETE must survive wrapper timeout; no second worker
+
+======================================================================
+FAIL: test_late_completion_cannot_launch_a_duplicate_delete (tests.test_adaptive_paper_cancel_worker_ownership.CancelWorkerOwnership.test_late_completion_cannot_launch_a_duplicate_delete)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_worker_ownership.py", line 42, in test_late_completion_cannot_launch_a_duplicate_delete
+    self._exercise('http', .05, shutdown_before_release=False)
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_worker_ownership.py", line 193, in _exercise
+    asyncio.run(exercise())
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_worker_ownership.py", line 157, in exercise
+    self.assertEqual(len(worker_calls), 1,
+AssertionError: 2 != 1 : one in-flight SDK DELETE must survive wrapper timeout; no second worker
+
+======================================================================
+FAIL: test_sdk_delete_survives_timeout_and_is_joined_before_session_close (tests.test_adaptive_paper_cancel_worker_ownership.CancelWorkerOwnership.test_sdk_delete_survives_timeout_and_is_joined_before_session_close)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_worker_ownership.py", line 36, in test_sdk_delete_survives_timeout_and_is_joined_before_session_close
+    self._exercise('http', 5.0)
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_worker_ownership.py", line 193, in _exercise
+    asyncio.run(exercise())
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_worker_ownership.py", line 157, in exercise
+    self.assertEqual(len(worker_calls), 1,
+AssertionError: 2 != 1 : one in-flight SDK DELETE must survive wrapper timeout; no second worker
+
+----------------------------------------------------------------------
+Ran 4 tests in 8.691s
+
+FAILED (failures=3)
+ASSERTION_FAILURES 3 ERRORS 0 SKIPS 0

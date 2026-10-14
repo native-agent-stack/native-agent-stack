@@ -1,0 +1,258 @@
+{
+  "base_revision": "67469fb6ba5476459d3d8dac9d11bc62dd1c1f4b",
+  "code_revision": "0c65ee7fd7333635a447b6b7b65a2872211a9a8b",
+  "completion_scope": {
+    "conflicts": [
+      "manifests/evidence.json"
+    ],
+    "extra_publication_dependencies": [
+      "old source_policy.json after current-main auto-merge",
+      "old publication-test source after RECEIPTS registration"
+    ],
+    "nonregistry_rebase_patch_ids": {
+      "paths": 217,
+      "unchanged": 217
+    },
+    "publication_registry": "new record added to existing RECEIPTS; old test preimage retained",
+    "sealed_records_modified": false,
+    "trading_source": "byte-identical to reviewed02e19f10"
+  },
+  "created_utc": "2026-10-14T05:29:22Z",
+  "evidence_class": "synthetic_local_validation",
+  "failed_calibrations": [
+    {
+      "cause": "The bwrap user namespace maps host root-owned /, /tmp and /var to uid65534 while the runtime uid is1000; six synthetic credential-fixture assertions reject ancestor ownership.",
+      "command": "same ten-module runner inside bwrap --dev-bind / / --unshare-net",
+      "errors": 4,
+      "exit_code": 1,
+      "failures": 2,
+      "measured_environment": {
+        "namespace_root_and_tmp_uid": 65534,
+        "runtime_uid": 1000
+      },
+      "output_bytes": 109274,
+      "output_sha256": "b14b6f7c1f153105adf6a9e162812a7c6caff82729c54f1034e8a6cc2e57313f",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-landing-rebase/completion-ten-namespace-calibration.sanitized.txt",
+      "resolution": "Run the genuine ten modules directly on the pinned runtime under the same shared runtime lock and idle CPU scope; no source/test guard was changed or skipped.",
+      "skipped": 0,
+      "tests": 474
+    }
+  ],
+  "historical_failure": {
+    "assertion": "a published digest has no file inside the published set",
+    "errors": 0,
+    "execution": "measured before rebase at 2026-10-14T05:04:36Z",
+    "failures": 1,
+    "module": "tests.test_overnight_published_preimages",
+    "revision": "02e19f10c0c0c02836811dd499298c8677cb4572",
+    "skipped": 0,
+    "tests": 4,
+    "unpublished_record_digest_pairs": 7
+  },
+  "historical_receipts": "Existing sealed records remain unchanged and their historical inputs resolve to exact published Git preimages.",
+  "input_git_blobs": {
+    "blueprints/us-equities/adaptive-paper/mover.py": "85a9e4a59689003bdcf38029321495503421d6d2",
+    "blueprints/us-equities/adaptive-paper/native_adapter.py": "fa6454b01dbef82e5a96d537bd0d8206fe5a31b5",
+    "blueprints/us-equities/adaptive-paper/native_strategy.py": "1437095c281b43051bbc5229a8e05fe52e2dc52c",
+    "blueprints/us-equities/adaptive-paper/overnight-cancel-identity-validation.json": "afd227831dcfed2c7f3294a21db2bf95ff90278f",
+    "blueprints/us-equities/adaptive-paper/recovery.py": "e4524a0352bbbb798390b97ac019371b49511935",
+    "blueprints/us-equities/adaptive-paper/runner.py": "7a2d18cbf28309074572f7983acdfdefac0c7133",
+    "blueprints/us-equities/adaptive-paper/transport.py": "37aeb3b7232e9289cc1b20298e997dcba71370e1",
+    "docs/decisions/2026-10-13-overnight-rest-arming.md": "c1c0785b0895f22a1194fec655fb29b0a3309b13",
+    "scripts/published_preimages.py": "6f4107553286645fb3daf6dc17d4464cfa3dfc2e",
+    "tests/test_adaptive_paper_cancel_acknowledgement.py": "e7a75f0f7ad79c83ef461c1d568f1bafc13b31bf",
+    "tests/test_adaptive_paper_cancel_liveness.py": "33c113cdb3cb13104773b6e05ada9c66f7268d0c",
+    "tests/test_adaptive_paper_cancel_worker_ownership.py": "b6d7c0a3e956926a7816480009c4999d62b3d0eb",
+    "tests/test_adaptive_paper_lane_a_continuity.py": "8c00e048b2f4845492018b497ff5d5dcaf58926f",
+    "tests/test_adaptive_paper_native.py": "f43f93399e5befd21361276b0513b55b7480f8f5",
+    "tests/test_adaptive_paper_overnight.py": "136022260fafeee9ab0d3d6c685aad6e23d415fd",
+    "tests/test_adaptive_paper_recovery.py": "79ad22bc71622e8e40b0858639d7f64f0eea5a4c",
+    "tests/test_adaptive_paper_runner.py": "a004334611697476b25ab86d9785f95ff2e1b03b",
+    "tests/test_adaptive_paper_source_hashes_manifest.py": "4c3104f685348cbcfb75a28b6402987fdcecd65e",
+    "tests/test_adaptive_paper_start_readiness.py": "47570a8842a09a7cf35fc1a668dbc5a497a1f0be",
+    "tests/test_adaptive_paper_transport.py": "f18d2a1ad40d5016be9c155621dac35e6436df92",
+    "tests/test_overnight_published_preimages.py": "41d038181993c22438b7f2fbcbfe3897cea3182a",
+    "tools/local-pages/source_policy.json": "c2e95f01ec99342024be0d7d1c6401247539ec2b"
+  },
+  "input_hashes": {
+    "blueprints/us-equities/adaptive-paper/mover.py": "d2663a99532925ddd071147297cd51bc44cbfd9b4c69c4f316f3bb4efb5a716d",
+    "blueprints/us-equities/adaptive-paper/native_adapter.py": "a61d735b9ba9865f2e09124d1d772f95dab29eb91b47db16a8c71b7ab0f4bd24",
+    "blueprints/us-equities/adaptive-paper/native_strategy.py": "98f30ac68a71088c616965db840a022c4ed979fdb87e52e5e1a8a6efba812e3c",
+    "blueprints/us-equities/adaptive-paper/overnight-cancel-identity-validation.json": "b07265b906c9c6b0dfdbe10d228ee6147c9a38236f526e6338a955ab32636abf",
+    "blueprints/us-equities/adaptive-paper/recovery.py": "04987802bfd8d5284f16c090d79ac6f216f7213c242b3b9945622b579ab3a330",
+    "blueprints/us-equities/adaptive-paper/runner.py": "eb937d131bf77a6e994a3dec1f4a7fc8adc2b7e78f148265af20268f5c031d30",
+    "blueprints/us-equities/adaptive-paper/transport.py": "c755cd6dcb96f6c4c8a450f7c348ac603755732f217d95ccff37ee4d05e97399",
+    "docs/decisions/2026-10-13-overnight-rest-arming.md": "038e7c12285c60033e05319aabbebb0fc80dd504c30d10537f90bfaeb849d046",
+    "scripts/published_preimages.py": "9fd7d490721d9396f53e4395483cbdcb643c70f91189ec98e409d6baa6ebba73",
+    "tests/test_adaptive_paper_cancel_acknowledgement.py": "2901b8a2c11e67aaa0f400924dc592e87c7e12919d1acd835861489514226a92",
+    "tests/test_adaptive_paper_cancel_liveness.py": "8a4dd3e557a53f4736ad67047bc4a07be8c79fc428f223bcb96afb49805e3d4f",
+    "tests/test_adaptive_paper_cancel_worker_ownership.py": "957e0938475630abbeddc903a1481ffba7914c3e6dfa98a0b59a7c072ee81743",
+    "tests/test_adaptive_paper_lane_a_continuity.py": "0aabe897edb8d96e89644b4704e7b55a5d81381495a267be5a97f255ae736232",
+    "tests/test_adaptive_paper_native.py": "728458624788243abcaf653f6a20a5a6201cfa9ec3328e8d7eb3fd58fdfa94b0",
+    "tests/test_adaptive_paper_overnight.py": "2985e2cfa01d743b418dad20f1c8440c76275f9b3121c78dcc917a8bb14c6846",
+    "tests/test_adaptive_paper_recovery.py": "ca1bb1dabb164fcb67ab249197192b78e376d4f03935b3e2b9d5a8504d5926c6",
+    "tests/test_adaptive_paper_runner.py": "fbf8e7ec9b044526952aba9f790a0e2519bd60313fce642a32fde1059d0b1f3c",
+    "tests/test_adaptive_paper_source_hashes_manifest.py": "04b687b922073349f6038978cf219ea33b2c9ec0b59fe441646dd961a4807905",
+    "tests/test_adaptive_paper_start_readiness.py": "41fa8789dd6bb9e7f23a3ea3be1a0fc7c3019acf5b8d2c90478bfb706d4b2852",
+    "tests/test_adaptive_paper_transport.py": "eb7f0463d581807caa2f70d627d294cb8b48e38545c2a7d5b2c98e13c13dda0d",
+    "tests/test_overnight_published_preimages.py": "8706d67ff7f9c25822ab45145837fc0acd30bbfffe383c16eb575e98c68a552f",
+    "tools/local-pages/source_policy.json": "d35fda6b8d6d088f6f7a5fa0843c4bf694fd916a0fafcde1a4188f18c76a7c95"
+  },
+  "limitations": [
+    "Tests use the shipped synthetic fixtures and pinned managed runtime; the standalone publication check uses a network namespace, while the full ten modules run natively to preserve host ancestor uid semantics. No broker acceptance is inferred.",
+    "Primary vendor capture and lifecycle items remain the PR body Follow-ups.",
+    "The original identity record describes its original source inputs; this separate record binds the integrated landing source bytes."
+  ],
+  "paper_acceptance": "NOT_RUN",
+  "publication_policy": "scripts/published_preimages.py: receipt_digests and unpublished_digests; registered in tests/test_overnight_published_preimages.py RECEIPTS",
+  "published_preimages": [
+    {
+      "bytes": 56875,
+      "git_blob": "721f85325201cbe150b93b0ec97c56b6aae21d65",
+      "published_path": "evidence/artifacts/overnight-arming-20261013/review-landing-rebase/historical/bf9e9969e545a504188d8a72bf6abfa059fb8c1dae07263dafb2c7befb23f951/native_adapter.py.txt",
+      "sha256": "bf9e9969e545a504188d8a72bf6abfa059fb8c1dae07263dafb2c7befb23f951",
+      "source_path": "blueprints/us-equities/adaptive-paper/native_adapter.py",
+      "source_revision": "09a1426908b5dbb6ca0d8d4d621752bd82b131b2"
+    },
+    {
+      "bytes": 181338,
+      "git_blob": "cfa238fb2262d942bfda21e571b136b0b88bec09",
+      "published_path": "evidence/artifacts/overnight-arming-20261013/review-landing-rebase/historical/3722efa985394897d72ada48cf77c8858d0f51378c82dd833cadae21355cb942/runner.py.txt",
+      "sha256": "3722efa985394897d72ada48cf77c8858d0f51378c82dd833cadae21355cb942",
+      "source_path": "blueprints/us-equities/adaptive-paper/runner.py",
+      "source_revision": "09a1426908b5dbb6ca0d8d4d621752bd82b131b2"
+    },
+    {
+      "bytes": 123407,
+      "git_blob": "637e634acc26a72078079893aa82965a441826b8",
+      "published_path": "evidence/artifacts/overnight-arming-20261013/review-landing-rebase/historical/b8b55d8b19e025865ad198d82e86d93b81317b3dd676cb508bd744c433cc67ee/transport.py.txt",
+      "sha256": "b8b55d8b19e025865ad198d82e86d93b81317b3dd676cb508bd744c433cc67ee",
+      "source_path": "blueprints/us-equities/adaptive-paper/transport.py",
+      "source_revision": "09a1426908b5dbb6ca0d8d4d621752bd82b131b2"
+    },
+    {
+      "bytes": 19078,
+      "git_blob": "9a5bd230aa4a23daac62e19457da160b28e15c90",
+      "published_path": "evidence/artifacts/overnight-arming-20261013/review-landing-rebase/historical/51057bb41d16bbd5e383213e0e71febfe5c73081f844ca3bf9aadaf22bec4108/test_adaptive_paper_lane_a_continuity.py.txt",
+      "sha256": "51057bb41d16bbd5e383213e0e71febfe5c73081f844ca3bf9aadaf22bec4108",
+      "source_path": "tests/test_adaptive_paper_lane_a_continuity.py",
+      "source_revision": "09a1426908b5dbb6ca0d8d4d621752bd82b131b2"
+    },
+    {
+      "bytes": 760050,
+      "chunks": 109,
+      "git_blob": "36128653fa1e34468fc12d72fa438eb30fffb14f",
+      "published_path": "evidence/artifacts/overnight-arming-20261013/review-landing-rebase/historical/db963c760f32f59969f7f064b2bc44d3f0262a14571352515f98067c8f2e0212/source_policy.json.txt",
+      "sha256": "db963c760f32f59969f7f064b2bc44d3f0262a14571352515f98067c8f2e0212",
+      "source_path": "tools/local-pages/source_policy.json",
+      "source_revision": "02e19f10c0c0c02836811dd499298c8677cb4572"
+    },
+    {
+      "bytes": 6146,
+      "chunks": 1,
+      "git_blob": "222ae23bc800f5d1f129cc6d9fc9c3c39e83d8da",
+      "published_path": "evidence/artifacts/overnight-arming-20261013/review-landing-rebase/historical/de4e1dfa167307bb3ec4a2e87332e4e3bda98bc3a1f7c628acae4b0f7a2bc22b/test_overnight_published_preimages.py.txt",
+      "sha256": "de4e1dfa167307bb3ec4a2e87332e4e3bda98bc3a1f7c628acae4b0f7a2bc22b",
+      "source_path": "tests/test_overnight_published_preimages.py",
+      "source_revision": "09a1426908b5dbb6ca0d8d4d621752bd82b131b2"
+    }
+  ],
+  "published_runner": {
+    "path": "evidence/artifacts/overnight-arming-20261013/review-landing-rebase/completion-check-runner.py.txt",
+    "scope": "actual helper source capture with private absolute paths replaced by placeholders",
+    "sha256": "cbfdaf39faa35f2c1b3fd7f4e98e72f203a3fc1b0b9ac9cb17073fd797fd21e0"
+  },
+  "runs": [
+    {
+      "CPUWeight": "idle",
+      "alpaca_py": "0.44.0",
+      "command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- bwrap --dev-bind / / --unshare-net -- ~/projects/us-equities-runtime/.venv/bin/python <LANE_DIR>/pr1081-landing-check.py preimages",
+      "digest_scope": "published sanitized output",
+      "elapsed_seconds": 0.08643426498747431,
+      "errors": 0,
+      "execution_state": "measured on the staged completion inputs before sealing this record; exact-head repeat retained in lane",
+      "exit_code": 0,
+      "failures": 0,
+      "input_binding": "input_hashes and input_git_blobs",
+      "modules": [
+        "tests.test_overnight_published_preimages"
+      ],
+      "name": "preimages",
+      "nautilus_trader": "2.0.0rc5",
+      "output_bytes": 1309,
+      "output_sha256": "1cb9ffbc63c51a876982c10fa22abb3098dfe8aaaecea5b1d1b4f45eff457c27",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-landing-rebase/completion-preimages.sanitized.txt",
+      "python": "3.12.3",
+      "requests": "2.34.2",
+      "runtime_read_lock": true,
+      "skipped": 0,
+      "started_utc": "2026-10-14T05:23:56Z",
+      "tests": 4
+    },
+    {
+      "CPUWeight": "idle",
+      "alpaca_py": "0.44.0",
+      "command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- ~/projects/us-equities-runtime/.venv/bin/python <LANE_DIR>/pr1081-landing-check.py ten host",
+      "digest_scope": "published sanitized output",
+      "elapsed_seconds": 127.1080232829845,
+      "errors": 0,
+      "execution_state": "measured on the staged completion inputs before sealing this record; exact-head repeat retained in lane",
+      "exit_code": 0,
+      "failures": 0,
+      "input_binding": "input_hashes and input_git_blobs",
+      "modules": [
+        "tests.test_adaptive_paper_cancel_acknowledgement",
+        "tests.test_adaptive_paper_cancel_liveness",
+        "tests.test_adaptive_paper_cancel_worker_ownership",
+        "tests.test_adaptive_paper_transport",
+        "tests.test_overnight_published_preimages",
+        "tests.test_adaptive_paper_overnight",
+        "tests.test_adaptive_paper_recovery",
+        "tests.test_adaptive_paper_runner",
+        "tests.test_adaptive_paper_native",
+        "tests.test_adaptive_paper_source_hashes_manifest"
+      ],
+      "name": "ten",
+      "nautilus_trader": "2.0.0rc5",
+      "output_bytes": 103951,
+      "output_sha256": "61923d55a79ada7b9c5e90bb7858b87b9de18b53105cf23e06fea27e109d4a64",
+      "passed_by_module": {
+        "tests.test_adaptive_paper_cancel_acknowledgement": 6,
+        "tests.test_adaptive_paper_cancel_liveness": 2,
+        "tests.test_adaptive_paper_cancel_worker_ownership": 6,
+        "tests.test_adaptive_paper_native": 54,
+        "tests.test_adaptive_paper_overnight": 27,
+        "tests.test_adaptive_paper_recovery": 42,
+        "tests.test_adaptive_paper_runner": 194,
+        "tests.test_adaptive_paper_source_hashes_manifest": 8,
+        "tests.test_adaptive_paper_transport": 131,
+        "tests.test_overnight_published_preimages": 4
+      },
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-landing-rebase/completion-ten.sanitized.txt",
+      "python": "3.12.3",
+      "requests": "2.34.2",
+      "runtime_read_lock": true,
+      "skipped": 0,
+      "started_utc": "2026-10-14T05:26:32Z",
+      "tests": 474
+    },
+    {
+      "CPUWeight": "idle",
+      "command": "python3 scripts/validate.py",
+      "digest_scope": "published sanitized output",
+      "elapsed_seconds": 58.11055736299022,
+      "execution_state": "measured on the staged completion inputs before sealing this record; exact-head repeat retained in lane",
+      "exit_code": 0,
+      "input_binding": "input_hashes and input_git_blobs",
+      "name": "validate",
+      "output_bytes": 343,
+      "output_sha256": "b55f7bf3a900c474fba183be47def7d2d3337802abec53778cf0b6821e40a1d6",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-landing-rebase/completion-validate.sanitized.txt",
+      "runtime_read_lock": false,
+      "started_utc": "2026-10-14T05:22:54Z"
+    }
+  ],
+  "schema_version": 1,
+  "scope": "CC05:01 registry-class completion of the landing rebase",
+  "status": "SEALED"
+}

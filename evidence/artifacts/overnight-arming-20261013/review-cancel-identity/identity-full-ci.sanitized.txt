@@ -1,0 +1,12 @@
+Sanitized diagnostic excerpt: cancellation states, complete failure section and summary.
+ASSERTION_FAILURES 0 ERRORS 0 SKIPS 453
+
+----------------------------------------------------------------------
+Ran 1598 tests in 365.593s
+
+OK (skipped=453)
+{"status": "not_started", "stage": "order_contract", "reason": "order_contract_boundary_inactive:invalid_sentinel_accepted", "orders_submitted": 0}
+{"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}
+{"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}
+{"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}
+ASSERTION_FAILURES 0 ERRORS 0 SKIPS 453

@@ -250,11 +250,18 @@ regexes = [
 # this manifest without failing that test regardless of this allowlist.
 # scripts/validate.py only pins this file's own hash, not each entry. A credential-shaped key (api_key, credential.key, ...)
 # in this same file, a non-hex value, a second secret on the same line, or this same
-# path-keyed shape in any other file, is still detected (tests/test_gitleaks_config.py).
+# path-keyed shape in any other file beyond the two validated public historical
+# preimages below, is still detected (tests/test_gitleaks_config.py).
 [[rules.allowlists]]
-description = "Content digests (64-hex) under adaptive-paper/tests repo-path keys in the pinned source-hashes manifest"
+description = "Content digests under repo-path keys in the source-hashes manifest and two validated historical preimages"
 condition = "AND"
-paths = ['''^blueprints/us-equities/adaptive-paper/source-hashes\.json$''']
+paths = [
+  '''^blueprints/us-equities/adaptive-paper/source-hashes\.json$''',
+  # Exact public historical preimages; tests/test_overnight_published_preimages.py
+  # checks the snapshot's own content address and every value against public bytes.
+  '''^evidence/artifacts/overnight-arming-20261013/historical/44c08b7cd391a090fcb7deb925924692e966169a8d7528d00f2c31f53369542a/source-hashes\.json\.txt$''',
+  '''^evidence/artifacts/overnight-arming-20261013/historical/4f9d0ed81f9f7c46037dce620c3d064bc0b6e5aa16e37343e09a188f2fb57d53/source-hashes\.json\.txt$''',
+]
 regexTarget = "line"
 regexes = [
   '''^\s*"(?:blueprints/us-equities/adaptive-paper|tests)/(?:[A-Za-z0-9_\-][A-Za-z0-9_\-.]*/)*[A-Za-z0-9_\-][A-Za-z0-9_\-.]*\.(?:py|json|sh|txt)":\s*"[0-9a-f]{64}",?\s*$''',

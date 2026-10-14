@@ -1,0 +1,102 @@
+{
+  "base_commit": "9cb7c0d3338af2689ca7e489ac06e95873bf3848",
+  "evidence_class": "synthetic",
+  "guards": {
+    "F1": "Actual production MoverStrategy runs on pinned native node through PRE exit; CI executes its committed emitter AST. Both adaptive exit factory keyword expressions pinned.",
+    "F2": "Real validate_preflight allows owned recovery in PRE/RTH/POST and refuses new entries.",
+    "F3": "Reserve, wire, admission and normalize each have independent negative pins; downstream guards isolated in layer tests. Side, ownership and calendar admission components plus pair/triple deletions covered.",
+    "F4": "Inactive, not tradable, standing halt and missing owned carry window refuse residual exits."
+  },
+  "input_hashes": {
+    "blueprints/us-equities/adaptive-paper/mover_strategy.py": "698a9b916099a4098a6e8397c9481f644192ce61d21818cca2bd1787f301fd1c",
+    "blueprints/us-equities/adaptive-paper/native_adapter.py": "bf9e9969e545a504188d8a72bf6abfa059fb8c1dae07263dafb2c7befb23f951",
+    "blueprints/us-equities/adaptive-paper/native_strategy.py": "f2472067be553b53535084776725a6b8144079c3024aef2d385b7ca7726d1ff1",
+    "blueprints/us-equities/adaptive-paper/overnight.py": "f52eabbf188b4cbd5f56ae139a2d916bddd1de142cf7a74eeba4b77cb30f63ba",
+    "blueprints/us-equities/adaptive-paper/runner.py": "4f35334a9b75cd523c9367f5270abb47ff385f3c9033e6e936db921e033f7077",
+    "blueprints/us-equities/adaptive-paper/source-hashes.json": "4f9d0ed81f9f7c46037dce620c3d064bc0b6e5aa16e37343e09a188f2fb57d53",
+    "blueprints/us-equities/adaptive-paper/transport.py": "ddae9b3967fe1dcd3cd39299068b3ca28bcd11196d0ea876f6d324b0b1a104d1",
+    "tests/test_adaptive_paper_overnight_arming.py": "5d2fa0071940b2dc910fd9f61c0a09a3d89ef43216c4a6b8099453c13420d7d8",
+    "tests/test_adaptive_paper_overnight_guard_pins.py": "eaab736bb6bd9c6a6ffdd5dae076b4f71af5155808db77fecce12d4f0e316aad"
+  },
+  "limitations": [
+    "All observations, decisions and broker transport are synthetic; no broker or paper acceptance.",
+    "Native mover decisions are a scripted book protocol fixture; production strategy emitter and native dispatch/callbacks run unchanged.",
+    "Receipt logs are host-local; bytes and SHA256 retained for export/reproduction.",
+    "Historical overnight arming receipt still binds its historical input revisions."
+  ],
+  "mutations": {
+    "assertion_failures": 26,
+    "errors": 0,
+    "killed": 19,
+    "names": [
+      "M2-reserve",
+      "M3-wire",
+      "M4-admission",
+      "M6-emitter",
+      "M8-active",
+      "M8-tradable",
+      "M9-halt",
+      "M10-window",
+      "M11-normalize",
+      "M15-preflight",
+      "F1-adaptive-direct",
+      "F1-adaptive-replacement",
+      "F3-admission-side",
+      "F3-admission-owned",
+      "F3-admission-calendar",
+      "M2-reserve+M3-wire",
+      "M2-reserve+M4-admission",
+      "M3-wire+M4-admission",
+      "M2-reserve+M3-wire+M4-admission"
+    ],
+    "native_production_mover_M6_additional_assertion_kill": true,
+    "production_files_mutated": false,
+    "restoration": "Original owning namespace/class/function identities restored",
+    "survived": 0
+  },
+  "native_only_tests": [
+    "NativeMoverEmitterPin.test_production_mover_strategy_reduces_held_position_in_pre",
+    "NativeMoverEmitterPin.test_native_emitter_keyword_deletion_is_killed"
+  ],
+  "paper_acceptance": "NOT_RUN",
+  "runs": [
+    {
+      "command": "idle scope env-i CPython3.12.3: python -m unittest tests.test_adaptive_paper_overnight_guard_pins -q",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 8.809,
+      "exit_code": 0,
+      "output_bytes": 1427,
+      "output_sha256": "1130c694cc08cf8d043a93e6d0fb11daf6ca9c2ec6ef59600eec9a866754202e",
+      "path": "evidence/artifacts/overnight-arming-20261013/logs/f1-f4-ci-final.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/logs/f1-f4-ci-final.sanitized.txt",
+      "skipped": 2,
+      "tests_run": 15
+    },
+    {
+      "command": "idle scope pinned native python/runtime_read_lock: guard_pins, arming, guard_mutations, order_contract, recovery modules -q",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 35.316,
+      "exit_code": 0,
+      "output_bytes": 5242,
+      "output_sha256": "146dfdb26ba78f80e8c88aba236a319f59a85c98565fe2b9a0441585f70c5b4f",
+      "path": "evidence/artifacts/overnight-arming-20261013/logs/f1-f4-native-final.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/logs/f1-f4-native-final.sanitized.txt",
+      "skipped": 0,
+      "tests_run": 127
+    },
+    {
+      "command": "idle scope env-i CPython3.12.3: same modules plus source_hashes_manifest -q",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 28.268,
+      "exit_code": 0,
+      "output_bytes": 5296,
+      "output_sha256": "c27c95279ecf0e90994a537c95330793369e16f155012df2dec51023bbc824e9",
+      "path": "evidence/artifacts/overnight-arming-20261013/logs/f1-f4-ci-related.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/logs/f1-f4-ci-related.sanitized.txt",
+      "skipped": 2,
+      "tests_run": 135
+    }
+  ],
+  "schema_version": 1,
+  "scope": "Pre-merge F1-F4 independent guard-removal regression pins; production behavior unchanged"
+}

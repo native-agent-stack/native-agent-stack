@@ -1,0 +1,8 @@
+test_stop_file_stops_entries_and_flattens (tests.test_adaptive_paper_mover_native.MoverNativeEndToEnd.test_stop_file_stops_entries_and_flattens) ... ok
+test_stop_file_stops_entries_and_flattens (tests.test_adaptive_paper_mover_native.MoverNativeEndToEnd.test_stop_file_stops_entries_and_flattens) ... ok
+test_stop_file_stops_entries_and_flattens (tests.test_adaptive_paper_mover_native.MoverNativeEndToEnd.test_stop_file_stops_entries_and_flattens) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 7.306s
+
+OK

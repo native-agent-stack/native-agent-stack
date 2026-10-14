@@ -24,9 +24,10 @@ class MoverStrategy(Strategy):
         return super().__new__(cls, StrategyConfig(strategy_id=StrategyId("MOVER-001"), order_id_tag="M",
                                                    log_events=False, log_commands=False, manage_stop=False))
 
-    def __init__(self, book, ledger, *, clock=time.time):
+    def __init__(self, book, ledger, *, clock=time.time, overnight_enabled=False):
         self.book = book
         self.ledger = ledger
+        self.overnight_enabled = overnight_enabled
         self._clock = clock
         self.started = False
         self.enabled = False
@@ -107,6 +108,7 @@ class MoverStrategy(Strategy):
                 OrderSide.BUY if record.side == "buy" else OrderSide.SELL,
                 Quantity.from_int(int(record.qty)), Price.from_str(price_text(record.limit_price)),
                 time_in_force=TimeInForce.DAY, client_order_id=ClientOrderId(record.client_id),
+                **({"reduce_only": True} if record.side == "sell" and self.overnight_enabled else {}),
                 tags=["strategy=mover", f"reason={record.reason}", f"exit_rule={self.book.plan.exit_rule}"])
             self.submitted += 1
             self.submit_order(order)

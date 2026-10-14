@@ -1,0 +1,21 @@
+test_stop_file_stops_entries_and_flattens (tests.test_adaptive_paper_mover_native.MoverNativeEndToEnd.test_stop_file_stops_entries_and_flattens) ... ok
+test_stop_file_stops_entries_and_flattens (tests.test_adaptive_paper_mover_native.MoverNativeEndToEnd.test_stop_file_stops_entries_and_flattens) ... ok
+test_stop_file_stops_entries_and_flattens (tests.test_adaptive_paper_mover_native.MoverNativeEndToEnd.test_stop_file_stops_entries_and_flattens) ... FAIL
+
+======================================================================
+FAIL: test_stop_file_stops_entries_and_flattens (tests.test_adaptive_paper_mover_native.MoverNativeEndToEnd.test_stop_file_stops_entries_and_flattens)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_mover_native.py", line 251, in test_stop_file_stops_entries_and_flattens
+    self.assert_clean(receipt, held, unresolved, status="passed")
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_mover_native.py", line 172, in assert_clean
+    self.assertEqual(receipt["status"], status, receipt.get("adapter_errors"))
+AssertionError: 'completed_no_signals' != 'passed'
+- completed_no_signals
++ passed
+ : []
+
+----------------------------------------------------------------------
+Ran 3 tests in 7.655s
+
+FAILED (failures=1)

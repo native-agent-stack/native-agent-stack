@@ -1,0 +1,356 @@
+"""Explicit bounded broker recovery; no strategy restart and no new buys."""
+from __future__ import annotations
+
+import asyncio
+from datetime import datetime, timezone
+from decimal import Decimal, ROUND_DOWN
+import inspect
+import re
+import time
+
+from safety import SafetyError
+from sessions import order_extended_hours_flag, validate_session_policy
+
+
+def _payload(intent, extended_hours=False):
+    return {"client_order_id": intent.client_id, "symbol": intent.symbol,
+            "side": intent.side, "qty": format(intent.qty, "f"),
+            "limit_price": format(intent.limit_price, "f"), "type": "limit",
+            "time_in_force": "day", "extended_hours": extended_hours}
+
+
+def _code(exc):
+    text = str(exc)
+    return text if isinstance(exc, SafetyError) and re.fullmatch(r"[a-z_]{1,100}", text) else type(exc).__name__
+
+
+_HOME_PATH = re.compile(r"/(?:home|Users|root)/[^\s'\"]*")
+_LONG_TOKEN = re.compile(r"[A-Za-z0-9+/=_-]{24,}")
+# The engine's own words: reason codes joined by "_" (quotes_subscription_rejected, the shape _code keeps) and
+# fixed phrases joined by "/" (authentication/subscription/quote). Lowercase letters only, so no credential,
+# digest or identifier (digits, capitals, "+", "=", "-") has that shape.
+_ENGINE_WORDS = re.compile(r"[a-z]+(?:[_/][a-z]+)+")
+
+
+def _text(value):
+    """Redact, then stop the text at 300 characters, so a long token that crosses the cut is redacted whole and never
+    survives as a short fragment. Every home path and every long token that is not one of the engine's own words is
+    found in the ORIGINAL text; overlapping or touching spans are joined and each joined span is replaced once
+    (<path> when it holds a home path, else <redacted>). So neither rule can shorten the other's match: a path inside
+    a token cannot leave a short token prefix, and a token cannot consume a path's start and leave its suffix."""
+    text = str(value)
+    spans = sorted([(m.start(), m.end(), True) for m in _HOME_PATH.finditer(text)]
+                   + [(m.start(), m.end(), False) for m in _LONG_TOKEN.finditer(text)
+                      if not _ENGINE_WORDS.fullmatch(m.group(0))])
+    joined = []
+    for start, end, path in spans:
+        if joined and start <= joined[-1][1]:
+            first, last, held = joined[-1]
+            joined[-1] = (first, max(last, end), held or path)
+        else:
+            joined.append((start, end, path))
+    out, position = [], 0
+    for start, end, path in joined:
+        out += [text[position:start], "<path>" if path else "<redacted>"]
+        position = end
+    out.append(text[position:])
+    return "".join(out)[:300]
+
+
+def _engine_text(exc):
+    """Only the engine's own exceptions carry receipt text: their messages are authored here (transport, safety).
+    A foreign exception (SDK, network, OS) may quote a request or a credential, so it contributes its type only."""
+    return type(exc).__module__ in ("transport", "safety") and type(exc).__name__ in ("TransportError", "SafetyError")
+
+
+def _detail(exc, prefix=""):
+    """The receipt's view of one failure: its code (the `errors` entry) and type, the message when the engine authored
+    it, and the chained or suppressed context's type (an exception raised `from None` still keeps __context__), with
+    that context's message under the same rule. Texts are redacted (_text) and then stop at 300 chars."""
+    context = exc.__cause__ or exc.__context__
+    detail = {"code": prefix + _code(exc), "type": type(exc).__name__}
+    if _engine_text(exc):
+        detail["message"] = _text(exc)
+    if context is not None:
+        detail["context_type"] = type(context).__name__
+        if _engine_text(context):
+            detail["context_message"] = _text(context)
+    return detail
+
+
+async def recover(controller, metadata, config, *, reconcile_fn=None):
+    """Reconcile/cancel/exit owned residuals using a fresh, unstarted port.
+
+    The caller holds the account writer lock and validates account/config identity.
+    ``metadata`` supplies the original ``trial_id`` and ``baseline_cash``. The
+    normal reconciler is runner.reconcile; injection supports isolated local tests.
+    All broker requests still cross controller/transport durable budget gates.
+    """
+    if reconcile_fn is None:
+        from runner import reconcile as reconcile_fn
+    ledger, port = controller.ledger, controller.port
+    session_policy = validate_session_policy(config)
+    controller.stop = True
+    changed = asyncio.Event()
+    cleanup = min(float(config["cleanup_seconds"]), float(ledger.limits.cleanup_seconds), 120.0)
+    if not 0 < cleanup <= 120:
+        raise SafetyError("invalid_recovery_deadline")
+    deadline = time.monotonic() + cleanup
+    trial = metadata["trial_id"]
+    if not isinstance(trial, str) or not re.fullmatch(r"[a-z0-9-]{1,24}", trial):
+        raise SafetyError("invalid_trial_id")
+    prefix = "rec-" + trial + "-"
+    sequence = max((int(i.client_id[len(prefix):]) for i in ledger.intents()
+                    if i.client_id.startswith(prefix) and i.client_id[len(prefix):].isdigit()), default=0)
+    errors, cancelled, submitted = [], [], []
+    details = []
+    # Held symbols without a fresh quote at the last exit turn (#215). The result's
+    # stale_symbols is meaningful only together with recovery_quote_not_fresh; after any
+    # other error (one before the exit loop included) it says nothing about quote freshness.
+    stale = set()
+    last_snapshot = None
+    proof = None
+    whole_exit = 2 * float(config["order_timeout_seconds"])
+    held = []
+    budget_error = None
+    before_request = getattr(port, "before_request", None)
+
+    def quote(row):
+        controller.quote(row)
+        changed.set()
+
+    def order(row):
+        controller.observe(row)
+        changed.set()
+
+    async def bounded(operation):
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            operation.close()  # Do not start a broker operation after the deadline.
+            raise SafetyError("recovery_deadline_reached")
+        timeout = asyncio.timeout(remaining)
+        try:
+            async with timeout:
+                return await operation
+        except asyncio.TimeoutError:
+            if timeout.expired():
+                raise SafetyError("recovery_deadline_reached") from None
+            raise  # A broker TimeoutError is an ambiguous operation, not our timer.
+
+    async def observe_snapshot():
+        nonlocal last_snapshot, proof
+        last_snapshot = await bounded(port.snapshot())
+        proof = reconcile_fn(ledger, last_snapshot, metadata["baseline_cash"])
+        return proof
+
+    async def wait_for(predicate, seconds):
+        until = min(deadline, time.monotonic() + seconds)
+        while not predicate():
+            changed.clear()
+            if predicate():
+                return True
+            remaining = until - time.monotonic()
+            if remaining <= 0:
+                return False
+            try:
+                await asyncio.wait_for(changed.wait(), remaining)
+            except asyncio.TimeoutError:
+                return bool(predicate())
+        return True
+
+    async def cancel(client_id):
+        guard_observation_integrity()
+        confirmation = await bounded(port.cancel(client_id))
+        cancelled.append(client_id)
+        if confirmation is not None:
+            order(confirmation)
+
+    def terminal(client_ids):
+        return not any(i.client_id in client_ids for i in ledger.unresolved())
+
+    def fresh(symbol):
+        value = controller.quotes.get(symbol)
+        configured_age = config.get("exit_quote_max_age_seconds")
+        if configured_age is None:
+            configured_age = config["quote_max_age_seconds"]
+        return value is not None and -0.25 <= controller.clock() - value.timestamp <= min(
+            float(configured_age), ledger.limits.effective_exit_quote_max_age_seconds)
+
+    def guard_observation_integrity():
+        # Reconnect/stale-quote admission freezes can coexist with an owned exit
+        # using a fresh quote. Event loss/identity conflicts cannot: a stream sink
+        # may detect these before invoking our order callback.
+        reasons = set(getattr(port, "health", {}).get("reasons", []))
+        if reasons & {"callback_failure", "queue_overflow", "client_id_collision",
+                      "snapshot_incomplete", "replay_unresolved"}:
+            raise SafetyError("recovery_observation_integrity_lost")
+
+    def guard_exit_budget():
+        nonlocal budget_error
+        if deadline - time.monotonic() < whole_exit:
+            unquoted = [s for s in held if not fresh(s)]
+            stale.difference_update(held)
+            stale.update(unquoted)
+            budget_error = "recovery_quote_not_fresh" if unquoted else "recovery_deadline_reached"
+            raise SafetyError(budget_error)
+
+    async def recovery_request(kind, *args, **kwargs):
+        # The native transport invokes this hook immediately before its HTTP
+        # guard. Authorization (including durable budget writes) can take time.
+        if kind == "submit":
+            guard_exit_budget()
+        result = before_request(kind, *args, **kwargs)
+        if inspect.isawaitable(result):
+            result = await result
+        if kind == "submit":
+            guard_exit_budget()
+        return result
+
+    if before_request is not None:
+        port.before_request = recovery_request
+    try:
+        ledger.begin_recovery(controller.clock())
+        for intent in ledger.intents():
+            if (intent.status == "reserved" and not intent.submit_attempted
+                    and intent.broker_id is None and not intent.filled_qty):
+                # The durable HTTP budget marks attempted *before* any POST. No
+                # attempted request is ever retired based on a missing lookup.
+                ledger.mark_not_sent(intent.client_id, "recovery_proven_never_attempted")
+        adoption_extended_hours = order_extended_hours_flag(
+            datetime.fromtimestamp(controller.clock(), timezone.utc), session_policy)
+        if session_policy.get("overnight_enabled") is True:
+            # Adoption is lookup/cancel only, never a resubmit. The held BOATS
+            # entry was extended-hours even if recovery now runs during RTH.
+            adoption_extended_hours = True
+        port.adopt_intents([_payload(i, adoption_extended_hours) for i in ledger.intents()
+                            if i.status not in {"not_sent", "broker_refused"}])
+        await bounded(port.start(quote, order))
+        await observe_snapshot()  # Unknown exposure/absent attempted IDs stop here.
+        outstanding = {i.client_id for i in ledger.unresolved()}
+        for client_id in sorted(outstanding):
+            await cancel(client_id)
+        if outstanding:
+            if not await wait_for(lambda: terminal(outstanding), float(config["order_timeout_seconds"])):
+                raise SafetyError("cancellation_not_confirmed")
+            await observe_snapshot()
+        if ledger.unresolved():
+            raise SafetyError("unresolved_orders_block_exit")
+        # Sequential closes prevent overselling and leave capacity for cancels and
+        # reconciliation. A terminal partial cancel must be snapshotted again. Each exit
+        # takes the alphabetically first held symbol whose own quote is fresh at that turn,
+        # not the freshest (#215). A held symbol without a fresh quote is skipped rather than
+        # ending recovery, and is exited once it quotes. No exit starts unless a whole exit
+        # (its fill wait and a cancel's wait) still fits before the deadline. Every failed
+        # exit still ends recovery, including the transport's pre-wire refusal (not_sent) of
+        # a quote that went stale before the POST.
+        while ledger.positions():
+            guard_observation_integrity()
+            if len(submitted) >= 100:
+                raise SafetyError("recovery_order_bound_reached")
+            held = sorted(ledger.positions())
+            if not controller.market_open or controller.close - controller.clock() <= 1:
+                raise SafetyError("outside_allowed_session")
+            # Wait for a quote only while a whole exit still fits before the deadline.
+            patience = deadline - time.monotonic() - whole_exit
+            await wait_for(lambda: any(fresh(s) for s in held),
+                           max(0.0, min(float(config["quote_max_age_seconds"]), patience)))
+            quoted = [s for s in held if fresh(s)]
+            unquoted = [s for s in held if s not in quoted]
+            stale.difference_update(quoted)
+            stale.update(unquoted)
+            # Checked after every wait (this quote wait, or the previous exit's fill and cancel
+            # waits) and before every exit, a symbol quoted all along included: bounded() could
+            # cut an exit started with less than a whole exit left after its POST. With a held
+            # symbol still unquoted this ends recovery as recovery_quote_not_fresh (named in
+            # stale_symbols), and otherwise as recovery_deadline_reached.
+            guard_exit_budget()
+            if not quoted:
+                continue
+            symbol = quoted[0]
+            position = ledger.positions()[symbol]
+            bid = controller.quotes[symbol].bid
+            price = (bid - Decimal("0.02")).quantize(Decimal("0.01"), rounding=ROUND_DOWN)
+            if price <= 0:
+                raise SafetyError("recovery_price_not_positive")
+            capacity = (ledger.limits.max_order_notional_usd / price).quantize(
+                Decimal("0.000000001"), rounding=ROUND_DOWN)
+            # The share cap reserve_intent applies to this sell at this bid. In "fixed" mode it
+            # is max_order_qty, exactly as before; in "notional" mode it is
+            # min(max_order_qty, floor(max_order_notional_usd / bid), 100), whole shares at or
+            # below the capacity, so an appreciated position exits in chunks the ledger admits.
+            quantity = min(position.qty, ledger.limits.effective_max_order_qty(price, quote_price=bid), capacity)
+            if quantity <= 0 or quantity.as_tuple().exponent < -9:
+                raise SafetyError("recovery_quantity_not_representable")
+            sequence += 1
+            client_id = prefix + f"{sequence:07d}"
+            exit_extended_hours = order_extended_hours_flag(
+                datetime.fromtimestamp(controller.clock(), timezone.utc), session_policy)
+            payload = {"client_order_id": client_id, "symbol": symbol, "side": "sell",
+                       "qty": format(quantity, "f"), "limit_price": format(price, "f"),
+                       "type": "limit", "time_in_force": "day", "extended_hours": exit_extended_hours,
+                       "strategy": "recovery", "reason": "owned_residual_exit"}
+            if session_policy.get("overnight_enabled") is True:
+                payload["reduce_only"] = True
+            try:
+                guard_observation_integrity()
+                # Position reads and payload preparation may consume the budget
+                # checked above. Recheck at the submission boundary.
+                guard_exit_budget()
+                submitted.append(client_id)
+                confirmation = await bounded(port.submit(payload))
+                order(confirmation)
+            except Exception as exc:
+                # A broker HTTP refusal is still an attempted request. Only an
+                # explicit pre-wire guarantee permits the not_sent transition.
+                # The controller records broker_refused via its distinct contract.
+                if getattr(exc, "not_sent", False) is True:
+                    intent = next((i for i in ledger.intents() if i.client_id == client_id), None)
+                    if intent and intent.status == "reserved" and not intent.filled_qty and intent.broker_id is None:
+                        ledger.mark_not_sent(client_id, "recovery_definitive_refusal")
+                    # The transport sanitizes hook failures into SubmissionNotSent.
+                    # Retain the recovery decision after its pre-wire guarantee.
+                    if budget_error is not None:
+                        raise SafetyError(budget_error) from None
+                raise
+            if not await wait_for(lambda: terminal({client_id}), float(config["order_timeout_seconds"])):
+                await cancel(client_id)
+                if not await wait_for(lambda: terminal({client_id}), float(config["order_timeout_seconds"])):
+                    raise SafetyError("exit_cancellation_not_confirmed")
+            intent = next(i for i in ledger.intents() if i.client_id == client_id)
+            if intent.status != "filled":
+                await observe_snapshot()
+                if not intent.filled_qty:
+                    raise SafetyError("exit_unfilled_no_blind_retry")
+        await observe_snapshot()  # A fresh broker proof is required even if already flat.
+    except asyncio.CancelledError:
+        errors.append("recovery_cancelled")
+        details.append({"code": "recovery_cancelled", "type": "CancelledError"})
+    except Exception as exc:
+        errors.append(_code(exc))
+        details.append(_detail(exc))
+    finally:
+        controller.stop = True
+        try:
+            # Teardown can outlive the order deadline, but cannot authorize orders.
+            await asyncio.wait_for(port.stop(), 10)
+        except Exception as exc:
+            errors.append("stop_" + _code(exc))
+            details.append(_detail(exc, "stop_"))
+        finally:
+            if before_request is not None:
+                port.before_request = before_request
+    positions = [{"symbol": p.symbol, "qty": format(p.qty, "f")} for p in ledger.positions().values()]
+    unresolved = [{"client_id": i.client_id, "symbol": i.symbol, "side": i.side,
+                   "status": i.status, "qty": format(i.qty, "f"), "filled_qty": format(i.filled_qty, "f"),
+                   "submit_attempted": i.submit_attempted} for i in ledger.unresolved()]
+    flat = (not positions and not unresolved and proof is not None and not errors
+            and proof["positions"] == 0 and proof["open_orders"] == 0)
+    return {"mode": "official_sdk_recovery", "native_engine_resumed": False,
+            "status": "passed" if flat else "needs_attention", "flat": flat,
+            "errors": errors, "error_details": details, "positions": positions, "unresolved_orders": unresolved,
+            "stale_symbols": sorted(stale & set(ledger.positions())),
+            "broker_positions_last_observed": None if last_snapshot is None else
+                [{"symbol": p["symbol"], "qty": str(p["qty"])} for p in last_snapshot["positions"]],
+            "reconciliation": proof, "cancel_attempt_client_ids": cancelled,
+            "exit_attempt_client_ids": submitted, "buy_submissions": 0,
+            "order_deadline_seconds": cleanup}

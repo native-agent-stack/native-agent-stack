@@ -852,6 +852,11 @@ class AdaptiveStrategy(Strategy):
         """Fresh acknowledgement/dispatch-time disposition for an owned exit."""
         if getattr(self, "_exit_session_at", None) is None:
             return None
+        if getattr(getattr(self, "transport", None), "overnight_enabled", False) is True:
+            try:
+                self.transport.overnight_check(symbol, now, "sell")
+            except (ValueError, RuntimeError) as error:
+                return ExitDecision(str(error), 0.0, "hold", submit=False, flag_position=True)
         quote = self.policy.latest.get(symbol)
         fresh = bool(quote and
                      now - quote.timestamp <= sell_quote_age_seconds(self.policy.config) and
@@ -861,6 +866,7 @@ class AdaptiveStrategy(Strategy):
             quote_fresh=fresh, risk_off=False, force_exit=True,
             force_exit_reason=reason, session=self._exit_session(now),
             bid=quote.bid if quote else None, ask=quote.ask if quote else None,
+            overnight_qualified=getattr(getattr(self, "transport", None), "overnight_enabled", False) is True,
         ), self.policy.config)
 
     def _flag_exit_position(self, symbol, decision):
@@ -911,6 +917,7 @@ class AdaptiveStrategy(Strategy):
         self.policy.sync_positions(self.positions(), now)
         if hasattr(self.policy, "exit_session"):
             self.policy.exit_session = self._exit_session(now)
+            self.policy.exit_overnight_qualified = getattr(getattr(self, "transport", None), "overnight_enabled", False) is True
         for client_id in list(self.pending):
             self._finish_if_terminal(client_id)
         operational = self._operational_status(now) if self.policy.selector is not None else None
@@ -1125,6 +1132,8 @@ class AdaptiveStrategy(Strategy):
                 Quantity.from_str(str(min(quantity, self.policy.config.max_shares))),
                 Price.from_str(price_str),
                 time_in_force=TimeInForce.DAY, client_order_id=ClientOrderId(client_id),
+                **({"reduce_only": True} if side == "sell" and
+                   getattr(self.transport, "overnight_enabled", False) is True else {}),
                 tags=[f"strategy={reason}", f"reason={reason}"])
             # D1 (round 5): "reason" is recorded on every pending entry (not
             # just sells) so on_order_{rejected,denied,expired,cancel_rejected}
@@ -1383,6 +1392,7 @@ class AdaptiveStrategy(Strategy):
             Quantity.from_str(str(min(quantity, self.policy.config.max_shares))),
             Price.from_str(price_str),
             time_in_force=TimeInForce.DAY, client_order_id=ClientOrderId(client_id),
+            **({"reduce_only": True} if getattr(self.transport, "overnight_enabled", False) is True else {}),
             tags=[f"strategy={reason}", f"reason={reason}", f"price_rule={price_rule}"])
         self.pending[client_id] = {"symbol": symbol, "side": "sell", "created": now,
                                    "price_rule": price_rule, "price": price_str, "reason": reason}
@@ -1411,11 +1421,26 @@ class AdaptiveStrategy(Strategy):
         in-range action never gets a stale, already-submitted buy filled
         after the block was decided."""
         for client_id, info in list(self.pending.items()):
+            if client_id in getattr(getattr(self, "transport", None), "overnight_cancel_pending", ()):
+                if not info.get("cancel_requested"):
+                    info["overnight_cancel_requested"] = True
+                info["cancel_requested"] = True
+                continue
+            if info.pop("overnight_cancel_requested", False):
+                # The shared per-order operation resolved. Release only the mark
+                # this background cancellation owns, never an engine cancel.
+                info["cancel_requested"] = False
             if info.get("cancel_requested"):
                 continue
             if info["side"] == "sell" and self._halted(info["symbol"]):
                 continue
-            if (now - info["created"] >= timeout or (all_entries and info["side"] == "buy")
+            if info["side"] == "sell" and getattr(getattr(self, "transport", None), "overnight_enabled", False) is True:
+                decision = self._session_exit_decision(info["symbol"], now, "exit_reprice")
+                if decision is not None and not decision.submit:
+                    self._flag_exit_position(info["symbol"], decision)
+                    continue
+            if (now - info["created"] >= timeout or (info["side"] == "buy" and self._halted(info["symbol"]))
+                    or (all_entries and info["side"] == "buy")
                     or (symbols and info["side"] == "buy" and info["symbol"] in symbols)):
                 self.cancel_order(ClientOrderId(client_id))
                 info["cancel_requested"] = True

@@ -1,0 +1,28 @@
+"""Run the owning reader's strand probe with hermetic stop state and runtime lock."""
+from pathlib import Path
+import runpy
+import subprocess
+import sys
+import types
+ROOT = Path('/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013')
+PROBE = ROOT / 'evidence/artifacts/overnight-arming-20261013/review-cancel-combined/q9_strand.py.txt'
+sys.path[:0] = [str(ROOT), str(ROOT / 'blueprints/us-equities/adaptive-paper')]
+from runtime_lock import runtime_read_lock
+from tests.adaptive_paper_hermetic import patch_default_stop, restore_default_stop
+mode = sys.argv[1]
+scratch = Path('/var/tmp/ns-seeds-overnight-arming-20261013/q9-' + mode)
+scratch.mkdir(exist_ok=True)
+with runtime_read_lock():
+    if mode == 'base':
+        for name in ('transport', 'runner', 'native_strategy'):
+            module = types.ModuleType(name)
+            module.__file__ = str(ROOT / 'blueprints/us-equities/adaptive-paper' / (name + '.py'))
+            sys.modules[name] = module
+            source = subprocess.check_output(['git', 'show', '8f64d5a49:blueprints/us-equities/adaptive-paper/' + name + '.py'], cwd=ROOT)
+            exec(compile(source, module.__file__, 'exec'), module.__dict__)
+    token = patch_default_stop()
+    try:
+        sys.argv = [str(PROBE), str(ROOT), str(scratch)]
+        runpy.run_path(str(PROBE), run_name='__main__')
+    finally:
+        restore_default_stop(token)

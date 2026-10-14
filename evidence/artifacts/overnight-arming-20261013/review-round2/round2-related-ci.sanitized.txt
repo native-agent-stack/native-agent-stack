@@ -1,0 +1,89 @@
+Running as unit: run-p1200441-i168603621.scope; invocation ID: 40dfd7e0b2c04dc4a40313a9d521bbd5
+~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmp_td_wz65'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmp0u5txpda'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpp1xktv0d'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpt8kqj0oa'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmp061n5829'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpocl0fpfo'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpaouehebv'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmp23gsv1w1'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpryo6ni3z'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmp4y_ouesp'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpvqek7bza'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmphah6_jev'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmp_3rox88w'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmp6va5bln7'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/adaptive-paper-hermetic-stop-aje6iwst'>
+  _warnings.warn(warn_message, ResourceWarning)
+----------------------------------------------------------------------
+Ran 726 tests in 97.362s
+
+OK (skipped=220)
+{"status": "not_started", "reason": "promotion_gate_failed_check", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_missing", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_missing", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_failed", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_mismatch", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_empty", "orders_submitted": 0}
+{"status": "not_started", "reason": "account_not_ready", "orders_submitted": 0}
+{"status": "ready", "orders_submitted": 0}
+{"status": "ready", "orders_submitted": 0}
+{"status": "not_started", "stage": "order_contract", "reason": "order_contract_boundary_inactive:invalid_sentinel_accepted", "orders_submitted": 0}
+{"status": "not_started", "stage": "order_contract", "reason": "order_contract_boundary_inactive:invalid_sentinel_accepted", "orders_submitted": 0}
+{"status": "not_started", "stage": "order_contract", "reason": "order_contract_boundary_inactive:invalid_sentinel_accepted", "orders_submitted": 0}
+{"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}
+{"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}
+{"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}
+{"status": "not_started", "stage": "validation", "reason": "scan_stale", "orders_submitted": 0}
+{"status": "not_started", "stage": "validation", "reason": "scan_empty", "orders_submitted": 0}
+{"status": "not_started", "stage": "validation", "reason": "scan_from_future", "orders_submitted": 0}
+transition_mutant reserve-current-close assertion_failures 1 errors 0
+transition_mutant pending-current-close assertion_failures 1 errors 0
+transition_mutant recovery-current-close assertion_failures 1 errors 0
+transition_mutant residual-reprice-admission assertion_failures 9 errors 0
+transition_mutant independent-asset-delivery assertion_failures 2 errors 0
+transition_mutant independent-quote-delivery assertion_failures 1 errors 0
+transition_mutant per-symbol-reschedule assertion_failures 1 errors 0
+followup_mutant M2-reserve assertion_failures 1 errors 0
+followup_mutant M3-wire assertion_failures 1 errors 0
+followup_mutant M4-admission assertion_failures 1 errors 0
+followup_mutant M6-emitter assertion_failures 1 errors 0
+followup_mutant M8-active assertion_failures 1 errors 0
+followup_mutant M8-tradable assertion_failures 1 errors 0
+followup_mutant M9-halt assertion_failures 1 errors 0
+followup_mutant M10-window assertion_failures 1 errors 0
+followup_mutant M11-normalize assertion_failures 1 errors 0
+followup_mutant M15-preflight assertion_failures 3 errors 0
+followup_mutant F1-adaptive-direct assertion_failures 1 errors 0
+followup_mutant F1-adaptive-replacement assertion_failures 1 errors 0
+followup_mutant F3-admission-side assertion_failures 1 errors 0
+followup_mutant F3-admission-owned assertion_failures 1 errors 0
+followup_mutant F3-admission-calendar assertion_failures 1 errors 0
+followup_mutant M2-reserve+M3-wire assertion_failures 2 errors 0
+followup_mutant M2-reserve+M4-admission assertion_failures 2 errors 0
+followup_mutant M3-wire+M4-admission assertion_failures 2 errors 0
+followup_mutant M2-reserve+M3-wire+M4-admission assertion_failures 3 errors 0
+followup_mutants_killed 19 survived 0
+overnight_guard_mutations 37 killed_by_assertions 118 secondary_errors 2
+round_two_mutant actual-cancel-event assertion_failures 1 errors 0
+round_two_mutant venue-session assertion_failures 3 errors 0
+round_two_mutant owner-cancel-task assertion_failures 1 errors 0
+round_two_mutant cancel-budget assertion_failures 1 errors 0
+round_two_mutant cancel-shutdown assertion_failures 1 errors 0
+round_two_mutant scan-trade-date assertion_failures 1 errors 0
+round_two_mutant scan-rule-order assertion_failures 1 errors 0
+round_two_mutant rule-window assertion_failures 2 errors 0

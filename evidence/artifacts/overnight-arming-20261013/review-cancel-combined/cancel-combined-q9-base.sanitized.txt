@@ -1,0 +1,16 @@
+tree native-agent-stack-ns-seeds-overnight-arming-20261013 mode exception
+  pass 1 halt seen: t+10s halted=True force=False latch=True strategy_mark=True broker_deletes=0 engine_cancels=0
+  after DELETE failure: latch=False events=['overnight_cancel_refused']
+  pass 2 halt cleared: t+12s halted=False force=False latch=False strategy_mark=True broker_deletes=1 engine_cancels=0
+  pass 3 order timeout (60 s) elapsed: t+130s halted=False force=False latch=False strategy_mark=True broker_deletes=1 engine_cancels=0
+  pass 4 kill switch / force exit (all_entries=True): t+130s halted=False force=False latch=False strategy_mark=True broker_deletes=1 engine_cancels=0
+  pass 5 at flatten_at 03:50 ET (carry-cutoff retry): t+10200s halted=False force=True latch=True strategy_mark=True broker_deletes=1 engine_cancels=0
+  RESULT: broker DELETE attempts=2, strategy engine cancels=0, entry still unresolved in the ledger=True
+tree native-agent-stack-ns-seeds-overnight-arming-20261013 mode timeout
+  pass 1 halt seen: t+10s halted=True force=False latch=True strategy_mark=True broker_deletes=0 engine_cancels=0
+  after DELETE failure: latch=False events=['overnight_cancel_refused']
+  pass 2 halt cleared: t+12s halted=False force=False latch=False strategy_mark=True broker_deletes=1 engine_cancels=0
+  pass 3 order timeout (60 s) elapsed: t+130s halted=False force=False latch=False strategy_mark=True broker_deletes=1 engine_cancels=0
+  pass 4 kill switch / force exit (all_entries=True): t+130s halted=False force=False latch=False strategy_mark=True broker_deletes=1 engine_cancels=0
+  pass 5 at flatten_at 03:50 ET (carry-cutoff retry): t+10200s halted=False force=True latch=True strategy_mark=True broker_deletes=1 engine_cancels=0
+  RESULT: broker DELETE attempts=2, strategy engine cancels=0, entry still unresolved in the ledger=True

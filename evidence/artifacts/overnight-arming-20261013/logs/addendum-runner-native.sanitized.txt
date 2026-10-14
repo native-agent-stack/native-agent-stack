@@ -1,0 +1,28 @@
+[1m2026-10-13T07:06:31.310812318Z[0m [1;31m[ERROR] ADAPTIVE-001.nautilus_live::node: Error disconnecting clients: Failed to disconnect data clients: Failed to disconnect data clients: RuntimeError: port.stop() itself fails; failed to disconnect execution clients: Failed to disconnect execution clients: RuntimeError: port.stop() itself fails[0m
+[1m2026-10-13T07:06:41.308712499Z[0m [1;31m[ERROR] ADAPTIVE-001.nautilus_live::node: Timed out (10s) waiting for engines to disconnect
+DataEngine.check_disconnected() == false
+ExecEngine.check_disconnected() == false[0m
+[1m2026-10-13T07:06:41.309797760Z[0m [1;31m[ERROR] ADAPTIVE-001.nautilus_live::python::node: Hosted run failed: Failed to disconnect data clients: Failed to disconnect data clients: RuntimeError: port.stop() itself fails; failed to disconnect execution clients: Failed to disconnect execution clients: RuntimeError: port.stop() itself fails; failed while awaiting engine disconnection: disconnect readiness timeout while waiting for engine disconnections[0m
+~/projects/us-equities-runtime/.venv/lib/python3.12/site-packages/websockets/legacy/__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
+  warnings.warn(  # deprecated in 14.0 - 2024-11-09
+/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/blueprints/us-equities/adaptive-paper/transport.py:1135: DeprecationWarning: websockets.exceptions.RedirectHandshake is deprecated
+  from websockets.exceptions import RedirectHandshake
+----------------------------------------------------------------------
+Ran 194 tests in 78.691s
+
+OK
+{"status": "not_started", "reason": "promotion_gate_failed_check", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_missing", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_missing", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_failed", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_mismatch", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_empty", "orders_submitted": 0}
+{"status": "not_started", "reason": "account_not_ready", "orders_submitted": 0}
+{"status": "ready", "orders_submitted": 0}
+{"status": "ready", "orders_submitted": 0}
+{"status": "not_started", "stage": "order_contract", "reason": "order_contract_boundary_inactive:invalid_sentinel_accepted", "orders_submitted": 0}
+{"status": "not_started", "stage": "order_contract", "reason": "order_contract_boundary_inactive:invalid_sentinel_accepted", "orders_submitted": 0}
+{"status": "not_started", "stage": "order_contract", "reason": "order_contract_boundary_inactive:invalid_sentinel_accepted", "orders_submitted": 0}
+{"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}
+{"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}
+{"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}

@@ -1,0 +1,12 @@
+Running as unit: run-p864950-i159903056.scope; invocation ID: c007dc8029954f0c928c4e5b810233e6
+----------------------------------------------------------------------
+Ran 11 tests in 7.031s
+
+OK
+transition_mutant reserve-current-close assertion_failures 1 errors 0
+transition_mutant pending-current-close assertion_failures 1 errors 0
+transition_mutant recovery-current-close assertion_failures 1 errors 0
+transition_mutant residual-reprice-admission assertion_failures 9 errors 0
+transition_mutant independent-asset-delivery assertion_failures 2 errors 0
+transition_mutant independent-quote-delivery assertion_failures 1 errors 0
+transition_mutant per-symbol-reschedule assertion_failures 1 errors 0

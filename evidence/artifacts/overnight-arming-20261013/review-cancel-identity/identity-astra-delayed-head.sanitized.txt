@@ -1,0 +1,11 @@
+ack_three_ticks accepted stream refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks accepted lookup refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks new stream refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks new lookup refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks pending_cancel stream refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks pending_cancel lookup refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+.
+----------------------------------------------------------------------
+Ran 1 test in 3.919s
+
+OK

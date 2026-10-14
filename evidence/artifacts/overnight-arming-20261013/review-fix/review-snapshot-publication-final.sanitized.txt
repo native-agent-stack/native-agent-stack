@@ -1,0 +1,5 @@
+Running as unit: run-p1516298-i160553371.scope; invocation ID: b3197418c34448e08bdf4bf2541d6fe5
+----------------------------------------------------------------------
+Ran 3 tests in 0.051s
+
+OK

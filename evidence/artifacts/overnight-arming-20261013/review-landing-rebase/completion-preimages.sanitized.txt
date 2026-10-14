@@ -1,0 +1,10 @@
+{"alpaca_py": "0.44.0", "elapsed_seconds": 0.08643426498747431, "errors": 0, "failures": 0, "head": "0c65ee7fd7333635a447b6b7b65a2872211a9a8b", "modules": ["tests.test_overnight_published_preimages"], "nautilus_trader": "2.0.0rc5", "network": "bwrap --unshare-net; synthetic local HTTP only", "python": "3.12.3", "rc": 0, "requests": "2.34.2", "skipped": 0, "started_utc": "2026-10-14T05:23:56Z", "tests": 4}
+test_absent_preimage_fails_even_when_its_private_bytes_can_be_found (tests.test_overnight_published_preimages.PublishedPreimages.test_absent_preimage_fails_even_when_its_private_bytes_can_be_found) ... ok
+test_all_overnight_receipt_digests_resolve_to_published_bytes (tests.test_overnight_published_preimages.PublishedPreimages.test_all_overnight_receipt_digests_resolve_to_published_bytes) ... ok
+test_published_logs_are_sanitized_and_named_inside_publication (tests.test_overnight_published_preimages.PublishedPreimages.test_published_logs_are_sanitized_and_named_inside_publication) ... ok
+test_seven_character_private_prefixes_fail_without_a_public_blacklist (tests.test_overnight_published_preimages.PublishedPreimages.test_seven_character_private_prefixes_fail_without_a_public_blacklist) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.072s
+
+OK

@@ -5247,8 +5247,8 @@
     },
     {
       "path": ".gitleaks.toml",
-      "sha256": "96482136147070cd68f0369d628b20f37103db882edb310724cb74efee46b551",
-      "bytes": 33456
+      "bytes": 34005,
+      "sha256": "dfef1ed7a1be7f8a7146f8a84bf2be050a431b9be3f04aabb9c1981bbdaeec24"
     },
     {
       "path": ".gitleaksignore",
@@ -13113,8 +13113,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-overnight.md",
-      "sha256": "639b8ed7ebd4b77f746e153dbf7477fc2e62210d7dcda6023737cee9db50eb60",
-      "bytes": 11280
+      "bytes": 18813,
+      "sha256": "2d3bd67ef05fcf9ba10f57a3bc97e03d7a10e0096d2489a4dc6fa1b2a3b30d0d"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-paper-exploration.md",
@@ -13218,8 +13218,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/exits.py",
-      "sha256": "9fa99dc844de37eddb7c2b6de9cb07a3417e8452a9c39437330e5f7e0bdf9fff",
-      "bytes": 9473
+      "bytes": 9942,
+      "sha256": "1384b79181e8d98a165c4c811ff3a108dc3c1d260b26350ff2d8829a58dc6c03"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/exploration.py",
@@ -13233,8 +13233,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/feeds.py",
-      "sha256": "679ae401dd75096bce42be46668d704d0a7a45ba613dabe0a8175c13fcf8f150",
-      "bytes": 1884
+      "bytes": 2221,
+      "sha256": "b405614ae1701146c8e90bb2767ee6408b065c82b3c93a460f7085bc30d15c5f"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/financing.py",
@@ -13263,13 +13263,13 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/mover.py",
-      "sha256": "d199ee4de9151efed7254a0fe7ebfea10055277f83901088b9a07cc3eea805c5",
-      "bytes": 75873
+      "bytes": 77999,
+      "sha256": "d2663a99532925ddd071147297cd51bc44cbfd9b4c69c4f316f3bb4efb5a716d"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/mover_runner.py",
-      "sha256": "483deee4cdc86cb2efd5a9fa860d87b4b9eeb538ae5880e1451114704775eef5",
-      "bytes": 71409
+      "bytes": 72253,
+      "sha256": "22542292fe2e3f18bee55fad845d48caf97487eedc4ef83e346a451de1345988"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/mover_simulation.py",
@@ -13278,8 +13278,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/mover_strategy.py",
-      "sha256": "4730c5e535aa480030d6484669a9d8565ca25e4e1ea50ea12a45bd1892536cba",
-      "bytes": 7873
+      "bytes": 8052,
+      "sha256": "698a9b916099a4098a6e8397c9481f644192ce61d21818cca2bd1787f301fd1c"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native-faults/README.md",
@@ -13428,13 +13428,68 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native_adapter.py",
-      "sha256": "56e680e18bf1a4054f59a4a91468dddd77fec04a58b82381d64420b2aeeae97b",
-      "bytes": 56485
+      "bytes": 57359,
+      "sha256": "a61d735b9ba9865f2e09124d1d772f95dab29eb91b47db16a8c71b7ab0f4bd24"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native_strategy.py",
-      "sha256": "d1ad7c8b70f375fd48d7c8e353320473eef5026cbf6df50659d6e59d5a20a572",
-      "bytes": 86962
+      "bytes": 88808,
+      "sha256": "98f30ac68a71088c616965db840a022c4ed979fdb87e52e5e1a8a6efba812e3c"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/overnight-arming-validation.json",
+      "bytes": 17872,
+      "sha256": "cf2bbe96fc27696ebd92965171da1540514bf1858ff5c048a976546741cff366"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/overnight-cancel-ack-validation.json",
+      "bytes": 8191,
+      "sha256": "6cf6e501cab47687f6983182e15ac59ff233b94f9664706e165e4cf685609bb6"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/overnight-cancel-identity-validation.json",
+      "bytes": 34418,
+      "sha256": "b07265b906c9c6b0dfdbe10d228ee6147c9a38236f526e6338a955ab32636abf"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/overnight-cancel-provenance-validation.json",
+      "bytes": 8850,
+      "sha256": "a426e77c9a271b327752ce435a76e21ce1a75fee153730b4fbe3813fde7016f0"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/overnight-cancel-refusal-validation.json",
+      "bytes": 4269,
+      "sha256": "c2cd4bcf9033d242b355b59336438b310b2aa166032fad37e5bf7856c9073a3c"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/overnight-cancel-worker-validation.json",
+      "bytes": 18191,
+      "sha256": "ba6a10dde89971a6a381064837f472866dfbed68992343c985c85cde2d151b76"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/overnight-guard-pins-validation.json",
+      "bytes": 5314,
+      "sha256": "5da6869beff88ab197d70edc90aa26b4224e151e6da960457229e5a112cfa9a3"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/overnight-landing-rebase-validation.json",
+      "bytes": 15619,
+      "sha256": "b2f0713e417d39a647c0b06c6863bcdba22b808db458e4a59c24ce5f964cda6b"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/overnight-review-fix-validation.json",
+      "bytes": 14061,
+      "sha256": "d94414dabc24c5d307e83a82a350af60b50d444224644a8e65d727a405913856"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/overnight-review-round2-validation.json",
+      "bytes": 14948,
+      "sha256": "8207b6c10543bb706003a93301cc29445515d7c8a2be35cb17e57210b09b1fc4"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/overnight.py",
+      "bytes": 8475,
+      "sha256": "fa3917d5a423bd873dd6f64805bd4755c1b0da6de132911906f7267476a22c1d"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/receipt.json",
@@ -13473,8 +13528,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/recovery.py",
-      "sha256": "b981de3c78f8fc5e29fbc49d8aeb158d3a6759155a267f128084c1b8636b94ef",
-      "bytes": 18561
+      "bytes": 19605,
+      "sha256": "04987802bfd8d5284f16c090d79ac6f216f7213c242b3b9945622b579ab3a330"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/registry.json",
@@ -13493,8 +13548,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "3ce902532fd0fe5c8f59c62b7788090b6de921ca733eae4d6032ac90afdae0d6",
-      "bytes": 170735
+      "bytes": 185462,
+      "sha256": "eb937d131bf77a6e994a3dec1f4a7fc8adc2b7e78f148265af20268f5c031d30"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runtime_lock.py",
@@ -13503,8 +13558,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/safety.py",
-      "sha256": "e63f76d1298133a9af7f2c36dff6d55f3489e61dd051d827a37456f5af328860",
-      "bytes": 99596
+      "bytes": 102847,
+      "sha256": "ad9016205e035979fa2114a5ae477309662ed33ca6ac9cbaa92fd0d150eb76aa"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/scheduled_trial.sh",
@@ -13518,8 +13573,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/sessions.py",
-      "sha256": "fb906b56c50c8e16168656b1b7fcbd3a4b1bfca0a8e6465e8dae2c93d3c8e315",
-      "bytes": 17546
+      "bytes": 17926,
+      "sha256": "a5fadc8100b7f9297756f2dd273bab7b1ee687d88905a92ec06b609e07aa9aab"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/simulation.py",
@@ -13528,8 +13583,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "085dea92477a206e94bc14a83c07777e06240058a4fb93977028282ab766a53c",
-      "bytes": 9996
+      "bytes": 11874,
+      "sha256": "e21d4801076497ad872bd0c1baa8719dae8f905f1f071b0b5fac1a70a9fc234e"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/start_readiness.py",
@@ -13543,13 +13598,13 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/strategies_v1.py",
-      "sha256": "515b0aa581b418879736cf7467154000aebef63827c991147cfcd4ecb552f985",
-      "bytes": 29795
+      "bytes": 30347,
+      "sha256": "53c4d7dab6c4638b03720c30c3469a91afe96ee5a6e83a78baa6fa43235212a4"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/transport.py",
-      "sha256": "5cd9b1b31b1eae1ae0e75440401dec9a7a47d2c327ad0b582ef324c1e1d20890",
-      "bytes": 104825
+      "bytes": 128848,
+      "sha256": "c755cd6dcb96f6c4c8a450f7c348ac603755732f217d95ccff37ee4d05e97399"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/README.md",
@@ -16538,8 +16593,8 @@
     },
     {
       "path": "blueprints/us-equities/order-contract/order_contract.py",
-      "sha256": "57405f752fc933a6f09a5b2f0eb46482f94a780aa818dd0b73d7149a1fe58025",
-      "bytes": 7301
+      "bytes": 7524,
+      "sha256": "d1581a3b4600f17e584b552e8b23626744c1b6b64974b0e6859a8708a1fe5fb3"
     },
     {
       "path": "blueprints/us-equities/order-contract/receipt.json",
@@ -19150,6 +19205,11 @@
       "path": "docs/decisions/2026-10-13-lane-a-frozen-field-continuity.md",
       "sha256": "4da74df3105b3e30d5408e17c15cc0b369c9feac2e7391f404b1e1669e55a073",
       "bytes": 5792
+    },
+    {
+      "path": "docs/decisions/2026-10-13-overnight-rest-arming.md",
+      "bytes": 26772,
+      "sha256": "038e7c12285c60033e05319aabbebb0fc80dd504c30d10537f90bfaeb849d046"
     },
     {
       "path": "docs/decisions/2026-10-13-paper-configurable-risk-ceilings.md",
@@ -48502,6 +48562,911 @@
       "bytes": 2
     },
     {
+      "path": "evidence/artifacts/overnight-arming-20261013/historical/21da37beff26ace2a8445c983b0f8c1bb46640ed667c07117ae3cb01b21a4b8c/runner.py.txt",
+      "bytes": 176175,
+      "sha256": "21da37beff26ace2a8445c983b0f8c1bb46640ed667c07117ae3cb01b21a4b8c"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/historical/44c08b7cd391a090fcb7deb925924692e966169a8d7528d00f2c31f53369542a/source-hashes.json.txt",
+      "bytes": 10127,
+      "sha256": "44c08b7cd391a090fcb7deb925924692e966169a8d7528d00f2c31f53369542a"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/historical/4f35334a9b75cd523c9367f5270abb47ff385f3c9033e6e936db921e033f7077/runner.py.txt",
+      "bytes": 178364,
+      "sha256": "4f35334a9b75cd523c9367f5270abb47ff385f3c9033e6e936db921e033f7077"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/historical/4f9d0ed81f9f7c46037dce620c3d064bc0b6e5aa16e37343e09a188f2fb57d53/source-hashes.json.txt",
+      "bytes": 10370,
+      "sha256": "4f9d0ed81f9f7c46037dce620c3d064bc0b6e5aa16e37343e09a188f2fb57d53"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/historical/77c0eaaa5afc87af54d5cc09e522f305c84539af63deec9e0987b598b3e27912/2026-10-13-overnight-rest-arming.md.txt",
+      "bytes": 8383,
+      "sha256": "77c0eaaa5afc87af54d5cc09e522f305c84539af63deec9e0987b598b3e27912"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/historical/ab191814fa124f3f6c77c6e5c27f70b10d794ad733355b8764f0d6f304d4eacf/recovery.py.txt",
+      "bytes": 18930,
+      "sha256": "ab191814fa124f3f6c77c6e5c27f70b10d794ad733355b8764f0d6f304d4eacf"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/historical/cabb282274214861d5eb3172a3b78b141b1bfe9ebeddbf5ff2c6ff38aab063da/README-overnight.md.txt",
+      "bytes": 17527,
+      "sha256": "cabb282274214861d5eb3172a3b78b141b1bfe9ebeddbf5ff2c6ff38aab063da"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/historical/ddae9b3967fe1dcd3cd39299068b3ca28bcd11196d0ea876f6d324b0b1a104d1/transport.py.txt",
+      "bytes": 106843,
+      "sha256": "ddae9b3967fe1dcd3cd39299068b3ca28bcd11196d0ea876f6d324b0b1a104d1"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/historical/f2472067be553b53535084776725a6b8144079c3024aef2d385b7ca7726d1ff1/native_strategy.py.txt",
+      "bytes": 88467,
+      "sha256": "f2472067be553b53535084776725a6b8144079c3024aef2d385b7ca7726d1ff1"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/historical/f52eabbf188b4cbd5f56ae139a2d916bddd1de142cf7a74eeba4b77cb30f63ba/overnight.py.txt",
+      "bytes": 8212,
+      "sha256": "f52eabbf188b4cbd5f56ae139a2d916bddd1de142cf7a74eeba4b77cb30f63ba"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/logs/addendum-four-green.sanitized.txt",
+      "bytes": 786,
+      "sha256": "e8ad62cbdd8b1defe60d122a2fff4d60683c6b5e699b7c8989568d8505caab54"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/logs/addendum-four-red-e73.sanitized.txt",
+      "bytes": 4945,
+      "sha256": "0b0952e792ae206fa58f215bd32341667f2f19cc19824d39a040684a2fcc2501"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/logs/addendum-runner-ci.sanitized.txt",
+      "bytes": 1544,
+      "sha256": "b41cb80b89169b9224e2dcfb24aa35d53137454a7009794e81e52337631aa04f"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/logs/addendum-runner-native.sanitized.txt",
+      "bytes": 3112,
+      "sha256": "a0bd72fede46b4ae18a5185e144d805c43a0c8cc3023a610d1a0e8459d9951f7"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/logs/f1-f4-ci-final.sanitized.txt",
+      "bytes": 1427,
+      "sha256": "1130c694cc08cf8d043a93e6d0fb11daf6ca9c2ec6ef59600eec9a866754202e"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/logs/f1-f4-ci-related.sanitized.txt",
+      "bytes": 5296,
+      "sha256": "c27c95279ecf0e90994a537c95330793369e16f155012df2dec51023bbc824e9"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/logs/f1-f4-native-final.sanitized.txt",
+      "bytes": 5242,
+      "sha256": "146dfdb26ba78f80e8c88aba236a319f59a85c98565fe2b9a0441585f70c5b4f"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/logs/restage-ci-sealed.sanitized.txt",
+      "bytes": 9764,
+      "sha256": "c994717e384214546c63091236ad315f4bd9267d549043faaed52b0c0a6068a8"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/logs/restage-four-sealed-green.sanitized.txt",
+      "bytes": 786,
+      "sha256": "db0deeded783fc32530777469151579dc2f4ad5ee38fe62c83a0e7bad4ab64c4"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/logs/restage-guards37-ci.sanitized.txt",
+      "bytes": 171,
+      "sha256": "e2126ef68c26f3def327f8b2669b248ee74a4ddd9885963f8e0fe544524e842f"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/logs/restage-native-sealed.sanitized.txt",
+      "bytes": 13982,
+      "sha256": "93414b7bd4ce4cc9d504f2faa0271520eec94b6fae322e423df89751db551d1d"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/logs/restage-shared-ci.sanitized.txt",
+      "bytes": 98,
+      "sha256": "295979d7d04aa62d37b1de5cf29aa98a366dd5fe439f3e8b611b87ee648a92a1"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/logs/restage-shared-native.sanitized.txt",
+      "bytes": 98,
+      "sha256": "4addca7c838a8568884c5094d803980440a7d9dea7bb6c536c8fb493928b8a57"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/probes/peer-order-contract.patch.txt",
+      "bytes": 29023,
+      "sha256": "9bde0dd6631b4d77a8e258a279d79fe84bf1483d5f349b1de06a1ea28eec3fd0"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/probes/prepush-red-probe.py.txt",
+      "bytes": 3106,
+      "sha256": "adfbf11b6518c3ce83c97d37256754c4c837d598be71e34447499176b5361456"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-ack/ack-base-5b-red.sanitized.txt",
+      "bytes": 15280,
+      "sha256": "cde5a5fd67c2db4f63dc14094a77b9e6a4dd613d8237232599ec627120ebcd21"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-ack/ack-check.py.txt",
+      "bytes": 1356,
+      "sha256": "8c4eaf7d0b7cbdb4baf4debf3eda5a2affaeae56f8f615bb636ac3abb3446d67"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-ack/ack-guard-removal-red.sanitized.txt",
+      "bytes": 15280,
+      "sha256": "b6a69c710a086fea16f4c38f701a456bb315b1e7813110d093d27e48021ba74a"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-ack/ack-head-green.sanitized.txt",
+      "bytes": 2229,
+      "sha256": "b775d8350bc688a97b12343282bb6a31d9718ec41fa48955221b547178e4ac9c"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-ack/ack-related-ci.sanitized.txt",
+      "bytes": 44399,
+      "sha256": "3dbab5748693e2829659588db4fa6caeb4c0658f8236351036c19abe185e7697"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-ack/ack-related-native.sanitized.txt",
+      "bytes": 42210,
+      "sha256": "63880b25a9b024415533ec8ce1e0e51fd35a50e4f7f99f1fdd4648fb584be616"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-ack/ack-related-suite.py.txt",
+      "bytes": 1018,
+      "sha256": "65d24867a76f50d52a3296e4a40c3638f944ce9059f3f3705e7f81e164532865"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-ack/historical/2026-10-13-overnight-rest-arming.md.txt",
+      "bytes": 17431,
+      "sha256": "6e13db2c87366eaf99e370a591f0c5215fa6a51488047f52f7342a114970970f"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-ack/historical/test_overnight_published_preimages.py.txt",
+      "bytes": 5864,
+      "sha256": "9dd21844ce5c727ddaacc1261e31a752e8eed3a9ce249a7efc5a19175f92bc96"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-ack/historical/transport.py.txt",
+      "bytes": 110776,
+      "sha256": "03da21ee42abcae082abb1d4bafb80ab96858a35c4b1b59f149339ea0b32b743"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-base-five-final.sanitized.txt",
+      "bytes": 8178,
+      "sha256": "5554009e9645a0075590d663123b6c9f0e0fcd0e34f0a96181edddb3aeae168d"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-final-ci787.sanitized.txt",
+      "bytes": 164541,
+      "sha256": "2fedbd173aaee252d9339192a49fa4c41e8d14e8d8da84641482b44a3148960a"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-final-green5.sanitized.txt",
+      "bytes": 1187,
+      "sha256": "9f11aaa16b6eeec72503c858659e71449c90692df93427444cac7564274d20e6"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-final-native787.sanitized.txt",
+      "bytes": 156484,
+      "sha256": "238609538e53a6af8a4836d487fd4443b0f3ee96b10ffcb72e78783fcd0a78e2"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-isolated-leverage-base.sanitized.txt",
+      "bytes": 1952,
+      "sha256": "cd1dd8148a9848d7e0bb09c13c1724b0a824af10c8e81342ebe8baf52ef14341"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-isolated-leverage-head.sanitized.txt",
+      "bytes": 626,
+      "sha256": "e523905f6d927a435977ca6c183f9eb0182b07d1ec3b91a5f4b0783dfb3fe0d1"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-marks-base.sanitized.txt",
+      "bytes": 5314,
+      "sha256": "cb20b161fd6aef39c5bed53112416f100e1486d9b786baf74a5b1de4f3658f3b"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-marks-ci-green.sanitized.txt",
+      "bytes": 890,
+      "sha256": "06819f7dde2248a915b2eca0ae23cb48254486685418f5e4c9d24b08a0457ed8"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-mutant-adaptive-sticky.sanitized.txt",
+      "bytes": 4408,
+      "sha256": "2d0d4d5556f72dda38d2efb56478b7d43dec4f364e2751d7d7b6ec02b6fba4c3"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-mutant-mover-sticky.sanitized.txt",
+      "bytes": 1851,
+      "sha256": "21734ea7d95821d5b04e078cbfb5c4dacf177efd15f7631bf2f79965a3e6bb2b"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-mutant-queued.sanitized.txt",
+      "bytes": 2120,
+      "sha256": "87d82fef5e6b464bd777739a0941f3b26153066ccfc199bf8b2f8a2432f2f1a1"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-mutant-release-live.sanitized.txt",
+      "bytes": 2101,
+      "sha256": "509d45b9ec659376140a1a374c6ae23acbc8e3bd3b3a1b3c7435a5c209818d81"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-mutant-unshielded.sanitized.txt",
+      "bytes": 2095,
+      "sha256": "3d4d7748ecdde16cdbbdf543d07cc46935232912f8a1e22c4be13c70162a98e7"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-q9-base.sanitized.txt",
+      "bytes": 1842,
+      "sha256": "bc16301891082b6e2dcfe67654407832b64260f6378850dd562a2d72c8cc0847"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-q9-head.sanitized.txt",
+      "bytes": 1844,
+      "sha256": "dfb9ce4d82413b9fd84996d7fa705486bf31583fdb4a17191f0ab7c74e372aee"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-marks-check.py.txt",
+      "bytes": 1692,
+      "sha256": "5a2277dd5d6e8593718fe658b66ebe807168df6288833a1ac957486e639de216"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-worker-check.py.txt",
+      "bytes": 2857,
+      "sha256": "791026eda57b56eea3f6f01e8255bb2225c1bbe9b69f0fbf237efa9e48bc895d"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-worker-isolated-mover.py.txt",
+      "bytes": 1553,
+      "sha256": "e21b8b1a30fa3b1c2bcaa472cc788f1ef3b9ce85aa08b90244cfcd03474fcb64"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/post-rebase-suite.py.txt",
+      "bytes": 1211,
+      "sha256": "d208159dba6e3d747a8dd1b000002903ca5cff52e0acdb0ccbc0d9d5b351dd54"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/q9-check.py.txt",
+      "bytes": 1387,
+      "sha256": "d7d53e3a0bed6c5f17eea1d6c31bb14a2c1172ae0f6893531172654858fdd6e2"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/q9_strand.py.txt",
+      "bytes": 6819,
+      "sha256": "ddcde61fc0a4d2c5c986fbe2213b6d13c277bfbc78f54d7d24009f41a749cc2a"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/ack-related-suite.py.txt",
+      "bytes": 1067,
+      "sha256": "720a29b4f0063256b66008c1ac9411ea381003bbb7779fa105b3516afde6a294"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/historical/55f23fb4f52f6704ee2ac649392852f5aeeca3436d99bf91d06f9281efa6d694/test_adaptive_paper_cancel_worker_ownership.py.txt",
+      "bytes": 13374,
+      "sha256": "55f23fb4f52f6704ee2ac649392852f5aeeca3436d99bf91d06f9281efa6d694"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/historical/75028f6ff836e02564bcf920adca06b8a6b1c12dcc282ca49dd7a53e0fe2945d/2026-10-13-overnight-rest-arming.md.txt",
+      "bytes": 21304,
+      "sha256": "75028f6ff836e02564bcf920adca06b8a6b1c12dcc282ca49dd7a53e0fe2945d"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/historical/7eb26ce910f35e9e820c8320a7e806c9932ad04eab7093ed2c71a4307de6381a/recovery.py.txt",
+      "bytes": 19174,
+      "sha256": "7eb26ce910f35e9e820c8320a7e806c9932ad04eab7093ed2c71a4307de6381a"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/historical/bcb4c2469bf95a634e7302aef13c9f26d543d4360eca668b6ed25469f0675b31/test_adaptive_paper_cancel_acknowledgement.py.txt",
+      "bytes": 9366,
+      "sha256": "bcb4c2469bf95a634e7302aef13c9f26d543d4360eca668b6ed25469f0675b31"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/historical/cd657bebf47262310b2be4d57fc979ccb0005a0e68bbfb2552b3f2fe26f7680c/test_overnight_published_preimages.py.txt",
+      "bytes": 6051,
+      "sha256": "cd657bebf47262310b2be4d57fc979ccb0005a0e68bbfb2552b3f2fe26f7680c"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/historical/d1f305f57c2b6be8cdf0e4de996d9b6caaf7cc5eb6f623605879dad6743d067d/runner.py.txt",
+      "bytes": 180743,
+      "sha256": "d1f305f57c2b6be8cdf0e4de996d9b6caaf7cc5eb6f623605879dad6743d067d"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/historical/f5da563d8cc4118abb3fd92c8c1341a02c1c9357f2dac96dab6c1c9af14a4383/transport.py.txt",
+      "bytes": 111693,
+      "sha256": "f5da563d8cc4118abb3fd92c8c1341a02c1c9357f2dac96dab6c1c9af14a4383"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/identity-astra-check.py.txt",
+      "bytes": 2433,
+      "sha256": "6039a9ca82fddaf4268b03badfa1fb777eb87440e936b7cfb04ef657486326e8"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/identity-astra-delayed-base-red.sanitized.txt",
+      "bytes": 13444,
+      "sha256": "75105ba0f056a9cf4f08e689f1f754cfc6bbdc0acc2e844a4825ee93f3542e3b"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/identity-astra-delayed-head.sanitized.txt",
+      "bytes": 2068,
+      "sha256": "af35d1aebb31342d65783b3486dd27512b7681b71b126a6d8334da3ec21748d6"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/identity-astra-replay-base-red.sanitized.txt",
+      "bytes": 13444,
+      "sha256": "2f754fafc3bd763dd6ee74e5817682360410651a926c0bd8fae7207b278129b8"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/identity-astra-replay-head.sanitized.txt",
+      "bytes": 2050,
+      "sha256": "711bab279916a4c61469350ce63f7b0a2bfa54895706484381d9bff8a09f0734"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/identity-check.py.txt",
+      "bytes": 3073,
+      "sha256": "406fc1334bdb038b6071238838506afa2581befd443c78d9a3240886c19d9961"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/identity-correlation-removal-red.sanitized.txt",
+      "bytes": 9705,
+      "sha256": "8a0a2d8bb56b52bf9f1597f38a74502254ebc013df0293f3a1bc837f1b8b1e46"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/identity-cutoff-head.sanitized.txt",
+      "bytes": 748,
+      "sha256": "56edd9a2e837294031f36ff6ae3814d58e83915d887bc0b919e9602a65cb1474"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/identity-final-all-base-red.sanitized.txt",
+      "bytes": 37028,
+      "sha256": "62beb03a8a7595df7db936c358d8e2a5b9331b2164e060928ec9c76b082bd7de"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/identity-final-head-green.sanitized.txt",
+      "bytes": 12142,
+      "sha256": "ba2a476743e75bf063b1a2cb9c325f6d8f8e576a6efc5e4c99d49ef42dc77f39"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/identity-final-related-ci.sanitized.txt",
+      "bytes": 46393,
+      "sha256": "2b9ea588d1c0652903e5fc84b0d3878ceb548757fca065445c53f528a06a47c0"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/identity-final-related-native.sanitized.txt",
+      "bytes": 51069,
+      "sha256": "0cc4cdd23bad503748f93abc76b13f8516a6b0b547078b4c302007984b642343"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/identity-full-callback-preseal-ci.sanitized.txt",
+      "bytes": 1892,
+      "sha256": "7eba08b665a59349ec1d846c4081c298c0e47b0beba834e41dbd4b966be0bed7"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/identity-full-callback-preseal-native.sanitized.txt",
+      "bytes": 11932,
+      "sha256": "cb283bba9d773a4b629feaf9c6df28201e2631c36ff9b80d8d70709d231d716b"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/identity-full-ci.sanitized.txt",
+      "bytes": 743,
+      "sha256": "c9d75b8620ece8260bdc35199f8d366a2172f1248af6cafdc19faf9f509f598e"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/identity-full-liveness-preseal-native.sanitized.txt",
+      "bytes": 12445,
+      "sha256": "477ae9f3bfc6bbea4a8084f2c026f69c9e600c371422671ac7710d133c0dff7d"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/identity-full-native.sanitized.txt",
+      "bytes": 11625,
+      "sha256": "8d60b8a6b62b66543f42ec7fb7ee01a5edff4de2b751b7877392c983ee0bf6ed"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/identity-full-suite.py.txt",
+      "bytes": 809,
+      "sha256": "8dfe37b2cce670b646d093b537bc5febef2f2f2b1a8aa21a0d7dfe2c4e6cd7b3"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/identity-monitor-removal-red.sanitized.txt",
+      "bytes": 4047,
+      "sha256": "1acee25e0f0d38a036409ef5ea074f61abddb015ce5ba32464ec8cd07ec4fa31"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/identity-recovery-removal-red.sanitized.txt",
+      "bytes": 2086,
+      "sha256": "ec30de15829d41f1b987603c30b81e4eae65e5d8317c25076a101929c2671de3"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/identity-sealed-full-ci.sanitized.txt",
+      "bytes": 743,
+      "sha256": "33057691054f6447a77b60092d34343270b719d98cb7124f81eb52aad4633f27"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/identity-sealed-full-native.sanitized.txt",
+      "bytes": 10782,
+      "sha256": "26de3e6fe2870d15f3be4ef325f5c68623bec4c0fbf2856efaf6c3a67b608173"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/identity-sell-recovery-base-red.sanitized.txt",
+      "bytes": 4104,
+      "sha256": "5de40bfecbacabe6a6aeac6043411a32368b160e1d97e1065b0fa8b5caeb9d3a"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/identity-sell-recovery-head.sanitized.txt",
+      "bytes": 802,
+      "sha256": "d3889c7b01053573664f6788b3ab5b2c505ab8f4e3bd90edea9751a29e76da3d"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/liveness-callback-stress-green.sanitized.txt",
+      "bytes": 2132,
+      "sha256": "a5636da413b6945dc18f8db89f2160da33469dc1a9b266ab3bd616d0d847a47b"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/liveness-callback-stress.py.txt",
+      "bytes": 739,
+      "sha256": "b2f0ac9810f228c8c9b2624ced3063a4038064e8118aff3ca6d90315150a51d6"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/liveness-deadline-budget-green.sanitized.txt",
+      "bytes": 459,
+      "sha256": "34d2d53641352711717602e64c01056b1cd7db7fb26ca832d67de58065e6af01"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/liveness-deadline-original-red.sanitized.txt",
+      "bytes": 3046,
+      "sha256": "2d679c0bf2cd8d37bb2b35a64c4df325399d8c9026d3070e05d72bdb635b355b"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/liveness-deadline-probe.py.txt",
+      "bytes": 1270,
+      "sha256": "6b0f692628107ad5007d1cdc4924677c49e7ce41f7bee99167c5b575bbdc8486"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-identity/review-replay-probe.py.txt",
+      "bytes": 3071,
+      "sha256": "08fcd0c7ebf63ea4721a63eceee28ba4e5acb5a7facfe5a467bacccc2dfd17b4"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/ack-check.py.txt",
+      "bytes": 1487,
+      "sha256": "8b0bce810de47d382068ba44b5bb4b18406ff3890fa49dcc275e0e6e6b8ab00b"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/ack-related-suite.py.txt",
+      "bytes": 1018,
+      "sha256": "65d24867a76f50d52a3296e4a40c3638f944ce9059f3f3705e7f81e164532865"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/historical/2026-10-13-overnight-rest-arming.md.txt",
+      "bytes": 19288,
+      "sha256": "34a25c4dadfc9cd6667e4b61fe218dd7e2290f85cb8c04bbc9489630ad892062"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/historical/test_adaptive_paper_cancel_acknowledgement.py.txt",
+      "bytes": 8150,
+      "sha256": "7a09f2b738b881a487eb7bee4f6ae46ae70ea03b9e64039c94160c81ae463fa2"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/historical/test_overnight_published_preimages.py.txt",
+      "bytes": 5954,
+      "sha256": "ee5dc9b4aa4bb9fa17207c888b8fd0fae30b72f77ef487fa48f8752bab2c5b63"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/historical/transport.py.txt",
+      "bytes": 111101,
+      "sha256": "1e45e3c598d7719be84f5ffe782d2c7000694cff6fb2128ad5d0f362995b1288"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/refusal-base-35df-red.sanitized.txt",
+      "bytes": 17573,
+      "sha256": "3eaa48db5181d621bd40be80bee342245d69647bfbd179ff933d80d4c7ca7564"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/refusal-guard-removal-red.sanitized.txt",
+      "bytes": 17573,
+      "sha256": "252fa4eee93f33f489a5a422bc7c907ed7f81306016897072534e901f6d60e9e"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/refusal-head-green.sanitized.txt",
+      "bytes": 4498,
+      "sha256": "4b643ea9f733a4e4153f7b2119756e884e04052c378cd545ba53f0cd40faef1b"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/refusal-related-ci.sanitized.txt",
+      "bytes": 44654,
+      "sha256": "d20b6581ae8134b39c206a67d48a9b1fb6ae16d955ef8084ef823541e10195fa"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/refusal-related-native.sanitized.txt",
+      "bytes": 44478,
+      "sha256": "eda8df1f44c951aad330866af5b82f8f2eb9406eb9458ecfbfa28f79e455aefa"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-base-final4.sanitized.txt",
+      "bytes": 6085,
+      "sha256": "64217faa05f51575ef9e515e6c5123727841341ac05cfc2d28bc43d40037f7c6"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-check.py.txt",
+      "bytes": 1968,
+      "sha256": "2837ff91ca3a4f17605f64dfd08702cc5a97cdf777a5309a320b3aa63c3e2121"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-final-ci.sanitized.txt",
+      "bytes": 163482,
+      "sha256": "ea1a89147c0d1fdd4e61f4fc76c8f336187f46c36c8c09d8ce6a0c9f42ac23c2"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-final-native-repeat.sanitized.txt",
+      "bytes": 154765,
+      "sha256": "1e8f99841b07e764859edd5bfbd708e1c83565550b584275c45a1592333435c6"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-final-native.sanitized.txt",
+      "bytes": 154816,
+      "sha256": "ed39dbfb28e23d83f3fdc6356dad0665e2c2ab2ec0598786029ea13b56339d02"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-isolated-mover-base.sanitized.txt",
+      "bytes": 1638,
+      "sha256": "e729c73e637f2a337a61842b0cb5f09da7554d340920c3b70d47065ee6ed37d6"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-isolated-mover-head.sanitized.txt",
+      "bytes": 1638,
+      "sha256": "3adc09bc2da5ebbab00d842b7c73079de38d3df8b50599a29a2f82b1836fc18d"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-isolated-mover.py.txt",
+      "bytes": 1254,
+      "sha256": "27ed7058d9a0bc5be0da811766dcf5ed69a256c18da9e517ae282cfbfc9a68b0"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-isolated-stop-base.sanitized.txt",
+      "bytes": 554,
+      "sha256": "b4c614cb7052903baaf2804c7a93a819ef14242cfbd427382e03f5af4f7ce224"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-isolated-stop-head.sanitized.txt",
+      "bytes": 1447,
+      "sha256": "3eb347ddbfae5d0df776a3decc0ce9d0afcaae5a10c47e61cee7c11f51cbcd1f"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-mutant-queued.sanitized.txt",
+      "bytes": 2120,
+      "sha256": "64797b9c3131b0a584878660b08e9cbc4be803f533017577f7fcbb3bf121e718"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-mutant-unshielded.sanitized.txt",
+      "bytes": 2690,
+      "sha256": "dc509f73bf13a98989bd7f4aaf433eb800cdd6141e982b0cb31b92b3d8819dcb"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-targeted-final-green.sanitized.txt",
+      "bytes": 962,
+      "sha256": "6ce7b643aa9390f081015d1d9f933fc865f5557a7ed76c9fcfcf1ec832b7d541"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/historical/2026-10-13-overnight-rest-arming.md.txt",
+      "bytes": 13291,
+      "sha256": "b9e72cdfb873a3568ef2cea53ea8ee0a72b8dc351b2f378cfa34ba8750d09786"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/historical/mover.py.txt",
+      "bytes": 77689,
+      "sha256": "e6616665a95e99287000d534f4ff8be15a69af2eee5cc65dabc6b100295c8827"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/historical/native_strategy.py.txt",
+      "bytes": 88424,
+      "sha256": "769b5084a2e0ae9597d650a3a54e18f46074a4ee5371301d4fcadfeb2c70613a"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/historical/test_adaptive_paper_overnight_cancel_refusal.py.txt",
+      "bytes": 3973,
+      "sha256": "6cc2e37d96fa7e7960d5bb31bb20345347d65b8923d35db0d0f0fccc290df80c"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/historical/test_overnight_published_preimages.py.txt",
+      "bytes": 5662,
+      "sha256": "2f18c04e06000221e9a3a871acc2d8084d6188c72ec7d38c48bf08e3859ca12c"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/historical/transport.py.txt",
+      "bytes": 107324,
+      "sha256": "ddd524ed241098595ba418e418dd7a4a98d6e1d0a95321adf028ab5b059a3ea7"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/post-rebase-suite.py.txt",
+      "bytes": 1185,
+      "sha256": "36183a9adaac3553ecbea81a5e5770998bb0345c73ca0a336474e276446e9c34"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/worker-only/2026-10-13-overnight-rest-arming.md.txt",
+      "bytes": 16100,
+      "sha256": "6cc51a483a1fd7e150b7162b021013e1a9ffdf9b9958d55369719ed8739a6cf0"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/worker-only/runner.py.txt",
+      "bytes": 180564,
+      "sha256": "40ade540cc83d75f9fdbdcc7af054dcdbee80bcbf7015bd81d5e64e42198546d"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/worker-only/test_adaptive_paper_cancel_worker_ownership.py.txt",
+      "bytes": 9377,
+      "sha256": "3f7fa625c2e77e3d126c106e852872250f93387540ba3cc14a27f7e9e54b5002"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/worker-only/test_overnight_published_preimages.py.txt",
+      "bytes": 5755,
+      "sha256": "fb927873cd42a8f4e887deae365ad159ddc85dde4f8d4e92f6a9cc4a7d9d7ae4"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/worker-only/transport.py.txt",
+      "bytes": 110416,
+      "sha256": "59c8ca87eb97cf392afb22f40db2f505260ea2d7b2257f97118e967f0f69f3dc"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/worker-only/validation.json",
+      "bytes": 14940,
+      "sha256": "8c9eb8fa1c85500dc59e0d3a1b5a04a56bffe9a619570bb689352c048a3e9b2c"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel422/cancel422-base-ea0-red.sanitized.txt",
+      "bytes": 2012,
+      "sha256": "c4f0bc47d81895cb21550a2a5d24be714fbc100dbaf2161ed094b960132f74fb"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel422/cancel422-green-transport.sanitized.txt",
+      "bytes": 2761,
+      "sha256": "44c982031644f082cedabb3cde81c68b1f2e47eb7693352ac7d31927696c2e7c"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel422/historical/2026-10-13-overnight-rest-arming.md.txt",
+      "bytes": 12339,
+      "sha256": "0417bbb15d5d4ac3825101680ab2ec692ffcc8395d18372ff56d4f7eb50524cb"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel422/historical/credential_source.py.txt",
+      "bytes": 9305,
+      "sha256": "0bbe30aab4e665226e230e9927ef51e7f8875c53dda6527d19e6efe76bbaeacc"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel422/historical/mover.py.txt",
+      "bytes": 77613,
+      "sha256": "94ce6735ccb3cf1d0884a1c988e67b3f15d649b864ba1ece36ec20b9bb63b802"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel422/historical/runner.py.txt",
+      "bytes": 180421,
+      "sha256": "d531b494e2c125b663e62512771460704b69877ae07badbdf544a42ad67450a1"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel422/historical/safety.py.txt",
+      "bytes": 100515,
+      "sha256": "6d8b3f0cbfcc0517015b5e450ab9b88eb2baae3812da3385e6e6e9bf202fcab9"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel422/historical/strategies_v1.py.txt",
+      "bytes": 29807,
+      "sha256": "7a6bcf9154656d174790d2ddd5aedba6f50242677b6b86ff6ea1c767837619b8"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel422/historical/test_adaptive_paper_credential_source.py.txt",
+      "bytes": 25506,
+      "sha256": "73b03dbca953df186b25354db9da8fa24d2ec7e767513f630289de9a75f75c14"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel422/historical/test_adaptive_paper_transport.py.txt",
+      "bytes": 117897,
+      "sha256": "915973f08c21091abc73585f704b0ae6235f7f8fb1ff59760815f6542c99d52d"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel422/historical/test_overnight_published_preimages.py.txt",
+      "bytes": 5568,
+      "sha256": "09a2a13f176e962d54e44ec3e5d0fbca3e68a91b332f183adc54b8aefa4c1853"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel422/historical/transport.py.txt",
+      "bytes": 107161,
+      "sha256": "76af68629b6792801f2bd07c514e470d77cbd32eb52e666ac7177cdd35469bf3"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/arming-inventory-grant-green.sanitized.txt",
+      "bytes": 194,
+      "sha256": "5b81d6143ae257c7a89e12d5b9e40b27532586e7d106b4d4f6230c5897b4324b"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/arming-inventory-grant-red-f8.sanitized.txt",
+      "bytes": 2713,
+      "sha256": "cd9186e726d643db13c834976cbe65b412c336a44abfc9323aaa798c553cda3d"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/privacy-red-exact-9cb-record-scope.sanitized.txt",
+      "bytes": 3607,
+      "sha256": "3de81b2bee2c1d8c6690903786d14421de0f52f300be7ff8b3cafdd22e61e25b"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-final-transition-native.sanitized.txt",
+      "bytes": 699,
+      "sha256": "afa6de9a7f98c369033a645d6771ac5e12932210c5a0e31c9d34d85c39c14bbd"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-functional-ci-final.sanitized.txt",
+      "bytes": 5802,
+      "sha256": "6c19cb8a58b9acd6755a421102bca537ce7214c4857db8eab3ce31c07966a93f"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-functional-native-related.sanitized.txt",
+      "bytes": 25524,
+      "sha256": "e5113c3ab785edd6cc9c43f9ef83cd4b9a70602af729c8acabb37d8fb6995a16"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-gitleaks-config-full.sanitized.txt",
+      "bytes": 195,
+      "sha256": "f42eb49cf942bb53c5290839adbfc4972379e6510b8c10c9f2b939a61092892b"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-gitleaks-historical-scopes.sanitized.txt",
+      "bytes": 192,
+      "sha256": "511e9a0a6df6d3cd079ee745437cf457d1ca4ad598cff63f0b2225b2200b554c"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-native-related-repeat.sanitized.txt",
+      "bytes": 11584,
+      "sha256": "dc857324991fbec6c45236bc3fa274bbe3228eca6ccd7dc19d83a964abd7b3a1"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-native-timing-base-alone.sanitized.txt",
+      "bytes": 191,
+      "sha256": "f5b682fce7ffa4680613ecefb218d1c201881e1350f3adf681498d6f5c4fee12"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-native-timing-head-alone.sanitized.txt",
+      "bytes": 191,
+      "sha256": "370c4a333d3677a76a0b75db8f44644a659eb701fab039bad71a985f459ae7a1"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-parent-2658-final-red.sanitized.txt",
+      "bytes": 19381,
+      "sha256": "b380b32b0dc9b5c73eb1685df80aea5d257e51fbe76d308518f2df3be15a118f"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-publication-inventory-final.sanitized.txt",
+      "bytes": 192,
+      "sha256": "8a0ab1f280f5f50c9972f7a84ce9028801db190658604d2b37bec403488e429b"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-published-digest-guard.sanitized.txt",
+      "bytes": 194,
+      "sha256": "aacebebe98e56ac540ae565489849da91a49c05b0d5bbf34629b694ee8aa96cf"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-snapshot-publication-final.sanitized.txt",
+      "bytes": 193,
+      "sha256": "3289ab1b1b6f01e5e4c36fe9475c98e4e13c267215a39f85f1a32078f3cceeaf"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-landing-rebase/completion-check-runner.py.txt",
+      "bytes": 3454,
+      "sha256": "cbfdaf39faa35f2c1b3fd7f4e98e72f203a3fc1b0b9ac9cb17073fd797fd21e0"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-landing-rebase/completion-preimages.sanitized.txt",
+      "bytes": 1309,
+      "sha256": "1cb9ffbc63c51a876982c10fa22abb3098dfe8aaaecea5b1d1b4f45eff457c27"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-landing-rebase/completion-ten-namespace-calibration.sanitized.txt",
+      "bytes": 109274,
+      "sha256": "b14b6f7c1f153105adf6a9e162812a7c6caff82729c54f1034e8a6cc2e57313f"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-landing-rebase/completion-ten.sanitized.txt",
+      "bytes": 103951,
+      "sha256": "61923d55a79ada7b9c5e90bb7858b87b9de18b53105cf23e06fea27e109d4a64"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-landing-rebase/completion-validate.sanitized.txt",
+      "bytes": 343,
+      "sha256": "b55f7bf3a900c474fba183be47def7d2d3337802abec53778cf0b6821e40a1d6"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-landing-rebase/historical/3722efa985394897d72ada48cf77c8858d0f51378c82dd833cadae21355cb942/runner.py.txt",
+      "bytes": 181338,
+      "sha256": "3722efa985394897d72ada48cf77c8858d0f51378c82dd833cadae21355cb942"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-landing-rebase/historical/51057bb41d16bbd5e383213e0e71febfe5c73081f844ca3bf9aadaf22bec4108/test_adaptive_paper_lane_a_continuity.py.txt",
+      "bytes": 19078,
+      "sha256": "51057bb41d16bbd5e383213e0e71febfe5c73081f844ca3bf9aadaf22bec4108"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-landing-rebase/historical/b8b55d8b19e025865ad198d82e86d93b81317b3dd676cb508bd744c433cc67ee/transport.py.txt",
+      "bytes": 123407,
+      "sha256": "b8b55d8b19e025865ad198d82e86d93b81317b3dd676cb508bd744c433cc67ee"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-landing-rebase/historical/bf9e9969e545a504188d8a72bf6abfa059fb8c1dae07263dafb2c7befb23f951/native_adapter.py.txt",
+      "bytes": 56875,
+      "sha256": "bf9e9969e545a504188d8a72bf6abfa059fb8c1dae07263dafb2c7befb23f951"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-landing-rebase/historical/db963c760f32f59969f7f064b2bc44d3f0262a14571352515f98067c8f2e0212/source_policy.json.txt",
+      "bytes": 760050,
+      "sha256": "db963c760f32f59969f7f064b2bc44d3f0262a14571352515f98067c8f2e0212"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-landing-rebase/historical/de4e1dfa167307bb3ec4a2e87332e4e3bda98bc3a1f7c628acae4b0f7a2bc22b/test_overnight_published_preimages.py.txt",
+      "bytes": 6146,
+      "sha256": "de4e1dfa167307bb3ec4a2e87332e4e3bda98bc3a1f7c628acae4b0f7a2bc22b"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-round2/historical/mover.py.txt",
+      "bytes": 76979,
+      "sha256": "d6ba7eadadf342adbedea605bce24bc6e2252cc78895345981d400b0787b3be8"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-round2/historical/mover_runner.py.txt",
+      "bytes": 72199,
+      "sha256": "3a60cd304a04424ca61bba9da79629f5664bbea1266d9332323a4aa9016c352f"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-round2/historical/published_preimages.py.txt",
+      "bytes": 942,
+      "sha256": "86f47a20e287fc433f901c1c9ee71e1bad58ce22cb42e391e2747b8e08987e59"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-round2/historical/runner.py.txt",
+      "bytes": 179178,
+      "sha256": "e708e8275c63c8a0cda226c7575916045642fb2c3de3ba393be482a8e92fbdbe"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-round2/historical/test_adaptive_paper_overnight_transition.py.txt",
+      "bytes": 16350,
+      "sha256": "2dbd14ff97713792e6c2d3a501ff214960aaff0577957fb03686a01cdb941003"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-round2/historical/test_overnight_published_preimages.py.txt",
+      "bytes": 4654,
+      "sha256": "920f59dcd3b84f3be965cebd784d17f11111bd51103172171ba1645ca5e062c7"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-round2/round2-base-seven-final.sanitized.txt",
+      "bytes": 22683,
+      "sha256": "b7c29c82b9a58f351f16d1690b6b1618b19735e0e4275c2a80604998e5f497ba"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-round2/round2-prefix-red.sanitized.txt",
+      "bytes": 1192,
+      "sha256": "6218a4d598c9b8b34729217238b1198221399de7df7a3f2013c88a0b275d8ccf"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-round2/round2-related-ci.sanitized.txt",
+      "bytes": 8330,
+      "sha256": "7b7aa9d94739c0f199a5281ee3a7d3f24d2b3f75c0b27a602ae3c2cf2e8c56ca"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-round2/round2-related-native-repeat.sanitized.txt",
+      "bytes": 8458,
+      "sha256": "9a2cccac8adfc445327d3f1126c452c13966c95cc9005055f52a3cd4ee1cce19"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-round2/round2-related-native.sanitized.txt",
+      "bytes": 11262,
+      "sha256": "7b11bcef0a97edfacd49094c68f1309387ce5c5fe1b4a5c58c4550497cb2f136"
+    },
+    {
+      "path": "evidence/artifacts/overnight-arming-20261013/review-round2/round2-transition-prefix-final-green.sanitized.txt",
+      "bytes": 1221,
+      "sha256": "05d1ba89d1ebb109598de6c448f3b092c4896af0f4f1a633bf728a3df4fe3db4"
+    },
+    {
       "path": "evidence/artifacts/plugin-skill-identity-20261013/README.md",
       "sha256": "b6afce8e7008ad7470041bcd52d3d1829a8e4e2f110e20e53ba4c5f66496910f",
       "bytes": 6792
@@ -62082,6 +63047,11 @@
       "bytes": 24443
     },
     {
+      "path": "scripts/published_preimages.py",
+      "bytes": 1662,
+      "sha256": "9fd7d490721d9396f53e4395483cbdcb643c70f91189ec98e409d6baa6ebba73"
+    },
+    {
       "path": "scripts/receipt_staleness.py",
       "sha256": "2360fcd200cf9a98914367408aca1ec7df44fdadf32c97c2f13df27a2b18a997",
       "bytes": 13408
@@ -62210,6 +63180,11 @@
       "path": "tests/fixtures/adaptive_paper_exit_quote_age/aggregate-selection.json",
       "sha256": "aaa3f7180569798e9108a2d758ce6748190f845c39ed2d7b7e5dd75606196b76",
       "bytes": 2435
+    },
+    {
+      "path": "tests/fixtures/adaptive_paper_overnight_cutoff.json",
+      "bytes": 462,
+      "sha256": "f55094153bde74217f8c5ac2d5f2828ae3224d2f11180c4f87ade39c3c7249a5"
     },
     {
       "path": "tests/fixtures/agent_frontmatter/client-oracle.json",
@@ -62482,6 +63457,21 @@
       "bytes": 12387
     },
     {
+      "path": "tests/test_adaptive_paper_cancel_acknowledgement.py",
+      "bytes": 18881,
+      "sha256": "2901b8a2c11e67aaa0f400924dc592e87c7e12919d1acd835861489514226a92"
+    },
+    {
+      "path": "tests/test_adaptive_paper_cancel_liveness.py",
+      "bytes": 12862,
+      "sha256": "8a4dd3e557a53f4736ad67047bc4a07be8c79fc428f223bcb96afb49805e3d4f"
+    },
+    {
+      "path": "tests/test_adaptive_paper_cancel_worker_ownership.py",
+      "bytes": 16436,
+      "sha256": "957e0938475630abbeddc903a1481ffba7914c3e6dfa98a0b59a7c072ee81743"
+    },
+    {
       "path": "tests/test_adaptive_paper_configurable_ceilings.py",
       "sha256": "73fce266396489fc651cda1ec599583427c993e3332f3f6e0736fb6631d45a63",
       "bytes": 9613
@@ -62528,8 +63518,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_fees.py",
-      "sha256": "a3a6fa9b19897e6dc7204f799aa41da7412085fc30e21da765cb78998c755459",
-      "bytes": 79622
+      "bytes": 79709,
+      "sha256": "48ee989b4a9c30b973b0beeed28b0e40b52dcf894534e1e680168b2e722a9b67"
     },
     {
       "path": "tests/test_adaptive_paper_financing.py",
@@ -62577,14 +63567,54 @@
       "bytes": 19858
     },
     {
+      "path": "tests/test_adaptive_paper_overnight_arming.py",
+      "bytes": 38187,
+      "sha256": "5d2fa0071940b2dc910fd9f61c0a09a3d89ef43216c4a6b8099453c13420d7d8"
+    },
+    {
+      "path": "tests/test_adaptive_paper_overnight_cancel_marks.py",
+      "bytes": 4473,
+      "sha256": "bb740ec5fc4df0ac3d794521f65f4c942bdaa999503db9ec81231928f63b3386"
+    },
+    {
+      "path": "tests/test_adaptive_paper_overnight_cancel_refusal.py",
+      "bytes": 4133,
+      "sha256": "9a62e4ff229fb83324eca859390c5660a115c7c77f3d3e242875225e051f8962"
+    },
+    {
+      "path": "tests/test_adaptive_paper_overnight_guard_mutations.py",
+      "bytes": 11076,
+      "sha256": "ea526b0119708daa2047d16abaf1d8eb6cc37d06ae3ffeae3b687a3c3df3746d"
+    },
+    {
+      "path": "tests/test_adaptive_paper_overnight_guard_pins.py",
+      "bytes": 24003,
+      "sha256": "eaab736bb6bd9c6a6ffdd5dae076b4f71af5155808db77fecce12d4f0e316aad"
+    },
+    {
+      "path": "tests/test_adaptive_paper_overnight_order_contract.py",
+      "bytes": 28233,
+      "sha256": "34c25443c8e56a25772fe9db39a0c52f75554351306407dd466377bd0d987789"
+    },
+    {
+      "path": "tests/test_adaptive_paper_overnight_round2.py",
+      "bytes": 14316,
+      "sha256": "7a853843bb7c81955f7d1106fca681e495b19ec17dd68dc67d9ac64c63e9bfdd"
+    },
+    {
+      "path": "tests/test_adaptive_paper_overnight_transition.py",
+      "bytes": 16476,
+      "sha256": "064698851d24eafbfafd6b747214168d3ae5cbf6cd323fb86f745e526fff3f08"
+    },
+    {
       "path": "tests/test_adaptive_paper_recovery.py",
-      "sha256": "688e23f102249d170bf03d6a8d06196a42472cea049453228e4831a436c602ce",
-      "bytes": 45949
+      "bytes": 49890,
+      "sha256": "ca1bb1dabb164fcb67ab249197192b78e376d4f03935b3e2b9d5a8504d5926c6"
     },
     {
       "path": "tests/test_adaptive_paper_runner.py",
-      "sha256": "54a971471dc7f4a213c1140c1566db52cb614ad318f7e9c4a97e04ea50a1b0bb",
-      "bytes": 297347
+      "bytes": 309335,
+      "sha256": "fbf8e7ec9b044526952aba9f790a0e2519bd60313fce642a32fde1059d0b1f3c"
     },
     {
       "path": "tests/test_adaptive_paper_runtime_lock.py",
@@ -62618,8 +63648,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_transport.py",
-      "sha256": "915973f08c21091abc73585f704b0ae6235f7f8fb1ff59760815f6542c99d52d",
-      "bytes": 117897
+      "bytes": 117965,
+      "sha256": "eb7f0463d581807caa2f70d627d294cb8b48e38545c2a7d5b2c98e13c13dda0d"
     },
     {
       "path": "tests/test_adjudicate.py",
@@ -63098,8 +64128,8 @@
     },
     {
       "path": "tests/test_gitleaks_config.py",
-      "sha256": "b668888f4ddafd075e144d9c6f483150d8588a138c2545c4d91c8249937e84f7",
-      "bytes": 91041
+      "bytes": 92390,
+      "sha256": "3802dff4c595d1d2531c58e43233728d1f71241fa3ee4852b8cf767e39719314"
     },
     {
       "path": "tests/test_gitleaks_guarded_macos.py",
@@ -63595,6 +64625,11 @@
       "path": "tests/test_overfitting_riskl_parity.py",
       "sha256": "ed2dbdc9108109a50da5ffca6561ef0a7695f36fef4784d754cc2420f40e9d94",
       "bytes": 15821
+    },
+    {
+      "path": "tests/test_overnight_published_preimages.py",
+      "bytes": 6240,
+      "sha256": "8706d67ff7f9c25822ab45145837fc0acd30bbfffe383c16eb575e98c68a552f"
     },
     {
       "path": "tests/test_paired_runs_results.py",
@@ -64478,8 +65513,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "85bcad7c52f8402a30558e3da35e5436a4aefa6eed7ecee7187b198eecdb95f7",
-      "bytes": 760049
+      "bytes": 760131,
+      "sha256": "d35fda6b8d6d088f6f7a5fa0843c4bf694fd916a0fafcde1a4188f18c76a7c95"
     },
     {
       "path": "tools/omniroute/gateway_record.py",

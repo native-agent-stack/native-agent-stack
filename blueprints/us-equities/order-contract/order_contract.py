@@ -64,7 +64,7 @@ def canonicalize(value: object) -> dict:
 
 
 def build_envelope(value: object, *, fractional_sell_qty: bool = False,
-                   extended_hours_allowed: bool = False) -> dict:
+                   extended_hours_allowed: bool = False, overnight_allowed: bool = False) -> dict:
     """Pre-submission validation boundary; the envelope is never an SDK request.
 
     With the defaults it is exactly ``canonicalize``. An owned adapter may widen
@@ -98,7 +98,10 @@ def build_envelope(value: object, *, fractional_sell_qty: bool = False,
         "qty": _number(value["qty"], "qty", 9 if fractional else 4, not fractional),
         "side": side,
         "type": kind,
-        "time_in_force": _enum(value["time_in_force"], ("day",), "time_in_force"),
+        # Alpaca Orders at Alpaca: extended-hours LIMIT DAY/GTC only.
+        "time_in_force": _enum(value["time_in_force"],
+            ("day", "gtc") if overnight_allowed is True and extended_hours is True and kind == "limit"
+            else ("day",), "time_in_force"),
         "client_order_id": identifier,
         "order_class": _enum(value.get("order_class", "simple"), ("simple",), "order_class"),
         "extended_hours": extended_hours,

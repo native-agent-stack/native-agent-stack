@@ -1,0 +1,22 @@
+Sanitized diagnostic excerpt: cancellation states, complete failure section and summary.
+ASSERTION_FAILURES 1 ERRORS 0 SKIPS 455
+======================================================================
+FAIL: test_every_entry_is_the_named_files_actual_sha256 (tests.test_adaptive_paper_source_hashes_manifest.SourceHashesManifestIsHonest.test_every_entry_is_the_named_files_actual_sha256)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_source_hashes_manifest.py", line 101, in test_every_entry_is_the_named_files_actual_sha256
+    self.assertEqual(mismatched, {},
+AssertionError: {'tests/test_adaptive_paper_cancel_livenes[161 chars]4f'}} != {}
++ {}
+- {'tests/test_adaptive_paper_cancel_liveness.py': {'actual': '<sha256 of an unsealed diagnostic value>',
+-                                                   'expected': '<sha256 of an unsealed diagnostic value>'}} : manifest entries whose recorded sha256 does not match the file's actual content: {'tests/test_adaptive_paper_cancel_liveness.py': {'expected': '<sha256 of an unsealed diagnostic value>', 'actual': '<sha256 of an unsealed diagnostic value>'}}
+
+----------------------------------------------------------------------
+Ran 1600 tests in 380.875s
+
+FAILED (failures=1, skipped=455)
+{"status": "not_started", "stage": "order_contract", "reason": "order_contract_boundary_inactive:invalid_sentinel_accepted", "orders_submitted": 0}
+{"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}
+{"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}
+{"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}
+ASSERTION_FAILURES 1 ERRORS 0 SKIPS 455

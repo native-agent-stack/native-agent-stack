@@ -1,0 +1,73 @@
+test_stale_overnight_entry_keeps_native_node_and_other_position_alive (tests.test_adaptive_paper_runner.IntegratedRunner.test_stale_overnight_entry_keeps_native_node_and_other_position_alive) ... FAIL
+test_held_overnight_native_reduce_only_exit_routes_in_pre (tests.test_adaptive_paper_runner.IntegratedRunner.test_held_overnight_native_reduce_only_exit_routes_in_pre) ... FAIL
+test_pre_entry_remains_refused (tests.test_adaptive_paper_overnight_arming.OvernightArming.test_pre_entry_remains_refused) ... ok
+test_overnight_recovery_outside_overnight_exits_owned_position (tests.test_adaptive_paper_recovery.RecoveryTests.test_overnight_recovery_outside_overnight_exits_owned_position) ... FAIL
+
+======================================================================
+FAIL: test_stale_overnight_entry_keeps_native_node_and_other_position_alive (tests.test_adaptive_paper_runner.IntegratedRunner.test_stale_overnight_entry_keeps_native_node_and_other_position_alive)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_runner.py", line 792, in test_stale_overnight_entry_keeps_native_node_and_other_position_alive
+    asyncio.run(exercise())
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_runner.py", line 760, in exercise
+    self.assertEqual(session.errors, [])
+AssertionError: Lists differ: ['entry_dispatch_session_unavailable:O-20261013-070518-001-000-2'] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+'entry_dispatch_session_unavailable:O-20261013-070518-001-000-2'
+
+- ['entry_dispatch_session_unavailable:O-20261013-070518-001-000-2']
++ []
+
+======================================================================
+FAIL: test_held_overnight_native_reduce_only_exit_routes_in_pre (tests.test_adaptive_paper_runner.IntegratedRunner.test_held_overnight_native_reduce_only_exit_routes_in_pre)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_runner.py", line 697, in test_held_overnight_native_reduce_only_exit_routes_in_pre
+    asyncio.run(exercise())
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_runner.py", line 682, in exercise
+    self.assertEqual(session.errors, [])
+AssertionError: Lists differ: ['exit_dispatch_session_unavailable:O-20261013-070519-001-000-2'] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+'exit_dispatch_session_unavailable:O-20261013-070519-001-000-2'
+
+- ['exit_dispatch_session_unavailable:O-20261013-070519-001-000-2']
++ []
+
+======================================================================
+FAIL: test_overnight_recovery_outside_overnight_exits_owned_position (tests.test_adaptive_paper_recovery.RecoveryTests.test_overnight_recovery_outside_overnight_exits_owned_position)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_recovery.py", line 302, in test_overnight_recovery_outside_overnight_exits_owned_position
+    self.assertEqual(result["status"], "passed", result["errors"])
+AssertionError: 'needs_attention' != 'passed'
+- needs_attention
++ passed
+ : ['outside_allowed_session']
+
+----------------------------------------------------------------------
+Ran 4 tests in 1.291s
+
+FAILED (failures=3)
+BASE_EXPECTATION: 4 run, 3 assertion failures, 0 errors; PRE entry passes

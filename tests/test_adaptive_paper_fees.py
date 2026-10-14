@@ -497,7 +497,8 @@ class FeeLedger(FeePrivacyCapture, unittest.TestCase):
         self.assertEqual(self.ledger.record_fees(measured_fees(), self.NOW), measured_fees())
 
     def test_any_other_schema_version_is_refused_before_any_change(self):
-        for version in ("4", "0", "3.0", ""):
+        # Schema 4 persists overnight carry clocks; the next unsupported version is 5.
+        for version in ("5", "0", "3.0", ""):
             with self.subTest(version=version):
                 self.ledger.db.execute("DROP TABLE IF EXISTS fees")
                 self.ledger.db.execute("UPDATE meta SET value=? WHERE key='schema_version'", (version,))

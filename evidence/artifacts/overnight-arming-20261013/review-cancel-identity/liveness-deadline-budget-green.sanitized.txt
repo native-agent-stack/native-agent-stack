@@ -1,0 +1,8 @@
+test_held_recovery_cancel_releases_on_terminal_lookup_without_second_delete (tests.liveness_deadline_probe.CancelLiveness.test_held_recovery_cancel_releases_on_terminal_lookup_without_second_delete) ... held_sell_recovery True flat True deletes 1 counters {'held_unattributed_refusals': 1, 'lookup_confirmed_retries': 0}
+ok
+
+----------------------------------------------------------------------
+Ran 1 test in 9.460s
+
+OK
+ASSERTION_FAILURES 0 ERRORS 0 SKIPS 0

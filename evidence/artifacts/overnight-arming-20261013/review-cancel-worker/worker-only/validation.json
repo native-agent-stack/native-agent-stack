@@ -1,0 +1,339 @@
+{
+  "base_revision": "8f64d5a49a38989e8578e4e2c9681e5a372f6ed3",
+  "evidence_class": "synthetic",
+  "input_hashes": {
+    "blueprints/us-equities/adaptive-paper/mover_runner.py": "22542292fe2e3f18bee55fad845d48caf97487eedc4ef83e346a451de1345988",
+    "blueprints/us-equities/adaptive-paper/runner.py": "40ade540cc83d75f9fdbdcc7af054dcdbee80bcbf7015bd81d5e64e42198546d",
+    "blueprints/us-equities/adaptive-paper/transport.py": "59c8ca87eb97cf392afb22f40db2f505260ea2d7b2257f97118e967f0f69f3dc",
+    "docs/decisions/2026-10-13-overnight-rest-arming.md": "6cc51a483a1fd7e150b7162b021013e1a9ffdf9b9958d55369719ed8739a6cf0",
+    "tests/test_adaptive_paper_cancel_worker_ownership.py": "3f7fa625c2e77e3d126c106e852872250f93387540ba3cc14a27f7e9e54b5002",
+    "tests/test_adaptive_paper_overnight_cancel_refusal.py": "9a62e4ff229fb83324eca859390c5660a115c7c77f3d3e242875225e051f8962",
+    "tests/test_overnight_published_preimages.py": "fb927873cd42a8f4e887deae365ad159ddc85dde4f8d4e92f6a9cc4a7d9d7ae4"
+  },
+  "limitations": [
+    "Real installed SDK, GuardedSession, request budget, Controller, cancel, lookup and teardown execute against synthetic HTTP.",
+    "The HTTP-blocked case uses the actual five-second owner timeout; other races use accelerated synthetic waits.",
+    "The base run loads the exact published8f64 transport Git blob; final tests and unchanged controller code execute.",
+    "Shutdown waits for running work instead of claiming to interrupt synchronous I/O.",
+    "Two native782 runs each fail one unchanged synthetic mover timing fixture (completed_no_signals, no adapter errors); failed outputs and exact-base/head isolated probes are retained separately. Neither is a passing whole-suite claim.",
+    "Historical public source snapshots preserve previous receipt bindings; no execution receipt is retargeted.",
+    "No actual credentials, broker access, broker latency or paper acceptance."
+  ],
+  "paper_acceptance": "NOT_RUN",
+  "runs": [
+    {
+      "assertion_failures": 3,
+      "command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- pinned-python <scratch>/cancel-worker-check.py base",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 8.691,
+      "errors": 0,
+      "exit_code": 1,
+      "output_bytes": 6085,
+      "output_sha256": "64217faa05f51575ef9e515e6c5123727841341ac05cfc2d28bc43d40037f7c6",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-base-final4.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-base-final4.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-check.py.txt",
+      "python_argv": [
+        "<scratch>/cancel-worker-check.py",
+        "base"
+      ],
+      "runtime_lock": true,
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "tests_run": 4
+    },
+    {
+      "assertion_failures": 1,
+      "command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- pinned-python <scratch>/cancel-worker-check.py unshielded",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 4.266,
+      "errors": 0,
+      "exit_code": 1,
+      "output_bytes": 2690,
+      "output_sha256": "dc509f73bf13a98989bd7f4aaf433eb800cdd6141e982b0cb31b92b3d8819dcb",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-mutant-unshielded.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-mutant-unshielded.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-check.py.txt",
+      "python_argv": [
+        "<scratch>/cancel-worker-check.py",
+        "unshielded"
+      ],
+      "runtime_lock": true,
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "tests_run": 1
+    },
+    {
+      "assertion_failures": 1,
+      "command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- pinned-python <scratch>/cancel-worker-check.py keep-queued",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 1.303,
+      "errors": 0,
+      "exit_code": 1,
+      "output_bytes": 2120,
+      "output_sha256": "64797b9c3131b0a584878660b08e9cbc4be803f533017577f7fcbb3bf121e718",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-mutant-queued.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-mutant-queued.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-check.py.txt",
+      "python_argv": [
+        "<scratch>/cancel-worker-check.py",
+        "keep-queued"
+      ],
+      "runtime_lock": true,
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "tests_run": 1
+    },
+    {
+      "assertion_failures": 0,
+      "command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- pinned-python <scratch>/cancel-worker-check.py green",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 8.685,
+      "errors": 0,
+      "exit_code": 0,
+      "output_bytes": 962,
+      "output_sha256": "6ce7b643aa9390f081015d1d9f933fc865f5557a7ed76c9fcfcf1ec832b7d541",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-targeted-final-green.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-targeted-final-green.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-check.py.txt",
+      "python_argv": [
+        "<scratch>/cancel-worker-check.py",
+        "green"
+      ],
+      "runtime_lock": true,
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "tests_run": 4
+    },
+    {
+      "assertion_failures": 1,
+      "command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- pinned-python <scratch>/post-rebase-suite.py native",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 281.302,
+      "errors": 0,
+      "exit_code": 1,
+      "output_bytes": 154816,
+      "output_sha256": "ed39dbfb28e23d83f3fdc6356dad0665e2c2ab2ec0598786029ea13b56339d02",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-final-native.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-final-native.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/post-rebase-suite.py.txt",
+      "python_argv": [
+        "<scratch>/post-rebase-suite.py",
+        "native"
+      ],
+      "runtime_lock": true,
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "tests_run": 782
+    },
+    {
+      "assertion_failures": 1,
+      "command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- pinned-python <scratch>/post-rebase-suite.py native",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 270.517,
+      "errors": 0,
+      "exit_code": 1,
+      "output_bytes": 154765,
+      "output_sha256": "1e8f99841b07e764859edd5bfbd708e1c83565550b584275c45a1592333435c6",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-final-native-repeat.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-final-native-repeat.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/post-rebase-suite.py.txt",
+      "python_argv": [
+        "<scratch>/post-rebase-suite.py",
+        "native"
+      ],
+      "runtime_lock": true,
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "tests_run": 782
+    },
+    {
+      "assertion_failures": 0,
+      "command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- pinned-python <scratch>/post-rebase-suite.py ci",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 122.875,
+      "errors": 0,
+      "exit_code": 0,
+      "output_bytes": 163482,
+      "output_sha256": "ea1a89147c0d1fdd4e61f4fc76c8f336187f46c36c8c09d8ce6a0c9f42ac23c2",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-final-ci.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-final-ci.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/post-rebase-suite.py.txt",
+      "python_argv": [
+        "<scratch>/post-rebase-suite.py",
+        "ci"
+      ],
+      "runtime_lock": false,
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 224,
+      "tests_run": 782
+    },
+    {
+      "assertion_failures": 1,
+      "command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- pinned-python <scratch>/cancel-worker-isolated-mover.py base",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 16.334,
+      "errors": 0,
+      "exit_code": 1,
+      "output_bytes": 1638,
+      "output_sha256": "e729c73e637f2a337a61842b0cb5f09da7554d340920c3b70d47065ee6ed37d6",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-isolated-mover-base.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-isolated-mover-base.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-isolated-mover.py.txt",
+      "python_argv": [
+        "<scratch>/cancel-worker-isolated-mover.py",
+        "base"
+      ],
+      "runtime_lock": true,
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "tests_run": 3
+    },
+    {
+      "assertion_failures": 1,
+      "command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- pinned-python <scratch>/cancel-worker-isolated-mover.py head",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 15.494,
+      "errors": 0,
+      "exit_code": 1,
+      "output_bytes": 1638,
+      "output_sha256": "3adc09bc2da5ebbab00d842b7c73079de38d3df8b50599a29a2f82b1836fc18d",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-isolated-mover-head.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-isolated-mover-head.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-isolated-mover.py.txt",
+      "python_argv": [
+        "<scratch>/cancel-worker-isolated-mover.py",
+        "head"
+      ],
+      "runtime_lock": true,
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "tests_run": 3
+    },
+    {
+      "assertion_failures": 0,
+      "command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- pinned-python <scratch>/cancel-worker-isolated-mover.py base",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 7.306,
+      "errors": 0,
+      "exit_code": 0,
+      "output_bytes": 554,
+      "output_sha256": "b4c614cb7052903baaf2804c7a93a819ef14242cfbd427382e03f5af4f7ce224",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-isolated-stop-base.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-isolated-stop-base.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-isolated-mover.py.txt",
+      "python_argv": [
+        "<scratch>/cancel-worker-isolated-mover.py",
+        "base",
+        "stop"
+      ],
+      "runtime_lock": true,
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "tests_run": 3
+    },
+    {
+      "assertion_failures": 1,
+      "command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- pinned-python <scratch>/cancel-worker-isolated-mover.py head",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 7.655,
+      "errors": 0,
+      "exit_code": 1,
+      "output_bytes": 1447,
+      "output_sha256": "3eb347ddbfae5d0df776a3decc0ce9d0afcaae5a10c47e61cee7c11f51cbcd1f",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-isolated-stop-head.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-isolated-stop-head.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/cancel-worker-isolated-mover.py.txt",
+      "python_argv": [
+        "<scratch>/cancel-worker-isolated-mover.py",
+        "head",
+        "stop"
+      ],
+      "runtime_lock": true,
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "tests_run": 3
+    }
+  ],
+  "schema_version": 1,
+  "sources": {
+    "alpaca_py_pin": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+    "cpython_pin": "f6650f9ad73359051f3e558c2431a109bc016664",
+    "executor_shutdown": "Lib/concurrent/futures/thread.py:219-241",
+    "future_cancel": "Lib/concurrent/futures/_base.py:364-372",
+    "sdk_cancel": "alpaca/trading/client.py:217",
+    "to_thread": "Lib/asyncio/threads.py:12-25"
+  },
+  "test_ids": [
+    "CancelWorkerOwnership.test_sdk_delete_survives_timeout_and_is_joined_before_session_close",
+    "CancelWorkerOwnership.test_budget_wait_retains_one_operation_and_shutdown_joins_it",
+    "CancelWorkerOwnership.test_late_completion_cannot_launch_a_duplicate_delete",
+    "CancelWorkerOwnership.test_shutdown_cancels_an_operation_still_waiting_for_the_owner_lock"
+  ]
+}

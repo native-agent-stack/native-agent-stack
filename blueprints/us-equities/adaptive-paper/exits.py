@@ -62,6 +62,7 @@ class ExitContext:
     bid: str | float | None = None
     ask: str | float | None = None
     exit_side: str = "sell"
+    overnight_qualified: bool = False
 
 
 @dataclass(frozen=True)
@@ -199,10 +200,10 @@ class ExitPlan:
                                     submit=False, flag_position=True)
             # OVERNIGHT remains a measured candidate. Its native classifier,
             # adapter and owned paper acceptance have not been established.
-            if ctx.session == "OVERNIGHT":
+            if ctx.session == "OVERNIGHT" and ctx.overnight_qualified is not True:
                 return ExitDecision("overnight_unqualified", 0.0, "hold",
                                     submit=False, flag_position=True)
-            if ctx.session not in ("PRE", "POST"):
+            if ctx.session not in ("PRE", "POST", "OVERNIGHT"):
                 return ExitDecision("session_unavailable", 0.0, "hold",
                                     submit=False, flag_position=True)
             # Local import reuses the native numeric/side-price primitive after
@@ -210,6 +211,12 @@ class ExitPlan:
             from strategies_v1 import limit_price
             try:
                 extended_price = limit_price(ctx.bid, ctx.ask, ctx.exit_side)
+                if ctx.session == "OVERNIGHT":
+                    from mover import sell_limit_price
+                    extended_price = sell_limit_price(ctx.bid, 0, decimals=2)
+                    if extended_price is None or ctx.exit_side != "sell":
+                        raise ValueError("invalid overnight exit")
+                    extended_price = str(extended_price)
             except (InvalidOperation, TypeError, ValueError):
                 return ExitDecision("quote_invalid", 0.0, "hold",
                                     submit=False, flag_position=True)

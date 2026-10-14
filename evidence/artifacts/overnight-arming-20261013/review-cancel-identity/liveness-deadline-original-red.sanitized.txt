@@ -1,0 +1,28 @@
+test_held_recovery_cancel_releases_on_terminal_lookup_without_second_delete (tests.liveness_deadline_probe.CancelLiveness.test_held_recovery_cancel_releases_on_terminal_lookup_without_second_delete) ... FAIL
+
+======================================================================
+FAIL: test_held_recovery_cancel_releases_on_terminal_lookup_without_second_delete (tests.liveness_deadline_probe.CancelLiveness.test_held_recovery_cancel_releases_on_terminal_lookup_without_second_delete)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_liveness.py", line 43, in test_held_recovery_cancel_releases_on_terminal_lookup_without_second_delete
+    self._exercise(recovery_first=True)
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_liveness.py", line 229, in _exercise
+    asyncio.run(exercise())
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_liveness.py", line 198, in exercise
+    self.assertFalse(port.cancel_pending('exit'),
+AssertionError: True is not false : {'stopping': True, 'recovery_done': True, 'cancel_clock': 5.0, 'next_lookup_at': 5.0, 'local_completion_applied': True, 'recovery_result': {'mode': 'official_sdk_recovery', 'native_engine_resumed': False, 'status': 'needs_attention', 'flat': False, 'errors': ['cancellation_not_confirmed'], 'error_details': [{'code': 'cancellation_not_confirmed', 'type': 'SafetyError', 'message': 'cancellation_not_confirmed'}], 'positions': [{'symbol': 'SPY', 'qty': '1'}], 'unresolved_orders': [{'client_id': 'exit', 'symbol': 'SPY', 'side': 'sell', 'status': 'accepted', 'qty': '1', 'filled_qty': '0', 'submit_attempted': False}], 'stale_symbols': [], 'broker_positions_last_observed': [{'symbol': 'SPY', 'qty': '1'}], 'reconciliation': {'positions_match': True, 'cash_match': True, 'cash_delta_usd': '-10.01', 'open_orders': 1, 'positions': 1}, 'cancel_attempt_client_ids': ['exit'], 'exit_attempt_client_ids': [], 'buy_submissions': 0, 'cancellation_counters': {'held_unattributed_refusals': 1, 'lookup_confirmed_retries': 0}, 'order_deadline_seconds': 3.0}}
+
+----------------------------------------------------------------------
+Ran 1 test in 5.626s
+
+FAILED (failures=1)
+ASSERTION_FAILURES 1 ERRORS 0 SKIPS 0

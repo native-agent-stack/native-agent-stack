@@ -1,0 +1,11 @@
+{
+  "evidence_class": "synthetic",
+  "paper_acceptance": "NOT_RUN",
+  "cutoff": "2026-03-11T03:50:00-04:00",
+  "boundary": "2026-03-11T04:00:00-04:00",
+  "day_expiry": "2026-03-11T20:00:00-04:00",
+  "cases": [
+    {"status": "halted", "entry": "accepted", "filled_qty": "0", "entry_action": "cancel", "exit_action": "rest"},
+    {"status": "unknown", "entry": "accepted", "filled_qty": "0", "entry_action": "cancel", "exit_action": "preserve_until_fresh"}
+  ]
+}

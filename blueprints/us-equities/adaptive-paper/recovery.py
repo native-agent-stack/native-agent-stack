@@ -209,6 +209,8 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
     if before_request is not None:
         port.before_request = recovery_request
     try:
+        if callable(getattr(controller, "refresh_exit_session", None)):
+            controller.refresh_exit_session()
         ledger.begin_recovery(controller.clock())
         for intent in ledger.intents():
             if (intent.status == "reserved" and not intent.submit_attempted
@@ -218,6 +220,10 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
                 ledger.mark_not_sent(intent.client_id, "recovery_proven_never_attempted")
         adoption_extended_hours = order_extended_hours_flag(
             datetime.fromtimestamp(controller.clock(), timezone.utc), session_policy)
+        if session_policy.get("overnight_enabled") is True:
+            # Adoption is lookup/cancel only, never a resubmit. The held BOATS
+            # entry was extended-hours even if recovery now runs during RTH.
+            adoption_extended_hours = True
         port.adopt_intents([_payload(i, adoption_extended_hours) for i in ledger.intents()
                             if i.status not in {"not_sent", "broker_refused"}])
         await bounded(port.start(quote, order))
@@ -240,6 +246,8 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
         # exit still ends recovery, including the transport's pre-wire refusal (not_sent) of
         # a quote that went stale before the POST.
         while ledger.positions():
+            if callable(getattr(controller, "refresh_exit_session", None)):
+                controller.refresh_exit_session()
             guard_observation_integrity()
             if len(submitted) >= 100:
                 raise SafetyError("recovery_order_bound_reached")
@@ -285,6 +293,8 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
                        "qty": format(quantity, "f"), "limit_price": format(price, "f"),
                        "type": "limit", "time_in_force": "day", "extended_hours": exit_extended_hours,
                        "strategy": "recovery", "reason": "owned_residual_exit"}
+            if session_policy.get("overnight_enabled") is True:
+                payload["reduce_only"] = True
             try:
                 guard_observation_integrity()
                 # Position reads and payload preparation may consume the budget
@@ -326,7 +336,10 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
         controller.stop = True
         try:
             # Teardown can outlive the order deadline, but cannot authorize orders.
-            await asyncio.wait_for(port.stop(), 10)
+            # The port owns bounded SDK calls (including a 65s budget waiter)
+            # and their final lookup. Join that ownership before releasing the
+            # account, rather than truncating it with an unrelated 10s timer.
+            await port.stop()
         except Exception as exc:
             errors.append("stop_" + _code(exc))
             details.append(_detail(exc, "stop_"))
@@ -339,6 +352,7 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
                    "submit_attempted": i.submit_attempted} for i in ledger.unresolved()]
     flat = (not positions and not unresolved and proof is not None and not errors
             and proof["positions"] == 0 and proof["open_orders"] == 0)
+    counters = getattr(port, "cancellation_counters", None)
     return {"mode": "official_sdk_recovery", "native_engine_resumed": False,
             "status": "passed" if flat else "needs_attention", "flat": flat,
             "errors": errors, "error_details": details, "positions": positions, "unresolved_orders": unresolved,
@@ -347,4 +361,6 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
                 [{"symbol": p["symbol"], "qty": str(p["qty"])} for p in last_snapshot["positions"]],
             "reconciliation": proof, "cancel_attempt_client_ids": cancelled,
             "exit_attempt_client_ids": submitted, "buy_submissions": 0,
+            "cancellation_counters": counters() if callable(counters) else {
+                "held_unattributed_refusals": 0, "lookup_confirmed_retries": 0},
             "order_deadline_seconds": cleanup}

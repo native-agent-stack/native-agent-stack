@@ -1,0 +1,62 @@
+Sanitized diagnostic excerpt: cancellation states, complete failure section and summary.
+test_cutoff_held_entry_reconciles_then_owned_position_flattens (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_cutoff_held_entry_reconciles_then_owned_position_flattens) ... ack_three_ticks accepted stream refusal True [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+cancel_stage_end {"held_unattributed_refusals": 1, "lookup_confirmed_retries": 1}
+test_held_cancel_reconciles_on_a_fixed_bound_before_any_retry (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_held_cancel_reconciles_on_a_fixed_bound_before_any_retry) ... ack_three_ticks accepted stream refusal True [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+cancel_stage_end {"held_unattributed_refusals": 1, "lookup_confirmed_retries": 0}
+ack_three_ticks accepted stream refusal True [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+cancel_stage_end {"held_unattributed_refusals": 1, "lookup_confirmed_retries": 1}
+ack_three_ticks accepted stream refusal True [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+cancel_stage_end {"held_unattributed_refusals": 1, "lookup_confirmed_retries": 0}
+test_http_acknowledgement_survives_a_failed_followup_lookup (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_http_acknowledgement_survives_a_failed_followup_lookup) ... ack_three_ticks accepted stream refusal False [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+test_old_refusal_never_releases_a_newer_acknowledged_cancel (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_old_refusal_never_releases_a_newer_acknowledged_cancel) ... ack_three_ticks accepted stream refusal True [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks accepted stream refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks accepted stream refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks accepted stream refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks accepted stream refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks accepted stream refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks accepted stream refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks accepted stream refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks accepted stream refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+test_rejection_during_lookup_releases_pending_and_allows_one_retry (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_rejection_during_lookup_releases_pending_and_allows_one_retry) ... ack_three_ticks accepted stream refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks accepted lookup refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks new stream refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks new lookup refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks pending_cancel stream refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks pending_cancel lookup refusal True [{"deletes": 1, "controller_pending": false, "adaptive_pending": false, "mover_pending": false}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 2, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_three_ticks_keep_acknowledged_live_cancel_pending_until_terminal) ... ack_three_ticks accepted stream refusal False [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks accepted lookup refusal False [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks new stream refusal False [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks new lookup refusal False [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks pending_cancel stream refusal False [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ack_three_ticks pending_cancel lookup refusal False [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+ASSERTION_FAILURES 1 ERRORS 0 SKIPS 0
+======================================================================
+FAIL: test_held_recovery_cancel_releases_on_terminal_lookup_without_second_delete (tests.test_adaptive_paper_cancel_liveness.CancelLiveness.test_held_recovery_cancel_releases_on_terminal_lookup_without_second_delete)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_liveness.py", line 43, in test_held_recovery_cancel_releases_on_terminal_lookup_without_second_delete
+    self._exercise(recovery_first=True)
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_liveness.py", line 217, in _exercise
+    asyncio.run(exercise())
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_liveness.py", line 191, in exercise
+    self.assertFalse(port.cancel_pending('exit'))
+AssertionError: True is not false
+
+----------------------------------------------------------------------
+Ran 1600 tests in 408.563s
+
+FAILED (failures=1)
+{"status": "not_started", "stage": "order_contract", "reason": "order_contract_boundary_inactive:invalid_sentinel_accepted", "orders_submitted": 0}
+{"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}
+{"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}
+{"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}
+ASSERTION_FAILURES 1 ERRORS 0 SKIPS 0

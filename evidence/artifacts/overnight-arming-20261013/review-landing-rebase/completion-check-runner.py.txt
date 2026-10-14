@@ -1,0 +1,70 @@
+"""Run local synthetic landing checks and emit a native-tool log patch."""
+import contextlib
+import importlib.metadata
+import io
+import json
+from pathlib import Path
+import platform
+import subprocess
+import sys
+import time
+import unittest
+
+ROOT = Path('<ARM_WORKTREE>')
+LANE = Path('<LANE_DIR>')
+MODULES = (
+    'tests.test_adaptive_paper_cancel_acknowledgement',
+    'tests.test_adaptive_paper_cancel_liveness',
+    'tests.test_adaptive_paper_cancel_worker_ownership',
+)
+mode = sys.argv[1]
+head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
+started = subprocess.check_output(['date', '-u', '+%Y-%m-%dT%H:%M:%SZ'], text=True).strip()
+begin = time.monotonic()
+if mode in ('native', 'readiness', 'preimages', 'ten'):
+    sys.path.insert(0, str(ROOT))
+    sys.path.insert(0, str(ROOT / 'blueprints/us-equities/adaptive-paper'))
+    from runtime_lock import runtime_read_lock
+    stream = io.StringIO()
+    with runtime_read_lock(), contextlib.redirect_stdout(stream), contextlib.redirect_stderr(stream):
+        modules = {
+            'native': MODULES,
+            'readiness': ('tests.test_adaptive_paper_start_readiness',),
+            'preimages': ('tests.test_overnight_published_preimages',),
+            'ten': MODULES + (
+                'tests.test_adaptive_paper_transport',
+                'tests.test_overnight_published_preimages',
+                'tests.test_adaptive_paper_overnight',
+                'tests.test_adaptive_paper_recovery',
+                'tests.test_adaptive_paper_runner',
+                'tests.test_adaptive_paper_native',
+                'tests.test_adaptive_paper_source_hashes_manifest',),
+        }[mode]
+        suite = unittest.defaultTestLoader.loadTestsFromNames(modules)
+        result = unittest.TextTestRunner(stream=stream, verbosity=2).run(suite)
+    meta = {'head': head, 'started_utc': started, 'python': platform.python_version(),
+            'alpaca_py': importlib.metadata.version('alpaca-py'),
+            'requests': importlib.metadata.version('requests'),
+            'nautilus_trader': importlib.metadata.version('nautilus_trader'),
+            'tests': result.testsRun, 'skipped': len(result.skipped),
+            'failures': len(result.failures), 'errors': len(result.errors),
+            'rc': int(not result.wasSuccessful()), 'elapsed_seconds': time.monotonic() - begin,
+            'network': ('native synthetic fixtures; no broker calls' if mode == 'ten'
+                        else 'bwrap --unshare-net; synthetic local HTTP only'),
+            'modules': modules}
+    log = stream.getvalue()
+elif mode == 'validate':
+    run = subprocess.run(['python3', 'scripts/validate.py'], cwd=ROOT,
+                         stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    meta = {'head': head, 'started_utc': started, 'command': 'python3 scripts/validate.py',
+            'rc': run.returncode, 'elapsed_seconds': time.monotonic() - begin}
+    log = run.stdout
+else:
+    raise SystemExit('native or validate required')
+label = mode + ('-' + sys.argv[2] if len(sys.argv) > 2 else '')
+target = LANE / ('pr1081-landing-' + label + '-' + head[:8] + '.log')
+content = json.dumps(meta, sort_keys=True) + '\n' + log
+patch = '*** Begin Patch\n*** Add File: ' + str(target) + '\n'
+patch += ''.join('+' + line + '\n' for line in content.splitlines())
+patch += '*** End Patch\n'
+print(json.dumps({'summary': meta, 'log_path': str(target), 'patch': patch}))

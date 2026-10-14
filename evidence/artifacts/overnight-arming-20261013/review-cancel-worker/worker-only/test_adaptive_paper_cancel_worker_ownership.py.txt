@@ -1,0 +1,193 @@
+"""Pinned SDK cancellation ownership; synthetic HTTP and budget boundaries only."""
+import asyncio
+from datetime import datetime, timezone
+import json
+from pathlib import Path
+import sys
+import threading
+import unittest
+from unittest.mock import patch
+from uuid import UUID
+
+SOURCE = Path(__file__).resolve().parents[1] / 'blueprints/us-equities/adaptive-paper'
+sys.path.insert(0, str(SOURCE))
+try:
+    from alpaca.trading.client import TradingClient
+    import requests
+except ImportError:
+    TradingClient = None
+try:
+    from . import test_adaptive_paper_overnight_arming as fixtures
+    from .adaptive_paper_hermetic import patch_default_stop, restore_default_stop
+except ImportError:
+    import test_adaptive_paper_overnight_arming as fixtures
+    from adaptive_paper_hermetic import patch_default_stop, restore_default_stop
+
+def setUpModule():
+    global _token
+    _token = patch_default_stop()
+
+def tearDownModule():
+    restore_default_stop(_token)
+
+@unittest.skipUnless(TradingClient, 'requires pinned alpaca-py runtime')
+class CancelWorkerOwnership(unittest.TestCase):
+    def test_sdk_delete_survives_timeout_and_is_joined_before_session_close(self):
+        self._exercise('http', 5.0)
+
+    def test_budget_wait_retains_one_operation_and_shutdown_joins_it(self):
+        self._exercise('budget', .05)
+
+    def test_late_completion_cannot_launch_a_duplicate_delete(self):
+        self._exercise('http', .05, shutdown_before_release=False)
+
+    def test_shutdown_cancels_an_operation_still_waiting_for_the_owner_lock(self):
+        self._exercise('queued', .05)
+
+    def _exercise(self, boundary, timeout, shutdown_before_release=True):
+        import runner
+        from transport import AlpacaPaperTransport, GuardedSession, PAPER_URL, normalize_order
+        from safety import Ledger
+        record_order = Ledger.record_order
+        broker_id = str(UUID(int=1))
+
+        def seed_order(ledger, cid, oid, *args, **kwargs):
+            # Give the durable synthetic seed the UUID required by the real SDK.
+            return record_order(ledger, cid, broker_id if oid == 'synthetic-entry' else oid,
+                                *args, **kwargs)
+
+        with patch.object(Ledger, 'record_order', seed_order):
+            c, clock, _, bounds, _ = fixtures.OvernightArming._controller(self)
+
+        async def exercise():
+            entered, release = threading.Event(), threading.Event()
+            worker_calls, finished, http_calls, closed = [], [], [], []
+            payload = {'id': broker_id,
+                       'client_order_id': 'entry', 'symbol': 'SPY', 'side': 'buy',
+                       'qty': '1', 'limit_price': '10.01', 'filled_qty': '0',
+                       'filled_avg_price': None, 'status': 'accepted',
+                       'updated_at': datetime.fromtimestamp(clock[0], timezone.utc).isoformat()}
+
+            class HTTP:
+                def request(self, method, url, **kwargs):
+                    http_calls.append((method, bool(closed)))
+                    if method == 'DELETE' and boundary == 'http':
+                        entered.set()
+                        if not release.wait(15):
+                            raise RuntimeError('synthetic HTTP boundary was not released')
+                    response = requests.Response()
+                    response.status_code = 204 if method == 'DELETE' else 200
+                    response._content = b'' if method == 'DELETE' else json.dumps(
+                        {**payload, 'status': 'canceled'}).encode()
+                    return response
+
+                def close(self):
+                    closed.append(True)
+
+            guarded = GuardedSession(origin=PAPER_URL, before_request=lambda *a, **k: None)
+            guarded._session.close()
+            guarded._session = HTTP()
+            client = TradingClient('synthetic-key', 'synthetic-secret', paper=True, raw_data=True)
+            client._session.close()
+            client._session = guarded
+            sdk_cancel = client.cancel_order_by_id
+
+            def tracked_cancel(order_id):
+                worker_calls.append(order_id)
+                try:
+                    return sdk_cancel(order_id)
+                finally:
+                    finished.append(bool(closed))
+
+            client.cancel_order_by_id = tracked_cancel
+            port = AlpacaPaperTransport.__new__(AlpacaPaperTransport)
+            port._operation_lock, port._observation_lock = asyncio.Lock(), asyncio.Lock()
+            port._loop = asyncio.get_running_loop()
+            port._client = client
+            port._intents = {'entry': {k: payload[k] for k in
+                ('client_order_id', 'symbol', 'side', 'qty', 'limit_price')}}
+            port._observed, port._executions = {'entry': normalize_order(payload)}, {}
+            port._terminal_stream_health = {}
+            port._orders_stream = port._quotes_stream = None
+            port._tasks, port._threads, port._boats_clients = [], [], {}
+            port.quote_source_mode, port.feed = 'boats_rest', 'boats'
+            port._started, port._stopping = True, False
+            from overnight import BoatsQuoteSource
+            port._boats_source = BoatsQuoteSource(['SPY'], lambda symbol: None, lambda symbol: None)
+            port.overnight_enabled, port.flatten_minutes_before_pre = True, 10
+            port.freeze_health = lambda reason: None
+            port.sink_observation = c.observe
+
+            async def before_request(kind, client_id=None):
+                if kind == 'cancel' and boundary == 'budget':
+                    entered.set()
+                    while not release.is_set():
+                        await asyncio.sleep(.001)
+                return await c.before_request(kind, client_id=client_id)
+
+            port.before_request = before_request
+            guarded.before_request = port._budget_sync
+            c.port = port
+            stop_task = None
+            if boundary == 'queued':
+                await port._operation_lock.acquire()
+            try:
+                with patch.object(runner, 'OVERNIGHT_CANCEL_TIMEOUT_SECONDS', timeout):
+                    clock[0] = bounds['flatten_at']
+                    self.assertTrue(await asyncio.wait_for(c.overnight_tick(clock[0]), 1))
+                    if boundary == 'queued':
+                        await asyncio.sleep(.02)
+                        await c.stop_overnight_cancels()
+                        stop_task = asyncio.create_task(port.stop())
+                        await asyncio.sleep(.05)
+                        self.assertTrue(stop_task.done(), 'shutdown must cancel an operation not yet started')
+                        self.assertEqual(worker_calls, [])
+                        self.assertEqual(http_calls, [])
+                        await stop_task
+                        self.assertTrue(closed)
+                        return
+                    for _ in range(1000):
+                        if entered.is_set():
+                            break
+                        await asyncio.sleep(.001)
+                    self.assertTrue(entered.is_set())
+                    await asyncio.sleep(timeout + .05)
+                    self.assertTrue(await asyncio.wait_for(c.overnight_tick(clock[0]), 1))
+                    await asyncio.sleep(.05)
+                    self.assertEqual(len(worker_calls), 1,
+                                     'one in-flight SDK DELETE must survive wrapper timeout; no second worker')
+                    if not shutdown_before_release:
+                        release.set()
+                        for _ in range(1000):
+                            if not c.ledger.unresolved():
+                                break
+                            await asyncio.sleep(.001)
+                        await asyncio.sleep(.05)
+                        self.assertEqual(len(worker_calls), 1,
+                                         'late completion must not release a queued duplicate DELETE')
+                    c.stop = True
+                    await c.stop_overnight_cancels()
+                    stop_task = asyncio.create_task(port.stop())
+                    await asyncio.sleep(.05)
+                    if shutdown_before_release:
+                        self.assertFalse(stop_task.done(), 'shutdown must join the started SDK operation')
+                        self.assertFalse(closed, 'the HTTP session must stay open while a worker owns it')
+                    release.set()
+                    await asyncio.wait_for(stop_task, 3)
+                    self.assertEqual(len(worker_calls), 1)
+                    self.assertEqual(finished, [False], 'worker must finish before session close')
+                    self.assertTrue(closed)
+                    self.assertTrue(all(not after_close for _, after_close in http_calls))
+                    self.assertEqual(sum(r['kind'] == 'cancel' for r in c.requests), 1)
+                    self.assertEqual(c.ledger.unresolved(), [])
+            finally:
+                release.set()
+                if boundary == 'queued' and port._operation_lock.locked():
+                    port._operation_lock.release()
+                await c.stop_overnight_cancels()
+                if stop_task is not None:
+                    await asyncio.gather(stop_task, return_exceptions=True)
+                else:
+                    await port.stop()
+
+        asyncio.run(exercise())

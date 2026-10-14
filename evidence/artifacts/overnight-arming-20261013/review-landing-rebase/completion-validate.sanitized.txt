@@ -1,0 +1,3 @@
+{"command": "python3 scripts/validate.py", "elapsed_seconds": 58.11055736299022, "head": "0c65ee7fd7333635a447b6b7b65a2872211a9a8b", "rc": 0, "started_utc": "2026-10-14T05:22:54Z"}
+{"components": 71, "hashed_files": 12191, "profiles": 4, "receipts": 240, "status": "passed"}
+Integrity and scope checks only; no live provider or GPU execution.

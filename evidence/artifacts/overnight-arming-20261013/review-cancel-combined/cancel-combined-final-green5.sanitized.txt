@@ -1,0 +1,11 @@
+test_budget_wait_retains_one_operation_and_shutdown_joins_it (tests.test_adaptive_paper_cancel_worker_ownership.CancelWorkerOwnership.test_budget_wait_retains_one_operation_and_shutdown_joins_it) ... ok
+test_failed_halt_delete_clears_strategy_mark_and_retries_before_flatten (tests.test_adaptive_paper_cancel_worker_ownership.CancelWorkerOwnership.test_failed_halt_delete_clears_strategy_mark_and_retries_before_flatten) ... ok
+test_late_completion_cannot_launch_a_duplicate_delete (tests.test_adaptive_paper_cancel_worker_ownership.CancelWorkerOwnership.test_late_completion_cannot_launch_a_duplicate_delete) ... ok
+test_sdk_delete_survives_timeout_and_is_joined_before_session_close (tests.test_adaptive_paper_cancel_worker_ownership.CancelWorkerOwnership.test_sdk_delete_survives_timeout_and_is_joined_before_session_close) ... ok
+test_shutdown_cancels_an_operation_still_waiting_for_the_owner_lock (tests.test_adaptive_paper_cancel_worker_ownership.CancelWorkerOwnership.test_shutdown_cancels_an_operation_still_waiting_for_the_owner_lock) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 9.822s
+
+OK
+ASSERTION_FAILURES 0 ERRORS 0 SKIPS 0

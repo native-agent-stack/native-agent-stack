@@ -1,0 +1,124 @@
+# Overnight admission and lifecycle through the supported BOATS REST SDK
+
+Paper acceptance: **NOT_RUN**. Base: native-agent-stack
+`c63c83a822f2687c3e7aed2d3b3ede0413119c9b`. This record describes the staged
+implementation for the CC's 03:33Z decision (a), routed to ns-seeds by the
+co-op's `overnight-arming-20261013/handoff-mizo.md` and owner-free builder brief
+(SHA256 `84db2e91e9b38ae864b2b260c669f03c031fc0397499b2c75a128c0879290289`).
+
+The trigger is an owned native LIMIT queued at a session boundary: previously
+OVERNIGHT always produced `entry_dispatch_session_unavailable`. The staged
+change admits only an explicitly enabled REST BOATS diagnostic, in an actual
+XNYS overnight window, with fresh quote and separate broker-asset eligibility
+and halt carrier, plus the exit/lifecycle paths implemented in the same tree.
+Any missing precondition retains the refusal before reservation/POST. Default
+stream configurations retain their existing windows and BOATS stream refusal.
+
+The maintained upstream already ships REST latest quote and asset reads. We
+use those interfaces and existing guarded HTTP Sessions, with per-symbol
+bounded polling, without a BOATS websocket implementation or SDK fork. The
+pinned SDK's stock stream still restricts feeds to IEX/SIP. Streaming becomes
+a new candidate when a maintained SDK release admits BOATS, followed by the
+same guard tests and actual authenticated acceptance; the enum alone is not
+evidence of that capability.
+
+The local default is flatten by 03:50 ET, with no planned PRE carry. Under the
+CC's 2026-10-13 P1-B ruling, a residual has exit-only PRE/RTH/POST admission.
+Native sell factories use NautilusTrader `reduce_only=True`; non-node recovery
+uses the existing ledger's held/unreserved sell bound. PRE/POST use extended-hours
+LIMIT DAY; RTH uses LIMIT DAY without extended hours. The supported REST request
+selects SIP outside OVERNIGHT, and requires fresh ordinary active/tradable asset
+state and standing halt checks. The existing trial/recovery cleanup deadline and
+all risk history remain intact. A new entry outside OVERNIGHT is still refused.
+The bounded owning-lane diagnostic remains flat by 07:45Z as defense in depth;
+real SIP entitlement and residual execution acceptance remain **NOT_RUN**.
+A broker accepted
+entry remains resting; a halt/cutoff independently cancels it. A held halted
+exit remains resting, and a foreseeable status/quote refusal preserves it
+through repricing. Carry cutoff, 04:00 boundary and broker DAY expiry persist
+before POST in the ledger; schema 4 prevents older engines from ignoring these
+clocks. Residual positions at the boundary/expiry produce an attention and
+handoff notification and freeze the instance. A flat new trial clears old
+clocks; an unresolved one cannot clear them. Client trail/time/force orders are
+extended-hours marketable LIMIT sells at or below bid. X1 is not admitted in
+an overnight plan. Order shape supports simple DAY/GTC only in this explicit
+adapter; other transports keep their DAY-only contract.
+
+## Primary sources
+
+- [NautilusTrader 2.0.0rc5](https://github.com/nautechsystems/nautilus_trader/tree/1b0a49d2792a9432a3aca3fcb617ce7a630d905e),
+  commit `1b0a49d2792a9432a3aca3fcb617ce7a630d905e`, read first-hand:
+  `python/nautilus_trader/live/clients.py:451-455` queues an order-denied event;
+  it does not stop the node. `crates/live/src/python/node.rs:175-183` signals
+  node stop and hosted-run shutdown. Our `NativeSession.fail` invokes this stop
+  path only for exit residuals at the overnight dispatch boundary; stale entries
+  are denied without liquidating another held position.
+  `crates/risk/src/engine/mod.rs:727-735,743-771` defines an eligible reducing
+  submission as reduce-only, opposite to an identified open position, with positive
+  quantity no greater than held. `:2305-2328` applies it in REDUCING state.
+  `crates/model/src/enums.rs:1987-1988` states the REDUCING contract. Native
+  orders use the engine flag; recovery's existing ledger reservation enforces
+  the same held-quantity semantics without a node.
+  `crates/model/src/python/orders/limit.rs:260-264` exposes that constructor flag
+  as the Python getter `is_reduce_only`, which native dispatch reads. A native
+  entry-then-PRE-exit regression exercises the actual getter and engine.
+
+- [alpaca-py v0.44.0](https://github.com/alpacahq/alpaca-py/tree/cc4cb3b7ba50ae250e621983c2779047fb16bb28),
+  commit `cc4cb3b7ba50ae250e621983c2779047fb16bb28`:
+  `alpaca/data/historical/stock.py`, `StockHistoricalDataClient.get_stock_latest_quote`;
+  `alpaca/data/requests.py`, `StockLatestQuoteRequest`;
+  `alpaca/data/enums.py`, `DataFeed.BOATS`;
+  `alpaca/trading/client.py`, `TradingClient.get_asset`;
+  `alpaca/trading/models.py`, `Asset.attributes`;
+  `alpaca/data/live/stock.py:47-48`, the IEX/SIP restriction;
+  `alpaca/common/rest.py`, supported request/retry behavior. The existing
+  `_sdk_client` pin check, no SDK retry and guarded HTTP path remain the boundary.
+- [Alpaca Orders at Alpaca](https://docs.alpaca.markets/us/docs/orders-at-alpaca.md),
+  source fetched with the context-mode HTTP reader on 2026-10-13:
+  extended-hours LIMIT DAY/GTC; bracket/OCO exclusions; trailing stops do not
+  trigger outside regular hours. The contract never places a broker stop.
+- [Alpaca 24/5 Trading](https://docs.alpaca.markets/us/docs/245-trading.md),
+  source fetched on 2026-10-13; updated `2026-10-12T06:43:44Z` in that source:
+  overnight eligibility/halt asset attributes, trade date and DAY carry to
+  20:00 of the upcoming trading day. The local cutoff is stricter than this
+  broker carry permission and is an owner policy, not a vendor fact.
+- [exchange-calendars 4.13.2](https://github.com/gerrymanoim/exchange_calendars/tree/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a),
+  commit `dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a`:
+  `exchange_calendars/exchange_calendar_xnys.py` and native session APIs;
+  existing `sessions.session_at` rejects phantom holiday/weekend trade dates.
+- [uet#63 Decision 2](https://github.com/seathatflowsinourveins/us-equities-trading/blob/f8c607bc1f1f0205fdc87095f47df150d2f78117/docs/decisions/2026-10-10-halt-exit-policy.md),
+  pin `f8c607bc1f1f0205fdc87095f47df150d2f78117`: held exits remain resting
+  during a halt. The carrier/quote freshness rules apply before any replacement.
+
+## Evidence and remaining acceptance
+
+Guard evidence is synthetic, using hermetic protocol fixtures and temporary
+SQLite journals, including close/reopen and the halted/unknown cutoff fixture.
+The committed native dispatch method also runs in CI against protocol fixtures
+without native dependencies; the actual pinned NautilusTrader runtime exercises
+the native queued-BUY OVERNIGHT admission/refusal. None is a broker run.
+
+CI-layout verification uses base CPython 3.12.3, a scratch home, `env -i`, and
+the hash-locked `.github/requirements-calendar.txt` in that user's site. It keeps
+alpaca-py/NautilusTrader absent. Interpreter-spawning tests are run in that layout
+so a `-s` dependency regression cannot be hidden by a local native environment.
+Mutation results and final run summaries are retained in the validation record.
+The candidate record is
+`blueprints/us-equities/adaptive-paper/overnight-arming-validation.json`.
+
+The wire check uses the existing transport `_on_owner` hook to return an SDK
+worker's final admission to the owning loop. It persists the actual wire-boundary
+midpoint/clock before HTTP; execution receipts retain source execution time,
+local observation time, signed midpoint slippage and latency, deduplicated by
+execution identity across reopen. Missing execution timestamps keep latency
+unknown. The callback and SQLite persistence are fixture-tested; no broker
+clock/latency acceptance follows from them.
+
+The actual cadence receipt (sweep wall time, per-request p50/p99), fresh BOATS
+parser/account entitlement/linkage, order/fill/rejection/latency and midpoint
+slippage receipts, and the owning T15 overnight diagnostic remain native
+acceptance work after landing on the readiness trigger. Quote/status age at
+each decision and trail-high changes are journal events; the one-second target
+cadence is not a measured delivery guarantee. The order stream retains its
+existing ownership; no BOATS market-data stream owner is claimed. No strategy
+performance, live authority or change to frozen N2 is supplied by these tests.

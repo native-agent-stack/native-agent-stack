@@ -1,0 +1,208 @@
+{
+  "base_revision": "35dfd01efe126d1941819e6be468bc9a156f8be3",
+  "cases": {
+    "baseline_delete_counts": [
+      1,
+      1,
+      1
+    ],
+    "head_delete_counts": [
+      1,
+      2,
+      2
+    ],
+    "nonterminal_statuses": [
+      "accepted",
+      "new",
+      "pending_cancel"
+    ],
+    "terminal_observation_sources": [
+      "stream",
+      "lookup"
+    ],
+    "ticks": 3
+  },
+  "evidence_class": "synthetic",
+  "input_hashes": {
+    "blueprints/us-equities/adaptive-paper/mover.py": "d2663a99532925ddd071147297cd51bc44cbfd9b4c69c4f316f3bb4efb5a716d",
+    "blueprints/us-equities/adaptive-paper/native_strategy.py": "98f30ac68a71088c616965db840a022c4ed979fdb87e52e5e1a8a6efba812e3c",
+    "blueprints/us-equities/adaptive-paper/runner.py": "d1f305f57c2b6be8cdf0e4de996d9b6caaf7cc5eb6f623605879dad6743d067d",
+    "blueprints/us-equities/adaptive-paper/transport.py": "f5da563d8cc4118abb3fd92c8c1341a02c1c9357f2dac96dab6c1c9af14a4383",
+    "docs/decisions/2026-10-13-overnight-rest-arming.md": "75028f6ff836e02564bcf920adca06b8a6b1c12dcc282ca49dd7a53e0fe2945d",
+    "tests/test_adaptive_paper_cancel_acknowledgement.py": "bcb4c2469bf95a634e7302aef13c9f26d543d4360eca668b6ed25469f0675b31",
+    "tests/test_adaptive_paper_cancel_worker_ownership.py": "55f23fb4f52f6704ee2ac649392852f5aeeca3436d99bf91d06f9281efa6d694",
+    "tests/test_overnight_published_preimages.py": "cd657bebf47262310b2be4d57fc979ccb0005a0e68bbfb2552b3f2fe26f7680c"
+  },
+  "limitations": [
+    "Actual pinned SDK cancellation/getter, GuardedSession, Controller, ledger and request budget execute with synthetic HTTP.",
+    "Production adaptive/mover cancel methods run on protocol owners, not running native nodes in this acknowledgement regression.",
+    "No running SDK operation is abandoned; worker/shutdown and HTTP422/strategy-strand regressions pass in the focused native suite.",
+    "Prior receipt inputs remain bound to exact public35dfd01 Git blobs; no historical execution receipt is retargeted.",
+    "Primary Orders page text was fetched/read; remaining earlier capture/lifecycle qualifications remain follow-ups.",
+    "No actual credential, broker call, paper acceptance or broker latency claim."
+  ],
+  "paper_acceptance": "NOT_RUN",
+  "refusal_provenance": {
+    "consumed_at_completion": true,
+    "event": "order_cancel_rejected",
+    "no_refusal_delete_counts": [
+      1,
+      1,
+      1
+    ],
+    "scope": "specific live operation"
+  },
+  "runs": [
+    {
+      "assertion_failures": 6,
+      "command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- pinned-python <scratch>/ack-check.py base",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 6.781,
+      "errors": 0,
+      "exit_code": 1,
+      "output_bytes": 17573,
+      "output_sha256": "3eaa48db5181d621bd40be80bee342245d69647bfbd179ff933d80d4c7ca7564",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/refusal-base-35df-red.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/refusal-base-35df-red.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/ack-check.py.txt",
+      "python_argv": [
+        "<scratch>/ack-check.py",
+        "base"
+      ],
+      "runtime_read_lock": true,
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "tests_run": 2
+    },
+    {
+      "assertion_failures": 0,
+      "command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- pinned-python <scratch>/ack-check.py head",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 7.321,
+      "errors": 0,
+      "exit_code": 0,
+      "output_bytes": 4498,
+      "output_sha256": "4b643ea9f733a4e4153f7b2119756e884e04052c378cd545ba53f0cd40faef1b",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/refusal-head-green.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/refusal-head-green.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/ack-check.py.txt",
+      "python_argv": [
+        "<scratch>/ack-check.py",
+        "head"
+      ],
+      "runtime_read_lock": true,
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "tests_run": 2
+    },
+    {
+      "assertion_failures": 6,
+      "command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- pinned-python <scratch>/ack-check.py drop-refusal",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 6.993,
+      "errors": 0,
+      "exit_code": 1,
+      "output_bytes": 17573,
+      "output_sha256": "252fa4eee93f33f489a5a422bc7c907ed7f81306016897072534e901f6d60e9e",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/refusal-guard-removal-red.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/refusal-guard-removal-red.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/ack-check.py.txt",
+      "python_argv": [
+        "<scratch>/ack-check.py",
+        "drop-refusal"
+      ],
+      "runtime_read_lock": true,
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "tests_run": 2
+    },
+    {
+      "assertion_failures": 0,
+      "command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- pinned-python <scratch>/ack-related-suite.py native",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 32.251,
+      "errors": 0,
+      "exit_code": 0,
+      "output_bytes": 44478,
+      "output_sha256": "eda8df1f44c951aad330866af5b82f8f2eb9406eb9458ecfbfa28f79e455aefa",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/refusal-related-native.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/refusal-related-native.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/ack-related-suite.py.txt",
+      "python_argv": [
+        "<scratch>/ack-related-suite.py",
+        "native"
+      ],
+      "runtime_read_lock": true,
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "tests_run": 219
+    },
+    {
+      "assertion_failures": 0,
+      "command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- pinned-python <scratch>/ack-related-suite.py ci",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 29.747,
+      "errors": 0,
+      "exit_code": 0,
+      "output_bytes": 44654,
+      "output_sha256": "d20b6581ae8134b39c206a67d48a9b1fb6ae16d955ef8084ef823541e10195fa",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/refusal-related-ci.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/refusal-related-ci.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-provenance/ack-related-suite.py.txt",
+      "python_argv": [
+        "<scratch>/ack-related-suite.py",
+        "ci"
+      ],
+      "runtime_read_lock": false,
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 94,
+      "tests_run": 219
+    }
+  ],
+  "schema_version": 1,
+  "scope": "CC23:43 final: retain operation-specific stream refusal provenance through local completion",
+  "sources": {
+    "alpaca_py_pin": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+    "canceled_definition": "The order has been canceled, and no further updates will occur for the order.",
+    "canceled_locator": "L1560",
+    "event_string_compatibility": "alpaca/trading/models.py:640 Union[TradeEvent, str]; stream.py:115-139",
+    "order_status_enum": "alpaca/trading/enums.py:148-169",
+    "orders_page": "https://docs.alpaca.markets/us/docs/orders-at-alpaca.md",
+    "pending_cancel_definition": "The order is waiting to be canceled.",
+    "pending_cancel_locator": "L1563",
+    "pending_replace_definition": "The order will reject cancel request while in this state.",
+    "pending_replace_locator": "L1564",
+    "trade_event_names": "alpaca/trading/enums.py:321-333"
+  },
+  "test_id": "CancelAcknowledgement.test_rejection_during_lookup_releases_pending_and_allows_one_retry"
+}

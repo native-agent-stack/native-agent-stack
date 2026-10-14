@@ -1,0 +1,26 @@
+Running as unit: run-p2126397-i173712267.scope; invocation ID: ec54d79ded6f4630909dd48ceb06a13a
+test_422_live_lookup_releases_latch_retries_and_stops_entry_at_cutoff (tests.test_adaptive_paper_overnight_cancel_refusal.OvernightCancelRefusal.test_422_live_lookup_releases_latch_retries_and_stops_entry_at_cutoff) ... FAIL
+
+======================================================================
+FAIL: test_422_live_lookup_releases_latch_retries_and_stops_entry_at_cutoff (tests.test_adaptive_paper_overnight_cancel_refusal.OvernightCancelRefusal.test_422_live_lookup_releases_latch_retries_and_stops_entry_at_cutoff)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_overnight_cancel_refusal.py", line 79, in test_422_live_lookup_releases_latch_retries_and_stops_entry_at_cutoff
+    asyncio.run(exercise())
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_overnight_cancel_refusal.py", line 65, in exercise
+    self.assertNotIn('entry',c.port.overnight_cancel_pending,
+AssertionError: 'entry' unexpectedly found in {'entry'} : REST422 with a live lookup must release cutoff retry latch
+
+----------------------------------------------------------------------
+Ran 1 test in 1.478s
+
+FAILED (failures=1)

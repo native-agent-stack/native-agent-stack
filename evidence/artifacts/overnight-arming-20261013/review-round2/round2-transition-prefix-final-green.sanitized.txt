@@ -1,0 +1,21 @@
+Running as unit: run-p1137733-i168540917.scope; invocation ID: 16aa407c4d934b27988fd973ae725d36
+.................
+----------------------------------------------------------------------
+Ran 17 tests in 18.102s
+
+OK
+transition_mutant reserve-current-close assertion_failures 1 errors 0
+transition_mutant pending-current-close assertion_failures 1 errors 0
+transition_mutant recovery-current-close assertion_failures 1 errors 0
+transition_mutant residual-reprice-admission assertion_failures 9 errors 0
+transition_mutant independent-asset-delivery assertion_failures 2 errors 0
+transition_mutant independent-quote-delivery assertion_failures 1 errors 0
+transition_mutant per-symbol-reschedule assertion_failures 1 errors 0
+round_two_mutant actual-cancel-event assertion_failures 1 errors 0
+round_two_mutant venue-session assertion_failures 3 errors 0
+round_two_mutant owner-cancel-task assertion_failures 1 errors 0
+round_two_mutant cancel-budget assertion_failures 1 errors 0
+round_two_mutant cancel-shutdown assertion_failures 1 errors 0
+round_two_mutant scan-trade-date assertion_failures 1 errors 0
+round_two_mutant scan-rule-order assertion_failures 1 errors 0
+round_two_mutant rule-window assertion_failures 2 errors 0
