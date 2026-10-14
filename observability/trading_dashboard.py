@@ -50,11 +50,11 @@ def dashboard():
                            "targets": [{"refId": "A", "expr": expression(lane, field), "queryType": "instant"}]})
             identifier += 1
         panels.append({"id": identifier, "type": "stat", "title": lane + (" · No session since / last receipt" if lane == "IBKR" else " · Last receipt time"),
-                       "description": "IBKR: no session since this receipt time. Other lanes: source timestamp, not observation time.",
+                       "description": "IBKR: no session since this receipt time. I-llm: source Unix seconds, Not recorded until live. Other lanes: source timestamp, not observation time.",
                        "datasource": SOURCE, "gridPos": {"x": 0, "y": y + 5, "w": 24, "h": 2},
-                       "fieldConfig": {"defaults": {"unit": "dateTimeAsIso", "noValue": "Not recorded", "mappings": [{"type": "value", "options": {"-1000": {"text": "Not recorded"}}}]}, "overrides": []},
-                       "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": False}, "graphMode": "none"},
-                       "targets": [{"refId": "A", "expr": expression(lane, "source_unix") + " * 1000", "queryType": "instant"}]})
+                       "fieldConfig": {"defaults": {"unit": "none" if lane == "I-llm" else "dateTimeAsIso", "noValue": "Not recorded", "mappings": [{"type": "value", "options": {"-1" if lane == "I-llm" else "-1000": {"text": "Not recorded"}}}]}, "overrides": []},
+                       "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": False}, "graphMode": "none", "textMode": "value"},
+                       "targets": [{"refId": "A", "expr": expression(lane, "source_unix") + ("" if lane == "I-llm" else " * 1000"), "queryType": "instant"}]})
         identifier += 1
         y += 7
         if lane == "IBKR":

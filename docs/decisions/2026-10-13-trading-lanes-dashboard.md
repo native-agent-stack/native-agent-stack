@@ -46,6 +46,14 @@ notes are corrected before the first PR read wave: rate units use explicit
 per-minute suffixes, A/B rate titles say last stage (IBKR says last session),
 and missing receipt time uses an explicit Not recorded fallback and mapping.
 The co-op identified the actual blank as I-llm Last receipt time (panel72).
+The final I-llm-only panel uses unformatted source Unix seconds, value text
+mode and the exact -1 Not recorded mapping; other lane dates remain ISO.
+The co-op's03:33:20Z final browser PASS closes all three notes and corrects
+its earlier method: panel72 was below the viewport and lazily rendered.
+Earlier empty observations without scrolling do not prove a formatter
+failure. The field fallback tests qualify the explicit display contract,
+not a reproduced historical browser defect. Initial source/mapping claims
+are superseded by that bounded observation.
 Independently, missing P&L uses a bounded exact-integer sentinel with Not
 recorded mapping/fallback; the prior extreme exponent remains a historical
 mapping only. That API exception was distinct from the observed blank panel.

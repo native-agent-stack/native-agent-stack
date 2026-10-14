@@ -69,7 +69,8 @@ class Ns2604DashboardTests(unittest.TestCase):
         panel = next(p for p in board["panels"] if p["title"] == "I-llm · Last receipt time")
         defaults = panel["fieldConfig"]["defaults"]
         self.assertEqual("Not recorded", defaults.get("noValue"))
-        self.assertEqual("Not recorded", defaults["mappings"][0]["options"]["-1000"]["text"])
+        self.assertEqual("none", defaults["unit"], "Unstarted lane must not feed a negative epoch to the date formatter")
+        self.assertEqual("Not recorded", defaults["mappings"][0]["options"]["-1"]["text"])
 
     def test_retarget_changes_only_datasources_and_prometheus_metric_names(self):
         board = {"panels": [

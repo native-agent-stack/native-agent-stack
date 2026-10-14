@@ -581,7 +581,7 @@
       "id": 11,
       "type": "stat",
       "title": "A \u00b7 Last receipt time",
-      "description": "IBKR: no session since this receipt time. Other lanes: source timestamp, not observation time.",
+      "description": "IBKR: no session since this receipt time. I-llm: source Unix seconds, Not recorded until live. Other lanes: source timestamp, not observation time.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -617,7 +617,8 @@
           "fields": "",
           "values": false
         },
-        "graphMode": "none"
+        "graphMode": "none",
+        "textMode": "value"
       },
       "targets": [
         {
@@ -1177,7 +1178,7 @@
       "id": 21,
       "type": "stat",
       "title": "B \u00b7 Last receipt time",
-      "description": "IBKR: no session since this receipt time. Other lanes: source timestamp, not observation time.",
+      "description": "IBKR: no session since this receipt time. I-llm: source Unix seconds, Not recorded until live. Other lanes: source timestamp, not observation time.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -1213,7 +1214,8 @@
           "fields": "",
           "values": false
         },
-        "graphMode": "none"
+        "graphMode": "none",
+        "textMode": "value"
       },
       "targets": [
         {
@@ -1773,7 +1775,7 @@
       "id": 31,
       "type": "stat",
       "title": "C \u00b7 Last receipt time",
-      "description": "IBKR: no session since this receipt time. Other lanes: source timestamp, not observation time.",
+      "description": "IBKR: no session since this receipt time. I-llm: source Unix seconds, Not recorded until live. Other lanes: source timestamp, not observation time.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -1809,7 +1811,8 @@
           "fields": "",
           "values": false
         },
-        "graphMode": "none"
+        "graphMode": "none",
+        "textMode": "value"
       },
       "targets": [
         {
@@ -2369,7 +2372,7 @@
       "id": 41,
       "type": "stat",
       "title": "lanea \u00b7 Last receipt time",
-      "description": "IBKR: no session since this receipt time. Other lanes: source timestamp, not observation time.",
+      "description": "IBKR: no session since this receipt time. I-llm: source Unix seconds, Not recorded until live. Other lanes: source timestamp, not observation time.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -2405,7 +2408,8 @@
           "fields": "",
           "values": false
         },
-        "graphMode": "none"
+        "graphMode": "none",
+        "textMode": "value"
       },
       "targets": [
         {
@@ -2965,7 +2969,7 @@
       "id": 51,
       "type": "stat",
       "title": "laneb \u00b7 Last receipt time",
-      "description": "IBKR: no session since this receipt time. Other lanes: source timestamp, not observation time.",
+      "description": "IBKR: no session since this receipt time. I-llm: source Unix seconds, Not recorded until live. Other lanes: source timestamp, not observation time.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -3001,7 +3005,8 @@
           "fields": "",
           "values": false
         },
-        "graphMode": "none"
+        "graphMode": "none",
+        "textMode": "value"
       },
       "targets": [
         {
@@ -3561,7 +3566,7 @@
       "id": 61,
       "type": "stat",
       "title": "IBKR \u00b7 No session since / last receipt",
-      "description": "IBKR: no session since this receipt time. Other lanes: source timestamp, not observation time.",
+      "description": "IBKR: no session since this receipt time. I-llm: source Unix seconds, Not recorded until live. Other lanes: source timestamp, not observation time.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -3597,7 +3602,8 @@
           "fields": "",
           "values": false
         },
-        "graphMode": "none"
+        "graphMode": "none",
+        "textMode": "value"
       },
       "targets": [
         {
@@ -4226,7 +4232,7 @@
       "id": 72,
       "type": "stat",
       "title": "I-llm \u00b7 Last receipt time",
-      "description": "IBKR: no session since this receipt time. Other lanes: source timestamp, not observation time.",
+      "description": "IBKR: no session since this receipt time. I-llm: source Unix seconds, Not recorded until live. Other lanes: source timestamp, not observation time.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -4239,13 +4245,13 @@
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "dateTimeAsIso",
+          "unit": "none",
           "noValue": "Not recorded",
           "mappings": [
             {
               "type": "value",
               "options": {
-                "-1000": {
+                "-1": {
                   "text": "Not recorded"
                 }
               }
@@ -4262,12 +4268,13 @@
           "fields": "",
           "values": false
         },
-        "graphMode": "none"
+        "graphMode": "none",
+        "textMode": "value"
       },
       "targets": [
         {
           "refId": "A",
-          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", source_unix=\"source_unix\" | lane=\"I-llm\" | keep lane, source_unix | unwrap source_unix | __error__=\"\" [10m]) * 1000",
+          "expr": "last_over_time({service_name=\"trading-lanes\"} | json lane=\"lane\", source_unix=\"source_unix\" | lane=\"I-llm\" | keep lane, source_unix | unwrap source_unix | __error__=\"\" [10m])",
           "queryType": "instant"
         }
       ]
