@@ -19688,8 +19688,8 @@
     },
     {
       "path": "docs/trading-handbook/sources/luld-bp-20261013.json",
-      "sha256": "a128179c1a906b820e274d9d9bc86bce601ef128d1927f5afe8a697059b81c4e",
-      "bytes": 10410
+      "sha256": "b6ca1b007945373ceff96a5bfa7ddeef990353efb29cde0088304272f20b8db1",
+      "bytes": 13469
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -63918,8 +63918,8 @@
     },
     {
       "path": "tests/test_trading_handbook_publication.py",
-      "sha256": "200bd1be0eacd51564fdb89568567107ac4e2a644ca4f97cc6cf14d3d0e2e0e2",
-      "bytes": 9402
+      "sha256": "a203659acb0b8f2f3fa58ed5769550c61a246e251f5fa0a58a23c471485a799c",
+      "bytes": 10755
     },
     {
       "path": "tests/test_trading_handbook_sizing.py",

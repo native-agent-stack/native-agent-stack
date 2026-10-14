@@ -173,6 +173,25 @@ class HandbookPublicationTests(unittest.TestCase):
                 self.fixture(root, text)
                 self.assertEqual(publication_findings(root)[1], [DOCS + "/page.md"] if refused else [])
 
+    def test_existing_chapter_public_citations_require_source_bindings(self):
+        # The assigned correction is cited by review record name, not finding text:
+        # pr1085-c3dc9801/review_output.json. Keep the complete handbook scan.
+        bound = "993cc890b3ff3fc95fa7cdba51edd726565f9ace"
+        unbound = hashlib.sha1(b"Synthetic unbound public revision fixture.").hexdigest()
+        for pin in (bound, "862504052407df2586122b752a645f88ce87afa1"):
+            with self.subTest(pin=pin), tempfile.TemporaryDirectory(dir="/var/tmp") as temporary:
+                root = Path(temporary)
+                self.fixture(root, "Neutral public policy.")
+                inventory = json.loads((ROOT / INVENTORY).read_text())
+                (root / INVENTORY).write_text(json.dumps({key: inventory[key] for key in
+                    ("public_captures", "public_contract", "upstream_engine")}))
+                chapter = root / DOCS / "boats-overnight-facts.md"
+                chapter.write_text("Public source revision " + unbound)
+                self.assertEqual(publication_findings(root)[1], [DOCS + "/boats-overnight-facts.md"])
+                for citation in (pin, pin[:7], pin[:12]):
+                    chapter.write_text("Public source revision " + citation)
+                    self.assertEqual(publication_findings(root), ([], []))
+
 
 if __name__ == "__main__":
     unittest.main()

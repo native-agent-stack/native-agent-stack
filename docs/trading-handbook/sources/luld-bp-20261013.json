@@ -134,6 +134,45 @@
       },
       "evidence_class": "source_review",
       "retention": "Exact public source bytes retained privately; HTTP bytes equal the maintained mirror's pinned Git blob. Public citations use the immutable upstream Git URL."
+    },
+    {
+      "id": "existing-handbook-overnight-snapshot",
+      "url": "https://raw.githubusercontent.com/native-agent-stack/native-agent-stack/993cc890b3ff3fc95fa7cdba51edd726565f9ace/blueprints/us-equities/adaptive-paper/README-overnight.md",
+      "artifact_name": "nas-overnight.md",
+      "bytes": 11280,
+      "sha256": "639b8ed7ebd4b77f746e153dbf7477fc2e62210d7dcda6023737cee9db50eb60",
+      "version": "Public native-agent-stack snapshot 993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "locators": ["README-overnight.md:1-21", "README-overnight.md:132-143"],
+      "capture_window_utc": {"started": "2026-10-14T01:21:54Z", "finished": "2026-10-14T01:23:44Z"},
+      "evidence_class": "source_review",
+      "retention": "Exact public source bytes retained privately; retrieved HTTP bytes equal the Git blob at the pinned revision. This binds existing handbook citations to the public implementation snapshot; no overnight execution is claimed.",
+      "citing_chapters": ["docs/trading-handbook/boats-overnight-facts.md", "docs/trading-handbook/portfolio-sizing.md"]
+    },
+    {
+      "id": "existing-handbook-engine-catalog-snapshot",
+      "url": "https://raw.githubusercontent.com/native-agent-stack/native-agent-stack/993cc890b3ff3fc95fa7cdba51edd726565f9ace/catalogs/us-equities/engines-strategies.json",
+      "artifact_name": "nas-engine-catalog.json",
+      "bytes": 113507,
+      "sha256": "048967637d3bd0e7f429d564ad1b9da0d070b49d0ca81e2404a9a4584b66f118",
+      "version": "Public native-agent-stack snapshot 993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "locators": ["engines-strategies.json:241-259"],
+      "capture_window_utc": {"started": "2026-10-14T01:21:54Z", "finished": "2026-10-14T01:23:44Z"},
+      "evidence_class": "source_review",
+      "retention": "Exact public source bytes retained privately; retrieved HTTP bytes equal the Git blob at the pinned revision. The catalog cites the maintained Lumibot README at its source pin; its conditional source-review status remains unchanged.",
+      "citing_chapters": ["docs/trading-handbook/portfolio-sizing.md"]
+    },
+    {
+      "id": "existing-handbook-lumibot-source",
+      "url": "https://raw.githubusercontent.com/Lumiwealth/lumibot/862504052407df2586122b752a645f88ce87afa1/README.md",
+      "artifact_name": "lumibot-readme.md",
+      "bytes": 42452,
+      "sha256": "290b50bae3195ea5961e5a97e8dc30134f9b36fcba865fb2eaca1febf40a2809",
+      "version": "Lumibot 4.6.11 source 862504052407df2586122b752a645f88ce87afa1, as cited by the pinned public catalog",
+      "locators": ["README.md at the immutable source revision"],
+      "capture_window_utc": {"started": "2026-10-14T01:21:54Z", "finished": "2026-10-14T01:23:44Z"},
+      "evidence_class": "source_review",
+      "retention": "Exact public upstream README bytes retained privately. This source binding authenticates the existing comparator citation only; no new simulation, sizing-parity or broker-acceptance result is claimed.",
+      "citing_chapters": ["docs/trading-handbook/portfolio-sizing.md"]
     }
   ],
   "trial_policy_gaps": [
