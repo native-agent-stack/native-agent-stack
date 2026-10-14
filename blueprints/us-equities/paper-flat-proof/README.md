@@ -18,6 +18,13 @@ then renames the ORIGINAL active bytes to `active.finished.json`. A non-flat
 proof writes `needs_attention` receipts and retains the marker. No recovery
 path reads, creates, deletes or clears STOP.
 
+Observer failures, timeouts and missing/invalid/stale native proof also write
+both standard `needs_attention` receipts. Exit codes are the observed value
+(null if execution raised), and bounded error class/phase replaces exception
+text. Absent or invalid proof has `native_proof_present=false`, null native
+hash and null counts. A retry cannot reuse an unchanged earlier proof or its
+counts; successful retirement requires a fresh valid native observation.
+
 The source packet is immutable. `recut.py` takes its externally supplied
 SHA256SUMS hash, captures every authenticated runtime member, transforms only
 the launcher dispatch, observer and unit locations, and adds the recovery

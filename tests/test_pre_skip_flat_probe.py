@@ -13,6 +13,7 @@ import json
 import os
 from pathlib import Path
 import shutil
+import subprocess
 import sys
 import tempfile
 import types
@@ -361,6 +362,109 @@ class FlatProbe(unittest.TestCase):
         with patch.object(self.launch.time, 'monotonic', return_value=receipt['recover_finished_monotonic'] + 61):
             _, value, _ = self.launch.verify_handoff('pre', '2026-10-14')
         self.assertIs(value['pre_did_not_trade'], True)
+
+
+class FailureReceipt(unittest.TestCase):
+    """Native HTTP failure regression from the reader's exact reproduction."""
+    def fixture(self):
+        fixture = FlatProbe()
+        fixture.setUp()
+        self.addCleanup(fixture.doCleanups)
+        active, instance = fixture.stuck_skip()
+        return fixture, active, instance
+
+    def assert_failure(self, fixture, active, instance, original):
+        self.assertEqual((fixture.state / 'active/pre-skip.json').read_bytes(), original)
+        self.assertEqual(fixture.launch.STOP.read_bytes(), fixture.stop_bytes)
+        self.assertFalse((fixture.state / 'completed/2026-10-14/pre.json').exists())
+        for name in ('handoff.json', 'recover-validation.json'):
+            self.assertTrue((instance / name).exists(), 'failed observer must persist needs_attention receipt')
+            receipt = fixture.launch.safe_json(instance / name)
+            self.assertEqual(receipt['status'], 'needs_attention')
+            self.assertIs(receipt['flat'], False)
+            self.assertIsNone(receipt['positions'])
+            self.assertIsNone(receipt['open_orders'])
+            self.assertIs(receipt['native_proof_present'], False)
+            self.assertIsNone(receipt['native_recover_sha256'])
+            self.assertEqual(receipt['predecessor_bundle_sha256'], active['bundle_sha256'])
+            self.assertEqual(receipt['bundle_sha256'], fixture.launch.sha(fixture.bundle / 'SHA256SUMS'))
+            self.assertTrue(receipt['observation_error'])
+        self.assertEqual((instance / 'handoff.json').read_bytes(), (instance / 'recover-validation.json').read_bytes())
+
+    def test_http_failure_records_needs_attention(self):
+        fixture, active, instance = self.fixture()
+        original = (fixture.state / 'active/pre-skip.json').read_bytes()
+        real_answer = fixture.answer
+        def unavailable(path):
+            if path == '/positions':
+                raise ConnectionError('SYN unavailable')
+            return real_answer(path)
+        fixture.answer = unavailable
+        self.assertEqual(fixture.recover_skip(), 2)
+        self.assert_failure(fixture, active, instance, original)
+        self.assertEqual(fixture.launch.safe_json(instance / 'handoff.json')['recover_rc'], 2)
+        self.assertFalse((instance / 'flat-probe.json').exists())
+
+    def test_timeout_records_absent_proof_without_invented_exit_code(self):
+        fixture, active, instance = self.fixture()
+        original = (fixture.state / 'active/pre-skip.json').read_bytes()
+        with patch.object(fixture.launch, 'keyed', side_effect=subprocess.TimeoutExpired('SYN observer', 120)):
+            self.assertEqual(fixture.recover_skip(), 2)
+        self.assert_failure(fixture, active, instance, original)
+        receipt = fixture.launch.safe_json(instance / 'handoff.json')
+        self.assertIsNone(receipt['recover_rc'])
+        self.assertEqual(receipt['observation_error']['error_class'], 'TimeoutExpired')
+
+    def test_invalid_or_missing_proof_records_needs_attention(self):
+        for shape in ('missing', 'bad-json', 'not-an-object', 'bad-counts'):
+            with self.subTest(shape=shape):
+                fixture, active, instance = self.fixture()
+                original = (fixture.state / 'active/pre-skip.json').read_bytes()
+                def invalid(command, **kwargs):
+                    path = instance / 'flat-probe.json'
+                    if shape == 'bad-json':
+                        path.write_text('{')
+                    elif shape == 'not-an-object':
+                        path.write_text('[]')
+                    elif shape == 'bad-counts':
+                        path.write_text('{"reconciliation":{"positions":"zero","open_orders":0}}')
+                    return 0
+                with patch.object(fixture.launch, 'keyed', side_effect=invalid):
+                    self.assertEqual(fixture.recover_skip(), 2)
+                self.assert_failure(fixture, active, instance, original)
+                fixture.doCleanups()
+
+    def test_unchanged_old_flat_proof_cannot_retire_marker(self):
+        fixture, active, instance = self.fixture()
+        original = (fixture.state / 'active/pre-skip.json').read_bytes()
+        fixture.execute([fixture.launch.PY, '-E', '-s', '-B', fixture.bundle / 'observe_flat.py',
+                         'pre', '--config', fixture.launch.config('pre'), '--output', instance / 'flat-probe.json'])
+        self.assertIs(fixture.launch.safe_json(instance / 'flat-probe.json')['flat'], True)
+        with patch.object(fixture.launch, 'keyed', return_value=0):
+            self.assertEqual(fixture.recover_skip(), 2)
+        self.assert_failure(fixture, active, instance, original)
+
+    def test_failed_retry_never_reemits_stale_nonflat_counts(self):
+        fixture, active, instance = self.fixture()
+        original = (fixture.state / 'active/pre-skip.json').read_bytes()
+        fixture.positions = [{'symbol': 'SPY', 'qty': '1', 'avg_entry_price': '100'}]
+        self.assertEqual(fixture.recover_skip(), 2)
+        previous = fixture.launch.safe_json(instance / 'handoff.json')
+        self.assertEqual(previous['positions'], 1)
+        old_proof = (instance / 'flat-probe.json').read_bytes()
+        real_answer = fixture.answer
+        def unavailable(path):
+            if path == '/positions':
+                raise ConnectionError('SYN retry unavailable')
+            return real_answer(path)
+        fixture.answer = unavailable
+        captured = io.StringIO()
+        with patch('sys.stdout', captured):
+            self.assertEqual(fixture.recover_skip(), 2)
+        self.assertNotIn('FileNotFoundError', captured.getvalue())
+        self.assertEqual((instance / 'flat-probe.json').read_bytes(), old_proof)
+        self.assert_failure(fixture, active, instance, original)
+        self.assertEqual(fixture.launch.safe_json(instance / 'handoff.json')['recover_rc'], 2)
 
 
 if __name__ == '__main__':

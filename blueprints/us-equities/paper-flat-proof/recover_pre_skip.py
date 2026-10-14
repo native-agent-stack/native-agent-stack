@@ -66,11 +66,36 @@ def recover(launch):
         output = instance / 'flat-probe.json'
         if output.is_symlink():
             raise launch.Refused('pre_skip_unsafe_proof_destination')
-        rc = launch.keyed([launch.PY, '-E', '-s', '-B', launch.ROOT / 'observe_flat.py', 'pre',
-                           '--config', launch.config('pre'), '--output', output], timeout=120)
-        result = launch.safe_json(output)
-        proof = result.get('reconciliation') or {}
-        flat = (rc == 0 and result.get('status') == 'passed' and result.get('flat') is True
+        before = output.stat() if output.exists() else None
+        rc, result, proof, proof_hash, error = None, {}, {}, None, None
+        phase = 'observer'
+        try:
+            rc = launch.keyed([launch.PY, '-E', '-s', '-B', launch.ROOT / 'observe_flat.py', 'pre',
+                               '--config', launch.config('pre'), '--output', output], timeout=120)
+            phase = 'native_proof'
+            after = output.stat()
+            if before is not None and (before.st_ino, before.st_mtime_ns, before.st_ctime_ns, before.st_size) == (
+                    after.st_ino, after.st_mtime_ns, after.st_ctime_ns, after.st_size):
+                raise ValueError('stale_native_proof')
+            candidate = launch.safe_json(output)
+            counts = candidate.get('reconciliation') if isinstance(candidate, dict) else None
+            if (not isinstance(counts, dict)
+                    or any(type(counts.get(key)) is not int or counts[key] < 0 for key in ('positions', 'open_orders'))
+                    or candidate.get('config_sha256') != active['config_sha256']
+                    or candidate.get('status') not in ('passed', 'needs_attention')
+                    or type(candidate.get('flat')) is not bool
+                    or type(candidate.get('open_orders_complete')) is not bool
+                    or not isinstance(candidate.get('positions'), list)
+                    or not isinstance(candidate.get('unresolved_orders'), list)):
+                raise ValueError('invalid_native_proof')
+            result, proof, proof_hash = candidate, counts, launch.sha(output)
+        except Exception as exc:
+            # Exception text may contain private paths/provider response data.
+            # Actual rc is null when execution raised (e.g. TimeoutExpired).
+            error = {'phase': phase, 'error_class': type(exc).__name__}
+        if rc != 0 and error is None:
+            error = {'phase': 'observer', 'error_class': 'NonzeroExit'}
+        flat = (error is None and rc == 0 and result.get('status') == 'passed' and result.get('flat') is True
                 and result.get('config_sha256') == active['config_sha256']
                 and result.get('open_orders_complete') is True
                 and result.get('positions') == [] and result.get('unresolved_orders') == []
@@ -80,7 +105,8 @@ def recover(launch):
                    'predecessor_bundle_sha256': active['bundle_sha256'],
                    'original_active_sha256': launch.sha(active_path),
                    'bundle_sha256': launch.sha(launch.ROOT / 'SHA256SUMS'),
-                   'native_recover_sha256': launch.sha(output), 'recover_rc': rc,
+                   'native_recover_sha256': proof_hash, 'recover_rc': rc,
+                   'native_proof_present': proof_hash is not None, 'observation_error': error,
                    'status': 'passed' if flat else 'needs_attention', 'flat': flat,
                    'positions': proof.get('positions'), 'open_orders': proof.get('open_orders'),
                    'skipped': active['skip_reason'], 'pre_did_not_trade': True,
