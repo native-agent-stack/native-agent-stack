@@ -132,7 +132,17 @@
         "kind": "vendor_page",
         "url": "https://platform.claude.com/docs/en/release-notes/overview"
       },
-      "overturn": "A newer Fable model ID appears. Restoring Opus as main/advisor is a selector decision, separate from model currency."
+      "overturn": "A newer Fable model ID appears. Restoring Opus as main/advisor is a selector decision, separate from model currency.",
+      "landscape_check": {
+        "date": "2026-10-14",
+        "sources": [
+          "https://platform.claude.com/docs/en/about-claude/models/overview",
+          "https://platform.claude.com/docs/en/models/fable-5-1/overview",
+          "https://platform.claude.com/docs/en/release-notes/overview#september-1-2026"
+        ],
+        "newer_candidates": [],
+        "reason": "First-hand read of the current official model comparison, Fable page and September 1 release entry confirms claude-fable-5-1; these sources show no newer Fable model ID. The comparison also lists Opus 5.5, Sonnet 5.5 and Haiku 5.5 in their separate lines. The Fable page identifies Mythos 5.1 as a same-capability restricted-access counterpart, not a newer Fable release. Retain this dated Fable-line currency exception; no selector, harness, runtime, quality or account-access acceptance is changed or newly measured."
+      }
     },
     {
       "id": "gpt-6-1-sol",
@@ -164,7 +174,16 @@
         "kind": "vendor_page",
         "url": "https://developers.openai.com/api/docs/models/gpt-6-astra"
       },
-      "overturn": "A newer Astra model ID appears in the maintainer's release notes."
+      "overturn": "A newer Astra model ID appears in the maintainer's release notes.",
+      "landscape_check": {
+        "date": "2026-10-14",
+        "sources": [
+          "https://developers.openai.com/api/docs/models",
+          "https://developers.openai.com/api/docs/models/gpt-6-astra"
+        ],
+        "newer_candidates": [],
+        "reason": "First-hand read of the official model overview and GPT-6 Astra page still lists gpt-6-astra as the flagship for complex reasoning and coding, with no newer Astra model ID shown. GPT-6.1 Sol and GPT-6 Luna are separately named model lines, not Astra successors. Add this sourced check proactively at release age 41 days, before the 42-day policy boundary. This source review changes no model selection, runtime, harness, account availability or measured acceptance."
+      }
     },
     {
       "id": "nemotron-3-embed-8b",
