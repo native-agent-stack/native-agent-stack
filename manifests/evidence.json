@@ -19183,8 +19183,8 @@
     },
     {
       "path": "docs/decisions/2026-10-13-trading-lanes-dashboard.md",
-      "sha256": "2ff55a484bb49192ea887fb1f0bff146f10df17c83f688f60717a3814a343315",
-      "bytes": 9367
+      "sha256": "0722638fc53f1b938ff530df43ff10fccf337152d3fd845ccb98b4f10b32a688",
+      "bytes": 11804
     },
     {
       "path": "docs/decisions/2026-10-14-muse-file-fence.md",
@@ -62013,8 +62013,8 @@
     },
     {
       "path": "observability/trading_receipts.py",
-      "sha256": "5c4c704d7ba06d9f8d1afff3a14823127b6d97a34a5a5ed5d91c5b9401c89fc7",
-      "bytes": 12525
+      "sha256": "74dbf15c21f5fa32b5cda5133567bdeab44f626189d8c457b189482bb2cb0c5f",
+      "bytes": 13604
     },
     {
       "path": "recipes/README.md",
@@ -64238,8 +64238,8 @@
     },
     {
       "path": "tests/test_trading_receipts.py",
-      "sha256": "66a85f84bdc55d3ab587eebd705aa8b6651fe782af0b971b3b3a861f0cc16315",
-      "bytes": 4871
+      "sha256": "99e24b6f6ad4fa4618d0c29e859e8368f87edc852958779eeaecbcf4ce922464",
+      "bytes": 8336
     },
     {
       "path": "tests/test_tvly_keyring.py",

@@ -155,3 +155,31 @@ No inference/model comparison, broker call, live endpoint, new account,
 paid data or hosting occurs in this work. Publication evidence records
 counts and statuses only, without actual financial balances or private
 source paths.
+
+## Native receipt correctness correction
+
+The local review at f0337688 (unchanged own code after the registry rebase
+to8e07833e) reproduced four data defects despite passing rendering tests.
+The browser acceptance was rendering/freshness/layout, not correctness of
+each value. This correction preserves that evidence distinction.
+
+| Native producer/witness | Defect before correction | Corrected behavior |
+| --- | --- | --- |
+| cc-overnight-mcp/calc_session.py:239 log; run-lanea-post-20261013/events.jsonl:35 preflight_refused and:57 final_flat; run-laneb-post-20261013/events.jsonl:34/:52 | Terminal/refused runs appeared Active then Stale | final_flat is Ended; preflight_refused is Blocked before freshness fallback; a later preflight_ok reopens the same run as Active |
+| ibkr-lane-build/ibkr_series4.sh:43/:45 (also ibkr_series.sh:40/:42) | An end with no JSON receipt left its earlier start Active forever | End timestamp/exit code is processed independently of metrics; failed end is Blocked, and no older-session metrics are carried onto it |
+| ibkr-lane-build/series_line.py:12 receipt basename | Latest-by-mtime accounting was combined with another session's rates/wire/time | Accounting comes only from the uniquely matching receipt named by the selected session's summary; missing/ambiguous binding remains unrecorded |
+| cc-overnight-mcp/calc_session.py:261 trail_cancelled handler; run-rth/events.jsonl:58 trail_cancelled and:187 entry_cancelled | Actual cancellation events produced zero count | Both native cancellation names count only within the recorded trailing minute |
+
+The native logger accepts event kinds through its own log command; the
+retained emitted event files above establish the exact lifecycle/cancel
+vocabulary. Tests preserve that schema's ISO timestamp and the launcher's
+actual end/no-receipt/receipt-basename shape, with harmless synthetic times
+and accounting values. No private event body, ID, source hash or producer
+diagnostic is copied into this record.
+
+At exact8e07833e, the four current corrected tests fail first: rc1,4tests,
+7failed subcases. The native baseline source is retained separately for that
+check. After the correction, the9-reader-test module passes; the PR's named
+reader/dashboard/grant modules pass55tests in7.667seconds. Only these four
+corrections, their regressions and record/bindings share the one released
+fix commit. Lane-health changes stay on their own branch.

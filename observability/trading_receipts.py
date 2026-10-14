@@ -119,16 +119,21 @@ def event_observation(lane, events, state, now, source_unix):
         latest = max(latest, moment)
         if kind == "preflight_ok":
             equity = number(event.get("equity"))
+            row["status_code"] = 1
+            row["ended_by_code"] = 0
         if now - 60 < moment <= now:
             if kind in ("entry_order", "exit_order", "trail_order"):
                 counts["orders_per_min"] += 1
             elif kind in ("entry_fill", "exit_fill", "trail_fill", "fill"):
                 counts["fills_per_min"] += 1
-            elif kind in ("cancel", "cancel_order", "order_cancelled"):
+            elif kind in ("cancel", "cancel_order", "order_cancelled", "trail_cancelled", "entry_cancelled"):
                 counts["cancels_per_min"] += 1
-        if kind in ("session_end", "segment_end", "stop", "ended"):
+        if kind in ("session_end", "segment_end", "stop", "ended", "final_flat"):
             row["status_code"] = 2
             row["ended_by_code"] = ENDED.get(event.get("ended_by", event.get("reason")), 99)
+        elif kind == "preflight_refused":
+            row["status_code"] = 3
+            row["ended_by_code"] = 0
     row.update(counts)
     positions = state.get("positions")
     if isinstance(positions, dict):
@@ -144,7 +149,7 @@ def event_observation(lane, events, state, now, source_unix):
     else:
         row["realized_pnl_usd"] = number(realized, UNKNOWN_PNL)
     row["source_unix"] = latest if latest > 0 else source_unix
-    if row["status_code"] != 2:
+    if row["status_code"] not in (2, 3):
         row["status_code"] = 1 if now - row["source_unix"] < 180 else 6
     return row
 
@@ -190,6 +195,7 @@ def ibkr_observation(summary, session_time, now):
 def ibkr_lane(status_path, receipts_root, now):
     row = empty("IBKR", now, 4)
     started = -1
+    selected_receipt = None
     try:
         with status_path.open(encoding="utf-8") as stream:
             for line in stream:
@@ -197,19 +203,33 @@ def ibkr_lane(status_path, receipts_root, now):
                 start_match = re.match(r'^(\S+) session k=\d+ start ', line)
                 if start_match:
                     started = max(started, timestamp(start_match[1]))
-                match = re.match(r'^(\S+) session k=\d+ end rc=-?\d+ (\{.*\})\s*$', line)
+                match = re.match(r'^(\S+) session k=\d+ end rc=(-?\d+) (.*)\s*$', line)
                 if match:
+                    ended = timestamp(match[1])
+                    if ended < 0 or ended > now:
+                        continue
+                    selected_receipt = None
+                    # Ending is authoritative even without a metrics receipt;
+                    # never retain older financial/rate fields under this end.
+                    row = empty("IBKR", now, 3 if int(match[2]) != 0 else 4)
+                    row["source_unix"] = ended
+                    row["ended_by_code"] = 5 if int(match[2]) != 0 else 0
                     try:
-                        summary = json.loads(match[2])
+                        summary = json.loads(match[3])
                     except ValueError:
                         continue
                     if isinstance(summary, dict):
-                        row = ibkr_observation(summary, timestamp(match[1]), now)
+                        row = ibkr_observation(summary, ended, now)
+                        if int(match[2]) != 0:
+                            row["status_code"] = 3
+                        name = summary.get("receipt")
+                        if isinstance(name, str) and re.fullmatch(r'ibp-[A-Za-z0-9_.-]+-paper\.json', name):
+                            selected_receipt = name
     except OSError:
         pass
-    receipts = list(receipts_root.glob('*/receipts/ibp-*-paper.json'))
-    if receipts:
-        path = max(receipts, key=lambda p: p.stat().st_mtime)
+    receipts = list(receipts_root.glob('*/receipts/' + selected_receipt)) if selected_receipt else []
+    if len(receipts) == 1:
+        path = receipts[0]
         receipt = load(path)
         accounting = receipt.get("accounting") if isinstance(receipt.get("accounting"), dict) else {}
         row["realized_pnl_usd"] = number(accounting.get("realized_pnl_usd"), UNKNOWN_PNL)
@@ -217,9 +237,8 @@ def ibkr_lane(status_path, receipts_root, now):
         if row["source_unix"] < 0:
             row["source_unix"] = path.stat().st_mtime
     if started > row["source_unix"] and started <= now:
-        row["status_code"] = 1
+        row = empty("IBKR", now, 1)
         row["source_unix"] = started
-        row["ended_by_code"] = 0
     return row
 
 

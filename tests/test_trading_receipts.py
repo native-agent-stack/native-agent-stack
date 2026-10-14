@@ -77,6 +77,61 @@ class TradingReceiptTests(unittest.TestCase):
             self.assertEqual(m.timestamp("2026-10-13T11:00:00Z"), row["source_unix"])
             self.assertNotRegex(json.dumps(row), r"PRIVATE|/private/|ids=|state=")
 
+    def test_native_final_flat_and_preflight_refused_are_terminal_before_staleness(self):
+        # Native logger: calc_session.py:239 log; emitted witnesses in the
+        # owner POST events: lanea lines35/57, laneb lines34/52 on2026-10-14.
+        m = self.module()
+        start = m.timestamp("2026-10-13T20:00:00Z")
+        for event, expected in [("final_flat", 2), ("preflight_refused", 3)]:
+            for now in (start + 1, start + 400):
+                with self.subTest(event=event, now=now):
+                    row = m.event_observation("lanea", [{"type": event, "t": "2026-10-13T20:00:00Z"}], {}, now, start)
+                    self.assertEqual(expected, row["status_code"])
+
+    def test_native_cancellation_types_count_in_the_recorded_minute(self):
+        # calc_session.py:261 implements trail_cancelled; native emitted
+        # run-rth/events.jsonl:58 trail_cancelled and:187 entry_cancelled.
+        m = self.module()
+        now = m.timestamp("2026-10-13T20:01:00Z")
+        row = m.event_observation("C", [{"type": "trail_cancelled", "t": "2026-10-13T20:00:40Z"},
+                                 {"type": "entry_cancelled", "t": "2026-10-13T20:00:50Z"}], {}, now, now - 10)
+        self.assertEqual(2, row["cancels_per_min"])
+
+    def test_native_ibkr_no_receipt_end_stops_active_session_and_clears_old_metrics(self):
+        # Native ibkr_series4.sh:43/45 and earlier series.sh:40/42.
+        m = self.module()
+        with tempfile.TemporaryDirectory() as scratch:
+            root = Path(scratch)
+            status = root / "status"
+            status.write_text('2026-10-13T10:00:00Z session k=1 end rc=0 {"elapsed_s":60,"submits":8}\n'
+                              '2026-10-13T11:00:00Z session k=2 start ids=PRIVATE/PRIVATE state=/private/canary\n'
+                              '2026-10-13T11:01:00Z session k=2 end rc=1 no receipt: UNPUBLISHED_ERROR_CANARY\n')
+            row = m.ibkr_lane(status, root / "absent", m.timestamp("2026-10-14T00:00:00Z"))
+            self.assertEqual(3, row["status_code"])
+            self.assertEqual(m.timestamp("2026-10-13T11:01:00Z"), row["source_unix"])
+            self.assertEqual(-1, row["orders_per_min"])
+            self.assertNotIn("CANARY", json.dumps(row))
+
+    def test_ibkr_accounting_uses_selected_summary_receipt_and_not_mtime(self):
+        # series_line.py:12 writes the exact own receipt basename in summary.
+        m = self.module()
+        with tempfile.TemporaryDirectory() as scratch:
+            root = Path(scratch)
+            receipts = root / "session" / "receipts"
+            receipts.mkdir(parents=True)
+            selected = receipts / "ibp-20261013-100000-paper.json"
+            selected.write_text(json.dumps({"accounting": {"realized_pnl_usd": 11, "held_symbols": 1}}))
+            newer = receipts / "ibp-20261013-110000-paper.json"
+            newer.write_text(json.dumps({"accounting": {"realized_pnl_usd": 999, "held_symbols": 9}}))
+            import os
+            os.utime(selected, (100, 100))
+            os.utime(newer, (200, 200))
+            status = root / "status"
+            status.write_text('2026-10-13T10:00:00Z session k=1 end rc=0 '
+                              '{"receipt":"ibp-20261013-100000-paper.json","elapsed_s":60,"submits":2}\n')
+            row = m.ibkr_lane(status, root, m.timestamp("2026-10-13T10:01:00Z"))
+            self.assertEqual((11, 1, 2), (row["realized_pnl_usd"], row["open_positions"], row["orders_per_min"]))
+
 
 if __name__ == "__main__":
     unittest.main()
