@@ -90,26 +90,56 @@ refusal test remains portable and still executes. No workflow or production
 interpreter guard changes. CPython's supported unittest skipTest and subprocess
 CLI supply this test-only selection; no interpreter is installed by a test.
 
-Re-cut into a NEW directory with `recut.py --source SEALED_SEQ2 --output NEW_SEQ3
---source-commit LANDED_FIX_COMMIT --predecessor-sha256 EXPECTED_PRIVATE_DIGEST`.
-The expected digest comes from the sealed private binding; omission refuses.
-After copying, every copied inventory row must match the captured predecessor
-manifest before any rewrite or new SHA256SUMS. Source checks alone cannot bind
-a later read. Derivations use the verified destination copies. The private
-RECUT-RECEIPT retains the predecessor binding; CLI stdout omits that digest.
-All five replay modules MUST already be inventoried by the authenticated
-predecessor. A missing module refuses before copying; the recutter never adds
-unbound replay bytes to a new seal. The original seq2 inventory omitted them,
-so it now refuses. A newly authenticated predecessor inventory is required
-before another operational packet can be prepared; never edit the old seal.
-The CC has now sealed the separate replay provenance record
-ROW-cc-20261014T0222Z-seq3-replay-inventory-git-bound.md, binding all five
-published files at landed commit 000ae0e39e20b947f1bd700e0257f781c069898d
+After this change lands, re-cut into a NEW directory using the managed
+CPython 3.12 executable and these arguments:
+
+```sh
+python3 -E -s -B recut.py --source SEALED_SEQ2 --output NEW_SEQ3 \
+  --source-commit LANDED_FIX_COMMIT --predecessor-sha256 ORIGINAL_SEQ2_SEAL \
+  --replay-inventory CC_REPLAY_RECORD --replay-inventory-sha256 CC_RECORD_HASH
+```
+
+The original seal and record hash come from their separate sealed private
+bindings. Never derive a replacement predecessor seal by adding replay rows.
+The CC record ROW-cc-20261014T0222Z-seq3-replay-inventory-git-bound.md binds all
+five published files at landed commit 000ae0e39e20b947f1bd700e0257f781c069898d
 (#1102). It establishes their first authenticated git provenance, not original
-seq2-seal membership. Cite that record and commit in the future seq3 recut.
-This final tests/docs round does not add an alternate runtime inventory input
-or change receipt-origin validation; do not present an operational re-cut or
-binding integration as completed by the test fixes.
+seq2-seal membership. Keep the record and its private hash outside the PR.
+
+The two replay flags are a required pair. The recutter verifies the record's
+bytes against its expected hash, parses exactly the five replay rows, checks
+the source commit is an ancestor of the builder's HEAD, and reads each exact
+`commit:path` blob through Git. Every recorded size and SHA256 must match that
+blob, and every copied replay file must equal it. Conflicting existing seal
+rows refuse. Without a record, all five replay files must already belong to
+the predecessor manifest; the original seq2 therefore requires this input.
+The original source seal is never rewritten.
+
+Every copied inventory row is captured and verified before transformation.
+Unit relocation and new manifest digests consume those captured bytes; later
+file reads cannot certify a changed preimage. A final native strict checksum
+check must pass before any success receipt is written. Authenticated replay
+files retain their exact landed bytes; the dry run adapts contracts in memory.
+The captured record becomes `REPLAY-INVENTORY.md`, covered by NEW SHA256SUMS.
+The private binding request and recut receipt record its name/hash, commit,
+git paths, sizes and hashes, including the first-provenance qualification.
+
+`PREDECESSOR_BUNDLE` and `predecessor_receipt_origin_sha256` stay bound to the
+ORIGINAL deployed seq2 manifest digest. Genuine same-state-root handoffs remain
+valid without rewriting their receipt bytes or substituting the new packaging
+digest. This is separate from the NEW bundle's digest and replay provenance.
+The private RECUT-RECEIPT retains the predecessor binding; CLI stdout omits
+that predecessor digest. Other CLI receipt fields can contain private record
+hashes and must also remain in private coordination.
+
+Primary source: Git v2.53.0 at
+67ad42147a7acc2af6074753ebd03d904476118f,
+`Documentation/git-cat-file.adoc:281-285` defines raw object contents for an
+explicit type, and `Documentation/revisions.adoc:217-225` defines the
+`<rev>:<path>` blob selector. This uses Git's maintained reader rather than
+reimplementing object decoding. The new regression module is
+`tests.test_seq3_replay_inventory`; all construction and handoff proofs in it
+use SYN scratch state and make no operational recut claim.
 The strict manifest covers runtime inputs AND all five replay sources;
 the GO-BINDING-REQUEST is a separate hashed envelope because it binds that
 manifest's digest. The record retains predecessor state and config bindings.
@@ -168,7 +198,7 @@ and native command paths to the canonical NEW destination. Symlink ancestors
 and `..` cannot put output inside the immutable source. Only the NEW root and
 unit directory become owner-writable during generation; the finished root and
 units are restored to 0500. Frozen/config equality is computed before sealing.
-The old prepare_units.py is removed, unit tests use the two-hook contract, and
+The old prepare_units.py is removed, dry-run unit tests use the two-hook contract, and
 GO-PROCEDURE/DEPLOYMENT are replaced with these current activation prerequisites.
 
 ## Required generation changeover
