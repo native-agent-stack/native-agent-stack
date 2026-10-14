@@ -6,6 +6,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from tests.test_workflow_hardening import jobs, run_block, step_block
 
@@ -47,6 +48,26 @@ class IntegrationEntryPoint(unittest.TestCase):
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
         self.assertIn("Ran 0 tests", result.stderr)
 
+    def test_all_skipped_integration_cases_cannot_pass(self):
+        (self.root / "tests/integration/skipped.py").write_text(
+            "import unittest\nclass Mandatory(unittest.TestCase):\n"
+            " @unittest.skip('fixture missing runtime')\n"
+            " def test_required(self): self.fail('must execute when enabled')\n")
+        result = self.run_entry()
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("skipped=1", result.stderr)
+
+    def test_passing_case_cannot_hide_a_skipped_mandatory_case(self):
+        (self.root / "tests/integration/partial.py").write_text(
+            "import unittest\nclass Mandatory(unittest.TestCase):\n"
+            " def test_passes(self): pass\n"
+            " @unittest.skip('fixture missing runtime')\n"
+            " def test_required(self): self.fail('must execute when enabled')\n")
+        result = self.run_entry()
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("Ran 2 tests", result.stderr)
+        self.assertIn("skipped=1", result.stderr)
+
     def test_import_error_cannot_pass(self):
         (self.root / "tests/integration/broken_import.py").write_text("raise ImportError('fixture missing runtime')\n")
         result = self.run_entry()
@@ -69,10 +90,14 @@ class IntegrationEntryPoint(unittest.TestCase):
     def test_actual_step_uses_public_inputs_outside_a_restricted_runner_home(self):
         if subprocess.run(["sudo", "--non-interactive", "true"], capture_output=True).returncode:
             self.skipTest("the hosted namespace command requires noninteractive sudo")
-        self.root.chmod(0o755)
         (self.root / "tests/integration/preset.py").write_text(
             "import unittest\nclass Preset(unittest.TestCase):\n def test_output(self): pass\n")
-        inputs = self.root / "inputs"
+        # The namespace maps the host UID differently; every source ancestor
+        # must be traversable, even when the caller's default TMPDIR is private.
+        public = tempfile.TemporaryDirectory(dir="/var/tmp", prefix="integration-ci-namespace-")
+        self.addCleanup(public.cleanup)
+        inputs = Path(public.name)
+        inputs.chmod(0o755)
         shutil.copytree(self.root / "scripts", inputs / "source/scripts")
         shutil.copytree(self.root / "tests", inputs / "source/tests")
         (inputs / "venv/bin").mkdir(parents=True)
@@ -95,6 +120,21 @@ class IntegrationEntryPoint(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("Ran 1 test", result.stdout)
         self.assertTrue((inputs / "reports/unittest.log").is_file())
+
+    @unittest.skipUnless(sys.platform == "linux" and shutil.which("bwrap") and shutil.which("sudo"),
+                         "actual namespace command requires Linux bubblewrap and sudo")
+    def test_namespace_fixture_works_with_a_private_default_tempdir(self):
+        if subprocess.run(["sudo", "--non-interactive", "true"], capture_output=True).returncode:
+            self.skipTest("the hosted namespace command requires noninteractive sudo")
+        with tempfile.TemporaryDirectory(prefix="integration-ci-private-") as private:
+            Path(private).chmod(0o700)
+            with patch.object(tempfile, "tempdir", private):
+                case = type(self)("test_actual_step_uses_public_inputs_outside_a_restricted_runner_home")
+                result = unittest.TestResult()
+                case.run(result)
+            self.assertEqual(result.testsRun, 1)
+            self.assertFalse(result.skipped, result.skipped)
+            self.assertTrue(result.wasSuccessful(), result.errors + result.failures)
 
 
 class IntegrationWorkflow(unittest.TestCase):

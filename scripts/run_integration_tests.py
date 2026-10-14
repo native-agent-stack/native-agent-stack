@@ -23,8 +23,12 @@ def main():
         result = unittest.TextTestRunner(verbosity=2, durations=20).run(suite)
     finally:
         restore_default_stop(token)
-    # TextTestRunner's successful result can be empty; require actual integration coverage.
-    return 0 if result.wasSuccessful() and result.testsRun > 0 else 1
+    # CPython v3.12.3 case.py:609-612 starts cases before checking skip;
+    # result.py:59,147,172 counts skips separately and accepts them as successful.
+    # Every integration case is mandatory: an empty or partially skipped suite fails.
+    if result.skipped:
+        print("integration refused: mandatory cases or fixtures were skipped", file=sys.stderr)
+    return 0 if result.wasSuccessful() and result.testsRun > 0 and not result.skipped else 1
 
 
 if __name__ == "__main__":

@@ -2134,6 +2134,10 @@
     },
     {
       "root": "repo",
+      "path": "scripts/run_integration_tests.py"
+    },
+    {
+      "root": "repo",
       "path": "scripts/saturation_ledger.py"
     },
     {
