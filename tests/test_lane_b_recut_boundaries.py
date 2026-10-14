@@ -12,6 +12,7 @@ import tempfile
 import types
 import unittest
 from unittest.mock import patch
+from tests.paper_issuer_python import on_issuer_python
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "blueprints/us-equities/paper-readiness-seq3"
@@ -192,6 +193,7 @@ class RecutBoundaries(unittest.TestCase):
                 if isinstance(node, ast.Constant) and isinstance(node.value, str) and re.fullmatch("[0-9a-f]{64}", node.value):
                     self.assertIn(node.value, published, path.name)
 
+    @on_issuer_python
     def test_active_or_enabled_seq2_watchers_refuse_an_otherwise_ready_GO(self):
         source, _ = sealed_fixture(self.root)
         launch = types.ModuleType("launch")
@@ -250,15 +252,28 @@ def dry_fixture(root):
 
 class DryRunBoundaries(unittest.TestCase):
     def setUp(self):
-        self.scratch = tempfile.TemporaryDirectory(dir="/var/tmp")
+        self.fixture_for_child(os.environ.copy())
+
+    def fixture_for_child(self, env):
+        # CPython3.12.3 tempfile.py:124,880-882: explicit dir bypasses
+        # gettempdir. Select the actual child env FIRST, including the
+        # verifier's /var/tmp fallback, then ask that interpreter for its root.
+        self.child_env = env.copy()
+        selected = subprocess.run([sys.executable, "-E", "-s", "-B", "-c",
+            "import os,tempfile;from pathlib import Path;"
+            "tempfile.tempdir=str(Path(os.environ.get('TMPDIR') or '/var/tmp').resolve());"
+            "print(tempfile.gettempdir())"], env=self.child_env, capture_output=True, text=True, check=True)
+        self.scratch = tempfile.TemporaryDirectory(dir=Path(selected.stdout.strip()))
         self.addCleanup(self.scratch.cleanup)
         self.root = Path(self.scratch.name)
         self.bundle = dry_fixture(self.root)
 
     def command(self, receipt, *, env=None):
+        if env is not None and env != self.child_env:
+            raise ValueError("fixture_child_environment_differs")
         # Deliberately no -B: the public runner must enforce its own isolation.
         return subprocess.run([sys.executable, "-E", "-s", str(SOURCE / "dry_run.py"),
-            "--bundle", str(self.bundle), "--receipt", str(receipt)], capture_output=True, text=True, env=env)
+            "--bundle", str(self.bundle), "--receipt", str(receipt)], capture_output=True, text=True, env=self.child_env)
 
     def test_empty_but_inventoried_replay_cannot_pass_with_fewer_cases(self):
         (self.bundle / "test_data_wiring.py").write_text("")
@@ -272,6 +287,8 @@ class DryRunBoundaries(unittest.TestCase):
         self.assertEqual(receipt["status"], "failed")
 
     def test_keyless_scratch_manifest_check_with_TMPDIR_unset(self):
+        env = {k:v for k,v in os.environ.items() if k not in ("TMPDIR", "TMP", "TEMP")}
+        self.fixture_for_child(env)
         self.add_replay_case("""
     def test_TMPDIR_unset_manifest_probe(self):
         import launch,subprocess
@@ -280,12 +297,37 @@ class DryRunBoundaries(unittest.TestCase):
                               cwd=Path(launch.__file__).parent,capture_output=True,text=True)
         self.assertEqual(result.returncode,0)
 """)
-        env = {k:v for k,v in os.environ.items() if k not in ("TMPDIR", "TMP", "TEMP")}
         result = self.command(self.root / "receipt.json", env=env)
         self.assertEqual(result.returncode, 0, result.stderr)
         receipt = json.loads(result.stdout)
         self.assertEqual(receipt["verification_processes_started"], 1)
         self.assertEqual(receipt["subprocess_tripwire_hits"], 0)
+
+    def test_checksum_process_TMPDIR_matrix_uses_actual_child_environment(self):
+        with tempfile.TemporaryDirectory(dir="/var/tmp") as alternate:
+            for selected in (None, "/var/tmp", alternate):
+                env = {k:v for k,v in os.environ.items() if k not in ("TMPDIR", "TMP", "TEMP")}
+                if selected is not None:
+                    env["TMPDIR"] = selected
+                with self.subTest(TMPDIR=selected), patch.dict(os.environ, env, clear=True):
+                    fixture = DryRunBoundaries()
+                    fixture.setUp()
+                try:
+                    fixture.add_replay_case("""
+    def test_matrix_manifest_probe(self):
+        import launch,subprocess
+        from pathlib import Path
+        result=subprocess.run(['/usr/bin/sha256sum','--strict','--quiet','-c','SHA256SUMS'],
+                              cwd=Path(launch.__file__).parent,capture_output=True,text=True)
+        self.assertEqual(result.returncode,0)
+""")
+                    result = fixture.command(fixture.root / "receipt.json", env=env)
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    receipt = json.loads(result.stdout)
+                    self.assertEqual(receipt["verification_processes_started"], 1)
+                    self.assertEqual(receipt["subprocess_tripwire_hits"], 0)
+                finally:
+                    fixture.doCleanups()
 
     def add_replay_case(self, text):
         target = self.bundle / "test_data_wiring.py"

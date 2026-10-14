@@ -73,8 +73,22 @@ another interpreter refuses `issuer_python_3_12_required`. The binding request
 records this pin. The co-op must verify its issuer service/daemon interpreter
 before restart; this tool does not change the service. pending() uses lstat,
 treating only FileNotFoundError as absence, so permission errors block admission
-even when a newer pathlib would suppress them. The regression runs pending()
-on the managed 3.12 interpreter against a real unreadable SYN instance directory.
+even when a newer pathlib would suppress them. Primary sources: CPython v3.12.3
+at f6650f9ad73359051f3e558c2431a109bc016664, Lib/pathlib.py:860-868,
+re-raises OSError values outside its ignored set; CPython v3.14.4 at
+23116f998f6789d8c2fbe5ed5b8146854c8c2a4f,
+Lib/pathlib/__init__.py (Path.exists/is_symlink) delegates to os.path and
+Lib/genericpath.py:16-34 catches OSError. The regression runs pending() against
+a real unreadable SYN instance on a probed CPython 3.12 executable.
+
+Test discovery is portable: the existing catalog-freshness.yml uses CPython
+3.13, while the three positive issuer/STOP/retirement probes explicitly run
+under CPython 3.12 (test override PAPER_ISSUER_TEST_PYTHON, current executable,
+or python3.12 on PATH, each version-checked). If none is discoverable they
+report unittest SKIP with the missing-interpreter reason. The wrong-interpreter
+refusal test remains portable and still executes. No workflow or production
+interpreter guard changes. CPython's supported unittest skipTest and subprocess
+CLI supply this test-only selection; no interpreter is installed by a test.
 
 Re-cut into a NEW directory with `recut.py --source SEALED_SEQ2 --output NEW_SEQ3
 --source-commit LANDED_FIX_COMMIT --predecessor-sha256 EXPECTED_PRIVATE_DIGEST`.
@@ -88,6 +102,14 @@ predecessor. A missing module refuses before copying; the recutter never adds
 unbound replay bytes to a new seal. The original seq2 inventory omitted them,
 so it now refuses. A newly authenticated predecessor inventory is required
 before another operational packet can be prepared; never edit the old seal.
+The CC has now sealed the separate replay provenance record
+ROW-cc-20261014T0222Z-seq3-replay-inventory-git-bound.md, binding all five
+published files at landed commit 000ae0e39e20b947f1bd700e0257f781c069898d
+(#1102). It establishes their first authenticated git provenance, not original
+seq2-seal membership. Cite that record and commit in the future seq3 recut.
+This final tests/docs round does not add an alternate runtime inventory input
+or change receipt-origin validation; do not present an operational re-cut or
+binding integration as completed by the test fixes.
 The strict manifest covers runtime inputs AND all five replay sources;
 the GO-BINDING-REQUEST is a separate hashed envelope because it binds that
 manifest's digest. The record retains predecessor state and config bindings.
@@ -111,10 +133,20 @@ and failed; the evaluator was corrected before the final commit.
 The evaluator requires at least 49 executed, non-skipped cases, the retained
 complete drill's measured baseline; a shorter suite fails its receipt even
 when unittest itself reports success. Emptying an inventoried data replay
-module must not turn a reduced drill into a passing gate. With TMPDIR unset,
-both replay temporary directories and manifest checks use canonical /var/tmp;
-an explicit TMPDIR is honored consistently by both. The P1-exception adds
-three fail-first regressions, bringing the focused suite to 46 tests.
+module must not turn a reduced drill into a passing gate. The verifier selects
+canonical /var/tmp when TMPDIR is unset; otherwise it uses that child's explicit
+TMPDIR. Fixtures must be allocated only AFTER choosing the actual child env.
+The tests evaluate tempfile.gettempdir in a child under that env and the same
+fallback rule, then pass that selected root to TemporaryDirectory. They rebuild
+the unset-environment fixture rather than reusing its parent's allocation.
+CPython v3.12.3 f6650f9ad73359051f3e558c2431a109bc016664,
+Lib/tempfile.py:124 and880-882: gettempdir is used only when dir is None, and
+TemporaryDirectory forwards an explicit dir unchanged. A later environment
+patch cannot relocate an already allocated fixture. The matrix checks the
+checksum process with TMPDIR unset, /var/tmp and a distinct writable root;
+each fixture uses its own actual child env. The prior universal TMPDIR claim
+was incomplete. The final focused suite has 47 tests; its earlier P1-exception
+baseline had 46. No all-platform or unwritable-directory claim is made.
 Normal test-owned SYN stubs still supply fixture recoveries. The full
 drill passed 49 invocations, zero failures/errors/skips; this count includes
 inherited Wiring cases discovered again by the sequencing module. An initial

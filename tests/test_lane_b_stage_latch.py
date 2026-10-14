@@ -10,6 +10,7 @@ import tempfile
 import types
 import unittest
 from unittest.mock import patch
+from tests.paper_issuer_python import issuer_python, on_issuer_python
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "blueprints/us-equities/paper-readiness-seq3"
@@ -123,6 +124,7 @@ class StageLatch(unittest.TestCase):
             with self.assertRaisesRegex(self.launch.Refused, "issuer_python_3_12_required"):
                 issuer.build("sip", "SYN-never-issued")
 
+    @on_issuer_python
     def test_pending_on_the_asserted_issuer_python_with_an_unreadable_instance(self):
         import subprocess
         script = """import os,sys
@@ -140,7 +142,7 @@ finally:
     instance.chmod(0o700)
 print('issuer_python=3.12 pending_unreadable=true')
 """
-        result = subprocess.run([sys.executable, "-E", "-s", "-B", "-c", script,
+        result = subprocess.run([issuer_python(), "-E", "-s", "-B", "-c", script,
             str(SOURCE), str(self.root / "SYN-runtime")], capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("issuer_python=3.12 pending_unreadable=true", result.stdout)
@@ -198,6 +200,7 @@ print('issuer_python=3.12 pending_unreadable=true')
             self.launch.recover_stage("pre")
         self.assertTrue(self.marker().exists())
 
+    @on_issuer_python
     def test_GO_admission_and_issuer_refuse_both_lane_and_host_latches(self):
         from recut import rewrite_issuer
         raw = (ROOT / "tests/fixtures/seq2-issue-go.txt").read_text()
