@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-14",
+  "base_commit": "ef2fea184b86a06005ef079a88f6b023d028e361",
+  "evidence_class": "source_review",
+  "scope": "Sourced model-line currency checks for the expired Fable entry and every model with an effective release age from 35 through 42 days. No model selection or runtime change.",
+  "policy": {"max_release_age_days": 42, "max_landscape_age_days": 7},
+  "age_inventory": {
+    "calculation_date": "2026-10-14",
+    "models_examined": 21,
+    "effective_release_rule": "Use release_date for in_use/held rows and the bound shipping package release_date for package_bound rows, matching scripts/validate.py.",
+    "expired_without_check": [{"id": "claude-fable-5-1", "release_age_days": 43}],
+    "within_seven_days_of_limit": [{"id": "gpt-6-astra", "release_age_days": 41}],
+    "next_below_window": {"id": "mineru-onnx-bundle", "effective_release_age_days": 34},
+    "separate_follow_up": "Existing landscape checks dated 2026-10-07 are exactly seven days old today and expire on 2026-10-15. Reported to the command center for a separately sourced refresh; no dates or old KEEP decisions silently renewed here."
+  },
+  "first_hand_sources": [
+    {"url": "https://platform.claude.com/docs/en/about-claude/models/overview", "read_date": "2026-10-14", "observed": "Current comparison lists claude-fable-5-1 alongside separate Opus 5.5, Sonnet 5.5 and Haiku 5.5 model lines."},
+    {"url": "https://platform.claude.com/docs/en/models/fable-5-1/overview", "read_date": "2026-10-14", "observed": "Claude Fable 5.1 remains named for demanding reasoning and long-horizon agentic work. Mythos 5.1 is a same-capability restricted-access counterpart, not a newer Fable model."},
+    {"url": "https://platform.claude.com/docs/en/release-notes/overview#september-1-2026", "read_date": "2026-10-14", "observed": "September 1 release entry launches claude-fable-5-1 as the successor to Fable 5, alongside claude-mythos-5-1."},
+    {"url": "https://developers.openai.com/api/docs/models", "read_date": "2026-10-14", "observed": "Flagship overview lists gpt-6-astra for complex reasoning and coding; gpt-6.1-sol and gpt-6-luna are separate named lines."},
+    {"url": "https://developers.openai.com/api/docs/models/gpt-6-astra", "read_date": "2026-10-14", "observed": "The selected GPT-6 Astra ID remains current on its official model page; no newer Astra ID is shown."}
+  ],
+  "candidate_scope": "newer_candidates is scoped to successors in each recorded model line. Neither official comparison/page identifies a newer Fable or Astra model ID, so both arrays are empty; cross-line models and the same-generation restricted counterpart are described separately, not invented as successors.",
+  "fail_before": {
+    "command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- python3 scripts/validate.py",
+    "tree": "Unmodified fresh origin/main at base_commit",
+    "rc": 1,
+    "output": "Publication validation failed:\nmodel currency model claude-fable-5-1: release older than 42 days needs a sourced landscape check within 7 days"
+  },
+  "limits": [
+    "First-hand public documentation review; no model/harness execution, quality comparison, subscription/account-access probe or runtime change.",
+    "The guessed Anthropic news URL returned HTTP 404 and is not used as a source; the official Fable model page and dated official release-note entry are used instead.",
+    "No release date, existing selection, consumer assignment, historical landscape check or validation age policy is changed."
+  ]
+}
