@@ -62508,8 +62508,8 @@
     },
     {
       "path": "tests/test_claude_review_worker.py",
-      "sha256": "efd8a21ced31a7c47b71296f84c6a60a456f65f6e709272c42830bcbecee39cf",
-      "bytes": 130695
+      "sha256": "1151e5f37c26e2f12270b15a048779ea081cad416f2ae2029048cf8447d36d24",
+      "bytes": 131238
     },
     {
       "path": "tests/test_claude_spend_scan.py",
@@ -63408,8 +63408,8 @@
     },
     {
       "path": "tests/test_runtime_profiles.py",
-      "sha256": "40457adb80ac6fc59793a1b093146ea89141f45dcbd7a47531f48813d7a67115",
-      "bytes": 36484
+      "sha256": "3b1aaa69a206937664340ab0797a4672ef25f31678eebfa4de9226ddbc472521",
+      "bytes": 44503
     },
     {
       "path": "tests/test_runtime_publication.py",
@@ -63873,8 +63873,8 @@
     },
     {
       "path": "tools/adoption/runtime_profiles.py",
-      "sha256": "e5b3201d4ffb40f63718302f5cdc2167f2801187801480dc9ae204b81ad3c830",
-      "bytes": 71677
+      "sha256": "b6f6886b38d2de73957faa29c28deb71adaa4fbc16017e0915fac0687d18f50b",
+      "bytes": 76065
     },
     {
       "path": "tools/adoption/runtime_skill_freshness.py",
@@ -63978,8 +63978,8 @@
     },
     {
       "path": "tools/claude-review-worker/worker.py",
-      "sha256": "94887696bf940372593f1864fa5fd69c66d321e675c2e69debe21195b6def364",
-      "bytes": 129396
+      "sha256": "95be97eaff682c1d4602fe26ece954a9861d8bd083f5c989afdd4c064725c939",
+      "bytes": 129769
     },
     {
       "path": "tools/credentials/anthropic_key_health.py",

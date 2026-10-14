@@ -86,6 +86,13 @@ DEFAULT_KEYS = ("anthropic-api-4", "anthropic-api-3", "anthropic-api-2", "anthro
                 "anthropic-api-6", "anthropic-api-7", "anthropic-api-8", "anthropic-api-9", "anthropic-api-10")
 SWITCH_CLASSES = ("credit_exhausted", "revoked_key")
 DEFAULT_CLAUDE_BIN = "~/.local/share/claude/versions/2.1.296"
+
+
+def credit_exhausted(status, text) -> bool:
+    """Anthropic's credit-exhausted refusal: HTTP 402, or a 400 whose text says "credit balance is too low" (the form a
+    prepaid Console balance at zero returns). The one classifier every fill-first consumer imports (this worker,
+    tools/adoption/runtime_profiles.py)."""
+    return status == 402 or (status == 400 and "credit balance is too low" in (text or "").lower())
 DEFAULT_STATE = "~/.local/state/native-agent-stack/claude-review-worker"
 DEFAULT_TIMEOUT_SECONDS = 2700
 DEFAULT_UPSTREAM = "~/code/upstream"
@@ -1084,7 +1091,7 @@ def analyze(records: list, unparseable: int, masked: bool = False) -> dict:
                                 and isinstance(r.get("message"), dict) and isinstance(r["message"].get("id"), str)}),
         "permission_denials": len(result["permission_denials"])
         if isinstance(result.get("permission_denials"), list) else None,
-        "credit_exhausted": status == 402 or (status == 400 and "credit balance is too low" in blob.lower()),
+        "credit_exhausted": credit_exhausted(status, blob),
         "masked_credential": masked or any(marker.decode("ascii") in text for text in [blob, *tool_result_texts(records)]
                                            for marker in MASK_MARKERS),
         "report_text": report,

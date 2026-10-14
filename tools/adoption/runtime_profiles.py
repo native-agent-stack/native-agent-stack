@@ -585,14 +585,77 @@ def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: 
     return {"profile": profile, "status": "trial", "mcp_servers": len(servers), "roles": len(roles)}
 
 
-def choose_slot() -> str:
-    """Reuse the installed no-token inventory/loader probe, fill-first 4/3/2."""
+def review_worker():
+    """The review worker module: the fill-first order (DEFAULT_KEYS) and the credit-exhausted classifier live there once."""
+    return module("runtime_review_worker", ROOT / "tools/claude-review-worker/worker.py")
+
+
+def fill_first_order() -> tuple:
+    """The Anthropic Console slots in fill-first order, as the review worker uses them (its DEFAULT_KEYS)."""
+    return tuple(review_worker().DEFAULT_KEYS)
+
+
+# The no-token check (GET /v1/models) screens out only a key Anthropic refuses outright. A key whose prepaid credit is
+# exhausted still answers 200 there, so "valid" never decides: the run itself finds an exhausted key and moves on.
+UNUSABLE_VALIDITY = ("invalid", "forbidden")
+
+
+def choose_slot(after: str | None = None) -> str:
+    """The first stored slot in fill-first order, after `after` when given, whose no-token check did not find the key
+    invalid (401) or forbidden (403)."""
+    order = fill_first_order()
+    if after is not None:
+        order = order[order.index(after) + 1:] if after in order else ()
     health = module("runtime_key_health", ROOT / "tools/credentials/anthropic_key_health.py")
-    for slot in ("anthropic-api-4", "anthropic-api-3", "anthropic-api-2"):
+    for slot in order:
         result = health.health([slot])[0]
-        if result.get("state") == "stored" and result.get("validity") == "valid":
+        if result.get("state") == "stored" and result.get("validity") not in UNUSABLE_VALIDITY:
             return slot
-    raise ProfileError("no ready Anthropic Console slot in fill-first api-4/3/2")
+    raise ProfileError("no usable Anthropic Console slot left in the fill-first order"
+                       + (f" after {after}" if after else ""))
+
+
+def first_call_refusal(log: Path, runtime: str) -> tuple[int | None, str] | None:
+    """(status, text) of the run's first model call when it was refused before any billed output, else None. Pi records
+    the refusal as an assistant message_end with stopReason "error" and errorMessage "<status> <body>"; OpenCode emits an
+    error event. Any completed step with usage first means the run was billed, so nothing is retried."""
+    for line in log.read_text().split("\n"):
+        try:
+            event = json.loads(line)
+        except ValueError:
+            continue
+        if not isinstance(event, dict):
+            continue
+        if runtime == "pi":
+            message = event.get("message")
+            if event.get("type") != "message_end" or not isinstance(message, dict) or message.get("role") != "assistant":
+                continue
+            usage = message.get("usage") if isinstance(message.get("usage"), dict) else {}
+            if message.get("stopReason") != "error" or usage.get("totalTokens"):
+                return None
+            text = message.get("errorMessage") if isinstance(message.get("errorMessage"), str) else ""
+            status = re.match(r"(\d{3})\b", text)
+            return (int(status.group(1)) if status else None), text
+        if event.get("type") == "step_finish":
+            return None
+        if event.get("type") == "error":
+            error = event.get("error")
+            text = json.dumps(error)
+            numbers = [v for k, v in (error.items() if isinstance(error, dict) else ())
+                       if k in ("statusCode", "status") and isinstance(v, int)]
+            if not numbers and isinstance(error, dict) and isinstance(error.get("data"), dict):
+                numbers = [v for k, v in error["data"].items() if k in ("statusCode", "status") and isinstance(v, int)]
+            # Without a numeric field, the Anthropic error type in the relayed body gives the status it comes with.
+            status = numbers[0] if numbers else (402 if "billing_error" in text
+                                                 else 400 if "invalid_request_error" in text else None)
+            return status, text
+    return None
+
+
+def credit_refused(log: Path, runtime: str) -> bool:
+    """True when the run's first call was refused as credit-exhausted, by the review worker's own classifier."""
+    refusal = first_call_refusal(log, runtime)
+    return refusal is not None and review_worker().credit_exhausted(*refusal)
 
 
 def inference_facts(log: Path, runtime: str):
@@ -934,35 +997,51 @@ def launch(args):
         # credential_run masks through pipes. util-linux script provides the
         # native TUI a PTY without reading/copying authentication state.
         command = ["script", "--quiet", "--return", "--command", shlex.join(command), "/dev/null"]
+    runtime_command, slot = command, None
+
+    def loaded(slot):
+        return [sys.executable, str(ROOT / "tools/credentials/credential_run.py"), slot,
+                "--only", "ANTHROPIC_API_KEY", "--", "env",
+                *[key + "=" + value for key, value in runtime_env.items()],
+                *runtime_command]
     if route == "claude":
         slot = choose_slot()
-        command = [sys.executable, str(ROOT / "tools/credentials/credential_run.py"), slot,
-                   "--only", "ANTHROPIC_API_KEY", "--", "env",
-                   *[key + "=" + value for key, value in runtime_env.items()],
-                   *command]
+        command = loaded(slot)
         # XDG_STATE_HOME also locates credential_run's inventory store. Resolve
         # the host store in the loader's original environment; apply runtime
         # XDG isolation only to its child through env. No store is copied into
         # a runtime profile and no credential path/value is materialized here.
         env = {**os.environ, "NS_RUNTIME_REQUEST_ID": env["NS_RUNTIME_REQUEST_ID"]}
     if args.print:
-        run = root / "runs" / uuid.uuid4().hex
-        run.mkdir(mode=0o700, parents=True)
-        log, errors = run / "events.jsonl", run / "stderr.log"
-        started = utc()
-        # GNU timeout owns the bounded process group and gives the credential
-        # runner its normal TERM cleanup grace; subprocess timeout is only an
-        # outer watchdog. This also bounds GPT descendants without credentials.
-        command = ["timeout", "--signal=TERM", "--kill-after=5s", str(args.timeout_seconds), *command]
-        with log.open("x", encoding="utf-8") as handle, errors.open("x", encoding="utf-8") as stderr:
-            log.chmod(0o600); errors.chmod(0o600)
-            # The loader masks Claude output before it reaches this private log.
+        # Fill-first: a slot whose first call is refused as credit-exhausted, before any billed output, is recorded and
+        # the run starts again on the next usable slot of the order (the review worker's DEFAULT_KEYS and classifier).
+        refused_slots = []
+        while True:
+            run = root / "runs" / uuid.uuid4().hex
+            run.mkdir(mode=0o700, parents=True)
+            log, errors = run / "events.jsonl", run / "stderr.log"
+            started = utc()
+            # GNU timeout owns the bounded process group and gives the credential
+            # runner its normal TERM cleanup grace; subprocess timeout is only an
+            # outer watchdog. This also bounds GPT descendants without credentials.
+            timed = ["timeout", "--signal=TERM", "--kill-after=5s", str(args.timeout_seconds), *command]
+            with log.open("x", encoding="utf-8") as handle, errors.open("x", encoding="utf-8") as stderr:
+                log.chmod(0o600); errors.chmod(0o600)
+                # The loader masks Claude output before it reaches this private log.
+                try:
+                    result = subprocess.run(timed, cwd=workspace, env=env, stdout=handle, stderr=stderr,
+                                            timeout=args.timeout_seconds + 15)
+                    exit_code = result.returncode
+                except subprocess.TimeoutExpired:
+                    exit_code = 124
+            if route != "claude" or not credit_refused(log, runtime):
+                break
             try:
-                result = subprocess.run(command, cwd=workspace, env=env, stdout=handle, stderr=stderr,
-                                        timeout=args.timeout_seconds + 15)
-                exit_code = result.returncode
-            except subprocess.TimeoutExpired:
-                exit_code = 124
+                following = choose_slot(after=slot)
+            except ProfileError:
+                break  # no slot left: the refused run's receipt stands
+            refused_slots.append({"credential_loader_id": slot, "reason": "credit_exhausted", "run": run.name})
+            slot, command = following, loaded(following)
         # Use the existing adapter API directly: the general tracker CLI also
         # visits Claude/Codex native stores, which this isolated run need not.
         sys.path.insert(0, str(ROOT / "tools/skill-usage"))
@@ -979,6 +1058,7 @@ def launch(args):
             "started_at": started, "finished_at": utc(), "head": head,
             "request_label": env["NS_RUNTIME_REQUEST_ID"], "model": meta["model"],
             "credential_loader_id": slot if route == "claude" else None,
+            "credit_refused_slots": refused_slots,
             "inference": inference_facts(log, runtime),
             "runtime_exit_code": exit_code, "tracker_exit_code": tracker_code,
             "invocations": report, "publication_boundary": "derived facts only; native state remains private",

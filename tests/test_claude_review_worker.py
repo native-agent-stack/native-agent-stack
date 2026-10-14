@@ -907,6 +907,13 @@ class ReviewRunTest(unittest.TestCase):
                 moved = [line for line in h.logs if line.startswith("<4>WARNING") and f"to {KEYS[1]}" in line]
                 self.assertEqual(len(moved), 1, h.logs)
 
+    def test_the_credit_classifier_is_one_function_every_consumer_imports(self):
+        # tools/adoption/runtime_profiles.py imports crw.credit_exhausted; analyze() uses the same function.
+        self.assertTrue(crw.credit_exhausted(402, ""))
+        self.assertTrue(crw.credit_exhausted(400, "Your credit balance is too low to access the Anthropic API."))
+        for status, text in ((400, "prompt is too long"), (429, "credit balance is too low"), (401, ""), (None, "")):
+            self.assertFalse(crw.credit_exhausted(status, text))
+
     def test_a_revoked_key_moves_to_the_next_key(self):
         h = Harness(self)
         repo, sha = self.private(h)
