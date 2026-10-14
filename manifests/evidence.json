@@ -5237,8 +5237,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "a026b23a199814534e94acd948dc11b01ac53bfbd90b292d9ab3c73032eadd9a",
-      "bytes": 46696
+      "sha256": "8d51268e6bf76673137cb62bae965932e0d8095a12a91f22ff255ac280ab81df",
+      "bytes": 51557
     },
     {
       "path": ".gitignore",
@@ -62132,6 +62132,16 @@
       "bytes": 34570
     },
     {
+      "path": "scripts/trading_runtime_suite.json",
+      "sha256": "f0044957d063d20daf74f7fe7201181a426e3cd668196f51126875d249d2614c",
+      "bytes": 3012
+    },
+    {
+      "path": "scripts/trading_runtime_suite.py",
+      "sha256": "49c71e38151857e96b9c16cbb008f4adc03538c9e11c2ba8efb81f975d974669",
+      "bytes": 8279
+    },
+    {
       "path": "scripts/upstream_surface_watch.py",
       "sha256": "ae147f00a36ef462198c8e8976bbbada632a6aff89fdf2edea9ebbb47817640d",
       "bytes": 107699
@@ -63658,8 +63668,8 @@
     },
     {
       "path": "tests/test_promotion_gate.py",
-      "sha256": "1c57740baf68290ed005dde43f3e3e415aa4974ab6df55c539a0953a849b3022",
-      "bytes": 31372
+      "sha256": "328dd241d4310d4f2774865543ca84d4acb78c421f115066629377945c5c08f9",
+      "bytes": 31393
     },
     {
       "path": "tests/test_promotion_gate_codex_review.py",
@@ -64032,6 +64042,11 @@
       "bytes": 2930
     },
     {
+      "path": "tests/test_trading_runtime_suite.py",
+      "sha256": "21789751a7f900a53618f166433d284bfba535e95571abd04e132843bd0836bc",
+      "bytes": 12981
+    },
+    {
       "path": "tests/test_tvly_keyring.py",
       "sha256": "4879ed6cccb7be2f9dd7db5cfcd087e1884428cdcb97b16f7d17aef827ec5763",
       "bytes": 12126
@@ -64113,8 +64128,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "5e87651b314dde9cb62b4caecf1d06df89ac567e1dbca0947158381dc3bd4cae",
-      "bytes": 152178
+      "sha256": "d3730099dcef8b91673dfca8f8e8ce78ea5dd48e4bf9fe98949cedc2e8f933c7",
+      "bytes": 152321
     },
     {
       "path": "tests/test_workflow_policy.py",
@@ -64478,8 +64493,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "85bcad7c52f8402a30558e3da35e5436a4aefa6eed7ecee7187b198eecdb95f7",
-      "bytes": 760049
+      "sha256": "5165ccf6537ba471af447c5db0859759c0234dd4046de0b703e0ae7aedb068e1",
+      "bytes": 760133
     },
     {
       "path": "tools/omniroute/gateway_record.py",

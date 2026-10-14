@@ -1347,7 +1347,8 @@ class ValidateShardWorkflowContract(unittest.TestCase):
     def test_final_required_name_runs_after_failed_cancelled_or_skipped_dependencies(self):
         self.assertRegex(self.final, r"(?m)^    name: validate$")
         self.assertEqual(block_if(self.final), "always()")
-        self.assertRegex(self.final, r"(?m)^    needs: validate$")
+        # The trading-runtime job joins the shards (tests/test_trading_runtime_suite.py pins how its result is required).
+        self.assertRegex(self.final, r"(?m)^    needs: \[validate, trading-runtime\]$")
         self.assertNotIn("continue-on-error", uncommented(self.final))
         self.assertEqual(sum(bool(re.search(r"(?m)^    name: validate$", job))
                              for job in self.jobs.values()), 1)
