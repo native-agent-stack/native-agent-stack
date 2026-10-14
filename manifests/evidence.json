@@ -17403,8 +17403,8 @@
     },
     {
       "path": "catalogs/foundation/model-currency.json",
-      "sha256": "8fd235096256010af2704c9c68e4c15d2d2dd7e83dce6331bbad528b27526e60",
-      "bytes": 34044
+      "sha256": "4ad577d0daf4307593592d967348193cd39390976b7b177173d69c5d3f1574b1",
+      "bytes": 35698
     },
     {
       "path": "catalogs/foundation/model-currency.schema.json",
@@ -40870,6 +40870,11 @@
       "path": "evidence/artifacts/model-currency-enforcement-20261007/j826-checks.json",
       "sha256": "e187cd3bfdda7c765cea796e4ba76693c3279745afe7892a23a6963cffbd94f8",
       "bytes": 6392
+    },
+    {
+      "path": "evidence/artifacts/model-landscape-check-20261014/receipt.json",
+      "sha256": "073e9bcfca252553e5df59ee671d71e6b0518393beb6ac628aec0b1e982b6249",
+      "bytes": 3552
     },
     {
       "path": "evidence/artifacts/native-claude-coop-20260921/loki-discovery.json",
