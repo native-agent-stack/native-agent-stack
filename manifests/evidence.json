@@ -63503,8 +63503,8 @@
     },
     {
       "path": "tests/test_muse_file_fence.py",
-      "sha256": "068e4d7c291f5f141ecce1d59e381e3443cc88be12d9c0da27ac5050fb6a826b",
-      "bytes": 11411
+      "sha256": "ae0c9fc996f300e3d5665e8306a6db994f07ebd4a03637a174464303f13cedb9",
+      "bytes": 11606
     },
     {
       "path": "tests/test_nanosecond_replay.py",

@@ -191,23 +191,27 @@ try:
  Path(''' + repr(str(canary)) + ''').read_bytes(); readable = True
 except FileNotFoundError:
  readable = False
-print(json.dumps({'outside_readable': readable}))
+print(json.dumps({'outside_readable': readable, 'argv': sys.argv[1:]}))
 ''')
         shim.chmod(0o700)
-        env = {**clean_env(Path.home(), self.logs), 'MUSE_BIN': str(shim)}
+        env = {**clean_env(Path.home(), self.logs), 'MUSE_BIN': str(shim),
+               'MUSE_LANE_MAX_MODEL_STEPS': '2'}
         unfenced_logs = self.root / 'unfenced-logs'
         before = subprocess.run(['/bin/bash', str(DEFAULT_LANE), '--role', 'reader',
                                  str(self.work), str(self.brief), str(unfenced_logs)],
                                 env=env, capture_output=True, text=True, timeout=30)
         self.assertEqual(before.returncode, 0, before.stderr)
-        self.assertEqual(json.loads((unfenced_logs / 'muse-exec.jsonl').read_text()),
-                         {'outside_readable': True})
+        control = json.loads((unfenced_logs / 'muse-exec.jsonl').read_text())
+        self.assertTrue(control['outside_readable'])
         argv = native_argv(DEFAULT_LANE, shim, self.work, self.brief, self.logs, 'reader', 2)
         fence = Fence(self.work, self.brief, self.logs, shim, self.auth, self.settings)
         with fence.prepared() as command:
             after = subprocess.run(command + argv, env={}, capture_output=True, text=True, timeout=30)
         self.assertEqual(after.returncode, 0, after.stderr)
-        self.assertEqual(json.loads(after.stdout), {'outside_readable': False})
+        enclosed = json.loads(after.stdout)
+        self.assertFalse(enclosed['outside_readable'])
+        self.assertEqual(control['argv'], enclosed['argv'])
+        self.assertEqual(enclosed['argv'], argv[1:])
 
 
 if __name__ == '__main__':
