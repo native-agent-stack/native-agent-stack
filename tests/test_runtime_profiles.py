@@ -25,6 +25,170 @@ import runtime_profiles as profiles
 import runtime_acceptance as acceptance
 
 
+WORKER = ROOT / "tools/claude-review-worker/worker.py"
+
+
+def pi_events(handle, *, error=None, tokens=0):
+    """Pi --mode json events for one assistant turn: refused with `error` ("<status> <body>"), or completed."""
+    message = {"role": "assistant", "content": [] if error else [{"type": "text", "text": "fixture"}],
+               "usage": {"input": tokens, "output": 0, "totalTokens": tokens, "cost": {"total": 0}},
+               "stopReason": "error" if error else "stop"}
+    if error:
+        message["errorMessage"] = error
+    for kind in ("message_start", "message_end"):
+        handle.write(json.dumps({"type": kind, "message": message}) + "\n")
+
+
+CREDIT_400 = '400 {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API."}}'
+
+
+class FillFirstSlotTests(unittest.TestCase):
+    """ns-run's Anthropic slot choice (the command center's incident of 2026-10-14, 01:01:52Z): a researcher run on
+    anthropic-api-4 was refused for exhausted credit because the profile chose by a no-token check, from a stale 4/3/2
+    list, and never moved on. The order is the review worker's DEFAULT_KEYS, the no-token check only screens out an
+    invalid or forbidden key, and a first call refused as credit-exhausted (the worker's classifier) moves the run to the
+    next slot."""
+
+    def worker(self):
+        spec = importlib.util.spec_from_file_location("fill_first_test_worker", WORKER)
+        mod = importlib.util.module_from_spec(spec)
+        sys.modules[spec.name] = mod  # its dataclasses resolve their module through sys.modules
+        spec.loader.exec_module(mod)
+        return mod
+
+    def launch(self, slot_outcomes, health_rows=None, ends=None):
+        """A pi-claude print launch whose runtime writes, per slot, a credit refusal, another refusal or a completed
+        turn, then ends with status `ends[slot]` (0 when absent; "watchdog" raises the outer subprocess timeout).
+        Returns (exit, receipt, runtime calls)."""
+        real_module = profiles.module
+        rows = health_rows or {}
+
+        class Health:
+            @staticmethod
+            def health(selected, run=None):
+                return [rows.get(slot, {"id": slot, "state": "stored", "validity": "valid"}) for slot in selected]
+
+        calls = []
+        with tempfile.TemporaryDirectory(dir="/var/tmp") as directory:
+            state = Path(directory)
+            root, workspace = state / "pi-claude", state / "worktree"
+            root.mkdir(); workspace.mkdir()
+            (root / "profile.json").write_text(json.dumps({"status": "trial", "pi_bin": "/fixture/pi",
+                                                          "model": "fixture", "effort": "high", "roles": {}}))
+            args = argparse.Namespace(profile="pi-claude", state_root=state, repository=state,
+                                      role=None, print=True, prompt="fixture", timeout_seconds=1)
+
+            def runtime(command, **kwargs):
+                if command[0] == "timeout":
+                    slot = next(s for s in self.worker().DEFAULT_KEYS if s in command)
+                    calls.append(slot)
+                    outcome = slot_outcomes.get(slot, "ok")
+                    pi_events(kwargs["stdout"], error=None if outcome == "ok" else outcome, tokens=12 if outcome == "ok" else 0)
+                    end = (ends or {}).get(slot, 0)
+                    if end == "watchdog":
+                        raise subprocess.TimeoutExpired(command, kwargs["timeout"])
+                    return subprocess.CompletedProcess(command, end)
+                return subprocess.CompletedProcess(command, 0)
+
+            with mock.patch.object(profiles, "module", side_effect=lambda name, path: Health if "key_health" in name
+                                   else real_module(name, path)), \
+                    mock.patch.object(profiles, "fresh_worktree", return_value=workspace), \
+                    mock.patch.object(profiles, "verify_runtime_binary", return_value="fixture"), \
+                    mock.patch.object(profiles.subprocess, "run", side_effect=runtime), \
+                    mock.patch.object(profiles.subprocess, "check_output", return_value="a" * 40), \
+                    mock.patch.object(profiles, "utc", return_value="2026-10-14T00:00:00Z"), \
+                    mock.patch.object(profiles, "cleanup_worktree", return_value={"status": "removed"}), \
+                    redirect_stdout(io.StringIO()) as out:
+                code = profiles.launch(args)
+            receipt = json.loads(Path(json.loads(out.getvalue().strip().splitlines()[-1])["receipt"]).read_text())
+        return code, receipt, calls
+
+    def test_an_exhausted_key_that_reports_valid_is_not_chosen_as_final(self):
+        order = self.worker().DEFAULT_KEYS
+        code, receipt, calls = self.launch({order[0]: CREDIT_400})
+        self.assertEqual(calls, [order[0], order[1]])
+        self.assertEqual(receipt["credential_loader_id"], order[1])
+        self.assertEqual([row["credential_loader_id"] for row in receipt["credit_refused_slots"]], [order[0]])
+        self.assertEqual(receipt["inference"]["usage"]["total_tokens"], 12)
+
+    def test_every_exhausted_slot_is_passed_over_in_order(self):
+        order = self.worker().DEFAULT_KEYS
+        code, receipt, calls = self.launch({order[0]: CREDIT_400, order[1]: CREDIT_400.replace("400 ", "402 ", 1)})
+        self.assertEqual(calls, [order[0], order[1], order[2]])
+        self.assertEqual(receipt["credential_loader_id"], order[2])
+
+    def test_the_last_exhausted_slot_is_recorded_when_no_slot_follows(self):
+        # With no successor the last refused run's receipt stands, and it still names its own slot as refused.
+        order = list(self.worker().DEFAULT_KEYS)
+        code, receipt, calls = self.launch({slot: CREDIT_400 for slot in order})
+        self.assertEqual(calls, order)
+        self.assertEqual([row["credential_loader_id"] for row in receipt["credit_refused_slots"]], order)
+        self.assertEqual(receipt["credential_loader_id"], order[-1])
+        only_first = {slot: {"id": slot, "state": "missing"} for slot in order[1:]}
+        code, receipt, calls = self.launch({order[0]: CREDIT_400}, only_first)
+        self.assertEqual(calls, [order[0]])
+        self.assertEqual([row["credential_loader_id"] for row in receipt["credit_refused_slots"]], [order[0]])
+
+    def test_a_timed_out_or_signalled_attempt_never_moves_to_another_slot(self):
+        # A credit refusal already flushed to the log authorizes nothing once the attempt itself was cut short: the
+        # outer watchdog, timeout's 124 and 137, the credential runner's 128+N, a signal on the direct child.
+        order = self.worker().DEFAULT_KEYS
+        for end, status in (("watchdog", 124), (124, 124), (137, 137), (143, 143), (-15, -15)):
+            with self.subTest(end=end):
+                code, receipt, calls = self.launch({order[0]: CREDIT_400}, ends={order[0]: end})
+                self.assertEqual(calls, [order[0]])
+                self.assertEqual((code, receipt["runtime_exit_code"]), (status, status))
+                self.assertEqual(receipt["credential_loader_id"], order[0])
+                self.assertEqual(receipt["credit_refused_slots"], [])
+        # A native refusal that ended on its own still moves on: Pi exits 0, OpenCode 1.
+        for end in (0, 1):
+            with self.subTest(end=end):
+                code, receipt, calls = self.launch({order[0]: CREDIT_400}, ends={order[0]: end})
+                self.assertEqual(calls, [order[0], order[1]])
+
+    def test_any_other_refusal_ends_the_run_on_its_slot(self):
+        order = self.worker().DEFAULT_KEYS
+        for refusal in ('401 {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"}}',
+                        '429 {"type":"error","error":{"type":"rate_limit_error","message":"slow down"}}',
+                        '400 {"type":"error","error":{"type":"invalid_request_error","message":"prompt is too long"}}'):
+            with self.subTest(refusal=refusal[:3]):
+                code, receipt, calls = self.launch({order[0]: refusal})
+                self.assertEqual(calls, [order[0]])
+                self.assertEqual(receipt["credit_refused_slots"], [])
+
+    def test_the_no_token_check_screens_out_only_invalid_or_forbidden_keys(self):
+        order = self.worker().DEFAULT_KEYS
+        rows = {order[0]: {"id": order[0], "state": "stored", "validity": "invalid"},
+                order[1]: {"id": order[1], "state": "missing"},
+                order[2]: {"id": order[2], "state": "stored", "validity": "forbidden"},
+                order[3]: {"id": order[3], "state": "stored", "validity": "rate_limited"}}
+        code, receipt, calls = self.launch({}, rows)
+        self.assertEqual(calls, [order[3]])
+
+    def test_the_order_is_the_review_worker_default_keys(self):
+        # One fill-first order for every Anthropic Console consumer: ns-run follows the review worker's DEFAULT_KEYS.
+        self.assertEqual(profiles.fill_first_order(), tuple(self.worker().DEFAULT_KEYS))
+
+    def test_first_call_refusal_reads_pi_and_opencode_events(self):
+        with tempfile.TemporaryDirectory() as directory:
+            log = Path(directory) / "events.jsonl"
+            with log.open("w") as handle:
+                pi_events(handle, error=CREDIT_400)
+            self.assertTrue(profiles.credit_refused(log, "pi"))
+            with log.open("w") as handle:
+                pi_events(handle, tokens=5)
+            self.assertFalse(profiles.credit_refused(log, "pi"))
+            for error, expected in (({"name": "APIError", "data": {"statusCode": 402, "message": "billing"}}, True),
+                                    ({"message": CREDIT_400[4:]}, True),
+                                    ({"name": "APIError", "data": {"statusCode": 401, "message": "invalid x-api-key"}}, False)):
+                with self.subTest(error=str(error)[:40]):
+                    log.write_text(json.dumps({"type": "error", "error": error}) + "\n")
+                    self.assertEqual(profiles.credit_refused(log, "opencode"), expected)
+            log.write_text(json.dumps({"type": "step_finish", "part": {"tokens": {"total": 3}}}) + "\n"
+                           + json.dumps({"type": "error", "error": {"data": {"statusCode": 402}}}) + "\n")
+            self.assertFalse(profiles.credit_refused(log, "opencode"))
+
+
 class GatewayPortBindingTests(unittest.TestCase):
     def test_omniroute_template_matches_new_wsl_gateway_record(self):
         source = ROOT / "adoption/new-wsl/client-config-map.json"
