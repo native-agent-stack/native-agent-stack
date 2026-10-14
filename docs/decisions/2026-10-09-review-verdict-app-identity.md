@@ -104,9 +104,10 @@ reports it (`GET /apps/seathat-review-checks`, read 2026-10-14 22:52Z, no token)
     token cannot list a user installation (GitHub answers 403 without an App-authorized token), so the App's own
     `GET /app/installations` confirms it once the key is in custody.
 - **Public, not "Only on this account":** the repositories now span the organization and the owner's account, and
-  GitHub installs an App on an account other than its owner's only when the App is public. That deviates from Owner
-  step 1. Anyone can now install the App on their own repositories, which gives it no access to ours. The landing
-  predicate keys on the App's ID and on check runs posted on our heads, and only our two installations can post those.
+  GitHub installs an App on an account other than its owner's only when the App is public [visibility]. That
+  deviates from Owner step 1. Anyone can now install the App on their own repositories, which gives it no access to
+  ours. The landing predicate keys on the App's ID and on check runs posted on our heads, and only our two
+  installations can post those.
 
 Key custody replaces Owner step 3's manual move, and Decision 4 is otherwise unchanged. The owner downloaded one key on
 2026-10-12. A script hands the downloaded file to `set_credential.py github-review-app --from-stdin` on standard input, so
@@ -147,3 +148,4 @@ Fetched 2026-10-09 between 22:58Z and 23:37Z.
 | installations | <https://docs.github.com/en/rest/apps/installations#revoke-an-installation-access-token> |
 | #42 N3 | us-equities-trading #42, security micro at `57f68472` |
 | jwt | <https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/generating-a-json-web-token-jwt-for-a-github-app> (read 2026-10-14) |
+| visibility | <https://docs.github.com/en/apps/creating-github-apps/registering-a-github-app/making-a-github-app-public-or-private> (read 2026-10-14: a private App "can only be installed on the account that owns the app") |
