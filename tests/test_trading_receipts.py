@@ -212,6 +212,41 @@ class TradingReceiptTests(unittest.TestCase):
             row = m.ibkr_lane(status, root, m.timestamp("2026-10-13T10:01:00Z"))
             self.assertEqual((11, 1, 2), (row["realized_pnl_usd"], row["open_positions"], row["orders_per_min"]))
 
+    def test_ibkr_current_block_status_supersedes_prior_session_format(self):
+        # Standalone primary producer ibkr_pre_series.py:41-45,287; exact
+        # inspected version is bound by the private status-fix source reference.
+        m = self.module()
+        with tempfile.TemporaryDirectory() as scratch:
+            root = Path(scratch)
+            old, current = root / "ibkr-series-20261013.status", root / "rth-series-20261014.status"
+            old.write_text('2026-10-13T10:00:00Z session k=1 end rc=0 {"elapsed_s":60,"submits":2}\n')
+            current.write_text('2026-10-14T10:00:00Z block 1 paper rc 0 receipt synthetic.json\n')
+            os.utime(old, (100, 100))
+            os.utime(current, (200, 200))
+            expected = m.timestamp("2026-10-14T10:00:00Z")
+            now = m.timestamp("2026-10-14T10:01:00Z")
+            # The default selects only exact native status names by mtime;
+            # an explicit single-file override remains authoritative.
+            row = m.ibkr_lane(root, root / "absent", now)
+            self.assertEqual((expected, 4), (row["source_unix"], row["status_code"]))
+            self.assertEqual(-1, row["orders_per_min"])
+            self.assertEqual(m.timestamp("2026-10-13T10:00:00Z"), m.ibkr_lane(old, root / "absent", now)["source_unix"])
+            current.write_text(old.read_text() + current.read_text())
+            self.assertEqual(expected, m.ibkr_lane(current, root / "absent", now)["source_unix"])
+            current.write_text('2026-10-14T10:00:00Z block 1 r3 paper rc 1 receipt None: suppressed\n')
+            self.assertEqual((expected, 3), tuple(m.ibkr_lane(current, root / "absent", now)[k]
+                                                for k in ("source_unix", "status_code")))
+            selected = root / "pre-series-20261014.status"
+            selected.write_text('2026-10-14T09:00:00Z block 2 r3 paper rc 0 receipt synthetic.json: suppressed\n')
+            for name in ("pre-series-mm-20261014.status", "pre-series-test.status", "pre-series-s-dry.status"):
+                (root / name).write_text(current.read_text())
+                os.utime(root / name, (1000, 1000))
+            (root / "nested").mkdir()
+            (root / "nested/rth-series-20261014.status").write_text(current.read_text())
+            os.utime(current, (200, 200))
+            os.utime(selected, (300, 300))
+            self.assertEqual(m.timestamp("2026-10-14T09:00:00Z"), m.ibkr_lane(root, root / "absent", now)["source_unix"])
+
 
 if __name__ == "__main__":
     unittest.main()

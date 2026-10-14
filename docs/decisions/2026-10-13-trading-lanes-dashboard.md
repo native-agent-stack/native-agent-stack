@@ -236,6 +236,24 @@ reproduction bodies, producer bytes or digests are added to public evidence.
 Follow-ups concerning liveness, freshness/recovery, native witnesses, query
 cost and IBKR explanatory text remain deferred to their cued work.
 
+## Current series status correction (2026-10-14)
+
+The CC released one status-only correction after the completed read wave.
+The IBKR adapter accepts the current block completion format as well as its
+retained session format. Its default discovers only top-level filenames
+matching `(ibkr|rth|pre)-series-` plus eight digits and `.status`, and selects
+the newest mtime (filename breaks ties);
+an explicit --ibkr-status file remains a single-file override. Block receipt
+diagnostics are never exported, and missing metrics remain unavailable.
+No exported field or other pending review disposition changes in this round.
+The mixed-format synthetic regression fails on71ac2733 and passes after.
+
+Primary source: standalone ibkr_pre_series.py:287, the existing producer's
+block completion writer; retained privately by version-bound metadata in
+the status-fix packet. No source body or diagnostic was copied. Earlier
+session grammar remains bound by the producer references above. Native
+file transport still follows Collector0.162.0 filelog/transform references.
+
 ## Per-lane receipt freshness correction
 
 The CC04:21Z measurement reproduced a false Stale receipt alarm: C's

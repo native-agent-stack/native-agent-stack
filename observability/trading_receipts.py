@@ -199,6 +199,11 @@ def ibkr_observation(summary, session_time, now):
 
 
 def ibkr_lane(status_path, receipts_root, now):
+    if status_path.is_dir():
+        candidates = [path for path in status_path.iterdir() if path.is_file()
+                      and re.fullmatch(r'(ibkr|rth|pre)-series-\d{8}\.status', path.name)]
+        selected = max(candidates, key=lambda path: (path.stat().st_mtime_ns, path.name), default=None)
+        return ibkr_lane(selected, receipts_root, now) if selected else empty('IBKR', now, 4)
     row = empty("IBKR", now, 4)
     started = -1
     selected_receipt = None
@@ -210,6 +215,15 @@ def ibkr_lane(status_path, receipts_root, now):
                 if start_match:
                     started = max(started, timestamp(start_match[1]))
                 match = re.match(r'^(\S+) session k=\d+ end rc=(-?\d+) (.*)\s*$', line)
+                block = re.match(r'^(\S+) block (\d+)(?: (\S+))? paper rc (-?\d+) receipt (\S+?)(?::|$)', line)
+                if block:
+                    ended = timestamp(block[1])
+                    if 0 <= ended <= now:
+                        selected_receipt = None
+                        row = empty("IBKR", now, 3 if int(block[4]) != 0 else 4)
+                        row["source_unix"] = ended
+                        row["ended_by_code"] = 5 if int(block[4]) != 0 else 0
+                    continue
                 if match:
                     ended = timestamp(match[1])
                     if ended < 0 or ended > now:
@@ -285,7 +299,7 @@ def main():
     parser.add_argument('--spool', type=Path, required=True)
     parser.add_argument('--home', type=Path, default=Path.home())
     parser.add_argument('--runs-root', type=Path, default=Path('/var/tmp/cc-overnight-mcp'))
-    parser.add_argument('--ibkr-status', type=Path, default=Path('/var/tmp/trading-cc-wt/ibkr-lane-build/ibkr-series-20261013.status'))
+    parser.add_argument('--ibkr-status', type=Path, default=Path('/var/tmp/trading-cc-wt/ibkr-lane-build'))
     args = parser.parse_args()
     try:
         rows = collect(args.home, args.runs_root, args.ibkr_status,
