@@ -296,8 +296,8 @@ def pi_models(route: str, *, role_scope=None) -> dict:
     # packages/ai/src/api/simple-options.ts:46 forwards the model ceiling;
     # anthropic-messages.ts:1162 and openai-responses.ts:340-341 send it.
     # Claude Opus5.5 vendor overview max output128K; OmniRoute /v1/models
-    # cx/gpt-6.1-sol max_output_tokens128000. Use a bounded32K builder budget.
-    max_tokens = 32768 if role_scope == "builder" else 8192
+    # cx/gpt-6.1-sol max_output_tokens128000. Use a bounded32K builder/researcher budget.
+    max_tokens = 32768 if role_scope in ("builder", "researcher") else 8192
     if route == "claude":
         return {"providers": {"anthropic": {
             "headers": {"x-client-request-id": "${NS_RUNTIME_REQUEST_ID}"},

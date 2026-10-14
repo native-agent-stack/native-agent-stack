@@ -26,15 +26,16 @@ class PiBuilderOutputTests(unittest.TestCase):
                 self.assertEqual(budget(model, route), 32768)
                 self.assertLessEqual(budget(model, route), maximum)
 
-    def test_other_roles_and_interactive_model_metadata_keep_existing_budget(self):
+    def test_reviewer_auditor_and_unscoped_metadata_keep_existing_budget(self):
         for route in ('claude', 'gpt'):
-            for scope in (None, 'reviewer', 'auditor', 'researcher'):
+            for scope in (None, 'reviewer', 'auditor'):
                 with self.subTest(route=route, role=scope):
                     self.assertEqual(budget(profiles.pi_models(route, role_scope=scope), route), 8192)
 
-    def test_generated_native_models_file_changes_only_for_builder_scope(self):
+    def test_generated_native_models_file_raises_builder_and_researcher_only(self):
         for route in ('claude', 'gpt'):
-            for scope, expected in [('builder', 32768), ('reviewer', 8192), (None, 8192)]:
+            for scope, expected in [('builder', 32768), ('researcher', 32768),
+                                    ('reviewer', 8192), ('auditor', 8192), (None, 8192)]:
                 with self.subTest(route=route, scope=scope), tempfile.TemporaryDirectory(dir='/var/tmp') as td:
                     state = Path(td)
                     with mock.patch.object(profiles, 'verify_runtime_binary', return_value='1.1.0'), \
