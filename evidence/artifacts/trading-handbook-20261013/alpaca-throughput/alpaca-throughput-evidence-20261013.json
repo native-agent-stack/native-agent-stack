@@ -1,0 +1,560 @@
+{
+  "capacity_run": {
+    "acceptance_as_recorded": {
+      "capacity_criteria_met": true,
+      "cleanup_verified_zero_open": true,
+      "independent_observation_required": true,
+      "no_unexpected_fills": true,
+      "passed": true,
+      "passed_is_self_reported": true,
+      "reconciliation_clean": true
+    },
+    "account": "lane A paper account (mapping private)",
+    "counts": {
+      "cancel_requests": 496,
+      "health_freezes": 0,
+      "http_429_total": 0,
+      "http_status_counts": {
+        "data:data_read:200": 1,
+        "trading:cancel:204": 496,
+        "trading:read:200": 9,
+        "trading:submit:200": 496
+      },
+      "port_errors": 0,
+      "rest_rejections_by_code": {},
+      "stderr_stream_restart_notices": 1,
+      "stream_completeness": 1.0,
+      "stream_events": 1488,
+      "stream_malformed_events": 0,
+      "submit_attempts": 496,
+      "submits_accepted_by_rest": 496,
+      "unexpected_fill_qty": "0"
+    },
+    "ended_at_utc": "2026-10-13T09:18:02Z",
+    "harness": {
+      "counts_as_strategy_trades": false,
+      "evidence_class": "native_paper",
+      "id": "order-throughput/1",
+      "receipt_schema_version": 1,
+      "strategy_trades": 0
+    },
+    "journal": {
+      "end_verified_zero_open": true,
+      "intent_fields": [
+        "client_order_id",
+        "extended_hours",
+        "limit_price",
+        "qty",
+        "seq",
+        "type"
+      ],
+      "intent_fields_include_timing": false,
+      "record_counts": {
+        "end": 1,
+        "intent": 496,
+        "start": 1
+      }
+    },
+    "latency_definitions": {
+      "p90": "NOT_RECORDED: neither the receipt nor the journal holds raw per-request samples",
+      "percentile_method": "nearest rank; the receipt records p50, p95, p99 and max only",
+      "submit_rest_ack": "from sending the order request to its HTTP response",
+      "submit_to_stream_ack": "from sending the order request to the order's acknowledgement on the trade-update stream",
+      "submit_to_stream_terminal": "from sending the order request to the order's terminal trade-update event (here: the cancel completing)"
+    },
+    "latency_ms_from_receipt": {
+      "submit_rest_ack": {
+        "count": 496,
+        "max": 157.167,
+        "p50": 20.631,
+        "p95": 24.407,
+        "p99": 32.646
+      },
+      "submit_to_stream_ack": {
+        "count": 496,
+        "max": 149.542,
+        "p50": 32.759,
+        "p95": 38.594,
+        "p99": 62.904
+      },
+      "submit_to_stream_terminal": {
+        "count": 496,
+        "max": 2034.778,
+        "p50": 368.158,
+        "p95": 388.31,
+        "p99": 2031.212
+      }
+    },
+    "limits": {
+      "action_definition": "ceil(target_actions_ratio * effective_limit); each broker-accepted submit and each acknowledged (2xx) cancel is one completed order action",
+      "budget_per_minute": 180,
+      "configured_cap_per_minute": 200,
+      "effective_limit": 200,
+      "headroom": 0.9,
+      "observed_limit_header": 200,
+      "required_consecutive_full_windows": 5,
+      "reserve_per_minute": 20,
+      "target_actions_ratio": 0.85,
+      "target_order_actions_per_full_window": 170,
+      "window_seconds": 60
+    },
+    "rate_limit_headers_seen_during_run": {
+      "counts_by_origin_and_limit": {
+        "data:10000": 1,
+        "trading:1000": 1,
+        "trading:200": 1000
+      },
+      "min_remaining_by_origin": {
+        "data": 9999,
+        "trading": 194
+      },
+      "write_path_reading": {
+        "all_submit_and_cancel_responses_reported_200": true,
+        "observations_with_limit_200": 1000,
+        "other_trading_reads": 8,
+        "reasoning": "by counting: every trading response carried the header (observations equal responses); the single 1000-valued observation matches the one the preflight recorded, so the 200-valued observations number submits + cancels + the other reads",
+        "submit_and_cancel_responses": 992,
+        "trading_header_observations": 1001,
+        "trading_responses": 1001
+      }
+    },
+    "reconciliation": {
+      "broker_orders_with_prefix": 496,
+      "cancel_all_used": false,
+      "cleanup_seconds": 0.748,
+      "filled_probes": 0,
+      "local_probes": 496,
+      "non_terminal_at_end": 0,
+      "open_orders_after_cleanup": 0,
+      "position_unchanged": true
+    },
+    "run_label": "a2",
+    "session_class": "PRE",
+    "session_class_meaning": "pre-market (extended hours), US equities",
+    "started_at_utc": "2026-10-13T09:12:30Z",
+    "status": "completed",
+    "stop_reason": "duration_reached",
+    "stop_reason_meaning": "the run ended on its configured duration limit, not on an error or a rate-limit response",
+    "throughput": {
+      "best_consecutive_full_windows_at_target": 5,
+      "cleanup_individual_cancels": 1,
+      "full_windows": 5,
+      "max_order_actions_full_window": 180,
+      "min_order_actions_full_window": 180,
+      "min_submits_full_window": 90,
+      "order_actions_in_phase": 991,
+      "order_actions_per_minute_mean": 180.181,
+      "submission_phase_seconds": 330.002,
+      "windows": [
+        {
+          "cancels": 88,
+          "full": true,
+          "index": 0,
+          "order_actions": 180,
+          "reads": 0,
+          "submits": 92
+        },
+        {
+          "cancels": 90,
+          "full": true,
+          "index": 1,
+          "order_actions": 180,
+          "reads": 0,
+          "submits": 90
+        },
+        {
+          "cancels": 90,
+          "full": true,
+          "index": 2,
+          "order_actions": 180,
+          "reads": 0,
+          "submits": 90
+        },
+        {
+          "cancels": 90,
+          "full": true,
+          "index": 3,
+          "order_actions": 180,
+          "reads": 0,
+          "submits": 90
+        },
+        {
+          "cancels": 90,
+          "full": true,
+          "index": 4,
+          "order_actions": 180,
+          "reads": 0,
+          "submits": 90
+        },
+        {
+          "cancels": 48,
+          "full": false,
+          "index": 5,
+          "order_actions": 92,
+          "reads": 4,
+          "submits": 44
+        }
+      ],
+      "windows_note": "the windows count every recorded action after the phase start, including the cancel the receipt records in cleanup, so they sum to windows_total_minus_in_phase more actions than order_actions_in_phase",
+      "windows_total_minus_in_phase": 1,
+      "windows_total_order_actions": 992
+    },
+    "workload": {
+      "cancel": "individual DELETE /v2/orders/{order_id}",
+      "data_feed": "sip",
+      "extended_hours": true,
+      "inflight": 4,
+      "instrument": "one liquid US equity ETF (symbol not published)",
+      "limit_band_bps_below_bid": 500,
+      "marketable": false,
+      "max_duration_seconds": 330.0,
+      "max_open_orders": 10,
+      "max_orders": 600,
+      "order_type": "limit",
+      "quantity_shares": 1,
+      "side": "buy",
+      "time_in_force": "day"
+    }
+  },
+  "caveats": [
+    "one account, one session class, one 330-second submission phase (five full one-minute windows)",
+    "the 200 rung is the configured cap; the governor admitted 180 requests per minute (headroom 0.9)",
+    "the receipt's passed flag is self-reported; the independent_observer block is the separate count check",
+    "the trade-update stream logged one reconnect notice with normal closure codes on stderr; the receipt reports stream completeness 1.0 and no health freeze",
+    "the vendor's own statement of the per-account limit is cited by the handbook from the vendor's support page and was not re-read here"
+  ],
+  "derived_units": {
+    "formulas": {
+      "orders_with_cancel_per_minute_in_phase": "in_phase_cancels * 60 / submission_phase_seconds (an order and its cancel are one complete order)",
+      "orders_with_cancel_per_minute_including_setup_and_cleanup": "submits_accepted * 60 / (ended_at - started_at)",
+      "pair_equivalents_per_minute_full_windows": "mean(order_actions over full windows) / 2",
+      "request_budget_per_minute": "floor(min(configured_cap, observed_limit) * headroom)",
+      "submits_per_minute_in_phase": "submits_accepted * 60 / submission_phase_seconds",
+      "target_actions_per_full_window": "ceil(target_actions_ratio * effective_limit)"
+    },
+    "reading": "The run sustained 90 orders per minute, each with its individual cancel, i.e. 180 completed trading requests per minute against a 200-per-minute bucket, for five consecutive full minutes plus a partial sixth, with no HTTP 429. Place-only capacity, the 429 onset and any rate above the 180-per-minute governed budget were not measured.",
+    "values": {
+      "full_window_cancels_mean_per_minute": "89.6",
+      "full_window_submits_mean_per_minute": "90.4",
+      "in_phase_cancels": 495,
+      "order_actions_per_minute_in_phase": "180.180726",
+      "orders_with_cancel_per_minute_in_phase": "89.999455",
+      "orders_with_cancel_per_minute_including_setup_and_cleanup": "89.784430",
+      "pair_equivalents_per_minute_full_windows": "90.000",
+      "request_budget_per_minute_computed": 180,
+      "request_budget_per_minute_in_receipt": 180,
+      "submits_per_minute_in_phase": "90.181272",
+      "wall_seconds_start_to_end_of_run": "331.460587"
+    }
+  },
+  "facts": {
+    "alpaca_py_version": "0.44.0",
+    "capacity_py_sha256": {
+      "a1": "91563bd337a50416584cc12e95eebbcc1b19cfdf34a428cdce71b2470b274f69",
+      "a2": "024797332ff367b76560c5c4495750d32b08143d5d4d824839eee333d3643567"
+    },
+    "harness_revision_a1": "dbe7a8da1bb497570471e2b9d0dcfe56bbdc56e9",
+    "harness_revision_a2": "d6056831b4e7324436f0ace2517066f708f86bf5",
+    "python_version": "3.12.3",
+    "source_files_hashed_in_receipt": [
+      "adaptive-paper/runner.py",
+      "adaptive-paper/safety.py",
+      "adaptive-paper/sessions.py",
+      "adaptive-paper/transport.py",
+      "order-throughput/alpaca_capacity_port.py",
+      "order-throughput/capacity.py",
+      "order-throughput/capacity_fixture.py",
+      "order-throughput/rate_governor.py"
+    ]
+  },
+  "headline": {
+    "governed_budget_requests_per_minute": 180,
+    "http_429_total": 0,
+    "limit_reported_on_submit_and_cancel_responses_during_run": 200,
+    "p90_latency": "NOT_RECORDED",
+    "place_only_capacity": "NOT_MEASURED",
+    "sustained_orders_with_cancel_per_minute": "90.000",
+    "sustained_seconds": 330.002,
+    "x_ratelimit_limit_account_order_position_reads": 200,
+    "x_ratelimit_limit_clock_read": 1000
+  },
+  "how_to_verify": "python3 verify_alpaca_throughput_evidence.py --evidence <this file> --capacity-dir <dir> --header-receipts-dir <dir> --observer-receipt <file>",
+  "independent_observer": {
+    "actions_total": 992,
+    "cancels_recorded": 496,
+    "filled_qty_total": 0.0,
+    "full_windows": 5,
+    "http_statuses": [
+      200
+    ],
+    "kind": "order_count_observer_receipt",
+    "limitation": "uses the same vendor API as the harness; it checks counts and order outcomes, it does not certify latency percentiles",
+    "matches": {
+      "all_prefix_orders_terminal": true,
+      "cancels_equal_receipt": true,
+      "no_fills": true,
+      "no_foreign_orders_in_window": true,
+      "one_order_form": true,
+      "submits_equal_receipt": true
+    },
+    "max_actions_full_window": 181,
+    "method": "one read-only request listing the account's orders (all statuses) for the run's time window plus or minus two minutes, made after the run; only counts, a status histogram and per-minute window counts were kept",
+    "min_actions_full_window": 180,
+    "min_submits_full_window": 90,
+    "observed_at_utc": "2026-10-13T09:21:51Z",
+    "orders_listed_in_window": 496,
+    "orders_with_prefix": 496,
+    "orders_without_prefix": 0,
+    "span_seconds": 330.005,
+    "status_counts": {
+      "canceled": 496
+    },
+    "submits": 496,
+    "window_difference_note": "the observer aligns its one-minute windows to the first order's broker submit time and the harness to its own phase start, so single cancels near a boundary fall in different windows (observer 181/180/180/180/180 against harness 180 in every full window); totals are identical (496 submits, 496 cancels); both are retained",
+    "windows": [
+      {
+        "actions": 181,
+        "cancels": 89,
+        "full": true,
+        "index": 0,
+        "submits": 92
+      },
+      {
+        "actions": 180,
+        "cancels": 90,
+        "full": true,
+        "index": 1,
+        "submits": 90
+      },
+      {
+        "actions": 180,
+        "cancels": 90,
+        "full": true,
+        "index": 2,
+        "submits": 90
+      },
+      {
+        "actions": 180,
+        "cancels": 90,
+        "full": true,
+        "index": 3,
+        "submits": 90
+      },
+      {
+        "actions": 180,
+        "cancels": 90,
+        "full": true,
+        "index": 4,
+        "submits": 90
+      },
+      {
+        "actions": 91,
+        "cancels": 47,
+        "full": false,
+        "index": 5,
+        "submits": 44
+      }
+    ]
+  },
+  "kind": "sanitized_projection_of_private_receipts",
+  "measured_date_utc": "2026-10-13",
+  "not_measured": [
+    "place-only (no cancel) order capacity: the harness cancels every probe individually",
+    "the HTTP 429 onset or behaviour above the 180-requests-per-minute governed budget; the headers reported 200",
+    "simultaneous order-write throughput on several accounts",
+    "whether the bucket is shared across several API connections or keys of one account (vendor-documented per account, not measured here)",
+    "latency p90, or any raw per-request latency sample",
+    "regular-session (RTH) behaviour: the run was pre-market with extended-hours orders"
+  ],
+  "privacy_statement": "Account labels are lane labels whose mapping to real accounts is private. No account identifier, credential, client order id, price, symbol or file-system path appears here. Each number is a receipt field or arithmetic on receipt fields.",
+  "provenance": {
+    "digest_policy": "Private receipts are cited by name only. Their bytes, sizes and digests are not published. The remaining facts bindings identify retained published code; public integrity is the native registration of this sanitized projection.",
+    "number_to_receipt_field": {
+      "a1_refusal": "a1: status, stage, refusal_reason, config.base_url, http_status_counts",
+      "derived_units": "computed in this projection from the fields above by the formulas in derived_units.formulas",
+      "five_full_windows_of_180_actions": "a2: throughput.windows[0..4].order_actions and throughput.full_windows",
+      "header_observations_1000_at_200_1_at_1000": "a2: observed_rate_limit_headers.counts_by_origin_and_limit and preflight.trading_limit_headers_seen",
+      "http_429_total_0": "a2: http_429.total",
+      "journal_not_timing": "a2 journal: record types and the intent field set",
+      "latency_p50_p95_p99_max": "a2: latency.submit_rest_ack / submit_to_stream_ack / submit_to_stream_terminal",
+      "limit_1000_on_clock_read": "header receipts v1 and v2: the /v2/clock row",
+      "limit_200_on_account_order_position_reads": "header receipts v2: limit_and_remaining_in_request_order (path, limit, remaining) x 3 accounts",
+      "min_remaining_194": "a2: observed_rate_limit_headers.min_remaining_by_origin.trading",
+      "observer_496_listed_496_canceled_0_filled": "observer receipt: summary.orders_listed_in_window, status_counts, filled_qty_total",
+      "order_actions_in_phase_991_and_mean_180_181": "a2: throughput.order_actions_in_phase, throughput.order_actions_per_minute_mean",
+      "remaining_199_198_197_196": "header receipts v2: remaining of the account, orders, positions, account rows",
+      "submission_phase_seconds_330_002": "a2: throughput.submission_phase_seconds",
+      "submits_496_cancels_496": "a2: orders.rest_accepted, orders.cancel_requests, http_status_counts[trading:submit:200, trading:cancel:204]"
+    },
+    "private_receipts": [
+      {
+        "name": "capacity-200-pre-a2.json"
+      },
+      {
+        "name": "capacity-200-pre-a2.journal.jsonl"
+      },
+      {
+        "name": "capacity-200-pre-a1.json"
+      },
+      {
+        "name": "order-count observer receipt (a2)"
+      },
+      {
+        "name": "header receipt v1 account_c"
+      },
+      {
+        "name": "header receipt v1 lane_a"
+      },
+      {
+        "name": "header receipt v1 lane_b"
+      },
+      {
+        "name": "header receipt v2 account_c"
+      },
+      {
+        "name": "header receipt v2 lane_a"
+      },
+      {
+        "name": "header receipt v2 lane_b"
+      }
+    ]
+  },
+  "rate_limit_headers": {
+    "accounts": {
+      "account_c": [
+        {
+          "endpoint": "/v2/clock",
+          "limit": 1000,
+          "remaining": 999
+        },
+        {
+          "endpoint": "/v2/account",
+          "limit": 200,
+          "remaining": 199
+        },
+        {
+          "endpoint": "/v2/orders?status=open&limit=1",
+          "limit": 200,
+          "remaining": 198
+        },
+        {
+          "endpoint": "/v2/positions",
+          "limit": 200,
+          "remaining": 197
+        },
+        {
+          "endpoint": "/v2/account",
+          "limit": 200,
+          "remaining": 196
+        }
+      ],
+      "lane_a": [
+        {
+          "endpoint": "/v2/clock",
+          "limit": 1000,
+          "remaining": 999
+        },
+        {
+          "endpoint": "/v2/account",
+          "limit": 200,
+          "remaining": 199
+        },
+        {
+          "endpoint": "/v2/orders?status=open&limit=1",
+          "limit": 200,
+          "remaining": 198
+        },
+        {
+          "endpoint": "/v2/positions",
+          "limit": 200,
+          "remaining": 197
+        },
+        {
+          "endpoint": "/v2/account",
+          "limit": 200,
+          "remaining": 196
+        }
+      ],
+      "lane_b": [
+        {
+          "endpoint": "/v2/clock",
+          "limit": 1000,
+          "remaining": 999
+        },
+        {
+          "endpoint": "/v2/account",
+          "limit": 200,
+          "remaining": 199
+        },
+        {
+          "endpoint": "/v2/orders?status=open&limit=1",
+          "limit": 200,
+          "remaining": 198
+        },
+        {
+          "endpoint": "/v2/positions",
+          "limit": 200,
+          "remaining": 197
+        },
+        {
+          "endpoint": "/v2/account",
+          "limit": 200,
+          "remaining": 196
+        }
+      ]
+    },
+    "method": "Read-only GET requests to the paper trading host, one account per run; only status, timing and five response headers (x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset, retry-after, date) were kept; no response body, key or identifier was retained.",
+    "probe_versions": {
+      "v1_requests": [
+        "/v2/clock",
+        "/v2/account"
+      ],
+      "v2_requests": [
+        "/v2/clock",
+        "/v2/account",
+        "/v2/orders?status=open&limit=1",
+        "/v2/positions",
+        "/v2/account"
+      ]
+    },
+    "read_window_utc": {
+      "first_request_started": "2026-10-13T06:40:18Z",
+      "last_request_finished": "2026-10-13T06:41:37Z"
+    },
+    "summary": {
+      "bucket_sharing_reading": "remaining fell by exactly one per request across account, order-list and position reads, so those endpoints draw on one bucket; /v2/clock reports its own, larger limit",
+      "limit_on_account_order_position_reads": [
+        200
+      ],
+      "limit_on_clock_read": [
+        1000
+      ],
+      "remaining_in_request_order_on_the_shared_bucket": [
+        199,
+        198,
+        197,
+        196
+      ],
+      "same_on_all_three_accounts": true,
+      "v1_receipts_agree_with_v2": true
+    }
+  },
+  "schema": "alpaca-throughput-evidence/2",
+  "superseded_attempt": {
+    "a2_base_url_spelling": "https://paper-api.alpaca.markets",
+    "base_url_spelling": "https://paper-api.alpaca.markets/v2",
+    "capacity_criteria_met": false,
+    "config_differs_from_a2_only_in_base_url": true,
+    "exit_code": 2,
+    "http_requests_sent": 0,
+    "orders_submitted": 0,
+    "refusal_reason": "non_paper_base_url",
+    "relation_to_a2": "a1 was refused at the configuration stage, before any request, because its base URL carried a path suffix; a2 ran the same configuration with the bare paper host, at a later harness revision (capacity.py differs between the two revisions)",
+    "run_label": "a1",
+    "stage": "config",
+    "started_at_utc": "2026-10-13T08:03:21Z",
+    "status": "refused"
+  },
+  "units": "an order is one accepted submit; an order with its individual cancel is two completed trading requests; the vendor bucket counts requests, so 200 requests per minute is at most 100 orders each with a cancel",
+  "venue": "Alpaca paper trading API (paper host)"
+}

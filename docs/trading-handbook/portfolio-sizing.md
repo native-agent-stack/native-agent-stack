@@ -54,20 +54,23 @@ default.
 The ledger checks quantity and order notional independently, requires whole
 shares for entries, limits unresolved orders and exposed symbols, and refuses
 new risk when held-position marks are stale. Its default aggregate check caps
-new exposure by the lesser of the effective gross cap and marked allocated
-equity. A validated leverage path adds its own envelope; changing a model's
+total exposure after the order, including held and pending gross, by the lesser
+of the effective gross cap and marked allocated equity. A validated leverage
+path adds its own envelope; changing a model's
 proposal cannot bypass these checks.
 [Ledger reserve checks](https://github.com/seathatflowsinourveins/native-agent-stack/blob/993cc890b3ff3fc95fa7cdba51edd726565f9ace/blueprints/us-equities/adaptive-paper/safety.py#L993-L1027).
+[Final aggregate check](https://github.com/native-agent-stack/native-agent-stack/blob/993cc890b3ff3fc95fa7cdba51edd726565f9ace/blueprints/us-equities/adaptive-paper/safety.py#L1074-L1084).
 
 Reservation and transmission are separate steps. The documented ledger
 interface requires revalidation after waits and immediately before submission;
-a duplicate intent does not authorize a second order. Quantity, price, quote
-freshness, session and cleanup bounds still apply to risk-reducing exits,
+a duplicate intent does not authorize a second order. Quantity, order notional,
+price, quote freshness, session and cleanup bounds still apply to risk-reducing exits,
 and a finite limit-order mechanism cannot guarantee a flat finish.
 [Reservation/revalidation contract](https://github.com/seathatflowsinourveins/native-agent-stack/blob/993cc890b3ff3fc95fa7cdba51edd726565f9ace/blueprints/us-equities/adaptive-paper/README-safety.md#L17-L56).
 
 Loss and drawdown halts block new entries; owned-position exits remain
-permitted subject to the quantity, price, quote, session and cleanup checks.
+permitted subject to the quantity, order notional, price, quote, session and cleanup checks.
+[Order size and notional check, both sides](https://github.com/native-agent-stack/native-agent-stack/blob/993cc890b3ff3fc95fa7cdba51edd726565f9ace/blueprints/us-equities/adaptive-paper/safety.py#L993-L996),
 [Reservation entry/exit split](https://github.com/seathatflowsinourveins/native-agent-stack/blob/993cc890b3ff3fc95fa7cdba51edd726565f9ace/blueprints/us-equities/adaptive-paper/safety.py#L1003-L1034),
 [final-validation entry/exit split](https://github.com/seathatflowsinourveins/native-agent-stack/blob/993cc890b3ff3fc95fa7cdba51edd726565f9ace/blueprints/us-equities/adaptive-paper/safety.py#L1065-L1092).
 
@@ -81,11 +84,11 @@ leverage range was exercised. Do not turn those historical gate thresholds
 into sizing advice.
 [Ceiling and achieved-exposure distinction](https://github.com/seathatflowsinourveins/native-agent-stack/blob/993cc890b3ff3fc95fa7cdba51edd726565f9ace/blueprints/us-equities/adaptive-paper/README-safety.md#L384-L415).
 
-Lumibot is a comparator path, not a change to the selected Nautilus engine.
+Lumibot is a second-engine candidate; Nautilus remains the selected engine.
 The public catalog snapshot reviewed Lumibot **4.6.11**, source
 `862504052407df2586122b752a645f88ce87afa1`, as conditional source review and
 kept historical simulation, fill semantics, recovery and broker acceptance as
 separate work. That snapshot supplies no accepted sizing or portfolio-parity
 result. Any subsequent accepted comparison must be cited with its own retained
 record and scope before claiming more.
-[Dated comparator scope](https://github.com/seathatflowsinourveins/native-agent-stack/blob/993cc890b3ff3fc95fa7cdba51edd726565f9ace/catalogs/us-equities/engines-strategies.json#L241-L259).
+[Dated candidate scope](https://github.com/seathatflowsinourveins/native-agent-stack/blob/993cc890b3ff3fc95fa7cdba51edd726565f9ace/catalogs/us-equities/engines-strategies.json#L241-L259).

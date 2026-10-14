@@ -19657,9 +19657,14 @@
       "bytes": 113512
     },
     {
+      "path": "docs/trading-handbook/alpaca-rate-limits.md",
+      "sha256": "a8d4a95f933fe9fdf2e17ffa996d1e5b248b3b4986aa3d3d566851d4df707d17",
+      "bytes": 5950
+    },
+    {
       "path": "docs/trading-handbook/boats-overnight-facts.md",
-      "sha256": "dec8c460d7ea417174ffef5e1175417f5f651c37db571bd1ef385521be463b9b",
-      "bytes": 6646
+      "sha256": "1e78ce7f8faa52a63799e92a4be3ee21fae21f0ef6ba59f2f4a8ce99168e236c",
+      "bytes": 7958
     },
     {
       "path": "docs/trading-handbook/ibkr-pacing.md",
@@ -19673,8 +19678,13 @@
     },
     {
       "path": "docs/trading-handbook/portfolio-sizing.md",
-      "sha256": "2b211c78251b7a71179fa08e9ebcc62a00c57c2958712e7d5e8f6414cc68d7ea",
-      "bytes": 7063
+      "sha256": "789b7580c31c1152cd0862f01ff59efbb62e2fe20ec05fbb5566ad79de61c3f9",
+      "bytes": 7543
+    },
+    {
+      "path": "docs/trading-handbook/smoke-budget-limits.md",
+      "sha256": "469b80294891a0be762f71513cd7aeb9f73aeff90a9d3271c11d887aa0ae3a07",
+      "bytes": 3307
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -36925,6 +36935,11 @@
       "path": "evidence/artifacts/gpt6-family-tiering-20260927/run-record.json",
       "sha256": "8dc946bd48daa06e417452b3b8a8b8afd5d7bd846b33c144d7fbaa452b691b3d",
       "bytes": 15311
+    },
+    {
+      "path": "evidence/artifacts/handbook-budget-throughput-20261013/alpaca-support-excerpt.json",
+      "sha256": "f0a59905ee9f2325d74369164d5b1bf53ba9b9464a24d0910fc57a3b1d350595",
+      "bytes": 672
     },
     {
       "path": "evidence/artifacts/harbor-0240-currency-20261009/receipt.json",
@@ -57817,6 +57832,36 @@
       "bytes": 30252
     },
     {
+      "path": "evidence/artifacts/trading-handbook-20261013/agent-lane-calculator-policy-spec-v1-20261013.md",
+      "sha256": "d00cde3a89a7ad939ee0e9b5488a10c9605746416513462253ea84da597393f5",
+      "bytes": 4559
+    },
+    {
+      "path": "evidence/artifacts/trading-handbook-20261013/alpaca-throughput/README.md",
+      "sha256": "813d59d45e9f70e1d7232d17218e445d18acb6e946f9d17da81fb6d6ecef018e",
+      "bytes": 7908
+    },
+    {
+      "path": "evidence/artifacts/trading-handbook-20261013/alpaca-throughput/alpaca-throughput-evidence-20261013.json",
+      "sha256": "321f294f127e212d9c45f90fc0bb0246305c8bf6643556aa6ee43779ab4a3092",
+      "bytes": 20614
+    },
+    {
+      "path": "evidence/artifacts/trading-handbook-20261013/alpaca-throughput/audit_publication_safety.py",
+      "sha256": "11faefdfa5036c95b6b2aa2368e13d66ce23ab46e0ea2da72a54e7d7a8bc5d20",
+      "bytes": 6525
+    },
+    {
+      "path": "evidence/artifacts/trading-handbook-20261013/alpaca-throughput/generate_alpaca_throughput_evidence.py",
+      "sha256": "faf6bcb6bfa6dc3b1b51e642f1e76291702956800fcf55f344fdc6ccfb1698f2",
+      "bytes": 31394
+    },
+    {
+      "path": "evidence/artifacts/trading-handbook-20261013/alpaca-throughput/verify_alpaca_throughput_evidence.py",
+      "sha256": "f32cf09ea87740b810a7171763286386ffe99c759b34958aa0af7bcc18a74e06",
+      "bytes": 17344
+    },
+    {
       "path": "evidence/artifacts/trading-runtime-2604-20261004/build-constraint-proof.json",
       "sha256": "a4a6254da40ac934dcb78592c693cca7c92d399b46ffa2cd19dc218ecf604ce9",
       "bytes": 34164
@@ -62062,6 +62107,11 @@
       "bytes": 61240
     },
     {
+      "path": "tests/fixtures/adaptive_paper_citations/245-trading-20261013-source.json",
+      "sha256": "a589fd402870248ffabf905c2b69462f03517470c18eb92da0b6731761f18fc6",
+      "bytes": 1142
+    },
+    {
       "path": "tests/fixtures/adaptive_paper_citations/asset-attributes.json",
       "sha256": "89b5ac4e7cb4c9d040f80159bbe689c2ac98777cfafdacde57aa7f477a41784d",
       "bytes": 1741
@@ -62070,6 +62120,11 @@
       "path": "tests/fixtures/adaptive_paper_citations/sources.json",
       "sha256": "42cc9d1097731c1e05b80d709d5553da5767771f0738bd22bfd8e0f168314e8a",
       "bytes": 2168
+    },
+    {
+      "path": "tests/fixtures/adaptive_paper_citations/us_docs_245-trading_20261013.md",
+      "sha256": "81680a1a283dfcf4cf32d9222059c73dd033dff7ee75dab691f8881550961d20",
+      "bytes": 21740
     },
     {
       "path": "tests/fixtures/adaptive_paper_citations/us_docs_historical-stock-data-1.md",
@@ -62580,6 +62635,11 @@
       "path": "tests/test_alpaca_paper.py",
       "sha256": "50051999c4c878dc2c934050fddc0a6b1c36b63c98c627da8637d2a2ac0eadeb",
       "bytes": 22270
+    },
+    {
+      "path": "tests/test_alpaca_throughput_publication.py",
+      "sha256": "caf4a5e9bdc6e95ff9e7f17458de6ab217198b72a580a17d77849ca678a01b46",
+      "bytes": 14757
     },
     {
       "path": "tests/test_anthropic_key_health.py",
@@ -63888,8 +63948,8 @@
     },
     {
       "path": "tests/test_trading_handbook_sizing.py",
-      "sha256": "4e8589283b4515616c7d458e775912e22ddf5272b1546d0a05d1849a72afbc03",
-      "bytes": 2930
+      "sha256": "166268503304fed3ec7238c3482d38fd421585b9b5e7b63d624408427b422985",
+      "bytes": 5991
     },
     {
       "path": "tests/test_tvly_keyring.py",
