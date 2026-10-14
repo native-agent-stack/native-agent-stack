@@ -196,6 +196,9 @@ def recut(source, output, source_commit, *, predecessor_sha256=None):
     inventory = (source / "SHA256SUMS").read_bytes()
     if sha(inventory) != predecessor_sha256:
         raise ValueError("seq2_bundle_pin_mismatch")
+    inventoried = {line.split("  ", 1)[1] for line in inventory.decode().splitlines()}
+    if not set(REPLAY_SOURCES) <= inventoried:
+        raise ValueError("predecessor_replay_source_not_in_manifest")
     check = subprocess.run(["sha256sum", "--check", "--strict", "--quiet", "SHA256SUMS"], cwd=source)
     if check.returncode:
         raise ValueError("seq2_manifest_refused")
@@ -263,8 +266,6 @@ def recut(source, output, source_commit, *, predecessor_sha256=None):
     for name in REPLAY_SOURCES:
         if not (output / name).is_file() or (output / name).is_symlink():
             raise ValueError("replay_source_missing")
-        if name not in names:
-            names.append(name)
     sums = "\n".join(sha((output / n).read_bytes()) + "  " + n for n in sorted(names)) + "\n"
     write(output / "SHA256SUMS", sums.encode())
     bundle_sha = sha(sums.encode())

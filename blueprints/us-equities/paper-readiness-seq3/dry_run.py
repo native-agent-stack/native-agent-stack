@@ -11,12 +11,17 @@ import hashlib
 import importlib
 import io
 import json
+import os
 from pathlib import Path
 import subprocess
 import tempfile
 import types
 import unittest
 from unittest.mock import patch
+
+# The complete retained five-module drill at the reviewed seq2/seq3 boundary
+# executes 49 cases (including inherited cases rediscovered by sequencing).
+MINIMUM_EXPECTED_CASES = 49
 
 
 def run(bundle):
@@ -47,6 +52,10 @@ def run(bundle):
         return Path("/SYN/never-opened-paper.env")
     launch.credential_pointer = fixture_pointer
     attempts = {"keyed": 0, "subprocess": 0, "verification_processes_started": 0}
+    # Both replay-created TemporaryDirectories and manifest_check use this
+    # same canonical root. With TMPDIR unset, keep the host's /var/tmp rule;
+    # never let tempfile's platform /tmp default disagree with the fixture.
+    scratch_root = Path(os.environ.get("TMPDIR") or "/var/tmp").resolve()
     real_run, real_popen = subprocess.run, subprocess.Popen
     def manifest_check(command, kwargs):
         # Retain the launcher's real bundle-tamper check in SYN roots.
@@ -58,7 +67,7 @@ def run(bundle):
         if kwargs.get('shell') or any(k in kwargs for k in ('executable', 'preexec_fn', 'env')):
             return False
         root = Path(kwargs.get('cwd', '/')).resolve()
-        if not root.is_relative_to(Path(tempfile.gettempdir()).resolve()):
+        if not root.is_relative_to(scratch_root):
             return False
         manifest = root / 'SHA256SUMS'
         if manifest.is_symlink() or not manifest.is_file():
@@ -91,7 +100,8 @@ def run(bundle):
     # before executing replay-module imports, and restore on every exit.
     with patch.object(launch, "keyed", blocked_keyed, create=True), \
          patch.object(subprocess, "run", blocked_process), \
-         patch.object(subprocess, "Popen", blocked_popen):
+         patch.object(subprocess, "Popen", blocked_popen), \
+         patch.object(tempfile, "tempdir", str(scratch_root)):
         return replay(bundle, launch, pointer_calls, attempts)
 
 
@@ -143,10 +153,13 @@ def replay(bundle, launch, pointer_calls, attempts):
     log = io.StringIO()
     with contextlib.redirect_stdout(log), contextlib.redirect_stderr(log):
         result = unittest.TextTestRunner(stream=log, verbosity=2).run(suite)
+    count_complete = result.testsRun - len(result.skipped) >= MINIMUM_EXPECTED_CASES
     receipt = {"schema_version": 1, "paper_lane": "B", "evidence_class": "synthetic",
         "deployment_version": "readiness-sequencing-v3-lane-latch",
         "bundle_sha256": hashlib.sha256((bundle / "SHA256SUMS").read_bytes()).hexdigest(),
-        "status": "passed" if result.wasSuccessful() and not (attempts['keyed'] or attempts['subprocess']) else "failed", "cases": result.testsRun,
+        "status": "passed" if result.wasSuccessful() and count_complete and not (attempts['keyed'] or attempts['subprocess']) else "failed", "cases": result.testsRun,
+        "minimum_expected_cases": MINIMUM_EXPECTED_CASES,
+        "reason": "replay_case_count_below_expected" if not count_complete else None,
         "failures": len(result.failures), "errors": len(result.errors), "skips": len(result.skipped),
         "fixture_adaptations": adaptations, "credential_pointer": "real implementation replaced before tests",
         "seq2_retirement": "SYN fixture only; live retirement proof required before installation",

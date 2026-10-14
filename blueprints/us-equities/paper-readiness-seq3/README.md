@@ -83,6 +83,11 @@ After copying, every copied inventory row must match the captured predecessor
 manifest before any rewrite or new SHA256SUMS. Source checks alone cannot bind
 a later read. Derivations use the verified destination copies. The private
 RECUT-RECEIPT retains the predecessor binding; CLI stdout omits that digest.
+All five replay modules MUST already be inventoried by the authenticated
+predecessor. A missing module refuses before copying; the recutter never adds
+unbound replay bytes to a new seal. The original seq2 inventory omitted them,
+so it now refuses. A newly authenticated predecessor inventory is required
+before another operational packet can be prepared; never edit the old seal.
 The strict manifest covers runtime inputs AND all five replay sources;
 the GO-BINDING-REQUEST is a separate hashed envelope because it binds that
 manifest's digest. The record retains predecessor state and config bindings.
@@ -103,6 +108,13 @@ inventory with no absolute, escaping or symlinked file targets. These keyless
 verification processes are counted separately; no service/credential/order
 command is allowed. A first overstrict staged drill blocked these hash checks
 and failed; the evaluator was corrected before the final commit.
+The evaluator requires at least 49 executed, non-skipped cases, the retained
+complete drill's measured baseline; a shorter suite fails its receipt even
+when unittest itself reports success. Emptying an inventoried data replay
+module must not turn a reduced drill into a passing gate. With TMPDIR unset,
+both replay temporary directories and manifest checks use canonical /var/tmp;
+an explicit TMPDIR is honored consistently by both. The P1-exception adds
+three fail-first regressions, bringing the focused suite to 46 tests.
 Normal test-owned SYN stubs still supply fixture recoveries. The full
 drill passed 49 invocations, zero failures/errors/skips; this count includes
 inherited Wiring cases discovered again by the sequencing module. An initial

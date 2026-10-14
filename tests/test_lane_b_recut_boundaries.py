@@ -91,6 +91,19 @@ class RecutBoundaries(unittest.TestCase):
         if output.exists():
             self.assertFalse((output / "RECUT-RECEIPT.json").exists())
 
+    def test_uninventoried_replay_source_is_refused_before_a_new_seal(self):
+        source, _ = sealed_fixture(self.root)
+        inventory = source / "SHA256SUMS"
+        inventory.write_text("\n".join(row for row in inventory.read_text().splitlines()
+            if not row.endswith("  test_data_wiring.py")) + "\n")
+        # The remaining inventory is valid, but this unbound replay was replaced.
+        (source / "test_data_wiring.py").write_text("")
+        pin = hashlib.sha256(inventory.read_bytes()).hexdigest()
+        output = self.root / "SYN-missing-replay-binding"
+        with self.assertRaisesRegex(ValueError, "predecessor_replay_source_not_in_manifest"):
+            self.build(source, pin, output)
+        self.assertFalse((output / "RECUT-RECEIPT.json").exists())
+
     def test_recutter_stdout_omits_the_private_predecessor_digest(self):
         source, pin = sealed_fixture(self.root)
         output = self.root / "SYN-new"
@@ -224,6 +237,11 @@ def dry_fixture(root):
             method = ("test_nonflat_recovery_does_not_clear_stop_or_publish_completed" if name == "test_wiring"
                       else "test_failed_pre_recover_cannot_be_skipped_or_start_sip")
             text += "    def " + method + "(self):\n        # self.assertTrue(self.stop.exists())\n        pass\n"
+        if name == "test_unit_contracts":
+            # The keyless CLI fixture models the real sealed drill's 49-case
+            # minimum (7 fixture cases plus 42 clearly synthetic cases).
+            text += "".join("    def test_SYN_count_fixture_" + str(i) + "(self): self.assertTrue(True)\n"
+                            for i in range(42))
         (bundle / (name + ".py")).write_text(text)
     sums = "\n".join(hashlib.sha256(p.read_bytes()).hexdigest() + "  " + p.name for p in sorted(bundle.iterdir())) + "\n"
     (bundle / "SHA256SUMS").write_text(sums)
@@ -237,10 +255,37 @@ class DryRunBoundaries(unittest.TestCase):
         self.root = Path(self.scratch.name)
         self.bundle = dry_fixture(self.root)
 
-    def command(self, receipt):
+    def command(self, receipt, *, env=None):
         # Deliberately no -B: the public runner must enforce its own isolation.
         return subprocess.run([sys.executable, "-E", "-s", str(SOURCE / "dry_run.py"),
-            "--bundle", str(self.bundle), "--receipt", str(receipt)], capture_output=True, text=True)
+            "--bundle", str(self.bundle), "--receipt", str(receipt)], capture_output=True, text=True, env=env)
+
+    def test_empty_but_inventoried_replay_cannot_pass_with_fewer_cases(self):
+        (self.bundle / "test_data_wiring.py").write_text("")
+        self.add_replay_case("")  # Re-seal the SYN fixture, keeping the empty module inventoried.
+        result = self.command(self.root / "receipt.json")
+        self.assertEqual(result.returncode, 1, result.stderr)
+        receipt = json.loads(result.stdout)
+        self.assertEqual(receipt["cases"], 48)
+        self.assertEqual(receipt["minimum_expected_cases"], 49)
+        self.assertEqual(receipt["reason"], "replay_case_count_below_expected")
+        self.assertEqual(receipt["status"], "failed")
+
+    def test_keyless_scratch_manifest_check_with_TMPDIR_unset(self):
+        self.add_replay_case("""
+    def test_TMPDIR_unset_manifest_probe(self):
+        import launch,subprocess
+        from pathlib import Path
+        result=subprocess.run(['/usr/bin/sha256sum','--strict','--quiet','-c','SHA256SUMS'],
+                              cwd=Path(launch.__file__).parent,capture_output=True,text=True)
+        self.assertEqual(result.returncode,0)
+""")
+        env = {k:v for k,v in os.environ.items() if k not in ("TMPDIR", "TMP", "TEMP")}
+        result = self.command(self.root / "receipt.json", env=env)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        receipt = json.loads(result.stdout)
+        self.assertEqual(receipt["verification_processes_started"], 1)
+        self.assertEqual(receipt["subprocess_tripwire_hits"], 0)
 
     def add_replay_case(self, text):
         target = self.bundle / "test_data_wiring.py"
