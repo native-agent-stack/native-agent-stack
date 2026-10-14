@@ -778,6 +778,68 @@ class ManifestAndLock(unittest.TestCase):
             self.assertEqual(S.load_lock_installed_at(bad), {})
 
 
+class InstalledTimePublication(unittest.TestCase):
+    """Fix round 11 (the GPT read at 8ec8ebc37, its BLOCKER 1): an installation time that the timestamp parser does not accept
+    is never published. The lock reader keeps only parseable values, and the report builder publishes a time only after it
+    has parsed, so file-fed and programmatic callers agree. The marker below is synthetic; the tests count it, never print it."""
+
+    MARKER = "synthetic-marker" + "@" + "example.invalid"
+    VALID = "2026-10-01T00:00:00.000Z"
+    NOW = "2026-10-12T10:00:00+00:00"
+
+    def scratch_home(self, tmp, value):
+        home = Path(tmp) / "home"
+        (home / ".agents").mkdir(parents=True)
+        (home / ".agents" / ".skill-lock.json").write_text(json.dumps({"version": 3, "skills": {"gh-fix-ci": {"installedAt": value}}}))
+        return home
+
+    def run_cli(self, home, route):
+        out = home / "report.out"
+        argv = [sys.executable, "-B", str(ROOT / "tools" / "skill-usage" / "skill_usage.py"), "--home", str(home), "--out", str(out),
+                "--now", self.NOW] + (["--json"] if route == "json" else [])
+        env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1")
+        env.pop("XDG_STATE_HOME", None)
+        done = subprocess.run(argv, cwd=home, env=env, capture_output=True, text=True, timeout=300)
+        return done, out.read_text(encoding="utf-8")
+
+    def test_an_unparseable_installation_time_reaches_no_output_of_the_cli(self):
+        for route in ("json", "text"):
+            with self.subTest(route=route), tempfile.TemporaryDirectory() as tmp:
+                done, written = self.run_cli(self.scratch_home(tmp, self.MARKER), route)
+                self.assertEqual(done.returncode, 0)
+                self.assertEqual([text.count(self.MARKER) for text in (done.stdout, done.stderr, written)], [0, 0, 0])
+                if route == "json":
+                    entry = next(s for s in json.loads(written)["skills"] if s["name"] == "gh-fix-ci")
+                    self.assertEqual((entry["installed_at"], entry["age_days"]), (None, None))
+
+    def test_a_valid_installation_time_keeps_its_value_and_age(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            done, written = self.run_cli(self.scratch_home(tmp, self.VALID), "json")
+            self.assertEqual(done.returncode, 0)
+            entry = next(s for s in json.loads(written)["skills"] if s["name"] == "gh-fix-ci")
+            self.assertEqual(entry["installed_at"], self.VALID)
+            self.assertAlmostEqual(entry["age_days"], 11 + 10 / 24, places=6)
+
+    def test_the_lock_reader_drops_an_unparseable_value(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = self.scratch_home(tmp, self.MARKER)
+            self.assertEqual(S.load_lock_installed_at(home / ".agents" / ".skill-lock.json"), {})
+
+    def test_the_report_builder_drops_an_unparseable_value_from_a_programmatic_caller(self):
+        # The same arguments as BuildReportPruneLogic's, with the lock map given directly.
+        manifest, now = load_fixture_manifest(), S.parse_iso(NOW)
+        windows = S.effective_windows([7, 30], manifest)
+        tmp = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        scan = S.scan_codex_roots(materialize_codex_roots(tmp), fixture_names(), now=now, windows=windows)
+        claude = S.parse_claude_output((FIXTURES / "skill-doctor-sample.json").read_text())
+        claude["origin"] = "file"
+        report = S.build_report(manifest, claude=claude, codex_scan=scan, lock_installed_at={"gh-fix-ci": self.MARKER},
+                                now=now, windows=[7, 30])
+        entry = next(s for s in report["skills"] if s["name"] == "gh-fix-ci")
+        self.assertEqual((entry["installed_at"], entry["age_days"]), (None, None))
+        self.assertNotIn(self.MARKER, json.dumps(report))
+
+
 class BuildReportPruneLogic(unittest.TestCase):
     """The master join test: exercises every prune_rule branch named in the manifest's own
     trial.prune_rule ("kept skills are flagged 'verdict re-record required' instead of demoted")

@@ -1,0 +1,24 @@
+Round 12 of #1043 (the fix10 verdict file's blocker 1, sha256 e095d2f3..., and the command center's 06:09Z instruction: the fix against that verdict): the round's tests and the verdict's own regression against the sources of 8ec8ebc37, the head that was read, and against this head. The marker is synthetic and is counted, never printed.
+
+== 8ec8ebc37, the head that was read (its sources, this test module)
+   FAIL: test_an_unparseable_installation_time_reaches_no_output_of_the_cli (tests.test_skill_usage.InstalledTimePublication.test_an_unparseable_installation_time_reaches_no_output_of_the_cli) (route='json')
+   FAIL: test_an_unparseable_installation_time_reaches_no_output_of_the_cli (tests.test_skill_usage.InstalledTimePublication.test_an_unparseable_installation_time_reaches_no_output_of_the_cli) (route='text')
+   FAIL: test_the_lock_reader_drops_an_unparseable_value (tests.test_skill_usage.InstalledTimePublication.test_the_lock_reader_drops_an_unparseable_value)
+   FAIL: test_the_report_builder_drops_an_unparseable_value_from_a_programmatic_caller (tests.test_skill_usage.InstalledTimePublication.test_the_report_builder_drops_an_unparseable_value_from_a_programmatic_caller)
+   Ran 4 tests in 0.309s
+   FAILED (failures=4)
+== this head
+   test_skill_usage.InstalledTimePublication: Ran 4, OK
+== the verdict's REVIEW-PRIVACY-REGRESSION.py (unchanged; its tree linked to each head), counts of the marker in stdout, stderr and the --out file
+   == read
+   FAIL: test_unparseable_install_time_is_not_published  (route='json')
+   AssertionError: Lists differ: [1, 0, 1] != [0, 0, 0]
+   FAIL: test_unparseable_install_time_is_not_published  (route='text')
+   AssertionError: Lists differ: [0, 0, 1] != [0, 0, 0]
+   Ran 1 test in 0.191s
+   FAILED (failures=2)
+   rc=1
+   == head
+   Ran 1 test in 0.151s
+   OK
+   rc=0

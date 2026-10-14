@@ -554,9 +554,22 @@ def node_path_join(*parts: str) -> Path:
     return install_skills.node_path_join(*parts)
 
 
+def validated_installed_at(value) -> str | None:
+    """An installation time as published: the value itself when parse_iso accepts it, else None. The skills CLI writes an
+    ISO timestamp (vercel-labs/skills@7407f389 v1.7.0 src/skill-lock.ts L30-L31, L182-L188), so anything else is not one,
+    and its text must not reach a report (fix round 11 of #1043: an unparseable value was copied into installed_at)."""
+    if not isinstance(value, str):
+        return None
+    try:
+        parse_iso(value)
+    except ValueError:
+        return None
+    return value
+
+
 def load_lock_installed_at(lock_path: Path) -> dict[str, str]:
-    """{name: installedAt} from the lock's version-3 skills{} map. Missing or unreadable is {},
-    never an error: age becomes unknown for every skill rather than aborting the report."""
+    """{name: installedAt} from the lock's version-3 skills{} map, keeping only values that parse as timestamps. Missing or
+    unreadable is {}, never an error: age becomes unknown for every skill rather than aborting the report."""
     try:
         document = json.loads(Path(lock_path).read_text(encoding="utf-8"))
     except (OSError, ValueError):
@@ -565,7 +578,7 @@ def load_lock_installed_at(lock_path: Path) -> dict[str, str]:
     if not isinstance(skills, dict):
         return {}
     return {name: entry["installedAt"] for name, entry in skills.items()
-            if isinstance(entry, dict) and isinstance(entry.get("installedAt"), str)}
+            if isinstance(entry, dict) and validated_installed_at(entry.get("installedAt")) is not None}
 
 
 # --------------------------------------------------------------------------- join and report
@@ -616,13 +629,11 @@ def build_report(manifest: dict, *, claude: dict | None, codex_scan: dict,
         codex_enabled = bool(skill.get("codex_enabled", False))
         claude_listed = claude_listing != "off"
 
-        installed_at = lock_installed_at.get(name)
+        # Published only after it parses, whoever built the map (a lock read, a plugin's record or a direct caller).
+        installed_at = validated_installed_at(lock_installed_at.get(name))
         age_days = None
         if installed_at:
-            try:
-                age_days = (now - parse_iso(installed_at)).total_seconds() / 86400.0
-            except ValueError:
-                age_days = None
+            age_days = (now - parse_iso(installed_at)).total_seconds() / 86400.0
 
         if not claude_usable:
             claude_out: dict | str = "not-measured"

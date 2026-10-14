@@ -5866,16 +5866,6 @@
       "bytes": 608
     },
     {
-      "path": "adoption/templates/systemd/skill-invoke-rate.service",
-      "sha256": "9297270957f82b401d82afa99663d41381bf708ab9992b88e3aa8416ac099a5c",
-      "bytes": 731
-    },
-    {
-      "path": "adoption/templates/systemd/skill-invoke-rate.timer",
-      "sha256": "b1f9eded28471df410105cb841ef1d4537c2da71efe2ad794aac32d413a0719a",
-      "bytes": 184
-    },
-    {
       "path": "adoption/templates/systemd/stack-currency.service",
       "sha256": "7139eacb5dddab8ff163ff9c55e3fc6c335a1bcef61ef91610bcf58ca26eeacf",
       "bytes": 5184
@@ -18653,7 +18643,7 @@
     },
     {
       "path": "docs/decisions/2026-10-04-pwsh7-windows-guidance.md",
-      "sha256": "c0bcd76a49f6a5dccc96635918a0c069f9b0a4afa249fcac49437fb0d6df725e",
+      "sha256": "c895a47e923908b73c6c0f65e9a7f9571f25cb5d81c37979db001d974ee44348",
       "bytes": 16799
     },
     {
@@ -52342,6 +52332,11 @@
       "bytes": 4070
     },
     {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/fail-before-round12.txt",
+      "sha256": "569f30c1faaa22fad3fb0d704901cb54dc08812a8dd20027813baca2c392bf25",
+      "bytes": 1829
+    },
+    {
       "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/fail-before-round2.txt",
       "sha256": "5d3fe65be336605b1633806dc2cf5c101a694e7be24faa1a3a53ad4c9ba4e911",
       "bytes": 1012
@@ -52400,6 +52395,11 @@
       "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/mutants-round11-37.txt",
       "sha256": "d29b47418f02e679a701fddde1f407224bad5384850b2539e6cd47a446758b5c",
       "bytes": 3688
+    },
+    {
+      "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/mutants-round12-5.txt",
+      "sha256": "536ea04fa73043979584efdf92876723abb94e606de3a5352277dd915f21e09b",
+      "bytes": 391
     },
     {
       "path": "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/mutants-round2-26.txt",
@@ -64083,8 +64083,8 @@
     },
     {
       "path": "tests/test_skill_usage.py",
-      "sha256": "3a55f88d5240f877f8b750edadd103258db21080b0d2c2b812c28203a65a36e9",
-      "bytes": 301970
+      "sha256": "289723c1537a1aee984badcd16f32f859971e7d9454050c4ca414ccd0cb5f351",
+      "bytes": 305819
     },
     {
       "path": "tests/test_skill_usage_daily.py",
@@ -64723,8 +64723,8 @@
     },
     {
       "path": "tools/skill-usage/skill_usage.py",
-      "sha256": "413a69fc8f575041c7765aceddea58dc4aed5ccff284bb70de5c49c1292be2d3",
-      "bytes": 169381
+      "sha256": "d5712ec4c4eed686825b5838ca54ff2fc5049a21de3201dd82f27ff6713ed947",
+      "bytes": 170067
     },
     {
       "path": "tools/skill-usage/stage_routing_eval.py",
