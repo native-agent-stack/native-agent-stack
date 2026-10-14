@@ -13503,8 +13503,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "3ec7e6203948871064ec6c287ec463e7041ea1a067160b3e7356f0819b48bac3",
-      "bytes": 171961
+      "sha256": "683b42acf7668986dfbf9302f030070fd8bed1b5a9e37090932cab60956eb9af",
+      "bytes": 172519
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runtime_lock.py",
@@ -13538,8 +13538,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "d69e0b875ae8a5089f022c7f396fc83e8f9f63aa9fd2791e2a678934f1473a50",
-      "bytes": 10243
+      "sha256": "acc8528d7ed94d778213601eef51619d6d1114fa6e37b237ea6c38b2018fbcba",
+      "bytes": 10362
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/start_readiness.py",
@@ -13558,8 +13558,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/transport.py",
-      "sha256": "71267166336b457e45d074d34f3f250d2d266ffdf1a426be2349ac2e38b9bf77",
-      "bytes": 108527
+      "sha256": "beb1506c91e1650088c4cea782e6bef13b2b9deceabfa96e71a9d8e5944e6ad4",
+      "bytes": 111317
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/README.md",
@@ -19190,6 +19190,11 @@
       "path": "docs/decisions/2026-10-14-session-relaunch-after-wsl-restart.md",
       "sha256": "a16bde3428b14a259f526c32d0e433b9cc8c5934f5ffe4296abb8ce436ff4303",
       "bytes": 6369
+    },
+    {
+      "path": "docs/decisions/2026-10-14-stream-integrity-followups.md",
+      "sha256": "ac5c3eac5b70e69e01a91d907265445b12876fd9b30863a9eb25612f2d1d4ed3",
+      "bytes": 8018
     },
     {
       "path": "docs/decisions/2026-10-15-model-currency-landscape-check.md",
@@ -60702,6 +60707,11 @@
       "bytes": 1938
     },
     {
+      "path": "evidence/receipts/stream-integrity-followups-20261014.json",
+      "sha256": "61f9c8150b473b3f146da335f4c5a4c23c1e3f0d8088de98c40e889cd7c4f07f",
+      "bytes": 3065
+    },
+    {
       "path": "evidence/receipts/suite-parallelism-trial-20261003.json",
       "sha256": "88d94dea0829c87eecd2b6f9cc2a03c010888de130fe430abce65d5ebd39e788",
       "bytes": 135042
@@ -62678,8 +62688,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_readiness_backpressure.py",
-      "sha256": "5a26dbf2ecb02e32a7dac4ab19584138969f757ab4511b38d66716473b1252b4",
-      "bytes": 5033
+      "sha256": "ccf8fa1c2df875b0357f2d746d0874ef1871a42a96b60df583568c991268ff8b",
+      "bytes": 6100
     },
     {
       "path": "tests/test_adaptive_paper_recovery.py",
@@ -62723,13 +62733,18 @@
     },
     {
       "path": "tests/test_adaptive_paper_stream_backpressure.py",
-      "sha256": "cd2c849bd0381034bb1f6679d05bc33bda94f3a0ce6e95985bd92c68c7a90d25",
-      "bytes": 17051
+      "sha256": "727fa830331bea2b8d5b8b6872d0a592b867c2e1ea09243555269f38c60eccfd",
+      "bytes": 17173
+    },
+    {
+      "path": "tests/test_adaptive_paper_stream_followups.py",
+      "sha256": "6094d1c3efa2e5f3935f1869dff74b77fda410ca91c7b64d8450dc9ab127833c",
+      "bytes": 14904
     },
     {
       "path": "tests/test_adaptive_paper_transport.py",
-      "sha256": "31858d27903478559830f4e4bb098243c9a096e44712767b4beadb77aaf4aabe",
-      "bytes": 118648
+      "sha256": "a171f0c387ec6a5cfb96beaa03028f72c777ee54ec195498b5f3ec4158f2ccb7",
+      "bytes": 118924
     },
     {
       "path": "tests/test_adjudicate.py",

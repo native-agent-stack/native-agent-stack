@@ -7,7 +7,7 @@ import sys
 import tempfile
 import types
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import AsyncMock, Mock, patch
 
 SOURCE = Path(__file__).resolve().parents[1] / 'blueprints/us-equities/adaptive-paper'
 sys.path.insert(0, str(SOURCE))
@@ -36,7 +36,9 @@ class ReadinessBackpressure(unittest.IsolatedAsyncioTestCase):
                  'alpaca.data': types.ModuleType('alpaca.data'), 'alpaca.data.enums': enums}
         with patch.dict(sys.modules, stubs), patch.object(transport, '_sdk_client', return_value=Mock()), \
              patch.object(transport, '_protocol_factory', return_value=None), \
-             patch.object(transport, '_stream_classes', return_value=(Mock, Mock)):
+             patch.object(transport, '_stream_classes', return_value=(
+                 lambda *a,**k:Mock(stop_ws=AsyncMock()),
+                 lambda *a,**k:Mock(stop_ws=AsyncMock()))):
             port = transport.AlpacaPaperTransport(
                 'fixture-key', 'fixture-secret', ['SPY'], required_quote_symbols=['SPY'],
                 before_request=lambda *a, **k: None, before_submit=lambda *a: None,
@@ -67,21 +69,35 @@ class ReadinessBackpressure(unittest.IsolatedAsyncioTestCase):
                         break
                     await asyncio.sleep(0)
                 self.assertEqual(len(seen), 1, 'age4.05 must pass the opted benchmark consumer')
+                self.assertEqual(port.stream_health()['skipped_stale_quotes'],0)
                 self.assertTrue(port.health['fresh_quotes'])
                 for side in ('buy', 'sell'):
                     with self.subTest(side=side), self.assertRaises(transport.SubmissionNotSent):
                         port._wire_guard({'symbol': 'SPY', 'side': side})
+                retained=dict(port._quote_values['SPY'])
+                rejected=dict(quote,t=datetime.fromtimestamp(epoch-5.01,timezone.utc))
+                await port._quote_callback(rejected)
+                # Wait for the consumer's next polling turn on the actual
+                # loop; its clock remains pinned to the quote-age fixture.
+                clock[0]+=.02
+                for _ in range(20):
+                    if port.stream_health()['skipped_stale_quotes']:break
+                    await asyncio.sleep(0)
+                self.assertEqual(port.stream_health()['skipped_stale_quotes'],1)
+                self.assertEqual(len(seen),1,'age>5 quote must not be delivered')
+                self.assertEqual(port._quote_values['SPY'],retained,'rejected quote must not replace cache')
             finally:
                 consumer.cancel()
                 await asyncio.gather(consumer, return_exceptions=True)
 
             # The actual SDK callback is held by a full queue. Deterministic
             # time runs the deadline without an eight-second wall-clock wait.
+            handler_started=clock[0]
             await port._quote_callback({'first': True})
             with patch.object(transport.asyncio, 'sleep', side_effect=advance):
                 await port._order_callback({'received_order': True})
-            self.assertAlmostEqual(clock[0], 8.0, places=6)
-            self.assertLess(clock[0], 10, 'handler must return below the SDK ping timeout')
+            self.assertAlmostEqual(clock[0]-handler_started, 8.0, places=6)
+            self.assertLess(clock[0]-handler_started, 10, 'handler must return below the SDK ping timeout')
             self.assertEqual(port.start_timeout, 30)
             self.assertEqual(port.stream_health()['backpressure_waits'], 1)
             self.assertIn('queue_overflow', port.health['reasons'])

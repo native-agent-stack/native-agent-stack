@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "kind": "synthetic_stream_integrity_measurement",
+  "base_commit": "c67bd78bebdd48d642307e3a91d5f791a9d1aad7",
+  "evidence_class": "synthetic/local integration",
+  "command": "Pinned Python -B engine-qual-stream-followups-controls-20261014.py measure under unshare -rn; assertion sources tests/test_adaptive_paper_stream_followups.py",
+  "observed_exit_code": 0,
+  "method": "synthetic loop/HTTP guard/journal/recovery; virtual3s envelope; synthetic FIFO delay",
+  "F1": {
+    "before": {
+      "active_submits_before_recovery": 30,
+      "freeze_at": 0.1,
+      "frozen_outcome": {
+        "frozen": true,
+        "reasons": [
+          "queue_overflow"
+        ]
+      },
+      "handoff_at": 3.0000000000000013,
+      "recovery_exit_count": 1,
+      "recovery_first_exit_at": 3.0000000000000013,
+      "recovery_flat": true,
+      "recovery_status": "passed",
+      "refused_exit_count": 29,
+      "refused_exit_submit_reservations": 29,
+      "submit_limit": 180
+    },
+    "after": {
+      "active_submits_before_recovery": 1,
+      "freeze_at": 0.1,
+      "frozen_outcome": {
+        "frozen": true,
+        "reasons": [
+          "queue_overflow"
+        ]
+      },
+      "handoff_at": 0.1,
+      "recovery_exit_count": 1,
+      "recovery_first_exit_at": 0.1,
+      "recovery_flat": true,
+      "recovery_status": "passed",
+      "refused_exit_count": 0,
+      "refused_exit_submit_reservations": 0,
+      "submit_limit": 180
+    },
+    "interpretation": "Previously 29 definitively refused exits still consumed 29 submit slots before recovery; fixed handoff creates zero refused-exit reservations. The first recovery exit was admitted in both bounded fixtures. No long-duration or live-budget starvation claim."
+  },
+  "F5": {
+    "measured": {
+      "backpressure_waits": 0,
+      "data_timeout_seconds": 30,
+      "fresh_quotes": true,
+      "frozen": false,
+      "order_update_callback_to_consumer_seconds_max": 4,
+      "order_update_queue_latency_seconds_max": 4,
+      "order_updates_dequeued": 1,
+      "quotes_reconnects": 0,
+      "reasons": [],
+      "skipped_stale_quotes": 0
+    },
+    "interpretation": "One order update waited behind two synthetic quotes; four simulated seconds from successful enqueue and callback receipt to consumer dispatch. FIFO preserved; this is not live throughput or socket acceptance."
+  },
+  "limitations": [
+    "Synthetic native lifecycle with real run_native loop, GuardedSession, Ledger and recovery; no broker or Rust-node timing claim",
+    "Three-second virtual envelope; shipped420-second and validated4200-second source bounds were not waited out",
+    "F1 permanent exit-bridge classification depends on1091 landing; deployment condition remains active pending that classification and final review",
+    "F2 stop_ws after irreversible loss bounds the reproduced stalled batch; no blanket keepalive guarantee for arbitrary healthy batches",
+    "Historical captures, real FIFO/shutdown/reconnect qualification and overnight/exception precedence remain separate follow-ups"
+  ]
+}

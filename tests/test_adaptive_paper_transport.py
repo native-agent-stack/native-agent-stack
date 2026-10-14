@@ -1589,7 +1589,10 @@ class QuoteStreamDataTimeout(unittest.TestCase):
         port.freeze_health("stream_stop_timeout")  # teardown's own freeze, after the view was taken
         self.assertEqual(port.stream_health(), {"frozen": True, "reasons": ["quote_stale"], "fresh_quotes": False,
                                                 "data_timeout_seconds": None, "backpressure_waits": 0,
-                                                "skipped_stale_quotes": 0, "quotes_reconnects": 0})
+                                                "skipped_stale_quotes": 0, "quotes_reconnects": 0,
+                                                "order_updates_dequeued": 0,
+                                                "order_update_queue_latency_seconds_max": None,
+                                                "order_update_callback_to_consumer_seconds_max": None})
 
     @unittest.skipUnless(HAS_SDK, "requires isolated reviewed alpaca-py runtime")
     def test_the_pinned_sdk_default_is_off(self):

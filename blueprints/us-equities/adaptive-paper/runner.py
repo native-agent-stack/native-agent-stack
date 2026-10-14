@@ -56,7 +56,8 @@ from sessions import (DEFAULT_SESSION_POLICY, SessionKind, boundary_receipt, ext
 from strategies import AdaptivePolicy, PolicyConfig, RegimeSelector, SelectorConfig, limit_price
 from start_readiness import validate_start_readiness, start_readiness_settings
 from transport import (AlpacaPaperTransport, TransportError, RejectedSubmission, order_contract_status,
-                       preflight, halt_statuses_supported, nasdaq_halt_seed, fee_activities, fee_checkpoint)
+                       preflight, halt_statuses_supported, nasdaq_halt_seed, fee_activities, fee_checkpoint,
+                       OBSERVATION_INTEGRITY_LOSS_REASONS)
 
 SOURCE = Path(__file__).resolve().parent
 LAST_OUTPUT = None
@@ -1869,6 +1870,14 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
             # A connection or integrity gap ends this bounded run. Quote silence
             # pauses admissions; it requires a fresh reconciled snapshot to thaw.
             health = getattr(port, "health", {})
+            if OBSERVATION_INTEGRITY_LOSS_REASONS.intersection(health.get("reasons", ())):
+                # Unknown order/position state cannot authorize another sell.
+                # Stop this session now; main's owned-residual path uses a
+                # fresh transport and durable recovery rather than retrying
+                # refused exits until duration+cleanup (and spending slots).
+                strategy.enabled = False
+                controller.stop = True
+                break
             serious_gap = any("stale" not in str(reason) for reason in health.get("reasons", []))
             if strategy.started and serious_gap:
                 controller.stop = True
