@@ -1,0 +1,833 @@
+{
+ "schema": "github-freshness/1",
+ "generated_at": "2026-10-13T13:53:22.429029+00:00",
+ "count": 3,
+ "errors": 0,
+ "partial_errors": 0,
+ "matching_tags_errors": 0,
+ "runtime_only_errors": 0,
+ "runtime_only_partial_errors": 0,
+ "runtime_only_repositories": [],
+ "fetched_this_run": 3,
+ "retained_from_prior_runs": 0,
+ "observation_window": {
+  "min": "2026-10-13T13:53:17.820489+00:00",
+  "max": "2026-10-13T13:53:18.935646+00:00"
+ },
+ "repositories": {
+  "https://github.com/alpacahq/alpaca-mcp-server": {
+   "slug": "alpacahq/alpaca-mcp-server",
+   "observed_at": "2026-10-13T13:53:17.820489+00:00",
+   "full_name": "alpacahq/alpaca-mcp-server",
+   "description": "Alpaca\u2019s official MCP Server lets you trade stocks, ETFs, crypto, and options, run data analysis, and build strategies in plain English directly from your favorite LLM tools and IDEs",
+   "stargazers_count": 1019,
+   "forks_count": 336,
+   "open_issues_count": 24,
+   "archived": false,
+   "disabled": false,
+   "fork": false,
+   "pushed_at": "2026-10-12T10:40:50Z",
+   "updated_at": "2026-10-13T09:50:30Z",
+   "created_at": "2025-06-03T17:09:19Z",
+   "default_branch": "main",
+   "language": "Python",
+   "html_url": "https://github.com/alpacahq/alpaca-mcp-server",
+   "license": "MIT",
+   "renamed_to": null,
+   "latest_release": {
+    "tag": "v2.4.0",
+    "published_at": "2026-10-12T10:40:50Z",
+    "prerelease": false
+   },
+   "head": {
+    "sha": "2a973a046607c42742bf141184b71f1990fa1809",
+    "date": "2026-10-12T10:38:06Z"
+   },
+   "aliases": [
+    "https://github.com/alpacahq/alpaca-mcp-server"
+   ]
+  },
+  "https://github.com/Lumiwealth/lumibot": {
+   "slug": "lumiwealth/lumibot",
+   "observed_at": "2026-10-13T13:53:17.821612+00:00",
+   "full_name": "Lumiwealth/lumibot",
+   "description": "AI agents that actually place the trade. 12 brokers, real backtests, stocks options futures forex crypto and prediction markets.",
+   "stargazers_count": 2119,
+   "forks_count": 413,
+   "open_issues_count": 100,
+   "archived": false,
+   "disabled": false,
+   "fork": false,
+   "pushed_at": "2026-10-13T13:34:50Z",
+   "updated_at": "2026-10-12T10:47:18Z",
+   "created_at": "2020-09-10T10:00:16Z",
+   "default_branch": "dev",
+   "language": "Python",
+   "html_url": "https://github.com/Lumiwealth/lumibot",
+   "license": "GPL-3.0",
+   "renamed_to": null,
+   "latest_release": {
+    "tag": "v4.6.18",
+    "published_at": "2026-10-10T07:22:53Z",
+    "prerelease": false
+   },
+   "head": {
+    "sha": "730d5608f3ee625f0a30dc15e8cc512205dd2a2b",
+    "date": "2026-10-10T07:13:18Z"
+   },
+   "aliases": [
+    "https://github.com/Lumiwealth/lumibot"
+   ]
+  },
+  "https://github.com/nautechsystems/nautilus_trader": {
+   "slug": "nautechsystems/nautilus_trader",
+   "observed_at": "2026-10-13T13:53:18.935646+00:00",
+   "full_name": "nautechsystems/nautilus_trader",
+   "description": "Production-grade Rust-native trading engine with deterministic event-driven architecture",
+   "stargazers_count": 29921,
+   "forks_count": 3995,
+   "open_issues_count": 122,
+   "archived": false,
+   "disabled": false,
+   "fork": false,
+   "pushed_at": "2026-10-13T13:12:11Z",
+   "updated_at": "2026-10-13T13:27:41Z",
+   "created_at": "2018-06-25T06:26:16Z",
+   "default_branch": "develop",
+   "language": "Rust",
+   "html_url": "https://github.com/nautechsystems/nautilus_trader",
+   "license": "LGPL-3.0",
+   "renamed_to": null,
+   "latest_release": {
+    "tag": "v1.231.0",
+    "published_at": "2026-08-02T18:53:49Z",
+    "prerelease": false
+   },
+   "release_list": {
+    "releases": [
+     {
+      "tag": "v2.0.0rc6",
+      "published_at": "2026-10-05T03:03:18Z",
+      "prerelease": true
+     },
+     {
+      "tag": "v2.0.0rc5",
+      "published_at": "2026-09-15T06:17:23Z",
+      "prerelease": true
+     },
+     {
+      "tag": "v2.0.0rc4",
+      "published_at": "2026-09-02T03:26:46Z",
+      "prerelease": true
+     },
+     {
+      "tag": "v2.0.0rc3",
+      "published_at": "2026-08-21T01:20:07Z",
+      "prerelease": true
+     },
+     {
+      "tag": "v1.231.0",
+      "published_at": "2026-08-02T18:53:49Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.230.0",
+      "published_at": "2026-06-29T12:06:45Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.229.0",
+      "published_at": "2026-06-26T05:06:18Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.228.0",
+      "published_at": "2026-06-08T18:55:56Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.227.0",
+      "published_at": "2026-05-18T06:54:11Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.226.0",
+      "published_at": "2026-04-29T13:43:14Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.225.0",
+      "published_at": "2026-04-06T09:36:36Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.224.0",
+      "published_at": "2026-03-03T07:48:59Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.223.0",
+      "published_at": "2026-02-21T10:54:03Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.222.0",
+      "published_at": "2026-01-02T05:23:05Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.221.0",
+      "published_at": "2025-10-26T14:41:37Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.220.0",
+      "published_at": "2025-09-10T09:11:11Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.219.0",
+      "published_at": "2025-07-05T14:51:35Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.218.0",
+      "published_at": "2025-05-31T05:30:15Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.217.0",
+      "published_at": "2025-04-30T14:27:02Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.216.0",
+      "published_at": "2025-04-13T13:41:35Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.215.0",
+      "published_at": "2025-04-05T01:33:14Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.214.0",
+      "published_at": "2025-03-28T13:10:59Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.213.0",
+      "published_at": "2025-03-16T09:56:19Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.212.0",
+      "published_at": "2025-03-11T04:50:06Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.211.0",
+      "published_at": "2025-02-09T18:59:31Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.210.0",
+      "published_at": "2025-01-10T04:22:38Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.209.0",
+      "published_at": "2024-12-25T12:19:36Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.208.0",
+      "published_at": "2024-12-15T13:41:15Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.207.0",
+      "published_at": "2024-11-29T11:35:27Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.206.0",
+      "published_at": "2024-11-17T08:56:25Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.205.0",
+      "published_at": "2024-11-03T17:50:20Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.204.0",
+      "published_at": "2024-10-22T10:01:10Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.203.0",
+      "published_at": "2024-10-05T20:23:12Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.202.0",
+      "published_at": "2024-09-27T12:12:50Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.201.0",
+      "published_at": "2024-09-09T12:16:18Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.200.0",
+      "published_at": "2024-09-07T10:30:32Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.199.0",
+      "published_at": "2024-08-19T18:00:26Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.198.0",
+      "published_at": "2024-08-09T12:19:21Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.197.0",
+      "published_at": "2024-08-02T22:04:27Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.196.0",
+      "published_at": "2024-07-05T11:53:33Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.195.0",
+      "published_at": "2024-06-17T12:59:22Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.194.0",
+      "published_at": "2024-05-31T11:31:23Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.193.0",
+      "published_at": "2024-05-24T12:11:25Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.192.0",
+      "published_at": "2024-05-18T09:07:02Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.191.0",
+      "published_at": "2024-04-20T03:36:04Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.190.0",
+      "published_at": "2024-03-22T16:39:24Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.189.0",
+      "published_at": "2024-03-15T12:53:22Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.188.0",
+      "published_at": "2024-02-25T11:37:15Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.187.0",
+      "published_at": "2024-02-09T12:15:02Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.186.0",
+      "published_at": "2024-02-02T23:36:11Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.185.0",
+      "published_at": "2024-01-26T11:58:28Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.184.0",
+      "published_at": "2024-01-22T14:34:33Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.183.0",
+      "published_at": "2024-01-12T13:40:08Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.182.0",
+      "published_at": "2023-12-23T04:12:32Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.181.0",
+      "published_at": "2023-12-02T06:52:37Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.180.0",
+      "published_at": "2023-11-03T10:58:59Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.179.0",
+      "published_at": "2023-10-22T13:35:15Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.178.0",
+      "published_at": "2023-09-02T12:23:51Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.177.0",
+      "published_at": "2023-08-25T15:55:13Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.176.0",
+      "published_at": "2023-07-31T04:06:04Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.175.0",
+      "published_at": "2023-06-17T07:42:26Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.174.0",
+      "published_at": "2023-05-20T00:55:56Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.173.0",
+      "published_at": "2023-05-05T11:17:59Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.172.0",
+      "published_at": "2023-04-30T05:47:14Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.171.0",
+      "published_at": "2023-03-30T05:39:55Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.170.0",
+      "published_at": "2023-03-12T01:43:36Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.169.0",
+      "published_at": "2023-02-18T02:05:07Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.168.0",
+      "published_at": "2023-01-29T13:13:24Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.167.0",
+      "published_at": "2023-01-28T04:37:39Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.166.0",
+      "published_at": "2023-01-17T16:51:37Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.165.0",
+      "published_at": "2023-01-14T05:50:49Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.164.0",
+      "published_at": "2022-12-23T23:25:47Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.163.0",
+      "published_at": "2022-12-17T11:47:46Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.162.0",
+      "published_at": "2022-12-11T22:19:15Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.161.0",
+      "published_at": "2022-12-09T12:52:06Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.160.0",
+      "published_at": "2022-11-28T11:24:19Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.159.0",
+      "published_at": "2022-11-19T00:59:13Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.158.0",
+      "published_at": "2022-11-03T11:58:42Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.157.0",
+      "published_at": "2022-10-23T23:37:08Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.156.0",
+      "published_at": "2022-10-19T12:27:47Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.155.0",
+      "published_at": "2022-09-15T12:15:28Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.154.0",
+      "published_at": "2022-09-14T10:33:57Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.153.0",
+      "published_at": "2022-09-05T23:45:07Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.152.0",
+      "published_at": "2022-09-01T07:08:14Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.151.0",
+      "published_at": "2022-08-22T02:46:49Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.150.0",
+      "published_at": "2022-08-15T03:19:52Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.149.0",
+      "published_at": "2022-07-28T09:45:34Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.148.0",
+      "published_at": "2022-06-30T12:51:01Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.147.1",
+      "published_at": "2022-06-06T18:17:55Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.147.0",
+      "published_at": "2022-06-05T00:43:30Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.146.0",
+      "published_at": "2022-05-22T12:44:56Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.145.0",
+      "published_at": "2022-05-16T00:04:26Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.144.0",
+      "published_at": "2022-05-10T23:41:34Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.143.0",
+      "published_at": "2022-04-21T12:01:03Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.142.0",
+      "published_at": "2022-04-18T06:14:09Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.141.0",
+      "published_at": "2022-04-04T13:27:41Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.140.0",
+      "published_at": "2022-03-14T00:05:46Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.139.0",
+      "published_at": "2022-03-11T22:20:17Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.138.0",
+      "published_at": "2022-02-13T21:57:41Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.137.1",
+      "published_at": "2022-01-15T12:13:47Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.137.0",
+      "published_at": "2022-01-12T23:13:02Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.136.0",
+      "published_at": "2021-12-29T12:22:49Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.135.0",
+      "published_at": "2021-12-13T10:36:10Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.134.0",
+      "published_at": "2021-11-22T00:48:55Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.133.0",
+      "published_at": "2021-11-08T11:50:19Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.132.0",
+      "published_at": "2021-10-24T10:28:18Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.131.0",
+      "published_at": "2021-10-10T11:31:34Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.130.0",
+      "published_at": "2021-09-26T22:37:30Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.129.0",
+      "published_at": "2021-09-12T14:32:20Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.128.0",
+      "published_at": "2021-08-30T10:00:08Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.127.0",
+      "published_at": "2021-08-17T12:21:08Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.126.1",
+      "published_at": "2021-08-02T21:56:43Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.126.0",
+      "published_at": "2021-08-02T13:17:20Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.125.0",
+      "published_at": "2021-07-18T13:36:24Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.124.0",
+      "published_at": "2021-07-06T05:25:00Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.123.0",
+      "published_at": "2021-06-20T08:07:52Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.122.0",
+      "published_at": "2021-06-06T10:11:56Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.121.0",
+      "published_at": "2021-05-30T07:40:10Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.120.0",
+      "published_at": "2021-05-23T09:30:58Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.119.0",
+      "published_at": "2021-05-17T12:31:27Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.118.0",
+      "published_at": "2021-05-10T01:35:46Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.117.0",
+      "published_at": "2021-04-29T06:58:32Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.116.1",
+      "published_at": "2021-04-18T11:21:00Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.116.0",
+      "published_at": "2021-04-17T00:06:35Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.115.0",
+      "published_at": "2021-04-10T01:12:56Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.114.0",
+      "published_at": "2021-04-05T11:43:27Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.113.0",
+      "published_at": "2021-04-01T09:19:53Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.112.0",
+      "published_at": "2021-03-27T07:52:39Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.111.0",
+      "published_at": "2021-03-15T01:11:02Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.110.0",
+      "published_at": "2021-03-13T01:10:26Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.109.0",
+      "published_at": "2021-03-10T04:52:10Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.108.0",
+      "published_at": "2021-03-09T22:56:13Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.107.1",
+      "published_at": "2021-03-07T22:19:42Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.107.0",
+      "published_at": "2021-03-07T01:52:19Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.106.0",
+      "published_at": "2021-02-26T23:30:10Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.105.1",
+      "published_at": "2021-02-21T23:22:42Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.105.0",
+      "published_at": "2021-02-21T01:21:51Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.104.0",
+      "published_at": "2021-02-19T04:18:35Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.103.1",
+      "published_at": "2021-02-18T05:05:10Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.103.0",
+      "published_at": "2021-02-16T22:54:49Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.102.1",
+      "published_at": "2021-02-16T01:07:36Z",
+      "prerelease": false
+     },
+     {
+      "tag": "v1.101.0",
+      "published_at": "2021-02-08T01:42:11Z",
+      "prerelease": false
+     }
+    ],
+    "pages": 2,
+    "per_page": 100,
+    "page_cap": 3,
+    "truncated": false
+   },
+   "head": {
+    "sha": "ca478e42f434d2ce185493f2bb42d112a88d1ffe",
+    "date": "2026-10-13T13:09:25Z"
+   },
+   "aliases": [
+    "https://github.com/nautechsystems/nautilus_trader"
+   ]
+  }
+ }
+}

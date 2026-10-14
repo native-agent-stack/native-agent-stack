@@ -1,0 +1,356 @@
+{
+  "schema_version": 1,
+  "scope": "Selected files only, fetched at exact commits; content hashes do not establish behavior.",
+  "files": [
+    {
+      "key": "nautilus-rc5",
+      "repository": "nautechsystems/nautilus_trader",
+      "commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "path": "crates/adapters/interactive_brokers/Cargo.toml",
+      "git_blob": "3864f8705c1668bce53e3fec9f0d3ecdd95c185c",
+      "sha256": "03452f44b39e40e0cb4aa3848079989e75d6b3223ab6fcd42e6e71f70f7b0c71",
+      "bytes": 3880,
+      "url": "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/adapters/interactive_brokers/Cargo.toml"
+    },
+    {
+      "key": "nautilus-rc5",
+      "repository": "nautechsystems/nautilus_trader",
+      "commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "path": "docs/concepts/live.md",
+      "git_blob": "a15eb9038131d9a1461cea9402a852d39a40b425",
+      "sha256": "49a2b4f48380f66540aa1731f40b567428ce3384575670503b5d898bc2940c21",
+      "bytes": 23723,
+      "url": "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/docs/concepts/live.md"
+    },
+    {
+      "key": "nautilus-rc5",
+      "repository": "nautechsystems/nautilus_trader",
+      "commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "path": "docs/integrations/interactive_brokers.md",
+      "git_blob": "a243060540fc629566d390795abe796312a2c0ab",
+      "sha256": "d9f0d193d5cb15a23afd5eab258ee97af873126e3a16e2bd039871e08b027610",
+      "bytes": 15190,
+      "url": "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/docs/integrations/interactive_brokers.md"
+    },
+    {
+      "key": "nautilus-rc5",
+      "repository": "nautechsystems/nautilus_trader",
+      "commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "path": "docs/getting_started/installation.md",
+      "git_blob": "0453e81a11ccc94aaa0936c8518bbfee34ecd7ab",
+      "sha256": "a6d9ea4be83314d2584487f1b5e4d38144739d4ce9c3131eedefe61c31cd8187",
+      "bytes": 18301,
+      "url": "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/docs/getting_started/installation.md"
+    },
+    {
+      "key": "nautilus-rc6",
+      "repository": "nautechsystems/nautilus_trader",
+      "commit": "7b766f8825b2539c5b2ac1375e9d97b41c509edb",
+      "path": "crates/adapters/interactive_brokers/Cargo.toml",
+      "git_blob": "3864f8705c1668bce53e3fec9f0d3ecdd95c185c",
+      "sha256": "03452f44b39e40e0cb4aa3848079989e75d6b3223ab6fcd42e6e71f70f7b0c71",
+      "bytes": 3880,
+      "url": "https://github.com/nautechsystems/nautilus_trader/blob/7b766f8825b2539c5b2ac1375e9d97b41c509edb/crates/adapters/interactive_brokers/Cargo.toml"
+    },
+    {
+      "key": "nautilus-rc6",
+      "repository": "nautechsystems/nautilus_trader",
+      "commit": "7b766f8825b2539c5b2ac1375e9d97b41c509edb",
+      "path": "docs/concepts/live.md",
+      "git_blob": "aa95c3645ead46856c18a477dc18eaeb06fdda9e",
+      "sha256": "5cbc79241be1f242d126face8d58b4001cd92cf935edc00f5d1a131780398449",
+      "bytes": 28206,
+      "url": "https://github.com/nautechsystems/nautilus_trader/blob/7b766f8825b2539c5b2ac1375e9d97b41c509edb/docs/concepts/live.md"
+    },
+    {
+      "key": "nautilus-rc6",
+      "repository": "nautechsystems/nautilus_trader",
+      "commit": "7b766f8825b2539c5b2ac1375e9d97b41c509edb",
+      "path": "docs/integrations/interactive_brokers.md",
+      "git_blob": "a243060540fc629566d390795abe796312a2c0ab",
+      "sha256": "d9f0d193d5cb15a23afd5eab258ee97af873126e3a16e2bd039871e08b027610",
+      "bytes": 15190,
+      "url": "https://github.com/nautechsystems/nautilus_trader/blob/7b766f8825b2539c5b2ac1375e9d97b41c509edb/docs/integrations/interactive_brokers.md"
+    },
+    {
+      "key": "nautilus-rc6",
+      "repository": "nautechsystems/nautilus_trader",
+      "commit": "7b766f8825b2539c5b2ac1375e9d97b41c509edb",
+      "path": "docs/getting_started/installation.md",
+      "git_blob": "0bb589f7fc4425b89594804d2198147f40fa7374",
+      "sha256": "cd877f8a313330e7665b28a6aa98c519c7052bbdc282ebe938b46dfc8633d61a",
+      "bytes": 18405,
+      "url": "https://github.com/nautechsystems/nautilus_trader/blob/7b766f8825b2539c5b2ac1375e9d97b41c509edb/docs/getting_started/installation.md"
+    },
+    {
+      "key": "nautilus-rc6",
+      "repository": "nautechsystems/nautilus_trader",
+      "commit": "7b766f8825b2539c5b2ac1375e9d97b41c509edb",
+      "path": "crates/risk/src/engine/mod.rs",
+      "git_blob": "ad734a2b3a58a0195f9934069b413efa5ebf1d15",
+      "sha256": "ad16f4bf0f071fd979f503423321d48df0ed6d51e0b98f2c060c6258a6c22776",
+      "bytes": 95253,
+      "url": "https://github.com/nautechsystems/nautilus_trader/blob/7b766f8825b2539c5b2ac1375e9d97b41c509edb/crates/risk/src/engine/mod.rs"
+    },
+    {
+      "key": "nautilus-develop",
+      "repository": "nautechsystems/nautilus_trader",
+      "commit": "ca478e42f434d2ce185493f2bb42d112a88d1ffe",
+      "path": "crates/adapters/interactive_brokers/Cargo.toml",
+      "git_blob": "9b2defa8b1ebe9d89803314211ea6bcf016f5397",
+      "sha256": "58a1b79a4cf0028298569809318730bf3ccd55781e75980d59ef4e0e67384eb5",
+      "bytes": 4021,
+      "url": "https://github.com/nautechsystems/nautilus_trader/blob/ca478e42f434d2ce185493f2bb42d112a88d1ffe/crates/adapters/interactive_brokers/Cargo.toml"
+    },
+    {
+      "key": "nautilus-develop",
+      "repository": "nautechsystems/nautilus_trader",
+      "commit": "ca478e42f434d2ce185493f2bb42d112a88d1ffe",
+      "path": "docs/integrations/interactive_brokers.md",
+      "git_blob": "0a0aca8c920b1fa4f9294a8f0ee89873fb42713c",
+      "sha256": "26e223a86869fbd21cd8861482e8e2d8ab04c739f7c2ff9ad7ae415ea6e9e080",
+      "bytes": 52642,
+      "url": "https://github.com/nautechsystems/nautilus_trader/blob/ca478e42f434d2ce185493f2bb42d112a88d1ffe/docs/integrations/interactive_brokers.md"
+    },
+    {
+      "key": "nautilus-develop",
+      "repository": "nautechsystems/nautilus_trader",
+      "commit": "ca478e42f434d2ce185493f2bb42d112a88d1ffe",
+      "path": "docs/getting_started/installation.md",
+      "git_blob": "185332465690a25fcf9500e50e9ba34d31f9bcca",
+      "sha256": "0a2a47aa2bad0d497a8dc265a835e8610e5a519eb9d221d5f2b2fdf46d5a2502",
+      "bytes": 18405,
+      "url": "https://github.com/nautechsystems/nautilus_trader/blob/ca478e42f434d2ce185493f2bb42d112a88d1ffe/docs/getting_started/installation.md"
+    },
+    {
+      "key": "nautilus-develop",
+      "repository": "nautechsystems/nautilus_trader",
+      "commit": "ca478e42f434d2ce185493f2bb42d112a88d1ffe",
+      "path": "docs/concepts/live.md",
+      "git_blob": "7860ef4d6e8004da105bd89661469ebf15fea4ae",
+      "sha256": "b861c90390bb3542753d5f528abea625634d7287e0d5f1d16015e7f8efb10953",
+      "bytes": 28233,
+      "url": "https://github.com/nautechsystems/nautilus_trader/blob/ca478e42f434d2ce185493f2bb42d112a88d1ffe/docs/concepts/live.md"
+    },
+    {
+      "key": "lumibot-4618",
+      "repository": "Lumiwealth/lumibot",
+      "commit": "730d5608f3ee625f0a30dc15e8cc512205dd2a2b",
+      "path": "docs/investigations/2026-10-10_ibkr-routed-qualification.md",
+      "git_blob": "72c48f15b5bc9c6888312cb83eaf63330a542f07",
+      "sha256": "08fb6044d6cfdc3684f311d70cd383ca85de37b06eeb982665b07c331f67d72a",
+      "bytes": 4708,
+      "url": "https://github.com/Lumiwealth/lumibot/blob/730d5608f3ee625f0a30dc15e8cc512205dd2a2b/docs/investigations/2026-10-10_ibkr-routed-qualification.md"
+    },
+    {
+      "key": "lumibot-4618",
+      "repository": "Lumiwealth/lumibot",
+      "commit": "730d5608f3ee625f0a30dc15e8cc512205dd2a2b",
+      "path": "docs/investigations/2026-10-10_ibkr-qualification.md",
+      "git_blob": "9e49953c839e35002147167c5940d297909f1718",
+      "sha256": "9976411b428ddef47c54e2fc15eb73f695d264af20d215daaf7287c7058425d6",
+      "bytes": 9010,
+      "url": "https://github.com/Lumiwealth/lumibot/blob/730d5608f3ee625f0a30dc15e8cc512205dd2a2b/docs/investigations/2026-10-10_ibkr-qualification.md"
+    },
+    {
+      "key": "lumibot-4618",
+      "repository": "Lumiwealth/lumibot",
+      "commit": "730d5608f3ee625f0a30dc15e8cc512205dd2a2b",
+      "path": "lumibot/backtesting/backtesting_broker.py",
+      "git_blob": "9a26f4118c8ca6305beeeeb1c446c2ef9c1482de",
+      "sha256": "60a25d2dc593472098b9d3da485b52603aeb9ffe5015b18a5256cfcfb1e1f5ca",
+      "bytes": 239030,
+      "url": "https://github.com/Lumiwealth/lumibot/blob/730d5608f3ee625f0a30dc15e8cc512205dd2a2b/lumibot/backtesting/backtesting_broker.py"
+    },
+    {
+      "key": "lumibot-4618",
+      "repository": "Lumiwealth/lumibot",
+      "commit": "730d5608f3ee625f0a30dc15e8cc512205dd2a2b",
+      "path": "tests/backtest/test_ibkr_routed_bounded_history.py",
+      "git_blob": "84afbc988487cf71c0c92683ca9c9e2e0ac9bbdb",
+      "sha256": "4b7d8ff6afb2aa9778645bef464a3ead0f54fb035b045670fb86fac40373c94c",
+      "bytes": 10075,
+      "url": "https://github.com/Lumiwealth/lumibot/blob/730d5608f3ee625f0a30dc15e8cc512205dd2a2b/tests/backtest/test_ibkr_routed_bounded_history.py"
+    },
+    {
+      "key": "lumibot-4618",
+      "repository": "Lumiwealth/lumibot",
+      "commit": "730d5608f3ee625f0a30dc15e8cc512205dd2a2b",
+      "path": "tests/test_stock_split_accounting.py",
+      "git_blob": "54986931fe609725bcace8ea6618f31183ddabe6",
+      "sha256": "576c8cd36339eb601d96772ed9b04af6bca62d26e79219428d121cff86ff3d6d",
+      "bytes": 18133,
+      "url": "https://github.com/Lumiwealth/lumibot/blob/730d5608f3ee625f0a30dc15e8cc512205dd2a2b/tests/test_stock_split_accounting.py"
+    },
+    {
+      "key": "lumibot-4618",
+      "repository": "Lumiwealth/lumibot",
+      "commit": "730d5608f3ee625f0a30dc15e8cc512205dd2a2b",
+      "path": "setup.py",
+      "git_blob": "ea1d25da7084bad51eaece565a63cb1a721118cd",
+      "sha256": "825c6796cae7ec942cb6650047d98cba75df46e3cf6e12240b34fa24c8b63b7f",
+      "bytes": 6449,
+      "url": "https://github.com/Lumiwealth/lumibot/blob/730d5608f3ee625f0a30dc15e8cc512205dd2a2b/setup.py"
+    },
+    {
+      "key": "lumibot-4618",
+      "repository": "Lumiwealth/lumibot",
+      "commit": "730d5608f3ee625f0a30dc15e8cc512205dd2a2b",
+      "path": "lumibot/brokers/alpaca.py",
+      "git_blob": "e43c05d828fddff7846e08023641168134bb501f",
+      "sha256": "b1ffb9c06cbf47586e8e05d73166799c523b467222ee68ce9bda8e49d146a45e",
+      "bytes": 87442,
+      "url": "https://github.com/Lumiwealth/lumibot/blob/730d5608f3ee625f0a30dc15e8cc512205dd2a2b/lumibot/brokers/alpaca.py"
+    },
+    {
+      "key": "alpaca-mcp-232",
+      "repository": "alpacahq/alpaca-mcp-server",
+      "commit": "9b0c72beda5579de088413ce9c3720456cde8f5f",
+      "path": "README.md",
+      "git_blob": "57bae6d5bc5a2f26c201fb397c9799295c2e4c13",
+      "sha256": "046e5dd90348ceea47878597e257d38547589a14618cab6729dc90d2614b9a83",
+      "bytes": 31744,
+      "url": "https://github.com/alpacahq/alpaca-mcp-server/blob/9b0c72beda5579de088413ce9c3720456cde8f5f/README.md"
+    },
+    {
+      "key": "alpaca-mcp-232",
+      "repository": "alpacahq/alpaca-mcp-server",
+      "commit": "9b0c72beda5579de088413ce9c3720456cde8f5f",
+      "path": "pyproject.toml",
+      "git_blob": "731944feaf49b8c6350261d10f2341f0eb0e93b6",
+      "sha256": "5c3338f12825617074516abcd683cbb24d9f61a078a921bbb931d874a18926f6",
+      "bytes": 2077,
+      "url": "https://github.com/alpacahq/alpaca-mcp-server/blob/9b0c72beda5579de088413ce9c3720456cde8f5f/pyproject.toml"
+    },
+    {
+      "key": "alpaca-mcp-240",
+      "repository": "alpacahq/alpaca-mcp-server",
+      "commit": "2a973a046607c42742bf141184b71f1990fa1809",
+      "path": "README.md",
+      "git_blob": "fe3f7e37192a2c3e5c76ed0f7523fb9a16871e78",
+      "sha256": "0f52cb9f51a74d0fad1438a7c2e212889a41a487ec59a82bd19526ebce7fc100",
+      "bytes": 31779,
+      "url": "https://github.com/alpacahq/alpaca-mcp-server/blob/2a973a046607c42742bf141184b71f1990fa1809/README.md"
+    },
+    {
+      "key": "alpaca-mcp-240",
+      "repository": "alpacahq/alpaca-mcp-server",
+      "commit": "2a973a046607c42742bf141184b71f1990fa1809",
+      "path": "pyproject.toml",
+      "git_blob": "0eba3a5d87c62be4c3407070bbb448e1c7a48ca5",
+      "sha256": "3f74dbc05f40ed53fca4d8e86fc266264c57dc19c2f984f32d9d4264a4e74f15",
+      "bytes": 2077,
+      "url": "https://github.com/alpacahq/alpaca-mcp-server/blob/2a973a046607c42742bf141184b71f1990fa1809/pyproject.toml"
+    },
+    {
+      "key": "nautilus-rc5",
+      "repository": "nautechsystems/nautilus_trader",
+      "commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "path": "Cargo.toml",
+      "git_blob": "a00ca1c9e5ee8cf97a0c43a1c1d62961422185d2",
+      "sha256": "e5338bb3f4f918147dbc92cfbffeaa8b3f8586bcbf8af2e3785ec4ce6f806130",
+      "bytes": 23669,
+      "url": "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/Cargo.toml"
+    },
+    {
+      "key": "nautilus-rc6",
+      "repository": "nautechsystems/nautilus_trader",
+      "commit": "7b766f8825b2539c5b2ac1375e9d97b41c509edb",
+      "path": "Cargo.toml",
+      "git_blob": "5a25f189980b9e0c5dc96b85f80b0ee856dda672",
+      "sha256": "5de96db3a0ef9c34e301caf8df965f9499765f1ec7fbd75c8bfe990c2ff36353",
+      "bytes": 23603,
+      "url": "https://github.com/nautechsystems/nautilus_trader/blob/7b766f8825b2539c5b2ac1375e9d97b41c509edb/Cargo.toml"
+    },
+    {
+      "key": "nautilus-rc6",
+      "repository": "nautechsystems/nautilus_trader",
+      "commit": "7b766f8825b2539c5b2ac1375e9d97b41c509edb",
+      "path": "crates/execution/src/engine/mod.rs",
+      "git_blob": "867c0b8db6e09c186e01fba981d93094b225ec44",
+      "sha256": "a9f7ed0c0ba2864e3bb5e0700012637a6b11a80c237a997aaf324129a326bfea",
+      "bytes": 203665,
+      "url": "https://github.com/nautechsystems/nautilus_trader/blob/7b766f8825b2539c5b2ac1375e9d97b41c509edb/crates/execution/src/engine/mod.rs"
+    },
+    {
+      "key": "nautilus-develop",
+      "repository": "nautechsystems/nautilus_trader",
+      "commit": "ca478e42f434d2ce185493f2bb42d112a88d1ffe",
+      "path": "Cargo.toml",
+      "git_blob": "70ce0aa8ab7c32917fe4073ffd6790f55bbadc15",
+      "sha256": "21a31f7ecce746b14311d25fd1eb2aaf5d7fd6db629af38876371529b2aa7b56",
+      "bytes": 23750,
+      "url": "https://github.com/nautechsystems/nautilus_trader/blob/ca478e42f434d2ce185493f2bb42d112a88d1ffe/Cargo.toml"
+    },
+    {
+      "key": "lumibot-4618",
+      "repository": "Lumiwealth/lumibot",
+      "commit": "730d5608f3ee625f0a30dc15e8cc512205dd2a2b",
+      "path": "lumibot/backtesting/interactive_brokers_rest_backtesting.py",
+      "git_blob": "850a5a230838103c1e1bd0a9dbd64a6670047591",
+      "sha256": "fbe3902a04419144307330935c41d3fb21b65574cfcf95abadca2acc1ff3cf02",
+      "bytes": 51015,
+      "url": "https://github.com/Lumiwealth/lumibot/blob/730d5608f3ee625f0a30dc15e8cc512205dd2a2b/lumibot/backtesting/interactive_brokers_rest_backtesting.py"
+    },
+    {
+      "key": "lumibot-4618",
+      "repository": "Lumiwealth/lumibot",
+      "commit": "730d5608f3ee625f0a30dc15e8cc512205dd2a2b",
+      "path": "tests/backtest/test_ibkr_frozen_replay.py",
+      "git_blob": "d85734a836b669d816e2f4c99ddae62a6fcfa47a",
+      "sha256": "0203d1ba3cbd70cfc07d2c80881765c77a7e97622fdcdc04dd27dc0c16689184",
+      "bytes": 20385,
+      "url": "https://github.com/Lumiwealth/lumibot/blob/730d5608f3ee625f0a30dc15e8cc512205dd2a2b/tests/backtest/test_ibkr_frozen_replay.py"
+    },
+    {
+      "key": "lumibot-4618",
+      "repository": "Lumiwealth/lumibot",
+      "commit": "730d5608f3ee625f0a30dc15e8cc512205dd2a2b",
+      "path": "pyproject.toml",
+      "git_blob": "21120a90624775fd2edb66c2f1793e614ec9206a",
+      "sha256": "c5c937aaa6678f4a6374240f4aad4e773ec33e50bee7ae2daba5dd2b2b22e007",
+      "bytes": 618,
+      "url": "https://github.com/Lumiwealth/lumibot/blob/730d5608f3ee625f0a30dc15e8cc512205dd2a2b/pyproject.toml"
+    },
+    {
+      "key": "alpaca-mcp-240",
+      "repository": "alpacahq/alpaca-mcp-server",
+      "commit": "2a973a046607c42742bf141184b71f1990fa1809",
+      "path": "src/alpaca_mcp_server/overrides.py",
+      "git_blob": "d43b5c9eeee3e0a0103ccbf4916d3b92b050cf1f",
+      "sha256": "548d83643943bf7ffeb854d608b9f9bc1e0684f943cd56a856259b01498679ad",
+      "bytes": 14360,
+      "url": "https://github.com/alpacahq/alpaca-mcp-server/blob/2a973a046607c42742bf141184b71f1990fa1809/src/alpaca_mcp_server/overrides.py"
+    },
+    {
+      "key": "alpaca-mcp-240",
+      "repository": "alpacahq/alpaca-mcp-server",
+      "commit": "2a973a046607c42742bf141184b71f1990fa1809",
+      "path": "src/alpaca_mcp_server/tool_registry.py",
+      "git_blob": "c5205b9c68fb4c048e08336a3333969c8e5f3336",
+      "sha256": "ecef982396f6298b430727d8d5c8c760fc7562889f7f971236629227938b7121",
+      "bytes": 16671,
+      "url": "https://github.com/alpacahq/alpaca-mcp-server/blob/2a973a046607c42742bf141184b71f1990fa1809/src/alpaca_mcp_server/tool_registry.py"
+    },
+    {
+      "key": "alpaca-mcp-240",
+      "repository": "alpacahq/alpaca-mcp-server",
+      "commit": "2a973a046607c42742bf141184b71f1990fa1809",
+      "path": "src/alpaca_mcp_server/server.py",
+      "git_blob": "440b0e2026b84ea3fce4d856764f69aebb53b1e8",
+      "sha256": "c19963b6d923de9f341f80fc1d604cadcbc8ffe9d70d99f0c0a11ffa364bb736",
+      "bytes": 7617,
+      "url": "https://github.com/alpacahq/alpaca-mcp-server/blob/2a973a046607c42742bf141184b71f1990fa1809/src/alpaca_mcp_server/server.py"
+    },
+    {
+      "key": "alpaca-mcp-240",
+      "repository": "alpacahq/alpaca-mcp-server",
+      "commit": "2a973a046607c42742bf141184b71f1990fa1809",
+      "path": "tests/test_server_construction.py",
+      "git_blob": "2bebefddeaafc4691f31b1ea6b0e317c528cbad8",
+      "sha256": "d020907373fbafd417ae4d73b900ec7c17de13ecebff27f202f89d2cf618af4a",
+      "bytes": 22671,
+      "url": "https://github.com/alpacahq/alpaca-mcp-server/blob/2a973a046607c42742bf141184b71f1990fa1809/tests/test_server_construction.py"
+    }
+  ]
+}

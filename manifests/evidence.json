@@ -19137,6 +19137,11 @@
       "bytes": 41530
     },
     {
+      "path": "docs/decisions/2026-10-13-engine-currency.md",
+      "sha256": "b4d36592a4029145c54a6c18bf87f85b7e2f8b0387db737b04e3b5078e7c9293",
+      "bytes": 13625
+    },
+    {
       "path": "docs/decisions/2026-10-13-extended-hours-paper-start-readiness.md",
       "sha256": "8d3174adc602c965064772c14de3c6b3a34841f190b118ea96f1302f754970f0",
       "bytes": 10512
@@ -22485,6 +22490,46 @@
       "path": "evidence/artifacts/edgartools-5600-20261004/this-host-import-smoke.json",
       "sha256": "af9b3da08c0c56e18c9c9e2578d3852a2dfcb6bb95e110398572676f5afe566f",
       "bytes": 6411
+    },
+    {
+      "path": "evidence/artifacts/engine-currency-20261013/checks.json",
+      "sha256": "90381c49ca4fbabfeb384426510c638a90148bcf21bfe8068900493371aaf7be",
+      "bytes": 1662
+    },
+    {
+      "path": "evidence/artifacts/engine-currency-20261013/context.json",
+      "sha256": "f495feb6c13309a1ddbebcde0b0e9f8c0b4c9f092d07b0f43c8da9d7f3838e68",
+      "bytes": 24178
+    },
+    {
+      "path": "evidence/artifacts/engine-currency-20261013/github-freshness.json",
+      "sha256": "d2d5af9dd6a667defa6ce96f219e4334d23b0ad53e1e6bd874623ac7adb60177",
+      "bytes": 19732
+    },
+    {
+      "path": "evidence/artifacts/engine-currency-20261013/source-excerpts.json",
+      "sha256": "528906d8691c8cadb6f46c52d0d2ad35d4fb326a5e416d000c388574aa631ddc",
+      "bytes": 24890
+    },
+    {
+      "path": "evidence/artifacts/engine-currency-20261013/source-index.json",
+      "sha256": "0f55ee4b878a4922d0d030f99df1e32b81120edbb8ed1354fe90ad2324475512",
+      "bytes": 17937
+    },
+    {
+      "path": "evidence/artifacts/engine-currency-20261013/trading-freshness.json",
+      "sha256": "24acac82102c973b35c3482db7f52bc5260407f1ba04898a492e33f6aa0fb840",
+      "bytes": 3409
+    },
+    {
+      "path": "evidence/artifacts/engine-currency-20261013/trading-pins.json",
+      "sha256": "11cf3de4000b1ed34b87de2ef16738f110b7c8d12505aabf9eb058cc79e41946",
+      "bytes": 906
+    },
+    {
+      "path": "evidence/artifacts/engine-currency-20261013/upstream-releases.json",
+      "sha256": "720ce37d954dacb1718b36bbc15f94c15398a0d7ef9e2b972a7c4d8584a23c25",
+      "bytes": 113460
     },
     {
       "path": "evidence/artifacts/env-freshness-20260924/wsl-ubuntu-main.json",
