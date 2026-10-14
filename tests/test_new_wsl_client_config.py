@@ -1605,14 +1605,17 @@ class RenderTests(unittest.TestCase):
         events = {event: [h["command"] for g in groups for h in g["hooks"]] for event, groups in settings["hooks"].items()}
         commands = [command for v in events.values() for command in v]
         # Each hook runs a file the repository copies, ai-memory (an interim install) at the link the plan's
-        # memory-owner row makes, rtk (the owner's directive of 2026-10-04), or the logging-only ConfigChange audit command
-        # that NativeStack runs; context-mode writes its own cache-heal hook.
+        # memory-owner row makes, rtk (the owner's directive of 2026-10-04), the logging-only ConfigChange audit command
+        # that NativeStack runs, or the skill-list reload after a compaction (the decision of 2026-10-14, jq alone);
+        # context-mode writes its own cache-heal hook.
         ai_memory = "/home/example/.local/bin/ai-memory "
         audit = "jq -c '{timestamp: now | todate, source: .source, file: .file_path}' >> ~/claude-config-audit.log || true"
+        reload_skills = "jq -cn '{hookSpecificOutput: {hookEventName: \"SessionStart\", reloadSkills: true}}'"
         self.assertEqual(events["ConfigChange"], [audit])
+        self.assertEqual(events["SessionStart"].count(reload_skills), 1, events)
         self.assertEqual(sum(".claude/hooks/" in command for command in commands), 6)
-        self.assertTrue(all(".claude/hooks/" in command or command.startswith(ai_memory) or command in ("rtk hook claude", audit)
-                            for command in commands), commands)
+        self.assertTrue(all(".claude/hooks/" in command or command.startswith(ai_memory)
+                            or command in ("rtk hook claude", audit, reload_skills) for command in commands), commands)
         self.assertTrue(any(command.startswith(ai_memory) for command in events["SessionStart"]), events)
         self.assertEqual([command for command in commands if "cache-heal" in command], [])
         self.assertFalse([e for e in settings["permissions"]["deny"] if e.startswith("Agent(codex")])

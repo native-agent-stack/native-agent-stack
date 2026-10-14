@@ -1,0 +1,10 @@
+tests/test_skill_list_reload_hook.py with adoption/templates/claude.settings.template.json as it is on main at 59899aaf (the rest of the tree as in this change):
+ERROR: test_the_receipt_was_taken_with_the_entry_the_template_ships
+ERROR: test_the_command_prints_the_documented_session_start_output
+ERROR: test_the_hook_fails_open
+FAIL: test_a_fresh_host_gets_the_group
+FAIL: test_a_host_hook_on_the_same_source_is_kept_beside_it
+FAIL: test_a_second_apply_does_not_add_a_second_copy
+FAIL: test_the_template_has_one_session_start_group_on_the_compact_source
+Ran 14 tests in 0.011s
+FAILED (failures=4, errors=3)

@@ -1,0 +1,19 @@
+Mutants of the settings template's skill-reload hook and of its receipt, against tests/test_skill_list_reload_hook.py.
+16 of 16 killed. Unmutated tree: exit 0, OK.
+
+killed    template: the compact group is removed  [test_a_fresh_host_gets_the_group, test_a_host_hook_on_the_same_source_is_kept_beside_it, test_a_second_apply_does_not_add_a_second_copy, test_the_command_prints_the_documented_session_start_output, test_the_hook_fails_open, test_the_receipt_was_taken_with_the_entry_the_template_ships, test_the_template_has_one_session_start_group_on_the_compact_source]
+killed    template: the group's matcher is startup  [test_a_fresh_host_gets_the_group, test_a_host_hook_on_the_same_source_is_kept_beside_it, test_a_second_apply_does_not_add_a_second_copy, test_no_other_session_start_source_reloads_the_skills, test_the_command_prints_the_documented_session_start_output, test_the_hook_fails_open, test_the_receipt_was_taken_with_the_entry_the_template_ships, test_the_template_has_one_session_start_group_on_the_compact_source]
+killed    template: the command prints reloadSkills false  [test_a_host_hook_on_the_same_source_is_kept_beside_it, test_a_second_apply_does_not_add_a_second_copy, test_the_command_prints_the_documented_session_start_output, test_the_receipt_was_taken_with_the_entry_the_template_ships, test_the_template_has_one_session_start_group_on_the_compact_source]
+killed    template: the command names the Setup event  [test_a_host_hook_on_the_same_source_is_kept_beside_it, test_a_second_apply_does_not_add_a_second_copy, test_the_command_prints_the_documented_session_start_output, test_the_receipt_was_taken_with_the_entry_the_template_ships, test_the_template_has_one_session_start_group_on_the_compact_source]
+killed    template: the hook gets onFailure block  [test_the_hook_fails_open, test_the_receipt_was_taken_with_the_entry_the_template_ships, test_the_template_has_one_session_start_group_on_the_compact_source]
+killed    template: the hook's timeout is 60  [test_the_hook_fails_open, test_the_receipt_was_taken_with_the_entry_the_template_ships, test_the_template_has_one_session_start_group_on_the_compact_source]
+killed    template: the group is there twice  [test_a_fresh_host_gets_the_group, test_a_second_apply_does_not_add_a_second_copy, test_the_template_has_one_session_start_group_on_the_compact_source]
+killed    template: the startup group also reloads the skills  [test_a_host_hook_on_the_same_source_is_kept_beside_it, test_no_other_session_start_source_reloads_the_skills]
+killed    template: the command prints JSON on several lines  [test_a_host_hook_on_the_same_source_is_kept_beside_it, test_a_second_apply_does_not_add_a_second_copy, test_the_command_prints_the_documented_session_start_output, test_the_receipt_was_taken_with_the_entry_the_template_ships, test_the_template_has_one_session_start_group_on_the_compact_source]
+killed    receipt: a control arm shows the list after the compaction  [test_without_the_hook_no_request_after_a_compaction_carries_the_list]
+killed    receipt: the hook arm after /compact misses the list once  [test_with_the_hook_the_list_is_back]
+killed    receipt: the hook arm after an automatic compaction never gets the list  [test_with_the_hook_the_list_is_back]
+killed    receipt: taken with a different hook command  [test_the_receipt_was_taken_with_the_entry_the_template_ships]
+killed    receipt: one client version is missing  [test_every_arm_ran_on_both_client_versions]
+killed    receipt: an automatic arm reports a manual trigger  [test_every_arm_ran_on_both_client_versions]
+killed    receipt: the probe's hash is another file's  [test_the_receipt_was_taken_with_the_entry_the_template_ships]

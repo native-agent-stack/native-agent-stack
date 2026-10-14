@@ -177,6 +177,13 @@
     },
     {
       "match": [
+        "claude/settings/hook/SessionStart/matcher=compact/jq -cn *reloadSkills: true*"
+      ],
+      "wiring": "practice",
+      "note": "The skill-list reload after a compaction (docs/decisions/2026-10-14-skill-list-reload-after-compaction.md). Claude Code does not send the skill list again after a compaction; this SessionStart hook on the `compact` source returns `reloadSkills: true`, which makes the client send it with the next request. It runs jq alone, has no `onFailure`, and a failure leaves the session as it was."
+    },
+    {
+      "match": [
         "claude/settings/hook/*/*research-routing-guard.py*",
         "claude/profile/hook-file/research-routing-guard.py"
       ],
