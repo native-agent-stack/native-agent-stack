@@ -1,0 +1,559 @@
+"""Native CLI/systemd readiness glue. No trading decisions or order implementation.
+
+Source: systemd.path/service at54b24a38; native paper CLIs at8c95a50d.
+Only a CC-hashed GO arriving in an active venue session admits a command.
+This module never reads a credential; every keyed command is inside credential_run.
+"""
+from contextlib import contextmanager
+from datetime import datetime, timezone
+import fcntl
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import stat
+import subprocess
+import sys
+import time
+
+ROOT = Path(__file__).resolve().parent
+FROZEN = ROOT / 'frozen'
+PY = Path.home() / 'projects/us-equities-runtime/.venv/bin/python'
+STATE = Path.home() / '.local/state/native-agent-stack/alpaca-paper/forward-ready-8c95a50d'
+STOP = Path.home() / '.local/state/native-agent-stack/alpaca-paper/STOP'
+STAGES = ['pre', 'sip', 'lev1', 'lev2', 'lev4', 'edge2', 'edge8', 'iex']
+CONFIGS = {'pre': 'pre.json', 'sip': 'sip.json', 'lev1': 'lev1.json', 'lev2': 'lev2.json',
+           'lev4': 'lev4.json', 'edge2': 'edge2.json', 'edge8': 'edge8.json', 'iex': 'iex.json'}
+PREDECESSOR_BUNDLE = hashlib.sha256(b'SYN predecessor manifest').hexdigest()
+SKIP_REASONS = ('pre_window_passed', 'scanner_failed', 'record_failed')
+
+class Refused(Exception):
+    pass
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+def boot_id():
+    return Path('/proc/sys/kernel/random/boot_id').read_text().strip()
+
+def safe_json(path):
+    info = path.lstat()
+    if not stat.S_ISREG(info.st_mode) or info.st_uid != os.geteuid() or info.st_size > 65536:
+        raise Refused('unsafe_input')
+    return json.loads(path.read_text())
+
+def save(path, value):
+    path.parent.mkdir(parents=True, mode=0o700, exist_ok=True)
+    temporary = path.with_name(path.name + '.tmp')
+    with temporary.open('x') as stream:
+        json.dump(value, stream, indent=2)
+        stream.write('\n')
+        stream.flush()
+        os.fsync(stream.fileno())
+    os.replace(temporary, path)
+    directory=os.open(path.parent,os.O_RDONLY|os.O_DIRECTORY)
+    try:
+        os.fsync(directory)
+    finally:
+        os.close(directory)
+
+def verify_bundle():
+    result = subprocess.run(['/usr/bin/sha256sum', '--strict', '--quiet', '-c', 'SHA256SUMS'],
+                            cwd=ROOT, capture_output=True, text=True)
+    if result.returncode:
+        raise Refused('bundle_hash_mismatch')
+
+def session_now():
+    sys.path.insert(0, str(FROZEN / 'blueprints/us-equities/adaptive-paper'))
+    from sessions import session_at
+    value = session_at(datetime.now(timezone.utc))
+    return value.kind.value, value.session_date.isoformat()
+
+def verify_runtime(project=None):
+    # Same frozen owner/completion/metadata contract as the published scheduler,
+    # evaluated while __main__ holds its upstream native runtime reader lock.
+    project=Path(project) if project is not None else (Path.home()/'projects/us-equities-runtime').resolve()
+    if not project.is_dir() or project.stat().st_uid!=os.geteuid() or (project/'.venv').is_symlink() or not (project/'.venv').is_dir():
+        raise Refused('runtime_ownership_incomplete')
+    for name,value in {'.trading-2604-owner':'native-stack-trading-2604-v1',
+                       '.trading-2604-complete':'native-stack-trading-2604-no-dvc-r4'}.items():
+        path=project/name
+        if path.is_symlink() or not path.is_file() or path.read_text().strip()!=value:
+            raise Refused('runtime_marker_incomplete')
+    for name in ('pyproject.toml','uv.lock'):
+        path=project/name
+        expected=FROZEN/'blueprints/us-equities/runtime-2604/trading-2604-runtime'/name
+        if path.is_symlink() or not path.is_file() or sha(path)!=sha(expected):
+            raise Refused('runtime_metadata_differs')
+
+@contextmanager
+def writer():
+    STATE.mkdir(parents=True, mode=0o700, exist_ok=True)
+    fd=os.open(STATE/'writer.lock',os.O_WRONLY|os.O_CREAT|os.O_APPEND|os.O_NOFOLLOW,0o600)
+    with os.fdopen(fd,'a') as stream:
+        if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode) or os.fstat(stream.fileno()).st_uid!=os.geteuid():
+            raise Refused('unsafe_writer_lock')
+        try:
+            fcntl.flock(stream.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            raise Refused('writer_busy') from None
+        yield
+
+def config(stage):
+    if stage not in CONFIGS:
+        raise Refused('unknown_stage')
+    return ROOT / 'configs' / CONFIGS[stage]
+
+def credential_pointer():
+    # Native inventory/template resolution only. The actual file is read solely
+    # by credential_run and its declared native child loader, never this glue.
+    sys.path.insert(0,str(FROZEN/'scripts'))
+    import credential_status
+    inventory=json.loads((FROZEN/'adoption/credential-inventory.json').read_text())
+    entry=next(value for value in inventory['entries'] if value['id']=='alpaca-paper')
+    return credential_status.expand_template(entry['store']['path_template'],os.environ)
+
+def record_units():
+    result = subprocess.run(['systemctl', '--user', 'list-units', '--all', '--type=service',
+                             '--no-legend', '--plain', 'paper-ready-record-*.service'],
+                            capture_output=True, text=True)
+    if result.returncode:
+        raise Refused('record_unit_inventory_unavailable')
+    rows = []
+    for line in result.stdout.splitlines():
+        pieces = line.split()
+        if len(pieces) < 4:
+            raise Refused('record_unit_inventory_malformed')
+        name, loaded, active, sub = pieces[:4]
+        if loaded != 'loaded' or active not in ('inactive','failed'):
+            raise Refused('record_service_not_quiescent')
+        rows.append({'Id': name, 'ActiveState': active, 'SubState': sub})
+    if not rows:
+        raise Refused('record_unit_inventory_empty')
+    return rows
+
+def record_evidence(date):
+    # This is a rate-window proof, independent of recorder success. A pending
+    # token or unknown active lifecycle is never treated as "never ran".
+    if (STATE/'active-data/record.json').exists() or (STATE/'active-data/record.json').is_symlink():
+        raise Refused('recorder_still_active')
+    slot = STATE/'ready/record'
+    if (slot/'GO.sha256').exists() or (slot/'GO.sha256').is_symlink():
+        raise Refused('record_GO_pending')
+    evidence = {}
+    completed = STATE/'data-completed/record.json'
+    if completed.exists() or completed.is_symlink():
+        value = safe_json(completed)
+        if value.get('session_date') == date:
+            if value.get('finished') is not True:
+                raise Refused('record_lifecycle_unknown')
+            evidence['data-completed/record.json'] = sha(completed)
+    for path in sorted(slot.glob('*.json')):
+        value = safe_json(path)
+        if value.get('session_date') != date:
+            continue
+        if path.name.startswith('GO.refused.'):
+            raise Refused('record_GO_was_refused')
+        evidence[str(path.relative_to(STATE))] = sha(path)
+        if path.name == 'GO.json' and (slot/(value['trial']+'.GO.used.sha256')).exists():
+            if 'data-completed/record.json' not in evidence:
+                raise Refused('record_consumed_without_completion')
+            if safe_json(completed).get('trial') != value['trial']:
+                raise Refused('record_completion_trial_mismatch')
+    return evidence
+
+def record_quiescence():
+    verify_bundle()
+    verify_runtime()
+    with writer():
+        kind, date = session_now()
+        if kind not in ('PRE', 'RTH'):
+            raise Refused('record_quiescence_outside_session')
+        units = record_units()
+        evidence = record_evidence(date)
+        path = STATE/'record-quiescence'/f'{date}.json'
+        if path.exists():
+            prior = safe_json(path)
+            if (prior.get('session_date') == date and prior.get('boot_id') == boot_id()
+                    and prior.get('evidence') == evidence):
+                return 0  # repeated readiness checks do not restart the clock
+        save(path, {'session_date': date, 'boot_id': boot_id(), 'evidence': evidence,
+                    'quiet_monotonic': time.monotonic(), 'unit_observation': units,
+                    'observed_at_utc': datetime.now(timezone.utc).isoformat(),
+                    'bundle_sha256': sha(ROOT/'SHA256SUMS'), 'broker_requests': 0})
+        return 0
+
+def record_window_drained(date):
+    units = record_units()
+    evidence = record_evidence(date)
+    path = STATE/'record-quiescence'/f'{date}.json'
+    if not path.is_file():
+        raise Refused('record_quiescence_missing')
+    quiet = safe_json(path)
+    if quiet.get('session_date') != date or quiet.get('boot_id') != boot_id():
+        raise Refused('record_quiescence_session_or_boot')
+    if quiet.get('evidence') != evidence:
+        raise Refused('record_quiescence_evidence_changed')
+    age = time.monotonic() - quiet['quiet_monotonic']
+    if not 60 <= age:
+        raise Refused('record_request_window_not_drained')
+    return {'checkpoint': str(path), 'sha256': sha(path), 'age_seconds': age, 'units': units}
+
+def verify_handoff(previous, date):
+    path = STATE/'completed'/date/(previous+'.json')
+    value = safe_json(path)
+    if (value.get('stage') != previous or value.get('session_date') != date
+            or value.get('config_sha256') != sha(config(previous)) or value.get('recover_rc') != 0):
+        raise Refused('previous_recover_config_or_rc')
+    trial = value.get('trial', '')
+    if not re.fullmatch(r'[a-z0-9-]{1,24}', trial):
+        raise Refused('previous_recover_trial')
+    instance = STATE/'instances'/trial
+    native = instance/('flat-probe.json' if (instance/'flat-probe.json').is_file() else 'recover.json')
+    output = safe_json(native)
+    proof = output.get('reconciliation') or {}
+    if sha(native) != value.get('native_recover_sha256'):
+        raise Refused('previous_native_recover_hash')
+    if not (value.get('flat') is True and value.get('positions') == 0 and value.get('open_orders') == 0
+            and output.get('status') == 'passed' and output.get('flat') is True
+            and output.get('positions') == [] and output.get('unresolved_orders') == []
+            and proof.get('positions') == 0 and proof.get('open_orders') == 0):
+        raise Refused('previous_not_flat')
+    origin = value.get('bundle_sha256')
+    if origin is None:
+        # Old genuine receipts carry source binding in active.finished.json.
+        original = safe_json(instance/'active.finished.json')
+        origin = original.get('bundle_sha256')
+        if (original.get('config_sha256') != value['config_sha256']
+                or original.get('go_sha256') != value.get('go_sha256')):
+            raise Refused('legacy_handoff_origin_mismatch')
+    if origin not in (PREDECESSOR_BUNDLE, sha(ROOT/'SHA256SUMS')):
+        raise Refused('handoff_source_bundle_not_authorized')
+    if 'skipped' in value and (previous != 'pre' or value.get('pre_did_not_trade') is not True
+                              or native.name != 'flat-probe.json'):
+        raise Refused('skip_handoff_not_native_no_trade_proof')
+    if value.get('boot_id') != boot_id() or time.monotonic()-value['recover_finished_monotonic'] < 60:
+        raise Refused('account_request_window_not_drained')
+    return path, value, native
+
+def skip_available(date):
+    if STOP.exists() or STOP.is_symlink():
+        raise Refused('stop_present')
+    if any((STATE/'active').glob('*.json')):
+        raise Refused('active_trial_requires_recovery')
+    if (STATE/'completed'/date/'pre.json').exists():
+        raise Refused('PRE_already_completed')
+    slot = STATE/'ready/pre'
+    if (slot/'GO.sha256').exists() or (slot/'GO.sha256').is_symlink():
+        raise Refused('PRE_GO_pending')
+    for path in slot.glob('GO*.json'):
+        if safe_json(path).get('session_date') == date:
+            raise Refused('PRE_already_admitted_or_refused')
+
+def skip_stage():
+    verify_bundle()
+    verify_runtime()
+    with writer():
+        slot = STATE/'ready/pre-skip'
+        token = slot/'GO.sha256'
+        info = token.lstat()
+        if not stat.S_ISREG(info.st_mode) or info.st_uid != os.geteuid() or info.st_size > 128:
+            raise Refused('unsafe_go_digest')
+        expected = token.read_text().strip()
+        value = safe_json(slot/'GO.json')
+        required = {'schema_version','purpose','bundle_sha256','config_sha256','trial',
+                    'session_kind','session_date','issued_at_utc','state_root','skip_reason'}
+        if set(value) != required or value['schema_version'] != 1 or value['purpose'] != 'GET_ONLY_PRE_SKIP':
+            raise Refused('skip_go_schema')
+        if not re.fullmatch(r'[a-f0-9]{64}', expected) or sha(slot/'GO.json') != expected:
+            raise Refused('skip_go_hash')
+        if value['bundle_sha256'] != sha(ROOT/'SHA256SUMS') or value['config_sha256'] != sha(config('pre')):
+            raise Refused('skip_go_binding')
+        issued = datetime.fromisoformat(value['issued_at_utc'])
+        if issued.tzinfo is None or not 0 <= time.time()-issued.timestamp() < 300:
+            raise Refused('skip_go_expired_or_future')
+        kind, date = session_now()
+        if kind not in ('PRE','RTH') or (kind,date) != (value['session_kind'],value['session_date']):
+            raise Refused('skip_session_binding')
+        if value['skip_reason'] not in SKIP_REASONS:
+            raise Refused('unknown_skip_reason')
+        if value['skip_reason'] == 'pre_window_passed' and kind == 'PRE':
+            sys.path.insert(0,str(FROZEN/'blueprints/us-equities/adaptive-paper'))
+            from mover import load_mover_config
+            from sessions import NY
+            _,_,settings = load_mover_config(config('pre'))
+            if datetime.fromtimestamp(time.time(),timezone.utc).astimezone(NY).time().replace(tzinfo=None) < settings.trial_end_et:
+                raise Refused('PRE_window_not_passed')
+        if not re.fullmatch(r'[a-z0-9-]{1,24}',value['trial']):
+            raise Refused('invalid_trial')
+        instance = STATE/'instances'/value['trial']
+        used = slot/(value['trial']+'.GO.used.sha256')
+        if instance.exists() or used.exists() or value['state_root'] != str(instance/'native-state'):
+            raise Refused('state_binding_or_reuse')
+        skip_available(date)
+        os.rename(token,used)
+        instance.mkdir(parents=True,mode=0o700)
+        active = dict(value, instance=str(instance), go_sha256=expected)
+        save(STATE/'active/pre-skip.json',active)
+        output = instance/'flat-probe.json'
+        rc = keyed([PY,'-E','-s','-B',ROOT/'observe_flat.py','pre',
+                    '--config',config('pre'),'--output',output],timeout=120)
+        result = safe_json(output)
+        proof = result.get('reconciliation') or {}
+        flat = (rc == 0 and result.get('status') == 'passed' and result.get('flat') is True
+                and result.get('positions') == [] and result.get('unresolved_orders') == []
+                and proof.get('positions') == 0 and proof.get('open_orders') == 0)
+        receipt = {'stage':'pre','trial':value['trial'],'session_date':date,
+                   'config_sha256':value['config_sha256'],'bundle_sha256':value['bundle_sha256'],
+                   'go_sha256':expected,'native_recover_sha256':sha(output),'recover_rc':rc,
+                   'flat':flat,'positions':proof.get('positions'),'open_orders':proof.get('open_orders'),
+                   'skipped':value['skip_reason'],'pre_did_not_trade':True,'broker_orders_submitted':0,
+                   'stop_cleared':False,'boot_id':boot_id(),'recover_finished_monotonic':time.monotonic(),
+                   'recover_finished_at_utc':datetime.now(timezone.utc).isoformat()}
+        save(instance/'recover-validation.json',receipt)
+        save(instance/'handoff.json',receipt)
+        if not flat:
+            raise Refused('skip_probe_not_flat')
+        save(STATE/'completed'/date/'pre.json',receipt)
+        (STATE/'active/pre-skip.json').rename(instance/'active.finished.json')
+        return 0
+
+def binding(stage):
+    slot = STATE / 'ready' / stage
+    go = slot / 'GO.json'
+    digest_path = slot / 'GO.sha256'
+    # The trusted CC relay publishes the expected digest; neither launcher nor
+    # dry-run receipt issues a production GO. Consume exactly once, under writer.
+    info = digest_path.lstat()
+    if not stat.S_ISREG(info.st_mode) or info.st_uid != os.geteuid() or info.st_size > 128:
+        raise Refused('unsafe_go_digest')
+    expected = digest_path.read_text().strip()
+    value = safe_json(go)
+    if not re.fullmatch(r'[0-9a-f]{64}', expected) or sha(go) != expected:
+        raise Refused('go_hash_mismatch')
+    required = {'schema_version','bundle_sha256','config_sha256','stage','trial','session_kind',
+                'session_date','issued_at_utc','state_root','scan_sha256','previous_recover_sha256'}
+    if set(value) != required or value['schema_version'] != 1 or value['stage'] != stage:
+        raise Refused('go_schema_mismatch')
+    if value['bundle_sha256'] != sha(ROOT / 'SHA256SUMS') or value['config_sha256'] != sha(config(stage)):
+        raise Refused('go_binding_mismatch')
+    if not re.fullmatch(r'[a-z0-9-]{1,24}', value['trial']):
+        raise Refused('invalid_trial')
+    issued = datetime.fromisoformat(value['issued_at_utc'])
+    if issued.tzinfo is None or not 0 <= time.time() - issued.timestamp() < 300:
+        raise Refused('go_expired_or_future')
+    kind, date = session_now()
+    if (kind, date) != (value['session_kind'], value['session_date']):
+        raise Refused('session_binding_mismatch')
+    if kind != ('PRE' if stage == 'pre' else 'RTH'):
+        raise Refused('outside_stage_session')
+    instance = STATE / 'instances' / value['trial']
+    if value['state_root'] != str(instance / 'native-state') or instance.exists():
+        raise Refused('state_binding_or_reuse')
+    if STOP.exists() or STOP.is_symlink():
+        raise Refused('stop_present')
+    previous = STAGES.index(stage) - 1
+    if previous >= 0:
+        receipt = STATE / 'completed' / date / (STAGES[previous] + '.json')
+        if not receipt.is_file() or sha(receipt) != value['previous_recover_sha256']:
+            raise Refused('previous_recover_binding_missing')
+        _, prior, _ = verify_handoff(STAGES[previous],date)
+        # New CONFIGs have independent native journals. Wait for the previous
+        # account's whole60s request window to drain, measured from its final
+        # recover completion, rather than pretend those histories are shared.
+        if prior.get('boot_id') != boot_id() or time.monotonic() - prior['recover_finished_monotonic'] < 60:
+            raise Refused('account_request_window_not_drained')
+        if stage == 'sip':
+            record_window_drained(date)
+    elif value['previous_recover_sha256'] is not None:
+        raise Refused('unexpected_previous_recover')
+    if stage == 'pre':
+        reference=safe_json(STATE/'reference-trading-last.json')
+        if reference.get('boot_id')!=boot_id() or time.monotonic()-reference['finished_monotonic']<60:
+            raise Refused('reference_request_window_not_drained')
+        if not value['scan_sha256'] or sha(slot / 'scan.json') != value['scan_sha256']:
+            raise Refused('scan_binding_mismatch')
+    elif value['scan_sha256'] is not None:
+        raise Refused('unexpected_rth_scan')
+    used = slot / (value['trial'] + '.GO.used.sha256')
+    if used.exists():
+        raise Refused('go_already_used')
+    os.rename(digest_path, used)
+    instance.mkdir(parents=True,mode=0o700)
+    if stage == 'pre':
+        (instance / 'scan.json').write_bytes((slot / 'scan.json').read_bytes())
+    value['go_sha256'] = expected
+    value['instance'] = str(instance)
+    save(STATE / 'active' / (stage + '.json'), value)
+    return value
+
+def keyed(command, *, timeout, environment=None):
+    argv = ['/usr/bin/python3', '-I', '-B', str(FROZEN / 'tools/credentials/credential_run.py'),
+            'alpaca-paper', '--', *map(str, command)]
+    # Native stdout is masked by the credential runner; private log, never
+    # echoed into agent messages or parsed as an instruction.
+    log = STATE / 'command-output.log'
+    with log.open('a') as stream:
+        result = subprocess.run(argv, env=environment, stdout=stream, stderr=stream, timeout=timeout)
+    return result.returncode
+
+def native_recover(stage, active):
+    instance = Path(active['instance'])
+    paper = FROZEN / 'blueprints/us-equities/adaptive-paper'
+    output = instance / 'recover.json'
+    return keyed([PY, '-E', '-s', '-B', paper / ('mover_runner.py' if stage == 'pre' else 'runner.py'),
+                  'recover', '--env-file', credential_pointer(),
+                  '--config', config(stage), '--output', output,
+                  '--state-root', active['state_root']], timeout=720), output
+
+def run_stage(stage):
+    verify_bundle()
+    verify_runtime()
+    with writer():
+        if any((STATE / 'active').glob('*.json')):
+            raise Refused('active_trial_requires_recovery')
+        value = binding(stage)
+        instance = Path(value['instance'])
+        paper = FROZEN / 'blueprints/us-equities/adaptive-paper'
+        if stage == 'pre':
+            return keyed([PY, '-E', '-s', '-B', paper / 'mover_runner.py', 'paper',
+                          '--env-file', credential_pointer(),
+                          '--config', config(stage), '--scan', instance / 'scan.json',
+                          '--trial', value['trial'], '--state-root', value['state_root'],
+                          '--output', instance / 'paper.json'], timeout=4490)
+        environment = dict(os.environ)
+        environment.update(TRIAL=value['trial'], CONFIG=str(config(stage)),
+                           ENV_FILE=str(credential_pointer()),
+                           STATE_ROOT=value['state_root'], OUT_DIR=str(instance / 'scheduled'), PY=str(PY))
+        return keyed(['/usr/bin/bash', paper / 'scheduled_trial.sh'], timeout=1190, environment=environment)
+
+def stop_mark(stage):
+    # Own the latch only if this hook creates it. An existing STOP, including a
+    # human abort during the run, must never be silently cleared by recovery.
+    active_path = STATE / 'active' / (stage + '.json')
+    if not active_path.is_file():
+        return 0
+    active = safe_json(active_path)
+    try:
+        descriptor = os.open(STOP, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
+        os.close(descriptor)
+        owned = True
+    except FileExistsError:
+        owned = False
+    save(Path(active['instance']) / 'stop-hook.json', {'created_by_hook': owned})
+    return 0
+
+def recover_stage(stage):
+    verify_bundle()
+    verify_runtime()
+    with writer():
+        active_path = STATE / 'active' / (stage + '.json')
+        if not active_path.is_file():
+            return 0
+        active = safe_json(active_path)
+        if active['config_sha256'] != sha(config(stage)) or active['bundle_sha256'] != sha(ROOT/'SHA256SUMS'):
+            raise Refused('recovery_config_binding_mismatch')
+        before = STOP.stat(follow_symlinks=False)
+        rc, output = native_recover(stage, active)
+        if output.is_file():
+            refused = safe_json(output)
+            if rc in (2,3) and refused.get('reason') in ('no_owned_trial_to_recover', 'no_mover_trial_to_recover'):
+                probe = Path(active['instance']) / 'flat-probe.json'
+                rc = keyed([PY, '-E', '-s', '-B', ROOT/'observe_flat.py', stage,
+                            '--config', config(stage), '--output', probe], timeout=120)
+                output = probe
+        result = safe_json(output)
+        proof = result.get('reconciliation') or {}
+        flat = (rc == 0 and result.get('status') == 'passed' and result.get('flat') is True
+                and proof.get('positions') == 0 and proof.get('open_orders') == 0
+                and result.get('positions') == [] and result.get('unresolved_orders') == [])
+        receipt = {'stage': stage, 'trial': active['trial'], 'session_date': active['session_date'],
+                   'config_sha256': active['config_sha256'], 'go_sha256': active['go_sha256'],
+                   'bundle_sha256': active['bundle_sha256'],
+                   'native_recover_sha256': sha(output), 'flat': flat,
+                   'positions': proof.get('positions'), 'open_orders': proof.get('open_orders'),
+                   'recover_rc': rc, 'stop_cleared': False,
+                   'recover_finished_monotonic': time.monotonic(),
+                   'boot_id': boot_id(),
+                   'recover_finished_at_utc': datetime.now(timezone.utc).isoformat()}
+        instance = Path(active['instance'])
+        # CC handoff requires this trial's own recover proof before clearing
+        # its latch, including a process death between clear and final handoff.
+        save(instance/'recover-validation.json',receipt)
+        if flat:
+            after = STOP.stat(follow_symlinks=False)
+            owned = safe_json(instance / 'stop-hook.json')['created_by_hook']
+            if owned and (before.st_dev,before.st_ino,before.st_mtime_ns,before.st_ctime_ns) == (
+                    after.st_dev,after.st_ino,after.st_mtime_ns,after.st_ctime_ns) and stat.S_ISREG(after.st_mode):
+                STOP.unlink()
+                receipt['stop_cleared'] = True
+            save(STATE/'completed'/active['session_date']/(stage+'.json'), receipt)
+            save(instance / 'handoff.json', receipt)
+            active_path.rename(instance / 'active.finished.json')
+            return 0
+        save(instance / 'handoff.json', receipt)
+        raise Refused('recovery_not_flat')
+
+def retire_token(stage,reason):
+    if stage not in STAGES+['record','scan','pre-skip']:
+        return
+    slot=STATE/'ready'/stage
+    token=slot/'GO.sha256'
+    if token.is_file():
+        stamp=str(time.time_ns())
+        body=slot/'GO.json'
+        if body.exists() or body.is_symlink():
+            body.rename(slot/('GO.refused.'+stamp+'.json'))
+        token.rename(slot/('GO.refused.'+stamp+'.sha256'))
+        save(slot/('refusal.'+stamp+'.json'),{'reason':reason,
+             'observed_at_utc':datetime.now(timezone.utc).isoformat(),'orders_dispatched':0})
+
+def main():
+    if len(sys.argv) == 3 and sys.argv[1:] == ['record-drain','record']:
+        try:
+            return record_quiescence()
+        except Exception as exc:
+            print('refused:' + (str(exc) if isinstance(exc,Refused) else type(exc).__name__))
+            return 2
+    if len(sys.argv) == 3 and sys.argv[1:] == ['skip','pre-skip']:
+        try:
+            return skip_stage()
+        except Exception as exc:
+            reason = str(exc) if isinstance(exc,Refused) else type(exc).__name__
+            retire_token('pre-skip',reason)
+            print('refused:' + reason)
+            return 2
+    if len(sys.argv) != 3 or sys.argv[2] not in STAGES:
+        return 2
+    command, stage = sys.argv[1:]
+    try:
+        if command == 'run':
+            return run_stage(stage)
+        if command == 'stop-mark':
+            return stop_mark(stage)
+        if command == 'recover':
+            return recover_stage(stage)
+        return 2
+    except Refused as exc:
+        # PathExists triggers immediately after a service exits. Retire a refused
+        # token instead of creating an unbounded restart loop. A new readiness
+        # event requires a fresh CC digest, with its own actual-ready timestamp.
+        if command == 'run':
+            retire_token(stage,str(exc))
+        print('refused:' + str(exc))
+        return 2
+    except Exception as exc:
+        if command == 'run':
+            retire_token(stage,type(exc).__name__)
+        # Only exception class, never provider text/environment/credential data.
+        print('refused:' + type(exc).__name__)
+        return 2
+
+if __name__ == '__main__':
+    # Protect package imports/commands through the published managed-runtime
+    # helper; it is stdlib-only and interoperates with #1009's native flock.
+    sys.path.insert(0, str(FROZEN / 'blueprints/us-equities/adaptive-paper'))
+    from runtime_lock import runtime_read_lock
+    with runtime_read_lock():
+        raise SystemExit(main())
