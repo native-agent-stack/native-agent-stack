@@ -18,8 +18,10 @@ import os
 from pathlib import Path
 import re
 import sqlite3
+import stat
 import sys
 import threading
+import time
 
 # This module is sometimes loaded directly via importlib file-spec without its
 # own directory on sys.path; self-heal so the local sessions.py sibling import
@@ -450,6 +452,46 @@ def account_lock(account_id, lock_root=None):
     fingerprint = hashlib.sha256(account_id.encode()).hexdigest()
     with account_lock_fingerprint(fingerprint, lock_root) as value:
         yield value
+
+
+@contextmanager
+def startup_request_lock(state_root):
+    """Serialize startup authority selection, pre-send accounting and replay.
+
+    The lock's only retained value is the expiry of previously unbound broker
+    attempts. Adoption refuses while those attempts can still be in flight or
+    awaiting replay; they cannot be lost between an existence check and send.
+    No request journal/trial/risk state is created for default unbound calls.
+    """
+    root = Path(state_root)
+    root.mkdir(parents=True, exist_ok=True, mode=0o700)
+    fd = os.open(root / "readiness-startup.lock", os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
+    try:
+        info = os.fstat(fd)
+        if not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid() or info.st_size > 64:
+            raise SafetyError("invalid_startup_request_lock")
+        try:
+            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            raise SafetyError("readiness_startup_busy") from None
+        raw = os.read(fd, 64)
+        try:
+            until = float(raw) if raw else 0.0
+        except ValueError:
+            raise SafetyError("invalid_startup_request_lock") from None
+        if not math.isfinite(until) or until < 0:
+            raise SafetyError("invalid_startup_request_lock")
+        state = {"unbound_until": until}
+        yield state
+        if state["unbound_until"] != until:
+            os.lseek(fd, 0, os.SEEK_SET)
+            encoded = str(state["unbound_until"]).encode("ascii")
+            if os.write(fd, encoded) != len(encoded):
+                raise SafetyError("startup_request_marker_write_failed")
+            os.ftruncate(fd, os.lseek(fd, 0, os.SEEK_CUR))
+            os.fsync(fd)
+    finally:
+        os.close(fd)
 
 
 @contextmanager
@@ -1538,7 +1580,194 @@ class Ledger:
                 recorded.append({"id": activity_id, "date": day, "net_amount": text, "sub_type": sub_type})
             return recorded
 
-    def request_budget(self, now, kind, client_id=None):
+    @staticmethod
+    def retained_request_source(path):
+        """Inspect existing binding without bootstrapping/migrating trading state."""
+        path = Path(path)
+        if path.is_symlink() or not path.is_file():
+            raise SafetyError("readiness_request_journal_required")
+        probe = sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True)
+        try:
+            row = probe.execute("SELECT value FROM meta WHERE key='request_source_path'").fetchone()
+            return row[0] if row else None
+        finally:
+            probe.close()
+
+    @classmethod
+    def import_retained_request_history(cls, path, source_path, now, *, exploratory=False):
+        """Bind/import only sibling request history; never read its risk envelope.
+
+        No constructor/schema migration, cap adoption or trading-state replay.
+        import_request_window needs only this connection, path, lane and lock.
+        Its existing destination->source transaction validates the source and
+        preserves bidirectional import provenance before any startup HTTP.
+        """
+        path = Path(path)
+        if path.is_symlink() or not path.is_file():
+            raise SafetyError("readiness_request_journal_required")
+        retained = object.__new__(cls)
+        retained.path = path
+        retained.exploratory = exploratory
+        retained._lock = threading.RLock()
+        retained.db = sqlite3.connect(path.resolve().as_uri() + "?mode=rw", uri=True,
+                                      timeout=5, isolation_level=None)
+        retained.db.row_factory = sqlite3.Row
+        try:
+            retained.db.execute("PRAGMA foreign_keys=ON")
+            retained.db.execute("PRAGMA synchronous=FULL")
+            lane = retained._get("paper_lane")
+            if lane != ("B" if exploratory else None):
+                raise SafetyError("readiness_request_lane_mismatch")
+            schema = retained._get("schema_version")
+            if schema != "3":
+                raise SafetyError("unsupported_ledger_schema")
+            prior = retained._get("request_source_path")
+            if prior is not None and Path(prior).resolve() != Path(source_path).resolve():
+                raise SafetyError("readiness_request_journal_required")
+            return retained.import_request_window(source_path, now)
+        finally:
+            retained.db.close()
+
+    @classmethod
+    def open_request_window(cls, path, limits, now, *, exploratory=False, follow_caps=False):
+        """Request-only cap rotation: retain rows and require an expired window."""
+        now = instant(now)
+        prior_limits = limits
+        path = Path(path)
+        if path.exists() and not path.is_symlink():
+            probe = sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True)
+            try:
+                for table in ("trials", "intents", "positions", "executions", "fees"):
+                    exists = probe.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", (table,)).fetchone()
+                    if exists and probe.execute(f"SELECT 1 FROM {table} LIMIT 1").fetchone():
+                        raise SafetyError("request_only_journal_required")
+                has_meta = probe.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='meta'").fetchone()
+                row = probe.execute("SELECT value FROM meta WHERE key='limits'").fetchone() if has_meta else None
+                if row:
+                    prior_limits = RiskLimits(**json.loads(row[0]))
+            finally:
+                probe.close()
+        ledger = cls(path, prior_limits, exploratory=exploratory,
+                     rotation=exploratory and follow_caps)
+        try:
+            # A permitted rotation can commit after the read-only probe but
+            # before construction. Recovery follows the envelope actually
+            # opened under the constructor's transaction, not that old probe.
+            prior_limits = ledger.limits
+            if exploratory and follow_caps:
+                old = json.loads(prior_limits.frozen_json())
+                new = json.loads(limits.frozen_json())
+                for name in ("max_rest_per_minute", "max_submits_per_minute"):
+                    old.pop(name); new.pop(name)
+                if old != new:
+                    raise SafetyError("request_window_only_caps_may_change")
+                # Inactive-readiness startup (including exact-config recovery)
+                # follows the retained request envelope, never rotates it.
+                limits = prior_limits
+            if prior_limits.frozen_json() != limits.frozen_json():
+                if not exploratory:
+                    raise SafetyError("persisted_risk_limits_differ")
+                old = json.loads(prior_limits.frozen_json())
+                new = json.loads(limits.frozen_json())
+                for name in ("max_rest_per_minute", "max_submits_per_minute"):
+                    old.pop(name); new.pop(name)
+                if old != new:
+                    raise SafetyError("request_window_only_caps_may_change")
+                with ledger._transaction():
+                    if any(ledger.db.execute(f"SELECT 1 FROM {table} LIMIT 1").fetchone()
+                           for table in ("trials", "intents", "positions", "executions", "fees")):
+                        raise SafetyError("request_only_journal_required")
+                    if ledger.db.execute("SELECT 1 FROM requests WHERE at>? LIMIT 1", (now-60,)).fetchone():
+                        raise SafetyError("readiness_cap_change_requires_expired_window")
+                    ledger._set("limits", limits.frozen_json())
+                    ledger.limits = limits
+            with ledger._transaction():
+                ledger._set("request_window", "1")
+            ledger._request_window_limits_guard = True
+            ledger._follow_request_caps = exploratory and follow_caps
+            return ledger
+        except BaseException:
+            ledger.close()
+            raise
+
+    def import_request_window(self, path, now):
+        """Bind one authoritative root window and mirror its active audit rows."""
+        now = instant(now)
+        path = Path(path)
+        if path.is_symlink() or not path.is_file():
+            raise SafetyError("readiness_request_journal_required")
+        if path.resolve() == self.path.resolve():
+            raise SafetyError("readiness_request_journal_required")
+        origin = hashlib.sha256(str(path.resolve()).encode()).hexdigest()
+        destination_origin = hashlib.sha256(str(self.path.resolve()).encode()).hexdigest()
+        source = sqlite3.connect(path.resolve().as_uri() + "?mode=rw", uri=True, isolation_level=None)
+        try:
+            source.execute("PRAGMA foreign_keys=ON")
+            with self._transaction():
+                source.execute("BEGIN IMMEDIATE")
+                try:
+                    lane = source.execute("SELECT value FROM meta WHERE key='paper_lane'").fetchone()
+                    if (lane[0] if lane else None) != ("B" if self.exploratory else None):
+                        raise SafetyError("readiness_request_lane_mismatch")
+                    if any(source.execute(f"SELECT 1 FROM {table} LIMIT 1").fetchone()
+                           for table in ("trials", "intents", "positions", "executions", "fees")):
+                        raise SafetyError("request_only_journal_required")
+                    if source.execute("SELECT 1 FROM meta WHERE key='request_source_path'").fetchone():
+                        raise SafetyError("request_only_journal_required")
+                    limits = source.execute("SELECT value FROM meta WHERE key='limits'").fetchone()[0]
+                    RiskLimits(**json.loads(limits))  # validate retained request envelope
+                    self._request_import_table(self.db)
+                    self._request_import_table(source)
+                    # Bring retained trading spends into the root window too.
+                    # Linked source copies are skipped, and reverse provenance
+                    # makes retry safe if only the source transaction committed.
+                    # Capture the validation/window clock only after obtaining
+                    # the source write lock: a concurrent normal reservation
+                    # can be newer than the caller's pre-lock timestamp.
+                    now = instant(time.time())
+                    outgoing = self.db.execute("SELECT id,at,kind FROM requests WHERE at>? "
+                        "AND NOT EXISTS(SELECT 1 FROM request_imports WHERE origin=? AND request_id=requests.id) "
+                        "ORDER BY at,id", (now-60,origin)).fetchall()
+                    for row_id, at, kind in outgoing:
+                        source_id = self._mirror_request(source,destination_origin,row_id,at,kind)
+                        self.db.execute("INSERT OR IGNORE INTO request_imports(origin,source_id,request_id) VALUES (?,?,?)",
+                                        (origin,source_id,row_id))
+                    rows = source.execute("SELECT id,at,kind FROM requests WHERE at>? ORDER BY at,id", (now-60,)).fetchall()
+                    if any(at > now or kind not in ("read", "data_read", "submit", "cancel") for _,at,kind in rows):
+                        raise SafetyError("invalid_readiness_request_history")
+                    for source_id,at,kind in rows:
+                        self._mirror_request(self.db,origin,source_id,at,kind)
+                    self._set("request_source_path",str(path.resolve()))
+                    self._set("request_source_limits",limits)
+                    source.execute("INSERT OR REPLACE INTO meta(key,value) VALUES ('request_window','1')")
+                    source.execute("COMMIT")
+                except BaseException:
+                    if source.in_transaction: source.execute("ROLLBACK")
+                    raise
+        finally:
+            source.close()
+        previous = getattr(self,"_request_source",None)
+        if previous is not None: previous.close()
+        self._request_source = None
+        return len(rows)
+
+    @staticmethod
+    def _request_import_table(db):
+        db.execute("CREATE TABLE IF NOT EXISTS request_imports(origin TEXT NOT NULL,source_id INTEGER NOT NULL,"
+                   "request_id INTEGER NOT NULL REFERENCES requests(id),PRIMARY KEY(origin,source_id))")
+
+    @staticmethod
+    def _mirror_request(db,origin,source_id,at,kind):
+        row = db.execute("SELECT request_id FROM request_imports WHERE origin=? AND source_id=?",(origin,source_id)).fetchone()
+        if row: return row[0]
+        cursor = db.execute("INSERT INTO requests(at,kind,client_id) VALUES (?,?,NULL)",(at,kind))
+        db.execute("INSERT INTO request_imports(origin,source_id,request_id) VALUES (?,?,?)",(origin,source_id,cursor.lastrowid))
+        return cursor.lastrowid
+
+    def request_budget(self, now, kind, client_id=None, *, rest_cap=None):
+        return self._reserve_request(now,kind,client_id,rest_cap=rest_cap)[0]
+
+    def _reserve_request(self, now, kind, client_id=None, *, rest_cap=None):
         """Return 0 after durable reservation, or delay <=60s WITHOUT reservation.
 
         The caller bounds its wait against entry/cleanup deadlines and calls again
@@ -1548,7 +1777,20 @@ class Ledger:
         now = instant(now)
         if type(kind) is not str or kind not in ("submit", "read", "cancel", "data_read"):
             raise SafetyError("invalid_request_kind")
+        if rest_cap is not None and (type(rest_cap) is not int or rest_cap < 1
+                                     or kind not in ("read", "data_read")):
+            raise SafetyError("invalid_request_cap")
         with self._transaction():
+            if ((getattr(self, "_request_window_limits_guard", False) or self._get("request_window") == "1")
+                    and self._get("limits") != self.limits.frozen_json()):
+                if not getattr(self,"_follow_request_caps",False):
+                    raise SafetyError("readiness_request_limits_changed")
+                current=RiskLimits(**json.loads(self._get("limits")))
+                old=json.loads(self.limits.frozen_json());new=json.loads(current.frozen_json())
+                for name in ("max_rest_per_minute","max_submits_per_minute"):
+                    old.pop(name);new.pop(name)
+                if old!=new:raise SafetyError("request_window_only_caps_may_change")
+                self.limits=current
             latest = self.db.execute("SELECT MAX(at) FROM requests").fetchone()[0]
             if latest is not None and now < latest:
                 raise SafetyError("request_clock_moved_backward")
@@ -1560,7 +1802,9 @@ class Ledger:
             delays = [ZERO]
             # Every submit leaves twenty unused total slots, even when earlier
             # reads/cancels have consumed requests in this rolling window.
-            total_cap = self.limits.max_rest_per_minute - (20 if kind == "submit" else 0)
+            total_cap = min(self.limits.max_rest_per_minute,
+                            rest_cap if rest_cap is not None else self.limits.max_rest_per_minute)
+            total_cap -= 20 if kind == "submit" else 0
             if len(total) >= total_cap:
                 delays.append(D(str(total[-total_cap]["at"] + 60 - now)))
             submits = [r["at"] for r in total if r["kind"] == "submit"]
@@ -1568,11 +1812,29 @@ class Ledger:
                 delays.append(D(str(submits[-self.limits.max_submits_per_minute] + 60 - now)))
             delay = float(max(delays))
             if delay > 0:
-                return min(60.0, delay)
-            self.db.execute("INSERT INTO requests(at,kind,client_id) VALUES (?,?,?)", (now, kind, client_id))
+                return min(60.0, delay), None
+            source_path = self._get("request_source_path")
+            source_id = None
+            if source_path is not None:
+                source = getattr(self,"_request_source",None)
+                if source is None:
+                    if Path(source_path).is_symlink() or not Path(source_path).is_file():
+                        raise SafetyError("readiness_request_journal_required")
+                    source = Ledger(source_path,RiskLimits(**json.loads(self._get("request_source_limits"))),
+                                    exploratory=self.exploratory,rotation=self.exploratory)
+                    source._request_window_limits_guard = True
+                    source._follow_request_caps = True
+                    self._request_source = source
+                delay,source_id = source._reserve_request(now,kind)
+                if delay: return delay,None
+            cursor = self.db.execute("INSERT INTO requests(at,kind,client_id) VALUES (?,?,?)", (now, kind, client_id))
+            if source_id is not None:
+                origin = hashlib.sha256(str(Path(source_path).resolve()).encode()).hexdigest()
+                self.db.execute("INSERT INTO request_imports(origin,source_id,request_id) VALUES (?,?,?)",
+                                (origin,source_id,cursor.lastrowid))
             if kind == "submit" and client_id is not None:
                 self.db.execute("UPDATE intents SET submit_attempted=1 WHERE client_id=?", (client_id,))
-            return 0.0
+            return 0.0,cursor.lastrowid
 
     def mark_to_market(self, quotes, now):
         now = instant(now)
@@ -1725,3 +1987,7 @@ class Ledger:
     def close(self):
         with self._lock:
             self.db.close()
+            source = getattr(self,"_request_source",None)
+            if source is not None:
+                source.close()
+                self._request_source = None

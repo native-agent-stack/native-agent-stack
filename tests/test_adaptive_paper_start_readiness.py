@@ -24,10 +24,10 @@ BLOCK={'window_seconds':30,'benchmark_quote_timeout_seconds':5}
 
 
 class StartReadiness(unittest.TestCase):
-    def budget_probe(self, root, *, readiness=True):
+    def budget_probe(self, root, *, readiness=True, refresh_case=None, ledger_path=None):
         """Astra's budget probe: real HTTP guard, preflight and durable Ledger."""
         clock=[0.0];epoch=transport.timestamp_ns('2026-10-14T08:00:00Z')
-        attempts=[];wire=[];quote_reads=[0]
+        attempts=[];wire=[];quote_reads=[0];snapshots={'account':0,'positions':0,'orders':0}
         def client(*args,**kwargs):
             auth=args[2];c=Mock()
             def get(path,value,data=False):
@@ -41,10 +41,20 @@ class StartReadiness(unittest.TestCase):
                     guard.request('GET',guard.origin+path)
                     return value() if callable(value) else value
                 return call
-            c.get_account.side_effect=get('/v2/account',{'id':'fixture-account-id','cash':'10000','equity':'20000','buying_power':'20000'})
+            def account():
+                snapshots['account']+=1
+                return {'id':'changed-fixture' if refresh_case=='identity' and snapshots['account']>1 else 'fixture-account-id',
+                        'cash':'10000','equity':'20000','buying_power':'20000'}
+            c.get_account.side_effect=get('/v2/account',account)
             c.get_clock.side_effect=get('/v2/clock',{'is_open':False,'timestamp':'2026-10-14T08:00:00Z',
                 'next_close':'2026-10-14T20:00:00Z','next_open':'2026-10-14T13:30:00Z'})
-            c.get_all_positions.side_effect=get('/v2/positions',[]);c.get.side_effect=get('/v2/orders',[])
+            def collection(kind):
+                snapshots[kind]+=1
+                if snapshots[kind]>1 and refresh_case and refresh_case.startswith(kind):
+                    return None if refresh_case.endswith('null') else {}
+                return []
+            c.get_all_positions.side_effect=get('/v2/positions',lambda:collection('positions'))
+            c.get.side_effect=get('/v2/orders',lambda:collection('orders'))
             c.get_asset.side_effect=get('/v2/assets/SPY',{'symbol':'SPY','status':'active','tradable':True,'attributes':[]})
             def quotes():
                 quote_reads[0]+=1;age=8 if quote_reads[0]==1 else 1
@@ -79,13 +89,19 @@ class StartReadiness(unittest.TestCase):
                     result=transport.preflight('fixture-key','fixture-secret',['SPY'],before_request=observe,
                         **({'start_readiness':BLOCK,'benchmark_symbols':['SPY']} if readiness else {}))
                 except transport.TransportError:
-                    self.assertEqual(wire,[])
+                    if refresh_case is None:self.assertEqual(wire,[])
                     raise
-        with contextlib.closing(runner.Ledger(root/'trading.sqlite3',limits)) as ledger:
+        with contextlib.closing(runner.Ledger(ledger_path or root/'trading.sqlite3',limits)) as ledger:
             if prior_replay is not None:
                 exec(compile(ast.fix_missing_locations(ast.Module(body=[prior_replay],type_ignores=[])),
                              'review-replay','exec'),{'ledger':ledger,'attempts':attempts,'SafetyError':runner.SafetyError})
-            else:runner.replay_preflight_requests(ledger,attempts,readiness=readiness)
+            else:
+                # Snapshot time is read inside the source transaction, after
+                # the preflight clock patch above has ended. Keep replay on
+                # the same deterministic fixture clock too.
+                with patch.object(transport.time,'time',return_value=epoch/1e9+clock[0]):
+                    runner.replay_preflight_requests(ledger,attempts,readiness=readiness,
+                        readiness_path=root/'readiness-requests.sqlite3',now=epoch/1e9+clock[0])
             rows=dict(ledger.db.execute('SELECT kind,COUNT(*) FROM requests GROUP BY kind'))
         return attempts,wire,result,rows
 
@@ -115,6 +131,13 @@ class StartReadiness(unittest.TestCase):
             self.assertEqual((len(attempts),len(wire)),(6,6))
             self.assertEqual(rows,{'read':5})
             self.assertFalse((root/'readiness-requests.sqlite3').exists())
+
+    def test_changed_identity_and_malformed_final_snapshot_refuse(self):
+        for case in ('identity','positions-object','positions-null','orders-object','orders-null'):
+            with self.subTest(case=case),tempfile.TemporaryDirectory(dir='/var/tmp') as directory:
+                with self.assertRaisesRegex(transport.TransportError,
+                        'preflight_account_changed' if case=='identity' else 'incomplete_readiness_snapshot'):
+                    self.budget_probe(Path(directory),refresh_case=case)
 
     def test_main_opted_budget_refuses_before_http_and_retains_retry_window(self):
         from sessions import SessionKind
@@ -196,7 +219,8 @@ class StartReadiness(unittest.TestCase):
         from types import SimpleNamespace
         from sessions import SessionKind
         for command,kind in (('paper',SessionKind.PRE),('paper',SessionKind.POST),
-                             ('paper',SessionKind.RTH),('preflight',SessionKind.PRE),('recover',SessionKind.PRE)):
+                             ('paper',SessionKind.RTH),('paper',SessionKind.OVERNIGHT),
+                             ('preflight',SessionKind.PRE),('recover',SessionKind.PRE)):
             with self.subTest(command=command,kind=kind),tempfile.TemporaryDirectory(dir='/var/tmp') as directory:
                 root=Path(directory);p=root/'config.json';p.write_text(json.dumps(self.config()))
                 argv=['runner.py',command,'--credentials','keychain-env','--config',str(p),
@@ -225,19 +249,28 @@ class StartReadiness(unittest.TestCase):
             runner.validate_preflight(obs,c,require_open=True,session_policy=runner.validate_session_policy(c),
                                       benchmark_quote_timeout_seconds=5)
 
+    def test_unregistered_benchmark_age_override_refuses(self):
+        c,_,_=self.load(self.config());fixture=mover_fixtures.MoverCommandSessionWiring()
+        obs=fixture.observation(c['symbols']);now=fixture.SERVER
+        for quote in obs['quotes']:quote['ts_ns']=int(now*1e9)
+        with patch.object(runner.time,'time',return_value=now),self.assertRaisesRegex(runner.SafetyError,'invalid_start_readiness_scope'):
+            runner.validate_preflight(obs,c,require_open=True,session_policy=runner.validate_session_policy(c),
+                                      benchmark_quote_timeout_seconds=6)
+
     def test_stream_benchmark_timeout_never_widens_order_wire_guard(self):
         port=self.port(extended_hours_allowed=True,start_timeout=30,benchmark_quote_timeout_seconds=5)
         port._started=True
         port._auth={k:True for k in ('orders','quotes')};port._acks=dict(port._auth)
-        port._quote_seen={s:transport.time.monotonic()-4.05 for s in port.required_quote_symbols}
-        port._quote_values={s:{'ts_ns':transport.time.time_ns()-4_050_000_000} for s in port.required_quote_symbols}
-        self.assertTrue(port.health['fresh_quotes'])
-        for side in ('buy','sell'):
-            with self.subTest(side=side),self.assertRaises(transport.SubmissionNotSent):
-                port._wire_guard({'symbol':port.required_quote_symbols[0],'side':side})
-        self.assertEqual((port.start_timeout,port.quote_timeout,port.order_quote_max_age_ns),(30,3,3_000_000_000))
-        port._quote_values['SPY']['ts_ns']=transport.time.time_ns()-6_000_000_000
-        self.assertFalse(port.health['fresh_quotes'])
+        port._quote_seen={s:95.95 for s in port.required_quote_symbols}
+        port._quote_values={s:{'ts_ns':95_950_000_000} for s in port.required_quote_symbols}
+        with patch.object(transport.time,'monotonic',return_value=100),patch.object(transport.time,'time_ns',return_value=100_000_000_000):
+            self.assertTrue(port.health['fresh_quotes'])
+            for side in ('buy','sell'):
+                with self.subTest(side=side),self.assertRaises(transport.SubmissionNotSent):
+                    port._wire_guard({'symbol':port.required_quote_symbols[0],'side':side})
+            self.assertEqual((port.start_timeout,port.quote_timeout,port.order_quote_max_age_ns),(30,3,3_000_000_000))
+            port._quote_values['SPY']['ts_ns']=94_000_000_000
+            self.assertFalse(port.health['fresh_quotes'])
 
     def test_constructor_default_and_unsupported_stream_scope(self):
         p=self.port(extended_hours_allowed=False)
@@ -268,12 +301,13 @@ class StartReadiness(unittest.TestCase):
             try:
                 for symbol in ['SPY','AAPL']:
                     raw={'S':symbol,'bp':100,'ap':100.01,'bs':1,'as':1,
-                         't':datetime.fromtimestamp(transport.time.time()-4.05,timezone.utc)}
+                         't':datetime.fromtimestamp(95.95,timezone.utc)}
                     await port._quote_callback(raw)
                 await asyncio.sleep(.03)
             finally:
                 port._stopping=True;task.cancel();await asyncio.gather(task,return_exceptions=True)
-        asyncio.run(exercise())
+        with patch.object(transport.time,'time_ns',return_value=100_000_000_000):
+            asyncio.run(exercise())
         self.assertEqual([q['symbol'] for q in seen],['SPY'])
         self.assertEqual(port.order_quote_max_age_ns,3_000_000_000)
 
@@ -312,7 +346,8 @@ class StartReadiness(unittest.TestCase):
                                           start_readiness=BLOCK,benchmark_symbols=['SPY'])
             for name in ('readiness-requests.sqlite3','trading.sqlite3'):
                 with contextlib.closing(runner.Ledger(root/name,limits)) as ledger:
-                    if name=='trading.sqlite3':runner.replay_preflight_requests(ledger,attempts,readiness=True)
+                    if name=='trading.sqlite3':runner.replay_preflight_requests(ledger,attempts,readiness=True,
+                        readiness_path=root/'readiness-requests.sqlite3',now=epoch/1e9+clock[0])
                     self.assertEqual(dict(ledger.db.execute('SELECT kind,COUNT(*) FROM requests GROUP BY kind')),
                                      {'read':9,'data_read':3})
         self.assertEqual(reads,{'account':2,'quote':3})
@@ -390,7 +425,37 @@ class StartReadiness(unittest.TestCase):
             receipt=json.loads((root/'receipt.json').read_text())
             self.assertEqual((receipt['status'],receipt['reason'],receipt['orders_submitted']),
                              ('not_started','preflight_request_bound',0))
-            self.assertFalse((root/'state').exists())
+            # No request/trading journal or trial is bootstrapped. The sole
+            # retained coordination marker prevents another invocation from
+            # adopting a fresh root budget while these unbound GETs are active.
+            self.assertEqual([p.name for p in (root/'state').iterdir()],['readiness-startup.lock'])
+
+    def _extended_request_bound(self, kind):
+        with tempfile.TemporaryDirectory(dir='/var/tmp') as directory:
+            root=Path(directory);p=root/'config.json';p.write_text(json.dumps(self.config()))
+            _,limits,_=runner.load_config(p)
+            argv=['runner.py','paper','--credentials','keychain-env','--config',str(p),
+                  '--state-root',str(root/'state'),'--output',str(root/'receipt.json'),'--trial','fixture']
+            def bounded(*args,**kwargs):
+                for _ in range(51):kwargs['before_request']('data_read')
+            with patch.object(sys,'argv',argv),patch.object(runner,'paper_credentials',return_value=('fixture-key','fixture-secret')), \
+                 patch.object(runner,'check_order_contract_boundary',return_value={}), \
+                 patch.object(runner,'session_at',return_value=types.SimpleNamespace(kind=kind)), \
+                 patch.object(runner,'preflight',side_effect=bounded):
+                self.assertEqual(runner.main(),2)
+            receipt=json.loads((root/'receipt.json').read_text())
+            self.assertEqual((receipt['status'],receipt['reason']),('not_started','preflight_request_bound'))
+            with contextlib.closing(runner.Ledger(root/'state'/'readiness-requests.sqlite3',limits)) as ledger:
+                self.assertEqual(dict(ledger.db.execute('SELECT kind,COUNT(*) FROM requests GROUP BY kind')),{'data_read':50})
+            self.assertEqual(list((root/'state').glob('*/adaptive/ledger.sqlite3')),[])
+
+    def test_request_bound_pre_retains_durable_readiness_journal(self):
+        from sessions import SessionKind
+        self._extended_request_bound(SessionKind.PRE)
+
+    def test_request_bound_post_retains_durable_readiness_journal(self):
+        from sessions import SessionKind
+        self._extended_request_bound(SessionKind.POST)
 
     def test_thirty_symbol_poll_reserves_final_snapshot_requests(self):
         clock=[0.0];calls=[];snapshots={'account':0,'clock':0,'positions':0,'orders':0}
