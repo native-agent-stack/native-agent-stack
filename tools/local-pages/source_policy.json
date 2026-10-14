@@ -2162,6 +2162,10 @@
     },
     {
       "root": "repo",
+      "path": "scripts/trading_runtime_suite.py"
+    },
+    {
+      "root": "repo",
       "path": "scripts/upstream_surface_watch.py"
     },
     {
