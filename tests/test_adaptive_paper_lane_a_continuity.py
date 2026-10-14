@@ -9,6 +9,7 @@ import json
 from pathlib import Path
 import sys
 import tempfile
+from types import SimpleNamespace
 import unittest
 from uuid import UUID
 from unittest.mock import AsyncMock, Mock, patch
@@ -17,6 +18,7 @@ SOURCE=Path(__file__).resolve().parents[1]/"blueprints/us-equities/adaptive-pape
 sys.path.insert(0,str(SOURCE))
 import runner
 from safety import Ledger, Quote, SafetyError
+from sessions import SessionKind
 from tests.adaptive_paper_hermetic import patch_default_stop, restore_default_stop
 
 TOKEN=None
@@ -36,7 +38,7 @@ def tearDownModule():
 class LaneASessionContinuity(unittest.TestCase):
     def exercise(self,*,command="paper",change="session",phase="finished",cash="9999.75",halt=None,
                  unresolved=False,stored_binding=None,unknown_prior=False,second_trial=False,
-                 race=None,interrupted_then_recover=False,readiness=False):
+                 race=None,interrupted_then_recover=False,readiness=False,opted_session=SessionKind.PRE):
         with tempfile.TemporaryDirectory(dir="/var/tmp") as directory:
             root=Path(directory)
             old_path=SOURCE/"config-leverage-1x.json"
@@ -114,6 +116,18 @@ class LaneASessionContinuity(unittest.TestCase):
             argv=["runner.py",command,"--credentials","keychain-env","--config",str(config_path),
                   "--output",str(output),"--trial","next","--state-root",str(state_root)]
             observe={"account_identity_sha256":"0"*64,"account":{"cash":cash},"assets":[]}
+            first_session=[True]
+            readiness_calls=[]
+            def preflight(*args,**kwargs):
+                if readiness:
+                    active='start_readiness' in kwargs
+                    readiness_calls.append(active)
+                    self.assertEqual(active,first_session[0])
+                    if active:
+                        self.assertEqual(kwargs['start_readiness'],{'window_seconds':30,'benchmark_quote_timeout_seconds':5})
+                        kwargs['before_request']('read')
+                        kwargs['before_request']('data_read')
+                return observe
             async def native(*args,**kwargs):
                 executions.append((args[4],args[1]))
                 if interrupted_then_recover and len(executions)==2:
@@ -137,7 +151,9 @@ class LaneASessionContinuity(unittest.TestCase):
                  patch.object(runner,"load_config",side_effect=load_with_path_edit), \
                  patch.object(runner,"check_order_contract_boundary",return_value={}), \
                  patch.object(runner,"paper_credentials",return_value=(None,None)), \
-                 patch.object(runner,"preflight",return_value=observe), \
+                 patch.object(runner,"preflight",side_effect=preflight), \
+                 patch.object(runner,"session_at",side_effect=lambda _:SimpleNamespace(
+                     kind=opted_session if readiness and first_session[0] else SessionKind.RTH)), \
                  patch.object(runner,"public_preflight",return_value={}), \
                  patch.object(runner,"validate_preflight",return_value=now+3600), \
                  patch.object(runner,"account_lock_fingerprint",return_value=contextlib.nullcontext()), \
@@ -180,6 +196,7 @@ class LaneASessionContinuity(unittest.TestCase):
                     self.assertFalse(any(hashlib.sha256(p.read_bytes()).hexdigest()==first["config_sha256"]
                                          for p in SOURCE.glob("config*.json")))
                     config_path.write_bytes(old_path.read_bytes())
+                    first_session[0]=False
                     argv[argv.index("--trial")+1]="next-two"
                     rc=runner.main()
             self.assertEqual(rc,0)
@@ -205,6 +222,11 @@ class LaneASessionContinuity(unittest.TestCase):
                 self.assertEqual(ledger.accounting().cash_delta_usd,Decimal("-0.25"))
                 self.assertEqual(len(ledger.fees()),1)
                 self.assertGreaterEqual(ledger.db.execute("SELECT COUNT(*) FROM requests").fetchone()[0],1)
+                if readiness:
+                    self.assertEqual(readiness_calls,[True,False])
+                    self.assertEqual(dict(ledger.db.execute('SELECT kind,COUNT(*) FROM requests GROUP BY kind')),
+                                     {'read':2,'data_read':1})
+                    self.assertTrue((state_root/'readiness-requests.sqlite3').is_file())
             return latest
 
     def test_session_fields_only_start_continues_existing_risk_and_cash_lineage(self):
@@ -252,8 +274,10 @@ class LaneASessionContinuity(unittest.TestCase):
         self.assertEqual(latest["trial_id"],"next-two")
 
     def test_opted_extended_trial_then_rth_continues_same_ledger_and_fees(self):
-        latest=self.exercise(second_trial=True,readiness=True)
-        self.assertEqual(latest["trial_id"],"next-two")
+        for kind in (SessionKind.PRE,SessionKind.POST):
+            with self.subTest(opted_session=kind):
+                latest=self.exercise(second_trial=True,readiness=True,opted_session=kind)
+                self.assertEqual(latest["trial_id"],"next-two")
 
     def test_stored_binding_mismatch_refuses_even_when_legacy_bytes_match(self):
         with self.assertRaisesRegex(SafetyError,"^next_trial_config_differs_from_frozen_limits$"):

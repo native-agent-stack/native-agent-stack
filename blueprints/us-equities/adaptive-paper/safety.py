@@ -1576,45 +1576,88 @@ class Ledger:
                         raise SafetyError("readiness_cap_change_requires_expired_window")
                     ledger._set("limits", limits.frozen_json())
                     ledger.limits = limits
+            with ledger._transaction():
+                ledger._set("request_window", "1")
+            ledger._request_window_limits_guard = True
             return ledger
         except BaseException:
             ledger.close()
             raise
 
     def import_request_window(self, path, now):
-        """Carry active failed/successful startup rows once, without refunds."""
+        """Bind one authoritative root window and mirror its active audit rows."""
         now = instant(now)
         path = Path(path)
         if path.is_symlink() or not path.is_file():
             raise SafetyError("readiness_request_journal_required")
+        if path.resolve() == self.path.resolve():
+            raise SafetyError("readiness_request_journal_required")
         origin = hashlib.sha256(str(path.resolve()).encode()).hexdigest()
-        source = sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True)
+        destination_origin = hashlib.sha256(str(self.path.resolve()).encode()).hexdigest()
+        source = sqlite3.connect(path.resolve().as_uri() + "?mode=rw", uri=True, isolation_level=None)
         try:
-            lane = source.execute("SELECT value FROM meta WHERE key='paper_lane'").fetchone()
-            if (lane[0] if lane else None) != ("B" if self.exploratory else None):
-                raise SafetyError("readiness_request_lane_mismatch")
-            if any(source.execute(f"SELECT 1 FROM {table} LIMIT 1").fetchone()
-                   for table in ("trials", "intents", "positions", "executions", "fees")):
-                raise SafetyError("request_only_journal_required")
-            rows = source.execute("SELECT id,at,kind FROM requests WHERE at>? ORDER BY at,id", (now-60,)).fetchall()
+            source.execute("PRAGMA foreign_keys=ON")
+            with self._transaction():
+                source.execute("BEGIN IMMEDIATE")
+                try:
+                    lane = source.execute("SELECT value FROM meta WHERE key='paper_lane'").fetchone()
+                    if (lane[0] if lane else None) != ("B" if self.exploratory else None):
+                        raise SafetyError("readiness_request_lane_mismatch")
+                    if any(source.execute(f"SELECT 1 FROM {table} LIMIT 1").fetchone()
+                           for table in ("trials", "intents", "positions", "executions", "fees")):
+                        raise SafetyError("request_only_journal_required")
+                    if source.execute("SELECT 1 FROM meta WHERE key='request_source_path'").fetchone():
+                        raise SafetyError("request_only_journal_required")
+                    limits = source.execute("SELECT value FROM meta WHERE key='limits'").fetchone()[0]
+                    RiskLimits(**json.loads(limits))  # validate retained request envelope
+                    self._request_import_table(self.db)
+                    self._request_import_table(source)
+                    # Bring retained trading spends into the root window too.
+                    # Linked source copies are skipped, and reverse provenance
+                    # makes retry safe if only the source transaction committed.
+                    outgoing = self.db.execute("SELECT id,at,kind FROM requests WHERE at>? "
+                        "AND NOT EXISTS(SELECT 1 FROM request_imports WHERE origin=? AND request_id=requests.id) "
+                        "ORDER BY at,id", (now-60,origin)).fetchall()
+                    for row_id, at, kind in outgoing:
+                        source_id = self._mirror_request(source,destination_origin,row_id,at,kind)
+                        self.db.execute("INSERT OR IGNORE INTO request_imports(origin,source_id,request_id) VALUES (?,?,?)",
+                                        (origin,source_id,row_id))
+                    rows = source.execute("SELECT id,at,kind FROM requests WHERE at>? ORDER BY at,id", (now-60,)).fetchall()
+                    if any(at > now or kind not in ("read", "data_read", "submit", "cancel") for _,at,kind in rows):
+                        raise SafetyError("invalid_readiness_request_history")
+                    for source_id,at,kind in rows:
+                        self._mirror_request(self.db,origin,source_id,at,kind)
+                    self._set("request_source_path",str(path.resolve()))
+                    self._set("request_source_limits",limits)
+                    source.execute("INSERT OR REPLACE INTO meta(key,value) VALUES ('request_window','1')")
+                    source.execute("COMMIT")
+                except BaseException:
+                    if source.in_transaction: source.execute("ROLLBACK")
+                    raise
         finally:
             source.close()
-        if any(at > now or kind not in ("read", "data_read") for _, at, kind in rows):
-            raise SafetyError("invalid_readiness_request_history")
-        with self._transaction():
-            self.db.execute("CREATE TABLE IF NOT EXISTS request_imports("
-                            "origin TEXT NOT NULL,source_id INTEGER NOT NULL,request_id INTEGER NOT NULL "
-                            "REFERENCES requests(id),PRIMARY KEY(origin,source_id))")
-            for source_id, at, kind in rows:
-                if self.db.execute("SELECT 1 FROM request_imports WHERE origin=? AND source_id=?",
-                                   (origin, source_id)).fetchone():
-                    continue
-                cursor = self.db.execute("INSERT INTO requests(at,kind,client_id) VALUES (?,?,NULL)", (at,kind))
-                self.db.execute("INSERT INTO request_imports(origin,source_id,request_id) VALUES (?,?,?)",
-                                (origin,source_id,cursor.lastrowid))
+        previous = getattr(self,"_request_source",None)
+        if previous is not None: previous.close()
+        self._request_source = None
         return len(rows)
 
+    @staticmethod
+    def _request_import_table(db):
+        db.execute("CREATE TABLE IF NOT EXISTS request_imports(origin TEXT NOT NULL,source_id INTEGER NOT NULL,"
+                   "request_id INTEGER NOT NULL REFERENCES requests(id),PRIMARY KEY(origin,source_id))")
+
+    @staticmethod
+    def _mirror_request(db,origin,source_id,at,kind):
+        row = db.execute("SELECT request_id FROM request_imports WHERE origin=? AND source_id=?",(origin,source_id)).fetchone()
+        if row: return row[0]
+        cursor = db.execute("INSERT INTO requests(at,kind,client_id) VALUES (?,?,NULL)",(at,kind))
+        db.execute("INSERT INTO request_imports(origin,source_id,request_id) VALUES (?,?,?)",(origin,source_id,cursor.lastrowid))
+        return cursor.lastrowid
+
     def request_budget(self, now, kind, client_id=None):
+        return self._reserve_request(now,kind,client_id)[0]
+
+    def _reserve_request(self, now, kind, client_id=None):
         """Return 0 after durable reservation, or delay <=60s WITHOUT reservation.
 
         The caller bounds its wait against entry/cleanup deadlines and calls again
@@ -1625,6 +1668,9 @@ class Ledger:
         if type(kind) is not str or kind not in ("submit", "read", "cancel", "data_read"):
             raise SafetyError("invalid_request_kind")
         with self._transaction():
+            if ((getattr(self, "_request_window_limits_guard", False) or self._get("request_window") == "1")
+                    and self._get("limits") != self.limits.frozen_json()):
+                raise SafetyError("readiness_request_limits_changed")
             latest = self.db.execute("SELECT MAX(at) FROM requests").fetchone()[0]
             if latest is not None and now < latest:
                 raise SafetyError("request_clock_moved_backward")
@@ -1644,11 +1690,28 @@ class Ledger:
                 delays.append(D(str(submits[-self.limits.max_submits_per_minute] + 60 - now)))
             delay = float(max(delays))
             if delay > 0:
-                return min(60.0, delay)
-            self.db.execute("INSERT INTO requests(at,kind,client_id) VALUES (?,?,?)", (now, kind, client_id))
+                return min(60.0, delay), None
+            source_path = self._get("request_source_path")
+            source_id = None
+            if source_path is not None:
+                source = getattr(self,"_request_source",None)
+                if source is None:
+                    if Path(source_path).is_symlink() or not Path(source_path).is_file():
+                        raise SafetyError("readiness_request_journal_required")
+                    source = Ledger(source_path,RiskLimits(**json.loads(self._get("request_source_limits"))),
+                                    exploratory=self.exploratory)
+                    source._request_window_limits_guard = True
+                    self._request_source = source
+                delay,source_id = source._reserve_request(now,kind)
+                if delay: return delay,None
+            cursor = self.db.execute("INSERT INTO requests(at,kind,client_id) VALUES (?,?,?)", (now, kind, client_id))
+            if source_id is not None:
+                origin = hashlib.sha256(str(Path(source_path).resolve()).encode()).hexdigest()
+                self.db.execute("INSERT INTO request_imports(origin,source_id,request_id) VALUES (?,?,?)",
+                                (origin,source_id,cursor.lastrowid))
             if kind == "submit" and client_id is not None:
                 self.db.execute("UPDATE intents SET submit_attempted=1 WHERE client_id=?", (client_id,))
-            return 0.0
+            return 0.0,cursor.lastrowid
 
     def mark_to_market(self, quotes, now):
         now = instant(now)
@@ -1801,3 +1864,7 @@ class Ledger:
     def close(self):
         with self._lock:
             self.db.close()
+            source = getattr(self,"_request_source",None)
+            if source is not None:
+                source.close()
+                self._request_source = None

@@ -72,8 +72,8 @@ Ledger.request_budget before HTTP, in a retained request-only
 readiness-requests.sqlite3 journal beside the root's trading state. Its atomic
 trailing-60-second window uses the configured total request cap and is retained
 after refused or failed starts and retries; exhaustion refuses before another GET.
-Successful startup transfers every still-active reservation, including failed
-starts and data_read, once into the trading ledger's window through the
+Successful startup binds trading to the same authoritative request-only window
+and mirrors every active reservation, including failed starts/data_read, through the
 [handoff correction](2026-10-14-paper-readiness-budget-handoff.md).
 Default data/broker accounting is unchanged. STOP or
 the deadline refuses. Once quotes qualify, re-read account, clock, positions

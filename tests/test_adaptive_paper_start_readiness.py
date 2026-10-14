@@ -256,15 +256,16 @@ class StartReadiness(unittest.TestCase):
         port=self.port(extended_hours_allowed=True,start_timeout=30,benchmark_quote_timeout_seconds=5)
         port._started=True
         port._auth={k:True for k in ('orders','quotes')};port._acks=dict(port._auth)
-        port._quote_seen={s:transport.time.monotonic()-4.05 for s in port.required_quote_symbols}
-        port._quote_values={s:{'ts_ns':transport.time.time_ns()-4_050_000_000} for s in port.required_quote_symbols}
-        self.assertTrue(port.health['fresh_quotes'])
-        for side in ('buy','sell'):
-            with self.subTest(side=side),self.assertRaises(transport.SubmissionNotSent):
-                port._wire_guard({'symbol':port.required_quote_symbols[0],'side':side})
-        self.assertEqual((port.start_timeout,port.quote_timeout,port.order_quote_max_age_ns),(30,3,3_000_000_000))
-        port._quote_values['SPY']['ts_ns']=transport.time.time_ns()-6_000_000_000
-        self.assertFalse(port.health['fresh_quotes'])
+        port._quote_seen={s:95.95 for s in port.required_quote_symbols}
+        port._quote_values={s:{'ts_ns':95_950_000_000} for s in port.required_quote_symbols}
+        with patch.object(transport.time,'monotonic',return_value=100),patch.object(transport.time,'time_ns',return_value=100_000_000_000):
+            self.assertTrue(port.health['fresh_quotes'])
+            for side in ('buy','sell'):
+                with self.subTest(side=side),self.assertRaises(transport.SubmissionNotSent):
+                    port._wire_guard({'symbol':port.required_quote_symbols[0],'side':side})
+            self.assertEqual((port.start_timeout,port.quote_timeout,port.order_quote_max_age_ns),(30,3,3_000_000_000))
+            port._quote_values['SPY']['ts_ns']=94_000_000_000
+            self.assertFalse(port.health['fresh_quotes'])
 
     def test_constructor_default_and_unsupported_stream_scope(self):
         p=self.port(extended_hours_allowed=False)
@@ -295,12 +296,13 @@ class StartReadiness(unittest.TestCase):
             try:
                 for symbol in ['SPY','AAPL']:
                     raw={'S':symbol,'bp':100,'ap':100.01,'bs':1,'as':1,
-                         't':datetime.fromtimestamp(transport.time.time()-4.05,timezone.utc)}
+                         't':datetime.fromtimestamp(95.95,timezone.utc)}
                     await port._quote_callback(raw)
                 await asyncio.sleep(.03)
             finally:
                 port._stopping=True;task.cancel();await asyncio.gather(task,return_exceptions=True)
-        asyncio.run(exercise())
+        with patch.object(transport.time,'time_ns',return_value=100_000_000_000):
+            asyncio.run(exercise())
         self.assertEqual([q['symbol'] for q in seen],['SPY'])
         self.assertEqual(port.order_quote_max_age_ns,3_000_000_000)
 

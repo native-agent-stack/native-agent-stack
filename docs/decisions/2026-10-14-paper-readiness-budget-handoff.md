@@ -6,19 +6,35 @@ retained failed-start rows and 12 successful preflight GETs, only eight further
 reads fit the 200-request window. The prior implementation replayed only the
 current invocation, so it allowed another 30 reads: 222 requests in that window.
 
-The retained source row id and journal path identity bind each imported row to
-one trading request row in the same SQLite transaction. Repeating the handoff,
-including after process restart, cannot count it twice. Historical rows remain
-retained; only timestamps greater than now minus 60 seconds transfer. Future
-rows and symlinked/missing journals refuse before import. Import preserves
-observed requests even if their count already exhausts the current cap; the
-existing budget then refuses new requests. No request is refunded or invented.
+The request-only root journal remains the authoritative budget after handoff.
+Trading reservations also reserve there before any GET, submit or cancel;
+the trading journal retains an audit mirror with source-row provenance.
+The durable binding survives process restart. A second same-root start sees
+the live trading spends, so 192 startup rows plus eight trading reads exhaust
+the window before another readiness GET. Two journals never independently
+authorize a spend after binding.
+
+Handoff holds the destination transaction and the source BEGIN IMMEDIATE
+transaction before taking the source snapshot. A source writer either commits
+before that snapshot or waits; any later request remains visible to the same
+authoritative limiter. Existing active trading rows are mirrored into the
+source too, with reverse provenance. Source row id and resolved path bind each
+audit copy exactly once. The source commits first: a fault before destination
+commit can conservatively retain a spent slot without an audit copy, and retry
+imports that slot once. No distributed-atomicity claim or refund is made.
+Historical rows remain; only timestamps greater than now minus60 transfer.
+Future rows, a direct symlink/missing source, same-file binding and a source
+already bound to another request source refuse. Default unbound budgets retain
+their previous behavior.
 
 Request-only cap rotation is a separate bounded metadata transition. Only lane B
 may change the two request caps, and only after every prior reservation leaves
 the trailing window. The transition preserves all request rows and refuses a
-journal holding trials, intents, positions, executions or fees. Lane A still
-refuses changed caps. The ordinary risk journal rotation and all order, price,
+journal holding trials, intents, positions, executions or fees. Every request
+reservation compares cached and persisted caps inside its own SQLite write
+transaction; old connections refuse after a lower-cap rotation before HTTP.
+The 200-to150 interleaving allows150, never151; the local200-to30 case allows30,
+never41. Lane A still refuses changed caps. The ordinary risk rotation and all order, price,
 cash, fee, halt, STOP and exact-byte recovery rules remain independent.
 
 ## Primary mechanisms and correction provenance
@@ -39,6 +55,15 @@ cap rotation. The public pinned engine source establishes the primitives:
 Repository identity was checked through the installed GitHub client:
 nameWithOwner is native-agent-stack/native-agent-stack. Earlier review packets
 used its former owner name; the links above use the current canonical repository.
+
+Fixture correction uses the supported CPython
+[v3.12.3/f6650f9ad73359051f3e558c2431a109bc016664, Lib/unittest/mock.py:1632-1655](https://github.com/python/cpython/blob/f6650f9ad73359051f3e558c2431a109bc016664/Lib/unittest/mock.py#L1632)
+patch.object context manager (bound at:1960). The RTH no-readiness fixture
+pins runner.session_at; continuity now explicitly drives PRE and POST first,
+then RTH, and invokes the real observer for broker/data reads. It asserts
+forwarding, durable rows, unchanged fees/cash and exact trial digests. All four
+outer-session controls pass. The two quote-age fixtures also pin vendor and
+local quote clocks; elapsed host scheduling no longer chooses their age boundary.
 
 Official quote requests still use alpacahq/alpaca-py 0.44.0 at
 [cc4cb3b7ba50ae250e621983c2779047fb16bb28, stock.py:163-182](https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/alpaca/data/historical/stock.py#L163).
@@ -75,6 +100,13 @@ until this correction lands and the operator records its successor binding.
   next qualification, retaining failed outcomes and exact configuration bytes.
 - Measure feed interarrival and provider/account request use before replacing
   initial readiness thresholds or widening this root-local accounting scope.
+- Direct-component symlink and intact lane checks do not establish ancestor-safe
+  opens or tamper-proof source provenance. A symlinked parent aliases the same
+  resolved journal; a manually mutated lane key is outside intact-state tests.
+  Ancestor-safe opens and explicit request-journal schema/provenance remain hardening work.
+- Review packets lack some historical source/measurement captures even where
+  current mirrors agree. Supply pinned copies and original logs when closing
+  historical provenance; synthetic tests do not fill those capture gaps.
 
 Any forgotten reservation, duplicate import, history deletion, active-window
 cap change or lane-A cap transition overturns this correction.

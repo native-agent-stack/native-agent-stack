@@ -89,9 +89,11 @@ three-second bound. This grants no permission to price an order from stale data.
 See the [start-readiness decision](../../../docs/decisions/2026-10-13-extended-hours-paper-start-readiness.md).
 
 Opted starts reserve GETs in a retained request-only journal. Before trading,
-all still-active startup reservations, including refused starts, transfer once
-into the trading ledger's trailing-60-second window. Retry and repeated handoff
-cannot refund or duplicate them. An exploratory request-cap change reopens that
+all active startup reservations, including refused starts, transfer once to
+trading's audit. The request-only journal remains the authoritative root budget
+for both readiness and linked trading; concurrent starts cannot spend separately.
+The binding survives reopen, and reservations reject stale cached caps atomically.
+Retry and repeated handoff cannot refund or duplicate rows. A request-cap change reopens that
 journal only after its prior window expires, preserving history; lane A stays
 strict. See the [handoff correction](../../../docs/decisions/2026-10-14-paper-readiness-budget-handoff.md).
 
