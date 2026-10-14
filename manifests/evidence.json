@@ -19183,8 +19183,8 @@
     },
     {
       "path": "docs/decisions/2026-10-14-muse-file-fence.md",
-      "sha256": "5296a7cd561cf4a9beee5333983704ccdc669c443cf93c402c7c23ba1691a42e",
-      "bytes": 10407
+      "sha256": "3e17f324dd606b046f9d0d455da99b925fd2b8063ffd61a0244c40ac5c4352ce",
+      "bytes": 12383
     },
     {
       "path": "docs/decisions/2026-10-14-session-relaunch-after-wsl-restart.md",
@@ -61367,6 +61367,11 @@
       "bytes": 132533
     },
     {
+      "path": "notes/muse-file-fence-20261014/fix-round-1.json",
+      "sha256": "148faae6cd179436fa0651ba527c663ae65acb02e2fa58d60a0b2320caa251ba",
+      "bytes": 2073
+    },
+    {
       "path": "notes/muse-file-fence-20261014/receipt.json",
       "sha256": "b74dc7482e8b5b7f8787856d88639acac74de580222fd549e3e39f47c2819547",
       "bytes": 4394
@@ -63503,8 +63508,8 @@
     },
     {
       "path": "tests/test_muse_file_fence.py",
-      "sha256": "ae0c9fc996f300e3d5665e8306a6db994f07ebd4a03637a174464303f13cedb9",
-      "bytes": 11606
+      "sha256": "bf39ffa26c8929b63e818c623af8478e0425c888c2c53180c0c8773527b6ab0c",
+      "bytes": 15910
     },
     {
       "path": "tests/test_nanosecond_replay.py",
@@ -64583,8 +64588,8 @@
     },
     {
       "path": "tools/muse_file_fence.py",
-      "sha256": "584a6fada9941c3b9eab5a4c13d44df359625c2c85b2e4a473be2eb53510bac7",
-      "bytes": 19478
+      "sha256": "1dfb247107cd6d2eebe95a8d3e0ad8246320a9b4ec833e11d61f582062d9569f",
+      "bytes": 19792
     },
     {
       "path": "tools/omniroute/gateway_record.py",

@@ -27,6 +27,9 @@ is shared. The new root starts empty rather than binding the host root.
 - Writable persistent host paths: one dedicated worktree and one fresh log
   directory, both canonical, disjoint children of `/var/tmp`. Existing logs are
   refused. Temporary files, data, sessions, state and cache live in the log tree.
+  `/tmp` binds the log tree's `tmp` directory before named input overmounts;
+  this supports read-only briefs/inputs under `/tmp` while temporary writes
+  persist only in the log tree. Undeclared host `/tmp` files remain absent.
 - Read-only: `/usr`, merged system executable/library paths, named resolver,
   NSS, identity and timezone files, `/etc/ssl/certs`, the exact runtime ELF,
   the brief and explicitly named input files. Input directories are refused.
@@ -158,3 +161,33 @@ reads; reimplementing a sandbox discards upstream namespace enforcement. A full
 VM/container or network proxy is a different scope. Replace this wrapper when
 native upstream provides equivalent whole-process containment and passes these
 same canary/config tests, or a stronger boundary is required and measured.
+
+## Fix round 1: local review at 604d905a
+
+The local review identified three P2 defects, reproduced before changes with
+three model-free OS regressions: the mandatory probe deleted an existing marker
+file, a `/tmp` brief/input collided with the later `/tmp` symlink, and the
+constructor rejected documented read-only worktree input overlays. The review
+JSON has SHA256
+`0b535fe89713acc0fa26b712a494f4343a85eedce0dea5866cffc71663897aee`.
+
+The probe now uses exclusively created random temporary files and context
+cleanup, including its expected-failure write checks. Existing filenames and
+contents are preserved. The wrapper binds the writable log `tmp` directory at
+`/tmp` before mounting named files read-only; there is no later symlink
+collision. Runtime/sign-in files remain disjoint from both writable trees,
+while declared inputs may be read-only overmounts inside the worktree. Inputs
+inside logs remain refused.
+
+Regression commands and results are retained in
+`notes/muse-file-fence-20261014/fix-round-1.json`. Final tests include the native
+echo extension controls; no additional live smoke or model call was made.
+The original live smoke remains evidence at its recorded source state, not a
+claim that another smoke was executed after this correction.
+
+Mechanism sources: bubblewrap `0.11.1` at the pinned `bwrap.xml` above defines
+`--bind` and `--ro-bind`, permitting ordered nested mounts. CPython
+[`v3.13.16/Lib/tempfile.py`](https://github.com/python/cpython/blob/v3.13.16/Lib/tempfile.py),
+`_bin_openflags`, `_mkstemp_inner`, `NamedTemporaryFile`, and `_TemporaryFileCloser`
+define exclusive randomized creation and context-managed cleanup. These native
+APIs supply the fixes; no custom mount or temporary-file mechanism is added.

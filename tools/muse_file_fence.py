@@ -118,7 +118,7 @@ class Fence:
                 raise ValueError("worktree and logs must be dedicated /var/tmp directories")
         if not disjoint(self.worktree, self.logdir):
             raise ValueError("worktree and log directory must be disjoint")
-        for p in (self.runtime, self.auth, *self.inputs):
+        for p in (self.runtime, self.auth):
             if not all(disjoint(p, rw) for rw in (self.worktree, self.logdir)):
                 raise ValueError("read-only dependency overlaps writable tree")
         for p in (self.brief, *self.inputs):
@@ -178,7 +178,10 @@ class Fence:
                  '--ro-bind', str(self.runtime), str(self.runtime),
                  '--ro-bind', str(self.auth), str(self.home / '.config/muse/auth.json'),
                  '--bind', str(self.worktree), str(self.worktree),
-                 '--bind', str(self.logdir), str(self.logdir)]
+                 '--bind', str(self.logdir), str(self.logdir),
+                 # A real mount accepts nested read-only /tmp input overlays.
+                 # Bind it before those overlays; a later symlink collides.
+                 '--bind', str(self.logdir / 'tmp'), '/tmp']
         for path in dict.fromkeys([self.brief, *self.inputs]):
             args += ['--ro-bind', str(path), str(path)]
         for name in PROJECT_MASKS:
@@ -187,8 +190,6 @@ class Fence:
             if path.is_symlink():
                 raise ValueError("symlink project configuration refused")
             args += ['--ro-bind', str(empty if name == '.muse' else blank), str(path)]
-        # tmp/runtime/state are aliases INTO the sole writable log tree.
-        args += ['--symlink', str(self.logdir / 'tmp'), '/tmp']
         for key, value in clean_env(self.home, self.logdir).items():
             args += ['--setenv', key, value]
         # bwrap's initial tmpfs root is writable unless explicitly sealed.
@@ -242,7 +243,7 @@ def probe(fence, command, argv):
         '.local/state/native-agent-stack/coordination/command-center')}
     masks.update({'host-runtime': '/run/user', 'host-mounts': '/mnt'})
     script = f'''
-import json, os
+import json, os, tempfile
 from pathlib import Path
 facts = {{name + '-masked': not Path(p).exists() for name, p in {masks!r}.items()}}
 for name in ['code', 'projects']:
@@ -251,8 +252,11 @@ for name in ['code', 'projects']:
     found = {{p for p in root.rglob('*') if not p.is_dir()}} if root.exists() else set()
     facts[name + '-other-files-masked'] = found == expected
 for name, p in {{'worktree': {str(fence.worktree)!r}, 'logdir': {str(fence.logdir)!r}}}.items():
-    marker = Path(p) / '.muse-fence-probe-marker'
-    marker.write_text('public'); facts[name + '-rw'] = marker.read_text() == 'public'; marker.unlink()
+    # CPython NamedTemporaryFile uses exclusive creation with a random name;
+    # the context removes only this probe's file, preserving existing entries.
+    with tempfile.NamedTemporaryFile(mode='w+', dir=p, prefix='.muse-fence-probe-') as marker:
+        marker.write('public'); marker.flush(); marker.seek(0)
+        facts[name + '-rw'] = marker.read() == 'public'
 for name, p in {{'brief': {str(fence.brief)!r}, 'runtime': {str(fence.runtime)!r},
                  'settings': {str(fence.home/'.config/muse/settings.json')!r},
                  'sign-in': {str(fence.home/'.config/muse/auth.json')!r}}}.items():
@@ -263,7 +267,8 @@ cfg = json.loads(Path({str(fence.home/'.config/muse/settings.json')!r}).read_tex
 facts['mcp-hooks-plugins-removed'] = set(cfg) <= {{'schema_version', 'contributor_mode_enabled', 'contributor_mode_disclosure_acknowledged'}}
 for p in ['/', '/etc', {str(fence.home)!r}]:
     try:
-        (Path(p)/'.muse-fence-probe-marker').write_text('public'); facts[p + '-readonly'] = False
+        with tempfile.NamedTemporaryFile(dir=p, prefix='.muse-fence-probe-'):
+            facts[p + '-readonly'] = False
     except OSError:
         facts[p + '-readonly'] = True
 print(json.dumps(facts))

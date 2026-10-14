@@ -133,6 +133,98 @@ print(json.dumps(out))
                      'HTTP_PROXY', 'CODEX_HOME', 'XDG_CONFIG_HOME'):
             self.assertNotIn(name, env)
 
+    def run_model_free_probe(self):
+        # Exercise the real OS payload; substitute only the final echo turn
+        # with synthetic terminal JSON so this regression needs no Muse install.
+        argv = [str(self.runtime), '-I', '-c',
+                'print(\'{"payload_type":"run.terminal.completed"}\')',
+                '--model', 'synthetic', '--reasoning-effort', 'max']
+        with self.fence.prepared() as command:
+            return probe(self.fence, command, argv)
+
+    @unittest.skipUnless(shutil.which('bwrap'), 'bubblewrap not installed')
+    def test_probe_preserves_existing_worktree_and_log_files(self):
+        existing = [self.work / '.muse-fence-probe-marker',
+                    self.logs / '.muse-fence-probe-marker']
+        for path in existing:
+            path.write_bytes(b'existing user data\x00preserve exactly\n')
+        snapshots = {path: (path.stat().st_ino, path.read_bytes()) for path in existing}
+        self.assertTrue(self.run_model_free_probe()['pass'])
+        for path, (inode, data) in snapshots.items():
+            self.assertTrue(path.exists(), str(path) + ' was removed by the probe')
+            self.assertEqual(path.read_bytes(), data)
+            self.assertEqual(path.stat().st_ino, inode)
+        # The probe must clean up only its own files.
+        self.assertEqual(set(p.name for p in self.work.iterdir()),
+                         {'.muse-fence-probe-marker', '.muse', '.mcp.json'})
+
+    @unittest.skipUnless(shutil.which('bwrap'), 'bubblewrap not installed')
+    def test_tmp_brief_and_input_mounts_remain_readonly(self):
+        # Explicit /tmp fixtures reproduce the supported input path regression.
+        with tempfile.TemporaryDirectory(prefix='muse-fence-tmp-input-', dir='/tmp') as tmp:
+            root = Path(tmp)
+            brief = root / 'brief.md'
+            named = root / 'named.txt'
+            other = root / 'undeclared.txt'
+            for path in (brief, named, other):
+                path.write_text(path.name)
+            self.fence = Fence(self.work, brief, self.logs, self.runtime,
+                               self.auth, self.settings, inputs=[named])
+            script = f'''
+import os
+from pathlib import Path
+for name in {[str(brief), str(named)]!r}:
+    p = Path(name)
+    assert p.read_text() == p.name
+    assert not os.access(p, os.W_OK)
+    try:
+        p.write_text('must refuse')
+    except OSError:
+        pass
+    else:
+        raise AssertionError('declared input writable')
+assert not Path({str(other)!r}).exists()
+Path('/tmp/private-write').write_text('log-only')
+'''
+            after = self.run_fenced(script)
+            self.assertEqual(after.returncode, 0, after.stderr)
+            self.assertEqual((self.logs / 'tmp/private-write').read_text(), 'log-only')
+            self.assertEqual(brief.read_text(), brief.name)
+            self.assertEqual(named.read_text(), named.name)
+
+    @unittest.skipUnless(shutil.which('bwrap'), 'bubblewrap not installed')
+    def test_declared_worktree_input_readonly_overlay(self):
+        named = self.work / 'input.txt'
+        named.write_text('preserved input')
+        self.fence = Fence(self.work, self.brief, self.logs, self.runtime,
+                           self.auth, self.settings, inputs=[named])
+        script = f'''
+from pathlib import Path
+p = Path({str(named)!r})
+assert p.read_text() == 'preserved input'
+try:
+    p.write_text('must refuse')
+except OSError:
+    pass
+else:
+    raise AssertionError('declared worktree input writable')
+Path({str(self.work / 'ordinary-write')!r}).write_text('allowed')
+'''
+        after = self.run_fenced(script)
+        self.assertEqual(after.returncode, 0, after.stderr)
+        self.assertEqual(named.read_text(), 'preserved input')
+        self.assertEqual((self.work / 'ordinary-write').read_text(), 'allowed')
+
+    def test_log_local_input_and_worktree_runtime_still_refused(self):
+        named = self.logs / 'input.txt'
+        named.write_text('not allowed')
+        with self.assertRaises(ValueError):
+            Fence(self.work, self.brief, self.logs, self.runtime, self.auth, inputs=[named])
+        runtime = self.work / 'runtime'
+        runtime.write_text('not allowed')
+        with self.assertRaises(ValueError):
+            Fence(self.work, self.brief, self.logs, runtime, self.auth)
+
     @unittest.skipUnless(os.environ.get('MUSE_FENCE_NATIVE_PROBE') == '1',
                          'explicit installed-client model-free integration')
     def test_native_echo_cannot_start_extensions(self):
