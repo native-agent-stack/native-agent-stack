@@ -73,6 +73,21 @@ ceilings are frozen in the journal and config; they cannot bypass continuity,
 loss budgets, leverage, request limits, STOP or reconciliation. See the
 [D6-b decision](../../../docs/decisions/2026-10-13-paper-configurable-risk-ceilings.md).
 
+Extended-hours PAPER can opt into
+`extended_hours_start_readiness: {"window_seconds": 30, "benchmark_quote_timeout_seconds": 5}`.
+Those exact integer values are the registered initial envelope; malformed or
+unsupported values refuse. It applies only to actual PRE/POST paper starts,
+with read-only benchmark polling and fresh account/clock/flat reads before
+admission. RTH, standalone preflight, recovery and omitted-block behavior
+retain their defaults. Required benchmark health and its stale-quote watchdog
+use five seconds throughout the extended-hours stage. An opted PRE stage
+refuses if duration, cleanup and the existing 60-second allowance would cross
+09:30 ET. The readiness block is excluded from the next-trial frozen signature,
+so PRE/POST and RTH trials can retain one journal; recovery still binds exact bytes.
+Strategy features, ledger checks and the final order wire retain their shipped
+three-second bound. This grants no permission to price an order from stale data.
+See the [start-readiness decision](../../../docs/decisions/2026-10-13-extended-hours-paper-start-readiness.md).
+
 Each trial records the SHA-256 of its selected config file as `config_sha256`
 in the state directory's `trial.json`. Recovery requires those exact bytes,
 including session flags, formatting and notes, and refuses every change with

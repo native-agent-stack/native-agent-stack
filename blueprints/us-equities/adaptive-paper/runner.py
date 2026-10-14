@@ -25,6 +25,7 @@ if __name__ == "__main__":
 import argparse
 import ast
 import asyncio
+from contextlib import contextmanager
 from dataclasses import asdict, replace
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
@@ -53,6 +54,7 @@ from safety import (Ledger, Quote, RiskLimits, SafetyError, account_lock_fingerp
 from sessions import (DEFAULT_SESSION_POLICY, SessionKind, boundary_receipt, extended_session_close,
                      must_end_flat, next_trading_day, session_at, validate_session_policy)
 from strategies import AdaptivePolicy, PolicyConfig, RegimeSelector, SelectorConfig, limit_price
+from start_readiness import validate_start_readiness, start_readiness_settings
 from transport import (AlpacaPaperTransport, TransportError, RejectedSubmission, order_contract_status,
                        preflight, halt_statuses_supported, nasdaq_halt_seed, fee_activities, fee_checkpoint)
 
@@ -379,7 +381,7 @@ def strategy_pool_and_selector(config, registry_entries, *, session="regular"):
 
 
 def frozen_trading_config_sha256(raw_config):
-    """Bind every config value except the three coordinated session flags.
+    """Bind every value except coordinated session flags and readiness bounds.
 
     README's same-ledger path must retain trading/risk fields. The session
     clock still validates each flag combination independently; this digest
@@ -388,6 +390,7 @@ def frozen_trading_config_sha256(raw_config):
     frozen=json.loads(json.dumps(raw_config))
     frozen.pop("regular_session_only",None)
     frozen.pop("extended_hours_enabled",None)
+    frozen.pop("extended_hours_start_readiness",None)
     if isinstance(frozen.get("sessions"),dict):
         frozen["sessions"].pop("extended_hours",None)
     return hashlib.sha256(json.dumps(frozen,sort_keys=True,separators=(",",":")).encode()).hexdigest()
@@ -437,6 +440,7 @@ def load_config(path, *, registry_path=None, config_bytes=None):
     # the default config (no "sessions" block, or one matching today's
     # defaults) this enforces exactly the same invariant as before.
     session_policy = validate_session_policy(c)
+    validate_start_readiness(c)
     # G-e: opt-in leverage-schedule validation. Absent (every shipped
     # config) -> leverage stays None and every downstream private key/kwarg
     # below is skipped entirely, so the rest of load_config's output is
@@ -547,7 +551,8 @@ def public_preflight(observation, config):
             "clock": observation["clock"], "asset_count": len(observation["assets"]),
             "position_count": len(observation["positions"]), "open_order_count": len(observation["orders"]),
             "orders_submitted": 0, "quote_count": len(observation["quotes"]),
-            "quote_errors": observation.get("quote_errors", {})}
+            "quote_errors": observation.get("quote_errors", {}),
+            **({"start_readiness": observation["start_readiness"]} if "start_readiness" in observation else {})}
 
 
 _GATE_REQUIRED_KEYS = ("status", "input_sha256", "row_count", "checks", "versions", "checked_at")
@@ -728,7 +733,8 @@ def check_order_contract_boundary(symbols):
 
 def validate_preflight(observation, config, *, require_open, allow_existing=False,
                        allow_existing_positions=None, session_policy=None,
-                       mode=None, gate_result_path=None, snapshot_path=None):
+                       mode=None, gate_result_path=None, snapshot_path=None,
+                       benchmark_quote_timeout_seconds=None):
     """``mode="paper"`` additionally requires a passing, hash-matched promotion
     gate (see ``_check_promotion_gate``); ``mode=None`` (the default) skips it
     for the preflight/recover call sites and for paper without either proof
@@ -813,8 +819,19 @@ def validate_preflight(observation, config, *, require_open, allow_existing=Fals
                                                    for s in required_assets):
         raise SafetyError("universe_not_tradable")
     if require_open and not allow_existing:
+        benchmark_age = config["quote_max_age_seconds"]
+        if benchmark_quote_timeout_seconds is not None:
+            approved = start_readiness_settings(config, "paper", session_at(
+                datetime.fromtimestamp(server, timezone.utc)).kind.value)
+            if approved.get("benchmark_quote_timeout_seconds") != benchmark_quote_timeout_seconds:
+                raise SafetyError("invalid_start_readiness_scope")
+            info = session_at(datetime.fromtimestamp(server, timezone.utc))
+            if (info.kind == SessionKind.PRE
+                    and info.close.timestamp() - server < required_window):
+                raise SafetyError("start_readiness_pre_crosses_rth")
+            benchmark_age = benchmark_quote_timeout_seconds
         quotes = {q["symbol"]: q for q in observation["quotes"]}
-        if any(s not in quotes or not -.25 <= time.time() - quotes[s]["ts_ns"] / 1e9 <= config["quote_max_age_seconds"]
+        if any(s not in quotes or not -.25 <= time.time() - quotes[s]["ts_ns"] / 1e9 <= benchmark_age
                for s in config["benchmarks"]):
             raise SafetyError("benchmark_quotes_not_ready")
     return close
@@ -1773,7 +1790,9 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
                 for a in assets]
     session = build_node(port, metadata, [strategy], account_id="ALPACA-PAPER-" + account_fingerprint[:16],
                          max_order_submit_rate="180/00:01:00", session_policy=session_policy,
-                         log_directory=log_directory)
+                         log_directory=log_directory,
+                         **({"connection_timeout_seconds": 40}
+                            if getattr(port, "benchmark_quote_timeout_seconds", None) == 5 else {}))
     # A guarded order/position callback that raises stops the session here: the
     # adapter then denies submits, the node stops, and main() recovers any residual.
     strategy.fault_sink = session.fail
@@ -2357,6 +2376,52 @@ def _controller_session(close, now, session_policy):
     return close, market_open
 
 
+@contextmanager
+def readiness_request_window(state_root, limits, *, enabled, exploratory=False):
+    """Reserve opted startup GETs before HTTP in a retained root-local window.
+
+    This request-only journal uses Ledger's existing atomic 60-second budget;
+    it is separate from trial/risk state so refused starts retain reservations
+    without bootstrapping a trial. Disabled calls create no journal.
+    """
+    ledger = None
+    def reserve(timestamp, kind):
+        nonlocal ledger
+        if ledger is None:
+            budget_limits = RiskLimits(max_rest_per_minute=limits.max_rest_per_minute,
+                                       max_submits_per_minute=limits.max_submits_per_minute)
+            ledger = Ledger(Path(state_root) / "readiness-requests.sqlite3", budget_limits,
+                            exploratory=exploratory)
+        if ledger.request_budget(timestamp, kind):
+            raise TransportError("readiness_request_budget_exhausted")
+    try:
+        yield reserve if enabled else None
+    finally:
+        if ledger is not None:
+            ledger.close()
+
+
+def preflight_request_observer(attempts, readiness_budget=None):
+    """Retain the invocation bound; opted GETs additionally reserve durably."""
+    def observe_request(kind, **kwargs):
+        timestamp = time.time()
+        attempts.append({"timestamp": timestamp, "kind": kind})
+        if len(attempts) > 50:
+            raise SafetyError("preflight_request_bound")
+        if readiness_budget is not None:
+            readiness_budget(timestamp, kind)
+    return observe_request
+
+
+def replay_preflight_requests(ledger, attempts, *, readiness=False):
+    """Carry opted data GETs into trading's window, leaving default policy intact."""
+    for attempt in attempts:
+        if attempt["kind"] != "data_read" or readiness:
+            kind = "data_read" if attempt["kind"] == "data_read" else "read"
+            if ledger.request_budget(attempt["timestamp"], kind):
+                raise SafetyError("preflight_budget_inconsistent")
+
+
 @runtime_read_locked
 @receipt_scope
 def main():
@@ -2427,19 +2492,24 @@ def main():
         CorporateActionMonitor(AlpacaCorporateActionsSource(key, secret))
         if session_policy["overnight_holds"] else None)
     attempts, responses = [], []
-    def observe_request(kind, **kwargs):
-        attempts.append({"timestamp": time.time(), "kind": kind})
-        if len(attempts) > 50:
-            raise SafetyError("preflight_request_bound")
     # G-e: only a validated leverage policy widens the preflight account
     # read to include margin fields (transport.normalize_account); the
     # default (no "leverage_policy" block) preflight is unchanged.
     include_margin = config.get("_leverage_policy") is not None
+    readiness = (start_readiness_settings(config, args.command,
+                 session_at(datetime.now(timezone.utc)).kind.value)
+                 if "extended_hours_start_readiness" in config else {})
     try:
-        observation = preflight(key, secret, config["symbols"], feed=config["feed"],
-                                before_request=observe_request, request_observer=responses.append,
-                                include_margin=include_margin)
-    except TransportError as exc:
+        with readiness_request_window(args.state_root, limits, enabled=bool(readiness),
+                                      exploratory=exploratory) as budget:
+            observation = preflight(key, secret, config["symbols"], feed=config["feed"],
+                                    before_request=preflight_request_observer(attempts, budget),
+                                    request_observer=responses.append, include_margin=include_margin,
+                                    **({"start_readiness": readiness, "benchmark_symbols": config["benchmarks"],
+                                        "stop_requested": lambda: DEFAULT_STOP.exists()} if readiness else {}))
+    except (TransportError, SafetyError) as exc:
+        if isinstance(exc, SafetyError) and str(exc) != "preflight_request_bound":
+            raise
         result = {"status": "not_started", "stage": "preflight", "reason": str(exc),
                   "feed": config["feed"], "orders_submitted": 0, "http": responses,
                   "attempts": attempts}
@@ -2507,7 +2577,9 @@ def main():
                                    allow_existing=args.command == "recover",
                                    allow_existing_positions=(args.command == "recover" or prior_hold),
                                    session_policy=session_policy,
-                                   mode=gate_mode, gate_result_path=args.gate_result, snapshot_path=args.snapshot)
+                                   mode=gate_mode, gate_result_path=args.gate_result, snapshot_path=args.snapshot,
+                                   **({"benchmark_quote_timeout_seconds": readiness["benchmark_quote_timeout_seconds"]}
+                                      if readiness else {}))
     except SafetyError as exc:
         summary.update(status="not_started", reason=str(exc))
         save(args.output, summary)
@@ -2560,10 +2632,7 @@ def main():
                         **({"exploratory": True, "rotation": args.command == 'paper'} if exploratory else {}))
         try:
             now = time.time()
-            for attempt in attempts:
-                if attempt["kind"] != "data_read":
-                    if ledger.request_budget(attempt["timestamp"], "read"):
-                        raise SafetyError("preflight_budget_inconsistent")
+            replay_preflight_requests(ledger, attempts, readiness=bool(readiness))
             # D4: under the default policy, close/market_open keep exactly
             # today's behaviour (the broker's own RTH close, always open).
             # Under extended_hours, entries must be bounded by the actual
@@ -2670,6 +2739,9 @@ def main():
                     sink_observation=controller.observe, sink_status=controller.trading_status,
                     request_observer=responses.append,
                     quote_timeout=config["quote_max_age_seconds"], feed=config["feed"],
+                    **({"start_timeout": readiness["window_seconds"],
+                        "benchmark_quote_timeout_seconds": readiness["benchmark_quote_timeout_seconds"]}
+                       if readiness and not recovering else {}),
                     order_quote_max_age_seconds=config["quote_max_age_seconds"],
                     **({"exit_quote_max_age_seconds": ledger.limits.exit_quote_max_age_seconds}
                        if ledger.limits.exit_quote_max_age_seconds is not None else {}),

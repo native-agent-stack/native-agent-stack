@@ -1007,12 +1007,29 @@ def _sdk_client(api_key, secret_key, before_request, observer=None, *, data=Fals
 
 
 def preflight(api_key, secret_key, symbols, *, feed="iex", before_request, request_observer=None,
-              include_margin=False):
+              include_margin=False, start_readiness=None, benchmark_symbols=None, stop_requested=None):
     """Read-only native SDK preflight; callback is synchronous in this helper."""
     from alpaca.data.enums import DataFeed
     from alpaca.data.requests import StockLatestQuoteRequest
     symbols = _symbols(symbols)
     feed = data_feed(feed)
+    readiness = start_readiness is not None
+    if readiness:
+        from start_readiness import REGISTERED
+        if (type(start_readiness) is not dict or start_readiness != REGISTERED
+                or any(type(v) is not int for v in start_readiness.values())):
+            raise TransportError("invalid_extended_hours_start_readiness")
+        benchmarks = _symbols(benchmark_symbols)
+        if not set(benchmarks).issubset(symbols):
+            raise TransportError("readiness_benchmarks_not_subscribed")
+        deadline = time.monotonic() + start_readiness["window_seconds"]
+        authorize = before_request
+        def before_request(*args, **kwargs):
+            if stop_requested is not None and stop_requested():
+                raise TransportError("start_readiness_stopped")
+            if time.monotonic() >= deadline:
+                raise TransportError("start_readiness_deadline_reached")
+            return authorize(*args, **kwargs)
     lock = threading.Lock()
     trading = _sdk_client(api_key, secret_key, before_request, request_observer, read_only=True, lock=lock)
     data = _sdk_client(api_key, secret_key, before_request, request_observer, data=True, read_only=True, lock=lock)
@@ -1041,7 +1058,61 @@ def preflight(api_key, secret_key, symbols, *, feed="iex", before_request, reque
             assets.append({key: asset.get(key) for key in
                            ("symbol", "status", "tradable", "fractionable", "marginable", "shortable", "attributes")})
             asset_statuses.append(normalize_overnight_status(asset, time.time_ns()))
-        quotes = data.get_stock_latest_quote(StockLatestQuoteRequest(symbol_or_symbols=list(symbols), feed=DataFeed(feed)))
+        quote_reads = 0
+        def latest(names):
+            nonlocal quote_reads
+            quote_reads += 1
+            return data.get_stock_latest_quote(StockLatestQuoteRequest(symbol_or_symbols=list(names), feed=DataFeed(feed)))
+        quotes = latest(symbols)
+        if readiness:
+            # Initial account/clock/positions/orders/assets/quotes cost N+5.
+            # Reserve five GETs for the authoritative post-poll snapshot.
+            # Spread the remaining poll slots over the registered window,
+            # leaving one cadence interval for that final refresh.
+            poll_slots = 50 - (len(symbols) + 5) - 5
+            poll_interval = max(2, start_readiness["window_seconds"] / (poll_slots + 1))
+            polls = 0
+            def benchmarks_ready():
+                for symbol in benchmarks:
+                    try:
+                        q = normalize_quote(quotes[symbol], symbol)
+                        age = (time.time_ns() - q["ts_ns"]) / 1e9
+                    except (KeyError, TransportError, TypeError, ValueError, AttributeError):
+                        return False
+                    if not -.25 <= age <= start_readiness["benchmark_quote_timeout_seconds"]:
+                        return False
+                return True
+            while not benchmarks_ready():
+                if stop_requested is not None and stop_requested():
+                    raise TransportError("start_readiness_stopped")
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    raise TransportError("benchmark_quotes_not_ready")
+                if polls >= poll_slots:
+                    raise TransportError("benchmark_quotes_not_ready")
+                time.sleep(min(poll_interval, remaining))
+                if time.monotonic() >= deadline:
+                    raise TransportError("benchmark_quotes_not_ready")
+                quotes.update(latest(benchmarks))
+                polls += 1
+            # Quotes may become usable after the initial flat/account reads.
+            # Re-establish that proof; never admit against an earlier snapshot.
+            refreshed = trading.get_account()
+            if str(refreshed["id"]) != str(raw_account["id"]):
+                raise TransportError("preflight_account_changed")
+            account = normalize_account(refreshed, include_margin=include_margin)
+            clock = trading.get_clock()
+            clock_received_at_ns = time.time_ns()
+            raw_positions = trading.get_all_positions()
+            raw_orders = trading.get("/orders", {"status": "open", "limit": 500, "nested": False})
+            if type(raw_positions) is not list or type(raw_orders) is not list:
+                raise TransportError("incomplete_readiness_snapshot")
+            positions = [{"symbol": p["symbol"], "qty": decimal_string(p["qty"]),
+                          "avg_entry_price": decimal_string(p["avg_entry_price"])} for p in raw_positions]
+            orders = [normalize_order(raw) for raw in raw_orders]
+            quotes.update(latest(benchmarks))
+            if time.monotonic() >= deadline or not benchmarks_ready():
+                raise TransportError("benchmark_quotes_not_ready")
         normalized_quotes, quote_errors = [], {}
         for symbol in symbols:
             if symbol not in quotes:
@@ -1058,7 +1129,9 @@ def preflight(api_key, secret_key, symbols, *, feed="iex", before_request, reque
                 "next_open_ns": timestamp_ns(clock["next_open"])},
                 "positions": positions, "orders": orders, "open_orders_complete": len(raw_orders) < 500,
                 "assets": assets, "asset_statuses": asset_statuses,
-                "quotes": normalized_quotes, "quote_errors": quote_errors}
+                "quotes": normalized_quotes, "quote_errors": quote_errors,
+                **({"start_readiness": {**start_readiness, "quote_reads": quote_reads,
+                                       "account_state_refreshed": True}} if readiness else {})}
     finally:
         trading._session.close()
         data._session.close()
@@ -1200,7 +1273,8 @@ class AlpacaPaperTransport:
                  order_update_timeout=10.0, request_observer=None, history_start=None,
                  max_snapshot_pages=20, required_quote_symbols=None, feed="iex",
                  extended_hours_allowed=False, include_margin=False, sink_status=None,
-                 fee_history_start=None, order_quote_max_age_seconds=3, exit_quote_max_age_seconds=None):
+                 fee_history_start=None, order_quote_max_age_seconds=3, exit_quote_max_age_seconds=None,
+                 benchmark_quote_timeout_seconds=None):
         # sink_status receives every normalized trading status message of a subscribed
         # symbol (normalize_trading_status) on the owning loop, like sink_observation.
         self.sink_status = sink_status
@@ -1233,6 +1307,11 @@ class AlpacaPaperTransport:
         self.before_request, self.before_submit = before_request, before_submit
         self.sink_observation, self.request_observer = sink_observation, request_observer
         self.quote_timeout, self.start_timeout = quote_timeout, start_timeout
+        if benchmark_quote_timeout_seconds is not None and (
+                not self.extended_hours_allowed or type(benchmark_quote_timeout_seconds) is not int
+                or benchmark_quote_timeout_seconds != 5 or start_timeout != 30):
+            raise TransportError("invalid_extended_hours_start_readiness")
+        self.benchmark_quote_timeout_seconds = benchmark_quote_timeout_seconds
         # Order admission is distinct from the stream-health watchdog. Keep
         # integer nanoseconds through the final pre-POST comparison.
         self.order_quote_max_age_ns = int(order_quote_max_age_seconds * 1_000_000_000)
@@ -1298,8 +1377,14 @@ class AlpacaPaperTransport:
     @property
     def health(self):
         with self._state_lock:
-            fresh = all(time.monotonic() - self._quote_seen.get(s, float("-inf")) <= self.quote_timeout
+            fresh = all(time.monotonic() - self._quote_seen.get(s, float("-inf")) <= (
+                        self.benchmark_quote_timeout_seconds or self.quote_timeout)
                         for s in self.required_quote_symbols)
+            if fresh and self.benchmark_quote_timeout_seconds is not None:
+                # Do not add the quote's age on receipt to another full timeout.
+                fresh = all(s in self._quote_values and -.25 <= (
+                    time.time_ns() - self._quote_values[s]["ts_ns"]) / 1e9 <= self.benchmark_quote_timeout_seconds
+                    for s in self.required_quote_symbols)
             return {"ready": self._started and not self._stopping and not self._reasons
                     and all(self._auth.values()) and all(self._acks.values()) and fresh,
                     "frozen": bool(self._reasons), "reasons": sorted(self._reasons),
@@ -1495,7 +1580,9 @@ class AlpacaPaperTransport:
                     if quote["symbol"] not in self.symbols:
                         raise TransportError("unexpected quote symbol")
                     age = (time.time_ns() - quote["ts_ns"]) / 1e9
-                    if not -0.25 <= age <= self.quote_timeout:
+                    max_age = (self.benchmark_quote_timeout_seconds if self.benchmark_quote_timeout_seconds is not None
+                               and quote["symbol"] in self.required_quote_symbols else self.quote_timeout)
+                    if not -0.25 <= age <= max_age:
                         if quote["symbol"] in self.required_quote_symbols:
                             self.freeze_health("quote_timestamp_stale")
                         continue
