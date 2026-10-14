@@ -85,7 +85,13 @@ FILES_API_CAP = 3000  # GET /pulls/{n}/files lists at most 3000 files; a list th
 DEFAULT_KEYS = ("anthropic-api-4", "anthropic-api-3", "anthropic-api-2", "anthropic-api-5", "anthropic-api",
                 "anthropic-api-6", "anthropic-api-7", "anthropic-api-8", "anthropic-api-9", "anthropic-api-10")
 SWITCH_CLASSES = ("credit_exhausted", "revoked_key")
-DEFAULT_CLAUDE_BIN = "~/.local/share/claude/versions/2.1.296"
+# The adopted native client. 2.1.299 fixes two 2.1.296 faults a headless worker can meet (official CHANGELOG, section
+# 2.1.299): "cloud and headless sessions could run an approved tool call twice if a new message arrived as the session
+# resumed after a restart", and "MCP tool calls in headless and SDK sessions sometimes failing or running twice when a
+# background reconnect closed the connection they were running on". Its `--help` is byte-identical to 2.1.296's, and
+# the offline probes (probes.py offline) give the same result on it: 16 PASS, 9 INFO, no FAIL. A comment below that
+# names a measurement on 2.1.296 dates that measurement.
+DEFAULT_CLAUDE_BIN = "~/.local/share/claude/versions/2.1.299"
 
 
 def credit_exhausted(status, text) -> bool:
@@ -613,7 +619,8 @@ def review_settings() -> dict:
 
 
 def claude_flags(input_view: str) -> list:
-    """claude -p's flags, each checked against `claude --help` of 2.1.296. No positional prompt: it comes on stdin."""
+    """claude -p's flags, each checked against `claude --help` of 2.1.299 (byte-identical to 2.1.296's). No positional
+    prompt: it comes on stdin."""
     return [
         "-p", "--model", MODEL, "--effort", EFFORT, "--max-budget-usd", str(BUDGET_USD),
         "--permission-mode", "dontAsk", "--permission-prompts", "none", "--restricted", "--setting-sources", "user",
