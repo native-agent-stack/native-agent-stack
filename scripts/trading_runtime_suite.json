@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "description": "The test modules behind trading-runtime skip guards, run by scripts/trading_runtime_suite.py in validate.yml's trading-runtime job on the runtime the lock pins. Any skip there fails unless it matches one exclusion below with exactly its count. tests/test_trading_runtime_suite.py fails when a tests/ module with a trading-runtime guard is missing from this list.",
+  "lock": "blueprints/us-equities/adaptive-paper/requirements-linux-x86_64-py312.lock",
+  "required_distributions": ["alpaca-py", "nautilus-trader", "requests", "numpy", "pandas", "exchange-calendars"],
+  "modules": [
+    "test_adaptive_market_research",
+    "test_adaptive_paper_adaptive_sell_age",
+    "test_adaptive_paper_corporate_actions",
+    "test_adaptive_paper_credential_race",
+    "test_adaptive_paper_diagnostic_seams",
+    "test_adaptive_paper_exits",
+    "test_adaptive_paper_extended_exits",
+    "test_adaptive_paper_fees",
+    "test_adaptive_paper_live_manifest",
+    "test_adaptive_paper_mover_native",
+    "test_adaptive_paper_native",
+    "test_adaptive_paper_overnight",
+    "test_adaptive_paper_runner",
+    "test_adaptive_paper_sessions",
+    "test_adaptive_paper_start_readiness",
+    "test_adaptive_paper_transport",
+    "test_alpaca_admission_regressions",
+    "test_alpaca_historical",
+    "test_capacity_probe_modes",
+    "test_ibkr_paper_orders",
+    "test_mover_exit_chain",
+    "test_native_faults_min",
+    "test_order_throughput",
+    "test_security_identity",
+    "test_sim_capacity",
+    "test_sim_engine_crosscheck",
+    "test_sim_paper_compare",
+    "test_us_equities_strategies",
+    "test_us_equities_strategy_lifecycle"
+  ],
+  "exclusions": [
+    {
+      "id_prefix": "tests.test_ibkr_paper_orders.",
+      "reason_contains": "needs nautilus_trader 1.231.0",
+      "count": 13,
+      "owner": "trading-cc",
+      "why": "Its guard (tests/test_ibkr_paper_orders.py, _nautilus_available) requires nautilus_trader 1.231.0; the runtime pins 2.0.0rc5. A known exclusion until trading-cc ports or retires the module."
+    },
+    {
+      "id_prefix": "tests.test_sim_paper_compare.",
+      "reason_contains": "retained page cache not present on this host",
+      "count": 10,
+      "owner": "trading lane",
+      "why": "The tests replay retained pages from the host's private state directory (~/.local/state/native-agent-stack/sim-paper/pages), which no runner holds."
+    },
+    {
+      "id_prefix": "tests.test_sim_engine_crosscheck.",
+      "reason_contains": "hftbacktest is not installed",
+      "count": 5,
+      "owner": "trading lane",
+      "why": "hftbacktest is a separate cross-check runtime (blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.lock), not part of the trading runtime's lock."
+    },
+    {
+      "id_prefix": "tests.test_security_identity.",
+      "reason_contains": "DuckDB",
+      "count": 3,
+      "owner": "trading lane",
+      "why": "DuckDB belongs to the research environment, not to the trading runtime's lock."
+    }
+  ]
+}

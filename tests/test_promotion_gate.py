@@ -152,7 +152,7 @@ class WorkflowProvisioningContract(unittest.TestCase):
         final = jobs(workflow)["validate-result"]
         self.assertRegex(final, r"(?m)^    name: validate$")
         self.assertEqual(block_if(final), "always()")
-        self.assertRegex(final, r"(?m)^    needs: validate$")
+        self.assertRegex(final, r"(?m)^    needs: \[validate, trading-runtime\]$")
 
         # Reuse the tiny native fixture, without running another repository test
         # method. An isolated subclass owns its setup and cleanup state.

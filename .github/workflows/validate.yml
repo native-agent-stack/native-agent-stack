@@ -380,10 +380,85 @@ jobs:
         if: matrix.shard == 0
         run: node --test blueprints/native-skill-practice/test-contract.cjs
 
+  trading-runtime:
+    # The test modules behind trading-runtime skip guards (scripts/trading_runtime_suite.json) skip in every validate
+    # shard, which installs only .github/requirements-ci.txt; no required check ran them (the co-op's skip-guard inventory
+    # of 2026-10-14, from run 38504827195). This job installs the trading runtime from its own lock and runs them, and
+    # scripts/trading_runtime_suite.py fails on any skip that is not a named exclusion with its exact count. The required
+    # `validate` check needs this job's success. Measured on a CPython 3.12.3 venv at main 67469fb6 with HOME scrubbed and
+    # CI=true: the lock installed in 2 s from PyPI with no cache, the no-runtime baseline took 49 s, the run 374 s.
+    name: validate-trading-runtime
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    permissions:
+      contents: read
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out repository with full history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Install checksum-locked CI analyzer
+        run: >-
+          python3 -m pip install --disable-pip-version-check --no-input
+          --only-binary=:all: --require-hashes
+          --index-url https://pypi.org/simple
+          -r .github/requirements-ci.txt
+      - name: Provision the pinned trading runtime from its lock
+        env:
+          UV_VERSION: '0.12.17'
+          # https://github.com/astral-sh/uv/releases/download/0.12.17/uv-x86_64-unknown-linux-gnu.tar.gz.sha256
+          UV_SHA256: fa82fd8dde8e8eefdecada6aa0889666556cfceb690d06e0c3bca49eb3070a63
+        run: |
+          mkdir -p "$RUNNER_TEMP/uv"
+          curl --fail --silent --show-error --location --retry 3 \
+            "https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/uv-x86_64-unknown-linux-gnu.tar.gz" \
+            --output "$RUNNER_TEMP/uv/archive.tar.gz"
+          printf '%s  %s\n' "$UV_SHA256" "$RUNNER_TEMP/uv/archive.tar.gz" | sha256sum --check
+          tar -xzf "$RUNNER_TEMP/uv/archive.tar.gz" -C "$RUNNER_TEMP/uv" --strip-components=1
+          "$RUNNER_TEMP/uv/uv" --version
+          "$RUNNER_TEMP/uv/uv" venv --python /usr/bin/python3 "$RUNNER_TEMP/trading-runtime-venv"
+          "$RUNNER_TEMP/uv/uv" pip sync --python "$RUNNER_TEMP/trading-runtime-venv/bin/python3" --require-hashes \
+            blueprints/us-equities/adaptive-paper/requirements-linux-x86_64-py312.lock
+          echo "TRADING_RUNTIME_PYTHON=$RUNNER_TEMP/trading-runtime-venv/bin/python3" >> "$GITHUB_ENV"
+      - name: Record which of the modules skip without the runtime (the baseline)
+        # The image's CPython with the shards' CI requirements and no runtime: the interpreter the shards use.
+        env:
+          PYTHONFAULTHANDLER: '1'
+        run: |
+          set -o pipefail
+          mkdir -p "$RUNNER_TEMP/trading"
+          python3 scripts/trading_runtime_suite.py baseline --report "$RUNNER_TEMP/trading/baseline.json" \
+            2>&1 | tee "$RUNNER_TEMP/trading/baseline.log"
+      - name: Run the trading-runtime modules, where a skip fails
+        # -v names each test before it runs and --durations 50 lists the 50 slowest. GNU timeout sends SIGABRT five
+        # minutes under the job's limit; with PYTHONFAULTHANDLER the traceback names the test a hang stopped in.
+        env:
+          PYTHONFAULTHANDLER: '1'
+        run: |
+          set -o pipefail
+          timeout --signal=ABRT --kill-after=60s 35m \
+            "$TRADING_RUNTIME_PYTHON" scripts/trading_runtime_suite.py run -v --durations 50 \
+              --baseline "$RUNNER_TEMP/trading/baseline.json" --report "$RUNNER_TEMP/trading/report.json" \
+              2>&1 | tee "$RUNNER_TEMP/trading/unittest-verbose.log"
+      - name: Upload the trading-runtime reports and log
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: validate-trading-runtime-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/trading/
+          if-no-files-found: warn
+          include-hidden-files: false
+          retention-days: 30
+
   validate-result:
     name: validate
     if: always()
-    needs: validate
+    needs: [validate, trading-runtime]
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
@@ -414,6 +489,13 @@ jobs:
           python3 scripts/validate_shards.py aggregate \
             --reports "$RUNNER_TEMP/shards" --shards 8 \
             --job-result "$VALIDATE_SHARDS_RESULT" --summary "$GITHUB_STEP_SUMMARY"
+      - name: Require the trading-runtime job's success
+        if: always()
+        # needs.<job_id>.result is success, failure, cancelled or skipped (docs.github.com, contexts reference, the
+        # needs context); only success passes, so a skipped or cancelled trading-runtime job fails this check too.
+        env:
+          TRADING_RUNTIME_RESULT: ${{ needs.trading-runtime.result }}
+        run: test "$TRADING_RUNTIME_RESULT" = success
       - name: Upload the aggregate shard receipt
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
