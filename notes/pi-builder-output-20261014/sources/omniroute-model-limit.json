@@ -1,0 +1,8 @@
+{
+  "evidence_class": "read_only_catalog_observation",
+  "observed_utc": "2026-10-14T02:36:20Z",
+  "source_endpoint": "/v1/models",
+  "model": "cx/gpt-6.1-sol",
+  "max_output_tokens": 128000,
+  "builder_max_tokens": 32768
+}

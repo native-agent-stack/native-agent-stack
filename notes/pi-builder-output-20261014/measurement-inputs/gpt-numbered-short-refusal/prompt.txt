@@ -1,0 +1,1 @@
+Output exactly 4000 lines. Each line contains its consecutive integer from 1 to 4000 followed by a space and the words amber river. Do not summarize, abbreviate, use ellipses, or write code. Write every line, then the final line OUTPUT_PROBE_COMPLETE_4000. This is a harmless token-budget measurement requiring an output longer than 8192 tokens.

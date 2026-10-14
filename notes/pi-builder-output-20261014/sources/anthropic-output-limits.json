@@ -1,0 +1,10 @@
+{
+  "evidence_class": "source_review",
+  "source": "https://platform.claude.com/docs/en/about-claude/models/overview",
+  "source_section": "Compare models",
+  "observed_utc": "2026-10-14T02:29:10Z",
+  "model": "claude-opus-5-5",
+  "documented_max_output": "128K tokens",
+  "chosen_builder_max_tokens": 32768,
+  "custody": "Derived source-review fact from the fetched official page; not retained full HTTP response bytes. Markdown retrieval separately refused HTTP 403."
+}
