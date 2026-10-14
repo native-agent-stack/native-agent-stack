@@ -1,0 +1,19 @@
+The new tests of the installer's agents step (links, folders, CLAUDE_CONFIG_DIR) against the sources of the base and against this head. A test is listed once, with the number of its failing subtests.
+
+== 329985de1, the base (its sources, this test module)
+   AgentsInstallTests: Ran 9, FAILED (failures=6, errors=1)
+      AgentsInstallTests.test_a_copy_that_cannot_be_renamed_into_place_leaves_no_temporary_file: 1 failing
+      AgentsInstallTests.test_a_dry_run_names_the_link_it_would_replace_and_changes_nothing: 1 failing
+      AgentsInstallTests.test_a_folder_at_a_shipped_name_is_refused_before_anything_is_copied: 1 failing
+      AgentsInstallTests.test_a_link_at_a_shipped_name_is_replaced_by_a_regular_copy_and_what_it_points_at_is_untouched: 2 failing
+      AgentsInstallTests.test_a_link_to_a_folder_is_replaced_and_the_folder_is_untouched: 1 failing
+      AgentsInstallTests.test_a_link_to_nothing_is_replaced_and_no_file_is_created_where_it_pointed: 1 failing
+   AgentsConfigDirTests: Ran 6, FAILED (failures=3, errors=1)
+      AgentsConfigDirTests.test_a_relative_value_is_refused_and_nothing_is_written: 1 failing
+      AgentsConfigDirTests.test_a_set_value_is_made_absolute_and_normalized_as_the_client_does: 2 failing
+      AgentsConfigDirTests.test_the_current_users_install_follows_claude_config_dir: 1 failing
+== this head
+   AgentsInstallTests: Ran 9, OK
+   AgentsConfigDirTests: Ran 6, OK
+
+Tests that fail or raise on 329985de1: 9.

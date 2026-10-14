@@ -529,8 +529,10 @@ GitHub-hosted macOS runner; see
      (paths relative to that file); skipped per file if the installed copy
      already matches.
    - **agents**: copies the eleven [`adoption/agents/claude/*.md`](agents/claude/)
-     files verbatim to `~/.claude/agents/`; skipped per-file when already
-     byte-identical. They changed after `v2026.09.26`: `stack-researcher`,
+     files verbatim to `~/.claude/agents/` (to `$CLAUDE_CONFIG_DIR/agents/` when that
+     is set to an absolute path and no `--home` is given, the folder the client reads
+     then); skipped per-file when already byte-identical; a link at a shipped name is
+     replaced by a regular copy and a folder there is refused. They changed after `v2026.09.26`: `stack-researcher`,
      `stack-verifier` and `security-reviewer` were added (the security role
      preloads `security-best-practices`), and `isolated-builder` preloads
      `context-mode:context-mode` (its `verification-before-completion` preload was

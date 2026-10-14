@@ -188,7 +188,7 @@ request; the local workflow check runs the step's script itself.
 - The practice page note (`reference/workers.md` L13, "four host copies differ") is stale; correcting it is a re-pin of the practice skill and belongs to the next one (the skills manifest pins the page).
 - The installer is not the recovery for every drift (separately authorized installer work, a follow-up): `install_agents` writes under `~/.claude/agents` and not under `CLAUDE_CONFIG_DIR`; its equality test
   (`install_claude_profile.py` L178-L179) follows a link, so a linked copy with equal bytes is skipped and its drift does not clear; and `shutil.copy2` over a link writes through it (`python/cpython@cbc944f4bc59`
-  `Lib/shutil.py` L262). Recovery by hand: remove the stale, linked or unlisted file, then rerun the installer.
+  `Lib/shutil.py` L262). Recovery by hand: remove the stale, linked or unlisted file, then rerun the installer. Resolved for the agents step by [the installer follow-up](2026-10-13-installer-agent-links-and-config-dir.md) (a link at a shipped name is replaced by a copy, a folder is refused, `CLAUDE_CONFIG_DIR` is followed for the current user's own install).
 - The check is a snapshot of one pass over the folder: a change made after it read an entry is not seen until the next run, and it is no boundary against one.
 - The check depends on a bun at the pinned version. The embedded build (`1.4.3+eecfd55de`) is not a public commit, so the release (`1.4.3+c6da4a4d3`) stands in for it: the two answered alike on 16,428 texts, and so did
   1.4.2 (`receipts/client-oracle.txt`); that is a measurement of one corpus, not a proof, and the pin stays at the version the client embeds, as ruled. The client's second parse attempt (after a rewrite of the text) is not

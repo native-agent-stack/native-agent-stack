@@ -1,0 +1,448 @@
+{
+  "schema_version": 1,
+  "kind": "gate_read_accounting_delta",
+  "date": "2026-10-13",
+  "source_commit": "cd1a7c443d8af759cd46133641acb6fccba6ff97",
+  "baseline_path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261012-pr1016.json",
+  "baseline_sha256": "6df6bb62e1bde5843ba77a800af2e889a4affb1c4c4bb6389234697c2755df05",
+  "mode": "monitoring_only",
+  "added_by_script": {
+    "scripts/adoption_status.py": 4,
+    "scripts/validate.py": 1,
+    "tools/adoption/install_claude_profile.py": 4,
+    "tools/credentials/set_credential.py": 4
+  },
+  "removed_by_script": {},
+  "added_shapes": [
+    {
+      "script": "scripts/validate.py",
+      "shape": [
+        "*:",
+        "*:*"
+      ],
+      "count": 1
+    },
+    {
+      "script": "tools/credentials/set_credential.py",
+      "shape": [
+        ".*.*.tmp"
+      ],
+      "count": 1
+    }
+  ],
+  "removed_shapes": [],
+  "added_locations": [
+    "scripts/adoption_status.py:1019",
+    "scripts/adoption_status.py:1107",
+    "scripts/adoption_status.py:1280",
+    "scripts/adoption_status.py:1396",
+    "scripts/adoption_status.py:1399",
+    "scripts/adoption_status.py:1448",
+    "scripts/adoption_status.py:1496",
+    "scripts/adoption_status.py:1497",
+    "scripts/adoption_status.py:1499",
+    "scripts/adoption_status.py:1515",
+    "scripts/adoption_status.py:1518",
+    "scripts/adoption_status.py:1521",
+    "scripts/adoption_status.py:953",
+    "scripts/credential_status.py:347",
+    "scripts/credential_status.py:493",
+    "scripts/credential_status.py:550",
+    "scripts/credential_status.py:557",
+    "scripts/credential_status.py:560",
+    "scripts/skills_status.py:233",
+    "scripts/skills_status.py:363",
+    "scripts/skills_status.py:364",
+    "scripts/skills_status.py:365",
+    "scripts/skills_status.py:369",
+    "scripts/skills_status.py:632",
+    "scripts/skills_status.py:640",
+    "scripts/skills_status.py:642",
+    "scripts/skills_status.py:710",
+    "scripts/skills_status.py:813",
+    "scripts/validate.py:795",
+    "tools/adoption/install_claude_profile.py:184",
+    "tools/adoption/install_claude_profile.py:186",
+    "tools/adoption/install_claude_profile.py:187",
+    "tools/adoption/install_claude_profile.py:189",
+    "tools/adoption/install_skills.py:319",
+    "tools/adoption/install_skills.py:320",
+    "tools/adoption/install_skills.py:832",
+    "tools/adoption/install_skills.py:859",
+    "tools/adoption/install_skills.py:860",
+    "tools/credentials/set_credential.py:105",
+    "tools/credentials/set_credential.py:133",
+    "tools/credentials/set_credential.py:160",
+    "tools/credentials/set_credential.py:213",
+    "tools/credentials/set_credential.py:297",
+    "tools/credentials/set_credential.py:323",
+    "tools/credentials/set_credential.py:347",
+    "tools/credentials/set_credential.py:84"
+  ],
+  "derived_count": 357,
+  "derivation": {
+    "source": "blueprints/runtime-workers/openhands/resolver/push_gate.py:derive_ci_protected; input commit cd1a7c443d8af759cd46133641acb6fccba6ff97",
+    "replay": "python3 -B -m unittest tests.test_runtime_worker_openhands_push_gate",
+    "method": "Native GitTree at the input commit and derive_ci_protected, compared with the immutable baseline that the previous delta names: script counts, read-shape multiplicities and exact locations. A gone and a new location of one script with the same read shape are paired as one line move.",
+    "interpretation": "Monitoring accounting only; no permission or execution authority is added."
+  },
+  "read_classifications": [
+    {
+      "location": "scripts/adoption_status.py:1019",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "read-only client-wiring status; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1107",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "read-only client-wiring status; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1280",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "read-only client-wiring status; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1396",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script; the line itself was edited by this change (it passes the source folder of the agent definitions on), the read is unchanged",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1399",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1448",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1496",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1497",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1499",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1515",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1518",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:1521",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/adoption_status.py:953",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "read-only client-wiring status; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/credential_status.py:347",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/credential_status.py:493",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/credential_status.py:550",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/credential_status.py:557",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/credential_status.py:560",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:233",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:363",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:364",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:365",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:369",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:632",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:640",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:642",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:710",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:813",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/validate.py:795",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "Read-only committed Git blob integrity for PR registration continuity; monitoring only, no worker permission or execution authority.",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/install_claude_profile.py:184",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "operator-run profile installer (install_claude_profile.py, agents step): reads the shipped definitions and the destination entries it replaces or skips, and the client's configuration-directory variable; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/install_claude_profile.py:186",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "operator-run profile installer (install_claude_profile.py, agents step): reads the shipped definitions and the destination entries it replaces or skips, and the client's configuration-directory variable; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/install_claude_profile.py:187",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "operator-run profile installer (install_claude_profile.py, agents step): reads the shipped definitions and the destination entries it replaces or skips, and the client's configuration-directory variable; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/install_claude_profile.py:189",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "operator-run profile installer (install_claude_profile.py, agents step): reads the shipped definitions and the destination entries it replaces or skips, and the client's configuration-directory variable; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/install_skills.py:319",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/install_skills.py:320",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/install_skills.py:832",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/install_skills.py:859",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/install_skills.py:860",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/set_credential.py:105",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "operator-run credential custody (set_credential.py --from-file): reads the inventory, the operator's downloaded key file and the stored copy for openssl's check; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/set_credential.py:133",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "operator-run credential custody (set_credential.py --from-file): reads the inventory, the operator's downloaded key file and the stored copy for openssl's check; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/set_credential.py:160",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "operator-run credential custody (set_credential.py --from-file): reads the inventory, the operator's downloaded key file and the stored copy for openssl's check; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/set_credential.py:213",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "operator-run credential custody (set_credential.py --from-file): reads the inventory, the operator's downloaded key file and the stored copy for openssl's check; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/set_credential.py:297",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/set_credential.py:323",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/set_credential.py:347",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    },
+    {
+      "location": "tools/credentials/set_credential.py:84",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "the same read at another line of the same script",
+      "permission_change": false
+    }
+  ],
+  "removed_locations": [
+    "scripts/adoption_status.py:1032",
+    "scripts/adoption_status.py:1034",
+    "scripts/adoption_status.py:1083",
+    "scripts/adoption_status.py:1131",
+    "scripts/adoption_status.py:1132",
+    "scripts/adoption_status.py:1134",
+    "scripts/adoption_status.py:1150",
+    "scripts/adoption_status.py:1153",
+    "scripts/adoption_status.py:1156",
+    "scripts/credential_status.py:346",
+    "scripts/credential_status.py:492",
+    "scripts/credential_status.py:549",
+    "scripts/credential_status.py:556",
+    "scripts/credential_status.py:559",
+    "scripts/skills_status.py:223",
+    "scripts/skills_status.py:346",
+    "scripts/skills_status.py:347",
+    "scripts/skills_status.py:348",
+    "scripts/skills_status.py:352",
+    "scripts/skills_status.py:604",
+    "scripts/skills_status.py:612",
+    "scripts/skills_status.py:614",
+    "scripts/skills_status.py:682",
+    "scripts/skills_status.py:785",
+    "tools/adoption/install_skills.py:294",
+    "tools/adoption/install_skills.py:295",
+    "tools/adoption/install_skills.py:721",
+    "tools/adoption/install_skills.py:748",
+    "tools/adoption/install_skills.py:749",
+    "tools/credentials/set_credential.py:103",
+    "tools/credentials/set_credential.py:129",
+    "tools/credentials/set_credential.py:153",
+    "tools/credentials/set_credential.py:69"
+  ]
+}

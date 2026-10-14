@@ -1,0 +1,13 @@
+Review round 1 tests run against tools/adoption/install_claude_profile.py at b09f6450 (the PR head before the round), with the round's tests:
+ERROR: test_a_dangling_parent_is_refused_and_not_created
+ERROR: test_a_file_where_a_folder_belongs_is_refused
+ERROR: test_a_folder_swapped_for_a_link_after_the_check_does_not_redirect_the_write
+FAIL: test_a_linked_agents_folder_is_refused
+FAIL: test_a_linked_configuration_root_is_refused
+FAIL: test_a_linked_dot_claude_is_refused
+FAIL: test_a_linked_higher_ancestor_is_refused
+FAIL: test_a_missing_folder_is_created_inside_the_checked_parent_even_if_the_parent_is_swapped
+FAIL: test_an_empty_value_is_refused_before_any_step_writes
+FAIL: test_an_entry_at_the_old_predictable_temporary_name_is_never_followed
+Ran 13 tests in 0.019s
+FAILED (failures=7, errors=3)
