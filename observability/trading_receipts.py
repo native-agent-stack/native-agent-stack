@@ -17,6 +17,10 @@ import time
 
 LANES = ("A", "B", "C", "lanea", "laneb", "IBKR", "I-llm")
 UNKNOWN_PNL = -9007199254740991
+# Each limit covers at least two of that lane's own measured round intervals.
+# Retained2026-10-14 medians: C295.238s, lanea558.335s, laneb374.841s.
+# CC04:21Z specifies12 minutes for overnight C. I-llm has no cadence receipt.
+STALE_AFTER_SECONDS = {"C": 720, "lanea": 1200, "laneb": 780, "I-llm": None}
 EXPORTED_FIELDS = ("lane", "observed_unix", "source_unix", "orders_per_min", "fills_per_min",
                    "cancels_per_min", "cash_use_ratio", "open_positions", "realized_pnl_usd",
                    "status_code", "ended_by_code", "wire_mean_per_s", "wire_peak_per_s")
@@ -150,7 +154,8 @@ def event_observation(lane, events, state, now, source_unix):
         row["realized_pnl_usd"] = number(realized, UNKNOWN_PNL)
     row["source_unix"] = latest if latest > 0 else source_unix
     if row["status_code"] not in (2, 3):
-        row["status_code"] = 1 if now - row["source_unix"] < 180 else 6
+        limit = STALE_AFTER_SECONDS[lane]
+        row["status_code"] = 7 if limit is None else 1 if now - row["source_unix"] < limit else 6
     return row
 
 

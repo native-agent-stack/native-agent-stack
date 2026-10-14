@@ -183,3 +183,38 @@ check. After the correction, the9-reader-test module passes; the PR's named
 reader/dashboard/grant modules pass55tests in7.667seconds. Only these four
 corrections, their regressions and record/bindings share the one released
 fix commit. Lane-health changes stay on their own branch.
+
+## Per-lane receipt freshness correction
+
+The CC04:21Z measurement reproduced a false Stale receipt alarm: C's
+overnight unit was active, while its rounds were about five minutes apart
+and the board used180seconds. The observer's30-second refresh is not the
+producer's round interval. Each event lane now uses at least twice its
+own measured interval. This is receipt freshness, not a unit-health probe.
+
+| Lane | Own interval | Retained source / measurement | Stale threshold |
+| --- | --- | --- | --- |
+| C | About5m12s in CC's latest three rounds; cumulative median295.237915s | run-overnight-20261013/events.jsonl:3-93;91 round events,90 positive gaps | 720s, CC's12-minute limit |
+| lanea | Median558.335276s | run-lanea-post-20261013/events.jsonl:3-48;18 round events,17 positive gaps | 1200s (20min) |
+| laneb | Median374.841485s | run-laneb-post-20261013/events.jsonl:3-49;25 round events,24 positive gaps | 780s (13min) |
+| I-llm | Unrecorded | No retained own run events at this measurement | No guessed limit; Not live without a receipt, Cadence unrecorded for non-terminal receipts |
+| A / B | Not a polling inference | Own completed paper receipt status | Recorded status, last-stage rates |
+| IBKR | Not a polling inference | Own native session start/end status | Recorded session status, last-session rates |
+
+Measurement uses only native rank_round/no_selection_round timestamps, in
+file order, and the median of positive adjacent gaps. It exports no source
+body, account identity, source path or financial value. The retained sources
+are already named above; these bounds are measured configuration for this
+board, not an inference that every irregular gap is a stalled producer.
+If producer cadence changes, remeasure and update that lane's bound before
+claiming freshness. I-llm requires that qualification before an Active or
+Stale label. Completion/refusal remains authoritative before any age rule.
+Panel descriptions state each policy; no lane retains an unsupported180s
+limit. Source time remains the producer time, and rates still use the actual
+trailing minute even when an older receipt remains within its cadence.
+
+At8e7cbaaa the five-minute C regression fails first (rc1, one test with
+three failures at ages300/624/719seconds). After the C-only correction it
+passes (rc0). The arm/unknown-cadence test then fails first (rc1, six failed
+subcases); after the per-lane correction both pass. Boundary fixtures cover
+the exact stale limits and preserve terminal/refused status and source time.

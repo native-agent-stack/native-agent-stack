@@ -19183,8 +19183,8 @@
     },
     {
       "path": "docs/decisions/2026-10-13-trading-lanes-dashboard.md",
-      "sha256": "0722638fc53f1b938ff530df43ff10fccf337152d3fd845ccb98b4f10b32a688",
-      "bytes": 11804
+      "sha256": "a0251b353c2945e54b0cca2a69a0bcee90591dca7ccfd5df03184f52ba3a07ee",
+      "bytes": 14324
     },
     {
       "path": "docs/decisions/2026-10-14-muse-file-fence.md",
@@ -44013,8 +44013,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/grafana-trading-lanes.json",
-      "sha256": "5e2742e68d683fdea347aea918856cebdf590cde1e97b02784dcb077dcebb732",
-      "bytes": 110825
+      "sha256": "fbe0c21ab25c555d88ca6c1b20327ca5c67803a69c82e9248bce68988df390de",
+      "bytes": 112563
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/grafana.ini",
@@ -62008,13 +62008,13 @@
     },
     {
       "path": "observability/trading_dashboard.py",
-      "sha256": "6fd1fbe0980c544384d999e413e0acf2000e819b553e51da215699006f501800",
-      "bytes": 6811
+      "sha256": "29fb5b420a811a401c01a246206547f79e262478a9a16a7c774dd54f807debad",
+      "bytes": 7624
     },
     {
       "path": "observability/trading_receipts.py",
-      "sha256": "74dbf15c21f5fa32b5cda5133567bdeab44f626189d8c457b189482bb2cb0c5f",
-      "bytes": 13604
+      "sha256": "e1c4cf575d0ecad2b64f3b999c6fc74e43afd073ab88b93963aa53b1ef849eda",
+      "bytes": 13976
     },
     {
       "path": "recipes/README.md",
@@ -64238,8 +64238,8 @@
     },
     {
       "path": "tests/test_trading_receipts.py",
-      "sha256": "99e24b6f6ad4fa4618d0c29e859e8368f87edc852958779eeaecbcf4ce922464",
-      "bytes": 8336
+      "sha256": "ad6a19a96fe9f42d46dd64565985581bd78a0256236542cfe453155bb11ed472",
+      "bytes": 10415
     },
     {
       "path": "tests/test_tvly_keyring.py",

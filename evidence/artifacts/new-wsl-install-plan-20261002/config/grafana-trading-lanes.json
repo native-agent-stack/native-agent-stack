@@ -28,7 +28,7 @@
       },
       "options": {
         "mode": "markdown",
-        "content": "Read-only projections of each lane's own receipts. Refreshed by the existing observer. Rates for A/B and IBKR are receipt stage averages; C and POST arms use the trailing minute of recorded events. Submissions are not fills. **Unavailable** means the source does not record the metric. Receipt time and status expose stale/ended runs; a fresh observation does not make a prior session live. IBKR has no session tonight; its last session is retained. I-llm stays not live until wired."
+        "content": "Read-only projections of each lane's own receipts. Refreshed by the existing observer. Rates for A/B and IBKR are receipt stage averages; C and POST arms use the trailing minute of recorded events. Submissions are not fills. **Unavailable** means the source does not record the metric. Receipt time and status expose stale/ended runs; a fresh observation does not make a prior session live. Event freshness follows each lane's own cadence: C12min, lanea20min, laneb13min; I-llm cadence unrecorded. IBKR has no session tonight; its last session is retained. I-llm stays not live until wired."
       }
     },
     {
@@ -48,7 +48,7 @@
       "id": 3,
       "type": "stat",
       "title": "A \u00b7 Orders/min (last stage)",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from the latest paper receipt; rates are last-stage averages.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -109,7 +109,7 @@
       "id": 4,
       "type": "stat",
       "title": "A \u00b7 Fills/min (last stage)",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from the latest paper receipt; rates are last-stage averages.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -170,7 +170,7 @@
       "id": 5,
       "type": "stat",
       "title": "A \u00b7 Cancels/min (last stage)",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from the latest paper receipt; rates are last-stage averages.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -231,7 +231,7 @@
       "id": 6,
       "type": "stat",
       "title": "A \u00b7 Cash use / equity",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from the latest paper receipt; rates are last-stage averages.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -292,7 +292,7 @@
       "id": 7,
       "type": "stat",
       "title": "A \u00b7 Open positions",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from the latest paper receipt; rates are last-stage averages.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -353,7 +353,7 @@
       "id": 8,
       "type": "stat",
       "title": "A \u00b7 Realized P&L",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from the latest paper receipt; rates are last-stage averages.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -417,7 +417,7 @@
       "id": 9,
       "type": "stat",
       "title": "A \u00b7 Status",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from the latest paper receipt; rates are last-stage averages.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -455,6 +455,9 @@
                 },
                 "6": {
                   "text": "Stale receipt"
+                },
+                "7": {
+                  "text": "Cadence unrecorded"
                 },
                 "99": {
                   "text": "Other status"
@@ -499,7 +502,7 @@
       "id": 10,
       "type": "stat",
       "title": "A \u00b7 Ended by",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from the latest paper receipt; rates are last-stage averages.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -645,7 +648,7 @@
       "id": 13,
       "type": "stat",
       "title": "B \u00b7 Orders/min (last stage)",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from the latest paper receipt; rates are last-stage averages.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -706,7 +709,7 @@
       "id": 14,
       "type": "stat",
       "title": "B \u00b7 Fills/min (last stage)",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from the latest paper receipt; rates are last-stage averages.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -767,7 +770,7 @@
       "id": 15,
       "type": "stat",
       "title": "B \u00b7 Cancels/min (last stage)",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from the latest paper receipt; rates are last-stage averages.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -828,7 +831,7 @@
       "id": 16,
       "type": "stat",
       "title": "B \u00b7 Cash use / equity",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from the latest paper receipt; rates are last-stage averages.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -889,7 +892,7 @@
       "id": 17,
       "type": "stat",
       "title": "B \u00b7 Open positions",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from the latest paper receipt; rates are last-stage averages.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -950,7 +953,7 @@
       "id": 18,
       "type": "stat",
       "title": "B \u00b7 Realized P&L",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from the latest paper receipt; rates are last-stage averages.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -1014,7 +1017,7 @@
       "id": 19,
       "type": "stat",
       "title": "B \u00b7 Status",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from the latest paper receipt; rates are last-stage averages.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -1052,6 +1055,9 @@
                 },
                 "6": {
                   "text": "Stale receipt"
+                },
+                "7": {
+                  "text": "Cadence unrecorded"
                 },
                 "99": {
                   "text": "Other status"
@@ -1096,7 +1102,7 @@
       "id": 20,
       "type": "stat",
       "title": "B \u00b7 Ended by",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from the latest paper receipt; rates are last-stage averages.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -1242,7 +1248,7 @@
       "id": 23,
       "type": "stat",
       "title": "C \u00b7 Orders/min (last minute)",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after12 minutes (overnight rounds about5 minutes apart).",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -1303,7 +1309,7 @@
       "id": 24,
       "type": "stat",
       "title": "C \u00b7 Fills/min (last minute)",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after12 minutes (overnight rounds about5 minutes apart).",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -1364,7 +1370,7 @@
       "id": 25,
       "type": "stat",
       "title": "C \u00b7 Cancels/min (last minute)",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after12 minutes (overnight rounds about5 minutes apart).",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -1425,7 +1431,7 @@
       "id": 26,
       "type": "stat",
       "title": "C \u00b7 Cash use / equity",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after12 minutes (overnight rounds about5 minutes apart).",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -1486,7 +1492,7 @@
       "id": 27,
       "type": "stat",
       "title": "C \u00b7 Open positions",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after12 minutes (overnight rounds about5 minutes apart).",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -1547,7 +1553,7 @@
       "id": 28,
       "type": "stat",
       "title": "C \u00b7 Realized P&L",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after12 minutes (overnight rounds about5 minutes apart).",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -1611,7 +1617,7 @@
       "id": 29,
       "type": "stat",
       "title": "C \u00b7 Status",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after12 minutes (overnight rounds about5 minutes apart).",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -1649,6 +1655,9 @@
                 },
                 "6": {
                   "text": "Stale receipt"
+                },
+                "7": {
+                  "text": "Cadence unrecorded"
                 },
                 "99": {
                   "text": "Other status"
@@ -1693,7 +1702,7 @@
       "id": 30,
       "type": "stat",
       "title": "C \u00b7 Ended by",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after12 minutes (overnight rounds about5 minutes apart).",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -1839,7 +1848,7 @@
       "id": 33,
       "type": "stat",
       "title": "lanea \u00b7 Orders/min (last minute)",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after20 minutes (retained median round interval558.335 seconds).",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -1900,7 +1909,7 @@
       "id": 34,
       "type": "stat",
       "title": "lanea \u00b7 Fills/min (last minute)",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after20 minutes (retained median round interval558.335 seconds).",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -1961,7 +1970,7 @@
       "id": 35,
       "type": "stat",
       "title": "lanea \u00b7 Cancels/min (last minute)",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after20 minutes (retained median round interval558.335 seconds).",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -2022,7 +2031,7 @@
       "id": 36,
       "type": "stat",
       "title": "lanea \u00b7 Cash use / equity",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after20 minutes (retained median round interval558.335 seconds).",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -2083,7 +2092,7 @@
       "id": 37,
       "type": "stat",
       "title": "lanea \u00b7 Open positions",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after20 minutes (retained median round interval558.335 seconds).",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -2144,7 +2153,7 @@
       "id": 38,
       "type": "stat",
       "title": "lanea \u00b7 Realized P&L",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after20 minutes (retained median round interval558.335 seconds).",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -2208,7 +2217,7 @@
       "id": 39,
       "type": "stat",
       "title": "lanea \u00b7 Status",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after20 minutes (retained median round interval558.335 seconds).",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -2246,6 +2255,9 @@
                 },
                 "6": {
                   "text": "Stale receipt"
+                },
+                "7": {
+                  "text": "Cadence unrecorded"
                 },
                 "99": {
                   "text": "Other status"
@@ -2290,7 +2302,7 @@
       "id": 40,
       "type": "stat",
       "title": "lanea \u00b7 Ended by",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after20 minutes (retained median round interval558.335 seconds).",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -2436,7 +2448,7 @@
       "id": 43,
       "type": "stat",
       "title": "laneb \u00b7 Orders/min (last minute)",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after13 minutes (retained median round interval374.841 seconds).",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -2497,7 +2509,7 @@
       "id": 44,
       "type": "stat",
       "title": "laneb \u00b7 Fills/min (last minute)",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after13 minutes (retained median round interval374.841 seconds).",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -2558,7 +2570,7 @@
       "id": 45,
       "type": "stat",
       "title": "laneb \u00b7 Cancels/min (last minute)",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after13 minutes (retained median round interval374.841 seconds).",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -2619,7 +2631,7 @@
       "id": 46,
       "type": "stat",
       "title": "laneb \u00b7 Cash use / equity",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after13 minutes (retained median round interval374.841 seconds).",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -2680,7 +2692,7 @@
       "id": 47,
       "type": "stat",
       "title": "laneb \u00b7 Open positions",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after13 minutes (retained median round interval374.841 seconds).",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -2741,7 +2753,7 @@
       "id": 48,
       "type": "stat",
       "title": "laneb \u00b7 Realized P&L",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after13 minutes (retained median round interval374.841 seconds).",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -2805,7 +2817,7 @@
       "id": 49,
       "type": "stat",
       "title": "laneb \u00b7 Status",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after13 minutes (retained median round interval374.841 seconds).",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -2843,6 +2855,9 @@
                 },
                 "6": {
                   "text": "Stale receipt"
+                },
+                "7": {
+                  "text": "Cadence unrecorded"
                 },
                 "99": {
                   "text": "Other status"
@@ -2887,7 +2902,7 @@
       "id": 50,
       "type": "stat",
       "title": "laneb \u00b7 Ended by",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Stale after13 minutes (retained median round interval374.841 seconds).",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -3033,7 +3048,7 @@
       "id": 53,
       "type": "stat",
       "title": "IBKR \u00b7 Orders/min (last session)",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from native session start/end records; rates are last-session averages.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -3094,7 +3109,7 @@
       "id": 54,
       "type": "stat",
       "title": "IBKR \u00b7 Fills/min (last session)",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from native session start/end records; rates are last-session averages.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -3155,7 +3170,7 @@
       "id": 55,
       "type": "stat",
       "title": "IBKR \u00b7 Cancels/min (last session)",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from native session start/end records; rates are last-session averages.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -3216,7 +3231,7 @@
       "id": 56,
       "type": "stat",
       "title": "IBKR \u00b7 Cash use / equity",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from native session start/end records; rates are last-session averages.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -3277,7 +3292,7 @@
       "id": 57,
       "type": "stat",
       "title": "IBKR \u00b7 Open positions",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from native session start/end records; rates are last-session averages.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -3338,7 +3353,7 @@
       "id": 58,
       "type": "stat",
       "title": "IBKR \u00b7 Realized P&L",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from native session start/end records; rates are last-session averages.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -3402,7 +3417,7 @@
       "id": 59,
       "type": "stat",
       "title": "IBKR \u00b7 Status",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from native session start/end records; rates are last-session averages.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -3440,6 +3455,9 @@
                 },
                 "6": {
                   "text": "Stale receipt"
+                },
+                "7": {
+                  "text": "Cadence unrecorded"
                 },
                 "99": {
                   "text": "Other status"
@@ -3484,7 +3502,7 @@
       "id": 60,
       "type": "stat",
       "title": "IBKR \u00b7 Ended by",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. Status comes from native session start/end records; rates are last-session averages.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -3699,7 +3717,7 @@
       "id": 64,
       "type": "stat",
       "title": "I-llm \u00b7 Orders/min (last minute)",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. No measured cadence yet: Not live without receipts; Cadence unrecorded with non-terminal receipts.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -3760,7 +3778,7 @@
       "id": 65,
       "type": "stat",
       "title": "I-llm \u00b7 Fills/min (last minute)",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. No measured cadence yet: Not live without receipts; Cadence unrecorded with non-terminal receipts.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -3821,7 +3839,7 @@
       "id": 66,
       "type": "stat",
       "title": "I-llm \u00b7 Cancels/min (last minute)",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. No measured cadence yet: Not live without receipts; Cadence unrecorded with non-terminal receipts.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -3882,7 +3900,7 @@
       "id": 67,
       "type": "stat",
       "title": "I-llm \u00b7 Cash use / equity",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. No measured cadence yet: Not live without receipts; Cadence unrecorded with non-terminal receipts.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -3943,7 +3961,7 @@
       "id": 68,
       "type": "stat",
       "title": "I-llm \u00b7 Open positions",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. No measured cadence yet: Not live without receipts; Cadence unrecorded with non-terminal receipts.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -4004,7 +4022,7 @@
       "id": 69,
       "type": "stat",
       "title": "I-llm \u00b7 Realized P&L",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. No measured cadence yet: Not live without receipts; Cadence unrecorded with non-terminal receipts.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -4068,7 +4086,7 @@
       "id": 70,
       "type": "stat",
       "title": "I-llm \u00b7 Status",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. No measured cadence yet: Not live without receipts; Cadence unrecorded with non-terminal receipts.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -4106,6 +4124,9 @@
                 },
                 "6": {
                   "text": "Stale receipt"
+                },
+                "7": {
+                  "text": "Cadence unrecorded"
                 },
                 "99": {
                   "text": "Other status"
@@ -4150,7 +4171,7 @@
       "id": 71,
       "type": "stat",
       "title": "I-llm \u00b7 Ended by",
-      "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+      "description": "Latest receipt-derived observation in ten minutes. No measured cadence yet: Not live without receipts; Cadence unrecorded with non-terminal receipts.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"

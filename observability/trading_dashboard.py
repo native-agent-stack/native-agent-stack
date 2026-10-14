@@ -2,7 +2,14 @@
 
 LANES = ("A", "B", "C", "lanea", "laneb", "IBKR", "I-llm")
 SOURCE = {"type": "loki", "uid": "ns2604-loki"}
-STATUS = {0: "Missing receipt", 1: "Active", 2: "Ended", 3: "Blocked", 4: "No session", 5: "Not live", 6: "Stale receipt", 99: "Other status"}
+STATUS = {0: "Missing receipt", 1: "Active", 2: "Ended", 3: "Blocked", 4: "No session", 5: "Not live", 6: "Stale receipt", 7: "Cadence unrecorded", 99: "Other status"}
+FRESHNESS = {"C": "Stale after12 minutes (overnight rounds about5 minutes apart).",
+             "lanea": "Stale after20 minutes (retained median round interval558.335 seconds).",
+             "laneb": "Stale after13 minutes (retained median round interval374.841 seconds).",
+             "I-llm": "No measured cadence yet: Not live without receipts; Cadence unrecorded with non-terminal receipts.",
+             "A": "Status comes from the latest paper receipt; rates are last-stage averages.",
+             "B": "Status comes from the latest paper receipt; rates are last-stage averages.",
+             "IBKR": "Status comes from native session start/end records; rates are last-session averages."}
 ENDED = {0: "Not recorded", 1: "Duration", 2: "Session end", 3: "Stopped", 4: "Risk limit", 5: "Error", 6: "No session", 99: "Other / unknown"}
 
 
@@ -21,6 +28,7 @@ def dashboard():
                  "Rates for A/B and IBKR are receipt stage averages; C and POST arms use the trailing minute of "
                  "recorded events. Submissions are not fills. **Unavailable** means the source does not record the metric. "
                  "Receipt time and status expose stale/ended runs; a fresh observation does not make a prior session live. "
+                 "Event freshness follows each lane's own cadence: C12min, lanea20min, laneb13min; I-llm cadence unrecorded. "
                  "IBKR has no session tonight; its last session is retained. I-llm stays not live until wired."}}]
     specs = (("orders_per_min", "Orders/min", "suffix:orders/min"), ("fills_per_min", "Fills/min", "suffix:fills/min"),
              ("cancels_per_min", "Cancels/min", "suffix:cancels/min"), ("cash_use_ratio", "Cash use / equity", "percentunit"),
@@ -41,7 +49,7 @@ def dashboard():
             if field in ("orders_per_min", "fills_per_min", "cancels_per_min"):
                 title += " (last stage)" if lane in ("A", "B") else " (last session)" if lane == "IBKR" else " (last minute)"
             panels.append({"id": identifier, "type": "stat", "title": lane + " · " + title,
-                           "description": "Latest receipt-derived observation in ten minutes. See receipt time and status for historical/stale sessions.",
+                           "description": "Latest receipt-derived observation in ten minutes. " + FRESHNESS[lane],
                            "datasource": SOURCE, "gridPos": {"x": index * 3, "y": y + 1, "w": 3, "h": 4},
                            "fieldConfig": {"defaults": {"unit": unit, "mappings": mappings, "noValue": "Not recorded",
                               "thresholds": {"mode": "absolute", "steps": [{"color": "blue", "value": None}]}}, "overrides": []},

@@ -97,6 +97,39 @@ class TradingReceiptTests(unittest.TestCase):
                                  {"type": "entry_cancelled", "t": "2026-10-13T20:00:50Z"}], {}, now, now - 10)
         self.assertEqual(2, row["cancels_per_min"])
 
+    def test_overnight_receipt_stays_active_between_five_minute_rounds(self):
+        # CC04:21Z: overnight rounds are ~5m12s apart; allow12 minutes,
+        # while terminal/refused receipts remain authoritative at any age.
+        m = self.module()
+        start = m.timestamp("2026-10-14T04:17:24Z")
+        events = [{"type": "preflight_ok", "t": "2026-10-14T04:17:24Z"}]
+        for age, status in [(300, 1), (624, 1), (719, 1), (720, 6), (900, 6)]:
+            with self.subTest(age=age):
+                row = m.event_observation("C", events, {}, start + age, start)
+                self.assertEqual(status, row["status_code"])
+                self.assertEqual(start, row["source_unix"])
+                self.assertEqual(0, row["orders_per_min"])
+        for event, expected in [("final_flat", 2), ("preflight_refused", 3)]:
+            with self.subTest(event=event):
+                row = m.event_observation("C", [{"type": event, "t": "2026-10-14T04:17:24Z"}],
+                                          {}, start + 300, start)
+                self.assertEqual(expected, row["status_code"])
+
+    def test_post_arms_use_their_own_measured_round_cadence_and_illm_is_unrecorded(self):
+        m = self.module()
+        start = m.timestamp("2026-10-14T04:17:24Z")
+        events = [{"type": "preflight_ok", "t": "2026-10-14T04:17:24Z"}]
+        for lane, age, expected in [("lanea", 1117, 1), ("lanea", 1199, 1), ("lanea", 1200, 6),
+                                    ("laneb", 750, 1), ("laneb", 779, 1), ("laneb", 780, 6),
+                                    ("I-llm", 1, 7), ("I-llm", 300, 7)]:
+            with self.subTest(lane=lane, age=age):
+                row = m.event_observation(lane, events, {}, start + age, start)
+                self.assertEqual(expected, row["status_code"])
+        # Unknown cadence cannot override authoritative completion/refusal.
+        row = m.event_observation("I-llm", [{"type": "final_flat", "t": "2026-10-14T04:17:24Z"}],
+                                  {}, start + 300, start)
+        self.assertEqual(2, row["status_code"])
+
     def test_native_ibkr_no_receipt_end_stops_active_session_and_clears_old_metrics(self):
         # Native ibkr_series4.sh:43/45 and earlier series.sh:40/42.
         m = self.module()
