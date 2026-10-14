@@ -86,6 +86,7 @@ def run_binding(live_dir):
 
 
 def read_ledger(path):
+    from metrics import request_budget_observation
     if path is None:
         return {"available": False}
     try:
@@ -101,12 +102,12 @@ def read_ledger(path):
             positions = [dict(r) for r in db.execute("SELECT symbol, qty, cost_basis FROM positions")]
             events = [{"kind": r["kind"], "client_id": r["client_id"]} for r in db.execute(
                 "SELECT kind, client_id FROM events ORDER BY id DESC LIMIT 50")]
-            requests = db.execute("SELECT COUNT(*) FROM requests WHERE at > ?", (time.time() - 60,)).fetchone()[0]
+            requests = request_budget_observation(db,path,time.time())['used']
         finally:
             db.close()
         limits = json.loads(meta["limits"]) if meta.get("limits") else None
         trial_start = float(meta.get("trial_start") or 0)
-    except (sqlite3.Error, ValueError) as exc:
+    except (sqlite3.Error, ValueError, KeyError, TypeError) as exc:
         return {"available": False, "error": type(exc).__name__}
     return {"available": True, "trial_id": meta.get("trial_id"), "halted_reason": meta.get("halted_reason") or None,
             "cash_delta_usd": meta.get("cash_delta"), "realized_usd": meta.get("realized"),

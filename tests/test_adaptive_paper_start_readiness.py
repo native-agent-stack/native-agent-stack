@@ -24,7 +24,7 @@ BLOCK={'window_seconds':30,'benchmark_quote_timeout_seconds':5}
 
 
 class StartReadiness(unittest.TestCase):
-    def budget_probe(self, root, *, readiness=True, refresh_case=None):
+    def budget_probe(self, root, *, readiness=True, refresh_case=None, ledger_path=None):
         """Astra's budget probe: real HTTP guard, preflight and durable Ledger."""
         clock=[0.0];epoch=transport.timestamp_ns('2026-10-14T08:00:00Z')
         attempts=[];wire=[];quote_reads=[0];snapshots={'account':0,'positions':0,'orders':0}
@@ -91,12 +91,17 @@ class StartReadiness(unittest.TestCase):
                 except transport.TransportError:
                     if refresh_case is None:self.assertEqual(wire,[])
                     raise
-        with contextlib.closing(runner.Ledger(root/'trading.sqlite3',limits)) as ledger:
+        with contextlib.closing(runner.Ledger(ledger_path or root/'trading.sqlite3',limits)) as ledger:
             if prior_replay is not None:
                 exec(compile(ast.fix_missing_locations(ast.Module(body=[prior_replay],type_ignores=[])),
                              'review-replay','exec'),{'ledger':ledger,'attempts':attempts,'SafetyError':runner.SafetyError})
-            else:runner.replay_preflight_requests(ledger,attempts,readiness=readiness,
-                    readiness_path=root/'readiness-requests.sqlite3' if readiness else None,now=epoch/1e9+clock[0])
+            else:
+                # Snapshot time is read inside the source transaction, after
+                # the preflight clock patch above has ended. Keep replay on
+                # the same deterministic fixture clock too.
+                with patch.object(transport.time,'time',return_value=epoch/1e9+clock[0]):
+                    runner.replay_preflight_requests(ledger,attempts,readiness=readiness,
+                        readiness_path=root/'readiness-requests.sqlite3',now=epoch/1e9+clock[0])
             rows=dict(ledger.db.execute('SELECT kind,COUNT(*) FROM requests GROUP BY kind'))
         return attempts,wire,result,rows
 

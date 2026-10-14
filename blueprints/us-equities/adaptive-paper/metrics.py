@@ -235,6 +235,43 @@ def _gauge(lines, name, help_text, samples):
         lines.append(f"{name}{labels} {value}")
 
 
+def request_budget_observation(conn, ledger_path, now):
+    """Read only: bound root source is authoritative; trading bounds also apply."""
+    meta=dict(conn.execute("SELECT key,value FROM meta"))
+    limits=json.loads(meta.get('limits') or '{}')
+    rows=conn.execute("SELECT at,kind FROM requests WHERE at>?",(now-60,)).fetchall()
+    rest=limits.get('max_rest_per_minute');submit=limits.get('max_submits_per_minute')
+    rest_remaining=max(0,rest-len(rows)) if type(rest) is int else None
+    used_submit=sum(r[1]=='submit' for r in rows)
+    submit_remaining=max(0,submit-used_submit) if type(submit) is int else None
+    if meta.get('request_source_path'):
+        path=Path(meta['request_source_path']);ledger_path=Path(ledger_path)
+        boundary=ledger_path.parent.resolve()
+        if ledger_path.parent.name in ('adaptive','mover'):
+            boundary=ledger_path.parent.parent.parent.resolve()
+        resolved=_resolve_confined(path,boundary)
+        if resolved is None or resolved.name!='readiness-requests.sqlite3' or resolved.parent!=boundary:
+            raise ValueError('request_budget_source_unavailable')
+        source=_open_ledger_readonly(resolved)
+        try:
+            source.execute('BEGIN')
+            source_meta=dict(source.execute('SELECT key,value FROM meta'))
+            if source_meta.get('paper_lane')!=meta.get('paper_lane'):
+                raise ValueError('request_budget_source_unavailable')
+            source_limits=json.loads(source_meta['limits'])
+            rows=source.execute('SELECT at,kind FROM requests WHERE at>?',(now-60,)).fetchall()
+            source_rest=source_limits['max_rest_per_minute'];source_submit=source_limits['max_submits_per_minute']
+            if type(source_rest) is not int or type(source_submit) is not int:
+                raise ValueError('request_budget_source_unavailable')
+            rest_remaining=min(rest_remaining,max(0,source_rest-len(rows)))
+            submit_remaining=min(submit_remaining,max(0,source_submit-sum(r[1]=='submit' for r in rows)))
+            rest=min(rest,source_rest);submit=min(submit,source_submit)
+        finally:
+            source.close()
+    return {'used':len(rows),'rest_limit':rest,'submit_limit':submit,
+            'rest_remaining':rest_remaining,'submit_remaining':submit_remaining}
+
+
 def _counter(lines, name, help_text, value):
     lines.append(f"# HELP {name} {help_text}")
     lines.append(f"# TYPE {name} counter")
@@ -329,18 +366,20 @@ def render_metrics(ledger_path: Path, trial_path: Path, *, now: float | None = N
                      "(a broker order absent from the ledger). Other reconcile mismatch types are not "
                      "durably recorded in the ledger; see the module docstring gap note.", divergence)
 
-            window_start = now - WINDOW_SECONDS
-            rows = conn.execute("SELECT at, kind FROM requests WHERE at > ?", (window_start,)).fetchall()
-            rest_limit = limits.get("max_rest_per_minute")
-            submit_limit = limits.get("max_submits_per_minute")
+            try:
+                budget=request_budget_observation(conn,ledger_resolved,now)
+            except (sqlite3.Error,ValueError,KeyError,TypeError):
+                budget={}
+                lines.append('# adaptive-paper-metrics gap: authoritative request budget unavailable; budget metrics omitted.')
+            rest_limit = budget.get('rest_limit')
+            submit_limit = budget.get('submit_limit')
             limit_samples, remaining_samples = [], []
             if isinstance(rest_limit, int):
                 limit_samples.append(('{kind="rest"}', rest_limit))
-                remaining_samples.append(('{kind="rest"}', max(0, rest_limit - len(rows))))
+                remaining_samples.append(('{kind="rest"}', budget['rest_remaining']))
             if isinstance(submit_limit, int):
-                submit_count = sum(1 for r in rows if r["kind"] == "submit")
                 limit_samples.append(('{kind="submit"}', submit_limit))
-                remaining_samples.append(('{kind="submit"}', max(0, submit_limit - submit_count)))
+                remaining_samples.append(('{kind="submit"}', budget['submit_remaining']))
             if limit_samples:
                 _gauge(lines, "paper_request_budget_limit",
                        "Rolling one-minute request budget limit from persisted RiskLimits, by kind.",

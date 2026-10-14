@@ -13248,8 +13248,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/live_manifest.py",
-      "sha256": "ca34cb59b4ff8f3a9dc763a0937a351ecab815d16164c75c319e3880a57585bd",
-      "bytes": 16245
+      "sha256": "84f7820ad3ffe3fd487f23cb9a882aadffa432aeccb123d5de9f1e63ea0c9fc5",
+      "bytes": 16281
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/market_research.py",
@@ -13258,8 +13258,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/metrics.py",
-      "sha256": "437fce8aaca350b9d8fe5d5b68212879d82e118f01d93fdcd333233709b80397",
-      "bytes": 27982
+      "sha256": "755ba8c8b375dd789ae8263d8b8c4e053689ac9a3ca93c0222ce62ae6eb30474",
+      "bytes": 30343
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/mover.py",
@@ -13493,8 +13493,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "6a8d87bcaea8118db089eee4ea36973fb44d64367ad9ebf0b0be46d650d43346",
-      "bytes": 171214
+      "sha256": "6bb0506f8fec8a04f2a9427737d189de2e9a5b9110af5b851218c4ecb29d84c9",
+      "bytes": 173065
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runtime_lock.py",
@@ -13503,8 +13503,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/safety.py",
-      "sha256": "cf010081b75d187dc3267368ddb55ad8332c0cea938b5937cb386dba0d115d30",
-      "bytes": 108501
+      "sha256": "0cace5a9b97f36371d870d8edd15d7b14113ec35cc6a5d3697bdaf3a622a27ce",
+      "bytes": 111316
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/scheduled_trial.sh",
@@ -13528,7 +13528,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "e7aa47adfcaa34ac74a4a7a4b948d4242a451ae80275c6c47456f6471067348c",
+      "sha256": "3d30fdaa11c1efaf01bf095d7d5d7ee707a0ac72d68c5f912fe5c1feee244125",
       "bytes": 10116
     },
     {
@@ -19163,8 +19163,8 @@
     },
     {
       "path": "docs/decisions/2026-10-14-paper-readiness-budget-handoff.md",
-      "sha256": "33a961ae2b403e232a90b94fac6363064a766d867c5c694d7b289b38b42d8ea8",
-      "bytes": 9501
+      "sha256": "426a684a55806f5ae2424509ae2ec3d2eb74cf9e1176f412a5eee15b95cbbef3",
+      "bytes": 14393
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -62278,8 +62278,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_readiness_handoff.py",
-      "sha256": "f98155a89901e4b40e9725851517055e8d03ba57e7714e8f7b5a3edf45b4791b",
-      "bytes": 19607
+      "sha256": "c031c264be02cf73c8902968c2129f0757130403030aac61c2e027ef559c2a63",
+      "bytes": 35201
     },
     {
       "path": "tests/test_adaptive_paper_recovery.py",
@@ -62313,8 +62313,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_start_readiness.py",
-      "sha256": "954ee9addb33c09c7b13ded61562c2d793e8150fc944aa10047c381950020d22",
-      "bytes": 33788
+      "sha256": "164277af6f0588130aad014538c934111b3b1f58d8332025c48d8b28c053072d",
+      "bytes": 34126
     },
     {
       "path": "tests/test_adaptive_paper_strategies.py",

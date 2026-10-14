@@ -2378,24 +2378,54 @@ def _controller_session(close, now, session_policy):
 
 @contextmanager
 def readiness_request_window(state_root, limits, *, enabled, exploratory=False):
-    """Reserve opted startup GETs before HTTP in a retained root-local window.
+    """Reserve startup GETs before HTTP whenever this root retains authority.
 
     This request-only journal uses Ledger's existing atomic 60-second budget;
     it is separate from trial/risk state so refused starts retain reservations
-    without bootstrapping a trial. Disabled calls create no journal.
+    without bootstrapping a trial. Genuinely unbound disabled calls retain the
+    default policy; a later RTH/recovery invocation cannot bypass a retained
+    window just because its current command disables readiness.
     """
+    root = Path(state_root)
+    path = root / "readiness-requests.sqlite3"
+    retained_paths = [p for p in sorted(root.glob("*/adaptive/ledger.sqlite3"))
+                      if re.fullmatch(r"[0-9a-f]{64}", p.parent.parent.name)]
+    bound = False
+    for retained in retained_paths:
+        source = Ledger.retained_request_source(retained)
+        if source is not None:
+            if (Path(source).resolve() != path.resolve() or path.is_symlink()
+                    or not path.is_file()):
+                raise SafetyError("readiness_request_journal_required")
+            bound = True
     ledger = None
+    startup_cap = None
     def reserve(timestamp, kind):
-        nonlocal ledger
+        nonlocal ledger, startup_cap
         if ledger is None:
+            startup_cap = limits.max_rest_per_minute
             budget_limits = RiskLimits(max_rest_per_minute=limits.max_rest_per_minute,
                                        max_submits_per_minute=limits.max_submits_per_minute)
-            ledger = Ledger.open_request_window(Path(state_root) / "readiness-requests.sqlite3",
-                                                budget_limits, timestamp, exploratory=exploratory)
-        if ledger.request_budget(timestamp, kind):
+            ledger = Ledger.open_request_window(path, budget_limits, timestamp,
+                                                exploratory=exploratory,
+                                                follow_caps=exploratory and not enabled)
+            # Preflight precedes the broker identity read. Reconcile every
+            # retained canonical account journal under this root BEFORE its
+            # first GET, rather than importing trading spends after HTTP.
+            # import_request_window uses destination->source lock order and
+            # binds even an already-open trading handle to this authority.
+            for retained in retained_paths:
+                trading = Ledger(retained, limits, exploratory=exploratory,
+                                 rotation=exploratory)
+                try:
+                    trading.import_request_window(path, timestamp)
+                    startup_cap = min(startup_cap, trading.limits.max_rest_per_minute)
+                finally:
+                    trading.close()
+        if ledger.request_budget(timestamp, kind, rest_cap=startup_cap):
             raise TransportError("readiness_request_budget_exhausted")
     try:
-        yield reserve if enabled else None
+        yield reserve if enabled or bound or path.exists() or path.is_symlink() else None
     finally:
         if ledger is not None:
             ledger.close()
@@ -2405,17 +2435,19 @@ def preflight_request_observer(attempts, readiness_budget=None):
     """Retain the invocation bound; opted GETs additionally reserve durably."""
     def observe_request(kind, **kwargs):
         timestamp = time.time()
-        attempts.append({"timestamp": timestamp, "kind": kind})
+        attempt = {"timestamp": timestamp, "kind": kind}
+        attempts.append(attempt)
         if len(attempts) > 50:
             raise SafetyError("preflight_request_bound")
         if readiness_budget is not None:
             readiness_budget(timestamp, kind)
+            attempt["root_reserved"] = True
     return observe_request
 
 
 def replay_preflight_requests(ledger, attempts, *, readiness=False, readiness_path=None, now=None):
     """Carry opted data GETs into trading's window, leaving default policy intact."""
-    if readiness:
+    if readiness or any(attempt.get("root_reserved", False) for attempt in attempts):
         if readiness_path is None:
             raise SafetyError("readiness_request_journal_required")
         ledger.import_request_window(readiness_path, time.time() if now is None else now)
@@ -2638,7 +2670,7 @@ def main():
         try:
             now = time.time()
             replay_preflight_requests(ledger, attempts, readiness=bool(readiness),
-                                      readiness_path=args.state_root / "readiness-requests.sqlite3" if readiness else None,
+                                      readiness_path=args.state_root / "readiness-requests.sqlite3",
                                       now=now)
             # D4: under the default policy, close/market_open keep exactly
             # today's behaviour (the broker's own RTH close, always open).

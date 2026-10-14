@@ -73,13 +73,82 @@ the imports table and request rows commit together.
 
 ## Validation and operating limits
 
+### Second correction: enforce retained authority before startup HTTP
+
+The next review found adjacent startup orderings that the original handoff
+fix did not cover. At reviewed head
+`4cd05154a094d34cdc7eb61b5a654bfdc941c95c`, a bound root already holding
+192 startup plus eight trading reservations sent six more mocked GETs when
+the current RTH/recovery command disabled readiness. First opted adoption
+of a root with 199 existing trading spends sent twelve GETs before importing
+them. Both new regressions exercise the real GuardedSession/preflight path
+and canonical fingerprint/adaptive/ledger.sqlite3 layout. They fail before
+the correction with six and twelve sends, respectively.
+
+Startup now selects the durable window from retained root authority as well
+as the current readiness setting. Before its first GET it reconciles existing
+canonical trading journals through the existing destination-to-source import
+transaction and durable binding. The 199-spend adoption admits at most one
+request; an exhausted bound root admits none. An already-open trading handle
+also sees the binding, so its later reservation uses the same source. A
+missing or changed retained source refuses before HTTP and is never replaced
+with a fresh budget. Disabled startup on a genuinely unbound root retains
+the original five broker GET reservations and default data-GET policy.
+
+The observer marks successfully reserved attempts; replay imports their
+source rows once rather than charging those GETs again. A positive bound
+non-readiness test starts with seven spends, sends six GETs and retains
+thirteen in each journal after replay and retry. Before knowing the broker
+identity, the scan covers the canonical account journals under this selected
+root. It is not a provider/account-wide limiter across unrelated roots, and
+the account-writer rule remains necessary.
+
+Linked lane-B recovery follows the current request-only cap envelope, including
+a cap-only rotation between the metadata probe and transactional open or a
+later reservation. Inactive-readiness startup never rotates that envelope.
+Frozen trading/risk limits and exact recovery config bytes remain unchanged;
+the real recovery fixture cancels a partial entry and flattens after rotation.
+Startup also takes the minimum of the invocation's and retained trading
+request caps inside the source reservation transaction. A source cap increase
+therefore cannot widen a frozen lower trading cap; the30-to200 fixture refuses
+the next startup read at30 without changing either envelope. This temporary
+restriction applies only to GET reservations, never to an order gate.
+Readiness handles still refuse stale caps. The handoff's future-row check now
+takes its clock after acquiring the source write lock: an ordinary concurrent
+row at1001.001 passes a1001.002 snapshot even if the caller captured1001,
+while genuinely future history still refuses. The preflight/replay fixtures
+pin the same clock on both sides of the transaction; elapsed host time does
+not erase their synthetic request history.
+
+Read-only exporter and dashboard budget observations now read the bound source,
+not just the stale trading audit mirror. The source path must resolve to the
+expected root readiness-requests.sqlite3, opens read-only and matches the
+lane. Effective remaining slots also respect the frozen trading envelope.
+The two-imported plus198-source fixture reports a full200 window and zero
+remaining; unavailable authority omits budget gauges or marks the dashboard
+ledger unavailable rather than reporting optimistic capacity.
+
+This correction retains the selected SQLite/SDK mechanisms. Its primary source
+is the actual reviewed engine at the fixed commit, not a library substitution:
+[runner.py:2380-2428](https://github.com/native-agent-stack/native-agent-stack/blob/4cd05154a094d34cdc7eb61b5a654bfdc941c95c/blueprints/us-equities/adaptive-paper/runner.py#L2380)
+selects the old invocation-only observer and replays after HTTP;
+[safety.py:1587-1714](https://github.com/native-agent-stack/native-agent-stack/blob/4cd05154a094d34cdc7eb61b5a654bfdc941c95c/blueprints/us-equities/adaptive-paper/safety.py#L1587)
+provides the reused binding, import provenance and source-first reservation;
+[metrics.py:332](https://github.com/native-agent-stack/native-agent-stack/blob/4cd05154a094d34cdc7eb61b5a654bfdc941c95c/blueprints/us-equities/adaptive-paper/metrics.py#L332)
+and
+[live_manifest.py:104](https://github.com/native-agent-stack/native-agent-stack/blob/4cd05154a094d34cdc7eb61b5a654bfdc941c95c/blueprints/us-equities/adaptive-paper/live_manifest.py#L104)
+show the previous destination-only telemetry. Exact source and the wire,
+recovery, concurrent-snapshot and telemetry regressions establish the correction.
+The CPython patch.object source above supplies the supported fixture seam.
+No new broker API/client or rate-limit framework is introduced.
+
 Evidence class is synthetic/local integration. The 180+12 fixture fails on
 landed #1097: only 12 rows reach trading. The cap fixture fails with
 persisted_risk_limits_differ even after expiry. New tests retain the entire
 source history, pin the exact 60-second boundary, repeat imports after reopen,
 and refuse partial import from future or symlinked history. Explicit PRE and
 POST invocation-bound tests expect the durable readiness journal to hold 50
-data_read reservations; the pinned RTH variant expects no journal. Negative
+data_read reservations; the genuinely unbound RTH variant expects no journal. Negative
 override, OVERNIGHT forwarding, changed identity and malformed final position/
 order collection cases exercise previously recorded branch follow-ups.
 

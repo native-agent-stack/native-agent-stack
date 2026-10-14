@@ -20,6 +20,7 @@ import re
 import sqlite3
 import sys
 import threading
+import time
 
 # This module is sometimes loaded directly via importlib file-spec without its
 # own directory on sys.path; self-heal so the local sessions.py sibling import
@@ -1538,8 +1539,21 @@ class Ledger:
                 recorded.append({"id": activity_id, "date": day, "net_amount": text, "sub_type": sub_type})
             return recorded
 
+    @staticmethod
+    def retained_request_source(path):
+        """Inspect existing binding without bootstrapping/migrating trading state."""
+        path = Path(path)
+        if path.is_symlink() or not path.is_file():
+            raise SafetyError("readiness_request_journal_required")
+        probe = sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True)
+        try:
+            row = probe.execute("SELECT value FROM meta WHERE key='request_source_path'").fetchone()
+            return row[0] if row else None
+        finally:
+            probe.close()
+
     @classmethod
-    def open_request_window(cls, path, limits, now, *, exploratory=False):
+    def open_request_window(cls, path, limits, now, *, exploratory=False, follow_caps=False):
         """Request-only cap rotation: retain rows and require an expired window."""
         now = instant(now)
         prior_limits = limits
@@ -1557,8 +1571,23 @@ class Ledger:
                     prior_limits = RiskLimits(**json.loads(row[0]))
             finally:
                 probe.close()
-        ledger = cls(path, prior_limits, exploratory=exploratory)
+        ledger = cls(path, prior_limits, exploratory=exploratory,
+                     rotation=exploratory and follow_caps)
         try:
+            # A permitted rotation can commit after the read-only probe but
+            # before construction. Recovery follows the envelope actually
+            # opened under the constructor's transaction, not that old probe.
+            prior_limits = ledger.limits
+            if exploratory and follow_caps:
+                old = json.loads(prior_limits.frozen_json())
+                new = json.loads(limits.frozen_json())
+                for name in ("max_rest_per_minute", "max_submits_per_minute"):
+                    old.pop(name); new.pop(name)
+                if old != new:
+                    raise SafetyError("request_window_only_caps_may_change")
+                # Inactive-readiness startup (including exact-config recovery)
+                # follows the retained request envelope, never rotates it.
+                limits = prior_limits
             if prior_limits.frozen_json() != limits.frozen_json():
                 if not exploratory:
                     raise SafetyError("persisted_risk_limits_differ")
@@ -1579,6 +1608,7 @@ class Ledger:
             with ledger._transaction():
                 ledger._set("request_window", "1")
             ledger._request_window_limits_guard = True
+            ledger._follow_request_caps = exploratory and follow_caps
             return ledger
         except BaseException:
             ledger.close()
@@ -1615,6 +1645,10 @@ class Ledger:
                     # Bring retained trading spends into the root window too.
                     # Linked source copies are skipped, and reverse provenance
                     # makes retry safe if only the source transaction committed.
+                    # Capture the validation/window clock only after obtaining
+                    # the source write lock: a concurrent normal reservation
+                    # can be newer than the caller's pre-lock timestamp.
+                    now = instant(time.time())
                     outgoing = self.db.execute("SELECT id,at,kind FROM requests WHERE at>? "
                         "AND NOT EXISTS(SELECT 1 FROM request_imports WHERE origin=? AND request_id=requests.id) "
                         "ORDER BY at,id", (now-60,origin)).fetchall()
@@ -1654,10 +1688,10 @@ class Ledger:
         db.execute("INSERT INTO request_imports(origin,source_id,request_id) VALUES (?,?,?)",(origin,source_id,cursor.lastrowid))
         return cursor.lastrowid
 
-    def request_budget(self, now, kind, client_id=None):
-        return self._reserve_request(now,kind,client_id)[0]
+    def request_budget(self, now, kind, client_id=None, *, rest_cap=None):
+        return self._reserve_request(now,kind,client_id,rest_cap=rest_cap)[0]
 
-    def _reserve_request(self, now, kind, client_id=None):
+    def _reserve_request(self, now, kind, client_id=None, *, rest_cap=None):
         """Return 0 after durable reservation, or delay <=60s WITHOUT reservation.
 
         The caller bounds its wait against entry/cleanup deadlines and calls again
@@ -1667,10 +1701,20 @@ class Ledger:
         now = instant(now)
         if type(kind) is not str or kind not in ("submit", "read", "cancel", "data_read"):
             raise SafetyError("invalid_request_kind")
+        if rest_cap is not None and (type(rest_cap) is not int or rest_cap < 1
+                                     or kind not in ("read", "data_read")):
+            raise SafetyError("invalid_request_cap")
         with self._transaction():
             if ((getattr(self, "_request_window_limits_guard", False) or self._get("request_window") == "1")
                     and self._get("limits") != self.limits.frozen_json()):
-                raise SafetyError("readiness_request_limits_changed")
+                if not getattr(self,"_follow_request_caps",False):
+                    raise SafetyError("readiness_request_limits_changed")
+                current=RiskLimits(**json.loads(self._get("limits")))
+                old=json.loads(self.limits.frozen_json());new=json.loads(current.frozen_json())
+                for name in ("max_rest_per_minute","max_submits_per_minute"):
+                    old.pop(name);new.pop(name)
+                if old!=new:raise SafetyError("request_window_only_caps_may_change")
+                self.limits=current
             latest = self.db.execute("SELECT MAX(at) FROM requests").fetchone()[0]
             if latest is not None and now < latest:
                 raise SafetyError("request_clock_moved_backward")
@@ -1682,7 +1726,9 @@ class Ledger:
             delays = [ZERO]
             # Every submit leaves twenty unused total slots, even when earlier
             # reads/cancels have consumed requests in this rolling window.
-            total_cap = self.limits.max_rest_per_minute - (20 if kind == "submit" else 0)
+            total_cap = min(self.limits.max_rest_per_minute,
+                            rest_cap if rest_cap is not None else self.limits.max_rest_per_minute)
+            total_cap -= 20 if kind == "submit" else 0
             if len(total) >= total_cap:
                 delays.append(D(str(total[-total_cap]["at"] + 60 - now)))
             submits = [r["at"] for r in total if r["kind"] == "submit"]
@@ -1699,8 +1745,9 @@ class Ledger:
                     if Path(source_path).is_symlink() or not Path(source_path).is_file():
                         raise SafetyError("readiness_request_journal_required")
                     source = Ledger(source_path,RiskLimits(**json.loads(self._get("request_source_limits"))),
-                                    exploratory=self.exploratory)
+                                    exploratory=self.exploratory,rotation=self.exploratory)
                     source._request_window_limits_guard = True
+                    source._follow_request_caps = True
                     self._request_source = source
                 delay,source_id = source._reserve_request(now,kind)
                 if delay: return delay,None
