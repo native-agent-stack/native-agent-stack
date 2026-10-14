@@ -375,6 +375,7 @@ class StartReadiness(unittest.TestCase):
         asyncio.run(exercise())
 
     def test_request_bound_writes_not_started_without_state(self):
+        from sessions import SessionKind
         with tempfile.TemporaryDirectory(dir='/var/tmp') as directory:
             root=Path(directory);p=root/'config.json';p.write_text(json.dumps(self.config()))
             argv=['runner.py','paper','--credentials','keychain-env','--config',str(p),
@@ -383,6 +384,7 @@ class StartReadiness(unittest.TestCase):
                 for _ in range(51):kwargs['before_request']('read')
             with patch.object(sys,'argv',argv),patch.object(runner,'paper_credentials',return_value=('fixture-key','fixture-secret')), \
                  patch.object(runner,'check_order_contract_boundary',return_value={}), \
+                 patch.object(runner,'session_at',return_value=types.SimpleNamespace(kind=SessionKind.RTH)), \
                  patch.object(runner,'preflight',side_effect=bounded):
                 self.assertEqual(runner.main(),2)
             receipt=json.loads((root/'receipt.json').read_text())
