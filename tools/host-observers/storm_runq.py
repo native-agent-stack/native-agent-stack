@@ -163,17 +163,6 @@ class Trigger:
         return None, pct
 
 
-def clean_argv(argv, comm, ss):
-    """storm_snapshot.shape keeps up to 40 characters of the program's base name as it is; a process that rewrote its title into one string (chrome does) would carry flags or a directory
-    name through it (3 such shapes are in the 2026-10-13 evidence). Here the program name must itself look like a word and carry no key-looking text, else the kernel's name stands."""
-    if not argv:
-        return argv
-    b0 = argv[0].rstrip("/").rsplit("/", 1)[-1]
-    if len(b0) > 40 or not ss.WORD_RX.match(b0) or ss.SECRET_RX.search(b0):
-        return [comm] + argv[1:]
-    return argv
-
-
 def take_snapshot(root, sess_dir, ss, scans=3, gap=0.05, sleep=time.sleep, clock=time.monotonic):
     """Scan the leader threads of every process `scans` times, `gap` seconds apart, and attribute the running or runnable ones. Returns the record without the trigger fields."""
     tabs, times, leader_r, active_n = [], [], [], []
@@ -233,7 +222,7 @@ def take_snapshot(root, sess_dir, ss, scans=3, gap=0.05, sleep=time.sleep, clock
             heavy.append((weight, tkey, pid, start))
     for _w, tkey, pid, start in sorted(heavy, reverse=True)[:TOP_N]:
         cwd, argv = detail.get((pid, start), (None, []))
-        table[tkey]["cwd"], table[tkey]["argv"] = cwd, clean_argv(argv, table[tkey]["comm"], ss)
+        table[tkey]["cwd"], table[tkey]["argv"] = cwd, argv
     roots = {ss.lane_of(p, table) for p, e in table.items() if e["cores"] >= ss.MIN_CORES} - {None}
     lanes = ss.aggregate(table, {r: session_info(sess_dir, r) for r in roots})
     return {"sample_s": round(span, 3), "scans": scans, "scan_ms": [round((times[i + 1] - times[i]) * 1000) for i in range(scans - 1)], "leader_R": leader_r, "active": active_n,

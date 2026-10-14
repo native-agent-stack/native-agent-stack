@@ -1,0 +1,1 @@
+min(net_probe_public_ok) and on() (time() - max(net_probe_last_run_timestamp_seconds) <= 300)

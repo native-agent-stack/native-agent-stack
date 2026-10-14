@@ -80,6 +80,7 @@ def backup_and_replace(path, new_text, backup_dir=None):
     mode = os.stat(path).st_mode & 0o777
     tmp = f"{path}.tmp-{os.getpid()}"
     fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_EXCL, mode)
+    os.fchmod(fd, mode)         # os.open's mode is narrowed by the caller's umask; the file keeps the mode it had, so a Grafana running as another user can still read it
     with os.fdopen(fd, "w") as f:
         f.write(new_text)
         f.flush()

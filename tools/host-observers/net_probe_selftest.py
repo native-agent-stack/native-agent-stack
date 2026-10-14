@@ -2,10 +2,14 @@
 """Self-test for net_probe.py against a fake DNS server and a fake TCP listener on loopback, and a pass of planted faults.
 
   net_probe_selftest.py [--tools DIR] [--mutate]
+
+--mutate plants each fault in a copy of net_probe.py and requires the suite to fail on it. It first runs the suite on an unchanged copy (the control) and gives no score, and a non-zero exit,
+when the control does not pass or cannot run; a mutant run that stops outside net_probe.py (the suite's own socket setup, a timeout) is not counted as a caught fault.
 """
 import argparse
 import importlib.util
 import os
+import re
 import shutil
 import socket
 import struct
@@ -182,28 +186,74 @@ MUTANTS = [("a response with the wrong id is accepted", "return rid == qid and b
            ("a failed probe exits non-zero", "        write_atomic(argv[1], render(dns, tcp, sysd, name, time.time(), time.time() - t0))\n", "        write_atomic(argv[1], render(dns, tcp, sysd, name, time.time(), time.time() - t0))\n        return 0 if sysd[0] else 1\n")]
 
 
+SUMMARY = re.compile(r"^\d+ of \d+ checks passed", re.M)
+FRAME = re.compile(r'File "([^"]+)", line \d+')
+
+
+def run_suite(tools):
+    """One run of the suite against the net_probe.py in `tools`, in its own process: (exit code, output, error output); a run that outlasts its time is a run that did not finish."""
+    try:
+        r = subprocess.run([sys.executable, "-I", str(Path(__file__).resolve()), "--tools", str(tools)], capture_output=True, text=True, timeout=300)
+    except subprocess.TimeoutExpired:
+        return -1, "", ""
+    return r.returncode, r.stdout, r.stderr
+
+
+def classify(rc, out, err):
+    """'pass': the suite ran to its summary and every check held. 'caught': it ran to its summary and a check failed. 'raised': it stopped before its summary on an exception whose last
+    frame is the code under test (net_probe.py), which the planted fault caused. 'broken': it stopped anywhere else (the suite's own socket setup, a timeout, a signal): that says nothing
+    about the code under test and is never counted as a caught fault."""
+    if SUMMARY.search(out):
+        failing = any(ln.startswith("FAIL ") for ln in out.splitlines())
+        return "pass" if rc == 0 and not failing else "caught" if rc != 0 and failing else "broken"
+    frames = FRAME.findall(err)
+    return "raised" if rc != 0 and frames and Path(frames[-1]).name == "net_probe.py" else "broken"
+
+
+def mutate():
+    """Plant each fault in a copy of net_probe.py and require the suite to fail on it. The same procedure first runs on an unchanged copy (the control) and must pass: a suite that does
+    not pass on the unmodified code, or cannot run, gives no score."""
+    with tempfile.TemporaryDirectory(prefix="np-mut-") as d:
+        shutil.copy(HERE / "net_probe.py", d)
+        rc, out, err = run_suite(d)
+    control = classify(rc, out, err)
+    print(f"control: the unmodified suite {'passes' if control == 'pass' else 'does NOT pass (' + control + ')'}")
+    if control != "pass":
+        shown = [ln for ln in out.splitlines() if ln.startswith("FAIL ")] or (out + err).strip().splitlines()[-3:]
+        print("\n".join(shown))
+        print("no mutation score is issued")
+        return 1
+    caught = broken = 0
+    for name, old, new in MUTANTS:
+        with tempfile.TemporaryDirectory(prefix="np-mut-") as d:
+            shutil.copy(HERE / "net_probe.py", d)
+            p = Path(d) / "net_probe.py"
+            s = p.read_text()
+            if s.count(old) < 1:
+                print(f"BROKEN  {name} (text not found)")
+                broken += 1
+                continue
+            p.write_text(s.replace(old, new, 1) if s.count(old) > 1 else s.replace(old, new))
+            verdict = classify(*run_suite(d))
+        if verdict in ("caught", "raised"):
+            caught += 1
+            print(("caught  " if verdict == "caught" else "caught  (the code under test raised) ") + name)
+        elif verdict == "pass":
+            print("MISSED  " + name)
+        else:
+            broken += 1
+            print(f"BROKEN  {name} (the suite stopped outside the code under test)")
+    print(f"{caught} of {len(MUTANTS)} planted faults caught")
+    return 0 if caught == len(MUTANTS) and not broken else 1
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--tools", default=str(HERE))
     ap.add_argument("--mutate", action="store_true")
     a = ap.parse_args()
     if a.mutate:
-        caught = 0
-        for name, old, new in MUTANTS:
-            with tempfile.TemporaryDirectory(prefix="np-mut-") as d:
-                shutil.copy(HERE / "net_probe.py", d)
-                p = Path(d) / "net_probe.py"
-                s = p.read_text()
-                if s.count(old) < 1:
-                    print(f"BROKEN  {name} (text not found)")
-                    continue
-                p.write_text(s.replace(old, new, 1) if s.count(old) > 1 else s.replace(old, new))
-                r = subprocess.run([sys.executable, "-I", str(Path(__file__).resolve()), "--tools", d], capture_output=True, text=True, timeout=300)
-                hit = r.returncode != 0
-                caught += hit
-                print(("caught  " if hit else "MISSED  ") + name)
-        print(f"{caught} of {len(MUTANTS)} planted faults caught")
-        return 0 if caught == len(MUTANTS) else 1
+        return mutate()
     checks(a.tools)
     bad = [r for r in RESULTS if not r[1]]
     for label, good, detail in RESULTS:

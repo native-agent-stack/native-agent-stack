@@ -177,13 +177,61 @@ with tempfile.TemporaryDirectory() as tmp:
     r = subprocess.run([sys.executable, "-I", str(TOOL)], capture_output=True, text=True, timeout=30)
     check("no arguments: usage, exit 2", r.returncode == 2 and "OUT.jsonl" in r.stdout)
 
+# ---- sensitive text at this tool's output boundary: the classes of storm_snapshot_selftest.py through take_snapshot on a fake tree, serialized as the tool writes them
+SENT = "zq7w9mk"          # short and word-like, so no secret pattern would catch it: it stands for any value a user could put on a command line
+with tempfile.TemporaryDirectory() as tmp:
+    sd = sessions(tmp)
+    fk = Fake(Path(tmp) / "proc")
+    fk.proc(1, "systemd", "S", 0, 10, 1)
+    cases = [("app", [f"app --root=/srv/{SENT}"], "app"), ("somecli", ["somecli", SENT], "somecli <arg>"), ("git", ["git", "status"], "git status"),
+             ("npm", ["npm", "--opt-x", SENT, "run", "build"], "npm"), ("python3", ["python3", "-W", SENT, "run_x.py"], "python3 run_x.py"), ("bash", ["bash", "-lc", SENT], "bash -c"),
+             ("sudo", ["sudo", "-u", SENT, "git", "status"], "sudo git status"), ("my-secret-x", None, "<proc>")]
+    for i, (comm, cmdline, _want) in enumerate(cases):
+        fk.proc(300 + 10 * i, "claude", "S", 1, 5, 30 + i, ["claude"], "/w/a")
+        fk.proc(301 + 10 * i, comm, "R", 300 + 10 * i, 100, 130 + i, cmdline, "/w/a/x")
+    tick = {"t": 0.0}
+
+    def clock2():
+        tick["t"] += 0.05
+        return tick["t"]
+
+    rec = rq.take_snapshot(str(fk.root), str(sd), ss, scans=3, gap=0.05, sleep=lambda dt: None, clock=clock2)
+    shapes = sorted(s["shape"] for L in rec["lanes"] for s in L["top"])
+    check("the serialized record holds no sentinel value", SENT not in json.dumps(rec), [s for s in shapes if SENT in s])
+    check("the recognized identities stay and the rest is a fixed marker or dropped", shapes == sorted(w for _c, _a, w in cases), shapes)
+
+# ---- a machine with only three processes: the scan sees them, and the live check's predicate (counted here, not by the tool) accepts it
+def count_procs(root="/proc"):
+    return sum(1 for n in os.listdir(root) if n.isdigit())
+
+
+def saw_processes(seen, before, after, slack=25):
+    """The scan counted the machine's processes: within one scan's churn of what /proc held before and after, counted by this test and not by the tool.
+    The earlier `group_processes > 50` was true only on a machine with a large process population and failed on a small container or runner."""
+    lo, hi = min(before, after), max(before, after)
+    return max(1, lo - slack) <= seen <= hi + slack
+
+
+with tempfile.TemporaryDirectory() as tmp:
+    sd = sessions(tmp)
+    fk = Fake(Path(tmp) / "proc")
+    fk.proc(1, "systemd", "S", 0, 10, 1)
+    fk.proc(100, "bash", "R", 1, 500, 10, ["bash"], "/w/a")
+    fk.proc(101, "python3", "R", 100, 100, 11, ["python3", "x.py"], "/w/a")
+    rec = rq.take_snapshot(str(fk.root), str(sd), ss, scans=3, gap=0.05, sleep=lambda dt: None, clock=clock2)
+    check("a three-process machine: the scan saw all three and the live predicate accepts it", rec["scans"] == 3 and rec["group_processes"] == 3 and saw_processes(rec["group_processes"], count_procs(fk.root), count_procs(fk.root)), rec)
+    check("the predicate rejects a scan that saw nothing of a large machine, and one that saw far more than exists", not saw_processes(0, 300, 310) and not saw_processes(900, 300, 310) and saw_processes(305, 300, 310))
+
 # ---- the real machine for one second (read-only): one poll loop with a trigger set low, so the real scan runs once
 with tempfile.TemporaryDirectory() as tmp:
     outp = Path(tmp) / "live.jsonl"
+    procs_before = count_procs()
     r = subprocess.run([sys.executable, "-I", str(TOOL), str(outp), "--max-hours", "0.0006", "--running", "1", "--polls", "1", "--min-gap", "60"], capture_output=True, text=True, timeout=90)
+    procs_after = count_procs()
     lines = outp.read_text().splitlines() if outp.exists() else []
     d = json.loads(lines[0]) if lines else {}
-    check("live: the real /proc, one snapshot on a trigger set low, exit 0", r.returncode == 0 and len(lines) == 1 and d.get("scans") == 3 and d.get("group_processes", 0) > 50, r.stderr[-300:] + str(d)[:200])
+    check("live: the real /proc, one snapshot on a trigger set low, exit 0, and the scan saw the machine's processes", r.returncode == 0 and len(lines) == 1 and d.get("scans") == 3
+          and saw_processes(d.get("group_processes", -1), procs_before, procs_after), r.stderr[-300:] + str(d)[:200] + str((procs_before, procs_after)))
     texts = [L["lane"] for L in d.get("lanes", [])] + [s["shape"] for L in d.get("lanes", []) for s in L["top"]]
     opaque = [x for x in texts if __import__("re").search(r"[A-Za-z0-9+/_-]{28,}", x)]
     check("live: no long opaque string in a lane name or a command shape, and no key-looking text in the record", not opaque and "sk-" not in json.dumps(d), opaque[:3])

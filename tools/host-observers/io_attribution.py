@@ -241,7 +241,7 @@ class Sampler:
             cg = proc_cgroup(self.proc_root, pid)
             cwd, argv = read_detail(self.proc_root, pid)
             comm = procs.get(pid, {}).get("comm", "?")
-            shape = (self.ss.shape(self.rq.clean_argv(argv, comm, self.ss), comm) if argv else comm) or comm
+            shape = self.ss.shape(argv, comm) or self.ss.safe_comm(comm)
             root = self.ss.lane_of(pid, self.table)
             if root is not None and root not in self.sessions:
                 self.sessions[root] = self.rq.session_info(self.sessions_dir, root)
@@ -260,7 +260,7 @@ class Sampler:
             if pid not in procs:
                 continue
             cg, lane, ar, shape = self.who(pid, procs[pid]["start"], procs)
-            rows.append((cg, lane, ar, shape, comm, w, wait_class(w)))
+            rows.append((cg, lane, ar, shape, self.ss.safe_comm(comm), w, wait_class(w)))
         self.scans.append(rows)
         self.snaps.append(snap)
         return snap

@@ -95,6 +95,12 @@ def prune(sm, alive):
         del sm.cgmap[key]
 
 
+def rotate(sm):
+    """Close a window while the sampling goes on: the closing snapshot is kept as the first one of the next window, so the interval between two records is counted in the second and not left out of
+    both; the scans start empty, so the closing sample's D-state threads stay with the window they closed."""
+    sm.snaps, sm.scans = sm.snaps[-1:], []
+
+
 def append(path, text):
     with open(path, "a") as f:
         f.write(text)
@@ -143,7 +149,8 @@ def main():
         if time.monotonic() - t_window >= window and len(sm.snaps) >= 2:
             emit(io, sm, group, top, burst, out_dir)
             prune(sm, set(io.snap_procs(proc_root)))
-            sm.snaps, sm.scans, t_window = [], [], None
+            rotate(sm)
+            t_window = sm.snaps[0]["t"]
         t_next += interval
         time.sleep(max(t_next - time.monotonic(), 0))
         if t_next < time.monotonic() - interval:             # fell behind (a long pause): do not burst to catch up

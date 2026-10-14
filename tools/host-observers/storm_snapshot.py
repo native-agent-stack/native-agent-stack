@@ -9,8 +9,11 @@ group twice, --sample seconds apart, and appends one JSON line to OUT.jsonl: the
 ~/.claude/sessions/<pid>.json, the only file of that directory it opens, never the .key files), each lane's cores and its top command shapes with a process count and up to two working directories.
 OUT.log (next to it) gets a heartbeat every 10 minutes and any error. --once takes one snapshot now, whatever the load (for a dry run).
 
-Privacy: raw command lines are never stored. A shape is the program's base name, plus `-m module`, the script's base name, or one plain subcommand word; flags, values, anything that looks like a key,
-token or long opaque string, and the code after -c are dropped or replaced. Per-process views miss processes that live less than the sample window, so measured_cores is reported beside the group's cores.
+Privacy: raw command lines are never stored. A shape names what a process is, never what it was given. Text is copied from a command line in three places only: the program's base name (a process
+that rewrote its title into one string is named by the kernel's process name instead, and nothing after it is read), the base name of a script or the module of `-m`, and one word of a fixed vocabulary
+of subcommands (SUBCOMMANDS, and the words a runner such as npm or uv takes). Everything else is dropped or replaced by a fixed marker: flags and the values they take, any other argument (<arg>),
+anything that looks like a key, token or long opaque string (<redacted>), the code after -c, and a process name that is not plain text (<proc>). The extraction stops at a flag whose arity it does not know,
+because the next word may be its value. Per-process views miss processes that live less than the sample window, so measured_cores is reported beside the group's cores.
 """
 import json
 import os
@@ -28,20 +31,94 @@ MIN_CORES = 0.25      # a process counts as heavy from this many cores over the 
 TOP_N = 60            # most processes whose cwd and command line are read per snapshot
 SECRET_RX = re.compile(r"(?i)(sk-[A-Za-z0-9]{6,}|gh[pousr]_[A-Za-z0-9]{6,}|eyJ[A-Za-z0-9_-]{8,}|[A-Za-z0-9+/_-]{28,}|key|token|secret|passw|bearer|auth|cookie|credential)")
 WORD_RX = re.compile(r"^[A-Za-z0-9_.:@+,-]{1,48}$")
-WRAPPERS = {"env", "nice", "timeout", "time", "setsid", "nohup", "xargs", "systemd-run", "sudo", "rtk", "stdbuf", "ionice", "chrt", "taskset"}
-RUNNERS = {"uv", "uvx", "npx", "pnpm", "npm", "yarn", "bunx", "pipx"}
+COMM_RX = re.compile(r"^[A-Za-z0-9_.:@+ ,/-]{1,40}$")       # a kernel process name: plain characters; spaces (Firefox's "Web Content") and slashes (kworker/u8:1, jbd2/sdd-8) are part of real names
+ASSIGN_RX = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
+NUMERIC_RX = re.compile(r"^(0x[0-9a-fA-F]+|[0-9][0-9.,-]*[smhd]?)$")       # a duration, a priority or a CPU mask
+SCRIPT_RX = re.compile(r"\.(py|pyw|sh|bash|zsh|js|mjs|cjs|ts|mts|cts|rb|pl|php|lua|jl)$", re.I)
 INTERPRETERS = re.compile(r"^(python[0-9.]*|node|nodejs|bash|sh|dash|zsh|deno|bun|ruby|perl|php)$")
+# What each interpreter family treats as inline code, and the short options that take the next word as a value. Checked against the installed python3, node, bash and perl --help on
+# 2026-10-14 (python3 -c, -m, -W, -X; node -e, -p, -r, -C; bash -c, -o, -O; perl -e, -E); ruby's -e and php's -r are from their documentation, neither is installed here.
+CODE_LETTERS = {"python": "c", "sh": "c", "node": "ep", "ruby": "e", "perl": "eE", "php": "r"}
+VALUED_SHORT = {"python": "WX", "node": "rC", "sh": "oO"}
+# Wrappers: (flags that take no value, flags that take the next word as a value), read from the installed tools' --help on 2026-10-14 (coreutils env, nice and timeout; util-linux
+# ionice and setsid; systemd-run; GNU time, xargs, stdbuf; sudo; chrt and taskset of util-linux). A flag a table does not list ends the extraction, because its next word may be its value.
+WRAPPER_FLAGS = {
+    "env": ({"-i", "--ignore-environment", "-0", "--null", "-v", "--debug"}, {"-u", "--unset", "-C", "--chdir", "-S", "--split-string", "-a", "--argv0"}),
+    "nice": (set(), {"-n", "--adjustment"}),
+    "timeout": ({"--foreground", "--preserve-status", "-v", "--verbose"}, {"-s", "--signal", "-k", "--kill-after"}),
+    "time": ({"-p", "--portability", "-v", "--verbose", "-a", "--append", "-q", "--quiet"}, {"-f", "--format", "-o", "--output"}),
+    "setsid": ({"-c", "--ctty", "-f", "--fork", "-w", "--wait"}, set()),
+    "nohup": (set(), set()),
+    "xargs": ({"-0", "--null", "-r", "--no-run-if-empty", "-t", "--verbose", "-p", "--interactive", "-x", "--exit", "-o", "--open-tty"},
+              {"-n", "--max-args", "-P", "--max-procs", "-I", "-d", "--delimiter", "-s", "--max-chars", "-a", "--arg-file", "-E", "-L", "--max-lines"}),
+    "systemd-run": ({"--user", "--scope", "-q", "--quiet", "--wait", "--collect", "--no-block", "--no-ask-password", "-t", "--pty", "-P", "--pipe", "-d", "--same-dir",
+                     "-S", "--shell", "--remain-after-exit", "-G", "--ignore-failure", "--send-sighup", "--no-pager"},
+                    {"-p", "--property", "-E", "--setenv", "-u", "--unit", "--slice", "--description", "-M", "--machine", "-H", "--host", "--uid", "--gid", "--nice", "--working-directory",
+                     "--service-type", "--on-active", "--on-boot", "--on-calendar", "--on-startup", "--on-unit-active", "--on-unit-inactive"}),
+    "sudo": ({"-n", "--non-interactive", "-S", "--stdin", "-i", "--login", "-s", "--shell", "-k", "-K", "-b", "-A"}, {"-u", "--user", "-g", "--group", "-D", "--chdir", "-p", "--prompt"}),
+    "rtk": (set(), set()),
+    "stdbuf": (set(), {"-i", "--input", "-o", "--output", "-e", "--error"}),
+    "ionice": ({"-t", "--ignore"}, {"-c", "--class", "-n", "--classdata", "-p", "--pid", "-P", "--pgid", "-u", "--uid"}),
+    "chrt": ({"-b", "--batch", "-f", "--fifo", "-i", "--idle", "-o", "--other", "-r", "--rr", "-R", "--reset-on-fork", "-m", "--max", "-v", "--verbose"}, {"-T", "--sched-runtime", "-P", "--sched-period", "-D", "--sched-deadline"}),
+    "taskset": ({"-a", "--all-tasks", "-c", "--cpu-list"}, set()),
+}
+WRAPPERS = set(WRAPPER_FLAGS)
+# Runners: the package-manager style ones keep a subcommand and, after one of RUNNER_TARGETS, the program or script it runs; the tool runners keep the tool only.
+RUNNER_TARGETS = {"npm": {"run", "exec", "x", "run-script"}, "pnpm": {"run", "exec", "dlx", "x"}, "yarn": {"run", "exec", "dlx"}, "uv": {"run", "tool"}, "pipx": {"run"}}
+TOOL_RUNNERS = {"npx", "uvx", "bunx"}
+RUNNERS = TOOL_RUNNERS | set(RUNNER_TARGETS)
+RUNNER_FLAGS = {"-q", "--quiet", "--silent", "-y", "--yes", "--no-color", "--verbose", "--offline", "--frozen", "--locked", "--no-progress"}       # known to take no value
+# The subcommand words that are copied from a command line, program by program. Each word was found in the installed tool's own help on 2026-10-14 (git, gh, docker, systemctl, restic, pip,
+# apt); git's list is a subset of command-list.txt of git/git@v2.53.0 (tag commit 67ad42147a7a, the installed version); cargo is not installed here: its words are the built-in commands of
+# rust-lang/cargo@0.99.0 (tag commit 797e8a9bca27, src/bin/cargo/commands/mod.rs:3-44 and :95-133), plus clippy and fmt, which rustup installs as the external subcommands cargo-clippy and
+# cargo-fmt. A word that is not listed is never copied: it is shown as the fixed marker <arg>.
+SUBCOMMANDS = {
+    "git": frozenset("status diff log show fetch pull push clone checkout switch restore commit add rebase merge worktree gc repack fsck grep blame stash reset cherry-pick bisect apply am remote branch "
+                     "tag submodule ls-files ls-tree rev-parse rev-list cat-file pack-objects index-pack unpack-objects update-index write-tree read-tree merge-tree patch-id hash-object "
+                     "for-each-ref maintenance prune count-objects config init clean mv rm describe shortlog notes archive bundle format-patch diff-tree diff-index".split()),
+    "cargo": frozenset("build test check clippy run fmt bench doc install fetch update clean tree metadata publish package vendor add remove new init search".split()),
+    "gh": frozenset("pr issue run api repo workflow release gist search status browse extension codespace cache variable label ruleset project".split()),
+    "docker": frozenset("run build compose ps exec logs pull push images stop start rm rmi network volume system buildx container image inspect cp commit tag".split()),
+    "systemctl": frozenset("start stop restart reload status is-active is-enabled is-failed show list-units list-timers list-unit-files daemon-reload enable disable mask unmask reset-failed cat edit kill".split()),
+    "restic": frozenset("backup check forget prune snapshots ls stats diff restore mount init unlock rewrite copy find cat tag generate version repair recover migrate".split()),
+    "pip": frozenset("install uninstall list freeze show wheel download check config cache index inspect".split()),
+    "apt": frozenset("update upgrade install remove autoremove list search show full-upgrade".split()),
+}
+SUBCOMMANDS["pip3"], SUBCOMMANDS["apt-get"] = SUBCOMMANDS["pip"], SUBCOMMANDS["apt"]
 
 
 def arg(name, default=None):
     return sys.argv[sys.argv.index(name) + 1] if name in sys.argv else default
 
 
+def safe_comm(c):
+    """The kernel's process name as safe text: plain characters and no key-looking text, else the fixed marker <proc>."""
+    c = (c or "")[:40]
+    return c if COMM_RX.match(c) and not SECRET_RX.search(c) else "<proc>"
+
+
+def _program(raw, comm=""):
+    """(name, plain): the base name of the first command-line word when it is one plain word without key-looking text, else the kernel's process name and plain False.
+    A process that rewrote its title into one string (chrome does) has spaces, flags or directories in its first word, and none of it is used, nor anything after it.
+    A version-like executable name (the versioned claude binary is called 2.1.296) is replaced by the kernel's process name."""
+    t = (raw or "").strip()
+    if t and not re.search(r"[\s=]", t):
+        b = t.rstrip("/").rsplit("/", 1)[-1]
+        if comm and re.fullmatch(r"[0-9][0-9.]*", b):
+            return safe_comm(comm), True
+        if 0 < len(b) <= 40 and WORD_RX.match(b) and not SECRET_RX.search(b):
+            return b, True
+    return safe_comm(comm), False
+
+
 def _word(t):
-    """One argument token as safe text, or None to drop it."""
+    """One argument token as safe text, or None to drop it. A path is reduced to its base name; a URL, an assignment or anything that is not one plain word is the marker <arg>,
+    and anything key-looking is the marker <redacted>."""
     t = t.strip()
     if not t or t.startswith("-"):
         return None
+    if "://" in t or "=" in t:
+        return "<arg>"
     if "/" in t:
         t = t.rstrip("/").rsplit("/", 1)[-1]
     if not t:
@@ -51,42 +128,120 @@ def _word(t):
     return t[:40] if WORD_RX.match(t[:48]) else "<arg>"
 
 
-def shape(argv, comm=""):
-    """The command shape of a command line (see the module docstring); an empty string when there is nothing safe to say.
-    A version-like executable name (the versioned claude binary is called 2.1.296) is replaced by the kernel's process name."""
+def _interpreter(fam, rest):
+    """The words after an interpreter: `-m MODULE`, the marker of inline code (the code itself is never kept), or the base name of the script. A bare word that is neither a script (a path or
+    a script extension) nor key-looking is not copied, whether it is an option's value or an argument; a key-looking one shows as <redacted>."""
+    codes, valued = CODE_LETTERS.get(fam, ""), VALUED_SHORT.get(fam, "")
+    k = 0
+    while k < len(rest):
+        t = rest[k]
+        k += 1
+        if t.startswith("-") and len(t) > 1:
+            if fam == "node" and t in ("--eval", "--print"):
+                return ["-e" if t == "--eval" else "-p"]
+            if re.fullmatch(r"-[A-Za-z]+", t):
+                letters = t[1:]
+                if fam == "python" and letters.endswith("m"):
+                    return ["-m", _word(rest[k]) or ""] if k < len(rest) else ["-m"]
+                hit = next((c for c in codes if c in letters), None)
+                if hit:
+                    return ["-" + hit]
+                if letters[-1] in valued:
+                    k += 1                                  # the next word is this option's value
+            continue
+        if "=" in t or "://" in t:
+            continue
+        if "/" in t or SCRIPT_RX.search(t):
+            return [_word(t) or ""]
+        if SECRET_RX.search(t):
+            return ["<redacted>"]
+    return []
+
+
+def _runner(b0, rest):
+    """The words after a runner (npm, uv, npx and the like): its subcommand and, after one that runs something, the program or script it runs; a tool runner keeps the tool only. The
+    extraction stops at the first option it does not know to be valueless, because the next word may be that option's value."""
+    words = []
+    for t in rest:
+        if t.startswith("-"):
+            if t in RUNNER_FLAGS or "=" in t:
+                continue
+            break
+        words.append(_word(t) or "")
+        if b0 in TOOL_RUNNERS or len(words) == 2 or words[0] not in RUNNER_TARGETS.get(b0, ()):
+            break
+    return [w for w in words if w]
+
+
+def _generic(b0, rest):
+    """The one word that may follow any other program: a subcommand of the fixed vocabulary of that program. An unknown first word is the marker <arg>, a key-looking one <redacted>, an
+    option, a path or an assignment is dropped (so is everything after the first word)."""
+    t = rest[0] if rest else ""
+    if not t or t.startswith("-"):
+        return []
+    if "://" in t:
+        return ["<arg>"]
+    if "/" in t or "=" in t:
+        return []
+    if t in SUBCOMMANDS.get(b0, ()):
+        return [t]
+    return ["<redacted>"] if SECRET_RX.search(t) else ["<arg>"]
+
+
+def _wrapper(name, rest, depth):
+    """`name` plus the command it runs. Skipped without being read: KEY=VALUE assignments, bare numbers (a duration, a priority, a CPU mask) and the wrapper's own flags with the values
+    its table says they take. A flag the table does not list ends the extraction at the wrapper, because its next word may be its value."""
+    plain, valued = WRAPPER_FLAGS[name]
+    i = 0
+    while i < len(rest):
+        t = rest[i]
+        if t == "--":
+            i += 1
+            break
+        if t.startswith("-") and len(t) > 1:
+            key = t.split("=", 1)[0]
+            if key in plain or (key in valued and "=" in t) or re.fullmatch(r"-[0-9]+", t):
+                i += 1
+            elif key in valued:
+                i += 2
+            elif not key.startswith("--") and len(key) > 2 and key[:2] in valued:       # -n10: the value is attached
+                i += 1
+            else:
+                return name
+            continue
+        if ASSIGN_RX.match(t) or NUMERIC_RX.match(t) or (name == "rtk" and t == "proxy"):
+            i += 1
+            continue
+        break
+    inner = _shape(rest[i:], "", depth + 1) if i < len(rest) else ""
+    return (name + " " + inner).strip()[:80]
+
+
+def _shape(argv, comm, depth):
     a = [x for x in argv if x]
     if not a:
         return ""
-    b0 = a[0].rstrip("/").rsplit("/", 1)[-1][:40]
-    if comm and re.fullmatch(r"[0-9][0-9.]*", b0):
-        b0 = comm[:40]
+    b0, plain = _program(a[0], comm)
+    if not plain:
+        return b0                                           # a rewritten title is no command line: nothing after it is read
     rest = a[1:]
-    if b0 in WRAPPERS:
-        # skip the wrapper's own flags, KEY=VALUE assignments and bare numbers (a duration or a priority), then describe the command it runs
-        i = 0
-        while i < len(rest) and (rest[i].startswith("-") or "=" in rest[i] or re.fullmatch(r"[0-9.]+[smhd]?", rest[i] or "")):
-            i += 1
-        inner = shape(rest[i:])
-        return (b0 + " " + inner).strip()[:80]
+    if b0 in WRAPPERS and depth < 4:
+        return _wrapper(b0, rest, depth)
     out = [b0]
     if INTERPRETERS.match(b0):
-        if rest[:1] == ["-m"] and len(rest) > 1:
-            out += ["-m", _word(rest[1]) or ""]
-        elif rest[:1] == ["-c"]:
-            out += ["-c"]
-        else:
-            first = next((x for x in rest if not x.startswith("-")), None)
-            w = _word(first) if first else None
-            if w:
-                out.append(w)
+        fam = "python" if b0.startswith("python") else "node" if b0 in ("node", "nodejs", "bun", "deno") else "sh" if b0 in ("bash", "sh", "dash", "zsh") else b0
+        out += _interpreter(fam, rest)
     elif b0 in RUNNERS:
-        words = [w for w in (_word(x) for x in rest if not x.startswith("-")) if w][:2]
-        out += words
+        out += _runner(b0, rest)
     else:
-        w = _word(rest[0]) if rest and "/" not in rest[0] else None
-        if w:
-            out.append(w)
+        out += _generic(b0, rest)
     return " ".join(x for x in out if x)[:80]
+
+
+def shape(argv, comm=""):
+    """The command shape of a command line (see the module docstring); an empty string when there is no command line. Every path through it (a rewritten title, a wrapped command, the
+    kernel's name standing in for a version-named executable) goes through the same reduction."""
+    return _shape(argv, comm, 0)
 
 
 def read_stat(pid):
@@ -149,7 +304,7 @@ def aggregate(table, sessions):
         L = lanes.setdefault(key, {"cores": 0.0, "n": 0, "shapes": {}})
         L["cores"] += e["cores"]
         L["n"] += 1
-        S = L["shapes"].setdefault(shape(e.get("argv") or [], e["comm"]) or e["comm"], {"cores": 0.0, "n": 0, "cwds": []})
+        S = L["shapes"].setdefault(shape(e.get("argv") or [], e["comm"]) or safe_comm(e["comm"]), {"cores": 0.0, "n": 0, "cwds": []})
         S["cores"] += e["cores"]
         S["n"] += 1
         c = e.get("cwd")

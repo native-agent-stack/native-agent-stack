@@ -46,8 +46,11 @@ def mod(name):
     return m
 
 
-def run_tool(name, *args, timeout=60):
-    return subprocess.run([sys.executable, "-I", str(TOOLS / (name + ".py")), *args], capture_output=True, text=True, timeout=timeout)
+def run_tool(name, *args, timeout=60, umask=None):
+    cmd = [sys.executable, "-I", str(TOOLS / (name + ".py")), *args]
+    if umask is not None:       # the caller's umask, set by a shell so that no fork hook runs beside the fake servers' threads
+        cmd = ["sh", "-c", f'umask {umask:04o}; exec "$@"', "sh", *cmd]
+    return subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
 
 
 def tmpdir():
@@ -215,6 +218,14 @@ def rule_add():
     ok("add appends the rule: 2 -> 3, in order, and prints the backup name", r.returncode == 0 and [x["uid"] for x in doc["groups"][0]["rules"]] == ["a", "b", "c"] and "2 -> 3" in r.stdout, r.stdout)
     ok("the backup holds the old content byte for byte and is mode 0600", len(baks) == 1 and baks[0].read_text() == original and stat.S_IMODE(baks[0].stat().st_mode) == 0o600, [str(b) for b in baks])
     ok("the file keeps its mode (0640) and no temp file is left behind", stat.S_IMODE(p.stat().st_mode) == 0o640 and not list(Path(d).glob("*.tmp-*")), oct(stat.S_IMODE(p.stat().st_mode)))
+    # the original mode is applied explicitly, so the caller's umask cannot narrow it: a 0644 provisioning file read by a Grafana running as another user must stay readable
+    d2 = tmpdir()
+    p2 = write_prov(d2, prov(rule("a"), rule("b")), mode=0o644)
+    spec2 = Path(d2) / "spec.json"
+    spec2.write_text(json.dumps(rule("c", expr="z")) + "\n")
+    r2 = run_tool("grafana_rule_add", "add", str(p2), str(spec2), umask=0o077)
+    ok("under a restrictive umask (0077) the file keeps its original mode (0644), and the backup is still 0600", r2.returncode == 0 and stat.S_IMODE(p2.stat().st_mode) == 0o644
+       and [stat.S_IMODE(b.stat().st_mode) for b in Path(d2).glob("rules.yaml.bak-*")] == [0o600], (r2.stdout, r2.stderr[-200:], oct(stat.S_IMODE(p2.stat().st_mode))))
     r = run_tool("grafana_rule_add", "add", str(p), str(spec))
     ok("adding the same uid again is refused (exit 1) and the file is unchanged", r.returncode == 1 and "already exists" in r.stdout and json.loads(p.read_text()) == doc, r.stdout)
     r = run_tool("grafana_rule_add", "remove", str(p), "c")
@@ -369,6 +380,7 @@ MUTANTS = [
     ("a duplicate uid is accepted", "grafana_rule_add.py", "        if any(r[\"uid\"] == spec.get(\"uid\") for g in new[\"groups\"] for r in g[\"rules\"]):", "        if False and any(r[\"uid\"] == spec.get(\"uid\") for g in new[\"groups\"] for r in g[\"rules\"]):", ["rule-add"]),
     ("the backup is world-readable", "grafana_rule_add.py", "fd = os.open(bak, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)", "fd = os.open(bak, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o644)", ["rule-add"]),
     ("the file mode is not kept", "grafana_rule_add.py", "mode = os.stat(path).st_mode & 0o777", "mode = 0o600", ["rule-add"]),
+    ("the original mode is left to the caller's umask", "grafana_rule_add.py", "os.fchmod(fd, mode)", "pass", ["rule-add"]),
     ("removing an unknown uid succeeds", "grafana_rule_add.py", "if removed != 1:", "if removed < 0:", ["rule-add"]),
     ("a condition that names no query is accepted", "grafana_rule_add.py", "if r.get(\"condition\") not in refids:", "if False:", ["rule-add"]),
     ("an unknown group appends to the first group", "grafana_rule_add.py", "if name is None or g[\"name\"] == name:", "if True:", ["rule-add"]),

@@ -13,7 +13,7 @@
       "model": {
         "refId": "A",
         "editorMode": "code",
-        "expr": "min(net_probe_public_ok)",
+        "expr": "min(net_probe_public_ok) and on() (time() - max(net_probe_last_run_timestamp_seconds) <= 300)",
         "instant": true,
         "range": false,
         "intervalMs": 15000,
@@ -48,7 +48,7 @@
       }
     }
   ],
-  "noDataState": "NoData",
+  "noDataState": "OK",
   "execErrState": "Error",
   "for": "2m",
   "isPaused": false,
@@ -62,6 +62,6 @@
   },
   "annotations": {
     "summary": "VM cannot reach either public resolver for 2 minutes",
-    "description": "The active probe (native-net-probe, once a minute) got no DNS answer from 1.1.1.1 or 9.9.9.9 and no TCP connect to their port 443 for two minutes: the VM has no Internet path, whatever the traffic. Check the router and the uplink before the lanes. Records: ALERT-NET-PROBE-20261014.md, HOST-HEALTH-ADDENDUM-NETWORK-20261014.md (host-capacity record)."
+    "description": "The active probe (native-net-probe, once a minute) got no DNS answer from 1.1.1.1 or 9.9.9.9 and no TCP connect to their port 443 for two minutes: the VM has no Internet path, whatever the traffic. Check the router and the uplink before the lanes. The measurement is read only while the probe is fresh (a run within the last 300 s): a stopped probe leaves its last gauge in the textfile, so a stale one reads no data here and the rule stays normal; ns2604-net-probe-stale-warn owns that case. Records: ALERT-NET-PROBE-20261014.md, HOST-HEALTH-ADDENDUM-NETWORK-20261014.md (host-capacity record)."
   }
 }

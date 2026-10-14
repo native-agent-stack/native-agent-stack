@@ -9,6 +9,7 @@ Two patterns run on a fixed schedule (--rate starts a second, open loop, so a sl
   replace  write a temp file, os.fsync it, os.rename it over the target and os.fsync the directory (the atomic state-file pattern the engine and the test suites use).
 Output: per pattern the count, the achieved rate, p50, p90, p99, p99.9 and max latency in milliseconds, and the late slots.
 """
+import math
 import os
 import sys
 import tempfile
@@ -47,15 +48,14 @@ def run(dirpath, seconds, rate, size, clock=time.perf_counter, sleep=time.sleep)
                 dfd = os.open(base, os.O_RDONLY)
             t0 = clock()
             slot, interval = 0, 1.0 / rate
-            while True:
+            n_slots = math.ceil(seconds * rate - 1e-9)      # the slots the schedule holds: those that start inside the run
+            while slot < n_slots:
                 due = t0 + slot * interval
                 now = clock()
-                if due - t0 >= seconds:
-                    break
                 if now < due:
                     sleep(due - now)
-                elif now - due > interval:          # the call before ran past this slot: count it and move on to the next one that has not passed
-                    skipped = int((now - due) / interval)
+                elif now - due > interval:          # the call before ran past this slot: count the slots that have passed, never more than the schedule still held, and move on to the next one that has not
+                    skipped = min(int((now - due) / interval), n_slots - slot)
                     late += skipped
                     slot += skipped
                     continue

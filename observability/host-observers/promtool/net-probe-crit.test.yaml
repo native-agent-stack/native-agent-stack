@@ -1,0 +1,91 @@
+rule_files: []
+evaluation_interval: 15s
+tests:
+  # fresh probe, every public check failing: the measurement is read and is 0 (under 1, so the rule can fire)
+  - interval: 15s
+    input_series:
+      - series: 'net_probe_public_ok{job="workstation-node",instance="127.0.0.1:21255"}'
+        values: '0+0x80'
+      - series: 'net_probe_last_run_timestamp_seconds{job="workstation-node",instance="127.0.0.1:21255"}'
+        values: '0+15x80'
+    promql_expr_test:
+      - expr: 'min(net_probe_public_ok) and on() (time() - max(net_probe_last_run_timestamp_seconds) <= 300)'
+        eval_time: 10m
+        exp_samples:
+          - labels: '{}'
+            value: 0
+  # fresh probe reaching a public resolver: 1, the rule cannot fire
+  - interval: 15s
+    input_series:
+      - series: 'net_probe_public_ok{job="workstation-node",instance="127.0.0.1:21255"}'
+        values: '1+0x80'
+      - series: 'net_probe_last_run_timestamp_seconds{job="workstation-node",instance="127.0.0.1:21255"}'
+        values: '0+15x80'
+    promql_expr_test:
+      - expr: 'min(net_probe_public_ok) and on() (time() - max(net_probe_last_run_timestamp_seconds) <= 300)'
+        eval_time: 10m
+        exp_samples:
+          - labels: '{}'
+            value: 1
+  # the probe stopped at 300 s after writing a failure and node exporter keeps serving the unchanged textfile: the retained 0 is not read once the stamp is older than 300 s
+  - interval: 15s
+    input_series:
+      - series: 'net_probe_public_ok{job="workstation-node",instance="127.0.0.1:21255"}'
+        values: '0+0x80'
+      - series: 'net_probe_last_run_timestamp_seconds{job="workstation-node",instance="127.0.0.1:21255"}'
+        values: '0+15x20 300+0x60'
+    promql_expr_test:
+      - expr: 'min(net_probe_public_ok) and on() (time() - max(net_probe_last_run_timestamp_seconds) <= 300)'
+        eval_time: 5m
+        exp_samples:
+          - labels: '{}'
+            value: 0
+      - expr: 'min(net_probe_public_ok) and on() (time() - max(net_probe_last_run_timestamp_seconds) <= 300)'
+        eval_time: 10m
+        exp_samples:
+          - labels: '{}'
+            value: 0
+      - expr: 'min(net_probe_public_ok) and on() (time() - max(net_probe_last_run_timestamp_seconds) <= 300)'
+        eval_time: 10m15s
+        exp_samples: []
+      - expr: 'min(net_probe_public_ok) and on() (time() - max(net_probe_last_run_timestamp_seconds) <= 300)'
+        eval_time: 15m
+        exp_samples: []
+  # the age limit itself: a stamp exactly 300 s old is fresh, one 315 s old is stale (the warning fires above 300 s)
+  - interval: 15s
+    input_series:
+      - series: 'net_probe_public_ok{job="workstation-node",instance="127.0.0.1:21255"}'
+        values: '0+0x80'
+      - series: 'net_probe_last_run_timestamp_seconds{job="workstation-node",instance="127.0.0.1:21255"}'
+        values: '600+0x80'
+    promql_expr_test:
+      - expr: 'min(net_probe_public_ok) and on() (time() - max(net_probe_last_run_timestamp_seconds) <= 300)'
+        eval_time: 15m
+        exp_samples:
+          - labels: '{}'
+            value: 0
+      - expr: 'min(net_probe_public_ok) and on() (time() - max(net_probe_last_run_timestamp_seconds) <= 300)'
+        eval_time: 15m15s
+        exp_samples: []
+  # the probe recovered and runs again: the gauge is 1 and the stamp is current
+  - interval: 15s
+    input_series:
+      - series: 'net_probe_public_ok{job="workstation-node",instance="127.0.0.1:21255"}'
+        values: '0+0x20 1+0x60'
+      - series: 'net_probe_last_run_timestamp_seconds{job="workstation-node",instance="127.0.0.1:21255"}'
+        values: '0+15x80'
+    promql_expr_test:
+      - expr: 'min(net_probe_public_ok) and on() (time() - max(net_probe_last_run_timestamp_seconds) <= 300)'
+        eval_time: 15m
+        exp_samples:
+          - labels: '{}'
+            value: 1
+  # no probe series at all: nothing to read
+  - interval: 15s
+    input_series:
+      - series: 'node_network_receive_bytes_total{job="workstation-node",device="eth0",instance="127.0.0.1:21255"}'
+        values: '5000000+0x80'
+    promql_expr_test:
+      - expr: 'min(net_probe_public_ok) and on() (time() - max(net_probe_last_run_timestamp_seconds) <= 300)'
+        eval_time: 10m
+        exp_samples: []

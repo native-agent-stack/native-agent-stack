@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Self-test for the three observers behind the command center's ruling of 2026-10-14 (fsync_canary.py, engine_delay_prom.py, io_attribution_daemon.py) on synthetic data: the textfile lines
 and their atomic write, the failure path, the delay sidecar's window, percentiles, share, active flag, stale units, heartbeat age, partial and cut lines and newest-file choice, the daemon's
-active-hours logic (boundaries and a span that wraps midnight), a window record from a fake machine, and a short daemon run on that machine that writes valid JSON and exits on SIGTERM.
-The real machine is not read."""
+active-hours logic (boundaries and a span that wraps midnight), a window record from a fake machine, and a short daemon run on that machine that writes valid JSON and exits on SIGTERM; also the
+fsync probe's late-slot count against its schedule, the sanitized command shapes in the IO window record and report, and consecutive windows that run back to back (the daemon loop on an injected
+clock). The real machine is not read."""
 import importlib.util
 import json
 import os
@@ -13,6 +14,7 @@ import tempfile
 import time
 from datetime import datetime
 from pathlib import Path
+from unittest import mock
 from zoneinfo import ZoneInfo
 
 HERE = Path(__file__).resolve().parent
@@ -32,7 +34,7 @@ def load(name):
     return mod
 
 
-fc, ep, dm, io = load("fsync_canary"), load("engine_delay_prom"), load("io_attribution_daemon"), load("io_attribution")
+fc, ep, dm, io, fp = load("fsync_canary"), load("engine_delay_prom"), load("io_attribution_daemon"), load("io_attribution"), load("fsync_probe")
 NY = ZoneInfo("America/New_York")
 
 # ---- fsync_canary
@@ -52,6 +54,30 @@ with tempfile.TemporaryDirectory() as d:
     body = Path(out).read_text()
     check("a failing probe exits 1 and replaces the file with a failure stamp only (no stale latency lines)", r.returncode == 1 and "fsync_probe_last_failure_timestamp_seconds" in body and "latency" not in body, (r.returncode, body))
     check("no arguments: usage, exit 2", subprocess.run([sys.executable, "-I", str(HERE / "fsync_canary.py")], capture_output=True, text=True).returncode == 2)
+
+
+# ---- fsync_probe: the slots counted late never exceed the slots the probe scheduled
+def slow_first_call():
+    """An injected clock whose fourth reading ends the first call: that call took four seconds. sleep advances the same clock."""
+    st = {"t": 0.0, "n": 0}
+
+    def clock():
+        st["n"] += 1
+        if st["n"] == 4:
+            st["t"] += 4.0
+        return st["t"]
+
+    def sleep(d):
+        st["t"] += d
+    return clock, sleep
+
+
+with tempfile.TemporaryDirectory() as d:
+    clock, sleep = slow_first_call()
+    got = fp.run(d, 3.0, 10.0, 16, clock=clock, sleep=sleep)
+    check("a 3 s probe at 10 a second whose first call takes 4 s: one sample, and only the 29 slots after it count as late (30 were scheduled)", got["append"]["n"] == 1 and got["append"]["late"] == 29, got["append"])
+    check("the next pattern then runs its full schedule on time: 30 samples, none late", got["replace"]["n"] == 30 and got["replace"]["late"] == 0, got["replace"])
+    check("the probe leaves no scratch directory behind", os.listdir(d) == [], os.listdir(d))
 
 # ---- engine_delay_prom
 HEADER = ep.COLS
@@ -205,6 +231,75 @@ with tempfile.TemporaryDirectory() as d:
           p.returncode == 0 and len(files) == 2 and len(lines) >= 2 and all({"start", "end", "device", "io_pressure_pct", "dstate", "cgroups", "memory"} <= set(json.loads(ln)) for ln in lines), (p.returncode, files, len(lines), e[-300:]))
     check("the files carry the New York date of the window start", all(datetime.now(NY).strftime("%Y%m%d") in f or True for f in files) and files[0].startswith("io-attribution-daemon-") if files else False, files)
 check("daemon: no arguments gives the usage and exit 2", subprocess.run([sys.executable, "-I", str(HERE / "io_attribution_daemon.py")], capture_output=True, text=True).returncode == 2)
+
+# ---- sensitive text at the IO sampler's output boundary: the command lines of D-state processes through Sampler.who (and its cache) into the window record and the text report
+SENT = "zq7w9mk"          # short and word-like, so no secret pattern would catch it: it stands for any value a user could put on a command line
+
+
+def add_dstate_proc(root, pid, comm, ppid, cmdline):
+    """A process with one thread in D state, in the sessions cgroup, with a raw command line (or none)."""
+    d = Path(root) / "proc" / str(pid)
+    (d / "task" / str(pid)).mkdir(parents=True, exist_ok=True)
+    (d / "stat").write_text(f"{pid} ({comm}) S {ppid} 0 0 0 0 0 0 0 0 0 0 0 0 0 20 0 1 0 {pid * 7} 0 0\n")
+    (d / "cgroup").write_text("0::/non-systemd\n")
+    if cmdline is not None:
+        (d / "cmdline").write_bytes(cmdline)
+    if not (d / "cwd").is_symlink():
+        (d / "cwd").symlink_to("/w/a/x")
+    (d / "task" / str(pid) / "stat").write_text(f"{pid} ({comm}) D 1 0 0 0 0 0 0 0 0 0 0 0 0 0 20 0 1 0 1 0 0\n")
+    (d / "task" / str(pid) / "wchan").write_text("jbd2_log_wait_commit")
+
+
+IO_CASES = [("app", f"app --root=/srv/{SENT}\0".encode(), "app"), ("somecli", f"somecli\0{SENT}\0".encode(), "somecli <arg>"), ("git", b"git\0status\0", "git status"),
+            ("npm", f"npm\0--opt-x\0{SENT}\0run\0build\0".encode(), "npm"), ("python3", f"python3\0-W\0{SENT}\0run_x.py\0".encode(), "python3 run_x.py"),
+            ("bash", f"bash\0-lc\0{SENT}\0".encode(), "bash -c"), ("sudo", f"sudo\0-u\0{SENT}\0git\0status\0".encode(), "sudo git status"), ("my-secret-x", None, "<proc>")]
+with tempfile.TemporaryDirectory() as d:
+    root = build_fake(d)
+    write_machine(root, 1)
+    for i, (comm, cmdline, _want) in enumerate(IO_CASES):
+        add_dstate_proc(root, 300 + i, comm, 100, cmdline)
+    tick = {"t": 0.0}
+    sm = io.Sampler(str(root / "proc"), str(root / "cg"), "sdd", str(root / "sessions"), clock=lambda: tick["t"], devkey="8:48")
+    sm.take()
+    tick["t"] = 10.0
+    write_machine(root, 201)
+    sm.take()                                             # the second sample reads every shape from the cache
+    rec = dm.window_record(io, sm, "/non-systemd", 20, 150.0)
+    shapes = {t["shape"] for t in rec["dstate"]["top_shapes"]}
+    text = "\n".join(io.report(sm, 20, "/non-systemd"))
+    check("the window record and the text report hold no sentinel value", SENT not in json.dumps(rec) and SENT not in text, [s for s in shapes if SENT in s])
+    check("the recognized identities stay in dstate.top_shapes and the rest is a fixed marker or dropped", {w for _c, _a, w in IO_CASES} <= shapes, sorted(shapes))
+
+# ---- consecutive windows are continuous: the closing sample of a window is the first of the next, so no interval between two records is left out of both
+with tempfile.TemporaryDirectory() as d:
+    root = build_fake(d)
+    write_machine(root, 1)
+    clk = {"t": 0.0}
+
+    def mono():
+        return clk["t"]
+
+    def fake_sleep(dt):
+        clk["t"] += dt
+        write_machine(root, 1 + int(clk["t"]))
+        if clk["t"] >= 220.0:
+            signal.raise_signal(signal.SIGTERM)
+
+    out = Path(d) / "out"
+    argv = ["io_attribution_daemon.py", "--out-dir", str(out), "--interval", "20", "--window", "100", "--active", "00:00-23:59", "--proc-root", str(root / "proc"),
+            "--cg-root", str(root / "cg"), "--sessions-dir", str(root / "sessions"), "--devkey", "8:48"]
+    saved = {s: signal.getsignal(s) for s in (signal.SIGTERM, signal.SIGINT)}
+    try:
+        with mock.patch.object(dm.time, "monotonic", mono), mock.patch.object(dm.time, "sleep", fake_sleep), mock.patch.object(dm, "_load", lambda name: io), \
+                mock.patch.object(io.Sampler.__init__, "__defaults__", (mono, None)), mock.patch.object(sys, "argv", argv):
+            rc = dm.main()
+    finally:
+        for s, h in saved.items():
+            signal.signal(s, h)
+    jl = sorted(out.glob("io-attribution-daemon-*.jsonl"))
+    recs = [json.loads(ln) for ln in jl[0].read_text().splitlines()] if jl else []
+    check("daemon loop on an injected clock (a sample every 20 s, a window of 100 s, 220 s in all): exits 0 and writes two windows", rc == 0 and len(recs) == 2, (rc, len(recs)))
+    check("the windows are back to back: 100 s and 100 s, 200 s of the 200 s sampled, nothing between them left out", [r["seconds"] for r in recs] == [100.0, 100.0], [r["seconds"] for r in recs])
 
 # ---- read-only sources
 for name in ("fsync_canary", "engine_delay_prom", "io_attribution_daemon"):
