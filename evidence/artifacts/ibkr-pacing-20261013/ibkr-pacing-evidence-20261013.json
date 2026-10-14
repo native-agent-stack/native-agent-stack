@@ -1,0 +1,5415 @@
+{
+ "adapter_phase_a": [
+  {
+   "abort_reason": "unexpected_event:updated",
+   "api_connections_of_the_node": 2,
+   "event_counts": {
+    "accepted": 1,
+    "canceled": 1,
+    "initialized": 1,
+    "pending_cancel": 2,
+    "submitted": 1,
+    "updated": 1
+   },
+   "fills_with_commission": 0,
+   "final_net_position": 0,
+   "final_open_orders": 0,
+   "journal_cancel_events": 1,
+   "journal_submit_events": 1,
+   "kind": "adapter",
+   "label": "A-r1",
+   "node_error_class": null,
+   "order_writing_connections": 1,
+   "orders_this_phase": 1,
+   "pacing_error_count": 0,
+   "phase": "A",
+   "rate_estimates_whole_run": {
+    "counted_msgs_per_s": {
+     "best_5s_mean": 0.4,
+     "best_5s_mean_utc_buckets": 0.4,
+     "max_1s": 2,
+     "max_1s_utc_buckets": 1
+    },
+    "wire_est_refined_msgs_per_s": {
+     "best_5s_mean": 0.6,
+     "best_5s_mean_utc_buckets": 0.6,
+     "max_1s": 3,
+     "max_1s_utc_buckets": 2
+    },
+    "wire_est_upper_bound_msgs_per_s": {
+     "best_5s_mean": 0.6,
+     "best_5s_mean_utc_buckets": 0.6,
+     "max_1s": 3,
+     "max_1s_utc_buckets": 2
+    }
+   },
+   "steps": {
+    "S1": {
+     "reason": "unexpected_event:updated",
+     "result": "fail"
+    },
+    "S1_observation": {
+     "accept_ms": 768.974
+    },
+    "preflight": {
+     "result": "pass",
+     "seconds": -0.0
+    }
+   },
+   "vendor_log_line_counts": {
+    "cancel_commands_with_perm_venue_id": 2,
+    "cancel_commands_without_venue_id": 0,
+    "code_100_lines": 0,
+    "notice_10147_cancel_not_found": 0,
+    "notice_103_duplicate_order_id": 0,
+    "notice_2100_account_data_unsubscribed": 6,
+    "pacing_text_lines": 0
+   }
+  },
+  {
+   "abort_reason": null,
+   "api_connections_of_the_node": 2,
+   "event_counts": {
+    "accepted": 4,
+    "canceled": 1,
+    "filled": 2,
+    "initialized": 4,
+    "pending_cancel": 2,
+    "submitted": 4,
+    "updated": 4
+   },
+   "fills_with_commission": 2,
+   "final_net_position": 0,
+   "final_open_orders": null,
+   "journal_cancel_events": 1,
+   "journal_submit_events": 4,
+   "kind": "adapter",
+   "label": "A-r2",
+   "node_error_class": null,
+   "order_writing_connections": 1,
+   "orders_this_phase": 4,
+   "pacing_error_count": 0,
+   "phase": "A",
+   "rate_estimates_whole_run": {
+    "counted_msgs_per_s": {
+     "best_5s_mean": 1.0,
+     "best_5s_mean_utc_buckets": 1.0,
+     "max_1s": 5,
+     "max_1s_utc_buckets": 3
+    },
+    "wire_est_refined_msgs_per_s": {
+     "best_5s_mean": 1.2,
+     "best_5s_mean_utc_buckets": 1.2,
+     "max_1s": 6,
+     "max_1s_utc_buckets": 4
+    },
+    "wire_est_upper_bound_msgs_per_s": {
+     "best_5s_mean": 1.2,
+     "best_5s_mean_utc_buckets": 1.2,
+     "max_1s": 6,
+     "max_1s_utc_buckets": 4
+    }
+   },
+   "steps": {
+    "S1": {
+     "result": "pass",
+     "seconds": 0.16
+    },
+    "S1_observation": {
+     "accept_ms": 58.571
+    },
+    "S2": {
+     "result": "pass",
+     "seconds": 0.343
+    },
+    "S3A": {
+     "result": "pass",
+     "seconds": 0.051
+    },
+    "S3A_observation": {
+     "accept_ms": 50.264
+    },
+    "preflight": {
+     "result": "pass",
+     "seconds": -0.0
+    }
+   },
+   "vendor_log_line_counts": {
+    "cancel_commands_with_perm_venue_id": 1,
+    "cancel_commands_without_venue_id": 0,
+    "code_100_lines": 0,
+    "notice_10147_cancel_not_found": 0,
+    "notice_103_duplicate_order_id": 0,
+    "notice_2100_account_data_unsubscribed": 6,
+    "pacing_text_lines": 0
+   }
+  },
+  {
+   "abort_reason": null,
+   "api_connections_of_the_node": 2,
+   "event_counts": {
+    "accepted": 4,
+    "canceled": 1,
+    "filled": 2,
+    "initialized": 4,
+    "pending_cancel": 2,
+    "submitted": 4,
+    "updated": 4
+   },
+   "fills_with_commission": 2,
+   "final_net_position": 0,
+   "final_open_orders": null,
+   "journal_cancel_events": 1,
+   "journal_submit_events": 4,
+   "kind": "adapter",
+   "label": "A-r3",
+   "node_error_class": null,
+   "order_writing_connections": 1,
+   "orders_this_phase": 4,
+   "pacing_error_count": 0,
+   "phase": "A",
+   "rate_estimates_whole_run": {
+    "counted_msgs_per_s": {
+     "best_5s_mean": 1.0,
+     "best_5s_mean_utc_buckets": 1.0,
+     "max_1s": 3,
+     "max_1s_utc_buckets": 3
+    },
+    "wire_est_refined_msgs_per_s": {
+     "best_5s_mean": 1.2,
+     "best_5s_mean_utc_buckets": 1.2,
+     "max_1s": 4,
+     "max_1s_utc_buckets": 4
+    },
+    "wire_est_upper_bound_msgs_per_s": {
+     "best_5s_mean": 1.2,
+     "best_5s_mean_utc_buckets": 1.2,
+     "max_1s": 4,
+     "max_1s_utc_buckets": 4
+    }
+   },
+   "steps": {
+    "S1": {
+     "result": "pass",
+     "seconds": 0.155
+    },
+    "S1_observation": {
+     "accept_ms": 55.279
+    },
+    "S2": {
+     "result": "pass",
+     "seconds": 2.237
+    },
+    "S3A": {
+     "result": "pass",
+     "seconds": 0.048
+    },
+    "S3A_observation": {
+     "accept_ms": 47.514
+    },
+    "preflight": {
+     "result": "pass",
+     "seconds": -0.0
+    }
+   },
+   "vendor_log_line_counts": {
+    "cancel_commands_with_perm_venue_id": 1,
+    "cancel_commands_without_venue_id": 0,
+    "code_100_lines": 0,
+    "notice_10147_cancel_not_found": 0,
+    "notice_103_duplicate_order_id": 0,
+    "notice_2100_account_data_unsubscribed": 8,
+    "pacing_text_lines": 0
+   }
+  },
+  {
+   "abort_reason": null,
+   "api_connections_of_the_node": 2,
+   "event_counts": {
+    "accepted": 4,
+    "canceled": 1,
+    "filled": 2,
+    "initialized": 4,
+    "pending_cancel": 2,
+    "submitted": 4,
+    "updated": 4
+   },
+   "fills_with_commission": 2,
+   "final_net_position": 0,
+   "final_open_orders": null,
+   "journal_cancel_events": 1,
+   "journal_submit_events": 4,
+   "kind": "adapter",
+   "label": "A-r4",
+   "node_error_class": null,
+   "order_writing_connections": 1,
+   "orders_this_phase": 4,
+   "pacing_error_count": 0,
+   "phase": "A",
+   "rate_estimates_whole_run": {
+    "counted_msgs_per_s": {
+     "best_5s_mean": 1.0,
+     "best_5s_mean_utc_buckets": 1.0,
+     "max_1s": 5,
+     "max_1s_utc_buckets": 3
+    },
+    "wire_est_refined_msgs_per_s": {
+     "best_5s_mean": 1.2,
+     "best_5s_mean_utc_buckets": 1.2,
+     "max_1s": 6,
+     "max_1s_utc_buckets": 3
+    },
+    "wire_est_upper_bound_msgs_per_s": {
+     "best_5s_mean": 1.2,
+     "best_5s_mean_utc_buckets": 1.2,
+     "max_1s": 6,
+     "max_1s_utc_buckets": 3
+    }
+   },
+   "steps": {
+    "S1": {
+     "result": "pass",
+     "seconds": 0.292
+    },
+    "S1_observation": {
+     "accept_ms": 217.901
+    },
+    "S2": {
+     "result": "pass",
+     "seconds": 0.396
+    },
+    "S3A": {
+     "result": "pass",
+     "seconds": 0.062
+    },
+    "S3A_observation": {
+     "accept_ms": 61.866
+    },
+    "preflight": {
+     "result": "pass",
+     "seconds": -0.0
+    }
+   },
+   "vendor_log_line_counts": {
+    "cancel_commands_with_perm_venue_id": 1,
+    "cancel_commands_without_venue_id": 0,
+    "code_100_lines": 0,
+    "notice_10147_cancel_not_found": 0,
+    "notice_103_duplicate_order_id": 0,
+    "notice_2100_account_data_unsubscribed": 8,
+    "pacing_text_lines": 0
+   }
+  },
+  {
+   "abort_reason": null,
+   "api_connections_of_the_node": 2,
+   "event_counts": {
+    "accepted": 4,
+    "canceled": 1,
+    "filled": 2,
+    "initialized": 4,
+    "pending_cancel": 2,
+    "submitted": 4,
+    "updated": 4
+   },
+   "fills_with_commission": 2,
+   "final_net_position": 0,
+   "final_open_orders": null,
+   "journal_cancel_events": 1,
+   "journal_submit_events": 4,
+   "kind": "adapter",
+   "label": "A-r5",
+   "node_error_class": null,
+   "order_writing_connections": 1,
+   "orders_this_phase": 4,
+   "pacing_error_count": 0,
+   "phase": "A",
+   "rate_estimates_whole_run": {
+    "counted_msgs_per_s": {
+     "best_5s_mean": 1.0,
+     "best_5s_mean_utc_buckets": 1.0,
+     "max_1s": 5,
+     "max_1s_utc_buckets": 5
+    },
+    "wire_est_refined_msgs_per_s": {
+     "best_5s_mean": 1.2,
+     "best_5s_mean_utc_buckets": 1.2,
+     "max_1s": 6,
+     "max_1s_utc_buckets": 6
+    },
+    "wire_est_upper_bound_msgs_per_s": {
+     "best_5s_mean": 1.2,
+     "best_5s_mean_utc_buckets": 1.2,
+     "max_1s": 6,
+     "max_1s_utc_buckets": 6
+    }
+   },
+   "steps": {
+    "S1": {
+     "result": "pass",
+     "seconds": 0.137
+    },
+    "S1_observation": {
+     "accept_ms": 56.249
+    },
+    "S2": {
+     "result": "pass",
+     "seconds": 0.285
+    },
+    "S3A": {
+     "result": "pass",
+     "seconds": 0.042
+    },
+    "S3A_observation": {
+     "accept_ms": 41.17
+    },
+    "preflight": {
+     "result": "pass",
+     "seconds": -0.0
+    }
+   },
+   "vendor_log_line_counts": {
+    "cancel_commands_with_perm_venue_id": 1,
+    "cancel_commands_without_venue_id": 0,
+    "code_100_lines": 0,
+    "notice_10147_cancel_not_found": 0,
+    "notice_103_duplicate_order_id": 0,
+    "notice_2100_account_data_unsubscribed": 8,
+    "pacing_text_lines": 0
+   }
+  },
+  {
+   "abort_reason": null,
+   "api_connections_of_the_node": 2,
+   "event_counts": {
+    "accepted": 4,
+    "canceled": 1,
+    "filled": 2,
+    "initialized": 4,
+    "pending_cancel": 2,
+    "submitted": 4,
+    "updated": 4
+   },
+   "fills_with_commission": 2,
+   "final_net_position": 0,
+   "final_open_orders": null,
+   "journal_cancel_events": 1,
+   "journal_submit_events": 4,
+   "kind": "adapter",
+   "label": "A-r6",
+   "node_error_class": null,
+   "order_writing_connections": 1,
+   "orders_this_phase": 4,
+   "pacing_error_count": 0,
+   "phase": "A",
+   "rate_estimates_whole_run": {
+    "counted_msgs_per_s": {
+     "best_5s_mean": 1.0,
+     "best_5s_mean_utc_buckets": 1.0,
+     "max_1s": 5,
+     "max_1s_utc_buckets": 5
+    },
+    "wire_est_refined_msgs_per_s": {
+     "best_5s_mean": 1.2,
+     "best_5s_mean_utc_buckets": 1.2,
+     "max_1s": 6,
+     "max_1s_utc_buckets": 6
+    },
+    "wire_est_upper_bound_msgs_per_s": {
+     "best_5s_mean": 1.2,
+     "best_5s_mean_utc_buckets": 1.2,
+     "max_1s": 6,
+     "max_1s_utc_buckets": 6
+    }
+   },
+   "steps": {
+    "S1": {
+     "result": "pass",
+     "seconds": 0.242
+    },
+    "S1_observation": {
+     "accept_ms": 101.426
+    },
+    "S2": {
+     "result": "pass",
+     "seconds": 0.238
+    },
+    "S3A": {
+     "result": "pass",
+     "seconds": 0.091
+    },
+    "S3A_observation": {
+     "accept_ms": 89.685
+    },
+    "preflight": {
+     "result": "pass",
+     "seconds": -0.0
+    }
+   },
+   "vendor_log_line_counts": {
+    "cancel_commands_with_perm_venue_id": 1,
+    "cancel_commands_without_venue_id": 0,
+    "code_100_lines": 0,
+    "notice_10147_cancel_not_found": 0,
+    "notice_103_duplicate_order_id": 0,
+    "notice_2100_account_data_unsubscribed": 6,
+    "pacing_text_lines": 0
+   }
+  }
+ ],
+ "adapter_single_connection_ladders": [
+  {
+   "abort_reason": "s4_underrate:30",
+   "accept_latency_all_ms": {
+    "max_ms": 974.555,
+    "n": 308,
+    "p50_ms": 546.04,
+    "p95_ms": 857.749
+   },
+   "api_connections_of_the_node": 2,
+   "cancel_latency_all_ms": {
+    "max_ms": 1071.684,
+    "n": 308,
+    "p50_ms": 783.167,
+    "p95_ms": 1000.987
+   },
+   "event_counts": {
+    "accepted": 312,
+    "cancel_rejected": 2,
+    "canceled": 313,
+    "initialized": 312,
+    "pending_cancel": 625,
+    "submitted": 312,
+    "updated": 312
+   },
+   "fills_with_commission": 0,
+   "final_net_position": 0,
+   "final_open_orders": 0,
+   "journal_cancel_events": 311,
+   "journal_submit_events": 312,
+   "kind": "adapter",
+   "label": "B-r2",
+   "node_error_class": null,
+   "order_writing_connections": 1,
+   "orders_this_phase": 313,
+   "pacing_error_count": 0,
+   "phase": "B",
+   "rate_estimates_whole_run": {
+    "counted_msgs_per_s": {
+     "best_5s_mean": 13.6,
+     "best_5s_mean_utc_buckets": 13.4,
+     "max_1s": 18,
+     "max_1s_utc_buckets": 18
+    },
+    "wire_est_refined_msgs_per_s": {
+     "best_5s_mean": 20.6,
+     "best_5s_mean_utc_buckets": 20.0,
+     "max_1s": 26,
+     "max_1s_utc_buckets": 26
+    },
+    "wire_est_upper_bound_msgs_per_s": {
+     "best_5s_mean": 20.6,
+     "best_5s_mean_utc_buckets": 20.0,
+     "max_1s": 26,
+     "max_1s_utc_buckets": 26
+    }
+   },
+   "rungs": [
+    {
+     "accept_ms": {
+      "max_ms": 151.019,
+      "n": 50,
+      "p50_ms": 51.576,
+      "p90_ms": 59.652
+     },
+     "cancel_ms": {
+      "max_ms": 399.601,
+      "n": 50,
+      "p50_ms": 99.097,
+      "p90_ms": 193.451
+     },
+     "cancels_before_acceptance": 0,
+     "cancels_sent": 50,
+     "cancels_sent_in_other_rung_window": 0,
+     "cancels_sent_in_own_window": 50,
+     "cancels_sent_outside_rung_windows": 0,
+     "cancels_with_known_venue_id": 50,
+     "counted_msgs_per_s_max": 6,
+     "counted_msgs_per_s_mean": 5.0,
+     "counted_msgs_per_s_min": 4,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 6,
+      "wire_est_refined": 9,
+      "wire_est_upper_bound": 9
+     },
+     "orders": 50,
+     "orders_per_min_by_counted_rate": 150,
+     "orders_per_min_by_submits": 150,
+     "peak_open_orders": 2,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
+     "seconds": 20,
+     "skipped_slots": 0,
+     "target_msgs_per_s": 5,
+     "wire_est_refined_msgs_per_s_mean": 7.5,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 7.5,
+     "wire_est_upper_bound_msgs_per_s_mean": 7.5,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 7.5
+    },
+    {
+     "accept_ms": {
+      "max_ms": 749.956,
+      "n": 100,
+      "p50_ms": 446.656,
+      "p90_ms": 683.432
+     },
+     "cancel_ms": {
+      "max_ms": 999.758,
+      "n": 100,
+      "p50_ms": 698.684,
+      "p90_ms": 907.374
+     },
+     "cancels_before_acceptance": 0,
+     "cancels_sent": 100,
+     "cancels_sent_in_other_rung_window": 1,
+     "cancels_sent_in_own_window": 99,
+     "cancels_sent_outside_rung_windows": 0,
+     "cancels_with_known_venue_id": 100,
+     "counted_msgs_per_s_max": 10,
+     "counted_msgs_per_s_mean": 9.95,
+     "counted_msgs_per_s_min": 9,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 12,
+      "wire_est_refined": 19,
+      "wire_est_upper_bound": 19
+     },
+     "orders": 100,
+     "orders_per_min_by_counted_rate": 298,
+     "orders_per_min_by_submits": 300,
+     "peak_open_orders": 9,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
+     "seconds": 20,
+     "skipped_slots": 0,
+     "target_msgs_per_s": 10,
+     "wire_est_refined_msgs_per_s_mean": 14.9,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 15.0,
+     "wire_est_upper_bound_msgs_per_s_mean": 14.9,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 15.0
+    },
+    {
+     "accept_ms": {
+      "max_ms": 885.814,
+      "n": 129,
+      "p50_ms": 702.97,
+      "p90_ms": 854.471
+     },
+     "cancel_ms": {
+      "max_ms": 1070.328,
+      "n": 129,
+      "p50_ms": 886.05,
+      "p90_ms": 998.245
+     },
+     "cancels_before_acceptance": 0,
+     "cancels_sent": 129,
+     "cancels_sent_in_other_rung_window": 1,
+     "cancels_sent_in_own_window": 128,
+     "cancels_sent_outside_rung_windows": 0,
+     "cancels_with_known_venue_id": 129,
+     "counted_msgs_per_s_max": 17,
+     "counted_msgs_per_s_mean": 12.9,
+     "counted_msgs_per_s_min": 9,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 17,
+      "wire_est_refined": 25,
+      "wire_est_upper_bound": 25
+     },
+     "orders": 129,
+     "orders_per_min_by_counted_rate": 387,
+     "orders_per_min_by_submits": 387,
+     "peak_open_orders": 10,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
+     "seconds": 20,
+     "skipped_slots": 68,
+     "target_msgs_per_s": 20,
+     "wire_est_refined_msgs_per_s_mean": 19.35,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 19.35,
+     "wire_est_upper_bound_msgs_per_s_mean": 19.35,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 19.35
+    },
+    {
+     "accept_ms": {
+      "max_ms": 974.508,
+      "n": 33,
+      "p50_ms": 737.387,
+      "p90_ms": 921.183
+     },
+     "cancel_ms": {
+      "max_ms": 1183.541,
+      "n": 29,
+      "p50_ms": 909.293,
+      "p90_ms": 1059.447
+     },
+     "cancels_before_acceptance": 0,
+     "cancels_sent": 29,
+     "cancels_sent_in_other_rung_window": 0,
+     "cancels_sent_in_own_window": 29,
+     "cancels_sent_outside_rung_windows": 0,
+     "cancels_with_known_venue_id": 29,
+     "counted_msgs_per_s_max": 15,
+     "counted_msgs_per_s_mean": 12.6,
+     "counted_msgs_per_s_min": 11,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 17,
+      "wire_est_refined": 26,
+      "wire_est_upper_bound": 26
+     },
+     "orders": 33,
+     "orders_per_min_by_counted_rate": 378,
+     "orders_per_min_by_submits": 396,
+     "peak_open_orders": 10,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
+     "seconds": 5,
+     "skipped_slots": 41,
+     "target_msgs_per_s": 30,
+     "wire_est_refined_msgs_per_s_mean": 18.6,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 18.2,
+     "wire_est_upper_bound_msgs_per_s_mean": 18.6,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 18.2
+    }
+   ],
+   "steps": {
+    "S3": {
+     "result": "pass",
+     "seconds": 0.059
+    },
+    "S3_observation": {},
+    "S4": {
+     "reason": "s4_underrate:30",
+     "result": "fail"
+    },
+    "preflight": {
+     "result": "pass",
+     "seconds": -0.0
+    }
+   },
+   "unaccepted_cancels": 0,
+   "vendor_log_line_counts": {
+    "cancel_commands_with_perm_venue_id": 313,
+    "cancel_commands_without_venue_id": 4,
+    "code_100_lines": 0,
+    "notice_10147_cancel_not_found": 0,
+    "notice_103_duplicate_order_id": 0,
+    "notice_2100_account_data_unsubscribed": 76,
+    "pacing_text_lines": 0
+   },
+   "window_pairs_max": 10
+  },
+  {
+   "abort_reason": "failure:on_order_event:RuntimeError",
+   "accept_latency_all_ms": {
+    "max_ms": 943.022,
+    "n": 520,
+    "p50_ms": 549.26,
+    "p95_ms": 853.577
+   },
+   "api_connections_of_the_node": 2,
+   "cancel_latency_all_ms": {
+    "max_ms": 1091.676,
+    "n": 510,
+    "p50_ms": 832.159,
+    "p95_ms": 998.599
+   },
+   "event_counts": {
+    "accepted": 521,
+    "canceled": 511,
+    "initialized": 529,
+    "pending_cancel": 1040,
+    "submitted": 529,
+    "updated": 521
+   },
+   "fills_with_commission": 0,
+   "final_net_position": 0,
+   "final_open_orders": null,
+   "journal_cancel_events": 521,
+   "journal_submit_events": 530,
+   "kind": "adapter",
+   "label": "B-r3",
+   "node_error_class": null,
+   "order_writing_connections": 1,
+   "orders_this_phase": 531,
+   "pacing_error_count": 0,
+   "phase": "B",
+   "rate_estimates_whole_run": {
+    "counted_msgs_per_s": {
+     "best_5s_mean": 30.6,
+     "best_5s_mean_utc_buckets": 30.2,
+     "max_1s": 35,
+     "max_1s_utc_buckets": 31
+    },
+    "wire_est_refined_msgs_per_s": {
+     "best_5s_mean": 46.2,
+     "best_5s_mean_utc_buckets": 45.4,
+     "max_1s": 54,
+     "max_1s_utc_buckets": 47
+    },
+    "wire_est_upper_bound_msgs_per_s": {
+     "best_5s_mean": 46.2,
+     "best_5s_mean_utc_buckets": 45.4,
+     "max_1s": 54,
+     "max_1s_utc_buckets": 47
+    }
+   },
+   "rungs": [
+    {
+     "accept_ms": {
+      "max_ms": 151.182,
+      "n": 50,
+      "p50_ms": 44.662,
+      "p90_ms": 47.208
+     },
+     "cancel_ms": {
+      "max_ms": 420.441,
+      "n": 50,
+      "p50_ms": 92.902,
+      "p90_ms": 132.888
+     },
+     "cancels_before_acceptance": 0,
+     "cancels_sent": 50,
+     "cancels_sent_in_other_rung_window": 0,
+     "cancels_sent_in_own_window": 50,
+     "cancels_sent_outside_rung_windows": 0,
+     "cancels_with_known_venue_id": 50,
+     "counted_msgs_per_s_max": 6,
+     "counted_msgs_per_s_mean": 5.0,
+     "counted_msgs_per_s_min": 4,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 6,
+      "wire_est_refined": 9,
+      "wire_est_upper_bound": 9
+     },
+     "orders": 50,
+     "orders_per_min_by_counted_rate": 150,
+     "orders_per_min_by_submits": 150,
+     "peak_open_orders": 2,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
+     "seconds": 20,
+     "skipped_slots": 0,
+     "target_msgs_per_s": 5,
+     "wire_est_refined_msgs_per_s_mean": 7.5,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 7.5,
+     "wire_est_upper_bound_msgs_per_s_mean": 7.5,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 7.5
+    },
+    {
+     "accept_ms": {
+      "max_ms": 742.852,
+      "n": 100,
+      "p50_ms": 342.904,
+      "p90_ms": 672.426
+     },
+     "cancel_ms": {
+      "max_ms": 999.161,
+      "n": 100,
+      "p50_ms": 655.215,
+      "p90_ms": 904.232
+     },
+     "cancels_before_acceptance": 0,
+     "cancels_sent": 100,
+     "cancels_sent_in_other_rung_window": 1,
+     "cancels_sent_in_own_window": 99,
+     "cancels_sent_outside_rung_windows": 0,
+     "cancels_with_known_venue_id": 100,
+     "counted_msgs_per_s_max": 11,
+     "counted_msgs_per_s_mean": 9.95,
+     "counted_msgs_per_s_min": 9,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 12,
+      "wire_est_refined": 19,
+      "wire_est_upper_bound": 19
+     },
+     "orders": 100,
+     "orders_per_min_by_counted_rate": 298,
+     "orders_per_min_by_submits": 300,
+     "peak_open_orders": 9,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
+     "seconds": 20,
+     "skipped_slots": 0,
+     "target_msgs_per_s": 10,
+     "wire_est_refined_msgs_per_s_mean": 14.9,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 15.0,
+     "wire_est_upper_bound_msgs_per_s_mean": 14.9,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 15.0
+    },
+    {
+     "accept_ms": {
+      "max_ms": 923.458,
+      "n": 200,
+      "p50_ms": 639.461,
+      "p90_ms": 847.158
+     },
+     "cancel_ms": {
+      "max_ms": 1091.675,
+      "n": 200,
+      "p50_ms": 876.546,
+      "p90_ms": 996.115
+     },
+     "cancels_before_acceptance": 0,
+     "cancels_sent": 200,
+     "cancels_sent_in_other_rung_window": 3,
+     "cancels_sent_in_own_window": 197,
+     "cancels_sent_outside_rung_windows": 0,
+     "cancels_with_known_venue_id": 200,
+     "counted_msgs_per_s_max": 22,
+     "counted_msgs_per_s_mean": 19.9,
+     "counted_msgs_per_s_min": 18,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 23,
+      "wire_est_refined": 36,
+      "wire_est_upper_bound": 36
+     },
+     "orders": 200,
+     "orders_per_min_by_counted_rate": 597,
+     "orders_per_min_by_submits": 600,
+     "peak_open_orders": 24,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
+     "seconds": 20,
+     "skipped_slots": 0,
+     "target_msgs_per_s": 20,
+     "wire_est_refined_msgs_per_s_mean": 29.8,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 30.0,
+     "wire_est_upper_bound_msgs_per_s_mean": 29.8,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 30.0
+    },
+    {
+     "accept_ms": {
+      "max_ms": 942.954,
+      "n": 171,
+      "p50_ms": 649.85,
+      "p90_ms": 855.584
+     },
+     "cancel_ms": {
+      "max_ms": 1082.462,
+      "n": 160,
+      "p50_ms": 884.427,
+      "p90_ms": 985.302
+     },
+     "cancels_before_acceptance": 0,
+     "cancels_sent": 170,
+     "cancels_sent_in_other_rung_window": 0,
+     "cancels_sent_in_own_window": 158,
+     "cancels_sent_outside_rung_windows": 12,
+     "cancels_with_known_venue_id": 170,
+     "counted_msgs_per_s_max": 31,
+     "counted_msgs_per_s_mean": 29.636,
+     "counted_msgs_per_s_min": 27,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 35,
+      "wire_est_refined": 54,
+      "wire_est_upper_bound": 54
+     },
+     "orders": 180,
+     "orders_per_min_by_counted_rate": 889,
+     "orders_per_min_by_submits": 982,
+     "peak_open_orders": 29,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
+     "seconds": 11,
+     "skipped_slots": 0,
+     "target_msgs_per_s": 30,
+     "wire_est_refined_msgs_per_s_mean": 44.27,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 47.27,
+     "wire_est_upper_bound_msgs_per_s_mean": 44.27,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 47.27
+    }
+   ],
+   "steps": {
+    "S3": {
+     "result": "pass",
+     "seconds": 0.058
+    },
+    "S3_observation": {},
+    "S4": {
+     "reason": "failure:on_order_event:RuntimeError",
+     "result": "fail"
+    },
+    "preflight": {
+     "result": "pass",
+     "seconds": -0.0
+    }
+   },
+   "unaccepted_cancels": 0,
+   "vendor_log_line_counts": {
+    "cancel_commands_with_perm_venue_id": 523,
+    "cancel_commands_without_venue_id": 8,
+    "code_100_lines": 0,
+    "notice_10147_cancel_not_found": 0,
+    "notice_103_duplicate_order_id": 0,
+    "notice_2100_account_data_unsubscribed": 80,
+    "pacing_text_lines": 0
+   },
+   "window_pairs_max": 30
+  },
+  {
+   "abort_reason": "failure:on_order_event:RuntimeError",
+   "accept_latency_all_ms": {
+    "max_ms": 904.745,
+    "n": 260,
+    "p50_ms": 489.601,
+    "p95_ms": 799.124
+   },
+   "api_connections_of_the_node": 2,
+   "cancel_latency_all_ms": {
+    "max_ms": 1102.847,
+    "n": 252,
+    "p50_ms": 765.093,
+    "p95_ms": 999.504
+   },
+   "event_counts": {
+    "accepted": 260,
+    "canceled": 253,
+    "initialized": 263,
+    "pending_cancel": 519,
+    "submitted": 263,
+    "updated": 259
+   },
+   "fills_with_commission": 0,
+   "final_net_position": 0,
+   "final_open_orders": null,
+   "journal_cancel_events": 261,
+   "journal_submit_events": 264,
+   "kind": "adapter",
+   "label": "B-r4",
+   "node_error_class": null,
+   "order_writing_connections": 1,
+   "orders_this_phase": 265,
+   "pacing_error_count": 0,
+   "phase": "B",
+   "rate_estimates_whole_run": {
+    "counted_msgs_per_s": {
+     "best_5s_mean": 20.8,
+     "best_5s_mean_utc_buckets": 20.2,
+     "max_1s": 24,
+     "max_1s_utc_buckets": 21
+    },
+    "wire_est_refined_msgs_per_s": {
+     "best_5s_mean": 31.4,
+     "best_5s_mean_utc_buckets": 30.4,
+     "max_1s": 37,
+     "max_1s_utc_buckets": 32
+    },
+    "wire_est_upper_bound_msgs_per_s": {
+     "best_5s_mean": 31.4,
+     "best_5s_mean_utc_buckets": 30.4,
+     "max_1s": 37,
+     "max_1s_utc_buckets": 32
+    }
+   },
+   "rungs": [
+    {
+     "accept_ms": {
+      "max_ms": 217.147,
+      "n": 50,
+      "p50_ms": 45.328,
+      "p90_ms": 81.062
+     },
+     "cancel_ms": {
+      "max_ms": 349.698,
+      "n": 50,
+      "p50_ms": 84.367,
+      "p90_ms": 134.451
+     },
+     "cancels_before_acceptance": 0,
+     "cancels_sent": 50,
+     "cancels_sent_in_other_rung_window": 0,
+     "cancels_sent_in_own_window": 50,
+     "cancels_sent_outside_rung_windows": 0,
+     "cancels_with_known_venue_id": 50,
+     "counted_msgs_per_s_max": 6,
+     "counted_msgs_per_s_mean": 5.0,
+     "counted_msgs_per_s_min": 4,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 6,
+      "wire_est_refined": 9,
+      "wire_est_upper_bound": 9
+     },
+     "orders": 50,
+     "orders_per_min_by_counted_rate": 150,
+     "orders_per_min_by_submits": 150,
+     "peak_open_orders": 2,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
+     "seconds": 20,
+     "skipped_slots": 0,
+     "target_msgs_per_s": 5,
+     "wire_est_refined_msgs_per_s_mean": 7.5,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 7.5,
+     "wire_est_upper_bound_msgs_per_s_mean": 7.5,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 7.5
+    },
+    {
+     "accept_ms": {
+      "max_ms": 887.963,
+      "n": 100,
+      "p50_ms": 521.573,
+      "p90_ms": 723.343
+     },
+     "cancel_ms": {
+      "max_ms": 1037.731,
+      "n": 100,
+      "p50_ms": 749.765,
+      "p90_ms": 938.583
+     },
+     "cancels_before_acceptance": 0,
+     "cancels_sent": 100,
+     "cancels_sent_in_other_rung_window": 3,
+     "cancels_sent_in_own_window": 97,
+     "cancels_sent_outside_rung_windows": 0,
+     "cancels_with_known_venue_id": 100,
+     "counted_msgs_per_s_max": 11,
+     "counted_msgs_per_s_mean": 9.85,
+     "counted_msgs_per_s_min": 9,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 12,
+      "wire_est_refined": 19,
+      "wire_est_upper_bound": 19
+     },
+     "orders": 100,
+     "orders_per_min_by_counted_rate": 296,
+     "orders_per_min_by_submits": 300,
+     "peak_open_orders": 13,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
+     "seconds": 20,
+     "skipped_slots": 0,
+     "target_msgs_per_s": 10,
+     "wire_est_refined_msgs_per_s_mean": 14.7,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 15.0,
+     "wire_est_upper_bound_msgs_per_s_mean": 14.7,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 15.0
+    },
+    {
+     "accept_ms": {
+      "max_ms": 904.694,
+      "n": 110,
+      "p50_ms": 589.448,
+      "p90_ms": 798.52
+     },
+     "cancel_ms": {
+      "max_ms": 1102.856,
+      "n": 102,
+      "p50_ms": 859.578,
+      "p90_ms": 998.114
+     },
+     "cancels_before_acceptance": 0,
+     "cancels_sent": 110,
+     "cancels_sent_in_other_rung_window": 0,
+     "cancels_sent_in_own_window": 103,
+     "cancels_sent_outside_rung_windows": 7,
+     "cancels_with_known_venue_id": 110,
+     "counted_msgs_per_s_max": 21,
+     "counted_msgs_per_s_mean": 19.636,
+     "counted_msgs_per_s_min": 16,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 24,
+      "wire_est_refined": 37,
+      "wire_est_upper_bound": 37
+     },
+     "orders": 114,
+     "orders_per_min_by_counted_rate": 589,
+     "orders_per_min_by_submits": 622,
+     "peak_open_orders": 19,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
+     "seconds": 11,
+     "skipped_slots": 0,
+     "target_msgs_per_s": 20,
+     "wire_est_refined_msgs_per_s_mean": 29.27,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 30.36,
+     "wire_est_upper_bound_msgs_per_s_mean": 29.27,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 30.36
+    }
+   ],
+   "steps": {
+    "S3": {
+     "result": "pass",
+     "seconds": 0.11
+    },
+    "S3_observation": {},
+    "S4": {
+     "reason": "failure:on_order_event:RuntimeError",
+     "result": "fail"
+    },
+    "preflight": {
+     "result": "pass",
+     "seconds": -0.0
+    }
+   },
+   "unaccepted_cancels": 0,
+   "vendor_log_line_counts": {
+    "cancel_commands_with_perm_venue_id": 262,
+    "cancel_commands_without_venue_id": 3,
+    "code_100_lines": 0,
+    "notice_10147_cancel_not_found": 0,
+    "notice_103_duplicate_order_id": 0,
+    "notice_2100_account_data_unsubscribed": 68,
+    "pacing_text_lines": 0
+   },
+   "window_pairs_max": 30
+  },
+  {
+   "abort_reason": null,
+   "accept_latency_all_ms": {
+    "max_ms": 1100.549,
+    "n": 1258,
+    "p50_ms": 663.437,
+    "p95_ms": 937.833
+   },
+   "api_connections_of_the_node": 2,
+   "cancel_latency_all_ms": {
+    "max_ms": 2086.17,
+    "n": 1258,
+    "p50_ms": 909.415,
+    "p95_ms": 1159.79
+   },
+   "event_counts": {
+    "accepted": 1258,
+    "cancel_rejected": 3,
+    "canceled": 1259,
+    "initialized": 1258,
+    "pending_cancel": 2511,
+    "submitted": 1258,
+    "updated": 1258
+   },
+   "fills_with_commission": 0,
+   "final_net_position": 0,
+   "final_open_orders": 0,
+   "journal_cancel_events": 1262,
+   "journal_submit_events": 1258,
+   "kind": "adapter",
+   "label": "B-r5",
+   "node_error_class": null,
+   "order_writing_connections": 1,
+   "orders_this_phase": 1259,
+   "pacing_error_count": 0,
+   "phase": "B",
+   "rate_estimates_whole_run": {
+    "counted_msgs_per_s": {
+     "best_5s_mean": 33.6,
+     "best_5s_mean_utc_buckets": 32.6,
+     "max_1s": 46,
+     "max_1s_utc_buckets": 37
+    },
+    "wire_est_refined_msgs_per_s": {
+     "best_5s_mean": 51.2,
+     "best_5s_mean_utc_buckets": 49.8,
+     "max_1s": 69,
+     "max_1s_utc_buckets": 57
+    },
+    "wire_est_upper_bound_msgs_per_s": {
+     "best_5s_mean": 51.2,
+     "best_5s_mean_utc_buckets": 49.8,
+     "max_1s": 69,
+     "max_1s_utc_buckets": 57
+    }
+   },
+   "rungs": [
+    {
+     "accept_ms": {
+      "max_ms": 261.465,
+      "n": 50,
+      "p50_ms": 44.596,
+      "p90_ms": 87.208
+     },
+     "cancel_ms": {
+      "max_ms": 353.064,
+      "n": 50,
+      "p50_ms": 85.384,
+      "p90_ms": 107.648
+     },
+     "cancels_before_acceptance": 0,
+     "cancels_sent": 50,
+     "cancels_sent_in_other_rung_window": 0,
+     "cancels_sent_in_own_window": 50,
+     "cancels_sent_outside_rung_windows": 0,
+     "cancels_with_known_venue_id": 50,
+     "counted_msgs_per_s_max": 6,
+     "counted_msgs_per_s_mean": 5.0,
+     "counted_msgs_per_s_min": 4,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 7,
+      "wire_est_refined": 11,
+      "wire_est_upper_bound": 11
+     },
+     "orders": 50,
+     "orders_per_min_by_counted_rate": 150,
+     "orders_per_min_by_submits": 150,
+     "peak_open_orders": 2,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
+     "seconds": 20,
+     "skipped_slots": 0,
+     "target_msgs_per_s": 5,
+     "wire_est_refined_msgs_per_s_mean": 7.5,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 7.5,
+     "wire_est_upper_bound_msgs_per_s_mean": 7.5,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 7.5
+    },
+    {
+     "accept_ms": {
+      "max_ms": 738.41,
+      "n": 100,
+      "p50_ms": 523.261,
+      "p90_ms": 666.292
+     },
+     "cancel_ms": {
+      "max_ms": 992.252,
+      "n": 100,
+      "p50_ms": 689.561,
+      "p90_ms": 933.531
+     },
+     "cancels_before_acceptance": 0,
+     "cancels_sent": 100,
+     "cancels_sent_in_other_rung_window": 3,
+     "cancels_sent_in_own_window": 97,
+     "cancels_sent_outside_rung_windows": 0,
+     "cancels_with_known_venue_id": 100,
+     "counted_msgs_per_s_max": 11,
+     "counted_msgs_per_s_mean": 9.85,
+     "counted_msgs_per_s_min": 9,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 12,
+      "wire_est_refined": 19,
+      "wire_est_upper_bound": 19
+     },
+     "orders": 100,
+     "orders_per_min_by_counted_rate": 296,
+     "orders_per_min_by_submits": 300,
+     "peak_open_orders": 11,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
+     "seconds": 20,
+     "skipped_slots": 0,
+     "target_msgs_per_s": 10,
+     "wire_est_refined_msgs_per_s_mean": 14.7,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 15.0,
+     "wire_est_upper_bound_msgs_per_s_mean": 14.7,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 15.0
+    },
+    {
+     "accept_ms": {
+      "max_ms": 958.855,
+      "n": 200,
+      "p50_ms": 631.547,
+      "p90_ms": 835.68
+     },
+     "cancel_ms": {
+      "max_ms": 1038.687,
+      "n": 200,
+      "p50_ms": 870.513,
+      "p90_ms": 986.74
+     },
+     "cancels_before_acceptance": 0,
+     "cancels_sent": 200,
+     "cancels_sent_in_other_rung_window": 6,
+     "cancels_sent_in_own_window": 194,
+     "cancels_sent_outside_rung_windows": 0,
+     "cancels_with_known_venue_id": 200,
+     "counted_msgs_per_s_max": 21,
+     "counted_msgs_per_s_mean": 19.85,
+     "counted_msgs_per_s_min": 17,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 23,
+      "wire_est_refined": 36,
+      "wire_est_upper_bound": 36
+     },
+     "orders": 200,
+     "orders_per_min_by_counted_rate": 596,
+     "orders_per_min_by_submits": 600,
+     "peak_open_orders": 24,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
+     "seconds": 20,
+     "skipped_slots": 0,
+     "target_msgs_per_s": 20,
+     "wire_est_refined_msgs_per_s_mean": 29.7,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 30.0,
+     "wire_est_upper_bound_msgs_per_s_mean": 29.7,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 30.0
+    },
+    {
+     "accept_ms": {
+      "max_ms": 1054.91,
+      "n": 293,
+      "p50_ms": 649.137,
+      "p90_ms": 862.752
+     },
+     "cancel_ms": {
+      "max_ms": 1903.71,
+      "n": 293,
+      "p50_ms": 899.699,
+      "p90_ms": 1019.953
+     },
+     "cancels_before_acceptance": 4,
+     "cancels_sent": 293,
+     "cancels_sent_in_other_rung_window": 10,
+     "cancels_sent_in_own_window": 283,
+     "cancels_sent_outside_rung_windows": 0,
+     "cancels_with_known_venue_id": 289,
+     "counted_msgs_per_s_max": 31,
+     "counted_msgs_per_s_mean": 29.1,
+     "counted_msgs_per_s_min": 22,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 36,
+      "wire_est_refined": 57,
+      "wire_est_upper_bound": 57
+     },
+     "orders": 293,
+     "orders_per_min_by_counted_rate": 873,
+     "orders_per_min_by_submits": 879,
+     "peak_open_orders": 30,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
+     "seconds": 20,
+     "skipped_slots": 7,
+     "target_msgs_per_s": 30,
+     "wire_est_refined_msgs_per_s_mean": 43.35,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 43.75,
+     "wire_est_upper_bound_msgs_per_s_mean": 43.55,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 43.95
+    },
+    {
+     "accept_ms": {
+      "max_ms": 998.972,
+      "n": 321,
+      "p50_ms": 704.549,
+      "p90_ms": 907.118
+     },
+     "cancel_ms": {
+      "max_ms": 1595.791,
+      "n": 321,
+      "p50_ms": 946.47,
+      "p90_ms": 1047.718
+     },
+     "cancels_before_acceptance": 0,
+     "cancels_sent": 321,
+     "cancels_sent_in_other_rung_window": 14,
+     "cancels_sent_in_own_window": 307,
+     "cancels_sent_outside_rung_windows": 0,
+     "cancels_with_known_venue_id": 321,
+     "counted_msgs_per_s_max": 37,
+     "counted_msgs_per_s_mean": 31.95,
+     "counted_msgs_per_s_min": 29,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 42,
+      "wire_est_refined": 68,
+      "wire_est_upper_bound": 68
+     },
+     "orders": 321,
+     "orders_per_min_by_counted_rate": 958,
+     "orders_per_min_by_submits": 963,
+     "peak_open_orders": 30,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
+     "seconds": 20,
+     "skipped_slots": 79,
+     "target_msgs_per_s": 40,
+     "wire_est_refined_msgs_per_s_mean": 47.85,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 48.15,
+     "wire_est_upper_bound_msgs_per_s_mean": 47.85,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 48.15
+    },
+    {
+     "accept_ms": {
+      "max_ms": 1100.482,
+      "n": 294,
+      "p50_ms": 761.131,
+      "p90_ms": 937.391
+     },
+     "cancel_ms": {
+      "max_ms": 2086.17,
+      "n": 294,
+      "p50_ms": 961.724,
+      "p90_ms": 1392.169
+     },
+     "cancels_before_acceptance": 2,
+     "cancels_sent": 294,
+     "cancels_sent_in_other_rung_window": 0,
+     "cancels_sent_in_own_window": 290,
+     "cancels_sent_outside_rung_windows": 4,
+     "cancels_with_known_venue_id": 292,
+     "counted_msgs_per_s_max": 38,
+     "counted_msgs_per_s_mean": 30.0,
+     "counted_msgs_per_s_min": 13,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 46,
+      "wire_est_refined": 69,
+      "wire_est_upper_bound": 69
+     },
+     "orders": 294,
+     "orders_per_min_by_counted_rate": 900,
+     "orders_per_min_by_submits": 882,
+     "peak_open_orders": 30,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
+     "seconds": 20,
+     "skipped_slots": 205,
+     "target_msgs_per_s": 50,
+     "wire_est_refined_msgs_per_s_mean": 45.25,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 44.0,
+     "wire_est_upper_bound_msgs_per_s_mean": 45.3,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 44.1
+    }
+   ],
+   "steps": {
+    "S3": {
+     "result": "pass",
+     "seconds": 0.103
+    },
+    "S3_observation": {},
+    "S4": {
+     "result": "pass",
+     "seconds": 121.732
+    },
+    "preflight": {
+     "result": "pass",
+     "seconds": -0.0
+    }
+   },
+   "unaccepted_cancels": 6,
+   "vendor_log_line_counts": {
+    "cancel_commands_with_perm_venue_id": 1256,
+    "cancel_commands_without_venue_id": 6,
+    "code_100_lines": 0,
+    "notice_10147_cancel_not_found": 0,
+    "notice_103_duplicate_order_id": 0,
+    "notice_2100_account_data_unsubscribed": 126,
+    "pacing_text_lines": 0
+   },
+   "window_pairs_max": 30
+  },
+  {
+   "abort_reason": null,
+   "accept_latency_all_ms": {
+    "max_ms": 1646.472,
+    "n": 1359,
+    "p50_ms": 762.54,
+    "p95_ms": 1247.861
+   },
+   "api_connections_of_the_node": 2,
+   "cancel_latency_all_ms": {
+    "max_ms": 1998.672,
+    "n": 1359,
+    "p50_ms": 971.391,
+    "p95_ms": 1836.385
+   },
+   "event_counts": {
+    "accepted": 1359,
+    "canceled": 1360,
+    "initialized": 1359,
+    "pending_cancel": 2440,
+    "submitted": 1359,
+    "updated": 1359
+   },
+   "fills_with_commission": 0,
+   "final_net_position": 0,
+   "final_open_orders": 0,
+   "journal_cancel_events": 1360,
+   "journal_submit_events": 1359,
+   "kind": "adapter",
+   "label": "B-r6",
+   "node_error_class": null,
+   "order_writing_connections": 1,
+   "orders_this_phase": 1360,
+   "pacing_error_count": 0,
+   "phase": "B",
+   "rate_estimates_whole_run": {
+    "counted_msgs_per_s": {
+     "best_5s_mean": 42.0,
+     "best_5s_mean_utc_buckets": 40.8,
+     "max_1s": 53,
+     "max_1s_utc_buckets": 48
+    },
+    "wire_est_refined_msgs_per_s": {
+     "best_5s_mean": 56.6,
+     "best_5s_mean_utc_buckets": 53.8,
+     "max_1s": 78,
+     "max_1s_utc_buckets": 66
+    },
+    "wire_est_upper_bound_msgs_per_s": {
+     "best_5s_mean": 63.4,
+     "best_5s_mean_utc_buckets": 60.8,
+     "max_1s": 83,
+     "max_1s_utc_buckets": 71
+    }
+   },
+   "rungs": [
+    {
+     "accept_ms": {
+      "max_ms": 118.802,
+      "n": 100,
+      "p50_ms": 72.514,
+      "p90_ms": 89.083
+     },
+     "cancel_ms": {
+      "max_ms": 189.035,
+      "n": 100,
+      "p50_ms": 103.665,
+      "p90_ms": 137.401
+     },
+     "cancels_before_acceptance": 0,
+     "cancels_sent": 100,
+     "cancels_sent_in_other_rung_window": 0,
+     "cancels_sent_in_own_window": 100,
+     "cancels_sent_outside_rung_windows": 0,
+     "cancels_with_known_venue_id": 100,
+     "counted_msgs_per_s_max": 10,
+     "counted_msgs_per_s_mean": 10.0,
+     "counted_msgs_per_s_min": 10,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 12,
+      "wire_est_refined": 18,
+      "wire_est_upper_bound": 18
+     },
+     "orders": 100,
+     "orders_per_min_by_counted_rate": 300,
+     "orders_per_min_by_submits": 300,
+     "peak_open_orders": 2,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
+     "seconds": 20,
+     "skipped_slots": 0,
+     "target_msgs_per_s": 10,
+     "wire_est_refined_msgs_per_s_mean": 15.0,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 15.0,
+     "wire_est_upper_bound_msgs_per_s_mean": 15.0,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 15.0
+    },
+    {
+     "accept_ms": {
+      "max_ms": 953.787,
+      "n": 200,
+      "p50_ms": 602.974,
+      "p90_ms": 806.506
+     },
+     "cancel_ms": {
+      "max_ms": 1077.747,
+      "n": 200,
+      "p50_ms": 863.313,
+      "p90_ms": 986.302
+     },
+     "cancels_before_acceptance": 0,
+     "cancels_sent": 200,
+     "cancels_sent_in_other_rung_window": 6,
+     "cancels_sent_in_own_window": 194,
+     "cancels_sent_outside_rung_windows": 0,
+     "cancels_with_known_venue_id": 200,
+     "counted_msgs_per_s_max": 21,
+     "counted_msgs_per_s_mean": 19.7,
+     "counted_msgs_per_s_min": 17,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 25,
+      "wire_est_refined": 40,
+      "wire_est_upper_bound": 40
+     },
+     "orders": 200,
+     "orders_per_min_by_counted_rate": 591,
+     "orders_per_min_by_submits": 600,
+     "peak_open_orders": 24,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
+     "seconds": 20,
+     "skipped_slots": 0,
+     "target_msgs_per_s": 20,
+     "wire_est_refined_msgs_per_s_mean": 29.4,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 30.0,
+     "wire_est_upper_bound_msgs_per_s_mean": 29.4,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 30.0
+    },
+    {
+     "accept_ms": {
+      "max_ms": 1038.022,
+      "n": 300,
+      "p50_ms": 613.175,
+      "p90_ms": 857.218
+     },
+     "cancel_ms": {
+      "max_ms": 1107.082,
+      "n": 300,
+      "p50_ms": 891.795,
+      "p90_ms": 1006.55
+     },
+     "cancels_before_acceptance": 1,
+     "cancels_sent": 300,
+     "cancels_sent_in_other_rung_window": 8,
+     "cancels_sent_in_own_window": 292,
+     "cancels_sent_outside_rung_windows": 0,
+     "cancels_with_known_venue_id": 299,
+     "counted_msgs_per_s_max": 31,
+     "counted_msgs_per_s_mean": 29.9,
+     "counted_msgs_per_s_min": 27,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 40,
+      "wire_est_refined": 63,
+      "wire_est_upper_bound": 64
+     },
+     "orders": 300,
+     "orders_per_min_by_counted_rate": 897,
+     "orders_per_min_by_submits": 900,
+     "peak_open_orders": 33,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
+     "seconds": 20,
+     "skipped_slots": 0,
+     "target_msgs_per_s": 30,
+     "wire_est_refined_msgs_per_s_mean": 44.75,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 44.95,
+     "wire_est_upper_bound_msgs_per_s_mean": 44.8,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 45.0
+    },
+    {
+     "accept_ms": {
+      "max_ms": 1499.045,
+      "n": 382,
+      "p50_ms": 903.081,
+      "p90_ms": 1203.388
+     },
+     "cancel_ms": {
+      "max_ms": 1948.229,
+      "n": 382,
+      "p50_ms": 1156.884,
+      "p90_ms": 1805.524
+     },
+     "cancels_before_acceptance": 113,
+     "cancels_sent": 382,
+     "cancels_sent_in_other_rung_window": 16,
+     "cancels_sent_in_own_window": 366,
+     "cancels_sent_outside_rung_windows": 0,
+     "cancels_with_known_venue_id": 269,
+     "counted_msgs_per_s_max": 44,
+     "counted_msgs_per_s_mean": 37.8,
+     "counted_msgs_per_s_min": 30,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 47,
+      "wire_est_refined": 69,
+      "wire_est_upper_bound": 73
+     },
+     "orders": 382,
+     "orders_per_min_by_counted_rate": 1134,
+     "orders_per_min_by_submits": 1146,
+     "peak_open_orders": 50,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
+     "seconds": 20,
+     "skipped_slots": 18,
+     "target_msgs_per_s": 40,
+     "wire_est_refined_msgs_per_s_mean": 51.3,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 51.65,
+     "wire_est_upper_bound_msgs_per_s_mean": 56.5,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 57.3
+    },
+    {
+     "accept_ms": {
+      "max_ms": 1646.371,
+      "n": 377,
+      "p50_ms": 927.416,
+      "p90_ms": 1252.852
+     },
+     "cancel_ms": {
+      "max_ms": 1998.674,
+      "n": 377,
+      "p50_ms": 1544.003,
+      "p90_ms": 1858.198
+     },
+     "cancels_before_acceptance": 144,
+     "cancels_sent": 377,
+     "cancels_sent_in_other_rung_window": 0,
+     "cancels_sent_in_own_window": 360,
+     "cancels_sent_outside_rung_windows": 17,
+     "cancels_with_known_venue_id": 233,
+     "counted_msgs_per_s_max": 48,
+     "counted_msgs_per_s_mean": 37.65,
+     "counted_msgs_per_s_min": 21,
+     "max_1s_sliding_in_rung_window": {
+      "counted": 53,
+      "wire_est_refined": 78,
+      "wire_est_upper_bound": 83
+     },
+     "orders": 377,
+     "orders_per_min_by_counted_rate": 1130,
+     "orders_per_min_by_submits": 1131,
+     "peak_open_orders": 50,
+     "receipt_slots_replayed_from_journal": {
+      "equal": true,
+      "max_abs_slot_difference": 0
+     },
+     "seconds": 20,
+     "skipped_slots": 123,
+     "target_msgs_per_s": 50,
+     "wire_est_refined_msgs_per_s_mean": 49.05,
+     "wire_est_refined_msgs_per_s_mean_by_order_rung": 49.35,
+     "wire_est_upper_bound_msgs_per_s_mean": 56.45,
+     "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 56.55
+    }
+   ],
+   "steps": {
+    "S3": {
+     "result": "pass",
+     "seconds": 0.091
+    },
+    "S3_observation": {},
+    "S4": {
+     "result": "pass",
+     "seconds": 102.543
+    },
+    "preflight": {
+     "result": "pass",
+     "seconds": -0.0
+    }
+   },
+   "unaccepted_cancels": 258,
+   "vendor_log_line_counts": {
+    "cancel_commands_with_perm_venue_id": 1102,
+    "cancel_commands_without_venue_id": 258,
+    "code_100_lines": 0,
+    "notice_10147_cancel_not_found": 0,
+    "notice_103_duplicate_order_id": 0,
+    "notice_2100_account_data_unsubscribed": 0,
+    "pacing_text_lines": 0
+   },
+   "window_pairs_max": 50
+  }
+ ],
+ "adapter_two_connection_pairs": [
+  {
+   "combined_rate_estimates": {
+    "counted_msgs_per_s": {
+     "best_5s_mean": 26.0,
+     "best_5s_mean_utc_buckets": 25.6,
+     "max_1s": 33,
+     "max_1s_utc_buckets": 29
+    },
+    "wire_est_refined_msgs_per_s": {
+     "best_5s_mean": 39.4,
+     "best_5s_mean_utc_buckets": 38.8,
+     "max_1s": 52,
+     "max_1s_utc_buckets": 44
+    },
+    "wire_est_upper_bound_msgs_per_s": {
+     "best_5s_mean": 39.6,
+     "best_5s_mean_utc_buckets": 38.8,
+     "max_1s": 53,
+     "max_1s_utc_buckets": 45
+    }
+   },
+   "connections": {
+    "higher_partition": {
+     "abort_reason": null,
+     "accept_latency_all_ms": {
+      "max_ms": 1013.281,
+      "n": 695,
+      "p50_ms": 599.776,
+      "p95_ms": 880.387
+     },
+     "api_connections_of_the_node": 2,
+     "cancel_latency_all_ms": {
+      "max_ms": 1789.756,
+      "n": 695,
+      "p50_ms": 873.349,
+      "p95_ms": 1054.662
+     },
+     "event_counts": {
+      "accepted": 695,
+      "cancel_rejected": 2,
+      "canceled": 695,
+      "initialized": 695,
+      "pending_cancel": 1387,
+      "submitted": 695,
+      "updated": 695
+     },
+     "fills_with_commission": 0,
+     "final_net_position": 0,
+     "final_open_orders": 0,
+     "first_refused_order_index": null,
+     "journal_cancel_events": 697,
+     "journal_submit_events": 695,
+     "kind": "adapter",
+     "label": "L1-m1",
+     "node_error_class": null,
+     "order_writing_connections": 1,
+     "orders_this_phase": 695,
+     "pacing_error_count": 0,
+     "phase": "L",
+     "rate_estimates_whole_run": {
+      "counted_msgs_per_s": {
+       "best_5s_mean": 26.0,
+       "best_5s_mean_utc_buckets": 25.6,
+       "max_1s": 33,
+       "max_1s_utc_buckets": 29
+      },
+      "wire_est_refined_msgs_per_s": {
+       "best_5s_mean": 39.4,
+       "best_5s_mean_utc_buckets": 38.8,
+       "max_1s": 52,
+       "max_1s_utc_buckets": 44
+      },
+      "wire_est_upper_bound_msgs_per_s": {
+       "best_5s_mean": 39.6,
+       "best_5s_mean_utc_buckets": 38.8,
+       "max_1s": 53,
+       "max_1s_utc_buckets": 45
+      }
+     },
+     "rungs": [
+      {
+       "accept_ms": {
+        "max_ms": 967.462,
+        "n": 100,
+        "p50_ms": 538.125,
+        "p90_ms": 771.247
+       },
+       "cancel_ms": {
+        "max_ms": 1789.765,
+        "n": 100,
+        "p50_ms": 797.077,
+        "p90_ms": 1038.476
+       },
+       "cancels_before_acceptance": 0,
+       "cancels_sent": 100,
+       "cancels_sent_in_other_rung_window": 1,
+       "cancels_sent_in_own_window": 99,
+       "cancels_sent_outside_rung_windows": 0,
+       "cancels_with_known_venue_id": 100,
+       "counted_msgs_per_s_max": 12,
+       "counted_msgs_per_s_mean": 9.95,
+       "counted_msgs_per_s_min": 9,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 13,
+        "wire_est_refined": 21,
+        "wire_est_upper_bound": 21
+       },
+       "orders": 100,
+       "orders_per_min_by_counted_rate": 298,
+       "orders_per_min_by_submits": 300,
+       "peak_open_orders": 12,
+       "receipt_slots_replayed_from_journal": {
+        "equal": true,
+        "max_abs_slot_difference": 0
+       },
+       "seconds": 20,
+       "skipped_slots": 0,
+       "target_msgs_per_s": 10,
+       "wire_est_refined_msgs_per_s_mean": 14.9,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 15.0,
+       "wire_est_upper_bound_msgs_per_s_mean": 14.9,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 15.0
+      },
+      {
+       "accept_ms": {
+        "max_ms": 1013.201,
+        "n": 150,
+        "p50_ms": 564.513,
+        "p90_ms": 807.208
+       },
+       "cancel_ms": {
+        "max_ms": 1172.815,
+        "n": 150,
+        "p50_ms": 839.238,
+        "p90_ms": 1002.437
+       },
+       "cancels_before_acceptance": 1,
+       "cancels_sent": 150,
+       "cancels_sent_in_other_rung_window": 4,
+       "cancels_sent_in_own_window": 146,
+       "cancels_sent_outside_rung_windows": 0,
+       "cancels_with_known_venue_id": 149,
+       "counted_msgs_per_s_max": 19,
+       "counted_msgs_per_s_mean": 14.85,
+       "counted_msgs_per_s_min": 11,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 21,
+        "wire_est_refined": 33,
+        "wire_est_upper_bound": 34
+       },
+       "orders": 150,
+       "orders_per_min_by_counted_rate": 446,
+       "orders_per_min_by_submits": 450,
+       "peak_open_orders": 15,
+       "receipt_slots_replayed_from_journal": {
+        "equal": true,
+        "max_abs_slot_difference": 0
+       },
+       "seconds": 20,
+       "skipped_slots": 0,
+       "target_msgs_per_s": 15,
+       "wire_est_refined_msgs_per_s_mean": 22.15,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 22.45,
+       "wire_est_upper_bound_msgs_per_s_mean": 22.2,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 22.5
+      },
+      {
+       "accept_ms": {
+        "max_ms": 955.369,
+        "n": 197,
+        "p50_ms": 601.717,
+        "p90_ms": 828.132
+       },
+       "cancel_ms": {
+        "max_ms": 1127.402,
+        "n": 197,
+        "p50_ms": 872.864,
+        "p90_ms": 988.594
+       },
+       "cancels_before_acceptance": 0,
+       "cancels_sent": 197,
+       "cancels_sent_in_other_rung_window": 7,
+       "cancels_sent_in_own_window": 190,
+       "cancels_sent_outside_rung_windows": 0,
+       "cancels_with_known_venue_id": 197,
+       "counted_msgs_per_s_max": 23,
+       "counted_msgs_per_s_mean": 19.5,
+       "counted_msgs_per_s_min": 16,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 24,
+        "wire_est_refined": 37,
+        "wire_est_upper_bound": 37
+       },
+       "orders": 197,
+       "orders_per_min_by_counted_rate": 585,
+       "orders_per_min_by_submits": 591,
+       "peak_open_orders": 20,
+       "receipt_slots_replayed_from_journal": {
+        "equal": false,
+        "max_abs_slot_difference": 1
+       },
+       "seconds": 20,
+       "skipped_slots": 3,
+       "target_msgs_per_s": 20,
+       "wire_est_refined_msgs_per_s_mean": 29.25,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 29.55,
+       "wire_est_upper_bound_msgs_per_s_mean": 29.25,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 29.55
+      },
+      {
+       "accept_ms": {
+        "max_ms": 1008.145,
+        "n": 248,
+        "p50_ms": 628.863,
+        "p90_ms": 873.226
+       },
+       "cancel_ms": {
+        "max_ms": 1212.371,
+        "n": 248,
+        "p50_ms": 894.156,
+        "p90_ms": 1033.459
+       },
+       "cancels_before_acceptance": 2,
+       "cancels_sent": 248,
+       "cancels_sent_in_other_rung_window": 0,
+       "cancels_sent_in_own_window": 239,
+       "cancels_sent_outside_rung_windows": 9,
+       "cancels_with_known_venue_id": 246,
+       "counted_msgs_per_s_max": 29,
+       "counted_msgs_per_s_mean": 24.8,
+       "counted_msgs_per_s_min": 21,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 33,
+        "wire_est_refined": 52,
+        "wire_est_upper_bound": 53
+       },
+       "orders": 248,
+       "orders_per_min_by_counted_rate": 744,
+       "orders_per_min_by_submits": 744,
+       "peak_open_orders": 26,
+       "receipt_slots_replayed_from_journal": {
+        "equal": true,
+        "max_abs_slot_difference": 0
+       },
+       "seconds": 20,
+       "skipped_slots": 2,
+       "target_msgs_per_s": 25,
+       "wire_est_refined_msgs_per_s_mean": 37.15,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 37.1,
+       "wire_est_upper_bound_msgs_per_s_mean": 37.2,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 37.2
+      }
+     ],
+     "steps": {
+      "S4": {
+       "result": "pass",
+       "seconds": 81.382
+      },
+      "preflight": {
+       "result": "pass",
+       "seconds": -0.0
+      }
+     },
+     "unaccepted_cancels": 3,
+     "vendor_log_line_counts": {
+      "cancel_commands_with_perm_venue_id": 694,
+      "cancel_commands_without_venue_id": 3,
+      "code_100_lines": 0,
+      "notice_10147_cancel_not_found": 0,
+      "notice_103_duplicate_order_id": 0,
+      "notice_2100_account_data_unsubscribed": 82,
+      "pacing_text_lines": 0
+     },
+     "window_pairs_max": 40
+    },
+    "lower_partition": {
+     "abort_reason": "order_rejected:S4",
+     "accept_latency_all_ms": {
+      "max_ms": 126.229,
+      "n": 1,
+      "p50_ms": 126.229,
+      "p95_ms": 126.229
+     },
+     "api_connections_of_the_node": 2,
+     "cancel_latency_all_ms": {
+      "max_ms": 673.57,
+      "n": 1,
+      "p50_ms": 673.57,
+      "p95_ms": 673.57
+     },
+     "event_counts": {
+      "accepted": 1,
+      "canceled": 1,
+      "initialized": 11,
+      "pending_cancel": 12,
+      "rejected": 10,
+      "submitted": 11,
+      "updated": 1
+     },
+     "fills_with_commission": 0,
+     "final_net_position": 0,
+     "final_open_orders": 0,
+     "first_refused_order_index": 2,
+     "journal_cancel_events": 6,
+     "journal_submit_events": 11,
+     "kind": "adapter",
+     "label": "L0-m1",
+     "node_error_class": null,
+     "order_writing_connections": 1,
+     "orders_this_phase": 11,
+     "pacing_error_count": 0,
+     "phase": "L",
+     "rate_estimates_whole_run": {
+      "counted_msgs_per_s": {
+       "best_5s_mean": 3.4,
+       "best_5s_mean_utc_buckets": 3.4,
+       "max_1s": 10,
+       "max_1s_utc_buckets": 8
+      },
+      "wire_est_refined_msgs_per_s": {
+       "best_5s_mean": 3.6,
+       "best_5s_mean_utc_buckets": 3.6,
+       "max_1s": 10,
+       "max_1s_utc_buckets": 8
+      },
+      "wire_est_upper_bound_msgs_per_s": {
+       "best_5s_mean": 4.6,
+       "best_5s_mean_utc_buckets": 4.6,
+       "max_1s": 15,
+       "max_1s_utc_buckets": 12
+      }
+     },
+     "rungs": [
+      {
+       "accept_ms": {
+        "max_ms": 126.159,
+        "n": 1,
+        "p50_ms": 126.159,
+        "p90_ms": 126.159
+       },
+       "cancel_ms": {
+        "max_ms": 673.579,
+        "n": 1,
+        "p50_ms": 673.579,
+        "p90_ms": 673.579
+       },
+       "cancels_before_acceptance": 5,
+       "cancels_sent": 6,
+       "cancels_sent_in_other_rung_window": 0,
+       "cancels_sent_in_own_window": 5,
+       "cancels_sent_outside_rung_windows": 1,
+       "cancels_with_known_venue_id": 1,
+       "counted_msgs_per_s_max": 9,
+       "counted_msgs_per_s_mean": 7.5,
+       "counted_msgs_per_s_min": 6,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 9,
+        "wire_est_refined": 9,
+        "wire_est_upper_bound": 13
+       },
+       "orders": 11,
+       "orders_per_min_by_counted_rate": 225,
+       "orders_per_min_by_submits": 330,
+       "peak_open_orders": 10,
+       "receipt_slots_replayed_from_journal": {
+        "equal": true,
+        "max_abs_slot_difference": 0
+       },
+       "seconds": 2,
+       "skipped_slots": 0,
+       "target_msgs_per_s": 10,
+       "wire_est_refined_msgs_per_s_mean": 8.0,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 9.0,
+       "wire_est_upper_bound_msgs_per_s_mean": 10.0,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 11.5
+      }
+     ],
+     "steps": {
+      "S4": {
+       "reason": "order_rejected:S4",
+       "result": "fail"
+      },
+      "preflight": {
+       "result": "pass",
+       "seconds": -0.0
+      }
+     },
+     "unaccepted_cancels": 5,
+     "vendor_log_line_counts": {
+      "cancel_commands_with_perm_venue_id": 1,
+      "cancel_commands_without_venue_id": 10,
+      "code_100_lines": 0,
+      "notice_10147_cancel_not_found": 3,
+      "notice_103_duplicate_order_id": 10,
+      "notice_2100_account_data_unsubscribed": 11,
+      "pacing_text_lines": 0
+     },
+     "window_pairs_max": 40
+    }
+   },
+   "label": "m1",
+   "lower_connection_first_103_notice_after_higher_first_submit_s": 1.24,
+   "lower_connection_first_rejection_after_higher_first_submit_s": 2.95,
+   "lower_first_submit_minus_higher_first_submit_s": 0.78,
+   "order_writing_connections": 2
+  },
+  {
+   "combined_rate_estimates": {
+    "counted_msgs_per_s": {
+     "best_5s_mean": 25.8,
+     "best_5s_mean_utc_buckets": 25.2,
+     "max_1s": 30,
+     "max_1s_utc_buckets": 26
+    },
+    "wire_est_refined_msgs_per_s": {
+     "best_5s_mean": 39.0,
+     "best_5s_mean_utc_buckets": 37.8,
+     "max_1s": 47,
+     "max_1s_utc_buckets": 40
+    },
+    "wire_est_upper_bound_msgs_per_s": {
+     "best_5s_mean": 39.0,
+     "best_5s_mean_utc_buckets": 37.8,
+     "max_1s": 47,
+     "max_1s_utc_buckets": 40
+    }
+   },
+   "connections": {
+    "higher_partition": {
+     "abort_reason": null,
+     "accept_latency_all_ms": {
+      "max_ms": 993.804,
+      "n": 699,
+      "p50_ms": 603.356,
+      "p95_ms": 871.446
+     },
+     "api_connections_of_the_node": 2,
+     "cancel_latency_all_ms": {
+      "max_ms": 1158.301,
+      "n": 699,
+      "p50_ms": 860.663,
+      "p95_ms": 1016.706
+     },
+     "event_counts": {
+      "accepted": 699,
+      "canceled": 699,
+      "initialized": 699,
+      "pending_cancel": 1393,
+      "submitted": 699,
+      "updated": 699
+     },
+     "fills_with_commission": 0,
+     "final_net_position": 0,
+     "final_open_orders": 0,
+     "first_refused_order_index": null,
+     "journal_cancel_events": 699,
+     "journal_submit_events": 699,
+     "kind": "adapter",
+     "label": "L1-m2",
+     "node_error_class": null,
+     "order_writing_connections": 1,
+     "orders_this_phase": 699,
+     "pacing_error_count": 0,
+     "phase": "L",
+     "rate_estimates_whole_run": {
+      "counted_msgs_per_s": {
+       "best_5s_mean": 25.8,
+       "best_5s_mean_utc_buckets": 25.2,
+       "max_1s": 30,
+       "max_1s_utc_buckets": 26
+      },
+      "wire_est_refined_msgs_per_s": {
+       "best_5s_mean": 39.0,
+       "best_5s_mean_utc_buckets": 37.8,
+       "max_1s": 47,
+       "max_1s_utc_buckets": 40
+      },
+      "wire_est_upper_bound_msgs_per_s": {
+       "best_5s_mean": 39.0,
+       "best_5s_mean_utc_buckets": 37.8,
+       "max_1s": 47,
+       "max_1s_utc_buckets": 40
+      }
+     },
+     "rungs": [
+      {
+       "accept_ms": {
+        "max_ms": 807.903,
+        "n": 100,
+        "p50_ms": 469.642,
+        "p90_ms": 721.369
+       },
+       "cancel_ms": {
+        "max_ms": 1158.313,
+        "n": 100,
+        "p50_ms": 760.441,
+        "p90_ms": 987.595
+       },
+       "cancels_before_acceptance": 0,
+       "cancels_sent": 100,
+       "cancels_sent_in_other_rung_window": 2,
+       "cancels_sent_in_own_window": 98,
+       "cancels_sent_outside_rung_windows": 0,
+       "cancels_with_known_venue_id": 100,
+       "counted_msgs_per_s_max": 11,
+       "counted_msgs_per_s_mean": 9.9,
+       "counted_msgs_per_s_min": 9,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 13,
+        "wire_est_refined": 21,
+        "wire_est_upper_bound": 21
+       },
+       "orders": 100,
+       "orders_per_min_by_counted_rate": 297,
+       "orders_per_min_by_submits": 300,
+       "peak_open_orders": 12,
+       "receipt_slots_replayed_from_journal": {
+        "equal": true,
+        "max_abs_slot_difference": 0
+       },
+       "seconds": 20,
+       "skipped_slots": 0,
+       "target_msgs_per_s": 10,
+       "wire_est_refined_msgs_per_s_mean": 14.8,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 15.0,
+       "wire_est_upper_bound_msgs_per_s_mean": 14.8,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 15.0
+      },
+      {
+       "accept_ms": {
+        "max_ms": 898.391,
+        "n": 150,
+        "p50_ms": 523.811,
+        "p90_ms": 793.369
+       },
+       "cancel_ms": {
+        "max_ms": 1111.174,
+        "n": 150,
+        "p50_ms": 816.031,
+        "p90_ms": 969.159
+       },
+       "cancels_before_acceptance": 0,
+       "cancels_sent": 150,
+       "cancels_sent_in_other_rung_window": 2,
+       "cancels_sent_in_own_window": 148,
+       "cancels_sent_outside_rung_windows": 0,
+       "cancels_with_known_venue_id": 150,
+       "counted_msgs_per_s_max": 16,
+       "counted_msgs_per_s_mean": 15.0,
+       "counted_msgs_per_s_min": 14,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 18,
+        "wire_est_refined": 29,
+        "wire_est_upper_bound": 29
+       },
+       "orders": 150,
+       "orders_per_min_by_counted_rate": 450,
+       "orders_per_min_by_submits": 450,
+       "peak_open_orders": 15,
+       "receipt_slots_replayed_from_journal": {
+        "equal": true,
+        "max_abs_slot_difference": 0
+       },
+       "seconds": 20,
+       "skipped_slots": 0,
+       "target_msgs_per_s": 15,
+       "wire_est_refined_msgs_per_s_mean": 22.5,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 22.5,
+       "wire_est_upper_bound_msgs_per_s_mean": 22.5,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 22.5
+      },
+      {
+       "accept_ms": {
+        "max_ms": 972.859,
+        "n": 199,
+        "p50_ms": 625.432,
+        "p90_ms": 845.73
+       },
+       "cancel_ms": {
+        "max_ms": 1088.236,
+        "n": 199,
+        "p50_ms": 869.414,
+        "p90_ms": 990.513
+       },
+       "cancels_before_acceptance": 0,
+       "cancels_sent": 199,
+       "cancels_sent_in_other_rung_window": 5,
+       "cancels_sent_in_own_window": 194,
+       "cancels_sent_outside_rung_windows": 0,
+       "cancels_with_known_venue_id": 199,
+       "counted_msgs_per_s_max": 21,
+       "counted_msgs_per_s_mean": 19.75,
+       "counted_msgs_per_s_min": 18,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 24,
+        "wire_est_refined": 38,
+        "wire_est_upper_bound": 38
+       },
+       "orders": 199,
+       "orders_per_min_by_counted_rate": 592,
+       "orders_per_min_by_submits": 597,
+       "peak_open_orders": 22,
+       "receipt_slots_replayed_from_journal": {
+        "equal": true,
+        "max_abs_slot_difference": 0
+       },
+       "seconds": 20,
+       "skipped_slots": 1,
+       "target_msgs_per_s": 20,
+       "wire_est_refined_msgs_per_s_mean": 29.55,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 29.85,
+       "wire_est_upper_bound_msgs_per_s_mean": 29.55,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 29.85
+      },
+      {
+       "accept_ms": {
+        "max_ms": 993.73,
+        "n": 250,
+        "p50_ms": 635.828,
+        "p90_ms": 869.297
+       },
+       "cancel_ms": {
+        "max_ms": 1147.826,
+        "n": 250,
+        "p50_ms": 890.289,
+        "p90_ms": 1009.922
+       },
+       "cancels_before_acceptance": 0,
+       "cancels_sent": 250,
+       "cancels_sent_in_other_rung_window": 0,
+       "cancels_sent_in_own_window": 245,
+       "cancels_sent_outside_rung_windows": 5,
+       "cancels_with_known_venue_id": 250,
+       "counted_msgs_per_s_max": 27,
+       "counted_msgs_per_s_mean": 25.0,
+       "counted_msgs_per_s_min": 23,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 30,
+        "wire_est_refined": 47,
+        "wire_est_upper_bound": 47
+       },
+       "orders": 250,
+       "orders_per_min_by_counted_rate": 750,
+       "orders_per_min_by_submits": 750,
+       "peak_open_orders": 25,
+       "receipt_slots_replayed_from_journal": {
+        "equal": true,
+        "max_abs_slot_difference": 0
+       },
+       "seconds": 20,
+       "skipped_slots": 0,
+       "target_msgs_per_s": 25,
+       "wire_est_refined_msgs_per_s_mean": 37.5,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 37.5,
+       "wire_est_upper_bound_msgs_per_s_mean": 37.5,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 37.5
+      }
+     ],
+     "steps": {
+      "S4": {
+       "result": "pass",
+       "seconds": 81.524
+      },
+      "preflight": {
+       "result": "pass",
+       "seconds": -0.0
+      }
+     },
+     "unaccepted_cancels": 0,
+     "vendor_log_line_counts": {
+      "cancel_commands_with_perm_venue_id": 699,
+      "cancel_commands_without_venue_id": 0,
+      "code_100_lines": 0,
+      "notice_10147_cancel_not_found": 0,
+      "notice_103_duplicate_order_id": 0,
+      "notice_2100_account_data_unsubscribed": 83,
+      "pacing_text_lines": 0
+     },
+     "window_pairs_max": 40
+    },
+    "lower_partition": {
+     "abort_reason": "order_rejected:S4",
+     "accept_latency_all_ms": {
+      "max_ms": 59.401,
+      "n": 2,
+      "p50_ms": 41.092,
+      "p95_ms": 59.401
+     },
+     "api_connections_of_the_node": 2,
+     "cancel_latency_all_ms": {
+      "max_ms": 121.994,
+      "n": 2,
+      "p50_ms": 101.828,
+      "p95_ms": 121.994
+     },
+     "event_counts": {
+      "accepted": 2,
+      "canceled": 2,
+      "initialized": 7,
+      "pending_cancel": 8,
+      "rejected": 5,
+      "submitted": 7,
+      "updated": 2
+     },
+     "fills_with_commission": 0,
+     "final_net_position": 0,
+     "final_open_orders": 0,
+     "first_refused_order_index": 3,
+     "journal_cancel_events": 2,
+     "journal_submit_events": 7,
+     "kind": "adapter",
+     "label": "L0-m2",
+     "node_error_class": null,
+     "order_writing_connections": 1,
+     "orders_this_phase": 7,
+     "pacing_error_count": 0,
+     "phase": "L",
+     "rate_estimates_whole_run": {
+      "counted_msgs_per_s": {
+       "best_5s_mean": 1.8,
+       "best_5s_mean_utc_buckets": 1.8,
+       "max_1s": 7,
+       "max_1s_utc_buckets": 5
+      },
+      "wire_est_refined_msgs_per_s": {
+       "best_5s_mean": 2.2,
+       "best_5s_mean_utc_buckets": 2.2,
+       "max_1s": 9,
+       "max_1s_utc_buckets": 7
+      },
+      "wire_est_upper_bound_msgs_per_s": {
+       "best_5s_mean": 2.2,
+       "best_5s_mean_utc_buckets": 2.2,
+       "max_1s": 9,
+       "max_1s_utc_buckets": 7
+      }
+     },
+     "rungs": [
+      {
+       "accept_ms": {
+        "max_ms": 59.355,
+        "n": 2,
+        "p50_ms": 41.002,
+        "p90_ms": 59.355
+       },
+       "cancel_ms": {
+        "max_ms": 122.004,
+        "n": 2,
+        "p50_ms": 101.837,
+        "p90_ms": 122.004
+       },
+       "cancels_before_acceptance": 0,
+       "cancels_sent": 2,
+       "cancels_sent_in_other_rung_window": 0,
+       "cancels_sent_in_own_window": 2,
+       "cancels_sent_outside_rung_windows": 0,
+       "cancels_with_known_venue_id": 2,
+       "counted_msgs_per_s_max": 7,
+       "counted_msgs_per_s_mean": 7.0,
+       "counted_msgs_per_s_min": 7,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 7,
+        "wire_est_refined": 9,
+        "wire_est_upper_bound": 9
+       },
+       "orders": 7,
+       "orders_per_min_by_counted_rate": 210,
+       "orders_per_min_by_submits": 420,
+       "peak_open_orders": 5,
+       "receipt_slots_replayed_from_journal": {
+        "equal": true,
+        "max_abs_slot_difference": 0
+       },
+       "seconds": 1,
+       "skipped_slots": 0,
+       "target_msgs_per_s": 10,
+       "wire_est_refined_msgs_per_s_mean": 9.0,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 11.0,
+       "wire_est_upper_bound_msgs_per_s_mean": 9.0,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 11.0
+      }
+     ],
+     "steps": {
+      "S4": {
+       "reason": "order_rejected:S4",
+       "result": "fail"
+      },
+      "preflight": {
+       "result": "pass",
+       "seconds": -0.0
+      }
+     },
+     "unaccepted_cancels": 0,
+     "vendor_log_line_counts": {
+      "cancel_commands_with_perm_venue_id": 2,
+      "cancel_commands_without_venue_id": 4,
+      "code_100_lines": 0,
+      "notice_10147_cancel_not_found": 3,
+      "notice_103_duplicate_order_id": 5,
+      "notice_2100_account_data_unsubscribed": 10,
+      "pacing_text_lines": 0
+     },
+     "window_pairs_max": 40
+    }
+   },
+   "label": "m2",
+   "lower_connection_first_103_notice_after_higher_first_submit_s": 0.31,
+   "lower_connection_first_rejection_after_higher_first_submit_s": 1.1,
+   "lower_first_submit_minus_higher_first_submit_s": -0.12,
+   "order_writing_connections": 2
+  },
+  {
+   "combined_rate_estimates": {
+    "counted_msgs_per_s": {
+     "best_5s_mean": 20.8,
+     "best_5s_mean_utc_buckets": 20.4,
+     "max_1s": 25,
+     "max_1s_utc_buckets": 21
+    },
+    "wire_est_refined_msgs_per_s": {
+     "best_5s_mean": 31.6,
+     "best_5s_mean_utc_buckets": 30.8,
+     "max_1s": 40,
+     "max_1s_utc_buckets": 32
+    },
+    "wire_est_upper_bound_msgs_per_s": {
+     "best_5s_mean": 31.6,
+     "best_5s_mean_utc_buckets": 30.8,
+     "max_1s": 40,
+     "max_1s_utc_buckets": 32
+    }
+   },
+   "connections": {
+    "higher_partition": {
+     "abort_reason": "s4_cancel_confirm_late",
+     "accept_latency_all_ms": {
+      "max_ms": 962.614,
+      "n": 367,
+      "p50_ms": 525.505,
+      "p95_ms": 828.127
+     },
+     "api_connections_of_the_node": 2,
+     "cancel_latency_all_ms": {
+      "max_ms": 11237.35,
+      "n": 367,
+      "p50_ms": 803.703,
+      "p95_ms": 1018.044
+     },
+     "event_counts": {
+      "accepted": 374,
+      "cancel_rejected": 5,
+      "canceled": 374,
+      "initialized": 374,
+      "pending_cancel": 745,
+      "submitted": 374,
+      "updated": 374
+     },
+     "fills_with_commission": 0,
+     "final_net_position": 0,
+     "final_open_orders": 0,
+     "first_refused_order_index": null,
+     "journal_cancel_events": 371,
+     "journal_submit_events": 374,
+     "kind": "adapter",
+     "label": "L1-m3",
+     "node_error_class": null,
+     "order_writing_connections": 1,
+     "orders_this_phase": 374,
+     "pacing_error_count": 0,
+     "phase": "L",
+     "rate_estimates_whole_run": {
+      "counted_msgs_per_s": {
+       "best_5s_mean": 20.8,
+       "best_5s_mean_utc_buckets": 20.4,
+       "max_1s": 25,
+       "max_1s_utc_buckets": 21
+      },
+      "wire_est_refined_msgs_per_s": {
+       "best_5s_mean": 31.6,
+       "best_5s_mean_utc_buckets": 30.8,
+       "max_1s": 40,
+       "max_1s_utc_buckets": 32
+      },
+      "wire_est_upper_bound_msgs_per_s": {
+       "best_5s_mean": 31.6,
+       "best_5s_mean_utc_buckets": 30.8,
+       "max_1s": 40,
+       "max_1s_utc_buckets": 32
+      }
+     },
+     "rungs": [
+      {
+       "accept_ms": {
+        "max_ms": 894.741,
+        "n": 100,
+        "p50_ms": 399.617,
+        "p90_ms": 696.881
+       },
+       "cancel_ms": {
+        "max_ms": 1030.663,
+        "n": 100,
+        "p50_ms": 593.019,
+        "p90_ms": 893.813
+       },
+       "cancels_before_acceptance": 0,
+       "cancels_sent": 100,
+       "cancels_sent_in_other_rung_window": 2,
+       "cancels_sent_in_own_window": 98,
+       "cancels_sent_outside_rung_windows": 0,
+       "cancels_with_known_venue_id": 100,
+       "counted_msgs_per_s_max": 11,
+       "counted_msgs_per_s_mean": 9.9,
+       "counted_msgs_per_s_min": 9,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 15,
+        "wire_est_refined": 24,
+        "wire_est_upper_bound": 24
+       },
+       "orders": 100,
+       "orders_per_min_by_counted_rate": 297,
+       "orders_per_min_by_submits": 300,
+       "peak_open_orders": 11,
+       "receipt_slots_replayed_from_journal": {
+        "equal": true,
+        "max_abs_slot_difference": 0
+       },
+       "seconds": 20,
+       "skipped_slots": 0,
+       "target_msgs_per_s": 10,
+       "wire_est_refined_msgs_per_s_mean": 14.8,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 15.0,
+       "wire_est_upper_bound_msgs_per_s_mean": 14.8,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 15.0
+      },
+      {
+       "accept_ms": {
+        "max_ms": 911.37,
+        "n": 148,
+        "p50_ms": 556.123,
+        "p90_ms": 776.98
+       },
+       "cancel_ms": {
+        "max_ms": 1092.603,
+        "n": 148,
+        "p50_ms": 816.456,
+        "p90_ms": 1006.313
+       },
+       "cancels_before_acceptance": 0,
+       "cancels_sent": 148,
+       "cancels_sent_in_other_rung_window": 3,
+       "cancels_sent_in_own_window": 145,
+       "cancels_sent_outside_rung_windows": 0,
+       "cancels_with_known_venue_id": 148,
+       "counted_msgs_per_s_max": 16,
+       "counted_msgs_per_s_mean": 14.7,
+       "counted_msgs_per_s_min": 13,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 18,
+        "wire_est_refined": 28,
+        "wire_est_upper_bound": 28
+       },
+       "orders": 148,
+       "orders_per_min_by_counted_rate": 441,
+       "orders_per_min_by_submits": 444,
+       "peak_open_orders": 16,
+       "receipt_slots_replayed_from_journal": {
+        "equal": false,
+        "max_abs_slot_difference": 1
+       },
+       "seconds": 20,
+       "skipped_slots": 2,
+       "target_msgs_per_s": 15,
+       "wire_est_refined_msgs_per_s_mean": 22.1,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 22.2,
+       "wire_est_upper_bound_msgs_per_s_mean": 22.1,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 22.2
+      },
+      {
+       "accept_ms": {
+        "max_ms": 962.538,
+        "n": 126,
+        "p50_ms": 603.46,
+        "p90_ms": 822.065
+       },
+       "cancel_ms": {
+        "max_ms": 11242.079,
+        "n": 119,
+        "p50_ms": 870.707,
+        "p90_ms": 1004.349
+       },
+       "cancels_before_acceptance": 0,
+       "cancels_sent": 119,
+       "cancels_sent_in_other_rung_window": 0,
+       "cancels_sent_in_own_window": 115,
+       "cancels_sent_outside_rung_windows": 4,
+       "cancels_with_known_venue_id": 119,
+       "counted_msgs_per_s_max": 23,
+       "counted_msgs_per_s_mean": 20.0,
+       "counted_msgs_per_s_min": 18,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 25,
+        "wire_est_refined": 40,
+        "wire_est_upper_bound": 40
+       },
+       "orders": 126,
+       "orders_per_min_by_counted_rate": 600,
+       "orders_per_min_by_submits": 630,
+       "peak_open_orders": 21,
+       "receipt_slots_replayed_from_journal": {
+        "equal": true,
+        "max_abs_slot_difference": 0
+       },
+       "seconds": 12,
+       "skipped_slots": 0,
+       "target_msgs_per_s": 20,
+       "wire_est_refined_msgs_per_s_mean": 30.0,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 30.33,
+       "wire_est_upper_bound_msgs_per_s_mean": 30.0,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 30.33
+      }
+     ],
+     "steps": {
+      "S4": {
+       "reason": "s4_cancel_confirm_late",
+       "result": "fail"
+      },
+      "preflight": {
+       "result": "pass",
+       "seconds": -0.0
+      }
+     },
+     "unaccepted_cancels": 0,
+     "vendor_log_line_counts": {
+      "cancel_commands_with_perm_venue_id": 375,
+      "cancel_commands_without_venue_id": 7,
+      "code_100_lines": 0,
+      "notice_10147_cancel_not_found": 0,
+      "notice_103_duplicate_order_id": 0,
+      "notice_2100_account_data_unsubscribed": 62,
+      "pacing_text_lines": 0
+     },
+     "window_pairs_max": 40
+    },
+    "lower_partition": {
+     "abort_reason": null,
+     "api_connections_of_the_node": 2,
+     "event_counts": {},
+     "fills_with_commission": 0,
+     "final_net_position": 0,
+     "final_open_orders": null,
+     "first_refused_order_index": null,
+     "journal_cancel_events": 0,
+     "journal_submit_events": 0,
+     "kind": "adapter",
+     "label": "L0-m3",
+     "node_error_class": "RuntimeError",
+     "order_writing_connections": 1,
+     "orders_this_phase": 0,
+     "pacing_error_count": 0,
+     "phase": "L",
+     "rate_estimates_whole_run": {
+      "counted_msgs_per_s": {
+       "best_5s_mean": 0.0,
+       "best_5s_mean_utc_buckets": 0.0,
+       "max_1s": 0,
+       "max_1s_utc_buckets": 0
+      },
+      "wire_est_refined_msgs_per_s": {
+       "best_5s_mean": 0.0,
+       "best_5s_mean_utc_buckets": 0.0,
+       "max_1s": 0,
+       "max_1s_utc_buckets": 0
+      },
+      "wire_est_upper_bound_msgs_per_s": {
+       "best_5s_mean": 0.0,
+       "best_5s_mean_utc_buckets": 0.0,
+       "max_1s": 0,
+       "max_1s_utc_buckets": 0
+      }
+     },
+     "steps": {},
+     "vendor_log_line_counts": {
+      "cancel_commands_with_perm_venue_id": 0,
+      "cancel_commands_without_venue_id": 0,
+      "code_100_lines": 0,
+      "notice_10147_cancel_not_found": 0,
+      "notice_103_duplicate_order_id": 0,
+      "notice_2100_account_data_unsubscribed": 0,
+      "pacing_text_lines": 0
+     }
+    }
+   },
+   "label": "m3",
+   "lower_connection_first_103_notice_after_higher_first_submit_s": null,
+   "lower_connection_first_rejection_after_higher_first_submit_s": null,
+   "lower_first_submit_minus_higher_first_submit_s": null,
+   "order_writing_connections": 2
+  },
+  {
+   "combined_rate_estimates": {
+    "counted_msgs_per_s": {
+     "best_5s_mean": 26.0,
+     "best_5s_mean_utc_buckets": 25.6,
+     "max_1s": 35,
+     "max_1s_utc_buckets": 28
+    },
+    "wire_est_refined_msgs_per_s": {
+     "best_5s_mean": 39.4,
+     "best_5s_mean_utc_buckets": 38.6,
+     "max_1s": 47,
+     "max_1s_utc_buckets": 43
+    },
+    "wire_est_upper_bound_msgs_per_s": {
+     "best_5s_mean": 39.4,
+     "best_5s_mean_utc_buckets": 38.6,
+     "max_1s": 52,
+     "max_1s_utc_buckets": 43
+    }
+   },
+   "connections": {
+    "higher_partition": {
+     "abort_reason": null,
+     "accept_latency_all_ms": {
+      "max_ms": 1799.702,
+      "n": 600,
+      "p50_ms": 629.297,
+      "p95_ms": 947.689
+     },
+     "api_connections_of_the_node": 2,
+     "cancel_latency_all_ms": {
+      "max_ms": 2854.02,
+      "n": 600,
+      "p50_ms": 885.478,
+      "p95_ms": 1094.981
+     },
+     "event_counts": {
+      "accepted": 600,
+      "canceled": 600,
+      "initialized": 600,
+      "pending_cancel": 1178,
+      "submitted": 600,
+      "updated": 600
+     },
+     "fills_with_commission": 0,
+     "final_net_position": 0,
+     "final_open_orders": 0,
+     "first_refused_order_index": null,
+     "journal_cancel_events": 600,
+     "journal_submit_events": 600,
+     "kind": "adapter",
+     "label": "L1-m4",
+     "node_error_class": null,
+     "order_writing_connections": 1,
+     "orders_this_phase": 600,
+     "pacing_error_count": 0,
+     "phase": "L",
+     "rate_estimates_whole_run": {
+      "counted_msgs_per_s": {
+       "best_5s_mean": 26.0,
+       "best_5s_mean_utc_buckets": 25.6,
+       "max_1s": 30,
+       "max_1s_utc_buckets": 28
+      },
+      "wire_est_refined_msgs_per_s": {
+       "best_5s_mean": 39.4,
+       "best_5s_mean_utc_buckets": 38.6,
+       "max_1s": 47,
+       "max_1s_utc_buckets": 43
+      },
+      "wire_est_upper_bound_msgs_per_s": {
+       "best_5s_mean": 39.4,
+       "best_5s_mean_utc_buckets": 38.6,
+       "max_1s": 47,
+       "max_1s_utc_buckets": 43
+      }
+     },
+     "rungs": [
+      {
+       "accept_ms": {
+        "max_ms": 1799.634,
+        "n": 150,
+        "p50_ms": 658.38,
+        "p90_ms": 1178.319
+       },
+       "cancel_ms": {
+        "max_ms": 2854.024,
+        "n": 150,
+        "p50_ms": 898.321,
+        "p90_ms": 1465.565
+       },
+       "cancels_before_acceptance": 23,
+       "cancels_sent": 150,
+       "cancels_sent_in_other_rung_window": 5,
+       "cancels_sent_in_own_window": 145,
+       "cancels_sent_outside_rung_windows": 0,
+       "cancels_with_known_venue_id": 127,
+       "counted_msgs_per_s_max": 16,
+       "counted_msgs_per_s_mean": 14.75,
+       "counted_msgs_per_s_min": 10,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 21,
+        "wire_est_refined": 31,
+        "wire_est_upper_bound": 34
+       },
+       "orders": 150,
+       "orders_per_min_by_counted_rate": 442,
+       "orders_per_min_by_submits": 450,
+       "peak_open_orders": 26,
+       "receipt_slots_replayed_from_journal": {
+        "equal": true,
+        "max_abs_slot_difference": 0
+       },
+       "seconds": 20,
+       "skipped_slots": 0,
+       "target_msgs_per_s": 15,
+       "wire_est_refined_msgs_per_s_mean": 20.85,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 21.35,
+       "wire_est_upper_bound_msgs_per_s_mean": 22.0,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 22.5
+      },
+      {
+       "accept_ms": {
+        "max_ms": 949.683,
+        "n": 200,
+        "p50_ms": 592.255,
+        "p90_ms": 813.311
+       },
+       "cancel_ms": {
+        "max_ms": 1064.229,
+        "n": 200,
+        "p50_ms": 878.59,
+        "p90_ms": 1004.994
+       },
+       "cancels_before_acceptance": 0,
+       "cancels_sent": 200,
+       "cancels_sent_in_other_rung_window": 7,
+       "cancels_sent_in_own_window": 193,
+       "cancels_sent_outside_rung_windows": 0,
+       "cancels_with_known_venue_id": 200,
+       "counted_msgs_per_s_max": 20,
+       "counted_msgs_per_s_mean": 19.9,
+       "counted_msgs_per_s_min": 18,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 26,
+        "wire_est_refined": 41,
+        "wire_est_upper_bound": 41
+       },
+       "orders": 200,
+       "orders_per_min_by_counted_rate": 597,
+       "orders_per_min_by_submits": 600,
+       "peak_open_orders": 20,
+       "receipt_slots_replayed_from_journal": {
+        "equal": true,
+        "max_abs_slot_difference": 0
+       },
+       "seconds": 20,
+       "skipped_slots": 0,
+       "target_msgs_per_s": 20,
+       "wire_est_refined_msgs_per_s_mean": 29.8,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 30.0,
+       "wire_est_upper_bound_msgs_per_s_mean": 29.8,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 30.0
+      },
+      {
+       "accept_ms": {
+        "max_ms": 981.972,
+        "n": 250,
+        "p50_ms": 637.511,
+        "p90_ms": 858.92
+       },
+       "cancel_ms": {
+        "max_ms": 1101.266,
+        "n": 250,
+        "p50_ms": 885.482,
+        "p90_ms": 992.266
+       },
+       "cancels_before_acceptance": 0,
+       "cancels_sent": 250,
+       "cancels_sent_in_other_rung_window": 0,
+       "cancels_sent_in_own_window": 241,
+       "cancels_sent_outside_rung_windows": 9,
+       "cancels_with_known_venue_id": 250,
+       "counted_msgs_per_s_max": 26,
+       "counted_msgs_per_s_mean": 24.9,
+       "counted_msgs_per_s_min": 23,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 30,
+        "wire_est_refined": 47,
+        "wire_est_upper_bound": 47
+       },
+       "orders": 250,
+       "orders_per_min_by_counted_rate": 747,
+       "orders_per_min_by_submits": 750,
+       "peak_open_orders": 25,
+       "receipt_slots_replayed_from_journal": {
+        "equal": true,
+        "max_abs_slot_difference": 0
+       },
+       "seconds": 20,
+       "skipped_slots": 0,
+       "target_msgs_per_s": 25,
+       "wire_est_refined_msgs_per_s_mean": 37.3,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 37.5,
+       "wire_est_upper_bound_msgs_per_s_mean": 37.3,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 37.5
+      }
+     ],
+     "steps": {
+      "S4": {
+       "result": "pass",
+       "seconds": 61.368
+      },
+      "preflight": {
+       "result": "pass",
+       "seconds": -0.0
+      }
+     },
+     "unaccepted_cancels": 23,
+     "vendor_log_line_counts": {
+      "cancel_commands_with_perm_venue_id": 577,
+      "cancel_commands_without_venue_id": 23,
+      "code_100_lines": 0,
+      "notice_10147_cancel_not_found": 0,
+      "notice_103_duplicate_order_id": 0,
+      "notice_2100_account_data_unsubscribed": 88,
+      "pacing_text_lines": 0
+     },
+     "window_pairs_max": 40
+    },
+    "lower_partition": {
+     "abort_reason": "order_rejected:S4",
+     "accept_latency_all_ms": {
+      "max_ms": 998.645,
+      "n": 179,
+      "p50_ms": 546.604,
+      "p95_ms": 857.428
+     },
+     "api_connections_of_the_node": 2,
+     "cancel_latency_all_ms": {
+      "max_ms": 1598.334,
+      "n": 179,
+      "p50_ms": 872.291,
+      "p95_ms": 1079.715
+     },
+     "event_counts": {
+      "accepted": 179,
+      "canceled": 179,
+      "initialized": 200,
+      "pending_cancel": 379,
+      "rejected": 21,
+      "submitted": 200,
+      "updated": 179
+     },
+     "fills_with_commission": 0,
+     "final_net_position": 0,
+     "final_open_orders": 0,
+     "first_refused_order_index": 180,
+     "journal_cancel_events": 190,
+     "journal_submit_events": 200,
+     "kind": "adapter",
+     "label": "L0-m4",
+     "node_error_class": null,
+     "order_writing_connections": 1,
+     "orders_this_phase": 200,
+     "pacing_error_count": 0,
+     "phase": "L",
+     "rate_estimates_whole_run": {
+      "counted_msgs_per_s": {
+       "best_5s_mean": 19.2,
+       "best_5s_mean_utc_buckets": 18.0,
+       "max_1s": 23,
+       "max_1s_utc_buckets": 20
+      },
+      "wire_est_refined_msgs_per_s": {
+       "best_5s_mean": 27.2,
+       "best_5s_mean_utc_buckets": 27.0,
+       "max_1s": 36,
+       "max_1s_utc_buckets": 30
+      },
+      "wire_est_upper_bound_msgs_per_s": {
+       "best_5s_mean": 28.4,
+       "best_5s_mean_utc_buckets": 27.0,
+       "max_1s": 36,
+       "max_1s_utc_buckets": 30
+      }
+     },
+     "rungs": [
+      {
+       "accept_ms": {
+        "max_ms": 998.584,
+        "n": 150,
+        "p50_ms": 542.421,
+        "p90_ms": 812.698
+       },
+       "cancel_ms": {
+        "max_ms": 1598.355,
+        "n": 150,
+        "p50_ms": 863.575,
+        "p90_ms": 1012.988
+       },
+       "cancels_before_acceptance": 0,
+       "cancels_sent": 150,
+       "cancels_sent_in_other_rung_window": 3,
+       "cancels_sent_in_own_window": 147,
+       "cancels_sent_outside_rung_windows": 0,
+       "cancels_with_known_venue_id": 150,
+       "counted_msgs_per_s_max": 20,
+       "counted_msgs_per_s_mean": 14.85,
+       "counted_msgs_per_s_min": 12,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 22,
+        "wire_est_refined": 36,
+        "wire_est_upper_bound": 36
+       },
+       "orders": 150,
+       "orders_per_min_by_counted_rate": 446,
+       "orders_per_min_by_submits": 450,
+       "peak_open_orders": 16,
+       "receipt_slots_replayed_from_journal": {
+        "equal": true,
+        "max_abs_slot_difference": 0
+       },
+       "seconds": 20,
+       "skipped_slots": 0,
+       "target_msgs_per_s": 15,
+       "wire_est_refined_msgs_per_s_mean": 22.2,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 22.5,
+       "wire_est_upper_bound_msgs_per_s_mean": 22.2,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 22.5
+      },
+      {
+       "accept_ms": {
+        "max_ms": 860.863,
+        "n": 29,
+        "p50_ms": 576.737,
+        "p90_ms": 803.686
+       },
+       "cancel_ms": {
+        "max_ms": 1035.687,
+        "n": 29,
+        "p50_ms": 886.056,
+        "p90_ms": 1003.794
+       },
+       "cancels_before_acceptance": 11,
+       "cancels_sent": 40,
+       "cancels_sent_in_other_rung_window": 0,
+       "cancels_sent_in_own_window": 30,
+       "cancels_sent_outside_rung_windows": 10,
+       "cancels_with_known_venue_id": 29,
+       "counted_msgs_per_s_max": 23,
+       "counted_msgs_per_s_mean": 18.25,
+       "counted_msgs_per_s_min": 16,
+       "max_1s_sliding_in_rung_window": {
+        "counted": 23,
+        "wire_est_refined": 36,
+        "wire_est_upper_bound": 36
+       },
+       "orders": 50,
+       "orders_per_min_by_counted_rate": 548,
+       "orders_per_min_by_submits": 750,
+       "peak_open_orders": 21,
+       "receipt_slots_replayed_from_journal": {
+        "equal": true,
+        "max_abs_slot_difference": 0
+       },
+       "seconds": 4,
+       "skipped_slots": 0,
+       "target_msgs_per_s": 20,
+       "wire_est_refined_msgs_per_s_mean": 26.25,
+       "wire_est_refined_msgs_per_s_mean_by_order_rung": 29.75,
+       "wire_est_upper_bound_msgs_per_s_mean": 26.5,
+       "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 32.5
+      }
+     ],
+     "steps": {
+      "S4": {
+       "reason": "order_rejected:S4",
+       "result": "fail"
+      },
+      "preflight": {
+       "result": "pass",
+       "seconds": -0.0
+      }
+     },
+     "unaccepted_cancels": 11,
+     "vendor_log_line_counts": {
+      "cancel_commands_with_perm_venue_id": 179,
+      "cancel_commands_without_venue_id": 21,
+      "code_100_lines": 0,
+      "notice_10147_cancel_not_found": 12,
+      "notice_103_duplicate_order_id": 21,
+      "notice_2100_account_data_unsubscribed": 34,
+      "pacing_text_lines": 0
+     },
+     "window_pairs_max": 40
+    }
+   },
+   "label": "m4",
+   "lower_connection_first_103_notice_after_higher_first_submit_s": 0.82,
+   "lower_connection_first_rejection_after_higher_first_submit_s": 2.29,
+   "lower_first_submit_minus_higher_first_submit_s": -22.72,
+   "order_writing_connections": 2
+  }
+ ],
+ "caveats": [
+  "The 1,500 orders a minute with cancels at 50 msgs/s was measured over one 20-second rung, not a full minute.",
+  "The third wire message per order (one reqAllOpenOrders per cancel) is derived from the adapter source at the pin; it was not captured on the wire.",
+  "The official client was not tested above 50 msgs/s (cap); whether the Gateway saturates between 50 and 57 is unmeasured.",
+  "Adapter rungs whose wire estimate exceeded 50 msgs/s ran above the cap in wire terms; no pacing text, no code 100 and no disconnect occurred.",
+  "The counted rate excludes the hidden request; the wire estimate is the cap-relevant figure.",
+  "Broker-side completed-order counts (6,292 and 8,494) are live raw-protocol reads recorded in the session transcript, not receipt files.",
+  "A first count attempt through a Nautilus node returned zero orders and is not used as evidence.",
+  "The pair tests T1..T10 and the reqIds probe were placed after the second independent count; a third raw-protocol count (10,313) is transcript-derived and reconciles by arithmetic (ADDENDUM-01).",
+  "Of the 38 journal orders absent at the broker, 35 carry the venue's [103] duplicate-order-id refusal, 1 a cancel-target-not-found rejection and 2 never reached the adapter (revision 2 corrects the v1 label of 36 as [103]).",
+  "Latencies of the pair tests are single 14-30 second runs at 10 msgs/s per connection and are not a latency study.",
+  "Timing offsets compare two timestamps taken on one host clock.",
+  "Per-second maxima (revision 3): whole-run, combined and per-rung-window `max_1s` / `best_5s_mean` are maxima over sliding windows anchored at a message; the revision-2 UTC-bucket values are kept as `*_utc_buckets` and are never above them.",
+  "The receipts' own per-rung `counted_msgs_per_s_min` / `counted_msgs_per_s_max` are fixed one-second slot counters, so they are bucket values and lower bounds of the sliding maximum; the official client's receipts hold no per-message times, so its per-second maxima cannot be recomputed under the sliding definition.",
+  "`peak_open_orders` of the adapter runs closes an order at its first terminal order event (revision 3); the official client's `peak_open_orders` is the probe's own run-time counter and is not recomputable from the receipts.",
+  "Per-rung wire means (revision 4) are the wire-series messages inside the rung's own window divided by its recorded seconds: they include the cancels of other rungs' orders sent in the window and exclude the cancels of the rung's own orders sent outside it, and for a rung stopped part-way they cover only its recorded seconds; the order-attributed values of revisions 1 to 3 are kept as `*_by_order_rung`."
+ ],
+ "facts": {
+  "develop_commits_ahead_of_pin": 26,
+  "develop_head_compared": "ca478e42f434d2ce185493f2bb42d112a88d1ffe",
+  "ib_adapter_changes_between_pin_and_head": [
+   "#5274 Fix Interactive Brokers order denial and position reports (3e49ffe2)",
+   "#5306 Fail IB order ID start above client partition (ddeba535)"
+  ],
+  "ib_api_server_version": 225,
+  "message_counting": {
+   "basis": "SOURCE-derived from the adapter's cancel path at the pin and cross-checked against the vendor logs' cancel commands; not captured on the wire",
+   "counted": "placeOrder + cancelOrder (what the harness receipts report)",
+   "official_client_probe": "placeOrder + cancelOrder only (no per-cancel request): its wire rate equals its counted rate",
+   "wire_estimate_refined": "counted + one reqAllOpenOrders per cancel of an order that was already accepted (its cancel carries a PERM venue id; journal reasons other than unaccepted_after_1s)",
+   "wire_estimate_upper_bound": "counted + one reqAllOpenOrders per cancel"
+  },
+  "nautilus_trader_pin": "01ced2a3e7b7d25ae7b2e5c0c077bcc46192eb25",
+  "nautilus_trader_pin_description": "develop 2.0.0rc7.dev20261012, CPython 3.13",
+  "official_client": "IB Python client 10.46.01 as vendored by the nautilus_ibapi mirror, one connection per probe",
+  "paper_marker": {
+   "all_connected": true,
+   "all_exactly_one_managed_account": true,
+   "all_paper_shaped_code": true,
+   "all_port_is_paper_gateway_4002": true,
+   "booleans_checked": [
+    "all_match_DU",
+    "exactly_one_account",
+    "paper_marker_present",
+    "port_is_4002",
+    "connected"
+   ],
+   "marker_checks": 20,
+   "server_versions": [
+    225
+   ]
+  },
+  "peak_open_orders_definition": {
+   "derivation": "the journals' own `event` vocabulary intersected with the Nautilus terminal order events (filled, canceled, cancelled, expired, denied, rejected); order_cancel_rejected (a refused cancel) and order_pending_cancel are not terminal",
+   "journal_event_vocabulary": [
+    "abort",
+    "accept_latency",
+    "account_ready",
+    "cancel",
+    "cancel_all",
+    "cancel_rejected_wait",
+    "order_accepted",
+    "order_cancel_rejected",
+    "order_canceled",
+    "order_filled",
+    "order_initialized",
+    "order_pending_cancel",
+    "order_rejected",
+    "order_submitted",
+    "order_updated",
+    "request",
+    "rung_end",
+    "rung_start",
+    "s4_underrate",
+    "snapshot",
+    "start",
+    "step_enter",
+    "step_pass",
+    "stop_node",
+    "submit"
+   ],
+   "ladder_order_quantities": [
+    1
+   ],
+   "official_client_peak_open": "source-derived from the private probe script, not recomputable: the receipts' `peak_open_orders` of the official-client runs are the probe's own run-time counter (at each placement: the orders already placed and not marked done, plus the one being placed); the probe marks an order done only on a Cancelled / ApiCancelled / Inactive status, a 202 notice or a 10147 / 10148 error, so a [103]-refused order counts as open until its stale cancel is answered; these values are unchanged in revisions 3 and 4",
+   "open_from": "the order's `submit` journal row",
+   "open_until": "the order's FIRST terminal order event; an order with no terminal event (an order_submitted with no later event, for one) stays open to the end of the journal",
+   "order_event_names_not_terminal": [
+    "order_accepted",
+    "order_cancel_rejected",
+    "order_initialized",
+    "order_pending_cancel",
+    "order_submitted",
+    "order_updated"
+   ],
+   "partial_fills": "every ladder order has quantity 1, so an order_filled event is a complete fill",
+   "peak": "the running count is updated at every submit and every terminal event of a rung's own orders and the rung's peak is the largest value reached; at equal timestamps terminal events are applied before submits",
+   "revision_2_defect": "revision 2 closed an order only at order_canceled, so a rejected, filled, expired or denied order stayed open for ever",
+   "scope": "adapter ladder orders (journal step S4), per rung of the receipt's ladder",
+   "terminal_event_names": [
+    "order_canceled",
+    "order_filled",
+    "order_rejected"
+   ],
+   "terminal_names_absent_from_the_journals": [
+    "order_cancelled",
+    "order_denied",
+    "order_expired"
+   ]
+  },
+  "rate_window_conventions": {
+   "anchor": "a window can always be shifted right to the first message it holds without losing one, so the maximum over every real start time equals the maximum over message-anchored windows",
+   "best_5s_mean": "the largest number of messages of the series in any half-open interval [t, t + 5 s) whose start t is the timestamp of a message of that series, divided by 5, rounded to 2 decimals",
+   "field_changes_in_revision_3": {
+    "added": [
+     "max_1s_utc_buckets",
+     "best_5s_mean_utc_buckets",
+     "max_1s_sliding_in_rung_window",
+     "receipt_slots_replayed_from_journal",
+     "reconciliation.journal_orders_missing_by_number_of_owner_journals",
+     "facts.rate_window_conventions",
+     "facts.peak_open_orders_definition"
+    ],
+    "renamed": [
+     "max_1s -> max_1s_utc_buckets",
+     "best_5s_mean -> best_5s_mean_utc_buckets"
+    ],
+    "same_name_new_meaning": [
+     "max_1s",
+     "best_5s_mean"
+    ]
+   },
+   "field_changes_in_revision_4": {
+    "added": [
+     "cancels_sent_in_own_window",
+     "cancels_sent_in_other_rung_window",
+     "cancels_sent_outside_rung_windows",
+     "facts.rate_window_conventions.rung_wire_means",
+     "facts.rate_window_conventions.field_changes_in_revision_4",
+     "revision.reason"
+    ],
+    "key_renamed_in_this_block": [
+     "field_changes -> field_changes_in_revision_3"
+    ],
+    "renamed": [
+     "the revision-3 value of wire_est_refined_msgs_per_s_mean -> wire_est_refined_msgs_per_s_mean_by_order_rung",
+     "the revision-3 value of wire_est_upper_bound_msgs_per_s_mean -> wire_est_upper_bound_msgs_per_s_mean_by_order_rung"
+    ],
+    "same_name_new_meaning": [
+     "wire_est_refined_msgs_per_s_mean",
+     "wire_est_upper_bound_msgs_per_s_mean (every adapter rung, and the adapter_r6_rung30/40/50 headline entries)"
+    ]
+   },
+   "interval": "half-open: a message exactly 1 s (5 s) after the start is outside the window; timestamps are compared as exact integer microseconds since the Unix epoch, never as floating-point seconds",
+   "max_1s": "the largest number of messages of the series in any half-open interval [t, t + 1 s) whose start t is the timestamp of a message of that series",
+   "official_client": "the official-client receipts hold no per-message times, so their per-second maxima cannot be recomputed under the sliding definition",
+   "parameters": {
+    "anchor": "message timestamp",
+    "best_5s_mean_window_us": 5000000,
+    "interval": "start inclusive, end exclusive",
+    "max_1s_window_us": 1000000,
+    "time_unit": "integer microseconds"
+   },
+   "receipt_slot_counters": "counted_msgs_per_s_min and counted_msgs_per_s_max of a rung are the receipts' own fixed one-second slot counters (from the rung start for the adapter, integer seconds of the probe's monotonic clock for the official client): bucket values, hence lower bounds of the sliding maximum; they are unchanged",
+   "rung_window": "max_1s_sliding_in_rung_window applies the same sliding maximum to the step-S4 submit and cancel rows inside a rung's window, which starts at the S4 step_enter row's timestamp plus (rung index x the frozen rung_s) and lasts the rung's recorded seconds; it is the harness's own per-second slot grid replayed from the journal",
+   "rung_window_replay": {
+    "largest_slot_difference_in_messages": 1,
+    "reading": "where the replay differs, one message was sent in the milliseconds between the nominal end of the previous rung and the harness tick that journalled the next rung's start; the harness does not count such a message (its slot index, 20, falls outside the finished rung's 20-slot row) and the replay counts it in the first slot of the new window",
+    "rungs": 40,
+    "slots_equal_to_the_receipts_per_second_counters": 38
+   },
+   "rung_wire_means": "wire_est_refined_msgs_per_s_mean and wire_est_upper_bound_msgs_per_s_mean of an adapter rung (and of the adapter_r6_rung30/40/50 headline entries) are the number of messages of that series whose journal time lies inside the rung's own window, divided by the rung's recorded seconds and rounded to 2 decimals: the same window rows and message series as max_1s_sliding_in_rung_window, the hidden reqAllOpenOrders counted as in `series`. They include the cancels of other rungs' orders that were sent inside the window and exclude the cancels (and, for a rung stopped part-way, the submits after its recorded seconds) of the rung's own orders that were sent outside it. Revisions 1 to 3 published (submits + cancels + known) / seconds with cancels and known counted over the orders the rung SUBMITTED wherever they were sent; those values are kept as wire_est_refined_msgs_per_s_mean_by_order_rung and wire_est_upper_bound_msgs_per_s_mean_by_order_rung. cancels_sent, cancels_with_known_venue_id and cancels_before_acceptance stay order-attributed (the first cancel row of each order the rung submitted); cancels_sent_in_own_window, cancels_sent_in_other_rung_window and cancels_sent_outside_rung_windows classify those same first cancel rows by journal time against every rung window of the run and sum to cancels_sent",
+   "series": "counted = one message per submit row and per cancel row; wire_est_refined and wire_est_upper_bound add the adapter's hidden reqAllOpenOrders per cancel (refined: only for a cancel of an order that had been accepted), stamped with the cancel row's timestamp because the journal does not timestamp it",
+   "utc_buckets": "max_1s_utc_buckets and best_5s_mean_utc_buckets are the revision-2 numbers: messages per UTC second (the integer second of the timestamp), the largest bucket and the best mean of 5 consecutive buckets; a sliding maximum is never below its bucket value and exceeds it when a burst straddles a second boundary"
+  },
+  "source_citations_at_the_pin": {
+   "blob_url_form": "https://github.com/nautechsystems/nautilus_trader/blob/01ced2a3e7b7d25ae7b2e5c0c077bcc46192eb25/crates/adapters/interactive_brokers/src/execution/core.rs#L<line>",
+   "commit": "01ced2a3e7b7d25ae7b2e5c0c077bcc46192eb25",
+   "file": "crates/adapters/interactive_brokers/src/execution/core.rs",
+   "open_order_requests_in_the_adapter_sources": {
+    "all_open_orders_calls": {
+     "by_file": {
+      "execution/commands.rs": 1,
+      "execution/core.rs": 5,
+      "execution/incarnations.rs": 1,
+      "execution/order_state.rs": 1,
+      "execution/reports.rs": 2,
+      "execution/updates.rs": 1
+     },
+     "total": 11
+    },
+    "client_scoped_open_orders_calls": 0,
+    "scope": "the 54 .rs files under crates/adapters/interactive_brokers/src/, string occurrences, identical at the pin and at the develop head"
+   },
+   "repository": "nautechsystems/nautilus_trader",
+   "same_symbols_at_develop_head_ca478e42f434d2ce185493f2bb42d112a88d1ffe": [
+    {
+     "definition_line": 382,
+     "symbol": "IbOrderSelector::from_venue_order_id"
+    },
+    {
+     "definition_line": 2409,
+     "selector_built_at_line": 2439,
+     "symbol": "handle_cancel_order_async"
+    },
+    {
+     "all_open_orders_call_line": 2659,
+     "definition_line": 2646,
+     "symbol": "resolve_ib_order_id"
+    }
+   ],
+   "symbols": [
+    {
+     "definition_line": 381,
+     "symbol": "IbOrderSelector::from_venue_order_id",
+     "what": "a venue id with the PERM- prefix becomes a PermId selector (a numeric id becomes an OrderId selector)"
+    },
+    {
+     "definition_line": 2387,
+     "resolve_call_line": 2429,
+     "selector_built_at_line": 2417,
+     "symbol": "handle_cancel_order_async",
+     "what": "builds the selector from the cancel command's venue_order_id, or from the order id map when the command has none, and calls resolve_ib_order_id"
+    },
+    {
+     "all_open_orders_call_line": 2637,
+     "definition_line": 2624,
+     "symbol": "resolve_ib_order_id",
+     "what": "an OrderId selector returns at once; a PermId selector is resolved with client.all_open_orders(), one reqAllOpenOrders per cancel of an accepted order"
+    }
+   ]
+  },
+  "upstream_issue_cited_nothing_filed": "nautechsystems/nautilus_trader#5277"
+ },
+ "headline_numbers": [
+  {
+   "id": "official_rung50_counted_msgs_per_s_mean",
+   "source": "P-r1",
+   "unit": "msgs/s",
+   "value": 49.95
+  },
+  {
+   "id": "official_rung50_orders_in_rung",
+   "source": "P-r1",
+   "unit": "orders",
+   "value": 500
+  },
+  {
+   "id": "official_rung50_seconds",
+   "source": "P-r1",
+   "unit": "s",
+   "value": 20
+  },
+  {
+   "id": "official_rung50_orders_per_min_with_cancel",
+   "source": "P-r1",
+   "unit": "orders/min",
+   "value": 1500
+  },
+  {
+   "id": "official_rung50_msgs_per_min",
+   "source": "P-r1 (mean x 60)",
+   "unit": "msgs/min",
+   "value": 2997
+  },
+  {
+   "id": "official_ladder_orders_accepted_cancelled_open_at_end",
+   "source": "P-r1",
+   "unit": "count",
+   "value": [
+    1650,
+    1650,
+    1650,
+    0
+   ]
+  },
+  {
+   "id": "adapter_r6_rung30",
+   "source": "B-r6 receipt + journal",
+   "unit": "mixed",
+   "value": {
+    "counted_msgs_per_s_mean": 29.9,
+    "counted_times_1_5": 44.85,
+    "orders_per_min_by_counted_rate": 897,
+    "orders_per_min_by_submits": 900,
+    "wire_est_refined_msgs_per_s_mean": 44.75,
+    "wire_est_refined_msgs_per_s_mean_by_order_rung": 44.95,
+    "wire_est_upper_bound_msgs_per_s_mean": 44.8,
+    "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 45.0
+   }
+  },
+  {
+   "id": "adapter_r6_rung40",
+   "source": "B-r6 receipt + journal",
+   "unit": "mixed",
+   "value": {
+    "counted_msgs_per_s_mean": 37.8,
+    "counted_times_1_5": 56.7,
+    "orders_per_min_by_counted_rate": 1134,
+    "orders_per_min_by_submits": 1146,
+    "wire_est_refined_msgs_per_s_mean": 51.3,
+    "wire_est_refined_msgs_per_s_mean_by_order_rung": 51.65,
+    "wire_est_upper_bound_msgs_per_s_mean": 56.5,
+    "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 57.3
+   }
+  },
+  {
+   "id": "adapter_r6_rung50",
+   "source": "B-r6 receipt + journal",
+   "unit": "mixed",
+   "value": {
+    "counted_msgs_per_s_mean": 37.65,
+    "counted_times_1_5": 56.47,
+    "orders_per_min_by_counted_rate": 1130,
+    "orders_per_min_by_submits": 1131,
+    "wire_est_refined_msgs_per_s_mean": 49.05,
+    "wire_est_refined_msgs_per_s_mean_by_order_rung": 49.35,
+    "wire_est_upper_bound_msgs_per_s_mean": 56.45,
+    "wire_est_upper_bound_msgs_per_s_mean_by_order_rung": 56.55
+   }
+  },
+  {
+   "id": "adapter_whole_run_rate_estimates",
+   "source": "B-r5, B-r6 journals",
+   "unit": "msgs/s (max over any sliding 1 s window anchored at a message, best sliding 5 s mean; `*_utc_buckets` keep the revision-2 values over UTC-second buckets)",
+   "value": {
+    "B-r5": {
+     "counted": {
+      "best_5s_mean": 33.6,
+      "best_5s_mean_utc_buckets": 32.6,
+      "max_1s": 46,
+      "max_1s_utc_buckets": 37
+     },
+     "wire_refined": {
+      "best_5s_mean": 51.2,
+      "best_5s_mean_utc_buckets": 49.8,
+      "max_1s": 69,
+      "max_1s_utc_buckets": 57
+     },
+     "wire_upper_bound": {
+      "best_5s_mean": 51.2,
+      "best_5s_mean_utc_buckets": 49.8,
+      "max_1s": 69,
+      "max_1s_utc_buckets": 57
+     }
+    },
+    "B-r6": {
+     "counted": {
+      "best_5s_mean": 42.0,
+      "best_5s_mean_utc_buckets": 40.8,
+      "max_1s": 53,
+      "max_1s_utc_buckets": 48
+     },
+     "wire_refined": {
+      "best_5s_mean": 56.6,
+      "best_5s_mean_utc_buckets": 53.8,
+      "max_1s": 78,
+      "max_1s_utc_buckets": 66
+     },
+     "wire_upper_bound": {
+      "best_5s_mean": 63.4,
+      "best_5s_mean_utc_buckets": 60.8,
+      "max_1s": 83,
+      "max_1s_utc_buckets": 71
+     }
+    }
+   }
+  },
+  {
+   "id": "adapter_two_connection_combined_rate_estimates",
+   "source": "L0 + L1 journals",
+   "unit": "msgs/s (max over any sliding 1 s window anchored at a message, best sliding 5 s mean; `*_utc_buckets` keep the revision-2 values over UTC-second buckets)",
+   "value": {
+    "m1": {
+     "counted": {
+      "best_5s_mean": 26.0,
+      "best_5s_mean_utc_buckets": 25.6,
+      "max_1s": 33,
+      "max_1s_utc_buckets": 29
+     },
+     "wire_refined": {
+      "best_5s_mean": 39.4,
+      "best_5s_mean_utc_buckets": 38.8,
+      "max_1s": 52,
+      "max_1s_utc_buckets": 44
+     },
+     "wire_upper_bound": {
+      "best_5s_mean": 39.6,
+      "best_5s_mean_utc_buckets": 38.8,
+      "max_1s": 53,
+      "max_1s_utc_buckets": 45
+     }
+    },
+    "m2": {
+     "counted": {
+      "best_5s_mean": 25.8,
+      "best_5s_mean_utc_buckets": 25.2,
+      "max_1s": 30,
+      "max_1s_utc_buckets": 26
+     },
+     "wire_refined": {
+      "best_5s_mean": 39.0,
+      "best_5s_mean_utc_buckets": 37.8,
+      "max_1s": 47,
+      "max_1s_utc_buckets": 40
+     },
+     "wire_upper_bound": {
+      "best_5s_mean": 39.0,
+      "best_5s_mean_utc_buckets": 37.8,
+      "max_1s": 47,
+      "max_1s_utc_buckets": 40
+     }
+    },
+    "m3": {
+     "counted": {
+      "best_5s_mean": 20.8,
+      "best_5s_mean_utc_buckets": 20.4,
+      "max_1s": 25,
+      "max_1s_utc_buckets": 21
+     },
+     "wire_refined": {
+      "best_5s_mean": 31.6,
+      "best_5s_mean_utc_buckets": 30.8,
+      "max_1s": 40,
+      "max_1s_utc_buckets": 32
+     },
+     "wire_upper_bound": {
+      "best_5s_mean": 31.6,
+      "best_5s_mean_utc_buckets": 30.8,
+      "max_1s": 40,
+      "max_1s_utc_buckets": 32
+     }
+    },
+    "m4": {
+     "counted": {
+      "best_5s_mean": 26.0,
+      "best_5s_mean_utc_buckets": 25.6,
+      "max_1s": 35,
+      "max_1s_utc_buckets": 28
+     },
+     "wire_refined": {
+      "best_5s_mean": 39.4,
+      "best_5s_mean_utc_buckets": 38.6,
+      "max_1s": 47,
+      "max_1s_utc_buckets": 43
+     },
+     "wire_upper_bound": {
+      "best_5s_mean": 39.4,
+      "best_5s_mean_utc_buckets": 38.6,
+      "max_1s": 52,
+      "max_1s_utc_buckets": 43
+     }
+    }
+   }
+  },
+  {
+   "id": "pair_tests_table",
+   "source": "P-* receipts",
+   "unit": "test, first orders, first refusals, second orders, second refusals",
+   "value": [
+    [
+     "E1",
+     125,
+     0,
+     125,
+     0
+    ],
+    [
+     "E2",
+     125,
+     0,
+     125,
+     0
+    ],
+    [
+     "T1",
+     25,
+     25,
+     25,
+     25
+    ],
+    [
+     "T1b",
+     150,
+     0,
+     70,
+     0
+    ],
+    [
+     "T2",
+     150,
+     0,
+     70,
+     0
+    ],
+    [
+     "T3",
+     150,
+     0,
+     70,
+     0
+    ],
+    [
+     "T4",
+     57,
+     26,
+     70,
+     0
+    ],
+    [
+     "T6",
+     150,
+     0,
+     70,
+     0
+    ],
+    [
+     "T7",
+     63,
+     27,
+     70,
+     0
+    ],
+    [
+     "T8",
+     150,
+     0,
+     70,
+     0
+    ],
+    [
+     "T9a",
+     58,
+     27,
+     70,
+     0
+    ],
+    [
+     "T9b",
+     150,
+     0,
+     70,
+     0
+    ],
+    [
+     "T10",
+     150,
+     10,
+     50,
+     0
+    ]
+   ]
+  },
+  {
+   "id": "reconciliation",
+   "source": "journals + transcript-derived broker counts",
+   "unit": "journal submits, missing at broker, found, official-client orders, broker count after",
+   "value": [
+    6330,
+    38,
+    6292,
+    2202,
+    8494
+   ]
+  }
+ ],
+ "inputs": {
+  "marker_checks": 20,
+  "note": "private; the run root is not published; names are run labels",
+  "receipt_run_labels": [
+   "A-r1",
+   "A-r2",
+   "A-r3",
+   "A-r4",
+   "A-r5",
+   "A-r6",
+   "B-r2",
+   "B-r3",
+   "B-r4",
+   "B-r5",
+   "B-r6",
+   "L0-m1",
+   "L0-m2",
+   "L0-m3",
+   "L0-m4",
+   "L1-m1",
+   "L1-m2",
+   "L1-m3",
+   "L1-m4",
+   "P-e1-a",
+   "P-e1-b",
+   "P-e2-a",
+   "P-e2-b",
+   "P-r1",
+   "P-t1",
+   "P-t1-a",
+   "P-t1-b",
+   "P-t10-a",
+   "P-t10-b",
+   "P-t1b-a",
+   "P-t1b-b",
+   "P-t2-a",
+   "P-t2-b",
+   "P-t3-a",
+   "P-t3-b",
+   "P-t4-a",
+   "P-t4-b",
+   "P-t6-a",
+   "P-t6-b",
+   "P-t7-a",
+   "P-t7-b",
+   "P-t8-a",
+   "P-t8-b",
+   "P-t9a-a",
+   "P-t9a-b",
+   "P-t9b-a",
+   "P-t9b-b"
+  ]
+ },
+ "measured_on": "2026-10-13",
+ "official_client_ladder": {
+  "accepted": 1650,
+  "cancel_confirmed": 1650,
+  "client": "ibapi 10.46.01 (nautilus_ibapi mirror), one connection",
+  "connections": 1,
+  "elapsed_s": 83.3,
+  "error_code_counts": {
+   "202": 1650,
+   "2104": 1,
+   "2107": 1,
+   "2158": 1
+  },
+  "kind": "official_client",
+  "label": "P-r1",
+  "non_info_error_texts": 0,
+  "open_at_end": 0,
+  "orders_placed": 1650,
+  "rungs": [
+   {
+    "accept_ms_p50_p90_max": [
+     629,
+     870,
+     981
+    ],
+    "cancel_ms_p50_p90_max": [
+     755,
+     859,
+     975
+    ],
+    "counted_msgs_per_s_max": 30,
+    "counted_msgs_per_s_mean": 29.35,
+    "counted_msgs_per_s_min": 20,
+    "orders": 300,
+    "orders_per_min_with_cancel": 900,
+    "peak_open_orders": 26,
+    "seconds": 20,
+    "skipped_slots": 0,
+    "target_msgs_per_s": 30,
+    "wire_msgs_per_s_mean_equals_counted": true
+   },
+   {
+    "accept_ms_p50_p90_max": [
+     652,
+     882,
+     999
+    ],
+    "cancel_ms_p50_p90_max": [
+     767,
+     892,
+     956
+    ],
+    "counted_msgs_per_s_max": 42,
+    "counted_msgs_per_s_mean": 39.7,
+    "counted_msgs_per_s_min": 34,
+    "orders": 400,
+    "orders_per_min_with_cancel": 1200,
+    "peak_open_orders": 37,
+    "seconds": 20,
+    "skipped_slots": 0,
+    "target_msgs_per_s": 40,
+    "wire_msgs_per_s_mean_equals_counted": true
+   },
+   {
+    "accept_ms_p50_p90_max": [
+     636,
+     890,
+     981
+    ],
+    "cancel_ms_p50_p90_max": [
+     771,
+     932,
+     1020
+    ],
+    "counted_msgs_per_s_max": 46,
+    "counted_msgs_per_s_mean": 44.85,
+    "counted_msgs_per_s_min": 43,
+    "orders": 450,
+    "orders_per_min_with_cancel": 1350,
+    "peak_open_orders": 42,
+    "seconds": 20,
+    "skipped_slots": 0,
+    "target_msgs_per_s": 45,
+    "wire_msgs_per_s_mean_equals_counted": true
+   },
+   {
+    "accept_ms_p50_p90_max": [
+     642,
+     882,
+     1002
+    ],
+    "cancel_ms_p50_p90_max": [
+     766,
+     949,
+     961
+    ],
+    "counted_msgs_per_s_max": 51,
+    "counted_msgs_per_s_mean": 49.95,
+    "counted_msgs_per_s_min": 48,
+    "orders": 500,
+    "orders_per_min_with_cancel": 1500,
+    "peak_open_orders": 47,
+    "seconds": 20,
+    "skipped_slots": 0,
+    "target_msgs_per_s": 50,
+    "wire_msgs_per_s_mean_equals_counted": true
+   }
+  ],
+  "server_version": 225,
+  "stop_reason": null,
+  "window": 120
+ },
+ "official_client_smoke": {
+  "accepted": 52,
+  "cancel_confirmed": 52,
+  "connections": 1,
+  "error_code_counts": {
+   "202": 52,
+   "2104": 1,
+   "2107": 1,
+   "2158": 1
+  },
+  "kind": "official_client",
+  "label": "SMOKE",
+  "order_id_tests": [
+   {
+    "accepted": true,
+    "new_error_codes": {},
+    "which": "nextValidId"
+   },
+   {
+    "accepted": true,
+    "new_error_codes": {},
+    "which": "above_high_water"
+   }
+  ],
+  "orders_placed": 52,
+  "receipt_label": "P-t1",
+  "rung": {
+   "accept_ms_p50_p90_max": [
+    69,
+    75,
+    80
+   ],
+   "cancel_ms_p50_p90_max": [
+    72,
+    76,
+    78
+   ],
+   "counted_msgs_per_s_mean": 10.0,
+   "seconds": 10,
+   "target_msgs_per_s": 10
+  }
+ },
+ "official_client_summary": {
+  "client_scoped_reqOpenOrders_polled_by_both": {
+   "orders": 220,
+   "refusals_103": 0,
+   "tests": [
+    "T8"
+   ]
+  },
+  "no_open_order_polling_by_either_connection": {
+   "orders": 1380,
+   "refusals_103": 0,
+   "tests": [
+    "E1",
+    "E2",
+    "T1b",
+    "T2",
+    "T3",
+    "T6"
+   ]
+  },
+  "reqAllOpenOrders_polled_by_both_or_by_the_lower_id_connection": {
+   "higher_id_connection": {
+    "orders": 260,
+    "refusals_103": 0,
+    "tests": [
+     "T4",
+     "T7",
+     "T9a",
+     "T10"
+    ]
+   },
+   "lower_id_connection": {
+    "orders": 328,
+    "refusals_103": 90,
+    "tests": [
+     "T4",
+     "T7",
+     "T9a",
+     "T10"
+    ]
+   },
+   "tests": [
+    "T4",
+    "T7",
+    "T9a",
+    "T10"
+   ]
+  },
+  "reqAllOpenOrders_polled_only_by_the_higher_id_connection": {
+   "orders": 220,
+   "refusals_103": 0,
+   "tests": [
+    "T9b"
+   ]
+  },
+  "reused_client_ids_with_order_ids_below_their_earlier_ids": {
+   "orders": 50,
+   "refusals_103": 50,
+   "tests": [
+    "T1"
+   ]
+  }
+ },
+ "official_client_two_connection_tests": [
+  {
+   "connection_stop_rule": "a probe stops after 25 [103] refusals (in-flight orders can add one or two)",
+   "connections": 2,
+   "design_declared_by_runner": {
+    "account_field": false,
+    "account_updates": false,
+    "client_ids": "fresh",
+    "hold_s": 0.0,
+    "order_id_scheme": "arbitrary bases 1e8+n and 2e8+n",
+    "order_ref": false,
+    "poll_all_open_orders": "none"
+   },
+   "first_connection": {
+    "accept_ms_p50_p90_max": [
+     48,
+     81,
+     159
+    ],
+    "accepted": 125,
+    "account_field_recorded": null,
+    "cancel_confirmed": 125,
+    "cancel_ms_p50_p90_max": [
+     71,
+     76,
+     103
+    ],
+    "cancel_not_found_10147": 0,
+    "cancelled_by_venue_202": 125,
+    "closed_as_not_found_10147": 0,
+    "counted_msgs_per_s_mean": 9.8,
+    "elapsed_s": 27.0,
+    "error_code_counts": {
+     "202": 125,
+     "2104": 1,
+     "2107": 1,
+     "2158": 1
+    },
+    "first_refused_order_index": null,
+    "hold_s_recorded": null,
+    "order_ref_recorded": null,
+    "orders_placed": 125,
+    "peak_open_orders": 1,
+    "refused_103": 0,
+    "stop_reason": null
+   },
+   "first_connection_order_ids_relative_to_second": "lower",
+   "kind": "official_client",
+   "receipt_labels": [
+    "P-e1-a",
+    "P-e1-b"
+   ],
+   "second_connection": {
+    "accept_ms_p50_p90_max": [
+     69,
+     81,
+     108
+    ],
+    "accepted": 125,
+    "account_field_recorded": null,
+    "cancel_confirmed": 125,
+    "cancel_ms_p50_p90_max": [
+     73,
+     78,
+     126
+    ],
+    "cancel_not_found_10147": 0,
+    "cancelled_by_venue_202": 125,
+    "closed_as_not_found_10147": 0,
+    "counted_msgs_per_s_mean": 9.8,
+    "elapsed_s": 27.0,
+    "error_code_counts": {
+     "202": 125,
+     "2104": 1,
+     "2107": 1,
+     "2158": 1
+    },
+    "first_refused_order_index": null,
+    "hold_s_recorded": null,
+    "order_ref_recorded": null,
+    "orders_placed": 125,
+    "peak_open_orders": 1,
+    "refused_103": 0,
+    "stop_reason": null
+   },
+   "test": "E1"
+  },
+  {
+   "connection_stop_rule": "a probe stops after 25 [103] refusals (in-flight orders can add one or two)",
+   "connections": 2,
+   "design_declared_by_runner": {
+    "account_field": false,
+    "account_updates": false,
+    "client_ids": "the same two ids as E1",
+    "hold_s": 0.0,
+    "order_id_scheme": "equal bases 3e8+n on both, above every id E1 used",
+    "order_ref": false,
+    "poll_all_open_orders": "none"
+   },
+   "first_connection": {
+    "accept_ms_p50_p90_max": [
+     120,
+     125,
+     161
+    ],
+    "accepted": 125,
+    "account_field_recorded": null,
+    "cancel_confirmed": 125,
+    "cancel_ms_p50_p90_max": [
+     42,
+     73,
+     89
+    ],
+    "cancel_not_found_10147": 0,
+    "cancelled_by_venue_202": 125,
+    "closed_as_not_found_10147": 0,
+    "counted_msgs_per_s_mean": 9.96,
+    "elapsed_s": 27.0,
+    "error_code_counts": {
+     "202": 125,
+     "2104": 1,
+     "2107": 1,
+     "2158": 1
+    },
+    "first_refused_order_index": null,
+    "hold_s_recorded": null,
+    "order_ref_recorded": null,
+    "orders_placed": 125,
+    "peak_open_orders": 1,
+    "refused_103": 0,
+    "stop_reason": null
+   },
+   "first_connection_order_ids_relative_to_second": "equal",
+   "kind": "official_client",
+   "receipt_labels": [
+    "P-e2-a",
+    "P-e2-b"
+   ],
+   "second_connection": {
+    "accept_ms_p50_p90_max": [
+     66,
+     69,
+     110
+    ],
+    "accepted": 125,
+    "account_field_recorded": null,
+    "cancel_confirmed": 125,
+    "cancel_ms_p50_p90_max": [
+     60,
+     73,
+     80
+    ],
+    "cancel_not_found_10147": 0,
+    "cancelled_by_venue_202": 125,
+    "closed_as_not_found_10147": 0,
+    "counted_msgs_per_s_mean": 9.96,
+    "elapsed_s": 27.0,
+    "error_code_counts": {
+     "202": 125,
+     "2104": 1,
+     "2107": 1,
+     "2158": 1
+    },
+    "first_refused_order_index": null,
+    "hold_s_recorded": null,
+    "order_ref_recorded": null,
+    "orders_placed": 125,
+    "peak_open_orders": 1,
+    "refused_103": 0,
+    "stop_reason": null
+   },
+   "test": "E2"
+  },
+  {
+   "connection_stop_rule": "a probe stops after 25 [103] refusals (in-flight orders can add one or two)",
+   "connections": 2,
+   "design_declared_by_runner": {
+    "account_field": false,
+    "account_updates": false,
+    "client_ids": "reused from an earlier adapter run",
+    "hold_s": 0.0,
+    "order_id_scheme": "client-partitioned ids restarted at 1, below the ids those clients used earlier the same day",
+    "order_ref": false,
+    "poll_all_open_orders": "none"
+   },
+   "first_connection": {
+    "accept_ms_p50_p90_max": [
+     0,
+     0,
+     0
+    ],
+    "accepted": 0,
+    "account_field_recorded": false,
+    "cancel_confirmed": 25,
+    "cancel_ms_p50_p90_max": [
+     3,
+     4,
+     4
+    ],
+    "cancel_not_found_10147": 25,
+    "cancelled_by_venue_202": 0,
+    "closed_as_not_found_10147": 25,
+    "counted_msgs_per_s_mean": 1.53,
+    "elapsed_s": 7.2,
+    "error_code_counts": {
+     "10147": 25,
+     "103": 25,
+     "2104": 1,
+     "2107": 1,
+     "2158": 1
+    },
+    "first_refused_order_index": 1,
+    "hold_s_recorded": 0.0,
+    "order_ref_recorded": false,
+    "orders_placed": 25,
+    "peak_open_orders": 6,
+    "refused_103": 25,
+    "stop_reason": "error_103"
+   },
+   "first_connection_first_103_after_second_connection_first_order_s": -5.93,
+   "first_connection_order_ids_relative_to_second": "lower",
+   "kind": "official_client",
+   "receipt_labels": [
+    "P-t1-a",
+    "P-t1-b"
+   ],
+   "second_connection": {
+    "accept_ms_p50_p90_max": [
+     0,
+     0,
+     0
+    ],
+    "accepted": 0,
+    "account_field_recorded": false,
+    "cancel_confirmed": 25,
+    "cancel_ms_p50_p90_max": [
+     3,
+     4,
+     4
+    ],
+    "cancel_not_found_10147": 25,
+    "cancelled_by_venue_202": 0,
+    "closed_as_not_found_10147": 25,
+    "counted_msgs_per_s_mean": 3.29,
+    "elapsed_s": 7.3,
+    "error_code_counts": {
+     "10147": 25,
+     "103": 25,
+     "2104": 1,
+     "2107": 1,
+     "2158": 1
+    },
+    "first_refused_order_index": 1,
+    "hold_s_recorded": 0.0,
+    "order_ref_recorded": false,
+    "orders_placed": 25,
+    "peak_open_orders": 6,
+    "refused_103": 25,
+    "stop_reason": "error_103"
+   },
+   "test": "T1"
+  },
+  {
+   "connection_stop_rule": "a probe stops after 25 [103] refusals (in-flight orders can add one or two)",
+   "connections": 2,
+   "design_declared_by_runner": {
+    "account_field": false,
+    "account_updates": false,
+    "client_ids": "fresh",
+    "hold_s": 0.0,
+    "order_id_scheme": "client-partitioned ids from 1",
+    "order_ref": false,
+    "poll_all_open_orders": "none"
+   },
+   "first_connection": {
+    "accept_ms_p50_p90_max": [
+     295,
+     694,
+     865
+    ],
+    "accepted": 150,
+    "account_field_recorded": false,
+    "cancel_confirmed": 150,
+    "cancel_ms_p50_p90_max": [
+     259,
+     722,
+     801
+    ],
+    "cancel_not_found_10147": 0,
+    "cancelled_by_venue_202": 150,
+    "closed_as_not_found_10147": 0,
+    "counted_msgs_per_s_mean": 9.93,
+    "elapsed_s": 32.2,
+    "error_code_counts": {
+     "202": 150,
+     "2104": 1,
+     "2107": 1,
+     "2158": 1
+    },
+    "first_refused_order_index": null,
+    "hold_s_recorded": 0.0,
+    "order_ref_recorded": false,
+    "orders_placed": 150,
+    "peak_open_orders": 7,
+    "refused_103": 0,
+    "stop_reason": null
+   },
+   "first_connection_order_ids_relative_to_second": "lower",
+   "kind": "official_client",
+   "receipt_labels": [
+    "P-t1b-a",
+    "P-t1b-b"
+   ],
+   "second_connection": {
+    "accept_ms_p50_p90_max": [
+     495,
+     778,
+     839
+    ],
+    "accepted": 70,
+    "account_field_recorded": false,
+    "cancel_confirmed": 70,
+    "cancel_ms_p50_p90_max": [
+     567,
+     800,
+     874
+    ],
+    "cancel_not_found_10147": 0,
+    "cancelled_by_venue_202": 70,
+    "closed_as_not_found_10147": 0,
+    "counted_msgs_per_s_mean": 9.71,
+    "elapsed_s": 16.5,
+    "error_code_counts": {
+     "202": 70,
+     "2104": 1,
+     "2107": 1,
+     "2158": 1
+    },
+    "first_refused_order_index": null,
+    "hold_s_recorded": 0.0,
+    "order_ref_recorded": false,
+    "orders_placed": 70,
+    "peak_open_orders": 7,
+    "refused_103": 0,
+    "stop_reason": null
+   },
+   "test": "T1b"
+  },
+  {
+   "connection_stop_rule": "a probe stops after 25 [103] refusals (in-flight orders can add one or two)",
+   "connections": 2,
+   "design_declared_by_runner": {
+    "account_field": false,
+    "account_updates": false,
+    "client_ids": "fresh",
+    "hold_s": "1.5 first / 3.0 second",
+    "order_id_scheme": "client-partitioned ids from 1",
+    "order_ref": false,
+    "poll_all_open_orders": "none"
+   },
+   "first_connection": {
+    "accept_ms_p50_p90_max": [
+     268,
+     606,
+     765
+    ],
+    "accepted": 150,
+    "account_field_recorded": false,
+    "cancel_confirmed": 150,
+    "cancel_ms_p50_p90_max": [
+     266,
+     536,
+     667
+    ],
+    "cancel_not_found_10147": 0,
+    "cancelled_by_venue_202": 150,
+    "closed_as_not_found_10147": 0,
+    "counted_msgs_per_s_mean": 9.7,
+    "elapsed_s": 32.3,
+    "error_code_counts": {
+     "202": 150,
+     "2104": 1,
+     "2107": 1,
+     "2158": 1
+    },
+    "first_refused_order_index": null,
+    "hold_s_recorded": 1.5,
+    "order_ref_recorded": false,
+    "orders_placed": 150,
+    "peak_open_orders": 15,
+    "refused_103": 0,
+    "stop_reason": null
+   },
+   "first_connection_order_ids_relative_to_second": "lower",
+   "kind": "official_client",
+   "receipt_labels": [
+    "P-t2-a",
+    "P-t2-b"
+   ],
+   "second_connection": {
+    "accept_ms_p50_p90_max": [
+     434,
+     632,
+     777
+    ],
+    "accepted": 70,
+    "account_field_recorded": false,
+    "cancel_confirmed": 70,
+    "cancel_ms_p50_p90_max": [
+     468,
+     646,
+     862
+    ],
+    "cancel_not_found_10147": 0,
+    "cancelled_by_venue_202": 70,
+    "closed_as_not_found_10147": 0,
+    "counted_msgs_per_s_mean": 8.86,
+    "elapsed_s": 16.7,
+    "error_code_counts": {
+     "202": 70,
+     "2104": 1,
+     "2107": 1,
+     "2158": 1
+    },
+    "first_refused_order_index": null,
+    "hold_s_recorded": 3.0,
+    "order_ref_recorded": false,
+    "orders_placed": 70,
+    "peak_open_orders": 22,
+    "refused_103": 0,
+    "stop_reason": null
+   },
+   "test": "T2"
+  },
+  {
+   "connection_stop_rule": "a probe stops after 25 [103] refusals (in-flight orders can add one or two)",
+   "connections": 2,
+   "design_declared_by_runner": {
+    "account_field": true,
+    "account_updates": false,
+    "client_ids": "fresh",
+    "hold_s": "1.5 first / 3.0 second",
+    "order_id_scheme": "client-partitioned ids from 1",
+    "order_ref": true,
+    "poll_all_open_orders": "none"
+   },
+   "first_connection": {
+    "accept_ms_p50_p90_max": [
+     103,
+     575,
+     976
+    ],
+    "accepted": 150,
+    "account_field_recorded": true,
+    "cancel_confirmed": 150,
+    "cancel_ms_p50_p90_max": [
+     75,
+     504,
+     862
+    ],
+    "cancel_not_found_10147": 0,
+    "cancelled_by_venue_202": 150,
+    "closed_as_not_found_10147": 0,
+    "counted_msgs_per_s_mean": 9.57,
+    "elapsed_s": 32.3,
+    "error_code_counts": {
+     "202": 150,
+     "2104": 1,
+     "2107": 1,
+     "2158": 1
+    },
+    "first_refused_order_index": null,
+    "hold_s_recorded": 1.5,
+    "order_ref_recorded": true,
+    "orders_placed": 150,
+    "peak_open_orders": 15,
+    "refused_103": 0,
+    "stop_reason": null
+   },
+   "first_connection_order_ids_relative_to_second": "lower",
+   "kind": "official_client",
+   "receipt_labels": [
+    "P-t3-a",
+    "P-t3-b"
+   ],
+   "second_connection": {
+    "accept_ms_p50_p90_max": [
+     449,
+     653,
+     822
+    ],
+    "accepted": 70,
+    "account_field_recorded": true,
+    "cancel_confirmed": 70,
+    "cancel_ms_p50_p90_max": [
+     470,
+     609,
+     767
+    ],
+    "cancel_not_found_10147": 0,
+    "cancelled_by_venue_202": 70,
+    "closed_as_not_found_10147": 0,
+    "counted_msgs_per_s_mean": 8.43,
+    "elapsed_s": 17.1,
+    "error_code_counts": {
+     "202": 70,
+     "2104": 1,
+     "2107": 1,
+     "2158": 1
+    },
+    "first_refused_order_index": null,
+    "hold_s_recorded": 3.0,
+    "order_ref_recorded": true,
+    "orders_placed": 70,
+    "peak_open_orders": 21,
+    "refused_103": 0,
+    "stop_reason": null
+   },
+   "test": "T3"
+  },
+  {
+   "connection_stop_rule": "a probe stops after 25 [103] refusals (in-flight orders can add one or two)",
+   "connections": 2,
+   "design_declared_by_runner": {
+    "account_field": true,
+    "account_updates": "snapshot every 2 s on both, plus the adapter's connect-time requests",
+    "client_ids": "fresh",
+    "hold_s": "1.5 first / 3.0 second",
+    "order_id_scheme": "client-partitioned ids from 1",
+    "order_ref": true,
+    "poll_all_open_orders": "reqAllOpenOrders every 1 s on both"
+   },
+   "first_connection": {
+    "accept_ms_p50_p90_max": [
+     134,
+     436,
+     535
+    ],
+    "accepted": 31,
+    "account_field_recorded": true,
+    "cancel_confirmed": 57,
+    "cancel_ms_p50_p90_max": [
+     423,
+     626,
+     862
+    ],
+    "cancel_not_found_10147": 26,
+    "cancelled_by_venue_202": 31,
+    "closed_as_not_found_10147": 26,
+    "counted_msgs_per_s_mean": 4.4,
+    "elapsed_s": 15.1,
+    "error_code_counts": {
+     "10147": 26,
+     "103": 26,
+     "202": 31,
+     "2100": 6,
+     "2104": 1,
+     "2107": 1,
+     "2158": 1
+    },
+    "first_refused_order_index": 32,
+    "hold_s_recorded": 1.5,
+    "order_ref_recorded": true,
+    "orders_placed": 57,
+    "peak_open_orders": 14,
+    "refused_103": 26,
+    "stop_reason": "error_103"
+   },
+   "first_connection_first_103_after_second_connection_first_order_s": 0.8,
+   "first_connection_order_ids_relative_to_second": "lower",
+   "kind": "official_client",
+   "receipt_labels": [
+    "P-t4-a",
+    "P-t4-b"
+   ],
+   "second_connection": {
+    "accept_ms_p50_p90_max": [
+     568,
+     770,
+     874
+    ],
+    "accepted": 70,
+    "account_field_recorded": true,
+    "cancel_confirmed": 70,
+    "cancel_ms_p50_p90_max": [
+     519,
+     761,
+     962
+    ],
+    "cancel_not_found_10147": 0,
+    "cancelled_by_venue_202": 70,
+    "closed_as_not_found_10147": 0,
+    "counted_msgs_per_s_mean": 10.0,
+    "elapsed_s": 18.3,
+    "error_code_counts": {
+     "202": 70,
+     "2100": 7,
+     "2104": 1,
+     "2107": 1,
+     "2158": 1
+    },
+    "first_refused_order_index": null,
+    "hold_s_recorded": 3.0,
+    "order_ref_recorded": true,
+    "orders_placed": 70,
+    "peak_open_orders": 25,
+    "refused_103": 0,
+    "stop_reason": null
+   },
+   "test": "T4"
+  },
+  {
+   "connection_stop_rule": "a probe stops after 25 [103] refusals (in-flight orders can add one or two)",
+   "connections": 2,
+   "design_declared_by_runner": {
+    "account_field": true,
+    "account_updates": "snapshot every 2 s on both",
+    "client_ids": "fresh",
+    "hold_s": "1.5 first / 3.0 second",
+    "order_id_scheme": "client-partitioned ids from 1",
+    "order_ref": true,
+    "poll_all_open_orders": "none"
+   },
+   "first_connection": {
+    "accept_ms_p50_p90_max": [
+     292,
+     681,
+     1088
+    ],
+    "accepted": 150,
+    "account_field_recorded": true,
+    "cancel_confirmed": 150,
+    "cancel_ms_p50_p90_max": [
+     296,
+     579,
+     958
+    ],
+    "cancel_not_found_10147": 0,
+    "cancelled_by_venue_202": 150,
+    "closed_as_not_found_10147": 0,
+    "counted_msgs_per_s_mean": 10.7,
+    "elapsed_s": 32.6,
+    "error_code_counts": {
+     "202": 150,
+     "2100": 15,
+     "2104": 1,
+     "2107": 1,
+     "2158": 1
+    },
+    "first_refused_order_index": null,
+    "hold_s_recorded": 1.5,
+    "order_ref_recorded": true,
+    "orders_placed": 150,
+    "peak_open_orders": 16,
+    "refused_103": 0,
+    "stop_reason": null
+   },
+   "first_connection_order_ids_relative_to_second": "lower",
+   "kind": "official_client",
+   "receipt_labels": [
+    "P-t6-a",
+    "P-t6-b"
+   ],
+   "second_connection": {
+    "accept_ms_p50_p90_max": [
+     508,
+     721,
+     881
+    ],
+    "accepted": 70,
+    "account_field_recorded": true,
+    "cancel_confirmed": 70,
+    "cancel_ms_p50_p90_max": [
+     563,
+     761,
+     848
+    ],
+    "cancel_not_found_10147": 0,
+    "cancelled_by_venue_202": 70,
+    "closed_as_not_found_10147": 0,
+    "counted_msgs_per_s_mean": 9.64,
+    "elapsed_s": 17.1,
+    "error_code_counts": {
+     "202": 70,
+     "2100": 7,
+     "2104": 1,
+     "2107": 1,
+     "2158": 1
+    },
+    "first_refused_order_index": null,
+    "hold_s_recorded": 3.0,
+    "order_ref_recorded": true,
+    "orders_placed": 70,
+    "peak_open_orders": 23,
+    "refused_103": 0,
+    "stop_reason": null
+   },
+   "test": "T6"
+  },
+  {
+   "connection_stop_rule": "a probe stops after 25 [103] refusals (in-flight orders can add one or two)",
+   "connections": 2,
+   "design_declared_by_runner": {
+    "account_field": true,
+    "account_updates": false,
+    "client_ids": "fresh",
+    "hold_s": "1.5 first / 3.0 second",
+    "order_id_scheme": "client-partitioned ids from 1",
+    "order_ref": true,
+    "poll_all_open_orders": "reqAllOpenOrders every 1 s on both"
+   },
+   "first_connection": {
+    "accept_ms_p50_p90_max": [
+     102,
+     377,
+     579
+    ],
+    "accepted": 36,
+    "account_field_recorded": true,
+    "cancel_confirmed": 63,
+    "cancel_ms_p50_p90_max": [
+     303,
+     605,
+     706
+    ],
+    "cancel_not_found_10147": 27,
+    "cancelled_by_venue_202": 36,
+    "closed_as_not_found_10147": 27,
+    "counted_msgs_per_s_mean": 4.47,
+    "elapsed_s": 15.0,
+    "error_code_counts": {
+     "10147": 27,
+     "103": 27,
+     "202": 36,
+     "2104": 1,
+     "2107": 1,
+     "2158": 1
+    },
+    "first_refused_order_index": 37,
+    "hold_s_recorded": 1.5,
+    "order_ref_recorded": true,
+    "orders_placed": 63,
+    "peak_open_orders": 13,
+    "refused_103": 27,
+    "stop_reason": "error_103"
+   },
+   "first_connection_first_103_after_second_connection_first_order_s": 1.6,
+   "first_connection_order_ids_relative_to_second": "lower",
+   "kind": "official_client",
+   "receipt_labels": [
+    "P-t7-a",
+    "P-t7-b"
+   ],
+   "second_connection": {
+    "accept_ms_p50_p90_max": [
+     469,
+     670,
+     873
+    ],
+    "accepted": 70,
+    "account_field_recorded": true,
+    "cancel_confirmed": 70,
+    "cancel_ms_p50_p90_max": [
+     418,
+     620,
+     745
+    ],
+    "cancel_not_found_10147": 0,
+    "cancelled_by_venue_202": 70,
+    "closed_as_not_found_10147": 0,
+    "counted_msgs_per_s_mean": 9.21,
+    "elapsed_s": 16.9,
+    "error_code_counts": {
+     "202": 70,
+     "2104": 1,
+     "2107": 1,
+     "2158": 1
+    },
+    "first_refused_order_index": null,
+    "hold_s_recorded": 3.0,
+    "order_ref_recorded": true,
+    "orders_placed": 70,
+    "peak_open_orders": 22,
+    "refused_103": 0,
+    "stop_reason": null
+   },
+   "test": "T7"
+  },
+  {
+   "connection_stop_rule": "a probe stops after 25 [103] refusals (in-flight orders can add one or two)",
+   "connections": 2,
+   "design_declared_by_runner": {
+    "account_field": true,
+    "account_updates": false,
+    "client_ids": "fresh",
+    "hold_s": "1.5 first / 3.0 second",
+    "order_id_scheme": "client-partitioned ids from 1",
+    "order_ref": true,
+    "poll_all_open_orders": "reqOpenOrders (this client only) every 1 s on both"
+   },
+   "first_connection": {
+    "accept_ms_p50_p90_max": [
+     340,
+     680,
+     951
+    ],
+    "accepted": 150,
+    "account_field_recorded": true,
+    "cancel_confirmed": 150,
+    "cancel_ms_p50_p90_max": [
+     331,
+     559,
+     861
+    ],
+    "cancel_not_found_10147": 0,
+    "cancelled_by_venue_202": 150,
+    "closed_as_not_found_10147": 0,
+    "counted_msgs_per_s_mean": 10.6,
+    "elapsed_s": 32.3,
+    "error_code_counts": {
+     "202": 150,
+     "2104": 1,
+     "2107": 1,
+     "2158": 1
+    },
+    "first_refused_order_index": null,
+    "hold_s_recorded": 1.5,
+    "order_ref_recorded": true,
+    "orders_placed": 150,
+    "peak_open_orders": 15,
+    "refused_103": 0,
+    "stop_reason": null
+   },
+   "first_connection_order_ids_relative_to_second": "lower",
+   "kind": "official_client",
+   "receipt_labels": [
+    "P-t8-a",
+    "P-t8-b"
+   ],
+   "second_connection": {
+    "accept_ms_p50_p90_max": [
+     522,
+     726,
+     921
+    ],
+    "accepted": 70,
+    "account_field_recorded": true,
+    "cancel_confirmed": 70,
+    "cancel_ms_p50_p90_max": [
+     569,
+     838,
+     878
+    ],
+    "cancel_not_found_10147": 0,
+    "cancelled_by_venue_202": 70,
+    "closed_as_not_found_10147": 0,
+    "counted_msgs_per_s_mean": 9.29,
+    "elapsed_s": 17.0,
+    "error_code_counts": {
+     "202": 70,
+     "2104": 1,
+     "2107": 1,
+     "2158": 1
+    },
+    "first_refused_order_index": null,
+    "hold_s_recorded": 3.0,
+    "order_ref_recorded": true,
+    "orders_placed": 70,
+    "peak_open_orders": 23,
+    "refused_103": 0,
+    "stop_reason": null
+   },
+   "test": "T8"
+  },
+  {
+   "connection_stop_rule": "a probe stops after 25 [103] refusals (in-flight orders can add one or two)",
+   "connections": 2,
+   "design_declared_by_runner": {
+    "account_field": true,
+    "account_updates": false,
+    "client_ids": "fresh",
+    "hold_s": "1.5 first / 3.0 second",
+    "order_id_scheme": "client-partitioned ids from 1",
+    "order_ref": true,
+    "poll_all_open_orders": "reqAllOpenOrders every 1 s on the first (lower-id) connection only"
+   },
+   "first_connection": {
+    "accept_ms_p50_p90_max": [
+     77,
+     173,
+     561
+    ],
+    "accepted": 31,
+    "account_field_recorded": true,
+    "cancel_confirmed": 58,
+    "cancel_ms_p50_p90_max": [
+     214,
+     574,
+     668
+    ],
+    "cancel_not_found_10147": 27,
+    "cancelled_by_venue_202": 31,
+    "closed_as_not_found_10147": 27,
+    "counted_msgs_per_s_mean": 4.1,
+    "elapsed_s": 14.1,
+    "error_code_counts": {
+     "10147": 27,
+     "103": 27,
+     "202": 31,
+     "2104": 1,
+     "2107": 1,
+     "2158": 1
+    },
+    "first_refused_order_index": 32,
+    "hold_s_recorded": 1.5,
+    "order_ref_recorded": true,
+    "orders_placed": 58,
+    "peak_open_orders": 12,
+    "refused_103": 27,
+    "stop_reason": "error_103"
+   },
+   "first_connection_first_103_after_second_connection_first_order_s": 0.57,
+   "first_connection_order_ids_relative_to_second": "lower",
+   "kind": "official_client",
+   "receipt_labels": [
+    "P-t9a-a",
+    "P-t9a-b"
+   ],
+   "second_connection": {
+    "accept_ms_p50_p90_max": [
+     336,
+     641,
+     844
+    ],
+    "accepted": 70,
+    "account_field_recorded": true,
+    "cancel_confirmed": 70,
+    "cancel_ms_p50_p90_max": [
+     99,
+     638,
+     794
+    ],
+    "cancel_not_found_10147": 0,
+    "cancelled_by_venue_202": 70,
+    "closed_as_not_found_10147": 0,
+    "counted_msgs_per_s_mean": 8.5,
+    "elapsed_s": 17.3,
+    "error_code_counts": {
+     "202": 70,
+     "2104": 1,
+     "2107": 1,
+     "2158": 1
+    },
+    "first_refused_order_index": null,
+    "hold_s_recorded": 3.0,
+    "order_ref_recorded": true,
+    "orders_placed": 70,
+    "peak_open_orders": 22,
+    "refused_103": 0,
+    "stop_reason": null
+   },
+   "test": "T9a"
+  },
+  {
+   "connection_stop_rule": "a probe stops after 25 [103] refusals (in-flight orders can add one or two)",
+   "connections": 2,
+   "design_declared_by_runner": {
+    "account_field": true,
+    "account_updates": false,
+    "client_ids": "fresh",
+    "hold_s": "1.5 first / 3.0 second",
+    "order_id_scheme": "client-partitioned ids from 1",
+    "order_ref": true,
+    "poll_all_open_orders": "reqAllOpenOrders every 1 s on the second (higher-id) connection only"
+   },
+   "first_connection": {
+    "accept_ms_p50_p90_max": [
+     328,
+     680,
+     1132
+    ],
+    "accepted": 150,
+    "account_field_recorded": true,
+    "cancel_confirmed": 150,
+    "cancel_ms_p50_p90_max": [
+     332,
+     621,
+     966
+    ],
+    "cancel_not_found_10147": 0,
+    "cancelled_by_venue_202": 150,
+    "closed_as_not_found_10147": 0,
+    "counted_msgs_per_s_mean": 9.73,
+    "elapsed_s": 32.8,
+    "error_code_counts": {
+     "202": 150,
+     "2104": 1,
+     "2107": 1,
+     "2158": 1
+    },
+    "first_refused_order_index": null,
+    "hold_s_recorded": 1.5,
+    "order_ref_recorded": true,
+    "orders_placed": 150,
+    "peak_open_orders": 16,
+    "refused_103": 0,
+    "stop_reason": null
+   },
+   "first_connection_order_ids_relative_to_second": "lower",
+   "kind": "official_client",
+   "receipt_labels": [
+    "P-t9b-a",
+    "P-t9b-b"
+   ],
+   "second_connection": {
+    "accept_ms_p50_p90_max": [
+     509,
+     779,
+     910
+    ],
+    "accepted": 70,
+    "account_field_recorded": true,
+    "cancel_confirmed": 70,
+    "cancel_ms_p50_p90_max": [
+     676,
+     804,
+     863
+    ],
+    "cancel_not_found_10147": 0,
+    "cancelled_by_venue_202": 70,
+    "closed_as_not_found_10147": 0,
+    "counted_msgs_per_s_mean": 9.0,
+    "elapsed_s": 17.2,
+    "error_code_counts": {
+     "202": 70,
+     "2104": 1,
+     "2107": 1,
+     "2158": 1
+    },
+    "first_refused_order_index": null,
+    "hold_s_recorded": 3.0,
+    "order_ref_recorded": true,
+    "orders_placed": 70,
+    "peak_open_orders": 23,
+    "refused_103": 0,
+    "stop_reason": null
+   },
+   "test": "T9b"
+  },
+  {
+   "connection_stop_rule": "a probe stops after 25 [103] refusals (in-flight orders can add one or two)",
+   "connections": 2,
+   "design_declared_by_runner": {
+    "account_field": true,
+    "account_updates": false,
+    "client_ids": "fresh",
+    "hold_s": "1.5 first / 3.0 second",
+    "order_id_scheme": "client-partitioned ids from 1",
+    "order_ref": true,
+    "poll_all_open_orders": "reqAllOpenOrders every 1 s on the first (lower-id) connection only; it re-seeds from reqIds after each [103]"
+   },
+   "first_connection": {
+    "accept_ms_p50_p90_max": [
+     372,
+     518,
+     1251
+    ],
+    "accepted": 149,
+    "account_field_recorded": true,
+    "cancel_confirmed": 150,
+    "cancel_ms_p50_p90_max": [
+     360,
+     471,
+     826
+    ],
+    "cancel_not_found_10147": 10,
+    "cancelled_by_venue_202": 140,
+    "closed_as_not_found_10147": 10,
+    "counted_msgs_per_s_mean": 10.77,
+    "elapsed_s": 33.1,
+    "error_code_counts": {
+     "10147": 10,
+     "103": 10,
+     "202": 140,
+     "2104": 1,
+     "2107": 1,
+     "2158": 1
+    },
+    "first_refused_order_index": 32,
+    "hold_s_recorded": 1.5,
+    "order_ref_recorded": true,
+    "orders_placed": 150,
+    "peak_open_orders": 14,
+    "refused_103": 10,
+    "stop_reason": null
+   },
+   "first_connection_first_103_after_second_connection_first_order_s": 0.27,
+   "first_connection_order_ids_relative_to_second": "lower",
+   "kind": "official_client",
+   "note": "after the first re-seed the first connection's order ids fall inside the second connection's id range; status callbacks of the second connection's same-numbered orders, delivered by the open-order poll, are attributed to the first connection, so its accepted and cancel_confirmed over-count; the refusal count and the cancelled_by_venue_202 count are not affected",
+   "receipt_labels": [
+    "P-t10-a",
+    "P-t10-b"
+   ],
+   "reseeds": {
+    "count": 10,
+    "first_reseed_returned_id_minus_other_connection_first_order_id": 1,
+    "reseeds_returning_an_id_above_own_next_id": 1
+   },
+   "second_connection": {
+    "accept_ms_p50_p90_max": [
+     380,
+     732,
+     772
+    ],
+    "accepted": 50,
+    "account_field_recorded": true,
+    "cancel_confirmed": 50,
+    "cancel_ms_p50_p90_max": [
+     510,
+     725,
+     827
+    ],
+    "cancel_not_found_10147": 0,
+    "cancelled_by_venue_202": 50,
+    "closed_as_not_found_10147": 0,
+    "counted_msgs_per_s_mean": 7.5,
+    "elapsed_s": 12.4,
+    "error_code_counts": {
+     "202": 50,
+     "2104": 1,
+     "2107": 1,
+     "2158": 1
+    },
+    "first_refused_order_index": null,
+    "hold_s_recorded": 3.0,
+    "order_ref_recorded": true,
+    "orders_placed": 50,
+    "peak_open_orders": 22,
+    "refused_103": 0,
+    "stop_reason": null
+   },
+   "test": "T10"
+  }
+ ],
+ "reconciliation": {
+  "broker_completed_orders_after_harness_runs": {
+   "equals_journal_minus_missing": true,
+   "source": "transcript-derived (raw-protocol reqCompletedOrders read; no receipt file)",
+   "value": 6292
+  },
+  "broker_completed_orders_after_official_client_runs": {
+   "equals_first_count_plus_official_orders": true,
+   "source": "transcript-derived (raw-protocol reqCompletedOrders read; no receipt file)",
+   "value": 8494
+  },
+  "broker_completed_orders_after_pair_tests": {
+   "equals_second_count_plus_listed_pair_orders_plus_probe_order": true,
+   "source": "transcript-derived (raw-protocol reqCompletedOrders read; no receipt file)",
+   "value": 10313
+  },
+  "diagnostic_pair_test_orders_expected_listed_as_completed": 1818,
+  "diagnostic_pair_test_orders_placed_after_second_count": 1958,
+  "diagnostic_pair_test_orders_refused_103": 140,
+  "journal_orders_found_at_broker_by_arithmetic": 6292,
+  "journal_orders_missing_at_broker": 38,
+  "journal_orders_missing_by_kind": {
+   "journalled_but_never_reached_the_adapter": 2,
+   "refused_by_the_venue_notice_103": 35,
+   "rejected_cancel_target_not_found_10147": 1
+  },
+  "journal_orders_missing_by_number_of_owner_journals": {
+   "0": 0,
+   "1": 38,
+   "2_or_more": 0
+  },
+  "journal_submit_events_by_run": {
+   "A-r1": 1,
+   "A-r2": 4,
+   "A-r3": 4,
+   "A-r4": 4,
+   "A-r5": 4,
+   "A-r6": 4,
+   "B-r2": 312,
+   "B-r3": 530,
+   "B-r4": 264,
+   "B-r5": 1258,
+   "B-r6": 1359,
+   "L0-m1": 11,
+   "L0-m2": 7,
+   "L0-m3": 0,
+   "L0-m4": 200,
+   "L1-m1": 695,
+   "L1-m2": 699,
+   "L1-m3": 374,
+   "L1-m4": 600
+  },
+  "journal_submit_events_total": 6330,
+  "official_client_orders_placed_before_second_count": 2202,
+  "reqids_probe_orders_placed_after_second_count": {
+   "source": "transcript-derived (one order, cancelled and confirmed)",
+   "value": 1
+  }
+ },
+ "reqids_probe": {
+  "a_next_valid_at_connect": 1,
+  "a_reqIds_after_other_connection_cancel": 1,
+  "a_reqIds_before_other_connection_order": 1,
+  "a_reqIds_while_other_connection_order_open": 1,
+  "b_reqIds_while_its_own_order_open_minus_its_order_id": 1,
+  "other_connection_order_status_after_cancel": "Cancelled",
+  "other_connection_order_status_while_open": "Submitted",
+  "source": "transcript-derived (probe output printed in the session; no receipt file)"
+ },
+ "revision": {
+  "changes": [
+   "rung wire means: wire_est_refined_msgs_per_s_mean and wire_est_upper_bound_msgs_per_s_mean of every adapter rung and of the adapter_r6_rung30/40/50 headline entries are now the messages inside the rung's own window divided by its recorded seconds; the revision-3 order-attributed values are kept as wire_est_refined_msgs_per_s_mean_by_order_rung and wire_est_upper_bound_msgs_per_s_mean_by_order_rung",
+   "each adapter rung gains cancels_sent_in_own_window, cancels_sent_in_other_rung_window and cancels_sent_outside_rung_windows, which sum to cancels_sent (cancels_sent, cancels_with_known_venue_id and cancels_before_acceptance are unchanged and order-attributed)",
+   "the generator stops with a message for a rung that placed orders but has no window, instead of publishing a null mean",
+   "facts.rate_window_conventions gains rung_wire_means and field_changes_in_revision_4 (its field_changes key is renamed field_changes_in_revision_3) and one caveat is added; every other measured value, count, latency, sliding maximum, peak and test result is unchanged"
+  ],
+  "earlier_revisions": {
+   "1": {
+    "generator_sha256": "56463b2622501446a9a1640c6d3065920dbd449a622457ea61f392ce6166c5a1",
+    "json_sha256": "b492f42d335370e22f4349bf43db54f1adf4c77921b36a28300159b08c8e11fa",
+    "verifier_sha256": "0e9fb1376a59e34cf1e3b6ba2fea30d89aad5e09db28de0b4d59792a41207468"
+   },
+   "2": {
+    "generator_sha256": "f44b595a13cf87b4ad555427000c7937cc62452076f0a3380f13338127147619",
+    "json_sha256": "25ef71020a06e1781fac0360aa8b19c564d9d146b65ea3fc6b8cb0ab62ab0c15",
+    "verifier_sha256": "cac1e764f429dc05575dfe8a692e74d4bcc04a8906e174e9e7b0178cf61494e3"
+   }
+  },
+  "number": 4,
+  "reason": "A co-op question on nas#1083 showed that the per-rung wire means of revisions 1 to 3 charged each rung with the cancels of the orders it SUBMITTED, wherever those cancels were sent, over the rung's own recorded seconds: a cancel sent in the next rung's window, or after the ladder, was counted in the submission rung, and for a rung stopped part-way the submits after its recorded seconds were counted too, so a rung's mean was not the rate of messages inside its window. The per-message series (max_1s_sliding_in_rung_window, the whole-run and combined rate blocks) and the official-client figures were already window or message based and are unchanged.",
+  "sealed_files": "the revision-1, revision-2 and revision-3 files stay sealed and unchanged; anything citing them by hash still resolves",
+  "supersedes": {
+   "generator_sha256": "933133afe24f128eb4226fb4c50230cb300d5e59ef8e663cc8dac0fb95a9100b",
+   "json_sha256": "180dd86e1848b8714ab7e5850d2989eb08217c1a0fb87f3af6493bc9006b8729",
+   "verifier_sha256": "c8872073cf71990e349ef77293dcef0e434b087e70091b26c6c2749cbce22630"
+  }
+ },
+ "schema": "ibkr-pacing-evidence/1",
+ "scope": "IBKR paper Gateway, one account; 1-share SPY BUY limit orders far below the bid, placed and cancelled: the ladders and pair tests filled nothing; the phase A step S2 is a one-share filled round trip (flat afterwards)"
+}

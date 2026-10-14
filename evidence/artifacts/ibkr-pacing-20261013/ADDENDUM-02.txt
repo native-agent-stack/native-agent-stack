@@ -1,0 +1,12 @@
+ADDENDUM 02 to ibkr-pacing-evidence-20261013.json (sealed): the cross-client order-id rule IS documented by IBKR (correction of README.md section 'What the data shows', last paragraph)
+
+README.md (and my message of the same day) said no IBKR documentation of the cross-client effect was cited here and treated the mechanism as observed behaviour only. That is out of date.
+The vendor's legacy TWS API documentation page "Placing Orders" (https://interactivebrokers.github.io/tws-api/order_submission.html, section "The Next Valid Identifier"; the page carries a
+deprecation banner pointing to IBKR Campus) states, read by tool on 2026-10-13 at about 16:18Z (a second reader, demo, cites the same sentence in its handbook change):
+  - "...if there are multiple client applications connected to one account, it is necessary to use an order ID with new orders which is greater than all previous order IDs returned to the
+    client application in openOrder or orderStatus callbacks."
+  - "...if the function reqAllOpenOrders is used by a client, subsequent orders placed by that client must have order IDs greater than the order IDs of all orders returned because of that
+    function call."
+These are the documented form of what the official-client tests observed (the refusals appear exactly where a connection asked for all open orders and its own ids were lower). The README's
+conclusion that the refusal is "a limit of the adapter's request pattern interacting with that behaviour, not an IBKR throughput limit" stands; the behaviour itself is documented, not merely
+observed. No measurement, count or figure in the JSON changes.
