@@ -1347,3 +1347,15 @@ is unwired and no sentence of the instruction blocks changes. All earlier projec
 observations.
 
 Today: 403 pieces, 363 wired (211 practice, 152 through a slot), 24 not wired (0 through a slot that does not install, 24 by their own entry) and 16 authorization pieces
+
+## Addendum 2026-10-14: skill-list reload after a compaction
+
+The Claude settings template gains one practice piece, the SessionStart hook on the `compact` source that returns
+`reloadSkills: true` ([decision](2026-10-14-skill-list-reload-after-compaction.md)). Its command runs jq alone, a
+command word the check already allows for a practice piece. No piece is unwired and no sentence of the instruction
+blocks changes. All earlier projections remain historical observations.
+
+Declared test change: `test_settings_keep_the_practice_pieces_and_drop_the_old_profile_pieces` now also accepts that
+one command among the rendered hooks and asserts that SessionStart carries it exactly once.
+
+Today: 404 pieces, 364 wired (212 practice, 152 through a slot), 24 not wired (0 through a slot that does not install, 24 by their own entry) and 16 authorization pieces

@@ -1,0 +1,831 @@
+{
+ "probe": "skill_list_probe.py",
+ "probe_sha256": "cb3d38215316bf77202025408c0ece387316ac605862f1d39612228a451ee68e",
+ "stand_in_sha256": "dfff686dff84d92d79fd88c2dd77630f6c5f480a8db847cf1aa4506ca546e6ac",
+ "template": "adoption/templates/claude.settings.template.json",
+ "template_sha256": "e5fa50061365622c65a460a446ae131ad2dd80c458729278269951c84d619ffb",
+ "hook_group": {
+  "matcher": "compact",
+  "hooks": [
+   {
+    "type": "command",
+    "command": "jq -cn '{hookSpecificOutput: {hookEventName: \"SessionStart\", reloadSkills: true}}'",
+    "timeout": 5
+   }
+  ]
+ },
+ "measured_at": "2026-10-14T04:15:01Z",
+ "arms": [
+  {
+   "version": "2.1.296",
+   "arm": "manual",
+   "hook": false,
+   "client_exit": 0,
+   "turn_results": [
+    "success",
+    "success",
+    "success",
+    "success",
+    "success"
+   ],
+   "compaction_triggers": [
+    "manual"
+   ],
+   "requests_logged_at_boundary": 3,
+   "requests": [
+    {
+     "n": 1,
+     "messages": 2,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 2,
+     "messages": 5,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 3,
+     "messages": 5,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 4,
+     "messages": 5,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": false,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 5,
+     "messages": 8,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": false,
+     "skill_list_in_system": false
+    }
+   ],
+   "list_in_requests_before_boundary": [
+    true,
+    true,
+    true
+   ],
+   "list_in_requests_after_boundary": [
+    false,
+    false
+   ]
+  },
+  {
+   "version": "2.1.296",
+   "arm": "manual",
+   "hook": true,
+   "client_exit": 0,
+   "turn_results": [
+    "success",
+    "success",
+    "success",
+    "success",
+    "success"
+   ],
+   "compaction_triggers": [
+    "manual"
+   ],
+   "requests_logged_at_boundary": 3,
+   "requests": [
+    {
+     "n": 1,
+     "messages": 2,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 2,
+     "messages": 5,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 3,
+     "messages": 5,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 4,
+     "messages": 5,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 5,
+     "messages": 8,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    }
+   ],
+   "list_in_requests_before_boundary": [
+    true,
+    true,
+    true
+   ],
+   "list_in_requests_after_boundary": [
+    true,
+    true
+   ]
+  },
+  {
+   "version": "2.1.296",
+   "arm": "auto",
+   "hook": false,
+   "client_exit": 0,
+   "turn_results": [
+    "success",
+    "success",
+    "success",
+    "success"
+   ],
+   "compaction_triggers": [
+    "auto"
+   ],
+   "requests_logged_at_boundary": 2,
+   "requests": [
+    {
+     "n": 1,
+     "messages": 2,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 2,
+     "messages": 4,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 3,
+     "messages": 2,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": false,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 4,
+     "messages": 5,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": false,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 5,
+     "messages": 8,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": false,
+     "skill_list_in_system": false
+    }
+   ],
+   "list_in_requests_before_boundary": [
+    true,
+    true
+   ],
+   "list_in_requests_after_boundary": [
+    false,
+    false,
+    false
+   ]
+  },
+  {
+   "version": "2.1.296",
+   "arm": "auto",
+   "hook": true,
+   "client_exit": 0,
+   "turn_results": [
+    "success",
+    "success",
+    "success",
+    "success"
+   ],
+   "compaction_triggers": [
+    "auto"
+   ],
+   "requests_logged_at_boundary": 2,
+   "requests": [
+    {
+     "n": 1,
+     "messages": 2,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 2,
+     "messages": 4,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 3,
+     "messages": 2,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": false,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 4,
+     "messages": 5,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 5,
+     "messages": 8,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    }
+   ],
+   "list_in_requests_before_boundary": [
+    true,
+    true
+   ],
+   "list_in_requests_after_boundary": [
+    false,
+    true,
+    true
+   ]
+  },
+  {
+   "version": "2.1.296",
+   "arm": "auto-tool",
+   "hook": false,
+   "client_exit": 0,
+   "turn_results": [
+    "success",
+    "success",
+    "success",
+    "success"
+   ],
+   "compaction_triggers": [
+    "auto"
+   ],
+   "requests_logged_at_boundary": 2,
+   "requests": [
+    {
+     "n": 1,
+     "messages": 2,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 2,
+     "messages": 5,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 3,
+     "messages": 2,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": false,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 4,
+     "messages": 5,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": false,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 5,
+     "messages": 8,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": false,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 6,
+     "messages": 11,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": false,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 7,
+     "messages": 14,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": false,
+     "skill_list_in_system": false
+    }
+   ],
+   "list_in_requests_before_boundary": [
+    true,
+    true
+   ],
+   "list_in_requests_after_boundary": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ]
+  },
+  {
+   "version": "2.1.296",
+   "arm": "auto-tool",
+   "hook": true,
+   "client_exit": 0,
+   "turn_results": [
+    "success",
+    "success",
+    "success",
+    "success"
+   ],
+   "compaction_triggers": [
+    "auto"
+   ],
+   "requests_logged_at_boundary": 2,
+   "requests": [
+    {
+     "n": 1,
+     "messages": 2,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 2,
+     "messages": 5,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 3,
+     "messages": 2,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": false,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 4,
+     "messages": 5,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 5,
+     "messages": 8,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 6,
+     "messages": 11,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 7,
+     "messages": 14,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    }
+   ],
+   "list_in_requests_before_boundary": [
+    true,
+    true
+   ],
+   "list_in_requests_after_boundary": [
+    false,
+    true,
+    true,
+    true,
+    true
+   ]
+  },
+  {
+   "version": "2.1.299",
+   "arm": "manual",
+   "hook": false,
+   "client_exit": 0,
+   "turn_results": [
+    "success",
+    "success",
+    "success",
+    "success",
+    "success"
+   ],
+   "compaction_triggers": [
+    "manual"
+   ],
+   "requests_logged_at_boundary": 3,
+   "requests": [
+    {
+     "n": 1,
+     "messages": 2,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 2,
+     "messages": 5,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 3,
+     "messages": 5,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 4,
+     "messages": 5,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": false,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 5,
+     "messages": 8,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": false,
+     "skill_list_in_system": false
+    }
+   ],
+   "list_in_requests_before_boundary": [
+    true,
+    true,
+    true
+   ],
+   "list_in_requests_after_boundary": [
+    false,
+    false
+   ]
+  },
+  {
+   "version": "2.1.299",
+   "arm": "manual",
+   "hook": true,
+   "client_exit": 0,
+   "turn_results": [
+    "success",
+    "success",
+    "success",
+    "success",
+    "success"
+   ],
+   "compaction_triggers": [
+    "manual"
+   ],
+   "requests_logged_at_boundary": 3,
+   "requests": [
+    {
+     "n": 1,
+     "messages": 2,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 2,
+     "messages": 5,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 3,
+     "messages": 5,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 4,
+     "messages": 5,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 5,
+     "messages": 8,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    }
+   ],
+   "list_in_requests_before_boundary": [
+    true,
+    true,
+    true
+   ],
+   "list_in_requests_after_boundary": [
+    true,
+    true
+   ]
+  },
+  {
+   "version": "2.1.299",
+   "arm": "auto",
+   "hook": false,
+   "client_exit": 0,
+   "turn_results": [
+    "success",
+    "success",
+    "success"
+   ],
+   "compaction_triggers": [
+    "auto"
+   ],
+   "requests_logged_at_boundary": 2,
+   "requests": [
+    {
+     "n": 1,
+     "messages": 2,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 2,
+     "messages": 4,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 3,
+     "messages": 2,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": false,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 4,
+     "messages": 5,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": false,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 5,
+     "messages": 8,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": false,
+     "skill_list_in_system": false
+    }
+   ],
+   "list_in_requests_before_boundary": [
+    true,
+    true
+   ],
+   "list_in_requests_after_boundary": [
+    false,
+    false,
+    false
+   ]
+  },
+  {
+   "version": "2.1.299",
+   "arm": "auto",
+   "hook": true,
+   "client_exit": 0,
+   "turn_results": [
+    "success",
+    "success",
+    "success",
+    "success"
+   ],
+   "compaction_triggers": [
+    "auto"
+   ],
+   "requests_logged_at_boundary": 2,
+   "requests": [
+    {
+     "n": 1,
+     "messages": 2,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 2,
+     "messages": 4,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 3,
+     "messages": 2,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": false,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 4,
+     "messages": 5,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 5,
+     "messages": 8,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    }
+   ],
+   "list_in_requests_before_boundary": [
+    true,
+    true
+   ],
+   "list_in_requests_after_boundary": [
+    false,
+    true,
+    true
+   ]
+  },
+  {
+   "version": "2.1.299",
+   "arm": "auto-tool",
+   "hook": false,
+   "client_exit": 0,
+   "turn_results": [
+    "success",
+    "success",
+    "success",
+    "success"
+   ],
+   "compaction_triggers": [
+    "auto"
+   ],
+   "requests_logged_at_boundary": 2,
+   "requests": [
+    {
+     "n": 1,
+     "messages": 2,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 2,
+     "messages": 5,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 3,
+     "messages": 2,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": false,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 4,
+     "messages": 5,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": false,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 5,
+     "messages": 8,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": false,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 6,
+     "messages": 11,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": false,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 7,
+     "messages": 14,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": false,
+     "skill_list_in_system": false
+    }
+   ],
+   "list_in_requests_before_boundary": [
+    true,
+    true
+   ],
+   "list_in_requests_after_boundary": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ]
+  },
+  {
+   "version": "2.1.299",
+   "arm": "auto-tool",
+   "hook": true,
+   "client_exit": 0,
+   "turn_results": [
+    "success",
+    "success",
+    "success",
+    "success"
+   ],
+   "compaction_triggers": [
+    "auto"
+   ],
+   "requests_logged_at_boundary": 2,
+   "requests": [
+    {
+     "n": 1,
+     "messages": 2,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 2,
+     "messages": 5,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 3,
+     "messages": 2,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": false,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 4,
+     "messages": 5,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 5,
+     "messages": 8,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 6,
+     "messages": 11,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    },
+    {
+     "n": 7,
+     "messages": 14,
+     "skill_tool_offered": true,
+     "skill_list_in_messages": true,
+     "skill_list_in_system": false
+    }
+   ],
+   "list_in_requests_before_boundary": [
+    true,
+    true
+   ],
+   "list_in_requests_after_boundary": [
+    false,
+    true,
+    true,
+    true,
+    true
+   ]
+  }
+ ]
+}

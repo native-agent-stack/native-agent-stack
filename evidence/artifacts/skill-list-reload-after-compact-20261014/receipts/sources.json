@@ -1,0 +1,43 @@
+{
+ "sources": [
+  {
+   "name": "Claude Code hooks reference",
+   "url": "https://code.claude.com/docs/en/hooks.md",
+   "fetched_at": "2026-10-14T04:20:16Z",
+   "bytes": 270367,
+   "sha256": "0ccea55b53b6b616134028b857028cf3822b89958a9c4b23806287dddeefe954",
+   "cited_lines": [
+    1214,
+    1276,
+    1294,
+    1296
+   ]
+  },
+  {
+   "name": "anthropics/claude-code CHANGELOG.md",
+   "url": "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md",
+   "commit": "db93774d73e8fdbaf315a6f4c175ae99ad3d515a",
+   "fetched_at": "2026-10-14T03:19:25Z",
+   "bytes": 1015061,
+   "sha256": "7abf62a98e6739e0b51071c5e289b0a6baef4f3a2d08046a6df2b338b3d0d086",
+   "cited_lines": [
+    149,
+    5008
+   ],
+   "cited_sections": [
+    "2.1.299",
+    "2.1.152"
+   ]
+  }
+ ],
+ "clients": [
+  {
+   "version": "2.1.296",
+   "binary_sha256": "24972e3bc859fab2b46ed4c1e51f7d6130f06d3bd550811a114640de3370d0de"
+  },
+  {
+   "version": "2.1.299",
+   "binary_sha256": "2d894a4b1bfaaa9aab72aeff7803e3c73bc2510f279a171f6b8f59f72d17d077"
+  }
+ ]
+}

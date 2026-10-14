@@ -255,6 +255,16 @@
             "timeout": 5
           }
         ]
+      },
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -cn '{hookSpecificOutput: {hookEventName: \"SessionStart\", reloadSkills: true}}'",
+            "timeout": 5
+          }
+        ]
       }
     ],
     "SubagentStop": [
