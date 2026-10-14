@@ -7,6 +7,9 @@ import sys
 import tempfile
 import types
 import asyncio
+import contextlib
+import threading
+import ast
 import unittest
 from unittest.mock import Mock, patch
 
@@ -21,6 +24,124 @@ BLOCK={'window_seconds':30,'benchmark_quote_timeout_seconds':5}
 
 
 class StartReadiness(unittest.TestCase):
+    def budget_probe(self, root, *, readiness=True):
+        """Astra's budget probe: real HTTP guard, preflight and durable Ledger."""
+        clock=[0.0];epoch=transport.timestamp_ns('2026-10-14T08:00:00Z')
+        attempts=[];wire=[];quote_reads=[0]
+        def client(*args,**kwargs):
+            auth=args[2];c=Mock()
+            def get(path,value,data=False):
+                def call(*a,**k):
+                    guard=object.__new__(transport.GuardedSession)
+                    guard.origin=transport.DATA_URL if data else transport.PAPER_URL
+                    guard.before_request=auth;guard.lock=threading.Lock();guard.observer=None
+                    guard.read_only=True;guard._session=Mock()
+                    def sent(*a,**k):wire.append(path);return types.SimpleNamespace(status_code=200)
+                    guard._session.request.side_effect=sent
+                    guard.request('GET',guard.origin+path)
+                    return value() if callable(value) else value
+                return call
+            c.get_account.side_effect=get('/v2/account',{'id':'fixture-account-id','cash':'10000','equity':'20000','buying_power':'20000'})
+            c.get_clock.side_effect=get('/v2/clock',{'is_open':False,'timestamp':'2026-10-14T08:00:00Z',
+                'next_close':'2026-10-14T20:00:00Z','next_open':'2026-10-14T13:30:00Z'})
+            c.get_all_positions.side_effect=get('/v2/positions',[]);c.get.side_effect=get('/v2/orders',[])
+            c.get_asset.side_effect=get('/v2/assets/SPY',{'symbol':'SPY','status':'active','tradable':True,'attributes':[]})
+            def quotes():
+                quote_reads[0]+=1;age=8 if quote_reads[0]==1 else 1
+                return {'SPY':{'bp':100,'ap':100.01,'bs':1,'as':1,
+                    't':datetime.fromtimestamp(epoch/1e9+clock[0]-age,timezone.utc)}}
+            c.get_stock_latest_quote.side_effect=get('/v2/stocks/quotes/latest',quotes,True)
+            return c
+        _,limits,_=runner.load_config(SOURCE/'config.json')
+        # At the fail-before head, execute the actual nested observer/replay
+        # statements, as the review probe did, rather than substitute a policy.
+        main=next(n for n in ast.parse((SOURCE/'runner.py').read_text()).body
+                  if isinstance(n,ast.FunctionDef) and n.name=='main')
+        prior_observer=next(n for n in ast.walk(main) if isinstance(n,ast.FunctionDef) and n.name=='observe_request') if not hasattr(runner,'preflight_request_observer') else None
+        prior_replay=next(n for n in ast.walk(main) if isinstance(n,ast.For) and isinstance(n.iter,ast.Name)
+                          and n.iter.id=='attempts') if not hasattr(runner,'replay_preflight_requests') else None
+        def advance(seconds):clock[0]+=seconds
+        with self.sdk_imports(),patch.object(transport,'_sdk_client',side_effect=client), \
+             patch.object(transport.time,'monotonic',side_effect=lambda:clock[0]), \
+             patch.object(transport.time,'time',side_effect=lambda:epoch/1e9+clock[0]), \
+             patch.object(transport.time,'time_ns',side_effect=lambda:epoch+int(clock[0]*1e9)), \
+             patch.object(transport.time,'sleep',side_effect=advance):
+            window=(runner.readiness_request_window(root,limits,enabled=readiness)
+                    if hasattr(runner,'readiness_request_window') else contextlib.nullcontext(None))
+            with window as budget:
+                if prior_observer is not None:
+                    ns={'attempts':attempts,'time':transport.time,'SafetyError':runner.SafetyError}
+                    exec(compile(ast.fix_missing_locations(ast.Module(body=[prior_observer],type_ignores=[])),
+                                 'review-observer','exec'),ns)
+                    observe=ns['observe_request']
+                else:observe=runner.preflight_request_observer(attempts,budget)
+                try:
+                    result=transport.preflight('fixture-key','fixture-secret',['SPY'],before_request=observe,
+                        **({'start_readiness':BLOCK,'benchmark_symbols':['SPY']} if readiness else {}))
+                except transport.TransportError:
+                    self.assertEqual(wire,[])
+                    raise
+        with contextlib.closing(runner.Ledger(root/'trading.sqlite3',limits)) as ledger:
+            if prior_replay is not None:
+                exec(compile(ast.fix_missing_locations(ast.Module(body=[prior_replay],type_ignores=[])),
+                             'review-replay','exec'),{'ledger':ledger,'attempts':attempts,'SafetyError':runner.SafetyError})
+            else:runner.replay_preflight_requests(ledger,attempts,readiness=readiness)
+            rows=dict(ledger.db.execute('SELECT kind,COUNT(*) FROM requests GROUP BY kind'))
+        return attempts,wire,result,rows
+
+    def test_readiness_twelve_gets_persist_in_both_windows(self):
+        with tempfile.TemporaryDirectory(dir='/var/tmp') as directory:
+            root=Path(directory)
+            attempts,wire,result,rows=self.budget_probe(root)
+            self.assertEqual((len(attempts),len(wire),result['start_readiness']['quote_reads']),(12,12,3))
+            self.assertEqual(rows,{'read':9,'data_read':3})
+            with contextlib.closing(runner.Ledger(root/'readiness-requests.sqlite3')) as budget:
+                self.assertEqual(dict(budget.db.execute('SELECT kind,COUNT(*) FROM requests GROUP BY kind')),rows)
+
+    def test_exhausted_readiness_window_refuses_before_get_and_survives_retry(self):
+        with tempfile.TemporaryDirectory(dir='/var/tmp') as directory:
+            root=Path(directory);epoch=transport.timestamp_ns('2026-10-14T08:00:00Z')/1e9
+            with contextlib.closing(runner.Ledger(root/'readiness-requests.sqlite3')) as budget:
+                for _ in range(200):self.assertEqual(budget.request_budget(epoch,'data_read'),0)
+            for _ in range(2):
+                with self.assertRaisesRegex(transport.TransportError,'readiness_request_budget_exhausted'):
+                    self.budget_probe(root)
+                with contextlib.closing(runner.Ledger(root/'readiness-requests.sqlite3')) as budget:
+                    self.assertEqual(budget.db.execute('SELECT COUNT(*) FROM requests').fetchone()[0],200)
+
+    def test_default_data_requests_keep_existing_policy(self):
+        with tempfile.TemporaryDirectory(dir='/var/tmp') as directory:
+            root=Path(directory);attempts,wire,result,rows=self.budget_probe(root,readiness=False)
+            self.assertEqual((len(attempts),len(wire)),(6,6))
+            self.assertEqual(rows,{'read':5})
+            self.assertFalse((root/'readiness-requests.sqlite3').exists())
+
+    def test_main_opted_budget_refuses_before_http_and_retains_retry_window(self):
+        from sessions import SessionKind
+        with tempfile.TemporaryDirectory(dir='/var/tmp') as directory:
+            root=Path(directory);state=root/'state';p=root/'config.json';p.write_text(json.dumps(self.config()))
+            _,limits,_=runner.load_config(p);now=transport.timestamp_ns('2026-10-14T08:00:00Z')/1e9
+            with contextlib.closing(runner.Ledger(state/'readiness-requests.sqlite3',limits)) as ledger:
+                for _ in range(200):ledger.request_budget(now,'read')
+            wire=Mock(side_effect=AssertionError('GET reached with exhausted durable readiness window'))
+            def get(*args,**kwargs):
+                guard=object.__new__(transport.GuardedSession)
+                guard.origin=transport.PAPER_URL;guard.read_only=True;guard.before_request=kwargs['before_request']
+                guard.lock=threading.Lock();guard.observer=None;guard._session=Mock();guard._session.request=wire
+                guard.request('GET',transport.PAPER_URL+'/v2/account')
+            argv=['runner.py','paper','--credentials','keychain-env','--config',str(p),
+                  '--state-root',str(state),'--output',str(root/'receipt.json'),'--trial','fixture']
+            for _ in range(2):
+                with patch.object(sys,'argv',argv),patch.object(runner,'paper_credentials',return_value=('fixture-key','fixture-secret')), \
+                     patch.object(runner,'check_order_contract_boundary',return_value={}), \
+                     patch.object(runner,'session_at',return_value=types.SimpleNamespace(kind=SessionKind.PRE)), \
+                     patch.object(runner.time,'time',return_value=now),patch.object(runner,'preflight',side_effect=get):
+                    self.assertEqual(runner.main(),2)
+                self.assertEqual(json.loads((root/'receipt.json').read_text())['reason'],'readiness_request_budget_exhausted')
+                wire.assert_not_called()
+                with contextlib.closing(runner.Ledger(state/'readiness-requests.sqlite3',limits)) as ledger:
+                    self.assertEqual(ledger.db.execute('SELECT COUNT(*) FROM requests').fetchone()[0],200)
+
     def sdk_imports(self):
         enums=types.ModuleType('alpaca.data.enums');enums.DataFeed=lambda value:value
         requests=types.ModuleType('alpaca.data.requests')
@@ -178,13 +299,22 @@ class StartReadiness(unittest.TestCase):
                 payload={'quotes':{'SPY':{'bp':100,'ap':100.01,'bs':1,'as':1,'t':stamp}}}
             else:raise AssertionError('unexpected read endpoint')
             return transport_fixtures.response(payload)
-        budget=Mock()
-        with patch('requests.Session.request',side_effect=http), \
+        with tempfile.TemporaryDirectory(dir='/var/tmp') as directory, \
+             patch('requests.Session.request',side_effect=http), \
              patch.object(transport.time,'monotonic',side_effect=lambda:clock[0]), \
+             patch.object(transport.time,'time',side_effect=lambda:epoch/1e9+clock[0]), \
              patch.object(transport.time,'time_ns',side_effect=lambda:epoch+int(clock[0]*1e9)), \
              patch.object(transport.time,'sleep',side_effect=advance):
-            result=transport.preflight('fixture-key','fixture-secret',['SPY'],before_request=budget,
-                                      start_readiness=BLOCK,benchmark_symbols=['SPY'])
+            root=Path(directory);_,limits,_=runner.load_config(SOURCE/'config.json');attempts=[]
+            with runner.readiness_request_window(root,limits,enabled=True) as reserve:
+                budget=Mock(wraps=runner.preflight_request_observer(attempts,reserve))
+                result=transport.preflight('fixture-key','fixture-secret',['SPY'],before_request=budget,
+                                          start_readiness=BLOCK,benchmark_symbols=['SPY'])
+            for name in ('readiness-requests.sqlite3','trading.sqlite3'):
+                with contextlib.closing(runner.Ledger(root/name,limits)) as ledger:
+                    if name=='trading.sqlite3':runner.replay_preflight_requests(ledger,attempts,readiness=True)
+                    self.assertEqual(dict(ledger.db.execute('SELECT kind,COUNT(*) FROM requests GROUP BY kind')),
+                                     {'read':9,'data_read':3})
         self.assertEqual(reads,{'account':2,'quote':3})
         self.assertEqual(result['account']['cash'],'9999')
         self.assertEqual(result['start_readiness'],dict(BLOCK,quote_reads=3,account_state_refreshed=True))

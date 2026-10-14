@@ -25,6 +25,7 @@ if __name__ == "__main__":
 import argparse
 import ast
 import asyncio
+from contextlib import contextmanager
 from dataclasses import asdict, replace
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
@@ -2375,6 +2376,52 @@ def _controller_session(close, now, session_policy):
     return close, market_open
 
 
+@contextmanager
+def readiness_request_window(state_root, limits, *, enabled, exploratory=False):
+    """Reserve opted startup GETs before HTTP in a retained root-local window.
+
+    This request-only journal uses Ledger's existing atomic 60-second budget;
+    it is separate from trial/risk state so refused starts retain reservations
+    without bootstrapping a trial. Disabled calls create no journal.
+    """
+    ledger = None
+    def reserve(timestamp, kind):
+        nonlocal ledger
+        if ledger is None:
+            budget_limits = RiskLimits(max_rest_per_minute=limits.max_rest_per_minute,
+                                       max_submits_per_minute=limits.max_submits_per_minute)
+            ledger = Ledger(Path(state_root) / "readiness-requests.sqlite3", budget_limits,
+                            exploratory=exploratory)
+        if ledger.request_budget(timestamp, kind):
+            raise TransportError("readiness_request_budget_exhausted")
+    try:
+        yield reserve if enabled else None
+    finally:
+        if ledger is not None:
+            ledger.close()
+
+
+def preflight_request_observer(attempts, readiness_budget=None):
+    """Retain the invocation bound; opted GETs additionally reserve durably."""
+    def observe_request(kind, **kwargs):
+        timestamp = time.time()
+        attempts.append({"timestamp": timestamp, "kind": kind})
+        if len(attempts) > 50:
+            raise SafetyError("preflight_request_bound")
+        if readiness_budget is not None:
+            readiness_budget(timestamp, kind)
+    return observe_request
+
+
+def replay_preflight_requests(ledger, attempts, *, readiness=False):
+    """Carry opted data GETs into trading's window, leaving default policy intact."""
+    for attempt in attempts:
+        if attempt["kind"] != "data_read" or readiness:
+            kind = "data_read" if attempt["kind"] == "data_read" else "read"
+            if ledger.request_budget(attempt["timestamp"], kind):
+                raise SafetyError("preflight_budget_inconsistent")
+
+
 @runtime_read_locked
 @receipt_scope
 def main():
@@ -2445,10 +2492,6 @@ def main():
         CorporateActionMonitor(AlpacaCorporateActionsSource(key, secret))
         if session_policy["overnight_holds"] else None)
     attempts, responses = [], []
-    def observe_request(kind, **kwargs):
-        attempts.append({"timestamp": time.time(), "kind": kind})
-        if len(attempts) > 50:
-            raise SafetyError("preflight_request_bound")
     # G-e: only a validated leverage policy widens the preflight account
     # read to include margin fields (transport.normalize_account); the
     # default (no "leverage_policy" block) preflight is unchanged.
@@ -2457,11 +2500,13 @@ def main():
                  session_at(datetime.now(timezone.utc)).kind.value)
                  if "extended_hours_start_readiness" in config else {})
     try:
-        observation = preflight(key, secret, config["symbols"], feed=config["feed"],
-                                before_request=observe_request, request_observer=responses.append,
-                                include_margin=include_margin,
-                                **({"start_readiness": readiness, "benchmark_symbols": config["benchmarks"],
-                                    "stop_requested": lambda: DEFAULT_STOP.exists()} if readiness else {}))
+        with readiness_request_window(args.state_root, limits, enabled=bool(readiness),
+                                      exploratory=exploratory) as budget:
+            observation = preflight(key, secret, config["symbols"], feed=config["feed"],
+                                    before_request=preflight_request_observer(attempts, budget),
+                                    request_observer=responses.append, include_margin=include_margin,
+                                    **({"start_readiness": readiness, "benchmark_symbols": config["benchmarks"],
+                                        "stop_requested": lambda: DEFAULT_STOP.exists()} if readiness else {}))
     except (TransportError, SafetyError) as exc:
         if isinstance(exc, SafetyError) and str(exc) != "preflight_request_bound":
             raise
@@ -2587,10 +2632,7 @@ def main():
                         **({"exploratory": True, "rotation": args.command == 'paper'} if exploratory else {}))
         try:
             now = time.time()
-            for attempt in attempts:
-                if attempt["kind"] != "data_read":
-                    if ledger.request_budget(attempt["timestamp"], "read"):
-                        raise SafetyError("preflight_budget_inconsistent")
+            replay_preflight_requests(ledger, attempts, readiness=bool(readiness))
             # D4: under the default policy, close/market_open keep exactly
             # today's behaviour (the broker's own RTH close, always open).
             # Under extended_hours, entries must be bounded by the actual

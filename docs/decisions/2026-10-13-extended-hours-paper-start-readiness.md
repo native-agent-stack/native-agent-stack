@@ -66,7 +66,14 @@ Read-only preflight polls selected benchmarks through the native SDK, no more
 often than every two seconds within a monotonic 30-second window. It reserves
 five GETs for the final snapshot; the cadence lengthens for larger universes
 to spread the remaining request slots across the window. Every GET uses the
-existing request authorization/observer and its 50-request ceiling; STOP or
+existing request authorization/observer and its 50-request ceiling. Opted
+readiness additionally reserves every broker and data GET through the existing
+Ledger.request_budget before HTTP, in a retained request-only
+readiness-requests.sqlite3 journal beside the root's trading state. Its atomic
+trailing-60-second window uses the configured total request cap and is retained
+after refused or failed starts and retries; exhaustion refuses before another GET.
+Successful startup replays all observed requests, including data_read, into the
+trading ledger's window. Default data/broker accounting is unchanged. STOP or
 the deadline refuses. Once quotes qualify, re-read account, clock, positions
 and open orders, verify the same identity, then re-read benchmark quotes.
 Every existing cash/entitlement/clock/session/universe/flat check still runs
@@ -75,6 +82,14 @@ Startup diagnostics record window, threshold, quote-read count and refreshed
 account-state proof; identifiers and credentials are not exported. Assets are
 read once before the wait; they are not refreshed after polling. A request-bound
 SafetyError publishes not_started with zero submitted orders.
+
+The durable request mechanism is the engine's existing
+[safety.py:1541-1572 at 9cc5c2046c89cf7d27519d1b01bdffb7f13dc727](https://github.com/native-agent-stack/native-agent-stack/blob/9cc5c2046c89cf7d27519d1b01bdffb7f13dc727/blueprints/us-equities/adaptive-paper/safety.py#L1541):
+request_budget accepts data_read, counts the retained trailing window and
+commits a reservation before returning zero. The opted provider-window policy
+is a local CC correction, not a vendor rate-limit claim. The request-only
+journal stores no trial, order or position; exploratory starts label its Ledger
+as lane B. It does not bootstrap or replace the trading journal.
 
 The transport independently receives start_timeout 30 and selected-benchmark
 age 5 throughout the extended-hours stage, including health and the stale-quote
@@ -138,6 +153,13 @@ acceptance is claimed by these synthetic tests.
   the current final snapshot refreshes only account, clock, positions, orders and benchmarks.
 - Extend branch coverage of malformed refresh responses and identity changes;
   synthetic acceptance does not establish native feed availability.
+- Before the next qualification of those branches, cover negative readiness
+  override/scope, OVERNIGHT forwarding, changed account identity and the full
+  malformed final-snapshot matrix.
+- Record correction-specific pinned local policy provenance for the signature
+  exclusion, PRE window allowance, request-slot arithmetic and refusal receipt.
+- At the next native qualification, cover session transitions, restore/replay
+  and exact-byte recovery; the second #1084/#1097 lander adds the combined test.
 
 A stale executable price, default/RTH widening, old flat/account proof after
 waiting, budget bypass or unbounded poll overturns this implementation.

@@ -13488,8 +13488,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "f66edd685631a86149f8757aaada8b10a49b3c4776767fab86ab12b483c46cec",
-      "bytes": 168813
+      "sha256": "3ce902532fd0fe5c8f59c62b7788090b6de921ca733eae4d6032ac90afdae0d6",
+      "bytes": 170735
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runtime_lock.py",
@@ -13523,7 +13523,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "e69fb4a3f6f4e00801b1e169d7ec8f945e1426a870d0d76c53fefc7fa785cf1f",
+      "sha256": "92ce5a800776255a94f58f0911fff11c7b7a2140aee23bf0e4dd97530ea4c354",
       "bytes": 9996
     },
     {
@@ -19118,8 +19118,8 @@
     },
     {
       "path": "docs/decisions/2026-10-13-extended-hours-paper-start-readiness.md",
-      "sha256": "ae6110ef18708b443ef7dfa81ca04f94277e8994d9872163ad21d1c37be25df2",
-      "bytes": 8815
+      "sha256": "8d3174adc602c965064772c14de3c6b3a34841f190b118ea96f1302f754970f0",
+      "bytes": 10512
     },
     {
       "path": "docs/decisions/2026-10-13-lane-a-frozen-field-continuity.md",
@@ -62178,8 +62178,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_start_readiness.py",
-      "sha256": "f1a1d585c551a6ea01298d304d6d292bbb595eab4f4f2cae981b16dc390c233c",
-      "bytes": 19797
+      "sha256": "0503d1f0643594b42aaa5c2bd90b1383bd912cf1079bd76cda516530d5a0ff17",
+      "bytes": 29599
     },
     {
       "path": "tests/test_adaptive_paper_strategies.py",
