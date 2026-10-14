@@ -88,6 +88,13 @@ Strategy features, ledger checks and the final order wire retain their shipped
 three-second bound. This grants no permission to price an order from stale data.
 See the [start-readiness decision](../../../docs/decisions/2026-10-13-extended-hours-paper-start-readiness.md).
 
+Opted starts reserve GETs in a retained request-only journal. Before trading,
+all still-active startup reservations, including refused starts, transfer once
+into the trading ledger's trailing-60-second window. Retry and repeated handoff
+cannot refund or duplicate them. An exploratory request-cap change reopens that
+journal only after its prior window expires, preserving history; lane A stays
+strict. See the [handoff correction](../../../docs/decisions/2026-10-14-paper-readiness-budget-handoff.md).
+
 Each trial records the SHA-256 of its selected config file as `config_sha256`
 in the state directory's `trial.json`. Recovery requires those exact bytes,
 including session flags, formatting and notes, and refuses every change with

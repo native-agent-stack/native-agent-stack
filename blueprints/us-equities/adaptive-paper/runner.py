@@ -2390,8 +2390,8 @@ def readiness_request_window(state_root, limits, *, enabled, exploratory=False):
         if ledger is None:
             budget_limits = RiskLimits(max_rest_per_minute=limits.max_rest_per_minute,
                                        max_submits_per_minute=limits.max_submits_per_minute)
-            ledger = Ledger(Path(state_root) / "readiness-requests.sqlite3", budget_limits,
-                            exploratory=exploratory)
+            ledger = Ledger.open_request_window(Path(state_root) / "readiness-requests.sqlite3",
+                                                budget_limits, timestamp, exploratory=exploratory)
         if ledger.request_budget(timestamp, kind):
             raise TransportError("readiness_request_budget_exhausted")
     try:
@@ -2413,8 +2413,13 @@ def preflight_request_observer(attempts, readiness_budget=None):
     return observe_request
 
 
-def replay_preflight_requests(ledger, attempts, *, readiness=False):
+def replay_preflight_requests(ledger, attempts, *, readiness=False, readiness_path=None, now=None):
     """Carry opted data GETs into trading's window, leaving default policy intact."""
+    if readiness:
+        if readiness_path is None:
+            raise SafetyError("readiness_request_journal_required")
+        ledger.import_request_window(readiness_path, time.time() if now is None else now)
+        return
     for attempt in attempts:
         if attempt["kind"] != "data_read" or readiness:
             kind = "data_read" if attempt["kind"] == "data_read" else "read"
@@ -2632,7 +2637,9 @@ def main():
                         **({"exploratory": True, "rotation": args.command == 'paper'} if exploratory else {}))
         try:
             now = time.time()
-            replay_preflight_requests(ledger, attempts, readiness=bool(readiness))
+            replay_preflight_requests(ledger, attempts, readiness=bool(readiness),
+                                      readiness_path=args.state_root / "readiness-requests.sqlite3" if readiness else None,
+                                      now=now)
             # D4: under the default policy, close/market_open keep exactly
             # today's behaviour (the broker's own RTH close, always open).
             # Under extended_hours, entries must be bounded by the actual

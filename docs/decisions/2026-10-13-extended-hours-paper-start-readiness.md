@@ -72,8 +72,10 @@ Ledger.request_budget before HTTP, in a retained request-only
 readiness-requests.sqlite3 journal beside the root's trading state. Its atomic
 trailing-60-second window uses the configured total request cap and is retained
 after refused or failed starts and retries; exhaustion refuses before another GET.
-Successful startup replays all observed requests, including data_read, into the
-trading ledger's window. Default data/broker accounting is unchanged. STOP or
+Successful startup transfers every still-active reservation, including failed
+starts and data_read, once into the trading ledger's window through the
+[handoff correction](2026-10-14-paper-readiness-budget-handoff.md).
+Default data/broker accounting is unchanged. STOP or
 the deadline refuses. Once quotes qualify, re-read account, clock, positions
 and open orders, verify the same identity, then re-read benchmark quotes.
 Every existing cash/entitlement/clock/session/universe/flat check still runs
@@ -156,8 +158,9 @@ acceptance is claimed by these synthetic tests.
 - Before the next qualification of those branches, cover negative readiness
   override/scope, OVERNIGHT forwarding, changed account identity and the full
   malformed final-snapshot matrix.
-- Record correction-specific pinned local policy provenance for the signature
-  exclusion, PRE window allowance, request-slot arithmetic and refusal receipt.
+- The [handoff correction](2026-10-14-paper-readiness-budget-handoff.md) records
+  correction-specific pinned policy provenance for the signature exclusion,
+  PRE window allowance, request-slot arithmetic and refusal receipt.
 - At the next native qualification, cover session transitions, restore/replay
   and exact-byte recovery; the second #1084/#1097 lander adds the combined test.
 

@@ -1538,6 +1538,82 @@ class Ledger:
                 recorded.append({"id": activity_id, "date": day, "net_amount": text, "sub_type": sub_type})
             return recorded
 
+    @classmethod
+    def open_request_window(cls, path, limits, now, *, exploratory=False):
+        """Request-only cap rotation: retain rows and require an expired window."""
+        now = instant(now)
+        prior_limits = limits
+        path = Path(path)
+        if path.exists() and not path.is_symlink():
+            probe = sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True)
+            try:
+                for table in ("trials", "intents", "positions", "executions", "fees"):
+                    exists = probe.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", (table,)).fetchone()
+                    if exists and probe.execute(f"SELECT 1 FROM {table} LIMIT 1").fetchone():
+                        raise SafetyError("request_only_journal_required")
+                has_meta = probe.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='meta'").fetchone()
+                row = probe.execute("SELECT value FROM meta WHERE key='limits'").fetchone() if has_meta else None
+                if row:
+                    prior_limits = RiskLimits(**json.loads(row[0]))
+            finally:
+                probe.close()
+        ledger = cls(path, prior_limits, exploratory=exploratory)
+        try:
+            if prior_limits.frozen_json() != limits.frozen_json():
+                if not exploratory:
+                    raise SafetyError("persisted_risk_limits_differ")
+                old = json.loads(prior_limits.frozen_json())
+                new = json.loads(limits.frozen_json())
+                for name in ("max_rest_per_minute", "max_submits_per_minute"):
+                    old.pop(name); new.pop(name)
+                if old != new:
+                    raise SafetyError("request_window_only_caps_may_change")
+                with ledger._transaction():
+                    if any(ledger.db.execute(f"SELECT 1 FROM {table} LIMIT 1").fetchone()
+                           for table in ("trials", "intents", "positions", "executions", "fees")):
+                        raise SafetyError("request_only_journal_required")
+                    if ledger.db.execute("SELECT 1 FROM requests WHERE at>? LIMIT 1", (now-60,)).fetchone():
+                        raise SafetyError("readiness_cap_change_requires_expired_window")
+                    ledger._set("limits", limits.frozen_json())
+                    ledger.limits = limits
+            return ledger
+        except BaseException:
+            ledger.close()
+            raise
+
+    def import_request_window(self, path, now):
+        """Carry active failed/successful startup rows once, without refunds."""
+        now = instant(now)
+        path = Path(path)
+        if path.is_symlink() or not path.is_file():
+            raise SafetyError("readiness_request_journal_required")
+        origin = hashlib.sha256(str(path.resolve()).encode()).hexdigest()
+        source = sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True)
+        try:
+            lane = source.execute("SELECT value FROM meta WHERE key='paper_lane'").fetchone()
+            if (lane[0] if lane else None) != ("B" if self.exploratory else None):
+                raise SafetyError("readiness_request_lane_mismatch")
+            if any(source.execute(f"SELECT 1 FROM {table} LIMIT 1").fetchone()
+                   for table in ("trials", "intents", "positions", "executions", "fees")):
+                raise SafetyError("request_only_journal_required")
+            rows = source.execute("SELECT id,at,kind FROM requests WHERE at>? ORDER BY at,id", (now-60,)).fetchall()
+        finally:
+            source.close()
+        if any(at > now or kind not in ("read", "data_read") for _, at, kind in rows):
+            raise SafetyError("invalid_readiness_request_history")
+        with self._transaction():
+            self.db.execute("CREATE TABLE IF NOT EXISTS request_imports("
+                            "origin TEXT NOT NULL,source_id INTEGER NOT NULL,request_id INTEGER NOT NULL "
+                            "REFERENCES requests(id),PRIMARY KEY(origin,source_id))")
+            for source_id, at, kind in rows:
+                if self.db.execute("SELECT 1 FROM request_imports WHERE origin=? AND source_id=?",
+                                   (origin, source_id)).fetchone():
+                    continue
+                cursor = self.db.execute("INSERT INTO requests(at,kind,client_id) VALUES (?,?,NULL)", (at,kind))
+                self.db.execute("INSERT INTO request_imports(origin,source_id,request_id) VALUES (?,?,?)",
+                                (origin,source_id,cursor.lastrowid))
+        return len(rows)
+
     def request_budget(self, now, kind, client_id=None):
         """Return 0 after durable reservation, or delay <=60s WITHOUT reservation.
 
