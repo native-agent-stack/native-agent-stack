@@ -18,6 +18,146 @@ import transport
 
 
 class ReadinessHandoff(unittest.TestCase):
+    def test_inflight_disabled_observer_rebinds_after_first_adoption(self):
+        from tests.test_adaptive_paper_start_readiness import StartReadiness
+        limits=runner.load_config(SOURCE/'config.json')[1]
+        epoch=transport.timestamp_ns('2026-10-14T08:00:00Z')/1e9
+        with tempfile.TemporaryDirectory(dir='/var/tmp') as directory:
+            root=Path(directory);trading=root/('a'*64)/'adaptive/ledger.sqlite3'
+            with contextlib.closing(Ledger(trading,limits)) as ledger:
+                for _ in range(199):ledger.request_budget(epoch-30,'read')
+            original=runner.readiness_request_window;wire=[]
+            request=transport.GuardedSession.request
+            def sent(guard,*args,**kwargs):
+                result=request(guard,*args,**kwargs);wire.append(args[0]);return result
+            @contextlib.contextmanager
+            def interleave(*args,**kwargs):
+                with original(*args,**kwargs) as budget:
+                    # Selection happens before another startup imports199
+                    # and takes the last slot. The first caller must consult
+                    # the new authority before its first actual HTTP send.
+                    with original(root,limits,enabled=True) as reserve:
+                        reserve(transport.time.time(),'read')
+                    yield budget
+            outcome=None
+            with patch.object(runner,'readiness_request_window',interleave), \
+                 patch.object(transport.GuardedSession,'request',sent):
+                try:StartReadiness().budget_probe(root,readiness=False,ledger_path=trading,refresh_case='budget')
+                except (SafetyError,transport.TransportError) as exc:outcome=str(exc)
+            self.assertEqual(wire,[],'in-flight observer bypassed newly established root authority')
+            self.assertEqual(outcome,'readiness_request_budget_exhausted')
+            with contextlib.closing(Ledger(root/'readiness-requests.sqlite3')) as source:
+                self.assertEqual(source.db.execute('SELECT COUNT(*) FROM requests').fetchone()[0],200)
+
+    def test_unbound_attempt_blocks_adoption_through_pending_replay_and_expiry(self):
+        limits=runner.load_config(SOURCE/'config.json')[1]
+        with tempfile.TemporaryDirectory(dir='/var/tmp') as directory:
+            root=Path(directory);trading=root/('a'*64)/'adaptive/ledger.sqlite3'
+            with runner.readiness_request_window(root,limits,enabled=False) as reserve:
+                self.assertIs(reserve(1000,'read'),False)
+                self.assertIs(reserve(1001,'data_read'),False)
+            self.assertFalse((root/'readiness-requests.sqlite3').exists())
+            # The unbound caller has left preflight and has not replayed yet.
+            with runner.readiness_request_window(root,limits,enabled=True) as reserve:
+                with self.assertRaisesRegex(transport.TransportError,'readiness_adoption_requires_expired_window'):
+                    reserve(1030,'read')
+            self.assertFalse((root/'readiness-requests.sqlite3').exists())
+            with contextlib.closing(Ledger(trading,limits)) as ledger:
+                runner.replay_preflight_requests(ledger,[{'timestamp':1000,'kind':'read'},
+                    {'timestamp':1001,'kind':'data_read'}],readiness_path=root/'readiness-requests.sqlite3')
+                self.assertEqual(dict(ledger.db.execute('SELECT kind,COUNT(*) FROM requests GROUP BY kind')),{'read':1})
+            # The guard stays conservative after replay; data GETs did not
+            # move the unbound broker-attempt expiry to1061.
+            with runner.readiness_request_window(root,limits,enabled=True) as reserve:
+                with self.assertRaisesRegex(transport.TransportError,'readiness_adoption_requires_expired_window'):
+                    reserve(1059.999,'read')
+                with patch.object(time,'time',return_value=1060):reserve(1060,'read')
+            with contextlib.closing(Ledger(root/'readiness-requests.sqlite3')) as source:
+                self.assertEqual(source.db.execute('SELECT COUNT(*) FROM requests').fetchone()[0],1)
+            self.assertEqual((root/'readiness-startup.lock').stat().st_mode&0o777,0o600)
+
+    def test_root_lock_serializes_first_adoption_and_pre_send_selection(self):
+        from safety import startup_request_lock
+        with tempfile.TemporaryDirectory(dir='/var/tmp') as directory:
+            root=Path(directory)
+            with runner.readiness_request_window(root,RiskLimits(),enabled=False) as old:
+                with startup_request_lock(root):
+                    for enabled in (False,True):
+                        with runner.readiness_request_window(root,RiskLimits(),enabled=enabled) as reserve:
+                            with self.assertRaisesRegex(SafetyError,'readiness_startup_busy'):
+                                reserve(1000,'read')
+                    with self.assertRaisesRegex(SafetyError,'readiness_startup_busy'):old(1000,'read')
+            self.assertFalse((root/'readiness-requests.sqlite3').exists())
+
+    def test_replay_holds_same_root_lock_against_adoption(self):
+        with tempfile.TemporaryDirectory(dir='/var/tmp') as directory:
+            root=Path(directory);seen=[];original=Ledger.request_budget
+            with contextlib.closing(Ledger(root/'trading.sqlite3')) as ledger:
+                def replaying(instance,*args,**kwargs):
+                    with runner.readiness_request_window(root,RiskLimits(),enabled=True) as reserve:
+                        with self.assertRaisesRegex(SafetyError,'readiness_startup_busy'):
+                            reserve(1000,'read')
+                    seen.append(True)
+                    return original(instance,*args,**kwargs)
+                with patch.object(Ledger,'request_budget',replaying):
+                    runner.replay_preflight_requests(ledger,[{'timestamp':1000,'kind':'read'}],
+                        readiness_path=root/'readiness-requests.sqlite3')
+                self.assertEqual(seen,[True])
+                self.assertEqual(ledger.db.execute('SELECT COUNT(*) FROM requests').fetchone()[0],1)
+            self.assertFalse((root/'readiness-requests.sqlite3').exists())
+
+    def test_other_account_caps_never_gate_owned_recovery_cancel_and_flatten(self):
+        import asyncio
+        from decimal import Decimal
+        from tests import test_adaptive_paper_recovery as fixtures
+        from tests.test_adaptive_paper_start_readiness import StartReadiness
+        from recovery import recover
+        from safety import Quote
+        limits=runner.load_config(SOURCE/'config.json')[1]
+        epoch=transport.timestamp_ns('2026-10-14T08:00:00Z')/1e9
+        with tempfile.TemporaryDirectory(dir='/var/tmp') as directory:
+            root=Path(directory);source=root/'readiness-requests.sqlite3'
+            own=root/('a'*64)/'adaptive/ledger.sqlite3';other=root/('b'*64)/'adaptive/ledger.sqlite3'
+            with contextlib.closing(Ledger(source)) as ledger:ledger.request_budget(epoch-120,'read')
+            with contextlib.closing(Ledger(own,limits)) as ledger:
+                ledger.start_trial(epoch-120);controller=fixtures.Controller(ledger)
+                port=controller.port=fixtures.FakePort(controller)
+                ledger.reserve_intent('entry-1','SPY','buy','1','100.01',quote=Quote('SPY','100','100.01',epoch-120),
+                    now=epoch-120,market_open=True,session_close=epoch+3600)
+                ledger.request_budget(epoch-120,'submit',client_id='entry-1')
+                row={'client_order_id':'entry-1','id':'fixture-owned-order','symbol':'SPY','side':'buy','qty':'1',
+                     'limit_price':'100.01','filled_qty':'0.5','filled_avg_price':'100.01',
+                     'status':'partially_filled','updated_at_ns':int((epoch-120)*1e9)}
+                port.rows['entry-1']=row;port.qty=Decimal('0.5');port.cash-=Decimal('50.005')
+                controller.observe(row);self.handoff(ledger,[],source,epoch-119)
+            sibling=replace(limits,max_rest_per_minute=150,max_submits_per_minute=130)
+            with contextlib.closing(Ledger(other,sibling)):pass
+            with contextlib.closing(sqlite3.connect(other)) as db:
+                before=db.execute("SELECT value FROM meta WHERE key='limits'").fetchone()[0]
+            # Import request history without instantiating the sibling under
+            # ANY envelope or selecting its meta.limits value.
+            connect=sqlite3.connect;queries=[]
+            def traced(database,*args,**kwargs):
+                db=connect(database,*args,**kwargs)
+                if str(other.resolve()) in str(database):db.set_trace_callback(queries.append)
+                return db
+            with patch.object(sqlite3,'connect',side_effect=traced):
+                _,wire,_,_=StartReadiness().budget_probe(root,readiness=False,ledger_path=own)
+            self.assertFalse(any("'limits'" in q.lower() for q in queries),queries)
+            self.assertEqual(len(wire),6)
+            with contextlib.closing(Ledger(own,limits)) as ledger:
+                controller=fixtures.Controller(ledger);port.c=controller;controller.port=port
+                result=asyncio.run(recover(controller,{'trial_id':'fault-test','baseline_cash':'10000'},
+                    {'cleanup_seconds':3,'quote_max_age_seconds':1,'order_timeout_seconds':.05,
+                     'regular_session_only':True,'extended_hours_enabled':False,
+                     'sessions':{'extended_hours':False,'overnight_holds':False,'overnight_gross_multiple':'1.0'}},
+                    reconcile_fn=fixtures.proof))
+                self.assertEqual((result['status'],result['flat']),('passed',True))
+                self.assertEqual(port.cancelled,['entry-1']);self.assertEqual(len(port.submissions),1)
+                self.assertEqual(ledger.limits.frozen_json(),limits.frozen_json())
+            with contextlib.closing(sqlite3.connect(other)) as db:
+                self.assertEqual(db.execute("SELECT value FROM meta WHERE key='limits'").fetchone()[0],before)
+
     def startup_probe(self, root, ledger_path, *, readiness):
         from tests.test_adaptive_paper_start_readiness import StartReadiness
         sends=[]
@@ -109,7 +249,8 @@ class ReadinessHandoff(unittest.TestCase):
             path.unlink()
             for enabled in (False,True):
                 with self.assertRaisesRegex(SafetyError,'readiness_request_journal_required'):
-                    with runner.readiness_request_window(root,limits,enabled=enabled):pass
+                    with runner.readiness_request_window(root,limits,enabled=enabled) as reserve:
+                        reserve(1001,'read')
                 self.assertFalse(path.exists())
 
     def test_recovery_startup_keeps_retained_caps_after_rotation(self):

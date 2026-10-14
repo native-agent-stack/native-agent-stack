@@ -50,7 +50,7 @@ from exploration import (active_trial_metadata, apply_exit_preset, config_digest
                          publish_trial_projection, receipt_labels, validate_exploratory_paths)
 from leverage import LeveragePolicyError, next_lower_rung_ceiling, validate_leverage_policy
 from safety import (Ledger, Quote, RiskLimits, SafetyError, account_lock_fingerprint, DEFAULT_STOP, risk_ceiling_kwargs,
-                    execution_from_observation)
+                    execution_from_observation, startup_request_lock)
 from sessions import (DEFAULT_SESSION_POLICY, SessionKind, boundary_receipt, extended_session_close,
                      must_end_flat, next_trading_day, session_at, validate_session_policy)
 from strategies import AdaptivePolicy, PolicyConfig, RegimeSelector, SelectorConfig, limit_price
@@ -2388,44 +2388,45 @@ def readiness_request_window(state_root, limits, *, enabled, exploratory=False):
     """
     root = Path(state_root)
     path = root / "readiness-requests.sqlite3"
-    retained_paths = [p for p in sorted(root.glob("*/adaptive/ledger.sqlite3"))
-                      if re.fullmatch(r"[0-9a-f]{64}", p.parent.parent.name)]
-    bound = False
-    for retained in retained_paths:
-        source = Ledger.retained_request_source(retained)
-        if source is not None:
-            if (Path(source).resolve() != path.resolve() or path.is_symlink()
-                    or not path.is_file()):
-                raise SafetyError("readiness_request_journal_required")
-            bound = True
     ledger = None
     startup_cap = None
     def reserve(timestamp, kind):
         nonlocal ledger, startup_cap
-        if ledger is None:
-            startup_cap = limits.max_rest_per_minute
-            budget_limits = RiskLimits(max_rest_per_minute=limits.max_rest_per_minute,
-                                       max_submits_per_minute=limits.max_submits_per_minute)
-            ledger = Ledger.open_request_window(path, budget_limits, timestamp,
-                                                exploratory=exploratory,
-                                                follow_caps=exploratory and not enabled)
-            # Preflight precedes the broker identity read. Reconcile every
-            # retained canonical account journal under this root BEFORE its
-            # first GET, rather than importing trading spends after HTTP.
-            # import_request_window uses destination->source lock order and
-            # binds even an already-open trading handle to this authority.
+        with startup_request_lock(root) as pending:
+            # Selection is repeated under the same lock as first adoption and
+            # replay. An observer created while unbound never stays unbudgeted
+            # after another invocation establishes authority.
+            retained_paths = [p for p in sorted(root.glob("*/adaptive/ledger.sqlite3"))
+                              if re.fullmatch(r"[0-9a-f]{64}", p.parent.parent.name)]
+            bound = False
             for retained in retained_paths:
-                trading = Ledger(retained, limits, exploratory=exploratory,
-                                 rotation=exploratory)
-                try:
-                    trading.import_request_window(path, timestamp)
-                    startup_cap = min(startup_cap, trading.limits.max_rest_per_minute)
-                finally:
-                    trading.close()
-        if ledger.request_budget(timestamp, kind, rest_cap=startup_cap):
-            raise TransportError("readiness_request_budget_exhausted")
+                source = Ledger.retained_request_source(retained)
+                if source is not None:
+                    if (Path(source).resolve() != path.resolve() or path.is_symlink()
+                            or not path.is_file()):
+                        raise SafetyError("readiness_request_journal_required")
+                    bound = True
+            if not (enabled or bound or path.exists() or path.is_symlink()):
+                if kind != "data_read":
+                    pending["unbound_until"] = max(pending["unbound_until"], timestamp + 60)
+                return False  # genuinely unbound default data/read policy
+            if pending["unbound_until"] > timestamp:
+                raise TransportError("readiness_adoption_requires_expired_window")
+            if ledger is None:
+                startup_cap = limits.max_rest_per_minute
+                budget_limits = RiskLimits(max_rest_per_minute=limits.max_rest_per_minute,
+                                           max_submits_per_minute=limits.max_submits_per_minute)
+                ledger = Ledger.open_request_window(path, budget_limits, timestamp,
+                                                    exploratory=exploratory,
+                                                    follow_caps=exploratory and not enabled)
+                for retained in retained_paths:
+                    Ledger.import_retained_request_history(retained, path, timestamp,
+                                                           exploratory=exploratory)
+            if ledger.request_budget(timestamp, kind, rest_cap=startup_cap):
+                raise TransportError("readiness_request_budget_exhausted")
+            return True
     try:
-        yield reserve if enabled or bound or path.exists() or path.is_symlink() else None
+        yield reserve
     finally:
         if ledger is not None:
             ledger.close()
@@ -2440,13 +2441,25 @@ def preflight_request_observer(attempts, readiness_budget=None):
         if len(attempts) > 50:
             raise SafetyError("preflight_request_bound")
         if readiness_budget is not None:
-            readiness_budget(timestamp, kind)
-            attempt["root_reserved"] = True
+            if readiness_budget(timestamp, kind) is not False:
+                attempt["root_reserved"] = True
     return observe_request
 
 
 def replay_preflight_requests(ledger, attempts, *, readiness=False, readiness_path=None, now=None):
     """Carry opted data GETs into trading's window, leaving default policy intact."""
+    root = Path(readiness_path).parent if readiness_path is not None else (
+        ledger.path.parent.parent.parent if ledger.path.parent.name in ("adaptive", "mover")
+        else ledger.path.parent)
+    if attempts or readiness:
+        with startup_request_lock(root):
+            return _replay_preflight_requests(ledger, attempts, readiness=readiness,
+                                             readiness_path=readiness_path, now=now)
+    return _replay_preflight_requests(ledger, attempts, readiness=readiness,
+                                     readiness_path=readiness_path, now=now)
+
+
+def _replay_preflight_requests(ledger, attempts, *, readiness=False, readiness_path=None, now=None):
     if readiness or any(attempt.get("root_reserved", False) for attempt in attempts):
         if readiness_path is None:
             raise SafetyError("readiness_request_journal_required")

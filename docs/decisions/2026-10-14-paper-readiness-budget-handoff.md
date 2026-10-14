@@ -87,8 +87,8 @@ the correction with six and twelve sends, respectively.
 
 Startup now selects the durable window from retained root authority as well
 as the current readiness setting. Before its first GET it reconciles existing
-canonical trading journals through the existing destination-to-source import
-transaction and durable binding. The 199-spend adoption admits at most one
+canonical trading request histories through the existing destination-to-source
+import transaction and durable binding. The 199-spend adoption admits at most one
 request; an exhausted bound root admits none. An already-open trading handle
 also sees the binding, so its later reservation uses the same source. A
 missing or changed retained source refuses before HTTP and is never replaced
@@ -108,8 +108,8 @@ a cap-only rotation between the metadata probe and transactional open or a
 later reservation. Inactive-readiness startup never rotates that envelope.
 Frozen trading/risk limits and exact recovery config bytes remain unchanged;
 the real recovery fixture cancels a partial entry and flattens after rotation.
-Startup also takes the minimum of the invocation's and retained trading
-request caps inside the source reservation transaction. A source cap increase
+Startup also restricts GETs by the current invocation's exact request cap
+inside the source reservation transaction. A source cap increase
 therefore cannot widen a frozen lower trading cap; the30-to200 fixture refuses
 the next startup read at30 without changing either envelope. This temporary
 restriction applies only to GET reservations, never to an order gate.
@@ -141,6 +141,71 @@ show the previous destination-only telemetry. Exact source and the wire,
 recovery, concurrent-snapshot and telemetry regressions establish the correction.
 The CPython patch.object source above supplies the supported fixture seam.
 No new broker API/client or rate-limit framework is introduced.
+
+### Last bounded correction: synchronize adoption and ignore sibling cap identity
+
+Review of937fd8f46 found two wider orderings. An observer selected while its
+root was unbound kept a None callback after another invocation imported199
+rows and consumed slot200, then sent six GETs. A different account's retained
+150/130 request caps also caused lane-A exact-config recovery of an owned
+partially filled position to fail before HTTP. Both assertion-bearing tests
+fail on actual937 production: six sends and persisted_risk_limits_differ.
+These are distinct from the already-closed sequential adoption and lane-B
+source-cap rotation cases; they supersede the prior one-time authority
+selection and sibling-envelope opening mechanisms.
+
+Every startup callback now selects authority again inside a native root flock,
+which also covers first adoption, pending unbound spends and replay. If root
+authority is established before an old observer sends, that observer rebinds
+or refuses under it; the exhausted200 interleaving sends zero. A disabled
+callback on a genuinely unbound root retains the existing data-GET policy and
+creates no readiness/trading journal or trial. Before returning for a broker
+GET it instead durably records only a conservative60-second transition hold
+in readiness-startup.lock. First adoption refuses until that hold expires,
+including the gap after preflight and before replay or a crash/refused start.
+Data GETs do not extend this broker-attempt hold. The exact59.999/60 boundary
+is tested; no pending unbound request can disappear between a second
+unsynchronized existence check and a send. No automatic retry is added.
+
+The marker is coordination metadata, not a new risk or request journal; it
+never changes a size, price, order cap or numeric trading state. Its sole
+timestamp is derived from the actual pre-send attempt and retained with fsync
+before the callback returns. Native nonblocking flock refuses a contending
+startup before HTTP; replay uses the same lock. The root lock order precedes
+the existing destination-to-source SQLite transaction order. Independent
+linked trading continues to reserve through the same source transaction.
+Same-root versions participating in this coordination are required; this is
+not acceptance evidence for old concurrent writers that lack it.
+
+Sibling histories now open existing databases without the trading constructor,
+schema migration or risk-envelope access. Only schema/lane/source binding and
+request/import rows participate. No SELECT of a sibling's limits, comparison
+with the caller or cap adoption occurs; SQL tracing asserts that boundary.
+The source budget and caller's exact limits govern startup separately. The
+two-account regression retains different sibling caps and an owned partial
+entry, executes real startup/replay, then synthetic cancellation and flatten,
+and verifies both accounts' frozen limits unchanged. Root request envelopes
+still retain their own lane/cap checks. Schema/provenance hardening remains
+separate; this does not claim arbitrary unknown sibling formats are accepted.
+
+Primary correction provenance is the exact reviewed engine at
+[937fd8f46, runner.py:2380-2445](https://github.com/native-agent-stack/native-agent-stack/blob/937fd8f46ea4a3546f00144176e78d75474f6a22/blueprints/us-equities/adaptive-paper/runner.py#L2380):
+one-time callback selection and the old sibling constructor are the two
+reproduced mechanisms. The existing native lock pattern is
+[safety.py:447-470 at that pin](https://github.com/native-agent-stack/native-agent-stack/blob/937fd8f46ea4a3546f00144176e78d75474f6a22/blueprints/us-equities/adaptive-paper/safety.py#L447),
+using CPython's supported fcntl.flock with LOCK_EX/LOCK_NB and O_NOFOLLOW;
+the retained import and transaction helpers at
+[safety.py:1617](https://github.com/native-agent-stack/native-agent-stack/blob/937fd8f46ea4a3546f00144176e78d75474f6a22/blueprints/us-equities/adaptive-paper/safety.py#L1617)
+remain the source-first/provenance mechanism. No selected SDK/limiter is
+substituted or forked. Evidence remains synthetic/local integration.
+
+The conservative pre-lock request-clock refusal remains a Follow-up; this
+round does not present the corrected handoff snapshot clock as proof of every
+reservation interleaving. Real broker/session restore/cancel/flatten acceptance,
+historical source captures and ancestor/schema hardening remain open. Lane-B
+mover startup integration is a separate P1 prerequisite before any bundle
+carrying this retained-window implementation runs mover trials. Today's older
+sealed operating records are not repinned by this change.
 
 Evidence class is synthetic/local integration. The 180+12 fixture fails on
 landed #1097: only 12 rows reach trading. The cap fixture fails with

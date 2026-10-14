@@ -425,7 +425,10 @@ class StartReadiness(unittest.TestCase):
             receipt=json.loads((root/'receipt.json').read_text())
             self.assertEqual((receipt['status'],receipt['reason'],receipt['orders_submitted']),
                              ('not_started','preflight_request_bound',0))
-            self.assertFalse((root/'state').exists())
+            # No request/trading journal or trial is bootstrapped. The sole
+            # retained coordination marker prevents another invocation from
+            # adopting a fresh root budget while these unbound GETs are active.
+            self.assertEqual([p.name for p in (root/'state').iterdir()],['readiness-startup.lock'])
 
     def _extended_request_bound(self, kind):
         with tempfile.TemporaryDirectory(dir='/var/tmp') as directory:

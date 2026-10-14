@@ -18,6 +18,7 @@ import os
 from pathlib import Path
 import re
 import sqlite3
+import stat
 import sys
 import threading
 import time
@@ -451,6 +452,46 @@ def account_lock(account_id, lock_root=None):
     fingerprint = hashlib.sha256(account_id.encode()).hexdigest()
     with account_lock_fingerprint(fingerprint, lock_root) as value:
         yield value
+
+
+@contextmanager
+def startup_request_lock(state_root):
+    """Serialize startup authority selection, pre-send accounting and replay.
+
+    The lock's only retained value is the expiry of previously unbound broker
+    attempts. Adoption refuses while those attempts can still be in flight or
+    awaiting replay; they cannot be lost between an existence check and send.
+    No request journal/trial/risk state is created for default unbound calls.
+    """
+    root = Path(state_root)
+    root.mkdir(parents=True, exist_ok=True, mode=0o700)
+    fd = os.open(root / "readiness-startup.lock", os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
+    try:
+        info = os.fstat(fd)
+        if not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid() or info.st_size > 64:
+            raise SafetyError("invalid_startup_request_lock")
+        try:
+            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            raise SafetyError("readiness_startup_busy") from None
+        raw = os.read(fd, 64)
+        try:
+            until = float(raw) if raw else 0.0
+        except ValueError:
+            raise SafetyError("invalid_startup_request_lock") from None
+        if not math.isfinite(until) or until < 0:
+            raise SafetyError("invalid_startup_request_lock")
+        state = {"unbound_until": until}
+        yield state
+        if state["unbound_until"] != until:
+            os.lseek(fd, 0, os.SEEK_SET)
+            encoded = str(state["unbound_until"]).encode("ascii")
+            if os.write(fd, encoded) != len(encoded):
+                raise SafetyError("startup_request_marker_write_failed")
+            os.ftruncate(fd, os.lseek(fd, 0, os.SEEK_CUR))
+            os.fsync(fd)
+    finally:
+        os.close(fd)
 
 
 @contextmanager
@@ -1551,6 +1592,41 @@ class Ledger:
             return row[0] if row else None
         finally:
             probe.close()
+
+    @classmethod
+    def import_retained_request_history(cls, path, source_path, now, *, exploratory=False):
+        """Bind/import only sibling request history; never read its risk envelope.
+
+        No constructor/schema migration, cap adoption or trading-state replay.
+        import_request_window needs only this connection, path, lane and lock.
+        Its existing destination->source transaction validates the source and
+        preserves bidirectional import provenance before any startup HTTP.
+        """
+        path = Path(path)
+        if path.is_symlink() or not path.is_file():
+            raise SafetyError("readiness_request_journal_required")
+        retained = object.__new__(cls)
+        retained.path = path
+        retained.exploratory = exploratory
+        retained._lock = threading.RLock()
+        retained.db = sqlite3.connect(path.resolve().as_uri() + "?mode=rw", uri=True,
+                                      timeout=5, isolation_level=None)
+        retained.db.row_factory = sqlite3.Row
+        try:
+            retained.db.execute("PRAGMA foreign_keys=ON")
+            retained.db.execute("PRAGMA synchronous=FULL")
+            lane = retained._get("paper_lane")
+            if lane != ("B" if exploratory else None):
+                raise SafetyError("readiness_request_lane_mismatch")
+            schema = retained._get("schema_version")
+            if schema != "3":
+                raise SafetyError("unsupported_ledger_schema")
+            prior = retained._get("request_source_path")
+            if prior is not None and Path(prior).resolve() != Path(source_path).resolve():
+                raise SafetyError("readiness_request_journal_required")
+            return retained.import_request_window(source_path, now)
+        finally:
+            retained.db.close()
 
     @classmethod
     def open_request_window(cls, path, limits, now, *, exploratory=False, follow_caps=False):
