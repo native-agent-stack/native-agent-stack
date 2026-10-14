@@ -51,8 +51,10 @@ import argparse
 import hashlib
 import json
 import os
+import secrets
 import shlex
 import shutil
+import stat
 import string
 import subprocess
 import sys
@@ -169,29 +171,118 @@ def install_guards(home: Path, dry_run: bool, names: list[str] | None = None) ->
 def claude_config_dir(environ, home: Path) -> Path:
     """The folder the client reads user-scope definitions from. Measured on Claude Code 2.1.296 (docs/decisions/2026-10-13-installer-agent-links-and-config-dir.md): with CLAUDE_CONFIG_DIR set the client
     lists the definitions under its agents/ and none under <home>/.claude/agents; an empty value is read as the client's working directory and a relative one is resolved against it, which no installer run
-    can match. So a set, absolute value is used (NFC-normalized and made absolute as the client does), an empty one is read as unset (as scripts/adoption_status.py reads it) and a relative one is refused."""
+    can match. So a set, absolute value is used (NFC-normalized and made absolute as the client does), an unset one is the home's own .claude, and an empty or a relative one is refused before any step
+    writes (review round 1 of #1099: an empty value is not the same as an unset one)."""
     value = environ.get("CLAUDE_CONFIG_DIR")
-    if not value:
+    if value is None:
         return home / ".claude"
+    if value == "":
+        raise InstallError("CLAUDE_CONFIG_DIR is set but empty: the client then reads its own working directory, which no installer run can match, "
+                           "so unset it or set an absolute path (or pass --home to install under that home's own .claude)")
     if not os.path.isabs(value):
         raise InstallError(f"CLAUDE_CONFIG_DIR is not an absolute path ({value!r}): the client resolves it against its own working directory, "
                            "so set an absolute path (or pass --home to install under that home's own .claude)")
     return Path(os.path.abspath(unicodedata.normalize("NFC", value)))
 
 
-def write_regular_copy(source: Path, dest: Path) -> None:
-    """A regular file at `dest` with the bytes of `source`, written beside it and renamed over it, so that a link at `dest` (to a file, to nothing, to a folder) is replaced and never written through."""
-    temporary = dest.with_name(f".{dest.name}.{os.getpid()}.tmp")
+DIRECTORY_FLAGS = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | getattr(os, "O_CLOEXEC", 0)
+
+
+def open_checked_dir(path: Path, create: bool) -> int | None:
+    """A descriptor of the folder at `path`, reached from / one component at a time without following a link (review round 1 of #1099: a check of the leaf alone let a linked agents folder, a
+    linked .claude or configuration folder, or a linked ancestor carry the copies elsewhere). The path is made absolute lexically first, as the client reads CLAUDE_CONFIG_DIR, so a `..` is
+    collapsed and never walked. A link or a non-folder anywhere on the chain is refused; a missing component is created when `create` is set, and otherwise ends the walk with None (a dry run:
+    nothing to check below it yet). Writes, renames and cleanup made relative to the returned descriptor stay in the folder that was checked even if a component is swapped afterwards."""
+    absolute = os.path.abspath(path)
+    parts = Path(absolute).parts
+    descriptor = os.open(parts[0], DIRECTORY_FLAGS)
     try:
-        shutil.copy2(source, temporary)
-        os.replace(temporary, dest)
+        for index, part in enumerate(parts[1:], start=1):
+            try:
+                following = os.open(part, DIRECTORY_FLAGS, dir_fd=descriptor)
+            except FileNotFoundError:
+                if not create:
+                    os.close(descriptor)
+                    return None
+                os.mkdir(part, dir_fd=descriptor)
+                following = os.open(part, DIRECTORY_FLAGS, dir_fd=descriptor)
+            except OSError as error:
+                raise InstallError(f"agents: {os.path.join(*parts[:index + 1])} is a link or not a folder ({error.strerror}); refusing to write through it, nothing copied") from None
+            os.close(descriptor)
+            descriptor = following
+        return descriptor
+    except BaseException:
+        try:
+            os.close(descriptor)
+        except OSError:
+            pass
+        raise
+
+
+def write_regular_copy(source: Path, dest: Path, dir_fd: int | None = None) -> None:
+    """A regular file at `dest` with the bytes of `source`, written beside it and renamed over it, so that a link at `dest` (to a file, to nothing, to a folder) is replaced and never written through.
+    Everything happens relative to a descriptor of the checked folder (`dir_fd`, or the folder of `dest` opened by open_checked_dir), so a parent swapped for a link cannot redirect the copy, the
+    rename or the cleanup. The temporary file is created exclusively under an unpredictable name (O_CREAT|O_EXCL|O_NOFOLLOW, mode 0600) and written through its own descriptor, so an entry that
+    someone placed at a guessable name beforehand is never followed; the source's mode and times are set on the descriptor, as copy2 would."""
+    owned = dir_fd is None
+    if owned:
+        dir_fd = open_checked_dir(dest.parent, create=False)
+        if dir_fd is None:
+            raise InstallError(f"agents: {dest.parent} does not exist")
+    temporary = None
+    try:
+        for _ in range(16):
+            candidate = f".{dest.name}.{secrets.token_hex(8)}.tmp"
+            try:
+                out_fd = os.open(candidate, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW | getattr(os, "O_CLOEXEC", 0), 0o600, dir_fd=dir_fd)
+            except FileExistsError:
+                continue
+            temporary = candidate
+            break
+        else:
+            raise InstallError(f"agents: could not create a temporary file beside {dest}")
+        with os.fdopen(out_fd, "wb") as out, source.open("rb") as inp:
+            shutil.copyfileobj(inp, out)
+            info = os.fstat(inp.fileno())
+            os.fchmod(out.fileno(), info.st_mode & 0o7777)
+            os.utime(out.fileno(), ns=(info.st_atime_ns, info.st_mtime_ns))
+        os.replace(temporary, dest.name, src_dir_fd=dir_fd, dst_dir_fd=dir_fd)
+        temporary = None
     finally:
-        temporary.unlink(missing_ok=True)
+        if temporary is not None:
+            try:
+                os.unlink(temporary, dir_fd=dir_fd)
+            except FileNotFoundError:
+                pass
+        if owned:
+            os.close(dir_fd)
+
+
+def entry_state(dir_fd: int | None, name: str) -> str:
+    """What stands at `name` in the checked folder, without following a link: absent, link, folder, file or other."""
+    if dir_fd is None:
+        return "absent"
+    try:
+        info = os.stat(name, dir_fd=dir_fd, follow_symlinks=False)
+    except FileNotFoundError:
+        return "absent"
+    if stat.S_ISLNK(info.st_mode):
+        return "link"
+    if stat.S_ISDIR(info.st_mode):
+        return "folder"
+    return "file" if stat.S_ISREG(info.st_mode) else "other"
+
+
+def read_entry(dir_fd: int, name: str) -> bytes:
+    descriptor = os.open(name, os.O_RDONLY | os.O_NOFOLLOW | getattr(os, "O_CLOEXEC", 0), dir_fd=dir_fd)
+    with os.fdopen(descriptor, "rb") as handle:
+        return handle.read()
 
 
 def install_agents(home: Path, dry_run: bool, names: list[str] | None = None, claude_dir: Path | None = None) -> list[str]:
-    """Copy the shipped definitions to <claude_dir or home/.claude>/agents as regular files. A link at a shipped name is replaced by a copy (what it pointed at is not written through, and
-    the drift check counts a link); a folder at a shipped name is refused before anything is copied."""
+    """Copy the shipped definitions to <claude_dir or home/.claude>/agents as regular files. Every component of that folder's path is checked without following a link, and the copies are written
+    relative to the checked folder (open_checked_dir), so a linked or swapped parent is refused or cannot redirect them. A link at a shipped name is replaced by a copy (what it pointed at is not
+    written through, and the drift check counts a link); a folder at a shipped name is refused before anything is copied."""
     if not AGENTS_SRC_DIR.is_dir():
         raise InstallError(f"missing source directory: {AGENTS_SRC_DIR}")
     dest_dir = (claude_dir if claude_dir is not None else home / ".claude") / "agents"
@@ -202,24 +293,29 @@ def install_agents(home: Path, dry_run: bool, names: list[str] | None = None, cl
         if unknown:
             raise InstallError(f"no such agent file in {AGENTS_SRC_DIR}: {', '.join(unknown)}")
         sources = [src for src in sources if src.name in names]
-    folders = [dest_dir / src.name for src in sources if (dest_dir / src.name).is_dir() and not (dest_dir / src.name).is_symlink()]
-    if folders:
-        raise InstallError(f"agents: a folder stands at the shipped name {', '.join(str(folder) for folder in folders)}; preserved, nothing copied")
-    for src in sources:
-        dest = dest_dir / src.name
-        linked = dest.is_symlink()
-        if not linked and dest.is_file() and dest.read_bytes() == src.read_bytes():
-            print(f"agents: {dest} already matches; skipped")
-            results.append("skipped")
-            continue
-        if dry_run:
-            print(f"agents: would replace the link at {dest} with a copy" if linked else f"agents: would install {dest}")
-            results.append("planned")
-            continue
-        dest_dir.mkdir(parents=True, exist_ok=True)
-        write_regular_copy(src, dest)
-        print(f"agents: replaced the link at {dest} with a copy" if linked else f"agents: installed {dest}")
-        results.append("installed")
+    dir_fd = open_checked_dir(dest_dir, create=not dry_run)
+    try:
+        folders = [dest_dir / src.name for src in sources if entry_state(dir_fd, src.name) == "folder"]
+        if folders:
+            raise InstallError(f"agents: a folder stands at the shipped name {', '.join(str(folder) for folder in folders)}; preserved, nothing copied")
+        for src in sources:
+            dest = dest_dir / src.name
+            state = entry_state(dir_fd, src.name)
+            linked = state == "link"
+            if state == "file" and read_entry(dir_fd, src.name) == src.read_bytes():
+                print(f"agents: {dest} already matches; skipped")
+                results.append("skipped")
+                continue
+            if dry_run:
+                print(f"agents: would replace the link at {dest} with a copy" if linked else f"agents: would install {dest}")
+                results.append("planned")
+                continue
+            write_regular_copy(src, dest, dir_fd=dir_fd)
+            print(f"agents: replaced the link at {dest} with a copy" if linked else f"agents: installed {dest}")
+            results.append("installed")
+    finally:
+        if dir_fd is not None:
+            os.close(dir_fd)
     return results
 
 

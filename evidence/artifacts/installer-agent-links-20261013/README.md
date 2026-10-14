@@ -10,6 +10,8 @@ a key or a transcript: definition names, counts and flags only.
 | `receipts/docs-excerpts.txt` | the lines of the environment-variable and sub-agents pages (fetched 2026-10-13, with size and sha256) that the decision cites |
 | `receipts/fail-before.txt` | the new tests against the sources of the base `329985de1` and against this head |
 | `receipts/mutants-installer.txt` | the 15 mutants of the change (link and folder handling, the temporary copy, the variable's reading and normalization): 15 of 15 killed; the first run killed 14 and the survivor is killed by the lexical-collapse assertion of its test |
+| `receipts/fail-before-round1.txt` | review round 1 (the GPT read's three P1 findings and the local review's P2): the round's 13 tests against the installer at b09f6450, 10 of them fail or raise |
+| `receipts/mutants-round1.txt` | the 8 mutants of the round's fixes (the link-free folder walk, the anchored rename and creation, the exclusive temporary file, the empty value): 8 of 8 killed |
 
 The probe driver is a script of the author's private record; the method is in the record and in the receipt. The measurements are the author's, taken on one host with one client version; nothing here is a
 measurement by an independent party.

@@ -40,6 +40,10 @@
     {
       "date": "2026-10-13",
       "path": "unclassified-gate-reads-20261013-installer-agents-delta.json"
+    },
+    {
+      "date": "2026-10-14",
+      "path": "unclassified-gate-reads-20261014-installer-agents-round1-delta.json"
     }
   ]
 }

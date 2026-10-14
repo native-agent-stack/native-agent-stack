@@ -5387,8 +5387,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "aa82f6f3a9df2c3c96c3154752a2b5de145498fb0d045af08fa0da7079a09c37",
-      "bytes": 74974
+      "sha256": "28bf664169265f28bbb6f6b5c5ffe84f2b8969383637e171ab0ff7a2e7abc552",
+      "bytes": 75200
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -11488,8 +11488,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-read-deltas.json",
-      "sha256": "f1fc89bb64f6094398b679cea33f05df077706dd663de0c156fe71baeb5d8332",
-      "bytes": 1033
+      "sha256": "9783dbf391f582f21a0d7913ad6a993581ab8720441a773019c7ca29ab255646",
+      "bytes": 1276
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
@@ -11515,6 +11515,11 @@
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261012-pr949-delta.json",
       "sha256": "f2f79a45d92e6be9d953ecc42a5623e78860d593ac36e38a173ae17c2b1502dc",
       "bytes": 6482
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261013-installer-agents-delta.json",
+      "sha256": "918ccb4e261cb0503090a2207fb7bfb55dc99b4e5f6827952b3b5d6f8cd411e0",
+      "bytes": 18281
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261013-pr1057-delta.json",
@@ -11545,6 +11550,11 @@
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261013-pr1074-delta.json",
       "sha256": "b1c9a6f590066a80876670bef8e439c9b4d163b18a6197ec9c3028ef1d0edde9",
       "bytes": 15771
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261014-installer-agents-round1-delta.json",
+      "sha256": "df40b416f66a72c016337a56c02725e7e91017dd5ad1c138c5ea64526b840931",
+      "bytes": 17728
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unit-pass.txt",
@@ -19133,8 +19143,8 @@
     },
     {
       "path": "docs/decisions/2026-10-13-claude-agent-drift-check.md",
-      "sha256": "b1f4cf2a44669cd12ffe04bf4f3255270774032291a5ffa42c8e0082b725689c",
-      "bytes": 41530
+      "sha256": "0742994fffd2faf5451d7158aa0433909ef015995903af4af916dd43518ab031",
+      "bytes": 41779
     },
     {
       "path": "docs/decisions/2026-10-13-engine-currency.md",
@@ -19145,6 +19155,11 @@
       "path": "docs/decisions/2026-10-13-extended-hours-paper-start-readiness.md",
       "sha256": "8d3174adc602c965064772c14de3c6b3a34841f190b118ea96f1302f754970f0",
       "bytes": 10512
+    },
+    {
+      "path": "docs/decisions/2026-10-13-installer-agent-links-and-config-dir.md",
+      "sha256": "0b102e12fe50494222aa828da05f3e947843bc866154724ecf4fa78adcd9beee",
+      "bytes": 10923
     },
     {
       "path": "docs/decisions/2026-10-13-lane-a-frozen-field-continuity.md",
@@ -37270,6 +37285,41 @@
       "path": "evidence/artifacts/ibkr-pacing-20261013/verify_ibkr_pacing_evidence.v3.py",
       "sha256": "c8872073cf71990e349ef77293dcef0e434b087e70091b26c6c2749cbce22630",
       "bytes": 33702
+    },
+    {
+      "path": "evidence/artifacts/installer-agent-links-20261013/README.md",
+      "sha256": "bdcee59bfda6005bf8b1726333d43fc634038542135b51ba70e77c86bd7b1d2d",
+      "bytes": 2423
+    },
+    {
+      "path": "evidence/artifacts/installer-agent-links-20261013/receipts/client-agents-probe.json",
+      "sha256": "03a13500ec47f325949b830ebcb057558d40aea89dcb0c76ce05c36786b48126",
+      "bytes": 935
+    },
+    {
+      "path": "evidence/artifacts/installer-agent-links-20261013/receipts/docs-excerpts.txt",
+      "sha256": "b1c81e81f7f479a9491dd6d9da16e5ffdd0047a3b8a7d20e6cd6b6b4c0b4614f",
+      "bytes": 1796
+    },
+    {
+      "path": "evidence/artifacts/installer-agent-links-20261013/receipts/fail-before-round1.txt",
+      "sha256": "aab035f35364a886fa1dedc7b31baee450a745a91bbfc2bab2c595567c15dbf4",
+      "bytes": 804
+    },
+    {
+      "path": "evidence/artifacts/installer-agent-links-20261013/receipts/fail-before.txt",
+      "sha256": "edabf58a177188b9c20b3942f952c0f9dd95e1e4d789a8b5978269911a5f89fb",
+      "bytes": 1454
+    },
+    {
+      "path": "evidence/artifacts/installer-agent-links-20261013/receipts/mutants-installer.txt",
+      "sha256": "80c472a8efa4af892edd55849a3fef05916fc7661200f01c40d1be4bb2e30b97",
+      "bytes": 1868
+    },
+    {
+      "path": "evidence/artifacts/installer-agent-links-20261013/receipts/mutants-round1.txt",
+      "sha256": "1ea799b493a1dd95e60590b714b784b41b65a8a6e51e50f78916e093d1eb3988",
+      "bytes": 2451
     },
     {
       "path": "evidence/artifacts/jcodemunch-route-args-20260927/README.md",
@@ -63068,8 +63118,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "dd3256ecc09f7fb0d451fe74b0630cde59dd2acd6de04e78f38dc5f37e44febc",
-      "bytes": 172637
+      "sha256": "2189ccc449d1b2cfa9cd6d82cb9155318918720c6082a146ad8649ffd40e378c",
+      "bytes": 192108
     },
     {
       "path": "tests/test_install_skills.py",
@@ -64063,8 +64113,8 @@
     },
     {
       "path": "tools/adoption/install_claude_profile.py",
-      "sha256": "187daeaf965192bdbae4551c4af7f288835d7a3f41314a74d0a8f5bc2e46aa40",
-      "bytes": 26080
+      "sha256": "9dc11329bcf9682e1c94066eaf0aab7aad020fdd921d39d70f840e8caf4945b9",
+      "bytes": 34515
     },
     {
       "path": "tools/adoption/install_skills.py",

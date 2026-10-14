@@ -1110,6 +1110,28 @@ class AgentsInstallTests(unittest.TestCase):
                 icp.write_regular_copy(icp.AGENTS_SRC_DIR / self.SHIPPED, target)
             self.assertEqual(sorted(path.name for path in folder.iterdir()), [self.SHIPPED], "the temporary copy is removed")
 
+    def test_an_entry_at_the_old_predictable_temporary_name_is_never_followed(self):
+        """Review round 2 (the local review's P2): the temporary name was `.<name>.<pid>.tmp`, so a link placed there beforehand made copy2 write through it; the file is now created exclusively under a random name."""
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp) / "home"
+            outside = Path(tmp) / "outside.txt"
+            outside.write_text("kept\n", encoding="utf-8")
+            dest_dir = home / ".claude" / "agents"
+            dest_dir.mkdir(parents=True)
+            for guess in (os.getpid(), os.getpid() + 1):
+                (dest_dir / f".{self.SHIPPED}.{guess}.tmp").symlink_to(outside)
+            self.assertEqual(icp.install_agents(home, dry_run=False, names=[self.SHIPPED]), ["installed"])
+            self.assertEqual(outside.read_text(encoding="utf-8"), "kept\n", "nothing was written through the link")
+            self.assertEqual((dest_dir / self.SHIPPED).read_bytes(), self.source_bytes())
+
+    def test_the_copy_keeps_the_sources_mode_and_is_not_group_or_world_writable_in_flight(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "agents" / self.SHIPPED
+            target.parent.mkdir()
+            icp.write_regular_copy(icp.AGENTS_SRC_DIR / self.SHIPPED, target)
+            self.assertEqual(target.stat().st_mode & 0o7777, (icp.AGENTS_SRC_DIR / self.SHIPPED).stat().st_mode & 0o7777)
+            self.assertEqual(target.read_bytes(), self.source_bytes())
+
     def test_no_temporary_file_is_left_beside_the_definitions(self):
         with tempfile.TemporaryDirectory() as tmp:
             home = Path(tmp)
@@ -1150,14 +1172,32 @@ class AgentsConfigDirTests(unittest.TestCase):
             self.assertTrue((target / ".claude" / "agents" / self.NAME).is_file())
             self.assertFalse(config.exists())
 
-    def test_an_unset_or_empty_value_is_the_homes_own_dot_claude(self):
-        for label, env in (("unset", {}), ("empty", {"CLAUDE_CONFIG_DIR": ""})):
-            with self.subTest(value=label), tempfile.TemporaryDirectory() as tmp:
-                home = Path(tmp) / "home"
-                home.mkdir()
-                code, _, err = self.run_main(["--only", "agents", "--agent", self.NAME], HOME=str(home), **env)
-                self.assertEqual(code, 0, err)
-                self.assertTrue((home / ".claude" / "agents" / self.NAME).is_file())
+    def test_an_unset_value_is_the_homes_own_dot_claude(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp) / "home"
+            home.mkdir()
+            code, _, err = self.run_main(["--only", "agents", "--agent", self.NAME], HOME=str(home))
+            self.assertEqual(code, 0, err)
+            self.assertTrue((home / ".claude" / "agents" / self.NAME).is_file())
+
+    def test_an_empty_value_is_refused_before_any_step_writes(self):
+        """Review round 1 (the GPT read's third P1): the measured client reads an empty value as its own working directory (receipt arm E), which no installer run can match, so an empty value
+        is refused like a relative one, before the guard step or any other step writes; an unset value keeps the home's own .claude."""
+        with tempfile.TemporaryDirectory() as tmp:
+            home, cwd = Path(tmp) / "home", Path(tmp) / "cwd"
+            home.mkdir()
+            cwd.mkdir()
+            previous = os.getcwd()
+            os.chdir(cwd)
+            try:
+                code, _, err = self.run_main(["--only", "guard", "--only", "agents", "--agent", self.NAME], HOME=str(home), CLAUDE_CONFIG_DIR="")
+            finally:
+                os.chdir(previous)
+            self.assertEqual(code, 1)
+            self.assertIn("CLAUDE_CONFIG_DIR", err)
+            self.assertIn("empty", err)
+            self.assertEqual(list(home.iterdir()), [], "no step wrote under the home")
+            self.assertEqual(list(cwd.iterdir()), [], "nothing under the working directory either")
 
     def test_a_set_value_is_made_absolute_and_normalized_as_the_client_does(self):
         # the client's folder is path.resolve of the value, NFC-normalized (scripts/skills_status.py claude_settings_path reads the same bundle code)
@@ -1190,6 +1230,123 @@ class AgentsConfigDirTests(unittest.TestCase):
             home.mkdir()
             code, _, err = self.run_main(["--only", "guard", "--hook", "currency-due-notice.py", "--dry-run"], HOME=str(home), CLAUDE_CONFIG_DIR="relative/config")
             self.assertEqual(code, 0, err)
+
+
+class AgentsParentChainTests(unittest.TestCase):
+    """Review round 1 (the GPT read's second P1): the agents step writes only into the folder it checked. Every component from / to the agents folder is opened without following a link, a link
+    or a non-folder anywhere on that chain is refused before anything is written, and the copy, the rename and the cleanup are made relative to the checked folder's descriptor, so swapping a
+    component afterwards cannot redirect them."""
+
+    NAME = "stack-verifier.md"
+
+    def source(self):
+        return (icp.AGENTS_SRC_DIR / self.NAME).read_bytes()
+
+    def assert_refused_and_outside_kept(self, home, outside, claude_dir=None):
+        before = sorted(p.relative_to(outside).as_posix() for p in outside.rglob("*"))
+        with self.assertRaises(icp.InstallError) as caught:
+            icp.install_agents(home, dry_run=False, names=[self.NAME], claude_dir=claude_dir)
+        self.assertIn("link", str(caught.exception))
+        self.assertEqual(sorted(p.relative_to(outside).as_posix() for p in outside.rglob("*")), before, "nothing was written outside")
+        with self.assertRaises(icp.InstallError):
+            icp.install_agents(home, dry_run=True, names=[self.NAME], claude_dir=claude_dir)
+
+    def test_a_linked_agents_folder_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home, outside = Path(tmp) / "home", Path(tmp) / "outside"
+            (home / ".claude").mkdir(parents=True)
+            outside.mkdir()
+            (home / ".claude" / "agents").symlink_to(outside, target_is_directory=True)
+            self.assert_refused_and_outside_kept(home, outside)
+
+    def test_a_linked_dot_claude_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home, outside = Path(tmp) / "home", Path(tmp) / "outside"
+            home.mkdir()
+            outside.mkdir()
+            (home / ".claude").symlink_to(outside, target_is_directory=True)
+            self.assert_refused_and_outside_kept(home, outside)
+
+    def test_a_linked_configuration_root_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home, outside, config = Path(tmp) / "home", Path(tmp) / "outside", Path(tmp) / "config"
+            home.mkdir()
+            outside.mkdir()
+            config.symlink_to(outside, target_is_directory=True)
+            self.assert_refused_and_outside_kept(home, outside, claude_dir=config)
+
+    def test_a_linked_higher_ancestor_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            real, outside = Path(tmp) / "real", Path(tmp) / "outside"
+            (real / "home").mkdir(parents=True)
+            outside.mkdir()
+            (Path(tmp) / "linked").symlink_to(outside, target_is_directory=True)
+            (outside / "home").mkdir()
+            self.assert_refused_and_outside_kept(Path(tmp) / "linked" / "home", outside)
+
+    def test_a_dangling_parent_is_refused_and_not_created(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home, missing = Path(tmp) / "home", Path(tmp) / "nowhere"
+            home.mkdir()
+            (home / ".claude").symlink_to(missing, target_is_directory=True)
+            with self.assertRaises(icp.InstallError):
+                icp.install_agents(home, dry_run=False, names=[self.NAME])
+            self.assertFalse(missing.exists(), "the link's target was not created")
+
+    def test_a_file_where_a_folder_belongs_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp) / "home"
+            home.mkdir()
+            (home / ".claude").write_text("not a folder\n", encoding="utf-8")
+            with self.assertRaises(icp.InstallError):
+                icp.install_agents(home, dry_run=False, names=[self.NAME])
+            self.assertEqual((home / ".claude").read_text(encoding="utf-8"), "not a folder\n")
+
+    def test_a_folder_swapped_for_a_link_after_the_check_does_not_redirect_the_write(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            agents, moved, outside = Path(tmp) / "agents", Path(tmp) / "moved", Path(tmp) / "outside"
+            agents.mkdir()
+            outside.mkdir()
+            descriptor = icp.open_checked_dir(agents, create=False)
+            try:
+                agents.rename(moved)
+                agents.symlink_to(outside, target_is_directory=True)
+                icp.write_regular_copy(icp.AGENTS_SRC_DIR / self.NAME, agents / self.NAME, dir_fd=descriptor)
+            finally:
+                os.close(descriptor)
+            self.assertEqual(list(outside.iterdir()), [], "nothing reached the link's target")
+            self.assertEqual((moved / self.NAME).read_bytes(), self.source(), "the copy landed in the folder that was checked")
+            self.assertEqual(sorted(p.name for p in moved.iterdir()), [self.NAME], "no temporary file is left")
+
+    def test_a_missing_folder_is_created_inside_the_checked_parent_even_if_the_parent_is_swapped(self):
+        # The swap happens at the moment the missing agents folder is created: the folder must land in the parent that was checked, not behind the link now at its path.
+        with tempfile.TemporaryDirectory() as tmp:
+            home, moved, outside = Path(tmp) / "home", Path(tmp) / "moved", Path(tmp) / "outside"
+            (home / ".claude").mkdir(parents=True)
+            outside.mkdir()
+            real_mkdir, swapped = os.mkdir, []
+
+            def swapping_mkdir(*args, **kwargs):
+                if not swapped:
+                    swapped.append(True)
+                    (home / ".claude").rename(moved)
+                    (home / ".claude").symlink_to(outside, target_is_directory=True)
+                return real_mkdir(*args, **kwargs)
+
+            with mock.patch.object(icp.os, "mkdir", swapping_mkdir):
+                try:
+                    icp.install_agents(home, dry_run=False, names=[self.NAME])
+                except icp.InstallError:
+                    pass
+            self.assertEqual(swapped, [True])
+            self.assertEqual(list(outside.iterdir()), [], "nothing was created through the swapped link")
+
+    def test_a_clean_chain_is_created_and_installed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp) / "home"
+            home.mkdir()
+            self.assertEqual(icp.install_agents(home, dry_run=False, names=[self.NAME]), ["installed"])
+            self.assertEqual((home / ".claude" / "agents" / self.NAME).read_bytes(), self.source())
 
 
 class ShippedAgentEffortTests(unittest.TestCase):
