@@ -19662,9 +19662,19 @@
       "bytes": 6646
     },
     {
+      "path": "docs/trading-handbook/buying-power-rotation.md",
+      "sha256": "b82fbfae00e50df752cb184d40715fd31f6ae6f897ec2f7c16b97698023865cb",
+      "bytes": 5202
+    },
+    {
       "path": "docs/trading-handbook/ibkr-pacing.md",
       "sha256": "62d28f0a53850eb44721da242c6f68cc7ff22a6627a96dd5860f50b6b4769a6f",
       "bytes": 16063
+    },
+    {
+      "path": "docs/trading-handbook/luld-halt-sizing.md",
+      "sha256": "64ffecd3ef6aa9beb3b94e74ff5d2e9bbeb6da95871be5c6615b32951751f83c",
+      "bytes": 8539
     },
     {
       "path": "docs/trading-handbook/paper-marker.md",
@@ -19675,6 +19685,11 @@
       "path": "docs/trading-handbook/portfolio-sizing.md",
       "sha256": "2b211c78251b7a71179fa08e9ebcc62a00c57c2958712e7d5e8f6414cc68d7ea",
       "bytes": 7063
+    },
+    {
+      "path": "docs/trading-handbook/sources/luld-bp-20261013.json",
+      "sha256": "b6ca1b007945373ceff96a5bfa7ddeef990353efb29cde0088304272f20b8db1",
+      "bytes": 13469
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -57817,6 +57832,21 @@
       "bytes": 30252
     },
     {
+      "path": "evidence/artifacts/trading-handbook-20261013/agent-lane-calculator-policy-spec-v1-20261013.md",
+      "sha256": "d00cde3a89a7ad939ee0e9b5488a10c9605746416513462253ea84da597393f5",
+      "bytes": 4559
+    },
+    {
+      "path": "evidence/artifacts/trading-handbook-20261013/alpaca-buying-power-passages-20261013.md",
+      "sha256": "e97314bf91f3fde5caaf1eb3f92c8e3cd18626f1454d936d426f286e4871ba23",
+      "bytes": 2578
+    },
+    {
+      "path": "evidence/artifacts/trading-handbook-20261013/luld-public-passages-20261013.md",
+      "sha256": "747a32db018a3c3bd6ae76762781d8adc0649ef2d133f0f5837992eeed08e97f",
+      "bytes": 5968
+    },
+    {
       "path": "evidence/artifacts/trading-runtime-2604-20261004/build-constraint-proof.json",
       "sha256": "a4a6254da40ac934dcb78592c693cca7c92d399b46ffa2cd19dc218ecf604ce9",
       "bytes": 34164
@@ -63985,6 +64015,11 @@
       "path": "tests/test_trading_gates_bindings.py",
       "sha256": "645bae30192a44f38495bceb1bd9ea659a4122f198fb4de0366f320f9f8eb272",
       "bytes": 14793
+    },
+    {
+      "path": "tests/test_trading_handbook_publication.py",
+      "sha256": "a021b9609ba8978b43a92932ebd5fd53a597a65a8e2c6c3d3354db59e5116c56",
+      "bytes": 12855
     },
     {
       "path": "tests/test_trading_handbook_sizing.py",
