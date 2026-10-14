@@ -1,0 +1,33 @@
+The 30 mutants of round 1 of #1074 (CPA-V-07; Astra's read and the local codex review of 2dae9751): the global switch for bundled skills (the setting and its environment equivalent, their spellings and precedence, a personal twin that it must not hide), the validation of the replacement plugin (pin, folder, bytes, the registered and enabled conditions, the scope), the folder of the registry, the Claude-only copied skill, the ordering of the last use (its units and its unknown), and the digest of the expanded prompt that the currency receipt must not publish. Each is one exact change in place, restored after each run, then tests.test_skills_manifest, tests.test_skills_status, tests.test_skill_usage_daily and tests.test_plugin_skill_identity_receipts; a mutant is killed when the run fails (the unmutated run passes first).
+
+killed   (failed) disableBundledSkills is not read
+killed   (failed) any truthy disableBundledSkills counts
+killed   (failed) the environment variable is not read
+killed   (failed) the variable's words are not lower-cased
+killed   (failed) the variable's value is not stripped
+killed   (failed) the settings env entry does not override the environment
+killed   (failed) a number or a boolean in the settings env is ignored
+killed   (failed) yes does not count
+killed   (failed) 2 counts
+killed   (failed) the global switch hides a personal twin too
+killed   (failed) the global switch hides nothing
+killed   (failed) a plugin that is not the pinned one is accepted
+killed   (failed) every invalid plugin is reported as an unreadable cache
+killed   (failed) a plugin that is not registered is validated
+killed   (failed) a plugin that is not enabled is validated
+killed   (failed) every plugin counts as registered
+killed   (failed) an install of another scope is accepted
+killed   (failed) the registry is read from the skills CLI's folder
+killed   (failed) the native plugin status reads the skills CLI's folder
+killed   (failed) a copied skill reports no twin
+killed   (failed) a copied skill's listing is not adjusted
+killed   (failed) the first used listing's date again
+killed   (failed) the oldest use is taken
+killed   (failed) an unorderable cell is skipped
+killed   (failed) a single used listing is ordered too
+killed   (failed) today is not the most recent
+killed   (failed) a week has the length of a day
+killed   (failed) the older table's spelling is not read
+killed   (failed) a month is a fixed length
+killed   (failed) the digest of the expanded prompt is published again
+30 mutants, 30 killed, survivors: none

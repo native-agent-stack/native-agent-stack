@@ -1,0 +1,8 @@
+The 5 mutants of the second local codex re-review round of #1062 (a relative bun made absolute without normalizing it: os.path.abspath instead, os.path.realpath instead, the working directory left out, a relative path returned as it is, a gone directory answered with the relative path): one exact change each to scripts/adoption_status.py, in place and restored after each run, then tests.test_adoption_status with the bun 1.4.3 named in AGENT_FRONTMATTER_BUN and GITHUB_ACTIONS=true; a mutant is killed when the run fails (the unmutated run passes first).
+
+killed   (failed) the path is made absolute with os.path.abspath, which removes a '..' before the link in front of it is resolved (the defect)
+killed   (failed) the path is resolved with os.path.realpath, which also resolves a link to the bun itself
+killed   (failed) the path is not made absolute (the working directory is '.')
+killed   (failed) a relative path is returned as it is
+killed   (failed) a caller whose directory is gone gets the relative path back
+5 mutants, 5 killed, survivors: none

@@ -1,0 +1,70 @@
+{
+ "client": "2.1.296 (Claude Code)",
+ "method": "claude -p ok --output-format stream-json --verbose --max-turns 1 --no-session-persistence --model haiku [--settings <overlay>] in an empty directory; the init record's skills list is read and the session is killed before any model call; the host's settings are untouched",
+ "runs": [
+  {
+   "label": "baseline",
+   "settings_overlay": "no overlay",
+   "skills_listed": 77,
+   "names_of_interest_listed": [
+    "claude-api",
+    "claude-api:claude-api",
+    "typesafe-ai",
+    "typesafe:typesafe-ai"
+   ]
+  },
+  {
+   "label": "claude-api-off",
+   "settings_overlay": "{\"skillOverrides\":{\"claude-api\":\"off\"}}",
+   "skills_listed": 76,
+   "names_of_interest_listed": [
+    "claude-api:claude-api",
+    "typesafe-ai",
+    "typesafe:typesafe-ai"
+   ]
+  },
+  {
+   "label": "personal-typesafe-off",
+   "settings_overlay": "{\"skillOverrides\":{\"typesafe-ai\":\"off\"}}",
+   "skills_listed": 76,
+   "names_of_interest_listed": [
+    "claude-api",
+    "claude-api:claude-api",
+    "typesafe:typesafe-ai"
+   ]
+  },
+  {
+   "label": "plugin-claude-api-off",
+   "settings_overlay": "{\"skillOverrides\":{\"claude-api:claude-api\":\"off\"}}",
+   "skills_listed": 77,
+   "names_of_interest_listed": [
+    "claude-api",
+    "claude-api:claude-api",
+    "typesafe-ai",
+    "typesafe:typesafe-ai"
+   ]
+  },
+  {
+   "label": "plugin-typesafe-off",
+   "settings_overlay": "{\"skillOverrides\":{\"typesafe:typesafe-ai\":\"off\"}}",
+   "skills_listed": 77,
+   "names_of_interest_listed": [
+    "claude-api",
+    "claude-api:claude-api",
+    "typesafe-ai",
+    "typesafe:typesafe-ai"
+   ]
+  },
+  {
+   "label": "both-bare-off",
+   "settings_overlay": "{\"skillOverrides\":{\"claude-api\":\"off\",\"typesafe-ai\":\"off\"}}",
+   "skills_listed": 75,
+   "names_of_interest_listed": [
+    "claude-api:claude-api",
+    "typesafe:typesafe-ai"
+   ]
+  }
+ ],
+ "earlier_captures": "the first five runs were captured earlier on 2026-10-13 (init records of the same client with the same overlays): the counts and the names listed are identical to the five below",
+ "reading": "the only change a skillOverrides entry makes is to hide the copy it names: the bare claude-api (the client's bundled one) or the bare typesafe-ai (the personal one); the qualified names claude-api:claude-api and typesafe:typesafe-ai stay listed whatever skillOverrides holds, and a qualified key changes nothing (77 skills listed in both qualified-key runs, as at baseline). Both bare names off, the proposed host state, lists 75 skills: one copy of each, the plugin's"
+}

@@ -1,0 +1,16 @@
+The tests of the codex-review round of #1062 (CPA-V-10; the delimiter precheck of the front matter extraction) against the sources of 2723f8fd, the head that the local codex review read, and against this head (GITHUB_ACTIONS=true, the bun 1.4.3 named in AGENT_FRONTMATTER_BUN).
+
+== 2723f8fd, the head that was reviewed (its sources, this test file): Ran 3 tests, FAILED (failures=6), 72.4 s
+   ClientWiringTests.test_a_vendor_file_that_is_one_long_unterminated_block_is_read_in_linear_time
+   ExtractionTests.test_an_unterminated_block_of_whitespace_is_refused_in_linear_time
+   AssertionError: 18.879044350003824 not less than 10.0
+   AssertionError: 19.103301151975757 not less than 1.0 : the extraction of an unterminated block took more than a second
+   AssertionError: 6.321217639022507 not less than 1.0 : the extraction of an unterminated block took more than a second
+   AssertionError: 9.063074984995183 not less than 1.0 : the extraction of an unterminated block took more than a second
+== this head: Ran 3 tests, OK, 0.1 s
+
+The extraction itself, timed (agent_front_matter on the reviewer's shape):
+agent_front_matter(64 KiB of newlines after the opening ---) at 2723f8fd: None in 19.87 s
+agent_front_matter(32 Ki pairs of a space and a newline after the opening ---) at 2723f8fd: None in 10.65 s
+agent_front_matter(64 KiB of newlines after the opening ---) at this head: None in 0.00 s
+agent_front_matter(32 Ki pairs of a space and a newline after the opening ---) at this head: None in 0.00 s

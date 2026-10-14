@@ -1,0 +1,97 @@
+{
+ "what": "Headless init records of Claude Code 2.1.296 (the skills the client lists), started in an empty directory with an environment and, for three runs, a settings overlay, killed at the init record before any model call: the client's switch for its bundled claude-api alone (CLAUDE_CODE_DISABLE_CLAUDE_API_SKILL), with the plugin claude-api@anthropic-agent-skills enabled. bundled_claude_api_listed is the client's own claude-api (bare name), plugin_claude_api_listed the plugin's claude-api:claude-api.",
+ "client": "2.1.296",
+ "captured_utc": "2026-10-13T16:34Z to 16:36Z",
+ "source": "the installed 2.1.296 binary, the function that initializes the bundled skills (byte offset 225255110 of the 257,068,216-byte binary): registerClaudeApiSkill({disabled: env.CLAUDE_CODE_DISABLE_CLAUDE_API_SKILL === true}); the documentation and the changelog at the pin name neither the variable nor the function",
+ "reading": {
+  "variable": "1, true, TRUE, yes, on and a padded ' 1' disable the bundled claude-api; 0, 2, false and an empty value do not (the same spellings as CLAUDE_CODE_DISABLE_BUNDLED_SKILLS)",
+  "settings env entry": "a string or a number enables it, and it overrides the process environment in both directions",
+  "scope": "one skill (77 to 76); with the all-bundled switch as well, 61: the plugin's skill stays listed in every run"
+ },
+ "runs": [
+  {
+   "run": "CLAUDE_CODE_DISABLE_CLAUDE_API_SKILL=[1]",
+   "skills_listed": 76,
+   "bundled_claude_api_listed": false,
+   "plugin_claude_api_listed": true
+  },
+  {
+   "run": "CLAUDE_CODE_DISABLE_CLAUDE_API_SKILL=[true]",
+   "skills_listed": 76,
+   "bundled_claude_api_listed": false,
+   "plugin_claude_api_listed": true
+  },
+  {
+   "run": "CLAUDE_CODE_DISABLE_CLAUDE_API_SKILL=[TRUE]",
+   "skills_listed": 76,
+   "bundled_claude_api_listed": false,
+   "plugin_claude_api_listed": true
+  },
+  {
+   "run": "CLAUDE_CODE_DISABLE_CLAUDE_API_SKILL=[yes]",
+   "skills_listed": 76,
+   "bundled_claude_api_listed": false,
+   "plugin_claude_api_listed": true
+  },
+  {
+   "run": "CLAUDE_CODE_DISABLE_CLAUDE_API_SKILL=[on]",
+   "skills_listed": 76,
+   "bundled_claude_api_listed": false,
+   "plugin_claude_api_listed": true
+  },
+  {
+   "run": "CLAUDE_CODE_DISABLE_CLAUDE_API_SKILL=[ 1]",
+   "skills_listed": 76,
+   "bundled_claude_api_listed": false,
+   "plugin_claude_api_listed": true
+  },
+  {
+   "run": "CLAUDE_CODE_DISABLE_CLAUDE_API_SKILL=[0]",
+   "skills_listed": 77,
+   "bundled_claude_api_listed": true,
+   "plugin_claude_api_listed": true
+  },
+  {
+   "run": "CLAUDE_CODE_DISABLE_CLAUDE_API_SKILL=[2]",
+   "skills_listed": 77,
+   "bundled_claude_api_listed": true,
+   "plugin_claude_api_listed": true
+  },
+  {
+   "run": "CLAUDE_CODE_DISABLE_CLAUDE_API_SKILL=[]",
+   "skills_listed": 77,
+   "bundled_claude_api_listed": true,
+   "plugin_claude_api_listed": true
+  },
+  {
+   "run": "CLAUDE_CODE_DISABLE_CLAUDE_API_SKILL=[false]",
+   "skills_listed": 77,
+   "bundled_claude_api_listed": true,
+   "plugin_claude_api_listed": true
+  },
+  {
+   "run": "settings-env-1",
+   "skills_listed": 76,
+   "bundled_claude_api_listed": false,
+   "plugin_claude_api_listed": true
+  },
+  {
+   "run": "process-1-settings-0",
+   "skills_listed": 77,
+   "bundled_claude_api_listed": true,
+   "plugin_claude_api_listed": true
+  },
+  {
+   "run": "settings-env-number-1",
+   "skills_listed": 76,
+   "bundled_claude_api_listed": false,
+   "plugin_claude_api_listed": true
+  },
+  {
+   "run": "both-switches",
+   "skills_listed": 61,
+   "bundled_claude_api_listed": false,
+   "plugin_claude_api_listed": true
+  }
+ ]
+}

@@ -6,8 +6,8 @@
   "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
   "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
   "outputs": {
-    "docs/new-wsl-handbook.md": "46043b18cade9b754a5a0c8cd6a02e0a39296230de94d5820866a39734f5dc72",
-    "docs/new-wsl-handbook.json": "4ce5f261562807cc0eca8e31aaf65cb7bf4c42bc115cf994905fc5ea1dd0bb6e"
+    "docs/new-wsl-handbook.md": "4352377ae90828283e8ac3c078e386a633a12773f82a04565cfa22a575d04fb0",
+    "docs/new-wsl-handbook.json": "bb68a0d06802f17a02ac00ced40d582de339b800c5e646b818c46eafb0d6b474"
   },
   "inventory": {
     "layers": 37,
@@ -1047,8 +1047,8 @@
       "check_command": "python3 scripts/build_new_wsl_handbook.py --check",
       "check_exit_code": 0,
       "current_outputs": {
-        "docs/new-wsl-handbook.md": "46043b18cade9b754a5a0c8cd6a02e0a39296230de94d5820866a39734f5dc72",
-        "docs/new-wsl-handbook.json": "4ce5f261562807cc0eca8e31aaf65cb7bf4c42bc115cf994905fc5ea1dd0bb6e"
+        "docs/new-wsl-handbook.md": "4352377ae90828283e8ac3c078e386a633a12773f82a04565cfa22a575d04fb0",
+        "docs/new-wsl-handbook.json": "bb68a0d06802f17a02ac00ced40d582de339b800c5e646b818c46eafb0d6b474"
       },
       "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
       "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",

@@ -1,0 +1,17 @@
+The 12 mutants of the final bounded commit of #1074 (the local review's two P2: a number or an array in a settings env entry is the text JavaScript makes of it; a missing settings file is empty
+settings). Each is one exact change of scripts/skills_status.py (restored after each run); tests.test_skills_status runs; a mutant is killed when the run fails. The unmutated run passes first. The first
+run left one survivor (an array read as its first element only): the test then had single-element arrays only, and now holds the measured multi-element and nested spellings.
+
+killed   (failed) a float is its repr (1.0 is not 1)
+killed   (failed) a float below one is written as an integer only below 1
+killed   (failed) a float with a fraction is cut to its integer part
+killed   (failed) an array is no text
+killed   (failed) an array is its first element only
+killed   (failed) an object is the text of its first value
+killed   (failed) a number is no text again (the earlier reader)
+killed   (failed) a missing file is unreadable again
+killed   (failed) a missing file disables every bundled skill
+killed   (failed) an unreadable file is empty settings
+killed   (failed) a too deeply nested array crashes the reader
+killed   (failed) the process environment is ignored when the settings file is missing
+12 mutants, 12 killed, survivors: none

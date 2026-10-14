@@ -1,0 +1,43 @@
+The 38 mutants of the design round: one exact change each to scripts/adoption_status.py (the extraction of the block, how bun is found, checked and called, the answers, the walk's settling of the vendor files), in a scratch
+copy, then tests.test_adoption_status with the bun 1.4.3 named in AGENT_FRONTMATTER_BUN and GITHUB_ACTIONS=true (so that a test which skips on a developer's machine fails as it does in the workflow); a mutant is killed when the run fails
+(the unmutated run passes first).
+
+killed   (failed) the byte order mark is not dropped
+killed   (failed) the opener allows spaces and tabs only
+killed   (failed) the block runs to the last closing line
+killed   (failed) invalid bytes are dropped
+killed   (failed) a text with no opener has an empty block
+killed   (failed) the path is searched before the named bun
+killed   (failed) the named bun is ignored
+killed   (failed) the version is not checked
+killed   (failed) the version is compared by prefix
+killed   (failed) a failing version call is accepted
+killed   (failed) bun is asked even when no text has front matter
+killed   (failed) a missing bun answers none
+killed   (failed) bun runs in the caller's directory
+killed   (failed) the parse runs in the caller's directory
+killed   (failed) no empty configuration is named
+killed   (failed) the home is the caller's
+killed   (failed) bun inherits the caller's environment
+killed   (failed) the parse has no time limit
+killed   (failed) a failing parse is accepted
+killed   (failed) an answer that is not JSON reads as none
+killed   (failed) the number of answers is not checked
+killed   (failed) a parse that throws reads as none
+killed   (failed) an empty name is a name
+killed   (failed) an answer of another state is accepted
+killed   (failed) a name that is not a string is accepted
+killed   (failed) none is unreadable
+killed   (failed) any name is a name
+killed   (failed) a throw is none
+killed   (failed) a vendor file without front matter is parsed too
+killed   (failed) the vendor files are not settled
+killed   (failed) an unreadable name is no obstacle
+killed   (failed) a shipped definition with no name declares none that a vendor could take
+killed   (failed) the vendor names are read from the wrong place
+killed   (failed) a vendor that declares a shipped name is not counted
+killed   (failed) the environment is not handed to the parser
+killed   (failed) the wiring does not hand its environment on
+killed   (failed) the drift check does not hand the environment on
+killed   (failed) the pin is another version
+38 mutants, 38 killed, survivors: none

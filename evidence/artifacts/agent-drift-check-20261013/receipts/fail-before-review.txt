@@ -1,0 +1,23 @@
+tests/test_adoption_status.py of the review fix of #1062 (CPA-V-10) against scripts/adoption_status.py at e70d2de0a, the head that was read. Nothing was added to the old sources: the constants the tests import exist there.
+Ran 170 tests, FAILED (failures=24, errors=3), counting subtests.
+Tests that fail (16):
+  test_a_definition_below_the_top_is_drift_at_any_depth
+  test_a_folder_that_cannot_be_listed_after_it_was_opened_is_unknown
+  test_a_platform_that_cannot_refuse_links_reads_nothing
+  test_a_replacement_of_a_folder_below_the_top_at_any_point_is_never_read_through
+  test_a_replacement_of_a_shipped_file_at_any_point_is_never_read_through
+  test_a_replacement_of_the_agents_folder_at_any_point_is_never_read_through
+  test_a_vendor_file_that_cannot_be_read_is_not_drift_for_what_it_might_declare
+  test_a_vendor_file_that_declares_the_name_of_a_shipped_definition_is_drift
+  test_a_vendor_name_below_the_top_or_as_a_link_is_not_the_vendors_own
+  test_an_unreadable_folder_below_the_top_is_unknown
+  test_links_and_other_kinds_below_the_top_are_counted_or_unknown_never_followed
+  test_read_regular_bytes_answers_for_every_kind_of_entry_without_following_a_link
+  test_the_codex_role_count_is_never_read_through_a_replacement_either
+  test_the_folders_are_opened_below_a_descriptor_without_following_a_link
+  test_the_limitations_name_the_agent_folders_the_check_compares
+  test_the_walk_is_bounded_and_a_tree_past_the_bound_is_unknown_not_a_count
+
+Every other test of the module passes there: they describe behavior the fix keeps, among them test_an_installed_definition_over_the_size_limit_is_unknown_not_drift (an oversize copy was unknown before) and
+test_an_entry_that_vanishes_between_the_listing_and_its_opening_is_unknown (a path read that lost the entry between its two steps also returned null).
+The four replacement tests fail on the reviewer's defect: after a shipped file, or the agents folder, was replaced by a link to outside copies equal to the source, the old check answered 0 ("a replacement after step N changed the answer").

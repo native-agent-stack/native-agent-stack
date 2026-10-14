@@ -4987,8 +4987,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/instructions-skills.md",
-      "sha256": "d6b5834d8e5e00969a60f740ce389d5c7d402b9d4669673ac0e0f9a542edf8cf",
-      "bytes": 9387
+      "sha256": "7fa69465f85dff3136ebf925924152bafe97bc6cde941ad09f408aa848a15f17",
+      "bytes": 10415
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/isolation.md",
@@ -5017,8 +5017,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.json",
-      "sha256": "76d5eff876c5ecf316b1006f0c8d2929b11d3d70ed0be3edeb67ab3aa3c1b046",
-      "bytes": 151622
+      "sha256": "b0b9d7949e07dd86ab80b34747cbc538a5eb6c97d1dec26e6684c0e1ffd7b2a1",
+      "bytes": 152660
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.md",
@@ -5137,8 +5137,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "fe15308e810b3e0534c6cbbda9fdf237ec7941549a9d06277ecefb8733f37349",
-      "bytes": 27298
+      "sha256": "0bb8f0237ca45bb787620a9c08f9ceaafcaf58eddb512496aefebf45696ddae3",
+      "bytes": 28607
     },
     {
       "path": ".github/workflows/dependency-review.yml",
@@ -5237,8 +5237,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "c2298315123147ec18ee56f7af0dafa1a55a39c0a2fb828adb0dee8b02bfb0c3",
-      "bytes": 45356
+      "sha256": "a026b23a199814534e94acd948dc11b01ac53bfbd90b292d9ab3c73032eadd9a",
+      "bytes": 46696
     },
     {
       "path": ".gitignore",
@@ -5772,8 +5772,8 @@
     },
     {
       "path": "adoption/skills/manifest.json",
-      "sha256": "699b0c0aa5df0631bdf56ac7633029a3355d96bc5ca6503f81bfcc1b96f822d8",
-      "bytes": 64517
+      "sha256": "f55d6065c4022b8b8164a8cd6c70bb83f78968c0e289579c3642ebc08fa4d724",
+      "bytes": 64651
     },
     {
       "path": "adoption/templates/claude.settings.linux-wsl2.overlay.json",
@@ -11488,8 +11488,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-read-deltas.json",
-      "sha256": "9350bfd9b61a0f26fb3d159d2d9ccf54836d6054e55ae8a77fb306695a97f9b4",
-      "bytes": 587
+      "sha256": "f1fc89bb64f6094398b679cea33f05df077706dd663de0c156fe71baeb5d8332",
+      "bytes": 1033
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
@@ -11522,9 +11522,29 @@
       "bytes": 12295
     },
     {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261013-pr1062-delta.json",
+      "sha256": "c10ba5cde317db1cc69fd5be13769ba29383dcf7f796b16fc176aaea2377dffe",
+      "bytes": 17036
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261013-pr1062-design-delta.json",
+      "sha256": "24bc390103366a709f62f6b1c22e75f485e2feab3a8b14ba76e120c180647e6e",
+      "bytes": 17279
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261013-pr1062-dotdot-delta.json",
+      "sha256": "126427e342993b0a890c71f59c25026fd09df89d635b87abbc2a873d839a9dd3",
+      "bytes": 17537
+    },
+    {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261013-pr1070-delta.json",
       "sha256": "8c5503bd3eba5b6ae2bb770e06121b68f49ad5d015d8d7bc80f8b9d7c6f1fe17",
       "bytes": 12645
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261013-pr1074-delta.json",
+      "sha256": "b1c9a6f590066a80876670bef8e439c9b4d163b18a6197ec9c3028ef1d0edde9",
+      "bytes": 15771
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unit-pass.txt",
@@ -15728,8 +15748,8 @@
     },
     {
       "path": "blueprints/us-equities/engine/patches/lean-dependencies.patch",
-      "sha256": "8770d14bf99d130e6fa9ecc460096edb8a7b3728349f8de2dba54b6a5961a058",
-      "bytes": 1892
+      "sha256": "06c89e172db63e949ceeab65966d6f3ec5d2dbfd1f2c35dbf2bde0bb3a0eefaf",
+      "bytes": 2089
     },
     {
       "path": "blueprints/us-equities/engine/patches/lean-locks/Algorithm.CSharp/packages.lock.json",
@@ -15793,8 +15813,8 @@
     },
     {
       "path": "blueprints/us-equities/engine/patches/lean-locks/Launcher/packages.lock.json",
-      "sha256": "9e02f713cf490d5916f014e62312d03f4253f075b529a57ef85a30bdc411904d",
-      "bytes": 26156
+      "sha256": "6319dd03ac1633195b9442a1d8b87163be36c6d36d46cfad91be82f1511f6a57",
+      "bytes": 26217
     },
     {
       "path": "blueprints/us-equities/engine/patches/lean-locks/Logging/packages.lock.json",
@@ -15803,8 +15823,8 @@
     },
     {
       "path": "blueprints/us-equities/engine/patches/lean-locks/Messaging/packages.lock.json",
-      "sha256": "17251bbb64c71724b3bf3c55af42217faa6cf220daa02825de8ddf0fa2b31bd5",
-      "bytes": 7445
+      "sha256": "4ff8c8dc0a2b6193df652252ca9b752e98f2c8f97229a8a84312daa8a199da08",
+      "bytes": 7477
     },
     {
       "path": "blueprints/us-equities/engine/patches/lean-locks/Optimizer.Launcher/packages.lock.json",
@@ -15823,8 +15843,8 @@
     },
     {
       "path": "blueprints/us-equities/engine/patches/lean-locks/Report/packages.lock.json",
-      "sha256": "a67125134ac7f1de0c426c73c248f0d5df2659d1122e7f7a7b2398470dae8387",
-      "bytes": 14623
+      "sha256": "d116becc8cb07dcdea04c4882df2a645e8c58e103c76d683f3c56d2875a99c42",
+      "bytes": 14684
     },
     {
       "path": "blueprints/us-equities/engine/patches/lean-locks/Research/packages.lock.json",
@@ -15833,8 +15853,8 @@
     },
     {
       "path": "blueprints/us-equities/engine/patches/lean-locks/Tests/packages.lock.json",
-      "sha256": "e2cebe0422f87419371ea2bda6e491f1658cc997e7c34b14275729527b27fd99",
-      "bytes": 32030
+      "sha256": "9c814cb42401ce0273533e7357137085213c51491e799c5398eee86f3bba3e29",
+      "bytes": 32091
     },
     {
       "path": "blueprints/us-equities/engine/patches/lean-locks/ToolBox/packages.lock.json",
@@ -15853,8 +15873,8 @@
     },
     {
       "path": "blueprints/us-equities/engine/resolution.md",
-      "sha256": "aa46db23be0c20b279026e24f1727e0bd3120df3349bb244cfa30f66725bc4ad",
-      "bytes": 10783
+      "sha256": "bcfa70fc2a53716fc48eaeb56133eda3c66de9ef4d0b7188975f1c9c33c03bde",
+      "bytes": 12078
     },
     {
       "path": "blueprints/us-equities/event-anchored-ranking/R2-COMPARISON.json",
@@ -17398,8 +17418,8 @@
     },
     {
       "path": "catalogs/foundation/model-currency.json",
-      "sha256": "8fd235096256010af2704c9c68e4c15d2d2dd7e83dce6331bbad528b27526e60",
-      "bytes": 34044
+      "sha256": "4ad577d0daf4307593592d967348193cd39390976b7b177173d69c5d3f1574b1",
+      "bytes": 35698
     },
     {
       "path": "catalogs/foundation/model-currency.schema.json",
@@ -17408,7 +17428,7 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "14fd038fb205c6a4ffb54c49c4d3a86b04d9b917b28a39e3866c9b43e56810ce",
+      "sha256": "cddb68683ccc06101378c861a0af2bd3504d0a2ac3f070e93b66335bd3442cac",
       "bytes": 326277
     },
     {
@@ -17433,7 +17453,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "7ffbbacca1721baeee78d1c9ad8f86a20037eee660f254973ae50557381e6e5d",
+      "sha256": "bf487822050bda202410b00e980e5f8d8db07cf5900bcffe80f5042699028a38",
       "bytes": 190328
     },
     {
@@ -19107,6 +19127,11 @@
       "bytes": 19447
     },
     {
+      "path": "docs/decisions/2026-10-13-claude-agent-drift-check.md",
+      "sha256": "b1f4cf2a44669cd12ffe04bf4f3255270774032291a5ffa42c8e0082b725689c",
+      "bytes": 41530
+    },
+    {
       "path": "docs/decisions/2026-10-13-lane-a-frozen-field-continuity.md",
       "sha256": "4da74df3105b3e30d5408e17c15cc0b369c9feac2e7391f404b1e1669e55a073",
       "bytes": 5792
@@ -19115,6 +19140,11 @@
       "path": "docs/decisions/2026-10-13-paper-configurable-risk-ceilings.md",
       "sha256": "4961225182a78eae3abf25aa120cd325ec0e5b335b766d79a0c38db6c1b12550",
       "bytes": 4526
+    },
+    {
+      "path": "docs/decisions/2026-10-13-plugin-skill-identity.md",
+      "sha256": "b4887a13c1ae27bfbec85ad51ffe8e96b73c6200279f7d6b437d10a5295c6f6f",
+      "bytes": 26299
     },
     {
       "path": "docs/decisions/2026-10-13-strict-paper-url-gates.md",
@@ -19488,12 +19518,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "4ce5f261562807cc0eca8e31aaf65cb7bf4c42bc115cf994905fc5ea1dd0bb6e",
+      "sha256": "bb68a0d06802f17a02ac00ced40d582de339b800c5e646b818c46eafb0d6b474",
       "bytes": 699356
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "46043b18cade9b754a5a0c8cd6a02e0a39296230de94d5820866a39734f5dc72",
+      "sha256": "4352377ae90828283e8ac3c078e386a633a12773f82a04565cfa22a575d04fb0",
       "bytes": 369789
     },
     {
@@ -19593,8 +19623,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.md",
-      "sha256": "91160fc24641c22d8321f45d94ce0736db24b1ed066f2a7e5edd01fbff5a8982",
-      "bytes": 33891
+      "sha256": "11f24ab833e6368fbe9ecf7020be5fbd87910f7000c444d4053e7f9121009220",
+      "bytes": 35528
     },
     {
       "path": "docs/token-native-saturation.md",
@@ -19985,6 +20015,111 @@
       "path": "evidence/artifacts/agent-browser-lna-20260930/run.sh.txt",
       "sha256": "d115d6b622752b7bd57f3529e5b7f4fd7ac7d56995989dc26b4a822482196b4d",
       "bytes": 1340
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/README.md",
+      "sha256": "4f96cb94cf408c71db0253d9fdc2a25b6b9b736a23d107150e4493b88ccd06f7",
+      "bytes": 7995
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/client-oracle.txt",
+      "sha256": "59b41c6acb9c7f2c35160d7315f2684d88bf0be521cbfdb384c479e6268b789d",
+      "bytes": 11568
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/fail-before-absolute-bun.txt",
+      "sha256": "9e00f539e392e7980099db06d42174e5f0cad1890071cad371cbc3aaf5cd08f8",
+      "bytes": 2087
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/fail-before-design.txt",
+      "sha256": "94174a9cada19a56e64be7b139b992cb632364c4af06dc42057ffc144f73cff5",
+      "bytes": 4858
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/fail-before-dotdot.txt",
+      "sha256": "dd87b6a1fb56f077021fdaadfb56e05a3b0d31735d96e8a68232ee0dbd3156b6",
+      "bytes": 1559
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/fail-before-freshness-bun.txt",
+      "sha256": "84e2a0a97a2871af168e22ea9b9a07c0bb763f5e627ff858e2ab0cde3ac8110e",
+      "bytes": 890
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/fail-before-precheck.txt",
+      "sha256": "e2b3fee16a0a44bf59470bc01b688bcd555ab5ab02a5257410ccd3f2d58af88c",
+      "bytes": 1506
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/fail-before-review.txt",
+      "sha256": "9ddc3eaffb8dfb98e148b10d51942d97b84402281247e18d03bf787accae3e27",
+      "bytes": 2055
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/fail-before-round2.txt",
+      "sha256": "3cf8db4d0ab3d125a7ca20a393182b9e95aa07eb44b839fb7004d9a30a651ec9",
+      "bytes": 1742
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/fail-before.txt",
+      "sha256": "2eedb1737eadde92d6e6a6c47b48bc6342317f4332ac02db6c57aa91b7d4c6ed",
+      "bytes": 1334
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/freshness-bun-local-check.txt",
+      "sha256": "1617169fac6f6b26ff2f84a2690441252cf8c5068e66a120ebf5595ac40b636c",
+      "bytes": 1283
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/host-run.json",
+      "sha256": "d7dd8b863bca8906bc29184495f59071a99bc0df795eb1b22f79f2747c9da94f",
+      "bytes": 1603
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/identity-oracle.txt",
+      "sha256": "e2ece90be35d989731de19cb8b01400358e3c9a5f0523ff9d99c8150eee9f801",
+      "bytes": 4709
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/mutants-20.txt",
+      "sha256": "67d078ee076d4e57a66003bb0c482b1574c1689212a70e54edc5eeb949d34188",
+      "bytes": 1418
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/mutants-absolute-bun.txt",
+      "sha256": "5c5b192937bb7a20adaefe1476aa3a71ba47a3f768fa55c0478133f8ac45409c",
+      "bytes": 1344
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/mutants-design.txt",
+      "sha256": "7bcb4aa202b2820640473722d3cdaa3d4869bca535fe023b1b28f1bf45637e00",
+      "bytes": 2588
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/mutants-dotdot.txt",
+      "sha256": "3ca8acdc9092092e27c83445d8326f3cc3f1ac44d4f4d4e1120d58b00c578092",
+      "bytes": 1059
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/mutants-freshness-bun-13.txt",
+      "sha256": "c28a6573caf703049850a4c28f2ec6caf34abf42646345f09d6926d7af0fc2cd",
+      "bytes": 1559
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/mutants-precheck.txt",
+      "sha256": "6c2499c5d409205375aa893760c572b3e5c93c98d43e00f5f7526a1dda9b3e81",
+      "bytes": 680
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/mutants-review.txt",
+      "sha256": "4b2b4d17927720ab201e4b2083dc6584b426a6125a9a27a8f4659a4ad2563b43",
+      "bytes": 2927
+    },
+    {
+      "path": "evidence/artifacts/agent-drift-check-20261013/receipts/mutants-round2.txt",
+      "sha256": "f2c51880037d7f6819e5e6bc4b078819198dc3e05351cc66ea7611a2458134d9",
+      "bytes": 5505
     },
     {
       "path": "evidence/artifacts/agentsview-044-qualification-20260927/README.md",
@@ -21343,8 +21478,8 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/claude-native-slot-manifest.json",
-      "sha256": "ca47cdf806dd6fe1571a5bb0e366d8dbd6d5de86b93f00972f9ab76a5209b5d5",
-      "bytes": 238146
+      "sha256": "b3db948a9878156abec03a3dc11764b1595c5c43b348d483c2a24355ca649e80",
+      "bytes": 238162
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/cross-client-lines.json",
@@ -40752,6 +40887,11 @@
       "bytes": 6392
     },
     {
+      "path": "evidence/artifacts/model-landscape-check-20261014/receipt.json",
+      "sha256": "073e9bcfca252553e5df59ee671d71e6b0518393beb6ac628aec0b1e982b6249",
+      "bytes": 3552
+    },
+    {
       "path": "evidence/artifacts/native-claude-coop-20260921/loki-discovery.json",
       "sha256": "b272572b57b6cfa63cf4679341e4d35a793fb27b2ed3ceb856b798417927f2ca",
       "bytes": 10460
@@ -43443,7 +43583,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "dad311e1a21d3d05ecb371ef3c1d2c49bba31a85dea75e44724c880826a27dda",
+      "sha256": "2ae75db2cf89adee8dae05ac303dc9d61487befbb6e9fd0a02d63db3eefcafa0",
       "bytes": 78495
     },
     {
@@ -48165,6 +48305,101 @@
       "path": "evidence/artifacts/osv-split-hardening-port-20261003/zizmor-offline.stdout.txt",
       "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
       "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/README.md",
+      "sha256": "b6afce8e7008ad7470041bcd52d3d1829a8e4e2f110e20e53ba4c5f66496910f",
+      "bytes": 6792
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/claude-api-currency.txt",
+      "sha256": "7200438cc4f17d8162b19d12085c8efffe3fa064a5306288bbc1c54154af3f3f",
+      "bytes": 4413
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/docs-env-vars-excerpt.txt",
+      "sha256": "b323fde91aa47e0ce3ac25d0c7159dad1f513a5e7fa946531b6fdc0e94027c09",
+      "bytes": 1226
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/docs-skills-md-excerpt.txt",
+      "sha256": "6abf92133e3efb31a3ddb3be51e754e8978065a89c6bf8767b5db2a92276b573",
+      "bytes": 859
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/fail-before-at-main-993cc890b.txt",
+      "sha256": "2d1e2647556a0b8dd5dc6f179df47abc6bbc4b79cae54c951315d413fde76668",
+      "bytes": 2228
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/fail-before-round1.txt",
+      "sha256": "69037613ae97a6860dba48d1c874f538ae2d95433b1c5c44ba7ba90d59b638b9",
+      "bytes": 3865
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/fail-before-round2.txt",
+      "sha256": "392d3e532109605eb35df315f2128d310d67e9969c969d7aecb36b5f29234427",
+      "bytes": 1137
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/fail-before-round3.txt",
+      "sha256": "d1607e353c3f9dd25edbb6a6b10b3f42fbd7e2b40ea56fee7ce83975b6459acb",
+      "bytes": 996
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/fail-before.txt",
+      "sha256": "2ec026093bc4ffb7ef4e95d0ad69779457fcfd66f71d9d276d95f7ace2de92df",
+      "bytes": 2540
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/global-disable-init-records.json",
+      "sha256": "0a3356a1a7c8f0b8a75a0c3ce0db6001f65566c1ddb95287e06bda4d953538db",
+      "bytes": 5479
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/host-overlay-simulation.json",
+      "sha256": "447ce48cc40d1fff4e092a313c45fc1e884de59bdd120fe80510ec3a69806433",
+      "bytes": 853
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/listing-init-records.json",
+      "sha256": "ec27df33a6d71168ab57df6337e076ef4ba1767bcb4da84e9b5958567a3bb9a4",
+      "bytes": 2569
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/mutants-round1-30.txt",
+      "sha256": "f7ec469dde150c69e9b592d0b9a81706b916d682452c681551c6f7b9b9a29427",
+      "bytes": 2561
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/mutants-round2.txt",
+      "sha256": "1196e0295262ff136a774d8c8c90cc1e5fa19c7e29b21bb31196ae480d9271cd",
+      "bytes": 1608
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/mutants-round3-12.txt",
+      "sha256": "f410f1d804c5c45c5f6eee002dd9326b49035816241ad4eab2e41ce948c4c1cc",
+      "bytes": 1342
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/mutants-v07-41.txt",
+      "sha256": "980780b95b4036ade1fab15df573421f0d7a2b2459b554157b0cf2e58d09ebc9",
+      "bytes": 2735
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/numeric-env-init-records.json",
+      "sha256": "fe7d1413f1c4fa4a234fb619e21caf306a1bdc62fc72896c06d2570cdd18df19",
+      "bytes": 6314
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/preload-probes.json",
+      "sha256": "d36a9c8948697b9a8018394fc58647f8b59b083422c6ffcc3c129ede82f573cd",
+      "bytes": 2939
+    },
+    {
+      "path": "evidence/artifacts/plugin-skill-identity-20261013/receipts/skill-switch-init-records.json",
+      "sha256": "26a0bff8bc5515974da84f60167d7806c2f9732accdb069ebb6f08a8171adbd8",
+      "bytes": 3554
     },
     {
       "path": "evidence/artifacts/portable-claude-native-qualification-20260921/angle1-upstream.json",
@@ -61398,8 +61633,8 @@
     },
     {
       "path": "scripts/adoption_status.py",
-      "sha256": "c5ea86bd324e9baf3263ac7f6edd107c736e3fa5c62c6395161d3319b4458998",
-      "bytes": 98120
+      "sha256": "cd8490a71854f68e1f4c2017c895723591f0dd80046c69408d418dba2774db46",
+      "bytes": 122433
     },
     {
       "path": "scripts/build_ecosystem.py",
@@ -61558,8 +61793,8 @@
     },
     {
       "path": "scripts/skills_status.py",
-      "sha256": "aa03834a67b0aea20557a9ef6452050f26b1cb936c47ecf010f243d8a0136af4",
-      "bytes": 47370
+      "sha256": "70c1232390f99cc5b0cb3aaf23abef56ef9f6c69011981762c26aa03ff09aaa8",
+      "bytes": 61214
     },
     {
       "path": "scripts/starred_convergence.py",
@@ -61660,6 +61895,11 @@
       "path": "tests/fixtures/adaptive_paper_exit_quote_age/aggregate-selection.json",
       "sha256": "aaa3f7180569798e9108a2d758ce6748190f845c39ed2d7b7e5dd75606196b76",
       "bytes": 2435
+    },
+    {
+      "path": "tests/fixtures/agent_frontmatter/client-oracle.json",
+      "sha256": "735ffb970329ebafa7e255bdb96013dde70ecf8cbc038fdbb076e88cf62ff3c0",
+      "bytes": 341189
     },
     {
       "path": "tests/fixtures/codex-worker-lane/README.md",
@@ -62108,13 +62348,18 @@
     },
     {
       "path": "tests/test_adoption_status.py",
-      "sha256": "ff9bd18c08199728ba70eeb8bc4e107c017fc96cbbac5b64a8d2076cc6de19a2",
-      "bytes": 161018
+      "sha256": "044a64bd2cf50352c4ae9ab4dea8e183950b711fb06786b99788549112f8965b",
+      "bytes": 254952
     },
     {
       "path": "tests/test_adoption_version_probes.py",
       "sha256": "36de5b9442ea76c735ef789599dfcf2b7d903d34f69d844f22423501bbde5054",
       "bytes": 23447
+    },
+    {
+      "path": "tests/test_agent_drift_record.py",
+      "sha256": "c9d6ddc7ff8ac6aa58a45c507684bfc7a6adae566edbea63e75a9d5e8bb02a23",
+      "bytes": 3128
     },
     {
       "path": "tests/test_agentsview_qualification.py",
@@ -63052,6 +63297,11 @@
       "bytes": 38625
     },
     {
+      "path": "tests/test_plugin_skill_identity_receipts.py",
+      "sha256": "ab92db30fd45367bd9c6998142b9b95f854c05965ad93daaaaf1a7879846c709",
+      "bytes": 4574
+    },
+    {
       "path": "tests/test_point_in_time.py",
       "sha256": "1f92eb8fb3f6abb1f6da24c89570900b1944816e691c5a77cc92c60e32579382",
       "bytes": 7481
@@ -63318,18 +63568,18 @@
     },
     {
       "path": "tests/test_skill_usage_daily.py",
-      "sha256": "620152c398c44829b9f0a57ed415c17026998e3014b44ae8912134ce7ae378fa",
-      "bytes": 10233
+      "sha256": "04719068560e1e4daa32ed6b3363646c29e1e6e73f3eb9b75f22d074f0e3993f",
+      "bytes": 17439
     },
     {
       "path": "tests/test_skills_manifest.py",
-      "sha256": "5b9336366957584a595d7c99549167f4816a1aa4a3663b8b1e89b2b463c6adb5",
-      "bytes": 20249
+      "sha256": "9416da75a268c51b5f87430f8e7214b1a799f72a7894a30d63df9b9f63555db3",
+      "bytes": 23850
     },
     {
       "path": "tests/test_skills_status.py",
-      "sha256": "25721f7174192f3e5e9b5a4ff10fe7b03789ad3f605803025f04623fa12d8f04",
-      "bytes": 79705
+      "sha256": "c4cf2a7fa2539ed1c1c452441ae36d3d24e0ed4691ca30f8aed3dcc51bd1cfec",
+      "bytes": 118297
     },
     {
       "path": "tests/test_sota_convergence.py",
@@ -63603,8 +63853,8 @@
     },
     {
       "path": "tools/adoption/host-baseline.md",
-      "sha256": "e7527052bd6c4f36bc7449185a978406bc796acf0f30c328f9ee6ec495a75a86",
-      "bytes": 16770
+      "sha256": "eb128ec84b91dcc9b34ed56ed5ec09228a421bf5e656ce20ae5d4de25ed2a000",
+      "bytes": 16827
     },
     {
       "path": "tools/adoption/host_baseline_probe.py",
@@ -63948,8 +64198,8 @@
     },
     {
       "path": "tools/skill-usage/skill_usage.py",
-      "sha256": "17aad1420b54ebac3e023b44b9de699802e133837dfd4d1d5dc149f527b95c3d",
-      "bytes": 158548
+      "sha256": "0c16c817238bf687596a14e5fccc129e2703544cb3d053d46c13466c1c784a96",
+      "bytes": 161317
     },
     {
       "path": "tools/skill-usage/stage_routing_eval.py",

@@ -868,7 +868,7 @@
     "skills-I1, skills-I2 (inline-verified)",
     "CHANGELOG L7339 (2.1.6), L4303 and L4313 (2.1.178)"
    ],
-   "notes": "Adjudicated: the native mechanism with the pinned manifest stands; the refuter upheld it. Owed: paired with/without runs per manifest skill on our tasks.",
+   "notes": "Adjudicated: the native mechanism with the pinned manifest stands; the refuter upheld it. Owed: paired with/without runs per manifest skill on our tasks. Plugin exception: Claude Code lists a plugin's skill as `<plugin>:<skill>` and `skillOverrides` changes nothing about that listing (skills.md L909, fetched 2026-10-13: \"Plugin skills are not affected by `skillOverrides`\"; measured on 2.1.296 in headless init records: `{\"typesafe-ai\":\"off\"}` hides only the personal copy and `{\"claude-api\":\"off\"}` only the bundled one, `typesafe:typesafe-ai` and `claude-api:claude-api` stay listed, and a qualified key changes nothing). A skill that a plugin and another copy both deliver is listed twice with one description until the other copy is hidden, and the preload by short name still resolves with the personal copy off (3 of 3 probes). adoption/skills/manifest.json names each such row (`claude_plugin`, or `native_plugin` with `bundled_twin`, and `claude_skill_name`), scripts/skills_status.py reports `duplicate_listing` where the plugin is present and the other copy is not hidden, and the usage tracker counts both listings (docs/decisions/2026-10-13-plugin-skill-identity.md).",
    "overturn_when": "A paired with/without run shows a manifest skill lowering quality, or a blinded comparison shows another library ahead.",
    "supersedes": [
     "M9 (judge still defaults to haiku)",

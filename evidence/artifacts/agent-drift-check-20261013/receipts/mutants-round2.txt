@@ -1,0 +1,95 @@
+The 92 mutants of the final source: one exact change each to scripts/adoption_status.py, in place, then tests.test_adoption_status.ClientWiringTests; a mutant is killed when the run fails (the unmutated run passes first).
+
+killed   (failed) the key is missing from the claude group
+killed   (failed) drift does not block completeness
+killed   (failed) the checkout's source folder is ignored
+killed   (failed) the limitation text drops the folders below
+killed   (failed) a vendor definition is not listed (semble-search)
+killed   (failed) the vendor exemption is gone
+killed   (failed) a vendor name is exempt at any depth
+killed   (failed) an unreadable vendor file counts
+killed   (failed) a link in place of a vendor file is exempt
+killed   (failed) a vendor file is exempt whatever it declares
+killed   (failed) a vendor file that declares any name is drift
+killed   (failed) a vendor file over the limit is read as one with no name
+killed   (failed) the shipped names are not collected
+killed   (failed) a shipped name that cannot be read is dropped
+killed   (failed) the byte order mark is not dropped
+killed   (failed) invalid bytes make the file unreadable text
+killed   (failed) the opener allows spaces and tabs only
+killed   (failed) the block is not cut at the first closing line
+killed   (failed) a text without front matter is unknown
+killed   (failed) line breaks are not unified
+killed   (failed) a tab or control character is allowed
+killed   (failed) the unreadable characters are not looked for
+killed   (failed) a comment or blank line is a key line
+killed   (failed) an indented line before any key is skipped
+killed   (failed) a sequence at the left margin is not a continuation
+killed   (failed) a sequence at the left margin continues any key
+killed   (failed) every key is open for a sequence
+killed   (failed) a line that is no key line is skipped
+killed   (failed) the key is read in any case
+killed   (failed) a quoted key is read as a plain one
+killed   (failed) no space is needed after the colon
+killed   (failed) the name twice is the first one
+killed   (failed) a comment after the colon is the value
+killed   (failed) a block scalar header is a plain value
+killed   (failed) a clipped block scalar is stripped
+killed   (failed) a stripped block scalar is clipped
+killed   (failed) a blank line before the text is skipped
+killed   (failed) a block scalar of two lines is read
+killed   (failed) trailing spaces of a block scalar are dropped
+killed   (failed) a block scalar runs to the end of the block
+killed   (failed) a comment line is part of the value
+killed   (failed) a value on a later line follows a value on the key line
+killed   (failed) a value over several lines is read
+killed   (failed) a plain value is cut at no comment
+killed   (failed) a mapping in a plain name is read
+killed   (failed) an indicator starts a plain scalar
+killed   (failed) a sequence mark starts a plain scalar
+killed   (failed) a quoted value is read as a plain one
+killed   (failed) a quoted value on the next line is read as a plain one
+killed   (failed) an unclosed quote is read
+killed   (failed) text after the closing quote is read
+killed   (failed) a comment needs no space before it
+killed   (failed) an escape is taken as text
+killed   (failed) a doubled single quote closes the scalar
+killed   (failed) a flow collection of one line is unknown
+killed   (failed) a block scalar header of another key is unknown
+killed   (failed) the quote of another key's value is not checked
+killed   (failed) the plain value of another key is not checked
+killed   (failed) no folder below the top is entered
+killed   (failed) hidden entries are skipped
+killed   (failed) a file that is not markdown counts
+killed   (failed) a nested file with a shipped name is the shipped one
+killed   (failed) the depth bound is gone
+killed   (failed) the depth bound is one too wide
+killed   (failed) the depth bound is one too narrow
+killed   (failed) the entry bound is gone
+killed   (failed) the entry bound is one too narrow
+killed   (failed) an unlistable folder is no drift
+killed   (failed) a link to a folder is not unknown
+killed   (failed) a link to a file named *.md is not counted
+killed   (failed) a link to nothing is counted
+killed   (failed) a socket named *.md is counted
+killed   (failed) a pipe named *.md is counted
+killed   (failed) a link is told by a later look, not by the refusal
+killed   (failed) a link is taken for any file by its target (a link to a folder is not unknown through the refusal)
+killed   (failed) a vanished entry is not unknown
+killed   (failed) an unreadable folder is not unknown
+killed   (failed) an unreadable shipped copy is not unknown
+killed   (failed) a shipped copy over the limit is not unknown
+killed   (failed) a shipped copy is never present
+killed   (failed) equal length is taken for equal bytes
+killed   (failed) a link is followed (no O_NOFOLLOW)
+killed   (failed) an entry is opened by its name, not below its folder
+killed   (failed) a link is described by its target
+killed   (failed) the platform guard is gone
+killed   (failed) the read limit is not enforced
+killed   (failed) a folder is read as a file
+killed   (failed) a regular file is taken for any file
+killed   (failed) the Codex carriers are read by path again
+killed   (failed) a linked Codex agents folder is followed
+killed   (failed) an absent Codex agents folder is unknown
+killed   (failed) an absent Claude agents folder is no drift
+92 mutants, 92 killed, survivors: none

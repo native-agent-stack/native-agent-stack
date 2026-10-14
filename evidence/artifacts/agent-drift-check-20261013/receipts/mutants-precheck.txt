@@ -1,0 +1,8 @@
+The 4 mutants of the codex-review round of #1062 (the delimiter precheck of the front matter extraction: removed, started at the opening line, started too late, inverted): one exact change each to scripts/adoption_status.py, in a scratch
+copy, then tests.test_adoption_status with the bun 1.4.3 named in AGENT_FRONTMATTER_BUN and GITHUB_ACTIONS=true; a mutant is killed when the run fails (the unmutated run passes first).
+
+killed   (failed) the precheck is removed
+killed   (failed) the precheck starts at the opening line
+killed   (failed) the precheck starts too late
+killed   (failed) the precheck refuses a text that has the closing line
+4 mutants, 4 killed, survivors: none

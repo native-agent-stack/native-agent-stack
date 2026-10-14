@@ -1,0 +1,38 @@
+{
+ "before": {
+  "result": "fail",
+  "rows": {
+   "claude-api": {
+    "pass": false,
+    "twin": "duplicate_listing",
+    "listing": "native-plugin"
+   },
+   "typesafe-ai": {
+    "pass": false,
+    "twin": "duplicate_listing",
+    "listing": "mismatch"
+   }
+  },
+  "failing": [
+   "claude-api",
+   "typesafe-ai"
+  ]
+ },
+ "after_simulated": {
+  "result": "ok",
+  "rows": {
+   "claude-api": {
+    "pass": true,
+    "twin": "ok",
+    "listing": "native-plugin"
+   },
+   "typesafe-ai": {
+    "pass": true,
+    "twin": "ok",
+    "listing": "ok"
+   }
+  },
+  "failing": []
+ },
+ "note": "scripts/skills_status.py on the first host's real settings (read, nothing written), then again with skillOverrides.typesafe-ai and skillOverrides.claude-api substituted by \"off\" in memory: the proposed host change. States only; the first host's own file is untouched."
+}

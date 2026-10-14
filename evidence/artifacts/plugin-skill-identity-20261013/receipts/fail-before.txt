@@ -1,0 +1,27 @@
+The tests of CPA-V-07 (tests/test_skills_manifest.py, tests/test_skills_status.py, tests/test_skill_usage_daily.py) against the sources of 3f1a921dd (main before the landing rebase onto 993cc890b, the base of the first commit as it was written; the replay at the exact base of the opened head is receipts/fail-before-at-main-993cc890b.txt: the same 22 of 142; the manifest, scripts/skills_status.py, tools/skill-usage/skill_usage.py and the practice page as they stood; GITHUB_ACTIONS=true): 142 tests run, 22 of them fail or raise (FAIL: an assertion; ERROR: the sources lack what the test uses).
+
+test_skills_manifest: Ran 38 tests, FAILED (failures=3, errors=1), in 3 tests
+  FAIL  test_every_row_a_plugin_delivers_names_the_listing_it_gets [1]
+  FAIL  test_the_practice_page_and_its_json_state_the_plugin_exception [2]
+  ERROR test_the_two_skills_listed_twice_on_the_first_host_name_their_twin [1]
+test_skills_status: Ran 88 tests, FAILED (failures=7, errors=23), in 11 tests
+  ERROR test_a_bundled_twin_is_hidden_under_its_own_name [1]
+  ERROR test_a_plugin_row_that_is_not_as_pinned_fails_even_with_its_twin_hidden [1]
+  ERROR test_a_plugin_that_is_installed_and_enabled_makes_the_personal_copy_a_duplicate_until_it_is_hidden [1]
+  FAIL  test_a_row_without_a_twin_has_no_twin_entry_and_the_text_shows_it_only_for_a_twin [1]
+  ERROR test_an_unreadable_settings_file_lists_no_plugin_and_the_personal_row_fails_on_its_own_listing_check [1]
+  ERROR test_only_an_explicit_true_enables_a_plugin_and_only_a_user_install_counts [9]
+  ERROR test_only_off_hides_the_twin [4]
+  ERROR test_overrides_of_the_wrong_type_hide_nothing_so_the_twin_stays_a_duplicate [1]
+  ERROR test_the_bundled_twin_of_a_native_plugin_row_must_be_hidden_where_the_plugin_is_enabled [2]
+  FAIL  test_the_manifest_loader_checks_the_plugin_fields [6]
+  ERROR test_without_the_plugin_the_personal_copy_keeps_the_manifest_listing_so_a_fresh_host_keeps_its_one_copy [3]
+test_skill_usage_daily: Ran 16 tests, FAILED (failures=1, errors=7), in 8 tests
+  ERROR test_a_listing_named_twice_is_one_listing [1]
+  ERROR test_a_row_without_a_twin_ignores_a_same_name_row [1]
+  ERROR test_an_unknown_context_stays_unknown_and_a_window_the_rows_hold_is_dropped [1]
+  ERROR test_both_listings_are_one_row_with_the_uses_added [1]
+  ERROR test_one_listing_is_that_row_and_none_is_none [1]
+  ERROR test_the_bundled_twin_of_a_native_plugin_row_is_added_too [1]
+  ERROR test_the_last_use_is_that_of_the_listing_that_was_used [1]
+  FAIL  test_the_report_counts_the_uses_of_both_listings [1]

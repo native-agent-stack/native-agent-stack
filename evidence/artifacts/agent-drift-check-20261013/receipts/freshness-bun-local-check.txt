@@ -1,0 +1,12 @@
+The local workflow check of the Bun step that .github/workflows/catalog-freshness.yml gains: the step's own env and run block are read from the workflow file and executed with a scratch RUNNER_TEMP and
+GITHUB_ENV (the release archive is downloaded, checked against the pinned checksum, unpacked and asked for its version); the variable it exports is read back; then tests.test_adoption_status runs
+twice under GITHUB_ACTIONS=true, with that variable (the job after the change) and with neither the variable nor a 1.4.3 on PATH (the job before it: the runner's PATH bun is not the pinned one).
+A dispatch of the workflow is not made: its propose job force-creates an evidence branch and opens a pull request.
+
+step env: {'BUN_VERSION': '1.4.3', 'BUN_SHA256': '3e730528d897...'}
+step exit status: 0
+step stdout (last lines): ['<RUNNER_TEMP>/bun/archive.zip: OK', '1.4.3']
+exported AGENT_FRONTMATTER_BUN names a file under RUNNER_TEMP: True | executable: True
+its version: 1.4.3
+tests.test_adoption_status under GITHUB_ACTIONS=true, after the fix (the exported variable): exit 0; Ran 215 tests in 21.897s | OK
+tests.test_adoption_status under GITHUB_ACTIONS=true, before the fix (no variable; the PATH shim gives 1.4.2): exit 1; Ran 206 tests in 20.046s | FAILED (failures=4, errors=1)

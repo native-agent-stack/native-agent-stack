@@ -1,0 +1,23 @@
+The 20 mutants of CPA-V-10 (scripts/adoption_status.py): one change each, run in place against tests.test_adoption_status.ClientWiringTests; a mutant is killed when the run fails.
+
+killed   (failed) the key is missing from the claude group
+killed   (failed) a vendor definition is not listed (semble-search)
+killed   (failed) a vendor definition counts as drift
+killed   (failed) a file that is not a definition counts
+killed   (failed) an unlisted definition does not count
+killed   (failed) shipped names count as unlisted
+killed   (failed) equal length is taken for equal bytes
+killed   (failed) a link or a folder in place of a definition is a match
+killed   (failed) an unreadable installed definition is drift, not unknown
+killed   (failed) an absent agents folder is no drift
+killed   (failed) a linked agents folder is followed
+killed   (failed) an unreadable agents folder is drift
+killed   (failed) a source folder with no definition is compared
+killed   (failed) an unreadable source folder is no drift
+killed   (failed) an unreadable source definition is skipped
+killed   (failed) drift does not block completeness
+killed   (failed) the checkout's source folder is ignored
+killed   (failed) client_wiring does not pass the checkout's source folder
+killed   (failed) the claude home is not followed
+killed   (failed) the limitation text drops the Claude agent folders
+20 mutants, 20 killed, survivors: none

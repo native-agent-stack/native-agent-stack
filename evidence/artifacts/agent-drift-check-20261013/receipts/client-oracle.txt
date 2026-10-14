@@ -1,0 +1,78 @@
+Differential measurement of the front matter pipeline of scripts/adoption_status.py (agent_front_matter, then agent_names: Bun.YAML.parse) against the installed Claude Code client, 2026-10-13.
+
+What is measured. The client is asked: each text of a generated corpus is written as .claude/agents/fNNNNN.md of a scratch project, with its own name token (zz00000-..., standing in for the prefix `stack-` of the name
+so that the token survives every spelling that breaks the literal: an escape, a fold over two lines), the installed client is started in headless mode (`claude -p ok --output-format stream-json --verbose --max-turns 1
+--no-session-persistence --model haiku`, in the scratch project, 400 files a start) and killed as soon as its init record has been read, and the agents listed in that record are the agents the loader served: a name that
+holds a text's token tells which text it came from. That is the client's own loader, parser and engine (its embedded Bun), not a copy of them. The pipeline is then run on the same texts. The property asserted is one-sided:
+wherever the client served a name, the pipeline returns that name or says it cannot tell (the parse throws), never none and never another name (a MISS). Where the client served nothing (no description, an invalid
+name, a text that fails both of its parse attempts) a name from the pipeline is an over-report, the safe direction, and an unreadable is counted apart.
+
+The corpus (16,428 texts; the drivers are the author's private record, and tests/fixtures/agent_frontmatter/client-oracle.json is the committed subset of 2,987 texts with the client's answers, which
+tests/test_adoption_status.py RealBunTests replays): the spellings of the key and of the value (quoted, block scalars, escapes, anchors, tags, flow collections, folds), openers and closers, neighbouring keys,
+CRLF and lone CR, a byte order mark, comment and blank lines between a key and its value and around block scalars at indentations 0 to 4 (the families `comments` and `comments-last`, added after the command center's
+P1 of 2026-10-13), and a seeded fuzz (4,000 texts, seed 20261013) of realistic front matter with insertions, deletions, swaps, indentation changes, comment lines and blank lines.
+
+The client. Claude Code 2.1.296 (`claude --version`). Its binary reads `Bun v1.4.3 (eecfd55de) Linux x64` and `1.4.3+eecfd55de`. The parse path, by byte interval of the installed binary (zero-based, end exclusive):
+WS (the byte order mark) 211904331-211904390; BL (Bun.YAML.parse) 211907194-211907234; the retry pattern N 211907290-211907318 and the retry rewrite I 211907318-211907782; the front matter patterns and z 211908706-211908840;
+oi and W9t (the parse, its second attempt after the rewrite and the tab rule) 211908840-211910460; C (the mapping guard) 211910610-211910687; Vk (a regular file of at most 1 MiB, read as UTF-8) at 207963464;
+d2 (the active set, keyed by agent type) at 217687011; pHo at 217688699; Iwt (the name: a string, not empty, not starting with `-`, at most y9 = 256 characters, no `:` after NFKC; the description: a non-empty string) at 217694005.
+
+The engines. Bun 1.4.3 as released (`bun-v1.4.3`, bun-linux-x64.zip, sha256 3e730528d89775f03f87f05c06787c4df4099d0a37f3f252e7b829cb23816e18 = the release's SHASUMS256.txt line): `bun --revision` 1.4.3+c6da4a4d3. The
+embedded build's id (eecfd55de) is not a commit of oven-sh/bun (`gh api repos/oven-sh/bun/commits/eecfd55de`: no commit found, 2026-10-13); the release stands in for it. Bun 1.4.2 (mise on the first host): 1.4.2+744846f84.
+
+client 2.1.296 | texts 16428 | the client loaded a name in 8339
+
+== release143 (bun 1.4.3)
+agree=7937  unreadable=402  MISS=0  agree-none=1829  over-report=1032  unreadable-where-none=5228
+   family                                         agree              unreadable                    MISS              agree-none             over-report   unreadable-where-none
+   astra                                              5                       0                       0                       0                       0                       0
+   comments                                        2320                      54                       0                     354                      39                    1169
+   comments-last                                   2243                     130                       0                     342                      39                    1182
+   crlf                                             186                      11                       0                      59                      18                     126
+   fuzz                                            2201                      40                       0                      65                     278                    1416
+   key-x-value                                      398                       0                       0                     576                      27                     410
+   lone-cr                                            0                       0                       0                     150                       0                       0
+   neighbours                                       410                     161                       0                     110                     583                     852
+   neighbours-name-last                               7                       3                       0                       2                      24                      10
+   neighbours-name-quoted-key                         7                       3                       0                       2                      24                      10
+   neighbours-no-name                                 0                       0                       0                      33                       0                      13
+   opener-closer                                    160                       0                       0                     136                       0                      40
+
+== mise142 (bun 1.4.2)
+agree=7937  unreadable=402  MISS=0  agree-none=1829  over-report=1032  unreadable-where-none=5228
+   family                                         agree              unreadable                    MISS              agree-none             over-report   unreadable-where-none
+   astra                                              5                       0                       0                       0                       0                       0
+   comments                                        2320                      54                       0                     354                      39                    1169
+   comments-last                                   2243                     130                       0                     342                      39                    1182
+   crlf                                             186                      11                       0                      59                      18                     126
+   fuzz                                            2201                      40                       0                      65                     278                    1416
+   key-x-value                                      398                       0                       0                     576                      27                     410
+   lone-cr                                            0                       0                       0                     150                       0                       0
+   neighbours                                       410                     161                       0                     110                     583                     852
+   neighbours-name-last                               7                       3                       0                       2                      24                      10
+   neighbours-name-quoted-key                         7                       3                       0                       2                      24                      10
+   neighbours-no-name                                 0                       0                       0                      33                       0                      13
+   opener-closer                                    160                       0                       0                     136                       0                      40
+
+== the hand-written reader of e7260fd3
+agree=3982  unreadable=3856  MISS=501  agree-none=1184  over-report=1080  unreadable-where-none=5825
+   family                                         agree              unreadable                    MISS              agree-none             over-report   unreadable-where-none
+   astra                                              3                       2                       0                       0                       0                       0
+   comments                                         655                    1473                     246                     289                      66                    1207
+   comments-last                                    655                    1472                     246                     289                      66                    1208
+   crlf                                              60                     128                       9                      32                      22                     149
+   fuzz                                            2049                     192                       0                      79                     485                    1195
+   key-x-value                                       83                     315                       0                     134                      30                     849
+   lone-cr                                            0                       0                       0                     150                       0                       0
+   neighbours                                       310                     261                       0                      46                     392                    1107
+   neighbours-name-last                               7                       3                       0                       1                      19                      16
+   neighbours-name-quoted-key                         0                      10                       0                       1                       0                      35
+   neighbours-no-name                                 0                       0                       0                      27                       0                      19
+   opener-closer                                    160                       0                       0                     136                       0                      40
+   misses in comments 246
+   misses in comments-last 246
+   misses in crlf 9
+
+Reading. The pipeline returned the client's name or said unreadable on every text where the client served one (MISS 0), with the release 1.4.3 and with 1.4.2 alike; the reader of e7260fd3 (the hand-written one, now removed)
+missed 501, all of them comment lines between a key and its value (the families the corpus lacked when that reader was measured) and nine CRLF texts. Not established: the corpus is generated and not exhaustive; the embedded
+build is not the release; the client's second parse attempt is not reproduced (a text that needs it is unreadable here, and the client may serve a name from it).
