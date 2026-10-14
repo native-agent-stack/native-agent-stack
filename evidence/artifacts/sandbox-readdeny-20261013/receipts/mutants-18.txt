@@ -1,0 +1,21 @@
+The 18 mutants of the route-B change (the overlay's three flags, a denied location of either list, a re-open, the process-environment rule, a mode and a wildcard; the shared template's rules; the probe's fixtures; the arms receipt's rows; the captured page). Each is one exact change of one file (restored after each run); tests.test_sandbox_readdeny runs; a mutant is killed when the run fails; the unmutated tree passes first. The first run killed 14 of 15: the mutant that made the deployment arm show a tool error had changed the first match in the file, which belongs to another arm's row, and the arms receipt's mutants now change the row of the arm by name.
+
+killed   the sandbox is not enabled
+killed   the sandbox may start unavailable
+killed   the unsandboxed retry is allowed
+killed   a credential location is not denied to sandboxed commands
+killed   a credential location is not denied to the Read tool
+killed   the overlay re-opens a path
+killed   the overlay carries the process-environment rule
+killed   the overlay sets a mode
+killed   a denial is a wildcard
+killed   the shared template drops its process-environment rule
+killed   the shared template gains a home credential rule the overlay lacks
+killed   the probe plants a credential outside the denied locations
+killed   the control no longer reads the credentials
+killed   the deployment shows a tool error
+killed   the deployment reads a credential through a symlink
+killed   the denial-only arm no longer leaves the Read tool alone
+killed   the user-scope arm no longer shows the process-environment error
+killed   the captured page no longer says that denyRead leaves the Read tool alone
+18 mutants, 18 killed, survivors: none
