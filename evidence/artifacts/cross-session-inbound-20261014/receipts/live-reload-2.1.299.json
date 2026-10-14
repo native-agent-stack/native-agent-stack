@@ -1,0 +1,82 @@
+{
+ "binary_version": "2.1.299",
+ "measured_at": "2026-10-14T05:47:02Z",
+ "arms": [
+  {
+   "arm": "L1-accept-removed-before-send",
+   "start_value": "accept",
+   "change": "remove",
+   "change_relative_to_send": "before",
+   "timeline": [
+    [
+     "user settings rewritten",
+     "(no value)",
+     0.0
+    ],
+    [
+     "message sent",
+     0,
+     6.5
+    ]
+   ],
+   "receiver_events": [
+    "system:peer_message_hold",
+    "result:success",
+    "system:peer_message_hold"
+   ],
+   "receiver_exit": 0,
+   "receiver_model_requests_with_marker": 0,
+   "delivered": false
+  },
+  {
+   "arm": "L2-accept-added-before-send",
+   "start_value": null,
+   "change": "add",
+   "change_relative_to_send": "before",
+   "timeline": [
+    [
+     "user settings rewritten",
+     "accept",
+     0.0
+    ],
+    [
+     "message sent",
+     0,
+     6.5
+    ]
+   ],
+   "receiver_events": [
+    "result:success"
+   ],
+   "receiver_exit": 0,
+   "receiver_model_requests_with_marker": 1,
+   "delivered": true
+  },
+  {
+   "arm": "L3-accept-added-after-send",
+   "start_value": null,
+   "change": "add",
+   "change_relative_to_send": "after",
+   "timeline": [
+    [
+     "message sent",
+     0,
+     0.5
+    ],
+    [
+     "user settings rewritten",
+     "accept",
+     4.5
+    ]
+   ],
+   "receiver_events": [
+    "system:peer_message_hold",
+    "system:peer_message_hold",
+    "result:success"
+   ],
+   "receiver_exit": 0,
+   "receiver_model_requests_with_marker": 1,
+   "delivered": true
+  }
+ ]
+}

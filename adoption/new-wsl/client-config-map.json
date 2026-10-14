@@ -339,13 +339,6 @@
     },
     {
       "match": [
-        "claude/settings/setting/crossSessionInbound"
-      ],
-      "wiring": "authorization:\"accept\" delivers messages from the user's other sessions to Claude without the approval hold that otherwise applies to a sender that is not in bypass mode, so it is written only with --with-authorization-settings and never over a value the file already has",
-      "note": "Claude Code crossSessionInbound = \"accept\" (one of \"accept\", \"hold\" or \"refuse\": settings reference, crossSessionInbound, and https://code.claude.com/docs/en/cross-session-messaging#control-inbound-messages, read 2026-10-04), which NativeStack carries. It overturns the wave-2 messaging ruling, which left the key unset because a message between two bypass-mode sessions delivers anyway, on the user's directive of 2026-10-04 (\"we need all the sota features, latest changlogs, fully enalbed seamlessly within our naitve workflow for new wsl also\") and his yes on the Claude-Codex messaging posture of 2026-10-02 (the new-WSL must-haves)."
-    },
-    {
-      "match": [
         "claude/settings/setting/theme"
       ],
       "wiring": "practice",
@@ -914,7 +907,6 @@
       "owner": "hcom 0.7.27",
       "decision": "docs/decisions/2026-10-06-hcom-relaxation.md",
       "apply": "evidence/artifacts/new-wsl-install-plan-20261002/config/hcom-client-config.py",
-      "claude_inbound_piece": "claude/settings/setting/crossSessionInbound",
       "hcom_config": {
         "terminal": {
           "title_mode": "off"

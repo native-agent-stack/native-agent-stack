@@ -1,0 +1,34 @@
+{
+ "sources": [
+  {
+   "name": "Claude Code settings reference",
+   "url": "https://code.claude.com/docs/en/settings-reference.md",
+   "fetched_at": "2026-10-14T05:40:19Z",
+   "sha256": "2db996847f31ad322a4eff57aa8a1e5ca4618701fd1caf2191327a3922be095c",
+   "cited_lines": [
+    5093,
+    5095,
+    5097,
+    5112
+   ]
+  },
+  {
+   "name": "Claude Code cross-session messaging",
+   "url": "https://code.claude.com/docs/en/cross-session-messaging.md",
+   "fetched_at": "2026-10-14T05:40:19Z",
+   "sha256": "7b359027749ff27d84019a388145bf78edce1dc424aaa9a50896c6c88e4b1edd",
+   "cited_lines": [
+    191,
+    196,
+    203,
+    231
+   ]
+  }
+ ],
+ "clients": [
+  {
+   "version": "2.1.299",
+   "binary_sha256": "2d894a4b1bfaaa9aab72aeff7803e3c73bc2510f279a171f6b8f59f72d17d077"
+  }
+ ]
+}

@@ -483,6 +483,24 @@ separately qualified
 isolation boundary. The older receipt's restricted Read/Glob/Grep invocation is
 historical evidence, not the default for every installed hook combination; see
 [restricted-worker compatibility](../docs/restricted-worker-compatibility.md).
+
+A `-p` worker does not take messages from your other sessions unless its launch
+says so. With no `crossSessionInbound` value, Claude Code delivers a message
+only when the sender's permission-mode class matches the receiver's: bypass
+with bypass, prompting with prompting. A `dontAsk` worker is in the prompting
+class, so a bypass-mode coordinator's message waits held, and in `-p` nobody
+approves it. Give `accept` only to the worker that must take a coordinator's
+messages unattended, on its own command line:
+
+```sh
+claude -p --permission-mode dontAsk --settings '{"crossSessionInbound":"accept"}' ...
+```
+
+Leave review, evaluation and other fenced runs without it, so that nothing
+steers them from outside. Do not put `accept` in user settings: it applies to
+every session you run
+([cross-session messaging](https://code.claude.com/docs/en/cross-session-messaging#control-inbound-messages);
+[decision](../docs/decisions/2026-10-14-cross-session-inbound-per-launcher.md)).
 An SDK is unnecessary
 for a single native review. A launcher must keep its own notices on stderr so
 the upstream JSON/JSONL stream remains parseable whenever a native child runs.
