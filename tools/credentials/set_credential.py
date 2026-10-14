@@ -26,6 +26,14 @@ copies the file, unread and unprinted, into the store as a new 0600 file. It che
 `openssl pkey -noout` (only its exit status is used), and removes the original only after that check passes:
 
     python3 tools/credentials/set_credential.py github-review-app --from-file
+
+`--from-stdin` (2026-10-14) is the key-file form without a terminal: its caller hands it a key on standard input, for
+example a script that redirects a downloaded key file into it, so no agent context ever reads the key. Unlike
+--from-file it never touches the source: the source stays where it is, and removing it is a separate decision after
+the stored key has been checked with the provider. It takes only a key-file entry, is create-only, needs -I -S like --from-env, checks the stored copy with
+`openssl pkey -noout` before it takes the final name, and prints only `<id>: stored`:
+
+    python3 -I -S tools/credentials/set_credential.py github-review-app --from-stdin < <downloaded key file>
 """
 from __future__ import annotations
 
@@ -33,15 +41,18 @@ import os
 import sys
 
 FROM_ENV_START = "python3 -I -S tools/credentials/set_credential.py <id> --from-env"
+FROM_STDIN_START = "python3 -I -S tools/credentials/set_credential.py <id> --from-stdin"
 
 if __name__ == "__main__":
-    if "--from-env" in sys.argv[1:]:
+    if "--from-env" in sys.argv[1:] or "--from-stdin" in sys.argv[1:]:
         # The value is already in this interpreter's environment, so whatever ran at start-up ran beside it. Only
         # -I -S starts no such code: -I ignores PYTHONPATH, PYTHON* variables and the user site directory, and -S
         # skips site, whose .pth lines of the interpreter's own site-packages run even under -I. Re-running cannot
         # undo a start that already ran such code, so this mode refuses and never re-executes.
         if not (sys.flags.isolated and sys.flags.no_site):
-            sys.stderr.write(f"refused: --from-env needs an interpreter started with -I -S: {FROM_ENV_START}\n")
+            start = FROM_STDIN_START if "--from-stdin" in sys.argv[1:] else FROM_ENV_START
+            mode = "--from-stdin" if "--from-stdin" in sys.argv[1:] else "--from-env"
+            sys.stderr.write(f"refused: {mode} needs an interpreter started with -I -S: {start}\n")
             raise SystemExit(2)
     elif not sys.flags.isolated:
         # Re-run isolated (-I): ignore PYTHONPATH, PYTHONSTARTUP and user site-packages, so a
@@ -445,6 +456,78 @@ def run_from_env(entry_id: str, *, env=None, uid=None, out=sys.stdout, root: Pat
     return 0
 
 
+def run_from_stdin(entry_id: str, *, env=None, uid=None, data: bytes | None = None, stdin=None, out=None,
+                   root: Path = ROOT, openssl: str | None = None, isolated_start: bool | None = None) -> int:
+    """Store a private key handed over on standard input, for a key-file entry; create-only (2026-10-14, custody of the
+    review-verdict App's key). Refused unless the interpreter was started with -I -S (the key is in this process's
+    memory, as the value is for --from-env), for a non-key-file entry (load_file_entry), when stdin is a terminal (a key is never
+    typed), for an empty or oversized input, and when the key file exists: rotation stays with --from-file, whose
+    hidden `replace` needs the operator. The bytes go into a new 0600 temporary file through the checked store handle,
+    the temporary file must pass `openssl pkey -noout -passin pass:` (exit status only), and it takes the final name
+    with os.link, which fails instead of replacing a file that appeared in between. The only output is
+    `<id>: stored`; no message holds the key or a path."""
+    env = os.environ if env is None else env
+    out = sys.stdout if out is None else out
+    if isolated_start is None:
+        isolated_start = bool(sys.flags.isolated and sys.flags.no_site)
+    if not isolated_start:
+        raise Refused(f"--from-stdin needs an interpreter started with -I -S: {FROM_STDIN_START}")
+    uid = os.getuid() if uid is None else uid
+    entry = load_file_entry(entry_id, root, env)
+    openssl = openssl or shutil.which("openssl")
+    if not openssl:
+        raise Refused("openssl not found; nothing written")
+    path = cs.expand_template(entry["store"]["path_template"], env)
+    exists = Refused(f"{path.name} already exists; --from-stdin never replaces a stored key (rotate with "
+                     f"tools/credentials/open_credential_terminal.sh {entry_id} --from-file)")
+    if os.path.lexists(path):  # every refusal comes before the first write, even open_store's mkdir or chmod
+        raise exists
+    if data is None:
+        stream = sys.stdin if stdin is None else stdin
+        if stream.isatty():
+            raise Refused("--from-stdin takes a key piped from a program, never typed; nothing written")
+        data = stream.buffer.read(MAX_KEY_FILE_BYTES + 1) if hasattr(stream, "buffer") else \
+            stream.read(MAX_KEY_FILE_BYTES + 1)
+    if not data or len(data) > MAX_KEY_FILE_BYTES:
+        raise Refused(f"input size is not that of a key file (1 to {MAX_KEY_FILE_BYTES} bytes); nothing written")
+    dfd = open_store(path.parent, uid)
+    try:
+        try:
+            os.stat(path.name, dir_fd=dfd, follow_symlinks=False)
+        except FileNotFoundError:
+            pass
+        else:  # again through the checked directory handle; the link below settles any later race
+            raise exists
+        tmp = f".{path.name}.{os.urandom(8).hex()}.tmp"
+        fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600, dir_fd=dfd)
+        try:
+            os.fchmod(fd, 0o600)
+            view = memoryview(data)
+            while view:
+                view = view[os.write(fd, view):]
+            os.fsync(fd)
+            os.close(fd)
+            fd = -1
+            if not key_file_valid(dfd, tmp, openssl):
+                raise Refused("the input is not a private key openssl can read without a passphrase; nothing stored")
+            try:
+                os.link(tmp, path.name, src_dir_fd=dfd, dst_dir_fd=dfd, follow_symlinks=False)
+            except FileExistsError:
+                raise exists from None
+        finally:
+            if fd >= 0:
+                os.close(fd)
+            try:
+                os.unlink(tmp, dir_fd=dfd)
+            except FileNotFoundError:
+                pass
+        os.fsync(dfd)
+    finally:
+        os.close(dfd)
+    print(f"{entry_id}: stored", file=out)
+    return 0
+
+
 def main(argv=None) -> int:
     # No abbreviations: --from would otherwise select --from-env, which the start-up check above does not see.
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n", 1)[0], allow_abbrev=False)
@@ -455,13 +538,16 @@ def main(argv=None) -> int:
     parser.add_argument("--from-file", action="store_true",
                         help="move a downloaded private key file into the entry's private file store, check it "
                              "with openssl pkey -noout, then remove the original (interactive terminal)")
+    parser.add_argument("--from-stdin", action="store_true",
+                        help="store a private key piped in by a program into the entry's private file store "
+                             "(create-only, key-file entries only, checked with openssl pkey -noout; needs python3 -I -S)")
     args = parser.parse_args(argv)
-    if args.from_env and args.from_file:
-        print("refused: --from-env and --from-file are separate modes", file=sys.stderr)
+    if sum((args.from_env, args.from_file, args.from_stdin)) > 1:
+        print("refused: --from-env, --from-file and --from-stdin are separate modes", file=sys.stderr)
         return 2
-    if args.from_env:
+    if args.from_env or args.from_stdin:
         try:
-            return run_from_env(args.entry_id)
+            return run_from_stdin(args.entry_id) if args.from_stdin else run_from_env(args.entry_id)
         except Refused as error:
             print(f"refused: {error}", file=sys.stderr)
             return 2

@@ -697,6 +697,83 @@ class _Response:
         raise AssertionError("body read")
 
 
+@unittest.skipUnless(shutil.which("openssl"), "openssl is needed to generate and check the synthetic keys")
+class StoreFromStdinTests(unittest.TestCase):
+    """set_credential.py --from-stdin (2026-10-14): a key handed over on stdin into a new 0600 key file; create-only,
+    key-file entries only, and the source is never touched. Every key is generated per test."""
+
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.base = Path(tmp.name)
+        self.env = {"HOME": str(self.base / "home"), "XDG_CONFIG_HOME": str(self.base / "cfg")}
+        self.store = self.base / "cfg" / "native-agent-stack"
+        self.pem = self.make_key("k.pem")
+
+    def make_key(self, name, *extra) -> bytes:
+        path = self.base / name
+        subprocess.run(["openssl", "genpkey", "-algorithm", "RSA", "-pkeyopt", "rsa_keygen_bits:2048", *extra,
+                        "-out", str(path)], check=True, capture_output=True, timeout=60)
+        return path.read_bytes()
+
+    def piped(self, data, entry="github-review-app", **kwargs):
+        out = io.StringIO()
+        code = store_mod.run_from_stdin(entry, env=self.env, data=data, out=out,
+                                        isolated_start=kwargs.pop("isolated_start", True), **kwargs)
+        return code, out.getvalue()
+
+    def test_stores_a_piped_key_in_a_new_private_file(self):
+        with mock.patch.object(store_mod.os, "replace", side_effect=AssertionError("os.replace overwrites")):
+            code, output = self.piped(self.pem)
+        self.assertEqual((code, output), (0, "github-review-app: stored\n"))
+        path = self.store / "github-review-app.pem"
+        self.assertEqual(path.read_bytes(), self.pem)
+        info = os.lstat(path)
+        self.assertEqual((stat.S_IMODE(info.st_mode), info.st_nlink), (0o600, 1))
+        self.assertEqual([p.name for p in self.store.iterdir()], ["github-review-app.pem"])
+
+    def test_never_replaces_a_stored_key(self):
+        self.assertEqual(self.piped(self.pem)[0], 0)
+        other = self.make_key("other.pem")
+        with self.assertRaisesRegex(store_mod.Refused, "never replaces"):
+            self.piped(other)
+        self.assertEqual((self.store / "github-review-app.pem").read_bytes(), self.pem)
+
+    def test_refuses_data_that_is_not_a_readable_key_and_leaves_nothing(self):
+        protected = self.make_key("p.pem", "-aes256", "-pass", "pass:" + os.urandom(8).hex())
+        for name, data in (("random", os.urandom(1200)), ("protected", protected), ("empty", b""),
+                           ("oversized", b"x" * (store_mod.MAX_KEY_FILE_BYTES + 1))):
+            with self.subTest(data=name), self.assertRaises(store_mod.Refused):
+                self.piped(data)
+            self.assertFalse((self.store / "github-review-app.pem").exists())
+            self.assertEqual(list(self.store.iterdir()) if self.store.exists() else [], [])
+
+    def test_refuses_a_value_entry_a_terminal_and_a_start_without_minus_I_minus_S(self):
+        for entry in ("tavily", "alpaca-paper", "no-such-entry"):
+            with self.subTest(entry=entry), self.assertRaises(store_mod.Refused):
+                self.piped(self.pem, entry=entry)
+        with self.assertRaisesRegex(store_mod.Refused, "-I -S"):
+            self.piped(self.pem, isolated_start=False)
+        tty = mock.Mock()
+        tty.isatty.return_value = True
+        with self.assertRaisesRegex(store_mod.Refused, "never typed"):
+            store_mod.run_from_stdin("github-review-app", env=self.env, stdin=tty, out=io.StringIO(),
+                                     isolated_start=True)
+        self.assertFalse(self.store.exists() and any(self.store.iterdir()))
+
+    def test_the_command_line_needs_minus_I_minus_S_and_prints_only_the_entry(self):
+        env = {"PATH": "/usr/bin:/bin", **self.env}
+        command = [sys.executable, "-I", str(TOOLS / "set_credential.py"), "github-review-app", "--from-stdin"]
+        refused = subprocess.run(command, input=self.pem, capture_output=True, timeout=60, env=env)
+        self.assertEqual(refused.returncode, 2)
+        self.assertIn(b"-I -S", refused.stderr)
+        command.insert(2, "-S")
+        done = subprocess.run(command, input=self.pem, capture_output=True, timeout=60, env=env)
+        self.assertEqual((done.returncode, done.stdout, done.stderr), (0, b"github-review-app: stored\n", b""))
+        both = subprocess.run([*command, "--from-env"], input=self.pem, capture_output=True, timeout=60, env=env)
+        self.assertEqual(both.returncode, 2)
+
+
 def headers(**values):
     message = email.message.Message()
     for name, value in values.items():

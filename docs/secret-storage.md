@@ -39,7 +39,7 @@ against it.
 | `huggingface-native`, `huggingface-native-stored` | Hugging Face sign-in: the active token and every saved token | stored by `hf auth login`, one token per host ([Hugging Face sign-in](#hugging-face-sign-in)) | `$HF_HOME/token` and `$HF_HOME/stored_tokens`; `HF_HOME` defaults to `${XDG_CACHE_HOME:-$HOME/.cache}/huggingface` | none |
 | `ibkr-gateway` | IB Gateway / TWS login | typed in at login, nothing stored | none | none |
 | `github-actions` | `FOUNDATION_RESTORE_FIXTURE_20260920` and the per-job `github.token` | CI only | GitHub's encrypted secret store | none locally |
-| `github-review-app` | GitHub App private key (PEM) for the review worker's status; stored with `open_credential_terminal.sh github-review-app --from-file`, never read by an agent | optional | `<store>/github-review-app.pem` (a key file, 0600), pointer `GITHUB_REVIEW_APP_KEY_PATH` | none in the file; `GITHUB_REVIEW_APP_ID` (the App's ID, not secret) is set beside its loader |
+| `github-review-app` | GitHub App private key (PEM) of the review-verdict App `seathat-review-checks` (App ID 5292606); stored with `set_credential.py github-review-app --from-stdin` from a script, or with `open_credential_terminal.sh github-review-app --from-file`, never read by an agent | optional | `<store>/github-review-app.pem` (a key file, 0600), pointer `GITHUB_REVIEW_APP_KEY_PATH` | none in the file; `GITHUB_REVIEW_APP_ID` (the App's ID, not secret) is set beside its loader |
 
 `<store>` means `${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack`.
 
@@ -467,6 +467,17 @@ The command opens a new terminal window: Windows Terminal on WSL2 (or a console 
   v3.13.16's (`cbc944f4`) `os.replace` (`Doc/library/os.rst:2754`), `os.fsync` (`:1108`), `os.lstat` (`:2412`) and
   `st_nlink` (`:3125`). Neither the hidden prompt nor `--from-env` accepts a key-file entry, so no
   `export` line is ever written to a key file.
+- **Key on standard input** (2026-10-14): `python3 -I -S tools/credentials/set_credential.py <inventory-id>
+  --from-stdin` is the key-file form without a terminal. A script hands it the key on standard input, for example by
+  redirecting a downloaded key file into it, so no agent context ever reads the key. It takes only a key-file entry,
+  refuses unless the interpreter was started with `-I -S` (the key is in its memory, as the value is for `--from-env`),
+  refuses a terminal on stdin and an input that is empty or over 64 KiB, and is create-only: it refuses an existing key
+  before it writes anything, writes a new 0600 temporary file through the checked store handle, checks it with
+  `openssl pkey -noout -passin pass:` (exit status only) and gives it the final name with `os.link`, which fails instead
+  of replacing a file that appeared in between. It prints only `<id>: stored`. Unlike `--from-file` it never touches
+  the source: the source stays where it is, and deleting it is the owner's decision after the stored key has been
+  checked with the provider (for the review App, a JWT signed with the stored key must get GitHub's `GET /app` answer
+  for the App's ID). Rotation stays with `--from-file`, whose hidden `replace` needs the operator.
 - **Paper rate limit:** `tools/credentials/alpaca_rate_limit_probe.py` sends one read-only `GET /v2/account` to the fixed paper host. It follows no redirect, reads no response body and places no order. It saves only the HTTP status and the `x-ratelimit-*` headers, under `${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/rate-limit/`, where a later session can read them. `x-ratelimit-limit` is Alpaca's own per-account calls-per-minute figure (200 on the standard tier), so measuring it never needs order traffic. Agents may run it with `--env-file "$PAPER_ENV_FILE"`.
 
 Live broker keys are out of scope for this repository. Live trading is handled outside it, and no tool here accepts a live endpoint.
