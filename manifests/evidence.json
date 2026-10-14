@@ -61397,6 +61397,11 @@
       "bytes": 3834
     },
     {
+      "path": "notes/pi-researcher-output-20261014.md",
+      "sha256": "5777d83a8a7b35c6878fde5e9b3faa2ec8af8ab320cd55c248ea2a097b27b177",
+      "bytes": 2766
+    },
+    {
       "path": "notes/runtime-profiles-20261012/README.md",
       "sha256": "e9d042df68520c9bcae0118dbad02eee8442c93c9876b20fed2334db88388370",
       "bytes": 23522
@@ -63603,8 +63608,8 @@
     },
     {
       "path": "tests/test_pi_builder_output_budget.py",
-      "sha256": "124d784ccfcd0daf033e76990e497ec780beac801fa4c274e45c479d2eb3eaf1",
-      "bytes": 3022
+      "sha256": "9f887c3788c4fe0a097a826e5367ba771718e425735df1b56f821da104b9dcdc",
+      "bytes": 3086
     },
     {
       "path": "tests/test_pin_holds.py",
@@ -64243,8 +64248,8 @@
     },
     {
       "path": "tools/adoption/runtime_profiles.py",
-      "sha256": "d954ca4353d5882bc33225f2f787ae81ec366189730b1ab9ae5fdde664451f88",
-      "bytes": 78384
+      "sha256": "2534d7954e388f5031bd33fc64e122c2b32a9a7d10958d2dd9acb65f0cf8fb5d",
+      "bytes": 78411
     },
     {
       "path": "tools/adoption/runtime_skill_freshness.py",
