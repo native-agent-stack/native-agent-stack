@@ -8,7 +8,9 @@ screen and acceptance; it establishes no new engine or broker acceptance.
 ## Frozen inputs and native result
 
 The [context record](../../evidence/artifacts/engine-currency-20261013/context.json)
-binds repository inputs to main `993cc890b3ff3fc95fa7cdba51edd726565f9ace` and
+binds 27 of its 31 repository inputs to frozen main
+`993cc890b3ff3fc95fa7cdba51edd726565f9ace` and the remaining four to the
+completed wave at `a049170124469c7cdbdff532135ea1fe46401b81`, each with
 SHA256. They include the trading rules, north star, runtime target, layer
 verdict/wave, saturation ledger, historical engine-trial preregistration and
 the currency producer. Only repository, release and source metadata was read;
@@ -70,8 +72,12 @@ The IBKR transport port is a separate source delta:
 
 [PR #5041](https://github.com/nautechsystems/nautilus_trader/pull/5041)
 merged as `f81f951776b2868a681364ceebae239fab3eb206` on October 8, after rc6's
-publication. Its body describes the transport port, account-code correction,
-resubscription, sentinel-price filtering and restart-fill handling. References
+publication. The pinned [merge message](https://github.com/nautechsystems/nautilus_trader/commit/f81f951776b2868a681364ceebae239fab3eb206)
+describes the ibapi 5.0.0 transport port at message lines 3–4 and the handling
+of held executions for untracked orders while fetching order details/fills
+at lines 9–11. Resubscription is described separately by the retained frozen
+develop [IBKR guide:191–200](https://github.com/nautechsystems/nautilus_trader/blob/ca478e42f434d2ce185493f2bb42d112a88d1ffe/docs/integrations/interactive_brokers.md#L191-L200).
+These source descriptions are qualification inputs. References
 to #5041 in rc6's release notes do not establish that the full port is in rc6.
 The captured rc6-to-develop comparison is **diverged**, 174 ahead/66 behind;
 develop must not be treated as a simple release superset. Also, the frozen
@@ -107,7 +113,8 @@ The source narrows applicability: the fast quote path in
 [backtesting_broker.py:3698–3706,3813–3824](https://github.com/Lumiwealth/lumibot/blob/730d5608f3ee625f0a30dc15e8cc512205dd2a2b/lumibot/backtesting/backtesting_broker.py#L3698-L3706)
 is specific to `InteractiveBrokersRESTBacktesting` and substitutes the open for
 close-derived bid/ask while a minute forms. Native regression sources include
-[the direct/routed 250-session and intraday replay tests](https://github.com/Lumiwealth/lumibot/blob/730d5608f3ee625f0a30dc15e8cc512205dd2a2b/tests/backtest/test_ibkr_frozen_replay.py#L81-L103)
+[the direct/routed 250-session replay test](https://github.com/Lumiwealth/lumibot/blob/730d5608f3ee625f0a30dc15e8cc512205dd2a2b/tests/backtest/test_ibkr_frozen_replay.py#L81-L103),
+[the intraday replay test:141–164](https://github.com/Lumiwealth/lumibot/blob/730d5608f3ee625f0a30dc15e8cc512205dd2a2b/tests/backtest/test_ibkr_frozen_replay.py#L141-L164)
 and [the ex-date dividend check](https://github.com/Lumiwealth/lumibot/blob/730d5608f3ee625f0a30dc15e8cc512205dd2a2b/tests/test_stock_split_accounting.py#L487-L498).
 Those tests were read, not run.
 

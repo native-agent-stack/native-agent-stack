@@ -19138,8 +19138,8 @@
     },
     {
       "path": "docs/decisions/2026-10-13-engine-currency.md",
-      "sha256": "b98edabaebafaf2407ebc8e98bd3f393cead4661340bc6b1e880872eb119c540",
-      "bytes": 12885
+      "sha256": "b4d36592a4029145c54a6c18bf87f85b7e2f8b0387db737b04e3b5078e7c9293",
+      "bytes": 13625
     },
     {
       "path": "docs/decisions/2026-10-13-extended-hours-paper-start-readiness.md",
