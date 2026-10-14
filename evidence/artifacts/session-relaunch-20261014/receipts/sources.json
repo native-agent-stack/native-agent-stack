@@ -1,0 +1,56 @@
+{
+ "schema": "session-relaunch-sources/1",
+ "client": "Claude Code 2.1.299 (claude --version)",
+ "sources": [
+  {
+   "id": "agent-view-docs",
+   "url": "https://code.claude.com/docs/en/agent-view.md",
+   "read_at": "2026-10-14T12:58:26Z",
+   "sha256": "c8e2b81092b94b4b3ded2c86b40b8329e73b8f39b36acb3288bd56385bc83266",
+   "lines": {
+    "823": "Exited unexpectedly while the supervisor is running: the supervisor restarts the process.",
+    "825": "The supervisor itself stops ... each session's process waits about a minute for a new supervisor to reconnect to it, and stops if none does.",
+    "884": "Shutting down or restarting your machine stops running background sessions.",
+    "886": "Within 48 hours, the session shows as failed. Attach or reply to it and it restarts from its saved conversation.",
+    "982": "Sessions are local: background sessions run on your machine. They are preserved across sleep but stop if the machine shuts down."
+   }
+  },
+  {
+   "id": "claude-daemon-help",
+   "command": "claude daemon --help",
+   "line_12": "Service install is disabled in this version — the daemon runs on demand"
+  },
+  {
+   "id": "claude-agents-help",
+   "command": "claude agents --help",
+   "lines_24_25": "--json  Print active sessions (interactive and background) as a JSON array and exit (for scripting; does not require a TTY)"
+  },
+  {
+   "id": "changelog",
+   "url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md",
+   "read_before": "2026-10-14T12:58:26Z (the next tool-clock read)",
+   "sha256": "7abf62a98e6739e0b51071c5e289b0a6baef4f3a2d08046a6df2b338b3d0d086",
+   "lines": {
+    "394": "2.1.295: Changed `claude agents` stopped with its background service (macOS, or Linux without the service installed): running sessions now stop in about a minute unless it is run again, and a notice says so"
+   }
+  },
+  {
+   "id": "terminal-decision",
+   "path": "docs/decisions/2026-09-28-terminal-experience.md",
+   "line": 616,
+   "reading": "firstWindowPreference persistedWindowLayout restores the layout and starts a fresh process from each tab's saved command line; it reattaches nothing."
+  },
+  {
+   "id": "layer-verdict",
+   "path": "catalogs/landscape/foundation.json",
+   "line": 3376,
+   "reading": "scheduling-supervision: current choice 'Dagu for selected local workflows and systemd user-manager supervision'; winners dagu 2.16.6 and systemd 255.4-1ubuntu8.17."
+  },
+  {
+   "id": "scheduled-tasks-slot",
+   "path": ".claude/skills/claude-native-practice/reference/scheduling-supervision.md",
+   "line": 13,
+   "reading": "On WSL2 the timers outlast sessions and terminal closes but not the distro; after a shutdown nothing fires until the distro starts."
+  }
+ ]
+}

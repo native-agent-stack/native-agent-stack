@@ -1,0 +1,51 @@
+{
+ "schema": "session-relaunch-probes/1",
+ "host": "the workstation's WSL distro, boot beb4ce836f4d48828ac60cfde6488630 (started 2026-10-14T12:48:57Z after the 06:41:17Z stop)",
+ "client": "Claude Code 2.1.299",
+ "evidence_class": "measured inside a running boot; no boot-time run",
+ "probes": [
+  {
+   "id": "interop-from-user-unit",
+   "started_at": "2026-10-14T13:03:40Z",
+   "command": "systemd-run --user --wait --pipe --collect --quiet -p RuntimeMaxSec=60 /bin/sh -c '[ -n \"$WSL_INTEROP\" ] && echo \"unit has WSL_INTEROP\" || echo \"unit lacks WSL_INTEROP\"; /mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -NoProfile -NonInteractive -Command \"Write-Output interop-ok; (Get-Process -Id \\$PID).SessionId\"; echo \"rc=$?\"'",
+   "output": ["unit lacks WSL_INTEROP", "interop-ok", "1", "rc=0"],
+   "systemd_run_rc": 0,
+   "reading": "A systemd --user unit runs a Windows executable although its environment has no WSL_INTEROP; PowerShell ran in Windows session 1, the signed-in desktop session (session 0 is services)."
+  },
+  {
+   "id": "inline-command-expansion",
+   "between": "2026-10-14T13:03:40Z and 2026-10-14T13:05:45Z (the tool-clock reads of the probes before and after)",
+   "reading": "A first tab probe passed PowerShell's script inline through systemd-run; systemd expanded the script's $p as an unset variable and PowerShell refused the empty -Command. The tool therefore calls the tab opener with -File, as open-tab.ps1 is called today."
+  },
+  {
+   "id": "tab-from-user-unit",
+   "started_at": "2026-10-14T13:05:45Z",
+   "command": "systemd-run --user --wait --pipe --collect --quiet -p RuntimeMaxSec=60 /mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File '\\\\wsl.localhost\\NativeStack2604\\var\\tmp\\ccnp-relaunch-20261014\\probes\\tab_probe.ps1'",
+   "scripts": ["../probe/tab_probe.ps1", "../probe/tab_probe.sh"],
+   "unit_output": ["wt_pid=115388 session=1"],
+   "systemd_run_rc": 0,
+   "tab_wrote": "2026-10-14T13:05:46Z tab-probe boot=beb4ce836f4d48828ac60cfde6488630 (printed with dashes) ppid_comm=Relay(190514)",
+   "reading": "The unit's PowerShell started wt.exe, the new tab ran wsl.exe back into the same boot (its parent is the WSL relay), and the tab's script ran about 1 s after the unit started; it exited 0, so the tab closed."
+  },
+  {
+   "id": "agents-json-cost",
+   "between": "2026-10-14T12:59:38Z and 2026-10-14T13:03:40Z (tool-clock reads)",
+   "command": "/usr/bin/time -f '%e s wall %U user %S sys %M KB' claude agents --json (three runs, 8 live sessions)",
+   "output": ["0.23 s wall 0.16 user 0.08 sys 165016 KB", "0.18 s wall 0.14 user 0.05 sys 165020 KB", "0.18 s wall 0.13 user 0.07 sys 165024 KB"],
+   "fields": ["cwd", "kind", "name", "pid", "sessionId", "startedAt", "status"]
+  },
+  {
+   "id": "session-files-after-the-stop",
+   "between": "2026-10-14T13:13:34Z and 2026-10-14T13:13:51Z (tool-clock reads)",
+   "reading": "Of the seven sessions alive at 06:41:17Z (old ids afa68669, 5bc7f7b9, d063c490, c3a33d96, 01804618, a4f28181, 0d2e4ed6), none has a ~/.claude/sessions/<pid>.json from the boot that ended; the one file for 0d2e4ed6 is its resumed process (pid 57494) in the new boot. All 155 parseable files carry one pidDomain, linux:<machine id>:pid:[<pid namespace>], equal to /etc/machine-id, so the field does not tell boots apart.",
+   "boots": "journalctl --list-boots: -1 a84c7d5283d54dee8de81e0c792dcaa0 2026-10-11T05:28:16Z..2026-10-14T06:41:17Z; 0 beb4ce836f4d48828ac60cfde6488630 from 2026-10-14T12:49:00Z"
+  },
+  {
+   "id": "retro-dry-run",
+   "evidence_class": "simulation",
+   "script": "../probe/retro_dry_run.py",
+   "reading": "The roster the timer would have written at 06:40:30Z, rebuilt from command-center/CC-AFTER-RESTART-20261014.md (old ids) and the CC launcher's launch.log (the CC's id), decided against this host's real journal boots with no session alive: action relaunch, order wsl-architecture-design, trading-cc, ns2604-coop, api-actions, native-agent-stack-d4, cc-native-practice; librarium-course-e2 left for the command center.",
+   "handoff": "retro-handoff.md (home directory shown as ~ and the user name as <user>)"
+  }
+ ]
+}
