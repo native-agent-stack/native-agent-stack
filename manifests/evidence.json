@@ -61272,6 +61272,101 @@
       "bytes": 132533
     },
     {
+      "path": "notes/pi-builder-output-20261014/README.md",
+      "sha256": "63e7cadf3792a6b3a39e7b3b15b58c2aceef504752e9dd3da314c447c66b66e5",
+      "bytes": 4817
+    },
+    {
+      "path": "notes/pi-builder-output-20261014/measurement-inputs/claude-after-builder-task-length/models.json",
+      "sha256": "681e2e1e7997fe29490c8617096c69fd1823c675470ca5d5fae30e52f445edb8",
+      "bytes": 238
+    },
+    {
+      "path": "notes/pi-builder-output-20261014/measurement-inputs/claude-after-builder-task-length/prompt.txt",
+      "sha256": "afa159acb7b2a7dee01942f3d9b39fdbe03c1f57d9211e56c2027f92f616543b",
+      "bytes": 6054
+    },
+    {
+      "path": "notes/pi-builder-output-20261014/measurement-inputs/claude-after-platform-refusal/models.json",
+      "sha256": "681e2e1e7997fe29490c8617096c69fd1823c675470ca5d5fae30e52f445edb8",
+      "bytes": 238
+    },
+    {
+      "path": "notes/pi-builder-output-20261014/measurement-inputs/claude-after-platform-refusal/prompt.txt",
+      "sha256": "cd6dc5f71c021e7b2daaa0c4b6b18826391029a7152b5d08f03b49c21c948f3c",
+      "bytes": 379
+    },
+    {
+      "path": "notes/pi-builder-output-20261014/measurement-inputs/claude-after-short-refusal/models.json",
+      "sha256": "681e2e1e7997fe29490c8617096c69fd1823c675470ca5d5fae30e52f445edb8",
+      "bytes": 238
+    },
+    {
+      "path": "notes/pi-builder-output-20261014/measurement-inputs/claude-after-short-refusal/prompt.txt",
+      "sha256": "25d3725a43ec1d19546632c3d656176b02901b00fb7c8868505520aa3a748b6c",
+      "bytes": 345
+    },
+    {
+      "path": "notes/pi-builder-output-20261014/measurement-inputs/claude-before-length/models.json",
+      "sha256": "746ddf8b42bf71ded000b44ab57b0e3ac3701cb5673ab8625a8d2555a8813665",
+      "bytes": 237
+    },
+    {
+      "path": "notes/pi-builder-output-20261014/measurement-inputs/claude-before-length/prompt.txt",
+      "sha256": "25d3725a43ec1d19546632c3d656176b02901b00fb7c8868505520aa3a748b6c",
+      "bytes": 345
+    },
+    {
+      "path": "notes/pi-builder-output-20261014/measurement-inputs/claude-presence-credit-refusal/models.json",
+      "sha256": "746ddf8b42bf71ded000b44ab57b0e3ac3701cb5673ab8625a8d2555a8813665",
+      "bytes": 237
+    },
+    {
+      "path": "notes/pi-builder-output-20261014/measurement-inputs/claude-presence-credit-refusal/prompt.txt",
+      "sha256": "25d3725a43ec1d19546632c3d656176b02901b00fb7c8868505520aa3a748b6c",
+      "bytes": 345
+    },
+    {
+      "path": "notes/pi-builder-output-20261014/measurement-inputs/gpt-csv-incomplete-stream/models.json",
+      "sha256": "3009b3eb2bc70a385e09674ca96d0583cd9fac0292b03dc1c5e2d070d48ca2d1",
+      "bytes": 654
+    },
+    {
+      "path": "notes/pi-builder-output-20261014/measurement-inputs/gpt-csv-incomplete-stream/prompt.txt",
+      "sha256": "cdee3a249da8cb3faac62532c895286370346a57ec5f2b524ed5b2d2432156bf",
+      "bytes": 497
+    },
+    {
+      "path": "notes/pi-builder-output-20261014/measurement-inputs/gpt-numbered-short-refusal/models.json",
+      "sha256": "3009b3eb2bc70a385e09674ca96d0583cd9fac0292b03dc1c5e2d070d48ca2d1",
+      "bytes": 654
+    },
+    {
+      "path": "notes/pi-builder-output-20261014/measurement-inputs/gpt-numbered-short-refusal/prompt.txt",
+      "sha256": "25d3725a43ec1d19546632c3d656176b02901b00fb7c8868505520aa3a748b6c",
+      "bytes": 345
+    },
+    {
+      "path": "notes/pi-builder-output-20261014/measurements.json",
+      "sha256": "71a3c9734649e115c1caedaef7dffbdd7a4cb52603067907a0f1815bf0c6c024",
+      "bytes": 9756
+    },
+    {
+      "path": "notes/pi-builder-output-20261014/sources/anthropic-output-limits.json",
+      "sha256": "82e36b8391247abc840cf4efc7be67243335702b9d3ff27171317c5d4e6a5387",
+      "bytes": 472
+    },
+    {
+      "path": "notes/pi-builder-output-20261014/sources/omniroute-model-limit.json",
+      "sha256": "c4b13dc4f9c26eb7a8239196f1e707d6c00de4ce9067d48b777c4b51816dfc21",
+      "bytes": 224
+    },
+    {
+      "path": "notes/pi-builder-output-20261014/sources/pi-max-tokens-source.txt",
+      "sha256": "eb5e47b34e2f59c56c37833e9e749f331e460048b826672e2676a788de0857a3",
+      "bytes": 3834
+    },
+    {
       "path": "notes/runtime-profiles-20261012/README.md",
       "sha256": "e9d042df68520c9bcae0118dbad02eee8442c93c9876b20fed2334db88388370",
       "bytes": 23522
@@ -63477,6 +63572,11 @@
       "bytes": 7047
     },
     {
+      "path": "tests/test_pi_builder_output_budget.py",
+      "sha256": "124d784ccfcd0daf033e76990e497ec780beac801fa4c274e45c479d2eb3eaf1",
+      "bytes": 3022
+    },
+    {
       "path": "tests/test_pin_holds.py",
       "sha256": "b7a64c982bd85842ec8b79fa5d40c4295a7967e03c3451916e6051d161f56a10",
       "bytes": 9565
@@ -64108,8 +64208,8 @@
     },
     {
       "path": "tools/adoption/runtime_profiles.py",
-      "sha256": "8e35a668184965b9883643c23cf710aa2c2fc37f553201b5f94c4d5ba4853b5d",
-      "bytes": 77818
+      "sha256": "d954ca4353d5882bc33225f2f787ae81ec366189730b1ab9ae5fdde664451f88",
+      "bytes": 78384
     },
     {
       "path": "tools/adoption/runtime_skill_freshness.py",

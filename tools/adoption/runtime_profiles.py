@@ -290,16 +290,23 @@ def opencode_mcp(servers: dict) -> dict:
     return converted
 
 
-def pi_models(route: str) -> dict:
+def pi_models(route: str, *, role_scope=None) -> dict:
+    # earendil-works/pi@04566631 packages/coding-agent/docs/models.md:67;
+    # schemas/models.schema.json:107-110,272-275 accepts native maxTokens.
+    # packages/ai/src/api/simple-options.ts:46 forwards the model ceiling;
+    # anthropic-messages.ts:1162 and openai-responses.ts:340-341 send it.
+    # Claude Opus5.5 vendor overview max output128K; OmniRoute /v1/models
+    # cx/gpt-6.1-sol max_output_tokens128000. Use a bounded32K builder budget.
+    max_tokens = 32768 if role_scope == "builder" else 8192
     if route == "claude":
         return {"providers": {"anthropic": {
             "headers": {"x-client-request-id": "${NS_RUNTIME_REQUEST_ID}"},
-            "modelOverrides": {CLAUDE_MODEL: {"maxTokens": 8192}}}}}
+            "modelOverrides": {CLAUDE_MODEL: {"maxTokens": max_tokens}}}}}
     return {"providers": {"omniroute": {
         "baseUrl": GATEWAY, "api": "openai-responses", "apiKey": "local",
         "headers": {"x-omniroute-session-id": "${NS_RUNTIME_REQUEST_ID}"},
         "models": [{"id": GPT_MODEL, "name": "OmniRoute GPT-6.1 Sol", "reasoning": True,
-                    "input": ["text"], "contextWindow": 258400, "maxTokens": 8192,
+                    "input": ["text"], "contextWindow": 258400, "maxTokens": max_tokens,
                     "cost": {"input": 2, "output": 10, "cacheRead": 0.1, "cacheWrite": 2.5}}],
     }}}
 
@@ -472,7 +479,7 @@ def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: 
                                     "permission": permissions,
                                     "options": {"reasoningEffort": "xhigh" if route == "claude" else "high"}}
     if runtime == "pi":
-        private_write(destination / "agent/models.json", json.dumps(pi_models(route), indent=2) + "\n")
+        private_write(destination / "agent/models.json", json.dumps(pi_models(route, role_scope=role_scope), indent=2) + "\n")
         # Strict role sessions use direct tools. Deferred activation and
         # codemode must not offer a second route around the imported fence.
         direct = {name: {**server, "exposure": "direct"} for name, server in servers.items()}

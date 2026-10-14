@@ -1,0 +1,76 @@
+## earendil-works/pi@04566631c2b51fb688486bc1f040f60d1518c126:packages/coding-agent/docs/models.md:65
+
+65: The dummy key makes the model available to Pi; Ollama ignores it. For an authenticated endpoint, `apiKey` and header values can use `$NAME` or `${NAME}` environment interpolation, a literal value, or a leading `!command`. Commands in `models.json` run at request time and are not cached by Pi.
+66:
+67: Opening `/model` reloads the file. A `models` entry adds or replaces a model with the same ID on that provider. Use `modelOverrides` to change metadata for an existing built-in or extension-provided model without replacing the provider's model list. Unknown override IDs are ignored.
+
+## earendil-works/pi@04566631c2b51fb688486bc1f040f60d1518c126:packages/coding-agent/src/core/provider-composer.ts:183
+
+183: 			? { ...model.thinkingLevelMap, ...override.thinkingLevelMap }
+184: 			: model.thinkingLevelMap,
+185: 		input: (override.input as ("text" | "image")[] | undefined) ?? model.input,
+186: 		inputLimits: mergeInputLimits(model.inputLimits, override.inputLimits),
+187: 		cost: override.cost
+188: 			? {
+189: 					input: override.cost.input ?? model.cost.input,
+190: 					output: override.cost.output ?? model.cost.output,
+191: 					cacheRead: override.cost.cacheRead ?? model.cost.cacheRead,
+192: 					cacheWrite: override.cost.cacheWrite ?? model.cost.cacheWrite,
+193: 					tiers: override.cost.tiers ?? model.cost.tiers,
+194: 				}
+195: 			: model.cost,
+196: 		promptCache: override.promptCache ? { ...model.promptCache, ...override.promptCache } : model.promptCache,
+197: 		contextWindow: override.contextWindow ?? model.contextWindow,
+198: 		maxTokens: override.maxTokens ?? model.maxTokens,
+199: 		samplingParams: override.samplingParams
+200: 			? { ...model.samplingParams, ...override.samplingParams }
+201: 			: model.samplingParams,
+202: 		samplingParamsByThinkingLevel: mergeSamplingParamsByThinkingLevel(
+203: 			model.samplingParamsByThinkingLevel,
+
+## earendil-works/pi@04566631c2b51fb688486bc1f040f60d1518c126:packages/coding-agent/schemas/models.schema.json:268
+
+268:                     "contextWindow": {
+269:                       "type": "number",
+270:                       "exclusiveMinimum": 0
+271:                     },
+272:                     "maxTokens": {
+273:                       "type": "number",
+274:                       "exclusiveMinimum": 0
+275:                     },
+
+## earendil-works/pi@04566631c2b51fb688486bc1f040f60d1518c126:packages/ai/src/api/simple-options.ts:36
+
+36: export function buildBaseOptions(
+37: 	model: Model<Api>,
+38: 	context: TranscriptContext,
+39: 	options?: SimpleStreamOptions,
+40: 	apiKey?: string,
+41: ): StreamOptions {
+42: 	const samplingParams = resolveSamplingParams(model, options?.reasoning ?? "off", options?.samplingParams);
+43: 	return {
+44: 		temperature: options?.temperature,
+45: 		samplingParams,
+46: 		maxTokens: clampMaxTokensToContext(model, context, options?.maxTokens ?? model.maxTokens),
+
+## earendil-works/pi@04566631c2b51fb688486bc1f040f60d1518c126:packages/ai/src/api/anthropic-messages.ts:1156
+
+1156: 	const params: MessageCreateParamsStreaming = {
+1157: 		model: model.id,
+1158: 		messages:
+1159: 			model.compat?.supportsMidConvoEffort === true
+1160: 				? insertThinkingLevelMessages(converted, activeEffort)
+1161: 				: converted.messages,
+1162: 		max_tokens: options?.maxTokens ?? model.maxTokens,
+1163: 		stream: true,
+1164: 		...(betaFeatures.length > 0 ? { betas: betaFeatures } : {}),
+1165: 	};
+1166:
+
+## earendil-works/pi@04566631c2b51fb688486bc1f040f60d1518c126:packages/ai/src/api/openai-responses.ts:338
+
+338: 	};
+339:
+340: 	if (options?.maxTokens && compat.supportsMaxOutputTokens && !omitUnsupportedFields) {
+341: 		params.max_output_tokens = Math.max(options.maxTokens, OPENAI_RESPONSES_MIN_OUTPUT_TOKENS);
+342: 	}

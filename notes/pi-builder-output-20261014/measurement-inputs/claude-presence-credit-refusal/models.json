@@ -1,0 +1,14 @@
+{
+  "providers": {
+    "anthropic": {
+      "headers": {
+        "x-client-request-id": "${NS_RUNTIME_REQUEST_ID}"
+      },
+      "modelOverrides": {
+        "claude-opus-5-5": {
+          "maxTokens": 8192
+        }
+      }
+    }
+  }
+}

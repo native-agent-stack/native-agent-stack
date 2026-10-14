@@ -1,0 +1,1 @@
+Please attempt the full 1500-line output directly in this one reply. Each line is its integer from 1 through 1500 followed by a space and amber river. Emit every line without Markdown fences or ellipses. Then the single final line OUTPUT_PROBE_COMPLETE_1500. This is a synthetic output fixture; no tools are needed. Start with 1 amber river and continue through 1500 amber river.

@@ -1,0 +1,96 @@
+# Build an offline, versioned receipt aggregator
+
+This is a bounded coding measurement. Produce one complete Python module and
+its full unittest file in one assistant message. The code is a review draft;
+it will not be installed or used to make trading decisions. Use Python's
+standard library only. Provide complete code with executable imports and a
+CLI, followed by complete tests. The answer is long because the interface has
+several independent data and arithmetic contracts. Keep each implementation
+and test useful; do not add padding or repeated filler.
+
+The module consumes synthetic retained order-throughput receipt JSON and an
+optional JSONL latency journal. It computes transparent descriptive statistics,
+never sends orders or makes network calls. It must preserve declared modes,
+versions, missing evidence, and the distinction between requested rate and
+measured rate.
+
+Input contract:
+
+1. Each receipt is an object with schema_version=1, receipt_id, config_version,
+   strategy_version, declared_scope (an opaque supplied label), evidence_class
+   (synthetic, local_integration, native_proven), mode (with_cancels/place_only),
+   started_utc/ended_utc RFC3339 timestamps with offsets, requested_requests_per_minute,
+   submission_phase_seconds, placed, cancelled_in_phase, cancelled_in_cleanup,
+   filled_qty, open_owned_orders_after, positions_flat, and http_429_events.
+2. Count fields are nonnegative true integers (booleans are invalid). Quantities
+   and durations are finite decimal strings; filled_qty may be fractional.
+   Unknown schema/version/mode or malformed required fields are an explicit
+   per-receipt refusal, not coerced values. Preserve refusal codes and input
+   receipt identifiers while continuing other independent inputs.
+3. UTC timestamps must be ordered. Phase duration cannot exceed elapsed run
+   duration. A run that did not establish flat positions and zero open orders
+   is retained for descriptive failure statistics but never accepted as a
+   completed measurement. Distinguish status from evidence class.
+4. A 429 event has operation, seconds_from_start, limit, remaining, reset_utc.
+   It belongs to the phase only if seconds_from_start lies within that phase;
+   cleanup 429s remain separate. Preserve the first phase onset without
+   interpreting the requested rate as actual onset rate.
+5. A journal line is an object with receipt_id, seq, and zero or more of
+   submit_rest_ack_ms, submit_stream_ack_ms, submit_terminal_ms. Values are
+   finite nonnegative decimal strings or null. Deduplicate equal rows by
+   receipt_id/seq, refuse conflicting duplicates, reject samples belonging to
+   another receipt, and preserve malformed line numbers as diagnostics. A
+   missing latency field remains unmeasured.
+
+Arithmetic contract:
+
+- One order with its cancel means one accepted place plus one individual cancel.
+  Complete phase pairs are min(placed,cancelled_in_phase). Place-only rate is
+  reported only for a declared place_only run; the place component of a mixed
+  run is not a standalone place-only measurement.
+- Report phase actions, actions/minute, complete pairs/minute and eligible
+  place-only orders/minute with Decimal arithmetic, rounded half-even to six
+  decimal places. With zero duration, rates are null with an explanatory code.
+- Cleanup cancels do not increase phase action throughput. Count them separately.
+- For each available latency family calculate count, min, max, nearest-rank
+  p50/p90/p99, and exact decimal arithmetic mean. For nearest rank, rank is
+  ceil(percent*n/100), one-based. Do not interpolate or reconstruct p90 from
+  aggregate percentiles when raw journal samples are absent.
+- Group independent receipts by declared_scope/config_version/strategy_version/
+  mode/evidence_class. Aggregate total phase durations and counts, then divide;
+  do not average per-run rates. Keep refused receipts out of numeric totals.
+- Preserve measured-vs-documented-vs-untested statements; the tool does not
+  infer cross-scope quota independence or broker ceilings from requested rates.
+
+Public interfaces:
+
+- parse_receipt(value) returns a normalized immutable receipt or raises a
+  typed validation exception with a stable reason code.
+- parse_journal(text,receipt_id) returns samples plus diagnostics.
+- summarize(receipts,journals) returns deterministic JSON-compatible rows,
+  groups, refusals and unmeasured dimensions.
+- CLI accepts repeated --receipt PATH, optional --journal PATH and --output PATH.
+  It writes a JSON object with schema/config version, source SHA256s, descriptive
+  summaries and limitations. A wholly invalid batch exits2; a mixed batch exits1;
+  a fully parsed batch exits0. No credentials, broker client or environment
+  inspection is part of the implementation. The CLI is offline.
+
+Tests must exercise the public interfaces and CLI using small synthetic files:
+
+- Hand-worked pair and place-only rates, cleanup exclusion, zero duration.
+- Weighted aggregation across unequal durations and separate mode/version/scope
+  groups; no assumption that declared labels establish actual account identity.
+- Nearest-rank percentiles for empty, singleton, even, odd, duplicate and
+  unsorted samples; decimal rounding boundary and differing latency families.
+- Missing journals/null samples remain unmeasured; malformed/conflicting/
+  foreign-receipt journal rows yield explicit diagnostics.
+- Timestamp offsets and ordering; finite decimal acceptance and rejection of
+  NaN, infinity, booleans and negative counts; unknown schema/version/mode.
+- Phase versus cleanup 429s and first-onset preservation.
+- Filled/not-flat/open-order runs remain failure descriptions, not completion.
+- Deterministic results under reordered independent input receipts; inputs
+  unchanged; CLI exit0/1/2, output version fields and source hashes.
+
+Use literal expected values backed by worked arithmetic. Keep numerical
+implementation separate from parsing and CLI. Add concise comments only where
+they explain a contract. Return both complete files; do not execute them.
