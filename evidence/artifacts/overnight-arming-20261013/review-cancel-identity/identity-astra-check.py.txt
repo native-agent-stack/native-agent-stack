@@ -1,0 +1,38 @@
+"""Astra replay/delayed probe, exact fddeb fixture and relocated source paths.
+
+Replay expectations follow the CC's fail-closed ruling: uncorrelated events
+authorize no retry. Delayed mode includes A's real422 then exactly one204 B.
+No production function is mocked or replaced in head mode.
+"""
+from pathlib import Path
+import subprocess
+import sys
+import types
+ROOT = Path('/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013')
+PROBE = Path('<reader-cache>/ns2604-gpt-reads/fix4-pr1081-fddebeb9a/review-replay-probe.py')
+mode, revision = sys.argv[1:3]
+sys.path[:0] = [str(ROOT), str(ROOT / 'blueprints/us-equities/adaptive-paper')]
+if revision == 'base':
+    for name in ('transport', 'runner'):
+        path = ROOT / 'blueprints/us-equities/adaptive-paper' / (name + '.py')
+        source = subprocess.check_output(['git', 'show', 'fddebeb9:' + str(path.relative_to(ROOT))], cwd=ROOT)
+        module = types.ModuleType(name)
+        module.__file__ = str(path)
+        sys.modules[name] = module
+        exec(compile(source, str(path), 'exec'), module.__dict__)
+fixture = subprocess.check_output(['git', 'show', 'fddebeb9:tests/test_adaptive_paper_cancel_acknowledgement.py'], cwd=ROOT, text=True)
+if mode == 'replay':
+    fixture = fixture.replace('expected = [1, 2, 2] if reject_first else [1, 1, 1]', 'expected = [1, 1, 1]')
+    fixture = fixture.replace('expected_pending = [False, True, True] if reject_first else [True, True, True]', 'expected_pending = [True, True, True]')
+    fixture = fixture.replace('2 if reject_first else 1', '1')
+else:
+    # The original fixture assumes no HTTP422; delayed mode deliberately has one.
+    fixture = fixture.replace('self.assertEqual(frozen, [])', "self.assertEqual(frozen, ['cancellation_unresolved'])")
+probe = PROBE.read_text()
+probe = probe.replace("ROOT=Path(__file__).resolve().parent", 'ROOT=' + repr(ROOT))
+probe = probe.replace("str(ROOT/'tree')", 'str(ROOT)')
+probe = probe.replace("ROOT/'tree/blueprints/us-equities/adaptive-paper'", "ROOT/'blueprints/us-equities/adaptive-paper'")
+probe = probe.replace("ROOT/'tree/tests/test_adaptive_paper_cancel_acknowledgement.py'", "ROOT/'tests/test_adaptive_paper_cancel_acknowledgement.py'")
+probe = probe.replace('code=path.read_text()', 'code=fixture')
+sys.argv = [str(PROBE), mode]
+exec(compile(probe, str(PROBE), 'exec'), {'__name__': '__main__', '__file__': str(PROBE), 'fixture': fixture, 'PosixPath': type(ROOT)})

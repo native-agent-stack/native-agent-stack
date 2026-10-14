@@ -1,0 +1,18 @@
+test_held_recovery_cancel_releases_on_terminal_lookup_without_second_delete (tests.test_adaptive_paper_cancel_liveness.CancelLiveness.test_held_recovery_cancel_releases_on_terminal_lookup_without_second_delete) ... held_sell_recovery True flat True deletes 1 counters {'held_unattributed_refusals': 1, 'lookup_confirmed_retries': 0}
+ok
+test_held_sell_cancel_at_cutoff_retries_once_then_recovery_reaches_flat (tests.test_adaptive_paper_cancel_liveness.CancelLiveness.test_held_sell_cancel_at_cutoff_retries_once_then_recovery_reaches_flat) ... held_sell_recovery False flat True deletes 2 counters {'held_unattributed_refusals': 1, 'lookup_confirmed_retries': 1}
+ok
+test_held_recovery_cancel_releases_on_terminal_lookup_without_second_delete (tests.test_adaptive_paper_cancel_liveness.CancelLiveness.test_held_recovery_cancel_releases_on_terminal_lookup_without_second_delete) ... held_sell_recovery True flat True deletes 1 counters {'held_unattributed_refusals': 1, 'lookup_confirmed_retries': 0}
+ok
+test_held_sell_cancel_at_cutoff_retries_once_then_recovery_reaches_flat (tests.test_adaptive_paper_cancel_liveness.CancelLiveness.test_held_sell_cancel_at_cutoff_retries_once_then_recovery_reaches_flat) ... held_sell_recovery False flat True deletes 2 counters {'held_unattributed_refusals': 1, 'lookup_confirmed_retries': 1}
+ok
+test_held_recovery_cancel_releases_on_terminal_lookup_without_second_delete (tests.test_adaptive_paper_cancel_liveness.CancelLiveness.test_held_recovery_cancel_releases_on_terminal_lookup_without_second_delete) ... held_sell_recovery True flat True deletes 1 counters {'held_unattributed_refusals': 1, 'lookup_confirmed_retries': 0}
+ok
+test_held_sell_cancel_at_cutoff_retries_once_then_recovery_reaches_flat (tests.test_adaptive_paper_cancel_liveness.CancelLiveness.test_held_sell_cancel_at_cutoff_retries_once_then_recovery_reaches_flat) ... held_sell_recovery False flat True deletes 2 counters {'held_unattributed_refusals': 1, 'lookup_confirmed_retries': 1}
+ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 30.169s
+
+OK
+ASSERTION_FAILURES 0 ERRORS 0 SKIPS 0

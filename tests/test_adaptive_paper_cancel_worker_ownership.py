@@ -48,6 +48,9 @@ class CancelWorkerOwnership(unittest.TestCase):
     def test_failed_halt_delete_clears_strategy_mark_and_retries_before_flatten(self):
         self._exercise('refusal', .05, shutdown_before_release=False)
 
+    def test_recover_joins_cancel_past_its_former_ten_second_stop_timeout(self):
+        self._exercise('recover', .05)
+
     def _exercise(self, boundary, timeout, shutdown_before_release=True):
         import runner
         from transport import AlpacaPaperTransport, GuardedSession, PAPER_URL, normalize_order
@@ -126,7 +129,7 @@ class CancelWorkerOwnership(unittest.TestCase):
             port.sink_observation = c.observe
 
             async def before_request(kind, client_id=None):
-                if kind == 'cancel' and boundary == 'budget':
+                if kind == 'cancel' and boundary in ('budget', 'recover'):
                     entered.set()
                     while not release.is_set():
                         await asyncio.sleep(.001)
@@ -148,6 +151,7 @@ class CancelWorkerOwnership(unittest.TestCase):
             if boundary == 'refusal':
                 from native_strategy import AdaptiveStrategy
             stop_task = None
+            recovery_task = None
             if boundary == 'queued':
                 await port._operation_lock.acquire()
             try:
@@ -179,6 +183,43 @@ class CancelWorkerOwnership(unittest.TestCase):
                             break
                         await asyncio.sleep(.001)
                     self.assertTrue(entered.is_set())
+                    if boundary == 'recover':
+                        from recovery import recover
+                        from safety import SafetyError
+
+                        async def startup_failure(*args):
+                            raise SafetyError('synthetic_recovery_start_failure')
+
+                        # Only stream startup/adoption are synthetic. The active
+                        # SDK budget waiter, recover(), stop(), worker and lookup
+                        # remain real. Recovery enters teardown with a live cancel.
+                        port.start = startup_failure
+                        port.adopt_intents = lambda intents: None
+                        config = {'cleanup_seconds': 1, 'order_timeout_seconds': .05,
+                                  'regular_session_only': False, 'extended_hours_enabled': True,
+                                  'sessions': {'extended_hours': True, 'overnight_holds': False},
+                                  'feed': 'boats', 'quote_source': 'boats_rest',
+                                  'overnight': {'enabled': True}, 'flatten_minutes_before_pre': 10}
+                        recovery_task = asyncio.create_task(recover(c,
+                            {'trial_id': 'cancel-ownership', 'baseline_cash': '10000'}, config))
+                        await asyncio.sleep(10.2)
+                        self.assertTrue(port.cancel_in_flight('entry'),
+                            'recover must not abandon the live SDK operation at ten seconds')
+                        self.assertIn('entry', c._overnight_cancel_pending)
+                        self.assertTrue(port._cancel_workers)
+                        self.assertFalse(recovery_task.done(), 'recovery must join before returning/account unlock')
+                        self.assertFalse(closed)
+                        self.assertEqual(http_calls, [], 'the worker is still in its bounded budget wait')
+                        release.set()
+                        result = await asyncio.wait_for(recovery_task, 3)
+                        self.assertEqual(result['errors'], ['synthetic_recovery_start_failure'])
+                        self.assertEqual(finished, [False])
+                        self.assertTrue(closed)
+                        self.assertEqual([m for m, _ in http_calls], ['DELETE', 'GET'])
+                        self.assertFalse(port.cancel_in_flight('entry'))
+                        self.assertFalse(port._cancel_workers)
+                        self.assertNotIn('entry', c._overnight_cancel_pending)
+                        return
                     await asyncio.sleep(timeout + .05)
                     live_pending = 'entry' in c._overnight_cancel_pending
                     if boundary == 'refusal':
@@ -241,12 +282,16 @@ class CancelWorkerOwnership(unittest.TestCase):
                     self.assertNotIn('entry', c._overnight_cancel_pending)
             finally:
                 release.set()
+                if recovery_task is not None:
+                    await asyncio.gather(recovery_task, return_exceptions=True)
                 if boundary == 'queued' and port._operation_lock.locked():
                     port._operation_lock.release()
                 await c.stop_overnight_cancels()
                 if stop_task is not None:
                     await asyncio.gather(stop_task, return_exceptions=True)
                 else:
-                    await port.stop()
+                    # Mutation controls must retain the safety assertion even
+                    # when the intentionally broken teardown itself is canceled.
+                    await asyncio.gather(port.stop(), return_exceptions=True)
 
         asyncio.run(exercise())

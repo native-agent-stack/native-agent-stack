@@ -1,0 +1,22 @@
+"""Replay the broad-run fixture delay; no production function is replaced."""
+from pathlib import Path
+import sys
+import types
+import unittest
+ROOT = Path('/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013')
+sys.path[:0] = [str(ROOT), str(ROOT / 'blueprints/us-equities/adaptive-paper')]
+from runtime_lock import runtime_read_lock
+path = ROOT / 'tests/test_adaptive_paper_cancel_liveness.py'
+source = path.read_text().replace('await asyncio.sleep(.1)', 'await asyncio.sleep(.7)')
+if sys.argv[1] == 'original':
+    source = source.replace("'cleanup_seconds': 20, 'order_timeout_seconds': 6", "'cleanup_seconds': 3, 'order_timeout_seconds': .5")
+module = types.ModuleType('tests.liveness_deadline_probe')
+module.__package__ = 'tests'
+module.__file__ = str(path)
+sys.modules[module.__name__] = module
+with runtime_read_lock():
+    exec(compile(source, str(path), 'exec'), module.__dict__)
+    suite = unittest.defaultTestLoader.loadTestsFromName('CancelLiveness.test_held_recovery_cancel_releases_on_terminal_lookup_without_second_delete', module)
+    result = unittest.TextTestRunner(verbosity=2).run(suite)
+    print('ASSERTION_FAILURES', len(result.failures), 'ERRORS', len(result.errors), 'SKIPS', len(result.skipped))
+sys.exit(not result.wasSuccessful())

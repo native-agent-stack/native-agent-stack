@@ -336,7 +336,10 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
         controller.stop = True
         try:
             # Teardown can outlive the order deadline, but cannot authorize orders.
-            await asyncio.wait_for(port.stop(), 10)
+            # The port owns bounded SDK calls (including a 65s budget waiter)
+            # and their final lookup. Join that ownership before releasing the
+            # account, rather than truncating it with an unrelated 10s timer.
+            await port.stop()
         except Exception as exc:
             errors.append("stop_" + _code(exc))
             details.append(_detail(exc, "stop_"))
@@ -349,6 +352,7 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
                    "submit_attempted": i.submit_attempted} for i in ledger.unresolved()]
     flat = (not positions and not unresolved and proof is not None and not errors
             and proof["positions"] == 0 and proof["open_orders"] == 0)
+    counters = getattr(port, "cancellation_counters", None)
     return {"mode": "official_sdk_recovery", "native_engine_resumed": False,
             "status": "passed" if flat else "needs_attention", "flat": flat,
             "errors": errors, "error_details": details, "positions": positions, "unresolved_orders": unresolved,
@@ -357,4 +361,6 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
                 [{"symbol": p["symbol"], "qty": str(p["qty"])} for p in last_snapshot["positions"]],
             "reconciliation": proof, "cancel_attempt_client_ids": cancelled,
             "exit_attempt_client_ids": submitted, "buy_submissions": 0,
+            "cancellation_counters": counters() if callable(counters) else {
+                "held_unattributed_refusals": 0, "lookup_confirmed_retries": 0},
             "order_deadline_seconds": cleanup}

@@ -1,0 +1,9 @@
+test_cutoff_held_entry_reconciles_then_owned_position_flattens (tests.test_adaptive_paper_cancel_acknowledgement.CancelAcknowledgement.test_cutoff_held_entry_reconciles_then_owned_position_flattens) ... ack_three_ticks accepted stream refusal True [{"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}, {"deletes": 1, "controller_pending": true, "adaptive_pending": true, "mover_pending": true}]
+cancel_stage_end {"held_unattributed_refusals": 1, "lookup_confirmed_retries": 1}
+ok
+
+----------------------------------------------------------------------
+Ran 1 test in 1.376s
+
+OK
+ASSERTION_FAILURES 0 ERRORS 0 SKIPS 0

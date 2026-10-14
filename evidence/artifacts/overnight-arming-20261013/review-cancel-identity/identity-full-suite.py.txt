@@ -1,0 +1,16 @@
+"""Package/CI-like adaptive-paper suite, no actual broker I/O."""
+from contextlib import nullcontext
+from pathlib import Path
+import sys
+import unittest
+ROOT = Path('/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013')
+sys.path[:0] = [str(ROOT), str(ROOT / 'blueprints/us-equities/adaptive-paper')]
+guard = nullcontext()
+if sys.argv[1] == 'native':
+    from runtime_lock import runtime_read_lock
+    guard = runtime_read_lock()
+with guard:
+    names = ['tests.' + p.stem for p in sorted((ROOT / 'tests').glob('test_adaptive_paper*.py'))]
+    result = unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromNames(names))
+    print('ASSERTION_FAILURES', len(result.failures), 'ERRORS', len(result.errors), 'SKIPS', len(result.skipped))
+sys.exit(not result.wasSuccessful())

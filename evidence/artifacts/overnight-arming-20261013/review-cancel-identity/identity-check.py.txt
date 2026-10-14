@@ -1,0 +1,52 @@
+"""Run one structural regression wave under the native runtime read lock."""
+from pathlib import Path
+import subprocess
+import sys
+import types
+import unittest
+ROOT = Path('/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013')
+sys.path[:0] = [str(ROOT), str(ROOT / 'blueprints/us-equities/adaptive-paper')]
+from runtime_lock import runtime_read_lock
+with runtime_read_lock():
+    if sys.argv[1] == 'base':
+        for name in ('transport', 'recovery', 'runner'):
+            path = ROOT / 'blueprints/us-equities/adaptive-paper' / (name + '.py')
+            source = subprocess.check_output(['git', 'show', 'fddebeb9:' + str(path.relative_to(ROOT))], cwd=ROOT)
+            module = types.ModuleType(name)
+            module.__file__ = str(path)
+            sys.modules[name] = module
+            exec(compile(source, str(path), 'exec'), module.__dict__)
+    elif sys.argv[1] == 'drop-correlation':
+        path = ROOT / 'blueprints/us-equities/adaptive-paper/transport.py'
+        source = path.read_text().replace('attempt = self.keys.get(key)',
+            'attempt = self.current.get(order["client_order_id"])')
+        module = types.ModuleType('transport')
+        module.__file__ = str(path)
+        sys.modules['transport'] = module
+        exec(compile(source, str(path), 'exec'), module.__dict__)
+    elif sys.argv[1] == 'drop-monitor':
+        path = ROOT / 'blueprints/us-equities/adaptive-paper/transport.py'
+        source = path.read_text().replace('self._arm_cancel_monitor()', 'pass  # owned-monitor mutation')
+        module = types.ModuleType('transport')
+        module.__file__ = str(path)
+        sys.modules['transport'] = module
+        exec(compile(source, str(path), 'exec'), module.__dict__)
+    elif sys.argv[1] == 'drop-recovery-join':
+        path = ROOT / 'blueprints/us-equities/adaptive-paper/recovery.py'
+        source = path.read_text().replace('await port.stop()', 'await asyncio.wait_for(port.stop(), 10)')
+        # Also remove the port's cancellation-resistant join, reproducing the
+        # load-bearing ownership policy as a whole rather than only its timer.
+        tpath = ROOT / 'blueprints/us-equities/adaptive-paper/transport.py'
+        text = tpath.read_text().replace('return await asyncio.shield(task)', 'return await task')
+        for name, value, f in [('transport', text, tpath), ('recovery', source, path)]:
+            module = types.ModuleType(name)
+            module.__file__ = str(f)
+            sys.modules[name] = module
+            exec(compile(value, str(f), 'exec'), module.__dict__)
+    names = sys.argv[2:] or ['tests.test_adaptive_paper_cancel_acknowledgement',
+                            'tests.test_adaptive_paper_cancel_worker_ownership',
+                            'tests.test_adaptive_paper_cancel_liveness']
+    suite = unittest.defaultTestLoader.loadTestsFromNames(names)
+    result = unittest.TextTestRunner(verbosity=2).run(suite)
+    print('ASSERTION_FAILURES', len(result.failures), 'ERRORS', len(result.errors), 'SKIPS', len(result.skipped))
+sys.exit(not result.wasSuccessful())

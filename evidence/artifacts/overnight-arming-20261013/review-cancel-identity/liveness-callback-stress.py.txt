@@ -1,0 +1,14 @@
+"""Repeat final all-side liveness without substituting production methods."""
+from pathlib import Path
+import sys
+import unittest
+ROOT = Path('/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013')
+sys.path[:0] = [str(ROOT), str(ROOT / 'blueprints/us-equities/adaptive-paper')]
+from runtime_lock import runtime_read_lock
+with runtime_read_lock():
+    suite = unittest.TestSuite()
+    for _ in range(3):
+        suite.addTests(unittest.defaultTestLoader.loadTestsFromName('tests.test_adaptive_paper_cancel_liveness'))
+    result = unittest.TextTestRunner(verbosity=2).run(suite)
+    print('ASSERTION_FAILURES', len(result.failures), 'ERRORS', len(result.errors), 'SKIPS', len(result.skipped))
+sys.exit(not result.wasSuccessful())

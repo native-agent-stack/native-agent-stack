@@ -282,7 +282,7 @@ HTTP422 retry and strategy-strand checks are retained in the focused integration
 Historical source and proof hashes retain exact published preimages. No actual
 credential, broker operation or paper acceptance is claimed.
 
-### Refusal provenance through local completion
+### Refusal provenance through local completion (superseded)
 
 Under the CC's23:43Z final narrow ruling, an `order_cancel_rejected` observed
 while the cancellation operation or its follow-up lookup is live is retained
@@ -310,4 +310,84 @@ stream and later-lookup terminal controls, must release all mirrored marks after
 the first refusal, send exactly one retry, and then remain acknowledged-pending.
 At35dfd01 the six cases strand at1/1/1 DELETEs; after this change they send1/2/2.
 The original no-refusal cases remain1/1/1. Guard removal restores stranding.
-The SDK, worker joins, strategy algorithms and retry budget remain unchanged.
+The SDK, worker joins, strategy algorithms and retry budget remained unchanged
+in that historical stage. Its current-task attribution was disproved by the
+delayed/replayed-refusal probe at fddebeb9 and is superseded below.
+
+### Broker cancellation correlation and bounded reconciliation
+
+The CC's 2026-10-14 01:39Z last-attempt ruling and 01:49Z conditional-correlation
+acceptance replace task-only attribution with transport-owned cancellation
+state. Each local operation is bound to its exact SDK DELETE through a copied
+ContextVar at the HTTP seam, after the budget wait. Its wire acknowledgement
+and definitive HTTP refusal belong to that operation, including when its final
+lookup fails. A successful 204 remains pending through a failed lookup.
+
+Stream refusals use a broker key only when available: the order UUID and its
+nullable `cancel_requested_at` marker. The operation's follow-up response must
+confirm a strictly advanced marker relative to its pre-operation broker state.
+An earlier operation with unknown provenance makes later markers ambiguous.
+Neither `updated_at`, the current task, nor the local receive time guesses the
+missing identity. Known keys and refusal observations remain deduplicated after
+operation completion; an old refusal cannot release a newer acknowledgement.
+The transport latch also covers direct adapter callers after SDK completion.
+
+The primary [Websocket Streaming page](https://docs.alpaca.markets/us/docs/websocket-streaming.md)
+documents `pending_cancel` at L158 and `order_cancel_rejected` at L163. Its L178
+example carries a nullable `cancel_requested_at`, and documents no per-DELETE
+id. At alpaca-py pin cc4cb3b7ba50ae250e621983c2779047fb16bb28, the
+[Order model](https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/alpaca/trading/models.py#L168-L222)
+does not declare that field; the selected `raw_data=True` SDK path preserves
+raw broker fields. These sources support a conditional carrier, not a guarantee
+that every cancel or refusal can be correlated. The Orders page's L1560, L1563
+and L1564 state definitions remain the terminal/pending/refusal references.
+
+For bounded liveness, a transport-owned monitor gives every held cancellation an
+independent REST lookup every five seconds, without depending on an owner tick.
+This includes owned SELL and recovery cancellations under the CC's 02:12Z scope
+ruling. Terminal results release pending;
+`pending_cancel` keeps holding. Other nonterminal results authorize exactly one
+lookup-confirmed retry per bound through the ordinary owned cancel operation,
+SDK and budget. Raw refusals never authorize that retry.
+Receipt stream-health fields report `held_unattributed_refusals` (deduplicated
+unattributed observations at ingestion) and `lookup_confirmed_retries` (confirmed
+retries that actually reach DELETE). A nonzero counter remains visible at run
+end, including in the recovery result. The cutoff proof drives a real SDK cancellation and Controller followed by
+the production deterministic recovery loop with a synthetic fill oracle; it
+finishes the held owned position flat. It does not claim a running native node
+or broker acceptance for that particular probe.
+
+The two SELL/recovery tests use the actual transport constructor, SDK DELETE,
+GET and POST, GuardedSession, Controller, ledger, and production recovery and
+reconciliation with synthetic HTTP and stream startup. The held SELL at the
+cutoff permits no DELETE before five seconds, retries once after a live lookup,
+then reaches flat with one reduce-only owned SELL. The held recovery cancellation
+releases on a terminal lookup, sends only one DELETE and reaches flat; its receipt
+reports the nonzero held counter. These paths are **not measured against the broker**.
+
+Recovery joins the transport teardown instead of imposing an unrelated ten-second
+cutoff on a supported 65-second budget wait. One shielded teardown owner retains
+the SDK future, controller latch and final lookup, then closes the HTTP session.
+Caller cancellation cannot return ownership to a new controller or release the
+account while the worker runs. SDK budget and HTTP bounds are unchanged.
+
+The exact fddebeb9 baseline fails delayed/replayed refusal, acknowledgement plus
+failed lookup, bounded hold reconciliation, cutoff-to-flat, and recovery-timeout
+regressions by assertion. The established three-tick no-refusal test and the
+correlated-refusal one-retry test remain controls; the latter now supplies the
+documented broker marker rather than relying on an equal order-state timestamp.
+No actual credentials, broker operations, arming or paper acceptance run.
+
+This is one final structural commit and one read wave. Any P1 in that wave, or
+no landing by 2026-10-14 06:30Z, parks #1081; lane B remains on seq2 and the
+cancellation state machine moves to a design PR. P2 REST-terminal forwarding
+before trade_updates, source captures, lifecycle notes and the CPython citation
+range correction remain Follow-ups.
+
+The first broad all-side run exposed a fixture deadline problem: its 0.5-second
+confirmation waiter could expire before the virtual cancellation clock advanced
+to five seconds under load. A controlled 0.7-second test delay reproduces
+`cancellation_not_confirmed`, with recovery already stopped; a larger fixture
+budget passes without runtime changes. The test now permits a six-second
+confirmation wait and twenty-second cleanup, with a ten-second fixture watchdog.
+The failed diagnostic is retained and does not stand in for final validation.

@@ -1,0 +1,28 @@
+test_recover_joins_cancel_past_its_former_ten_second_stop_timeout (tests.test_adaptive_paper_cancel_worker_ownership.CancelWorkerOwnership.test_recover_joins_cancel_past_its_former_ten_second_stop_timeout) ... FAIL
+
+======================================================================
+FAIL: test_recover_joins_cancel_past_its_former_ten_second_stop_timeout (tests.test_adaptive_paper_cancel_worker_ownership.CancelWorkerOwnership.test_recover_joins_cancel_past_its_former_ten_second_stop_timeout)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_worker_ownership.py", line 52, in test_recover_joins_cancel_past_its_former_ten_second_stop_timeout
+    self._exercise('recover', .05)
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_worker_ownership.py", line 297, in _exercise
+    asyncio.run(exercise())
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_worker_ownership.py", line 206, in exercise
+    self.assertTrue(port.cancel_in_flight('entry'),
+AssertionError: False is not true : recover must not abandon the live SDK operation at ten seconds
+
+----------------------------------------------------------------------
+Ran 1 test in 11.102s
+
+FAILED (failures=1)
+ASSERTION_FAILURES 1 ERRORS 0 SKIPS 0

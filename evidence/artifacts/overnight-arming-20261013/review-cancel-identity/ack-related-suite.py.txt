@@ -1,0 +1,20 @@
+"""Focused cancellation/finality integration; synthetic broker I/O only."""
+from contextlib import nullcontext
+from pathlib import Path
+import sys
+import unittest
+ROOT = Path('/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013')
+sys.path[:0] = [str(ROOT), str(ROOT / 'blueprints/us-equities/adaptive-paper')]
+names = ['tests.test_adaptive_paper_transport', 'tests.test_adaptive_paper_recovery',
+    'tests.test_adaptive_paper_overnight_arming', 'tests.test_adaptive_paper_overnight_round2',
+    'tests.test_adaptive_paper_overnight_cancel_refusal', 'tests.test_adaptive_paper_cancel_worker_ownership',
+    'tests.test_adaptive_paper_overnight_cancel_marks', 'tests.test_adaptive_paper_cancel_acknowledgement',
+    'tests.test_adaptive_paper_cancel_liveness']
+if sys.argv[1] == 'native':
+    from runtime_lock import runtime_read_lock
+    guard = runtime_read_lock()
+else:
+    guard = nullcontext()
+with guard:
+    result = unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromNames(names))
+sys.exit(not result.wasSuccessful())

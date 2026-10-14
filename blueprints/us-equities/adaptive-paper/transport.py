@@ -31,6 +31,7 @@ DATA_URL = "https://data.alpaca.markets"
 PAPER_WS = "wss://paper-api.alpaca.markets/stream"
 DATA_WS_BASE = "wss://stream.data.alpaca.markets/v2"
 TERMINAL = {"filled", "canceled", "expired", "rejected", "replaced"}
+CANCEL_RECONCILE_INTERVAL_SECONDS = 5.0
 SYMBOL = re.compile(r"[A-Z][A-Z0-9.\-]{0,14}\Z")
 CLIENT_ID = re.compile(r"[A-Za-z0-9_\-]{1,48}\Z")
 UUID = re.compile(r"[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}\Z")
@@ -386,6 +387,16 @@ def normalize_order(raw):
         value = raw.get(name)
         result[name] = None if value is None else decimal_string(value)
     result["updated_at_ns"] = timestamp_ns(raw.get("updated_at") or raw.get("created_at"))
+    # Optional broker cancellation-request time, NOT order.updated_at or the
+    # local receive time. Raw SDK responses retain this documented stream field.
+    # Missing/malformed provenance cannot authorize a cancellation retry.
+    if raw.get("cancel_requested_at") is not None:
+        try:
+            marker = timestamp_ns(raw["cancel_requested_at"])
+            if marker > 0:
+                result["cancel_requested_at_ns"] = marker
+        except (TransportError, ValueError, TypeError, OverflowError):
+            pass
     if result["side"] not in {"buy", "sell"} or not result["client_order_id"] or not result["id"]:
         raise TransportError("invalid order identity")
     if not Decimal("0") <= Decimal(result["filled_qty"]) <= Decimal(result["qty"]):
@@ -882,6 +893,92 @@ def normalize_intent(order, symbols, *, allow_extended_hours=False, overnight_al
     return result
 
 
+class _CancelAttempt:
+    """One local operation and its broker-owned cancellation identity.
+
+    HTTP has no stream request id. A broker marker may be bound only once,
+    must advance the pre-request high-water mark, and cannot bridge an earlier
+    operation whose broker identity was unknown. Ambiguity retains the latch.
+    """
+    def __init__(self):
+        self.broker_id = self.baseline = self.key = None
+        self.unknown_prior = False
+        self.refused = self.terminal = self.finished = self.failed = False
+        self.wire_started_at_ns = self.response_status = None
+        self.result = None
+        self.retry_authorized = self.lookup_confirmed_retry = False
+        self.next_lookup_at = float("inf")
+
+    @property
+    def resolved(self):
+        return self.finished and (self.failed or self.refused or self.terminal or self.retry_authorized)
+
+
+class _CancelBook:
+    """Correlate observations at ingestion; never infer identity from current cid.
+
+    A request marker is the pair (broker order UUID, cancel_requested_at).
+    Uncorrelated observations still update the order ledger, but cannot resolve
+    an acknowledgement. Keys and consumed refusals survive operation completion.
+    """
+    def __init__(self):
+        self.current, self.keys, self.highwater, self.refusals = {}, {}, {}, set()
+        self.refusal_events = set()
+        self.counters = {"held_unattributed_refusals": 0, "lookup_confirmed_retries": 0}
+
+    def begin(self, cid):
+        previous = self.current.get(cid)
+        attempt = _CancelAttempt()
+        attempt.unknown_prior = previous is not None and (
+            previous.unknown_prior or previous.key is None)
+        attempt.lookup_confirmed_retry = previous is not None and previous.retry_authorized
+        self.current[cid] = attempt
+        return attempt
+
+    def before_request(self, attempt, order):
+        attempt.broker_id = order["id"]
+        attempt.baseline = max(self.highwater.get(order["id"], 0),
+                               order.get("cancel_requested_at_ns", 0))
+
+    def observe(self, order):
+        marker = order.get("cancel_requested_at_ns", 0)
+        key = (order["id"], marker)
+        if marker:
+            self.highwater[order["id"]] = max(marker, self.highwater.get(order["id"], 0))
+        if order.get("event") == "order_cancel_rejected" and marker:
+            # A set deduplicates even refusals arriving before their REST key.
+            self.refusals.add(key)
+            attempt = self.keys.get(key)
+            if attempt is not None:
+                attempt.refused = True
+        if order.get("event") == "order_cancel_rejected":
+            fingerprint = (key, order["updated_at_ns"], order["status"], order["filled_qty"])
+            if fingerprint not in self.refusal_events:
+                self.refusal_events.add(fingerprint)
+                if not marker or self.keys.get(key) is not self.current.get(order["client_order_id"]):
+                    self.counters["held_unattributed_refusals"] += 1
+        attempt = self.current.get(order["client_order_id"])
+        if (attempt is not None and attempt.broker_id == order["id"]
+                and order["status"] in TERMINAL):
+            attempt.terminal = True
+
+    def confirmed(self, attempt, order):
+        """Bind only the follow-up response belonging to this exact operation."""
+        marker = order.get("cancel_requested_at_ns", 0)
+        key = (order["id"], marker)
+        if (not attempt.unknown_prior and order["id"] == attempt.broker_id
+                and marker > attempt.baseline and key not in self.keys):
+            attempt.key = key
+            self.keys[key] = attempt
+            attempt.refused = key in self.refusals
+        attempt.result = order
+        attempt.terminal |= order["status"] in TERMINAL
+
+    def pending(self, cid):
+        attempt = self.current.get(cid)
+        return attempt is not None and not attempt.resolved
+
+
 class GuardedSession:
     """The SDK's sole HTTP boundary, including budget and response observation."""
 
@@ -906,6 +1003,7 @@ class GuardedSession:
         # asyncio.to_thread copies this context: canceling the awaiting task cannot
         # clear or overwrite the identity retained by an unfinished HTTP worker.
         self._cancel_context = ContextVar("cancel_expectation", default=None)
+        self._cancel_attempt = ContextVar("cancel_attempt", default=None)
 
     @property
     def _cancel_expectation(self):
@@ -921,14 +1019,16 @@ class GuardedSession:
     def withdraw_submission(self, client_id):
         self._envelopes.pop(client_id, None)
 
-    def announce_cancel(self, order_id, client_id):
+    def announce_cancel(self, order_id, client_id, attempt=None):
         try:
             self._cancel_expectation = (str(order_id).lower(), str(client_id))
         except Exception:
             self._cancel_expectation = None
+        self._cancel_attempt.set(attempt)
 
     def withdraw_cancel(self):
         self._cancel_expectation = None
+        self._cancel_attempt.set(None)
 
     def _cancel_client_id(self, path):
         """The announced client id when `path` is the announced DELETE, else None. Never
@@ -985,7 +1085,14 @@ class GuardedSession:
             else:
                 self.before_request(kind)
             kwargs.update(timeout=(5, 5), allow_redirects=False, verify=True, proxies={})
+            attempt = self._cancel_attempt.get() if kind == "cancel" and self._cancel_client_id(path) else None
+            if attempt is not None:
+                # Copied ContextVar binds this exact DELETE, after its budget
+                # wait, to the local identity. No key material/header is kept.
+                attempt.wire_started_at_ns = time.time_ns()
             response = self._session.request(method, url, **kwargs)
+            if attempt is not None:
+                attempt.response_status = response.status_code
             if self.observer:
                 headers = {key.lower(): value for key, value in response.headers.items()
                            if key.lower() in {"x-ratelimit-limit", "x-ratelimit-remaining",
@@ -1385,7 +1492,7 @@ class AlpacaPaperTransport:
         self._tasks = []
         self._operation_lock = asyncio.Lock()
         self._cancel_operations = {}
-        self._cancel_refusals = set()
+        self._cancel_book = _CancelBook()
         self._cancel_started = set()
         self._cancel_workers = {}
         self._cancel_executor = None
@@ -1655,11 +1762,13 @@ class AlpacaPaperTransport:
                               or (previous["status"] in TERMINAL and order["status"] not in TERMINAL))))
             if stale and not new_execution:
                 return previous
-        operation = getattr(self, "_cancel_operations", {}).get(cid)
-        if order.get("event") == "order_cancel_rejected" and operation is not None and not operation.done():
-            # Keep this refusal tied to this operation: its live lookup may
-            # still return a nonterminal order after the stream rejects DELETE.
-            self._cancel_refusals.add(operation)
+        book = getattr(self, "_cancel_book", None)
+        if book is not None:
+            book.observe(order)
+            if cid in book.current and not book.pending(cid):
+                pending = getattr(self, "overnight_cancel_pending", None)
+                if pending is not None:
+                    pending.discard(cid)
         await self._invoke(self.sink_observation, dict(order))
         if new_execution:
             self._executions.setdefault(cid, set()).add(execution)
@@ -1918,13 +2027,19 @@ class AlpacaPaperTransport:
         # Protocol fixtures may construct the transport without SDK startup.
         if not hasattr(self, "_cancel_operations"):
             self._cancel_operations = {}
-            self._cancel_refusals = set()
+            self._cancel_book = _CancelBook()
             self._cancel_started = set()
             self._cancel_workers = {}
             self._cancel_executor = None
         task = self._cancel_operations.get(client_order_id)
         if task is None:
-            task = asyncio.create_task(self._cancel_owned(client_order_id))
+            previous = self._cancel_book.current.get(client_order_id)
+            if previous is not None and previous.finished and not previous.resolved:
+                # A completed HTTP204 worker is still a broker-pending cancel.
+                # Even a direct adapter caller cannot turn an old event into C.
+                return previous.result
+            attempt = self._cancel_book.begin(client_order_id)
+            task = asyncio.create_task(self._cancel_owned(client_order_id, attempt))
             self._cancel_operations[client_order_id] = task
 
             def completed(operation):
@@ -1933,15 +2048,21 @@ class AlpacaPaperTransport:
                 self._cancel_started.discard(client_order_id)
                 pending = getattr(self, "overnight_cancel_pending", None)
                 failed = operation.cancelled() or operation.exception() is not None
-                refused = operation in self._cancel_refusals
-                self._cancel_refusals.discard(operation)
+                # A lookup failure is not evidence that an acknowledged DELETE
+                # was refused. Ambiguous wire failures retain ownership too.
+                attempt.failed = failed and (attempt.wire_started_at_ns is None
+                    or attempt.response_status in (400, 401, 403, 404, 422))
+                attempt.finished = True
+                attempt.next_lookup_at = getattr(self, "_cancel_clock", time.monotonic)() + CANCEL_RECONCILE_INTERVAL_SECONDS
+                if attempt.lookup_confirmed_retry and attempt.wire_started_at_ns is not None:
+                    self._cancel_book.counters["lookup_confirmed_retries"] += 1
                 # HTTP204 finishes the local worker, not broker cancellation.
                 # Keep an acknowledged live order pending until an observation
                 # confirms terminal state; explicit failures permit a retry.
-                resolved = failed or refused or operation.result()["status"] in (
-                    "canceled", "filled", "expired", "rejected")
-                if pending is not None and resolved:
+                if pending is not None and attempt.resolved:
                     pending.discard(client_order_id)
+                if not attempt.resolved:
+                    self._arm_cancel_monitor()
 
             task.add_done_callback(completed)
         return await asyncio.shield(task)
@@ -1950,7 +2071,101 @@ class AlpacaPaperTransport:
         operation = getattr(self, "_cancel_operations", {}).get(client_order_id)
         return operation is not None and not operation.done()
 
-    async def _cancel_owned(self, client_order_id):
+    def cancel_pending(self, client_order_id):
+        """Includes a completed HTTP204 with no correlated broker resolution."""
+        book = getattr(self, "_cancel_book", None)
+        return self.cancel_in_flight(client_order_id) or (
+            book is not None and book.pending(client_order_id))
+
+    def cancellation_counters(self):
+        book = getattr(self, "_cancel_book", None)
+        return dict(book.counters) if book is not None else {
+            "held_unattributed_refusals": 0, "lookup_confirmed_retries": 0}
+
+    def _arm_cancel_monitor(self):
+        """Every held cancellation has an owner even when caller ticks stop."""
+        task = getattr(self, "_cancel_monitor", None)
+        if not self._stopping and (task is None or task.done()):
+            self._cancel_monitor = asyncio.create_task(self._monitor_pending_cancels())
+            self._tasks.append(self._cancel_monitor)
+
+    async def _monitor_pending_cancels(self):
+        while not self._stopping:
+            for cid, attempt in list(self._cancel_book.current.items()):
+                if attempt.finished and not attempt.resolved:
+                    self.refresh_pending_cancel(cid)
+            await asyncio.sleep(.05)
+
+    async def _retry_confirmed_cancel(self, client_order_id):
+        # This is an already-authorized cancellation, not a new order. The
+        # ordinary cancel() registry, SDK budget and wire guard remain in use.
+        try:
+            await self.cancel(client_order_id)
+        except Exception:
+            # cancel() retains ambiguous ownership; definitive failures release
+            # through its completion callback. No blind per-tick retry here.
+            pass
+
+    def refresh_pending_cancel(self, client_order_id):
+        """Schedule a bounded REST reconciliation; never block the owner tick.
+
+        Raw refusals do not grant a retry. A fresh independent lookup may grant
+        one, at most once per five-second bound, unless it says pending_cancel.
+        The same transport operation registry owns lookup and DELETE lifetimes.
+        """
+        book = getattr(self, "_cancel_book", None)
+        attempt = None if book is None else book.current.get(client_order_id)
+        now = getattr(self, "_cancel_clock", time.monotonic)()
+        if (getattr(self, "_stopping", False) or attempt is None or attempt.resolved
+                or self.cancel_in_flight(client_order_id) or now < attempt.next_lookup_at):
+            return
+        attempt.next_lookup_at = now + CANCEL_RECONCILE_INTERVAL_SECONDS
+        task = asyncio.create_task(self._reconcile_cancel_owned(client_order_id, attempt))
+        self._cancel_operations[client_order_id] = task
+
+        def completed(operation):
+            if self._cancel_operations.get(client_order_id) is operation:
+                self._cancel_operations.pop(client_order_id)
+            self._cancel_started.discard(client_order_id)
+            attempt.next_lookup_at = getattr(self, "_cancel_clock", time.monotonic)() + CANCEL_RECONCILE_INTERVAL_SECONDS
+            if not operation.cancelled():
+                operation.exception()  # Retrieve errors; a failed lookup keeps holding.
+            pending = getattr(self, "overnight_cancel_pending", None)
+            if book.current.get(client_order_id) is attempt and attempt.resolved:
+                if attempt.retry_authorized and not self._stopping:
+                    if pending is not None:
+                        pending.add(client_order_id)
+                    # Retain the latch through this handover. Callers sharing
+                    # cancel() join the same new operation; no second DELETE.
+                    retry = asyncio.create_task(self._retry_confirmed_cancel(client_order_id))
+                    self._tasks.append(retry)
+                elif pending is not None:
+                    pending.discard(client_order_id)
+
+        task.add_done_callback(completed)
+
+    async def _reconcile_cancel_owned(self, client_order_id, attempt):
+        async with self._operation_lock:
+            if self._stopping:
+                return attempt.result
+            self._cancel_started.add(client_order_id)
+            try:
+                final = await self._lookup(client_order_id)
+            except Exception:
+                self.freeze_health("cancel_finality_unobserved")
+                raise
+            if final is None:
+                self.freeze_health("cancel_finality_unobserved")
+                return None
+            self._assert_matches(final, self._intents[client_order_id])
+            attempt.result = final
+            if final["status"] in TERMINAL:
+                attempt.terminal = True
+            elif final["status"] != "pending_cancel":
+                attempt.retry_authorized = True  # consumed by exactly one begin()
+            return final
+
+    async def _cancel_owned(self, client_order_id, attempt):
         """Send the broker DELETE for an owned order and return its queried final state.
 
         The caller asks to cancel an order it believes open or whose state is
@@ -1977,11 +2192,12 @@ class AlpacaPaperTransport:
                     self.freeze_health("cancel_identity_unobserved")
                     raise TransportError("cancel_identity_unobserved")
             self._assert_matches(order, self._intents[client_order_id])
+            self._cancel_book.before_request(attempt, order)
             answer = 204
             try:
                 if getattr(self, "_stopping", False):
                     raise TransportError("transport stopping")
-                self._client._session.announce_cancel(order["id"], client_order_id)
+                self._client._session.announce_cancel(order["id"], client_order_id, attempt)
                 if self._cancel_executor is None:
                     self._cancel_executor = ThreadPoolExecutor(
                         max_workers=1, thread_name_prefix="paper-cancel")
@@ -1999,11 +2215,16 @@ class AlpacaPaperTransport:
                 self._client._session.withdraw_cancel()
                 self._cancel_workers.pop(client_order_id, None)
             # A successful DELETE is only an acknowledgement; query cumulative state.
-            final = await self._lookup(client_order_id)
+            try:
+                final = await self._lookup(client_order_id)
+            except Exception:
+                self.freeze_health("cancel_finality_unobserved")
+                raise
             if final is None:
                 self.freeze_health("cancel_finality_unobserved")
                 raise TransportError("cancel_finality_unobserved")
-            elif answer != 204 and final["status"] not in TERMINAL:
+            self._cancel_book.confirmed(attempt, final)
+            if answer != 204 and final["status"] not in TERMINAL:
                 # A refusal for an order that is still working is not resolved data.
                 self.freeze_health("cancellation_unresolved")
                 raise TransportError("cancellation_unresolved")
@@ -2104,6 +2325,20 @@ class AlpacaPaperTransport:
                 raise TransportError("snapshot incomplete; admissions remain frozen") from None
 
     async def stop(self):
+        # A recover() deadline or a second caller cancels only its own wait.
+        # Retain one teardown owner, and do not return while its SDK thread or
+        # final lookup still owns the session/account. The SDK bounds its calls.
+        task = getattr(self, "_stop_task", None)
+        if task is None:
+            task = self._stop_task = asyncio.create_task(self._stop_owned())
+        while True:
+            try:
+                return await asyncio.shield(task)
+            except asyncio.CancelledError:
+                if task.done():
+                    return task.result()
+
+    async def _stop_owned(self):
         if self._terminal_stream_health is None:
             self._terminal_stream_health = self.stream_health()
         self._stopping = True

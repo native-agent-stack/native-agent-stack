@@ -1146,6 +1146,9 @@ class Controller:
             force |= now >= window["flatten_at"]
             if (intent is not None and intent.side == "buy"
                     and (self.is_halted(intent.symbol) or now >= window["flatten_at"])):
+                refresh = getattr(self.port, "refresh_pending_cancel", None)
+                if cid in self._overnight_cancel_pending and callable(refresh):
+                    refresh(cid)
                 if cid not in self._overnight_cancel_pending and cid not in self._overnight_cancel_tasks:
                     self._overnight_cancel_pending.add(cid)
                     reason = "halt" if self.is_halted(intent.symbol) else "carry_cutoff"
@@ -1172,7 +1175,11 @@ class Controller:
             self._overnight_cancel_tasks.pop(cid, None)
 
     def _release_overnight_cancel(self, cid):
-        live = getattr(self.port, "cancel_in_flight", None)
+        # The transport owns refusal correlation and the acknowledged latch,
+        # including after its worker finishes. Raw replayed events have no say.
+        live = getattr(self.port, "cancel_pending", None)
+        if not callable(live):
+            live = getattr(self.port, "cancel_in_flight", None)
         if not callable(live) or not live(cid):
             self._overnight_cancel_pending.discard(cid)
 
@@ -2308,7 +2315,9 @@ def _stream_health(port):
     """The native transport's terminal stream view (transport.AlpacaPaperTransport.stream_health: frozen,
     reasons, fresh_quotes, data_timeout_seconds); None for a port without one (simulation and test ports)."""
     reader = getattr(port, "stream_health", None)
-    return reader() if callable(reader) else None
+    result = reader() if callable(reader) else None
+    counters = getattr(port, "cancellation_counters", None)
+    return {**result, **counters()} if result is not None and callable(counters) else result
 
 
 def _run_native_status(reconciliation, session_errors, native_fills, outcome, session_policy, now):

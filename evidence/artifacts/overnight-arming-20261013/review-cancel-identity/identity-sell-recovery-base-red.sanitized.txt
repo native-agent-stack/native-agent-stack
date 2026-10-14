@@ -1,0 +1,50 @@
+test_held_recovery_cancel_releases_on_terminal_lookup_without_second_delete (tests.test_adaptive_paper_cancel_liveness.CancelLiveness.test_held_recovery_cancel_releases_on_terminal_lookup_without_second_delete) ... FAIL
+test_held_sell_cancel_at_cutoff_retries_once_then_recovery_reaches_flat (tests.test_adaptive_paper_cancel_liveness.CancelLiveness.test_held_sell_cancel_at_cutoff_retries_once_then_recovery_reaches_flat) ... FAIL
+
+======================================================================
+FAIL: test_held_recovery_cancel_releases_on_terminal_lookup_without_second_delete (tests.test_adaptive_paper_cancel_liveness.CancelLiveness.test_held_recovery_cancel_releases_on_terminal_lookup_without_second_delete)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_liveness.py", line 43, in test_held_recovery_cancel_releases_on_terminal_lookup_without_second_delete
+    self._exercise(recovery_first=True)
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_liveness.py", line 229, in _exercise
+    asyncio.run(exercise())
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_liveness.py", line 183, in exercise
+    self.assertTrue(pending('exit') if callable(pending) else 'exit' in c._overnight_cancel_pending,
+AssertionError: False is not true : a held SELL/recovery cancel must retain broker pending ownership
+
+======================================================================
+FAIL: test_held_sell_cancel_at_cutoff_retries_once_then_recovery_reaches_flat (tests.test_adaptive_paper_cancel_liveness.CancelLiveness.test_held_sell_cancel_at_cutoff_retries_once_then_recovery_reaches_flat)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_liveness.py", line 40, in test_held_sell_cancel_at_cutoff_retries_once_then_recovery_reaches_flat
+    self._exercise(recovery_first=False)
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_liveness.py", line 229, in _exercise
+    asyncio.run(exercise())
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_liveness.py", line 183, in exercise
+    self.assertTrue(pending('exit') if callable(pending) else 'exit' in c._overnight_cancel_pending,
+AssertionError: False is not true : a held SELL/recovery cancel must retain broker pending ownership
+
+----------------------------------------------------------------------
+Ran 2 tests in 8.898s
+
+FAILED (failures=2)
+ASSERTION_FAILURES 2 ERRORS 0 SKIPS 0
