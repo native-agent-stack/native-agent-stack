@@ -21,6 +21,9 @@ REVIEWED_RECEIPT_PIN = "c945ea1f011e4c7e69a0b5f19052717b2af9d46e"
 # reviewed union plus exactly these paths, every other path stays refused, and nothing here is a wildcard or is derived from the
 # evidence manifest.
 POST_PIN_RECEIPT_GRANTS = {
+    "evidence/receipts/stream-integrity-followups-20261014.json":
+        "#1119, CI run 38644302759 at 14dc9940; CC exact-grant direction 2026-10-14: "
+        "proposal names this registered receipt; the Architecture build refused it without this grant",
     "evidence/receipts/harbor-smoke-20261012.json":
         "#1047, GPT read of 1f5413b6 (P2): the new registered receipt; the Architecture build refused it without this grant",
     "evidence/artifacts/harbor-0240-currency-20261009/receipt.json":

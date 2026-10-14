@@ -13538,7 +13538,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "acc8528d7ed94d778213601eef51619d6d1114fa6e37b237ea6c38b2018fbcba",
+      "sha256": "884913bdd196b59ca084723f270984221092e27562c1c71d7f4df7e41810dade",
       "bytes": 10362
     },
     {
@@ -62738,8 +62738,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_stream_followups.py",
-      "sha256": "6094d1c3efa2e5f3935f1869dff74b77fda410ca91c7b64d8450dc9ab127833c",
-      "bytes": 14904
+      "sha256": "d0c89d5b899e594b1b23eb0e4e9d736eec307e859d3935ef532bac903c560ce5",
+      "bytes": 15183
     },
     {
       "path": "tests/test_adaptive_paper_transport.py",
@@ -63453,8 +63453,8 @@
     },
     {
       "path": "tests/test_local_pages_policy_grants.py",
-      "sha256": "5821eae4b5f34f8ed3d407d7e2460091aacf84d9e9a593e3c407a4607f44e732",
-      "bytes": 27271
+      "sha256": "d01e30c83f6507bfdcb5b49358451bcbd8b770c9a69b175bdb371241f100b815",
+      "bytes": 27528
     },
     {
       "path": "tests/test_managed_block.py",
@@ -64638,8 +64638,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "c1406979770796d405533a2ef4cc95b570d17634313fcfec19cca05e72a34dda",
-      "bytes": 763446
+      "sha256": "c0a3b27807acaf179a86563285ff762107d60ad7c5441364f1f7367690f31dfc",
+      "bytes": 763564
     },
     {
       "path": "tools/muse_file_fence.py",

@@ -22,6 +22,14 @@ import transport
 from safety import Ledger, Quote, RiskLimits
 from tests.adaptive_paper_hermetic import patch_default_stop, restore_default_stop
 
+try:
+    import nautilus_trader
+    import alpaca
+    import msgpack
+    NATIVE = True
+except ImportError:
+    NATIVE = False
+
 _hermetic=None
 def setUpModule():
     global _hermetic
@@ -160,6 +168,7 @@ class StreamFollowups(unittest.TestCase):
         self.assertEqual(len(result.failures),1)
         self.assertEqual(result.errors,[])
 
+    @unittest.skipUnless(NATIVE, "requires pinned combined native runtime")
     def test_integrity_loss_with_held_position_hands_off_before_refused_exits(self):
         result=integrity_handoff_probe()
         self.assertLessEqual(result['handoff_at']-result['freeze_at'],.1,result)
@@ -221,6 +230,7 @@ class StreamFollowupsAsync(unittest.IsolatedAsyncioTestCase):
             finally:
                 consumer.cancel();await asyncio.gather(consumer,return_exceptions=True)
 
+    @unittest.skipUnless(NATIVE, "requires pinned combined native runtime")
     async def test_sdk_batch_stops_after_one_integrity_loss_deadline(self):
         import msgpack
         from alpaca.data.live.websocket import DataStream
