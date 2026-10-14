@@ -56,9 +56,10 @@ class FillFirstSlotTests(unittest.TestCase):
         spec.loader.exec_module(mod)
         return mod
 
-    def launch(self, slot_outcomes, health_rows=None):
+    def launch(self, slot_outcomes, health_rows=None, ends=None):
         """A pi-claude print launch whose runtime writes, per slot, a credit refusal, another refusal or a completed
-        turn. Returns (exit, receipt, runtime calls)."""
+        turn, then ends with status `ends[slot]` (0 when absent; "watchdog" raises the outer subprocess timeout).
+        Returns (exit, receipt, runtime calls)."""
         real_module = profiles.module
         rows = health_rows or {}
 
@@ -83,6 +84,10 @@ class FillFirstSlotTests(unittest.TestCase):
                     calls.append(slot)
                     outcome = slot_outcomes.get(slot, "ok")
                     pi_events(kwargs["stdout"], error=None if outcome == "ok" else outcome, tokens=12 if outcome == "ok" else 0)
+                    end = (ends or {}).get(slot, 0)
+                    if end == "watchdog":
+                        raise subprocess.TimeoutExpired(command, kwargs["timeout"])
+                    return subprocess.CompletedProcess(command, end)
                 return subprocess.CompletedProcess(command, 0)
 
             with mock.patch.object(profiles, "module", side_effect=lambda name, path: Health if "key_health" in name
@@ -111,6 +116,35 @@ class FillFirstSlotTests(unittest.TestCase):
         code, receipt, calls = self.launch({order[0]: CREDIT_400, order[1]: CREDIT_400.replace("400 ", "402 ", 1)})
         self.assertEqual(calls, [order[0], order[1], order[2]])
         self.assertEqual(receipt["credential_loader_id"], order[2])
+
+    def test_the_last_exhausted_slot_is_recorded_when_no_slot_follows(self):
+        # With no successor the last refused run's receipt stands, and it still names its own slot as refused.
+        order = list(self.worker().DEFAULT_KEYS)
+        code, receipt, calls = self.launch({slot: CREDIT_400 for slot in order})
+        self.assertEqual(calls, order)
+        self.assertEqual([row["credential_loader_id"] for row in receipt["credit_refused_slots"]], order)
+        self.assertEqual(receipt["credential_loader_id"], order[-1])
+        only_first = {slot: {"id": slot, "state": "missing"} for slot in order[1:]}
+        code, receipt, calls = self.launch({order[0]: CREDIT_400}, only_first)
+        self.assertEqual(calls, [order[0]])
+        self.assertEqual([row["credential_loader_id"] for row in receipt["credit_refused_slots"]], [order[0]])
+
+    def test_a_timed_out_or_signalled_attempt_never_moves_to_another_slot(self):
+        # A credit refusal already flushed to the log authorizes nothing once the attempt itself was cut short: the
+        # outer watchdog, timeout's 124 and 137, the credential runner's 128+N, a signal on the direct child.
+        order = self.worker().DEFAULT_KEYS
+        for end, status in (("watchdog", 124), (124, 124), (137, 137), (143, 143), (-15, -15)):
+            with self.subTest(end=end):
+                code, receipt, calls = self.launch({order[0]: CREDIT_400}, ends={order[0]: end})
+                self.assertEqual(calls, [order[0]])
+                self.assertEqual((code, receipt["runtime_exit_code"]), (status, status))
+                self.assertEqual(receipt["credential_loader_id"], order[0])
+                self.assertEqual(receipt["credit_refused_slots"], [])
+        # A native refusal that ended on its own still moves on: Pi exits 0, OpenCode 1.
+        for end in (0, 1):
+            with self.subTest(end=end):
+                code, receipt, calls = self.launch({order[0]: CREDIT_400}, ends={order[0]: end})
+                self.assertEqual(calls, [order[0], order[1]])
 
     def test_any_other_refusal_ends_the_run_on_its_slot(self):
         order = self.worker().DEFAULT_KEYS

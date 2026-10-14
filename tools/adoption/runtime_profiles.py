@@ -616,9 +616,18 @@ def choose_slot(after: str | None = None) -> str:
 
 
 def first_call_refusal(log: Path, runtime: str) -> tuple[int | None, str] | None:
-    """(status, text) of the run's first model call when it was refused before any billed output, else None. Pi records
-    the refusal as an assistant message_end with stopReason "error" and errorMessage "<status> <body>"; OpenCode emits an
-    error event. Any completed step with usage first means the run was billed, so nothing is retried."""
+    """(status, text) of the run's first model call when it was refused before any billed output, else None.
+
+    Pi 1.1.0 (earendil-works/pi@04566631): a refused request ends the stream with stopReason "error" and errorMessage
+    set to the SDK error's message (packages/ai/src/api/anthropic-messages.ts:893-895), on an assistant message whose
+    usage starts at zero (:589-596); the agent loop emits it as message_end (packages/agent/src/agent-loop.ts:443-455)
+    and print mode writes each event as a JSON line (packages/coding-agent/src/modes/print-mode.ts:108-112).
+    That message is "<status> <body>": @anthropic-ai/sdk 0.129.0 (pinned at packages/ai/package.json:70),
+    src/core/error.ts:40-50.
+    OpenCode 1.18.35 (anomalyco/opencode@53d1eabb): `run --format json` emits step_finish for each finished step
+    (packages/opencode/src/cli/cmd/run.ts:750) and an error event carrying the session error (:789), which for a
+    provider refusal is {name, data: {statusCode, ...}} (packages/opencode/src/session/message-v2.ts:707-717,
+    packages/core/src/util/error.ts:55-60). Any completed step first means the run was billed, so nothing is retried."""
     for line in log.read_text().split("\n"):
         try:
             event = json.loads(line)
@@ -656,6 +665,15 @@ def credit_refused(log: Path, runtime: str) -> bool:
     """True when the run's first call was refused as credit-exhausted, by the review worker's own classifier."""
     refusal = first_call_refusal(log, runtime)
     return refusal is not None and review_worker().credit_exhausted(*refusal)
+
+
+def cut_short(exit_code: int) -> bool:
+    """True when the attempt did not end on its own, so nothing in its log authorizes another slot: timeout's statuses
+    (124 timed out, 125 timeout failed, 126 and 127 command not run, 137 killed; the installed `timeout --help`, "Exit
+    status"), the credential runner's 128+N for a command that died of a signal (tools/credentials/credential_run.py,
+    "Exit status"), or subprocess's negative status for a signal. A native refusal ends on its own below those: Pi exits
+    0, OpenCode 1 (anomalyco/opencode@53d1eabb:packages/opencode/src/cli/cmd/run.ts:842)."""
+    return exit_code < 0 or exit_code >= 124
 
 
 def inference_facts(log: Path, runtime: str):
@@ -1034,13 +1052,15 @@ def launch(args):
                     exit_code = result.returncode
                 except subprocess.TimeoutExpired:
                     exit_code = 124
-            if route != "claude" or not credit_refused(log, runtime):
+            # A timed-out or signalled attempt keeps its own receipt and exit status, whatever its log holds: only an
+            # attempt that ended on its own with a credit refusal moves the run to another slot.
+            if route != "claude" or cut_short(exit_code) or not credit_refused(log, runtime):
                 break
+            refused_slots.append({"credential_loader_id": slot, "reason": "credit_exhausted", "run": run.name})
             try:
                 following = choose_slot(after=slot)
             except ProfileError:
-                break  # no slot left: the refused run's receipt stands
-            refused_slots.append({"credential_loader_id": slot, "reason": "credit_exhausted", "run": run.name})
+                break  # no slot left: the last refused run's receipt stands, with its own slot recorded above
             slot, command = following, loaded(following)
         # Use the existing adapter API directly: the general tracker CLI also
         # visits Claude/Codex native stores, which this isolated run need not.
