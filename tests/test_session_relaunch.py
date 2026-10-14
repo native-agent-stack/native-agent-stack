@@ -151,7 +151,8 @@ class Snapshot(Fixture):
 
     def test_the_minute_snapshot_carries_the_unrelaunched_rows_while_a_relaunch_runs(self):
         self.crash_roster()
-        with mock.patch.object(R, "open_tab", side_effect=Interrupted), self.assertRaises(Interrupted):
+        # Stopped before its first call (a call stopped in flight stays unresolved: test_a_run_stopped_during_a_tab_call_...).
+        with mock.patch.object(R, "listed", side_effect=Interrupted), self.assertRaises(Interrupted):
             R.cmd_relaunch(self.config, boot_id=THIS, at=NOW, boots=BOOTS, dry_run=False)
         self.agents.write_text(json.dumps([row("api-actions", "s-new")]))
         self.assertEqual(self.main("snapshot", boot=THIS), 0)
@@ -282,7 +283,8 @@ class Relaunch(Fixture):
 
     def test_a_run_stopped_before_its_first_tab_is_rerun_with_the_same_handoff(self):
         self.crash_roster()
-        with mock.patch.object(R, "open_tab", side_effect=Interrupted), self.assertRaises(Interrupted):
+        # Stopped at the live-list read before the first call: no call was recorded, so nothing is unresolved.
+        with mock.patch.object(R, "listed", side_effect=Interrupted), self.assertRaises(Interrupted):
             self.run_relaunch()
         self.assertEqual(self.state()["status"], "in_progress")
         self.assertEqual(set(self.outcomes().values()), {"pending"})
@@ -388,6 +390,62 @@ class Relaunch(Fixture):
         self.assertEqual(len(self.ps_calls()), 1)
         self.assertEqual((self.outcomes(), self.state()["status"]), ({"trading-cc": "unconfirmed"}, "partial"))
 
+    def test_a_rerun_does_not_reopen_a_tab_start_it_could_not_confirm(self):
+        # The CC micro at 376f2bb9, F1 (P1): a rerun reset an unconfirmed or uncertain session to pending and opened a second
+        # tab, while the first `claude -n` could still register. Such a call stays unresolved until the CC reopens it by name.
+        for launch, rc, timeout, outcome in (("0", "0", 30, "unconfirmed"), ("0", "1", 1, "uncertain")):
+            with self.subTest(outcome=outcome):
+                self.setUp()
+                self.crash_roster([row("trading-cc", "s")])
+                self.config.update(tab_timeout_s=timeout)
+                with mock.patch.dict(os.environ, {"FAKE_PS_LAUNCH": launch, "FAKE_PS_RC": rc, "FAKE_PS_SLEEP": "2" if timeout == 1 else "0"}):
+                    self.run_relaunch()
+                    self.assertEqual((self.outcomes(), len(self.ps_calls())), ({"trading-cc": outcome}, 1))
+                    self.run_relaunch(at=NOW + dt.timedelta(minutes=5))
+                self.assertEqual(len(self.ps_calls()), 1)
+                self.assertEqual((self.outcomes(), self.state()["status"]), ({"trading-cc": outcome}, "partial"))
+                with mock.patch.dict(os.environ, {"FAKE_PS_LAUNCH": "1", "FAKE_PS_RC": "0"}):
+                    R.cmd_relaunch(self.config, boot_id=THIS, at=NOW + dt.timedelta(minutes=10), boots=BOOTS, dry_run=False,
+                                   reopen={"trading-cc"})
+                self.assertEqual(len(self.ps_calls()), 2)
+                self.assertEqual((self.outcomes(), self.state()["status"]), ({"trading-cc": "running"}, "complete"))
+                self.assertEqual(self.state()["runs"][-1]["reopened"], ["trading-cc"])
+
+    def test_a_run_stopped_during_a_tab_call_leaves_it_unresolved(self):
+        # F1, second path: TimeoutStartSec stops a run inside a call. The call is recorded before it is made, so the rerun
+        # sees it in flight and does not open the session again.
+        self.crash_roster([row("trading-cc", "s"), row("ns2604-coop", "t")])
+        with mock.patch.object(R, "open_tab", side_effect=Interrupted), self.assertRaises(Interrupted):
+            self.run_relaunch()
+        self.assertEqual(self.state()["sessions"][0]["attempts"][-1]["result"], "in_flight")
+        self.run_relaunch(at=NOW + dt.timedelta(minutes=5))
+        self.assertEqual([c[c.index("-Name") + 1] for c in self.ps_calls()], ["coop"])
+        self.assertEqual(self.outcomes(), {"trading-cc": "uncertain", "ns2604-coop": "running"})
+        self.assertEqual(self.state()["status"], "partial")
+
+    def test_an_unreadable_live_list_before_the_first_call_opens_nothing(self):
+        # The CC micro at 376f2bb9, F2 (P1): a failed pre-open query on attempt 0 went on to open a tab.
+        self.crash_roster([row("trading-cc", "s")])
+        with mock.patch.object(R, "listed", return_value=None):
+            self.run_relaunch()
+        self.assertEqual(self.ps_calls(), [])
+        self.assertEqual((self.outcomes(), self.state()["status"]), ({"trading-cc": "skipped"}, "partial"))
+        self.assertEqual(self.state()["sessions"][0]["attempts"], [])
+        self.run_relaunch(at=NOW + dt.timedelta(minutes=5))  # no call was made, so a rerun may open it
+        self.assertEqual((len(self.ps_calls()), self.outcomes()), (1, {"trading-cc": "running"}))
+
+    def test_two_roster_rows_of_one_name_get_one_turn(self):
+        # The CC micro at 376f2bb9, F3: plan() kept every row, so two rows of one name got two turns.
+        self.crash_roster([row("wsl-architecture-design", "sid-cc"), row("wsl-architecture-design", "sid-cc-2"),
+                           row("trading-cc", "s")])
+        decided = R.plan(self.config, boot_id=THIS, at=NOW, boots=BOOTS, alive_rows=[])
+        self.assertEqual([r["sessionId"] for r, _ in decided["launch"]], ["sid-cc", "s"])
+        self.assertEqual([r["sessionId"] for r in decided["left"]], ["sid-cc-2"])
+        self.run_relaunch()
+        self.assertEqual([c[c.index("-Name") + 1] for c in self.ps_calls()], ["cc", "trading-cc"])
+        text = Path(self.state()["handoff"]).read_text()
+        self.assertIn("wsl-architecture-design (interactive, a second row of a name relaunched above)", text)
+
     def test_the_handoff_names_the_stop_the_sessions_and_the_rest(self):
         self.crash_roster()
         text = self.run_relaunch(dry_run=True)["handoff_text"]
@@ -453,6 +511,16 @@ class CommandLine(Fixture):
         doc = json.loads(Path(done.stdout.strip()).read_text())
         self.assertEqual(doc["boot_id"], R.current_boot_id())
 
+    def test_a_missing_journal_entry_or_an_unreadable_state_exits_nonzero(self):
+        # The CC micro at 376f2bb9, F4: both skips exited 0, so the unit did not fail and nothing alerted.
+        self.crash_roster()
+        with mock.patch.object(R, "read_boots", return_value=[BOOTS[1]]):
+            self.assertEqual(self.main("relaunch", boot=THIS), 1)
+        R.marker(self.config, "relaunch", PREV).write_text("{not json")
+        with mock.patch.object(R, "read_boots", return_value=BOOTS):
+            self.assertEqual(self.main("relaunch", boot=THIS), 1)
+        self.assertEqual(self.ps_calls(), [])
+
     def test_a_config_without_a_required_key_is_refused(self):
         path = self.write_config({"state_dir": str(self.tmp)})
         with self.assertRaises(SystemExit):
@@ -516,10 +584,25 @@ class Units(unittest.TestCase):
         self.assertLess(60 + 10, json.loads((ROOT / "tools" / "session-relaunch" / "config.example.json").read_text())[
             "max_roster_age_s"])
 
+    def test_a_failed_relaunch_run_alerts(self):
+        # The CC micro at 376f2bb9, F4: the only alert was a failed unit. OnFailure= runs the command center's stack-alert@
+        # template, as adoption/templates/systemd/mineru.service does (systemd.unit(5), OnFailure=).
+        relaunch = (ROOT / "tools" / "session-relaunch" / "units" / "ns-session-relaunch.service").read_text()
+        unit_section = relaunch.split("[Unit]", 1)[1].split("[Service]", 1)[0]
+        self.assertIn("OnFailure=stack-alert@%n.service", unit_section)
+
     def test_the_readme_runs_every_installed_command_through_python(self):
         readme = (ROOT / "tools" / "session-relaunch" / "README.md").read_text()
         self.assertIn('/usr/bin/python3 -I "$T/session_relaunch.py" plan-restart --config "$S/config.json"', readme)
+        self.assertIn('/usr/bin/python3 -I "$T/session_relaunch.py" relaunch --reopen <name> --config "$S/config.json"', readme)
         self.assertNotIn("`session_relaunch.py plan-restart", readme)
+
+    def test_the_evidence_readme_states_the_module_test_count(self):
+        # The CC micro at 376f2bb9, F4: the evidence README said 22 tests after the module had grown to 38.
+        loader = unittest.TestLoader()
+        count = loader.loadTestsFromModule(sys.modules[__name__]).countTestCases()
+        evidence = (ROOT / "evidence" / "artifacts" / "session-relaunch-20261014" / "README.md").read_text()
+        self.assertIn(f"`python3 -m unittest tests.test_session_relaunch` ({count} tests;", evidence)
 
 
 if __name__ == "__main__":

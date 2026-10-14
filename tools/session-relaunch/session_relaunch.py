@@ -242,9 +242,11 @@ def handoff_text(config: dict, *, at: dt.datetime, prev: dict, prev_end: dt.date
         "- The sessions in the table below start after you and send you READY by name.",
     ]
     if left:
+        launched = {row.get("name") for row, _ in launch}
         lines.append("- Not relaunched (no launcher profile, or already running); your call:")
         for row in left:
-            why = "already running" if row.get("name") in alive else "no launcher profile"
+            why = ("already running" if row.get("name") in alive else
+                   "a second row of a name relaunched above" if row.get("name") in launched else "no launcher profile")
             lines.append(f"  - {row.get('name')} ({row.get('kind')}, {why}): cwd {row.get('cwd')}; "
                          f"resume with `claude --resume {row.get('sessionId')}`")
     lines += [
@@ -311,11 +313,19 @@ def wait_for(config: dict, name: str, deadline_s: float) -> bool:
         time.sleep(config["poll_s"])
 
 
+def unresolved(entry: dict) -> bool:
+    """A tab start of this session may have been issued and was never seen listed: an unconfirmed or uncertain outcome,
+    or a call recorded in flight (the run stopped inside it). Only an explicit `--reopen <name>` opens it again."""
+    attempts = entry.get("attempts") or []
+    return entry.get("outcome") in ("unconfirmed", "uncertain") or bool(attempts and attempts[-1].get("result") == "in_flight")
+
+
 def relaunch_one(config: dict, profile: dict, handoff: Path, entry: dict, save) -> str:
-    """Open one session's tab and return its outcome. The live list is read before every call. An opened or timed-out
-    call is never repeated: the session is waited for (cc_wait_s for the command center, settle_s for the rest) and is
-    running, unconfirmed (opened, not listed) or uncertain (timed out, not listed). Only a definite failure is retried,
-    up to tab_attempts calls, and not when the live list cannot be read before the retry."""
+    """Open one session's tab and return its outcome. The live list is read before every call, and a call is opened
+    only when that read lists the session as absent: an unreadable list skips the session (skipped, nothing opened).
+    Each call is recorded in flight before it is made. An opened or timed-out call is never repeated: the session is
+    waited for (cc_wait_s for the command center, settle_s for the rest) and is running, unconfirmed (opened, not
+    listed) or uncertain (timed out, not listed). Only a definite failure is retried, up to tab_attempts calls."""
     name = profile["session_name"]
     settle_s = config["cc_wait_s"] if name == config["cc_session_name"] else config["settle_s"]
     for attempt in range(config["tab_attempts"]):
@@ -324,10 +334,12 @@ def relaunch_one(config: dict, profile: dict, handoff: Path, entry: dict, save) 
         live = listed(config, name)
         if live:
             return "running"
-        if live is None and attempt:
-            return "uncertain"
+        if live is None:
+            return "skipped"
+        entry["attempts"].append({"at": iso(now_utc()), "result": "in_flight"})
+        save()
         result = open_tab(config, profile, handoff)
-        entry["attempts"].append(result)
+        entry["attempts"][-1] = result
         save()
         if result["result"] != "failed":
             if wait_for(config, name, settle_s):
@@ -353,13 +365,12 @@ def plan(config: dict, *, boot_id: str, at: dt.datetime, boots: list[dict], aliv
     if status == "complete":
         return {"action": "none", "reason": f"boot {prev_boot} was already relaunched", "prev_boot": prev_boot}
     if status not in (None, "in_progress", "partial"):
-        return {"action": "none", "reason": f"the relaunch state {state_path} is unreadable", "prev_boot": prev_boot}
+        return refuse(f"the relaunch state {state_path} is unreadable", prev_boot=prev_boot)
     _, prev_end = boot_window(boots, prev_boot)
     this_start, _ = boot_window(boots, boot_id)
     if prev_end is None:
-        return {"action": "none", "prev_boot": prev_boot,
-                "reason": f"no journal entry for boot {prev_boot} ({len(boots)} boots listed), so the roster's age at that "
-                          "boot's end is unknown"}
+        return refuse(f"no journal entry for boot {prev_boot} ({len(boots)} boots listed), so the roster's age at that "
+                      "boot's end is unknown", prev_boot=prev_boot)
     written = parse_iso(prev["written_at"])
     if (prev_end - written).total_seconds() > config["max_roster_age_s"]:
         return {"action": "none", "prev_boot": prev_boot,
@@ -372,11 +383,12 @@ def plan(config: dict, *, boot_id: str, at: dt.datetime, boots: list[dict], aliv
     alive = {row.get("name") for row in alive_rows}
     cc = config["cc_session_name"]
     order = {p["session_name"]: i for i, p in enumerate(config["profiles"])}
-    launch, left = [], []
+    launch, left, taken = [], [], set()
     for row in prev.get("sessions") or []:
         name = row.get("name")
-        if name in profiles and name not in alive and row.get("kind") == "interactive":
+        if name in profiles and name not in alive and name not in taken and row.get("kind") == "interactive":
             launch.append((row, profiles[name]))
+            taken.add(name)  # one turn per name: a second row of the name is left to the command center
         else:
             left.append(row)
     launch.sort(key=lambda pair: (pair[0].get("name") != cc, order[pair[0].get("name")]))
@@ -391,7 +403,8 @@ def refuse(reason: str, **fields) -> dict:
     return {**fields, "action": "none", "reason": reason, "refused": True}
 
 
-def cmd_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[dict], dry_run: bool) -> dict:
+def cmd_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[dict], dry_run: bool,
+                 reopen: set[str] | frozenset[str] = frozenset()) -> dict:
     alive_rows = wait_client(config)
     if alive_rows is None:
         return refuse(f"claude agents --json gave no session list within {config['client_wait_s']} s, so who is running "
@@ -428,18 +441,25 @@ def cmd_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[dic
     carry = [row for row in decided["prev"].get("sessions") or [] if row.get("name") not in alive]
     cmd_snapshot(config, boot_id=boot_id, sessions=alive_rows + carry, at=at)
     earlier = {entry["session_name"]: entry for entry in state.get("sessions") or []}
-    sessions, profiles = [], {}
+    sessions, profiles, reopened = [], {}, []
     for row, profile in decided["launch"]:
         entry = earlier.pop(row.get("name"), None) or {"session_name": row.get("name"),
                                                         "launcher_name": profile["launcher_name"], "attempts": []}
-        entry["outcome"], profiles[entry["session_name"]] = "pending", profile
+        profiles[entry["session_name"]] = profile
+        if not unresolved(entry):
+            entry["outcome"] = "pending"
+        elif entry["session_name"] in reopen:
+            entry["outcome"] = "pending"
+            reopened.append(entry["session_name"])
+        elif entry.get("outcome") not in ("unconfirmed", "uncertain"):
+            entry["outcome"] = "uncertain"  # the run stopped inside its call; the tab may be open
         sessions.append(entry)
     for name, entry in earlier.items():
         if name in alive:
             entry["outcome"] = "running"
         sessions.append(entry)
     state.update(status="in_progress", boot=boot_id, carry=carry, sessions=sessions)
-    state["runs"].append({"boot": boot_id, "started_at": iso(at)})
+    state["runs"].append({"boot": boot_id, "started_at": iso(at), **({"reopened": reopened} if reopened else {})})
     state_path = marker(config, "relaunch", prev_boot)
     save = lambda: write_atomic(state_path, json.dumps(state, indent=1) + "\n")
     save()
@@ -468,6 +488,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("command", choices=("snapshot", "relaunch", "plan-restart"))
     parser.add_argument("--config", required=True, type=Path)
     parser.add_argument("--dry-run", action="store_true", help="relaunch: print the plan and the handoff size, open nothing")
+    parser.add_argument("--reopen", action="append", default=[], metavar="NAME",
+                        help="relaunch: open this session again although an earlier call may have started its tab "
+                             "(unconfirmed, uncertain or in flight); the command center's explicit act, once it has "
+                             "checked that no tab of the session is open")
     args = parser.parse_args(argv)
     config = load_config(args.config)
     boot_id, at = current_boot_id(), now_utc()
@@ -483,7 +507,8 @@ def main(argv: list[str] | None = None) -> int:
         write_atomic(target, json.dumps({"boot_id": boot_id, "written_at": iso(at)}) + "\n")
         print(target)
     else:
-        result = cmd_relaunch(config, boot_id=boot_id, at=at, boots=read_boots(), dry_run=args.dry_run)
+        result = cmd_relaunch(config, boot_id=boot_id, at=at, boots=read_boots(), dry_run=args.dry_run,
+                              reopen=frozenset(args.reopen))
         if result.get("refused") or (not args.dry_run and (result.get("state") or {}).get("status") == "partial"):
             return 1
     return 0

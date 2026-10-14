@@ -49,13 +49,15 @@ measurements are in `evidence/artifacts/session-relaunch-20261014/`.
 - no roster from an earlier boot exists;
 - a `planned-<boot>.json` marker exists for the boot that ended;
 - that boot's relaunch is complete (`relaunch-<boot>.json` with status `complete`);
+- that boot's `relaunch-<boot>.json` cannot be read: a refusal, exit 1;
 - the journal has no entry for that boot (`journalctl --list-boots -o json` failed or no longer lists it), so the
-  roster's age at the boot's end cannot be checked;
+  roster's age at the boot's end cannot be checked: a refusal, exit 1;
 - the roster was written more than `max_roster_age_s` (300 s) before that boot's last journal entry;
 - `max_relaunches` (3) relaunch runs already started within `relaunch_window_s` (6 h), which caps a crash loop; a rerun
   of an unfinished relaunch counts as a run.
 
-Otherwise it relaunches every `interactive` roster session whose name has a profile and is not running now.
+Otherwise it relaunches every `interactive` roster session whose name has a profile and is not running now, once per
+name: a second roster row of the same name is left to the command center in the handoff.
 
 ## Relaunch state and reruns
 
@@ -67,24 +69,36 @@ sha256, each run (`boot`, `started_at`, `ended_at`), and each session's tab call
 | `pending` | not tried yet in this run |
 | `running` | listed by `claude agents --json` |
 | `failed` | every call failed definitely (a nonzero rc, or the opener could not start) |
-| `uncertain` | a call timed out after `tab_timeout_s` (120 s) and the session was not listed within the settle wait, or the live list could not be read before a retry |
+| `skipped` | the live list could not be read before a call, so no call was made |
+| `uncertain` | a call timed out after `tab_timeout_s` (120 s), or the run stopped inside a call, and the session was not listed |
 | `unconfirmed` | the opener returned rc 0 but the session was not listed within the settle wait |
 
 The status is `in_progress` from the run's start, then `complete` when every session is listed, else `partial`. The
-live list is read before every tab call. A definite failure is retried up to `tab_attempts` calls; an opened or
-timed-out call is never repeated, because a tab may already be open: the run waits for the session (`cc_wait_s` for
-the command center, `settle_s`, 60 s, for the rest) and records the outcome.
+live list is read before every tab call, and a call is made only when that read lists the session as absent. Each
+call is recorded in the state file (`in_flight`) before it is made, then replaced by its result. A definite failure
+is retried up to `tab_attempts` calls; an opened or timed-out call is never repeated, because a tab may already be
+open: the run waits for the session (`cc_wait_s` for the command center, `settle_s`, 60 s, for the rest) and records
+the outcome.
 
 A rerun of an `in_progress` or `partial` relaunch reuses its sealed handoff (refused when the file is missing or its
-sha256 differs) and opens only the sessions that are not running. The next boot reruns it by itself when no roster
-of this boot exists; within this boot the command center reruns it with
-`systemctl --user start ns-session-relaunch.service`.
+sha256 differs). It opens again only the sessions that are not running and whose earlier calls cannot have started a
+tab (`pending`, `failed`, `skipped`). An `unconfirmed` or `uncertain` session, or one whose last call is still
+`in_flight`, stays as it is, because its first `claude -n` may still register. The next boot reruns the relaunch by
+itself when no roster of this boot exists; within this boot the command center reruns it with
+`systemctl --user start ns-session-relaunch.service`. Only the command center reopens an unresolved session, once it
+has checked that no tab of it is open:
+`/usr/bin/python3 -I "$T/session_relaunch.py" relaunch --reopen <name> --config "$S/config.json"` (repeat `--reopen`
+for more names; the run records them under `reopened`).
 
 At its start a run writes this boot's roster as the live sessions plus the ended boot's rows not running yet, and the
 minute snapshot keeps carrying those rows while the run is `in_progress`. A second crash before the timer's first
 snapshot (90 s after boot) therefore still leaves every session to the next boot.
 
-The service's `TimeoutStartSec=900` bounds one run. A run stopped by it stays `in_progress` and is rerun as above.
+The service's `TimeoutStartSec=900` bounds one run. A run stopped by it stays `in_progress` and is rerun as above; a
+call it stopped is left `in_flight`, so the rerun records that session as `uncertain` and does not open it.
+
+A refused, skipped or `partial` run exits 1, the unit fails, and `OnFailure=stack-alert@%n.service` runs the command
+center's alert handler.
 
 ## Private files
 
@@ -101,6 +115,7 @@ install -D -m 0600 tools/session-relaunch/config.example.json "$S/config.json"  
 install -m 0644 tools/session-relaunch/units/ns-session-roster.service tools/session-relaunch/units/ns-session-roster.timer \
   tools/session-relaunch/units/ns-session-relaunch.service ~/.config/systemd/user/
 systemctl --user daemon-reload
+systemctl --user show stack-alert@ns-session-relaunch.service.service --property=LoadState   # the alert handler: loaded
 systemctl --user enable --now ns-session-roster.timer
 systemctl --user enable ns-session-relaunch.service    # runs at the next boot; start it by hand only for a rerun
 ```
