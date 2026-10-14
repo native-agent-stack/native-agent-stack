@@ -8,9 +8,11 @@ It has two parts, both systemd `--user` units, the layer's recorded supervisor (
 - `ns-session-roster.timer` runs `snapshot` every minute. It writes the live sessions that `claude agents --json`
   lists to `rosters/roster-<boot id>.json` in the state directory. That flag is the client's scripting interface
   ("Print active sessions (interactive and background) as a JSON array and exit (for scripting; does not require a
-  TTY)", `claude agents --help` at 2.1.299). One call took 0.18-0.23 s here.
+  TTY)", `claude agents --help` at 2.1.299). One call took 0.18-0.23 s here. When the client gives no list (an
+  error, a timeout or output that is not a JSON array), the last good roster stays as it was and `snapshot` exits 1; an
+  empty array is a valid, empty roster.
 - `ns-session-relaunch.service` runs `relaunch` once at boot. It reads the newest roster from an earlier boot. If that
-  boot did not end in a planned restart, it writes one handoff, `AUTO-RESTART-<UTC>.md` (mode 0444), in the
+  boot did not end in a planned restart, it writes one handoff, `AUTO-RESTART-<UTC>.md` (mode 0400), in the
   command center's directory. Then it opens a fresh tab for each session that has a launcher profile, command center
   first, through the command center's own tab opener (`open-tab.ps1`, which starts `launch.sh`). Sessions without a
   profile, and sessions already running, are listed in the handoff for the command center.
@@ -42,14 +44,53 @@ measurements are in `evidence/artifacts/session-relaunch-20261014/`.
 
 `relaunch` does nothing, and says why, when any of these holds:
 
+- the client gives no session list within `client_wait_s` (120 s): who is running is unknown, so nothing is written
+  or opened and `relaunch` exits 1;
 - no roster from an earlier boot exists;
 - a `planned-<boot>.json` marker exists for the boot that ended;
-- that boot was already relaunched (`relaunched-<boot>.json`);
-- the roster was written more than `max_roster_age_s` (300 s) before that boot's last journal entry
-  (`journalctl --list-boots -o json`);
-- `max_relaunches` (3) relaunches already happened within `relaunch_window_s` (6 h), which caps a crash loop.
+- that boot's relaunch is complete (`relaunch-<boot>.json` with status `complete`);
+- the journal has no entry for that boot (`journalctl --list-boots -o json` failed or no longer lists it), so the
+  roster's age at the boot's end cannot be checked;
+- the roster was written more than `max_roster_age_s` (300 s) before that boot's last journal entry;
+- `max_relaunches` (3) relaunch runs already started within `relaunch_window_s` (6 h), which caps a crash loop; a rerun
+  of an unfinished relaunch counts as a run.
 
 Otherwise it relaunches every `interactive` roster session whose name has a profile and is not running now.
+
+## Relaunch state and reruns
+
+`relaunch-<ended boot>.json` in the state directory records the relaunch of one ended boot: the sealed handoff and its
+sha256, each run (`boot`, `started_at`, `ended_at`), and each session's tab calls and outcome:
+
+| outcome | meaning |
+|---|---|
+| `pending` | not tried yet in this run |
+| `running` | listed by `claude agents --json` |
+| `failed` | every call failed definitely (a nonzero rc, or the opener could not start) |
+| `uncertain` | a call timed out after `tab_timeout_s` (120 s) and the session was not listed within the settle wait, or the live list could not be read before a retry |
+| `unconfirmed` | the opener returned rc 0 but the session was not listed within the settle wait |
+
+The status is `in_progress` from the run's start, then `complete` when every session is listed, else `partial`. The
+live list is read before every tab call. A definite failure is retried up to `tab_attempts` calls; an opened or
+timed-out call is never repeated, because a tab may already be open: the run waits for the session (`cc_wait_s` for
+the command center, `settle_s`, 60 s, for the rest) and records the outcome.
+
+A rerun of an `in_progress` or `partial` relaunch reuses its sealed handoff (refused when the file is missing or its
+sha256 differs) and opens only the sessions that are not running. The next boot reruns it by itself when no roster
+of this boot exists; within this boot the command center reruns it with
+`systemctl --user start ns-session-relaunch.service`.
+
+At its start a run writes this boot's roster as the live sessions plus the ended boot's rows not running yet, and the
+minute snapshot keeps carrying those rows while the run is `in_progress`. A second crash before the timer's first
+snapshot (90 s after boot) therefore still leaves every session to the next boot.
+
+The service's `TimeoutStartSec=900` bounds one run. A run stopped by it stays `in_progress` and is rerun as above.
+
+## Private files
+
+The state directory and `rosters/` are mode 0700 (set on every write, so a directory made by `install -D` is narrowed
+too). Rosters, the relaunch state and the planned-restart marker are 0600; the handoff is 0400. The handoff directory
+is made 0700 only when the tool creates it; the command center's existing directory keeps its mode.
 
 ## Install (the command center's act; nothing here is applied)
 
@@ -61,7 +102,7 @@ install -m 0644 tools/session-relaunch/units/ns-session-roster.service tools/ses
   tools/session-relaunch/units/ns-session-relaunch.service ~/.config/systemd/user/
 systemctl --user daemon-reload
 systemctl --user enable --now ns-session-roster.timer
-systemctl --user enable ns-session-relaunch.service    # runs at the next boot; never start it by hand
+systemctl --user enable ns-session-relaunch.service    # runs at the next boot; start it by hand only for a rerun
 ```
 
 Check after two minutes: `ls "$S/rosters"` shows `roster-<this boot>.json`. Then
@@ -74,7 +115,7 @@ then remove the three unit files, run `systemctl --user daemon-reload`, and remo
 ## A planned restart
 
 Before a restart that has its own relaunch path (the command center's hands-free restart opens its own tabs), run
-`session_relaunch.py plan-restart --config "$S/config.json"`. The next boot then relaunches nothing from this boot's
+`/usr/bin/python3 -I "$T/session_relaunch.py" plan-restart --config "$S/config.json"`. The next boot then relaunches nothing from this boot's
 roster.
 
 ## Not covered
@@ -84,7 +125,7 @@ roster.
   is the host lane's part.
 - **A boot-time tab.** Measured inside a running boot only: a transient `systemd --user` unit ran `powershell.exe` in
   Windows session 1 and opened a tab that started a process back in the distro. No boot-time run has been measured.
-  The relaunch retries each tab (`tab_attempts`) and records each attempt's rc in `relaunched-<boot>.json`.
+  The relaunch retries a definite failure (`tab_attempts`) and records each call in `relaunch-<boot>.json`.
 - **Codex lanes and transient units.** These are re-armed by their owning sessions from the handoff, not by this tool.
 
 ## Tests

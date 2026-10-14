@@ -13,6 +13,10 @@
  "spacing_s": 5,
  "tab_attempts": 3,
  "tab_retry_pause_s": 10,
+ "tab_timeout_s": 120,
+ "settle_s": 60,
+ "client_wait_s": 120,
+ "poll_s": 5,
  "profiles": [
   {"session_name": "wsl-architecture-design", "launcher_name": "cc", "title": "CC wsl-architecture-design"},
   {"session_name": "trading-cc", "launcher_name": "trading-cc", "title": "trading-cc"},

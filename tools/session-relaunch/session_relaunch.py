@@ -5,11 +5,14 @@ Three subcommands, the first two run by systemd --user units (see units/ beside 
 
   snapshot      Every minute: write the live sessions that `claude agents --json` lists (the client's documented scripting
                 interface, "Print active sessions (interactive and background) as a JSON array") to
-                rosters/roster-<boot id>.json under the state directory.
+                rosters/roster-<boot id>.json under the state directory. When the client gives no list, the last good
+                roster stays as it is and the command exits 1.
   relaunch      Once at boot: read the newest roster written in an earlier boot. When that boot ended without a planned-
                 restart marker and the roster was fresh at its end, write one handoff file and open a fresh Windows Terminal
                 tab per session that has a launcher profile, the command center first, through the command center's own
-                tab opener and launcher. Sessions without a profile are listed in the handoff for the command center.
+                tab opener and launcher. Sessions without a profile are listed in the handoff for the command center. The
+                state file relaunch-<boot>.json records each run and each session's outcome; a rerun of an unfinished
+                relaunch reuses its handoff and opens only the sessions that are not running.
   plan-restart  Mark this boot's end as planned, so the restart's own relaunch path (the command center's) is the only one.
 
 Native background sessions do not cover this: after a shutdown they restart only when attached or replied to, and the
@@ -52,13 +55,32 @@ def current_boot_id() -> str:
     return norm_boot(Path("/proc/sys/kernel/random/boot_id").read_text())
 
 
-def write_atomic(path: Path, text: str, mode: int = 0o644) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
+def write_atomic(path: Path, text: str, mode: int = 0o600) -> None:
     fd, tmp = tempfile.mkstemp(dir=path.parent, prefix=f".{path.name}.")
     with os.fdopen(fd, "w", encoding="utf-8") as handle:
         handle.write(text)
     os.chmod(tmp, mode)
     os.replace(tmp, path)
+
+
+def private_dir(path: Path) -> Path:
+    """A directory this tool owns (the state directory and its rosters): created when missing and kept 0700."""
+    path.mkdir(parents=True, exist_ok=True)
+    os.chmod(path, 0o700)
+    return path
+
+
+def state_dir(config: dict) -> Path:
+    return private_dir(Path(config["state_dir"]))
+
+
+def handoff_dir(config: dict) -> Path:
+    """The command center's directory: made 0700 only when this tool creates it; an existing one keeps its mode."""
+    path = Path(config["handoff_dir"])
+    if not path.is_dir():
+        path.mkdir(parents=True, exist_ok=True)
+        os.chmod(path, 0o700)
+    return path
 
 
 def load_config(path: Path) -> dict:
@@ -77,12 +99,17 @@ def load_config(path: Path) -> dict:
     config.setdefault("spacing_s", 5)
     config.setdefault("tab_attempts", 3)
     config.setdefault("tab_retry_pause_s", 10)
+    config.setdefault("tab_timeout_s", 120)
+    config.setdefault("settle_s", 60)
+    config.setdefault("client_wait_s", 120)
+    config.setdefault("poll_s", 5)
     config.setdefault("projects_dir", str(Path.home() / ".claude" / "projects"))
     return config
 
 
-def list_sessions(claude: str) -> list[dict]:
-    """The live sessions as `claude agents --json` prints them; an error is an empty list plus a stderr line."""
+def list_sessions(claude: str) -> list[dict] | None:
+    """The live sessions as `claude agents --json` prints them; None (plus a stderr line) when the client gave no list,
+    which is not the same as an empty list."""
     try:
         done = subprocess.run([claude, "agents", "--json"], capture_output=True, text=True, timeout=60)
         rows = json.loads(done.stdout) if done.returncode == 0 else None
@@ -90,9 +117,19 @@ def list_sessions(claude: str) -> list[dict]:
         rows = None
     if not isinstance(rows, list):
         print("session_relaunch: claude agents --json gave no session list", file=sys.stderr)
-        return []
+        return None
     keep = ("name", "kind", "sessionId", "cwd", "pid", "startedAt", "status")
     return [{k: row.get(k) for k in keep} for row in rows if isinstance(row, dict)]
+
+
+def wait_client(config: dict) -> list[dict] | None:
+    """The live sessions, asking again for up to client_wait_s while the client gives no list."""
+    end = time.monotonic() + config["client_wait_s"]
+    while True:
+        rows = list_sessions(config["claude"])
+        if rows is not None or time.monotonic() >= end:
+            return rows
+        time.sleep(config["poll_s"])
 
 
 def roster_dir(config: dict) -> Path:
@@ -100,7 +137,8 @@ def roster_dir(config: dict) -> Path:
 
 
 def cmd_snapshot(config: dict, *, boot_id: str, sessions: list[dict], at: dt.datetime) -> Path:
-    target = roster_dir(config) / f"roster-{boot_id}.json"
+    state_dir(config)
+    target = private_dir(roster_dir(config)) / f"roster-{boot_id}.json"
     write_atomic(target, json.dumps({"boot_id": boot_id, "written_at": iso(at), "sessions": sessions}, indent=1) + "\n")
     rosters = sorted(roster_dir(config).glob("roster-*.json"), key=lambda p: p.stat().st_mtime)
     for old in rosters[:-ROSTER_KEEP]:
@@ -147,16 +185,42 @@ def marker(config: dict, kind: str, boot_id: str) -> Path:
     return Path(config["state_dir"]) / f"{kind}-{boot_id}.json"
 
 
-def recent_relaunches(config: dict, at: dt.datetime) -> int:
-    count = 0
-    for path in Path(config["state_dir"]).glob("relaunched-*.json"):
+def relaunch_states(config: dict) -> list[dict]:
+    """Every readable relaunch-<boot>.json: one per ended boot, with its runs and each session's outcome."""
+    states = []
+    for path in Path(config["state_dir"]).glob("relaunch-*.json"):
         try:
-            started = parse_iso(json.loads(path.read_text(encoding="utf-8"))["started_at"])
-        except (OSError, ValueError, KeyError, TypeError):
+            doc = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
             continue
-        if (at - started).total_seconds() <= config["relaunch_window_s"]:
-            count += 1
+        if isinstance(doc, dict):
+            states.append(doc)
+    return states
+
+
+def recent_relaunches(config: dict, at: dt.datetime) -> int:
+    """Relaunch runs started within relaunch_window_s, a rerun of an unfinished relaunch included."""
+    count = 0
+    for doc in relaunch_states(config):
+        for run in doc.get("runs") or []:
+            try:
+                started = parse_iso(run["started_at"])
+            except (ValueError, KeyError, TypeError):
+                continue
+            if (at - started).total_seconds() <= config["relaunch_window_s"]:
+                count += 1
     return count
+
+
+def carried_rows(config: dict, boot_id: str, live: list[dict]) -> list[dict]:
+    """The earlier boot's rows that a relaunch running in this boot has not brought back yet (not listed live), so a
+    second crash before the relaunch ends still finds them in this boot's roster."""
+    names = {row.get("name") for row in live}
+    carried = []
+    for doc in relaunch_states(config):
+        if doc.get("status") == "in_progress" and doc.get("boot") == boot_id:
+            carried += [row for row in doc.get("carry") or [] if row.get("name") not in names]
+    return carried
 
 
 def transcript_path(config: dict, session_id: str) -> str:
@@ -214,36 +278,62 @@ def handoff_text(config: dict, *, at: dt.datetime, prev: dict, prev_end: dt.date
 
 
 def open_tab(config: dict, profile: dict, handoff: Path) -> dict:
-    """One tab through the command center's tab opener (it starts the launcher in a new Windows Terminal tab); an
-    interop failure early in a boot is retried."""
-    attempts, pause_s = config["tab_attempts"], config["tab_retry_pause_s"]
+    """One call of the command center's tab opener (it starts the launcher in a new Windows Terminal tab). Its result is
+    opened (rc 0), failed (a nonzero rc, or the opener could not start) or timeout (no answer within tab_timeout_s: a tab
+    may or may not have opened)."""
     argv = [config["powershell"], "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File",
             config["tab_opener"], "-Name", profile["launcher_name"], "-Title", profile.get("title") or profile["session_name"],
             "-Handoff", str(handoff)]
-    result = {"session_name": profile["session_name"], "launcher_name": profile["launcher_name"], "attempts": []}
-    for attempt in range(attempts):
-        try:
-            done = subprocess.run(argv, capture_output=True, text=True, timeout=120)
-            rc, out = done.returncode, (done.stdout.strip().splitlines() or [""])[-1][:200]
-        except (OSError, subprocess.TimeoutExpired) as exc:
-            rc, out = None, type(exc).__name__
-        result["attempts"].append({"at": iso(now_utc()), "rc": rc, "last_line": out})
-        if rc == 0:
-            break
-        if attempt + 1 < attempts:
-            time.sleep(pause_s)
-    result["rc"] = result["attempts"][-1]["rc"]
-    return result
+    try:
+        done = subprocess.run(argv, capture_output=True, text=True, timeout=config["tab_timeout_s"])
+        rc, out = done.returncode, (done.stdout.strip().splitlines() or [""])[-1][:200]
+        result = "opened" if rc == 0 else "failed"
+    except subprocess.TimeoutExpired:
+        rc, out, result = None, "TimeoutExpired", "timeout"
+    except OSError as exc:
+        rc, out, result = None, type(exc).__name__, "failed"
+    return {"at": iso(now_utc()), "rc": rc, "result": result, "last_line": out}
 
 
-def wait_for(config: dict, name: str, deadline_s: float, poll_s: float = 5.0) -> bool:
+def listed(config: dict, name: str) -> bool | None:
+    """Whether the session is listed live; None when the client gave no list."""
+    rows = list_sessions(config["claude"])
+    return None if rows is None else any(row.get("name") == name for row in rows)
+
+
+def wait_for(config: dict, name: str, deadline_s: float) -> bool:
     end = time.monotonic() + deadline_s
     while True:
-        if any(row.get("name") == name for row in list_sessions(config["claude"])):
+        if listed(config, name):
             return True
         if time.monotonic() >= end:
             return False
-        time.sleep(poll_s)
+        time.sleep(config["poll_s"])
+
+
+def relaunch_one(config: dict, profile: dict, handoff: Path, entry: dict, save) -> str:
+    """Open one session's tab and return its outcome. The live list is read before every call. An opened or timed-out
+    call is never repeated: the session is waited for (cc_wait_s for the command center, settle_s for the rest) and is
+    running, unconfirmed (opened, not listed) or uncertain (timed out, not listed). Only a definite failure is retried,
+    up to tab_attempts calls, and not when the live list cannot be read before the retry."""
+    name = profile["session_name"]
+    settle_s = config["cc_wait_s"] if name == config["cc_session_name"] else config["settle_s"]
+    for attempt in range(config["tab_attempts"]):
+        if attempt:
+            time.sleep(config["tab_retry_pause_s"])
+        live = listed(config, name)
+        if live:
+            return "running"
+        if live is None and attempt:
+            return "uncertain"
+        result = open_tab(config, profile, handoff)
+        entry["attempts"].append(result)
+        save()
+        if result["result"] != "failed":
+            if wait_for(config, name, settle_s):
+                return "running"
+            return "unconfirmed" if result["result"] == "opened" else "uncertain"
+    return "failed"
 
 
 def plan(config: dict, *, boot_id: str, at: dt.datetime, boots: list[dict], alive_rows: list[dict]) -> dict:
@@ -254,12 +344,24 @@ def plan(config: dict, *, boot_id: str, at: dt.datetime, boots: list[dict], aliv
     prev_boot = norm_boot(str(prev["boot_id"]))
     if marker(config, "planned", prev_boot).exists():
         return {"action": "none", "reason": f"the end of boot {prev_boot} was a planned restart", "prev_boot": prev_boot}
-    if marker(config, "relaunched", prev_boot).exists():
+    state_path = marker(config, "relaunch", prev_boot)
+    try:
+        state = json.loads(state_path.read_text(encoding="utf-8")) if state_path.exists() else None
+        status = None if state is None else state["status"]
+    except (OSError, ValueError, KeyError, TypeError):
+        status = "unreadable"
+    if status == "complete":
         return {"action": "none", "reason": f"boot {prev_boot} was already relaunched", "prev_boot": prev_boot}
+    if status not in (None, "in_progress", "partial"):
+        return {"action": "none", "reason": f"the relaunch state {state_path} is unreadable", "prev_boot": prev_boot}
     _, prev_end = boot_window(boots, prev_boot)
     this_start, _ = boot_window(boots, boot_id)
+    if prev_end is None:
+        return {"action": "none", "prev_boot": prev_boot,
+                "reason": f"no journal entry for boot {prev_boot} ({len(boots)} boots listed), so the roster's age at that "
+                          "boot's end is unknown"}
     written = parse_iso(prev["written_at"])
-    if prev_end is not None and (prev_end - written).total_seconds() > config["max_roster_age_s"]:
+    if (prev_end - written).total_seconds() > config["max_roster_age_s"]:
         return {"action": "none", "prev_boot": prev_boot,
                 "reason": f"the roster was written {int((prev_end - written).total_seconds())} s before boot {prev_boot} "
                           f"ended (limit {config['max_roster_age_s']} s), so it does not show who was alive at the end"}
@@ -278,43 +380,87 @@ def plan(config: dict, *, boot_id: str, at: dt.datetime, boots: list[dict], aliv
         else:
             left.append(row)
     launch.sort(key=lambda pair: (pair[0].get("name") != cc, order[pair[0].get("name")]))
-    if not launch:
+    if not launch and state is None:
         return {"action": "none", "prev_boot": prev_boot, "reason": "no session of the roster needs a relaunch (no launcher profile, or already running)"}
     return {"action": "relaunch", "prev_boot": prev_boot, "prev": prev, "prev_end": prev_end, "this_start": this_start,
-            "launch": launch, "left": left, "alive": alive}
+            "launch": launch, "left": left, "alive": alive, "state": state}
+
+
+def refuse(reason: str, **fields) -> dict:
+    print(f"session_relaunch: refused: {reason}", file=sys.stderr)
+    return {**fields, "action": "none", "reason": reason, "refused": True}
 
 
 def cmd_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[dict], dry_run: bool) -> dict:
-    decided = plan(config, boot_id=boot_id, at=at, boots=boots, alive_rows=list_sessions(config["claude"]))
+    alive_rows = wait_client(config)
+    if alive_rows is None:
+        return refuse(f"claude agents --json gave no session list within {config['client_wait_s']} s, so who is running "
+                      "is unknown; nothing was written or opened")
+    decided = plan(config, boot_id=boot_id, at=at, boots=boots, alive_rows=alive_rows)
     if decided["action"] != "relaunch":
         print(f"session_relaunch: nothing to relaunch: {decided['reason']}")
         return decided
-    text = handoff_text(config, at=at, prev=decided["prev"], prev_end=decided["prev_end"],
-                        this_start=decided["this_start"], launch=decided["launch"], left=decided["left"],
-                        alive=decided["alive"])
-    names = [row.get("name") for row, _ in decided["launch"]]
+    state, names = decided["state"], [row.get("name") for row, _ in decided["launch"]]
+    if state is None:
+        text = handoff_text(config, at=at, prev=decided["prev"], prev_end=decided["prev_end"],
+                            this_start=decided["this_start"], launch=decided["launch"], left=decided["left"],
+                            alive=decided["alive"])
+    else:
+        try:
+            text = Path(state.get("handoff") or "").read_bytes().decode()
+        except (OSError, UnicodeDecodeError):
+            text = None
+        if text is None or hashlib.sha256(text.encode()).hexdigest() != state.get("handoff_sha256"):
+            return refuse(f"the sealed handoff {state.get('handoff')} of the unfinished relaunch is missing or changed",
+                          prev_boot=decided["prev_boot"])
     if dry_run:
-        print(f"DRY: would write a handoff of {len(text.encode())} bytes and open tabs in this order: {', '.join(names)}")
+        print(f"DRY: would {'write' if state is None else 'reuse'} a handoff of {len(text.encode())} bytes and open tabs "
+              f"in this order: {', '.join(names) or 'none'}")
         return {**decided, "handoff_text": text}
-    handoff = Path(config["handoff_dir"]) / f"AUTO-RESTART-{at.strftime('%Y%m%dT%H%M%SZ')}.md"
-    write_atomic(handoff, text, mode=0o444)
-    digest = hashlib.sha256(text.encode()).hexdigest()
-    receipt = {"prev_boot": decided["prev_boot"], "boot": boot_id, "started_at": iso(at), "handoff": str(handoff),
-               "handoff_sha256": digest, "tabs": []}
-    receipt_path = marker(config, "relaunched", decided["prev_boot"])
-    write_atomic(receipt_path, json.dumps(receipt, indent=1) + "\n")
-    cc = config["cc_session_name"]
-    for index, (row, profile) in enumerate(decided["launch"]):
+    prev_boot, alive = decided["prev_boot"], decided["alive"]
+    if state is None:
+        handoff = handoff_dir(config) / f"AUTO-RESTART-{at.strftime('%Y%m%dT%H%M%SZ')}.md"
+        write_atomic(handoff, text, mode=0o400)
+        state = {"prev_boot": prev_boot, "handoff": str(handoff), "handoff_sha256": hashlib.sha256(text.encode()).hexdigest(),
+                 "runs": [], "sessions": []}
+    # This boot's roster at once: the live sessions and the earlier boot's rows not running yet, so a crash before the
+    # timer's first snapshot still leaves them to the next boot; the timer carries them while this run is in progress.
+    carry = [row for row in decided["prev"].get("sessions") or [] if row.get("name") not in alive]
+    cmd_snapshot(config, boot_id=boot_id, sessions=alive_rows + carry, at=at)
+    earlier = {entry["session_name"]: entry for entry in state.get("sessions") or []}
+    sessions, profiles = [], {}
+    for row, profile in decided["launch"]:
+        entry = earlier.pop(row.get("name"), None) or {"session_name": row.get("name"),
+                                                        "launcher_name": profile["launcher_name"], "attempts": []}
+        entry["outcome"], profiles[entry["session_name"]] = "pending", profile
+        sessions.append(entry)
+    for name, entry in earlier.items():
+        if name in alive:
+            entry["outcome"] = "running"
+        sessions.append(entry)
+    state.update(status="in_progress", boot=boot_id, carry=carry, sessions=sessions)
+    state["runs"].append({"boot": boot_id, "started_at": iso(at)})
+    state_path = marker(config, "relaunch", prev_boot)
+    save = lambda: write_atomic(state_path, json.dumps(state, indent=1) + "\n")
+    save()
+    handoff = Path(state["handoff"])
+    for index, entry in enumerate(e for e in sessions if e["outcome"] == "pending"):
         if index:
             time.sleep(config["spacing_s"])
-        tab = open_tab(config, profile, handoff)
-        if row.get("name") == cc and tab["rc"] == 0:
-            tab["cc_listed"] = wait_for(config, cc, config["cc_wait_s"])
-        receipt["tabs"].append(tab)
-        write_atomic(receipt_path, json.dumps(receipt, indent=1) + "\n")
-    print(f"session_relaunch: handoff {handoff} (sha256 {digest}); tabs: "
-          + ", ".join(f"{t['session_name']} rc={t['rc']}" for t in receipt["tabs"]))
-    return {**decided, "receipt": receipt}
+        entry["outcome"] = relaunch_one(config, profiles[entry["session_name"]], handoff, entry, save)
+        save()
+    final = list_sessions(config["claude"])
+    if final is not None:
+        live = {row.get("name") for row in final}
+        for entry in sessions:
+            if entry["session_name"] in live:
+                entry["outcome"] = "running"
+    state["status"] = "complete" if all(entry["outcome"] == "running" for entry in sessions) else "partial"
+    state["runs"][-1]["ended_at"] = iso(now_utc())
+    save()
+    print(f"session_relaunch: handoff {handoff} (sha256 {state['handoff_sha256']}); {state['status']}: "
+          + ", ".join(f"{entry['session_name']} {entry['outcome']}" for entry in sessions))
+    return {**decided, "state": state}
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -326,13 +472,20 @@ def main(argv: list[str] | None = None) -> int:
     config = load_config(args.config)
     boot_id, at = current_boot_id(), now_utc()
     if args.command == "snapshot":
-        print(cmd_snapshot(config, boot_id=boot_id, sessions=list_sessions(config["claude"]), at=at))
+        sessions = list_sessions(config["claude"])
+        if sessions is None:
+            print("session_relaunch: the last good roster stays as it is", file=sys.stderr)
+            return 1
+        print(cmd_snapshot(config, boot_id=boot_id, sessions=sessions + carried_rows(config, boot_id, sessions), at=at))
     elif args.command == "plan-restart":
         target = marker(config, "planned", boot_id)
+        state_dir(config)
         write_atomic(target, json.dumps({"boot_id": boot_id, "written_at": iso(at)}) + "\n")
         print(target)
     else:
-        cmd_relaunch(config, boot_id=boot_id, at=at, boots=read_boots(), dry_run=args.dry_run)
+        result = cmd_relaunch(config, boot_id=boot_id, at=at, boots=read_boots(), dry_run=args.dry_run)
+        if result.get("refused") or (not args.dry_run and (result.get("state") or {}).get("status") == "partial"):
+            return 1
     return 0
 
 

@@ -52,13 +52,14 @@ All of it is in `evidence/artifacts/session-relaunch-20261014/`.
 - **Simulation:** the 06:40:30Z roster, rebuilt from the command center's handoff and decided against the real
   journal. It relaunches six sessions, the command center first, and leaves `librarium-course-e2` to the command
   center.
-- **Tests:** 22 unit tests with stand-ins for the client and PowerShell; one checks that no published sentence of this change attributes a quoted phrase to the owner.
+- **Tests:** 38 unit tests with stand-ins for the client and PowerShell; one checks that no published sentence of this change attributes a quoted phrase to the owner. The fix round of the first read (four P2s) added the relaunch state file with per-session outcomes and reruns, the refusals when the client gives no list or the journal no longer lists the ended boot, the settle wait instead of a retry after a timed-out tab call, and private file modes; each has a test that fails on the first version.
 
 It also does not pay the scheduled-tasks slot's owed "`claude -p` run started by a systemd timer across a WSL
 restart": no model call runs here, and no boot was measured.
 
 ## Not established
 
-- **A boot-time run:** interop readiness when the user manager reaches `default.target`. The tool retries each tab and
-  records every attempt. The first real restart after the install is the measurement.
+- **A boot-time run:** interop readiness when the user manager reaches `default.target`. The tool retries a definite tab
+  failure, records every call and leaves an unfinished relaunch to a rerun. The first real restart after the install is
+  the measurement.
 - **The distro start after a WSL service restart:** the host lane's part.
