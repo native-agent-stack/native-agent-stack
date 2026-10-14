@@ -19183,8 +19183,8 @@
     },
     {
       "path": "docs/decisions/2026-10-13-trading-lanes-dashboard.md",
-      "sha256": "a0251b353c2945e54b0cca2a69a0bcee90591dca7ccfd5df03184f52ba3a07ee",
-      "bytes": 14324
+      "sha256": "11f715646b3f6450b13e4cfec65d86e024f0b05eb7093f6fe023c422535518a7",
+      "bytes": 17431
     },
     {
       "path": "docs/decisions/2026-10-14-muse-file-fence.md",
@@ -43853,8 +43853,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
-      "sha256": "4fd428d643b3539253001225b7ff2f76ea0fc3abe557006612575dc741f8499b",
-      "bytes": 52135
+      "sha256": "024cab4ec0106e5e7a93d8a718880ed3e9cb64acae0a6962a4fe1231d5244842",
+      "bytes": 52656
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/acceptance-execution-instructions.txt",
@@ -62013,8 +62013,8 @@
     },
     {
       "path": "observability/trading_receipts.py",
-      "sha256": "e1c4cf575d0ecad2b64f3b999c6fc74e43afd073ab88b93963aa53b1ef849eda",
-      "bytes": 13976
+      "sha256": "09c2b136433d656db75a0cd406e446bb60e603fb3826e0d28dd4081df9b04abd",
+      "bytes": 14107
     },
     {
       "path": "recipes/README.md",
@@ -63673,8 +63673,8 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "4dde6cfcb82636cad926dc412b9e0a587e53f98454b80b01b821b76bf579f6b6",
-      "bytes": 345950
+      "sha256": "731092cd4b714c3dfa1301ac67e2a63ecd91824cbee4a0388746a19032b0aeba",
+      "bytes": 348402
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
@@ -64238,8 +64238,8 @@
     },
     {
       "path": "tests/test_trading_receipts.py",
-      "sha256": "ad6a19a96fe9f42d46dd64565985581bd78a0256236542cfe453155bb11ed472",
-      "bytes": 10415
+      "sha256": "e66f98e752f75ce8188fcf04158b0225f93a7c7554a447d86ca45205339ab177",
+      "bytes": 13295
     },
     {
       "path": "tests/test_tvly_keyring.py",

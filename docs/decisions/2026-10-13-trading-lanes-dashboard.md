@@ -184,6 +184,58 @@ reader/dashboard/grant modules pass55tests in7.667seconds. Only these four
 corrections, their regressions and record/bindings share the one released
 fix commit. Lane-health changes stay on their own branch.
 
+## Version-bound producer references
+
+The out-of-tree producers are **unversioned**: these observations are not
+repository pins. The private, sealed manifest
+`ns2604-pr1106-producer-refs-20261014` binds each reference below to its
+source path, SHA256, byte count and exact mtime. It is retained with the
+lane's read-fix packet as `producer-references.json`. No producer body was
+copied. Private paths, digests and diagnostic text stay out of publication.
+This metadata identifies the inspected version; it does not supply a public
+source checkout or independently reproduce native event/cadence evidence.
+
+| Producer | Version-bound source reference | Inspected source locations |
+| --- | --- | --- |
+| calc_session.py | source-ref:ns2604-pr1106-producer-refs-20261014/calc-session | 239, 261 |
+| ibkr_series4.sh | source-ref:ns2604-pr1106-producer-refs-20261014/ibkr-series4 | 43, 45 |
+| ibkr_series.sh | source-ref:ns2604-pr1106-producer-refs-20261014/ibkr-series | 40, 42 |
+| series_line.py | source-ref:ns2604-pr1106-producer-refs-20261014/series-line | 12 |
+
+These references qualify the earlier correctness citations above. They do
+not convert the missing native witnesses into independently verified
+evidence. The delta review determines whether this retained reference is
+sufficient; a required repository pin would need producer-owner publication.
+
+## Read-wave integration and paper outcome correction
+
+The completed read wave requested the consumed-config integration repair,
+paper outcome preservation and version-bound producer references. The
+existing install-plan checker now validates Trading lanes through the exact
+native renderer source/destination pair and its actual source asset. It
+still rejects an absent asset, missing/wrong binding or omitted transport.
+Paper receipt selection respects recorded outcomes independently of optional
+numeric groups; absent measurements remain unavailable. Native failure
+outcomes use the existing Blocked display mapping.
+
+Primary repository source: `native-agent-stack/native-agent-stack` at
+`eb1b4183a9918ed432a5ca5b0ab6c242c793b0ac`,
+`evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py:678-704`,
+`config/observability_config.py:30-40` within that plan, and
+`blueprints/us-equities/adaptive-paper/runner.py:2130-2134,2771-2778`.
+The installed Grafana13.2.3 file-provider contract remains the version-pinned
+upstream source listed above. No additional observability runtime is added.
+
+Four regression tests fail against the released baseline and pass after
+the correction: the consumed-config binding test, optional-measurement
+outcome selection, public native failure receipt mapping and producer
+reference coverage. The first three exercise installation/reader behavior;
+the last guards citation coverage, not independent private source fidelity.
+Reader tests use already published repository fixtures. No private
+reproduction bodies, producer bytes or digests are added to public evidence.
+Follow-ups concerning liveness, freshness/recovery, native witnesses, query
+cost and IBKR explanatory text remain deferred to their cued work.
+
 ## Per-lane receipt freshness correction
 
 The CC04:21Z measurement reproduced a false Stale receipt alarm: C's

@@ -1,6 +1,7 @@
 """Receipt-to-observation public seam: no broker, credentials, or native state."""
 import importlib.util
 import json
+import os
 from pathlib import Path
 import tempfile
 import unittest
@@ -45,6 +46,52 @@ class TradingReceiptTests(unittest.TestCase):
         self.assertEqual((2, 1, 1), (row["orders_per_min"], row["fills_per_min"], row["cancels_per_min"]))
         self.assertEqual((.2, 1, 12, 990), (row["cash_use_ratio"], row["open_positions"], row["realized_pnl_usd"], row["source_unix"]))
         self.assertNotIn("unexported", json.dumps(row))
+
+    def test_latest_terminal_paper_receipt_survives_missing_optional_metrics(self):
+        m = self.module()
+        original = json.loads((ROOT / "blueprints/us-equities/adaptive-paper/trials/"
+                               "20260923b-needs-attention/paper-output.json").read_text())
+        # A public producer receipt supplies the outcome; optional numeric groups
+        # must not decide which attempt is selected. No host receipt is opened.
+        with tempfile.TemporaryDirectory() as scratch:
+            root = Path(scratch)
+            previous, latest = root / "previous.json", root / "latest.json"
+            previous.write_text(json.dumps(dict(original, status="passed")))
+            latest.write_text(json.dumps({k: v for k, v in original.items()
+                                          if k not in ("requests", "accounting")}))
+            os.utime(previous, (100, 100))
+            os.utime(latest, (200, 200))
+            for paths in ([previous, latest], [latest]):
+                with self.subTest(previous_present=len(paths) > 1):
+                    row = m.paper_lane("A", paths, 300)
+                    self.assertEqual(200, row["source_unix"])
+                    self.assertEqual(m.paper_observation("A", original, 200, 300)["status_code"],
+                                     row["status_code"])
+                    self.assertEqual(-1, row["orders_per_min"])
+                    self.assertEqual(-1, row["open_positions"])
+                    self.assertEqual(m.UNKNOWN_PNL, row["realized_pnl_usd"])
+
+    def test_public_native_paper_failure_receipts_map_to_blocked(self):
+        m = self.module()
+        for trial in ("20260923e-first-roundtrip", "20260923b-needs-attention",
+                      "ladder-1x-20260924a-needs-attention"):
+            with self.subTest(trial=trial):
+                receipt = json.loads((ROOT / "blueprints/us-equities/adaptive-paper/trials" /
+                                      trial / "paper-output.json").read_text())
+                self.assertEqual(3, m.paper_observation("B", receipt, 100, 110)["status_code"])
+
+    def test_correctness_record_binds_each_out_of_tree_producer_to_a_version_reference(self):
+        record = (ROOT / "docs/decisions/2026-10-13-trading-lanes-dashboard.md").read_text()
+        heading = "## Version-bound producer references"
+        self.assertIn(heading, record)
+        references = record.split(heading, 1)[1].split("\n## ", 1)[0]
+        for name in ("calc_session.py", "ibkr_series4.sh", "series_line.py"):
+            rows = [line.split("|") for line in references.splitlines()
+                    if line.startswith("|") and name in line]
+            self.assertTrue(rows, name)
+            for cells in rows:
+                self.assertRegex(cells[2], r"source-ref:[A-Za-z0-9-]+/[A-Za-z0-9-]+")
+                self.assertRegex(cells[3], r"[0-9]+")
 
     def test_cash_is_not_equity_and_missing_data_never_becomes_zero(self):
         m = self.module()

@@ -26,7 +26,7 @@ EXPORTED_FIELDS = ("lane", "observed_unix", "source_unix", "orders_per_min", "fi
                    "status_code", "ended_by_code", "wire_mean_per_s", "wire_peak_per_s")
 STATUS = {"passed": 2, "completed": 2, "ended": 2, "stopped": 2, "ok": 2,
           "completed_no_signals": 2, "not_started": 0,
-          "running": 1, "active": 1, "blocked": 3, "failed": 3, "error": 3}
+          "running": 1, "active": 1, "blocked": 3, "failed": 3, "error": 3, "needs_attention": 3}
 ENDED = {"duration": 1, "duration_elapsed": 1, "duration_limit": 1, "time_limit": 1,
          "session_end": 2, "session_closed": 2, "stop": 3, "stopped": 3,
          "risk_limit": 4, "drawdown": 4, "error": 5, "failed": 5}
@@ -103,7 +103,8 @@ def load(path):
 def paper_lane(lane, paths, now):
     for path in sorted(paths, key=lambda p: p.stat().st_mtime, reverse=True):
         receipt = load(path)
-        if not isinstance(receipt.get("requests"), list) or "accounting" not in receipt:
+        has_status = isinstance(receipt.get("status"), str) and bool(receipt["status"])
+        if not has_status and (not isinstance(receipt.get("requests"), list) or "accounting" not in receipt):
             continue
         return paper_observation(lane, receipt, path.stat().st_mtime, now)
     return empty(lane, now)
