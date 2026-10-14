@@ -47,6 +47,44 @@ class FinalIntegrityTests(FixtureTestCase):
         self.assertNotEqual(layer["status"], "reopened")
         self.assertEqual(layer["verdict"]["reopened_by"], [])
 
+    def test_unswept_layer_cannot_be_final(self):
+        root, _, _ = self.measured()
+        path = root / fs.LEDGER
+        ledger = json.loads(path.read_bytes())
+        ledger["sweeps"] = []
+        _write_json(path, ledger)
+        self.matrix(root)
+        self.fresh_reject(root, "non-definitive status unswept cannot be FINAL")
+
+    def test_covering_scope_hash_change_reopens_final(self):
+        for field in ("requirement_sha256", "platform_profiles_sha256"):
+            for scenario in ("changed", "changed_then_reverted", "prior_change_only", "unchanged"):
+                with self.subTest(field=field, scenario=scenario):
+                    root, _, _ = self.measured()
+                    if scenario == "prior_change_only":
+                        self.sweep(root, "2026-09-21", ident="older")
+                    self.sweep(root, "2026-09-23")
+                    if scenario == "changed_then_reverted":
+                        self.sweep(root, "2026-09-24", ident="reverted")
+                    path = root / fs.LEDGER
+                    ledger = json.loads(path.read_bytes())
+                    for sweep in ledger["sweeps"]:
+                        sweep["layers"][0][field] = ("b" if
+                            (scenario.startswith("changed") and sweep["date"] == "2026-09-23") or
+                            (scenario == "prior_change_only" and sweep["date"] == "2026-09-21")
+                            else "a") * 64
+                    _write_json(path, ledger)
+                    self.matrix(root)
+                    if scenario.startswith("changed"):
+                        self.fresh_reject(root, "reopened sweep delta must be adjudicated")
+                    else:
+                        code, output = self.run_main(root, "--write")
+                        self.assertEqual(code, 0, output)
+                        document = json.loads((root / fs.OUTPUT).read_bytes())
+                        layer = self.layer(document, "layer-a")
+                        self.assertEqual(layer["terminal_state"], "FINAL")
+                        self.assertEqual(layer["verdict"]["reopened_by"], [])
+
     def test_retained_change_reopens_final_and_its_receipt_is_required(self):
         for retained in (True, False):
             with self.subTest(retained=retained):

@@ -615,14 +615,20 @@ def retained_final_reference(sources: Sources, ref, reason: str):
         raise FinalStackError(reason) from None
 
 
-def final_reopened_by(sources: Sources, key: tuple[str, str], later: list[dict]) -> list[dict]:
+def final_reopened_by(sources: Sources, key: tuple[str, str], later: list[dict],
+                      baseline: dict | None) -> list[dict]:
     """A later date is matrix staleness; FINAL needs a sweep's retained change."""
+    baseline_row = next((row for row in baseline["record"]["layers"]
+                         if (row["catalog"], row["layer_id"]) == key), {}) if baseline else {}
     reopened = []
     for sweep in later:
         changed = False
         for row in sweep["record"]["layers"]:
             if (row["catalog"], row["layer_id"]) != key:
                 continue
+            # The ledger's retained scope hashes reset independently of reopen markers.
+            changed = changed or any(baseline_row.get(field) not in (None, row.get(field))
+                                     for field in ("requirement_sha256", "platform_profiles_sha256"))
             markers = row.get("reopen") or []
             if not isinstance(markers, list):
                 raise FinalStackError("FINAL reopening requires retained change evidence")
@@ -730,8 +736,10 @@ def enforce_final(sources: Sources, layers: list[dict], runs: list[dict], angle_
         def fail(reason):
             raise FinalStackError(f"FINAL {layer_key(*key)}: {reason}")
 
-        if layer["status"] == "reopened":
-            fail("reopened sweep delta must be adjudicated before FINAL")
+        if layer["status"] not in DEFINITIVE_STATUSES:
+            fail("reopened sweep delta must be adjudicated before FINAL"
+                 if layer["status"] == "reopened"
+                 else f"non-definitive status {layer['status']} cannot be FINAL")
         if layer["survivors"]:
             fail("cumulative unresolved survivors require retained dispositions before FINAL")
         entry = angle_inputs.get(key)
@@ -884,7 +892,9 @@ def build_document(root: Path) -> dict:
             if resolved_terminal == "FINAL":
                 # Preserve the matrix's ordinary dated metric, then apply the
                 # protocol's stricter changed-evidence rule to settled FINAL.
-                reopened_by = final_reopened_by(sources, key, later)
+                baseline = next((sweep for sweep in reversed(covering)
+                                 if verdict_day is not None and sweep["day"] <= verdict_day), None)
+                reopened_by = final_reopened_by(sources, key, later, baseline)
                 if state == "recorded_reopened" and not reopened_by:
                     state = "confirmed_current"
         held = isinstance(row.get("current_adoption_status"), str) and row["current_adoption_status"].startswith("held")

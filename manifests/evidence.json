@@ -20333,8 +20333,8 @@
     },
     {
       "path": "evidence/artifacts/angle-records-20261012/fix3-checks.json",
-      "sha256": "b1d3d392f2d034e6396c83beeca6bf423db5af5701350c78ff71ad1d79acae46",
-      "bytes": 4310
+      "sha256": "1b4000c1ae703f5b1e6c58c8c6b9fd3b4a92280b43b250655dd8f816031dbc5e",
+      "bytes": 4490
     },
     {
       "path": "evidence/artifacts/angle-records-20261012/muse-install-sanitized.json",
@@ -62223,8 +62223,8 @@
     },
     {
       "path": "scripts/final_stack.py",
-      "sha256": "184da8c2aa5d9132ef25c93bc43d97f194bd8eab70e24fde224d286e55c50772",
-      "bytes": 73733
+      "sha256": "8682a061d1d988400ba1a528e229a219813cc2a487d923f1a0ab1516310ef308",
+      "bytes": 74548
     },
     {
       "path": "scripts/freshness_propose.py",
@@ -62978,8 +62978,8 @@
     },
     {
       "path": "tests/test_angle_records_fix3.py",
-      "sha256": "7fbb8568a654c41190f7c1490143e52e7d6e2e443aa1e24ff6c73b52510684ea",
-      "bytes": 8910
+      "sha256": "c1820391943384fff0c65579a928efbe2799b3059de147c0b0640ee3ed2fa22d",
+      "bytes": 11041
     },
     {
       "path": "tests/test_anthropic_key_health.py",
