@@ -5621,6 +5621,16 @@
       "bytes": 67387
     },
     {
+      "path": "adoption/plugins/README.md",
+      "sha256": "930096a6f59248efaa2b21128820a2482f4a0cbaeb246e54ed8668d69b1a2732",
+      "bytes": 1311
+    },
+    {
+      "path": "adoption/plugins/pins.json",
+      "sha256": "ea36512017bfd80573825ffa8eca84841bab5b8925f04b7626cd0240179a629f",
+      "bytes": 4279
+    },
+    {
       "path": "adoption/pre-login-observation.json",
       "sha256": "db86ad9ea65cc14e14d2e604b63816ce2d70b2747293d05d1be3375da5b2c239",
       "bytes": 4338
@@ -19155,6 +19165,11 @@
       "path": "docs/decisions/2026-10-13-paper-configurable-risk-ceilings.md",
       "sha256": "4961225182a78eae3abf25aa120cd325ec0e5b335b766d79a0c38db6c1b12550",
       "bytes": 4526
+    },
+    {
+      "path": "docs/decisions/2026-10-13-plugin-pins-stage-1.md",
+      "sha256": "4345fa9448a225e04103dead1a1aff131c015968c6bd7e5d8c0da4a4b0856a6d",
+      "bytes": 11997
     },
     {
       "path": "docs/decisions/2026-10-13-plugin-skill-identity.md",
@@ -48502,6 +48517,56 @@
       "bytes": 2
     },
     {
+      "path": "evidence/artifacts/plugin-pins-20261013/README.md",
+      "sha256": "a4138b6c403f207d68061fba0853855d2fc15c8a78819f1385b60d5aed4a6eac",
+      "bytes": 2774
+    },
+    {
+      "path": "evidence/artifacts/plugin-pins-20261013/receipts/changelog-excerpts.txt",
+      "sha256": "c35c61fc7229809884680f2bc9e2cc80c4a8926664746a36734aa9b8f0f2a741",
+      "bytes": 471
+    },
+    {
+      "path": "evidence/artifacts/plugin-pins-20261013/receipts/context-mode-compare.json",
+      "sha256": "b79c97850bac43a7fb9e2bea79d6ebcbbd484a4ff88e5f3f364d7811a8d76374",
+      "bytes": 1450
+    },
+    {
+      "path": "evidence/artifacts/plugin-pins-20261013/receipts/docs-excerpts.txt",
+      "sha256": "53ff6f791521d6595af3297c44db2bc15fa9a6f3976ca0b1c00135a13f1692dc",
+      "bytes": 1752
+    },
+    {
+      "path": "evidence/artifacts/plugin-pins-20261013/receipts/fail-before.txt",
+      "sha256": "dc3e0b41cf32c63c2d9c50cce7ae9781e8e92fc0cde94898ee88a93207594714",
+      "bytes": 742
+    },
+    {
+      "path": "evidence/artifacts/plugin-pins-20261013/receipts/mutants-17.txt",
+      "sha256": "27adcc37255ed7052afeb0cca0c0a7b996978f5f54e62d23fcdefbaf81ce471a",
+      "bytes": 1366
+    },
+    {
+      "path": "evidence/artifacts/plugin-pins-20261013/receipts/mutants-round1-29.txt",
+      "sha256": "f41de57247f096b52c68016264f0b9463d42a80b02008902988a7e70337d38ca",
+      "bytes": 3937
+    },
+    {
+      "path": "evidence/artifacts/plugin-pins-20261013/receipts/observed-registry.json",
+      "sha256": "7e41046ca09aaea8012c81f14d25520a71e4acdb13621becab7d6f7c96b63b90",
+      "bytes": 604
+    },
+    {
+      "path": "evidence/artifacts/plugin-pins-20261013/receipts/official-marketplace-pins.txt",
+      "sha256": "dec20caefff14d01246a58ba4a56edee1526d554fd0f124c1b2547c0c6265dad",
+      "bytes": 290
+    },
+    {
+      "path": "evidence/artifacts/plugin-pins-20261013/receipts/tag-resolution.txt",
+      "sha256": "b915858fc221365e1d558e1149a080b365a628b45dfd4bbb0a8396e97ff810c5",
+      "bytes": 611
+    },
+    {
       "path": "evidence/artifacts/plugin-skill-identity-20261013/README.md",
       "sha256": "b6afce8e7008ad7470041bcd52d3d1829a8e4e2f110e20e53ba4c5f66496910f",
       "bytes": 6792
@@ -63625,6 +63690,11 @@
       "path": "tests/test_platform_status.py",
       "sha256": "a5a6e1645f25b43f8e0b53fa718868ab6fcfea1e4e6b503515ee536eb64ce558",
       "bytes": 38625
+    },
+    {
+      "path": "tests/test_plugin_pins.py",
+      "sha256": "532e4065d98e48b1aaf6756b07b0a6a6ae15ab1a9fe0b2b447cb12022f65a4be",
+      "bytes": 12842
     },
     {
       "path": "tests/test_plugin_skill_identity_receipts.py",

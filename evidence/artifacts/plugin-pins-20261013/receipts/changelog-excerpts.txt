@@ -1,0 +1,5 @@
+anthropics/claude-code@3deb873687379f0c199a69fdaccc65f0865f7a29 CHANGELOG.md:
+
+L3425: - Added `archive` plugin source: install plugins from a zip over HTTPS without git or npm, with optional SHA-256 pinning
+L5103: - Fixed `claude plugin install` failing for plugins whose marketplace `ref` no longer exists upstream when a `sha` is also pinned
+L7353: - Added support for pinning plugins to specific git commit SHAs, allowing marketplace entries to install exact versions

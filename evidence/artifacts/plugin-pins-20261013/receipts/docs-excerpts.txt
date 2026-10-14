@@ -1,0 +1,13 @@
+Pages of code.claude.com fetched 2026-10-13T19:42Z (the size and the sha256 are of the page bytes as served):
+
+code.claude.com/docs/en/plugins/marketplace-reference.md (44335 bytes, sha256 f9733d0ca8639440700b5e2af718c62052e5b0774e9e9d7903c8cdce353f4a07):
+L143: | `github` | `repo`, `ref`, `sha` | GitHub repository in `owner/repo` form |
+L144: | `url` | `url`, `ref`, `sha` | Any git repository by URL |
+L145: | `git-subdir` | `url`, `path`, `ref`, `sha` | One subdirectory of a git repository, fetched with a sparse checkout |
+L147: | `archive` | `url`, `sha256` | Zip archive over HTTPS. Requires Claude Code v2.1.224 or later |
+L157: * **`sha`**: a full 40-character lowercase commit SHA. When you set both `ref` and `sha`, Claude Code checks out `sha`. On most git hosts, including GitHub, GitLab, and Bitbucket, this means installation succeeds even if the branch or tag named by `ref` has since been deleted upstream, as long as the commit is still reachable from the repository. Some servers, such as AWS CodeCommit, don't support fetching commits by SHA. On those servers the `ref` must still exist and the pinned commit must be reachable from it.
+L351: | `git` | A git repository to clone, with fields `url`, `ref`, `path`, and `sparsePaths` | Doesn't exist |
+L352: | `github` | A GitHub repository, with fields `repo`, `ref`, `path`, and `sparsePaths` | A GitHub repository, with fields `repo`, `ref`, and `sha`, and no `path` |
+
+code.claude.com/docs/en/plugin-marketplaces.md (14189 bytes, sha256 0597250fec9a5eb9734df9c6821409431623604656129cf8e462f93460db6a84):
+L172: For the fields of every source type, and for pinning a git-based source to a `ref` or `sha`, see [Plugin sources](/docs/en/plugins/marketplace-reference#plugin-sources).

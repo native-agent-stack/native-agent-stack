@@ -1,0 +1,20 @@
+The 17 mutants of CPA-V-11 stage 1 (the pin record, the templates' plugin entries and marketplace sources, the bootstrap guide's reviewed revisions and the receipts the pins rest on). Each is one exact change of one file (restored after each run); tests.test_plugin_pins runs; a mutant is killed when the run fails. The unmutated run passes first.
+
+killed   (failed) an enabled plugin has no entry
+killed   (failed) an entry is stale (no template enables it)
+killed   (failed) a tag pin names another commit
+killed   (failed) a sha is not a full commit
+killed   (failed) an exception has no reason
+killed   (failed) an exception names no content rule
+killed   (failed) a builtin has no reason
+killed   (failed) the record's source differs from the template's
+killed   (failed) the record carries a sha in a marketplace source
+killed   (failed) the template enables a plugin the record lacks
+killed   (failed) the template moves a tag
+killed   (failed) the template drops the context-mode marketplace
+killed   (failed) the additions template enables another plugin
+killed   (failed) the guide's reviewed commit differs
+killed   (failed) the captured tag resolves to another commit
+killed   (failed) the compare shows more than the stats file
+killed   (failed) the docs excerpt no longer shows the marketplace source without sha
+17 mutants, 17 killed, survivors: none
