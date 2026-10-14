@@ -58,7 +58,7 @@ directory), deleted after the run. The inner bubblewrap is the filesystem fence.
 `/review/config` (writable, deleted after the run) and the pinned binary. There is no `/home`, so the gh login, the key
 store and every other host file are absent. No CLAUDE.md memory of any kind is loaded: every session runs with
 `CLAUDE_CODE_DISABLE_CLAUDE_MDS=1` (the instruction fence). The flags and settings are listed in `claude_flags()` and
-`review_settings()` in `worker.py`, each checked against `claude --help` of 2.1.296.
+`review_settings()` in `worker.py`, each checked against `claude --help` of 2.1.299 (byte-identical to 2.1.296's).
 
 A trading head (every `us-equities-trading` head, and a `native-agent-stack` head that changes one of its
 `trading_paths`) gets the upstream-alignment rule in its prompt. Every claim or fix about external behaviour must cite
@@ -107,7 +107,7 @@ prompt says the check covers citation presence only.
    # CLAUDE_REVIEW_KEYS=anthropic-api-4,anthropic-api-3,anthropic-api-2,anthropic-api-5,anthropic-api,...
    #   fill-first: the next key only when one is out of credit or revoked; a switch is a ledger row and a warning;
    #   anthropic-api-3 is second (its CI-review purpose ended with #981) and anthropic-api-2 third (owner, 2026-10-11)
-   # CLAUDE_BIN=~/.local/share/claude/versions/2.1.296                  # the pinned native binary
+   # CLAUDE_BIN=~/.local/share/claude/versions/2.1.299                  # the pinned native binary
    # CLAUDE_REVIEW_STATE=~/.local/state/native-agent-stack/claude-review-worker
    # CLAUDE_REVIEW_TIMEOUT_SECONDS=2700
    # CLAUDE_REVIEW_UPSTREAM=~/code/upstream   # the local upstream mirrors, read as git objects only

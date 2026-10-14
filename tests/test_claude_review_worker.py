@@ -1679,7 +1679,9 @@ class InvocationTest(unittest.TestCase):
     def test_settings_read_the_environment(self):
         settings = crw.settings_from({"HOME": "/h", "API_ACTIONS_LEDGER": "~/l.jsonl"})
         self.assertEqual(settings.keys, crw.DEFAULT_KEYS)
-        self.assertEqual(settings.claude_bin, Path("/h/.local/share/claude/versions/2.1.296"))
+        # The adopted client release: 2.1.299, which fixes two 2.1.296 faults that ran a headless tool call twice.
+        self.assertEqual(crw.DEFAULT_CLAUDE_BIN, "~/.local/share/claude/versions/2.1.299")
+        self.assertEqual(settings.claude_bin, Path("/h/.local/share/claude/versions/2.1.299"))
         self.assertEqual(settings.state, Path("/h/.local/state/native-agent-stack/claude-review-worker"))
         self.assertEqual(settings.ledger, Path("/h/l.jsonl"))
         self.assertFalse(settings.post)  # posting is off until CLAUDE_REVIEW_POST=1
