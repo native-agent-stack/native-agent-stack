@@ -7,6 +7,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -28,6 +29,23 @@ class SelfTests(unittest.TestCase):
             with self.subTest(name):
                 done = subprocess.run([sys.executable, "-I", str(TOOLS / f"{name}.py")], capture_output=True, text=True, timeout=900)
                 self.assertEqual(done.returncode, 0, done.stdout[-2000:] + done.stderr[-1000:])
+
+    def test_storm_snapshot_selftest_holds_on_a_machine_without_the_sessions_cgroup(self):
+        """A CI runner has no /sys/fs/cgroup/non-systemd. The selftest's live group check used to assert more than 50 processes,
+        which is true only on the workstation, and failed on every runner (validate-shard-7 of PR 1115). Run the selftest against
+        a copy of the tool whose default group is missing; it must pass on any machine."""
+        missing = "/sys/fs/cgroup/ns2604-test-missing-group"
+        with tempfile.TemporaryDirectory() as tmp:
+            for name in ("storm_snapshot.py", "storm_snapshot_selftest.py"):
+                text = (TOOLS / name).read_text()
+                if name == "storm_snapshot.py":
+                    patched = text.replace('GROUP_DEFAULT = "/sys/fs/cgroup/non-systemd"', f'GROUP_DEFAULT = "{missing}"')
+                    self.assertNotEqual(patched, text, "the tool's default group line moved; update this test")
+                    text = patched
+                (Path(tmp) / name).write_text(text)
+            self.assertFalse(Path(missing).exists())
+            done = subprocess.run([sys.executable, "-I", str(Path(tmp) / "storm_snapshot_selftest.py")], capture_output=True, text=True, timeout=300)
+            self.assertEqual(done.returncode, 0, done.stdout[-2000:] + done.stderr[-1000:])
 
 
 class RuleAndUnitTests(unittest.TestCase):

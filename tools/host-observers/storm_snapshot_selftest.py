@@ -5,6 +5,7 @@ string. Real /proc is read only by the last three checks."""
 import ast
 import importlib.util
 import json
+import os
 import re
 import subprocess
 import sys
@@ -22,6 +23,28 @@ def check(name, cond, extra=""):
     global failed
     print(("ok   " if cond else "FAIL ") + name + ((" :: " + str(extra)) if (extra and not cond) else ""))
     failed += 0 if cond else 1
+
+
+def count_group(path):
+    """cgroup.procs entries under `path`, counted here and not by the tool."""
+    n = 0
+    for root, _dirs, files in os.walk(path):
+        if "cgroup.procs" in files:
+            try:
+                n += len(Path(root, "cgroup.procs").read_text().split())
+            except OSError:
+                pass
+    return n
+
+
+def saw_group(seen, before, after, slack=25):
+    """The snapshot counted the group: within one sample's churn of what the cgroup files held before and after.
+    A machine with no such cgroup (a CI runner) holds nothing, so the snapshot must hold nothing too. The earlier
+    `seen > 50` was true only on the workstation and failed on every runner."""
+    lo, hi = min(before, after), max(before, after)
+    if hi == 0:
+        return seen == 0
+    return max(1, lo - slack) <= seen <= hi + slack
 
 
 S = ss.shape
@@ -71,16 +94,27 @@ calls = {n.attr for n in ast.walk(tree) if isinstance(n, ast.Attribute)} | {n.id
 check("no code string mentions .key", not any(".key" in c for c in consts), [c for c in consts if ".key" in c])
 check("the sessions directory is never listed or globbed", not ({"iterdir", "glob", "rglob", "listdir", "scandir"} & calls), sorted({"iterdir", "glob", "rglob", "listdir", "scandir"} & calls))
 
+# the group check itself, with numbers: a runner with no cgroup, the workstation, a tool that saw nothing, one that saw too much
+check("group check: no cgroup and an empty snapshot agree (a CI runner)", saw_group(0, 0, 0))
+check("group check: a snapshot of 3 processes of an empty group is wrong", not saw_group(3, 0, 0))
+check("group check: an empty snapshot of a group that held 300 is wrong", not saw_group(0, 300, 310))
+check("group check: 305 of a group that held 300 to 310 is right", saw_group(305, 300, 310))
+check("group check: 900 of a group that held 300 to 310 is wrong", not saw_group(900, 300, 310))
+
 # live --once snapshot of the real group: parses, has the keys, and its shapes and lane names hold no long opaque string
 tmp = Path(tempfile.mkdtemp()) / "s.jsonl"
-r = subprocess.run([sys.executable, "-I", str(TOOL), str(tmp), "--once", "--sample", "1.0"], capture_output=True, text=True, timeout=60)
+GROUP = os.environ.get("STORM_SELFTEST_GROUP", ss.GROUP_DEFAULT)  # point it at a missing path to rehearse a CI runner
+group_before = count_group(GROUP)
+r = subprocess.run([sys.executable, "-I", str(TOOL), str(tmp), "--once", "--sample", "1.0", "--group", GROUP], capture_output=True, text=True, timeout=60)
 ok = r.returncode == 0 and tmp.exists()
 rec = json.loads(tmp.read_text().splitlines()[-1]) if ok else {}
 check("live --once exits 0 and writes one parseable line", ok and {"utc", "trigger_cores", "sample_s", "group_processes", "measured_cores", "lanes"} <= set(rec), (r.returncode, r.stderr[-200:]))
 texts = [x["lane"] for x in rec.get("lanes", [])] + [s["shape"] for x in rec.get("lanes", []) for s in x["top"]]
 long_tokens = [m for tx in texts for m in re.findall(r"[A-Za-z0-9+/_-]{28,}", tx)]
 check("the live snapshot's shapes and lane names hold no long opaque string", not long_tokens, long_tokens[:3])
-check("the live snapshot saw the group", rec.get("group_processes", 0) > 50 and isinstance(rec.get("lanes"), list), rec.get("group_processes"))
+group_after = count_group(GROUP)
+check("the live snapshot saw the group", saw_group(rec.get("group_processes", -1), group_before, group_after) and isinstance(rec.get("lanes"), list),
+      (group_before, rec.get("group_processes"), group_after))
 
 print("\n" + ("ALL PASS" if failed == 0 else f"{failed} FAILED"))
 sys.exit(1 if failed else 0)
