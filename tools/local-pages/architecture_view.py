@@ -285,6 +285,181 @@ def _local_host_receipts(host: dict) -> str:
     return _closed("Local host receipt metadata", len(items), note + table)
 
 
+# ---------------------------------------------------------------- layer pages
+_STATE_TEXT = {"FINAL": "Final", "SCHEDULED": "Scheduled", "RETIRED": "Retired", "non-terminal": "Not terminal"}
+
+
+def _glyph_svg(state: str | None) -> str:
+    key = _diagrams().STATE_GLYPH.get(state or "")
+    inner = _diagrams()._glyph(7, 7, key) if key else '<rect x="3" y="3" width="8" height="8" rx="2" class="mf-g-none"/>'
+    return f'<svg class="mf-glyph" viewBox="0 0 14 14" aria-hidden="true" focusable="false">{inner}</svg>'
+
+
+def _mark(met: bool, label: str | None = None) -> str:
+    glyph = '<rect x="3" y="3" width="8" height="8" rx="1" class="mf-g-built"/>' if met else '<circle cx="7" cy="7" r="3.6" class="mf-g-candidate"/>'
+    return f'<span class="lp-mark lp-mark--{"met" if met else "missing"}"><svg class="mf-glyph" viewBox="0 0 14 14" aria-hidden="true" focusable="false">{glyph}</svg>{esc(label or ("Met" if met else "Missing"))}</span>'
+
+
+def _anchor(key: str) -> str:
+    return "layer-" + re.sub(r"[^a-z0-9-]+", "-", key.casefold()).strip("-")
+
+
+def _refs(refs: list[str]) -> str:
+    return "<ul class=\"lp-refs\">" + "".join(f"<li><code>{esc(ref)}</code></li>" for ref in refs) + "</ul>" if refs else "<p>No repository file is cited.</p>"
+
+
+def _count_strip(manifest: dict) -> str:
+    """One compact strip: layers by computed state, then each condition as a meter (dataviz: stat figures and meters, no chart)."""
+    summary = manifest["summary"]
+    total = summary["layers"]
+    states = "".join(f'<div class="lp-stat lp-stat--{esc(state.casefold())}"><dt>{_glyph_svg(state)}{esc(_STATE_TEXT[state])}</dt><dd>{summary["states"][state]}</dd></div>'
+                     for state in ("FINAL", "SCHEDULED", "RETIRED", "non-terminal"))
+    meters = ""
+    for condition in manifest["definitions"]["conditions"]:
+        count = summary["conditions_met"][condition["key"]]
+        share = 0 if not total else round(100 * count / total, 1)
+        meters += (f'<div class="lp-meter"><dt>{esc(condition["label"])}</dt><dd><span class="lp-meter-value">{count} of {total}</span>'
+                   f'<span class="lp-meter-track" role="img" aria-label="{esc(condition["label"])}: {count} of {total} layers meet it" title="{esc(condition["rule"])} {count} of {total} layers.">'
+                   f'<span class="lp-meter-fill" style="width: {share}%"></span></span></dd></div>')
+    return (f'<section class="lp-strip" aria-labelledby="lp-strip-title"><h2 id="lp-strip-title" class="lp-quiet">{total} layers by computed state</h2>'
+            f'<dl class="lp-stats">{states}</dl><h2 class="lp-quiet">Layers where every winner meets the condition</h2><dl class="lp-meters">{meters}</dl></section>')
+
+
+def _rail(manifest: dict) -> str:
+    conditions = manifest["definitions"]["conditions"]
+    head = '<th scope="col">Layer</th>' + "".join(f'<th scope="col" class="lp-rail-head" title="{esc(c["rule"])}">{esc(c["label"])}</th>' for c in conditions) + '<th scope="col">Computed state</th>'
+    rows = []
+    for layer in manifest["layers"]:
+        cells = []
+        for condition in conditions:
+            met = layer["conditions"][condition["key"]]
+            count = sum(1 for winner in layer["winners"] if winner["conditions"][condition["key"]]["met"])
+            label = "Met" if met else (f"{count} of {len(layer['winners'])}" if layer["winners"] else "No winner")
+            cells.append(f'<td class="lp-rail-cell lp-rail-cell--{"met" if met else "missing"}">{_mark(met, label)}</td>')
+        rows.append(f'<tr><th scope="row"><a href="#{_anchor(layer["layer"])}">{esc(layer["title"])}</a></th>{"".join(cells)}'
+                    f'<td class="lp-state-cell">{_glyph_svg(layer["state"])}{esc(_STATE_TEXT[layer["state"]])}</td></tr>')
+    return (f'<div class="table-wrap lp-rail" tabindex="0" role="region" aria-label="Four FINAL conditions by layer"><table><caption>Four FINAL conditions by layer. '
+            f'A condition is met for a layer only when every winner meets it.</caption><thead><tr>{head}</tr></thead><tbody>{"".join(rows)}</tbody></table></div>')
+
+
+def _layer_article(layer: dict, manifest: dict) -> str:
+    conditions = manifest["definitions"]["conditions"]
+    verdict = layer["verdict"]
+    rows = []
+    for winner in layer["winners"]:
+        pin = winner["pin"]
+        run = f'<code>{esc(pin["run"])}</code> <small>{esc(pin["run_id"])}</small>' if pin["run"] else f'none ({esc(pin["run_reason"] or "unresolved")})'
+        rows.append([esc(winner["component"]), f'<code>{esc(pin["verdict"])}</code>', run, esc(pin["pin_drift"] or "no run"), esc(winner["evidence_class"] or "unreported")]
+                    + [_mark(winner["conditions"][c["key"]]["met"]) + f'<small>{esc(winner["conditions"][c["key"]]["detail"])}</small>' for c in conditions])
+    winners = (_table("Winners of " + str(layer["title"]), ["Component", "Verdict pin", "Run pin", "Pin drift", "Evidence class"] + [c["label"] for c in conditions], rows)
+               if rows else '<p class="lp-empty">No recorded winner. ' + esc(f'Verdict {verdict["status"] or "absent"}; final_stack.py status {layer["final_stack_status"]}.') + '</p>')
+    missing = ("<ul class=\"lp-missing\">" + "".join(f"<li>{esc(reason)}</li>" for reason in layer["missing"]) + "</ul>") if layer["missing"] else "<p>Nothing is missing.</p>"
+    gaps = "<ol>" + "".join(f"<li>{esc(gap)}</li>" for gap in layer["open_gaps"]) + "</ol>" if layer["open_gaps"] else "<p>The catalog lists no open gap.</p>"
+    reopened = ", ".join(verdict["reopened_by"]) or "none"
+    facts = (f'<dl class="lp-facts"><div><dt>Next review</dt><dd>{esc(verdict["next_review"] or "none recorded")}</dd></div>'
+             f'<div><dt>Verdict</dt><dd>{esc(verdict["status"] or "absent")}, wave {esc(verdict["wave"] or "none")}, dated {esc(verdict["date"] or "undated")}</dd></div>'
+             f'<div><dt>final_stack.py status</dt><dd>{esc(layer["final_stack_status"])}; reopened by {esc(reopened)}</dd></div>'
+             f'<div><dt>Open gaps</dt><dd>{layer["open_gap_count"]}</dd></div></dl>')
+    outside = f'<p class="source-note">{layer["refs_outside_repository"]} cited references point outside this repository and are not listed.</p>' if layer["refs_outside_repository"] else ""
+    return (f'<article class="lp-layer" id="{_anchor(layer["layer"])}" aria-labelledby="{_anchor(layer["layer"])}-title">'
+            f'<header class="lp-layer-head"><h3 id="{_anchor(layer["layer"])}-title">{esc(layer["title"])}</h3><p class="lp-key"><code>{esc(layer["layer"])}</code></p>'
+            f'<p class="lp-state lp-state--{esc(layer["state"].casefold())}">{_glyph_svg(layer["state"])}{esc(_STATE_TEXT[layer["state"]])}</p></header>'
+            f'<p class="lp-choice">{esc(layer["current_choice"] or "No current choice recorded.")}</p>{facts}'
+            f'<div class="lp-missing-wrap"><h4>What keeps it from FINAL</h4>{missing}</div>{winners}'
+            f'<details class="lp-more"><summary>Open gaps ({layer["open_gap_count"]})</summary>{gaps}</details>'
+            f'<details class="lp-more"><summary>Overturn when</summary><p>{esc(layer["overturn_when"] or "Not recorded.")}</p></details>'
+            f'<details class="lp-more"><summary>Evidence files ({len(layer["evidence_refs"])})</summary>{_refs(layer["evidence_refs"])}{outside}</details></article>')
+
+
+def _flags(manifest: dict) -> str:
+    flags = manifest.get("flags") or {}
+    if not flags:
+        return '<section class="mf-view" id="lp-flags"><h2>Drift flags</h2><p class="mf-unreported">The final_stack.py flags were not produced for this build.</p></section>'
+    totals = flags["totals"]
+
+    def block(title: str, lines: list[str]) -> str:
+        return f'<details class="lp-more" open><summary>{esc(title)} ({len(lines)})</summary>' + ("<ul class=\"lp-flag-list\">" + "".join(f"<li><code>{esc(line)}</code></li>" for line in lines) + "</ul>" if lines else "<p>None on this page.</p>") + "</details>"
+
+    without = [line + f" ({reason})" for reason, lines in (flags.get("without_run") or {}).items() for line in lines]
+    review = flags.get("past_next_review")
+    review_text = (f'{len(review)} layers past next_review on {esc(flags.get("today"))}.' if review is not None else "next_review was not evaluated.")
+    return ('<section class="mf-view" id="lp-flags" aria-labelledby="lp-flags-title"><h2 id="lp-flags-title">Drift flags from final_stack.py --check</h2>'
+            f'<p>Report-only flags, produced by the script\'s own <code>flags()</code> on the committed final-stack.json. Across both catalogs it reports '
+            f'{totals["pin_drift"]} winners whose run pin differs from the verdict pin, {totals["pin_drift_unknown"]} whose drift is unknown and {totals["without_run"]} without a run pin; '
+            f'this page lists its own catalog\'s share. {review_text}</p>'
+            + block("Run pin differs from the verdict pin", flags.get("pin_drift") or []) + block("Pin drift unknown", flags.get("pin_drift_unknown") or [])
+            + block("Winner without a run pin", without) + "</section>")
+
+
+def _figure_text(manifest: dict, drawn: dict) -> str:
+    spec = manifest.get("topology") or manifest.get("flow") or {}
+    names = {node["id"]: node["name"] for node in spec.get("nodes", [])}
+    items = []
+    for node in spec.get("nodes", []):
+        chips = "; ".join(f'{chip["name"]} ({"pin " + str(chip["pin"]) if chip.get("pin") else "no run pin" if chip.get("run_id") else "no run id"})' for chip in node.get("chips", []))
+        layers = ", ".join(node["layers"]) or "no catalog layer"
+        state = _STATE_TEXT.get(node.get("state"), "no layer state")
+        refs = ", ".join(node["evidence_refs"]) or "no repository record at this commit"
+        detail = " ".join(part for part in (node.get("sub"), node.get("tool")) if part)
+        items.append(f'<li><strong>{esc(node["name"])}</strong> ({esc(detail)}). Layers: {esc(layers)}; state: {esc(state)}.' + (f' Chips: {esc(chips)}.' if chips else "")
+                     + f' Records: <code>{esc(refs)}</code>.' + (f' Absent at this commit: <code>{esc(", ".join(node["absent_refs"]))}</code>.' if node["absent_refs"] else "") + '</li>')
+    edges = []
+    for edge in spec.get("edges", []):
+        shown = [variant for variant, pairs in drawn.items() if (edge["from"], edge["to"]) in pairs]
+        where = {"w": "wide", "m": "medium", "n": "narrow"}
+        edges.append(f'<li>{esc(names.get(edge["from"], edge["from"]))} to {esc(names.get(edge["to"], edge["to"]))}'
+                     + (f' ({esc(edge["label"].lower())})' if edge.get("label") else "") + f'; drawn in the {esc(", ".join(where[v] for v in shown) or "text view only")}{" view" if shown else ""}.</li>')
+    return f'<h3>Parts</h3><ul>{"".join(items)}</ul><h3>Connections</h3><ul>{"".join(edges)}</ul>'
+
+
+def render_layer_page(manifest: dict) -> tuple[str, dict]:
+    """Body of the Foundation or North-star page from its layer manifest."""
+    figure, drawn = _diagrams().layer_figure(manifest)
+    north = bool(manifest.get("flow"))
+    summary = manifest["summary"]
+    finalized = summary["finalized"]
+    lede = (f'<p class="mf-summary">{finalized} of {summary["layers"]} layers are finalized. A layer is FINAL only when the protocol\'s four conditions hold for every winner '
+            f'and final_stack.py reports it current or converged; each row below says what is missing. Verdicts, run pins and drift come from '
+            f'<code>{esc(manifest["sources"][0]["path"] if manifest.get("sources") else "catalogs/landscape/final-stack.json")}</code>, read at commit <code>{esc(manifest.get("commit") or "unrecorded")}</code>.</p>')
+    jumps = [("lp-figure", "Data flow" if north else "Topology")] + ([("lp-decisions", "Data-layer decisions"), ("lp-pending", "Pending study")] if north else []) + [
+        ("lp-rail-title", "Conditions by layer"), ("lp-register", "Layer register"), ("lp-flags", "Drift flags"), ("layer-sources", "Manifest and sources")]
+    nav = '<nav class="mf-jump" aria-label="Page sections"><ul>' + "".join(f'<li><a href="#{anchor}">{esc(label)}</a></li>' for anchor, label in jumps) + "</ul></nav>"
+    title = "How the trading data flows" if north else "What runs on the workstation"
+    intro = ("Feeds, the owned collector, the trading lanes, the brokers and the history path, with each node tied to its trading layer." if north
+             else "The lanes, the gateway and its provider slots, the runtime workers and the services around them, with each node tied to its foundation layer.")
+    body = [lede, _count_strip(manifest), nav,
+            f'<section class="mf-view mf-hero" id="lp-figure" aria-labelledby="lp-figure-title"><h2 id="lp-figure-title">{title}</h2><p>{esc(intro)}</p>{figure}'
+            + _diagrams()._alt("Read the diagram as text", _figure_text(manifest, drawn)) + "</section>"]
+    if north:
+        decisions = manifest["decisions"]
+        rows = [[esc(row["id"]), esc(row["decision"]), esc(row["element"]), _refs(row["evidence_refs"]) if row["evidence_refs"] else "None at this commit", esc(row["status"])] for row in decisions["rows"]]
+        body.append('<section class="mf-view" id="lp-decisions" aria-labelledby="lp-decisions-title"><h2 id="lp-decisions-title">Data-layer decisions of 2026-10-14</h2>'
+                    f'<p>The decisions are recorded in the {esc(decisions["record"])}. Each row names the element of the data flow it settles; the cited files are repository leads at this commit, not the decision text.</p>'
+                    + _table("Data-layer decisions", ["ID", "Decision", "Data-flow element", "Repository evidence", "Status"], rows) + "</section>")
+        pending = manifest["pending_study"]
+        body.append(f'<section class="mf-view lp-pending" id="lp-pending" aria-labelledby="lp-pending-title"><h2 id="lp-pending-title">{esc(pending["title"])}</h2>'
+                    f'<dl class="lp-facts"><div><dt>Readiness trigger</dt><dd>{esc(pending["trigger"])}</dd></div><div><dt>Content</dt><dd>{esc(pending["content"])}</dd></div></dl></section>')
+    body.append(f'<section class="mf-view" aria-labelledby="lp-rail-title"><h2 id="lp-rail-title">Conditions by layer</h2>'
+                '<p>Rows link to the register entry. Hover a column head for the protocol\'s wording of that condition.</p>' + _rail(manifest) + "</section>")
+    planned = manifest.get("planned_layers") or []
+    planned_note = (f'<p class="source-note">final-stack.json also lists {len(planned)} planned layers outside this catalog file: '
+                    + ", ".join(f'<code>{esc(row["layer"])}</code> ({esc(row["status"])})' for row in planned) + ".</p>") if planned else ""
+    body.append('<section class="mf-view" id="lp-register" aria-labelledby="lp-register-title"><h2 id="lp-register-title">Layer register</h2>'
+                '<p>Catalog order. Each entry gives the winners with their verdict and run pins, evidence class and the four conditions per winner, then the open gaps, the overturn rule and the evidence files.</p>'
+                + planned_note + "".join(_layer_article(layer, manifest) for layer in manifest["layers"]) + "</section>")
+    body.append(_flags(manifest))
+    sources = "".join(f'<div><dt><code>{esc(source["path"])}</code></dt><dd>SHA-256 <code>{esc(source["sha256"])}</code>, {esc(source["bytes"])} bytes</dd></div>' for source in manifest.get("sources") or [])
+    config = manifest.get("page_file") or {}
+    body.append('<section class="mf-view" id="layer-sources" aria-labelledby="layer-sources-title"><h2 id="layer-sources-title">Manifest and sources</h2>'
+                f'<p>The machine-readable manifest for this page is <a href="{esc(config.get("manifest") or "")}"><code>{esc(config.get("manifest") or "")}</code></a> '
+                f'(schema <code>{esc(manifest["schema"])}</code>): one item per layer and winner with its repository, pins, evidence files at commit <code>{esc(manifest.get("commit") or "unrecorded")}</code>, state and missing conditions. '
+                f'Conditions and states follow <code>{esc(manifest["protocol"])}</code>.</p><dl class="lp-sources">{sources}</dl>'
+                + _diagrams()._alt("How the conditions and states are read", "<dl class=\"lp-defs\">" + "".join(f'<div><dt>{esc(c["label"])}</dt><dd>{esc(c["rule"])}</dd></div>' for c in manifest["definitions"]["conditions"])
+                                   + "".join(f'<div><dt>{esc(_STATE_TEXT[s["state"]])}</dt><dd>{esc(s["rule"])}</dd></div>' for s in manifest["definitions"]["states"]) + "</dl>") + "</section>")
+    counts = {"rendered_layer_count": len(manifest["layers"]), "items": len(manifest["items"]), "finalized": finalized, "drawn_connectors": {key: len(value) for key, value in drawn.items()}}
+    return "".join(body), counts
+
+
 def render(model: dict, inventory: dict, first_layer: str | None = None,
            detail_outputs: dict[str, bytes] | None = None) -> tuple[str, dict]:
     mapped, unmapped = join_inventory(model, inventory)

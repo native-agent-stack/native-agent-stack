@@ -663,6 +663,317 @@ def _desk_draw(desk: dict) -> Callable[[str, int, str], tuple[str, float]]:
     return draw
 
 
+# ---------------------------------------------------------------- layer-page figures
+# Terminal states of the resolution protocol reuse the status glyph shapes, so a
+# state reads by shape and label as well as color.
+STATE_GLYPH = {"FINAL": "built", "SCHEDULED": "adopted", "non-terminal": "candidate", "RETIRED": "planned"}
+STATE_LEGEND = {"FINAL": "Final", "SCHEDULED": "Scheduled", "non-terminal": "Not terminal", "RETIRED": "Retired"}
+
+
+def _state_legend(x: float, y: float, width: float, states: list[str], ramp: dict, *, focus: str | None, flow: str | None,
+                  link: str | None = None) -> tuple[str, float]:
+    size, out = ramp["sub"] + 1, [f'<line x1="{_num(x)}" y1="{_num(y)}" x2="{_num(x + width)}" y2="{_num(y)}" class="mf-seam"/>']
+    out.append(_t(x, y + 20, "Legend", ramp["brow"], brow=True))
+    start = x + _brow_width("LEGEND", ramp["brow"]) + 24
+    cx, row = start, y + 20
+    items = [(STATE_GLYPH[state], STATE_LEGEND[state]) for state in states if state in STATE_GLYPH]
+    items += [("nolayer", "No catalog layer")] if "none" in states else []
+    if focus:
+        items.append(("focus", focus))
+    if flow:
+        items.append(("flow", flow))
+    if link:
+        items.append(("link", link))
+    for key, label in items:
+        span = 18 + _width(label, size) + 24
+        if cx + span > x + width and cx > start:
+            cx, row = start, row + 20
+        if key in ("flow", "link"):
+            out.append(f'<line x1="{_num(cx - 2)}" y1="{_num(row - 4)}" x2="{_num(cx + 12)}" y2="{_num(row - 4)}" class="{"mf-flow" if key == "flow" else "mf-flow-link"}"/>')
+        elif key == "nolayer":
+            out.append(_rect(cx + 1, row - 8, 8, 8, "mf-g-none", rx=2))
+        else:
+            out.append(_glyph(cx + 5, row - 4, key))
+        out.append(_t(cx + 18, row, label, size, "mf-muted"))
+        cx += span
+    return "".join(out), row - y + 12
+
+
+def _blocked(segment: tuple[float, float, float, float], boxes: list[tuple[float, float, float, float]]) -> bool:
+    """True when an axis-aligned segment passes through any box other than its endpoints (§6 rule 5)."""
+    x1, y1, x2, y2 = segment
+    left, right, top, bottom = min(x1, x2), max(x1, x2), min(y1, y2), max(y1, y2)
+    return any(left < bx + bw and right > bx and top < by + bh and bottom > by for bx, by, bw, bh in boxes)
+
+
+def _label(x: float, y: float, text: str, ramp: dict, *, anchor: str = "middle") -> str:
+    """Arrow label on an opaque mask; the caller keeps a 6-10px gap from the stroke."""
+    size = ramp["brow"]
+    width = _grid(_brow_width(text, size) + 8)
+    left = x - width / 2 if anchor == "middle" else x - 4
+    return _rect(left, y - size - 1, width, size + 5, "mf-mask", rx=2) + _t(x if anchor == "middle" else x, y, text, size, anchor=anchor, brow=True)
+
+
+TOPOLOGY_LAYOUT = {
+    "w": {"cols": 3, "rows": (("lanes", "gateway", None), ("workers", "scheduling", "mcp"), ("telemetry", "backup", None)), "side": 248},
+    "m": {"cols": 2, "rows": (("lanes", "gateway"), ("workers", "scheduling"), ("mcp", "telemetry"), ("backup", None)), "side": 0},
+    "n": {"cols": 1, "rows": (("lanes",), ("gateway",), ("workers",), ("scheduling",), ("mcp",), ("telemetry",), ("backup",)), "side": 0},
+}
+
+
+def _topology_draw(topology: dict) -> Callable[[str, int, str], tuple[str, float]]:
+    nodes = {node["id"]: node for node in topology.get("nodes", [])}
+    zones = {zone["id"]: zone["label"] for zone in topology.get("zones", [])}
+    focal_edge = tuple(topology.get("focal_edge") or ())
+
+    def node_height(node: dict) -> int:
+        return _grid(72 + len(node.get("chips") or []) * 30 + 6)
+
+    def draw_node(node: dict, x: float, y: float, w: float, r: dict, used: set) -> str:
+        state = node.get("state")
+        used.add(state or "none")
+        cls = "mf-node mf-focus" if node.get("focal") else "mf-node"
+        out = [_rect(x, y, w, node_height(node), cls, rx=6)]
+        tag = node["layers"][0] + (f" +{len(node['layers']) - 1}" if len(node["layers"]) > 1 else "") if node.get("layers") else "no catalog layer"
+        tag_w = min(_grid(_width(tag, r["brow"] + 0.5, mono=True) + 12), w - 40)
+        out.append(_rect(x + 12, y + 10, tag_w, 15, "mf-tag", rx=2))
+        out.append(_t(x + 18, y + 21, _wrap(tag, r["brow"] + 0.5, tag_w - 10, mono=True, lines=1)[0], r["brow"] + 0.5, "mf-mono mf-muted"))
+        if state:
+            out.append(_glyph(x + w - 16, y + 17, STATE_GLYPH.get(state)))
+        else:
+            out.append(_rect(x + w - 20, y + 13, 8, 8, "mf-g-none", rx=2))
+        out.append(_t(x + 12, y + 44, _wrap(node["name"], r["name"] + 1, w - 24, bold=True, lines=1)[0], r["name"] + 1, bold=True))
+        out.append(_t(x + 12, y + 59, _wrap(node.get("sub") or "", r["sub"], w - 24, mono=True, lines=1)[0], r["sub"], "mf-mono mf-muted"))
+        cy = y + 70
+        for chip in node.get("chips") or []:
+            out.append(_rect(x + 12, cy, w - 24, 24, "mf-art", rx=4))
+            pin = ("pin " + str(chip["pin"])) if chip.get("pin") else ("no run pin" if chip.get("run_id") else "no run id")
+            pin_text = _wrap(pin, r["sub"], (w - 24) * 0.55, mono=True, lines=1)[0]
+            room = w - 24 - 16 - _width(pin_text, r["sub"], mono=True) - 8
+            out.append(_t(x + 20, cy + 16, _wrap(chip["name"], r["item"], room, lines=1)[0], r["item"]))
+            out.append(_t(x + w - 20, cy + 16, pin_text, r["sub"], "mf-mono mf-muted", anchor="end"))
+            cy += 30
+        return "".join(out)
+
+    def draw(variant: str, width: int, ident: str) -> tuple[str, float]:
+        r, layout = RAMP[variant], TOPOLOGY_LAYOUT[variant]
+        pad, inset, gap_x, gap_y = r["pad"], (12 if variant == "n" else 24), (0 if variant == "n" else 96), 40
+        side = layout["side"]
+        host_l, host_r = pad, width - pad - (side + 24 if side else 0)
+        top = pad + 8
+        inner_l, inner_r = host_l + inset, host_r - inset
+        col_w = (inner_r - inner_l - (layout["cols"] - 1) * gap_x) / layout["cols"]
+        boxes, used, body, arrows, labels = {}, set(), [], [], []
+        y = top + 28
+        for row in layout["rows"]:
+            height = max((node_height(nodes[ident_]) for ident_ in row if ident_ in nodes), default=0)
+            for column, ident_ in enumerate(row):
+                if ident_ in nodes:
+                    boxes[ident_] = (inner_l + column * (col_w + gap_x), y, col_w, node_height(nodes[ident_]))
+            y += height + gap_y
+        host_bottom = y - gap_y + inset
+        zone_rects = [("host", host_l, top, host_r - host_l, host_bottom - top)]
+        if side:
+            side_l = host_r + 24
+            first = boxes.get("lanes", (0, top + 28, 0, 0))[1]
+            provider_h = node_height(nodes["providers"]) if "providers" in nodes else 0
+            boxes["providers"] = (side_l + 16, first, side - 32, provider_h)
+            zone_rects.append(("remote", side_l, top, side, first + provider_h + 20 - top))
+            github_top = first + provider_h + 56
+            if "github" in nodes:
+                boxes["github"] = (side_l + 16, github_top + 28, side - 32, node_height(nodes["github"]))
+                zone_rects.append(("github", side_l, github_top, side, node_height(nodes["github"]) + 48))
+            bottom = max(host_bottom, github_top + node_height(nodes.get("github", {"chips": []})) + 48)
+        else:
+            cursor = host_bottom + 32
+            for zone, node_id in (("remote", "providers"), ("github", "github")):
+                if node_id in nodes:
+                    boxes[node_id] = (host_l + inset, cursor + 28, min(col_w, host_r - host_l - 2 * inset), node_height(nodes[node_id]))
+                    zone_rects.append((zone, host_l, cursor, host_r - host_l, node_height(nodes[node_id]) + 48))
+                    cursor += node_height(nodes[node_id]) + 48 + 32
+            bottom = cursor - 32
+        for zone, zx, zy, zw, zh in zone_rects:
+            label = zones.get(zone, zone)
+            body.append(_rect(zx, zy, zw, zh, "mf-zone", rx=8))
+            body.append(_rect(zx + 12, zy - 6, _grid(_brow_width(label, r["brow"]) + 16), 14, "mf-mask", rx=2))
+            body.append(_t(zx + 20, zy + 4.5, label, r["brow"], brow=True))
+        drawn = []
+        for edge in topology.get("edges", []):
+            a, b = boxes.get(edge["from"]), boxes.get(edge["to"])
+            if not a or not b:
+                continue
+            others = [box for key, box in boxes.items() if key not in (edge["from"], edge["to"])]
+            focal = (edge["from"], edge["to"]) == focal_edge
+            cross = next((zone for zone, node in (("remote", "providers"), ("github", "github")) if node in (edge["from"], edge["to"])), None)
+            style, marker = ("mf-flow-focus", ident + "-arrow-focus") if focal else (("mf-flow-link", ident + "-arrow-link") if cross else ("mf-flow", ident + "-arrow"))
+            if abs(a[1] - b[1]) < 1 and (a[0] + a[2] <= b[0] or b[0] + b[2] <= a[0]):
+                line_y = a[1] + 32
+                x1, x2 = (a[0] + a[2], b[0]) if a[0] < b[0] else (a[0], b[0] + b[2])
+                segment = (x1, line_y, x2 - (2 if x2 > x1 else -2), line_y)
+                if _blocked(segment, others):
+                    continue
+                arrows.append(f'<line x1="{_num(segment[0])}" y1="{_num(line_y)}" x2="{_num(segment[2])}" y2="{_num(line_y)}" class="{style}" marker-end="url(#{marker})"/>')
+                if edge.get("label") and abs(x2 - x1) >= _brow_width(edge["label"], r["brow"]) + 20:
+                    labels.append(_label((x1 + x2) / 2, line_y - 10, edge["label"], r))
+                drawn.append(edge)
+            elif abs(a[0] - b[0]) < 1 and (a[1] + a[3] <= b[1] or b[1] + b[3] <= a[1]):
+                line_x = a[0] + 32
+                y1, y2 = (a[1] + a[3], b[1]) if a[1] < b[1] else (a[1], b[1] + b[3])
+                segment = (line_x, y1, line_x, y2 - (2 if y2 > y1 else -2))
+                if _blocked(segment, others):
+                    continue
+                arrows.append(f'<line x1="{_num(line_x)}" y1="{_num(segment[1])}" x2="{_num(line_x)}" y2="{_num(segment[3])}" class="{style}" marker-end="url(#{marker})"/>')
+                if edge.get("label") and abs(y2 - y1) >= 20:
+                    labels.append(_label(line_x + 10, (y1 + y2) / 2 + 4, edge["label"], r, anchor="start"))
+                drawn.append(edge)
+        node_marks = [draw_node(nodes[key], *box[:3], r, used) for key, box in boxes.items() if key in nodes]
+        states = [state for state in ("FINAL", "SCHEDULED", "RETIRED", "non-terminal") if state in used] + (["none"] if "none" in used else [])
+        legend, legend_h = _state_legend(pad, bottom + 28, width - 2 * pad, states, r, focus="Focal: the model gateway", flow="Call or trigger",
+                                         link="Crosses a zone" if any(edge["to"] in ("providers", "github") for edge in drawn if (edge["from"], edge["to"]) != focal_edge) else None)
+        draw.drawn[variant] = [(edge["from"], edge["to"]) for edge in drawn]
+        return "".join(body + arrows + node_marks + labels) + legend, bottom + 28 + legend_h + pad
+    draw.drawn = {}
+    return draw
+
+
+def _flow_draw(flow: dict) -> Callable[[str, int, str], tuple[str, float]]:
+    lanes = flow.get("lanes", [])
+    steps = flow.get("steps", [])
+    nodes = flow.get("nodes", [])
+    focal_step, focal_edge = flow.get("focal_step"), tuple(flow.get("focal_edge") or ())
+
+    def node_mark(node: dict, x: float, y: float, w: float, h: float, r: dict, used: set, *, size: float | None = None, wrap: int = 1) -> str:
+        state = node.get("state")
+        used.add(state or "none")
+        size = size or r["name"]
+        out = [_rect(x, y, w, h, "mf-node mf-focus" if node.get("focal") else "mf-node", rx=6)]
+        if state:
+            out.append(_glyph(x + 11, y + 14, STATE_GLYPH.get(state)))
+        else:
+            out.append(_rect(x + 7, y + 10, 8, 8, "mf-g-none", rx=2))
+        line_y = y + 18
+        for line in _wrap(node["name"], size, w - 24, bold=True, lines=2):
+            out.append(_t(x + 22, line_y, line, size, bold=True))
+            line_y += size + 3
+        sub_size = r["sub"] - (0.5 if wrap > 1 else 0)
+        for text, lines in ((node.get("sub"), wrap), (node.get("tool"), 1)):
+            if text:
+                for line in _wrap(text, sub_size, w - 28, mono=True, lines=lines):
+                    out.append(_t(x + 22, line_y + 2, line, sub_size, "mf-mono mf-muted"))
+                    line_y += sub_size + 4
+        return "".join(out)
+
+    def draw(variant: str, width: int, ident: str) -> tuple[str, float]:
+        r = RAMP[variant]
+        pad, used, bg, out, arrows, labels = r["pad"], set(), [], [], [], []
+        if variant == "n":
+            y = pad
+            node_w, node_h = width - 2 * pad - 24, 58
+            lane_names = dict((lane["id"], lane["label"]) for lane in lanes)
+            for index, label in enumerate(steps):
+                focus = index == focal_step
+                out.append(_rect(pad, y, 32, 16, "mf-step mf-focus" if focus else "mf-step", rx=8))
+                out.append(_t(pad + 16, y + 12, f"{index + 1:02d}", r["sub"], "mf-mono" + (" mf-focus-text" if focus else ""), anchor="middle"))
+                out.append(_t(pad + 44, y + 13, label, r["head"], "mf-focus-text" if focus else "", bold=True))
+                y += 28
+                for node in [node for node in nodes if node["step"] == index]:
+                    shown = {**node, "tool": lane_names.get(node["lane"], node["lane"]) + " lane"}
+                    out.append(node_mark(shown, pad + 24, y, node_w, node_h, r, used))
+                    y += node_h + 8
+                if index < len(steps) - 1:
+                    arrows.append(f'<line x1="{_num(pad + 16)}" y1="{_num(y)}" x2="{_num(pad + 16)}" y2="{_num(y + 16)}" class="mf-flow" marker-end="url(#{ident}-arrow)"/>')
+                    y += 24
+            bottom = y
+            draw.drawn[variant] = []
+        else:
+            label_w, header = (128, 48) if variant == "w" else (72, 48)
+            slot = (width - pad - label_w - 16) / len(steps)
+            node_w = _grid(slot - 64) if variant == "w" else slot - 16
+            lane_h, node_h = (100, 72) if variant == "w" else (112, 96)
+            left = pad + label_w
+            centers = [left + index * slot + slot / 2 for index in range(len(steps))]
+            boxes = {node["id"]: (centers[node["step"]] - node_w / 2, pad + header + [lane["id"] for lane in lanes].index(node["lane"]) * lane_h + (lane_h - node_h) / 2, node_w, node_h) for node in nodes}
+            for index, label in enumerate(steps):
+                focus = index == focal_step
+                bg.append(_rect(centers[index] - 16, pad, 32, 16, "mf-step mf-focus" if focus else "mf-step", rx=8))
+                bg.append(_t(centers[index], pad + 12, f"{index + 1:02d}", r["sub"], "mf-mono" + (" mf-focus-text" if focus else ""), anchor="middle"))
+                bg.append(_t(centers[index], pad + 34, label, r["name"], "mf-focus-text" if focus else "", anchor="middle", bold=True))
+            for position, lane in enumerate(lanes):
+                lane_top = pad + header + position * lane_h
+                if position % 2 == 0:
+                    bg.append(_rect(pad, lane_top, width - 2 * pad, lane_h, "mf-band", rx=0))
+                bg.append(f'<line x1="{_num(pad)}" y1="{_num(lane_top)}" x2="{_num(width - pad)}" y2="{_num(lane_top)}" class="mf-seam"/>')
+                for offset, line in enumerate(_wrap(lane["label"], r["brow"], label_w - 16, mono=True, lines=2)):
+                    bg.append(_t(pad + 8, lane_top + lane_h / 2 + offset * 12, line, r["brow"], brow=True))
+            bottom = pad + header + len(lanes) * lane_h
+            drawn = []
+            for edge in flow.get("edges", []):
+                a, b = boxes.get(edge["from"]), boxes.get(edge["to"])
+                if not a or not b:
+                    continue
+                others = [box for key, box in boxes.items() if key not in (edge["from"], edge["to"])]
+                focal = (edge["from"], edge["to"]) == focal_edge
+                style, marker = ("mf-flow-focus", ident + "-arrow-focus") if focal else ("mf-flow", ident + "-arrow")
+                if abs(a[1] - b[1]) < 1:
+                    line_y = a[1] + a[3] / 2
+                    segment = (a[0] + a[2], line_y, b[0] - 2, line_y)
+                    if _blocked(segment, others):
+                        continue
+                    arrows.append(f'<line x1="{_num(segment[0])}" y1="{_num(line_y)}" x2="{_num(segment[2])}" y2="{_num(line_y)}" class="{style}" marker-end="url(#{marker})"/>')
+                    if edge.get("label") and b[0] - (a[0] + a[2]) >= _brow_width(edge["label"], r["brow"]) + 12:
+                        labels.append(_label((a[0] + a[2] + b[0]) / 2, line_y - 10, edge["label"], r))
+                    drawn.append(edge)
+                else:
+                    # Single bend: exit right, run to the target's centre line, then turn toward it.
+                    corner_x, start_y = b[0] + b[2] / 2, a[1] + a[3] / 2
+                    end_y = b[1] + b[3] if b[1] < a[1] else b[1]
+                    rise = -1 if end_y < start_y else 1
+                    first = (a[0] + a[2], start_y, corner_x, start_y)
+                    second = (corner_x, start_y, corner_x, end_y)
+                    if _blocked(first, others) or _blocked(second, others) or corner_x - 8 <= a[0] + a[2]:
+                        continue
+                    path = (f"M{_num(first[0])},{_num(start_y)} L{_num(corner_x - 8)},{_num(start_y)} "
+                            f"Q{_num(corner_x)},{_num(start_y)} {_num(corner_x)},{_num(start_y + 8 * rise)} L{_num(corner_x)},{_num(end_y - 2 * rise)}")
+                    arrows.append(f'<path d="{path}" class="{style}" marker-end="url(#{marker})"/>')
+                    drawn.append(edge)
+            out.extend(node_mark(node, *boxes[node["id"]], r, used, size=r["name"] if variant == "w" else r["name"] - 1, wrap=1 if variant == "w" else 2) for node in nodes)
+            draw.drawn[variant] = [(edge["from"], edge["to"]) for edge in drawn]
+        states = [state for state in ("FINAL", "SCHEDULED", "RETIRED", "non-terminal") if state in used] + (["none"] if "none" in used else [])
+        legend, legend_h = _state_legend(pad, bottom + 24, width - 2 * pad, states, r, focus="Focal: the K1 ranking step", flow="Data moves")
+        return "".join(bg) + "".join(arrows) + "".join(out) + "".join(labels) + legend, bottom + 24 + legend_h + pad
+    draw.drawn = {}
+    return draw
+
+
+def _defs_link(ident: str) -> str:
+    return f'<marker id="{ident}-arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" class="mf-arrowhead-link"/></marker>'
+
+
+def layer_figure(manifest: dict) -> tuple[str, dict]:
+    """The page's system figure (topology or data flow) and the connectors each variant could draw."""
+    if manifest.get("topology"):
+        topology = manifest["topology"]
+        draw = _topology_draw(topology)
+        nodes = topology["nodes"]
+        desc = (f"{len(nodes)} parts of the foundation stack in {len(topology['zones'])} zones: the lanes on the WSL host call OmniRoute, "
+                "which reaches the provider slots; runtime workers, scheduling, MCP and memory, telemetry and backup run beside them, and GitHub hosts the automation.")
+        caption = ("Deployment, faithful detail. Each node names its foundation layer and shows the layer's computed state; each chip shows the run pin "
+                   "catalogs/landscape/final-stack.json records for it. Connectors are drawn only where they stay orthogonal and clear of other nodes; "
+                   "the text view lists every connection.")
+        html = _figure("topology", "Foundation topology", desc, draw, caption)
+    else:
+        flow = manifest["flow"]
+        draw = _flow_draw(flow)
+        desc = ("Feeds enter the owned collector, which writes the L0 raw log that K1 ranking reads; ranked symbols drive lanes A and B to the Alpaca "
+                "paper broker, account C trades through its MCP trader, the IBKR lane runs to IBKR, and history feeds strategy templates and the BacktestNode.")
+        caption = ("Data flow: lanes are the paths data takes, steps run left to right. Each node shows the computed state of the trading layer it belongs to; "
+                   "nodes without a catalog layer carry the hollow square. The narrow view lists steps in order; the text view lists every connection.")
+        html = _figure("flow", "North-star data flow", desc, draw, caption)
+    # Link-coloured cross-zone arrows need their own marker; add it to every variant's defs.
+    html = re.sub(r'<defs>(<marker id="(mf-[a-z]+-[wmn])-arrow")', lambda match: "<defs>" + _defs_link(match.group(2)) + match.group(1), html)
+    return html, dict(draw.drawn)
+
+
 # ---------------------------------------------------------------- HTML
 def _table(caption: str, headers: list[str], rows: list[list[str]]) -> str:
     head = "".join(f'<th scope="col">{_esc(header)}</th>' for header in headers)

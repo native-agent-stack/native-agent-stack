@@ -40,7 +40,7 @@ ROAD_REFERENCE_FILES = {
     "css_from": ("coordination/command-center/cc-tools/invoke-evidence/build_page.py",),
 }
 _SANITIZER = None
-PAGES = {"index": "Home", "readiness": "Readiness", "gaps": "Gap board", "roadmap": "Roadmap", "fleet": "Fleet", "architecture": "Architecture", "sources": "Sources"}
+PAGES = {"index": "Home", "readiness": "Readiness", "gaps": "Gap board", "roadmap": "Roadmap", "fleet": "Fleet", "architecture": "Architecture", "architecture-foundation": "Foundation", "architecture-north-star": "North star", "sources": "Sources"}
 
 
 def utc_now() -> str:
@@ -145,10 +145,10 @@ def source_scope(item: dict[str, Any], document: dict[str, Any], *, detail: bool
 
 def document(page: str, title: str, lede: str, scope: str, body: str,
              refreshed: str, manifest_sha: str, source_notes: list[str], leading: str | None = None,
-             head: str = "") -> bytes:
+             head: str = "", digest_label: str = "Native readiness manifest SHA-256") -> bytes:
     nav = "".join(f'<a href="{name}.html"' + (' aria-current="page"' if name == page else '') + f'>{text}</a>' for name, text in PAGES.items())
     heading = leading if leading is not None else f'<header class="page-header"><h1>{esc(title)}</h1><p class="lede">{esc(lede)}</p></header>'
-    source_link = "#architecture-custody" if page == "architecture" else f"sources.html#{page}"
+    source_link = "#architecture-custody" if page == "architecture" else "#layer-sources" if page.startswith("architecture-") else f"sources.html#{page}"
     return f'''<!doctype html>
 <html lang="en">
 <head>
@@ -177,7 +177,7 @@ def document(page: str, title: str, lede: str, scope: str, body: str,
 <footer class="site-footer"><p><a href="{source_link}">Sources and dates for this page</a></p>
   <div class="snapshot-note"><p><strong>Source as of:</strong> {esc(scope)}</p>
     <p><strong>Page refreshed:</strong> <time datetime="{esc(refreshed)}">{esc(refreshed)}</time></p>
-    <p><strong>Native readiness manifest SHA-256:</strong> <code>{manifest_sha}</code></p>
+    <p><strong>{esc(digest_label)}:</strong> <code>{manifest_sha}</code></p>
   </div>
   <p class="evidence-footnote">Current views and dated receipts retain their source scope; this page does not establish new execution, approval or landing.</p>
 </footer>
@@ -582,6 +582,16 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
                 receipt_doc["architecture"]["page_status"] = "unreported placeholder"
             else:
                 receipt_doc["architecture"]["page_status"] = "previous page retained without a new observation"
+    if architecture_path.exists():
+        # The Foundation and North-star pages read committed repository records only.
+        try:
+            layer_pages = load_local("architecture_builder").build_layer_pages(
+                root, output_dir, receipt.parent / "architecture/layer-pages-receipt.json", state_root=state_root, generated=refreshed)
+            if not isinstance(layer_pages, dict):
+                raise TypeError("layer-page builder returned no receipt")
+            receipt_doc["architecture_layer_pages"] = {key: layer_pages.get(key) for key in ("schema", "generated_utc", "commit", "pages", "outputs")}
+        except (OSError, ValueError, UnicodeError, KeyError, TypeError, AttributeError, ImportError) as error:
+            receipt_doc["architecture_layer_pages"] = {"status": "UNREPORTED", "reason": "Layer pages unavailable (" + type(error).__name__ + ")"}
     publish(output_dir, receipt, outputs, receipt_doc)
     return receipt_doc
 
@@ -643,9 +653,19 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--roadmap-source", type=Path)
     parser.add_argument("--roadmap-inputs", type=Path)
     parser.add_argument("--current-source", type=Path, help="CC-owned cc-now/1 current view (read only)")
+    parser.add_argument("--layer-pages-only", action="store_true",
+                        help="render only the Foundation and North-star architecture pages, which read committed repository records")
     args = parser.parse_args(argv)
     output = args.output_dir or args.state_root / "coordination/command-center/local-pages"
     receipt = args.receipt or args.state_root / "research/fullspeed-20261008/g5-stars-gap/local-pages/refresh-receipt.json"
+    if args.layer_pages_only:
+        try:
+            result = load_local("architecture_builder").build_layer_pages(args.root, output, receipt, state_root=args.state_root)
+        except (OSError, ValueError, KeyError, TypeError, AttributeError, ImportError) as error:
+            parser.exit(1, f"local-pages: layer pages failed ({type(error).__name__}): {error}\n")
+        print(json.dumps({"output_dir": str(output), "receipt": str(receipt), "generated_utc": result["generated_utc"], "commit": result["commit"],
+                          "pages": {key: {field: value[field] for field in ("page", "manifest", "rendered_layer_count", "states")} for key, value in result["pages"].items()}}, sort_keys=True))
+        return 0
     try:
         result = refresh(args.root, args.state_root, output, receipt, args.sources, args.gaps_source, args.roadmap_source, args.roadmap_inputs, current_source=args.current_source)
     except HTTPException as error:

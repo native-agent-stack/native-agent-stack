@@ -68,3 +68,56 @@ The second pass found that the approved pending foreground `#996421` on the firs
 Long gap titles, milestone titles, source paths, and code identifiers can break at narrow widths instead of forcing page overflow. The system dark fallback is limited to screen media so a script-free preview still prints with the light palette. Gap filtering preserves control focus and uses a polite result-count announcement; an optional reset returns focus to search. No motion or card hover effects were added because they do not explain the evidence.
 
 The CSS expects a native first readiness gate section inside `.readiness-content .wrap`, gap rows inside `#gap-register`, and milestone dates, titles, and states with the retained class names. Source order remains the mobile reading order. Actual desktop/mobile screenshots, keyboard navigation, filter combinations, and persistence/blocked-storage behavior remain parent-lane verification gates.
+
+## Foundation and North-star pages
+
+The Architecture generator also writes two catalog pages, `architecture-foundation.html`
+and `architecture-north-star.html`. Their job is narrower than the stack overview: for
+each layer, show whether it is finalized under the layer resolution protocol, which of
+the four conditions is missing, and the repository files to proceed from. The audience
+is the next session that revisits a layer.
+
+**Tokens.** The palette above is unchanged. Met conditions use the measured token,
+missing ones the pending token, each with a shape (filled square, dashed ring) and a
+text label so no state is color alone. Computed states reuse the diagram glyphs: Final
+is the filled square, Not terminal the dashed ring, Scheduled the filled circle and
+Retired the dotted square. Each diagram keeps its single violet focus. Headings use the
+Architecture page's display serif, reading text the shared sans, and monospace only
+pins and paths.
+
+**Layout.** Left aligned, in source order: title and lede, one ruled count strip, the
+system diagram, the four-condition rail, the layer register, the drift flags, then the
+manifest and sources. The North-star page adds the data-layer decisions and the pending
+study after its diagram.
+
+```text
+title + lede (finalized n of N, commit)
+count strip: states as figures | four condition meters
+system diagram (topology or data flow) + text view
+conditions by layer: layer | verdict | run pin | E2E | invoke | state   <- the bold element
+register: per layer, winners x four conditions, missing, open gaps, overturn rule, files
+drift flags (final_stack.py --check) | manifest link + sources with SHA-256
+```
+
+**Review before implementation.** The first draft gave every layer a card and led with
+a large headline number. Cards would give 32 heterogeneous layers equal weight and hide
+the one thing that differs between them, the condition pattern. The rail replaces both:
+it is the gate rail this plan already uses for readiness, turned sideways, and it is the
+only place the page spends emphasis. The register uses ruled rows like the gap board.
+No uppercase eyebrows or middle-dot meta strings are added outside the diagrams, whose
+lane and zone labels follow diagram-design's eyebrow role.
+
+**Skills and checks.** frontend-design (the installed skill read for this plan, SKILL.md
+SHA-256 `d91970639e9f5c37682ac7ab60094d35f1c7c1f38d731bd56396563aee10c1d3`) shaped the
+plan and its review. diagram-design 2.6.73 (SKILL.md SHA-256
+`9cb173e6d30a9aa4af646f4eba4431ddb03dbbed23c041eaefdc13b1bf445826`; references
+type-deployment.md and type-data-flow.md) set the two figures: a zoned deployment at
+faithful detail with run-pin chips, and a four-lane, five-step data flow with one focal
+step, node and labelled handoff. Connectors are drawn only when an orthogonal segment
+clears every other node (§6 rules 1 and 5); the text view lists every connection. The
+dataviz skill bundled with Claude Code 2.1.300 set the count strip as stat figures and
+meters, not a chart. Its palette validator (`scripts/validate_palette.py`) passes the
+met and missing pair in light mode on the normal-vision floor (ΔE 15.8) and warns on
+protan separation (7.1); in dark mode the pair falls to ΔE 13.8 normal and 5.4 protan.
+Every mark therefore carries its shape and label. Changing the approved status tokens is
+left to the critique pass.

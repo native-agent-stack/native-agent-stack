@@ -9,7 +9,8 @@ client measurements stay UNKNOWN. The section is refreshed by the existing
 page builder after the CC deploys the daily timer.
 
 `build_pages.py` presents the CC current view, native readiness receipts,
-gap board, roadmap, fleet, architecture and sources as seven complete local HTML documents. It uses the existing
+gap board, roadmap, fleet, architecture and sources as seven complete local HTML documents, plus the Foundation
+and North-star architecture pages described below. It uses the existing
 `tools/north-star/build_readiness.py` functions `build`, `render` and
 `render_fragment`; it adds presentation and refresh custody without deciding
 gate acceptance. The initial reference is repository commit
@@ -208,6 +209,32 @@ page tokens, so light, dark and the theme picker all apply. Each figure ships
 1200-, 720- and 400-wide variants that a container query selects, so a 390px
 screen never scrolls sideways. `assets/architecture-manifest.css` is inlined
 into the page head, and its hash is recorded in the receipt.
+
+The same generator splits the per-layer view into two pages by landscape
+catalog. `build_layer_pages` in `architecture_builder.py` writes
+`architecture-foundation.html` (the 20 layers of
+`catalogs/landscape/foundation.json`, with a deployment topology of what runs
+on the workstation) and `architecture-north-star.html` (the 12 layers of
+`catalogs/landscape/us-equities.json`, with a data-flow diagram, the
+2026-10-14 data-layer decisions cited by record name, and the pending
+pre-ranked feeds and overlap study with its readiness trigger). Each page has a
+machine-readable manifest beside it (`architecture-foundation-manifest.json`,
+`architecture-north-star-manifest.json`, schema
+`local-architecture-layer-manifest/1`) built by `architecture_manifest.layer_manifest`:
+one item per layer and winner with its repository, verdict and run pins,
+evidence files at the build commit, computed state and missing conditions.
+Verdicts, run pins and pin drift come from the committed
+`catalogs/landscape/final-stack.json`, read only through the dedicated
+`architecture_final_stack` role (both supplement globs still skip it); the
+drift flags are `scripts/final_stack.py`'s own `flags()`. Host E2E state and
+invoke evidence come from the component evidence matrix. The four FINAL
+conditions and the terminal states follow
+`docs/decisions/2026-10-11-layer-resolution-protocol.md`; FINAL is shown only
+where final_stack.py reports the layer current or converged and every winner
+meets all four conditions. These pages read committed repository records only,
+so `build_pages.py --layer-pages-only --output-dir DIR --receipt FILE` renders
+them without the state root; a full refresh renders them too and records their
+receipt under `architecture_layer_pages`.
 
 Inventory rows use canonical winner component-ID and candidate repository
 joins, followed by the reviewed `architecture_mapping.json` for remaining

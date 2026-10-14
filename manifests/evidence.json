@@ -64488,8 +64488,8 @@
     },
     {
       "path": "tools/local-pages/README.md",
-      "sha256": "7e968b62ba9f4a12ee8069b356a5dfaf22436d896566e5dee8dfa6785549c8bc",
-      "bytes": 33519
+      "sha256": "c87232d4ba4691472d33d4de26f6b6464f4ba24330e412533e7346c4563d7ace",
+      "bytes": 35338
     },
     {
       "path": "tools/local-pages/architecture_mapping.json",
@@ -64513,8 +64513,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "41d52366891119047d9b609f49efc5ab5fdb8470293227e157833962895b9caa",
-      "bytes": 760133
+      "sha256": "3ec2c9e1267fb087714a3bb650ba185621021ed2d7b479fb7aad99920ba43881",
+      "bytes": 760297
     },
     {
       "path": "tools/omniroute/gateway_record.py",
