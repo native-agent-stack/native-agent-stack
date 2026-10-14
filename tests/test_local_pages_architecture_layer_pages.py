@@ -8,6 +8,7 @@ allows it.
 """
 from contextlib import redirect_stdout
 from datetime import date
+from html import escape
 import importlib.util
 import io
 import json
@@ -66,7 +67,7 @@ class ConditionTests(unittest.TestCase):
         conditions = self.conditions(record, matrix_row(invoke=None))
         state, missing = MANIFEST.layer_state(record, conditions)
         self.assertEqual(state, "non-terminal")
-        self.assertIn("Invoke: 0 of 1 winners", missing)
+        self.assertIn("Invoke: no invoke evidence; the matrix records: no post-fix invoke receipt yet", missing)
         self.assertIn("no post-fix invoke receipt yet", conditions[0]["invoke"]["detail"])
 
     def test_e2e_at_the_verdict_pin_does_not_count_when_the_run_pin_differs(self):
@@ -132,7 +133,9 @@ class GeometryTests(unittest.TestCase):
         self.assertFalse(DIAGRAMS._blocked((0, 50, 70, 50), [(80, 20, 40, 60)]))
 
 
-class CommittedBuildTests(unittest.TestCase):
+class BuiltPages(unittest.TestCase):
+    """Builds both pages once from the committed records for the test classes below."""
+
     @classmethod
     def setUpClass(cls):
         cls.temporary = tempfile.TemporaryDirectory()
@@ -148,6 +151,8 @@ class CommittedBuildTests(unittest.TestCase):
     def tearDownClass(cls):
         cls.temporary.cleanup()
 
+
+class CommittedBuildTests(BuiltPages):
     def test_each_page_covers_its_catalog_layers_exactly(self):
         for key, catalog in (("foundation", "foundation"), ("north-star", "us-equities")):
             expected = [row["layer_id"] for row in json.loads((ROOT / MANIFEST.CATALOGS[catalog]).read_text())["layers"]]
@@ -220,6 +225,60 @@ class CommittedBuildTests(unittest.TestCase):
             self.assertNotRegex(text, r"/home/[A-Za-z]|/Users/[A-Za-z]")
             self.assertNotRegex(text, r"[^\s<>\"']+@[^\s<>\"']+\.[A-Za-z]{2,}")
         self.assertIn("cited by name", self.html["north-star"])
+
+
+class CritiqueRegressionTests(BuiltPages):
+    """Findings of the frontend-design critique pass; each failed on the first commit of these pages."""
+
+    def chip(self, name):
+        return next(chip for node in self.manifests["foundation"]["topology"]["nodes"] for chip in node.get("chips", []) if chip["name"] == name)
+
+    def test_topology_chips_carry_their_final_stack_index_role(self):
+        omniroute = self.chip("OmniRoute")
+        self.assertEqual((omniroute["role"], omniroute["winner_here"]), ("alternate", False))
+        self.assertTrue(omniroute["layer"].startswith("us-equities/"))
+        self.assertEqual((self.chip("Grafana")["role"], self.chip("Grafana")["winner_here"]), ("alternate", False))
+        self.assertTrue(self.chip("Loki")["winner_here"])
+        self.assertIsNone(self.chip("GPT Researcher")["role"])
+        html = self.html["foundation"]
+        self.assertNotIn("no catalog layer", html)
+        self.assertIn("no foundation layer", html)
+        self.assertIn("mf-art--other", html)
+
+    def test_flow_nodes_without_a_repository_record_are_marked(self):
+        nodes = {node["id"]: node for node in self.manifests["north-star"]["flow"]["nodes"]}
+        self.assertEqual({key for key, node in nodes.items() if not node["recorded"]}, {"l0", "k1", "account-c"})
+        self.assertIn("mf-unrecorded", self.html["north-star"])
+        self.assertIn("No repository record yet", self.html["north-star"])
+
+    def test_captions_name_only_marks_the_figure_draws(self):
+        self.assertNotIn("hollow square", self.html["north-star"])
+        self.assertIn("hollow square", self.html["foundation"])
+
+    def test_layer_wide_invoke_reason_is_stated_once_per_layer(self):
+        for key, manifest in self.manifests.items():
+            reason = "no post-fix invoke receipt yet"
+            layers = sum(1 for row in manifest["layers"] if row["winners"] and not row["conditions"]["invoke"])
+            self.assertEqual(self.html[key].count(reason), layers, key)
+
+    def test_strip_adds_no_headings_and_conditions_are_defined_visibly(self):
+        for html in self.html.values():
+            strip = html[html.index('class="lp-strip"'):html.index("</section>", html.index('class="lp-strip"'))]
+            self.assertNotIn("<h2", strip)
+            self.assertNotIn("Hover", html)
+            self.assertEqual(html.count('class="lp-key-list"'), 1)
+            for condition in MANIFEST.CONDITIONS:
+                self.assertIn(escape(condition[2], quote=True), html)
+
+    def test_branch_builds_cite_the_main_commit_whose_records_match(self):
+        records = {relative: (ROOT / relative).read_bytes() for relative in (MANIFEST.FINAL_STACK, MANIFEST.MATRIX)}
+        commit = BUILDER._commit(ROOT, records)
+        if commit is None:
+            self.skipTest("not a Git checkout")
+        for relative, raw in records.items():
+            shown = BUILDER._git(ROOT, "show", f"{commit}:{relative}")
+            self.assertEqual(shown, raw.decode("utf-8").strip())
+        self.assertEqual(BUILDER._commit(ROOT, {MANIFEST.FINAL_STACK: b"changed\n"}), BUILDER._git(ROOT, "rev-parse", "HEAD"))
 
 
 class ComposerTests(unittest.TestCase):

@@ -670,14 +670,18 @@ STATE_GLYPH = {"FINAL": "built", "SCHEDULED": "adopted", "non-terminal": "candid
 STATE_LEGEND = {"FINAL": "Final", "SCHEDULED": "Scheduled", "non-terminal": "Not terminal", "RETIRED": "Retired"}
 
 
+MARK_LEGEND = {"chip-winner": "Layer winner", "chip-other": "Not a layer winner", "unrecorded": "No repository record yet"}
+
+
 def _state_legend(x: float, y: float, width: float, states: list[str], ramp: dict, *, focus: str | None, flow: str | None,
-                  link: str | None = None) -> tuple[str, float]:
+                  link: str | None = None, marks: list[str] | None = None) -> tuple[str, float]:
     size, out = ramp["sub"] + 1, [f'<line x1="{_num(x)}" y1="{_num(y)}" x2="{_num(x + width)}" y2="{_num(y)}" class="mf-seam"/>']
     out.append(_t(x, y + 20, "Legend", ramp["brow"], brow=True))
     start = x + _brow_width("LEGEND", ramp["brow"]) + 24
     cx, row = start, y + 20
     items = [(STATE_GLYPH[state], STATE_LEGEND[state]) for state in states if state in STATE_GLYPH]
-    items += [("nolayer", "No catalog layer")] if "none" in states else []
+    items += [("nolayer", "No layer in this catalog")] if "none" in states else []
+    items += [(mark, MARK_LEGEND[mark]) for mark in marks or [] if mark in MARK_LEGEND]
     if focus:
         items.append(("focus", focus))
     if flow:
@@ -692,6 +696,10 @@ def _state_legend(x: float, y: float, width: float, states: list[str], ramp: dic
             out.append(f'<line x1="{_num(cx - 2)}" y1="{_num(row - 4)}" x2="{_num(cx + 12)}" y2="{_num(row - 4)}" class="{"mf-flow" if key == "flow" else "mf-flow-link"}"/>')
         elif key == "nolayer":
             out.append(_rect(cx + 1, row - 8, 8, 8, "mf-g-none", rx=2))
+        elif key in ("chip-winner", "chip-other"):
+            out.append(_rect(cx - 2, row - 10, 14, 10, "mf-art" if key == "chip-winner" else "mf-art mf-art--other", rx=2))
+        elif key == "unrecorded":
+            out.append(_rect(cx - 2, row - 10, 14, 10, "mf-node mf-unrecorded", rx=2))
         else:
             out.append(_glyph(cx + 5, row - 4, key))
         out.append(_t(cx + 18, row, label, size, "mf-muted"))
@@ -725,6 +733,7 @@ def _topology_draw(topology: dict) -> Callable[[str, int, str], tuple[str, float
     nodes = {node["id"]: node for node in topology.get("nodes", [])}
     zones = {zone["id"]: zone["label"] for zone in topology.get("zones", [])}
     focal_edge = tuple(topology.get("focal_edge") or ())
+    catalog = topology.get("catalog") or "catalog"
 
     def node_height(node: dict) -> int:
         return _grid(72 + len(node.get("chips") or []) * 30 + 6)
@@ -734,7 +743,7 @@ def _topology_draw(topology: dict) -> Callable[[str, int, str], tuple[str, float
         used.add(state or "none")
         cls = "mf-node mf-focus" if node.get("focal") else "mf-node"
         out = [_rect(x, y, w, node_height(node), cls, rx=6)]
-        tag = node["layers"][0] + (f" +{len(node['layers']) - 1}" if len(node["layers"]) > 1 else "") if node.get("layers") else "no catalog layer"
+        tag = node["layers"][0] + (f" +{len(node['layers']) - 1}" if len(node["layers"]) > 1 else "") if node.get("layers") else f"no {catalog} layer"
         tag_w = min(_grid(_width(tag, r["brow"] + 0.5, mono=True) + 12), w - 40)
         out.append(_rect(x + 12, y + 10, tag_w, 15, "mf-tag", rx=2))
         out.append(_t(x + 18, y + 21, _wrap(tag, r["brow"] + 0.5, tag_w - 10, mono=True, lines=1)[0], r["brow"] + 0.5, "mf-mono mf-muted"))
@@ -746,8 +755,9 @@ def _topology_draw(topology: dict) -> Callable[[str, int, str], tuple[str, float
         out.append(_t(x + 12, y + 59, _wrap(node.get("sub") or "", r["sub"], w - 24, mono=True, lines=1)[0], r["sub"], "mf-mono mf-muted"))
         cy = y + 70
         for chip in node.get("chips") or []:
-            out.append(_rect(x + 12, cy, w - 24, 24, "mf-art", rx=4))
-            pin = ("pin " + str(chip["pin"])) if chip.get("pin") else ("no run pin" if chip.get("run_id") else "no run id")
+            used.add("chip-winner" if chip.get("winner_here") else "chip-other")
+            out.append(_rect(x + 12, cy, w - 24, 24, "mf-art" if chip.get("winner_here") else "mf-art mf-art--other", rx=4))
+            pin = str(chip["pin"]) if chip.get("pin") else "no pin"
             pin_text = _wrap(pin, r["sub"], (w - 24) * 0.55, mono=True, lines=1)[0]
             room = w - 24 - 16 - _width(pin_text, r["sub"], mono=True) - 8
             out.append(_t(x + 20, cy + 16, _wrap(chip["name"], r["item"], room, lines=1)[0], r["item"]))
@@ -829,7 +839,8 @@ def _topology_draw(topology: dict) -> Callable[[str, int, str], tuple[str, float
         node_marks = [draw_node(nodes[key], *box[:3], r, used) for key, box in boxes.items() if key in nodes]
         states = [state for state in ("FINAL", "SCHEDULED", "RETIRED", "non-terminal") if state in used] + (["none"] if "none" in used else [])
         legend, legend_h = _state_legend(pad, bottom + 28, width - 2 * pad, states, r, focus="Focal: the model gateway", flow="Call or trigger",
-                                         link="Crosses a zone" if any(edge["to"] in ("providers", "github") for edge in drawn if (edge["from"], edge["to"]) != focal_edge) else None)
+                                         link="Crosses a zone" if any(edge["to"] in ("providers", "github") for edge in drawn if (edge["from"], edge["to"]) != focal_edge) else None,
+                                         marks=[mark for mark in ("chip-winner", "chip-other") if mark in used])
         draw.drawn[variant] = [(edge["from"], edge["to"]) for edge in drawn]
         return "".join(body + arrows + node_marks + labels) + legend, bottom + 28 + legend_h + pad
     draw.drawn = {}
@@ -846,7 +857,11 @@ def _flow_draw(flow: dict) -> Callable[[str, int, str], tuple[str, float]]:
         state = node.get("state")
         used.add(state or "none")
         size = size or r["name"]
-        out = [_rect(x, y, w, h, "mf-node mf-focus" if node.get("focal") else "mf-node", rx=6)]
+        # A node no repository file records yet keeps its place in the flow, drawn dashed.
+        unrecorded = not node.get("recorded", True)
+        if unrecorded:
+            used.add("unrecorded")
+        out = [_rect(x, y, w, h, ("mf-node mf-focus" if node.get("focal") else "mf-node") + (" mf-unrecorded" if unrecorded else ""), rx=6)]
         if state:
             out.append(_glyph(x + 11, y + 14, STATE_GLYPH.get(state)))
         else:
@@ -939,7 +954,8 @@ def _flow_draw(flow: dict) -> Callable[[str, int, str], tuple[str, float]]:
             out.extend(node_mark(node, *boxes[node["id"]], r, used, size=r["name"] if variant == "w" else r["name"] - 1, wrap=1 if variant == "w" else 2) for node in nodes)
             draw.drawn[variant] = [(edge["from"], edge["to"]) for edge in drawn]
         states = [state for state in ("FINAL", "SCHEDULED", "RETIRED", "non-terminal") if state in used] + (["none"] if "none" in used else [])
-        legend, legend_h = _state_legend(pad, bottom + 24, width - 2 * pad, states, r, focus="Focal: the K1 ranking step", flow="Data moves")
+        legend, legend_h = _state_legend(pad, bottom + 24, width - 2 * pad, states, r, focus="Focal: the K1 ranking step", flow="Data moves",
+                                         marks=["unrecorded"] if "unrecorded" in used else [])
         return "".join(bg) + "".join(arrows) + "".join(out) + "".join(labels) + legend, bottom + 24 + legend_h + pad
     draw.drawn = {}
     return draw
@@ -955,19 +971,30 @@ def layer_figure(manifest: dict) -> tuple[str, dict]:
         topology = manifest["topology"]
         draw = _topology_draw(topology)
         nodes = topology["nodes"]
+        chips = [chip for node in nodes for chip in node.get("chips") or []]
         desc = (f"{len(nodes)} parts of the foundation stack in {len(topology['zones'])} zones: the lanes on the WSL host call OmniRoute, "
                 "which reaches the provider slots; runtime workers, scheduling, MCP and memory, telemetry and backup run beside them, and GitHub hosts the automation.")
-        caption = ("Deployment, faithful detail. Each node names its foundation layer and shows the layer's computed state; each chip shows the run pin "
-                   "catalogs/landscape/final-stack.json records for it. Connectors are drawn only where they stay orthogonal and clear of other nodes; "
-                   "the text view lists every connection.")
+        caption = ("Deployment, faithful detail. Each node names its foundation layer and shows that layer's computed state; each chip shows the run pin "
+                   "catalogs/landscape/final-stack.json records for it.")
+        if any(chip.get("winner_here") for chip in chips) and any(not chip.get("winner_here") for chip in chips):
+            caption += " A solid chip is a winner of a foundation layer; a dashed chip is an alternate, a candidate or not in the catalogs."
+        if any(not node.get("layers") for node in nodes):
+            caption += " A hollow square marks a node with no foundation layer."
+        caption += " Connectors are drawn only where they stay orthogonal and clear of other nodes; the text view lists every connection."
         html = _figure("topology", "Foundation topology", desc, draw, caption)
     else:
         flow = manifest["flow"]
         draw = _flow_draw(flow)
-        desc = ("Feeds enter the owned collector, which writes the L0 raw log that K1 ranking reads; ranked symbols drive lanes A and B to the Alpaca "
-                "paper broker, account C trades through its MCP trader, the IBKR lane runs to IBKR, and history feeds strategy templates and the BacktestNode.")
-        caption = ("Data flow: lanes are the paths data takes, steps run left to right. Each node shows the computed state of the trading layer it belongs to; "
-                   "nodes without a catalog layer carry the hollow square. The narrow view lists steps in order; the text view lists every connection.")
+        nodes = flow["nodes"]
+        desc = ("Feeds enter the owned collector, which writes the L0 raw log that K1 ranking reads; the ranking drives lanes A and B to the Alpaca "
+                "paper broker, account C trades through its MCP trader and calc, the IBKR lane runs to IBKR, and history runs through the strategy "
+                "templates in the BacktestNode.")
+        caption = "Data flow: lanes are the paths data takes and steps run left to right. Each node shows the computed state of the trading layer it belongs to."
+        if any(not node.get("recorded", True) for node in nodes):
+            caption += " Dashed nodes have no repository record at this commit; the decisions below cite their record by name."
+        if any(not node.get("layers") for node in nodes):
+            caption += " A hollow square marks a node with no trading layer."
+        caption += " The narrow view lists steps in order; the text view lists every connection."
         html = _figure("flow", "North-star data flow", desc, draw, caption)
     # Link-coloured cross-zone arrows need their own marker; add it to every variant's defs.
     html = re.sub(r'<defs>(<marker id="(mf-[a-z]+-[wmn])-arrow")', lambda match: "<defs>" + _defs_link(match.group(2)) + match.group(1), html)

@@ -121,3 +121,40 @@ met and missing pair in light mode on the normal-vision floor (ΔE 15.8) and war
 protan separation (7.1); in dark mode the pair falls to ΔE 13.8 normal and 5.4 protan.
 Every mark therefore carries its shape and label. Changing the approved status tokens is
 left to the critique pass.
+
+### Critique pass
+
+A second frontend-design pass reviewed both rendered pages against the brief and this
+plan. It fixed the following:
+
+- **Topology roles.** Nodes outside a foundation layer were labelled "no catalog layer",
+  although final-stack.json's index records OmniRoute as a trading-catalog alternate.
+  Running chips gave no sign that Grafana, Hindsight, DeerFlow and the OpenHands SDK are
+  alternates. Each chip now carries its index role: solid for a winner of a layer in the
+  page's catalog, dashed otherwise. The text view names the role and layer.
+- **Unrecorded flow nodes.** L0 raw log, K1 ranking and the account C trader have no
+  repository record, yet they looked like evidenced nodes. They are now dashed, with a
+  legend entry.
+- **Captions** mention only the marks a figure draws.
+- **Node sublabels** that were unverified ("ranked symbols", "data catalog", "shared by
+  lanes") now follow their cited sources.
+- **Header.** Three statements of the same count and a 40-character commit in body text
+  became one sentence, the four states in one row, and a 12-character commit.
+- **Strip headings.** The strip no longer adds two headings to the page outline.
+- **Condition definitions** were hover-only. They now sit as a visible key beside the
+  rail, numbered as the protocol numbers them. The rail sizes to its content.
+- **Register.** Layer-wide facts were repeated in every winner row (the invoke reason 21
+  times on one page), and two columns were both named "Run pin". The invoke reason is now
+  stated once per layer, and the winner table groups its columns under "Winner and pins"
+  and "FINAL conditions", with fixed widths that keep all four conditions in view.
+- **Commit.** A branch build cited its own head, which disappears after a squash merge. It
+  now cites the merge base with main when every record it read is byte-identical there.
+
+It left the following, with reasons:
+
+- **Dark-mode met and missing pair.** It stays below the dataviz normal-vision floor
+  because this plan's status tokens are shared by every local page; shape and label carry
+  the state.
+- **Diagram labels** keep diagram-design's uppercase eyebrow role for lanes and zones.
+- **Drift flags** stay verbatim final_stack.py output.
+- **Register length** follows from the brief's per-layer content.

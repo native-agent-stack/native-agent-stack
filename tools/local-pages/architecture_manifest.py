@@ -348,7 +348,7 @@ TOPOLOGY = {
          "chips": (("Codex / GPT", None), ("muse-code", None), ("Anthropic API slots", None)),
          "evidence": ("docs/decisions/2026-10-12-model-effort-routing.md", "docs/decisions/2026-10-12-harbor-parallel-runtimes.md", "tools/adoption/runtime_profiles.py")},
         {"id": "workers", "zone": "host", "name": "Runtime workers", "sub": "SDK workers, ns-run profiles", "layers": ("agent-sdks",),
-         "chips": (("OpenHands SDK", None), ("Codex SDK", "codex"), ("Pi / OpenCode", None), ("DeerFlow", None), ("GPT Researcher", None)),
+         "chips": (("OpenHands SDK", None, "github.com/openhands/software-agent-sdk"), ("Codex SDK", "codex"), ("Pi / OpenCode", None), ("DeerFlow", None, "github.com/bytedance/deer-flow"), ("GPT Researcher", None)),
          "evidence": ("blueprints/runtime-workers/openhands/README.md", "blueprints/runtime-workers/skills/README.md", "tools/adoption/runtime_profiles.py", "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md")},
         {"id": "scheduling", "zone": "host", "name": "Scheduling", "sub": "timers and supervised jobs", "layers": ("scheduling-supervision",),
          "chips": (("Dagu", "dagu"), ("systemd", "systemd")),
@@ -379,22 +379,22 @@ FLOW = {
     "nodes": (
         {"id": "feeds", "lane": "collector", "step": 0, "name": "Feeds", "sub": "Alpaca SIP and OPRA", "tool": "FINRA free data", "layers": ("market-data-reference",),
          "evidence": ("catalogs/us-equities/ns-movers-phase0-decisions-20261009.json", "blueprints/us-equities/incentive-monitor/README.md")},
-        {"id": "l0", "lane": "collector", "step": 1, "name": "L0 raw log", "sub": "owned collector", "tool": "first write", "layers": ("storage-compute",), "evidence": ()},
-        {"id": "k1", "lane": "collector", "step": 2, "name": "K1 ranking", "sub": "reads the L0 log", "tool": "ranked symbols", "layers": ("research-factors-ml",), "focal": True, "evidence": ()},
+        {"id": "l0", "lane": "collector", "step": 1, "name": "L0 raw log", "sub": "owned collector", "layers": ("storage-compute",), "evidence": ()},
+        {"id": "k1", "lane": "collector", "step": 2, "name": "K1 ranking", "sub": "reads the L0 log", "layers": ("research-factors-ml",), "focal": True, "evidence": ()},
         {"id": "lanes-ab", "lane": "collector", "step": 3, "name": "Lanes A and B", "sub": "adaptive-paper", "tool": "NautilusTrader", "layers": ("execution-broker",),
          "evidence": ("blueprints/us-equities/adaptive-paper/README.md", "docs/decisions/2026-10-13-lane-a-frozen-field-continuity.md", "docs/decisions/2026-10-13-lane-b-concurrent-presets.md")},
         {"id": "alpaca", "lane": "collector", "step": 4, "name": "Alpaca", "sub": "paper accounts", "tool": "alpaca-py", "layers": ("execution-broker",),
          "evidence": ("catalogs/us-equities/runtime-target.json", "docs/paper-lane-policy.md")},
-        {"id": "account-c", "lane": "account-c", "step": 3, "name": "MCP trader", "sub": "and calc", "tool": "account C", "layers": ("agents-models-workers",), "evidence": ()},
+        {"id": "account-c", "lane": "account-c", "step": 3, "name": "MCP trader and calc", "sub": "account C", "layers": ("agents-models-workers",), "evidence": ()},
         {"id": "ibkr-feed", "lane": "ibkr", "step": 0, "name": "IBKR data", "sub": "TWS API", "tool": "market data", "layers": ("market-data-reference",),
          "evidence": ("catalogs/us-equities/runtime-target.json",)},
         {"id": "ibkr-lane", "lane": "ibkr", "step": 3, "name": "IBKR lane", "sub": "NautilusTrader", "tool": "IBKR adapter", "layers": ("execution-broker",),
          "evidence": ("blueprints/us-equities/engine-nautilus/ibkr-paper-orders/README.md",)},
         {"id": "ibkr-broker", "lane": "ibkr", "step": 4, "name": "IBKR", "sub": "paper account", "tool": "TWS API", "layers": ("execution-broker",),
          "evidence": ("catalogs/us-equities/runtime-target.json", "docs/paper-lane-policy.md")},
-        {"id": "history", "lane": "history", "step": 1, "name": "History", "sub": "historical bars", "tool": "data catalog", "layers": ("storage-compute",),
+        {"id": "history", "lane": "history", "step": 1, "name": "History", "sub": "historical bars", "tool": "Alpaca SIP", "layers": ("storage-compute",),
          "evidence": ("blueprints/us-equities/alpaca-historical/README.md",)},
-        {"id": "templates", "lane": "history", "step": 2, "name": "Strategy templates", "sub": "shared by lanes", "tool": "presets", "layers": ("backtesting-engine",),
+        {"id": "templates", "lane": "history", "step": 2, "name": "Strategy templates", "sub": "backtest and paper", "tool": "risk presets", "layers": ("backtesting-engine",),
          "evidence": ("blueprints/us-equities/strategies/README.md",)},
         {"id": "backtest", "lane": "history", "step": 3, "name": "BacktestNode", "sub": "NautilusTrader", "tool": "history replay", "layers": ("backtesting-engine",),
          "evidence": ("blueprints/us-equities/runtime-2604/receipts/backtest-pipeline-20261008.json",)},
@@ -421,7 +421,7 @@ DATA_DECISIONS = (
     ("DL-09", "The IBKR lane runs through NautilusTrader", "ibkr-lane", ("blueprints/us-equities/engine-nautilus/ibkr-paper-orders/README.md",)),
     ("DL-10", "Alpaca and IBKR are the paper brokers", "alpaca", ("catalogs/us-equities/runtime-target.json", "docs/paper-lane-policy.md")),
     ("DL-11", "History and backtests run through NautilusTrader BacktestNode", "backtest", ("blueprints/us-equities/runtime-2604/receipts/backtest-pipeline-20261008.json",)),
-    ("DL-12", "Strategy templates are shared across lanes and backtests", "templates", ("blueprints/us-equities/strategies/README.md",)),
+    ("DL-12", "Strategy templates serve both the backtests and the paper lanes", "templates", ("blueprints/us-equities/strategies/README.md",)),
 )
 PENDING_STUDY = {
     "title": "Pre-ranked feeds and overlap study: pending",
@@ -501,7 +501,11 @@ def layer_state(layer: dict, conditions: list[dict]) -> tuple[str, list[str]]:
         missing.append("no recorded winner to meet the four conditions")
     for key, label, _ in CONDITIONS:
         if winners and not met[key]:
-            missing.append(f"{label}: {sum(1 for row in conditions if row[key]['met'])} of {len(conditions)} winners")
+            if key == "invoke":
+                # Invoke evidence is recorded per layer in the matrix, so its reason is stated once.
+                missing.append(f"{label}: {conditions[0][key]['detail']}")
+            else:
+                missing.append(f"{label}: {sum(1 for row in conditions if row[key]['met'])} of {len(conditions)} winners")
     return "non-terminal", missing
 
 
@@ -585,6 +589,18 @@ def layer_manifest(root: Path, page: str, final_stack: dict, catalog: dict, matr
                 "layers": layers, "items": items, "planned_layers": planned, "flags": drift}
     layer_states = {layer["layer_id"]: layer["state"] for layer in layers}
     run_pins = {run_id: run.get("pin") for run_id, run in runs.items()}
+    run_repositories = {run_id: run.get("repository") for run_id, run in runs.items()}
+    by_repository = ((final_stack.get("index") or {}).get("by_repository") or {}) if isinstance(final_stack.get("index"), dict) else {}
+    rank = {role: position for position, role in enumerate(("winner", "alternate", "survivor", "candidate"))}
+
+    def catalog_role(repository: str | None) -> dict:
+        """The chip's strongest role in final-stack.json's index, this page's catalog first."""
+        entries = [entry for entry in _list(by_repository.get(repository)) if isinstance(entry, dict) and entry.get("role") in rank] if repository else []
+        here = [entry for entry in entries if entry.get("catalog") == catalog_id]
+        chosen = min(here or entries, key=lambda entry: (rank[entry["role"]], entry.get("layer_id", "")), default=None)
+        if chosen is None:
+            return {"role": None, "layer": None, "winner_here": False}
+        return {"role": chosen["role"], "layer": f"{chosen.get('catalog')}/{chosen.get('layer_id')}", "winner_here": bool(here) and chosen["role"] == "winner"}
 
     def nodes(spec_nodes, chips: bool):
         projected = []
@@ -593,14 +609,19 @@ def layer_manifest(root: Path, page: str, final_stack: dict, catalog: dict, matr
             states_here = [layer_states[layer] for layer in node.get("layers", ()) if layer in layer_states]
             entry = {key: node.get(key) for key in ("id", "zone", "lane", "step", "name", "sub", "tool") if node.get(key) is not None}
             entry.update(layers=list(node.get("layers", ())), state=(min(states_here, key=STATES.index) if states_here and len(set(states_here)) == 1 else "non-terminal" if states_here else None),
-                         focal=bool(node.get("focal")), evidence_refs=present, absent_refs=absent)
+                         focal=bool(node.get("focal")), evidence_refs=present, absent_refs=absent, recorded=bool(present))
             if chips:
-                entry["chips"] = [{"name": name, "run_id": run_id, "pin": run_pins.get(run_id) if run_id else None} for name, run_id in node.get("chips", ())]
+                entry["chips"] = []
+                for chip in node.get("chips", ()):
+                    name, run_id = chip[0], chip[1]
+                    repository = run_repositories.get(run_id) if run_id else (chip[2] if len(chip) > 2 else None)
+                    entry["chips"].append({"name": name, "run_id": run_id, "pin": run_pins.get(run_id) if run_id else None,
+                                           "repository": repository, **catalog_role(repository)})
             projected.append(entry)
         return projected
 
     if page == "foundation":
-        document["topology"] = {"zones": [{"id": key, "label": label} for key, label in TOPOLOGY["zones"]],
+        document["topology"] = {"catalog": catalog_id, "zones": [{"id": key, "label": label} for key, label in TOPOLOGY["zones"]],
                                 "nodes": nodes(TOPOLOGY["nodes"], True),
                                 "edges": [{"from": a, "to": b, "label": label} for a, b, label in TOPOLOGY["edges"]],
                                 "focal_edge": list(TOPOLOGY["focal_edge"])}

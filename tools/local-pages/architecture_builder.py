@@ -252,14 +252,34 @@ def _final_stack_flags(document: dict, today) -> dict:
             sys.path.remove(scripts)
 
 
-def _commit(root: Path) -> str | None:
-    """The checked-out commit the cited repository paths belong to, or None outside a Git checkout."""
+def _git(root: Path, *args: str) -> str | None:
     try:
-        result = subprocess.run(["git", "-C", str(root), "rev-parse", "HEAD"], capture_output=True, text=True, timeout=10, check=False)
+        result = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True, timeout=10, check=False)
     except (OSError, subprocess.TimeoutExpired):
         return None
     value = result.stdout.strip()
-    return value if result.returncode == 0 and re.fullmatch(r"[0-9a-f]{40}", value) else None
+    return value if result.returncode == 0 else None
+
+
+def _commit(root: Path, records: dict[str, bytes]) -> str | None:
+    """The main commit the cited repository paths belong to.
+
+    A branch commit disappears after a squash merge, so a branch build cites its
+    merge base with main, but only when every record it read is byte-identical
+    there (compared as Git blob ids). Otherwise, and on main itself, it cites the
+    checked-out commit; outside a Git checkout, None.
+    """
+    head = _git(root, "rev-parse", "HEAD")
+    if not head or not re.fullmatch(r"[0-9a-f]{40}", head):
+        return None
+    blobs = {relative: hashlib.sha1(b"blob " + str(len(raw)).encode() + b"\0" + raw).hexdigest() for relative, raw in records.items()}
+    for ref in ("origin/main", "main"):
+        base = _git(root, "merge-base", "HEAD", ref)
+        if base and re.fullmatch(r"[0-9a-f]{40}", base):
+            if all(_git(root, "rev-parse", f"{base}:{relative}") == blob for relative, blob in blobs.items()):
+                return base
+            break
+    return head
 
 
 def build_layer_pages(root: Path, output_dir: Path, receipt: Path, *, state_root: Path | None = None,
@@ -272,7 +292,7 @@ def build_layer_pages(root: Path, output_dir: Path, receipt: Path, *, state_root
     reads = architecture_reads(root, state_root if state_root is not None else root / ".layer-pages-no-state")
     manifest_module, view = load("architecture_manifest"), load("architecture_view")
     policy_module, sanitizer = load("source_policy"), load("sanitization")
-    documents, captured = {}, {}
+    documents, captured, raws = {}, {}, {}
     for name, relative, role in (("final_stack", manifest_module.FINAL_STACK, "architecture_final_stack"), ("matrix", manifest_module.MATRIX, "architecture_static"),
                                  ("foundation", manifest_module.CATALOGS["foundation"], "architecture_catalog"), ("us-equities", manifest_module.CATALOGS["us-equities"], "architecture_catalog")):
         raw, record = reads.read(role, root / relative, max_bytes=16 * 1024 * 1024)
@@ -280,10 +300,11 @@ def build_layer_pages(root: Path, output_dir: Path, receipt: Path, *, state_root
         if not isinstance(document, dict):
             raise ValueError(relative + " must be a JSON object")
         documents[name] = document
+        raws[relative] = raw
         captured[name] = {"path": relative, "sha256": record["sha256"], "bytes": record["bytes"], "role": role}
     generated = generated or datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
     today = today or datetime.fromisoformat(generated.replace("Z", "+00:00")).date()
-    commit = commit or _commit(root)
+    commit = commit or _commit(root, raws)
     flags = _final_stack_flags(documents["final_stack"], today)
     style_raw = policy_module._read_regular(MANIFEST_STYLE, 1024 * 1024)
     style = "\n  <style>\n" + style_raw.decode("utf-8") + "  </style>"
