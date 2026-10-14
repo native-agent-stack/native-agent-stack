@@ -34,6 +34,23 @@ DATED_REFERENCE = re.compile(
     r"(?<![\w-])[A-Za-z][A-Za-z0-9_.-]*[-_](?P<date>[0-9]{8})"
     r"(?=(?:\.[A-Za-z][A-Za-z0-9]*\b)|/)")
 PUBLIC_HOSTS = {"www.luldplan.com", "cdn.luldplan.com", "docs.alpaca.markets", "raw.githubusercontent.com"}
+# Landed #1083 chapters cite these public Git revisions. Exact source bytes
+# were verified; the historical main pin binds a name-only custody reference,
+# never the private record's bytes. No publication surface is excluded.
+PUBLIC_CHAPTER_SOURCES = {
+    DOCS + "/ibkr-pacing.md": (
+        "https://raw.githubusercontent.com/nautechsystems/nautilus_trader/"
+        "01ced2a3e7b7d25ae7b2e5c0c077bcc46192eb25/"
+        "crates/adapters/interactive_brokers/src/execution/core.rs",
+    ),
+    DOCS + "/paper-marker.md": (
+        "https://raw.githubusercontent.com/native-agent-stack/native-agent-stack/"
+        "8fc7b605b0e083f213aa4d9ecacf27ff02bc52fd/"
+        "docs/decisions/2026-10-13-paper-deployment-review-fixes.md",
+        "https://raw.githubusercontent.com/native-agent-stack/native-agent-stack/"
+        "8c95a50d10bd2db0b59058c6827275917ce35aa3/docs/paper-lane-policy.md",
+    ),
+}
 
 
 def handbook_files(root: Path) -> list[Path]:
@@ -75,6 +92,10 @@ def publication_findings(root: Path) -> tuple[list[str], list[str]]:
         pin = inventory.get(key, {}).get("commit", "")
         if re.fullmatch(r"[0-9a-f]{40}", pin):
             public_pins.add(pin)
+    for chapter, sources in PUBLIC_CHAPTER_SOURCES.items():
+        if chapter in texts:
+            for source in sources:
+                public_pins.update(re.findall(r"(?<=/)[0-9a-f]{40}(?=/)", urlsplit(source).path))
     manifest = root / "manifests/evidence.json"
     if manifest.is_file():
         for row in json.loads(manifest.read_text()).get("files", []):
@@ -191,6 +212,22 @@ class HandbookPublicationTests(unittest.TestCase):
                 for citation in (pin, pin[:7], pin[:12]):
                     chapter.write_text("Public source revision " + citation)
                     self.assertEqual(publication_findings(root), ([], []))
+
+    def test_landed_pacing_and_marker_chapters_require_public_source_bindings(self):
+        citations = {
+            "ibkr-pacing.md": ["01ced2a3e7b7d25ae7b2e5c0c077bcc46192eb25"],
+            "paper-marker.md": ["8fc7b605b0e083f213aa4d9ecacf27ff02bc52fd", "8c95a50d"],
+        }
+        unbound = hashlib.sha256(b"Synthetic unpublished pacing input.").hexdigest()
+        for filename, pins in citations.items():
+            with self.subTest(chapter=filename), tempfile.TemporaryDirectory(dir="/var/tmp") as temporary:
+                root = Path(temporary)
+                self.fixture(root, "Neutral public policy.")
+                chapter = root / DOCS / filename
+                chapter.write_text("Unpublished source " + unbound)
+                self.assertEqual(publication_findings(root)[1], [DOCS + "/" + filename])
+                chapter.write_text("Public source revisions " + " ".join(pins))
+                self.assertEqual(publication_findings(root), ([], []))
 
 
 if __name__ == "__main__":
