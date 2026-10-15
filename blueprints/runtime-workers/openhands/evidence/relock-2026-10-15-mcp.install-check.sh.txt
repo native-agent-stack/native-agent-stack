@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# Documentary #562 install sequence in its own scratch venv, not a host install.
+# Source: native-agent-stack@5561321b:.../relock-2026-10-13-oauthlib.install-check.sh.txt; only the last two steps differ.
+# The fixed-package step asserts mcp 1.30.0 and the two defaults its fix sets on StreamableHTTPSessionManager
+# (session_idle_timeout 1800 s, max_sessions 10000; modelcontextprotocol/python-sdk@v1.30.0
+# src/mcp/server/streamable_http_manager.py:42,45,99,101; at v1.28.1 the timeout defaults to None and max_sessions is absent).
+# The client smoke runs fastmcp 3.2.0, the SDK's MCP client library, against an in-process FastMCP server over its
+# in-memory transport: no network, no subprocess server, no model request.
+# Usage: bash <script> <owned-scratch> <tree> <rtk-binary> <uv-binary>
+set -uo pipefail
+rc=0
+R=$1; W=$2; RTK=$3; UV=$4
+OH=$W/blueprints/runtime-workers/openhands; V=$R/u3/venv
+export UV_CACHE_DIR=$R/uv-cache UV_PYTHON_DOWNLOADS=never UV_NO_CONFIG=1 TMPDIR=$R/tmp
+step() { echo "$1 exit: $2"; [ "$2" -eq 0 ] || rc=1; }
+"$RTK" mkdir -p "$TMPDIR"
+"$RTK" rm -rf "$V"
+"$RTK" "$UV" venv --python 3.13 "$V" 2>&1 | "$RTK" tail -2; step venv "${PIPESTATUS[0]}"
+"$RTK" proxy "$UV" pip install --python "$V/bin/python" --require-hashes --no-deps --only-binary :all: --index-url https://pypi.org/simple -r "$OH/build-requirements.lock" 2>&1 | "$RTK" tail -3; step 'build-requirements install' "${PIPESTATUS[0]}"
+"$RTK" proxy "$UV" pip install --python "$V/bin/python" --require-hashes --no-deps --no-build-isolation --index-url https://pypi.org/simple -r "$OH/requirements.lock" 2>&1 | "$RTK" tail -3; step 'runtime lock install' "${PIPESTATUS[0]}"
+"$RTK" "$UV" pip check --python "$V/bin/python" 2>&1 | "$RTK" tail -3; step 'uv pip check' "${PIPESTATUS[0]}"
+"$RTK" "$V/bin/python" -c 'import importlib.metadata as m; assert m.version("openhands-sdk") == m.version("openhands-tools") == "1.49.6"; from openhands.sdk import LLM, Agent, Conversation; from openhands.tools.terminal import TerminalTool; from openhands.tools.file_editor import FileEditorTool; print("SDK/tools 1.49.6 imports passed; no model request")' 2>&1 | "$RTK" tail -3; step 'sdk import' "${PIPESTATUS[0]}"
+"$RTK" "$V/bin/python" -c 'import importlib.metadata as m, inspect; import mcp; from mcp.server.streamable_http_manager import StreamableHTTPSessionManager; from openhands.sdk.mcp.config import coerce_mcp_config; import fastmcp; p = inspect.signature(StreamableHTTPSessionManager.__init__).parameters; assert m.version("mcp") == "1.30.0"; assert p["session_idle_timeout"].default == 1800 and p["max_sessions"].default == 10000; print("mcp", m.version("mcp"), "session_idle_timeout default", p["session_idle_timeout"].default, "max_sessions default", p["max_sessions"].default, "fastmcp", m.version("fastmcp"), "browser-use", m.version("browser-use"), "starlette", m.version("starlette"), "sse-starlette", m.version("sse-starlette"), "uvicorn", m.version("uvicorn"))' 2>&1 | "$RTK" tail -3; step 'fixed-package imports' "${PIPESTATUS[0]}"
+"$RTK" "$V/bin/python" -c '
+import asyncio
+from fastmcp import Client, FastMCP
+server = FastMCP("relock-smoke")
+@server.tool
+def add(a: int, b: int) -> int:
+    return a + b
+async def main():
+    async with Client(server) as client:
+        names = [tool.name for tool in await client.list_tools()]
+        result = await client.call_tool("add", {"a": 2, "b": 3})
+        assert names == ["add"] and result.data == 5, (names, result)
+        print("fastmcp in-memory client smoke passed: tools", names, "add(2, 3) =", result.data)
+asyncio.run(main())' 2>&1 | "$RTK" tail -3; step 'fastmcp client smoke' "${PIPESTATUS[0]}"
+echo "done, status $rc"
+exit "$rc"

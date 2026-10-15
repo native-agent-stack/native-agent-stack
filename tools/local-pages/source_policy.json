@@ -20852,6 +20852,10 @@
       },
       {
         "root": "repo",
+        "path": "evidence/receipts/osv-openhands-mcp-relock-20261015.json"
+      },
+      {
+        "root": "repo",
         "path": "evidence/receipts/osv-openhands-oauthlib-relock-20261013.json"
       },
       {
