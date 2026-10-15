@@ -17433,8 +17433,8 @@
     },
     {
       "path": "catalogs/foundation/model-currency.json",
-      "sha256": "4ad577d0daf4307593592d967348193cd39390976b7b177173d69c5d3f1574b1",
-      "bytes": 35698
+      "sha256": "3441d4f0aa20c054d98c5ae10a5ab5e4336cac5e028b9d73e0b1035600ad1f3e",
+      "bytes": 39358
     },
     {
       "path": "catalogs/foundation/model-currency.schema.json",
@@ -19180,6 +19180,11 @@
       "path": "docs/decisions/2026-10-13-strict-paper-url-gates.md",
       "sha256": "172927d56413762dc04f333cb6c236b1a85bb70a06740a8359c0d8cac904e8af",
       "bytes": 6429
+    },
+    {
+      "path": "docs/decisions/2026-10-15-model-currency-landscape-check.md",
+      "sha256": "64c36068e46ed1595065a485fa0b2c346a121867c2bb21629b7a6c634b457063",
+      "bytes": 6618
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
