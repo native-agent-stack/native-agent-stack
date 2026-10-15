@@ -78,6 +78,10 @@ one root is explicitly given. The report itself contains only skill names and co
   never the matched string, the surrounding message, or any other field of the line.
 - the Claude side is limited to native `/skill-doctor`'s own table (skill, source, context tokens,
   7-day tokens, uses, last used); it is never asked to read `~/.claude/skills` or any transcript.
+  Only when that table parses to zero rows does it read the Claude config's `skillUsage` object
+  (`--claude-config`, default `$CLAUDE_CONFIG_DIR/.claude.json`, else `~/.claude.json`), in process,
+  keeping skill names and `usageCount` values only; the refusal names how many skills it lists and
+  nothing else of the file.
 
 ## Commands
 
@@ -120,6 +124,13 @@ python3 tools/skill-usage/skill_usage.py --run-skill-doctor --codex-root ~/.code
 
 `--claude-skill-doctor FILE` also accepts a plain-text capture (the table as printed, no
 `--output-format json`) — useful when the table was pasted rather than captured as JSON.
+
+A table that parses to zero rows is refused as **not measured**, never reported as an empty table:
+Claude Code 2.1.300 prints a header and, with nothing loaded, `(no skills loaded)`, so text with no
+row in it means the table changed or the capture is something else. The refusal says whether the
+text was empty and how many skills the Claude config's `skillUsage` lists (`--claude-config FILE`).
+`--plugin-exceptions FILE` (default `tools/skill-usage/plugin-exceptions.json`) names the plugins
+the owner directed to keep although their skills went unused (see `plugins_unused_7d` below).
 
 Common options: `--manifest PATH` (default `adoption/skills/manifest.json`), `--window N`
 (repeatable; default 7 and 30 — the manifest's own `trial.window_days` is always included even if
@@ -201,6 +212,23 @@ native output, it is not an unchanged upstream test and not a synthetic fixture 
   `counts` minus both parts is the own records of every other session. Whether the trial should
   compare only within one listing state is the trial owner's rule to record; until then no flag
   reads the parts.
+- **A name on two rows is one listing.** `/skill-doctor` prints a row for every loaded skill
+  command, so a skill in both `~/.claude/skills` and the project's `.claude/skills` is printed from
+  `userSettings` and from `projectSettings`. Each name-keyed row keeps its cells as before (those of
+  its last row) and gains `listings`, every row of the name; the report's `duplicate_listings` names
+  such skills with their sources. Their `table_context_tokens` (the rows added) is not a cost:
+  Claude Code 2.1.300 lists a name once (the `skill_listing` attachment and the table's skill set
+  pass the loaded skills through lodash `uniqBy` on `name`) and prints that one estimate on every
+  row, so `listing_context_tokens` is what the model is shown each turn
+  (`evidence/artifacts/skills-listing-20261015`). A plugin's copy is another name
+  (`<plugin>:<skill>`), listed separately; `claude_row` adds those.
+- **`plugins_unused_7d` is the synced-plugin guard.** `listing_sources` groups the table's rows
+  by source (`plugin` when every row is named `<source>:<skill>`, the settings sources,
+  `claude.ai sync`, `mcp`, else `other`). A plugin with a listed skill whose every row shows no use
+  in the last 7 days — 0 uses, `never`, or a last-used cell of 7 or more whole days (the client
+  prints whole days, rounded down) — is named in `plugins_unused_7d`; a cell that cannot be put in
+  order (an absolute date) shows no such absence. A plugin in the owner-direction exceptions file is
+  reported in `plugins_excepted` instead.
 - **Codex counts are two distinct signals, never merged.** `skill_md_reads` (a tool/function call
   whose command or arguments named that skill's `SKILL.md`) and `name_mentions` (a user message
   containing `$<name>`) are reported side by side; a prune decision at the trial window treats

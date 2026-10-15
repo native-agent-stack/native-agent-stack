@@ -114,24 +114,191 @@ def parse_approx_count(raw: str) -> int | None:
 # --------------------------------------------------------------------------- Claude /skill-doctor
 
 
-def parse_skill_doctor_text(text: str) -> dict[str, dict]:
-    """Every table row in a /skill-doctor listing, keyed by skill name. Non-row lines (header,
-    footnotes, blanks) never match SKILL_DOCTOR_ROW (no row lacks a literal "N×" uses column) and
-    are silently skipped, so this is safe to run over the whole command output or file."""
-    rows: dict[str, dict] = {}
+LISTING_CELLS = ("source", "context_tokens", "tokens_7d", "uses", "last_used")
+
+
+def parse_skill_doctor_listings(text: str) -> list[dict]:
+    """Every table row in a /skill-doctor listing, in table order, one {"skill", "source", "context_tokens", "tokens_7d",
+    "uses", "last_used"} per printed row. Non-row lines (header, footnotes, blanks) never match SKILL_DOCTOR_ROW (no row
+    lacks a literal "N×" uses column) and are silently skipped, so this is safe to run over the whole command output or
+    file. One name can be printed on several rows: Claude Code 2.1.300 prints a row for every loaded skill command (tkn in
+    the binary of sha256 674deba0bba9aee479f4503c438b49303b6fdd304b9a471b14977aaec5215453), so a skill both in
+    ~/.claude/skills and in the project's .claude/skills is printed once from userSettings and once from projectSettings."""
+    listings = []
     for line in text.splitlines():
         match = SKILL_DOCTOR_ROW.match(line)
         if not match:
             continue
         groups = match.groupdict()
-        rows[groups["skill"]] = {
+        listings.append({
+            "skill": groups["skill"],
             "source": groups["source"].strip(),
             "context_tokens": parse_approx_count(groups["context"]),
             "tokens_7d": parse_approx_count(groups["tokens_7d"]),
             "uses": int(groups["uses"]),
             "last_used": groups["last_used"].strip(),
-        }
+        })
+    return listings
+
+
+def parse_skill_doctor_text(text: str) -> dict[str, dict]:
+    """Every table row in a /skill-doctor listing, keyed by skill name (parse_skill_doctor_listings). A name's cells are
+    those of its last row, as they always were; `listings` keeps every row of the name in table order, each with the
+    same five cells, so a name printed on two rows loses neither."""
+    rows: dict[str, dict] = {}
+    for listing in parse_skill_doctor_listings(text):
+        cells = {key: listing[key] for key in LISTING_CELLS}
+        listings = rows[listing["skill"]]["listings"] if listing["skill"] in rows else []
+        listings.append(cells)
+        rows[listing["skill"]] = {**cells, "listings": listings}
     return rows
+
+
+def row_listings(row: dict) -> list[dict]:
+    """The rows /skill-doctor printed for one name: the row's `listings`, or the row itself when it was built without
+    them (by hand, as tests/test_skill_usage_daily.py does)."""
+    listings = row.get("listings")
+    if isinstance(listings, list) and listings:
+        return listings
+    return [{key: row.get(key) for key in LISTING_CELLS}]
+
+
+def duplicate_listings(rows: dict) -> list[dict]:
+    """Every name /skill-doctor printed on more than one row: its sources in table order, each row's context cell, their
+    sum (`table_context_tokens`, what the rows add up to) and `listing_context_tokens`, the one listing the model is
+    shown, when every row prints the same cell (None otherwise).
+
+    The sum is not a cost. Claude Code 2.1.300 lists a skill name once: the skill_listing attachment it sends (T5r, byte
+    228551628 of the binary named above) and the skill set its table reads (Hfr, byte 227068501) both pass the loaded
+    skills through lodash uniqBy on "name" (`var Oi=T`, byte 216279796), and the table (tkn, byte 238412509) prints that
+    name's one estimate on each of its rows (listingTokens: y.get(e.name)); this repository's skill_listing attachments
+    name such a skill once (evidence/artifacts/skills-listing-20261015). A plugin copy is another name (<plugin>:<skill>)
+    and is listed separately: claude_row adds those."""
+    found = []
+    for name, row in rows.items():
+        listings = row_listings(row)
+        if len(listings) < 2:
+            continue
+        cells = [listing.get("context_tokens") for listing in listings]
+        known = [cell for cell in cells if cell is not None]
+        found.append({"name": name, "sources": [listing.get("source") for listing in listings], "rows": len(listings),
+                      "context_tokens_per_row": cells, "table_context_tokens": sum(known) if known else None,
+                      "listing_context_tokens": cells[0] if known and len(set(cells)) == 1 else None})
+    return found
+
+
+# The source cell of Claude Code 2.1.300's table (tkn): a plugin skill's plugin manifest name, "claude.ai sync" for a skill
+# synced from claude.ai (the constant WX), and otherwise the command's own source, a settings source or "mcp".
+SOURCE_KINDS = {"userSettings": "settings", "projectSettings": "settings", "localSettings": "settings",
+                "flagSettings": "settings", "policySettings": "settings", "claude.ai sync": "synced", "mcp": "mcp"}
+UNUSED_DAYS = 7  # the table's own window ("7d tokens") and the one the command center's synced-plugin guard reads
+DEFAULT_PLUGIN_EXCEPTIONS = ROOT / "tools" / "skill-usage" / "plugin-exceptions.json"
+
+
+def source_kind(source: str, names) -> str:
+    """"plugin" when every row of a source is named <source>:<skill> (2.1.300 prints a plugin skill under its namespaced
+    name, with the plugin's manifest name as its source), the kind of a known source, and "other" for anything else,
+    which is reported and never flagged."""
+    if source in SOURCE_KINDS:
+        return SOURCE_KINDS[source]
+    return "plugin" if names and all(name.startswith(f"{source}:") for name in names) else "other"
+
+
+def unused_within(listing: dict, days: int = UNUSED_DAYS) -> bool | None:
+    """Whether a row shows no use in the last `days` days: True for 0 uses, for "never", and for a last-used cell at least
+    `days` whole days ago (2.1.300 prints daysSinceUse = floor(age / 1 day), function tcs, so "7 days" is 7 to 8 days ago);
+    False for a cell inside the window; None for a cell that cannot be put in order (last_used_age_seconds)."""
+    if listing.get("uses") == 0:
+        return True
+    cell = listing.get("last_used")
+    if isinstance(cell, str) and cell.strip().lower() == "never":
+        return True
+    age = last_used_age_seconds(cell)
+    return None if age is None else age >= days * 86_400
+
+
+def listing_sources(rows: dict) -> dict[str, dict]:
+    """The table's rows grouped by source: its kind (source_kind), its rows ("skills"), the rows with a context cell
+    ("listed"), their context cells and uses added, and unused_7d: True when every row shows no use in the last 7 days,
+    False when one does, None when neither can be shown."""
+    groups: dict[str, list] = {}
+    for name, row in rows.items():
+        for listing in row_listings(row):
+            groups.setdefault(str(listing.get("source")), []).append((name, listing))
+    sources = {}
+    for source, members in groups.items():
+        unused = [unused_within(listing) for _, listing in members]
+        contexts = [listing["context_tokens"] for _, listing in members if listing.get("context_tokens") is not None]
+        sources[source] = {"kind": source_kind(source, [name for name, _ in members]), "skills": len(members),
+                           "listed": len(contexts), "context_tokens": sum(contexts),
+                           "uses": sum(listing.get("uses") or 0 for _, listing in members),
+                           "unused_7d": False if False in unused else None if None in unused else True}
+    return sources
+
+
+def plugin_flags(sources: dict, exceptions=()) -> tuple[list[str], list[str]]:
+    """(plugins_unused_7d, plugins_excepted): the plugin sources with a listed skill (context tokens above 0) whose every
+    row shows no use in the last 7 days, split by the owner-direction exceptions."""
+    flagged = sorted(source for source, entry in sources.items()
+                     if entry["kind"] == "plugin" and entry["context_tokens"] > 0 and entry["unused_7d"] is True)
+    excepted = set(exceptions)
+    return [source for source in flagged if source not in excepted], [source for source in flagged if source in excepted]
+
+
+def load_plugin_exceptions(path) -> set[str]:
+    """The plugin names of an exceptions file shaped like tools/skill-usage/plugin-exceptions.json: {"comment": ...,
+    "exceptions": [{"plugin": <the table's source cell>, ...}]}. Raises ValueError for another shape (and for a file that
+    is not JSON) and OSError when it cannot be read."""
+    document = json.loads(Path(path).read_text(encoding="utf-8"))
+    entries = document.get("exceptions") if isinstance(document, dict) else None
+    if not isinstance(entries, list) or not all(isinstance(entry, dict) and isinstance(entry.get("plugin"), str)
+                                                and entry["plugin"] for entry in entries):
+        raise ValueError('expected {"exceptions": [{"plugin": <name>, ...}, ...]}')
+    return {entry["plugin"] for entry in entries}
+
+
+def claude_config_path(environment=None, home=None) -> Path:
+    """The Claude Code config file that holds skillUsage: CLAUDE_CONFIG_DIR, else the home directory, joined with
+    ".claude.json", as 2.1.300 builds it ($5n: `.claude${W5()}.json` under CLAUDE_CONFIG_DIR or the home directory, W5()
+    being "" with production OAuth). The legacy <config dir>/.config.json that the client prefers while it is a non-empty
+    file (W_) is not followed: pass --claude-config on a host that still has one."""
+    environment = os.environ if environment is None else environment
+    base = environment.get("CLAUDE_CONFIG_DIR") or home or environment.get("HOME") or os.path.expanduser("~")
+    return Path(base) / ".claude.json"
+
+
+def claude_skill_usage(path=None) -> dict[str, int] | None:
+    """{skill name: usageCount} from the config's skillUsage object, the record /skill-doctor's uses column reads (2.1.300
+    tcs: skillUsage[name]); names and counts only, nothing else of the file is kept. None when the file is absent,
+    unreadable or not JSON, or holds no skillUsage object."""
+    try:
+        document = json.loads(Path(path or claude_config_path()).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    usage = document.get("skillUsage") if isinstance(document, dict) else None
+    if not isinstance(usage, dict):
+        return None
+    return {name: entry["usageCount"] for name, entry in usage.items() if isinstance(entry, dict)
+            and isinstance(entry.get("usageCount"), int) and not isinstance(entry["usageCount"], bool)}
+
+
+def not_measured_reason(text, rows: dict, skill_usage=None) -> str | None:
+    """Why a /skill-doctor result that parsed to zero rows is no measurement, or None when it has rows. Zero rows is never
+    an empty pass: 2.1.300 prints a header and, with nothing loaded, "(no skills loaded)", so even an empty table has
+    text, and text with no row in it means the table changed or the capture is something else. The reason names what was
+    seen: the text, and the Claude config's skillUsage (skill_usage: a function returning {name: usageCount} or None,
+    called only here, so a result with rows never reads the config). The client's "(no skills loaded)" is refused too."""
+    if rows:
+        return None
+    seen = []
+    if isinstance(text, str) and text.strip():
+        seen.append(f"its text has {len(text.strip().splitlines())} lines and no line of it is a table row")
+    usage = skill_usage() if callable(skill_usage) else None
+    if usage:
+        seen.append(f"the Claude config's skillUsage lists {len(usage)} skill{'' if len(usage) == 1 else 's'}")
+    if not seen:
+        seen.append("its text is empty")
+    return "not measured: the /skill-doctor result parses to zero rows; " + "; ".join(seen)
 
 
 def find_result_event(events: list) -> dict | None:
@@ -148,7 +315,7 @@ def evaluate_cost(total_cost_usd, num_turns) -> bool:
     return total_cost_usd == 0 and num_turns == 0
 
 
-def parse_claude_output(raw: str) -> dict:
+def parse_claude_output(raw: str, skill_usage=None) -> dict:
     """Parse a captured `--output-format json` result object or stream-json event array, or a
     plain-text /skill-doctor table.
 
@@ -165,12 +332,17 @@ def parse_claude_output(raw: str) -> dict:
     Returns {"format", "rows", "total_cost_usd", "num_turns"} and, when the capture is refused
     or malformed, an "error" key with rows left empty. total_cost_usd/num_turns are None for a
     plain-text capture: there is no cost signal to check, because there is no result event.
+    A table that parses to zero rows is refused as not measured (not_measured_reason, which calls
+    skill_usage, a function returning the Claude config's skillUsage, only in that case).
     """
     try:
         events = json.loads(raw)
     except json.JSONDecodeError:
-        return {"format": "text", "rows": parse_skill_doctor_text(raw),
-                "total_cost_usd": None, "num_turns": None}
+        rows = parse_skill_doctor_text(raw)
+        reason = not_measured_reason(raw, rows, skill_usage)
+        if reason:
+            return {"format": "text", "rows": {}, "total_cost_usd": None, "num_turns": None, "error": reason}
+        return {"format": "text", "rows": rows, "total_cost_usd": None, "num_turns": None}
     if isinstance(events, dict):
         events = [events]
     if not isinstance(events, list):
@@ -197,8 +369,11 @@ def parse_claude_output(raw: str) -> dict:
     if not isinstance(text, str):
         return {"format": "json", "rows": {}, "total_cost_usd": total_cost_usd, "num_turns": num_turns,
                 "error": "result event has no string 'result' field"}
-    return {"format": "json", "rows": parse_skill_doctor_text(text),
-            "total_cost_usd": total_cost_usd, "num_turns": num_turns}
+    rows = parse_skill_doctor_text(text)
+    reason = not_measured_reason(text, rows, skill_usage)
+    if reason:
+        return {"format": "json", "rows": {}, "total_cost_usd": total_cost_usd, "num_turns": num_turns, "error": reason}
+    return {"format": "json", "rows": rows, "total_cost_usd": total_cost_usd, "num_turns": num_turns}
 
 
 # /skill-doctor is a local command (0 turns, $0), so these fences change nothing while the client recognises it:
@@ -251,9 +426,9 @@ def skill_doctor_argv(managed_paths=None) -> list:
     return list(SKILL_DOCTOR_ARGV)
 
 
-def run_skill_doctor(*, timeout: int = 30, runner=subprocess.run, managed_paths=None) -> dict:
+def run_skill_doctor(*, timeout: int = 30, runner=subprocess.run, managed_paths=None, skill_usage=None) -> dict:
     """Run skill_doctor_argv() (SKILL_DOCTOR_ARGV; without --strict-mcp-config on a host with a managed MCP config),
-    stdin from /dev/null."""
+    stdin from /dev/null; skill_usage goes to parse_claude_output."""
     try:
         completed = runner(skill_doctor_argv(managed_paths),
                             stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=timeout)
@@ -263,7 +438,7 @@ def run_skill_doctor(*, timeout: int = 30, runner=subprocess.run, managed_paths=
     if completed.returncode != 0:
         return {"format": None, "rows": {}, "total_cost_usd": None, "num_turns": None,
                 "error": f"claude -p /skill-doctor exited {completed.returncode}"}
-    return parse_claude_output(completed.stdout)
+    return parse_claude_output(completed.stdout, skill_usage=skill_usage)
 
 
 # --------------------------------------------------------------------------- Codex rollout scan
@@ -582,7 +757,7 @@ def _claude_summary(claude: dict | None) -> dict:
 
 
 def build_report(manifest: dict, *, claude: dict | None, codex_scan: dict,
-                  lock_installed_at: dict, now: datetime, windows) -> dict:
+                  lock_installed_at: dict, now: datetime, windows, plugin_exceptions=()) -> dict:
     trial = manifest.get("trial") if isinstance(manifest.get("trial"), dict) else {}
     trial_window_days = trial.get("window_days")
     windows = effective_windows(windows, manifest)
@@ -692,6 +867,12 @@ def build_report(manifest: dict, *, claude: dict | None, codex_scan: dict,
             else:
                 prune_candidates.append(record)
 
+    duplicates = sources = plugins_unused = plugins_excepted = None
+    if claude_usable:
+        duplicates = duplicate_listings(claude["rows"])
+        sources = listing_sources(claude["rows"])
+        plugins_unused, plugins_excepted = plugin_flags(sources, plugin_exceptions)
+
     return {
         "schema_version": 1,
         "kind": "skill_invoke_rate_report",
@@ -708,6 +889,10 @@ def build_report(manifest: dict, *, claude: dict | None, codex_scan: dict,
         "codex_use_policy": codex_scan.get("use_policy"),
         "prune_candidates": prune_candidates,
         "verdict_recheck": verdict_recheck,
+        "duplicate_listings": duplicates,
+        "listing_sources": sources,
+        "plugins_unused_7d": plugins_unused,
+        "plugins_excepted": plugins_excepted,
         "limits": (
             "Claude 'uses' from /skill-doctor is not windowed by --window (only its '7d tokens' "
             "column is): the same lifetime count is reused for every window's zero-usage check, "
@@ -723,7 +908,16 @@ def build_report(manifest: dict, *, claude: dict | None, codex_scan: dict,
             "copied from its parent, which the parent's rollout also holds). A skill with no measured, enabled/listed client "
             "is excluded from prune_candidates and verdict_recheck, never read as zero usage. "
             "The measured listing cost (claude.context_tokens) is its own counter: never mix it "
-            "into tools/token-report's token-efficiency ledger."
+            "into tools/token-report's token-efficiency ledger. /skill-doctor prints a skill that two "
+            "sources load (~/.claude/skills and the project's .claude/skills) on two rows: "
+            "duplicate_listings keeps every row, and their sum (table_context_tokens) counts one "
+            "listing once per row, because Claude Code 2.1.300 lists a name once; "
+            "listing_context_tokens is that one listing. listing_sources groups the rows by source; "
+            "plugins_unused_7d names each plugin "
+            "with a listed skill whose every row shows no use in the last 7 days (0 uses, \"never\", "
+            "or a last-used cell 7 or more whole days ago), less the owner-direction exceptions of "
+            "tools/skill-usage/plugin-exceptions.json, reported in plugins_excepted. A table that "
+            "parses to zero rows is refused as not measured."
         ),
     }
 
@@ -744,6 +938,14 @@ def render_text(report: dict) -> str:
                  f"roots_count={codex['roots_count']} files_scanned={codex['files_scanned']} "
                  f"parse_errors={codex['parse_errors']} "
                  f"user_config_ignored_sessions={codex['sessions_user_config_ignored']}")
+    for entry in report.get("duplicate_listings") or []:
+        cost = entry["listing_context_tokens"]
+        lines.append(f"claude duplicate listing: {entry['name']} ({', '.join(entry['sources'])}): {entry['rows']} rows, "
+                     f"one listing of {'unknown' if cost is None else cost} context tokens")
+    if report.get("plugins_unused_7d") is not None:
+        excepted = report.get("plugins_excepted") or []
+        lines.append(f"claude plugins unused 7d: {', '.join(report['plugins_unused_7d']) or 'none'}"
+                     + (f"  excepted: {', '.join(excepted)}" if excepted else ""))
     lines.append("")
     windows = report["windows_days"]
     lines.append(f"{'skill':<34} {'status':<6} {'age_days':>9} {'claude_uses':>11} "
@@ -2350,6 +2552,13 @@ def build_parser() -> argparse.ArgumentParser:
                                      "unless total_cost_usd == 0 and num_turns == 0")
     parser.add_argument("--claude-timeout", type=int, default=30, metavar="SECONDS",
                          help="Timeout for --run-skill-doctor (default: 30)")
+    parser.add_argument("--claude-config", type=Path, default=None, metavar="FILE",
+                         help="Claude Code config whose skillUsage, read only when /skill-doctor parses to zero rows, is "
+                              "named in the not-measured refusal (default: $CLAUDE_CONFIG_DIR/.claude.json, else "
+                              "~/.claude.json)")
+    parser.add_argument("--plugin-exceptions", type=Path, default=DEFAULT_PLUGIN_EXCEPTIONS, metavar="FILE",
+                         help="Owner-direction exceptions to plugins_unused_7d (default: "
+                              "tools/skill-usage/plugin-exceptions.json)")
     parser.add_argument("--codex-root", action="append", default=[], type=Path, metavar="DIR",
                          help="Root to scan for rollout-*.jsonl (repeatable; no default search: "
                               "omit entirely to report Codex as not-measured)")
@@ -2416,9 +2625,19 @@ def main(argv=None) -> int:
         print("skill_usage: --since, --until and --marker need --lanes", file=sys.stderr)
         return 2
 
+    try:
+        plugin_exceptions = load_plugin_exceptions(args.plugin_exceptions)
+    except (OSError, ValueError) as error:
+        print(f"skill_usage: invalid --plugin-exceptions {args.plugin_exceptions}: {type(error).__name__}: {error}",
+              file=sys.stderr)
+        return 2
+
+    def skill_usage():  # read only when /skill-doctor parses to zero rows (not_measured_reason)
+        return claude_skill_usage(args.claude_config)
+
     claude = None
     if args.run_skill_doctor:
-        claude = run_skill_doctor(timeout=args.claude_timeout)
+        claude = run_skill_doctor(timeout=args.claude_timeout, skill_usage=skill_usage)
         claude["origin"] = "run"
     elif args.claude_skill_doctor is not None:
         try:
@@ -2427,7 +2646,7 @@ def main(argv=None) -> int:
             print(f"skill_usage: cannot read --claude-skill-doctor: {type(error).__name__}",
                   file=sys.stderr)
             return 2
-        claude = parse_claude_output(raw)
+        claude = parse_claude_output(raw, skill_usage=skill_usage)
         claude["origin"] = "file"
     if claude is not None and claude.get("error"):
         print(f"skill_usage: Claude skill-doctor capture not used: {claude['error']}", file=sys.stderr)
@@ -2452,7 +2671,8 @@ def main(argv=None) -> int:
     codex_scan = scan_codex_roots(args.codex_root, names, now=now, windows=windows, codex_off=codex_off)
 
     report = build_report(manifest, claude=claude, codex_scan=codex_scan,
-                           lock_installed_at=lock_installed_at, now=now, windows=windows)
+                           lock_installed_at=lock_installed_at, now=now, windows=windows,
+                           plugin_exceptions=plugin_exceptions)
     if args.runtime_log:
         from runtime_usage import scan
         try:

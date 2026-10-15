@@ -1,0 +1,39 @@
+{
+  "kind": "measurement",
+  "read_utc": "2026-10-15T06:12:56Z",
+  "question": "Does a skill that /skill-doctor prints on two rows take two entries in the skill listing the model is sent?",
+  "skill": "claude-native-practice",
+  "copies": "userSettings: ~/.claude/skills/claude-native-practice, a link into ~/.agents/skills made 2026-10-11T23:38:30Z; projectSettings: this repository's .claude/skills/claude-native-practice",
+  "scope": "every initial skill_listing attachment in the Claude Code transcripts of this repository's main checkout (sessions and their subagents) stamped after the personal copy was made; counts and times only: no session ids, paths or listing text",
+  "by_client": {
+    "2.1.296": {
+      "initial_listings": 143,
+      "naming_it_once": 143,
+      "names_unique": 143,
+      "first_utc": "2026-10-12T00:00:23Z",
+      "last_utc": "2026-10-14T06:01:46Z"
+    },
+    "2.1.299": {
+      "initial_listings": 13,
+      "naming_it_once": 13,
+      "names_unique": 13,
+      "first_utc": "2026-10-14T03:15:38Z",
+      "last_utc": "2026-10-14T20:12:51Z"
+    },
+    "2.1.300": {
+      "initial_listings": 26,
+      "naming_it_once": 26,
+      "names_unique": 26,
+      "first_utc": "2026-10-14T20:20:24Z",
+      "last_utc": "2026-10-15T06:10:53Z"
+    }
+  },
+  "client_source": {
+    "binary": "Claude Code 2.1.300 native binary, sha256 674deba0bba9aee479f4503c438b49303b6fdd304b9a471b14977aaec5215453",
+    "listing": "T5r (byte 228551628) builds the skill_listing attachment from Oi([...S,...s],\"name\") and sends each name once",
+    "uniq_by": "var Oi=T (byte 216279796); T(e,o) is lodash uniqBy: baseUniq over baseIteratee(o), keeping a name's first entry",
+    "skill_doctor": "tkn (byte 238412509) prints a row for every loaded skill command, with listingTokens y.get(e.name) from Mfr over the included set of Hfr (byte 227068501), which applies the same uniqBy",
+    "uses": "tcs (byte 227067812) reads skillUsage[name], so both rows of a name print the same uses and last used"
+  },
+  "result": "Every counted listing names claude-native-practice once and carries one line for it: the second /skill-doctor row is the table printing one listing twice, not a second listing."
+}

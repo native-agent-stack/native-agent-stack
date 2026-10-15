@@ -1,0 +1,4 @@
+{
+  "comment": "Plugins the owner directed to keep enabled although every skill they list showed no use in the last 7 days. tools/skill-usage/skill_usage.py reports such a plugin under plugins_excepted instead of plugins_unused_7d (the command center's synced-plugin guard). One entry per plugin: {\"plugin\": the /skill-doctor source cell (the plugin's manifest name), \"direction\": a dated paraphrase of the owner's direction, never a quote, \"recorded\": YYYY-MM-DD}. Empty when created on 2026-10-15.",
+  "exceptions": []
+}
