@@ -116,7 +116,6 @@ EXEMPTIONS = {
 }
 # Every write grant in the repository, by job. A new one is a reviewed change to this inventory.
 WRITE_GRANTS = {
-    "catalog-freshness.yml:propose": ["contents: write", "pull-requests: write"],
     "publish-catalog.yml:publish": ["id-token: write", "attestations: write"],
     "publish-catalog.yml:release": ["contents: write"],
     "saturation-tracking.yml:issue": ["issues: write"],
@@ -1217,7 +1216,8 @@ class RepositoryPolicyTests(unittest.TestCase):
         self.assertEqual(grants, WRITE_GRANTS)
 
     def test_no_job_pushes_with_a_persisted_credential(self):
-        # The one job that pushes keeps persist-credentials: false and sends the token for that command alone.
+        # The one job that pushes keeps persist-credentials: false and sends its App installation token for that command
+        # alone (docs/decisions/2026-09-23-bot-pr-dispatch.md, "App installation token (2026-10-14)").
         pushers = set()
         for path in workflow_files(WORKFLOWS):
             for job_id, job in load_workflow(path.read_text(encoding="utf-8"))["jobs"].items():

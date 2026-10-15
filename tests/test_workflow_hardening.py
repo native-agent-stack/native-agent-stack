@@ -2407,13 +2407,12 @@ class LinuxBootstrapChangesTests(unittest.TestCase):
 
 
 class NoWorkflowApprovesPullRequestsTests(unittest.TestCase):
-    """`can_approve_pull_request_reviews` stays on because one toggle also lets GITHUB_TOKEN
-    create the catalog-freshness `propose` PR (docs/decisions/2026-09-23-bot-pr-dispatch.md,
-    "Approval guard (2026-09-25)"). Since the setting also lets any workflow approve a PR, these
-    cross-workflow checks keep the approve capability unused: `pull-requests: write` only on
-    `catalog-freshness.yml:propose` (whose exact scopes tests/test_catalog_freshness_propose.py
-    pins), no `actions: write` (the scope `POST /actions/runs/{run_id}/approve` needs), and no
-    review/approve call anywhere."""
+    """The catalog-freshness `propose` PR is opened with the nas-catalog-propose App's installation
+    token (docs/decisions/2026-09-23-bot-pr-dispatch.md, "App installation token (2026-10-14)"), so
+    no workflow's GITHUB_TOKEN needs to create or approve a pull request and
+    `can_approve_pull_request_reviews` stays off. These cross-workflow checks keep it that way: no
+    `pull-requests: write` anywhere, no `actions: write` (the scope
+    `POST /actions/runs/{run_id}/approve` needs), and no review/approve call anywhere."""
 
     texts = {path.name: path.read_text(encoding="utf-8") for path in sorted(WORKFLOWS.glob("*.y*ml"))}
 
@@ -2429,14 +2428,14 @@ class NoWorkflowApprovesPullRequestsTests(unittest.TestCase):
             empty = len(re.findall(r"(?m)^\s*permissions:[ \t]*\{\}[ \t]*$", body))
             self.assertEqual(keys, len(permission_blocks(body)) + empty, f"{name}: unparsed permissions key")
 
-    def test_pull_requests_write_is_granted_only_to_the_propose_job(self):
+    def test_no_workflow_grants_pull_requests_write(self):
         grants = set()
         for name, text in self.texts.items():
             sections = {"<top-level>": text.split("\njobs:\n", 1)[0], **jobs(text)}
             for section, section_text in sections.items():
                 if any(block.get("pull-requests") == "write" for block in scopes(section_text)):
                     grants.add(f"{name}:{section}")
-        self.assertEqual(grants, {"catalog-freshness.yml:propose"})
+        self.assertEqual(grants, set())
 
     def test_no_workflow_holds_actions_write(self):
         for name, text in self.texts.items():

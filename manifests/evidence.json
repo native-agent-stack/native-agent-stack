@@ -5137,8 +5137,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "0bb8f0237ca45bb787620a9c08f9ceaafcaf58eddb512496aefebf45696ddae3",
-      "bytes": 28607
+      "sha256": "7f4e621187d82978312aea7671008067a418c5bb2943ce76299b2c629abd9a20",
+      "bytes": 28370
     },
     {
       "path": ".github/workflows/dependency-review.yml",
@@ -19413,8 +19413,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "493052e05ac60606d3a0be4e6d3d9f83c02b40463c2c98e80508e793f560c5fc",
-      "bytes": 106136
+      "sha256": "17b9ea099faf9c06d4b3ce05bcc74d4336fb8845ff99c22f1471ff56cc0c5f93",
+      "bytes": 106487
     },
     {
       "path": "docs/grand-catalog-counts.md",
@@ -62913,8 +62913,8 @@
     },
     {
       "path": "tests/test_catalog_freshness_propose.py",
-      "sha256": "6aa868be73a47e3f2347c0728ec4489e59c52ecfb84f115aed051698effc4e6d",
-      "bytes": 64694
+      "sha256": "99e350f2832af31e56dce03904d4cb2c336c978cd06a004f9cbc709122c1ea68",
+      "bytes": 66565
     },
     {
       "path": "tests/test_catalog_freshness_runtime.py",
@@ -64258,13 +64258,13 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "5e87651b314dde9cb62b4caecf1d06df89ac567e1dbca0947158381dc3bd4cae",
-      "bytes": 152178
+      "sha256": "57d7fb8d3d1a47a46d17f3da911ea93f7dfca5f4e6cd349f482cab257dcdd707",
+      "bytes": 152064
     },
     {
       "path": "tests/test_workflow_policy.py",
-      "sha256": "d84b6f165b3b0866df65fbc8634e97eed382a9b03aff83eb387c7e90815cd1e4",
-      "bytes": 83049
+      "sha256": "84b7bf6bfc761d2c9919db43d4b1e73c3beac988fa5bd8a57c0d82187f6a8f3c",
+      "bytes": 83080
     },
     {
       "path": "tests/test_workflow_security.py",
