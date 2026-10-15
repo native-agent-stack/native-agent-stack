@@ -51,7 +51,10 @@ env_key = "OMNIROUTE_API_KEY"
 env_key_instructions = "Export OMNIROUTE_API_KEY only in the shell that starts `codex -p omniroute`: the gateway's key, stored under inventory id omniroute with tools/credentials/open_credential_terminal.sh omniroute, or any non-empty value for a keyless loopback gateway."
 wire_api = "responses"
 requires_openai_auth = false
-supports_standalone_web_search = true
+# Held out (2026-10-15, matching the client-config map and 2604's live profile): the running 21128 build (3.8.51,
+# 2a41147b7) has no api/v1/alpha route, so POST /v1/alpha/search falls to the catch-all 404 (co-op parity record
+# ea5c38b7). Reopen when a tagged OmniRoute release contains PR #13788.
+supports_standalone_web_search = false
 
 # Keeps the gateway key out of every command the model runs. The keyed `filters` table is the canonical form, and it
 # must not be mixed with the legacy exclude/include_only arrays in one layer (codex-rs/config/src/
@@ -64,5 +67,5 @@ supports_standalone_web_search = true
 # every exported variable, a provider key included, into $CODEX_HOME/shell_snapshots
 # (codex-rs/shell-command/src/shell_snapshot_exports.rs), so this profile turns it off whatever the base config says.
 [features]
-standalone_web_search = true
+standalone_web_search = false
 shell_snapshot = false

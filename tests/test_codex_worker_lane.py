@@ -670,7 +670,9 @@ class TemplateTests(unittest.TestCase):
         self.assertEqual(provider["env_key"], "OMNIROUTE_API_KEY")
         self.assertEqual(provider["wire_api"], "responses")
         self.assertIs(provider["requires_openai_auth"], False)
-        self.assertIs(provider["supports_standalone_web_search"], True)
+        # Held out (2026-10-15): the 21128 build has no api/v1/alpha route (co-op parity record ea5c38b7), and the template
+        # matches the client-config map (tests/test_omniroute_template_map_parity.py).
+        self.assertIs(provider["supports_standalone_web_search"], False)
         self.assertNotIn("supports_websockets", provider)
         self.assertNotIn("auth", provider)  # env_key, not a command (K3)
         instructions = provider["env_key_instructions"]
@@ -684,7 +686,7 @@ class TemplateTests(unittest.TestCase):
         # The canonical keyed form only: mixing it with the legacy exclude/include_only arrays in one layer is a
         # config error, and no `set` here, so the base config's [shell_environment_policy.set] keeps applying.
         self.assertEqual(profile["shell_environment_policy"], {"filters": {"OMNIROUTE_API_KEY": "exclude"}})
-        self.assertEqual(profile["features"], {"standalone_web_search": True, "shell_snapshot": False})
+        self.assertEqual(profile["features"], {"standalone_web_search": False, "shell_snapshot": False})
         # K2: the base template stays gateway-free, so render_config.py --check still compares like with like. Its
         # interactive default is GPT-6.1 Sol at ultra (the user's decision of 2026-09-30, model-currency addendum)
         # where the platform's Codex pin lists it: rendered here for the Linux pin, the lane's CODEX_VERSION. This

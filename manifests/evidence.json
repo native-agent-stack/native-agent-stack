@@ -5537,8 +5537,8 @@
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
-      "sha256": "c395763f94d5bb335584d22ca4903dc977544d0e50fc6027f36e0fa64ee3a2af",
-      "bytes": 57789
+      "sha256": "ea8a2a1e23831cc3a9d5c47ffb102969f9bcd7c9280f7134ca11f3486308185d",
+      "bytes": 58483
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
@@ -5797,8 +5797,8 @@
     },
     {
       "path": "adoption/templates/codex.omniroute.config.toml",
-      "sha256": "d7bceccbade707b4293e3157dd5929e9c2173c5c88436c0c99e3ac981686e958",
-      "bytes": 5562
+      "sha256": "7eac62c0e1d7fb23ff3f2c0086b24b93f9796d806a995adf1ade9529fd825803",
+      "bytes": 5863
     },
     {
       "path": "adoption/templates/codex.stack-worker.config.toml",
@@ -18718,8 +18718,8 @@
     },
     {
       "path": "docs/decisions/2026-10-05-omniroute-gateway-composition.md",
-      "sha256": "124b035a26fcb63b38629cdc466f411b046dc8b7e92a78ec1a28648a89b7ddf8",
-      "bytes": 91325
+      "sha256": "b6f73d224d944418b9fa0162ae64d84272f873910078304e8c62a1b864c3b367",
+      "bytes": 92486
     },
     {
       "path": "docs/decisions/2026-10-05-overfitting-riskl-parity.md",
@@ -63008,8 +63008,8 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "53027f4c1225da5a4061b16594c77f9e277c5bf874d6fb94ebdb5f6a6f115cb1",
-      "bytes": 193549
+      "sha256": "e59407f98f7055ff32e98be5fdac96d312ae7c0d0fb2220e4f63ba7043da0f58",
+      "bytes": 193762
     },
     {
       "path": "tests/test_codex_worker_skill.py",
@@ -63343,8 +63343,8 @@
     },
     {
       "path": "tests/test_landscape_sweep_harness.py",
-      "sha256": "69ee39d4d1007934ae0ee45d0d51e189ec3792da6c5c88bb90a4a7d98fbdefba",
-      "bytes": 392428
+      "sha256": "9dc1ed7d003adcc50d348fa491709aa38c6c19c89f1f7f8ad9279a75dc7a8dc9",
+      "bytes": 392552
     },
     {
       "path": "tests/test_landscape_sweep_skills.py",
@@ -64773,8 +64773,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_args.py",
-      "sha256": "87d149928fd44e3193cb97c7b0e3dec3e692a93f35652cac625cf9475eb52c85",
-      "bytes": 51739
+      "sha256": "3ca15405ab9505e002337a508ff36cc6a59cbad52b0319ec350c8df44f5ef560",
+      "bytes": 51982
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_inputs.py",
