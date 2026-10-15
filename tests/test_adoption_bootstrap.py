@@ -628,7 +628,7 @@ class InteractiveEffortLauncherTests(unittest.TestCase):
         "#!/usr/bin/env python3\n"
         "import json, os, sys\n"
         "if sys.argv[1:] == ['--version']:\n"
-        "    print(os.environ.get('STUB_VERSION', '2.1.295') + ' (Claude Code)')\n"
+        "    print(os.environ.get('STUB_VERSION', '2.1.300') + ' (Claude Code)')\n"
         "else:\n"
         "    print('RAN')\n"
         "    print(json.dumps(sys.argv[1:]))\n"
@@ -1199,18 +1199,20 @@ class NativeInstallFloorTests(unittest.TestCase):
     the pin is kept with no download and no install; anything else takes the unchanged
     checksum-verified install."""
 
-    PIN = "2.1.295"
+    PIN = "2.1.300"
     URL = f"https://downloads.claude.ai/claude-code-releases/{PIN}/linux-x64/claude"
-    KEPT = ("2.1.295 (Claude Code)", "2.1.296 (Claude Code)", "2.2.0 (Claude Code)",
-            "10.0.0 (Claude Code)", "2.1.295")
-    # 2.1.294 is one below the pin; 2.1.281 was the floor before 2026-09-29 and 2.1.280 the one
+    KEPT = ("2.1.300 (Claude Code)", "2.1.301 (Claude Code)", "2.2.0 (Claude Code)",
+            "10.0.0 (Claude Code)", "2.1.300")
+    # 2.1.299 is one below the pin (the headless roles pin it by path); 2.1.295 was the floor before 2026-10-14,
+    # 2.1.281 the floor before 2026-09-29 and 2.1.280 the one
     # before it, so a launcher on either now takes the install (2.1.284 is the first release whose
     # `sonnet` alias resolves to Sonnet 5.5). 2.1.99 sorts after 2.1.284 as text but is older; a
     # pre-release suffix, a non-version first word and empty output are not trusted as a version.
-    INSTALLED = ("2.1.294 (Claude Code)", "2.1.290 (Claude Code)", "2.1.284 (Claude Code)",
+    INSTALLED = ("2.1.299 (Claude Code)", "2.1.296 (Claude Code)", "2.1.295 (Claude Code)",
+                 "2.1.294 (Claude Code)", "2.1.290 (Claude Code)", "2.1.284 (Claude Code)",
                  "2.1.283 (Claude Code)", "2.1.281 (Claude Code)", "2.1.280 (Claude Code)",
                  "2.1.99 (Claude Code)", "1.99.999 (Claude Code)",
-                 "2.1.296-dev (Claude Code)", "Claude Code", "")
+                 "2.1.301-dev (Claude Code)", "Claude Code", "")
 
     def _run(self, tmp_path: Path, version_line=None, launcher_exit=0, sha256=None, native_bin_dir=False):
         for tool in ["jq"] if sha256sum_checks_like_gnu() else ["jq", "shasum"]:
@@ -1300,7 +1302,7 @@ class NativeInstallFloorTests(unittest.TestCase):
 
     def test_a_kept_launcher_in_the_native_bin_dir_is_not_replaced(self):
         # With bin_dir == ~/.local/bin, the exec wrapper would replace the kept launcher and exec itself.
-        self.assert_kept("2.1.296 (Claude Code)", native_bin_dir=True)
+        self.assert_kept("2.1.301 (Claude Code)", native_bin_dir=True)
 
     def test_a_missing_older_or_unreadable_launcher_takes_the_verified_install(self):
         for version_line in (None, *self.INSTALLED):

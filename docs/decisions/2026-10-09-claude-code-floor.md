@@ -139,3 +139,57 @@ separately recorded search-route build keeps its own source, build and
 owner gates. Both
 designated reads, required CI, the pre-cue tool and an explicit command-center
 cue remain landing gates.
+
+## Addendum (2026-10-14): the floor rises to 2.1.300, and the run pin carries its source commit
+
+On 2026-10-14 the command center asked for the claude-code run pin in `catalogs/landscape/final-stack.json` to name the
+client the core lanes run, 2.1.300, with its source commit. `scripts/final_stack.py` takes that run pin from
+`adoption/pins-linux-x86_64.json` `tools[].version` and `tools[].commit` (`record_pin`), and the same `version` is this
+floor (`version_probe.match: minimum`). So the run pin and the floor move together, and the change mirrors the 2.1.295
+raise above.
+
+**Distribution evidence.** cc-native-practice repeated the documented check
+(https://code.claude.com/docs/en/setup#binary-integrity-and-code-signing) at 2026-10-14T23:55:04Z:
+
+| Item | Value |
+| --- | --- |
+| Manifest | https://downloads.claude.ai/claude-code-releases/2.1.300/manifest.json, sha256 `fb62dae2893ff954bbf8caa9f4b9345737b98a210e3a6085bf9feec9ddf5d9ca`; version 2.1.300, build commit `c6733ae1276880507ca0c5b053ae18fb0df090d6`, buildDate 2026-10-14T13:29:53Z |
+| Signature | `manifest.json.sig` sha256 `a6ab3967d23a57edc237c2ff9ba9619366fe76f5f3c72b408a89b90026957b85`. The key https://downloads.claude.ai/keys/claude-code.asc (sha256 `bd70a5e4a268002704024ceba7f8446024114e94f3f0bdd11c23a9e592be81c6`) was imported into an empty keyring, fingerprint `31DD DE24 DDFA B679 F42D 7BD2 BAA9 29FF 1A7E CACE`. `gpg --verify` reports a good signature from Anthropic Claude Code Release Signing. |
+| linux-x64 | checksum `674deba0bba9aee479f4503c438b49303b6fdd304b9a471b14977aaec5215453`, size 266972344. The installed `~/.local/share/claude/versions/2.1.300` re-hashes to the same digest and size. |
+| darwin-arm64 | checksum `475517caa611e3318a2f298fa071287ec98955538df78c58f709ecc01e5ae2d3`, size 249556880 (signed-manifest value only; no Mac re-hash, execution or code-signature check) |
+
+The lane's working record of that check is sha256 `9dea8022c9daa1e615f733549766dd63d8223f670f131d84d11921a6c353cba2`.
+
+**Source commit.** Both pins carry `"commit": "94506ff0d3bd9185f1752da36e968775021fb48f"`. That is the
+anthropics/claude-code commit whose `CHANGELOG.md` first carries the `## 2.1.300` section (2026-10-14T18:24:07Z). The
+commit before it, `db93774d73e8fdbaf315a6f4c175ae99ad3d515a`, tops at 2.1.299. `version` stays plain `2.1.300`, because
+both bootstrap scripts compare `--version`'s first word numerically. The regenerated final-stack.json run reads
+`2.1.300` with that commit in `pin_parsed`.
+
+**CHANGELOG delta 2.1.296-2.1.300** (read at 94506ff0):
+- 357 entries: 2.1.296 has 79, 2.1.299 has 190 and 2.1.300 has 88; 2.1.297 and 2.1.298 have none.
+- None changes the native installer, the auto-update channel, `autoUpdatesChannel` or `minimumVersion`.
+- The floor stays a minimum, with latest-channel auto-update as the client-core default.
+
+**Roles that pin 2.1.299 by path.**
+- The headless review worker: `tools/claude-review-worker/worker.py` `DEFAULT_CLAUDE_BIN`, set in #1107.
+- The trading lane's private session runner, which is outside this repository.
+- Both run `~/.local/share/claude/versions/2.1.299`. CHANGELOG 2.1.243 records auto-update cleaning up an old version.
+- Native auto-update is on here. `claude doctor` at 2026-10-15T00:44:57Z prints `Auto-updates: enabled`, channel
+  `latest`, last update `2.1.300 (2026-10-14)`. `~/.claude.json` does hold `autoUpdates: false`, but with
+  `installMethod: native` and `autoUpdatesProtectedForNative: true`. The native installer writes that triple itself
+  when a host leaves another install method ("disabled legacy auto-updater for protection", Claude Code 2.1.300
+  binary), and its disabled check counts `autoUpdates: false` only without that protection.
+- So the version cleanup runs. It keeps the launcher's version, any version a session on this machine is
+  running and the two newest (https://code.claude.com/docs/en/setup, the section on home directories on network
+  storage). A 2.1.299 path survives the next release only while a session runs it, so the pinned roles need their
+  own protection.
+- Moving those roles to 2.1.300 waits for their paired check.
+- That protection is a separate, command-center-reviewed change.
+
+**Derived records:**
+- **Regenerated through their builders:** the profile, both pins, the stack manifest, the generated handbook (receipt regeneration entry), the grand list and the final-stack catalog.
+- **Mirrored as in the 2.1.295 raise:** the upstream snapshot's selected version (a dated local-integration refresh, not a new upstream observation) and the lifecycle audit's version.
+
+**Inverse:** restore the 2.1.295 pins, digests and texts from Git and rerun the builders. That does not downgrade a newer
+installed launcher.

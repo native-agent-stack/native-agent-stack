@@ -35,7 +35,8 @@
    "overturn_when": "An observed auto-update regression breaks a qualified workflow (then `stable` plus `minimumVersion`), or Anthropic changes the default channel.",
    "supersedes": [
     "M51 reconfirmed"
-   ]
+   ],
+   "notes": "Version pins (2026-10-14): the floor and the final-stack run pin are 2.1.300 with source commit 94506ff0d3bd9185f1752da36e968775021fb48f, the anthropics/claude-code commit whose CHANGELOG.md first carries 2.1.300 (docs/decisions/2026-10-09-claude-code-floor.md, addendum of 2026-10-14); the CHANGELOG delta 2.1.296-2.1.300 changes no installer, channel or minimumVersion behaviour. Two headless roles pin 2.1.299 by path: the review worker (tools/claude-review-worker/worker.py DEFAULT_CLAUDE_BIN, #1107) and the trading lane's private session runner. Native auto-update is on as this row's default says (claude doctor 2026-10-15T00:44:57Z: Auto-updates enabled, channel latest); the autoUpdates false in ~/.claude.json is the native installer's own legacy-updater marker, written with autoUpdatesProtectedForNative true, and does not disable native updates (Claude Code 2.1.300 binary). The installer keeps the launcher's version, any version a running session uses and the two newest (setup.md), so both roles need their own protection, a separate command-center change; the paired check that would move them to 2.1.300 is open."
   },
   {
    "id": "instruction-files",

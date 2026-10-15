@@ -254,7 +254,7 @@ machine-readable copy with each `checksum_source` and `checksum_ref` is
 | `uv` | 0.12.17 | `uv-aarch64-apple-darwin.tar.gz` | `85f00cbdc6dd3e97eba4c31b4d014375a9fdfe8f570023b84e5102fc3456896b` | `publisher_checksum_sidecar` |
 | `gh` | 2.101.0 | `gh_2.101.0_macOS_arm64.zip` | `e4303e39d8f07141c4bad4b99b01079f05029c59b27076e8fbc825c985ecdd8b` | `publisher_checksum_file` |
 | `codex` | 0.155.1 | `codex-0.155.1.tgz` | `fded5b71797aaaf9b1c3229c0e2747b53b39887ef25f36ec7196f6d511db1a66` | `npm_registry_integrity_crosscheck` |
-| `claude-code` | 2.1.295 minimum | `darwin-arm64/claude` (native; signed-manifest value reported by cc-native-practice at 2026-10-09T06:13:50Z; no Mac re-hash or execution) | `0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70` | `manifest_crosscheck` |
+| `claude-code` | 2.1.300 minimum | `darwin-arm64/claude` (native; signed-manifest value reported by cc-native-practice at 2026-10-14T23:55:04Z; no Mac re-hash or execution) | `475517caa611e3318a2f298fa071287ec98955538df78c58f709ecc01e5ae2d3` | `manifest_crosscheck` |
 | `mcporter` | 0.13.13 | `mcporter-0.13.13.tgz` | `ccab169473a3f863fcadf833eff5023f40eb8600dcfe3b7b92678d876765601d` | `npm_registry_integrity_crosscheck` |
 | `context-hub` | 0.1.4 | `chub-0.1.4.tgz` (`@aisuite/chub`) | `ca9fb94a21d3b5ae3025923ded305dd11f189626da5adab48a8b947bc523888f` | `npm_registry_integrity_crosscheck` |
 | `context-mode` | 1.0.169 | `context-mode-1.0.169.tgz` | `09c41e4cf77b21566c76b8ea2fdbd7f3d823055fee2f02c2166fd5bb575daf2c` | `npm_registry_integrity_crosscheck` |
@@ -422,14 +422,14 @@ postinstall-copy design entirely.** It is now a `kind: native` pin (see the
 table above): `adoption/bootstrap-macos.sh`'s `install_native` downloads the
 per-version `darwin-arm64/claude` binary directly from
 `downloads.claude.ai`, verifies its sha256 against the pin, and runs `"$bin"
-install 2.1.295`, exactly mirroring `adoption/pins-linux-x86_64.json`'s own
+install 2.1.300`, exactly mirroring `adoption/pins-linux-x86_64.json`'s own
 `claude-code` pin and `~/codex-ecosystem/bin/bootstrap-linux.sh`'s
 existing claude-code step. There is no more nested platform package, no
 `install.cjs` postinstall to defer, and no `postinstall_binary_check`; the
 native binary manages its own version directory and launcher and keeps
 auto-updating on the latest channel afterward. (`adoption/pins-linux-x86_64.json`
 changed after `v2026.09.24.1` in `install_note` text and in its `claude-code`
-pin (2.1.280 at that tag, 2.1.281 at `v2026.09.25.2`, 2.1.295 on main). It
+pin (2.1.280 at that tag, 2.1.281 at `v2026.09.25.2`, 2.1.300 on main). It
 changed after `v2026.09.25.2` again: its `rtk`,
 `markitdown`, `ai-memory` and `mcporter` entries moved to newer versions, and
 new `ccusage`, `headroom`, `repomix`, `serena`, `socraticode` and `toon`
@@ -461,18 +461,18 @@ requires every `[hooks] exclude_commands` entry from
 [the RTK hook recipe](../../recipes/README.md#native-context-mode-and-hooks),
 exactly once, instead of the tag's original two, and it also asks the installed
 `rtk hook check` whether rtk honours that file. `adoption/pins-linux-x86_64.json`
-changed after `v2026.09.26` in its rtk and headroom `install_note` text and in its `claude-code` entry (2.1.281 at that tag, 2.1.295 on main).
+changed after `v2026.09.26` in its rtk and headroom `install_note` text and in its `claude-code` entry (2.1.281 at that tag, 2.1.300 on main).
 The Linux script's `install_npm` and `install_uv_tool` changed after `v2026.09.26` as well: its `install_npm` now reads the socraticode pin's `ignore_scripts: true` and passes `--ignore-scripts`, as this page's script already does (the tag's Linux script ignores that field, so there npm runs every install script in socraticode's dependency tree), and its `install_uv_tool` now downloads, sha256-verifies and installs headroom's pinned wheel instead of resolving `headroom-ai[mcp]==0.37.0` from the index. This page's script carries that same `install_uv_tool` for its own headroom pin, whose `macosx_11_0_arm64` wheel it downloads and verifies the same way (both added after `v2026.09.26`; the pins paragraph above).
-The script and both claude-code pins (currently a 2.1.295 floor, including
+The script and both claude-code pins (currently a 2.1.300 floor, including
 2.1.284's `sonnet` alias resolution to Sonnet 5.5 on the Anthropic API;
 the earlier 2.1.281 floor fixed a recursive `rm` of
 command-substitution output running unprompted in auto and bypass mode)
 changed after `v2026.09.24.1`: at that tag the pins are 2.1.280 and the script
 runs the pinned install unconditionally, downgrading a newer Claude Code. Both
 pins also changed after `v2026.09.26.2`, where both are 2.1.281. The former
-2.1.284 checksum and September 29 download re-hash are historical evidence.
-The current 2.1.295 darwin-arm64 value comes from the signed manifest reported
-at 2026-10-09T06:13:50Z; there is no new Mac binary re-hash, execution or
+2.1.284 checksum and September 29 download re-hash, and the 2.1.295 value of
+2026-10-09, are historical evidence. The current 2.1.300 darwin-arm64 value comes
+from the signed manifest reported at 2026-10-14T23:55:04Z; there is no new Mac binary re-hash, execution or
 Apple code-signature check. The pin's `checksum_ref` records that boundary.
 
 `llama-server` is a profile `required_command`, so llama.cpp is pinned rather
