@@ -4,7 +4,8 @@
  "date_utc": "2026-10-04",
  "meaning": "the decide-round-2 verdicts on the gap skill-lifecycle-verification (paired skill verification in both clients) and the Opus check of them, which the wave4 owner default on the promptfoo row cites; an extract of private coordination records, with their digests; selection evidence only, no comparison has run",
  "rule": "docs/decisions/2026-10-04-repository-quality-rule.md",
- "owner_words": "with the repos quality itself resolute our architecture with the sota repos's own quality and finalize for the architecture for us to clean install",
+ "owner_paraphrase": "the owner, 2026-10-04 (paraphrased): they asked for the architecture to be resolved by the candidate repositories' own quality and finalized for the clean install.",
+ "publication_note": "Paraphrased 2026-10-15 under the no-owner-quote rule of 2026-10-14, which supersedes the earlier verbatim quotation; earlier commits keep the original wording.",
  "round2": {
   "decider_A": {
    "model": "GPT-6.1 Sol, blind",

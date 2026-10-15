@@ -6,9 +6,11 @@
 
 Round 1 (2026-10-04, 11 packets, 48 proposed jobs) applied the 2026-10-01 rule: "no extra install unless measured evidence shows a challenger's gain". The user had also said not to rerun tests, so no candidate could show a measured gain. Round 1 adopted no new tool: 38 jobs were not adopted and 10 only configured existing owners. That included jobs whose need the deciders agreed was real, such as Codex in CI.
 
-A side note put two options to the user: allow small targeted tests, or let clearly documented gaps be filled without a test. The user answered at about 20:50Z:
+A side note put two options to the user: allow small targeted tests, or let clearly documented gaps be filled without a test. The user answered at about 20:50Z; in a dated paraphrase (the exact words stay in the command center's private records):
 
-> "with the repos quality itself resolute our architecture with the sota repos's own quality and finalize for the architecture for us to clean install"
+> the owner, 2026-10-04 (paraphrased): they asked for the architecture to be resolved by the candidate repositories' own quality and finalized for the clean install.
+
+Paraphrased 2026-10-15 under the no-owner-quote rule of 2026-10-14, which supersedes the earlier verbatim quotation; earlier commits keep the original wording.
 
 ## Decision
 

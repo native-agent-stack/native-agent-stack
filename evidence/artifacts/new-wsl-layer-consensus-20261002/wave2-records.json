@@ -59,7 +59,8 @@
      "repository": "https://github.com/mksglu/context-mode"
     }
    ],
-   "verbatim": "please always use the sota gpt powered sota sdks, runtime for the research, context mode etc, we are evolve beyond simple action of web search",
+   "paraphrase": "the owner, 2026-10-03 (paraphrased): they asked that research always use the state-of-the-art GPT-powered SDKs and runtimes, context-mode among them, since the work has moved beyond plain web search.",
+   "publication_note": "Paraphrased 2026-10-15 under the no-owner-quote rule of 2026-10-14, which supersedes the earlier verbatim quotation; earlier commits keep the original wording.",
    "relayed_by": "the wave-2 brief, 'Why (the user's words, 2026-10-03 ~01:10Z)', lines 8-10, quoting the owner's words in the destination; private coordination record"
   }
  ],

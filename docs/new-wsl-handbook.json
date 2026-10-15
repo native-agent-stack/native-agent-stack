@@ -210,7 +210,7 @@
         },
         "consensus": {
           "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-          "sha256": "0c7bf9d9fcd9f5ecd17fe515c0b501a1942947a637d55252aa1da3089e4cb7dc"
+          "sha256": "bdc7a7e707ad6e1eb25ddaff1d37293887842b452fc5f04ef0a73d59c8228a02"
         },
         "convergence": {
           "file": "convergence.json",
@@ -1560,7 +1560,7 @@
               "records": [
                 {
                   "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
-                  "sha256": "c091152fb1a277ce6fecbf95d388215137e48aa1f28d781d35ef8a9b4e3cfca5"
+                  "sha256": "62eaf252d00250ee50db8069ba730b1b600dddb8260bdb17443e7d6dd5a3c7c1"
                 }
               ],
               "repository": "https://github.com/MinishLab/semble; https://github.com/giancarloerra/SocratiCode",
@@ -1858,7 +1858,7 @@
               "records": [
                 {
                   "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
-                  "sha256": "c091152fb1a277ce6fecbf95d388215137e48aa1f28d781d35ef8a9b4e3cfca5"
+                  "sha256": "62eaf252d00250ee50db8069ba730b1b600dddb8260bdb17443e7d6dd5a3c7c1"
                 }
               ],
               "repository": "https://github.com/akitaonrails/ai-memory",
@@ -2102,7 +2102,7 @@
               "outcome": "owner_default",
               "overturn": "the slot's named comparison, run through upstream Harbor: the adopted MCP interface against Playwright CLI 0.1.22 on the same 20 browser tasks; it reports to the owner and removes nothing by itself",
               "pin": "chrome-devtools-mcp@1.10.1 on npm. Tag chrome-devtools-mcp-v1.10.1 = commit e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df, published 2026-09-23T10:37:16Z; still the latest release when checked on 2026-10-04. npm gitHead matches the tag, with SLSA v1 provenance and 2 registry signatures; engines node ^20.19.0 || ^22.12.0 || >=23. The browser is google-chrome-stable amd64 and cannot be pinned through the upstream route: the README requires \"current stable version or newer\", so the host receipt should record the installed Chrome version.",
-              "reason": "Decide round 2 applied the owner's repository-quality rule to the gap web-research/playwright-cli; its Opus verification named Chrome DevTools MCP against live upstream. I upheld the converged verdict. The evidence supports Chrome DevTools MCP 1.10.1 through its MCP interface under criteria-quality.txt rule D(1).\n\n(1) Requirement gate: met three ways. A(1): agent browser automation serves the two-client coding and research scope. A(2): the round-1 critics agreed one browser tool is needed (definitive-manifest resolution: \"both critics agree on one browser tool, not two\"). A(3): the repository-quality rule is quoted verbatim in docs/decisions/2026-10-04-repository-quality-rule.md; the earlier 20:45Z packet gloss is a coordinator summary, not the user's words.\n\n(2) Candidate gates, re-checked live on 2026-10-04, all pass:\n- Unarchive",
+              "reason": "Decide round 2 applied the owner's repository-quality rule to the gap web-research/playwright-cli; its Opus verification named Chrome DevTools MCP against live upstream. I upheld the converged verdict. The evidence supports Chrome DevTools MCP 1.10.1 through its MCP interface under criteria-quality.txt rule D(1).\n\n(1) Requirement gate: met three ways. A(1): agent browser automation serves the two-client coding and research scope. A(2): the round-1 critics agreed one browser tool is needed (definitive-manifest resolution: \"both critics agree on one browser tool, not two\"). A(3): the repository-quality rule is stated, in a dated paraphrase, in docs/decisions/2026-10-04-repository-quality-rule.md; the earlier 20:45Z packet gloss is a coordinator summary, not the user's words.\n\n(2) Candidate gates, re-checked live on 2026-10-04, all pass:\n- Unarchive",
               "sources": [
                 "docs/decisions/2026-10-04-final-architecture-round2.md",
                 "docs/decisions/2026-10-04-repository-quality-rule.md",
@@ -2403,7 +2403,7 @@
                 "records": [
                   {
                     "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
-                    "sha256": "c091152fb1a277ce6fecbf95d388215137e48aa1f28d781d35ef8a9b4e3cfca5"
+                    "sha256": "62eaf252d00250ee50db8069ba730b1b600dddb8260bdb17443e7d6dd5a3c7c1"
                   }
                 ],
                 "repository": "https://github.com/mksglu/context-mode",
@@ -8007,7 +8007,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "7b899e3e5efa7c7bf5f2bb33eecdc97171ce3213be61efce629d6387a759bca6"
+      "sha256": "f8f193bbfb903cb80b959867bfcbab69d6c736b8d02866e0a615f9f74780b88a"
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -8031,7 +8031,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-      "sha256": "0c7bf9d9fcd9f5ecd17fe515c0b501a1942947a637d55252aa1da3089e4cb7dc"
+      "sha256": "bdc7a7e707ad6e1eb25ddaff1d37293887842b452fc5f04ef0a73d59c8228a02"
     },
     {
       "path": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",

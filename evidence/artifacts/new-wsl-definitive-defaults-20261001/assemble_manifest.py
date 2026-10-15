@@ -390,7 +390,12 @@ OWNER_BATCH_FIELDS = (("date_utc", str), ("meaning", str), ("owner_rule", str), 
 # which relay_record names by name and location only (command center ruling 2026-10-15T12:38Z; the no-owner-quote rule of
 # 2026-10-14 supersedes the round-2 resolution to quote the owner exactly).
 OWNER_AUTHORITY_FIELDS = ("kind", "date_utc", "decision", "paraphrase", "relay_record", "relayed_by", "rule_basis")
-DIGEST_LIKE = re.compile(r"[0-9a-fA-F]{7,}|sha-?256", re.IGNORECASE)
+# Any digest form: a hex run, a named algorithm (sha256, or sha512-<base64> as in SRI integrity) or a long base64 run.
+# A base64 run is 20+ characters with a digit and both letter cases, so names like native-agent-stack-99 pass.
+DIGEST_LIKE = re.compile(r"[0-9a-fA-F]{7,}|(?i:sha-?(?:1|224|256|384|512))"
+                         r"|(?=[A-Za-z0-9+/_-]*[0-9])(?=[A-Za-z0-9+/_-]*[A-Z])(?=[A-Za-z0-9+/_-]*[a-z])[A-Za-z0-9+/_-]{20,}={0,2}")
+# Fields that would carry the owner's own words; an owner decision carries a dated paraphrase instead.
+OWNER_WORDS_KEYS = frozenset({"verbatim", "owner_words", "owner_verbatim", "owner_quote", "owner_quotation"})
 # Amendment 4: a row the owner adds has this kind and outcome; a row whose decided default installs nothing and which the
 # owner gives a default keeps its kind and takes OWNER_DEFAULT_OUTCOME. Neither is definitive: the state is resolved. The
 # fields an owner default replaces are OVERTURNED_FIELDS, kept on the row under overturned.fields.
@@ -425,6 +430,10 @@ def relayed_decision(sid, interim, authority):
     if not isinstance(decisions, list) or index >= len(decisions) or not isinstance(decisions[index], dict):
         raise ValueError(f"consensus {sid}: {match['name']} has no owner_decisions[{index}]")
     entry = decisions[index]
+    words = sorted(OWNER_WORDS_KEYS & set(entry))
+    if words:
+        raise ValueError(f"consensus {sid}: {match['name']} owner_decisions[{index}] carries the owner's words "
+                         f"({', '.join(words)}); a relayed decision carries a dated paraphrase")
     owner = interim["repository"].rstrip("/").rsplit("/", 1)[-1].lower()
     text = str(entry.get("decision", "")).lower()
     if not any(re.search(r"(?<![a-z0-9])" + re.escape(name) + r"(?![a-z0-9])", text) for name in (sid.lower(), owner)):
@@ -548,6 +557,8 @@ def check_owner_batch(name, batch):
     prefix = f"the owner, {authority['date_utc']} (paraphrased): "
     if not authority["paraphrase"].startswith(prefix):
         raise ValueError(f"consensus {name}: the owner's paraphrase begins {prefix!r}")
+    if len(authority["paraphrase"].strip()) <= len(prefix.strip()) + 1:
+        raise ValueError(f"consensus {name}: the owner's paraphrase states nothing after {prefix!r}")
     if DIGEST_LIKE.search(authority["relay_record"]):
         raise ValueError(f"consensus {name}: relay_record names the private record by name and location, never by a digest")
     if authority["paraphrase"] not in text:
@@ -678,6 +689,10 @@ def apply_interims(rows, by_slot, entries):
             blank = [key for key in AUTHORITY_KINDS[kind] if not (isinstance(authority.get(key), str) and authority[key].strip())]
             if blank:
                 raise ValueError(f"consensus {sid}: the owner's decision needs its {', '.join(blank)}")
+            words = sorted(OWNER_WORDS_KEYS & set(authority))
+            if words:
+                raise ValueError(f"consensus {sid}: an owner decision carries a dated paraphrase, never the owner's words "
+                                 f"({', '.join(words)})")
         elif not set(FAMILIES) <= acknowledged_families(authority.get("acknowledgements")
                                                          if isinstance(authority.get("acknowledgements"), list) else []):
             raise ValueError(f"consensus {sid}: a direct consensus needs an acknowledgement of each family")

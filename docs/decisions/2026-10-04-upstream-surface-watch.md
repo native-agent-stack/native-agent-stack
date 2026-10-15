@@ -16,8 +16,7 @@ settings source, an 80% floor per kind, cache-aged reports, profile mirrors drop
 
 ## Requirement
 
-The user, to session 99 on 2026-10-04: "for the sota features form changelogs, make sure we enabled all latest sota
-ones into our wsl and new wsl and keep maitnaced updated latest sota aligned". Keeping that aligned needs a standing
+The user, to session 99 on 2026-10-04, in a dated paraphrase (the owner, 2026-10-04 (paraphrased): they asked for every latest state-of-the-art feature the changelogs list to be enabled on both the current and the new WSL distribution, and kept maintained and aligned with the latest releases; paraphrased 2026-10-15 under the no-owner-quote rule of 2026-10-14, which supersedes the earlier verbatim quotation; earlier commits keep the original wording). Keeping that aligned needs a standing
 signal when a release adds a switch. The repository's daily machinery (`scripts/currency_due.py`,
 `tools/sota-convergence/github_freshness.py`) catches version drift only.
 

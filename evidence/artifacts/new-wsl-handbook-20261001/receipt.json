@@ -6,8 +6,8 @@
   "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
   "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
   "outputs": {
-    "docs/new-wsl-handbook.md": "b773dfad62ffca3097e50ebebb7f1dd7e0d5be146bdb440b10c082e29eeeb371",
-    "docs/new-wsl-handbook.json": "383694f6c9eefd566b84204e77e0fb5749024a675555cf8a4900551669d6995c"
+    "docs/new-wsl-handbook.md": "289f893c75470e87f71b83be6a16c90d4690d58fd2670c101c5c193c1eba5066",
+    "docs/new-wsl-handbook.json": "1a2eea1707c9828de37bee2bed4d655c7d57512f401a0b845eaa493863ab6e80"
   },
   "inventory": {
     "layers": 37,
@@ -1086,6 +1086,22 @@
       "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
       "evidence_class": "local_integration",
       "scope": "relay-contract scrub (command center ruling 2026-10-15T12:38Z): the owner batches' authority carries a dated paraphrase and relay_record; the three relaying decision records state the paraphrase; regenerated through the builders"
+    },
+    {
+      "recorded_at_utc": "2026-10-15T13:43:29Z",
+      "source_main": "420452059bc307e13121d9769096291b95cdbf42",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "check_command": "python3 scripts/build_new_wsl_handbook.py --check",
+      "check_exit_code": 0,
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "289f893c75470e87f71b83be6a16c90d4690d58fd2670c101c5c193c1eba5066",
+        "docs/new-wsl-handbook.json": "1a2eea1707c9828de37bee2bed4d655c7d57512f401a0b845eaa493863ab6e80"
+      },
+      "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+      "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
+      "evidence_class": "local_integration",
+      "scope": "repo-wide owner-quote scrub, commit 3 of #1161: the records the consensus hashes carry dated paraphrases; regenerated through the builders"
     }
   ],
   "previous_outputs": [
@@ -1164,7 +1180,8 @@
         "profile_entries": 78,
         "projected_tools": 82,
         "canonical_package_ids": 25
-      }
+      },
+      "reason": "The relay contract moved to a dated paraphrase plus relay_record, and the three relaying decision records state the paraphrases (the command center's ruling of 2026-10-15T12:38Z), which changed the regenerated outputs."
     },
     {
       "superseded_at_utc": "2026-10-08T17:42:22Z",
@@ -1310,7 +1327,17 @@
       "outputs": {
         "docs/new-wsl-handbook.md": "fc76c9cd638086fea49f99d423796cfbf6e474ba54a3c9ab15ae3f78b469b920",
         "docs/new-wsl-handbook.json": "4a43c627140093b4c758eaa75134242917fca1ca98a68984762ba9f2c4559299"
-      }
+      },
+      "reason": "The relay contract moved to a dated paraphrase plus relay_record, and the three relaying decision records state the paraphrases (the command center's ruling of 2026-10-15T12:38Z), which changed the regenerated outputs."
+    },
+    {
+      "superseded_at_utc": "2026-10-15T13:37:24Z",
+      "source_main": "420452059bc307e13121d9769096291b95cdbf42",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "b773dfad62ffca3097e50ebebb7f1dd7e0d5be146bdb440b10c082e29eeeb371",
+        "docs/new-wsl-handbook.json": "383694f6c9eefd566b84204e77e0fb5749024a675555cf8a4900551669d6995c"
+      },
+      "reason": "The remaining owner sentences in the records the consensus hashes became dated paraphrases (the command center's FULL read of #1161 at c95453a1), which changed the regenerated outputs."
     }
   ]
 }

@@ -33,7 +33,7 @@
   },
   "claude_request": {
    "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/claude-request.md",
-   "sha256": "d939a5b4ee1433a0f68250c334fbe5bce1759279c19e2a9a21ca2c21d00af005"
+   "sha256": "88209714852e1499cd32cb985a5081e5917bf00715a550e0afb1c2c5abc7a129"
   },
   "codex_decisions": {
    "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/codex-decisions.md",
@@ -518,7 +518,7 @@
   "records": {
    "wave2_records": {
     "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
-    "sha256": "c091152fb1a277ce6fecbf95d388215137e48aa1f28d781d35ef8a9b4e3cfca5"
+    "sha256": "62eaf252d00250ee50db8069ba730b1b600dddb8260bdb17443e7d6dd5a3c7c1"
    }
   },
   "acknowledgements": [
@@ -634,7 +634,7 @@
      "records": [
       {
        "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
-       "sha256": "c091152fb1a277ce6fecbf95d388215137e48aa1f28d781d35ef8a9b4e3cfca5"
+       "sha256": "62eaf252d00250ee50db8069ba730b1b600dddb8260bdb17443e7d6dd5a3c7c1"
       }
      ],
      "configuration": {
@@ -683,7 +683,7 @@
      "records": [
       {
        "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
-       "sha256": "c091152fb1a277ce6fecbf95d388215137e48aa1f28d781d35ef8a9b4e3cfca5"
+       "sha256": "62eaf252d00250ee50db8069ba730b1b600dddb8260bdb17443e7d6dd5a3c7c1"
       }
      ],
      "configuration": {
@@ -733,7 +733,7 @@
      "records": [
       {
        "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
-       "sha256": "c091152fb1a277ce6fecbf95d388215137e48aa1f28d781d35ef8a9b4e3cfca5"
+       "sha256": "62eaf252d00250ee50db8069ba730b1b600dddb8260bdb17443e7d6dd5a3c7c1"
       }
      ],
      "configuration": {
@@ -768,7 +768,7 @@
    "kind": "owner_decision",
    "date_utc": "2026-10-04",
    "decision": "install the full token-efficiency stack (the core rows of docs/token-efficiency-stack.json with RTK, context-mode and the token-lane carriers) cleanly on the new distribution, as the default every future session launches and invokes",
-   "paraphrase": "the owner, 2026-10-04 (paraphrased): enable the full state-of-the-art token-efficiency stack, installed cleanly so it runs seamlessly as the native workflow that future sessions launch and invoke by default; report to the main session when it is ready, proven end to end with a newly launched session, monitored invoke rates and token use, and upstream commands, using the related full-lifecycle skills; and keep at it until the upstream tools are fully resolved and live in the native workflow, including ultracode subagents and the experimental agent teams, with upstream commands that show the real savings.",
+   "paraphrase": "the owner, 2026-10-04 (paraphrased): they asked for the full state-of-the-art token-efficiency stack to be enabled and installed cleanly, so that it runs seamlessly as the native workflow that future sessions launch and invoke by default; for a report to the main session when it is ready, proven end to end with a newly launched session, monitored invoke rates and token use, and upstream commands, using the related full-lifecycle skills; and for the work to continue until the upstream tools are fully resolved and live in the native workflow, including ultracode subagents and the experimental agent teams, with upstream commands that show the real savings.",
    "relay_record": "the command center's private coordination records of 2026-10-04: the harness relay to session wsl-architecture-design and the coordination brief of session native-agent-stack-99 (outside the repository)",
    "relayed_by": "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
    "rule_basis": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md, section Overturn: 'For the rule: the user asks again for arms on the clean install'; wave2.interim_rule: 'The authority is the owner's dated decision, as the record that relays it states it'"
@@ -776,7 +776,7 @@
   "records": {
    "decision_record": {
     "path": "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
-    "sha256": "e255627bd1eef63bac3ec5ec7b44b1e039c6b2dc34e33a5558fb42b87f954048"
+    "sha256": "1626395038cd777cddf48a84d6becc09d91ee3dce8ff4c1010ff2ad8e05f6c7c"
    }
   },
   "acknowledgements": [],
@@ -1369,7 +1369,7 @@
    "kind": "owner_decision",
    "date_utc": "2026-10-04",
    "decision": "fill documented gaps by the candidate repository's own quality evidence, without a new local trial, and finalize the architecture for the clean install (the repository-quality rule, applied by decide round 2)",
-   "paraphrase": "the owner, 2026-10-04 (paraphrased): resolve the architecture by the candidate repositories' own quality, and finalize it for the clean install.",
+   "paraphrase": "the owner, 2026-10-04 (paraphrased): they asked for the architecture to be resolved by the candidate repositories' own quality and finalized for the clean install.",
    "relay_record": "the command center's private coordination records of 2026-10-04, about 20:50Z (outside the repository)",
    "relayed_by": "docs/decisions/2026-10-04-2604-e2e-fix-wave.md",
    "rule_basis": "docs/decisions/2026-10-04-repository-quality-rule.md (decide round 2); amendment 4's owner default (wave3.owner_rule)"
@@ -1377,15 +1377,15 @@
   "records": {
    "decision_record": {
     "path": "docs/decisions/2026-10-04-2604-e2e-fix-wave.md",
-    "sha256": "7a772f7406df2dcf7d8d16f263e2e246f9b345afe4bddc7e03ec65683b24c801"
+    "sha256": "3b4ba79caf769879fc3965c6fe0e2acb661b350fc4045200b84e32c1deb99fdb"
    },
    "quality_rule": {
     "path": "docs/decisions/2026-10-04-repository-quality-rule.md",
-    "sha256": "b11fac1ba8dfa8b64a1a1c53c24fe5bea69228e74c7142aa38ec169890326e91"
+    "sha256": "772751b9bc68a1377747721109f74233a01847eeb96aa6f8110997d3e1990e5d"
    },
    "round2_extract": {
     "path": "evidence/artifacts/new-wsl-fix-wave-20261004/repository-quality-promptfoo.json",
-    "sha256": "92b70fde74999cb3ae8f00462b01ce92a3a0a649dbc1380bc00619d7b1d7c6bc"
+    "sha256": "52a4d37f9d2c23e4c830c17f64095eb8c61c9c1f951114ba02a9fe4f753aef40"
    }
   },
   "acknowledgements": [],
@@ -1435,7 +1435,7 @@
    "kind": "owner_decision",
    "date_utc": "2026-10-04",
    "decision": "fill documented gaps by the candidate repository's own quality evidence, without a new local trial, and finalize the architecture for the clean install (the repository-quality rule); decide round 2 and its Opus verification named the owners",
-   "paraphrase": "the owner, 2026-10-04 (paraphrased): resolve the architecture by the candidate repositories' own quality, and finalize it for the clean install.",
+   "paraphrase": "the owner, 2026-10-04 (paraphrased): they asked for the architecture to be resolved by the candidate repositories' own quality and finalized for the clean install.",
    "relay_record": "the command center's private coordination records of 2026-10-04, about 20:50Z (outside the repository)",
    "relayed_by": "docs/decisions/2026-10-04-final-architecture-round2.md",
    "rule_basis": "docs/decisions/2026-10-04-repository-quality-rule.md (decide round 2); amendment 4's owner rows and owner defaults (wave3.owner_rule)"
@@ -1443,15 +1443,15 @@
   "records": {
    "decision_record": {
     "path": "docs/decisions/2026-10-04-final-architecture-round2.md",
-    "sha256": "41a5890b867b0f2f283ff42753b8b9c3366b7361c95ad889616433289569a3d5"
+    "sha256": "02d6697f05f15fb09300d9692db3d16c2240411f18ca6493ce49e3626bed25bf"
    },
    "quality_rule": {
     "path": "docs/decisions/2026-10-04-repository-quality-rule.md",
-    "sha256": "b11fac1ba8dfa8b64a1a1c53c24fe5bea69228e74c7142aa38ec169890326e91"
+    "sha256": "772751b9bc68a1377747721109f74233a01847eeb96aa6f8110997d3e1990e5d"
    },
    "round2_extract": {
     "path": "evidence/artifacts/final-architecture-round2-20261004/verdicts.json",
-    "sha256": "45cd2b5c580d6f65aaf8eafd80d9412295e40de275dc8a5356d08f8deadb05a7"
+    "sha256": "db41330edea63f46884c2fadcf72076da268326d1e71efa6f8228bd55d1b92c6"
    }
   },
   "acknowledgements": [],
@@ -1659,7 +1659,7 @@
       "outcome": "owner_default",
       "by": "the owner's repository-quality rule of 2026-10-04",
       "batch": "wave5",
-      "reason": "Decide round 2 applied the owner's repository-quality rule to the gap web-research/playwright-cli; its Opus verification named Chrome DevTools MCP against live upstream. I upheld the converged verdict. The evidence supports Chrome DevTools MCP 1.10.1 through its MCP interface under criteria-quality.txt rule D(1).\n\n(1) Requirement gate: met three ways. A(1): agent browser automation serves the two-client coding and research scope. A(2): the round-1 critics agreed one browser tool is needed (definitive-manifest resolution: \"both critics agree on one browser tool, not two\"). A(3): the repository-quality rule is quoted verbatim in docs/decisions/2026-10-04-repository-quality-rule.md; the earlier 20:45Z packet gloss is a coordinator summary, not the user's words.\n\n(2) Candidate gates, re-checked live on 2026-10-04, all pass:\n- Unarchive",
+      "reason": "Decide round 2 applied the owner's repository-quality rule to the gap web-research/playwright-cli; its Opus verification named Chrome DevTools MCP against live upstream. I upheld the converged verdict. The evidence supports Chrome DevTools MCP 1.10.1 through its MCP interface under criteria-quality.txt rule D(1).\n\n(1) Requirement gate: met three ways. A(1): agent browser automation serves the two-client coding and research scope. A(2): the round-1 critics agreed one browser tool is needed (definitive-manifest resolution: \"both critics agree on one browser tool, not two\"). A(3): the repository-quality rule is stated, in a dated paraphrase, in docs/decisions/2026-10-04-repository-quality-rule.md; the earlier 20:45Z packet gloss is a coordinator summary, not the user's words.\n\n(2) Candidate gates, re-checked live on 2026-10-04, all pass:\n- Unarchive",
       "pin": "chrome-devtools-mcp@1.10.1 on npm. Tag chrome-devtools-mcp-v1.10.1 = commit e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df, published 2026-09-23T10:37:16Z; still the latest release when checked on 2026-10-04. npm gitHead matches the tag, with SLSA v1 provenance and 2 registry signatures; engines node ^20.19.0 || ^22.12.0 || >=23. The browser is google-chrome-stable amd64 and cannot be pinned through the upstream route: the README requires \"current stable version or newer\", so the host receipt should record the installed Chrome version.",
       "install": "1) Linux-side Chrome, from the upstream WSL section (docs/troubleshooting.md#wsl at tag chrome-devtools-mcp-v1.10.1): wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && sudo dpkg -i google-chrome-stable_current_amd64.deb (if dpkg reports unmet dependencies, the standard Debian fix-up is sudo apt-get -f install; that step is not in the upstream text and is not verified on Ubuntu 26.04). 2) Claude Code, from docs/client-configurations.md:71 with @latest replaced by the pin; the -- separator lets the server flags reach npx: claude mcp add chrome-devtools --scope user -- npx -y chrome-devtools-mcp@1.10.1 --headless --isolated --no-usage-statistics. 3) Codex, from docs/client-configurations.md:109: codex mcp add chrome-devtools -- npx -y chrome-devtools-mcp@1.10.1 --headless --isolated --no-usage-statistics. Every flag is documented upstream. --isolated is the a",
       "overturn": "the slot's named comparison, run through upstream Harbor: the adopted MCP interface against Playwright CLI 0.1.22 on the same 20 browser tasks; it reports to the owner and removes nothing by itself",

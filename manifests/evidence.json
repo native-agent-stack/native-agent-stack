@@ -18778,8 +18778,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
-      "sha256": "e255627bd1eef63bac3ec5ec7b44b1e039c6b2dc34e33a5558fb42b87f954048",
-      "bytes": 26093
+      "sha256": "1626395038cd777cddf48a84d6becc09d91ee3dce8ff4c1010ff2ad8e05f6c7c",
+      "bytes": 26160
     },
     {
       "path": "docs/decisions/2026-10-04-trading-2604-preparation.md",
@@ -18788,8 +18788,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-upstream-surface-watch.md",
-      "sha256": "1389de18bbaf5c41d8f22093a9642d982230a851f954183b7c8254e0b5890bce",
-      "bytes": 18701
+      "sha256": "4ac9fd256c0c718bf30c2fc477eacbf4d63a9a0df286028e28875b92dfd880ac",
+      "bytes": 18961
     },
     {
       "path": "docs/decisions/2026-10-05-adaptive-paper-xnys-primary.md",
@@ -19718,12 +19718,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "383694f6c9eefd566b84204e77e0fb5749024a675555cf8a4900551669d6995c",
-      "bytes": 699736
+      "sha256": "1a2eea1707c9828de37bee2bed4d655c7d57512f401a0b845eaa493863ab6e80",
+      "bytes": 699751
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "b773dfad62ffca3097e50ebebb7f1dd7e0d5be146bdb440b10c082e29eeeb371",
+      "sha256": "289f893c75470e87f71b83be6a16c90d4690d58fd2670c101c5c193c1eba5066",
       "bytes": 369789
     },
     {
@@ -22868,7 +22868,7 @@
     },
     {
       "path": "evidence/artifacts/final-architecture-round2-20261004/integration-resolutions.json",
-      "sha256": "8dd4d08202e4f334fa0c47ebe4d210c4e4a4d96eba990b76cb09cc17203a99e9",
+      "sha256": "8e12eb25447bdbaab7552546383e9f635fa83406476e3c6508b25c956e04f4b6",
       "bytes": 101093
     },
     {
@@ -22883,8 +22883,8 @@
     },
     {
       "path": "evidence/artifacts/final-architecture-round2-20261004/verdicts.json",
-      "sha256": "45cd2b5c580d6f65aaf8eafd80d9412295e40de275dc8a5356d08f8deadb05a7",
-      "bytes": 319713
+      "sha256": "db41330edea63f46884c2fadcf72076da268326d1e71efa6f8228bd55d1b92c6",
+      "bytes": 320298
     },
     {
       "path": "evidence/artifacts/foundation-closure-20260921/claude-review.md",
@@ -43658,8 +43658,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/assemble_manifest.py",
-      "sha256": "d61f3505f90f92b69e498e09ba12ea33d08cf4275d331d00ad4768dd8fc0d52c",
-      "bytes": 62331
+      "sha256": "878b4a502db652cce0cbc7f1018aa7c0f921fb4e26c9bae93e4a769cbc5a228d",
+      "bytes": 63627
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/build_decide_packets.py",
@@ -43703,8 +43703,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "7b899e3e5efa7c7bf5f2bb33eecdc97171ce3213be61efce629d6387a759bca6",
-      "bytes": 235489
+      "sha256": "f8f193bbfb903cb80b959867bfcbab69d6c736b8d02866e0a615f9f74780b88a",
+      "bytes": 235504
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -44448,8 +44448,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-fix-wave-20261004/repository-quality-promptfoo.json",
-      "sha256": "92b70fde74999cb3ae8f00462b01ce92a3a0a649dbc1380bc00619d7b1d7c6bc",
-      "bytes": 13604
+      "sha256": "52a4d37f9d2c23e4c830c17f64095eb8c61c9c1f951114ba02a9fe4f753aef40",
+      "bytes": 13809
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/README.md",
@@ -44458,8 +44458,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "a4471c1e714ef26f7ae69a21b92e56cbeecaa364b0b01051378340fc934c8672",
-      "bytes": 81769
+      "sha256": "401f2c8cdf992d8a1fa77a5a01fd44821c0893d06baa31a8cd93b6843b9d6bef",
+      "bytes": 83776
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -44978,8 +44978,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/claude-request.md",
-      "sha256": "d939a5b4ee1433a0f68250c334fbe5bce1759279c19e2a9a21ca2c21d00af005",
-      "bytes": 2575
+      "sha256": "88209714852e1499cd32cb985a5081e5917bf00715a550e0afb1c2c5abc7a129",
+      "bytes": 2935
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/claude-review-held-topics.md",
@@ -44993,18 +44993,18 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-      "sha256": "0c7bf9d9fcd9f5ecd17fe515c0b501a1942947a637d55252aa1da3089e4cb7dc",
-      "bytes": 144260
+      "sha256": "bdc7a7e707ad6e1eb25ddaff1d37293887842b452fc5f04ef0a73d59c8228a02",
+      "bytes": 144364
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/copy-notes.json",
-      "sha256": "01254578f639d6cba5f14b856feb4ef9af43bf8c2d82c1336242eb940842b7a5",
-      "bytes": 2856
+      "sha256": "91a30f5cd58f660641762a3ed59fb4cd99e78fe127d667a3db61f8274245a087",
+      "bytes": 3172
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
-      "sha256": "c091152fb1a277ce6fecbf95d388215137e48aa1f28d781d35ef8a9b4e3cfca5",
-      "bytes": 92155
+      "sha256": "62eaf252d00250ee50db8069ba730b1b600dddb8260bdb17443e7d6dd5a3c7c1",
+      "bytes": 92400
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/README.md",
@@ -64443,8 +64443,8 @@
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
-      "sha256": "dccb07cdcbe2495f511397697f7a3a2149431817cc49f56f762170a3a581561c",
-      "bytes": 315242
+      "sha256": "ad568321c501fb490b86f8c74a57910a00455829888d29dfac3c4eb230fab24f",
+      "bytes": 316080
     },
     {
       "path": "tests/test_new_wsl_handbook.py",
