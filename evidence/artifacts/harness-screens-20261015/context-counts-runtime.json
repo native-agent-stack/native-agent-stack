@@ -1,0 +1,684 @@
+{
+  "schema_version": 1,
+  "evidence_class": "source_review",
+  "read_date": "2026-10-15",
+  "measurement": false,
+  "method": "ESTIMATE: ceil(decoded UTF-8 prompt-text bytes / 4). Counted components are not full-session totals. Template placeholders remain unexpanded; fixture schemas retain fixture serialization.",
+  "counts": [
+    {
+      "candidate": "anomalyco/opencode",
+      "pin": "4a929747483f9e19b05c7cf944fc0aca6e5111b0",
+      "path": "packages/opencode/src/session/prompt/anthropic.txt",
+      "line_start": 1,
+      "line_end": 105,
+      "label": "Anthropic base prompt",
+      "text_kind": "prompt_template",
+      "families": [
+        "anthropic"
+      ],
+      "utf8_bytes": 8212,
+      "estimated_tokens": 2053,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "8324e4cf58eb45d4d9d6fd120f5e8da59e0548de48e7e6aefcdfbf2923f40b4e",
+      "source_file_sha256": "8324e4cf58eb45d4d9d6fd120f5e8da59e0548de48e7e6aefcdfbf2923f40b4e"
+    },
+    {
+      "candidate": "anomalyco/opencode",
+      "pin": "4a929747483f9e19b05c7cf944fc0aca6e5111b0",
+      "path": "packages/opencode/src/session/prompt/gpt-astra.txt",
+      "line_start": 1,
+      "line_end": 46,
+      "label": "GPT Astra base prompt",
+      "text_kind": "prompt_template",
+      "families": [
+        "openai"
+      ],
+      "utf8_bytes": 4078,
+      "estimated_tokens": 1020,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "46d386ea8dd8db5734d06f6ec1d04c566f1224b1afa5bc5b0ccefd6f853281f9",
+      "source_file_sha256": "46d386ea8dd8db5734d06f6ec1d04c566f1224b1afa5bc5b0ccefd6f853281f9"
+    },
+    {
+      "candidate": "1jehuang/jcode",
+      "pin": "1c7426eb1925a1167eb56011fa479ad707cc28b6",
+      "path": "crates/jcode-base/src/prompt/system_prompt.md",
+      "line_start": 1,
+      "line_end": 29,
+      "label": "default base prompt",
+      "text_kind": "prompt_template",
+      "families": [
+        "anthropic",
+        "openai"
+      ],
+      "utf8_bytes": 1070,
+      "estimated_tokens": 268,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "ce7ed4e8e91720fb1db61d5942abf807aa0d49d1e4e4928cfd079bd409cf75b1",
+      "source_file_sha256": "ce7ed4e8e91720fb1db61d5942abf807aa0d49d1e4e4928cfd079bd409cf75b1"
+    },
+    {
+      "candidate": "aaif-goose/goose",
+      "pin": "cd643d2126fffab4c6a6186905211ba868d6a657",
+      "path": "crates/goose/src/prompts/system.md",
+      "line_start": 1,
+      "line_end": 39,
+      "label": "base prompt template",
+      "text_kind": "prompt_template",
+      "families": [
+        "anthropic",
+        "openai"
+      ],
+      "utf8_bytes": 1232,
+      "estimated_tokens": 308,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "e0a59861edd6791f3df404e27de8bc360d5e5053f535a14b2d775f7815fdb3f0",
+      "source_file_sha256": "e0a59861edd6791f3df404e27de8bc360d5e5053f535a14b2d775f7815fdb3f0"
+    },
+    {
+      "candidate": "can1357/oh-my-pi",
+      "pin": "7cc912940b107eb2d771b0d106c640a8eddc9edf",
+      "path": "packages/coding-agent/src/prompts/system/system-prompt.md",
+      "line_start": 1,
+      "line_end": 264,
+      "label": "base instruction template",
+      "text_kind": "prompt_template",
+      "families": [
+        "anthropic",
+        "openai"
+      ],
+      "utf8_bytes": 14296,
+      "estimated_tokens": 3574,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "16193a4d43a1646b27dfb1c97810f3a92bb316c4c8773ff8a9d18c9481215dd3",
+      "source_file_sha256": "16193a4d43a1646b27dfb1c97810f3a92bb316c4c8773ff8a9d18c9481215dd3"
+    },
+    {
+      "candidate": "letta-ai/letta-code",
+      "pin": "cc4654acc3b424a68c385bce0fe0c00edaad5d7e",
+      "path": "src/agent/prompts/letta.md",
+      "line_start": 1,
+      "line_end": 207,
+      "label": "bundled Letta prompt; cloud can supersede",
+      "text_kind": "prompt_template",
+      "families": [
+        "anthropic",
+        "openai"
+      ],
+      "utf8_bytes": 22267,
+      "estimated_tokens": 5567,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "032dc39418580a3ce594f3003fa0066b47d2160a434fa95efebb53be5d0dca78",
+      "source_file_sha256": "032dc39418580a3ce594f3003fa0066b47d2160a434fa95efebb53be5d0dca78"
+    },
+    {
+      "candidate": "langchain-ai/deepagents",
+      "pin": "90d4ce36dd6f9f402b8c40547972ffc13c8814ca",
+      "path": "libs/code/deepagents_code/system_prompt.md",
+      "line_start": 1,
+      "line_end": 173,
+      "label": "Deep Agents Code base prompt template",
+      "text_kind": "prompt_template",
+      "families": [
+        "anthropic",
+        "openai"
+      ],
+      "utf8_bytes": 8913,
+      "estimated_tokens": 2229,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "a5e75d84d86a82d3c8234a0d41fc42a84bb13dc3f4b086d86b9859c95867b416",
+      "source_file_sha256": "a5e75d84d86a82d3c8234a0d41fc42a84bb13dc3f4b086d86b9859c95867b416"
+    },
+    {
+      "candidate": "langchain-ai/deepagents",
+      "pin": "90d4ce36dd6f9f402b8c40547972ffc13c8814ca",
+      "path": "libs/deepagents/tests/unit_tests/smoke_tests/snapshots/system_prompt_with_execute_tools.json",
+      "line_start": 1,
+      "line_end": 279,
+      "label": "upstream execute fixture tool schemas",
+      "text_kind": "fixture_text",
+      "families": [
+        "anthropic",
+        "openai"
+      ],
+      "utf8_bytes": 14567,
+      "estimated_tokens": 3642,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "d10aef93ba9ca84fa2986891201acfad50c332b79673fa409a5b156a986664ad",
+      "source_file_sha256": "d10aef93ba9ca84fa2986891201acfad50c332b79673fa409a5b156a986664ad"
+    },
+    {
+      "candidate": "openhands/software-agent-sdk",
+      "pin": "fd387b58dc7b707b73c159845c0396a17000be24",
+      "path": "tests/sdk/context/prompts/snapshots/anthropic__secana-off__cli-on.txt",
+      "line_start": 1,
+      "line_end": 188,
+      "label": "upstream Anthropic CLI/no-security-analyzer static snapshot",
+      "text_kind": "fixture_text",
+      "families": [
+        "anthropic"
+      ],
+      "utf8_bytes": 14784,
+      "estimated_tokens": 3696,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "93ae1abecc125db30270a29a8a9f4786f34358102add87e450bd6bc769245871",
+      "source_file_sha256": "93ae1abecc125db30270a29a8a9f4786f34358102add87e450bd6bc769245871"
+    },
+    {
+      "candidate": "openhands/software-agent-sdk",
+      "pin": "fd387b58dc7b707b73c159845c0396a17000be24",
+      "path": "tests/sdk/context/prompts/snapshots/openai__secana-off__cli-on.txt",
+      "line_start": 1,
+      "line_end": 186,
+      "label": "upstream OpenAI CLI/no-security-analyzer static snapshot",
+      "text_kind": "fixture_text",
+      "families": [
+        "openai"
+      ],
+      "utf8_bytes": 14824,
+      "estimated_tokens": 3706,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "28591a3d40ba378a7cc9f31465beb027d09257af1b565ac2f299a5a3cd357118",
+      "source_file_sha256": "28591a3d40ba378a7cc9f31465beb027d09257af1b565ac2f299a5a3cd357118"
+    },
+    {
+      "candidate": "gastownhall/beads",
+      "pin": "c1c4b642ac1c08d8c828007a1c2f96e47e43ef7c",
+      "path": "internal/templates/agents/defaults/beads-section.md",
+      "line_start": 1,
+      "line_end": 131,
+      "label": "default project instruction section",
+      "text_kind": "prompt_template",
+      "families": [
+        "anthropic"
+      ],
+      "utf8_bytes": 4971,
+      "estimated_tokens": 1243,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "28533dc787a4d43729a37df4ba6e088be633de31f28cc32f02c24d53fbe24c8c",
+      "source_file_sha256": "28533dc787a4d43729a37df4ba6e088be633de31f28cc32f02c24d53fbe24c8c"
+    },
+    {
+      "candidate": "gastownhall/beads",
+      "pin": "c1c4b642ac1c08d8c828007a1c2f96e47e43ef7c",
+      "path": "internal/templates/agents/defaults/beads-section-codex.md",
+      "line_start": 1,
+      "line_end": 21,
+      "label": "Codex project instruction section",
+      "text_kind": "prompt_template",
+      "families": [
+        "openai"
+      ],
+      "utf8_bytes": 1171,
+      "estimated_tokens": 293,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "43fe92f779e01202fb60d9dffaa41b68789aba84d9e92cec1c33b5b3d22b604b",
+      "source_file_sha256": "43fe92f779e01202fb60d9dffaa41b68789aba84d9e92cec1c33b5b3d22b604b"
+    },
+    {
+      "candidate": "bytedance/deer-flow",
+      "pin": "345f08be00c8a9495079b732a39b46aa9af1584e",
+      "path": "backend/packages/harness/deerflow/agents/lead_agent/prompt.py",
+      "line_start": 541,
+      "line_end": 772,
+      "label": "SYSTEM_PROMPT_TEMPLATE",
+      "text_kind": "decoded_literal_template",
+      "families": [
+        "research",
+        "anthropic",
+        "openai"
+      ],
+      "utf8_bytes": 12457,
+      "estimated_tokens": 3115,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "fee8d77a5c9eacf930086bb7800dcc8c65beb69f6e6330f122bc9a11f21ba6cc",
+      "source_file_sha256": "18d0584af692c27d266e0e16335f77597caaf6d4c815b638213f9c5f97d43719"
+    },
+    {
+      "candidate": "strands-agents/harness-sdk",
+      "pin": "5cb880559e5ed88bd55de2779e72d060020f756b",
+      "path": "harness-py/src/strands_harness/prompt.py",
+      "line_start": 11,
+      "line_end": 40,
+      "label": "HARNESS_CONTRACT",
+      "text_kind": "decoded_literal_template",
+      "families": [
+        "anthropic",
+        "openai"
+      ],
+      "utf8_bytes": 1665,
+      "estimated_tokens": 417,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "57c1190c695ee4e1286ab1e6c82680134234ee6b733650edcc08c2bd638f8e1b",
+      "source_file_sha256": "1fbd8bda87abf3c5271913cedb581f481fb125fa0a0742bcb93fe1fd7f81c850"
+    },
+    {
+      "candidate": "nousresearch/hermes-agent",
+      "pin": "d923a5eb487a17c0a68801bba9ef0f56c81040a8",
+      "path": "agent/prompt_builder.py",
+      "line_start": 162,
+      "line_end": 167,
+      "label": "DEFAULT_AGENT_IDENTITY",
+      "text_kind": "decoded_literal_template",
+      "families": [
+        "anthropic",
+        "openai"
+      ],
+      "utf8_bytes": 667,
+      "estimated_tokens": 167,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "36c1f5a2e92cd1d018311eaf4c8f1e8886672eae78212e033c681d0e3d5d506f",
+      "source_file_sha256": "660e7a2c311adf1b794c7b81c83090ea1b6f07619bd79be152c2f3c099ec0f05"
+    },
+    {
+      "candidate": "nousresearch/hermes-agent",
+      "pin": "d923a5eb487a17c0a68801bba9ef0f56c81040a8",
+      "path": "agent/prompt_builder.py",
+      "line_start": 437,
+      "line_end": 499,
+      "label": "OPENAI_MODEL_EXECUTION_GUIDANCE",
+      "text_kind": "decoded_literal_template",
+      "families": [
+        "openai"
+      ],
+      "utf8_bytes": 3982,
+      "estimated_tokens": 996,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "f7bf543d37672622cdb7d1faf5f837bc35719baf8a37a5f227217b982208ae62",
+      "source_file_sha256": "660e7a2c311adf1b794c7b81c83090ea1b6f07619bd79be152c2f3c099ec0f05"
+    },
+    {
+      "candidate": "langchain-ai/deepagents",
+      "pin": "90d4ce36dd6f9f402b8c40547972ffc13c8814ca",
+      "path": "libs/deepagents/deepagents/profiles/harness/_anthropic_opus_4_7.py",
+      "line_start": 26,
+      "line_end": 47,
+      "label": "_SYSTEM_PROMPT_SUFFIX",
+      "text_kind": "decoded_literal_template",
+      "families": [
+        "anthropic"
+      ],
+      "utf8_bytes": 2148,
+      "estimated_tokens": 537,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "48d5184381c151d954b45e5d6f5228989cee9b0e251c35b1c679d9ebc5c9e008",
+      "source_file_sha256": "195e77a4c329a2e461766dc594c8324c21c9de825ca134fdae8e9b1b100356f7"
+    },
+    {
+      "candidate": "letta-ai/letta",
+      "pin": "1131535716e8a31c9a437f8695e25ac98f203a24",
+      "path": "letta/prompts/system_prompts/letta_v1.py",
+      "line_start": 1,
+      "line_end": 25,
+      "label": "PROMPT",
+      "text_kind": "decoded_literal_template",
+      "families": [
+        "anthropic",
+        "openai"
+      ],
+      "utf8_bytes": 1709,
+      "estimated_tokens": 428,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "c02c87ad5611cf5c6c49772c49fde12fb7696cae1cdc81bef60a8d361f7797ec",
+      "source_file_sha256": "ee8a3343ca0ba6deab303b36a7dd33e4558a7479fb3910f132867d7b729543dd"
+    },
+    {
+      "candidate": "openai/codex",
+      "pin": "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d",
+      "path": "codex-rs/models-manager/models.json",
+      "line_start": 76,
+      "line_end": 76,
+      "label": "gpt-6-astra instructions_template",
+      "text_kind": "decoded_json_string",
+      "families": [
+        "openai"
+      ],
+      "utf8_bytes": 21428,
+      "estimated_tokens": 5357,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "35bd51b5f577cb7b24cd5f4629e49e37cb724ab57754ce6f8f202001635bab8a",
+      "source_file_sha256": "943ca7fe1d19ed019054158303f0dbbd80b3bef43b3aa425a71aa7cb3fb52c2b"
+    },
+    {
+      "candidate": "openai/codex",
+      "pin": "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d",
+      "path": "codex-rs/models-manager/models.json",
+      "line_start": 250,
+      "line_end": 250,
+      "label": "gpt-6.1-sol instructions_template",
+      "text_kind": "decoded_json_string",
+      "families": [
+        "openai"
+      ],
+      "utf8_bytes": 21779,
+      "estimated_tokens": 5445,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "e1bdd4f8f0df4b20f4a0ffc8a861ce819df45325d8cecdfb92e80379cf8d142e",
+      "source_file_sha256": "943ca7fe1d19ed019054158303f0dbbd80b3bef43b3aa425a71aa7cb3fb52c2b"
+    },
+    {
+      "candidate": "earendil-works/pi",
+      "pin": "71023aec1546d6d677a65669c5665c0927ce0dd0",
+      "path": "packages/coding-agent/src/core/system-prompt.ts",
+      "line_start": 156,
+      "line_end": 156,
+      "label": "fixed preamble only; tools and dynamic sections excluded",
+      "text_kind": "fixed_prompt_text",
+      "families": [
+        "anthropic",
+        "openai"
+      ],
+      "utf8_bytes": 169,
+      "estimated_tokens": 43,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "00aa6d13d16562265135a7c704d8a33be5d9f647e98a36ea3efa25662e40fc97",
+      "source_file_sha256": "5e28c82634113d0cca7ff5da6fa94e27aaae80e461cd5664ced9dbcef6f89089"
+    },
+    {
+      "candidate": "swe-agent/mini-swe-agent",
+      "pin": "a83fcae82d2a08f0ee0c688f9d137b3566c097f8",
+      "path": "src/minisweagent/config/mini.yaml",
+      "line_start": 2,
+      "line_end": 3,
+      "label": "system_template (task/environment placeholders unexpanded)",
+      "text_kind": "decoded_yaml_block",
+      "families": [
+        "anthropic",
+        "openai"
+      ],
+      "utf8_bytes": 63,
+      "estimated_tokens": 16,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "6fb54145bbb1724ce77430ff3852887acbd4a5cce10c86cd8dfbf4c7d55f1091",
+      "source_file_sha256": "b539a8965f5bf41dd0f32daafa5d2db22581923d13812fa378fd09569b9d6b0c"
+    },
+    {
+      "candidate": "swe-agent/mini-swe-agent",
+      "pin": "a83fcae82d2a08f0ee0c688f9d137b3566c097f8",
+      "path": "src/minisweagent/config/mini.yaml",
+      "line_start": 4,
+      "line_end": 100,
+      "label": "instance_template (task/environment placeholders unexpanded)",
+      "text_kind": "decoded_yaml_block",
+      "families": [
+        "anthropic",
+        "openai"
+      ],
+      "utf8_bytes": 3007,
+      "estimated_tokens": 752,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "546a89156d7823eb34eb49c5b31a3703df4d27639d034a6d13f0162488d70821",
+      "source_file_sha256": "b539a8965f5bf41dd0f32daafa5d2db22581923d13812fa378fd09569b9d6b0c"
+    },
+    {
+      "candidate": "openai/codex-plugin-cc",
+      "pin": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+      "path": "plugins/codex/agents/codex-rescue.md",
+      "line_start": 1,
+      "line_end": 10,
+      "label": "advertised name/description; body is on-demand",
+      "text_kind": "decoded_frontmatter",
+      "families": [
+        "anthropic",
+        "openai"
+      ],
+      "utf8_bytes": 222,
+      "estimated_tokens": 56,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "c887d09bdc63c96e0f81fe8d7ffea8ca96cb7aa653be3fed193d9c5341b132c9",
+      "source_file_sha256": "5b0362f3658fe1fedb6f1def42b585bd20d58f0d27659edd165a6592a91c7587"
+    },
+    {
+      "candidate": "openai/codex-plugin-cc",
+      "pin": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+      "path": "plugins/codex/commands/adversarial-review.md",
+      "line_start": 1,
+      "line_end": 7,
+      "label": "advertised name/description; body is on-demand",
+      "text_kind": "decoded_frontmatter",
+      "families": [
+        "anthropic",
+        "openai"
+      ],
+      "utf8_bytes": 81,
+      "estimated_tokens": 21,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "ef722810c605a79dbac7cccfa07de0a487e47dd53f481c4a4570a8682af373c9",
+      "source_file_sha256": "6c6ec17b0dcc39c45541321f663aa1e856e7ad3a4f7343281bd98886ef40c2c6"
+    },
+    {
+      "candidate": "openai/codex-plugin-cc",
+      "pin": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+      "path": "plugins/codex/commands/cancel.md",
+      "line_start": 1,
+      "line_end": 7,
+      "label": "advertised name/description; body is on-demand",
+      "text_kind": "decoded_frontmatter",
+      "families": [
+        "anthropic",
+        "openai"
+      ],
+      "utf8_bytes": 56,
+      "estimated_tokens": 14,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "bae9f7e42f7d3da915587d165364a817ec003c25a2b38fa907fa72ae2c9aa3fb",
+      "source_file_sha256": "e01ce5fbed90f4e65e21b39052cc018f091ad9cb8756629483ef09d6d00fba20"
+    },
+    {
+      "candidate": "openai/codex-plugin-cc",
+      "pin": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+      "path": "plugins/codex/commands/rescue.md",
+      "line_start": 1,
+      "line_end": 6,
+      "label": "advertised name/description; body is on-demand",
+      "text_kind": "decoded_frontmatter",
+      "families": [
+        "anthropic",
+        "openai"
+      ],
+      "utf8_bytes": 102,
+      "estimated_tokens": 26,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "67b83d0b2082ab6abbb9e9ad5d62317cfdca7c2915bab564194f49c7782f1e27",
+      "source_file_sha256": "089207554cc3d34907916fbbf34b1954b1f5f1f3178e72dcbfb7ebd2d61d4e1e"
+    },
+    {
+      "candidate": "openai/codex-plugin-cc",
+      "pin": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+      "path": "plugins/codex/commands/result.md",
+      "line_start": 1,
+      "line_end": 7,
+      "label": "advertised name/description; body is on-demand",
+      "text_kind": "decoded_frontmatter",
+      "families": [
+        "anthropic",
+        "openai"
+      ],
+      "utf8_bytes": 72,
+      "estimated_tokens": 18,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "0c78ab1f0ec19cee97de43b8dd9da62b8dbb243ff29e8ac242868d9a8111b5b6",
+      "source_file_sha256": "2d996b04f51c6618e76fa142524a0cdf42ccf04fb70cd65bdc74f237de00873d"
+    },
+    {
+      "candidate": "openai/codex-plugin-cc",
+      "pin": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+      "path": "plugins/codex/commands/review.md",
+      "line_start": 1,
+      "line_end": 7,
+      "label": "advertised name/description; body is on-demand",
+      "text_kind": "decoded_frontmatter",
+      "families": [
+        "anthropic",
+        "openai"
+      ],
+      "utf8_bytes": 47,
+      "estimated_tokens": 12,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "dae6b1db2326b69d0e40a30efb3e64d888f3e50c7ee2abe9b171f99cb033f0e4",
+      "source_file_sha256": "4e333e9172e5abca130f49b248b10d899743c959c43192ca20cfe535c7473cae"
+    },
+    {
+      "candidate": "openai/codex-plugin-cc",
+      "pin": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+      "path": "plugins/codex/commands/setup.md",
+      "line_start": 1,
+      "line_end": 6,
+      "label": "advertised name/description; body is on-demand",
+      "text_kind": "decoded_frontmatter",
+      "families": [
+        "anthropic",
+        "openai"
+      ],
+      "utf8_bytes": 90,
+      "estimated_tokens": 23,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "8e859b78a3344a6389d6d9722b05128222b0c2402bac20ec0410dd8e177cb7ef",
+      "source_file_sha256": "e2d2c2671d7ea86691687030d6f8f6f3f054445cec06207d874732a2c6e0d2fa"
+    },
+    {
+      "candidate": "openai/codex-plugin-cc",
+      "pin": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+      "path": "plugins/codex/commands/status.md",
+      "line_start": 1,
+      "line_end": 7,
+      "label": "advertised name/description; body is on-demand",
+      "text_kind": "decoded_frontmatter",
+      "families": [
+        "anthropic",
+        "openai"
+      ],
+      "utf8_bytes": 83,
+      "estimated_tokens": 21,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "0b49fa319c0fd70cc32485a7a33ab479f106c24560c00a08474ad17e367e60d0",
+      "source_file_sha256": "1af1dadf984bc65349935b288d8c078caedfd6272a6514a9ee93992f17bda489"
+    },
+    {
+      "candidate": "openai/codex-plugin-cc",
+      "pin": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+      "path": "plugins/codex/commands/transfer.md",
+      "line_start": 1,
+      "line_end": 7,
+      "label": "advertised name/description; body is on-demand",
+      "text_kind": "decoded_frontmatter",
+      "families": [
+        "anthropic",
+        "openai"
+      ],
+      "utf8_bytes": 70,
+      "estimated_tokens": 18,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "db1c75158948a62456a670cea1edcc6be2d382c9179207d4680bdb291c38fbd4",
+      "source_file_sha256": "ce2047c1d766bb371e96d24a8ff0eebdbc5be2e208b26cb0a7653c92b78db596"
+    },
+    {
+      "candidate": "openai/codex-plugin-cc",
+      "pin": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+      "path": "plugins/codex/skills/codex-cli-runtime/SKILL.md",
+      "line_start": 1,
+      "line_end": 6,
+      "label": "advertised name/description; body is on-demand",
+      "text_kind": "decoded_frontmatter",
+      "families": [
+        "anthropic",
+        "openai"
+      ],
+      "utf8_bytes": 99,
+      "estimated_tokens": 25,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "36fd2430cec1835922b569dea2636fea6e71f7265e4f554dcbb10ead85c497e5",
+      "source_file_sha256": "cce11c3bd6d7b5ec6277b3527e65ff38c5bd16084b436bf2870fabb30414359c"
+    },
+    {
+      "candidate": "openai/codex-plugin-cc",
+      "pin": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+      "path": "plugins/codex/skills/codex-result-handling/SKILL.md",
+      "line_start": 1,
+      "line_end": 6,
+      "label": "advertised name/description; body is on-demand",
+      "text_kind": "decoded_frontmatter",
+      "families": [
+        "anthropic",
+        "openai"
+      ],
+      "utf8_bytes": 91,
+      "estimated_tokens": 23,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "8255c2c2806a19b2cd0fdf1f0e8c3c29ef90022db9cc558211e4e4da9cb6b2b9",
+      "source_file_sha256": "99fcbbebaeac1e1504b8adfba513bd5964e171414f6709034f3f980a1f2385a8"
+    },
+    {
+      "candidate": "openai/codex-plugin-cc",
+      "pin": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+      "path": "plugins/codex/skills/gpt-5-4-prompting/SKILL.md",
+      "line_start": 1,
+      "line_end": 6,
+      "label": "advertised name/description; body is on-demand",
+      "text_kind": "decoded_frontmatter",
+      "families": [
+        "anthropic",
+        "openai"
+      ],
+      "utf8_bytes": 161,
+      "estimated_tokens": 41,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "86cc252912ded9a4c727e2514ea7a3efd60bce63552643242d7bb8bc5b48c954",
+      "source_file_sha256": "48222490b629e0e5cf7372253b864cc03b7780ce7afeaab4129f3dd2efdbf5d9"
+    },
+    {
+      "candidate": "deepseek-ai/deepseek-harness",
+      "pin": "86a402200d95fecef4529d969836f1fe13c6cb0d",
+      "path": "packages/core/system-prompt/src/index.ts",
+      "line_start": 453,
+      "line_end": 453,
+      "label": "fixed identity only; dynamic sections and tool schemas excluded",
+      "text_kind": "fixed_prompt_text",
+      "families": [
+        "anthropic",
+        "openai"
+      ],
+      "utf8_bytes": 48,
+      "estimated_tokens": 12,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "1dd6363fa551837a710e2112cccb63d61feaa0e1b1070d91b51e840e171e9be1",
+      "source_file_sha256": "9e254cddc9ef00072f9205950405ba8650bc43c8809fba6162da93253efc7f71"
+    },
+    {
+      "candidate": "openclaw/openclaw",
+      "pin": "59cb44796b0f1f0daa0e37af8b1495abb45d9bc1",
+      "path": "src/agents/system-prompt.ts",
+      "line_start": 415,
+      "line_end": 415,
+      "label": "fixed identity only; dynamic sections and tool schemas excluded",
+      "text_kind": "fixed_prompt_text",
+      "families": [
+        "anthropic",
+        "openai"
+      ],
+      "utf8_bytes": 53,
+      "estimated_tokens": 14,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "08a0816f30d20d831780c85dc94663bc680a4b338fc0199a997b1020a957cedd",
+      "source_file_sha256": "7d6ce13023781569ed63fc5fa2033b0a8237c63d2a5c565c5ea502b79d96b9e1"
+    },
+    {
+      "candidate": "cline/cline",
+      "pin": "1a25410ccd889a7c7ef4d10902869fd5b7203608",
+      "path": "sdk/packages/shared/src/prompt/system/act.ts",
+      "line_start": 1,
+      "line_end": 36,
+      "label": "ACT system template; metadata placeholders unexpanded",
+      "text_kind": "decoded_template_literal",
+      "families": [
+        "anthropic",
+        "openai"
+      ],
+      "utf8_bytes": 3695,
+      "estimated_tokens": 924,
+      "method": "ESTIMATE: ceil(UTF-8 bytes / 4), applied to the decoded text, not source-code bytes",
+      "counted_text_sha256": "547ae68061360a69ef9c39141dcbd67f079edca40ac6a22941badd7aa0cbea1c",
+      "source_file_sha256": "dd1560a5a9b2f9b6691b8f355d9e776e12a95e7bc262347fadc3b89617956be4"
+    }
+  ]
+}
