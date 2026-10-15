@@ -289,6 +289,7 @@ class BootReceiptTests(unittest.TestCase):
                                ("alpaca-paper-c.env", "APCA_API_KEY_ID"),
                                ("sec-contact.env", "SEC_USER_AGENT"), ("tavily.env", "TAVILY_API_KEY"),
                                ("omniroute.env", "OMNIROUTE_API_KEY"), ("databento.env", "DATABENTO_API_KEY"),
+                               ("quantconnect.env", "QUANTCONNECT_API_TOKEN"),
                                ("stray.env", "STRAY_API_KEY"),
                                (".tavily.env.0123456789abcdef.tmp", "TAVILY_API_KEY")):
             self.plant(name, variable)
@@ -314,7 +315,7 @@ class BootReceiptTests(unittest.TestCase):
         self.assertEqual(compare.returncode, 0, compare.stderr)
         outputs = {"receipt": text, "printed line": result.stdout, "stderr": result.stderr,
                    "compare": compare.stdout + compare.stderr}
-        self.assertEqual(len(self.canaries), 10)
+        self.assertEqual(len(self.canaries), 11)
         for name, (canary, content) in self.canaries.items():
             for form, encoded in encoded_forms(canary, content).items():
                 for label, output in outputs.items():

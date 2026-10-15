@@ -160,6 +160,28 @@ class CredentialStatusTests(unittest.TestCase):
         self.assertIn("github_app_private_key", cs.CLASSES)
         self.assertIn("--from-file", row["notes"])
 
+    def test_quantconnect_row_holds_the_two_names_the_official_mcp_server_reads(self):
+        # The QuantConnect slot (2026-10-15) for the engine comparison's cloud and MCP path: QuantConnect/mcp-server@1f0fa4e4
+        # src/api_connection.py:13-14 reads exactly these two names and signs every request with both (:16-29), so both are
+        # required and masked, in one env file with no pointer; the runbook row names the same file and variables.
+        row = next(e for e in self.inventory["entries"] if e["id"] == "quantconnect")
+        self.assertEqual((row["class"], row["status"], row["lane"], row["store"]["kind"]),
+                         ("provider_api_key", "user_only_paid", "us-equities-research", "private_env_file"))
+        self.assertEqual(row["store"]["path_template"],
+                         "${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack/quantconnect.env")
+        self.assertEqual(row["variables"], ["QUANTCONNECT_USER_ID", "QUANTCONNECT_API_TOKEN"])
+        self.assertEqual((row["optional_variables"], row["pointer_variables"]), ([], []))
+        self.assertEqual(cs.masked_names(row), ["QUANTCONNECT_USER_ID", "QUANTCONNECT_API_TOKEN"])
+        self.assertEqual(row["loaders"], ["tools/credentials/credential_run.py quantconnect -- <command>"])
+        self.assertIn("mcp-server@1f0fa4e4 src/api_connection.py:13-14", row["environment_only_consumers"][0])
+        self.assertIn("Never run `lean login`", row["notes"])
+        table = (ROOT / "docs/secret-storage.md").read_text(encoding="utf-8")
+        docs_rows = [line for line in table.splitlines() if line.startswith("| `quantconnect` |")]
+        self.assertEqual(len(docs_rows), 1)
+        cells = [cell.strip() for cell in docs_rows[0].strip("|").split("|")]
+        self.assertEqual(cells[2:], ["only when you buy it", "`<store>/quantconnect.env`",
+                                     "`QUANTCONNECT_USER_ID`, `QUANTCONNECT_API_TOKEN`"])
+
     def test_public_variables_classify_every_optional_stored_variable(self):
         # 2026-09-29 (tools/credentials/credential_run.py): the key runner masks every variable it injects except the
         # names in the entry's optional public_variables, which may name only optional variables that are not secret,

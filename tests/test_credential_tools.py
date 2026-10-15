@@ -219,7 +219,7 @@ class StoreFromEnvTests(unittest.TestCase):
         # optional variable counts too (sec-contact declares SEC_USER_AGENT and EDGAR_IDENTITY).
         self.env.update({"APCA_API_KEY_ID": fake_token("PK"), "APCA_API_SECRET_KEY": fake_token(),
                          "SEC_USER_AGENT": "name a@b.example"})
-        for entry in ("alpaca-paper", "alpaca-paper-2", "alpaca-paper-c", "sec-contact"):
+        for entry in ("alpaca-paper", "alpaca-paper-2", "alpaca-paper-c", "sec-contact", "quantconnect"):
             with self.subTest(entry=entry), self.assertRaisesRegex(store_mod.Refused, "exactly one variable"):
                 self.store_from_env(entry)
         self.assertFalse(self.store.exists())
