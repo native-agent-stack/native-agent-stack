@@ -439,7 +439,7 @@
    "layer_id": "native-clients",
    "status": "recommendation",
    "default": "Native per-role model and effort: subagent and skill frontmatter, the Agent tool's `model` and `effort` (2.1.292+), per-model `modelSettings`, and `--model`/`--effort` on headless jobs",
-   "route": "Opus 5.5 for judgment and build; Sonnet 5.5 or Haiku 5.5 only for a task class with a frozen paired A/B at parity; keep `CLAUDE_CODE_EFFORT_LEVEL` and `CLAUDE_CODE_SUBAGENT_MODEL_FORCE` unset, because they override frontmatter and per-call effort; Codex lanes through the gateway for fan-out research",
+   "route": "Opus 5.5 for judgment and build; Sonnet 5.5 or Haiku 5.5 only for a task class with a frozen paired A/B at parity; keep `CLAUDE_CODE_EFFORT_LEVEL`, `CLAUDE_CODE_SUBAGENT_MODEL_FORCE` and `CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL` (2.1.296: every workflow agent on one model) unset, because they override frontmatter and per-call model or effort; Codex lanes through the gateway for fan-out research",
    "alternatives": [
     "Re-run failed attempts at a higher effort",
     "Native advisor pairing",
@@ -458,7 +458,7 @@
     "Measured here: promptfoo three-model extraction A/B, 60/60 each (one fixture class); #840 Haiku trial",
     "Designed, not measured: J4 tiering (Opus census, Haiku sample, sealed 5% Opus re-read)"
    ],
-   "notes": "Model choices are the owner's; this row is a recommendation. The M7 effort sweep (high, xhigh, max on our tasks) is owed.",
+   "notes": "Model choices are the owner's; this row is a recommendation. The M7 effort sweep (high, xhigh, max on our tasks) is owed. The project settings' `effortLevel` \"xhigh\" comes from #479 (squash ba31dcd02, 2026-09-29): at 2.1.284 ultracode neither raised nor overrode effort, so a session with no saved level ran at medium (docs/decisions/2026-09-29-sonnet-5-5-dispatch.md); kept, recorded 2026-10-15 without a change.",
    "overturn_when": "The M7 sweep shows a lower effort at quality parity for a task class, or max scoring below xhigh; or a newer model release.",
    "supersedes": [
     "R52 (Ultracode is a separate toggle since 2.1.284)",
@@ -967,7 +967,7 @@
     "plugin-marketplaces reference (sha on plugin sources)",
     "plugins-marketplaces-O7, O8, O9"
    ],
-   "notes": "Our marketplaces use tags or no ref (context-mode, worktrunk, codex). codex 0.162.0 now ships the review capability codex-plugin-cc bridged: trial owed (currency).",
+   "notes": "Our marketplaces use tags or no ref (context-mode, worktrunk, codex). codex 0.162.0 now ships the review capability codex-plugin-cc bridged: trial owed (currency). `extraKnownMarketplaces` (settings-reference at 2.1.300): a repository's entries apply only after the workspace trust dialog for that folder (a `-p` run in an untrusted folder ignores them), and `autoUpdate` defaults true for `claude-plugins-official` and most official Anthropic marketplaces while third-party marketplaces default to false; set it explicitly on each entry (guide screen item 35, 2026-10-15).",
    "overturn_when": "A release adds sha pins to marketplace sources, or a pinned commit becomes unreachable.",
    "supersedes": [
     "M8 answered (no sha on marketplace sources)",
@@ -1941,7 +1941,7 @@
     "M42",
     "M31"
    ],
-   "notes": "Ultrareview from a script runs as `claude ultrareview <PR#> --json`; `claude -p '/code-review ultra'` exits without findings. The run in GitHub (`claude-pr-toolkit-review.yml`, through #909) was retired on 2026-10-10 with the other Claude workflows, and the toolkit read never ran there (docs/decisions/2026-10-10-retire-in-github-claude-review.md; see github-action).",
+   "notes": "Ultrareview from a script runs as `claude ultrareview <PR#> --json`; `claude -p '/code-review ultra'` exits without findings. The run in GitHub (`claude-pr-toolkit-review.yml`, through #909) was retired on 2026-10-10 with the other Claude workflows, and the toolkit read never ran there (docs/decisions/2026-10-10-retire-in-github-claude-review.md; see github-action). Local `/code-review` runs pass `--max-findings` explicitly every time: the choice is reused by later runs until `--max-findings default` (CHANGELOG 2.1.288), so an earlier run's limit never carries over unseen (guide screen item 15, 2026-10-15).",
    "primary_sources": [
     {
      "title": "Bringing Code Review to Claude Code",
