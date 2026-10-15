@@ -1,0 +1,31 @@
+{
+ "kind": "invocation",
+ "component_id": "affaan-m/ECC",
+ "repository": "https://github.com/affaan-m/ECC",
+ "pin": "dd6ee538aee0f548d4a6b520118f875431fd749e",
+ "evidence_class": "native_proven",
+ "client": "claude-code",
+ "window_start": "2026-10-04T15:44:42Z",
+ "window_end": "2026-10-15T02:10:00Z",
+ "calls": 204,
+ "unit": "skill_activated events for iterative-retrieval, the loaded ECC skill whose content equals ECC at dd6ee538",
+ "applies_to": "the ECC run pin on main (manifests/stack.json#/components/0, dd6ee538), which stays (command center, 2026-10-15T02:38Z)",
+ "pin_binding": "adoption/skills/manifest.json loads iterative-retrieval at 2b6e8397; the installed SKILL.md hashes to the manifest's skill_md_sha256 (born 2026-10-03T01:16:01Z), and the skill directory's blob set (path and blob sha) is identical at 2b6e8397 and dd6ee538. search-first's 213 activations are not counted: its directory at the loaded c70874fa differs from dd6ee538",
+ "measurement": {
+  "method": "docs/decisions/2026-09-26-tool-invoke-rates.md (Loki count of record): Claude Code's native OpenTelemetry tool events; the Collector copies the MCP server name, the skill name and a derived shell_rtk boolean; no command text",
+  "logql": [
+   "{service_name=\"claude-code\"} | event_name=\"skill_activated\" | skill_name=\"iterative-retrieval\""
+  ],
+  "chunking": "24-hour count_over_time chunks summed",
+  "script": "invoke_counts.py",
+  "script_sha256": "672b655ead80ae5d84fd5f6d23da248360547b4f5405a282c7cf606f96c49453",
+  "counts_file": "counts.json",
+  "counts_sha256": "75198d6eb4fc6a631d8448e434321aedf199fdd28e781e4ae89d185a0a67293d",
+  "counted_utc": "2026-10-15T02:35:59Z"
+ },
+ "measured_by": "cc-native-practice, FINALIZE-ALL F2 (Claude side)",
+ "not_evidence": "installation alone; this receipt counts calls only",
+ "excluded": {
+  "search-first": 213
+ }
+}

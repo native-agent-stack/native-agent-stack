@@ -1,0 +1,135 @@
+{
+ "checked_with": "scripts/final_stack.py complete_final_pin, scripts/host_receipts.py normalize_repository and scripts/angle_records.py timestamp at #1058 head 252babe4040e39173cc178317c67699371806df6 (final_stack.py:818-827)",
+ "checked_utc": "2026-10-15T02:41:10Z",
+ "results": [
+  {
+   "receipt": "invoke-claude-code-2.1.295.json",
+   "run_pin_parsed": {
+    "version": "2.1.295",
+    "commit": null
+   },
+   "checks": {
+    "kind": true,
+    "native_proven": true,
+    "complete_final_pin": true,
+    "window": true,
+    "calls": true,
+    "repository": true
+   },
+   "ok": true
+  },
+  {
+   "receipt": "invoke-claude-code-2.1.300.json",
+   "run_pin_parsed": {
+    "version": "2.1.300",
+    "commit": "94506ff0d3bd9185f1752da36e968775021fb48f"
+   },
+   "checks": {
+    "kind": true,
+    "native_proven": true,
+    "complete_final_pin": true,
+    "window": true,
+    "calls": true,
+    "repository": true
+   },
+   "ok": true
+  },
+  {
+   "receipt": "invoke-serena-2.0.0.dev0.json",
+   "run_pin_parsed": {
+    "version": "2.0.0.dev0",
+    "commit": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143"
+   },
+   "checks": {
+    "kind": true,
+    "native_proven": true,
+    "complete_final_pin": true,
+    "window": true,
+    "calls": true,
+    "repository": true
+   },
+   "ok": true
+  },
+  {
+   "receipt": "invoke-qmd-2.8.3.json",
+   "run_pin_parsed": {
+    "version": "2.8.3",
+    "commit": null
+   },
+   "checks": {
+    "kind": true,
+    "native_proven": true,
+    "complete_final_pin": true,
+    "window": true,
+    "calls": true,
+    "repository": true
+   },
+   "ok": true
+  },
+  {
+   "receipt": "invoke-headroom-0.40.0.json",
+   "run_pin_parsed": {
+    "version": "0.40.0",
+    "commit": null
+   },
+   "checks": {
+    "kind": true,
+    "native_proven": true,
+    "complete_final_pin": true,
+    "window": true,
+    "calls": true,
+    "repository": true
+   },
+   "ok": true
+  },
+  {
+   "receipt": "invoke-rtk-0.51.0.json",
+   "run_pin_parsed": {
+    "version": "0.51.0",
+    "commit": null
+   },
+   "checks": {
+    "kind": true,
+    "native_proven": true,
+    "complete_final_pin": true,
+    "window": true,
+    "calls": true,
+    "repository": true
+   },
+   "ok": true
+  },
+  {
+   "receipt": "invoke-ai-memory-2.6.3.json",
+   "run_pin_parsed": {
+    "version": "2.6.3",
+    "commit": null
+   },
+   "checks": {
+    "kind": true,
+    "native_proven": true,
+    "complete_final_pin": true,
+    "window": true,
+    "calls": true,
+    "repository": true
+   },
+   "ok": true
+  },
+  {
+   "receipt": "invoke-affaan-m-ecc-dd6ee538.json",
+   "run_pin_parsed": {
+    "version": null,
+    "commit": "dd6ee538aee0f548d4a6b520118f875431fd749e"
+   },
+   "checks": {
+    "kind": true,
+    "native_proven": true,
+    "complete_final_pin": true,
+    "window": true,
+    "calls": true,
+    "repository": true
+   },
+   "ok": true
+  }
+ ],
+ "all_ok": true
+}

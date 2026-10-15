@@ -1,0 +1,32 @@
+{
+ "kind": "invocation",
+ "component_id": "claude-code",
+ "repository": "https://github.com/anthropics/claude-code",
+ "pin": "2.1.300; source 94506ff0d3bd9185f1752da36e968775021fb48f",
+ "evidence_class": "native_proven",
+ "client": "claude-code",
+ "window_start": "2026-10-14T20:16:22Z",
+ "window_end": "2026-10-15T02:10:00Z",
+ "calls": 12132,
+ "unit": "tool_result events of Claude Code 2.1.300",
+ "applies_to": "the run pin #1128 records (version 2.1.300 with the CHANGELOG source commit); binds once #1128 lands",
+ "pin_binding": "the client labels every event with its own version (service_version), so the window holds only that version's events",
+ "measurement": {
+  "method": "docs/decisions/2026-09-26-tool-invoke-rates.md (Loki count of record): Claude Code's native OpenTelemetry tool events; the Collector copies the MCP server name, the skill name and a derived shell_rtk boolean; no command text",
+  "logql": [
+   "{service_name=\"claude-code\"} | event_name=\"tool_result\" | service_version=\"2.1.300\""
+  ],
+  "chunking": "24-hour count_over_time chunks summed",
+  "script": "invoke_counts.py",
+  "script_sha256": "672b655ead80ae5d84fd5f6d23da248360547b4f5405a282c7cf606f96c49453",
+  "counts_file": "counts.json",
+  "counts_sha256": "75198d6eb4fc6a631d8448e434321aedf199fdd28e781e4ae89d185a0a67293d",
+  "counted_utc": "2026-10-15T02:35:59Z"
+ },
+ "measured_by": "cc-native-practice, FINALIZE-ALL F2 (Claude side)",
+ "not_evidence": "installation alone; this receipt counts calls only",
+ "second_figure": {
+  "unit": "api_request events (model calls)",
+  "calls": 11755
+ }
+}
