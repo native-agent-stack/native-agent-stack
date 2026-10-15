@@ -6,7 +6,7 @@
     "release": "3.8.51",
     "adoption_status": "Source parity with the supplied 3.8.51 composition selected by merged PR #744 at 0fb32ee583589f1a0809b20d18dff40ce2f65a1c. Historical co-op readback joined one Sol/max call; this revised recipe and native profile qualification remain UNRUN.",
     "source_pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
-    "endpoint": "http://127.0.0.1:21128/v1",
+    "endpoint": "http://127.0.0.1:@PORT_GATEWAY@/v1",
     "role": "account pool and fallback",
     "sol_effort_cap": "max",
     "local_carries": [
@@ -42,8 +42,8 @@
     "model_provider": "omniroute",
     "model": "cx/gpt-6.1-sol-max",
     "model_reasoning_effort": "max",
-    "base_url": "http://127.0.0.1:21128/v1",
-    "command": "OMNIROUTE_API_KEY=keyless-loopback codex exec -p omniroute -m cx/gpt-6.1-sol-max -c model_reasoning_effort=max -c model_provider=omniroute -c 'model_providers.omniroute.base_url=\"http://127.0.0.1:21128/v1\"' -c web_search=disabled --json --ephemeral"
+    "base_url": "http://127.0.0.1:@PORT_GATEWAY@/v1",
+    "command": "OMNIROUTE_API_KEY=keyless-loopback codex exec -p omniroute -m cx/gpt-6.1-sol-max -c model_reasoning_effort=max -c model_provider=omniroute -c 'model_providers.omniroute.base_url=\"http://127.0.0.1:@PORT_GATEWAY@/v1\"' -c web_search=disabled --json --ephemeral"
   },
   "re_pin": {
     "source": "https://github.com/diegosouzapw/OmniRoute/pull/15167",

@@ -1,0 +1,121 @@
+{
+  "base": "8053f14e7",
+  "files": [
+    {
+      "path": "agentsview.toml",
+      "sha256": "1ad4432c9120ed04e4047a2cc96a10830b25911f750880c2a4e55df2349ee0f2"
+    },
+    {
+      "path": "deer-flow-config.yaml",
+      "sha256": "385ca138f5f02b9e971aa2593f35fa3f6705a92b9fc5952b455b0d2b6d924e17"
+    },
+    {
+      "path": "gateway-effort-accept.py",
+      "sha256": "79f022f19603917c37b25073fb5f508aaf1b87389accd16ac6c26cb1b832ded3"
+    },
+    {
+      "path": "gpt-gateway-client-accept.sh",
+      "sha256": "b4688f9c56ba3a0d943f4fdfaafeb6c4805d034cc8683ccf59a264c341727866"
+    },
+    {
+      "path": "gpt-gateway-topology.json",
+      "sha256": "60c4c714cca3df46ec2c666d991e5461e1530123e3b3bc3099e5095fa440d2e8"
+    },
+    {
+      "path": "grafana-command-center.json",
+      "sha256": "6a5eb0001526fa1af064c9715e23e3f152fc734db7b215d32b6a91f243034f96"
+    },
+    {
+      "path": "grafana-datasources.yaml",
+      "sha256": "3ebbc86a941753eb3f1caba09b82d5a5eada044d21b3c0165b7e6aca5ef18e32"
+    },
+    {
+      "path": "grafana-ecosystem-native.json",
+      "sha256": "f5fc3ad28fcc2a651dbeebd42266f1f2e68fbeef671e858ca28f606342e199c7"
+    },
+    {
+      "path": "grafana-lanes.json",
+      "sha256": "474d03439416bbc0b908c5908a1af968b014d84c501048b6104b6123e4139e6e"
+    },
+    {
+      "path": "grafana-native-foundation-data.json",
+      "sha256": "c4f4f8fb9286c7b10a250a339dda6ccac1b556a5900e5c384029c3f34369499c"
+    },
+    {
+      "path": "grafana.ini",
+      "sha256": "d0e6e66a4ca4e11b02b119903e1e0904737facb13414be7363f8fbd03b47b08f"
+    },
+    {
+      "path": "loki.yaml",
+      "sha256": "151a56b093712f20ebd15329a8fa33678ca21fc36a7a8db46ed890a887032bb7"
+    },
+    {
+      "path": "ns2604-research-progress.service",
+      "sha256": "f6f8702b5b86578830e3b7febfddc280f6bc8a5e921fdd4f25ac3e5aa5421d72"
+    },
+    {
+      "path": "ollama.env.example",
+      "sha256": "f5ee98e1470cc83e2c62b146ac72e851f2896038705149716ded1007a049893f"
+    },
+    {
+      "path": "ollama.service",
+      "sha256": "5e8e8bc42306f2d1ebc6da912e34daa28c6ce73eccf793d3155851733dccc6db"
+    },
+    {
+      "path": "omniroute-canary-evidence.json",
+      "sha256": "c3df46cd80e4bac2c06f1c267a4b31dd6c5929e36152fac8f6eb321adfd07fe2"
+    },
+    {
+      "path": "omniroute-serve.sh",
+      "sha256": "672063a12174d46f7065ae7bb9adf1ed268c958cd264f64a25d0af3f74ae45bc"
+    },
+    {
+      "path": "omniroute.env.example",
+      "sha256": "f5980fc29c7cccb2fd4956f9fbe92d6d814b90994f2fcac01c0a24dfe0553e00"
+    },
+    {
+      "path": "omniroute.service",
+      "sha256": "27430616a4c7537eeb5925ed09b69b064cb47fb9e112880b9801b24574ae684b"
+    },
+    {
+      "path": "openhands-job.json",
+      "sha256": "c1ec395012d6d49cd63514e2849904f3e55a6a5e1a97d6ee2617249863392625"
+    },
+    {
+      "path": "openhands-srt.json",
+      "sha256": "3150fb6509d9af91ae964fec9fd4f14f90b7b8189e9ba81da2dc5753b8b67b0f"
+    },
+    {
+      "path": "openhands-worker-skill.md",
+      "sha256": "5c9c225171ee83e8a4146e1419f7030e11e0c8d57c13c2f6e153e5e171571784"
+    },
+    {
+      "path": "otel.yaml",
+      "sha256": "4b103f0bcdc6a57f8be7316bd56c951d1fb40acc84a5154d8957d7b3bfd8d5fb"
+    },
+    {
+      "path": "prometheus-alerts.test.yaml",
+      "sha256": "521fc971b2beb6a5e51e9c15c432864239d1fa0189b77ce07842ee94804d5a2a"
+    },
+    {
+      "path": "prometheus.yaml",
+      "sha256": "a20c7160cf9cd39c52703315f60bedd1af5bb1d25e7624e5b297934dda8142fa"
+    },
+    {
+      "path": "promptfoo-gateway.cjs",
+      "sha256": "57c542180e409025b80db9454ca51597a2723cb9879fb832a2dcbb926eb0db64"
+    },
+    {
+      "path": "promptfoo-gateway.yaml",
+      "sha256": "f282da90866bd4434e272a3377c3d9a1862ce2feaf4c78d80594eea64f347d71"
+    },
+    {
+      "path": "grafana-token-layer.json",
+      "sha256": "ffe992ccd8a9caa4d56753b44b43da785cc6d80ed7415f99d8b1332f05138cdd"
+    },
+    {
+      "path": "grafana-research-grand.json",
+      "sha256": "bc794124335f1f4bb900157d02cdabd00803897e9416d7161c443453dd91e541"
+    }
+  ]
+}

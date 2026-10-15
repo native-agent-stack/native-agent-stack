@@ -15,7 +15,7 @@ systemctl --user start --wait "openhands-job@$job.service"
 
 The dispatcher creates the per-job srt policy and permits only the named workspace
 and its private state for writes. Its model route is the keyless loopback
-OmniRoute gateway on 127.0.0.1:21128; native client sign-ins stay native.
+OmniRoute gateway on 127.0.0.1:@PORT_GATEWAY@; native client sign-ins stay native.
 
 Inspect `~/.local/state/native-agent-stack/runtime-workers/openhands/$job/run-report.json`
 and the actual task files. Require a successful unit, `requests_to_model > 0`, and

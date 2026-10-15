@@ -1,0 +1,11 @@
+# grafana/loki v3.7.8 docs/sources/setup/install/local.md:74, foreground command.
+[Unit]
+Description=Native stack Loki
+
+[Service]
+WorkingDirectory=@TOOLS_ROOT@/loki
+ExecStart=%h/.local/bin/loki -config.file=@CONFIG_ROOT@/loki.yaml
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

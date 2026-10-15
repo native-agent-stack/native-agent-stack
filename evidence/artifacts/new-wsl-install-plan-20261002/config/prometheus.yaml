@@ -5,22 +5,22 @@ global:
 alerting:
   alertmanagers:
     - static_configs:
-        - targets: ["127.0.0.1:21093"]
+        - targets: ["127.0.0.1:@PORT_ALERTMANAGER@"]
 rule_files: [prometheus-alerts.yaml]
 scrape_configs:
   - job_name: prometheus
     static_configs:
-      - targets: ["127.0.0.1:21090"]
+      - targets: ["127.0.0.1:@PORT_PROMETHEUS@"]
         labels:
           app: prometheus
     scrape_native_histograms: true
   - job_name: otel-native
     honor_labels: true
     static_configs:
-      - targets: ["127.0.0.1:21889"]
+      - targets: ["127.0.0.1:@PORT_OTEL_EXPORTER@"]
   - job_name: otel-collector
     static_configs:
-      - targets: ["127.0.0.1:21888"]
+      - targets: ["127.0.0.1:@PORT_OTEL_METRICS@"]
   # Kept empty outside explicitly selected native delivery acceptance.
   - job_name: acceptance-fixture
     scrape_interval: 5s

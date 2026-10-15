@@ -9,6 +9,7 @@ import hashlib
 import json
 import os
 import re
+import runpy
 import shutil
 import subprocess
 import sys
@@ -2413,7 +2414,9 @@ class PromptfooGatewayTopologyConfiguration(unittest.TestCase):
     def render(self, topology, env=None):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            shutil.copyfile(PLAN / "config/promptfoo-gateway.cjs", root / "promptfoo-gateway.cjs")
+            renderer = runpy.run_path(str(PLAN / "config/observability_config.py"))
+            (root / "promptfoo-gateway.cjs").write_text(renderer["render_ports"](
+                (PLAN / "config/promptfoo-gateway.cjs").read_text(), renderer["service_ports"]()))
             (root / "gpt-gateway-topology.json").write_text(json.dumps(topology))
             return subprocess.run(
                 ["node", "-e", "process.stdout.write(JSON.stringify(require(process.argv[1])))",
@@ -2567,6 +2570,7 @@ class PromptfooGatewayTopologyConfiguration(unittest.TestCase):
             root = Path(directory)
             (root / "config").mkdir()
             # A poison config proves the preflight does not load it or run providers.
+            shutil.copyfile(PLAN / "config/observability_config.py", root / "config/observability_config.py")
             (root / "config/promptfoo-gateway.cjs").write_text('throw new Error("CONFIG_LOADED");')
             for case in ("pending", "supplied-bad-route", "missing-ownership", "wrong-port",
                          "endpoint-array", "promptfoo-array", "promptfoo-string", "promptfoo-null", "gpt-nul"):
@@ -2592,7 +2596,8 @@ class PromptfooGatewayTopologyConfiguration(unittest.TestCase):
                              ' ' + pending_kind + '\nexit "$failed"')
                     result = subprocess.run(["bash", "-euo", "pipefail", "-c", stage],
                                             env={"PATH": os.environ["PATH"], "HOME": str(root),
-                                                 "plan_dir": str(root)},
+                                                 "plan_dir": str(root), "config_root": str(root / "config"),
+                                                 "config_source_root": str(root / "config")},
                                             capture_output=True, text=True, timeout=10)
                     if case == "pending":
                         self.assertEqual(result.returncode, 0, result.stderr)

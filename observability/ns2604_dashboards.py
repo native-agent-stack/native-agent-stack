@@ -138,7 +138,7 @@ def main():
     args = parser.parse_args()
     stale = []
     for name, board in dashboards().items():
-        text = json.dumps(board, indent=2) + '\n'
+        text = GRAFANA_POLICY.port_template(json.dumps(board, indent=2) + '\n')
         path = args.plan_dir / 'config' / name
         if args.check:
             if not path.is_file() or path.read_text() != text:

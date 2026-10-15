@@ -10,12 +10,12 @@ prompts:
 providers:
   - id: openai:chat:your-gpt-model-id
     config:
-      apiBaseUrl: http://127.0.0.1:21128/v1
+      apiBaseUrl: http://127.0.0.1:@PORT_GATEWAY@/v1
       apiKeyEnvar: GATEWAY_API_KEY
       temperature: 0.2
   - id: openai:chat:your-claude-model-id
     config:
-      apiBaseUrl: http://127.0.0.1:21128/v1
+      apiBaseUrl: http://127.0.0.1:@PORT_GATEWAY@/v1
       apiKeyEnvar: GATEWAY_API_KEY
       temperature: 0.2
 

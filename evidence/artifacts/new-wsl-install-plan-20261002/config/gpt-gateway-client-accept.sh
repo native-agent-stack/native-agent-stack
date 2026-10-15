@@ -2,7 +2,7 @@
 # openai/codex@rust-v0.160.0:codex-rs/exec/src/cli.rs (--json, --ephemeral),
 # https://developers.openai.com/codex/noninteractive (turn.completed).
 # The destination profile is rendered by tools/adoption/new_wsl_client_config.py
-# from adoption/templates/codex.omniroute.config.toml, with base_url on 21128.
+# from adoption/templates/codex.omniroute.config.toml, with base_url on @PORT_GATEWAY@.
 # PR #744 at 0fb32ee583589f1a0809b20d18dff40ce2f65a1c selects the supplied
 # composition and the explicit Sol/max route; this check proves native completion,
 # while delivered effort requires independent gateway correlation evidence.
@@ -12,7 +12,7 @@ gateway_session_probe="$(mktemp -d)"
 trap 'rm -rf -- "$gateway_session_probe"' EXIT
 gateway_session_rc=0
 OMNIROUTE_API_KEY=keyless-loopback codex exec -p omniroute -m cx/gpt-6.1-sol-max -c model_reasoning_effort=max \
-  -c model_provider=omniroute -c 'model_providers.omniroute.base_url="http://127.0.0.1:21128/v1"' \
+  -c model_provider=omniroute -c 'model_providers.omniroute.base_url="http://127.0.0.1:@PORT_GATEWAY@/v1"' \
   -c web_search=disabled --json --ephemeral \
   'Reply with exactly GATEWAY_OK. Do not use tools.' </dev/null > "$gateway_session_probe/events.jsonl" || gateway_session_rc=$?
 printf 'gpt-gateway | native-codex-exit=%s\n' "$gateway_session_rc" >&2

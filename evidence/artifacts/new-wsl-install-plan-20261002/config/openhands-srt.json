@@ -1,6 +1,6 @@
 {
   "network": {
-    "allowedDomains": ["127.0.0.1:21128"],
+    "allowedDomains": ["127.0.0.1:@PORT_GATEWAY@"],
     "deniedDomains": [],
     "allowLocalBinding": false
   },

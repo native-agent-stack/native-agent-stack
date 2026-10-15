@@ -1,6 +1,6 @@
 # New WSL install plan
 
-Current structural inventory (2026-10-05): 84 rows, 192 install commands and 113 acceptance entries (including two additional checks). The source includes 66 configuration assets. D-ollama-2 carries the updated owner-approved user unit and removes the warmup asset; #713 supplies the additional rows. These counts describe the source, not host acceptance.
+Current structural inventory (2026-10-15): 84 rows, 195 install commands and 113 acceptance entries (including two additional checks). D-ollama-2 carries the updated owner-approved user unit and removes the warmup asset; #713 supplies the additional rows. These counts describe the source, not host acceptance.
 
 **Run the plan from a checkout of the repository** (step F7, "Clone origin/main", of `adoption/platforms/linux-wsl2-new-distro.md`). `worktrunk` and the convergence validators change into `repo_root`, the checkout three levels above this folder, so `install.sh` and `accept.sh` stop with a clear message when `repo_root` is not a git checkout (`install.sh --list` needs none).
 
@@ -18,12 +18,34 @@ The target remains a clean Ubuntu 26.04.1 WSL 2 distribution with systemd, one n
 python3 -B check_plan.py
 bash install.sh --list
 bash install.sh --only <slot>
+bash install.sh --no-start --host-file /path/to/host.json --only <slot>
 bash accept.sh --only <slot>
 bash accept.sh --only <slot> --stage service_health
 bash accept.sh --only <slot> --stage after_sign_in
 ```
 
 Both scripts refuse root. Installation selects dependencies, isolates owner failures and retains existing operator configuration. No default-shell or Windows-side change is prescribed. `--list` is read-only and prints `slot | owner | route | status` for every row; the status is `planned`, `measurement-only` or `excluded`.
+
+`--no-start` installs service files and reloads systemd without enabling or starting
+units, including the Grafana research timer. Dagu uses its pinned installer's
+`--service no` mode; rootless Docker setup is deferred and the upstream unit form
+is installed directly. The rootful Docker/containerd units are masked before apt
+can activate them. MinerU's daemon-dependent model/configuration step is deferred.
+Existing enabled/running units keep their state; this option does not undo earlier
+activation. Foreground observability services receive disabled user units.
+
+Allocate ports in the same nonsecret host JSON used by client configuration.
+`NS_PORT_*` keys select listeners and their client/scrape targets; `AI_MEMORY_URL`
+remains the canonical memory endpoint. The default WSL host template reproduces
+the previous config bytes. Supply `--host-file PATH` to install, acceptance,
+`check_plan.py`, or the plan's `config/observability_config.py`. Installation saves
+only the resolved allocation in `$config_root/.service-ports.json`; later runs
+reuse it unless given another host file. Client rendering reads the selected
+host's keys through that same renderer. Check occupied ports in the shared WSL
+namespace before choosing values. Differing operator files return `needs_owner`.
+The staged files, service commands, acceptance URLs, and pinned gateway wrapper's
+derived digest all use this allocation. See [NO_START_PORTS.md](NO_START_PORTS.md)
+for sources, fail-first fixtures, and the separate target-host acceptance boundary.
 
 A row is installed by the default run when the manifest row says it installs something, its outcome is not `not_installed` and its state is not `split`, or when it carries an interim install (amendment 3 of the manifest's decision rule, 2026-10-03): an interim installs beside a decided default that installs nothing, whatever that row's state, so code search (split), durable memory (waiting for its measurement) and context supply (a definitive no-install row) install their interims, while their decided defaults stay as the rounds recorded them. `check_plan.py` requires the plan to install every interim the manifest records, with the interim's owner and repository, and requires each interim row's install function to call `interim_acknowledged` first. Two rows the manifest marks as installing are not: MCP Inspector (run on demand with `npx`; mcporter owns MCP calls from scripts) and the base distribution (the image the plan runs on). Two installed rows are left out of the default run: the local-model creation rows. The separate local-model-server row now carries the lasting-owner boot-enabled unit described below.
 
@@ -57,7 +79,14 @@ Installed route counts: native-installer 5; none 14; npm-global 5; uv-tool 9; mi
 
 Docker requires uidmap, dbus-user-session, kernel/rootless prerequisites and its upstream user unit. Exact Engine 29.8.2/Compose 5.5.1 apt revisions come from repository metadata; missing versions fail. Harbor's CLI installed in round 1; its overall installer failed later in Docker setup. Keep this prerequisite gate for the real distribution.
 
-Upstream Docker and Dagu user setup start their services during installation. Other documented foreground/daemon starts, including Alertmanager's, are in [SOURCES.md](SOURCES.md#service-starts--separate-from-installation); the install does not run them, so those services' health checks fail until they are started (as the real-distribution run showed). Post-install checks do not require them. Dagu's user-bus setup, rootless Docker, sandbox namespaces and Git worktree access were checked on the real distribution (VALIDATION.md).
+Upstream Docker and Dagu user setup normally starts their services during installation.
+The plan now controls activation separately: Dagu always uses no-service installation
+and its cited unit form, and `--no-start` also bypasses rootless Docker setup.
+Other documented foreground/daemon starts, including Alertmanager's, are in
+[SOURCES.md](SOURCES.md#service-starts--separate-from-installation); their new user
+units are registered without activation. Service-health checks run after an
+explicit start. The older Dagu/rootless Docker distribution results remain
+historical (VALIDATION.md); the new no-start path has fixture evidence only.
 
 GPT Researcher runs only through `tools/research/gpt_researcher.sh` (a keyless configuration, an `env -i` scrub, a fail-closed preflight and `research_report` only). DeerFlow's backend is installed with `uv sync --locked`; foreground research uses its shipped headless JSON CLI with the native 100-step recursion limit and the tagged keyless DDGS adapter. The scrub leaves Jina and Tavily keys empty, and callers select the current public config explicitly. The run retains original JSON events, unqualified returned AI text and an integration receipt requiring a matched substantive search result, linked final citation and terminal usage. Empty DDGS outcomes remain provider-availability evidence and fail acceptance. The measured Tavily adapter is a ready-to-apply proposal requiring a command-center ruling; it does not decide the separate provider-owner measurement or alter GPT Researcher's keyless route. No HTTP stack is started. Historical embedded-client and Compose recipes remain recorded in [SOURCES.md](SOURCES.md).
 

@@ -1,0 +1,10 @@
+# prometheus/alertmanager v0.34.1 Procfile:1 and README.md:394-396 (clustering disabled).
+[Unit]
+Description=Native stack Alertmanager
+
+[Service]
+ExecStart=@TOOLS_ROOT@/alertmanager/alertmanager-0.34.1.linux-amd64/alertmanager --config.file=@CONFIG_ROOT@/alertmanager.yaml --web.listen-address=127.0.0.1:@PORT_ALERTMANAGER@ --cluster.listen-address= --storage.path=@TOOLS_ROOT@/alertmanager/data
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

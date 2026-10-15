@@ -505,7 +505,8 @@ def plan_collector_ports() -> tuple[int, int]:
     """(OTLP/gRPC port, OTLP/HTTP port) of the install plan's collector, read from the plan's config/otel.yaml and not
     from the tool that renders from it."""
     match = re.search(r"protocols:\s*\n\s*grpc:\s*\n\s*endpoint:\s*127\.0\.0\.1:(\d+)\s*\n\s*http:\s*\n"
-                      r"\s*endpoint:\s*127\.0\.0\.1:(\d+)", read(PLAN_DIR / "config/otel.yaml"))
+                      r"\s*endpoint:\s*127\.0\.0\.1:(\d+)", read(PLAN_DIR / "config/otel.yaml")
+                      .replace("@PORT_OTEL_GRPC@", "21317").replace("@PORT_OTEL_HTTP@", "21318"))
     if match is None:
         raise AssertionError("the install plan's config/otel.yaml has no OTLP grpc and http endpoints")
     return int(match.group(1)), int(match.group(2))
@@ -524,7 +525,7 @@ def plan_loopback_ports() -> set[int]:
     ports = {int(row["service"]["port"]) for row in plan_rows()
              if isinstance(row.get("service"), dict) and row["service"].get("port") is not None}
     for config in sorted((PLAN_DIR / "config").rglob("*")):
-        if config.is_file():
+        if config.is_file() and "__pycache__" not in config.parts:
             ports.update(int(port) for port in re.findall(r"127\.0\.0\.1:(\d+)", read(config)))
     return ports | set(plan_collector_ports())
 

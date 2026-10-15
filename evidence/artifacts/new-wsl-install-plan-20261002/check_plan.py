@@ -3,10 +3,10 @@
 
 Reads install-plan.json, owners.json, install.sh, accept.sh, mise.toml, config/ and the merged definitive manifest, names every
 disagreement and exits 1; prints actual installed, measurement-only, excluded, command and acceptance counts
-and exits 0 when they agree. It runs `bash install.sh --list` (read-only) and
-installs nothing.
+and exits 0 when they agree. It inspects the literal `--list` table without
+executing either shell script and installs nothing.
 
-usage: python3 -B check_plan.py [--plan-dir DIR] [--manifest PATH]
+usage: python3 -B check_plan.py [--plan-dir DIR] [--manifest PATH] [--host-file PATH]
 """
 import argparse
 import collections
@@ -14,6 +14,7 @@ import hashlib
 import json
 import pathlib
 import re
+import runpy
 import shlex
 import subprocess
 import sys
@@ -24,8 +25,8 @@ RUNTIME_PINS = {"node", "python", "uv"}  # install.sh installs these uncondition
 ON_DEMAND = {"mcp-inspector", "base-distribution"}  # the manifest says installs; the plan installs nothing for them (README.md)
 GATE = "interim_acknowledged"  # install.sh's gate of the interim installs (amendment 3 of the manifest's decision rule)
 FUNCTION = re.compile(r"^([A-Za-z0-9_.-]+) ?\(\) ?\{(.*)$")
-PORT_IN_CONFIG = (re.compile(r"(?<![\d.])(?:\d{1,3}\.){3}\d{1,3}:(\d{4,5})\b|\[[0-9a-f:]*\]:(\d{4,5})\b|(?<![\w.]):(\d{4,5})\b"),
-                  re.compile(r"(?i)\b\w*port\w*\s*[=:]\s*[\"']?(\d{4,5})\b"))
+PORT_IN_CONFIG = (re.compile(r"(?<![\d.])(?:\d{1,3}\.){3}\d{1,3}:(\d{1,5})\b|\[[0-9a-f:]*\]:(\d{1,5})\b|(?<![\w.\[]):(\d{4,5})\b"),
+                  re.compile(r"(?i)\b\w*port\w*\s*[=:]\s*[\"']?(\d{1,5})\b"))
 
 
 def functions(text):
@@ -102,6 +103,71 @@ def ports_in(text):
             for match in pattern.finditer(line):
                 found.update(int(g) for g in match.groups() if g)
     return found
+
+
+def no_start_contract(rows, funcs, text, bad):
+    """Audit every service row, including native daemon rows without user units."""
+    if '--no-start) NS2604_NO_START=1; dagu_service_mode=no;' not in text:
+        bad("no-start", "install.sh must propagate --no-start to service activation and Dagu")
+    activation = funcs.get("activate_user_unit", "")
+    if 'if [[ "${NS2604_NO_START:-0}" != 1 ]]; then systemctl --user enable --now "$@"; fi' not in activation:
+        bad("no-start", "user-unit activation must be guarded by NS2604_NO_START")
+    registrar = funcs.get("register_service_row", "")
+    if ('"$slot" && register_service_row "$slot"' not in funcs.get("run_slot", "")
+            or "systemctl --user daemon-reload" not in registrar
+            or re.search(r"systemctl.*\b(?:enable|start|restart|preset)\b", registrar)):
+        bad("no-start", "every registered service row must install its unit and only daemon-reload")
+    for row in rows:
+        slot = row["slot"]
+        if not row.get("service"):
+            continue
+        body = "\n".join(line for line in funcs.get(slot, "").splitlines() if not line.lstrip().startswith("#"))
+        if slot not in {"mineru", "session-analytics"} and not (
+                ("systemd/user" in body and "systemctl --user daemon-reload" in body)
+                or f"{slot}) unit=" in registrar
+                or (slot == "local-model-server" and "systemctl --user daemon-reload" in body)):
+            bad("no-start", f"{slot}: service unit installation and daemon-reload are required")
+        if re.search(r"systemctl\s+--user\s+(?:enable|start|restart|preset)\b", body):
+            bad("no-start", f"{slot}: direct service activation bypasses --no-start")
+        if re.search(r"(?:agentsview daemon|mineru server) start\b", body) and 'if [[ "$NS2604_NO_START" != 1 ]]; then' not in body:
+            bad("no-start", f"{slot}: native daemon start bypasses --no-start")
+        if slot == "dagu" and '--service "$dagu_service_mode"' not in body:
+            bad("no-start", "dagu: installer must use its documented SERVICE_MODE=no")
+        if slot == "container-engine" and '"$NS2604_NO_START" != 1 &&' not in body:
+            bad("no-start", "container-engine: rootless setup starts Docker and must be skipped")
+    if 'if [[ "${NS2604_NO_START:-0}" == 1 ]]; then\n    sudo systemctl mask docker.service docker.socket containerd.service' not in funcs.get("docker_engine_packages", ""):
+        bad("no-start", "container-engine: package postinst activation must be blocked")
+
+
+def host_port_contract(plan_dir, rows, host_file, bad):
+    renderer = runpy.run_path(str(plan_dir / "config/observability_config.py"))
+    try:
+        ports = renderer["load_service_ports"](host_file)
+    except (OSError, ValueError) as error:
+        bad("ports", str(error))
+        return
+    slots = {row["slot"] for row in rows}
+    defaults = {str(default) for slot, default in renderer["SERVICE_PORTS"].values()}
+    pattern = re.compile(r"(?<![\w-])(?:" + "|".join(defaults) + r")(?![\w])")
+    nonservice_ports = {"ollama.service": {18231, 18232}, "prometheus-alerts.test.yaml": {21997},
+                       "openhands-worker.py": {1}}  # closed-port negative control, never a listener
+    for name, (slot, default) in renderer["SERVICE_PORTS"].items():
+        if slot not in slots:
+            bad("ports", f"{name}: unknown owning row {slot}")
+    for path in (plan_dir / "config").rglob("*"):
+        if not path.is_file() or "__pycache__" in path.parts or path.name == "observability_config.py":
+            continue
+        text = path.read_text()
+        active = "\n".join(line for line in text.splitlines() if not line.lstrip().startswith(("#", ";")))
+        # JSONL usage fixtures contain token counts, not endpoints. The two
+        # explicit exceptions are external GPU-owner guards and a synthetic alert label.
+        literal_ports = set() if path.suffix == ".fixture" else ports_in(active) - nonservice_ports.get(path.name, set())
+        if pattern.search(active) or literal_ports:
+            bad("ports", f"config/{path.relative_to(plan_dir / 'config')}: literal service port; use @PORT_NAME@")
+        try:
+            renderer["render_ports"](text, ports)
+        except ValueError as error:
+            bad("ports", f"{path.name}: {error}")
 
 
 def client_additional_checks(row, funcs, bad):
@@ -323,6 +389,7 @@ def main():
     here = pathlib.Path(__file__).resolve().parent
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--plan-dir", type=pathlib.Path, default=here)
+    ap.add_argument("--host-file", type=pathlib.Path)
     ap.add_argument("--manifest", type=pathlib.Path,
                     default=here.parent / "new-wsl-definitive-defaults-20261001" / "definitive-manifest.json")
     args = ap.parse_args()
@@ -338,6 +405,8 @@ def main():
     manifest = {s["slot_id"]: s for s in json.loads(args.manifest.read_text())["slots"] if s["catalog"] == "foundation"}
     install_text, accept_text = (plan_dir / "install.sh").read_text(), (plan_dir / "accept.sh").read_text()
     install_funcs, accept_funcs = functions(install_text), functions(accept_text)
+    no_start_contract(rows, install_funcs, install_text, bad)
+    host_port_contract(plan_dir, rows, args.host_file, bad)
 
     slots = [r["slot"] for r in rows]
     for slot, count in collections.Counter(slots).items():
@@ -555,12 +624,21 @@ def main():
         if r not in named_only and f'if [[ "$only" == {slot} ]]; then {slot}; elif [[ -z "$only" ]]; then skipped {slot}; fi' in accept_text:
             bad("dispatch", f"accept.sh skips row {slot} in the default run, but install.sh installs it by default")
 
-    # --list prints exactly the rows of install-plan.json
-    proc = subprocess.run(["bash", str(plan_dir / "install.sh"), "--list"], capture_output=True, text=True, cwd=plan_dir, timeout=120)
-    if proc.returncode != 0:
-        bad("list", f"bash install.sh --list exited {proc.returncode}: {proc.stderr.strip()[:200]}")
+    # Inspect the literal --list table without executing any installation script.
+    listing = re.search(r"^if \$list; then\n(.*?)^fi$", install_text, re.M | re.S)
+    lines = []
+    if listing:
+        for line in listing[1].splitlines():
+            if line.strip().startswith("printf "):
+                words = shlex.split(line)
+                if len(words) == 3 and words[1] == "%s\\n":
+                    lines.append(words[2])
+                else:
+                    bad("list", "--list must contain literal printf rows")
+    else:
+        bad("list", "missing --list table")
     printed = []
-    for line in proc.stdout.splitlines():
+    for line in lines:
         parts = line.split(" | ")
         printed.append((parts[0], " | ".join(parts[1:-2]), parts[-2], parts[-1]) if len(parts) >= 4 else (line, "", "", ""))
     expected = [(r["slot"], r["owner"], r["route"], "planned" if r["installed"] else "measurement-only" if r.get("measurement_only") else "excluded")
@@ -591,7 +669,7 @@ def main():
     ollama = by_slot.get("local-model-server", {})
     if not ollama.get("needs", {}).get("systemd_user_unit"):
         bad("local-model-server", "lasting GPU owner requires its user-unit prerequisite")
-    native_enable = "systemctl --user daemon-reload && systemctl --user enable --now ollama.service"
+    native_enable = "systemctl --user daemon-reload && activate_user_unit ollama.service"
     if native_enable not in ollama.get("commands", []):
         bad("local-model-server", "missing native daemon-reload and boot enable/start command")
     health = (ollama.get("acceptance", {}).get("service_health") or {}).get("command") or ""
@@ -611,7 +689,8 @@ def main():
     }
     for name, expected in assets.items():
         path = plan_dir / "config" / name
-        if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != expected:
+        renderer = runpy.run_path(str(plan_dir / "config/observability_config.py"))
+        if not path.is_file() or hashlib.sha256(renderer["render_ports"](path.read_text(), renderer["service_ports"]()).encode()).hexdigest() != expected:
             bad("local-model-server", f"{name} differs from its designated owner-approved bytes")
         if f"copy_config '{name}'" not in install_funcs.get("local-model-server", ""):
             bad("local-model-server", f"install function must place {name} through copy_config")
@@ -646,7 +725,7 @@ def main():
     # Config files: service copy_config calls and direct, preserving tool-config installs both consume plan files.
     # Ports do not collide between rows. Only the install source operand counts, never an arbitrary filename mention.
     config = {p.relative_to(plan_dir / "config").as_posix()
-              for p in (plan_dir / "config").rglob("*") if p.is_file()}
+              for p in (plan_dir / "config").rglob("*") if p.is_file() and "__pycache__" not in p.parts}
     copied = set(re.findall(r"copy_config '([^']+)'", install_text))
     commands = "\n".join(command for row in rows for command in row["commands"])
     copied.update(re.findall(r'install -m 0600 -- "\$plan_dir/config/([A-Za-z0-9._@/-]+)" "[^"\n]+"', commands))

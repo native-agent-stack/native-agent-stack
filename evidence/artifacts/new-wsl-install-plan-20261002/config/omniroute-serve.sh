@@ -17,4 +17,4 @@ printf '{"announced_codex_client_version": "%s", "started_at": "%s", "build": "%
   "${CODEX_CLIENT_VERSION:-}" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$(basename "$PREFIX")" > "$state/omniroute-gateway.json"
 # lsof shim v2 first on PATH (evidence/artifacts/omniroute-sol-max-20260930/scripts/lsof-shim-v2.sh.txt; remove when upstream serve preflight ignores clients)
 PATH="$PREFIX/shim:$PATH"; export PATH
-exec "$PREFIX/bin/omniroute" serve --port 21128 --no-open --no-tray
+exec "$PREFIX/bin/omniroute" serve --port @PORT_GATEWAY@ --no-open --no-tray

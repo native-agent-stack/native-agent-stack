@@ -3,9 +3,9 @@
 auth_enabled: false
 server:
   http_listen_address: 127.0.0.1
-  http_listen_port: 21300
+  http_listen_port: @PORT_LOKI_HTTP@
   grpc_listen_address: 127.0.0.1
-  grpc_listen_port: 21396
+  grpc_listen_port: @PORT_LOKI_GRPC@
   log_level: debug
   grpc_server_max_concurrent_streams: 1000
 common:
@@ -40,6 +40,6 @@ schema_config:
 pattern_ingester:
   enabled: true
   metric_aggregation:
-    loki_address: 127.0.0.1:21300
+    loki_address: 127.0.0.1:@PORT_LOKI_HTTP@
 frontend:
   encoding: protobuf

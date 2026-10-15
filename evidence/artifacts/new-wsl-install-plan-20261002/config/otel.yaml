@@ -6,9 +6,9 @@ receivers:
   otlp:
     protocols:
       grpc:
-        endpoint: 127.0.0.1:21317
+        endpoint: 127.0.0.1:@PORT_OTEL_GRPC@
       http:
-        endpoint: 127.0.0.1:21318
+        endpoint: 127.0.0.1:@PORT_OTEL_HTTP@
   file_log/sdk_receipts:
     include: ["${env:NS2604_OBSERVABILITY_DATA}/sdk-receipts/*.json"]
     start_at: beginning
@@ -40,7 +40,7 @@ receivers:
   http_check/ecosystem:
     collection_interval: 30s
     targets:
-      - endpoint: http://127.0.0.1:21333/health/status
+      - endpoint: http://127.0.0.1:@PORT_OTEL_HEALTH@/health/status
         timeout: 5s
       # 2026-10-06: selected native HTTP health routes; metrics exposure is a separate service-owner qualification.
       # OmniRoute 3.8.51 unauthenticated liveness: diegosouzapw/OmniRoute@c1e30b7676975feb298b49eff6ff58923c04b89e
@@ -52,13 +52,13 @@ receivers:
       # on-demand daemon (observed only, no alert rule): kenn-io/agentsview (pin: manifests/stack.json, agentsview)
       # internal/server/huma_routes_health.go:19-23. A refused connection records httpcheck.error and status 0 without
       # a scrape error (receiver/httpcheckreceiver/scraper.go:407-451 at v0.162.0).
-      - endpoint: http://127.0.0.1:21128/api/health
+      - endpoint: http://127.0.0.1:@PORT_GATEWAY@/api/health
         timeout: 5s
-      - endpoint: http://127.0.0.1:21080/api/v1/health
+      - endpoint: http://127.0.0.1:@PORT_DAGU@/api/v1/health
         timeout: 5s
-      - endpoint: http://127.0.0.1:21434/api/version
+      - endpoint: http://127.0.0.1:@PORT_OLLAMA@/api/version
         timeout: 5s
-      - endpoint: http://127.0.0.1:21808/api/ping
+      - endpoint: http://127.0.0.1:@PORT_AGENTSVIEW@/api/ping
         timeout: 5s
   # clock-offset-check (a user oneshot every minute, and clock-change-check on a clock step or zone change) writes one
   # line per run to the journal: "OK|WARN|CRIT <UTC time> ...". Match SYSLOG_IDENTIFIER, never the unit: journald loses
@@ -461,7 +461,7 @@ processors:
     send_batch_max_size: 512
 exporters:
   prometheus:
-    endpoint: 127.0.0.1:21889
+    endpoint: 127.0.0.1:@PORT_OTEL_EXPORTER@
     # Only the lane name becomes a label (ecosystem_lane); other resource attributes stay on target_info.
     # resource_constant_labels replaces the deprecated resource_to_telemetry_conversion, whose enabled: false was the
     # default; configuring both is a validation error (opentelemetry-collector-contrib v0.161.0,
@@ -469,7 +469,7 @@ exporters:
     resource_constant_labels:
       included: ["ecosystem.lane"]
   otlphttp/loki:
-    endpoint: http://127.0.0.1:21300/otlp
+    endpoint: http://127.0.0.1:@PORT_LOKI_HTTP@/otlp
     sending_queue:
       enabled: true
       queue_size: 1000
@@ -552,7 +552,7 @@ extensions:
     create_directory: true
     directory_permissions: "0700"
   health_check:
-    endpoint: 127.0.0.1:21333
+    endpoint: 127.0.0.1:@PORT_OTEL_HEALTH@
     path: /health/status
 service:
   extensions: [file_storage, health_check]
@@ -565,7 +565,7 @@ service:
             exporter:
               prometheus:
                 host: 127.0.0.1
-                port: 21888
+                port: @PORT_OTEL_METRICS@
   pipelines:
     logs:
       receivers: [otlp]

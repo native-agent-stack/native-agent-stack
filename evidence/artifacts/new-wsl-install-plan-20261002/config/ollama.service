@@ -10,9 +10,9 @@ Description=Ollama 0.35.0 local model server (NativeStack2604; one GPU owner at 
 After=network-online.target
 
 [Service]
-ExecCondition=/bin/sh -c 'out=$$(/usr/bin/ss -ltnH "( sport = :18231 or sport = :18232 or sport = :21434 )") || exit 255; test -z "$$out"'
+ExecCondition=/bin/sh -c 'out=$$(/usr/bin/ss -ltnH "( sport = :18231 or sport = :18232 or sport = :@PORT_OLLAMA@ )") || exit 255; test -z "$$out"'
 ExecStart=%h/.local/share/mise/installs/ollama/0.35.0/bin/ollama serve
-Environment=OLLAMA_HOST=127.0.0.1:21434
+Environment=OLLAMA_HOST=127.0.0.1:@PORT_OLLAMA@
 Environment=OLLAMA_KEEP_ALIVE=30m
 Environment=OLLAMA_NUM_PARALLEL=1
 Environment=OLLAMA_NO_CLOUD=1

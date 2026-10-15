@@ -1,0 +1,12 @@
+# grafana/grafana v13.2.3 docs/sources/setup-grafana/start-restart-grafana.md:107.
+[Unit]
+Description=Native stack Grafana
+
+[Service]
+WorkingDirectory=@GRAFANA_HOME@
+Environment=NS2604_OBSERVABILITY_DATA=@DATA_ROOT@
+ExecStart=%h/.local/bin/grafana server --homepath @GRAFANA_HOME@ --config @CONFIG_ROOT@/grafana.ini
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

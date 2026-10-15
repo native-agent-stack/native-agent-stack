@@ -1298,7 +1298,7 @@
         "uv tool install --python 3.13 \"mineru==4.0.10\"",
         "npm install --global --prefix \"$tool_root/skills-1.7.0\" skills@1.7.0",
         "python3 -B \"$repo_root/tools/adoption/install_skills.py\" --manifest \"$plan_dir/config/mineru-skills-manifest.json\" --skills-bin \"$tool_root/skills-1.7.0/bin/skills\" --json --only mineru",
-        "mineru_started=false; if ! mineru server status --json | jq -e '.running == true' >/dev/null; then   mineru server start;   mineru_started=true; fi; trap 'if $mineru_started; then mineru server stop; fi' EXIT; mineru telemetry disable; mineru-kit models download --tier standard; mineru-kit models verify --tier standard; mineru config set parse_server.local.managed_tier standard; mineru config set parse_server.local.mode managed",
+        "if [[ \"$NS2604_NO_START\" != 1 ]]; then mineru_started=false; if ! mineru server status --json | jq -e '.running == true' >/dev/null; then   mineru server start;   mineru_started=true; fi; trap 'if $mineru_started; then mineru server stop; fi' EXIT; mineru telemetry disable; mineru-kit models download --tier standard; mineru-kit models verify --tier standard; mineru config set parse_server.local.managed_tier standard; mineru config set parse_server.local.mode managed; else printf \"Deferred MinerU daemon/model configuration under --no-start.\\\\n\"; fi",
         "fetch_verified https://raw.githubusercontent.com/opendatalab/MinerU/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/demo/pdfs/demo1.pdf f3b3be345bf2df8979f2491ca9466e078e4fd1d6a216611faa8566e4c44d474b \"$tool_root/mineru/demo1.pdf\""
       ],
       "needs": {
@@ -1597,7 +1597,7 @@
         "tar -xzf \"$HOME/.local/opt/ai-memory-2.5.2/ai-memory-linux-x86_64.tar.gz\" -C \"$HOME/.local/opt/ai-memory-2.5.2\" && ln -sfn \"$HOME/.local/opt/ai-memory-2.5.2/ai-memory\" \"$HOME/.local/bin/ai-memory\"",
         "if [[ ! -e \"$HOME/.config/ai-memory/config.toml\" ]]; then mkdir -p \"$HOME/.config/ai-memory\" \"$HOME/.local/share/ai-memory\" && ai-memory --data-dir \"$HOME/.local/share/ai-memory\" --config \"$HOME/.config/ai-memory/config.toml\" init; fi",
         "f=\"$HOME/.config/ai-memory/config.toml\"; if grep -qx 'bind = \"127.0.0.1:49374\"' \"$f\"; then sed -i 's|^bind = \"127.0.0.1:49374\"$|bind = \"127.0.0.1:29374\"\\nembedding_provider = \"local\"|' \"$f\"; fi; grep -qx 'bind = \"127.0.0.1:29374\"' \"$f\"; grep -qx 'embedding_provider = \"local\"' \"$f\"",
-        "mkdir -p \"$HOME/.config/systemd/user\" && sed 's|^ExecStart=/usr/bin/ai-memory |ExecStart=%h/.local/bin/ai-memory |' \"$HOME/.local/opt/ai-memory-2.5.2/packaging/systemd/ai-memory-user.service\" > \"$HOME/.config/systemd/user/ai-memory.service\" && systemctl --user daemon-reload && systemctl --user enable --now ai-memory.service",
+        "mkdir -p \"$HOME/.config/systemd/user\" && sed 's|^ExecStart=/usr/bin/ai-memory |ExecStart=%h/.local/bin/ai-memory |' \"$HOME/.local/opt/ai-memory-2.5.2/packaging/systemd/ai-memory-user.service\" > \"$HOME/.config/systemd/user/ai-memory.service\" && systemctl --user daemon-reload && activate_user_unit ai-memory.service",
         "AI_MEMORY_SERVER_URL=http://127.0.0.1:29374 ai-memory install-hooks --agent codex --apply"
       ],
       "needs": {
@@ -1804,7 +1804,7 @@
         "fetch_verified https://github.com/rtk-ai/rtk/releases/download/v0.51.0/rtk-x86_64-unknown-linux-musl.tar.gz 5028d3b19a8f0990d30fec9fbb07e32782bc5698e618fb1861aad8a9ccba4eb5 \"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/downloads/rtk-0.51.0/rtk-x86_64-unknown-linux-musl.tar.gz\"",
         "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"; mkdir -p \"$e/tools/rtk-0.51.0\" \"$e/bin\"; tar -xf \"$e/downloads/rtk-0.51.0/rtk-x86_64-unknown-linux-musl.tar.gz\" -C \"$e/tools/rtk-0.51.0\"; [[ -x \"$e/tools/rtk-0.51.0/rtk\" ]]; ln -sfn \"$e/tools/rtk-0.51.0/rtk\" \"$e/bin/rtk\"",
         "rtk_config_dir=\"$HOME/.config/rtk\"; if [[ \"${XDG_CONFIG_HOME:-}\" == /* ]]; then rtk_config_dir=\"$XDG_CONFIG_HOME/rtk\"; fi; mkdir -p -- \"$rtk_config_dir\"; if [[ ! -e \"$rtk_config_dir/config.toml\" ]]; then install -m 0600 -- \"$plan_dir/config/rtk-config.toml\" \"$rtk_config_dir/config.toml\"; elif ! cmp -s -- \"$plan_dir/config/rtk-config.toml\" \"$rtk_config_dir/config.toml\"; then printf \"Existing RTK config.toml differs; retained. Review hook exclusions before client configuration.\\n\" >&2; fi",
-        "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"; for command in \"git show HEAD:README.md | tail -20\" \"diff a b\" \"jq . x.json\" \"git branch -a\"; do rc=0; decision=$(RTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" hook check \"$command\" 2>&1) || rc=$?; [[ \"$rc\" -eq 1 && \"$decision\" == \"No rewrite for: $command\" ]]; done; decision=$(RTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" hook check \"git status\" 2>&1); [[ \"$decision\" == \"rtk git status\" ]]",
+        "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"; for command in \"git show HEAD:README.md | tail -20\" \"diff a b\" \"jq . x.json\" \"git branch -a\"; do rc=0; decision=$(RTK_TELEMETRY_DISABLED=1 RTK_SUPPRESS_HOOK_WARNING=1 \"$e/bin/rtk\" hook check \"$command\" 2>&1) || rc=$?; [[ \"$rc\" -eq 1 && \"$decision\" == \"No rewrite for: $command\" ]]; done; decision=$(RTK_TELEMETRY_DISABLED=1 RTK_SUPPRESS_HOOK_WARNING=1 \"$e/bin/rtk\" hook check \"git status\" 2>&1); [[ \"$decision\" == \"rtk git status\" ]]",
         "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"; PATH=\"$e/bin:$PATH\" RTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" init -g --codex",
         "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"; python3 \"$repo_root/tools/adoption/codex_hook_trust.py\" --command \"rtk hook codex\" --rtk \"$e/bin/rtk\" --apply"
       ],
@@ -1824,7 +1824,7 @@
       "service": null,
       "acceptance": {
         "post_install": {
-          "command": "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"\n[[ \"$(\"$e/bin/rtk\" --version)\" == \"rtk 0.51.0\" ]]\ncd \"$repo_root\"\nRTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" git log -n 3\nRTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" proxy git log -n 3\ne=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"\nfor command in \"git show HEAD:README.md | tail -20\" \"diff a b\" \"jq . x.json\" \"git branch -a\"; do\n  rc=0\n  decision=$(RTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" hook check \"$command\" 2>&1) || rc=$?\n  [[ \"$rc\" -eq 1 && \"$decision\" == \"No rewrite for: $command\" ]]\ndone\ndecision=$(RTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" hook check \"git status\" 2>&1)\n[[ \"$decision\" == \"rtk git status\" ]]\ncodex_home=\"${CODEX_HOME:-$HOME/.codex}\"\nshown=$(RTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" init --show --codex 2>&1)\n[[ \"$shown\" == *\"[ok] Global hook: $codex_home/hooks.json\"* ]]\n[[ \"$shown\" == *\"[ok] Global RTK.md: $codex_home/RTK.md\"* ]]\npython3 \"$repo_root/tools/adoption/codex_hook_trust.py\" --command \"rtk hook codex\" --rtk \"$e/bin/rtk\" --check",
+          "command": "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"\n[[ \"$(\"$e/bin/rtk\" --version)\" == \"rtk 0.51.0\" ]]\ncd \"$repo_root\"\nRTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" git log -n 3\nRTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" proxy git log -n 3\ne=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"\nfor command in \"git show HEAD:README.md | tail -20\" \"diff a b\" \"jq . x.json\" \"git branch -a\"; do\n  rc=0\n  decision=$(RTK_TELEMETRY_DISABLED=1 RTK_SUPPRESS_HOOK_WARNING=1 \"$e/bin/rtk\" hook check \"$command\" 2>&1) || rc=$?\n  [[ \"$rc\" -eq 1 && \"$decision\" == \"No rewrite for: $command\" ]]\ndone\ndecision=$(RTK_TELEMETRY_DISABLED=1 RTK_SUPPRESS_HOOK_WARNING=1 \"$e/bin/rtk\" hook check \"git status\" 2>&1)\n[[ \"$decision\" == \"rtk git status\" ]]\ncodex_home=\"${CODEX_HOME:-$HOME/.codex}\"\nshown=$(RTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" init --show --codex 2>&1)\n[[ \"$shown\" == *\"[ok] Global hook: $codex_home/hooks.json\"* ]]\n[[ \"$shown\" == *\"[ok] Global RTK.md: $codex_home/RTK.md\"* ]]\npython3 \"$repo_root/tools/adoption/codex_hook_trust.py\" --command \"rtk hook codex\" --rtk \"$e/bin/rtk\" --check",
           "kind": "smoke",
           "source": {
             "url": "https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L121",
@@ -2256,7 +2256,8 @@
       "service": {
         "form": "service form: not documented upstream for systemd user; foreground otelcol-contrib --config",
         "port": 21333,
-        "port_setting": "health_check.endpoint=127.0.0.1:21333 path=/health/status; OTLP grpc/http endpoint=127.0.0.1:21317/21318; service.telemetry.metrics.readers.pull.exporter.prometheus host=127.0.0.1 port=21888; native metrics exporter=127.0.0.1:21889; NS2604_OBSERVABILITY_DATA is the shared service/validation data root"
+        "port_setting": "health_check.endpoint=127.0.0.1:21333 path=/health/status; OTLP grpc/http endpoint=127.0.0.1:21317/21318; service.telemetry.metrics.readers.pull.exporter.prometheus host=127.0.0.1 port=21888; native metrics exporter=127.0.0.1:21889; NS2604_OBSERVABILITY_DATA is the shared service/validation data root",
+        "unit": "ns2604-otel-collector.service"
       },
       "acceptance": {
         "post_install": {
@@ -2278,7 +2279,9 @@
       },
       "config_paths": [
         "$config_root/otel.yaml",
-        "$config_root/observability_config.py"
+        "$config_root/observability_config.py",
+        "$config_root/ns2604-otel-collector.service.example",
+        "$config_root/systemd/ns2604-otel-collector.service"
       ],
       "notes": "Selected 0.162.0; qualified on scratch/synthetic validation only (evidence/receipts/otelcol-contrib-0162-qualification-20261003.json:11-15); host acceptance pending. NativeStack2604 release hold: the release-tag build-and-test failed (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117). G4 source-backed plan repair, UNRUN on a distribution: release v0.162.0 remains the selected checksum-verified tar installation. Installation creates the owned observability/otelcol/queue, collector and sdk-receipts directories; both the service and acceptance use NS2604_OBSERVABILITY_DATA (default ${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/observability). Pristine configurations adopt the existing repository native privacy, metrics, Loki and SDK-receipt pipelines in this PR, adapted to the plan ports. Existing operator pipelines are retained; only the exact /otelcol/queue directory is migrated, with native validation before replacement. file_storage create_directory and directory_permissions=0700 cover a clean install. The measured destination runs ns2604-otelcol-contrib.service, not ecosystem-*; this plan starts no service. The client configuration map already wires both native clients to HTTP21318; acceptance of a fresh destination session remains host work.",
       "release_asset": {
@@ -2427,7 +2430,8 @@
       "service": {
         "form": "service form: not documented upstream for systemd user; foreground loki -config.file",
         "port": 21300,
-        "port_setting": "server.http_listen_address=127.0.0.1 http_listen_port=21300 grpc_listen_address=127.0.0.1 grpc_listen_port=21396 (docs/sources/shared/configuration.md:6196-6216)"
+        "port_setting": "server.http_listen_address=127.0.0.1 http_listen_port=21300 grpc_listen_address=127.0.0.1 grpc_listen_port=21396 (docs/sources/shared/configuration.md:6196-6216)",
+        "unit": "ns2604-loki.service"
       },
       "acceptance": {
         "post_install": {
@@ -2448,7 +2452,9 @@
         }
       },
       "config_paths": [
-        "$config_root/loki.yaml"
+        "$config_root/loki.yaml",
+        "$config_root/ns2604-loki.service.example",
+        "$config_root/systemd/ns2604-loki.service"
       ],
       "notes": "Measurement only: the manifest state is split, so the default run installs nothing and prints skipped; --only loki installs it for the deciding measurement (manifest: critic 1: tool results and API errors exist only as log events, so observing outcomes needs an event store and a display; critic 2: the requirement names usage and outcomes, not log search, and the Collector's connectors turn events into counters for Prometheus). Planned. Documented release-binary route plus published checksum. Download/checksum/user-prefix operations are script transport glue, not a claimed verbatim upstream installer; version/artifact parameterization and extraction follow cited source. Release-note template tools/release-note.md:24-28 supplies exact curl/unzip/chmod commands; release variable pinned to v3.7.8. No upstream systemd user unit documented; installed binary/configuration only, foreground service start remains separate.",
       "release_asset": {
@@ -2471,8 +2477,8 @@
         "(cd \"$tool_root/grafana\" && tar -zxvf 'grafana_13.2.3_36482603486_linux_amd64.tar.gz')",
         "link_grafana",
         "install -m 0600 -- \"$plan_dir/config/observability_config.py\" \"$config_root/observability_config.py\"",
-        "NS2604_OBSERVABILITY_DATA=\"${NS2604_OBSERVABILITY_DATA:-${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/observability}\" python3 \"$config_root/observability_config.py\" grafana --config-root \"$config_root\" --source-root \"$plan_dir/config\"",
-        "units=\"${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user\" && install -d -m 0700 -- \"$units\" && install -m 0600 -- \"$config_root/systemd/ns2604-research-progress.service\" \"$config_root/systemd/ns2604-research-progress.timer\" \"$units/\" && systemctl --user daemon-reload && systemctl --user enable --now ns2604-research-progress.timer"
+        "NS2604_OBSERVABILITY_DATA=\"${NS2604_OBSERVABILITY_DATA:-${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/observability}\" python3 \"$config_root/observability_config.py\" grafana --config-root \"$config_root\" --source-root \"$plan_dir/config\" --repo-root \"$repo_root\"",
+        "units=\"${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user\" && install -d -m 0700 -- \"$units\" && install -m 0600 -- \"$config_root/systemd/ns2604-research-progress.service\" \"$config_root/systemd/ns2604-research-progress.timer\" \"$units/\" && systemctl --user daemon-reload && activate_user_unit ns2604-research-progress.timer"
       ],
       "needs": {
         "sudo": false,
@@ -2490,7 +2496,8 @@
       "service": {
         "form": "service form: not documented upstream for systemd user; upstream system-wide service and foreground grafana server",
         "port": 21301,
-        "port_setting": "[server] http_addr=127.0.0.1 http_port=21301 (conf/defaults.ini:50-53); [grpc_server] address=127.0.0.1:21302 (conf/defaults.ini:117-119)"
+        "port_setting": "[server] http_addr=127.0.0.1 http_port=21301 (conf/defaults.ini:50-53); [grpc_server] address=127.0.0.1:21302 (conf/defaults.ini:117-119)",
+        "unit": "ns2604-grafana.service"
       },
       "acceptance": {
         "post_install": {
@@ -2535,7 +2542,9 @@
         "$config_root/grafana-dashboards/lanes.json",
         "$plan_dir/config/grafana-command-center.json",
         "$config_root/ecosystem-grafana-dashboards/command-center.json",
-        "$plan_dir/config/lanes-registry.json"
+        "$plan_dir/config/lanes-registry.json",
+        "$config_root/ns2604-grafana.service.example",
+        "$config_root/systemd/ns2604-grafana.service"
       ],
       "notes": "Selected 13.2.3 in the WSL profile/install plan; qualified on scratch/synthetic validation only (W1b receipt:11-14, https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14); host acceptance pending. NativeStack2604 release hold: open regression reports grafana/grafana#133835 and #133856 (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117). W1b moves the stack manifest and snapshot selection to 13.2.3; the deployed host and its retained acceptance evidence remain 13.2.2. G4 source-backed plan repair, UNRUN on a distribution: verified OSS 13.2.3 tar route remains available with --only grafana. The canonical selection still marks this row split/measurement-only; this bounded job cannot edit owners.json or the definitive manifest. Finalization must explicitly install this slot (and Loki) before service acceptance; the coordinator owns reconciliation of that selection. Native file provisioning installs the token-layer dashboard and the three datasource definitions. All six affected hourly Claude queries retain [1h] and use targets[].interval=1m. Anonymous Viewer is loopback only. Post-install archive/JSON checks are repository integration checks; running native HTTP datasource/query operations provide functional acceptance. Alertmanager acceptance uses the frontend plugin testDatasource /api/v2/status proxy operation, not its unavailable backend health endpoint. After sign-in the existing native SDK worker produces a new sanitized receipt and all six affected Claude plus three SDK-receipt queries must return observed values. No synthetic receipt substitutes for that workload. Counter first-sample undercount remains a separate Prometheus service-start prerequisite; never sum overlapping native counters or cumulative snapshots. A30 custody preflight: any reappearance of the three exact retired provisioning paths (including a dangling symlink) returns nonzero needs_owner before Grafana publication or checking. Historical digests are provenance only; the co-op preserves the backup and owns any later retirement after the command-center soak. All three acceptance stages invoke the current plan helper first so a stale installed copy cannot bypass the check; native prompts and workload gates remain byte-identical. Sources: python/cpython@v3.13.16:Lib/pathlib/_abc.py:432-437; grafana/grafana@6193dc03311b631b9727b560d24369e683dc396e:docs/sources/administration/provisioning/index.md:90,339,371; seathatflowsinourveins/native-agent-stack@86268eb193700714fe4b6df5eb956f485b91bbe6:evidence/artifacts/new-wsl-install-plan-20261002/config/observability_config.py:115-141. 2026-10-06 port of the observation front door: a second file provider (folder Ecosystem) adds research-grand, ecosystem-native and native-foundation-data, rendered for this host by observability/ns2604_dashboards.py (datasource UIDs ns2604-*, metric names without the workstation collector's ecosystem_ namespace); the grafana action also renders the research emitter units (ns2604-research-progress.service and .timer, adapted from observability/grand-dashboard/install.py), which run progress.py every 30 seconds: it reads restic-backup, restic-restore-check and tz-currency-check through `dagu history <dag> --format json` (no Dagu login; Dagu authentication is unchanged) and pushes to Loki on 21300; grafana.ini turns the news feed off. Provider and ini changes load when Grafana starts, so the service owner restarts ns2604-grafana.service after this install. J775 step8: lanes.json has UID cc-lanes and uses the existing Token efficiency file provider at grafana-dashboards/lanes.json. The registry is an operator-populated empty example, never installed over private canonical roots. Provisioned-UID API acceptance includes cc-lanes; panel-query/browser and identity/freshness readback remain gated. Matching withdrawal/rollback is recorded in lane_dashboard_provisioning. 2026-10-13: the command center's god view (UID cc-god-view, docs/decisions/2026-10-13-command-center-god-view.md) is rendered by the same transport from $plan_dir/config/grafana-command-center.json into the Ecosystem provider; provisioned-UID acceptance includes it, and its withdrawal/rollback is recorded in command_center_dashboard_provisioning.",
       "release_asset": {
@@ -2570,18 +2579,18 @@
           "scope": "Empty public template; operator separately supplies canonical native roots in a private registry"
         },
         "readback_gate": "Provisioned cc-lanes UID plus panel-query results for1h/24h and browser readback of current native identities, freshness and unknown rows; not accepted by source rendering",
-          "rollback": "File-based rollback under the same Token efficiency provider: restore the previous grafana-dashboards/lanes.json if retaining Lanes. To withdraw cc-lanes, remove only that lanes.json and temporarily set disableDeletion=false on the nativestack2604-token-layer provider. Restart ns2604-grafana.service in a permitted slot; verify the anonymous /api/dashboards/uid/cc-lanes returns 404, then restore disableDeletion=true and restart/read back the provider configuration. Preserve token-layer.json, the provider, all other dashboards and the private registry. No administrator login or Grafana UI mutation is required."
+        "rollback": "File-based rollback under the same Token efficiency provider: restore the previous grafana-dashboards/lanes.json if retaining Lanes. To withdraw cc-lanes, remove only that lanes.json and temporarily set disableDeletion=false on the nativestack2604-token-layer provider. Restart ns2604-grafana.service in a permitted slot; verify the anonymous /api/dashboards/uid/cc-lanes returns 404, then restore disableDeletion=true and restart/read back the provider configuration. Preserve token-layer.json, the provider, all other dashboards and the private registry. No administrator login or Grafana UI mutation is required."
       },
       "command_center_dashboard_provisioning": {
-          "source": "$plan_dir/config/grafana-command-center.json",
-          "published_path": "$config_root/ecosystem-grafana-dashboards/command-center.json",
-          "renderer": "observability/command_center_dashboard.py through observability/ns2604_dashboards.py",
-          "provider": "nativestack2604-ecosystem",
-          "folder": "Ecosystem",
-          "uid": "cc-god-view",
-          "readback_gate": "Provisioned cc-god-view UID with meta.provisioned, served bytes equal to the published file, every panel query returning data or a labelled no data, and browser readback of the lane roster; hcom columns need the re-rendered research-progress unit (no --name) and its freshness gauge",
-          "rollback": "Remove only ecosystem-grafana-dashboards/command-center.json and temporarily set disableDeletion=false on the nativestack2604-ecosystem provider. Restart ns2604-grafana.service in a permitted slot; verify the anonymous /api/dashboards/uid/cc-god-view returns 404, then restore disableDeletion=true and restart/read back the provider configuration. Preserve the other Ecosystem dashboards, the Token efficiency provider and the private registry. No administrator login or Grafana UI mutation is required."
-        }
+        "source": "$plan_dir/config/grafana-command-center.json",
+        "published_path": "$config_root/ecosystem-grafana-dashboards/command-center.json",
+        "renderer": "observability/command_center_dashboard.py through observability/ns2604_dashboards.py",
+        "provider": "nativestack2604-ecosystem",
+        "folder": "Ecosystem",
+        "uid": "cc-god-view",
+        "readback_gate": "Provisioned cc-god-view UID with meta.provisioned, served bytes equal to the published file, every panel query returning data or a labelled no data, and browser readback of the lane roster; hcom columns need the re-rendered research-progress unit (no --name) and its freshness gauge",
+        "rollback": "Remove only ecosystem-grafana-dashboards/command-center.json and temporarily set disableDeletion=false on the nativestack2604-ecosystem provider. Restart ns2604-grafana.service in a permitted slot; verify the anonymous /api/dashboards/uid/cc-god-view returns 404, then restore disableDeletion=true and restart/read back the provider configuration. Preserve the other Ecosystem dashboards, the Token efficiency provider and the private registry. No administrator login or Grafana UI mutation is required."
+      }
     },
     {
       "layer": "observation-inference",
@@ -2618,7 +2627,7 @@
       "commands": [
         "mise use -g ollama@0.35.0",
         "ollama_unit_path=\"$HOME/.config/systemd/user/ollama.service\"; if [[ -L \"$ollama_unit_path\" ]] || { [[ -e \"$ollama_unit_path\" ]] && ! cmp -s -- \"$config_root/ollama.service\" \"$ollama_unit_path\"; }; then   printf 'needs_owner: retained differing Ollama unit.\\n' >&2;   exit 3; fi; install -d -m 0700 -- \"$HOME/.config/systemd/user\" && install -m 0600 -- \"$config_root/ollama.service\" \"$ollama_unit_path\"",
-        "systemctl --user daemon-reload && systemctl --user enable --now ollama.service"
+        "systemctl --user daemon-reload && activate_user_unit ollama.service"
       ],
       "needs": {
         "sudo": false,
@@ -2720,7 +2729,8 @@
       "service": {
         "form": "service form: not documented upstream for systemd user; foreground alertmanager",
         "port": 21093,
-        "port_setting": "--web.listen-address=127.0.0.1:21093 (Procfile:1; cmd/alertmanager/main.go:63); --cluster.listen-address= turns clustering off (README.md:394-396)"
+        "port_setting": "--web.listen-address=127.0.0.1:21093 (Procfile:1; cmd/alertmanager/main.go:63); --cluster.listen-address= turns clustering off (README.md:394-396)",
+        "unit": "ns2604-alertmanager.service"
       },
       "acceptance": {
         "post_install": {
@@ -2757,7 +2767,9 @@
         "$config_root/prometheus-alerts.test.yaml",
         "$config_root/acceptance-targets.json",
         "$config_root/prometheus.yaml",
-        "$config_root/observability_config.py"
+        "$config_root/observability_config.py",
+        "$config_root/ns2604-alertmanager.service.example",
+        "$config_root/systemd/ns2604-alertmanager.service"
       ],
       "notes": "G4 source-backed plan repair, UNRUN on a distribution: the v0.34.1 checksum-verified tar installation is unchanged. Native webhook url_file or Telegram bot_token_file/chat_id_file wiring is rendered and accepted with amtool only once the private file metadata is safe; the existing sink stays until that point. Prometheus alertmanager discovery, rule_files, collector scrapes and an empty acceptance-fixture file_sd are installed. Native promtool check rules and test rules cover firing and resolution using synthetic rule inputs. Selected after_sign_in acceptance also exercises a confirmed closed loopback fixture, observes native Prometheus firing/resolution, posts a uniquely tagged expiring alert with amtool, and requires notification counters to increase without failures. It returns pending until an independent user receiver confirmation matches the bounded receipt. A local sink or readiness response is not READY delivery. Loki ruler evaluation is deferred because its measurement-only slot is outside this ownership; Prometheus service rules are active after deployment. The observed destination unit is ns2604-alertmanager.service; the older ecosystem-* note was not a deployed unit inventory. Repair: stale or mismatched delivery/attestation pairs are archived before a fresh test; a matching receiver file is explicitly a user attestation whose provenance this CLI cannot independently verify. Repair round 3, 2026-10-05: support webhook/ntfy, Telegram and on-host receivers as main f946c6d4c/77d7516d8 does. ntfy.sh was the coordinator's delegated 2026-10-04 pick. The user personally configured and accepted Telegram on NativeStack2604 at about 06:58Z on 2026-10-05, superseding that delegated pick; nothing was overturned. The coordinator reports both firing and resolved messages for acceptance 9e6f4a70b5874573aff1d22b40e87a32 and main 4c897418f's unmodified alerting acceptance returning 0 with receiver_evidence=user_attestation. These are reported host facts, separate from this PR's local checks. Telegram uses alertmanager-telegram-token and alertmanager-telegram-chat-id pointers; webhook/ntfy and on-host use alertmanager-webhook-url. Missing destination files remain needs_user (78). The existing sink is a disarmed bootstrap placeholder while that file is absent, never the selected receiver or READY delivery. Native amtool check-config and the existing firing/resolution and notification-counter checks remain required. Repair 2026-10-05: a closed-port precondition requires both a failed connect_ex (any nonzero errno) and independent ss evidence of no listener; mirrored WSL may time out rather than return ECONNREFUSED. A listening-port negative control must fail.",
       "supporting_sources": [
@@ -3429,7 +3441,8 @@
       "installed": true,
       "route": "native-installer",
       "commands": [
-        "curl -fsSL https://raw.githubusercontent.com/dagucloud/dagu/v2.18.2/scripts/installer.sh | bash -s -- --version v2.18.2 --no-prompt --service yes --service-scope user --host 127.0.0.1 --port 21080 --open-browser no"
+        "curl -fsSL https://raw.githubusercontent.com/dagucloud/dagu/v2.18.2/scripts/installer.sh | bash -s -- --version v2.18.2 --no-prompt --service \"$dagu_service_mode\" --service-scope user --host 127.0.0.1 --port 21080 --open-browser no",
+        "mkdir -p \"$HOME/.config/systemd/user\" \"$HOME/.dagu\"; install -m 0600 \"$config_root/dagu.service\" \"$HOME/.config/systemd/user/dagu.service\"; systemctl --user daemon-reload; activate_user_unit dagu.service"
       ],
       "needs": {
         "sudo": false,
@@ -3445,7 +3458,7 @@
         "line": 105
       },
       "service": {
-        "form": "upstream systemd user unit dagu.service (scripts/installer.sh:1635,1666-1697)",
+        "form": "Pinned upstream unit form; no-service installer, then guarded unit activation",
         "port": 21080,
         "port_setting": "--host 127.0.0.1 --port 21080; DAGU_HOST/DAGU_PORT in upstream env file. Coordinator default 127.0.0.1:50055 (internal/cmn/config/loader.go:2029-2031); start-all disables extra health listeners."
       },
@@ -3469,7 +3482,8 @@
       },
       "config_paths": [
         "$HOME/.config/systemd/user/dagu.service",
-        "$HOME/.config/dagu/dagu.env"
+        "$HOME/.config/dagu/dagu.env",
+        "$config_root/dagu.service"
       ],
       "notes": "Independent Ubuntu 26.04 new-WSL pin 2.18.2; the workstation/trading stack stays held at 2.16.6. Storage changes #2784 (suspend flags under data_dir), #2776 (partitioned/indexed artifacts), and #2858 (DAG definition index under data_dir) make an existing-home upgrade different from a clean install. For a future upgrade of any existing owned installation, stop the owned unit and retain a complete pre-upgrade DAGU_HOME copy plus the prior binary, unit and environment. Conditional rollback stops the new unit, preserves post-upgrade state separately, restores the saved home and prior binary/unit/environment together, then verifies the native version and owned workflow. Do not open a shared home with mixed binary versions; 2.17.2 removes legacy dags/.dag.index. NativeStack2604 is already on 2.18.2 with no pre-upgrade copy, so its rollback is re-provisioning. See [Command center correction and NativeStack2604 state](../../../docs/decisions/2026-10-05-dagu-mise-pin-move.md#command-center-correction-and-nativestack2604-state-2026-10-05-r2b). No such host upgrade or rollback was executed in this builder round."
     },
@@ -3525,9 +3539,10 @@
       "commands": [
         "docker_repository",
         "docker_engine_packages",
-        "sudo systemctl disable --now docker.service docker.socket",
-        "if [[ ! -f \"$HOME/.config/systemd/user/docker.service\" ]]; then dockerd-rootless-setuptool.sh install; fi",
-        "systemctl --user enable --now docker.service"
+        "if [[ \"$NS2604_NO_START\" != 1 ]]; then sudo systemctl disable --now docker.service docker.socket; fi",
+        "if [[ \"$NS2604_NO_START\" != 1 && ! -f \"$HOME/.config/systemd/user/docker.service\" ]]; then dockerd-rootless-setuptool.sh install; fi",
+        "if [[ \"$NS2604_NO_START\" == 1 && ! -e \"$HOME/.config/systemd/user/docker.service\" ]]; then mkdir -p \"$HOME/.config/systemd/user\"; install -m 0600 \"$config_root/docker.service\" \"$HOME/.config/systemd/user/docker.service\"; fi; systemctl --user daemon-reload",
+        "activate_user_unit docker.service"
       ],
       "needs": {
         "sudo": true,
@@ -3568,7 +3583,8 @@
       "config_paths": [
         "/etc/apt/sources.list.d/docker.sources",
         "$HOME/.config/systemd/user/docker.service",
-        "$HOME/.config/docker/daemon.json"
+        "$HOME/.config/docker/daemon.json",
+        "$config_root/docker.service"
       ],
       "notes": "Planned. Special-case official Docker apt repository on supported Ubuntu Resolute26.04. Version29.8.2 selected from native apt metadata at future execution; fail if absent, do not guess Resolute package revision. uidmap/dbus-user-session prerequisites; docker-ce-rootless-extras required. Disable rootful service/socket before rootless setup. Upstream setup creates unit/context. Package dependencies remain repo-managed. Linger not enabled: unit runs with user session; boot persistence needs OS policy separately."
     },

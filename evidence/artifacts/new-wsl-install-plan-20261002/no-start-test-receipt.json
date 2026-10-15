@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "baseline": "8053f14e7e0817d2502dff2bb284bfb7e1b0152f",
+  "date": "2026-10-15",
+  "evidence_class": "synthetic",
+  "execution_prefix": "systemd-run --user --scope -p CPUWeight=idle --quiet --",
+  "baseline_runs": [
+    {
+      "command": "python3 -m unittest discover -s tests -p test_install_plan_no_start_ports.py -v",
+      "production_sources": "unchanged 8053f14e7; new tests only",
+      "exit_code": 1,
+      "tests": 4,
+      "failures": 4,
+      "causes": [
+        "memory unit fixture observed systemctl enable --now",
+        "install option parser had no --no-start branch",
+        "collector renderer rejected --host-file",
+        "host port allocation/collision validator was absent"
+      ]
+    },
+    {
+      "command": "python3 -B -m unittest discover -s tests -p test_install_plan_no_start_ports.py -v",
+      "production_sources": "RTK hook-check commands still identical to 8053f14e7 before suppression edit",
+      "exit_code": 1,
+      "tests": 6,
+      "failures": 2,
+      "causes": ["warning-writing fake RTK contaminated both install and acceptance exact-output checks"]
+    },
+    {
+      "command": "python3 -B -m unittest tests.test_install_plan_no_start_ports.HostPortTests.test_dashboard_generator_emits_plan_port_markers",
+      "production_sources": "observability/ns2604_dashboards.py unchanged from 8053f14e7",
+      "exit_code": 1,
+      "tests": 1,
+      "failures": 1,
+      "causes": ["generated plan dashboard contained numeric ports instead of host markers"]
+    }
+  ],
+  "passing_runs": [
+    {
+      "command": "python3 -B -m unittest tests.test_install_plan_no_start_ports",
+      "exit_code": 0,
+      "tests": 19,
+      "failures": 0
+    },
+    {
+      "command": "python3 -B -m unittest tests.test_new_wsl_client_config tests.test_new_wsl_definitive_defaults.Manifest tests.test_new_wsl_definitive_defaults.InterimPlanChecks tests.test_new_wsl_definitive_defaults.PromptfooGatewayTopologyConfiguration tests.test_new_wsl_gateway_composition tests.test_wsl_new_distro_recipe.HostTemplateTests tests.test_observability_writer_identity.CollectorProfileTests",
+      "exit_code": 0,
+      "tests": 335,
+      "failures": 0
+    },
+    {
+      "command": "python3 -B -m unittest tests.test_install_plan_no_start_ports tests.test_task_model_routing tests.test_upstream_surface_watch.DispositionCitationTests tests.test_rtk_receipt_locators tests.test_harbor_currency_contracts tests.test_ns2604_dashboards",
+      "exit_code": 0,
+      "tests": 75,
+      "failures": 0,
+      "note": "Before the final dispatcher fixture was added; that fixture is included in the subsequent 19-test regression run."
+    }
+  ],
+  "unrelated_failures": {
+    "command": "python3 -B -m unittest tests.test_install_plan_no_start_ports tests.test_task_model_routing tests.test_upstream_surface_watch tests.test_rtk_receipt_locators tests.test_harbor_currency_contracts tests.test_ns2604_dashboards",
+    "exit_code": 1,
+    "tests": 182,
+    "class": "CachedArtifactTests",
+    "failures": 4,
+    "observed_counts": ["settings 172 vs expected 171", "SDK settings 174 vs expected 173 (two tests)", "Codex schema 1057 vs expected 1034"],
+    "boundary": "The module and its source implementation are unchanged by this PR. DispositionCitationTests passes. These cached-artifact assertions are not repaired in this lane."
+  },
+  "target_acceptance": {
+    "owner": "native-agent-stack-51",
+    "distribution": "NativeHorizonNY",
+    "status": "UNRUN by this lane",
+    "command": "install.sh --no-start --only memory-owner",
+    "required_observations": ["unit disabled", "no new listener"]
+  }
+}

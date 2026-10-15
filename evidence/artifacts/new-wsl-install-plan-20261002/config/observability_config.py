@@ -20,6 +20,121 @@ import sys
 import tempfile
 
 
+# Host files stay flat string maps, as required by adoption/render_config.py.
+# Defaults are the reviewed plan at 8053f14e7; each listener has one owning row.
+# Public API shared by check_plan.py and tools/adoption/new_wsl_client_config.py.
+SERVICE_PORTS = {
+    "MEMORY": ("memory-owner", 29374),
+    "OTEL_GRPC": ("otel-collector-contrib", 21317),
+    "OTEL_HTTP": ("otel-collector-contrib", 21318),
+    "OTEL_HEALTH": ("otel-collector-contrib", 21333),
+    "OTEL_METRICS": ("otel-collector-contrib", 21888),
+    "OTEL_EXPORTER": ("otel-collector-contrib", 21889),
+    "PROMETHEUS": ("prometheus", 21090),
+    "LOKI_HTTP": ("loki", 21300),
+    "LOKI_GRPC": ("loki", 21396),
+    "GRAFANA_HTTP": ("grafana", 21301),
+    "GRAFANA_GRPC": ("grafana", 21302),
+    "OLLAMA": ("local-model-server", 21434),
+    "ALERTMANAGER": ("alerting", 21093),
+    "AGENTSVIEW": ("session-analytics", 21808),
+    "DAGU": ("dagu", 21080),
+    "DAGU_COORDINATOR": ("dagu", 50055),
+    "GATEWAY": ("gpt-gateway", 21128),
+    "GATEWAY_WS": ("gpt-gateway", 21129),
+    "GATEWAY_EMBED_WS": ("gpt-gateway", 21131),
+    "TRACE_VIEWER": ("trace-viewer", 9749),
+}
+PORT_MARKER = re.compile(r"@PORT_([A-Z_]+)@")
+FOREGROUND_UNITS = {
+    "otel-collector-contrib": "ns2604-otel-collector.service",
+    "loki": "ns2604-loki.service",
+    "grafana": "ns2604-grafana.service",
+    "alerting": "ns2604-alertmanager.service",
+}
+
+
+def service_ports(values=None):
+    """Resolve and validate the host's listener allocation before any writes."""
+    values = values or {}
+    unknown = {key for key in values if key.startswith("NS_PORT_")} - {"NS_PORT_" + key for key in SERVICE_PORTS}
+    if unknown:
+        raise ValueError("unknown service port keys: " + ", ".join(sorted(unknown)))
+    ports, claimed = {}, {}
+    for name, (slot, default) in SERVICE_PORTS.items():
+        value = values.get("NS_PORT_" + name, str(default))
+        if name == "MEMORY" and "AI_MEMORY_URL" in values:
+            endpoint = values["AI_MEMORY_URL"]
+            match = re.fullmatch(r"127\.0\.0\.1:([0-9]{1,5})", endpoint) if isinstance(endpoint, str) else None
+            if not match:
+                raise ValueError("AI_MEMORY_URL must be a 127.0.0.1:port endpoint")
+            if "NS_PORT_MEMORY" in values and value != match[1]:
+                raise ValueError("NS_PORT_MEMORY and AI_MEMORY_URL disagree")
+            value = match[1]
+        if not isinstance(value, str) or not re.fullmatch(r"[0-9]{1,5}", value) or not 0 < int(value) < 65536:
+            raise ValueError(f"NS_PORT_{name} must be a decimal port from 1 to 65535")
+        port = int(value)
+        if port in claimed:
+            raise ValueError(f"port {port} is claimed by {claimed[port]} and {slot}/{name}")
+        claimed[port] = f"{slot}/{name}"
+        ports[name] = port
+    return ports
+
+
+def render_ports(text, ports):
+    """Expand only named service-port markers; other template markers survive."""
+    def replace(match):
+        if match[1] not in ports:
+            raise ValueError("unknown service port marker " + match[0])
+        return str(ports[match[1]])
+    return PORT_MARKER.sub(replace, text)
+
+
+def render_asset(name, text, ports):
+    """Derive the wrapper only from the composition's pinned default bytes."""
+    if name == "omniroute-serve.sh":
+        original = render_ports(text, service_ports())
+        if digest(original) != "672063a12174d46f7065ae7bb9adf1ed268c958cd264f64a25d0af3f74ae45bc":
+            raise ValueError("needs_owner: supplied wrapper template differs from the pinned composition")
+    return render_ports(text, ports)
+
+
+def render_command(text, ports):
+    """Parameterize the plan's quoted upstream commands at their default ports.
+
+    One simultaneous substitution also handles swapping two default ports.
+    Install/accept inventories retain their pinned upstream command quotations.
+    """
+    defaults = {str(default): str(ports[name]) for name, (_, default) in SERVICE_PORTS.items()}
+    wrapper_sha = "672063a12174d46f7065ae7bb9adf1ed268c958cd264f64a25d0af3f74ae45bc"
+    if wrapper_sha in text:
+        # Source: native-agent-stack@0fb32ee5 config/omniroute-serve.sh:20.
+        # The explicit CLI port has precedence; its derived hash must move too.
+        wrapper = (Path(__file__).parent / "omniroute-serve.sh").read_text()
+        text = text.replace(wrapper_sha, digest(render_asset("omniroute-serve.sh", wrapper, ports)))
+    pattern = r"@PORT_([A-Z_]+)@|(?<![\w])(?:" + "|".join(defaults) + r")(?![\w])"
+    def replace(match):
+        return render_ports(match[0], ports) if match[1] else defaults[match[0]]
+    return re.sub(pattern, replace, text)
+
+
+def port_template(text):
+    """Convert generated default-port dashboards into this plan's source format."""
+    defaults = {str(default): "@PORT_" + name + "@" for name, (_, default) in SERVICE_PORTS.items()}
+    return re.sub(r"(?<![0-9])(?:" + "|".join(defaults) + r")(?![0-9])",
+                  lambda match: defaults[match[0]], text)
+
+
+def load_service_ports(host_file=None, config_root=None):
+    path = host_file or (config_root / ".service-ports.json" if config_root else None)
+    values = json.loads(path.read_text()) if path and path.exists() else {}
+    if host_file and not host_file.is_file():
+        raise ValueError("host value file does not exist")
+    if not isinstance(values, dict):
+        raise ValueError("host value file must be a JSON object")
+    return service_ports(values)
+
+
 PRISTINE = {
     "otel.yaml": "1bcdf496537bab925fd39b42fd5b2b8226e2d4fb4f95b3aaba1d52e23c3d731f",
     "grafana.ini": "139c743c02b428653de39bfac449a9a0f4f02f786732891715838022b25f936d",
@@ -156,11 +271,15 @@ def destination():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("otel", "grafana", "alerting", "alerting-ready", "grafana-check", "prometheus"))
+    parser.add_argument("action", choices=("otel", "grafana", "alerting", "alerting-ready", "grafana-check", "prometheus", "stage", "command", "units"))
     parser.add_argument("--config-root", type=Path, required=True)
     parser.add_argument("--source-root", type=Path)
     parser.add_argument("--tools-root", type=Path)
     parser.add_argument("--plan-file", type=Path)
+    parser.add_argument("--host-file", type=Path, help="nonsecret host value JSON; NS_PORT_* values override defaults")
+    parser.add_argument("--output-root", type=Path, help="stage: temporary rendered source tree")
+    parser.add_argument("--persist-ports", action="store_true", help="stage: save the nonsecret resolved allocation for later acceptance")
+    parser.add_argument("--slot", choices=tuple(FOREGROUND_UNITS))
     parser.add_argument("--installed-units", action="store_true",
                         help="grafana-check: also verify the installed user units match the rendered candidates")
     # The emitter unit runs progress.py from this checkout. Default: three levels above the plan folder, as
@@ -169,6 +288,22 @@ def main():
     args = parser.parse_args()
     root = args.config_root
     source = args.source_root or root
+    ports = load_service_ports(args.host_file, root)
+    if args.action == "command":
+        print(render_command(sys.stdin.read(), ports), end="")
+        return 0
+    if args.action == "stage":
+        if args.output_root is None or args.source_root is None:
+            raise ValueError("stage requires --source-root and --output-root")
+        for path in sorted(source.rglob("*")):
+            if path.is_file() and "__pycache__" not in path.parts:
+                text = path.read_text()
+                # The renderer contains marker syntax, not a service config.
+                atomic(args.output_root / path.relative_to(source),
+                       text if path.name == "observability_config.py" else render_asset(path.name, text, ports))
+        if args.persist_ports:
+            atomic(root / ".service-ports.json", json.dumps({"NS_PORT_" + name: str(port) for name, port in ports.items()}, indent=2) + "\n")
+        return 0
     if args.action in ("grafana", "grafana-check"):
         # CPython@v3.13.16:Lib/pathlib/_abc.py:432-437, unlike exists(),
         # lstat sees a dangling symlink. Check before any ledger read or write.
@@ -184,6 +319,22 @@ def main():
         Path(os.environ.get("XDG_DATA_HOME", str(Path.home() / ".local/share"))) / "new-wsl-native-stack/observability")))
     if not data.is_absolute():
         raise ValueError("NS2604_OBSERVABILITY_DATA must be absolute")
+    if args.action == "units":
+        if args.slot is None or args.tools_root is None:
+            raise ValueError("units requires --slot and --tools-root")
+        markers = {"@CONFIG_ROOT@": str(root), "@DATA_ROOT@": str(data), "@TOOLS_ROOT@": str(args.tools_root)}
+        if args.slot == "grafana":
+            markers["@GRAFANA_HOME@"] = str((Path.home() / ".local/bin/grafana").resolve(strict=True).parent.parent)
+        if any(not Path(value).is_absolute() or UNIT_PATH_UNSAFE.search(value) for value in markers.values()):
+            raise ValueError("unit paths must be absolute without whitespace or systemd metacharacters")
+        name = FOREGROUND_UNITS[args.slot]
+        template = render_ports((source / (name + ".example")).read_text(), ports)
+        for marker, value in markers.items():
+            template = template.replace(marker, value)
+        if re.search(r"@[A-Z_]+@", template):
+            raise ValueError("unresolved unit template marker")
+        atomic(root / "systemd" / name, template)
+        return 0
     ledger_path = root / ".g4-source-digests.json"
     ledger = json.loads(ledger_path.read_text()) if ledger_path.exists() else {}
 
@@ -235,7 +386,7 @@ def main():
         row = rows[0]
         release = row.get("release")
         features = (row.get("service") or {}).get("enable_features")
-        port = (row.get("service") or {}).get("port")
+        port = ports["PROMETHEUS"]
         if not isinstance(release, str) or not re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+", release):
             raise ValueError("invalid plan Prometheus release")
         if (not isinstance(features, list) or not features
@@ -255,7 +406,7 @@ def main():
             "@PROMETHEUS_PORT@": str(port),
             "@PROMETHEUS_FEATURES@": ",".join(features),
         }
-        template = (source / "ns2604-prometheus.service.example").read_text()
+        template = render_ports((source / "ns2604-prometheus.service.example").read_text(), ports)
         rendered = template
         for marker, value in markers.items():
             rendered = rendered.replace(marker, value)
@@ -268,7 +419,7 @@ def main():
         target = root / "otel.yaml"
         if target.is_symlink():
             raise ValueError("retained symlink for otel.yaml; migrate its owner configuration separately")
-        template = (source / "otel.yaml").read_text()
+        template = render_ports((source / "otel.yaml").read_text(), ports)
         backup = target.with_name("otel.yaml.pre-g4-observability")
         # Recover the earlier ledger bug as well as retaining new migrations.
         # A migration backup/receipt records operator custody, never template ownership.
@@ -316,7 +467,7 @@ def main():
         if UNIT_PATH_UNSAFE.search(str(repo)) or UNIT_PATH_UNSAFE.search(str(data)):
             raise ValueError("emitter unit paths require no whitespace, percent signs, quotes, backslashes or dollar signs")
         for name, output in GRAFANA_FILES:
-            template = (source / name).read_text()
+            template = render_ports((source / name).read_text(), ports)
             rendered = template.replace("@CONFIG_ROOT@", str(root)).replace("@DATA_ROOT@", str(data))
             rendered = rendered.replace("@DASHBOARD_PATH_JSON@", json.dumps(str(root / "grafana-dashboards")))
             rendered = rendered.replace("@ECOSYSTEM_DASHBOARD_PATH_JSON@", json.dumps(str(root / "ecosystem-grafana-dashboards")))
@@ -364,7 +515,7 @@ def main():
         if args.action == "alerting":
             # Install source/receiver wiring together for a pristine or previously owned plan.
             # Custom Prometheus configuration is retained for its owner to merge.
-            publish("prometheus.yaml", (source / "prometheus.yaml").read_text())
+            publish("prometheus.yaml", render_ports((source / "prometheus.yaml").read_text(), ports))
         mode, pointers, ready = destination()
         if not ready:
             print("needs_user: choose the alert destination and supply its private destination file(s); disarmed placeholder retained", file=sys.stderr)

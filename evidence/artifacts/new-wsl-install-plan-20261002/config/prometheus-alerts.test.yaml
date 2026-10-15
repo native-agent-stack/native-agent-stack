@@ -5,7 +5,7 @@ evaluation_interval: 5s
 tests:
   - interval: 5s
     input_series:
-      - series: 'up{job="prometheus",instance="127.0.0.1:21090"}'
+      - series: 'up{job="prometheus",instance="127.0.0.1:@PORT_PROMETHEUS@"}'
         values: '0+0x25 1+0x4'
       - series: 'up{job="acceptance-fixture",instance="127.0.0.1:21997"}'
         values: '0+0x3 1+0x26'
@@ -16,7 +16,7 @@ tests:
       - eval_time: 120s
         alertname: EcosystemServiceUnavailable
         exp_alerts:
-          - exp_labels: {job: prometheus, instance: '127.0.0.1:21090', severity: warning, scope: local-ecosystem}
+          - exp_labels: {job: prometheus, instance: '127.0.0.1:@PORT_PROMETHEUS@', severity: warning, scope: local-ecosystem}
             exp_annotations: {summary: 'Local service prometheus is unavailable'}
       - eval_time: 130s
         alertname: EcosystemServiceUnavailable

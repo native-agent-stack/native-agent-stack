@@ -1,0 +1,74 @@
+{
+  "baseline": "8053f14e7e0817d2502dff2bb284bfb7e1b0152f",
+  "search": "git grep -nE '(install|accept)\\.sh(:[0-9]|#L[0-9])'",
+  "live_carriers": [
+    "docs/decisions/2026-10-09-harbor-0240-profile.md",
+    "tests/test_harbor_currency_contracts.py"
+  ],
+  "dated_history": {
+    "path": "evidence/artifacts/row70-defect-a-20261008/expanded-source-critic.md",
+    "sha256": "92b7170350d3d923006638c028566db42b33acfe1aa40df6210c7f6b3a379c95",
+    "binding": "evidence/receipts/row70-defect-a-install-plan-20261008.json:20",
+    "resolution": "Co-op #181553: preserve receipt-bound bytes; record current locators separately. git grep -lF expanded-source-critic -- tests returned no matches."
+  },
+  "other_history": "Explicit commit-pinned URLs, wave-2/final-architecture extracted records and the dated roadmap observation retain their original locators. Several predate the baseline and already differ there; this change does not relabel them as live evidence. Config helper citations do not shift because only same-line markers changed.",
+  "dashboard_generator_citations": "git grep ns2604_dashboards.py path:line found tools/local-pages/fleet_data.py:757 citing lines7-8, unchanged by the one-line main() edit.",
+  "locators": [
+    {
+      "script": "install.sh",
+      "old_line": 1034,
+      "current_line": 1099,
+      "status": "repinned_live",
+      "anchor_sha256": "fe99ee8c563bc26042367467a6d48062634230383ee038f82413cd9e547566bf"
+    },
+    {
+      "script": "install.sh",
+      "old_line": 1036,
+      "current_line": 1101,
+      "status": "repinned_live",
+      "anchor_sha256": "30f513fd2f82b468003d3d8ab55683e6f55f6635f2eb267a1ed80a67107a2fa6"
+    },
+    {
+      "script": "install.sh",
+      "old_line": 1136,
+      "current_line": 1201,
+      "status": "repinned_live",
+      "anchor_sha256": "d90536572f912dd52347994c9852b5c98afef10316757881e13a7833f8a062f5"
+    },
+    {
+      "script": "accept.sh",
+      "old_line": 2726,
+      "current_line": 2737,
+      "status": "repinned_live",
+      "anchor_sha256": "8d182cac21483f2c37f826a70e020cbf442b4e52237a6a72ddee28712e43cbec"
+    },
+    {
+      "script": "install.sh",
+      "old_line": 327,
+      "current_line": 381,
+      "status": "preserved_hash_bound_history",
+      "anchor_sha256": "a1c5e2b55f03f2b74f3c639ece86372a6c82b3f9e46ae531b4ace54a380a5845"
+    },
+    {
+      "script": "install.sh",
+      "old_line": 948,
+      "current_line": 1013,
+      "status": "preserved_hash_bound_history",
+      "anchor_sha256": "d36f4e29900bafef779ea763c681bf70ef605a5f5de16d1ccda48d63fea6e621"
+    },
+    {
+      "script": "accept.sh",
+      "old_line": 369,
+      "current_line": 379,
+      "status": "preserved_hash_bound_history",
+      "anchor_sha256": "6cc2b6073ddc1568fe8e0b17efce773f92653f25c408adf039260069b777b336"
+    },
+    {
+      "script": "accept.sh",
+      "old_line": 373,
+      "current_line": 383,
+      "status": "preserved_hash_bound_history",
+      "anchor_sha256": "abf47ff67a56b480a5a9eb1b2983dce73cc5640f44a04b70c245db440774561c"
+    }
+  ]
+}
