@@ -155,24 +155,39 @@ def md_tables(text: str) -> list[dict]:
     return tables
 
 
-def md_items(text: str, heading_contains: str) -> list[str]:
-    """Numbered items under the first heading whose text contains the key, up to the next heading."""
-    items, inside, key = [], False, heading_contains.casefold()
+def md_list(text: str, heading_contains: str, *, lead: bool = False) -> tuple[str | None, list[str]]:
+    """The first heading whose text contains the key, and its numbered items up to the next heading.
+
+    With lead, an item that opens with a bold span keeps only that span (the item's claim), and
+    its continuation lines are dropped.
+    """
+    heading, items, inside, key, raw = None, [], False, heading_contains.casefold(), []
     for line in text.splitlines():
         match = _HEADING.match(line)
         if match:
             if inside:
                 break
             inside = key in plain(match.group(2)).casefold()
+            heading = plain(match.group(2)) if inside else heading
             continue
         if not inside:
             continue
         item = _ITEM.match(line)
         if item:
+            raw.append(item.group(1))
             items.append(plain(item.group(1)))
         elif items and line.startswith((" ", "\t")) and line.strip():
+            raw[-1] += " " + line.strip()
             items[-1] += " " + plain(line)
-    return items
+    if lead:
+        # A lead that introduces its details ("Validation:") drops the trailing colon or comma.
+        items = [plain(bold.group(1)).rstrip(":,; ") if (bold := re.match(r"\*\*(.+?)\*\*", source)) else item for source, item in zip(raw, items)]
+    return heading, items
+
+
+def md_items(text: str, heading_contains: str) -> list[str]:
+    """Numbered items under the first heading whose text contains the key, up to the next heading."""
+    return md_list(text, heading_contains)[1]
 
 
 def column_index(header: list[str], column: str) -> int | None:
@@ -295,9 +310,9 @@ def convergence(source: dict) -> dict:
         return _pending(source)
     entry = source["entry"]
     table = table_with_column(source["content"], entry["table"])
-    items = md_items(source["content"], entry["list"]) if entry.get("list") else []
-    return {"status": "present", "name": source["name"], "root": source["root"], "table": table, "items": items,
-            "column": entry["table"], "list_heading": entry.get("list")}
+    heading, items = md_list(source["content"], entry["list"], lead=bool(entry.get("list_lead"))) if entry.get("list") else (None, [])
+    return {"status": "present", "name": source["name"], "root": source["root"], "path": source.get("path"), "table": table, "items": items,
+            "column": entry["table"], "list_heading": heading or entry.get("list"), "list_key": entry.get("list")}
 
 
 def _receipt_date(path: str) -> str | None:
@@ -359,7 +374,8 @@ def claude_code(source: dict) -> dict:
     pin = next((match.group(0) for line in text.splitlines() if label in line.casefold()
                 for match in [re.search(r"\d+\.\d+\.\d+", line)] if match), None)
     tables = {name: table_under(text, heading) for name, heading in (entry.get("tables") or {}).items()}
-    return {"status": "present", "name": source["name"], "pin": pin, "tables": tables, "headings": dict(entry.get("tables") or {})}
+    return {"status": "present", "name": source["name"], "root": source["root"], "path": source.get("path"), "pin": pin, "tables": tables,
+            "headings": dict(entry.get("tables") or {})}
 
 
 def github(source: dict) -> dict:
@@ -372,7 +388,7 @@ def github(source: dict) -> dict:
     queue = [row for row in content.get(keys.get("landing_queue", "landing_queue")) or [] if isinstance(row, str)]
     main_key = keys.get("main_ci", "main_ci")
     main = content.get(main_key)
-    return {"status": "present", "name": source["name"], "updated_utc": content.get("updated_utc"),
+    return {"status": "present", "name": source["name"], "root": source["root"], "path": source.get("path"), "updated_utc": content.get("updated_utc"),
             "in_review": [{field: row.get(field) for field in ("pr", "head", "state", "next_gate")} for row in review],
             "landing_queue": queue, "main_ci": main, "main_ci_key": main_key}
 

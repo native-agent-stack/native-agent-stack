@@ -28,6 +28,7 @@ body[data-page="overview"] .ov-section > h2 { font-family: var(--mf-display); fo
 .ov-repos td:nth-child(4) { font-variant-numeric: tabular-nums; }
 .ov-repos td:nth-child(3) small { display: inline; }
 .ov-review table { min-width: 52rem; }
+.ov-review td:nth-child(2) code { white-space: nowrap; }
 .ov-next, .ov-queue { max-width: 80ch; padding-left: 1.4rem; }
 .ov-next li, .ov-queue li { margin-bottom: .3rem; }
 .ov-evidence { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); gap: .5rem 2rem; }

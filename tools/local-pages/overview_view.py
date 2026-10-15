@@ -190,10 +190,11 @@ def convergence(result: dict, label: str) -> str:
     table = result.get("table")
     if table:
         out += _table(f'{label[0].upper() + label[1:]}: {result["column"]} rows', table["header"], [[esc(cell) for cell in row] for row in table["rows"]])
-    else:
-        out += f'<p class="lp-empty">The record has no table with a "{esc(result["column"])}" column.</p>'
     if result.get("items"):
-        out += f'<h3>{esc(result["list_heading"])}, by readiness trigger</h3><ol class="ov-next">' + "".join(f"<li>{esc(item)}</li>" for item in result["items"]) + "</ol>"
+        out += f'<h3>{esc(result["list_heading"])}</h3><ol class="ov-next">' + "".join(f"<li>{esc(item)}</li>" for item in result["items"]) + "</ol>"
+    if not table and not result.get("items"):
+        out += (f'<p class="lp-empty">The record has no table with a "{esc(result["column"])}" column'
+                + (f' and no numbered items under a heading naming "{esc(result["list_key"])}"' if result.get("list_key") else "") + ".</p>")
     return out
 
 

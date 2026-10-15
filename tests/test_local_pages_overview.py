@@ -202,12 +202,46 @@ class PendingTests(OverviewCase):
         self.assertIn("CONVERGENCE-WS2-20990101.md", html)
 
 
+    def test_a_list_only_shortlist_renders_each_items_bold_lead_under_the_records_heading(self):
+        fixture = Fixture(self.base)
+        record = ("# Fixture shortlist\n\n## Inputs\n1. **Not this.** input\n\n## Converged by both judges\n"
+                  "1. **Lead one.** long detail\n   - nested detail\n2. **Lead two:** more detail\n3. An item without a lead\n\n## Disputed\n1. **Not this either.**\n")
+        path = fixture.state / f"{STATE_DIR}/extreme-mover-strategies-20261014/CONVERGENCE-WS5-20990101.md"
+        path.parent.mkdir(parents=True)
+        path.write_text(record)
+        result, html = fixture.build(self.base)
+        self.assertIn("strategies_convergence", result["present"])
+        section = html[html.index('id="ov-strategies"'):html.index('id="ov-workers"')]
+        self.assertIn("<h3>Converged by both judges</h3>", section)
+        for text in ("<li>Lead one.</li>", "<li>Lead two</li>", "<li>An item without a lead</li>"):
+            self.assertIn(text, section)
+        for text in ("long detail", "nested detail", "Not this"):
+            self.assertNotIn(text, section)
+        self.assertEqual(DATA.md_list(record, "Converged", lead=True), ("Converged by both judges", ["Lead one.", "Lead two", "An item without a lead"]))
+
+
+    def test_a_present_claude_code_record_shows_its_pin_and_both_tables(self):
+        fixture = Fixture(self.base)
+        record = ("# Fixture client record\n\nPinned client: 9.9.9 (fixture)\n\n## CHANGELOG delta 9.9.8 to 9.9.9\n| Version | Change |\n|---|---|\n| 9.9.9 | fixture change |\n\n"
+                  "## Best-practice screen\n| Practice | Verdict |\n|---|---|\n| fixture practice | fixture verdict |\n")
+        path = fixture.state / f"{STATE_DIR}/cc-native-practice-20261014/CLIENT-20990101.md"
+        path.parent.mkdir(parents=True)
+        path.write_text(record)
+        result, html = fixture.build(self.base)
+        self.assertIn("claude_code_practice", result["present"])
+        section = html[html.index('id="ov-claude-code"'):html.index('id="ov-github"')]
+        self.assertIn("Pinned client 9.9.9", section)
+        for text in ("fixture change", "fixture verdict", "From <code>CLIENT-20990101.md</code> (private record, cited by name)."):
+            self.assertIn(text, section)
+
+
 class QueueTests(OverviewCase):
     def test_cc_now_queue_and_a_pending_main_ci(self):
         _, html = Fixture(self.base).build(self.base)
         for text in ("#9001", "abc12345", "fixture review state", "fixture gate", "#9002 fixture landing item", "#9003 second fixture item"):
             self.assertIn(text, html)
         self.assertIn("In review (1)", html)
+        self.assertIn("From <code>cc-now.json</code> (private record, cited by name), updated 2099-01-01T00:00:00Z.", html)
         self.assertIn("Landing queue (2)", html)
         self.assertIn("the command center adds a main_ci entry to its current view", html)
 

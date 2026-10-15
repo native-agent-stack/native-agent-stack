@@ -49,9 +49,10 @@
       "role": "overview_strategies_convergence",
       "root": "state",
       "glob": "coordination/command-center/research-cc-role-20261008/extreme-mover-strategies-20261014/CONVERGENCE-WS5-*.md",
-      "reads": "the first table whose header names the column below, and the numbered items under the heading below",
+      "reads": "the first table whose header names the column below, if any, and the bold lead of each numbered item under the heading below",
       "table": "Strategy",
-      "list": "Next",
+      "list": "Converged",
+      "list_lead": true,
       "trigger": "the command center records its WS5 convergence of the extreme-mover strategy shortlist"
     },
     "finalize_rows": {
