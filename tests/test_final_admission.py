@@ -137,7 +137,7 @@ class FinalAdmissionTests(FixtureTestCase):
         self.assertEqual(code, 1, output)
         self.assertIn("cumulative unresolved survivors", output)
 
-    def native_cutoff_fixture(self, field, status):
+    def native_cutoff_fixture(self, field, status, *, refutation=False):
         native = ledger_helpers.V2PendingCliTests()
         native.setUp()
         self.addCleanup(native.tearDown)
@@ -157,7 +157,8 @@ class FinalAdmissionTests(FixtureTestCase):
         clean = converter.convert(run, sl.scope_hashes(native.root), ledger_helpers.LANE, {}, work=native.work)
         path = native.retain_v2_result(clean, "fx-clean", "2026-09-22", "completed")
         ledger = sl.append(native.root, native.ledger(), json.loads(path.read_bytes()))
-        frozen[field] = "d" * 64
+        if not refutation:
+            frozen[field] = "d" * 64
         frozen["field_sha256"] = sl.v2_field_sha256(frozen)
         _write_json(native.work / "inputs/alpha.json", frozen)
         scope = sl.scope_hashes(native.root)
@@ -165,12 +166,16 @@ class FinalAdmissionTests(FixtureTestCase):
             scope[field]["foundation/alpha"] = frozen[field]
         else:
             scope[field] = frozen[field]
-        run["first"][0]["lost"] = True
+        if refutation:
+            run = native.screen_run(copies=2, status="not_credible", criterion="outside_requirement",
+                                    fact="The primary source implements a different frozen requirement.")
+        else:
+            run["first"][0]["lost"] = True
         cutoff = converter.convert(run, scope, ledger_helpers.LANE, {}, work=native.work)
         path = native.retain_v2_result(cutoff, "fx-cutoff", "2026-09-23", status)
         ledger = sl.append(native.root, ledger, json.loads(path.read_bytes()))
         self.assertEqual(sl.check_ledger(native.root, ledger), [])
-        self.assertEqual(len(sl.material_pending(ledger["sweeps"][-1]["layers"][0])), 2)
+        self.assertEqual(len(sl.material_pending(ledger["sweeps"][-1]["layers"][0])), 0 if refutation else 2)
 
         root, _, _ = self.measured()
         for path in list(root.rglob("*.json")):

@@ -653,23 +653,97 @@ def final_reopened_by(sources: Sources, key: tuple[str, str], later: list[dict],
 def final_covering_sweeps(ledger: dict, key: tuple[str, str]) -> list[dict]:
     """Retained FINAL history in ledger order, without date/status/cutoff filtering."""
     covering = []
-    for record in ledger["sweeps"]:
+    seen = set()
+    for ledger_index, record in enumerate(ledger["sweeps"]):
         layers = record.get("layers")
         if not isinstance(layers, list) or not layers or not all(isinstance(row, dict)
                 and isinstance(row.get("catalog"), str) and isinstance(row.get("layer_id"), str)
                 for row in layers):
             raise FinalStackError("FINAL sweep history requires retained layer records")
         if any((row.get("catalog"), row.get("layer_id")) == key for row in layers):
-            covering.append({"sweep_id": record.get("sweep_id"), "date": record.get("date"),
+            sweep_id = record.get("sweep_id")
+            if not isinstance(sweep_id, str) or not sweep_id or sweep_id in seen:
+                raise FinalStackError("FINAL sweep history requires unique retained sweep ids")
+            seen.add(sweep_id)
+            covering.append({"ledger_index": ledger_index, "sweep_id": sweep_id, "date": record.get("date"),
                              "manifest_ref": record.get("manifest_ref"), "record": record})
     return covering
 
 
-def final_unresolved_survivors(sources: Sources, row: dict, covering: list[dict], verdict_day) -> list[dict]:
+def final_v2_refutes_on_merit(sources: Sources, entry: dict, layer: dict) -> bool:
+    """Recognize native retained V2 screens by recomputing their supported outcome."""
+    target_of = saturation_ledger.ref_resolver(sources.json)
+    try:
+        discovery = target_of(layer.get("discovery_ref"))
+        source = discovery.get("source_field") if isinstance(discovery, dict) else None
+        documents = discovery.get("screen_judgments") if isinstance(discovery, dict) else None
+        if (not isinstance(source, dict) or source.get("contract_version") != 2
+            or not isinstance(documents, dict) or set(documents) != set(saturation_ledger.ROLES)
+            or not all(isinstance(documents[role], list) for role in saturation_ledger.ROLES)
+            or any(source.get(field) != layer.get(field) for field in
+                   ("contract_version", "catalog", "layer_id", "requirement_sha256", "platform_profiles_sha256"))
+            or saturation_ledger.v2_field_sha256(source) != source.get("field_sha256")):
+            return False
+        members = [member for member in _dicts(source.get("eligible_field"))
+                   if member.get("candidate_key") == entry.get("candidate_key")]
+        if (len(members) != 1 or members[0].get("repository") != entry.get("repository")
+            or members[0].get("evidence_key") != entry.get("evidence_key")):
+            return False
+        member = members[0]
+        if host_receipts.normalize_repository(entry.get("repo")) != host_receipts.normalize_repository(
+                member["repository"]):
+            return False
+        conflict = saturation_ledger.v2_provenance_conflict(documents)
+        screens = {role: saturation_ledger.v2_screen(role, documents[role], member, source, conflict)
+                   for role in saturation_ledger.ROLES}
+        outcome = saturation_ledger.v2_member_outcome(member, screens)
+        if (outcome.get("status") != "not_credible" or outcome.get("disposition") != "refuted"
+            or any(entry.get(field) != value for field, value in outcome.items())):
+            return False
+        for role in saturation_ledger.ROLES:
+            vote = entry.get(role)
+            if not isinstance(vote, dict) or vote.get("vote") != screens[role]["status"]:
+                return False
+            expected = {"contract_version": 2, "role": role, "candidate_key": member["candidate_key"],
+                        "repository": member["repository"], "evidence_key": member["evidence_key"],
+                        "judgments": documents[role], **screens[role]}
+            if target_of(vote.get("ref")) != expected:
+                return False
+        return True
+    except (FinalStackError, saturation_ledger.LedgerError, KeyError, TypeError, ValueError):
+        return False
+
+
+def final_disposition_index(sources: Sources, references: list, sweep_indices: dict) -> int | None:
+    """A recorder-preserved evidence ref must name a known covering ledger event."""
+    positions = []
+    target_of = saturation_ledger.ref_resolver(sources.json)
+    for reference in references:
+        retained_final_reference(sources, reference, "FINAL survivor disposition requires retained evidence")
+        try:
+            target = target_of(reference)
+        except (FinalStackError, saturation_ledger.LedgerError, TypeError, ValueError):
+            continue
+        if isinstance(target, dict):
+            position = sweep_indices.get(target.get("sweep_id"))
+            if position is not None:
+                positions.append(position)
+    return max(positions) if positions else None
+
+
+def final_unresolved_survivors(sources: Sources, row: dict, covering: list[dict]) -> list[dict]:
     """Replay all survivor history; age, omission and a missing vote never settle it."""
     pending = {}
+    pending_positions = {}
+    sweep_indices = {sweep["sweep_id"]: sweep["ledger_index"] for sweep in covering}
 
-    def retained_merit(entry) -> bool:
+    def mark_pending(identity, sweep):
+        pending[identity] = {"repository": identity, "sweep_id": sweep["sweep_id"], "date": sweep["date"]}
+        pending_positions[identity] = sweep["ledger_index"]
+
+    def retained_merit(entry, layer) -> bool:
+        if layer.get("contract_version") == 2:
+            return final_v2_refutes_on_merit(sources, entry, layer)
         if "lens_votes" in entry:
             votes = entry.get("lens_votes") or []
         else:
@@ -693,29 +767,32 @@ def final_unresolved_survivors(sources: Sources, row: dict, covering: list[dict]
                 repo = host_receipts.normalize_repository(candidate.get("repository", candidate.get("repo")))
                 identity = repo or candidate.get("candidate_key")
                 if identity:
-                    pending[identity] = {"repository": identity, "sweep_id": sweep["sweep_id"],
-                                         "date": sweep["date"]}
+                    mark_pending(identity, sweep)
             answered = {host_receipts.normalize_repository(candidate.get("repo"))
                         for field in ("survived", "refuted") for candidate in _dicts(layer.get(field))}
             for proposal in layer.get("proposed") or []:
                 repo = host_receipts.normalize_repository(proposal)
                 if repo and repo not in answered:
-                    pending[repo] = {"repository": repo, "sweep_id": sweep["sweep_id"], "date": sweep["date"]}
+                    mark_pending(repo, sweep)
             for candidate in _dicts(layer.get("survived")):
                 repo = host_receipts.normalize_repository(candidate.get("repo"))
                 if repo:
-                    pending[repo] = {"repository": repo, "sweep_id": sweep["sweep_id"], "date": sweep["date"]}
+                    mark_pending(repo, sweep)
             for candidate in _dicts(layer.get("refuted")):
                 repo = host_receipts.normalize_repository(candidate.get("repo"))
                 if not repo:
                     continue
-                if retained_merit(candidate):
+                if retained_merit(candidate, layer):
                     pending.pop(repo, None)
+                    pending_positions.pop(repo, None)
                 else:
-                    pending[repo] = {"repository": repo, "sweep_id": sweep["sweep_id"], "date": sweep["date"]}
-    settled = set()
+                    mark_pending(repo, sweep)
+    settled = {}
     for winner in _dicts(row.get("winners")):
-        settled.add(host_receipts.normalize_repository(winner.get("repository")))
+        repo = host_receipts.normalize_repository(winner.get("repository"))
+        position = final_disposition_index(sources, winner.get("evidence_refs") or [], sweep_indices)
+        if repo and position is not None:
+            settled[repo] = position
     for alternative in _dicts(row.get("alternatives")):
         refs = alternative.get("evidence_refs")
         if (alternative.get("disposition") not in {"observed_failure", "measured_tradeoff", "overlap", "out_of_scope",
@@ -723,11 +800,12 @@ def final_unresolved_survivors(sources: Sources, row: dict, covering: list[dict]
             or not isinstance(alternative.get("why_not_default"), str) or not alternative["why_not_default"].strip()
             or not isinstance(refs, list) or not refs):
             continue
-        for ref in refs:
-            retained_final_reference(sources, ref, "FINAL survivor disposition requires retained evidence")
-        settled.add(host_receipts.normalize_repository(alternative.get("repository")))
+        repo = host_receipts.normalize_repository(alternative.get("repository"))
+        position = final_disposition_index(sources, refs, sweep_indices)
+        if repo and position is not None:
+            settled[repo] = max(settled.get(repo, -1), position)
     return sorted((survivor for repo, survivor in pending.items() if not (
-        repo in settled and verdict_day is not None and date.fromisoformat(survivor["date"]) <= verdict_day)),
+        repo in settled and settled[repo] >= pending_positions[repo])),
         key=lambda survivor: survivor["repository"])
 
 
@@ -928,7 +1006,7 @@ def build_document(root: Path) -> dict:
                     raise FinalStackError("FINAL baseline requires one retained consumed covering sweep")
                 sources.read_bytes(consumed)
                 baseline = matches[0]
-                later = covering[covering.index(baseline) + 1:]
+                later = [sweep for sweep in covering if sweep["ledger_index"] > baseline["ledger_index"]]
                 reopened_by = final_reopened_by(sources, key, later, baseline)
                 if reopened_by:
                     state = "recorded_reopened"
@@ -943,7 +1021,7 @@ def build_document(root: Path) -> dict:
                             if outcome == "survived" and (verdict_day is None or date.fromisoformat(day) > verdict_day)),
                            key=lambda survivor: survivor["repository"])
         if resolved_terminal == "FINAL":
-            survivors = final_unresolved_survivors(sources, {**row, "catalog": catalog}, covering, verdict_day)
+            survivors = final_unresolved_survivors(sources, {**row, "catalog": catalog}, covering)
         recorded_repositories = {host_receipts.normalize_repository(item.get("repository"))
                                  for role in ("winners", "alternatives", "candidates") for item in _dicts(row.get(role))}
         layers.append({

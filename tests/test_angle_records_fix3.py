@@ -274,7 +274,7 @@ class FinalIntegrityTests(FixtureTestCase):
                 self.sweep(root, "2026-09-21", ident="earlier", survived=[repository])
                 evidence = "evidence/artifacts/fixture/disposition.json"
                 if settlement == "catalog":
-                    _write_json(root / evidence, {"reason": "Outside this frozen role."})
+                    _write_json(root / evidence, {"reason": "Outside this frozen role.", "sweep_id": "earlier"})
                     path = root / "catalogs/landscape/foundation.json"
                     catalog = json.loads(path.read_bytes())
                     catalog["layers"][0]["alternatives"] = [{"name": "Challenger", "repository": repository,
