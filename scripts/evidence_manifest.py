@@ -25,6 +25,7 @@ import json
 import os
 from pathlib import Path, PurePosixPath
 import re
+import stat
 import subprocess
 
 try:
@@ -37,6 +38,23 @@ EVIDENCE = "manifests/evidence.json"
 RECORDS = "manifests/evidence-files"
 
 
+class SourceError(ValueError):
+    """One identified source failed; historical readers may skip that source."""
+
+    def __init__(self, source, error):
+        self.source = source
+        self.io_failure = isinstance(error, (OSError, subprocess.SubprocessError))
+        detail = type(error).__name__ if self.io_failure else str(error)
+        super().__init__(f"{source!r}: {detail}")
+
+
+class RegistryEnumerationError(OSError):
+    """The complete entry set is unknown, so no reader may return a partial view."""
+
+    def __init__(self, source, error):
+        super().__init__(f"{source!r}: cannot enumerate records ({type(error).__name__})")
+
+
 def _object(raw: bytes | str) -> dict:
     value = json.loads(raw, object_pairs_hook=unique_json)
     if not isinstance(value, dict):
@@ -44,11 +62,32 @@ def _object(raw: bytes | str) -> dict:
     return value
 
 
+def _read_object(source, read) -> dict:
+    try:
+        return _object(read(source))
+    except (SourceError, RegistryEnumerationError):
+        raise
+    except (OSError, ValueError, subprocess.SubprocessError) as error:
+        raise SourceError(source, error) from error
+
+
+def read_git(git, revision: str, path: str) -> bytes:
+    """Bind a failed Git blob read to its source without printing Git stderr."""
+    try:
+        return git("show", revision + ":" + path)
+    except (OSError, subprocess.SubprocessError) as error:
+        raise SourceError(path, error) from error
+
+
+def read_seed_at(git, revision: str) -> dict:
+    return _read_object(EVIDENCE, lambda path: read_git(git, revision, path))
+
+
 def uses_records(document: dict) -> bool:
     """An explicit format marker keeps historical/fixture registries readable."""
     marker = document.get("file_records")
     if "file_records" in document and marker != RECORDS:
-        raise ValueError("unsupported evidence file_records source")
+        raise SourceError(EVIDENCE, ValueError("unsupported evidence file_records source"))
     return marker == RECORDS
 
 
@@ -68,19 +107,42 @@ def record_path(path: str) -> str:
 
 
 def record_sources(root: Path) -> list[str]:
-    directory = safe_file(root, RECORDS)
-    if not directory.exists():
+    try:
+        directory = safe_file(root, RECORDS)
+        mode = directory.lstat().st_mode
+    except FileNotFoundError:
         return []
-    if not directory.is_dir():
-        raise ValueError(f"{RECORDS}: evidence file_records source is not a directory")
+    except (OSError, ValueError) as error:
+        raise SourceError(RECORDS, error) from error
+    if not stat.S_ISDIR(mode):
+        raise SourceError(RECORDS, ValueError("evidence file_records source is not a directory"))
     result = []
-    for path in directory.rglob("*"):
-        relative = path.relative_to(root).as_posix()
-        safe_file(root, relative)  # includes directory symlinks, which rglob does not follow
-        if path.is_file():
-            if path.suffix != ".json":
-                raise ValueError(f"{relative}: unexpected non-JSON evidence record")
-            result.append(relative)
+    pending = [directory]
+    while pending:
+        directory = pending.pop()
+        # CPython v3.13.16 Lib/glob.py:509-523 suppresses scanning/stat errors.
+        # scandir plus explicit lstat keeps every failure visible and never
+        # treats a disappeared or nonregular entry as an absent registration.
+        try:
+            with os.scandir(directory) as entries:
+                children = sorted(entries, key=lambda entry: entry.name)
+        except OSError as error:
+            raise RegistryEnumerationError(directory.relative_to(root).as_posix(), error) from error
+        for entry in children:
+            relative = Path(entry.path).relative_to(root).as_posix()
+            try:
+                path = safe_file(root, relative)
+                mode = path.lstat().st_mode
+            except (OSError, ValueError) as error:
+                raise SourceError(relative, error) from error
+            if stat.S_ISDIR(mode):
+                pending.append(path)
+            elif stat.S_ISREG(mode):
+                if path.suffix != ".json":
+                    raise SourceError(relative, ValueError("unexpected non-JSON evidence record"))
+                result.append(relative)
+            else:
+                raise SourceError(relative, ValueError("evidence record must be a regular file or directory"))
     return sorted(result)
 
 
@@ -109,7 +171,9 @@ def assemble(seed: dict, sources, read, *, historical: bool = False) -> dict:
         if not isinstance(files, list):
             raise ValueError("evidence seed files must be an array")
     except ValueError as error:
-        raise ValueError(f"{EVIDENCE}: {error}") from error
+        if isinstance(error, SourceError):
+            raise
+        raise SourceError(EVIDENCE, error) from error
     records = {}
     ambiguous = set()
     for row in files:
@@ -118,10 +182,10 @@ def assemble(seed: dict, sources, read, *, historical: bool = False) -> dict:
         except ValueError as error:
             if historical:
                 continue
-            raise ValueError(f"{EVIDENCE}: {error}") from error
+            raise SourceError(EVIDENCE, error) from error
         if path in records:
             if not historical:
-                raise ValueError(f"{EVIDENCE}: duplicate evidence seed path")
+                raise SourceError(EVIDENCE, ValueError("duplicate evidence seed path"))
             ambiguous.add(path)
         records[path] = row
     for path in ambiguous:
@@ -142,10 +206,14 @@ def assemble(seed: dict, sources, read, *, historical: bool = False) -> dict:
                 path = validate_record(row)
             if record_path(path) != source or path in seen:
                 raise ValueError("misnamed or duplicate evidence record")
-        except (OSError, ValueError) as error:
+        except RegistryEnumerationError:
+            raise
+        except (OSError, ValueError, subprocess.SubprocessError) as error:
             if historical:
                 continue
-            raise ValueError(f"{source}: {error}") from error
+            if isinstance(error, SourceError):
+                raise
+            raise SourceError(source, error) from error
         seen.add(path)
         if row is None:
             records.pop(path, None)
@@ -159,10 +227,7 @@ def load(root: Path, *, read=None) -> dict:
     root = Path(root).resolve()
     if read is None:
         read = lambda path: safe_file(root, path).read_bytes()
-    try:
-        seed = _object(read(EVIDENCE))
-    except (OSError, ValueError) as error:
-        raise ValueError(f"{EVIDENCE}: {error}") from error
+    seed = _read_object(EVIDENCE, read)
     return assemble(seed, record_sources(root) if uses_records(seed) else [], read)
 
 
@@ -178,12 +243,15 @@ def load_at(root: Path, revision: str, *, git=None, historical: bool = False) ->
         def git(*args):
             return subprocess.run(["git", "--no-optional-locks", "-C", str(root), *args],
                                   env=environment, capture_output=True, check=True, timeout=30).stdout
-    seed = _object(git("show", revision + ":" + EVIDENCE))
+    seed = read_seed_at(git, revision)
     sources = []
     if uses_records(seed):
-        listing = git("ls-tree", "-r", "-z", revision, "--", RECORDS)
-        if listing and not listing.endswith(b"\0"):
-            raise ValueError("unterminated evidence record listing")
+        try:
+            listing = git("ls-tree", "-r", "-z", revision, "--", RECORDS)
+            if listing and not listing.endswith(b"\0"):
+                raise ValueError("unterminated evidence record listing")
+        except (OSError, ValueError, subprocess.SubprocessError) as error:
+            raise RegistryEnumerationError(RECORDS, error) from error
         for entry in listing.split(b"\0"):
             if not entry:
                 continue
@@ -200,13 +268,13 @@ def load_at(root: Path, revision: str, *, git=None, historical: bool = False) ->
                     continue
                 raise ValueError(f"invalid evidence record entry {entry!r}: {error}") from error
             sources.append(source)
-    return assemble(seed, sources, lambda path: git("show", revision + ":" + path), historical=historical)
+    return assemble(seed, sources, lambda path: read_git(git, revision, path), historical=historical)
 
 
 def write_record(root: Path, record: dict) -> None:
     """Register exactly the supplied expected metadata in its own Git path."""
-    if not uses_records(_object(safe_file(root, EVIDENCE).read_bytes())):
-        raise ValueError("evidence file_records format is not enabled")
+    if not uses_records(_read_object(EVIDENCE, lambda path: safe_file(root, path).read_bytes())):
+        raise SourceError(EVIDENCE, ValueError("evidence file_records format is not enabled"))
     target = safe_file(root, record_path(validate_record(record)))
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(json.dumps({"schema_version": 1, "record": record}, indent=2) + "\n", encoding="utf-8")
@@ -214,8 +282,8 @@ def write_record(root: Path, record: dict) -> None:
 
 def remove_record(root: Path, path: str) -> None:
     """An explicit tombstone preserves the seed and competes at the same Git path."""
-    if not uses_records(_object(safe_file(root, EVIDENCE).read_bytes())):
-        raise ValueError("evidence file_records format is not enabled")
+    if not uses_records(_read_object(EVIDENCE, lambda path: safe_file(root, path).read_bytes())):
+        raise SourceError(EVIDENCE, ValueError("evidence file_records format is not enabled"))
     target = safe_file(root, record_path(path))
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(json.dumps({"schema_version": 1, "remove": path}, indent=2) + "\n", encoding="utf-8")
@@ -248,8 +316,8 @@ def main(argv=None) -> int:
     mode.add_argument("--render", action="store_true", help="Print the generated registry; never update expected hashes")
     args = parser.parse_args(argv)
     root = args.root.resolve()
-    path = safe_file(root, EVIDENCE)
     try:
+        path = safe_file(root, EVIDENCE)
         evidence = json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=unique_json)
     except (OSError, UnicodeError, ValueError) as error:
         print(f"{EVIDENCE}: invalid JSON ({error})")

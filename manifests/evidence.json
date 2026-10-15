@@ -11533,8 +11533,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-read-deltas.json",
-      "sha256": "3fe847a3dfb4115eab07d9dd4ae4605a2a9a1bc4211b6dc45c1b583c3f331aa5",
-      "bytes": 1364
+      "sha256": "eecdd5076c4966d1586ada48a68f5a6ab9ce9ad986e91dd9dc5d5218917941dc",
+      "bytes": 1475
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
@@ -11605,6 +11605,16 @@
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261015-pr1166-delta.json",
       "sha256": "29073b10d664ca79e5aca91429ecd51e59e40200186e96bcbc0940e2c46444c2",
       "bytes": 1840
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261015-pr1166-io-delta.json",
+      "sha256": "221933e12d0c13404b761ec2f2376cdbc8e023e77eeec1533476163a1be90f87",
+      "bytes": 2593
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261015-pr1166-io.json",
+      "sha256": "fe030d99fc3b7b8b65922a7dfd4d50a6f67d007ecd3678b5c20ed6d97f1168d2",
+      "bytes": 27587
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261015-pr1166.json",
@@ -19288,8 +19298,8 @@
     },
     {
       "path": "docs/decisions/2026-10-15-github-merge-queue-evaluation.md",
-      "sha256": "65a0d803a784cad120a6cbb4127cd35defd1da28d1044d274fb18b7ef59df4a1",
-      "bytes": 40462
+      "sha256": "13993428a317ad292eb578898588aad23bea3b258ce6f97b932920a78f45f6a6",
+      "bytes": 45499
     },
     {
       "path": "docs/decisions/2026-10-15-jev-trading-harness-build.md",
@@ -41393,8 +41403,8 @@
     },
     {
       "path": "evidence/artifacts/merge-queue-evaluation-20261015/registry-reference-probes.json",
-      "sha256": "c2c7ced60d940dbeeca2987b8b6558b8aa122c314596a05dc128f94d2c26270f",
-      "bytes": 12208
+      "sha256": "56c05fe75ea08dde6f738e1e65a61fb2cbc8e39d3f5b15336cf8fc137e5710b4",
+      "bytes": 24425
     },
     {
       "path": "evidence/artifacts/model-currency-enforcement-20261007/checks.json",
@@ -62433,8 +62443,8 @@
     },
     {
       "path": "scripts/evidence_manifest.py",
-      "sha256": "c3090fc067108af221556d57adb97c2a7e1b37437258df4bfca8818ad673257d",
-      "bytes": 12335
+      "sha256": "a59ea32cce0ab790f67a2b2925fd2488a0dd677f072e30d92d82ace48c0c7f56",
+      "bytes": 15181
     },
     {
       "path": "scripts/final_stack.py",
@@ -62583,8 +62593,8 @@
     },
     {
       "path": "scripts/validate.py",
-      "sha256": "eb2b2d070a7a82be6bac83b94ed00df3da225ae09cc523dff77b02e92fcdc66f",
-      "bytes": 50968
+      "sha256": "ee9db41dc17ba4d3d7994d0126bf22e1d4062412c0452c98013135bc054541d5",
+      "bytes": 51424
     },
     {
       "path": "scripts/validate_catalogs.py",
@@ -63503,8 +63513,8 @@
     },
     {
       "path": "tests/test_evidence_manifest.py",
-      "sha256": "f6f92d74fa45e6db477aebcf0ee3bece73696cc4fab7daf7500a9047bbeab14c",
-      "bytes": 21958
+      "sha256": "096c3741da6910300bc1805b89c4bdf8a22830a94089aea9e688bcd5b9b6a170",
+      "bytes": 30202
     },
     {
       "path": "tests/test_execution_realism.py",

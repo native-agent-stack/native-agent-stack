@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import hashlib
+import errno
 from contextlib import redirect_stdout
 import io
 import os
@@ -12,6 +13,7 @@ from pathlib import Path
 import subprocess
 import tempfile
 import unittest
+from unittest import mock
 
 from scripts import evidence_manifest as em
 from scripts.host_receipts import register_file
@@ -377,6 +379,162 @@ class EvidenceRegistrationMergeTests(unittest.TestCase):
                 historical = em.load_at(self.root, "HEAD", git=git, historical=True)
                 self.assertEqual({row["path"] for row in historical["files"]},
                                  {"evidence/seed.txt", "docs/keep.md"})
+
+    def test_unreadable_fanout_directory_cannot_produce_a_successful_partial_view(self):
+        self.seed["files"] = []
+        (self.root / em.EVIDENCE).write_text(json.dumps(self.seed))
+        (self.root / "evidence/only.txt").write_text("the only authored record\n")
+        register_file(self.root, "evidence/only.txt")
+        self.assertEqual(len(em.load(self.root)["files"]), 1)
+        directory = (self.root / em.record_path("evidence/only.txt")).parent
+        mode = directory.stat().st_mode & 0o777
+        directory.chmod(0)
+        try:
+            # Prove the real permission boundary; never turn a privileged run
+            # that can still read the directory into a false passing probe.
+            with self.assertRaises(PermissionError), os.scandir(directory):
+                pass
+            with self.subTest(entry_point="load"):
+                with self.assertRaises((OSError, ValueError)) as raised:
+                    em.load(self.root)
+                self.assertIn(directory.relative_to(self.root).as_posix(), str(raised.exception))
+            for option in ("--check", "--render"):
+                with self.subTest(entry_point=option):
+                    output = io.StringIO()
+                    with redirect_stdout(output):
+                        self.assertEqual(em.main(["--root", str(self.root), option]), 1)
+                    self.assertIn(directory.relative_to(self.root).as_posix(), output.getvalue())
+        finally:
+            directory.chmod(mode)
+
+    def test_enumerated_record_stat_failure_cannot_be_treated_as_absence(self):
+        self.registration_branch("registered", "evidence/new.txt", b"registered\n")
+        source = self.root / em.record_path("evidence/new.txt")
+        native_stat = Path.stat
+
+        def disappeared(path, *args, **kwargs):
+            if path == source:
+                raise FileNotFoundError(errno.ENOENT, "fixture disappearance", str(path))
+            return native_stat(path, *args, **kwargs)
+
+        with mock.patch.object(Path, "stat", disappeared):
+            with self.assertRaises((OSError, ValueError)) as raised:
+                em.load(self.root)
+        self.assertIn(source.relative_to(self.root).as_posix(), str(raised.exception))
+
+    def test_nonregular_record_is_refused_before_any_body_read(self):
+        self.registration_branch("registered", "evidence/new.txt", b"registered\n")
+        fifo = self.root / em.RECORDS / "not-a-regular-record.json"
+        os.mkfifo(fifo)
+        with self.assertRaises((OSError, ValueError)) as raised:
+            em.record_sources(self.root)
+        self.assertIn(fifo.relative_to(self.root).as_posix(), str(raised.exception))
+
+    def test_unreadable_record_body_is_rejected_with_its_source_path(self):
+        self.registration_branch("registered", "evidence/new.txt", b"registered\n")
+        source = self.root / em.record_path("evidence/new.txt")
+        mode = source.stat().st_mode & 0o777
+        source.chmod(0)
+        try:
+            with self.assertRaises(PermissionError):
+                source.read_bytes()
+            with self.assertRaises((OSError, ValueError)) as raised:
+                em.load(self.root)
+            self.assertIn(source.relative_to(self.root).as_posix(), str(raised.exception))
+        finally:
+            source.chmod(mode)
+
+    def test_historical_git_blob_read_errors_skip_only_the_named_record(self):
+        (self.root / "docs").mkdir()
+        for path in ("docs/keep.md", "docs/unreadable.md"):
+            (self.root / path).write_text("registered document\n")
+            register_file(self.root, path)
+        self.commit("two independently registered documents")
+        source = em.record_path("docs/unreadable.md")
+        errors = (
+            FileNotFoundError(errno.ENOENT, "fixture missing blob", source),
+            PermissionError(errno.EACCES, "fixture unreadable blob", source),
+            subprocess.CalledProcessError(128, ["git", "show", "HEAD:" + source]),
+            subprocess.TimeoutExpired(["git", "show", "HEAD:" + source], 30),
+        )
+        for error in errors:
+            with self.subTest(error=type(error).__name__):
+                def git(*args):
+                    if args == ("show", "HEAD:" + source):
+                        raise error
+                    return self.git_bytes(*args)
+
+                with self.assertRaises((OSError, ValueError, subprocess.SubprocessError)) as raised:
+                    em.load_at(self.root, "HEAD", git=git)
+                self.assertIn(source, str(raised.exception))
+                rows = em.load_at(self.root, "HEAD", git=git, historical=True)["files"]
+                self.assertEqual({row["path"] for row in rows}, {"evidence/seed.txt", "docs/keep.md"})
+
+    def test_seed_decode_errors_name_the_manifest_at_every_entry_point(self):
+        (self.root / em.EVIDENCE).write_bytes(b"\xff")
+        self.commit("undecodable seed")
+        operations = {
+            "load": lambda: em.load(self.root),
+            "load_at": lambda: em.load_at(self.root, "HEAD"),
+            "write_record": lambda: em.write_record(self.root, {
+                "path": "evidence/new.txt", "sha256": "a" * 64, "bytes": 1}),
+            "remove_record": lambda: em.remove_record(self.root, "evidence/seed.txt"),
+        }
+        for name, operation in operations.items():
+            with self.subTest(entry_point=name):
+                with self.assertRaises((OSError, ValueError)) as raised:
+                    operation()
+                self.assertIn(em.EVIDENCE, str(raised.exception))
+        output = io.StringIO()
+        with redirect_stdout(output):
+            self.assertEqual(em.main(["--root", str(self.root), "--check"]), 1)
+        self.assertIn(em.EVIDENCE, output.getvalue())
+
+    def test_failed_git_enumeration_cannot_clear_historical_registration_intent(self):
+        (self.root / "docs").mkdir()
+        registered = self.registration_branch("registered", "docs/keep.md", b"keep registration\n")
+        (self.root / em.record_path("docs/keep.md")).unlink()
+        self.commit("remove the registration but keep its document")
+        native_run = subprocess.run
+        observed = []
+
+        def run(command, *args, **kwargs):
+            if command[-6:] == ["ls-tree", "-r", "-z", registered, "--", em.RECORDS]:
+                observed.append(command)
+                raise subprocess.CalledProcessError(128, command)
+            return native_run(command, *args, **kwargs)
+
+        with mock.patch("scripts.validate.subprocess.run", side_effect=run):
+            with self.assertRaisesRegex(InvalidPublication, em.RECORDS):
+                validate_registration_rows(self.root, self.base, before_ref=registered, record_fragments=True)
+        self.assertTrue(observed)
+
+    def test_fragment_control_and_artifact_reads_fail_closed_with_the_source_name(self):
+        head = self.registration_branch("registered", "evidence/new.txt", b"registered bytes\n")
+        validate_registration_rows(self.root, self.base, record_fragments=True)
+        native_run = subprocess.run
+        targets = (
+            (self.base, em.EVIDENCE, 2),
+            (head, em.EVIDENCE, 2),
+            (head, em.record_path("evidence/new.txt"), 1),
+            (head, "evidence/new.txt", 1),
+        )
+        for revision, source, occurrence in targets:
+            with self.subTest(revision=revision, source=source, occurrence=occurrence):
+                observed = []
+
+                def run(command, *args, **kwargs):
+                    if command[-2:] == ["show", revision + ":" + source]:
+                        observed.append(command)
+                        if len(observed) == occurrence:
+                            raise subprocess.CalledProcessError(128, command)
+                    return native_run(command, *args, **kwargs)
+
+                with mock.patch("scripts.validate.subprocess.run", side_effect=run):
+                    with self.assertRaises(InvalidPublication) as raised:
+                        validate_registration_rows(self.root, self.base, record_fragments=True)
+                self.assertGreaterEqual(len(observed), occurrence)
+                self.assertIn(source, str(raised.exception))
 
 
 if __name__ == "__main__":

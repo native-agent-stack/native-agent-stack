@@ -186,5 +186,243 @@
       }
     ],
     "accessed": "2026-10-15"
+  },
+  "io_fold": {
+    "date": "2026-10-15",
+    "source_revision_before": "c0437a49687a3d50bb28312cba893ce5cd045f9b",
+    "scope": "All enumeration/read/decode/stat sites in scripts/evidence_manifest.py; only PR-added or record_fragments=True paths in scripts/validate.py. Complete enumeration failure aborts both modes; a historical record read failure skips only that identified record.",
+    "implementation": "Explicit os.scandir plus lstat rejects scan/stat failures and nonregular records. SourceError binds reads/decodes to named sources; read_git/read_seed_at centralize Git I/O. RegistryEnumerationError aborts an incomplete inventory in both modes. Historical known-record read failures skip only that record. Scoped validate.py controls no longer turn a base-seed I/O failure into an empty seed; current errors retain source names. No existing tests were weakened.",
+    "source_files_sha256": {
+      "scripts/evidence_manifest.py": "a59ea32cce0ab790f67a2b2925fd2488a0dd677f072e30d92d82ace48c0c7f56",
+      "scripts/validate.py": "ee9db41dc17ba4d3d7994d0126bf22e1d4062412c0452c98013135bc054541d5",
+      "tests/test_evidence_manifest.py": "096c3741da6910300bc1805b89c4bdf8a22830a94089aea9e688bcd5b9b6a170"
+    },
+    "red_source": "Only the eight regression tests were added to the unchanged source_revision_before implementation.",
+    "red_command": "python3 -m unittest tests.test_evidence_manifest.EvidenceRegistrationMergeTests.test_unreadable_fanout_directory_cannot_produce_a_successful_partial_view tests.test_evidence_manifest.EvidenceRegistrationMergeTests.test_enumerated_record_stat_failure_cannot_be_treated_as_absence tests.test_evidence_manifest.EvidenceRegistrationMergeTests.test_nonregular_record_is_refused_before_any_body_read tests.test_evidence_manifest.EvidenceRegistrationMergeTests.test_unreadable_record_body_is_rejected_with_its_source_path tests.test_evidence_manifest.EvidenceRegistrationMergeTests.test_historical_git_blob_read_errors_skip_only_the_named_record tests.test_evidence_manifest.EvidenceRegistrationMergeTests.test_seed_decode_errors_name_the_manifest_at_every_entry_point tests.test_evidence_manifest.EvidenceRegistrationMergeTests.test_failed_git_enumeration_cannot_clear_historical_registration_intent tests.test_evidence_manifest.EvidenceRegistrationMergeTests.test_fragment_control_and_artifact_reads_fail_closed_with_the_source_name -q",
+    "red_tests": 8,
+    "red_failures": 13,
+    "red_errors": 2,
+    "red_seconds": 0.743,
+    "red_exit": 1,
+    "green_command": "python3 -m unittest tests.test_evidence_manifest.EvidenceRegistrationMergeTests.test_unreadable_fanout_directory_cannot_produce_a_successful_partial_view tests.test_evidence_manifest.EvidenceRegistrationMergeTests.test_enumerated_record_stat_failure_cannot_be_treated_as_absence tests.test_evidence_manifest.EvidenceRegistrationMergeTests.test_nonregular_record_is_refused_before_any_body_read tests.test_evidence_manifest.EvidenceRegistrationMergeTests.test_unreadable_record_body_is_rejected_with_its_source_path tests.test_evidence_manifest.EvidenceRegistrationMergeTests.test_historical_git_blob_read_errors_skip_only_the_named_record tests.test_evidence_manifest.EvidenceRegistrationMergeTests.test_seed_decode_errors_name_the_manifest_at_every_entry_point tests.test_evidence_manifest.EvidenceRegistrationMergeTests.test_failed_git_enumeration_cannot_clear_historical_registration_intent tests.test_evidence_manifest.EvidenceRegistrationMergeTests.test_fragment_control_and_artifact_reads_fail_closed_with_the_source_name -q",
+    "green_tests": 8,
+    "green_seconds": 0.631,
+    "green_exit": 0,
+    "green_skips": 0,
+    "broader_green_command": "python3 -m unittest tests.test_evidence_manifest tests.test_registry_rows tests.test_host_receipts tests.test_validate tests.test_verdict_review_gate -q",
+    "broader_green_tests": 502,
+    "broader_green_seconds": 39.681,
+    "broader_green_skips": 0,
+    "broader_green_exit": 0,
+    "regressions": [
+      {
+        "name": "test_unreadable_fanout_directory_cannot_produce_a_successful_partial_view",
+        "class": "EvidenceRegistrationMergeTests"
+      },
+      {
+        "name": "test_enumerated_record_stat_failure_cannot_be_treated_as_absence",
+        "class": "EvidenceRegistrationMergeTests"
+      },
+      {
+        "name": "test_nonregular_record_is_refused_before_any_body_read",
+        "class": "EvidenceRegistrationMergeTests"
+      },
+      {
+        "name": "test_unreadable_record_body_is_rejected_with_its_source_path",
+        "class": "EvidenceRegistrationMergeTests"
+      },
+      {
+        "name": "test_historical_git_blob_read_errors_skip_only_the_named_record",
+        "class": "EvidenceRegistrationMergeTests"
+      },
+      {
+        "name": "test_seed_decode_errors_name_the_manifest_at_every_entry_point",
+        "class": "EvidenceRegistrationMergeTests"
+      },
+      {
+        "name": "test_failed_git_enumeration_cannot_clear_historical_registration_intent",
+        "class": "EvidenceRegistrationMergeTests"
+      },
+      {
+        "name": "test_fragment_control_and_artifact_reads_fail_closed_with_the_source_name",
+        "class": "EvidenceRegistrationMergeTests"
+      }
+    ],
+    "controls": [
+      "The mode-000 fanout-directory fixture first proves a real PermissionError with os.scandir, exercises load/--check/--render, and restores modes in finally; no skip or mocked permission boundary.",
+      "Unreadable record-body handling already rejected current input and is retained as a positive control, not counted as a newly discovered vulnerability.",
+      "Enumerated record stat failure and FIFO input are rejected before reading record bytes.",
+      "Historical Git record read OSError, CalledProcessError and TimeoutExpired preserve a valid sibling.",
+      "Unavailable Git enumeration rejects both current and historical views and cannot erase registration intent.",
+      "Scoped base/head seed, record and artifact read failures identify the failed source. Unrelated legacy validator behavior remains unchanged."
+    ],
+    "native_monitoring_comparison": {
+      "source_overlay": {
+        "base_commit": "c0437a49687a3d50bb28312cba893ce5cd045f9b",
+        "overlaid_files_sha256": {
+          "scripts/evidence_manifest.py": "a59ea32cce0ab790f67a2b2925fd2488a0dd677f072e30d92d82ace48c0c7f56",
+          "scripts/validate.py": "ee9db41dc17ba4d3d7994d0126bf22e1d4062412c0452c98013135bc054541d5",
+          "tests/test_evidence_manifest.py": "096c3741da6910300bc1805b89c4bdf8a22830a94089aea9e688bcd5b9b6a170"
+        },
+        "method": "Native patch_policy.GitTree at base_commit, with read(path) overlaid by exactly the three named working-tree files; all other reads and entries remain from that commit. derive_ci_protected measures this candidate overlay, not the unmodified base commit. The hashes identify source files published with this observation."
+      },
+      "before": 359,
+      "after": 354,
+      "added_by_script": {},
+      "removed_by_script": {
+        "scripts/evidence_manifest.py": 3,
+        "scripts/validate.py": 2
+      },
+      "added_shapes": [],
+      "removed_shapes": [
+        [
+          "scripts/validate.py",
+          [
+            "*:manifests/evidence.json"
+          ],
+          2
+        ]
+      ],
+      "added_locations": [
+        "scripts/evidence_manifest.py:127",
+        "scripts/validate.py:828"
+      ],
+      "removed_locations": [
+        "scripts/evidence_manifest.py:77",
+        "scripts/evidence_manifest.py:78",
+        "scripts/evidence_manifest.py:80",
+        "scripts/evidence_manifest.py:81",
+        "scripts/validate.py:788",
+        "scripts/validate.py:793",
+        "scripts/validate.py:824"
+      ],
+      "read_classifications": [
+        {
+          "location": "scripts/evidence_manifest.py:127",
+          "classification": "explicit_registry_directory_enumeration",
+          "native_bucket": "unclassified",
+          "scope": "os.scandir raises on unavailable directories; the static advisory walker does not establish runtime read completeness.",
+          "permission_change": false
+        },
+        {
+          "location": "scripts/validate.py:828",
+          "classification": "existing_legacy_artifact_read",
+          "native_bucket": "unclassified",
+          "scope": "The legacy flag=False Git artifact read is retained on a moved line; fragment-aware reads now use the named-source helper.",
+          "permission_change": false
+        }
+      ],
+      "snapshot_path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261015-pr1166-io.json",
+      "delta_path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261015-pr1166-io-delta.json",
+      "historical_snapshots": "unchanged",
+      "interpretation": "Static scanner inventory decreased; no runtime read reduction or permission change is claimed."
+    },
+    "inventory": {
+      "exact_pattern": "directory.rglob(\"*\")",
+      "exact_matches": [
+        "scripts/evidence_manifest.py:77 at c0437a49"
+      ],
+      "original_em_sites": [
+        72,
+        74,
+        77,
+        80,
+        161,
+        197,
+        208,
+        217,
+        253
+      ],
+      "original_validate_sites": [
+        331,
+        335,
+        337,
+        404,
+        410,
+        420,
+        434,
+        442,
+        453,
+        483,
+        495,
+        498,
+        499,
+        538,
+        555,
+        557,
+        604,
+        691,
+        694,
+        745,
+        808,
+        813
+      ],
+      "excluded_followups": "Unrelated validate.py publication walking, optional existence checks, regular-file and symlink predicates, ordinary scanner reads/decodes remain for the first burn-down PR; do not edit them here.",
+      "scope_note": "Only validate_registration_rows(record_fragments=True) paths changed. Legacy flag=False behavior preserved.",
+      "original_git_read_sites": {
+        "scripts/evidence_manifest.py": [
+          181,
+          184,
+          203
+        ]
+      },
+      "inventory_note": "The native Git wrapper calls are listed separately from the direct filesystem/stat/decode sites; all are included in the bounded sweep."
+    },
+    "follow_ups": {
+      "target": "First burn-down PR",
+      "paths": [
+        "scripts/validate.py"
+      ],
+      "sites_at_source_revision_before": [
+        331,
+        335,
+        337,
+        404,
+        410,
+        420,
+        434,
+        442,
+        453,
+        483,
+        495,
+        498,
+        499,
+        538,
+        555,
+        557,
+        604,
+        691,
+        694
+      ],
+      "scope": "Review ordinary publication traversal, optional existence checks, regular-file/symlink predicates and scanner reads/decodes. These sites were deliberately not changed here; a listed site is not a claim of a bug.",
+      "existing_controls_at_source_revision_before": [
+        745,
+        808,
+        813
+      ],
+      "control_disposition": "Revision, merge-base and rev-list control decodes already reject unavailable or invalid global Git inputs through the existing outer error boundary; retain those controls."
+    },
+    "mechanism_sources": [
+      {
+        "repository": "python/cpython",
+        "tag": "v3.13.16",
+        "tag_object": "3b55c23ff4a6aa32f77be661802a3978d7324f88",
+        "pin": "cbc944f4bc59639a444dd971c737788ba2283a91",
+        "path": "Lib/pathlib/_local.py",
+        "lines": "611-620,622-628",
+        "url": "https://github.com/python/cpython/blob/v3.13.16/Lib/pathlib/_local.py#L611",
+        "mechanism": "rglob delegates to glob; Path.walk delegates to os.walk, so a walker replacement must explicitly preserve scan errors."
+      },
+      {
+        "repository": "python/cpython",
+        "tag": "v3.13.16",
+        "pin": "cbc944f4bc59639a444dd971c737788ba2283a91",
+        "path": "Lib/glob.py",
+        "lines": "452-467,509-523",
+        "url": "https://github.com/python/cpython/blob/v3.13.16/Lib/glob.py#L509",
+        "mechanism": "Glob suppresses scanning and entry-is_dir OSErrors; explicit os.scandir and lstat expose those failures instead of returning a successful partial registry."
+      }
+    ],
+    "accessed": "2026-10-15"
   }
 }

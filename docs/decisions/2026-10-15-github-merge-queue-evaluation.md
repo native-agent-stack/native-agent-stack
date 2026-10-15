@@ -158,6 +158,66 @@ under `listing_fold` in `registry-reference-probes.json`. The broader suite
 passes **494 tests** without skips in **79.958 seconds**. Native advisory
 comparison remains at 359 sites with identical locations and shapes.
 
+The next I/O sweep uses `c0437a49687a3d50bb28312cba893ce5cd045f9b` as
+its unchanged RED implementation. A real mode-000 digest fanout directory
+exposed a successful partial registry: `Path.rglob` silently omitted the
+unreadable directory. The fix uses explicit `os.scandir` and `lstat`, rejecting
+scan/stat failures and nonregular entries before any body read. A genuinely
+absent record root remains a valid empty record set. An unavailable complete
+enumeration aborts both current and historical reads; it cannot be treated as
+an empty historical registry. Read/decode failures identify their source,
+while a failed individual historical record is skipped without losing valid
+siblings. Git stderr and command details are not included in I/O diagnostics.
+
+This behavior follows the release-tag source for CPython **v3.13.16**:
+[`Lib/pathlib/_local.py:611–620`](https://github.com/python/cpython/blob/v3.13.16/Lib/pathlib/_local.py#L611)
+delegates `rglob` to `glob`, and
+[`Lib/glob.py:452–467`](https://github.com/python/cpython/blob/v3.13.16/Lib/glob.py#L452)
+and [`:509–523`](https://github.com/python/cpython/blob/v3.13.16/Lib/glob.py#L509)
+suppress scanning and entry `is_dir` errors. `Path.walk` also delegates to
+`os.walk` at
+[`Lib/pathlib/_local.py:622–628`](https://github.com/python/cpython/blob/v3.13.16/Lib/pathlib/_local.py#L622);
+a walker replacement must explicitly preserve the error path. The annotated
+release tag resolves to `cbc944f4bc59639a444dd971c737788ba2283a91`;
+these sources were accessed **2026-10-15**.
+
+The bounded site inventory and dispositions are:
+
+| Site class at `c0437a49` | Disposition and regression |
+| --- | --- |
+| `evidence_manifest.py` record-root predicates and recursive scan/stat, lines 72, 74, 77, 80 | Explicit enumeration and stat errors reject partial views. The mode-000 fixture first proves a real `PermissionError`, then exercises `load`, `--check` and `--render`; an enumerated entry's stat failure and a FIFO are separate cases. Modes are restored in `finally`; no permission skip or mock. |
+| Local seed/record reads, including lines 161, 208, 217, 253 | Named-source read/decode boundaries cover loading, registration, removal and CLI paths. Seed decode diagnostics are tested through all entry points. Unreadable record-body rejection was already correct and remains a positive control. |
+| Native Git seed, listing and record reads in `load_at`, including strict entry decode at line 197 | Global enumeration failure aborts; each known historical record's I/O/process/timeout failure skips only that record. The existing malformed-entry decode boundary and current strictness remain. |
+| Fragment-aware `validate_registration_rows` seed, record and artifact reads | Scoped named-source helpers preserve current rejection and the frozen-seed guard. Base-seed I/O failure can no longer disable that guard; base/head seed, fragment and artifact failures name the source. The `record_fragments=False` path retains its behavior. |
+| Global Git revision/history control decodes in `validate.py`, lines 745, 808, 813 | Existing controls already reject unavailable/invalid global Git inputs through the outer error boundary; retained without a speculative fix. |
+
+With only the eight new regression tests added to `c0437a49`, RED produced
+**13 failures and 2 errors in 8 tests** (exit 1, 0.743 seconds). The same
+eight tests pass after correction (exit 0, 0.631 seconds); the broader suite
+passes **502 tests**, no skips, in **39.681 seconds**. Exact commands, test
+names, source hashes and dispositions are retained under `io_fold` in
+`registry-reference-probes.json`. No existing test is weakened.
+
+The native monitoring observation is appended as
+[`unclassified-gate-reads-20261015-pr1166-io.json`](../../blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261015-pr1166-io.json)
+with a new dated delta. Its provenance is `GitTree(c0437a49)` plus the three
+explicitly hashed candidate source/test files, not `c0437a49` alone. Native
+derivation changes **359 to 354 sites**: minus three in `evidence_manifest.py`
+and two in `validate.py`, with the exact location/shape differences retained.
+Centralizing reads changes the static scanner inventory; this is not a claim
+of fewer runtime reads. The complete new snapshot supports an empty relative
+delta; all historical snapshots, deltas and exact assertions remain intact,
+with no worker permission change.
+
+**Follow-ups for the first burn-down PR:** inspect unrelated `validate.py`
+publication traversal, optional existence checks, regular-file/symlink
+predicates and ordinary scanner reads/decodes. The retained locations at
+`c0437a49` are 331, 335, 337, 404, 410, 420, 434, 442, 453, 483, 495, 498,
+499, 538, 555, 557, 604, 691 and 694. These sites are deliberately outside
+this correction; their presence in the inventory is not a finding of a bug.
+The existing fail-closed Git controls above remain controls. The I/O sweep
+does not authorize production registry activation or a wider validator change.
+
 The first evaluation CI run, **38755360119**, failed two OpenHands advisory
 baseline checks in `validate-shard-3` (job **116492228275**). Both failures were
 reproduced locally before correction. Native `GitTree`/`derive_ci_protected`

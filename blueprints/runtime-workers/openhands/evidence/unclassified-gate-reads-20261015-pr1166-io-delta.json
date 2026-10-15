@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "kind": "gate_read_accounting_delta",
+  "date": "2026-10-15",
+  "source_commit": "c0437a49687a3d50bb28312cba893ce5cd045f9b",
+  "source_commit_role": "base_of_recorded_source_overlay",
+  "source_overlay": {
+    "base_commit": "c0437a49687a3d50bb28312cba893ce5cd045f9b",
+    "overlaid_files_sha256": {
+      "scripts/evidence_manifest.py": "a59ea32cce0ab790f67a2b2925fd2488a0dd677f072e30d92d82ace48c0c7f56",
+      "scripts/validate.py": "ee9db41dc17ba4d3d7994d0126bf22e1d4062412c0452c98013135bc054541d5",
+      "tests/test_evidence_manifest.py": "096c3741da6910300bc1805b89c4bdf8a22830a94089aea9e688bcd5b9b6a170"
+    },
+    "method": "Native patch_policy.GitTree at base_commit, with read(path) overlaid by exactly the three named working-tree files; all other reads and entries remain from that commit. derive_ci_protected measures this candidate overlay, not the unmodified base commit. The hashes identify source files published with this observation."
+  },
+  "baseline_path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261015-pr1166-io.json",
+  "baseline_sha256": "fe030d99fc3b7b8b65922a7dfd4d50a6f67d007ecd3678b5c20ed6d97f1168d2",
+  "mode": "monitoring_only",
+  "added_by_script": {},
+  "removed_by_script": {},
+  "added_shapes": [],
+  "removed_shapes": [],
+  "added_locations": [],
+  "derived_count": 354,
+  "derivation": {
+    "source": "blueprints/runtime-workers/openhands/resolver/push_gate.py:derive_ci_protected through native patch_policy.GitTree plus the explicitly hashed source overlay",
+    "contract": "blueprints/runtime-workers/openhands/evidence/advisory-gate-deltas.md at c0437a49687a3d50bb28312cba893ce5cd045f9b",
+    "replay": "python3 -m unittest tests.test_runtime_worker_openhands_push_gate -q on the committed candidate",
+    "method": "Append a complete dated native snapshot. Relative additions and removals are empty because that new baseline includes every observed location and shape. Its source_change separately retains the comparison with the unmodified base: 359 to 354, minus three evidence_manifest sites and two validate sites, with exact shape and location differences. The candidate source is the base commit plus source_overlay, never the base commit alone.",
+    "interpretation": "Static monitoring accounting only. Centralizing reads changes the scanner inventory; it does not establish fewer runtime reads, grant worker permission, or relax enforcement. Historical snapshot/delta bytes and exact test assertions are unchanged."
+  },
+  "read_classifications": [],
+  "removed_locations": []
+}

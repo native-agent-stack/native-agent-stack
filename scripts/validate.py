@@ -765,8 +765,11 @@ def validate_registration_rows(root: Path, base_ref: str, *, before_ref: str | N
                        (isinstance(row.get("sha256"), str)
                         and re.fullmatch(r"[0-9a-f]{64}", row["sha256"])
                         and type(row.get("bytes")) is int and row["bytes"] >= 0))}
-        except (subprocess.CalledProcessError, ValueError, KeyError, TypeError):
+        except (subprocess.CalledProcessError, ValueError, KeyError, TypeError) as error:
             if not historical:
+                if record_fragments and isinstance(error, evidence_manifest.SourceError):
+                    raise InvalidPublication(
+                        f"{ref}:manifests/evidence.json: invalid current registration manifest: {error}") from None
                 raise InvalidPublication(f"{ref}:manifests/evidence.json: invalid current registration manifest") from None
             print(f"PR registration: skipped invalid historical manifest {ref}:manifests/evidence.json",
                   file=sys.stderr)
@@ -785,13 +788,13 @@ def validate_registration_rows(root: Path, base_ref: str, *, before_ref: str | N
         baseline, current = rows(base, historical=True), rows(head)
         if record_fragments:
             try:
-                base_seed = json.loads(git("show", base + ":manifests/evidence.json"),
-                                       object_pairs_hook=_json_without_duplicates)
-            except (subprocess.CalledProcessError, ValueError):
+                base_seed = evidence_manifest.read_seed_at(git, base)
+            except evidence_manifest.SourceError as error:
+                if error.io_failure:
+                    raise
                 base_seed = {}
             if isinstance(base_seed, dict) and evidence_manifest.uses_records(base_seed):
-                head_seed = json.loads(git("show", head + ":manifests/evidence.json"),
-                                       object_pairs_hook=_json_without_duplicates)
+                head_seed = evidence_manifest.read_seed_at(git, head)
                 if (not evidence_manifest.uses_records(head_seed)
                         or head_seed.get("files") != base_seed.get("files")):
                     raise InvalidPublication("frozen files[] seed changed: register file changes in per-path records")
@@ -821,14 +824,18 @@ def validate_registration_rows(root: Path, base_ref: str, *, before_ref: str | N
             if row is None:
                 errors.append(f"{name}: required registration row missing")
                 continue
-            raw = git("show", head + ":" + name)
+            raw = (evidence_manifest.read_git(git, head, name) if record_fragments
+                   else git("show", head + ":" + name))
             if row.get("sha256") != hashlib.sha256(raw).hexdigest():
                 errors.append(f"{name}: SHA-256 mismatch at Git head")
             if type(row.get("bytes")) is not int or row["bytes"] != len(raw):
                 errors.append(f"{name}: byte count mismatch at Git head")
     except InvalidPublication:
         raise
-    except (OSError, subprocess.SubprocessError, ValueError, KeyError, TypeError):
+    except (OSError, subprocess.SubprocessError, ValueError, KeyError, TypeError) as error:
+        if record_fragments and isinstance(error, (evidence_manifest.SourceError,
+                                                   evidence_manifest.RegistryEnumerationError)):
+            raise InvalidPublication(str(error)) from None
         raise InvalidPublication("PR registration Git inputs unavailable or invalid") from None
     if errors:
         raise InvalidPublication("\n".join(errors))
