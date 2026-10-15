@@ -2319,10 +2319,9 @@ class SkillsDocsTests(unittest.TestCase):
 YAML_PIN_REL = "tools/sota-convergence/landscape-sweep/skills-yaml.pin.json"
 YAML_WORKFLOW, YAML_JOB = "validate.yml", "validate"
 YAML_KEY = f"{YAML_WORKFLOW}:{YAML_JOB}"
-# The remaining serial suite without the YAML pin is catalog-freshness.yml:freshness.
-# Its reader tests and tripwire report this recorded gap; add provisioning and
-# delete the entry together. The ratchet rejects stale exemptions.
-YAML_KNOWN_UNPROVISIONED = {"catalog-freshness.yml:freshness"}
+# Every native suite/shard now provisions this pin, including catalog freshness.
+# The synthetic gap transition below keeps the ratchet exercised.
+YAML_KNOWN_UNPROVISIONED = set()
 YAML_TRIPWIRE = "tests.test_landscape_sweep_skills.SkillsYamlInstalledInCI"
 
 
@@ -2578,13 +2577,14 @@ class SkillsYamlProvisioningControls(unittest.TestCase):
         self.assertEqual([category for category, _ in yaml_ratchet_problems({**self.texts, name: added})], ["unlisted"])
         lines = self.text.split("\n")
         start, end = yaml_provisioning_span(lines)
-        for key in sorted(YAML_KNOWN_UNPROVISIONED):
-            workflow, _, job = key.partition(":")
-            with self.subTest(key):
-                mutant = {**self.texts, workflow: shell_ci.with_step(self.texts[workflow], job, lines[start:end])}
-                self.assertEqual([category for category, _ in yaml_ratchet_problems(mutant)], ["stale"])
-                self.assertEqual(yaml_ratchet_problems(mutant, YAML_KNOWN_UNPROVISIONED - {key}), [])
-                self.assertEqual(yaml_provisioning_problems(mutant[workflow], job), [])
+        workflow, job = "synthetic-gap.yml", "sample"
+        key = f"{workflow}:{job}"
+        texts = {**self.texts, workflow: "on: push\njobs:\n  sample:\n    steps:\n" + shell_ci.SUITE_STEP}
+        self.assertEqual(yaml_ratchet_problems(texts, {key}), [])
+        mutant = {**texts, workflow: shell_ci.with_step(texts[workflow], job, lines[start:end])}
+        self.assertEqual([category for category, _ in yaml_ratchet_problems(mutant, {key})], ["stale"])
+        self.assertEqual(yaml_ratchet_problems(mutant, set()), [])
+        self.assertEqual(yaml_provisioning_problems(mutant[workflow], job), [])
         bare = {**self.texts, YAML_WORKFLOW: "\n".join(lines[:start] + lines[end:])}
         self.assertIn("required", [category for category, _ in yaml_ratchet_problems(bare)])
 

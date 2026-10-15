@@ -16,17 +16,54 @@ on:
         description: 'Open or update the report-only catalog-freshness evidence PR when drift is detected.'
         type: boolean
         default: false
+      currency_dry_run:
+        description: 'Show per-row model currency issue actions without creating, editing or closing issues.'
+        type: boolean
+        default: false
 
 # No token scope by default; each job grants its own (docs/decisions/2026-10-04-ci-least-privilege.md).
 permissions: {}
 
 jobs:
+  # Independent of report/network/test outcomes: due reviews must still reach
+  # the co-op when an unrelated freshness lane fails. No model or new secret.
+  model-currency:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    concurrency:
+      group: model-currency-review-issues
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      issues: write # Only this job may deliver the per-row CURRENCY-DUE requests.
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out main inventory
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Check age gate and delivery invariants offline
+        run: python3 -m unittest tests.test_model_currency_tracking -v
+      - name: Deliver day-five model landscape review requests
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          DRY_RUN: ${{ inputs.currency_dry_run && 'true' || 'false' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=()
+          if [ "$DRY_RUN" = true ]; then args+=(--dry-run); fi
+          python3 scripts/model_currency_tracking.py --repository "$REPOSITORY" "${args[@]}"
+
   freshness:
     runs-on: ubuntu-24.04
-    # Raised from 30 to 60 on 2026-10-04: the job took 1687 of its 1800 s in run 37104350733 (its test suite step
-    # 1502 s) and 1623 s in run 37116574776, and the suite grows with most merged changes. The limit stays a hang guard;
-    # the suite step below aborts five minutes before it.
-    timeout-minutes: 60
+    # Network metadata/report integrity only; the full suite is a separate native matrix below.
+    timeout-minutes: 30
     permissions:
       contents: read
     outputs:
@@ -182,52 +219,6 @@ jobs:
         run: >-
           python3 scripts/validate_convergence.py
           --all-recorded --root . --json
-      - name: Install the native runtime-name scanner for synthetic validation tests
-        uses: $/.github/actions/setup-host-name-scanner
-      - name: Provision the Bun that Claude Code 2.1.296 embeds, for the agent front matter tests
-        env:
-          BUN_VERSION: '1.4.3'
-          # https://github.com/oven-sh/bun/releases/download/bun-v1.4.3/SHASUMS256.txt, the line of bun-linux-x64.zip
-          BUN_SHA256: 3e730528d89775f03f87f05c06787c4df4099d0a37f3f252e7b829cb23816e18
-        # The same pin and checksum as the step of validate.yml (tests.test_adoption_status.WorkflowPinTests holds the two equal). The suite below reaches tests/test_adoption_status.py, whose
-        # bun tests fail under GitHub Actions rather than skip (unavailable()), so a runner without this bun fails the scheduled and the manual run and the propose job never starts.
-        run: |
-          mkdir -p "$RUNNER_TEMP/bun"
-          curl --fail --silent --show-error --location --retry 3 \
-            "https://github.com/oven-sh/bun/releases/download/bun-v${BUN_VERSION}/bun-linux-x64.zip" \
-            --output "$RUNNER_TEMP/bun/archive.zip"
-          printf '%s  %s\n' "$BUN_SHA256" "$RUNNER_TEMP/bun/archive.zip" | sha256sum --check
-          unzip -q "$RUNNER_TEMP/bun/archive.zip" -d "$RUNNER_TEMP/bun"
-          "$RUNNER_TEMP/bun/bun-linux-x64/bun" --version
-          echo "AGENT_FRONTMATTER_BUN=$RUNNER_TEMP/bun/bun-linux-x64/bun" >> "$GITHUB_ENV"
-      - name: Run project test suite
-        # --durations 50 lists the 50 slowest tests at the end of the run (Python 3.12+; this job sets up 3.13). GNU
-        # timeout sends SIGABRT at 55 minutes, five under the job's limit, and SIGKILL 60 s later; with
-        # PYTHONFAULTHANDLER faulthandler first prints every thread's Python traceback, so a hang names the test it
-        # stopped in. A timeout fails the step with status 124. The steps before this one took 127 to 178 s in the eight
-        # completed runs 35934519434 to 37116574776.
-        env:
-          PYTHONFAULTHANDLER: '1'
-        run: |
-          set -o pipefail
-          timeout --signal=ABRT --kill-after=60s 55m \
-            python3 -m unittest --durations 50 2>&1 | tee "$RUNNER_TEMP/freshness/unittest.log"
-      - name: Report the test suite's skipped-test count
-        if: ${{ !cancelled() }}
-        run: |
-          python3 - "$RUNNER_TEMP/freshness/unittest.log" <<'PYEOF'
-          import os, re, sys
-
-          text = open(sys.argv[1], encoding="utf-8", errors="replace").read()
-          match = re.search(r"skipped=(\d+)", text)
-          skipped = match.group(1) if match else "0"
-          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as handle:
-              handle.write(
-                  "## Test suite skipped-test count\n\n"
-                  f"`python3 -m unittest` reported {skipped} skipped test(s) on this job's interpreter "
-                  "(see the \"Run project test suite\" step log for which cases).\n\n"
-              )
-          PYEOF
       - name: Retain the rebuilt manifest and drift report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -243,7 +234,235 @@ jobs:
           include-hidden-files: false
           retention-days: 30
 
-  # The only write-permitted job in this workflow (docs/decisions/2026-09-23-bot-pr-dispatch.md).
+  # Reuse validate.yml's native whole-module partition and prerequisite commands.
+  # No module filtering or timeout increase: all eight reports must aggregate.
+  freshness-tests:
+    name: catalog-freshness-tests-${{ matrix.shard }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+    permissions:
+      contents: read
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # Full history (as in validate.yml and the propose job below): the project test
+          # suite this job runs includes tests/test_release_pin_contents.py, which requires
+          # the pinned release commit and tag to resolve in a CI clone. A depth-1 clone of a
+          # main that has moved past the release commit fails those tests (run 35931645459).
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.13'
+          check-latest: false
+      - name: Install the hash-locked session calendar
+        run: |
+          python3 -m pip install --require-hashes --only-binary=:all: -r .github/requirements-calendar.txt
+      - name: Install checksum-locked CI dependencies for the full suite
+        run: >-
+          python3 -m pip install --disable-pip-version-check --no-input
+          --only-binary=:all: --require-hashes --index-url https://pypi.org/simple
+          -r .github/requirements-ci.txt
+      - name: Install checksum-locked native validation dependencies
+        run: >-
+          python3 -m pip install --disable-pip-version-check --no-input
+          --only-binary=:all: --require-hashes --index-url https://pypi.org/simple
+          -r .github/requirements-validation.txt
+      - name: Provision the promotion gate's isolated venv
+        env:
+          UV_VERSION: '0.12.17'
+          # https://github.com/astral-sh/uv/releases/download/0.12.17/uv-x86_64-unknown-linux-gnu.tar.gz.sha256
+          UV_SHA256: fa82fd8dde8e8eefdecada6aa0889666556cfceb690d06e0c3bca49eb3070a63
+        run: |
+          mkdir -p "$RUNNER_TEMP/uv"
+          curl --fail --silent --show-error --location --retry 3 \
+            "https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/uv-x86_64-unknown-linux-gnu.tar.gz" \
+            --output "$RUNNER_TEMP/uv/archive.tar.gz"
+          printf '%s  %s\n' "$UV_SHA256" "$RUNNER_TEMP/uv/archive.tar.gz" | sha256sum --check
+          tar -xzf "$RUNNER_TEMP/uv/archive.tar.gz" -C "$RUNNER_TEMP/uv" --strip-components=1
+          "$RUNNER_TEMP/uv/uv" --version
+          "$RUNNER_TEMP/uv/uv" venv --python /usr/bin/python3 "$RUNNER_TEMP/promotion-gate-venv"
+          "$RUNNER_TEMP/uv/uv" pip sync --python "$RUNNER_TEMP/promotion-gate-venv/bin/python3" --require-hashes \
+            blueprints/us-equities/data/requirements.lock
+          echo "PROMOTION_GATE_PYTHON=$RUNNER_TEMP/promotion-gate-venv/bin/python3" >> "$GITHUB_ENV"
+          echo "REQUIRE_PROMOTION_GATE_VENV=1" >> "$GITHUB_ENV"
+      - name: Provision the Bun that Claude Code 2.1.296 embeds, for the agent front matter tests
+        env:
+          BUN_VERSION: '1.4.3'
+          # https://github.com/oven-sh/bun/releases/download/bun-v1.4.3/SHASUMS256.txt, the line of bun-linux-x64.zip
+          BUN_SHA256: 3e730528d89775f03f87f05c06787c4df4099d0a37f3f252e7b829cb23816e18
+        # scripts/adoption_status.py reads agent front matter with Bun.YAML.parse at this version (CLIENT_BUN_VERSION), and the tests that need it fail under GitHub Actions rather than skip
+        # (tests/test_adoption_status.py unavailable()). The release build is 1.4.3+c6da4a4d3; the client embeds 1.4.3+eecfd55de, which is not a public commit: docs/decisions/2026-10-13-claude-agent-drift-check.md.
+        run: |
+          mkdir -p "$RUNNER_TEMP/bun"
+          curl --fail --silent --show-error --location --retry 3 \
+            "https://github.com/oven-sh/bun/releases/download/bun-v${BUN_VERSION}/bun-linux-x64.zip" \
+            --output "$RUNNER_TEMP/bun/archive.zip"
+          printf '%s  %s\n' "$BUN_SHA256" "$RUNNER_TEMP/bun/archive.zip" | sha256sum --check
+          unzip -q "$RUNNER_TEMP/bun/archive.zip" -d "$RUNNER_TEMP/bun"
+          "$RUNNER_TEMP/bun/bun-linux-x64/bun" --version
+          echo "AGENT_FRONTMATTER_BUN=$RUNNER_TEMP/bun/bun-linux-x64/bun" >> "$GITHUB_ENV"
+      - name: Provision the pinned tree-sitter-bash parser for the token-measurement lane tests
+        # examples/claude-native/workflows/shell-parser.pin.json pins web-tree-sitter and tree-sitter-bash (npm
+        # integrity values, the sha256 of the six files child-usage.mjs reads) and records the install command.
+        # This step runs that command with its <directory> placeholder filled in and retypes none of it. Without
+        # a verified install the kernel fails closed, so the Python lane tests and the node lane checks skip and
+        # this job passed with only the fail-closed gate exercised. tests/test_shell_parser_ci.py now fails this
+        # job when the loader does not report the pinned install, and fails the suite when this step is missing,
+        # late, retyped or no longer exported.
+        # The command is `npm install --ignore-scripts`, so no package script runs (npm/cli v10.9.8,
+        # workspaces/config/lib/definitions/definitions.js:863); the loader then checks every installed byte
+        # against the pin. The directory reaches the later steps of this job through the GITHUB_ENV file, not
+        # this step (github/docs, workflow-commands.md:652); a name outside [A-Za-z0-9._-] is refused so that
+        # no line can set another variable. The ubuntu-24.04 image 20260920.314.1 ships Node.js 22.23.2, Python
+        # 3.12.3 and npm 10.9.8 (actions/runner-images, Ubuntu2404-Readme.md).
+        run: |
+          python3 - <<'PYEOF'
+          import json, os, shlex, string, subprocess
+
+          with open("examples/claude-native/workflows/shell-parser.pin.json", encoding="utf-8") as handle:
+              pin = json.load(handle)
+          name = os.path.basename(pin["install"]["default_directory"])
+          alphanumeric = string.ascii_letters + string.digits
+          if not name or name[0] not in alphanumeric or any(char not in alphanumeric + "._-" for char in name):
+              raise SystemExit("the pin names an install directory outside [A-Za-z0-9._-]")
+          words = shlex.split(pin["install"]["command"])
+          if words[:2] != ["npm", "install"] or words.count("<directory>") != 1:
+              raise SystemExit("the pin's install command is not an npm install with one <directory>")
+          directory = os.path.join(os.environ["RUNNER_TEMP"], name)
+          os.makedirs(directory, exist_ok=True)
+          subprocess.run([directory if word == "<directory>" else word for word in words], check=True)
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env_file:
+              env_file.write("CHILD_USAGE_SHELL_PARSER=" + directory + "\n")
+          PYEOF
+      - name: Provision the pinned yaml package for the skills-modality SKILL.md reader tests
+        # tools/sota-convergence/landscape-sweep/skills-yaml.pin.json pins yaml@2.9.0 (the npm integrity recorded in
+        # vercel-labs/skills v1.7.0's lockfile and the sha256 of the 75 files skill_md.mjs runs) and records the install
+        # command. This step runs that command with its <directory> placeholder filled in and retypes none of it, as the
+        # tree-sitter step above does. Without a verified install skill_md.mjs parses nothing, so the reader tests skip
+        # and a skill survivor stops; tests/test_landscape_sweep_skills.py fails this job when the reader does not
+        # report the pinned install, and fails the suite when this step is missing, late, retyped or no longer
+        # exported. npm checks the tarball against the registry's integrity; skill_md.mjs then checks the lockfile's
+        # integrity and every file's sha256 against the pin, so a different tarball fails closed.
+        run: |
+          python3 - <<'PYEOF'
+          import json, os, shlex, string, subprocess
+
+          with open("tools/sota-convergence/landscape-sweep/skills-yaml.pin.json", encoding="utf-8") as handle:
+              pin = json.load(handle)
+          name = os.path.basename(pin["install"]["default_directory"])
+          alphanumeric = string.ascii_letters + string.digits
+          if not name or name[0] not in alphanumeric or any(char not in alphanumeric + "._-" for char in name):
+              raise SystemExit("the pin names an install directory outside [A-Za-z0-9._-]")
+          words = shlex.split(pin["install"]["command"])
+          if words[:2] != ["npm", "install"] or words.count("<directory>") != 1:
+              raise SystemExit("the pin's install command is not an npm install with one <directory>")
+          directory = os.path.join(os.environ["RUNNER_TEMP"], name)
+          os.makedirs(directory, exist_ok=True)
+          subprocess.run([directory if word == "<directory>" else word for word in words], check=True)
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env_file:
+              env_file.write("LANDSCAPE_SWEEP_SKILLS_YAML=" + directory + "\n")
+          PYEOF
+      - name: Install the native runtime-name scanner for synthetic validation tests
+        uses: $/.github/actions/setup-host-name-scanner
+      - name: Test validation failure modes
+        # --durations 50 lists the 50 slowest tests at the end of the run (Python 3.12+; this job runs the image's
+        # CPython 3.12.3). GNU timeout sends SIGABRT at 55 minutes, five under the job's limit, and SIGKILL 60 s later;
+        # with PYTHONFAULTHANDLER faulthandler first prints every thread's Python traceback, so a hang names the test it
+        # stopped in. A timeout fails the step with status 124. The steps before this one took 70 to 99 s in the five
+        # passing runs 37183894365 to 37186357296. -v names each test before it runs; tee keeps that log for the upload
+        # below, and pipefail keeps the exit status of timeout and unittest as the step's.
+        env:
+          PYTHONFAULTHANDLER: '1'
+          VALIDATE_SHARD: ${{ matrix.shard }}
+        run: |
+          set -o pipefail
+          mkdir -p "$RUNNER_TEMP/suite"
+          timeout --signal=ABRT --kill-after=60s 55m \
+            python3 scripts/validate_shards.py run -v \
+              --shard "$VALIDATE_SHARD" --shards 8 \
+              --report "$RUNNER_TEMP/suite/report.json" --durations 50 \
+              2>&1 | tee "$RUNNER_TEMP/suite/unittest-verbose.log"
+      - name: Report unittest counts
+        if: always()
+        run: |
+          # Parse unittest's native summary as adoption-bootstrap.yml's changed-tests step does.
+          # An interrupted or missing log has unknown counts; reporting never changes the suite result.
+          log="$RUNNER_TEMP/suite/unittest-verbose.log"
+          ran="$(sed -n 's/^Ran \([0-9][0-9]*\) tests\{0,1\} in .*/\1/p' "$log" 2>/dev/null | tail -n 1 || true)"
+          skipped="$(sed -n -E 's/^(OK|FAILED) \(.*skipped=([0-9]+).*$/\2/p' "$log" 2>/dev/null | tail -n 1 || true)"
+          summary="$(sed -n -E '/^(OK|FAILED|NO TESTS RAN)( \(.*\))?$/p' "$log" 2>/dev/null | tail -n 1 || true)"
+          if [ -n "$summary" ]; then
+            skipped="${skipped:-0}"
+          fi
+          printf 'validate: ran %s tests; skipped %s.\n' "${ran:-unknown}" "${skipped:-unknown}" >> "$GITHUB_STEP_SUMMARY" || true
+      - name: Upload the verbose test suite log
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: catalog-freshness-shard-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.shard }}
+          path: |
+            ${{ runner.temp }}/suite/unittest-verbose.log
+            ${{ runner.temp }}/suite/report.json
+          if-no-files-found: warn
+          include-hidden-files: false
+          retention-days: 30
+
+  freshness-test-results:
+    name: catalog-freshness-test-results
+    if: always()
+    needs: freshness-tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out repository with full history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Download this attempt's shard reports and native logs
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: catalog-freshness-shard-${{ github.run_id }}-${{ github.run_attempt }}-*
+          path: ${{ runner.temp }}/shards
+          merge-multiple: false
+          digest-mismatch: error
+      - name: Require complete discovery coverage and success from every shard
+        if: always()
+        shell: bash
+        env:
+          VALIDATE_SHARDS_RESULT: ${{ needs.freshness-tests.result }}
+        run: |
+          python3 scripts/validate_shards.py aggregate \
+            --reports "$RUNNER_TEMP/shards" --shards 8 \
+            --job-result "$VALIDATE_SHARDS_RESULT" --summary "$GITHUB_STEP_SUMMARY"
+      - name: Upload the aggregate shard receipt
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: catalog-freshness-shard-summary-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/shards/aggregate.json
+          if-no-files-found: warn
+          include-hidden-files: false
+          retention-days: 30
+
+  # The only repository/PR-write job (model-currency above only writes review issues).
   # It opens/updates a human-reviewable evidence branch and PR from this run's own drift
   # artifact; scripts/freshness_propose.py enforces that it only ever adds files under
   # evidence/artifacts/ and evidence/receipts/ and updates manifests/evidence.json's
@@ -257,7 +476,7 @@ jobs:
   # over by the tags endpoint) -- a bounded or partly-failed fetch must not be turned into
   # evidence that looks complete.
   propose:
-    needs: freshness
+    needs: [freshness, freshness-test-results]
     if: >-
       github.ref == 'refs/heads/main' && needs.freshness.outputs.drift == 'true' &&
       (inputs.max_repos || 0) == 0 && needs.freshness.outputs.upstream_errors == '0' &&

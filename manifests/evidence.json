@@ -5137,8 +5137,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "0bb8f0237ca45bb787620a9c08f9ceaafcaf58eddb512496aefebf45696ddae3",
-      "bytes": 28607
+      "sha256": "d0805586e32770d3d0981f02a036f7b60bb11826f0e860f689417f05a8f14f3b",
+      "bytes": 41231
     },
     {
       "path": ".github/workflows/dependency-review.yml",
@@ -19195,6 +19195,11 @@
       "path": "docs/decisions/2026-10-14-stream-integrity-followups.md",
       "sha256": "b2ea42bd0d9314292b8e5ce5b44307719f27679622956e55429685f3343ce077",
       "bytes": 13866
+    },
+    {
+      "path": "docs/decisions/2026-10-15-model-currency-age-sweep.md",
+      "sha256": "42fe130b109574200e76f12a78adbf51c124bf910feed10dac7441206ebe0010",
+      "bytes": 8728
     },
     {
       "path": "docs/decisions/2026-10-15-model-currency-landscape-check.md",
@@ -62157,6 +62162,11 @@
       "bytes": 110592
     },
     {
+      "path": "scripts/model_currency_tracking.py",
+      "sha256": "2946f8015c1ea258a4742ccc861af086f5bf0d8a977b44b1dbf2a48a76cd9802",
+      "bytes": 8304
+    },
+    {
       "path": "scripts/native_token_ci.py",
       "sha256": "fa83183c61407724083dfac2f5441859268a4de93663dae5d024eea7c733681d",
       "bytes": 117733
@@ -62947,6 +62957,11 @@
       "bytes": 119415
     },
     {
+      "path": "tests/test_catalog_freshness_shards.py",
+      "sha256": "b69cab604c9962a4f3e4c704d83bd20a734097676451d82cce2c55236a646af3",
+      "bytes": 3153
+    },
+    {
       "path": "tests/test_catalog_freshness_trading.py",
       "sha256": "5de4a7a8de9d860c541e1649b005e55bccca18b76ba8bdffbcd61474c644d4ea",
       "bytes": 35494
@@ -63398,8 +63413,8 @@
     },
     {
       "path": "tests/test_landscape_sweep_skills.py",
-      "sha256": "88308af6ecf78cdf9850b4739933ed4a17fb45db1d2296bc0bc23010e2fb768d",
-      "bytes": 183846
+      "sha256": "3af4d76162e844eac7e39e499b6dfead02526a6534d7d09c55f87b7973e5d9e6",
+      "bytes": 183791
     },
     {
       "path": "tests/test_landscape_sweep_worker_boundary.py",
@@ -63510,6 +63525,11 @@
       "path": "tests/test_model_currency_propose.py",
       "sha256": "8695d7b69652cef3eca20369eac5c4dd1de60ec1f91f78353dcaa7fdf0a2efc6",
       "bytes": 17767
+    },
+    {
+      "path": "tests/test_model_currency_tracking.py",
+      "sha256": "f7898cfe556b33731620129ff0df76d81b6817b47494f9867dde9e96c42e11aa",
+      "bytes": 7727
     },
     {
       "path": "tests/test_mover_coverage_asof.py",
@@ -64028,8 +64048,8 @@
     },
     {
       "path": "tests/test_shell_parser_ci.py",
-      "sha256": "abbe643e6d448ef7cd0e84e31548a708c198922a4736e612663b3737dbab7297",
-      "bytes": 43278
+      "sha256": "2066120fcc79d1f8d381d29a3f6a3a0369c8c27a04bf71baae17fea9b2ff44e5",
+      "bytes": 43541
     },
     {
       "path": "tests/test_sim_capacity.py",
@@ -64283,13 +64303,13 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "5e87651b314dde9cb62b4caecf1d06df89ac567e1dbca0947158381dc3bd4cae",
-      "bytes": 152178
+      "sha256": "bacd42e213fb5fcc96469a89e4f870648fc1230404d3cbef978381f537a9d93e",
+      "bytes": 152256
     },
     {
       "path": "tests/test_workflow_policy.py",
-      "sha256": "d84b6f165b3b0866df65fbc8634e97eed382a9b03aff83eb387c7e90815cd1e4",
-      "bytes": 83049
+      "sha256": "e33d8e1858d71cbb04fe70cff3e84d70a2c44ffb63482c2b0e843d211264f2af",
+      "bytes": 83112
     },
     {
       "path": "tests/test_workflow_security.py",

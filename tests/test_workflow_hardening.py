@@ -1101,7 +1101,7 @@ class WholeSuiteJobsCheckOutFullHistory(unittest.TestCase):
                         self.assertTrue(checkouts, "runs the suite without a checkout step")
                         for step in checkouts:
                             self.assertRegex(step, r"(?m)^\s+fetch-depth:\s*0\s*(#.*)?$")
-        self.assertIn("catalog-freshness.yml:freshness", suite_jobs)
+        self.assertIn("catalog-freshness.yml:freshness-tests", suite_jobs)
         self.assertIn("validate.yml:validate", suite_jobs)
 
     def test_whole_suite_classification(self):
@@ -1150,7 +1150,7 @@ class PublicationScannerTestPrerequisites(unittest.TestCase):
                     self.assertNotIn("continue-on-error", install, "scanner installation must fail closed")
                     for suite_index in suite_steps:
                         self.assertLess(install_index, suite_index, "install the scanner before running tests")
-        self.assertIn("catalog-freshness.yml:freshness", suite_jobs)
+        self.assertIn("catalog-freshness.yml:freshness-tests", suite_jobs)
         self.assertIn("validate.yml:validate", suite_jobs)
 
 
@@ -1162,7 +1162,7 @@ class SessionCalendarTestPrerequisites(unittest.TestCase):
         install_command = ("python3 -m pip install --require-hashes --only-binary=:all: "
                            "-r .github/requirements-calendar.txt")
         for workflow, job_id, test_steps in (
-                ("catalog-freshness.yml", "freshness", ("Run project test suite",)),):
+                ("catalog-freshness.yml", "freshness-tests", ("Test validation failure modes",)),):
             with self.subTest(workflow=workflow):
                 job = jobs((WORKFLOWS / workflow).read_text(encoding="utf-8"))[job_id]
                 step = step_block(job, install_name)
@@ -1177,7 +1177,7 @@ class WholeSuiteHeadroomAndDiagnostics(unittest.TestCase):
     The validate job also uploads its verbose log when a shard fails."""
 
     SUITE_STEPS = {
-        "catalog-freshness.yml:freshness": "Run project test suite",
+        "catalog-freshness.yml:freshness-tests": "Test validation failure modes",
         "validate.yml:validate": "Test validation failure modes",
     }
     VALIDATE = "validate.yml:validate"
@@ -1193,7 +1193,7 @@ class WholeSuiteHeadroomAndDiagnostics(unittest.TestCase):
 
     def suite_invocation(self, key):
         step = self.suite_step(key)
-        if key == self.VALIDATE:
+        if validate_shard_invocations(step):
             self.assertEqual(unittest_invocations(step), [], "a shard is not a serial whole-suite command")
             found = validate_shard_invocations(step)
         else:
@@ -1219,7 +1219,7 @@ class WholeSuiteHeadroomAndDiagnostics(unittest.TestCase):
             with self.subTest(key):
                 limit = int(re.search(r"(?m)^    timeout-minutes: (\d+)$", self.jobs[key]).group(1))
                 script = re.sub(r"[ \t]*\\\n\s*", " ", self.suite_step(key))
-                command = "scripts/validate_shards.py run" if key == self.VALIDATE else "-m unittest"
+                command = "scripts/validate_shards.py run" if validate_shard_invocations(self.suite_step(key)) else "-m unittest"
                 self.assertIn(f"timeout --signal=ABRT --kill-after=60s {limit - 5}m python3 {command} ", script)
                 self.assertIn("set -o pipefail", script, "tee would otherwise hide the exit status of timeout and unittest")
 

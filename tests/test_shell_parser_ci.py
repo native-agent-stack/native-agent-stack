@@ -59,10 +59,9 @@ ENV_NAME = "CHILD_USAGE_SHELL_PARSER"
 PROVISIONING_WORKFLOW = "validate.yml"
 PROVISIONING_JOB = "validate"
 PROVISIONING_KEY = f"{PROVISIONING_WORKFLOW}:{PROVISIONING_JOB}"
-# The remaining serial suite without this parser is catalog-freshness.yml:freshness.
-# Adding its provisioning step and deleting this entry closes the recorded gap;
-# the ratchet rejects stale exemptions.
-KNOWN_UNPROVISIONED = {"catalog-freshness.yml:freshness"}
+# Catalog freshness now provisions the pin in every native module shard.
+# No recorded omission remains; mutation controls below retain the gap ratchet.
+KNOWN_UNPROVISIONED = set()
 # The read-only check the handbook gives a host, run from the repository root.
 CHECK_PREFIX = "node --input-type=module -e "
 TRIPWIRE = "tests.test_shell_parser_ci.ShellParserInstalledInCI"
@@ -613,23 +612,31 @@ class RealRatchetControls(unittest.TestCase):
         self.assertEqual([category for category, _ in ratchet_problems({**self.texts, name: added})], ["unlisted"])
 
     def test_provisioning_a_recorded_gap_job_is_cleared_by_deleting_its_entry(self):
-        self.assertTrue(KNOWN_UNPROVISIONED, "no recorded gap is left to provision")
-        for key in sorted(KNOWN_UNPROVISIONED):
+        # Exercise the same transition without requiring a real CI omission.
+        name, job = "synthetic-gap.yml", "sample"
+        bare = "on: push\njobs:\n  sample:\n    steps:\n" + SUITE_STEP
+        texts = {**self.texts, name: bare}
+        gaps = {f"{name}:{job}"}
+        self.assertEqual(ratchet_problems(texts, gaps), [])
+        for key in sorted(gaps):
             name, _, job = key.partition(":")
             with self.subTest(key):
-                mutant = {**self.texts, name: with_step(self.texts[name], job, self.step)}
-                self.assertEqual([category for category, _ in ratchet_problems(mutant)], ["stale"])
-                self.assertEqual(ratchet_problems(mutant, KNOWN_UNPROVISIONED - {key}), [])
+                mutant = {**texts, name: with_step(bare, job, self.step)}
+                self.assertEqual([category for category, _ in ratchet_problems(mutant, gaps)], ["stale"])
+                self.assertEqual(ratchet_problems(mutant, gaps - {key}), [])
                 self.assertEqual(provisioning_problems(mutant[name], job), [], "the transplanted step is judged like validate.yml's")
                 self.assertTrue(key in provisioning_targets(mutant), "the structure checks do not inspect the newly provisioned job")
 
     def test_a_step_that_only_names_the_pin_file_is_judged_by_the_structure_checks(self):
         fake = ["      - name: Pretend to provision", f"        run: echo {PIN_PATH}"]
-        for key in sorted(KNOWN_UNPROVISIONED):
+        name, job = "synthetic-gap.yml", "sample"
+        texts = {**self.texts, name: "on: push\njobs:\n  sample:\n    steps:\n" + SUITE_STEP}
+        gaps = {f"{name}:{job}"}
+        for key in sorted(gaps):
             name, _, job = key.partition(":")
             with self.subTest(key):
-                mutant = {**self.texts, name: with_step(self.texts[name], job, fake)}
-                self.assertEqual(ratchet_problems(mutant, KNOWN_UNPROVISIONED - {key}), [])
+                mutant = {**texts, name: with_step(texts[name], job, fake)}
+                self.assertEqual(ratchet_problems(mutant, gaps - {key}), [])
                 self.assertTrue({"derived", "export"} <= categories(mutant[name], job), "the structure checks accept a step that installs nothing")
 
 
