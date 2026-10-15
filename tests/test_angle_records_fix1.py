@@ -1,4 +1,4 @@
-"""Specific production-path controls for the angle-record review rounds.
+"""Disabled-admission controls using the historical angle evidence fixtures.
 
 All receipts here are synthetic fixtures. Fresh-output controls distinguish
 an evidence rejection from the unrelated source-drift rejection.
@@ -57,7 +57,7 @@ class FinalFix1Tests(FixtureTestCase):
         mutate(value)
         _write_json(path, value)
 
-    def test_version_only_run_cannot_bridge_conflicting_commit_receipts(self):
+    def test_final_disabled_with_conflicting_commit_receipts(self):
         root, path, record = self.measured()
         stack = json.loads((root / fs.STACK).read_bytes())
         del stack["components"][0]["source_pin"]
@@ -78,9 +78,9 @@ class FinalFix1Tests(FixtureTestCase):
         self.edit_receipt(root, record, "e2e_receipt",
                           lambda r: r["upstream_sources"][0].update(pin="1.0.0 @ " + COMMIT_B))
         _write_json(path, record)
-        self.fresh_reject(root, "complete FINAL pin identity")
+        self.assert_final_disabled(root)
 
-    def test_malformed_citations_and_commands_are_rejected(self):
+    def test_final_disabled_with_malformed_citations_and_commands(self):
         mutations = [
             lambda r: r["upstream_sources"][0].update(path=True, line=True),
             lambda r: r["upstream_sources"][0].update(path="../outside", line=-1),
@@ -94,9 +94,9 @@ class FinalFix1Tests(FixtureTestCase):
             with self.subTest(index=index):
                 root, _, record = self.measured()
                 self.edit_receipt(root, record, "e2e_receipt", mutation)
-                self.fresh_reject(root, "condition 3 receipt has invalid commands or citations")
+                self.assert_final_disabled(root)
 
-    def test_any_conflicting_final_marker_is_rejected(self):
+    def test_final_disabled_with_conflicting_markers(self):
         for marker in ("angle", "alias"):
             with self.subTest(marker=marker):
                 root, path, record = self.measured()
@@ -109,35 +109,33 @@ class FinalFix1Tests(FixtureTestCase):
                     doc["layers"][0]["verdict_status"] = "FINAL"
                 _write_json(source, doc)
                 _write_json(path, record)
-                self.fresh_reject(root, "conflicting terminal-state claims")
+                self.assert_final_disabled(root)
 
-    def test_directory_aliases_and_newline_are_not_upstream_file_citations(self):
+    def test_final_disabled_with_directory_and_newline_citations(self):
         for value in ("././", "././.", "./././", "src/.", "src/", "README.md\n"):
             with self.subTest(path=value):
                 root, _, record = self.measured()
                 self.edit_receipt(root, record, "e2e_receipt",
                                   lambda r: r["upstream_sources"][0].update(path=value))
-                self.fresh_reject(root, "condition 3 receipt has invalid commands or citations")
+                self.assert_final_disabled(root)
 
-    def test_safe_relative_upstream_file_citations_still_pass(self):
+    def test_final_disabled_with_safe_relative_citations(self):
         for value in ("README.md", "./README.md", "src/./module.py", ".github/workflows/test.yml"):
             with self.subTest(path=value):
                 root, _, record = self.measured()
                 self.edit_receipt(root, record, "e2e_receipt",
                                   lambda r: r["upstream_sources"][0].update(path=value))
-                _write(root / fs.OUTPUT, fs.serialize(fs.build_document(root)))
-                code, output = self.run_main(root, "--check")
-                self.assertEqual(code, 0, output)
+                self.assert_final_disabled(root)
 
-    def test_final_requires_non_provisional_measured_convergence(self):
+    def test_final_disabled_with_provisional_convergence(self):
         root, path, record = self.prepare(final=True)
         c = record["candidates"][0]
         c.update(a6_comparative=False, provisional=True)
         c["angles"]["A6"].update(score="U", sources=[])
         _write_json(path, record)
-        self.fresh_reject(root, "NON-provisional CONVERGED")
+        self.assert_final_disabled(root)
 
-    def test_reopened_matrix_layer_cannot_be_final(self):
+    def test_final_disabled_with_reopened_matrix(self):
         root, _, _ = self.measured()
         ledger = json.loads((root / fs.LEDGER).read_bytes())
         later = _sweep("changed", "2026-09-23", [("foundation", "layer-a")])
@@ -151,9 +149,9 @@ class FinalFix1Tests(FixtureTestCase):
         matrix["rows"][0]["convergence"].update(layer_state="recorded_reopened",
             reopened_by=[{"sweep_id": "changed", "date": "2026-09-23"}])
         _write_json(root / fs.MATRIX, matrix)
-        self.fresh_reject(root, "reopened sweep delta must be adjudicated")
+        self.assert_final_disabled(root)
 
-    def test_final_eligible_false_cannot_freeze_an_otherwise_measured_winner(self):
+    def test_final_disabled_with_ineligible_winner(self):
         root, path, record = self.measured()
         # Permit the newly specified neutral metadata in the synthetic schema,
         # so this control reaches production FINAL enforcement on the old head.
@@ -166,9 +164,9 @@ class FinalFix1Tests(FixtureTestCase):
         record["candidates"][0].update(trial_permitted=True, final_eligible=False,
                                       basis="operator decision, recorded privately")
         _write_json(path, record)
-        self.fresh_reject(root, "final_eligible is false")
+        self.assert_final_disabled(root)
 
-    def test_unverified_entitlement_cannot_be_final(self):
+    def test_final_disabled_with_unverified_entitlement(self):
         for status in ("pending", "unverified"):
             with self.subTest(status=status):
                 root, path, record = self.measured()
@@ -176,9 +174,9 @@ class FinalFix1Tests(FixtureTestCase):
                     "sources": record["candidates"][0]["angles"]["A1"]["sources"],
                     "note": "Synthetic unverified entitlement."}
                 _write_json(path, record)
-                self.fresh_reject(root, "entitlement remains unverified")
+                self.assert_final_disabled(root)
 
-    def test_pool_trial_metadata_blocks_final_even_with_measured_evidence(self):
+    def test_final_disabled_with_pool_trial_and_measured_evidence(self):
         committed = json.loads((REPO_ROOT / "catalogs/landscape/angles/foundation-model-routes.json").read_bytes())
         pool = next(c for c in committed["candidates"] if c["id"] == "openai-pool-foreign-harness")
         root, path, record = self.measured()
@@ -190,17 +188,15 @@ class FinalFix1Tests(FixtureTestCase):
                           ("id", "trial_permitted", "final_eligible", "basis", "entitlement")})
         record["final_evidence"][0]["candidate_id"] = pool["id"]
         _write_json(path, record)
-        self.fresh_reject(root, "final_eligible is false")
+        self.assert_final_disabled(root)
         candidate["final_eligible"] = True
         _write_json(path, record)
-        self.fresh_reject(root, "entitlement remains unverified")
+        self.assert_final_disabled(root)
         candidate["entitlement"]["status"] = "documented"
         _write_json(path, record)
-        _write(root / fs.OUTPUT, fs.serialize(fs.build_document(root)))
-        code, output = self.run_main(root, "--check")
-        self.assertEqual(code, 0, output)
+        self.assert_final_disabled(root)
 
-    def test_final_alias_obtains_the_recorded_review_date(self):
+    def test_final_alias_refuses_while_admission_disabled(self):
         root, _, _ = self.measured()
         source = root / "catalogs/landscape/foundation.json"
         doc = json.loads(source.read_bytes())
@@ -213,13 +209,7 @@ class FinalFix1Tests(FixtureTestCase):
         matrix, violations = cm.build_document(root)
         self.assertEqual(violations, [])
         _write_json(root / fs.MATRIX, matrix)
-        document = fs.build_document(root)
-        layer = self.layer(document, "layer-a")
-        self.assertEqual(layer["terminal_state"], "FINAL")
-        self.assertEqual(layer["verdict"]["next_review"], "2026-10-22")
-        _write(root / fs.OUTPUT, fs.serialize(document))
-        code, output = self.run_main(root, "--check")
-        self.assertEqual(code, 0, output)
+        self.assert_final_disabled(root)
 
 
 class RecordFix1Tests(FixtureTestCase):

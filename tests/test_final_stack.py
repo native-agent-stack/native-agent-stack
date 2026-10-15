@@ -152,6 +152,17 @@ class FixtureTestCase(unittest.TestCase):
     def layer(document, layer_id) -> dict:
         return next(layer for layer in document["layers"] if layer["layer_id"] == layer_id)
 
+    def assert_final_disabled(self, root):
+        """Both CLI paths refuse FINAL without changing an existing artifact."""
+        path = root / fs.OUTPUT
+        previous = path.read_bytes() if path.exists() else None
+        for mode in ("--write", "--check"):
+            with self.subTest(mode=mode):
+                code, output = self.run_main(root, mode)
+                self.assertEqual(code, 1, output)
+                self.assertIn("admission under redesign", output)
+                self.assertEqual(path.read_bytes() if path.exists() else None, previous)
+
     @staticmethod
     def run_main(root: Path, *args, native_scan=False, private_names=("fixture-private-account",)) -> tuple[int, str]:
         buffer = io.StringIO()
@@ -1090,7 +1101,8 @@ class AngleEnforcementTests(FixtureTestCase):
 
     def assert_check_rejects(self, mutate, reason, *, final=False, run=True):
         root, path, record = self.prepare(final=final, run=run)
-        _write(root / fs.OUTPUT, fs.serialize(fs.build_document(root)))
+        if not final:
+            _write(root / fs.OUTPUT, fs.serialize(fs.build_document(root)))
         mutate(record, root)
         _write_json(path, record)
         code, output = self.run_main(root, "--check")
@@ -1109,79 +1121,60 @@ class AngleEnforcementTests(FixtureTestCase):
     def test_check_rejects_verdict_that_does_not_rederive(self):
         self.assert_check_rejects(lambda r, _: r["candidates"][0].update(verdict="REJECTED"), "stated verdict does not re-derive")
 
-    def test_final_rejects_winner_without_convergence(self):
+    def test_final_disabled_with_winner_without_convergence(self):
         def mutate(record, _):
             candidate = record["candidates"][0]
             candidate["angles"]["A3"]["score"] = "-"
             candidate.update(verdict="DISAGREE", provisional=False, measure_next="Compare the disagreement.")
-        self.assert_check_rejects(mutate, "winner requires one CONVERGED angle verdict", final=True)
+        self.assert_check_rejects(mutate, "admission under redesign", final=True)
 
-    def test_final_rejects_missing_evidence_class(self):
+    def test_final_disabled_with_missing_evidence_class(self):
         root, path, record = self.prepare(final=True)
-        _write(root / fs.OUTPUT, fs.serialize(fs.build_document(root)))
         source = root / "catalogs/landscape/foundation.json"
         doc = json.loads(source.read_bytes())
         del doc["layers"][0]["winners"][0]["evidence_class"]
         _write_json(source, doc)
-        code, output = self.run_main(root, "--check")
-        self.assertEqual(code, 1, output)
-        self.assertIn("condition 1 winner has no evidence class", output)
+        self.assert_final_disabled(root)
 
-    def test_final_rejects_missing_run_pin(self):
+    def test_final_disabled_with_missing_run_pin(self):
         root, _, _ = self.prepare(final=True, run=False)
-        code, output = self.run_main(root, "--check")
-        self.assertEqual(code, 1, output)
-        self.assertIn("condition 2 winner requires a matching run pin", output)
+        self.assert_final_disabled(root)
 
-    def test_final_rejects_missing_e2e_receipt(self):
+    def test_final_disabled_with_missing_e2e_receipt(self):
         self.assert_check_rejects(lambda r, _: r["final_evidence"][0].update(e2e_receipt=None),
-                                  "condition 3 requires e2e_receipt", final=True)
+                                  "admission under redesign", final=True)
 
-    def test_final_rejects_missing_invoke_evidence_and_reason(self):
+    def test_final_disabled_with_missing_invoke_evidence_and_reason(self):
         self.assert_check_rejects(lambda r, _: r["final_evidence"][0].update(invoke_receipt=None),
-                                  "condition 4 requires invoke evidence or a recorded non-invocation reason", final=True)
+                                  "admission under redesign", final=True)
 
-    def test_final_accepts_bound_receipts_and_recorded_non_invocation_reason(self):
+    def test_final_disabled_with_bound_receipts_and_non_invocation_reason(self):
         for reason in (None, "The role is retained for recovery; it was not needed in this measured window."):
             with self.subTest(reason=reason):
                 root, path, record = self.prepare(final=True)
                 if reason:
                     record["final_evidence"][0].update(invoke_receipt=None, not_invoked_reason=reason)
                     _write_json(path, record)
-                _write(root / fs.OUTPUT, fs.serialize(fs.build_document(root)))
-                code, output = self.run_main(root, "--check")
-                self.assertEqual(code, 0, output)
+                self.assert_final_disabled(root)
 
     def test_missing_records_are_reported_as_gaps(self):
         document = self.build(foundation=[_layer("layer-a")])
         self.assertEqual(self.layer(document, "layer-a")["angles"]["status"], "missing")
         self.assertEqual(document["summary"]["angles"]["missing"], 1)
 
-    def test_final_rejects_receipts_for_another_pin_or_synthetic_execution(self):
-        native_binding = "condition 3 receipt must bind native evidence to repository and complete FINAL pin identity"
-        invoke_window = "condition 4 requires positive invocation calls in a measured window"
-        for field, mutation, reason in (("e2e_receipt", {"pin": COMMIT_B}, native_binding),
-                                        ("e2e_receipt", {"evidence_class": "synthetic"}, native_binding),
-                                        ("invoke_receipt", {"calls": 0}, invoke_window),
-                                        ("invoke_receipt", {"calls": True}, invoke_window),
-                                        ("invoke_receipt", {"window_end": "2026-10-12T21:32:22Z"}, invoke_window)):
+    def test_final_disabled_with_misbound_or_synthetic_execution_receipts(self):
+        for field, mutation in (("e2e_receipt", {"pin": COMMIT_B}),
+                                ("e2e_receipt", {"evidence_class": "synthetic"}),
+                                ("invoke_receipt", {"calls": 0}),
+                                ("invoke_receipt", {"calls": True}),
+                                ("invoke_receipt", {"window_end": "2026-10-12T21:32:22Z"})):
             with self.subTest(field=field, mutation=mutation):
                 root, _, record = self.prepare(final=True)
                 path = root / record["final_evidence"][0][field]
                 receipt = json.loads(path.read_bytes())
                 receipt.update(mutation)
                 _write_json(path, receipt)
-                # If a guard is removed, refresh the output so source drift
-                # cannot stand in for the intended receipt rejection.
-                try:
-                    document = fs.build_document(root)
-                except fs.FinalStackError:
-                    pass
-                else:
-                    _write(root / fs.OUTPUT, fs.serialize(document))
-                code, output = self.run_main(root, "--check")
-                self.assertEqual(code, 1, output)
-                self.assertIn(reason, output)
+                self.assert_final_disabled(root)
 
     def test_nonfinal_pin_and_review_flags_remain_report_only(self):
         root = self.root()

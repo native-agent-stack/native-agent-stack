@@ -1,4 +1,4 @@
-"""Scope-locked FINAL lifecycle and retained-metadata controls.
+"""Disabled FINAL lifecycle scenarios and independent retained-metadata controls.
 
 Every execution receipt and sweep in these controls is synthetic. Fresh-output
 refusals distinguish FINAL evidence checks from unrelated output drift.
@@ -39,15 +39,10 @@ class FinalIntegrityTests(FixtureTestCase):
         _write_json(root / record["manifest_ref"], {"checked_at": day})
         self.matrix(root)
 
-    def test_final_survives_a_later_covering_sweep_without_change_evidence(self):
+    def test_final_disabled_with_unchanged_later_covering_sweep(self):
         root, _, _ = self.measured()
         self.sweep(root, "2026-09-23")
-        code, output = self.run_main(root, "--write")
-        self.assertEqual(code, 0, output)
-        layer = self.layer(json.loads((root / fs.OUTPUT).read_bytes()), "layer-a")
-        self.assertEqual(layer["terminal_state"], "FINAL")
-        self.assertNotEqual(layer["status"], "reopened")
-        self.assertEqual(layer["verdict"]["reopened_by"], [])
+        self.assert_final_disabled(root)
 
     def test_unswept_layer_cannot_be_final(self):
         root, _, _ = self.measured()
@@ -56,9 +51,9 @@ class FinalIntegrityTests(FixtureTestCase):
         ledger["sweeps"] = []
         _write_json(path, ledger)
         self.matrix(root)
-        self.fresh_reject(root, "FINAL baseline requires one retained consumed covering sweep")
+        self.assert_final_disabled(root)
 
-    def test_covering_scope_hash_change_reopens_final(self):
+    def test_final_disabled_with_changed_or_unchanged_covering_scope(self):
         for field in ("requirement_sha256", "platform_profiles_sha256"):
             for scenario in ("changed", "changed_then_reverted", "prior_change_only", "unchanged"):
                 with self.subTest(field=field, scenario=scenario):
@@ -79,15 +74,7 @@ class FinalIntegrityTests(FixtureTestCase):
                             else "a") * 64
                     _write_json(path, ledger)
                     self.matrix(root)
-                    if scenario.startswith("changed"):
-                        self.fresh_reject(root, "reopened sweep delta must be adjudicated")
-                    else:
-                        code, output = self.run_main(root, "--write")
-                        self.assertEqual(code, 0, output)
-                        document = json.loads((root / fs.OUTPUT).read_bytes())
-                        layer = self.layer(document, "layer-a")
-                        self.assertEqual(layer["terminal_state"], "FINAL")
-                        self.assertEqual(layer["verdict"]["reopened_by"], [])
+                    self.assert_final_disabled(root)
 
     def test_post_verdict_scope_hashes_without_baseline_refuse_final(self):
         for field in ("requirement_sha256", "platform_profiles_sha256"):
@@ -111,14 +98,9 @@ class FinalIntegrityTests(FixtureTestCase):
                                 row[field] = later_hash * 64
                         _write_json(path, ledger)
                         self.matrix(root)
-                        self.fresh_reject(root, "FINAL baseline requires one retained consumed covering sweep"
-                                          if baseline == "absent" else
-                                          "FINAL baseline requires retained complete scope hashes")
-                        code, output = self.run_main(root, "--write")
-                        self.assertEqual(code, 1, output)
-                        self.assertFalse((root / fs.OUTPUT).exists())
+                        self.assert_final_disabled(root)
 
-    def test_unchanged_scope_with_retained_baseline_preserves_final(self):
+    def test_final_disabled_with_unchanged_scope_and_retained_baseline(self):
         root, _, _ = self.measured()
         self.sweep(root, "2026-09-23", ident="first-after")
         self.sweep(root, "2026-09-24", ident="unchanged-after")
@@ -128,15 +110,7 @@ class FinalIntegrityTests(FixtureTestCase):
             sweep["layers"][0].update(requirement_sha256="a" * 64, platform_profiles_sha256="a" * 64)
         _write_json(path, ledger)
         self.matrix(root)
-        code, output = self.run_main(root, "--write")
-        self.assertEqual(code, 0, output)
-        document = json.loads((root / fs.OUTPUT).read_bytes())
-        layer = self.layer(document, "layer-a")
-        self.assertEqual(layer["terminal_state"], "FINAL")
-        self.assertEqual(layer["verdict"]["reopened_by"], [])
-        self.assertEqual(document["summary"]["final_layers"], 1)
-        code, output = self.run_main(root, "--check")
-        self.assertEqual(code, 0, output)
+        self.assert_final_disabled(root)
 
     def test_same_day_scope_change_after_consumed_sweep_refuses_final(self):
         for field in ("requirement_sha256", "platform_profiles_sha256"):
@@ -152,9 +126,9 @@ class FinalIntegrityTests(FixtureTestCase):
                     ledger["sweeps"][-1]["layers"][0][field] = "b" * 64
                     _write_json(path, ledger)
                     self.matrix(root)
-                    self.fresh_reject(root, "reopened sweep delta must be adjudicated")
+                    self.assert_final_disabled(root)
 
-    def test_same_day_reopen_after_consumed_sweep_is_read(self):
+    def test_final_disabled_with_same_day_reopen(self):
         for retained in (True, False):
             with self.subTest(retained=retained):
                 root, _, _ = self.measured()
@@ -163,11 +137,9 @@ class FinalIntegrityTests(FixtureTestCase):
                     _write_json(root / path, {"change": {"from": "1.0.0", "to": "1.1.0"}})
                 self.sweep(root, "2026-09-22", ident="same-day-after",
                            reopen=[{"trigger": "pin_moved", "ref": path + "#/change"}])
-                reason = ("reopened sweep delta must be adjudicated" if retained
-                          else "FINAL reopening requires retained change evidence")
-                self.fresh_reject(root, reason)
+                self.assert_final_disabled(root)
 
-    def test_same_day_consumed_sweep_preserves_final(self):
+    def test_final_disabled_with_same_day_consumed_sweep(self):
         root, _, _ = self.measured()
         self.sweep(root, "2026-09-22", ident="same-day-consumed")
         path = root / fs.LEDGER
@@ -181,13 +153,9 @@ class FinalIntegrityTests(FixtureTestCase):
         waves["waves"][0]["manifest"] = ledger["sweeps"][-1]["manifest_ref"]
         _write_json(registry, waves)
         self.matrix(root)
-        code, output = self.run_main(root, "--write")
-        self.assertEqual(code, 0, output)
-        layer = self.layer(json.loads((root / fs.OUTPUT).read_bytes()), "layer-a")
-        self.assertEqual(layer["terminal_state"], "FINAL")
-        self.assertEqual(layer["verdict"]["reopened_by"], [])
+        self.assert_final_disabled(root)
 
-    def test_final_requires_unique_retained_consumed_sweep(self):
+    def test_final_disabled_with_missing_or_ambiguous_consumed_sweep(self):
         for missing in ("manifest", "match", "covering_layer", "ambiguous"):
             with self.subTest(missing=missing):
                 root, _, _ = self.measured()
@@ -208,10 +176,9 @@ class FinalIntegrityTests(FixtureTestCase):
                 _write_json(path, ledger)
                 _write_json(registry, waves)
                 self.matrix(root)
-                self.fresh_reject(root, "FINAL" if missing == "covering_layer" else
-                                  "FINAL baseline requires one retained consumed covering sweep")
+                self.assert_final_disabled(root)
 
-    def test_retained_change_reopens_final_and_its_receipt_is_required(self):
+    def test_final_disabled_with_retained_or_missing_change_receipt(self):
         for retained in (True, False):
             with self.subTest(retained=retained):
                 root, _, _ = self.measured()
@@ -219,18 +186,16 @@ class FinalIntegrityTests(FixtureTestCase):
                 if retained:
                     _write_json(root / path, {"change": {"from": "1.0.0", "to": "1.1.0"}})
                 self.sweep(root, "2026-09-23", reopen=[{"trigger": "pin_moved", "ref": path + "#/change"}])
-                reason = ("reopened sweep delta must be adjudicated" if retained
-                          else "FINAL reopening requires retained change evidence")
-                self.fresh_reject(root, reason)
+                self.assert_final_disabled(root)
 
     def test_same_day_and_older_omitted_survivors_block_final(self):
         for day in ("2026-09-21", "2026-09-22"):
             with self.subTest(day=day):
                 root, _, _ = self.measured()
                 self.sweep(root, day, survived=["https://github.com/example/challenger"])
-                self.fresh_reject(root, "cumulative unresolved survivors require retained dispositions")
+                self.assert_final_disabled(root)
 
-    def test_missing_return_or_unretained_catalog_disposition_does_not_settle(self):
+    def test_final_disabled_with_missing_return_or_unretained_disposition(self):
         for disposition in (False, True):
             with self.subTest(disposition=disposition):
                 root, _, _ = self.measured()
@@ -250,9 +215,9 @@ class FinalIntegrityTests(FixtureTestCase):
                     layer = ledger["sweeps"][-1]["layers"][0]
                     layer.update(survived=[], refuted=[])
                     _write_json(path, ledger)
-                self.fresh_reject(root, "cumulative unresolved survivors require retained dispositions")
+                self.assert_final_disabled(root)
 
-    def test_later_omission_and_missing_vote_do_not_settle_survivors(self):
+    def test_final_disabled_with_later_omission_or_missing_vote(self):
         for missing in (False, True):
             with self.subTest(missing_vote=missing):
                 root, _, _ = self.measured()
@@ -264,9 +229,9 @@ class FinalIntegrityTests(FixtureTestCase):
                     _write_json(root / vote, {"refuted": True, "missing": True})
                     refuted = [{"repo": repository, "facts": {"vote": "refuted", "ref": vote}}]
                 self.sweep(root, "2026-09-22", refuted=refuted)
-                self.fresh_reject(root, "cumulative unresolved survivors require retained dispositions")
+                self.assert_final_disabled(root)
 
-    def test_explicit_retained_catalog_disposition_or_substantive_refutation_settles_survivor(self):
+    def test_final_disabled_with_retained_disposition_or_substantive_refutation(self):
         for settlement in ("catalog", "refutation"):
             with self.subTest(settlement=settlement):
                 root, _, _ = self.measured()
@@ -286,11 +251,7 @@ class FinalIntegrityTests(FixtureTestCase):
                     _write_json(root / evidence, {"refuted": True, "missing": False})
                     self.sweep(root, "2026-09-22", refuted=[{"repo": repository,
                         "facts": {"vote": "refuted", "ref": evidence}}])
-                code, output = self.run_main(root, "--write")
-                self.assertEqual(code, 0, output)
-                document = json.loads((root / fs.OUTPUT).read_bytes())
-                self.assertEqual(self.layer(document, "layer-a")["survivors"], [])
-                self.assertIn(evidence, document["sources"])
+                self.assert_final_disabled(root)
 
     def metadata(self, record, field, path):
         candidate = record["candidates"][0]
@@ -318,6 +279,11 @@ class FinalIntegrityTests(FixtureTestCase):
                 _write_json(root / receipt, {"observed": "first"})
                 self.metadata(record, field, receipt)
                 _write_json(path, record)
+                # Source hashing remains active for ordinary, non-FINAL records.
+                catalog_path = root / "catalogs/landscape/foundation.json"
+                catalog = json.loads(catalog_path.read_bytes())
+                catalog["layers"][0].pop("terminal_state", None)
+                _write_json(catalog_path, catalog)
                 document = fs.build_document(root)
                 self.assertIn(receipt, document["sources"])
                 _write(root / fs.OUTPUT, fs.serialize(document))

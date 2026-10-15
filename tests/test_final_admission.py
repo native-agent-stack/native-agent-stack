@@ -1,4 +1,4 @@
-"""FINAL admission controls through native ledger conversion and the public CLI."""
+"""Disabled FINAL controls through native ledger conversion and the public CLI."""
 
 import copy
 import hashlib
@@ -110,17 +110,12 @@ class FinalAdmissionTests(FixtureTestCase):
                    reopen=[{"trigger": "retained_failure", "ref": reference}])
         code, output = self.run_main(root, "--write")
         self.assertEqual(code, 1, output)
-        self.assertIn("reopened", output)
+        self.assertIn("admission under redesign", output)
 
-    def test_completed_unchanged_post_anchor_sweep_is_admitted(self):
+    def test_completed_unchanged_post_anchor_sweep_refuses_while_disabled(self):
         root, _, _ = self.measured()
         self.sweep(root, "2026-09-22", ident="completed-after")
-        code, output = self.run_main(root, "--write")
-        self.assertEqual(code, 0, output)
-        layer = self.layer(json.loads((root / fs.OUTPUT).read_bytes()), "layer-a")
-        self.assertEqual(layer["terminal_state"], "FINAL")
-        code, output = self.run_main(root, "--check")
-        self.assertEqual(code, 0, output)
+        self.assert_final_disabled(root)
 
     def test_material_pending_before_anchor_requires_retained_disposition(self):
         root, _, _ = self.measured()
@@ -135,7 +130,7 @@ class FinalAdmissionTests(FixtureTestCase):
         self.matrix(root)
         code, output = self.run_main(root, "--write")
         self.assertEqual(code, 1, output)
-        self.assertIn("cumulative unresolved survivors", output)
+        self.assertIn("admission under redesign", output)
 
     def native_cutoff_fixture(self, field, status, *, refutation=False):
         native = ledger_helpers.V2PendingCliTests()

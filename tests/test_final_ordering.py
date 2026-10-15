@@ -1,4 +1,8 @@
-"""Ledger-index disposition and retained native V2 settlement controls."""
+"""Historical ordering fixtures refuse FINAL while admission is disabled.
+
+The structural control describes the retained, inactive helpers. It does not
+qualify admission or its deferred redesign.
+"""
 
 import ast
 import json
@@ -76,19 +80,14 @@ class FinalLedgerIndexTests(FixtureTestCase):
         self.matrix(root)
         return root
 
-    def test_same_day_dispositions_require_a_named_same_or_later_sweep(self):
+    def test_final_disabled_with_every_same_day_disposition_binding(self):
         for kind in ("winner", "alternative"):
             for binding in ("missing", "unknown", "before", "same", "later", "pointer"):
                 with self.subTest(kind=kind, binding=binding):
                     root = self.disposition_fixture(kind, binding)
-                    code, output = self.run_main(root, "--write")
-                    self.assertEqual(code, 0 if binding in ("same", "later", "pointer") else 1, output)
-                    if code == 0:
-                        layer = self.layer(json.loads((root / fs.OUTPUT).read_bytes()), "layer-a")
-                        self.assertEqual(layer["terminal_state"], "FINAL")
-                        self.assertEqual(layer["survivors"], [])
+                    self.assert_final_disabled(root)
 
-    def test_recorder_drops_hand_added_sweep_field_and_admission_ignores_it(self):
+    def test_recorder_drops_hand_added_sweep_field_and_final_stays_disabled(self):
         root = self.disposition_fixture("alternative", "missing")
         path = root / "catalogs/landscape/foundation.json"
         catalog = json.loads(path.read_bytes())
@@ -103,10 +102,9 @@ class FinalLedgerIndexTests(FixtureTestCase):
             catalog["layers"][0]["alternatives"] = alternatives
             _write_json(path, catalog)
             self.matrix(root)
-            code, output = self.run_main(root, "--write")
-            self.assertEqual(code, 1, output)
+            self.assert_final_disabled(root)
 
-    def test_native_v2_refuting_vote_settles_and_unknown_vote_does_not(self):
+    def test_final_disabled_with_native_v2_refuting_and_unknown_votes(self):
         for mutation in (None, "unknown_vote", "missing_reference", "wrong_identity", "wrong_evidence_key",
                          "wrong_repository", "wrong_outcome"):
             with self.subTest(mutation=mutation):
@@ -129,8 +127,7 @@ class FinalLedgerIndexTests(FixtureTestCase):
                         entry["material"] = True
                     _write_json(path, ledger)
                     self.matrix(root)
-                code, output = self.run_main(root, "--write")
-                self.assertEqual(code, 0 if mutation is None else 1, output)
+                self.assert_final_disabled(root)
 
 
 del FinalIntegrityTests, FinalAdmissionTests
