@@ -1347,3 +1347,14 @@ is unwired and no sentence of the instruction blocks changes. All earlier projec
 observations.
 
 Today: 403 pieces, 363 wired (211 practice, 152 through a slot), 24 not wired (0 through a slot that does not install, 24 by their own entry) and 16 authorization pieces
+
+## Addendum 2026-10-15: the metrics entrypoint switch
+
+The template's `env` gains `OTEL_METRICS_INCLUDE_ENTRYPOINT` set to `"true"` (practice gap ledger row A3-0090;
+env-vars.md:510 at client 2.1.300), so Claude Code metrics carry `app.entrypoint`. Its piece
+`claude/settings/env/OTEL_METRICS_INCLUDE_ENTRYPOINT` is wired through the `otel-collector-contrib` slot, whose map
+entry matches `claude/settings/env/OTEL_*`. The collector profiles do not keep the label yet, and the host steps
+go to the command center as a host diff. No piece is unwired and no sentence of the instruction blocks changes.
+All earlier projections remain historical observations.
+
+Today: 404 pieces, 364 wired (211 practice, 153 through a slot), 24 not wired (0 through a slot that does not install, 24 by their own entry) and 16 authorization pieces

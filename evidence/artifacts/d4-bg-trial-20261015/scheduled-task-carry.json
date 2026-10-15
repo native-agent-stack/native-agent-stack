@@ -1,0 +1,27 @@
+{
+ "kind": "measurement",
+ "subject": "A session-scoped CronCreate task carries into a background copy started with claude --resume <id> --bg",
+ "client": "claude-code 2.1.300",
+ "host": "the 2604 workstation's WSL distro",
+ "measured_by": "cc-native-practice, d4 Phase 2 background trial (command center GO 2026-10-15T06:58Z)",
+ "observed": [
+  {
+   "session": "3d36653d (interactive tab, native-agent-stack-d4)",
+   "at": "2026-10-15T01:35:01Z",
+   "event": "CronCreate tool call",
+   "cron": "36 3 15 10 *",
+   "recurring": false,
+   "durable": "unset"
+  },
+  {
+   "session": "33888fe1 (background copy started 2026-10-15T07:12:15Z by claude --resume 3d36653d --bg)",
+   "at": "2026-10-15T07:36:00Z",
+   "event": "scheduled_task_fire",
+   "task": "60ad686c",
+   "session_kind": "bg"
+  }
+ ],
+ "method": "read from the two sessions' own transcripts under ~/.claude/projects (not committed): the CronCreate tool_use input and the copy's system entry with subtype scheduled_task_fire",
+ "evidence_class": "native_proven",
+ "untested": "backgrounding from inside a running session (documented for /loop tasks only)"
+}

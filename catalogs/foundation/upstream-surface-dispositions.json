@@ -812,6 +812,18 @@
    "version": "2.1.289"
   },
   {
+   "key": "claude:env:OTEL_METRICS_INCLUDE_ENTRYPOINT",
+   "disposition": "adopt-pending",
+   "reason": "Template sets true (gap ledger A3-0090) to split interactive, -p and SDK metrics; 2604 lacks it, and the collector allowlists drop the label (host diff).",
+   "source": "https://code.claude.com/docs/en/env-vars.md#L510",
+   "carrier": "adoption/templates/claude.settings.template.json",
+   "value": "true",
+   "scope": "both",
+   "overturn": "The label splits no series a lane or cost decision reads, or upstream changes or removes the switch.",
+   "reviewed_utc": "2026-10-15T10:46:06Z",
+   "version": "2.1.300"
+  },
+  {
    "key": "claude:env:OTEL_METRICS_INCLUDE_SESSION_ID",
    "disposition": "enabled",
    "reason": "set in the user settings of both hosts (read 2026-10-04); the cited record names it",
