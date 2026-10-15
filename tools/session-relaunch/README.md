@@ -113,8 +113,9 @@ never overlaps the unit's run.
 At its start a run writes this boot's roster as the live sessions plus the ended boot's rows not running yet, then saves
 its state. The minute snapshot keeps carrying those rows, minus the ones listed live, while the run is `in_progress`
 and after it ends `partial`, so a second crash leaves every session the relaunch has not brought back to the next boot.
-A row leaves the carry once the run sees its session running, so a lane that came back and later exits on purpose is not
-carried again. A second crash before the timer's first snapshot (90 s after boot), or between the run's two writes,
+A row leaves the carry only when the run's final live list shows its session running, so a lane that came back and later
+exits on purpose is not carried again, while one that registered and exited before a second crash stays carried; a
+session that registered and then went missing from the final list (absent) re-enters the carry. A second crash before the timer's first snapshot (90 s after boot), or between the run's two writes,
 finds the run's own roster as this boot's newest. The snapshot holds an exclusive lock on `roster.lock` in the state
 directory from its carry read to its roster write, and a run holds it while it writes that roster and saves its state,
 so a snapshot never replaces it with a carry read before the state existed. Both hold it briefly; `relaunch.lock` is

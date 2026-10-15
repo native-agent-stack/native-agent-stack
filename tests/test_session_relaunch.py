@@ -344,6 +344,30 @@ class Relaunch(Fixture):
         self.assertEqual([c[c.index("-Name") + 1] for c in self.ps_calls()], ["cc", "trading-cc", "coop", "cc"])
         self.assertEqual((self.state()["status"], set(self.outcomes().values())), ("complete", {"running"}))
 
+    def test_a_session_that_registers_and_exits_before_a_crash_stays_carried(self):
+        # The command center's FULL read of #1141 at b2755a0e (P2): a row left the carry as soon as its session was seen
+        # running, so when the command center registered and then exited while the next tab opened, and the boot stopped
+        # before the final pass, every snapshot wrote this boot's roster without it, and the next boot dropped it. A row
+        # now leaves the carry only when the final list shows its session running.
+        self.crash_roster()
+        launched, real_one = [], R.relaunch_one
+
+        def one(*args, **kwargs):
+            launched.append(real_one(*args, **kwargs))
+            if len(launched) == 2:
+                raise Interrupted()  # the boot stops right after the second tab
+            return launched[-1]
+
+        os.environ["FAKE_PS_KILL"] = json.dumps({"trading-cc": "wsl-architecture-design"})
+        try:
+            with mock.patch.object(R, "relaunch_one", side_effect=one), self.assertRaises(Interrupted):
+                self.run_relaunch()
+        finally:
+            del os.environ["FAKE_PS_KILL"]
+        self.assertEqual(self.main("snapshot", boot=THIS), 0)
+        roster = json.loads((R.roster_dir(self.config) / f"roster-{THIS}.json").read_text())
+        self.assertIn("wsl-architecture-design", {row["name"] for row in roster["sessions"]})
+
     def test_a_session_that_registers_and_then_exits_is_carried_again(self):
         # Rebase resolution of #1141 onto #1145 (main's completion rule meets #1141's carry retirement): a session seen
         # running and then missing from the final list is absent and still to be brought back, so a second crash in this

@@ -584,7 +584,6 @@ def locked_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[
                                         reopening=entry["session_name"] in reopened)
         if entry["outcome"] != "running" and unresolved(entry):
             entry["outcome"] = unresolved_outcome(entry)  # e.g. a reopen that was skipped before its call
-        retire({entry["session_name"]} if entry["outcome"] == "running" else set())
         save()
     # Completion rests on this final read: a session seen running earlier in the run (it registered) and missing now
     # has exited, so it is absent, and its tab start is resolved (seen listed), so a rerun opens it again without a
@@ -598,6 +597,8 @@ def locked_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[
             elif entry["outcome"] == "running":
                 entry["outcome"] = "absent"
                 entry["resolved_through"] = len(entry.get("attempts") or [])
+        # A row leaves the carry only when this final list shows its session running (the command center's FULL read
+        # of #1141 at b2755a0e, P2): seen once and then gone, it stays carried through a second crash.
         retire({entry["session_name"] for entry in sessions if entry["outcome"] == "running"})
         # A session that registered and then exited is still to be brought back, so its row is carried again.
         absent = {entry["session_name"] for entry in sessions if entry["outcome"] == "absent"}
