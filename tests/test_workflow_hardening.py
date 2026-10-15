@@ -1550,8 +1550,19 @@ class ValidateSuiteStepTracesAHang(unittest.TestCase):
         (tools / "python3").write_text(f'#!/bin/sh\nexec {shlex.quote(sys.executable)} "$@"\n', encoding="utf-8")
         (tools / "python3").chmod(0o755)
         (scratch / "step.sh").write_text(script, encoding="utf-8")
+        # Native assignment can move the sole test when its tie-break changes.
+        # Locate its actual shard without running it; keep the hang, signal,
+        # timeout status and traceback assertions below unchanged.
+        plan = subprocess.run([sys.executable, "-c",
+            "from pathlib import Path; from scripts.validate_shards import discover, load_weights, assignment; "
+            "weights, fallback, _ = load_weights(Path('scripts/validate_shard_weights.json')); "
+            "_, inventory, errors = discover(Path.cwd()); assert errors == 0; "
+            "mapping, _, _ = assignment(inventory, 8, weights, fallback); print(mapping['tests.test_hang'])"],
+            cwd=scratch, env=environment, check=True, capture_output=True, text=True, timeout=20)
+        shard = int(plan.stdout.strip())
+        self.assertIn(shard, range(8))
         environment.update(PATH=f"{tools}{os.pathsep}{os.environ.get('PATH', '')}", PYTHONDONTWRITEBYTECODE="1",
-                           RUNNER_TEMP=str(scratch / "runner-temp"), VALIDATE_SHARD="0")
+                           RUNNER_TEMP=str(scratch / "runner-temp"), VALIDATE_SHARD=str(shard))
         if faulthandler:
             environment["PYTHONFAULTHANDLER"] = "1"
         proc = subprocess.run(["bash", "-e", str(scratch / "step.sh")], cwd=scratch, env=environment,

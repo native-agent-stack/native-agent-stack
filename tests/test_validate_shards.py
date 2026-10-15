@@ -6,6 +6,8 @@ from collections import Counter
 from itertools import permutations
 import os
 from pathlib import Path
+import re
+import statistics
 import subprocess
 import sys
 import tempfile
@@ -127,13 +129,14 @@ class ShardCliFixtures(unittest.TestCase):
 
     def test_duplicate_receipt_is_not_counted_twice_or_accepted(self):
         self.simple()
-        self.run_shards()
+        rows = self.run_shards()
+        populated_shard = next(row["shard"] for _, row in rows if row["counts"]["ran"])
         duplicate = self.reports / "extra/report.json"
         duplicate.parent.mkdir()
-        duplicate.write_text((self.reports / "shard-0/report.json").read_text())
+        duplicate.write_text((self.reports / f"shard-{populated_shard}/report.json").read_text())
         self.assertEqual(self.finish().returncode, 1)
         receipt = json.loads((self.reports / "aggregate.json").read_text())
-        self.assertIn(0, receipt["unknown_count_shards"])
+        self.assertEqual(receipt["unknown_count_shards"], [populated_shard])
         self.assertEqual(receipt["counts"]["ran"], 0)
 
     def test_receipt_corruption_is_detected_at_the_public_aggregate_boundary(self):
@@ -202,6 +205,53 @@ class PlannerProperties(unittest.TestCase):
         spec = importlib.util.spec_from_file_location("validate_shards_fixture_api", SCRIPT)
         cls.api = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(cls.api)
+
+    def test_timing_readme_cites_unpublished_records_without_digests(self):
+        # Correction #161: the working screen stays private. The general
+        # published-digest guard currently scans JSON, so pin this Markdown
+        # record separately without copying the private digests into the test.
+        readme = (SCRIPT.parents[1] /
+            "evidence/artifacts/validate-shard-balance-20261015/README.md").read_text()
+        self.assertFalse(bool(re.search(r"\b[0-9a-fA-F]{64}\b", readme)),
+                         "cite unpublished working records by name, without SHA-256 digests")
+        self.assertIn("SCREEN-blacksmith-20261015.md", readme)
+        self.assertIn("MEASURED-nas-load.md", readme)
+
+    def test_committed_ci_timings_bound_eight_shard_balance(self):
+        # Independent, dated CI observations catch stale production weights.
+        # Module fixtures remain indivisible: the largest module is a lower
+        # bound on any assignment's critical path, even with eight workers.
+        table = json.loads((SCRIPT.parents[1] /
+            "evidence/artifacts/validate-shard-balance-20261015/timings.json").read_text())
+        self.assertEqual(table["measured_at"], "2026-10-15")
+        self.assertEqual([run["id"] for run in table["runs"]],
+                         [38486609305, 38647310087, 38675090239])
+        expected = {module: statistics.median(samples)
+                    for module, samples in table["module_samples_seconds"].items()}
+        rows = [{"module": module, "case_count": 1, "origins": [module]}
+                for module in expected]
+        weights, fallback, _ = self.api.load_weights(self.api.WEIGHTS)
+        mapping, strategy, constraints = self.api.assignment(rows, 8, weights, fallback)
+        self.assertEqual(strategy, "duration-weighted-native-modules")
+        self.assertEqual(constraints, {})
+        self.assertEqual(set(mapping), set(expected))
+        loads = [sum(seconds for module, seconds in expected.items() if mapping[module] == shard)
+                 for shard in range(8)]
+        largest_module = max(expected.values())
+        # One second allows numeric/proxy noise; it is not runner setup time.
+        with self.subTest(bound="indivisible critical path plus 1 second"):
+            self.assertLessEqual(max(loads), largest_module + 1.0, loads)
+        with self.subTest(bound="all other shards fit below largest module"):
+            largest_shard = loads.index(max(loads))
+            for shard, seconds in enumerate(loads):
+                if shard != largest_shard:
+                    self.assertLessEqual(seconds, largest_module, loads)
+        with self.subTest(bound="max to median below 2.1"):
+            self.assertLess(max(loads) / statistics.median(loads), 2.1, loads)
+        with self.subTest(bound="shard zero validators keep off the critical path"):
+            extra = statistics.median(table["shard_zero_overhead"]["samples_seconds"])
+            with_validators = [loads[0] + extra, *loads[1:]]
+            self.assertLessEqual(max(with_validators), largest_module + 1.0, with_validators)
 
     def test_small_exhaustive_assignments_cover_once_and_ignore_input_order(self):
         for modules in range(1, 5):

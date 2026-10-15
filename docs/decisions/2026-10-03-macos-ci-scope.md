@@ -71,12 +71,23 @@ The question: does the macOS lane cause stagnation without real benefit, and if 
 
 **Account cap.**
 - At most 5 macOS jobs run at once, shared across the whole account. [doc: docs.github.com/en/actions/reference/limits]
-- The same page says "GitHub Support can increase job concurrency limits". Whether Support grants that to a `User`
-  account is not verified. [doc; not verified]
+- The same page says "GitHub Support can increase job concurrency limits". Whether Support will grant an increase
+  to this Free organization remains unverified. [doc, accessed 2026-10-15; grant not verified]
 
-**Ownership limits.** The repository owner is a `User`, which rules out:
-- merge queue [doc: managing-a-merge-queue];
-- larger runners [doc: actions-runner-pricing, larger-runners].
+**Ownership limits (corrected 2026-10-15).** The repository owner is an `Organization` on the Free plan
+(live readback 2026-10-15: `gh api orgs/native-agent-stack --jq '{type, plan: .plan.name}'`
+returned `{"type":"Organization","plan":"free"}`). The same day's
+`gh api repos/native-agent-stack/native-agent-stack --jq '{owner_type: .owner.type, private}'`
+returned `{"owner_type":"Organization","private":false}`. These readbacks supersede the former personal-owner premise.
+- Merge queue is available to any public repository owned by an organization
+  ([GitHub Docs, Managing a merge queue](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue),
+  accessed 2026-10-15). The platform reopen trigger in §8 is therefore met.
+- Larger runners still require GitHub Team or Enterprise Cloud
+  ([GitHub Docs, Larger runners](https://docs.github.com/en/actions/using-github-hosted-runners/using-larger-runners/about-larger-runners),
+  accessed 2026-10-15); the current Free plan does not qualify.
+- Availability is not activation: `gh api repos/native-agent-stack/native-agent-stack/rules/branches/main --jq 'map(.type) | unique'`
+  on 2026-10-15 returned no `merge_queue` rule. Evaluating and enabling the queue, including the documented
+  `merge_group` required-check configuration, is a follow-up; this correction changes no workflow or ruleset.
 
 **Required checks.**
 - `validate-macos` is one of 8 required contexts, with integration 15368.
@@ -434,8 +445,8 @@ Notes on the table:
 | E. A Mac-core subset (about 10 min) on every PR, full suite after merge | Allowed | Like B | Every PR still takes a slot | A curated list |
 | F. PR #632's O2: an in-job gate on a frozen INERT list, 14-day dry run | Pre-registered | Like D | INERT-type lists skip about 25% | Gate script and dry run |
 | G. CPython-style aggregator job | Same substance | Like B | Like B | Ruleset context swap and a new job |
-| H. Merge queue | Not available to a `User` repository [doc] | — | — | Needs transfer to an organization |
-| I. Buy capacity, or ask GitHub Support for a higher concurrency limit (D10) | — | — | Unknown. Larger runners need Team or Enterprise [doc]. A Support grant for a `User` account is not verified. | External |
+| H. Merge queue | Available to this public Organization repository (2026-10-15 correction, §1); §8's platform reopen trigger is met | — | Unmeasured here | Ruleset and required-check integration to evaluate; no transfer needed |
+| I. Buy capacity, or ask GitHub Support for a higher concurrency limit (D10) | — | — | Unknown. Larger runners need Team or Enterprise; current plan is Free [doc]. A Support grant for this organization remains unverified. | External |
 | J. Parallelize the suite (PR #632, O4) | — | — | Shorter jobs; each PR still takes a slot | Complements every option |
 | (a-mac), (a-all), (b1), (b2), (c) | The D1 remedies, measured in §3.5 | | | |
 
@@ -1073,7 +1084,7 @@ main's push runs and acts as above.
 2. **Queue.** The PR `validate-macos` queue p90 stays above 15 min over any 7 days. Apply these levers in order:
    1. R1: collapse push runs on main.
    2. J: parallelize the suite.
-   3. A GitHub Support request for higher concurrency. Availability for a `User` account is not verified.
+   3. A GitHub Support request for higher concurrency. Approval for this Free organization remains unverified.
    4. If the queue is still above 15 min, move to C′.
 3. **Flake.** Classified flakes exceed 10% of a rolling window of 20 decisive full-mode runs, for 7 days.
    - Hand them to R6's owners.
@@ -1087,7 +1098,8 @@ main's push runs and acts as above.
    - If `host-roles.json` drops the Mac's `coordination` and `macos-acceptance` roles, move to A.
    - If `macos-arm64` leaves `drafted_not_accepted`, move to D, as shipping-platform coverage.
 6. **Platform.** Any of these reopens the decision:
-   - a merge queue becomes available;
+   - a merge queue becomes available (**met on the 2026-10-15 readback**: public Organization repository; see §1).
+     This reopens the queue option for evaluation; it does not enable a queue or adopt a new macOS policy;
    - GitHub changes how a skipped job counts for a required check;
    - the macOS concurrency cap changes;
    - Support raises the limit.
@@ -1205,7 +1217,7 @@ main's push runs and acts as above.
 | D7 | **Fixed.** The cancel recipe filters on job status, keeps any run with an `in_progress` job, and cancels only by recorded literal ID. |
 | D8 | **Fixed.** 22 entries are added. The drift-guard grep is widened and its 6 exclusions are recorded with reasons. The list is reconciled with `test_adoption_bootstrap_macos.py:3712-3725`; `manifests/evidence.json` is the one recorded exclusion. |
 | D9 | **Fixed.** §6.3 lists each expectation that changes, at :1249-1257, :1292-1300, :1259-1290, :1321, :1331, :1336, :1348 and :1352. |
-| D10 | **Fixed.** A Support request is a lever. Whether it is available to a `User` account is not verified. |
+| D10 | **Fixed.** A Support request is a lever. Approval of a concurrency increase for this Free organization remains unverified (ownership correction 2026-10-15, §1). |
 | D11 | **Fixed.** `PushNetTests` pins `manifests/evidence.json`. The record states that the net is coverage by coincidence, names its gap, and adds overturn 8. |
 | D12 | **Fixed.** Queue medians are given on one basis (1.2 / 0.94 / 0.68). "52 of 1,211" is corrected. REST and G are reported side by side, not as agreement. The 25-run tallies sum correctly. PR #666 closed at 18:17:17Z. The simulation is presented as direction only. |
 

@@ -117,10 +117,14 @@ the first three successful runs per event at measurement time.
 - **O3, run the full suite on macOS only after merge and weekly.** Rejected: its own rule needs zero macOS-only
   failures over at least 100 distinct pull requests since full-suite gating began (#126), and the first 8-day sample
   shows 30 among 1,025 pull-request head SHAs.
-- **A merge queue, so the heavy suite runs once per merge group.** Not available here: GitHub offers merge queues in
-  public repositories owned by an organization and in private repositories of organizations on Enterprise Cloud, and
-  `gh api --method GET repos/seathatflowsinourveins/native-agent-stack --jq .owner.type` returned `User`
-  (2026-10-03).
+- **A merge queue, so the heavy suite runs once per merge group.** The former personal-owner exclusion is superseded
+  by the 2026-10-15 live readback: `gh api repos/native-agent-stack/native-agent-stack --jq '{owner_type: .owner.type, private}'`
+  returned `{"owner_type":"Organization","private":false}`; `gh api orgs/native-agent-stack --jq .plan.name` returned `free`.
+  [GitHub's merge-queue eligibility](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue)
+  (accessed 2026-10-15) includes every public organization repository, so this option is now available and this
+  record's merge-queue reopen trigger is met. Evaluation and activation, including `merge_group` checks, remain a
+  follow-up; the live `rules/branches/main` readback has no `merge_queue` rule. See the
+  [ownership correction in the macOS CI scope decision](2026-10-03-macos-ci-scope.md#1-question-and-constraints).
 
 ## Reductions
 
@@ -199,7 +203,8 @@ Revisit this record when any of these happens:
   job or a skipped workflow reports to a required check;
 - the required checks, the runner labels (`macos-15`, `ubuntu-24.04`) or the concurrent macOS job limit (5 on the
   Free and Pro plans) change;
-- a merge queue becomes available to this repository;
+- a merge queue becomes available to this repository (**met by the 2026-10-15 public-organization readback above**;
+  reopen the option for evaluation, without enabling it or changing this record's suite policy);
 - the owner decides R1 against `docs/github-automation.md:77`.
 
 ## Evidence class

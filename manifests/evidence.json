@@ -18508,13 +18508,13 @@
     },
     {
       "path": "docs/decisions/2026-10-03-macos-ci-scope.md",
-      "sha256": "e3834666ac376f3b5cc213264aec73db0d27cd00f5369e502b658b9408af21d3",
-      "bytes": 85020
+      "sha256": "0e5b35a2ecb3afec8fef5c9eae5501f9d0f15ea76943a4e647df4d3f5498680a",
+      "bytes": 86721
     },
     {
       "path": "docs/decisions/2026-10-03-macos-full-suite-coverage.md",
-      "sha256": "a9fc9cab334e419d96405f9ae1da3c6c3e00894fbb9fe88d0e92fc05c079313e",
-      "bytes": 24000
+      "sha256": "852317ef1f55cdc0229d7376f5e6cc64f6d82b3b80ef1598a7cd3c95dae5f37d",
+      "bytes": 24789
     },
     {
       "path": "docs/decisions/2026-10-03-omniroute-3851-pin.md",
@@ -58127,6 +58127,16 @@
       "bytes": 8660
     },
     {
+      "path": "evidence/artifacts/validate-shard-balance-20261015/README.md",
+      "sha256": "321628fcc0ef6d5b5318ebd4f426442d783974f375c86df5f4f1bcbb600a6c27",
+      "bytes": 8495
+    },
+    {
+      "path": "evidence/artifacts/validate-shard-balance-20261015/timings.json",
+      "sha256": "ee4d439c2156f14aed22ea3aac61301c185391b540ee320ce4b125b55b753701",
+      "bytes": 50246
+    },
+    {
       "path": "evidence/artifacts/w4-grand-catalog-counts-20261011/receipt.json",
       "sha256": "3de4cb7155fa30296f1c1e05923131f44a0479bb3a0021a96900ea31af84b262",
       "bytes": 14901
@@ -62233,13 +62243,13 @@
     },
     {
       "path": "scripts/validate_shard_weights.json",
-      "sha256": "34ce9b0bbf2ccb20722c6e45cac027ee086beb588d8c82729269c9cc76db8674",
-      "bytes": 17352
+      "sha256": "9f869ced2e580c8cd7fdbef566dec74c9fca48c26d085337d2a7b43f753f37b3",
+      "bytes": 21700
     },
     {
       "path": "scripts/validate_shards.py",
-      "sha256": "7e6c965fc70147e2753c588376aa92fd6400500beee0fb992e8caac69ee04c21",
-      "bytes": 21933
+      "sha256": "42c642787d25cf61c818665c4538f54ebfbcfcfee07c5ae93c2aa28aaf6976e4",
+      "bytes": 22167
     },
     {
       "path": "scripts/verdict_review_gate.py",
@@ -64168,8 +64178,8 @@
     },
     {
       "path": "tests/test_validate_shards.py",
-      "sha256": "c84bbb61fc4b5c901ced3b076d46818617ff68b9d9051ba2f77ced65ee25c16e",
-      "bytes": 12648
+      "sha256": "db3832e3a86439b7f73521b8f1e637a1f67586a56d032709641eb4de383764c5",
+      "bytes": 15907
     },
     {
       "path": "tests/test_verdict_lane_vendoring.py",
@@ -64228,8 +64238,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "5e87651b314dde9cb62b4caecf1d06df89ac567e1dbca0947158381dc3bd4cae",
-      "bytes": 152178
+      "sha256": "f8e329097b6644ff128930c6eca9ab1f9d5a9746c8104598e627b6c7ebe380ba",
+      "bytes": 153040
     },
     {
       "path": "tests/test_workflow_policy.py",
