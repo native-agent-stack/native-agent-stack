@@ -45,34 +45,46 @@ selection/acceptance boundaries stated separately.
 
 ## Acceptance and remaining work
 
-The actual current-date `model_currency_problems(document)` check reproduces nine
+The actual current-date `model_currency_problems(document)` check reproduced nine
 errors on the base inventory and zero on the refreshed inventory; no date
-argument or validator/policy modification is involved. The full validator and
-existing model-currency tests are required before commit. This is integrity and
-source review, not a fresh native model-quality/usage qualification.
+argument or validator/policy modification was involved. At final reviewed
+`cc271846cde2e9107dcc5ff779c754a1d5cf819b`, the full current-date validator passed
+(71 components, 12025 hashed files, 240 receipts, 4 profiles), and both named
+model-currency modules passed 46 tests. This is integrity and source review,
+not fresh native model-quality/usage qualification.
 
 Any better compatible candidate with accepted common-harness evidence reopens
 its role. Haiku 5.5's already-triggered migration review is outstanding. A separate
-age-triggered scheduled-refresh follow-up is queued only after this incident PR
-lands; existing proposer scheduling/reporting is a starting point, not evidence
-that checks are automatically reviewed or refreshed today.
+age-triggered scheduled-refresh follow-up is tracked in
+[the follow-up record](2026-10-15-model-currency-followups.md#check-age-triggered-currency-sweep);
+existing proposer scheduling/reporting is a starting point, not evidence that
+checks are automatically reviewed or refreshed today.
 
 ## Haiku correction regression receipt (2026-10-15)
 
 `tests.test_model_currency.ModelCurrencyTests.test_background_haiku_records_sourced_successor_and_triggered_review`
 loads the real inventory row offline. It asserts the official sourced Haiku 5.5
 candidate, exact candidate ID/revision, October 7 release observation, superseded
-no-newer claim and triggered review/authorized-application gate; it also preserves
-the distinction between detection and the unchanged in-use 4.5 pin.
+no-newer claim and triggered review/authorized-application gate. The shipped
+extended test also asserts the CC review owner, tracking-record anchor, paired
+4.5/5.5 check, Claude Code headless route/no bare Codex API, Active (legacy)
+status, retirement floor and 60-day notice. It preserves the distinction between
+detection and the unchanged in-use 4.5 pin. These assertions bind the dated
+October 15 observation; a later sourced refresh deliberately updates the row
+and regression together, rather than retaining outdated vendor lifecycle text.
 
 Fail-first uses the pre-correction Haiku judgment from `f691e5ce^` (empty
 candidates, no-newer rationale and untriggered overturn), substituted only for
 those semantic fields in the test's in-memory inventory read. Refreshed dates
 are retained. The inventory file, policy and clock are not modified. This
 specific semantic regression passes generic schema/date checks, which is why
-the new real-row test is needed. Per the review clarification, corrected
-`f691e5ce` bytes already pass the new assertion; no failure on those corrected
-bytes is claimed.
+the new real-row test is needed. The original narrower successor-only assertion
+passed corrected `f691e5ce` data before the test was extended. **The shipped
+extended test fails on `f691e5ce` and temporary `7c61af71` data**, because their
+overturn lacks the owner assertion at reviewed test line76; they also lack the
+legacy/notice facts checked later. Only final `cc271846` data passes that shipped
+test. The earlier receipt conflated two test revisions; this paragraph corrects
+that record without changing the historical run output below.
 
 ```text
 Pre-correction judgment, refreshed dates retained:
@@ -81,7 +93,7 @@ AssertionError: 'claude-haiku-5-5' not found in {}
 Ran 1 test in 0.002s
 FAILED (failures=1), rc1
 
-Corrected real inventory:
+Original narrower assertion on corrected f691e5ce data:
 python3 -m unittest tests.test_model_currency.ModelCurrencyTests.test_background_haiku_records_sourced_successor_and_triggered_review
 Ran 1 test in 0.001s
 OK, rc0
@@ -90,6 +102,13 @@ python3 -m unittest tests.test_model_currency tests.test_model_currency_propose
 Ran 46 tests in 0.238s
 OK, rc0
 ```
+
+Additional measured run with the shipped extended test and exact `7c61af71`
+inventory substituted in memory (identical Haiku row to `f691e5ce`): one test,
+rc1, `AssertionError: 'Migration-review owner: command center (CC)' not found`.
+The final row passed the full 46-test run in0.230seconds, rc0. Neither proof
+changes the inventory file, clock or policy. Source scope:
+[`cc271846:tests/test_model_currency.py:54`](https://github.com/native-agent-stack/native-agent-stack/blob/cc271846cde2e9107dcc5ff779c754a1d5cf819b/tests/test_model_currency.py#L54).
 
 ## Haiku background migration review
 
@@ -101,6 +120,9 @@ record. Readiness trigger: paired quality parity measured on the same tasks,
 plus cost and latency, plus CC review, before any apply. The October 7 enforcement record's
 newest-Haiku rule makes this review due now; it is not waiting for another release.
 No provider run or configuration change is claimed by this source-only incident PR.
+If paired parity fails, do not apply: retain the current pin, record the measured
+failure for CC review and reopen the slot comparison. A later Haiku successor
+also reopens that review; neither outcome silently promotes a heavier line.
 
 Read again October 15: the [4.5 specification](https://platform.claude.com/docs/en/models/haiku-4-5/overview)
 now says **Active (legacy)**, retirement **not sooner than October 15, 2026**, and
@@ -119,9 +141,11 @@ are identical to [0.40.0's entries](https://github.com/headroomlabs-ai/headroom/
 An AST comparison of the actual downloaded Linux wheels confirms equality of
 HF_MODEL_ID and the entire _PINNED_REVISIONS mapping; no package code was executed
 or installed. Thus KEEP/held still holds for both model rows. The package row's
-0.40.0 selection remains a recorded follow-up, not a latest-package assertion.
+0.40.0 selection remains [a tracked package-review follow-up](2026-10-15-model-currency-followups.md#headroom-package-review),
+not a latest-package assertion.
 
 Upcoming currency exceptions first expire October22 (Fable/Astra) and October23
 (these nine rows, and the MinerU ONNX bundle's release-age transition). The
 separately reviewed check-age-triggered sweep must fire before October22, using
-the existing day-five refresh lead; its implementation follows this fix's landing.
+the existing day-five refresh lead; its implementation is tracked
+[separately](2026-10-15-model-currency-followups.md#check-age-triggered-currency-sweep).

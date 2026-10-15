@@ -19182,9 +19182,24 @@
       "bytes": 6429
     },
     {
+      "path": "docs/decisions/2026-10-15-model-currency-followups.md",
+      "sha256": "6329515b75eac0ba7e1de89e20a72259ef4a64320a0201107715f8d681a128fa",
+      "bytes": 8619
+    },
+    {
       "path": "docs/decisions/2026-10-15-model-currency-landscape-check.md",
-      "sha256": "2351ea7da59e6fc93556b4048efeec2be0288fa01bdbe36139c870d9b5a2e6ec",
-      "bytes": 10680
+      "sha256": "091974f7d53a4c376c5d975ede613cb472ad8093efaa6e1ef8b29c47253892d3",
+      "bytes": 12624
+    },
+    {
+      "path": "docs/decisions/model-currency-20261015-sources/captures.json",
+      "sha256": "4ba9883c64b2e4ed28839413e4d258fd7c981b10c9c4a2888906d91b998aa99a",
+      "bytes": 54513
+    },
+    {
+      "path": "docs/decisions/model-currency-20261015-sources/headroom-pins.json",
+      "sha256": "784fce6adf81169437e822a069f7cb4de45250556c3355c1a276c06a5098f3e2",
+      "bytes": 4497
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -62488,8 +62503,8 @@
     },
     {
       "path": "tests/test_active_model_currency.py",
-      "sha256": "69e5318afc4a6dd70cb85fc189680fd180ff5c322f0174530c0705a41a69583a",
-      "bytes": 58353
+      "sha256": "cc9046abf70a53b80956d55f4e6722b67c2fe0bdde466763407d4746a7cd53fe",
+      "bytes": 59710
     },
     {
       "path": "tests/test_active_recovery_plans.py",
@@ -63403,8 +63418,8 @@
     },
     {
       "path": "tests/test_model_currency.py",
-      "sha256": "0d5b98a3894c1d5f39484e0f6be87f8cc48452be3b831501e6b42e4d43651b54",
-      "bytes": 18945
+      "sha256": "59819211564954970ba64d12438b2d5f6d15fa814499312c2da2f8f3a633ee43",
+      "bytes": 20700
     },
     {
       "path": "tests/test_model_currency_propose.py",

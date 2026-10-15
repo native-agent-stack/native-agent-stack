@@ -1,6 +1,7 @@
 """Fixed-date policy fixtures; no model, credential or network operation."""
 
 import copy
+import ast
 import hashlib
 import json
 from datetime import date
@@ -51,6 +52,34 @@ def package_bound_inventory():
 
 
 class ModelCurrencyTests(unittest.TestCase):
+    def test_headroom_041_correction_keeps_vendor_weight_and_tokenizer_pins(self):
+        """Cross-check real selection against independently captured vendor code.
+
+        Parse the retained assignments; never import Headroom, install a package,
+        fetch a model, or treat a package release as a new model-weight release.
+        """
+        root = Path(__file__).resolve().parents[1]
+        fixture = json.loads((root / "docs/decisions/model-currency-20261015-sources/headroom-pins.json").read_text())
+        releases = {}
+        for release in fixture["releases"]:
+            values = {}
+            for assignment in release["assignments"]:
+                node, = ast.parse(assignment["source_text"]).body
+                values[assignment["name"]] = ast.literal_eval(node.value)
+            releases[release["version"]] = values
+        self.assertEqual(releases["0.40.0"], releases["0.41.0"])
+        data = json.loads((root / "catalogs/foundation/model-currency.json").read_text())
+        models = {row["id"]: row for row in data["models"]}
+        model = models["headroom-kompress-int8-wo"]
+        tokenizer = models["kompress-modernbert-tokenizer"]
+        vendor = releases["0.41.0"]
+        self.assertEqual(vendor["HF_MODEL_ID"], model["model_id"])
+        for row in (model, tokenizer):
+            self.assertEqual(vendor["_PINNED_REVISIONS"][row["model_id"]], row["revision"])
+            self.assertIn("Headroom-ai 0.41.0 shipped 2026-10-14T23:03:59Z", row["landscape_check"]["reason"])
+            self.assertIn("https://pypi.org/project/headroom-ai/0.41.0/", row["landscape_check"]["sources"])
+            self.assertIn("stale packages row at 0.40.0 is an explicit follow-up", row["landscape_check"]["reason"])
+
     def test_background_haiku_records_sourced_successor_and_triggered_review(self):
         """Guard the corrected real row, independently of date/shape validation.
 

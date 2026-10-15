@@ -936,17 +936,37 @@ class GenerateLatestModelsTests(unittest.TestCase):
 
 
 class CurrencyCollectorIntegrationTests(unittest.TestCase):
+    def test_stale_model_notice_with_long_temporary_base_retains_exact_due_count(self):
+        from tests import test_currency_due as fixtures
+        # Long but permitted TMPDIR roots can leave only a truncated count
+        # label even when the shortest runnable details command fits.
+        with tempfile.TemporaryDirectory(prefix="permitted-" + "x" * 35,
+                                         dir=fixtures.short_temp_base()) as base:
+            with mock.patch.object(fixtures, "short_temp_base", return_value=base):
+                self.test_every_currency_check_runs_active_selector_check_and_fails_stale()
+
     def test_every_currency_check_runs_active_selector_check_and_fails_stale(self):
         from tests.test_currency_due import Checkout
         from scripts import currency_due as cd
-        fixture=Checkout(self)
-        fixture.set(cd.ACTIVE_MODELS[0], {"schema_version":1,"status":"stale","stale_count":1,
-                    "findings":[{"path":"fixture/client.toml","line":1,"model":"gpt-6-sol","expected":"gpt-6.1-sol"}],"errors":[]}, code=1)
-        code, stdout, stderr=fixture.run()
-        self.assertEqual((code,stderr),(1,""))
-        self.assertIn("1 stale model selector",stdout)
-        args=fixture.recorded(cd.ACTIVE_MODELS[0]);self.assertEqual(args[0],"check");self.assertIn("--json",args)
-        self.assertEqual(json.loads(fixture.due_file.read_text())["due"][cd.MODEL_KEY],1)
+        for name in ("checkout", "checkout-" + "long-permitted-path-" * 5):
+            with self.subTest(checkout=name):
+                fixture=Checkout(self, name=name)
+                fixture.set(cd.ACTIVE_MODELS[0], {"schema_version":1,"status":"stale","stale_count":1,
+                            "findings":[{"path":"fixture/client.toml","line":1,"model":"gpt-6-sol","expected":"gpt-6.1-sol"}],"errors":[]}, code=1)
+                code, stdout, stderr=fixture.run()
+                self.assertEqual((code,stderr),(1,""))
+                due = json.loads(fixture.due_file.read_text())
+                # The durable count and runnable details survive long paths;
+                # the bounded human notice may truncate its count label.
+                self.assertEqual(due["due"][cd.MODEL_KEY],1)
+                notice = due["summary_line"]
+                self.assertLessEqual(len(notice), cd.SUMMARY_LIMIT)
+                self.assertIn(notice, stdout)
+                self.assertIn("; details: ", notice)
+                self.assertTrue(notice.startswith("stack currency: 1 stale"))
+                self.assertTrue(notice.endswith(due["details_command"])
+                                or "; details: cat " in notice)
+                args=fixture.recorded(cd.ACTIVE_MODELS[0]);self.assertEqual(args[0],"check");self.assertIn("--json",args)
 
     def test_incomplete_selector_check_does_not_remove_existing_due_notice(self):
         from tests.test_currency_due import Checkout
