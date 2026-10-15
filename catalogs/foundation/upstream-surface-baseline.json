@@ -1,20 +1,20 @@
 {
  "schema_version": 1,
- "generated_utc": "2026-10-10T00:10:55Z",
+ "generated_utc": "2026-10-15T06:38:40Z",
  "generator": "python3 scripts/upstream_surface_watch.py --network --write-baseline",
  "description": "Names-only snapshot of the user-switchable surface of Claude Code and Codex at the versions below: sorted names per kind, the codex:feature stages that stage_changed compares, the per-source counts of claude:setting (the union of sdk.d.ts and settings-reference.md) that the 80% floor compares, and per fetched artifact its URL, version, fetch time, sha256 and size, never its content. docs/upstream-surface-watch.md.",
  "versions": {
-  "claude_code": "2.1.296",
+  "claude_code": "2.1.300",
   "claude_code_channel": "latest",
-  "claude_agent_sdk": "0.3.296",
-  "claude_agent_sdk_claude_code_version": "2.1.296",
+  "claude_agent_sdk": "0.3.300",
+  "claude_agent_sdk_claude_code_version": "2.1.300",
   "codex": "rust-v0.162.1",
   "codex_binary": "codex-cli 0.162.1"
  },
  "counts": {
   "claude:setting": 184,
   "claude:hook": 33,
-  "claude:env": 417,
+  "claude:env": 422,
   "claude:mod": 6,
   "codex:config": 1057,
   "codex:feature": 167
@@ -22,121 +22,107 @@
  "source_counts": {
   "claude:setting": {
    "sdk.d.ts": 174,
-   "settings-reference.md": 171
+   "settings-reference.md": 172
   }
  },
  "sources": {
   "claude-agent-sdk-types": {
-   "url": "https://unpkg.com/@anthropic-ai/claude-agent-sdk@0.3.296/sdk.d.ts",
-   "version": "0.3.296",
-   "fetched_utc": "2026-10-10T00:10:55Z",
-   "sha256": "fc2866dfe2c01468edb19b1d94f26156bfacecdf1e7f1452b276ed2f8cc0b08f",
-   "bytes": 538514
+   "url": "https://unpkg.com/@anthropic-ai/claude-agent-sdk@0.3.300/sdk.d.ts",
+   "version": "0.3.300",
+   "fetched_utc": "2026-10-15T06:38:40Z",
+   "sha256": "9ebce26cc46cea565330280703f180801556956ef8f2b52b86e6da947546633d",
+   "bytes": 540343
   },
   "claude-changelog": {
    "url": "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md",
    "version": null,
-   "fetched_utc": "2026-10-10T00:10:55Z",
-   "sha256": "0383b383e05c30b7592c512ea3356104cbc3a799d028d36204033175ff256a51",
-   "bytes": 987162
-  },
-  "claude-doc-docs-index": {
-   "url": "https://code.claude.com/docs/llms.txt",
-   "version": "2.1.296",
-   "fetched_utc": "2026-10-10T00:10:55Z",
-   "sha256": "5bbcf52ca6dd329b7ccdba2c4abea1223f66a66ebc65375e7369108a2738c006",
-   "bytes": 61615
+   "fetched_utc": "2026-10-15T06:38:40Z",
+   "sha256": "8c6fdbbd692bd9b2e108e9946948aa77200b6c8ffec4f807ea9c8cee92545139",
+   "bytes": 1028694
   },
   "claude-doc-memory": {
    "url": "https://code.claude.com/docs/en/memory",
    "version": "2.1.296",
-   "fetched_utc": "2026-10-10T00:10:55Z",
-   "sha256": "52c9ce2203d522ab02f6f5d9e6bede9998a9a71c9b2bf58fd237ca689e013161",
-   "bytes": 51556
-  },
-  "claude-doc-platform-release-notes": {
-   "url": "https://platform.claude.com/docs/en/release-notes/overview.md",
-   "version": "2.1.296",
-   "fetched_utc": "2026-10-10T00:10:55Z",
-   "sha256": "e3071b255e401a312b7805759190c49d69b5dc04fddf7bb181c6d0034e3b1f09",
-   "bytes": 124726
+   "fetched_utc": "2026-10-15T06:38:40Z",
+   "sha256": "1ebf1bdc299fe03a8f7566f2da60b2bfca2bd0be7ccf5aa715e75171ac1e5a46",
+   "bytes": 51382
   },
   "claude-doc-skills": {
    "url": "https://code.claude.com/docs/en/skills",
    "version": "2.1.296",
-   "fetched_utc": "2026-10-10T00:10:55Z",
-   "sha256": "3a4428d15e821c576506d6a870844f8a9744cc69f85a63bd563e159b00eb0b11",
-   "bytes": 106661
+   "fetched_utc": "2026-10-15T06:38:40Z",
+   "sha256": "4d090296b0a4549865a7b5770b4ab33c6a522fc77a76c769dde589920f38c8fe",
+   "bytes": 109126
   },
   "claude-env-vars-page": {
    "url": "https://code.claude.com/docs/en/env-vars.md",
    "version": null,
-   "fetched_utc": "2026-10-10T00:10:55Z",
-   "sha256": "7df98a600e2fda71818cea0031c0296bcc6960892da12572cd7cdf4c7d72c8f3",
-   "bytes": 168369
+   "fetched_utc": "2026-10-15T06:38:40Z",
+   "sha256": "54351937e4d1a8b7b79d43fc9784709be4fd0a2c5d2423c5388fa2ff88550b3a",
+   "bytes": 171358
   },
   "claude-mods-overview-page": {
    "url": "https://code.claude.com/docs/en/plugins/mods/overview.md",
    "version": null,
-   "fetched_utc": "2026-10-10T00:10:55Z",
-   "sha256": "fe5601eb58bd3be5cb06eb28fda9cbf09852ece268729d71b3cfffed882a2825",
-   "bytes": 23651
+   "fetched_utc": "2026-10-15T06:38:40Z",
+   "sha256": "9d2ed34f2a7bc14ce8f3c4fe844cfa9733a4dbaee02495f9a4488e54de1029ce",
+   "bytes": 23615
   },
   "claude-settings-reference-page": {
    "url": "https://code.claude.com/docs/en/settings-reference.md",
    "version": null,
-   "fetched_utc": "2026-10-10T00:10:55Z",
-   "sha256": "e7d592dc8ec3baaeaf3156e764f924874e491ffd9af911d5a743edbdafb8452f",
-   "bytes": 419994
+   "fetched_utc": "2026-10-15T06:38:40Z",
+   "sha256": "8ba90434d2801f9e7b3dc44e304bea0e3ca94c25d540cdcf9763369deeb355e4",
+   "bytes": 425177
   },
   "codex-config-schema": {
    "url": "https://github.com/openai/codex/releases/download/rust-v0.162.1/config-schema.json",
    "version": "rust-v0.162.1",
-   "fetched_utc": "2026-10-10T00:10:55Z",
+   "fetched_utc": "2026-10-15T06:38:40Z",
    "sha256": "7933a70506e753a6e98c16800d2a76770b2af2b7295491f8f0b8e713e952027e",
    "bytes": 236751
   },
   "codex-doc-agents-md": {
    "url": "https://learn.chatgpt.com/docs/agent-configuration/agents-md.md",
    "version": "rust-v0.160.1",
-   "fetched_utc": "2026-10-10T00:10:55Z",
+   "fetched_utc": "2026-10-15T06:38:40Z",
    "sha256": "9d1f87a2d1cb55b4782b95abe710692b35b9659789c2db31a22c7074a3383e8e",
    "bytes": 9149
   },
   "codex-features-list": {
    "command": "codex features list",
    "version": "codex-cli 0.162.1",
-   "fetched_utc": "2026-10-10T00:10:55Z",
+   "fetched_utc": "2026-10-15T06:38:40Z",
    "sha256": "8095d5c2cf431c74c3634d12e304829509cd2cc4b1b17ea16ef6fba274a41e1e",
    "bytes": 10965
   },
   "github-codex-latest-release": {
    "url": "https://api.github.com/repos/openai/codex/releases/latest",
    "version": null,
-   "fetched_utc": "2026-10-10T00:10:55Z",
-   "sha256": "362e4a1206cbddf0a50c6f4a4b57a0411f1006f36f5e703176e25befbe324226",
-   "bytes": 299921
+   "fetched_utc": "2026-10-15T06:38:40Z",
+   "sha256": "a1ce2232ac66dfacc878d2b2120f03dc06a3be5f78bb72bc2983c0ace9b561d6",
+   "bytes": 300164
   },
   "npm-claude-agent-sdk-packument": {
    "url": "https://registry.npmjs.org/@anthropic-ai/claude-agent-sdk",
    "version": null,
-   "fetched_utc": "2026-10-10T00:10:55Z",
-   "sha256": "63658e378335d16bf61d19cd1b3d0c3bc9c33092801a395230dce9d82cf0295a",
-   "bytes": 1069766
+   "fetched_utc": "2026-10-15T06:38:40Z",
+   "sha256": "5064c503fee36aa50b784a39412b6ce9e3e228ba126d1ad0e3c8bef2d4740479",
+   "bytes": 1078073
   },
   "npm-claude-code-dist-tags": {
    "url": "https://registry.npmjs.org/-/package/@anthropic-ai/claude-code/dist-tags",
    "version": null,
-   "fetched_utc": "2026-10-10T00:10:55Z",
-   "sha256": "15929f4e719c40be25a600496323b4668cec4f5e9a64490d0baf458f79971e3d",
+   "fetched_utc": "2026-10-15T06:38:40Z",
+   "sha256": "4fbd82569b4495e865b905a99e5db1e6aa3975a9392ef778fb5a022b98abaf49",
    "bytes": 56
   },
   "npm-codex-dist-tags": {
    "url": "https://registry.npmjs.org/-/package/@openai/codex/dist-tags",
    "version": null,
-   "fetched_utc": "2026-10-10T00:10:55Z",
-   "sha256": "f6513aeb48cd9dded7967dfe8e856fb60e7ff30f2ca8066eb5e93a46ba97a899",
-   "bytes": 3236
+   "fetched_utc": "2026-10-15T06:38:40Z",
+   "sha256": "883245731bb70facc1c38a3d27b6e59ab4dc7f1d528997b151413b07d18911d9",
+   "bytes": 3771
   }
  },
  "kinds": {
@@ -439,6 +425,7 @@
    "CLAUDE_CODE_ARTIFACT_AUTO_OPEN",
    "CLAUDE_CODE_ARTIFACT_COMMENTS",
    "CLAUDE_CODE_ARTIFACT_COMMENTS_AUTOREACT",
+   "CLAUDE_CODE_ARTIFACT_PUBLISH_EDITS",
    "CLAUDE_CODE_ATTRIBUTION_HEADER",
    "CLAUDE_CODE_AUTO_BACKGROUND_WORKER_CHECKIN_SECONDS",
    "CLAUDE_CODE_AUTO_COMPACT_WINDOW",
@@ -482,6 +469,7 @@
    "CLAUDE_CODE_DISABLE_FAST_MODE",
    "CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY",
    "CLAUDE_CODE_DISABLE_FILE_CHECKPOINTING",
+   "CLAUDE_CODE_DISABLE_FILE_MENTIONS",
    "CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS",
    "CLAUDE_CODE_DISABLE_INLINE_SHELL_RM_PROMPT",
    "CLAUDE_CODE_DISABLE_LEGACY_MODEL_REMAP",
@@ -542,6 +530,7 @@
    "CLAUDE_CODE_IDE_HOST_OVERRIDE",
    "CLAUDE_CODE_IDE_SKIP_AUTO_INSTALL",
    "CLAUDE_CODE_IDE_SKIP_VALID_CHECK",
+   "CLAUDE_CODE_IDLE_COMPACT_MIN_TOKENS",
    "CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS",
    "CLAUDE_CODE_MAX_CONTEXT_TOKENS",
    "CLAUDE_CODE_MAX_MCP_DESCRIPTION_LENGTH",
@@ -573,6 +562,7 @@
    "CLAUDE_CODE_OTEL_HEADERS_HELPER_DEBOUNCE_MS",
    "CLAUDE_CODE_OTEL_SHUTDOWN_TIMEOUT_MS",
    "CLAUDE_CODE_OVERLOADED_RETRY_BASE_DELAY_MS",
+   "CLAUDE_CODE_OVERLOADED_RETRY_MAX_DELAY_MS",
    "CLAUDE_CODE_PACKAGE_MANAGER_AUTO_UPDATE",
    "CLAUDE_CODE_PERFORCE_MODE",
    "CLAUDE_CODE_PLUGIN_CACHE_DIR",
@@ -651,6 +641,7 @@
    "CLAUDE_CODE_WORKER_CHECKIN_SCHEDULE",
    "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS",
    "CLAUDE_CODE_WORKFLOW_PREFIX_STAGGER_MS",
+   "CLAUDE_CODE_YOU_SHOULD_KNOW_DEBUG",
    "CLAUDE_CONFIG_DIR",
    "CLAUDE_DISABLE_ADOPT",
    "CLAUDE_EFFORT",
