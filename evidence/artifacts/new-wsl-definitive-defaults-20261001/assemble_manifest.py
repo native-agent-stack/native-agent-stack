@@ -365,8 +365,9 @@ BATCH_FIELDS = (("date_utc", str), ("meaning", str), ("interim_rule", str), ("no
 # Amendment 3: an interim install, written to the row's `interim` field (outside PROTECTED), on a row whose decided default
 # installs nothing. It names what it installs and at which pin, what replaces or removes it (decided_by), the authority that
 # installs it meanwhile, each family's recorded review and its hashed records. The authority is the owner's dated decision
-# (as the record that relays it states it, with the owner's own words where that record quotes them, and with the exact
-# slot and repository pair it authorizes) or a direct consensus that carries both families' acknowledgements.
+# (as the record that relays it states it, with a dated paraphrase of the owner's words where that record quotes them,
+# never the quotation itself, and with the exact slot and repository pair it authorizes) or a direct consensus that carries
+# both families' acknowledgements.
 INTERIM_FIELDS = ("date_utc", "default", "repository", "pin", "label", "decided_by", "authority", "reviews", "records")
 INTERIM_TEXT = ("date_utc", "default", "repository", "pin", "label", "decided_by")
 INTERIM_OPTIONAL = ("configuration", "open_acceptance_gates", "sources")

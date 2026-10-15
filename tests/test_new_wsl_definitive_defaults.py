@@ -19,6 +19,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 from tests.test_adoption_bootstrap import sha256sum_checks_like_gnu  # helpers only; its test classes run there
+from tests.test_new_wsl_handbook import attributed_quotations  # helper only; its test classes run there
 
 ROOT = Path(__file__).resolve().parents[1]
 ART = ROOT / "evidence/artifacts/new-wsl-definitive-defaults-20261001"
@@ -1065,7 +1066,12 @@ class Manifest(unittest.TestCase):
         self.assertIn(self.consensus["rule"], text)
         self.assertIn(self.wave2["interim_rule"], text)
         self.assertIn(self.wave2["no_install_rule_exception"], text)
-        self.assertNotIn(self.consensus["authorization"]["verbatim"], text)
+        # The owner's sentence is a dated paraphrase in the consensus record (the GPT read of #1128 at bd3eecfe5, blocker 1),
+        # and the decision record attributes no quotation to the owner or the user.
+        authorization = self.consensus["authorization"]
+        self.assertNotIn("verbatim", authorization)
+        self.assertTrue(authorization["paraphrase"].startswith("the owner, 2026-10-02 (paraphrased): "))
+        self.assertEqual(attributed_quotations(text), 0)
         normalized = " ".join(text.split()).casefold()
         for clause in self.consensus["authorization"]["reading"].split("; "):
             self.assertIn(clause.casefold(), normalized)
@@ -1146,11 +1152,15 @@ class Manifest(unittest.TestCase):
                 self.assertEqual(set(interim["reviews"]), {"claude", "gpt"})
                 self.assertTrue(interim["decided_by"].strip())
         # The GPT family's standing position is carried as it was: it disagreed on the context layer and recommended the
-        # holds that the owner's decision lifted; the owner's own words are quoted where the relaying record quotes them.
+        # holds that the owner's decision lifted; the owner's words are a dated paraphrase, never a quotation (the GPT read
+        # of #1128 at bd3eecfe5, blocker 1), and the hashed relaying record holds the decision.
         self.assertIn("disagreed", self.interims["context-supply"]["reviews"]["gpt"])
         for sid in ("memory-owner", "code-search"):
             self.assertIn("hold", self.interims[sid]["reviews"]["gpt"])
-        self.assertIn("context mode", self.interims["context-supply"]["authority"]["verbatim"])
+        paraphrase = self.interims["context-supply"]["authority"]["paraphrase"]
+        self.assertTrue(paraphrase.startswith("the owner, 2026-10-03 (paraphrased): "), paraphrase)
+        self.assertIn("context mode", paraphrase)
+        self.assertNotIn("verbatim", self.interims["context-supply"]["authority"])
         self.assertIn("definitive", self.interims["context-supply"]["label"])
         self.assertIn("never removed automatically", self.interims["context-supply"]["decided_by"])
         # The memory server listens where the host and client templates point (wave-2 synthesis X5), not on 21374.
@@ -1482,7 +1492,9 @@ class Manifest(unittest.TestCase):
         self.assertEqual(sha(ROOT / ref["path"]), ref["sha256"])
         text = (ROOT / ref["path"]).read_text(encoding="utf-8")
         self.assertIn(authority["verbatim"], text)
-        self.assertTrue(authority["verbatim"].startswith("WE NEED TO ENABLE FULL SOTA STACKS FOR THE TOKEN EFFICIENCY REPOS "))
+        # The record quotes the whole order as one block quote. This test holds none of its words (the GPT read of #1128 at
+        # bd3eecfe5, blocker 1); the field stays while assemble_manifest.py requires it (OWNER_AUTHORITY_FIELDS).
+        self.assertIn("\n> " + authority["verbatim"] + "\n", text)
         for sid in WAVE3_OWNER_ADDED + sorted((OWNER_DEFAULTS - {"promptfoo"} - WAVE5_OWNER_DEFAULTS) | OWNER_INTERIM):
             self.assertIn(f"`{sid}`", text, sid)
         for key in ("owner_rule", "no_install_rule_exception"):
