@@ -217,9 +217,19 @@ def verify_handoff(previous, date):
         candidate = instance / name
         if not candidate.is_file():
             continue
-        candidate_output = safe_json(candidate)
-        if sha(candidate) == value.get('native_recover_sha256'):
-            native, output = candidate, candidate_output
+        # Keep the existing 64KiB/owner/regular-file boundary. CPython
+        # v3.12.3 os.open/fstat/read capture one bounded snapshot; hash those
+        # bytes BEFORE JSON decoding so an unrelated partial write is ignored.
+        limit = 65536
+        with os.fdopen(os.open(candidate, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK), 'rb') as stream:
+            info = os.fstat(stream.fileno())
+            if not stat.S_ISREG(info.st_mode) or info.st_uid != os.geteuid() or info.st_size > limit:
+                raise Refused('unsafe_input')
+            raw = stream.read(limit + 1)
+        if len(raw) > limit:
+            raise Refused('unsafe_input')
+        if hashlib.sha256(raw).hexdigest() == value.get('native_recover_sha256'):
+            native, output = candidate, json.loads(raw)
             break
     if native is None:
         raise Refused('previous_native_recover_hash')
@@ -465,8 +475,26 @@ def run_stage(stage):
                 result = empty
                 if (empty.get('kind') == 'mover_trial_receipt' and empty.get('status') == 'not_started'
                         and empty.get('reason') == 'scan_empty' and empty.get('stage') == 'validation'
-                        and type(empty.get('orders_submitted')) is int and empty['orders_submitted'] == 0
-                        and empty.get('config_sha256') == sha(config(stage))):
+                        and type(empty.get('orders_submitted')) is int and empty['orders_submitted'] == 0):
+                    # Native mover_runner.py:690,701-703 at 8053f14e uses the
+                    # loaded config AND effective RiskLimits, not raw CONFIG
+                    # bytes, for exploratory receipts (exploration.py:45-51).
+                    # binding(stage) retains its separate raw CONFIG seal.
+                    sys.path.insert(0, str(paper))
+                    from mover import load_mover_config
+                    loaded, limits, _ = load_mover_config(config(stage))
+                    raw_config = config(stage).read_bytes()
+                    # Unlabelled legacy frozen producers predate exploration.py
+                    # and use the raw digest. Never require a new runtime module
+                    # for those unchanged producers. Labelled configs use the
+                    # native effective digest, including loaded risk limits.
+                    if 'paper_lane' in loaded or 'evidence_class' in loaded:
+                        from exploration import config_digest
+                        expected_config = config_digest(loaded, raw_config, limits=limits)
+                    else:
+                        expected_config = hashlib.sha256(raw_config).hexdigest()
+                    if empty.get('config_sha256') != expected_config:
+                        raise Refused('empty_scan_config_digest_mismatch')
                     scan, scan_sha256 = paper_output(instance / 'scan.json')
                     if scan.get('symbols') != [] or empty.get('scan_sha256') != scan_sha256:
                         raise Refused('empty_scan_receipt_binding_mismatch')
@@ -521,6 +549,8 @@ def rest_flat_after_stream_failure(stage, active, rc, output):
     recover_stage's existing no_owned_trial_to_recover path, never a stream retry.
     runner.py:2890-2891 publishes RTH recovery mode=adaptive_paper; the
     mover producer retains the inner mode. Match the public producer by stage.
+    runner.py:554 fixes public_preflight orders_submitted at zero. It is an
+    eligibility field only; flatness rests on the REST counts, never that zero.
     """
     if rc != 3 or not output.is_file():
         return rc, output

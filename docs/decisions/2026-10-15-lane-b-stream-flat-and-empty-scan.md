@@ -58,6 +58,13 @@ All native locators below are at base
   retains errors, local positions/orders and unknown reconciliation.
 - `blueprints/us-equities/adaptive-paper/mover_runner.py:592-601,701-703`:
   existing empty-scan no-start receipt and rc2 before credential loading.
+- `blueprints/us-equities/adaptive-paper/mover_runner.py:690` and
+  `exploration.py:45-51`: native receipt config digest uses the loaded mover
+  config and effective RiskLimits for exploratory lane B, rather than raw
+  CONFIG bytes. `mover.py:320` supplies the supported config loader.
+- `blueprints/us-equities/adaptive-paper/runner.py:554`: public preflight's
+  orders_submitted is fixed at zero. This field only restricts eligibility;
+  account flatness rests on the fresh complete REST counts.
 - `blueprints/us-equities/paper-lane-latch/r3_contract.py:31-49`:
   source-bound canonical method graft, extended with the fallback helper/call
   while retaining the source generation's recovery/latch implementation.
@@ -118,6 +125,37 @@ Before this correction the issuer refuses `previous_native_recover_hash`.
 After it, issuance/binding pass; tampering with the stream proof still refuses
 under that same hash check. Authority, clock, unit inventory and all GO/state
 files in the test are SYN fixtures. This does not issue a real GO or run a unit.
+
+### Correction to reviewed head 51369893
+
+The exploratory empty-scan regression now uses native `command_paper` with
+the published mover configuration and lane B exploratory labels, validating
+the real scan, paths, effective limits/digest and no-start serializer. Before
+the correction, this valid native receipt returns2 with no INFO event. The
+launcher now calls the same pure `load_mover_config`/`config_digest` functions;
+the existing raw CONFIG admission seal remains separate. A qualification
+control also traverses the real producer, and raw-digest substitution or scan
+mutation refuses without a clean no-trade event. No credentials are loaded.
+Unlabelled legacy frozen producers predate `exploration.py`; their unchanged
+native raw-config digest is retained without importing that newer module.
+The retained legacy frozen producer was also measured with the same empty-scan
+test, separately from the current producer and exploratory digest regression.
+
+The held local proof-selection P2 and GPT's retry P2 describe the same defect:
+a partial nonmatching stream receipt raises JSONDecodeError before the native
+receipt bound by the handoff is reached. The bounded descriptor reader checks
+regular-file type, owner and the existing64KiB cap, hashes the captured bytes,
+then decodes only the matching candidate. CPython v3.12.3's supported
+`os.open`/`fstat`, buffered `read(size)`, `hashlib.sha256` and `json.loads`
+interfaces implement this snapshot; the regression verifies a successful
+real native recovery remains admissible beside that partial stream file.
+
+The scratch next-stage regression now fixtures `lane_latch.assert_issuer_python`
+because host-interpreter qualification is a separate native gate. A simulated
+CPython3.13 host fails `issuer_python_3_12_required` before this test-only fix,
+then reaches the real issuer/proof/binding paths after it. Production's3.12
+issuer gate is unchanged. The record also explicitly describes the replaced
+handoff validator and the public preflight submission counter's limitation.
 
 The pinned mover CLI does not publish the required preflight counters. That
 missing evidence remains a refusal for this new stream-error path; no zero

@@ -13,7 +13,6 @@ import unittest
 from unittest.mock import AsyncMock, Mock, patch
 
 from tests import test_pre_skip_flat_probe as observer_fixtures
-from tests import test_lane_b_r3_launcher as launcher_fixtures
 
 ROOT = Path(__file__).resolve().parents[1]
 LATCH = ROOT / 'blueprints/us-equities/paper-readiness-seq3'
@@ -214,37 +213,102 @@ class StreamFlatFallback(unittest.TestCase):
 
 
 class EmptyScanOutcome(unittest.TestCase):
+    def native_empty_scan(self, exploratory, *, tamper=None):
+        with StreamFlatFallback().scenario() as (fixture, launch, instance, native):
+            mover = observer_fixtures.load('mover_runner', fixture.paper / 'mover_runner.py')
+            config = launch.config('pre')
+            document = json.loads((fixture.paper / 'config-mover.json').read_text())
+            if exploratory:
+                document.update(paper_lane='B', evidence_class='exploratory')
+            config.write_text(json.dumps(document))
+            instance = fixture.root / 'exploratory' / 'syn-empty-scan'
+            instance.mkdir(parents=True)
+            args = SimpleNamespace(trial='syn-empty-scan', config=config, scan=instance / 'scan.json',
+                state_root=instance / 'native-state', output=instance / 'paper.json',
+                live_dir=None, gate_result=None, snapshot=None)
+            launch.save(args.scan, {'schema_version': 1, 'kind': 'mover_scan',
+                'protocol': document['protocol'], 'rule': document['mover']['rule'],
+                'scan_time': '2026-10-14T12:00:00Z', 'symbols': []})
+            launch.binding = Mock(return_value={'instance': str(instance), 'trial': args.trial,
+                'state_root': str(args.state_root), 'config_sha256': launch.sha(config)})
+            (fixture.state / 'active/pre.json').unlink()  # No active SYN trial at admission.
+            def empty_scan(command, **kwargs):
+                # Real config/path/scan validation, effective digest and no-start
+                # serializer, before any native credential or broker boundary.
+                with patch.object(mover.time, 'time', return_value=1791979200), \
+                     patch.object(sys.modules['safety'], 'DEFAULT_STOP', fixture.root / 'absent-STOP'), \
+                     patch.object(mover, 'credentials', side_effect=AssertionError('credential boundary')):
+                    rc = mover.command_paper(args)
+                if tamper == 'raw-config-digest':
+                    receipt = launch.safe_json(args.output)
+                    receipt['config_sha256'] = launch.sha(config)
+                    launch.save(args.output, receipt)
+                elif tamper == 'scan':
+                    args.scan.write_text('{"symbols": []}\n')
+                return rc
+            launch.keyed = Mock(side_effect=empty_scan)
+            with patch('sys.stdout', io.StringIO()):
+                if tamper:
+                    reason = ('empty_scan_config_digest_mismatch' if tamper == 'raw-config-digest'
+                              else 'empty_scan_receipt_binding_mismatch')
+                    with self.assertRaisesRegex(launch.Refused, reason):
+                        launch.run_stage('pre')
+                    self.assertFalse((instance / 'no-trade.json').exists())
+                    return
+                self.assertEqual(launch.run_stage('pre'), 0)
+            receipt = launch.safe_json(args.output)
+            if exploratory:
+                self.assertNotEqual(receipt['config_sha256'], launch.sha(config))
+            else:
+                self.assertEqual(receipt['config_sha256'], launch.sha(config))
+            event = launch.safe_json(instance / 'no-trade.json')
+            self.assertEqual((event['level'], event['reason']), ('INFO', 'scan_empty'))
+            self.assertIs(event['trial_evidence'], False)
+            self.assertEqual(event['native_exit_code'], 2)
+            self.assertEqual(event['evaluated_counts'], {'selected_symbols': 0, 'orders_submitted': 0})
+            self.assertFalse((fixture.state / 'completed').exists())
+
+    def test_native_exploratory_empty_scan_returns_info_without_trial_evidence(self):
+        self.native_empty_scan(True)
+
     def test_empty_scan_returns_zero_and_records_info_no_trade_counts(self):
-        fixture = launcher_fixtures.Acceptance()
-        fixture.setUp()
-        self.addCleanup(fixture.doCleanups)
-        launch, instance = fixture.launch, fixture.instance
-        config = fixture.root / 'configs/pre.json'
-        config.parent.mkdir()
-        config.write_text('{}\n')
-        scan = instance / 'scan.json'
-        launch.save(scan, {'symbols': []})
-        fixture.value['config_sha256'] = launch.sha(config)
-        def no_trade(command, **kwargs):
-            output = instance / 'paper.json'
-            launch.save(output, {'kind': 'mover_trial_receipt', 'status': 'not_started',
-                'reason': 'scan_empty', 'stage': 'validation', 'orders_submitted': 0,
-                'config_sha256': launch.sha(config), 'scan_sha256': launch.sha(scan)})
-            return 2  # The immutable native runner's documented no-start return.
-        launch.keyed = no_trade
-        stdout = io.StringIO()
-        with patch('sys.stdout', stdout):
-            self.assertEqual(launch.run_stage('pre'), 0)
-        event = launch.safe_json(instance / 'no-trade.json')
-        self.assertEqual((event['level'], event['event'], event['reason']), ('INFO', 'no_trade', 'scan_empty'))
-        self.assertEqual(event['evaluated_counts'], {'selected_symbols': 0, 'orders_submitted': 0})
-        self.assertIs(event['trial_evidence'], False)
-        self.assertIn('INFO', stdout.getvalue())
-        self.assertNotIn('refused', stdout.getvalue())
-        self.assertFalse((launch.STATE / 'completed').exists())
+        self.native_empty_scan(False)
+
+    def test_exploratory_raw_digest_or_changed_scan_cannot_claim_clean_no_trade(self):
+        for tamper in ('raw-config-digest', 'scan'):
+            with self.subTest(tamper=tamper):
+                self.native_empty_scan(True, tamper=tamper)
 
 
 class NativeCLIRewriteContract(unittest.TestCase):
+    def test_next_stage_regression_can_run_on_python_313_review_host(self):
+        # The host-interpreter admission rule has its own native tests. This
+        # scratch issuer regression must traverse proof admission on 3.13 too.
+        with patch.object(sys, 'path', [str(LATCH), *sys.path]):
+            import lane_latch
+        review_host = SimpleNamespace(implementation=SimpleNamespace(name='cpython'), version_info=(3, 13))
+        with patch.object(lane_latch, 'sys', review_host):
+            self.test_actual_rth_cli_fallback_proof_admits_next_stage_and_rejects_tampering()
+
+    def test_partial_nonmatching_stream_proof_allows_matching_native_recovery(self):
+        with StreamFlatFallback().scenario() as (fixture, launch, instance, native):
+            rc, result = actual_rth_cli_receipt(fixture, native, passed=True)
+            active = launch.safe_json(fixture.state / 'active/pre.json')
+            active.update(stage='lev1', config_sha256=launch.sha(launch.config('lev1')))
+            launch.save(fixture.state / 'active/lev1.json', active)
+            (fixture.state / 'active/pre.json').unlink()
+            launch.native_recover = Mock(return_value=(rc, native))
+            with patch.object(launch.time, 'monotonic', return_value=100):
+                self.assertEqual(launch.recover_stage('lev1'), 0)
+            partial = instance / 'stream-flat-probe.json'
+            partial.write_text('{"status":')
+            with patch.object(launch.time, 'monotonic', return_value=161):
+                _, handoff, selected = launch.verify_handoff('lev1', '2026-10-14')
+            self.assertEqual(selected, native)
+            self.assertTrue(handoff['flat'])
+            self.assertEqual(partial.read_text(), '{"status":')
+            launch.keyed.assert_not_called()
+
     def test_successful_runner_cli_output_survives_direct_seq3_fixture_rewrite(self):
         with StreamFlatFallback().scenario() as (fixture, launch, instance, native):
             rc, result = actual_rth_cli_receipt(fixture, native, passed=True)
@@ -322,7 +386,8 @@ class NativeCLIRewriteContract(unittest.TestCase):
             spec.loader.exec_module(builder)
             issuer_path.write_text(builder.isolate_issuer((ROOT / 'tests/fixtures/seq2-issue-go.txt').read_text()))
             with patch.dict(sys.modules, {'launch': launch}), \
-                 patch.object(launch.time, 'monotonic', return_value=161):
+                 patch.object(launch.time, 'monotonic', return_value=161), \
+                 patch('lane_latch.assert_issuer_python', return_value=None):
                 issuer = observer_fixtures.load('next_stage_real_issuer', issuer_path)
                 issuer.writer_units = Mock(return_value=[])
                 answer = issuer.issue('lev2', 'syn-next-lev2', authority, launch.sha(authority), False)

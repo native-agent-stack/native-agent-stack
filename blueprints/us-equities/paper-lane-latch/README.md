@@ -61,8 +61,8 @@ predecessor need not contain a driver. This builder does not call #1113's
 The lane B preparation overlays the canonical launcher's `keyed` and
 `run_stage` and `verify_handoff` methods and its narrow `rest_flat_after_stream_failure` hook from
 `tests/fixtures/seq2-launch.txt`, selected from the builder's exact source
-commit. The hook is inserted after native recovery, preserving the source
-generation's private-latch and handoff code. It leaves the authenticated native runner and
+commit. The hook is inserted after native recovery; the graft replaces the handoff validator
+with the canonical proof-aware validator and retains the source generation's private-latch/recovery code. It leaves the authenticated native runner and
 CONFIG files unchanged. Trial acceptance reads PRE `paper.json` or scheduled
 `paper-output.json`, records recovery-only starts separately and refuses them
 as trial evidence. Native paper reads have a separate 1MiB cap (measured
@@ -82,6 +82,8 @@ observer rc0, passed/flat=true and complete REST0/0 proof. An absent observer
 output preserves the native failed receipt and records a refusing handoff.
 No native retry or live stream is added. The observer fits the already
 reserved120s fallback slot; the enclosing recovery budgets do not change.
+At the cited base, `runner.py:554` sets `orders_submitted` fixed at zero in
+public preflight. This field is eligibility only: flatness rests on the REST counts.
 
 RTH qualification uses the public `runner.py recover` mode `adaptive_paper`,
 not the inner recovery mode. The mover producer does not emit the required
@@ -90,13 +92,17 @@ zero counts are never inferred. The ordinary no-owned-trial fallback remains.
 The emitted handoff validator recognizes `stream-flat-probe.json` alongside
 the two legacy paths only when its exact hash matches the handoff's existing
 `native_recover_sha256`. Bundle/config/trial/flatness/boot/drain checks stay
-in force. A stale legacy file cannot override the recorded stream proof, and
+in force. The reader captures bounded owned regular-file bytes and compares
+their hash before decoding the matching JSON, so an unrelated partial stream
+file cannot hide a valid native receipt. A stale legacy file cannot override the recorded stream proof, and
 a tampered proof cannot admit the next stage. This validator is grafted into
 new packets, not just changed in the canonical fixture.
 
 An authenticated PRE `scan_empty`/`not_started` receipt with zero submitted
-orders is a clean no-trade stage. The launcher verifies its config and scan
-hashes plus the empty selected-symbol list, records `no-trade.json` with an
+orders is a clean no-trade stage. The launcher verifies the native effective
+`config_digest` (loaded mover config plus effective RiskLimits for exploratory
+lane B), scan hash and empty selected-symbol list. The raw CONFIG seal remains
+separately checked at admission. It records `no-trade.json` with an
 INFO event and evaluated counts selected_symbols0/orders_submitted0, and
 returns0 even when the immutable runner returned its legacy no-start code2.
 The native receipt stays unchanged. This creates no trial evidence or flat
