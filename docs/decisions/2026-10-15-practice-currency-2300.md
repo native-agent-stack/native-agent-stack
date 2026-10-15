@@ -161,20 +161,25 @@ Of the 19 entries that touch a slot, 13 are applied to six rows here and 6 touch
 | `checkpoints-rewind` | `native-clients.md` | L66 |
 
 Each gains the entries as `evidence` items and a sentence or two at the end of its `notes`, the same text in `slots.json` and on its
-layer page. No default, route, alternative, rejection or overturn condition changes.
+layer page. No default, alternative, rejection or overturn condition changes; two routes gain the additions the command
+center accepted (below).
 
-## Proposed supersessions
+## Route additions, accepted
 
-No entry overturns a default. Two entries meet a row's overturn condition with a change the route does not yet describe; the route
-text is the command center's to change, so each is proposed here and not applied:
+No entry overturns a default. Two entries meet a row's overturn condition with a change the route did not describe. The route
+text is the command center's to change: each was proposed here, and the command center's ruling of 2026-10-15T17:17Z accepted both,
+with the two edits named below, after checking CHANGELOG@94506ff0 L65 and L97-L98. Both are applied to the rows:
 
 1. **`context-compaction`, route addition** (2.1.299 L97, L98): name idle compaction among the automatic paths: in a terminal session
    a conversation of 200K or more tokens left idle for about 54 minutes is compacted before its one-hour cache expires, the native form
    of the Opus 5.5 long-context post's advice to compact before an idle gap. Keep `idleCompaction` and
    `CLAUDE_CODE_IDLE_COMPACT_MIN_TOKENS` unset (neither is set on the host or the template, checked 2026-10-15). The default stands.
+   The ruling's edit: set `idleCompaction` false only in a session that must keep its exact context across an idle wait over about
+   54 minutes (CC ruling 2026-10-14).
 2. **`background-workflows`, route addition** (2.1.300 L65): a background session resumes a carried workflow through the Workflow
-   tool's approval, not from the handoff file, so a carried run meets the same permission check as a launch (in a fenced `-p` run, the
-   launch-scoped `--allowedTools 'Workflow(<name>)'` the row already names). The default stands.
+   tool's approval, not from the handoff file, so a carried run meets the same permission check as a launch. The default stands.
+   The ruling's edit: whether a fenced `-p` run's launch-scoped `--allowedTools 'Workflow(<name>)'` also covers the carried run is an
+   untested boundary, because the entry does not say; the route leaves it out and the notes label it.
 
 The two other overturn conditions met, Workflow limits (2.1.299 L245) and MCP rule evaluation (2.1.299 L253), need no route change:
 the re-checks are in the rows' notes.
@@ -213,7 +218,7 @@ re-registers the files.
 2. **Six rows gain the entries that touch them** (above), with evidence and a note. The snapshot manifest's label
    (`evidence/artifacts/claude-native-practice-20261009/claude-native-slot-manifest.json`, `current_decision_source`) follows the new
    `slots.json`: its sha256 and the rows whose `evidence` now differs from the snapshot.
-3. **Two route additions are proposed** (above), not applied.
+3. **Two route additions are applied** (above), as the command center accepted them.
 4. **The overlaps are listed** (above), not applied. #1053's re-measured `subagent-definitions` drift note is left to #1142 or a
    follow-up, because #1142 changes that row.
 5. **A test pins the version and the delta.** `tests/test_native_practice_currency.py`, ported from #1053, checks that `slots.json` and
@@ -245,7 +250,6 @@ re-registers the files.
 
 ## Overturn conditions
 
-- The command center accepts or declines a proposed route addition: the row changes by its own record.
 - A paired same-task run showing an earlier subagent compaction window, one model for all workflow agents, or idle compaction off, at
   quality parity and lower cost: the `context-compaction` or `model-effort-routing` default changes by its own record.
 - A later release that changes the behaviour a default above depends on: its own delta.

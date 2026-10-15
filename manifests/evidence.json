@@ -5017,8 +5017,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.json",
-      "sha256": "cb0efa142bbd99c5991cd365a6d9877a0e45bfac3aada8050fee3962e3c86e61",
-      "bytes": 158636
+      "sha256": "4e994e162f2defb70e5060516e98420747f2505afb689240377510bbc2c8b011",
+      "bytes": 159332
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.md",
@@ -5027,13 +5027,13 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/token-efficiency.md",
-      "sha256": "a0fabbb60b0823820927ed051ea6a68e9b4610ef0af8a5d443b764733ccbbab9",
-      "bytes": 13599
+      "sha256": "cb1303dacc5c7c4fdba81ce4776ca4834ca0335b119928df0c7734ebdcf72cb9",
+      "bytes": 13982
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/workers.md",
-      "sha256": "6c4342d27470fd975a5d15dce3048f53124ef9370ab42154931973f5bf44977a",
-      "bytes": 29299
+      "sha256": "44cd37d4122060ef6ede47aa98d80835cb4cce256feea77e1e4a6423f35cce6d",
+      "bytes": 29612
     },
     {
       "path": ".claude/skills/native-skill-routing/SKILL.md",
@@ -19298,8 +19298,8 @@
     },
     {
       "path": "docs/decisions/2026-10-15-practice-currency-2300.md",
-      "sha256": "18efa4a3f1b5da60e7ad71fd424d71e2393ee38656fc748bd29ad269fc875f27",
-      "bytes": 31507
+      "sha256": "1e213b015ff44f122c97f86c2f9dffd38829a3e3aba74b329c95a17f3072a186",
+      "bytes": 31950
     },
     {
       "path": "docs/decisions/2026-10-15-unrun-registration-rules.md",
@@ -21738,8 +21738,8 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/claude-native-slot-manifest.json",
-      "sha256": "2c8aec984ac34fb0b33b35a4d8d1ddcadbbb69bc2bd0e5c17164071119a9f825",
-      "bytes": 238290
+      "sha256": "46909b9caad532e035f655dbde545547d86b446e8e88d59a74497c00242ae2c9",
+      "bytes": 238317
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/cross-client-lines.json",
@@ -63983,8 +63983,8 @@
     },
     {
       "path": "tests/test_native_practice_currency.py",
-      "sha256": "d72b62e95d0ab44fc4a7e411feeddc0588db8786d4d04fb91557b736e8b7f98f",
-      "bytes": 12370
+      "sha256": "1d637078c14f672a773cc8f62c46fd1461da2c2d08e387c87c6bb7aad6c653c8",
+      "bytes": 13856
     },
     {
       "path": "tests/test_native_practice_doc_corrections.py",

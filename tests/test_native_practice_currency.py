@@ -202,7 +202,7 @@ class DeltaTests(unittest.TestCase):
                             self.assertIn(slot_id, allowed.get(number, set()))
 
     def test_no_default_changed_and_the_overturn_conditions_the_record_says_were_met_are_the_rows_own(self):
-        """The record changes no default; route additions are proposed to the command center, not applied."""
+        """The record changes no default; its route additions apply only as the command center accepted them."""
         self.assertIn("this record changes no default", self.record)
         defaults = {
             "context-compaction": "Native auto-compaction at the model's default window",
@@ -221,6 +221,25 @@ class DeltaTests(unittest.TestCase):
             with self.subTest(slot=slot_id):
                 self.assertIn(condition, self.slots[slot_id]["overturn_when"])
                 self.assertIn("overturn condition", self.slots[slot_id]["notes"])
+
+    def test_the_accepted_route_additions_are_on_the_rows_with_the_rulings_edits(self):
+        """The command center's ruling of 2026-10-15T17:17Z accepted both route additions with two edits: the idle-compaction
+        exception (CC ruling 2026-10-14) and the fenced -p allow labelled an untested boundary, not stated in the route."""
+        self.assertIn("accepted both", self.record)
+        compaction = self.slots["context-compaction"]
+        self.assertIn("idle compaction (2.1.299)", compaction["route"])
+        self.assertIn("set `idleCompaction` false only in a session that must keep its exact context", compaction["route"])
+        self.assertIn("(CC ruling 2026-10-14)", compaction["route"])
+        workflows = self.slots["background-workflows"]
+        self.assertIn("resumes a carried workflow through the Workflow tool's approval", workflows["route"])
+        self.assertNotIn("carried run (in a fenced", workflows["route"])
+        self.assertIn("Untested boundary: whether, in a fenced `-p` run", workflows["notes"])
+        for slot_id in ("context-compaction", "background-workflows"):
+            with self.subTest(slot=slot_id):
+                section = page_section(slot_id)
+                self.assertIn(f"- **Route:** {self.slots[slot_id]['route']}\n", section)
+                self.assertIn(f"- **Notes:** {self.slots[slot_id]['notes']}\n", section)
+                self.assertNotIn("is proposed to the command center", self.slots[slot_id]["notes"])
 
 
 if __name__ == "__main__":
