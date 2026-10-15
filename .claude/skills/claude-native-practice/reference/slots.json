@@ -35,7 +35,8 @@
    "overturn_when": "An observed auto-update regression breaks a qualified workflow (then `stable` plus `minimumVersion`), or Anthropic changes the default channel.",
    "supersedes": [
     "M51 reconfirmed"
-   ]
+   ],
+   "notes": "Watch (2026-10-15): sandboxed runs leave 0-byte read-only placeholders under C:\\Program Files\\ClaudeCode, among them a file named managed-settings.d; the managed-settings docs say a managed-settings.d that exists but cannot be read, for a reason other than an operating-system denial, makes every session exit at startup. No effect measured: WSL 2.1.300 reads that directory's managed-settings.json only for wslInheritsWindowsSettings, and both WSL 2.1.300 and Windows claude.exe 2.1.270 start past managed settings; re-check when the Windows client is next upgraded."
   },
   {
    "id": "instruction-files",
@@ -388,7 +389,7 @@
     "sandboxing.md",
     "sandbox-environments.md (bypass sessions belong in a container, VM or the sandbox runtime)"
    ],
-   "notes": "The native sandbox bounds shell commands only; file tools, MCP servers, hooks and the status line stay outside it. Bypass is not reopened.",
+   "notes": "The native sandbox bounds shell commands only; file tools, MCP servers, hooks and the status line stay outside it. Bypass is not reopened. Own clone only (command center, 2026-10-15): a sandboxed Claude Code session runs in its own clone with its own .git, never in the shared main checkout or one of its worktrees. The 2.1.300 sandbox write-protects .git/config, .git/config.lock, .git/config.worktree and its lock, .git/hooks, .git/worktrees and more, and for a path that does not exist bwrap creates an empty read-only placeholder on the real filesystem; a worktree's common directory is the main .git, so sandboxed runs in worktrees left .git/config.lock in the shared repository and blocked every lane's git config writes while it existed (2026-10-14T23:59:29Z until it was removed at 2026-10-15T00:50:33Z, and again at 01:04Z). Interim: a stale 0-byte 0444 .git/config.lock with no git or sandboxed process running is removed with its stat recorded, and an alert fires when one persists more than 10 minutes. Separately, CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1 runs Bash in a bwrap PID namespace with a seccomp filter whatever sandbox.enabled says (CHANGELOG 2.1.98; measured 2026-10-15: NSpid 6, Seccomp 2, a write outside the working directory still allowed with sandbox.enabled false), so a lane that runs sandbox-runtime's own tests runs without the scrub.",
    "overturn_when": "M1's arms pass on this host and the owner opts in, or a worker is seen taking a harmful action.",
    "supersedes": [
     "M1 refined"

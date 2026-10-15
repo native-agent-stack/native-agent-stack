@@ -11,6 +11,7 @@ Client 2.1.295, checked 2026-10-09. Index: [slots.md](slots.md).
 - **Rejected:** npm global install (deprecated since 2.1.15); `DISABLE_UPDATES` on this host
 - **Evidence:** setup.md install and update sections; settings-reference.md `autoUpdatesChannel`; CHANGELOG@v2.1.295 L7262 (npm deprecation, 2.1.15)
 - **Supersedes:** M51 reconfirmed
+- **Notes:** Watch (2026-10-15): sandboxed runs leave 0-byte read-only placeholders under C:\Program Files\ClaudeCode, among them a file named managed-settings.d; the managed-settings docs say a managed-settings.d that exists but cannot be read, for a reason other than an operating-system denial, makes every session exit at startup. No effect measured: WSL 2.1.300 reads that directory's managed-settings.json only for wslInheritsWindowsSettings, and both WSL 2.1.300 and Windows claude.exe 2.1.270 start past managed settings; re-check when the Windows client is next upgraded.
 - **Overturn when:** An observed auto-update regression breaks a qualified workflow (then `stable` plus `minimumVersion`), or Anthropic changes the default channel.
 
 ## instruction-files
