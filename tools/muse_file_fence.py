@@ -203,6 +203,28 @@ class Fence:
 
     @contextlib.contextmanager
     def prepared(self):
+        # openai/codex rust-v0.162.1 permissions.rs:2360-2367,2573-2629.
+        # Resolve before any fenced execution; no new external grant is made.
+        git = self.worktree / '.git'
+        gitdir = None
+        if git.is_symlink():
+            raise ValueError('symlink Git metadata refused')
+        if git.is_file():
+            try:
+                prefix, raw = git.read_text().strip().split(':', 1)
+                if prefix.strip() != 'gitdir' or not raw.strip():
+                    raise ValueError('unresolved Git metadata')
+                target = Path(raw.strip())
+                if not target.is_absolute():
+                    target = git.parent / target
+                gitdir = target.resolve(strict=True)
+                if not gitdir.is_dir() or any(ord(c) < 32 for c in str(gitdir)):
+                    raise ValueError('unresolved Git metadata')
+            except (OSError, UnicodeError, RuntimeError) as exc:
+                raise ValueError('unresolved Git metadata') from exc
+            if any(gitdir == root or gitdir in root.parents
+                   for root in (self.worktree, self.logdir)):
+                raise ValueError('unsupported Git metadata overlap')
         # Host-only staging is outside every visible bind. No auth copy.
         with host_artifacts(self.logdir) as (self.artifacts, self.artifact_dirfd), \
                 tempfile.TemporaryDirectory(prefix="muse-fence-control-", dir="/var/tmp") as tmp:
@@ -222,9 +244,9 @@ class Fence:
             empty.mkdir()
             blank = stage / 'blank'
             blank.write_text('{}\n')
-            yield self.command(stage, home, empty, blank)
+            yield self.command(stage, home, empty, blank, gitdir)
 
-    def command(self, stage, home, empty, blank):
+    def command(self, stage, home, empty, blank, gitdir):
         # Empty root, rather than exposing host / and subtracting known secrets.
         args = ["bwrap", "--unshare-pid", "--unshare-ipc", "--unshare-uts",
                 "--die-with-parent", "--new-session", "--cap-drop", "ALL",
@@ -264,6 +286,15 @@ class Fence:
         if git.is_symlink():
             raise ValueError('symlink Git metadata refused')
         args += ['--ro-bind', str(git if git.exists() else empty), str(git)]
+        if gitdir is not None:
+            # Preserve existing visibility only. External targets stay absent;
+            # targets inside either writable bind receive a read-only overlay.
+            if any(root in gitdir.parents for root in (self.worktree, self.logdir)):
+                args += ['--ro-bind', str(gitdir), str(gitdir)]
+                temporary = self.logdir / 'tmp'
+                if gitdir == temporary or temporary in gitdir.parents:
+                    alias = Path('/tmp') / gitdir.relative_to(temporary)
+                    args += ['--ro-bind', str(gitdir), str(alias)]
         for name in HOST_ARTIFACT_NAMES:
             artifact = self.logdir / name
             args += ['--ro-bind', str(artifact), str(artifact)]

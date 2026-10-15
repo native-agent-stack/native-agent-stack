@@ -411,6 +411,83 @@ for path in [root / '.git/config', root / '.git/fence-test-marker']:
         self.assertFalse((self.work / '.git/fence-test-marker').exists())
         self.assertTrue((self.work / 'ordinary-output').exists())
 
+    @unittest.skipUnless(os.environ.get('MUSE_FENCE_NATIVE_PROBE') == '1',
+                         'explicit installed launcher model-free integration')
+    def test_reader_git_pointer_target_readonly(self):
+        """GPT-VERDICT-5cfb83462.md blocker 1, exercised through main()."""
+        metadata = self.work / 'administration'
+        subprocess.run(['git', 'init', '--quiet', '--separate-git-dir', str(metadata),
+                        str(self.work)], check=True, capture_output=True)
+        original = (metadata / 'config').read_bytes()
+        runtime = self.root / 'git-pointer-runtime'
+        runtime.write_text('''#!/usr/bin/python3
+import json, sys
+from pathlib import Path
+if '--version' in sys.argv:
+ print('Muse Code synthetic (1.4.7-R6101.1)'); raise SystemExit(0)
+if '--provider' not in sys.argv:
+ root = Path(''' + repr(str(metadata)) + ''')
+ for name in ['config', 'public-metadata-marker']:
+  try:
+   (root / name).write_text('public synthetic metadata fixture')
+  except OSError:
+   pass
+  else:
+   raise AssertionError('resolved Git metadata must be read-only')
+ Path(''' + repr(str(self.work / 'ordinary-output')) + ''').write_text('allowed')
+print(json.dumps({'payload_type':'run.terminal.completed'}))
+''')
+        runtime.chmod(0o700)
+        for layout in ('absolute', 'relative'):
+            with self.subTest(layout=layout):
+                if layout == 'relative':
+                    (self.work / '.git').write_text('gitdir: administration\n')
+                logs = self.root / ('git-pointer-logs-' + layout)
+                argv = ['muse_file_fence.py', '--lane', str(DEFAULT_LANE),
+                        '--runtime', str(runtime), '--auth', str(self.auth),
+                        '--settings', str(self.settings), '--role', 'reader',
+                        str(self.work), str(self.brief), str(logs)]
+                with mock.patch('sys.argv', argv):
+                    self.assertEqual(main(), 0)
+                self.assertEqual((metadata / 'config').read_bytes(), original)
+                self.assertFalse((metadata / 'public-metadata-marker').exists())
+                self.assertEqual((self.work / 'ordinary-output').read_text(), 'allowed')
+                self.assertTrue(json.loads((logs / 'fence-probe.json').read_text())['pass'])
+
+    @unittest.skipUnless(shutil.which('bwrap'), 'bubblewrap not installed')
+    def test_unresolved_git_pointer_refused_before_execution(self):
+        for index, content in enumerate(('invalid pointer', 'gitdir: absent\n', 'gitdir: \n')):
+            with self.subTest(pointer=content.split(':')[0]):
+                (self.work / '.git').write_text(content)
+                logs = self.root / ('invalid-pointer-logs-' + str(index))
+                logs.mkdir()
+                fence = Fence(self.work, self.brief, logs, self.runtime, self.auth, self.settings)
+                with self.assertRaises(ValueError), fence.prepared():
+                    self.fail('unresolved Git pointer accepted')
+
+    @unittest.skipUnless(shutil.which('bwrap'), 'bubblewrap not installed')
+    def test_git_pointer_target_in_log_scratch_readonly(self):
+        metadata = self.logs / 'tmp/administration'
+        subprocess.run(['git', 'init', '--quiet', '--separate-git-dir', str(metadata),
+                        str(self.work)], check=True, capture_output=True)
+        original = (metadata / 'config').read_bytes()
+        script = f'''
+from pathlib import Path
+for root in [{str(metadata)!r}, '/tmp/administration']:
+    p = Path(root) / 'config'
+    assert p.read_bytes() == {original!r}
+    try:
+        p.write_text('public metadata fixture')
+    except OSError:
+        pass
+    else:
+        raise AssertionError('Git metadata must be read-only')
+Path({str(self.work / 'ordinary-output')!r}).write_text('allowed')
+'''
+        result = self.run_fenced(script)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual((metadata / 'config').read_bytes(), original)
+
     @unittest.skipUnless(shutil.which('bwrap'), 'bubblewrap not installed')
     def test_bounded_run_timeout_returns_124(self):
         from tools.muse_file_fence import run_bounded_fence

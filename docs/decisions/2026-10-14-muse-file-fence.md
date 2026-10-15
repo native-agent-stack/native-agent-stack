@@ -264,9 +264,9 @@ The implemented scope is tracked by source locations and regression names:
 
 | Reviewed item | Implementation | Regression |
 | --- | --- | --- |
-| `MICRO-81008f54.md:14,16` | `tools/muse_file_fence.py:114`, `:277`, `:372`, `:436` | `test_probe_artifact_custody`, `test_live_artifact_custody` |
-| `MICRO-81008f54.md:17` | `tools/muse_file_fence.py:260` | `test_git_metadata_readonly` |
-| `MICRO-81008f54.md:15` | `tools/muse_file_fence.py:141` | `test_launcher_exit_stops_run`, `test_bounded_run_timeout_returns_124` |
+| `MICRO-81008f54.md:14,16` | `tools/muse_file_fence.py` at `5cfb8346:114`, `:277`, `:372`, `:436` | `test_probe_artifact_custody`, `test_live_artifact_custody` |
+| `MICRO-81008f54.md:17` | `tools/muse_file_fence.py` at `5cfb8346:260` | `test_git_metadata_readonly` |
+| `MICRO-81008f54.md:15` | `tools/muse_file_fence.py` at `5cfb8346:141` | `test_launcher_exit_stops_run`, `test_bounded_run_timeout_returns_124` |
 
 Four required fail-first tests failed at81008f54 before implementation; the
 deadline check is additional coverage. Model-free controls and the PR's own
@@ -285,3 +285,26 @@ defines parent-death handling. CPython
 [`Doc/library/subprocess.rst`](https://github.com/python/cpython/blob/v3.13.16/Doc/library/subprocess.rst),
 `Popen`, `wait`, `terminate` and `kill`, define the native interfaces used here.
 No custom filesystem or process supervisor is introduced.
+
+## CC upstream-parity completion
+
+Authority: `adjudication-pr1120-5cfb8346-20261015.md`, items1-3 and loop stop;
+`GPT-VERDICT-5cfb83462.md`, blocker1. Implementation is confined to
+`tools/muse_file_fence.py:205` and `:249`, with regression
+`test_reader_git_pointer_target_readonly` at
+`tests/test_muse_file_fence.py:416`. Finding details remain in the cited sealed
+records. This correction completes the already selected upstream policy;
+no new runtime, grant, model call or candidate change is introduced.
+
+Primary source: openai/codex `rust-v0.162.1`, commit
+`092d3acd6bec3e3a14bdc7e7a2810ab628ab759d`,
+`codex-rs/protocol/src/permissions.rs:2360-2367,2573-2629`. These exact pinned
+source sections were read. The required regression fails against exact
+`5cfb8346` source and passes after this change. Ordinary-directory and shell-role
+refusal controls remain green; unresolved-layout and scratch controls are
+included in the PR's own fixture style. Results are appended to
+`notes/muse-file-fence-20261014/ruled-extra.json` as a separately scoped ruling.
+
+Three GPT P3s are retained in the PR body Follow-ups. CC DELTA and GPT delta are
+required before any registry rebase. The sealed loop stop remains controlling;
+this record does not authorize another fix round or wider accepted layouts.

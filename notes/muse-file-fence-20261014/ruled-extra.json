@@ -32,5 +32,26 @@
     "openai/codex rust-v0.162.1 codex-rs/protocol/src/permissions.rs:2347-2367",
     "containers/bubblewrap v0.11.1 bubblewrap.c:380-388 and bwrap.xml",
     "CPython v3.13.16 Doc/library/os.rst and Doc/library/subprocess.rst"
-  ]
+  ],
+  "upstream_parity_completion": {
+    "reviewed_head": "5cfb834628afdecbda9fa7087e2c129457270add",
+    "authority": "adjudication-pr1120-5cfb8346-20261015.md items 1-3 and loop stop",
+    "finding": "GPT-VERDICT-5cfb83462.md blocker 1",
+    "test": "test_reader_git_pointer_target_readonly",
+    "before_source": "Exact detached 5cfb8346 with current regression module",
+    "before_exit_code": 1,
+    "before_tests": 1,
+    "before_failures": 2,
+    "after_exit_code": 0,
+    "after_fence_tests": 25,
+    "after_combined_tests": 83,
+    "after_combined_skips": 1,
+    "retained_controls": ["ordinary-directory", "shell-role refusal", "unresolved-layout refusal", "scratch metadata"],
+    "live_model_calls": 0,
+    "source": "openai/codex rust-v0.162.1@092d3acd6bec3e3a14bdc7e7a2810ab628ab759d codex-rs/protocol/src/permissions.rs:2360-2367,2573-2629",
+    "followups": "GPT-VERDICT-5cfb83462.md FOLLOW-UPS 1-3 in PR body",
+    "reviews": ["CC DELTA", "GPT delta"],
+    "rebase": "No rebase before both reads pass and CC cue",
+    "loop_stop": "Further Git-metadata residual routes to CC layout narrowing per sealed ruling; no additional round inferred"
+  }
 }
