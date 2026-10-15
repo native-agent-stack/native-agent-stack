@@ -63,6 +63,10 @@ BLOCKED = {
     "echo $APCA_API_SECRET_KEY": "secret_variable_reference",
     "printf '%s' \"${DATABENTO_API_KEY}\"": "secret_variable_reference",
     "python3 -c 'import os; print(os.environ[\"APCA_API_KEY_ID\"])'": "secret_variable_reference",
+    # The two names of the `quantconnect` inventory entry (2026-10-15; QuantConnect/mcp-server@1f0fa4e4 src/api_connection.py:13-14).
+    "echo \"$QUANTCONNECT_API_TOKEN\"": "secret_variable_reference",
+    "printf '%s' \"${QUANTCONNECT_USER_ID}\"": "secret_variable_reference",
+    "python3 -c 'import os; print(os.getenv(\"QUANTCONNECT_API_TOKEN\"))'": "secret_variable_reference",
     # The variable of the `canary-e2e` inventory entry (a disposable synthetic proof key, class test_canary): a secret name like any other.
     "echo \"$CANARY_E2E_KEY\"": "secret_variable_reference",
     "rg -n CANARY_E2E_KEY": "secret_name_search",
@@ -366,6 +370,8 @@ BLOCKED = {
     "grep -n APCA_API_KEY_ID blueprints/us-equities/adaptive-paper/runner.py": "secret_name_search",
     "grep -r APCA_API_SECRET_KEY ~": "secret_name_search",
     "rg -n 'DATABENTO_API_KEY|TYPESAFE_API_KEY' /srv": "secret_name_search",
+    "grep -rn QUANTCONNECT_API_TOKEN ~/code/upstream/QuantConnect": "secret_name_search",
+    "git grep -n QUANTCONNECT_USER_ID": "secret_name_search",
     "ag GF_SECURITY_ADMIN_PASSWORD /etc": "secret_name_search",
     "ack --hidden OPENAI_API_KEY": "secret_name_search",
     "git grep -n GH_TOKEN": "secret_name_search",

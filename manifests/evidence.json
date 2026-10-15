@@ -5392,8 +5392,8 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "9edb9ac1dea4b75b17883d7ba619129bd44a2a0f1c21314842cf2913d72f13a6",
-      "bytes": 45333
+      "sha256": "80c71f835067d53485b33ab4c018f88584efb2a47084f119f2fce0f04139a51b",
+      "bytes": 47216
     },
     {
       "path": "adoption/hardware-profiles.json",
@@ -5407,7 +5407,7 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "dd739c014f5cb6b4ec09b1b4b53558397356ddf5858f4df96fb0203581bb7846",
+      "sha256": "06eacb69926ae7f997d19ecd0f4057dce9b5a70f106a613469429a4cc0d11c39",
       "bytes": 1229
     },
     {
@@ -17513,7 +17513,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "abb2881310233e3491c6b25db91f872cc5a40d9c86e6c6bea4017fc21f771618",
+      "sha256": "f8ebfce992e9bd05746c75ea22986307a6b08a3e337e3d43d752e59a50ddaf4b",
       "bytes": 190472
     },
     {
@@ -19708,8 +19708,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "2b163760b42a608ce53bf27f204e3b25944e051fafaf03950ed45974adc8634e",
-      "bytes": 207692
+      "sha256": "5ff91e7ebd2c214c1016bb702ba3a1c15c4c26195971ffeffbdac9797df7e2bf",
+      "bytes": 208137
     },
     {
       "path": "docs/stack.md",
@@ -62468,8 +62468,8 @@
     },
     {
       "path": "scripts/hooks/secret_path_guard.py",
-      "sha256": "b19e15f5b7a2928e8bb190da812a9745e0683ba7a5ed5637811a6a2fcdb42773",
-      "bytes": 298097
+      "sha256": "db2d9226507e59f77f01a28aca79da79c40108b286f563baf9dea5671a1d10dc",
+      "bytes": 298147
     },
     {
       "path": "scripts/host_name_scan.py",
@@ -63448,18 +63448,18 @@
     },
     {
       "path": "tests/test_credential_run.py",
-      "sha256": "9e21fcab4591d2ee44cbd35ff6811ddba43b9766e8266ae0eb280a068a9725b9",
-      "bytes": 133229
+      "sha256": "1585889e49e6505bc215be63e5157276ac8f8af81f7eca0902b87767482596ae",
+      "bytes": 133245
     },
     {
       "path": "tests/test_credential_status.py",
-      "sha256": "18100204ae30f7284c716ee2df96c9d33c69d924e1d5ab025cd36319f017345b",
-      "bytes": 69673
+      "sha256": "7ab698b6e82ce1d0b6787f96a5103fb34dadc28a252528db3bcacd8baa23608b",
+      "bytes": 71611
     },
     {
       "path": "tests/test_credential_tools.py",
-      "sha256": "2287b67eef5f5498102136c7bb0f2831526bb2057cd77628ebbc12ed9708d4fd",
-      "bytes": 51581
+      "sha256": "fe7464576890672ce59ede305b88d1fa18b687b3cb2efa2e6c06ae7feca602c3",
+      "bytes": 51597
     },
     {
       "path": "tests/test_currency_due.py",
@@ -64388,8 +64388,8 @@
     },
     {
       "path": "tests/test_secret_path_guard.py",
-      "sha256": "bae76bedf85231e10cb205d65e166cb90a4924d7b86554299d2b7e3487ca661e",
-      "bytes": 394232
+      "sha256": "3ae19cdad0f56f213fcad26bd950da6b6719db2bc3361b533162fb418c72ce3d",
+      "bytes": 394768
     },
     {
       "path": "tests/test_secret_scan_metrics.py",
