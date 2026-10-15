@@ -1,0 +1,83 @@
+{
+ "kind": "measurement",
+ "read_utc": "2026-10-15T04:55:55Z",
+ "client": "2.1.300 (Claude Code)",
+ "command": "claude -p /skill-doctor --output-format json --permission-mode dontAsk --permission-prompts none --tools '' --strict-mcp-config --max-turns 1 --max-budget-usd 0.05",
+ "num_turns": 0,
+ "total_cost_usd": 0,
+ "by_source": {
+  "bigdata-com": {
+   "skills": 27,
+   "used": 0,
+   "listing_tokens": 6360
+  },
+  "userSettings": {
+   "skills": 37,
+   "used": 33,
+   "listing_tokens": 4940
+  },
+  "lseg": {
+   "skills": 16,
+   "used": 0,
+   "listing_tokens": 1230
+  },
+  "context-mode": {
+   "skills": 8,
+   "used": 1,
+   "listing_tokens": 860
+  },
+  "daloopa": {
+   "skills": 21,
+   "used": 0,
+   "listing_tokens": 620
+  },
+  "diagram-design": {
+   "skills": 7,
+   "used": 1,
+   "listing_tokens": 500
+  },
+  "claude-api": {
+   "skills": 1,
+   "used": 0,
+   "listing_tokens": 360
+  },
+  "projectSettings": {
+   "skills": 3,
+   "used": 1,
+   "listing_tokens": 310
+  },
+  "socraticode": {
+   "skills": 2,
+   "used": 0,
+   "listing_tokens": 310
+  },
+  "worktrunk": {
+   "skills": 2,
+   "used": 0,
+   "listing_tokens": 250
+  },
+  "cowork-plugin-management": {
+   "skills": 2,
+   "used": 0,
+   "listing_tokens": 240
+  },
+  "typesafe": {
+   "skills": 1,
+   "used": 0,
+   "listing_tokens": 230
+  },
+  "codex": {
+   "skills": 11,
+   "used": 0,
+   "listing_tokens": 210
+  },
+  "claude-hud": {
+   "skills": 2,
+   "used": 0,
+   "listing_tokens": 70
+  }
+ },
+ "synced_total_tokens": 8450,
+ "all_total_tokens": 16490,
+ "note": "context is per turn, before prompt caching; uses are /skill-doctor's own counts"
+}

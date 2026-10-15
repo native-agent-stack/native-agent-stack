@@ -2217,15 +2217,15 @@
   },
   {
    "key": "claude:setting:syncClaudeAiPlugins",
-   "disposition": "declined",
-   "reason": "off on both hosts (read 2026-10-04)); the repository decision at docs/decisions/2026-09-25-skills-trial-and-usage.md:377 names it",
-   "source": "docs/decisions/2026-09-25-skills-trial-and-usage.md:377",
+   "disposition": "default-on",
+   "reason": "sync left on (key unset); each synced plugin is disabled per plugin in enabledPlugins (owner direction 2026-10-15); the 2026-10-04 row wrongly called it off",
+   "source": "docs/decisions/2026-10-15-claudeai-synced-plugins-exception.md:5",
    "carrier": null,
    "value": null,
    "scope": null,
-   "overturn": "the record is superseded by a measured result",
-   "reviewed_utc": "2026-10-04T18:55:00Z",
-   "version": "2.1.289"
+   "overturn": "a synced plugin is wanted: enable it per plugin and pin it through the catalog; or the owner turns the whole sync off",
+   "reviewed_utc": "2026-10-15T03:09:39Z",
+   "version": "2.1.300"
   },
   {
    "key": "claude:setting:syncClaudeAiSkills",

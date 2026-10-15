@@ -1,0 +1,159 @@
+{
+ "kind": "inventory",
+ "subject": "claude.ai synced plugins on the 2604 host (~/.claude/plugins/synced)",
+ "read_utc": "2026-10-15T02:56:16Z",
+ "client": "claude-code 2.1.300",
+ "account_buckets": 10,
+ "buckets_with_plugins": 1,
+ "buckets_note": "ten account buckets; nine hold only the Anthropic Directory marketplace row and no plugin. Bucket and account identifiers are left out on purpose.",
+ "plugins_bucket_last_complete_sync_utc": "2026-10-10T01:57:26Z",
+ "plugins": [
+  {
+   "name": "cowork-plugin-management",
+   "loaded_as": "cowork-plugin-management@synced",
+   "marketplace": "knowledge-work-plugins",
+   "server_version": "0040",
+   "server_updated_utc": "2026-10-01T21:59:56.801289Z",
+   "installation_preference": "available",
+   "skills": 2,
+   "skill_names": [
+    "cowork-plugin-customizer",
+    "create-cowork-plugin"
+   ],
+   "mcp_servers": [],
+   "commands": 0,
+   "in_use_markers": 30,
+   "skill_activations": 0,
+   "mcp_tool_results": 0,
+   "catalog_pin": null
+  },
+  {
+   "name": "lseg",
+   "loaded_as": "lseg@synced",
+   "marketplace": "knowledge-work-plugins",
+   "server_version": "0039",
+   "server_updated_utc": "2026-09-22T20:19:47.156315Z",
+   "installation_preference": "available",
+   "skills": 8,
+   "skill_names": [
+    "bond-futures-basis",
+    "bond-relative-value",
+    "equity-research",
+    "fixed-income-portfolio",
+    "fx-carry-trade",
+    "macro-rates-monitor",
+    "option-vol-analysis",
+    "swap-curve-strategy"
+   ],
+   "mcp_servers": [
+    "lseg"
+   ],
+   "commands": 8,
+   "in_use_markers": 30,
+   "skill_activations": 0,
+   "mcp_tool_results": 0,
+   "catalog_pin": null
+  },
+  {
+   "name": "daloopa",
+   "loaded_as": "daloopa@synced",
+   "marketplace": "knowledge-work-plugins",
+   "server_version": "0039",
+   "server_updated_utc": "2026-09-22T20:19:49.928209Z",
+   "installation_preference": "available",
+   "skills": 23,
+   "skill_names": [
+    "build-model",
+    "bull-bear",
+    "capital-allocation",
+    "comp-sheet",
+    "comps",
+    "data-access",
+    "dcf",
+    "design-system",
+    "earnings-flash",
+    "earnings-prep",
+    "earnings-review",
+    "guidance-tracker",
+    "ib-deck",
+    "industry",
+    "inflection",
+    "initiate",
+    "precedent-transactions",
+    "research-note",
+    "setup",
+    "supply-chain",
+    "tearsheet",
+    "unit-economics",
+    "working-capital"
+   ],
+   "mcp_servers": [
+    "daloopa",
+    "daloopa-docs"
+   ],
+   "commands": 0,
+   "in_use_markers": 30,
+   "skill_activations": 0,
+   "mcp_tool_results": 0,
+   "catalog_pin": null
+  },
+  {
+   "name": "bigdata-com",
+   "loaded_as": "bigdata-com@synced",
+   "marketplace": "knowledge-work-plugins",
+   "server_version": "0043",
+   "server_updated_utc": "2026-10-01T21:59:57.558347Z",
+   "installation_preference": "available",
+   "skills": 27,
+   "skill_names": [
+    "bigdata-catalyst-monitor",
+    "bigdata-company-brief",
+    "bigdata-country-analysis",
+    "bigdata-country-sector-analysis",
+    "bigdata-cross-sector",
+    "bigdata-earnings-digest",
+    "bigdata-earnings-preview",
+    "bigdata-earnings-quality-screen",
+    "bigdata-earnings-reaction",
+    "bigdata-g7-comparison",
+    "bigdata-investment-memo",
+    "bigdata-moat-governance-review",
+    "bigdata-peer-comparables",
+    "bigdata-post-ipo-day1",
+    "bigdata-post-ipo-day14",
+    "bigdata-post-ipo-day179",
+    "bigdata-post-ipo-day365",
+    "bigdata-pre-ipo-analysis",
+    "bigdata-quick-take",
+    "bigdata-regional-comparison",
+    "bigdata-risk-assessment",
+    "bigdata-scenario-analysis",
+    "bigdata-sector-analysis",
+    "bigdata-sector-playbook",
+    "bigdata-thematic-research",
+    "bigdata-valuation-snapshot",
+    "bigdata-variant-perception"
+   ],
+   "mcp_servers": [
+    "bigdata.com"
+   ],
+   "commands": 0,
+   "in_use_markers": 30,
+   "skill_activations": 0,
+   "mcp_tool_results": 0,
+   "catalog_pin": null
+  }
+ ],
+ "loading_sessions": {
+  "in_use_markers": "each plugin's .in_use directory holds the same 30 process markers, born 2026-10-09T07:11:20Z to 07:15:13Z; none of those processes is alive",
+  "loki": "plugin_loaded events, 2026-10-09T07:10:00Z to 07:17:00Z: 30 sessions, all Claude Code 2.1.295, 13 plugins each (window_sessions.py). The event carries no plugin name, so Loki cannot name which plugins a session loaded.",
+  "current_account": "claude plugin list --json in this session lists 9 plugins and none @synced"
+ },
+ "invocations": {
+  "window": "2026-09-20T00:00:00Z to 2026-10-15T02:48:30Z; Loki's first claude-code event is on 2026-10-04",
+  "skill_activations": 0,
+  "mcp_tool_results": 0,
+  "method": "loki_by.py sums 24-hour count_over_time chunks by skill_name (skill_activated) and mcp_server_name (tool_result); no synced plugin skill name and no plugin MCP server name appears among the 43 skill names and 19 server names counted"
+ },
+ "catalog": "none of the four synced plugins is pinned in adoption/skills/manifest.json or any adoption pin. Their source, anthropics/knowledge-work-plugins, has four grand-catalog rows (catalogs/landscape/grand-catalog-20261008.json): 447 durable-memory: WATCH (SOURCE-REVIEW), pinned to the repository at ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1; 448 instructions-skills: PENDING, PROPOSED provisional WATCH, no pin; 449 mcp-surfaces: PENDING, PROPOSED provisional WATCH, no pin; 450 token-efficiency: PENDING, PROPOSED provisional OUT-OF-SCOPE, no pin. No row pins an individual synced plugin"
+}
