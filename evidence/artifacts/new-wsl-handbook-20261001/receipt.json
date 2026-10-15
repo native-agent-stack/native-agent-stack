@@ -6,8 +6,8 @@
   "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
   "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
   "outputs": {
-    "docs/new-wsl-handbook.md": "4352377ae90828283e8ac3c078e386a633a12773f82a04565cfa22a575d04fb0",
-    "docs/new-wsl-handbook.json": "bb68a0d06802f17a02ac00ced40d582de339b800c5e646b818c46eafb0d6b474"
+    "docs/new-wsl-handbook.md": "2da04efaba1fca299e1dbebdf234677d6d58f69786ee40e44ba1d153f698c6f9",
+    "docs/new-wsl-handbook.json": "bfd6ec5cc60eb5da448a09c344c40ec8eb3d34e67cfea774909c1a6dbc5c32be"
   },
   "inventory": {
     "layers": 37,
@@ -1054,6 +1054,23 @@
       "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
       "evidence_class": "local_integration",
       "scope": "Regenerated through the unchanged native builder after the Harbor stack-component registration changed two hashed inputs: the adoption recipe map gained harbor, and the architecture edition's Nemotron revision citation moved from stack line 2118 to 2141 (the cited revision is unchanged). No host, model or provider acceptance."
+    },
+    {
+      "recorded_at_utc": "2026-10-15T21:00:52Z",
+      "source_main": "8053f14e7e0817d2502dff2bb284bfb7e1b0152f",
+      "source_head": "eedd595e06833706d6d7b5b1b3f4855786ee19ce",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "check_command": "python3 scripts/build_new_wsl_handbook.py --check",
+      "check_exit_code": 0,
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "2da04efaba1fca299e1dbebdf234677d6d58f69786ee40e44ba1d153f698c6f9",
+        "docs/new-wsl-handbook.json": "bfd6ec5cc60eb5da448a09c344c40ec8eb3d34e67cfea774909c1a6dbc5c32be"
+      },
+      "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+      "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
+      "evidence_class": "local_integration",
+      "scope": "PR #1179 model-routes registration updates only the research-state source hash in both generated handbook outputs. Unchanged native builder; no selection, profile, install, model or provider acceptance change."
     }
   ],
   "previous_outputs": [
@@ -1262,6 +1279,15 @@
         "docs/new-wsl-handbook.json": "fe0b6628bc589e59dc71a5a0fb6805ecab067e3f06043702919bf7f09ef9cba4"
       },
       "reason": "Harbor stack-component registration changes two hashed handbook inputs (adoption recipe map; architecture Nemotron stack-line citation); the previous maintained output binding is preserved as historical evidence."
+    },
+    {
+      "superseded_at_utc": "2026-10-15T21:00:52Z",
+      "source_main": "8053f14e7e0817d2502dff2bb284bfb7e1b0152f",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "4352377ae90828283e8ac3c078e386a633a12773f82a04565cfa22a575d04fb0",
+        "docs/new-wsl-handbook.json": "bb68a0d06802f17a02ac00ced40d582de339b800c5e646b818c46eafb0d6b474"
+      },
+      "reason": "Model-routes registration changes the research-state input digest; preserve the prior published handbook binding as historical evidence."
     }
   ]
 }

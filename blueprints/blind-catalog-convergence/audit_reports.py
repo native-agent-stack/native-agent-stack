@@ -10,7 +10,13 @@ from pathlib import Path
 import sys
 
 ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from scripts.landscape import is_unrun_registration
+
 ARTIFACTS = ROOT / 'evidence/artifacts/blind-catalog-convergence-20260921'
+HISTORICAL_SCOPE_DATE = '2026-09-21'
+HISTORICAL_LAYER_COUNT = 32
 
 
 def read(name):
@@ -24,7 +30,7 @@ def norm(value):
 
 
 def check_layer_decisions(root=ROOT):
-    """Keep operative synthesis labels and the handbook tied to canonical decisions.
+    """Check the dated 2026-09-21 synthesis against its canonical decision scope.
 
     Historical peer labels are evidence, never an alternate source of adoption
     authority. This check deliberately leaves the frozen screening ledger alone.
@@ -34,10 +40,14 @@ def check_layer_decisions(root=ROOT):
         path = f'catalogs/landscape/{name}.json'
         catalog = json.loads((root / path).read_text())
         for index, layer in enumerate(catalog['layers']):
+            if is_unrun_registration(layer, root=root):
+                # An admitted new scope has no historical decision to synthesize.
+                # Selected, sealed or previously swept rows cannot take this path.
+                continue
             key = layer['layer_id']
             assert key not in canonical, f'duplicate canonical layer: {key}'
             canonical[key] = (layer['decision'], path, f'/layers/{index}/decision')
-    assert len(canonical) == 32, 'expected the 32 canonical layers'
+    assert len(canonical) == HISTORICAL_LAYER_COUNT, f'expected the {HISTORICAL_LAYER_COUNT} canonical layers in the {HISTORICAL_SCOPE_DATE} synthesis scope'
     synthesis = json.loads((root / 'catalogs/landscape/blind-convergence.json').read_text())
     assert synthesis['decision_authority'] == {
         'catalogs': ['catalogs/landscape/foundation.json', 'catalogs/landscape/us-equities.json'],

@@ -32,6 +32,35 @@ class BlindLayerDecisionTests(unittest.TestCase):
     def test_current_catalog_matches_canonical(self):
         self.assertEqual(AUDIT.check_layer_decisions(self.root), 32)
 
+    def test_new_unrun_registration_does_not_expand_the_dated_synthesis(self):
+        synthesis = (self.root / 'catalogs/landscape/blind-convergence.json').read_bytes()
+        handbook = (self.root / 'docs/blind-catalog-layer-findings-20260921.md').read_bytes()
+        self.assertEqual(AUDIT.check_layer_decisions(self.root), 32)
+        self.assertEqual((self.root / 'catalogs/landscape/blind-convergence.json').read_bytes(), synthesis)
+        self.assertEqual((self.root / 'docs/blind-catalog-layer-findings-20260921.md').read_bytes(), handbook)
+
+    def test_only_admitted_registration_can_be_exempt_from_historical_scope(self):
+        path = self.root / 'catalogs/landscape/foundation.json'
+        original = json.loads(path.read_text())
+        for case in ('winner', 'sealed', 'swept'):
+            with self.subTest(case=case):
+                data = json.loads(json.dumps(original))
+                row = next(row for row in data['layers'] if row['layer_id'] == 'model-routes')
+                reason = 'registration_only requires an empty, unsealed pending scope'
+                if case == 'winner':
+                    row['winners'] = [{'component_id': 'invented'}]
+                elif case == 'sealed':
+                    row['lanes']['claude'].update(run_id='claimed', sealed_sha256='a' * 64)
+                else:
+                    target = self.root / 'catalogs/sota-convergence/manifest-20261015.json'
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    target.write_text(json.dumps({'foundation': [{'layer': 'model-routes', 'components': []}],
+                                                  'trading': []}))
+                    reason = 'registration_only.*published sweep'
+                path.write_text(json.dumps(data))
+                with self.assertRaisesRegex(ValueError, reason):
+                    AUDIT.check_layer_decisions(self.root)
+
     def test_rejects_retain_when_comparison_is_open(self):
         self.mutate(lambda data: next(row for row in data['layers'] if row['layer_id'] == 'workers').update(coordinator_disposition='retain'))
         with self.assertRaisesRegex(AssertionError, 'workers: coordinator decision'):

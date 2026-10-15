@@ -5922,8 +5922,8 @@
     },
     {
       "path": "blueprints/blind-catalog-convergence/audit_reports.py",
-      "sha256": "1c448cffcee108a4b7d1701f5c9d42edb8684fb7d477d30784f1f0f88589b91e",
-      "bytes": 9348
+      "sha256": "51dd69a58220e9cc51fe639aebef56a2a498d2744d1227ae697f59a685959aec",
+      "bytes": 9863
     },
     {
       "path": "blueprints/blind-catalog-convergence/experiment.json",
@@ -17503,8 +17503,8 @@
     },
     {
       "path": "catalogs/foundation/surfaces.json",
-      "sha256": "40dde472d2c1660e8baf64ff93b1fc766c86363e3aa91dd5e0d27d8333f53808",
-      "bytes": 20706
+      "sha256": "7c9a0e96f7b07eaaee30df9612435e28d29c56ecb431deba45786560965069dc",
+      "bytes": 20884
     },
     {
       "path": "catalogs/foundation/upstream-surface-baseline.json",
@@ -17513,7 +17513,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "abb2881310233e3491c6b25db91f872cc5a40d9c86e6c6bea4017fc21f771618",
+      "sha256": "0223176602e8d897c5be753cbbb395b0e33d329a5d83a0f692b39c84f555a4f1",
       "bytes": 190472
     },
     {
@@ -19293,8 +19293,8 @@
     },
     {
       "path": "docs/decisions/2026-10-15-model-routes-catalog-registration.md",
-      "sha256": "3b430f04886df830bfc673be885d927072e6f9aaa0558901ad7c2749beb4acab",
-      "bytes": 7746
+      "sha256": "c357832d51db5e44cb92ec21f2dd96c95d60701f525bdfe6558f6afd132d16be",
+      "bytes": 12825
     },
     {
       "path": "docs/decisions/2026-10-15-muse-toolchain-directory-grants.md",
@@ -19528,8 +19528,8 @@
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "295919abdb9dd6d4d33390cc24beedf1073765df741670a0a5bae4f1e10d8477",
-      "bytes": 426643
+      "sha256": "c136541288a76aad1d7663256796a2de7bb78757035d472a94c47c56de55b9c5",
+      "bytes": 426789
     },
     {
       "path": "docs/harness-defaults.md",
@@ -19673,12 +19673,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "bb68a0d06802f17a02ac00ced40d582de339b800c5e646b818c46eafb0d6b474",
+      "sha256": "bfd6ec5cc60eb5da448a09c344c40ec8eb3d34e67cfea774909c1a6dbc5c32be",
       "bytes": 699356
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "4352377ae90828283e8ac3c078e386a633a12773f82a04565cfa22a575d04fb0",
+      "sha256": "2da04efaba1fca299e1dbebdf234677d6d58f69786ee40e44ba1d153f698c6f9",
       "bytes": 369789
     },
     {
@@ -41448,8 +41448,8 @@
     },
     {
       "path": "evidence/artifacts/model-routes-registration-20261015/controls.json",
-      "sha256": "9419ec60a31825d94f15b47a671aea5e6eb23c216511c6447588ac0c9a40f8ec",
-      "bytes": 2227
+      "sha256": "14c7b4b1257f3f1fd88de2e34ee2d244f75741c0669163ac27cc87c98e0a85d8",
+      "bytes": 6288
     },
     {
       "path": "evidence/artifacts/native-claude-coop-20260921/loki-discovery.json",
@@ -44143,8 +44143,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "2ae75db2cf89adee8dae05ac303dc9d61487befbb6e9fd0a02d63db3eefcafa0",
-      "bytes": 78495
+      "sha256": "338f6a2e2e00c5d2b5676290a110a0b01c599756726d5f81f466735f736a5fb3",
+      "bytes": 80114
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -63233,8 +63233,8 @@
     },
     {
       "path": "tests/test_blind_layer_decisions.py",
-      "sha256": "327f104fc335a2b25f2a910e8cae44661fe9439764f4ab778412dbf3beeaea99",
-      "bytes": 2827
+      "sha256": "79a9e82a52ce3cf1ef49256331bf9d0869f68752de0b4e3ae6936c30dc39d6f4",
+      "bytes": 4744
     },
     {
       "path": "tests/test_bootstrap_full_profile.py",
@@ -63647,6 +63647,11 @@
       "bytes": 6657
     },
     {
+      "path": "tests/test_handbook_summary.py",
+      "sha256": "c4e7f3fe47d76388677d76064272d1a300f71eed9f6778d2dd7b61547e7e0de0",
+      "bytes": 3824
+    },
+    {
       "path": "tests/test_harbor_currency_contracts.py",
       "sha256": "40a8501a2220d876ea4c6d537ccec35f7a74d662da47375cfdde4e08d72b62fe",
       "bytes": 17375
@@ -63832,6 +63837,11 @@
       "bytes": 13218
     },
     {
+      "path": "tests/test_local_pages_architecture_layer_pages.py",
+      "sha256": "93de81c91fa446ac34c9c67a45fac19fca706ad84df96704de51f721917bd82a",
+      "bytes": 29655
+    },
+    {
       "path": "tests/test_local_pages_architecture_manifest.py",
       "sha256": "67d6cc2dd8b6908336f68faad0c994410fd1f1ecfafa89261e753d27f47bda28",
       "bytes": 28443
@@ -63908,8 +63918,8 @@
     },
     {
       "path": "tests/test_model_routes_registration.py",
-      "sha256": "5179fe3fbabfe062871b87334d12b3a2db8054c1b40628673e68d4a1c13b18f2",
-      "bytes": 2973
+      "sha256": "c05609f4cb1eb91173d316721aaa8c1602e5f403eb17358880eb777d669ddf80",
+      "bytes": 3394
     },
     {
       "path": "tests/test_mover_coverage_asof.py",

@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 import unittest
 
-from scripts import landscape
+from scripts import build_ecosystem, landscape
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -49,6 +49,14 @@ class ModelRoutesRegistrationTests(unittest.TestCase):
         del row["registration_only"]
         with self.assertRaisesRegex(ValueError, "layer needs candidates"):
             self.build_with(row)
+
+    def test_pending_model_routes_has_an_empty_native_surface_binding(self):
+        data = build_ecosystem.build_data(ROOT)
+        row = next(row for row in data["grand_catalogs"]["foundation"]["layers"]
+                   if row["id"] == "model-routes")
+        self.assertIs(row["registration_only"], True)
+        self.assertEqual(row["surfaces"], [])
+        self.assertEqual(row["runbooks"], [])
 
     def test_winner_sealed_run_and_wave_claim_are_refused(self):
         for mutation in (lambda row: row.update(winners=[{"component_id": "invented"}]),

@@ -195,6 +195,7 @@ owns versions, and this table does not create a second package lock.
 | MCP servers and client surfaces | MCPorter, MCP Inspector (retain) | Scoped server discovery and contract checks per client |
 | Secrets and credentials | Gitleaks (keep but compare) | Full-coverage scanning and a credential-store decision per host |
 | Git practice and GitHub automation | Worktrunk, Difftastic, gh CLI (retain; source review only) | Executed hosted runs of each automation lane |
+| Model routes | Pending registration; no winner | CC review before a ledger-countable two-family sweep; keyed measurements require CC approval |
 
 Optional container platforms, cloud providers, inference gateways and alternative
 orchestrators are not a universal startup bundle. Select them through the

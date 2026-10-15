@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "checked_at": "2026-09-21",
-  "scope": "Operator map for the selected native foundation. Repository identities, pins and capability acceptance are joined from canonical manifests, not duplicated here. This PC links are dated loopback examples, not public deployments or new-host acceptance. Every layer has an explicit native command, terminal or web surface.",
+  "scope": "Operator map for the selected native foundation. Repository identities, pins and capability acceptance are joined from canonical manifests, not duplicated here. This PC links are dated loopback examples, not public deployments or new-host acceptance. Selected layers have an explicit native command, terminal or web surface; an unselected scope registration may bind empty surface and runbook lists.",
   "surfaces": [
     {
       "id": "codex-sessions",
@@ -647,6 +647,11 @@
         "docs/github-automation.md",
         "recipes/README.md"
       ]
+    },
+    {
+      "layer_id": "model-routes",
+      "surface_ids": [],
+      "runbook_paths": []
     }
   ]
 }
