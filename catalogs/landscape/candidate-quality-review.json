@@ -1869,6 +1869,20 @@
         "docs/github-automation.md",
         "catalogs/foundation/decisions.json"
       ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "model-routes",
+      "decision_ref": "catalogs/landscape/foundation.json#/layers/20",
+      "requirement": "the routing layer that selects provider, model, account pool and effort for each agent request (gateway, fallback, rate-limit and credit handling) across the Codex lanes, Claude Code (subscription and API slots) and the runtime workers",
+      "current_choice": "No winner: the route layer awaits its scoped landscape sweep and retained comparison.",
+      "decision": "keep_but_compare",
+      "evidence_gap": "No covering sweep, catalog verdict or measured comparison is retained at the main base. Register the scope only; CC reads the PR, then landscape-sweep runs with --slots 2 after it lands.",
+      "challenger_repositories": [],
+      "overturn_when": "A retained covering sweep and source-bound comparison identify a qualified route; apply the existing layer-resolution protocol and keep route-level source/invoke/account evidence distinct.",
+      "evidence_refs": [
+        "docs/decisions/2026-10-15-model-routes-catalog-registration.md"
+      ]
     }
   ]
 }

@@ -17418,8 +17418,8 @@
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "5a72d2cd395bdef2dbc807e6172c9526256f2784aa0dcb7acbfcefeda4061f6f",
-      "bytes": 29964
+      "sha256": "80ca6a4869f881a2dfe53fa06cfcb0d96a76b202f4264eae39912b2c3fd95109",
+      "bytes": 30911
     },
     {
       "path": "catalogs/foundation/memory-rag-stacks-20261007.json",
@@ -17483,8 +17483,8 @@
     },
     {
       "path": "catalogs/landscape/candidate-quality-review.json",
-      "sha256": "dbb5de39e9f5af58c20e3b75b560386776a29a994207ebf73b499e22f7d46ed8",
-      "bytes": 152069
+      "sha256": "dac0a0e150c196dc2c9df5b2327af42e9a09a375e245539213789590f813aa6c",
+      "bytes": 153199
     },
     {
       "path": "catalogs/landscape/claude-independent-discovery.json",
@@ -17493,18 +17493,18 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "7c68cc6e9e0001e4953ad08c6dec86cca462a5ca9787e5d1035a90f515f27885",
-      "bytes": 315225
+      "sha256": "0ffb95c512f86c4aa770abce2669d645ab5b3e3fdbd134f9eea41d7a447c3600",
+      "bytes": 316552
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "ce8a3375eaf0594d2a336192082dcbce3836b850b523aef2555fbafde495c269",
-      "bytes": 309707
+      "sha256": "3c51f4e873b0b69df84fa936c53513d8ecbe680c97b298e10381d2a7bebee128",
+      "bytes": 311011
     },
     {
       "path": "catalogs/landscape/foundation.json",
-      "sha256": "55751afc9a6e3d2dd814d5ba35d811ea9424464ccc417234b8cb6d08864e48b8",
-      "bytes": 480209
+      "sha256": "f0e8f5ffae3b9ab40ceb4ffdbb5182d823d77cb100804efc948f8a9117bd65da",
+      "bytes": 482586
     },
     {
       "path": "catalogs/landscape/gap-closeouts/README.md",
@@ -17593,8 +17593,8 @@
     },
     {
       "path": "catalogs/landscape/research-state.json",
-      "sha256": "fe142c1b8b8ec8b92d69ec5971d68028225899c101ffc43cea618883b119332a",
-      "bytes": 21449
+      "sha256": "8bbdac81d870586731c2845ac3a17324cf09b03ad9dd7355e8a6c12faaf194c5",
+      "bytes": 21982
     },
     {
       "path": "catalogs/landscape/skills-lifecycle.json",
@@ -18128,8 +18128,8 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "0fad007a8e9568b4271e2ac2b1996a57dd1fa52883f902b8c784eeca07e968a7",
-      "bytes": 32981
+      "sha256": "cf0d69c2be675caac81f2e7d3321df3a814e4a5517d8ada1f005a2f5236f12cc",
+      "bytes": 33210
     },
     {
       "path": "docs/contributing-evidence.md",
@@ -19180,6 +19180,11 @@
       "path": "docs/decisions/2026-10-13-strict-paper-url-gates.md",
       "sha256": "172927d56413762dc04f333cb6c236b1a85bb70a06740a8359c0d8cac904e8af",
       "bytes": 6429
+    },
+    {
+      "path": "docs/decisions/2026-10-15-model-routes-catalog-registration.md",
+      "sha256": "67b19cb6b78d1953236668cc599941d0617ee4db6662c55c7538c7293a982524",
+      "bytes": 4676
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -62068,8 +62073,8 @@
     },
     {
       "path": "scripts/landscape.py",
-      "sha256": "d16b5625dd343972eb8efc508c8a642abf37cff8c39b3e22173d181f24a9c40e",
-      "bytes": 106393
+      "sha256": "58818373049680436e53d352b4d9a7ea2e9ab73c8e43437abd3418aa93f2cb34",
+      "bytes": 107269
     },
     {
       "path": "scripts/native_token_ci.py",
@@ -63640,6 +63645,11 @@
       "path": "tests/test_path_safety.py",
       "sha256": "3ef5408df71c98eca31ddfd8e065594ee0bb09d61b37108df9d73c8e66c4acaf",
       "bytes": 7047
+    },
+    {
+      "path": "tests/test_pending_catalog_registration.py",
+      "sha256": "3ccdb4e5b588592815d76fbb30a5db0dadb07a82070a9ba2eee5e292b8d7e819",
+      "bytes": 1937
     },
     {
       "path": "tests/test_pi_builder_output_budget.py",

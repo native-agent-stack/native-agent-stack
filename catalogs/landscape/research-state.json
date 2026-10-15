@@ -430,6 +430,17 @@
         "catalogs/foundation/decisions.json"
       ],
       "saturation": "not_established"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "model-routes",
+      "status": "comparison_required",
+      "next_action": "No covering sweep, catalog verdict or measured comparison is retained at the main base. Register the scope only; CC reads the PR, then landscape-sweep runs with --slots 2 after it lands.",
+      "decision_ref": "catalogs/landscape/foundation.json",
+      "evidence_refs": [
+        "docs/decisions/2026-10-15-model-routes-catalog-registration.md"
+      ],
+      "saturation": "not_established"
     }
   ]
 }

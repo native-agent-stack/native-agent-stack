@@ -1289,7 +1289,14 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
                                   wave_refs=wave_refs)
             source_links = evidence(row.get("evidence_refs"), str(key))
             candidates, candidate_ids = [], set()
-            require(isinstance(row.get("candidates"), list) and row["candidates"], "layer needs candidates")
+            pending_empty = (row.get("verdict_status") == "pending_lanes" and row.get("candidates") == []
+                             and row.get("winners") == [] and row.get("alternatives") == []
+                             and row.get("terminal_state") is None
+                             and bool(row.get("open_gaps")) and row.get("lanes", {}).get("agreement") == "pending"
+                             and all(not row.get("lanes", {}).get(lane, {}).get(field)
+                                     for lane in LANES for field in ("sealed_sha256", "run_id")))
+            require(isinstance(row.get("candidates"), list) and (row["candidates"] or pending_empty),
+                    "layer needs candidates or an explicit empty pending registration")
             for candidate in row["candidates"]:
                 for field in ("name", "rationale"):
                     nonempty(candidate.get(field), "candidate." + field)
@@ -1311,8 +1318,9 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
                                 for ref in candidate["evidence_refs"]),
                             "observed failure needs a retained local result")
                 candidates.append({**candidate, "repository_id": repo_id, "sources": candidate_sources})
-            require(any(row["disposition"] == "selected" for row in candidates), "layer needs a selected candidate")
-            require(any(row["disposition"] != "selected" for row in candidates), "layer needs a named alternative")
+            if not pending_empty:
+                require(any(row["disposition"] == "selected" for row in candidates), "layer needs a selected candidate")
+                require(any(row["disposition"] != "selected" for row in candidates), "layer needs a named alternative")
             layers.append({**row, "id": ":".join(key), "candidates": candidates,
                            "sources": source_links, "url": file_url(path), "catalog_candidates": []})
     require(seen == expected, "comparison coverage must exactly match all foundation and domain layers")
@@ -1569,7 +1577,9 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
                 nonempty(item.get(field), "quality layer " + field)
             for field in ("requirement", "current_choice", "overturn_when"):
                 require(item[field] == layer[field], "quality layer " + field + " differs from current comparison")
-            challengers = strings(item.get("challenger_repositories"), "quality challengers")
+            challengers = ([] if layer.get("verdict_status") == "pending_lanes"
+                          and layer["candidates"] == [] and item.get("challenger_repositories") == []
+                          else strings(item.get("challenger_repositories"), "quality challengers"))
             layer_ids = {candidate["repository_id"] for candidate in layer["candidates"]}
             require(all(canonical(identity(repo), aliases) in layer_ids for repo in challengers),
                     "quality challenger absent from its layer")
