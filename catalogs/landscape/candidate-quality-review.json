@@ -1869,6 +1869,20 @@
         "docs/github-automation.md",
         "catalogs/foundation/decisions.json"
       ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "model-routes",
+      "decision_ref": "catalogs/landscape/foundation.json#/layers/20",
+      "requirement": "Scope: current model ids and routes for the Anthropic API (vendor docs and the claude-api skill), OpenAI through OmniRoute, and Meta's Muse through the muse-code provider (Wonder Full; the Muse fence rules hold).",
+      "current_choice": "No winner: the route layer awaits its scoped landscape sweep and retained comparison.",
+      "decision": "keep_but_compare",
+      "evidence_gap": "No ledger-countable two-family landscape sweep has run for foundation/model-routes. Two single-family initial sweeps are running or being retained separately: the GPT half (Codex lane mage, PR #1177) and the Claude half (co-op under CC's 19:52Z ruling (A)). A later, separate PR records them as PRIOR evidence for the documented two-family sweep; neither is this registration's verdict and neither is FINAL. Each keyed measurement waits for the CC's specific approval; this registration makes no keyed call or route activation. Later covering-sweep publication and candidate/taxonomy promotion require separately owned admission/lifecycle rules; no existing guard is relaxed by registration.",
+      "challenger_repositories": [],
+      "overturn_when": "After this registration lands and the CC reads it, a retained two-family covering sweep and source-bound comparison may settle the route scope under the layer-resolution protocol; preserve cumulative unresolved survivors and separate per-route source and invoke evidence.",
+      "evidence_refs": [
+        "docs/decisions/2026-10-15-model-routes-catalog-registration.md"
+      ]
     }
   ]
 }

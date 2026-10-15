@@ -430,6 +430,17 @@
         "catalogs/foundation/decisions.json"
       ],
       "saturation": "not_established"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "model-routes",
+      "status": "comparison_required",
+      "next_action": "After CC review and registration landing, run the documented two-family landscape-sweep --slots 2 when the Codex pool permits. Adjudicate all 14 carried candidates; propose new candidates only with primary sources. Retain the separately reviewed single-family initial results as PRIOR evidence in a later PR; keyed measurements require CC approval.",
+      "decision_ref": "catalogs/landscape/foundation.json",
+      "evidence_refs": [
+        "docs/decisions/2026-10-15-model-routes-catalog-registration.md"
+      ],
+      "saturation": "not_established"
     }
   ]
 }

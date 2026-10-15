@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "kind": "pending_scope_registration_controls",
+  "evidence_class": "local_integration",
+  "base": "8053f14e7e0817d2502dff2bb284bfb7e1b0152f",
+  "layer": "foundation/model-routes",
+  "registration_predecessor": "https://github.com/native-agent-stack/native-agent-stack/pull/1126",
+  "rules_pr": "https://github.com/native-agent-stack/native-agent-stack/pull/1130",
+  "before": {
+    "command": "python3 -m unittest tests.test_model_routes_registration",
+    "source": "Unchanged base catalog data with only the new regression module added",
+    "exit_code": 1,
+    "tests": 3,
+    "failures": 3,
+    "errors": 0,
+    "cause": "0 != 1: one explicit model-routes registration must be published",
+    "scope": "Behavioral failure on the absent catalog registration, not an import or fixture error"
+  },
+  "after_initial_registration": {
+    "source_commit": "eedd595e06833706d6d7b5b1b3f4855786ee19ce",
+    "command": "python3 -m unittest tests.test_model_routes_registration",
+    "exit_code": 0,
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "checks": [
+      "The real repository build_landscape join admits the exact pending-empty registration and scope sentence.",
+      "Removing registration_only refuses an empty verdict with the candidate diagnostic.",
+      "Adding a winner, sealed lane run or wave claim refuses the registration with the unrun-state diagnostic."
+    ]
+  },
+  "initial_rules_suites": {
+    "source_commit": "eedd595e06833706d6d7b5b1b3f4855786ee19ce",
+    "command": "python3 -m unittest tests.test_registration_rules tests.test_pending_catalog_registration tests.test_layer_verdicts tests.test_record_verdicts tests.test_model_routes_registration",
+    "execution": "Native TestLoader/TextTestRunner, with fixture stdout/stderr captured only for output size",
+    "exit_code": 0,
+    "tests": 184,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "surface_inventory_review_control": {
+    "review": "pr1179-eedd595e/review_output.json",
+    "finding": "Add the new scope to the foundation surface inventory",
+    "before": {
+      "source": "eedd595e catalog data with only the new surface-join regression added",
+      "command": "python3 -m unittest tests.test_model_routes_registration.ModelRoutesRegistrationTests.test_pending_model_routes_has_an_empty_native_surface_binding",
+      "exit_code": 1,
+      "tests": 1,
+      "errors": 1,
+      "cause": "ValueError: foundation surface layers must exactly match foundation layers",
+      "publication_check": "python3 scripts/build_ecosystem.py --check also exits 1 with the same message"
+    },
+    "after": {
+      "command": "python3 -m unittest tests.test_model_routes_registration",
+      "exit_code": 0,
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "publication_check": "python3 scripts/build_ecosystem.py --check passes deterministic native rendering",
+      "scope": "The model-routes binding has no selected surface or runbook; existing native surface records are preserved."
+    }
+  },
+  "remaining_review_wave_controls": {
+    "review": "GPT-VERDICT-eedd595e0.md",
+    "reviewed_commit": "eedd595e06833706d6d7b5b1b3f4855786ee19ce",
+    "before": [
+      "DispositionCitationTests: 8 tests, 2 failures on moved active manifest locators.",
+      "Handbook summary: coverage assertion failed, 20 != 21.",
+      "Historical blind audit: all 6 existing tests failed the old canonical-layer count; 2 added exemption controls also failed before the correction.",
+      "Architecture pages: both affected assertions failed the old foundation count of 20.",
+      "New-WSL owning builder --check and committed-output/receipt test failed on stale generated output."
+    ],
+    "after_targeted": {
+      "tests": 19,
+      "failures": 0,
+      "errors": 0,
+      "publication_checks": [
+        "Native blind-convergence audit --check passes with unchanged historical synthesis and handbook bytes.",
+        "Native new-WSL handbook --check and its committed-output/receipt test pass after owning regeneration and receipt rebinding.",
+        "Frozen-wave --check passes with unchanged 20 foundation and 12 trading members.",
+        "Base-trusted verdict-review gate passes with no trust-path, rule-input or wave changes."
+      ]
+    },
+    "affected_suites_first_run": {
+      "tests": 496,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "failure": "test_general_publication_validator_passes_after_the_run: edited files had not yet been re-registered in manifests/evidence.json",
+      "boundary": "This first run is not a passing suite; 495 tests passed and the publication control was rerun separately after registry refresh."
+    },
+    "publication_control_after_registry_refresh": {
+      "command": "python3 -m unittest tests.test_catalog_freshness_propose.RebuildExplorerSubprocessTests.test_general_publication_validator_passes_after_the_run",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "exit_code": 0,
+      "duration_seconds": 62.735,
+      "boundary": "This targeted successful rerun resolves the sole first-run failure; the entire 496-test selection was not redundantly rerun."
+    }
+  },
+  "released_fold_final_recheck": {
+    "reviewed_commit": "eedd595e06833706d6d7b5b1b3f4855786ee19ce",
+    "before": {
+      "tests": 24,
+      "failures": 16,
+      "errors": 1,
+      "skipped": 0,
+      "scope": "Clean reviewed-head export with added surface and blind-audit controls; all six expected failure mechanisms reproduced with specific diagnostics."
+    },
+    "after": {
+      "tests": 24,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "scope": "Final-tree registration, disposition citation, handbook summary, blind audit, committed new-WSL output/receipt and two architecture controls."
+    }
+  },
+  "gap_ledger_review_control": {
+    "review": "GPT-VERDICT-92c95deff.md",
+    "reviewed_commit": "92c95deff39b8106534407e0b75f5c94f53504bd",
+    "command": "python3 -m unittest tests.test_gap_resolution_ledger",
+    "before_existing_tests": {
+      "tests": 7,
+      "failures": 1,
+      "errors": 0,
+      "cause": "The dated ledger omits the current foundation/model-routes identity."
+    },
+    "before_added_controls": {
+      "tests": 9,
+      "failures": 4,
+      "errors": 0,
+      "cause": "The coverage mismatch and winner, sealed-run and prior-sweep controls fail before history-aware admission is applied."
+    },
+    "after": {
+      "command": "python3 -m unittest tests.test_gap_resolution_ledger tests.test_blind_layer_decisions tests.test_model_routes_registration",
+      "tests": 21,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "checks": [
+        "The ledger retains its exact 2026-09-22, 32-identity scope; only history-aware admitted unrun registrations may be excluded from current rows.",
+        "Winner, sealed-run and registered-prior-sweep mutations are refused with specific admission diagnostics.",
+        "An unmarked new row remains in coverage; a missing dated row still fails exact identity comparison.",
+        "Existing receipt, source-revision, source-text and historical digest checks remain enabled."
+      ]
+    }
+  },
+  "boundary": [
+    "Fixture mutations are confined to in-memory projections and temporary test roots; no published row or frozen evidence is mutated by a test.",
+    "No model request, account-state read, provider mutation, install, receipt registration or sweep dispatch occurs.",
+    "The separate single-family initial sweeps are later PRIOR evidence, never this registration's verdict or FINAL.",
+    "This is registration integrity evidence, not a route capability comparison or E2E adoption result."
+  ]
+}

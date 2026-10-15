@@ -1236,6 +1236,20 @@
     },
     {
       "catalog": "foundation",
+      "layer_id": "model-routes",
+      "title": "Model routes",
+      "decision": "keep_but_compare",
+      "verdict_status": "pending_lanes",
+      "independent_review": "pending_lanes",
+      "open_executable_now_gaps": null,
+      "open_gaps": null,
+      "winners": [],
+      "registration_only": true,
+      "sweep_status": "unswept",
+      "sweep_gap": "Unrun scope registration; no covering sweep or selected component."
+    },
+    {
+      "catalog": "foundation",
       "layer_id": "native-clients",
       "title": "Native clients",
       "decision": "retain",
@@ -3081,7 +3095,7 @@
   ],
   "summary": {
     "layers": {
-      "foundation": 20,
+      "foundation": 21,
       "us-equities": 12
     },
     "winners": 66,

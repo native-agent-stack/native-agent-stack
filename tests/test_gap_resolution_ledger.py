@@ -1,9 +1,13 @@
-"""Consistency checks for catalogs/landscape/gap-resolution-20260922.json (local integration)."""
+"""Consistency checks for the dated 2026-09-22, 32-row gap ledger (local integration)."""
 from __future__ import annotations
 
 import json
+import shutil
+import tempfile
 import unittest
 from pathlib import Path
+
+from scripts.landscape import is_unrun_registration
 
 ROOT = Path(__file__).resolve().parents[1]
 LEDGER = ROOT / "catalogs/landscape/gap-resolution-20260922.json"
@@ -19,13 +23,67 @@ class GapResolutionLedgerTests(unittest.TestCase):
     def setUpClass(cls):
         cls.doc = json.loads(LEDGER.read_text(encoding="utf-8"))
 
-    def test_covers_every_landscape_row(self):
+    def assert_dated_coverage(self, root=ROOT):
         rows = set()
         for catalog in ("foundation", "us-equities"):
-            data = json.loads((ROOT / f"catalogs/landscape/{catalog}.json").read_text(encoding="utf-8"))
-            rows |= {(catalog, row["layer_id"]) for row in data["layers"]}
+            data = json.loads((root / f"catalogs/landscape/{catalog}.json").read_text(encoding="utf-8"))
+            # The ledger freezes the 2026-09-22 scope, not every future scope.
+            # Only shared, history-aware admission may exclude a new unrun row.
+            rows |= {(catalog, row["layer_id"]) for row in data["layers"]
+                     if not is_unrun_registration(row, root=root)}
         ledger_rows = {(layer["catalog"], layer["layer_id"]) for layer in self.doc["layers"]}
+        self.assertEqual(self.doc["checked_at"], "2026-09-22")
+        self.assertEqual(len(self.doc["layers"]), 32)
+        self.assertEqual(len(ledger_rows), 32, "dated ledger identities must be unique")
         self.assertEqual(ledger_rows, rows)
+
+    def test_covers_the_dated_scope_excluding_only_unrun_registrations(self):
+        self.assert_dated_coverage()
+
+    def copy_catalogs(self, root):
+        for catalog in ("foundation", "us-equities"):
+            relative = f"catalogs/landscape/{catalog}.json"
+            target = root / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(ROOT / relative, target)
+
+    def test_selected_sealed_swept_or_unmarked_rows_cannot_take_the_exemption(self):
+        for case in ("winner", "sealed", "swept", "unmarked"):
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                self.copy_catalogs(root)
+                path = root / "catalogs/landscape/foundation.json"
+                data = json.loads(path.read_text())
+                row = next(row for row in data["layers"] if row["layer_id"] == "model-routes")
+                reason = "registration_only requires an empty, unsealed pending scope"
+                error = ValueError
+                if case == "winner":
+                    row["winners"] = [{"component_id": "invented"}]
+                elif case == "sealed":
+                    row["lanes"]["claude"].update(run_id="claimed", sealed_sha256="a" * 64)
+                elif case == "swept":
+                    history = root / "catalogs/saturation/ledger.json"
+                    history.parent.mkdir(parents=True, exist_ok=True)
+                    history.write_text(json.dumps({"sweeps": [{"sweep_id": "prior-control", "layers": [
+                        {"catalog": "foundation", "layer_id": "model-routes"}]}]}))
+                    reason = "registration_only.*registered sweep prior-control"
+                else:
+                    del row["registration_only"]
+                    error, reason = AssertionError, "model-routes"
+                path.write_text(json.dumps(data))
+                with self.assertRaisesRegex(error, reason):
+                    self.assert_dated_coverage(root)
+
+    def test_a_missing_dated_row_still_breaks_coverage(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.copy_catalogs(root)
+            path = root / "catalogs/landscape/foundation.json"
+            data = json.loads(path.read_text())
+            data["layers"] = [row for row in data["layers"] if row["layer_id"] != "agent-sdks"]
+            path.write_text(json.dumps(data))
+            with self.assertRaisesRegex(AssertionError, "agent-sdks"):
+                self.assert_dated_coverage(root)
 
     def test_vocabularies_and_receipt_links(self):
         receipt_paths = {r["path"] for r in self.doc["receipts"]}

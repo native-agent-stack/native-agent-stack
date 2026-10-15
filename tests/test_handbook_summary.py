@@ -8,6 +8,7 @@ from pathlib import Path
 import json
 import re
 import unittest
+from scripts.landscape import is_unrun_registration
 
 ROOT = Path(__file__).resolve().parents[1]
 HANDBOOK = ROOT / "docs/grand-catalog-handbook.md"
@@ -53,6 +54,11 @@ class FoundationSummaryTableTests(unittest.TestCase):
         self.assertEqual(len(rows), len(layers), "one summary row per foundation ledger layer, in ledger order")
         for layer, (label, winners_cell, _) in zip(layers, rows):
             with self.subTest(layer=layer["layer_id"], row=label):
+                if is_unrun_registration(layer, root=ROOT):
+                    self.assertEqual(label, layer["title"])
+                    self.assertEqual(winners_cell, "Pending registration; no winner")
+                    self.assertNotIn("FINAL", winners_cell)
+                    continue
                 self.assertEqual(layer["verdict_status"], "recorded")
                 expected = {DISPLAY[winner["component_id"]] for winner in layer["winners"]}
                 self.assertEqual(names_in(winners_cell), expected)

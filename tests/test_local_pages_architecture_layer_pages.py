@@ -189,8 +189,15 @@ class CommittedBuildTests(BuiltPages):
             expected = [row["layer_id"] for row in json.loads((ROOT / MANIFEST.CATALOGS[catalog]).read_text())["layers"]]
             self.assertEqual([row["layer_id"] for row in self.manifests[key]["layers"]], expected)
             self.assertEqual(self.result["pages"][key]["rendered_layer_count"], len(expected))
-        self.assertEqual(len(self.manifests["foundation"]["layers"]), 20)
+        self.assertEqual(len(self.manifests["foundation"]["layers"]), 21)
         self.assertEqual(len(self.manifests["north-star"]["layers"]), 12)
+        registration = next(row for row in self.manifests["foundation"]["layers"]
+                            if row["layer_id"] == "model-routes")
+        self.assertEqual(registration["winners"], [])
+        self.assertNotEqual(registration["state"], "FINAL")
+        source = next(row for row in self.final_stack["layers"] if row["layer_id"] == "model-routes")
+        self.assertEqual(source["verdict"]["status"], "pending_lanes")
+        self.assertIsNone(source["verdict"]["wave"])
 
     def test_finalized_is_claimed_only_where_status_and_all_four_conditions_hold(self):
         statuses = {(row["catalog"], row["layer_id"]): row["status"] for row in self.final_stack["layers"]}
@@ -328,7 +335,7 @@ class ComposerTests(unittest.TestCase):
                 code = PAGES.main(["--layer-pages-only", "--output-dir", str(output), "--receipt", str(receipt), "--state-root", str(Path(base) / "state")])
             self.assertEqual(code, 0)
             summary = json.loads(stdout.getvalue())
-            self.assertEqual({value["rendered_layer_count"] for value in summary["pages"].values()}, {20, 12})
+            self.assertEqual({value["rendered_layer_count"] for value in summary["pages"].values()}, {21, 12})
             names = {path.name for path in output.iterdir()}
             self.assertLessEqual({"architecture-foundation.html", "architecture-north-star.html", "architecture-foundation-manifest.json", "architecture-north-star-manifest.json"}, names)
             self.assertTrue(receipt.is_file())

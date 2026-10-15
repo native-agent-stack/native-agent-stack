@@ -5214,6 +5214,53 @@
       ],
       "checked_at": "2026-09-22",
       "verdict_overturn_when": "Any of these results would change the verdict.\n(a) A challenger structural-diff tool runs on fixtures/before.py and fixtures/after.py and produces more correct syntax-aware hunks, with fewer spurious changes and a correct exit code, than `difft --exit-code --color never fixtures/before.py fixtures/after.py`.\n(b) A gh lifecycle receipt, or a failed gh PR/ruleset/attestation operation, is recorded. A failure would demote c2. A matched challenger passing that same operation would replace it.\n(c) c3 would be promoted from conditional to a default review lane if a retained native-review artifact shows /codex:review completing a Workflow-background (polled) or same-workspace concurrent review, or a review of an actual GitHub PR fetched through gh, with its findings checked against source.\nAfter any catalog change, including the correction that records foundation-rd-20260921 as c3 use-stage evidence, re-run the decision-consistency check with `python3 -m unittest tests.test_catalog_decisions`."
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "model-routes",
+      "registration_only": true,
+      "title": "Model routes",
+      "requirement": "Scope: current model ids and routes for the Anthropic API (vendor docs and the claude-api skill), OpenAI through OmniRoute, and Meta's Muse through the muse-code provider (Wonder Full; the Muse fence rules hold).",
+      "current_choice": "No winner: the route layer awaits its scoped landscape sweep and retained comparison.",
+      "decision": "keep_but_compare",
+      "rationale": "The CC's 19:52Z option (B) registers the unswept layer under #1130's landed pending-empty rules. The 19:19Z dispatch supplies the current scope; the prior #1126 registration shape supplies no selected route or transferred client/runtime receipt.",
+      "evidence_refs": [
+        "docs/decisions/2026-10-15-model-routes-catalog-registration.md"
+      ],
+      "limitations": [
+        "Scope registration establishes no provider, model, account-pool entitlement, gateway behavior, native invocation or FINAL result.",
+        "The 14 carried angle records remain source-review inputs: 13 INSUFFICIENT, one REJECTED; catalog candidates, winners and alternatives stay empty.",
+        "The Muse fence decisions and named toolchain grant boundaries hold. No credential file, account state, environment inventory or keyed endpoint is read by this change."
+      ],
+      "overturn_when": "After this registration lands and the CC reads it, a retained two-family covering sweep and source-bound comparison may settle the route scope under the layer-resolution protocol; preserve cumulative unresolved survivors and separate per-route source and invoke evidence.",
+      "candidates": [],
+      "verdict_status": "pending_lanes",
+      "winners": [],
+      "alternatives": [],
+      "overturn_protocol": {
+        "fixture_paths": [],
+        "metric": "No comparison is frozen or executed by this registration; the covering sweep must retain its decision contract.",
+        "arms": []
+      },
+      "lanes": {
+        "claude": {
+          "run_id": "",
+          "sealed_sha256": ""
+        },
+        "codex": {
+          "run_id": "",
+          "sealed_sha256": ""
+        },
+        "agreement": "pending"
+      },
+      "open_gaps": [
+        "No ledger-countable two-family landscape sweep has run for foundation/model-routes.",
+        "Two single-family initial sweeps are running or being retained separately: the GPT half (Codex lane mage, PR #1177) and the Claude half (co-op under CC's 19:52Z ruling (A)). A later, separate PR records them as PRIOR evidence for the documented two-family sweep; neither is this registration's verdict and neither is FINAL.",
+        "Each keyed measurement waits for the CC's specific approval; this registration makes no keyed call or route activation.",
+        "Later covering-sweep publication and candidate/taxonomy promotion require separately owned admission/lifecycle rules; no existing guard is relaxed by registration."
+      ],
+      "checked_at": "2026-10-15",
+      "verdict_overturn_when": "Register only this pending scope; the CC reads the PR before the co-op paced landscape-sweep --slots 2. The single-family initial results are later PRIOR evidence only, never this row's verdict or FINAL."
     }
   ]
 }

@@ -1930,8 +1930,8 @@
   {
    "key": "claude:setting:sandbox.credentials",
    "disposition": "declined",
-   "reason": "off on both hosts (read 2026-10-04)); the repository record at catalogs/foundation/manifest.json:255 names it",
-   "source": "catalogs/foundation/manifest.json:255",
+   "reason": "off on both hosts (read 2026-10-04)); the repository record at catalogs/foundation/manifest.json:265 names it",
+   "source": "catalogs/foundation/manifest.json:265",
    "carrier": null,
    "value": null,
    "scope": null,
@@ -1942,7 +1942,7 @@
   {
    "key": "claude:setting:sandbox.credentials.awsPairs",
    "disposition": "declined",
-   "reason": "Native sandbox is not enabled (catalogs/foundation/manifest.json:251-254) and no AWS credentials are masked; pairs matter only for SigV4 re-signing",
+   "reason": "Native sandbox is not enabled (catalogs/foundation/manifest.json:261-264) and no AWS credentials are masked; pairs matter only for SigV4 re-signing",
    "source": "https://code.claude.com/docs/en/settings-reference.md",
    "carrier": null,
    "value": null,
@@ -1978,7 +1978,7 @@
   {
    "key": "claude:setting:sandbox.excludedCommands",
    "disposition": "declined",
-   "reason": "Native sandbox is off on both hosts (catalogs/foundation/manifest.json:251-254; a sandbox profile is an open item); exclusions have nothing to exempt",
+   "reason": "Native sandbox is off on both hosts (catalogs/foundation/manifest.json:261-264; a sandbox profile is an open item); exclusions have nothing to exempt",
    "source": "https://code.claude.com/docs/en/settings-reference.md",
    "carrier": null,
    "value": null,
