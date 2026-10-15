@@ -10,8 +10,8 @@ The CC's 2026-10-15 01:12Z split ruling follows the required gate at main base
 `a339425ca56ec3fb87dff0fa8ad5dffc83354168`,
 scripts/verdict_review_gate.py:1567-1576: a verdict change cannot land together
 with its validating trust-base changes. CI deliberately runs base-trusted
-validators against the head. Retained job evidence SHA256
-`592a836829884baff2de24c34c39295baeb36017ab09837aca65a9482d528719`
+validators against the head. Retained job evidence
+`extra-1126-verdict-review-gate-0f9e90b1.md`, cited by name without a digest,
 reproduces this refusal at both combined heads. The gate is unchanged.
 
 ## Rules and independent regressions
@@ -51,7 +51,7 @@ account, runtime or adoption claim follows from these schema tests.
 ## Sources and next readiness input
 
 Round-one local review at 5277796785096286d86c83d2b2dc0ad1ace3fddd
-(review SHA256 5294a89d3b846032004862774d7456353968e90be30e8f2ce7c56c61bbaa5af1)
+(pr1130-52777967/review_output.json, cited by name without a digest)
 found four consumer gaps. Each correction has a behavioral fail-first regression:
 
 - Native unittest module discovery collected an imported LandscapeTests class
@@ -83,10 +83,9 @@ These corrections introduce no catalog, verdict-row, wave or generated output ed
 
 ## Round-two admission and publication boundary
 
-CC FULL at 94f4c76497cb41b5d431b73101c64002d9918694, SHA256
-20e91f29dd558bed0c8b7214c666b3d70d45dc3df5142b3b009222c3a82060e0,
-and the overlapping local review SHA256
-56dff7216525ea8ce66561119256c9b55c7bd2ad150d270ec21b93b3220ba4e8
+CC FULL at 94f4c76497cb41b5d431b73101c64002d9918694,
+MICRO-94f4c764.md, and the overlapping local review
+pr1130-94f4c764/review_output.json, both cited by name without digests,
 showed that row shape cannot establish never-run identity. Admission now needs
 repository context and refuses any catalog/layer key in a hash-verified registered
 wave document, registered sweep ledger or published sweep manifest. All native
