@@ -19298,8 +19298,8 @@
     },
     {
       "path": "docs/decisions/2026-10-15-session-relaunch-install-and-inverse.md",
-      "sha256": "c901d3e582277a6051ab09ed2649de57c6e8fe92656f5fdb02a33a7d278cb0e8",
-      "bytes": 8173
+      "sha256": "564cc40005888572b16572ff8c0f75c729ac1418b88cd996b51a0bf410b907ba",
+      "bytes": 9056
     },
     {
       "path": "docs/decisions/2026-10-15-unrun-registration-rules.md",
@@ -52468,7 +52468,7 @@
     },
     {
       "path": "evidence/artifacts/session-relaunch-20261014/README.md",
-      "sha256": "381ef354a9533949b3a1e21917d394ae24991d48ea6fc8c63926f544ddeb23dc",
+      "sha256": "57ec01fae2910aeb510cdd2c472e42062c1672efa8efcb7e7b4fca5aeefb10fd",
       "bytes": 2110
     },
     {
@@ -52508,18 +52508,18 @@
     },
     {
       "path": "evidence/artifacts/session-relaunch-install-20261015/receipts/respawn-probe.json",
-      "sha256": "7459321d647fe876026cdbadc23bb2fb08fa80d51cf8a5ff770a963432f83306",
-      "bytes": 1574
+      "sha256": "2d57b63608ce1faa23e17bf2e052a71b98fa4d788d88152fcac23cc04804dd5d",
+      "bytes": 2806
     },
     {
       "path": "evidence/artifacts/session-relaunch-install-20261015/receipts/sources.json",
-      "sha256": "a419c2f7787b9ec5571157d0a80297a6a1f1a9693567fa52143d1d4970138108",
-      "bytes": 2424
+      "sha256": "d9057cf85142606590ca0e8fc225a4f4e475fd331e3721215de891ce5d9bec62",
+      "bytes": 2426
     },
     {
       "path": "evidence/artifacts/session-relaunch-install-20261015/receipts/tests.json",
-      "sha256": "884c7537f6f5ed131acbf3681bc632d9a2233acc178285e8d47afffea8124283",
-      "bytes": 609
+      "sha256": "d2dec7aef412ed8395d81071b4bb7e3b625256eac0a5b2cbd489098283356114",
+      "bytes": 799
     },
     {
       "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/advisory-before.log",
@@ -64443,8 +64443,8 @@
     },
     {
       "path": "tests/test_session_relaunch.py",
-      "sha256": "4429f958576874445b36e3105f9eb636414a3b2c861fa3271bdbf7a4a4a5defa",
-      "bytes": 49195
+      "sha256": "7b7f04e823af6175248ef5d289837e27122887c2dd7cc9133aa4dd0d20540fcb",
+      "bytes": 50218
     },
     {
       "path": "tests/test_session_relaunch_install.py",
@@ -65128,8 +65128,8 @@
     },
     {
       "path": "tools/session-relaunch/README.md",
-      "sha256": "9d73d2779d6fd9458efb931d229a8d971db4e8a7dbab21d3dc8509ada1d4f3d3",
-      "bytes": 15701
+      "sha256": "4ce4c9be263526b569ce673e041e5c3f71bb76a1ed64bbbb532599f8e4db052e",
+      "bytes": 16380
     },
     {
       "path": "tools/session-relaunch/config.example.json",
@@ -65138,13 +65138,13 @@
     },
     {
       "path": "tools/session-relaunch/install.sh",
-      "sha256": "d870f15344fac614cf737c393b1483f62c1ddb2132f7af8e20dd3a0cdd9bcc94",
-      "bytes": 7708
+      "sha256": "de1f0123aebbf0eb52c1d12b69e4aa8ac14f080284ec89807cfc95db46ecf2b4",
+      "bytes": 7710
     },
     {
       "path": "tools/session-relaunch/session_relaunch.py",
-      "sha256": "578a4b31a7ac21be86950332f26b052f80bef079a96aba1dcdfab5efc3a9bddb",
-      "bytes": 36323
+      "sha256": "79819d389fb699b0a3c33aeba4ae2bffdbcb10b2db986db9e3cf4f64ffda57be",
+      "bytes": 36904
     },
     {
       "path": "tools/session-relaunch/uninstall.sh",

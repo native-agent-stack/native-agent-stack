@@ -83,6 +83,13 @@ sent again and its command ran again, although the 2.1.290 CHANGELOG says such a
 boundary, which is why the transcript gate exists. A failed row with a saved transcript after a real shutdown is
 untested until the first real boot.
 
+Each respawn runs in its own transient scope, `systemd-run --user --scope --quiet -- claude respawn <id>`
+(systemd-run(1)). Measured the same day: with no supervisor running, a respawn issued straight from a oneshot unit
+returned 0, but it had started the client's on-demand supervisor inside the unit's cgroup, and the unit's exit killed
+the supervisor and the session (the default `KillMode=control-group`, systemd.kill(5)). Wrapped in a scope, both
+outlived the unit, and the session was listed with a process by `claude agents --json` with and without `--all`. The
+boot itself (the unit's environment and the supervisor's credential source) is still untested until the first real boot.
+
 ## Relaunch state and reruns
 
 `relaunch-<ended boot>.json` in the state directory records the relaunch of one ended boot: the sealed handoff and its
@@ -149,7 +156,7 @@ is made 0700 only when the tool creates it; the command center's existing direct
 ## Install (the command center's act, or the host install stage's; nothing here is applied)
 
 `install.sh` is the forward install and `uninstall.sh` its automated inverse. Both port #1116's applied host install
-v6 (2026-10-15, install_id `ba61c343` on NativeStack2604) and its manual inverse, with their gates unchanged:
+v6 (applied on NativeStack2604 on 2026-10-15) and its manual inverse, with their gates unchanged:
 
 ```bash
 tools/session-relaunch/install.sh --config <this host's config.json>   # default: config.example.json at HEAD

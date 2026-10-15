@@ -108,6 +108,7 @@ def load_config(path: Path) -> dict:
     config.setdefault("client_wait_s", 120)
     config.setdefault("poll_s", 5)
     config.setdefault("projects_dir", str(Path.home() / ".claude" / "projects"))
+    config.setdefault("systemd_run", "/usr/bin/systemd-run")
     return config
 
 
@@ -409,7 +410,12 @@ def respawn_one(config: dict, entry: dict, save) -> str:
     still lists with no process: a row with a process would be restarted mid-work. It is also called only when the
     session's saved transcript exists: on 2026-10-15 at 2.1.301 a respawn of a failed row with no saved transcript
     re-sent that row's dispatch prompt and ran it again (README.md, Background sessions). Each call is recorded in
-    flight before it is made; an unreadable list skips the row, and a rerun reads it again."""
+    flight before it is made; an unreadable list skips the row, and a rerun reads it again.
+
+    The call runs in its own transient scope (`systemd-run --user --scope`, systemd-run(1)): a respawn with no
+    supervisor running starts the client's on-demand supervisor as its child, and when the call comes from the boot
+    oneshot, the unit's exit kills everything left in its cgroup (KillMode=control-group, systemd.kill(5)), the
+    supervisor and the respawned session with it. Measured at 2.1.301 on 2026-10-15 (README.md, Background sessions)."""
     if not entry.get("id"):
         return "left: no background id"
     rows = list_sessions(config["claude"], every=True)
@@ -425,8 +431,8 @@ def respawn_one(config: dict, entry: dict, save) -> str:
     entry.setdefault("calls", []).append({"at": iso(now_utc()), "result": "in_flight"})
     save()
     try:
-        done = subprocess.run([config["claude"], "respawn", entry["id"]], capture_output=True, text=True,
-                              timeout=config["tab_timeout_s"])
+        done = subprocess.run([config["systemd_run"], "--user", "--scope", "--quiet", "--", config["claude"], "respawn",
+                               entry["id"]], capture_output=True, text=True, timeout=config["tab_timeout_s"])
         rc, result = done.returncode, "respawned" if done.returncode == 0 else "failed"
     except subprocess.TimeoutExpired:
         rc, result = None, "timeout"

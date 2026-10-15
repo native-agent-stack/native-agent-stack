@@ -41,7 +41,7 @@
   },
   {
    "id": "host-install-v6",
-   "what": "#1116's applied host install v6 (apply.sh and MANUAL-INVERSE.md), install_id ba61c343 on NativeStack2604, and its simulation run_sim_v6.sh (v6 PASS 16 FAIL 0, v5 PASS 9 FAIL 7)",
+   "what": "#1116's applied host install v6 (apply.sh and MANUAL-INVERSE.md), applied on NativeStack2604 on 2026-10-15, and its simulation run_sim_v6.sh (v6 PASS 16 FAIL 0, v5 PASS 9 FAIL 7)",
    "where": "a coordination record of cc-native-practice, cited by name and date (2026-10-15)"
   }
  ]

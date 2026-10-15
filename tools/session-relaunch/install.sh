@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Forward install of the session-relaunch tool for one host (README.md, Install). Ported from #1116's applied host install
-# v6 (apply.sh, install_id ba61c343 on NativeStack2604) with three changes: the sources are this checkout's committed
+# v6 (apply.sh, applied on NativeStack2604 on 2026-10-15) with three changes: the sources are this checkout's committed
 # bytes at HEAD, the host's config can be passed in, and the install state lives in its own root. Every gate stops the run
 # before any write; after the gates and before the first write it seals an install manifest of what it creates, which
 # uninstall.sh reverses. Usage: install.sh [--config <host config.json>]   (default: config.example.json at HEAD)

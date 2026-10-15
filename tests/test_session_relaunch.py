@@ -56,6 +56,13 @@ print(json.dumps(json.load(open(os.environ["FAKE_AGENTS_JSON"])) + json.load(ope
 fi
 cat "$FAKE_AGENTS_JSON"
 """
+FAKE_SYSTEMD_RUN = """#!/bin/sh
+# Records the wrapper call, then runs the wrapped command, as `systemd-run --user --scope` does in the foreground.
+echo "$*" >> "$FAKE_SYSTEMD_RUN_LOG"
+while [ "$#" -gt 0 ] && [ "$1" != -- ]; do shift; done
+shift
+exec "$@"
+"""
 FAKE_POWERSHELL = """#!/usr/bin/env python3
 import json, os, sys, time
 argv = sys.argv[1:]
@@ -92,7 +99,7 @@ class Fixture(unittest.TestCase):
         self.tmp = Path(self.enterContext(tempfile.TemporaryDirectory()))
         bin_dir = self.tmp / "bin"
         bin_dir.mkdir()
-        for name, body in (("claude", FAKE_CLAUDE), ("powershell", FAKE_POWERSHELL)):
+        for name, body in (("claude", FAKE_CLAUDE), ("powershell", FAKE_POWERSHELL), ("systemd-run", FAKE_SYSTEMD_RUN)):
             (bin_dir / name).write_text(body)
             (bin_dir / name).chmod(0o755)
         self.agents = self.tmp / "agents.json"
@@ -101,7 +108,7 @@ class Fixture(unittest.TestCase):
         example = json.loads((ROOT / "tools" / "session-relaunch" / "config.example.json").read_text())
         self.config = R.load_config(self.write_config(dict(
             example, state_dir=str(self.tmp / "state"), claude=str(bin_dir / "claude"),
-            powershell=str(bin_dir / "powershell"), handoff_dir=str(self.tmp / "cc"), projects_dir=str(self.tmp / "projects"),
+            powershell=str(bin_dir / "powershell"), systemd_run=str(bin_dir / "systemd-run"), handoff_dir=str(self.tmp / "cc"), projects_dir=str(self.tmp / "projects"),
             cc_wait_s=2, spacing_s=0, tab_attempts=2, tab_retry_pause_s=0, tab_timeout_s=30, settle_s=0.3, poll_s=0.05,
             client_wait_s=0)))
         names = {p["launcher_name"]: p["session_name"] for p in self.config["profiles"]}
@@ -110,7 +117,8 @@ class Fixture(unittest.TestCase):
         self.respawn_log = self.tmp / "respawn.log"
         self.enterContext(mock.patch.dict(os.environ, {
             "FAKE_AGENTS_JSON": str(self.agents), "FAKE_PS_LOG": str(self.ps_log), "FAKE_PS_NAMES": json.dumps(names),
-            "FAKE_AGENTS_ALL_JSON": str(self.all_rows), "FAKE_RESPAWN_LOG": str(self.respawn_log)}))
+            "FAKE_AGENTS_ALL_JSON": str(self.all_rows), "FAKE_RESPAWN_LOG": str(self.respawn_log),
+            "FAKE_SYSTEMD_RUN_LOG": str(self.tmp / "systemd-run.log")}))
         transcript = self.tmp / "projects" / "-home-example-code-native-agent-stack" / "sid-cc.jsonl"
         transcript.parent.mkdir(parents=True)
         transcript.write_text("{}\n")
@@ -659,6 +667,15 @@ class Background(Fixture):
         self.assertEqual(state["status"], "complete")
         self.assertEqual(self.run_relaunch()["action"], "none")
         self.assertEqual(self.respawned(), ["d4d4d4d4"])
+
+    def test_the_respawn_runs_in_its_own_scope_so_the_supervisor_outlives_the_boot_unit(self):
+        # Measured 2026-10-15 at 2.1.301 (receipts/respawn-probe.json, case U): a respawn run straight from a oneshot
+        # unit started the on-demand supervisor inside the unit's cgroup, and the unit's exit killed it and the session.
+        self.crash_with_background()
+        self.save_transcript("sid-d4")
+        self.run_relaunch()
+        calls = (self.tmp / "systemd-run.log").read_text().splitlines()
+        self.assertEqual(calls, [f"--user --scope --quiet -- {self.config['claude']} respawn d4d4d4d4"])
 
     def test_without_a_saved_transcript_it_is_left_with_its_attach_command_and_not_respawned(self):
         self.crash_with_background()

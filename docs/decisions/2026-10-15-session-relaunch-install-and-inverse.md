@@ -6,7 +6,7 @@ client 2.1.301; nothing is installed by this change. It extends
 
 ## Trigger
 
-#1116's tool was installed on NativeStack2604 by hand on 2026-10-15 (host install v6, install_id `ba61c343`): a forward
+#1116's tool was installed on NativeStack2604 by hand on 2026-10-15 (host install v6): a forward
 install script, an ownership manifest and a manual inverse that the command center runs. Its v5 inverse had three P1s
 (a forged or reused manifest pair, a symlinked install-state parent or tool directory, and a handoff inventory inside a
 process substitution that escaped `pipefail`); v6 closed them in the manual block. The command center then ruled
@@ -45,8 +45,10 @@ use upstream's own scripted restart.
    from the checkout refuses.
 3. **Background rows** with a launcher profile are respawned with `claude respawn <id>`, only when
    `claude agents --json --all` still lists the row with no process and its saved transcript exists; otherwise the
-   handoff leaves them to the command center with `claude attach <id>`. Rosters keep the background row's short id and
-   state for this. This closes the follow-up recorded at `session_relaunch.py:420` (39b3fcaf5): only interactive rows
+   handoff leaves them to the command center with `claude attach <id>`. Each respawn runs in its own transient scope
+   (`systemd-run --user --scope`), because a respawn from the boot oneshot starts the on-demand supervisor inside the
+   unit's cgroup, where the unit's exit kills it (measured, below). Rosters keep the background row's short id and state
+   for this. This closes the follow-up recorded at `session_relaunch.py:420` (39b3fcaf5): only interactive rows
    were relaunched.
 4. **The handoff's reason text** names the actual reason a row is left (already running, a second row of a name relaunched
    above, no launcher profile, or a kind the tool does not relaunch). This closes the follow-up at `:249-250`, which
@@ -63,6 +65,12 @@ transcript came back too, but its dispatch prompt was sent again and its command
 opposite since 2.1.290 (anthropics/claude-code@03b5892ee77de289bcd5dfa39f541525ade74aff `CHANGELOG.md` L794): such a
 row starts with an empty conversation. That is one observation on a row with an unusual history, so it is recorded as an
 **untested boundary**, not a regression, and the transcript gate in item 3 keeps the tool away from it.
+
+A second probe the same day ran the respawn from a transient `Type=oneshot` user unit with no supervisor running, as the
+boot unit would. The unit returned 0, but the supervisor it started lived in the unit's cgroup, and the unit's exit
+killed the supervisor and the session (systemd's default `KillMode=control-group`, systemd.kill(5)). Run through
+`systemd-run --user --scope`, both outlived the unit, and the session was listed with a process by `claude agents
+--json`, with and without `--all`. The real boot's environment and the supervisor's credential source stay untested.
 
 ## Tests
 
@@ -94,6 +102,7 @@ row starts with an empty conversation. That is one observation on a row with an 
   `c8e2b81092b94b4b3ded2c86b40b8329e73b8f39b36acb3288bd56385bc83266`: lines 766, 817, 823, 884-886.
 - anthropics/claude-code@03b5892ee77de289bcd5dfa39f541525ade74aff `CHANGELOG.md` (sha256
   `0551b63e968529c0ddbff2010b89014f84f97c8117fd233c176f6392061f3979`): L794 (2.1.290), L4147 (2.1.211).
+- systemd-run(1) `--user --scope` and systemd.kill(5) `KillMode=` (default `control-group`).
 - The systemd user manager, the scheduling-supervision layer's recorded winner (`catalogs/landscape/foundation.json`
   `/layers/12`, pinned there at 255.4-1ubuntu8.17; this host runs 259.5-0ubuntu3.4, `systemctl --version` on
   2026-10-15): `systemctl --user enable`, `disable --now`, `reset-failed` and `show -p LoadState/ActiveState`

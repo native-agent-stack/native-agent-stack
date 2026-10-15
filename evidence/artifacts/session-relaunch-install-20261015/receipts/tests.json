@@ -3,9 +3,9 @@
  "date": "2026-10-15",
  "fail_first": {
   "tree": "origin/main 8053f14e7 with this change's two test modules",
-  "ran": 72,
+  "ran": 73,
   "failures": 15,
-  "errors": 9
+  "errors": 10
  },
  "mutants_of_uninstall_sh": [
   {
@@ -26,5 +26,10 @@
     "test_F_B4"
    ]
   }
- ]
+ ],
+ "scope_wrapper": {
+  "test": "test_the_respawn_runs_in_its_own_scope_so_the_supervisor_outlives_the_boot_unit",
+  "before_the_fix": "error (no wrapper call recorded)",
+  "after": "ok"
+ }
 }

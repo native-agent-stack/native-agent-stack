@@ -34,8 +34,28 @@
    },
    "re_sent": true,
    "note": "the row's original dispatch prompt was sent again and its command ran again; this disagrees with CHANGELOG 2.1.290 (L794). One observation on a row with an unusual history (a --bg resume of a session open elsewhere): an untested boundary, not a confirmed regression"
+  },
+  {
+   "case": "U",
+   "row": "9fa2a208",
+   "start": "done, no process; saved transcript present; no supervisor running",
+   "steps": [
+    "systemd-run --user --wait --collect -p Type=oneshot -- claude respawn <id> (unit rc 0)"
+   ],
+   "after_5_and_60_s": "no supervisor running; the row done with no process; not in the plain claude agents --json list",
+   "note": "the respawn started the on-demand supervisor inside the oneshot unit's cgroup, and the unit's exit killed it and the session (systemd's default KillMode=control-group)"
+  },
+  {
+   "case": "U-scope",
+   "row": "9fa2a208",
+   "start": "as in U",
+   "steps": [
+    "the same oneshot unit running systemd-run --user --scope --quiet -- claude respawn <id> (unit rc 0)"
+   ],
+   "after_5_and_60_s": "the supervisor running; the row done, idle, with a process, listed by both claude agents --json --all and plain claude agents --json",
+   "note": "the scope is a sibling of the unit's cgroup, so the supervisor and the session outlive the unit; the tool runs each respawn this way"
   }
  ],
- "cleanup": "both rows stopped and removed (claude stop, claude rm; rc 0)",
- "not_measured": "a failed row WITH a saved transcript after a real shutdown, which waits for the first real boot"
+ "cleanup": "all probe rows stopped and removed (claude stop, claude rm; rc 0); afterwards no background row had a process and the supervisor had exited on its own",
+ "not_measured": "a failed row WITH a saved transcript after a real shutdown, and the supervisor's start from the real boot unit (its environment and credential source), which wait for the first real boot"
 }
