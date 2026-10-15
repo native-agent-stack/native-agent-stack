@@ -1637,7 +1637,7 @@
       "configuration_sha256": "4c4d077808a03f4937b129fc349b65ebf0841a75df2456f37eb3db6a51e3bf97",
       "measured_record": {
         "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
-        "sha256": "ed2ce799e3b8a3821ea424a635f68d744c1ffc6da9070ff094825ff9826b290f",
+        "sha256": "e337a50b2d0523e72576f597a85bb9dfcc5780fa8be9284180546c10cd1b4df8",
         "pointer": "layers.gpt-runtimes.ruling.decided_default and changes.2-5",
         "boundary": "The public retained ruling binds these values to session 80; the credential-bearing original configuration was not read. This is historical evidence, not a new model run."
       },

@@ -1841,6 +1841,17 @@ class OwnerQuotationTests(unittest.TestCase):
                 self.assertNotIn(self.WORDS, found[0])
         self.assertEqual(attributed_quotations(f'Notes.\n\nThe owner wrote "{self.WORDS}" to the lane.'), 1)
 
+    def test_the_custody_tavily_change_states_the_owner_decision_in_other_words(self):
+        """GPT fix3r at fd51f88d (#1161), its blocker at wave2-records.json:274: change 12 kept the earlier wording under a
+        paraphrase label. It now states the 2026-09-26 decision in other words; this pins the new public text only."""
+        records = json.loads((ROOT / "evidence" / "artifacts" / "new-wsl-layer-consensus-20261002" / "wave2-records.json")
+                             .read_text(encoding="utf-8"))
+        change = records["layers"]["custody"]["ruling"]["changes"]["12"]
+        self.assertIn("On 2026-09-26 the owner decided that this stack makes no further use of Tavily's paid search (their "
+                      "decision, restated here in other words on 2026-10-15)", change)
+        self.assertNotIn("(paraphrased 2026-10-15)", change)
+        self.assertEqual(owner_quotations({"change": change}), [])
+
     def test_a_dated_paraphrase_and_separately_defined_protocol_text_pass(self):
         paraphrase = "the owner, 2026-01-02 (paraphrased): they asked that every fixture lane stay lit"
         value = {"amendment": {"date_utc": "2026-01-02", "by": "the owner's decision, then direct consensus of both families",

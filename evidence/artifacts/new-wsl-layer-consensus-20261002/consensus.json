@@ -518,7 +518,7 @@
   "records": {
    "wave2_records": {
     "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
-    "sha256": "ed2ce799e3b8a3821ea424a635f68d744c1ffc6da9070ff094825ff9826b290f"
+    "sha256": "e337a50b2d0523e72576f597a85bb9dfcc5780fa8be9284180546c10cd1b4df8"
    }
   },
   "acknowledgements": [
@@ -634,7 +634,7 @@
      "records": [
       {
        "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
-       "sha256": "ed2ce799e3b8a3821ea424a635f68d744c1ffc6da9070ff094825ff9826b290f"
+       "sha256": "e337a50b2d0523e72576f597a85bb9dfcc5780fa8be9284180546c10cd1b4df8"
       }
      ],
      "configuration": {
@@ -683,7 +683,7 @@
      "records": [
       {
        "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
-       "sha256": "ed2ce799e3b8a3821ea424a635f68d744c1ffc6da9070ff094825ff9826b290f"
+       "sha256": "e337a50b2d0523e72576f597a85bb9dfcc5780fa8be9284180546c10cd1b4df8"
       }
      ],
      "configuration": {
@@ -733,7 +733,7 @@
      "records": [
       {
        "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
-       "sha256": "ed2ce799e3b8a3821ea424a635f68d744c1ffc6da9070ff094825ff9826b290f"
+       "sha256": "e337a50b2d0523e72576f597a85bb9dfcc5780fa8be9284180546c10cd1b4df8"
       }
      ],
      "configuration": {
