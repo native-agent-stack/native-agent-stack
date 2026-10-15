@@ -17468,8 +17468,8 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "bf487822050bda202410b00e980e5f8d8db07cf5900bcffe80f5042699028a38",
-      "bytes": 190328
+      "sha256": "94997389d0b2bae6078b467a279b1f2d5938425108136b9986bee032c860bb58",
+      "bytes": 190372
     },
     {
       "path": "catalogs/landscape/README.md",
@@ -19185,6 +19185,11 @@
       "path": "docs/decisions/2026-10-14-session-relaunch-after-wsl-restart.md",
       "sha256": "a16bde3428b14a259f526c32d0e433b9cc8c5934f5ffe4296abb8ce436ff4303",
       "bytes": 6369
+    },
+    {
+      "path": "docs/decisions/2026-10-15-claudeai-synced-plugins-exception.md",
+      "sha256": "05b10a944b4d7c1b512a720a11903a26afb3770f310350dcbad54f331be55e9e",
+      "bytes": 3880
     },
     {
       "path": "docs/decisions/2026-10-15-model-currency-landscape-check.md",
@@ -21720,6 +21725,31 @@
       "path": "evidence/artifacts/claude-upstream-checks-20260921/token-savings-manifest-page-20260921.png",
       "sha256": "787f3d49cedc86489e6e7446810d992bda880071d0bbf22d7c0fef67d8120b2a",
       "bytes": 85934
+    },
+    {
+      "path": "evidence/artifacts/claudeai-synced-plugins-20261015/inventory.json",
+      "sha256": "53c5d4722f779aee96d297aeebcda30dc861bea4c5af133e3d2a70196c1e313b",
+      "bytes": 5118
+    },
+    {
+      "path": "evidence/artifacts/claudeai-synced-plugins-20261015/loki_by.py",
+      "sha256": "ff937e27b0ddc6e7bfe633786c590d081aecacfaf044ddfa884044a4bccddeb6",
+      "bytes": 1053
+    },
+    {
+      "path": "evidence/artifacts/claudeai-synced-plugins-20261015/mcp-tool-results.json",
+      "sha256": "e535bd7748f1f79745defecf0c679d8c4cb6754c7218cd44d1a1cf8475acfba2",
+      "bytes": 496
+    },
+    {
+      "path": "evidence/artifacts/claudeai-synced-plugins-20261015/skill-activations.json",
+      "sha256": "5a6c7bcf09fbba9b8d98ad26d74176e16f86bd28cd0cf93bc35616e0a019a366",
+      "bytes": 1228
+    },
+    {
+      "path": "evidence/artifacts/claudeai-synced-plugins-20261015/window_sessions.py",
+      "sha256": "1fc6e53f128560b4d76bdd30d4b05070f6b35a7e1aff9dcc617d234d15bf25b0",
+      "bytes": 938
     },
     {
       "path": "evidence/artifacts/cloudflare-audit-skill-trial-20260927/README.md",
@@ -62965,6 +62995,11 @@
       "path": "tests/test_claude_usage_sampler.py",
       "sha256": "793cc956557f282a1b33caef3140bcc6b9d58049182e9e7bc4f9e40ebf0490cf",
       "bytes": 14093
+    },
+    {
+      "path": "tests/test_claudeai_synced_plugins_exception.py",
+      "sha256": "5d92d64a7652b21909ef9ec9c5bc5b00b4935f2e9a5e02821d8a65b9dd4aa0ef",
+      "bytes": 2334
     },
     {
       "path": "tests/test_codex_agents.py",

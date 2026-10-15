@@ -1,0 +1,16 @@
+{
+ "field": "mcp_server_name",
+ "selector": "{service_name=\"claude-code\"} | event_name=\"tool_result\"",
+ "start": "2026-09-20T00:00:00Z",
+ "end_utc": "2026-10-15T02:48:30Z",
+ "server_names_counted": 19,
+ "events_with_a_server_name": 60880,
+ "synced_plugin_servers": [
+  "lseg",
+  "daloopa",
+  "daloopa-docs",
+  "bigdata.com"
+ ],
+ "synced_plugin_server_matches": {},
+ "note": "host server names are left out; only the synced plugins' servers are matched (substring, dots as underscores too)"
+}
