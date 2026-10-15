@@ -130,10 +130,17 @@ SCRATCHPAD_SESSION = re.compile(
     r"[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}(?=/scratchpad(?:/|$))", re.I)
 
 
-def method_limits(models: dict, gpt6_model: str = GPT6_DEFAULT["model"], skills: bool = False) -> list[str]:
+def method_limits(models: dict, gpt6_model: str = GPT6_DEFAULT["model"], skills: bool = False,
+                  gpt6_search: dict | None = None) -> list[str]:
     """The lane's method limits; `skills` for a skills run (every layer's catalog is skills), whose unit is a skill
     (owner/repo@name) merged by its skill_ref."""
     unit, key = ("skills (owner/repo@name)", "skill_ref") if skills else ("repositories", "canonical repository")
+    search = gpt6_search or {"completed": 0, "failed": 0, "incomplete": 0, "unavailable": 1}
+    availability = ("observed" if search["completed"] else
+                    "unavailable" if search["failed"] and not (search["incomplete"] or search["unavailable"])
+                    else "unverified")
+    search_limit = (f"web search {availability} ({search['completed']} completed, {search['failed']} failed, "
+                    f"{search['incomplete']} incomplete, {search['unavailable']} unmeasured discovery jobs)")
     last = ("SKILL.md source review and GitHub metadata only: no skill was installed, invoked, benchmarked "
             "(skill-creator or promptfoo) or compared with an installed skill; survival means the proposal withstood "
             "fact and fit checks, not that it beats an installed skill." if skills else
@@ -141,7 +148,7 @@ def method_limits(models: dict, gpt6_model: str = GPT6_DEFAULT["model"], skills:
             "winner; survival means the proposal withstood fact and fit checks, not that it beats a winner.")
     return [
         f"Discovery per layer: a Claude researcher ({models['discover']}, effort max) and a GPT-6 researcher "
-        f"({gpt6_model} through the Codex CLI, effort max, web search, read-only sandbox, user config "
+        f"({gpt6_model} through the Codex CLI, effort max, {search_limit}, read-only sandbox, user config "
         f"ignored), each proposing at most 6 {unit} within 12 web searches, 8 page fetches and 40 GitHub API "
         f"calls; the two returns are merged by {key} and capped at {MERGE_CAP} per layer (two-family "
         "proposals first; dropped proposals are logged and kept under raw).",
@@ -299,6 +306,52 @@ def job_exit(directory: Path):
         return None
 
 
+def measured_web_search(work: Path | None, job: str) -> dict:
+    """Count Codex result events, never the final answer's calls. No log means unmeasured.
+
+    openai/codex rust-v0.162.1 (092d3acd), exec/src/exec_events.rs:125-127,
+    296-305; ext/web-search/src/tool.rs:135-191 emits completion only after a
+    response. A started tool still without results at turn end failed to complete;
+    without a turn end its outcome remains incomplete. Open/find are not searches.
+    """
+    unavailable = {"completed": 0, "failed": 0, "incomplete": 0, "unavailable": 1}
+    if work is None:
+        return unavailable
+    pending, completed, failed = set(), set(), set()
+    seen = False
+    try:
+        with (work / "gpt6" / job / "events.jsonl").open(encoding="utf-8") as stream:
+            for line in stream:
+                if not line.strip():
+                    continue
+                event = json.loads(line)
+                if not isinstance(event, dict):
+                    raise ValueError("invalid event")
+                seen = True
+                kind, item = event.get("type"), as_dict(event.get("item"))
+                if item.get("type") == "web_search" and kind in ("item.started", "item.completed"):
+                    call_id = item.get("id")
+                    if not isinstance(call_id, str) or not call_id:
+                        raise ValueError("web search event without identity")
+                    if kind == "item.started":
+                        pending.add(call_id)
+                    else:
+                        pending.discard(call_id)
+                        if item.get("status") == "failed" or item.get("error"):
+                            failed.add(call_id)
+                        elif as_dict(item.get("action")).get("type") == "search":
+                            completed.add(call_id)
+                if kind in ("turn.completed", "turn.failed"):
+                    failed.update(pending)
+                    pending.clear()
+    except (OSError, ValueError):
+        return unavailable
+    if not seen:
+        return unavailable
+    return {"completed": len(completed - failed), "failed": len(failed),
+            "incomplete": len(pending - completed - failed), "unavailable": 0}
+
+
 def copy_check(work: Path | None, job: str, entry) -> str | None:
     """Did the workflow receive exactly what Codex wrote (gpt6/<job>/last.json)? None when there is nothing to
     compare: no work dir, no job, or a job that failed and whose output the workflow rightly did not use."""
@@ -446,6 +499,7 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
     children = usage_children(usage)
     lane_layers, proposals, ledger_layers, survivors, lost = [], [], [], [], []
     calls_total, skills_usage, checks = {}, {}, {}
+    discovery_search = {"completed": 0, "failed": 0, "incomplete": 0, "unavailable": 0}
     # `usage` sums the final attempt of each job; `earlier_attempts` sums the attempts the runner kept under
     # gpt6/<job>/attempts/ (failed, refused or superseded). Complete GPT-6 usage is the per-counter sum of the two;
     # an attempt with no reported usage is counted in `usage_unavailable`, never as zero.
@@ -522,6 +576,23 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
             raw[rnd] = {"claude_discover": cd, "gpt6_discover": gpt6_meta(gd), "dropped": r.get("dropped"),
                         "fit_gpt6_meta": gpt6_meta(fg, ("status", "usage", "started", "finished")),
                         "followup_reason": r.get("followup_reason")}
+            searches = {}
+            for name, entry in (("discover", gd), ("fit", fg)):
+                if not isinstance(entry, dict):
+                    continue
+                job = f"gpt6-{name}-{layer_id}{suffix}"
+                searches[name] = search = measured_web_search(work, job)
+                if name == "discover":
+                    for outcome, count in search.items():
+                        discovery_search[outcome] += count
+                for outcome, count in search.items():
+                    counter = "gpt6_web_search" + ("" if outcome == "completed" else f"_{outcome}")
+                    calls[counter] = calls.get(counter, 0) + count
+                if search["failed"]:
+                    failures.append({"round": rnd, "cause": "gpt6_web_search_failed", "job": job,
+                                     "count": search["failed"],
+                                     "detail": "Codex web tool failed or ended the turn without returning results"})
+            raw[rnd]["gpt6_web_search"] = searches
             if routes:
                 raw[rnd]["gpt6_routes"] = routes
             check = {name: copy_check(work, f"gpt6-{name}-{layer_id}{suffix}", entry)
@@ -547,9 +618,11 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
                     gpt6_usage["earlier_attempts"]["attempts"] += 1
                     add_usage(gpt6_usage["earlier_attempts"], as_dict(attempt))
             for name, value in as_dict(as_dict(cd).get("calls")).items():
-                calls[name] = calls.get(name, 0) + int(value)
+                if not name.startswith("gpt6_web_search"):
+                    calls[name] = calls.get(name, 0) + int(value)
             for name, value in as_dict(as_dict(gpt6_out(gd)).get("calls")).items():
-                calls[f"gpt6_{name}"] = calls.get(f"gpt6_{name}", 0) + int(value)
+                if not name.startswith("web_search"):
+                    calls[f"gpt6_{name}"] = calls.get(f"gpt6_{name}", 0) + int(value)
             round_votes = {"facts": r.get("facts"), "fit_claude": r.get("fit_claude"), "fit_gpt6": gpt6_out(fg)}
             for role_key, obj in (("discover_claude", cd), ("discover_gpt6", gpt6_out(gd)), *round_votes.items()):
                 for skill in as_dict(obj).get("skills_used") or []:
@@ -695,11 +768,13 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
     skills_run = bool(rounds_by_layer) and all(rounds[0]["catalog"] == SKILLS_CATALOG
                                                for rounds in rounds_by_layer.values())
     route_limits = (["GPT-6 transport-only native-to-OmniRoute failover is recorded per job in raw gpt6_routes; "
-                     "bound native inputs stay unchanged. Gateway standalone web search uses OmniRoute's /alpha/search "
-                     "backend; native search recall and outbound max-effort parity are unqualified."]
+                     "bound native inputs stay unchanged. Gateway standalone web search requests /alpha/search; "
+                     "availability is measured from job results. Native search recall and outbound max-effort "
+                     "parity are unqualified."]
                     if any(r.get("gpt6_routes") for layer in returns["raw"].values() for r in layer.values()) else [])
     lanes = {"lanes": [{"lane": lane, "result": {"layers": lane_layers, "calls": calls_total,
-                                                 "limits": [*method_limits(models, gpt6_model_text, skills_run),
+                                                 "limits": [*method_limits(models, gpt6_model_text, skills_run,
+                                                                           discovery_search),
                                                             *route_limits, *limits]},
                         "proposals": proposals}],
              "critic": res.get("critic"), "lost": lost}

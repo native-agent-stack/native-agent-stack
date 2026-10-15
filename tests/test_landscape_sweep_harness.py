@@ -1436,6 +1436,18 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
     """--gpt6-provider omniroute stages a lane-local CODEX_HOME: the provider block, the rendered token MCP servers
     and the stack-worker profile, and nothing of the host's interactive trust state."""
 
+    def test_readme_gateway_examples_match_stager_and_client_config_map(self):
+        default_url = build_args.OMNIROUTE_DEFAULT_URL
+        host = default_url.removeprefix("http://").removesuffix("/v1")
+        config = json.loads((ROOT / "adoption/new-wsl/client-config-map.json").read_text())
+        self.assertTrue(any(rewrite.get("from") == host for entry in config["entries"]
+                            for rewrite in entry.get("rewrite", [])))
+        readme = (HARNESS / "README.md").read_text()
+        for expected in (f"--fallback-codex-host {host}", f"(default `{host}`)",
+                         f"`--omniroute-base-url` defaults to `{default_url}`"):
+            with self.subTest(expected=expected):
+                self.assertIn(expected, readme)
+
     def stage_lane(self, *extra):
         work = stage_work(self)
         profile = temp_dir(self) / "stack-worker.config.toml"
@@ -3503,6 +3515,116 @@ class ShellTests(RunnerCase):
 # --------------------------------------------------------------------------- convert
 
 
+class MeasuredSearchTests(unittest.TestCase):
+    def setUp(self):
+        self.work = temp_dir(self)
+        self.res = healthy_result()
+        write_codex_files(self.work, self.res)
+
+    def events(self, role, records):
+        path = self.work / "gpt6" / f"gpt6-{role}-alpha" / "events.jsonl"
+        path.write_text("".join(json.dumps(row) + "\n" for row in records), encoding="utf-8")
+
+    def converted(self):
+        return convert.convert(self.res, scope_for(), LANE, convert.resolved_models(None), self.work)
+
+    def test_failed_searches_do_not_use_the_researchers_claimed_count(self):
+        # Synthetic S0 shape: the model claims three searches, but a web tool starts
+        # without returning results before the turn ends. No private run bytes.
+        for role in ("discover", "fit"):
+            self.events(role, [
+                {"type": "item.started", "item": {"id": "search-fixture", "type": "web_search",
+                                                   "query": "", "action": {"type": "other"}}},
+                {"type": "item.completed", "item": {"id": "answer", "type": "agent_message",
+                    "text": '{"calls":{"web_search":3}}'}},
+                {"type": "turn.completed", "usage": {"input_tokens": 10, "output_tokens": 10}},
+            ])
+        out = self.converted()
+        for calls in (out["summary"]["calls"], out["lanes"]["lanes"][0]["result"]["calls"],
+                      out["layers"][0]["calls"]):
+            self.assertEqual(calls["gpt6_web_search"], 0)
+            self.assertEqual(calls["gpt6_web_search_failed"], 2)
+        failures = out["returns"]["failures"]["alpha"]
+        self.assertEqual([f["job"] for f in failures if f["cause"] == "gpt6_web_search_failed"],
+                         ["gpt6-discover-alpha", "gpt6-fit-alpha"])
+
+    def test_limits_use_discovery_results_even_when_fit_search_succeeded(self):
+        self.events("discover", [
+            {"type": "item.started", "item": {"id": "failed", "type": "web_search",
+                                               "query": "", "action": {"type": "other"}}},
+            {"type": "turn.completed", "usage": {}},
+        ])
+        self.events("fit", [
+            {"type": "item.completed", "item": {"id": "fit-search", "type": "web_search",
+                "query": "fixture", "action": {"type": "search", "query": "fixture"}, "results": []}},
+            {"type": "turn.completed", "usage": {}},
+        ])
+        out = self.converted()
+        self.assertEqual(out["summary"]["calls"]["gpt6_web_search"], 1)
+        limit = out["lanes"]["lanes"][0]["result"]["limits"][0]
+        self.assertIn("web search unavailable (0 completed, 1 failed", limit)
+
+    def test_counts_unique_completed_searches_and_separates_unfinished_tools(self):
+        completed = {"type": "item.completed", "item": {"id": "search", "type": "web_search",
+            "query": "fixture", "action": {"type": "search", "queries": ["fixture", "example"]}, "results": []}}
+        self.events("discover", [
+            {"type": "item.started", "item": {"id": "search", "type": "web_search"}},
+            completed, completed,
+            {"type": "item.completed", "item": {"id": "open", "type": "web_search",
+                "action": {"type": "open_page", "url": "https://example.com"}}},
+            {"type": "item.completed", "item": {"id": "find", "type": "web_search",
+                "action": {"type": "find_in_page", "pattern": "example"}}},
+            {"type": "item.started", "item": {"id": "pending", "type": "web_search"}},
+        ])
+        self.events("fit", [{"type": "turn.completed", "usage": {}}])
+        out = self.converted()
+        counts = out["summary"]["calls"]
+        self.assertEqual((counts["gpt6_web_search"], counts["gpt6_web_search_failed"],
+                          counts["gpt6_web_search_incomplete"], counts["gpt6_web_search_unavailable"]), (1, 0, 1, 0))
+        self.assertIn("web search observed (1 completed, 0 failed, 1 incomplete",
+                      out["lanes"]["lanes"][0]["result"]["limits"][0])
+
+    def test_missing_empty_or_malformed_logs_are_unmeasured_never_self_reported(self):
+        # A forged model counter cannot overwrite any measurement field.
+        self.res["first"][0]["gpt6_discover"]["output"]["calls"].update(
+            web_search="invented", web_search_unavailable=0, web_search_failed=900)
+        for contents in (None, "", "not json\n", '[]\n', '{"type":"turn.completed"}\n{'):
+            with self.subTest(contents=contents):
+                for role in ("discover", "fit"):
+                    path = self.work / "gpt6" / f"gpt6-{role}-alpha" / "events.jsonl"
+                    if contents is not None:
+                        path.write_text(contents, encoding="utf-8")
+                out = self.converted()
+                counts = out["summary"]["calls"]
+                self.assertEqual(counts["gpt6_web_search"], 0)
+                self.assertEqual(counts["gpt6_web_search_failed"], 0)
+                self.assertEqual(counts["gpt6_web_search_unavailable"], 2)
+                self.assertIn("web search unverified (0 completed", out["lanes"]["lanes"][0]["result"]["limits"][0])
+
+    def test_followup_job_results_are_measured_separately(self):
+        followup = copy.deepcopy(self.res["first"][0])
+        followup["round"] = "followup"
+        self.res["followups"] = [followup]
+        self.res["critic"]["followup_layers"] = [{"layer_id": "alpha", "reason": "fixture"}]
+        write_codex_files(self.work, self.res)
+        for role in ("discover", "fit", "discover-alpha-followup", "fit-alpha-followup"):
+            job = f"gpt6-{role}-alpha" if "followup" not in role else f"gpt6-{role}"
+            records = [
+                {"type": "item.completed", "item": {"id": "same-local-id", "type": "web_search",
+                    "action": {"type": "search", "query": "fixture"}, "results": []}},
+                {"type": "turn.completed", "usage": {}},
+            ]
+            (self.work / "gpt6" / job / "events.jsonl").write_text(
+                "".join(json.dumps(row) + "\n" for row in records), encoding="utf-8")
+        out = self.converted()
+        self.assertEqual(out["summary"]["calls"]["gpt6_web_search"], 4)
+        self.assertIn("web search observed (2 completed", out["lanes"]["lanes"][0]["result"]["limits"][0])
+
+    def test_other_model_cannot_inject_gpt6_measurement_counters(self):
+        self.res["first"][0]["claude_discover"]["calls"]["gpt6_web_search"] = 900
+        self.assertEqual(self.converted()["summary"]["calls"]["gpt6_web_search"], 0)
+
+
 class ConvertTests(unittest.TestCase):
     def test_route_provenance_survives_the_wrappers_fixed_field_copy(self):
         work = temp_dir(self)
@@ -3627,7 +3749,9 @@ class ConvertTests(unittest.TestCase):
         self.assertEqual(facts_b2["skills_used"], ["supply-chain-risk-auditor"])  # its own round's skills
         alpha_calls = out["layers"][0]["calls"]
         self.assertEqual(alpha_calls, {"web_search": 3, "web_fetch": 2, "gh_api": 20,
-                                       "gpt6_web_search": 4, "gpt6_web_fetch": 5, "gpt6_gh_api": 6})
+                                       "gpt6_web_search": 0, "gpt6_web_search_failed": 0,
+                                       "gpt6_web_search_incomplete": 0, "gpt6_web_search_unavailable": 2,
+                                       "gpt6_web_fetch": 5, "gpt6_gh_api": 6})
         self.assertEqual((out["returns"]["gpt6_usage"]["jobs"], out["returns"]["gpt6_usage"]["by_status"]),
                          (6, {"ok": 5, "failed_exit_1": 1}))
         lane = out["lanes"]["lanes"][0]
