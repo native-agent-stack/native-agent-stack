@@ -1,0 +1,65 @@
+{
+  "read_date": "2026-10-15",
+  "evidence_class": "source_review",
+  "scope": "Exact assignment text from vendor source at both version tags, independently captured; AST only, no vendor import or model execution.",
+  "releases": [
+    {
+      "version": "0.40.0",
+      "assignments": [
+        {
+          "name": "HF_MODEL_ID",
+          "capture_id": 47,
+          "line": 47,
+          "source_text": "HF_MODEL_ID = \"chopratejas/kompress-v2-base\"",
+          "value": "chopratejas/kompress-v2-base",
+          "url": "https://github.com/headroomlabs-ai/headroom/blob/v0.40.0/headroom/transforms/kompress_compressor.py#L47",
+          "source_sha256": "edaf47876b5d198541aef6600300275732c4c3bafad432f989613492b6607070"
+        },
+        {
+          "name": "_PINNED_REVISIONS",
+          "capture_id": 31,
+          "line": 73,
+          "source_text": "_PINNED_REVISIONS: dict[str, str] = {\n    # chopratejas/kompress-v2-base @ 2026-06-10\n    \"chopratejas/kompress-v2-base\": \"b1563631b35bfdcee37587ad530147497d820d4c\",\n    # Kompress tokenizer + torch-path encoder base. The ONNX artifacts were\n    # exported against this snapshot; a silently updated tokenizer would shift\n    # token ids under the shipped weights.\n    \"answerdotai/ModernBERT-base\": \"8949b909ec900327062f0ebf497f51aef5e6f0c8\",\n    \"chopratejas/technique-router-onnx\": \"27b0b4bfa510a1cff66d888072c0b807082721a8\",\n    \"chopratejas/siglip-image-encoder-onnx\": \"d0a9fbd66d4bd8c761bff592d44831f7c2ae184e\",\n    # Third-party repo — pinning matters most here.\n    \"Qdrant/all-MiniLM-L6-v2-onnx\": \"5f1b8cd78bc4fb444dd171e59b18f3a3af89a079\",\n}",
+          "value": {
+            "chopratejas/kompress-v2-base": "b1563631b35bfdcee37587ad530147497d820d4c",
+            "answerdotai/ModernBERT-base": "8949b909ec900327062f0ebf497f51aef5e6f0c8",
+            "chopratejas/technique-router-onnx": "27b0b4bfa510a1cff66d888072c0b807082721a8",
+            "chopratejas/siglip-image-encoder-onnx": "d0a9fbd66d4bd8c761bff592d44831f7c2ae184e",
+            "Qdrant/all-MiniLM-L6-v2-onnx": "5f1b8cd78bc4fb444dd171e59b18f3a3af89a079"
+          },
+          "url": "https://github.com/headroomlabs-ai/headroom/blob/v0.40.0/headroom/onnx_runtime.py#L73-L79",
+          "source_sha256": "0e76d79044f889585b8798ef8c10648893f578a7e3105a83d0c821b51a4ffb89"
+        }
+      ]
+    },
+    {
+      "version": "0.41.0",
+      "assignments": [
+        {
+          "name": "HF_MODEL_ID",
+          "capture_id": 29,
+          "line": 47,
+          "source_text": "HF_MODEL_ID = \"chopratejas/kompress-v2-base\"",
+          "value": "chopratejas/kompress-v2-base",
+          "url": "https://github.com/headroomlabs-ai/headroom/blob/v0.41.0/headroom/transforms/kompress_compressor.py#L47",
+          "source_sha256": "3446a8446723d65a3799dcdf77025572007ffb4948d62f7953edf3d5bc065c8f"
+        },
+        {
+          "name": "_PINNED_REVISIONS",
+          "capture_id": 30,
+          "line": 73,
+          "source_text": "_PINNED_REVISIONS: dict[str, str] = {\n    # chopratejas/kompress-v2-base @ 2026-06-10\n    \"chopratejas/kompress-v2-base\": \"b1563631b35bfdcee37587ad530147497d820d4c\",\n    # Kompress tokenizer + torch-path encoder base. The ONNX artifacts were\n    # exported against this snapshot; a silently updated tokenizer would shift\n    # token ids under the shipped weights.\n    \"answerdotai/ModernBERT-base\": \"8949b909ec900327062f0ebf497f51aef5e6f0c8\",\n    \"chopratejas/technique-router-onnx\": \"27b0b4bfa510a1cff66d888072c0b807082721a8\",\n    \"chopratejas/siglip-image-encoder-onnx\": \"d0a9fbd66d4bd8c761bff592d44831f7c2ae184e\",\n    # Third-party repo — pinning matters most here.\n    \"Qdrant/all-MiniLM-L6-v2-onnx\": \"5f1b8cd78bc4fb444dd171e59b18f3a3af89a079\",\n}",
+          "value": {
+            "chopratejas/kompress-v2-base": "b1563631b35bfdcee37587ad530147497d820d4c",
+            "answerdotai/ModernBERT-base": "8949b909ec900327062f0ebf497f51aef5e6f0c8",
+            "chopratejas/technique-router-onnx": "27b0b4bfa510a1cff66d888072c0b807082721a8",
+            "chopratejas/siglip-image-encoder-onnx": "d0a9fbd66d4bd8c761bff592d44831f7c2ae184e",
+            "Qdrant/all-MiniLM-L6-v2-onnx": "5f1b8cd78bc4fb444dd171e59b18f3a3af89a079"
+          },
+          "url": "https://github.com/headroomlabs-ai/headroom/blob/v0.41.0/headroom/onnx_runtime.py#L73-L79",
+          "source_sha256": "0e76d79044f889585b8798ef8c10648893f578a7e3105a83d0c821b51a4ffb89"
+        }
+      ]
+    }
+  ]
+}

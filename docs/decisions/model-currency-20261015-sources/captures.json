@@ -1,0 +1,1472 @@
+{
+  "schema_version": 1,
+  "evidence_class": "source_review",
+  "captured_on": "2026-10-15",
+  "scope": "Public primary source responses retained intact outside Git at /var/tmp/currency-pr1124-source-captures-20261015; excerpts and hashes below are review aids, not model execution evidence. Public HTTPS links identify the captured material; co-op attaches the immutable raw files to review packets.",
+  "sources": [
+    {
+      "i": 1,
+      "url": "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16/blob/d1f2f25730bbd775b99b29185134bc86653bf2d1/README.md",
+      "fetch_url": "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16/raw/d1f2f25730bbd775b99b29185134bc86653bf2d1/README.md",
+      "capture": "source-01.raw",
+      "sha256": "242e2ec0874c87ecd31558a8ef7b29e5a0e28a830f117132886290add30c1300",
+      "bytes": 36098,
+      "read_date": "2026-10-15",
+      "excerpts": []
+    },
+    {
+      "i": 2,
+      "url": "https://huggingface.co/google/embeddinggemma-2/blob/914f7f89142e33e77833254d9c9b90c3cef7303b/README.md",
+      "fetch_url": "https://huggingface.co/google/embeddinggemma-2/raw/914f7f89142e33e77833254d9c9b90c3cef7303b/README.md",
+      "capture": "source-02.raw",
+      "sha256": "b677a0ee2818c36f091b65fd3d9b4baea9f04d53b02b49cae916c74bf9682037",
+      "bytes": 21730,
+      "read_date": "2026-10-15",
+      "excerpts": []
+    },
+    {
+      "i": 3,
+      "url": "https://huggingface.co/nvidia",
+      "fetch_url": "https://huggingface.co/api/models?author=nvidia&search=Embed&sort=createdAt&direction=-1&limit=20",
+      "capture": "source-03.raw",
+      "sha256": "98e98b0ec86433fef57129f6504f5cc70deba102b935d30e79844caaebd16cbe",
+      "bytes": 9554,
+      "read_date": "2026-10-15",
+      "excerpts": [
+        {
+          "json_pointer": "/0",
+          "value": {
+            "id": "nvidia/Nemotron-3-Embed-1B-NVFP4"
+          }
+        },
+        {
+          "json_pointer": "/1",
+          "value": {
+            "id": "nvidia/Nemotron-3-Embed-8B-BF16"
+          }
+        },
+        {
+          "json_pointer": "/2",
+          "value": {
+            "id": "nvidia/Nemotron-3-Embed-1B-BF16"
+          }
+        },
+        {
+          "json_pointer": "/3",
+          "value": {
+            "id": "nvidia/llama-nemotron-embed-vl-1b-v2-fp8"
+          }
+        },
+        {
+          "json_pointer": "/4",
+          "value": {
+            "id": "nvidia/Cosmos-Embed1-448p-anomaly-detection"
+          }
+        },
+        {
+          "json_pointer": "/5",
+          "value": {
+            "id": "nvidia/llama-nv-embed-reasoning-3b"
+          }
+        },
+        {
+          "json_pointer": "/6",
+          "value": {
+            "id": "nvidia/llama-nemotron-embed-vl-1b-v2"
+          }
+        },
+        {
+          "json_pointer": "/7",
+          "value": {
+            "id": "nvidia/llama-nemotron-embed-1b-v2"
+          }
+        },
+        {
+          "json_pointer": "/8",
+          "value": {
+            "id": "nvidia/llama-embed-nemotron-8b"
+          }
+        },
+        {
+          "json_pointer": "/9",
+          "value": {
+            "id": "nvidia/omni-embed-nemotron-3b"
+          }
+        },
+        {
+          "json_pointer": "/10",
+          "value": {
+            "id": "nvidia/NV-EmbedCode-7b-v1"
+          }
+        },
+        {
+          "json_pointer": "/11",
+          "value": {
+            "id": "nvidia/Cosmos-Embed1-448p"
+          }
+        },
+        {
+          "json_pointer": "/12",
+          "value": {
+            "id": "nvidia/Cosmos-Embed1-336p"
+          }
+        },
+        {
+          "json_pointer": "/13",
+          "value": {
+            "id": "nvidia/Cosmos-Embed1-224p"
+          }
+        },
+        {
+          "json_pointer": "/14",
+          "value": {
+            "id": "nvidia/MM-Embed"
+          }
+        },
+        {
+          "json_pointer": "/15",
+          "value": {
+            "id": "nvidia/NV-Embed-v2"
+          }
+        },
+        {
+          "json_pointer": "/16",
+          "value": {
+            "id": "nvidia/NV-Embed-v1"
+          }
+        }
+      ]
+    },
+    {
+      "i": 4,
+      "url": "https://huggingface.co/models?author=nvidia&search=Embed&sort=created",
+      "fetch_url": "https://huggingface.co/api/models?author=nvidia&search=Embed&sort=createdAt&direction=-1&limit=20",
+      "capture": "source-04.raw",
+      "sha256": "98e98b0ec86433fef57129f6504f5cc70deba102b935d30e79844caaebd16cbe",
+      "bytes": 9554,
+      "read_date": "2026-10-15",
+      "excerpts": [
+        {
+          "json_pointer": "/0",
+          "value": {
+            "id": "nvidia/Nemotron-3-Embed-1B-NVFP4"
+          }
+        },
+        {
+          "json_pointer": "/1",
+          "value": {
+            "id": "nvidia/Nemotron-3-Embed-8B-BF16"
+          }
+        },
+        {
+          "json_pointer": "/2",
+          "value": {
+            "id": "nvidia/Nemotron-3-Embed-1B-BF16"
+          }
+        },
+        {
+          "json_pointer": "/3",
+          "value": {
+            "id": "nvidia/llama-nemotron-embed-vl-1b-v2-fp8"
+          }
+        },
+        {
+          "json_pointer": "/4",
+          "value": {
+            "id": "nvidia/Cosmos-Embed1-448p-anomaly-detection"
+          }
+        },
+        {
+          "json_pointer": "/5",
+          "value": {
+            "id": "nvidia/llama-nv-embed-reasoning-3b"
+          }
+        },
+        {
+          "json_pointer": "/6",
+          "value": {
+            "id": "nvidia/llama-nemotron-embed-vl-1b-v2"
+          }
+        },
+        {
+          "json_pointer": "/7",
+          "value": {
+            "id": "nvidia/llama-nemotron-embed-1b-v2"
+          }
+        },
+        {
+          "json_pointer": "/8",
+          "value": {
+            "id": "nvidia/llama-embed-nemotron-8b"
+          }
+        },
+        {
+          "json_pointer": "/9",
+          "value": {
+            "id": "nvidia/omni-embed-nemotron-3b"
+          }
+        },
+        {
+          "json_pointer": "/10",
+          "value": {
+            "id": "nvidia/NV-EmbedCode-7b-v1"
+          }
+        },
+        {
+          "json_pointer": "/11",
+          "value": {
+            "id": "nvidia/Cosmos-Embed1-448p"
+          }
+        },
+        {
+          "json_pointer": "/12",
+          "value": {
+            "id": "nvidia/Cosmos-Embed1-336p"
+          }
+        },
+        {
+          "json_pointer": "/13",
+          "value": {
+            "id": "nvidia/Cosmos-Embed1-224p"
+          }
+        },
+        {
+          "json_pointer": "/14",
+          "value": {
+            "id": "nvidia/MM-Embed"
+          }
+        },
+        {
+          "json_pointer": "/15",
+          "value": {
+            "id": "nvidia/NV-Embed-v2"
+          }
+        },
+        {
+          "json_pointer": "/16",
+          "value": {
+            "id": "nvidia/NV-Embed-v1"
+          }
+        }
+      ]
+    },
+    {
+      "i": 5,
+      "url": "https://huggingface.co/ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF/blob/a02f48bb4f057028298c21fa033da2b30d7742d5/README.md",
+      "fetch_url": "https://huggingface.co/ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF/raw/a02f48bb4f057028298c21fa033da2b30d7742d5/README.md",
+      "capture": "source-05.raw",
+      "sha256": "5538c6bce0ab02f680fd0f17ab538e2acfb06fd51376d64ce218edf09c855bfb",
+      "bytes": 540,
+      "read_date": "2026-10-15",
+      "excerpts": []
+    },
+    {
+      "i": 6,
+      "url": "https://github.com/tobi/qmd/blob/93d211f9ef4a869a9aed0d075ca767dda552627f/src/llm.ts",
+      "fetch_url": "https://raw.githubusercontent.com/tobi/qmd/93d211f9ef4a869a9aed0d075ca767dda552627f/src/llm.ts",
+      "capture": "source-06.raw",
+      "sha256": "3a06fe70cc6c6a56c12aa711af4b17fef207fad1b268b9761376b2d55db4bada",
+      "bytes": 80403,
+      "read_date": "2026-10-15",
+      "excerpts": [
+        {
+          "line": 283,
+          "text": "const DEFAULT_RERANK_MODEL = \"hf:ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF/qwen3-reranker-0.6b-q8_0.gguf\";"
+        },
+        {
+          "line": 284,
+          "text": "// const DEFAULT_GENERATE_MODEL = \"hf:ggml-org/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q8_0.gguf\";"
+        },
+        {
+          "line": 285,
+          "text": "const DEFAULT_GENERATE_MODEL = \"hf:tobil/qmd-query-expansion-1.7B-gguf/qmd-query-expansion-1.7B-q4_k_m.gguf\";"
+        }
+      ]
+    },
+    {
+      "i": 7,
+      "url": "https://huggingface.co/Horizon-Labs/multilingual-reranker-base/blob/1302619c8478dd630e06a934d4064ae345a7d0da/README.md",
+      "fetch_url": "https://huggingface.co/Horizon-Labs/multilingual-reranker-base/raw/1302619c8478dd630e06a934d4064ae345a7d0da/README.md",
+      "capture": "source-07.raw",
+      "sha256": "cfb1fe0af8396da2c95f4a264725b58b0561a02d89644cbb36fe08336827f975",
+      "bytes": 9844,
+      "read_date": "2026-10-15",
+      "excerpts": []
+    },
+    {
+      "i": 8,
+      "url": "https://huggingface.co/americansquid/Qwen3-Reranker-4B-Q4_K_M-GGUF/blob/bde5202b1001731471f8e4bbda0f4c6315859904/README.md",
+      "fetch_url": "https://huggingface.co/americansquid/Qwen3-Reranker-4B-Q4_K_M-GGUF/raw/bde5202b1001731471f8e4bbda0f4c6315859904/README.md",
+      "capture": "source-08.raw",
+      "sha256": "f4c3f8c2c240fe654eb1cd97956928779b8fd1ef4076087532aae30216bbfd82",
+      "bytes": 1847,
+      "read_date": "2026-10-15",
+      "excerpts": []
+    },
+    {
+      "i": 9,
+      "url": "https://huggingface.co/jinaai/jina-reranker-v3.5/blob/e8a93f33f0b22108f8c2364f8484ce3422552fbc/README.md",
+      "fetch_url": "https://huggingface.co/jinaai/jina-reranker-v3.5/raw/e8a93f33f0b22108f8c2364f8484ce3422552fbc/README.md",
+      "capture": "source-09.raw",
+      "sha256": "da4fd1e360aef1139a5e0dc12cee19093e1fb7958a46682df062430a2a990ffc",
+      "bytes": 6678,
+      "read_date": "2026-10-15",
+      "excerpts": []
+    },
+    {
+      "i": 10,
+      "url": "https://huggingface.co/tobil/qmd-query-expansion-1.7B-gguf/blob/7816de0b72572c6c860ca1eddf97ba9e7fb8cc65/README.md",
+      "fetch_url": "https://huggingface.co/tobil/qmd-query-expansion-1.7B-gguf/raw/7816de0b72572c6c860ca1eddf97ba9e7fb8cc65/README.md",
+      "capture": "source-10.raw",
+      "sha256": "c5e987383b9b475a2e0ea020852f8468b4e40a58bc2c22bf71c8c961385d58d2",
+      "bytes": 9755,
+      "read_date": "2026-10-15",
+      "excerpts": [
+        {
+          "line": 23,
+          "text": "lex: authentication configuration"
+        },
+        {
+          "line": 24,
+          "text": "lex: auth settings setup"
+        },
+        {
+          "line": 25,
+          "text": "vec: how to configure authentication settings"
+        },
+        {
+          "line": 26,
+          "text": "vec: authentication configuration options"
+        },
+        {
+          "line": 27,
+          "text": "hyde: Authentication can be configured by setting the AUTH_SECRET environment variable."
+        },
+        {
+          "line": 31,
+          "text": "- **`lex:`** lines go to BM25 full-text search (short, keyword-focused)"
+        },
+        {
+          "line": 32,
+          "text": "- **`vec:`** lines go to vector similarity search (natural language phrases)"
+        },
+        {
+          "line": 33,
+          "text": "- **`hyde:`** is a hypothetical document passage for embedding-based retrieval ([HyDE](https://arxiv.org/abs/2212.10496) technique)"
+        }
+      ]
+    },
+    {
+      "i": 11,
+      "url": "https://huggingface.co/langleu/qmd-query-expansion-lfm2.5-1.2b-base-v2/blob/c7ba4b9bb5c9cd6e0e493bf4d96e1d4a5e1367dc/README.md",
+      "fetch_url": "https://huggingface.co/langleu/qmd-query-expansion-lfm2.5-1.2b-base-v2/raw/c7ba4b9bb5c9cd6e0e493bf4d96e1d4a5e1367dc/README.md",
+      "capture": "source-11.raw",
+      "sha256": "55a9db29ceb288c38257365989395948eaa893c0eaeabd0f3eefc7a339f02221",
+      "bytes": 4830,
+      "read_date": "2026-10-15",
+      "excerpts": [
+        {
+          "line": 59,
+          "text": "Each emitted line begins with `lex:`, `vec:`, or `hyde:`."
+        }
+      ]
+    },
+    {
+      "i": 12,
+      "url": "https://huggingface.co/tobil/qmd-query-expansion-0.6B-gguf/raw/main/README.md",
+      "fetch_url": "https://huggingface.co/tobil/qmd-query-expansion-0.6B-gguf/raw/main/README.md",
+      "capture": "source-12.raw",
+      "sha256": "d4fa02e8e0a234bfb769edf2af17d8765bf9b73267505dd053f5a7381ccc29fb",
+      "bytes": 458,
+      "read_date": "2026-10-15",
+      "excerpts": []
+    },
+    {
+      "i": 13,
+      "url": "https://huggingface.co/models?author=tobil&search=query-expansion&sort=created",
+      "fetch_url": "https://huggingface.co/api/models?author=tobil&search=query-expansion&sort=createdAt&direction=-1&limit=20",
+      "capture": "source-13.raw",
+      "sha256": "221af6cd9578035027b578a1f02942f5259676faa8a2da0a7c1f4613520853df",
+      "bytes": 4538,
+      "read_date": "2026-10-15",
+      "excerpts": [
+        {
+          "json_pointer": "/0",
+          "value": {
+            "id": "tobil/qmd-query-expansion-0.6B-sft-improved"
+          }
+        },
+        {
+          "json_pointer": "/1",
+          "value": {
+            "id": "tobil/qmd-query-expansion-0.6B-grpo-improved"
+          }
+        },
+        {
+          "json_pointer": "/2",
+          "value": {
+            "id": "tobil/qmd-query-expansion-1.7B-v2"
+          }
+        },
+        {
+          "json_pointer": "/3",
+          "value": {
+            "id": "tobil/qmd-query-expansion-qwen3.5-0.8B-sft"
+          }
+        },
+        {
+          "json_pointer": "/4",
+          "value": {
+            "id": "tobil/qmd-query-expansion-0.6B-gguf"
+          }
+        },
+        {
+          "json_pointer": "/5",
+          "value": {
+            "id": "tobil/qmd-query-expansion-evals"
+          }
+        },
+        {
+          "json_pointer": "/6",
+          "value": {
+            "id": "tobil/qmd-query-expansion-0.6B-sft"
+          }
+        },
+        {
+          "json_pointer": "/7",
+          "value": {
+            "id": "tobil/qmd-query-expansion-qwen3.5-2B"
+          }
+        },
+        {
+          "json_pointer": "/8",
+          "value": {
+            "id": "tobil/qmd-query-expansion-1.7B-gguf"
+          }
+        },
+        {
+          "json_pointer": "/9",
+          "value": {
+            "id": "tobil/qmd-query-expansion-1.7B-grpo"
+          }
+        },
+        {
+          "json_pointer": "/10",
+          "value": {
+            "id": "tobil/qmd-query-expansion-1.7B-sft"
+          }
+        },
+        {
+          "json_pointer": "/11",
+          "value": {
+            "id": "tobil/qmd-query-expansion-1.7B"
+          }
+        }
+      ]
+    },
+    {
+      "i": 14,
+      "url": "https://huggingface.co/minishlab/potion-code-16M-v2/blob/e9d2a44ca6a05ac6685f3b23709ea57eb7352d5b/README.md",
+      "fetch_url": "https://huggingface.co/minishlab/potion-code-16M-v2/raw/e9d2a44ca6a05ac6685f3b23709ea57eb7352d5b/README.md",
+      "capture": "source-14.raw",
+      "sha256": "835e4161a3942cd5284d423dbdb4ca69024b671436273142d7512153e770794c",
+      "bytes": 5301,
+      "read_date": "2026-10-15",
+      "excerpts": [
+        {
+          "line": 42,
+          "text": "model = StaticModel.from_pretrained(\"minishlab/potion-code-16M-v2\")"
+        }
+      ]
+    },
+    {
+      "i": 15,
+      "url": "https://huggingface.co/Takara-DS1/miru-codev3-tokenlearn/blob/56cfb2cb71f8d34b9f8c889a8a3206c418b8c471/README.md",
+      "fetch_url": "https://huggingface.co/Takara-DS1/miru-codev3-tokenlearn/raw/56cfb2cb71f8d34b9f8c889a8a3206c418b8c471/README.md",
+      "capture": "source-15.raw",
+      "sha256": "a5687543db47c64ae6000b3ad079e2604d76846a679c53ab7decf747d035d3c3",
+      "bytes": 3415,
+      "read_date": "2026-10-15",
+      "excerpts": [
+        {
+          "line": 127,
+          "text": "model = StaticModel.from_pretrained(\"Takara-DS1/miru-codev3-tokenlearn\")"
+        }
+      ]
+    },
+    {
+      "i": 16,
+      "url": "https://huggingface.co/Takara-DS1/miru-codev3-dual/blob/44af3347572c9bc0bf0dcd54ea0a8cec6b4e6cb8/README.md",
+      "fetch_url": "https://huggingface.co/Takara-DS1/miru-codev3-dual/raw/44af3347572c9bc0bf0dcd54ea0a8cec6b4e6cb8/README.md",
+      "capture": "source-16.raw",
+      "sha256": "777b7dee21081c5b007e2c81135ef2b05322007a9990bcc25839bb2b84c4acad",
+      "bytes": 10078,
+      "read_date": "2026-10-15",
+      "excerpts": [
+        {
+          "line": 338,
+          "text": "from dual_encode import DualConcatEncoder"
+        },
+        {
+          "line": 340,
+          "text": "enc = DualConcatEncoder.from_pretrained(\"Takara-DS1/miru-codev3-dual\")"
+        }
+      ]
+    },
+    {
+      "i": 17,
+      "url": "https://huggingface.co/models?author=minishlab&search=code&sort=created",
+      "fetch_url": "https://huggingface.co/api/models?author=minishlab&search=code&sort=createdAt&direction=-1&limit=20",
+      "capture": "source-17.raw",
+      "sha256": "63a7537ac98e066f98076f2c5c67a238fd6db85d479ed30388e5ace867d88388",
+      "bytes": 1367,
+      "read_date": "2026-10-15",
+      "excerpts": [
+        {
+          "json_pointer": "/0",
+          "value": {
+            "id": "minishlab/potion-code-16M-v2"
+          }
+        },
+        {
+          "json_pointer": "/1",
+          "value": {
+            "id": "minishlab/potion-code-16M"
+          }
+        }
+      ]
+    },
+    {
+      "i": 18,
+      "url": "https://huggingface.co/jinzhenj/MinerU2.5-Pro-2605-1.2B-GGUF/tree/9185688a0495e1577d521a757c7c0b62dd38ca48",
+      "fetch_url": "https://huggingface.co/api/models/jinzhenj/MinerU2.5-Pro-2605-1.2B-GGUF/revision/9185688a0495e1577d521a757c7c0b62dd38ca48",
+      "capture": "source-18.raw",
+      "sha256": "f266ea9893dd059d3281814b5784dcd9eed32765216835241a6c95ba2b0a823f",
+      "bytes": 1817,
+      "read_date": "2026-10-15",
+      "excerpts": [
+        {
+          "json_pointer": "/",
+          "value": {
+            "id": "jinzhenj/MinerU2.5-Pro-2605-1.2B-GGUF",
+            "sha": "9185688a0495e1577d521a757c7c0b62dd38ca48",
+            "lastModified": "2026-08-13T06:12:43.000Z",
+            "siblings": [
+              {
+                "rfilename": ".gitattributes"
+              },
+              {
+                "rfilename": "MinerU2.5-Pro-2605-1.2B-Q8_0.gguf"
+              },
+              {
+                "rfilename": "mmproj-MinerU2.5-Pro-2605-1.2B-Q8_0.gguf"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "i": 19,
+      "url": "https://github.com/opendatalab/MinerU/blob/b7f3dd0c5f6e6d66a298239ffd02b328b873918e/mineru/model/registry.py",
+      "fetch_url": "https://raw.githubusercontent.com/opendatalab/MinerU/b7f3dd0c5f6e6d66a298239ffd02b328b873918e/mineru/model/registry.py",
+      "capture": "source-19.raw",
+      "sha256": "fdee44ee20f759c6ce775c40a0415f17327a974bfa3cbfd821ee5b83a52374b0",
+      "bytes": 6384,
+      "read_date": "2026-10-15",
+      "excerpts": [
+        {
+          "line": 67,
+          "text": "MINERU_2_5_PRO_2605_1_2B_GGUF = ModelRepo("
+        },
+        {
+          "line": 75,
+          "text": "        \"mmproj\": \"mmproj-MinerU2.5-Pro-2605-1.2B-Q8_0.gguf\","
+        },
+        {
+          "line": 83,
+          "text": "    MINERU_2_5_PRO_2605_1_2B_GGUF,"
+        },
+        {
+          "line": 94,
+          "text": "    \"llama-cpp\": MINERU_2_5_PRO_2605_1_2B_GGUF,"
+        },
+        {
+          "line": 163,
+          "text": "    \"MINERU_2_5_PRO_2605_1_2B_GGUF\","
+        }
+      ]
+    },
+    {
+      "i": 20,
+      "url": "https://huggingface.co/aeddix-labs/aeddix-alpine-ocr/blob/69d0b125ccbb1a7ec926116264ed2d968794ebfe/README.md",
+      "fetch_url": "https://huggingface.co/aeddix-labs/aeddix-alpine-ocr/raw/69d0b125ccbb1a7ec926116264ed2d968794ebfe/README.md",
+      "capture": "source-20.raw",
+      "sha256": "91ecd707b0a6dbbff824625c63bc5d0dd7a44b91201c65a5c6c3f11d52e687e0",
+      "bytes": 18718,
+      "read_date": "2026-10-15",
+      "excerpts": []
+    },
+    {
+      "i": 21,
+      "url": "https://huggingface.co/opendatalab/MinerU2.5-Pro-2605-1.2B/raw/main/README.md",
+      "fetch_url": "https://huggingface.co/opendatalab/MinerU2.5-Pro-2605-1.2B/raw/main/README.md",
+      "capture": "source-21.raw",
+      "sha256": "8f829b69be518375b02023f795b3898adec98f5ac37208239884ad88e9a21cb7",
+      "bytes": 15571,
+      "read_date": "2026-10-15",
+      "excerpts": []
+    },
+    {
+      "i": 22,
+      "url": "https://huggingface.co/models?author=opendatalab&search=MinerU&sort=created",
+      "fetch_url": "https://huggingface.co/api/models?author=opendatalab&search=MinerU&sort=createdAt&direction=-1&limit=20",
+      "capture": "source-22.raw",
+      "sha256": "58c8e4da488770b38349085e27af5cf03de49c8acebe7c49ce76755b2115be39",
+      "bytes": 3730,
+      "read_date": "2026-10-15",
+      "excerpts": [
+        {
+          "json_pointer": "/0",
+          "value": {
+            "id": "opendatalab/MinerU-4_models_onnx"
+          }
+        },
+        {
+          "json_pointer": "/1",
+          "value": {
+            "id": "opendatalab/MinerU-4_models_torch"
+          }
+        },
+        {
+          "json_pointer": "/2",
+          "value": {
+            "id": "opendatalab/MinerU2.5-Pro-2605-1.2B"
+          }
+        },
+        {
+          "json_pointer": "/3",
+          "value": {
+            "id": "opendatalab/MinerU2.5-Pro-2604-1.2B"
+          }
+        },
+        {
+          "json_pointer": "/4",
+          "value": {
+            "id": "opendatalab/MinerU-Diffusion-V1-0320-2.5B"
+          }
+        },
+        {
+          "json_pointer": "/5",
+          "value": {
+            "id": "opendatalab/MinerU-HTML-v1.1-hunyuan0.5B-compact"
+          }
+        },
+        {
+          "json_pointer": "/6",
+          "value": {
+            "id": "opendatalab/MinerU-HTML"
+          }
+        },
+        {
+          "json_pointer": "/7",
+          "value": {
+            "id": "opendatalab/MinerU2.5-2509-1.2B"
+          }
+        },
+        {
+          "json_pointer": "/8",
+          "value": {
+            "id": "opendatalab/MinerU2.0-2505-0.9B"
+          }
+        }
+      ]
+    },
+    {
+      "i": 23,
+      "url": "https://huggingface.co/chopratejas/kompress-v2-base/blob/e00cc5e60ff73b01674ef8fa6da6c5acf6d54181/README.md",
+      "fetch_url": "https://huggingface.co/chopratejas/kompress-v2-base/raw/e00cc5e60ff73b01674ef8fa6da6c5acf6d54181/README.md",
+      "capture": "source-23.raw",
+      "sha256": "1fe01cb31ad612b26574e39b576b6e433875d01e41a7857bbd29206449b81710",
+      "bytes": 8376,
+      "read_date": "2026-10-15",
+      "excerpts": [
+        {
+          "line": 33,
+          "text": "Headroom's proxy loads `onnx/kompress-int8-wo.onnx` from this repo and runs it"
+        },
+        {
+          "line": 139,
+          "text": "| `onnx/kompress-int8-wo.onnx` | 274 MB | weight-only int8 (MatMulNBits), the default artifact; needs `onnxruntime>=1.24` |"
+        },
+        {
+          "line": 143,
+          "text": "`int8-wo` first and falls back to `fp32` on runtimes without the 8-bit kernel."
+        },
+        {
+          "line": 151,
+          "text": "onnx/kompress-int8-wo.onnx  # weight-only int8, Headroom's default artifact"
+        },
+        {
+          "line": 158,
+          "text": "tokenizer.json              # answerdotai/ModernBERT-base tokenizer"
+        }
+      ]
+    },
+    {
+      "i": 24,
+      "url": "https://pypi.org/project/headroom-ai/0.40.0/",
+      "fetch_url": "https://pypi.org/pypi/headroom-ai/0.40.0/json",
+      "capture": "source-24.raw",
+      "sha256": "2fcab77833d85a5d621fe17c21a67dc93c3ab7d822650b19eaa169c70bbfbbac",
+      "bytes": 47009,
+      "read_date": "2026-10-15",
+      "excerpts": [
+        {
+          "json_pointer": "/info/version",
+          "value": "0.40.0"
+        },
+        {
+          "json_pointer": "/urls",
+          "value": [
+            {
+              "filename": "headroom_ai-0.40.0-cp310-abi3-macosx_10_12_x86_64.whl",
+              "sha256": "b7320996ea165bee1cbf250402b4d88dfd4b30abbe148664986e41b0ae09ca07",
+              "upload_time": "2026-10-06T03:15:49.347418Z",
+              "yanked": false
+            },
+            {
+              "filename": "headroom_ai-0.40.0-cp310-abi3-macosx_11_0_arm64.whl",
+              "sha256": "f7b0186ad5e76d5c8f75e5de6c57e001637258ead75481575ccca4d57557f5fb",
+              "upload_time": "2026-10-06T03:15:52.206081Z",
+              "yanked": false
+            },
+            {
+              "filename": "headroom_ai-0.40.0-cp310-abi3-manylinux_2_28_aarch64.whl",
+              "sha256": "140811066bfb7afe888f471be4a587375779af9de8dd76bb9a8126b52b8e930f",
+              "upload_time": "2026-10-06T03:15:54.920123Z",
+              "yanked": false
+            },
+            {
+              "filename": "headroom_ai-0.40.0-cp310-abi3-manylinux_2_28_x86_64.whl",
+              "sha256": "49b6d8a01c8eceb5b9e9a675720ed5e4cb24e467282642653aac7f2fd8faf47f",
+              "upload_time": "2026-10-06T03:15:57.540323Z",
+              "yanked": false
+            },
+            {
+              "filename": "headroom_ai-0.40.0-cp310-abi3-win_amd64.whl",
+              "sha256": "a803a60d90ec74806c02df1eb5d5e063af8a7aa3977c6aa7559693817490d193",
+              "upload_time": "2026-10-06T03:16:00.233394Z",
+              "yanked": false
+            },
+            {
+              "filename": "headroom_ai-0.40.0.tar.gz",
+              "sha256": "19403478224ae30e2599865de743051d0138f0e5d68d78418643c6f1f7892593",
+              "upload_time": "2026-10-06T03:16:02.166419Z",
+              "yanked": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "i": 25,
+      "url": "https://huggingface.co/api/models/chopratejas/kompress-v2-base/tree/e00cc5e60ff73b01674ef8fa6da6c5acf6d54181/onnx?expand=true",
+      "fetch_url": "https://huggingface.co/api/models/chopratejas/kompress-v2-base/tree/e00cc5e60ff73b01674ef8fa6da6c5acf6d54181/onnx?expand=true",
+      "capture": "source-25.raw",
+      "sha256": "5bf3d04020a3e20b5ec3048d5c5b4224a35153133f7d123915ff100e978da86f",
+      "bytes": 2760,
+      "read_date": "2026-10-15",
+      "excerpts": [
+        {
+          "json_pointer": "/0",
+          "value": {
+            "path": "onnx/kompress-fp32.onnx",
+            "type": "file",
+            "size": 600561247,
+            "lfs": {
+              "oid": "0f6758d903b5b5b90f784b7f17b599277f040a3c268afb88c193fe5bb9c08649",
+              "size": 600561247,
+              "pointerSize": 134
+            },
+            "lastCommit": {
+              "id": "036cad5df6af156a8915a81219a2a8f1bf33307c",
+              "title": "Add fp32 ONNX export for Headroom lightweight (no-torch) path",
+              "date": "2026-06-10T03:05:53.000Z"
+            }
+          }
+        },
+        {
+          "json_pointer": "/1",
+          "value": {
+            "path": "onnx/kompress-int8-wo.onnx",
+            "type": "file",
+            "size": 274049435,
+            "lfs": {
+              "oid": "c47ddd764dec5cf91fd1f10cf69e5538dd2a49d913828da7f6a993931cc7904f",
+              "size": 274049435,
+              "pointerSize": 134
+            },
+            "lastCommit": {
+              "id": "b1563631b35bfdcee37587ad530147497d820d4c",
+              "title": "Add weight-only int8 ONNX (eval on dataset_v2/test n=500: f1=0.9130 must_keep_recall=0.9765 keep_rate=0.8097, fp32 agreement 99.6%)",
+              "date": "2026-06-10T05:35:23.000Z"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "i": 26,
+      "url": "https://huggingface.co/api/models/chopratejas/kompress-v2-base/tree/b1563631b35bfdcee37587ad530147497d820d4c/onnx?expand=true",
+      "fetch_url": "https://huggingface.co/api/models/chopratejas/kompress-v2-base/tree/b1563631b35bfdcee37587ad530147497d820d4c/onnx?expand=true",
+      "capture": "source-26.raw",
+      "sha256": "da3e4d624b63af852fc8572c1eaa2bcfbfdfb6394b9c6a70299fc46c901928ed",
+      "bytes": 2760,
+      "read_date": "2026-10-15",
+      "excerpts": [
+        {
+          "json_pointer": "/0",
+          "value": {
+            "path": "onnx/kompress-fp32.onnx",
+            "type": "file",
+            "size": 600561247,
+            "lfs": {
+              "oid": "0f6758d903b5b5b90f784b7f17b599277f040a3c268afb88c193fe5bb9c08649",
+              "size": 600561247,
+              "pointerSize": 134
+            },
+            "lastCommit": {
+              "id": "036cad5df6af156a8915a81219a2a8f1bf33307c",
+              "title": "Add fp32 ONNX export for Headroom lightweight (no-torch) path",
+              "date": "2026-06-10T03:05:53.000Z"
+            }
+          }
+        },
+        {
+          "json_pointer": "/1",
+          "value": {
+            "path": "onnx/kompress-int8-wo.onnx",
+            "type": "file",
+            "size": 274049435,
+            "lfs": {
+              "oid": "c47ddd764dec5cf91fd1f10cf69e5538dd2a49d913828da7f6a993931cc7904f",
+              "size": 274049435,
+              "pointerSize": 134
+            },
+            "lastCommit": {
+              "id": "b1563631b35bfdcee37587ad530147497d820d4c",
+              "title": "Add weight-only int8 ONNX (eval on dataset_v2/test n=500: f1=0.9130 must_keep_recall=0.9765 keep_rate=0.8097, fp32 agreement 99.6%)",
+              "date": "2026-06-10T05:35:23.000Z"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "i": 27,
+      "url": "https://huggingface.co/models?author=chopratejas&search=kompress&sort=created",
+      "fetch_url": "https://huggingface.co/api/models?author=chopratejas&search=kompress&sort=createdAt&direction=-1&limit=20",
+      "capture": "source-27.raw",
+      "sha256": "d35c2285deedce0c840a7d3fe54b292689917da276f1bd1910f8c5953df30a20",
+      "bytes": 1580,
+      "read_date": "2026-10-15",
+      "excerpts": [
+        {
+          "json_pointer": "/0",
+          "value": {
+            "id": "chopratejas/kompress-v2-base"
+          }
+        },
+        {
+          "json_pointer": "/1",
+          "value": {
+            "id": "chopratejas/kompress-small"
+          }
+        },
+        {
+          "json_pointer": "/2",
+          "value": {
+            "id": "chopratejas/kompress-base"
+          }
+        }
+      ]
+    },
+    {
+      "i": 28,
+      "url": "https://pypi.org/project/headroom-ai/0.41.0/",
+      "fetch_url": "https://pypi.org/pypi/headroom-ai/0.41.0/json",
+      "capture": "source-28.raw",
+      "sha256": "2db18eda599b18ca3d98636c0dbda0c6e0e241c7bb47176e27c43efaf41ea7ce",
+      "bytes": 49802,
+      "read_date": "2026-10-15",
+      "excerpts": [
+        {
+          "json_pointer": "/info/version",
+          "value": "0.41.0"
+        },
+        {
+          "json_pointer": "/urls",
+          "value": [
+            {
+              "filename": "headroom_ai-0.41.0-cp310-abi3-macosx_10_12_x86_64.whl",
+              "sha256": "7e48d3896846558aeb1d84be82469be5be8bb7efbd65601ea0650524460b067f",
+              "upload_time": "2026-10-14T23:03:59.831945Z",
+              "yanked": false
+            },
+            {
+              "filename": "headroom_ai-0.41.0-cp310-abi3-macosx_11_0_arm64.whl",
+              "sha256": "b842d36e161f9f0d1fc4d56de1d870e22a3e4d05c94d2272d9a306b38f406242",
+              "upload_time": "2026-10-14T23:04:03.357554Z",
+              "yanked": false
+            },
+            {
+              "filename": "headroom_ai-0.41.0-cp310-abi3-manylinux_2_28_aarch64.whl",
+              "sha256": "04631aac0082605888594669bf0e983736321307c8c7f5306768e72d606a65ae",
+              "upload_time": "2026-10-14T23:04:06.357269Z",
+              "yanked": false
+            },
+            {
+              "filename": "headroom_ai-0.41.0-cp310-abi3-manylinux_2_28_x86_64.whl",
+              "sha256": "f4db5e5119a73af3ed952b1c10caff2430831d899eb17d995a27574ae6e6b306",
+              "upload_time": "2026-10-14T23:04:09.218406Z",
+              "yanked": false
+            },
+            {
+              "filename": "headroom_ai-0.41.0-cp310-abi3-win_amd64.whl",
+              "sha256": "18b43230c4dbbe9889fdb0863a7943059f4509fdf49ad20b19be394f2725db18",
+              "upload_time": "2026-10-14T23:04:13.456201Z",
+              "yanked": false
+            },
+            {
+              "filename": "headroom_ai-0.41.0.tar.gz",
+              "sha256": "b24e6b33becfa767d7b82bce02b9ca06f05ce2a3daf1392f8e591947a9c5bf28",
+              "upload_time": "2026-10-14T23:04:16.511316Z",
+              "yanked": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "i": 29,
+      "url": "https://github.com/headroomlabs-ai/headroom/blob/v0.41.0/headroom/transforms/kompress_compressor.py#L47",
+      "fetch_url": "https://raw.githubusercontent.com/headroomlabs-ai/headroom/v0.41.0/headroom/transforms/kompress_compressor.py",
+      "capture": "source-29.raw",
+      "sha256": "3446a8446723d65a3799dcdf77025572007ffb4948d62f7953edf3d5bc065c8f",
+      "bytes": 109294,
+      "read_date": "2026-10-15",
+      "excerpts": [
+        {
+          "line": 47,
+          "text": "HF_MODEL_ID = \"chopratejas/kompress-v2-base\""
+        },
+        {
+          "line": 158,
+          "text": "# - kompress-int8-wo.onnx: weight-only int8 (MatMulNBits), 261MB. Evaluated on"
+        },
+        {
+          "line": 169,
+          "text": "    \"onnx/kompress-int8-wo.onnx\","
+        },
+        {
+          "line": 944,
+          "text": "    (``onnx_runtime._PINNED_REVISIONS``): the ONNX export was produced against"
+        }
+      ]
+    },
+    {
+      "i": 30,
+      "url": "https://github.com/headroomlabs-ai/headroom/blob/v0.41.0/headroom/onnx_runtime.py#L73-L79",
+      "fetch_url": "https://raw.githubusercontent.com/headroomlabs-ai/headroom/v0.41.0/headroom/onnx_runtime.py",
+      "capture": "source-30.raw",
+      "sha256": "0e76d79044f889585b8798ef8c10648893f578a7e3105a83d0c821b51a4ffb89",
+      "bytes": 13181,
+      "read_date": "2026-10-15",
+      "excerpts": [
+        {
+          "line": 73,
+          "text": "_PINNED_REVISIONS: dict[str, str] = {"
+        },
+        {
+          "line": 75,
+          "text": "    \"chopratejas/kompress-v2-base\": \"b1563631b35bfdcee37587ad530147497d820d4c\","
+        },
+        {
+          "line": 79,
+          "text": "    \"answerdotai/ModernBERT-base\": \"8949b909ec900327062f0ebf497f51aef5e6f0c8\","
+        },
+        {
+          "line": 94,
+          "text": "    return _PINNED_REVISIONS.get(repo_id)"
+        },
+        {
+          "line": 119,
+          "text": "            ``_PINNED_REVISIONS``) for supply-chain integrity; unknown repos use"
+        }
+      ]
+    },
+    {
+      "i": 31,
+      "url": "https://github.com/headroomlabs-ai/headroom/blob/v0.40.0/headroom/onnx_runtime.py#L73-L79",
+      "fetch_url": "https://raw.githubusercontent.com/headroomlabs-ai/headroom/v0.40.0/headroom/onnx_runtime.py",
+      "capture": "source-31.raw",
+      "sha256": "0e76d79044f889585b8798ef8c10648893f578a7e3105a83d0c821b51a4ffb89",
+      "bytes": 13181,
+      "read_date": "2026-10-15",
+      "excerpts": [
+        {
+          "line": 73,
+          "text": "_PINNED_REVISIONS: dict[str, str] = {"
+        },
+        {
+          "line": 75,
+          "text": "    \"chopratejas/kompress-v2-base\": \"b1563631b35bfdcee37587ad530147497d820d4c\","
+        },
+        {
+          "line": 79,
+          "text": "    \"answerdotai/ModernBERT-base\": \"8949b909ec900327062f0ebf497f51aef5e6f0c8\","
+        },
+        {
+          "line": 94,
+          "text": "    return _PINNED_REVISIONS.get(repo_id)"
+        },
+        {
+          "line": 119,
+          "text": "            ``_PINNED_REVISIONS``) for supply-chain integrity; unknown repos use"
+        }
+      ]
+    },
+    {
+      "i": 32,
+      "url": "https://huggingface.co/answerdotai/ModernBERT-base/blob/8949b909ec900327062f0ebf497f51aef5e6f0c8/tokenizer_config.json",
+      "fetch_url": "https://huggingface.co/answerdotai/ModernBERT-base/raw/8949b909ec900327062f0ebf497f51aef5e6f0c8/tokenizer_config.json",
+      "capture": "source-32.raw",
+      "sha256": "3cd2017ff46d0a527e5d39cae39272eccfa1f19bb9f89b05d166aab2e38354e2",
+      "bytes": 20810,
+      "read_date": "2026-10-15",
+      "excerpts": []
+    },
+    {
+      "i": 33,
+      "url": "https://huggingface.co/answerdotai/ModernBERT-base/blob/8949b909ec900327062f0ebf497f51aef5e6f0c8/README.md",
+      "fetch_url": "https://huggingface.co/answerdotai/ModernBERT-base/raw/8949b909ec900327062f0ebf497f51aef5e6f0c8/README.md",
+      "capture": "source-33.raw",
+      "sha256": "40539466fa1117be4693b8f1fdfdac81fac3c5db472ff57bc05d013d48eafa82",
+      "bytes": 8427,
+      "read_date": "2026-10-15",
+      "excerpts": []
+    },
+    {
+      "i": 34,
+      "url": "https://github.com/google/magika/blob/b1909890d4477d34381ce12b31882e9a197706d8/assets/models/CHANGELOG.md",
+      "fetch_url": "https://raw.githubusercontent.com/google/magika/b1909890d4477d34381ce12b31882e9a197706d8/assets/models/CHANGELOG.md",
+      "capture": "source-34.raw",
+      "sha256": "d4200ae328bb63e4f9e10bfbb878fd67307f5a409da82995ddd5621e28232981",
+      "bytes": 2391,
+      "read_date": "2026-10-15",
+      "excerpts": [
+        {
+          "line": 7,
+          "text": "## `standard_v3_3` - 2025-04-11"
+        },
+        {
+          "line": 9,
+          "text": "- [216 possible tool's outputs](./standard_v3_3/README.md), ~99% average accuracy, ~2ms inference speed."
+        }
+      ]
+    },
+    {
+      "i": 35,
+      "url": "https://github.com/google/magika/tree/b1909890d4477d34381ce12b31882e9a197706d8/assets/models",
+      "fetch_url": "https://api.github.com/repos/google/magika/contents/assets/models?ref=b1909890d4477d34381ce12b31882e9a197706d8",
+      "capture": "source-35.raw",
+      "sha256": "e46c88316d25c1618cd7634b1c8067733bbd87185c424d94e5c8bb5563d0b6b9",
+      "bytes": 9772,
+      "read_date": "2026-10-15",
+      "excerpts": [
+        {
+          "json_pointer": "/0",
+          "value": {
+            "sha": "f4004ffc2bf243faf41dfa5013c769d6f3ec5ca7",
+            "path": "assets/models/CHANGELOG.md",
+            "name": "CHANGELOG.md",
+            "type": "file",
+            "size": 2391
+          }
+        },
+        {
+          "json_pointer": "/1",
+          "value": {
+            "sha": "b4f97cff59c0e9964a778c068c1fdf804aed2190",
+            "path": "assets/models/begonly_v2_1",
+            "name": "begonly_v2_1",
+            "type": "dir",
+            "size": 0
+          }
+        },
+        {
+          "json_pointer": "/2",
+          "value": {
+            "sha": "757abc5bad46b242227861203fb8f26e1e1817e5",
+            "path": "assets/models/fast_v2_1",
+            "name": "fast_v2_1",
+            "type": "dir",
+            "size": 0
+          }
+        },
+        {
+          "json_pointer": "/3",
+          "value": {
+            "sha": "89aeae78034c13be0bfce617757a6a4b57d9c0a0",
+            "path": "assets/models/standard_v1",
+            "name": "standard_v1",
+            "type": "dir",
+            "size": 0
+          }
+        },
+        {
+          "json_pointer": "/4",
+          "value": {
+            "sha": "e97ae4597beece79871eb748a3a8d71d8121b82e",
+            "path": "assets/models/standard_v2_0",
+            "name": "standard_v2_0",
+            "type": "dir",
+            "size": 0
+          }
+        },
+        {
+          "json_pointer": "/5",
+          "value": {
+            "sha": "880a2dfe624935f9dbf52a4c213ae62553290fb7",
+            "path": "assets/models/standard_v2_1",
+            "name": "standard_v2_1",
+            "type": "dir",
+            "size": 0
+          }
+        },
+        {
+          "json_pointer": "/6",
+          "value": {
+            "sha": "4042b692b5eca34602a1451a40f584ee1bf9e943",
+            "path": "assets/models/standard_v3_0",
+            "name": "standard_v3_0",
+            "type": "dir",
+            "size": 0
+          }
+        },
+        {
+          "json_pointer": "/7",
+          "value": {
+            "sha": "91452e93a892373d371636d2f73041ce5ae6eec9",
+            "path": "assets/models/standard_v3_1",
+            "name": "standard_v3_1",
+            "type": "dir",
+            "size": 0
+          }
+        },
+        {
+          "json_pointer": "/8",
+          "value": {
+            "sha": "b9040e69b0995ba30f915431a31ebf73d0afd048",
+            "path": "assets/models/standard_v3_2",
+            "name": "standard_v3_2",
+            "type": "dir",
+            "size": 0
+          }
+        },
+        {
+          "json_pointer": "/9",
+          "value": {
+            "sha": "29261f69f7031fe75b7d5a3b51b964d8b131100d",
+            "path": "assets/models/standard_v3_3",
+            "name": "standard_v3_3",
+            "type": "dir",
+            "size": 0
+          }
+        }
+      ]
+    },
+    {
+      "i": 36,
+      "url": "https://pypi.org/project/magika/1.0.3/",
+      "fetch_url": "https://pypi.org/pypi/magika/1.0.3/json",
+      "capture": "source-36.raw",
+      "sha256": "f165e4c4796881421afc0018273cff606f0f1014e01e1fffbff61fe416ad9b8a",
+      "bytes": 15247,
+      "read_date": "2026-10-15",
+      "excerpts": [
+        {
+          "json_pointer": "/info/version",
+          "value": "1.0.3"
+        },
+        {
+          "json_pointer": "/urls",
+          "value": [
+            {
+              "filename": "magika-1.0.3-py3-none-any.whl",
+              "sha256": "938d8e033953f2ddeb8c35dc423aa289ca116bfa7a71a778f6e77460f9025803",
+              "upload_time": "2026-05-04T08:41:45.071953Z",
+              "yanked": false
+            },
+            {
+              "filename": "magika-1.0.3-py3-none-macosx_11_0_arm64.whl",
+              "sha256": "de9af9c96892e610eefc920cca9e71179661d39d9d1d7acc1f28f357bcc8805e",
+              "upload_time": "2026-05-04T08:41:46.734833Z",
+              "yanked": false
+            },
+            {
+              "filename": "magika-1.0.3-py3-none-manylinux_2_28_x86_64.whl",
+              "sha256": "3e9b49134e8116ee40b431664dcbed9e199413efddcce1a173c734b4e0521529",
+              "upload_time": "2026-05-04T08:41:48.763698Z",
+              "yanked": false
+            },
+            {
+              "filename": "magika-1.0.3-py3-none-win_amd64.whl",
+              "sha256": "8a817588c177e81efadf2efa3690bfd46000279fd32e5bfc814776b007ee5d89",
+              "upload_time": "2026-05-04T08:41:50.884097Z",
+              "yanked": false
+            },
+            {
+              "filename": "magika-1.0.3.tar.gz",
+              "sha256": "ad3216012f6dd337be34c23ae3dfab36f0623bc62fbfb329f9a1852c9ad40304",
+              "upload_time": "2026-05-04T08:41:53.124634Z",
+              "yanked": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "i": 37,
+      "url": "https://platform.claude.com/docs/en/about-claude/models/overview",
+      "fetch_url": "https://platform.claude.com/docs/en/about-claude/models/overview.md",
+      "capture": "source-37.raw",
+      "sha256": "02faed97309963e7c90d18a80ff0f6ba7cf6099d46a7cc1b2ac600ceaebac578",
+      "bytes": 19747,
+      "read_date": "2026-10-15",
+      "excerpts": [
+        {
+          "line": 33,
+          "text": "| Claude API ID                                                                                             | `claude-fable-5-1`                                                                | `claude-opus-5-5`                                                               | `claude-sonnet-5-5`                                                                 | `claude-haiku-5-5`                                                                       |"
+        },
+        {
+          "line": 41,
+          "text": "| Claude API alias                                                                                          | `claude-fable-5-1`                                                                | `claude-opus-5-5`                                                               | `claude-sonnet-5-5`                                                                 | `claude-haiku-5-5`                                                                       |"
+        },
+        {
+          "line": 42,
+          "text": "| [Amazon Bedrock ID](https://platform.claude.com/docs/en/build-with-claude/claude-in-amazon-bedrock)       | `anthropic.claude-fable-5-1`                                                      | `anthropic.claude-opus-5-5`                                                     | `anthropic.claude-sonnet-5-5`                                                       | `anthropic.claude-haiku-5-5`                                                             |"
+        },
+        {
+          "line": 43,
+          "text": "| [Google Cloud ID](https://platform.claude.com/docs/en/build-with-claude/claude-on-vertex-ai)              | `claude-fable-5-1`                                                                | `claude-opus-5-5`                                                               | `claude-sonnet-5-5`                                                                 | `claude-haiku-5-5`                                                                       |"
+        },
+        {
+          "line": 44,
+          "text": "| [Microsoft Foundry ID](https://platform.claude.com/docs/en/build-with-claude/claude-in-microsoft-foundry) | `claude-fable-5-1`                                                                | `claude-opus-5-5`                                                               | `claude-sonnet-5-5`                                                                 | `claude-haiku-5-5`                                                                       |"
+        },
+        {
+          "line": 45,
+          "text": "| [Claude Platform on AWS ID](https://platform.claude.com/docs/en/build-with-claude/claude-platform-on-aws) | `claude-fable-5-1`                                                                | `claude-opus-5-5`                                                               | `claude-sonnet-5-5`                                                                 | `claude-haiku-5-5`                                                                       |"
+        }
+      ]
+    },
+    {
+      "i": 38,
+      "url": "https://platform.claude.com/docs/en/models/haiku-4-5/overview",
+      "fetch_url": "https://platform.claude.com/docs/en/models/haiku-4-5/overview.md",
+      "capture": "source-38.raw",
+      "sha256": "bec0ed34119af773736e4ee5897e25cf43b1261a5e63b77b0639fb36814f32e7",
+      "bytes": 13402,
+      "read_date": "2026-10-15",
+      "excerpts": []
+    },
+    {
+      "i": 39,
+      "url": "https://platform.claude.com/docs/en/about-claude/models/model-ids-and-versions",
+      "fetch_url": "https://platform.claude.com/docs/en/about-claude/models/model-ids-and-versions.md",
+      "capture": "source-39.raw",
+      "sha256": "2a2353199b7d09aa111b8287ecab1c6c9649ecadd04835017e8b3a03ea177f03",
+      "bytes": 4032,
+      "read_date": "2026-10-15",
+      "excerpts": []
+    },
+    {
+      "i": 40,
+      "url": "https://www.anthropic.com/news/claude-haiku-4-5",
+      "fetch_url": "https://www.anthropic.com/news/claude-haiku-4-5",
+      "capture": "source-40.raw",
+      "sha256": "6dedc387a81514cce5d88ced033944b14b4f28b36a0369389b75f3a2ac8f63ee",
+      "bytes": 175509,
+      "read_date": "2026-10-15",
+      "excerpts": []
+    },
+    {
+      "i": 41,
+      "url": "https://platform.claude.com/docs/en/models/haiku-5-5/overview",
+      "fetch_url": "https://platform.claude.com/docs/en/models/haiku-5-5/overview.md",
+      "capture": "source-41.raw",
+      "sha256": "855f19b98e70c83526d722a72334bdc6ff4f58366097e465917cb8e6ed3a3b86",
+      "bytes": 14684,
+      "read_date": "2026-10-15",
+      "excerpts": [
+        {
+          "line": 11,
+          "text": "Model ID: `claude-haiku-5-5`"
+        },
+        {
+          "line": 15,
+          "text": "[Announcement](https://www.anthropic.com/claude-haiku-5-5) · [What’s new](https://platform.claude.com/docs/en/models/haiku-5-5/whats-new-haiku-5-5) · [Migration guide](https://platform.claude.com/docs/en/models/haiku-5-5/migration-guide)"
+        },
+        {
+          "line": 21,
+          "text": "For code changes, see the [migration guide](https://platform.claude.com/docs/en/models/haiku-5-5/migration-guide). For model IDs, pricing, and limits, see the [Claude Haiku 5.5 overview](https://platform.claude.com/docs/en/models/haiku-5-5/overview). For prompting guidance, see [Prompting Claude Haiku 5.5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-haiku-5-5)."
+        },
+        {
+          "line": 48,
+          "text": "| Claude API                                                                                             | `claude-haiku-5-5`           |"
+        },
+        {
+          "line": 49,
+          "text": "| [Amazon Bedrock](https://platform.claude.com/docs/en/build-with-claude/claude-in-amazon-bedrock)       | `anthropic.claude-haiku-5-5` |"
+        },
+        {
+          "line": 50,
+          "text": "| [Google Cloud](https://platform.claude.com/docs/en/build-with-claude/claude-on-vertex-ai)              | `claude-haiku-5-5`           |"
+        },
+        {
+          "line": 51,
+          "text": "| [Microsoft Foundry](https://platform.claude.com/docs/en/build-with-claude/claude-in-microsoft-foundry) | `claude-haiku-5-5`           |"
+        },
+        {
+          "line": 52,
+          "text": "| [Claude Platform on AWS](https://platform.claude.com/docs/en/build-with-claude/claude-platform-on-aws) | `claude-haiku-5-5`           |"
+        }
+      ]
+    },
+    {
+      "i": 42,
+      "url": "https://platform.claude.com/docs/en/release-notes/overview",
+      "fetch_url": "https://platform.claude.com/docs/en/release-notes/overview.md",
+      "capture": "source-42.raw",
+      "sha256": "6c6fecbbba21f4066ac02c61c86e960d44350332817b4f85545c166f76a0f807",
+      "bytes": 125473,
+      "read_date": "2026-10-15",
+      "excerpts": []
+    },
+    {
+      "i": 43,
+      "url": "https://platform.claude.com/docs/en/about-claude/model-deprecations",
+      "fetch_url": "https://platform.claude.com/docs/en/about-claude/model-deprecations.md",
+      "capture": "source-43.raw",
+      "sha256": "ad1c50227e13e9d3e194da3cc109db9b18012453059ed792eaae178d2aca206a",
+      "bytes": 14238,
+      "read_date": "2026-10-15",
+      "excerpts": [
+        {
+          "line": 36,
+          "text": "Anthropic notifies customers with active deployments for models with upcoming retirements, providing at least 60 days' notice before model retirement for publicly released models."
+        },
+        {
+          "line": 90,
+          "text": "| claude-haiku-5-5           | Active        | N/A                | Not sooner than October 7, 2027    |"
+        },
+        {
+          "line": 91,
+          "text": "| claude-haiku-4-5-20251001  | Active        | N/A                | Not sooner than October 15, 2026   |"
+        }
+      ]
+    },
+    {
+      "i": 44,
+      "url": "https://platform.claude.com/docs/en/models/haiku-5-5/migration-guide",
+      "fetch_url": "https://platform.claude.com/docs/en/models/haiku-5-5/migration-guide.md",
+      "capture": "source-44.raw",
+      "sha256": "83725c6237d1675659ff3bf568bc8316581e02deb9be94829b1ed81adad9d40f",
+      "bytes": 19755,
+      "read_date": "2026-10-15",
+      "excerpts": [
+        {
+          "line": 15,
+          "text": "  /claude-api migrate this project to claude-haiku-5-5"
+        },
+        {
+          "line": 29,
+          "text": "1. Replace the model ID with the Claude Haiku 5.5 ID for your platform. See [Use the Claude Haiku 5.5 model ID](https://platform.claude.com/docs/en/models/haiku-5-5/migration-guide#use-the-claude-haiku-5-5-model-id)."
+        },
+        {
+          "line": 38,
+          "text": "10. Handle `stop_reason: \"refusal\"`. Claude Haiku 5.5 runs safety classifiers that can decline a request, and it has no server-side fallback. See [Safeguard refusals](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-haiku-5-5#safeguard-refusals)."
+        },
+        {
+          "line": 58,
+          "text": "| Claude API             | `claude-haiku-4-5-20251001` or `claude-haiku-4-5` | `claude-haiku-5-5`           |"
+        },
+        {
+          "line": 59,
+          "text": "| Amazon Bedrock         | `anthropic.claude-haiku-4-5`                      | `anthropic.claude-haiku-5-5` |"
+        },
+        {
+          "line": 60,
+          "text": "| Claude Platform on AWS | `claude-haiku-4-5`                                | `claude-haiku-5-5`           |"
+        },
+        {
+          "line": 61,
+          "text": "| Google Cloud           | `claude-haiku-4-5@20251001`                       | `claude-haiku-5-5`           |"
+        },
+        {
+          "line": 62,
+          "text": "| Microsoft Foundry      | `claude-haiku-4-5`                                | `claude-haiku-5-5`           |"
+        }
+      ]
+    },
+    {
+      "i": 45,
+      "url": "https://huggingface.co/tobil/qmd-query-expansion-0.6B-gguf/blob/edddacb0ae2c1f70524b6af7c3849826897177a9/README.md",
+      "fetch_url": "https://huggingface.co/tobil/qmd-query-expansion-0.6B-gguf/raw/edddacb0ae2c1f70524b6af7c3849826897177a9/README.md",
+      "capture": "source-45.raw",
+      "sha256": "d4fa02e8e0a234bfb769edf2af17d8765bf9b73267505dd053f5a7381ccc29fb",
+      "bytes": 458,
+      "read_date": "2026-10-15",
+      "excerpts": []
+    },
+    {
+      "i": 46,
+      "url": "https://huggingface.co/opendatalab/MinerU2.5-Pro-2605-1.2B/blob/08aaea840498d49ce16247b6263196cf02814885/README.md",
+      "fetch_url": "https://huggingface.co/opendatalab/MinerU2.5-Pro-2605-1.2B/raw/08aaea840498d49ce16247b6263196cf02814885/README.md",
+      "capture": "source-46.raw",
+      "sha256": "8f829b69be518375b02023f795b3898adec98f5ac37208239884ad88e9a21cb7",
+      "bytes": 15571,
+      "read_date": "2026-10-15",
+      "excerpts": []
+    },
+    {
+      "i": 47,
+      "url": "https://github.com/headroomlabs-ai/headroom/blob/v0.40.0/headroom/transforms/kompress_compressor.py#L47",
+      "fetch_url": "https://raw.githubusercontent.com/headroomlabs-ai/headroom/v0.40.0/headroom/transforms/kompress_compressor.py",
+      "capture": "source-47.raw",
+      "sha256": "edaf47876b5d198541aef6600300275732c4c3bafad432f989613492b6607070",
+      "bytes": 108555,
+      "read_date": "2026-10-15",
+      "excerpts": [
+        {
+          "line": 47,
+          "text": "HF_MODEL_ID = \"chopratejas/kompress-v2-base\""
+        },
+        {
+          "line": 158,
+          "text": "# - kompress-int8-wo.onnx: weight-only int8 (MatMulNBits), 261MB. Evaluated on"
+        },
+        {
+          "line": 169,
+          "text": "    \"onnx/kompress-int8-wo.onnx\","
+        },
+        {
+          "line": 948,
+          "text": "    (``onnx_runtime._PINNED_REVISIONS``): the ONNX export was produced against"
+        }
+      ]
+    }
+  ]
+}
