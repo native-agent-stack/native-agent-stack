@@ -1,0 +1,32 @@
+{
+  "schema": "muse-toolchain-directory-controls/1",
+  "base": "ec15c903751cf2f6ed906a6ad10df8c61f04f1c7",
+  "ruling_sha256": "9ba078028c1762f71a78791a24ea02949944d870df376cee6d7d402b78745ec3",
+  "source_locations": [
+    "tools/muse_file_fence.py:35-82,261-300,326-327,479-480",
+    "tests/test_muse_toolchain_dirs.py:39-199"
+  ],
+  "fail_first": [
+    {"source": "tests/test_muse_toolchain_dirs.py:39", "baseline": "ec15c903", "exit_code": 1, "observation": "TypeError: API parameter absent; not an unsafe-grant reproduction"},
+    {"source": "tests/test_muse_toolchain_dirs.py:43-58", "baseline": "intermediate implementation before component and entry guards", "exit_code": 1, "assertion_failures": 3},
+    {"source": "tests/test_muse_toolchain_dirs.py:60-102", "baseline": "intermediate implementation before store-root guards", "exit_code": 1, "assertion_failures": 29},
+    {"source": "tests/test_muse_toolchain_dirs.py:104-136", "baseline": "intermediate implementation before final policy guards", "exit_code": 1, "assertion_failures": 8}
+  ],
+  "verification": {
+    "command": "MUSE_FENCE_TOOLCHAIN_PROBE=1 MUSE_FENCE_NATIVE_PROBE=1 python3 -m unittest tests.test_muse_file_fence tests.test_muse_toolchain_dirs",
+    "exit_code": 0,
+    "tests": 39,
+    "skipped": 0,
+    "recorded_utc": "2026-10-15T07:19:25Z",
+    "repository_validation": {"command": "python3 scripts/validate.py", "exit_code": 0},
+    "evidence_classes": {
+      "fixture_refusals": "synthetic",
+      "installed_go_readonly_and_version": "native_proven",
+      "installed_muse_echo_with_toolchain": "local_integration"
+    },
+    "toolchain_version": "go1.25.12",
+    "bubblewrap_version": "0.11.1",
+    "live_model_calls": 0,
+    "host_toolchain_installs": 0
+  }
+}
