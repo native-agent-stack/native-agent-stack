@@ -1,8 +1,27 @@
 """Apply the canonical launcher contract and enclosing unit budgets to NEW bytes."""
 import ast
+import shlex
 
+# r3 cb0e7d348d564520eb0911476d9d4b0f227952ea transport.py:973;
+# recovery.py:94-98,223,329: 50*(5+5) preflight +120 order work +10 teardown.
 RECOVERY_GRACE_SECONDS = 50 * (5 + 5) + 120 + 10
 ENVELOPE_MARGIN_SECONDS = 30
+TEARDOWN_SECONDS = 10
+
+
+def scheduler(text, bundle):
+    """Generate separate deployment glue; never alter the frozen input script."""
+    old_root = 'here="$(cd "$(dirname "$0")" && pwd)"'
+    if (text.count(old_root) != 1 or text.count('timeout 900 "$PY"') != 1
+            or text.count('timeout 120 ') != 2):
+        raise ValueError('scheduled_script_source_shape')
+    native = bundle / 'frozen/blueprints/us-equities/adaptive-paper'
+    text = text.replace(old_root, 'here=' + shlex.quote(str(native)))
+    # These are read-only ingestion/qualification steps, before any runner.
+    # Give them real hard bounds so the outer ordering proof is arithmetic.
+    text = text.replace('timeout 120 ', 'timeout --kill-after=1s 120 ')
+    after = RECOVERY_GRACE_SECONDS + TEARDOWN_SECONDS + ENVELOPE_MARGIN_SECONDS
+    return text.replace('timeout 900 "$PY"', 'timeout --kill-after=' + str(after) + 's 900 "$PY"')
 
 
 def launcher(text, canonical):
@@ -34,7 +53,9 @@ def unit_envelopes(text):
     stage = args[-1]
     normal = 4490 if stage == 'pre' else 120 if stage == 'pre-skip' else 1190
     runtime = normal + RECOVERY_GRACE_SECONDS + ENVELOPE_MARGIN_SECONDS
-    stop = 720 + RECOVERY_GRACE_SECONDS + ENVELOPE_MARGIN_SECONDS
+    # The stage recovery hook can do native recovery, then its GET-only
+    # no-owned-trial fallback. Leave both child budgets plus teardown/margin.
+    stop = (720 + RECOVERY_GRACE_SECONDS) + (120 + RECOVERY_GRACE_SECONDS) + TEARDOWN_SECONDS + ENVELOPE_MARGIN_SECONDS
     updates = {'RuntimeMaxSec': runtime}
     if stage != 'pre-skip':
         updates['TimeoutStopSec'] = stop

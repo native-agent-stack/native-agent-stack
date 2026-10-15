@@ -49,12 +49,16 @@ CONFIG files unchanged. Trial acceptance reads PRE `paper.json` or scheduled
 as trial evidence. A timeout sends TERM, permits 630 seconds for the cited
 recovery bounds, then KILL if still running; timeout remains refusal exit124.
 The scheduled Bash leader keeps a trap until its foreground runner ends.
+The generated root `scheduled_trial_r3.sh` retains the frozen script's logic
+and native module directory, adding `--kill-after=670s` to its TERM900 wrapper.
+It does not alter the frozen input script. Wrapper hard deadline1570s exceeds
+900+630+10; the two read-only120s ingestion/gate commands gain1s KILL-after
+bounds, so loader1820s exceeds242s preparatory work plus1570s wrapper.
 
 New-unit envelopes cover that full wait plus 30 seconds: RuntimeMaxSec at least
-5150s PRE, 1850s RTH and 780s GET-only pre-skip; TimeoutStopSec at least1380s
-for trading recovery (720s native recovery timeout +630s grace +30s margin).
-The script's existing timeout900 sends TERM and has no kill-after setting;
-it is retained. These are new-packet construction values, not changes to any
+5150s PRE, 1850s RTH and 780s GET-only pre-skip; TimeoutStopSec at least2140s
+for native recovery plus its possible GET-only fallback, including both630s
+graces,10s teardown and30s margin. These are new-packet construction values, not changes to any
 installed unit. The enclosing native runner's recovery bounds and CPython
 subprocess semantics are cited in
 `docs/decisions/2026-10-15-lane-b-r3-launcher-contract.md`.

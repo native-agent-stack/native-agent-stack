@@ -64,9 +64,22 @@ The enclosing unit must not expire before its child's grace. A separate
 recut/envelope commit overlays only the two canonical launcher methods into
 newly authenticated predecessor text and raises the NEW packet unit limits:
 PRE 4490+630+30=5150s, RTH1190+630+30=1850s, GET-only pre-skip120+630+30=780s;
-trading stop/recovery720+630+30=1380s. The 30 seconds is an explicit supervisor
+trading stop/recovery(720+630)+(120+630)+10+30=2140s covers native recovery
+and its possible GET-only fallback. The 30 seconds is an explicit supervisor
 margin. Native runner/config bytes and scheduled script stay unchanged.
 systemd v259 commit9ca433482f2281d71718718705ca8cd3bf562ad6,
 `man/systemd.service.xml` sections RuntimeMaxSec and TimeoutStopSec, defines
-the enclosing runtime and stop-command timeouts. The existing script's
-`timeout900` sends TERM and has no KILL deadline, so it is retained.
+the enclosing runtime and stop-command timeouts. A generated root-level
+scheduler retains the frozen script's logic/native directory and adds
+`--kill-after=670s` to its TERM900 wrapper, leaving the frozen input unchanged.
+The two read-only preparatory120s commands gain1s KILL-after bounds, making
+their total hard budget242s rather than assuming TERM always ends them.
+Wrapper hard1570s >900+630+10; loader hard1820s >242+1570; runtime1850s >
+loader1820+teardown10. PRE and recovery envelopes are checked independently.
+The ordering test reads actual caller deadlines and loader grace from the
+canonical launcher AST, then compares every generated enclosing deadline.
+
+Known rollout window: armed lane B stages in the next session still use the
+existing sealed launcher, including its900-second wrapper and absence of this
+new grace, under the standing authorization. This PR changes the generators,
+templates and NEW recuts only; the window closes at the next approved recut.

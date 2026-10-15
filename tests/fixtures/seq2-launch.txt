@@ -399,8 +399,9 @@ def keyed(command, *, timeout, environment=None):
             try:
                 return child.wait(timeout=timeout)
             except subprocess.TimeoutExpired:
-                # r3 cb0e7d34: preflight 50*(5s connect+5s read),
-                # bounded cleanup <=120s, then teardown <=10s: 630s.
+                # r3 cb0e7d348d564520eb0911476d9d4b0f227952ea:
+                # transport.py:973, 50*(5s connect+5s read);
+                # recovery.py:94-98,223 <=120s, :329 teardown <=10s: 630s.
                 # credential_run forwards TERM to the native command group.
                 try:
                     child.terminate()
@@ -461,7 +462,7 @@ def run_stage(stage):
         # Bash runs this trap after its foreground command finishes. Otherwise
         # credential_run would observe its group leader exit and clean the group.
         rc = keyed(['/usr/bin/bash', '-c', 'trap ":" TERM INT; source "$1"',
-                    'lane-b-scheduled', paper / 'scheduled_trial.sh'], timeout=1190, environment=environment)
+                    'lane-b-scheduled', ROOT / 'scheduled_trial_r3.sh'], timeout=1190, environment=environment)
         return trial_result(rc, instance / 'scheduled/paper-output.json')
 
 def stop_mark(stage):

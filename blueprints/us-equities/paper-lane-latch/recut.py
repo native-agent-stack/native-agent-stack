@@ -95,6 +95,10 @@ def seal(source, installed, output, source_sha256, installed_sha256, source_comm
                 raise ValueError('installed_runtime_or_config_differs')
     payloads['launch.py'] = isolate_launch(payloads['launch.py'].decode(), installed_sha256,
                                          canonical=canonical).encode()
+    scheduled = 'frozen/blueprints/us-equities/adaptive-paper/scheduled_trial.sh'
+    if scheduled not in payloads:
+        raise ValueError('scheduled_source_not_in_manifest')
+    payloads['scheduled_trial_r3.sh'] = r3.scheduler(payloads[scheduled].decode(), output).encode()
     payloads['issue_go.py'] = isolate_issuer(payloads['issue_go.py'].decode()).encode()
     for name in ('lane_latch.py', 'seq2_retirement.py'):
         payloads[name] = (LATCH / name).read_bytes()
