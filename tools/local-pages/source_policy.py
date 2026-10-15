@@ -365,6 +365,119 @@ class ArchitectureReads:
                      "file_utc": datetime.fromtimestamp(info.st_mtime, timezone.utc).isoformat().replace("+00:00", "Z")}
 
 
+_FAMILY_TOKEN = r"[A-Za-z0-9._-]*"
+_FAMILY_SUFFIXES = (".md", ".json")
+
+
+class OverviewReads:
+    """Authorize the overview page's source-map reads before any content access.
+
+    Grants are the committed policy's "overview" roles (exact repo or state
+    paths) and "overview_families" (one fixed directory, a literal filename
+    prefix and suffix, and a name token without separators). The source map
+    selects among these grants; it cannot extend them. final-stack.json stays
+    on its dedicated Architecture role, so no overview role may grant it.
+    """
+
+    limit_error = SourceReadLimitError
+
+    def __init__(self, root, state_root, policy_path=POLICY_PATH):
+        self.policy = load_policy(policy_path)
+        self.roots = {"repo": Path(root).absolute(), "state": Path(state_root).absolute()}
+        entries = self.policy.document.get("overview", {})
+        if not isinstance(entries, dict):
+            raise SourcePolicyError("overview permissions must be a role map")
+        self.allowed = {}
+        for role, paths in entries.items():
+            if not isinstance(role, str) or not role.startswith("overview_") or not isinstance(paths, list):
+                raise SourcePolicyError("invalid overview exact-path role")
+            self.allowed[role] = set()
+            for record in paths:
+                if not isinstance(record, dict) or set(record) != {"root", "path"} or record["root"] not in self.roots:
+                    raise SourcePolicyError("overview permission requires exactly a known root and a path")
+                relative = _relative(record["path"])
+                if (record["root"], relative) == ("repo", FINAL_STACK_PATH):
+                    raise SourcePolicyError("final-stack.json is read only through its dedicated Architecture role")
+                self.allowed[role].add((record["root"], relative))
+        families = self.policy.document.get("overview_families", {})
+        if not isinstance(families, dict):
+            raise SourcePolicyError("overview families must be a role map")
+        self.families = {}
+        for role, record in families.items():
+            if not isinstance(role, str) or not role.startswith("overview_") or not isinstance(record, dict) \
+                    or set(record) != {"root", "directory", "prefix", "suffix"} or record["root"] not in self.roots:
+                raise SourcePolicyError("overview family requires exactly a root, directory, prefix and suffix")
+            if not isinstance(record["prefix"], str) or not record["prefix"] or not re.fullmatch(_FAMILY_TOKEN, record["prefix"]) \
+                    or record["suffix"] not in _FAMILY_SUFFIXES:
+                raise SourcePolicyError("overview family names a literal prefix and a .md or .json suffix")
+            self.families[role] = {**record, "directory": _relative(record["directory"])}
+
+    def pattern(self, role):
+        """The family's glob in source-map form, or None when the role has no family."""
+        family = self.families.get(role)
+        return f'{family["directory"]}/{family["prefix"]}*{family["suffix"]}' if family else None
+
+    def _family_match(self, role, root, relative):
+        family = self.families.get(role)
+        if not family or root != family["root"]:
+            return False
+        path = PurePosixPath(relative)
+        return path.parent.as_posix() == family["directory"] and bool(
+            re.fullmatch(re.escape(family["prefix"]) + r"[A-Za-z0-9._-]+" + re.escape(family["suffix"]), path.name))
+
+    def validate(self, role, root, *, path=None, glob=None):
+        """Check one source-map declaration against its grant before anything is opened."""
+        if (path is None) == (glob is None):
+            raise SourcePolicyError("an overview source names exactly one path or glob")
+        if glob is not None:
+            if glob != self.pattern(role) or root != self.families[role]["root"]:
+                raise SourcePolicyError("overview glob differs from its reviewed family: " + str(role))
+            return
+        relative = _relative(path)
+        if (root, relative) not in self.allowed.get(role, set()):
+            raise SourcePolicyError("overview role/path has no independent approval: " + str(role))
+
+    def authorize(self, role, path):
+        path = Path(path).absolute()
+        for root, base in self.roots.items():
+            try:
+                relative = path.relative_to(base).as_posix()
+            except ValueError:
+                continue
+            relative = _relative(relative)
+            if (root, relative) in self.allowed.get(role, set()) or self._family_match(role, root, relative):
+                return path
+        raise SourcePolicyError("overview role/path has no independent approval: " + str(role))
+
+    def match(self, role, root, glob):
+        """Family members present now, sorted by name; a missing directory has none."""
+        self.validate(role, root, glob=glob)
+        family = self.families[role]
+        directory = self.roots[root] / family["directory"]
+        try:
+            with _directory(directory) as descriptor:
+                names = os.listdir(descriptor)
+        except FileNotFoundError:
+            return []
+        except OSError as error:
+            raise SourcePolicyError("overview family directory or ancestor is a symlink or unavailable") from error
+        return sorted(directory / name for name in names if self._family_match(role, root, f'{family["directory"]}/{name}'))
+
+    def read(self, role, path, max_bytes=MAX_SOURCE_BYTES):
+        path = self.authorize(role, path)
+        if isinstance(max_bytes, bool) or not isinstance(max_bytes, int) or max_bytes <= 0:
+            raise SourcePolicyError("overview read bound must be a positive integer")
+        _check_target(path)
+        with _open_regular(path, limit=max_bytes) as handle:
+            info = os.fstat(handle.fileno())
+            raw = handle.read(max_bytes + 1)
+        if len(raw) > max_bytes:
+            raise SourceReadLimitError("approved overview input exceeds its bounded read")
+        return raw, {"path": str(path), "role": role, "sha256": hashlib.sha256(raw).hexdigest(),
+                     "bytes": len(raw), "status": "independently authorized overview input",
+                     "file_utc": datetime.fromtimestamp(info.st_mtime, timezone.utc).isoformat().replace("+00:00", "Z")}
+
+
 @contextmanager
 def guard_native(native, root, state_root, spec_path, *, policy_path=POLICY_PATH):
     """Guard every original native file read, including forced and linked inputs.

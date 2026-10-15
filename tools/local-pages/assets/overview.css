@@ -1,0 +1,36 @@
+/* Overview page: eight ruled sections on the shared local-pages tokens. The one
+   bold element is the layer-stack figure; everything else is ruled text, stat
+   figures and tables. Pending blocks carry the pending token, a dashed-ring
+   glyph and the word, so no state is color alone. */
+body[data-page="overview"] { --mf-display: "Iowan Old Style", "Sitka Heading", "Palatino Linotype", Palatino, "Book Antiqua", "Noto Serif", Georgia, serif; }
+body[data-page="overview"] .page-header h1 { font-family: var(--mf-display); font-weight: 500; letter-spacing: -.01em; font-size: clamp(2.1rem, 4.2vw, 3.4rem); }
+body[data-page="overview"] .ov-section > h2 { font-family: var(--mf-display); font-weight: 600; letter-spacing: -.01em; font-size: clamp(1.4rem, 2.1vw, 1.75rem); }
+.ov-section { margin-top: 2.25rem; padding-top: 1rem; border-top: 2px solid var(--rule); }
+.ov-section > h2 { margin-bottom: .3rem; }
+.ov-section h3 { margin: 1.1rem 0 .4rem; font-size: 1rem; }
+.ov-intro { max-width: 72ch; color: var(--muted); margin: 0 0 .75rem; }
+.ov-record, .ov-links { max-width: 80ch; margin: 0 0 .6rem; font-size: .925rem; overflow-wrap: anywhere; }
+.ov-pending { max-width: 72rem; margin: .5rem 0 .75rem; padding: .35rem 0 0 .9rem; border-left: 3px solid var(--warn); }
+.ov-pending-state { display: flex; align-items: center; gap: .4rem; margin: 0; font-weight: 650; }
+.ov-pending .lp-facts { margin-bottom: .25rem; }
+.ov-none { color: var(--muted); }
+.ov-table table { font-size: .875rem; }
+.ov-table td, .ov-table th { vertical-align: top; overflow-wrap: break-word; }
+.ov-table td small { display: block; margin-top: .15rem; color: var(--muted); line-height: 1.4; }
+.ov-workers table { min-width: 48rem; }
+.ov-workers td:first-child { width: 15rem; }
+.ov-repos table { min-width: 56rem; table-layout: fixed; width: 100%; }
+.ov-repos td, .ov-repos th { padding-block: .4rem; line-height: 1.35; }
+.ov-repos th:nth-child(1) { width: 26%; }
+.ov-repos th:nth-child(2) { width: 11%; }
+.ov-repos th:nth-child(3) { width: 25%; }
+.ov-repos th:nth-child(4) { width: 8%; }
+.ov-repos td:nth-child(4) { font-variant-numeric: tabular-nums; }
+.ov-repos td:nth-child(3) small { display: inline; }
+.ov-review table { min-width: 52rem; }
+.ov-next, .ov-queue { max-width: 80ch; padding-left: 1.4rem; }
+.ov-next li, .ov-queue li { margin-bottom: .3rem; }
+.ov-evidence { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); gap: .5rem 2rem; }
+.ov-evidence h3 { margin-top: .25rem; }
+.ov-evidence small { color: var(--muted); }
+.ov-stat-sources { padding-left: 1.25rem; border-left: 1px solid var(--rule); }

@@ -21608,5 +21608,51 @@
       "pin": "4d6cee1582f024d27319ee005117da5f15ebe269",
       "scope": "Excluded from architecture_supplement: this derived manifest duplicates the canonical landscape layer records and is presented by landscape.html. Its classification was reviewed at this pin; regenerated output bytes remain bound separately by manifests/evidence.json. planned-layers.json remains a granted supplement."
     }
-  ]
+  ],
+  "overview": {
+    "overview_cc_now": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/pages/cc-now.json"
+      }
+    ],
+    "overview_registry": [
+      {
+        "root": "repo",
+        "path": "manifests/evidence.json"
+      }
+    ],
+    "overview_runtime_profiles": [
+      {
+        "root": "repo",
+        "path": "notes/runtime-profiles-20261012/receipts/qualification.json"
+      }
+    ]
+  },
+  "overview_families": {
+    "overview_feeds_convergence": {
+      "root": "state",
+      "directory": "coordination/command-center/research-cc-role-20261008/ranked-feeds-20261014",
+      "prefix": "CONVERGENCE-WS2-",
+      "suffix": ".md"
+    },
+    "overview_strategies_convergence": {
+      "root": "state",
+      "directory": "coordination/command-center/research-cc-role-20261008/extreme-mover-strategies-20261014",
+      "prefix": "CONVERGENCE-WS5-",
+      "suffix": ".md"
+    },
+    "overview_finalize_rows": {
+      "root": "state",
+      "directory": "coordination/command-center/research-cc-role-20261008/finalize-all-20261014",
+      "prefix": "ROWS-",
+      "suffix": ".md"
+    },
+    "overview_claude_code_practice": {
+      "root": "state",
+      "directory": "coordination/command-center/research-cc-role-20261008/cc-native-practice-20261014",
+      "prefix": "CLIENT-",
+      "suffix": ".md"
+    }
+  }
 }

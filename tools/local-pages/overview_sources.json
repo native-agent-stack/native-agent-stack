@@ -1,0 +1,151 @@
+{
+  "schema": "local-overview-sources/1",
+  "about": "Every source the overview page reads, in one place. Each entry names its section, the source_policy.json role that grants it, its root (repo or state), one exact path or one glob, what the page reads from it and the trigger that makes a pending source present. To move a record, change its path or glob here and the matching grant in source_policy.json; the generator needs no change. A glob reads the newest match by name. A missing source renders as pending with its trigger.",
+  "sources": {
+    "final_stack": {
+      "section": "architecture",
+      "role": "architecture_final_stack",
+      "root": "repo",
+      "path": "catalogs/landscape/final-stack.json",
+      "reads": "layers[] (catalog, layer_id, title, status, winners, survivors) and runs[] (id, pin); the layer states and FINAL count follow tools/local-pages/architecture_manifest.py layer_state()",
+      "trigger": "scripts/final_stack.py writes the file at a merged commit"
+    },
+    "foundation_catalog": {
+      "section": "architecture",
+      "role": "architecture_catalog",
+      "root": "repo",
+      "path": "catalogs/landscape/foundation.json",
+      "reads": "layers[] order and titles of the foundation catalog",
+      "trigger": "the foundation landscape catalog is committed"
+    },
+    "trading_catalog": {
+      "section": "architecture",
+      "role": "architecture_catalog",
+      "root": "repo",
+      "path": "catalogs/landscape/us-equities.json",
+      "reads": "layers[] order and titles of the us-equities trading catalog",
+      "trigger": "the us-equities landscape catalog is committed"
+    },
+    "evidence_matrix": {
+      "section": "architecture",
+      "role": "architecture_static",
+      "root": "repo",
+      "path": "catalogs/landscape/component-evidence-matrix.json",
+      "reads": "rows[] host E2E state and invoke evidence, for the four FINAL conditions",
+      "trigger": "the component evidence matrix is committed"
+    },
+    "feeds_convergence": {
+      "section": "feeds",
+      "role": "overview_feeds_convergence",
+      "root": "state",
+      "glob": "coordination/command-center/research-cc-role-20261008/ranked-feeds-20261014/CONVERGENCE-WS2-*.md",
+      "reads": "the first table whose header names the column below, and the numbered items under the heading below",
+      "table": "Signal",
+      "list": "Next",
+      "trigger": "the command center records its WS2 convergence after both blind judges have scored the arms"
+    },
+    "strategies_convergence": {
+      "section": "strategies",
+      "role": "overview_strategies_convergence",
+      "root": "state",
+      "glob": "coordination/command-center/research-cc-role-20261008/extreme-mover-strategies-20261014/CONVERGENCE-WS5-*.md",
+      "reads": "the first table whose header names the column below, and the numbered items under the heading below",
+      "table": "Strategy",
+      "list": "Next",
+      "trigger": "the command center records its WS5 convergence of the extreme-mover strategy shortlist"
+    },
+    "finalize_rows": {
+      "section": "repos",
+      "role": "overview_finalize_rows",
+      "root": "state",
+      "glob": "coordination/command-center/research-cc-role-20261008/finalize-all-20261014/ROWS-*.md",
+      "reads": "the table whose header names the key column below; per layer, the columns below",
+      "table": "layer",
+      "columns": {
+        "next_action": "closes by",
+        "receipt_worker": "F1 receipt worker"
+      },
+      "trigger": "the command center writes the finalize-all rows for every layer"
+    },
+    "registered_receipts": {
+      "section": "workers",
+      "role": "overview_registry",
+      "root": "repo",
+      "path": "manifests/evidence.json",
+      "reads": "receipts[] (path, component_ids); a worker's newest receipt is the registered receipt with the latest date in its path",
+      "trigger": "a receipt is registered with scripts/host_receipts.py"
+    },
+    "runtime_profiles": {
+      "section": "workers",
+      "role": "overview_runtime_profiles",
+      "root": "repo",
+      "path": "notes/runtime-profiles-20261012/receipts/qualification.json",
+      "reads": "status and tool_read_utc of the pi and OpenCode profile qualification",
+      "trigger": "the runtime-profile qualification receipt is committed"
+    },
+    "claude_code_practice": {
+      "section": "claude_code",
+      "role": "overview_claude_code_practice",
+      "root": "state",
+      "glob": "coordination/command-center/research-cc-role-20261008/cc-native-practice-20261014/CLIENT-*.md",
+      "reads": "the version on the line naming the pin label below, and the first table under each heading below",
+      "pin_label": "Pinned client",
+      "tables": {
+        "changelog": "CHANGELOG",
+        "screen": "screen"
+      },
+      "trigger": "cc-native-practice records the pinned client, its 2.1.295 to 2.1.300 CHANGELOG delta and its best-practice screen"
+    },
+    "cc_now": {
+      "section": "github",
+      "role": "overview_cc_now",
+      "root": "state",
+      "path": "coordination/command-center/pages/cc-now.json",
+      "reads": "updated_utc, in_review[] (pr, head, state, next_gate), landing_queue[], main_ci and api_credit (routing, read_utc), schema cc-now/1",
+      "keys": {
+        "in_review": "in_review",
+        "landing_queue": "landing_queue",
+        "main_ci": "main_ci"
+      },
+      "trigger": "the command center publishes its current view"
+    }
+  },
+  "workers": [
+    {
+      "name": "Codex",
+      "role": "CLI lanes and the Codex SDK",
+      "state": {"source": "final_stack", "run": "codex"},
+      "receipt": {"source": "registered_receipts", "component_id": "codex"}
+    },
+    {
+      "name": "Claude Code, subscription",
+      "role": "command center and Claude lanes",
+      "state": {"source": "final_stack", "run": "claude-code"},
+      "receipt": {"source": "registered_receipts", "component_id": "claude-code"}
+    },
+    {
+      "name": "Claude API slots",
+      "role": "review worker and API-slot runs",
+      "state": {"source": "cc_now", "pointer": "/api_credit/routing", "as_of": "/api_credit/read_utc"},
+      "receipt": null
+    },
+    {
+      "name": "Meta Wonder Full",
+      "role": "through its fence",
+      "state": null,
+      "receipt": null
+    },
+    {
+      "name": "pi and OpenCode",
+      "role": "trial profiles pi-claude, pi-gpt, opencode-claude, opencode-gpt",
+      "state": {"source": "runtime_profiles", "pointer": "/status", "as_of": "/tool_read_utc"},
+      "receipt": {"source": "runtime_profiles", "as_of": "/tool_read_utc"}
+    },
+    {
+      "name": "GPT kit",
+      "role": "GPT-family harness kit",
+      "state": null,
+      "receipt": null
+    }
+  ]
+}

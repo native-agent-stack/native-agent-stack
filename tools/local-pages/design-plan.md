@@ -161,3 +161,54 @@ It left the following, with reasons:
 - **Diagram labels** keep diagram-design's uppercase eyebrow role for lanes and zones.
 - **Drift flags** stay verbatim final_stack.py output.
 - **Register length** follows from the brief's per-layer content.
+
+## Overview page
+
+`overview.html` answers one question per section, in a fixed order: where the layers
+stand, which data feeds converged, which strategies, which workers run with what
+receipt, which repositories win each layer and what closes it, what the page read,
+Claude Code, and GitHub. The audience opens the desk and wants the state in one pass,
+then follows a link to the Foundation or North-star page for detail.
+
+**Tokens.** The palette above is unchanged; the overview adds no color. Pending blocks
+use the pending token as a left rule, the dashed-ring glyph and the word "Pending",
+so no state is color alone. Headings use the Architecture pages' display serif,
+reading text the shared sans, monospace only pins, paths and record names.
+
+**Layout.** Left aligned, source order, one section per screen height where the
+content allows:
+
+```text
+title + lede
+count strip: FINAL sentence | states as figures | sources present
+section links (8)
+1 layer stack: trading band above foundation band, one cell per layer   <- the bold element
+2 feeds: signal table + next steps by trigger        | pending block
+3 strategies: shortlist table                         | pending block
+4 workers: worker | state | newest receipt
+5 repositories: per catalog, layer | state | winners at run pin | survivors | next action
+6 evidence: repository records | private records by name | layer pages
+7 Claude Code: pin, CHANGELOG delta, screen table     | pending block
+8 GitHub: main CI, in review, landing queue
+```
+
+**Review before implementation.** The first plan gave each section a card and led
+with a large FINAL number. Cards would make eight unlike answers look alike, and a
+hero zero is a claim the protocol does not support. The plan instead uses ruled
+sections like the layer pages, a sentence for the FINAL count, and spends emphasis
+only on the layer stack. Section markers are not numbered on the page: the order
+is fixed but the sections are not a sequence. Repository rows put the layer key in
+the link title and shorten commit pins to 12 characters, which halved the table's
+height in the first browser pass.
+
+**Skills.** frontend-design (SKILL.md SHA-256
+`d91970639e9f5c37682ac7ab60094d35f1c7c1f38d731bd56396563aee10c1d3`) shaped the plan
+and the review above. diagram-design 2.6.73 (SKILL.md SHA-256
+`9cb173e6d30a9aa4af646f4eba4431ddb03dbbed23c041eaefdc13b1bf445826`, reference
+type-layers.md) set the figure: a layer stack of two full-width bands with index tags,
+a direction label, one focal band (the trading layers) and a bottom legend; one cell
+per layer, with equal cell widths across bands so the bands compare by length. The
+caption names only the states the figure draws. The dataviz skill bundled with
+Claude Code 2.1.300 set the strip as stat figures, not a chart; its validator again
+reports the shared status pair at light ΔE 15.8 normal and 7.1 protan, dark 13.8 and
+5.4, so each state carries its glyph and label as on the layer pages.
