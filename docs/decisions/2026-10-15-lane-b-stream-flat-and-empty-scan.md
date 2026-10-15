@@ -1,0 +1,93 @@
+# REST proof after a stream-only recovery refusal; clean empty scans
+
+Date: 2026-10-15. Scope: canonical launcher glue and new recuts only.
+
+## Trigger and decision
+
+A flat stage can trade no symbols, leaving recovery with no quote subscription
+that can become ready. The native transport then reports its stream-start
+TransportError; recovery correctly leaves flatness unknown. A successful
+earlier zero-count preflight does not resolve that uncertainty. Reconnecting
+or retrying the same empty subscription is not a flat proof.
+
+The CC's REST-fallback ruling supersedes the earlier retry proposal. After
+the specific native stream-readiness error, the launcher may use the existing
+GET-only observer only when native position/open-order/submission counts are
+strict integer0/0/0, there is exactly one matching TransportError, there are
+no local positions/unresolved orders or submit/cancel/exit attempts, and no
+prior broker snapshot/reconciliation exists. The fixed message template and
+native stream-reason allowlist reject unknown or mixed integrity/order/REST
+failures. A fresh observer0/0 proof must pass the existing handoff validator.
+
+The original native recovery receipt is preserved. If the observer fails
+without emitting a result, ordinary validation uses the original failed
+receipt and records flat=false; no handoff is silently repaired. A non-flat
+REST answer also refuses. The existing private-marker ownership, operator
+STOP preservation, active-trial retirement and handoff binding stay intact.
+The120s observer budget was already reserved for the no-owned-trial fallback;
+there is at most one of those two observer paths after a native attempt, so
+the reviewed outer budgets remain sufficient.
+
+An empty validated PRE scan is separately a clean no-trade outcome. The native
+runner's immutable no-start receipt/rc2 remain preserved; the launcher binds
+its config/scan hashes and empty selection, records an INFO no-trade event
+with selected_symbols0/orders_submitted0, and returns0 to systemd. Thus the
+empty scan itself does not trigger OnFailure. The receipt remains explicitly
+non-trial evidence and does not certify account flatness. Existing recovery
+still runs. The source scan contains no evaluated-universe count; the record
+does not manufacture one.
+
+## Primary sources
+
+All native locators below are at base
+`8053f14e7e0817d2502dff2bb284bfb7e1b0152f` in
+[native-agent-stack](https://github.com/native-agent-stack/native-agent-stack/commit/8053f14e7e0817d2502dff2bb284bfb7e1b0152f).
+
+- `tests/fixtures/seq2-launch.txt:516-520`: existing
+  `no_owned_trial_to_recover` / `no_mover_trial_to_recover` GET-only
+  `observe_flat.py` fallback, reused rather than replaced.
+- `blueprints/us-equities/paper-flat-proof/observe_flat.py:27-49`:
+  native bounded synchronous preflight, complete REST positions/orders proof,
+  no order submission; failure returns2 without fabricating a successful file.
+- `blueprints/us-equities/adaptive-paper/transport.py:1793-1800`:
+  fixed stream-readiness TransportError and native failure-reason template.
+  Its native reason producers supply the explicit allowlist; observation-loss,
+  identity and order ambiguity remain excluded.
+- `blueprints/us-equities/adaptive-paper/recovery.py:228-229,326-358`:
+  streams start before the first snapshot/order work; native failure receipt
+  retains errors, local positions/orders and unknown reconciliation.
+- `blueprints/us-equities/adaptive-paper/mover_runner.py:592-601,701-703`:
+  existing empty-scan no-start receipt and rc2 before credential loading.
+- `blueprints/us-equities/paper-lane-latch/r3_contract.py:31-49`:
+  source-bound canonical method graft, extended with the fallback helper/call
+  while retaining the source generation's recovery/latch implementation.
+- [systemd259](https://github.com/systemd/systemd/blob/v259/man/systemd.unit.xml),
+  OnFailure: activates on a failed unit; clean process exit avoids that failure
+  for the no-trade outcome. A genuine recovery failure still remains a failure.
+
+No new adapter, credential loader, broker transport or dependency is added.
+The frozen runtime and CONFIG bytes and all already sealed packets stay intact.
+
+## Fail-first validation and limits
+
+`tests.test_lane_b_stream_flat_fallback` exercises the emitted private-latch
+launcher and the actual GET observer/preflight with fixture HTTP answers.
+It never reads a credential or opens a real stream. The empty-traded-symbol
+case invokes native recovery with an empty fake ledger and a fake stream port,
+then proves flat through the real observer. Positive/REST-path and empty-scan
+cases go RED against the base; existing non-flat/non-stream refusal guards
+already pass there and remain required negative coverage.
+
+Cases cover persistent stream failure with0/0/0 and REST flat; non-flat native
+preflight; failing/non-flat REST; no traded symbols; non-stream/mixed integrity
+errors; malformed boolean counts; and empty-scan rc0/INFO/non-trial recording.
+Adjacent latch, recovery-only acceptance, grace/order and native GET observer
+tests remain required. Actual execution counts and retained logs belong in
+the PR record; raw private-log fingerprints do not belong in public records.
+
+Both review families precede installation or any new recut activation.
+No builder or test connects a live stream with a lane credential during a
+session. The current incident's state operation remains with trading-cc;
+there is no issuer restart, STOP/HOLD edit or handoff mutation in this PR.
+After approved installation, the documented native recovery path must create
+its own flat handoff before the co-op restarts the issuer.

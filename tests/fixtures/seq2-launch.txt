@@ -448,9 +448,30 @@ def run_stage(stage):
                 raise Refused('unsafe_input')
             return json.loads(raw), hashlib.sha256(raw).hexdigest()
         def trial_result(rc, output):
+            result, output_sha256 = None, None
+            # Immutable native mover_runner.py:592-601,701-703 returns2 for
+            # an empty validated scan. CC rules this a clean no-trade stage.
+            if stage == 'pre' and rc in (0, 2) and output.is_file():
+                empty, output_sha256 = paper_output(output)
+                result = empty
+                if (empty.get('kind') == 'mover_trial_receipt' and empty.get('status') == 'not_started'
+                        and empty.get('reason') == 'scan_empty' and empty.get('stage') == 'validation'
+                        and type(empty.get('orders_submitted')) is int and empty['orders_submitted'] == 0
+                        and empty.get('config_sha256') == sha(config(stage))):
+                    scan, scan_sha256 = paper_output(instance / 'scan.json')
+                    if scan.get('symbols') != [] or empty.get('scan_sha256') != scan_sha256:
+                        raise Refused('empty_scan_receipt_binding_mismatch')
+                    event = {'level': 'INFO', 'event': 'no_trade', 'reason': 'scan_empty',
+                             'stage': stage, 'trial': value['trial'], 'trial_evidence': False,
+                             'native_exit_code': rc, 'native_output_sha256': output_sha256,
+                             'evaluated_counts': {'selected_symbols': 0, 'orders_submitted': 0}}
+                    save(instance / 'no-trade.json', event)
+                    print(json.dumps(event))
+                    return 0
             if rc != 0:
                 return rc
-            result, output_sha256 = paper_output(output)
+            if result is None:
+                result, output_sha256 = paper_output(output)
             if result.get('status') == 'recovery_only':
                 save(instance / 'recovery-run.json', {
                     'status': 'recovery_only', 'stage': stage, 'trial': value['trial'],
@@ -499,6 +520,53 @@ def stop_mark(stage):
     save(Path(active['instance']) / 'stop-hook.json', {'created_by_hook': owned})
     return 0
 
+def rest_flat_after_stream_failure(stage, active, rc, output):
+    """Narrow startup-only fallback; native receipt remains unchanged.
+
+    Native transport.py:1793-1800 emits this exact readiness error before
+    recovery.py's first snapshot/order work. Reuse the GET-only observer from
+    recover_stage's existing no_owned_trial_to_recover path, never a stream retry.
+    """
+    if rc != 3 or not output.is_file():
+        return rc, output
+    result = safe_json(output)
+    preflight, details = result.get('preflight'), result.get('error_details')
+    if (result.get('mode') != 'official_sdk_recovery' or result.get('status') != 'needs_attention'
+            or result.get('flat') is not False or result.get('errors') != ['TransportError']
+            or not isinstance(preflight, dict) or not isinstance(details, list) or len(details) != 1
+            or not isinstance(details[0], dict) or details[0].get('type') != 'TransportError'
+            or details[0].get('code') != 'TransportError'
+            or result.get('positions') != [] or result.get('unresolved_orders') != []
+            or result.get('cancel_attempt_client_ids') != [] or result.get('exit_attempt_client_ids') != []
+            or type(result.get('buy_submissions')) is not int or result['buy_submissions'] != 0
+            or result.get('reconciliation') is not None or result.get('broker_positions_last_observed') is not None):
+        return rc, output
+    if any(type(preflight.get(key)) is not int or preflight[key] != 0
+           for key in ('position_count', 'open_order_count', 'orders_submitted')):
+        return rc, output
+    message = details[0].get('message')
+    match = re.fullmatch(r'stream authentication/subscription/quote readiness failed \(([a-z_]+(?:,[a-z_]+)*)\)',
+                         message) if isinstance(message, str) else None
+    if match is None:
+        return rc, output
+    reasons = set(match.group(1).split(','))
+    # Only native stream-start reasons. Event loss, identity, REST/snapshot,
+    # order/cancel ambiguity and teardown failures must keep refusing.
+    stream_reasons = {'start_not_ready', 'quote_stale', 'quote_timestamp_stale',
+                      'halt_status_subscription_rejected',
+                      *(channel + suffix for channel in ('quotes', 'orders')
+                        for suffix in ('_disconnected', '_subscription_rejected', '_control_error',
+                                       '_thread_failed', '_thread_stopped'))}
+    if 'start_not_ready' not in reasons or not reasons <= stream_reasons:
+        return rc, output
+    probe = Path(active['instance']) / 'stream-flat-probe.json'
+    probe_rc = keyed([PY, '-E', '-s', '-B', ROOT/'observe_flat.py', stage,
+                      '--config', config(stage), '--output', probe], timeout=120)
+    # A failed observer may emit no file. Preserve native failure evidence so
+    # ordinary recovery validation still writes a refusing handoff.
+    return (probe_rc, probe) if probe.is_file() else (rc, output)
+
+
 def recover_stage(stage):
     verify_bundle()
     verify_runtime()
@@ -511,6 +579,7 @@ def recover_stage(stage):
             raise Refused('recovery_config_binding_mismatch')
         before = STOP.stat(follow_symlinks=False)
         rc, output = native_recover(stage, active)
+        rc, output = rest_flat_after_stream_failure(stage, active, rc, output)
         if output.is_file():
             refused = safe_json(output)
             if rc in (2,3) and refused.get('reason') in ('no_owned_trial_to_recover', 'no_mover_trial_to_recover'):

@@ -31,10 +31,11 @@ def scheduler(text, bundle):
 
 
 def launcher(text, canonical):
-    """Keep source admission/latch/bindings; replace only keyed and run_stage."""
+    """Keep source admission/latch/bindings; graft canonical stage contracts."""
     expected = ast.parse(canonical)
-    methods = {node.name: ast.get_source_segment(canonical, node) for node in expected.body
-               if isinstance(node, ast.FunctionDef) and node.name in ('keyed', 'run_stage')}
+    all_methods = {node.name: ast.get_source_segment(canonical, node) for node in expected.body
+                   if isinstance(node, ast.FunctionDef)}
+    methods = {name: all_methods[name] for name in ('keyed', 'run_stage') if name in all_methods}
     if set(methods) != {'keyed', 'run_stage'}:
         raise ValueError('canonical_launcher_contract_missing')
     nodes = [node for node in ast.parse(text).body if isinstance(node, ast.FunctionDef)
@@ -45,6 +46,13 @@ def launcher(text, canonical):
     for node in sorted(nodes, key=lambda item: item.lineno, reverse=True):
         lines[node.lineno - 1:node.end_lineno] = [methods[node.name] + '\n']
     result = ''.join(lines)
+    helper = all_methods.get('rest_flat_after_stream_failure')
+    call = '        rc, output = native_recover(stage, active)\n'
+    entry = 'def recover_stage(stage):\n'
+    if helper is None or result.count(call) != 1 or result.count(entry) != 1:
+        raise ValueError('predecessor_stream_fallback_shape')
+    result = result.replace(call, call + '        rc, output = rest_flat_after_stream_failure(stage, active, rc, output)\n')
+    result = result.replace(entry, helper + '\n\n' + entry)
     ast.parse(result)
     return result
 
