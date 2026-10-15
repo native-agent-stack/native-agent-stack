@@ -1,0 +1,804 @@
+{
+  "schema_version": 1,
+  "evidence_class": "SYN",
+  "kind": "guard_mutations",
+  "isolation": "bwrap: live root read-only; network namespace; private /var/tmp removed per mutant",
+  "count": 86,
+  "killed": 86,
+  "mutants": [
+    {
+      "id": "dependency_pin",
+      "module": "jev_trading_cases.py",
+      "test": "tests.test_jev_trading.CaseTests.test_builder_requires_the_record_source_pins_and_library_versions",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "source_bytes",
+      "module": "jev_trading_cases.py",
+      "test": "tests.test_jev_trading.CaseTests.test_source_pin_rejects_changed_bytes_before_decode",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "source_role_pins",
+      "module": "jev_trading_cases.py",
+      "test": "tests.test_jev_trading.CaseTests.test_builder_requires_the_record_source_pins_and_library_versions",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "unicode_whitespace",
+      "module": "jev_trading_cases.py",
+      "test": "tests.test_jev_trading.CaseTests.test_unicode_exclusion_and_frozen_lists_fail_closed",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "content_exclusion",
+      "module": "jev_trading_cases.py",
+      "test": "tests.test_jev_trading.CaseTests.test_unicode_exclusion_and_frozen_lists_fail_closed",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "frozen_lists",
+      "module": "jev_trading_cases.py",
+      "test": "tests.test_jev_trading.CaseTests.test_unicode_exclusion_and_frozen_lists_fail_closed",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "option_seed",
+      "module": "jev_trading_cases.py",
+      "test": "tests.test_jev_trading.CaseTests.test_option_order_matches_record_and_duplicates_stay",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "probability_labels",
+      "module": "jev_trading_scoring.py",
+      "test": "tests.test_jev_trading.MetricsTests.test_probability_validation_and_exact_one_percent_boundary",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "probability_domain",
+      "module": "jev_trading_scoring.py",
+      "test": "tests.test_jev_trading.MetricsTests.test_probability_validation_and_exact_one_percent_boundary",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "probability_sum",
+      "module": "jev_trading_scoring.py",
+      "test": "tests.test_jev_trading.MetricsTests.test_probability_validation_and_exact_one_percent_boundary",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "probability_choice",
+      "module": "jev_trading_scoring.py",
+      "test": "tests.test_jev_trading.TransportTests.test_response_shapes_usage_and_safe_error_retention",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "tie_order",
+      "module": "jev_trading_scoring.py",
+      "test": "tests.test_jev_trading.MetricsTests.test_probability_validation_and_exact_one_percent_boundary",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "brier_scaling",
+      "module": "jev_trading_scoring.py",
+      "test": "tests.test_jev_trading.MetricsTests.test_record_worked_example_and_failure_inclusive_population",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "ece_not_confidence",
+      "module": "jev_trading_scoring.py",
+      "test": "tests.test_jev_trading.MetricsTests.test_record_worked_example_and_failure_inclusive_population",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "sentinel_miss",
+      "module": "jev_trading_scoring.py",
+      "test": "tests.test_jev_trading.MetricsTests.test_record_worked_example_and_failure_inclusive_population",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "incomplete_boundary",
+      "module": "jev_trading_scoring.py",
+      "test": "tests.test_jev_trading.MetricsTests.test_probability_validation_and_exact_one_percent_boundary",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "bootstrap_clusters",
+      "module": "jev_trading_scoring.py",
+      "test": "tests.test_jev_trading.MetricsTests.test_cluster_intervals_match_independent_sklearn_resampling",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "original_representatives",
+      "module": "jev_trading_scoring.py",
+      "test": "tests.test_jev_trading.MetricsTests.test_cluster_bootstrap_call_and_representative_no_substitution",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "bootstrap_paired",
+      "module": "jev_trading_scoring.py",
+      "test": "tests.test_jev_trading.MetricsTests.test_cluster_bootstrap_call_and_representative_no_substitution",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "bootstrap_method",
+      "module": "jev_trading_scoring.py",
+      "test": "tests.test_jev_trading.MetricsTests.test_cluster_bootstrap_call_and_representative_no_substitution",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "bootstrap_draws",
+      "module": "jev_trading_scoring.py",
+      "test": "tests.test_jev_trading.MetricsTests.test_cluster_bootstrap_call_and_representative_no_substitution",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "bootstrap_seed",
+      "module": "jev_trading_scoring.py",
+      "test": "tests.test_jev_trading.MetricsTests.test_cluster_bootstrap_call_and_representative_no_substitution",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "beats_model",
+      "module": "jev_trading_scoring.py",
+      "test": "tests.test_jev_trading.BeatsTests.test_all_pairs_subset_not_run_and_interval_boundaries",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "beats_pair_coverage",
+      "module": "jev_trading_scoring.py",
+      "test": "tests.test_jev_trading.BeatsTests.test_all_pairs_subset_not_run_and_interval_boundaries",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "beats_incomplete",
+      "module": "jev_trading_scoring.py",
+      "test": "tests.test_jev_trading.BeatsTests.test_all_pairs_subset_not_run_and_interval_boundaries",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "beats_no_pairs",
+      "module": "jev_trading_scoring.py",
+      "test": "tests.test_jev_trading.BeatsTests.test_all_pairs_subset_not_run_and_interval_boundaries",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "beats_strict_f1",
+      "module": "jev_trading_scoring.py",
+      "test": "tests.test_jev_trading.BeatsTests.test_all_pairs_subset_not_run_and_interval_boundaries",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "beats_brier_upper",
+      "module": "jev_trading_scoring.py",
+      "test": "tests.test_jev_trading.BeatsTests.test_all_pairs_subset_not_run_and_interval_boundaries",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "beats_canary",
+      "module": "jev_trading_scoring.py",
+      "test": "tests.test_jev_trading.BeatsTests.test_canary_failure_missing_report_and_harness_not_pooled",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "harness_conjunction",
+      "module": "jev_trading_scoring.py",
+      "test": "tests.test_jev_trading.BeatsTests.test_canary_failure_missing_report_and_harness_not_pooled",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "date_casefold",
+      "module": "jev_trading_canaries.py",
+      "test": "tests.test_jev_trading.CanaryTests.test_date_shift_worked_examples_preserve_form_and_guard_years",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "date_offset",
+      "module": "jev_trading_canaries.py",
+      "test": "tests.test_jev_trading.CanaryTests.test_date_shift_worked_examples_preserve_form_and_guard_years",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "date_mixed_separators",
+      "module": "jev_trading_canaries.py",
+      "test": "tests.test_jev_trading.CanaryTests.test_date_shift_worked_examples_preserve_form_and_guard_years",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "date_option_contract",
+      "module": "jev_trading_canaries.py",
+      "test": "tests.test_jev_trading.CanaryTests.test_date_shift_worked_examples_preserve_form_and_guard_years",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "date_year_guard",
+      "module": "jev_trading_canaries.py",
+      "test": "tests.test_jev_trading.CanaryTests.test_date_shift_worked_examples_preserve_form_and_guard_years",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "date_subset_pin",
+      "module": "jev_trading_canaries.py",
+      "test": "tests.test_jev_trading.CanaryTests.test_date_subset_pins_and_measured_leftover_year_invariant",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "date_fomc_empty",
+      "module": "jev_trading_canaries.py",
+      "test": "tests.test_jev_trading.CanaryTests.test_date_subset_pins_and_measured_leftover_year_invariant",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "date_freeze_guard",
+      "module": "jev_trading_canaries.py",
+      "test": "tests.test_jev_trading.CanaryTests.test_date_subset_pins_and_measured_leftover_year_invariant",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "audit_fixed_n",
+      "module": "jev_trading_canaries.py",
+      "test": "tests.test_jev_trading.CanaryTests.test_audit_exact_fixed_n_invalid_is_recovery",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "audit_invalid_recovery",
+      "module": "jev_trading_canaries.py",
+      "test": "tests.test_jev_trading.CanaryTests.test_audit_exact_fixed_n_invalid_is_recovery",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "audit_margin",
+      "module": "jev_trading_canaries.py",
+      "test": "tests.test_jev_trading.CanaryTests.test_audit_exact_fixed_n_invalid_is_recovery",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "finbert_fomc",
+      "module": "jev_trading_baselines.py",
+      "test": "tests.test_jev_trading.BaselineTests.test_finbert_mapping_and_fomc_refusal",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "finbert_mapping",
+      "module": "jev_trading_baselines.py",
+      "test": "tests.test_jev_trading.BaselineTests.test_finbert_mapping_and_fomc_refusal",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "finbert_offline",
+      "module": "jev_trading_baselines.py",
+      "test": "tests.test_jev_trading.BaselineTests.test_native_factories_use_pinned_local_only_upstream_loaders",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "nemotron_dimensions",
+      "module": "jev_trading_baselines.py",
+      "test": "tests.test_jev_trading.BaselineTests.test_head_fits_raw_excluded_training_once_and_freezes_bytes",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "head_raw_training",
+      "module": "jev_trading_baselines.py",
+      "test": "tests.test_jev_trading.BaselineTests.test_head_fits_raw_excluded_training_once_and_freezes_bytes",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "head_parameters",
+      "module": "jev_trading_baselines.py",
+      "test": "tests.test_jev_trading.BaselineTests.test_head_fits_raw_excluded_training_once_and_freezes_bytes",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "haiku_parameters",
+      "module": "jev_trading_baselines.py",
+      "test": "tests.test_jev_trading.BaselineTests.test_haiku_rejects_unfrozen_parameters_prices_and_invalid_usage",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "haiku_cap",
+      "module": "jev_trading_baselines.py",
+      "test": "tests.test_jev_trading.BaselineTests.test_haiku_rejects_unfrozen_parameters_prices_and_invalid_usage",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "haiku_reservation",
+      "module": "jev_trading_baselines.py",
+      "test": "tests.test_jev_trading.BaselineTests.test_haiku_gate_cap_and_clm_gpu_boundary",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "model_request",
+      "module": "jev_trading_run.py",
+      "test": "tests.test_jev_trading.TransportTests.test_request_version_options_and_response_mismatch_fail_closed",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "model_response",
+      "module": "jev_trading_run.py",
+      "test": "tests.test_jev_trading.TransportTests.test_request_version_options_and_response_mismatch_fail_closed",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "wire_option_order",
+      "module": "jev_trading_run.py",
+      "test": "tests.test_jev_trading.TransportTests.test_request_version_options_and_response_mismatch_fail_closed",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "danger_zone_header",
+      "module": "jev_trading_run.py",
+      "test": "tests.test_jev_trading.TransportTests.test_http_contract_has_only_standard_headers_and_no_alias",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "syn_fake_only",
+      "module": "jev_trading_run.py",
+      "test": "tests.test_jev_trading.TransportTests.test_scored_preregistration_guards_without_invoking_any_transport",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "scored_source_authority",
+      "module": "jev_trading_run.py",
+      "test": "tests.test_jev_trading.TransportTests.test_scored_preregistration_guards_without_invoking_any_transport",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "scored_two_family_reads",
+      "module": "jev_trading_run.py",
+      "test": "tests.test_jev_trading.TransportTests.test_scored_preregistration_guards_without_invoking_any_transport",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "scored_sdk_amendment",
+      "module": "jev_trading_run.py",
+      "test": "tests.test_jev_trading.TransportTests.test_scored_preregistration_guards_without_invoking_any_transport",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "scored_models_capture",
+      "module": "jev_trading_run.py",
+      "test": "tests.test_jev_trading.TransportTests.test_scored_preregistration_guards_without_invoking_any_transport",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "baseline_pin",
+      "module": "jev_trading_run.py",
+      "test": "tests.test_jev_trading.TransportTests.test_scored_preregistration_guards_without_invoking_any_transport",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "head_freeze",
+      "module": "jev_trading_run.py",
+      "test": "tests.test_jev_trading.TransportTests.test_scored_preregistration_guards_without_invoking_any_transport",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "baseline_preflight",
+      "module": "jev_trading_run.py",
+      "test": "tests.test_jev_trading.TransportTests.test_missing_baseline_adapter_is_rejected_before_calls",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "preregistration_integrity",
+      "module": "jev_trading_run.py",
+      "test": "tests.test_jev_trading.TransportTests.test_changed_preregistration_stops_before_the_next_call",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "no_reuse_directory",
+      "module": "jev_trading_run.py",
+      "test": "tests.test_jev_trading.TransportTests.test_partial_receipt_preserves_collision_and_existing_empty_directory",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "exclusive_artifacts",
+      "module": "jev_trading_run.py",
+      "test": "tests.test_jev_trading.TransportTests.test_partial_receipt_preserves_collision_and_existing_empty_directory",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "receipt_hash_schema",
+      "module": "jev_trading_run.py",
+      "test": "tests.test_jev_trading.TransportTests.test_invalid_registration_no_calls_and_partial_run_retained",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "case_row_validation",
+      "module": "jev_trading_cases.py",
+      "test": "tests.test_jev_trading.CaseTests.test_duplicate_ids_unknown_labels_and_empty_text_rejected",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "finbert_config",
+      "module": "jev_trading_baselines.py",
+      "test": "tests.test_jev_trading.BaselineTests.test_native_factories_use_pinned_local_only_upstream_loaders",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "head_all_labels",
+      "module": "jev_trading_baselines.py",
+      "test": "tests.test_jev_trading.BaselineTests.test_head_requires_all_classes_before_fit",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "haiku_required_gate",
+      "module": "jev_trading_baselines.py",
+      "test": "tests.test_jev_trading.BaselineTests.test_haiku_rejects_unfrozen_parameters_prices_and_invalid_usage",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "haiku_workload_pricing",
+      "module": "jev_trading_baselines.py",
+      "test": "tests.test_jev_trading.BaselineTests.test_haiku_rejects_unfrozen_parameters_prices_and_invalid_usage",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "haiku_estimate_cap",
+      "module": "jev_trading_baselines.py",
+      "test": "tests.test_jev_trading.BaselineTests.test_haiku_rejects_unfrozen_parameters_prices_and_invalid_usage",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "haiku_bound_nonnegative",
+      "module": "jev_trading_baselines.py",
+      "test": "tests.test_jev_trading.BaselineTests.test_haiku_rejects_unfrozen_parameters_prices_and_invalid_usage",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "haiku_usage_nonnegative",
+      "module": "jev_trading_baselines.py",
+      "test": "tests.test_jev_trading.BaselineTests.test_haiku_rejects_unfrozen_parameters_prices_and_invalid_usage",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "empty_metric_population",
+      "module": "jev_trading_scoring.py",
+      "test": "tests.test_jev_trading.MetricsTests.test_empty_scored_population_rejected",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "harness_all_sets",
+      "module": "jev_trading_scoring.py",
+      "test": "tests.test_jev_trading.BeatsTests.test_canary_failure_missing_report_and_harness_not_pooled",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "latency_minimum",
+      "module": "jev_trading_run.py",
+      "test": "tests.test_jev_trading.TransportTests.test_latency_nearest_rank_sample_and_cost_oracle",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "latency_valid_values",
+      "module": "jev_trading_run.py",
+      "test": "tests.test_jev_trading.TransportTests.test_latency_nearest_rank_sample_and_cost_oracle",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "preregistration_shape",
+      "module": "jev_trading_run.py",
+      "test": "tests.test_jev_trading.TransportTests.test_scored_preregistration_guards_without_invoking_any_transport",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "receipt_required",
+      "module": "jev_trading_run.py",
+      "test": "tests.test_jev_trading.TransportTests.test_receipt_schema_rejects_missing_fields_states_and_commands",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "receipt_state",
+      "module": "jev_trading_run.py",
+      "test": "tests.test_jev_trading.TransportTests.test_receipt_schema_rejects_missing_fields_states_and_commands",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "receipt_command_exit",
+      "module": "jev_trading_run.py",
+      "test": "tests.test_jev_trading.TransportTests.test_receipt_schema_rejects_missing_fields_states_and_commands",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "http_model_guard",
+      "module": "jev_trading_run.py",
+      "test": "tests.test_jev_trading.TransportTests.test_http_invalid_model_stops_before_any_key_read_or_socket",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "haiku_shared_workload",
+      "module": "jev_trading_run.py",
+      "test": "tests.test_jev_trading.TransportTests.test_haiku_workload_config_cannot_change_between_sets",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "clm_gpu_window",
+      "module": "jev_trading_run.py",
+      "test": "tests.test_jev_trading.TransportTests.test_scored_preregistration_guards_without_invoking_any_transport",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    },
+    {
+      "id": "baseline_not_run_reason",
+      "module": "jev_trading_run.py",
+      "test": "tests.test_jev_trading.TransportTests.test_scored_preregistration_guards_without_invoking_any_transport",
+      "status": "KILLED",
+      "exit_code": 1,
+      "live_source_unchanged": true,
+      "failure_tail": null
+    }
+  ],
+  "command": [
+    "<P1-scoring-python>",
+    "-B",
+    "blueprints/native-skill-practice/p1/jev_trading_mutants.py"
+  ],
+  "exit_code": 0,
+  "initial_campaign": {
+    "count": 66,
+    "killed": 64,
+    "survived": [
+      "finbert_fomc",
+      "baseline_pin"
+    ],
+    "correction": "Assert the explicit FOMC refusal and provide an otherwise valid head pin when testing the baseline pin. Both isolated reruns were killed; then all explicit refusal guards were added."
+  },
+  "projection": {
+    "kind": "historical-result-without-unsupported-digests",
+    "note": "Dated measurements and test associations retained. Unpublished failure-output and superseded source/mutant digests omitted; this is not current-fold acceptance. Original public history is not rewritten.",
+    "superseded_by": "guard-mutants.json"
+  }
+}

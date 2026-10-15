@@ -1,0 +1,183 @@
+{
+  "schema_version": 1,
+  "kind": "frozen_source_reproduction",
+  "evidence_class": "local_integration",
+  "exit_code": 0,
+  "seed": 20261011,
+  "source_sha256": {
+    "fpb": "bb1b4df6de05d50b146f87a9d4d024b69f947066445f2384f014c3564c1612c8",
+    "tfn_train": "71aa99d0d37feced03c999ec23b5b25302c92f39d69b6acb0a37aa076c5420e8",
+    "tfn_scored": "31ea8274c98b52212daa68f2fb962811bf1913c1efe51b99765c8e2311806de6",
+    "fomc_train": "3c9ec066b7bbdedc60d553b48e74ae6ca36715b5de2f9000a82e76e909bd76b7",
+    "fomc_scored": "c4b6a660a3cd67f940f59b1b77fc4d2f1b99e56c94eaf54b9298a37647ecfbac"
+  },
+  "dependencies": {
+    "numpy": "2.5.3",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1"
+  },
+  "sets": {
+    "FPB-50": {
+      "id_sha256": {
+        "training": "6c465f233055ff08f4b24fc2a2e27c25873a9e930d2a57c789ce8ace88b7290a",
+        "final_training": "3b1ab6c118ecd6714cd48766289d35bfb34eb1b33d1f642190a1673e6b2e9ff2",
+        "scored": "8190e1b51b698362ac21134a74b4e5e3f835e009ca5a29729aa17f8c3e35b008",
+        "excluded_training": "fb94ccfcbce477cd2fe9ca9674f2acd64e28bb7d14c822aa484524386082aa75"
+      },
+      "counts": {
+        "training": 3392,
+        "final_training": 3389,
+        "scored": 1454,
+        "excluded_training": 3
+      },
+      "label_counts": {
+        "training": {
+          "negative": 423,
+          "neutral": 2015,
+          "positive": 954
+        },
+        "final_training": {
+          "negative": 423,
+          "neutral": 2012,
+          "positive": 954
+        },
+        "scored": {
+          "negative": 181,
+          "neutral": 864,
+          "positive": 409
+        }
+      },
+      "content_sha256": {
+        "training": "f643fdeeffbc3a987dfb2e80f6b0b2afe0cc4bfa859194f4f415f5cefed3fed9",
+        "final_training": "ecc44bf4b8ef288e711fcaefda5e30cc2b5e85ef989508045212b2d05c73468b",
+        "scored": "834ce5fdf1cfba065395e3f8e4f1e40a25bc504d494db5839a2f22130b2531f3"
+      },
+      "clusters": {
+        "count": 1454,
+        "duplicate_texts": 0,
+        "duplicate_rows": 0,
+        "conflicting_labels": 0
+      },
+      "date_shift": {
+        "id_sha256": "e1ec893251c2272482a5a5431b9b9425478d32dff2dda07dab1a89efc4c530a0",
+        "expression_sha256": "4c708d21f7e2c866af594ff7fde7e7367c011b2283919f69ed031dd1974efcb2",
+        "shifted_matches": 117,
+        "unchanged_matches": 0,
+        "guarded_years": 0,
+        "leftover_years": 0
+      },
+      "date_shift_count": 108
+    },
+    "TFN": {
+      "id_sha256": {
+        "training": "54ee1a5b3d81542b0b7876fa2eb5e8e3927829ad300138d2d5ce32e2f6ee6059",
+        "final_training": "823bd5d20b6e3ff05cf83cbbd131d71852dcd1405f97012acd1d61a7f563f0ab",
+        "scored": "19ca04442b94550b226cd9afc0d07cf1f878ba0b2e7df0d3c2c9273dba0b0f67",
+        "excluded_training": "7d8ce0ca27bc50ec1cfe61854f1cbfebdf2896e78c7320f1070b4ff7bf246e2e"
+      },
+      "counts": {
+        "training": 9543,
+        "final_training": 9542,
+        "scored": 2388,
+        "excluded_training": 1
+      },
+      "label_counts": {
+        "training": {
+          "bearish": 1442,
+          "bullish": 1923,
+          "neutral": 6178
+        },
+        "final_training": {
+          "bearish": 1441,
+          "bullish": 1923,
+          "neutral": 6178
+        },
+        "scored": {
+          "bearish": 347,
+          "bullish": 475,
+          "neutral": 1566
+        }
+      },
+      "content_sha256": {
+        "training": "14461098decbea3cbeeeb9bb0f671add3868174b36d2eb78864e93cb1f6abfd7",
+        "final_training": "d2883c0e565e22af2784abc118b81bdf7ebf4bb87c838ccaa22eba49b0b59220",
+        "scored": "1dffaaa892e934a8d7ce3f162fab093928b325f85354ca2f3f302d58fb08ef8d"
+      },
+      "clusters": {
+        "count": 2388,
+        "duplicate_texts": 0,
+        "duplicate_rows": 0,
+        "conflicting_labels": 0
+      },
+      "date_shift": {
+        "id_sha256": "620cb349447fd38b32cc63d5502acac01f71757d152a7e2cc63ad9ed26d00797",
+        "expression_sha256": "4c708d21f7e2c866af594ff7fde7e7367c011b2283919f69ed031dd1974efcb2",
+        "shifted_matches": 16,
+        "unchanged_matches": 0,
+        "guarded_years": 0,
+        "leftover_years": 0
+      },
+      "date_shift_count": 16
+    },
+    "FOMC": {
+      "id_sha256": {
+        "training": "dd3e718c4662bb3b5c11705528159995e65ab6c1ef3ffdd57447ecce0df39400",
+        "final_training": "6f3e0699af75db9a981cd1a86c780b882663e5c7e7803c12a3a0ef28889928bc",
+        "scored": "c88b19824ffc35cafb1e87765c88eed214f4eaf775d0e7f35bb58409d227cdb6",
+        "excluded_training": "efaa64725fd5936e8442887a739817b39049cb1d25877f06a97ad25da2f1e097"
+      },
+      "counts": {
+        "training": 1984,
+        "final_training": 1960,
+        "scored": 496,
+        "excluded_training": 24
+      },
+      "label_counts": {
+        "training": {
+          "dovish": 515,
+          "hawkish": 492,
+          "neutral": 977
+        },
+        "final_training": {
+          "dovish": 507,
+          "hawkish": 484,
+          "neutral": 969
+        },
+        "scored": {
+          "dovish": 135,
+          "hawkish": 114,
+          "neutral": 247
+        }
+      },
+      "content_sha256": {
+        "training": "7c14bb7f55aa45df831650363131ece5d7fb1f91e7b6648fd00657cbe804caff",
+        "final_training": "95b92ef604d779f2f35b1ec3c007a217acd496cfb82dd31b3a25a7092976ab29",
+        "scored": "85f7a4bc18f8f734a0149e91a6be56fdb9275783ef17c576f703bbb684e9e7ad"
+      },
+      "clusters": {
+        "count": 494,
+        "duplicate_texts": 2,
+        "duplicate_rows": 4,
+        "conflicting_labels": 1
+      },
+      "date_shift": {
+        "id_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "expression_sha256": "4c708d21f7e2c866af594ff7fde7e7367c011b2283919f69ed031dd1974efcb2",
+        "shifted_matches": 0,
+        "unchanged_matches": 0,
+        "guarded_years": 0,
+        "leftover_years": 0
+      },
+      "date_shift_count": 0
+    }
+  },
+  "code_sha256": {
+    "jev_trading_cases.py": "540c4629c9ffe3dbc2b0d1104c8332a7f7dcd70b1e6fa55b07a91d1b2caa1d32",
+    "jev_trading_canaries.py": "3e3ae0c32dbf4c5286b6028e8306c94e5e231c7f3fe69397c1fe8b5d006c7e23"
+  },
+  "command": [
+    "<P1-scoring-python>",
+    "-B",
+    "build_frozen_sets(retained paths plus SOURCE_PINS); freeze_dates(frozen=True)"
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "build_base": "0f4ee075b2ab3af1b099d5ca1ecb8cae02ee3f5b",
+  "isolation": "bwrap: live root read-only, private /var/tmp, fresh /dev and /proc, --unshare-net --die-with-parent",
+  "numeric_dependencies": {"numpy": "2.5.3", "scipy": "1.18.1", "scikit-learn": "1.9.1"},
+  "final_tests": {
+    "command": ["<P1-scoring-python>", "-B", "-m", "unittest", "tests.test_jev_trading", "tests.test_jev_p1_casepack", "tests.test_jev_p1_scoring"],
+    "tests_run": 127,
+    "exit_code": 0,
+    "skipped": 0,
+    "status": "PASS"
+  },
+  "guard_mutants": {"receipt": "guard-mutants.json", "count": 90, "killed": 90, "exit_code": 0},
+  "fail_first": [
+    {"seam": "builder", "before": "ModuleNotFoundError: jev_trading_cases", "test": "CaseTests", "after": "PASS"},
+    {"seam": "metrics/bootstrap", "before": "ModuleNotFoundError: jev_trading_scoring", "test": "MetricsTests", "after": "PASS"},
+    {"seam": "BEATS/canaries", "before": "missing beats function and canary module", "test": "BeatsTests and CanaryTests", "after": "PASS"},
+    {"seam": "baseline adapters", "before": "ModuleNotFoundError: jev_trading_baselines", "test": "BaselineTests", "after": "PASS"},
+    {"seam": "transport/receipts", "before": "ModuleNotFoundError: jev_trading_run", "test": "TransportTests", "after": "PASS"},
+    {"correction": "date regex case folding widened TFN to 18 items instead of 16", "before_exit_code": 1, "test": "CanaryTests.test_date_shift_worked_examples_preserve_form_and_guard_years", "source": "record decision 7, JV47 exact expression and subset hash", "after": "PASS"},
+    {"correction": "retain exact request wire bytes to preserve option order", "before": "KeyError: request_wire", "test": "TransportTests.test_syn_preregistration_precedes_every_call_and_both_models_share_requests", "source": "record decisions 3/9; TypeSafe HTTP Choice API capture", "after": "PASS"},
+    {"correction": "reject missing baseline adapter before Jev calls", "before": "76 fake Jev calls occurred before rejection", "test": "TransportTests.test_missing_baseline_adapter_is_rejected_before_calls", "source": "record decision 9 preregistration deadline", "after": "PASS; zero calls"},
+    {"correction": "unwrap decorated numeric functions when citing implementation source", "before": "four implementation-filename assertions failed", "test": "SourceEvidenceTests.test_metric_source_citations_reference_implementations", "source": "CPython 3.12 Lib/inspect.py inspect.unwrap; installed sklearn/scipy implementation files", "after": "PASS"},
+    {"correction": "first-position diagnostic applies only to ordered-option arms", "before": "TypeError for ordered_options argument", "test": "MetricsTests.test_unordered_baseline_has_no_first_position_diagnostic", "source": "record decision 3 first-position diagnostic", "after": "PASS"},
+    {"correction": "derive Haiku estimate from captured rates and frozen call/token counts", "before": "invalid estimate and twice-estimate cap accepted", "test": "BaselineTests.test_haiku_rejects_unfrozen_parameters_prices_and_invalid_usage", "source": "record decision 8, JV52", "after": "PASS"},
+    {"correction": "match declared Haiku order to actual set/condition order before calls", "before": "wrong order proceeded to COMPLETE_WITH_FAILURES", "test": "TransportTests.test_haiku_declared_order_must_equal_actual_order_before_calls", "source": "record decision 4 Haiku call order", "after": "PASS; zero calls"},
+    {"correction": "mask malformed Haiku usage while retaining valid accounting", "before": "untrusted nonnumeric usage text appeared in the synthetic journal", "test": "TransportTests.test_fake_haiku_gate_order_and_malformed_usage_are_retained_safely", "source": "record decision 9 masked retention; typed response usage", "after": "PASS"}
+  ],
+  "publication_preflight": {"exit_code": 1, "finding": "new evidence required files[] hash registration; the extended P1 README required its current digest and byte count; the two deliberately public SYN journals needed explicit tracking under the repository's JSONL ignore rule", "source": "native-agent-stack 0f4ee075 scripts/validate.py and scripts/evidence_manifest.py"},
+  "repository_validation": {"command": ["python3", "scripts/validate.py"], "status": "PASS", "exit_code": 0, "components": 71, "hashed_files": 12063, "profiles": 4, "receipts": 240},
+  "scored_run": "NOT_RUN; trading-cc owns credential_run execution after two-family reads",
+  "build_network_calls": 0,
+  "credential_reads": 0
+}

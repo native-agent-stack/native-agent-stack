@@ -1,5 +1,11 @@
 # P1 case pack and draft freeze packet (claim-to-source verification)
 
+The [frozen trading classification extension](JEV-TRADING.md) implements the
+2026-10-11 Jev static-set record and ADDENDUM-01. It has separate case and metric
+definitions, reuses P1's numeric dependencies and statistical primitives, and
+provides an offline fake-transport SYN runner. Its scored execution belongs to
+the trading runner after review.
+
 P1 is the first preregistration of the Jev and TypeSafe design report r1 (section 5.1): can
 `jev-1.13.0` close "supported" claims ahead of Opus without letting non-supported claims through?
 This folder holds its deterministic tooling. Nothing here has called a model or sent a case to any
