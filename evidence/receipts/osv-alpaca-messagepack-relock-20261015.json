@@ -56,7 +56,7 @@
     "evidence_class": "local_integration",
     "dotnet_sdk": "10.0.401, official Linux x64 archive, publisher SHA-512 51c8b999af9e8dd9998c9edc5944e19a90788862068acd38694e098889054ce8c23d4f0c5cccfa16bf187d044562359e5ee69a9f8ad0bbe913ba90311fbce25b verified before extraction (the #1098 archive, re-verified)",
     "icu": "libicu78_78.2-2ubuntu1_amd64.deb sha256 c8b97930f9e365d6d00978144b468ac8397ef07d2fb2c453869f05fc3a98c4ca extracted to a task-local prefix and passed through LD_LIBRARY_PATH; host packages and SDK globalization unchanged",
-    "nuget_config": "Task-owned public-only NuGet.Config (nuget.org v3 only, cleared sources), sha256 aec93b5637ab6d62470979a008990a4a336a287ab83a3f2541849ae735674055, passed with --configfile to every restore",
+    "nuget_config": "Task-owned public-only NuGet.Config: a cleared packageSources list plus the single nuget.org v3 source, passed with --configfile to every restore",
     "layout": "Fresh physical sibling clones under one task root: Lean at 985ef30ad3ac774218c5ac516b4cb0aa2655730f with the published lean-dependencies.patch and 22 lean-locks; Alpaca at 1973f6165bee212acf656ed2f9cb0af86d4f2a18",
     "scheduling": "Restores, builds and scans ran under systemd-run --user --scope -p CPUWeight=idle"
   },

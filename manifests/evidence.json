@@ -60883,8 +60883,8 @@
     },
     {
       "path": "evidence/receipts/osv-alpaca-messagepack-relock-20261015.json",
-      "sha256": "be7ced1ef6eb3aa0e5a178ef3f57cccc3ab7cfcf438d37f3d42833eb6a8a7b25",
-      "bytes": 10946
+      "sha256": "8b9126ca81fc992a32487d62d2abbabbe1b46a06bbf99d5f6f731435b370c98f",
+      "bytes": 10903
     },
     {
       "path": "evidence/receipts/osv-captured-lumibot-lockchecks-20261005.json",
