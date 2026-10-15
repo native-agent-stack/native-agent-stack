@@ -17463,8 +17463,8 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-baseline.json",
-      "sha256": "d95bbcc8d78a91f3632be198ee01c821a41a2b3b93f6f03f8cae963b63942204",
-      "bytes": 79507
+      "sha256": "448dc455109c97facd36a4d56acaaa1581bf13e2681cb9330b5f6bf9b39bdb77",
+      "bytes": 79180
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
@@ -19738,8 +19738,8 @@
     },
     {
       "path": "docs/upstream-surface-watch.md",
-      "sha256": "f6a26af19fcca7610ab0fea3a51dce9a5ee5d275626efec42dda8eb34e0e24f4",
-      "bytes": 20312
+      "sha256": "1bf99549d0f4881d1290e01bdaac12cfd78709bebfadded5d8e68537d08d21c6",
+      "bytes": 20361
     },
     {
       "path": "docs/w6-layer-verdict-delta-20261011.md",
@@ -64183,8 +64183,8 @@
     },
     {
       "path": "tests/test_upstream_surface_watch.py",
-      "sha256": "a87fccebd1ebbc31b02c665e640d7945211ff9f4a48422a95dbfb8e40ee61cff",
-      "bytes": 128671
+      "sha256": "660d9c253f5c8dcbf7137f04861fa4a4d47f4d0d86ea84e838d494ca7057e9c6",
+      "bytes": 133311
     },
     {
       "path": "tests/test_us_equities_hosting.py",

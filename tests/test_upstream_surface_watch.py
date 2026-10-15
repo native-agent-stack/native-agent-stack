@@ -49,6 +49,32 @@ def cached_artifact(test: unittest.TestCase, source: str) -> bytes:
         test.skipTest(f"cached upstream input unavailable: {source}; set UPSTREAM_SURFACE_TEST_CACHE")
     return path.read_bytes()
 
+
+def committed_baseline_for(bodies: dict[str, bytes]) -> tuple[dict, bool]:
+    """The committed baseline, and whether every cached body ({source: body}) is the very artifact it recorded (the
+    sha256 of its sources entry). The cached-artifact checks compare a parse with it instead of a release-specific
+    literal, so they hold for whatever release the baseline and the cache are at."""
+    baseline = json.loads((ROOT / usw.BASELINE_PATH).read_text(encoding="utf-8"))
+    return baseline, all(sha256(body) == baseline["sources"][source]["sha256"] for source, body in bodies.items())
+
+
+def assert_baseline_holds(test: unittest.TestCase, exact: bool, label: str, observed: list[str], names: list[str],
+                          count: int | None = None) -> None:
+    """The parse of an unmodified cached artifact against the committed baseline. When the cache holds the baseline's
+    own artifact (exact), observed must equal the baseline's names, or, given its per-source count, have that count
+    and lie within the kind's names; so a parser that loses or misreads names on an artifact and on its reformatted
+    copy alike still fails. When the cache holds another release, the count must keep the watch's own floor
+    (usw.FLOOR_PERCENT % of the baseline count), the check a daily run applies before a re-baseline."""
+    held = len(names) if count is None else count
+    with test.subTest(baseline="exact: the baseline's own artifact" if exact else "floor: another release", of=label):
+        if not exact:
+            test.assertIsNone(usw.floor_failure(label, len(observed), held))
+        elif count is None:
+            test.assertEqual(observed, names, f"{label}: the committed baseline names differ for this artifact")
+        else:
+            test.assertEqual(len(observed), count, f"{label}: the committed baseline count differs for this artifact")
+            test.assertLessEqual(set(observed), set(names), f"{label}: names outside the committed baseline kind")
+
 # Small synthetic document bodies; never used as observed upstream evidence.
 DOCUMENTS = {
     "https://code.claude.com/docs/en/memory": b"# Memory\nSynthetic instruction imports.\n",
@@ -870,13 +896,20 @@ class FloorTests(unittest.TestCase):
 
 
 class CachedArtifactTests(unittest.TestCase):
-    """Local integration checks using optional cached vendor artifacts; these are not upstream tests."""
+    """Local integration checks using optional cached vendor artifacts; these are not upstream tests. Each checks the
+    parse of the unmodified artifact against the committed baseline (assert_baseline_holds), not a release-specific
+    count, and then that a reformatted or corrupted copy parses the same or fails its anchor."""
 
     def test_equivalent_string_escapes_preserve_the_real_sdk_hook_and_settings_sets(self):
         """Local integration check, not an upstream test: escaped hook and quoted $schema spellings preserve names."""
-        sdk = cached_artifact(self, "claude-agent-sdk-types").decode("utf-8")
+        body = cached_artifact(self, "claude-agent-sdk-types")
+        sdk = body.decode("utf-8")
         hooks, settings = usw.parse_hook_events(sdk), usw.parse_settings_keys(sdk)
-        self.assertEqual((len(hooks), len(settings)), (33, 173))
+        baseline, exact = committed_baseline_for({"claude-agent-sdk-types": body})
+        assert_baseline_holds(self, exact, "claude:hook", hooks, baseline["kinds"]["claude:hook"])
+        assert_baseline_holds(self, exact, "claude:setting from sdk.d.ts", settings,
+                              baseline["kinds"]["claude:setting"],
+                              baseline["source_counts"]["claude:setting"]["sdk.d.ts"])
         escaped = sdk.replace("'PreToolUse'", r"'\u0050reToolUse'", 1)
         anchor = usw.SETTINGS_ANCHOR.search(escaped)
         key = re.compile(r"(?m)^([ \t]+)\$schema(\??[ \t]*:)").search(escaped, anchor.end())
@@ -887,9 +920,13 @@ class CachedArtifactTests(unittest.TestCase):
 
     def test_escaped_quoted_setting_preserves_the_real_sdk_settings_set(self):
         """Local integration check, not an upstream test: quote a real SDK key and decode its hexadecimal escapes."""
-        sdk = cached_artifact(self, "claude-agent-sdk-types").decode("utf-8")
+        body = cached_artifact(self, "claude-agent-sdk-types")
+        sdk = body.decode("utf-8")
         original = usw.parse_settings_keys(sdk)
-        self.assertEqual(len(original), 173)
+        baseline, exact = committed_baseline_for({"claude-agent-sdk-types": body})
+        assert_baseline_holds(self, exact, "claude:setting from sdk.d.ts", original,
+                              baseline["kinds"]["claude:setting"],
+                              baseline["source_counts"]["claude:setting"]["sdk.d.ts"])
         anchor = usw.SETTINGS_ANCHOR.search(sdk)
         key = re.compile(r"(?m)^([ \t]+)\$schema(\??[ \t]*:)").search(sdk, anchor.end())
         self.assertIsNotNone(key)
@@ -897,23 +934,42 @@ class CachedArtifactTests(unittest.TestCase):
         self.assertEqual(usw.parse_settings_keys(escaped), original)
 
     def test_commonmark_closing_markers_on_every_heading_preserve_the_real_settings(self):
-        """Local integration check, not an upstream test: CommonMark ATX formatting preserves all 171 keys."""
-        page = cached_artifact(self, "claude-settings-reference-page").decode("utf-8")
+        """Local integration check, not an upstream test: CommonMark ATX formatting preserves every key."""
+        body = cached_artifact(self, "claude-settings-reference-page")
+        page = body.decode("utf-8")
         expected = usw.parse_settings_reference(page)
-        self.assertEqual(len(expected), 171)
+        baseline, exact = committed_baseline_for({"claude-settings-reference-page": body})
+        assert_baseline_holds(self, exact, "claude:setting from settings-reference.md", expected,
+                              baseline["kinds"]["claude:setting"],
+                              baseline["source_counts"]["claude:setting"]["settings-reference.md"])
         for indent in range(4):
             with self.subTest(leading_spaces=indent):
                 reformatted = re.sub(r"(?m)^(#{1,6})([ \t]+.*)$",
                                      lambda match: " " * indent + match.group() + "\t" + match.group(1) + " \t", page)
                 self.assertEqual(usw.parse_settings_reference(reformatted), expected)
 
-    def test_closing_markers_on_the_ten_docs_only_headings_preserve_the_real_settings(self):
+    def assert_docs_only_holds(self, page: bytes, sdk: bytes, docs_only: set[str]) -> None:
+        """The docs-only keys (settings-reference.md keys that sdk.d.ts does not type) number the committed baseline's
+        claude:setting count minus its sdk.d.ts count when the cache holds both artifacts it recorded. With another
+        release there must be at least one, or the check would reformat nothing; the watch sets no floor on them."""
+        baseline, exact = committed_baseline_for({"claude-settings-reference-page": page,
+                                                  "claude-agent-sdk-types": sdk})
+        branch = "exact: the baseline's own artifacts" if exact else "another release"
+        with self.subTest(baseline=branch, of="docs-only"):
+            if exact:
+                self.assertEqual(len(docs_only), baseline["counts"]["claude:setting"]
+                                 - baseline["source_counts"]["claude:setting"]["sdk.d.ts"])
+            self.assertTrue(docs_only, "no docs-only heading to reformat")
+
+    def test_closing_markers_on_the_docs_only_headings_preserve_the_real_settings(self):
         """Local integration check, not an upstream test: the SDK union cannot mask lost docs-only headings."""
-        page = cached_artifact(self, "claude-settings-reference-page").decode("utf-8")
+        page_body, sdk_body = (cached_artifact(self, "claude-settings-reference-page"),
+                               cached_artifact(self, "claude-agent-sdk-types"))
+        page = page_body.decode("utf-8")
         expected = usw.parse_settings_reference(page)
-        sdk = usw.parse_settings_keys(cached_artifact(self, "claude-agent-sdk-types").decode("utf-8"))
+        sdk = usw.parse_settings_keys(sdk_body.decode("utf-8"))
         docs_only = set(expected) - set(sdk)
-        self.assertEqual(len(docs_only), 10)
+        self.assert_docs_only_holds(page_body, sdk_body, docs_only)
         headings = re.findall(r"(?m)^### `([^`]+)`$", page)
         self.assertEqual({key.split(".")[0] for key in headings if key.split(".")[0] in docs_only}, docs_only)
         reformatted = re.sub(r"(?m)^### `([^`]+)`$",
@@ -922,11 +978,14 @@ class CachedArtifactTests(unittest.TestCase):
         self.assertEqual(usw.parse_settings_reference(reformatted), expected)
 
     def test_setext_docs_only_headings_trip_the_independent_index_guard(self):
-        """Local integration check, not an upstream test: an unsupported heading form cannot silently lose ten keys."""
-        page = cached_artifact(self, "claude-settings-reference-page").decode("utf-8")
-        sdk = usw.parse_settings_keys(cached_artifact(self, "claude-agent-sdk-types").decode("utf-8"))
+        """Local integration check, not an upstream test: an unsupported heading form cannot silently lose docs-only
+        keys."""
+        page_body, sdk_body = (cached_artifact(self, "claude-settings-reference-page"),
+                               cached_artifact(self, "claude-agent-sdk-types"))
+        page = page_body.decode("utf-8")
+        sdk = usw.parse_settings_keys(sdk_body.decode("utf-8"))
         docs_only = set(usw.parse_settings_reference(page)) - set(sdk)
-        self.assertEqual(len(docs_only), 10)
+        self.assert_docs_only_holds(page_body, sdk_body, docs_only)
         unsupported = re.sub(r"(?m)^### `([^`]+)`$",
                              lambda match: f"`{match.group(1)}`\n---" if match.group(1).split(".")[0] in docs_only
                              else match.group(), page)
@@ -934,9 +993,11 @@ class CachedArtifactTests(unittest.TestCase):
             usw.parse_settings_reference(unsupported)
 
     def test_incomplete_schema_is_rejected_daily_and_when_writing_baseline(self):
-        """Local integration check, not an upstream test: corrupt the real rust-v0.160.0 schema offline."""
+        """Local integration check, not an upstream test: corrupt the real cached schema offline."""
         original = cached_artifact(self, "codex-config-schema")
-        self.assertEqual(len(usw.flatten_codex_schema(original)), 1034)
+        baseline, exact = committed_baseline_for({"codex-config-schema": original})
+        assert_baseline_holds(self, exact, "codex:config", usw.flatten_codex_schema(original),
+                              baseline["kinds"]["codex:config"])
         missing_definitions = json.loads(original)
         del missing_definitions["definitions"]
         dangling = json.loads(original)

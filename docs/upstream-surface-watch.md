@@ -88,8 +88,8 @@ Integrity checks apply before the baseline floor in every mode: all local Codex 
 their top-level names, including global and removed entries before exclusion, must agree with the Settings index's
 first-column backticked names within two distinct keys. TypeScript hook and quoted-setting literals decode
 [string escapes](https://tc39.es/ecma262/#sec-literals-string-literals), including line continuations; malformed
-numeric escapes fail the anchor. These are local integration checks against cached SDK 0.3.289, Codex rust-v0.160.0
-and docs artifacts, with synthetic malformed-input controls.
+numeric escapes fail the anchor. These are local integration checks against the cached SDK, Codex and docs artifacts,
+held to the committed baseline (its 80% floor at another release), with synthetic malformed-input controls.
 
 ## Instruction-document watch (2026-10-05)
 
