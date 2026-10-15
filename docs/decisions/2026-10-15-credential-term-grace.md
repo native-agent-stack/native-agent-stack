@@ -21,16 +21,18 @@ TERM to the owned command group, waits the selected grace while checking group
 existence, then sends KILL if necessary. This PR leaves that program unchanged.
 It also leaves end_group, parent-death behavior, credential lookup/loading,
 masking, child scrubbing and must_not_be_set rules unchanged. The small changes
-in _main and run_command route only the parsed option. A byte comparison test
-proves those policy functions/constants and the watchdog program equal base;
-within _main it excludes only the option unpack/dispatch lines.
+in _main and run_command route only the parsed option. The reviewed diff leaves
+those policy functions/constants and the watchdog program unchanged. Semantic
+tests exercise synthetic parsing, required-variable refusal, child scrubbing,
+must_not_be_set and masking against both the current module and a fixed base
+control. Unrelated future edits do not fail a whole-file equality assertion.
 
 K4's new grammar at `scripts/hooks/secret_path_guard.py:3104,3119-3134`
 admits exactly the separate bounded integer form. Child arguments after --
 retain their existing meaning. The options parity check pins the one addition,
-and the invariance test proves every byte outside the runner-options constant
-and runner-usage grammar function equals base. All existing safety checks in
-that function remain after the added validation. No other guard rule changes.
+and semantic compatibility cases reuse the existing runner-start, environment,
+mention, usage and documentation fixtures. All existing safety checks in that
+function remain after the added validation. No other guard rule changes.
 
 ## Primary sources and limits
 
@@ -45,11 +47,13 @@ that function remain after the added validation. No other guard rule changes.
   `Lib/subprocess.py:2176-2216` supplies supported signal/wait primitives.
   The existing watchdog follows CPython's multiprocessing resource-tracker
   pipe/EOF design, already cited in credential_run.py's source.
-- Shared-runner r3 `cb0e7d348d564520eb0911476d9d4b0f227952ea`:
-  transport.py:973 gives5s connect+5s read, preflight observers cap50requests,
-  recovery.py:94-98,223 caps order work at120s and329 teardown at10s.
-  Its validated budget is50*(5+5)+120+10=630s. Future r4 caller wiring chooses
-  at least that value; no caller is opted in by this PR and #1139 is unchanged.
+- Public mechanism references:
+  [signal(7)](https://git.kernel.org/pub/scm/docs/man-pages/man-pages.git/tree/man/man7/signal.7?id=c420f73ec92dacd8c6801283e2e4c47e9a1828b7)
+  and [kill(2)](https://git.kernel.org/pub/scm/docs/man-pages/man-pages.git/tree/man/man2/kill.2?id=c420f73ec92dacd8c6801283e2e4c47e9a1828b7)
+  at the Linux man-pages pin above establish the TERM/KILL and group-targeting
+  semantics. Each future caller must validate its own recovery budget before
+  choosing a grace; 630 seconds is an accepted example, not a budget validated
+  by this generic tool. Caller validation and wiring remain separate.
 
 These are existing supported mechanisms. The override cannot guarantee
 recovery success, alter kernel signal semantics, control escaped groups, or
@@ -103,7 +107,10 @@ New fail-first tests use the existing WatchdogTests process-group fixture with
 an empty child environment. They execute the new constructor/API path, TERM-
 handling and TERM-ignoring children, default2s behavior and successful disarm.
 Pure parser tests access no inventory. Guard cases accept1/630/3600 and refuse
-all required malformed forms; byte/parity checks retain the original rules.
+all required malformed forms, including first-position options, --check and a
+missing separator. Semantic compatibility/parity checks retain the original
+rules without freezing whole files. The ignoring-child test checks the actual
+watchdog argv is 1, distinguishing the opt-in from the existing 2.0 default.
 The full existing credential and privacy-guard suites run as compatibility
 checks using their established synthetic fixtures. No real credential store,
 credential value or provider is read or printed by the new tests.
@@ -115,6 +122,8 @@ environment skips. Its existing portable CI mode passes90 cases with3 skips
 (including that host-install comparison). Skips are not host acceptance.
 The first credential run caught the legacy help-line assertion; the original
 usage line was retained and a separate opt-in form added before the final pass.
+The help/usage output therefore gains two documented lines; it is not byte-
+identical, while no-flag execution and default grace are unchanged.
 
 Only arithmetic source metadata is refreshed beyond those production regions:
 the guard's installer checksum and its registry row, plus the credential tool's
@@ -122,3 +131,40 @@ registry row. Other registry rows and every installer behavior remain intact;
 no installer is run against the host. The supported installer tests use their
 own temporary homes. Future r4 adoption, shared-lane acknowledgement and both
 family reviews remain separate from creating this PR.
+
+## Review-wave test corrections
+
+The ignoring-child regression now asserts that its real watchdog receives the
+selected argument `1`, rather than accepting a watchdog that silently uses
+the existing `2.0` default. A local negative control discards the override and
+the test fails on that exact argument mismatch. The native signal tests still
+cover a TERM handler, a TERM-ignoring child, the lower grace bound and disarm.
+
+Whole-file equality assertions were removed from ongoing CI. Existing K4
+runner fixtures check the unchanged admission/refusal decisions, and synthetic
+policy cases check parsing, required-variable refusal, environment scrubbing,
+forbidden names and output masking. The historical base is a fixed semantic
+control, not a restriction on unrelated future edits to current source.
+
+The exact original 13-test module ran verbosely against base: 15 failed
+assertions and one missing-feature error, including the previously unrecorded
+CLI-refusal test. The prepared 14-test module also ran verbosely against base:
+17 failed assertions and one missing-feature error; both policy controls and
+the existing guard semantic cases pass there. The prepared module passes all
+14 tests on managed CPython 3.12.3; the combined credential/new suite passes
+108 tests on that runtime. The preparation validator passes with 12040 hashed
+files and 240 receipts. The full-review relay adds no production blocker;
+these test and documentation corrections form one fold, with a separate
+delta review before adoption.
+
+## Follow-ups
+
+- Extend native handler-duration coverage beyond the default grace while
+  remaining within a larger selected value. The fold's actual-argv assertion
+  already detects a silently ignored override; the duration case is deferred.
+- Pin displaced historical line citations in
+  `2026-10-08-guard-hook-fails-closed.md:15,141` to their intended version.
+  The current grammar docstring now names parse_args instead of stale lines;
+  historical documents and frozen snapshots remain unchanged.
+- Exact no-flag help/usage text compatibility remains a follow-up: two added
+  lines document the option, while default execution remains unchanged.

@@ -5407,7 +5407,7 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "c966a6352d11bd7f37754b099001ffe510259fbe5219716c7d3c3b87cdab7308",
+      "sha256": "dd739c014f5cb6b4ec09b1b4b53558397356ddf5858f4df96fb0203581bb7846",
       "bytes": 1229
     },
     {
@@ -62093,8 +62093,8 @@
     },
     {
       "path": "scripts/hooks/secret_path_guard.py",
-      "sha256": "5b1883acc0c0d45e7d8e7e1a23d4e5d6a2a8cec32a615d9e228bee2ea7aea87e",
-      "bytes": 297996
+      "sha256": "b19e15f5b7a2928e8bb190da812a9745e0683ba7a5ed5637811a6a2fcdb42773",
+      "bytes": 298097
     },
     {
       "path": "scripts/host_name_scan.py",

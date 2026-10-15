@@ -7,6 +7,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import types
 import unittest
 from unittest import mock
 from tests import test_credential_run as fixtures
@@ -67,6 +68,9 @@ class TermGrace(unittest.TestCase):
                                'Path(' + repr(str(ready)) + ').write_text("SYN ready")\ntime.sleep(60)\n')
             self.ready(ready)
             dog = self.watchdog(child.pid, grace=1)
+            # A watchdog silently using the default 2.0 must fail this test,
+            # even though its later KILL would satisfy the lower time bound.
+            self.assertEqual(dog.process.args[-1], '1')
             started = time.monotonic()
             dog.close_pipe()
             self.assertEqual(child.wait(timeout=10), -signal.SIGKILL)
@@ -146,43 +150,29 @@ class GuardTermGrace(unittest.TestCase):
         variants = ['--term-grace ' + value + ' -- python3 collect.py'
                     for value in ('0', '-1', '3601', '1.5', 'nan', 'SYN-invalid')]
         variants += ['--term-grace 1 --term-grace 2 -- python3 collect.py',
-                     '--term-grace=630 -- python3 collect.py', '--term-grace -- python3 collect.py']
+                     '--term-grace=630 -- python3 collect.py', '--term-grace -- python3 collect.py',
+                     '--term-grace 630 --check', '--term-grace 630 python3 collect.py']
         for text in variants:
             with self.subTest(text=text):
                 self.assertEqual(guard.check(prefix + text), 'credential_run_usage')
+        self.assertEqual(guard.check('python3 tools/credentials/credential_run.py --term-grace 630 -- python3 collect.py'),
+                         'credential_run_usage')
 
     def test_child_arguments_are_not_runner_options(self):
         from scripts.hooks import secret_path_guard as guard
         self.assertIsNone(guard.check('python3 tools/credentials/credential_run.py tavily -- python3 collect.py --term-grace=anything'))
 
-    def test_every_other_guard_rule_is_byte_identical_to_base(self):
-        import ast
+    def test_existing_guard_rules_keep_their_behavior(self):
         from scripts.hooks import secret_path_guard as guard
-        root = Path(__file__).resolve().parents[1]
-        before = subprocess.check_output(['git', '-C', str(root), 'show',
-            '0f4ee075b2ab3af1b099d5ca1ecb8cae02ee3f5b:scripts/hooks/secret_path_guard.py'], text=True)
-        after = Path(guard.__file__).read_text()
-        def unchanged(source):
-            skip = set()
-            for node in ast.parse(source).body:
-                allowed = isinstance(node, ast.FunctionDef) and node.name == 'k4_runner_usage_reason'
-                allowed |= (isinstance(node, ast.Assign) and any(isinstance(t, ast.Name) and t.id == 'K4_RUNNER_OPTIONS'
-                                                               for t in node.targets))
-                if allowed:
-                    skip.update(range(node.lineno - 1, node.end_lineno))
-            return ''.join(line for i, line in enumerate(source.splitlines(keepends=True)) if i not in skip)
-        self.assertTrue(unchanged(before) == unchanged(after), 'a guard rule outside the permitted grammar region changed')
-        def original_usage_rules(source):
-            function = next(n for n in ast.parse(source).body if isinstance(n, ast.FunctionDef)
-                            and n.name == 'k4_runner_usage_reason')
-            loop = next(n for n in function.body if isinstance(n, ast.For))
-            help_check = next(n for n in loop.body if isinstance(n, ast.If))
-            usage_check = next(n for n in loop.body if isinstance(n, ast.If)
-                               and ast.get_source_segment(source, n.test).startswith('not arguments or'))
-            lines = source.splitlines(keepends=True)
-            return ''.join(lines[function.lineno - 1:help_check.end_lineno] + lines[usage_check.lineno - 1:function.end_lineno])
-        self.assertTrue(original_usage_rules(before) == original_usage_rules(after),
-                        'an existing rule inside runner-usage grammar changed')
+        from tests.test_secret_path_guard import K4_CASES
+        # Reuse the established command-text fixtures. Assert decisions rather
+        # than freezing unrelated source, comments, imports or future rules.
+        groups = ('runner_start_and_inline_order', 'runner_environment_and_mentions',
+                  'runner_usage_and_documentation')
+        for group in groups:
+            for text, reason in K4_CASES[group]:
+                with self.subTest(group=group, text=text):
+                    self.assertEqual(guard.check(text), reason)
 
     def test_option_parity_adds_exactly_the_one_opt_in_flag(self):
         import ast
@@ -194,38 +184,51 @@ class GuardTermGrace(unittest.TestCase):
         self.assertEqual(options, {'--only', '--check', '-h', '--help', '--', '--term-grace'})
         self.assertEqual(guard.K4_RUNNER_OPTIONS, options)
 
-    def test_credential_policy_and_watchdog_program_are_byte_identical(self):
-        import ast
+class CredentialPolicyCompatibility(unittest.TestCase):
+    @staticmethod
+    def pinned_baseline():
+        # A historical source is a fixed control, never an equality constraint
+        # on today's file. As in test_workflow_hardening's baseline control,
+        # run the contract against it instead of comparing source bytes.
         root = Path(__file__).resolve().parents[1]
-        before = subprocess.check_output(['git', '-C', str(root), 'show',
+        source = subprocess.check_output(['git', '-C', str(root), 'show',
             '0f4ee075b2ab3af1b099d5ca1ecb8cae02ee3f5b:tools/credentials/credential_run.py'], text=True)
-        after = Path(runner.__file__).read_text()
-        changed = {'Watchdog', 'parse_args', 'term_grace_seconds', 'run_command', '_main'}
-        def nodes(source):
-            result = {}
-            for node in ast.parse(source).body:
-                name = getattr(node, 'name', None)
-                if isinstance(node, ast.Assign):
-                    name = next((target.id for target in node.targets if isinstance(target, ast.Name)), None)
-                if name is not None and name not in changed and name != 'USAGE':
-                    result[name] = ast.get_source_segment(source, node)
-            return result
-        old, new = nodes(before), nodes(after)
-        self.assertEqual(set(old), set(new))
-        self.assertFalse([name for name in old if old[name] != new[name]], 'credential policy or watchdog code changed')
-        # Within _main, only the option unpack/dispatch can differ. All store
-        # lookup, parsing, must_not_be_set, child scrubbing and masking remain.
-        def loading(source):
-            node = next(n for n in ast.parse(source).body if isinstance(n, ast.FunctionDef) and n.name == '_main')
-            skip = set()
-            for part in node.body:
-                if isinstance(part, ast.Assign) and any(isinstance(t, ast.Tuple) for t in part.targets):
-                    skip.update(range(part.lineno - 1, part.end_lineno))
-                if isinstance(part, ast.If) and any(isinstance(n, ast.Name) and n.id == 'term_grace' for n in ast.walk(part.test)):
-                    skip.update(range(part.lineno - 1, part.end_lineno))
-            return ''.join(line for i, line in enumerate(source.splitlines(keepends=True))
-                           if node.lineno - 1 <= i < node.end_lineno and i not in skip)
-        self.assertTrue(loading(before) == loading(after), 'credential loading/dispatch changed outside option routing')
+        module = types.ModuleType('credential_grace_baseline')
+        module.__file__ = str(root / 'tools/credentials/credential_run.py')
+        with mock.patch.dict(sys.modules, {module.__name__: module}):
+            exec(compile(source, module.__file__, 'exec'), module.__dict__)
+        return module
+
+    def policy_contract(self, module):
+        # Only synthetic values from the existing fixture; no inventory/store
+        # read, environment lookup or credential output is involved.
+        value = fixtures.fake()
+        entry = {'id': 'syn-entry', 'variables': ['SYN_SELECTED'], 'optional_variables': [],
+                 'pointer_variables': ['SYN_POINTER']}
+        other = {'variables': ['SYN_OTHER'], 'optional_variables': ['SYN_OPTIONAL'],
+                 'pointer_variables': ['SYN_OTHER_POINTER']}
+        inventory = {'must_not_be_set': ['SYN_FORBIDDEN'], 'entries': [entry, other]}
+        data = ('export SYN_SELECTED=' + value + '\n').encode('ascii')
+        values = module.parse('syn-entry', data, entry)
+        self.assertTrue(values == {'SYN_SELECTED': value}, 'declared synthetic value must parse without expansion')
+        module.require(entry, values)
+        with self.assertRaises(module.Refused):
+            module.require(entry, {})
+        inherited = dict.fromkeys(('SYN_SELECTED', 'SYN_OTHER', 'SYN_OPTIONAL', 'SYN_FORBIDDEN',
+                                   'SYN_POINTER', 'SYN_OTHER_POINTER', 'SYN_KEEP'), 'SYN inherited')
+        environment = module.child_environment(inventory, entry, values, inherited)
+        self.assertTrue(environment == {'SYN_SELECTED': value, 'SYN_POINTER': 'SYN inherited',
+                                       'SYN_KEEP': 'SYN inherited'}, 'strip other names, forbidden names and pointers')
+        masker = module.Masker(module.needles_for(values, ['SYN_SELECTED']))
+        output = masker.feed(value.encode('ascii') + b'\n', time.monotonic()) + masker.close()
+        self.assertNotIn(value.encode('ascii'), output)
+        self.assertIn(b'[REDACTED:SYN_SELECTED]', output)
+
+    def test_credential_policy_preserves_synthetic_contract(self):
+        self.policy_contract(runner)
+
+    def test_pinned_base_satisfies_synthetic_policy_contract(self):
+        self.policy_contract(self.pinned_baseline())
 
 
 if __name__ == '__main__':
