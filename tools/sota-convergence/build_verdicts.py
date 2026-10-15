@@ -161,12 +161,12 @@ def default_out(run_id: str) -> str:
     return f"catalogs/sota-convergence/layer-verdicts-{run_id}.json"
 
 
-def row_run_id(row: dict) -> str | None:
+def row_run_id(row: dict, *, root: Path = None) -> str | None:
     """An explicit unrun registration has no wave. Every other ledger row uses
     lanes.sealed_base or the historical 2026-09-22 fallback. Frozen rows are
     never relabelled merely because their lane run IDs happen to be empty.
     """
-    if is_unrun_registration(row):
+    if is_unrun_registration(row, root=root):
         return None
     sealed_base = (row.get("lanes") or {}).get("sealed_base") or SEALED_BASE_PREFIX + DEFAULT_RUN_ID
     if not isinstance(sealed_base, str) or not sealed_base.startswith(SEALED_BASE_PREFIX):
@@ -254,7 +254,7 @@ def build_document(root: Path, checked_at: str, *, run_id: str = DEFAULT_RUN_ID,
     for catalog, relative in LEDGER_FILES.items():
         ledger = load_json(root / relative)
         rows = [build_verdict_row(row, sota_index.get(row["layer_id"], [])) for row in ledger.get("layers", [])
-                if not is_unrun_registration(row)]
+                if not is_unrun_registration(row, root=root)]
         rows.sort(key=lambda item: item["layer_id"])
         catalogs[catalog] = rows
         counts[catalog] = {
@@ -480,7 +480,7 @@ def check_frozen_rows(root: Path, run_id: str, wave: dict, rows: list, text: str
                  for catalog, entries in (document.get("catalogs") or {}).items() for entry in entries}
     sota_index = sota_layer_index(load_json(root / (wave.get("manifest") or default_manifest(run_id))))
     for catalog, row in rows:
-        if row_run_id(row) != run_id:
+        if row_run_id(row, root=root) != run_id:
             continue
         entry = published.get((catalog, row["layer_id"]))
         if entry is None:
@@ -498,7 +498,7 @@ def main(argv=None) -> int:
     requested = validate_run_id(args.run_id) if args.run_id is not None else None
     registry = load_registry(root)
     rows = ledger_rows(root)
-    row_runs = {run for _, row in rows if (run := row_run_id(row)) is not None}
+    row_runs = {run for _, row in rows if (run := row_run_id(row, root=root)) is not None}
     known = row_runs | set(registry)
     current = max(known) if known else DEFAULT_RUN_ID
 

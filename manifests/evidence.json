@@ -19193,8 +19193,8 @@
     },
     {
       "path": "docs/decisions/2026-10-15-unrun-registration-rules.md",
-      "sha256": "5aaddd455668a67d37730a14477fb06d3c3c4f29e2dc07c2d87f58dc154b56fa",
-      "bytes": 6456
+      "sha256": "aa33f3a2e0c2b590bf626f48a6e46697bbb26579bca26535ec68c6ab6c52cafa",
+      "bytes": 9939
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -62068,8 +62068,8 @@
     },
     {
       "path": "scripts/final_stack.py",
-      "sha256": "3ca3d089ee46a12f29f1e23ec63e145b45dde8e872bd565fb413ac868aa11398",
-      "bytes": 59235
+      "sha256": "80096cb19edde2a8ce658cdead076c97607e9f8e561d8a6bc4baacf7ad59fb0d",
+      "bytes": 59279
     },
     {
       "path": "scripts/freshness_propose.py",
@@ -62118,8 +62118,8 @@
     },
     {
       "path": "scripts/landscape.py",
-      "sha256": "8f35212d296da94ccb0e5774782f13cd979bbdabc4a0569e41614e00903a858d",
-      "bytes": 108624
+      "sha256": "8410c7c7184f770e1af255f3a7f7413de286deac9a1440150572884aabda39cc",
+      "bytes": 110592
     },
     {
       "path": "scripts/native_token_ci.py",
@@ -62228,8 +62228,8 @@
     },
     {
       "path": "scripts/validate_foundation.py",
-      "sha256": "b92bb2c1a1168f5e07c75972467c52f255957844e79b60247e7883f3e7e2af6d",
-      "bytes": 16867
+      "sha256": "f70d6f7db38a8ca9b35b068941a7e91cce114f08b0b11524d87349a355c72030",
+      "bytes": 17053
     },
     {
       "path": "scripts/validate_shard_weights.json",
@@ -63363,8 +63363,8 @@
     },
     {
       "path": "tests/test_layer_verdicts.py",
-      "sha256": "ee85d714bdd00edcc217e20441d0e59a2b3382c0533496428558d75b764c9267",
-      "bytes": 30275
+      "sha256": "7ef43644d36e2a685f56d7fcffeb5ecc0172bfabd151ef157de54b3a7395a013",
+      "bytes": 31532
     },
     {
       "path": "tests/test_lifecycle_capture.py",
@@ -63698,8 +63698,8 @@
     },
     {
       "path": "tests/test_pending_catalog_registration.py",
-      "sha256": "d1fe6c487d05771b3139b0a43dbf7a5fc9fe6bf71e70a74a6370fe970a7a1176",
-      "bytes": 2001
+      "sha256": "d5714dd2a3c0df4ff30db8b767de004d151284bd68237af5871adb64b1d26865",
+      "bytes": 5648
     },
     {
       "path": "tests/test_pi_builder_output_budget.py",
@@ -63788,13 +63788,13 @@
     },
     {
       "path": "tests/test_record_verdicts.py",
-      "sha256": "2eed0a78e56cf9d06146176df95ff26b0e4c2cc8e66c23742f112c313d878344",
-      "bytes": 163477
+      "sha256": "84ccf80829c182203ce4bacacc88b0442d7ad56f070cd459a66021b1ec8220c7",
+      "bytes": 164909
     },
     {
       "path": "tests/test_registration_rules.py",
-      "sha256": "85e113d24c5228481d3391a03783dfd75e4c704c5c26ad0c17fa480eac738d3f",
-      "bytes": 9942
+      "sha256": "193acde5a952060f68a323c2b40b8876cd3a4c94dbca47f8425d775bf9c42f10",
+      "bytes": 12427
     },
     {
       "path": "tests/test_registry_rows.py",
@@ -64718,8 +64718,8 @@
     },
     {
       "path": "tools/sota-convergence/build_verdicts.py",
-      "sha256": "e9f4026e2b0fc472719289f1388afa2a8238b691e42a7c78b0cdec4f78760ae9",
-      "bytes": 27699
+      "sha256": "507b393aca9482ee5ccaa299f8e1770e11c3b5ddfd5e9e89dc93d66a7ce648f1",
+      "bytes": 27765
     },
     {
       "path": "tools/sota-convergence/codex_lane.py",
@@ -64908,8 +64908,8 @@
     },
     {
       "path": "tools/sota-convergence/record_verdicts.py",
-      "sha256": "e9ad83eefabe75bce8c19aef447f69ed517f0d0bf491c1c55bb8903468625043",
-      "bytes": 93721
+      "sha256": "38a9f25181667cf5a40620823d0ab02efb2144ed3ea22ba2b7b8516a7ee2c9a7",
+      "bytes": 94005
     },
     {
       "path": "tools/sota-convergence/schemas/compact-decision-start-closure-1.json",

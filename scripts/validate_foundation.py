@@ -96,6 +96,7 @@ def validate_foundation(root: Path) -> dict:
             require(layer.get("registration_only") is True, identifier,
                     "additional taxonomy layer needs registration_only")
         if "registration_only" in layer:
+            require(identifier not in LAYERS, identifier, "required taxonomy layer cannot be registration_only")
             require(layer["registration_only"] is True, identifier, "registration_only must be true")
             expected.add("registration_only")
             try:
@@ -103,8 +104,9 @@ def validate_foundation(root: Path) -> dict:
             except ImportError:
                 from landscape import is_unrun_registration
             catalog = validator.load("catalogs/landscape/foundation.json")
-            matches = [row for row in catalog.get("layers", []) if row.get("layer_id") == identifier]
-            require(len(matches) == 1 and is_unrun_registration(matches[0]), identifier,
+            matches = [row for row in catalog.get("layers", [])
+                       if row.get("catalog") == "foundation" and row.get("layer_id") == identifier]
+            require(len(matches) == 1 and is_unrun_registration(matches[0], root=root), identifier,
                     "pending taxonomy registration needs one matching unrun catalog row")
             require(layer["purpose"] == matches[0]["requirement"], identifier, "registered scope differs from catalog")
             registered_layers.add(identifier)

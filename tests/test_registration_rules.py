@@ -77,12 +77,16 @@ class RegistrationRuleTests(unittest.TestCase):
         self.assertEqual(report["counts"]["decisions"], 1)
 
     def test_foundation_refuses_scope_mismatch_and_borrowed_capability(self):
-        for mutation in [lambda f: f.manifest["layers"][-1].update(purpose="Different scope"),
-                         lambda f: f.decision.update(layer_ids=[*f.decision["layer_ids"], "model-routes"])]:
+        for mutation, reason in [
+                (lambda f: f.manifest["layers"][-1].update(purpose="Different scope"),
+                 "registered scope differs from catalog"),
+                (lambda f: f.decision.update(layer_ids=[*f.decision["layer_ids"], "model-routes"]),
+                 "an unrun registration cannot claim a capability decision")]:
             fixture = self.foundation_fixture()
             mutation(fixture)
             result, _ = fixture.run_check()
             self.assertEqual(result.returncode, 1, result.stdout)
+            self.assertIn(reason, result.stdout)
 
     def test_additional_taxonomy_layer_cannot_omit_registration_and_borrow_capability(self):
         fixture = self.foundation_fixture()
@@ -93,10 +97,26 @@ class RegistrationRuleTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1, result.stdout)
         self.assertIn("additional taxonomy layer needs registration_only", result.stdout)
 
+    def test_required_taxonomy_layer_cannot_waive_capability_by_reregistration(self):
+        fixture = foundation_fixtures.FoundationCatalogTests()
+        fixture.setUp()
+        self.addCleanup(fixture.doCleanups)
+        layer = fixture.manifest["layers"][0]
+        layer["registration_only"] = True
+        row = registration()
+        row.update(layer_id=layer["id"], requirement=layer["purpose"])
+        fixture.write("catalogs/landscape/foundation.json", {"layers": [row]})
+        fixture.decision["layer_ids"] = [name for name in fixture.decision["layer_ids"] if name != layer["id"]]
+        result, _ = fixture.run_check()
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("required taxonomy layer cannot be registration_only", result.stdout)
+
     def test_unrun_registration_has_no_wave_or_wave_document(self):
         row = registration()
-        self.assertIsNone(build_verdicts.row_run_id(row))
-        verdict = final_stack.build_verdict(row, {}, {"20260922": {"path": "frozen.json", "sha256": "a" * 64}}, [])
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            self.assertIsNone(build_verdicts.row_run_id(row, root=root))
+            verdict = final_stack.build_verdict(row, {}, {}, [], root=root)
         self.assertIsNone(verdict["wave"])
         self.assertIsNone(verdict["wave_doc"])
 
@@ -105,8 +125,33 @@ class RegistrationRuleTests(unittest.TestCase):
                          lambda row: row["lanes"]["claude"].update(run_id="claimed-run")]:
             row = registration()
             mutation(row)
-            with self.assertRaises((ValueError, SystemExit)):
+            with self.assertRaisesRegex(ValueError, "registration_only requires an empty, unsealed pending scope"):
                 build_verdicts.row_run_id(row)
+
+    def test_registration_classification_requires_repository_history(self):
+        with self.assertRaisesRegex(ValueError, "admission requires repository wave/sweep history"):
+            build_verdicts.row_run_id(registration())
+
+    def test_taxonomy_requires_foundation_catalog_identity(self):
+        fixture = self.foundation_fixture()
+        row = registration()
+        row["catalog"] = "us-equities"
+        fixture.write("catalogs/landscape/foundation.json", {"layers": [row]})
+        result, _ = fixture.run_check()
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("matching unrun catalog row", result.stdout)
+
+    def test_taxonomy_registration_checks_date_and_protocol_schema(self):
+        for field, value, reason in [("checked_at", "invalid-date", "checked_at must be an ISO date"),
+                                     ("overturn_protocol", None, "overturn_protocol must be an object")]:
+            with self.subTest(field=field):
+                fixture = self.foundation_fixture()
+                row = registration()
+                row[field] = value
+                fixture.write("catalogs/landscape/foundation.json", {"layers": [row]})
+                result, _ = fixture.run_check()
+                self.assertEqual(result.returncode, 1, result.stdout)
+                self.assertIn(reason, result.stdout)
 
     def test_registration_never_changes_frozen_wave_bytes_or_membership(self):
         fixture = wave_fixtures.LayerVerdictFixture()

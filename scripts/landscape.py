@@ -22,7 +22,42 @@ except ImportError:
 MANIFEST = "catalogs/landscape/manifest.json"
 
 
-def is_unrun_registration(row):
+def registration_history(root):
+    """Published wave and sweep membership cannot be reset by editing a ledger row."""
+    root = Path(root)
+    history = {}
+    registry_path = "catalogs/sota-convergence/layer-verdict-waves.json"
+    manifests = {str(path.relative_to(root)) for path in
+                 (root / "catalogs/sota-convergence").glob("manifest-*.json")}
+    if safe_file(root, registry_path).is_file():
+        registry = load(root, registry_path)
+        for wave in registry.get("waves", []):
+            raw = safe_file(root, wave["path"]).read_bytes()
+            require(hashlib.sha256(raw).hexdigest() == wave["sha256"],
+                    f"registered wave {wave['run_id']} differs from its registered sha256")
+            document = json.loads(raw)
+            for catalog, entries in document.get("catalogs", {}).items():
+                for entry in entries:
+                    history.setdefault((catalog, entry["layer_id"]), f"registered wave {wave['run_id']}")
+            if wave.get("manifest"):
+                manifests.add(wave["manifest"])
+    ledger_path = "catalogs/saturation/ledger.json"
+    if safe_file(root, ledger_path).is_file():
+        for sweep in load(root, ledger_path).get("sweeps", []):
+            for layer in sweep.get("layers", []):
+                history.setdefault((layer["catalog"], layer["layer_id"]),
+                                   f"registered sweep {sweep['sweep_id']}")
+            if sweep.get("manifest_ref"):
+                manifests.add(sweep["manifest_ref"])
+    for path in sorted(manifests):
+        document = load(root, path)
+        for section, catalog in (("foundation", "foundation"), ("trading", "us-equities")):
+            for layer in document.get(section, []):
+                history.setdefault((catalog, layer["layer"]), f"published sweep {path}")
+    return history
+
+
+def is_unrun_registration(row, *, root=None):
     """An explicit scope registration has no verdict wave, lane run or selection.
 
     Shared by the wave and taxonomy readers so absence never defaults a new
@@ -42,6 +77,14 @@ def is_unrun_registration(row):
                      and lanes[lane].get("run_id") == "" and lanes[lane].get("sealed_sha256") == ""
                      for lane in LANES))
     require(valid, "registration_only requires an empty, unsealed pending scope with named gaps")
+    _validate_verdict_schema(row, (row.get("catalog"), row.get("layer_id")))
+    require(set(lanes) == {"claude", "codex", "agreement"}
+            and all(set(lanes[lane]) == {"run_id", "sealed_sha256"} for lane in LANES),
+            "registration_only cannot carry lane run-binding fields")
+    require(root is not None, "registration_only admission requires repository wave/sweep history")
+    key = (row.get("catalog"), row.get("layer_id"))
+    published = registration_history(root).get(key)
+    require(published is None, f"registration_only {key} already belongs to {published}")
     return True
 DISPOSITIONS = {
     "selected", "observed_failure", "measured_tradeoff", "overlap",
@@ -874,17 +917,8 @@ def https_url(value):
         return False
 
 
-def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recipe_map, sota_pins,
-                          status_context, lane_registry=None, wave_refs=None):
-    """Layer-verdict schema v2 checks for a single landscape row. ``evidence``
-    is the confined evidence()/track() helper already bound to this run; a
-    winner/alternative's ``evidence_refs`` may be an empty list (schema v2
-    allows empty containers while ``verdict_status`` is ``pending_lanes``)."""
-
-    def evidence_maybe_empty(values, label):
-        require(isinstance(values, list), label + " must be a list")
-        return evidence(values, label) if values else []
-
+def _validate_verdict_schema(row, key):
+    """Common types apply to registrations as well as rows with wave evidence."""
     require(row.get("verdict_status") in VERDICT_STATUSES, str(key) + ".verdict_status is unknown")
     require(isinstance(row.get("checked_at"), str) and bool(row["checked_at"]),
             str(key) + ".checked_at must be nonempty text")
@@ -892,9 +926,6 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
         date.fromisoformat(row["checked_at"])
     except ValueError as error:
         raise ValueError(str(key) + ".checked_at must be an ISO date") from error
-
-    if is_unrun_registration(row):
-        return
 
     protocol = row.get("overturn_protocol")
     require(isinstance(protocol, dict), str(key) + ".overturn_protocol must be an object")
@@ -906,6 +937,27 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
 
     lanes_field = row.get("lanes")
     require(isinstance(lanes_field, dict), str(key) + ".lanes must be an object")
+    for lane_name in LANES:
+        lane = lanes_field.get(lane_name)
+        require(isinstance(lane, dict), str(key) + f".lanes.{lane_name} must be an object")
+        require(isinstance(lane.get("run_id"), str), str(key) + f".lanes.{lane_name}.run_id must be text")
+        require(isinstance(lane.get("sealed_sha256"), str), str(key) + f".lanes.{lane_name}.sealed_sha256 must be text")
+    require(isinstance(row.get("verdict_overturn_when", ""), str),
+            str(key) + ".verdict_overturn_when must be text")
+
+
+def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recipe_map, sota_pins,
+                          status_context, lane_registry=None, wave_refs=None):
+    """Validate common schema before applying any unrun or wave-specific rules."""
+    def evidence_maybe_empty(values, label):
+        require(isinstance(values, list), label + " must be a list")
+        return evidence(values, label) if values else []
+
+    _validate_verdict_schema(row, key)
+    if is_unrun_registration(row, root=root):
+        return
+    protocol = row["overturn_protocol"]
+    lanes_field = row["lanes"]
     # The sealed directory a row's lanes point at is recorded on the row itself
     # (tools/sota-convergence/record_verdicts.py's "sealed_base"), not read from
     # a global constant here, so a later run's rows can point at a later sealed
@@ -918,11 +970,6 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
                                                            sealed_base),
             str(key) + ".lanes.sealed_base must be evidence/artifacts/layer-verdicts-<run-id>")
     wave = run_id_of(sealed_base)
-    for lane_name in LANES:
-        lane = lanes_field.get(lane_name)
-        require(isinstance(lane, dict), str(key) + f".lanes.{lane_name} must be an object")
-        require(isinstance(lane.get("run_id"), str), str(key) + f".lanes.{lane_name}.run_id must be text")
-        require(isinstance(lane.get("sealed_sha256"), str), str(key) + f".lanes.{lane_name}.sealed_sha256 must be text")
     # A row gets every new-wave rule when its sealed_base OR any lane run id (the recorder's
     # <catalog>-<layer_id>-<run-id>) names a non-grandfathered wave, whether or not a lane carries a
     # run id: a hand edit cannot drop the rules by emptying a run id or omitting sealed_base.
@@ -1105,7 +1152,6 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
         require(alternative.get("source") in ALTERNATIVE_SOURCES, str(key) + ".alternative.source is unknown")
 
     verdict_overturn_when = row.get("verdict_overturn_when", "")
-    require(isinstance(verdict_overturn_when, str), str(key) + ".verdict_overturn_when must be text")
     status = row["verdict_status"]
     chosen_lane = None
     if status == "recorded":
@@ -1315,12 +1361,7 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
                                   wave_refs=wave_refs)
             source_links = evidence(row.get("evidence_refs"), str(key))
             candidates, candidate_ids = [], set()
-            pending_empty = (row.get("verdict_status") == "pending_lanes" and row.get("candidates") == []
-                             and row.get("winners") == [] and row.get("alternatives") == []
-                             and row.get("terminal_state") is None
-                             and bool(row.get("open_gaps")) and row.get("lanes", {}).get("agreement") == "pending"
-                             and all(not row.get("lanes", {}).get(lane, {}).get(field)
-                                     for lane in LANES for field in ("sealed_sha256", "run_id")))
+            pending_empty = is_unrun_registration(row, root=root)
             require(isinstance(row.get("candidates"), list) and (row["candidates"] or pending_empty),
                     "layer needs candidates or an explicit empty pending registration")
             for candidate in row["candidates"]:
@@ -1603,8 +1644,8 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
                 nonempty(item.get(field), "quality layer " + field)
             for field in ("requirement", "current_choice", "overturn_when"):
                 require(item[field] == layer[field], "quality layer " + field + " differs from current comparison")
-            challengers = ([] if layer.get("verdict_status") == "pending_lanes"
-                          and layer["candidates"] == [] and item.get("challenger_repositories") == []
+            challengers = ([] if is_unrun_registration(layer, root=root)
+                          and item.get("challenger_repositories") == []
                           else strings(item.get("challenger_repositories"), "quality challengers"))
             layer_ids = {candidate["repository_id"] for candidate in layer["candidates"]}
             require(all(canonical(identity(repo), aliases) in layer_ids for repo in challengers),

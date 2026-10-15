@@ -521,9 +521,9 @@ def trialled_repositories(row: dict) -> set[str]:
 # --------------------------------------------------------------------------- layers
 
 
-def build_verdict(row: dict, matrix_row: dict, registry: dict, reopened_by: list[dict]) -> dict:
+def build_verdict(row: dict, matrix_row: dict, registry: dict, reopened_by: list[dict], *, root: Path = None) -> dict:
     verdict_day = component_matrix.parse_iso_date(row.get("checked_at"))
-    wave = row_run_id(row)
+    wave = row_run_id(row, root=root)
     registered = registry.get(wave)
     reviewed = row.get("verdict_status") in REVIEWED_VERDICTS and verdict_day is not None
     return {
@@ -657,7 +657,7 @@ def build_document(root: Path) -> dict:
             "title": row.get("title"),
             "source": entry["source"],
             "status": layer_status(bool(covering), state if is_landscape else None, convergence),
-            "verdict": build_verdict(row, matrix_row, registry, reopened_by) if is_landscape else None,
+            "verdict": build_verdict(row, matrix_row, registry, reopened_by, root=root) if is_landscape else None,
             "winners": winners,
             "alternates": [{field: alternative.get(field) for field in
                             ("name", "repository", "disposition", "evidence_class")}

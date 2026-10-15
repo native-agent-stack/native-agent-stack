@@ -60,11 +60,11 @@ found four consumer gaps. Each correction has a behavioral fail-first regression
 - An unmarked additional taxonomy layer borrowed an existing capability decision
   and passed without any matching catalog. Extra layers now require the explicit
   registration marker and its existing matching-scope checks.
-- record_verdicts accepted and sealed the first valid lane returns but retained
-  registration_only, leaving a recorded row rejected by the next consumer.
-  The recorder removes that marker when valid lane processing mutates the row;
-  missing or wholly rejected returns still leave the row untouched. New-wave
-  controls cover both agreeing lanes and a sole Codex lane with no recorded winner.
+- record_verdicts must not publish a sealed row while its ledger candidate
+  container is still an empty registration. It refuses before publication until
+  screened ledger candidates and explicit marker retirement are recorded.
+  Packet candidates or one lane do not supply missing v1 selection roles.
+  Missing or wholly rejected returns leave the registration row untouched.
 - A pending registration with actual covering sweep membership was published as
   unswept. The grand-list joins layer membership from the selected sweep manifest,
   including empty component lists, and reports pending verdict lanes separately.
@@ -80,6 +80,60 @@ scripts/new_host_grand_list.py:91-163, :311-318, :381-383
 mechanism is python/cpython v3.13.16 Lib/unittest/loader.py, loadTestsFromModule:
 it collects every module-bound TestCase subclass, including imported classes.
 These corrections introduce no catalog, verdict-row, wave or generated output edits.
+
+## Round-two admission and publication boundary
+
+CC FULL at 94f4c76497cb41b5d431b73101c64002d9918694, SHA256
+20e91f29dd558bed0c8b7214c666b3d70d45dc3df5142b3b009222c3a82060e0,
+and the overlapping local review SHA256
+56dff7216525ea8ce66561119256c9b55c7bd2ad150d270ec21b93b3220ba4e8
+showed that row shape cannot establish never-run identity. Admission now needs
+repository context and refuses any catalog/layer key in a hash-verified registered
+wave document, registered sweep ledger or published sweep manifest. All native
+wave, taxonomy, landscape and final-stack callers supply that context; rootless
+marked-row classification refuses. Required foundation layers cannot use the
+marker to waive a capability decision.
+
+Only that explicit admitted registration may bypass candidate/alternative and
+quality challenger requirements. The previous unmarked empty-row acceptance is
+removed. A two-wave fail-first fixture emptied the grandfathered row, erased its
+lane identity and regenerated the newer wave successfully before the correction;
+both --write and --check now refuse while every output stays byte-identical.
+The unmarked empty-row and required-taxonomy capability-waiver controls also
+failed behaviorally before correction. Independent sweep-manifest and ledger
+membership controls exercise the same history boundary.
+
+The first-run tests now start with genuinely valid empty registrations: native
+admission and the full landscape join both pass before any returns arrive.
+Both agreeing lane returns and Codex-only returns refuse before any ledger,
+sealed return, registry or other root output changes, rather than removing the
+marker and publishing an invalid candidate-less row. This takes the review's
+explicit refusal-before-publication option; candidate promotion is a separate
+screened catalog transition, not inferred by this rules PR. Missing/rejected
+return controls assert the original row remains exactly unchanged. Specific
+diagnostics replace broad exception/return-code-only negative controls.
+
+Pinned mechanisms at 94f4c764: scripts/landscape.py:25-45, :1318-1349 and
+:1606-1608; tools/sota-convergence/build_verdicts.py:164-174, :472-501;
+scripts/validate_foundation.py:98-110, :237-239;
+tools/sota-convergence/record_verdicts.py:813-830, :1016-1019; and
+scripts/final_stack.py:524-528, :660. The existing confined JSON loader,
+registered wave hashes and native recorder refusal path are reused. No gate,
+catalog, frozen wave, sweep record or selection changes with these rules.
+
+The Astra fix-one read at the same head, SHA256
+75223767b82ebef737cee494a1ed9edfd802f34d6a558e36264219becc5ff32e,
+added two P2 blockers to this same final bounded round. Both reproduced before
+correction: marked rows accepted malformed protocols, non-text overturn conditions
+and lane run bindings; taxonomy accepted the right layer ID from the wrong catalog
+and accepted an invalid registration date. The maintained common verdict-schema
+checks now run for every registration admission and before the full validator's
+wave exemption. Registrations admit only the empty lane fields, without run-manifest,
+adjudication or prose-exposure bindings. Taxonomy matching requires the complete
+foundation/layer identity, and shared admission validates its date and protocol.
+The eight negative subcases failed before and pass after the correction.
+Sources at the reviewed head: scripts/landscape.py:896-905, :1107 and
+scripts/validate_foundation.py:105-109. No additional bounded fix commit is split off.
 
 Native source at `a339425ca56ec3fb87dff0fa8ad5dffc83354168`:
 
