@@ -4982,8 +4982,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/git-github-automation.md",
-      "sha256": "8f654575424c45c3f92a4f932eed1e987ea81c019ba1995db0e0284c10d90165",
-      "bytes": 8497
+      "sha256": "495540f87a624fee894038b0c508310cf5345b1356a0172a2038a3bdc991794c",
+      "bytes": 9314
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/instructions-skills.md",
@@ -5002,8 +5002,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/native-clients.md",
-      "sha256": "94d8b63e28355bd9d6ac7147b7c67de061ddb77476d0e763c371bf95eb416918",
-      "bytes": 18365
+      "sha256": "ccb3988ae63a38b5344e9fe17a3258fe7fdede0a186d357e10c308c55515ccd7",
+      "bytes": 19192
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/observation-inference.md",
@@ -5017,8 +5017,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.json",
-      "sha256": "c310046d8c62323c482d05c31afd9aaeae544b5fc59445777597817da2fc51bf",
-      "bytes": 153088
+      "sha256": "fb2247d2d0fb1e8201489cc7467c7918fffb91aeb236ab67684eef6e4869bc01",
+      "bytes": 156141
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.md",
@@ -5027,8 +5027,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/token-efficiency.md",
-      "sha256": "e08151227c3db7d5bce74813afba40989900f961882d2546b19fd12ae45686e5",
-      "bytes": 12230
+      "sha256": "7a428d92ecf5a09db424d16ff61b55eff6abe627c038f85c83ef242429befe79",
+      "bytes": 13398
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/workers.md",
@@ -5137,8 +5137,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "0bb8f0237ca45bb787620a9c08f9ceaafcaf58eddb512496aefebf45696ddae3",
-      "bytes": 28607
+      "sha256": "283f9ee73d681877f25090f803de469d3bf74b50c6aaff22ef3c0d1f734bebc3",
+      "bytes": 29475
     },
     {
       "path": ".github/workflows/dependency-review.yml",
@@ -17548,8 +17548,8 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "abb2881310233e3491c6b25db91f872cc5a40d9c86e6c6bea4017fc21f771618",
-      "bytes": 190472
+      "sha256": "43cae953c5ad6d348bb25ad81202b585316b4eb7b4e49a66f9e591fd298a18e4",
+      "bytes": 192783
     },
     {
       "path": "catalogs/landscape/README.md",
@@ -19548,8 +19548,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "493052e05ac60606d3a0be4e6d3d9f83c02b40463c2c98e80508e793f560c5fc",
-      "bytes": 106136
+      "sha256": "d1d7aa52c57644a7b6395b2b7ac5be58b58919c8ed2ff622f8a722ab2efb4ff4",
+      "bytes": 106503
     },
     {
       "path": "docs/grand-catalog-counts.md",
@@ -21768,7 +21768,7 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/claude-native-slot-manifest.json",
-      "sha256": "d1676d690aa7495eb3ba2a5f3c69138bb6b19e584f1e9120ce5af7e0c41cf08c",
+      "sha256": "b50222fb4fb34e40b9dc444e39b5518f0eda2d6e32ff5bb65bdaa13239429e47",
       "bytes": 238162
     },
     {
@@ -63333,8 +63333,8 @@
     },
     {
       "path": "tests/test_catalog_freshness_propose.py",
-      "sha256": "6aa868be73a47e3f2347c0728ec4489e59c52ecfb84f115aed051698effc4e6d",
-      "bytes": 64694
+      "sha256": "d373182102b12644d00a98aa8d675c718f78e9240291067ea91c4ce2fd58555d",
+      "bytes": 69076
     },
     {
       "path": "tests/test_catalog_freshness_runtime.py",
@@ -64030,6 +64030,11 @@
       "path": "tests/test_native_practice_ledger_rows_1.py",
       "sha256": "73d3a04fc70f7db522196825daaca16cbda233fe16936addf935c0f26a8a44dc",
       "bytes": 2679
+    },
+    {
+      "path": "tests/test_native_practice_ledger_rows_tokeff_new.py",
+      "sha256": "e69133ce3c7d4170b42bf3cefd2c788b82ec43a9e0c4fbbf573ee99d9025f9d7",
+      "bytes": 7036
     },
     {
       "path": "tests/test_native_practice_meter_windows.py",

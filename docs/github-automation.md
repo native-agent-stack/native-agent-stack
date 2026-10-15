@@ -1142,6 +1142,11 @@ so a new or unlabeled PR defaults to `lane:shared`. An existing single supported
 lane label is preserved and reflected in the body; multiple or unknown lane
 labels stop the metadata step for owner resolution. Shared reports retain the
 other lane's acknowledgement requirement in [the lane policy](lanes.md).
+Since 2026-10-15 the step then reads the published description back
+(`gh pr view --json body`) and stops without reporting the PR when it differs
+from the file it sent: GitHub answered HTTP 200 to description updates over
+262,144 bytes and kept the old description (probe of 2026-10-11 on #991; the
+claude-native-practice pr-review-pre-cue row records the practice).
 See the [metadata decision](decisions/2026-10-02-catalog-freshness-pr-metadata.md).
 
 For an existing PR whose old body lacks source metadata, the preceding push can
