@@ -1,0 +1,761 @@
+{
+  "schema_version": 1,
+  "label": "SINGLE-FAMILY (GPT) research sweep",
+  "status": "PROPOSED; no catalog/ledger/research-state mutation",
+  "candidates": [
+    {
+      "id": "native-pine-v6",
+      "identity": "https://www.tradingview.com/pine-script-docs/concepts/strategies/",
+      "maintainer": "TradingView Inc.",
+      "pin": "Pine Script v6 documentation observed 2026-10-15",
+      "license": "Proprietary service; Terms of Use; each copied example's license must be recorded",
+      "catalog": "us-equities",
+      "layer_id": "backtesting-engine",
+      "proposed_label": "TRIAL candidate",
+      "evidence_class": "source_review",
+      "capability": {
+        "claim": "Run strategies in TradingView's native broker emulator; use vendor examples as correctness controls.",
+        "locator": "https://www.tradingview.com/pine-script-docs/concepts/strategies/#broker-emulator (observed 2026-10-15)"
+      },
+      "terms_of_service": {
+        "source": "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+        "constraint": "An implementation license does not grant TradingView service/data rights. No candidate may feed TradingView content into an automated order, numeric-risk or decision path under the reviewed terms."
+      },
+      "hot_path_fit": {
+        "required_model_in_order_path": false,
+        "candidate_order_path_qualification": "Unqualified; no candidate was run and no model-to-order access is admitted.",
+        "deterministic_risk_governor": "Not supplied or qualified for this role; required outside all model/MCP control for any separately authorized future paper integration.",
+        "positions_manifest_binding": "No verified binding; a versioned authoritative manifest and deterministic checks remain a named gap.",
+        "current_execution": "None. Public source review only."
+      },
+      "reason": "Survives only for attended in-app research and emulator observation. No brokerage or TradingView Paper Trading connection; no SOTA-return claim.",
+      "pin_kind": "dated_vendor_documentation",
+      "trial_scope": "Attended simulation/observer only; all order interfaces disconnected."
+    },
+    {
+      "id": "official-tradingview-mcp",
+      "identity": "https://www.tradingview.com/mcp/docs",
+      "maintainer": "TradingView Inc.",
+      "pin": "Official MCP public beta documentation observed 2026-10-15",
+      "license": "Proprietary service; TradingView Terms and beta permitted-use conditions",
+      "catalog": "foundation",
+      "layer_id": "mcp-surfaces",
+      "proposed_label": "TRIAL candidate",
+      "evidence_class": "source_review",
+      "capability": {
+        "claim": "Vendor-supported personal interactive market research and simple watchlist/price-alert operations; delayed beta data.",
+        "locator": "https://www.tradingview.com/support/solutions/43000795699-mcp-server-connect-your-ai-assistant-to-tradingview/ (observed 2026-10-15, Beta limitations; Permitted use)"
+      },
+      "terms_of_service": {
+        "source": "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+        "constraint": "An implementation license does not grant TradingView service/data rights. No candidate may feed TradingView content into an automated order, numeric-risk or decision path under the reviewed terms."
+      },
+      "hot_path_fit": {
+        "required_model_in_order_path": false,
+        "candidate_order_path_qualification": "Unqualified; no candidate was run and no model-to-order access is admitted.",
+        "deterministic_risk_governor": "Not supplied or qualified for this role; required outside all model/MCP control for any separately authorized future paper integration.",
+        "positions_manifest_binding": "No verified binding; a versioned authoritative manifest and deterministic checks remain a named gap.",
+        "current_execution": "None. Public source review only."
+      },
+      "reason": "Survives only for a read-allowlisted attended research observer. Does not provide requested Pine/chart control or manifest binding.",
+      "pin_kind": "dated_vendor_documentation",
+      "trial_scope": "Read-only observer with a synthetic symbol manifest; no webhook, watchlist or alert mutation."
+    },
+    {
+      "id": "atila-tradingview-mcp",
+      "identity": "https://github.com/atilaahmettaner/tradingview-mcp",
+      "maintainer": "atilaahmettaner",
+      "pin": "90470ee22cc997b1fabb5046ea8ed2af87f5368f",
+      "license": "MIT",
+      "catalog": "foundation",
+      "layer_id": "mcp-surfaces",
+      "proposed_label": "OUT-OF-SCOPE",
+      "evidence_class": "source_review",
+      "capability": {
+        "claim": "Python public-endpoint data/analysis and its own backtests, explicitly no TradingView UI control.",
+        "locator": "https://github.com/atilaahmettaner/tradingview-mcp/blob/90470ee22cc997b1fabb5046ea8ed2af87f5368f/README.md#L50"
+      },
+      "terms_of_service": {
+        "source": "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+        "constraint": "An implementation license does not grant TradingView service/data rights. No candidate may feed TradingView content into an automated order, numeric-risk or decision path under the reviewed terms."
+      },
+      "hot_path_fit": {
+        "required_model_in_order_path": false,
+        "candidate_order_path_qualification": "Unqualified; no candidate was run and no model-to-order access is admitted.",
+        "deterministic_risk_governor": "Not supplied or qualified for this role; required outside all model/MCP control for any separately authorized future paper integration.",
+        "positions_manifest_binding": "No verified binding; a versioned authoritative manifest and deterministic checks remain a named gap.",
+        "current_execution": "None. Public source review only."
+      },
+      "reason": "Does not satisfy app/Pine control; its backtests are not the native Pine runtime. Historical market-data WATCH remains untouched.",
+      "readme_sha256": "e04f00421d51f7bd6c92e5708948888b9839095dea73d02f2fc2447e3919909a",
+      "upstream_now": {
+        "latest_release": null,
+        "released_at": null,
+        "stars": 5063,
+        "pushed_at": "2026-10-14T06:01:59Z",
+        "archived": false,
+        "license": "MIT"
+      },
+      "default_branch_commit_at": "2026-10-14T06:01:57Z"
+    },
+    {
+      "id": "tradesdontlie-mcp",
+      "identity": "https://github.com/tradesdontlie/tradingview-mcp",
+      "maintainer": "tradesdontlie",
+      "pin": "c05b8f5755ed8e64ea242de88ddbf46aa24d56a4",
+      "license": "MIT text plus TradingView disclaimer; API classifies NOASSERTION",
+      "catalog": "foundation",
+      "layer_id": "mcp-surfaces",
+      "proposed_label": "GAP",
+      "evidence_class": "source_review",
+      "capability": {
+        "claim": "Uses Desktop CDP/internal APIs to set, compile and save Pine.",
+        "locator": "https://github.com/tradesdontlie/tradingview-mcp/blob/c05b8f5755ed8e64ea242de88ddbf46aa24d56a4/src/core/pine.js#L266"
+      },
+      "terms_of_service": {
+        "source": "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+        "constraint": "An implementation license does not grant TradingView service/data rights. No candidate may feed TradingView content into an automated order, numeric-risk or decision path under the reviewed terms."
+      },
+      "hot_path_fit": {
+        "required_model_in_order_path": false,
+        "candidate_order_path_qualification": "Unqualified; no candidate was run and no model-to-order access is admitted.",
+        "deterministic_risk_governor": "Not supplied or qualified for this role; required outside all model/MCP control for any separately authorized future paper integration.",
+        "positions_manifest_binding": "No verified binding; a versioned authoritative manifest and deterministic checks remain a named gap.",
+        "current_execution": "None. Public source review only."
+      },
+      "reason": "Technical app-control fit, but vendor support/permission and enforced manifest/risk boundaries are unestablished. Desktop-internal API breakage is acknowledged by upstream; do not trial as an automated trading path.",
+      "readme_sha256": "c52470ccb9d7c55c57a2e9b41127ad5f9297eea3171282640b290a43e073f30e",
+      "license_ref": "https://github.com/tradesdontlie/tradingview-mcp/blob/c05b8f5755ed8e64ea242de88ddbf46aa24d56a4/LICENSE#L1",
+      "upstream_now": {
+        "latest_release": null,
+        "released_at": null,
+        "stars": 6842,
+        "pushed_at": "2026-07-28T17:28:37Z",
+        "archived": false,
+        "license": "NOASSERTION"
+      },
+      "default_branch_commit_at": "2026-07-28T17:28:37Z"
+    },
+    {
+      "id": "mathieu-api",
+      "identity": "https://github.com/Mathieu2301/TradingView-API",
+      "maintainer": "Mathieu2301",
+      "pin": "6a4f8ff9a2b332d0a59dbd27c75201eb84663045",
+      "license": "ISC declared in package.json:71; GitHub license metadata null",
+      "catalog": "us-equities",
+      "layer_id": "market-data-reference",
+      "proposed_label": "OUT-OF-SCOPE",
+      "evidence_class": "source_review",
+      "capability": {
+        "claim": "Independent data/session API supports indicator and strategy reports; Pine studies need an account.",
+        "locator": "https://github.com/Mathieu2301/TradingView-API/blob/6a4f8ff9a2b332d0a59dbd27c75201eb84663045/README.md#L96"
+      },
+      "terms_of_service": {
+        "source": "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+        "constraint": "An implementation license does not grant TradingView service/data rights. No candidate may feed TradingView content into an automated order, numeric-risk or decision path under the reviewed terms."
+      },
+      "hot_path_fit": {
+        "required_model_in_order_path": false,
+        "candidate_order_path_qualification": "Unqualified; no candidate was run and no model-to-order access is admitted.",
+        "deterministic_risk_governor": "Not supplied or qualified for this role; required outside all model/MCP control for any separately authorized future paper integration.",
+        "positions_manifest_binding": "No verified binding; a versioned authoritative manifest and deterministic checks remain a named gap.",
+        "current_execution": "None. Public source review only."
+      },
+      "reason": "Neither an official app-control MCP nor an entitled deterministic broker bridge. Report retrieval is not order authority.",
+      "readme_sha256": "273397413d9e646d73128d64183ec211d10de1351657a4d23777a9a449a21d90",
+      "license_ref": "https://github.com/Mathieu2301/TradingView-API/blob/6a4f8ff9a2b332d0a59dbd27c75201eb84663045/package.json#L71",
+      "upstream_now": {
+        "latest_release": "v3.5.2",
+        "released_at": "2025-10-05T14:15:42Z",
+        "stars": 5605,
+        "pushed_at": "2026-10-07T17:02:37Z",
+        "archived": false,
+        "license": "ISC"
+      }
+    },
+    {
+      "id": "shner-screener",
+      "identity": "https://github.com/shner-elmo/TradingView-Screener",
+      "maintainer": "shner-elmo",
+      "pin": "5422d9012752353c59a31d13f54ceba55c265d9d",
+      "license": "MIT",
+      "catalog": "us-equities",
+      "layer_id": "market-data-reference",
+      "proposed_label": "OUT-OF-SCOPE",
+      "evidence_class": "source_review",
+      "capability": {
+        "claim": "Python wrapper around the TradingView screener endpoint.",
+        "locator": "https://github.com/shner-elmo/TradingView-Screener/blob/5422d9012752353c59a31d13f54ceba55c265d9d/README.md#L275"
+      },
+      "terms_of_service": {
+        "source": "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+        "constraint": "An implementation license does not grant TradingView service/data rights. No candidate may feed TradingView content into an automated order, numeric-risk or decision path under the reviewed terms."
+      },
+      "hot_path_fit": {
+        "required_model_in_order_path": false,
+        "candidate_order_path_qualification": "Unqualified; no candidate was run and no model-to-order access is admitted.",
+        "deterministic_risk_governor": "Not supplied or qualified for this role; required outside all model/MCP control for any separately authorized future paper integration.",
+        "positions_manifest_binding": "No verified binding; a versioned authoritative manifest and deterministic checks remain a named gap.",
+        "current_execution": "None. Public source review only."
+      },
+      "reason": "Data acquisition does not supply Pine app automation, authoritative positions or a broker governor. Reconfirms only this role's exclusion.",
+      "readme_sha256": "dbee5aca43762e6ca2269cfeb37e11dc960008c292c5379dba9b0fea4a230573",
+      "upstream_now": {
+        "latest_release": "v3.2.1",
+        "released_at": "2026-06-20T22:58:11Z",
+        "stars": 1322,
+        "pushed_at": "2026-10-15T12:12:23Z",
+        "archived": false,
+        "license": "MIT"
+      },
+      "default_branch_commit_at": "2026-09-14T16:34:17Z"
+    },
+    {
+      "id": "allisonbit-mcp",
+      "identity": "https://github.com/allisonbit/tradingview-mcp",
+      "maintainer": "allisonbit",
+      "pin": "cd7c43c4bbdebdfaeab60fd693d7f5b376f2016d",
+      "license": "MIT text plus disclaimer; API NOASSERTION",
+      "catalog": "foundation",
+      "layer_id": "mcp-surfaces",
+      "proposed_label": "GAP",
+      "evidence_class": "source_review",
+      "capability": {
+        "claim": "78-tool Desktop CDP workflow, Pine editing and Strategy Tester reading.",
+        "locator": "https://github.com/allisonbit/tradingview-mcp/blob/cd7c43c4bbdebdfaeab60fd693d7f5b376f2016d/README.md#L8"
+      },
+      "terms_of_service": {
+        "source": "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+        "constraint": "An implementation license does not grant TradingView service/data rights. No candidate may feed TradingView content into an automated order, numeric-risk or decision path under the reviewed terms."
+      },
+      "hot_path_fit": {
+        "required_model_in_order_path": false,
+        "candidate_order_path_qualification": "Unqualified; no candidate was run and no model-to-order access is admitted.",
+        "deterministic_risk_governor": "Not supplied or qualified for this role; required outside all model/MCP control for any separately authorized future paper integration.",
+        "positions_manifest_binding": "No verified binding; a versioned authoritative manifest and deterministic checks remain a named gap.",
+        "current_execution": "None. Public source review only."
+      },
+      "reason": "Same unsupported internal-control and service-rights gap; claimed private strategy showcase supplies no reproducible US-equities efficacy evidence.",
+      "default_branch_commit_at": "2026-07-26T16:45:26Z",
+      "readme_sha256": "9507ec150ae83b49f26a3ee5bdc5ab7c83bb58378d7f76d789a21cb74edfd427",
+      "license_ref": "https://github.com/allisonbit/tradingview-mcp/blob/cd7c43c4bbdebdfaeab60fd693d7f5b376f2016d/LICENSE#L1",
+      "identity_note": "GitHub metadata reports fork=false; similar code/claims are not independent convergence."
+    },
+    {
+      "id": "jostqq-mcp",
+      "identity": "https://github.com/JostQQ/tradingview-mcp",
+      "maintainer": "JostQQ",
+      "pin": "4d9b440935d5e8b862ab61a72812adf801684564",
+      "license": "MIT text plus disclaimer; API NOASSERTION",
+      "catalog": "foundation",
+      "layer_id": "mcp-surfaces",
+      "proposed_label": "GAP",
+      "evidence_class": "source_review",
+      "capability": {
+        "claim": "104-tool Desktop internal-API workflow with Pine lifecycle, versioning and Strategy Tester extraction.",
+        "locator": "https://github.com/JostQQ/tradingview-mcp/blob/4d9b440935d5e8b862ab61a72812adf801684564/README.md#L19"
+      },
+      "terms_of_service": {
+        "source": "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+        "constraint": "An implementation license does not grant TradingView service/data rights. No candidate may feed TradingView content into an automated order, numeric-risk or decision path under the reviewed terms."
+      },
+      "hot_path_fit": {
+        "required_model_in_order_path": false,
+        "candidate_order_path_qualification": "Unqualified; no candidate was run and no model-to-order access is admitted.",
+        "deterministic_risk_governor": "Not supplied or qualified for this role; required outside all model/MCP control for any separately authorized future paper integration.",
+        "positions_manifest_binding": "No verified binding; a versioned authoritative manifest and deterministic checks remain a named gap.",
+        "current_execution": "None. Public source review only."
+      },
+      "reason": "Requires Windows Desktop per README:32; target-host fit and permissions are not established. A protected-script registry is not a positions/risk governor.",
+      "default_branch_commit_at": "2026-10-10T18:53:20Z",
+      "readme_sha256": "af8643baa1a04c978a589036ca9fbf34b018f4755c26908bcb23072ffced1d43",
+      "license_ref": "https://github.com/JostQQ/tradingview-mcp/blob/4d9b440935d5e8b862ab61a72812adf801684564/LICENSE#L1",
+      "identity_note": "GitHub metadata reports fork=false; no repository copied, forked or executed."
+    },
+    {
+      "id": "luxalgo-pinets",
+      "identity": "https://github.com/LuxAlgo/PineTS",
+      "maintainer": "LuxAlgo",
+      "pin": "c5e6b0efee7e42d78b42d96f14173f38be082551",
+      "license": "AGPL-3.0; README also advertises a commercial license",
+      "catalog": "us-equities",
+      "layer_id": "backtesting-engine",
+      "proposed_label": "OUT-OF-SCOPE",
+      "evidence_class": "source_review",
+      "capability": {
+        "claim": "TypeScript Pine compiler/runtime runs outside TradingView.",
+        "locator": "https://github.com/LuxAlgo/PineTS/blob/c5e6b0efee7e42d78b42d96f14173f38be082551/README.md#L34"
+      },
+      "terms_of_service": {
+        "source": "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+        "constraint": "An implementation license does not grant TradingView service/data rights. No candidate may feed TradingView content into an automated order, numeric-risk or decision path under the reviewed terms."
+      },
+      "hot_path_fit": {
+        "required_model_in_order_path": false,
+        "candidate_order_path_qualification": "Unqualified; no candidate was run and no model-to-order access is admitted.",
+        "deterministic_risk_governor": "Not supplied or qualified for this role; required outside all model/MCP control for any separately authorized future paper integration.",
+        "positions_manifest_binding": "No verified binding; a versioned authoritative manifest and deterministic checks remain a named gap.",
+        "current_execution": "None. Public source review only."
+      },
+      "reason": "Role-only exclusion: an external runtime/parser does not automate native TradingView. The prior backtesting-engine survivor remains UNRESOLVED; no global refutation or measurement.",
+      "carried_from": "landscape-sweep-20261009-pine",
+      "readme_sha256": "ffd69f58c4f9035afe8785139da05937c3a48e23fb6d513255787d3a615be7c9",
+      "license_ref": "https://github.com/LuxAlgo/PineTS/blob/c5e6b0efee7e42d78b42d96f14173f38be082551/LICENSE#L1",
+      "prior_layer_disposition": "UNRESOLVED; unchanged"
+    },
+    {
+      "id": "pineforge-codegen",
+      "identity": "https://github.com/pineforge-4pass/pineforge-codegen-oss",
+      "maintainer": "pineforge-4pass",
+      "pin": "15294ebb3a03035876674c476d81b3dd2ba73d81",
+      "license": "PineForge Source License 1.2 (not merely NOASSERTION)",
+      "catalog": "us-equities",
+      "layer_id": "backtesting-engine",
+      "proposed_label": "OUT-OF-SCOPE",
+      "evidence_class": "source_review",
+      "capability": {
+        "claim": "Pine v6 to C++ transpiler targets pineforge-engine.",
+        "locator": "https://github.com/pineforge-4pass/pineforge-codegen-oss/blob/15294ebb3a03035876674c476d81b3dd2ba73d81/README.md#L3"
+      },
+      "terms_of_service": {
+        "source": "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+        "constraint": "An implementation license does not grant TradingView service/data rights. No candidate may feed TradingView content into an automated order, numeric-risk or decision path under the reviewed terms."
+      },
+      "hot_path_fit": {
+        "required_model_in_order_path": false,
+        "candidate_order_path_qualification": "Unqualified; no candidate was run and no model-to-order access is admitted.",
+        "deterministic_risk_governor": "Not supplied or qualified for this role; required outside all model/MCP control for any separately authorized future paper integration.",
+        "positions_manifest_binding": "No verified binding; a versioned authoritative manifest and deterministic checks remain a named gap.",
+        "current_execution": "None. Public source review only."
+      },
+      "reason": "Role-only exclusion: an external runtime/parser does not automate native TradingView. The prior backtesting-engine survivor remains UNRESOLVED; no global refutation or measurement.",
+      "carried_from": "landscape-sweep-20261009-pine",
+      "readme_sha256": "4ce3528383697f549584b9599ea90cb2db204a2cd6e9825bd87fe455e1cf27f8",
+      "license_ref": "https://github.com/pineforge-4pass/pineforge-codegen-oss/blob/15294ebb3a03035876674c476d81b3dd2ba73d81/LICENSE#L1",
+      "prior_layer_disposition": "UNRESOLVED; unchanged"
+    },
+    {
+      "id": "pynecore",
+      "identity": "https://github.com/PyneSys/pynecore",
+      "maintainer": "PyneSys",
+      "pin": "cab1266911a31245e885dc06789f900717be9e98",
+      "license": "Apache-2.0",
+      "catalog": "us-equities",
+      "layer_id": "backtesting-engine",
+      "proposed_label": "OUT-OF-SCOPE",
+      "evidence_class": "source_review",
+      "capability": {
+        "claim": "Python AST/runtime executes Pine-style code outside TradingView.",
+        "locator": "https://github.com/PyneSys/pynecore/blob/cab1266911a31245e885dc06789f900717be9e98/README.md#L16"
+      },
+      "terms_of_service": {
+        "source": "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+        "constraint": "An implementation license does not grant TradingView service/data rights. No candidate may feed TradingView content into an automated order, numeric-risk or decision path under the reviewed terms."
+      },
+      "hot_path_fit": {
+        "required_model_in_order_path": false,
+        "candidate_order_path_qualification": "Unqualified; no candidate was run and no model-to-order access is admitted.",
+        "deterministic_risk_governor": "Not supplied or qualified for this role; required outside all model/MCP control for any separately authorized future paper integration.",
+        "positions_manifest_binding": "No verified binding; a versioned authoritative manifest and deterministic checks remain a named gap.",
+        "current_execution": "None. Public source review only."
+      },
+      "reason": "Role-only exclusion: an external runtime/parser does not automate native TradingView. The prior backtesting-engine survivor remains UNRESOLVED; no global refutation or measurement.",
+      "carried_from": "landscape-sweep-20261009-pine",
+      "readme_sha256": "9894fb295bb1a112ecd931302fd172005d2e44153dae9018f6128a5e9df38c21",
+      "license_ref": "https://github.com/PyneSys/pynecore/blob/cab1266911a31245e885dc06789f900717be9e98/LICENSE#L1",
+      "prior_layer_disposition": "UNRESOLVED; unchanged"
+    },
+    {
+      "id": "pynescript",
+      "identity": "https://github.com/elbakramer/pynescript",
+      "maintainer": "elbakramer",
+      "pin": "0b9b4d0b0cd40d7d98c939830ccd06527a90c4d5",
+      "license": "LGPL-3.0",
+      "catalog": "us-equities",
+      "layer_id": "backtesting-engine",
+      "proposed_label": "OUT-OF-SCOPE",
+      "evidence_class": "source_review",
+      "capability": {
+        "claim": "Python Pine parsing/handling examples; not an in-app control server.",
+        "locator": "https://github.com/elbakramer/pynescript/blob/0b9b4d0b0cd40d7d98c939830ccd06527a90c4d5/README.md#L17"
+      },
+      "terms_of_service": {
+        "source": "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+        "constraint": "An implementation license does not grant TradingView service/data rights. No candidate may feed TradingView content into an automated order, numeric-risk or decision path under the reviewed terms."
+      },
+      "hot_path_fit": {
+        "required_model_in_order_path": false,
+        "candidate_order_path_qualification": "Unqualified; no candidate was run and no model-to-order access is admitted.",
+        "deterministic_risk_governor": "Not supplied or qualified for this role; required outside all model/MCP control for any separately authorized future paper integration.",
+        "positions_manifest_binding": "No verified binding; a versioned authoritative manifest and deterministic checks remain a named gap.",
+        "current_execution": "None. Public source review only."
+      },
+      "reason": "Role-only exclusion: an external runtime/parser does not automate native TradingView. The prior backtesting-engine survivor remains UNRESOLVED; no global refutation or measurement.",
+      "carried_from": "landscape-sweep-20261009-pine",
+      "readme_sha256": "6b2e0036b0cde7443199f1c1698708fd3d63399f3953fd2cc86bc6b0a91b9164",
+      "license_ref": "https://github.com/elbakramer/pynescript/blob/0b9b4d0b0cd40d7d98c939830ccd06527a90c4d5/LICENSE#L1",
+      "prior_layer_disposition": "UNRESOLVED; unchanged"
+    },
+    {
+      "id": "backtest-engine",
+      "identity": "https://github.com/s7cret/backtest_engine",
+      "maintainer": "s7cret",
+      "pin": "0a8a6a62e3556e9c3ef4cd0b5bcd048ce3cd62a0",
+      "license": "MIT",
+      "catalog": "us-equities",
+      "layer_id": "backtesting-engine",
+      "proposed_label": "OUT-OF-SCOPE",
+      "evidence_class": "source_review",
+      "capability": {
+        "claim": "Independent deterministic OpenPine backtesting/accounting engine.",
+        "locator": "https://github.com/s7cret/backtest_engine/blob/0a8a6a62e3556e9c3ef4cd0b5bcd048ce3cd62a0/README.md#L14"
+      },
+      "terms_of_service": {
+        "source": "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+        "constraint": "An implementation license does not grant TradingView service/data rights. No candidate may feed TradingView content into an automated order, numeric-risk or decision path under the reviewed terms."
+      },
+      "hot_path_fit": {
+        "required_model_in_order_path": false,
+        "candidate_order_path_qualification": "Unqualified; no candidate was run and no model-to-order access is admitted.",
+        "deterministic_risk_governor": "Not supplied or qualified for this role; required outside all model/MCP control for any separately authorized future paper integration.",
+        "positions_manifest_binding": "No verified binding; a versioned authoritative manifest and deterministic checks remain a named gap.",
+        "current_execution": "None. Public source review only."
+      },
+      "reason": "Role-only exclusion: an external runtime/parser does not automate native TradingView. The prior backtesting-engine survivor remains UNRESOLVED; no global refutation or measurement.",
+      "carried_from": "landscape-sweep-20261009-pine",
+      "readme_sha256": "bb3534c81b1619f38345c4bf43d377f036669c686314c78dba4ed2abdd4dea20",
+      "license_ref": "https://github.com/s7cret/backtest_engine/blob/0a8a6a62e3556e9c3ef4cd0b5bcd048ce3cd62a0/LICENSE#L1",
+      "prior_layer_disposition": "UNRESOLVED; unchanged"
+    },
+    {
+      "id": "pinescript-langium",
+      "identity": "https://github.com/arose26/pinescript-langium",
+      "maintainer": "arose26",
+      "pin": "152d3e8a5fa31c68c27499ece17c1d8216640a0e",
+      "license": "MIT",
+      "catalog": "us-equities",
+      "layer_id": "backtesting-engine",
+      "proposed_label": "OUT-OF-SCOPE",
+      "evidence_class": "source_review",
+      "capability": {
+        "claim": "Parser, language server and standalone JavaScript transpiler.",
+        "locator": "https://github.com/arose26/pinescript-langium/blob/152d3e8a5fa31c68c27499ece17c1d8216640a0e/README.md#L3"
+      },
+      "terms_of_service": {
+        "source": "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+        "constraint": "An implementation license does not grant TradingView service/data rights. No candidate may feed TradingView content into an automated order, numeric-risk or decision path under the reviewed terms."
+      },
+      "hot_path_fit": {
+        "required_model_in_order_path": false,
+        "candidate_order_path_qualification": "Unqualified; no candidate was run and no model-to-order access is admitted.",
+        "deterministic_risk_governor": "Not supplied or qualified for this role; required outside all model/MCP control for any separately authorized future paper integration.",
+        "positions_manifest_binding": "No verified binding; a versioned authoritative manifest and deterministic checks remain a named gap.",
+        "current_execution": "None. Public source review only."
+      },
+      "reason": "Role-only exclusion: an external runtime/parser does not automate native TradingView. The prior backtesting-engine survivor remains UNRESOLVED; no global refutation or measurement.",
+      "carried_from": "landscape-sweep-20261009-pine",
+      "readme_sha256": "df6f437105c267e9cbd82f368b1be6daa8f4f3e3870bdd5e17e372ba857ee181",
+      "license_ref": "https://github.com/arose26/pinescript-langium/blob/152d3e8a5fa31c68c27499ece17c1d8216640a0e/LICENSE#L1",
+      "prior_layer_disposition": "UNRESOLVED; unchanged"
+    },
+    {
+      "id": "pine-oracle",
+      "identity": "https://github.com/folknor/pine-oracle",
+      "maintainer": "folknor",
+      "pin": "f4a1e25edf9c0176bcf1cd9cbc1f229c2bb5ef37",
+      "license": "MPL-2.0 code; bundled vendor documentation requires separate provenance/rights review",
+      "catalog": "us-equities",
+      "layer_id": "research-factors-ml",
+      "proposed_label": "GAP",
+      "evidence_class": "source_review",
+      "capability": {
+        "claim": "Offline Pine v6 semantic lookup and independently authored recipes; never executes user strategies.",
+        "locator": "https://github.com/folknor/pine-oracle/blob/f4a1e25edf9c0176bcf1cd9cbc1f229c2bb5ef37/README.md#L3"
+      },
+      "terms_of_service": {
+        "source": "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+        "constraint": "An implementation license does not grant TradingView service/data rights. No candidate may feed TradingView content into an automated order, numeric-risk or decision path under the reviewed terms."
+      },
+      "hot_path_fit": {
+        "required_model_in_order_path": false,
+        "candidate_order_path_qualification": "Unqualified; no candidate was run and no model-to-order access is admitted.",
+        "deterministic_risk_governor": "Not supplied or qualified for this role; required outside all model/MCP control for any separately authorized future paper integration.",
+        "positions_manifest_binding": "No verified binding; a versioned authoritative manifest and deterministic checks remain a named gap.",
+        "current_execution": "None. Public source review only."
+      },
+      "reason": "Useful template/semantic reference, but no strategy efficacy or broker authority. Its install bundles vendor-derived docs (README:27–46); permission and exact recipe test provenance remain unresolved. Authored-recipe source review can continue without installing the bundled CLI.",
+      "carried_from": "landscape-sweep-20261009-pine",
+      "prior_pin": "a8df6386b6b4fc24f8851070c33f6c24703c522d",
+      "prior_readme_sha256": "dc026a0a4c70453fed1851e105078ed3a4174eaf0927294f9cb5bd70d99f016f",
+      "readme_sha256": "5a448689a741320e612bd12ea325a12193ef5dc270c336cb038ded5bf7d05d6a",
+      "license_ref": "https://github.com/folknor/pine-oracle/blob/f4a1e25edf9c0176bcf1cd9cbc1f229c2bb5ef37/LICENSE#L1",
+      "prior_layer_disposition": "UNRESOLVED; unchanged",
+      "upstream_now": {
+        "latest_release": null,
+        "released_at": null,
+        "stars": 2,
+        "pushed_at": "2026-10-14T16:05:00Z",
+        "archived": false,
+        "license": "MPL-2.0"
+      },
+      "default_branch_commit_at": "2026-10-14T16:04:53Z"
+    },
+    {
+      "id": "pine-utils",
+      "identity": "https://github.com/pinecoders/pine-utils",
+      "maintainer": "pinecoders",
+      "pin": "659deb224d2ddee8031db82798fed0830fbbd712",
+      "license": "GPL-3.0 per repository metadata",
+      "catalog": "us-equities",
+      "layer_id": "research-factors-ml",
+      "proposed_label": "OUT-OF-SCOPE",
+      "evidence_class": "source_review",
+      "capability": {
+        "claim": "Community snippets and boilerplates.",
+        "locator": "https://github.com/pinecoders/pine-utils/blob/659deb224d2ddee8031db82798fed0830fbbd712/README.md#L3"
+      },
+      "terms_of_service": {
+        "source": "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+        "constraint": "An implementation license does not grant TradingView service/data rights. No candidate may feed TradingView content into an automated order, numeric-risk or decision path under the reviewed terms."
+      },
+      "hot_path_fit": {
+        "required_model_in_order_path": false,
+        "candidate_order_path_qualification": "Unqualified; no candidate was run and no model-to-order access is admitted.",
+        "deterministic_risk_governor": "Not supplied or qualified for this role; required outside all model/MCP control for any separately authorized future paper integration.",
+        "positions_manifest_binding": "No verified binding; a versioned authoritative manifest and deterministic checks remain a named gap.",
+        "current_execution": "None. Public source review only."
+      },
+      "reason": "Default-branch last commit 2019-08-22; does not supply current maintained v6/SOTA template or efficacy evidence.",
+      "default_branch_commit_at": "2019-08-22T03:21:01Z",
+      "upstream_now": {
+        "latest_release": null,
+        "released_at": null,
+        "stars": 439,
+        "pushed_at": "2019-08-22T03:21:01Z",
+        "archived": false,
+        "license": "GPL-3.0"
+      }
+    },
+    {
+      "id": "lightweight-charts",
+      "identity": "https://github.com/tradingview/lightweight-charts",
+      "maintainer": "tradingview",
+      "pin": "v5.2.1",
+      "license": "Apache-2.0",
+      "catalog": "us-equities",
+      "layer_id": "backtesting-engine",
+      "proposed_label": "OUT-OF-SCOPE",
+      "evidence_class": "source_review",
+      "capability": {
+        "claim": "Vendor HTML5 financial chart rendering library.",
+        "locator": "https://github.com/tradingview/lightweight-charts/blob/v5.2.1/README.md#L22"
+      },
+      "terms_of_service": {
+        "source": "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+        "constraint": "An implementation license does not grant TradingView service/data rights. No candidate may feed TradingView content into an automated order, numeric-risk or decision path under the reviewed terms."
+      },
+      "hot_path_fit": {
+        "required_model_in_order_path": false,
+        "candidate_order_path_qualification": "Unqualified; no candidate was run and no model-to-order access is admitted.",
+        "deterministic_risk_governor": "Not supplied or qualified for this role; required outside all model/MCP control for any separately authorized future paper integration.",
+        "positions_manifest_binding": "No verified binding; a versioned authoritative manifest and deterministic checks remain a named gap.",
+        "current_execution": "None. Public source review only."
+      },
+      "reason": "Embedding a chart library does not execute Pine strategies in TradingView or create an automation bridge.",
+      "readme_sha256": "e32aae65b24825b9368a25c6de05e7a93c0fe9fff45e5c02cd24fa7e1de81db5",
+      "upstream_now": {
+        "latest_release": "v5.2.1",
+        "released_at": "2026-08-12T11:39:26Z",
+        "stars": 17580,
+        "pushed_at": "2026-10-13T13:23:44Z",
+        "archived": false,
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "id": "charting-examples",
+      "identity": "https://github.com/tradingview/charting-library-examples",
+      "maintainer": "tradingview",
+      "pin": "dfec6fca5e60e854258c9fed51143ca611404cbb",
+      "license": "MIT examples; underlying Advanced Charts uses separate vendor terms",
+      "catalog": "us-equities",
+      "layer_id": "backtesting-engine",
+      "proposed_label": "OUT-OF-SCOPE",
+      "evidence_class": "source_review",
+      "capability": {
+        "claim": "Vendor integration examples for embedding chart libraries.",
+        "locator": "https://github.com/tradingview/charting-library-examples/blob/dfec6fca5e60e854258c9fed51143ca611404cbb/README.md#L5"
+      },
+      "terms_of_service": {
+        "source": "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+        "constraint": "An implementation license does not grant TradingView service/data rights. No candidate may feed TradingView content into an automated order, numeric-risk or decision path under the reviewed terms."
+      },
+      "hot_path_fit": {
+        "required_model_in_order_path": false,
+        "candidate_order_path_qualification": "Unqualified; no candidate was run and no model-to-order access is admitted.",
+        "deterministic_risk_governor": "Not supplied or qualified for this role; required outside all model/MCP control for any separately authorized future paper integration.",
+        "positions_manifest_binding": "No verified binding; a versioned authoritative manifest and deterministic checks remain a named gap.",
+        "current_execution": "None. Public source review only."
+      },
+      "reason": "Vendor FAQ says Advanced Charts/Trading Platform do not support Pine. Public charting_library metadata returned 404, not proof the private library does not exist.",
+      "default_branch_commit_at": "2025-12-02T10:11:20Z",
+      "readme_sha256": "c8ab9e35c6e204ad7e95a9ecc5f022742a57ab90a2d60814c391fa90eae94aaa"
+    },
+    {
+      "id": "native-webhooks",
+      "identity": "https://www.tradingview.com/support/solutions/43000529348-how-to-configure-webhook-alerts/",
+      "maintainer": "TradingView Inc.",
+      "pin": "Vendor documentation observed 2026-10-15",
+      "license": "Proprietary service; Terms of Use",
+      "catalog": "us-equities",
+      "layer_id": "execution-broker",
+      "proposed_label": "GAP",
+      "evidence_class": "source_review",
+      "capability": {
+        "claim": "Send HTTP alert notifications; transport is not an order protocol.",
+        "locator": "https://www.tradingview.com/support/solutions/43000529348-how-to-configure-webhook-alerts/ (observed 2026-10-15)"
+      },
+      "terms_of_service": {
+        "source": "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+        "constraint": "An implementation license does not grant TradingView service/data rights. No candidate may feed TradingView content into an automated order, numeric-risk or decision path under the reviewed terms."
+      },
+      "hot_path_fit": {
+        "required_model_in_order_path": false,
+        "candidate_order_path_qualification": "Unqualified; no candidate was run and no model-to-order access is admitted.",
+        "deterministic_risk_governor": "Not supplied or qualified for this role; required outside all model/MCP control for any separately authorized future paper integration.",
+        "positions_manifest_binding": "No verified binding; a versioned authoritative manifest and deterministic checks remain a named gap.",
+        "current_execution": "None. Public source review only."
+      },
+      "reason": "Three-second timeout and failure possibilities need durable/idempotent handling, but current service/data terms already prevent qualifying the requested automated order use.",
+      "pin_kind": "dated_vendor_documentation"
+    },
+    {
+      "id": "alpaca-zapier-reference",
+      "identity": "https://alpaca.markets/learn/low-code-algorithimic-trading-on-alpaca-using-tradingview",
+      "maintainer": "Alpaca (tutorial); Zapier (external automation service)",
+      "pin": "Dated vendor tutorial observed 2026-10-15; no maintained bridge release identified",
+      "license": "Vendor article; third-party Zapier service terms separate",
+      "catalog": "us-equities",
+      "layer_id": "execution-broker",
+      "proposed_label": "GAP",
+      "evidence_class": "source_review",
+      "capability": {
+        "claim": "Tutorial demonstrates alert-to-Zapier-to-Alpaca technical routing.",
+        "locator": "https://alpaca.markets/learn/low-code-algorithimic-trading-on-alpaca-using-tradingview (observed 2026-10-15, Setting Webhook Alerts; Takeaways)"
+      },
+      "terms_of_service": {
+        "source": "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+        "constraint": "An implementation license does not grant TradingView service/data rights. No candidate may feed TradingView content into an automated order, numeric-risk or decision path under the reviewed terms."
+      },
+      "hot_path_fit": {
+        "required_model_in_order_path": false,
+        "candidate_order_path_qualification": "Unqualified; no candidate was run and no model-to-order access is admitted.",
+        "deterministic_risk_governor": "Not supplied or qualified for this role; required outside all model/MCP control for any separately authorized future paper integration.",
+        "positions_manifest_binding": "No verified binding; a versioned authoritative manifest and deterministic checks remain a named gap.",
+        "current_execution": "None. Public source review only."
+      },
+      "reason": "Conflicts with current TradingView non-display terms and does not establish a vendor-maintained bridge with a manifest governor. No SaaS subscription or bridge implementation proposed.",
+      "pin_kind": "dated_vendor_documentation"
+    },
+    {
+      "id": "alpaca-py",
+      "identity": "https://github.com/alpacahq/alpaca-py",
+      "maintainer": "alpacahq",
+      "pin": "v0.44.0",
+      "license": "Apache-2.0",
+      "catalog": "us-equities",
+      "layer_id": "execution-broker",
+      "proposed_label": "OUT-OF-SCOPE",
+      "evidence_class": "source_review",
+      "capability": {
+        "claim": "Official Alpaca Python SDK is the supported API component.",
+        "locator": "https://github.com/alpacahq/alpaca-py/blob/v0.44.0/README.md#L29"
+      },
+      "terms_of_service": {
+        "source": "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+        "constraint": "An implementation license does not grant TradingView service/data rights. No candidate may feed TradingView content into an automated order, numeric-risk or decision path under the reviewed terms."
+      },
+      "hot_path_fit": {
+        "required_model_in_order_path": false,
+        "candidate_order_path_qualification": "Unqualified; no candidate was run and no model-to-order access is admitted.",
+        "deterministic_risk_governor": "Not supplied or qualified for this role; required outside all model/MCP control for any separately authorized future paper integration.",
+        "positions_manifest_binding": "No verified binding; a versioned authoritative manifest and deterministic checks remain a named gap.",
+        "current_execution": "None. Public source review only."
+      },
+      "reason": "Retain broker lane's official SDK path. An SDK alone is not a TradingView webhook bridge or a positions-manifest governor.",
+      "readme_sha256": "39d63bccc8dccc2871f62de52f31270c046b5613bb8d8dac7b50f2106ae2300f",
+      "upstream_now": {
+        "latest_release": "v0.44.0",
+        "released_at": "2026-08-11T10:11:55Z",
+        "stars": 1552,
+        "pushed_at": "2026-10-15T18:50:39Z",
+        "archived": false,
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "id": "alpaca-mcp",
+      "identity": "https://github.com/alpacahq/alpaca-mcp-server",
+      "maintainer": "alpacahq",
+      "pin": "2a973a046607c42742bf141184b71f1990fa1809",
+      "license": "MIT",
+      "catalog": "us-equities",
+      "layer_id": "execution-broker",
+      "proposed_label": "OUT-OF-SCOPE",
+      "evidence_class": "source_review",
+      "capability": {
+        "claim": "Official broker MCP exposes portfolio and trading operations; native trading toolset includes position deletion.",
+        "locator": "https://github.com/alpacahq/alpaca-mcp-server/blob/2a973a046607c42742bf141184b71f1990fa1809/src/alpaca_mcp_server/toolsets.py#L32"
+      },
+      "terms_of_service": {
+        "source": "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+        "constraint": "An implementation license does not grant TradingView service/data rights. No candidate may feed TradingView content into an automated order, numeric-risk or decision path under the reviewed terms."
+      },
+      "hot_path_fit": {
+        "required_model_in_order_path": false,
+        "candidate_order_path_qualification": "Unqualified; no candidate was run and no model-to-order access is admitted.",
+        "deterministic_risk_governor": "Not supplied or qualified for this role; required outside all model/MCP control for any separately authorized future paper integration.",
+        "positions_manifest_binding": "No verified binding; a versioned authoritative manifest and deterministic checks remain a named gap.",
+        "current_execution": "None. Public source review only."
+      },
+      "reason": "Does not control TradingView. A model-facing broker trading toolset violates this task's hot-path boundary; a future observer needs proven read-only isolation, not a prompt promise.",
+      "readme_sha256": "0f52cb9f51a74d0fad1438a7c2e212889a41a487ec59a82bd19526ebce7fc100",
+      "upstream_now": {
+        "latest_release": "v2.4.0",
+        "released_at": "2026-10-12T10:40:50Z",
+        "stars": 1023,
+        "pushed_at": "2026-10-12T10:40:50Z",
+        "archived": false,
+        "license": "MIT"
+      }
+    },
+    {
+      "id": "ibkr-native-reference",
+      "identity": "https://interactivebrokers.github.io/tws-api/",
+      "maintainer": "Interactive Brokers",
+      "pin": "Vendor API/TradingView documentation observed 2026-10-15; no new API release selected",
+      "license": "Interactive Brokers API distribution license; no redistribution clearance inferred",
+      "catalog": "us-equities",
+      "layer_id": "execution-broker",
+      "proposed_label": "GAP",
+      "evidence_class": "source_review",
+      "capability": {
+        "claim": "Official TWS API is the broker lane's supported interface family; IBKR separately documents TradingView chart integration.",
+        "locator": "https://www.interactivebrokers.com/docs/third-party-integrations/trading-view/intro (observed 2026-10-15)"
+      },
+      "terms_of_service": {
+        "source": "https://www.tradingview.com/policies/ (observed 2026-10-15, section 3)",
+        "constraint": "An implementation license does not grant TradingView service/data rights. No candidate may feed TradingView content into an automated order, numeric-risk or decision path under the reviewed terms."
+      },
+      "hot_path_fit": {
+        "required_model_in_order_path": false,
+        "candidate_order_path_qualification": "Unqualified; no candidate was run and no model-to-order access is admitted.",
+        "deterministic_risk_governor": "Not supplied or qualified for this role; required outside all model/MCP control for any separately authorized future paper integration.",
+        "positions_manifest_binding": "No verified binding; a versioned authoritative manifest and deterministic checks remain a named gap.",
+        "current_execution": "None. Public source review only."
+      },
+      "reason": "No current broker-maintained TradingView webhook receiver or positions-manifest integration was established. Bounded absence in reviewed docs, not a universal nonexistence claim.",
+      "pin_kind": "dated_vendor_documentation"
+    }
+  ]
+}

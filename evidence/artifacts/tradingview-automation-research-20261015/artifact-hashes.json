@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "hash_method": "SHA256 of exact retained bytes",
+  "excluded": [
+    "artifact-hashes.json (self)",
+    "validation.json (validation result written after checks)"
+  ],
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "33a2fe0b7493e0e38b45b2ce493cfcd2ec83e082648a450784528ef98de3e66f",
+      "bytes": 3538
+    },
+    {
+      "path": "gaps.md",
+      "sha256": "9d68ef7f9c3987e20835c1dac841cf438a220bfa609c1e0dbaff7c9766537765",
+      "bytes": 3181
+    },
+    {
+      "path": "gpt6-discover.json",
+      "sha256": "ea75c9717da8006cdf0d73b92d3fcd0702d870c23aa87c4c8ebc188c4156a3fb",
+      "bytes": 8326
+    },
+    {
+      "path": "gpt6-refute-fit.json",
+      "sha256": "d75be4558cee37e2353a7c20c54c607dabd131972549b7199364a03d2acd9915",
+      "bytes": 17499
+    },
+    {
+      "path": "layer-mapping.md",
+      "sha256": "a8c344bc42404f305bda97a8c6e094ec6403fe4c71bfe33551788cef5d48ae9d",
+      "bytes": 2842
+    },
+    {
+      "path": "proposed-rows.json",
+      "sha256": "865f4ffb79da095ed69fe6aca5712e2bb3106fe8d54bd6c871350b5bbb135a1f",
+      "bytes": 48543
+    },
+    {
+      "path": "protocol-inputs.json",
+      "sha256": "0e6d533568e8ba8f331f8f35170f08c043d41289ffd5971f88bfaf6cafeb2c4c",
+      "bytes": 4199
+    },
+    {
+      "path": "protocol-record.md",
+      "sha256": "7b7a8f8c6a8b2708fa8f1bec38178c68b05db50b17cb561ee6e0fbf3da03e9ab",
+      "bytes": 7078
+    },
+    {
+      "path": "research-brief.md",
+      "sha256": "7f318ae69b591a72eadafe1689371c3c57c0e3ef565b435d279a2ac1e7d71f7b",
+      "bytes": 1835
+    },
+    {
+      "path": "research-requests.json",
+      "sha256": "bce3d278dd2d5ebea43c735ab99c1484064bf3567f1dddeec04a35f4b0d1decd",
+      "bytes": 7194
+    },
+    {
+      "path": "returns.json",
+      "sha256": "124ba154521f879a7997af204ee5a02e5527be3540a2d3538a8b7ade8a95a428",
+      "bytes": 42989
+    },
+    {
+      "path": "scope.json",
+      "sha256": "9415def5d013defec574174b877aab527d2cb675a8f5641a189193f727755273",
+      "bytes": 2252
+    },
+    {
+      "path": "source-reviews/native-pine-v6.json",
+      "sha256": "ec10113be386083a65144f61e1d3b9e284f1ec53a8f2378f61fb05ecc8754080",
+      "bytes": 3082
+    },
+    {
+      "path": "source-reviews/official-tradingview-mcp.json",
+      "sha256": "a11196d33de4d33ba78bd85f97fc8e9f1981ce44b499de6d89ee740f70833700",
+      "bytes": 3147
+    },
+    {
+      "path": "sources.json",
+      "sha256": "a6b1b16c1363272ecc51c32368458ba9adab2380f441e6d892fb8c3d2d5a4991",
+      "bytes": 6681
+    },
+    {
+      "path": "trial-plan.json",
+      "sha256": "56a14b9e96b43ed0f0aa4bf39505bae2aa8720966e6f9e05dfb654f857da73ab",
+      "bytes": 6380
+    }
+  ]
+}
