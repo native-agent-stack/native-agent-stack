@@ -55,11 +55,31 @@ checkout, default workflow permissions remain empty, and it uses only the native
 `scripts/model_currency_tracking.py` calls the existing
 `collect_model_currency(..., offline=True)` calculation and consumes only
 `refresh_due` rows, including the existing pre-release-age transition behavior.
+For a row without a landscape check, delivery now begins two days before its
+effective release reaches day43 (the first invalid date), rather than waiting
+until validation already fails. Effective package release dates are retained
+for package-bound rows; no release/check date or validator rule is changed.
 The threshold remains max_landscape_age_days minus refresh_lead_days (7 minus2,
 day5). Schema/source/future-date errors fail delivery; no inventory bytes change.
 The gate is row/check-age driven, not a hardcoded October deadline. Initial
 triggers are October19 for Fable/Astra and October20 for the nine October15
 checks, before first invalid dates October22/23.
+
+No-check rows at the rebased main inventory are `claude-opus-5-5`,
+`claude-sonnet-5-5`, `gpt-6-1-sol`, `mineru-onnx-bundle`,
+`headroom-bge-onnx`, `headroom-minilm-onnx`,
+`headroom-technique-router-onnx`, `headroom-siglip-onnx`,
+`markitdown-magika-standard-v3-3` and `codebase-memory-static-nomic`.
+The actual MinerU ONNX row's September10 release means review is due October21,
+before its October23 failure date. The regression uses that committed row and
+checks October20 (not due),21/22 (due, not expired),23 (due, expired).
+
+At reviewed `fd849227`, the new test fails on October21/22 (request absent)
+and October23 (no first-invalid date); at the fold all four dates pass.
+Runtime parser/YAML skip controls now plant a synthetic recorded gap in the
+child test module and run the real tripwire; empty committed gap sets no longer
+make those branches vacuous. The workflow's interpreter comment follows its
+actual setup-python3.13 selection.
 
 One bot-owned issue per stable row is maintained with labels
 `model-currency-review` and `lane:foundation`, title `CURRENCY-DUE: <row>` and

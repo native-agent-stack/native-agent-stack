@@ -30,6 +30,27 @@ def issue(number=1, *, state="open", login=tracking.BOT, identifier="reader"):
 
 
 class CurrencyAgeGateTests(unittest.TestCase):
+    def test_mineru_without_landscape_gets_two_day_lead_before_october_23(self):
+        data = json.loads((ROOT / "catalogs/foundation/model-currency.json").read_text())
+        row = next(row for row in data["models"] if row["id"] == "mineru-onnx-bundle")
+        self.assertNotIn("landscape_check", row)
+        self.assertEqual(row["release_date"], "2026-09-10")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = root / "catalogs/foundation/model-currency.json"
+            path.parent.mkdir(parents=True)
+            path.write_text(json.dumps(data))
+            for day, due, expired in ((20, False, False), (21, True, False),
+                                      (22, True, False), (23, True, True)):
+                with self.subTest(day=day), patch.object(proposer, "utc_now", return_value=f"2026-10-{day}T12:00:00Z"):
+                    plan = tracking.build_plan(root)
+                    self.assertEqual("mineru-onnx-bundle" in plan["due"], due)
+                    if due:
+                        task = plan["due"]["mineru-onnx-bundle"]
+                        self.assertEqual(task["first_invalid_date"], "2026-10-23")
+                        self.assertEqual(task["expired"], expired)
+            self.assertEqual(json.loads(path.read_text()), data)
+
     def plan(self, checked, *, release="2026-08-01"):
         data = inventory()
         row = data["models"][0]

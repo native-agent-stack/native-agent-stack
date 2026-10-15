@@ -263,11 +263,22 @@ class TripwireControls(unittest.TestCase):
 
     @unittest.skipUnless(shutil.which("node"), "node is not installed")
     def test_a_recorded_gap_skips_and_says_so(self):
-        for key in sorted(KNOWN_UNPROVISIONED):
+        # A synthetic recorded gap exercises the live stand-down branch even
+        # though all committed CI jobs now provision the parser.
+        key = "synthetic-gap.yml:sample"
+        for key in [key]:
             workflow, _, job = key.partition(":")
             extra = {"GITHUB_JOB": job, "GITHUB_WORKFLOW_REF": f"owner/repo/.github/workflows/{workflow}@refs/heads/main"}
             with self.subTest(key), tempfile.TemporaryDirectory() as home:
-                self.assert_skipped(self.run_tripwire(home, **extra), "a recorded gap")
+                code = ("import unittest; from tests import test_shell_parser_ci as module; "
+                        f"module.KNOWN_UNPROVISIONED={{{key!r}}}; "
+                        "result=unittest.TextTestRunner(verbosity=2).run("
+                        "unittest.defaultTestLoader.loadTestsFromName(module.TRIPWIRE)); "
+                        "raise SystemExit(not result.wasSuccessful())")
+                done = subprocess.run([sys.executable, "-c", code], cwd=ROOT, capture_output=True,
+                                      text=True, timeout=300, check=False,
+                                      env=simulated_ci_env(home, **extra))
+                self.assert_skipped(done, "a recorded gap")
 
     def test_the_verified_install_passes_the_tripwire_without_skipping(self):
         if self.install is None:

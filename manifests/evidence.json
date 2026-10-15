@@ -5137,8 +5137,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "709cf0877b7d2748bddd6a3ea226f925d2eed1d287fdcc69b54471b09a57d403",
-      "bytes": 41735
+      "sha256": "15a5516b7007f70942d3a9200e897f9c14433f2775a3b905cf0a397593e0e0d1",
+      "bytes": 41751
     },
     {
       "path": ".github/workflows/dependency-review.yml",
@@ -19198,8 +19198,8 @@
     },
     {
       "path": "docs/decisions/2026-10-15-model-currency-age-sweep.md",
-      "sha256": "42fe130b109574200e76f12a78adbf51c124bf910feed10dac7441206ebe0010",
-      "bytes": 8728
+      "sha256": "b957ea1420319790ee78143a7a5fd8c55be74e6b5b36106a705194a60ad4c71f",
+      "bytes": 9980
     },
     {
       "path": "docs/decisions/2026-10-15-model-currency-landscape-check.md",
@@ -62163,8 +62163,8 @@
     },
     {
       "path": "scripts/model_currency_tracking.py",
-      "sha256": "2946f8015c1ea258a4742ccc861af086f5bf0d8a977b44b1dbf2a48a76cd9802",
-      "bytes": 8304
+      "sha256": "80f676459056a3f5aa339edf50e5310759e60c98f75d94d7343fff634d44baf9",
+      "bytes": 8859
     },
     {
       "path": "scripts/native_token_ci.py",
@@ -63413,8 +63413,8 @@
     },
     {
       "path": "tests/test_landscape_sweep_skills.py",
-      "sha256": "3af4d76162e844eac7e39e499b6dfead02526a6534d7d09c55f87b7973e5d9e6",
-      "bytes": 183791
+      "sha256": "b39f42e7c9cacfcfa6fecfd1f87a5dd221ade49aba460de2eb8116da92710ef2",
+      "bytes": 184560
     },
     {
       "path": "tests/test_landscape_sweep_worker_boundary.py",
@@ -63528,8 +63528,8 @@
     },
     {
       "path": "tests/test_model_currency_tracking.py",
-      "sha256": "9bca616213ee380305ab550265cdadefb8c85488350c12ece7a48e7d38d9daaf",
-      "bytes": 10119
+      "sha256": "2e2932a5dc6e6a6af6136a8757ab7b277df84b6092355c297c1dbbc813711b69",
+      "bytes": 11450
     },
     {
       "path": "tests/test_mover_coverage_asof.py",
@@ -64048,8 +64048,8 @@
     },
     {
       "path": "tests/test_shell_parser_ci.py",
-      "sha256": "2066120fcc79d1f8d381d29a3f6a3a0369c8c27a04bf71baae17fea9b2ff44e5",
-      "bytes": 43541
+      "sha256": "0826d2a04aced22d1a33a8c7c1a276ab71591d4bdcb8e417a6cb2a95443f8a96",
+      "bytes": 44323
     },
     {
       "path": "tests/test_sim_capacity.py",

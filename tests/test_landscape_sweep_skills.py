@@ -2445,11 +2445,22 @@ class SkillsYamlTripwireControls(unittest.TestCase):
         for label, extra in unlisted.items():
             with self.subTest(label), tempfile.TemporaryDirectory() as home:
                 self.assert_failed(self.run_tripwire(home, **extra), "not_installed")
-        for key in sorted(YAML_KNOWN_UNPROVISIONED):
+        # The synthetic gap keeps this runtime skip branch covered after the
+        # last real CI omission was removed.
+        key = "synthetic-gap.yml:sample"
+        for key in [key]:
             workflow, _, job = key.partition(":")
             extra = {"GITHUB_JOB": job, "GITHUB_WORKFLOW_REF": f"owner/repo/.github/workflows/{workflow}@refs/heads/main"}
             with self.subTest(key), tempfile.TemporaryDirectory() as home:
-                self.assert_skipped(self.run_tripwire(home, **extra), "a recorded gap")
+                code = ("import unittest; from tests import test_landscape_sweep_skills as module; "
+                        f"module.YAML_KNOWN_UNPROVISIONED={{{key!r}}}; "
+                        "result=unittest.TextTestRunner(verbosity=2).run("
+                        "unittest.defaultTestLoader.loadTestsFromName(module.YAML_TRIPWIRE)); "
+                        "raise SystemExit(not result.wasSuccessful())")
+                done = subprocess.run([sys.executable, "-c", code], cwd=ROOT, capture_output=True,
+                                      text=True, timeout=300, check=False,
+                                      env=yaml_ci_env(home, **extra))
+                self.assert_skipped(done, "a recorded gap")
 
     def test_runs_outside_actions_skip_with_a_message(self):
         with tempfile.TemporaryDirectory() as home:
