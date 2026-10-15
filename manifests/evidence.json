@@ -20188,8 +20188,8 @@
     },
     {
       "path": "evidence/artifacts/agent-lifecycle-20261015/measurement.json",
-      "sha256": "6feade4d0c7b89d54722b6f697a952301c4ee1a23e3628b254287280302fe3f4",
-      "bytes": 1562
+      "sha256": "ba369567c810dfc96ee6dbb055b894eb9795418559a9b48c18ef4e6fb726f675",
+      "bytes": 1523
     },
     {
       "path": "evidence/artifacts/agent-lifecycle-20261015/sources.json",

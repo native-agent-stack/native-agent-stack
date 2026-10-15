@@ -17,8 +17,7 @@
  "shutdown_request_removes": true,
  "transcript": {
   "path_kind": "the lead session's own JSONL under ~/.claude/projects (not committed)",
-  "lines": 303,
-  "sha256_prefix": "908f4236f2013d1b"
+  "lines": 303
  },
  "evidence_class": "native_proven",
  "measured_by": "cc-native-practice, on the command center's YES of 2026-10-15T04:18Z"

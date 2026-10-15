@@ -6,6 +6,7 @@ client 2.1.300). The command center found 48 idle teammates, each a one-shot rea
 how to spawn and end workers, cite the docs lines, and agree with the rendered page.
 """
 import json
+import re
 import unittest
 from pathlib import Path
 
@@ -48,6 +49,28 @@ class AgentLifecycleRows(unittest.TestCase):
         measured = json.loads((SOURCES.parent / "measurement.json").read_text(encoding="utf-8"))
         self.assertEqual((measured["continue_false_shuts_down"], measured["shutdown_request_removes"],
                           measured["final_answer_reaches_lead"]), (False, True, True))
+
+    def test_no_digest_commits_to_the_unpublished_transcript(self):
+        # GPT read of #1142 at b4c4bba3 (P1): the lead's transcript is not committed, so no digest of it, full or
+        # abbreviated (7 or more hex characters), may be published beside it.
+        measured = json.loads((SOURCES.parent / "measurement.json").read_text(encoding="utf-8"))
+
+        def objects(node):
+            if isinstance(node, dict):
+                yield node
+                for value in node.values():
+                    yield from objects(value)
+            elif isinstance(node, list):
+                for value in node:
+                    yield from objects(value)
+
+        unpublished = [o for o in objects(measured) if any("not committed" in v for v in o.values() if isinstance(v, str))]
+        self.assertTrue(unpublished)
+        for obj in unpublished:
+            for key, value in obj.items():
+                self.assertNotIn("sha", key.lower())
+                self.assertNotIn("digest", key.lower())
+                self.assertFalse(isinstance(value, str) and re.fullmatch(r"[0-9a-fA-F]{7,}", value), key)
 
     def test_the_page_renders_the_same_route_and_notes(self):
         for slot_id, row in self.rows.items():
