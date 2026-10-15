@@ -3,8 +3,10 @@ import json
 import os
 from pathlib import Path
 import shutil
+import signal
 import subprocess
 import tempfile
+import time
 import unittest
 from unittest import mock
 
@@ -207,7 +209,8 @@ else:
                     mock.patch('tools.muse_file_fence.native_argv', return_value=plan), \
                     self.assertRaises(ValueError):
                 main()
-            self.assertFalse((explicit_logs / 'muse-exec.jsonl').exists())
+            if (explicit_logs / 'muse-exec.jsonl').exists():
+                self.assertEqual((explicit_logs / 'muse-exec.jsonl').stat().st_size, 0)
 
     @unittest.skipUnless(os.environ.get('MUSE_FENCE_NATIVE_PROBE') == '1',
                          'explicit installed launcher model-free integration')
@@ -258,7 +261,7 @@ else:
             self.assertEqual(path.stat().st_ino, inode)
         # The probe must clean up only its own files.
         self.assertEqual(set(p.name for p in self.work.iterdir()),
-                         {'.muse-fence-probe-marker', '.muse', '.mcp.json'})
+                         {'.muse-fence-probe-marker', '.muse', '.mcp.json', '.git'})
 
     @unittest.skipUnless(shutil.which('bwrap'), 'bubblewrap not installed')
     def test_tmp_brief_and_input_mounts_remain_readonly(self):
@@ -326,6 +329,151 @@ Path({str(self.work / 'ordinary-write')!r}).write_text('allowed')
         runtime.write_text('not allowed')
         with self.assertRaises(ValueError):
             Fence(self.work, self.brief, self.logs, runtime, self.auth)
+
+    def custody_runtime(self, phase):
+        runtime = self.root / ('custody-runtime-' + phase)
+        read_target = self.root / ('retained-input-' + phase)
+        read_target.write_text('{"payload_type":"run.terminal.completed"}\n'
+                               '{"payload_type":"fixture.private-artifact"}\n')
+        write_target = self.root / ('retained-output-' + phase)
+        write_target.write_bytes(b'public synthetic preserved fixture\n')
+        runtime.write_text('''#!/usr/bin/python3
+import json, sys
+from pathlib import Path
+if '--version' in sys.argv:
+ print('Muse Code synthetic (1.4.7-R6101.1)'); raise SystemExit(0)
+echo = '--provider' in sys.argv
+if echo == ''' + repr(phase == 'probe') + ''':
+ for name, target in ''' + repr([
+            ('probe-echo.jsonl' if phase == 'probe' else 'muse-exec.jsonl', str(read_target)),
+            ('fence-probe.json' if phase == 'probe' else 'receipt.json', str(write_target))]) + ''':
+  p = Path(''' + repr(str(self.logs if phase == 'probe' else self.root / 'live-custody-logs')) + ''') / name
+  try:
+   p.unlink(missing_ok=True); p.symlink_to(target)
+  except OSError:
+   pass
+print(json.dumps({'payload_type':'run.terminal.completed'}))
+''')
+        runtime.chmod(0o700)
+        return runtime, write_target
+
+    @unittest.skipUnless(shutil.which('bwrap'), 'bubblewrap not installed')
+    def test_probe_artifact_custody(self):
+        runtime, preserved = self.custody_runtime('probe')
+        fence = Fence(self.work, self.brief, self.logs, runtime, self.auth, self.settings)
+        argv = [str(runtime), 'exec', '--model', 'synthetic', '--reasoning-effort', 'max']
+        with fence.prepared() as command:
+            result = probe(fence, command, argv)
+        self.assertEqual(preserved.read_bytes(), b'public synthetic preserved fixture\n')
+        self.assertEqual(result['echo']['event_count'], 1)
+        self.assertNotIn('fixture.private-artifact', result['echo']['event_counts'])
+        self.assertFalse((self.logs / 'fence-probe.json').is_symlink())
+
+    @unittest.skipUnless(shutil.which('bwrap'), 'bubblewrap not installed')
+    def test_live_artifact_custody(self):
+        runtime, preserved = self.custody_runtime('live')
+        lane = self.root / 'custody-lane'
+        lane.write_text('synthetic argv boundary, never executed')
+        logs = self.root / 'live-custody-logs'
+        argv = ['muse_file_fence.py', '--lane', str(lane), '--runtime', str(runtime),
+                '--auth', str(self.auth), '--settings', str(self.settings),
+                str(self.work), str(self.brief), str(logs)]
+        plan = [str(runtime), 'exec', '--model', 'synthetic', '--reasoning-effort', 'max']
+        with mock.patch('sys.argv', argv), \
+                mock.patch('tools.muse_file_fence.native_argv', return_value=plan):
+            self.assertEqual(main(), 0)
+        self.assertEqual(preserved.read_bytes(), b'public synthetic preserved fixture\n')
+        receipt = json.loads((logs / 'receipt.json').read_text())
+        self.assertEqual(receipt['event_count'], 1)
+        self.assertNotIn('fixture.private-artifact', receipt['event_counts'])
+        self.assertFalse((logs / 'receipt.json').is_symlink())
+
+    @unittest.skipUnless(shutil.which('bwrap'), 'bubblewrap not installed')
+    def test_git_metadata_readonly(self):
+        subprocess.run(['git', 'init', '--quiet', str(self.work)], check=True)
+        config = self.work / '.git/config'
+        original = config.read_bytes()
+        payload = f'''
+from pathlib import Path
+root = Path({str(self.work)!r})
+for path in [root / '.git/config', root / '.git/fence-test-marker']:
+    try:
+        path.write_text('public synthetic metadata fixture')
+    except OSError:
+        pass
+    else:
+        raise AssertionError('Git metadata must be read-only')
+(root / 'ordinary-output').write_text('public work output')
+'''
+        result = self.run_fenced(payload)
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(config.read_bytes(), original)
+        self.assertFalse((self.work / '.git/fence-test-marker').exists())
+        self.assertTrue((self.work / 'ordinary-output').exists())
+
+    @unittest.skipUnless(shutil.which('bwrap'), 'bubblewrap not installed')
+    def test_bounded_run_timeout_returns_124(self):
+        from tools.muse_file_fence import run_bounded_fence
+        with self.fence.prepared() as command:
+            rc = run_bounded_fence(command + [str(self.runtime), '-I', '-c',
+                                             'import time; time.sleep(20)'],
+                                   stdout=self.fence.artifacts['muse-exec.jsonl'],
+                                   stderr=self.fence.artifacts['muse-exec.stderr.log'], timeout=0.1)
+        self.assertEqual(rc, 124)
+
+    @unittest.skipUnless(os.environ.get('MUSE_FENCE_NATIVE_PROBE') == '1',
+                         'explicit installed launcher model-free integration')
+    def test_launcher_exit_stops_run(self):
+        runtime = self.root / 'lifetime-runtime'
+        heartbeat = self.work / 'lifetime-heartbeat'
+        runtime.write_text('''#!/usr/bin/python3
+import sys, time
+from pathlib import Path
+if '--version' in sys.argv:
+ print('Muse Code synthetic (1.4.7-R6101.1)'); raise SystemExit(0)
+if '--provider' in sys.argv:
+ print('{"payload_type":"run.terminal.completed"}'); raise SystemExit(0)
+for i in range(300):
+ Path(''' + repr(str(heartbeat)) + ''').write_text(str(i))
+ time.sleep(0.1)
+''')
+        runtime.chmod(0o700)
+        logs = self.root / 'lifetime-logs'
+        cli = Path(__file__).resolve().parents[1] / 'tools/muse_file_fence.py'
+        child_fds = []
+        with (self.root / 'lifetime.stdout').open('w') as out, \
+                (self.root / 'lifetime.stderr').open('w') as err:
+            launcher = subprocess.Popen(['python3', '-B', str(cli), '--lane', str(DEFAULT_LANE),
+                '--runtime', str(runtime), '--auth', str(self.auth), '--settings', str(self.settings),
+                '--timeout', '30', str(self.work), str(self.brief), str(logs)],
+                stdout=out, stderr=err, start_new_session=True)
+            try:
+                deadline = time.monotonic() + 10
+                while not heartbeat.exists() and time.monotonic() < deadline:
+                    if launcher.poll() is not None:
+                        self.fail('synthetic lifetime fixture did not start')
+                    time.sleep(0.05)
+                self.assertTrue(heartbeat.exists(), 'synthetic lifetime fixture did not start')
+                # Stable handles ensure cleanup targets only this fixture's children.
+                children = Path(f'/proc/{launcher.pid}/task/{launcher.pid}/children').read_text().split()
+                child_fds = [os.pidfd_open(int(pid)) for pid in children]
+                launcher.terminate()
+                launcher.wait(timeout=3)
+                time.sleep(0.3)
+                settled = heartbeat.read_bytes()
+                time.sleep(0.3)
+                self.assertEqual(heartbeat.read_bytes(), settled, 'run continued after launcher exit')
+            finally:
+                for fd in child_fds:
+                    try:
+                        signal.pidfd_send_signal(fd, signal.SIGKILL)
+                    except ProcessLookupError:
+                        pass
+                    finally:
+                        os.close(fd)
+                if launcher.poll() is None:
+                    launcher.kill()
+                launcher.wait(timeout=3)
 
     @unittest.skipUnless(os.environ.get('MUSE_FENCE_NATIVE_PROBE') == '1',
                          'explicit installed-client model-free integration')

@@ -1,0 +1,36 @@
+{
+  "schema": "muse-file-fence-ruled-extra/1",
+  "reviewed_head": "81008f54cd6fed88b55dee4d127187a69c78d0e8",
+  "authority": {
+    "ruling": "adjudication-pr1120-81008f54-20261015.md:13-23",
+    "micro": "MICRO-81008f54.md:14-17",
+    "handling": "Isolation class: findings referenced by file and line"
+  },
+  "evidence_class": "local_integration",
+  "regressions": [
+    {"test": "test_probe_artifact_custody", "finding": "MICRO-81008f54.md:14,16", "before": "FAIL", "after": "PASS"},
+    {"test": "test_live_artifact_custody", "finding": "MICRO-81008f54.md:14,16", "before": "FAIL", "after": "PASS"},
+    {"test": "test_git_metadata_readonly", "finding": "MICRO-81008f54.md:17", "before": "FAIL", "after": "PASS"},
+    {"test": "test_launcher_exit_stops_run", "finding": "MICRO-81008f54.md:15", "before": "FAIL", "after": "PASS"}
+  ],
+  "before_exit_code": 1,
+  "before_tests": 4,
+  "before_failures": 4,
+  "additional_test": "test_bounded_run_timeout_returns_124",
+  "after_command": "MUSE_FENCE_NATIVE_PROBE=1 python3 -B -m unittest -v tests.test_muse_file_fence tests.test_published_digest_privacy tests.test_provenance_digest_custody tests.test_evidence_manifest tests.test_registry_rows",
+  "after_exit_code": 0,
+  "after_tests": 80,
+  "after_skips": 1,
+  "skip_note": "Host-name digest guard needs its host source and runs again in normal pre-push",
+  "fence_tests": 22,
+  "live_model_calls": 0,
+  "historical_smoke": "Prior dated measurement only; no repeated live smoke",
+  "followups": ["MICRO-81008f54.md:18", "MICRO-81008f54.md:19", "MICRO-81008f54.md:20"],
+  "required_reviews": ["CC Claude DELTA", "GPT delta"],
+  "rebase": "Forbidden until CC registry-only cue",
+  "sources": [
+    "openai/codex rust-v0.162.1 codex-rs/protocol/src/permissions.rs:2347-2367",
+    "containers/bubblewrap v0.11.1 bubblewrap.c:380-388 and bwrap.xml",
+    "CPython v3.13.16 Doc/library/os.rst and Doc/library/subprocess.rst"
+  ]
+}

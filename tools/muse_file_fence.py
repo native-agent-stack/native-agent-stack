@@ -27,6 +27,8 @@ SYSTEM_FILES = ("/etc/resolv.conf", "/etc/hosts", "/etc/nsswitch.conf",
                 "/etc/passwd", "/etc/group", "/etc/localtime")
 # Trusting a workspace must not reintroduce project hooks, MCP, or plugins.
 PROJECT_MASKS = (".muse", ".mcp.json")
+HOST_ARTIFACT_NAMES = ('probe-echo.jsonl', 'probe-echo.stderr.log', 'fence-probe.json',
+                       'muse-exec.jsonl', 'muse-exec.stderr.log', 'receipt.json')
 
 
 class UnsupportedGitWorktree(ValueError):
@@ -108,6 +110,60 @@ def disjoint(a, b):
     return a != b and a not in b.parents and b not in a.parents
 
 
+@contextlib.contextmanager
+def host_artifacts(logdir):
+    """Establish host-owned descriptor custody before any fenced execution.
+
+    CPython os.open(dir_fd=...) and fdopen retain the original file objects.
+    Every artifact is exclusive, no-follow, close-on-exec, and additionally
+    mounted read-only by Fence.command. Only intentional stdout/stderr handles
+    are passed to the child. No artifact is reopened by pathname after a run.
+    """
+    with contextlib.ExitStack() as stack:
+        directory = os.open(logdir, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC)
+        stack.callback(os.close, directory)
+        artifacts = {}
+        for name in HOST_ARTIFACT_NAMES:
+            fd = os.open(name, os.O_RDWR | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW | os.O_CLOEXEC,
+                         0o600, dir_fd=directory)
+            artifacts[name] = stack.enter_context(os.fdopen(fd, 'w+', encoding='utf-8'))
+        yield artifacts, directory
+
+
+def write_json(stream, document):
+    stream.seek(0)
+    json.dump(document, stream, indent=2)
+    stream.write('\n')
+    stream.truncate()
+    stream.flush()
+
+
+def run_bounded_fence(argv, *, stdout, stderr, timeout):
+    """Keep bwrap a direct child; its upstream parent-death handling applies.
+
+    Python supplies the deadline without an intermediate watchdog process.
+    See bubblewrap v0.11.1 bubblewrap.c:380-388 and CPython subprocess.Popen.
+    """
+    process = subprocess.Popen(argv, env={}, stdin=subprocess.DEVNULL,
+                               stdout=stdout, stderr=stderr)
+    try:
+        try:
+            rc = process.wait(timeout=timeout)
+            return rc if rc >= 0 else 128 - rc
+        except subprocess.TimeoutExpired:
+            process.terminate()
+            try:
+                process.wait(timeout=10)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait()
+            return 124
+    except BaseException:
+        process.kill()
+        process.wait()
+        raise
+
+
 class Fence:
     def __init__(self, worktree, brief, logdir, runtime, auth, settings=None, inputs=()):
         self.home = Path.home().resolve()
@@ -148,7 +204,8 @@ class Fence:
     @contextlib.contextmanager
     def prepared(self):
         # Host-only staging is outside every visible bind. No auth copy.
-        with tempfile.TemporaryDirectory(prefix="muse-fence-control-", dir="/var/tmp") as tmp:
+        with host_artifacts(self.logdir) as (self.artifacts, self.artifact_dirfd), \
+                tempfile.TemporaryDirectory(prefix="muse-fence-control-", dir="/var/tmp") as tmp:
             stage = Path(tmp)
             home = stage / 'home'
             (home / '.config/muse').mkdir(parents=True)
@@ -200,6 +257,16 @@ class Fence:
             if path.is_symlink():
                 raise ValueError("symlink project configuration refused")
             args += ['--ro-bind', str(empty if name == '.muse' else blank), str(path)]
+        # openai/codex rust-v0.162.1 permissions.rs:2347-2367 protects Git
+        # administrative paths under writable roots. Missing metadata is also
+        # sealed so this fence cannot introduce a new administrative tree.
+        git = self.worktree / '.git'
+        if git.is_symlink():
+            raise ValueError('symlink Git metadata refused')
+        args += ['--ro-bind', str(git if git.exists() else empty), str(git)]
+        for name in HOST_ARTIFACT_NAMES:
+            artifact = self.logdir / name
+            args += ['--ro-bind', str(artifact), str(artifact)]
         for key, value in clean_env(self.home, self.logdir).items():
             args += ['--setenv', key, value]
         # bwrap's initial tmpfs root is writable unless explicitly sealed.
@@ -207,25 +274,25 @@ class Fence:
         return args + ['--remount-ro', '/', '--chdir', str(self.worktree), '--']
 
 
-def event_receipt(path, rc):
+def event_receipt(stream, rc):
     counts = collections.Counter()
     models = set()
     terminals = collections.Counter()
     invalid = 0
-    with path.open() as fh:
-        for line in fh:
-            try:
-                event = json.loads(line)
-            except ValueError:
-                invalid += 1
-                continue
-            kind = event.get('payload_type', '<unknown>')
-            counts[kind] += 1
-            payload = event.get('payload') or {}
-            if kind == 'run.model.configured':
-                models.add(payload.get('model_id', '<unknown>'))
-            if kind.startswith('run.terminal.'):
-                terminals[kind] += 1
+    stream.seek(0)
+    for line in stream:
+        try:
+            event = json.loads(line)
+        except ValueError:
+            invalid += 1
+            continue
+        kind = event.get('payload_type', '<unknown>')
+        counts[kind] += 1
+        payload = event.get('payload') or {}
+        if kind == 'run.model.configured':
+            models.add(payload.get('model_id', '<unknown>'))
+        if kind.startswith('run.terminal.'):
+            terminals[kind] += 1
     return {'exit_code': rc, 'event_count': sum(counts.values()),
             'event_counts': dict(counts), 'invalid_lines': invalid,
             'models': sorted(models), 'terminal_counts': dict(terminals)}
@@ -273,6 +340,9 @@ for name, p in {{'brief': {str(fence.brief)!r}, 'runtime': {str(fence.runtime)!r
     facts[name + '-ro'] = Path(p).is_file() and not os.access(p, os.W_OK)
 facts['project-hooks-masked'] = not list(Path({str(fence.worktree/'.muse')!r}).iterdir())
 facts['project-config-ro'] = not os.access({str(fence.worktree/'.muse')!r}, os.W_OK)
+facts['git-metadata-ro'] = not os.access({str(fence.worktree/'.git')!r}, os.W_OK)
+for name in {HOST_ARTIFACT_NAMES!r}:
+    facts['host-artifact-ro-' + name] = not os.access(Path({str(fence.logdir)!r}) / name, os.W_OK)
 cfg = json.loads(Path({str(fence.home/'.config/muse/settings.json')!r}).read_text())
 facts['mcp-hooks-plugins-removed'] = set(cfg) <= {{'schema_version', 'contributor_mode_enabled', 'contributor_mode_disclosure_acknowledged'}}
 for p in ['/', '/etc', {str(fence.home)!r}]:
@@ -290,24 +360,28 @@ print(json.dumps(facts))
         raise ValueError('model-free filesystem probe failed')
     # Echo provider is the installed upstream's offline execution path. It
     # exercises startup/config/hooks/MCP discovery with no Meta model request.
-    echo_path = fence.logdir / 'probe-echo.jsonl'
     echo_argv = list(argv)
     # The upstream echo provider refuses a Meta model selection. This change
     # applies to the offline startup probe only; live argv stays byte-for-byte.
     for flag in ('--model', '--reasoning-effort'):
         index = echo_argv.index(flag)
         del echo_argv[index:index + 2]
-    with echo_path.open('x') as out, (fence.logdir / 'probe-echo.stderr.log').open('x') as err:
-        echo = subprocess.run(command + echo_argv + ['--provider', 'echo', '--disable-reminders'],
-                              env={}, stdin=subprocess.DEVNULL, stdout=out, stderr=err, timeout=45)
-    echo_receipt = event_receipt(echo_path, echo.returncode)
+    echo = subprocess.run(command + echo_argv + ['--provider', 'echo', '--disable-reminders'],
+                          env={}, stdin=subprocess.DEVNULL, stdout=fence.artifacts['probe-echo.jsonl'],
+                          stderr=fence.artifacts['probe-echo.stderr.log'], timeout=45)
+    echo_receipt = event_receipt(fence.artifacts['probe-echo.jsonl'], echo.returncode)
     facts['native-echo-exit-zero'] = echo.returncode == 0
     facts['native-echo-terminal'] = echo_receipt['terminal_counts'].get('run.terminal.completed', 0) == 1
     for name in ('mcp-fired', 'user-hook-fired', 'project-hook-fired', 'managed-hook-fired'):
-        facts[name + '-absent'] = not (fence.logdir / name).exists()
+        try:
+            os.stat(name, dir_fd=fence.artifact_dirfd, follow_symlinks=False)
+        except FileNotFoundError:
+            facts[name + '-absent'] = True
+        else:
+            facts[name + '-absent'] = False
     result = {'schema': 'muse-file-fence-probe/1', 'checks': facts,
               'pass': all(facts.values()), 'echo': echo_receipt}
-    (fence.logdir / 'fence-probe.json').write_text(json.dumps(result, indent=2) + '\n')
+    write_json(fence.artifacts['fence-probe.json'], result)
     if not result['pass']:
         raise ValueError('native model-free probe failed')
     return result
@@ -341,6 +415,7 @@ def main():
     fence = Fence(options.worktree, options.brief, options.logdir, options.runtime,
                   options.auth, settings, options.input)
     lane = checked_path(options.lane)
+    lane_sha256 = hashlib.sha256(lane.read_bytes()).hexdigest()
     argv = native_argv(lane, fence.runtime, fence.worktree, fence.brief,
                        fence.logdir, options.role, options.max_model_steps)
     fence.logdir.mkdir(mode=0o700)  # exclusive fresh log dir; never overwrite a run
@@ -356,22 +431,17 @@ def main():
         if options.probe_only:
             print('muse-file-fence: model-free probe PASS')
             return 0
-        with (fence.logdir / 'muse-exec.jsonl').open('x') as out, \
-                (fence.logdir / 'muse-exec.stderr.log').open('x') as err:
-            # timeout's process group receives TERM then KILL; bwrap dies with
-            # its parent and its PID namespace cannot leave child processes.
-            result = subprocess.run(['/usr/bin/timeout', '-k', '10', str(options.timeout)] +
-                                    command + argv, env={}, stdin=subprocess.DEVNULL,
-                                    stdout=out, stderr=err)
-    receipt = event_receipt(fence.logdir / 'muse-exec.jsonl', result.returncode)
-    receipt.update(schema='muse-file-fence/1', role=options.role, requested_model=MODEL,
-                   runtime_version=version.stdout.strip(), started_utc=start,
-                   finished_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),
-                   network='shared host network; no egress allowlist',
-                   argv=argv, lane_sha256=hashlib.sha256(lane.read_bytes()).hexdigest())
-    (fence.logdir / 'receipt.json').write_text(json.dumps(receipt, indent=2) + '\n')
+        rc = run_bounded_fence(command + argv, stdout=fence.artifacts['muse-exec.jsonl'],
+                               stderr=fence.artifacts['muse-exec.stderr.log'], timeout=options.timeout)
+        receipt = event_receipt(fence.artifacts['muse-exec.jsonl'], rc)
+        receipt.update(schema='muse-file-fence/1', role=options.role, requested_model=MODEL,
+                       runtime_version=version.stdout.strip(), started_utc=start,
+                       finished_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                       network='shared host network; no egress allowlist',
+                       argv=argv, lane_sha256=lane_sha256)
+        write_json(fence.artifacts['receipt.json'], receipt)
     print(json.dumps({k: receipt[k] for k in ('exit_code', 'event_count', 'models', 'terminal_counts')}))
-    return result.returncode
+    return rc
 
 
 if __name__ == '__main__':

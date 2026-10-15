@@ -1,7 +1,7 @@
 # Native Muse Code file-access fence
 
-Status: model-free acceptance and the single native reader smoke passed;
-independent GPT-family reviews and landing pending. No default/runtime promotion.
+Status: ruled corrections implemented; CC Claude DELTA and GPT delta pending.
+The single native reader smoke is a dated prior measurement. No default promotion.
 
 Muse Code 1.4.7's own shell sandbox permits filesystem reads outside a workspace,
 and its MCP servers and hooks execute outside that sandbox. A reader role alone
@@ -30,13 +30,16 @@ is shared. The new root starts empty rather than binding the host root.
   `/tmp` binds the log tree's `tmp` directory before named input overmounts;
   this supports read-only briefs/inputs under `/tmp` while temporary writes
   persist only in the log tree. Undeclared host `/tmp` files remain absent.
+  Git administrative metadata is read-only within the writable worktree. Host
+  artifacts have read-only path mounts within the writable log tree; native
+  stdout/stderr use the explicitly supplied handles.
 - Read-only: `/usr`, merged system executable/library paths, named resolver,
   NSS, identity and timezone files, `/etc/ssl/certs`, the exact runtime ELF,
   the brief and explicitly named input files. Input directories are refused.
   Brief/input files inside the worktree get read-only overmounts.
 - Home is a synthetic read-only tree with only the runtime file, projected Muse
   settings and the sign-in file. The original home, other repositories, SSH,
-  Codex/Claude/hcom roots, private state, co-op/CC roots, host runtime sockets and
+  Codex/Claude/hcom roots, private state, co-op/CC roots, host filesystem sockets and
   Windows mounts are absent. Binding a named brief exposes only that file and
   synthetic ancestors, not its host parent directory.
 - A fenced settings copy retains only `schema_version`, the boolean contributor
@@ -70,6 +73,15 @@ cleanup contain child lifetime. A timeout sends TERM then KILL. Mount policy
 contains file access; it does not defend against a hostile same-UID host process
 racing paths before setup, kernel vulnerabilities, resource exhaustion or files
 already deliberately included in the worktree/input set.
+
+The bounded native process is a direct child of the launcher, using
+`subprocess.Popen.wait` for its deadline and bubblewrap's documented
+`--die-with-parent` handling. The deadline returns124 after TERM and, if needed,
+KILL after10seconds. A synthetic lifetime test measures launcher termination;
+there is no separate watchdog process. Host artifacts are exclusively opened
+before any fenced execution, retained as descriptors and mounted read-only by
+path. Host processing uses those retained descriptors and no-follow metadata
+queries; source metadata needed for receipts is captured before execution.
 
 ## Network and execution boundaries
 
@@ -243,3 +255,33 @@ Final whole-tree validation returned rc 1 with only the same nine model-currency
 age errors that the supplied Astra review classifies as an exempt CI-wide
 incident. No other error was reported. This round does not change those records
 or bypass validation; the prior round's rc 0 remains a dated prior result.
+
+## CC ruled extra commit
+
+Authority: `adjudication-pr1120-81008f54-20261015.md:13-23` and
+`MICRO-81008f54.md:14-17`. Isolation-class details remain in those reviewed files.
+The implemented scope is tracked by source locations and regression names:
+
+| Reviewed item | Implementation | Regression |
+| --- | --- | --- |
+| `MICRO-81008f54.md:14,16` | `tools/muse_file_fence.py:114`, `:277`, `:372`, `:436` | `test_probe_artifact_custody`, `test_live_artifact_custody` |
+| `MICRO-81008f54.md:17` | `tools/muse_file_fence.py:260` | `test_git_metadata_readonly` |
+| `MICRO-81008f54.md:15` | `tools/muse_file_fence.py:141` | `test_launcher_exit_stops_run`, `test_bounded_run_timeout_returns_124` |
+
+Four required fail-first tests failed at81008f54 before implementation; the
+deadline check is additional coverage. Model-free controls and the PR's own
+tests are recorded in `notes/muse-file-fence-20261014/ruled-extra.json`. No new
+live model call or smoke is claimed. The original historical receipt remains
+unchanged. Follow-ups from `MICRO-81008f54.md:18-20` remain in the PR body.
+
+Sources: openai/codex
+[`rust-v0.162.1/codex-rs/protocol/src/permissions.rs:2347-2367`](https://github.com/openai/codex/blob/rust-v0.162.1/codex-rs/protocol/src/permissions.rs#L2347)
+defines the protected Git metadata under writable roots. The existing
+bubblewrap pin's `bwrap.xml` defines read-only mounts; its
+[`bubblewrap.c:380-388`](https://github.com/containers/bubblewrap/blob/124c4cdf4321f63ef17a1cb0ce8f9dd45bd7adbe/bubblewrap.c#L380)
+defines parent-death handling. CPython
+[`v3.13.16/Doc/library/os.rst`](https://github.com/python/cpython/blob/v3.13.16/Doc/library/os.rst),
+`open`, `fdopen`, `dir_fd`, `follow_symlinks` and the `O_*` flags, and
+[`Doc/library/subprocess.rst`](https://github.com/python/cpython/blob/v3.13.16/Doc/library/subprocess.rst),
+`Popen`, `wait`, `terminate` and `kill`, define the native interfaces used here.
+No custom filesystem or process supervisor is introduced.
