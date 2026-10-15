@@ -45,6 +45,9 @@ is shared. The new root starts empty rather than binding the host root.
   paths, plugins and unknown future extension keys are removed. No host settings
   are modified. A private host staging directory supplies the immutable copy;
   its source is outside all visible writable binds.
+  When the CLI's default settings file is absent, the copy uses inert defaults.
+  An explicitly supplied missing, malformed, symlinked or non-file settings
+  path remains an error; existing default files are validated normally.
 - Only the specific sign-in file is bound, read-only, at the documented default
   location. The wrapper never opens, hashes, copies or logs its contents. This
   single file remains readable by the native process and its same-UID tools;
@@ -76,6 +79,13 @@ host loopback services. There is no DNS/IP/domain egress allowlist. Credentials
 reachable through a separate network service are outside this filesystem-only
 claim. No proxy credentials are inherited. The scope is an owner-approved reader
 smoke, not a hostile-code network qualification or builder/reviewer qualification.
+
+For shell-enabled builder/reviewer roles, linked Git worktrees (a `.git` file
+pointing outside the mounted tree), and symlinked Git metadata are refused
+before probe/log creation. Use a standalone checkout with local Git metadata
+for these roles. Reader remains allowed to consume a linked worktree's files;
+its shell tools are disabled and its common repository stays masked. This
+deliberate rejection avoids adding a grant for another repository's metadata.
 
 Hooks/MCP/plugins are absent from immutable startup sources. The native echo
 probe demonstrates the planted extension sources do not start. This does not
@@ -191,3 +201,45 @@ Mechanism sources: bubblewrap `0.11.1` at the pinned `bwrap.xml` above defines
 `_bin_openflags`, `_mkstemp_inner`, `NamedTemporaryFile`, and `_TemporaryFileCloser`
 define exclusive randomized creation and context-managed cleanup. These native
 APIs supply the fixes; no custom mount or temporary-file mechanism is added.
+
+## Fix round 2: privacy and input-layout boundaries
+
+The Astra P1 and patched-runner local P2s at `d2c0c9fb` were reproduced with
+three fail-before tests before this final bounded fix. The acceptance record
+now names private native run artifacts using a task/time custody reference;
+it publishes no content-derived commitment to their unpublished bytes.
+Historical timestamps, model and event counts remain unchanged. Raw native
+events, diagnostics and private receipts remain private. Versioned vendor,
+launcher and reference-script source fingerprints are distinct from native
+run content and remain in their named source fields.
+
+The CLI now distinguishes an omitted settings option from an explicit path,
+using `sanitized_settings(None)` only when the default file is absent. Native
+Muse 1.4.7's optional user settings behavior motivated the correction; its
+[configuration documentation](https://dev.meta.ai/docs/muse-code/configuration#settings-file)
+describes defaults and the flat user settings layer. The regression exercises
+the real parser, OS probe and synthetic echo runtime, and confirms explicit
+invalid file choices still fail before any live execution.
+
+Shell-enabled roles reject linked Git worktrees before accepting a native argv.
+Installed Git is `2.53.0`; upstream
+[`v2.53.0/Documentation/git-worktree.adoc`](https://github.com/git/git/blob/v2.53.0/Documentation/git-worktree.adoc),
+**DETAILS**, and
+[`gitrepository-layout.adoc`](https://github.com/git/git/blob/v2.53.0/Documentation/gitrepository-layout.adoc),
+**DESCRIPTION**, define the gitfile, private administrative directory and shared
+common repository. The regression creates a real linked worktree, proves
+unfenced Git works and its common metadata stays inaccessible in the fence,
+then requires early rejection of builder/reviewer roles. No common-repository
+bind or metadata copy is added. The reader role still permits this file layout.
+
+The [fix receipt](../../notes/muse-file-fence-20261014/fix-round-2.json) records
+the findings, fail-before/pass-after results and remaining P3 boundaries.
+`test_notes_publish_no_private_run_commitments` covers the notes JSON publication
+boundary. The existing general digest guard does not scan this notes directory;
+its passing result cannot replace this scoped regression. No digest allowlist
+or scanner exemption was added, and no live model call was repeated.
+
+Final whole-tree validation returned rc 1 with only the same nine model-currency
+age errors that the supplied Astra review classifies as an exempt CI-wide
+incident. No other error was reported. This round does not change those records
+or bypass validation; the prior round's rc 0 remains a dated prior result.

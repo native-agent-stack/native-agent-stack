@@ -29,6 +29,10 @@ SYSTEM_FILES = ("/etc/resolv.conf", "/etc/hosts", "/etc/nsswitch.conf",
 PROJECT_MASKS = (".muse", ".mcp.json")
 
 
+class UnsupportedGitWorktree(ValueError):
+    """A shell role would lose required Git metadata inside this fence."""
+
+
 def checked_path(value, *, directory=False):
     path = Path(value).absolute()
     if any(ord(c) < 32 or ord(c) == 127 for c in str(path)):
@@ -71,6 +75,12 @@ def clean_env(home, logdir):
 
 def native_argv(lane, runtime, worktree, brief, logdir, role, steps):
     """Use the unchanged CC builder; never eval its shell-escaped dry-run."""
+    if role in ('builder', 'reviewer') and (
+            (worktree / '.git').is_file() or (worktree / '.git').is_symlink()):
+        # Git linked-worktree gitfiles point to common metadata outside this
+        # bind. Do not expose that repository or pretend Git inspection works.
+        raise UnsupportedGitWorktree(
+            'linked Git worktrees require reader role; shell roles need local Git metadata')
     env = clean_env(Path.home(), logdir)
     env.update(MUSE_BIN=str(runtime), MUSE_LANE_MODEL=MODEL,
                MUSE_LANE_MAX_MODEL_STEPS=str(steps))
@@ -308,7 +318,8 @@ def main():
     parser.add_argument('--lane', type=Path, default=DEFAULT_LANE)
     parser.add_argument('--runtime', type=Path, default=Path.home() / f'.local/bin/muse-bin-{VERSION}')
     parser.add_argument('--auth', type=Path, default=Path.home() / '.config/muse/auth.json')
-    parser.add_argument('--settings', type=Path, default=Path.home() / '.config/muse/settings.json')
+    parser.add_argument('--settings', type=Path,
+                        help='explicit settings file (must exist); absent default uses inert defaults')
     parser.add_argument('--input', action='append', default=[], type=Path)
     parser.add_argument('--role', choices=['reader', 'reviewer', 'builder'], default='reader')
     parser.add_argument('--max-model-steps', type=int, default=2)
@@ -320,8 +331,15 @@ def main():
     options = parser.parse_args()
     if options.max_model_steps < 1 or options.timeout < 1:
         parser.error('positive bounds required')
+    settings = options.settings
+    if settings is None:
+        default_settings = Path.home() / '.config/muse/settings.json'
+        # Muse supports no user settings file. Explicit paths, existing
+        # non-files and symlinks still pass through strict checked_path().
+        if default_settings.exists() or default_settings.is_symlink():
+            settings = default_settings
     fence = Fence(options.worktree, options.brief, options.logdir, options.runtime,
-                  options.auth, options.settings, options.input)
+                  options.auth, settings, options.input)
     lane = checked_path(options.lane)
     argv = native_argv(lane, fence.runtime, fence.worktree, fence.brief,
                        fence.logdir, options.role, options.max_model_steps)
@@ -359,6 +377,10 @@ def main():
 if __name__ == '__main__':
     try:
         raise SystemExit(main())
+    except UnsupportedGitWorktree:
+        print('muse-file-fence: linked Git worktrees require reader role; '
+              'shell roles need local Git metadata', file=__import__('sys').stderr)
+        raise SystemExit(1)
     except (ValueError, OSError, subprocess.SubprocessError) as exc:
         # Do not serialize environment/config/payloads from exceptions.
         print('muse-file-fence: refused (' + type(exc).__name__ + ')', file=__import__('sys').stderr)

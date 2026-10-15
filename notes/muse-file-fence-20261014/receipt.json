@@ -69,14 +69,12 @@
     "cost": "Subscription smoke; billed usage/cost not measured"
   },
   "private_custody": {
-    "muse-exec.jsonl": "c958cbf0ad5033ec5eaac0713de2cecd1cb1b84b749beeb312b5bd365dd204b6",
-    "muse-exec.stderr.log": "777a75c9c01c104f00148efe0bd84e98299c8ba61a1e1cbc64540a872d2ae6f2",
-    "fence-probe.json": "d9ec2a91f54f7acfbc358ba1d74c2761a43cf7d5d5cfb1a201ba01b23eb213e9",
-    "receipt.json": "9c1fd6a214d972477a60374bc7f37e6dc9451cb5897087b508610f4efc23bc4c",
-    "probe-echo.jsonl": "01676a71d1f06123225052527561ea7e0e8ff729ab32558093f40bd80e0cdb39",
-    "native_lane_source": "71980b580bad1f7bdc9434dbd788b7e580bc819176ede42614c5bb572c392c07"
+    "reference": "muse-file-fence-smoke-20261014T225744Z",
+    "artifacts": ["muse-exec.jsonl", "muse-exec.stderr.log", "fence-probe.json", "receipt.json", "probe-echo.jsonl"],
+    "note": "Private operator custody reference assigned from task name and time; no content-derived commitment to unpublished run bytes"
   },
   "reference_sources": {
+    "native_lane_source": "71980b580bad1f7bdc9434dbd788b7e580bc819176ede42614c5bb572c392c07",
     "rankedfeeds_fence.sh": "af0789b352c940f6802639f654d2ffe08ce669557915a7eeab26e9688a750432",
     "fence_checks_rankedfeeds.sh": "5f98f74917e92c3f7230204c462ec17c7cb8ddad6e16276aca4c8904887a415f",
     "fence_probe_rankedfeeds.sh": "9399b08ff665d665c5422448082fbbca5cc260e9b2c61797626cdf2d398f0cb9"

@@ -6,9 +6,10 @@ import shutil
 import subprocess
 import tempfile
 import unittest
+from unittest import mock
 
 from tools.muse_file_fence import (Fence, sanitized_settings, clean_env, native_argv,
-                                  probe, DEFAULT_LANE, VERSION)
+                                  probe, main, DEFAULT_LANE, VERSION)
 
 
 class MuseFenceTests(unittest.TestCase):
@@ -132,6 +133,107 @@ print(json.dumps(out))
                      'MUSE_TRANSPORT_TRACE', 'MUSE_PERMISSION_PROFILE_FAIL_OPEN',
                      'HTTP_PROXY', 'CODEX_HOME', 'XDG_CONFIG_HOME'):
             self.assertNotIn(name, env)
+
+    def test_notes_publish_no_private_run_commitments(self):
+        notes = Path(__file__).resolve().parents[1] / 'notes/muse-file-fence-20261014'
+        receipt = json.loads((notes / 'receipt.json').read_text())
+        custody = receipt['private_custody']
+        self.assertEqual(set(custody), {'reference', 'artifacts', 'note'})
+        self.assertIsInstance(custody['reference'], str)
+        self.assertTrue(custody['reference'])
+        self.assertEqual(set(custody['artifacts']), {
+            'muse-exec.jsonl', 'muse-exec.stderr.log', 'fence-probe.json',
+            'receipt.json', 'probe-echo.jsonl'})
+        self.assertNotRegex(json.dumps(custody), r'[0-9a-fA-F]{64}')
+        # Cover the notes publication boundary, including future JSON records.
+        # Source/review/vendor fingerprints have separate named fields; native
+        # conversation and diagnostic filenames must never key a commitment.
+        private_names = set(custody['artifacts'])
+        def check(value):
+            if isinstance(value, dict):
+                for key, item in value.items():
+                    if key in private_names and isinstance(item, str):
+                        self.assertNotRegex(item, r'^[0-9a-fA-F]{7,64}$')
+                    check(item)
+            elif isinstance(value, list):
+                for item in value:
+                    check(item)
+        for path in notes.glob('*.json'):
+            check(json.loads(path.read_text()))
+        # Measured historical facts survive the privacy correction unchanged.
+        smoke = receipt['live_smoke']
+        self.assertEqual((smoke['exit_code'], smoke['event_count']), (0, 39))
+        self.assertEqual(smoke['started_utc'], '2026-10-14T22:57:44.899234+00:00')
+        self.assertEqual(smoke['finished_utc'], '2026-10-14T22:57:58.138320+00:00')
+
+    @unittest.skipUnless(shutil.which('bwrap'), 'bubblewrap not installed')
+    def test_cli_absent_default_settings_probe_passes(self):
+        home = self.root / 'default-home'
+        home.mkdir()
+        runtime = self.root / 'synthetic-muse'
+        runtime.write_text('''#!/usr/bin/python3
+import sys
+if '--version' in sys.argv:
+ print('Muse Code synthetic (1.4.7-R6101.1)')
+else:
+ print('{"payload_type":"run.terminal.completed"}')
+''')
+        runtime.chmod(0o700)
+        lane = self.root / 'synthetic-lane'
+        lane.write_text('synthetic argv boundary, never executed')
+        logs = self.root / 'default-settings-logs'
+        argv = ['muse_file_fence.py', '--probe-only', '--lane', str(lane),
+                '--runtime', str(runtime), '--auth', str(self.auth),
+                str(self.work), str(self.brief), str(logs)]
+        plan = [str(runtime), 'exec', '--model', 'synthetic', '--reasoning-effort', 'max']
+        with mock.patch('pathlib.Path.home', return_value=home), \
+                mock.patch('sys.argv', argv), \
+                mock.patch('tools.muse_file_fence.native_argv', return_value=plan):
+            self.assertEqual(main(), 0)
+        self.assertFalse((home / '.config/muse/settings.json').exists())
+        self.assertTrue(json.loads((logs / 'fence-probe.json').read_text())['pass'])
+        # An explicit nonexistent file is an error, never a defaults fallback.
+        malformed = self.root / 'malformed.json'
+        malformed.write_text('invalid JSON')
+        linked = self.root / 'settings-link.json'
+        linked.symlink_to(self.settings)
+        for name, path in (('absent', self.root / 'absent.json'),
+                           ('malformed', malformed), ('symlink', linked), ('directory', home)):
+            explicit_logs = self.root / ('explicit-' + name + '-logs')
+            explicit = argv[:-1] + [str(explicit_logs), '--settings', str(path)]
+            with self.subTest(explicit=name), \
+                    mock.patch('pathlib.Path.home', return_value=home), \
+                    mock.patch('sys.argv', explicit), \
+                    mock.patch('tools.muse_file_fence.native_argv', return_value=plan), \
+                    self.assertRaises(ValueError):
+                main()
+            self.assertFalse((explicit_logs / 'muse-exec.jsonl').exists())
+
+    @unittest.skipUnless(os.environ.get('MUSE_FENCE_NATIVE_PROBE') == '1',
+                         'explicit installed launcher model-free integration')
+    def test_linked_git_worktree_refused_for_shell_roles(self):
+        common = self.root / 'common-repo'
+        def git(*args):
+            return subprocess.run(['git', *args], check=True, capture_output=True, text=True)
+        git('init', '--quiet', str(common))
+        git('-C', str(common), 'config', 'user.name', 'Fence fixture')
+        git('-C', str(common), 'config', 'user.email', 'fixture@users.noreply.github.com')
+        git('-C', str(common), '-c', 'commit.gpgsign=false', '-c', 'core.hooksPath=/dev/null',
+            'commit', '--quiet', '--allow-empty', '-m', 'Synthetic Git fixture')
+        git('-C', str(common), 'worktree', 'add', '--quiet', '--detach', str(self.work))
+        self.assertTrue((self.work / '.git').is_file())
+        self.assertEqual(git('-C', str(self.work), 'diff', 'HEAD').returncode, 0)
+        # Keep the common repository masked: no metadata bind is introduced.
+        masked = self.run_fenced('import subprocess; assert subprocess.run('
+                                 + repr(['git', 'diff', 'HEAD']) + ').returncode == 128')
+        self.assertEqual(masked.returncode, 0, masked.stderr)
+        # The reader may use the tree as file inputs, but accepting shell roles
+        # would promise Git access that the hidden common metadata cannot give.
+        for role in ('reviewer', 'builder'):
+            with self.subTest(role=role), self.assertRaisesRegex(ValueError, 'linked Git worktrees'):
+                native_argv(DEFAULT_LANE, self.runtime, self.work, self.brief, self.logs, role, 2)
+        self.assertIn('--disable-shell', native_argv(
+            DEFAULT_LANE, self.runtime, self.work, self.brief, self.logs, 'reader', 2))
 
     def run_model_free_probe(self):
         # Exercise the real OS payload; substitute only the final echo turn
