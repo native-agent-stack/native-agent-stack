@@ -74,3 +74,39 @@ Leaving the scope outside the taxonomy would keep the sweep/coverage join
 undefined. The chosen registration exposes that gap through the existing schema.
 Reopen this registration design only if a retained validator/sweep result shows
 that its pending boundary cannot represent the named layer without false claims.
+
+## Review correction: required publication consumers
+
+Local review at `5da12bca3a90237c2f4155814c05b2498c333062`, retained review
+SHA256 `5a03c17995ca4684322d00b452355390c1d3e2deaea92fece93736eb8af49764`,
+identified three missed consumers. Each regression reproduced the reported
+behavior before its fix: the foundation validator rejected 21 layers; the wave
+reader returned 20260922 for the new unrun row; and the grand-list sweep join
+refused the missing model-routes sweep entry.
+
+The foundation validator now recognizes the 21-layer taxonomy and accepts a
+marked pending taxonomy row only when its exact scope matches a valid unrun
+catalog registration. That registration cannot claim a capability decision.
+Existing fixed-count fixture expectations are updated to 21.
+
+An explicit registration_only marker is validated by the shared landscape
+predicate: empty selections, unsealed/empty lane identities, pending agreement,
+named gaps and no terminal state. Wave readers return null for that state and
+omit it from wave output; they retain the old fallback for every unmarked row.
+The generated final stack therefore has wave=null and wave_doc=null for this
+registration. The grandfathered document, registry and handbook stay byte-for-byte
+unchanged. Negative controls reject a marker carrying a winner or sealed run.
+
+The matrix carries the explicit marker into the new-host grand list. A missing
+sweep layer is admitted only for the marked, empty pending matrix row with no
+adjudication, zero in-use/converged/winner rows and manifest_layer_found=false.
+The grand-list output keeps that layer and exposes sweep_status=unswept and its
+source gap. Missing coverage for ordinary or selected rows still refuses; no
+future sweep is assumed and no manifest entry is invented.
+
+Pinned mechanism references at reviewed head: scripts/validate_foundation.py:35-42,
+:88-94 and :216; tools/sota-convergence/build_verdicts.py:164-170, :232-272 and
+:467-486; scripts/new_host_grand_list.py:91-151 and :301-373. These are native
+repository corrections using the existing generators and unittest harness,
+without new dependencies or changes to frozen evidence. Relevant validation and
+generated outputs are rerun for this one correction commit.

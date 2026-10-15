@@ -198,6 +198,7 @@
     },
     {
       "id": "model-routes",
+      "registration_only": true,
       "title": "Model routes",
       "purpose": "the routing layer that selects provider, model, account pool and effort for each agent request (gateway, fallback, rate-limit and credit handling) across the Codex lanes, Claude Code (subscription and API slots) and the runtime workers",
       "selection": "Pending scoped landscape sweep; no route winner or comparison result is claimed.",

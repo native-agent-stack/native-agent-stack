@@ -38,6 +38,7 @@ LAYERS = {
     "token-efficiency", "quality-evaluation", "ci-supply-chain", "scheduling-supervision",
     "hosting-services", "recovery-portability", "observation-inference",
     "agent-sdks", "mcp-surfaces", "secrets-credentials", "git-github-automation",
+    "model-routes",
 }
 STAGES = {"install", "use", "persistence", "restart", "cleanup", "recovery"}
 STATUSES = {
@@ -86,11 +87,27 @@ def validate_foundation(root: Path) -> dict:
     lifecycle = indexed(validator.load(SOURCES["lifecycle"]).get("components"), "component_id", "lifecycle")
 
     layers = indexed(manifest["layers"], "id", "layers")
-    require(set(layers) == LAYERS, "layers", "must contain exactly the 20 required layers")
+    require(set(layers) == LAYERS, "layers", f"must contain exactly the {len(LAYERS)} required layers")
+    registered_layers = set()
     for identifier, layer in layers.items():
-        fields(layer, {"id", "title", "purpose", "selection", "activation", "lifecycle_scope", "next_gap"}, identifier)
+        expected = {"id", "title", "purpose", "selection", "activation", "lifecycle_scope", "next_gap"}
+        if "registration_only" in layer:
+            require(layer["registration_only"] is True, identifier, "registration_only must be true")
+            expected.add("registration_only")
+            try:
+                from .landscape import is_unrun_registration
+            except ImportError:
+                from landscape import is_unrun_registration
+            catalog = validator.load("catalogs/landscape/foundation.json")
+            matches = [row for row in catalog.get("layers", []) if row.get("layer_id") == identifier]
+            require(len(matches) == 1 and is_unrun_registration(matches[0]), identifier,
+                    "pending taxonomy registration needs one matching unrun catalog row")
+            require(layer["purpose"] == matches[0]["requirement"], identifier, "registered scope differs from catalog")
+            registered_layers.add(identifier)
+        fields(layer, expected, identifier)
         for key, value in layer.items():
-            text(value, f"{identifier}.{key}")
+            if key != "registration_only":
+                text(value, f"{identifier}.{key}")
 
     domain = {}
     for row in sequence(manifest["domain_boundary"], "domain_boundary", nonempty=False):
@@ -213,7 +230,9 @@ def validate_foundation(root: Path) -> dict:
         used_components.update(component_ids)
         used_receipts.update(evidence_ids)
 
-    require(used_layers == LAYERS, "decisions", "every required layer needs a capability or explicit pending decision")
+    require(not used_layers & registered_layers, "decisions", "an unrun registration cannot claim a capability decision")
+    require(used_layers | registered_layers == LAYERS, "decisions",
+            "every required layer needs a capability or explicit pending registration")
     for identifier, row in decisions.items():
         targets = set()
         for supersession in sequence(row["supersedes"], f"{identifier}.supersedes", nonempty=False):

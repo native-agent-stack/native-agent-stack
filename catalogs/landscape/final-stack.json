@@ -6344,11 +6344,8 @@
         "next_review": null,
         "reopened_by": [],
         "status": "pending_lanes",
-        "wave": "20260922",
-        "wave_doc": {
-          "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
-          "sha256": "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de"
-        }
+        "wave": null,
+        "wave_doc": null
       },
       "winners": []
     },
@@ -10719,8 +10716,8 @@
     "adoption/pins-linux-x86_64.json": "964d085d8fe2cb8aba3d44678938e34a2b1d8b6e320227db4152352a0d0e2449",
     "adoption/pins-macos-arm64.json": "539a4840e1c5e2d5377685c274932f697d22bd16e28f99e70c12b2f86dc9f24c",
     "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock": "f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989",
-    "catalogs/landscape/component-evidence-matrix.json": "0ffb95c512f86c4aa770abce2669d645ab5b3e3fdbd134f9eea41d7a447c3600",
-    "catalogs/landscape/foundation.json": "f0e8f5ffae3b9ab40ceb4ffdbb5182d823d77cb100804efc948f8a9117bd65da",
+    "catalogs/landscape/component-evidence-matrix.json": "3c9881b07f20ec4b504095b2bca36761e2311b4f951afe44d4bbe2c7f83b022b",
+    "catalogs/landscape/foundation.json": "57a80a3a75456b29978d818da71d0b5419e1f7e0532c0d96e1094d57f367c8d8",
     "catalogs/landscape/manifest.json": "8f2795612616853c92db1571de32d5ffb2019c32b3376ef0ed3b28fe9a8cc077",
     "catalogs/landscape/planned-layers.json": "b24e06efe5a029e4187af803701a56bdd74319e6b2d8fd82daa243b33294fb5d",
     "catalogs/landscape/research-state.json": "8bbdac81d870586731c2845ac3a17324cf09b03ad9dd7355e8a6c12faaf194c5",

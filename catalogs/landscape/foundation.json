@@ -5218,6 +5218,7 @@
     {
       "catalog": "foundation",
       "layer_id": "model-routes",
+      "registration_only": true,
       "title": "Model routes",
       "requirement": "the routing layer that selects provider, model, account pool and effort for each agent request (gateway, fallback, rate-limit and credit handling) across the Codex lanes, Claude Code (subscription and API slots) and the runtime workers",
       "current_choice": "No winner: the route layer awaits its scoped landscape sweep and retained comparison.",

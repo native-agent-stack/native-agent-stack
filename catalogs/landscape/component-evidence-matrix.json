@@ -3038,6 +3038,7 @@
       "layer_id": "model-routes",
       "open_executable_now_gaps": null,
       "open_gaps": null,
+      "registration_only": true,
       "title": "Model routes",
       "verdict_status": "pending_lanes",
       "winners": []

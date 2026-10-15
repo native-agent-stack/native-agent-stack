@@ -20,6 +20,29 @@ except ImportError:
     import platform_status as platform_evidence
 
 MANIFEST = "catalogs/landscape/manifest.json"
+
+
+def is_unrun_registration(row):
+    """An explicit scope registration has no verdict wave, lane run or selection.
+
+    Shared by the wave and taxonomy readers so absence never defaults a new
+    registration into the immutable 20260922 wave. Existing rows retain their
+    historical fallback unless they carry this explicit marker.
+    """
+    if "registration_only" not in row:
+        return False
+    lanes = row.get("lanes")
+    valid = (row["registration_only"] is True and row.get("verdict_status") == "pending_lanes"
+             and all(row.get(key) == [] for key in ("candidates", "winners", "alternatives"))
+             and row.get("terminal_state") is None and isinstance(row.get("open_gaps"), list)
+             and bool(row["open_gaps"]) and all(isinstance(gap, str) and gap.strip() for gap in row["open_gaps"])
+             and isinstance(lanes, dict) and lanes.get("agreement") == "pending"
+             and "sealed_base" not in lanes and "single_lane_decision" not in lanes
+             and all(isinstance(lanes.get(lane), dict)
+                     and lanes[lane].get("run_id") == "" and lanes[lane].get("sealed_sha256") == ""
+                     for lane in LANES))
+    require(valid, "registration_only requires an empty, unsealed pending scope with named gaps")
+    return True
 DISPOSITIONS = {
     "selected", "observed_failure", "measured_tradeoff", "overlap",
     "out_of_scope", "unqualified", "conditional",
@@ -869,6 +892,9 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
         date.fromisoformat(row["checked_at"])
     except ValueError as error:
         raise ValueError(str(key) + ".checked_at must be an ISO date") from error
+
+    if is_unrun_registration(row):
+        return
 
     protocol = row.get("overturn_protocol")
     require(isinstance(protocol, dict), str(key) + ".overturn_protocol must be an object")
