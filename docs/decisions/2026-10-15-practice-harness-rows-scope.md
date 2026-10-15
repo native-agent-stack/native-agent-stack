@@ -13,6 +13,20 @@ owner corrected the command center: practice content comes from research converg
 center's correction record of 2026-10-15 (20:48Z) withdrew its own definition of the context lead and routed the context-engineering
 practice to this protocol. These are dated paraphrases; the coordination records are cited by name and date.
 
+## Requirements recorded since (inputs, not decisions)
+
+At 17:54 ET on 2026-10-15 the owner asked for a new-host command center whose fleet view and orchestration use the SOTA
+platforms' own views through their MCP servers and native CLIs. The command center recorded this as dated requirements
+(addendum 10 to its 19:12Z direction, a coordination record cited by name and date) and routed two of them here:
+
+- **R2:** the fleet view and orchestration use each platform's own views (GitHub, agentsview, Grafana and the other
+  converged platforms) through their shipped MCP servers and CLIs, with nothing rebuilt by the command center
+  (AGENTS.md: never rebuild what an upstream ships).
+- **R3:** CLI first; MCP where the platform ships a server; each pinned, with an install receipt and an inverse.
+
+They bind the fleet-view and orchestration rows here and the framework rows of the framework change. The platform MCP and
+CLI candidates are screened by the co-op; a row names only a converged winner, and anything else stays a PROPOSAL.
+
 ## Step 1: layer verdicts read
 
 At `origin/main` 8053f14e7 (`catalogs/landscape/foundation.json`, every row `recorded`, wave 20260922 in
