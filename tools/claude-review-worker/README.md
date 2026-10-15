@@ -107,7 +107,11 @@ prompt says the check covers citation presence only.
    # CLAUDE_REVIEW_KEYS=anthropic-api-4,anthropic-api-3,anthropic-api-2,anthropic-api-5,anthropic-api,...
    #   fill-first: the next key only when one is out of credit or revoked; a switch is a ledger row and a warning;
    #   anthropic-api-3 is second (its CI-review purpose ended with #981) and anthropic-api-2 third (owner, 2026-10-11)
-   # CLAUDE_BIN=~/.local/share/claude/versions/2.1.299                  # the pinned native binary
+   # CLAUDE_BIN=~/.local/share/claude-retained/2.1.299/claude          # the pinned native binary, a retained copy outside
+   #   versions/ (the native installer's cleanup keeps only the launcher's, running and two newest versions there)
+   # CLAUDE_BIN_SHA256=2d894a4b1bfaaa9aab72aeff7803e3c73bc2510f279a171f6b8f59f72d17d077   # checked at every tick; the
+   #   default binary's digest is built in (the signed 2.1.299 manifest's linux-x64 checksum); a CLAUDE_BIN override
+   #   is checked only when this is set
    # CLAUDE_REVIEW_STATE=~/.local/state/native-agent-stack/claude-review-worker
    # CLAUDE_REVIEW_TIMEOUT_SECONDS=2700
    # CLAUDE_REVIEW_UPSTREAM=~/code/upstream   # the local upstream mirrors, read as git objects only

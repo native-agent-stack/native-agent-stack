@@ -11,6 +11,7 @@ import dataclasses
 import datetime as dt
 import importlib.util
 import io
+import hashlib
 import json
 import os
 import pwd
@@ -1676,12 +1677,34 @@ class InvocationTest(unittest.TestCase):
         self.assertEqual(len(checked), 1)
         self.assertEqual((started, h.rows()), ([], []))  # no run started and nothing debited
 
+    def test_preflight_refuses_a_client_binary_that_fails_its_sha256_check(self):
+        # B2 (CC, 2026-10-15): the worker runs a retained copy of 2.1.299 and checks it at every tick; a binary whose sha256
+        # is not the pinned one stops the tick before any key is read.
+        h = Harness(self)
+        repo, _ = h.repo("o/priv", heads={1: {"a.py": "a\n"}})
+        digest = hashlib.sha256(h.claude.read_bytes()).hexdigest()
+        for expected, refused in ((digest, False), ("0" * 64, True), (None, False)):
+            with self.subTest(expected=expected):
+                settings = crw.Settings(h.state, h.ledger_path, KEYS, h.claude, False, 60, claude_sha256=expected)
+                worker = crw.Worker([repo], settings, h.env(), clock=h.clock, log=h.logs.append, bwrap="")
+                problems = worker.preflight(sandbox=False)
+                self.assertEqual(any("CLAUDE_BIN failed its sha256 check" in p for p in problems), refused, problems)
+
     def test_settings_read_the_environment(self):
         settings = crw.settings_from({"HOME": "/h", "API_ACTIONS_LEDGER": "~/l.jsonl"})
         self.assertEqual(settings.keys, crw.DEFAULT_KEYS)
-        # The adopted client release: 2.1.299, which fixes two 2.1.296 faults that ran a headless tool call twice.
-        self.assertEqual(crw.DEFAULT_CLAUDE_BIN, "~/.local/share/claude/versions/2.1.299")
-        self.assertEqual(settings.claude_bin, Path("/h/.local/share/claude/versions/2.1.299"))
+        # The adopted client release: 2.1.299, which fixes two 2.1.296 faults that ran a headless tool call twice. Its binary
+        # is the retained copy outside versions/, which the native installer's cleanup does not touch (setup.md: it keeps only
+        # the launcher's version, running sessions' versions and the two newest), checked against the signed manifest digest.
+        self.assertEqual(crw.DEFAULT_CLAUDE_BIN, "~/.local/share/claude-retained/2.1.299/claude")
+        self.assertEqual(settings.claude_bin, Path("/h/.local/share/claude-retained/2.1.299/claude"))
+        self.assertEqual(crw.DEFAULT_CLAUDE_BIN_SHA256, "2d894a4b1bfaaa9aab72aeff7803e3c73bc2510f279a171f6b8f59f72d17d077")
+        self.assertEqual(settings.claude_sha256, crw.DEFAULT_CLAUDE_BIN_SHA256)
+        self.assertIsNone(crw.settings_from({"HOME": "/h", "CLAUDE_BIN": "/x/claude"}).claude_sha256)  # an override names its own
+        self.assertEqual(crw.settings_from({"HOME": "/h", "CLAUDE_BIN": "/x/claude", "CLAUDE_BIN_SHA256": "0" * 64}).claude_sha256,
+                         "0" * 64)
+        with self.assertRaises(crw.ConfigError):
+            crw.settings_from({"HOME": "/h", "CLAUDE_BIN_SHA256": "not-a-digest"})
         self.assertEqual(settings.state, Path("/h/.local/state/native-agent-stack/claude-review-worker"))
         self.assertEqual(settings.ledger, Path("/h/l.jsonl"))
         self.assertFalse(settings.post)  # posting is off until CLAUDE_REVIEW_POST=1

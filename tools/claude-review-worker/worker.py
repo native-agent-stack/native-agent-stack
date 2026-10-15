@@ -28,8 +28,8 @@ did until #981 removed it; the verdict is parsed without a model; a commit statu
 sanitized comment) is posted through the ambient gh login by this process, never by the sandboxed one. Nothing is
 posted unless CLAUDE_REVIEW_POST=1.
 
-Environment: API_ACTIONS_LEDGER (required), CLAUDE_REVIEW_POST, CLAUDE_REVIEW_KEYS, CLAUDE_BIN, CLAUDE_REVIEW_STATE,
-CLAUDE_REVIEW_TIMEOUT_SECONDS, CLAUDE_REVIEW_UPSTREAM. No key is ever read, logged or written by this file.
+Environment: API_ACTIONS_LEDGER (required), CLAUDE_REVIEW_POST, CLAUDE_REVIEW_KEYS, CLAUDE_BIN, CLAUDE_BIN_SHA256,
+CLAUDE_REVIEW_STATE, CLAUDE_REVIEW_TIMEOUT_SECONDS, CLAUDE_REVIEW_UPSTREAM. No key is ever read, logged or written by this file.
 """
 from __future__ import annotations
 
@@ -91,7 +91,13 @@ SWITCH_CLASSES = ("credit_exhausted", "revoked_key")
 # background reconnect closed the connection they were running on". Its `--help` is byte-identical to 2.1.296's, and
 # the offline probes (probes.py offline) give the same result on it: 16 PASS, 9 INFO, no FAIL. A comment below that
 # names a measurement on 2.1.296 dates that measurement.
-DEFAULT_CLAUDE_BIN = "~/.local/share/claude/versions/2.1.299"
+# The binary is a retained copy outside ~/.local/share/claude/versions/: the native installer deletes old versions there,
+# keeping only the launcher's version, any version a running session uses and the two newest
+# (https://code.claude.com/docs/en/setup, home directories on network storage), and native auto-update is on. The copy is
+# checked at every tick against the linux-x64 checksum of the GPG-verified signed manifest of 2.1.299
+# (https://downloads.claude.ai/claude-code-releases/2.1.299/manifest.json, sha256 5052df4b...; CC, 2026-10-15).
+DEFAULT_CLAUDE_BIN = "~/.local/share/claude-retained/2.1.299/claude"
+DEFAULT_CLAUDE_BIN_SHA256 = "2d894a4b1bfaaa9aab72aeff7803e3c73bc2510f279a171f6b8f59f72d17d077"
 
 
 def credit_exhausted(status, text) -> bool:
@@ -302,6 +308,7 @@ class Settings:
     upstream: Path = Path("/nonexistent")  # the local upstream mirrors, ~/code/upstream/<owner>/<repo>
     srt: Path = Path("/nonexistent")  # the npm prefix srt is installed under
     node: Path = Path("/nonexistent")
+    claude_sha256: str | None = None  # the client binary's pinned sha256; preflight refuses a binary that differs
 
 
 def settings_from(env: dict) -> Settings:
@@ -311,6 +318,9 @@ def settings_from(env: dict) -> Settings:
     timeout = env.get("CLAUDE_REVIEW_TIMEOUT_SECONDS", str(DEFAULT_TIMEOUT_SECONDS))
     if not re.fullmatch(r"[0-9]{2,5}", timeout):
         raise ConfigError("CLAUDE_REVIEW_TIMEOUT_SECONDS must be a whole number of seconds")
+    claude_sha256 = env.get("CLAUDE_BIN_SHA256") or (None if "CLAUDE_BIN" in env else DEFAULT_CLAUDE_BIN_SHA256)
+    if claude_sha256 is not None and not re.fullmatch(r"[0-9a-f]{64}", claude_sha256):
+        raise ConfigError("CLAUDE_BIN_SHA256 must be a 64-hex sha256")
     ledger = env.get("API_ACTIONS_LEDGER", "")
     home = env.get("HOME", str(Path.home()))
     expand = lambda value: Path(value.replace("~", home, 1) if value.startswith("~") else value)  # noqa: E731
@@ -324,10 +334,19 @@ def settings_from(env: dict) -> Settings:
         upstream=expand(env.get("CLAUDE_REVIEW_UPSTREAM", DEFAULT_UPSTREAM)),
         srt=expand(env.get("CLAUDE_REVIEW_SRT", DEFAULT_SRT)),
         node=expand(env.get("CLAUDE_REVIEW_NODE", DEFAULT_NODE)),
+        claude_sha256=claude_sha256,
     )
 
 
 # --------------------------------------------------------------------------- small helpers
+
+
+def file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for block in iter(lambda: handle.read(1 << 20), b""):
+            digest.update(block)
+    return digest.hexdigest()
 
 
 def utc_now() -> dt.datetime:
@@ -1633,6 +1652,9 @@ class Worker:
             problems.append("API_ACTIONS_LEDGER is not set; nothing is spent without a ledger")
         if not self.settings.claude_bin.is_file():
             problems.append("CLAUDE_BIN is not a file")
+        elif self.settings.claude_sha256 and file_sha256(self.settings.claude_bin) != self.settings.claude_sha256:
+            problems.append(f"CLAUDE_BIN failed its sha256 check (expected {self.settings.claude_sha256[:12]}...); "
+                            "nothing runs on a client binary that is not the pinned one")
         if isinstance(self.launcher, SandboxLauncher):
             if not CREDENTIAL_RUN.is_file():
                 problems.append("tools/credentials/credential_run.py is missing")
