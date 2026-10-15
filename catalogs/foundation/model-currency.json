@@ -193,7 +193,7 @@
       "revision": "d1f2f25730bbd775b99b29185134bc86653bf2d1",
       "release_date": "2026-07-16",
       "release_source": "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16/blob/d1f2f25730bbd775b99b29185134bc86653bf2d1/README.md",
-      "checked_at": "2026-10-07",
+      "checked_at": "2026-10-15",
       "status": "in_use",
       "release_line": {
         "kind": "huggingface",
@@ -202,21 +202,22 @@
       },
       "overturn": "NVIDIA publishes a successor or official FP8/NVFP4 checkpoint; or a released compatible dense text model fits the declared budget and has admissible LMEB/RTEB superiority. Re-open EmbeddingGemma 2 when its benchmark submissions and released server support meet the recorded gates.",
       "landscape_check": {
-        "date": "2026-10-07",
+        "date": "2026-10-15",
         "sources": [
           "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16/blob/d1f2f25730bbd775b99b29185134bc86653bf2d1/README.md",
           "https://huggingface.co/google/embeddinggemma-2/blob/914f7f89142e33e77833254d9c9b90c3cef7303b/README.md",
-          "https://huggingface.co/nvidia"
+          "https://huggingface.co/nvidia",
+          "https://huggingface.co/models?author=nvidia&search=Embed&sort=created"
         ],
         "newer_candidates": [
           {
             "model_id": "google/embeddinggemma-2",
             "revision": "914f7f89142e33e77833254d9c9b90c3cef7303b",
             "source": "https://huggingface.co/google/embeddinggemma-2/blob/914f7f89142e33e77833254d9c9b90c3cef7303b/README.md",
-            "reason": "The command-center KEEP review rejects the current consumer/server and evidence fit: 768-dimensional successor, no accepted LMEB/complete RTEB parity, and no released vLLM 0.31.0 registration. The October 6 public release is also within the clean-release cooldown at the ruled timestamp. This child checks identity/source only, not those capabilities or benchmark behavior."
+            "reason": "Released newer embedding alternative re-read at the same revision on 2026-10-15. Compatible server/input and same-protocol retrieval/memory qualification remain open. Earlier clean-release cooldown has elapsed; no new runtime/quality comparison is claimed."
           }
         ],
-        "reason": "Retain the ruled Nemotron checkpoint. The source packet's corrected comparison finds no newer candidate satisfying the current server, plain-string input, quality evidence and memory gates; it does not claim every alternative is worse. The child confirms the selected ID/SHA and the card's product date, and preserves the command center's sourced KEEP reasoning without executing a comparison."
+        "reason": "Read 2026-10-15: the NVIDIA dense-text model card and current Hub main still identify the selected 8B checkpoint; the bounded NVIDIA Embed publisher search found no successor to this line. Re-read Google's released EmbeddingGemma 2 alternative. Retain the selected pin pending compatible-server and same-protocol retrieval/memory qualification, without asserting global superiority. The earlier October 6 cooldown has elapsed and is not a present hold reason. No new runtime or benchmark result is claimed."
       }
     },
     {
@@ -227,7 +228,7 @@
       "revision": "a02f48bb4f057028298c21fa033da2b30d7742d5",
       "release_date": "2025-10-03",
       "release_source": "https://huggingface.co/ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF/blob/a02f48bb4f057028298c21fa033da2b30d7742d5/qwen3-reranker-0.6b-q8_0.gguf",
-      "checked_at": "2026-10-07",
+      "checked_at": "2026-10-15",
       "status": "in_use",
       "release_line": {
         "kind": "huggingface",
@@ -236,12 +237,13 @@
       },
       "overturn": "Qwen/ggml-org publishes a newer stock-loadable rank GGUF, qmd changes its loader/default or remote rerank support, or an upstream-harness CPU comparison accepts the 4B candidate's latency and quality.",
       "landscape_check": {
-        "date": "2026-10-07",
+        "date": "2026-10-15",
         "sources": [
-          "https://huggingface.co/ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF/blob/a02f48bb4f057028298c21fa033da2b30d7742d5/qwen3-reranker-0.6b-q8_0.gguf",
-          "https://github.com/tobi/qmd/blob/v2.8.3/src/llm.ts",
+          "https://huggingface.co/ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF/blob/a02f48bb4f057028298c21fa033da2b30d7742d5/README.md",
+          "https://github.com/tobi/qmd/blob/93d211f9ef4a869a9aed0d075ca767dda552627f/src/llm.ts",
           "https://huggingface.co/Horizon-Labs/multilingual-reranker-base/blob/1302619c8478dd630e06a934d4064ae345a7d0da/README.md",
-          "https://huggingface.co/americansquid/Qwen3-Reranker-4B-Q4_K_M-GGUF/blob/bde5202b1001731471f8e4bbda0f4c6315859904/README.md"
+          "https://huggingface.co/americansquid/Qwen3-Reranker-4B-Q4_K_M-GGUF/blob/bde5202b1001731471f8e4bbda0f4c6315859904/README.md",
+          "https://huggingface.co/jinaai/jina-reranker-v3.5/blob/e8a93f33f0b22108f8c2364f8484ce3422552fbc/README.md"
         ],
         "newer_candidates": [
           {
@@ -255,9 +257,15 @@
             "revision": "bde5202b1001731471f8e4bbda0f4c6315859904",
             "source": "https://huggingface.co/americansquid/Qwen3-Reranker-4B-Q4_K_M-GGUF/blob/bde5202b1001731471f8e4bbda0f4c6315859904/README.md",
             "reason": "The refuter confirms the loader markers and stronger base-model evidence. Keep the maintained qmd/ggml-org default until a real same-protocol CPU-latency and quality comparison resolves the 6.75x-parameter tradeoff. Do not claim this candidate failed the loader or quality gate."
+          },
+          {
+            "model_id": "jinaai/jina-reranker-v3.5",
+            "revision": "e8a93f33f0b22108f8c2364f8484ce3422552fbc",
+            "source": "https://huggingface.co/jinaai/jina-reranker-v3.5/blob/e8a93f33f0b22108f8c2364f8484ce3422552fbc/README.md",
+            "reason": "Publisher reranker card re-read 2026-10-15. Qualify serving/ranking compatibility with qmd's rank-GGUF loader and compare complete quality/CPU latency before replacing the slot; source review alone is not drop-in acceptance."
           }
         ],
-        "reason": "Named exception, not current-by-age. The KEEP decision rests on the maintained qmd default and publisher and on an unresolved latency/qualification tradeoff; the corrected 4B candidate remains an overturn lead."
+        "reason": "Read 2026-10-15: qmd's current upstream loader still defaults to the selected 0.6B rank GGUF. Re-read its card and the Jina 3.5, Horizon and 4B GGUF candidate cards. The compatible 4B candidate remains a quality/CPU-latency comparison lead; Jina's newer publisher model requires qmd-compatible serving/ranking qualification. Retain the pin as an explicit qualification hold, not a claim that newer rerankers are worse or that a fresh comparison ran."
       }
     },
     {
@@ -268,7 +276,7 @@
       "revision": "7816de0b72572c6c860ca1eddf97ba9e7fb8cc65",
       "release_date": "2026-01-29",
       "release_source": "https://huggingface.co/tobil/qmd-query-expansion-1.7B-gguf/blob/7816de0b72572c6c860ca1eddf97ba9e7fb8cc65/qmd-query-expansion-1.7B-q4_k_m.gguf",
-      "checked_at": "2026-10-07",
+      "checked_at": "2026-10-15",
       "status": "in_use",
       "release_line": {
         "kind": "huggingface",
@@ -277,11 +285,13 @@
       },
       "overturn": "tobil or qmd changes the expansion GGUF/default/loader, or a maintainer-harness or promptfoo comparison favors another compatible GGUF. Compare the LFM2.5 candidate first and preserve cache/config migration gates.",
       "landscape_check": {
-        "date": "2026-10-07",
+        "date": "2026-10-15",
         "sources": [
-          "https://huggingface.co/tobil/qmd-query-expansion-1.7B-gguf/blob/7816de0b72572c6c860ca1eddf97ba9e7fb8cc65/qmd-query-expansion-1.7B-q4_k_m.gguf",
-          "https://github.com/tobi/qmd/blob/v2.8.3/src/llm.ts",
-          "https://huggingface.co/langleu/qmd-query-expansion-lfm2.5-1.2b-base-v2/blob/c7ba4b9bb5c9cd6e0e493bf4d96e1d4a5e1367dc/README.md"
+          "https://huggingface.co/tobil/qmd-query-expansion-1.7B-gguf/blob/7816de0b72572c6c860ca1eddf97ba9e7fb8cc65/README.md",
+          "https://github.com/tobi/qmd/blob/93d211f9ef4a869a9aed0d075ca767dda552627f/src/llm.ts",
+          "https://huggingface.co/langleu/qmd-query-expansion-lfm2.5-1.2b-base-v2/blob/c7ba4b9bb5c9cd6e0e493bf4d96e1d4a5e1367dc/README.md",
+          "https://huggingface.co/tobil/qmd-query-expansion-0.6B-gguf/raw/main/README.md",
+          "https://huggingface.co/models?author=tobil&search=query-expansion&sort=created"
         ],
         "newer_candidates": [
           {
@@ -291,7 +301,7 @@
             "reason": "The source review finds a compatible newer expansion GGUF, but its self-reported QMD reward omits a stated query set and same-run qmd-default comparison. It is the first candidate for a measured upstream-harness A/B; no such run was authorized here."
           }
         ],
-        "reason": "Named exception. Retain qmd's maintained default; the packet's newer maintainer adapter is not GGUF, the smaller GGUF has weaker non-comparable publisher evidence, and the leading third-party GGUF awaits a same-protocol comparison."
+        "reason": "Read 2026-10-15: the selected expansion card/main revision and qmd's current 1.7B default remain unchanged. The publisher search includes newer 0.6B GGUF and 1.7B-v2 training variants; the smaller GGUF card documents the lex/vec/hyde task. Re-read the compatible LFM2.5 base-v2 GGUF lead. Preserve the default pending a common query-set quality/latency comparison and cache/config migration review; publisher variants alone do not establish a better default."
       }
     },
     {
@@ -302,7 +312,7 @@
       "revision": "e9d2a44ca6a05ac6685f3b23709ea57eb7352d5b",
       "release_date": "2026-07-04",
       "release_source": "https://huggingface.co/minishlab/potion-code-16M-v2/blob/e9d2a44ca6a05ac6685f3b23709ea57eb7352d5b/model.safetensors",
-      "checked_at": "2026-10-07",
+      "checked_at": "2026-10-15",
       "status": "in_use",
       "release_line": {
         "kind": "huggingface",
@@ -311,11 +321,12 @@
       },
       "overturn": "MinishLab publishes a newer code model, Semble changes its default, or Semble's own same-protocol benchmark finds a complete compatible static code model better. A switch requires cached-repository reindexing.",
       "landscape_check": {
-        "date": "2026-10-07",
+        "date": "2026-10-15",
         "sources": [
-          "https://huggingface.co/minishlab/potion-code-16M-v2/blob/e9d2a44ca6a05ac6685f3b23709ea57eb7352d5b/model.safetensors",
+          "https://huggingface.co/minishlab/potion-code-16M-v2/blob/e9d2a44ca6a05ac6685f3b23709ea57eb7352d5b/README.md",
           "https://huggingface.co/Takara-DS1/miru-codev3-tokenlearn/blob/56cfb2cb71f8d34b9f8c889a8a3206c418b8c471/README.md",
-          "https://huggingface.co/Takara-DS1/miru-codev3-dual/blob/44af3347572c9bc0bf0dcd54ea0a8cec6b4e6cb8/README.md"
+          "https://huggingface.co/Takara-DS1/miru-codev3-dual/blob/44af3347572c9bc0bf0dcd54ea0a8cec6b4e6cb8/README.md",
+          "https://huggingface.co/models?author=minishlab&search=code&sort=created"
         ],
         "newer_candidates": [
           {
@@ -331,7 +342,7 @@
             "reason": "The source packet records a custom DualConcatEncoder requirement outside Semble's StaticModel.from_pretrained loader and incomplete comparable task evidence."
           }
         ],
-        "reason": "KEEP rests on the absence of admissible evidence for a better compatible current model, not proof every candidate is worse. The packet's refuter found omitted candidate families and crossed harnesses; that completeness limitation remains explicit."
+        "reason": "Read 2026-10-15: MinishLab's code-model search still returns Potion code v2 as its newest code model and the selected main revision is unchanged. Re-read its code-retrieval card and both miru-codev3 cards: tokenlearn documents StaticModel loading while dual is a distinct encoder approach. Retain the static retrieval pin pending a complete same-protocol Semble quality/latency comparison and reindex qualification. This bounded publisher/candidate survey does not assert global superiority or execute a benchmark."
       }
     },
     {
@@ -342,7 +353,7 @@
       "revision": "9185688a0495e1577d521a757c7c0b62dd38ca48",
       "release_date": "2026-08-13",
       "release_source": "https://huggingface.co/jinzhenj/MinerU2.5-Pro-2605-1.2B-GGUF/blob/9185688a0495e1577d521a757c7c0b62dd38ca48/MinerU2.5-Pro-2605-1.2B-Q8_0.gguf",
-      "checked_at": "2026-10-07",
+      "checked_at": "2026-10-15",
       "status": "in_use",
       "release_line": {
         "kind": "huggingface",
@@ -351,21 +362,23 @@
       },
       "overturn": "OpenDataLab publishes a newer protocol-compatible parsing VLM or MinerU changes its registry; a compatible GGUF/mmproj candidate earns same-scorer ParseBench evidence; the registry adopts PP-DocLayoutV3; or a qualified runtime/memory route changes the fit.",
       "landscape_check": {
-        "date": "2026-10-07",
+        "date": "2026-10-15",
         "sources": [
-          "https://huggingface.co/jinzhenj/MinerU2.5-Pro-2605-1.2B-GGUF/blob/9185688a0495e1577d521a757c7c0b62dd38ca48/MinerU2.5-Pro-2605-1.2B-Q8_0.gguf",
-          "https://github.com/opendatalab/MinerU/blob/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/mineru/model/registry.py",
-          "https://huggingface.co/aeddix-labs/aeddix-alpine-ocr/blob/7fa09b7328898ceedf6c52b6665a943286fa6413/README.md"
+          "https://huggingface.co/jinzhenj/MinerU2.5-Pro-2605-1.2B-GGUF/tree/9185688a0495e1577d521a757c7c0b62dd38ca48",
+          "https://github.com/opendatalab/MinerU/blob/b7f3dd0c5f6e6d66a298239ffd02b328b873918e/mineru/model/registry.py",
+          "https://huggingface.co/aeddix-labs/aeddix-alpine-ocr/blob/69d0b125ccbb1a7ec926116264ed2d968794ebfe/README.md",
+          "https://huggingface.co/opendatalab/MinerU2.5-Pro-2605-1.2B/raw/main/README.md",
+          "https://huggingface.co/models?author=opendatalab&search=MinerU&sort=created"
         ],
         "newer_candidates": [
           {
             "model_id": "aeddix-labs/aeddix-alpine-ocr",
-            "revision": "7fa09b7328898ceedf6c52b6665a943286fa6413",
-            "source": "https://huggingface.co/aeddix-labs/aeddix-alpine-ocr/blob/7fa09b7328898ceedf6c52b6665a943286fa6413/README.md",
-            "reason": "A newer MinerU-base fine-tune and publisher ParseBench lead, but no selected compatible GGUF plus mmproj path is qualified. Its October 6 release remains in cooldown at the ruling timestamp. Do not rebuild or substitute it into MinerU's protocol by assumption."
+            "revision": "69d0b125ccbb1a7ec926116264ed2d968794ebfe",
+            "source": "https://huggingface.co/aeddix-labs/aeddix-alpine-ocr/blob/69d0b125ccbb1a7ec926116264ed2d968794ebfe/README.md",
+            "reason": "Newer MinerU-base fine-tune re-read at its current head on 2026-10-15. October 6 cooldown has elapsed; the remaining gate is qualified GGUF plus matching mmproj and same-scorer acceptance in the selected protocol. No inference superiority is claimed."
           }
         ],
-        "reason": "KEEP the upstream registry's selected GGUF pair. The packet's corrected comparison finds newer fine-tunes without the CPU GGUF/mmproj delivery needed here and other OCR runtimes with different protocol, device or scoring contracts."
+        "reason": "Read 2026-10-15: current upstream MinerU registry still selects the named Q8_0 GGUF and matching mmproj for llama.cpp and the quantizer's main revision is unchanged. Its README returns 404; use the official base-model card and registry as model/protocol evidence. Re-read the newer alpine fine-tune at its current head. Keep the registry-selected pair pending compatible GGUF/mmproj and same-scorer qualification, not the expired October 6 cooldown. Publisher MinerU-4 bundles are not assumed to replace this VLM. No inference acceptance is added."
       }
     },
     {
@@ -393,7 +406,7 @@
       "revision": "b1563631b35bfdcee37587ad530147497d820d4c",
       "release_date": "2026-06-10",
       "release_source": "https://huggingface.co/chopratejas/kompress-v2-base/blob/b1563631b35bfdcee37587ad530147497d820d4c/onnx/kompress-int8-wo.onnx",
-      "checked_at": "2026-10-07",
+      "checked_at": "2026-10-15",
       "status": "held",
       "release_line": {
         "kind": "huggingface",
@@ -402,11 +415,17 @@
       },
       "overturn": "Headroom's selected extra or native backend changes; the maintainer publishes another compatible Kompress export; a Headroom release changes HF_MODEL_ID/_PINNED_REVISIONS; or an explicitly authorized qualified remote route is selected.",
       "landscape_check": {
-        "date": "2026-10-07",
+        "date": "2026-10-15",
         "sources": [
-          "https://huggingface.co/chopratejas/kompress-v2-base/blob/b1563631b35bfdcee37587ad530147497d820d4c/onnx/kompress-int8-wo.onnx",
           "https://huggingface.co/chopratejas/kompress-v2-base/blob/e00cc5e60ff73b01674ef8fa6da6c5acf6d54181/README.md",
-          "https://pypi.org/project/headroom-ai/0.40.0/"
+          "https://pypi.org/project/headroom-ai/0.40.0/",
+          "https://huggingface.co/api/models/chopratejas/kompress-v2-base/tree/e00cc5e60ff73b01674ef8fa6da6c5acf6d54181/onnx?expand=true",
+          "https://huggingface.co/api/models/chopratejas/kompress-v2-base/tree/b1563631b35bfdcee37587ad530147497d820d4c/onnx?expand=true",
+          "https://huggingface.co/models?author=chopratejas&search=kompress&sort=created",
+          "https://pypi.org/project/headroom-ai/0.41.0/",
+          "https://github.com/headroomlabs-ai/headroom/blob/v0.41.0/headroom/transforms/kompress_compressor.py#L47",
+          "https://github.com/headroomlabs-ai/headroom/blob/v0.41.0/headroom/onnx_runtime.py#L73-L79",
+          "https://github.com/headroomlabs-ai/headroom/blob/v0.40.0/headroom/onnx_runtime.py#L73-L79"
         ],
         "newer_candidates": [
           {
@@ -416,7 +435,7 @@
             "reason": "This newer repository revision preserves the exact selected int8-wo artifact: last modifying commit b1563631..., LFS SHA c47ddd76.... It is a metadata/card revision, not a new weight release. The packet finds no newer compatible two-input/final_scores export."
           }
         ],
-        "reason": "Retain the pinned export as held until its supported runtime extra is qualified. The source packet rejects other compression formats and an unqualified remote shim; a README-only head does not reset the selected weight date."
+        "reason": "Read 2026-10-15: the current Kompress card names int8-wo as Headroom's default and prescribes ModernBERT tokenization. The bounded publisher search shows no newer Kompress family. Current and pinned ONNX tree metadata give this artifact the same LFS identity and last modifying commit b1563631; head e00cc5e6 is a newer repository revision, not a new selected-weight release. Preserve the held pin and runtime-extra qualification gate; no CPU execution or remote activation is claimed. Headroom-ai 0.41.0 shipped 2026-10-14T23:03:59Z. Source review and an AST comparison of the actual 0.40.0/0.41.0 wheels confirm identical HF_MODEL_ID (kompress_compressor.py:47) and entire _PINNED_REVISIONS (onnx_runtime.py:73-79 for this pair). The Kompress and ModernBERT pins therefore remain valid KEEP/held choices; the stale packages row at 0.40.0 is an explicit follow-up, not the claimed newest package."
       }
     },
     {
@@ -427,7 +446,7 @@
       "revision": "8949b909ec900327062f0ebf497f51aef5e6f0c8",
       "release_date": "2025-01-15",
       "release_source": "https://huggingface.co/answerdotai/ModernBERT-base/blob/8949b909ec900327062f0ebf497f51aef5e6f0c8/tokenizer_config.json",
-      "checked_at": "2026-10-07",
+      "checked_at": "2026-10-15",
       "status": "held",
       "release_line": {
         "kind": "huggingface",
@@ -436,13 +455,18 @@
       },
       "overturn": "Headroom's selected extra or native backend changes; the maintainer publishes another compatible Kompress export; a Headroom release changes HF_MODEL_ID/_PINNED_REVISIONS; or an explicitly authorized qualified remote route is selected.",
       "landscape_check": {
-        "date": "2026-10-07",
+        "date": "2026-10-15",
         "sources": [
           "https://huggingface.co/answerdotai/ModernBERT-base/blob/8949b909ec900327062f0ebf497f51aef5e6f0c8/tokenizer_config.json",
-          "https://huggingface.co/chopratejas/kompress-v2-base/blob/e00cc5e60ff73b01674ef8fa6da6c5acf6d54181/README.md"
+          "https://huggingface.co/chopratejas/kompress-v2-base/blob/e00cc5e60ff73b01674ef8fa6da6c5acf6d54181/README.md",
+          "https://huggingface.co/answerdotai/ModernBERT-base/blob/8949b909ec900327062f0ebf497f51aef5e6f0c8/README.md",
+          "https://pypi.org/project/headroom-ai/0.41.0/",
+          "https://github.com/headroomlabs-ai/headroom/blob/v0.41.0/headroom/transforms/kompress_compressor.py#L47",
+          "https://github.com/headroomlabs-ai/headroom/blob/v0.41.0/headroom/onnx_runtime.py#L73-L79",
+          "https://github.com/headroomlabs-ai/headroom/blob/v0.40.0/headroom/onnx_runtime.py#L73-L79"
         ],
         "newer_candidates": [],
-        "reason": "The maintained Kompress checkpoint prescribes ModernBERT-base, and the current upstream main SHA remains the selected tokenizer pin. No newer paired tokenizer revision was found in this exact line; arbitrary tokenizer substitution is not equivalent to adopting a compatible newer model. The source packet's hold and runtime-extra gate remain."
+        "reason": "Read 2026-10-15: ModernBERT-base's current main SHA remains the pinned tokenizer revision. Re-read its card and the current Kompress card, which explicitly pairs tokenizer.json with answerdotai/ModernBERT-base. This role is a checkpoint-specific tokenization contract, not an independent encoder contest. Retain the held pair pending a compatible upstream export/tokenizer or supported backend qualification; arbitrary newer tokenizer substitution does not demonstrate compatibility. Headroom-ai 0.41.0 shipped 2026-10-14T23:03:59Z. Source review and an AST comparison of the actual 0.40.0/0.41.0 wheels confirm identical HF_MODEL_ID (kompress_compressor.py:47) and entire _PINNED_REVISIONS (onnx_runtime.py:73-79 for this pair). The Kompress and ModernBERT pins therefore remain valid KEEP/held choices; the stale packages row at 0.40.0 is an explicit follow-up, not the claimed newest package."
       }
     },
     {
@@ -537,7 +561,7 @@
       "revision": "git-blob:e669a1120903d93417f57a1aedd1bc0000819b8b",
       "release_date": "2025-04-11",
       "release_source": "https://github.com/google/magika/blob/3f2cb8537dce123587bfb3535a402145adcba2c7/assets/models/CHANGELOG.md",
-      "checked_at": "2026-10-07",
+      "checked_at": "2026-10-15",
       "status": "package_bound",
       "overturn": "Google Magika ships a newer model than standard_v3_3, or the enclosing consumer changes its model/library contract.",
       "package": {
@@ -545,14 +569,14 @@
         "version": "1.0.3"
       },
       "landscape_check": {
-        "date": "2026-10-07",
+        "date": "2026-10-15",
         "sources": [
-          "https://github.com/google/magika/blob/3f2cb8537dce123587bfb3535a402145adcba2c7/assets/models/CHANGELOG.md",
-          "https://github.com/google/magika/tree/main/assets/models",
+          "https://github.com/google/magika/blob/b1909890d4477d34381ce12b31882e9a197706d8/assets/models/CHANGELOG.md",
+          "https://github.com/google/magika/tree/b1909890d4477d34381ce12b31882e9a197706d8/assets/models",
           "https://pypi.org/project/magika/1.0.3/"
         ],
         "newer_candidates": [],
-        "reason": "The primary model changelog's latest standard model is standard_v3_3 and the current model-directory listing contains no successor. PyPI's latest non-yanked shipping release is still Magika 1.0.3. Retain the package-bundled model under the source packet's PACKAGE_BOUND decision; no runtime or GPU inference acceptance is added."
+        "reason": "Read 2026-10-15: Google's current model changelog still places standard_v3_3 first, with model date 2025-04-11. The primary PyPI release-line check still reports Magika 1.0.3 (2026-05-04). Retain this package-bound model; distinguish the model date from the shipping package date. No inference or alternate file-type-model quality comparison is claimed."
       },
       "release_line": {
         "kind": "github_release",
@@ -607,24 +631,35 @@
       "revision": "claude-haiku-4-5-20251001",
       "release_date": "2025-10-15",
       "release_source": "https://www.anthropic.com/news/claude-haiku-4-5",
-      "checked_at": "2026-10-07",
+      "checked_at": "2026-10-15",
       "status": "in_use",
       "release_line": {
         "kind": "vendor_page",
         "url": "https://platform.claude.com/docs/en/models/haiku-4-5/overview"
       },
       "landscape_check": {
-        "date": "2026-10-07",
+        "date": "2026-10-15",
         "sources": [
           "https://platform.claude.com/docs/en/about-claude/models/overview",
           "https://platform.claude.com/docs/en/models/haiku-4-5/overview",
           "https://platform.claude.com/docs/en/about-claude/models/model-ids-and-versions",
-          "https://www.anthropic.com/news/claude-haiku-4-5"
+          "https://www.anthropic.com/news/claude-haiku-4-5",
+          "https://platform.claude.com/docs/en/models/haiku-5-5/overview",
+          "https://platform.claude.com/docs/en/release-notes/overview",
+          "https://platform.claude.com/docs/en/about-claude/model-deprecations",
+          "https://platform.claude.com/docs/en/models/haiku-5-5/migration-guide"
         ],
-        "newer_candidates": [],
-        "reason": "The current official model overview and Haiku model page list Haiku 4.5 with the exact API ID claude-haiku-4-5-20251001; no newer Haiku ID was identified in those sources. Retain it as a dated exception for simple background work. Currency is assessed within the Haiku line; Sonnet and Opus are different task and model lines, so their newer releases do not justify promoting this slot. The release announcement and current specification describe Haiku as a fast, economical option suitable for low-latency tasks. This is source review, not a new quality or native-usage measurement."
+        "newer_candidates": [
+          {
+            "model_id": "claude-haiku-5-5",
+            "revision": "claude-haiku-5-5",
+            "source": "https://platform.claude.com/docs/en/models/haiku-5-5/overview",
+            "reason": "Official specification lists this successor as Active (latest), released 2026-10-07. The availability overturn condition is met; queue background-slot migration/quality-cost review and authorized application rather than silently changing the pin."
+          }
+        ],
+        "reason": "Read 2026-10-15: Anthropic now lists Claude Haiku 5.5 as Active (latest), released 2026-10-07, with API ID claude-haiku-5-5 for latency-sensitive classification/extraction/routing. This supersedes the October 7 no-newer-Haiku claim and triggers the recorded Haiku-line overturn condition. Record the successor for normal background-slot migration/quality-cost review and authorized application. Haiku 4.5 remains pinned pending that review; it is not represented as the leading Haiku. No model call or silent configuration switch occurs. The cited Haiku 4.5 page NOW labels it Active (legacy), gives retirement as not sooner than 2026-10-15, and directs migration to Haiku 5.5. Anthropic promises at least 60 days' notice before retirement of publicly released models; the floor is not a dated retirement announcement. Keeping the current pin is temporary migration staging, not an untriggered exception."
       },
-      "overturn": "An Anthropic Haiku 5.x model ID becomes available; the background slot then follows the Haiku line through the owner's review and application."
+      "overturn": "Triggered by the 2026-10-15 source review: Haiku 5.5 is available. Migration-review owner: command center (CC), which reviews and applies. Paired Haiku 4.5/5.5 check: api-actions runs Claude API slots through Claude Code headless using the routing-run paired-run practice and full harness on same-task background-role workloads; never a bare API call from a Codex lane. Tracking record: docs/decisions/2026-10-15-model-currency-landscape-check.md#haiku-background-migration-review. Readiness trigger: paired quality parity measured on the same tasks, plus cost and latency, plus CC review, before any authorized application. The October 7 newest-Haiku rule requires this review now; no silent pin switch."
     }
   ]
 }

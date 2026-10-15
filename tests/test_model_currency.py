@@ -51,6 +51,42 @@ def package_bound_inventory():
 
 
 class ModelCurrencyTests(unittest.TestCase):
+    def test_background_haiku_records_sourced_successor_and_triggered_review(self):
+        """Guard the corrected real row, independently of date/shape validation.
+
+        The old no-successor judgment passes the generic schema with fresh dates;
+        it must not silently return after the October 15 primary-source review.
+        """
+        path = Path(__file__).resolve().parents[1] / "catalogs/foundation/model-currency.json"
+        data = json.loads(path.read_text())
+        row = next(model for model in data["models"] if model["id"] == "background-haiku")
+        check = row["landscape_check"]
+        candidates = {candidate["model_id"]: candidate for candidate in check["newer_candidates"]}
+        self.assertIn("claude-haiku-5-5", candidates)
+        successor = candidates["claude-haiku-5-5"]
+        self.assertEqual(successor["revision"], "claude-haiku-5-5")
+        self.assertEqual(successor["source"],
+                         "https://platform.claude.com/docs/en/models/haiku-5-5/overview")
+        self.assertIn(successor["source"], check["sources"])
+        self.assertIn("2026-10-07", successor["reason"])
+        self.assertIn("overturn condition is met", successor["reason"])
+        self.assertIn("supersedes the October 7 no-newer-Haiku claim", check["reason"])
+        self.assertIn("Triggered", row["overturn"])
+        self.assertIn("Haiku 5.5 is available", row["overturn"])
+        self.assertIn("Migration-review owner: command center (CC)", row["overturn"])
+        self.assertIn("#haiku-background-migration-review", row["overturn"])
+        self.assertIn("Paired Haiku 4.5/5.5", row["overturn"])
+        self.assertIn("Claude Code headless", row["overturn"])
+        self.assertIn("never a bare API call from a Codex lane", row["overturn"])
+        self.assertIn("Active (legacy)", check["reason"])
+        self.assertIn("not sooner than 2026-10-15", check["reason"])
+        self.assertIn("at least 60 days' notice", check["reason"])
+        self.assertIn("review", row["overturn"])
+        self.assertIn("authorized application", row["overturn"])
+        # A detected successor is a review gate, not a silent deployed-pin change.
+        self.assertEqual((row["model_id"], row["revision"], row["status"]),
+                         ("claude-haiku-4-5-20251001", "claude-haiku-4-5-20251001", "in_use"))
+
     def assert_valid(self, document):
         self.assertEqual(model_currency_problems(document, TODAY), [])
 
