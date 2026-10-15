@@ -1,7 +1,7 @@
 {
  "schema": "claude-native-practice-slots/1",
- "client_version": "2.1.295",
- "checked_at": "2026-10-09",
+ "client_version": "2.1.300",
+ "checked_at": "2026-10-15",
  "record": "docs/decisions/2026-10-09-claude-code-native-practice.md",
  "selection_rule": "One default per role slot; overlaps become ranked alternatives or rejections. A native Claude Code feature that covers the slot is the default unless a measured gap exists. Repository quality selects (maintenance, releases, tests, docs, upstream adoption); popularity and invoke counts never do. A token or cost saving becomes a default only with quality parity measured on paired same-task runs (promptfoo 0.124.0 or the skill-creator benchmark, blind judge plus exact checks); otherwise it stays an alternative marked pending. A retired slot is the exception: it has no default, and its row says what replaced the route.",
  "status_values": {
@@ -183,9 +183,10 @@
     "settings.md precedence",
     "permissions.md deny-first evaluation",
     "permission-modes.md",
-    "settings-permissions-O7, O15, O16"
+    "settings-permissions-O7, O15, O16",
+    "CHANGELOG@v2.1.300 L253 (2.1.299: an MCP allow rule reaches only the server it names: `mcp__a` no longer allows a server named `a__b` or `a_`; write `mcp__<server>__*` with the server's whole normalized name)"
    ],
-   "notes": "Under bypass, writes to `.claude` and `.git` are auto-approved and no deny rule covers the guard's own files; any non-interactive run skips the trust dialog. The docs limit bypass to isolated containers or VMs; the recipe records bypass as an open owner decision (recipes/claude-native-profile.md:367).",
+   "notes": "Under bypass, writes to `.claude` and `.git` are auto-approved and no deny rule covers the guard's own files; any non-interactive run skips the trust dialog. The docs limit bypass to isolated containers or VMs; the recipe records bypass as an open owner decision (recipes/claude-native-profile.md:367). 2.1.299 narrows an MCP allow rule to the server it names, a change in rule evaluation that this row's overturn condition names; re-checked 2026-10-15, the default stands: every `mcp__` rule in the host's user settings (13) and in the repository's settings files (adoption/new-wsl/templates/claude.settings.additions.json) names a whole tool, not a bare server.",
    "overturn_when": "The owner reopens the permission mode, a release changes precedence or rule evaluation, or an incident shows a deny or hook gap.",
    "supersedes": [
     "M46 evidence sentence (auto start mode, 2.1.285)",
@@ -234,9 +235,11 @@
    ],
    "evidence": [
     "hooks-O9 (2.1.295 onFailure)",
-    "docs/decisions/2026-10-08-guard-hook-fails-closed.md probe cases"
+    "docs/decisions/2026-10-08-guard-hook-fails-closed.md probe cases",
+    "CHANGELOG@v2.1.300 L262 (2.1.299: `UserPromptSubmit` hooks run before a skill or custom slash command expands, so a hook that blocks the prompt also stops its embedded shell commands); CHANGELOG@v2.1.300 L263 (2.1.299: a skill's own frontmatter `UserPromptSubmit` hook first runs on the prompt after the one that invokes the skill)",
+    "CHANGELOG@v2.1.300 L69 (2.1.300: `updatedInput` from PreToolUse and PermissionRequest hooks is validated like Claude's own input: unknown keys are dropped, and input the tool rejects denies the call)"
    ],
-   "notes": "The repository's pinned floor is 2.1.284 (adoption/pins-linux-x86_64.json), which ignores `onFailure`; the template wrapper exits 0 when the guard script is missing. Only managed-settings hooks resist `disableAllHooks`.",
+   "notes": "The repository's pinned floor is 2.1.284 (adoption/pins-linux-x86_64.json), which ignores `onFailure`; the template wrapper exits 0 when the guard script is missing. Only managed-settings hooks resist `disableAllHooks`. Since 2.1.299 a `UserPromptSubmit` hook that blocks a prompt also stops the embedded shell commands of the skill or command it invokes; the template's only `UserPromptSubmit` hook (research-routing-guard.py) resets a per-turn counter and never blocks, and a skill-scoped `UserPromptSubmit` hook (alternative 2) first sees the prompt after the invoking one. Since 2.1.300 `updatedInput` is validated like Claude's own input: the template's rewriting hook, `rtk hook claude` (rtk 0.51.0), returned `command`, `description` and `timeout` for a sample Bash call, all Bash input keys (measured 2026-10-15 on that sample, not in a session).",
    "overturn_when": "A release changes `onFailure` semantics, or reruns of the record's cases B, D, H and N on a newer client let the call through.",
    "supersedes": [
     "M40 refined",
@@ -336,9 +339,10 @@
    "evidence": [
     "checkpointing.md",
     "claude-directory.md retention (cleanupPeriodDays default 30)",
-    "checkpoints-rewind-O6, O7, O8"
+    "checkpoints-rewind-O6, O7, O8",
+    "CHANGELOG@v2.1.300 L66 (2.1.300: local session transcripts also record each API request's system prompt, tools and parameters, so a shared transcript can reproduce a request exactly)"
    ],
-   "notes": "`cleanupPeriodDays: 3650` keeps plaintext transcripts and pre-edit snapshots for about ten years: an exposure window for any secret a tool read. Retention is the owner's choice; the record gives the trade-off and a recommended value.",
+   "notes": "`cleanupPeriodDays: 3650` keeps plaintext transcripts and pre-edit snapshots for about ten years: an exposure window for any secret a tool read. Retention is the owner's choice; the record gives the trade-off and a recommended value. Since 2.1.300 a transcript also holds each API request's system prompt, tool definitions and parameters, so the retained files keep more than the conversation and grow faster; the trade-off above now covers that too.",
    "overturn_when": "A measured footprint or an owner retention decision, or a release changes what checkpoints restore.",
    "supersedes": [],
    "primary_sources": [
@@ -559,9 +563,11 @@
    "evidence": [
     "context-window.md what survives compaction",
     "context-token-O3, O15, O16",
-    "Measured upstream: compaction pays only on long runs (Anthropic, optimizing-for-cost-and-intelligence)"
+    "Measured upstream: compaction pays only on long runs (Anthropic, optimizing-for-cost-and-intelligence)",
+    "CHANGELOG@v2.1.300 L290 (2.1.296: `autoCompactWindow` in subagent frontmatter and `--agents` definitions: a subagent can auto-compact earlier than the main conversation's window)",
+    "CHANGELOG@v2.1.300 L97 (2.1.299: idle compaction in the terminal: a conversation of 200K or more tokens left idle for about 54 minutes is compacted before its one-hour prompt cache expires); CHANGELOG@v2.1.300 L98 (2.1.299: `CLAUDE_CODE_IDLE_COMPACT_MIN_TOKENS` changes the 200K minimum and `idleCompaction: false` in settings turns idle compaction off; both need 2.1.290 or later)"
    ],
-   "notes": "No quality loss measured or claimed: this is the native default; no override is set on the host or template.",
+   "notes": "No quality loss measured or claimed: this is the native default; no override is set on the host or template. Since 2.1.296 a subagent definition can set `autoCompactWindow` to compact earlier than the main window; none of ours does (.claude/agents and adoption/agents/claude, checked 2026-10-15), and no paired run supports an earlier window. Since 2.1.299 the terminal compacts a conversation of 200K or more tokens after about 54 idle minutes, before its one-hour prompt cache expires: the native form of the Opus 5.5 post's advice to compact before an idle gap. Neither `idleCompaction` nor `CLAUDE_CODE_IDLE_COMPACT_MIN_TOKENS` is set in the host's settings or the template (checked 2026-10-15), so it runs at its native default. That release meets this row's overturn condition; the default stands, and a route addition is proposed to the command center in docs/decisions/2026-10-15-practice-currency-2300.md.",
    "overturn_when": "A paired same-task run shows an earlier window keeps quality at lower cost, or a release changes compaction.",
    "supersedes": [
     "topic: auto-compact threshold (window now saved per model)",
@@ -1251,9 +1257,12 @@
    "evidence": [
     "workflows.md resume and limits",
     "background-workflows-O8, O9, O10",
+    "CHANGELOG@v2.1.300 L291 (2.1.296: `CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL` runs every workflow agent on one model while other subagents keep theirs)",
+    "CHANGELOG@v2.1.300 L245 (2.1.299: a value a workflow script hands back may nest at most 28,000 levels, refused with an error naming the limit; workflow scripts allowed 100,000)",
+    "CHANGELOG@v2.1.300 L65 (2.1.300: a background session resumes a carried workflow through the Workflow tool's approval instead of running it from the handoff file)",
     "Paired run 1, 2026-10-10 (evidence/artifacts/native-practice-paired-runs-20261010/paired-runs.json; RESULT.md sha256 e87b9cabd8c2, score.json 72dc84ef76b0): six bounded north-star fixes, one trial per arm; every mode passed 6 of 6, the single session cost $5.87 on average, the verify Workflow 1.6x and the agent team 3.0x (estimates), and the blind judges preferred the single session's diff to the Workflow's on 5 of 6 fixtures and to the team's on 3 of the 5 where the team's diff was captured"
    ],
-   "notes": "Saved workflows are not yet at a native discovery location, and the adopt step names an agents/ directory that does not exist. Verified: a `-p` launch of a saved Workflow needs a launch-scoped `--allowedTools 'Workflow(<name>)'`; on WSL2 background carry-over relies on the on-demand supervisor. Measured 2026-10-10 (paired run 1, arm B): under `--setting-sources local` a saved Workflow in the repository's `.claude/workflows` was not found by name in 6 of 6 headless runs (the available list held only `deep-research`) and was launched by `scriptPath` instead; the verifier returned in 2 of 6 runs (0 refuted), was cut by the background-wait ceiling of `claude -p` in 3 (45 minutes as the runner set it with `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=2700000`; the client's default is 10 minutes: env-vars.md and headless.md of the pinned documentation), and in 1 the implementer itself ran to that ceiling.",
+   "notes": "Saved workflows are not yet at a native discovery location, and the adopt step names an agents/ directory that does not exist. Verified: a `-p` launch of a saved Workflow needs a launch-scoped `--allowedTools 'Workflow(<name>)'`; on WSL2 background carry-over relies on the on-demand supervisor. Measured 2026-10-10 (paired run 1, arm B): under `--setting-sources local` a saved Workflow in the repository's `.claude/workflows` was not found by name in 6 of 6 headless runs (the available list held only `deep-research`) and was launched by `scriptPath` instead; the verifier returned in 2 of 6 runs (0 refuted), was cut by the background-wait ceiling of `claude -p` in 3 (45 minutes as the runner set it with `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=2700000`; the client's default is 10 minutes: env-vars.md and headless.md of the pinned documentation), and in 1 the implementer itself ran to that ceiling. `CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL` (2.1.296) is unset in the host's settings and the template: workflow agents keep the model their role or call names. Two later releases meet this row's overturn condition and the default stands: 2.1.299 refuses a value a workflow script hands back that nests deeper than 28,000 levels (100,000 before), a limit the route does not rely on; since 2.1.300 a background session resumes a carried workflow through the Workflow tool's approval rather than from the handoff file, so a carried run meets the same permission check as a launch (in a fenced `-p` run, the launch-scoped allow above). Not observed here; the route addition is proposed to the command center in docs/decisions/2026-10-15-practice-currency-2300.md.",
    "overturn_when": "A release changes Workflow resume or limits, or a measured failure mode on our runs beyond the two that paired run 1, arm B measured in fenced headless runs (the name lookup, which `scriptPath` avoids, and the verifier's wait ceiling, which the route above tells a session to expect).",
    "supersedes": [
     "R52 Ultracode clause"
@@ -1670,9 +1679,11 @@
    ],
    "evidence": [
     "mcp.md tool search and output limits",
-    "mcp-O2, O3, O4, O5, O6, O7"
+    "mcp-O2, O3, O4, O5, O6, O7",
+    "CHANGELOG@v2.1.300 L349 (2.1.296: the default limit on MCP tool descriptions sent up front and on MCP server instructions is 4,096 characters, was 2,048); `CLAUDE_CODE_MAX_MCP_DESCRIPTION_LENGTH` changes it: CHANGELOG@v2.1.300 L1806",
+    "CHANGELOG@v2.1.300 L257 (2.1.299: tool descriptions and server instructions from Anthropic's first-party MCP servers at api.anthropic.com reach Claude in full instead of being cut at 4,096 characters)"
    ],
-   "notes": "Registrations drift between host and template (qmd stdio versus HTTP, ports, a server key): G6b. Verified: on user-scope registrations `alwaysLoad: true` loads every tool of that server upfront (the per-tool opt-out works only for --mcp-config, SDK and plugin servers); image results stay under MAX_MCP_OUTPUT_TOKENS; the upfront fallback behind a non-first-party base URL dates from 2.1.70.",
+   "notes": "Registrations drift between host and template (qmd stdio versus HTTP, ports, a server key): G6b. Verified: on user-scope registrations `alwaysLoad: true` loads every tool of that server upfront (the per-tool opt-out works only for --mcp-config, SDK and plugin servers); image results stay under MAX_MCP_OUTPUT_TOKENS; the upfront fallback behind a non-first-party base URL dates from 2.1.70. Since 2.1.296 the default cap on MCP tool descriptions and server instructions is 4,096 characters (2,048 before), and since 2.1.299 it does not apply to Anthropic's first-party MCP servers at api.anthropic.com; the knob that changes the cap is unset in the host's settings and the template.",
    "overturn_when": "A measured context or quality gap from deferral, or a release changes tool-search defaults.",
    "supersedes": [
     "topic: MCP tool loading (native deferral converged)"

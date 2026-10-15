@@ -1,6 +1,6 @@
 # Context and tokens (`token-efficiency`)
 
-Client 2.1.295, checked 2026-10-09. Index: [slots.md](slots.md).
+Client 2.1.300, checked 2026-10-15. Index: [slots.md](slots.md).
 
 ## context-compaction
 
@@ -9,8 +9,8 @@ Client 2.1.295, checked 2026-10-09. Index: [slots.md](slots.md).
 - **Route:** Manual levers apply to top-level interactive sessions; `-p` workers, Workflow children and subagents compact automatically; re-inject must-keep state with a SessionStart hook matching `compact`
 - **Alternatives, ranked:** 1. SessionStart(compact) hook; 2. Per-model `/autocompact` window behind a 200K gateway
 - **Rejected:** A standing `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` or lowered window; Disabling auto-compaction; Fixed-percentage 'rot boundary' rules
-- **Evidence:** context-window.md what survives compaction; context-token-O3, O15, O16; Measured upstream: compaction pays only on long runs (Anthropic, optimizing-for-cost-and-intelligence)
-- **Notes:** No quality loss measured or claimed: this is the native default; no override is set on the host or template.
+- **Evidence:** context-window.md what survives compaction; context-token-O3, O15, O16; Measured upstream: compaction pays only on long runs (Anthropic, optimizing-for-cost-and-intelligence); CHANGELOG@v2.1.300 L290 (2.1.296: `autoCompactWindow` in subagent frontmatter and `--agents` definitions: a subagent can auto-compact earlier than the main conversation's window); CHANGELOG@v2.1.300 L97 (2.1.299: idle compaction in the terminal: a conversation of 200K or more tokens left idle for about 54 minutes is compacted before its one-hour prompt cache expires); CHANGELOG@v2.1.300 L98 (2.1.299: `CLAUDE_CODE_IDLE_COMPACT_MIN_TOKENS` changes the 200K minimum and `idleCompaction: false` in settings turns idle compaction off; both need 2.1.290 or later)
+- **Notes:** No quality loss measured or claimed: this is the native default; no override is set on the host or template. Since 2.1.296 a subagent definition can set `autoCompactWindow` to compact earlier than the main window; none of ours does (.claude/agents and adoption/agents/claude, checked 2026-10-15), and no paired run supports an earlier window. Since 2.1.299 the terminal compacts a conversation of 200K or more tokens after about 54 idle minutes, before its one-hour prompt cache expires: the native form of the Opus 5.5 post's advice to compact before an idle gap. Neither `idleCompaction` nor `CLAUDE_CODE_IDLE_COMPACT_MIN_TOKENS` is set in the host's settings or the template (checked 2026-10-15), so it runs at its native default. That release meets this row's overturn condition; the default stands, and a route addition is proposed to the command center in docs/decisions/2026-10-15-practice-currency-2300.md.
 - **Supersedes:** topic: auto-compact threshold (window now saved per model); M16 (compaction retraction defect fixed in 2.1.293); M17 (SessionStart compact matcher is the documented route)
 - **Overturn when:** A paired same-task run shows an earlier window keeps quality at lower cost, or a release changes compaction.
 - **Primary sources** (read 2026-10-09; 6 of 12 practices the refuters kept, measured first; fetch time and sha256 of the bytes read in the record's reading file):

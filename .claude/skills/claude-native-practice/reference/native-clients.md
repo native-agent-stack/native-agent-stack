@@ -1,6 +1,6 @@
 # Native client (`native-clients`)
 
-Client 2.1.295, checked 2026-10-09. Index: [slots.md](slots.md).
+Client 2.1.300, checked 2026-10-15. Index: [slots.md](slots.md).
 
 ## client-core
 
@@ -50,8 +50,8 @@ Client 2.1.295, checked 2026-10-09. Index: [slots.md](slots.md).
 - **Route:** Deny rules block in every mode, bypass included; the host's `bypassPermissions` default is the owner's standing choice and is not reopened here
 - **Alternatives, ranked:** 1. `auto` mode (unconfigured interactive sessions start in it since 2.1.285); 2. `dontAsk` with `--permission-prompts none` for headless review; 3. `permissions.blockReadsOutsideWorkingDirectories`
 - **Rejected:** `bypassPermissions` or `auto` in project settings; Model-backed PermissionRequest auto-approve hooks; Managed settings on this single-owner host
-- **Evidence:** settings.md precedence; permissions.md deny-first evaluation; permission-modes.md; settings-permissions-O7, O15, O16
-- **Notes:** Under bypass, writes to `.claude` and `.git` are auto-approved and no deny rule covers the guard's own files; any non-interactive run skips the trust dialog. The docs limit bypass to isolated containers or VMs; the recipe records bypass as an open owner decision (recipes/claude-native-profile.md:367).
+- **Evidence:** settings.md precedence; permissions.md deny-first evaluation; permission-modes.md; settings-permissions-O7, O15, O16; CHANGELOG@v2.1.300 L253 (2.1.299: an MCP allow rule reaches only the server it names: `mcp__a` no longer allows a server named `a__b` or `a_`; write `mcp__<server>__*` with the server's whole normalized name)
+- **Notes:** Under bypass, writes to `.claude` and `.git` are auto-approved and no deny rule covers the guard's own files; any non-interactive run skips the trust dialog. The docs limit bypass to isolated containers or VMs; the recipe records bypass as an open owner decision (recipes/claude-native-profile.md:367). 2.1.299 narrows an MCP allow rule to the server it names, a change in rule evaluation that this row's overturn condition names; re-checked 2026-10-15, the default stands: every `mcp__` rule in the host's user settings (13) and in the repository's settings files (adoption/new-wsl/templates/claude.settings.additions.json) names a whole tool, not a bare server.
 - **Supersedes:** M46 evidence sentence (auto start mode, 2.1.285); AN-20 list of what still blocks under bypass
 - **Overturn when:** The owner reopens the permission mode, a release changes precedence or rule evaluation, or an incident shows a deny or hook gap.
 
@@ -73,8 +73,8 @@ Client 2.1.295, checked 2026-10-09. Index: [slots.md](slots.md).
 - **Route:** Needs client 2.1.295 or later; the guard wrapper must also refuse when its script is missing (proposal with the command center)
 - **Alternatives, ranked:** 1. hookify (anthropics/claude-plugins-official); 2. Skill-scoped frontmatter hooks
 - **Rejected:** lasso-security/claude-hooks; Plugin mods as guards; Prompt or agent hooks as security guards; `onFailure` on the matcher group (no effect)
-- **Evidence:** hooks-O9 (2.1.295 onFailure); docs/decisions/2026-10-08-guard-hook-fails-closed.md probe cases
-- **Notes:** The repository's pinned floor is 2.1.284 (adoption/pins-linux-x86_64.json), which ignores `onFailure`; the template wrapper exits 0 when the guard script is missing. Only managed-settings hooks resist `disableAllHooks`.
+- **Evidence:** hooks-O9 (2.1.295 onFailure); docs/decisions/2026-10-08-guard-hook-fails-closed.md probe cases; CHANGELOG@v2.1.300 L262 (2.1.299: `UserPromptSubmit` hooks run before a skill or custom slash command expands, so a hook that blocks the prompt also stops its embedded shell commands); CHANGELOG@v2.1.300 L263 (2.1.299: a skill's own frontmatter `UserPromptSubmit` hook first runs on the prompt after the one that invokes the skill); CHANGELOG@v2.1.300 L69 (2.1.300: `updatedInput` from PreToolUse and PermissionRequest hooks is validated like Claude's own input: unknown keys are dropped, and input the tool rejects denies the call)
+- **Notes:** The repository's pinned floor is 2.1.284 (adoption/pins-linux-x86_64.json), which ignores `onFailure`; the template wrapper exits 0 when the guard script is missing. Only managed-settings hooks resist `disableAllHooks`. Since 2.1.299 a `UserPromptSubmit` hook that blocks a prompt also stops the embedded shell commands of the skill or command it invokes; the template's only `UserPromptSubmit` hook (research-routing-guard.py) resets a per-turn counter and never blocks, and a skill-scoped `UserPromptSubmit` hook (alternative 2) first sees the prompt after the invoking one. Since 2.1.300 `updatedInput` is validated like Claude's own input: the template's rewriting hook, `rtk hook claude` (rtk 0.51.0), returned `command`, `description` and `timeout` for a sample Bash call, all Bash input keys (measured 2026-10-15 on that sample, not in a session).
 - **Supersedes:** M40 refined; M28 refined (onFailure does not make Stop gates fail closed)
 - **Overturn when:** A release changes `onFailure` semantics, or reruns of the record's cases B, D, H and N on a newer client let the call through.
 - **Primary sources** (read 2026-10-09; 4 of 4 practices the refuters kept, measured first; fetch time and sha256 of the bytes read in the record's reading file):
@@ -102,8 +102,8 @@ Client 2.1.295, checked 2026-10-09. Index: [slots.md](slots.md).
 - **Route:** Covers the interactive coordinator's file-tool edits; `-p` workers get none unless `CLAUDE_CODE_ENABLE_SDK_FILE_CHECKPOINTING=true`; subagent and Workflow edits are not restored
 - **Alternatives, ranked:** 1. `/branch` or `--fork-session`; 2. SDK file checkpointing for `-p` workers that need rewind
 - **Rejected:** Turning checkpointing off; Checkpoints as version control
-- **Evidence:** checkpointing.md; claude-directory.md retention (cleanupPeriodDays default 30); checkpoints-rewind-O6, O7, O8
-- **Notes:** `cleanupPeriodDays: 3650` keeps plaintext transcripts and pre-edit snapshots for about ten years: an exposure window for any secret a tool read. Retention is the owner's choice; the record gives the trade-off and a recommended value.
+- **Evidence:** checkpointing.md; claude-directory.md retention (cleanupPeriodDays default 30); checkpoints-rewind-O6, O7, O8; CHANGELOG@v2.1.300 L66 (2.1.300: local session transcripts also record each API request's system prompt, tools and parameters, so a shared transcript can reproduce a request exactly)
+- **Notes:** `cleanupPeriodDays: 3650` keeps plaintext transcripts and pre-edit snapshots for about ten years: an exposure window for any secret a tool read. Retention is the owner's choice; the record gives the trade-off and a recommended value. Since 2.1.300 a transcript also holds each API request's system prompt, tool definitions and parameters, so the retained files keep more than the conversation and grow faster; the trade-off above now covers that too.
 - **Overturn when:** A measured footprint or an owner retention decision, or a release changes what checkpoints restore.
 - **Primary sources** (read 2026-10-09; 2 of 2 practices the refuters kept, measured first; fetch time and sha256 of the bytes read in the record's reading file):
   - [Using Claude Code: session management and 1M context | Claude by Anthropic](https://claude.com/blog/using-claude-code-session-management-and-1m-context) (2026-04-15; asserted; extends): When an attempt fails, rewind the conversation to the last useful point, for example just after the file reads, and re-prompt with what you learned instead of adding a correction turn on top of the failed attempt.

@@ -22,7 +22,7 @@ Sources: <https://claude.com/blog/code-review>, <https://www.anthropic.com/resea
 
 ## Native mechanism per client
 
-| Need | Claude Code 2.1.295 | Codex 0.161.0 |
+| Need | Claude Code 2.1.300 | Codex 0.161.0 |
 | --- | --- | --- |
 | Delegation with fresh context | subagents (Agent tool), saved Workflows | subagents (explorer and custom agents) |
 | Completion gate | Stop hook returning decision block; stop_hook_active bounds the loop | Stop hook returning decision block; stop_hook_active in the input |
