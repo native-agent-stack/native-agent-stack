@@ -16,7 +16,9 @@ from pathlib import Path
 import re
 import sys
 import tempfile
+from types import SimpleNamespace
 import unittest
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 HERE = ROOT / "tools/local-pages"
@@ -31,9 +33,16 @@ def load(name, path=None):
 
 
 MANIFEST, DIAGRAMS, POLICY, BUILDER, PAGES = (load(name) for name in ("architecture_manifest", "architecture_diagrams", "source_policy", "architecture_builder", "build_pages"))
+_SAVED_PATH = list(sys.path)
 sys.path.insert(0, str(ROOT / "scripts"))
 FINAL_STACK = load("final_stack", ROOT / "scripts/final_stack.py")
-sys.path.remove(str(ROOT / "scripts"))
+sys.path[:] = _SAVED_PATH
+PREREGISTERED = {"comparison_id": "cmp-1", "preregistration_sha256": "f" * 64, "readiness_trigger": "both arms sealed", "decision_rule": "higher score wins"}
+
+
+def decisions_section(html):
+    start = html.index('id="lp-decisions"')
+    return html[start:html.index("</section>", start)]
 
 
 def layer(status="current", winners=1, comparison=None):
@@ -81,11 +90,33 @@ class ConditionTests(unittest.TestCase):
         self.assertFalse(condition["run_pin"]["met"])
         self.assertIn("unpinned", condition["run_pin"]["detail"])
 
-    def test_scheduled_needs_a_recorded_comparison_and_no_selection_without_one_is_not_terminal(self):
-        self.assertEqual(MANIFEST.layer_state(layer(status="no-winner", winners=0, comparison="cmp-1"), []), ("SCHEDULED", []))
+    def test_scheduled_needs_the_full_preregistration_and_no_selection_without_one_is_not_terminal(self):
+        scheduled = layer(status="no-winner", winners=0)
+        scheduled["verdict"].update(PREREGISTERED)
+        self.assertEqual(MANIFEST.layer_state(scheduled, []), ("SCHEDULED", []))
         state, missing = MANIFEST.layer_state(layer(status="no-winner", winners=0), [])
         self.assertEqual(state, "non-terminal")
         self.assertTrue(any("no scheduled comparison" in reason for reason in missing))
+        # A comparison id alone is not a preregistered comparison (protocol, SCHEDULED).
+        for field in ("preregistration_sha256", "readiness_trigger", "decision_rule"):
+            partial = layer(status="no-winner", winners=0)
+            partial["verdict"].update({key: value for key, value in PREREGISTERED.items() if key != field})
+            state, missing = MANIFEST.layer_state(partial, [])
+            self.assertEqual(state, "non-terminal", field)
+            self.assertTrue(any(reason.startswith("comparison cmp-1 lacks its") for reason in missing), field)
+
+    def test_invoke_counts_only_calls_above_zero_or_a_recorded_reason_it_is_not_invoked(self):
+        record = layer()
+        for invoke, met in (({"calls": 0}, False), (0, False), ({"calls": True}, False), ({"note": "seen"}, False), ({"calls": 2}, True), (5, True)):
+            with self.subTest(invoke=invoke):
+                self.assertIs(self.conditions(record, matrix_row(invoke=invoke))[0]["invoke"]["met"], met)
+        self.assertIn("zero recorded calls", self.conditions(record, matrix_row(invoke={"calls": 0}))[0]["invoke"]["detail"])
+        row = matrix_row(invoke=None)
+        row["convergence"]["not_invoked_reason"] = "role retired with the hub move"
+        excused = self.conditions(record, row)[0]["invoke"]
+        self.assertTrue(excused["met"])
+        self.assertIn("role retired with the hub move", excused["detail"])
+        self.assertEqual(MANIFEST.layer_state(record, self.conditions(record, row)), ("FINAL", []))
 
     def test_retired_is_never_inferred_from_final_stack_v1(self):
         for status in ("current", "converged", "reopened", "unswept", "no-winner"):
@@ -208,7 +239,6 @@ class CommittedBuildTests(BuiltPages):
         self.assertIn('id="lp-decisions"', north)
         self.assertIn("Pre-ranked feeds and overlap study: pending", north)
         self.assertIn("The sealed WS2 arms and the WS3 records exist.", north)
-        self.assertEqual(len(self.manifests["north-star"]["decisions"]["rows"]), len(MANIFEST.DATA_DECISIONS))
 
     def test_diagram_nodes_cite_present_files_and_name_known_layers(self):
         for key, spec in (("foundation", "topology"), ("north-star", "flow")):
@@ -225,6 +255,12 @@ class CommittedBuildTests(BuiltPages):
             self.assertNotRegex(text, r"/home/[A-Za-z]|/Users/[A-Za-z]")
             self.assertNotRegex(text, r"[^\s<>\"']+@[^\s<>\"']+\.[A-Za-z]{2,}")
         self.assertIn("cited by name", self.html["north-star"])
+        # The private decision records appear by name, with no digest, line number or quoted text beside them.
+        for text in (decisions_section(self.html["north-star"]), json.dumps(self.manifests["north-star"]["decisions"])):
+            for name in ("CONVERGENCE-CC-20261014.md", "CONVERGENCE-CC-20261014.addendum-01.md"):
+                self.assertIn(name, text)
+            self.assertNotRegex(text, r"\b[0-9a-f]{12,}\b")
+            self.assertNotRegex(text, r"\.md:\d|\bline \d|“")
 
 
 class CritiqueRegressionTests(BuiltPages):
@@ -247,7 +283,9 @@ class CritiqueRegressionTests(BuiltPages):
 
     def test_flow_nodes_without_a_repository_record_are_marked(self):
         nodes = {node["id"]: node for node in self.manifests["north-star"]["flow"]["nodes"]}
-        self.assertEqual({key for key, node in nodes.items() if not node["recorded"]}, {"l0", "k1", "account-c"})
+        self.assertEqual({key for key, node in nodes.items() if not node["recorded"]}, {"l0", "k1"})
+        self.assertEqual(nodes["account-c"]["evidence_refs"], ["evidence/artifacts/trading-handbook-20261013/agent-lane-calculator-policy-spec-v1-20261013.md"])
+        self.assertNotIn("no repository record at this commit", json.dumps(self.manifests["north-star"]))
         self.assertIn("mf-unrecorded", self.html["north-star"])
         self.assertIn("No repository record yet", self.html["north-star"])
 
@@ -300,6 +338,128 @@ class ComposerTests(unittest.TestCase):
         self.assertIn('href="architecture-foundation.html"', html)
         self.assertIn('href="architecture-north-star.html"', html)
         self.assertIn("Native readiness manifest SHA-256", html)
+
+
+class FixRoundTests(BuiltPages):
+    """Findings of the command-center micro at ee725cc1; each test failed on that commit's modules."""
+
+    RECORD, ADDENDUM = "CONVERGENCE-CC-20261014.md", "CONVERGENCE-CC-20261014.addendum-01.md"
+
+    def test_decisions_are_the_recorded_ones_cited_by_record_name(self):
+        decisions = self.manifests["north-star"]["decisions"]
+        self.assertEqual(decisions["records"], [self.RECORD, self.ADDENDUM])
+        by_record = {}
+        for row in decisions["rows"]:
+            by_record.setdefault(row["recorded_in"], []).append(row["id"])
+        # The sealed record has six decisions and addendum-01 four, in record order.
+        self.assertEqual(by_record, {self.RECORD: [f"CC-{n}" for n in range(1, 7)], self.ADDENDUM: [f"A01-{n}" for n in range(1, 5)]})
+        topics = {row["topic"]: row["decision"] for row in decisions["rows"]}
+        self.assertIn("paid tiers", topics["tier-spend"])
+        self.assertIn("rc6", topics["engine-pin"])
+        self.assertIn("within 1 s is a target", topics["ranking-target"])
+        section = decisions_section(self.html["north-star"])
+        for row in decisions["rows"]:
+            self.assertIn(escape(row["decision"], quote=True), section)
+        self.assertNotIn("brief-architecture-pages", section + json.dumps(decisions))
+        # Data-flow restatements without a counterpart in the record are not decisions.
+        self.assertNotRegex(section + json.dumps(decisions), r"DL-\d")
+
+    def test_lede_counts_are_generated_from_the_rendered_layers(self):
+        self.assertTrue(BUILDER._lede("foundation", 7).startswith("The 7 foundation layers,"))
+        self.assertTrue(BUILDER._lede("us-equities", 3).startswith("The 3 trading layers,"))
+        for key, config in MANIFEST.LAYER_PAGES.items():
+            lede = BUILDER._lede(config["catalog"], len(self.manifests[key]["layers"]))
+            self.assertIn(f'<p class="lede">{escape(lede)}</p>', self.html[key])
+
+    def test_final_stack_flags_leave_sys_path_as_found(self):
+        added = {str(ROOT), str(ROOT / "scripts"), str(ROOT / "tools/sota-convergence"), "", "."}
+        saved = list(sys.path)
+        sys.path[:] = [entry for entry in saved if entry not in added]
+        before = list(sys.path)
+        try:
+            BUILDER._final_stack_flags(self.final_stack, date(2026, 10, 14))
+            after = list(sys.path)
+        finally:
+            sys.path[:] = saved
+        self.assertEqual(after, before)
+
+    def test_evidence_presence_is_read_at_the_cited_commit(self):
+        present, absent = MANIFEST._present(ROOT, ["tools/local-pages/README.md", "catalogs/landscape/final-stack.json#/runs"],
+                                            frozenset({"catalogs/landscape/final-stack.json"}))
+        self.assertEqual((present, absent), (["catalogs/landscape/final-stack.json#/runs"], ["tools/local-pages/README.md"]))
+        catalog, matrix = (json.loads((ROOT / path).read_text()) for path in (MANIFEST.CATALOGS["us-equities"], MANIFEST.MATRIX))
+        manifest = MANIFEST.layer_manifest(ROOT, "north-star", self.final_stack, catalog, matrix, commit="1" * 40, sources=[], flags=None, tracked=frozenset())
+        self.assertEqual(manifest["evidence_checked_at"], "1" * 40)
+        self.assertFalse(any(node["recorded"] for node in manifest["flow"]["nodes"]))
+        # The shared build cites a commit that is not in the repository, so it says it read the checkout.
+        self.assertEqual(self.manifests["north-star"]["evidence_checked_at"], "checkout")
+        self.assertIn("present in the checkout", self.html["north-star"])
+        head = BUILDER._git(ROOT, "rev-parse", "HEAD")
+        if head is None:
+            self.skipTest("not a Git checkout")
+        self.assertIn(MANIFEST.FINAL_STACK, BUILDER._tracked(ROOT, head))
+        self.assertIsNone(BUILDER._tracked(ROOT, "0" * 40))
+
+
+class ComposerFixRoundTests(unittest.TestCase):
+    """Composer findings of the command-center micro at ee725cc1; each test failed on that commit's modules."""
+
+    def failing_builder(self, error):
+        """Patch only the layer-page builder; every other local module (the sanitizer too) loads as usual."""
+        def build_layer_pages(*args, **kwargs):
+            raise error
+        stub, real = SimpleNamespace(build_layer_pages=build_layer_pages), PAGES.load_local
+        return mock.patch.object(PAGES, 'load_local', side_effect=lambda name, *rest: stub if name == 'architecture_builder' else real(name, *rest))
+
+    def test_layer_pages_only_never_overwrites_the_refresh_receipt(self):
+        with tempfile.TemporaryDirectory() as base:
+            state, output = Path(base) / "state", Path(base) / "served"
+            refresh = state / "research/fullspeed-20261008/g5-stars-gap/local-pages/refresh-receipt.json"
+            refresh.parent.mkdir(parents=True)
+            refresh.write_text('{"schema": "full refresh"}\n')
+            stdout = io.StringIO()
+            with redirect_stdout(stdout):
+                code = PAGES.main(["--layer-pages-only", "--root", str(ROOT), "--output-dir", str(output), "--state-root", str(state)])
+            self.assertEqual(code, 0)
+            self.assertEqual(refresh.read_text(), '{"schema": "full refresh"}\n')
+            written = refresh.parent / "architecture/layer-pages-receipt.json"
+            self.assertEqual(json.loads(stdout.getvalue())["receipt"], str(written))
+            self.assertEqual(json.loads(written.read_text())["schema"], "local-architecture-layer-pages/1")
+            named = Path(base) / "elsewhere/refresh-receipt.json"
+            with redirect_stdout(io.StringIO()), mock.patch("sys.stderr", io.StringIO()), self.assertRaises(SystemExit) as raised:
+                PAGES.main(["--layer-pages-only", "--root", str(ROOT), "--output-dir", str(output), "--state-root", str(state), "--receipt", str(named)])
+            self.assertEqual(raised.exception.code, 2)
+            self.assertFalse(named.exists())
+
+    def test_layer_pages_only_reports_overflow_and_recursion_errors(self):
+        for error in (OverflowError("big"), RecursionError("deep")):
+            with self.subTest(error=type(error).__name__), tempfile.TemporaryDirectory() as base:
+                stderr = io.StringIO()
+                with self.failing_builder(error), mock.patch("sys.stderr", stderr), \
+                        self.assertRaises(SystemExit) as raised:
+                    PAGES.main(["--layer-pages-only", "--output-dir", str(Path(base) / "served"), "--state-root", str(Path(base) / "state")])
+                self.assertEqual(raised.exception.code, 1)
+                self.assertIn(type(error).__name__, stderr.getvalue())
+
+    def test_refresh_keeps_navigation_whole_when_the_layer_pages_fail(self):
+        for error in (OverflowError("big"), RecursionError("deep"), ValueError("bad")):
+            with self.subTest(error=type(error).__name__), tempfile.TemporaryDirectory() as base:
+                output = Path(base) / "served"
+                output.mkdir()
+                (output / "architecture-north-star.html").write_text("previous page\n")
+                outputs, receipt_doc = {}, {"outputs": {}}
+                with self.failing_builder(error):
+                    PAGES.refresh_layer_pages(ROOT, Path(base) / "state", output, Path(base) / "custody/refresh-receipt.json",
+                                              "2026-10-14T00:00:00Z", "a" * 64, outputs, receipt_doc)
+                status = receipt_doc["architecture_layer_pages"]
+                self.assertEqual((status["status"], status["reason"]), ("UNREPORTED", f"Layer pages unavailable ({type(error).__name__})"))
+                self.assertEqual(status["page_status"], {"architecture-foundation": "unreported placeholder",
+                                                         "architecture-north-star": "previous page retained without a new observation"})
+                self.assertEqual(set(outputs), {"architecture-foundation.html"})
+                placeholder = outputs["architecture-foundation.html"].decode()
+                self.assertIn("UNREPORTED", placeholder)
+                self.assertIn('id="layer-sources"', placeholder)
+                self.assertIn("architecture-foundation.html", receipt_doc["outputs"])
 
 
 if __name__ == "__main__":

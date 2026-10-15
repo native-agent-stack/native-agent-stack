@@ -119,6 +119,9 @@ dataviz skill bundled with Claude Code 2.1.300 set the count strip as stat figur
 meters, not a chart. Its palette validator (`scripts/validate_palette.py`) passes the
 met and missing pair in light mode on the normal-vision floor (ΔE 15.8) and warns on
 protan separation (7.1); in dark mode the pair falls to ΔE 13.8 normal and 5.4 protan.
+The same run FAILs the validator's chroma floor in light mode: the approved light tokens
+are muted (OKLCH chroma 0.082 for `--ok` #246d55 and 0.105 for `--warn` #996421), so the
+met fill reads as a dark grey-green beside the other marks. The tokens stay unchanged.
 Every mark therefore carries its shape and label. Changing the approved status tokens is
 left to the critique pass.
 
@@ -132,9 +135,9 @@ plan. It fixed the following:
   Running chips gave no sign that Grafana, Hindsight, DeerFlow and the OpenHands SDK are
   alternates. Each chip now carries its index role: solid for a winner of a layer in the
   page's catalog, dashed otherwise. The text view names the role and layer.
-- **Unrecorded flow nodes.** L0 raw log, K1 ranking and the account C trader have no
-  repository record, yet they looked like evidenced nodes. They are now dashed, with a
-  legend entry.
+- **Unrecorded flow nodes.** L0 raw log and K1 ranking have no repository record, yet
+  they looked like evidenced nodes. They are now dashed, with a legend entry. (The account
+  C node cites the agent-lane calculator policy spec from fix round 1 on.)
 - **Captions** mention only the marks a figure draws.
 - **Node sublabels** that were unverified ("ranked symbols", "data catalog", "shared by
   lanes") now follow their cited sources.

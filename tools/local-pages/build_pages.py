@@ -583,17 +583,43 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
             else:
                 receipt_doc["architecture"]["page_status"] = "previous page retained without a new observation"
     if architecture_path.exists():
-        # The Foundation and North-star pages read committed repository records only.
-        try:
-            layer_pages = load_local("architecture_builder").build_layer_pages(
-                root, output_dir, receipt.parent / "architecture/layer-pages-receipt.json", state_root=state_root, generated=refreshed)
-            if not isinstance(layer_pages, dict):
-                raise TypeError("layer-page builder returned no receipt")
-            receipt_doc["architecture_layer_pages"] = {key: layer_pages.get(key) for key in ("schema", "generated_utc", "commit", "pages", "outputs")}
-        except (OSError, ValueError, UnicodeError, KeyError, TypeError, AttributeError, ImportError) as error:
-            receipt_doc["architecture_layer_pages"] = {"status": "UNREPORTED", "reason": "Layer pages unavailable (" + type(error).__name__ + ")"}
+        refresh_layer_pages(root, state_root, output_dir, receipt, refreshed, manifest_sha, outputs, receipt_doc)
     publish(output_dir, receipt, outputs, receipt_doc)
     return receipt_doc
+
+
+LAYER_PAGE_ERRORS = (OSError, ValueError, UnicodeError, KeyError, TypeError, AttributeError, ImportError, OverflowError, RecursionError)
+
+
+def layer_pages_receipt(receipt: Path) -> Path:
+    """The layer pages' own receipt beside a refresh receipt; never the refresh receipt itself."""
+    return receipt.parent / "architecture/layer-pages-receipt.json"
+
+
+def refresh_layer_pages(root: Path, state_root: Path, output_dir: Path, receipt: Path, refreshed: str, manifest_sha: str,
+                        outputs: dict, receipt_doc: dict) -> None:
+    """Render the Foundation and North-star pages, which read committed repository records only.
+
+    Every page's navigation links both pages, so on failure a missing page gets
+    an UNREPORTED placeholder; an existing page is kept without a new observation.
+    """
+    try:
+        layer_pages = load_local("architecture_builder").build_layer_pages(
+            root, output_dir, layer_pages_receipt(receipt), state_root=state_root, generated=refreshed)
+        if not isinstance(layer_pages, dict):
+            raise TypeError("layer-page builder returned no receipt")
+        receipt_doc["architecture_layer_pages"] = {key: layer_pages.get(key) for key in ("schema", "generated_utc", "commit", "pages", "outputs")}
+    except LAYER_PAGE_ERRORS as error:
+        receipt_doc["architecture_layer_pages"] = {"status": "UNREPORTED", "reason": "Layer pages unavailable (" + type(error).__name__ + ")", "page_status": {}}
+        for page in ("architecture-foundation", "architecture-north-star"):
+            if (output_dir / f"{page}.html").exists():
+                receipt_doc["architecture_layer_pages"]["page_status"][page] = "previous page retained without a new observation"
+                continue
+            body = '<section class="panel" id="layer-sources"><h2>UNREPORTED</h2><p>This architecture page is unavailable. Other pages retain their own current observations.</p></section>'
+            outputs[f"{page}.html"] = document(page, PAGES[page] + " architecture unavailable", "No current observation of this page is reported.",
+                                               "Layer pages unavailable; no gate or execution claim.", body, refreshed, manifest_sha, [])
+            receipt_doc.setdefault("outputs", {})[f"{page}.html"] = {"sha256": hashlib.sha256(outputs[f"{page}.html"]).hexdigest(), "bytes": len(outputs[f"{page}.html"])}
+            receipt_doc["architecture_layer_pages"]["page_status"][page] = "unreported placeholder"
 
 
 def prune_architecture_details(output_dir: Path, outputs: dict) -> None:
@@ -659,9 +685,15 @@ def main(argv: list[str] | None = None) -> int:
     output = args.output_dir or args.state_root / "coordination/command-center/local-pages"
     receipt = args.receipt or args.state_root / "research/fullspeed-20261008/g5-stars-gap/local-pages/refresh-receipt.json"
     if args.layer_pages_only:
+        # The refresh receipt records the last full refresh, and the Architecture
+        # refresh rejects any other receipt kind, so it is never overwritten here.
+        if args.receipt is None:
+            receipt = layer_pages_receipt(receipt)
+        elif receipt.name == "refresh-receipt.json":
+            parser.exit(2, "local-pages: --layer-pages-only never writes a refresh receipt; name another --receipt\n")
         try:
             result = load_local("architecture_builder").build_layer_pages(args.root, output, receipt, state_root=args.state_root)
-        except (OSError, ValueError, KeyError, TypeError, AttributeError, ImportError) as error:
+        except LAYER_PAGE_ERRORS as error:
             parser.exit(1, f"local-pages: layer pages failed ({type(error).__name__}): {error}\n")
         print(json.dumps({"output_dir": str(output), "receipt": str(receipt), "generated_utc": result["generated_utc"], "commit": result["commit"],
                           "pages": {key: {field: value[field] for field in ("page", "manifest", "rendered_layer_count", "states")} for key, value in result["pages"].items()}}, sort_keys=True))

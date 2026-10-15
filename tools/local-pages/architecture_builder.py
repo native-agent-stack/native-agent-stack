@@ -230,11 +230,13 @@ FINAL_STACK_SCRIPT = ROOT / "scripts/final_stack.py"
 
 
 def _final_stack_flags(document: dict, today) -> dict:
-    """The report-only flags of `scripts/final_stack.py --check`, from the script's own flags() on the read document."""
-    scripts = str(FINAL_STACK_SCRIPT.parent)
-    added = scripts not in sys.path
-    if added:
-        sys.path.insert(0, scripts)
+    """The report-only flags of `scripts/final_stack.py --check`, from the script's own flags() on the read document.
+
+    final_stack.py and the modules it imports add scripts/, tools/sota-convergence
+    and the repository root to sys.path; the caller's sys.path is restored afterwards.
+    """
+    saved = list(sys.path)
+    sys.path.insert(0, str(FINAL_STACK_SCRIPT.parent))
     try:
         spec = importlib.util.spec_from_file_location("local_architecture_final_stack", FINAL_STACK_SCRIPT)
         if spec is None or spec.loader is None:
@@ -248,8 +250,7 @@ def _final_stack_flags(document: dict, today) -> dict:
         finally:
             sys.modules.pop(spec.name, None)
     finally:
-        if added:
-            sys.path.remove(scripts)
+        sys.path[:] = saved
 
 
 def _git(root: Path, *args: str) -> str | None:
@@ -282,6 +283,23 @@ def _commit(root: Path, records: dict[str, bytes]) -> str | None:
     return head
 
 
+def _tracked(root: Path, commit: str | None) -> frozenset | None:
+    """The file paths of `commit`'s tree, or None when the commit cannot be read."""
+    if not commit or not re.fullmatch(r"[0-9a-f]{40}", commit):
+        return None
+    listing = _git(root, "ls-tree", "-r", "--name-only", "-z", commit)
+    return frozenset(path for path in listing.split("\0") if path) if listing else None
+
+
+LEDE = {"foundation": "The {count} foundation layers, what runs on the workstation, and what each layer still needs before it is finalized.",
+        "us-equities": "The {count} trading layers, how the trading data flows, and what each layer still needs before it is finalized."}
+
+
+def _lede(catalog: str, count: int) -> str:
+    """The page lede, counting the layers the page renders."""
+    return LEDE[catalog].format(count=count)
+
+
 def build_layer_pages(root: Path, output_dir: Path, receipt: Path, *, state_root: Path | None = None,
                       today: date | None = None, commit: str | None = None, generated: str | None = None) -> dict:
     """Render the Foundation and North-star pages and their manifests from committed repository records only."""
@@ -306,6 +324,7 @@ def build_layer_pages(root: Path, output_dir: Path, receipt: Path, *, state_root
     today = today or datetime.fromisoformat(generated.replace("Z", "+00:00")).date()
     commit = commit or _commit(root, raws)
     flags = _final_stack_flags(documents["final_stack"], today)
+    tracked = _tracked(root, commit)
     style_raw = policy_module._read_regular(MANIFEST_STYLE, 1024 * 1024)
     style = "\n  <style>\n" + style_raw.decode("utf-8") + "  </style>"
     outputs, summaries = {}, {}
@@ -314,7 +333,7 @@ def build_layer_pages(root: Path, output_dir: Path, receipt: Path, *, state_root
         catalog = config["catalog"]
         sources = [captured["final_stack"], captured[catalog], captured["matrix"]]
         manifest = manifest_module.layer_manifest(root, key, documents["final_stack"], documents[catalog], documents["matrix"],
-                                                  commit=commit, sources=sources, flags=flags)
+                                                  commit=commit, sources=sources, flags=flags, tracked=tracked)
         manifest = sanitizer.sanitize(manifest)
         manifest["page_file"] = {"html": config["page"] + ".html", "manifest": config["manifest"]}
         manifest["generated_utc"] = generated
@@ -323,8 +342,7 @@ def build_layer_pages(root: Path, output_dir: Path, receipt: Path, *, state_root
         if counts["rendered_layer_count"] != expected:
             raise ValueError(f"{key} page renders {counts['rendered_layer_count']} layers; the catalog has {expected}")
         scope = f"committed records at {commit or 'an unrecorded commit'}; final-stack.json checked_at {documents['final_stack'].get('checked_at')}"
-        lede = ("The 20 foundation layers, what runs on the workstation, and what each layer still needs before it is finalized." if catalog == "foundation"
-                else "The 12 trading layers, how the trading data flows, and what each layer still needs before it is finalized.")
+        lede = _lede(catalog, counts["rendered_layer_count"])
         html = pages.document(config["page"], config["title"], lede, scope, body, generated, final_sha, [], head=style,
                               digest_label="final-stack.json SHA-256")
         manifest_raw = (json.dumps(manifest, indent=2, sort_keys=True, ensure_ascii=False, allow_nan=False) + "\n").encode("utf-8")
@@ -343,7 +361,7 @@ def build_layer_pages(root: Path, output_dir: Path, receipt: Path, *, state_root
               "source_policy": dict(reads.policy.receipt),
               "outputs": {name: {"sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)} for name, raw in outputs.items()},
               "limits": ["Pages project committed records; they establish no new E2E, invoke or verdict.",
-                         "The data-layer decisions are cited by record name; their text is not in this repository."]}
+                         "The data-layer decisions are paraphrased and cited by record name; their text is not in this repository."]}
     pages.publish(output_dir, receipt, outputs, result)
     return result
 

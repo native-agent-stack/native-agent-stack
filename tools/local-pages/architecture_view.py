@@ -461,6 +461,14 @@ def _figure_text(manifest: dict, drawn: dict) -> str:
     return f'<h3>Parts</h3><ul>{"".join(items)}</ul><h3>Connections</h3><ul>{"".join(edges)}</ul>'
 
 
+def _evidence_scope(manifest: dict) -> str:
+    """Where evidence presence was read: the cited commit's tree, or the checkout when that tree was unreadable."""
+    checked = manifest.get("evidence_checked_at")
+    if checked and checked != "checkout":
+        return f'present at commit <code>{esc(checked)}</code>'
+    return f'present in the checkout (commit <code>{esc(manifest.get("commit") or "unrecorded")}</code> was not read)'
+
+
 def render_layer_page(manifest: dict) -> tuple[str, dict]:
     """Body of the Foundation or North-star page from its layer manifest."""
     figure, drawn = _diagrams().layer_figure(manifest)
@@ -478,10 +486,14 @@ def render_layer_page(manifest: dict) -> tuple[str, dict]:
             + _diagrams()._alt("Read the diagram as text", _figure_text(manifest, drawn)) + "</section>"]
     if north:
         decisions = manifest["decisions"]
-        rows = [[esc(row["decision"]), esc(row["element"]), _refs(row["evidence_refs"]) if row["evidence_refs"] else "None at this commit", esc(row["status"])] for row in decisions["rows"]]
+        rows = [[esc(row["id"]), esc(row["decision"]), esc(row["element"] or "Research process"), f'<code>{esc(row["recorded_in"])}</code>',
+                 _refs(row["evidence_refs"]) if row["evidence_refs"] else "None"] for row in decisions["rows"]]
+        records = " and its addendum ".join(f'<code>{esc(name)}</code>' for name in decisions["records"])
         body.append('<section class="mf-view" id="lp-decisions" aria-labelledby="lp-decisions-title"><h2 id="lp-decisions-title">Data-layer decisions of 2026-10-14</h2>'
-                    f'<p>The decisions are recorded in the {esc(decisions["record"])}. Each row names the element of the data flow it settles; the cited files are repository leads at this commit, not the decision text.</p>'
-                    + _table("Data-layer decisions", ["Decision", "Data-flow element", "Repository evidence", "Status"], rows) + "</section>")
+                    f'<p>The decisions are recorded in the sealed command-center convergence record {records}, private records cited by name. '
+                    'Each row paraphrases one recorded decision in record order and names the part of the data flow it bears on; '
+                    'the cited files are repository leads, not the decision text.</p>'
+                    + _table("Data-layer decisions", ["Decision", "What was decided", "Data-flow element", "Recorded in", "Repository leads"], rows) + "</section>")
         pending = manifest["pending_study"]
         body.append(f'<section class="mf-view lp-pending" id="lp-pending" aria-labelledby="lp-pending-title"><h2 id="lp-pending-title">{esc(pending["title"])}</h2>'
                     f'<dl class="lp-facts"><div><dt>Readiness trigger</dt><dd>{esc(pending["trigger"])}</dd></div><div><dt>Content</dt><dd>{esc(pending["content"])}</dd></div></dl></section>')
@@ -499,7 +511,7 @@ def render_layer_page(manifest: dict) -> tuple[str, dict]:
     config = manifest.get("page_file") or {}
     body.append('<section class="mf-view" id="layer-sources" aria-labelledby="layer-sources-title"><h2 id="layer-sources-title">Manifest and sources</h2>'
                 f'<p>The machine-readable manifest for this page is <a href="{esc(config.get("manifest") or "")}"><code>{esc(config.get("manifest") or "")}</code></a> '
-                f'(schema <code>{esc(manifest["schema"])}</code>): one item per layer and winner with its repository, pins, evidence files at commit <code>{esc(manifest.get("commit") or "unrecorded")}</code>, state and missing conditions. '
+                f'(schema <code>{esc(manifest["schema"])}</code>): one item per layer and winner with its repository, pins, evidence files {_evidence_scope(manifest)}, state and missing conditions. '
                 f'Conditions and states follow <code>{esc(manifest["protocol"])}</code>.</p><dl class="lp-sources">{sources}</dl>'
                 + _diagrams()._alt("How the conditions and states are read", "<dl class=\"lp-defs\">" + "".join(f'<div><dt>{esc(c["label"])}</dt><dd>{esc(c["rule"])}</dd></div>' for c in manifest["definitions"]["conditions"])
                                    + "".join(f'<div><dt>{esc(_STATE_TEXT[s["state"]])}</dt><dd>{esc(s["rule"])}</dd></div>' for s in manifest["definitions"]["states"]) + "</dl>") + "</section>")

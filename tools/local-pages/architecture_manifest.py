@@ -317,10 +317,15 @@ CONDITIONS = (
 STATES = ("FINAL", "SCHEDULED", "RETIRED", "non-terminal")
 STATE_RULES = {
     "FINAL": "final_stack.py reports the layer current or converged and every winner meets all four conditions.",
-    "SCHEDULED": "No winner, and final-stack.json records the preregistered comparison (verdict.comparison_id) the layer waits on.",
+    "SCHEDULED": "No winner, and final-stack.json records the preregistered comparison the layer waits on: its comparison id, "
+                 "preregistration hash, readiness trigger and decision rule (verdict.comparison_id, preregistration_sha256, "
+                 "readiness_trigger and decision_rule).",
     "RETIRED": "The role is retired with a recorded reason. final-stack.json v1 has no retirement field, so no layer can be shown retired yet.",
     "non-terminal": "Everything else: reopened, unswept, pending lanes or no winner without a scheduled comparison, or a missing condition.",
 }
+# What a scheduled comparison retains before its run, per the protocol's SCHEDULED rule.
+PREREGISTRATION = (("comparison_id", "comparison id"), ("preregistration_sha256", "preregistration hash"),
+                   ("readiness_trigger", "readiness trigger"), ("decision_rule", "decision rule"))
 DEFINITIVE = ("current", "converged")
 E2E_ACCEPTED = ("accepted", "host_verified")
 LAYER_PAGES = {
@@ -385,7 +390,8 @@ FLOW = {
          "evidence": ("blueprints/us-equities/adaptive-paper/README.md", "docs/decisions/2026-10-13-lane-a-frozen-field-continuity.md", "docs/decisions/2026-10-13-lane-b-concurrent-presets.md")},
         {"id": "alpaca", "lane": "collector", "step": 4, "name": "Alpaca", "sub": "paper accounts", "tool": "alpaca-py", "layers": ("execution-broker",),
          "evidence": ("catalogs/us-equities/runtime-target.json", "docs/paper-lane-policy.md")},
-        {"id": "account-c", "lane": "account-c", "step": 3, "name": "MCP trader and calc", "sub": "account C", "layers": ("agents-models-workers",), "evidence": ()},
+        {"id": "account-c", "lane": "account-c", "step": 3, "name": "MCP trader and calc", "sub": "account C", "layers": ("agents-models-workers",),
+         "evidence": ("evidence/artifacts/trading-handbook-20261013/agent-lane-calculator-policy-spec-v1-20261013.md",)},
         {"id": "ibkr-feed", "lane": "ibkr", "step": 0, "name": "IBKR data", "sub": "TWS API", "tool": "market data", "layers": ("market-data-reference",),
          "evidence": ("catalogs/us-equities/runtime-target.json",)},
         {"id": "ibkr-lane", "lane": "ibkr", "step": 3, "name": "IBKR lane", "sub": "NautilusTrader", "tool": "IBKR adapter", "layers": ("execution-broker",),
@@ -404,24 +410,41 @@ FLOW = {
     "focal_edge": ("k1", "lanes-ab"),
 }
 
-# The data-layer decisions of 2026-10-14 live in a private command-center record,
-# cited by name only. Each row restates the data-flow element it settles and the
-# repository files that hold related evidence at the build commit; those files are
-# leads, not the decision text.
-DECISION_RECORD = "command-center brief brief-architecture-pages-20261014 (private; cited by name)"
+# The data-layer decisions of 2026-10-14 are recorded in a sealed private
+# command-center convergence record and its first addendum, cited by name only.
+# Each row paraphrases one recorded decision, in record order, and names the
+# data-flow element it bears on (None for a decision about the research process).
+# Cited files are repository leads at the build commit, not the decision text.
+DECISION_RECORDS = {
+    "record": "CONVERGENCE-CC-20261014.md",
+    "addendum-01": "CONVERGENCE-CC-20261014.addendum-01.md",
+}
+# (id, record key, topic, paraphrase, flow node, repository leads)
 DATA_DECISIONS = (
-    ("DL-01", "Alpaca SIP is the equities feed", "feeds", ("catalogs/us-equities/ns-movers-phase0-decisions-20261009.json", "blueprints/us-equities/north-star.md")),
-    ("DL-02", "OPRA is the options feed", "feeds", ("catalogs/us-equities/ns-movers-phase0-decisions-20261009.json",)),
-    ("DL-03", "FINRA free data joins the feeds", "feeds", ("blueprints/us-equities/incentive-monitor/README.md",)),
-    ("DL-04", "IBKR market data feeds the IBKR lane", "ibkr-feed", ("catalogs/us-equities/runtime-target.json",)),
-    ("DL-05", "An owned collector writes the L0 raw log first", "l0", ()),
-    ("DL-06", "K1 ranking reads the L0 log", "k1", ()),
-    ("DL-07", "Lanes A and B run on adaptive-paper and NautilusTrader", "lanes-ab", ("blueprints/us-equities/adaptive-paper/README.md", "docs/decisions/2026-10-13-lane-b-concurrent-presets.md")),
-    ("DL-08", "Account C runs the MCP trader and calc", "account-c", ()),
-    ("DL-09", "The IBKR lane runs through NautilusTrader", "ibkr-lane", ("blueprints/us-equities/engine-nautilus/ibkr-paper-orders/README.md",)),
-    ("DL-10", "Alpaca and IBKR are the paper brokers", "alpaca", ("catalogs/us-equities/runtime-target.json", "docs/paper-lane-policy.md")),
-    ("DL-11", "History and backtests run through NautilusTrader BacktestNode", "backtest", ("blueprints/us-equities/runtime-2604/receipts/backtest-pipeline-20261008.json",)),
-    ("DL-12", "Strategy templates serve both the backtests and the paper lanes", "templates", ("blueprints/us-equities/strategies/README.md",)),
+    ("CC-1", "record", "hub", "The owned hub stays the plan for the agreed zero-spend tier: one collector per stream allowance "
+     "writes the L0 raw log first and the NautilusTrader catalog is built from it, the K1 ranker runs outside NautilusTrader nodes, "
+     "one versioned state serves the traders and the exit gateway, and the data vendor does not change.", "l0", ()),
+    ("CC-2", "record", "tier-1-additions", "Four zero-spend additions follow, each as its own reviewed pull request through the hub gates: "
+     "news for every symbol once the pre-market probe shows it does not use the stock allowance, TRF/ADF print features in K1, "
+     "EDGAR filing discovery as a catalyst input within the SEC fair-access limit, and the borrow check on the IBKR lane.", "feeds", ()),
+    ("CC-3", "record", "tier-spend", "Nothing is bought from the paid tiers (2 and 3) now; each purchase first needs a measured gap, "
+     "and paying for it is for the owner to approve.", "feeds", ()),
+    ("CC-4", "record", "engine-pin", "NautilusTrader remains the engine. Its v2.0.0rc6 release cannot take the in-house Alpaca "
+     "transport through the v2 API, so that release is used for screening only.", "lanes-ab",
+     ("blueprints/us-equities/engine-nautilus/ibkr-paper-orders/README.md",)),
+    ("CC-5", "record", "ranking-target", "Ranking the whole market within 1 s is a target that K1 has to measure, not a claim.", "k1", ()),
+    ("CC-6", "record", "fourth-arm", "The fourth research arm joins through an addendum after its re-run, with the blind judging "
+     "repeated over four arms; the record itself stays sealed.", None, ()),
+    ("A01-1", "addendum-01", "disconnect-events", "The full-session probe and the shadow L0 and K1 run log every 406 and 407 "
+     "rejection as well as reconnect gaps.", "l0", ()),
+    ("A01-2", "addendum-01", "tier-1-later", "Two more zero-spend additions are queued as later hub items, each a reviewed pull "
+     "request: FINRA short interest as a free daily reference join, and a bounded OPRA set for candidate underlyings within the "
+     "plan's option-quote subscriptions, only once the stock collector is accepted.", "feeds", ()),
+    ("A01-3", "addendum-01", "allowance-topology", "An observation in production, not yet a measurement, supports one stream "
+     "allowance per paper account: two lanes streamed SIP at the same time on their own accounts with no 406 reported. The formal "
+     "measurement still counts 406s for concurrent connections across accounts.", "feeds", ()),
+    ("A01-4", "addendum-01", "unchanged", "Everything else stands: no paid-tier purchase, NautilusTrader kept with rc6 for "
+     "screening only, the 1 s whole-market ranking still a target K1 measures, and only the public alpaca-py API.", "alpaca", ()),
 )
 PENDING_STUDY = {
     "title": "Pre-ranked feeds and overlap study: pending",
@@ -430,14 +453,19 @@ PENDING_STUDY = {
 }
 
 
-def _present(root: Path, refs) -> tuple[list[str], list[str]]:
-    """Split repository references into files present at this checkout and absent ones; anchors are kept."""
+def _present(root: Path, refs, tracked: frozenset | None = None) -> tuple[list[str], list[str]]:
+    """Split repository references into present and absent files; anchors are kept.
+
+    With `tracked`, the paths of the cited commit's tree, presence is read at that
+    commit; without it, from the checkout.
+    """
     present, absent = [], []
     for ref in refs or ():
         if not isinstance(ref, str) or not ref or ref.startswith(("/", "~", "http:", "https:")) or ".." in ref.split("#", 1)[0].split("/"):
             continue
-        target = root / ref.split("#", 1)[0]
-        (present if target.is_file() else absent).append(ref)
+        path = ref.split("#", 1)[0]
+        found = path in tracked if tracked is not None else (root / path).is_file()
+        (present if found else absent).append(ref)
     return present, absent
 
 
@@ -475,9 +503,18 @@ def winner_conditions(layer: dict, winner: dict, run: dict | None, matrix_row: d
     else:
         e2e_detail = f"{state} at verdict pin {winner.get('verdict_pin')}; run pin {run.get('pin')} " + ("differs" if drift == "differs" else "drift unknown")
     convergence = matrix_row.get("convergence") if isinstance(matrix_row.get("convergence"), dict) else {}
-    invoke = convergence.get("invoke")
-    invoke_met = invoke not in (None, {}, [], "")
-    invoke_detail = "invoke evidence recorded in the matrix" if invoke_met else "no invoke evidence; the matrix records: " + str(convergence.get("invoke_reason") or "no reason")
+    invoke, not_invoked = convergence.get("invoke"), convergence.get("not_invoked_reason")
+    calls = invoke.get("calls") if isinstance(invoke, dict) else invoke
+    called = isinstance(calls, int) and not isinstance(calls, bool) and calls > 0
+    excused = isinstance(not_invoked, str) and bool(not_invoked.strip())
+    invoke_met = called or excused
+    if called:
+        invoke_detail = f"{calls} recorded calls in the matrix"
+    elif excused:
+        invoke_detail = "not invoked; the matrix records the reason: " + not_invoked.strip()
+    else:
+        invoke_detail = ("zero recorded calls, a wiring defect or a role to retire" if calls == 0 and invoke is not None
+                         else "no invoke evidence; the matrix records: " + str(convergence.get("invoke_reason") or "no reason"))
     return {"verdict": {"met": not absent, "detail": verdict_detail}, "run_pin": {"met": run is not None, "detail": run_detail},
             "e2e": {"met": e2e_met, "detail": e2e_detail}, "invoke": {"met": invoke_met, "detail": invoke_detail}}
 
@@ -488,9 +525,12 @@ def layer_state(layer: dict, conditions: list[dict]) -> tuple[str, list[str]]:
     met = {key: bool(conditions) and all(row[key]["met"] for row in conditions) for key, _, _ in CONDITIONS}
     if winners and status in DEFINITIVE and all(met.values()):
         return "FINAL", []
-    if not winners and verdict.get("comparison_id"):
+    preregistration = [label for field, label in PREREGISTRATION if not verdict.get(field)]
+    if not winners and not preregistration:
         return "SCHEDULED", []
     missing = []
+    if not winners and verdict.get("comparison_id"):
+        missing.append(f"comparison {verdict['comparison_id']} lacks its " + ", ".join(preregistration))
     if status == "reopened":
         missing.append("reopened by " + ", ".join(sweep.get("sweep_id", "a sweep") for sweep in verdict.get("reopened_by") or []) if verdict.get("reopened_by") else "reopened by a later sweep")
     elif status == "unswept":
@@ -510,8 +550,12 @@ def layer_state(layer: dict, conditions: list[dict]) -> tuple[str, list[str]]:
 
 
 def layer_manifest(root: Path, page: str, final_stack: dict, catalog: dict, matrix: dict, *, commit: str | None,
-                   sources: list[dict], flags: dict | None) -> dict:
-    """Project one page's layers, items, diagram nodes and drift flags from the read records."""
+                   sources: list[dict], flags: dict | None, tracked: frozenset | None = None) -> dict:
+    """Project one page's layers, items, diagram nodes and drift flags from the read records.
+
+    `tracked` holds the paths of `commit`'s tree; evidence presence is read there
+    when given, and from the checkout otherwise (recorded as evidence_checked_at).
+    """
     config = LAYER_PAGES[page]
     catalog_id = config["catalog"]
     catalog_rows = {row.get("layer_id"): (index, row) for index, row in enumerate(_list(catalog.get("layers"))) if isinstance(row, dict)}
@@ -536,8 +580,8 @@ def layer_manifest(root: Path, page: str, final_stack: dict, catalog: dict, matr
         verdict = layer.get("verdict") or {}
         wave_doc = (verdict.get("wave_doc") or {}).get("path")
         layer_refs = [f"{CATALOGS[catalog_id]}#/layers/{index}", f"{FINAL_STACK}#/layers/{position}", MATRIX] + ([wave_doc] if wave_doc else [])
-        cited, outside = _present(root, row.get("evidence_refs"))
-        present, absent = _present(root, layer_refs)
+        cited, outside = _present(root, row.get("evidence_refs"), tracked)
+        present, absent = _present(root, layer_refs, tracked)
         gaps = [gap for gap in _list(row.get("open_gaps")) if isinstance(gap, str)]
         record = {"layer": key, "layer_id": layer["layer_id"], "title": layer.get("title") or row.get("title"),
                   "current_choice": row.get("current_choice"), "final_stack_status": layer.get("status"),
@@ -551,7 +595,7 @@ def layer_manifest(root: Path, page: str, final_stack: dict, catalog: dict, matr
                   "winners": []}
         for winner, entry in zip(winners, conditions):
             run = runs.get(winner.get("run"))
-            run_refs, _ = _present(root, [run.get("source")] if run else [])
+            run_refs, _ = _present(root, [run.get("source")] if run else [], tracked)
             winner_record = {"component": winner.get("component_id"), "repository": winner.get("repository"),
                              "pin": {"verdict": winner.get("verdict_pin"), "run": run.get("pin") if run else None, "run_id": winner.get("run"),
                                      "run_source": run.get("source") if run else None, "pin_drift": winner.get("pin_drift"), "run_reason": winner.get("run_reason")},
@@ -579,6 +623,7 @@ def layer_manifest(root: Path, page: str, final_stack: dict, catalog: dict, matr
                             "without_run": sum(len(lines) for lines in (flags.get("without_run") or {}).values())}}
     states = {state: sum(1 for layer in layers if layer["state"] == state) for state in STATES}
     document = {"schema": LAYER_SCHEMA, "page": config["page"], "catalog": catalog_id, "commit": commit,
+                "evidence_checked_at": commit if tracked is not None and commit else "checkout",
                 "protocol": PROTOCOL, "producer": "scripts/final_stack.py (committed output and its --check flags)",
                 "definitions": {"conditions": [{"key": key, "label": label, "rule": rule} for key, label, rule in CONDITIONS],
                                 "states": [{"state": state, "rule": STATE_RULES[state]} for state in STATES]},
@@ -605,7 +650,7 @@ def layer_manifest(root: Path, page: str, final_stack: dict, catalog: dict, matr
     def nodes(spec_nodes, chips: bool):
         projected = []
         for node in spec_nodes:
-            present, absent = _present(root, node.get("evidence"))
+            present, absent = _present(root, node.get("evidence"), tracked)
             states_here = [layer_states[layer] for layer in node.get("layers", ()) if layer in layer_states]
             entry = {key: node.get(key) for key in ("id", "zone", "lane", "step", "name", "sub", "tool") if node.get(key) is not None}
             entry.update(layers=list(node.get("layers", ())), state=(min(states_here, key=STATES.index) if states_here and len(set(states_here)) == 1 else "non-terminal" if states_here else None),
@@ -631,12 +676,12 @@ def layer_manifest(root: Path, page: str, final_stack: dict, catalog: dict, matr
                             "edges": [{"from": a, "to": b, "label": label} for a, b, label in FLOW["edges"]], "focal_edge": list(FLOW["focal_edge"])}
         names = {node["id"]: node["name"] for node in FLOW["nodes"]}
         decisions = []
-        for ident, text, node, refs in DATA_DECISIONS:
-            present, absent = _present(root, refs)
-            decisions.append({"id": ident, "decision": text, "element": names.get(node, node), "recorded_in": DECISION_RECORD,
-                              "evidence_refs": present, "absent_refs": absent,
-                              "status": "repository evidence cited" if present else "no repository record at this commit"})
-        document["decisions"] = {"date": "2026-10-14", "record": DECISION_RECORD, "rows": decisions}
+        for ident, record, topic, text, node, refs in DATA_DECISIONS:
+            present, absent = _present(root, refs, tracked)
+            decisions.append({"id": ident, "topic": topic, "decision": text, "element": names.get(node, node) if node else None,
+                              "recorded_in": DECISION_RECORDS[record], "evidence_refs": present, "absent_refs": absent})
+        document["decisions"] = {"date": "2026-10-14", "records": list(DECISION_RECORDS.values()),
+                                 "citation": "private command-center records, cited by name; each row is a paraphrase", "rows": decisions}
         document["pending_study"] = dict(PENDING_STUDY)
     return document
 

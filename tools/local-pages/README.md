@@ -216,13 +216,16 @@ catalog. `build_layer_pages` in `architecture_builder.py` writes
 `catalogs/landscape/foundation.json`, with a deployment topology of what runs
 on the workstation) and `architecture-north-star.html` (the 12 layers of
 `catalogs/landscape/us-equities.json`, with a data-flow diagram, the
-2026-10-14 data-layer decisions cited by record name, and the pending
+2026-10-14 data-layer decisions paraphrased from the sealed command-center
+convergence record and its first addendum, both cited by name, and the pending
 pre-ranked feeds and overlap study with its readiness trigger). Each page has a
 machine-readable manifest beside it (`architecture-foundation-manifest.json`,
 `architecture-north-star-manifest.json`, schema
 `local-architecture-layer-manifest/1`) built by `architecture_manifest.layer_manifest`:
 one item per layer and winner with its repository, verdict and run pins,
-evidence files at the build commit, computed state and missing conditions.
+evidence files present in the build commit's tree (or in the checkout, recorded
+as `evidence_checked_at`, when that tree cannot be read), computed state and
+missing conditions.
 Verdicts, run pins and pin drift come from the committed
 `catalogs/landscape/final-stack.json`, read only through the dedicated
 `architecture_final_stack` role (both supplement globs still skip it); the
@@ -233,8 +236,11 @@ conditions and the terminal states follow
 where final_stack.py reports the layer current or converged and every winner
 meets all four conditions. These pages read committed repository records only,
 so `build_pages.py --layer-pages-only --output-dir DIR --receipt FILE` renders
-them without the state root; a full refresh renders them too and records their
-receipt under `architecture_layer_pages`.
+them without the state root. Without `--receipt` it writes
+`architecture/layer-pages-receipt.json` beside the refresh receipt and never
+the refresh receipt itself, which it also refuses as `--receipt`. A full refresh
+renders them too and records their receipt under `architecture_layer_pages`; if
+they fail, a missing page gets an UNREPORTED placeholder.
 
 Inventory rows use canonical winner component-ID and candidate repository
 joins, followed by the reviewed `architecture_mapping.json` for remaining
