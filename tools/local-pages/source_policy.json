@@ -2843,6 +2843,12 @@
         "path": "catalogs/landscape/component-evidence-matrix.json"
       }
     ],
+    "architecture_final_stack": [
+      {
+        "root": "repo",
+        "path": "catalogs/landscape/final-stack.json"
+      }
+    ],
     "architecture_registry": [
       {
         "root": "repo",
@@ -21536,7 +21542,7 @@
     {
       "root": "repo",
       "path": "catalogs/landscape/final-stack.json",
-      "reason": "A derived manifest reserved for the planned landscape.html (W4 PR 4); that consumer is not shipped by the W4 PR 2 generator. Architecture dated views would duplicate the source layer records."
+      "reason": "A derived manifest that would duplicate the source layer records as a supplement. Both supplement globs skip it; the Foundation and North-star layer pages read it only through the dedicated architecture_final_stack role."
     }
   ],
   "architecture_derivation_sources": [

@@ -467,7 +467,9 @@ class LocalPagesTests(unittest.TestCase):
         expected = hashlib.sha256(native.render(native.build(self.root, self.state, self.source_index))).hexdigest()
         self.assertEqual(receipt["native_readiness_manifest_sha256"], expected)
         self.assertEqual(json.loads(self.receipt.read_text()), receipt)
-        self.assertEqual(len(receipt["outputs"]), 8)
+        # The fixture root has no landscape catalogs, so both layer pages publish as UNREPORTED placeholders.
+        self.assertEqual(receipt["architecture_layer_pages"]["page_status"], {"architecture-foundation": "unreported placeholder", "architecture-north-star": "unreported placeholder"})
+        self.assertEqual(len(receipt["outputs"]), 10)
         for name in ("index", "readiness", "gaps", "roadmap", "fleet", "sources"):
             text = (self.output / (name + ".html")).read_text()
             audit = DocumentAudit()
@@ -553,7 +555,8 @@ class LocalPagesTests(unittest.TestCase):
                         return collector.collect(fallback, lambda *args, **kwargs: {"status": "success", "data": {"resultType": "matrix", "result": []}})
                     with patch.object(BUILDER, "collect_workstation", side_effect=observed):
                         result = self.refresh()
-                    self.assertEqual(len(result["outputs"]), 8)
+                    # Eight pages; the first refresh also writes the two layer-page placeholders, later ones keep them.
+                    self.assertEqual(len([name for name in result["outputs"] if not name.startswith("architecture-")]), 8)
                     self.assertNotIn(field, result["workstation"])
                     self.assertEqual(result["workstation"]["optional_total_status"][field]["status"], "UNKNOWN")
                     text = (self.output / "readiness.html").read_text()

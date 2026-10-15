@@ -68,3 +68,96 @@ The second pass found that the approved pending foreground `#996421` on the firs
 Long gap titles, milestone titles, source paths, and code identifiers can break at narrow widths instead of forcing page overflow. The system dark fallback is limited to screen media so a script-free preview still prints with the light palette. Gap filtering preserves control focus and uses a polite result-count announcement; an optional reset returns focus to search. No motion or card hover effects were added because they do not explain the evidence.
 
 The CSS expects a native first readiness gate section inside `.readiness-content .wrap`, gap rows inside `#gap-register`, and milestone dates, titles, and states with the retained class names. Source order remains the mobile reading order. Actual desktop/mobile screenshots, keyboard navigation, filter combinations, and persistence/blocked-storage behavior remain parent-lane verification gates.
+
+## Foundation and North-star pages
+
+The Architecture generator also writes two catalog pages, `architecture-foundation.html`
+and `architecture-north-star.html`. Their job is narrower than the stack overview: for
+each layer, show whether it is finalized under the layer resolution protocol, which of
+the four conditions is missing, and the repository files to proceed from. The audience
+is the next session that revisits a layer.
+
+**Tokens.** The palette above is unchanged. Met conditions use the measured token,
+missing ones the pending token, each with a shape (filled square, dashed ring) and a
+text label so no state is color alone. Computed states reuse the diagram glyphs: Final
+is the filled square, Not terminal the dashed ring, Scheduled the filled circle and
+Retired the dotted square. Each diagram keeps its single violet focus. Headings use the
+Architecture page's display serif, reading text the shared sans, and monospace only
+pins and paths.
+
+**Layout.** Left aligned, in source order: title and lede, one ruled count strip, the
+system diagram, the four-condition rail, the layer register, the drift flags, then the
+manifest and sources. The North-star page adds the data-layer decisions and the pending
+study after its diagram.
+
+```text
+title + lede (finalized n of N, commit)
+count strip: states as figures | four condition meters
+system diagram (topology or data flow) + text view
+conditions by layer: layer | verdict | run pin | E2E | invoke | state   <- the bold element
+register: per layer, winners x four conditions, missing, open gaps, overturn rule, files
+drift flags (final_stack.py --check) | manifest link + sources with SHA-256
+```
+
+**Review before implementation.** The first draft gave every layer a card and led with
+a large headline number. Cards would give 32 heterogeneous layers equal weight and hide
+the one thing that differs between them, the condition pattern. The rail replaces both:
+it is the gate rail this plan already uses for readiness, turned sideways, and it is the
+only place the page spends emphasis. The register uses ruled rows like the gap board.
+No uppercase eyebrows or middle-dot meta strings are added outside the diagrams, whose
+lane and zone labels follow diagram-design's eyebrow role.
+
+**Skills and checks.** frontend-design (the installed skill read for this plan, SKILL.md
+SHA-256 `d91970639e9f5c37682ac7ab60094d35f1c7c1f38d731bd56396563aee10c1d3`) shaped the
+plan and its review. diagram-design 2.6.73 (SKILL.md SHA-256
+`9cb173e6d30a9aa4af646f4eba4431ddb03dbbed23c041eaefdc13b1bf445826`; references
+type-deployment.md and type-data-flow.md) set the two figures: a zoned deployment at
+faithful detail with run-pin chips, and a four-lane, five-step data flow with one focal
+step, node and labelled handoff. Connectors are drawn only when an orthogonal segment
+clears every other node (§6 rules 1 and 5); the text view lists every connection. The
+dataviz skill bundled with Claude Code 2.1.300 set the count strip as stat figures and
+meters, not a chart. Its palette validator (`scripts/validate_palette.py`) passes the
+met and missing pair in light mode on the normal-vision floor (ΔE 15.8) and warns on
+protan separation (7.1); in dark mode the pair falls to ΔE 13.8 normal and 5.4 protan.
+The same run FAILs the validator's chroma floor in light mode: the approved light tokens
+are muted (OKLCH chroma 0.082 for `--ok` #246d55 and 0.105 for `--warn` #996421), so the
+met fill reads as a dark grey-green beside the other marks. The tokens stay unchanged.
+Every mark therefore carries its shape and label. Changing the approved status tokens is
+left to the critique pass.
+
+### Critique pass
+
+A second frontend-design pass reviewed both rendered pages against the brief and this
+plan. It fixed the following:
+
+- **Topology roles.** Nodes outside a foundation layer were labelled "no catalog layer",
+  although final-stack.json's index records OmniRoute as a trading-catalog alternate.
+  Running chips gave no sign that Grafana, Hindsight, DeerFlow and the OpenHands SDK are
+  alternates. Each chip now carries its index role: solid for a winner of a layer in the
+  page's catalog, dashed otherwise. The text view names the role and layer.
+- **Unrecorded flow nodes.** L0 raw log and K1 ranking have no repository record, yet
+  they looked like evidenced nodes. They are now dashed, with a legend entry. (The account
+  C node cites the agent-lane calculator policy spec from fix round 1 on.)
+- **Captions** mention only the marks a figure draws.
+- **Node sublabels** that were unverified ("ranked symbols", "data catalog", "shared by
+  lanes") now follow their cited sources.
+- **Header.** Three statements of the same count and a 40-character commit in body text
+  became one sentence, the four states in one row, and a 12-character commit.
+- **Strip headings.** The strip no longer adds two headings to the page outline.
+- **Condition definitions** were hover-only. They now sit as a visible key beside the
+  rail, numbered as the protocol numbers them. The rail sizes to its content.
+- **Register.** Layer-wide facts were repeated in every winner row (the invoke reason 21
+  times on one page), and two columns were both named "Run pin". The invoke reason is now
+  stated once per layer, and the winner table groups its columns under "Winner and pins"
+  and "FINAL conditions", with fixed widths that keep all four conditions in view.
+- **Commit.** A branch build cited its own head, which disappears after a squash merge. It
+  now cites the merge base with main when every record it read is byte-identical there.
+
+It left the following, with reasons:
+
+- **Dark-mode met and missing pair.** It stays below the dataviz normal-vision floor
+  because this plan's status tokens are shared by every local page; shape and label carry
+  the state.
+- **Diagram labels** keep diagram-design's uppercase eyebrow role for lanes and zones.
+- **Drift flags** stay verbatim final_stack.py output.
+- **Register length** follows from the brief's per-layer content.

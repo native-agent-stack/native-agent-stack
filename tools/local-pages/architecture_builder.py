@@ -9,13 +9,15 @@ from __future__ import annotations
 
 import argparse
 import copy
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 import hashlib
 import importlib.util
 import json
 import os
 from pathlib import Path
 import re
+import subprocess
+import sys
 from typing import Any
 
 
@@ -221,6 +223,146 @@ def build(root: Path, state_root: Path, output_dir: Path, receipt: Path,
               "outputs": {name: {"sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)} for name, raw in outputs.items()},
                 "limits": ["Published source records and metadata observations do not confer gate acceptance or fresh-session evidence.", "Catalog component/repository joins and the committed inventory mapping associate layers; remaining unmapped items carry their reason.", "Initial HTML defers closed component tables to generated layer pages, loaded only on expansion."]}
     pages.publish(output_dir, receipt, outputs, result, architecture_details=True)
+    return result
+
+
+FINAL_STACK_SCRIPT = ROOT / "scripts/final_stack.py"
+
+
+def _final_stack_flags(document: dict, today) -> dict:
+    """The report-only flags of `scripts/final_stack.py --check`, from the script's own flags() on the read document.
+
+    final_stack.py and the modules it imports add scripts/, tools/sota-convergence
+    and the repository root to sys.path; the caller's sys.path is restored afterwards.
+    """
+    saved = list(sys.path)
+    sys.path.insert(0, str(FINAL_STACK_SCRIPT.parent))
+    try:
+        spec = importlib.util.spec_from_file_location("local_architecture_final_stack", FINAL_STACK_SCRIPT)
+        if spec is None or spec.loader is None:
+            raise ImportError("final_stack.py unavailable")
+        module = importlib.util.module_from_spec(spec)
+        # final_stack.py declares a dataclass, which resolves its module through sys.modules.
+        sys.modules[spec.name] = module
+        try:
+            spec.loader.exec_module(module)
+            return module.flags(document, today)
+        finally:
+            sys.modules.pop(spec.name, None)
+    finally:
+        sys.path[:] = saved
+
+
+def _git(root: Path, *args: str) -> str | None:
+    try:
+        result = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True, timeout=10, check=False)
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    value = result.stdout.strip()
+    return value if result.returncode == 0 else None
+
+
+def _commit(root: Path, records: dict[str, bytes]) -> str | None:
+    """The main commit the cited repository paths belong to.
+
+    A branch commit disappears after a squash merge, so a branch build cites its
+    merge base with main, but only when every record it read is byte-identical
+    there (compared as Git blob ids). Otherwise, and on main itself, it cites the
+    checked-out commit; outside a Git checkout, None.
+    """
+    head = _git(root, "rev-parse", "HEAD")
+    if not head or not re.fullmatch(r"[0-9a-f]{40}", head):
+        return None
+    blobs = {relative: hashlib.sha1(b"blob " + str(len(raw)).encode() + b"\0" + raw).hexdigest() for relative, raw in records.items()}
+    for ref in ("origin/main", "main"):
+        base = _git(root, "merge-base", "HEAD", ref)
+        if base and re.fullmatch(r"[0-9a-f]{40}", base):
+            if all(_git(root, "rev-parse", f"{base}:{relative}") == blob for relative, blob in blobs.items()):
+                return base
+            break
+    return head
+
+
+def _tracked(root: Path, commit: str | None) -> frozenset | None:
+    """The file paths of `commit`'s tree, or None when the commit cannot be read."""
+    if not commit or not re.fullmatch(r"[0-9a-f]{40}", commit):
+        return None
+    listing = _git(root, "ls-tree", "-r", "--name-only", "-z", commit)
+    return frozenset(path for path in listing.split("\0") if path) if listing else None
+
+
+LEDE = {"foundation": "The {count} foundation layers, what runs on the workstation, and what each layer still needs before it is finalized.",
+        "us-equities": "The {count} trading layers, how the trading data flows, and what each layer still needs before it is finalized."}
+
+
+def _lede(catalog: str, count: int) -> str:
+    """The page lede, counting the layers the page renders."""
+    return LEDE[catalog].format(count=count)
+
+
+def build_layer_pages(root: Path, output_dir: Path, receipt: Path, *, state_root: Path | None = None,
+                      today: date | None = None, commit: str | None = None, generated: str | None = None) -> dict:
+    """Render the Foundation and North-star pages and their manifests from committed repository records only."""
+    pages = load("build_pages")
+    output_dir, receipt = pages.no_symlinks(output_dir), pages.no_symlinks(receipt)
+    if receipt.is_relative_to(output_dir):
+        raise ValueError("layer-page receipt must remain outside serving root")
+    reads = architecture_reads(root, state_root if state_root is not None else root / ".layer-pages-no-state")
+    manifest_module, view = load("architecture_manifest"), load("architecture_view")
+    policy_module, sanitizer = load("source_policy"), load("sanitization")
+    documents, captured, raws = {}, {}, {}
+    for name, relative, role in (("final_stack", manifest_module.FINAL_STACK, "architecture_final_stack"), ("matrix", manifest_module.MATRIX, "architecture_static"),
+                                 ("foundation", manifest_module.CATALOGS["foundation"], "architecture_catalog"), ("us-equities", manifest_module.CATALOGS["us-equities"], "architecture_catalog")):
+        raw, record = reads.read(role, root / relative, max_bytes=16 * 1024 * 1024)
+        document = pages.strict_json(raw)
+        if not isinstance(document, dict):
+            raise ValueError(relative + " must be a JSON object")
+        documents[name] = document
+        raws[relative] = raw
+        captured[name] = {"path": relative, "sha256": record["sha256"], "bytes": record["bytes"], "role": role}
+    generated = generated or datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    today = today or datetime.fromisoformat(generated.replace("Z", "+00:00")).date()
+    commit = commit or _commit(root, raws)
+    flags = _final_stack_flags(documents["final_stack"], today)
+    tracked = _tracked(root, commit)
+    style_raw = policy_module._read_regular(MANIFEST_STYLE, 1024 * 1024)
+    style = "\n  <style>\n" + style_raw.decode("utf-8") + "  </style>"
+    outputs, summaries = {}, {}
+    final_sha = captured["final_stack"]["sha256"]
+    for key, config in manifest_module.LAYER_PAGES.items():
+        catalog = config["catalog"]
+        sources = [captured["final_stack"], captured[catalog], captured["matrix"]]
+        manifest = manifest_module.layer_manifest(root, key, documents["final_stack"], documents[catalog], documents["matrix"],
+                                                  commit=commit, sources=sources, flags=flags, tracked=tracked)
+        manifest = sanitizer.sanitize(manifest)
+        manifest["page_file"] = {"html": config["page"] + ".html", "manifest": config["manifest"]}
+        manifest["generated_utc"] = generated
+        body, counts = view.render_layer_page(manifest)
+        expected = len([row for row in documents[catalog].get("layers", []) if isinstance(row, dict)])
+        if counts["rendered_layer_count"] != expected:
+            raise ValueError(f"{key} page renders {counts['rendered_layer_count']} layers; the catalog has {expected}")
+        scope = f"committed records at {commit or 'an unrecorded commit'}; final-stack.json checked_at {documents['final_stack'].get('checked_at')}"
+        lede = _lede(catalog, counts["rendered_layer_count"])
+        html = pages.document(config["page"], config["title"], lede, scope, body, generated, final_sha, [], head=style,
+                              digest_label="final-stack.json SHA-256")
+        manifest_raw = (json.dumps(manifest, indent=2, sort_keys=True, ensure_ascii=False, allow_nan=False) + "\n").encode("utf-8")
+        outputs[config["page"] + ".html"] = html
+        outputs[config["manifest"]] = manifest_raw
+        summaries[key] = {**counts, "page": config["page"] + ".html", "manifest": config["manifest"], "states": manifest["summary"]["states"],
+                          "conditions_met": manifest["summary"]["conditions_met"], "manifest_sha256": hashlib.sha256(manifest_raw).hexdigest()}
+    for name in ("site.css", "site.js"):
+        outputs["assets/" + name] = policy_module._read_regular(HERE / "assets" / name, 8 * 1024 * 1024)
+    builder_path = Path(__file__).resolve()
+    result = {"schema": "local-architecture-layer-pages/1", "generated_utc": generated, "commit": commit,
+              "builder": {"path": str(builder_path), "sha256": hashlib.sha256(policy_module._read_regular(builder_path, 8 * 1024 * 1024)).hexdigest()},
+              "manifest_schema": manifest_module.LAYER_SCHEMA, "pages": summaries, "sources": list(captured.values()),
+              "flags_today": flags.get("today"), "design": load("architecture_diagrams").DESIGN,
+              "style": {"path": str(MANIFEST_STYLE), "sha256": hashlib.sha256(style_raw).hexdigest()},
+              "source_policy": dict(reads.policy.receipt),
+              "outputs": {name: {"sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)} for name, raw in outputs.items()},
+              "limits": ["Pages project committed records; they establish no new E2E, invoke or verdict.",
+                         "The data-layer decisions are paraphrased and cited by record name; their text is not in this repository."]}
+    pages.publish(output_dir, receipt, outputs, result)
     return result
 
 

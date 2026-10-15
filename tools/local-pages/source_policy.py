@@ -28,6 +28,8 @@ import stat
 POLICY_PATH = Path(__file__).with_name("source_policy.json")
 MAX_POLICY_BYTES = 1_048_576
 MAX_SOURCE_BYTES = 8 * 1024 * 1024
+FINAL_STACK_ROLE = "architecture_final_stack"
+FINAL_STACK_PATH = "catalogs/landscape/final-stack.json"
 _BLOCKED = {"auth.json", "credentials.json", "credentials.toml", "credential.json",
             "client_secret.json", "client_secrets.json", "secrets.json", "settings.json",
             "config.toml", ".env", "environment.json", "environment.env"}
@@ -285,7 +287,12 @@ class ArchitectureReads:
         rows = self.policy.document.get("architecture_supplement_exclusions", [])
         if not isinstance(rows, list):
             raise SourcePolicyError("supplement exclusions must be an exact reviewed list")
-        granted = set().union(*self.allowed.values())
+        # The one dedicated role may grant exactly the derived final-stack manifest
+        # that the supplement globs exclude; no other role may overlap an exclusion.
+        final_stack = self.allowed.get(FINAL_STACK_ROLE)
+        if final_stack is not None and final_stack != {("repo", FINAL_STACK_PATH)}:
+            raise SourcePolicyError("final-stack role grants exactly catalogs/landscape/final-stack.json")
+        granted = set().union(*(paths for role, paths in self.allowed.items() if role != FINAL_STACK_ROLE))
         for row in rows:
             if not isinstance(row, dict) or set(row) != {"root", "path", "reason"} or row["root"] != "repo":
                 raise SourcePolicyError("supplement exclusion requires exactly a repo root, path and reason")

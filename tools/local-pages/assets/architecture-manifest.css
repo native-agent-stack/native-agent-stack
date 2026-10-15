@@ -111,6 +111,86 @@ body[data-page="architecture"] .page-header h1 { font-size: clamp(2.1rem, 4.2vw,
 .mf-arrowhead-focus { fill: var(--mf-focus); }
 .mf-step { fill: var(--surface); stroke: var(--rule); stroke-width: 1; }
 .mf-step.mf-focus { fill: var(--mf-focus-tint); stroke: var(--mf-focus); }
+.mf-art { fill: var(--mf-band); stroke: var(--muted); stroke-width: 1; }
+.mf-art.mf-art--other { fill: none; stroke: var(--mf-zone); stroke-dasharray: 3 3; }
+.mf-node.mf-unrecorded { stroke: var(--muted); stroke-dasharray: 5 4; }
+.mf-node.mf-focus.mf-unrecorded { stroke: var(--mf-focus); }
+.mf-g-none { fill: none; stroke: var(--muted); stroke-width: 1.2; }
+.mf-flow-link { fill: none; stroke: var(--link); stroke-width: 1.2; }
+.mf-arrowhead-link { fill: var(--link); }
+
+/* Foundation and North-star layer pages. One bold element: the four-condition
+   rail. Counts are stat figures and meters (dataviz), not charts. */
+body[data-page^="architecture-"] { --mf-display: "Iowan Old Style", "Sitka Heading", "Palatino Linotype", Palatino, "Book Antiqua", "Noto Serif", Georgia, serif; }
+body[data-page^="architecture-"] .page-header h1 { font-family: var(--mf-display); font-weight: 500; letter-spacing: -.01em; font-size: clamp(2.1rem, 4.2vw, 3.4rem); }
+body[data-page^="architecture-"] .mf-view > h2 { font-family: var(--mf-display); font-weight: 600; letter-spacing: -.01em; }
+.lp-quiet { font-size: .95rem; font-weight: 650; margin: 0 0 .4rem; color: var(--muted); }
+.lp-strip { margin: 1.25rem 0 1.75rem; padding: 1rem 0 .25rem; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.lp-verdict { margin: 0 0 .35rem; font-size: 1.2rem; font-weight: 650; }
+.lp-stats { display: flex; flex-wrap: wrap; gap: .25rem 1.75rem; margin: 0 0 .35rem; }
+.lp-stat { display: flex; align-items: baseline; gap: .45rem; }
+.lp-stat dt { display: flex; align-items: center; gap: .35rem; color: var(--muted); font-size: .9rem; }
+.lp-stat dd { margin: 0; font-weight: 650; }
+.lp-provenance { margin: 0 0 1rem; color: var(--muted); font-size: .875rem; overflow-wrap: anywhere; }
+.lp-n { display: inline-block; min-width: 1.1em; margin-right: .3rem; color: var(--muted); font-weight: 650; font-variant-numeric: tabular-nums; }
+.lp-key-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: .5rem 1.75rem; margin: .75rem 0 1rem; max-width: 72rem; }
+.lp-key-list > div { min-width: 0; padding-top: .35rem; border-top: 1px solid var(--rule); }
+.lp-key-list dt { font-weight: 650; }
+.lp-key-list dd { margin: .15rem 0 0; color: var(--muted); font-size: .875rem; line-height: 1.45; }
+.lp-meters { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: .5rem 2rem; margin: 0 0 .75rem; }
+.lp-meter dt { font-size: .9rem; font-weight: 650; }
+.lp-meter dd { margin: .2rem 0 0; display: grid; grid-template-columns: 4.5rem minmax(4rem, 1fr); align-items: center; gap: .6rem; }
+.lp-meter-value { font-variant-numeric: tabular-nums; color: var(--muted); font-size: .875rem; }
+.lp-meter-track { display: block; height: 8px; border-radius: 4px; background: var(--ok-bg); overflow: hidden; }
+.lp-meter-fill { display: block; height: 100%; min-width: 0; border-radius: 4px; background: var(--ok); }
+.lp-mark { display: inline-flex; align-items: center; gap: .3rem; white-space: nowrap; font-size: .85rem; }
+.lp-rail { width: fit-content; max-width: 100%; }
+.lp-rail table { font-size: .9rem; width: auto; min-width: 46rem; }
+.lp-rail th[scope="row"] { min-width: 14rem; font-weight: 600; }
+.lp-rail-head { width: 8.5rem; }
+.lp-rail-cell { border-left: 1px solid var(--surface); }
+.lp-rail-cell--met { background: var(--ok-bg); }
+.lp-rail-cell--missing { background: var(--warn-bg); }
+.lp-state-cell, .lp-state { display: flex; align-items: center; gap: .4rem; }
+.lp-state { margin: 0; font-weight: 650; }
+.lp-layer { margin-top: 2rem; padding-top: 1rem; border-top: 2px solid var(--rule); min-width: 0; scroll-margin-top: 1.5rem; }
+.lp-layer-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: .35rem 1.25rem; }
+.lp-layer-head h3 { margin: 0; font-size: 1.25rem; }
+.lp-key { margin: 0; color: var(--muted); }
+.lp-choice { max-width: 72ch; }
+.lp-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: .1rem 2rem; margin: .5rem 0 1rem; }
+.lp-facts > div { padding-block: .35rem; border-top: 1px solid var(--rule); min-width: 0; }
+.lp-facts dt { color: var(--muted); font-size: .85rem; }
+.lp-facts dd { margin: 0; overflow-wrap: anywhere; }
+.lp-missing-wrap h4 { margin: 0 0 .25rem; font-size: .95rem; }
+.lp-missing { margin: 0 0 1rem; padding-left: 1.2rem; max-width: 80ch; }
+/* Fixed columns keep all four conditions in view at desktop widths; narrower screens scroll the table. */
+.lp-layer .table-wrap table { font-size: .85rem; table-layout: fixed; width: 100%; min-width: 79rem; }
+.lp-layer td, .lp-layer th { vertical-align: top; overflow-wrap: break-word; }
+.lp-layer thead tr + tr th { white-space: nowrap; }
+.lp-layer .lp-col-1, .lp-layer .lp-col-2, .lp-layer .lp-col-5 { width: 9rem; }
+.lp-layer .lp-col-3 { width: 7.5rem; }
+.lp-layer .lp-col-4, .lp-layer .lp-col-6, .lp-layer .lp-col-9 { width: 6.5rem; }
+.lp-layer .lp-col-7 { width: 11rem; }
+.lp-layer .lp-col-8 { width: 14rem; }
+.lp-layer thead th[scope="colgroup"] { padding-block: .35rem; color: var(--muted); font-size: .8rem; font-weight: 650; }
+.lp-layer .lp-group-start, .lp-layer tbody td:nth-child(6) { border-left: 2px solid var(--rule); }
+.lp-layer td small { display: block; margin-top: .2rem; color: var(--muted); line-height: 1.4; }
+.lp-more { margin-top: .5rem; }
+.lp-more summary { cursor: pointer; padding-block: .3rem; font-weight: 600; }
+.lp-more summary:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.lp-more ol, .lp-more ul, .lp-more p { max-width: 80ch; }
+.lp-refs, .lp-flag-list { padding-left: 1.2rem; overflow-wrap: anywhere; }
+.lp-empty { color: var(--muted); }
+.lp-pending { padding: .25rem 0 0; }
+.lp-pending > h2 { border-left: 3px solid var(--warn); padding-left: .75rem; }
+.lp-sources { margin: 0 0 1rem; max-width: 80ch; }
+.lp-sources > div { padding-block: .45rem; border-top: 1px solid var(--rule); }
+.lp-sources dt, .lp-sources dd { margin: 0; overflow-wrap: anywhere; }
+.lp-sources dd { color: var(--muted); font-size: .875rem; }
+.lp-defs > div { margin-bottom: .5rem; }
+.lp-defs dt { font-weight: 650; }
+.lp-defs dd { margin: 0; color: var(--muted); max-width: 80ch; }
 
 @media print {
   .mf-v { display: none !important; }
