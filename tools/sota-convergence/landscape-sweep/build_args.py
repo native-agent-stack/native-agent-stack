@@ -343,7 +343,7 @@ def stage_lane_home(work: Path, *, model: str, base_url: str, host: str, profile
         "# supports_standalone_web_search (Codex config docs, config-advanced) and the standalone_web_search feature",
         "# turns it on (under development in 0.157.1); the lane's parity check must show it works through OmniRoute.",
         "# Held out (2026-10-15): the running gateway build has no api/v1/alpha route, so web.run falls to its catch-all",
-        "# 404 (co-op parity record ea5c38b7); both keys stay false, as in codex.omniroute.config.toml and the map.",
+        "# 404 (the co-op's parity record omniroute-web-search-parity-20261015.md); both keys stay false, as in codex.omniroute.config.toml and the map.",
         "# shell_snapshot is off: Codex's shell snapshot writes the exported environment, the provider key included,",
         "# to <CODEX_HOME>/shell_snapshots (codex-rs/shell-command/src/shell_snapshot_exports.rs at rust-v0.157.1).",
         f"# {OMNIROUTE_KEY_ENV} is filtered out of model-run commands: 0.157.1 skips its default *KEY*/*SECRET*/*TOKEN*",

@@ -670,7 +670,7 @@ class TemplateTests(unittest.TestCase):
         self.assertEqual(provider["env_key"], "OMNIROUTE_API_KEY")
         self.assertEqual(provider["wire_api"], "responses")
         self.assertIs(provider["requires_openai_auth"], False)
-        # Held out (2026-10-15): the 21128 build has no api/v1/alpha route (co-op parity record ea5c38b7), and the template
+        # Held out (2026-10-15): the 21128 build has no api/v1/alpha route (the co-op's parity record omniroute-web-search-parity-20261015.md), and the template
         # matches the client-config map (tests/test_omniroute_template_map_parity.py).
         self.assertIs(provider["supports_standalone_web_search"], False)
         self.assertNotIn("supports_websockets", provider)

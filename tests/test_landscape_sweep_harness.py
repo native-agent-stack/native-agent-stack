@@ -1456,7 +1456,7 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
         self.assertNotIn("supports_websockets = true", config)
         self.assertNotIn("http_headers", config)  # the 21128 default sends no provider headers
         # The key never reaches a shell snapshot file. Standalone web.run is held out through 21128 (2026-10-15: the running
-        # build has no api/v1/alpha route, co-op parity record ea5c38b7), matching the client-config map.
+        # build has no api/v1/alpha route, the co-op's parity record omniroute-web-search-parity-20261015.md), matching the client-config map.
         for line in ("[features]", "shell_snapshot = false", "standalone_web_search = false",
                      "supports_standalone_web_search = false"):
             self.assertIn(line, config)

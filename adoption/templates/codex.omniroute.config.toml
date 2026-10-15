@@ -52,8 +52,8 @@ env_key_instructions = "Export OMNIROUTE_API_KEY only in the shell that starts `
 wire_api = "responses"
 requires_openai_auth = false
 # Held out (2026-10-15, matching the client-config map and 2604's live profile): the running 21128 build (3.8.51,
-# 2a41147b7) has no api/v1/alpha route, so POST /v1/alpha/search falls to the catch-all 404 (co-op parity record
-# ea5c38b7). Reopen when a tagged OmniRoute release contains PR #13788.
+# 2a41147b7) has no api/v1/alpha route, so POST /v1/alpha/search falls to the catch-all 404 (the co-op's
+# parity record omniroute-web-search-parity-20261015.md). Reopen when a tagged OmniRoute release contains PR #13788.
 supports_standalone_web_search = false
 
 # Keeps the gateway key out of every command the model runs. The keyed `filters` table is the canonical form, and it

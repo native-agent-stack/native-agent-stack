@@ -5797,8 +5797,8 @@
     },
     {
       "path": "adoption/templates/codex.omniroute.config.toml",
-      "sha256": "7eac62c0e1d7fb23ff3f2c0086b24b93f9796d806a995adf1ade9529fd825803",
-      "bytes": 5863
+      "sha256": "18471a642e8196cd823fd4b7b737412df8ba834382606f2b90784df0b34a30c2",
+      "bytes": 5900
     },
     {
       "path": "adoption/templates/codex.stack-worker.config.toml",
@@ -18718,8 +18718,8 @@
     },
     {
       "path": "docs/decisions/2026-10-05-omniroute-gateway-composition.md",
-      "sha256": "b6f73d224d944418b9fa0162ae64d84272f873910078304e8c62a1b864c3b367",
-      "bytes": 92486
+      "sha256": "38325dfce6e94981a0e2c56e053fe288d2b61286237c9a9c4522eac3fc97d0c5",
+      "bytes": 92523
     },
     {
       "path": "docs/decisions/2026-10-05-overfitting-riskl-parity.md",
@@ -63008,8 +63008,8 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "e59407f98f7055ff32e98be5fdac96d312ae7c0d0fb2220e4f63ba7043da0f58",
-      "bytes": 193762
+      "sha256": "f3053609ca8bce85a05a934574f3fdf203850f748c7698570baffd4a8f1d57a0",
+      "bytes": 193799
     },
     {
       "path": "tests/test_codex_worker_skill.py",
@@ -63343,8 +63343,8 @@
     },
     {
       "path": "tests/test_landscape_sweep_harness.py",
-      "sha256": "9dc1ed7d003adcc50d348fa491709aa38c6c19c89f1f7f8ad9279a75dc7a8dc9",
-      "bytes": 392552
+      "sha256": "cdbeeab591da674ef31bc7ad0daeafa0a0671dccfd171b173afabeed05830e31",
+      "bytes": 392589
     },
     {
       "path": "tests/test_landscape_sweep_skills.py",
@@ -64773,8 +64773,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_args.py",
-      "sha256": "3ca15405ab9505e002337a508ff36cc6a59cbad52b0319ec350c8df44f5ef560",
-      "bytes": 51982
+      "sha256": "c9801b97bf384bd5b8e5c2c90892b1e66cd119dc42514459eb0c7349075f3dca",
+      "bytes": 52019
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_inputs.py",
