@@ -3711,14 +3711,50 @@
   },
   {
    "key": "claude:setting:idleCompaction",
-   "disposition": "declined",
-   "reason": "Default true at 2.1.300 (interactive, 1-hour TTL, 200K+ tokens, ~54 idle minutes); command center ruling 2026-10-14: leave unset, false per session only",
+   "disposition": "default-on",
+   "reason": "Default true at 2.1.300 (interactive, 1-hour TTL, 200K+ tokens, ~54 idle min); left unset per the 2026-10-06 leave-default record and the CC's 2026-10-14 ruling",
    "source": "https://code.claude.com/docs/en/settings-reference.md:2964-2983",
    "carrier": null,
    "value": null,
    "scope": "native setting; no override",
    "overturn": "A measured quality or cost loss from idle compaction on our sessions, or a release that changes its default or conditions.",
-   "reviewed_utc": "2026-10-15T11:39:24Z",
+   "reviewed_utc": "2026-10-15T16:53:16Z",
+   "version": "2.1.300"
+  },
+  {
+   "key": "claude:setting:disableArtifact",
+   "disposition": "not-applicable",
+   "reason": "Deprecated alias of enableArtifact, still honored as enableArtifact false; the host records that choice through enableArtifact, so this key is never set",
+   "source": "https://code.claude.com/docs/en/settings-reference.md:5354-5360",
+   "carrier": null,
+   "value": null,
+   "scope": null,
+   "overturn": "disableArtifact gains behavior of its own, or enableArtifact is removed.",
+   "reviewed_utc": "2026-10-15T16:53:16Z",
+   "version": "2.1.300"
+  },
+  {
+   "key": "claude:env:DISABLE_AUTO_COMPACT",
+   "disposition": "default-on",
+   "reason": "Unset, so automatic and idle compaction stay on as the context-compaction slot keeps them; 1 turns both off, for an explicit-/compact session only",
+   "source": "https://code.claude.com/docs/en/env-vars.md:450",
+   "carrier": null,
+   "value": null,
+   "scope": "native default; no override",
+   "overturn": "A measured quality or cost loss from automatic compaction on our sessions, or a release that changes what the variable turns off.",
+   "reviewed_utc": "2026-10-15T16:53:16Z",
+   "version": "2.1.300"
+  },
+  {
+   "key": "claude:env:CLAUDE_CODE_IDLE_COMPACT_MIN_TOKENS",
+   "disposition": "default-on",
+   "reason": "Unset, so idle compaction applies from its 200000-token default (floor 100000), which the context-compaction slot keeps",
+   "source": "https://code.claude.com/docs/en/env-vars.md:323",
+   "carrier": null,
+   "value": null,
+   "scope": "native default; no override",
+   "overturn": "Paired runs show another threshold keeps quality at a lower cost, or a release changes the default.",
+   "reviewed_utc": "2026-10-15T16:53:16Z",
    "version": "2.1.300"
   },
   {

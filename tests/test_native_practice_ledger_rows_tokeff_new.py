@@ -46,11 +46,29 @@ class LedgerRowsTokenEfficiencyAndNew(unittest.TestCase):
         self.assertIn("idle compaction (2.1.299", source["native_mechanism"])
 
     def test_the_idle_compaction_disposition_cites_the_2_1_300_docs(self):
+        """The host leaves the native default alone (docs/decisions/2026-10-06-harness-context-budget-refresh.md:25),
+        which the dispositions rules call default-on (the command center's FULL read of #1169 at bf06685a, P2-2)."""
         found = disposition("claude:setting:idleCompaction")
         self.assertNotIn("rollout", found["reason"])
-        self.assertIn("leave unset", found["reason"])
+        self.assertIn("left unset", found["reason"])
         self.assertEqual(found["source"], "https://code.claude.com/docs/en/settings-reference.md:2964-2983")
-        self.assertEqual((found["disposition"], found["carrier"], found["version"]), ("declined", None, "2.1.300"))
+        self.assertEqual((found["disposition"], found["carrier"], found["value"], found["version"]),
+                         ("default-on", None, None, "2.1.300"))
+
+    def test_the_compaction_and_artifact_neighbours_have_rows(self):
+        """The command center's FULL read of #1169 at bf06685a (P3): the deprecated artifact switch and the two
+        compaction variables are judged, not left to the baseline."""
+        expected = {
+            "claude:setting:disableArtifact": ("not-applicable", "https://code.claude.com/docs/en/settings-reference.md:5354-5360"),
+            "claude:env:DISABLE_AUTO_COMPACT": ("default-on", "https://code.claude.com/docs/en/env-vars.md:450"),
+            "claude:env:CLAUDE_CODE_IDLE_COMPACT_MIN_TOKENS": ("default-on", "https://code.claude.com/docs/en/env-vars.md:323"),
+        }
+        for key, (value, source) in expected.items():
+            with self.subTest(key=key):
+                found = disposition(key)
+                self.assertEqual((found["disposition"], found["source"], found["value"], found["version"]),
+                                 (value, source, None, "2.1.300"))
+                self.assertLessEqual(len(found["reason"]), 160)
 
     def test_enable_artifact_false_is_recorded_as_a_host_choice(self):
         found = disposition("claude:setting:enableArtifact")

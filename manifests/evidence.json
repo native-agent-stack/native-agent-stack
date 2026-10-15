@@ -5137,8 +5137,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "5b8113612089d00ab002df9436d961e3977c870c1e5a2981a3d5b9da0d81ca6d",
-      "bytes": 29332
+      "sha256": "283f9ee73d681877f25090f803de469d3bf74b50c6aaff22ef3c0d1f734bebc3",
+      "bytes": 29475
     },
     {
       "path": ".github/workflows/dependency-review.yml",
@@ -17513,8 +17513,8 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "45378341baa596c5e24a714ef942114a42cfedf5bec644c4f9910acca22f92d1",
-      "bytes": 191045
+      "sha256": "43cae953c5ad6d348bb25ad81202b585316b4eb7b4e49a66f9e591fd298a18e4",
+      "bytes": 192783
     },
     {
       "path": "catalogs/landscape/README.md",
@@ -63248,8 +63248,8 @@
     },
     {
       "path": "tests/test_catalog_freshness_propose.py",
-      "sha256": "ca504c2729618f2eb1c88a90c524368c4301090257a8c56a6726196938798ceb",
-      "bytes": 67282
+      "sha256": "d373182102b12644d00a98aa8d675c718f78e9240291067ea91c4ce2fd58555d",
+      "bytes": 69076
     },
     {
       "path": "tests/test_catalog_freshness_runtime.py",
@@ -63948,8 +63948,8 @@
     },
     {
       "path": "tests/test_native_practice_ledger_rows_tokeff_new.py",
-      "sha256": "d50cad137bf2deb8deb2a16cc909679d57bb13f49388684452e1c763a6008a8f",
-      "bytes": 5720
+      "sha256": "e69133ce3c7d4170b42bf3cefd2c788b82ec43a9e0c4fbbf573ee99d9025f9d7",
+      "bytes": 7036
     },
     {
       "path": "tests/test_native_practice_meter_windows.py",

@@ -446,7 +446,10 @@ jobs:
           # answered HTTP 200 to description updates over 262,144 bytes and kept the old description (probe of
           # 2026-10-11 on #991, read back with GET). $(...) drops trailing newlines on both sides; the description
           # #727 holds is byte-identical to the file this step writes for its lane (read 2026-10-15).
-          published="$(gh pr view automation/catalog-freshness --json body --jq '.body')"
+          if ! published="$(gh pr view automation/catalog-freshness --json body --jq '.body')"; then
+            echo "The published PR description could not be read back; the PR is not reported." >&2
+            exit 1
+          fi
           if [ "$published" != "$(cat "$body_file")" ]; then
             echo "The published PR description differs from $body_file; the PR is not reported." >&2
             exit 1
