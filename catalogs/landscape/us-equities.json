@@ -4360,6 +4360,38 @@
       "open_gaps": [
         "lanes disagreed: claude=loki,opentelemetry-collector-contrib,prometheus; codex=opentelemetry-collector-contrib,restic,sandbox-runtime; the counterbalanced adjudication did not agree (claude 2, codex 2, 0 refuted; evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-observability-hosting-20260922.json); an executed comparison must decide it"
       ],
+      "scheduled_comparison": {
+        "id": "w6-us-equities-observability-hosting-20261011",
+        "preregistration_ref": "evidence/artifacts/w6-observability-hosting-20261011/preregistration.json",
+        "prereg_sha256": "cd83fdb082cf729ef80996b3a53e17a221838955f2e67143ea6065a3666a772a",
+        "trigger": "Each subrole starts when its own named inputs exist. DISPLAY alone waits for landed live projection v1 including v1.1 and one immutable full-session spool capture; original backend/recovery triggers remain independent.",
+        "decision_rule": "Apply each preregistered role rule independently; a display result cannot qualify or retire backend/recovery. FINAL additionally requires the protocol's verdict, run-pin, upstream E2E and invoke/retirement evidence.",
+        "subroles": [
+          {
+            "id": "backend",
+            "preregistration_ref": "evidence/artifacts/w6-observability-hosting-20261011/preregistration.json",
+            "prereg_sha256": "cd83fdb082cf729ef80996b3a53e17a221838955f2e67143ea6065a3666a772a",
+            "trigger": "Original readiness_trigger/all_of: pinned supported source/image deployment and native E2E, adopted SigNoz driver, sealed fixture/measurement/alert/accessibility criteria, attributable native/private-runner receipts and isolated queued slot. Starts independently of DISPLAY.",
+            "decision_rule": "Original fixed_decision_rule: all mapped oracles in three repetitions; exact 10% elapsed/RSS advantage with opposing resource guard, otherwise co-qualification; neither qualifies retires only that role."
+          },
+          {
+            "id": "off_host_deletion_protection",
+            "preregistration_ref": "evidence/artifacts/w6-observability-hosting-20261011/preregistration.json",
+            "prereg_sha256": "cd83fdb082cf729ef80996b3a53e17a221838955f2e67143ea6065a3666a772a",
+            "trigger": "Original recovery_subrole and readiness inputs: independent persistent destination capability/principal separation, immutable-snapshot premise, pinned protected-arm and SFTP-control setup, and fresh-target live-state restore setup. Starts independently of DISPLAY.",
+            "decision_rule": "Original recovery_subrole/fixed_decision_rule: three repetitions of deletion refusal, isolation, TLS and fresh restore; SFTP destructive control must reproduce; co-qualify every passing protected mechanism without speed ranking."
+          },
+          {
+            "id": "display",
+            "preregistration_ref": "evidence/artifacts/w6-observability-hosting-20261011/DISPLAY-AMENDMENT-20261015.md",
+            "prereg_sha256": "00e5873ef0bca9fdd614ba83a28967c22d71c1656324fd7ed207417d69f34b4e",
+            "trigger": "Live projection v1 including v1.1 timestamp/row_id corrections is landed and an immutable spool capture covers one complete session.",
+            "decision_rule": "All mandatory correctness/coverage, per-run p95 <=5000 ms, readonly, licence and native screen/test gates pass three repetitions. With two qualifiers, select a twofold median-p95 advantage subject to <=10% RSS/CPU penalties; else fewer new services within <=10% latency/RSS/CPU guards; else >=10% lower RSS within <=10% latency/CPU guards; otherwise co-qualify. Apply in both directions with exact cross-products. One qualifier wins DISPLAY only; none retires only the attempted display solution."
+          }
+        ],
+        "readiness_audit_ref": "evidence/artifacts/w6-observability-hosting-20261011/display-readiness-20261015.json",
+        "decision_ref": "docs/decisions/2026-10-15-observability-display-preregistration.md"
+      },
       "checked_at": "2026-09-22",
       "verdict_overturn_when": ""
     },

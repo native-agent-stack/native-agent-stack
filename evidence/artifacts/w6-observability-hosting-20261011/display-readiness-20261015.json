@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "comparison_id": "w6-us-equities-observability-hosting-20261011",
+  "checked_at": "2026-10-15T00:08:13Z",
+  "evidence_class": "source_review",
+  "base_commit": "a339425ca56ec3fb87dff0fa8ad5dffc83354168",
+  "checked_scope": [
+    "evidence/artifacts/w6-observability-hosting-20261011",
+    "evidence/receipts",
+    "observability/backends",
+    "docs/w6-observability-hosting-delta-20261011.md",
+    "latest retained layer-verdict lane handoff and landing record"
+  ],
+  "subroles": [
+    {
+      "id": "backend",
+      "status": "not_ready_in_retained_evidence",
+      "overdue_established": false,
+      "trigger_ref": "evidence/artifacts/w6-observability-hosting-20261011/preregistration.json#/readiness_trigger",
+      "unmet_inputs": [
+        "supported complete Foundry deployment/source/image graph and SigNoz driver adoption",
+        "pinned upstream E2E and attributable native-usage/private-runner receipts",
+        "source/measurement-bound alert timing and sourced/measured accessibility pre-run amendment",
+        "sealed measurement invocation and isolated queued runner slot"
+      ],
+      "evidence": "The frozen preregistration and resolution-delta still identify these gaps. The bounded retained-receipt search returned those registrations, not a completion receipt. The latest retained landing record preserves the two pre-run gate conditions."
+    },
+    {
+      "id": "off_host_deletion_protection",
+      "status": "not_ready_in_retained_evidence",
+      "overdue_established": false,
+      "trigger_ref": "evidence/artifacts/w6-observability-hosting-20261011/preregistration.json#/recovery_subrole",
+      "unmet_inputs": [
+        "independent persistent destination capability/principal-separation receipt",
+        "immutable-snapshot exclusion premise or a reviewed amendment adding that mechanism",
+        "source-bound protected-arm/control deployment and fresh-target live-state restore setup"
+      ],
+      "evidence": "The recovery oracle requires an independent destination; retained records provide source review and fictional cases, not the required destination or execution receipts. restic/rest-server remains included."
+    },
+    {
+      "id": "display",
+      "status": "awaiting_projection_and_full_session_capture",
+      "overdue_established": false,
+      "trigger": "Live projection v1 including v1.1 corrections is landed, and its immutable spool capture covers one complete session.",
+      "evidence": "The supplied input states projection implementation is in progress. No landing-plus-complete-session input was supplied to this registration."
+    }
+  ],
+  "dispatch_rule": "Each subrole starts immediately when its own inputs exist. Any ready but unrun subrole is overdue and must be dispatched; DISPLAY cannot delay backend or recovery.",
+  "limitations": "This is a bounded retained-evidence audit, not a claim that no newer private receipt exists anywhere or a probe of operational account state. A newer receipt supersedes this status immediately.",
+  "original_preregistration_sha256": "cd83fdb082cf729ef80996b3a53e17a221838955f2e67143ea6065a3666a772a",
+  "original_fixture_sha256": "3a3750b19def868dd36aed6ab9e357a76a3896137fd93722b6ca95df5b2c4eca",
+  "original_resolution_delta_sha256": "c246560f1151d1ed836b1528499bfd8bb301c028e6f62ba5b63cafbebf91208a",
+  "comparison_runs_performed": 0,
+  "operational_actions_performed": 0
+}
