@@ -1,0 +1,48 @@
+{
+ "schema": "session-relaunch-sources/1",
+ "client": "Claude Code 2.1.301 (claude --version, 2026-10-15)",
+ "sources": [
+  {
+   "id": "agent-view-docs",
+   "url": "https://code.claude.com/docs/en/agent-view.md",
+   "read_at": "2026-10-15T20:05:17Z",
+   "sha256": "c8e2b81092b94b4b3ded2c86b40b8329e73b8f39b36acb3288bd56385bc83266",
+   "note": "the same bytes as the 2026-10-14 read in ../../session-relaunch-20261014/receipts/sources.json",
+   "lines": {
+    "766": "claude respawn <id>: Restart a session, running or stopped, for example to pick up an updated Claude Code binary. A session that has a saved conversation resumes it",
+    "817": "The supervisor ... Claude Code starts it the first time you background a session or open agent view",
+    "823": "Exited unexpectedly while the supervisor is running: the supervisor restarts the process.",
+    "884": "Shutting down or restarting your machine stops running background sessions.",
+    "886": "Within 48 hours, the session shows as failed. Attach or reply to it and it restarts from its saved conversation."
+   }
+  },
+  {
+   "id": "claude-daemon-help",
+   "command": "claude daemon --help",
+   "client": "2.1.301",
+   "line_12": "Service install is disabled in this version — the daemon runs on demand"
+  },
+  {
+   "id": "claude-respawn-help",
+   "command": "claude respawn --help",
+   "client": "2.1.301",
+   "lines_1_3": "Usage: claude respawn <id>|--all / Restart a background session (or all of them) so it picks up the current Claude binary."
+  },
+  {
+   "id": "changelog",
+   "repository": "anthropics/claude-code",
+   "commit": "03b5892ee77de289bcd5dfa39f541525ade74aff",
+   "path": "CHANGELOG.md",
+   "sha256": "0551b63e968529c0ddbff2010b89014f84f97c8117fd233c176f6392061f3979",
+   "lines": {
+    "794": "2.1.290: Fixed claude respawn re-sending an earlier message to a backgrounded session that has no saved transcript instead of starting it with an empty conversation",
+    "4147": "2.1.211: Fixed background agents killed by the user auto-respawning, and revived agents re-running stale prompts from old sessions"
+   }
+  },
+  {
+   "id": "host-install-v6",
+   "what": "#1116's applied host install v6 (apply.sh and MANUAL-INVERSE.md), applied on NativeStack2604 on 2026-10-15, and its simulation run_sim_v6.sh (v6 PASS 16 FAIL 0, v5 PASS 9 FAIL 7)",
+   "where": "a coordination record of cc-native-practice, cited by name and date (2026-10-15)"
+  }
+ ]
+}

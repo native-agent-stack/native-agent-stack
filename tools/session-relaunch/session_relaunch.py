@@ -10,13 +10,16 @@ Three subcommands, the first two run by systemd --user units (see units/ beside 
   relaunch      Once at boot: read the newest roster written in an earlier boot. When that boot ended without a planned-
                 restart marker and the roster was fresh at its end, write one handoff file and open a fresh Windows Terminal
                 tab per session that has a launcher profile, the command center first, through the command center's own
-                tab opener and launcher. Sessions without a profile are listed in the handoff for the command center. The
+                tab opener and launcher. A background session that has a profile is restarted on its own conversation
+                with the client's `claude respawn <id>`, but only when it has no process and its saved transcript
+                exists. Sessions without a profile are listed in the handoff for the command center. The
                 state file relaunch-<boot>.json records each run and each session's outcome; a rerun of an unfinished
                 relaunch reuses its handoff and opens only the sessions that are not running.
   plan-restart  Mark this boot's end as planned, so the restart's own relaunch path (the command center's) is the only one.
 
-Native background sessions do not cover this: after a shutdown they restart only when attached or replied to, and the
-supervisor's service install is disabled at 2.1.299 (README.md, Sources). The tool starts no model call of its own.
+Native background sessions do not cover this: after a shutdown they restart only when attached, replied to or respawned,
+and the supervisor's service install is disabled at 2.1.301 (README.md, Sources). The tool starts no model call of its
+own; a respawned background session resumes its saved conversation.
 """
 
 from __future__ import annotations
@@ -105,21 +108,24 @@ def load_config(path: Path) -> dict:
     config.setdefault("client_wait_s", 120)
     config.setdefault("poll_s", 5)
     config.setdefault("projects_dir", str(Path.home() / ".claude" / "projects"))
+    config.setdefault("systemd_run", "/usr/bin/systemd-run")
     return config
 
 
-def list_sessions(claude: str) -> list[dict] | None:
-    """The live sessions as `claude agents --json` prints them; None (plus a stderr line) when the client gave no list,
-    which is not the same as an empty list."""
+def list_sessions(claude: str, *, every: bool = False) -> list[dict] | None:
+    """The live sessions as `claude agents --json` prints them, or with every=True also the background sessions whose
+    process has exited (`--all`); None (plus a stderr line) when the client gave no list, which is not the same as an
+    empty list. A background row keeps its short `id` and its `state` for `claude respawn`."""
+    argv = [claude, "agents", "--json"] + (["--all"] if every else [])
     try:
-        done = subprocess.run([claude, "agents", "--json"], capture_output=True, text=True, timeout=60)
+        done = subprocess.run(argv, capture_output=True, text=True, timeout=60)
         rows = json.loads(done.stdout) if done.returncode == 0 else None
     except (OSError, subprocess.TimeoutExpired, ValueError):
         rows = None
     if not isinstance(rows, list):
-        print("session_relaunch: claude agents --json gave no session list", file=sys.stderr)
+        print(f"session_relaunch: claude agents --json{' --all' if every else ''} gave no session list", file=sys.stderr)
         return None
-    keep = ("name", "kind", "sessionId", "cwd", "pid", "startedAt", "status")
+    keep = ("name", "kind", "sessionId", "cwd", "pid", "startedAt", "status", "id", "state")
     return [{k: row.get(k) for k in keep} for row in rows if isinstance(row, dict)]
 
 
@@ -230,8 +236,10 @@ def transcript_path(config: dict, session_id: str) -> str:
 
 
 def handoff_text(config: dict, *, at: dt.datetime, prev: dict, prev_end: dt.datetime | None,
-                 this_start: dt.datetime | None, launch: list[tuple[dict, dict]], left: list[dict], alive: set[str]) -> str:
+                 this_start: dt.datetime | None, launch: list[tuple[dict, dict]], left: list[dict], alive: set[str],
+                 respawn: list[tuple[dict, dict]] = ()) -> str:
     cc = config["cc_session_name"]
+    profiled = {p["session_name"] for p in config["profiles"]}
     end = iso(prev_end) if prev_end else "unknown (no journal entry for that boot)"
     start = iso(this_start) if this_start else "unknown"
     lines = [
@@ -242,13 +250,24 @@ def handoff_text(config: dict, *, at: dt.datetime, prev: dict, prev_end: dt.date
         "  take over directly from your own last handoff and tracker.",
         "- The sessions in the table below start after you and send you READY by name.",
     ]
+    if respawn:
+        lines.append("- Background sessions with a profile are restarted on their own saved conversation with "
+                     "`claude respawn <id>`, only when they have no process and their saved transcript exists; the "
+                     "relaunch state records each one. One that is not respawned is yours: `claude attach <id>`.")
+        for row, _ in respawn:
+            lines.append(f"  - {row.get('name')} (background {row.get('id')}): cwd {row.get('cwd')}; "
+                         f"`claude attach {row.get('id')}`")
     if left:
-        launched = {row.get("name") for row, _ in launch}
-        lines.append("- Not relaunched (no launcher profile, or already running); your call:")
+        launched = {row.get("name") for row, _ in list(launch) + list(respawn)}
+        lines.append("- Not relaunched (no launcher profile, a kind this tool does not relaunch, or already running); "
+                     "your call:")
         for row in left:
-            why = ("already running" if row.get("name") in alive else
-                   "a second row of a name relaunched above" if row.get("name") in launched else "no launcher profile")
-            lines.append(f"  - {row.get('name')} ({row.get('kind')}, {why}): cwd {row.get('cwd')}; "
+            name = row.get("name")
+            why = ("already running" if name in alive else
+                   "a second row of a name relaunched above" if name in launched else
+                   "no launcher profile" if name not in profiled else
+                   f"kind {row.get('kind')}, which this tool does not relaunch")
+            lines.append(f"  - {name} ({row.get('kind')}, {why}): cwd {row.get('cwd')}; "
                          f"resume with `claude --resume {row.get('sessionId')}`")
     lines += [
         "",
@@ -380,6 +399,52 @@ def relaunch_one(config: dict, profile: dict, handoff: Path, entry: dict, save, 
     return "failed"
 
 
+BACKGROUND_SETTLED = ("running", "absent", "left: no background id", "left: no saved transcript")
+
+
+def respawn_one(config: dict, entry: dict, save) -> str:
+    """Restart one background session with the client's `claude respawn <id>` and return its outcome.
+
+    The client documents respawn as restarting a session, running or stopped, and resuming its saved conversation
+    (agent-view docs, "Manage sessions from the shell"). So it is called only for a row that `claude agents --json --all`
+    still lists with no process: a row with a process would be restarted mid-work. It is also called only when the
+    session's saved transcript exists: on 2026-10-15 at 2.1.301 a respawn of a failed row with no saved transcript
+    re-sent that row's dispatch prompt and ran it again (README.md, Background sessions). Each call is recorded in
+    flight before it is made; an unreadable list skips the row, and a rerun reads it again.
+
+    The call runs in its own transient scope (`systemd-run --user --scope`, systemd-run(1)): a respawn with no
+    supervisor running starts the client's on-demand supervisor as its child, and when the call comes from the boot
+    oneshot, the unit's exit kills everything left in its cgroup (KillMode=control-group, systemd.kill(5)), the
+    supervisor and the respawned session with it. Measured at 2.1.301 on 2026-10-15 (README.md, Background sessions)."""
+    if not entry.get("id"):
+        return "left: no background id"
+    rows = list_sessions(config["claude"], every=True)
+    if rows is None:
+        return "skipped"
+    match = [row for row in rows if row.get("id") == entry["id"]]
+    if not match:
+        return "absent"
+    if match[0].get("pid"):
+        return "running"
+    if transcript_path(config, entry.get("sessionId") or "") == "not found":
+        return "left: no saved transcript"
+    entry.setdefault("calls", []).append({"at": iso(now_utc()), "result": "in_flight"})
+    save()
+    try:
+        done = subprocess.run([config["systemd_run"], "--user", "--scope", "--quiet", "--", config["claude"], "respawn",
+                               entry["id"]], capture_output=True, text=True, timeout=config["tab_timeout_s"])
+        rc, result = done.returncode, "respawned" if done.returncode == 0 else "failed"
+    except subprocess.TimeoutExpired:
+        rc, result = None, "timeout"
+    except OSError:
+        rc, result = None, "failed"
+    entry["calls"][-1] = {"at": iso(now_utc()), "rc": rc, "result": result}
+    save()
+    if result == "failed":
+        return "failed"
+    return "running" if wait_for(config, entry["session_name"], config["settle_s"]) else "unconfirmed"
+
+
 def plan(config: dict, *, boot_id: str, at: dt.datetime, boots: list[dict], alive_rows: list[dict]) -> dict:
     """What a relaunch would do now; pure apart from reading the state directory."""
     prev = previous_roster(config, boot_id)
@@ -415,19 +480,20 @@ def plan(config: dict, *, boot_id: str, at: dt.datetime, boots: list[dict], aliv
     alive = {row.get("name") for row in alive_rows}
     cc = config["cc_session_name"]
     order = {p["session_name"]: i for i, p in enumerate(config["profiles"])}
-    launch, left, taken = [], [], set()
+    launch, respawn, left, taken = [], [], [], set()
     for row in prev.get("sessions") or []:
         name = row.get("name")
-        if name in profiles and name not in alive and name not in taken and row.get("kind") == "interactive":
-            launch.append((row, profiles[name]))
+        if name in profiles and name not in alive and name not in taken and row.get("kind") in ("interactive", "background"):
+            # an interactive session gets a fresh tab; a background one is respawned on its own conversation
+            (launch if row.get("kind") == "interactive" else respawn).append((row, profiles[name]))
             taken.add(name)  # one turn per name: a second row of the name is left to the command center
         else:
             left.append(row)
     launch.sort(key=lambda pair: (pair[0].get("name") != cc, order[pair[0].get("name")]))
-    if not launch and state is None:
+    if not launch and not respawn and state is None:
         return {"action": "none", "prev_boot": prev_boot, "reason": "no session of the roster needs a relaunch (no launcher profile, or already running)"}
     return {"action": "relaunch", "prev_boot": prev_boot, "prev": prev, "prev_end": prev_end, "this_start": this_start,
-            "launch": launch, "left": left, "alive": alive, "state": state}
+            "launch": launch, "respawn": respawn, "left": left, "alive": alive, "state": state}
 
 
 def refuse(reason: str, **fields) -> dict:
@@ -490,7 +556,7 @@ def locked_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[
     if state is None:
         text = handoff_text(config, at=at, prev=decided["prev"], prev_end=decided["prev_end"],
                             this_start=decided["this_start"], launch=decided["launch"], left=decided["left"],
-                            alive=decided["alive"])
+                            alive=decided["alive"], respawn=decided["respawn"])
     else:
         try:
             text = Path(state.get("handoff") or "").read_bytes().decode()
@@ -501,7 +567,8 @@ def locked_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[
                           prev_boot=decided["prev_boot"])
     if dry_run:
         print(f"DRY: would {'write' if state is None else 'reuse'} a handoff of {len(text.encode())} bytes and open tabs "
-              f"in this order: {', '.join(names) or 'none'}")
+              f"in this order: {', '.join(names) or 'none'}; background sessions to respawn when their saved transcript "
+              f"exists: {', '.join(row.get('name') for row, _ in decided['respawn']) or 'none'}")
         return {**decided, "handoff_text": text}
     prev_boot, alive = decided["prev_boot"], decided["alive"]
     if state is None:
@@ -545,6 +612,18 @@ def locked_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[
         if entry["outcome"] != "running" and unresolved(entry):
             entry["outcome"] = unresolved_outcome(entry)  # e.g. a reopen that was skipped before its call
         save()
+    # Background sessions after the tabs: each is respawned at most once per run, and only when it has no process.
+    background = state.setdefault("background", [])
+    known = {entry["session_name"]: entry for entry in background}
+    for row, _ in decided["respawn"]:
+        entry = known.get(row.get("name"))
+        if entry is None:
+            entry = {"session_name": row.get("name"), "id": row.get("id"), "sessionId": row.get("sessionId"), "calls": []}
+            background.append(entry)
+        if entry.get("outcome") in BACKGROUND_SETTLED:
+            continue
+        entry["outcome"] = respawn_one(config, entry, save)
+        save()
     # Completion rests on this final read: a session seen running earlier in the run (it registered) and missing now
     # has exited, so it is absent, and its tab start is resolved (seen listed), so a rerun opens it again without a
     # --reopen. An unreadable final list leaves the run partial; a rerun reads it again.
@@ -557,12 +636,16 @@ def locked_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[
             elif entry["outcome"] == "running":
                 entry["outcome"] = "absent"
                 entry["resolved_through"] = len(entry.get("attempts") or [])
-    complete = final is not None and all(entry["outcome"] == "running" for entry in sessions)
+        for entry in background:
+            if entry["session_name"] in live:
+                entry["outcome"] = "running"
+    complete = (final is not None and all(entry["outcome"] == "running" for entry in sessions)
+                and all(entry.get("outcome") in BACKGROUND_SETTLED for entry in background))
     state["status"] = "complete" if complete else "partial"
     state["runs"][-1]["ended_at"] = iso(now_utc())
     save()
     print(f"session_relaunch: handoff {handoff} (sha256 {state['handoff_sha256']}); {state['status']}: "
-          + ", ".join(f"{entry['session_name']} {entry['outcome']}" for entry in sessions))
+          + ", ".join(f"{entry['session_name']} {entry['outcome']}" for entry in sessions + background))
     return {**decided, "state": state}
 
 
