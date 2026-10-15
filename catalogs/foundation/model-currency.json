@@ -421,7 +421,11 @@
           "https://pypi.org/project/headroom-ai/0.40.0/",
           "https://huggingface.co/api/models/chopratejas/kompress-v2-base/tree/e00cc5e60ff73b01674ef8fa6da6c5acf6d54181/onnx?expand=true",
           "https://huggingface.co/api/models/chopratejas/kompress-v2-base/tree/b1563631b35bfdcee37587ad530147497d820d4c/onnx?expand=true",
-          "https://huggingface.co/models?author=chopratejas&search=kompress&sort=created"
+          "https://huggingface.co/models?author=chopratejas&search=kompress&sort=created",
+          "https://pypi.org/project/headroom-ai/0.41.0/",
+          "https://github.com/headroomlabs-ai/headroom/blob/v0.41.0/headroom/transforms/kompress_compressor.py#L47",
+          "https://github.com/headroomlabs-ai/headroom/blob/v0.41.0/headroom/onnx_runtime.py#L73-L79",
+          "https://github.com/headroomlabs-ai/headroom/blob/v0.40.0/headroom/onnx_runtime.py#L73-L79"
         ],
         "newer_candidates": [
           {
@@ -431,7 +435,7 @@
             "reason": "This newer repository revision preserves the exact selected int8-wo artifact: last modifying commit b1563631..., LFS SHA c47ddd76.... It is a metadata/card revision, not a new weight release. The packet finds no newer compatible two-input/final_scores export."
           }
         ],
-        "reason": "Read 2026-10-15: the current Kompress card names int8-wo as Headroom's default and prescribes ModernBERT tokenization. The bounded publisher search shows no newer Kompress family. Current and pinned ONNX tree metadata give this artifact the same LFS identity and last modifying commit b1563631; head e00cc5e6 is a newer repository revision, not a new selected-weight release. Preserve the held pin and runtime-extra qualification gate; no CPU execution or remote activation is claimed."
+        "reason": "Read 2026-10-15: the current Kompress card names int8-wo as Headroom's default and prescribes ModernBERT tokenization. The bounded publisher search shows no newer Kompress family. Current and pinned ONNX tree metadata give this artifact the same LFS identity and last modifying commit b1563631; head e00cc5e6 is a newer repository revision, not a new selected-weight release. Preserve the held pin and runtime-extra qualification gate; no CPU execution or remote activation is claimed. Headroom-ai 0.41.0 shipped 2026-10-14T23:03:59Z. Source review and an AST comparison of the actual 0.40.0/0.41.0 wheels confirm identical HF_MODEL_ID (kompress_compressor.py:47) and entire _PINNED_REVISIONS (onnx_runtime.py:73-79 for this pair). The Kompress and ModernBERT pins therefore remain valid KEEP/held choices; the stale packages row at 0.40.0 is an explicit follow-up, not the claimed newest package."
       }
     },
     {
@@ -455,10 +459,14 @@
         "sources": [
           "https://huggingface.co/answerdotai/ModernBERT-base/blob/8949b909ec900327062f0ebf497f51aef5e6f0c8/tokenizer_config.json",
           "https://huggingface.co/chopratejas/kompress-v2-base/blob/e00cc5e60ff73b01674ef8fa6da6c5acf6d54181/README.md",
-          "https://huggingface.co/answerdotai/ModernBERT-base/blob/8949b909ec900327062f0ebf497f51aef5e6f0c8/README.md"
+          "https://huggingface.co/answerdotai/ModernBERT-base/blob/8949b909ec900327062f0ebf497f51aef5e6f0c8/README.md",
+          "https://pypi.org/project/headroom-ai/0.41.0/",
+          "https://github.com/headroomlabs-ai/headroom/blob/v0.41.0/headroom/transforms/kompress_compressor.py#L47",
+          "https://github.com/headroomlabs-ai/headroom/blob/v0.41.0/headroom/onnx_runtime.py#L73-L79",
+          "https://github.com/headroomlabs-ai/headroom/blob/v0.40.0/headroom/onnx_runtime.py#L73-L79"
         ],
         "newer_candidates": [],
-        "reason": "Read 2026-10-15: ModernBERT-base's current main SHA remains the pinned tokenizer revision. Re-read its card and the current Kompress card, which explicitly pairs tokenizer.json with answerdotai/ModernBERT-base. This role is a checkpoint-specific tokenization contract, not an independent encoder contest. Retain the held pair pending a compatible upstream export/tokenizer or supported backend qualification; arbitrary newer tokenizer substitution does not demonstrate compatibility."
+        "reason": "Read 2026-10-15: ModernBERT-base's current main SHA remains the pinned tokenizer revision. Re-read its card and the current Kompress card, which explicitly pairs tokenizer.json with answerdotai/ModernBERT-base. This role is a checkpoint-specific tokenization contract, not an independent encoder contest. Retain the held pair pending a compatible upstream export/tokenizer or supported backend qualification; arbitrary newer tokenizer substitution does not demonstrate compatibility. Headroom-ai 0.41.0 shipped 2026-10-14T23:03:59Z. Source review and an AST comparison of the actual 0.40.0/0.41.0 wheels confirm identical HF_MODEL_ID (kompress_compressor.py:47) and entire _PINNED_REVISIONS (onnx_runtime.py:73-79 for this pair). The Kompress and ModernBERT pins therefore remain valid KEEP/held choices; the stale packages row at 0.40.0 is an explicit follow-up, not the claimed newest package."
       }
     },
     {
@@ -637,7 +645,9 @@
           "https://platform.claude.com/docs/en/about-claude/models/model-ids-and-versions",
           "https://www.anthropic.com/news/claude-haiku-4-5",
           "https://platform.claude.com/docs/en/models/haiku-5-5/overview",
-          "https://platform.claude.com/docs/en/release-notes/overview"
+          "https://platform.claude.com/docs/en/release-notes/overview",
+          "https://platform.claude.com/docs/en/about-claude/model-deprecations",
+          "https://platform.claude.com/docs/en/models/haiku-5-5/migration-guide"
         ],
         "newer_candidates": [
           {
@@ -647,9 +657,9 @@
             "reason": "Official specification lists this successor as Active (latest), released 2026-10-07. The availability overturn condition is met; queue background-slot migration/quality-cost review and authorized application rather than silently changing the pin."
           }
         ],
-        "reason": "Read 2026-10-15: Anthropic now lists Claude Haiku 5.5 as Active (latest), released 2026-10-07, with API ID claude-haiku-5-5 for latency-sensitive classification/extraction/routing. This supersedes the October 7 no-newer-Haiku claim and triggers the recorded Haiku-line overturn condition. Record the successor for normal background-slot migration/quality-cost review and authorized application. Haiku 4.5 remains pinned pending that review; it is not represented as the leading Haiku. No model call or silent configuration switch occurs."
+        "reason": "Read 2026-10-15: Anthropic now lists Claude Haiku 5.5 as Active (latest), released 2026-10-07, with API ID claude-haiku-5-5 for latency-sensitive classification/extraction/routing. This supersedes the October 7 no-newer-Haiku claim and triggers the recorded Haiku-line overturn condition. Record the successor for normal background-slot migration/quality-cost review and authorized application. Haiku 4.5 remains pinned pending that review; it is not represented as the leading Haiku. No model call or silent configuration switch occurs. The cited Haiku 4.5 page NOW labels it Active (legacy), gives retirement as not sooner than 2026-10-15, and directs migration to Haiku 5.5. Anthropic promises at least 60 days' notice before retirement of publicly released models; the floor is not a dated retirement announcement. Keeping the current pin is temporary migration staging, not an untriggered exception."
       },
-      "overturn": "Triggered by the 2026-10-15 source review: Haiku 5.5 is available. Complete normal background-slot migration/quality-cost review and authorized application; a later successor or failed slot comparison reopens the choice."
+      "overturn": "Triggered by the 2026-10-15 source review: Haiku 5.5 is available. Migration-review owner: command center (CC), which reviews and applies. Paired Haiku 4.5/5.5 check: api-actions runs Claude API slots through Claude Code headless using the routing-run paired-run practice and full harness on same-task background-role workloads; never a bare API call from a Codex lane. Tracking record: docs/decisions/2026-10-15-model-currency-landscape-check.md#haiku-background-migration-review. Readiness trigger: paired quality parity measured on the same tasks, plus cost and latency, plus CC review, before any authorized application. The October 7 newest-Haiku rule requires this review now; no silent pin switch."
     }
   ]
 }

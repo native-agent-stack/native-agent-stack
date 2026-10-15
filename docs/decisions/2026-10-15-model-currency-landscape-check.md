@@ -56,3 +56,72 @@ its role. Haiku 5.5's already-triggered migration review is outstanding. A separ
 age-triggered scheduled-refresh follow-up is queued only after this incident PR
 lands; existing proposer scheduling/reporting is a starting point, not evidence
 that checks are automatically reviewed or refreshed today.
+
+## Haiku correction regression receipt (2026-10-15)
+
+`tests.test_model_currency.ModelCurrencyTests.test_background_haiku_records_sourced_successor_and_triggered_review`
+loads the real inventory row offline. It asserts the official sourced Haiku 5.5
+candidate, exact candidate ID/revision, October 7 release observation, superseded
+no-newer claim and triggered review/authorized-application gate; it also preserves
+the distinction between detection and the unchanged in-use 4.5 pin.
+
+Fail-first uses the pre-correction Haiku judgment from `f691e5ce^` (empty
+candidates, no-newer rationale and untriggered overturn), substituted only for
+those semantic fields in the test's in-memory inventory read. Refreshed dates
+are retained. The inventory file, policy and clock are not modified. This
+specific semantic regression passes generic schema/date checks, which is why
+the new real-row test is needed. Per the review clarification, corrected
+`f691e5ce` bytes already pass the new assertion; no failure on those corrected
+bytes is claimed.
+
+```text
+Pre-correction judgment, refreshed dates retained:
+test_background_haiku_records_sourced_successor_and_triggered_review ... FAIL
+AssertionError: 'claude-haiku-5-5' not found in {}
+Ran 1 test in 0.002s
+FAILED (failures=1), rc1
+
+Corrected real inventory:
+python3 -m unittest tests.test_model_currency.ModelCurrencyTests.test_background_haiku_records_sourced_successor_and_triggered_review
+Ran 1 test in 0.001s
+OK, rc0
+
+python3 -m unittest tests.test_model_currency tests.test_model_currency_propose
+Ran 46 tests in 0.238s
+OK, rc0
+```
+
+## Haiku background migration review
+
+Review owner: **the CC, which reviews and applies**. Paired check: Haiku 4.5 vs
+5.5, run in api-actions on Claude API slots through Claude Code headless using
+the routing-run paired-run practice and full harness, on same-task background-role
+workloads. Never a bare API call from a Codex lane. This section is the tracking
+record. Readiness trigger: paired quality parity measured on the same tasks,
+plus cost and latency, plus CC review, before any apply. The October 7 enforcement record's
+newest-Haiku rule makes this review due now; it is not waiting for another release.
+No provider run or configuration change is claimed by this source-only incident PR.
+
+Read again October 15: the [4.5 specification](https://platform.claude.com/docs/en/models/haiku-4-5/overview)
+now says **Active (legacy)**, retirement **not sooner than October 15, 2026**, and
+links the migration to 5.5. The [deprecations policy](https://platform.claude.com/docs/en/about-claude/model-deprecations)
+promises **at least 60 days' notice** before retirement of publicly released models.
+A retirement floor on the read date is not an announced retirement date. The
+temporary unchanged 4.5 pin is migration staging, not a claim that the newest-line
+requirement is already satisfied by 4.5.
+
+## Headroom 0.41.0 release check
+
+[Headroom-ai 0.41.0](https://pypi.org/project/headroom-ai/0.41.0/) first shipped
+2026-10-14T23:03:59Z. Its [HF_MODEL_ID at line47](https://github.com/headroomlabs-ai/headroom/blob/v0.41.0/headroom/transforms/kompress_compressor.py#L47)
+and [Kompress/ModernBERT pin entries at lines73–79](https://github.com/headroomlabs-ai/headroom/blob/v0.41.0/headroom/onnx_runtime.py#L73-L79)
+are identical to [0.40.0's entries](https://github.com/headroomlabs-ai/headroom/blob/v0.40.0/headroom/onnx_runtime.py#L73-L79).
+An AST comparison of the actual downloaded Linux wheels confirms equality of
+HF_MODEL_ID and the entire _PINNED_REVISIONS mapping; no package code was executed
+or installed. Thus KEEP/held still holds for both model rows. The package row's
+0.40.0 selection remains a recorded follow-up, not a latest-package assertion.
+
+Upcoming currency exceptions first expire October22 (Fable/Astra) and October23
+(these nine rows, and the MinerU ONNX bundle's release-age transition). The
+separately reviewed check-age-triggered sweep must fire before October22, using
+the existing day-five refresh lead; its implementation follows this fix's landing.
