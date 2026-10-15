@@ -187,13 +187,19 @@ def load_at(root: Path, revision: str, *, git=None, historical: bool = False) ->
         for entry in listing.split(b"\0"):
             if not entry:
                 continue
-            metadata, path = entry.split(b"\t", 1)
-            mode, kind, _oid = metadata.split()
-            if mode not in (b"100644", b"100755") or kind != b"blob":
+            # Git ls-tree -z emits verbatim bytes. Parse each source independently
+            # so one malformed historical entry cannot erase valid siblings.
+            try:
+                metadata, path = entry.split(b"\t", 1)
+                mode, kind, _oid = metadata.split()
+                if mode not in (b"100644", b"100755") or kind != b"blob":
+                    raise ValueError("evidence record must be a regular Git blob")
+                source = path.decode("utf-8")
+            except ValueError as error:
                 if historical:
                     continue
-                raise ValueError("evidence record must be a regular Git blob")
-            sources.append(path.decode("utf-8"))
+                raise ValueError(f"invalid evidence record entry {entry!r}: {error}") from error
+            sources.append(source)
     return assemble(seed, sources, lambda path: git("show", revision + ":" + path), historical=historical)
 
 

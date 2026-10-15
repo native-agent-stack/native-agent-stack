@@ -47,7 +47,9 @@ Primary sources, accessed 2026-10-15:
 | [`git/git@67ad42147a7acc2af6074753ebd03d904476118f` (2.53.0), merge-tree](https://github.com/git/git/blob/67ad42147a7acc2af6074753ebd03d904476118f/Documentation/git-merge-tree.adoc#L24) | Native merges without changing index/worktree; exit 0 for clean and 1 for conflict (line 214). |
 | [Same Git pin, attributes](https://github.com/git/git/blob/67ad42147a7acc2af6074753ebd03d904476118f/Documentation/gitattributes.adoc#L1122) and [union implementation](https://github.com/git/git/blob/67ad42147a7acc2af6074753ebd03d904476118f/merge-ll.c#L149) | Union combines lines without JSON semantics; custom driver configuration is local Git configuration. |
 | [Same Git pin, object layout](https://github.com/git/git/blob/67ad42147a7acc2af6074753ebd03d904476118f/Documentation/gitrepository-layout.adoc#L55) | Lines 55–61 store digest-named files below a two-hex-character directory. The proposal adopts that fixed-depth layout for path identities. |
+| [Same Git pin, raw tree listing](https://github.com/git/git/blob/67ad42147a7acc2af6074753ebd03d904476118f/Documentation/git-ls-tree.adoc#L55) and [index input](https://github.com/git/git/blob/67ad42147a7acc2af6074753ebd03d904476118f/Documentation/git-update-index.adoc#L283) | `ls-tree -z` emits verbatim filenames with NUL termination (lines 130–133). `update-index --index-info -z` accepts native entry bytes, allowing a real committed invalid-UTF-8 filename in the regression. |
 | [`python/cpython@cbc944f4bc59639a444dd971c737788ba2283a91`, hashlib](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Doc/library/hashlib.rst#L40) | Lines 40–46 and 217–221 specify SHA-256 over bytes and hexadecimal output; record names use the UTF-8 artifact path. |
+| [Same CPython pin, bytes decoding](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Objects/bytesobject.c#L2439) | Lines 2439–2458 define strict UTF-8 decoding and `UnicodeDecodeError`. The reader retains strict decoding while isolating each historical entry's failure. |
 | [`native-agent-stack@bf665ec698f9121b4c8e075804c259c57fd4f7b8`, legacy registration filter](https://github.com/native-agent-stack/native-agent-stack/blob/bf665ec698f9121b4c8e075804c259c57fd4f7b8/scripts/validate.py#L747) and [loader diagnostics](https://github.com/native-agent-stack/native-agent-stack/blob/bf665ec698f9121b4c8e075804c259c57fd4f7b8/scripts/validate.py#L415) | Independently valid historical rows retain registration intent; malformed current input fails. The loader identifies the file that failed. These are the reference behaviors extended to fragments. |
 | [Same repository pin, explicit legacy-root contract](https://github.com/native-agent-stack/native-agent-stack/blob/bf665ec698f9121b4c8e075804c259c57fd4f7b8/scripts/evidence_manifest.py#L14) and [publication enumeration](https://github.com/native-agent-stack/native-agent-stack/blob/bf665ec698f9121b4c8e075804c259c57fd4f7b8/scripts/validate.py#L449) | The prototype does not activate the root. The production validator now rejects the marker and record-tree paths using its existing complete publication boundary. |
 | [`twisted/towncrier@f92fbf5180f70e797af62932a4346573023d4001`, README](https://github.com/twisted/towncrier/blob/f92fbf5180f70e797af62932a4346573023d4001/README.rst#L18) and [builder](https://github.com/twisted/towncrier/blob/f92fbf5180f70e797af62932a4346573023d4001/src/towncrier/_builder.py#L148) | Separate authored fragments avoid shared-file conflicts; discover, read and check identity before assembly. |
@@ -135,6 +137,26 @@ tests**, no skips, in **40.941 seconds**. Native advisory derivation remains
 snapshots remain unchanged. The commands, source pins and observations are
 retained in `registry-reference-probes.json`. The path digest selects only a
 record filename; it does not replace or recompute recorded artifact hashes.
+
+A subsequent native probe at `9badf2e609d910ebb50c860b4dbbc1ac1c1348c4`
+exposed a remaining failure before record assembly: one filename containing
+invalid UTF-8 bytes aborted the entire historical listing. The listing reader
+now handles tab separation, metadata splitting, regular-blob validation and
+UTF-8 decoding inside each entry's boundary. Historical reads skip only that
+entry; current reads refuse it and include the complete escaped byte entry in
+the error. Strict decoding is retained without replacement or ignored bytes.
+
+Two fail-first tests cover this correction. One uses native Git index plumbing
+to commit a valid `docs/keep.md` registration beside an invalid-UTF-8 fragment
+filename, then deletes both fragments while keeping the document. The missing
+registration must be refused, and restoring it passes. The second checks
+escaped current-mode diagnostics and sibling preservation for invalid UTF-8,
+a missing tab, incomplete metadata and a nonregular blob. At `9badf2e6` these
+produce **5 failing assertions/subtests in 2 tests** (exit 1, 0.547 seconds).
+After correction both pass (0.797 seconds). The additional receipt is recorded
+under `listing_fold` in `registry-reference-probes.json`. The broader suite
+passes **494 tests** without skips in **79.958 seconds**. Native advisory
+comparison remains at 359 sites with identical locations and shapes.
 
 The first evaluation CI run, **38755360119**, failed two OpenHands advisory
 baseline checks in `validate-shard-3` (job **116492228275**). Both failures were

@@ -127,5 +127,64 @@
       }
     ],
     "accessed": "2026-10-15"
+  },
+  "listing_fold": {
+    "date": "2026-10-15",
+    "source_revision_before": "9badf2e609d910ebb50c860b4dbbc1ac1c1348c4",
+    "scope": "Per-entry listing boundary: tab separation, metadata split, regular Git blob check and strict UTF-8 decode. Historical mode skips only the invalid entry; current mode refuses it and names the complete escaped bytes.",
+    "red_command": "python3 -m unittest tests.test_evidence_manifest.EvidenceRegistrationMergeTests.test_non_utf8_fragment_filename_cannot_erase_sibling_registration_history tests.test_evidence_manifest.EvidenceRegistrationMergeTests.test_current_git_listing_errors_name_escaped_entry_bytes_and_history_keeps_siblings -q",
+    "red_source": "Only the two regression tests and their binary Git fixture helper were added to the reviewed implementation for RED.",
+    "red_exit": 1,
+    "red_tests": 2,
+    "red_failures_including_subtests": 5,
+    "red_seconds": 0.547,
+    "red_observations": [
+      "The real Git tree contained a non-UTF-8 fragment filename beside the valid docs/keep.md record; deleting both fragments while retaining the document was incorrectly accepted.",
+      "Current-mode errors for invalid UTF-8, a missing tab, incomplete metadata and a nonregular blob did not contain the complete escaped entry bytes."
+    ],
+    "green_command": "python3 -m unittest tests.test_evidence_manifest.EvidenceRegistrationMergeTests.test_non_utf8_fragment_filename_cannot_erase_sibling_registration_history tests.test_evidence_manifest.EvidenceRegistrationMergeTests.test_current_git_listing_errors_name_escaped_entry_bytes_and_history_keeps_siblings -q",
+    "green_exit": 0,
+    "green_tests": 2,
+    "green_skips": 0,
+    "green_seconds": 0.797,
+    "green_observations": [
+      "The missing valid registration is refused; restoring it passes. Current registration validation rejects the malformed tree.",
+      "Current load_at errors include repr(entry); historical load_at preserves the independently valid seed and document records for all four malformed-entry cases."
+    ],
+    "broader_green_command": "python3 -m unittest tests.test_evidence_manifest tests.test_registry_rows tests.test_host_receipts tests.test_validate tests.test_verdict_review_gate -q",
+    "broader_green_exit": 0,
+    "broader_green_tests": 494,
+    "broader_green_skips": 0,
+    "broader_green_seconds": 79.958,
+    "native_monitoring_comparison": {
+      "method": "Native derive_ci_protected on GitTree at source_revision_before and a candidate overlay of the two changed source/test files.",
+      "before_count": 359,
+      "after_count": 359,
+      "locations_and_shapes_identical": true
+    },
+    "mechanism_sources": [
+      {
+        "repository": "git/git",
+        "pin": "67ad42147a7acc2af6074753ebd03d904476118f",
+        "path": "Documentation/git-ls-tree.adoc",
+        "lines": "55-57,113-120,130-133",
+        "mechanism": "Native metadata/tab/path output and verbatim NUL-terminated filename bytes."
+      },
+      {
+        "repository": "git/git",
+        "pin": "67ad42147a7acc2af6074753ebd03d904476118f",
+        "path": "Documentation/git-update-index.adoc",
+        "lines": "83-84,184-186,283-299",
+        "mechanism": "The regression constructs the actual malformed-filename Git tree with supported binary index input."
+      },
+      {
+        "repository": "python/cpython",
+        "pin": "cbc944f4bc59639a444dd971c737788ba2283a91",
+        "path": "Objects/bytesobject.c",
+        "lines": "2439-2458",
+        "mechanism": "bytes.decode defaults to strict UTF-8 and raises UnicodeDecodeError; no replacement or ignored bytes."
+      }
+    ],
+    "accessed": "2026-10-15"
   }
 }

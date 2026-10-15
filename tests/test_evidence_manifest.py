@@ -116,6 +116,10 @@ class EvidenceRegistrationMergeTests(unittest.TestCase):
         self.git("commit", "--quiet", "-m", message)
         return self.git("rev-parse", "HEAD").stdout.strip()
 
+    def git_bytes(self, *args, stdin=None):
+        return subprocess.run(["git", *args], cwd=self.root, env=self.env, input=stdin,
+                              capture_output=True, check=True, timeout=15).stdout
+
     def registration_branch(self, branch, path, raw):
         self.git("checkout", "--quiet", "-b", branch, self.base)
         (self.root / path).write_bytes(raw)
@@ -321,6 +325,58 @@ class EvidenceRegistrationMergeTests(unittest.TestCase):
                     diagnostic = "manifests/evidence-files/.*legacy"
                 with self.assertRaisesRegex(InvalidPublication, diagnostic):
                     validate_publication(fixture.root)
+
+    def test_non_utf8_fragment_filename_cannot_erase_sibling_registration_history(self):
+        (self.root / "docs").mkdir()
+        (self.root / "docs/keep.md").write_text("keep the valid registration\n")
+        register_file(self.root, "docs/keep.md")
+        self.git("add", "--all")
+        # Git 2.53.0 update-index --index-info/-z accepts raw path bytes. This
+        # commits the actual offending tree without filesystem encoding limits.
+        blob = self.git_bytes("hash-object", "-w", "--stdin", stdin=b"{}\n").strip()
+        bad_name = em.RECORDS.encode("ascii") + b"/\xff.json"
+        bad_entry = b"100644 blob " + blob + b"\t" + bad_name
+        self.git_bytes("update-index", "-z", "--index-info", stdin=bad_entry + b"\0")
+        self.git("commit", "--quiet", "-m", "valid registration beside non-UTF-8 fragment name")
+        bad_head = self.git("rev-parse", "HEAD").stdout.strip()
+        self.assertIn(bad_entry, self.git_bytes("ls-tree", "-r", "-z", bad_head,
+                                              "--", em.RECORDS).split(b"\0"))
+        with self.assertRaises(ValueError):
+            em.load_at(self.root, bad_head)
+        with self.assertRaisesRegex(InvalidPublication, "invalid current registration manifest"):
+            validate_registration_rows(self.root, self.base, record_fragments=True)
+        (self.root / em.record_path("docs/keep.md")).unlink()
+        # add --all removes both missing fragments; the document stays tracked.
+        self.commit("remove both fragments but retain the valid document")
+        with self.assertRaisesRegex(InvalidPublication, "docs/keep.md: required registration row missing"):
+            validate_registration_rows(self.root, self.base, before_ref=bad_head, record_fragments=True)
+        register_file(self.root, "docs/keep.md")
+        self.commit("restore the independently valid registration")
+        validate_registration_rows(self.root, self.base, before_ref=bad_head, record_fragments=True)
+
+    def test_current_git_listing_errors_name_escaped_entry_bytes_and_history_keeps_siblings(self):
+        (self.root / "docs").mkdir()
+        self.registration_branch("registered", "docs/keep.md", b"keep the valid registration\n")
+        oid = b"0" * 40
+        prefix = em.RECORDS.encode("ascii") + b"/"
+        bad_entries = (
+            b"100644 blob " + oid + b"\t" + prefix + b"\xff.json",
+            b"100644 blob " + oid + b" " + prefix + b"missing-tab.json",
+            b"100644 blob\t" + prefix + b"missing-object-id.json",
+            b"120000 blob " + oid + b"\t" + prefix + b"symlink.json",
+        )
+        for bad_entry in bad_entries:
+            with self.subTest(entry=bad_entry):
+                def git(*args):
+                    raw = self.git_bytes(*args)
+                    return raw + bad_entry + b"\0" if args[0] == "ls-tree" else raw
+
+                with self.assertRaises(ValueError) as raised:
+                    em.load_at(self.root, "HEAD", git=git)
+                self.assertIn(repr(bad_entry), str(raised.exception))
+                historical = em.load_at(self.root, "HEAD", git=git, historical=True)
+                self.assertEqual({row["path"] for row in historical["files"]},
+                                 {"evidence/seed.txt", "docs/keep.md"})
 
 
 if __name__ == "__main__":

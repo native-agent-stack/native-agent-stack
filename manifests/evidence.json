@@ -19288,8 +19288,8 @@
     },
     {
       "path": "docs/decisions/2026-10-15-github-merge-queue-evaluation.md",
-      "sha256": "480d5ea97a90ec9806f6e17db93d5ffdc62f0717a4332f4bafe812eb7dd310ee",
-      "bytes": 38293
+      "sha256": "65a0d803a784cad120a6cbb4127cd35defd1da28d1044d274fb18b7ef59df4a1",
+      "bytes": 40462
     },
     {
       "path": "docs/decisions/2026-10-15-jev-trading-harness-build.md",
@@ -41393,8 +41393,8 @@
     },
     {
       "path": "evidence/artifacts/merge-queue-evaluation-20261015/registry-reference-probes.json",
-      "sha256": "21535b3340b3cd4f241097009d038666e7a77ff695716aa4e90e48e77704c7ec",
-      "bytes": 8555
+      "sha256": "c2c7ced60d940dbeeca2987b8b6558b8aa122c314596a05dc128f94d2c26270f",
+      "bytes": 12208
     },
     {
       "path": "evidence/artifacts/model-currency-enforcement-20261007/checks.json",
@@ -62433,8 +62433,8 @@
     },
     {
       "path": "scripts/evidence_manifest.py",
-      "sha256": "1661b0537a6857ccaef914d07c319e1ea0d940861c4222c87d041d196f6f1d56",
-      "bytes": 11973
+      "sha256": "c3090fc067108af221556d57adb97c2a7e1b37437258df4bfca8818ad673257d",
+      "bytes": 12335
     },
     {
       "path": "scripts/final_stack.py",
@@ -63503,8 +63503,8 @@
     },
     {
       "path": "tests/test_evidence_manifest.py",
-      "sha256": "f16c4efa0787bf76444181aa22d88e86267e9f3624ac85818ac7bf6fc20af948",
-      "bytes": 18463
+      "sha256": "f6f92d74fa45e6db477aebcf0ee3bece73696cc4fab7daf7500a9047bbeab14c",
+      "bytes": 21958
     },
     {
       "path": "tests/test_execution_realism.py",
