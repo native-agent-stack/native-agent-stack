@@ -1,0 +1,3324 @@
+[
+  {
+    "candidate": {
+      "repository": "https://github.com/abhigyanpatwari/gitnexus",
+      "ids": [
+        "gitnexus"
+      ]
+    },
+    "pin": {
+      "commit": "c4ecf398de637cf779ab2238e69958cfd5d601ce",
+      "tag": "v1.6.12",
+      "read_at": "2026-10-15",
+      "note": "Source pin only; not an installed-version or measured-run receipt."
+    },
+    "family": "research",
+    "layer": "code-navigation",
+    "evidence_class": "source_review",
+    "family_independent_facts_ref": "README-context.md#facts-abhigyanpatwari-gitnexus",
+    "requirements_result": [
+      {
+        "id": "exact-source",
+        "result": "PASS",
+        "reason": "The context/query tools and their CLI equivalents return bounded code/symbol context from the indexed repository. Original source remains the correctness reference.",
+        "citations": [
+          {
+            "repository": "https://github.com/abhigyanpatwari/gitnexus",
+            "commit": "c4ecf398de637cf779ab2238e69958cfd5d601ce",
+            "path": "README.md",
+            "lines": [
+              162,
+              184
+            ],
+            "url": "https://github.com/abhigyanpatwari/gitnexus/blob/c4ecf398de637cf779ab2238e69958cfd5d601ce/README.md#L162"
+          }
+        ]
+      },
+      {
+        "id": "references",
+        "result": "PASS",
+        "reason": "Context categorizes references; trace follows directed call/member paths and impact exposes affected paths. Static completeness is not asserted.",
+        "citations": [
+          {
+            "repository": "https://github.com/abhigyanpatwari/gitnexus",
+            "commit": "c4ecf398de637cf779ab2238e69958cfd5d601ce",
+            "path": "README.md",
+            "lines": [
+              162,
+              184
+            ],
+            "url": "https://github.com/abhigyanpatwari/gitnexus/blob/c4ecf398de637cf779ab2238e69958cfd5d601ce/README.md#L162"
+          }
+        ]
+      },
+      {
+        "id": "question-scoping",
+        "result": "PASS",
+        "reason": "Per-repository/branch selection and maxTokens bound a question; known-source reads can remain cheaper than indexing.",
+        "citations": [
+          {
+            "repository": "https://github.com/abhigyanpatwari/gitnexus",
+            "commit": "c4ecf398de637cf779ab2238e69958cfd5d601ce",
+            "path": "README.md",
+            "lines": [
+              184,
+              184
+            ],
+            "url": "https://github.com/abhigyanpatwari/gitnexus/blob/c4ecf398de637cf779ab2238e69958cfd5d601ce/README.md#L184"
+          }
+        ]
+      },
+      {
+        "id": "maintenance",
+        "result": "PASS",
+        "reason": "Not archived; the supplied primary-source receipt has a default-branch commit within the fixed 90-day window. This proves activity, not all engineering quality angles.",
+        "citations": [
+          {
+            "url": "https://api.github.com/repos/abhigyanpatwari/gitnexus",
+            "read_at": "2026-10-15T20:03Z",
+            "source": "gh-facts-20261015T2003Z.json or the documented anonymous correction read"
+          },
+          {
+            "url": "https://api.github.com/repos/abhigyanpatwari/gitnexus/commits?per_page=1",
+            "read_at": "2026-10-15T20:03Z",
+            "source": "gh-facts-20261015T2003Z.json or the documented anonymous correction read"
+          }
+        ]
+      },
+      {
+        "id": "linux-wsl2-x86_64",
+        "result": "UNKNOWN",
+        "reason": "The source documents native grammar/embedding build and platform fallbacks, but the exact complete Linux x86_64/macOS arm64 dependency set for this release was not established. Do not equate a Node CLI with all native grammar support.",
+        "citations": [
+          {
+            "repository": "https://github.com/abhigyanpatwari/gitnexus",
+            "commit": "c4ecf398de637cf779ab2238e69958cfd5d601ce",
+            "path": "README.md",
+            "lines": [
+              63,
+              77
+            ],
+            "url": "https://github.com/abhigyanpatwari/gitnexus/blob/c4ecf398de637cf779ab2238e69958cfd5d601ce/README.md#L63"
+          }
+        ]
+      },
+      {
+        "id": "macos-arm64",
+        "result": "UNKNOWN",
+        "reason": "The source documents native grammar/embedding build and platform fallbacks, but the exact complete Linux x86_64/macOS arm64 dependency set for this release was not established. Do not equate a Node CLI with all native grammar support.",
+        "citations": [
+          {
+            "repository": "https://github.com/abhigyanpatwari/gitnexus",
+            "commit": "c4ecf398de637cf779ab2238e69958cfd5d601ce",
+            "path": "README.md",
+            "lines": [
+              63,
+              77
+            ],
+            "url": "https://github.com/abhigyanpatwari/gitnexus/blob/c4ecf398de637cf779ab2238e69958cfd5d601ce/README.md#L63"
+          }
+        ]
+      },
+      {
+        "id": "headless",
+        "result": "PASS",
+        "reason": "The CLI mirrors query/context/impact/trace/cypher/check without a model call. Analysis has an index-only path.",
+        "citations": [
+          {
+            "repository": "https://github.com/abhigyanpatwari/gitnexus",
+            "commit": "c4ecf398de637cf779ab2238e69958cfd5d601ce",
+            "path": "README.md",
+            "lines": [
+              375,
+              451
+            ],
+            "url": "https://github.com/abhigyanpatwari/gitnexus/blob/c4ecf398de637cf779ab2238e69958cfd5d601ce/README.md#L375"
+          }
+        ]
+      },
+      {
+        "id": "profile-or-project-scoping",
+        "result": "PASS",
+        "reason": "Repository-specific analysis and --index-only suppress context/skill generation at the source boundary. No automatic global setup is selected.",
+        "citations": [
+          {
+            "repository": "https://github.com/abhigyanpatwari/gitnexus",
+            "commit": "c4ecf398de637cf779ab2238e69958cfd5d601ce",
+            "path": "gitnexus/src/cli/analyze.ts",
+            "lines": [
+              1340,
+              1359
+            ],
+            "url": "https://github.com/abhigyanpatwari/gitnexus/blob/c4ecf398de637cf779ab2238e69958cfd5d601ce/gitnexus/src/cli/analyze.ts#L1340"
+          }
+        ]
+      },
+      {
+        "id": "family-route",
+        "result": "PASS",
+        "reason": "DeerFlow's admitted shell/sandbox can invoke this CLI when installed inside that sandbox. GPT Researcher has no direct CLI-adapter claim in this row.",
+        "citations": [
+          {
+            "repository": "https://github.com/abhigyanpatwari/gitnexus",
+            "commit": "c4ecf398de637cf779ab2238e69958cfd5d601ce",
+            "path": "README.md",
+            "lines": [
+              50,
+              75
+            ],
+            "url": "https://github.com/abhigyanpatwari/gitnexus/blob/c4ecf398de637cf779ab2238e69958cfd5d601ce/README.md#L50"
+          },
+          {
+            "repository": "https://github.com/abhigyanpatwari/gitnexus",
+            "commit": "c4ecf398de637cf779ab2238e69958cfd5d601ce",
+            "path": "README.md",
+            "lines": [
+              375,
+              451
+            ],
+            "url": "https://github.com/abhigyanpatwari/gitnexus/blob/c4ecf398de637cf779ab2238e69958cfd5d601ce/README.md#L375"
+          },
+          {
+            "repository": "https://github.com/abhigyanpatwari/gitnexus",
+            "commit": "c4ecf398de637cf779ab2238e69958cfd5d601ce",
+            "path": "gitnexus/src/cli/analyze.ts",
+            "lines": [
+              1340,
+              1359
+            ],
+            "url": "https://github.com/abhigyanpatwari/gitnexus/blob/c4ecf398de637cf779ab2238e69958cfd5d601ce/gitnexus/src/cli/analyze.ts#L1340"
+          },
+          {
+            "repository": "https://github.com/bytedance/deer-flow",
+            "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+            "path": "extensions_config.example.json",
+            "lines": [
+              6,
+              39
+            ],
+            "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/extensions_config.example.json#L6"
+          },
+          {
+            "repository": "https://github.com/assafelovic/gpt-researcher",
+            "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+            "path": "docs/docs/gpt-researcher/retrievers/mcp-configs.mdx",
+            "lines": [
+              60,
+              101
+            ],
+            "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/docs/docs/gpt-researcher/retrievers/mcp-configs.mdx#L60"
+          },
+          {
+            "repository": "https://github.com/bytedance/deer-flow",
+            "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+            "path": "backend/packages/harness/deerflow/sandbox/tools.py",
+            "lines": [
+              2118,
+              2156
+            ],
+            "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/sandbox/tools.py#L2118"
+          }
+        ]
+      }
+    ],
+    "install_path": {
+      "commands": [
+        "npm install -g gitnexus@1.6.12",
+        "gitnexus analyze --index-only"
+      ],
+      "scope": "Only the selected DeerFlow sandbox/extensions configuration or GPT Researcher invocation; do not enable globally.",
+      "configuration": null,
+      "citations": [
+        {
+          "repository": "https://github.com/abhigyanpatwari/gitnexus",
+          "commit": "c4ecf398de637cf779ab2238e69958cfd5d601ce",
+          "path": "README.md",
+          "lines": [
+            50,
+            75
+          ],
+          "url": "https://github.com/abhigyanpatwari/gitnexus/blob/c4ecf398de637cf779ab2238e69958cfd5d601ce/README.md#L50"
+        },
+        {
+          "repository": "https://github.com/abhigyanpatwari/gitnexus",
+          "commit": "c4ecf398de637cf779ab2238e69958cfd5d601ce",
+          "path": "README.md",
+          "lines": [
+            375,
+            451
+          ],
+          "url": "https://github.com/abhigyanpatwari/gitnexus/blob/c4ecf398de637cf779ab2238e69958cfd5d601ce/README.md#L375"
+        },
+        {
+          "repository": "https://github.com/abhigyanpatwari/gitnexus",
+          "commit": "c4ecf398de637cf779ab2238e69958cfd5d601ce",
+          "path": "gitnexus/src/cli/analyze.ts",
+          "lines": [
+            1340,
+            1359
+          ],
+          "url": "https://github.com/abhigyanpatwari/gitnexus/blob/c4ecf398de637cf779ab2238e69958cfd5d601ce/gitnexus/src/cli/analyze.ts#L1340"
+        },
+        {
+          "repository": "https://github.com/bytedance/deer-flow",
+          "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+          "path": "extensions_config.example.json",
+          "lines": [
+            6,
+            39
+          ],
+          "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/extensions_config.example.json#L6"
+        },
+        {
+          "repository": "https://github.com/assafelovic/gpt-researcher",
+          "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+          "path": "docs/docs/gpt-researcher/retrievers/mcp-configs.mdx",
+          "lines": [
+            60,
+            101
+          ],
+          "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/docs/docs/gpt-researcher/retrievers/mcp-configs.mdx#L60"
+        }
+      ],
+      "pinning_note": "Commands are reviewable source-derived recipes, never executed here. Explicit version/revision substitutions bind the documented package route where possible; any vendor floating selector must be resolved to the screened pin before installation."
+    },
+    "inverse": {
+      "commands": [
+        "gitnexus uninstall --force"
+      ],
+      "finding": "README documents preview-first uninstall, with --force to apply, for MCP/skills/hooks. Selected index-only CLI route does not need those integrations; generated indexes are separate data.",
+      "citations": [
+        {
+          "repository": "https://github.com/abhigyanpatwari/gitnexus",
+          "commit": "c4ecf398de637cf779ab2238e69958cfd5d601ce",
+          "path": "README.md",
+          "lines": [
+            375,
+            398
+          ],
+          "url": "https://github.com/abhigyanpatwari/gitnexus/blob/c4ecf398de637cf779ab2238e69958cfd5d601ce/README.md#L375"
+        },
+        {
+          "repository": "https://github.com/bytedance/deer-flow",
+          "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+          "path": "extensions_config.example.json",
+          "lines": [
+            6,
+            39
+          ],
+          "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/extensions_config.example.json#L6"
+        },
+        {
+          "repository": "https://github.com/assafelovic/gpt-researcher",
+          "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+          "path": "docs/docs/gpt-researcher/retrievers/mcp-configs.mdx",
+          "lines": [
+            60,
+            101
+          ],
+          "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/docs/docs/gpt-researcher/retrievers/mcp-configs.mdx#L60"
+        }
+      ],
+      "host_disable": "DeerFlow documents enabled=false; GPT Researcher is configured per invocation. Candidate package/data deletion is separate."
+    },
+    "conflicts": {
+      "summary": "Ordinary analyze/setup can write AGENTS.md/CLAUDE.md, skills and hooks and auto-detect multiple clients. Index-only is the bounded candidate route. Native grammar postinstall work, optional embeddings and duplicate graph indexes have separate resource costs. Fenced repository/transcript inputs must not be indexed.",
+      "citations": [
+        {
+          "repository": "https://github.com/abhigyanpatwari/gitnexus",
+          "commit": "c4ecf398de637cf779ab2238e69958cfd5d601ce",
+          "path": "README.md",
+          "lines": [
+            50,
+            77
+          ],
+          "url": "https://github.com/abhigyanpatwari/gitnexus/blob/c4ecf398de637cf779ab2238e69958cfd5d601ce/README.md#L50"
+        },
+        {
+          "repository": "https://github.com/abhigyanpatwari/gitnexus",
+          "commit": "c4ecf398de637cf779ab2238e69958cfd5d601ce",
+          "path": "README.md",
+          "lines": [
+            208,
+            238
+          ],
+          "url": "https://github.com/abhigyanpatwari/gitnexus/blob/c4ecf398de637cf779ab2238e69958cfd5d601ce/README.md#L208"
+        },
+        {
+          "repository": "https://github.com/abhigyanpatwari/gitnexus",
+          "commit": "c4ecf398de637cf779ab2238e69958cfd5d601ce",
+          "path": "gitnexus/src/cli/analyze.ts",
+          "lines": [
+            1340,
+            1359
+          ],
+          "url": "https://github.com/abhigyanpatwari/gitnexus/blob/c4ecf398de637cf779ab2238e69958cfd5d601ce/gitnexus/src/cli/analyze.ts#L1340"
+        }
+      ],
+      "protected_sessions": "Never enable in fenced trading, judge or review sessions. Ordinary reviewer proposals do not include fenced review."
+    },
+    "suited_roles": {
+      "status": "PROPOSAL ONLY; not adopted practice and not an A1 pass/fail criterion",
+      "enable_if_trial_admitted": [],
+      "candidate_role_hypotheses": [
+        "builder",
+        "ordinary reviewer",
+        "auditor",
+        "researcher tracing code",
+        "runtime workers with structural questions"
+      ],
+      "not_enabled": [
+        "fenced trading",
+        "fenced judge",
+        "fenced review"
+      ],
+      "reason": "References, trace and impact fit code-change analysis. These are proposed roles; no vendor benchmark or popularity claim is treated as a measured local result.",
+      "citations": [
+        {
+          "repository": "https://github.com/abhigyanpatwari/gitnexus",
+          "commit": "c4ecf398de637cf779ab2238e69958cfd5d601ce",
+          "path": "README.md",
+          "lines": [
+            162,
+            184
+          ],
+          "url": "https://github.com/abhigyanpatwari/gitnexus/blob/c4ecf398de637cf779ab2238e69958cfd5d601ce/README.md#L162"
+        }
+      ]
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_tokens": 0,
+      "method": "ceil(UTF-8 bytes/4); selected CLI-only startup payload is empty",
+      "counted_bytes": 0,
+      "counted_ranges": [
+        {
+          "repository": "https://github.com/abhigyanpatwari/gitnexus",
+          "commit": "c4ecf398de637cf779ab2238e69958cfd5d601ce",
+          "path": "README.md",
+          "lines": [
+            375,
+            398
+          ],
+          "url": "https://github.com/abhigyanpatwari/gitnexus/blob/c4ecf398de637cf779ab2238e69958cfd5d601ce/README.md#L375"
+        },
+        {
+          "repository": "https://github.com/abhigyanpatwari/gitnexus",
+          "commit": "c4ecf398de637cf779ab2238e69958cfd5d601ce",
+          "path": "gitnexus/src/cli/analyze.ts",
+          "lines": [
+            1340,
+            1359
+          ],
+          "url": "https://github.com/abhigyanpatwari/gitnexus/blob/c4ecf398de637cf779ab2238e69958cfd5d601ce/gitnexus/src/cli/analyze.ts#L1340"
+        }
+      ],
+      "scope": "CLI-only plus index-only analysis: no MCP registration, startup context or skill load is selected. Optional normal setup has repository-generated context and is not covered by zero.",
+      "estimate_extent": "Complete for the selected no-startup route",
+      "family_loading": "DeerFlow/GPT Researcher select/load MCP tools per research configuration; client selection text and tool routing are additional.",
+      "unmeasured": "NativeHorizonNY must replace this estimate with the actual startup receipt. Per-task outputs, fetched skills, recalled memory and provider input/output/cache usage are not measured here.",
+      "cheapest_check": "Count the admitted profile's rendered startup components, then verify the client-visible payload at installation without a model-quality claim."
+    },
+    "screen_verdict": {
+      "result": "INCOMPLETE",
+      "meaning": "Not yet TRIAL-eligible; named source gaps remain",
+      "reason": "linux-wsl2-x86_64: The source documents native grammar/embedding build and platform fallbacks, but the exact complete Linux x86_64/macOS arm64 dependency set for this release was not established. Do not equate a Node CLI with all native grammar support. macos-arm64: The source documents native grammar/embedding build and platform fallbacks, but the exact complete Linux x86_64/macOS arm64 dependency set for this release was not established. Do not equate a Node CLI with all native grammar support.",
+      "disqualifier": null,
+      "cheapest_check": "Read the exact release's native dependency/prebuild target matrix for Linux x86_64 and Darwin arm64, including any chosen languages, before admitting a trial."
+    },
+    "fenced_sessions": "Never enable in fenced trading, judge or review sessions. Ordinary reviewer proposals do not include fenced review.",
+    "service_status": "served: DeerFlow CLI/sandbox route only; GPT Researcher not served directly"
+  },
+  {
+    "candidate": {
+      "repository": "https://github.com/anthropics/claude-plugins-official",
+      "ids": [
+        "pyright-lsp@claude-plugins-official (representative code-navigation component)",
+        "pyright-langserver"
+      ]
+    },
+    "pin": {
+      "commit": "8f814f49002ff824e8a9ba43cf96112dc7f5948d",
+      "tag": null,
+      "read_at": "2026-10-15",
+      "note": "Source pin only; not an installed-version or measured-run receipt."
+    },
+    "family": "research",
+    "layer": "code-navigation",
+    "evidence_class": "source_review",
+    "family_independent_facts_ref": "README-context.md#facts-anthropics-claude-plugins-official",
+    "requirements_result": [
+      {
+        "id": "exact-source",
+        "result": "UNKNOWN",
+        "reason": "This inventory row is a marketplace, not one versioned code retriever. The pinned pyright-lsp entry launches an external unpinned pyright-langserver; its exact definition/source contract needs that dependency pin.",
+        "citations": [
+          {
+            "repository": "https://github.com/anthropics/claude-plugins-official",
+            "commit": "8f814f49002ff824e8a9ba43cf96112dc7f5948d",
+            "path": ".claude-plugin/marketplace.json",
+            "lines": [
+              3045,
+              3065
+            ],
+            "url": "https://github.com/anthropics/claude-plugins-official/blob/8f814f49002ff824e8a9ba43cf96112dc7f5948d/.claude-plugin/marketplace.json#L3045"
+          }
+        ]
+      },
+      {
+        "id": "references",
+        "result": "UNKNOWN",
+        "reason": "The plugin declares a Python language-server bridge, but this marketplace commit does not pin the Pyright implementation or every other LSP plugin.",
+        "citations": [
+          {
+            "repository": "https://github.com/anthropics/claude-plugins-official",
+            "commit": "8f814f49002ff824e8a9ba43cf96112dc7f5948d",
+            "path": "plugins/pyright-lsp/README.md",
+            "lines": [
+              1,
+              6
+            ],
+            "url": "https://github.com/anthropics/claude-plugins-official/blob/8f814f49002ff824e8a9ba43cf96112dc7f5948d/plugins/pyright-lsp/README.md#L1"
+          }
+        ]
+      },
+      {
+        "id": "question-scoping",
+        "result": "PASS",
+        "reason": "The representative component is restricted to .py/.pyi in its LSP registration; no entire-marketplace installation is proposed.",
+        "citations": [
+          {
+            "repository": "https://github.com/anthropics/claude-plugins-official",
+            "commit": "8f814f49002ff824e8a9ba43cf96112dc7f5948d",
+            "path": ".claude-plugin/marketplace.json",
+            "lines": [
+              3045,
+              3065
+            ],
+            "url": "https://github.com/anthropics/claude-plugins-official/blob/8f814f49002ff824e8a9ba43cf96112dc7f5948d/.claude-plugin/marketplace.json#L3045"
+          }
+        ]
+      },
+      {
+        "id": "maintenance",
+        "result": "PASS",
+        "reason": "Not archived; the supplied primary-source receipt has a default-branch commit within the fixed 90-day window. This proves activity, not all engineering quality angles.",
+        "citations": [
+          {
+            "url": "https://api.github.com/repos/anthropics/claude-plugins-official",
+            "read_at": "2026-10-15T20:03Z",
+            "source": "gh-facts-20261015T2003Z.json or the documented anonymous correction read"
+          },
+          {
+            "url": "https://api.github.com/repos/anthropics/claude-plugins-official/commits?per_page=1",
+            "read_at": "2026-10-15T20:03Z",
+            "source": "gh-facts-20261015T2003Z.json or the documented anonymous correction read"
+          }
+        ]
+      },
+      {
+        "id": "linux-wsl2-x86_64",
+        "result": "UNKNOWN",
+        "reason": "The plugin's npm/pip/pipx instructions do not pin the external server or establish its full Linux x86_64/macOS arm64 release dependency set.",
+        "citations": [
+          {
+            "repository": "https://github.com/anthropics/claude-plugins-official",
+            "commit": "8f814f49002ff824e8a9ba43cf96112dc7f5948d",
+            "path": "plugins/pyright-lsp/README.md",
+            "lines": [
+              8,
+              30
+            ],
+            "url": "https://github.com/anthropics/claude-plugins-official/blob/8f814f49002ff824e8a9ba43cf96112dc7f5948d/plugins/pyright-lsp/README.md#L8"
+          }
+        ]
+      },
+      {
+        "id": "macos-arm64",
+        "result": "UNKNOWN",
+        "reason": "The plugin's npm/pip/pipx instructions do not pin the external server or establish its full Linux x86_64/macOS arm64 release dependency set.",
+        "citations": [
+          {
+            "repository": "https://github.com/anthropics/claude-plugins-official",
+            "commit": "8f814f49002ff824e8a9ba43cf96112dc7f5948d",
+            "path": "plugins/pyright-lsp/README.md",
+            "lines": [
+              8,
+              30
+            ],
+            "url": "https://github.com/anthropics/claude-plugins-official/blob/8f814f49002ff824e8a9ba43cf96112dc7f5948d/plugins/pyright-lsp/README.md#L8"
+          }
+        ]
+      },
+      {
+        "id": "headless",
+        "result": "PASS",
+        "reason": "The manifest launches pyright-langserver --stdio; native client lifecycle owns it.",
+        "citations": [
+          {
+            "repository": "https://github.com/anthropics/claude-plugins-official",
+            "commit": "8f814f49002ff824e8a9ba43cf96112dc7f5948d",
+            "path": ".claude-plugin/marketplace.json",
+            "lines": [
+              3055,
+              3065
+            ],
+            "url": "https://github.com/anthropics/claude-plugins-official/blob/8f814f49002ff824e8a9ba43cf96112dc7f5948d/.claude-plugin/marketplace.json#L3055"
+          }
+        ]
+      },
+      {
+        "id": "profile-or-project-scoping",
+        "result": "PASS",
+        "reason": "The native plugin host offers installation scopes; use only a selected project and a language-specific plugin, not the marketplace wholesale.",
+        "citations": [
+          {
+            "url": "https://code.claude.com/docs/en/plugins/install",
+            "read_at": "2026-10-15"
+          }
+        ]
+      },
+      {
+        "id": "family-route",
+        "result": "FAIL",
+        "reason": "The selected Claude LSP plugin has no DeerFlow/GPT Researcher MCP or plugin route in the candidate's contract.",
+        "citations": [
+          {
+            "repository": "https://github.com/anthropics/claude-plugins-official",
+            "commit": "8f814f49002ff824e8a9ba43cf96112dc7f5948d",
+            "path": "README.md",
+            "lines": [
+              3,
+              16
+            ],
+            "url": "https://github.com/anthropics/claude-plugins-official/blob/8f814f49002ff824e8a9ba43cf96112dc7f5948d/README.md#L3"
+          },
+          {
+            "repository": "https://github.com/anthropics/claude-plugins-official",
+            "commit": "8f814f49002ff824e8a9ba43cf96112dc7f5948d",
+            "path": "plugins/pyright-lsp/README.md",
+            "lines": [
+              1,
+              6
+            ],
+            "url": "https://github.com/anthropics/claude-plugins-official/blob/8f814f49002ff824e8a9ba43cf96112dc7f5948d/plugins/pyright-lsp/README.md#L1"
+          },
+          {
+            "repository": "https://github.com/bytedance/deer-flow",
+            "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+            "path": "extensions_config.example.json",
+            "lines": [
+              6,
+              39
+            ],
+            "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/extensions_config.example.json#L6"
+          },
+          {
+            "repository": "https://github.com/assafelovic/gpt-researcher",
+            "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+            "path": "docs/docs/gpt-researcher/retrievers/mcp-configs.mdx",
+            "lines": [
+              60,
+              101
+            ],
+            "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/docs/docs/gpt-researcher/retrievers/mcp-configs.mdx#L60"
+          }
+        ]
+      }
+    ],
+    "install_path": {
+      "commands": [],
+      "scope": "Only the selected DeerFlow sandbox/extensions configuration or GPT Researcher invocation; do not enable globally.",
+      "configuration": null,
+      "citations": [
+        {
+          "repository": "https://github.com/anthropics/claude-plugins-official",
+          "commit": "8f814f49002ff824e8a9ba43cf96112dc7f5948d",
+          "path": "plugins/pyright-lsp/README.md",
+          "lines": [
+            8,
+            25
+          ],
+          "url": "https://github.com/anthropics/claude-plugins-official/blob/8f814f49002ff824e8a9ba43cf96112dc7f5948d/plugins/pyright-lsp/README.md#L8"
+        },
+        {
+          "repository": "https://github.com/anthropics/claude-plugins-official",
+          "commit": "8f814f49002ff824e8a9ba43cf96112dc7f5948d",
+          "path": "README.md",
+          "lines": [
+            12,
+            16
+          ],
+          "url": "https://github.com/anthropics/claude-plugins-official/blob/8f814f49002ff824e8a9ba43cf96112dc7f5948d/README.md#L12"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/plugins/install",
+          "read_at": "2026-10-15"
+        },
+        {
+          "repository": "https://github.com/bytedance/deer-flow",
+          "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+          "path": "extensions_config.example.json",
+          "lines": [
+            6,
+            39
+          ],
+          "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/extensions_config.example.json#L6"
+        },
+        {
+          "repository": "https://github.com/assafelovic/gpt-researcher",
+          "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+          "path": "docs/docs/gpt-researcher/retrievers/mcp-configs.mdx",
+          "lines": [
+            60,
+            101
+          ],
+          "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/docs/docs/gpt-researcher/retrievers/mcp-configs.mdx#L60"
+        }
+      ],
+      "pinning_note": "Commands are reviewable source-derived recipes, never executed here. Explicit version/revision substitutions bind the documented package route where possible; any vendor floating selector must be resolved to the screened pin before installation."
+    },
+    "inverse": {
+      "commands": [],
+      "finding": "No activation in this family. The native plugin host documents disable-for-me versus uninstall-for-project; the candidate README has no separate inverse. External Pyright package removal is separate.",
+      "citations": [
+        {
+          "repository": "https://github.com/anthropics/claude-plugins-official",
+          "commit": "8f814f49002ff824e8a9ba43cf96112dc7f5948d",
+          "path": "README.md",
+          "lines": [
+            12,
+            16
+          ],
+          "url": "https://github.com/anthropics/claude-plugins-official/blob/8f814f49002ff824e8a9ba43cf96112dc7f5948d/README.md#L12"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/plugins/install",
+          "read_at": "2026-10-15"
+        },
+        {
+          "repository": "https://github.com/bytedance/deer-flow",
+          "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+          "path": "extensions_config.example.json",
+          "lines": [
+            6,
+            39
+          ],
+          "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/extensions_config.example.json#L6"
+        },
+        {
+          "repository": "https://github.com/assafelovic/gpt-researcher",
+          "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+          "path": "docs/docs/gpt-researcher/retrievers/mcp-configs.mdx",
+          "lines": [
+            60,
+            101
+          ],
+          "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/docs/docs/gpt-researcher/retrievers/mcp-configs.mdx#L60"
+        }
+      ],
+      "host_disable": "DeerFlow documents enabled=false; GPT Researcher is configured per invocation. Candidate package/data deletion is separate."
+    },
+    "conflicts": {
+      "summary": "Marketplace plugins may add skills, agents, hooks and MCP/LSP components independently. A language-server plugin overlaps Serena/other LSP owners and can add client tool context; the manifest's backend executable must be on the intended PATH. Do not treat marketplace installation as approval of every plugin.",
+      "citations": [
+        {
+          "repository": "https://github.com/anthropics/claude-plugins-official",
+          "commit": "8f814f49002ff824e8a9ba43cf96112dc7f5948d",
+          "path": "README.md",
+          "lines": [
+            3,
+            5
+          ],
+          "url": "https://github.com/anthropics/claude-plugins-official/blob/8f814f49002ff824e8a9ba43cf96112dc7f5948d/README.md#L3"
+        },
+        {
+          "repository": "https://github.com/anthropics/claude-plugins-official",
+          "commit": "8f814f49002ff824e8a9ba43cf96112dc7f5948d",
+          "path": ".claude-plugin/marketplace.json",
+          "lines": [
+            3045,
+            3065
+          ],
+          "url": "https://github.com/anthropics/claude-plugins-official/blob/8f814f49002ff824e8a9ba43cf96112dc7f5948d/.claude-plugin/marketplace.json#L3045"
+        }
+      ],
+      "protected_sessions": "Never enable in fenced trading, judge or review sessions. Ordinary reviewer proposals do not include fenced review."
+    },
+    "suited_roles": {
+      "status": "PROPOSAL ONLY; not adopted practice and not an A1 pass/fail criterion",
+      "enable_if_trial_admitted": [],
+      "candidate_role_hypotheses": [],
+      "not_enabled": [
+        "fenced trading",
+        "fenced judge",
+        "fenced review"
+      ],
+      "reason": "Builder/reviewer Python code-intelligence use is a candidate hypothesis; no enabling role is admitted until the concrete plugin and backend are pinned.",
+      "citations": [
+        {
+          "repository": "https://github.com/anthropics/claude-plugins-official",
+          "commit": "8f814f49002ff824e8a9ba43cf96112dc7f5948d",
+          "path": "plugins/pyright-lsp/README.md",
+          "lines": [
+            1,
+            6
+          ],
+          "url": "https://github.com/anthropics/claude-plugins-official/blob/8f814f49002ff824e8a9ba43cf96112dc7f5948d/plugins/pyright-lsp/README.md#L1"
+        }
+      ]
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_tokens": 0,
+      "method": "No admitted activation in this family: empty startup payload = 0 bytes. Candidate activation cost remains unresolved where stated.",
+      "counted_bytes": 0,
+      "counted_ranges": [
+        {
+          "repository": "https://github.com/anthropics/claude-plugins-official",
+          "commit": "8f814f49002ff824e8a9ba43cf96112dc7f5948d",
+          "path": ".claude-plugin/marketplace.json",
+          "lines": [
+            3045,
+            3065
+          ],
+          "url": "https://github.com/anthropics/claude-plugins-official/blob/8f814f49002ff824e8a9ba43cf96112dc7f5948d/.claude-plugin/marketplace.json#L3045"
+        }
+      ],
+      "scope": "Not served / no activation proposed. The selected marketplace entry has no skill/hook prompt, but the native LSP tool schema and versioned backend are not in this repository. Its incremental client startup payload is UNKNOWN, not zero.",
+      "estimate_extent": "Complete for the selected no-startup route",
+      "family_loading": "DeerFlow/GPT Researcher select/load MCP tools per research configuration; client selection text and tool routing are additional.",
+      "unmeasured": "NativeHorizonNY must replace this estimate with the actual startup receipt. Per-task outputs, fetched skills, recalled memory and provider input/output/cache usage are not measured here.",
+      "cheapest_check": "Pin the actual language-server package and the native LSP tool-loading contract; count its descriptor before enabling the plugin."
+    },
+    "screen_verdict": {
+      "result": "FAIL",
+      "meaning": "Not TRIAL-eligible for the stated layer/family capability",
+      "reason": "family-route: The selected Claude LSP plugin has no DeerFlow/GPT Researcher MCP or plugin route in the candidate's contract.",
+      "disqualifier": "missing_capability",
+      "cheapest_check": "Resolve the specific UNKNOWN requirements from pinned upstream source/package metadata before installation. Pin the actual language-server package and the native LSP tool-loading contract; count its descriptor before enabling the plugin."
+    },
+    "fenced_sessions": "Never enable in fenced trading, judge or review sessions. Ordinary reviewer proposals do not include fenced review.",
+    "service_status": "not served: The selected Claude LSP plugin has no DeerFlow/GPT Researcher MCP or plugin route in the candidate's contract."
+  },
+  {
+    "candidate": {
+      "repository": "https://github.com/ast-grep/ast-grep",
+      "ids": [
+        "@ast-grep/cli",
+        "ast-grep",
+        "sg"
+      ]
+    },
+    "pin": {
+      "commit": "48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a",
+      "tag": "0.51.0",
+      "read_at": "2026-10-15",
+      "note": "Source pin only; not an installed-version or measured-run receipt."
+    },
+    "family": "research",
+    "layer": "code-navigation",
+    "evidence_class": "source_review",
+    "family_independent_facts_ref": "README-context.md#facts-ast-grep-ast-grep",
+    "requirements_result": [
+      {
+        "id": "exact-source",
+        "result": "PASS",
+        "reason": "AST-aware code search returns the source matching a structural pattern; use the read-only search interface for this row.",
+        "citations": [
+          {
+            "repository": "https://github.com/ast-grep/ast-grep",
+            "commit": "48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a",
+            "path": "README.md",
+            "lines": [
+              18,
+              34
+            ],
+            "url": "https://github.com/ast-grep/ast-grep/blob/48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a/README.md#L18"
+          }
+        ]
+      },
+      {
+        "id": "references",
+        "result": "PASS",
+        "reason": "Fits syntax-shaped reference/call-site searches expressed as patterns. It does not claim language-server semantic resolution or complete dynamic callers; use it only for questions that match this bounded reference meaning.",
+        "citations": [
+          {
+            "repository": "https://github.com/ast-grep/ast-grep",
+            "commit": "48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a",
+            "path": "README.md",
+            "lines": [
+              18,
+              34
+            ],
+            "url": "https://github.com/ast-grep/ast-grep/blob/48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a/README.md#L18"
+          }
+        ]
+      },
+      {
+        "id": "question-scoping",
+        "result": "PASS",
+        "reason": "The CLI operates on requested patterns/files/languages. No index is required for known structural queries.",
+        "citations": [
+          {
+            "repository": "https://github.com/ast-grep/ast-grep",
+            "commit": "48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a",
+            "path": "README.md",
+            "lines": [
+              18,
+              34
+            ],
+            "url": "https://github.com/ast-grep/ast-grep/blob/48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a/README.md#L18"
+          }
+        ]
+      },
+      {
+        "id": "maintenance",
+        "result": "PASS",
+        "reason": "Not archived; the supplied primary-source receipt has a default-branch commit within the fixed 90-day window. This proves activity, not all engineering quality angles.",
+        "citations": [
+          {
+            "url": "https://api.github.com/repos/ast-grep/ast-grep",
+            "read_at": "2026-10-15T20:03Z",
+            "source": "gh-facts-20261015T2003Z.json or the documented anonymous correction read"
+          },
+          {
+            "url": "https://api.github.com/repos/ast-grep/ast-grep/commits?per_page=1",
+            "read_at": "2026-10-15T20:03Z",
+            "source": "gh-facts-20261015T2003Z.json or the documented anonymous correction read"
+          }
+        ]
+      },
+      {
+        "id": "linux-wsl2-x86_64",
+        "result": "PASS",
+        "reason": "The pinned npm package names Darwin arm64 and Linux x64 native artifacts at 0.51.0; WSL2 uses the Linux artifact.",
+        "citations": [
+          {
+            "repository": "https://github.com/ast-grep/ast-grep",
+            "commit": "48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a",
+            "path": "npm/package.json",
+            "lines": [
+              30,
+              39
+            ],
+            "url": "https://github.com/ast-grep/ast-grep/blob/48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a/npm/package.json#L30"
+          }
+        ]
+      },
+      {
+        "id": "macos-arm64",
+        "result": "PASS",
+        "reason": "The pinned npm package names Darwin arm64 and Linux x64 native artifacts at 0.51.0; WSL2 uses the Linux artifact.",
+        "citations": [
+          {
+            "repository": "https://github.com/ast-grep/ast-grep",
+            "commit": "48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a",
+            "path": "npm/package.json",
+            "lines": [
+              30,
+              39
+            ],
+            "url": "https://github.com/ast-grep/ast-grep/blob/48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a/npm/package.json#L30"
+          }
+        ]
+      },
+      {
+        "id": "headless",
+        "result": "PASS",
+        "reason": "Documented CLI search and package installation require no model or interactive UI.",
+        "citations": [
+          {
+            "repository": "https://github.com/ast-grep/ast-grep",
+            "commit": "48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a",
+            "path": "README.md",
+            "lines": [
+              33,
+              67
+            ],
+            "url": "https://github.com/ast-grep/ast-grep/blob/48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a/README.md#L33"
+          }
+        ]
+      },
+      {
+        "id": "profile-or-project-scoping",
+        "result": "PASS",
+        "reason": "Scope each invocation to the chosen repository/file pattern; it installs no agent-global context owner.",
+        "citations": [
+          {
+            "repository": "https://github.com/ast-grep/ast-grep",
+            "commit": "48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a",
+            "path": "README.md",
+            "lines": [
+              18,
+              34
+            ],
+            "url": "https://github.com/ast-grep/ast-grep/blob/48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a/README.md#L18"
+          }
+        ]
+      },
+      {
+        "id": "family-route",
+        "result": "PASS",
+        "reason": "DeerFlow's admitted shell/sandbox can invoke this CLI when installed inside that sandbox. GPT Researcher has no direct CLI-adapter claim in this row.",
+        "citations": [
+          {
+            "repository": "https://github.com/ast-grep/ast-grep",
+            "commit": "48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a",
+            "path": "README.md",
+            "lines": [
+              33,
+              48
+            ],
+            "url": "https://github.com/ast-grep/ast-grep/blob/48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a/README.md#L33"
+          },
+          {
+            "repository": "https://github.com/ast-grep/ast-grep",
+            "commit": "48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a",
+            "path": "npm/package.json",
+            "lines": [
+              1,
+              39
+            ],
+            "url": "https://github.com/ast-grep/ast-grep/blob/48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a/npm/package.json#L1"
+          },
+          {
+            "repository": "https://github.com/bytedance/deer-flow",
+            "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+            "path": "extensions_config.example.json",
+            "lines": [
+              6,
+              39
+            ],
+            "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/extensions_config.example.json#L6"
+          },
+          {
+            "repository": "https://github.com/assafelovic/gpt-researcher",
+            "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+            "path": "docs/docs/gpt-researcher/retrievers/mcp-configs.mdx",
+            "lines": [
+              60,
+              101
+            ],
+            "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/docs/docs/gpt-researcher/retrievers/mcp-configs.mdx#L60"
+          },
+          {
+            "repository": "https://github.com/bytedance/deer-flow",
+            "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+            "path": "backend/packages/harness/deerflow/sandbox/tools.py",
+            "lines": [
+              2118,
+              2156
+            ],
+            "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/sandbox/tools.py#L2118"
+          }
+        ]
+      }
+    ],
+    "install_path": {
+      "commands": [
+        "npm install -g @ast-grep/cli@0.51.0"
+      ],
+      "scope": "Only the selected DeerFlow sandbox/extensions configuration or GPT Researcher invocation; do not enable globally.",
+      "configuration": null,
+      "citations": [
+        {
+          "repository": "https://github.com/ast-grep/ast-grep",
+          "commit": "48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a",
+          "path": "README.md",
+          "lines": [
+            33,
+            48
+          ],
+          "url": "https://github.com/ast-grep/ast-grep/blob/48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a/README.md#L33"
+        },
+        {
+          "repository": "https://github.com/ast-grep/ast-grep",
+          "commit": "48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a",
+          "path": "npm/package.json",
+          "lines": [
+            1,
+            39
+          ],
+          "url": "https://github.com/ast-grep/ast-grep/blob/48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a/npm/package.json#L1"
+        },
+        {
+          "repository": "https://github.com/bytedance/deer-flow",
+          "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+          "path": "extensions_config.example.json",
+          "lines": [
+            6,
+            39
+          ],
+          "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/extensions_config.example.json#L6"
+        },
+        {
+          "repository": "https://github.com/assafelovic/gpt-researcher",
+          "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+          "path": "docs/docs/gpt-researcher/retrievers/mcp-configs.mdx",
+          "lines": [
+            60,
+            101
+          ],
+          "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/docs/docs/gpt-researcher/retrievers/mcp-configs.mdx#L60"
+        }
+      ],
+      "pinning_note": "Commands are reviewable source-derived recipes, never executed here. Explicit version/revision substitutions bind the documented package route where possible; any vendor floating selector must be resolved to the screened pin before installation."
+    },
+    "inverse": {
+      "commands": [],
+      "finding": "No candidate-specific uninstall/disable in the reviewed README; this direct CLI registers no hooks or MCP entry. Package-manager removal is separate.",
+      "citations": [
+        {
+          "repository": "https://github.com/ast-grep/ast-grep",
+          "commit": "48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a",
+          "path": "README.md",
+          "lines": [
+            33,
+            69
+          ],
+          "url": "https://github.com/ast-grep/ast-grep/blob/48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a/README.md#L33"
+        },
+        {
+          "repository": "https://github.com/bytedance/deer-flow",
+          "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+          "path": "extensions_config.example.json",
+          "lines": [
+            6,
+            39
+          ],
+          "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/extensions_config.example.json#L6"
+        },
+        {
+          "repository": "https://github.com/assafelovic/gpt-researcher",
+          "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+          "path": "docs/docs/gpt-researcher/retrievers/mcp-configs.mdx",
+          "lines": [
+            60,
+            101
+          ],
+          "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/docs/docs/gpt-researcher/retrievers/mcp-configs.mdx#L60"
+        }
+      ],
+      "host_disable": "DeerFlow documents enabled=false; GPT Researcher is configured per invocation. Candidate package/data deletion is separate."
+    },
+    "conflicts": {
+      "summary": "The sg binary name can collide with an existing executable. AST rewrite operations exist but are outside the read-only navigation route. No ports, lifecycle hooks or startup instruction files are added by the CLI.",
+      "citations": [
+        {
+          "repository": "https://github.com/ast-grep/ast-grep",
+          "commit": "48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a",
+          "path": "README.md",
+          "lines": [
+            18,
+            34
+          ],
+          "url": "https://github.com/ast-grep/ast-grep/blob/48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a/README.md#L18"
+        },
+        {
+          "repository": "https://github.com/ast-grep/ast-grep",
+          "commit": "48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a",
+          "path": "npm/package.json",
+          "lines": [
+            1,
+            45
+          ],
+          "url": "https://github.com/ast-grep/ast-grep/blob/48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a/npm/package.json#L1"
+        }
+      ],
+      "protected_sessions": "Never enable in fenced trading, judge or review sessions. Ordinary reviewer proposals do not include fenced review."
+    },
+    "suited_roles": {
+      "status": "PROPOSAL ONLY; not adopted practice and not an A1 pass/fail criterion",
+      "enable_if_trial_admitted": [
+        "builder",
+        "ordinary reviewer",
+        "auditor",
+        "runtime workers with syntax-pattern questions"
+      ],
+      "candidate_role_hypotheses": [
+        "builder",
+        "ordinary reviewer",
+        "auditor",
+        "runtime workers with syntax-pattern questions"
+      ],
+      "not_enabled": [
+        "fenced trading",
+        "fenced judge",
+        "fenced review"
+      ],
+      "reason": "Structural search suits bounded syntax questions and checks; it is not a proposed replacement for semantic cross-file references.",
+      "citations": [
+        {
+          "repository": "https://github.com/ast-grep/ast-grep",
+          "commit": "48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a",
+          "path": "README.md",
+          "lines": [
+            18,
+            34
+          ],
+          "url": "https://github.com/ast-grep/ast-grep/blob/48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a/README.md#L18"
+        }
+      ]
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_tokens": 0,
+      "method": "ceil(UTF-8 bytes/4); selected CLI-only startup payload is empty",
+      "counted_bytes": 0,
+      "counted_ranges": [
+        {
+          "repository": "https://github.com/ast-grep/ast-grep",
+          "commit": "48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a",
+          "path": "README.md",
+          "lines": [
+            18,
+            48
+          ],
+          "url": "https://github.com/ast-grep/ast-grep/blob/48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a/README.md#L18"
+        }
+      ],
+      "scope": "Direct CLI use adds no startup skill, prompt, hook or MCP schema; matched source enters context only on demand.",
+      "estimate_extent": "Complete for the selected no-startup route",
+      "family_loading": "DeerFlow/GPT Researcher select/load MCP tools per research configuration; client selection text and tool routing are additional.",
+      "unmeasured": "NativeHorizonNY must replace this estimate with the actual startup receipt. Per-task outputs, fetched skills, recalled memory and provider input/output/cache usage are not measured here.",
+      "cheapest_check": "Count the admitted profile's rendered startup components, then verify the client-visible payload at installation without a model-quality claim."
+    },
+    "screen_verdict": {
+      "result": "PASS",
+      "meaning": "TRIAL-eligible only; no default promotion",
+      "reason": "The scoped capability, maintenance, platform, headless and scoping claims pass source review. Estimates and role hypotheses are not measured evidence or defaults.",
+      "disqualifier": null,
+      "cheapest_check": "NativeHorizonNY: verify the installed pin, declared host platform, isolated scope and documented inverse; capture actual startup payload. Quality/provider-usage parity belongs to a later authorized trial."
+    },
+    "fenced_sessions": "Never enable in fenced trading, judge or review sessions. Ordinary reviewer proposals do not include fenced review.",
+    "service_status": "served: DeerFlow CLI/sandbox route only; GPT Researcher not served directly"
+  },
+  {
+    "candidate": {
+      "repository": "https://github.com/colbymchenry/codegraph",
+      "ids": [
+        "@colbymchenry/codegraph",
+        "codegraph"
+      ]
+    },
+    "pin": {
+      "commit": "6560052a6f856855d3f71eee838fd66ccfa4285d",
+      "tag": "v1.6.2",
+      "read_at": "2026-10-15",
+      "note": "Source pin only; not an installed-version or measured-run receipt."
+    },
+    "family": "research",
+    "layer": "code-navigation",
+    "evidence_class": "source_review",
+    "family_independent_facts_ref": "README-context.md#facts-colbymchenry-codegraph",
+    "requirements_result": [
+      {
+        "id": "exact-source",
+        "result": "PASS",
+        "reason": "CLI equivalents expose the graph's verbatim source and symbol bodies; default MCP is one explore tool, but MCP activation is not selected here.",
+        "citations": [
+          {
+            "repository": "https://github.com/colbymchenry/codegraph",
+            "commit": "6560052a6f856855d3f71eee838fd66ccfa4285d",
+            "path": "README.md",
+            "lines": [
+              192,
+              192
+            ],
+            "url": "https://github.com/colbymchenry/codegraph/blob/6560052a6f856855d3f71eee838fd66ccfa4285d/README.md#L192"
+          }
+        ]
+      },
+      {
+        "id": "references",
+        "result": "PASS",
+        "reason": "Source documents caller/callee/impact paths and their CLI equivalents; resolver heuristics are explicitly marked and do not prove dynamic runtime behavior.",
+        "citations": [
+          {
+            "repository": "https://github.com/colbymchenry/codegraph",
+            "commit": "6560052a6f856855d3f71eee838fd66ccfa4285d",
+            "path": "README.md",
+            "lines": [
+              275,
+              289
+            ],
+            "url": "https://github.com/colbymchenry/codegraph/blob/6560052a6f856855d3f71eee838fd66ccfa4285d/README.md#L275"
+          }
+        ]
+      },
+      {
+        "id": "question-scoping",
+        "result": "PASS",
+        "reason": "Per-project .codegraph indexes and explicit projectPath/CLI paths scope retrieval; missing indexes return guidance rather than silently indexing.",
+        "citations": [
+          {
+            "repository": "https://github.com/colbymchenry/codegraph",
+            "commit": "6560052a6f856855d3f71eee838fd66ccfa4285d",
+            "path": "README.md",
+            "lines": [
+              530,
+              600
+            ],
+            "url": "https://github.com/colbymchenry/codegraph/blob/6560052a6f856855d3f71eee838fd66ccfa4285d/README.md#L530"
+          }
+        ]
+      },
+      {
+        "id": "maintenance",
+        "result": "PASS",
+        "reason": "Not archived; the supplied primary-source receipt has a default-branch commit within the fixed 90-day window. This proves activity, not all engineering quality angles.",
+        "citations": [
+          {
+            "url": "https://api.github.com/repos/colbymchenry/codegraph",
+            "read_at": "2026-10-15T20:03Z",
+            "source": "gh-facts-20261015T2003Z.json or the documented anonymous correction read"
+          },
+          {
+            "url": "https://api.github.com/repos/colbymchenry/codegraph/commits?per_page=1",
+            "read_at": "2026-10-15T20:03Z",
+            "source": "gh-facts-20261015T2003Z.json or the documented anonymous correction read"
+          }
+        ]
+      },
+      {
+        "id": "linux-wsl2-x86_64",
+        "result": "PASS",
+        "reason": "The installer explicitly maps Darwin/Linux and arm64/aarch64/x86_64/amd64 into release targets. WSL2 uses Linux; a Windows-stored index has separate boundary handling.",
+        "citations": [
+          {
+            "repository": "https://github.com/colbymchenry/codegraph",
+            "commit": "6560052a6f856855d3f71eee838fd66ccfa4285d",
+            "path": "install.sh",
+            "lines": [
+              29,
+              47
+            ],
+            "url": "https://github.com/colbymchenry/codegraph/blob/6560052a6f856855d3f71eee838fd66ccfa4285d/install.sh#L29"
+          }
+        ]
+      },
+      {
+        "id": "macos-arm64",
+        "result": "PASS",
+        "reason": "The installer explicitly maps Darwin/Linux and arm64/aarch64/x86_64/amd64 into release targets. WSL2 uses Linux; a Windows-stored index has separate boundary handling.",
+        "citations": [
+          {
+            "repository": "https://github.com/colbymchenry/codegraph",
+            "commit": "6560052a6f856855d3f71eee838fd66ccfa4285d",
+            "path": "install.sh",
+            "lines": [
+              29,
+              47
+            ],
+            "url": "https://github.com/colbymchenry/codegraph/blob/6560052a6f856855d3f71eee838fd66ccfa4285d/install.sh#L29"
+          }
+        ]
+      },
+      {
+        "id": "headless",
+        "result": "PASS",
+        "reason": "init --yes and query/callers/callees/impact CLI interfaces are documented for scripts and CI.",
+        "citations": [
+          {
+            "repository": "https://github.com/colbymchenry/codegraph",
+            "commit": "6560052a6f856855d3f71eee838fd66ccfa4285d",
+            "path": "README.md",
+            "lines": [
+              400,
+              435
+            ],
+            "url": "https://github.com/colbymchenry/codegraph/blob/6560052a6f856855d3f71eee838fd66ccfa4285d/README.md#L400"
+          }
+        ]
+      },
+      {
+        "id": "profile-or-project-scoping",
+        "result": "PASS",
+        "reason": "Only the selected project's graph is initialized. The standalone binary step does not configure agents; codegraph install is a separate, excluded step.",
+        "citations": [
+          {
+            "repository": "https://github.com/colbymchenry/codegraph",
+            "commit": "6560052a6f856855d3f71eee838fd66ccfa4285d",
+            "path": "README.md",
+            "lines": [
+              75,
+              108
+            ],
+            "url": "https://github.com/colbymchenry/codegraph/blob/6560052a6f856855d3f71eee838fd66ccfa4285d/README.md#L75"
+          }
+        ]
+      },
+      {
+        "id": "family-route",
+        "result": "PASS",
+        "reason": "DeerFlow's admitted shell/sandbox can invoke this CLI when installed inside that sandbox. GPT Researcher has no direct CLI-adapter claim in this row.",
+        "citations": [
+          {
+            "repository": "https://github.com/colbymchenry/codegraph",
+            "commit": "6560052a6f856855d3f71eee838fd66ccfa4285d",
+            "path": "README.md",
+            "lines": [
+              75,
+              108
+            ],
+            "url": "https://github.com/colbymchenry/codegraph/blob/6560052a6f856855d3f71eee838fd66ccfa4285d/README.md#L75"
+          },
+          {
+            "repository": "https://github.com/colbymchenry/codegraph",
+            "commit": "6560052a6f856855d3f71eee838fd66ccfa4285d",
+            "path": "README.md",
+            "lines": [
+              424,
+              443
+            ],
+            "url": "https://github.com/colbymchenry/codegraph/blob/6560052a6f856855d3f71eee838fd66ccfa4285d/README.md#L424"
+          },
+          {
+            "repository": "https://github.com/bytedance/deer-flow",
+            "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+            "path": "extensions_config.example.json",
+            "lines": [
+              6,
+              39
+            ],
+            "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/extensions_config.example.json#L6"
+          },
+          {
+            "repository": "https://github.com/assafelovic/gpt-researcher",
+            "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+            "path": "docs/docs/gpt-researcher/retrievers/mcp-configs.mdx",
+            "lines": [
+              60,
+              101
+            ],
+            "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/docs/docs/gpt-researcher/retrievers/mcp-configs.mdx#L60"
+          },
+          {
+            "repository": "https://github.com/bytedance/deer-flow",
+            "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+            "path": "backend/packages/harness/deerflow/sandbox/tools.py",
+            "lines": [
+              2118,
+              2156
+            ],
+            "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/sandbox/tools.py#L2118"
+          }
+        ]
+      }
+    ],
+    "install_path": {
+      "commands": [
+        "npm install -g @colbymchenry/codegraph@1.6.2",
+        "codegraph init <selected-project> --yes"
+      ],
+      "scope": "Only the selected DeerFlow sandbox/extensions configuration or GPT Researcher invocation; do not enable globally.",
+      "configuration": null,
+      "citations": [
+        {
+          "repository": "https://github.com/colbymchenry/codegraph",
+          "commit": "6560052a6f856855d3f71eee838fd66ccfa4285d",
+          "path": "README.md",
+          "lines": [
+            75,
+            108
+          ],
+          "url": "https://github.com/colbymchenry/codegraph/blob/6560052a6f856855d3f71eee838fd66ccfa4285d/README.md#L75"
+        },
+        {
+          "repository": "https://github.com/colbymchenry/codegraph",
+          "commit": "6560052a6f856855d3f71eee838fd66ccfa4285d",
+          "path": "README.md",
+          "lines": [
+            424,
+            443
+          ],
+          "url": "https://github.com/colbymchenry/codegraph/blob/6560052a6f856855d3f71eee838fd66ccfa4285d/README.md#L424"
+        },
+        {
+          "repository": "https://github.com/bytedance/deer-flow",
+          "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+          "path": "extensions_config.example.json",
+          "lines": [
+            6,
+            39
+          ],
+          "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/extensions_config.example.json#L6"
+        },
+        {
+          "repository": "https://github.com/assafelovic/gpt-researcher",
+          "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+          "path": "docs/docs/gpt-researcher/retrievers/mcp-configs.mdx",
+          "lines": [
+            60,
+            101
+          ],
+          "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/docs/docs/gpt-researcher/retrievers/mcp-configs.mdx#L60"
+        }
+      ],
+      "pinning_note": "Commands are reviewable source-derived recipes, never executed here. Explicit version/revision substitutions bind the documented package route where possible; any vendor floating selector must be resolved to the screened pin before installation."
+    },
+    "inverse": {
+      "commands": [
+        "codegraph uninit <selected-project> --force",
+        "codegraph uninstall --keep-cli --target <selected-agent> --yes"
+      ],
+      "finding": "Project uninit and targeted integration uninstall are documented. The selected CLI-only route adds no agent integration; remove its graph separately from the binary.",
+      "citations": [
+        {
+          "repository": "https://github.com/colbymchenry/codegraph",
+          "commit": "6560052a6f856855d3f71eee838fd66ccfa4285d",
+          "path": "README.md",
+          "lines": [
+            129,
+            139
+          ],
+          "url": "https://github.com/colbymchenry/codegraph/blob/6560052a6f856855d3f71eee838fd66ccfa4285d/README.md#L129"
+        },
+        {
+          "repository": "https://github.com/colbymchenry/codegraph",
+          "commit": "6560052a6f856855d3f71eee838fd66ccfa4285d",
+          "path": "README.md",
+          "lines": [
+            530,
+            600
+          ],
+          "url": "https://github.com/colbymchenry/codegraph/blob/6560052a6f856855d3f71eee838fd66ccfa4285d/README.md#L530"
+        },
+        {
+          "repository": "https://github.com/bytedance/deer-flow",
+          "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+          "path": "extensions_config.example.json",
+          "lines": [
+            6,
+            39
+          ],
+          "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/extensions_config.example.json#L6"
+        },
+        {
+          "repository": "https://github.com/assafelovic/gpt-researcher",
+          "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+          "path": "docs/docs/gpt-researcher/retrievers/mcp-configs.mdx",
+          "lines": [
+            60,
+            101
+          ],
+          "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/docs/docs/gpt-researcher/retrievers/mcp-configs.mdx#L60"
+        }
+      ],
+      "host_disable": "DeerFlow documents enabled=false; GPT Researcher is configured per invocation. Candidate package/data deletion is separate."
+    },
+    "conflicts": {
+      "summary": "codegraph install writes MCP entries, marker-fenced CLAUDE/AGENTS/GEMINI instructions and, by default, Claude auto-allow permissions. The selected CLI route avoids that installer. .codegraph/ indexes and watchers overlap other graph tools; default MCP instructions alone would add an estimated 2,175 tokens and include aggressive tool-preference text.",
+      "citations": [
+        {
+          "repository": "https://github.com/colbymchenry/codegraph",
+          "commit": "6560052a6f856855d3f71eee838fd66ccfa4285d",
+          "path": "README.md",
+          "lines": [
+            389,
+            418
+          ],
+          "url": "https://github.com/colbymchenry/codegraph/blob/6560052a6f856855d3f71eee838fd66ccfa4285d/README.md#L389"
+        },
+        {
+          "repository": "https://github.com/colbymchenry/codegraph",
+          "commit": "6560052a6f856855d3f71eee838fd66ccfa4285d",
+          "path": "src/mcp/server-instructions.ts",
+          "lines": [
+            1,
+            111
+          ],
+          "url": "https://github.com/colbymchenry/codegraph/blob/6560052a6f856855d3f71eee838fd66ccfa4285d/src/mcp/server-instructions.ts#L1"
+        }
+      ],
+      "protected_sessions": "Never enable in fenced trading, judge or review sessions. Ordinary reviewer proposals do not include fenced review."
+    },
+    "suited_roles": {
+      "status": "PROPOSAL ONLY; not adopted practice and not an A1 pass/fail criterion",
+      "enable_if_trial_admitted": [
+        "builder",
+        "ordinary reviewer",
+        "auditor",
+        "researcher tracing code",
+        "runtime workers with repository questions"
+      ],
+      "candidate_role_hypotheses": [
+        "builder",
+        "ordinary reviewer",
+        "auditor",
+        "researcher tracing code",
+        "runtime workers with repository questions"
+      ],
+      "not_enabled": [
+        "fenced trading",
+        "fenced judge",
+        "fenced review"
+      ],
+      "reason": "Verbatim source, caller paths and impact are relevant to edits/reviews. Proposed roles do not adopt the vendor's claims about relative agent quality or cost.",
+      "citations": [
+        {
+          "repository": "https://github.com/colbymchenry/codegraph",
+          "commit": "6560052a6f856855d3f71eee838fd66ccfa4285d",
+          "path": "README.md",
+          "lines": [
+            192,
+            192
+          ],
+          "url": "https://github.com/colbymchenry/codegraph/blob/6560052a6f856855d3f71eee838fd66ccfa4285d/README.md#L192"
+        },
+        {
+          "repository": "https://github.com/colbymchenry/codegraph",
+          "commit": "6560052a6f856855d3f71eee838fd66ccfa4285d",
+          "path": "README.md",
+          "lines": [
+            275,
+            289
+          ],
+          "url": "https://github.com/colbymchenry/codegraph/blob/6560052a6f856855d3f71eee838fd66ccfa4285d/README.md#L275"
+        }
+      ]
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_tokens": 0,
+      "method": "ceil(UTF-8 bytes/4); selected CLI-only startup payload is empty",
+      "counted_bytes": 0,
+      "counted_ranges": [
+        {
+          "repository": "https://github.com/colbymchenry/codegraph",
+          "commit": "6560052a6f856855d3f71eee838fd66ccfa4285d",
+          "path": "README.md",
+          "lines": [
+            75,
+            108
+          ],
+          "url": "https://github.com/colbymchenry/codegraph/blob/6560052a6f856855d3f71eee838fd66ccfa4285d/README.md#L75"
+        },
+        {
+          "repository": "https://github.com/colbymchenry/codegraph",
+          "commit": "6560052a6f856855d3f71eee838fd66ccfa4285d",
+          "path": "README.md",
+          "lines": [
+            530,
+            600
+          ],
+          "url": "https://github.com/colbymchenry/codegraph/blob/6560052a6f856855d3f71eee838fd66ccfa4285d/README.md#L530"
+        }
+      ],
+      "scope": "Standalone CLI route does not call codegraph install or register MCP/instruction files. Optional MCP SERVER_INSTRUCTIONS contains 8,697 decoded literal bytes (ESTIMATE 2,175 tokens), excluded here.",
+      "estimate_extent": "Complete for the selected no-startup route",
+      "family_loading": "DeerFlow/GPT Researcher select/load MCP tools per research configuration; client selection text and tool routing are additional.",
+      "unmeasured": "NativeHorizonNY must replace this estimate with the actual startup receipt. Per-task outputs, fetched skills, recalled memory and provider input/output/cache usage are not measured here.",
+      "cheapest_check": "Count the admitted profile's rendered startup components, then verify the client-visible payload at installation without a model-quality claim."
+    },
+    "screen_verdict": {
+      "result": "PASS",
+      "meaning": "TRIAL-eligible only; no default promotion",
+      "reason": "The scoped capability, maintenance, platform, headless and scoping claims pass source review. Estimates and role hypotheses are not measured evidence or defaults.",
+      "disqualifier": null,
+      "cheapest_check": "NativeHorizonNY: verify the installed pin, declared host platform, isolated scope and documented inverse; capture actual startup payload. Quality/provider-usage parity belongs to a later authorized trial."
+    },
+    "fenced_sessions": "Never enable in fenced trading, judge or review sessions. Ordinary reviewer proposals do not include fenced review.",
+    "service_status": "served: DeerFlow CLI/sandbox route only; GPT Researcher not served directly"
+  },
+  {
+    "candidate": {
+      "repository": "https://github.com/deusdata/codebase-memory-mcp",
+      "ids": [
+        "codebase-memory-mcp"
+      ]
+    },
+    "pin": {
+      "commit": "8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798",
+      "tag": "v0.11.0",
+      "read_at": "2026-10-15",
+      "note": "Source pin only; not an installed-version or measured-run receipt."
+    },
+    "family": "research",
+    "layer": "code-navigation",
+    "evidence_class": "source_review",
+    "family_independent_facts_ref": "README-context.md#facts-deusdata-codebase-memory-mcp",
+    "requirements_result": [
+      {
+        "id": "exact-source",
+        "result": "PASS",
+        "reason": "The server provides exact source snippets alongside its static graph; its source defines an explicit snippet line cap, so larger bodies need follow-up source reads.",
+        "citations": [
+          {
+            "repository": "https://github.com/deusdata/codebase-memory-mcp",
+            "commit": "8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798",
+            "path": "src/mcp/mcp.c",
+            "lines": [
+              25,
+              36
+            ],
+            "url": "https://github.com/deusdata/codebase-memory-mcp/blob/8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798/src/mcp/mcp.c#L25"
+          }
+        ]
+      },
+      {
+        "id": "references",
+        "result": "PASS",
+        "reason": "Static search/trace and language-specific semantic resolution expose call relationships; these are source-derived relationships, not proof of dynamic calls.",
+        "citations": [
+          {
+            "repository": "https://github.com/deusdata/codebase-memory-mcp",
+            "commit": "8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798",
+            "path": "README.md",
+            "lines": [
+              17,
+              40
+            ],
+            "url": "https://github.com/deusdata/codebase-memory-mcp/blob/8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798/README.md#L17"
+          }
+        ]
+      },
+      {
+        "id": "question-scoping",
+        "result": "PASS",
+        "reason": "The published verification tiers require targeted coverage checks and direct reads of missed ranges; use a graph only for the question it answers.",
+        "citations": [
+          {
+            "repository": "https://github.com/deusdata/codebase-memory-mcp",
+            "commit": "8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798",
+            "path": "README.md",
+            "lines": [
+              475,
+              485
+            ],
+            "url": "https://github.com/deusdata/codebase-memory-mcp/blob/8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798/README.md#L475"
+          }
+        ]
+      },
+      {
+        "id": "maintenance",
+        "result": "PASS",
+        "reason": "Not archived; the supplied primary-source receipt has a default-branch commit within the fixed 90-day window. This proves activity, not all engineering quality angles.",
+        "citations": [
+          {
+            "url": "https://api.github.com/repos/deusdata/codebase-memory-mcp",
+            "read_at": "2026-10-15T20:03Z",
+            "source": "gh-facts-20261015T2003Z.json or the documented anonymous correction read"
+          },
+          {
+            "url": "https://api.github.com/repos/deusdata/codebase-memory-mcp/commits?per_page=1",
+            "read_at": "2026-10-15T20:03Z",
+            "source": "gh-facts-20261015T2003Z.json or the documented anonymous correction read"
+          }
+        ]
+      },
+      {
+        "id": "linux-wsl2-x86_64",
+        "result": "PASS",
+        "reason": "The pinned README explicitly provides native macOS arm64/amd64 and Linux arm64/amd64 releases; WSL2 uses Linux amd64.",
+        "citations": [
+          {
+            "repository": "https://github.com/deusdata/codebase-memory-mcp",
+            "commit": "8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798",
+            "path": "README.md",
+            "lines": [
+              31,
+              35
+            ],
+            "url": "https://github.com/deusdata/codebase-memory-mcp/blob/8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798/README.md#L31"
+          }
+        ]
+      },
+      {
+        "id": "macos-arm64",
+        "result": "PASS",
+        "reason": "The pinned README explicitly provides native macOS arm64/amd64 and Linux arm64/amd64 releases; WSL2 uses Linux amd64.",
+        "citations": [
+          {
+            "repository": "https://github.com/deusdata/codebase-memory-mcp",
+            "commit": "8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798",
+            "path": "README.md",
+            "lines": [
+              31,
+              35
+            ],
+            "url": "https://github.com/deusdata/codebase-memory-mcp/blob/8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798/README.md#L31"
+          }
+        ]
+      },
+      {
+        "id": "headless",
+        "result": "PASS",
+        "reason": "JSON-RPC over stdio is the native server interface; manual MCP command registration is documented.",
+        "citations": [
+          {
+            "repository": "https://github.com/deusdata/codebase-memory-mcp",
+            "commit": "8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798",
+            "path": "src/mcp/mcp.c",
+            "lines": [
+              1,
+              2
+            ],
+            "url": "https://github.com/deusdata/codebase-memory-mcp/blob/8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798/src/mcp/mcp.c#L1"
+          }
+        ]
+      },
+      {
+        "id": "profile-or-project-scoping",
+        "result": "PASS",
+        "reason": "Manual project MCP registration plus CBM_ALLOWED_ROOT/root admission and per-repository graph identifiers provide a scoped route. Do not use the broad auto-installer for clean profiles.",
+        "citations": [
+          {
+            "repository": "https://github.com/deusdata/codebase-memory-mcp",
+            "commit": "8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798",
+            "path": "README.md",
+            "lines": [
+              450,
+              464
+            ],
+            "url": "https://github.com/deusdata/codebase-memory-mcp/blob/8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798/README.md#L450"
+          }
+        ]
+      },
+      {
+        "id": "family-route",
+        "result": "PASS",
+        "reason": "The candidate's documented MCP route composes with this family's scoped native MCP configuration. This does not imply native lifecycle hooks or API-model invocation.",
+        "citations": [
+          {
+            "repository": "https://github.com/deusdata/codebase-memory-mcp",
+            "commit": "8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798",
+            "path": "README.md",
+            "lines": [
+              72,
+              95
+            ],
+            "url": "https://github.com/deusdata/codebase-memory-mcp/blob/8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798/README.md#L72"
+          },
+          {
+            "repository": "https://github.com/deusdata/codebase-memory-mcp",
+            "commit": "8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798",
+            "path": "README.md",
+            "lines": [
+              450,
+              464
+            ],
+            "url": "https://github.com/deusdata/codebase-memory-mcp/blob/8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798/README.md#L450"
+          },
+          {
+            "repository": "https://github.com/bytedance/deer-flow",
+            "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+            "path": "extensions_config.example.json",
+            "lines": [
+              6,
+              39
+            ],
+            "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/extensions_config.example.json#L6"
+          },
+          {
+            "repository": "https://github.com/assafelovic/gpt-researcher",
+            "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+            "path": "docs/docs/gpt-researcher/retrievers/mcp-configs.mdx",
+            "lines": [
+              60,
+              101
+            ],
+            "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/docs/docs/gpt-researcher/retrievers/mcp-configs.mdx#L60"
+          }
+        ]
+      }
+    ],
+    "install_path": {
+      "commands": [
+        "./install.sh --skip-config --dir=<isolated-profile-bin> (from the verified v0.11.0 platform archive)"
+      ],
+      "scope": "Only the selected DeerFlow sandbox/extensions configuration or GPT Researcher invocation; do not enable globally.",
+      "configuration": {
+        "deerflow": {
+          "file": "extensions_config.json",
+          "entry": "mcpServers.codebase-memory-mcp",
+          "server_command": "/absolute/path/to/codebase-memory-mcp",
+          "enabled": "only in selected research profile"
+        },
+        "gpt_researcher": {
+          "parameter": "mcp_configs",
+          "server_command": "/absolute/path/to/codebase-memory-mcp",
+          "note": "Per-invocation name/command/args entry; keep runtime authentication and model route unchanged."
+        }
+      },
+      "citations": [
+        {
+          "repository": "https://github.com/deusdata/codebase-memory-mcp",
+          "commit": "8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798",
+          "path": "README.md",
+          "lines": [
+            72,
+            95
+          ],
+          "url": "https://github.com/deusdata/codebase-memory-mcp/blob/8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798/README.md#L72"
+        },
+        {
+          "repository": "https://github.com/deusdata/codebase-memory-mcp",
+          "commit": "8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798",
+          "path": "README.md",
+          "lines": [
+            450,
+            464
+          ],
+          "url": "https://github.com/deusdata/codebase-memory-mcp/blob/8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798/README.md#L450"
+        },
+        {
+          "repository": "https://github.com/bytedance/deer-flow",
+          "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+          "path": "extensions_config.example.json",
+          "lines": [
+            6,
+            39
+          ],
+          "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/extensions_config.example.json#L6"
+        },
+        {
+          "repository": "https://github.com/assafelovic/gpt-researcher",
+          "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+          "path": "docs/docs/gpt-researcher/retrievers/mcp-configs.mdx",
+          "lines": [
+            60,
+            101
+          ],
+          "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/docs/docs/gpt-researcher/retrievers/mcp-configs.mdx#L60"
+        }
+      ],
+      "pinning_note": "Commands are reviewable source-derived recipes, never executed here. Explicit version/revision substitutions bind the documented package route where possible; any vendor floating selector must be resolved to the screened pin before installation."
+    },
+    "inverse": {
+      "commands": [
+        "codebase-memory-mcp uninstall"
+      ],
+      "finding": "Removes owned configurations/skills/hooks/instructions/binary; existing indexes require confirmation. The installer copy is reported, not silently deleted.",
+      "citations": [
+        {
+          "repository": "https://github.com/deusdata/codebase-memory-mcp",
+          "commit": "8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798",
+          "path": "README.md",
+          "lines": [
+            180,
+            188
+          ],
+          "url": "https://github.com/deusdata/codebase-memory-mcp/blob/8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798/README.md#L180"
+        },
+        {
+          "repository": "https://github.com/bytedance/deer-flow",
+          "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+          "path": "extensions_config.example.json",
+          "lines": [
+            6,
+            39
+          ],
+          "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/extensions_config.example.json#L6"
+        },
+        {
+          "repository": "https://github.com/assafelovic/gpt-researcher",
+          "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+          "path": "docs/docs/gpt-researcher/retrievers/mcp-configs.mdx",
+          "lines": [
+            60,
+            101
+          ],
+          "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/docs/docs/gpt-researcher/retrievers/mcp-configs.mdx#L60"
+        }
+      ],
+      "host_disable": "DeerFlow documents enabled=false; GPT Researcher is configured per invocation. Candidate package/data deletion is separate."
+    },
+    "conflicts": {
+      "summary": "Native install/update/uninstall performs account-wide activation coordination and can cancel/wait on sibling CBM work. Auto-configuration writes many clients' rules/skills/hooks. Use the binary-only/manual selected entry for this trial proposal; do not change active shared installs or index fenced corpora. Server-name and cache-root/version barriers matter.",
+      "citations": [
+        {
+          "repository": "https://github.com/deusdata/codebase-memory-mcp",
+          "commit": "8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798",
+          "path": "README.md",
+          "lines": [
+            128,
+            130
+          ],
+          "url": "https://github.com/deusdata/codebase-memory-mcp/blob/8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798/README.md#L128"
+        },
+        {
+          "repository": "https://github.com/deusdata/codebase-memory-mcp",
+          "commit": "8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798",
+          "path": "README.md",
+          "lines": [
+            180,
+            188
+          ],
+          "url": "https://github.com/deusdata/codebase-memory-mcp/blob/8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798/README.md#L180"
+        },
+        {
+          "repository": "https://github.com/deusdata/codebase-memory-mcp",
+          "commit": "8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798",
+          "path": "README.md",
+          "lines": [
+            475,
+            485
+          ],
+          "url": "https://github.com/deusdata/codebase-memory-mcp/blob/8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798/README.md#L475"
+        }
+      ],
+      "protected_sessions": "Never enable in fenced trading, judge or review sessions. Ordinary reviewer proposals do not include fenced review."
+    },
+    "suited_roles": {
+      "status": "PROPOSAL ONLY; not adopted practice and not an A1 pass/fail criterion",
+      "enable_if_trial_admitted": [
+        "builder",
+        "ordinary reviewer",
+        "auditor",
+        "researcher tracing architecture",
+        "runtime workers with graph questions"
+      ],
+      "candidate_role_hypotheses": [
+        "builder",
+        "ordinary reviewer",
+        "auditor",
+        "researcher tracing architecture",
+        "runtime workers with graph questions"
+      ],
+      "not_enabled": [
+        "fenced trading",
+        "fenced judge",
+        "fenced review"
+      ],
+      "reason": "The source distinguishes provisional scouts, task-directed verification and bounded audit tiers. The role list is a proposal, not an instruction to spawn agents or treat graphs as complete.",
+      "citations": [
+        {
+          "repository": "https://github.com/deusdata/codebase-memory-mcp",
+          "commit": "8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798",
+          "path": "README.md",
+          "lines": [
+            475,
+            485
+          ],
+          "url": "https://github.com/deusdata/codebase-memory-mcp/blob/8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798/README.md#L475"
+        }
+      ]
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_tokens": null,
+      "method": "ceil(UTF-8 bytes of the selected rendered startup payload / 4); numeric value UNKNOWN because the selected payload is not fixed by the available source",
+      "counted_bytes": null,
+      "counted_ranges": [
+        {
+          "repository": "https://github.com/deusdata/codebase-memory-mcp",
+          "commit": "8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798",
+          "path": "src/mcp/mcp.c",
+          "lines": [
+            1371,
+            1378
+          ],
+          "url": "https://github.com/deusdata/codebase-memory-mcp/blob/8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798/src/mcp/mcp.c#L1371"
+        }
+      ],
+      "scope": "The server emits one of default/analysis/scout instructions and a selected tool surface. Installer-added skills/hooks are excluded from the manual MCP-only route. Exact selected instruction/schema bytes are unresolved; no zero is claimed.",
+      "estimate_extent": "Unresolved generated component; UNKNOWN is not zero",
+      "family_loading": "DeerFlow/GPT Researcher select/load MCP tools per research configuration; client selection text and tool routing are additional.",
+      "unmeasured": "NativeHorizonNY must replace this estimate with the actual startup receipt. Per-task outputs, fetched skills, recalled memory and provider input/output/cache usage are not measured here.",
+      "cheapest_check": "Read the selected MCP_SERVER_INSTRUCTIONS definition and serialized 15-tool schema source at this pin, then count the native profile's deferred/eager presentation."
+    },
+    "screen_verdict": {
+      "result": "PASS",
+      "meaning": "TRIAL-eligible only; no default promotion",
+      "reason": "The scoped capability, maintenance, platform, headless and scoping claims pass source review. Estimates and role hypotheses are not measured evidence or defaults.",
+      "disqualifier": null,
+      "cheapest_check": "NativeHorizonNY: verify the installed pin, declared host platform, isolated scope and documented inverse; capture actual startup payload. Quality/provider-usage parity belongs to a later authorized trial."
+    },
+    "fenced_sessions": "Never enable in fenced trading, judge or review sessions. Ordinary reviewer proposals do not include fenced review.",
+    "service_status": "served: mcp route, subject to the screen verdict"
+  },
+  {
+    "candidate": {
+      "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+      "ids": [
+        "jcodemunch-mcp",
+        "jcodemunch"
+      ]
+    },
+    "pin": {
+      "commit": "687cccfb4efc573fa28160f5a59742976eeb2093",
+      "tag": "v1.108.366",
+      "read_at": "2026-10-15",
+      "note": "Source pin only; not an installed-version or measured-run receipt."
+    },
+    "family": "research",
+    "layer": "code-navigation",
+    "evidence_class": "source_review",
+    "family_independent_facts_ref": "README-context.md#facts-jgravelle-jcodemunch-mcp",
+    "requirements_result": [
+      {
+        "id": "exact-source",
+        "result": "PASS",
+        "reason": "Indexes raw content with symbol byte offsets and retrieves exact implementations; source bodies must remain the final correctness check.",
+        "citations": [
+          {
+            "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+            "commit": "687cccfb4efc573fa28160f5a59742976eeb2093",
+            "path": "README.md",
+            "lines": [
+              30,
+              37
+            ],
+            "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/687cccfb4efc573fa28160f5a59742976eeb2093/README.md#L30"
+          }
+        ]
+      },
+      {
+        "id": "references",
+        "result": "PASS",
+        "reason": "Structural tools include importers, blast radius and class relationships. This does not establish every dynamic caller or a language-server replacement.",
+        "citations": [
+          {
+            "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+            "commit": "687cccfb4efc573fa28160f5a59742976eeb2093",
+            "path": "README.md",
+            "lines": [
+              67,
+              72
+            ],
+            "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/687cccfb4efc573fa28160f5a59742976eeb2093/README.md#L67"
+          }
+        ]
+      },
+      {
+        "id": "question-scoping",
+        "result": "PASS",
+        "reason": "Scoped repository indexes and focused symbol/context retrieval fit bounded discovery; known file spans may be cheaper without an index.",
+        "citations": [
+          {
+            "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+            "commit": "687cccfb4efc573fa28160f5a59742976eeb2093",
+            "path": "README.md",
+            "lines": [
+              30,
+              37
+            ],
+            "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/687cccfb4efc573fa28160f5a59742976eeb2093/README.md#L30"
+          }
+        ]
+      },
+      {
+        "id": "maintenance",
+        "result": "PASS",
+        "reason": "Not archived; the supplied primary-source receipt has a default-branch commit within the fixed 90-day window. This proves activity, not all engineering quality angles.",
+        "citations": [
+          {
+            "url": "https://api.github.com/repos/jgravelle/jcodemunch-mcp",
+            "read_at": "2026-10-15T20:03Z",
+            "source": "gh-facts-20261015T2003Z.json or the documented anonymous correction read"
+          },
+          {
+            "url": "https://api.github.com/repos/jgravelle/jcodemunch-mcp/commits?per_page=1",
+            "read_at": "2026-10-15T20:03Z",
+            "source": "gh-facts-20261015T2003Z.json or the documented anonymous correction read"
+          }
+        ]
+      },
+      {
+        "id": "linux-wsl2-x86_64",
+        "result": "PASS",
+        "reason": "The pinned package declares OS Independent and Python >=3.10. This is a portable-runtime source claim for Linux/WSL2 and macOS, with parser/dependency wheels still an install-stage check.",
+        "citations": [
+          {
+            "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+            "commit": "687cccfb4efc573fa28160f5a59742976eeb2093",
+            "path": "pyproject.toml",
+            "lines": [
+              1,
+              35
+            ],
+            "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/687cccfb4efc573fa28160f5a59742976eeb2093/pyproject.toml#L1"
+          }
+        ]
+      },
+      {
+        "id": "macos-arm64",
+        "result": "PASS",
+        "reason": "The pinned package declares OS Independent and Python >=3.10. This is a portable-runtime source claim for Linux/WSL2 and macOS, with parser/dependency wheels still an install-stage check.",
+        "citations": [
+          {
+            "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+            "commit": "687cccfb4efc573fa28160f5a59742976eeb2093",
+            "path": "pyproject.toml",
+            "lines": [
+              1,
+              35
+            ],
+            "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/687cccfb4efc573fa28160f5a59742976eeb2093/pyproject.toml#L1"
+          }
+        ]
+      },
+      {
+        "id": "headless",
+        "result": "PASS",
+        "reason": "The source documents stdio and Streamable HTTP MCP entry points; the selected binary route is noninteractive.",
+        "citations": [
+          {
+            "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+            "commit": "687cccfb4efc573fa28160f5a59742976eeb2093",
+            "path": "CLIENTS.md",
+            "lines": [
+              1,
+              31
+            ],
+            "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/687cccfb4efc573fa28160f5a59742976eeb2093/CLIENTS.md#L1"
+          }
+        ]
+      },
+      {
+        "id": "profile-or-project-scoping",
+        "result": "PASS",
+        "reason": "Index/retrieval requests identify repositories and raw source roots; register only the selected project/profile's server and corpus, never fenced session material.",
+        "citations": [
+          {
+            "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+            "commit": "687cccfb4efc573fa28160f5a59742976eeb2093",
+            "path": "README.md",
+            "lines": [
+              30,
+              37
+            ],
+            "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/687cccfb4efc573fa28160f5a59742976eeb2093/README.md#L30"
+          }
+        ]
+      },
+      {
+        "id": "family-route",
+        "result": "PASS",
+        "reason": "The candidate's documented MCP route composes with this family's scoped native MCP configuration. This does not imply native lifecycle hooks or API-model invocation.",
+        "citations": [
+          {
+            "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+            "commit": "687cccfb4efc573fa28160f5a59742976eeb2093",
+            "path": "README.md",
+            "lines": [
+              80,
+              122
+            ],
+            "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/687cccfb4efc573fa28160f5a59742976eeb2093/README.md#L80"
+          },
+          {
+            "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+            "commit": "687cccfb4efc573fa28160f5a59742976eeb2093",
+            "path": "CLIENTS.md",
+            "lines": [
+              1,
+              31
+            ],
+            "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/687cccfb4efc573fa28160f5a59742976eeb2093/CLIENTS.md#L1"
+          },
+          {
+            "repository": "https://github.com/bytedance/deer-flow",
+            "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+            "path": "extensions_config.example.json",
+            "lines": [
+              6,
+              39
+            ],
+            "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/extensions_config.example.json#L6"
+          },
+          {
+            "repository": "https://github.com/assafelovic/gpt-researcher",
+            "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+            "path": "docs/docs/gpt-researcher/retrievers/mcp-configs.mdx",
+            "lines": [
+              60,
+              101
+            ],
+            "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/docs/docs/gpt-researcher/retrievers/mcp-configs.mdx#L60"
+          }
+        ]
+      }
+    ],
+    "install_path": {
+      "commands": [
+        "uv tool install jcodemunch-mcp==1.108.366"
+      ],
+      "scope": "Only the selected DeerFlow sandbox/extensions configuration or GPT Researcher invocation; do not enable globally.",
+      "configuration": {
+        "deerflow": {
+          "file": "extensions_config.json",
+          "entry": "mcpServers.jcodemunch",
+          "server_command": "/absolute/path/to/isolated-environment/bin/jcodemunch-mcp",
+          "enabled": "only in selected research profile"
+        },
+        "gpt_researcher": {
+          "parameter": "mcp_configs",
+          "server_command": "/absolute/path/to/isolated-environment/bin/jcodemunch-mcp",
+          "note": "Per-invocation name/command/args entry; keep runtime authentication and model route unchanged."
+        }
+      },
+      "citations": [
+        {
+          "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+          "commit": "687cccfb4efc573fa28160f5a59742976eeb2093",
+          "path": "README.md",
+          "lines": [
+            80,
+            122
+          ],
+          "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/687cccfb4efc573fa28160f5a59742976eeb2093/README.md#L80"
+        },
+        {
+          "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+          "commit": "687cccfb4efc573fa28160f5a59742976eeb2093",
+          "path": "CLIENTS.md",
+          "lines": [
+            1,
+            31
+          ],
+          "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/687cccfb4efc573fa28160f5a59742976eeb2093/CLIENTS.md#L1"
+        },
+        {
+          "repository": "https://github.com/bytedance/deer-flow",
+          "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+          "path": "extensions_config.example.json",
+          "lines": [
+            6,
+            39
+          ],
+          "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/extensions_config.example.json#L6"
+        },
+        {
+          "repository": "https://github.com/assafelovic/gpt-researcher",
+          "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+          "path": "docs/docs/gpt-researcher/retrievers/mcp-configs.mdx",
+          "lines": [
+            60,
+            101
+          ],
+          "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/docs/docs/gpt-researcher/retrievers/mcp-configs.mdx#L60"
+        }
+      ],
+      "pinning_note": "Commands are reviewable source-derived recipes, never executed here. Explicit version/revision substitutions bind the documented package route where possible; any vendor floating selector must be resolved to the screened pin before installation."
+    },
+    "inverse": {
+      "commands": [],
+      "finding": "No dedicated uninstall in the reviewed README/CLIENTS.md. Disable/remove only the selected native MCP entry. Auto-init additionally writes prompt policy/hooks and requires a separate documented reversal.",
+      "citations": [
+        {
+          "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+          "commit": "687cccfb4efc573fa28160f5a59742976eeb2093",
+          "path": "README.md",
+          "lines": [
+            87,
+            124
+          ],
+          "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/687cccfb4efc573fa28160f5a59742976eeb2093/README.md#L87"
+        },
+        {
+          "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+          "commit": "687cccfb4efc573fa28160f5a59742976eeb2093",
+          "path": "CLIENTS.md",
+          "lines": [
+            1,
+            31
+          ],
+          "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/687cccfb4efc573fa28160f5a59742976eeb2093/CLIENTS.md#L1"
+        },
+        {
+          "repository": "https://github.com/bytedance/deer-flow",
+          "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+          "path": "extensions_config.example.json",
+          "lines": [
+            6,
+            39
+          ],
+          "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/extensions_config.example.json#L6"
+        },
+        {
+          "repository": "https://github.com/assafelovic/gpt-researcher",
+          "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+          "path": "docs/docs/gpt-researcher/retrievers/mcp-configs.mdx",
+          "lines": [
+            60,
+            101
+          ],
+          "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/docs/docs/gpt-researcher/retrievers/mcp-configs.mdx#L60"
+        }
+      ],
+      "host_disable": "DeerFlow documents enabled=false; GPT Researcher is configured per invocation. Candidate package/data deletion is separate."
+    },
+    "conflicts": {
+      "summary": "init auto-detects clients, writes CLAUDE.md policy, optionally installs enforcement hooks/indexes, and audits agent configuration. The selected manual MCP route omits init. Codex specifically requires a preinstalled absolute binary rather than uvx's first-stdout installation path. MCP SDK is capped below 2.0 at this pin; do not flatten environments with Serena's 2.x SDK.",
+      "citations": [
+        {
+          "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+          "commit": "687cccfb4efc573fa28160f5a59742976eeb2093",
+          "path": "README.md",
+          "lines": [
+            91,
+            124
+          ],
+          "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/687cccfb4efc573fa28160f5a59742976eeb2093/README.md#L91"
+        },
+        {
+          "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+          "commit": "687cccfb4efc573fa28160f5a59742976eeb2093",
+          "path": "CLIENTS.md",
+          "lines": [
+            34,
+            70
+          ],
+          "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/687cccfb4efc573fa28160f5a59742976eeb2093/CLIENTS.md#L34"
+        },
+        {
+          "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+          "commit": "687cccfb4efc573fa28160f5a59742976eeb2093",
+          "path": "pyproject.toml",
+          "lines": [
+            37,
+            38
+          ],
+          "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/687cccfb4efc573fa28160f5a59742976eeb2093/pyproject.toml#L37"
+        }
+      ],
+      "protected_sessions": "Never enable in fenced trading, judge or review sessions. Ordinary reviewer proposals do not include fenced review."
+    },
+    "suited_roles": {
+      "status": "PROPOSAL ONLY; not adopted practice and not an A1 pass/fail criterion",
+      "enable_if_trial_admitted": [
+        "builder",
+        "ordinary reviewer",
+        "auditor",
+        "researcher retrieving code",
+        "runtime workers doing scoped discovery"
+      ],
+      "candidate_role_hypotheses": [
+        "builder",
+        "ordinary reviewer",
+        "auditor",
+        "researcher retrieving code",
+        "runtime workers doing scoped discovery"
+      ],
+      "not_enabled": [
+        "fenced trading",
+        "fenced judge",
+        "fenced review"
+      ],
+      "reason": "Exact symbol retrieval and structural relationship queries fit those tasks; vendor savings counters and popularity are not evidence of local benefit.",
+      "citations": [
+        {
+          "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+          "commit": "687cccfb4efc573fa28160f5a59742976eeb2093",
+          "path": "README.md",
+          "lines": [
+            30,
+            37
+          ],
+          "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/687cccfb4efc573fa28160f5a59742976eeb2093/README.md#L30"
+        },
+        {
+          "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+          "commit": "687cccfb4efc573fa28160f5a59742976eeb2093",
+          "path": "README.md",
+          "lines": [
+            67,
+            72
+          ],
+          "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/687cccfb4efc573fa28160f5a59742976eeb2093/README.md#L67"
+        }
+      ]
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_tokens": 1046,
+      "method": "ceil(counted UTF-8 bytes / 4); no tokenizer, candidate import, server launch or model call",
+      "counted_bytes": 4184,
+      "counted_ranges": [
+        {
+          "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+          "commit": "687cccfb4efc573fa28160f5a59742976eeb2093",
+          "path": "src/jcodemunch_mcp/server.py",
+          "lines": [
+            415,
+            474
+          ],
+          "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/687cccfb4efc573fa28160f5a59742976eeb2093/src/jcodemunch_mcp/server.py#L415"
+        },
+        {
+          "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+          "commit": "687cccfb4efc573fa28160f5a59742976eeb2093",
+          "path": "src/jcodemunch_mcp/server.py",
+          "lines": [
+            4835,
+            4891
+          ],
+          "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/687cccfb4efc573fa28160f5a59742976eeb2093/src/jcodemunch_mcp/server.py#L4835"
+        }
+      ],
+      "scope": "Six front-door/meta Tool objects statically reconstructed from Python AST literals total 4,184 compact-JSON bytes (ESTIMATE 1,046 tokens). This is a front-door descriptor component, not every optional tier or native client envelope; no init-generated prompt/skill is selected.",
+      "estimate_extent": "Eager static descriptor component; client deferral/envelopes excluded",
+      "family_loading": "DeerFlow/GPT Researcher select/load MCP tools per research configuration; client selection text and tool routing are additional.",
+      "unmeasured": "NativeHorizonNY must replace this estimate with the actual startup receipt. Per-task outputs, fetched skills, recalled memory and provider input/output/cache usage are not measured here.",
+      "cheapest_check": "Count the admitted profile's rendered startup components, then verify the client-visible payload at installation without a model-quality claim."
+    },
+    "screen_verdict": {
+      "result": "PASS",
+      "meaning": "TRIAL-eligible only; no default promotion",
+      "reason": "The scoped capability, maintenance, platform, headless and scoping claims pass source review. Estimates and role hypotheses are not measured evidence or defaults.",
+      "disqualifier": null,
+      "cheapest_check": "NativeHorizonNY: verify the installed pin, declared host platform, isolated scope and documented inverse; capture actual startup payload. Quality/provider-usage parity belongs to a later authorized trial."
+    },
+    "fenced_sessions": "Never enable in fenced trading, judge or review sessions. Ordinary reviewer proposals do not include fenced review.",
+    "service_status": "served: mcp route, subject to the screen verdict"
+  },
+  {
+    "candidate": {
+      "repository": "https://github.com/mibayy/token-savior",
+      "ids": [
+        "token-savior-recall[mcp]",
+        "token-savior",
+        "ts"
+      ]
+    },
+    "pin": {
+      "commit": "770e055defd10b114591c4a426af67d9422e0330",
+      "tag": "v4.24.0",
+      "read_at": "2026-10-15",
+      "note": "Source pin only; not an installed-version or measured-run receipt."
+    },
+    "family": "research",
+    "layer": "code-navigation",
+    "evidence_class": "source_review",
+    "family_independent_facts_ref": "README-context.md#facts-mibayy-token-savior",
+    "requirements_result": [
+      {
+        "id": "exact-source",
+        "result": "PASS",
+        "reason": "The source exposes find_symbol and exact function/class-source/context tools, rather than treating compressed output as full source.",
+        "citations": [
+          {
+            "repository": "https://github.com/mibayy/token-savior",
+            "commit": "770e055defd10b114591c4a426af67d9422e0330",
+            "path": "docs/mcp_toolset.example.json",
+            "lines": [
+              9,
+              24
+            ],
+            "url": "https://github.com/mibayy/token-savior/blob/770e055defd10b114591c4a426af67d9422e0330/docs/mcp_toolset.example.json#L9"
+          }
+        ]
+      },
+      {
+        "id": "references",
+        "result": "PASS",
+        "reason": "get_dependencies/get_dependents/get_file_dependents provide scoped structural relationship retrieval; completeness remains an unmeasured trial dimension.",
+        "citations": [
+          {
+            "repository": "https://github.com/mibayy/token-savior",
+            "commit": "770e055defd10b114591c4a426af67d9422e0330",
+            "path": "docs/mcp_toolset.example.json",
+            "lines": [
+              19,
+              22
+            ],
+            "url": "https://github.com/mibayy/token-savior/blob/770e055defd10b114591c4a426af67d9422e0330/docs/mcp_toolset.example.json#L19"
+          }
+        ]
+      },
+      {
+        "id": "question-scoping",
+        "result": "PASS",
+        "reason": "The MCP surface includes switch_project/list_projects/reindex; profile/env switches let other installed navigation/memory layers remain separate.",
+        "citations": [
+          {
+            "repository": "https://github.com/mibayy/token-savior",
+            "commit": "770e055defd10b114591c4a426af67d9422e0330",
+            "path": "docs/mcp_toolset.example.json",
+            "lines": [
+              9,
+              11
+            ],
+            "url": "https://github.com/mibayy/token-savior/blob/770e055defd10b114591c4a426af67d9422e0330/docs/mcp_toolset.example.json#L9"
+          }
+        ]
+      },
+      {
+        "id": "maintenance",
+        "result": "PASS",
+        "reason": "Not archived; the supplied primary-source receipt has a default-branch commit within the fixed 90-day window. This proves activity, not all engineering quality angles.",
+        "citations": [
+          {
+            "url": "https://api.github.com/repos/mibayy/token-savior",
+            "read_at": "2026-10-15T20:03Z",
+            "source": "gh-facts-20261015T2003Z.json or the documented anonymous correction read"
+          },
+          {
+            "url": "https://api.github.com/repos/mibayy/token-savior/commits?per_page=1",
+            "read_at": "2026-10-15T20:03Z",
+            "source": "gh-facts-20261015T2003Z.json or the documented anonymous correction read"
+          }
+        ]
+      },
+      {
+        "id": "linux-wsl2-x86_64",
+        "result": "UNKNOWN",
+        "reason": "Python >=3.11 and Tree-sitter dependencies are specified, but the exact Linux x86_64/macOS arm64 native parser wheel/build set was not established at this pin.",
+        "citations": [
+          {
+            "repository": "https://github.com/mibayy/token-savior",
+            "commit": "770e055defd10b114591c4a426af67d9422e0330",
+            "path": "pyproject.toml",
+            "lines": [
+              9,
+              40
+            ],
+            "url": "https://github.com/mibayy/token-savior/blob/770e055defd10b114591c4a426af67d9422e0330/pyproject.toml#L9"
+          }
+        ]
+      },
+      {
+        "id": "macos-arm64",
+        "result": "UNKNOWN",
+        "reason": "Python >=3.11 and Tree-sitter dependencies are specified, but the exact Linux x86_64/macOS arm64 native parser wheel/build set was not established at this pin.",
+        "citations": [
+          {
+            "repository": "https://github.com/mibayy/token-savior",
+            "commit": "770e055defd10b114591c4a426af67d9422e0330",
+            "path": "pyproject.toml",
+            "lines": [
+              9,
+              40
+            ],
+            "url": "https://github.com/mibayy/token-savior/blob/770e055defd10b114591c4a426af67d9422e0330/pyproject.toml#L9"
+          }
+        ]
+      },
+      {
+        "id": "headless",
+        "result": "PASS",
+        "reason": "The documented MCP command is a stdio service; hook/init integration is separate.",
+        "citations": [
+          {
+            "repository": "https://github.com/mibayy/token-savior",
+            "commit": "770e055defd10b114591c4a426af67d9422e0330",
+            "path": "README.md",
+            "lines": [
+              112,
+              170
+            ],
+            "url": "https://github.com/mibayy/token-savior/blob/770e055defd10b114591c4a426af67d9422e0330/README.md#L112"
+          }
+        ]
+      },
+      {
+        "id": "profile-or-project-scoping",
+        "result": "PASS",
+        "reason": "Project switching and memory/capture disable controls are documented. Select a single navigation profile and corpus; no hook capture or cross-project memory is enabled by this row.",
+        "citations": [
+          {
+            "repository": "https://github.com/mibayy/token-savior",
+            "commit": "770e055defd10b114591c4a426af67d9422e0330",
+            "path": "README.md",
+            "lines": [
+              445,
+              457
+            ],
+            "url": "https://github.com/mibayy/token-savior/blob/770e055defd10b114591c4a426af67d9422e0330/README.md#L445"
+          }
+        ]
+      },
+      {
+        "id": "family-route",
+        "result": "PASS",
+        "reason": "The candidate's documented MCP route composes with this family's scoped native MCP configuration. This does not imply native lifecycle hooks or API-model invocation.",
+        "citations": [
+          {
+            "repository": "https://github.com/mibayy/token-savior",
+            "commit": "770e055defd10b114591c4a426af67d9422e0330",
+            "path": "README.md",
+            "lines": [
+              112,
+              139
+            ],
+            "url": "https://github.com/mibayy/token-savior/blob/770e055defd10b114591c4a426af67d9422e0330/README.md#L112"
+          },
+          {
+            "repository": "https://github.com/mibayy/token-savior",
+            "commit": "770e055defd10b114591c4a426af67d9422e0330",
+            "path": "pyproject.toml",
+            "lines": [
+              1,
+              40
+            ],
+            "url": "https://github.com/mibayy/token-savior/blob/770e055defd10b114591c4a426af67d9422e0330/pyproject.toml#L1"
+          },
+          {
+            "repository": "https://github.com/bytedance/deer-flow",
+            "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+            "path": "extensions_config.example.json",
+            "lines": [
+              6,
+              39
+            ],
+            "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/extensions_config.example.json#L6"
+          },
+          {
+            "repository": "https://github.com/assafelovic/gpt-researcher",
+            "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+            "path": "docs/docs/gpt-researcher/retrievers/mcp-configs.mdx",
+            "lines": [
+              60,
+              101
+            ],
+            "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/docs/docs/gpt-researcher/retrievers/mcp-configs.mdx#L60"
+          }
+        ]
+      }
+    ],
+    "install_path": {
+      "commands": [
+        "pip install \"token-savior-recall[mcp]==4.24.0\""
+      ],
+      "scope": "Only the selected DeerFlow sandbox/extensions configuration or GPT Researcher invocation; do not enable globally.",
+      "configuration": {
+        "deerflow": {
+          "file": "extensions_config.json",
+          "entry": "mcpServers.token-savior",
+          "server_command": "token-savior",
+          "enabled": "only in selected research profile"
+        },
+        "gpt_researcher": {
+          "parameter": "mcp_configs",
+          "server_command": "token-savior",
+          "note": "Per-invocation name/command/args entry; keep runtime authentication and model route unchanged."
+        }
+      },
+      "citations": [
+        {
+          "repository": "https://github.com/mibayy/token-savior",
+          "commit": "770e055defd10b114591c4a426af67d9422e0330",
+          "path": "README.md",
+          "lines": [
+            112,
+            139
+          ],
+          "url": "https://github.com/mibayy/token-savior/blob/770e055defd10b114591c4a426af67d9422e0330/README.md#L112"
+        },
+        {
+          "repository": "https://github.com/mibayy/token-savior",
+          "commit": "770e055defd10b114591c4a426af67d9422e0330",
+          "path": "pyproject.toml",
+          "lines": [
+            1,
+            40
+          ],
+          "url": "https://github.com/mibayy/token-savior/blob/770e055defd10b114591c4a426af67d9422e0330/pyproject.toml#L1"
+        },
+        {
+          "repository": "https://github.com/bytedance/deer-flow",
+          "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+          "path": "extensions_config.example.json",
+          "lines": [
+            6,
+            39
+          ],
+          "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/extensions_config.example.json#L6"
+        },
+        {
+          "repository": "https://github.com/assafelovic/gpt-researcher",
+          "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+          "path": "docs/docs/gpt-researcher/retrievers/mcp-configs.mdx",
+          "lines": [
+            60,
+            101
+          ],
+          "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/docs/docs/gpt-researcher/retrievers/mcp-configs.mdx#L60"
+        }
+      ],
+      "pinning_note": "Commands are reviewable source-derived recipes, never executed here. Explicit version/revision substitutions bind the documented package route where possible; any vendor floating selector must be resolved to the screened pin before installation."
+    },
+    "inverse": {
+      "commands": [
+        "Set TS_MEMORY_DISABLE=1 and TS_CAPTURE_DISABLED=1 for the navigation-only server profile; remove/disable its scoped native MCP entry to stop all tools."
+      ],
+      "finding": "Documented feature-disable variables exist; no full package uninstall/integration inverse was established in the reviewed source.",
+      "citations": [
+        {
+          "repository": "https://github.com/mibayy/token-savior",
+          "commit": "770e055defd10b114591c4a426af67d9422e0330",
+          "path": "README.md",
+          "lines": [
+            445,
+            457
+          ],
+          "url": "https://github.com/mibayy/token-savior/blob/770e055defd10b114591c4a426af67d9422e0330/README.md#L445"
+        },
+        {
+          "repository": "https://github.com/bytedance/deer-flow",
+          "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+          "path": "extensions_config.example.json",
+          "lines": [
+            6,
+            39
+          ],
+          "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/extensions_config.example.json#L6"
+        },
+        {
+          "repository": "https://github.com/assafelovic/gpt-researcher",
+          "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+          "path": "docs/docs/gpt-researcher/retrievers/mcp-configs.mdx",
+          "lines": [
+            60,
+            101
+          ],
+          "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/docs/docs/gpt-researcher/retrievers/mcp-configs.mdx#L60"
+        }
+      ],
+      "host_disable": "DeerFlow documents enabled=false; GPT Researcher is configured per invocation. Candidate package/data deletion is separate."
+    },
+    "conflicts": {
+      "summary": "The README explicitly identifies overlap with Serena and codebase-memory. ts init adds native hooks; alwaysLoad changes native deferral; auto/optimized profiles change which schemas are exposed. A full server also includes memory/capture and optional discipline prompts, so those must be scoped independently of navigation. No vendor benchmark is treated as a local result.",
+      "citations": [
+        {
+          "repository": "https://github.com/mibayy/token-savior",
+          "commit": "770e055defd10b114591c4a426af67d9422e0330",
+          "path": "README.md",
+          "lines": [
+            137,
+            170
+          ],
+          "url": "https://github.com/mibayy/token-savior/blob/770e055defd10b114591c4a426af67d9422e0330/README.md#L137"
+        },
+        {
+          "repository": "https://github.com/mibayy/token-savior",
+          "commit": "770e055defd10b114591c4a426af67d9422e0330",
+          "path": "README.md",
+          "lines": [
+            300,
+            310
+          ],
+          "url": "https://github.com/mibayy/token-savior/blob/770e055defd10b114591c4a426af67d9422e0330/README.md#L300"
+        },
+        {
+          "repository": "https://github.com/mibayy/token-savior",
+          "commit": "770e055defd10b114591c4a426af67d9422e0330",
+          "path": "README.md",
+          "lines": [
+            445,
+            457
+          ],
+          "url": "https://github.com/mibayy/token-savior/blob/770e055defd10b114591c4a426af67d9422e0330/README.md#L445"
+        }
+      ],
+      "protected_sessions": "Never enable in fenced trading, judge or review sessions. Ordinary reviewer proposals do not include fenced review."
+    },
+    "suited_roles": {
+      "status": "PROPOSAL ONLY; not adopted practice and not an A1 pass/fail criterion",
+      "enable_if_trial_admitted": [],
+      "candidate_role_hypotheses": [
+        "builder",
+        "ordinary reviewer",
+        "auditor",
+        "runtime workers with structural code questions"
+      ],
+      "not_enabled": [
+        "fenced trading",
+        "fenced judge",
+        "fenced review"
+      ],
+      "reason": "A navigation-only profile is a role hypothesis, contingent on parser/platform completion and avoiding duplicate memory owners.",
+      "citations": [
+        {
+          "repository": "https://github.com/mibayy/token-savior",
+          "commit": "770e055defd10b114591c4a426af67d9422e0330",
+          "path": "README.md",
+          "lines": [
+            300,
+            310
+          ],
+          "url": "https://github.com/mibayy/token-savior/blob/770e055defd10b114591c4a426af67d9422e0330/README.md#L300"
+        },
+        {
+          "repository": "https://github.com/mibayy/token-savior",
+          "commit": "770e055defd10b114591c4a426af67d9422e0330",
+          "path": "docs/mcp_toolset.example.json",
+          "lines": [
+            9,
+            24
+          ],
+          "url": "https://github.com/mibayy/token-savior/blob/770e055defd10b114591c4a426af67d9422e0330/docs/mcp_toolset.example.json#L9"
+        }
+      ]
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_tokens": 104,
+      "method": "ceil(counted UTF-8 bytes / 4); no tokenizer, candidate import, server launch or model call",
+      "counted_bytes": 415,
+      "counted_ranges": [
+        {
+          "repository": "https://github.com/mibayy/token-savior",
+          "commit": "770e055defd10b114591c4a426af67d9422e0330",
+          "path": "src/token_savior/server.py",
+          "lines": [
+            532,
+            554
+          ],
+          "url": "https://github.com/mibayy/token-savior/blob/770e055defd10b114591c4a426af67d9422e0330/src/token_savior/server.py#L532"
+        }
+      ],
+      "scope": "The statically reconstructable ts_extended descriptor fields total 415 compact-JSON bytes (ESTIMATE 104 tokens), excluding its generated description and the profile-selected hot tool schemas. This is only a known component; the auto/optimized tool set must be bound before a total can be estimated.",
+      "estimate_extent": "Partial literal component only; do not treat as a total",
+      "family_loading": "DeerFlow/GPT Researcher select/load MCP tools per research configuration; client selection text and tool routing are additional.",
+      "unmeasured": "NativeHorizonNY must replace this estimate with the actual startup receipt. Per-task outputs, fetched skills, recalled memory and provider input/output/cache usage are not measured here.",
+      "cheapest_check": "Bind a navigation-only profile, inspect its generated hot-tool descriptions/schemas, and verify the required parser wheels for both target platforms."
+    },
+    "screen_verdict": {
+      "result": "INCOMPLETE",
+      "meaning": "Not yet TRIAL-eligible; named source gaps remain",
+      "reason": "linux-wsl2-x86_64: Python >=3.11 and Tree-sitter dependencies are specified, but the exact Linux x86_64/macOS arm64 native parser wheel/build set was not established at this pin. macos-arm64: Python >=3.11 and Tree-sitter dependencies are specified, but the exact Linux x86_64/macOS arm64 native parser wheel/build set was not established at this pin.",
+      "disqualifier": null,
+      "cheapest_check": "Resolve the specific UNKNOWN requirements from pinned upstream source/package metadata before installation. Bind a navigation-only profile, inspect its generated hot-tool descriptions/schemas, and verify the required parser wheels for both target platforms."
+    },
+    "fenced_sessions": "Never enable in fenced trading, judge or review sessions. Ordinary reviewer proposals do not include fenced review.",
+    "service_status": "served: mcp route, subject to the screen verdict"
+  },
+  {
+    "candidate": {
+      "repository": "https://github.com/oraios/serena",
+      "ids": [
+        "serena-agent",
+        "serena"
+      ]
+    },
+    "pin": {
+      "commit": "4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3",
+      "tag": "v2.0.0",
+      "read_at": "2026-10-15",
+      "note": "Source pin only; not an installed-version or measured-run receipt."
+    },
+    "family": "research",
+    "layer": "code-navigation",
+    "evidence_class": "source_review",
+    "family_independent_facts_ref": "README-context.md#facts-oraios-serena",
+    "requirements_result": [
+      {
+        "id": "exact-source",
+        "result": "PASS",
+        "reason": "Semantic symbol/body retrieval is the product's stated code-intelligence interface; exact-language-server support remains language-specific.",
+        "citations": [
+          {
+            "repository": "https://github.com/oraios/serena",
+            "commit": "4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3",
+            "path": "README.md",
+            "lines": [
+              14,
+              19
+            ],
+            "url": "https://github.com/oraios/serena/blob/4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3/README.md#L14"
+          }
+        ]
+      },
+      {
+        "id": "references",
+        "result": "PASS",
+        "reason": "The documented tool set includes find referencing symbols; LSP and other backends have explicitly different feature coverage.",
+        "citations": [
+          {
+            "repository": "https://github.com/oraios/serena",
+            "commit": "4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3",
+            "path": "README.md",
+            "lines": [
+              130,
+              177
+            ],
+            "url": "https://github.com/oraios/serena/blob/4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3/README.md#L130"
+          }
+        ]
+      },
+      {
+        "id": "question-scoping",
+        "result": "PASS",
+        "reason": "Project/context configuration selects the repository and avoids duplicating native file/shell tools. Activate only for symbol/reference questions that need it.",
+        "citations": [
+          {
+            "repository": "https://github.com/oraios/serena",
+            "commit": "4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3",
+            "path": "README.md",
+            "lines": [
+              185,
+              210
+            ],
+            "url": "https://github.com/oraios/serena/blob/4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3/README.md#L185"
+          }
+        ]
+      },
+      {
+        "id": "maintenance",
+        "result": "PASS",
+        "reason": "Not archived; the supplied primary-source receipt has a default-branch commit within the fixed 90-day window. This proves activity, not all engineering quality angles.",
+        "citations": [
+          {
+            "url": "https://api.github.com/repos/oraios/serena",
+            "read_at": "2026-10-15T20:03Z",
+            "source": "gh-facts-20261015T2003Z.json or the documented anonymous correction read"
+          },
+          {
+            "url": "https://api.github.com/repos/oraios/serena/commits?per_page=1",
+            "read_at": "2026-10-15T20:03Z",
+            "source": "gh-facts-20261015T2003Z.json or the documented anonymous correction read"
+          }
+        ]
+      },
+      {
+        "id": "linux-wsl2-x86_64",
+        "result": "PASS",
+        "reason": "The package supports CPython 3.11–3.14 and documents a Linux/Windows/macOS CI matrix. Linux/WSL2 and macOS runtime compatibility is source-level; individual language-server binaries and arm64 availability remain qualified per chosen language, not universally certified.",
+        "citations": [
+          {
+            "repository": "https://github.com/oraios/serena",
+            "commit": "4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3",
+            "path": "pyproject.toml",
+            "lines": [
+              11,
+              18
+            ],
+            "url": "https://github.com/oraios/serena/blob/4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3/pyproject.toml#L11"
+          },
+          {
+            "repository": "https://github.com/oraios/serena",
+            "commit": "4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3",
+            "path": "pyproject.toml",
+            "lines": [
+              111,
+              114
+            ],
+            "url": "https://github.com/oraios/serena/blob/4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3/pyproject.toml#L111"
+          }
+        ]
+      },
+      {
+        "id": "macos-arm64",
+        "result": "PASS",
+        "reason": "The package supports CPython 3.11–3.14 and documents a Linux/Windows/macOS CI matrix. Linux/WSL2 and macOS runtime compatibility is source-level; individual language-server binaries and arm64 availability remain qualified per chosen language, not universally certified.",
+        "citations": [
+          {
+            "repository": "https://github.com/oraios/serena",
+            "commit": "4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3",
+            "path": "pyproject.toml",
+            "lines": [
+              11,
+              18
+            ],
+            "url": "https://github.com/oraios/serena/blob/4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3/pyproject.toml#L11"
+          },
+          {
+            "repository": "https://github.com/oraios/serena",
+            "commit": "4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3",
+            "path": "pyproject.toml",
+            "lines": [
+              111,
+              114
+            ],
+            "url": "https://github.com/oraios/serena/blob/4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3/pyproject.toml#L111"
+          }
+        ]
+      },
+      {
+        "id": "headless",
+        "result": "PASS",
+        "reason": "The source documents client-launched stdio or standalone HTTP MCP servers.",
+        "citations": [
+          {
+            "repository": "https://github.com/oraios/serena",
+            "commit": "4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3",
+            "path": "README.md",
+            "lines": [
+              82,
+              84
+            ],
+            "url": "https://github.com/oraios/serena/blob/4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3/README.md#L82"
+          }
+        ]
+      },
+      {
+        "id": "profile-or-project-scoping",
+        "result": "PASS",
+        "reason": "Claude uses an explicit project or project-from-cwd context; Codex has its own context and activation caveat for the app's cwd. Do not share a cwd-sensitive server across unrelated profiles.",
+        "citations": [
+          {
+            "repository": "https://github.com/oraios/serena",
+            "commit": "4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3",
+            "path": "docs/02-usage/030_clients.md",
+            "lines": [
+              182,
+              240
+            ],
+            "url": "https://github.com/oraios/serena/blob/4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3/docs/02-usage/030_clients.md#L182"
+          }
+        ]
+      },
+      {
+        "id": "family-route",
+        "result": "PASS",
+        "reason": "Any MCP host is documented; the agent context supplies initial instructions at startup. Restrict to code-research tasks in the admitted project.",
+        "citations": [
+          {
+            "repository": "https://github.com/oraios/serena",
+            "commit": "4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3",
+            "path": "README.md",
+            "lines": [
+              72,
+              84
+            ],
+            "url": "https://github.com/oraios/serena/blob/4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3/README.md#L72"
+          },
+          {
+            "repository": "https://github.com/oraios/serena",
+            "commit": "4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3",
+            "path": "src/serena/resources/config/contexts/agent.yml",
+            "lines": [
+              1,
+              7
+            ],
+            "url": "https://github.com/oraios/serena/blob/4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3/src/serena/resources/config/contexts/agent.yml#L1"
+          },
+          {
+            "repository": "https://github.com/bytedance/deer-flow",
+            "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+            "path": "extensions_config.example.json",
+            "lines": [
+              6,
+              39
+            ],
+            "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/extensions_config.example.json#L6"
+          },
+          {
+            "repository": "https://github.com/assafelovic/gpt-researcher",
+            "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+            "path": "docs/docs/gpt-researcher/retrievers/mcp-configs.mdx",
+            "lines": [
+              60,
+              101
+            ],
+            "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/docs/docs/gpt-researcher/retrievers/mcp-configs.mdx#L60"
+          }
+        ]
+      }
+    ],
+    "install_path": {
+      "commands": [
+        "uv tool install -p 3.13 serena-agent==2.0.0"
+      ],
+      "scope": "Only the selected DeerFlow sandbox/extensions configuration or GPT Researcher invocation; do not enable globally.",
+      "configuration": {
+        "deerflow": {
+          "file": "extensions_config.json",
+          "entry": "mcpServers.serena",
+          "server_command": "serena start-mcp-server --context agent --project /absolute/path/to/selected-project",
+          "enabled": "only in selected research profile"
+        },
+        "gpt_researcher": {
+          "parameter": "mcp_configs",
+          "server_command": "serena start-mcp-server --context agent --project /absolute/path/to/selected-project",
+          "note": "Per-invocation name/command/args entry; keep runtime authentication and model route unchanged."
+        }
+      },
+      "citations": [
+        {
+          "repository": "https://github.com/oraios/serena",
+          "commit": "4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3",
+          "path": "README.md",
+          "lines": [
+            218,
+            247
+          ],
+          "url": "https://github.com/oraios/serena/blob/4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3/README.md#L218"
+        },
+        {
+          "repository": "https://github.com/oraios/serena",
+          "commit": "4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3",
+          "path": "docs/02-usage/030_clients.md",
+          "lines": [
+            182,
+            240
+          ],
+          "url": "https://github.com/oraios/serena/blob/4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3/docs/02-usage/030_clients.md#L182"
+        },
+        {
+          "repository": "https://github.com/bytedance/deer-flow",
+          "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+          "path": "extensions_config.example.json",
+          "lines": [
+            6,
+            39
+          ],
+          "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/extensions_config.example.json#L6"
+        },
+        {
+          "repository": "https://github.com/assafelovic/gpt-researcher",
+          "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+          "path": "docs/docs/gpt-researcher/retrievers/mcp-configs.mdx",
+          "lines": [
+            60,
+            101
+          ],
+          "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/docs/docs/gpt-researcher/retrievers/mcp-configs.mdx#L60"
+        }
+      ],
+      "pinning_note": "Commands are reviewable source-derived recipes, never executed here. Explicit version/revision substitutions bind the documented package route where possible; any vendor floating selector must be resolved to the screened pin before installation."
+    },
+    "inverse": {
+      "commands": [],
+      "finding": "No complete package uninstall recipe in the reviewed candidate docs. Disable/remove the selected native MCP entry; optional serena setup/hooks/dashboard changes need separate reversal.",
+      "citations": [
+        {
+          "repository": "https://github.com/oraios/serena",
+          "commit": "4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3",
+          "path": "README.md",
+          "lines": [
+            218,
+            247
+          ],
+          "url": "https://github.com/oraios/serena/blob/4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3/README.md#L218"
+        },
+        {
+          "repository": "https://github.com/oraios/serena",
+          "commit": "4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3",
+          "path": "docs/02-usage/030_clients.md",
+          "lines": [
+            343,
+            365
+          ],
+          "url": "https://github.com/oraios/serena/blob/4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3/docs/02-usage/030_clients.md#L343"
+        },
+        {
+          "repository": "https://github.com/bytedance/deer-flow",
+          "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+          "path": "extensions_config.example.json",
+          "lines": [
+            6,
+            39
+          ],
+          "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/extensions_config.example.json#L6"
+        },
+        {
+          "repository": "https://github.com/assafelovic/gpt-researcher",
+          "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+          "path": "docs/docs/gpt-researcher/retrievers/mcp-configs.mdx",
+          "lines": [
+            60,
+            101
+          ],
+          "url": "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/docs/docs/gpt-researcher/retrievers/mcp-configs.mdx#L60"
+        }
+      ],
+      "host_disable": "DeerFlow documents enabled=false; GPT Researcher is configured per invocation. Candidate package/data deletion is separate."
+    },
+    "conflicts": {
+      "summary": "serena setup and optional hooks can add reminders, activation and plan guards. Language servers, dashboard ports and project state can collide across sessions; manual scoped MCP is the selected route. Its Claude context has strong tool-preference instructions, which remain subordinate to the host's authority. Editing/memory tools overlap native tools and other memory owners.",
+      "citations": [
+        {
+          "repository": "https://github.com/oraios/serena",
+          "commit": "4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3",
+          "path": "docs/02-usage/030_clients.md",
+          "lines": [
+            343,
+            365
+          ],
+          "url": "https://github.com/oraios/serena/blob/4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3/docs/02-usage/030_clients.md#L343"
+        },
+        {
+          "repository": "https://github.com/oraios/serena",
+          "commit": "4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3",
+          "path": "src/serena/resources/config/contexts/claude-code.yml",
+          "lines": [
+            1,
+            56
+          ],
+          "url": "https://github.com/oraios/serena/blob/4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3/src/serena/resources/config/contexts/claude-code.yml#L1"
+        },
+        {
+          "repository": "https://github.com/oraios/serena",
+          "commit": "4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3",
+          "path": "src/serena/resources/config/contexts/codex.yml",
+          "lines": [
+            1,
+            22
+          ],
+          "url": "https://github.com/oraios/serena/blob/4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3/src/serena/resources/config/contexts/codex.yml#L1"
+        }
+      ],
+      "protected_sessions": "Never enable in fenced trading, judge or review sessions. Ordinary reviewer proposals do not include fenced review."
+    },
+    "suited_roles": {
+      "status": "PROPOSAL ONLY; not adopted practice and not an A1 pass/fail criterion",
+      "enable_if_trial_admitted": [
+        "builder",
+        "ordinary reviewer",
+        "auditor",
+        "runtime workers needing exact source/references"
+      ],
+      "candidate_role_hypotheses": [
+        "builder",
+        "ordinary reviewer",
+        "auditor",
+        "runtime workers needing exact source/references"
+      ],
+      "not_enabled": [
+        "fenced trading",
+        "fenced judge",
+        "fenced review"
+      ],
+      "reason": "Language-server symbol bodies/references support code changes and inspections. These proposals do not certify all languages, automatic edits or default memory ownership.",
+      "citations": [
+        {
+          "repository": "https://github.com/oraios/serena",
+          "commit": "4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3",
+          "path": "README.md",
+          "lines": [
+            130,
+            201
+          ],
+          "url": "https://github.com/oraios/serena/blob/4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3/README.md#L130"
+        }
+      ]
+    },
+    "startup_context_cost": {
+      "classification": "ESTIMATE",
+      "estimated_tokens": null,
+      "method": "ceil(UTF-8 bytes of the selected rendered startup payload / 4); numeric value UNKNOWN because the selected payload is not fixed by the available source",
+      "counted_bytes": null,
+      "counted_ranges": [
+        {
+          "repository": "https://github.com/oraios/serena",
+          "commit": "4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3",
+          "path": "src/serena/resources/config/contexts/agent.yml",
+          "lines": [
+            1,
+            7
+          ],
+          "url": "https://github.com/oraios/serena/blob/4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3/src/serena/resources/config/contexts/agent.yml#L1"
+        },
+        {
+          "repository": "https://github.com/oraios/serena",
+          "commit": "4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3",
+          "path": "src/serena/resources/config/prompt_templates/system_prompt.yml",
+          "lines": [
+            1,
+            211
+          ],
+          "url": "https://github.com/oraios/serena/blob/4c4268f9c0adf8743a75e6dda2ef1fa635f34cc3/src/serena/resources/config/prompt_templates/system_prompt.yml#L1"
+        }
+      ],
+      "scope": "The agent context explicitly supplies the shared system prompt at startup. Its conditional tool/mode/project substitutions must be bound; no fixed total is established here.",
+      "estimate_extent": "Unresolved generated component; UNKNOWN is not zero",
+      "family_loading": "DeerFlow/GPT Researcher select/load MCP tools per research configuration; client selection text and tool routing are additional.",
+      "unmeasured": "NativeHorizonNY must replace this estimate with the actual startup receipt. Per-task outputs, fetched skills, recalled memory and provider input/output/cache usage are not measured here.",
+      "cheapest_check": "Bind the admitted research tool/mode set and render/count the shared prompt without any private memory; then verify native startup."
+    },
+    "screen_verdict": {
+      "result": "PASS",
+      "meaning": "TRIAL-eligible only; no default promotion",
+      "reason": "The scoped capability, maintenance, platform, headless and scoping claims pass source review. Estimates and role hypotheses are not measured evidence or defaults.",
+      "disqualifier": null,
+      "cheapest_check": "NativeHorizonNY: verify the installed pin, declared host platform, isolated scope and documented inverse; capture actual startup payload. Quality/provider-usage parity belongs to a later authorized trial."
+    },
+    "fenced_sessions": "Never enable in fenced trading, judge or review sessions. Ordinary reviewer proposals do not include fenced review.",
+    "service_status": "served: mcp route, subject to the screen verdict"
+  }
+]
