@@ -26,10 +26,14 @@ def load(name, path):
 
 upstream = load('landed_latch_recut', LATCH / 'recut.py')
 flat = load('fixed_flat_recut', FLAT / 'recut.py')
+r3 = load('lane_b_r3_contract', Path(__file__).with_name('r3_contract.py'))
+replay_adapter = load('lane_b_r3_replay_adapter', Path(__file__).with_name('replay_adapter.py'))
 
 
-def isolate_launch(text, predecessor):
-    return upstream.rewrite_launch(text, predecessor, flat.sha(text.encode()))
+def isolate_launch(text, predecessor, *, canonical=None):
+    scoped = upstream.rewrite_launch(text, predecessor, flat.sha(text.encode()))
+    canonical = (ROOT / 'tests/fixtures/seq2-launch.txt').read_text() if canonical is None else canonical
+    return r3.launcher(scoped, canonical)
 
 
 def isolate_issuer(text):
@@ -38,7 +42,8 @@ def isolate_issuer(text):
 
 def isolate_unit(text, old_root, new_root):
     # #1117 named its generation seq2-flat; normalize before the landed adapter.
-    return upstream.rewrite_unit(text.replace('-seq2-flat', '-seq2'), old_root, new_root)
+    scoped, removed = upstream.rewrite_unit(text.replace('-seq2-flat', '-seq2'), old_root, new_root)
+    return r3.unit_envelopes(scoped), removed
 
 
 def pinned_file(pin, path):
@@ -71,10 +76,11 @@ def seal(source, installed, output, source_sha256, installed_sha256, source_comm
                            cwd=installed, capture_output=True)
     if check.returncode:
         raise ValueError('installed_generation_manifest_refused')
-    for name in ('recut.py', 'flat_retirement.py', 'README.md'):
+    for name in ('recut.py', 'flat_retirement.py', 'README.md', 'r3_contract.py', 'replay_adapter.py'):
         path = 'blueprints/us-equities/paper-lane-latch/' + name
         if (ROOT / path).read_bytes() != pinned_file(source_commit, path):
             raise ValueError('recut_commit_binding_mismatch')
+    canonical = pinned_file(source_commit, 'tests/fixtures/seq2-launch.txt').decode()
     # Existing #1117 builder authenticates/captures ORIGINAL runtime/config bytes.
     flat.recut(source, output, source_sha256, source_commit)
     payloads = {}
@@ -88,7 +94,16 @@ def seal(source, installed, output, source_sha256, installed_sha256, source_comm
         if name.startswith(('frozen/', 'configs/')):
             if not (installed / name).is_file() or (installed / name).read_bytes() != raw:
                 raise ValueError('installed_runtime_or_config_differs')
-    payloads['launch.py'] = isolate_launch(payloads['launch.py'].decode(), installed_sha256).encode()
+    payloads['launch.py'] = isolate_launch(payloads['launch.py'].decode(), installed_sha256,
+                                         canonical=canonical).encode()
+    scheduled = 'frozen/blueprints/us-equities/adaptive-paper/scheduled_trial.sh'
+    if scheduled not in payloads:
+        raise ValueError('scheduled_source_not_in_manifest')
+    payloads['scheduled_trial_r3.sh'] = r3.scheduler(payloads[scheduled].decode(), output).encode()
+    if 'dry_run.py' not in payloads:
+        raise ValueError('replay_driver_not_in_manifest')
+    payloads['dry_run.py'] = replay_adapter.driver(payloads['dry_run.py'].decode()).encode()
+    payloads['replay_adapter.py'] = Path(__file__).with_name('replay_adapter.py').read_bytes()
     payloads['issue_go.py'] = isolate_issuer(payloads['issue_go.py'].decode()).encode()
     for name in ('lane_latch.py', 'seq2_retirement.py'):
         payloads[name] = (LATCH / name).read_bytes()

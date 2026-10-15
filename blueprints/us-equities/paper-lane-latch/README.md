@@ -41,6 +41,42 @@ and native strict checksum before its runtime/config bytes are compared.
 No source seal is rewritten. The new receipt origin is the supplied currently
 installed bundle, so same-state-root historical handoffs need no relabeling.
 
+The lane B r3 preparation overlays only the canonical launcher's `keyed` and
+`run_stage` methods from `tests/fixtures/seq2-launch.txt`, selected from the
+builder's exact source commit. It leaves the authenticated native runner and
+CONFIG files unchanged. Trial acceptance reads PRE `paper.json` or scheduled
+`paper-output.json`, records recovery-only starts separately and refuses them
+as trial evidence. Native paper reads have a separate 1MiB cap (measured
+maximum407527B across98 outputs); the64KiB GO/control reader is unchanged.
+Native exit-zero statuses passed/completed_no_signals/held_overnight remain
+successful. A timeout sends TERM, permits 630 seconds for the cited
+recovery bounds, then KILL if still running; timeout remains refusal exit124.
+The scheduled Bash leader defers its TERM/INT exiting traps until its
+foreground runner ends, then returns143/130 without starting any later command.
+The generated root `scheduled_trial_r3.sh` retains the frozen script's logic
+and native module directory, adding `--kill-after=670s` to its TERM900 wrapper.
+It does not alter the frozen input script. Wrapper hard deadline1570s exceeds
+900+630+10; the two read-only120s ingestion/gate commands gain1s KILL-after
+bounds, so loader1820s exceeds242s preparatory work plus1570s wrapper.
+Those signal/group semantics are uutils/coreutils0.10.0 at28b6856d,
+timeout/platform/unix.rs:47-54,64-81,99-119. Its uucore process/unix.rs:119-144
+ignores repeated TERM in kill-after without resetting the grace deadline.
+The decision record gives full paths/pin and the installed -k3/1 timing probe.
+
+New packets also emit a source-bound replay adapter. It updates retained SYN
+paper outputs, scheduler-name assertions and unit-budget expectations only
+in memory; all five archived replay files remain byte-identical. Run the new
+packet's own dry_run.py: it retains the full49-case minimum and all credential/
+process tripwires. A narrow CI contract probe is separate from that full drill.
+
+New-unit envelopes cover that full wait plus 30 seconds: RuntimeMaxSec at least
+5150s PRE, 1850s RTH and 780s GET-only pre-skip; TimeoutStopSec at least2140s
+for native recovery plus its possible GET-only fallback, including both630s
+graces,10s teardown and30s margin. These are new-packet construction values, not changes to any
+installed unit. The enclosing native runner's recovery bounds and CPython
+subprocess semantics are cited in
+`docs/decisions/2026-10-15-lane-b-r3-launcher-contract.md`.
+
 The packet uses canonical `-seq3` unit names. It embeds BOTH old-generation
 retirement checks so an enabled/active seq2 or seq2-flat watcher refuses new
 issuer admission. The shared seq3 retirement-inventory PR remains separately

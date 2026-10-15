@@ -395,8 +395,25 @@ def keyed(command, *, timeout, environment=None):
     # echoed into agent messages or parsed as an instruction.
     log = STATE / 'command-output.log'
     with log.open('a') as stream:
-        result = subprocess.run(argv, env=environment, stdout=stream, stderr=stream, timeout=timeout)
-    return result.returncode
+        with subprocess.Popen(argv, env=environment, stdout=stream, stderr=stream) as child:
+            try:
+                return child.wait(timeout=timeout)
+            except subprocess.TimeoutExpired:
+                # r3 cb0e7d348d564520eb0911476d9d4b0f227952ea:
+                # transport.py:973, 50*(5s connect+5s read);
+                # recovery.py:94-98,223 <=120s, :329 teardown <=10s: 630s.
+                # credential_run forwards TERM to the native command group.
+                try:
+                    child.terminate()
+                except ProcessLookupError:
+                    pass
+                try:
+                    child.wait(timeout=50 * (5 + 5) + 120 + 10)
+                except subprocess.TimeoutExpired:
+                    child.kill()
+                    child.wait()
+                # A timeout remains a refusal even if recovery finishes rc0.
+                return 124
 
 def native_recover(stage, active):
     instance = Path(active['instance'])
@@ -416,17 +433,55 @@ def run_stage(stage):
         value = binding(stage)
         instance = Path(value['instance'])
         paper = FROZEN / 'blueprints/us-equities/adaptive-paper'
+        def paper_output(output):
+            # Native outputs: 98 sizes inspected, 80 above 64KiB, max 407527B.
+            # A 1MiB cap leaves headroom without raising safe_json's GO limit.
+            # CPython v3.12.3 os.open/fstat and buffered read(size) bound this
+            # descriptor's bytes even if the native file grows after fstat.
+            limit = 1024 * 1024
+            with os.fdopen(os.open(output, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK), 'rb') as stream:
+                info = os.fstat(stream.fileno())
+                if not stat.S_ISREG(info.st_mode) or info.st_uid != os.geteuid() or info.st_size > limit:
+                    raise Refused('unsafe_input')
+                raw = stream.read(limit + 1)
+            if len(raw) > limit:
+                raise Refused('unsafe_input')
+            return json.loads(raw), hashlib.sha256(raw).hexdigest()
+        def trial_result(rc, output):
+            if rc != 0:
+                return rc
+            result, output_sha256 = paper_output(output)
+            if result.get('status') == 'recovery_only':
+                save(instance / 'recovery-run.json', {
+                    'status': 'recovery_only', 'stage': stage, 'trial': value['trial'],
+                    'trial_evidence': False, 'native_exit_code': rc,
+                    'native_output_sha256': output_sha256,
+                    'recovery_status': result.get('recovery_status')})
+                raise Refused('paper_start_recovery_only')
+            # Native exit-zero statuses at 8c95a50d runner.py:2273 and
+            # mover_runner.py:878-891 delegates to that same phase/exit function.
+            # Recovery-only remains separately refused.
+            if result.get('status') not in ('passed', 'completed_no_signals', 'held_overnight'):
+                raise Refused('paper_trial_status_not_successful')
+            return rc
         if stage == 'pre':
-            return keyed([PY, '-E', '-s', '-B', paper / 'mover_runner.py', 'paper',
+            rc = keyed([PY, '-E', '-s', '-B', paper / 'mover_runner.py', 'paper',
                           '--env-file', credential_pointer(),
                           '--config', config(stage), '--scan', instance / 'scan.json',
                           '--trial', value['trial'], '--state-root', value['state_root'],
                           '--output', instance / 'paper.json'], timeout=4490)
+            return trial_result(rc, instance / 'paper.json')
         environment = dict(os.environ)
         environment.update(TRIAL=value['trial'], CONFIG=str(config(stage)),
                            ENV_FILE=str(credential_pointer()),
                            STATE_ROOT=value['state_root'], OUT_DIR=str(instance / 'scheduled'), PY=str(PY))
-        return keyed(['/usr/bin/bash', paper / 'scheduled_trial.sh'], timeout=1190, environment=environment)
+        # Bash defers these traps until its foreground command finishes, so
+        # recovery keeps its wait. Then cancellation must exit, never resume
+        # ingestion/gate/paper commands or turn cancellation into exit zero.
+        rc = keyed(['/usr/bin/bash', '-c',
+                    'trap \'exit 143\' TERM; trap \'exit 130\' INT; source "$1"',
+                    'lane-b-scheduled', ROOT / 'scheduled_trial_r3.sh'], timeout=1190, environment=environment)
+        return trial_result(rc, instance / 'scheduled/paper-output.json')
 
 def stop_mark(stage):
     # Own the latch only if this hook creates it. An existing STOP, including a
