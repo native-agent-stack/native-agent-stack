@@ -33,11 +33,26 @@ BOOTS = [{"index": -1, "boot_id": PREV, "first_entry": 1791640000000000, "last_e
          {"index": 0, "boot_id": THIS, "first_entry": int(START.timestamp() * 1e6), "last_entry": int(NOW.timestamp() * 1e6)}]
 
 FAKE_CLAUDE = """#!/bin/sh
+if [ "$1" = respawn ]; then
+  echo "$2" >> "$FAKE_RESPAWN_LOG"
+  [ "${FAKE_RESPAWN_RC:-0}" = 0 ] || exit "$FAKE_RESPAWN_RC"
+  # Like the client, the respawned row gets a process again: it moves from the --all-only rows to the live list.
+  exec python3 -c 'import json, os, sys
+live, gone = os.environ["FAKE_AGENTS_JSON"], os.environ["FAKE_AGENTS_ALL_JSON"]
+rows, rest = json.load(open(live)), json.load(open(gone))
+hit = [r for r in rest if r.get("id") == sys.argv[1]]
+json.dump([r for r in rest if r.get("id") != sys.argv[1]], open(gone, "w"))
+json.dump(rows + [dict(r, pid="2", status="idle", state="done") for r in hit], open(live, "w"))' "$2"
+fi
 [ "$1 $2" = "agents --json" ] || exit 2
 if [ -n "$FAKE_CLAUDE_FAILS" ] && [ "$(cat "$FAKE_CLAUDE_FAILS")" -gt 0 ]; then
   echo $(( $(cat "$FAKE_CLAUDE_FAILS") - 1 )) > "$FAKE_CLAUDE_FAILS"
   echo "client not ready" >&2
   exit 1
+fi
+if [ "$3" = --all ]; then
+  exec python3 -c 'import json, os
+print(json.dumps(json.load(open(os.environ["FAKE_AGENTS_JSON"])) + json.load(open(os.environ["FAKE_AGENTS_ALL_JSON"]))))'
 fi
 cat "$FAKE_AGENTS_JSON"
 """
@@ -90,8 +105,12 @@ class Fixture(unittest.TestCase):
             cc_wait_s=2, spacing_s=0, tab_attempts=2, tab_retry_pause_s=0, tab_timeout_s=30, settle_s=0.3, poll_s=0.05,
             client_wait_s=0)))
         names = {p["launcher_name"]: p["session_name"] for p in self.config["profiles"]}
+        self.all_rows = self.tmp / "agents-all.json"  # rows `claude agents --json --all` adds: background, no process
+        self.all_rows.write_text("[]")
+        self.respawn_log = self.tmp / "respawn.log"
         self.enterContext(mock.patch.dict(os.environ, {
-            "FAKE_AGENTS_JSON": str(self.agents), "FAKE_PS_LOG": str(self.ps_log), "FAKE_PS_NAMES": json.dumps(names)}))
+            "FAKE_AGENTS_JSON": str(self.agents), "FAKE_PS_LOG": str(self.ps_log), "FAKE_PS_NAMES": json.dumps(names),
+            "FAKE_AGENTS_ALL_JSON": str(self.all_rows), "FAKE_RESPAWN_LOG": str(self.respawn_log)}))
         transcript = self.tmp / "projects" / "-home-example-code-native-agent-stack" / "sid-cc.jsonl"
         transcript.parent.mkdir(parents=True)
         transcript.write_text("{}\n")
@@ -131,7 +150,8 @@ class Snapshot(Fixture):
         self.assertEqual(path.name, f"roster-{THIS}.json")
         doc = json.loads(path.read_text())
         self.assertEqual((doc["boot_id"], doc["written_at"]), (THIS, "2026-10-14T12:49:30Z"))
-        self.assertEqual(doc["sessions"], [row("api-actions", "s1")])
+        # A background row's short id and state are kept for `claude respawn`; an interactive row has neither.
+        self.assertEqual(doc["sessions"], [dict(row("api-actions", "s1"), id=None, state=None)])
 
     def test_a_failing_client_gives_no_list_and_an_empty_one_stays_a_list(self):
         self.agents.write_text("not json")
@@ -603,6 +623,89 @@ class Relaunch(Fixture):
         self.assertEqual([[a["rc"] for a in s["attempts"]] for s in sessions], [[1, 1], [1, 1], [1, 1]])
         self.assertEqual({a["result"] for s in sessions for a in s["attempts"]}, {"failed"})
         self.assertEqual(len(self.ps_calls()), 6)
+
+
+class Background(Fixture):
+    """A background session with a profile is restarted on its own conversation with `claude respawn <id>` (agent-view
+    docs, Manage sessions from the shell), only with no process and a saved transcript: the 2.1.301 probe of 2026-10-15
+    saw a respawn of a row with no saved transcript re-send its dispatch prompt (README.md, Background sessions)."""
+
+    D4 = "native-agent-stack-d4"  # a profiled lane (launcher d4) that ran as a background session in the d4 trial
+
+    def bg_row(self, state="failed"):
+        return dict(row(self.D4, "sid-d4", kind="background"), id="d4d4d4d4", state=state, pid=None, status=None)
+
+    def crash_with_background(self):
+        self.crash_roster([row("wsl-architecture-design", "sid-cc"), self.bg_row()])
+        self.all_rows.write_text(json.dumps([self.bg_row()]))
+
+    def save_transcript(self, sid):
+        (self.tmp / "projects" / "-home-example-code-native-agent-stack" / f"{sid}.jsonl").write_text("{}\n")
+
+    def respawned(self):
+        return self.respawn_log.read_text().split() if self.respawn_log.exists() else []
+
+    def run_relaunch(self, dry_run=False):
+        return R.cmd_relaunch(self.config, boot_id=THIS, at=NOW, boots=BOOTS, dry_run=dry_run)
+
+    def test_a_profiled_background_session_is_respawned_once_on_its_own_conversation(self):
+        self.crash_with_background()
+        self.save_transcript("sid-d4")
+        self.run_relaunch()
+        state = self.state()
+        self.assertEqual(self.respawned(), ["d4d4d4d4"])
+        self.assertEqual([c[c.index("-Name") + 1] for c in self.ps_calls()], ["cc"])  # no tab for the background row
+        self.assertEqual([(b["session_name"], b["outcome"]) for b in state["background"]], [(self.D4, "running")])
+        self.assertEqual(state["status"], "complete")
+        self.assertEqual(self.run_relaunch()["action"], "none")
+        self.assertEqual(self.respawned(), ["d4d4d4d4"])
+
+    def test_without_a_saved_transcript_it_is_left_with_its_attach_command_and_not_respawned(self):
+        self.crash_with_background()
+        self.run_relaunch()
+        state = self.state()
+        self.assertEqual(self.respawned(), [])
+        self.assertEqual(state["background"][0]["outcome"], "left: no saved transcript")
+        self.assertEqual(state["status"], "complete")
+        self.assertIn("`claude attach d4d4d4d4`", Path(state["handoff"]).read_text())
+
+    def test_a_row_with_a_process_is_never_respawned(self):
+        self.all_rows.write_text(json.dumps([dict(self.bg_row(state="working"), pid="9")]))
+        self.save_transcript("sid-d4")
+        entry = {"session_name": self.D4, "id": "d4d4d4d4", "sessionId": "sid-d4", "calls": []}
+        self.assertEqual(R.respawn_one(self.config, entry, lambda: None), "running")
+        self.assertEqual((self.respawned(), entry["calls"]), ([], []))
+        self.all_rows.write_text("[]")
+        self.assertEqual(R.respawn_one(self.config, entry, lambda: None), "absent")
+        self.assertEqual(R.respawn_one(self.config, dict(entry, id=None), lambda: None), "left: no background id")
+
+    def test_a_failed_respawn_leaves_the_run_partial_and_a_rerun_tries_again(self):
+        self.crash_with_background()
+        self.save_transcript("sid-d4")
+        with mock.patch.dict(os.environ, {"FAKE_RESPAWN_RC": "1"}):
+            self.run_relaunch()
+        state = self.state()
+        self.assertEqual((state["status"], state["background"][0]["outcome"]), ("partial", "failed"))
+        self.assertEqual([c["rc"] for c in state["background"][0]["calls"]], [1])
+        self.run_relaunch()
+        state = self.state()
+        self.assertEqual((state["status"], state["background"][0]["outcome"]), ("complete", "running"))
+        self.assertEqual(self.respawned(), ["d4d4d4d4", "d4d4d4d4"])
+        self.assertEqual([c[c.index("-Name") + 1] for c in self.ps_calls()], ["cc"])
+
+    def test_the_reason_names_the_kind_when_the_name_has_a_profile(self):
+        # The #1116 follow-up accepted 2026-10-15 (session_relaunch.py:249-250 at 39b3fcaf5): a profiled row the tool does
+        # not relaunch was reported as having no launcher profile.
+        self.crash_roster([row("wsl-architecture-design", "sid-cc"), row("trading-cc", "sid-t", kind="tool"),
+                           row("bg-job", "sid-bg", kind="background")])
+        text = self.run_relaunch(dry_run=True)["handoff_text"]
+        self.assertIn("trading-cc (tool, kind tool, which this tool does not relaunch)", text)
+        self.assertIn("bg-job (background, no launcher profile)", text)
+
+    def test_the_example_config_has_the_ns51_profile_of_the_launcher(self):
+        example = json.loads((ROOT / "tools" / "session-relaunch" / "config.example.json").read_text())
+        self.assertIn({"session_name": "native-agent-stack-51", "launcher_name": "ns51", "title": "native-agent-stack-51"},
+                      example["profiles"])
 
 
 class Modes(Fixture):

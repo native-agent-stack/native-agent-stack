@@ -14,23 +14,27 @@ It has two parts, both systemd `--user` units, the layer's recorded supervisor (
 - `ns-session-relaunch.service` runs `relaunch` once at boot. It reads the newest roster from an earlier boot. If that
   boot did not end in a planned restart, it writes one handoff, `AUTO-RESTART-<UTC>.md` (mode 0400), in the
   command center's directory. Then it opens a fresh tab for each session that has a launcher profile, command center
-  first, through the command center's own tab opener (`open-tab.ps1`, which starts `launch.sh`). Sessions without a
-  profile, and sessions already running, are listed in the handoff for the command center.
+  first, through the command center's own tab opener (`open-tab.ps1`, which starts `launch.sh`). A background session
+  that has a profile is restarted with the client's `claude respawn <id>` instead (Background sessions, below).
+  Sessions without a profile, and sessions already running, are listed in the handoff for the command center.
 
-The tool makes no model call. Each relaunched session is a new Claude session (new session id) that reads the handoff,
-the same fresh-from-handoff practice as the command center's launcher (`launch.sh`). It does not resume the old
-transcript.
+The tool makes no model call. Each relaunched interactive session is a new Claude session (new session id) that reads
+the handoff, the same fresh-from-handoff practice as the command center's launcher (`launch.sh`); it does not resume
+the old transcript. A respawned background session resumes its own saved conversation.
 
 ## Why not a native feature
 
-Background sessions (agent view, `claude --bg`) do not restart by themselves after a shutdown. At 2.1.299:
+Background sessions (agent view, `claude --bg`) do not restart by themselves after a shutdown. At 2.1.299, and again
+at 2.1.301 (the same docs bytes, read 2026-10-15T20:05:17Z; `evidence/artifacts/session-relaunch-install-20261015/receipts/sources.json`):
 
 - "Shutting down or restarting your machine stops running background sessions"; within 48 hours a session "shows as
   failed. Attach or reply to it and it restarts from its saved conversation" (agent-view docs, lines 884-886 of the
   copy read 2026-10-14T12:58:26Z, sha256 `c8e2b810…`).
 - The docs' Limitations section says sessions "stop if the machine shuts down" (line 982).
 - `claude daemon --help` says "Service install is disabled in this version — the daemon runs on demand and exits when
-  the last client disconnects".
+  the last client disconnects" (line 12, at 2.1.299 and at 2.1.301).
+- The supervisor restarts a session that exits unexpectedly only while the supervisor itself runs (line 823), and it
+  starts on demand (line 817). Nothing upstream brings sessions back after a boot.
 
 Windows Terminal's `persistedWindowLayout` was rejected earlier because it starts a fresh process from each tab's saved
 command line and reattaches nothing (`docs/decisions/2026-09-28-terminal-experience.md`, line 616).
@@ -57,7 +61,27 @@ measurements are in `evidence/artifacts/session-relaunch-20261014/`.
   of an unfinished relaunch counts as a run.
 
 Otherwise it relaunches every `interactive` roster session whose name has a profile and is not running now, once per
-name: a second roster row of the same name is left to the command center in the handoff.
+name: a second roster row of the same name is left to the command center in the handoff. A `background` row whose name
+has a profile is respawned instead (Background sessions). The handoff gives each row it leaves its reason: already
+running, a second row of a name relaunched above, no launcher profile, or a kind the tool does not relaunch.
+
+## Background sessions
+
+The client's scripted restart of a background session is `claude respawn <id>`: "Restart a session, running or stopped
+... A session that has a saved conversation resumes it" (agent-view docs, line 766, read 2026-10-15T20:05:17Z, sha256
+`c8e2b810…`; `claude respawn --help` at 2.1.301). After the tabs, `relaunch` reads `claude agents --json --all` and
+respawns a profiled background row only when that read still lists it, it has no process (a respawn restarts a working
+session), and its saved transcript exists under the projects directory. Each call is recorded in flight in
+`relaunch-<boot>.json` under `background`; a rerun respawns a row again only while it still has no process. A row with
+no saved transcript, no short id or no listing is left to the command center with `claude attach <id>`.
+
+Measured 2026-10-15 at 2.1.301 (`evidence/artifacts/session-relaunch-install-20261015/receipts/respawn-probe.json`):
+a stopped row with a saved transcript came back on the same session id with its conversation, from a non-interactive
+shell, and its process stayed up. A failed row with no saved transcript was respawned too, but its dispatch prompt was
+sent again and its command ran again, although the 2.1.290 CHANGELOG says such a row starts with an empty conversation
+(anthropics/claude-code@03b5892e `CHANGELOG.md` L794). That is one observation on an unusual row and an untested
+boundary, which is why the transcript gate exists. A failed row with a saved transcript after a real shutdown is
+untested until the first real boot.
 
 ## Relaunch state and reruns
 
@@ -122,26 +146,40 @@ The state directory and `rosters/` are mode 0700 (set on every write, so a direc
 too). Rosters, the relaunch state and the planned-restart marker are 0600; the handoff is 0400. The handoff directory
 is made 0700 only when the tool creates it; the command center's existing directory keeps its mode.
 
-## Install (the command center's act; nothing here is applied)
+## Install (the command center's act, or the host install stage's; nothing here is applied)
+
+`install.sh` is the forward install and `uninstall.sh` its automated inverse. Both port #1116's applied host install
+v6 (2026-10-15, install_id `ba61c343` on NativeStack2604) and its manual inverse, with their gates unchanged:
 
 ```bash
-T=~/.local/share/native-agent-stack/session-relaunch; S=~/.local/state/native-agent-stack/session-relaunch
-install -D -m 0644 tools/session-relaunch/session_relaunch.py "$T/session_relaunch.py"
-install -D -m 0600 tools/session-relaunch/config.example.json "$S/config.json"   # then check every path in it
-install -m 0644 tools/session-relaunch/units/ns-session-roster.service tools/session-relaunch/units/ns-session-roster.timer \
-  tools/session-relaunch/units/ns-session-relaunch.service ~/.config/systemd/user/
-systemctl --user daemon-reload
-systemctl --user show stack-alert@ns-session-relaunch.service.service --property=LoadState   # the alert handler: loaded
-systemctl --user enable --now ns-session-roster.timer
-systemctl --user enable ns-session-relaunch.service    # runs at the next boot; start it by hand only for a rerun
+tools/session-relaunch/install.sh --config <this host's config.json>   # default: config.example.json at HEAD
+tools/session-relaunch/uninstall.sh                                    # from a checkout that holds the recorded commit
 ```
 
-Check after two minutes: `ls "$S/rosters"` shows `roster-<this boot>.json`. Then
+- **Sources:** the tool's committed bytes at HEAD of this checkout, read into a private staging directory; a tool
+  directory that differs from HEAD stops the install. The host's config is passed with `--config`; its `state_dir` must
+  be `~/.local/state/native-agent-stack/session-relaunch`, the path the units read.
+- **Gates, before any write:** no target exists (a dangling symlink included); every directory written under is a real
+  path; the alert handler loads (`systemctl --user show stack-alert@ns-session-relaunch.service.service
+  --property=LoadState` reads `loaded`, so a new host installs its alert template first); the handoff and unit
+  directories exist.
+- **Install manifest:** sealed before the first write in `~/.local/state/native-agent-stack/session-relaunch-install/install-state/`,
+  with a random install id, the source commit, the handoff directory, each directory it creates, each file with its mode
+  and sha256, and the handoff files present then. The receipt beside it binds the manifest's full sha256.
+- **Inverse:** `uninstall.sh` refuses unless the receipt and manifest are bound, no consumed receipt exists for the
+  install, the file records equal the recorded commit's bytes (and the manifest's config record), the directory records
+  are exact, and every path it may touch is a real path; a unit command touches only a unit file with the manifest's
+  sha256. It records evidence first, stops at the first failed manager call, removes files only with their manifest
+  sha256 and directories only when empty, and on a clean result consumes the receipt (`apply-receipt.txt.consumed-<id>`,
+  0400). Anything left over reads "reconciliation pending", and the receipt stays live.
+
+With `T=~/.local/share/native-agent-stack/session-relaunch` and `S=~/.local/state/native-agent-stack/session-relaunch`,
+check after two minutes: `ls "$S/rosters"` shows `roster-<this boot>.json`. Then
 `/usr/bin/python3 -I "$T/session_relaunch.py" relaunch --dry-run --config "$S/config.json"` prints
 `nothing to relaunch: no roster from an earlier boot`.
 
-Inverse: `systemctl --user disable --now ns-session-roster.timer && systemctl --user disable ns-session-relaunch.service`,
-then remove the three unit files, run `systemctl --user daemon-reload`, and remove `$T` and `$S`.
+Inverse: `tools/session-relaunch/uninstall.sh` (above). Runtime files the tool wrote (rosters, relaunch state, handoffs)
+are not removed; the inverse copies the state directory into its evidence first.
 
 ## A planned restart
 
@@ -161,4 +199,6 @@ roster.
 
 ## Tests
 
-`python3 -m unittest tests.test_session_relaunch`, which uses stand-ins for the client and PowerShell.
+`python3 -m unittest tests.test_session_relaunch`, which uses stand-ins for the client and PowerShell, and
+`python3 -m unittest tests.test_session_relaunch_install`, which runs `install.sh` and `uninstall.sh` in scratch HOMEs
+against a stateful `systemctl` stand-in with the fixtures of the v6 simulation.

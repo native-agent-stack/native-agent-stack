@@ -1,0 +1,41 @@
+{
+ "schema": "session-relaunch-respawn-probe/1",
+ "client": "Claude Code 2.1.301",
+ "date": "2026-10-15",
+ "class": "measured (one run per case; scratch cwd; Haiku 5.5, effort low; this lane's probe rows only)",
+ "preconditions": "no other background session had a process (claude agents --json --all: 7 background rows, none with a pid)",
+ "cases": [
+  {
+   "case": "S",
+   "row": "b3441cb6",
+   "start": "done, with a process; saved transcript present",
+   "steps": [
+    "claude stop (rc 0): the process ended; state stayed done",
+    "claude respawn (rc 0) from a non-interactive shell"
+   ],
+   "after_15_and_90_s": "done, idle, a new pid, the same sessionId",
+   "transcript": {
+    "prompts": 1,
+    "replies": 1
+   },
+   "re_sent": false
+  },
+  {
+   "case": "F",
+   "row": "0ccfa0df",
+   "start": "failed, no process; no saved transcript (its transcript file was created at the respawn)",
+   "steps": [
+    "claude respawn (rc 0)"
+   ],
+   "after_20_and_60_s": "done, idle, a new pid, the same sessionId",
+   "transcript": {
+    "prompts": 1,
+    "replies": 1
+   },
+   "re_sent": true,
+   "note": "the row's original dispatch prompt was sent again and its command ran again; this disagrees with CHANGELOG 2.1.290 (L794). One observation on a row with an unusual history (a --bg resume of a session open elsewhere): an untested boundary, not a confirmed regression"
+  }
+ ],
+ "cleanup": "both rows stopped and removed (claude stop, claude rm; rc 0)",
+ "not_measured": "a failed row WITH a saved transcript after a real shutdown, which waits for the first real boot"
+}

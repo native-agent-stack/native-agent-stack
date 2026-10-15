@@ -23,6 +23,7 @@
   {"session_name": "ns2604-coop", "launcher_name": "coop", "title": "ns2604-coop"},
   {"session_name": "api-actions", "launcher_name": "api-actions", "title": "api-actions"},
   {"session_name": "native-agent-stack-d4", "launcher_name": "d4", "title": "native-agent-stack-d4"},
-  {"session_name": "cc-native-practice", "launcher_name": "cc-native-practice", "title": "cc-native-practice"}
+  {"session_name": "cc-native-practice", "launcher_name": "cc-native-practice", "title": "cc-native-practice"},
+  {"session_name": "native-agent-stack-51", "launcher_name": "ns51", "title": "native-agent-stack-51"}
  ]
 }

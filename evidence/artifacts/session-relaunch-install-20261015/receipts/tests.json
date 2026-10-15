@@ -1,0 +1,30 @@
+{
+ "schema": "session-relaunch-install-tests/1",
+ "date": "2026-10-15",
+ "fail_first": {
+  "tree": "origin/main 8053f14e7 with this change's two test modules",
+  "ran": 72,
+  "failures": 15,
+  "errors": 9
+ },
+ "mutants_of_uninstall_sh": [
+  {
+   "mutant": "no real-path check of each payload's parents (the V5-B3 class)",
+   "failed": [
+    "test_F_B3"
+   ]
+  },
+  {
+   "mutant": "a consumed receipt does not refuse (the V5-B1 class)",
+   "failed": [
+    "test_F_B1b"
+   ]
+  },
+  {
+   "mutant": "no handoff-directory check before the inventory (the V5-B4 class)",
+   "failed": [
+    "test_F_B4"
+   ]
+  }
+ ]
+}
