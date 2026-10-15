@@ -75,20 +75,29 @@ sha256, each run (`boot`, `started_at`, `ended_at`), and each session's tab call
 
 The status is `in_progress` from the run's start, then `complete` when every session is listed, else `partial`. The
 live list is read before every tab call, and a call is made only when that read lists the session as absent. Each
-call is recorded in the state file (`in_flight`) before it is made, then replaced by its result. A definite failure
-is retried up to `tab_attempts` calls; an opened or timed-out call is never repeated, because a tab may already be
-open: the run waits for the session (`cc_wait_s` for the command center, `settle_s`, 60 s, for the rest) and records
-the outcome.
+call is recorded in the state file (`in_flight`) before it is made. Its result is saved together with the provisional
+outcome (`unconfirmed` after rc 0, `uncertain` after a timeout) before the settle wait, so a run stopped while it waits
+leaves the session unresolved. A definite failure is retried up to `tab_attempts` calls; an opened or timed-out call is
+never repeated, because a tab may already be open: the run waits for the session (`cc_wait_s` for the command center,
+`settle_s`, 60 s, for the rest) and records the outcome.
 
 A rerun of an `in_progress` or `partial` relaunch reuses its sealed handoff (refused when the file is missing or its
 sha256 differs). It opens again only the sessions that are not running and whose earlier calls cannot have started a
-tab (`pending`, `failed`, `skipped`). An `unconfirmed` or `uncertain` session, or one whose last call is still
-`in_flight`, stays as it is, because its first `claude -n` may still register. The next boot reruns the relaunch by
+tab (`pending`, `failed`, `skipped`). A session with a call since its last reopen that opened, timed out or is still
+`in_flight` is unresolved and stays as it is (`unconfirmed` or `uncertain`), because its first `claude -n` may still
+register. The next boot reruns the relaunch by
 itself when no roster of this boot exists; within this boot the command center reruns it with
 `systemctl --user start ns-session-relaunch.service`. Only the command center reopens an unresolved session, once it
 has checked that no tab of it is open:
 `/usr/bin/python3 -I "$T/session_relaunch.py" relaunch --reopen <name> --config "$S/config.json"` (repeat `--reopen`
-for more names; the run records them under `reopened`).
+for more names; the run records them under `reopened`). A reopen is spent only by the call it makes
+(`resolved_through` in the session's record), so a reopen run that skips the session or stops before its call leaves it
+unresolved. A `--reopen` name that is not an unresolved session this relaunch still has to bring back is refused, exit 1,
+with a `refusals` entry in the state file, and nothing is opened.
+
+Every relaunch run, the unit's or a direct one, holds an exclusive lock on `relaunch.lock` in the state directory
+(`fcntl.flock`). A run that finds it held is refused with exit 1 and writes and opens nothing, so a direct `--reopen` run
+never overlaps the unit's run.
 
 At its start a run writes this boot's roster as the live sessions plus the ended boot's rows not running yet, and the
 minute snapshot keeps carrying those rows while the run is `in_progress`. A second crash before the timer's first

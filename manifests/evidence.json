@@ -19183,8 +19183,8 @@
     },
     {
       "path": "docs/decisions/2026-10-14-session-relaunch-after-wsl-restart.md",
-      "sha256": "efdcd49bd3b83e0183e3e1e627427990bd83f1e0338cbbe5b45f71e7ef3d177b",
-      "bytes": 5621
+      "sha256": "8d4b2566146c8c778d8a697b628316ce1e05ae67bf85f84442019549463c1745",
+      "bytes": 6091
     },
     {
       "path": "docs/decisions/2026-10-15-model-currency-landscape-check.md",
@@ -52133,7 +52133,7 @@
     },
     {
       "path": "evidence/artifacts/session-relaunch-20261014/README.md",
-      "sha256": "37f33ffb7aa8fe6274fd0fb0614d6105d3e74ef586180e356eaa65249058a224",
+      "sha256": "b80affd4b736c9fe5c7ea2588e58f750a270a934a10cfd1926570333e093afdd",
       "bytes": 2110
     },
     {
@@ -63938,8 +63938,8 @@
     },
     {
       "path": "tests/test_session_relaunch.py",
-      "sha256": "8d261c2e3dcc95374aac9a0d56311606d83e1a9ab9d0bc3ab63a9793af46f143",
-      "bytes": 34158
+      "sha256": "a0d213c6fd53b721f2b6e4e3105ff1bb4710d47f8512e3cf317fb7731239a5e3",
+      "bytes": 38145
     },
     {
       "path": "tests/test_shell_parser_ci.py",
@@ -64608,8 +64608,8 @@
     },
     {
       "path": "tools/session-relaunch/README.md",
-      "sha256": "15208e841c6a71fde312b43035964f3928440d438e3b88ba796b1d0e7f5bd236",
-      "bytes": 10121
+      "sha256": "29ce873c200609d44281c0ae007361c5b0c14263b96d5fe4b28bd0c05912f153",
+      "bytes": 10967
     },
     {
       "path": "tools/session-relaunch/config.example.json",
@@ -64618,8 +64618,8 @@
     },
     {
       "path": "tools/session-relaunch/session_relaunch.py",
-      "sha256": "9791d157dddd54cbba38fd24a7f61c3625bfecae89f964c67eedd5b91934ee6c",
-      "bytes": 26724
+      "sha256": "734958441a524084616a4036f163bad796e62d6685a65ba8bbb66404c3c7ef96",
+      "bytes": 29931
     },
     {
       "path": "tools/session-relaunch/units/ns-session-relaunch.service",

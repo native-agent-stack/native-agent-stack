@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import fcntl
 import hashlib
 import json
 import os
@@ -313,19 +314,45 @@ def wait_for(config: dict, name: str, deadline_s: float) -> bool:
         time.sleep(config["poll_s"])
 
 
+TAB_STARTS = ("opened", "timeout", "in_flight")  # call results after which a tab may be open
+
+
 def unresolved(entry: dict) -> bool:
-    """A tab start of this session may have been issued and was never seen listed: an unconfirmed or uncertain outcome,
-    or a call recorded in flight (the run stopped inside it). Only an explicit `--reopen <name>` opens it again."""
-    attempts = entry.get("attempts") or []
-    return entry.get("outcome") in ("unconfirmed", "uncertain") or bool(attempts and attempts[-1].get("result") == "in_flight")
+    """A tab start of this session may have been issued and the session was never seen listed: a call since the last
+    reopen (`resolved_through`) opened, timed out or is recorded in flight. Only an explicit `--reopen <name>` opens the
+    session again, and a reopen counts only once its own call is recorded."""
+    if entry.get("outcome") == "running":
+        return False
+    calls = (entry.get("attempts") or [])[entry.get("resolved_through", 0):]
+    return any(call.get("result") in TAB_STARTS for call in calls)
 
 
-def relaunch_one(config: dict, profile: dict, handoff: Path, entry: dict, save) -> str:
+def unresolved_outcome(entry: dict) -> str:
+    """unconfirmed when the last possible tab start was an opened call, else uncertain (timed out or in flight)."""
+    starts = [call for call in entry.get("attempts") or [] if call.get("result") in TAB_STARTS]
+    return "unconfirmed" if starts and starts[-1]["result"] == "opened" else "uncertain"
+
+
+def run_lock(config: dict) -> int | None:
+    """An exclusive lock on relaunch.lock in the state directory, held for the whole run (the unit's or a direct one);
+    None when another run holds it."""
+    fd = os.open(state_dir(config) / "relaunch.lock", os.O_RDWR | os.O_CREAT, 0o600)
+    try:
+        fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except OSError:
+        os.close(fd)
+        return None
+    return fd
+
+
+def relaunch_one(config: dict, profile: dict, handoff: Path, entry: dict, save, reopening: bool = False) -> str:
     """Open one session's tab and return its outcome. The live list is read before every call, and a call is opened
     only when that read lists the session as absent: an unreadable list skips the session (skipped, nothing opened).
-    Each call is recorded in flight before it is made. An opened or timed-out call is never repeated: the session is
-    waited for (cc_wait_s for the command center, settle_s for the rest) and is running, unconfirmed (opened, not
-    listed) or uncertain (timed out, not listed). Only a definite failure is retried, up to tab_attempts calls."""
+    Each call is recorded in flight before it is made, and its result is saved with the provisional outcome
+    (unconfirmed after rc 0, uncertain after a timeout) before the settle wait. An opened or timed-out call is never
+    repeated: the session is waited for (cc_wait_s for the command center, settle_s for the rest) and is running or
+    keeps the provisional outcome. Only a definite failure is retried, up to tab_attempts calls. A reopen is spent by
+    the first call it makes (`resolved_through`), so a reopen that makes no call leaves the session unresolved."""
     name = profile["session_name"]
     settle_s = config["cc_wait_s"] if name == config["cc_session_name"] else config["settle_s"]
     for attempt in range(config["tab_attempts"]):
@@ -336,10 +363,14 @@ def relaunch_one(config: dict, profile: dict, handoff: Path, entry: dict, save) 
             return "running"
         if live is None:
             return "skipped"
+        if reopening:
+            entry["resolved_through"], reopening = len(entry["attempts"]), False
         entry["attempts"].append({"at": iso(now_utc()), "result": "in_flight"})
         save()
         result = open_tab(config, profile, handoff)
         entry["attempts"][-1] = result
+        if result["result"] != "failed":
+            entry["outcome"] = "unconfirmed" if result["result"] == "opened" else "uncertain"
         save()
         if result["result"] != "failed":
             if wait_for(config, name, settle_s):
@@ -405,15 +436,39 @@ def refuse(reason: str, **fields) -> dict:
 
 def cmd_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[dict], dry_run: bool,
                  reopen: set[str] | frozenset[str] = frozenset()) -> dict:
+    """One relaunch run under the exclusive run lock: a second run (the unit's or a direct one) is refused, exit 1."""
+    lock = run_lock(config)
+    if lock is None:
+        return refuse(f"another relaunch run holds {state_dir(config) / 'relaunch.lock'}; nothing was written or opened")
+    try:
+        return locked_relaunch(config, boot_id=boot_id, at=at, boots=boots, dry_run=dry_run, reopen=frozenset(reopen))
+    finally:
+        os.close(lock)
+
+
+def locked_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[dict], dry_run: bool,
+                    reopen: frozenset[str]) -> dict:
     alive_rows = wait_client(config)
     if alive_rows is None:
         return refuse(f"claude agents --json gave no session list within {config['client_wait_s']} s, so who is running "
                       "is unknown; nothing was written or opened")
     decided = plan(config, boot_id=boot_id, at=at, boots=boots, alive_rows=alive_rows)
     if decided["action"] != "relaunch":
+        if reopen and not decided.get("refused"):
+            return refuse(f"--reopen {', '.join(sorted(reopen))}: nothing to relaunch ({decided['reason']})",
+                          prev_boot=decided.get("prev_boot"))
         print(f"session_relaunch: nothing to relaunch: {decided['reason']}")
         return decided
     state, names = decided["state"], [row.get("name") for row, _ in decided["launch"]]
+    known = {entry["session_name"]: entry for entry in (state or {}).get("sessions") or []}
+    bad = sorted(name for name in reopen if name not in names or not unresolved(known.get(name, {})))
+    if bad:
+        reason = (f"--reopen {', '.join(bad)}: not an unresolved session that this relaunch still has to bring back; "
+                  "nothing was opened")
+        if state is not None:
+            state.setdefault("refusals", []).append({"at": iso(now_utc()), "reopen": bad, "reason": reason})
+            write_atomic(marker(config, "relaunch", decided["prev_boot"]), json.dumps(state, indent=1) + "\n")
+        return refuse(reason, prev_boot=decided["prev_boot"])
     if state is None:
         text = handoff_text(config, at=at, prev=decided["prev"], prev_end=decided["prev_end"],
                             this_start=decided["this_start"], launch=decided["launch"], left=decided["left"],
@@ -451,8 +506,8 @@ def cmd_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[dic
         elif entry["session_name"] in reopen:
             entry["outcome"] = "pending"
             reopened.append(entry["session_name"])
-        elif entry.get("outcome") not in ("unconfirmed", "uncertain"):
-            entry["outcome"] = "uncertain"  # the run stopped inside its call; the tab may be open
+        else:
+            entry["outcome"] = unresolved_outcome(entry)  # a tab start may be open; only the CC reopens it
         sessions.append(entry)
     for name, entry in earlier.items():
         if name in alive:
@@ -467,7 +522,10 @@ def cmd_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[dic
     for index, entry in enumerate(e for e in sessions if e["outcome"] == "pending"):
         if index:
             time.sleep(config["spacing_s"])
-        entry["outcome"] = relaunch_one(config, profiles[entry["session_name"]], handoff, entry, save)
+        entry["outcome"] = relaunch_one(config, profiles[entry["session_name"]], handoff, entry, save,
+                                        reopening=entry["session_name"] in reopened)
+        if entry["outcome"] != "running" and unresolved(entry):
+            entry["outcome"] = unresolved_outcome(entry)  # e.g. a reopen that was skipped before its call
         save()
     final = list_sessions(config["claude"])
     if final is not None:

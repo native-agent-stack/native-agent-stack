@@ -423,6 +423,63 @@ class Relaunch(Fixture):
         self.assertEqual(self.outcomes(), {"trading-cc": "uncertain", "ns2604-coop": "running"})
         self.assertEqual(self.state()["status"], "partial")
 
+    def test_a_run_stopped_in_its_settle_wait_is_not_reopened_by_a_rerun(self):
+        # The CC DELTA micro at 307f686c, P1-a: the call's result was saved with the outcome still pending, so a run stopped
+        # in wait_for left a lane that a rerun opened again. The provisional outcome is saved with the result.
+        self.crash_roster([row("trading-cc", "s")])
+        with mock.patch.dict(os.environ, {"FAKE_PS_LAUNCH": "0", "FAKE_PS_RC": "0"}):
+            with mock.patch.object(R, "wait_for", side_effect=Interrupted), self.assertRaises(Interrupted):
+                self.run_relaunch()
+            self.assertEqual((self.outcomes(), self.state()["sessions"][0]["attempts"][-1]["result"]),
+                             ({"trading-cc": "unconfirmed"}, "opened"))
+            self.run_relaunch(at=NOW + dt.timedelta(minutes=5))
+        self.assertEqual(len(self.ps_calls()), 1)
+        self.assertEqual((self.outcomes(), self.state()["status"]), ({"trading-cc": "unconfirmed"}, "partial"))
+
+    def test_a_held_run_lock_refuses_the_run_and_opens_nothing(self):
+        # P1-b: a direct --reopen run could overlap the unit's run, and both rewrote the whole state. Every relaunch run takes
+        # an exclusive lock in the state directory and exits 1 when another run holds it.
+        import fcntl
+        self.crash_roster([row("trading-cc", "s")])
+        lock = R.state_dir(self.config) / "relaunch.lock"
+        with open(lock, "a") as held:
+            fcntl.flock(held, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            with mock.patch.object(R, "read_boots", return_value=BOOTS):
+                self.assertEqual(self.main("relaunch", boot=THIS), 1)
+                self.assertEqual(self.main("relaunch", "--reopen", "trading-cc", boot=THIS), 1)
+        self.assertEqual((self.ps_calls(), self.state()), ([], None))
+        with mock.patch.object(R, "read_boots", return_value=BOOTS):
+            self.assertEqual(self.main("relaunch", boot=THIS), 0)  # released: the next run goes ahead
+        self.assertEqual(len(self.ps_calls()), 1)
+
+    def test_a_reopen_run_that_makes_no_call_leaves_the_lane_unresolved(self):
+        # P3 of the same invariant: a --reopen run that ended skipped kept the earlier opened call as the last attempt, and the
+        # next plain rerun opened the lane with no new explicit act. A reopen counts only once its call is made.
+        self.crash_roster([row("trading-cc", "s")])
+        with mock.patch.dict(os.environ, {"FAKE_PS_LAUNCH": "0", "FAKE_PS_RC": "0"}):
+            self.run_relaunch()
+            with mock.patch.object(R, "listed", return_value=None):
+                R.cmd_relaunch(self.config, boot_id=THIS, at=NOW + dt.timedelta(minutes=5), boots=BOOTS, dry_run=False,
+                               reopen={"trading-cc"})
+            self.assertEqual(self.outcomes(), {"trading-cc": "unconfirmed"})
+            self.run_relaunch(at=NOW + dt.timedelta(minutes=10))
+        self.assertEqual(len(self.ps_calls()), 1)
+        self.assertEqual(self.outcomes(), {"trading-cc": "unconfirmed"})
+
+    def test_a_reopen_of_a_name_that_is_not_unresolved_or_not_planned_is_refused_with_a_record(self):
+        self.crash_roster([row("trading-cc", "s"), row("ns2604-coop", "t")])
+        with mock.patch.dict(os.environ, {"FAKE_PS_LAUNCH": "0", "FAKE_PS_RC": "0"}):
+            self.run_relaunch()  # both unconfirmed
+        self.agents.write_text(json.dumps([row("ns2604-coop", "by-hand")]))
+        for name in ("ns2604-coop", "librarium-course-e2", "no-such-lane"):
+            with self.subTest(name=name):
+                decided = R.cmd_relaunch(self.config, boot_id=THIS, at=NOW + dt.timedelta(minutes=5), boots=BOOTS,
+                                         dry_run=False, reopen={name})
+                self.assertTrue(decided.get("refused"))
+                self.assertIn(name, decided["reason"])
+                self.assertEqual(self.state()["refusals"][-1]["reopen"], [name])
+        self.assertEqual(len(self.ps_calls()), 2)
+
     def test_an_unreadable_live_list_before_the_first_call_opens_nothing(self):
         # The CC micro at 376f2bb9, F2 (P1): a failed pre-open query on attempt 0 went on to open a tab.
         self.crash_roster([row("trading-cc", "s")])
