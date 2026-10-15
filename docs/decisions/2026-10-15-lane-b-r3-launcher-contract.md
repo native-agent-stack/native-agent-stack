@@ -34,13 +34,16 @@ to the native command group and continues waiting for that command;
 `tools/credentials/credential_run.py:996-1041` at current-main source commit
 `89e89852161d8157e464f4bd07c2b5c747ad4706` records that mechanism. This task
 does not load credentials or weaken its process/secret cleanup contract.
-The scheduler's Bash leader installs a TERM/INT no-op trap before sourcing
-the unchanged script. Bash defers a trap until its foreground command exits
+The scheduler's Bash leader installs TERM/INT traps that exit 143/130 before
+sourcing the unchanged script. Bash defers a trap until its foreground command exits
 (installed GNU Bash5.3.9 manual, Signals section); this keeps the native relay's
 leader alive during recovery instead of triggering group cleanup early. A
 test runs the actual credential relay API with empty synthetic environment
 and a late-armed child, verifying the recovery survives its 2-second cleanup
-threshold. It never calls the credential inventory/loader entry point.
+threshold. Pending cancellation then exits the scheduler, so ingestion, gate
+or paper commands cannot resume afterward. Tests cover TERM/INT at the gate/
+paper boundary and native relay recovery through a real nested timeout.
+They never call the credential inventory/loader entry point.
 
 Primary subprocess reference: CPython v3.12.3 commit
 `f6650f9ad73359051f3e558c2431a109bc016664`, `Lib/subprocess.py:548-571`
@@ -99,13 +102,16 @@ the documented cap still refuses. The GO/control limit is unchanged.
 
 Native successful CLI statuses come from pinned
 `8c95a50d10bd2db0b59058c6827275917ce35aa3`,
-`adaptive-paper/runner.py:2273` and `mover_runner.py:1043`. Recovery-only is
+`adaptive-paper/runner.py:2273`; PRE `mover_runner.py:878-891` delegates to
+the same phase/exit function. The old1043 locator described synthetic mode.
+Recovery-only is
 still refused as trial evidence. This changes no native return/status producer
 or recovery/flat-completion rule. Bounded file I/O follows CPython 3.12.3
 `f6650f9ad73359051f3e558c2431a109bc016664`,
 `Doc/library/os.rst:865,1056,1227` (fdopen/fstat/open),
 `Doc/library/io.rst:563` (read up to size) and `Lib/json/__init__.py:299`
-(loads accepts bytes).
+(loads accepts bytes). Recovery-only receipts hash the bounded raw bytes
+already parsed; they no longer reopen the native output path for hashing.
 
 New packets retain the archived five replay source files byte-for-byte. A
 source-bound `replay_adapter.py` adapts their in-memory SYN keyed double to
@@ -118,14 +124,56 @@ retained lifecycle, pre-skip handoff and unit contracts on a newly sealed SYN
 packet; the full 49-case drill uses the authenticated retained deployment
 context separately, with no installation or credential/native runner call.
 
+## Deployed timeout and repeated TERM
+
+The deployed binary is uutils coreutils 0.10.0. Its annotated0.10.0 tag peels
+to public commit `28b6856d7b215bf844b4223589cb54ade84f5223` in
+[uutils/coreutils](https://github.com/uutils/coreutils/tree/28b6856d7b215bf844b4223589cb54ade84f5223):
+
+- `src/uu/timeout/src/platform/unix.rs:47-54` sets timeout's own process
+  group when --foreground is absent; the child inherits that group.
+- The same file`:64-81` installs the child's parent-death signal, and
+  `:99-119` calls direct/group signal APIs, then CONT except for KILL/CONT.
+- `src/uu/timeout/src/timeout.rs:223` calls wait_or_timeout with true
+  during kill-after. Its`:238-245` immediate-KILL arm handles expiry or
+  Interrupted; it does not itself establish which signals interrupt that wait.
+- The actual Unix implementation is
+  `src/uucore/src/lib/features/process/unix.rs:119-144` (not a flat process.rs).
+  Line139 consumes SIGTERM and continues when ignore_term is true; line143
+  subtracts elapsed time from the original deadline. Repeated TERM therefore
+  neither triggers immediate KILL nor restarts the grace. Other interruptions
+  can take the early-KILL arm. The shared trait documents this at
+  `src/uucore/src/lib/features/process/mod.rs:28-32`.
+
+The installed `/usr/bin/timeout -k3 1` probe on a nonterminating TERM handler,
+with another TERM sent after the first deadline, retains the full three-second
+grace. The matching SIGINT negative control is detected as a shortened wait.
+The source and host result agree: timeout's own/group or external TERM cannot
+shorten the670-second kill-after window. The r3 runner's TERM handler still
+only sets the same stop latch (`cb0e7d34 runner.py:252-258`); duplicate TERM
+delivery is idempotent. No native runner signal handler changes are required.
+This does not extend the guarantee to non-TERM forceful interruption.
+
+An additional concrete source limitation concerns group KILL, independently
+of repeated TERM. The same uucore Unix file`:110-115` attempts to ignore the
+signal before group delivery; SIGKILL cannot be ignored, so that error returns
+before the group send. The platform caller ignores that result. A host -k1/1
+SYN probe returned137 after killing its direct child while a TERM-ignoring
+grandchild remained running; the probe explicitly cleaned up its group.
+Direct-child timeout bounds are established, while complete descendant cleanup
+needs the CC/owner's separate evaluation before adoption. This fold changes
+no upstream binary and makes no successful group-KILL guarantee.
+
 ## Follow-ups
 
-- The scheduled shell's no-op TERM/INT trap can swallow a stop between
-  foreground commands. A later change must handle that window while preserving
-  recovery grace; this fold does not alter the trap.
+- The between-command cancellation defect is closed by deferred exiting traps,
+  with fail-first boundary and nested-timeout tests; it is no longer deferred.
 - Extend ordering verification to materialized units, the actual PRE starting
   envelope and the complete pre-skip/startup chain. Existing synthetic ordering
   coverage and cap checks do not establish deployed-systemd acceptance.
-- Exact installed timeout process-group behavior and remaining pinned r3
-  sources are separate co-op packet inputs. The installed timeout is uutils
-  coreutils 0.10.0, not GNU coreutils; GNU timeout behavior is not host evidence.
+- Remaining historical source captures and replay-adaptation receipt labels
+  are documentation/custody follow-ups. Installed timeout behavior is supported
+  by the pinned uutils/uucore sources and host probe above; GNU timeout behavior
+  is not substituted for host evidence.
+- Resolve the observed uucore group-KILL error path for any caller requiring
+  descendant termination; direct-child deadlines alone do not prove that.

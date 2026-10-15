@@ -19,6 +19,12 @@ def scheduler(text, bundle):
     text = text.replace(old_root, 'here=' + shlex.quote(str(native)))
     # These are read-only ingestion/qualification steps, before any runner.
     # Give them real hard bounds so the outer ordering proof is arithmetic.
+    # Deployed uutils/coreutils 0.10.0, 28b6856d7b215bf844b4223589cb54ade84f5223:
+    # src/uu/timeout/src/platform/unix.rs:47-54 creates the separate group;
+    # :64-81 installs child PDEATHSIG; :99-119 calls child/group signal APIs.
+    # Group KILL has a uucore error-path caveat documented in the decision.
+    # src/uucore/src/lib/features/process/unix.rs:119-144 ignores repeated
+    # TERM during kill-after without resetting its deadline (:139,143).
     text = text.replace('timeout 120 ', 'timeout --kill-after=1s 120 ')
     after = RECOVERY_GRACE_SECONDS + TEARDOWN_SECONDS + ENVELOPE_MARGIN_SECONDS
     return text.replace('timeout 900 "$PY"', 'timeout --kill-after=' + str(after) + 's 900 "$PY"')

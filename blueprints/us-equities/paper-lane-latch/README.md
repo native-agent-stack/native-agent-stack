@@ -51,12 +51,17 @@ maximum407527B across98 outputs); the64KiB GO/control reader is unchanged.
 Native exit-zero statuses passed/completed_no_signals/held_overnight remain
 successful. A timeout sends TERM, permits 630 seconds for the cited
 recovery bounds, then KILL if still running; timeout remains refusal exit124.
-The scheduled Bash leader keeps a trap until its foreground runner ends.
+The scheduled Bash leader defers its TERM/INT exiting traps until its
+foreground runner ends, then returns143/130 without starting any later command.
 The generated root `scheduled_trial_r3.sh` retains the frozen script's logic
 and native module directory, adding `--kill-after=670s` to its TERM900 wrapper.
 It does not alter the frozen input script. Wrapper hard deadline1570s exceeds
 900+630+10; the two read-only120s ingestion/gate commands gain1s KILL-after
 bounds, so loader1820s exceeds242s preparatory work plus1570s wrapper.
+Those signal/group semantics are uutils/coreutils0.10.0 at28b6856d,
+timeout/platform/unix.rs:47-54,64-81,99-119. Its uucore process/unix.rs:119-144
+ignores repeated TERM in kill-after without resetting the grace deadline.
+The decision record gives full paths/pin and the installed -k3/1 timing probe.
 
 New packets also emit a source-bound replay adapter. It updates retained SYN
 paper outputs, scheduler-name assertions and unit-budget expectations only

@@ -446,20 +446,21 @@ def run_stage(stage):
                 raw = stream.read(limit + 1)
             if len(raw) > limit:
                 raise Refused('unsafe_input')
-            return json.loads(raw)
+            return json.loads(raw), hashlib.sha256(raw).hexdigest()
         def trial_result(rc, output):
             if rc != 0:
                 return rc
-            result = paper_output(output)
+            result, output_sha256 = paper_output(output)
             if result.get('status') == 'recovery_only':
                 save(instance / 'recovery-run.json', {
                     'status': 'recovery_only', 'stage': stage, 'trial': value['trial'],
                     'trial_evidence': False, 'native_exit_code': rc,
-                    'native_output_sha256': sha(output),
+                    'native_output_sha256': output_sha256,
                     'recovery_status': result.get('recovery_status')})
                 raise Refused('paper_start_recovery_only')
             # Native exit-zero statuses at 8c95a50d runner.py:2273 and
-            # mover_runner.py:1043. Recovery-only remains separately refused.
+            # mover_runner.py:878-891 delegates to that same phase/exit function.
+            # Recovery-only remains separately refused.
             if result.get('status') not in ('passed', 'completed_no_signals', 'held_overnight'):
                 raise Refused('paper_trial_status_not_successful')
             return rc
@@ -474,10 +475,11 @@ def run_stage(stage):
         environment.update(TRIAL=value['trial'], CONFIG=str(config(stage)),
                            ENV_FILE=str(credential_pointer()),
                            STATE_ROOT=value['state_root'], OUT_DIR=str(instance / 'scheduled'), PY=str(PY))
-        # Keep the scheduler shell alive while a deferred-TERM runner recovers;
-        # Bash runs this trap after its foreground command finishes. Otherwise
-        # credential_run would observe its group leader exit and clean the group.
-        rc = keyed(['/usr/bin/bash', '-c', 'trap ":" TERM INT; source "$1"',
+        # Bash defers these traps until its foreground command finishes, so
+        # recovery keeps its wait. Then cancellation must exit, never resume
+        # ingestion/gate/paper commands or turn cancellation into exit zero.
+        rc = keyed(['/usr/bin/bash', '-c',
+                    'trap \'exit 143\' TERM; trap \'exit 130\' INT; source "$1"',
                     'lane-b-scheduled', ROOT / 'scheduled_trial_r3.sh'], timeout=1190, environment=environment)
         return trial_result(rc, instance / 'scheduled/paper-output.json')
 
