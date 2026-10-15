@@ -1,0 +1,44 @@
+{
+  "calls": 0,
+  "calls_definition": "zero eligible calls at the target identity; observed lower bounds retained separately",
+  "client": "codex",
+  "component_id": "syft",
+  "consumer": "Codex shell/CLI role",
+  "disposition": "cli-attribution-gap",
+  "frozen_run_pin": "1.54.0",
+  "frozen_run_pin_parsed": {
+    "commit": "cc326e45a6213360266dda4b30cc68095946d676",
+    "version": "1.54.0"
+  },
+  "host_differs_from_frozen_run": true,
+  "host_version": "1.54.1",
+  "kind": "non_invocation_reason",
+  "layers": [
+    "foundation/ci-supply-chain",
+    "us-equities/security-supply-chain"
+  ],
+  "measurement": {
+    "attribution": "measure_cli.py",
+    "attribution_sha256": "2abd869e26906c17b073ee39889286acf6049723fc8350948bd7bdd03fa4f8ac",
+    "count_is_lower_bound": false,
+    "counter": "tools/invocation-monitoring/codex_counter.py",
+    "counter_sha256": "06b569826c76c2dc9455fccd3e004329e71f791483b42b33571fad21910dc8e3",
+    "counter_summary": "counter-summary.json",
+    "counts_file": "native-cli-counts.json",
+    "counts_sha256": "302b3b89ea9627f54b79fbfce4283af980d8372f59ab391df7e664398be415ce",
+    "host_versions_file": "host-versions.json",
+    "host_versions_sha256": "e21e1d1e94769e4d9f70d79dedd8c22bb6b4842330d156a3085523ad6b991dff",
+    "organic_use_claim": false,
+    "scope": "all default/private native roots; current registry aliases for dedup; no organic-use claim"
+  },
+  "not_invoked_reason": "Consumer Codex shell/CLI role: zero directly attributed syft first-executable calls. Nested shell, Python subprocesses and native hooks are not counted by this bounded adapter, so actual execution remains unknown. Missing instrumentation is completed child/hook identity at its run pin. If a slot explicitly names Codex and a complete counter confirms zero, the owner must wire that role or retire it; this partial view alone does not establish a wiring defect.",
+  "observed_cli_calls_lower_bound": 0,
+  "observed_mcp_calls": 0,
+  "publication": "Local paths normalized and native sample identifiers omitted; hashes bind only this public export. Measured counts/window/component identities unchanged.",
+  "repository": "github.com/anchore/syft",
+  "run_id": "syft",
+  "source_pin_table_sha256": "e345afc0913b36d179bbffe53933d2f8ca60dea41e35f0f58bc265306f4119b9",
+  "target_pin": "1.54.0; source cc326e45a6213360266dda4b30cc68095946d676",
+  "window_end": "2026-10-14T23:58:06Z",
+  "window_start": "2026-10-13T23:58:06Z"
+}

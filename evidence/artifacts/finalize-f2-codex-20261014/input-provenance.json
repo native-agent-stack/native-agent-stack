@@ -1,0 +1,1663 @@
+{
+  "codex_mcp_names": [
+    {
+      "enabled": true,
+      "name": "ai-memory"
+    },
+    {
+      "enabled": false,
+      "name": "chrome-devtools"
+    },
+    {
+      "enabled": true,
+      "name": "codebase-memory-mcp"
+    },
+    {
+      "enabled": true,
+      "name": "context-mode"
+    },
+    {
+      "enabled": true,
+      "name": "headroom"
+    },
+    {
+      "enabled": true,
+      "name": "hindsight"
+    },
+    {
+      "enabled": true,
+      "name": "jcodemunch"
+    },
+    {
+      "enabled": true,
+      "name": "promptfoo"
+    },
+    {
+      "enabled": true,
+      "name": "qmd"
+    },
+    {
+      "enabled": true,
+      "name": "semble"
+    },
+    {
+      "enabled": true,
+      "name": "serena"
+    },
+    {
+      "enabled": true,
+      "name": "socraticode"
+    }
+  ],
+  "inventory_ref": "252babe4040e39173cc178317c67699371806df6",
+  "inventory_sha256": "e482c30346bbe97fc06a8909a43e86d8d69a93983a443747f92ad7d3d8b9d46d",
+  "pin_resolution_path": "pin-resolution-projection.json",
+  "pin_resolution_sha256": "e345afc0913b36d179bbffe53933d2f8ca60dea41e35f0f58bc265306f4119b9",
+  "pins": [
+    {
+      "component": "agent-browser",
+      "original_pin": "0.38.2",
+      "peeled_commit": "39a74c70d7759d5a6de7a22c04570bb626bbd081",
+      "ref_object": "39a74c70d7759d5a6de7a22c04570bb626bbd081",
+      "repository": "github.com/vercel-labs/agent-browser",
+      "source": "adoption/pins-linux-x86_64.json#/tools/14",
+      "source_version": "0.38.2",
+      "status": "resolved",
+      "tag": "v0.38.2",
+      "tag_object": null,
+      "version": "0.38.2"
+    },
+    {
+      "component": "ai-memory",
+      "original_pin": "2.4.1",
+      "peeled_commit": "385b81ea95f7b73ede7146d0ae606c4caa7b43c1",
+      "ref_object": "e40a3678b6b9e41893302a0ade757cf97ee27b23",
+      "repository": "github.com/akitaonrails/ai-memory",
+      "source": "adoption/pins-linux-x86_64.json#/tools/7",
+      "source_version": "2.4.1",
+      "status": "resolved",
+      "tag": "v2.6.3",
+      "tag_object": "e40a3678b6b9e41893302a0ade757cf97ee27b23",
+      "version": "2.6.3"
+    },
+    {
+      "component": "alpaca-py",
+      "original_pin": "0.44.0",
+      "peeled_commit": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+      "ref_object": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+      "repository": "github.com/alpacahq/alpaca-py",
+      "source": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock#/package/6",
+      "source_version": "0.44.0",
+      "status": "resolved",
+      "tag": "v0.44.0",
+      "tag_object": null,
+      "version": "0.44.0"
+    },
+    {
+      "component": "ccusage",
+      "original_pin": "20.0.26",
+      "peeled_commit": "d9821088b98aa536c7a385aa1a4579d6fa02269b",
+      "ref_object": "d9821088b98aa536c7a385aa1a4579d6fa02269b",
+      "repository": "github.com/ccusage/ccusage",
+      "source": "adoption/pins-linux-x86_64.json#/tools/17",
+      "source_version": "20.0.26",
+      "status": "resolved",
+      "tag": "v20.0.26",
+      "tag_object": null,
+      "version": "20.0.26"
+    },
+    {
+      "component": "claude-code",
+      "original_pin": "2.1.295",
+      "peeled_commit": null,
+      "ref_object": null,
+      "repository": "github.com/anthropics/claude-code",
+      "source": "adoption/pins-linux-x86_64.json#/tools/4",
+      "source_version": "2.1.295",
+      "status": "excluded",
+      "tag": null,
+      "tag_object": null,
+      "version": "2.1.295"
+    },
+    {
+      "component": "codex",
+      "original_pin": "0.160.0",
+      "peeled_commit": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "ref_object": "79b1b666f2e8551f8abbbca34957227f67f3f553",
+      "repository": "github.com/openai/codex",
+      "source": "adoption/pins-linux-x86_64.json#/tools/3",
+      "source_version": "0.160.0",
+      "status": "resolved",
+      "tag": "rust-v0.160.0",
+      "tag_object": "79b1b666f2e8551f8abbbca34957227f67f3f553",
+      "version": "0.160.0"
+    },
+    {
+      "component": "dagu",
+      "original_pin": "2.16.6",
+      "peeled_commit": "58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+      "ref_object": "58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+      "repository": "github.com/dagucloud/dagu",
+      "source": "manifests/stack.json#/components/44",
+      "source_version": "2.16.6",
+      "status": "resolved",
+      "tag": "v2.16.6",
+      "tag_object": null,
+      "version": "2.16.6"
+    },
+    {
+      "component": "difftastic",
+      "original_pin": "0.71.0",
+      "peeled_commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+      "ref_object": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+      "repository": "github.com/wilfred/difftastic",
+      "source": "manifests/stack.json#/components/14",
+      "source_version": "0.71.0",
+      "status": "resolved",
+      "tag": "0.71.0",
+      "tag_object": null,
+      "version": "0.71.0"
+    },
+    {
+      "component": "duckdb",
+      "original_pin": "1.5.5",
+      "peeled_commit": "d8cdaa33fda8df955cc76ef58a280f68f4cd43fa",
+      "ref_object": "d8cdaa33fda8df955cc76ef58a280f68f4cd43fa",
+      "repository": "github.com/duckdb/duckdb",
+      "source": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock#/package/34",
+      "source_version": "1.5.5",
+      "status": "resolved",
+      "tag": "v1.5.5",
+      "tag_object": null,
+      "version": "1.5.5"
+    },
+    {
+      "component": "edgartools",
+      "original_pin": "5.61.1",
+      "peeled_commit": "7338aa335f6442c52dfa0695422cf1cd27e946e0",
+      "ref_object": "7338aa335f6442c52dfa0695422cf1cd27e946e0",
+      "repository": "github.com/dgunning/edgartools",
+      "source": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock#/package/35",
+      "source_version": "5.61.1",
+      "status": "resolved",
+      "tag": "v5.61.1",
+      "tag_object": null,
+      "version": "5.61.1"
+    },
+    {
+      "component": "exchange-calendars",
+      "original_pin": "4.13.2",
+      "peeled_commit": "dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+      "ref_object": "dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+      "repository": "github.com/gerrymanoim/exchange_calendars",
+      "source": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock#/package/38",
+      "source_version": "4.13.2",
+      "status": "resolved",
+      "tag": "4.13.2",
+      "tag_object": null,
+      "version": "4.13.2"
+    },
+    {
+      "component": "gh",
+      "original_pin": "2.101.0",
+      "peeled_commit": "0cf1092493af067646fc5f3db9421c6a6ec9c938",
+      "ref_object": "0cf1092493af067646fc5f3db9421c6a6ec9c938",
+      "repository": "github.com/cli/cli",
+      "source": "adoption/pins-linux-x86_64.json#/tools/2",
+      "source_version": "2.101.0",
+      "status": "resolved",
+      "tag": "v2.101.0",
+      "tag_object": null,
+      "version": "2.101.0"
+    },
+    {
+      "component": "headroom",
+      "original_pin": "0.40.0",
+      "peeled_commit": "855390d6110e0bbb199d9b97025baac16c2f5cf3",
+      "ref_object": "855390d6110e0bbb199d9b97025baac16c2f5cf3",
+      "repository": "github.com/headroomlabs-ai/headroom",
+      "source": "adoption/pins-linux-x86_64.json#/tools/18",
+      "source_version": "0.40.0",
+      "status": "resolved",
+      "tag": "v0.40.0",
+      "tag_object": null,
+      "version": "0.40.0"
+    },
+    {
+      "component": "markitdown",
+      "original_pin": "0.1.8",
+      "peeled_commit": "b8f79c57ebc0044be41323d89b2a45d3fda8460e",
+      "ref_object": "c2ac3b7d55bfa3751af12f2dce5dbf62a26266cc",
+      "repository": "github.com/microsoft/markitdown",
+      "source": "adoption/pins-linux-x86_64.json#/tools/11",
+      "source_version": "0.1.8",
+      "status": "resolved",
+      "tag": "v0.1.8",
+      "tag_object": "c2ac3b7d55bfa3751af12f2dce5dbf62a26266cc",
+      "version": "0.1.8"
+    },
+    {
+      "component": "mcp-inspector",
+      "original_pin": "2.9.0",
+      "peeled_commit": "ae865a19178ddf6f375780a02e9c77c4cf4da184",
+      "ref_object": "ae865a19178ddf6f375780a02e9c77c4cf4da184",
+      "repository": "github.com/modelcontextprotocol/inspector",
+      "source": "manifests/stack.json#/components/19",
+      "source_version": "2.9.0",
+      "status": "resolved",
+      "tag": "2.9.0",
+      "tag_object": null,
+      "version": "2.9.0"
+    },
+    {
+      "component": "mcporter",
+      "original_pin": "0.14.2",
+      "peeled_commit": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+      "ref_object": "a031fc437df4bfb3b1c4362d479026a5045805bc",
+      "repository": "github.com/openclaw/mcporter",
+      "source": "adoption/pins-linux-x86_64.json#/tools/8",
+      "source_version": "0.14.2",
+      "status": "resolved",
+      "tag": "v0.14.2",
+      "tag_object": "a031fc437df4bfb3b1c4362d479026a5045805bc",
+      "version": "0.14.2"
+    },
+    {
+      "component": "mlflow",
+      "original_pin": "3.16.1",
+      "peeled_commit": "32792afe5b0183fce10532d3a023f5cfa8612d09",
+      "ref_object": "32792afe5b0183fce10532d3a023f5cfa8612d09",
+      "repository": "github.com/mlflow/mlflow",
+      "source": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock#/package/91",
+      "source_version": "3.16.1",
+      "status": "resolved",
+      "tag": "v3.16.1",
+      "tag_object": null,
+      "version": "3.16.1"
+    },
+    {
+      "component": "nautilus-trader",
+      "original_pin": "2.0.0rc5",
+      "peeled_commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "ref_object": "34de0d6f886a9fe8359f9d6590f43f53c86b1d32",
+      "repository": "github.com/nautechsystems/nautilus_trader",
+      "source": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock#/package/99",
+      "source_version": "2.0.0rc5",
+      "status": "resolved",
+      "tag": "v2.0.0rc5",
+      "tag_object": "34de0d6f886a9fe8359f9d6590f43f53c86b1d32",
+      "version": "2.0.0rc5"
+    },
+    {
+      "component": "openresearch",
+      "original_pin": "0.2.15",
+      "peeled_commit": "ee36ef0333ca3c533eace915f1bec322a1efde1c",
+      "ref_object": "ee36ef0333ca3c533eace915f1bec322a1efde1c",
+      "repository": "github.com/alphaxiv/openresearch",
+      "source": "adoption/pins-linux-x86_64.json#/tools/13",
+      "source_version": "0.2.15",
+      "status": "resolved",
+      "tag": "v0.2.15",
+      "tag_object": null,
+      "version": "0.2.15"
+    },
+    {
+      "component": "opentelemetry-collector-contrib",
+      "original_pin": "0.162.0",
+      "peeled_commit": "ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+      "ref_object": "0cea0d4f24220e2e54bf89b6ace0416cf6fdd593",
+      "repository": "github.com/open-telemetry/opentelemetry-collector-contrib",
+      "source": "manifests/stack.json#/components/36",
+      "source_version": "0.162.0",
+      "status": "resolved",
+      "tag": "v0.162.0",
+      "tag_object": "0cea0d4f24220e2e54bf89b6ace0416cf6fdd593",
+      "version": "0.162.0"
+    },
+    {
+      "component": "pandera",
+      "original_pin": "0.33.1",
+      "peeled_commit": "62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6",
+      "ref_object": "f6cb6ef6d0f6e251d4d3ffb0bb5c488ee414db05",
+      "repository": "github.com/unionai-oss/pandera",
+      "source": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock#/package/110",
+      "source_version": "0.33.1",
+      "status": "resolved",
+      "tag": "v0.33.1",
+      "tag_object": "f6cb6ef6d0f6e251d4d3ffb0bb5c488ee414db05",
+      "version": "0.33.1"
+    },
+    {
+      "component": "poppler",
+      "original_pin": "26.09.0",
+      "peeled_commit": "e661b7b61a1b1feeb3193e5eced6274cc03e0ffa",
+      "ref_object": "cd58510145725f4870c3e51dbbf2b03ea97e4887",
+      "repository": "github.com/tsdgeos/poppler_mirror",
+      "source": "manifests/stack.json#/components/63",
+      "source_version": "26.09.0",
+      "status": "resolved",
+      "tag": "poppler-26.09.0",
+      "tag_object": "cd58510145725f4870c3e51dbbf2b03ea97e4887",
+      "version": "26.09.0"
+    },
+    {
+      "component": "postgresql",
+      "original_pin": "18.6",
+      "peeled_commit": "724edf9bde9d356724ad384a2e196edc3c9f80f7",
+      "ref_object": "724edf9bde9d356724ad384a2e196edc3c9f80f7",
+      "repository": "github.com/postgres/postgres",
+      "source": "manifests/stack.json#/components/62",
+      "source_version": "18.6",
+      "status": "resolved",
+      "tag": "REL_18_6",
+      "tag_object": null,
+      "version": "18.6"
+    },
+    {
+      "component": "promptfoo",
+      "original_pin": "0.123.1",
+      "peeled_commit": "30949931ee90c963acd487e97828c9441db0bcd4",
+      "ref_object": "30949931ee90c963acd487e97828c9441db0bcd4",
+      "repository": "github.com/promptfoo/promptfoo",
+      "source": "manifests/stack.json#/components/23",
+      "source_version": "0.123.1",
+      "status": "resolved",
+      "tag": "0.124.0",
+      "tag_object": null,
+      "version": "0.124.0"
+    },
+    {
+      "component": "qdrant",
+      "original_pin": "1.19.1",
+      "peeled_commit": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+      "ref_object": "de333e3c04660fe475d6275e9efc9fb9f54138fe",
+      "repository": "github.com/qdrant/qdrant",
+      "source": "adoption/pins-macos-arm64.json#/tools/10",
+      "source_version": "1.19.1",
+      "status": "resolved",
+      "tag": "v1.19.1",
+      "tag_object": "de333e3c04660fe475d6275e9efc9fb9f54138fe",
+      "version": "1.19.1"
+    },
+    {
+      "component": "qmd",
+      "original_pin": "2.8.3",
+      "peeled_commit": "facd35e01359e59d938bc9418e93fb9318addee3",
+      "ref_object": "30edfa8b11b3bdcb8ff2bb34d85c10d542333cc1",
+      "repository": "github.com/tobi/qmd",
+      "source": "adoption/pins-linux-x86_64.json#/tools/5",
+      "source_version": "2.8.3",
+      "status": "resolved",
+      "tag": "v2.8.3",
+      "tag_object": "30edfa8b11b3bdcb8ff2bb34d85c10d542333cc1",
+      "version": "2.8.3"
+    },
+    {
+      "component": "restic",
+      "original_pin": "0.19.1",
+      "peeled_commit": "6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf",
+      "ref_object": "6099d4b5c4376368d42b9982c7d3e93ba13d83b1",
+      "repository": "github.com/restic/restic",
+      "source": "manifests/stack.json#/components/43",
+      "source_version": "0.19.1",
+      "status": "resolved",
+      "tag": "v0.19.1",
+      "tag_object": "6099d4b5c4376368d42b9982c7d3e93ba13d83b1",
+      "version": "0.19.1"
+    },
+    {
+      "component": "rtk",
+      "original_pin": "0.51.0",
+      "peeled_commit": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+      "ref_object": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+      "repository": "github.com/rtk-ai/rtk",
+      "source": "adoption/pins-linux-x86_64.json#/tools/6",
+      "source_version": "0.51.0",
+      "status": "resolved",
+      "tag": "v0.51.0",
+      "tag_object": null,
+      "version": "0.51.0"
+    },
+    {
+      "component": "skfolio",
+      "original_pin": "1.7.0",
+      "peeled_commit": "8a399757200d46b1ac1bff1b3daa71d9f0fa4170",
+      "ref_object": "6633af2dcbe5f32825f839d17d2155889e3e21d8",
+      "repository": "github.com/skfolio/skfolio",
+      "source": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock#/package/155",
+      "source_version": "1.7.0",
+      "status": "resolved",
+      "tag": "v1.7.0",
+      "tag_object": "6633af2dcbe5f32825f839d17d2155889e3e21d8",
+      "version": "1.7.0"
+    },
+    {
+      "component": "socraticode",
+      "original_pin": "1.15.0",
+      "peeled_commit": "3d3a4a4d427cb0f29de4f5dd1360da52896f62df",
+      "ref_object": "a50f72c5b79dcb8f69ac9bc68b21fe744d82d45b",
+      "repository": "github.com/giancarloerra/socraticode",
+      "source": "adoption/pins-linux-x86_64.json#/tools/20",
+      "source_version": "1.15.0",
+      "status": "resolved",
+      "tag": "v1.16.0",
+      "tag_object": "a50f72c5b79dcb8f69ac9bc68b21fe744d82d45b",
+      "version": "1.16.0"
+    },
+    {
+      "component": "systemd",
+      "original_pin": "255.4-1ubuntu8.17",
+      "peeled_commit": null,
+      "ref_object": null,
+      "repository": "github.com/systemd/systemd",
+      "source": "manifests/stack.json#/components/48",
+      "source_version": "255.4-1ubuntu8.17",
+      "status": "gap",
+      "tag": null,
+      "tag_object": null,
+      "version": "255.4-1ubuntu8.17"
+    },
+    {
+      "component": "tavily-cli",
+      "original_pin": "0.1.8",
+      "peeled_commit": null,
+      "ref_object": null,
+      "repository": "github.com/tavily-ai/tavily-cli",
+      "source": "adoption/pins-linux-x86_64.json#/tools/12",
+      "source_version": "0.1.8",
+      "status": "gap",
+      "tag": null,
+      "tag_object": null,
+      "version": "0.1.8"
+    },
+    {
+      "component": "uv",
+      "original_pin": "0.12.17",
+      "peeled_commit": "635500036e1705961315e86447f0fab0a8ddb309",
+      "ref_object": "635500036e1705961315e86447f0fab0a8ddb309",
+      "repository": "github.com/astral-sh/uv",
+      "source": "adoption/pins-linux-x86_64.json#/tools/1",
+      "source_version": "0.12.17",
+      "status": "resolved",
+      "tag": "0.12.17",
+      "tag_object": null,
+      "version": "0.12.17"
+    }
+  ],
+  "winners": {
+    "affaan-m/ECC": {
+      "id": "affaan-m/ECC",
+      "layers": [
+        "foundation/instructions-skills"
+      ],
+      "repository": "https://github.com/affaan-m/ECC",
+      "run": {
+        "conflicts": [],
+        "id": "affaan-m/ECC",
+        "pin": "dd6ee538aee0f548d4a6b520118f875431fd749e",
+        "pin_parsed": {
+          "commit": "dd6ee538aee0f548d4a6b520118f875431fd749e",
+          "version": null
+        },
+        "platforms": [],
+        "repository": "github.com/affaan-m/ecc",
+        "source": "manifests/stack.json#/components/0"
+      },
+      "run_id": "affaan-m/ECC"
+    },
+    "agent-browser": {
+      "id": "agent-browser",
+      "layers": [
+        "foundation/web-research"
+      ],
+      "repository": "https://github.com/vercel-labs/agent-browser",
+      "run": {
+        "conflicts": [],
+        "id": "agent-browser",
+        "pin": "0.38.2",
+        "pin_parsed": {
+          "commit": null,
+          "version": "0.38.2"
+        },
+        "platforms": [
+          "linux-x86_64"
+        ],
+        "repository": "github.com/vercel-labs/agent-browser",
+        "source": "adoption/pins-linux-x86_64.json#/tools/14"
+      },
+      "run_id": "agent-browser"
+    },
+    "ai-memory": {
+      "id": "ai-memory",
+      "layers": [
+        "foundation/durable-memory"
+      ],
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "run": {
+        "conflicts": [
+          {
+            "pin": "2.3.2",
+            "source": "adoption/pins-macos-arm64.json#/tools/8"
+          }
+        ],
+        "id": "ai-memory",
+        "pin": "2.4.1",
+        "pin_parsed": {
+          "commit": null,
+          "version": "2.4.1"
+        },
+        "platforms": [
+          "linux-x86_64"
+        ],
+        "repository": "github.com/akitaonrails/ai-memory",
+        "source": "adoption/pins-linux-x86_64.json#/tools/7"
+      },
+      "run_id": "ai-memory"
+    },
+    "candidate:actions-attest": {
+      "id": "candidate:actions-attest",
+      "layers": [
+        "foundation/ci-supply-chain"
+      ],
+      "repository": "https://github.com/actions/attest",
+      "run": null,
+      "run_id": null
+    },
+    "candidate:astral-sh-uv": {
+      "id": "candidate:astral-sh-uv",
+      "layers": [
+        "foundation/recovery-portability"
+      ],
+      "repository": "https://github.com/astral-sh/uv",
+      "run": {
+        "conflicts": [],
+        "id": "uv",
+        "pin": "0.12.17",
+        "pin_parsed": {
+          "commit": null,
+          "version": "0.12.17"
+        },
+        "platforms": [
+          "linux-x86_64",
+          "macos-arm64"
+        ],
+        "repository": "github.com/astral-sh/uv",
+        "source": "adoption/pins-linux-x86_64.json#/tools/1"
+      },
+      "run_id": "uv"
+    },
+    "candidate:cli-cli": {
+      "id": "candidate:cli-cli",
+      "layers": [
+        "foundation/git-github-automation"
+      ],
+      "repository": "https://github.com/cli/cli",
+      "run": {
+        "conflicts": [],
+        "id": "gh",
+        "pin": "2.101.0",
+        "pin_parsed": {
+          "commit": null,
+          "version": "2.101.0"
+        },
+        "platforms": [
+          "linux-x86_64",
+          "macos-arm64"
+        ],
+        "repository": "github.com/cli/cli",
+        "source": "adoption/pins-linux-x86_64.json#/tools/2"
+      },
+      "run_id": "gh"
+    },
+    "candidate:openai-skills": {
+      "id": "candidate:openai-skills",
+      "layers": [
+        "foundation/instructions-skills"
+      ],
+      "repository": "https://github.com/openai/skills",
+      "run": null,
+      "run_id": null
+    },
+    "candidate:typesafe-ai-skills": {
+      "id": "candidate:typesafe-ai-skills",
+      "layers": [
+        "foundation/instructions-skills"
+      ],
+      "repository": "https://github.com/typesafe-ai/skills",
+      "run": null,
+      "run_id": null
+    },
+    "ccusage": {
+      "id": "ccusage",
+      "layers": [
+        "foundation/token-efficiency"
+      ],
+      "repository": "https://github.com/ccusage/ccusage",
+      "run": {
+        "conflicts": [],
+        "id": "ccusage",
+        "pin": "20.0.26",
+        "pin_parsed": {
+          "commit": null,
+          "version": "20.0.26"
+        },
+        "platforms": [
+          "linux-x86_64",
+          "macos-arm64"
+        ],
+        "repository": "github.com/ccusage/ccusage",
+        "source": "adoption/pins-linux-x86_64.json#/tools/17"
+      },
+      "run_id": "ccusage"
+    },
+    "claude-code": {
+      "id": "claude-code",
+      "layers": [
+        "foundation/native-clients",
+        "foundation/workers"
+      ],
+      "repository": "https://github.com/anthropics/claude-code",
+      "run": {
+        "conflicts": [],
+        "id": "claude-code",
+        "pin": "2.1.295",
+        "pin_parsed": {
+          "commit": null,
+          "version": "2.1.295"
+        },
+        "platforms": [
+          "linux-x86_64",
+          "macos-arm64"
+        ],
+        "repository": "github.com/anthropics/claude-code",
+        "source": "adoption/pins-linux-x86_64.json#/tools/4"
+      },
+      "run_id": "claude-code"
+    },
+    "codex": {
+      "id": "codex",
+      "layers": [
+        "foundation/agent-sdks",
+        "foundation/native-clients"
+      ],
+      "repository": "https://github.com/openai/codex",
+      "run": {
+        "conflicts": [
+          {
+            "pin": "0.155.1",
+            "source": "adoption/pins-macos-arm64.json#/tools/3"
+          }
+        ],
+        "id": "codex",
+        "pin": "0.160.0",
+        "pin_parsed": {
+          "commit": null,
+          "version": "0.160.0"
+        },
+        "platforms": [
+          "linux-x86_64"
+        ],
+        "repository": "github.com/openai/codex",
+        "source": "adoption/pins-linux-x86_64.json#/tools/3"
+      },
+      "run_id": "codex"
+    },
+    "codex-native-sdk": {
+      "id": "codex-native-sdk",
+      "layers": [
+        "us-equities/agents-models-workers"
+      ],
+      "repository": "https://github.com/openai/codex",
+      "run": {
+        "conflicts": [
+          {
+            "pin": "0.155.1",
+            "source": "adoption/pins-macos-arm64.json#/tools/3"
+          }
+        ],
+        "id": "codex",
+        "pin": "0.160.0",
+        "pin_parsed": {
+          "commit": null,
+          "version": "0.160.0"
+        },
+        "platforms": [
+          "linux-x86_64"
+        ],
+        "repository": "github.com/openai/codex",
+        "source": "adoption/pins-linux-x86_64.json#/tools/3"
+      },
+      "run_id": "codex"
+    },
+    "dagu": {
+      "id": "dagu",
+      "layers": [
+        "foundation/scheduling-supervision",
+        "us-equities/data-quality-orchestration"
+      ],
+      "repository": "https://github.com/dagucloud/dagu",
+      "run": {
+        "conflicts": [],
+        "id": "dagu",
+        "pin": "2.16.6",
+        "pin_parsed": {
+          "commit": null,
+          "version": "2.16.6"
+        },
+        "platforms": [],
+        "repository": "github.com/dagucloud/dagu",
+        "source": "manifests/stack.json#/components/44",
+        "source_pin": "v2.16.6",
+        "source_pin_kind": "tag"
+      },
+      "run_id": "dagu"
+    },
+    "data-alpaca-py": {
+      "id": "data-alpaca-py",
+      "layers": [
+        "us-equities/market-data-reference"
+      ],
+      "repository": "https://github.com/alpacahq/alpaca-py",
+      "run": {
+        "conflicts": [],
+        "id": "alpaca-py",
+        "pin": "0.44.0",
+        "pin_parsed": {
+          "commit": null,
+          "version": "0.44.0"
+        },
+        "platforms": [],
+        "repository": "github.com/alpacahq/alpaca-py",
+        "source": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock#/package/6"
+      },
+      "run_id": "alpaca-py"
+    },
+    "data-duckdb": {
+      "id": "data-duckdb",
+      "layers": [
+        "us-equities/storage-compute"
+      ],
+      "repository": "https://github.com/duckdb/duckdb",
+      "run": {
+        "conflicts": [],
+        "id": "duckdb",
+        "pin": "1.5.5",
+        "pin_parsed": {
+          "commit": null,
+          "version": "1.5.5"
+        },
+        "platforms": [],
+        "repository": "github.com/duckdb/duckdb",
+        "source": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock#/package/34"
+      },
+      "run_id": "duckdb"
+    },
+    "data-dvc": {
+      "id": "data-dvc",
+      "layers": [
+        "us-equities/identity-provenance"
+      ],
+      "repository": "https://github.com/treeverse/dvc",
+      "run": null,
+      "run_id": null
+    },
+    "data-edgartools": {
+      "id": "data-edgartools",
+      "layers": [
+        "us-equities/market-data-reference",
+        "us-equities/research-factors-ml"
+      ],
+      "repository": "https://github.com/dgunning/edgartools",
+      "run": {
+        "conflicts": [
+          {
+            "pin": "5.60.0",
+            "source": "manifests/stack.json#/components/51"
+          }
+        ],
+        "id": "edgartools",
+        "pin": "5.61.1",
+        "pin_parsed": {
+          "commit": null,
+          "version": "5.61.1"
+        },
+        "platforms": [],
+        "repository": "github.com/dgunning/edgartools",
+        "source": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock#/package/35"
+      },
+      "run_id": "edgartools"
+    },
+    "data-exchange-calendars": {
+      "id": "data-exchange-calendars",
+      "layers": [
+        "us-equities/market-data-reference"
+      ],
+      "repository": "https://github.com/gerrymanoim/exchange_calendars",
+      "run": {
+        "conflicts": [],
+        "id": "exchange-calendars",
+        "pin": "4.13.2",
+        "pin_parsed": {
+          "commit": null,
+          "version": "4.13.2"
+        },
+        "platforms": [],
+        "repository": "github.com/gerrymanoim/exchange_calendars",
+        "source": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock#/package/38"
+      },
+      "run_id": "exchange-calendars"
+    },
+    "data-mlflow": {
+      "id": "data-mlflow",
+      "layers": [
+        "us-equities/evaluation-experiments"
+      ],
+      "repository": "https://github.com/mlflow/mlflow",
+      "run": {
+        "conflicts": [],
+        "id": "mlflow",
+        "pin": "3.16.1",
+        "pin_parsed": {
+          "commit": null,
+          "version": "3.16.1"
+        },
+        "platforms": [],
+        "repository": "github.com/mlflow/mlflow",
+        "source": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock#/package/91"
+      },
+      "run_id": "mlflow"
+    },
+    "data-pandera": {
+      "id": "data-pandera",
+      "layers": [
+        "us-equities/data-quality-orchestration"
+      ],
+      "repository": "https://github.com/unionai-oss/pandera",
+      "run": {
+        "conflicts": [],
+        "id": "pandera",
+        "pin": "0.33.1",
+        "pin_parsed": {
+          "commit": null,
+          "version": "0.33.1"
+        },
+        "platforms": [],
+        "repository": "github.com/unionai-oss/pandera",
+        "source": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock#/package/110"
+      },
+      "run_id": "pandera"
+    },
+    "difftastic": {
+      "id": "difftastic",
+      "layers": [
+        "foundation/git-github-automation"
+      ],
+      "repository": "https://github.com/Wilfred/difftastic",
+      "run": {
+        "conflicts": [],
+        "id": "difftastic",
+        "pin": "0.71.0",
+        "pin_parsed": {
+          "commit": null,
+          "version": "0.71.0"
+        },
+        "platforms": [],
+        "repository": "github.com/wilfred/difftastic",
+        "source": "manifests/stack.json#/components/14"
+      },
+      "run_id": "difftastic"
+    },
+    "fastapi": {
+      "id": "fastapi",
+      "layers": [
+        "foundation/hosting-services"
+      ],
+      "repository": "https://github.com/fastapi/fastapi",
+      "run": {
+        "conflicts": [],
+        "id": "fastapi",
+        "pin": "0.141.1",
+        "pin_parsed": {
+          "commit": "95f8322ee1dcda7ceace7b1c4f6c9915b36d748f",
+          "version": "0.141.1"
+        },
+        "platforms": [],
+        "repository": "github.com/fastapi/fastapi",
+        "source": "manifests/stack.json#/components/61"
+      },
+      "run_id": "fastapi"
+    },
+    "foundation-agent-retrieval-bench": {
+      "id": "foundation-agent-retrieval-bench",
+      "layers": [
+        "us-equities/evaluation-experiments"
+      ],
+      "repository": "https://github.com/eyuansu62/agent-retrieval-bench",
+      "run": null,
+      "run_id": null
+    },
+    "foundation-ai-memory": {
+      "id": "foundation-ai-memory",
+      "layers": [
+        "us-equities/agents-models-workers"
+      ],
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "run": {
+        "conflicts": [
+          {
+            "pin": "2.3.2",
+            "source": "adoption/pins-macos-arm64.json#/tools/8"
+          }
+        ],
+        "id": "ai-memory",
+        "pin": "2.4.1",
+        "pin_parsed": {
+          "commit": null,
+          "version": "2.4.1"
+        },
+        "platforms": [
+          "linux-x86_64"
+        ],
+        "repository": "github.com/akitaonrails/ai-memory",
+        "source": "adoption/pins-linux-x86_64.json#/tools/7"
+      },
+      "run_id": "ai-memory"
+    },
+    "foundation-socraticode": {
+      "id": "foundation-socraticode",
+      "layers": [
+        "us-equities/agents-models-workers"
+      ],
+      "repository": "https://github.com/giancarloerra/SocratiCode",
+      "run": {
+        "conflicts": [
+          {
+            "pin": "1.14.0",
+            "source": "adoption/pins-macos-arm64.json#/tools/11"
+          }
+        ],
+        "id": "socraticode",
+        "pin": "1.15.0",
+        "pin_parsed": {
+          "commit": null,
+          "version": "1.15.0"
+        },
+        "platforms": [
+          "linux-x86_64"
+        ],
+        "repository": "github.com/giancarloerra/socraticode",
+        "source": "adoption/pins-linux-x86_64.json#/tools/20"
+      },
+      "run_id": "socraticode"
+    },
+    "gitleaks": {
+      "id": "gitleaks",
+      "layers": [
+        "foundation/secrets-credentials",
+        "us-equities/security-supply-chain"
+      ],
+      "repository": "https://github.com/gitleaks/gitleaks",
+      "run": {
+        "conflicts": [],
+        "id": "gitleaks",
+        "pin": "8.30.1",
+        "pin_parsed": {
+          "commit": "83d9cd684c87d95d656c1458ef04895a7f1cbd8e",
+          "version": "8.30.1"
+        },
+        "platforms": [],
+        "repository": "github.com/gitleaks/gitleaks",
+        "source": "manifests/stack.json#/components/15"
+      },
+      "run_id": "gitleaks"
+    },
+    "grype": {
+      "id": "grype",
+      "layers": [
+        "us-equities/security-supply-chain"
+      ],
+      "repository": "https://github.com/anchore/grype",
+      "run": null,
+      "run_id": null
+    },
+    "headroom": {
+      "id": "headroom",
+      "layers": [
+        "foundation/token-efficiency"
+      ],
+      "repository": "https://github.com/headroomlabs-ai/headroom",
+      "run": {
+        "conflicts": [],
+        "id": "headroom",
+        "pin": "0.40.0",
+        "pin_parsed": {
+          "commit": null,
+          "version": "0.40.0"
+        },
+        "platforms": [
+          "linux-x86_64",
+          "macos-arm64"
+        ],
+        "repository": "github.com/headroomlabs-ai/headroom",
+        "source": "adoption/pins-linux-x86_64.json#/tools/18"
+      },
+      "run_id": "headroom"
+    },
+    "inspect-ai": {
+      "id": "inspect-ai",
+      "layers": [
+        "us-equities/evaluation-experiments"
+      ],
+      "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+      "run": null,
+      "run_id": null
+    },
+    "lean": {
+      "id": "lean",
+      "layers": [
+        "us-equities/backtesting-engine"
+      ],
+      "repository": "https://github.com/QuantConnect/Lean",
+      "run": {
+        "conflicts": [],
+        "id": "lean",
+        "pin": "985ef30 with documented dependency remediation",
+        "pin_parsed": {
+          "commit": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+          "version": null
+        },
+        "platforms": [],
+        "repository": "github.com/quantconnect/lean",
+        "source": "manifests/stack.json#/components/45"
+      },
+      "run_id": "lean"
+    },
+    "loki": {
+      "id": "loki",
+      "layers": [
+        "foundation/observation-inference"
+      ],
+      "repository": "https://github.com/grafana/loki",
+      "run": {
+        "conflicts": [],
+        "id": "loki",
+        "pin": "3.7.8",
+        "pin_parsed": {
+          "commit": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+          "version": "3.7.8"
+        },
+        "platforms": [],
+        "repository": "github.com/grafana/loki",
+        "source": "manifests/stack.json#/components/38"
+      },
+      "run_id": "loki"
+    },
+    "markitdown": {
+      "id": "markitdown",
+      "layers": [
+        "foundation/document-retrieval"
+      ],
+      "repository": "https://github.com/microsoft/markitdown",
+      "run": {
+        "conflicts": [],
+        "id": "markitdown",
+        "pin": "0.1.8",
+        "pin_parsed": {
+          "commit": null,
+          "version": "0.1.8"
+        },
+        "platforms": [
+          "linux-x86_64",
+          "macos-arm64"
+        ],
+        "repository": "github.com/microsoft/markitdown",
+        "source": "adoption/pins-linux-x86_64.json#/tools/11"
+      },
+      "run_id": "markitdown"
+    },
+    "mcp-inspector": {
+      "id": "mcp-inspector",
+      "layers": [
+        "foundation/mcp-surfaces"
+      ],
+      "repository": "https://github.com/modelcontextprotocol/inspector",
+      "run": {
+        "conflicts": [],
+        "id": "mcp-inspector",
+        "pin": "2.9.0",
+        "pin_parsed": {
+          "commit": null,
+          "version": "2.9.0"
+        },
+        "platforms": [],
+        "repository": "github.com/modelcontextprotocol/inspector",
+        "source": "manifests/stack.json#/components/19"
+      },
+      "run_id": "mcp-inspector"
+    },
+    "mcporter": {
+      "id": "mcporter",
+      "layers": [
+        "foundation/mcp-surfaces"
+      ],
+      "repository": "https://github.com/openclaw/mcporter",
+      "run": {
+        "conflicts": [
+          {
+            "pin": "0.13.13",
+            "source": "adoption/pins-macos-arm64.json#/tools/5"
+          }
+        ],
+        "id": "mcporter",
+        "pin": "0.14.2",
+        "pin_parsed": {
+          "commit": null,
+          "version": "0.14.2"
+        },
+        "platforms": [
+          "linux-x86_64"
+        ],
+        "repository": "github.com/openclaw/mcporter",
+        "source": "adoption/pins-linux-x86_64.json#/tools/8"
+      },
+      "run_id": "mcporter"
+    },
+    "nautilustrader": {
+      "id": "nautilustrader",
+      "layers": [
+        "us-equities/backtesting-engine"
+      ],
+      "repository": "https://github.com/nautechsystems/nautilus_trader",
+      "run": {
+        "conflicts": [],
+        "id": "nautilus-trader",
+        "pin": "2.0.0rc5",
+        "pin_parsed": {
+          "commit": null,
+          "version": "2.0.0rc5"
+        },
+        "platforms": [],
+        "repository": "github.com/nautechsystems/nautilus_trader",
+        "source": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock#/package/99"
+      },
+      "run_id": "nautilus-trader"
+    },
+    "nextjs": {
+      "id": "nextjs",
+      "layers": [
+        "foundation/hosting-services"
+      ],
+      "repository": "https://github.com/vercel/next.js",
+      "run": {
+        "conflicts": [],
+        "id": "nextjs",
+        "pin": "16.3.8",
+        "pin_parsed": {
+          "commit": "b0fad0d45eb4c4430fda5eeeb442e8a5af08a5f6",
+          "version": "16.3.8"
+        },
+        "platforms": [],
+        "repository": "github.com/vercel/next.js",
+        "source": "manifests/stack.json#/components/59"
+      },
+      "run_id": "nextjs"
+    },
+    "openresearch": {
+      "id": "openresearch",
+      "layers": [
+        "foundation/web-research"
+      ],
+      "repository": "https://github.com/alphaXiv/OpenResearch",
+      "run": {
+        "conflicts": [],
+        "id": "openresearch",
+        "pin": "0.2.15",
+        "pin_parsed": {
+          "commit": null,
+          "version": "0.2.15"
+        },
+        "platforms": [
+          "linux-x86_64"
+        ],
+        "repository": "github.com/alphaxiv/openresearch",
+        "source": "adoption/pins-linux-x86_64.json#/tools/13"
+      },
+      "run_id": "openresearch"
+    },
+    "opentelemetry-collector-contrib": {
+      "id": "opentelemetry-collector-contrib",
+      "layers": [
+        "foundation/observation-inference"
+      ],
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+      "run": {
+        "conflicts": [],
+        "id": "opentelemetry-collector-contrib",
+        "pin": "0.162.0",
+        "pin_parsed": {
+          "commit": null,
+          "version": "0.162.0"
+        },
+        "platforms": [],
+        "repository": "github.com/open-telemetry/opentelemetry-collector-contrib",
+        "source": "manifests/stack.json#/components/36"
+      },
+      "run_id": "opentelemetry-collector-contrib"
+    },
+    "playwright-test": {
+      "id": "playwright-test",
+      "layers": [
+        "foundation/quality-evaluation"
+      ],
+      "repository": "https://github.com/microsoft/playwright",
+      "run": {
+        "conflicts": [],
+        "id": "playwright-test",
+        "pin": "1.63.0",
+        "pin_parsed": {
+          "commit": "1b025d7e20a026371cd5f98ba0cdce48892737c8",
+          "version": "1.63.0"
+        },
+        "platforms": [],
+        "repository": "github.com/microsoft/playwright",
+        "source": "manifests/stack.json#/components/65"
+      },
+      "run_id": "playwright-test"
+    },
+    "poppler": {
+      "id": "poppler",
+      "layers": [
+        "foundation/document-retrieval"
+      ],
+      "repository": "https://github.com/tsdgeos/poppler_mirror",
+      "run": {
+        "conflicts": [],
+        "id": "poppler",
+        "pin": "26.09.0",
+        "pin_parsed": {
+          "commit": null,
+          "version": "26.09.0"
+        },
+        "platforms": [],
+        "repository": "github.com/tsdgeos/poppler_mirror",
+        "source": "manifests/stack.json#/components/63",
+        "source_pin": "8059eadb6805340768f138c465b57f8164c92b4a0773c37ef031ea6c0d987b2e",
+        "source_pin_kind": "sha256"
+      },
+      "run_id": "poppler"
+    },
+    "postgresql": {
+      "id": "postgresql",
+      "layers": [
+        "foundation/hosting-services"
+      ],
+      "repository": "https://github.com/postgres/postgres",
+      "run": {
+        "conflicts": [],
+        "id": "postgresql",
+        "pin": "18.6",
+        "pin_parsed": {
+          "commit": null,
+          "version": "18.6"
+        },
+        "platforms": [],
+        "repository": "github.com/postgres/postgres",
+        "source": "manifests/stack.json#/components/62",
+        "source_pin": "555610c24d53e4316da5b7d3fc25c279d96856d5e0e23ee308c328c5fa881d9f",
+        "source_pin_kind": "sha256"
+      },
+      "run_id": "postgresql"
+    },
+    "prometheus": {
+      "id": "prometheus",
+      "layers": [
+        "foundation/observation-inference"
+      ],
+      "repository": "https://github.com/prometheus/prometheus",
+      "run": {
+        "conflicts": [],
+        "id": "prometheus",
+        "pin": "3.15.0",
+        "pin_parsed": {
+          "commit": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+          "version": "3.15.0"
+        },
+        "platforms": [],
+        "repository": "github.com/prometheus/prometheus",
+        "source": "manifests/stack.json#/components/37"
+      },
+      "run_id": "prometheus"
+    },
+    "promptfoo": {
+      "id": "promptfoo",
+      "layers": [
+        "foundation/quality-evaluation"
+      ],
+      "repository": "https://github.com/promptfoo/promptfoo",
+      "run": {
+        "conflicts": [],
+        "id": "promptfoo",
+        "pin": "0.123.1",
+        "pin_parsed": {
+          "commit": null,
+          "version": "0.123.1"
+        },
+        "platforms": [],
+        "repository": "github.com/promptfoo/promptfoo",
+        "source": "manifests/stack.json#/components/23"
+      },
+      "run_id": "promptfoo"
+    },
+    "qdrant": {
+      "id": "qdrant",
+      "layers": [
+        "foundation/semantic-rag"
+      ],
+      "repository": "https://github.com/qdrant/qdrant",
+      "run": {
+        "conflicts": [],
+        "id": "qdrant",
+        "pin": "1.19.1",
+        "pin_parsed": {
+          "commit": null,
+          "version": "1.19.1"
+        },
+        "platforms": [
+          "macos-arm64"
+        ],
+        "repository": "github.com/qdrant/qdrant",
+        "source": "adoption/pins-macos-arm64.json#/tools/10"
+      },
+      "run_id": "qdrant"
+    },
+    "qmd": {
+      "id": "qmd",
+      "layers": [
+        "foundation/document-retrieval"
+      ],
+      "repository": "https://github.com/tobi/qmd",
+      "run": {
+        "conflicts": [],
+        "id": "qmd",
+        "pin": "2.8.3",
+        "pin_parsed": {
+          "commit": null,
+          "version": "2.8.3"
+        },
+        "platforms": [
+          "linux-x86_64",
+          "macos-arm64"
+        ],
+        "repository": "github.com/tobi/qmd",
+        "source": "adoption/pins-linux-x86_64.json#/tools/5"
+      },
+      "run_id": "qmd"
+    },
+    "restic": {
+      "id": "restic",
+      "layers": [
+        "foundation/recovery-portability"
+      ],
+      "repository": "https://github.com/restic/restic",
+      "run": {
+        "conflicts": [],
+        "id": "restic",
+        "pin": "0.19.1",
+        "pin_parsed": {
+          "commit": null,
+          "version": "0.19.1"
+        },
+        "platforms": [],
+        "repository": "github.com/restic/restic",
+        "source": "manifests/stack.json#/components/43",
+        "source_pin": "v0.19.1",
+        "source_pin_kind": "tag"
+      },
+      "run_id": "restic"
+    },
+    "rtk": {
+      "id": "rtk",
+      "layers": [
+        "foundation/token-efficiency"
+      ],
+      "repository": "https://github.com/rtk-ai/rtk",
+      "run": {
+        "conflicts": [],
+        "id": "rtk",
+        "pin": "0.51.0",
+        "pin_parsed": {
+          "commit": null,
+          "version": "0.51.0"
+        },
+        "platforms": [
+          "linux-x86_64",
+          "macos-arm64"
+        ],
+        "repository": "github.com/rtk-ai/rtk",
+        "source": "adoption/pins-linux-x86_64.json#/tools/6"
+      },
+      "run_id": "rtk"
+    },
+    "sandbox-runtime": {
+      "id": "sandbox-runtime",
+      "layers": [
+        "foundation/isolation"
+      ],
+      "repository": "https://github.com/anthropics/sandbox-runtime",
+      "run": {
+        "conflicts": [],
+        "id": "sandbox-runtime",
+        "pin": "0.0.79",
+        "pin_parsed": {
+          "commit": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+          "version": "0.0.79"
+        },
+        "platforms": [],
+        "repository": "github.com/anthropics/sandbox-runtime",
+        "source": "manifests/stack.json#/components/28"
+      },
+      "run_id": "sandbox-runtime"
+    },
+    "serena": {
+      "id": "serena",
+      "layers": [
+        "foundation/code-navigation"
+      ],
+      "repository": "https://github.com/oraios/serena",
+      "run": {
+        "conflicts": [],
+        "id": "serena",
+        "pin": "2.0.0.dev0",
+        "pin_parsed": {
+          "commit": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+          "version": "2.0.0.dev0"
+        },
+        "platforms": [
+          "linux-x86_64",
+          "macos-arm64"
+        ],
+        "repository": "github.com/oraios/serena",
+        "source": "adoption/pins-linux-x86_64.json#/tools/19"
+      },
+      "run_id": "serena"
+    },
+    "skfolio": {
+      "id": "skfolio",
+      "layers": [
+        "us-equities/portfolio-risk",
+        "us-equities/research-factors-ml"
+      ],
+      "repository": "https://github.com/skfolio/skfolio",
+      "run": {
+        "conflicts": [
+          {
+            "pin": "1.2.9",
+            "source": "manifests/stack.json#/components/50"
+          }
+        ],
+        "id": "skfolio",
+        "pin": "1.7.0",
+        "pin_parsed": {
+          "commit": null,
+          "version": "1.7.0"
+        },
+        "platforms": [],
+        "repository": "github.com/skfolio/skfolio",
+        "source": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock#/package/155"
+      },
+      "run_id": "skfolio"
+    },
+    "socraticode": {
+      "id": "socraticode",
+      "layers": [
+        "foundation/semantic-rag"
+      ],
+      "repository": "https://github.com/giancarloerra/SocratiCode",
+      "run": {
+        "conflicts": [
+          {
+            "pin": "1.14.0",
+            "source": "adoption/pins-macos-arm64.json#/tools/11"
+          }
+        ],
+        "id": "socraticode",
+        "pin": "1.15.0",
+        "pin_parsed": {
+          "commit": null,
+          "version": "1.15.0"
+        },
+        "platforms": [
+          "linux-x86_64"
+        ],
+        "repository": "github.com/giancarloerra/socraticode",
+        "source": "adoption/pins-linux-x86_64.json#/tools/20"
+      },
+      "run_id": "socraticode"
+    },
+    "syft": {
+      "id": "syft",
+      "layers": [
+        "foundation/ci-supply-chain",
+        "us-equities/security-supply-chain"
+      ],
+      "repository": "https://github.com/anchore/syft",
+      "run": {
+        "conflicts": [],
+        "id": "syft",
+        "pin": "1.54.0",
+        "pin_parsed": {
+          "commit": "cc326e45a6213360266dda4b30cc68095946d676",
+          "version": "1.54.0"
+        },
+        "platforms": [],
+        "repository": "github.com/anchore/syft",
+        "source": "manifests/stack.json#/components/46"
+      },
+      "run_id": "syft"
+    },
+    "systemd": {
+      "id": "systemd",
+      "layers": [
+        "foundation/scheduling-supervision"
+      ],
+      "repository": "https://github.com/systemd/systemd",
+      "run": {
+        "conflicts": [],
+        "id": "systemd",
+        "pin": "255.4-1ubuntu8.17",
+        "pin_parsed": {
+          "commit": null,
+          "version": "255.4-1ubuntu8.17"
+        },
+        "platforms": [],
+        "repository": "github.com/systemd/systemd",
+        "source": "manifests/stack.json#/components/48"
+      },
+      "run_id": "systemd"
+    },
+    "tavily-cli": {
+      "id": "tavily-cli",
+      "layers": [
+        "foundation/web-research"
+      ],
+      "repository": "https://github.com/tavily-ai/tavily-cli",
+      "run": {
+        "conflicts": [],
+        "id": "tavily-cli",
+        "pin": "0.1.8",
+        "pin_parsed": {
+          "commit": null,
+          "version": "0.1.8"
+        },
+        "platforms": [
+          "linux-x86_64"
+        ],
+        "repository": "github.com/tavily-ai/tavily-cli",
+        "source": "adoption/pins-linux-x86_64.json#/tools/12"
+      },
+      "run_id": "tavily-cli"
+    },
+    "vllm": {
+      "id": "vllm",
+      "layers": [
+        "foundation/semantic-rag"
+      ],
+      "repository": "https://github.com/vllm-project/vllm",
+      "run": {
+        "conflicts": [],
+        "id": "vllm",
+        "pin": "0.30.0",
+        "pin_parsed": {
+          "commit": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+          "version": "0.30.0"
+        },
+        "platforms": [],
+        "repository": "github.com/vllm-project/vllm",
+        "source": "manifests/stack.json#/components/34"
+      },
+      "run_id": "vllm"
+    },
+    "worktrunk": {
+      "id": "worktrunk",
+      "layers": [
+        "foundation/git-github-automation",
+        "foundation/isolation",
+        "foundation/workers"
+      ],
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "run": {
+        "conflicts": [],
+        "id": "worktrunk",
+        "pin": "0.80.0",
+        "pin_parsed": {
+          "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+          "version": "0.80.0"
+        },
+        "platforms": [],
+        "repository": "github.com/max-sixty/worktrunk",
+        "source": "manifests/stack.json#/components/35"
+      },
+      "run_id": "worktrunk"
+    },
+    "zizmor": {
+      "id": "zizmor",
+      "layers": [
+        "foundation/ci-supply-chain"
+      ],
+      "repository": "https://github.com/zizmorcore/zizmor",
+      "run": {
+        "conflicts": [],
+        "id": "zizmor",
+        "pin": "1.30.1",
+        "pin_parsed": {
+          "commit": "99a054ed9283c90abdd2d5b9fb5101d27dde9783",
+          "version": "1.30.1"
+        },
+        "platforms": [],
+        "repository": "github.com/zizmorcore/zizmor",
+        "source": "manifests/stack.json#/components/53"
+      },
+      "run_id": "zizmor"
+    }
+  }
+}

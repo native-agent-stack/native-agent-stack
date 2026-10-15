@@ -1,0 +1,515 @@
+[
+  {
+    "calls": 0,
+    "disposition": "other-consumer",
+    "host_version": null,
+    "id": "affaan-m/ECC",
+    "path": "reasons/not-invoked-affaan-m-ecc.json",
+    "pin": "dd6ee538aee0f548d4a6b520118f875431fd749e",
+    "scope": "skill-loader role"
+  },
+  {
+    "calls": 0,
+    "disposition": "cli-attribution-gap",
+    "host_version": null,
+    "id": "agent-browser",
+    "path": "reasons/not-invoked-agent-browser.json",
+    "pin": "0.38.2; source 39a74c70d7759d5a6de7a22c04570bb626bbd081",
+    "scope": "Codex shell/CLI role"
+  },
+  {
+    "calls": 0,
+    "disposition": "codex-dispatch-wiring-flag",
+    "host_version": "2.6.3",
+    "id": "ai-memory",
+    "path": "reasons/not-invoked-ai-memory.json",
+    "pin": "2.6.3; source 385b81ea95f7b73ede7146d0ae606c4caa7b43c1",
+    "scope": "Codex MCP registration"
+  },
+  {
+    "calls": 0,
+    "disposition": "other-consumer",
+    "host_version": null,
+    "id": "candidate:actions-attest",
+    "path": "reasons/not-invoked-candidate-actions-attest.json",
+    "pin": null,
+    "scope": "runtime/service/CI consumer"
+  },
+  {
+    "calls": 2,
+    "disposition": "host-run-drift",
+    "host_version": "0.12.22",
+    "id": "candidate:astral-sh-uv",
+    "path": "reasons/not-invoked-candidate-astral-sh-uv.json",
+    "pin": "0.12.17; source 635500036e1705961315e86447f0fab0a8ddb309",
+    "scope": "Codex shell/CLI role"
+  },
+  {
+    "calls": 116,
+    "disposition": "host-run-drift",
+    "host_version": "2.102.0",
+    "id": "candidate:cli-cli",
+    "path": "reasons/not-invoked-candidate-cli-cli.json",
+    "pin": "2.101.0; source 0cf1092493af067646fc5f3db9421c6a6ec9c938",
+    "scope": "Codex shell/CLI role"
+  },
+  {
+    "calls": 0,
+    "disposition": "other-consumer",
+    "host_version": null,
+    "id": "candidate:openai-skills",
+    "path": "reasons/not-invoked-candidate-openai-skills.json",
+    "pin": null,
+    "scope": "skill-loader role"
+  },
+  {
+    "calls": 0,
+    "disposition": "other-consumer",
+    "host_version": null,
+    "id": "candidate:typesafe-ai-skills",
+    "path": "reasons/not-invoked-candidate-typesafe-ai-skills.json",
+    "pin": null,
+    "scope": "skill-loader role"
+  },
+  {
+    "calls": 0,
+    "disposition": "cli-attribution-gap",
+    "host_version": "20.0.26",
+    "id": "ccusage",
+    "path": "reasons/not-invoked-ccusage.json",
+    "pin": "20.0.26; source d9821088b98aa536c7a385aa1a4579d6fa02269b",
+    "scope": "Codex shell/CLI role"
+  },
+  {
+    "calls": 0,
+    "disposition": "other-consumer",
+    "host_version": null,
+    "id": "claude-code",
+    "path": "reasons/not-invoked-claude-code.json",
+    "pin": "2.1.295",
+    "scope": "runtime/service/CI consumer"
+  },
+  {
+    "calls": 0,
+    "disposition": "host-run-drift",
+    "host_version": "0.162.1",
+    "id": "codex",
+    "path": "reasons/not-invoked-codex.json",
+    "pin": "0.160.0; source a956835d020762cb2b570053af06f643a11c0ecc",
+    "scope": "Codex client"
+  },
+  {
+    "calls": 0,
+    "disposition": "other-consumer-attribution-gap",
+    "host_version": "0.162.1",
+    "id": "codex-native-sdk",
+    "path": "reasons/not-invoked-codex-native-sdk.json",
+    "pin": "0.160.0; source a956835d020762cb2b570053af06f643a11c0ecc",
+    "scope": "runtime SDK caller"
+  },
+  {
+    "calls": 0,
+    "disposition": "cli-attribution-gap",
+    "host_version": "2.18.2",
+    "id": "dagu",
+    "path": "reasons/not-invoked-dagu.json",
+    "pin": "2.16.6; source 58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+    "scope": "Codex shell/CLI role"
+  },
+  {
+    "calls": 0,
+    "disposition": "other-consumer",
+    "host_version": null,
+    "id": "data-alpaca-py",
+    "path": "reasons/not-invoked-data-alpaca-py.json",
+    "pin": "0.44.0; source cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+    "scope": "runtime/service/CI consumer"
+  },
+  {
+    "calls": 0,
+    "disposition": "other-consumer",
+    "host_version": null,
+    "id": "data-duckdb",
+    "path": "reasons/not-invoked-data-duckdb.json",
+    "pin": "1.5.5; source d8cdaa33fda8df955cc76ef58a280f68f4cd43fa",
+    "scope": "runtime/service/CI consumer"
+  },
+  {
+    "calls": 0,
+    "disposition": "other-consumer",
+    "host_version": null,
+    "id": "data-dvc",
+    "path": "reasons/not-invoked-data-dvc.json",
+    "pin": null,
+    "scope": "runtime/service/CI consumer"
+  },
+  {
+    "calls": 0,
+    "disposition": "other-consumer",
+    "host_version": null,
+    "id": "data-edgartools",
+    "path": "reasons/not-invoked-data-edgartools.json",
+    "pin": "5.61.1; source 7338aa335f6442c52dfa0695422cf1cd27e946e0",
+    "scope": "runtime/service/CI consumer"
+  },
+  {
+    "calls": 0,
+    "disposition": "other-consumer",
+    "host_version": null,
+    "id": "data-exchange-calendars",
+    "path": "reasons/not-invoked-data-exchange-calendars.json",
+    "pin": "4.13.2; source dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+    "scope": "runtime/service/CI consumer"
+  },
+  {
+    "calls": 0,
+    "disposition": "other-consumer",
+    "host_version": null,
+    "id": "data-mlflow",
+    "path": "reasons/not-invoked-data-mlflow.json",
+    "pin": "3.16.1; source 32792afe5b0183fce10532d3a023f5cfa8612d09",
+    "scope": "runtime/service/CI consumer"
+  },
+  {
+    "calls": 0,
+    "disposition": "other-consumer",
+    "host_version": null,
+    "id": "data-pandera",
+    "path": "reasons/not-invoked-data-pandera.json",
+    "pin": "0.33.1; source 62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6",
+    "scope": "runtime/service/CI consumer"
+  },
+  {
+    "calls": 0,
+    "disposition": "cli-attribution-gap",
+    "host_version": "0.71.0",
+    "id": "difftastic",
+    "path": "reasons/not-invoked-difftastic.json",
+    "pin": "0.71.0; source b7d119e90ac9f972f03f69508da765dacd302c0c",
+    "scope": "Codex shell/CLI role"
+  },
+  {
+    "calls": 0,
+    "disposition": "other-consumer",
+    "host_version": null,
+    "id": "fastapi",
+    "path": "reasons/not-invoked-fastapi.json",
+    "pin": "0.141.1; source 95f8322ee1dcda7ceace7b1c4f6c9915b36d748f",
+    "scope": "runtime/service/CI consumer"
+  },
+  {
+    "calls": 0,
+    "disposition": "other-consumer",
+    "host_version": null,
+    "id": "foundation-agent-retrieval-bench",
+    "path": "reasons/not-invoked-foundation-agent-retrieval-bench.json",
+    "pin": null,
+    "scope": "runtime/service/CI consumer"
+  },
+  {
+    "calls": 0,
+    "disposition": "codex-dispatch-wiring-flag",
+    "host_version": "2.6.3",
+    "id": "foundation-ai-memory",
+    "path": "reasons/not-invoked-foundation-ai-memory.json",
+    "pin": "2.6.3; source 385b81ea95f7b73ede7146d0ae606c4caa7b43c1",
+    "scope": "Codex MCP registration"
+  },
+  {
+    "calls": 64,
+    "disposition": "invoke-pending-registration",
+    "host_version": "1.16.0",
+    "id": "foundation-socraticode",
+    "path": "receipts/invoke-foundation-socraticode.json",
+    "pin": "1.16.0; source 3d3a4a4d427cb0f29de4f5dd1360da52896f62df",
+    "scope": "Codex MCP registration"
+  },
+  {
+    "calls": 78,
+    "disposition": "invoke",
+    "host_version": "8.30.1",
+    "id": "gitleaks",
+    "path": "receipts/invoke-gitleaks.json",
+    "pin": "8.30.1; source 83d9cd684c87d95d656c1458ef04895a7f1cbd8e",
+    "scope": "Codex shell/CLI role"
+  },
+  {
+    "calls": 0,
+    "disposition": "other-consumer",
+    "host_version": null,
+    "id": "grype",
+    "path": "reasons/not-invoked-grype.json",
+    "pin": null,
+    "scope": "runtime/service/CI consumer"
+  },
+  {
+    "calls": 0,
+    "disposition": "codex-dispatch-wiring-flag",
+    "host_version": "0.40.0",
+    "id": "headroom",
+    "path": "reasons/not-invoked-headroom.json",
+    "pin": "0.40.0; source 855390d6110e0bbb199d9b97025baac16c2f5cf3",
+    "scope": "Codex MCP registration"
+  },
+  {
+    "calls": 0,
+    "disposition": "other-consumer",
+    "host_version": null,
+    "id": "inspect-ai",
+    "path": "reasons/not-invoked-inspect-ai.json",
+    "pin": null,
+    "scope": "runtime/service/CI consumer"
+  },
+  {
+    "calls": 0,
+    "disposition": "other-consumer",
+    "host_version": null,
+    "id": "lean",
+    "path": "reasons/not-invoked-lean.json",
+    "pin": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+    "scope": "runtime/service/CI consumer"
+  },
+  {
+    "calls": 0,
+    "disposition": "other-consumer",
+    "host_version": null,
+    "id": "loki",
+    "path": "reasons/not-invoked-loki.json",
+    "pin": "3.7.8; source 09e6ce2ff1bdc19763a10265b870c86f51c98655",
+    "scope": "runtime/service/CI consumer"
+  },
+  {
+    "calls": 0,
+    "disposition": "cli-attribution-gap",
+    "host_version": null,
+    "id": "markitdown",
+    "path": "reasons/not-invoked-markitdown.json",
+    "pin": "0.1.8; source b8f79c57ebc0044be41323d89b2a45d3fda8460e",
+    "scope": "Codex shell/CLI role"
+  },
+  {
+    "calls": 0,
+    "disposition": "cli-attribution-gap",
+    "host_version": null,
+    "id": "mcp-inspector",
+    "path": "reasons/not-invoked-mcp-inspector.json",
+    "pin": "2.9.0; source ae865a19178ddf6f375780a02e9c77c4cf4da184",
+    "scope": "Codex shell/CLI role"
+  },
+  {
+    "calls": 0,
+    "disposition": "cli-attribution-gap",
+    "host_version": "0.14.2",
+    "id": "mcporter",
+    "path": "reasons/not-invoked-mcporter.json",
+    "pin": "0.14.2; source aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+    "scope": "Codex shell/CLI role"
+  },
+  {
+    "calls": 0,
+    "disposition": "other-consumer",
+    "host_version": null,
+    "id": "nautilustrader",
+    "path": "reasons/not-invoked-nautilustrader.json",
+    "pin": "2.0.0rc5; source 1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+    "scope": "runtime/service/CI consumer"
+  },
+  {
+    "calls": 0,
+    "disposition": "other-consumer",
+    "host_version": null,
+    "id": "nextjs",
+    "path": "reasons/not-invoked-nextjs.json",
+    "pin": "16.3.8; source b0fad0d45eb4c4430fda5eeeb442e8a5af08a5f6",
+    "scope": "runtime/service/CI consumer"
+  },
+  {
+    "calls": 0,
+    "disposition": "cli-attribution-gap",
+    "host_version": null,
+    "id": "openresearch",
+    "path": "reasons/not-invoked-openresearch.json",
+    "pin": "0.2.15; source ee36ef0333ca3c533eace915f1bec322a1efde1c",
+    "scope": "Codex shell/CLI role"
+  },
+  {
+    "calls": 0,
+    "disposition": "other-consumer",
+    "host_version": null,
+    "id": "opentelemetry-collector-contrib",
+    "path": "reasons/not-invoked-opentelemetry-collector-contrib.json",
+    "pin": "0.162.0; source ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+    "scope": "runtime/service/CI consumer"
+  },
+  {
+    "calls": 0,
+    "disposition": "cli-attribution-gap",
+    "host_version": null,
+    "id": "playwright-test",
+    "path": "reasons/not-invoked-playwright-test.json",
+    "pin": "1.63.0; source 1b025d7e20a026371cd5f98ba0cdce48892737c8",
+    "scope": "Codex shell/CLI role"
+  },
+  {
+    "calls": 0,
+    "disposition": "cli-attribution-gap",
+    "host_version": null,
+    "id": "poppler",
+    "path": "reasons/not-invoked-poppler.json",
+    "pin": "26.09.0; source e661b7b61a1b1feeb3193e5eced6274cc03e0ffa",
+    "scope": "Codex shell/CLI role"
+  },
+  {
+    "calls": 0,
+    "disposition": "other-consumer",
+    "host_version": null,
+    "id": "postgresql",
+    "path": "reasons/not-invoked-postgresql.json",
+    "pin": "18.6; source 724edf9bde9d356724ad384a2e196edc3c9f80f7",
+    "scope": "runtime/service/CI consumer"
+  },
+  {
+    "calls": 0,
+    "disposition": "other-consumer",
+    "host_version": null,
+    "id": "prometheus",
+    "path": "reasons/not-invoked-prometheus.json",
+    "pin": "3.15.0; source 5241a27fe3c6983549fccc32f6e65917408c63cd",
+    "scope": "runtime/service/CI consumer"
+  },
+  {
+    "calls": 0,
+    "disposition": "codex-dispatch-wiring-flag",
+    "host_version": "0.124.0",
+    "id": "promptfoo",
+    "path": "reasons/not-invoked-promptfoo.json",
+    "pin": "0.124.0; source 30949931ee90c963acd487e97828c9441db0bcd4",
+    "scope": "Codex MCP registration"
+  },
+  {
+    "calls": 0,
+    "disposition": "other-consumer",
+    "host_version": null,
+    "id": "qdrant",
+    "path": "reasons/not-invoked-qdrant.json",
+    "pin": "1.19.1; source 6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+    "scope": "runtime/service/CI consumer"
+  },
+  {
+    "calls": 0,
+    "disposition": "codex-dispatch-wiring-flag",
+    "host_version": "2.8.3",
+    "id": "qmd",
+    "path": "reasons/not-invoked-qmd.json",
+    "pin": "2.8.3; source facd35e01359e59d938bc9418e93fb9318addee3",
+    "scope": "Codex MCP registration"
+  },
+  {
+    "calls": 2,
+    "disposition": "invoke-pending-registration",
+    "host_version": "0.19.1",
+    "id": "restic",
+    "path": "receipts/invoke-restic.json",
+    "pin": "0.19.1; source 6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf",
+    "scope": "Codex shell/CLI role"
+  },
+  {
+    "calls": 1158,
+    "disposition": "invoke-pending-registration",
+    "host_version": "0.51.0",
+    "id": "rtk",
+    "path": "receipts/invoke-rtk.json",
+    "pin": "0.51.0; source e001f773f80b22b7dc4c7a79521b30e35aaef026",
+    "scope": "Codex shell/CLI role"
+  },
+  {
+    "calls": 0,
+    "disposition": "other-consumer",
+    "host_version": null,
+    "id": "sandbox-runtime",
+    "path": "reasons/not-invoked-sandbox-runtime.json",
+    "pin": "0.0.79; source d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+    "scope": "runtime/service/CI consumer"
+  },
+  {
+    "calls": 130,
+    "disposition": "invoke",
+    "host_version": "2.0.0.dev0",
+    "id": "serena",
+    "path": "receipts/invoke-serena.json",
+    "pin": "2.0.0.dev0; source c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+    "scope": "Codex MCP registration"
+  },
+  {
+    "calls": 0,
+    "disposition": "other-consumer",
+    "host_version": null,
+    "id": "skfolio",
+    "path": "reasons/not-invoked-skfolio.json",
+    "pin": "1.7.0; source 8a399757200d46b1ac1bff1b3daa71d9f0fa4170",
+    "scope": "runtime/service/CI consumer"
+  },
+  {
+    "calls": 64,
+    "disposition": "invoke-pending-registration",
+    "host_version": "1.16.0",
+    "id": "socraticode",
+    "path": "receipts/invoke-socraticode.json",
+    "pin": "1.16.0; source 3d3a4a4d427cb0f29de4f5dd1360da52896f62df",
+    "scope": "Codex MCP registration"
+  },
+  {
+    "calls": 0,
+    "disposition": "cli-attribution-gap",
+    "host_version": "1.54.1",
+    "id": "syft",
+    "path": "reasons/not-invoked-syft.json",
+    "pin": "1.54.0; source cc326e45a6213360266dda4b30cc68095946d676",
+    "scope": "Codex shell/CLI role"
+  },
+  {
+    "calls": 439,
+    "disposition": "host-run-drift",
+    "host_version": "259.5-0ubuntu3.4",
+    "id": "systemd",
+    "path": "reasons/not-invoked-systemd.json",
+    "pin": "255.4-1ubuntu8.17",
+    "scope": "Codex shell/CLI role"
+  },
+  {
+    "calls": 0,
+    "disposition": "cli-attribution-gap",
+    "host_version": null,
+    "id": "tavily-cli",
+    "path": "reasons/not-invoked-tavily-cli.json",
+    "pin": "0.1.8",
+    "scope": "Codex shell/CLI role"
+  },
+  {
+    "calls": 0,
+    "disposition": "other-consumer",
+    "host_version": null,
+    "id": "vllm",
+    "path": "reasons/not-invoked-vllm.json",
+    "pin": "0.30.0; source ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+    "scope": "runtime/service/CI consumer"
+  },
+  {
+    "calls": 5,
+    "disposition": "invoke",
+    "host_version": "0.80.0",
+    "id": "worktrunk",
+    "path": "receipts/invoke-worktrunk.json",
+    "pin": "0.80.0; source b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+    "scope": "Codex shell/CLI role"
+  },
+  {
+    "calls": 1,
+    "disposition": "invoke",
+    "host_version": "1.30.1",
+    "id": "zizmor",
+    "path": "receipts/invoke-zizmor.json",
+    "pin": "1.30.1; source 99a054ed9283c90abdd2d5b9fb5101d27dde9783",
+    "scope": "Codex shell/CLI role"
+  }
+]

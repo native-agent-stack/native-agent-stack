@@ -1,0 +1,107 @@
+{
+  "checked_against": "252babe4040e39173cc178317c67699371806df6",
+  "failures": [],
+  "final_stack_source_sha256": "151d0a5a7c721ab6d713532fff12c81b654a58bcebd0e20a18174273e3f9777b",
+  "limit": "predicate/shape validation only; pending pin records are not registered FINAL evidence",
+  "negative_controls": [
+    {
+      "id": "foundation-socraticode",
+      "omitted_commit_rejected": true,
+      "wrong_commit_rejected": true
+    },
+    {
+      "id": "gitleaks",
+      "omitted_commit_rejected": true,
+      "wrong_commit_rejected": true
+    },
+    {
+      "id": "restic",
+      "omitted_commit_rejected": true,
+      "wrong_commit_rejected": true
+    },
+    {
+      "id": "rtk",
+      "omitted_commit_rejected": true,
+      "wrong_commit_rejected": true
+    },
+    {
+      "id": "serena",
+      "omitted_commit_rejected": true,
+      "wrong_commit_rejected": true
+    },
+    {
+      "id": "socraticode",
+      "omitted_commit_rejected": true,
+      "wrong_commit_rejected": true
+    },
+    {
+      "id": "worktrunk",
+      "omitted_commit_rejected": true,
+      "wrong_commit_rejected": true
+    },
+    {
+      "id": "zizmor",
+      "omitted_commit_rejected": true,
+      "wrong_commit_rejected": true
+    }
+  ],
+  "non_invocation_reasons": 49,
+  "receipts": [
+    {
+      "calls": 64,
+      "id": "foundation-socraticode",
+      "matches_frozen_run": false,
+      "matches_prospective_F1_run": true,
+      "status": "PASS"
+    },
+    {
+      "calls": 78,
+      "id": "gitleaks",
+      "matches_frozen_run": true,
+      "matches_prospective_F1_run": true,
+      "status": "PASS"
+    },
+    {
+      "calls": 2,
+      "id": "restic",
+      "matches_frozen_run": false,
+      "matches_prospective_F1_run": true,
+      "status": "PASS"
+    },
+    {
+      "calls": 1158,
+      "id": "rtk",
+      "matches_frozen_run": false,
+      "matches_prospective_F1_run": true,
+      "status": "PASS"
+    },
+    {
+      "calls": 130,
+      "id": "serena",
+      "matches_frozen_run": true,
+      "matches_prospective_F1_run": true,
+      "status": "PASS"
+    },
+    {
+      "calls": 64,
+      "id": "socraticode",
+      "matches_frozen_run": false,
+      "matches_prospective_F1_run": true,
+      "status": "PASS"
+    },
+    {
+      "calls": 5,
+      "id": "worktrunk",
+      "matches_frozen_run": true,
+      "matches_prospective_F1_run": true,
+      "status": "PASS"
+    },
+    {
+      "calls": 1,
+      "id": "zizmor",
+      "matches_frozen_run": true,
+      "matches_prospective_F1_run": true,
+      "status": "PASS"
+    }
+  ]
+}

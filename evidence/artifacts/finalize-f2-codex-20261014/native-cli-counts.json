@@ -1,0 +1,38 @@
+{
+  "cli_counts": {
+    "candidate:astral-sh-uv": 2,
+    "candidate:cli-cli": 116,
+    "gitleaks": 78,
+    "restic": 2,
+    "rtk": 1158,
+    "systemd": 439,
+    "worktrunk": 5,
+    "zizmor": 1
+  },
+  "cli_scope": "successful native parent commands only; executable/wrapper prefix; bounded file snapshot",
+  "client_tool_calls_by_version": {
+    "0.162.1": 14846
+  },
+  "diagnostics": {
+    "command_completed": 5755,
+    "multiline_or_non_posix": 526,
+    "non_successful_parent_not_attributed": 518,
+    "not_attributed_to_winner": 4024
+  },
+  "exit_code": 0,
+  "files_considered": 3963,
+  "mcp_counts": {
+    "codebase-memory-mcp": 33,
+    "codex_apps": 2,
+    "context-mode": 8339,
+    "hindsight": 5,
+    "serena": 130,
+    "socraticode": 64
+  },
+  "publication": "Native sample thread/item identifiers omitted; counts and window unchanged.",
+  "scope": "all default/private native roots; current registry aliases for dedup; no organic-use claim",
+  "unregistered_window_threads": 195,
+  "window_end": "2026-10-14T23:58:06Z",
+  "window_start": "2026-10-13T23:58:06Z",
+  "window_threads": 214
+}

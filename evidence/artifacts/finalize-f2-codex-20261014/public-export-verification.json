@@ -1,0 +1,29 @@
+{
+  "kind": "public_export_verification",
+  "evidence_class": "local_integration",
+  "native_host_scan_before": {
+    "status": "refused",
+    "findings": 24,
+    "values_suppressed": true
+  },
+  "native_host_scan_after": {
+    "status": "pass",
+    "findings": 0
+  },
+  "measurement_fields_compared": [
+    "component_id",
+    "repository",
+    "pin",
+    "calls",
+    "window_start",
+    "window_end",
+    "registration_pending",
+    "binds_frozen_run"
+  ],
+  "receipts_compared": 8,
+  "measurement_field_mismatches": 0,
+  "private_source_digest_policy": "Omitted; dependent digests bind only the public export.",
+  "native_sample_identifiers": "Omitted from public counts/receipts; original private sample identifiers and their pre-normalization digests are not published.",
+  "whole_tree_publication_preflight": {"status_before": "refused", "files_with_native_identifier_findings": 10},
+  "scanner_configuration_changed": false
+}

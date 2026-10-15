@@ -1,0 +1,9 @@
+{
+  "cases": 12,
+  "evidence_class": "synthetic",
+  "exit_code": 0,
+  "failed_case_ids": [],
+  "kind": "attribution_controls",
+  "not_invocation_evidence": true,
+  "source_sha256": "2abd869e26906c17b073ee39889286acf6049723fc8350948bd7bdd03fa4f8ac"
+}

@@ -1,0 +1,160 @@
+{
+  "ai-memory": {
+    "executable_mtime_utc": "2026-10-10T03:20:52Z",
+    "exit_code": 0,
+    "resolved_executable": "~/.local/share/mise/installs/github-akitaonrails-ai-memory/2.6.3/ai-memory",
+    "version_tokens": [
+      "2.6.3"
+    ]
+  },
+  "ccusage": {
+    "executable_mtime_utc": "2026-10-05T16:17:31.632306Z",
+    "exit_code": 0,
+    "resolved_executable": "~/.local/share/codex-ecosystem/tools/ccusage-20.0.26/lib/node_modules/ccusage/src/cli.js",
+    "version_tokens": [
+      "20.0.26"
+    ]
+  },
+  "dagu": {
+    "executable_mtime_utc": "2026-10-05T16:22:01.095694Z",
+    "exit_code": 0,
+    "resolved_executable": "~/.local/bin/dagu",
+    "version_tokens": [
+      "2.18.2"
+    ]
+  },
+  "difft": {
+    "executable_mtime_utc": "2026-09-18T21:59:16Z",
+    "exit_code": 0,
+    "resolved_executable": "~/.local/share/mise/installs/difftastic/0.71.0/difft",
+    "version_tokens": [
+      "0.71.0",
+      "1.85.0"
+    ]
+  },
+  "gh": {
+    "executable_mtime_utc": "2026-09-30T02:33:04Z",
+    "exit_code": 0,
+    "resolved_executable": "~/.local/share/mise/installs/github-cli/2.102.0/gh_2.102.0_linux_amd64/bin/gh",
+    "version_tokens": [
+      "2.102.0"
+    ]
+  },
+  "gitleaks": {
+    "executable_mtime_utc": "2026-03-21T02:13:23Z",
+    "exit_code": 0,
+    "resolved_executable": "~/.local/share/mise/installs/gitleaks/8.30.1/gitleaks",
+    "version_tokens": [
+      "8.30.1"
+    ]
+  },
+  "headroom": {
+    "executable_mtime_utc": "2026-10-06T18:58:09.006346Z",
+    "exit_code": 0,
+    "resolved_executable": "~/.local/share/codex-ecosystem/python-tools/headroom-ai/bin/headroom",
+    "version_tokens": [
+      "0.40.0"
+    ]
+  },
+  "mcporter": {
+    "executable_mtime_utc": "2026-10-04T18:24:36.047208Z",
+    "exit_code": 0,
+    "resolved_executable": "~/.local/share/mise/installs/node/24.21.0/lib/node_modules/mcporter/dist/cli.js",
+    "version_tokens": [
+      "0.14.2"
+    ]
+  },
+  "promptfoo": {
+    "metadata_mtime_utc": "2026-10-08T04:54:48.276009Z",
+    "metadata_sha256": "deb8f6569cd90b7ceb17dd57bc051bcd17401bf489ab2dd4019448ffaf37e101",
+    "version_tokens": [
+      "0.124.0"
+    ]
+  },
+  "qmd": {
+    "executable_mtime_utc": "2026-10-04T18:24:46.152891Z",
+    "exit_code": 0,
+    "resolved_executable": "~/.local/share/mise/installs/node/24.21.0/lib/node_modules/@tobilu/qmd/bin/qmd",
+    "version_tokens": [
+      "2.8.3"
+    ]
+  },
+  "restic": {
+    "executable_mtime_utc": "2026-10-02T14:52:17.928695Z",
+    "exit_code": 0,
+    "resolved_executable": "~/.local/share/mise/installs/restic/0.19.1/restic_0.19.1_linux_amd64",
+    "version_tokens": [
+      "0.19.1"
+    ]
+  },
+  "rtk": {
+    "executable_mtime_utc": "2026-10-02T13:37:44Z",
+    "exit_code": 0,
+    "resolved_executable": "~/.local/share/codex-ecosystem/tools/rtk-0.51.0/rtk",
+    "version_tokens": [
+      "0.51.0"
+    ]
+  },
+  "serena": {
+    "executable_mtime_utc": "2026-10-05T16:09:43.953745Z",
+    "exit_code": 0,
+    "resolved_executable": "~/.local/share/uv/tools/serena-agent/bin/serena",
+    "version_tokens": [
+      "2.0.0.dev0"
+    ]
+  },
+  "socraticode": {
+    "metadata_mtime_utc": "2026-10-07T20:33:59.565806Z",
+    "metadata_sha256": "d8d4ef0f9a271a3453a8241b587e627c997a7e316d761b7a4daf22865f2c8ca9",
+    "version_tokens": [
+      "1.16.0"
+    ]
+  },
+  "syft": {
+    "executable_mtime_utc": "2026-10-06T14:36:33Z",
+    "exit_code": 0,
+    "resolved_executable": "~/.local/share/mise/installs/syft/1.54.1/syft",
+    "version_tokens": [
+      "1.54.1"
+    ]
+  },
+  "systemctl": {
+    "executable_mtime_utc": "2026-07-27T20:44:02Z",
+    "exit_code": 0,
+    "resolved_executable": "/usr/bin/systemctl",
+    "version_tokens": [
+      "259.5-0ubuntu3.4"
+    ]
+  },
+  "uv": {
+    "executable_mtime_utc": "2026-10-01T23:56:16Z",
+    "exit_code": 0,
+    "resolved_executable": "~/.local/share/mise/installs/uv/0.12.22/uv-x86_64-unknown-linux-gnu/uv",
+    "version_tokens": [
+      "0.12.22"
+    ]
+  },
+  "wt": {
+    "executable_mtime_utc": "2026-09-27T21:09:08Z",
+    "exit_code": 0,
+    "resolved_executable": "~/.local/share/mise/installs/worktrunk/0.80.0/wt",
+    "version_tokens": [
+      "0.80.0"
+    ],
+    "version_method": "mise ls worktrunk --json: installed true; resolved install directory 0.80.0; --version emitted no parseable version"
+  },
+  "zizmor": {
+    "executable_mtime_utc": "2026-10-11T09:40:17.598907Z",
+    "exit_code": 0,
+    "resolved_executable": "~/.local/share/mise/installs/python/3.13.16/bin/zizmor",
+    "version_tokens": [
+      "1.30.1"
+    ]
+  },
+  "codex": {
+    "version_tokens": [
+      "0.162.1"
+    ],
+    "version_method": "codex --version and native session_meta.cli_version"
+  }
+}
