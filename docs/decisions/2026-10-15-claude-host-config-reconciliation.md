@@ -95,8 +95,9 @@ For the new distribution, rows 7, 12 and 14 are the only template gap that chang
 
 1. Template-behind rows (7, 12, 14): one map and template change, sequenced against the open PRs that touch
    `adoption/new-wsl/client-config-map.json` (#1051, #1089, #1109, #1111, #1151 and older ones from 2026-10-06 to 10-09).
-2. Host rows: a reviewed diff for the command center. NativeStack2604 keeps account C, so its configuration stays the
-   command center's.
+2. Host rows: a reviewed diff for the command center. NativeStack2604 stays its host until the boundary, so its
+   configuration stays the command center's until then (the CC's direction of 2026-10-15, 19:46Z: every paper lane and
+   then the CC move to NativeHorizonNY).
 3. New WSL distribution: built from the clean render through the recipe
    (`adoption/platforms/linux-wsl2-new-distro.md`), up to the owner's sign-ins
    ([install plan record](2026-10-15-new-wsl-clean-install-plan.md)).
