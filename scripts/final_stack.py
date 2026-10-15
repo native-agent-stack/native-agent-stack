@@ -617,19 +617,23 @@ def retained_final_reference(sources: Sources, ref, reason: str):
 
 def final_reopened_by(sources: Sources, key: tuple[str, str], later: list[dict],
                       baseline: dict | None) -> list[dict]:
-    """A later date is matrix staleness; FINAL needs a sweep's retained change."""
+    """FINAL admits only explicitly complete, unchanged retained post-anchor rows."""
     baseline_row = next((row for row in baseline["record"]["layers"]
                          if (row["catalog"], row["layer_id"]) == key), {}) if baseline else {}
+    fields = ("requirement_sha256", "platform_profiles_sha256")
+    if (baseline is None or baseline["record"].get("status") != "completed"
+        or not all(isinstance(baseline_row.get(field), str)
+                   and saturation_ledger.HEX64.fullmatch(baseline_row[field]) for field in fields)):
+        raise FinalStackError("FINAL baseline requires retained complete scope hashes")
     reopened = []
     for sweep in later:
-        changed = False
+        admitted = sweep["record"].get("status") == "completed"
         for row in sweep["record"]["layers"]:
             if (row["catalog"], row["layer_id"]) != key:
                 continue
-            # An unknown pre-verdict scope cannot establish that later scope is unchanged.
-            changed = changed or baseline is None or any(baseline_row.get(field) != row.get(field)
-                                     for field in ("requirement_sha256", "platform_profiles_sha256"))
-            markers = row.get("reopen") or []
+            admitted = admitted and len([candidate for candidate in sweep["record"]["layers"]
+                if (candidate["catalog"], candidate["layer_id"]) == key]) == 1
+            markers = row.get("reopen")
             if not isinstance(markers, list):
                 raise FinalStackError("FINAL reopening requires retained change evidence")
             for marker in markers:
@@ -637,10 +641,28 @@ def final_reopened_by(sources: Sources, key: tuple[str, str], later: list[dict],
                     raise FinalStackError("FINAL reopening requires retained change evidence")
                 retained_final_reference(sources, marker.get("ref"),
                                          "FINAL reopening requires retained change evidence")
-                changed = True
-        if changed:
+            admitted = admitted and all(isinstance(row.get(field), str)
+                and saturation_ledger.HEX64.fullmatch(row[field])
+                and row[field] == baseline_row[field] for field in fields)
+            admitted = admitted and not markers and not saturation_ledger.material_pending(row)
+        if not admitted:
             reopened.append({"sweep_id": sweep["sweep_id"], "date": sweep["date"]})
     return reopened
+
+
+def final_covering_sweeps(ledger: dict, key: tuple[str, str]) -> list[dict]:
+    """Retained FINAL history in ledger order, without date/status/cutoff filtering."""
+    covering = []
+    for record in ledger["sweeps"]:
+        layers = record.get("layers")
+        if not isinstance(layers, list) or not layers or not all(isinstance(row, dict)
+                and isinstance(row.get("catalog"), str) and isinstance(row.get("layer_id"), str)
+                for row in layers):
+            raise FinalStackError("FINAL sweep history requires retained layer records")
+        if any((row.get("catalog"), row.get("layer_id")) == key for row in layers):
+            covering.append({"sweep_id": record.get("sweep_id"), "date": record.get("date"),
+                             "manifest_ref": record.get("manifest_ref"), "record": record})
+    return covering
 
 
 def final_unresolved_survivors(sources: Sources, row: dict, covering: list[dict], verdict_day) -> list[dict]:
@@ -667,6 +689,12 @@ def final_unresolved_survivors(sources: Sources, row: dict, covering: list[dict]
         for layer in sweep["record"]["layers"]:
             if (layer["catalog"], layer["layer_id"]) != (row["catalog"], row["layer_id"]):
                 continue
+            for candidate in saturation_ledger.material_pending(layer):
+                repo = host_receipts.normalize_repository(candidate.get("repository", candidate.get("repo")))
+                identity = repo or candidate.get("candidate_key")
+                if identity:
+                    pending[identity] = {"repository": identity, "sweep_id": sweep["sweep_id"],
+                                         "date": sweep["date"]}
             answered = {host_receipts.normalize_repository(candidate.get("repo"))
                         for field in ("survived", "refuted") for candidate in _dicts(layer.get(field))}
             for proposal in layer.get("proposed") or []:
@@ -891,11 +919,20 @@ def build_document(root: Path) -> dict:
                                       "Run python3 scripts/component_matrix.py --write first")
             if resolved_terminal == "FINAL":
                 # Preserve the matrix's ordinary dated metric, then apply the
-                # protocol's stricter changed-evidence rule to settled FINAL.
-                baseline = next((sweep for sweep in reversed(covering)
-                                 if verdict_day is not None and sweep["day"] <= verdict_day), None)
+                # protocol's consumed-sweep anchor in retained append-only order.
+                covering = final_covering_sweeps(ledger, key)
+                consumed = (registry.get(row_run_id(row)) or {}).get("manifest")
+                matches = [sweep for sweep in covering if isinstance(consumed, str) and consumed
+                           and sweep["manifest_ref"] == consumed]
+                if len(matches) != 1:
+                    raise FinalStackError("FINAL baseline requires one retained consumed covering sweep")
+                sources.read_bytes(consumed)
+                baseline = matches[0]
+                later = covering[covering.index(baseline) + 1:]
                 reopened_by = final_reopened_by(sources, key, later, baseline)
-                if state == "recorded_reopened" and not reopened_by:
+                if reopened_by:
+                    state = "recorded_reopened"
+                elif state == "recorded_reopened":
                     state = "confirmed_current"
         held = isinstance(row.get("current_adoption_status"), str) and row["current_adoption_status"].startswith("held")
         winners = [build_winner(winner, matrix_row, runs_by_repository, runs_by_id, held)

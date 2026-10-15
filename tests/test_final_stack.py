@@ -1036,11 +1036,14 @@ def _angle_fixture() -> dict:
 class AngleEnforcementTests(FixtureTestCase):
     def prepare(self, *, final=False, evidence_class="native_proven", run=True):
         root = self.root()
+        initial_sweep = _sweep("fixture", "2026-09-22", [("foundation", "layer-a")])
+        initial_sweep["layers"][0].update(requirement_sha256="a" * 64,
+                                         platform_profiles_sha256="a" * 64, reopen=[])
         _fixture(root, foundation=[_layer("layer-a", winners=[_winner("widget", pin=COMMIT_A)],
                                          terminal_state="FINAL" if final else None)],
                  stack=[{"id": "widget", "repository": "https://github.com/example/widget",
                          "version": "1.0.0", "source_pin": COMMIT_A}] if run else [],
-                 sweeps=[_sweep("fixture", "2026-09-22", [("foundation", "layer-a")])])
+                 sweeps=[initial_sweep])
         record = _angle_fixture()
         if final:
             c = record["candidates"][0]
@@ -1059,6 +1062,7 @@ class AngleEnforcementTests(FixtureTestCase):
         _write_json(root / wave_path, {"layers": [{"layer_id": "layer-a", "fixture": True}]})
         _write_json(root / "catalogs/sota-convergence/layer-verdict-waves.json", {"waves": [{
             "run_id": "20260922", "path": wave_path,
+            "manifest": "catalogs/sota-convergence/manifest-20260922.json",
             "sha256": hashlib.sha256((root / wave_path).read_bytes()).hexdigest()}]})
         record["final_evidence"] = [{"candidate_id": "widget", "run_pin": COMMIT_A,
                                       "e2e_receipt": "evidence/artifacts/fixture/e2e.json",
