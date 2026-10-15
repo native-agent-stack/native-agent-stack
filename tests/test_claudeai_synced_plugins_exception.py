@@ -45,5 +45,15 @@ class SyncedPluginsRowTests(unittest.TestCase):
         self.assertIn("**Trigger:**", decision)
 
 
+    def test_the_decision_states_the_measured_listing_cost(self):
+        # Correction (2026-10-15T04:52Z, /skill-doctor at 2.1.300): the four synced plugins add about 8,450 tokens of skill
+        # listing to every turn with 0 uses, so "nothing measurable" was wrong.
+        decision = (ROOT / DECISION).read_text(encoding="utf-8")
+        self.assertNotIn("cost nothing measurable", decision)
+        cost = json.loads((INVENTORY.parent / "listing-cost.json").read_text(encoding="utf-8"))
+        synced = sum(cost["by_source"][p]["listing_tokens"] for p in ("bigdata-com", "lseg", "daloopa", "cowork-plugin-management"))
+        self.assertEqual(synced, cost["synced_total_tokens"])
+        self.assertIn(f"{synced:,}", decision)
+
 if __name__ == "__main__":
     unittest.main()

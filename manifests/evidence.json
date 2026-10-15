@@ -19188,8 +19188,8 @@
     },
     {
       "path": "docs/decisions/2026-10-15-claudeai-synced-plugins-exception.md",
-      "sha256": "05b10a944b4d7c1b512a720a11903a26afb3770f310350dcbad54f331be55e9e",
-      "bytes": 3880
+      "sha256": "5875485317c9f027f3ad6dbe7ce0c024f6bd424ad8b2e58c70f4ae7cc1afbbdc",
+      "bytes": 4475
     },
     {
       "path": "docs/decisions/2026-10-15-model-currency-landscape-check.md",
@@ -21730,6 +21730,16 @@
       "path": "evidence/artifacts/claudeai-synced-plugins-20261015/inventory.json",
       "sha256": "53c5d4722f779aee96d297aeebcda30dc861bea4c5af133e3d2a70196c1e313b",
       "bytes": 5118
+    },
+    {
+      "path": "evidence/artifacts/claudeai-synced-plugins-20261015/listing-cost.json",
+      "sha256": "89c8bd8190e9364715960187f3aebb123c7d5de61541bdef8651eb6fb900d1a9",
+      "bytes": 1599
+    },
+    {
+      "path": "evidence/artifacts/claudeai-synced-plugins-20261015/listing_cost.py",
+      "sha256": "934034818cfe33d7e57a4713220ef0fa9e618c6ada8939f77196eb54a224ec05",
+      "bytes": 2559
     },
     {
       "path": "evidence/artifacts/claudeai-synced-plugins-20261015/loki_by.py",
@@ -62998,8 +63008,8 @@
     },
     {
       "path": "tests/test_claudeai_synced_plugins_exception.py",
-      "sha256": "5d92d64a7652b21909ef9ec9c5bc5b00b4935f2e9a5e02821d8a65b9dd4aa0ef",
-      "bytes": 2334
+      "sha256": "9dd2c9962264d676738c21791eddd866e3dacc801c7943e01e6333be7307c7f5",
+      "bytes": 3070
     },
     {
       "path": "tests/test_codex_agents.py",

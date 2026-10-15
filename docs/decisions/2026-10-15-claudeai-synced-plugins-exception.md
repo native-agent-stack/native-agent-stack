@@ -26,7 +26,7 @@ The inventory is [evidence/artifacts/claudeai-synced-plugins-20261015/inventory.
 
 The four plugins stay synced as an **owner-synced exception** to the rule that skills and plugins load from a pinned catalog.
 - They are the owner's own claude.ai integrations, and three are financial data providers.
-- Unused, they cost nothing measurable.
+- Unused, they still cost context: their 66 skills add about 8,450 tokens of skill listing to the system prompt of every turn (bigdata-com 6,360, lseg 1,230, daloopa 620, cowork-plugin-management 240), about half of the 16,490 listing tokens of all loaded skills, measured with /skill-doctor at 2.1.300 on 2026-10-15T04:55:55Z ([listing-cost.json](../../evidence/artifacts/claudeai-synced-plugins-20261015/listing-cost.json)). This corrects the first version of this record, which claimed no measurable cost; a single plugin can be dropped with `"<name>@synced": false` in `enabledPlugins` (settings reference, `syncClaudeAiPlugins`).
 - Turning the sync off would move them to `~/.claude/plugins/.trash/` for every CLI session.
 
 The template and the host settings stay unchanged.
