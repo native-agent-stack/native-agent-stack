@@ -392,7 +392,9 @@ OWNER_BATCH_FIELDS = (("date_utc", str), ("meaning", str), ("owner_rule", str), 
 OWNER_AUTHORITY_FIELDS = ("kind", "date_utc", "decision", "paraphrase", "relay_record", "relayed_by", "rule_basis")
 # Any digest form: a hex run, a named algorithm (sha256, or sha512-<base64> as in SRI integrity) or a long base64 run.
 # A base64 run is 20+ characters with a digit and both letter cases, so names like native-agent-stack-99 pass.
-DIGEST_LIKE = re.compile(r"[0-9a-fA-F]{7,}|(?i:sha-?(?:1|224|256|384|512))"
+# A hex run counts as a digest only when it mixes digits and letters a-f, so a dated record name (20261004) or a run
+# id passes; a digest of 7+ characters is all digits about 4% of the time (the local review of #1161 at c95453a1, P2).
+DIGEST_LIKE = re.compile(r"(?=[0-9a-fA-F]*[a-fA-F])(?=[0-9a-fA-F]*[0-9])[0-9a-fA-F]{7,}|(?i:sha-?(?:1|224|256|384|512))"
                          r"|(?=[A-Za-z0-9+/_-]*[0-9])(?=[A-Za-z0-9+/_-]*[A-Z])(?=[A-Za-z0-9+/_-]*[a-z])[A-Za-z0-9+/_-]{20,}={0,2}")
 # Fields that would carry the owner's own words; an owner decision carries a dated paraphrase instead.
 OWNER_WORDS_KEYS = frozenset({"verbatim", "owner_words", "owner_verbatim", "owner_quote", "owner_quotation"})

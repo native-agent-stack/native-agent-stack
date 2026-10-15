@@ -29,7 +29,7 @@
  "records": {
   "claude_proposals": {
    "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/claude-proposals.md",
-   "sha256": "cd7b99553cc8d9c608262e47e709add19819aef84c06bbf35b84787f5969e832"
+   "sha256": "f59c7621f4fbb6cf50dbfaecc954e652137dbfc17c5eacf668dd9c90f49ca93a"
   },
   "claude_request": {
    "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/claude-request.md",
@@ -1451,7 +1451,7 @@
    },
    "round2_extract": {
     "path": "evidence/artifacts/final-architecture-round2-20261004/verdicts.json",
-    "sha256": "db41330edea63f46884c2fadcf72076da268326d1e71efa6f8228bd55d1b92c6"
+    "sha256": "f10b9e32d32f989bb239c0e5717e7dc4b3835a882d13633c19659ee2774c8975"
    }
   },
   "acknowledgements": [],

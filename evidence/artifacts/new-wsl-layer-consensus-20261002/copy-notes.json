@@ -3,7 +3,7 @@
  "copied_utc": "2026-10-02",
  "copies": {
   "claude-proposals.md": {
-   "sha256": "cd7b99553cc8d9c608262e47e709add19819aef84c06bbf35b84787f5969e832",
+   "sha256": "f59c7621f4fbb6cf50dbfaecc954e652137dbfc17c5eacf668dd9c90f49ca93a",
    "original_sha256": "116932940653053f5f24c16b8649ed399a61bf7444801d99dff7635033f79b3d",
    "original_bytes": 7805,
    "paragraphs_left_out": 0,
@@ -11,6 +11,11 @@
     {
      "replaced_by": "the lane's private state folder (not published)",
      "what": "a path in the lane's private state folder",
+     "times": 1
+    },
+    {
+     "replaced_by": "a dated paraphrase (the no-owner-quote rule of 2026-10-14; applied 2026-10-15, earlier commits keep the original wording)",
+     "what": "the user's words quoted in item 7",
      "times": 1
     }
    ]

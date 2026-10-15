@@ -85,7 +85,7 @@ changes only when both families agree or a measurement decides.
 
 ### 7. Messaging between sessions and between the two clients. Today: split. The user's word of 2026-10-02 settles the posture: yes.
 
-- The user to this session: "bypasspremission seamless across session messaging, claude-codex messaging". That is the
+- The user to this session, in a dated paraphrase (the owner, 2026-10-02 (paraphrased): they asked for seamless messaging across sessions with permission prompts bypassed, including messaging between Claude and Codex; paraphrased 2026-10-15 under the no-owner-quote rule of 2026-10-14; earlier commits keep the original wording). That is the
   owner's decision the manifest asked for. What remains is the manifest's test.
 - hcom `aannoo/hcom` v0.7.27 (2026-10-01): hooks and a local SQLite database, many clients, an MQTT relay across
   machines. agmsg `fujibee/agmsg` v1.5.2 (2026-10-02; created 2026-04-02): bash and sqlite3 only, no daemon, Claude

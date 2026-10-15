@@ -27,9 +27,15 @@ PARAPHRASE = re.compile(r"^\s*>\s*the (?:owner|user), \d{4}-\d{2}-\d{2} \(paraph
 SPEECH = (r"(?<![\w-])(?:ask(?:s|ed|ing)?|answer(?:s|ed)?|request(?:s|ed)?|said|says|told|wrote|words|"
           r"quot(?:e|es|ed|ing)|verbatim)(?![\w-])")
 GAP = "[^\"“”|]"
+# An opening quote mark: a double quote, a typographic single quote, or a straight single quote that opens a word (not an
+# apostrophe inside or after one).
+QUOTE = "(?:[\"“”‘’]|(?<![\\w])'(?=\\w))"
 # The owner and a speech word close together, then a quote mark, or a closing quote mark followed by them, within one line.
-ATTRIBUTED = re.compile(rf"(?:{OWNER}{GAP}{{0,80}}?{SPEECH}|{SPEECH}{GAP}{{0,80}}?{OWNER}){GAP}{{0,160}}?[\"“”]"
+ATTRIBUTED = re.compile(rf"(?:{OWNER}{GAP}{{0,80}}?{SPEECH}|{SPEECH}{GAP}{{0,80}}?{OWNER}){GAP}{{0,160}}?{QUOTE}"
                         rf"|[\"“”]{GAP}{{0,30}}?{OWNER}{GAP}{{0,30}}?{SPEECH}", re.IGNORECASE)
+# An attribution without a speech word: the owner, then within a short span a colon and a quote mark ("The user to this
+# session: ..."). The command center's adjudication of #1161 at 9371e2ad (P2-2).
+INTRODUCED = re.compile(rf"{OWNER}{GAP}{{0,60}}?:\s*{QUOTE}", re.IGNORECASE)
 # A line that calls the owner's text verbatim.
 VERBATIM_CLAIM = re.compile(rf"{OWNER}[^\n.]{{0,80}}verbatim|verbatim[^\n.]{{0,80}}{OWNER}", re.IGNORECASE)
 # A field that holds the owner's words.
@@ -65,7 +71,8 @@ def line_hits(text, as_json=False):
     owner_record = bool(OWNER_RECORD.search(text))
     found = []
     for number, line in enumerate(lines, 1):
-        hit = (any(ATTRIBUTED.search(part) or VERBATIM_CLAIM.search(part) for part in prose(line, as_json))
+        hit = (any(ATTRIBUTED.search(part) or INTRODUCED.search(part) or VERBATIM_CLAIM.search(part)
+                   for part in prose(line, as_json))
                or WORDS_KEY.search(line) or (owner_record and VERBATIM_KEY.search(line)))
         if not hit and line.lstrip().startswith(">") and not PARAPHRASE.match(line):
             before = next((lines[index] for index in range(number - 2, max(-1, number - 5), -1) if lines[index].strip()), "")
@@ -122,7 +129,9 @@ class OwnerQuotePublication(unittest.TestCase):
         quoted = {"attributed": 'The owner asked: "light every fixture lane now".',
                   "verbatim": "The owner's order, verbatim, as relayed:",
                   "field": '{"owner_words": "light every fixture lane now"}',
-                  "block": "The owner wrote at 10:00Z:\n\n> light every fixture lane now"}
+                  "block": "The owner wrote at 10:00Z:\n\n> light every fixture lane now",
+                  "no speech word": 'The user to this session: "light every fixture lane now".',
+                  "single quotes": "the record keeps the owner's words 'light every fixture lane now'"}
         for label, text in quoted.items():
             with self.subTest(case=label):
                 self.assertTrue(line_hits(text))
@@ -133,7 +142,8 @@ class OwnerQuotePublication(unittest.TestCase):
         passing = {"paraphrase": "the owner, 2026-10-15 (paraphrased): they asked for every fixture lane to be lit.",
                    "protocol": 'The contract counts "delivered" runs.',
                    "slot": 'the memory-owner row quotes the release notes: "fixture notes"',
-                   "verbatim elsewhere": '{"verbatim": "a test needle"}'}
+                   "verbatim elsewhere": '{"verbatim": "a test needle"}',
+                   "apostrophes": "the owner's decision and the user's rule stand; it's the lane's call"}
         for label, text in passing.items():
             with self.subTest(case=label):
                 self.assertEqual(line_hits(text), [])

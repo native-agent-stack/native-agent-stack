@@ -19718,12 +19718,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "1a2eea1707c9828de37bee2bed4d655c7d57512f401a0b845eaa493863ab6e80",
+      "sha256": "910fc5628b05a30a525f8945f7caea33f81454bb053db9755dae1d0ea786bc5e",
       "bytes": 699751
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "289f893c75470e87f71b83be6a16c90d4690d58fd2670c101c5c193c1eba5066",
+      "sha256": "97cca087e9d2c7289adc0d0ceee7c3f2ed3be95c2bfd06d62ff859b6b595749a",
       "bytes": 369789
     },
     {
@@ -22883,8 +22883,8 @@
     },
     {
       "path": "evidence/artifacts/final-architecture-round2-20261004/verdicts.json",
-      "sha256": "db41330edea63f46884c2fadcf72076da268326d1e71efa6f8228bd55d1b92c6",
-      "bytes": 320298
+      "sha256": "f10b9e32d32f989bb239c0e5717e7dc4b3835a882d13633c19659ee2774c8975",
+      "bytes": 320430
     },
     {
       "path": "evidence/artifacts/foundation-closure-20260921/claude-review.md",
@@ -43658,8 +43658,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/assemble_manifest.py",
-      "sha256": "878b4a502db652cce0cbc7f1018aa7c0f921fb4e26c9bae93e4a769cbc5a228d",
-      "bytes": 63627
+      "sha256": "cb1e03e19d1277745bbc4e68ed7eecc618c004e0a52f3a1f6f7e1e48f63e4e4e",
+      "bytes": 63908
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/build_decide_packets.py",
@@ -43703,7 +43703,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "f8f193bbfb903cb80b959867bfcbab69d6c736b8d02866e0a615f9f74780b88a",
+      "sha256": "91631098625ddc0f5902e7a95ac57f1e25731692bed55ba80704b50e2be4865e",
       "bytes": 235504
     },
     {
@@ -44458,8 +44458,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "401f2c8cdf992d8a1fa77a5a01fd44821c0893d06baa31a8cd93b6843b9d6bef",
-      "bytes": 83776
+      "sha256": "4a2d22a066de68686298042635ec3bd4606ef4c07a1726f2c5aa4ef7295c18e6",
+      "bytes": 85385
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -44973,8 +44973,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/claude-proposals.md",
-      "sha256": "cd7b99553cc8d9c608262e47e709add19819aef84c06bbf35b84787f5969e832",
-      "bytes": 7792
+      "sha256": "f59c7621f4fbb6cf50dbfaecc954e652137dbfc17c5eacf668dd9c90f49ca93a",
+      "bytes": 8016
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/claude-request.md",
@@ -44993,13 +44993,13 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-      "sha256": "bdc7a7e707ad6e1eb25ddaff1d37293887842b452fc5f04ef0a73d59c8228a02",
+      "sha256": "407e4b9f0be2181bd6004e17f2d1378b899a54c301c15a6a6f9199be1313234e",
       "bytes": 144364
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/copy-notes.json",
-      "sha256": "91a30f5cd58f660641762a3ed59fb4cd99e78fe127d667a3db61f8274245a087",
-      "bytes": 3172
+      "sha256": "f3b883c3ae65def4d1a04625f1d0ba614e3160793c55c097a136f18d2f90ee34",
+      "bytes": 3396
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
@@ -64443,8 +64443,8 @@
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
-      "sha256": "ad568321c501fb490b86f8c74a57910a00455829888d29dfac3c4eb230fab24f",
-      "bytes": 316080
+      "sha256": "8093db163133ee08c4b4be0706063d81e1faf1f4a0c07dd0d7a12eead8dc1814",
+      "bytes": 316613
     },
     {
       "path": "tests/test_new_wsl_handbook.py",
