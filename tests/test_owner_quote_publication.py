@@ -1,12 +1,20 @@
-"""Owner chat is paraphrased on publication, never quoted: every tracked text file is checked.
+"""Owner chat is paraphrased on publication, never quoted: every tracked text file up to MAX_BYTES is checked, within
+the bounds below.
 
 The no-owner-quote rule of 2026-10-14 supersedes the round-2 resolution to quote the owner exactly. The command center's
 FULL read of #1161 at c95453a1 (2026-10-15) found owner sentences still quoted in files outside the three the earlier check
 read, and ruled a tree-wide scanner with a ratchet: tests/fixtures/owner-quote-baseline.json lists, by path, how many
 owner-attribution hits each file still holds (names and counts only, never text) for the burn-down PRs. A file the
 baseline does not list must be clean, and a listed count may not change unless the baseline changes with it, so a fixed
-file lowers its count in the same commit and a new quotation fails here. The check is structural: it holds no owner text,
-and its messages give path:line locators only.
+file lowers its count in the same commit, and a new quotation on a line or paragraph with no counted hit fails here. The
+check is structural: it holds no owner text, and its messages give path:line locators only.
+
+Bounds (the command center's adjudication of #1161 at 9bcb8133, 2026-10-15); each is a Follow-up in #1161's body:
+- a file over MAX_BYTES (8 MB) is not scanned (the scanner's size bound);
+- several attributions in one line or one paragraph count once, so a quotation added beside a counted one leaves the
+  count unchanged (C1: the detector's restructure);
+- a block-quote introduction wrapped across lines is not detected (C3: a CommonMark parser, a PROPOSAL routed to the
+  layer-resolution protocol).
 """
 import json
 import os
