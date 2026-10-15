@@ -1,0 +1,89 @@
+{
+  "schema": "muse-file-fence-acceptance/1",
+  "evidence_class": "native_proven",
+  "scope": "One owner-authorized native reader smoke; no other Muse work or default promotion",
+  "base_commit": "a339425ca56ec3fb87dff0fa8ad5dffc83354168",
+  "bubblewrap": {
+    "version": "0.11.1",
+    "distribution_package": "0.11.1-1ubuntu0.3",
+    "upstream_commit": "124c4cdf4321f63ef17a1cb0ce8f9dd45bd7adbe"
+  },
+  "muse": {
+    "version": "Muse Code 1.4.7 (1.4.7-R6101.1)",
+    "runtime_sha256": "36e3dac91f56c15572b95be55d70ee9fd9685cd9ab49f747bab4746c8d7c2518",
+    "role": "reader",
+    "model": "muse-wonder-full-1.0",
+    "contributor_mode": "off",
+    "web_tools": "disabled",
+    "network": "shared host namespace; no egress allowlist"
+  },
+  "model_free_acceptance": {
+    "pass": true,
+    "named_checks": 31,
+    "echo_exit_code": 0,
+    "echo_event_count": 14,
+    "echo_terminal_completed": 1,
+    "fail_first_test": "test_unfenced_launcher_canary_read_fenced_denial",
+    "fail_first_result": "Unchanged native launcher plus synthetic runtime reads planted outside file; same exec argv inside fence reports it absent",
+    "extension_test": "test_native_echo_cannot_start_extensions",
+    "extension_positive_control": "Native unfenced echo executes MCP stdio and user, managed and project SessionStart marker commands",
+    "extension_fenced_result": "All four markers absent; sanitized settings and project config read-only; native echo completed",
+    "mask_names": [
+      "ssh", "codex", "claude", "hcom", "private-state", "other-code",
+      "other-projects", "co-op-root", "command-center-root", "host-runtime", "host-mounts"
+    ],
+    "write_checks": "Worktree and logs writable; root, home, etc, brief, runtime, settings and sign-in read-only",
+    "credential_handling": "Metadata and read-only mount only; wrapper/probes do not open, hash, copy or log real sign-in contents"
+  },
+  "live_smoke": {
+    "started_utc": "2026-10-14T22:57:44.899234+00:00",
+    "finished_utc": "2026-10-14T22:57:58.138320+00:00",
+    "exit_code": 0,
+    "event_count": 39,
+    "invalid_lines": 0,
+    "models": ["muse-wonder-full-1.0"],
+    "terminal_counts": {"run.terminal.completed": 1},
+    "event_counts": {
+      "runtime.command.accepted": 1,
+      "session.run.linked": 1,
+      "run.model.configured": 1,
+      "session.workspace_branch.observed": 1,
+      "turn.input.user": 1,
+      "run.lifecycle.started": 1,
+      "task.stream.linked": 4,
+      "task.lifecycle.proposed": 4,
+      "task.lifecycle.accepted": 4,
+      "task.lifecycle.scheduled": 4,
+      "task.lifecycle.side_effect_intent": 4,
+      "task.lifecycle.started": 4,
+      "task.lifecycle.status": 2,
+      "run.output.delta": 2,
+      "task.lifecycle.completed": 3,
+      "task.lifecycle.cancelled": 1,
+      "run.terminal.completed": 1
+    },
+    "main_model_tasks": 1,
+    "reminder_tasks": 3,
+    "tool_result_events": 0,
+    "expected_assembled_reply": true,
+    "cost": "Subscription smoke; billed usage/cost not measured"
+  },
+  "private_custody": {
+    "reference": "muse-file-fence-smoke-20261014T225744Z",
+    "artifacts": ["muse-exec.jsonl", "muse-exec.stderr.log", "fence-probe.json", "receipt.json", "probe-echo.jsonl"],
+    "note": "Private operator custody reference assigned from task name and time; no content-derived commitment to unpublished run bytes"
+  },
+  "reference_sources": {
+    "native_lane_source": "71980b580bad1f7bdc9434dbd788b7e580bc819176ede42614c5bb572c392c07",
+    "rankedfeeds_fence.sh": "af0789b352c940f6802639f654d2ffe08ce669557915a7eeab26e9688a750432",
+    "fence_checks_rankedfeeds.sh": "5f98f74917e92c3f7230204c462ec17c7cb8ddad6e16276aca4c8904887a415f",
+    "fence_probe_rankedfeeds.sh": "9399b08ff665d665c5422448082fbbca5cc260e9b2c61797626cdf2d398f0cb9"
+  },
+  "limitations": [
+    "The one explicitly mounted sign-in file is readable by the native process and same-UID tools",
+    "Host networking remains shared, including loopback; no egress confinement claim",
+    "No hostile same-UID host race, kernel, resource-limit or builder/reviewer qualification",
+    "Model-free probe state precedes the live run; it is not an exhaustive adversarial proof",
+    "Raw prompts, native event streams and session identifiers stay private"
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "schema": "muse-file-fence-fix/1",
+  "reviewed_head": "d2c0c9fbeb7b721821555906110ee74b0f811380",
+  "fix_round": 2,
+  "round_limit": 2,
+  "evidence_class": "local_integration",
+  "review_sources": {
+    "astra_full1_verdict_sha256": "16dd7fabcf4ebc682e70d64faa0c2a817424c2117d9149c01a71e12ad4c40410",
+    "patched_mcp_off_review_sha256": "8558feda8347477bff00ecbb9e86e82519b5d1ac14b304baeb0a2efdb3295ea5",
+    "superseded_review": "Earlier MCP-on local review excluded from this round"
+  },
+  "regressions": [
+    {
+      "test": "test_notes_publish_no_private_run_commitments",
+      "before": "FAIL: acceptance custody object contains native output commitments",
+      "after": "PASS: task/time reference and artifact names only; no native-run digest or prefix; historical counts and timestamps preserved"
+    },
+    {
+      "test": "test_cli_absent_default_settings_probe_passes",
+      "before": "ERROR: checked_path refuses absent default settings before probe",
+      "after": "PASS: real CLI parser and model-free OS probe use inert defaults; explicit missing, malformed, symlink and directory settings still refuse"
+    },
+    {
+      "test": "test_linked_git_worktree_refused_for_shell_roles",
+      "before": "FAIL for reviewer and builder: unsupported linked Git layout accepted",
+      "after": "PASS: real linked Git checkout works unfenced, common metadata remains masked; shell roles explicitly refused; reader files permitted"
+    }
+  ],
+  "before_command": "MUSE_FENCE_NATIVE_PROBE=1 python3 -B -m unittest -v tests.test_muse_file_fence.MuseFenceTests.test_notes_publish_no_private_run_commitments tests.test_muse_file_fence.MuseFenceTests.test_cli_absent_default_settings_probe_passes tests.test_muse_file_fence.MuseFenceTests.test_linked_git_worktree_refused_for_shell_roles",
+  "before_exit_code": 1,
+  "before_tests": 3,
+  "before_result": "3 assertion failures including two role subtests, 1 error",
+  "after_command": "MUSE_FENCE_NATIVE_PROBE=1 python3 -B -m unittest tests.test_muse_file_fence -v",
+  "after_exit_code": 0,
+  "after_tests": 17,
+  "validation": {
+    "command": "python3 scripts/validate.py",
+    "exit_code": 1,
+    "reported_errors": 9,
+    "error_class": "Model-currency age checks only; the same CI-wide incident explicitly classified as exempt in the supplied Astra verdict",
+    "other_reported_errors": 0,
+    "scope": "No model-currency records modified or checks bypassed in this bounded round"
+  },
+  "live_calls_this_round": 0,
+  "native_boundary": "Only model-free OS, synthetic runtime and installed native echo controls; no second live smoke",
+  "p3_followups": [
+    "Portable reference and pinned Muse documentation/help captures, and measured historical fence argv/source identity when available; no reconstructed measurement claim",
+    "Safe phase/failure receipts and refusal/timeout recovery tests; fresh-log retry semantics remain fail-closed",
+    "Inherited historical manifest line locators remain pinned/history-context references; no new current-head locator defect demonstrated"
+  ],
+  "sources": [
+    "https://dev.meta.ai/docs/muse-code/configuration#settings-file",
+    "https://github.com/git/git/blob/v2.53.0/Documentation/git-worktree.adoc",
+    "https://github.com/git/git/blob/v2.53.0/Documentation/gitrepository-layout.adoc"
+  ]
+}
