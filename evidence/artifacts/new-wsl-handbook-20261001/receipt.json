@@ -6,8 +6,8 @@
   "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
   "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
   "outputs": {
-    "docs/new-wsl-handbook.md": "4352377ae90828283e8ac3c078e386a633a12773f82a04565cfa22a575d04fb0",
-    "docs/new-wsl-handbook.json": "bb68a0d06802f17a02ac00ced40d582de339b800c5e646b818c46eafb0d6b474"
+    "docs/new-wsl-handbook.md": "fc76c9cd638086fea49f99d423796cfbf6e474ba54a3c9ab15ae3f78b469b920",
+    "docs/new-wsl-handbook.json": "4a43c627140093b4c758eaa75134242917fca1ca98a68984762ba9f2c4559299"
   },
   "inventory": {
     "layers": 37,
@@ -1054,6 +1054,22 @@
       "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
       "evidence_class": "local_integration",
       "scope": "Regenerated through the unchanged native builder after the Harbor stack-component registration changed two hashed inputs: the adoption recipe map gained harbor, and the architecture edition's Nemotron revision citation moved from stack line 2118 to 2141 (the cited revision is unchanged). No host, model or provider acceptance."
+    },
+    {
+      "recorded_at_utc": "2026-10-15T11:18:29Z",
+      "source_main": "420452059bc307e13121d9769096291b95cdbf42",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "check_command": "python3 scripts/build_new_wsl_handbook.py --check",
+      "check_exit_code": 0,
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "fc76c9cd638086fea49f99d423796cfbf6e474ba54a3c9ab15ae3f78b469b920",
+        "docs/new-wsl-handbook.json": "4a43c627140093b4c758eaa75134242917fca1ca98a68984762ba9f2c4559299"
+      },
+      "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+      "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
+      "evidence_class": "local_integration",
+      "scope": "Regenerated through the unchanged native builder after the layer-consensus record replaced its owner quotations with dated, attributed paraphrases (the GPT read of #1128 at bd3eecfe5, blocker 1) and assemble_manifest.py rebuilt the definitive manifest from it; the agent-messaging and context-supply records of the handbook carry the paraphrases. No host, model or provider acceptance."
     }
   ],
   "previous_outputs": [
@@ -1262,6 +1278,15 @@
         "docs/new-wsl-handbook.json": "fe0b6628bc589e59dc71a5a0fb6805ecab067e3f06043702919bf7f09ef9cba4"
       },
       "reason": "Harbor stack-component registration changes two hashed handbook inputs (adoption recipe map; architecture Nemotron stack-line citation); the previous maintained output binding is preserved as historical evidence."
+    },
+    {
+      "superseded_at_utc": "2026-10-15T11:18:29Z",
+      "source_main": "420452059bc307e13121d9769096291b95cdbf42",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "4352377ae90828283e8ac3c078e386a633a12773f82a04565cfa22a575d04fb0",
+        "docs/new-wsl-handbook.json": "bb68a0d06802f17a02ac00ced40d582de339b800c5e646b818c46eafb0d6b474"
+      },
+      "reason": "The layer-consensus record's owner quotations became dated, attributed paraphrases (the GPT read of #1128 at bd3eecfe5, blocker 1), which changes the definitive manifest and both outputs; the previous maintained output binding is preserved as historical evidence."
     }
   ]
 }

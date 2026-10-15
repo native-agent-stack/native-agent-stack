@@ -2,6 +2,7 @@
 
 from copy import deepcopy
 from contextlib import redirect_stderr, redirect_stdout
+import importlib.util
 import io
 import json
 import os
@@ -62,6 +63,77 @@ def all_strings(value):
     elif isinstance(value, list):
         for child in value:
             yield from all_strings(child)
+
+
+# Owner chat is paraphrased on publication, never quoted (the GPT read of #1128 at bd3eecfe5, blocker 1): the handbook
+# copies each manifest slot whole (scripts/build_new_wsl_handbook.py, the "record" of every default slot), and the manifest
+# copies the layer-consensus record's rows and amendments, so a quotation in that record reached the handbook. The check is
+# structural, as tests/test_session_relaunch.py PublicationSurfaces checks its files, so no owner text is held here.
+CONSENSUS_SOURCE = "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json"
+ASSEMBLER = "evidence/artifacts/new-wsl-definitive-defaults-20261001/assemble_manifest.py"
+QUOTE_MARKS = ('"', "“", "”")
+# The owner or the user as a speaker; a slot or a setting named after them (memory-owner, user-config) is not one.
+SPEAKER = r"(?<![\w-])(?:owner|user)(?:'s|’s)?(?![\w-])"
+# The words that introduce what a speaker said.
+SPEECH = (r"(?<![\w-])(?:ask(?:s|ed|ing)?|answer(?:s|ed)?|request(?:s|ed)?|said|says|told|wrote|words|"
+          r"quot(?:e|es|ed|ing)|verbatim)(?![\w-])")
+# Within one sentence and one table cell: the speaker and a speech word close together, then a quote mark ("the owner asking
+# for ...", "the user's answer, quoted: ...", "the owner wrote ..."), or a closing quote mark followed by them ("..., the
+# owner said"). A gap never crosses a quote mark or a table cell's pipe.
+GAP = "[^\"“”|]"
+ATTRIBUTION = re.compile(rf"(?:{SPEAKER}{GAP}{{0,80}}?{SPEECH}|{SPEECH}{GAP}{{0,80}}?{SPEAKER}){GAP}{{0,160}}?[\"“”]"
+                         rf"|[\"“”]{GAP}{{0,30}}?{SPEAKER}{GAP}{{0,30}}?{SPEECH}", re.IGNORECASE)
+SENTENCE_BREAK = re.compile(r"(?<=[.!?])\s+|\n\s*\n")
+WORDS_FIELDS = {"verbatim", "quote", "quotation", "words"}
+
+
+def attributed_quotations(text):
+    """How many sentences of the text attribute a double-quoted span to the owner or the user (ATTRIBUTION). A quotation in
+    protocol or contract text, a critic's finding or a command line has no such speaker and passes."""
+    return sum(1 for sentence in SENTENCE_BREAK.split(text) if ATTRIBUTION.search(sentence))
+
+
+def owner_quotations(value, kept=frozenset(), path=""):
+    """The locators of every owner quotation in a JSON value, never its text: a field that holds the owner's words
+    (owner_verbatim and the like, or verbatim in an object of the owner's decision) and a string with an attributed
+    quotation. `kept` names the paths that a separately defined contract requires (see relay_contract_paths)."""
+    found = []
+    if isinstance(value, dict):
+        owners = value.get("kind") == "owner_decision" or bool(re.search(SPEAKER, str(value.get("by", "")), re.IGNORECASE))
+        for key, child in value.items():
+            where = f"{path}/{key}"
+            words = re.fullmatch(r"owner_(?:verbatim|quote|quotation|words)", key) or (owners and key in WORDS_FIELDS)
+            if words and where not in kept and isinstance(child, str) and child.strip():
+                found.append(f"{where}: a field that holds the owner's words")
+            found += owner_quotations(child, kept, where)
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            found += owner_quotations(child, kept, f"{path}/{index}")
+    elif isinstance(value, str) and attributed_quotations(value):
+        found.append(f"{path}: a quotation attributed to the owner or the user")
+    return found
+
+
+def relay_contract_paths(consensus):
+    """The owner batches' authority.verbatim paths of the layer-consensus record, while assemble_manifest.py requires them.
+
+    The assembler's OWNER_AUTHORITY_FIELDS lists `verbatim`, and its check_owner_batch refuses a batch whose relaying
+    decision record, hashed in the batch, does not contain it. Removing that is a change to the relay contract, outside
+    this paraphrase; once the assembler stops requiring the field, no path is kept and the check below covers these fields
+    too. The manifest and the handbook never carry them (the manifest keeps the authority's kind, date and relaying record
+    only).
+
+    TEMPORARY (command center ruling 2026-10-15T12:19Z, P1): the follow-up PR on branch
+    claude/cc-native-practice-relay-contract-scrub-20261015 changes the relay contract to a dated paraphrase plus a hash
+    binding to a private record, scrubs these three fields and the relaying decision records, and removes this
+    exemption."""
+    spec = importlib.util.spec_from_file_location("assemble_manifest_relay_contract", ROOT / ASSEMBLER)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    if "verbatim" not in module.OWNER_AUTHORITY_FIELDS:
+        return frozenset()
+    return frozenset(f"/{key}/authority/verbatim" for key, batch in consensus.items()
+                     if re.fullmatch(r"wave[0-9]+", key) and module.is_owner_batch(batch))
 
 
 class NewWslHandbookTests(unittest.TestCase):
@@ -1761,6 +1833,63 @@ class NewWslHandbookTests(unittest.TestCase):
                 self.assertIn("stale generated output", failed.stderr)
                 manifest.write_bytes(original)
                 self.assertEqual(self.public_cli(mode="--check").returncode, 0)
+
+
+class OwnerQuotationTests(unittest.TestCase):
+    """The generated handbook and the canonical inputs it projects carry no owner quotation (owner_quotations above)."""
+
+    maxDiff = None  # a failure lists every locator; a locator never holds the quoted text
+    # Invented owner prose for the fixtures; no record holds it.
+    WORDS = "keep the lanterns lit on every shelf"
+
+    def test_a_quoted_owner_field_or_sentence_is_found_and_reported_without_its_text(self):
+        cases = {
+            "a field of the owner's words": {"amendment": {"date_utc": "2026-01-02", "by": "the owner's decision",
+                                                           "decision": "the owner wants the fixture lanes lit",
+                                                           "owner_verbatim": self.WORDS}},
+            "an owner decision's words": {"authority": {"kind": "owner_decision", "date_utc": "2026-01-02",
+                                                        "decision": "light the fixture lanes", "verbatim": self.WORDS,
+                                                        "relayed_by": "fixture-records.json owner_decisions[0]"}},
+            "a quoted request": {"reason": f'A(3): the amendment quotes the owner asking for "{self.WORDS}"; it names no tool.'},
+            "a quoted answer": {"posture": f"from the user's answer on the posture question, quoted: “{self.WORDS}”; "
+                                           "record: https://example.invalid/answer"},
+            "a quotation before its speaker": {"note": f'"{self.WORDS}," the owner said.'},
+        }
+        for label, value in cases.items():
+            with self.subTest(case=label):
+                found = owner_quotations(value)
+                self.assertEqual(len(found), 1, found)
+                self.assertNotIn(self.WORDS, found[0])
+        self.assertEqual(attributed_quotations(f'Notes.\n\nThe owner wrote "{self.WORDS}" to the lane.'), 1)
+
+    def test_a_dated_paraphrase_and_separately_defined_protocol_text_pass(self):
+        paraphrase = "the owner, 2026-01-02 (paraphrased): they asked that every fixture lane stay lit"
+        value = {"amendment": {"date_utc": "2026-01-02", "by": "the owner's decision, then direct consensus of both families",
+                               "decision": "the owner wants the fixture lanes lit; the transport is measured first",
+                               "owner_paraphrase": paraphrase,
+                               "text": "The row's first condition, the owner's decision, is answered.",
+                               "contract": 'Runs count "persisted", "delivered" and "acknowledged" separately; the owner '
+                                           'receives the counts.'},
+                 "reason": f"A(3): the amendment records the request; {paraphrase}; it names no tool.",
+                 "install": 'in one environment shared with the fixture owner: pip install "fixture==1.0"',
+                 "critic": 'the round-1 critic recorded "fixture gap" as holding',
+                 "memory": 'the memory-owner row quotes the release notes: "fixture notes"'}
+        self.assertEqual(owner_quotations(value), [])
+        self.assertEqual(attributed_quotations(paraphrase + '. The contract counts "delivered" runs.'), 0)
+        # A path that a separately defined contract requires is kept out of the findings; relay_contract_paths names them.
+        kept = {"authority": {"kind": "owner_decision", "verbatim": self.WORDS}}
+        self.assertEqual(owner_quotations(kept, frozenset({"/authority/verbatim"})), [])
+
+    def test_the_canonical_inputs_and_the_generated_handbook_carry_no_owner_quotation(self):
+        consensus = json.loads((ROOT / CONSENSUS_SOURCE).read_text(encoding="utf-8"))
+        kept = relay_contract_paths(consensus)
+        found = [CONSENSUS_SOURCE + where for where in owner_quotations(consensus, kept)]
+        for name in (DEFAULTS_SOURCE, handbook.OUTPUTS[1]):
+            found += [name + where for where in owner_quotations(json.loads((ROOT / name).read_text(encoding="utf-8")))]
+        markdown = attributed_quotations((ROOT / handbook.OUTPUTS[0]).read_text(encoding="utf-8"))
+        if markdown:
+            found.append(f"{handbook.OUTPUTS[0]}: {markdown} sentences attribute a quotation to the owner or the user")
+        self.assertEqual(found, [], "paraphrase owner chat with its date ('the owner, <date> (paraphrased): ...'); never quote it")
 
 
 if __name__ == "__main__":
