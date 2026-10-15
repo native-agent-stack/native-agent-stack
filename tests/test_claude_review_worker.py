@@ -672,6 +672,54 @@ class ReviewRunTest(unittest.TestCase):
         self.assertEqual((len(h.launcher.calls), [r["kind"] for r in h.rows()]), (1, ["debit", "settle"]))
         self.assertTrue(any("no longer matches its sha256 pin" in line for line in h.logs), h.logs)
 
+    def test_a_binary_replaced_before_the_next_key_starts_nothing_more(self):
+        # CC adjudication of #1127 at 0fb64d83 (a): both families' P2 (worker.py:2056-2057). The run hashed the binary once,
+        # so a binary replaced while key 1 was refused for credit was launched under key 2. Each key's launch hashes the
+        # file again; a mismatch stops the run before the switch row, the debit and the launch.
+        h = Harness(self)
+        repo, sha = self.private(h)
+        h.queue([refusal(402, "API Error: 402 billing_error"), run_of(PASS_REPORT)])
+        worker = h.worker([repo])
+        worker.settings = dataclasses.replace(worker.settings, claude_sha256=crw.sha256_file(h.claude))
+        run = h.launcher.run
+
+        def refused_then_replaced(*args, **kwargs):
+            launched = run(*args, **kwargs)
+            if len(h.launcher.calls) == 1:
+                with open(h.claude, "a", encoding="utf-8") as handle:
+                    handle.write("# replaced while key 1 was refused\n")
+            return launched
+
+        h.launcher.run = refused_then_replaced
+        worker.tick()
+        self.assertEqual([c["key"] for c in h.launcher.calls], [KEYS[0]])
+        self.assertEqual([(r["kind"], r["key"]) for r in h.rows()], [("debit", KEYS[0]), ("void", KEYS[0])])
+        self.assertTrue(any("no longer matches its sha256 pin" in line and KEYS[1] in line for line in h.logs), h.logs)
+
+    def test_a_binary_that_cannot_be_read_at_the_run_is_a_recorded_refusal(self):
+        # CC adjudication of #1127 at 0fb64d83 (e): the read-error correction of fix 2 gets its own test, and a binary
+        # that stays unreadable cannot escape while the refusal's receipt is written (the receipt's binary field read
+        # the same file).
+        h = Harness(self)
+        repo, sha = self.private(h)
+        h.queue([run_of(REPORT)])
+        worker = h.worker([repo])
+        worker.settings = dataclasses.replace(worker.settings, claude_sha256=crw.sha256_file(h.claude))
+        checked = worker.preflight
+
+        def preflight_then_unreadable(*args, **kwargs):
+            problems = checked(*args, **kwargs)
+            h.claude.chmod(0)
+            return problems
+
+        worker.preflight = preflight_then_unreadable
+        try:
+            worker.tick()
+        finally:
+            h.claude.chmod(0o755)
+        self.assertEqual((h.launcher.calls, h.rows()), ([], []))
+        self.assertTrue(any("could not be read for its sha256 check" in line for line in h.logs), h.logs)
+
     def test_a_private_repository_gets_the_status_and_one_sanitized_comment(self):
         h = Harness(self)
         repo, sha = self.private(h)

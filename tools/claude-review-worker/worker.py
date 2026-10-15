@@ -1967,6 +1967,14 @@ class Worker:
             self.binary = {"key": key, "sha256": sha256_file(path), "name": path.name}
         return {"sha256": self.binary["sha256"], "name": self.binary["name"]}
 
+    def readable_binary_identity(self) -> dict | None:
+        """binary_identity() for a receipt, or None when the file is absent or cannot be read: a refusal's receipt is still
+        written when the binary stays unreadable (CC adjudication of #1127 at 0fb64d83, item e)."""
+        try:
+            return self.binary_identity() if self.settings.claude_bin.is_file() else None
+        except OSError:
+            return None
+
     def new_ref(self, candidate: Candidate) -> str:
         return f"{WORKLOAD}:{stamp(self.clock())}:{candidate.repo.short}#{candidate.pr}:{candidate.sha[:12]}"
 
@@ -2072,6 +2080,18 @@ class Worker:
                 skipped += 1
                 continue
             if previous is not None:
+                # Each key's launch hashes the file again (CC adjudication of #1127 at 0fb64d83): a binary replaced while
+                # the previous key was refused stops the run before the switch row, the debit and the launch.
+                try:
+                    again = self.binary_identity(fresh=True)
+                except OSError:
+                    again = None
+                if again is None or (self.settings.claude_sha256 and again["sha256"] != self.settings.claude_sha256):
+                    now = "could not be read" if again is None else f"now {again['sha256'][:12]}..."
+                    self.log(f"{label}: CLAUDE_BIN no longer matches its sha256 pin before {key} ({now}); nothing more runs")
+                    stop, unmet = "no_stream", [f"the client binary changed or became unreadable before {key}; no "
+                                                "further key ran"]
+                    break
                 self.ledger.switch(previous[0], key, previous[1], self.clock())
             detail = {"repo": candidate.repo.name, "pr": candidate.pr, "head_sha": candidate.sha, "run_id": run_id,
                       **extra, "model": MODEL, "effort": EFFORT, "budget_usd": BUDGET_USD, "client": binary["name"],
@@ -2239,7 +2259,7 @@ class Worker:
             "keys": [t["key"] for t in tries], "ledger_refs": attempt.get("ledger_refs", []),
             "tries": tries, "cost_usd": round(sum(t["cost_usd"] or 0 for t in tries), 6),
             "client_version": numbers.get("claude_code_version") if numbers else None,
-            "binary": self.binary_identity() if self.settings.claude_bin.is_file() else None,
+            "binary": self.readable_binary_identity(),
             "sandbox": self.preflight_detail or None, "stop_class": stop, "outcome": attempt.get("outcome"),
             "final": attempt.get("final"), "verdict": parsed["verdict"] if parsed else None,
             "counts": parsed["counts"] if parsed else None, "status": {"state": state, "description": description},
