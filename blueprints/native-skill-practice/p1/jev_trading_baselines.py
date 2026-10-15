@@ -127,6 +127,18 @@ class HaikuBudget:
         self.active_reservation = None
         self.uncertain_calls = 0
         self.stopped = False
+        self.workload = config["workload"]
+
+    def snapshot(self):
+        """Retain unresolved exposure, including a dispatch interrupted in-flight."""
+        active = self.active_reservation is not None
+        return {"workload": self.workload, "usd": str(self.spent) if not self.reserved else None,
+            "known_usd": str(self.spent), "reserved_usd": str(self.reserved),
+            "upper_bound_usd": str(self.spent + self.reserved),
+            "open_reservation_usd": str(self.active_reservation) if active else "0",
+            "uncertain_calls": self.uncertain_calls + int(active), "interrupted_call": active,
+            "stopped": self.stopped, "cap_usd": str(self.cap),
+            "ledger": "owning api-actions workload is the authoritative spend record"}
 
     def reserve(self, input_token_upper_bound: int) -> bool:
         if type(input_token_upper_bound) is not int or input_token_upper_bound < 0:

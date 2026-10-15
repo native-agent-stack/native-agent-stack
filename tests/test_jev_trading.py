@@ -41,6 +41,13 @@ def private_attestation_fixture(directory):
 
 
 class CaseTests(unittest.TestCase):
+    def test_content_pins_match_published_frozen_source_reproduction(self):
+        path = P1.parents[2] / "evidence/artifacts/jev-trading-build-20261015/frozen-source-check.json"
+        retained = json.loads(path.read_text())
+        self.assertEqual(cases.CONTENT_PINS,
+                         {name: row["content_sha256"] for name, row in retained["sets"].items()})
+        self.assertEqual(retained["source_sha256"], cases.SOURCE_PINS)
+
     def test_builder_requires_the_record_source_pins_and_library_versions(self):
         with mock.patch.object(cases, "version", return_value="different"):
             with self.assertRaisesRegex(ValueError, "dependency pin"):
@@ -89,13 +96,14 @@ class CaseTests(unittest.TestCase):
 
 
 class MetricsTests(unittest.TestCase):
-    def test_ece_uses_the_accepted_returned_label_on_a_tie(self):
+    def test_ece_uses_frozen_sorted_argmax_on_a_tie(self):
         import jev_trading_scoring as s
         answer = s.prediction({"bearish": 0.4, "bullish": 0.4, "neutral": 0.2}, cases.LABELS["TFN"], "bullish")
         pack = cases.assemble("TFN", [], [cases.Case(0, "Synthetic tied answer.", "bullish")])
-        self.assertAlmostEqual(s.arm_metrics(pack, {0: answer})["ece"], 0.6)
+        self.assertEqual(answer.label, "bullish")
+        self.assertAlmostEqual(s.arm_metrics(pack, {0: answer})["ece"], 0.4)
 
-    def test_paired_ece_interval_uses_the_same_accepted_label(self):
+    def test_paired_ece_interval_uses_frozen_sorted_argmax(self):
         import jev_trading_scoring as s
         labels = cases.LABELS["TFN"]
         first = s.prediction({"bearish": 0.4, "bullish": 0.4, "neutral": 0.2}, labels, "bullish")
@@ -103,7 +111,7 @@ class MetricsTests(unittest.TestCase):
         pack = cases.assemble("TFN", [], [cases.Case(i, f"Synthetic tie {i}.", "bullish") for i in range(2)])
         result = s.paired_metrics(pack, {i: first for i in range(2)}, {i: second for i in range(2)})
         for field in ("point", "low", "high"):
-            self.assertAlmostEqual(result["ece"][field], 0.4, msg=field)
+            self.assertAlmostEqual(result["ece"][field], 0.2, msg=field)
 
     def test_unordered_baseline_has_no_first_position_diagnostic(self):
         import jev_trading_scoring as s
@@ -441,6 +449,79 @@ class JevBudgetTests(unittest.TestCase):
 
 
 class TransportTests(unittest.TestCase):
+    def test_scored_rejects_changed_content_with_unchanged_ids(self):
+        from dataclasses import replace
+        import jev_trading_run as r
+        packs = {name: cases.assemble(name, [cases.Case(i, f"training {name} {i}", label)
+                 for i, label in enumerate(cases.LABELS[name])], pack.scored)
+                 for name, pack in r.synthetic_sets().items()}
+        frozen = {name: pack.manifest() for name, pack in packs.items()}
+        ids = {name: {part: manifest["id_sha256"][part] for part in ("training", "final_training", "scored")}
+               for name, manifest in frozen.items()}
+        content = {name: manifest["content_sha256"] for name, manifest in frozen.items()}
+        with tempfile.TemporaryDirectory(dir="/var/tmp", prefix="jev-test-") as d, \
+             mock.patch.dict(r.ID_PINS, ids, clear=True), \
+             mock.patch.object(cases, "CONTENT_PINS", content, create=True), \
+             mock.patch.object(r, "freeze_dates", return_value={}), mock.patch.object(r, "latency_sample", return_value=[]):
+            path, _ = private_attestation_fixture(d)
+            transport = mock.Mock(is_fake=False)
+            r.preregistration(packs, "SCORED", transport, {}, path)
+            for part in ("scored", "original_training", "training"):
+                rows = getattr(packs["TFN"], part)
+                for field in ("label", "text"):
+                    replacement = ("bullish" if rows[0].label != "bullish" else "bearish") if field == "label" else rows[0].text + " changed"
+                    changed_row = replace(rows[0], **{field: replacement})
+                    changed_pack = replace(packs["TFN"], **{part: (changed_row,) + rows[1:]})
+                    self.assertEqual(changed_pack.manifest()["id_sha256"], frozen["TFN"]["id_sha256"])
+                    with self.subTest(part=part, field=field), self.assertRaisesRegex(ValueError, "content"):
+                        r.preregistration({**packs, "TFN": changed_pack}, "SCORED", transport, {}, path)
+            transport.evaluate.assert_not_called()
+
+    def test_partial_receipt_keeps_haiku_exposure_after_two_completed_calls(self):
+        from decimal import Decimal
+        import jev_trading_run as r
+        gate = {"model": "claude-haiku-5-5", "workload": "synthetic-partial-haiku", "pricing_sha256": "a" * 64,
+            "credential_runner": True, "estimate_usd": "1.6608", "cap_usd": "3.3216",
+            "input_per_million": "0.10", "output_per_million": "0.50",
+            "parameters": {"temperature": 0, "max_tokens": 200}, "run_order": ["TFN/raw", "TFN/date_shift"]}
+        for interruption in (KeyboardInterrupt, SystemExit):
+            with self.subTest(interruption=interruption.__name__), tempfile.TemporaryDirectory(dir="/var/tmp", prefix="jev-test-") as d:
+                calls = []
+                def adapter(name, row):
+                    calls.append(row.id)
+                    if len(calls) == 3:
+                        raise interruption()
+                    return {"choice": "neutral", "probabilities": {label: 0.8 if label == "neutral" else 0.1 for label in cases.LABELS[name]},
+                            "input_tokens": 100, "output_tokens": 10}
+                adapter.token_bound = lambda name, row: 1000
+                out = Path(d) / "partial"
+                receipt = r.run(r.synthetic_sets(), out, r.FakeTransport(), evidence_class="SYN", command=["test"],
+                    baseline_adapters={"haiku": adapter},
+                    baseline_meta={"TFN": {"haiku": {"status": "RAN", "pin": r.PINS["haiku"], "gate": gate}}})
+                self.assertEqual((receipt["status"], receipt["exit_code"], calls), ("PARTIAL", 1, [0, 1, 2]))
+                self.assertFalse((out / "report.json").exists())
+                journal = [json.loads(line) for line in (out / "calls.jsonl").read_text().splitlines()]
+                self.assertEqual(sum(row["model"] == "haiku" for row in journal), 2)
+                self.assertTrue("haiku_spend" in receipt, "partial receipt lost Haiku exposure")
+                spend = receipt["haiku_spend"]
+                self.assertEqual(spend["workload"], gate["workload"])
+                self.assertEqual(Decimal(spend["known_usd"]), Decimal("0.00003"))
+                self.assertEqual(Decimal(spend["reserved_usd"]), Decimal("0.0002"))
+                self.assertEqual(Decimal(spend["upper_bound_usd"]), Decimal("0.00023"))
+                self.assertEqual(Decimal(spend["cap_usd"]), Decimal("3.3216"))
+                self.assertEqual(Decimal(spend["open_reservation_usd"]), Decimal("0.0002"))
+                self.assertEqual(spend["uncertain_calls"], 1)
+                self.assertTrue(spend["interrupted_call"])
+                self.assertIsNone(spend["usd"])
+                self.assertEqual(json.loads((out / "receipt.json").read_text())["haiku_spend"], spend)
+
+    def test_failed_preflight_receipt_has_no_haiku_exposure(self):
+        import jev_trading_run as r
+        with tempfile.TemporaryDirectory(dir="/var/tmp", prefix="jev-test-") as d:
+            receipt = r.run({}, Path(d) / "failed", r.FakeTransport(), evidence_class="SYN", command=["test"])
+            self.assertEqual(receipt["status"], "FAILED")
+            self.assertEqual(receipt.get("haiku_spend"), {"status": "NOT_RUN"})
+
     def test_jev_retry_uncertainty_is_visible_in_each_arm_cost(self):
         import jev_trading_run as r
         from jev_trading_budget import JevBudget
@@ -617,7 +698,7 @@ class TransportTests(unittest.TestCase):
                              "amendment": records["sdk_amendment"]}, "models_page": records["models_page"]}
             spec = root / "private-preregistration.json"
             spec.write_text(json.dumps(proof))
-            with mock.patch.object(r, "verify_lists"), mock.patch.object(r, "freeze_dates", return_value={}), \
+            with mock.patch.object(r, "verify_lists"), mock.patch.object(r, "verify_content"), mock.patch.object(r, "freeze_dates", return_value={}), \
                  mock.patch.object(r, "latency_sample", return_value=[]):
                 result = r.preregistration(r.synthetic_sets(), "SCORED", mock.Mock(is_fake=False), {}, spec)
                 encoded = json.dumps(result)
@@ -795,7 +876,7 @@ class TransportTests(unittest.TestCase):
         import jev_trading_run as r
         packs = r.synthetic_sets()
         with tempfile.TemporaryDirectory(dir="/var/tmp", prefix="jev-test-") as directory, \
-             mock.patch.object(r, "verify_lists"), mock.patch.object(r, "freeze_dates", return_value={}), \
+             mock.patch.object(r, "verify_lists"), mock.patch.object(r, "verify_content"), mock.patch.object(r, "freeze_dates", return_value={}), \
              mock.patch.object(r, "latency_sample", return_value=[]):
             path, proof = private_attestation_fixture(directory)
             transport = mock.Mock(is_fake=False)

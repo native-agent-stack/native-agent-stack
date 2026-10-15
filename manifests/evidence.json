@@ -10568,8 +10568,8 @@
     },
     {
       "path": "blueprints/native-skill-practice/p1/JEV-TRADING.md",
-      "sha256": "267a2487d8a9d29d6751ce5a712db57e1c973860bb5cff64ac4cf249f3f39197",
-      "bytes": 17900
+      "sha256": "729499b5faa23a2e44c0e73752023b60860326f25d8e77ad88f926d49e20be93",
+      "bytes": 19338
     },
     {
       "path": "blueprints/native-skill-practice/p1/README.md",
@@ -10578,8 +10578,8 @@
     },
     {
       "path": "blueprints/native-skill-practice/p1/jev_trading_baselines.py",
-      "sha256": "c6353165d0dac35cd33d4703a9506d304670e5b3a1fed0762d594eae2c5f8b24",
-      "bytes": 7854
+      "sha256": "2b30b1f1c4555fc4bfb39f497623417f799a7446a3c666314cceb13f969ecedb",
+      "bytes": 8631
     },
     {
       "path": "blueprints/native-skill-practice/p1/jev_trading_budget.py",
@@ -10593,8 +10593,8 @@
     },
     {
       "path": "blueprints/native-skill-practice/p1/jev_trading_cases.py",
-      "sha256": "540c4629c9ffe3dbc2b0d1104c8332a7f7dcd70b1e6fa55b07a91d1b2caa1d32",
-      "bytes": 7493
+      "sha256": "edbb9e5839b530db27fb4e2a260141a461b131bb38eaf2379944097ba2448195",
+      "bytes": 8696
     },
     {
       "path": "blueprints/native-skill-practice/p1/jev_trading_custody.py",
@@ -10603,18 +10603,18 @@
     },
     {
       "path": "blueprints/native-skill-practice/p1/jev_trading_mutants.py",
-      "sha256": "264246e788fc974355528f12ecb256b0dd887c2575924cc9c3df12998961a9e6",
-      "bytes": 25041
+      "sha256": "f4da549198f53d2d9553b2fc79f6c9b9f4800a76018cfc277be6bdf274bce6a7",
+      "bytes": 26139
     },
     {
       "path": "blueprints/native-skill-practice/p1/jev_trading_run.py",
-      "sha256": "0c4f13d53234c7a313955147406ccd7fecabb572b77fb13027adedb60e1fb19b",
-      "bytes": 31127
+      "sha256": "b32e06fd721be7f13ec4d5ab77df0dba6c571f3b59947a1f7ff1bb6458fd745f",
+      "bytes": 30954
     },
     {
       "path": "blueprints/native-skill-practice/p1/jev_trading_scoring.py",
-      "sha256": "2b32407d36cb4cd580a0368eddfa5131ee63082f6b1cdc065b271f6d5bd195e0",
-      "bytes": 10844
+      "sha256": "9c4828c1a1f0452e9c13901d85e277ef5bb7c0ebf49c5e8744f8e407b1112815",
+      "bytes": 10927
     },
     {
       "path": "blueprints/native-skill-practice/p1/l_nli_provider.py",
@@ -19275,6 +19275,11 @@
       "path": "docs/decisions/2026-10-14-stream-integrity-followups.md",
       "sha256": "b2ea42bd0d9314292b8e5ce5b44307719f27679622956e55429685f3343ce077",
       "bytes": 13866
+    },
+    {
+      "path": "docs/decisions/2026-10-15-jev-scored-contract-corrections.md",
+      "sha256": "d4f80209a55e2f27ac426a0a070fc6257a4a38c864ccc10099d46d4739e9d737",
+      "bytes": 3859
     },
     {
       "path": "docs/decisions/2026-10-15-jev-trading-harness-build.md",
@@ -37625,6 +37630,41 @@
       "path": "evidence/artifacts/jev-trading-build-20261015/validation.json",
       "sha256": "e2bd80c2ce869371074344184ec7e660025c9195aa404ef2757c241232ee06f9",
       "bytes": 9652
+    },
+    {
+      "path": "evidence/artifacts/jev-trading-scored-contract-20261015/README.md",
+      "sha256": "6616845284e1eed27249cf93b3bf5ee6bb205d2dc846f9c0df60f992d07b6eca",
+      "bytes": 1398
+    },
+    {
+      "path": "evidence/artifacts/jev-trading-scored-contract-20261015/guard-mutants.json",
+      "sha256": "2e8d3a57b4808f4ddc7fce1961ce039c27be22fae58b20d8f26bc48c5bbe121a",
+      "bytes": 56367
+    },
+    {
+      "path": "evidence/artifacts/jev-trading-scored-contract-20261015/syn/calls.jsonl",
+      "sha256": "2cfdfc005cb3f3e53f8cb5f02fc8c62af8ca89b333a1d40c6b0870c5c6053c14",
+      "bytes": 131350
+    },
+    {
+      "path": "evidence/artifacts/jev-trading-scored-contract-20261015/syn/preregistration.json",
+      "sha256": "0757792e6a9119adbe84c5d5c0673d30ef57fc7480d5bbedd80b947d03a3e9ab",
+      "bytes": 7914
+    },
+    {
+      "path": "evidence/artifacts/jev-trading-scored-contract-20261015/syn/receipt.json",
+      "sha256": "f7d3974cc245f605ec78f86a6f7a2f9edd26520a2979fa831eed00019f39e12e",
+      "bytes": 2251
+    },
+    {
+      "path": "evidence/artifacts/jev-trading-scored-contract-20261015/syn/report.json",
+      "sha256": "1f0441dbf2e75b955fb13b51fd501764f2095acc18e2a3447c186e6752c38781",
+      "bytes": 25557
+    },
+    {
+      "path": "evidence/artifacts/jev-trading-scored-contract-20261015/validation.json",
+      "sha256": "b458df56c717db814b8b882a05bccfa5446a389c0e5569b76efc9ec29e0d4c76",
+      "bytes": 3262
     },
     {
       "path": "evidence/artifacts/k4-timing-gc-20261003/summary.json",
@@ -63698,8 +63738,8 @@
     },
     {
       "path": "tests/test_jev_trading.py",
-      "sha256": "3012558bb9a3ac51ef5a8c818a962d1b8b7f369e9b677a6ba0bda81b1cae39b2",
-      "bytes": 60247
+      "sha256": "2ade573f8399fb7ed4e1b0f6cd71d3e49f1bf3924e02b30aeb6f8456af78bd20",
+      "bytes": 66118
     },
     {
       "path": "tests/test_jev_trading_sdk.py",

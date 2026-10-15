@@ -41,6 +41,23 @@ ID_PINS = {
         "final_training": "6f3e0699af75db9a981cd1a86c780b882663e5c7e7803c12a3a0ef28889928bc"},
 }
 
+# Public dataset-derived pins retained in the reviewed frozen-source-check.json
+# from the original build. These bind exact text/labels/order as well as IDs.
+CONTENT_PINS = {
+    "FPB-50": {
+        "training": "f643fdeeffbc3a987dfb2e80f6b0b2afe0cc4bfa859194f4f415f5cefed3fed9",
+        "final_training": "ecc44bf4b8ef288e711fcaefda5e30cc2b5e85ef989508045212b2d05c73468b",
+        "scored": "834ce5fdf1cfba065395e3f8e4f1e40a25bc504d494db5839a2f22130b2531f3"},
+    "TFN": {
+        "training": "14461098decbea3cbeeeb9bb0f671add3868174b36d2eb78864e93cb1f6abfd7",
+        "final_training": "d2883c0e565e22af2784abc118b81bdf7ebf4bb87c838ccaa22eba49b0b59220",
+        "scored": "1dffaaa892e934a8d7ce3f162fab093928b325f85354ca2f3f302d58fb08ef8d"},
+    "FOMC": {
+        "training": "7c14bb7f55aa45df831650363131ece5d7fb1f91e7b6648fd00657cbe804caff",
+        "final_training": "95b92ef604d779f2f35b1ec3c007a217acd496cfb82dd31b3a25a7092976ab29",
+        "scored": "85f7a4bc18f8f734a0149e91a6be56fdb9275783ef17c576f703bbb684e9e7ad"},
+}
+
 
 def sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
@@ -135,6 +152,11 @@ def verify_lists(pack: CaseSet, pins: dict[str, str]) -> None:
     actual = pack.manifest()["id_sha256"]
     if set(pins) != {"training", "final_training", "scored"} or any(actual[k] != v for k, v in pins.items()):
         raise ValueError("id-list pin mismatch")
+
+
+def verify_content(pack: CaseSet) -> None:
+    if pack.manifest()["content_sha256"] != CONTENT_PINS[pack.name]:
+        raise ValueError("frozen case content pin mismatch")
 
 
 def option_order(name: str, item_id: int) -> list[str]:
