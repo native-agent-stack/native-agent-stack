@@ -17,6 +17,7 @@ files retain their documented behavior; hermetic boot evidence is scoped below.
 from __future__ import annotations
 
 import argparse
+import datetime
 import importlib.util
 import json
 import os
@@ -650,28 +651,154 @@ def first_call_refusal(log: Path, runtime: str) -> tuple[int | None, str] | None
             if message.get("stopReason") != "error" or usage.get("totalTokens"):
                 return None
             text = message.get("errorMessage") if isinstance(message.get("errorMessage"), str) else ""
-            status = re.match(r"(\d{3})\b", text)
-            return (int(status.group(1)) if status else None), text
+            return pi_refusal_status(text), text
         if event.get("type") == "step_finish":
             return None
         if event.get("type") == "error":
-            error = event.get("error")
-            text = json.dumps(error)
-            numbers = [v for k, v in (error.items() if isinstance(error, dict) else ())
-                       if k in ("statusCode", "status") and isinstance(v, int)]
-            if not numbers and isinstance(error, dict) and isinstance(error.get("data"), dict):
-                numbers = [v for k, v in error["data"].items() if k in ("statusCode", "status") and isinstance(v, int)]
-            # Without a numeric field, the Anthropic error type in the relayed body gives the status it comes with.
-            status = numbers[0] if numbers else (402 if "billing_error" in text
-                                                 else 400 if "invalid_request_error" in text else None)
-            return status, text
+            return opencode_refusal(event.get("error"))
     return None
+
+
+def body_status(text: str) -> int | None:
+    """Without a numeric status, the Anthropic error type in the relayed body gives the status it comes with."""
+    return 402 if "billing_error" in text else 400 if "invalid_request_error" in text else None
+
+
+def pi_refusal_status(text: str) -> int | None:
+    """The status of a pi errorMessage: its leading "<status> " (the SDK's APIError message, above), else the body's
+    error type. A refusal that arrives inside a response already streaming has no status prefix, only the body: measured
+    2026-10-15 ~04:06Z, when an API slot's credit ran out mid-run and the refused message had already been billed."""
+    status = re.match(r"(\d{3})\b", text)
+    return int(status.group(1)) if status else body_status(text)
+
+
+def opencode_refusal(error) -> tuple[int | None, str]:
+    """(status, text) of an OpenCode error event's session error: its numeric statusCode/status, else the body's type."""
+    text = json.dumps(error)
+    numbers = [v for k, v in (error.items() if isinstance(error, dict) else ())
+               if k in ("statusCode", "status") and isinstance(v, int)]
+    if not numbers and isinstance(error, dict) and isinstance(error.get("data"), dict):
+        numbers = [v for k, v in error["data"].items() if k in ("statusCode", "status") and isinstance(v, int)]
+    return (numbers[0] if numbers else body_status(text)), text
 
 
 def credit_refused(log: Path, runtime: str) -> bool:
     """True when the run's first call was refused as credit-exhausted, by the review worker's own classifier."""
     refusal = first_call_refusal(log, runtime)
     return refusal is not None and review_worker().credit_exhausted(*refusal)
+
+
+def mid_run_refusal(log: Path, runtime: str) -> tuple[int | None, str] | None:
+    """(status, text) of the run's LAST model call when it was refused after billed output, else None: the case
+    first_call_refusal leaves to the run. Pi: the last assistant message_end ends on stopReason "error" while it, or an
+    earlier one, carried tokens. OpenCode: an error event after a step_finish, with no step finished since."""
+    refusal, billed = None, False
+    for line in log.read_text().split("\n"):
+        try:
+            event = json.loads(line)
+        except ValueError:
+            continue
+        if not isinstance(event, dict):
+            continue
+        if runtime == "pi":
+            message = event.get("message")
+            if event.get("type") != "message_end" or not isinstance(message, dict) or message.get("role") != "assistant":
+                continue
+            usage = message.get("usage") if isinstance(message.get("usage"), dict) else {}
+            billed = billed or bool(usage.get("totalTokens"))
+            text = message.get("errorMessage") if isinstance(message.get("errorMessage"), str) else ""
+            refusal = (pi_refusal_status(text), text) if message.get("stopReason") == "error" else None
+        elif event.get("type") == "step_finish":
+            billed, refusal = True, None
+        elif event.get("type") == "error" and billed:
+            refusal = opencode_refusal(event.get("error"))
+    return refusal if billed else None
+
+
+def credit_exhausted_mid_run(log: Path, runtime: str) -> bool:
+    """True when the run's last call was refused as credit-exhausted after billed output (the worker's classifier)."""
+    refusal = mid_run_refusal(log, runtime)
+    return refusal is not None and review_worker().credit_exhausted(*refusal)
+
+
+def attempt_outcome(log: Path, runtime: str, route: str, exit_code: int | None) -> str:
+    """What one attempt's end allows. "cut_short": a timeout or signal, so nothing in its log authorizes another slot.
+    "first_call_refused": credit refused before any billed output; start again on the next slot. "credit_exhausted_mid_run":
+    credit refused after billed output; the same session continues on the next slot (pi), or the run stops resumable.
+    "ended": anything else, the run's own end. "error": the attempt raised before it had an exit status."""
+    if exit_code is None:
+        return "error"
+    if cut_short(exit_code):
+        return "cut_short"
+    if route != "claude":
+        return "ended"
+    if credit_refused(log, runtime):
+        return "first_call_refused"
+    if credit_exhausted_mid_run(log, runtime):
+        return "credit_exhausted_mid_run"
+    return "ended"
+
+
+def combined_facts(facts: list) -> dict:
+    """One run's native facts over all its attempts: a failover's earlier attempts were billed too."""
+    total = dict(facts[-1])
+    total["usage"] = {key: sum(item["usage"][key] for item in facts) for key in facts[-1]["usage"]}
+    total["native_cost_usd"] = round(sum(item["native_cost_usd"] for item in facts), 8)
+    total["completed_native_steps"] = sum(item["completed_native_steps"] for item in facts)
+    total["usage_measured"] = any(item["usage_measured"] for item in facts)
+    for key in ("response_ids", "native_session_ids"):
+        total[key] = sorted({value for item in facts for value in item[key]})
+    return total
+
+
+# The api-actions spend ledger: the review worker's API_ACTIONS_LEDGER (tools/claude-review-worker/worker.py), read by
+# the Fleet page (tools/local-pages/fleet_data.py), the api-actions harness and the command center's keys board.
+DEFAULT_LEDGER = Path.home() / ".local/state/native-agent-stack/coordination/api-actions-20261008/api-actions-ledger.jsonl"
+LEDGER_WORKLOAD = "NSRUN"
+# An open attempt's reservation until it settles, so a run killed mid-attempt still shows pending spend. Not a budget:
+# ns-run has no budget flag. The figure is the command center's per-arm cap of 2026-10-15.
+ATTEMPT_RESERVE_USD = 25.0
+# The prompt a failover sends into the continued session; the brief is already in it.
+CONTINUE_PROMPT = ("Your previous turn was cut off because the API key's credit ran out. The run continues on another key "
+                   "and nothing else changed. Continue the same task from where you stopped, under the same instructions, "
+                   "and end with the reply the task asks for.")
+
+
+class SpendLedger:
+    """Debit, settle and switch rows for each Anthropic Console attempt, through the review worker's Ledger (its lock
+    and append; worker.py "ledger"). A row names the slot id as `key`, never a key value. Refuses, before any key is
+    loaded, when no ledger is named or it cannot be written."""
+
+    def __init__(self, path, profile: str, role: str | None, model: str):
+        if not path:
+            raise ProfileError("no API spend ledger named; launch refused")
+        self.ledger = review_worker().Ledger(Path(path))
+        self.detail = {"profile": profile, "role": role, "request_label": None}
+        self.model = model
+        try:
+            with self.ledger.locked():
+                os.close(os.open(self.ledger.path, os.O_WRONLY | os.O_APPEND | os.O_CREAT, 0o600))
+        except OSError:
+            raise ProfileError("API spend ledger unwritable; launch refused") from None
+
+    def debit(self, ref: str, slot: str, run: str) -> None:
+        with self.ledger.locked():
+            self.ledger.append({"kind": "debit", "ts": utc(), "key": slot, "workload": LEDGER_WORKLOAD, "ref": ref,
+                                "max_usd": ATTEMPT_RESERVE_USD, "detail": {**self.detail, "run": run}})
+
+    def settle(self, ref: str, slot: str, run: str, facts: dict, outcome: str) -> None:
+        usage = facts["usage"]
+        with self.ledger.locked():
+            self.ledger.append({"kind": "settle", "ts": utc(), "key": slot, "workload": LEDGER_WORKLOAD,
+                                "use_case": "ns-run " + self.detail["profile"] + " " + str(self.detail["role"]),
+                                "ref": ref, "actual_usd": facts["native_cost_usd"], "outcome": outcome,
+                                "requests": facts["completed_native_steps"],
+                                "tokens": {self.model: {key: usage[key] for key in ("input", "output", "cache_read",
+                                                                                     "cache_write")}},
+                                "detail": {**self.detail, "run": run}})
+
+    def switch(self, slot: str, following: str, reason: str) -> None:
+        self.ledger.switch(slot, following, reason, datetime.datetime.now(datetime.timezone.utc))
 
 
 def cut_short(exit_code: int) -> bool:
@@ -958,6 +1085,10 @@ def launch(args):
     if meta.get("status") != "trial":
         raise ProfileError("only measured selections may change trial status")
     verify_runtime_binary(runtime, Path(meta[runtime + "_bin"]))
+    # Every Anthropic Console attempt is debited before its key is loaded and settled after; a missing or unwritable
+    # ledger refuses the launch before any worktree or key exists.
+    ledger = SpendLedger(getattr(args, "ledger", None), profile, args.role, meta["model"]) \
+        if route == "claude" and args.print else None
     workspace = fresh_worktree(args.repository.resolve(), profile)
     aux = Path(meta["auxiliary_root"]) if meta.get("auxiliary_root") else None
     runtime_env = profile_environment(profile, args.state_root, role_scope, aux)
@@ -1003,7 +1134,7 @@ def launch(args):
                 command += ["--exclude-tools", "codemode,tool_search,list_mcp_resources,list_mcp_resource_templates,read_mcp_resource"]
         if args.print:
             command += ["--mode", "json"]
-        if args.prompt:
+        if args.prompt and not args.print:
             command += [("/" + args.role + " " if args.role else "") + args.prompt]
     else:
         if args.role and args.role not in ROLES:
@@ -1023,15 +1154,28 @@ def launch(args):
         # native TUI a PTY without reading/copying authentication state.
         command = ["script", "--quiet", "--return", "--command", shlex.join(command), "/dev/null"]
     runtime_command, slot = command, None
+    first_prompt = (("/" + args.role + " " if args.role else "") + args.prompt) if args.prompt else None
+    # pi@04566631 packages/coding-agent/src/main.ts:436-448 (docs/cli.md:92): --session-id reopens the session with that
+    # exact id for this worktree, or creates it. A fresh start takes a new id; only a mid-run failover reuses one.
+    session_id = uuid.uuid4().hex if runtime == "pi" and args.print else None
 
-    def loaded(slot):
+    def attempt_command(session, prompt):
+        """One print-mode attempt's runtime command: pi with its session id and this attempt's prompt."""
+        if session is None:
+            return runtime_command
+        return runtime_command + ["--session-id", session] + ([prompt] if prompt else [])
+
+    def loaded(slot, runtime_command=runtime_command):
         return [sys.executable, str(ROOT / "tools/credentials/credential_run.py"), slot,
                 "--only", "ANTHROPIC_API_KEY", "--", "env",
                 *[key + "=" + value for key, value in runtime_env.items()],
                 *runtime_command]
+    command = attempt_command(session_id, first_prompt)
+    if ledger:
+        ledger.detail["request_label"] = env["NS_RUNTIME_REQUEST_ID"]
     if route == "claude":
         slot = choose_slot()
-        command = loaded(slot)
+        command = loaded(slot, command)
         # XDG_STATE_HOME also locates credential_run's inventory store. Resolve
         # the host store in the loader's original environment; apply runtime
         # XDG isolation only to its child through env. No store is copied into
@@ -1040,35 +1184,85 @@ def launch(args):
     if args.print:
         # Fill-first: a slot whose first call is refused as credit-exhausted, before any billed output, is recorded and
         # the run starts again on the next usable slot of the order (the review worker's DEFAULT_KEYS and classifier).
-        refused_slots = []
+        # A slot whose credit runs out MID-RUN (after billed output; measured 2026-10-15, when two researcher arms lost
+        # $5.44 and $2.85 of work) continues the same pi session on the next slot. pi skips the refused turn when it
+        # rebuilds the context (pi@04566631 packages/ai/src/api/transform-messages.ts:195-202). With no slot left, or on
+        # OpenCode, the run stops resumable: its worktree and session are kept and the receipt names them.
+        refused_slots, attempts, facts, logs, resume = [], [], [], [], None
+        started = utc()
         while True:
             run = root / "runs" / uuid.uuid4().hex
             run.mkdir(mode=0o700, parents=True)
             log, errors = run / "events.jsonl", run / "stderr.log"
-            started = utc()
+            ref = "NSRUN:" + env["NS_RUNTIME_REQUEST_ID"] + ":" + str(len(attempts) + 1) + ":" + str(slot)
+            if ledger:
+                ledger.debit(ref, slot, run.name)
             # GNU timeout owns the bounded process group and gives the credential
             # runner its normal TERM cleanup grace; subprocess timeout is only an
             # outer watchdog. This also bounds GPT descendants without credentials.
+            # Each attempt has the whole --timeout-seconds.
             timed = ["timeout", "--signal=TERM", "--kill-after=5s", str(args.timeout_seconds), *command]
-            with log.open("x", encoding="utf-8") as handle, errors.open("x", encoding="utf-8") as stderr:
-                log.chmod(0o600); errors.chmod(0o600)
-                # The loader masks Claude output before it reaches this private log.
-                try:
-                    result = subprocess.run(timed, cwd=workspace, env=env, stdout=handle, stderr=stderr,
-                                            timeout=args.timeout_seconds + 15)
-                    exit_code = result.returncode
-                except subprocess.TimeoutExpired:
-                    exit_code = 124
+            exit_code = None
+            try:
+                with log.open("x", encoding="utf-8") as handle, errors.open("x", encoding="utf-8") as stderr:
+                    log.chmod(0o600); errors.chmod(0o600)
+                    # The loader masks Claude output before it reaches this private log.
+                    try:
+                        result = subprocess.run(timed, cwd=workspace, env=env, stdout=handle, stderr=stderr,
+                                                timeout=args.timeout_seconds + 15)
+                        exit_code = result.returncode
+                    except subprocess.TimeoutExpired:
+                        exit_code = 124
+            finally:
+                # Settled whatever happened: the ledger holds what the attempt's own log shows.
+                if not log.exists():
+                    log.touch(mode=0o600)
+                outcome = attempt_outcome(log, runtime, route, exit_code)
+                facts.append(inference_facts(log, runtime))
+                logs.append(log)
+                attempts.append({"run": run.name, "credential_loader_id": slot, "outcome": outcome,
+                                 "runtime_exit_code": exit_code, "native_cost_usd": facts[-1]["native_cost_usd"],
+                                 "completed_native_steps": facts[-1]["completed_native_steps"]})
+                if ledger:
+                    ledger.settle(ref, slot, run.name, facts[-1], outcome)
             # A timed-out or signalled attempt keeps its own receipt and exit status, whatever its log holds: only an
             # attempt that ended on its own with a credit refusal moves the run to another slot.
-            if route != "claude" or cut_short(exit_code) or not credit_refused(log, runtime):
+            if outcome == "first_call_refused":
+                refused_slots.append({"credential_loader_id": slot, "reason": "credit_exhausted", "run": run.name})
+            elif outcome != "credit_exhausted_mid_run":
                 break
-            refused_slots.append({"credential_loader_id": slot, "reason": "credit_exhausted", "run": run.name})
+            elif runtime != "pi":
+                resume = {"status": "stopped_resumable", "reason": "credit_exhausted_mid_run",
+                          "session_id": (facts[-1]["native_session_ids"] or [None])[-1], "credential_loader_id": slot,
+                          "note": "OpenCode run --session continues it; its handling of the refused turn is unverified"}
+                break
             try:
                 following = choose_slot(after=slot)
             except ProfileError:
-                break  # no slot left: the last refused run's receipt stands, with its own slot recorded above
-            slot, command = following, loaded(following)
+                # No slot left: the last refused run's receipt stands, with its own slot recorded.
+                if outcome == "credit_exhausted_mid_run":
+                    resume = {"status": "stopped_resumable", "reason": "credit_exhausted_mid_run",
+                              "session_id": session_id, "credential_loader_id": slot}
+                break
+            if ledger:
+                ledger.switch(slot, following, "credit_exhausted_mid_run" if outcome == "credit_exhausted_mid_run"
+                              else "credit_exhausted_first_call")
+            if outcome == "credit_exhausted_mid_run" and any((root / "sessions").glob("*_" + session_id + ".jsonl")):
+                resume = {"status": "resumed", "reason": "credit_exhausted_mid_run", "session_id": session_id,
+                          "from": slot, "to": following}
+                prompt = CONTINUE_PROMPT
+            elif outcome == "credit_exhausted_mid_run":
+                # No session file to continue (pi names it <time>_<id>.jsonl): start again with the brief rather than
+                # send the continuation prompt into an empty session.
+                resume = {"status": "restarted_no_session", "reason": "credit_exhausted_mid_run",
+                          "session_id": session_id, "from": slot, "to": following}
+                session_id, prompt = uuid.uuid4().hex, first_prompt
+            else:
+                session_id = uuid.uuid4().hex if session_id else None
+                prompt = first_prompt
+            slot, command = following, loaded(following, attempt_command(session_id, prompt))
+        if resume and resume["status"] == "stopped_resumable":
+            resume["retained_worktree"] = str(workspace)
         # Use the existing adapter API directly: the general tracker CLI also
         # visits Claude/Codex native stores, which this isolated run need not.
         sys.path.insert(0, str(ROOT / "tools/skill-usage"))
@@ -1076,7 +1270,7 @@ def launch(args):
         from skill_usage import skillmd_hits
         inventory = json.loads((ROOT / "adoption/skills/manifest.json").read_text())
         names, skill_sources = invocation_inventory(inventory, meta, runtime)
-        report = scan([(runtime, log)], names, skillmd_hits=skillmd_hits)[runtime]
+        report = scan([(runtime, path) for path in logs], names, skillmd_hits=skillmd_hits)[runtime]
         tracker_code = 0
         private_write(run / "invocations.json", json.dumps(report, indent=2) + "\n")
         head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=workspace, text=True).strip()
@@ -1086,7 +1280,8 @@ def launch(args):
             "request_label": env["NS_RUNTIME_REQUEST_ID"], "model": meta["model"],
             "credential_loader_id": slot if route == "claude" else None,
             "credit_refused_slots": refused_slots,
-            "inference": inference_facts(log, runtime),
+            "attempts": attempts, "resume": resume,
+            "inference": combined_facts(facts),
             "runtime_exit_code": exit_code, "tracker_exit_code": tracker_code,
             "invocations": report, "publication_boundary": "derived facts only; native state remains private",
             "configured_preloads": [{"name": p["name"], "source": p["source"]}
@@ -1110,6 +1305,10 @@ def launch(args):
                 if isinstance(part.get("text"), str):
                     texts.append(part["text"])
         final = texts[-1].strip() if texts else "No completed assistant text."
+        if resume and resume["status"] == "stopped_resumable":
+            final = ("Stopped resumable: the API credit ran out mid-run on " + str(resume["credential_loader_id"])
+                     + " and no funded slot follows. The worktree and session " + str(resume["session_id"])
+                     + " are kept; the receipt names them.")
         record = (f"# Trial runtime handoff\n\nProfile: ns-{profile}\nRole: {args.role or 'interactive'}\n"
                   f"Head: {head}\nRuntime exit: {exit_code}\nTracker exit: {tracker_code}\n"
                   "Standing checks: privacy/publication, digest, review threads and fail-before are "
@@ -1121,12 +1320,15 @@ def launch(args):
         private_write(run / "CC-RECORD.md", record)
         # Receipts and handoff are complete before native cleanup. The cleanup
         # result is a separate receipt so no earlier evidence is overwritten.
-        cleanup = cleanup_worktree(args.repository.resolve(), workspace)
+        cleanup = ({"status": "retained_resumable"} if resume and resume["status"] == "stopped_resumable"
+                   else cleanup_worktree(args.repository.resolve(), workspace))
         private_write(run / "worktree-cleanup.json", json.dumps(cleanup, indent=2) + "\n")
         print(json.dumps({"runtime_exit_code": exit_code, "tracker_exit_code": tracker_code,
                           "receipt": str(run / "receipt.json"), "record": str(run / "CC-RECORD.md"),
                           "worktree_cleanup": cleanup,
                           "retained_worktree": str(workspace) if cleanup["status"] != "removed" else None}))
+        if resume and resume["status"] == "stopped_resumable":
+            return 75  # EX_TEMPFAIL (sysexits.h): resumable once a funded slot exists
         return exit_code or (2 if tracker_code else 0)
     else:
         result = subprocess.run(command, cwd=workspace, env=env)
@@ -1264,6 +1466,8 @@ def parser():
     run.add_argument("--print", action="store_true")
     run.add_argument("--prompt")
     run.add_argument("--timeout-seconds", type=int, default=900)
+    run.add_argument("--ledger", type=Path, default=Path(os.environ.get("API_ACTIONS_LEDGER") or DEFAULT_LEDGER),
+                     help="the API spend ledger each Anthropic Console attempt is debited and settled in")
     lane = sub.add_parser("run", help="ns-run <profile> <role> <brief-file>")
     lane.add_argument("--state-root", type=Path, required=True)
     lane.add_argument("--repository", type=Path, required=True)
@@ -1271,6 +1475,8 @@ def parser():
     lane.add_argument("role", choices=("builder", "reviewer", "auditor", "researcher"))
     lane.add_argument("brief", type=Path)
     lane.add_argument("--timeout-seconds", type=int, default=900)
+    lane.add_argument("--ledger", type=Path, default=Path(os.environ.get("API_ACTIONS_LEDGER") or DEFAULT_LEDGER),
+                      help="the API spend ledger each Anthropic Console attempt is debited and settled in")
     install = sub.add_parser("install-launchers")
     install.add_argument("--home", type=Path, default=Path.home())
     install.add_argument("--state-root", type=Path, required=True)

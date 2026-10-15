@@ -100,7 +100,8 @@ class DatabaseEnvironmentPolicyTests(unittest.TestCase):
                 config=root/'config/opencode/opencode.json';config.parent.mkdir(parents=True)
                 config.write_text('{"agent":{}}')
                 args=argparse.Namespace(profile=profile,state_root=state,repository=state,
-                                       role='isolated-builder',print=True,prompt=None,timeout_seconds=5)
+                                       role='isolated-builder',print=True,prompt=None,timeout_seconds=5,
+                                       ledger=state/'ledger.jsonl')
                 observed=[]
                 def run(command,**kwargs):
                     if profile.endswith('-claude'):
