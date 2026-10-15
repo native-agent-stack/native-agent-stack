@@ -15,7 +15,7 @@ import unittest
 
 from scripts import evidence_manifest as em
 from scripts.host_receipts import register_file
-from scripts.validate import InvalidPublication, validate_registration_rows
+from scripts.validate import InvalidPublication, validate as validate_publication, validate_registration_rows
 
 
 class EvidenceManifestSortTests(unittest.TestCase):
@@ -147,7 +147,7 @@ class EvidenceRegistrationMergeTests(unittest.TestCase):
         right = self.registration_branch("right", "evidence/seed.txt", b"right replacement\n")
         merged = self.git("merge-tree", "--write-tree", left, right, check=False)
         self.assertEqual(merged.returncode, 1, "competing authored records must not be silently combined")
-        self.assertIn("manifests/evidence-files/evidence/seed.txt.json", merged.stdout)
+        self.assertIn(em.record_path("evidence/seed.txt"), merged.stdout)
 
     def test_git_registration_validation_uses_the_recorded_hash_and_rejects_tampering(self):
         self.registration_branch("registered", "evidence/new.txt", b"reviewed bytes\n")
@@ -167,7 +167,7 @@ class EvidenceRegistrationMergeTests(unittest.TestCase):
 
     def test_checker_rejects_a_malformed_record_instead_of_checking_only_the_seed(self):
         self.registration_branch("registered", "evidence/new.txt", b"reviewed bytes\n")
-        path = self.root / "manifests/evidence-files/evidence/new.txt.json"
+        path = self.root / em.record_path("evidence/new.txt")
         path.write_text('{"schema_version": 1, "record": {"path": "evidence/new.txt", "sha256": "bad", "bytes": true}}')
         self.assertEqual(em.main(["--root", str(self.root), "--check"]), 1)
 
@@ -194,7 +194,7 @@ class EvidenceRegistrationMergeTests(unittest.TestCase):
 
     def test_misnamed_duplicate_and_symlink_records_fail_closed(self):
         self.registration_branch("registered", "evidence/new.txt", b"reviewed bytes\n")
-        source = self.root / "manifests/evidence-files/evidence/new.txt.json"
+        source = self.root / em.record_path("evidence/new.txt")
         duplicate = source.with_name("duplicate.json")
         duplicate.write_bytes(source.read_bytes())
         with self.assertRaises(ValueError):
@@ -221,7 +221,7 @@ class EvidenceRegistrationMergeTests(unittest.TestCase):
 
     def test_render_preserves_expected_hashes_and_never_rewrites_source_records(self):
         self.registration_branch("registered", "evidence/new.txt", b"reviewed bytes\n")
-        sources = [self.root / "manifests/evidence.json", self.root / "manifests/evidence-files/evidence/new.txt.json"]
+        sources = [self.root / em.EVIDENCE, self.root / em.record_path("evidence/new.txt")]
         before = {path: path.read_bytes() for path in sources}
         (self.root / "evidence/new.txt").write_bytes(b"tampered after registration\n")
         output = io.StringIO()
@@ -233,7 +233,7 @@ class EvidenceRegistrationMergeTests(unittest.TestCase):
 
     def test_git_tree_rejects_symlink_even_when_its_target_text_is_valid_record_json(self):
         self.registration_branch("registered", "evidence/new.txt", b"reviewed bytes\n")
-        source = self.root / "manifests/evidence-files/evidence/new.txt.json"
+        source = self.root / em.record_path("evidence/new.txt")
         document = json.loads(source.read_text())
         source.unlink()
         source.symlink_to(json.dumps(document, separators=(",", ":")))
@@ -244,10 +244,83 @@ class EvidenceRegistrationMergeTests(unittest.TestCase):
     def test_prior_fragment_history_keeps_registration_intent_for_non_evidence_files(self):
         (self.root / "docs").mkdir()
         self.registration_branch("registered", "docs/new.md", b"registered doc\n")
-        (self.root / "manifests/evidence-files/docs/new.md.json").unlink()
+        (self.root / em.record_path("docs/new.md")).unlink()
         self.commit("lost registration after first push")
         with self.assertRaisesRegex(InvalidPublication, "docs/new.md: required registration row missing"):
             validate_registration_rows(self.root, self.base, record_fragments=True)
+
+    def test_malformed_sibling_cannot_erase_valid_historical_registration(self):
+        (self.root / "docs").mkdir()
+        (self.root / "docs/keep.md").write_text("keep this registration\n")
+        (self.root / "docs/bad.md").write_text("invalid metadata creates no intent\n")
+        register_file(self.root, "docs/keep.md")
+        valid_source = self.root / em.record_path("docs/keep.md")
+        bad_source = self.root / em.record_path("docs/bad.md")
+        bad_source.parent.mkdir(parents=True, exist_ok=True)
+        bad_source.write_text(json.dumps({"schema_version": 1, "record": {
+            "path": "docs/bad.md", "sha256": "malformed", "bytes": 1}}))
+        bad_head = self.commit("valid registration beside a malformed sibling")
+        with self.assertRaisesRegex(InvalidPublication, "invalid current registration manifest"):
+            validate_registration_rows(self.root, self.base, record_fragments=True)
+        valid_source.unlink()
+        bad_source.unlink()
+        self.commit("remove both fragments but retain both documents")
+        with self.assertRaisesRegex(InvalidPublication, "docs/keep.md: required registration row missing"):
+            validate_registration_rows(self.root, self.base, before_ref=bad_head, record_fragments=True)
+        register_file(self.root, "docs/keep.md")
+        self.commit("restore only the independently valid registration")
+        validate_registration_rows(self.root, self.base, before_ref=bad_head, record_fragments=True)
+
+    def test_valid_artifact_paths_cannot_collide_as_record_file_and_directory(self):
+        paths = ("evidence/a", "evidence/a.json/b", "evidence/" + "x" * 255)
+        for path in paths:
+            artifact = self.root / path
+            artifact.parent.mkdir(parents=True, exist_ok=True)
+            artifact.write_bytes(path.encode("utf-8"))
+            try:
+                register_file(self.root, path)
+            except OSError as error:
+                self.fail(f"independent valid artifact {path!r} could not be registered: {error}")
+        self.commit("register independently valid artifact names")
+        rows = {row["path"]: row for row in em.load_at(self.root, "HEAD")["files"]}
+        self.assertEqual(set(rows), {*paths, "evidence/seed.txt"})
+        for path in paths:
+            self.assertEqual(rows[path]["sha256"], hashlib.sha256(path.encode("utf-8")).hexdigest())
+        self.assertEqual(json.loads((self.root / em.EVIDENCE).read_text()), self.seed)
+
+    def test_bad_fragment_diagnostic_identifies_its_own_source_file(self):
+        self.registration_branch("registered", "evidence/new.txt", b"reviewed bytes\n")
+        source = self.root / em.record_path("evidence/new.txt")
+        for raw in ('{', '{"schema_version": 1, "record": {"path": "evidence/new.txt", "sha256": "bad", "bytes": 1}}'):
+            with self.subTest(raw=raw):
+                source.write_text(raw)
+                output = io.StringIO()
+                with redirect_stdout(output):
+                    self.assertEqual(em.main(["--root", str(self.root), "--check"]), 1)
+                self.assertIn(source.relative_to(self.root).as_posix(), output.getvalue())
+                self.assertNotIn(em.EVIDENCE + ": invalid JSON", output.getvalue())
+
+    def test_production_validator_keeps_the_root_registry_legacy(self):
+        from tests.test_validate import PublicationValidationTests
+
+        for case in ("marker", "null-marker", "unregistered-tree", "registered-tree"):
+            with self.subTest(case=case):
+                fixture = PublicationValidationTests()
+                self.addCleanup(fixture.doCleanups)
+                fixture.setUp()
+                validate_publication(fixture.root)
+                if case in {"marker", "null-marker"}:
+                    fixture.evidence["file_records"] = em.RECORDS if case == "marker" else None
+                    fixture.save()
+                    diagnostic = "file_records.*legacy"
+                else:
+                    source = em.RECORDS + "/00/probe.json"
+                    fixture.write(source, "{}\n")
+                    if case == "registered-tree":
+                        register_file(fixture.root, source)
+                    diagnostic = "manifests/evidence-files/.*legacy"
+                with self.assertRaisesRegex(InvalidPublication, diagnostic):
+                    validate_publication(fixture.root)
 
 
 if __name__ == "__main__":

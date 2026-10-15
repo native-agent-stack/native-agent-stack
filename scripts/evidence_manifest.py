@@ -20,6 +20,7 @@ expected hashes. Production reader migration is a separate reviewed change.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path, PurePosixPath
@@ -60,7 +61,10 @@ def record_path(path: str) -> str:
             or any(ord(char) < 32 or char in "\\:?#" for char in path)
             or path == EVIDENCE or path.startswith(RECORDS + "/")):
         raise ValueError("invalid or recursive evidence record path")
-    return f"{RECORDS}/{path}.json"
+    # Git 2.53.0 gitrepository-layout.adoc:55-61: fixed-depth digest fanout.
+    # Hash the path identity, never the artifact or its expected integrity fields.
+    identity = hashlib.sha256(path.encode("utf-8")).hexdigest()
+    return f"{RECORDS}/{identity[:2]}/{identity[2:]}.json"
 
 
 def record_sources(root: Path) -> list[str]:
@@ -68,14 +72,14 @@ def record_sources(root: Path) -> list[str]:
     if not directory.exists():
         return []
     if not directory.is_dir():
-        raise ValueError("evidence file_records source is not a directory")
+        raise ValueError(f"{RECORDS}: evidence file_records source is not a directory")
     result = []
     for path in directory.rglob("*"):
         relative = path.relative_to(root).as_posix()
         safe_file(root, relative)  # includes directory symlinks, which rglob does not follow
         if path.is_file():
             if path.suffix != ".json":
-                raise ValueError("unexpected non-JSON evidence record")
+                raise ValueError(f"{relative}: unexpected non-JSON evidence record")
             result.append(relative)
     return sorted(result)
 
@@ -91,44 +95,62 @@ def validate_record(row: dict) -> str:
     return path
 
 
-def assemble(seed: dict, sources, read) -> dict:
+def assemble(seed: dict, sources, read, *, historical: bool = False) -> dict:
     """Project complete authored records; never hash or repair evidence here.
 
     Separate authored fragments follow Towncrier@f92fbf51 README.rst:18 and
     Changesets@a897bb8a packages/write/src/index.ts:27. The frozen files[] seed
     avoids rewriting twelve thousand records during migration.
     """
-    if not uses_records(seed):
-        return seed
-    files = seed.get("files")
-    if not isinstance(files, list):
-        raise ValueError("evidence seed files must be an array")
+    try:
+        if not uses_records(seed):
+            return seed
+        files = seed.get("files")
+        if not isinstance(files, list):
+            raise ValueError("evidence seed files must be an array")
+    except ValueError as error:
+        raise ValueError(f"{EVIDENCE}: {error}") from error
     records = {}
+    ambiguous = set()
     for row in files:
-        path = validate_record(row)
+        try:
+            path = validate_record(row)
+        except ValueError as error:
+            if historical:
+                continue
+            raise ValueError(f"{EVIDENCE}: {error}") from error
         if path in records:
-            raise ValueError("duplicate evidence seed path")
+            if not historical:
+                raise ValueError(f"{EVIDENCE}: duplicate evidence seed path")
+            ambiguous.add(path)
         records[path] = row
+    for path in ambiguous:
+        records.pop(path)
     seen = set()
     for source in sorted(sources):
-        document = _object(read(source))
-        if document.get("schema_version") != 1 or type(document.get("schema_version")) is not int:
-            raise ValueError("unsupported evidence record schema")
-        if set(document) == {"schema_version", "remove"}:
-            path = document["remove"]
+        try:
+            document = _object(read(source))
+            if document.get("schema_version") != 1 or type(document.get("schema_version")) is not int:
+                raise ValueError("unsupported evidence record schema")
+            if set(document) == {"schema_version", "remove"}:
+                path = document["remove"]
+                row = None
+            else:
+                row = document.get("record")
+                if not isinstance(row, dict) or set(document) != {"schema_version", "record"}:
+                    raise ValueError("evidence fragment must contain one complete record")
+                path = validate_record(row)
             if record_path(path) != source or path in seen:
-                raise ValueError("misnamed or duplicate evidence removal")
-            seen.add(path)
-            records.pop(path, None)
-            continue
-        row = document.get("record")
-        if not isinstance(row, dict) or set(document) != {"schema_version", "record"}:
-            raise ValueError("evidence fragment must contain one complete record")
-        path = validate_record(row)
-        if record_path(path) != source or path in seen:
-            raise ValueError("misnamed or duplicate evidence record")
+                raise ValueError("misnamed or duplicate evidence record")
+        except (OSError, ValueError) as error:
+            if historical:
+                continue
+            raise ValueError(f"{source}: {error}") from error
         seen.add(path)
-        records[path] = row
+        if row is None:
+            records.pop(path, None)
+        else:
+            records[path] = row
     return {**seed, "files": [records[path] for path in sorted(records)]}
 
 
@@ -137,12 +159,19 @@ def load(root: Path, *, read=None) -> dict:
     root = Path(root).resolve()
     if read is None:
         read = lambda path: safe_file(root, path).read_bytes()
-    seed = _object(read(EVIDENCE))
+    try:
+        seed = _object(read(EVIDENCE))
+    except (OSError, ValueError) as error:
+        raise ValueError(f"{EVIDENCE}: {error}") from error
     return assemble(seed, record_sources(root) if uses_records(seed) else [], read)
 
 
-def load_at(root: Path, revision: str, *, git=None) -> dict:
-    """Assemble one Git tree, including historical registries without fragments."""
+def load_at(root: Path, revision: str, *, git=None, historical: bool = False) -> dict:
+    """Read one Git tree; historical intent retains independently valid records.
+
+    Default/current reads remain strict. Historical filtering follows the legacy
+    validate_registration_rows row filter at bf665ec6, applied per source record.
+    """
     if git is None:
         environment = {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
 
@@ -161,9 +190,11 @@ def load_at(root: Path, revision: str, *, git=None) -> dict:
             metadata, path = entry.split(b"\t", 1)
             mode, kind, _oid = metadata.split()
             if mode not in (b"100644", b"100755") or kind != b"blob":
+                if historical:
+                    continue
                 raise ValueError("evidence record must be a regular Git blob")
             sources.append(path.decode("utf-8"))
-    return assemble(seed, sources, lambda path: git("show", revision + ":" + path))
+    return assemble(seed, sources, lambda path: git("show", revision + ":" + path), historical=historical)
 
 
 def write_record(root: Path, record: dict) -> None:
@@ -214,9 +245,13 @@ def main(argv=None) -> int:
     path = safe_file(root, EVIDENCE)
     try:
         evidence = json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=unique_json)
-        projected = load(root)
     except (OSError, UnicodeError, ValueError) as error:
         print(f"{EVIDENCE}: invalid JSON ({error})")
+        return 1
+    try:
+        projected = load(root)
+    except (OSError, UnicodeError, ValueError) as error:
+        print(f"invalid evidence registry ({error})")
         return 1
     files = evidence.get("files")
     if not isinstance(files, list):

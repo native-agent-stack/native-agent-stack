@@ -46,6 +46,10 @@ Primary sources, accessed 2026-10-15:
 | [`github/rest-api-description@507b88ecbdccb4789ce77228fa2f2fde4bdeaf1f`, create-ruleset schema](https://github.com/github/rest-api-description/blob/507b88ecbdccb4789ce77228fa2f2fde4bdeaf1f/descriptions/api.github.com/api.github.com.json#L84445) | Exact branch, queue, required-check and code-scanning rule fields. |
 | [`git/git@67ad42147a7acc2af6074753ebd03d904476118f` (2.53.0), merge-tree](https://github.com/git/git/blob/67ad42147a7acc2af6074753ebd03d904476118f/Documentation/git-merge-tree.adoc#L24) | Native merges without changing index/worktree; exit 0 for clean and 1 for conflict (line 214). |
 | [Same Git pin, attributes](https://github.com/git/git/blob/67ad42147a7acc2af6074753ebd03d904476118f/Documentation/gitattributes.adoc#L1122) and [union implementation](https://github.com/git/git/blob/67ad42147a7acc2af6074753ebd03d904476118f/merge-ll.c#L149) | Union combines lines without JSON semantics; custom driver configuration is local Git configuration. |
+| [Same Git pin, object layout](https://github.com/git/git/blob/67ad42147a7acc2af6074753ebd03d904476118f/Documentation/gitrepository-layout.adoc#L55) | Lines 55–61 store digest-named files below a two-hex-character directory. The proposal adopts that fixed-depth layout for path identities. |
+| [`python/cpython@cbc944f4bc59639a444dd971c737788ba2283a91`, hashlib](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Doc/library/hashlib.rst#L40) | Lines 40–46 and 217–221 specify SHA-256 over bytes and hexadecimal output; record names use the UTF-8 artifact path. |
+| [`native-agent-stack@bf665ec698f9121b4c8e075804c259c57fd4f7b8`, legacy registration filter](https://github.com/native-agent-stack/native-agent-stack/blob/bf665ec698f9121b4c8e075804c259c57fd4f7b8/scripts/validate.py#L747) and [loader diagnostics](https://github.com/native-agent-stack/native-agent-stack/blob/bf665ec698f9121b4c8e075804c259c57fd4f7b8/scripts/validate.py#L415) | Independently valid historical rows retain registration intent; malformed current input fails. The loader identifies the file that failed. These are the reference behaviors extended to fragments. |
+| [Same repository pin, explicit legacy-root contract](https://github.com/native-agent-stack/native-agent-stack/blob/bf665ec698f9121b4c8e075804c259c57fd4f7b8/scripts/evidence_manifest.py#L14) and [publication enumeration](https://github.com/native-agent-stack/native-agent-stack/blob/bf665ec698f9121b4c8e075804c259c57fd4f7b8/scripts/validate.py#L449) | The prototype does not activate the root. The production validator now rejects the marker and record-tree paths using its existing complete publication boundary. |
 | [`twisted/towncrier@f92fbf5180f70e797af62932a4346573023d4001`, README](https://github.com/twisted/towncrier/blob/f92fbf5180f70e797af62932a4346573023d4001/README.rst#L18) and [builder](https://github.com/twisted/towncrier/blob/f92fbf5180f70e797af62932a4346573023d4001/src/towncrier/_builder.py#L148) | Separate authored fragments avoid shared-file conflicts; discover, read and check identity before assembly. |
 | [`changesets/changesets@a897bb8ac115fa65343a8bfe53654040c1542a80`, writer](https://github.com/changesets/changesets/blob/a897bb8ac115fa65343a8bfe53654040c1542a80/packages/write/src/index.ts#L27) and [reader](https://github.com/changesets/changesets/blob/a897bb8ac115fa65343a8bfe53654040c1542a80/packages/read/src/index.ts#L29) | Unique fragment files avoid Git conflicts and are parsed into a generated view. |
 | [`actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294`, action.yml](https://github.com/actions/dependency-review-action/blob/a1d282b36b6f3519aa1f3fc636f609c47dddb294/action.yml#L25) | Explicit base/head refs outside PR events. |
@@ -60,16 +64,22 @@ server-side merge driver or new service is installed by this proposal.
 Only a source explicitly declaring
 `"file_records": "manifests/evidence-files"` opts into the reference format.
 The existing `files[]` becomes a frozen seed; this avoids a 12,000-file
-migration. An update to `evidence/example.json` writes
-`manifests/evidence-files/evidence/example.json.json`, containing schema version
-1 and the complete `record`. An explicit `remove` tombstone at the same path
+migration. For an update to `evidence/example.json`, SHA-256 of the UTF-8 path
+selects `manifests/evidence-files/<first-two-hex>/<remaining-62-hex>.json`,
+containing schema version 1 and the complete `record`, including its artifact
+path. Every record has the same directory depth and bounded filename length;
+artifact names cannot become record-directory prefixes. This supersedes the
+unactivated path-plus-`.json` proposal after the collision regression below.
+An explicit `remove` tombstone at the same path
 represents deletion. Two writers for the same evidence item therefore meet at
 the same Git path instead of producing two competing identities.
 
 `scripts/evidence_manifest.py` provides the strict assembly boundary:
 
 - `load` reads the explicitly enabled seed and records; `load_at` assembles a
-  named Git tree without borrowing files from the current checkout.
+  named Git tree without borrowing files from the current checkout. Its explicit
+  historical mode retains independently valid registrations when a sibling is
+  malformed; default/current reads remain strict.
 - `write_record` and `remove_record` update one deterministic record path.
   Registration retains `publication_review` and unknown authored fields while
   deliberately updating only the artifact's expected hash and byte count.
@@ -82,8 +92,12 @@ the same Git path instead of producing two competing identities.
 `host_receipts.register_file` keeps its legacy writer unless the source has the
 explicit marker. The reference historical validator additionally requires
 `validate_registration_rows(..., record_fragments=True)`. Production callers
-do not pass that option. The normal `Validator.load` remains a raw JSON reader;
-no production reader silently changes format in this PR. The new helper is
+do not pass that option. The normal `Validator.load` remains a raw JSON reader.
+Production validation rejects any root `file_records` key, including null,
+and any publication under `manifests/evidence-files/`, whether hash-listed or
+unregistered. The existing Git/archive publication enumerator supplies that
+boundary. Root activation therefore requires a separate reviewed change.
+The new helper is
 added to the verdict gate's derived trust-code list because it is reachable
 from existing modules, without changing the sealed-data reading contract.
 
@@ -96,12 +110,31 @@ from existing modules, without changing the sealed-data reading contract.
 | Malformed fragment with bad hash/boolean byte count | Normalizer checked only the seed and returned 0 | Checker returns 1 |
 | Legacy writer without marker | Existing shared-array format | Byte-exact legacy output retained; no record directory created |
 
-The focused suite currently passes **43 tests** across
+The initial focused suite passed **43 tests** across
 `tests.test_evidence_manifest` and `tests.test_registry_rows`. It also covers
 current-versus-historical tree isolation and a tombstone that cannot hide a
 still-tracked artifact. These are synthetic/local integration results, not
 hosted queue outcomes. The native conflict fixture failed before the format
 change; hashes are never recomputed by validation to make tampering pass.
+
+The review fold on `bf665ec698f9121b4c8e075804c259c57fd4f7b8` adds four fail-first
+regressions. With only those tests added, the pinned implementation produced
+**8 failing assertions/subtests in 4 tests** (exit 1, 0.398 seconds):
+
+| Correction | RED at the reviewed head | GREEN behavior |
+| --- | --- | --- |
+| Historical registration continuity | A valid `docs/keep.md` registration beside a malformed sibling disappeared from history; deleting both fragments was accepted | The missing valid registration is rejected; restoring it passes while the malformed sibling creates no registration obligation; current malformed input still fails |
+| Record naming | `evidence/a` and `evidence/a.json/b` collided as a record file and directory | Both register and load through native Git; a 255-byte artifact filename also works; the shared seed is unchanged |
+| Fragment diagnostics | Invalid JSON and invalid record metadata named the seed manifest | Both errors identify the actual fragment source |
+| Legacy root boundary | The root marker, null marker and registered/unregistered record-tree files were accepted | Production validation rejects all four cases; ordinary legacy fixtures pass |
+
+All four regressions pass after the fold (0.525 seconds). The broader
+manifest, registry, host-receipt, validator and verdict suite passes **492
+tests**, no skips, in **40.941 seconds**. Native advisory derivation remains
+**359 sites**, with identical script and shape counts; historical monitoring
+snapshots remain unchanged. The commands, source pins and observations are
+retained in `registry-reference-probes.json`. The path digest selects only a
+record filename; it does not replace or recompute recorded artifact hashes.
 
 The first evaluation CI run, **38755360119**, failed two OpenHands advisory
 baseline checks in `validate-shard-3` (job **116492228275**). Both failures were

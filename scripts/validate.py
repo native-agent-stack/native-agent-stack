@@ -525,6 +525,8 @@ class Validator:
         artifact_roots = {("evidence", "artifacts"), ("blueprints", "convergence-practice")}
         for name in self.publication_paths(files):
             relative = PurePosixPath(name)
+            if relative.parts[:2] == ("manifests", "evidence-files"):
+                self.error(f"{relative}: root evidence registry must remain legacy; record files are not enabled")
             if relative.parts[:2] in {("evidence", "receipts"), ("evidence", "artifacts")} and name not in files:
                 self.error(f"{relative}: evidence file is not hash-listed")
             path = self.path(name, name)
@@ -569,6 +571,8 @@ class Validator:
     def validate(self) -> dict[str, int]:
         stack = self.load("manifests/stack.json")
         evidence = self.load("manifests/evidence.json")
+        if "file_records" in evidence:
+            self.error("manifests/evidence.json: file_records is not enabled; root registry must remain legacy")
         components = self.records(stack.get("components"), "components")
         profiles = self.records(stack.get("profiles"), "profiles")
         receipts = self.records(evidence.get("receipts"), "receipts")
@@ -743,7 +747,7 @@ def validate_registration_rows(root: Path, base_ref: str, *, before_ref: str | N
     def rows(ref, *, historical=False):
         try:
             if record_fragments:
-                document = evidence_manifest.load_at(root, ref, git=git)
+                document = evidence_manifest.load_at(root, ref, git=git, historical=historical)
             else:
                 document = json.loads(git("show", ref + ":manifests/evidence.json"),
                                       object_pairs_hook=_json_without_duplicates)

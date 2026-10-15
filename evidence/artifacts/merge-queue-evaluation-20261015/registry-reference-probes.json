@@ -53,5 +53,79 @@
     "Hosted merge-queue behavior of the proposed registry format.",
     "Production reader/writer migration or root activation.",
     "Population conflict or ejection rate, multi-entry throughput or stable CI speedup."
-  ]
+  ],
+  "review_fold": {
+    "date": "2026-10-15",
+    "source_revision_before": "bf665ec698f9121b4c8e075804c259c57fd4f7b8",
+    "scope": "Four requested review corrections; production root remains legacy.",
+    "red_command": "python3 -m unittest tests.test_evidence_manifest.EvidenceRegistrationMergeTests.test_malformed_sibling_cannot_erase_valid_historical_registration tests.test_evidence_manifest.EvidenceRegistrationMergeTests.test_valid_artifact_paths_cannot_collide_as_record_file_and_directory tests.test_evidence_manifest.EvidenceRegistrationMergeTests.test_bad_fragment_diagnostic_identifies_its_own_source_file tests.test_evidence_manifest.EvidenceRegistrationMergeTests.test_production_validator_keeps_the_root_registry_legacy -q",
+    "red_source": "Only these tests were added to the reviewed head; implementation files were unchanged for RED.",
+    "red_exit": 1,
+    "red_tests": 4,
+    "red_failures_including_subtests": 8,
+    "red_seconds": 0.398,
+    "red_observations": {
+      "test_malformed_sibling_cannot_erase_valid_historical_registration": "InvalidPublication was not raised after deleting valid and malformed sibling fragments while keeping both documents tracked.",
+      "test_valid_artifact_paths_cannot_collide_as_record_file_and_directory": "register_file raised FileExistsError because the first record occupied the second record directory.",
+      "test_bad_fragment_diagnostic_identifies_its_own_source_file": "Both invalid JSON and invalid metadata errors named manifests/evidence.json rather than the fragment.",
+      "test_production_validator_keeps_the_root_registry_legacy": "Marker, null marker, unregistered record file and registered record file were accepted by production validation."
+    },
+    "green_command": "python3 -m unittest tests.test_evidence_manifest.EvidenceRegistrationMergeTests.test_malformed_sibling_cannot_erase_valid_historical_registration tests.test_evidence_manifest.EvidenceRegistrationMergeTests.test_valid_artifact_paths_cannot_collide_as_record_file_and_directory tests.test_evidence_manifest.EvidenceRegistrationMergeTests.test_bad_fragment_diagnostic_identifies_its_own_source_file tests.test_evidence_manifest.EvidenceRegistrationMergeTests.test_production_validator_keeps_the_root_registry_legacy -q",
+    "green_exit": 0,
+    "green_tests": 4,
+    "green_skips": 0,
+    "green_seconds": 0.525,
+    "broader_green_command": "python3 -m unittest tests.test_evidence_manifest tests.test_registry_rows tests.test_host_receipts tests.test_validate tests.test_verdict_review_gate -q",
+    "broader_green_exit": 0,
+    "broader_green_tests": 492,
+    "broader_green_skips": 0,
+    "broader_green_seconds": 40.941,
+    "native_monitoring_comparison": {
+      "method": "Native GitTree at source_revision_before compared with the same tree overlaid with the three changed implementation/test files; derive_ci_protected on both.",
+      "before_count": 359,
+      "after_count": 359,
+      "added_by_script": {},
+      "removed_by_script": {},
+      "added_shapes": [],
+      "removed_shapes": [],
+      "historical_snapshots": "unchanged"
+    },
+    "mechanism_sources": [
+      {
+        "mechanism": "Retain independently valid historical rows; keep current input strict.",
+        "repository": "native-agent-stack/native-agent-stack",
+        "pin": "bf665ec698f9121b4c8e075804c259c57fd4f7b8",
+        "path": "scripts/validate.py",
+        "lines": "747-771"
+      },
+      {
+        "mechanism": "Fixed-depth digest fanout avoids file/directory prefix collisions and bounds filename length.",
+        "repository": "git/git",
+        "pin": "67ad42147a7acc2af6074753ebd03d904476118f",
+        "path": "Documentation/gitrepository-layout.adoc",
+        "lines": "55-61"
+      },
+      {
+        "mechanism": "Hash UTF-8 path identity with the standard SHA-256 constructor; render hexadecimal filename components.",
+        "repository": "python/cpython",
+        "pin": "cbc944f4bc59639a444dd971c737788ba2283a91",
+        "path": "Doc/library/hashlib.rst",
+        "lines": "40-46,217-221"
+      },
+      {
+        "mechanism": "Identify the failing source file at its loader boundary.",
+        "repository": "native-agent-stack/native-agent-stack",
+        "pin": "bf665ec698f9121b4c8e075804c259c57fd4f7b8",
+        "path": "scripts/validate.py",
+        "lines": "415-429"
+      },
+      {
+        "mechanism": "Enforce the explicit legacy-root contract through the existing publication enumeration.",
+        "repository": "native-agent-stack/native-agent-stack",
+        "pin": "bf665ec698f9121b4c8e075804c259c57fd4f7b8",
+        "path": "scripts/evidence_manifest.py:14-17; scripts/validate.py:449-502"
+      }
+    ],
+    "accessed": "2026-10-15"
+  }
 }
