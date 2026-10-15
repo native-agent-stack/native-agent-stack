@@ -16,6 +16,8 @@ import stat
 import subprocess
 import sys
 import tempfile
+import threading
+import time
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -357,6 +359,48 @@ class Relaunch(Fixture):
         self.run_relaunch(at=NOW + dt.timedelta(minutes=5))
         self.assertEqual(len(self.ps_calls()), 3)
         self.assertEqual((self.state()["status"], set(self.outcomes().values())), ("complete", {"running"}))
+
+    def test_a_timer_snapshot_never_overwrites_the_seed_roster_of_a_starting_relaunch(self):
+        # Local review P2 at 7aad5a02 (:496; the seed roster write at c8d7fa9e :512): a timer snapshot that read its
+        # carry before the relaunch saved its state, and wrote after the seed, replaced the seed with the live list only.
+        # The snapshot holds a pause between its carry read and its roster write; the relaunch starts inside that pause.
+        self.crash_roster()
+        paused, real_carry = threading.Event(), R.carried_rows
+
+        def slow_carry(config, boot_id, live):
+            rows = real_carry(config, boot_id, live)
+            paused.set()
+            time.sleep(1.0)
+            return rows
+
+        with mock.patch.object(R, "carried_rows", side_effect=slow_carry), \
+                mock.patch.object(R, "current_boot_id", return_value=THIS):
+            results = []
+            timer = threading.Thread(target=lambda: results.append(
+                R.main(["snapshot", "--config", str(self.tmp / "config.json")])))
+            timer.start()
+            self.assertTrue(paused.wait(10))
+            self.run_relaunch()
+            timer.join(10)
+        self.assertEqual(results, [0])  # the snapshot ran to its end (a thread error would leave this empty)
+        seeded = json.loads((R.roster_dir(self.config) / f"roster-{THIS}.json").read_text())
+        self.assertLessEqual({"wsl-architecture-design", "trading-cc", "ns2604-coop"},
+                             {row["name"] for row in seeded["sessions"]})
+
+    def test_a_partial_relaunch_keeps_its_unfinished_rows_in_this_boots_roster(self):
+        # Local review P2 at 7aad5a02 (:222; carried_rows at c8d7fa9e :221-223): only an in_progress state carried its
+        # rows, so the first snapshot after a partial run kept the live sessions only, and a second crash lost the lanes
+        # the relaunch had not brought back. A partial state of this boot carries them too.
+        self.crash_roster()
+        os.environ["FAKE_PS_RC"] = "1"
+        self.run_relaunch()
+        self.assertEqual(self.state()["status"], "partial")
+        self.agents.write_text(json.dumps([row("trading-cc", "s-by-hand")]))
+        self.assertEqual(self.main("snapshot", boot=THIS), 0)
+        roster = json.loads((R.roster_dir(self.config) / f"roster-{THIS}.json").read_text())
+        names = [r["name"] for r in roster["sessions"]]
+        self.assertEqual(names.count("trading-cc"), 1)  # live, not carried a second time
+        self.assertLessEqual({"wsl-architecture-design", "ns2604-coop", "trading-cc"}, set(names))
 
     def test_a_crash_before_the_first_minute_snapshot_is_recovered_by_the_next_boot(self):
         self.crash_roster()

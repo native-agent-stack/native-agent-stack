@@ -110,9 +110,13 @@ Every relaunch run, the unit's or a direct one, holds an exclusive lock on `rela
 (`fcntl.flock`). A run that finds it held is refused with exit 1 and writes and opens nothing, so a direct `--reopen` run
 never overlaps the unit's run.
 
-At its start a run writes this boot's roster as the live sessions plus the ended boot's rows not running yet, and the
-minute snapshot keeps carrying those rows while the run is `in_progress`. A second crash before the timer's first
-snapshot (90 s after boot) therefore still leaves every session to the next boot.
+At its start a run saves its state, then writes this boot's roster as the live sessions plus the ended boot's rows not
+running yet. The minute snapshot keeps carrying those rows, minus the ones listed live, while the run is `in_progress`
+and after it ends `partial`, so a second crash leaves every session the relaunch has not brought back to the next boot.
+A second crash before the timer's first snapshot (90 s after boot) finds the run's own roster. The snapshot holds an
+exclusive lock on `roster.lock` in the state directory (`fcntl.flock`) from its carry read to its roster write, and a
+run holds it while it saves its state and writes that roster, so a snapshot never replaces it with a carry read before
+the state existed. Both hold it briefly; `relaunch.lock` is the run's own lock.
 
 The service's `TimeoutStartSec=900` bounds one run. A run stopped by it stays `in_progress` and is rerun as above; a
 call it stopped is left `in_flight`, so the rerun records that session as `uncertain` and does not open it.

@@ -22,6 +22,7 @@ supervisor's service install is disabled at 2.1.299 (README.md, Sources). The to
 from __future__ import annotations
 
 import argparse
+import contextlib
 import datetime as dt
 import fcntl
 import hashlib
@@ -156,6 +157,26 @@ def cmd_snapshot(config: dict, *, boot_id: str, sessions: list[dict], at: dt.dat
     return target
 
 
+@contextlib.contextmanager
+def roster_lock(config: dict):
+    """An exclusive lock on roster.lock in the state directory (flock(2), released when the descriptor closes), held by
+    the timer's snapshot from its carry read to its roster write and by a relaunch while it saves its state and writes
+    the seed roster, so a snapshot never writes a carry read before that state over the seed. Both holders are short;
+    the relaunch's own run lock (relaunch.lock) is a different lock, held for the whole run."""
+    fd = os.open(state_dir(config) / "roster.lock", os.O_RDWR | os.O_CREAT, 0o600)
+    try:
+        fcntl.flock(fd, fcntl.LOCK_EX)
+        yield
+    finally:
+        os.close(fd)
+
+
+def snapshot_live(config: dict, *, boot_id: str, sessions: list[dict], at: dt.datetime) -> Path:
+    """The timer's snapshot: the live sessions plus the rows a relaunch of this boot still carries, under roster_lock."""
+    with roster_lock(config):
+        return cmd_snapshot(config, boot_id=boot_id, sessions=sessions + carried_rows(config, boot_id, sessions), at=at)
+
+
 def previous_roster(config: dict, boot_id: str) -> dict | None:
     """The newest roster written in another boot than this one (by its own written_at)."""
     best = None
@@ -223,12 +244,13 @@ def recent_relaunches(config: dict, at: dt.datetime) -> int:
 
 
 def carried_rows(config: dict, boot_id: str, live: list[dict]) -> list[dict]:
-    """The earlier boot's rows that a relaunch running in this boot has not brought back yet (not listed live), so a
-    second crash before the relaunch ends still finds them in this boot's roster."""
+    """The earlier boot's rows that a relaunch in this boot has not brought back yet (not listed live), while it runs
+    or after it ended partial, so a second crash still finds them in this boot's roster and the next boot relaunches
+    them."""
     names = {row.get("name") for row in live}
     carried = []
     for doc in relaunch_states(config):
-        if doc.get("status") == "in_progress" and doc.get("boot") == boot_id:
+        if doc.get("status") in ("in_progress", "partial") and doc.get("boot") == boot_id:
             carried += [row for row in doc.get("carry") or [] if row.get("name") not in names]
     return carried
 
@@ -518,10 +540,7 @@ def locked_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[
         write_atomic(handoff, text, mode=0o400)
         state = {"prev_boot": prev_boot, "handoff": str(handoff), "handoff_sha256": hashlib.sha256(text.encode()).hexdigest(),
                  "runs": [], "sessions": []}
-    # This boot's roster at once: the live sessions and the earlier boot's rows not running yet, so a crash before the
-    # timer's first snapshot still leaves them to the next boot; the timer carries them while this run is in progress.
     carry = [row for row in decided["prev"].get("sessions") or [] if row.get("name") not in alive]
-    cmd_snapshot(config, boot_id=boot_id, sessions=alive_rows + carry, at=at)
     earlier = {entry["session_name"]: entry for entry in state.get("sessions") or []}
     sessions, profiles, reopened = [], {}, []
     for row, profile in decided["launch"]:
@@ -544,7 +563,12 @@ def locked_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[
     state["runs"].append({"boot": boot_id, "started_at": iso(at), **({"reopened": reopened} if reopened else {})})
     state_path = marker(config, "relaunch", prev_boot)
     save = lambda: write_atomic(state_path, json.dumps(state, indent=1) + "\n")
-    save()
+    # The state first, then this boot's roster at once (the live sessions and the earlier boot's rows not running yet),
+    # both under roster_lock: a crash before the timer's first snapshot still leaves the rows to the next boot, the
+    # timer carries them from the saved state, and no snapshot interleaves with the two writes.
+    with roster_lock(config):
+        save()
+        cmd_snapshot(config, boot_id=boot_id, sessions=alive_rows + carry, at=at)
     handoff = Path(state["handoff"])
     for index, entry in enumerate(e for e in sessions if e["outcome"] == "pending"):
         if index:
@@ -592,7 +616,7 @@ def main(argv: list[str] | None = None) -> int:
         if sessions is None:
             print("session_relaunch: the last good roster stays as it is", file=sys.stderr)
             return 1
-        print(cmd_snapshot(config, boot_id=boot_id, sessions=sessions + carried_rows(config, boot_id, sessions), at=at))
+        print(snapshot_live(config, boot_id=boot_id, sessions=sessions, at=at))
     elif args.command == "plan-restart":
         target = marker(config, "planned", boot_id)
         state_dir(config)
