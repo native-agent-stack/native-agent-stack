@@ -66,8 +66,34 @@ CC_NOW = {"schema": "cc-now/1", "updated_utc": "2099-01-01T00:00:00Z",
           "api_credit": {"routing": "fixture routing text", "read_utc": "2099-01-01T00:00:00Z"}}
 ROWS_OLD = "| layer | state | winner | closes by | F1 receipt worker |\n|---|---|---|---|---|\n| foundation/alpha | reopened | tool-a | OLD ACTION | lane x |\n"
 ROWS_NEW = "| layer | state | winner | closes by | F1 receipt worker |\n|---|---|---|---|---|\n| foundation/alpha | reopened | tool-a | fixture next action | lane y |\n| us-equities/gamma | reopened | tool-d | gamma action | lane z |\n"
-WS2 = ("# Fixture convergence\n\n## Converged\n\n| # | Signal (feed we hold) | Leads or lags |\n|---|---|---|\n| 1 | fixture signal one | leads |\n| 2 | fixture signal two | lags |\n\n"
-       "## Next, by readiness trigger\n1. When fixture A holds: step one.\n2. Now: step two\n   continued.\n")
+# Synthetic records in the shape of the WS2 and WS5 convergence records; each carries a path, a digest, a
+# line reference or a declared drop term that the projection must withhold.
+WS2 = ("# Fixture convergence\n\n## Inputs\n- Fixture packet /var/tmp/fixture/packet (SHA256SUMS abc1234d...).\n\n"
+       "## Converged by both judges (fixture note)\n"
+       "1. **Every fixture list lags by construction.** Lists are a baseline that fixture signals must beat. The list\n"
+       "   comes from /var/tmp/fixture/lists.json.\n"
+       "2. **Fixture replay needs capture.** Ranks cannot be replayed.\n"
+       "3. **The early fixture candidates cost $0.** Each is a separate fixture detector:\n\n"
+       "| # | Signal (feed we hold) | Leads or lags | Replay | False-alarm profile |\n|---|---|---|---|---|\n"
+       "| 1 | fixture signal one | leads by fixture | see /var/tmp/fixture/replay.md | few fixture flags |\n"
+       "| 2 | fixture signal two | lags. Measured in probe.py beef1234:12-14. | Derive | noisy fixture |\n\n"
+       "4. **Lagging or conditioning only, not entry rows:** fixture pause; fixture prints.\n"
+       "5. **Paid and conditional; no purchase until a measured gap justifies it:**\n   - Fixture vendor A: $1 a month.\n   - Fixture vendor B: no API.\n\n"
+       "## First-hand live stack: what we hold, and the gaps\n- **Held:** fixture feeds.\n"
+       "- **Gap 1, the fixture connection allowance.** Measured on paper-x, which shares a slot. A whole-fixture capture\n"
+       "  needs its own connection. Its capacity is unmeasured.\n- **Gap 2:** fixture entitlement checks (above).\n\n"
+       "## Next, by readiness trigger\n1. When fixture A holds: step one.\n")
+WS5 = ("# Fixture shortlist\n\n## Inputs\n1. **The one input shortlist family is not this.** input\n\n## Converged by both judges\n"
+       "1. **The one strict shortlist family is the fixture breakout on the top fixture names,**\n   from doi:10.0000/fixture.\n"
+       "   - Source rules:\n     - Fixture rule one.\n"
+       "   - Source result: fixture stocks, 2001-2002. Top 5 returned 10% net; commission was $0.01/share. There was **no sealed\n"
+       "     out-of-sample test and no fixture slippage model.** The fixture recreation covers 2001 only, inside the sample.\n"
+       "     Kept at /var/tmp/fixture/result.md.\n"
+       "2. **Fixture selector inside the breakout.** Detail.\n"
+       "3. **The other fixture templates lack results:**\n   - Fixture template X: none.\n"
+       "   They enter only as on/off ablations of the fixture row:\n   - fixture filter one;\n   - a fixture gate (see cafe1234).\n"
+       "4. **Selector and sizing (fixture):**\n   - eligibility before fixture ranking;\n   - at most 2 fixture names, an account-level setting.\n\n"
+       "## Disputed\n1. **Not this either.**\n")
 
 
 class Fixture:
@@ -78,9 +104,10 @@ class Fixture:
             "catalogs/landscape/foundation.json": {"layers": [{"layer_id": "alpha", "title": "Alpha layer"}, {"layer_id": "beta", "title": "Beta layer"}]},
             "catalogs/landscape/us-equities.json": {"layers": [{"layer_id": "gamma", "title": "Gamma layer"}]},
             "catalogs/landscape/component-evidence-matrix.json": matrix_doc or matrix(),
-            "manifests/evidence.json": {"receipts": [{"path": "evidence/receipts/tool-a-smoke-20990101.json", "component_ids": ["codex"]},
-                                                     {"path": "evidence/receipts/tool-a-smoke-20990305.json", "component_ids": ["codex", "claude-code"]},
-                                                     {"path": "evidence/receipts/other-20991231.json", "component_ids": ["other"]}]},
+            "manifests/evidence.json": {"receipts": [{"path": "evidence/receipts/tool-a-smoke-20990101.json", "kind": "native_cli_e2e", "component_ids": ["codex"]},
+                                                     {"path": "evidence/receipts/tool-a-smoke-20990305.json", "kind": "native_model_e2e", "component_ids": ["codex", "claude-code"]},
+                                                     {"path": "docs/decisions/index-20991231.json", "kind": "historical_inventory", "component_ids": ["codex", "claude-code"]},
+                                                     {"path": "evidence/receipts/other-20991231.json", "kind": "native_cli_e2e", "component_ids": ["other"]}]},
             "notes/runtime-profiles-20261012/receipts/qualification.json": {"status": "trial", "tool_read_utc": "2099-01-02T00:00:00Z"},
         }
         for relative, document in files.items():
@@ -147,6 +174,8 @@ class GeneratedFactsTests(OverviewCase):
         self.assertEqual(result["finalized"], 1)
         self.assertIn("1 of 3 catalog layers are final under the resolution protocol.", html)
         self.assertEqual(html.count("mf-cell-mini mf-s-built"), 3)  # one cell in each of the three figure variants
+        repos = html[html.index('id="ov-repos"'):html.index('id="overview-evidence"')]
+        self.assertEqual(repos.count('<th scope="col">State</th>'), 1)  # the foundation group's states differ, so only it keeps the column
 
     def test_register_rows_join_run_pins_survivors_and_the_newest_rows_record(self):
         fixture = Fixture(self.base)
@@ -160,6 +189,11 @@ class GeneratedFactsTests(OverviewCase):
         self.assertFalse(rows["us-equities/planned-delta"]["in_catalog"])
         self.assertEqual(data["repos"]["rows_record"], "ROWS-bbbb2222.md")
         _, html = fixture.build(self.base)
+        # One state shared by a group's catalog layers is said once; the planned row carries its own status.
+        self.assertIn("2 catalog layers, all not terminal.", html)
+        self.assertIn("1 catalog layer, not terminal.", html)
+        self.assertIn("planned, outside the catalog file; unswept", html)
+        self.assertNotIn('<th scope="col">State</th>', html[html.index('id="ov-repos"'):html.index('id="overview-evidence"')])
         self.assertNotIn("OLD ACTION", html)
         self.assertIn('href="architecture-foundation.html#layer-foundation-alpha"', html)
         self.assertIn(f'<code title="{"a" * 40}">{"a" * 12}</code>', html)
@@ -178,6 +212,7 @@ class GeneratedFactsTests(OverviewCase):
         _, html = fixture.build(self.base)
         self.assertEqual(html.count("No receipt source yet"), 3)
         self.assertEqual(html.count("No state source yet"), 2)
+        self.assertNotIn("index-20991231", html)  # an inventory is not an execution receipt
 
 
 class PendingTests(OverviewCase):
@@ -193,31 +228,62 @@ class PendingTests(OverviewCase):
         self.assertIn("CONVERGENCE-WS5-*.md", html)
         self.assertNotIn("Traceback", html)
 
-    def test_a_present_convergence_record_renders_its_table_and_next_steps(self):
+    def test_the_ws2_record_renders_as_a_sanitized_projection(self):
         fixture = Fixture(self.base)
+        data = DATA.model(fixture.root, fixture.state, commit="0" * 40)["feeds"]
+        self.assertEqual(data["caption"], "The early fixture candidates cost $0.")
+        self.assertEqual(data["table"]["header"], ["#", "Signal (feed we hold)", "Leads or lags", "Replay", "False-alarm profile"])
+        self.assertEqual(data["table"]["rows"], [["1", "fixture signal one", "leads by fixture", None, "few fixture flags"],
+                                                 ["2", "fixture signal two", "lags.", "Derive", "noisy fixture"]])
+        self.assertEqual(data["points"]["baseline"], {"lead": "Every fixture list lags by construction.", "sentences": ["Lists are a baseline that fixture signals must beat."], "rows": []})
+        self.assertEqual(data["points"]["lagging"]["sentences"], ["fixture pause; fixture prints."])
+        self.assertEqual(data["points"]["gated"], {"lead": "Paid and conditional; no purchase until a measured gap justifies it", "sentences": [],
+                                                   "rows": ["Fixture vendor A: $1 a month", "Fixture vendor B: no API"]})
+        self.assertEqual(data["gaps"], [{"name": "The fixture connection allowance", "sentences": ["A whole-fixture capture needs its own connection.", "Its capacity is unmeasured."]},
+                                        {"name": "Fixture entitlement checks", "sentences": []}])
         _, html = fixture.build(self.base)
-        self.assertIn("fixture signal two", html)
-        self.assertIn("Signal (feed we hold)", html)
-        self.assertIn("Now: step two continued.", html)
-        self.assertIn("CONVERGENCE-WS2-20990101.md", html)
+        section = html[html.index('id="ov-feeds"'):html.index('id="ov-strategies"')]
+        source_map = json.loads((HERE / "overview_sources.json").read_text())["sources"]
+        for text in ("No measured winner yet.", source_map["feeds_battery"]["trigger"], "<code>CONVERGENCE-WS2-20990101.md</code> (private record, cited by name)",
+                     "Withheld: it cites a path, digest or line", "<li><strong>Fixture entitlement checks.</strong></li>"):
+            self.assertIn(text, section)
+        for text in ("/var/tmp/fixture", "abc1234d", "beef1234", "probe.py", "paper-x", "(above)", "step one", "Every row is a test candidate"):
+            self.assertNotIn(text, section)
 
-
-    def test_a_list_only_shortlist_renders_each_items_bold_lead_under_the_records_heading(self):
+    def test_the_ws5_record_renders_the_family_caveats_ablations_and_sizing(self):
         fixture = Fixture(self.base)
-        record = ("# Fixture shortlist\n\n## Inputs\n1. **Not this.** input\n\n## Converged by both judges\n"
-                  "1. **Lead one.** long detail\n   - nested detail\n2. **Lead two:** more detail\n3. An item without a lead\n\n## Disputed\n1. **Not this either.**\n")
         path = fixture.state / f"{STATE_DIR}/extreme-mover-strategies-20261014/CONVERGENCE-WS5-20990101.md"
         path.parent.mkdir(parents=True)
-        path.write_text(record)
+        path.write_text(WS5)
+        data = DATA.model(fixture.root, fixture.state, commit="0" * 40)["strategies"]
+        self.assertEqual(data["family"], {"lead": "The one strict shortlist family is the fixture breakout on the top fixture names",
+                                          "caveats": ["Commission was $0.01/share.", "There was no sealed out-of-sample test and no fixture slippage model.",
+                                                      "The fixture recreation covers 2001 only, inside the sample."]})
+        self.assertEqual(data["ablations"], {"lead": "The other fixture templates lack results", "intro": "They enter only as on/off ablations of the fixture row:",
+                                             "rows": ["Fixture filter one"]})
+        self.assertEqual(data["sizing"], {"lead": "Selector and sizing (fixture)", "rows": ["Eligibility before fixture ranking"]})
         result, html = fixture.build(self.base)
         self.assertIn("strategies_convergence", result["present"])
         section = html[html.index('id="ov-strategies"'):html.index('id="ov-workers"')]
-        self.assertIn("<h3>Converged by both judges</h3>", section)
-        for text in ("<li>Lead one.</li>", "<li>Lead two</li>", "<li>An item without a lead</li>"):
+        for text in ("No live result; replication next.", "<h3>Evidence caveats</h3>", "<h3>Ablations</h3>", "<h3>Selector and sizing (fixture)</h3>",
+                     "<code>CONVERGENCE-WS5-20990101.md</code> (private record, cited by name)"):
             self.assertIn(text, section)
-        for text in ("long detail", "nested detail", "Not this"):
+        for text in ("doi:10.0000", "/var/tmp/fixture", "cafe1234", "account-level", "not this"):
             self.assertNotIn(text, section)
-        self.assertEqual(DATA.md_list(record, "Converged", lead=True), ("Converged by both judges", ["Lead one.", "Lead two", "An item without a lead"]))
+
+    def test_a_present_result_record_replaces_the_plain_statement(self):
+        fixture = Fixture(self.base)
+        for relative in ("ranked-feeds-20261014/BATTERY-WS2-20990102.md", "extreme-mover-strategies-20261014/REPLICATION-WS5-20990102.md",
+                         "extreme-mover-strategies-20261014/CONVERGENCE-WS5-20990101.md"):
+            path = fixture.state / STATE_DIR / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(WS5 if "CONVERGENCE" in relative else "# fixture result\n")
+        result, html = fixture.build(self.base)
+        self.assertIn("feeds_battery", result["present"])
+        self.assertIn("Measured battery result: <code>BATTERY-WS2-20990102.md</code> (private record, cited by name).", html)
+        self.assertIn("Replication record: <code>REPLICATION-WS5-20990102.md</code> (private record, cited by name).", html)
+        for text in ("No measured winner yet.", "No live result; replication next."):
+            self.assertNotIn(text, html)
 
 
     def test_a_present_claude_code_record_shows_its_pin_and_both_tables(self):
@@ -244,6 +310,7 @@ class QueueTests(OverviewCase):
         self.assertIn("From <code>cc-now.json</code> (private record, cited by name), updated 2099-01-01T00:00:00Z.", html)
         self.assertIn("Landing queue (2)", html)
         self.assertIn("the command center adds a main_ci entry to its current view", html)
+        self.assertNotIn("<dt>Record</dt>", html[html.index('id="ov-github"'):])  # the section line already names cc-now.json
 
     def test_a_published_main_ci_entry_replaces_the_pending_block(self):
         cc_now = copy.deepcopy(CC_NOW)
@@ -328,12 +395,20 @@ class SourceMapPolicyTests(unittest.TestCase):
 class MarkdownTests(unittest.TestCase):
     def test_tables_match_a_column_by_name_or_prefix_and_keep_their_heading(self):
         table = DATA.table_with_column(WS2, "Signal")
-        self.assertEqual(table["header"], ["#", "Signal (feed we hold)", "Leads or lags"])
-        self.assertEqual(table["heading"], "Converged")
+        self.assertEqual(table["header"][:3], ["#", "Signal (feed we hold)", "Leads or lags"])
+        self.assertEqual(table["heading"], "Converged by both judges (fixture note)")
         self.assertEqual(len(table["rows"]), 2)
         self.assertIsNone(DATA.table_with_column(WS2, "Strategy"))
-        self.assertEqual(DATA.md_items(WS2, "Next"), ["When fixture A holds: step one.", "Now: step two continued."])
         self.assertEqual(DATA.plain("**bold** `code` [label](https://example.invalid)"), "bold code label")
+
+    def test_points_keep_their_leads_and_sentences_drop_paths_digests_lines_and_labels(self):
+        heading, points = DATA.md_points(WS2, "Converged")
+        self.assertEqual(heading, "Converged by both judges (fixture note)")
+        self.assertEqual([point["lead"] for point in points], ["Every fixture list lags by construction.", "Fixture replay needs capture.", "The early fixture candidates cost $0.",
+                                                             "Lagging or conditioning only, not entry rows", "Paid and conditional; no purchase until a measured gap justifies it"])
+        self.assertEqual([point["has_table"] for point in points], [False, False, True, False, False])
+        text = "Kept. See /var/tmp/x/y.md for it. Digest abc1234f here. A probe.py:12 line. Named paper-z slot. Plain end (above)."
+        self.assertEqual(DATA.sentences(text, ["paper"]), ["Kept.", "Plain end."])
 
 
 class ComposerTests(unittest.TestCase):

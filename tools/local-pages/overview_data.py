@@ -155,39 +155,135 @@ def md_tables(text: str) -> list[dict]:
     return tables
 
 
-def md_list(text: str, heading_contains: str, *, lead: bool = False) -> tuple[str | None, list[str]]:
-    """The first heading whose text contains the key, and its numbered items up to the next heading.
+_BULLET = re.compile(r"^(\s*)[-*+]\s+(.*)$")
+_BOLD_LEAD = re.compile(r"^\*\*(.+?)\*\*\s*(.*)$")
 
-    With lead, an item that opens with a bold span keeps only that span (the item's claim), and
-    its continuation lines are dropped.
-    """
-    heading, items, inside, key, raw = None, [], False, heading_contains.casefold(), []
+
+def md_section(text: str, heading_contains: str) -> tuple[str | None, list[str]]:
+    """The first heading whose text contains the key, and its lines up to the next heading."""
+    heading, lines, key = None, [], heading_contains.casefold()
     for line in text.splitlines():
         match = _HEADING.match(line)
         if match:
-            if inside:
+            if heading is not None:
                 break
-            inside = key in plain(match.group(2)).casefold()
-            heading = plain(match.group(2)) if inside else heading
+            if key in plain(match.group(2)).casefold():
+                heading = plain(match.group(2))
             continue
-        if not inside:
+        if heading is not None:
+            lines.append(line)
+    return heading, lines
+
+
+def outline(lines: list[str]) -> dict:
+    """Nested bullets as a tree of nodes, each with its text and blocks (a text run or a list of nodes).
+
+    A line indented deeper than a bullet's marker continues that bullet; a line at or left of the
+    marker closes it. Blank lines and table lines are skipped; md_tables reads the tables.
+    """
+    root = {"text": "", "blocks": [], "indent": -1}
+    stack = [root]
+    for line in lines:
+        if not line.strip() or line.lstrip().startswith("|"):
             continue
+        indent = len(line) - len(line.lstrip())
+        while len(stack) > 1 and indent <= stack[-1]["indent"]:
+            stack.pop()
+        node, bullet = stack[-1], _BULLET.match(line)
+        if bullet:
+            child = {"text": bullet.group(2).strip(), "blocks": [], "indent": indent}
+            if not node["blocks"] or node["blocks"][-1][0] != "list":
+                node["blocks"].append(("list", []))
+            node["blocks"][-1][1].append(child)
+            stack.append(child)
+        elif not node["blocks"]:
+            node["text"] = (node["text"] + " " + line.strip()).strip()
+        elif node["blocks"][-1][0] == "text":
+            node["blocks"][-1] = ("text", node["blocks"][-1][1] + " " + line.strip())
+        else:
+            node["blocks"].append(("text", line.strip()))
+    return root
+
+
+def _lead(text: str) -> tuple[str | None, str]:
+    """An item's opening bold span (its claim) and the text after it."""
+    bold = _BOLD_LEAD.match(text.strip())
+    return (plain(bold.group(1)).rstrip(":,; ").strip(), bold.group(2)) if bold else (None, text)
+
+
+def md_points(text: str, heading_contains: str) -> tuple[str | None, list[dict]]:
+    """The numbered items under a heading: each with its bold lead, its outline and whether a table sits in it."""
+    heading, lines = md_section(text, heading_contains)
+    raw: list[dict] = []
+    for line in lines:
         item = _ITEM.match(line)
-        if item:
-            raw.append(item.group(1))
-            items.append(plain(item.group(1)))
-        elif items and line.startswith((" ", "\t")) and line.strip():
-            raw[-1] += " " + line.strip()
-            items[-1] += " " + plain(line)
-    if lead:
-        # A lead that introduces its details ("Validation:") drops the trailing colon or comma.
-        items = [plain(bold.group(1)).rstrip(":,; ") if (bold := re.match(r"\*\*(.+?)\*\*", source)) else item for source, item in zip(raw, items)]
-    return heading, items
+        if item and not line[:1].isspace():
+            raw.append({"first": item.group(1), "lines": [], "has_table": False})
+        elif raw:
+            raw[-1]["lines"].append(line)
+            raw[-1]["has_table"] = raw[-1]["has_table"] or line.lstrip().startswith("|")
+    points = []
+    for item in raw:
+        lead, rest = _lead(item["first"])
+        points.append({"lead": lead, "tree": outline(([rest] if rest.strip() else []) + item["lines"]), "has_table": item["has_table"]})
+    return heading, points
 
 
-def md_items(text: str, heading_contains: str) -> list[str]:
-    """Numbered items under the first heading whose text contains the key, up to the next heading."""
-    return md_list(text, heading_contains)[1]
+# A projected passage keeps no sentence that cites a path, a digest or a line, or names a declared label.
+_PATH = re.compile(r"(?:^|[\s(\"'])~?/[^\s)]+|\b[\w.-]+\.(?:py|md|jsonl?|sh|toml|ya?ml|txt|lock|html|csv|parquet)\b")
+_DIGEST = re.compile(r"\b(?=[0-9a-f]*[a-f])(?=[0-9a-f]*\d)[0-9a-f]{7,64}\b")
+_LINE_REF = re.compile(r"\b[0-9a-f]{7,64}:\d+|\.[A-Za-z]{1,5}:\d+(?:-\d+)?\b")
+_CROSS_REF = re.compile(r"\s*\((?:see )?(?:above|below)\)", re.I)
+_SENTENCE = re.compile(r"(?<=[.!?])\s+(?=[A-Z0-9(\"'$])")
+
+
+def _terms(drop: list[str]) -> list[re.Pattern]:
+    return [re.compile(r"(?<![A-Za-z0-9])" + re.escape(term) + r"(?![A-Za-z])", re.I) for term in drop if isinstance(term, str) and term]
+
+
+def _withheld(text: str, terms: list[re.Pattern]) -> bool:
+    return bool(_PATH.search(text) or _DIGEST.search(text) or _LINE_REF.search(text) or any(term.search(text) for term in terms))
+
+
+def sentences(text: str, drop: list[str] = ()) -> list[str]:
+    """The passage's plain sentences, without any that cite a path, digest or line or name a declared label."""
+    terms = _terms(list(drop))
+    parts = (part.strip() for part in _SENTENCE.split(plain(_CROSS_REF.sub("", text))))
+    return [part for part in parts if part and not _withheld(part, terms)]
+
+
+def _clean(text: str | None, terms: list[re.Pattern]) -> str | None:
+    """A lead or caption as written; None when it cites a path, digest or line or names a declared label."""
+    return text if text and not _withheld(text, terms) else None
+
+
+def _cell(text: str, drop: list[str]) -> str | None:
+    """A table cell's kept sentences; None when the cell has text and none of it is kept."""
+    kept = " ".join(sentences(text, drop))
+    return kept if kept or not text.strip() else None
+
+
+def _row(text: str, drop: list[str]) -> str | None:
+    """One list row as kept sentences, without a trailing separator; None when nothing is kept."""
+    kept = " ".join(sentences(text, drop)).rstrip(";,. ").strip()
+    return kept[:1].upper() + kept[1:] if kept else None
+
+
+def _phrase(text: str | None, key: str) -> bool:
+    return bool(text) and bool(re.search(r"(?<![A-Za-z])" + re.escape(key) + r"(?![A-Za-z])", text, re.I))
+
+
+def _nodes(tree: dict):
+    for kind, value in tree["blocks"]:
+        if kind == "list":
+            for node in value:
+                yield node
+                yield from _nodes(node)
+
+
+def _rows(tree: dict, drop: list[str]) -> list[str]:
+    """The kept text of the item's top-level list rows."""
+    return [row for kind, value in tree["blocks"] if kind == "list" for node in value if (row := _row(node["text"], drop))]
 
 
 def column_index(header: list[str], column: str) -> int | None:
@@ -304,15 +400,95 @@ def repos(sources: dict, glance: dict) -> dict:
             "rows_record": source["name"] if source["status"] == "present" else None, "rows_layers": len(rows_by_layer)}
 
 
-def convergence(source: dict) -> dict:
-    """A command-center convergence record: its table and its next steps, by record name."""
+def _statement(sources: dict, key: str | None) -> dict | None:
+    """The plain statement a section shows until its named result record exists, or that record by name."""
+    if not key:
+        return None
+    source = sources[key]
+    entry = source["entry"]
+    if source["status"] == "present":
+        return {"status": "present", "label": entry.get("label") or "Result", "name": source["name"], "root": source["root"], "path": source.get("path")}
+    return {"status": "pending", "text": entry.get("statement") or "No result yet", "trigger": source["trigger"], "name": source["name"], "root": source["root"],
+            "declared": source["declared"]}
+
+
+def _record(source: dict) -> dict:
+    return {"status": "present", "name": source["name"], "root": source["root"], "path": source.get("path")}
+
+
+def feeds(sources: dict) -> dict:
+    """The WS2 convergence as a sanitized projection: the $0 early-signal table, the baseline, the lagging or
+    conditioning signals, the gated paid rows and the live-stack gaps, by record name only."""
+    source = sources["feeds_convergence"]
     if source["status"] != "present":
         return _pending(source)
-    entry = source["entry"]
-    table = table_with_column(source["content"], entry["table"])
-    heading, items = md_list(source["content"], entry["list"], lead=bool(entry.get("list_lead"))) if entry.get("list") else (None, [])
-    return {"status": "present", "name": source["name"], "root": source["root"], "path": source.get("path"), "table": table, "items": items,
-            "column": entry["table"], "list_heading": heading or entry.get("list"), "list_key": entry.get("list")}
+    entry, text = source["entry"], source["content"]
+    drop = entry.get("drop_terms") or []
+    terms = _terms(drop)
+    heading, points = md_points(text, entry["under"])
+    found = next((table for table in md_tables(text) if entry["under"].casefold() in table["heading"].casefold()
+                  and column_index(table["header"], entry["table"]) is not None), None)
+    # Cells pass the same filter as the list text; a cell with nothing kept is None (withheld).
+    table = None if found is None else {**found, "rows": [[_cell(cell, drop) for cell in row] for row in found["rows"]]}
+    caption = _clean(next((point["lead"] for point in points if point["has_table"] and point["lead"]), None), terms)
+    projected = {}
+    for key, phrase in (entry.get("points") or {}).items():
+        point = next((point for point in points if _phrase(point["lead"], phrase)), None)
+        projected[key] = None if point is None else {"lead": _clean(point["lead"], terms), "sentences": sentences(point["tree"]["text"], drop),
+                                                     "rows": _rows(point["tree"], drop)}
+    gap_spec = entry.get("gaps") or {}
+    gaps = []
+    if gap_spec:
+        _, lines = md_section(text, gap_spec["under"])
+        for node in _nodes(outline(lines)):
+            lead, rest = _lead(node["text"])
+            if not _phrase(lead, gap_spec["lead"]):
+                continue
+            name = re.sub(r"^" + re.escape(gap_spec["lead"]) + r"\s*\d*\s*[,:.]?\s*", "", lead, flags=re.I).strip(" .")
+            details = sentences(rest, drop)
+            if not name and details:
+                name, details = details[0].rstrip(". "), details[1:]
+            if name and not _withheld(name, terms):
+                gaps.append({"name": name[:1].upper() + name[1:], "sentences": details})
+    return {**_record(source), "table": table, "caption": caption, "column": entry["table"], "heading": heading, "points": projected,
+            "gaps": gaps, "statement": _statement(sources, entry.get("result"))}
+
+
+def strategies(sources: dict) -> dict:
+    """The WS5 convergence as a sanitized projection: the shortlisted family with its evidence caveats, the
+    ablation rows and the selector and sizing rule, by record name only."""
+    source = sources["strategies_convergence"]
+    if source["status"] != "present":
+        return _pending(source)
+    entry, text = source["entry"], source["content"]
+    drop = entry.get("drop_terms") or []
+    terms = _terms(drop)
+    heading, points = md_points(text, entry["under"])
+    family = next((point for point in points if _phrase(point["lead"], entry["family"])), None)
+    caveats = []
+    if family is not None:
+        passages = [family["tree"]["text"]] + [node["text"] for node in _nodes(family["tree"])]
+        for sentence in (sentence for passage in passages for sentence in sentences(passage, drop)):
+            for clause in (clause.strip().rstrip(".") for clause in sentence.split("; ")):
+                if clause and any(_phrase(clause, key) for key in entry.get("caveats") or []):
+                    clause = clause[:1].upper() + clause[1:] + "."
+                    if clause not in caveats:
+                        caveats.append(clause)
+    ablations = None
+    for point in points:
+        blocks = point["tree"]["blocks"]
+        for index, (kind, value) in enumerate(blocks):
+            if kind == "text" and _phrase(value, entry["ablations"]) and index + 1 < len(blocks) and blocks[index + 1][0] == "list":
+                ablations = {"lead": _clean(point["lead"], terms), "intro": " ".join(sentences(value, drop)),
+                             "rows": [row for node in blocks[index + 1][1] if (row := _row(node["text"], drop))]}
+                break
+        if ablations:
+            break
+    sizing = next((point for point in points if _phrase(point["lead"], entry["sizing"])), None)
+    return {**_record(source), "heading": heading,
+            "family": {"lead": _clean(family["lead"], terms), "caveats": caveats} if family else None, "ablations": ablations,
+            "sizing": {"lead": _clean(sizing["lead"], terms), "rows": _rows(sizing["tree"], drop)} if sizing else None,
+            "selectors": {key: entry.get(key) for key in ("family", "ablations", "sizing")}, "statement": _statement(sources, entry.get("result"))}
 
 
 def _receipt_date(path: str) -> str | None:
@@ -354,11 +530,15 @@ def workers(document: dict, sources: dict, glance: dict) -> list[dict]:
             if source["status"] != "present":
                 row["receipt"] = {**_pending(source), "status": "pending"}
             elif "component_id" in binding:
+                # Only the declared receipt kinds count (execution receipts, not indexes or inventories).
+                kinds = binding.get("kinds")
                 matches = [item["path"] for item in source["content"].get("receipts") or []
-                           if isinstance(item, dict) and isinstance(item.get("path"), str) and binding["component_id"] in (item.get("component_ids") or [])]
+                           if isinstance(item, dict) and isinstance(item.get("path"), str) and binding["component_id"] in (item.get("component_ids") or [])
+                           and (not kinds or item.get("kind") in kinds)]
                 newest = max(matches, key=lambda path: (_receipt_date(path) or "", path), default=None)
-                row["receipt"] = ({"status": "present", "path": newest, "date": _receipt_date(newest), "count": len(matches), "root": "repo"} if newest
-                                  else {"status": "none", "reason": f'no receipt registered for {binding["component_id"]}'})
+                kind_text = " of kind " + " or ".join(kinds) if kinds else ""
+                row["receipt"] = ({"status": "present", "path": newest, "date": _receipt_date(newest), "count": len(matches), "root": "repo", "kinds": kinds} if newest
+                                  else {"status": "none", "reason": f'no receipt{kind_text} registered for {binding["component_id"]}'})
             else:
                 as_of = _pointer(source["content"], binding["as_of"]) if binding.get("as_of") else None
                 row["receipt"] = {"status": "present", "path": source["path"] if source["root"] == "repo" else source["name"], "date": as_of, "count": 1, "root": source["root"]}
@@ -417,7 +597,7 @@ def model(root: Path, state_root: Path, *, source_map: Path = SOURCE_MAP, policy
     glance = architecture(sources, Path(root), commit)
     worker_rows = workers(document, sources, glance)
     return {"commit": commit, "source_map": map_receipt, "sources": sources, "architecture": glance,
-            "feeds": convergence(sources["feeds_convergence"]), "strategies": convergence(sources["strategies_convergence"]),
+            "feeds": feeds(sources), "strategies": strategies(sources),
             "workers": worker_rows, "repos": repos(sources, glance), "evidence": evidence(sources, worker_rows, glance),
             "claude_code": claude_code(sources["claude_code_practice"]), "github": github(sources["cc_now"]),
             "policy": dict(architecture_reads.policy.receipt)}

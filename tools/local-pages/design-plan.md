@@ -183,10 +183,10 @@ title + lede
 count strip: FINAL sentence | states as figures | sources present
 section links (8)
 1 layer stack: trading band above foundation band, one cell per layer   <- the bold element
-2 feeds: signal table + next steps by trigger        | pending block
-3 strategies: shortlist table                         | pending block
+2 feeds: statement | $0 signal table | baseline, lagging, gated | live-stack gaps   | pending block
+3 strategies: statement | family claim | caveats, ablations, selector and sizing   | pending block
 4 workers: worker | state | newest receipt
-5 repositories: per catalog, layer | state | winners at run pin | survivors | next action
+5 repositories: per catalog, shared state once | layer | winners at run pin | survivors | next action
 6 evidence: repository records | private records by name | layer pages
 7 Claude Code: pin, CHANGELOG delta, screen table     | pending block
 8 GitHub: main CI, in review, landing queue
@@ -200,6 +200,21 @@ only on the layer stack. Section markers are not numbered on the page: the order
 is fixed but the sections are not a sequence. Repository rows put the layer key in
 the link title and shorten commit pins to 12 characters, which halved the table's
 height in the first browser pass.
+
+**Critique pass.** Sections 2 and 3 are sanitized projections of the convergence
+records: selected passages only, and any sentence, cell or lead that cites a path,
+digest or line, or names a declared drop term, is withheld. The plain statement
+("No measured winner yet.", "No live result; replication next.") stands until the
+named result record exists. The review against the brief then changed five things.
+The feeds lede no longer repeats a status the generator owns, so it cannot go stale.
+Captions that repeat the heading above their table are kept for screen readers only.
+A state shared by every catalog layer of a group is said once above its table
+instead of on 20 rows, which shortened the repositories section from 1958 to 1672
+px at 1440 wide. The strategy caveats, ablations and sizing sit in one row under the
+family claim. The pending main-CI block no longer names the record the section line
+already names. Left as they are: the figure's capitalised monospace labels, which
+the layer pages share, and the repositories and GitHub sections, which still exceed
+one screen at 34 layers and nine reviews.
 
 **Skills.** frontend-design (SKILL.md SHA-256
 `d91970639e9f5c37682ac7ab60094d35f1c7c1f38d731bd56396563aee10c1d3`) shaped the plan

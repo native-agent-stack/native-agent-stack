@@ -39,21 +39,56 @@
       "role": "overview_feeds_convergence",
       "root": "state",
       "glob": "coordination/command-center/research-cc-role-20261008/ranked-feeds-20261014/CONVERGENCE-WS2-*.md",
-      "reads": "the first table whose header names the column below, and the numbered items under the heading below",
+      "reads": "a sanitized projection: under the heading below, the table with the column below and its item's lead as caption; the numbered items whose leads name each point phrase; and, under the gaps heading, the bullets whose leads start with the gap word. Any sentence that cites a path, digest or line, or names a drop term, is withheld",
+      "under": "Converged by both judges",
       "table": "Signal",
-      "list": "Next",
+      "points": {
+        "baseline": "lags",
+        "lagging": "lagging or conditioning",
+        "gated": "paid and conditional"
+      },
+      "gaps": {
+        "under": "First-hand live stack",
+        "lead": "Gap"
+      },
+      "drop_terms": ["paper", "hub", "account", "owner"],
+      "result": "feeds_battery",
       "trigger": "the command center records its WS2 convergence after both blind judges have scored the arms"
+    },
+    "feeds_battery": {
+      "section": "feeds",
+      "role": "overview_feeds_battery",
+      "root": "state",
+      "glob": "coordination/command-center/research-cc-role-20261008/ranked-feeds-20261014/BATTERY-WS2-*.md",
+      "reads": "presence only: until it exists the feeds section states the statement below; then it cites the record by name",
+      "label": "Measured battery result",
+      "statement": "No measured winner yet.",
+      "trigger": "the frozen all-flag battery reports measured earliness, precision and all-flag returns on the development and validation windows"
     },
     "strategies_convergence": {
       "section": "strategies",
       "role": "overview_strategies_convergence",
       "root": "state",
       "glob": "coordination/command-center/research-cc-role-20261008/extreme-mover-strategies-20261014/CONVERGENCE-WS5-*.md",
-      "reads": "the first table whose header names the column below, if any, and the bold lead of each numbered item under the heading below",
-      "table": "Strategy",
-      "list": "Converged",
-      "list_lead": true,
+      "reads": "a sanitized projection of the numbered items under the heading below: the item whose lead names the family word, with the clauses that name a caveat word; the list that follows the text naming the ablations word; and the rows of the item whose lead names the sizing word. Any sentence that cites a path, digest or line, or names a drop term, is withheld",
+      "under": "Converged by both judges",
+      "family": "shortlist",
+      "caveats": ["commission", "sample"],
+      "ablations": "ablations",
+      "sizing": "sizing",
+      "drop_terms": ["account", "owner"],
+      "result": "strategies_replication",
       "trigger": "the command center records its WS5 convergence of the extreme-mover strategy shortlist"
+    },
+    "strategies_replication": {
+      "section": "strategies",
+      "role": "overview_strategies_replication",
+      "root": "state",
+      "glob": "coordination/command-center/research-cc-role-20261008/extreme-mover-strategies-20261014/REPLICATION-WS5-*.md",
+      "reads": "presence only: until it exists the strategies section states the statement below; then it cites the record by name",
+      "label": "Replication record",
+      "statement": "No live result; replication next.",
+      "trigger": "the trading program records the frozen, costed replication of the shortlisted family"
     },
     "finalize_rows": {
       "section": "repos",
@@ -116,13 +151,13 @@
       "name": "Codex",
       "role": "CLI lanes and the Codex SDK",
       "state": {"source": "final_stack", "run": "codex"},
-      "receipt": {"source": "registered_receipts", "component_id": "codex"}
+      "receipt": {"source": "registered_receipts", "component_id": "codex", "kinds": ["native_cli_e2e", "native_model_e2e"]}
     },
     {
       "name": "Claude Code, subscription",
       "role": "command center and Claude lanes",
       "state": {"source": "final_stack", "run": "claude-code"},
-      "receipt": {"source": "registered_receipts", "component_id": "claude-code"}
+      "receipt": {"source": "registered_receipts", "component_id": "claude-code", "kinds": ["native_cli_e2e", "native_model_e2e"]}
     },
     {
       "name": "Claude API slots",
