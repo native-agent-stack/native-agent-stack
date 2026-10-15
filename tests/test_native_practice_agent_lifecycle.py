@@ -37,6 +37,18 @@ class AgentLifecycleRows(unittest.TestCase):
             with self.subTest(cite=cite):
                 self.assertIn(cite, notes)
 
+    def test_the_owner_decision_and_the_idle_hook_measurement_are_recorded(self):
+        # Owner direction 2026-10-15 (paraphrased via the command center): teams stay on host-wide. Measured the same
+        # day: TeammateIdle's continue false ends the turn but leaves the teammate listed and answering; a shutdown
+        # request removes it (evidence/artifacts/agent-lifecycle-20261015/measurement.json).
+        notes = self.rows["agent-teams"]["notes"]
+        self.assertIn("direction, 2026-10-15 (paraphrased via the command center)", notes)
+        self.assertIn("does not shut it down", notes)
+        self.assertNotIn("a TeammateIdle hook can stop it at idle", notes)
+        measured = json.loads((SOURCES.parent / "measurement.json").read_text(encoding="utf-8"))
+        self.assertEqual((measured["continue_false_shuts_down"], measured["shutdown_request_removes"],
+                          measured["final_answer_reaches_lead"]), (False, True, True))
+
     def test_the_page_renders_the_same_route_and_notes(self):
         for slot_id, row in self.rows.items():
             section = self.page[self.page.index(f"\n## {slot_id}\n"):]
