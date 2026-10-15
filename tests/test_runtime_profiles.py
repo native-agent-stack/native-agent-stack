@@ -238,9 +238,16 @@ class FillFirstSlotTests(PiLaunchFixture, unittest.TestCase):
                 with self.subTest(error=str(error)[:40]):
                     log.write_text(json.dumps({"type": "error", "error": error}) + "\n")
                     self.assertEqual(profiles.credit_refused(log, "opencode"), expected)
-            log.write_text(json.dumps({"type": "step_finish", "part": {"tokens": {"total": 3}}}) + "\n"
-                           + json.dumps({"type": "error", "error": {"data": {"statusCode": 402}}}) + "\n")
-            self.assertFalse(profiles.credit_refused(log, "opencode"))
+            # OpenCode retries a failed stream itself, so a credit refusal can follow work already done: a finished step,
+            # text, reasoning or a tool call before the error means nothing is replayed on another slot.
+            refusal = json.dumps({"type": "error", "error": {"data": {"statusCode": 402}}}) + "\n"
+            for kind, part in (("step_finish", {"tokens": {"total": 3}}), ("text", {"text": "fixture"}),
+                               ("reasoning", {"text": "fixture"}), ("tool_use", {"tool": "bash"})):
+                with self.subTest(before=kind):
+                    log.write_text(json.dumps({"type": kind, "part": part}) + "\n" + refusal)
+                    self.assertFalse(profiles.credit_refused(log, "opencode"))
+            log.write_text(json.dumps({"type": "step_start", "part": {}}) + "\n" + refusal)
+            self.assertTrue(profiles.credit_refused(log, "opencode"))
 
 
 class MidRunFailoverTests(PiLaunchFixture, unittest.TestCase):
@@ -302,6 +309,14 @@ class MidRunFailoverTests(PiLaunchFixture, unittest.TestCase):
             config.parent.mkdir(parents=True); config.write_text('{"agent":{}}')
             calls = []
 
+            def next_slot(after=None):
+                # One more slot after the first, then none: an attempt started again on another slot shows in the calls.
+                if after is None:
+                    return "anthropic-api-4"
+                if after == "anthropic-api-4":
+                    return "anthropic-api-3"
+                raise profiles.ProfileError("no usable Anthropic Console slot left in the fill-first order")
+
             def runtime(command, **kwargs):
                 if command[0] == "timeout":
                     calls.append(command)
@@ -316,7 +331,7 @@ class MidRunFailoverTests(PiLaunchFixture, unittest.TestCase):
                     mock.patch.object(profiles, "opencode_sandbox_command", side_effect=lambda command, *args: command), \
                     mock.patch.object(profiles, "fresh_worktree", return_value=workspace), \
                     mock.patch.object(profiles, "verify_runtime_binary", return_value="fixture"), \
-                    mock.patch.object(profiles, "choose_slot", return_value="anthropic-api-4") as choose, \
+                    mock.patch.object(profiles, "choose_slot", side_effect=next_slot) as choose, \
                     mock.patch.object(profiles.subprocess, "run", side_effect=runtime), \
                     mock.patch.object(profiles.subprocess, "check_output", return_value="a" * 40), \
                     mock.patch.object(profiles, "utc", return_value="2026-10-15T00:00:00Z"), \
@@ -344,6 +359,24 @@ class MidRunFailoverTests(PiLaunchFixture, unittest.TestCase):
         code, receipt, rows, calls, chosen, cleaned = self.opencode_launch([step, error], 1)
         self.assertEqual((rows[-1]["outcome"], rows[-1]["actual_usd"]), ("ended", 0.5))
         self.assertTrue(receipt["attempts"][0]["spend_known"])
+
+    def test_opencode_output_inside_the_first_step_keeps_a_credit_refusal_on_its_slot(self):
+        # #1108: OpenCode retries a failed stream itself (anomalyco/opencode@53d1eabb processor.ts:649-689), so a credit
+        # refusal can follow text, reasoning or a finished tool call before any step_finish. That run was billed and may
+        # have acted in the worktree: starting the brief again on the next slot would run it twice.
+        start = {"type": "step_start", "sessionID": "ses_fixture1", "part": {}}
+        refused = {"type": "error", "sessionID": "ses_fixture1",
+                   "error": {"name": "APIError", "data": {"statusCode": 402, "message": "billing"}}}
+        for kind, part in (("text", {"text": "fixture"}), ("reasoning", {"text": "fixture"}),
+                           ("tool_use", {"tool": "bash"})):
+            with self.subTest(before=kind):
+                code, receipt, rows, calls, chosen, cleaned = self.opencode_launch(
+                    [start, {"type": kind, "sessionID": "ses_fixture1", "part": part}, refused], 1)
+                self.assertEqual((code, len(calls), chosen, cleaned), (1, 1, 1, 0))
+                self.assertEqual(receipt["resume"]["status"], "stopped_not_resumable")
+                # The step never finished, so its usage was never reported: the spend stays unknown.
+                self.assertEqual([(row["kind"], row.get("outcome"), row.get("attempt_outcome")) for row in rows],
+                                 [("debit", None, None), ("settle", "unknown", "credit_exhausted_mid_run")])
 
     def test_opencode_mid_run_exhaustion_stops_on_its_slot_and_is_not_called_resumable(self):
         with tempfile.TemporaryDirectory(dir="/var/tmp") as directory:
@@ -704,6 +737,16 @@ class MidRunFailoverTests(PiLaunchFixture, unittest.TestCase):
                     log.write_text(text)
                     self.assertEqual(profiles.credit_exhausted_mid_run(log, "opencode"), expected)
                     self.assertEqual(profiles.attempt_outcome(log, "opencode", "claude", 1), outcome)
+            # #1108: output inside the first step, before any step_finish, already billed the run.
+            start = json.dumps({"type": "step_start", "part": {}}) + "\n"
+            for kind, part in (("text", {"text": "fixture"}), ("reasoning", {"text": "fixture"}),
+                               ("tool_use", {"tool": "bash"})):
+                with self.subTest(opencode_before=kind):
+                    log.write_text(start + json.dumps({"type": kind, "part": part}) + "\n" + refused)
+                    self.assertTrue(profiles.credit_exhausted_mid_run(log, "opencode"))
+                    self.assertEqual(profiles.attempt_outcome(log, "opencode", "claude", 1), "credit_exhausted_mid_run")
+            log.write_text(start + refused)
+            self.assertEqual(profiles.attempt_outcome(log, "opencode", "claude", 1), "first_call_refused")
 
     def test_each_attempt_is_debited_and_settled_under_its_slot_with_a_switch_on_failover(self):
         order = self.worker().DEFAULT_KEYS

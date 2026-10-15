@@ -64288,8 +64288,8 @@
     },
     {
       "path": "tests/test_runtime_profiles.py",
-      "sha256": "9f1e3d9379d8a2d6e0653e6b72817a08224d5d749d7557a2b1c5f0f77bfdc599",
-      "bytes": 87148
+      "sha256": "2d7dd2f6293ef4d6749ad2974e712ff8bc5c00d424c269637db06cd0775702d1",
+      "bytes": 90625
     },
     {
       "path": "tests/test_runtime_publication.py",
@@ -64768,8 +64768,8 @@
     },
     {
       "path": "tools/adoption/runtime_profiles.py",
-      "sha256": "5e4628636e3f7b6a944ed5383803381007a3d15c80668d5271d90e869ec95081",
-      "bytes": 105423
+      "sha256": "06df8366bee940605ecae10d41dc6b7cb365804749b12f53939b8b16ebb342d2",
+      "bytes": 105990
     },
     {
       "path": "tools/adoption/runtime_skill_freshness.py",

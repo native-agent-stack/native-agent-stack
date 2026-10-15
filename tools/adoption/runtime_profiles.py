@@ -625,6 +625,13 @@ def choose_slot(after: str | None = None) -> str:
                        + (f" after {after}" if after else ""))
 
 
+# The events OpenCode 1.18.35's `run --format json` emits only after model output: a finished tool call, step, text part or
+# reasoning part (anomalyco/opencode@53d1eabb packages/opencode/src/cli/cmd/run.ts:725, :750, :754, :767). OpenCode retries a
+# failed stream itself (packages/opencode/src/session/processor.ts:649-689), so a credit refusal can follow any of them
+# inside one step, before its step_finish.
+OPENCODE_OUTPUT_EVENTS = ("step_finish", "text", "reasoning", "tool_use")
+
+
 def first_call_refusal(log: Path, runtime: str) -> tuple[int | None, str] | None:
     """(status, text) of the run's first model call when it was refused before any billed output, else None.
 
@@ -637,7 +644,8 @@ def first_call_refusal(log: Path, runtime: str) -> tuple[int | None, str] | None
     OpenCode 1.18.35 (anomalyco/opencode@53d1eabb): `run --format json` emits step_finish for each finished step
     (packages/opencode/src/cli/cmd/run.ts:750) and an error event carrying the session error (:789), which for a
     provider refusal is {name, data: {statusCode, ...}} (packages/opencode/src/session/message-v2.ts:707-717,
-    packages/core/src/util/error.ts:55-60). Any completed step first means the run was billed, so nothing is retried."""
+    packages/core/src/util/error.ts:55-60). Any output event first (OPENCODE_OUTPUT_EVENTS) means the run was billed or
+    acted, so nothing is retried."""
     for line in log.read_text().split("\n"):
         try:
             event = json.loads(line)
@@ -654,7 +662,7 @@ def first_call_refusal(log: Path, runtime: str) -> tuple[int | None, str] | None
                 return None
             text = message.get("errorMessage") if isinstance(message.get("errorMessage"), str) else ""
             return pi_refusal_status(text), text
-        if event.get("type") == "step_finish":
+        if event.get("type") in OPENCODE_OUTPUT_EVENTS:
             return None
         if event.get("type") == "error":
             return opencode_refusal(event.get("error"))
@@ -693,7 +701,8 @@ def credit_refused(log: Path, runtime: str) -> bool:
 def mid_run_refusal(log: Path, runtime: str) -> tuple[int | None, str] | None:
     """(status, text) of the run's LAST model call when it was refused after billed output, else None: the case
     first_call_refusal leaves to the run. Pi: the last assistant message_end ends on stopReason "error" while it, or an
-    earlier one, carried tokens. OpenCode: an error event after a step_finish, with no step finished since."""
+    earlier one, carried tokens. OpenCode: an error event after an output event (OPENCODE_OUTPUT_EVENTS), with no output
+    since."""
     refusal, billed = None, False
     for line in log.read_text().split("\n"):
         try:
@@ -710,7 +719,7 @@ def mid_run_refusal(log: Path, runtime: str) -> tuple[int | None, str] | None:
             billed = billed or bool(usage.get("totalTokens"))
             text = message.get("errorMessage") if isinstance(message.get("errorMessage"), str) else ""
             refusal = (pi_refusal_status(text), text) if message.get("stopReason") == "error" else None
-        elif event.get("type") == "step_finish":
+        elif event.get("type") in OPENCODE_OUTPUT_EVENTS:
             billed, refusal = True, None
         elif event.get("type") == "error" and billed:
             refusal = opencode_refusal(event.get("error"))
