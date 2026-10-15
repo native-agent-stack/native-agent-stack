@@ -283,6 +283,67 @@ class MidRunFailoverTests(PiLaunchFixture, unittest.TestCase):
         self.assertEqual(self.cleanup_calls, 0)
         # The CC's F3: no switch row for a failover that never happened.
         self.assertEqual([row["kind"] for row in self.ledger_rows], ["debit", "settle"])
+        # The local review's P2 at 5bea71f9: with no slot left either, the stop is still not called resumable.
+        only_first = {slot: {"id": slot, "state": "missing"} for slot in order[1:]}
+        code, receipt, calls = self.launch({order[0]: ["ok", (CREDIT_400, 40)]}, only_first, sessions=False)
+        self.assertEqual((code, calls, receipt["resume"]["status"]), (1, [order[0]], "stopped_no_session"))
+
+    def opencode_launch(self, events, status):
+        """An opencode-claude print launch whose one attempt writes `events` and exits `status`. Returns (exit, receipt,
+        ledger rows, runtime calls, choose_slot calls, cleanup calls)."""
+        with tempfile.TemporaryDirectory(dir="/var/tmp") as directory:
+            state = Path(directory)
+            root = state / "opencode-claude" / "roles/reviewer"
+            root.mkdir(parents=True)
+            workspace = state / "worktree"; workspace.mkdir()
+            (root / "profile.json").write_text(json.dumps({"status": "trial", "model": "fixture", "effort": "high",
+                "opencode_bin": "/fixture/opencode", "roles": {"evidence-reviewer": {"tools": ["read"]}}}))
+            config = root / "config/opencode/opencode.json"
+            config.parent.mkdir(parents=True); config.write_text('{"agent":{}}')
+            calls = []
+
+            def runtime(command, **kwargs):
+                if command[0] == "timeout":
+                    calls.append(command)
+                    for event in events:
+                        kwargs["stdout"].write(json.dumps(event) + "\n")
+                    return subprocess.CompletedProcess(command, status)
+                return subprocess.CompletedProcess(command, 0)
+            args = argparse.Namespace(profile="opencode-claude", state_root=state, repository=state,
+                                      role="evidence-reviewer", print=True, prompt="fixture", timeout_seconds=1,
+                                      ledger=state / "ledger.jsonl")
+            with mock.patch.dict(os.environ, {"PWD": str(state)}), \
+                    mock.patch.object(profiles, "opencode_sandbox_command", side_effect=lambda command, *args: command), \
+                    mock.patch.object(profiles, "fresh_worktree", return_value=workspace), \
+                    mock.patch.object(profiles, "verify_runtime_binary", return_value="fixture"), \
+                    mock.patch.object(profiles, "choose_slot", return_value="anthropic-api-4") as choose, \
+                    mock.patch.object(profiles.subprocess, "run", side_effect=runtime), \
+                    mock.patch.object(profiles.subprocess, "check_output", return_value="a" * 40), \
+                    mock.patch.object(profiles, "utc", return_value="2026-10-15T00:00:00Z"), \
+                    mock.patch.object(profiles, "cleanup_worktree", return_value={"status": "removed"}) as cleanup, \
+                    redirect_stdout(io.StringIO()) as out:
+                code = profiles.launch(args)
+            receipt = json.loads(Path(json.loads(out.getvalue().strip().splitlines()[-1])["receipt"]).read_text())
+            rows = [json.loads(line) for line in (state / "ledger.jsonl").read_text().splitlines()]
+        return code, receipt, rows, calls, choose.call_count, cleanup.call_count
+
+    def test_an_ordinary_error_inside_a_response_settles_as_unknown_spend(self):
+        # The GPT read and the local review at 64f41af3/5bea71f9: a step that started and never finished, ended by a
+        # non-credit API error (OpenCode exits 1: anomalyco/opencode@53d1eabb run.ts:842), left its usage unreported;
+        # it was settled as known spend because the outcome was "ended".
+        step = {"type": "step_finish", "sessionID": "ses_fixture1", "part": {"tokens": {"total": 9}, "cost": 0.5}}
+        start = {"type": "step_start", "sessionID": "ses_fixture1", "part": {}}
+        error = {"type": "error", "sessionID": "ses_fixture1",
+                 "error": {"name": "APIError", "data": {"statusCode": 500, "message": "overloaded"}}}
+        code, receipt, rows, calls, chosen, cleaned = self.opencode_launch([step, start, error], 1)
+        settle = rows[-1]
+        self.assertEqual((settle["outcome"], settle["attempt_outcome"], settle["actual_usd"],
+                          settle["measured_lower_bound_usd"]), ("unknown", "ended", profiles.ATTEMPT_RESERVE_USD, 0.5))
+        self.assertFalse(receipt["attempts"][0]["spend_known"])
+        # Finished before the error: the measured amount is the whole cost.
+        code, receipt, rows, calls, chosen, cleaned = self.opencode_launch([step, error], 1)
+        self.assertEqual((rows[-1]["outcome"], rows[-1]["actual_usd"]), ("ended", 0.5))
+        self.assertTrue(receipt["attempts"][0]["spend_known"])
 
     def test_opencode_mid_run_exhaustion_stops_on_its_slot_and_is_not_called_resumable(self):
         with tempfile.TemporaryDirectory(dir="/var/tmp") as directory:
@@ -471,6 +532,26 @@ class MidRunFailoverTests(PiLaunchFixture, unittest.TestCase):
                 self.assertTrue((stopped.parent / "resumed-by.json").is_file())
                 with self.assertRaisesRegex(profiles.ProfileError, "already resumed"):
                     self.launch({}, resume=lambda state, root: stopped, state=state)
+
+    def test_a_failed_resume_preflight_leaves_the_receipt_resumable(self):
+        # The local review's P2 at 64f41af3: with every slot unusable, --resume starts no attempt; it must not consume
+        # the receipt, so a retry once a slot is usable continues it.
+        order = self.worker().DEFAULT_KEYS
+        with tempfile.TemporaryDirectory(dir="/var/tmp") as directory:
+            state = Path(directory)
+            only_first = {slot: {"id": slot, "state": "missing"} for slot in order[1:]}
+            code, receipt, calls = self.launch({order[0]: ["ok", (CREDIT_STREAM, 40)]}, only_first, state=state)
+            stopped = self.receipt_path
+            fake = {"workspace": Path(receipt["resume"]["retained_worktree"]), "session_id": receipt["resume"]["session_id"],
+                    "receipt_run": stopped.parent.name, "from": order[0]}
+            none_usable = {slot: {"id": slot, "state": "missing"} for slot in order}
+            with mock.patch.object(profiles, "resumable_receipt", return_value=fake):
+                with self.assertRaisesRegex(profiles.ProfileError, "no usable"):
+                    self.launch({}, none_usable, resume=lambda state, root: stopped, state=state)
+                self.assertFalse((stopped.parent / "resumed-by.json").exists())
+                code, receipt, calls = self.launch({}, resume=lambda state, root: stopped, state=state)
+            self.assertEqual((code, calls), (0, [order[0]]))
+            self.assertTrue((stopped.parent / "resumed-by.json").is_file())
 
     def test_no_ledger_row_carries_an_absolute_path(self):
         # The CC's F1 at 5bea71f9: ledger rows are quoted into public records; no value may be a private path.

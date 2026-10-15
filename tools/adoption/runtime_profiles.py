@@ -744,7 +744,7 @@ def attempt_outcome(log: Path, runtime: str, route: str, exit_code: int | None) 
 def response_in_flight(log: Path, runtime: str) -> bool:
     """True when the log ends inside a model response: billed tokens may have streamed with no usage reported yet. Pi
     emits an assistant message_start when a response starts and message_end only when it is done or refused
-    (pi@04566631 packages/agent/src/agent-loop.ts:419 and :454); OpenCode pairs step_start with step_finish
+    (pi@04566631 packages/agent/src/agent-loop.ts:420 and :454); OpenCode pairs step_start with step_finish
     (anomalyco/opencode@53d1eabb packages/opencode/src/cli/cmd/run.ts:746-750)."""
     open_response = False
     for line in log.read_text().split("\n"):
@@ -871,12 +871,13 @@ class SpendLedger:
                                            "pid_start": process_start(os.getpid())}})
 
     def settle(self, ref: str, slot: str, run: str, facts: dict, outcome: str, in_flight: bool = False) -> None:
-        """The attempt's measured cost. An attempt cut short or failed inside a response has an unknown cost: it settles
-        at its reservation (or the measured amount, if higher) with outcome "unknown", as the review worker settles an
-        unknown outcome (worker.py Ledger.close), and keeps the measured amount as a lower bound."""
+        """The attempt's measured cost. An attempt that ended inside a response, however it ended (a timeout, a signal,
+        an ordinary API error), has an unknown cost: it settles at its reservation (or the measured amount, if higher)
+        with outcome "unknown", as the review worker settles an unknown outcome (worker.py Ledger.close), and keeps the
+        measured amount as a lower bound."""
         usage = facts["usage"]
         measured = facts["native_cost_usd"]
-        unknown = in_flight and outcome in ("cut_short", "error")
+        unknown = in_flight
         row = {"kind": "settle", "ts": utc(), "key": slot, "workload": LEDGER_WORKLOAD,
                "use_case": "ns-run " + self.detail["profile"] + " " + str(self.detail["role"]),
                "ref": ref, "actual_usd": max(measured, ATTEMPT_RESERVE_USD) if unknown else measured,
@@ -1231,14 +1232,6 @@ def launch(args):
     # homeless or unwritable ledger refuses the launch before any worktree or key exists.
     ledger = SpendLedger(getattr(args, "ledger", None), profile, args.role, meta["model"], args.state_root) \
         if route == "claude" and args.print else None
-    if resumed:
-        # A receipt is resumed once: the claim is an exclusive create beside it, so a second --resume (or a concurrent
-        # one) is refused instead of continuing the same session twice.
-        try:
-            private_write(args.resume.parent / "resumed-by.json",
-                          json.dumps({"resumed_at": utc(), "by_pid": os.getpid()}) + "\n")
-        except FileExistsError:
-            raise ProfileError("receipt already resumed; resume refused") from None
     workspace = resumed["workspace"] if resumed else fresh_worktree(args.repository.resolve(), profile)
     aux = Path(meta["auxiliary_root"]) if meta.get("auxiliary_root") else None
     runtime_env = profile_environment(profile, args.state_root, role_scope, aux)
@@ -1349,6 +1342,15 @@ def launch(args):
                             if threading.current_thread() is threading.main_thread() else None)
         try:
             while True:
+                if resumed and not attempts:
+                    # A receipt is resumed once. The claim is an exclusive create beside it, taken when the first
+                    # attempt starts, so a second or concurrent --resume is refused, and a launch that fails before
+                    # any attempt (no usable slot, say) leaves the receipt resumable.
+                    try:
+                        private_write(args.resume.parent / "resumed-by.json",
+                                      json.dumps({"resumed_at": utc(), "by_pid": os.getpid()}) + "\n")
+                    except FileExistsError:
+                        raise ProfileError("receipt already resumed; resume refused") from None
                 run = root / "runs" / uuid.uuid4().hex
                 run.mkdir(mode=0o700, parents=True)
                 log, errors = run / "events.jsonl", run / "stderr.log"
@@ -1386,7 +1388,7 @@ def launch(args):
                     attempts.append({"run": run.name, "credential_loader_id": slot, "outcome": outcome,
                                      "runtime_exit_code": exit_code, "native_cost_usd": facts[-1]["native_cost_usd"],
                                      "completed_native_steps": facts[-1]["completed_native_steps"],
-                                     "spend_known": not (in_flight and outcome in ("cut_short", "error"))})
+                                     "spend_known": not in_flight})
                     if ledger:
                         ledger.settle(ref, slot, run.name, facts[-1], outcome, in_flight)
                 # A timed-out or signalled attempt keeps its own receipt and exit status, whatever its log holds: only an
