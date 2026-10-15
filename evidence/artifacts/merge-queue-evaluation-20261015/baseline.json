@@ -1,0 +1,339 @@
+{
+  "schema_version": 1,
+  "status": "pre_trial_read_only_baseline",
+  "queue_trial_executed": false,
+  "access_date": "2026-10-15",
+  "repository": "native-agent-stack/native-agent-stack",
+  "repository_revision": "39b3fcaf5bcb96c8a672fb6198972dffd3d9937a",
+  "live_controls": {
+    "ruleset_id": 23739774,
+    "integration_id": 15368,
+    "strict_required_status_checks_policy": false,
+    "merge_queue_rule_present": false,
+    "graphql_merge_queue": null,
+    "classic_branch_protection_http_status": 404,
+    "visibility": "public",
+    "owner_type": "Organization",
+    "plan": "free",
+    "allowed_merge_methods": [
+      "squash"
+    ]
+  },
+  "required_checks": [
+    {
+      "context": "validate",
+      "workflow": ".github/workflows/validate.yml",
+      "job_id": "validate-result",
+      "merge_group": false
+    },
+    {
+      "context": "secret-scan",
+      "workflow": ".github/workflows/validate.yml",
+      "job_id": "secret-scan",
+      "merge_group": false
+    },
+    {
+      "context": "token-report",
+      "workflow": ".github/workflows/token-report.yml",
+      "job_id": "token-report",
+      "merge_group": false
+    },
+    {
+      "context": "dependency-review",
+      "workflow": ".github/workflows/dependency-review.yml",
+      "job_id": "dependency-review",
+      "merge_group": false
+    },
+    {
+      "context": "osv-scanner",
+      "workflow": ".github/workflows/security-scan.yml",
+      "job_id": "osv-scanner",
+      "merge_group": false
+    },
+    {
+      "context": "verdict-review-gate",
+      "workflow": ".github/workflows/pr-metadata.yml",
+      "job_id": "verdict-review-gate",
+      "merge_group": false
+    },
+    {
+      "context": "sota-sources",
+      "workflow": ".github/workflows/pr-metadata.yml",
+      "job_id": "sota-sources",
+      "merge_group": false,
+      "job_condition": "github.event_name == 'pull_request'"
+    }
+  ],
+  "additional_required_rule": {
+    "type": "code_scanning",
+    "tool": "CodeQL",
+    "alerts_threshold": "errors",
+    "security_alerts_threshold": "high_or_higher",
+    "default_setup": "configured",
+    "merge_group_execution": "unverified",
+    "merge_group_enforcement": "Ruleset code-scanning merge protection does not apply to merge queue groups; rule presence does not enforce group analysis or thresholds.",
+    "exception_source": "github/docs@0226a2d78cf2be40ee3d769ec5661638461af0cc:content/code-security/concepts/code-scanning/merge-protection.md:27,37-38",
+    "exception_verified_date": "2026-10-15"
+  },
+  "open_prs": {
+    "captured_at": "2026-10-15T13:19:12.726112+00:00",
+    "query": "query($after:String) { repository(owner:\"native-agent-stack\",name:\"native-agent-stack\") { pullRequests(first:100,after:$after,states:OPEN,baseRefName:\"main\",orderBy:{field:UPDATED_AT,direction:DESC}) { totalCount pageInfo {hasNextPage endCursor} nodes {number headRefOid mergeable} } } }",
+    "total": 132,
+    "rows": [
+      {"number":1106,"headRefOid":"955632578ac959c8858eb455eda84f9b51183e40","mergeable":"UNKNOWN"},
+      {"number":1161,"headRefOid":"c95453a12f3f68fd55746cc5bbf8db90e0f9be7a","mergeable":"UNKNOWN"},
+      {"number":1162,"headRefOid":"ff43d609774027b17c3d94a0d411e2d66045a5bf","mergeable":"UNKNOWN"},
+      {"number":1148,"headRefOid":"6028d29eb004b60cfbd729cfbd9ff3f5d75446fa","mergeable":"UNKNOWN"},
+      {"number":1145,"headRefOid":"08c187807b6b49f97fe3a63d0ebb75f1fb222585","mergeable":"UNKNOWN"},
+      {"number":1146,"headRefOid":"b77207340ed1643744e88c244989b8adafb34772","mergeable":"UNKNOWN"},
+      {"number":1133,"headRefOid":"879ce4320f385fd1f37bba833b9941efe8ad3ecd","mergeable":"UNKNOWN"},
+      {"number":1160,"headRefOid":"8593b163b1bf480e657be880d2e410bd2f94b86f","mergeable":"UNKNOWN"},
+      {"number":1058,"headRefOid":"611ee639c6817e6e70a91485d84f846f26cef46c","mergeable":"MERGEABLE"},
+      {"number":1151,"headRefOid":"a8d84596b3ec60c8e85d2f67c94dc7ca37cbc6e9","mergeable":"UNKNOWN"},
+      {"number":1158,"headRefOid":"8c03cbe5fc671ec8b2b1b24e2fc0f88033fd74bb","mergeable":"UNKNOWN"},
+      {"number":1091,"headRefOid":"52924b028c8419b48042f80b088ec3135a0f8084","mergeable":"UNKNOWN"},
+      {"number":1142,"headRefOid":"c28c14b2647d33fe31b6757cb4c2313c8621d416","mergeable":"UNKNOWN"},
+      {"number":1141,"headRefOid":"d9c6dd0580cbbef1737809bfbbc1d2aff5c4b544","mergeable":"UNKNOWN"},
+      {"number":1138,"headRefOid":"ac14d3f2ca2f13bdc3d8bb28096c03c6fed315c5","mergeable":"UNKNOWN"},
+      {"number":1136,"headRefOid":"6563b78491c36dd7c1e3638dd5ec9bdea9486329","mergeable":"UNKNOWN"},
+      {"number":1131,"headRefOid":"c986f4ac3d9ec9017066cd987a71a818d67b9365","mergeable":"UNKNOWN"},
+      {"number":1129,"headRefOid":"cdee315c4f11ced7e00afd98c77f5a71745ee08a","mergeable":"UNKNOWN"},
+      {"number":1127,"headRefOid":"0fb64d83b4c10c87dda39cb76445c84f6fc7fb16","mergeable":"UNKNOWN"},
+      {"number":1121,"headRefOid":"442142f706d7d10f5f84a5dd62afc72432753ad2","mergeable":"UNKNOWN"},
+      {"number":1139,"headRefOid":"b2c6c493299ee592f65cf0faa369c9c03507499b","mergeable":"UNKNOWN"},
+      {"number":1157,"headRefOid":"b122d22f4d2eac60a861e3851777d43a108220cc","mergeable":"UNKNOWN"},
+      {"number":1135,"headRefOid":"671f6f7b9a9634099ad10b517195aa80fb4af625","mergeable":"UNKNOWN"},
+      {"number":1155,"headRefOid":"bf9153afdd06d5aea6c19454f9d1fdb95b51dc2a","mergeable":"UNKNOWN"},
+      {"number":1154,"headRefOid":"016d4faafca9cfd68d25d496dceb73444e134d34","mergeable":"UNKNOWN"},
+      {"number":1153,"headRefOid":"29804349f95bfd08883cfcb4a1846826a1cabe77","mergeable":"UNKNOWN"},
+      {"number":1152,"headRefOid":"134e08a1753410e2233b0dd3fc509ab2718f51f2","mergeable":"UNKNOWN"},
+      {"number":1149,"headRefOid":"e5e414a548d2dd77c1e980cec857389b05ed72f4","mergeable":"UNKNOWN"},
+      {"number":1147,"headRefOid":"0eec488fd0ca235d12a45a16274f3848d0d442ad","mergeable":"UNKNOWN"},
+      {"number":1137,"headRefOid":"29a1daa28a744be34e079aac07a34da4ccf96206","mergeable":"UNKNOWN"},
+      {"number":1128,"headRefOid":"bd3eecfe50b49f614466e74c019f85e8e82ea06f","mergeable":"UNKNOWN"},
+      {"number":1132,"headRefOid":"dbae875971b1ec385859834ac93f1432415f5ac7","mergeable":"UNKNOWN"},
+      {"number":1125,"headRefOid":"0466bea02838e12986718174bb07d1fbec702555","mergeable":"UNKNOWN"},
+      {"number":1123,"headRefOid":"5e2205d72ad7811d042402007cd936b0a18be319","mergeable":"UNKNOWN"},
+      {"number":1115,"headRefOid":"2b057db11f56bf6fcb86263b53a11d327b3accc3","mergeable":"UNKNOWN"},
+      {"number":1043,"headRefOid":"e217e1ef0c66066a9d1bab99ffd0cc2e5fc8aba0","mergeable":"UNKNOWN"},
+      {"number":1081,"headRefOid":"9d43e306e9bf8f43c758717a02898b408fcc30a7","mergeable":"UNKNOWN"},
+      {"number":1105,"headRefOid":"72d4a410c946dc75e60251ca2a2c4791413b8171","mergeable":"UNKNOWN"},
+      {"number":1108,"headRefOid":"b0406855ee96a55a90ebf6133deef100dd999107","mergeable":"UNKNOWN"},
+      {"number":1100,"headRefOid":"c50173d37e3000bcf5b541ae6e8b36f546c055ef","mergeable":"UNKNOWN"},
+      {"number":1089,"headRefOid":"ee9d9013eb87a93511aa1f7ac01b44251e163848","mergeable":"UNKNOWN"},
+      {"number":1092,"headRefOid":"52091e56b78f400991a4a1248925b13908799cfc","mergeable":"UNKNOWN"},
+      {"number":1093,"headRefOid":"bb809dcbe4c07bbe4e592242ea0393f0b52cd0d7","mergeable":"UNKNOWN"},
+      {"number":1099,"headRefOid":"084a5d431bade6d68810c166ccc19f8e66b2c786","mergeable":"UNKNOWN"},
+      {"number":1112,"headRefOid":"141b643a58720303ba1e0745dc554f60beea0281","mergeable":"UNKNOWN"},
+      {"number":1111,"headRefOid":"30af6b85c6dd81ccf2e04c0cbba7c2150a2e596f","mergeable":"UNKNOWN"},
+      {"number":1110,"headRefOid":"7e2b1b6e3690bd7e7ef75722a7342fa9949734a0","mergeable":"UNKNOWN"},
+      {"number":1109,"headRefOid":"dc03f692a268135a6b1d549e3e66169cdb89b473","mergeable":"UNKNOWN"},
+      {"number":1090,"headRefOid":"f243d4b33936ed394dfb521f81c7664911c1be5a","mergeable":"UNKNOWN"},
+      {"number":991,"headRefOid":"d9eb2691d86631bcb23c7961b128fe475e275c6c","mergeable":"UNKNOWN"},
+      {"number":1006,"headRefOid":"f80e2c357f617c779074085c9cc1d3ad66d07cf4","mergeable":"UNKNOWN"},
+      {"number":870,"headRefOid":"8a71411d3474e8ea8f585409933827478dcb32da","mergeable":"UNKNOWN"},
+      {"number":1086,"headRefOid":"2aae430a4515340b39005acb5d63f8fe60bcb172","mergeable":"UNKNOWN"},
+      {"number":1050,"headRefOid":"6a40d6abd7e7a9a75ccbff5c011cf4c15e92b7f6","mergeable":"UNKNOWN"},
+      {"number":1066,"headRefOid":"2d6da468be6890ac9f9ecabb0371d83d0b3e737e","mergeable":"UNKNOWN"},
+      {"number":1078,"headRefOid":"18fb8918f5ba27fec3db34bce0ccaf460ed878d0","mergeable":"UNKNOWN"},
+      {"number":1073,"headRefOid":"a049170124469c7cdbdff532135ea1fe46401b81","mergeable":"UNKNOWN"},
+      {"number":1064,"headRefOid":"18a805df003b2d2e813ae68abbb2e30f32b0bdf1","mergeable":"UNKNOWN"},
+      {"number":1071,"headRefOid":"0278cb12e513f2b1e35e3bdf19de25541154705c","mergeable":"UNKNOWN"},
+      {"number":1042,"headRefOid":"8fc7b605b0e083f213aa4d9ecacf27ff02bc52fd","mergeable":"UNKNOWN"},
+      {"number":1048,"headRefOid":"f91c0ac749ea45cfa5bee636bc27ecd4b0019a8d","mergeable":"UNKNOWN"},
+      {"number":1039,"headRefOid":"a1c3e9f5f122516fdbee3844efdcadc4595e42df","mergeable":"UNKNOWN"},
+      {"number":1052,"headRefOid":"f69ecef516e30196c92ebaf65291c8a7451c5550","mergeable":"UNKNOWN"},
+      {"number":1051,"headRefOid":"0f060e7f210c328ff90bcb9e8230ba19bf5b8fd2","mergeable":"UNKNOWN"},
+      {"number":1056,"headRefOid":"b2e95dc855decbe9740c7df1362edb1dbc1b4fd9","mergeable":"UNKNOWN"},
+      {"number":1059,"headRefOid":"841fb49e9505c47ae8ccc9ad6345e30f767d18a2","mergeable":"UNKNOWN"},
+      {"number":1055,"headRefOid":"a6c88e692c543f7744d2ace74a97229159b53432","mergeable":"UNKNOWN"},
+      {"number":1032,"headRefOid":"93c18540c73423d5efebee7c01fc0a9cccdcbc71","mergeable":"UNKNOWN"},
+      {"number":1054,"headRefOid":"c3998e650ec008ccdbbb9040fbb6c8561e20a757","mergeable":"UNKNOWN"},
+      {"number":1053,"headRefOid":"213a9b4d87998985f7ab62f1dddcbeaf856e4f1d","mergeable":"UNKNOWN"},
+      {"number":1002,"headRefOid":"6ba4206a1f10de4caafdd9694c5163e2cb183a6d","mergeable":"UNKNOWN"},
+      {"number":1031,"headRefOid":"0140a71bebef18db168bd89e3b560ec7a778fa87","mergeable":"UNKNOWN"},
+      {"number":1041,"headRefOid":"aa6b911413b3a46a63ad0f9b03891cc13ed7c2c4","mergeable":"UNKNOWN"},
+      {"number":1040,"headRefOid":"2a214bfdb295b2a58448164d9fe3f20e25540d8e","mergeable":"UNKNOWN"},
+      {"number":1036,"headRefOid":"92774eaeb61a9726bb03723833a8832a4b06792c","mergeable":"UNKNOWN"},
+      {"number":1027,"headRefOid":"cb0429d77e097e42db0b2027c1a96c947818095d","mergeable":"UNKNOWN"},
+      {"number":1037,"headRefOid":"6fd44df6a3b0364a935e5c4f7208cb929bce2e98","mergeable":"UNKNOWN"},
+      {"number":1012,"headRefOid":"66e82815cd12c226fdd725d3e5cbe6c805a82a38","mergeable":"UNKNOWN"},
+      {"number":1019,"headRefOid":"fd664e2af1da6b061022410fb2f01866901c65ff","mergeable":"UNKNOWN"},
+      {"number":955,"headRefOid":"f1d5f01a60eefa288c4b788ef98c097bffadfff3","mergeable":"UNKNOWN"},
+      {"number":990,"headRefOid":"5ff038464fbbb27981743bad529acb67576cdfaf","mergeable":"UNKNOWN"},
+      {"number":993,"headRefOid":"d82361cd1766caba5ae8790d79434b4fc39a32f8","mergeable":"UNKNOWN"},
+      {"number":821,"headRefOid":"64b038d00f7601d61995c0939b094445f494b1d1","mergeable":"CONFLICTING"},
+      {"number":804,"headRefOid":"34c586361ac2eb0c7a25ad12acac6bd2e9b938d7","mergeable":"UNKNOWN"},
+      {"number":901,"headRefOid":"85ad8eb6371580e885c9d9ae7b47361270588246","mergeable":"UNKNOWN"},
+      {"number":776,"headRefOid":"cda3e5089f28d3839d5a5a1fc7fb0d5001e07ff7","mergeable":"UNKNOWN"},
+      {"number":983,"headRefOid":"7580b6da52221890c7464f3fd94223527e99a822","mergeable":"UNKNOWN"},
+      {"number":976,"headRefOid":"886fb41de1d8c01bfeb01b4057042aaaeed5c8d0","mergeable":"UNKNOWN"},
+      {"number":980,"headRefOid":"c3ca2246ab28edaa33257836c6f4202154a7e80b","mergeable":"UNKNOWN"},
+      {"number":977,"headRefOid":"c1f0a960b6ed1d055ba4478d0ad8b4e5664bb925","mergeable":"UNKNOWN"},
+      {"number":951,"headRefOid":"e1ef838a8ed835ace75e09644ce41b1049e7b591","mergeable":"UNKNOWN"},
+      {"number":935,"headRefOid":"cff7e62461fcaa01df4feba3638a3ce9b1e1e254","mergeable":"UNKNOWN"},
+      {"number":933,"headRefOid":"dab7adebf2a7ab9a7ddae04068db08d5276fc333","mergeable":"UNKNOWN"},
+      {"number":915,"headRefOid":"71b52ec01c35c1df4f494479f83c33feca5671b1","mergeable":"UNKNOWN"},
+      {"number":928,"headRefOid":"76cbf924fb550285bd5ddc5963bc6a031b39210f","mergeable":"UNKNOWN"},
+      {"number":919,"headRefOid":"7e522fff0825906c60351525a4bfe75c83cb0a68","mergeable":"UNKNOWN"},
+      {"number":906,"headRefOid":"2a6097c62eb1c50121ada8751ebe0e8abc1da51b","mergeable":"UNKNOWN"},
+      {"number":905,"headRefOid":"dfd1956f7b5e71a85431ef235ed491fd033b39bb","mergeable":"UNKNOWN"},
+      {"number":898,"headRefOid":"259e13ee4b79284daf0dfe21241dfb906c13d5ff","mergeable":"UNKNOWN"},
+      {"number":887,"headRefOid":"d86b6ecdaa740fa8d4ccaf5ef525fc5560c965ba","mergeable":"UNKNOWN"},
+      {"number":882,"headRefOid":"f4965224b569325a8ab41c2a97b8d71157d630c6","mergeable":"UNKNOWN"},
+      {"number":863,"headRefOid":"a9620ce9def198ed2348fbbff11cdc412ef04671","mergeable":"UNKNOWN"},
+      {"number":850,"headRefOid":"73cac0d4b10eea7fb4118d03482ea341bf63763d","mergeable":"UNKNOWN"},
+      {"number":840,"headRefOid":"e72e070f11e08ded55f7f791cd23e684a0ac0a56","mergeable":"UNKNOWN"},
+      {"number":839,"headRefOid":"4d8ecef02eb43e1be1266712fe76737b258006f0","mergeable":"UNKNOWN"},
+      {"number":829,"headRefOid":"44f77fd6861935a044197b294df1fbd3bf176100","mergeable":"UNKNOWN"},
+      {"number":820,"headRefOid":"1068cd644141bb0e89e230c7328ea9d0802ea470","mergeable":"UNKNOWN"},
+      {"number":807,"headRefOid":"e3d2213b66ac9d0215bfb7f3f6a813a66b9c198f","mergeable":"UNKNOWN"},
+      {"number":825,"headRefOid":"2f56347c8f596a4a0b34ca2e654b981e10ad4cc2","mergeable":"UNKNOWN"},
+      {"number":709,"headRefOid":"53c5153aa661fb37ea242ee8c4ffadfe8da6e3d0","mergeable":"UNKNOWN"},
+      {"number":773,"headRefOid":"c5642134851247d2f3a5ff4dc0f239b3e870508e","mergeable":"UNKNOWN"},
+      {"number":795,"headRefOid":"37d60bc205e3485c6fbdbac6808633a2634cdd3d","mergeable":"UNKNOWN"},
+      {"number":800,"headRefOid":"8980fd5932f2f88ea44906a11c947832427f2147","mergeable":"UNKNOWN"},
+      {"number":760,"headRefOid":"3f7a8cd9825916ee536f5524c3c27cbb8004963b","mergeable":"UNKNOWN"},
+      {"number":733,"headRefOid":"beee52d6690c73c89c17e8e285951584d2836b05","mergeable":"UNKNOWN"},
+      {"number":770,"headRefOid":"e4e1e6094526848b18d3d5cae3df35f4d84ef350","mergeable":"UNKNOWN"},
+      {"number":783,"headRefOid":"41d39dc7a0b35b15e98be4a9d769b91a7ae7463c","mergeable":"UNKNOWN"},
+      {"number":823,"headRefOid":"ec8d1d800d63a91e717b8e2c59fc0b1329750473","mergeable":"UNKNOWN"},
+      {"number":814,"headRefOid":"fba4205806af19739da780ec472e87f94a8c46de","mergeable":"UNKNOWN"},
+      {"number":788,"headRefOid":"cd0bb6906f1a060a4237c6ed29171595c30c79db","mergeable":"UNKNOWN"},
+      {"number":810,"headRefOid":"db9301440f0e363f17a1bad8c7d065bdb2861def","mergeable":"UNKNOWN"},
+      {"number":816,"headRefOid":"95a4f5c55dcf93d8695a55e9fe0d54d1b46674f8","mergeable":"UNKNOWN"},
+      {"number":806,"headRefOid":"9f22183755524c74949845d4f623a55d3ffc1084","mergeable":"UNKNOWN"},
+      {"number":779,"headRefOid":"82640c6f054e2abf88c240e07bec0a71221cccfc","mergeable":"UNKNOWN"},
+      {"number":769,"headRefOid":"17a06de05ce941361186d34ad41a97dc21813ca5","mergeable":"UNKNOWN"},
+      {"number":774,"headRefOid":"19c574c635e605851447daf429dcc9e2dd5351fe","mergeable":"UNKNOWN"},
+      {"number":784,"headRefOid":"5a2ab393519ee963f09355ed5690085ad268777a","mergeable":"UNKNOWN"},
+      {"number":772,"headRefOid":"28d82fc4fbfb3b24db46bf74404cb33c8f5f9e1b","mergeable":"UNKNOWN"},
+      {"number":754,"headRefOid":"3e23f71abf3ae29c63483ef35c8506b8347e2c56","mergeable":"UNKNOWN"},
+      {"number":755,"headRefOid":"bca2a3891419a03ee6b964de79af0930fab48dce","mergeable":"UNKNOWN"},
+      {"number":734,"headRefOid":"2eeee60fd31231345c09dde3fc2a3d0ab98509dd","mergeable":"UNKNOWN"},
+      {"number":731,"headRefOid":"9092d2d121c106961d6fe2f3b071ae2a08fbd51a","mergeable":"CONFLICTING"}
+    ]
+  },
+  "conflict_probes": {
+    "method": "git merge-tree --write-tree --name-only --no-messages <repository_revision> <head>",
+    "selection": "Three deliberately selected PRs already reported CONFLICTING; mechanism probes, not a representative sample.",
+    "rows": [
+      {
+        "pr": 1145,
+        "head": "08c187807b6b49f97fe3a63d0ebb75f1fb222585",
+        "exit": 1,
+        "conflict_paths": [
+          "docs/decisions/2026-10-14-session-relaunch-after-wsl-restart.md",
+          "evidence/artifacts/session-relaunch-20261014/README.md",
+          "manifests/evidence.json"
+        ]
+      },
+      {
+        "pr": 1091,
+        "head": "52924b028c8419b48042f80b088ec3135a0f8084",
+        "exit": 1,
+        "conflict_paths": [
+          "blueprints/us-equities/adaptive-paper/runner.py",
+          "blueprints/us-equities/adaptive-paper/source-hashes.json",
+          "blueprints/us-equities/adaptive-paper/transport.py",
+          "manifests/evidence.json"
+        ]
+      },
+      {
+        "pr": 1141,
+        "head": "d9c6dd0580cbbef1737809bfbbc1d2aff5c4b544",
+        "exit": 1,
+        "conflict_paths": [
+          "docs/decisions/2026-10-14-session-relaunch-after-wsl-restart.md",
+          "evidence/artifacts/session-relaunch-20261014/README.md",
+          "manifests/evidence.json",
+          "tests/test_session_relaunch.py",
+          "tools/session-relaunch/session_relaunch.py"
+        ]
+      }
+    ]
+  },
+  "baseline_validators": {
+    "files": [
+      ".github/workflows/validate.yml",
+      ".github/workflows/token-report.yml",
+      ".github/workflows/dependency-review.yml",
+      ".github/workflows/security-scan.yml",
+      ".github/workflows/pr-metadata.yml",
+      ".github/workflows/sota-sources-gate.yml"
+    ],
+    "actionlint": {
+      "version": "1.17.0",
+      "upstream": "kjanat/actionlint",
+      "exit": 0,
+      "seconds": 0.06
+    },
+    "zizmor": {
+      "version": "1.30.1",
+      "arguments": [
+        "--offline",
+        "--no-config",
+        "--no-ignores",
+        "--persona",
+        "regular",
+        "--strict-collection"
+      ],
+      "exit": 0,
+      "seconds": 0.12,
+      "tool_report": "No findings to report. Good job! (14 suppressed)"
+    },
+    "resource_scope": "systemd-run --user --scope -p CPUWeight=idle"
+  },
+  "sources": [
+    {
+      "repository": "github/docs",
+      "revision": "0226a2d78cf2be40ee3d769ec5661638461af0cc",
+      "path": "content/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue.md",
+      "lines": "23-43,49,57-67,80-84"
+    },
+    {
+      "repository": "github/docs",
+      "revision": "0226a2d78cf2be40ee3d769ec5661638461af0cc",
+      "path": "content/actions/reference/workflows-and-actions/events-that-trigger-workflows.md",
+      "lines": "374-398"
+    },
+    {
+      "repository": "github/docs",
+      "revision": "0226a2d78cf2be40ee3d769ec5661638461af0cc",
+      "path": "content/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets.md",
+      "lines": "45-66"
+    },
+    {
+      "repository": "github/rest-api-description",
+      "revision": "507b88ecbdccb4789ce77228fa2f2fde4bdeaf1f",
+      "path": "descriptions/api.github.com/api.github.com.json",
+      "lines": "148030-148106"
+    },
+    {
+      "repository": "github/docs",
+      "revision": "0226a2d78cf2be40ee3d769ec5661638461af0cc",
+      "path": "src/graphql/data/fpt/schema.docs.graphql",
+      "lines": "14285-14304,26227-26285,50733-50772,55547-55555"
+    },
+    {
+      "repository": "actions/dependency-review-action",
+      "revision": "a1d282b36b6f3519aa1f3fc636f609c47dddb294",
+      "path": "action.yml",
+      "lines": "25-29"
+    }
+  ],
+  "commands": [
+    "gh api repos/native-agent-stack/native-agent-stack/rules/branches/main",
+    "gh api repos/native-agent-stack/native-agent-stack/branches/main/protection",
+    "gh api repos/native-agent-stack/native-agent-stack/code-scanning/default-setup",
+    "gh api graphql -f query=<open_prs.query> [-f after=<cursor>]",
+    "gh api graphql -f query='query { repository(owner:\"native-agent-stack\",name:\"native-agent-stack\") { mergeQueue(branch:\"main\") { url } } }'"
+  ],
+  "limitations": [
+    "API readbacks are time-specific and not an atomic repository snapshot.",
+    "CONFLICTING is a PR-level result, not attribution to manifests/evidence.json.",
+    "The selected merge-tree probes also conflict in other files; they do not estimate an ejection rate.",
+    "No merge_queue activation, enqueue, merge_group run or native ejection was performed.",
+    "Static baseline validator results do not qualify proposed workflow changes or merge-group execution."
+  ]
+}

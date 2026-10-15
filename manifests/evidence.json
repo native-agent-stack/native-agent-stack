@@ -19277,6 +19277,11 @@
       "bytes": 13866
     },
     {
+      "path": "docs/decisions/2026-10-15-github-merge-queue-evaluation.md",
+      "sha256": "1a43fc2a782bb01bce0fe7789f2481f0374a2e6c7563e4164a523d7dbe9f3458",
+      "bytes": 26474
+    },
+    {
       "path": "docs/decisions/2026-10-15-jev-trading-harness-build.md",
       "sha256": "cbf1ff9120d3aa1e5687b53240896ecb54dccf6782eef833590851a4ddfc78fd",
       "bytes": 8484
@@ -41362,6 +41367,21 @@
       "bytes": 12897
     },
     {
+      "path": "evidence/artifacts/merge-queue-evaluation-20261015/baseline.json",
+      "sha256": "bd7354f685de8550975db8c00344025692bd43722b1f3f2ab2e17e6501c1348c",
+      "bytes": 20934
+    },
+    {
+      "path": "evidence/artifacts/merge-queue-evaluation-20261015/registry-migration-inventory.json",
+      "sha256": "870663fea5bc07930a0fbd004997da5f9e51c327994e2bf0ce3677e50e33ce27",
+      "bytes": 110655
+    },
+    {
+      "path": "evidence/artifacts/merge-queue-evaluation-20261015/registry-reference-probes.json",
+      "sha256": "c91598464dc1e113130484b7cdcf379acc061b154d099da4598108e433567e9a",
+      "bytes": 3826
+    },
+    {
       "path": "evidence/artifacts/model-currency-enforcement-20261007/checks.json",
       "sha256": "2d789eb233000fac56764b7eb6fb2696e46ec617b4d0cd025e009e573e81cbd8",
       "bytes": 7741
@@ -62397,6 +62417,11 @@
       "bytes": 7138
     },
     {
+      "path": "scripts/evidence_manifest.py",
+      "sha256": "f69d2f687f112a80eb742a8b428a2b1922782cc644842401500e3f3341c34ec7",
+      "bytes": 10543
+    },
+    {
       "path": "scripts/final_stack.py",
       "sha256": "2319364f1f99b491f7d5fed2ec3a7851e1bce5117da5f0f6eebad1a0d05a66f1",
       "bytes": 81671
@@ -62438,8 +62463,8 @@
     },
     {
       "path": "scripts/host_receipts.py",
-      "sha256": "c3dc47cdab33e2ed2f1473700774a006a34c6218d6cd7ceb36f33d7f71f0fd6f",
-      "bytes": 111077
+      "sha256": "9a74c60667087b7dcd6e71914a516006755f1653218a7ba2564022b603422894",
+      "bytes": 111557
     },
     {
       "path": "scripts/kernel_keyring.py",
@@ -62543,8 +62568,8 @@
     },
     {
       "path": "scripts/validate.py",
-      "sha256": "a68c189c56bef41b0d3d8a5069920e15db45249818054c444988abad1e8f8477",
-      "bytes": 49157
+      "sha256": "4dec59ded211261983af2d5c7f44c5098fb714330be3a6d88dfad75ffea73415",
+      "bytes": 50608
     },
     {
       "path": "scripts/validate_catalogs.py",
@@ -62573,8 +62598,8 @@
     },
     {
       "path": "scripts/verdict_review_gate.py",
-      "sha256": "e93527dc1ecb9a67c90254d5f6a21293e36e7aa5a1e1dee45b7e42a4eaba5db7",
-      "bytes": 100431
+      "sha256": "03561686b4c98ee1b9bf909e722907c1fab810f51e1ad5e84082275b3cba0080",
+      "bytes": 100467
     },
     {
       "path": "scripts/verify_nautilus_ci.py",
@@ -63460,6 +63485,11 @@
       "path": "tests/test_env_freshness.py",
       "sha256": "0eb7bb209a38fd5b680776b67b99e448f50b1f1c29b2c550b33483b2404919f3",
       "bytes": 3446
+    },
+    {
+      "path": "tests/test_evidence_manifest.py",
+      "sha256": "1c0c82430e8625135ad2b0838443667ba30d7c3cd9feeec5369d1fd8af7c8d59",
+      "bytes": 14132
     },
     {
       "path": "tests/test_execution_realism.py",
