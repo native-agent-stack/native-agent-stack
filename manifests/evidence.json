@@ -5772,7 +5772,7 @@
     },
     {
       "path": "adoption/skills/manifest.json",
-      "sha256": "f55d6065c4022b8b8164a8cd6c70bb83f78968c0e289579c3642ebc08fa4d724",
+      "sha256": "154927fd1054d660f947a9058bc99073f6bab731a0a10bfaf148aea2e58fe471",
       "bytes": 64651
     },
     {
@@ -11688,7 +11688,7 @@
     },
     {
       "path": "blueprints/runtime-workers/skills/manifest.json",
-      "sha256": "f7ace88aa9b072cfff6f265c70f0f85fd826bd8e90154bde275ea1be6b3397f4",
+      "sha256": "40a1048228cce11385a45be8abbab9bdae8ba570d4ab33564eee643ee3c10d07",
       "bytes": 189559
     },
     {
@@ -52122,6 +52122,41 @@
       "bytes": 248046
     },
     {
+      "path": "evidence/artifacts/search-first-ecc-repin-20261015/README.md",
+      "sha256": "44e34a7b0f95d8a5735aae8fba6f2489ca7aebd73d3d7104b2a570b53b82f92e",
+      "bytes": 3994
+    },
+    {
+      "path": "evidence/artifacts/search-first-ecc-repin-20261015/regression.json",
+      "sha256": "3f709d8bb2315bdd9493e2c72f226e631cdf8b7233ebee567108ab35e22a24e4",
+      "bytes": 1106
+    },
+    {
+      "path": "evidence/artifacts/search-first-ecc-repin-20261015/source-binding.json",
+      "sha256": "3686df0248318d1db2a81973b40eb05d24d237754742f185f69245693e36602a",
+      "bytes": 2435
+    },
+    {
+      "path": "evidence/artifacts/search-first-ecc-repin-20261015/sources/iterative-retrieval.md",
+      "sha256": "b453b16d3e36174b8487c05ab807d0321a66c2d058812b2ae129d82824183725",
+      "bytes": 6786
+    },
+    {
+      "path": "evidence/artifacts/search-first-ecc-repin-20261015/sources/search-first-previous.md",
+      "sha256": "76835db48dd910061d2e4271b1151793d2fddbabeb2d2866eed068b3580c55d5",
+      "bytes": 8210
+    },
+    {
+      "path": "evidence/artifacts/search-first-ecc-repin-20261015/sources/search-first-selected.md",
+      "sha256": "d66d744228b9cf860acf35f8a90cbbe8195e61367860da9d3632f9fc65706733",
+      "bytes": 8021
+    },
+    {
+      "path": "evidence/artifacts/search-first-ecc-repin-20261015/trigger-check.json",
+      "sha256": "48eff502114f72c452b10dad8006f16a0e3d49d53b3d870faad7ceb149435e37",
+      "bytes": 7130
+    },
+    {
       "path": "evidence/artifacts/secret-scan-large-targets-20261010/measurements.json",
       "sha256": "2b220549599f2fb33a8f39a1b1e85446423abb5b97ac4a490abc9177f31237e2",
       "bytes": 10253
@@ -63965,6 +64000,11 @@
       "path": "tests/test_sdk_usage_scope.py",
       "sha256": "e1a0e758e0f5d50411f5a18a2114eabdbe7091aae600e80ddeca51ecaeb1c532",
       "bytes": 9774
+    },
+    {
+      "path": "tests/test_search_first_ecc_pin.py",
+      "sha256": "4f637686bb7e097175ca8fd51d2c6f67b8b6d0f8cf17cb048f7031db6c8a4ead",
+      "bytes": 1180
     },
     {
       "path": "tests/test_secret_path_guard.py",
