@@ -116,6 +116,7 @@ EXEMPTIONS = {
 }
 # Every write grant in the repository, by job. A new one is a reviewed change to this inventory.
 WRITE_GRANTS = {
+    "catalog-freshness.yml:model-currency": ["issues: write"],
     "catalog-freshness.yml:propose": ["contents: write", "pull-requests: write"],
     "publish-catalog.yml:publish": ["id-token: write", "attestations: write"],
     "publish-catalog.yml:release": ["contents: write"],

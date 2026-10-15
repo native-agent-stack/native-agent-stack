@@ -297,9 +297,9 @@ class ClaudeUsageDashboardTests(unittest.TestCase):
     def test_daily_full_suite_installs_the_hashed_ci_pin_before_tests(self):
         import yaml
         root = Path(__file__).resolve().parents[1]
-        steps = yaml.safe_load((root / ".github/workflows/catalog-freshness.yml").read_text())["jobs"]["freshness"]["steps"]
+        steps = yaml.safe_load((root / ".github/workflows/catalog-freshness.yml").read_text())["jobs"]["freshness-tests"]["steps"]
         installer = next(i for i, step in enumerate(steps) if "requirements-ci.txt" in step.get("run", ""))
-        test = next(i for i, step in enumerate(steps) if step["name"] == "Run project test suite")
+        test = next(i for i, step in enumerate(steps) if step["name"] == "Test validation failure modes")
         self.assertLess(installer, test)
         self.assertIn("--require-hashes", steps[installer]["run"])
         self.assertIn("--only-binary=:all:", steps[installer]["run"])

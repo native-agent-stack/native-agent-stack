@@ -2319,10 +2319,9 @@ class SkillsDocsTests(unittest.TestCase):
 YAML_PIN_REL = "tools/sota-convergence/landscape-sweep/skills-yaml.pin.json"
 YAML_WORKFLOW, YAML_JOB = "validate.yml", "validate"
 YAML_KEY = f"{YAML_WORKFLOW}:{YAML_JOB}"
-# The remaining serial suite without the YAML pin is catalog-freshness.yml:freshness.
-# Its reader tests and tripwire report this recorded gap; add provisioning and
-# delete the entry together. The ratchet rejects stale exemptions.
-YAML_KNOWN_UNPROVISIONED = {"catalog-freshness.yml:freshness"}
+# Every native suite/shard now provisions this pin, including catalog freshness.
+# The synthetic gap transition below keeps the ratchet exercised.
+YAML_KNOWN_UNPROVISIONED = set()
 YAML_TRIPWIRE = "tests.test_landscape_sweep_skills.SkillsYamlInstalledInCI"
 
 
@@ -2446,11 +2445,22 @@ class SkillsYamlTripwireControls(unittest.TestCase):
         for label, extra in unlisted.items():
             with self.subTest(label), tempfile.TemporaryDirectory() as home:
                 self.assert_failed(self.run_tripwire(home, **extra), "not_installed")
-        for key in sorted(YAML_KNOWN_UNPROVISIONED):
+        # The synthetic gap keeps this runtime skip branch covered after the
+        # last real CI omission was removed.
+        key = "synthetic-gap.yml:sample"
+        for key in [key]:
             workflow, _, job = key.partition(":")
             extra = {"GITHUB_JOB": job, "GITHUB_WORKFLOW_REF": f"owner/repo/.github/workflows/{workflow}@refs/heads/main"}
             with self.subTest(key), tempfile.TemporaryDirectory() as home:
-                self.assert_skipped(self.run_tripwire(home, **extra), "a recorded gap")
+                code = ("import unittest; from tests import test_landscape_sweep_skills as module; "
+                        f"module.YAML_KNOWN_UNPROVISIONED={{{key!r}}}; "
+                        "result=unittest.TextTestRunner(verbosity=2).run("
+                        "unittest.defaultTestLoader.loadTestsFromName(module.YAML_TRIPWIRE)); "
+                        "raise SystemExit(not result.wasSuccessful())")
+                done = subprocess.run([sys.executable, "-c", code], cwd=ROOT, capture_output=True,
+                                      text=True, timeout=300, check=False,
+                                      env=yaml_ci_env(home, **extra))
+                self.assert_skipped(done, "a recorded gap")
 
     def test_runs_outside_actions_skip_with_a_message(self):
         with tempfile.TemporaryDirectory() as home:
@@ -2578,13 +2588,14 @@ class SkillsYamlProvisioningControls(unittest.TestCase):
         self.assertEqual([category for category, _ in yaml_ratchet_problems({**self.texts, name: added})], ["unlisted"])
         lines = self.text.split("\n")
         start, end = yaml_provisioning_span(lines)
-        for key in sorted(YAML_KNOWN_UNPROVISIONED):
-            workflow, _, job = key.partition(":")
-            with self.subTest(key):
-                mutant = {**self.texts, workflow: shell_ci.with_step(self.texts[workflow], job, lines[start:end])}
-                self.assertEqual([category for category, _ in yaml_ratchet_problems(mutant)], ["stale"])
-                self.assertEqual(yaml_ratchet_problems(mutant, YAML_KNOWN_UNPROVISIONED - {key}), [])
-                self.assertEqual(yaml_provisioning_problems(mutant[workflow], job), [])
+        workflow, job = "synthetic-gap.yml", "sample"
+        key = f"{workflow}:{job}"
+        texts = {**self.texts, workflow: "on: push\njobs:\n  sample:\n    steps:\n" + shell_ci.SUITE_STEP}
+        self.assertEqual(yaml_ratchet_problems(texts, {key}), [])
+        mutant = {**texts, workflow: shell_ci.with_step(texts[workflow], job, lines[start:end])}
+        self.assertEqual([category for category, _ in yaml_ratchet_problems(mutant, {key})], ["stale"])
+        self.assertEqual(yaml_ratchet_problems(mutant, set()), [])
+        self.assertEqual(yaml_provisioning_problems(mutant[workflow], job), [])
         bare = {**self.texts, YAML_WORKFLOW: "\n".join(lines[:start] + lines[end:])}
         self.assertIn("required", [category for category, _ in yaml_ratchet_problems(bare)])
 
