@@ -1,0 +1,44 @@
+{
+  "calls": null,
+  "calls_definition": "null means unknown execution/identity; zero is reserved for observed MCP endpoint non-invocation",
+  "client": "codex",
+  "component_id": "openresearch",
+  "consumer": "Codex shell/CLI role",
+  "disposition": "cli-attribution-gap",
+  "frozen_run_pin": "0.2.15",
+  "frozen_run_pin_parsed": {
+    "commit": null,
+    "version": "0.2.15"
+  },
+  "host_differs_from_frozen_run": false,
+  "host_version": null,
+  "kind": "invocation_attribution_gap",
+  "layers": [
+    "foundation/web-research"
+  ],
+  "measurement": {
+    "attribution": "measure_cli.py",
+    "attribution_sha256": "8b762f3b2312aa54a9feec92095b9e83747fb0e1b5aff2d46a2039bd86a5b7fb",
+    "cli_execution_verified": false,
+    "count_is_lower_bound": false,
+    "counter": "tools/invocation-monitoring/codex_counter.py",
+    "counter_sha256": "06b569826c76c2dc9455fccd3e004329e71f791483b42b33571fad21910dc8e3",
+    "counter_summary": "counter-summary.json",
+    "counts_file": "native-cli-counts.json",
+    "counts_sha256": "16f0ac125a7b3e7d8a5d13d1a2d11e277c8c649cc585f1080b96f06c206f0116",
+    "host_versions_file": "host-versions.json",
+    "host_versions_sha256": "cc5a9b1da749f87e0c21baa0d82bd43bd10a36156eb04666a5fcf73eb8b7f9d1",
+    "organic_use_claim": false,
+    "scope": "all default/private native roots; current registry aliases for dedup; no organic-use claim"
+  },
+  "not_invoked_reason": "Consumer Codex shell/CLI role: actual execution remains unknown. Prior shell-prefix matches, when present, are not invocation evidence and were not remeasured for this window. Missing instrumentation is completed child/hook identity at its run pin, covering nested shell/Python commands and wrappers. If a slot explicitly names Codex and a complete counter confirms zero, the owner must wire that role or retire it; this incomplete view does not establish a wiring defect.",
+  "observed_cli_calls_lower_bound": null,
+  "observed_mcp_calls": 0,
+  "repository": "github.com/alphaxiv/openresearch",
+  "run_id": "openresearch",
+  "source_pin_table_sha256": "e345afc0913b36d179bbffe53933d2f8ca60dea41e35f0f58bc265306f4119b9",
+  "target_pin": "0.2.15; source ee36ef0333ca3c533eace915f1bec322a1efde1c",
+  "unvalidated_cli_prefix_matches": null,
+  "window_end": "2026-10-14T23:58:06Z",
+  "window_start": "2026-10-13T23:58:06Z"
+}

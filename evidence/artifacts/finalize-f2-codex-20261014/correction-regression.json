@@ -1,0 +1,25 @@
+{
+  "kind": "review_round_regressions",
+  "evidence_class": "local_integration",
+  "reviewed_head": "38b6369656149949c922f88c637f3d517b13ddf0",
+  "dispositions": ["Astra full1 findings 1-3", "local v4 findings 1-3"],
+  "command": "python3 -m unittest tests.test_finalize_f2_corrections -v",
+  "before": {"tests": 5, "failures": 5, "errors": 0, "exit_code": 1},
+  "after": {"tests": 6, "failures": 0, "errors": 0, "exit_code": 0},
+  "before_coverage": {
+    "Astra 1": "test_astra_1_name_only_installation_provenance_in_free_text",
+    "Astra 2/local 1": "test_astra_2_local_1_builder_uses_actual_public_inputs",
+    "Astra 3": "test_astra_3_redirection_failure_is_not_a_cli_invocation",
+    "local 2": "test_local_2_validator_runs_without_git_history_or_checkout_scripts",
+    "local 3": "test_local_3_compact_functions_are_not_invocations"
+  },
+  "retained_shell_control_vectors": 16,
+  "validator": {"receipts": 3, "reasons": 54, "negative_pin_controls_rejected": 6, "git_history_required": false},
+  "cli_disposition": "Historical prefix matches are unvalidated candidates, not lower bounds; no CLI receipt is emitted without execution evidence. The five prior positive CLI rows now have explicit attribution gaps for the same window.",
+  "historical_window_remeasured": false,
+  "mcp_counts_unchanged": true,
+  "limitations": [
+    "Synthetic regressions and local source loading are not new native-use measurements.",
+    "No role retirement, host configuration change, candidate upgrade or FINAL layer verdict."
+  ]
+}

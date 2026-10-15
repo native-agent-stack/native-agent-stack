@@ -1,0 +1,241 @@
+[
+  {
+    "command": [
+      "git",
+      "ls-remote",
+      "https://github.com/vercel-labs/agent-browser.git",
+      "refs/tags/v0.38.2",
+      "refs/tags/v0.38.2^{}"
+    ],
+    "component": "agent-browser",
+    "exit_code": 0,
+    "expected_peeled_commit": "39a74c70d7759d5a6de7a22c04570bb626bbd081",
+    "matches": true,
+    "peeled_commit": "39a74c70d7759d5a6de7a22c04570bb626bbd081",
+    "refs": {
+      "refs/tags/v0.38.2": "39a74c70d7759d5a6de7a22c04570bb626bbd081"
+    },
+    "tag": "v0.38.2"
+  },
+  {
+    "command": [
+      "git",
+      "ls-remote",
+      "https://github.com/akitaonrails/ai-memory.git",
+      "refs/tags/v2.6.3",
+      "refs/tags/v2.6.3^{}"
+    ],
+    "component": "ai-memory",
+    "exit_code": 0,
+    "expected_peeled_commit": "385b81ea95f7b73ede7146d0ae606c4caa7b43c1",
+    "matches": true,
+    "peeled_commit": "385b81ea95f7b73ede7146d0ae606c4caa7b43c1",
+    "refs": {
+      "refs/tags/v2.6.3": "e40a3678b6b9e41893302a0ade757cf97ee27b23",
+      "refs/tags/v2.6.3^{}": "385b81ea95f7b73ede7146d0ae606c4caa7b43c1"
+    },
+    "tag": "v2.6.3"
+  },
+  {
+    "command": [
+      "git",
+      "ls-remote",
+      "https://github.com/ccusage/ccusage.git",
+      "refs/tags/v20.0.26",
+      "refs/tags/v20.0.26^{}"
+    ],
+    "component": "ccusage",
+    "exit_code": 0,
+    "expected_peeled_commit": "d9821088b98aa536c7a385aa1a4579d6fa02269b",
+    "matches": true,
+    "peeled_commit": "d9821088b98aa536c7a385aa1a4579d6fa02269b",
+    "refs": {
+      "refs/tags/v20.0.26": "d9821088b98aa536c7a385aa1a4579d6fa02269b"
+    },
+    "tag": "v20.0.26"
+  },
+  {
+    "command": [
+      "git",
+      "ls-remote",
+      "https://github.com/wilfred/difftastic.git",
+      "refs/tags/0.71.0",
+      "refs/tags/0.71.0^{}"
+    ],
+    "component": "difftastic",
+    "exit_code": 0,
+    "expected_peeled_commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+    "matches": true,
+    "peeled_commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+    "refs": {
+      "refs/tags/0.71.0": "b7d119e90ac9f972f03f69508da765dacd302c0c"
+    },
+    "tag": "0.71.0"
+  },
+  {
+    "command": [
+      "git",
+      "ls-remote",
+      "https://github.com/headroomlabs-ai/headroom.git",
+      "refs/tags/v0.40.0",
+      "refs/tags/v0.40.0^{}"
+    ],
+    "component": "headroom",
+    "exit_code": 0,
+    "expected_peeled_commit": "855390d6110e0bbb199d9b97025baac16c2f5cf3",
+    "matches": true,
+    "peeled_commit": "855390d6110e0bbb199d9b97025baac16c2f5cf3",
+    "refs": {
+      "refs/tags/v0.40.0": "855390d6110e0bbb199d9b97025baac16c2f5cf3"
+    },
+    "tag": "v0.40.0"
+  },
+  {
+    "command": [
+      "git",
+      "ls-remote",
+      "https://github.com/openclaw/mcporter.git",
+      "refs/tags/v0.14.2",
+      "refs/tags/v0.14.2^{}"
+    ],
+    "component": "mcporter",
+    "exit_code": 0,
+    "expected_peeled_commit": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+    "matches": true,
+    "peeled_commit": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+    "refs": {
+      "refs/tags/v0.14.2": "a031fc437df4bfb3b1c4362d479026a5045805bc",
+      "refs/tags/v0.14.2^{}": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c"
+    },
+    "tag": "v0.14.2"
+  },
+  {
+    "command": [
+      "git",
+      "ls-remote",
+      "https://github.com/promptfoo/promptfoo.git",
+      "refs/tags/0.124.0",
+      "refs/tags/0.124.0^{}"
+    ],
+    "component": "promptfoo",
+    "exit_code": 0,
+    "expected_peeled_commit": "30949931ee90c963acd487e97828c9441db0bcd4",
+    "matches": true,
+    "peeled_commit": "30949931ee90c963acd487e97828c9441db0bcd4",
+    "refs": {
+      "refs/tags/0.124.0": "30949931ee90c963acd487e97828c9441db0bcd4"
+    },
+    "tag": "0.124.0"
+  },
+  {
+    "command": [
+      "git",
+      "ls-remote",
+      "https://github.com/tobi/qmd.git",
+      "refs/tags/v2.8.3",
+      "refs/tags/v2.8.3^{}"
+    ],
+    "component": "qmd",
+    "exit_code": 0,
+    "expected_peeled_commit": "facd35e01359e59d938bc9418e93fb9318addee3",
+    "matches": true,
+    "peeled_commit": "facd35e01359e59d938bc9418e93fb9318addee3",
+    "refs": {
+      "refs/tags/v2.8.3": "30edfa8b11b3bdcb8ff2bb34d85c10d542333cc1",
+      "refs/tags/v2.8.3^{}": "facd35e01359e59d938bc9418e93fb9318addee3"
+    },
+    "tag": "v2.8.3"
+  },
+  {
+    "command": [
+      "git",
+      "ls-remote",
+      "https://github.com/restic/restic.git",
+      "refs/tags/v0.19.1",
+      "refs/tags/v0.19.1^{}"
+    ],
+    "component": "restic",
+    "exit_code": 0,
+    "expected_peeled_commit": "6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf",
+    "matches": true,
+    "peeled_commit": "6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf",
+    "refs": {
+      "refs/tags/v0.19.1": "6099d4b5c4376368d42b9982c7d3e93ba13d83b1",
+      "refs/tags/v0.19.1^{}": "6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf"
+    },
+    "tag": "v0.19.1"
+  },
+  {
+    "command": [
+      "git",
+      "ls-remote",
+      "https://github.com/rtk-ai/rtk.git",
+      "refs/tags/v0.51.0",
+      "refs/tags/v0.51.0^{}"
+    ],
+    "component": "rtk",
+    "exit_code": 0,
+    "expected_peeled_commit": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+    "matches": true,
+    "peeled_commit": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+    "refs": {
+      "refs/tags/v0.51.0": "e001f773f80b22b7dc4c7a79521b30e35aaef026"
+    },
+    "tag": "v0.51.0"
+  },
+  {
+    "command": [
+      "git",
+      "ls-remote",
+      "https://github.com/giancarloerra/socraticode.git",
+      "refs/tags/v1.16.0",
+      "refs/tags/v1.16.0^{}"
+    ],
+    "component": "socraticode",
+    "exit_code": 0,
+    "expected_peeled_commit": "3d3a4a4d427cb0f29de4f5dd1360da52896f62df",
+    "matches": true,
+    "peeled_commit": "3d3a4a4d427cb0f29de4f5dd1360da52896f62df",
+    "refs": {
+      "refs/tags/v1.16.0": "a50f72c5b79dcb8f69ac9bc68b21fe744d82d45b",
+      "refs/tags/v1.16.0^{}": "3d3a4a4d427cb0f29de4f5dd1360da52896f62df"
+    },
+    "tag": "v1.16.0"
+  },
+  {
+    "command": [
+      "git",
+      "ls-remote",
+      "https://github.com/max-sixty/worktrunk.git",
+      "refs/tags/v0.80.0",
+      "refs/tags/v0.80.0^{}"
+    ],
+    "component": "worktrunk",
+    "exit_code": 0,
+    "expected_peeled_commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+    "matches": true,
+    "peeled_commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+    "refs": {
+      "refs/tags/v0.80.0": "b49ca7eea9b03145791a5b94eccaf9c59412ed37"
+    },
+    "tag": "v0.80.0"
+  },
+  {
+    "command": [
+      "git",
+      "ls-remote",
+      "https://github.com/gitleaks/gitleaks.git",
+      "refs/tags/v8.30.1",
+      "refs/tags/v8.30.1^{}"
+    ],
+    "component": "gitleaks",
+    "exit_code": 0,
+    "expected_peeled_commit": "83d9cd684c87d95d656c1458ef04895a7f1cbd8e",
+    "matches": true,
+    "peeled_commit": "83d9cd684c87d95d656c1458ef04895a7f1cbd8e",
+    "refs": {
+      "refs/tags/v8.30.1": "83d9cd684c87d95d656c1458ef04895a7f1cbd8e"
+    },
+    "tag": "v8.30.1"
+  }
+]

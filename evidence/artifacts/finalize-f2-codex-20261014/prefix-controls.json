@@ -1,0 +1,101 @@
+{
+  "kind": "attribution_controls",
+  "evidence_class": "synthetic",
+  "cases": 16,
+  "vectors": [
+    {
+      "id": "literal",
+      "command": "rtk --version",
+      "expected_components": [
+        "rtk"
+      ]
+    },
+    {
+      "id": "gh",
+      "command": "gh --version",
+      "expected_components": [
+        "candidate:cli-cli"
+      ]
+    },
+    {
+      "id": "quoted-executable",
+      "command": "'/usr/bin/gh' --version",
+      "expected_components": [
+        "candidate:cli-cli"
+      ]
+    },
+    {
+      "id": "quoted-prose",
+      "command": "printf '%s' 'rtk proxy gh'",
+      "expected_components": []
+    },
+    {
+      "id": "echo",
+      "command": "echo gh --version",
+      "expected_components": []
+    },
+    {
+      "id": "space-in-program",
+      "command": "'gh arg' --version",
+      "expected_components": []
+    },
+    {
+      "id": "wrapper-child",
+      "command": "rtk proxy gh pr view 1",
+      "expected_components": [
+        "rtk"
+      ]
+    },
+    {
+      "id": "scope-wrapper",
+      "command": "systemd-run --user --scope -- uv --version",
+      "expected_components": []
+    },
+    {
+      "id": "environment-wrapper",
+      "command": "env F2_TEST=1 gh --version",
+      "expected_components": []
+    },
+    {
+      "id": "timeout-wrapper",
+      "command": "timeout 30s gh --version",
+      "expected_components": []
+    },
+    {
+      "id": "spaced-function",
+      "command": "gh () { true; }",
+      "expected_components": []
+    },
+    {
+      "id": "compact-function",
+      "command": "rtk (){ :; }",
+      "expected_components": []
+    },
+    {
+      "id": "comment",
+      "command": "# gh --version",
+      "expected_components": []
+    },
+    {
+      "id": "python-string",
+      "command": "python3 -c \"print(gh)\"",
+      "expected_components": []
+    },
+    {
+      "id": "masked-redirect",
+      "command": "rtk --version > missing/output || true",
+      "expected_components": []
+    },
+    {
+      "id": "substitution",
+      "command": "rtk $(echo --version)",
+      "expected_components": []
+    }
+  ],
+  "failed_case_ids": [],
+  "source_sha256": "8b762f3b2312aa54a9feec92095b9e83747fb0e1b5aff2d46a2039bd86a5b7fb",
+  "not_invocation_evidence": true,
+  "exit_code": 0,
+  "supersedes": "Initial prefix-only control claim; wrapper child execution is now unmeasured.",
+  "runner": "python3 -m unittest tests.test_finalize_f2_corrections.FinalizeF2CorrectionsTests.test_retained_literal_command_controls -v"
+}

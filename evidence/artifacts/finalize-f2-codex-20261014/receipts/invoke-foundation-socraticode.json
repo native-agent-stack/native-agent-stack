@@ -1,0 +1,49 @@
+{
+  "binds_frozen_run": false,
+  "calls": 64,
+  "client": "codex",
+  "component_id": "foundation-socraticode",
+  "consumer": "Codex MCP registration",
+  "evidence_class": "native_proven",
+  "frozen_run_pin": "1.15.0",
+  "frozen_run_pin_parsed": {
+    "commit": null,
+    "version": "1.15.0"
+  },
+  "host_differs_from_frozen_run": true,
+  "host_version": "1.16.0",
+  "kind": "invocation",
+  "layers": [
+    "us-equities/agents-models-workers"
+  ],
+  "measurement": {
+    "attribution": "measure_cli.py",
+    "attribution_sha256": "8b762f3b2312aa54a9feec92095b9e83747fb0e1b5aff2d46a2039bd86a5b7fb",
+    "cli_execution_verified": false,
+    "count_is_lower_bound": false,
+    "counter": "tools/invocation-monitoring/codex_counter.py",
+    "counter_sha256": "06b569826c76c2dc9455fccd3e004329e71f791483b42b33571fad21910dc8e3",
+    "counter_summary": "counter-summary.json",
+    "counts_file": "native-cli-counts.json",
+    "counts_sha256": "16f0ac125a7b3e7d8a5d13d1a2d11e277c8c649cc585f1080b96f06c206f0116",
+    "host_versions_file": "host-versions.json",
+    "host_versions_sha256": "cc5a9b1da749f87e0c21baa0d82bd43bd10a36156eb04666a5fcf73eb8b7f9d1",
+    "organic_use_claim": false,
+    "scope": "all default/private native roots; current registry aliases for dedup; no organic-use claim"
+  },
+  "not_evidence": "installation alone, organic use, upstream quality, or unseen nested/hook/library execution",
+  "observed_cli_calls_lower_bound": null,
+  "observed_mcp_calls": 64,
+  "pin": "1.16.0; source 3d3a4a4d427cb0f29de4f5dd1360da52896f62df",
+  "pin_binding": "Native completed MCP item identity plus installed version/source metadata predating the window; source identity is the retained upstream tag completion. MCP events have no per-call binary-version label; historical registration continuity is not independently attested.",
+  "pin_pending": false,
+  "registration_pending": true,
+  "repository": "github.com/giancarloerra/socraticode",
+  "run_id": "socraticode",
+  "same_observation_as": "socraticode",
+  "source_pin_table_sha256": "e345afc0913b36d179bbffe53933d2f8ca60dea41e35f0f58bc265306f4119b9",
+  "unit": "completed native MCP attempts; historical CLI prefix matches are not credited",
+  "unvalidated_cli_prefix_matches": null,
+  "window_end": "2026-10-14T23:58:06Z",
+  "window_start": "2026-10-13T23:58:06Z"
+}

@@ -1,0 +1,31 @@
+{
+  "cli_counts": {},
+  "client_tool_calls_by_version": {
+    "0.162.1": 2548
+  },
+  "diagnostics": {
+    "command_completed": 1392,
+    "multiline_or_non_posix": 143,
+    "not_attributed_to_winner": 1028
+  },
+  "files_considered": 3943,
+  "mcp_counts": {
+    "codebase-memory-mcp": 26,
+    "context-mode": 1048,
+    "hindsight": 5,
+    "serena": 77
+  },
+  "publication": "Native sample thread/item identifiers omitted; counts and window unchanged.",
+  "scope": "registered native roots only; no organic-use claim",
+  "window_end": "2026-10-14T23:58:06Z",
+  "window_start": "2026-10-13T23:58:06Z",
+  "window_threads": 19,
+  "unvalidated_cli_prefix_matches": {
+    "candidate:cli-cli": 18,
+    "rtk": 275,
+    "systemd": 69,
+    "worktrunk": 2
+  },
+  "cli_execution_verified": false,
+  "attribution_status": "Superseded preliminary prefix projection;not verified execution or a lower bound."
+}
