@@ -17743,8 +17743,8 @@
     },
     {
       "path": "catalogs/us-equities/README.md",
-      "sha256": "d38458ce7790ef58cff1984aa1677ebaead5b59e1d78b484bf8b4affe4274710",
-      "bytes": 25779
+      "sha256": "24814613c06241b117dfc1711b864b19e2ecee96e54223804f8299606d12dcfd",
+      "bytes": 26165
     },
     {
       "path": "catalogs/us-equities/agents-operations.json",
@@ -17913,8 +17913,23 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "23d750c008debcc0ffb59b6460869397a705ff56c728a0328c3c9cb2f1974a03",
-      "bytes": 1158790
+      "sha256": "324a0e2a7ecdcd39f9d17589ecc18eea2acb92d7ccf2046d6a1ecd288962a376",
+      "bytes": 1159231
+    },
+    {
+      "path": "catalogs/us-equities/edgartools-562-fixture-output-20261015.json",
+      "sha256": "fed33d8489d3840ea505d2dfe998fb1c730342184b36b49eba341dabcb334ff7",
+      "bytes": 255
+    },
+    {
+      "path": "catalogs/us-equities/edgartools-562-screen-20261015.json",
+      "sha256": "7e05517981a151d0a1736b5cd03f823365d93600002aca8e69a4db1c74f7e84b",
+      "bytes": 6524
+    },
+    {
+      "path": "catalogs/us-equities/edgartools-562-screen-20261015.md",
+      "sha256": "69379646e35ff16b88d673fa42589648d43c552ddc19e448bc31200fe2dd7615",
+      "bytes": 9938
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",

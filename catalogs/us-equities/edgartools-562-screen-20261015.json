@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "kind": "sanitized_upstream_layer_screen",
+  "candidates": [
+    {
+      "repository": "https://github.com/dgunning/edgartools",
+      "pin": "5068cc548552fab1fbd061f1b8bccdc4e1677c6f",
+      "version": "5.62.0",
+      "catalog_layers": ["market-data-reference", "data-research"],
+      "decision": "screen_passed_for_native_fixture_parsing",
+      "evidence_kind": "native_execution",
+      "scope": "Isolated vendor install, the vendor's own offline SGML/Form144/424B/XBRL tests, targeted EntityFactsParser tests, and public-fixture parser/persistence E2E. No live service, original availability, strategy or whole-layer FINAL claim.",
+      "sources": [
+        "dgunning/edgartools@5068cc548552fab1fbd061f1b8bccdc4e1677c6f:README.md:74",
+        "dgunning/edgartools@5068cc548552fab1fbd061f1b8bccdc4e1677c6f:pyproject.toml",
+        "dgunning/edgartools@5068cc548552fab1fbd061f1b8bccdc4e1677c6f:tests/_offline_harness.py",
+        "dgunning/edgartools@5068cc548552fab1fbd061f1b8bccdc4e1677c6f:edgar/sgml/sgml_header.py:453",
+        "dgunning/edgartools@5068cc548552fab1fbd061f1b8bccdc4e1677c6f:edgar/sgml/sgml_parser.py:320",
+        "dgunning/edgartools@5068cc548552fab1fbd061f1b8bccdc4e1677c6f:edgar/ownership/form144.py",
+        "dgunning/edgartools@5068cc548552fab1fbd061f1b8bccdc4e1677c6f:edgar/entity/parser.py"
+      ],
+      "install": {
+        "method": "CPython 3.12.3 venv under isolated scratch; native pip install edgartools==5.62.0 from the public PyPI index, plus exactly the vendor's tool.hatch.envs.test.dependencies",
+        "returncode": 0,
+        "installed_version": "5.62.0",
+        "new_model_dependency_invoked": false
+      },
+      "test_runs": [
+        {
+          "command_display": "python -B -m pytest -p tests._offline_harness -p no:pytest-retry -m 'not network' -q tests/sgml/test_filing_header.py tests/sgml/test_filing_sgml.py tests/core/test_144_notice_contract.py tests/issues/regression/test_424b_parser.py tests/xbrl/test_xbrl_parser.py tests/entity/test_entity_facts.py",
+          "returncode": 0,
+          "executed": 114,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "selection_limit": "Network-marked tests were deselected; the broad entity module was not credited as exercised by this run."
+        },
+        {
+          "command_display": "python -B -m pytest -p tests._offline_harness -p no:pytest-retry -q tests/entity/test_entity_facts.py::TestEntityFactsParser tests/xbrl/test_xbrl_parser.py::test_parse_instance_content",
+          "returncode": 0,
+          "executed": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "selection_limit": "Exact parser fixtures only; this is not a companyfacts acquisition or full entity-suite result. The XBRL instance check also occurs in the first campaign, so the counts are executions per run, not a claim of 125 distinct tests."
+        }
+      ],
+      "test_isolation": "Vendor offline harness blocks outbound sockets/DNS and clears caches; bubblewrap also unshares network, hides the host home, and binds only the runtime and owned scratch. Tests ran in a user systemd scope with CPUWeight=idle.",
+      "retained_failed_attempts": {
+        "precollection_launcher_attempts": 3,
+        "returncode": 1,
+        "tests_executed": 0,
+        "reason": "The isolated runtime bind initially omitted the virtual environment interpreter's version-alias symlink. The complete runtime directory fixed the launcher; no vendor failure or SEC call occurred."
+      },
+      "public_fixture_e2e": {
+        "observed_at_utc": "2026-10-15T17:33:30.155127+00:00",
+        "returncode": 0,
+        "fixture": "data/secheader.424B5.abeona.txt",
+        "fixture_sha256": "420ae1977a1664fbf7d3c9d25cc577c7a7197048b21332b5292abb13a6a71396",
+        "rows": 1,
+        "accession": "0001493152-23-020412",
+        "form": "424B5",
+        "cik": 318306,
+        "acceptance_datetime_utc": "2023-06-07T20:10:23+00:00",
+        "clock_authority": "SGML ACCEPTANCE-DATETIME, localized America/New_York",
+        "roundtrip": "Native parse, UTC conversion, create-only JSON persistence, mode 0444, byte-identical reread and JSON equality all passed.",
+        "output_file": "catalogs/us-equities/edgartools-562-fixture-output-20261015.json",
+        "output_sha256": "fed33d8489d3840ea505d2dfe998fb1c730342184b36b49eba341dabcb334ff7",
+        "form144_fixture": "data/144/EDGAR Form 144 XML Samples/Sample 144.xml",
+        "form144_fixture_sha256": "a3dc164656352992d6b15cc4568953d8eb8592b8b76c2b9e81bfe68ccf2bf9d2",
+        "form144_security_rows": 2,
+        "form144_header_clock": "NOT_IN_XML_FIXTURE",
+        "network_calls": 0,
+        "model_calls": 0,
+        "limit": "The execution clock is a receipt clock, not original historical availability. The Form144 XML result certifies its public fixture parser, not an acceptance clock absent from that XML."
+      },
+      "installed_source_matches_tag": [
+        {"path": "edgar/sgml/sgml_header.py", "sha256": "b54fff3ab146a0fec7fc58ad8360ceccfe017983e97b91f68860bb88452343c0"},
+        {"path": "edgar/sgml/sgml_parser.py", "sha256": "6e0c7e7f2f3e91c1709f31a4f0a68a8ebf180eb1e08825b0a2a4a300c525ac63"},
+        {"path": "edgar/httpclient.py", "sha256": "63675da6f438d5e06422882a07b20802eded59a944a8357242969b53d7876ecc"},
+        {"path": "edgar/httprequests.py", "sha256": "ac89c7d0cb8ebcbeb6a73e27aaa03b517e823e7c796e74c9aea92740e631826f"},
+        {"path": "edgar/company_reports/current_report.py", "sha256": "63f4d187ea7d939cc73d83db46fe908615d00f1a7bd8af3cbb68152a1ea912f9"},
+        {"path": "edgar/entity/parser.py", "sha256": "416d41b7d759cf367345294a72dbcfa64ef5f2db058484e1445a4a9080cb0468"},
+        {"path": "edgar/entity/entity_facts.py", "sha256": "e6121bf92c80dc94293851fa66731830552c449583af60d5747b041354b63c44"},
+        {"path": "edgar/ownership/form144.py", "sha256": "4d5dff1e85d48720b5666cb72dbec33f218873ea4a3b43fa6214b4cd4b93e6d2"}
+      ],
+      "limits": [
+        "Fixture acceptance is scoped; no live SEC availability or dissemination timing was measured.",
+        "The header clock must come from SGML, not the submissions JSON field.",
+        "FilingHeader.parse_submission_format_header does not populate acceptance_datetime at this pin; the separate native SGML clock parser must be used when composing tagged-header metadata.",
+        "A generic screen passes no strategy, broker, order or dataset-completeness gate."
+      ]
+    }
+  ]
+}
