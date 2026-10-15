@@ -8,7 +8,7 @@ import sys
 import time
 import types
 import unittest
-from unittest.mock import Mock,patch
+from unittest.mock import AsyncMock,Mock,patch
 
 SOURCE=Path(os.environ.get('ADAPTIVE_SOURCE_ROOT',str(Path(__file__).resolve().parents[1]/'blueprints/us-equities/adaptive-paper')))
 sys.path.insert(0,str(SOURCE))
@@ -24,7 +24,9 @@ class StreamBackpressure(unittest.IsolatedAsyncioTestCase):
                'alpaca.data.enums':enums}
         with patch.dict(sys.modules,stubs),patch.object(t,'_sdk_client',return_value=Mock()), \
                 patch.object(t,'_protocol_factory',return_value=None), \
-                patch.object(t,'_stream_classes',return_value=(Mock,Mock)):
+                patch.object(t,'_stream_classes',return_value=(
+                    lambda *a,**k:Mock(stop_ws=AsyncMock()),
+                    lambda *a,**k:Mock(stop_ws=AsyncMock()))):
             port=t.AlpacaPaperTransport('fixture-key','fixture-secret',['SPY'],
                 before_request=lambda *a,**k:None,before_submit=lambda *a:None,
                 sink_observation=lambda *a:None,**kwargs)

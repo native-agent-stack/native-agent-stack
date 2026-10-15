@@ -13503,8 +13503,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "3ec7e6203948871064ec6c287ec463e7041ea1a067160b3e7356f0819b48bac3",
-      "bytes": 171961
+      "sha256": "46f217dc06bc4d47b32d831e851c53f635b60fe2582fbf1a650c0a3f273de096",
+      "bytes": 174945
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runtime_lock.py",
@@ -13538,8 +13538,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "d69e0b875ae8a5089f022c7f396fc83e8f9f63aa9fd2791e2a678934f1473a50",
-      "bytes": 10243
+      "sha256": "9129f062b2ab3390e473f9c44235670b196d947c7331889722ae9582ce5c966d",
+      "bytes": 10600
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/start_readiness.py",
@@ -13558,8 +13558,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/transport.py",
-      "sha256": "71267166336b457e45d074d34f3f250d2d266ffdf1a426be2349ac2e38b9bf77",
-      "bytes": 108527
+      "sha256": "beb1506c91e1650088c4cea782e6bef13b2b9deceabfa96e71a9d8e5944e6ad4",
+      "bytes": 111317
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/README.md",
@@ -19190,6 +19190,11 @@
       "path": "docs/decisions/2026-10-14-session-relaunch-after-wsl-restart.md",
       "sha256": "a16bde3428b14a259f526c32d0e433b9cc8c5934f5ffe4296abb8ce436ff4303",
       "bytes": 6369
+    },
+    {
+      "path": "docs/decisions/2026-10-14-stream-integrity-followups.md",
+      "sha256": "b2ea42bd0d9314292b8e5ce5b44307719f27679622956e55429685f3343ce077",
+      "bytes": 13866
     },
     {
       "path": "docs/decisions/2026-10-15-model-currency-landscape-check.md",
@@ -60702,6 +60707,11 @@
       "bytes": 1938
     },
     {
+      "path": "evidence/receipts/stream-integrity-followups-20261014.json",
+      "sha256": "adc48c4ac243869e4e46fe9e1f7e9788a5cc2888ef31bbf98435f4c3afb7e512",
+      "bytes": 7321
+    },
+    {
       "path": "evidence/receipts/suite-parallelism-trial-20261003.json",
       "sha256": "88d94dea0829c87eecd2b6f9cc2a03c010888de130fe430abce65d5ebd39e788",
       "bytes": 135042
@@ -62557,6 +62567,16 @@
       "bytes": 304
     },
     {
+      "path": "tests/integration/stream_cancel_dispatch.py",
+      "sha256": "18b8a800355f64201b19fc0961a1de88cc2b8f00532f621297d7b5b87e5bf0d5",
+      "bytes": 8210
+    },
+    {
+      "path": "tests/integration/stream_integrity_followups.py",
+      "sha256": "9e37ada153aaffc8c4ffe003036647e5c18587c54b83a0754b36832d9b240a5d",
+      "bytes": 12824
+    },
+    {
       "path": "tests/local_pages_architecture_policy_fixture.py",
       "sha256": "903c8e73e8596f943a3073312539a7f721a5613b9d22a8c35e385677c27e9271",
       "bytes": 4506
@@ -62678,8 +62698,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_readiness_backpressure.py",
-      "sha256": "5a26dbf2ecb02e32a7dac4ab19584138969f757ab4511b38d66716473b1252b4",
-      "bytes": 5033
+      "sha256": "ccf8fa1c2df875b0357f2d746d0874ef1871a42a96b60df583568c991268ff8b",
+      "bytes": 6100
     },
     {
       "path": "tests/test_adaptive_paper_recovery.py",
@@ -62723,13 +62743,18 @@
     },
     {
       "path": "tests/test_adaptive_paper_stream_backpressure.py",
-      "sha256": "cd2c849bd0381034bb1f6679d05bc33bda94f3a0ce6e95985bd92c68c7a90d25",
-      "bytes": 17051
+      "sha256": "727fa830331bea2b8d5b8b6872d0a592b867c2e1ea09243555269f38c60eccfd",
+      "bytes": 17173
+    },
+    {
+      "path": "tests/test_adaptive_paper_stream_followups.py",
+      "sha256": "9ee80621f3eef2c2201b6dd4ef06990e616accf99f6066c8e4bacb652f3f8650",
+      "bytes": 4983
     },
     {
       "path": "tests/test_adaptive_paper_transport.py",
-      "sha256": "31858d27903478559830f4e4bb098243c9a096e44712767b4beadb77aaf4aabe",
-      "bytes": 118648
+      "sha256": "a171f0c387ec6a5cfb96beaa03028f72c777ee54ec195498b5f3ec4158f2ccb7",
+      "bytes": 118924
     },
     {
       "path": "tests/test_adjudicate.py",
@@ -63438,8 +63463,8 @@
     },
     {
       "path": "tests/test_local_pages_policy_grants.py",
-      "sha256": "5821eae4b5f34f8ed3d407d7e2460091aacf84d9e9a593e3c407a4607f44e732",
-      "bytes": 27271
+      "sha256": "d01e30c83f6507bfdcb5b49358451bcbd8b770c9a69b175bdb371241f100b815",
+      "bytes": 27528
     },
     {
       "path": "tests/test_managed_block.py",
@@ -64623,8 +64648,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "c1406979770796d405533a2ef4cc95b570d17634313fcfec19cca05e72a34dda",
-      "bytes": 763446
+      "sha256": "c0a3b27807acaf179a86563285ff762107d60ad7c5441364f1f7367690f31dfc",
+      "bytes": 763564
     },
     {
       "path": "tools/muse_file_fence.py",

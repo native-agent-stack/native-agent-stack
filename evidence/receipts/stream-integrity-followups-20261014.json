@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "kind": "synthetic_stream_integrity_measurement",
+  "base_commit": "c67bd78bebdd48d642307e3a91d5f791a9d1aad7",
+  "evidence_class": "synthetic/local integration",
+  "command": "Pinned Python -B engine-qual-stream-followups-controls-20261014.py measure under unshare -rn; assertion sources tests/test_adaptive_paper_stream_followups.py",
+  "observed_exit_code": 0,
+  "assertion_source_note": "The original F1/F5 capture command above names the source at capture time. F1 and F2 now execute mandatorily from tests/integration/stream_integrity_followups.py; SDK-free F3-F5 remain in the unit module.",
+  "method": "synthetic loop/HTTP guard/journal/recovery; virtual3s envelope; synthetic FIFO delay",
+  "F1": {
+    "before": {
+      "active_submits_before_recovery": 30,
+      "freeze_at": 0.1,
+      "frozen_outcome": {
+        "frozen": true,
+        "reasons": [
+          "queue_overflow"
+        ]
+      },
+      "handoff_at": 3.0000000000000013,
+      "recovery_exit_count": 1,
+      "recovery_first_exit_at": 3.0000000000000013,
+      "recovery_flat": true,
+      "recovery_status": "passed",
+      "refused_exit_count": 29,
+      "refused_exit_submit_reservations": 29,
+      "submit_limit": 180
+    },
+    "after": {
+      "active_submits_before_recovery": 1,
+      "freeze_at": 0.1,
+      "frozen_outcome": {
+        "frozen": true,
+        "reasons": [
+          "queue_overflow"
+        ]
+      },
+      "handoff_at": 0.1,
+      "recovery_exit_count": 1,
+      "recovery_first_exit_at": 0.1,
+      "recovery_flat": true,
+      "recovery_status": "passed",
+      "refused_exit_count": 0,
+      "refused_exit_submit_reservations": 0,
+      "submit_limit": 180
+    },
+    "interpretation": "Previously 29 definitively refused exits still consumed 29 submit slots before recovery; fixed handoff creates zero refused-exit reservations. The first recovery exit was admitted in both bounded fixtures. No long-duration or live-budget starvation claim."
+  },
+  "F1_cancel_order_correction": {
+    "base_commit": "9e1892b142c2608b86b4e45432857fb0ab8bd70c",
+    "test": "test_integrity_loss_cancels_resting_entry_before_teardown_without_recovery",
+    "command": "Pinned Python scripts/run_integration_tests.py under the prescribed no-network/private-runtime-lock harness",
+    "observed_exit_code": 0,
+    "before": {
+      "freeze_at": 0.1,
+      "handoff_at": 0.1,
+      "resting_entry_cancel_requested": false,
+      "lifecycle": [["teardown", 0.1]],
+      "refused_exit_submit_reservations": 0,
+      "fail_first": {"tests": 1, "failures": 1, "errors": 0, "skipped": 0, "exit_code": 1}
+    },
+    "after": {
+      "freeze_at": 0.1,
+      "handoff_at": 0.1,
+      "resting_entry_cancel_requested": true,
+      "lifecycle": [["cancel", 0.1], ["teardown", 0.1]],
+      "refused_exit_submit_reservations": 0
+    },
+    "interpretation": "Historical synchronous-stub observation: the actual selection policy and DELETE guard request cancellation, but this does not establish production queued dispatch before teardown. The current virtual fixture also models its terminal callback. Native dispatch and confirmation are measured separately below."
+  },
+  "F1_native_dispatch_correction": {
+    "base_commit": "cd81cc15d65bafa7815a4ee12a9a68df1bc56018",
+    "runtime": "nautilus_trader 2.0.0rc5, nautechsystems/nautilus_trader at 1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+    "test": "tests.integration.stream_cancel_dispatch.NativeCancelDispatch.test_integrity_loss_waits_for_real_native_cancel_confirmation_before_stop",
+    "fail_first_command": "python -m unittest -v tests.integration.stream_cancel_dispatch",
+    "fail_first_scope": "Exact parent runner, first version of the new integration module containing only the named positive case; pinned runtime under no-network/private-runtime-lock wrapper",
+    "before": {
+      "events": ["loss", "session_stop"],
+      "cancel_calls": 0,
+      "confirmed_before_stop": false,
+      "active_at_stop": 1,
+      "unresolved": 1,
+      "fail_first": {"tests": 1, "failures": 1, "errors": 0, "skipped": 0, "exit_code": 1},
+      "diagnostic": "Native client abandoned queued operation _cancel_order; assertion cancel_calls == 1 failed with actual 0"
+    },
+    "after": {
+      "events": ["loss", "dispatcher_released", "cancel_dispatched", "confirmed", "session_stop"],
+      "cancel_calls": 1,
+      "confirmed_before_stop": true,
+      "active_at_stop": 0,
+      "unresolved": 0,
+      "cancellations": {"status": "confirmed", "requested_count": 1, "confirmed_count": 1, "unconfirmed_count": 0, "timeout_seconds": 2}
+    },
+    "unconfirmed_control": {
+      "test": "test_integrity_loss_cancel_ack_without_terminal_confirmation_stays_unresolved",
+      "events": ["loss", "dispatcher_released", "cancel_dispatched", "session_stop"],
+      "cancel_calls": 1,
+      "confirmed_before_stop": false,
+      "active_at_stop": 1,
+      "unresolved": 1,
+      "status": "needs_attention",
+      "adapter_errors": ["integrity_loss_cancellation_unconfirmed"],
+      "cancellations": {"status": "deadline_expired", "requested_count": 1, "confirmed_count": 0, "unconfirmed_count": 1, "timeout_seconds": 1}
+    },
+    "positive_command": "python scripts/run_integration_tests.py",
+    "observed_exit_code": 0,
+    "positive_suite": {"tests": 7, "failures": 0, "errors": 0, "skipped": 0},
+    "interpretation": "Completed real rc5 LiveNode/strategy/adapter dispatch and native terminal callback, real journal, synthetic broker and one-order decision. The submit dispatcher is held for 0.6 seconds, beyond the adapter's stop grace. No fresh recovery runs. The pending_cancel control proves an acknowledgement is insufficient. Waiting is bounded by existing order_timeout_seconds; expiry retains unresolved state and needs_attention. No real-broker acknowledgement or universal shutdown-latency claim."
+  },
+  "F5": {
+    "measured": {
+      "backpressure_waits": 0,
+      "data_timeout_seconds": 30,
+      "fresh_quotes": true,
+      "frozen": false,
+      "order_update_callback_to_consumer_seconds_max": 4,
+      "order_update_queue_latency_seconds_max": 4,
+      "order_updates_dequeued": 1,
+      "quotes_reconnects": 0,
+      "reasons": [],
+      "skipped_stale_quotes": 0
+    },
+    "interpretation": "One order update waited behind two synthetic quotes; four simulated seconds from successful enqueue and callback receipt to consumer dispatch. FIFO preserved; this is not live throughput or socket acceptance."
+  },
+  "limitations": [
+    "Original F1 and virtual cancellation measurements use synthetic native lifecycle; the native-dispatch correction uses a real rc5 LiveNode with synthetic broker. No venue acceptance or universal Rust-node timing claim",
+    "Three-second virtual envelope; shipped420-second and validated4200-second source bounds were not waited out",
+    "#1091 is PARKED; F1 permanent exit-bridge classification is REQUIRED and pending on its re-scoped successor PR; deployment condition remains active pending that classification and final review",
+    "F2 stop_ws after irreversible loss bounds the reproduced stalled batch; no blanket keepalive guarantee for arbitrary healthy batches",
+    "Historical captures, real FIFO/shutdown/reconnect qualification and overnight/exception precedence remain separate follow-ups"
+  ]
+}

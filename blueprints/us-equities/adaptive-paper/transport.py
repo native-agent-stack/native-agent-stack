@@ -967,6 +967,15 @@ class GuardedSession:
                         raise SubmissionNotSent("submission budget deferred")
                     if self.before_send:
                         self.before_send(kwargs.get("json", {}))
+                except SubmissionNotSent as exc:
+                    # Preserve only the fixed local admission diagnoses.
+                    # Caller/provider exception text must still be masked.
+                    reason = str(exc)
+                    if reason in ("recovery_observation_integrity_lost",
+                                  "quote or stream readiness changed before submission",
+                                  "submission budget deferred"):
+                        raise SubmissionNotSent(reason) from None
+                    raise SubmissionNotSent("submission prevented before HTTP request") from None
                 except Exception:
                     raise SubmissionNotSent("submission prevented before HTTP request") from None
             elif kind == "cancel" and (named := self._cancel_client_id(path)):
@@ -1271,6 +1280,14 @@ def _stream_classes(data_ws):
     return Orders, Quotes
 
 
+class _QueuedStreamEvent(tuple):
+    """The existing (kind, raw) FIFO item with local monotonic timing only."""
+    def __new__(cls, kind, raw, received_at, enqueued_at):
+        item = super().__new__(cls, (kind, raw))
+        item.received_at, item.enqueued_at = received_at, enqueued_at
+        return item
+
+
 class AlpacaPaperTransport:
     def __init__(self, api_key, secret_key, symbols, *, before_request, before_submit,
                  sink_observation, queue_size=1024, quote_timeout=5.0, start_timeout=15.0,
@@ -1336,6 +1353,9 @@ class AlpacaPaperTransport:
         self._backpressure_waits = 0
         self._skipped_stale_quotes = 0
         self._quotes_reconnects = 0
+        self._order_updates_dequeued = 0
+        self._order_queue_latency_max = None
+        self._order_callback_latency_max = None
         self._quote_reconnect_pending = False
         self._reasons = set()
         self._dropped_quotes = {}
@@ -1424,7 +1444,10 @@ class AlpacaPaperTransport:
                     "fresh_quotes": health["fresh_quotes"], "data_timeout_seconds": self.quote_data_timeout,
                     "backpressure_waits": self._backpressure_waits,
                     "skipped_stale_quotes": self._skipped_stale_quotes,
-                    "quotes_reconnects": self._quotes_reconnects}
+                    "quotes_reconnects": self._quotes_reconnects,
+                    "order_updates_dequeued": self._order_updates_dequeued,
+                    "order_update_queue_latency_seconds_max": self._order_queue_latency_max,
+                    "order_update_callback_to_consumer_seconds_max": self._order_callback_latency_max}
 
     def freeze_health(self, reason):
         with self._state_lock:
@@ -1573,12 +1596,23 @@ class AlpacaPaperTransport:
         bounded below the websocket ping timeout, with two seconds reserved
         for keepalive progress; stop can interrupt it without parking a thread.
         """
-        deadline = time.monotonic() + min(self.start_timeout, WEBSOCKET_PING_TIMEOUT_SECONDS - 2)
+        # Once observation integrity is lost, there is no useful bounded
+        # admission left on this stream. Ask the SDK to stop through its
+        # supported awaited surface; remaining events in this received batch
+        # return promptly rather than each starting a fresh eight-second wait.
+        with self._state_lock:
+            lost = bool(self._reasons & OBSERVATION_INTEGRITY_LOSS_REASONS)
+        if lost:
+            stream = self._orders_stream if kind == "order" else self._quotes_stream
+            await self._invoke(stream.stop_ws)
+            return
+        received_at = time.monotonic()
+        deadline = received_at + min(self.start_timeout, WEBSOCKET_PING_TIMEOUT_SECONDS - 2)
         counted_wait = False
         try:
             while not self._stopping:
                 try:
-                    self._events.put_nowait((kind, raw))
+                    self._events.put_nowait(_QueuedStreamEvent(kind, raw, received_at, time.monotonic()))
                     return
                 except queue.Full:
                     if not counted_wait:
@@ -1588,6 +1622,8 @@ class AlpacaPaperTransport:
                     remaining = deadline - time.monotonic()
                     if remaining <= 0:
                         self.freeze_health("queue_overflow")
+                        stream = self._orders_stream if kind == "order" else self._quotes_stream
+                        await self._invoke(stream.stop_ws)
                         return
                     await asyncio.sleep(min(0.01, remaining))
         except asyncio.CancelledError:
@@ -1629,11 +1665,20 @@ class AlpacaPaperTransport:
     async def _consume_events(self):
         while not self._stopping:
             try:
-                kind, raw = self._events.get_nowait()
+                event = self._events.get_nowait()
+                kind, raw = event
             except queue.Empty:
                 await asyncio.sleep(0.01)
                 continue
             try:
+                if kind == "order" and isinstance(event, _QueuedStreamEvent):
+                    now = time.monotonic()
+                    queue_latency = max(0.0, now - event.enqueued_at)
+                    callback_latency = max(0.0, now - event.received_at)
+                    with self._state_lock:
+                        self._order_updates_dequeued += 1
+                        self._order_queue_latency_max = max(self._order_queue_latency_max or 0.0, queue_latency)
+                        self._order_callback_latency_max = max(self._order_callback_latency_max or 0.0, callback_latency)
                 if kind == "quote":
                     try:
                         quote = normalize_quote(raw)

@@ -20968,6 +20968,10 @@
       },
       {
         "root": "repo",
+        "path": "evidence/receipts/stream-integrity-followups-20261014.json"
+      },
+      {
+        "root": "repo",
         "path": "evidence/receipts/suite-parallelism-trial-20261003.json"
       },
       {
