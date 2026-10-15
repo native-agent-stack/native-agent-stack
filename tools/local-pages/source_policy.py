@@ -365,19 +365,17 @@ class ArchitectureReads:
                      "file_utc": datetime.fromtimestamp(info.st_mtime, timezone.utc).isoformat().replace("+00:00", "Z")}
 
 
-_FAMILY_TOKEN = r"[A-Za-z0-9._-]*"
-_FAMILY_SUFFIXES = (".md", ".json")
 
 
 class OverviewReads:
     """Authorize the overview page's source-map reads before any content access.
 
-    Grants are the committed policy's "overview" roles (exact repo or state
-    paths) and "overview_families" (one fixed directory, a literal filename
-    prefix and suffix, an optional literal infix, and name tokens without
-    separators, with a dot only between digits). The source map
-    selects among these grants; it cannot extend them. final-stack.json stays
-    on its dedicated Architecture role, so no overview role may grant it.
+    Grants are the committed policy's "overview" roles, exact repo or state
+    paths only: no filename family authorizes a read (an "overview_families"
+    key is refused), so the source map's path is both the grant it must match
+    and the explicit pointer to the current record. The source map selects
+    among these grants; it cannot extend them. final-stack.json stays on its
+    dedicated Architecture role, so no overview role may grant it.
     """
 
     limit_error = SourceReadLimitError
@@ -400,48 +398,13 @@ class OverviewReads:
                 if (record["root"], relative) == ("repo", FINAL_STACK_PATH):
                     raise SourcePolicyError("final-stack.json is read only through its dedicated Architecture role")
                 self.allowed[role].add((record["root"], relative))
-        families = self.policy.document.get("overview_families", {})
-        if not isinstance(families, dict):
-            raise SourcePolicyError("overview families must be a role map")
-        self.families = {}
-        for role, record in families.items():
-            if not isinstance(role, str) or not role.startswith("overview_") or not isinstance(record, dict) \
-                    or set(record) - {"infix"} != {"root", "directory", "prefix", "suffix"} or record["root"] not in self.roots:
-                raise SourcePolicyError("overview family requires exactly a root, directory, prefix and suffix, and at most an infix")
-            literals = [record["prefix"]] + ([record["infix"]] if "infix" in record else [])
-            if not all(isinstance(text, str) and text and re.fullmatch(_FAMILY_TOKEN, text) for text in literals) \
-                    or record["suffix"] not in _FAMILY_SUFFIXES:
-                raise SourcePolicyError("overview family names a literal prefix, an optional literal infix and a .md or .json suffix")
-            self.families[role] = {**record, "directory": _relative(record["directory"])}
-
-    def pattern(self, role):
-        """The family's glob in source-map form, or None when the role has no family."""
-        family = self.families.get(role)
-        if not family:
-            return None
-        middle = f'*{family["infix"]}*' if "infix" in family else "*"
-        return f'{family["directory"]}/{family["prefix"]}{middle}{family["suffix"]}'
-
-    def _family_match(self, role, root, relative):
-        family = self.families.get(role)
-        if not family or root != family["root"]:
-            return False
-        path = PurePosixPath(relative)
-        # A name token carries a dot only between digits (a version such as 2.1.300), so a record's addendum
-        # (prefix, token, infix, token, suffix) is never the record.
-        token = r"(?:[A-Za-z0-9_-]|(?<=[0-9])\.(?=[0-9]))+"
-        middle = token + (re.escape(family["infix"]) + token if "infix" in family else "")
-        return path.parent.as_posix() == family["directory"] and bool(
-            re.fullmatch(re.escape(family["prefix"]) + middle + re.escape(family["suffix"]), path.name))
+        if "overview_families" in self.policy.document:
+            raise SourcePolicyError("overview reads are exact-path grants only; overview_families is not accepted")
 
     def validate(self, role, root, *, path=None, glob=None):
-        """Check one source-map declaration against its grant before anything is opened."""
-        if (path is None) == (glob is None):
-            raise SourcePolicyError("an overview source names exactly one path or glob")
-        if glob is not None:
-            if glob != self.pattern(role) or root != self.families[role]["root"]:
-                raise SourcePolicyError("overview glob differs from its reviewed family: " + str(role))
-            return
+        """Check one source-map declaration against its exact grant before anything is opened."""
+        if glob is not None or path is None:
+            raise SourcePolicyError("an overview source names exactly one path; a glob is not a grant")
         relative = _relative(path)
         if (root, relative) not in self.allowed.get(role, set()):
             raise SourcePolicyError("overview role/path has no independent approval: " + str(role))
@@ -454,23 +417,10 @@ class OverviewReads:
             except ValueError:
                 continue
             relative = _relative(relative)
-            if (root, relative) in self.allowed.get(role, set()) or self._family_match(role, root, relative):
+            if (root, relative) in self.allowed.get(role, set()):
                 return path
         raise SourcePolicyError("overview role/path has no independent approval: " + str(role))
 
-    def match(self, role, root, glob):
-        """Family members present now, sorted by name; a missing directory has none."""
-        self.validate(role, root, glob=glob)
-        family = self.families[role]
-        directory = self.roots[root] / family["directory"]
-        try:
-            with _directory(directory) as descriptor:
-                names = os.listdir(descriptor)
-        except FileNotFoundError:
-            return []
-        except OSError as error:
-            raise SourcePolicyError("overview family directory or ancestor is a symlink or unavailable") from error
-        return sorted(directory / name for name in names if self._family_match(role, root, f'{family["directory"]}/{name}'))
 
     def read(self, role, path, max_bytes=MAX_SOURCE_BYTES):
         path = self.authorize(role, path)

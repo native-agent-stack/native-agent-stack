@@ -586,12 +586,7 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
     if architecture_path.exists():
         refresh_layer_pages(root, state_root, output_dir, receipt, refreshed, manifest_sha, outputs, receipt_doc)
     if (Path(__file__).resolve().parent / "overview_data.py").exists():
-        # The overview reads only the records its source map names; a missing one renders as pending.
-        try:
-            overview = load_local("overview_data").build_overview_page(root, state_root, output_dir, receipt.parent / "overview/overview-receipt.json", generated=refreshed)
-            receipt_doc["overview"] = {key: overview.get(key) for key in ("schema", "generated_utc", "commit", "page", "present", "pending", "outputs")}
-        except LAYER_PAGE_ERRORS as error:
-            receipt_doc["overview"] = {"status": "UNREPORTED", "reason": "Overview unavailable (" + type(error).__name__ + ")"}
+        refresh_overview(root, state_root, output_dir, receipt, refreshed, manifest_sha, outputs, receipt_doc)
     publish(output_dir, receipt, outputs, receipt_doc)
     return receipt_doc
 
@@ -623,11 +618,41 @@ def refresh_layer_pages(root: Path, state_root: Path, output_dir: Path, receipt:
             if (output_dir / f"{page}.html").exists():
                 receipt_doc["architecture_layer_pages"]["page_status"][page] = "previous page retained without a new observation"
                 continue
-            body = '<section class="panel" id="layer-sources"><h2>UNREPORTED</h2><p>This architecture page is unavailable. Other pages retain their own current observations.</p></section>'
-            outputs[f"{page}.html"] = document(page, PAGES[page] + " architecture unavailable", "No current observation of this page is reported.",
-                                               "Layer pages unavailable; no gate or execution claim.", body, refreshed, manifest_sha, [])
+            outputs[f"{page}.html"] = unavailable_page(page, refreshed, manifest_sha)
             receipt_doc.setdefault("outputs", {})[f"{page}.html"] = {"sha256": hashlib.sha256(outputs[f"{page}.html"]).hexdigest(), "bytes": len(outputs[f"{page}.html"])}
             receipt_doc["architecture_layer_pages"]["page_status"][page] = "unreported placeholder"
+
+
+def unavailable_page(page: str, refreshed: str, manifest_sha: str) -> bytes:
+    """An UNREPORTED placeholder for a generated page the navigation links but no current observation produced."""
+    if page == "overview":
+        section, title, scope = "overview-evidence", "Overview unavailable", "Overview unavailable; no gate or execution claim."
+        text = "This overview is unavailable. The Foundation and North-star pages and the other pages retain their own current observations."
+    else:
+        section, title, scope = "layer-sources", PAGES[page] + " architecture unavailable", "Layer pages unavailable; no gate or execution claim."
+        text = "This architecture page is unavailable. Other pages retain their own current observations."
+    body = f'<section class="panel" id="{section}"><h2>UNREPORTED</h2><p>{text}</p></section>'
+    return document(page, title, "No current observation of this page is reported.", scope, body, refreshed, manifest_sha, [])
+
+
+def refresh_overview(root: Path, state_root: Path, output_dir: Path, receipt: Path, refreshed: str, manifest_sha: str,
+                     outputs: dict, receipt_doc: dict) -> None:
+    """Render the overview, which reads only the records its source map names (a missing one renders as pending).
+
+    Home and every page's navigation link it, so on failure a missing overview gets an UNREPORTED placeholder; an
+    existing one is kept without a new observation.
+    """
+    try:
+        overview = load_local("overview_data").build_overview_page(root, state_root, output_dir, receipt.parent / "overview/overview-receipt.json", generated=refreshed)
+        receipt_doc["overview"] = {key: overview.get(key) for key in ("schema", "generated_utc", "commit", "page", "present", "pending", "outputs")}
+    except LAYER_PAGE_ERRORS as error:
+        receipt_doc["overview"] = {"status": "UNREPORTED", "reason": "Overview unavailable (" + type(error).__name__ + ")"}
+        if (output_dir / "overview.html").exists():
+            receipt_doc["overview"]["page_status"] = "previous page retained without a new observation"
+            return
+        outputs["overview.html"] = unavailable_page("overview", refreshed, manifest_sha)
+        receipt_doc.setdefault("outputs", {})["overview.html"] = {"sha256": hashlib.sha256(outputs["overview.html"]).hexdigest(), "bytes": len(outputs["overview.html"])}
+        receipt_doc["overview"]["page_status"] = "unreported placeholder"
 
 
 def prune_architecture_details(output_dir: Path, outputs: dict) -> None:
@@ -701,17 +726,27 @@ def main(argv: list[str] | None = None) -> int:
             receipt = refresh_receipt.parent / "overview/overview-receipt.json"
         elif receipt.name == "refresh-receipt.json":
             parser.exit(2, "local-pages: --overview-only never writes a refresh receipt; name another --receipt\n")
+        refreshed, layer_status = utc_now(), "rendered"
         try:
-            refreshed = utc_now()
             layers = load_local("architecture_builder").build_layer_pages(args.root, output, layer_pages_receipt(refresh_receipt),
                                                                          state_root=args.state_root, generated=refreshed)
+            layer_pages = sorted(value["page"] for value in layers["pages"].values())
+        except LAYER_PAGE_ERRORS as error:
+            # The overview's own sections do not depend on the layer pages; its links into them get placeholders.
+            layer_status, layer_pages = f"UNREPORTED (layer pages unavailable: {type(error).__name__})", []
+            placeholders = {f"{page}.html": unavailable_page(page, refreshed, "pending")
+                            for page in ("architecture-foundation", "architecture-north-star") if not (output / f"{page}.html").exists()}
+            publish(output, layer_pages_receipt(refresh_receipt), placeholders,
+                    {"schema": "local-architecture-layer-pages/1", "status": "UNREPORTED", "reason": layer_status, "generated_utc": refreshed,
+                     "outputs": {name: {"sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)} for name, raw in placeholders.items()}})
+        try:
             result = load_local("overview_data").build_overview_page(args.root, args.state_root, output, receipt, generated=refreshed)
         except LAYER_PAGE_ERRORS as error:
             parser.exit(1, f"local-pages: overview failed ({type(error).__name__}): {error}\n")
         print(json.dumps({"output_dir": str(output), "receipt": str(receipt), "generated_utc": result["generated_utc"], "commit": result["commit"],
                           "page": result["page"], "present": result["present"], "pending": result["pending"],
-                          "layer_pages": sorted(value["page"] for value in layers["pages"].values())}, sort_keys=True))
-        return 0
+                          "layer_pages": layer_pages, "layer_pages_status": layer_status}, sort_keys=True))
+        return 0 if layer_status == "rendered" else 1
     if args.layer_pages_only:
         # The refresh receipt records the last full refresh, and the Architecture
         # refresh rejects any other receipt kind, so it is never overwritten here.

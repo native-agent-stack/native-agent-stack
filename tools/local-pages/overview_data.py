@@ -2,10 +2,11 @@
 """Read the overview page's sources through its declarative source map.
 
 overview_sources.json names every source the overview reads: its section,
-the source_policy.json role that grants it, its root, one exact path or one
-glob, and the trigger that makes it present. Each declaration is checked
-against its grant before any file is opened; a glob reads the newest match by
-name. A missing source is pending with its trigger, never an error. Layer
+the source_policy.json role that grants it, its root, one exact path and
+the trigger that makes it present. Each declaration is checked against its
+exact grant before any file is opened; no filename family is read, so the path
+is the explicit pointer to the current record. A missing source is pending
+with its trigger, never an error. Layer
 states and the FINAL count are architecture_manifest.layer_manifest() over
 the same committed records the Foundation and North-star pages read; this
 module adjudicates nothing.
@@ -87,15 +88,10 @@ def read_sources(document: dict, root: Path, state_root: Path, architecture: Any
     results = {}
     for key, entry in document["sources"].items():
         role, base = entry["role"], bases[entry["root"]]
-        declared = entry.get("path") or entry.get("glob")
+        declared = entry["path"]
         result = {"id": key, "section": entry["section"], "role": role, "root": entry["root"], "declared": declared,
                   "name": PurePosixPath(declared).name, "trigger": entry["trigger"], "status": "pending", "entry": entry}
-        if entry.get("glob"):
-            matches = overview.match(role, entry["root"], entry["glob"])
-            path = matches[-1] if matches else None
-            result["matches"] = len(matches)
-        else:
-            path = base / entry["path"]
+        path = base / entry["path"]
         if path is not None:
             reader = architecture if role.startswith("architecture_") else overview
             try:
@@ -256,6 +252,12 @@ def _uncited(text: str, terms: list[re.Pattern]) -> str:
     return text
 
 
+def raw_sentences(text: str, drop: list[str] = ()) -> list[str]:
+    """The passage's sentences after citation asides are dropped, before any sentence is withheld."""
+    terms = _terms(list(drop))
+    return [part.strip() for part in _SENTENCE.split(_uncited(plain(_CROSS_REF.sub("", text)), terms)) if part.strip()]
+
+
 def sentences(text: str, drop: list[str] = ()) -> list[str]:
     """The passage's plain sentences: a citation aside is dropped and the claim kept; a sentence that still cites a
     path, digest or line or names a declared label is withheld."""
@@ -358,7 +360,7 @@ def architecture(sources: dict, root: Path, commit: str | None) -> dict:
 
 
 def _finalize_rows(source: dict) -> tuple[dict, dict | None]:
-    """Rows of the newest finalize-all record, grouped by layer key."""
+    """Rows of the finalize-all record the source map names, grouped by layer key."""
     if source["status"] != "present":
         return {}, _pending(source)
     entry = source["entry"]
@@ -406,9 +408,20 @@ def repos(sources: dict, glance: dict) -> dict:
             rows.append({"layer": key, "title": title, "state": state, "status": record.get("status"), "in_catalog": in_catalog,
                          "page": band["page"], "winners": winners, "survivors": len(record.get("survivors") or []),
                          "next_action": found.get("next_action") or [], "receipt_worker": found.get("receipt_worker") or []})
+        # A layer the finalize-all record lists but neither the catalog file nor its planned rows hold (an unswept
+        # layer has no verdict yet) is shown with the record's own state, so the three counts reconcile.
+        shown = {row["layer"] for row in rows}
+        for key in sorted(layer for layer in rows_by_layer if layer.split("/", 1)[0] == band["catalog"] and layer not in shown):
+            found = rows_by_layer[key]
+            rows.append({"layer": key, "title": key.split("/", 1)[-1], "state": None, "status": "; ".join(found.get("record_state") or []) or None,
+                         "in_catalog": False, "rows_only": True, "page": band["page"], "winners": [], "survivors": 0,
+                         "next_action": found.get("next_action") or [], "receipt_worker": found.get("receipt_worker") or []})
         groups.append({"label": band["label"], "catalog": band["catalog"], "page": band["page"], "rows": rows})
     source = sources["finalize_rows"]
-    return {"status": "present", "groups": groups, "rows_pending": rows_pending,
+    counted = {"catalog": sum(1 for group in groups for row in group["rows"] if row["in_catalog"]),
+               "planned": sum(1 for group in groups for row in group["rows"] if not row["in_catalog"] and not row.get("rows_only")),
+               "rows_only": sum(1 for group in groups for row in group["rows"] if row.get("rows_only"))}
+    return {"status": "present", "groups": groups, "rows_pending": rows_pending, "counted": counted,
             "rows_record": source["name"] if source["status"] == "present" else None, "rows_layers": len(rows_by_layer)}
 
 
@@ -428,8 +441,15 @@ def _record(source: dict) -> dict:
     return {"status": "present", "name": source["name"], "root": source["root"], "path": source.get("path")}
 
 
+def _readiness(text: str, entry: dict) -> str:
+    """A scheduled check said as its readiness trigger, never a date: each declared [pattern, trigger] rewrite applies."""
+    for pattern, trigger in entry.get("readiness") or []:
+        text = re.sub(pattern, trigger, text)
+    return text
+
+
 def addendum(sources: dict, key: str | None, record: dict) -> dict | None:
-    """The newest addendum to the convergence record shown: each top-level "subject: result" bullet as its subject
+    """The addendum the source map names, when it belongs to the convergence record shown: each top-level "subject: result" bullet as its subject
     and the kept sentences of it and its nested bullets that name a declared result word, by record name only."""
     if not key:
         return None
@@ -450,7 +470,7 @@ def addendum(sources: dict, key: str | None, record: dict) -> dict | None:
                 continue
             inner = re.search(r"\(([^()]+)\)\s*$", label.group(1))
             subject = _clean((inner.group(1) if inner else label.group(1)).strip(), terms)
-            passages = [label.group(2)] + [child["text"] for child in _nodes(node)]
+            passages = [_readiness(text, entry) for text in [label.group(2)] + [child["text"] for child in _nodes(node)]]
             kept = [sentence for passage in passages for sentence in sentences(passage, drop) if any(_phrase(sentence, word) for word in words)]
             if subject:
                 results.append({"subject": subject[:1].upper() + subject[1:], "sentences": kept})
@@ -506,15 +526,21 @@ def strategies(sources: dict) -> dict:
     terms = _terms(drop)
     heading, points = md_points(text, entry["under"])
     family = next((point for point in points if _phrase(point["lead"], entry["family"])), None)
-    caveats = []
+    caveats, withheld = [], 0
     if family is not None:
         passages = [family["tree"]["text"]] + [node["text"] for node in _nodes(family["tree"])]
-        for sentence in (sentence for passage in passages for sentence in sentences(passage, drop)):
+        # Clause by clause: a citation withholds only its own clause, and a caveat clause that is still withheld is
+        # counted, so a filtered projection never reads as a record without caveats.
+        for sentence in (sentence for passage in passages for sentence in raw_sentences(passage, drop)):
             for clause in (clause.strip().rstrip(".") for clause in sentence.split("; ")):
-                if clause and any(_phrase(clause, key) for key in entry.get("caveats") or []):
-                    clause = clause[:1].upper() + clause[1:] + "."
-                    if clause not in caveats:
-                        caveats.append(clause)
+                if not clause or not any(_phrase(clause, key) for key in entry.get("caveats") or []):
+                    continue
+                if _withheld(clause, terms):
+                    withheld += 1
+                    continue
+                clause = clause[:1].upper() + clause[1:] + "."
+                if clause not in caveats:
+                    caveats.append(clause)
     ablations = None
     for point in points:
         blocks = point["tree"]["blocks"]
@@ -527,7 +553,8 @@ def strategies(sources: dict) -> dict:
             break
     sizing = next((point for point in points if _phrase(point["lead"], entry["sizing"])), None)
     return {**_record(source), "heading": heading,
-            "family": {"lead": _clean(family["lead"], terms), "caveats": caveats} if family else None, "ablations": ablations,
+            "family": {"lead": _clean(family["lead"], terms), "caveats": caveats, "withheld_caveats": withheld} if family else None,
+            "ablations": ablations,
             "sizing": {"lead": _clean(sizing["lead"], terms), "rows": _rows(sizing["tree"], drop)} if sizing else None,
             "selectors": {key: entry.get(key) for key in ("family", "ablations", "sizing")}, "statement": _statement(sources, entry.get("result"))}
 
@@ -545,7 +572,7 @@ def workers(document: dict, sources: dict, glance: dict) -> list[dict]:
         row = {"name": worker["name"], "role": worker.get("role"), "state": None, "receipt": None}
         binding = worker.get("state")
         if binding is None:
-            row["state"] = {"status": "no source"}
+            row["state"] = {"status": "no source", "trigger": worker.get("state_trigger")}
         else:
             source = sources[binding["source"]]
             if source["status"] != "present":
@@ -565,7 +592,7 @@ def workers(document: dict, sources: dict, glance: dict) -> list[dict]:
                                 else {**_pending(source), "status": "pending", "reason": f'{binding["pointer"]} is absent from the record'})
         binding = worker.get("receipt")
         if binding is None:
-            row["receipt"] = {"status": "no source"}
+            row["receipt"] = {"status": "no source", "trigger": worker.get("receipt_trigger")}
         else:
             source = sources[binding["source"]]
             if source["status"] != "present":
@@ -703,9 +730,20 @@ def finalize(sources: dict) -> dict:
         arms = f1_source["content"] if isinstance(f1_source["content"], list) else []
         counts: dict[str, int] = {}
         for arm in (arm for arm in arms if isinstance(arm, dict)):
-            result = ("passed" if arm["success"] is True else "failed") if "success" in arm else str(arm.get("state") or "no receipt").replace("-", " ")
+            # A pass meets the plan only at the exact run pin; a preview assembly or a version-only pin is not that.
+            if "success" not in arm:
+                result = str(arm.get("state") or "no receipt").replace("-", " ")
+            elif arm["success"] is not True:
+                result = "failed"
+            elif arm.get("assembled") == "preview":
+                result = "passed, preview assembly"
+            elif arm.get("pin_ok") is True:
+                result = "passed at the exact run pin"
+            else:
+                result = "passed, run pin not yet bound"
             counts[result] = counts.get(result, 0) + 1
-        ordered = {key: counts.pop(key) for key in ("passed", "failed") if key in counts} | dict(sorted(counts.items()))
+        first = ("passed at the exact run pin", "passed, run pin not yet bound", "passed, preview assembly", "failed")
+        ordered = {key: counts.pop(key) for key in first if key in counts} | dict(sorted(counts.items()))
         f1 = {**_record(f1_source), "arms": sum(ordered.values()), "counts": ordered}
     f2 = _pending(f2_source)
     if f2_source["status"] == "present":

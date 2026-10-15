@@ -267,7 +267,12 @@ def strategies(data: dict) -> str:
     if family:
         claim = f'{esc(family["lead"])}.' if family["lead"] else WITHHELD
         out += f'<div class="ov-family"><h3>Shortlisted family</h3><p class="ov-claim">{claim}</p></div>'
-        columns.append('<div><h3>Evidence caveats</h3>' + (_items(family["caveats"]) if family["caveats"] else '<p class="lp-empty">The record states no caveat for it.</p>') + "</div>")
+        held = family.get("withheld_caveats") or 0
+        note = (f'<p class="ov-trigger">{held} more caveat{"s" if held != 1 else ""} withheld from this projection because '
+                f'{"it cites" if held == 1 else "they cite"} a path, digest or line; read the named record.</p>') if held else ""
+        listed = (_items(family["caveats"]) if family["caveats"]
+                  else "" if held else '<p class="lp-empty">No caveat was found in the projected text; read the named record to confirm.</p>')
+        columns.append('<div><h3>Evidence caveats</h3>' + listed + note + "</div>")
     else:
         missing.append(f'an item whose lead names "{result["selectors"]["family"]}"')
     ablations = result.get("ablations")
@@ -288,7 +293,7 @@ def strategies(data: dict) -> str:
 
 def _state_cell(state: dict) -> str:
     if state["status"] == "no source":
-        return '<span class="ov-none">No state source yet</span>'
+        return '<span class="ov-none">No state source yet</span>' + (f' <small>Ready when {esc(state["trigger"])}.</small>' if state.get("trigger") else "")
     if state["status"] != "present":
         return f'Pending: {_record(state)}; ready when {esc(state["trigger"])}.' + (f' <small>{esc(state["reason"])}</small>' if state.get("reason") else "")
     detail = ""
@@ -302,7 +307,7 @@ def _state_cell(state: dict) -> str:
 
 def _receipt_cell(receipt: dict) -> str:
     if receipt["status"] == "no source":
-        return '<span class="ov-none">No receipt source yet</span>'
+        return '<span class="ov-none">No receipt source yet</span>' + (f' <small>Ready when {esc(receipt["trigger"])}.</small>' if receipt.get("trigger") else "")
     if receipt["status"] == "none":
         return esc(receipt["reason"])
     if receipt["status"] != "present":
@@ -335,7 +340,7 @@ def _finalize(result: dict) -> str:
         out = f'<h3>Finalize-all plan</h3>{pending(plan)}'
     cells = []
     if f1["status"] == "present":
-        counts = ", ".join(f'{count} {name}' for name, count in f1["counts"].items())
+        counts = "; ".join(f'{count} {name}' for name, count in f1["counts"].items())
         cells.append(f'<div><dt>F1 upstream E2E receipts</dt><dd><p>{f1["arms"]} arms: {esc(counts)}.</p><p class="ov-trigger">From {_record(f1)}.</p></dd></div>')
     else:
         cells.append(f'<div><dt>F1 upstream E2E receipts</dt><dd>{pending(f1)}</dd></div>')
@@ -353,14 +358,18 @@ def repos(data: dict) -> str:
         return _finalize(result["finalize"]) + "".join(pending(source) for source in result["missing"])
     note = (f'<p class="ov-record">Winners and run pins from <code>catalogs/landscape/final-stack.json</code>; next actions from {_record({"root": "state", "name": result["rows_record"]})}.</p>'
             if result["rows_record"] else "")
-    out = _finalize(result["finalize"]) + note + (pending(result["rows_pending"]) if result.get("rows_pending") else "")
+    counted = result.get("counted") or {}
+    reconcile = (f'<p class="ov-record">{counted.get("catalog", 0)} catalog layers, {counted.get("planned", 0)} planned outside the catalog files and '
+                 f'{counted.get("rows_only", 0)} listed only in the finalize-all record.</p>' if counted else "")
+    out = _finalize(result["finalize"]) + note + reconcile + (pending(result["rows_pending"]) if result.get("rows_pending") else "")
     for group in result["groups"]:
         # One state shared by every catalog layer is said once above the table instead of on every row.
         catalog_states = {row["state"] for row in group["rows"] if row["in_catalog"]}
         shared = next(iter(catalog_states)) if len(catalog_states) == 1 and None not in catalog_states else None
         rows = []
         for row in group["rows"]:
-            planned = "" if row["in_catalog"] else " <small>planned, outside the catalog file" + (f'; {esc(row["status"])}' if shared and row["status"] else "") + "</small>"
+            planned = ("" if row["in_catalog"] else " <small>in the finalize-all record only, not yet in the catalog file</small>" if row.get("rows_only")
+                       else " <small>planned, outside the catalog file" + (f'; {esc(row["status"])}' if shared and row["status"] else "") + "</small>")
             link = (f'<a href="{esc(row["page"])}#{anchor(row["layer"])}" title="{esc(row["layer"])}">{esc(row["title"])}</a>' if row["in_catalog"]
                     else f'<a href="{esc(row["page"])}" title="{esc(row["layer"])}">{esc(row["title"])}</a>{planned}')
             state = f'<span class="lp-state-cell">{glyph(row["state"])}{esc(STATE_TEXT[row["state"]])}</span>' if row["state"] else esc(row["status"] or "no state")

@@ -1,6 +1,6 @@
 {
   "schema": "local-overview-sources/1",
-  "about": "Every source the overview page reads, in one place. Each entry names its section, the source_policy.json role that grants it, its root (repo or state), one exact path or one glob, what the page reads from it and the trigger that makes a pending source present. To move a record, change its path or glob here and the matching grant in source_policy.json; the generator needs no change. A glob reads the newest match by name. A missing source renders as pending with its trigger.",
+  "about": "Every source the overview page reads, in one place. Each entry names its section, the source_policy.json role that grants it, its root (repo or state), one exact path, what the page reads from it and the trigger that makes a pending source present. Every read is an exact-path grant in source_policy.json, so the path here is also the pointer to the current record: a new record (a newer ROWS or convergence record) is shown once its path is changed here and in its grant, and the generator needs no change. A missing source renders as pending with its trigger.",
   "sources": {
     "final_stack": {
       "section": "architecture",
@@ -38,7 +38,7 @@
       "section": "feeds",
       "role": "overview_feeds_convergence",
       "root": "state",
-      "glob": "coordination/command-center/research-cc-role-20261008/ranked-feeds-20261014/CONVERGENCE-WS2-*.md",
+      "path": "coordination/command-center/research-cc-role-20261008/ranked-feeds-20261014/CONVERGENCE-WS2-20261014.md",
       "reads": "a sanitized projection: under the heading below, the table with the column below and its item's lead as caption; the numbered items whose leads name each point phrase; and, under the gaps heading, the bullets whose leads start with the gap word. Any sentence that cites a path, digest or line, or names a drop term, is withheld",
       "under": "Converged by both judges",
       "table": "Signal",
@@ -61,29 +61,30 @@
       "section": "feeds",
       "role": "overview_feeds_addendum",
       "root": "state",
-      "glob": "coordination/command-center/research-cc-role-20261008/ranked-feeds-20261014/CONVERGENCE-WS2-*.addendum-*.md",
-      "reads": "a sanitized projection of the newest addendum to the convergence record shown: under the heading below, each top-level bullet of the form 'subject: result', as its subject (the parenthesised one, if any) and the sentences of it and its nested bullets that name a result word below. A parenthesised citation of a path, digest or line is dropped; any other sentence that cites one, or names a drop term, is withheld",
+      "path": "coordination/command-center/research-cc-role-20261008/ranked-feeds-20261014/CONVERGENCE-WS2-20261014.addendum-01.md",
+      "reads": "a sanitized projection of the addendum named here, which must belong to the convergence record shown: under the heading below, each top-level bullet of the form 'subject: result', as its subject (the parenthesised one, if any) and the sentences of it and its nested bullets that name a result word below. A parenthesised citation of a path, digest or line is dropped; any other sentence that cites one, or names a drop term, is withheld",
       "under": "addendum",
       "results": ["settled", "confirmed", "proven", "row"],
       "producer": "measured these",
       "drop_terms": ["paper", "hub", "account", "owner"],
+      "readiness": [["the one-shot \\S+ at \\d{4}-\\d{2}-\\d{2}[ T]\\d{2}:\\d{2}(?::\\d{2})?Z settles it", "it settles at the first regular-hours check after its run"]],
       "trigger": "the command center records entitlement measurements as an addendum to the WS2 convergence record"
     },
     "feeds_battery": {
       "section": "feeds",
       "role": "overview_feeds_battery",
       "root": "state",
-      "glob": "coordination/command-center/research-cc-role-20261008/ranked-feeds-20261014/BATTERY-WS2-*.md",
+      "path": "coordination/command-center/research-cc-role-20261008/ranked-feeds-20261014/BATTERY-WS2-20261014.md",
       "reads": "presence only: until it exists the feeds section states the statement below; then it cites the record by name",
       "label": "Measured battery result",
       "statement": "No measured winner yet.",
-      "trigger": "the frozen all-flag battery reports measured earliness, precision and all-flag returns on the development and validation windows"
+      "trigger": "the frozen all-flag battery reports measured earliness, precision and all-flag returns on the development and validation windows, under the name BATTERY-WS2-20261014.md (another name is a change to this path and its grant)"
     },
     "strategies_convergence": {
       "section": "strategies",
       "role": "overview_strategies_convergence",
       "root": "state",
-      "glob": "coordination/command-center/research-cc-role-20261008/extreme-mover-strategies-20261014/CONVERGENCE-WS5-*.md",
+      "path": "coordination/command-center/research-cc-role-20261008/extreme-mover-strategies-20261014/CONVERGENCE-WS5-20261015.md",
       "reads": "a sanitized projection of the numbered items under the heading below: the item whose lead names the family word, with the clauses that name a caveat word; the list that follows the text naming the ablations word; and the rows of the item whose lead names the sizing word. Any sentence that cites a path, digest or line, or names a drop term, is withheld",
       "under": "Converged by both judges",
       "family": "shortlist",
@@ -99,22 +100,23 @@
       "section": "strategies",
       "role": "overview_strategies_replication",
       "root": "state",
-      "glob": "coordination/command-center/research-cc-role-20261008/extreme-mover-strategies-20261014/REPLICATION-WS5-*.md",
+      "path": "coordination/command-center/research-cc-role-20261008/extreme-mover-strategies-20261014/REPLICATION-WS5-20261015.md",
       "reads": "presence only: until it exists the strategies section states the statement below; then it cites the record by name",
       "label": "Replication record",
       "statement": "No live result; replication next.",
-      "trigger": "the trading program records the frozen, costed replication of the shortlisted family"
+      "trigger": "the trading program records the frozen, costed replication of the shortlisted family, under the name REPLICATION-WS5-20261015.md (another name is a change to this path and its grant)"
     },
     "finalize_rows": {
       "section": "repos",
       "role": "overview_finalize_rows",
       "root": "state",
-      "glob": "coordination/command-center/research-cc-role-20261008/finalize-all-20261014/ROWS-*.md",
+      "path": "coordination/command-center/research-cc-role-20261008/finalize-all-20261014/ROWS-252babe4.md",
       "reads": "the table whose header names the key column below; per layer, the columns below",
       "table": "layer",
       "columns": {
         "next_action": "closes by",
-        "receipt_worker": "F1 receipt worker"
+        "receipt_worker": "F1 receipt worker",
+        "record_state": "state"
       },
       "trigger": "the command center writes the finalize-all rows for every layer"
     },
@@ -122,7 +124,7 @@
       "section": "repos",
       "role": "overview_finalize_plan",
       "root": "state",
-      "glob": "coordination/command-center/research-cc-role-20261008/finalize-all-20261014/PLAN-finalize-all-*.md",
+      "path": "coordination/command-center/research-cc-role-20261008/finalize-all-20261014/PLAN-finalize-all-20261014.md",
       "reads": "each wave paragraph opening with a bold 'F<n>. <title>.' lead: its id, its title and the first sentence after the trigger word below",
       "trigger_word": "Trigger:",
       "drop_terms": ["owner", "account"],
@@ -140,7 +142,7 @@
       "section": "repos",
       "role": "overview_finalize_f2",
       "root": "state",
-      "glob": "coordination/cc-native-practice-20261009/finalize-f2-20261014/F2-claude-side-*.md",
+      "path": "coordination/cc-native-practice-20261009/finalize-f2-20261014/F2-claude-side-20261014.md",
       "reads": "presence, and per second-level heading (without its parenthesised aside) a count: the rows of its first table, otherwise its entries that open with a bold lead",
       "trigger": "cc-native-practice records the Claude side of F2"
     },
@@ -164,7 +166,7 @@
       "section": "claude_code",
       "role": "overview_cc_floor_prep",
       "root": "state",
-      "glob": "coordination/cc-native-practice-20261009/floor-2300-20261014/FLOOR-*-prep-*.md",
+      "path": "coordination/cc-native-practice-20261009/floor-2300-20261014/FLOOR-2300-prep-20261014.md",
       "reads": "under the heading below, the first version and the first 40-character commit: the proposed run pin, shown as proposed until the claude-code run in final-stack.json carries that version",
       "under": "Source commit for the run pin",
       "run": "claude-code",
@@ -174,7 +176,7 @@
       "section": "claude_code",
       "role": "overview_cc_changelog",
       "root": "state",
-      "glob": "coordination/cc-native-practice-20261009/floor-2300-20261014/changelog-*.md",
+      "path": "coordination/cc-native-practice-20261009/floor-2300-20261014/changelog-2.1.296-2.1.300.md",
       "reads": "per version heading: the version, the count of entries opening with each kind below (others counted together), and at most the item limit of short items, taken from the first kinds in order",
       "kinds": ["Added", "Fixed", "Changed"],
       "items": 3,
@@ -243,13 +245,16 @@
       "name": "Claude API slots",
       "role": "review worker and API-slot runs",
       "state": {"source": "cc_now", "pointer": "/api_credit/routing", "as_of": "/api_credit/read_utc"},
-      "receipt": null
+      "receipt": null,
+      "receipt_trigger": "the finalize-all F1 receipts pull request registers the API-slot runs' receipts"
     },
     {
       "name": "Meta Wonder Full",
       "role": "through its fence",
       "state": null,
-      "receipt": null
+      "receipt": null,
+      "state_trigger": "its fence is accepted (#1120)",
+      "receipt_trigger": "its first F1 paired-sample receipt is registered after the fence is accepted"
     },
     {
       "name": "pi and OpenCode",
@@ -261,7 +266,9 @@
       "name": "GPT kit",
       "role": "GPT-family harness kit",
       "state": null,
-      "receipt": null
+      "receipt": null,
+      "state_trigger": "a registered receipt or runtime profile names the GPT kit",
+      "receipt_trigger": "the GPT kit's first run receipt is registered"
     }
   ]
 }

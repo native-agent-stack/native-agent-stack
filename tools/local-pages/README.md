@@ -250,14 +250,13 @@ winners, run pins, survivors and next action per layer, the evidence (who
 produced each converged study's arms, with model family, and which judges
 converged it), Claude Code (run pin and prepared pin, CHANGELOG delta counts,
 best-practice slots), and GitHub's main CI and pull-request queue. Every source it reads is declared once in `overview_sources.json`
-(section, `source_policy.json` role, repo or state root, one path or one glob,
+(section, `source_policy.json` role, repo or state root, one exact path,
 what is read, readiness trigger), so a record can move by editing that map and
 its grant, without code changes. Repository records reuse the layer pages'
-Architecture roles; state records use the `overview` exact grants and the
-`overview_families` (a fixed directory, a literal filename prefix, an optional
-literal infix and a `.md` or `.json` suffix; a glob reads the newest match by
-name), enforced by
-`source_policy.OverviewReads` before any open. Layer states and the FINAL count
+Architecture roles; state records use the `overview` exact grants only, enforced
+by `source_policy.OverviewReads` before any open: no filename family authorizes a
+read, and the path in the map is the explicit pointer to the current record (a
+newer ROWS or convergence record is shown once its path and grant name it). Layer states and the FINAL count
 are `architecture_manifest.layer_manifest()` over the same committed records,
 so the page never claims a FINAL layer the protocol does not. A missing source
 renders as pending with its trigger; private state records appear by name only,

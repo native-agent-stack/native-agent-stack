@@ -21651,70 +21651,66 @@
         "root": "state",
         "path": "coordination/command-center/research-cc-role-20261008/extreme-mover-strategies-20261014/README.md"
       }
+    ],
+    "overview_feeds_convergence": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/research-cc-role-20261008/ranked-feeds-20261014/CONVERGENCE-WS2-20261014.md"
+      }
+    ],
+    "overview_feeds_battery": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/research-cc-role-20261008/ranked-feeds-20261014/BATTERY-WS2-20261014.md"
+      }
+    ],
+    "overview_feeds_addendum": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/research-cc-role-20261008/ranked-feeds-20261014/CONVERGENCE-WS2-20261014.addendum-01.md"
+      }
+    ],
+    "overview_strategies_convergence": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/research-cc-role-20261008/extreme-mover-strategies-20261014/CONVERGENCE-WS5-20261015.md"
+      }
+    ],
+    "overview_strategies_replication": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/research-cc-role-20261008/extreme-mover-strategies-20261014/REPLICATION-WS5-20261015.md"
+      }
+    ],
+    "overview_finalize_rows": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/research-cc-role-20261008/finalize-all-20261014/ROWS-252babe4.md"
+      }
+    ],
+    "overview_finalize_plan": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/research-cc-role-20261008/finalize-all-20261014/PLAN-finalize-all-20261014.md"
+      }
+    ],
+    "overview_finalize_f2": [
+      {
+        "root": "state",
+        "path": "coordination/cc-native-practice-20261009/finalize-f2-20261014/F2-claude-side-20261014.md"
+      }
+    ],
+    "overview_cc_floor_prep": [
+      {
+        "root": "state",
+        "path": "coordination/cc-native-practice-20261009/floor-2300-20261014/FLOOR-2300-prep-20261014.md"
+      }
+    ],
+    "overview_cc_changelog": [
+      {
+        "root": "state",
+        "path": "coordination/cc-native-practice-20261009/floor-2300-20261014/changelog-2.1.296-2.1.300.md"
+      }
     ]
-  },
-  "overview_families": {
-    "overview_feeds_convergence": {
-      "root": "state",
-      "directory": "coordination/command-center/research-cc-role-20261008/ranked-feeds-20261014",
-      "prefix": "CONVERGENCE-WS2-",
-      "suffix": ".md"
-    },
-    "overview_feeds_battery": {
-      "root": "state",
-      "directory": "coordination/command-center/research-cc-role-20261008/ranked-feeds-20261014",
-      "prefix": "BATTERY-WS2-",
-      "suffix": ".md"
-    },
-    "overview_feeds_addendum": {
-      "root": "state",
-      "directory": "coordination/command-center/research-cc-role-20261008/ranked-feeds-20261014",
-      "prefix": "CONVERGENCE-WS2-",
-      "infix": ".addendum-",
-      "suffix": ".md"
-    },
-    "overview_strategies_convergence": {
-      "root": "state",
-      "directory": "coordination/command-center/research-cc-role-20261008/extreme-mover-strategies-20261014",
-      "prefix": "CONVERGENCE-WS5-",
-      "suffix": ".md"
-    },
-    "overview_strategies_replication": {
-      "root": "state",
-      "directory": "coordination/command-center/research-cc-role-20261008/extreme-mover-strategies-20261014",
-      "prefix": "REPLICATION-WS5-",
-      "suffix": ".md"
-    },
-    "overview_finalize_rows": {
-      "root": "state",
-      "directory": "coordination/command-center/research-cc-role-20261008/finalize-all-20261014",
-      "prefix": "ROWS-",
-      "suffix": ".md"
-    },
-    "overview_finalize_plan": {
-      "root": "state",
-      "directory": "coordination/command-center/research-cc-role-20261008/finalize-all-20261014",
-      "prefix": "PLAN-finalize-all-",
-      "suffix": ".md"
-    },
-    "overview_finalize_f2": {
-      "root": "state",
-      "directory": "coordination/cc-native-practice-20261009/finalize-f2-20261014",
-      "prefix": "F2-claude-side-",
-      "suffix": ".md"
-    },
-    "overview_cc_floor_prep": {
-      "root": "state",
-      "directory": "coordination/cc-native-practice-20261009/floor-2300-20261014",
-      "prefix": "FLOOR-",
-      "infix": "-prep-",
-      "suffix": ".md"
-    },
-    "overview_cc_changelog": {
-      "root": "state",
-      "directory": "coordination/cc-native-practice-20261009/floor-2300-20261014",
-      "prefix": "changelog-",
-      "suffix": ".md"
-    }
   }
 }

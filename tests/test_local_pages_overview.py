@@ -10,6 +10,7 @@ import hashlib
 import importlib.util
 import io
 import json
+import os
 from pathlib import Path
 import re
 import sys
@@ -119,7 +120,8 @@ SLOTS = {"client_version": "9.9.1", "checked_at": "2099-01-01", "status_values":
                    {"id": "slot-b", "status": "default", "default": "Fixture default B", "client_version": "9.9.2"}]}
 PLAN = ("# Fixture plan\n\n## Waves\n**F1. Fixture receipts.** Trigger: inputs exist now. More text.\n\n"
         "**F2. Fixture invoke.** Trigger: #9001 lands, then the fixture\nfollow-up lands. Detail.\n- a bullet\n\n**F3. Fixture no trigger.** Owners: fixture.\n")
-F1_INDEX = [{"spec": "a", "success": True, "receipt": "x"}, {"spec": "b", "success": True}, {"spec": "c", "success": False},
+F1_INDEX = [{"spec": "a", "success": True, "pin_ok": True, "assembled": "v2", "receipt": "x"}, {"spec": "b", "success": True, "pin_ok": False, "assembled": "v2"},
+            {"spec": "b2", "success": True, "pin_ok": False, "assembled": "preview"}, {"spec": "c", "success": False},
             {"spec": "d", "state": "running"}, {"spec": "e", "state": "not-started"}]
 F2 = ("# Fixture F2\n\n**Top:** ignored.\n\n## Receipts (directory `receipts/`)\n| Receipt | Calls |\n|---|---|\n| r1 | 1 |\n| r2 | 2 |\n\n"
       "**Inputs:**\n\n| File | sha |\n|---|---|\n| f | 1 |\n\n## Findings (no receipt)\n- **one:** x\n  - nested\n- **two:** y\n\n## Empty\nnothing here\n")
@@ -157,9 +159,9 @@ class Fixture:
             state_files["coordination/command-center/pages/cc-now.json"] = json.dumps(cc_now)
         if rows:
             state_files[f"{STATE_DIR}/finalize-all-20261014/ROWS-aaaa1111.md"] = ROWS_OLD
-            state_files[f"{STATE_DIR}/finalize-all-20261014/ROWS-bbbb2222.md"] = ROWS_NEW
+            state_files[f"{STATE_DIR}/finalize-all-20261014/ROWS-252babe4.md"] = ROWS_NEW
         if ws2:
-            state_files[f"{STATE_DIR}/ranked-feeds-20261014/CONVERGENCE-WS2-20990101.md"] = WS2
+            state_files[f"{STATE_DIR}/ranked-feeds-20261014/CONVERGENCE-WS2-20261014.md"] = WS2
         for relative, text in state_files.items():
             path = self.state / relative
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -225,7 +227,7 @@ class GeneratedFactsTests(OverviewCase):
         self.assertEqual(rows["us-equities/gamma"]["survivors"], 5)
         self.assertEqual(rows["foundation/beta"]["winners"][1], {"component": "tool-c", "run_pin": None, "run_reason": "unresolved"})
         self.assertFalse(rows["us-equities/planned-delta"]["in_catalog"])
-        self.assertEqual(data["repos"]["rows_record"], "ROWS-bbbb2222.md")
+        self.assertEqual(data["repos"]["rows_record"], "ROWS-252babe4.md")
         _, html = fixture.build(self.base)
         # One state shared by a group's catalog layers is said once; the planned row carries its own status.
         self.assertIn("2 catalog layers, all not terminal.", html)
@@ -264,7 +266,7 @@ class PendingTests(OverviewCase):
             self.assertIn(source_map[key]["trigger"], html)
         self.assertIn("final_stack", result["present"])
         self.assertEqual({row["id"]: row["status"] for row in result["sources"]}["cc_now"], "pending")
-        self.assertIn("CONVERGENCE-WS5-*.md", html)
+        self.assertIn("CONVERGENCE-WS5-20261015.md", html)
         self.assertNotIn("Traceback", html)
 
     def test_the_ws2_record_renders_as_a_sanitized_projection(self):
@@ -283,7 +285,7 @@ class PendingTests(OverviewCase):
         _, html = fixture.build(self.base)
         section = html[html.index('id="ov-feeds"'):html.index('id="ov-strategies"')]
         source_map = json.loads((HERE / "overview_sources.json").read_text())["sources"]
-        for text in ("No measured winner yet.", source_map["feeds_battery"]["trigger"], "<code>CONVERGENCE-WS2-20990101.md</code> (private record, cited by name)",
+        for text in ("No measured winner yet.", source_map["feeds_battery"]["trigger"], "<code>CONVERGENCE-WS2-20261014.md</code> (private record, cited by name)",
                      "Withheld: it cites a path, digest or line", "<li><strong>Fixture entitlement checks.</strong></li>"):
             self.assertIn(text, section)
         for text in ("/var/tmp/fixture", "abc1234d", "beef1234", "probe.py", "paper-x", "(above)", "step one", "Every row is a test candidate"):
@@ -292,10 +294,7 @@ class PendingTests(OverviewCase):
     def test_the_ws2_addendum_renders_its_entitlement_results_by_name(self):
         fixture = Fixture(self.base)
         directory = fixture.state / STATE_DIR / "ranked-feeds-20261014"
-        (directory / "CONVERGENCE-WS2-20990101.addendum-01.md").write_text(ADDENDUM)
-        glob = f"{STATE_DIR}/ranked-feeds-20261014/CONVERGENCE-WS2-*.md"
-        members = POLICY.OverviewReads(fixture.root, fixture.state).match("overview_feeds_convergence", "state", glob)
-        self.assertEqual([path.name for path in members], ["CONVERGENCE-WS2-20990101.md"])  # an addendum is not the record
+        (directory / "CONVERGENCE-WS2-20261014.addendum-01.md").write_text(ADDENDUM)
         data = DATA.model(fixture.root, fixture.state, commit="0" * 40)["feeds"]
         self.assertEqual(data["addendum"]["results"], [
             {"subject": "Fixture statuses entitlement", "sentences": ["SETTLED, confirmed."]},
@@ -305,26 +304,28 @@ class PendingTests(OverviewCase):
         result, html = fixture.build(self.base)
         self.assertIn("feeds_addendum", result["present"])
         section = html[html.index('id="ov-feeds"'):html.index('id="ov-strategies"')]
-        for text in ("<code>CONVERGENCE-WS2-20990101.addendum-01.md</code> (private record, cited by name)",
+        for text in ("<code>CONVERGENCE-WS2-20261014.addendum-01.md</code> (private record, cited by name)",
                      "<li><strong>Fixture statuses entitlement:</strong> SETTLED, confirmed.</li>",
                      "<li><strong>Fixture BOATS entitlement:</strong> SETTLED, real-time confirmed.</li>",
                      "<li><strong>FIXTURE-OPRA:</strong> historical access confirmed. Real-time is NOT yet proven; the one-shot fixture check settles it.</li>"):
             self.assertIn(text, section)
         for text in ("probe-1.json", "abcdef12", "1234abcd", "fixture-opra.json", "fixture-paper", "3 of 90", "5 of 5", "The server said ok", "Effect:"):
             self.assertNotIn(text, section)
-        (directory / "CONVERGENCE-WS2-20991231.addendum-01.md").write_text(ADDENDUM)  # the newest addendum now belongs to another record
-        _, html = fixture.build(self.base)
-        self.assertNotIn("Fixture statuses entitlement", html)
+        # Only the exact path the source map names is read: an unlisted later addendum changes nothing.
+        (directory / "CONVERGENCE-WS2-20261014.addendum-02.md").write_text(ADDENDUM.replace("Fixture statuses entitlement", "Unlisted subject"))
+        _, again = fixture.build(self.base)
+        self.assertNotIn("Unlisted subject", again)
+        self.assertIn("Fixture statuses entitlement", again)
 
     def test_the_ws5_record_renders_the_family_caveats_ablations_and_sizing(self):
         fixture = Fixture(self.base)
-        path = fixture.state / f"{STATE_DIR}/extreme-mover-strategies-20261014/CONVERGENCE-WS5-20990101.md"
+        path = fixture.state / f"{STATE_DIR}/extreme-mover-strategies-20261014/CONVERGENCE-WS5-20261015.md"
         path.parent.mkdir(parents=True)
         path.write_text(WS5)
         data = DATA.model(fixture.root, fixture.state, commit="0" * 40)["strategies"]
         self.assertEqual(data["family"], {"lead": "The one strict shortlist family is the fixture breakout on the top fixture names",
                                           "caveats": ["Commission was $0.01/share.", "There was no sealed out-of-sample test and no fixture slippage model.",
-                                                      "The fixture recreation covers 2001 only, inside the sample."]})
+                                                      "The fixture recreation covers 2001 only, inside the sample."], "withheld_caveats": 0})
         self.assertEqual(data["ablations"], {"lead": "The other fixture templates lack results", "intro": "They enter only as on/off ablations of the fixture row:",
                                              "rows": ["Fixture filter one", "A fixture gate"]})  # the cited digest aside is dropped
         self.assertEqual(data["sizing"], {"lead": "Selector and sizing (fixture)", "rows": ["Eligibility before fixture ranking"]})
@@ -332,22 +333,22 @@ class PendingTests(OverviewCase):
         self.assertIn("strategies_convergence", result["present"])
         section = html[html.index('id="ov-strategies"'):html.index('id="ov-workers"')]
         for text in ("No live result; replication next.", "<h3>Evidence caveats</h3>", "<h3>Ablations</h3>", "<h3>Selector and sizing (fixture)</h3>",
-                     "<code>CONVERGENCE-WS5-20990101.md</code> (private record, cited by name)"):
+                     "<code>CONVERGENCE-WS5-20261015.md</code> (private record, cited by name)"):
             self.assertIn(text, section)
         for text in ("doi:10.0000", "/var/tmp/fixture", "cafe1234", "account-level", "not this"):
             self.assertNotIn(text, section)
 
     def test_a_present_result_record_replaces_the_plain_statement(self):
         fixture = Fixture(self.base)
-        for relative in ("ranked-feeds-20261014/BATTERY-WS2-20990102.md", "extreme-mover-strategies-20261014/REPLICATION-WS5-20990102.md",
-                         "extreme-mover-strategies-20261014/CONVERGENCE-WS5-20990101.md"):
+        for relative in ("ranked-feeds-20261014/BATTERY-WS2-20261014.md", "extreme-mover-strategies-20261014/REPLICATION-WS5-20261015.md",
+                         "extreme-mover-strategies-20261014/CONVERGENCE-WS5-20261015.md"):
             path = fixture.state / STATE_DIR / relative
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(WS5 if "CONVERGENCE" in relative else "# fixture result\n")
         result, html = fixture.build(self.base)
         self.assertIn("feeds_battery", result["present"])
-        self.assertIn("Measured battery result: <code>BATTERY-WS2-20990102.md</code> (private record, cited by name).", html)
-        self.assertIn("Replication record: <code>REPLICATION-WS5-20990102.md</code> (private record, cited by name).", html)
+        self.assertIn("Measured battery result: <code>BATTERY-WS2-20261014.md</code> (private record, cited by name).", html)
+        self.assertIn("Replication record: <code>REPLICATION-WS5-20261015.md</code> (private record, cited by name).", html)
         for text in ("No measured winner yet.", "No live result; replication next."):
             self.assertNotIn(text, html)
 
@@ -356,8 +357,8 @@ class PendingTests(OverviewCase):
         stack = final_stack()
         stack["runs"].append({"id": "claude-code", "pin": "9.9.1", "source": "manifests/stack.json#/components/3"})
         fixture = Fixture(self.base, stack=stack)
-        write(fixture.state, "coordination/cc-native-practice-20261009/floor-2300-20261014/FLOOR-2300-prep-20990101.md", PREP)
-        write(fixture.state, "coordination/cc-native-practice-20261009/floor-2300-20261014/changelog-9.9.1-9.9.2.md", CHANGELOG)
+        write(fixture.state, "coordination/cc-native-practice-20261009/floor-2300-20261014/FLOOR-2300-prep-20261014.md", PREP)
+        write(fixture.state, "coordination/cc-native-practice-20261009/floor-2300-20261014/changelog-2.1.296-2.1.300.md", CHANGELOG)
         write(fixture.root, ".claude/skills/claude-native-practice/reference/slots.json", json.dumps(SLOTS))
         data = DATA.model(fixture.root, fixture.state, commit="0" * 40)["claude_code"]
         self.assertEqual(data["client"]["current"]["pin"], "9.9.1")
@@ -372,7 +373,7 @@ class PendingTests(OverviewCase):
             self.assertIn(key, result["present"])
         section = html[html.index('id="ov-claude-code"'):html.index('id="ov-github"')]
         commit = "c" * 40
-        for text in (f'<code title="{commit}">{commit[:12]}</code>: proposed, lands with its pin PR.', "<code>FLOOR-2300-prep-20990101.md</code> (private record, cited by name)",
+        for text in (f'<code title="{commit}">{commit[:12]}</code>: proposed, lands with its pin PR.', "<code>FLOOR-2300-prep-20261014.md</code> (private record, cited by name)",
                      "CHANGELOG delta 9.9.1 to 9.9.2", "2 slots, 1 default, 1 trial", "<code>slot-a</code>"):
             self.assertIn(text, section)
         for text in ("e" * 64, "d" * 40, ".fixture/x.md"):
@@ -385,25 +386,28 @@ class PendingTests(OverviewCase):
 
     def test_finalize_all_shows_the_waves_the_f1_counts_and_the_f2_summary(self):
         fixture = Fixture(self.base)
-        write(fixture.state, f"{STATE_DIR}/finalize-all-20261014/PLAN-finalize-all-20990101.md", PLAN)
+        write(fixture.state, f"{STATE_DIR}/finalize-all-20261014/PLAN-finalize-all-20261014.md", PLAN)
         write(fixture.state, "coordination/ns2604-coop/work-20261012/finalize-f1-20261014/INDEX.json", json.dumps(F1_INDEX))
-        write(fixture.state, "coordination/cc-native-practice-20261009/finalize-f2-20261014/F2-claude-side-20990101.md", F2)
+        write(fixture.state, "coordination/cc-native-practice-20261009/finalize-f2-20261014/F2-claude-side-20261014.md", F2)
         data = DATA.model(fixture.root, fixture.state, commit="0" * 40)["repos"]["finalize"]
         self.assertEqual(data["plan"]["waves"], [{"id": "F1", "title": "Fixture receipts", "trigger": "inputs exist now."},
                                                  {"id": "F2", "title": "Fixture invoke", "trigger": "#9001 lands, then the fixture follow-up lands."},
                                                  {"id": "F3", "title": "Fixture no trigger", "trigger": None}])
-        self.assertEqual((data["f1"]["arms"], data["f1"]["counts"]), (5, {"passed": 2, "failed": 1, "not started": 1, "running": 1}))
+        # A pass meets the plan only at the exact run pin; the split keeps a version-only pin and a preview apart.
+        self.assertEqual((data["f1"]["arms"], data["f1"]["counts"]),
+                         (6, {"passed at the exact run pin": 1, "passed, run pin not yet bound": 1, "passed, preview assembly": 1,
+                              "failed": 1, "not started": 1, "running": 1}))
         self.assertEqual(data["f2"]["groups"], [{"label": "Receipts", "count": 2}, {"label": "Findings", "count": 2}])
         _, html = fixture.build(self.base)
         section = html[html.index('id="ov-repos"'):html.index('id="overview-evidence"')]
-        for text in ("<strong>F2 Fixture invoke.</strong> Starts when: #9001 lands, then the fixture follow-up lands.", "5 arms: 2 passed, 1 failed, 1 not started, 1 running.",
-                     "<li>Receipts: 2</li>", "<code>F2-claude-side-20990101.md</code> (private record, cited by name)"):
+        for text in ("<strong>F2 Fixture invoke.</strong> Starts when: #9001 lands, then the fixture follow-up lands.", "6 arms: 1 passed at the exact run pin; 1 passed, run pin not yet bound; 1 passed, preview assembly; 1 failed; 1 not started; 1 running.",
+                     "<li>Receipts: 2</li>", "<code>F2-claude-side-20261014.md</code> (private record, cited by name)"):
             self.assertIn(text, section)
 
     def test_each_study_names_its_arms_workers_model_families_and_judges_without_a_winner(self):
         fixture = Fixture(self.base)
         write(fixture.state, f"{STATE_DIR}/ranked-feeds-20261014/README.md", ARMS)
-        write(fixture.state, f"{STATE_DIR}/ranked-feeds-20261014/CONVERGENCE-WS2-20990101.addendum-01.md", ADDENDUM)
+        write(fixture.state, f"{STATE_DIR}/ranked-feeds-20261014/CONVERGENCE-WS2-20261014.addendum-01.md", ADDENDUM)
         studies = {item["label"]: item for item in DATA.model(fixture.root, fixture.state, commit="0" * 40)["evidence"]["studies"]}
         ws2 = studies["WS2 data feeds for early entry"]
         self.assertEqual(ws2["arms"]["rows"], [{"worker": "FixtureFlow", "model": None}, {"worker": "Fixture Codex", "model": "GPT family (gpt-9-fixture)"},
@@ -485,13 +489,14 @@ class SourceMapPolicyTests(unittest.TestCase):
                 with self.subTest(change=name), self.assertRaises(POLICY.SourcePolicyError):
                     DATA.load_source_map(ROOT, Path(base), source_map=self.mutated(Path(base), change))
 
-    def test_overview_policy_refuses_final_stack_wide_families_and_symlinked_members(self):
+    def test_overview_policy_is_exact_paths_only_and_refuses_symlinked_records(self):
         policy = json.loads((HERE / "source_policy.json").read_text())
+        self.assertNotIn("overview_families", policy)
         with tempfile.TemporaryDirectory() as base:
             base = Path(base)
+            family = {"overview_finalize_rows": {"root": "state", "directory": f"{STATE_DIR}/finalize-all-20261014", "prefix": "ROWS-", "suffix": ".md"}}
             for name, change in (("final-stack", lambda doc: doc["overview"]["overview_registry"].append({"root": "repo", "path": "catalogs/landscape/final-stack.json"})),
-                                 ("wildcard", lambda doc: doc["overview_families"]["overview_finalize_rows"].update(prefix=".*")),
-                                 ("suffix", lambda doc: doc["overview_families"]["overview_finalize_rows"].update(suffix=".py")),
+                                 ("families", lambda doc: doc.update(overview_families=family)),
                                  ("role", lambda doc: doc["overview"].update(architecture_x=[]))):
                 document = copy.deepcopy(policy)
                 change(document)
@@ -503,15 +508,31 @@ class SourceMapPolicyTests(unittest.TestCase):
             directory = base / "state" / STATE_DIR / "finalize-all-20261014"
             directory.mkdir(parents=True)
             (base / "target.md").write_text("| layer |\n|---|\n")
-            (directory / "ROWS-link.md").symlink_to(base / "target.md")
-            (directory / "notes.md").write_text("not a family member")
-            matches = reads.match("overview_finalize_rows", "state", f"{STATE_DIR}/finalize-all-20261014/ROWS-*.md")
-            self.assertEqual([path.name for path in matches], ["ROWS-link.md"])
+            (directory / "ROWS-252babe4.md").symlink_to(base / "target.md")
             with self.assertRaises(POLICY.SourcePolicyError):
-                reads.read("overview_finalize_rows", matches[0])
-            with self.assertRaises(POLICY.SourcePolicyError):
-                reads.read("overview_finalize_rows", directory / "notes.md")
+                reads.read("overview_finalize_rows", directory / "ROWS-252babe4.md")
 
+    def test_a_file_beside_a_granted_record_is_refused_however_it_is_named(self):
+        # Astra's reproduction at 0a87d376: a family grant admitted ROWS-unreviewed.md with no exact grant.
+        with tempfile.TemporaryDirectory() as base:
+            reads = POLICY.OverviewReads(ROOT, Path(base) / "state")
+            directory = Path(base) / "state" / STATE_DIR / "finalize-all-20261014"
+            directory.mkdir(parents=True)
+            for name in ("ROWS-unreviewed.md", "ROWS-252babe4.md.bak", "notes.md"):
+                (directory / name).write_text("| layer |\n|---|\n")
+                with self.subTest(name=name), self.assertRaises(POLICY.SourcePolicyError):
+                    reads.read("overview_finalize_rows", directory / name)
+            (directory / "ROWS-252babe4.md").write_text("| layer |\n|---|\n")
+            raw, _ = reads.read("overview_finalize_rows", directory / "ROWS-252babe4.md")
+            self.assertEqual(raw, b"| layer |\n|---|\n")
+
+    def test_every_overview_grant_is_declared_by_the_source_map_and_no_more(self):
+        policy = json.loads((HERE / "source_policy.json").read_text())
+        with tempfile.TemporaryDirectory() as state:
+            document, _, _, _ = DATA.load_source_map(ROOT, Path(state))
+        declared = {(entry["role"], entry["root"], entry["path"]) for entry in document["sources"].values() if entry["role"].startswith("overview_")}
+        granted = {(role, record["root"], record["path"]) for role, records in policy["overview"].items() for record in records}
+        self.assertEqual(declared, granted)
 
 class MarkdownTests(unittest.TestCase):
     def test_tables_match_a_column_by_name_or_prefix_and_keep_their_heading(self):
@@ -581,6 +602,115 @@ class ComposerTests(unittest.TestCase):
         self.assertIn('href="overview.html"', html)
         overview = PAGES.document("overview", "Overview", "", "scope", "", "2099-01-01T00:00:00Z", "a" * 64, []).decode()
         self.assertIn('href="#overview-evidence"', overview)
+
+
+class MicroFixTests(OverviewCase):
+    """The CC FULL micro and the local review at 0a87d376; each test failed on that commit's modules."""
+
+    def test_the_rows_record_is_the_one_the_source_map_names_never_a_newer_or_higher_name(self):
+        # The CC micro's P2-1 and the local review: a name carries no order. The source map's exact path is the pointer.
+        fixture = Fixture(self.base, rows=False)
+        write(fixture.state, f"{STATE_DIR}/finalize-all-20261014/ROWS-252babe4.md", ROWS_NEW)
+        write(fixture.state, f"{STATE_DIR}/finalize-all-20261014/ROWS-ffffffff.md", ROWS_OLD)  # later and higher, unlisted
+        data = DATA.model(fixture.root, fixture.state, commit="0" * 40)["repos"]
+        self.assertEqual(data["rows_record"], "ROWS-252babe4.md")
+        alpha = next(row for group in data["groups"] for row in group["rows"] if row["layer"] == "foundation/alpha")
+        self.assertEqual(alpha["next_action"], ["fixture next action"])
+
+    def test_a_layer_only_the_finalize_all_record_lists_is_shown_with_its_state(self):
+        fixture = Fixture(self.base, rows=False)
+        write(fixture.state, f"{STATE_DIR}/finalize-all-20261014/ROWS-252babe4.md",
+              ROWS_NEW + "| foundation/omega | unswept | - | F5 delta sweep -> F4 adjudication | - |\n")
+        data = DATA.model(fixture.root, fixture.state, commit="0" * 40)["repos"]
+        omega = next(row for group in data["groups"] for row in group["rows"] if row["layer"] == "foundation/omega")
+        self.assertEqual((omega["rows_only"], omega["in_catalog"], omega["status"], omega["next_action"]),
+                         (True, False, "unswept", ["F5 delta sweep -> F4 adjudication"]))
+        self.assertEqual(data["counted"], {"catalog": 3, "planned": 1, "rows_only": 1})
+        _, html = fixture.build(self.base)
+        section = html[html.index('id="ov-repos"'):html.index('id="overview-evidence"')]
+        self.assertIn("3 catalog layers, 1 planned outside the catalog files and 1 listed only in the finalize-all record.", section)
+        self.assertIn("in the finalize-all record only, not yet in the catalog file", section)
+        self.assertIn("F5 delta sweep -&gt; F4 adjudication", section)
+
+    def test_a_scheduled_check_is_said_as_its_readiness_trigger_never_a_date(self):
+        fixture = Fixture(self.base)
+        directory = fixture.state / STATE_DIR / "ranked-feeds-20261014"
+        dated = ADDENDUM.replace("the one-shot fixture check settles it", "the one-shot fixture-check-x at 2099-01-01 14:00Z settles it")
+        self.assertNotEqual(dated, ADDENDUM)
+        (directory / "CONVERGENCE-WS2-20261014.addendum-01.md").write_text(dated)
+        data = DATA.model(fixture.root, fixture.state, commit="0" * 40)["feeds"]
+        opra = next(item for item in data["addendum"]["results"] if item["subject"] == "FIXTURE-OPRA")
+        self.assertIn("Real-time is NOT yet proven; it settles at the first regular-hours check after its run.", opra["sentences"])
+        _, html = fixture.build(self.base)
+        self.assertNotIn("2099-01-01 14:00Z", html)
+
+    def test_a_cited_or_withheld_caveat_never_becomes_a_no_caveat_claim(self):
+        fixture = Fixture(self.base)
+        directory = fixture.state / STATE_DIR / "extreme-mover-strategies-20261014"
+        cases = {
+            "kept": ("   - Evidence: No out-of-sample validation; see study.md.\n", ["Evidence: No out-of-sample validation."], 0),
+            "withheld": ("   - Evidence: in-sample result kept at /var/tmp/fixture/study.md.\n", [], 1),
+        }
+        for name, (line, caveats, withheld) in cases.items():
+            with self.subTest(case=name):
+                record = ("# Fixture\n\n## Converged by both judges\n1. **The one shortlist family is a synthetic strategy.**\n" + line)
+                directory.mkdir(parents=True, exist_ok=True)
+                (directory / "CONVERGENCE-WS5-20261015.md").write_text(record)
+                family = DATA.model(fixture.root, fixture.state, commit="0" * 40)["strategies"]["family"]
+                self.assertEqual((family["caveats"], family["withheld_caveats"]), (caveats, withheld))
+                _, html = fixture.build(self.base)
+                section = html[html.index('id="ov-strategies"'):html.index('id="ov-workers"')]
+                self.assertNotIn("states no caveat", section)
+                self.assertNotIn("No caveat was found", section)
+                if withheld:
+                    self.assertIn("1 more caveat withheld from this projection because it cites a path, digest or line", section)
+
+    def test_a_worker_without_a_source_names_its_readiness_trigger(self):
+        fixture = Fixture(self.base)
+        _, html = fixture.build(self.base)
+        section = html[html.index('id="ov-workers"'):html.index('id="ov-repos"')]
+        for text in ("Ready when its fence is accepted (#1120).", "Ready when its first F1 paired-sample receipt is registered after the fence is accepted.",
+                     "Ready when a registered receipt or runtime profile names the GPT kit.",
+                     "Ready when the finalize-all F1 receipts pull request registers the API-slot runs&#x27; receipts."):
+            self.assertIn(text, section)
+
+    def failing(self, module, function, error):
+        stub, real = type("Stub", (), {function: staticmethod(lambda *args, **kwargs: (_ for _ in ()).throw(error))}), PAGES.load_local
+        return unittest.mock.patch.object(PAGES, "load_local", side_effect=lambda name, *rest: stub if name == module else real(name, *rest))
+
+    def test_a_full_refresh_publishes_an_overview_placeholder_when_the_overview_fails(self):
+        for previous in (False, True):
+            with self.subTest(previous=previous), tempfile.TemporaryDirectory() as base:
+                output = Path(base) / "served"
+                output.mkdir()
+                if previous:
+                    (output / "overview.html").write_text("previous page\n")
+                outputs, receipt_doc = {}, {"outputs": {}}
+                with self.failing("overview_data", "build_overview_page", ValueError("bad")):
+                    PAGES.refresh_overview(ROOT, Path(base) / "state", output, Path(base) / "custody/refresh-receipt.json",
+                                           "2099-01-01T00:00:00Z", "a" * 64, outputs, receipt_doc)
+                status = receipt_doc["overview"]
+                self.assertEqual((status["status"], status["reason"]), ("UNREPORTED", "Overview unavailable (ValueError)"))
+                if previous:
+                    self.assertEqual((status["page_status"], outputs), ("previous page retained without a new observation", {}))
+                else:
+                    self.assertEqual(status["page_status"], "unreported placeholder")
+                    placeholder = outputs["overview.html"].decode()
+                    self.assertIn("UNREPORTED", placeholder)
+                    self.assertIn('id="overview-evidence"', placeholder)
+
+    def test_overview_only_renders_the_overview_when_the_layer_pages_fail(self):
+        with tempfile.TemporaryDirectory() as base:
+            output, receipt = Path(base) / "served", Path(base) / "custody/overview.json"
+            stdout = io.StringIO()
+            with self.failing("architecture_builder", "build_layer_pages", ValueError("bad")), redirect_stdout(stdout):
+                code = PAGES.main(["--overview-only", "--output-dir", str(output), "--receipt", str(receipt), "--state-root", str(Path(base) / "state")])
+            self.assertEqual(code, 1)
+            summary = json.loads(stdout.getvalue())
+            self.assertEqual((summary["layer_pages"], summary["layer_pages_status"]), ([], "UNREPORTED (layer pages unavailable: ValueError)"))
+            self.assertTrue((output / "overview.html").exists())
+            for page in ("architecture-foundation", "architecture-north-star"):
+                self.assertIn("UNREPORTED", (output / f"{page}.html").read_text())
 
 
 if __name__ == "__main__":
