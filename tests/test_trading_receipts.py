@@ -10,6 +10,51 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class TradingReceiptTests(unittest.TestCase):
+    def test_native_stream_frozen_and_held_overnight_are_blocked(self):
+        # adaptive-paper/runner.py at0959c4cf:2144,2267,2372-2380.
+        m = self.module()
+        for status in ("stream_frozen", "held_overnight"):
+            with self.subTest(status=status):
+                self.assertEqual(3, m.paper_observation("A", {"status": status}, 100, 110)["status_code"])
+
+    def test_bad_lane_receipts_preserve_every_other_lane_and_publish_unavailable(self):
+        m = self.module()
+        cases = [("A", "status", []), ("A", "ended_by", {}), ("C", "reason", []),
+                 ("IBKR", "ended_by", []), ("C", "decode", None)]
+        for lane, field, value in cases:
+            with self.subTest(lane=lane, field=field), tempfile.TemporaryDirectory() as scratch:
+                root = Path(scratch)
+                a = root / "home/.local/state/native-agent-stack/alpaca-paper-2/lane-a-sample/receipts/paper-sample.json"
+                b = root / "home/.local/state/native-agent-stack/alpaca-paper/forward-ready-sample/instances/sample/scheduled/paper-output.json"
+                events = root / "runs/run-sample/events.jsonl"
+                status = root / "status"
+                paper = {"status": "passed", "ended_by": "duration", "requests": [], "accounting": {}}
+                for path in (a, b):
+                    path.parent.mkdir(parents=True)
+                    path.write_text(json.dumps(paper))
+                events.parent.mkdir(parents=True)
+                event = {"type": "final_flat", "t": 100, "reason": "duration"}
+                events.write_text(json.dumps(event) + "\n")
+                status.write_text('2026-10-14T10:00:00Z session k=1 end rc=0 {"ended_by":"duration"}\n')
+                args = (root / "home", root / "runs", status, root / "receipts")
+                now = m.timestamp("2026-10-14T10:01:00Z")
+                before = {r["lane"]: r for r in m.collect(*args, now=now)}
+                if lane == "A":
+                    a.write_text(json.dumps(dict(paper, **{field: value})))
+                elif lane == "C":
+                    events.write_bytes(b"\xff\n") if field == "decode" else events.write_text(json.dumps(dict(event, reason=value)) + "\n")
+                else:
+                    status.write_text('2026-10-14T10:00:00Z session k=1 end rc=0 ' + json.dumps({field: value}) + "\n")
+                after = {r["lane"]: r for r in m.collect(*args, now=now)}
+                self.assertEqual(set(m.LANES), set(after))
+                for other in set(m.LANES) - {lane}:
+                    self.assertEqual(before[other], after[other])
+                self.assertEqual(-1, after[lane]["status_code"])
+                self.assertEqual(-1, after[lane]["orders_per_min"])
+                spool = root / "spool.jsonl"
+                m.append_spool(spool, list(after.values()))
+                self.assertEqual(7, len(spool.read_text().splitlines()))
+
     def module(self):
         path = ROOT / "observability/trading_receipts.py"
         self.assertTrue(path.is_file(), "Trading receipt projection must exist")

@@ -435,6 +435,9 @@
             {
               "type": "value",
               "options": {
+                "-1": {
+                  "text": "Unavailable"
+                },
                 "0": {
                   "text": "Missing receipt"
                 },
@@ -1035,6 +1038,9 @@
             {
               "type": "value",
               "options": {
+                "-1": {
+                  "text": "Unavailable"
+                },
                 "0": {
                   "text": "Missing receipt"
                 },
@@ -1635,6 +1641,9 @@
             {
               "type": "value",
               "options": {
+                "-1": {
+                  "text": "Unavailable"
+                },
                 "0": {
                   "text": "Missing receipt"
                 },
@@ -2235,6 +2244,9 @@
             {
               "type": "value",
               "options": {
+                "-1": {
+                  "text": "Unavailable"
+                },
                 "0": {
                   "text": "Missing receipt"
                 },
@@ -2835,6 +2847,9 @@
             {
               "type": "value",
               "options": {
+                "-1": {
+                  "text": "Unavailable"
+                },
                 "0": {
                   "text": "Missing receipt"
                 },
@@ -3435,6 +3450,9 @@
             {
               "type": "value",
               "options": {
+                "-1": {
+                  "text": "Unavailable"
+                },
                 "0": {
                   "text": "Missing receipt"
                 },
@@ -4104,6 +4122,9 @@
             {
               "type": "value",
               "options": {
+                "-1": {
+                  "text": "Unavailable"
+                },
                 "0": {
                   "text": "Missing receipt"
                 },

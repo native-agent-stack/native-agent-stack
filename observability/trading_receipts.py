@@ -26,7 +26,8 @@ EXPORTED_FIELDS = ("lane", "observed_unix", "source_unix", "orders_per_min", "fi
                    "status_code", "ended_by_code", "wire_mean_per_s", "wire_peak_per_s")
 STATUS = {"passed": 2, "completed": 2, "ended": 2, "stopped": 2, "ok": 2,
           "completed_no_signals": 2, "not_started": 0,
-          "running": 1, "active": 1, "blocked": 3, "failed": 3, "error": 3, "needs_attention": 3}
+          "running": 1, "active": 1, "blocked": 3, "failed": 3, "error": 3, "needs_attention": 3,
+          "stream_frozen": 3, "held_overnight": 3}
 ENDED = {"duration": 1, "duration_elapsed": 1, "duration_limit": 1, "time_limit": 1,
          "session_end": 2, "session_closed": 2, "stop": 3, "stopped": 3,
          "risk_limit": 4, "drawdown": 4, "error": 5, "failed": 5}
@@ -264,17 +265,27 @@ def ibkr_lane(status_path, receipts_root, now):
 
 def collect(home, runs_root, ibkr_status, ibkr_receipts, now=None):
     now = time.time() if now is None else now
-    a = paper_lane("A", list((home / '.local/state/native-agent-stack/alpaca-paper-2').glob('lane-a-*/receipts/paper-*.json')), now)
-    b = paper_lane("B", list((home / '.local/state/native-agent-stack/alpaca-paper').glob('forward-ready-*/instances/*/scheduled/paper-output.json')), now)
-    roots = list(runs_root.glob('run-*'))
-    rows = [a, b]
-    for lane in ("C", "lanea", "laneb", "I-llm"):
-        selected = [p for p in roots if (lane == "C" and not any(x in p.name for x in ['lanea', 'laneb', 'illm', 'i-llm']))
-                    or (lane in ['lanea', 'laneb'] and ('-' + lane + '-') in p.name)
-                    or (lane == "I-llm" and any(x in p.name for x in ['illm', 'i-llm']))]
-        rows.append(event_lane(lane, selected, now))
-    rows.append(ibkr_lane(ibkr_status, ibkr_receipts, now))
-    return sorted(rows, key=lambda row: LANES.index(row['lane']))
+    rows = []
+    for lane in LANES:
+        try:
+            if lane == "A":
+                row = paper_lane(lane, list((home / '.local/state/native-agent-stack/alpaca-paper-2').glob('lane-a-*/receipts/paper-*.json')), now)
+            elif lane == "B":
+                row = paper_lane(lane, list((home / '.local/state/native-agent-stack/alpaca-paper').glob('forward-ready-*/instances/*/scheduled/paper-output.json')), now)
+            elif lane == "IBKR":
+                row = ibkr_lane(ibkr_status, ibkr_receipts, now)
+            else:
+                roots = list(runs_root.glob('run-*'))
+                selected = [p for p in roots if (lane == "C" and not any(x in p.name for x in ['lanea', 'laneb', 'illm', 'i-llm']))
+                            or (lane in ['lanea', 'laneb'] and ('-' + lane + '-') in p.name)
+                            or (lane == "I-llm" and any(x in p.name for x in ['illm', 'i-llm']))]
+                row = event_lane(lane, selected, now)
+        except (OSError, ValueError, TypeError, OverflowError, KeyError):
+            # DecodeError is a ValueError. Keep a fixed unavailable observation
+            # for this lane; neither source text nor a peer's failure escapes.
+            row = empty(lane, now, -1)
+        rows.append(row)
+    return rows
 
 
 def append_spool(path, rows):

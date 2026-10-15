@@ -283,6 +283,30 @@ this correction. Producer source identity is metadata only and unversioned;
 the named reference makes its inspected revision identifiable without
 publishing private source bytes or digests.
 
+## Pre-landing status and fault-isolation fold (2026-10-15)
+
+The CC's full read released one fold for the owner's lane-health view:
+native stream_frozen and held_overnight paper outcomes now use Blocked.
+This display classification does not redefine the runner's exit semantics.
+Primary producer source is adaptive-paper/runner.py at
+`0959c4cfbda87268691da0ddb39d9f2993c0cfe6`, lines2144,2267,2372-2380;
+the retained native status function also names held_overnight. The fixture
+mapping fails for both outcomes before this fold and passes afterward.
+
+Collection now isolates each lane's source read and projection. An invalid
+typed outcome/reason or decoding failure emits a fixed Unavailable row for
+that lane and preserves all peers' observations; no source/error text is
+exported. The bounded per-lane exception guard covers source I/O, decoding
+and conversion failures. Python3.13's UnicodeError/UnicodeDecodeError are
+ValueError subclasses, per the installed runtime's exception hierarchy and
+[CPython v3.13.0 exceptions reference](https://github.com/python/cpython/blob/v3.13.0/Doc/library/exceptions.rst),
+checked against the installed3.13runtime's actual exception hierarchy.
+Synthetic file fixtures cover unhashable paper status/end reason, event
+reason, IBKR summary reason and invalid UTF-8; every peer remains byte-equal
+as a projected mapping, and all seven rows can still be spooled. The test
+fails on the exact previous head and passes after the fold. No unrelated
+partial-fill, scheduler, transport or follow-up behavior changes here.
+
 ## Per-lane receipt freshness correction
 
 The CC04:21Z measurement reproduced a false Stale receipt alarm: C's

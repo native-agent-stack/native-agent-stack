@@ -2,7 +2,7 @@
 
 LANES = ("A", "B", "C", "lanea", "laneb", "IBKR", "I-llm")
 SOURCE = {"type": "loki", "uid": "ns2604-loki"}
-STATUS = {0: "Missing receipt", 1: "Active", 2: "Ended", 3: "Blocked", 4: "No session", 5: "Not live", 6: "Stale receipt", 7: "Cadence unrecorded", 99: "Other status"}
+STATUS = {-1: "Unavailable", 0: "Missing receipt", 1: "Active", 2: "Ended", 3: "Blocked", 4: "No session", 5: "Not live", 6: "Stale receipt", 7: "Cadence unrecorded", 99: "Other status"}
 FRESHNESS = {"C": "Stale after12 minutes (overnight rounds about5 minutes apart).",
              "lanea": "Stale after20 minutes (retained median round interval558.335 seconds).",
              "laneb": "Stale after13 minutes (retained median round interval374.841 seconds).",
