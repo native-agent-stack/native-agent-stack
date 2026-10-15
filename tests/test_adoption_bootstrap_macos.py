@@ -1703,7 +1703,7 @@ class NativeInstallFloorTests(unittest.TestCase):
     URL = f"https://downloads.claude.ai/claude-code-releases/{PIN}/darwin-arm64/claude"
     KEPT = ("2.1.300 (Claude Code)", "2.1.301 (Claude Code)", "2.2.0 (Claude Code)",
             "10.0.0 (Claude Code)", "2.1.300")
-    # 2.1.299 is one below the pin (the headless roles pin it by path); 2.1.295 was the floor before 2026-10-14,
+    # 2.1.299 is one below the pin; 2.1.295 was the floor before 2026-10-14,
     # 2.1.281 the floor before 2026-09-29 and 2.1.280 the one
     # before it, so a launcher on either now takes the install (2.1.284 is the first release whose
     # `sonnet` alias resolves to Sonnet 5.5). 2.1.99 sorts after 2.1.284 as text but is older; a

@@ -5002,8 +5002,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/native-clients.md",
-      "sha256": "0f8cbc465311a24be6afdb8a06bb4862cc246c0c52632eb8fd5a1410f974f6df",
-      "bytes": 19509
+      "sha256": "c7810109b13c270bcb3879d430c6d44aea625bc31067766b9e1f2acdc5ad7cb3",
+      "bytes": 19644
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/observation-inference.md",
@@ -5017,8 +5017,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.json",
-      "sha256": "80ca32bdece82d92157fef60729cf5e4274c019979504cd69c514e0508e34291",
-      "bytes": 153806
+      "sha256": "d432a000bd790b888e890b9666e43d296f2e51759a0e35615139391f193aca19",
+      "bytes": 153941
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.md",
@@ -5597,13 +5597,13 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "5289794dec14de3adbfcda1946a320e0080feee8439175518285395dd877e132",
-      "bytes": 35482
+      "sha256": "547d9702bafa89f6f9aef06d07794d69a2b2ee07e18c360769b46975cd1184b4",
+      "bytes": 35621
     },
     {
       "path": "adoption/pins-macos-arm64.json",
-      "sha256": "3b32daf64a7c64e82a2b80e2d44d7812d75da94aebf182769774b32601954d88",
-      "bytes": 40984
+      "sha256": "2af10bb3e8fa4e76bfdd459d9f01bf10ac8c673b6a4dcbc42dd7e2669d2fe2e5",
+      "bytes": 41123
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
@@ -17498,7 +17498,7 @@
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "c63d0265b06facbb5fd7acdc6ce2daad636410841c862e40e2580b989dc24cab",
+      "sha256": "fa033d657fd47edb4622cfe55b33d6dff2cf7e700da4559994aec3bbe7670eec",
       "bytes": 309745
     },
     {
@@ -18953,8 +18953,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-claude-code-floor.md",
-      "sha256": "36daf2607d1ac9be96f735fa3d1897e7408b6816ce8d57b212f547adeb5e3139",
-      "bytes": 13056
+      "sha256": "f704b9f3523ea46027a4db48e6ff7e72c8f290f6928117625864e24ed3be8806",
+      "bytes": 13555
     },
     {
       "path": "docs/decisions/2026-10-09-claude-code-native-practice.md",
@@ -21533,7 +21533,7 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/claude-native-slot-manifest.json",
-      "sha256": "1034aa7f4e6c55b95e736249703afe0c983f457897ca24420e54f75cad0065c3",
+      "sha256": "24017114f496b1f736ccdfaf18dc13db65190b67ceaf92a11fafabf6565a36dd",
       "bytes": 238205
     },
     {
@@ -62658,8 +62658,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
-      "sha256": "e6ea2473395063704b0339dd94df6c6b8d3f768e717cec50c563c7f5e2efbd1e",
-      "bytes": 105993
+      "sha256": "143247790b246d79fb34680ef048f7c0cbd3b3e1c01ca6887bf375fd0eaabb50",
+      "bytes": 105957
     },
     {
       "path": "tests/test_adoption_bootstrap_linux_platform.py",
@@ -62668,8 +62668,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "78d648724f239a315d774e3db578c0aff6877866d2809e2862cdea217940e5b2",
-      "bytes": 223210
+      "sha256": "46ca06db4d3efb6af3aac48be07f59146e2be6e34cabac1ce2c3357fe3c7fd0c",
+      "bytes": 223174
     },
     {
       "path": "tests/test_adoption_bootstrap_parity.py",

@@ -171,10 +171,15 @@ both bootstrap scripts compare `--version`'s first word numerically. The regener
 - None changes the native installer, the auto-update channel, `autoUpdatesChannel` or `minimumVersion`.
 - The floor stays a minimum, with latest-channel auto-update as the client-core default.
 
-**Roles that pin 2.1.299 by path.**
-- The headless review worker: `tools/claude-review-worker/worker.py` `DEFAULT_CLAUDE_BIN`, set in #1107.
-- The trading lane's private session runner, which is outside this repository.
-- Both run `~/.local/share/claude/versions/2.1.299`. CHANGELOG 2.1.243 records auto-update cleaning up an old version.
+**Headless roles follow the latest release through a retained copy.**
+- The headless review worker (`tools/claude-review-worker/worker.py` `DEFAULT_CLAUDE_BIN`, #1107) and the trading lane's
+  private session runner (outside this repository) both pinned `~/.local/share/claude/versions/2.1.299` by path.
+  CHANGELOG 2.1.243 records auto-update cleaning up an old version.
+- On 2026-10-14 the owner directed (paraphrased, through the command center) that these roles follow the latest Claude
+  Code. A pinned role runs a retained copy outside `versions/` (`~/.local/share/claude-retained/<version>/claude`), checks
+  its sha256 against the release's signed manifest at launch, and moves to a new release after a function check of its
+  exact invocation, not a paired quality run.
+- At this addendum both roles move to 2.1.300 this way: the trading runner by its own dated copy, and the worker in #1127.
 - Native auto-update is on here. `claude doctor` at 2026-10-15T00:44:57Z prints `Auto-updates: enabled`, channel
   `latest`, last update `2.1.300 (2026-10-14)`. `~/.claude.json` does hold `autoUpdates: false`, but with
   `installMethod: native` and `autoUpdatesProtectedForNative: true`. The native installer writes that triple itself
@@ -182,10 +187,8 @@ both bootstrap scripts compare `--version`'s first word numerically. The regener
   binary), and its disabled check counts `autoUpdates: false` only without that protection.
 - So the version cleanup runs. It keeps the launcher's version, any version a session on this machine is
   running and the two newest (https://code.claude.com/docs/en/setup, the section on home directories on network
-  storage). A 2.1.299 path survives the next release only while a session runs it, so the pinned roles need their
-  own protection.
-- Moving those roles to 2.1.300 waits for their paired check.
-- That protection is a separate, command-center-reviewed change.
+  storage). A path under `versions/` survives a later release only while a session runs it. The retained copy is the
+  pinned roles' protection against that cleanup and against a broken release.
 
 **Derived records:**
 - **Regenerated through their builders:** the profile, both pins, the stack manifest, the generated handbook (receipt regeneration entry), the grand list and the final-stack catalog.
