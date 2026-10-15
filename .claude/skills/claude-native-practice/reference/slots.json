@@ -1112,7 +1112,7 @@
    "layer_id": "workers",
    "status": "default-scoped",
    "default": "File-based subagent definitions at project scope (`.claude/agents`), installed to `~/.claude/agents` by the profile installer",
-   "route": "Each role carries its `tools` allowlist, model and effort; under `-p` or the Agent SDK a named spawn stays a subagent, while an interactive named spawn can become a teammate",
+   "route": "Each role carries its `tools` allowlist, model and effort. Spawn a one-shot worker (a read, a judge, a builder) without a `name` and resume it by its agent id; a name is for a worker that others must message. In an interactive session with agent teams on, a named spawn from the main conversation launches as a teammate (unless the call is a fork or passes `isolation`); under `-p` or the Agent SDK it stays a subagent",
    "alternatives": [
     "`--agents` JSON per session",
     "Ad-hoc stages with per-call model and effort"
@@ -1124,7 +1124,8 @@
    ],
    "evidence": [
     "sub-agents.md frontmatter and priority",
-    "subagents-teams-O2, O3, O15"
+    "subagents-teams-O2, O3, O15",
+    "agent-lifecycle-20261015: sub-agents.md:937-939 and agent-teams.md:60, fetched 2026-10-15"
    ],
    "notes": "Four host copies differ from adoption/agents/claude and four host-only definitions exist (G6b). Portability: the user-scope copies run in other projects, where 4 are stale and 4 of 11 bodies point at native-agent-stack-only paths; the north star needs repository-neutral bodies before relying on them.",
    "overturn_when": "A release changes definition scope or priority, or a measured role-quality gap.",
@@ -1186,7 +1187,7 @@
    "layer_id": "workers",
    "status": "default-scoped",
    "default": "Native agent teams, used only where workers must message each other",
-   "route": "Teammates spawn only in interactive sessions; `-p` and SDK runs keep named subagents as subagents",
+   "route": "Teammates spawn only in interactive sessions; `-p` and SDK runs keep named subagents as subagents. Spawn a teammate (a `name` on the Agent call) only for a worker that must message others, and give one-shot workers no name: without a `name` they stay subagents. Shut each teammate down once its result is sealed (a shutdown request, or TaskStop): an idle teammate stays running and addressable until then",
    "alternatives": [
     "Plain subagents",
     "Cross-session messaging between sessions you run",
@@ -1199,9 +1200,10 @@
    "evidence": [
     "agent-teams.md",
     "subagents-teams-O15",
-    "Paired run 1, 2026-10-10 (evidence/artifacts/native-practice-paired-runs-20261010/paired-runs.json; RESULT.md sha256 e87b9cabd8c2, score.json 72dc84ef76b0): six bounded north-star fixes, one trial per arm; every mode passed 6 of 6, the single session cost $5.87 on average, the verify Workflow 1.6x and the agent team 3.0x (estimates), and the blind judges preferred the single session's diff to the Workflow's on 5 of 6 fixtures and to the team's on 3 of the 5 where the team's diff was captured"
+    "Paired run 1, 2026-10-10 (evidence/artifacts/native-practice-paired-runs-20261010/paired-runs.json; RESULT.md sha256 e87b9cabd8c2, score.json 72dc84ef76b0): six bounded north-star fixes, one trial per arm; every mode passed 6 of 6, the single session cost $5.87 on average, the verify Workflow 1.6x and the agent team 3.0x (estimates), and the blind judges preferred the single session's diff to the Workflow's on 5 of 6 fixtures and to the team's on 3 of the 5 where the team's diff was captured",
+    "agent-lifecycle-20261015: agent-teams.md:60, :86, :202-210, :420, :430; hooks.md:2853-2858; CHANGELOG 2.1.178"
    ],
-   "notes": "The host enables teams globally while the repository scopes them narrowly; whether that matches is the owner's call. Measured 2026-10-10 on six bounded north-star fixes (paired run 1): the interactive team passed 6 of 6 but cost about 3.0x a single session (estimates priced from token counts); in the judges' pairs against the single session it won 1 of the 5 fixtures where its diff was captured (F2, in the analysis over all six fixtures; the single session won 3 and F4 was a tie) and none of the primary fixtures F3 to F6; it reached TEAM-DONE in 2 of 6 runs, hit its $30 cap in 1, was stopped at its 45-minute ceiling in 3, and in 1 run the lead stopped on a question to the absent user. A team stays for work where workers must message each other. Verified: the switch sits in host user settings, so named subagents become teammates in every interactive session of every project, and teammates start in the lead's permission mode (bypass here).",
+   "notes": "The host enables teams globally while the repository scopes them narrowly; whether that matches is the owner's call. Measured 2026-10-10 on six bounded north-star fixes (paired run 1): the interactive team passed 6 of 6 but cost about 3.0x a single session (estimates priced from token counts); in the judges' pairs against the single session it won 1 of the 5 fixtures where its diff was captured (F2, in the analysis over all six fixtures; the single session won 3 and F4 was a tie) and none of the primary fixtures F3 to F6; it reached TEAM-DONE in 2 of 6 runs, hit its $30 cap in 1, was stopped at its 45-minute ceiling in 3, and in 1 run the lead stopped on a question to the absent user. A team stays for work where workers must message each other. Verified: the switch sits in host user settings, so named subagents become teammates in every interactive session of every project, and teammates start in the lead's permission mode (bypass here). Lifecycle (2026-10-15; docs fetched 04:08:42Z for 2.1.300, digests in evidence/artifacts/agent-lifecycle-20261015/sources.json): with teams on, every session has one implicit team and a `name` on the Agent tool spawns a teammate (CHANGELOG 2.1.178); Claude may name a subagent on its own, so teams form during ordinary delegation (agent-teams.md:60 and :430; sub-agents.md:937-939). An idle teammate's row hides 30 s after the panel goes idle, but the teammate stays running and addressable (agent-teams.md:86 and :420). The lead ends it with a shutdown request the teammate approves or rejects (agent-teams.md:202-210), and a TeammateIdle hook can stop it at idle with continue false (hooks.md:2853-2858). Measured by the command center on 2026-10-15: 48 idle evidence-reviewer teammates, each a one-shot micro spawned with a name; it stopped them all.",
    "overturn_when": "A paired run on work where workers must message each other (the class this default is scoped to; paired run 1 measured bounded fixes, which need no messaging and fall outside it) shows teams lose quality or cost more for the same work, or the feature leaves experimental status with changed semantics.",
    "supersedes": [
     "R50 effort clause"

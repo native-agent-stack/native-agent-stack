@@ -1,0 +1,51 @@
+{
+ "purpose": "Docs read for the workers rows' agent lifecycle (2026-10-15)",
+ "client": "claude-code 2.1.300",
+ "sources": [
+  {
+   "url": "https://code.claude.com/docs/en/agent-teams.md",
+   "sha256": "e9a12f8d1601d07665fc9153bd428b12cd70609da82c0c91ccb34c3b48ffb035",
+   "bytes": 40556,
+   "fetched_utc": "2026-10-15T04:08:42Z",
+   "quoted_lines": {
+    "60": "Enabling agent teams also changes ordinary delegation. Claude may [name a subagent](/docs/en/sub-agents#subagent-names) on its own, and while agent teams are enabled, a subagent that Claude names launches as a teammate, so teams can form even when you didn't ask for one. For more, see [How Claude starts agent teams](#how-claude-starts-agent-teams); to turn the behavior off, see [Claude spawns teammates instead of subagents](#claude-spawns-teammates-instead-of-subagents).",
+    "62": "Spawning teammates also requires an interactive session. In [non-interactive mode](/docs/en/headless) with the `-p` flag, including Agent SDK sessions, Claude doesn't spawn teammates, and a subagent that Claude names runs as an ordinary [subagent](/docs/en/sub-agents) even with agent teams enabled.",
+    "86": "An idle teammate's row stays in the panel while any teammate or subagent is still working, so you can select it to review its transcript or send it more work. Once every agent in the panel is idle, idle rows hide after 30 seconds and reappear on the teammate's next turn; the teammate stays running and addressable while hidden.",
+    "202": "### Shut down teammates",
+    "204": "To gracefully end a teammate's session, refer to it by name. For example, with a teammate named researcher:",
+    "210": "The lead sends a shutdown request. The teammate can approve, exiting gracefully, or reject with an explanation.",
+    "420": "* A teammate row that disappeared after sitting idle has been hidden, not stopped. Idle rows hide 30 seconds after the whole panel goes idle and reappear on the teammate's next turn. When more than three teammates are idle, their surplus rows collapse into a single `N idle agents` row that Enter expands. Send the teammate a message by name to bring a hidden row back.",
+    "430": "While agent teams are enabled, a subagent that Claude names in the lead's session launches as a teammate. Claude [can name subagents on its own](#how-claude-starts-agent-teams), so this can happen during delegation you never framed as team work."
+   }
+  },
+  {
+   "url": "https://code.claude.com/docs/en/sub-agents.md",
+   "sha256": "a0c1d6fb66b6f3d81f5ada63f94d766c7a82de216b8acbed154cc6781492265f",
+   "bytes": 110968,
+   "fetched_utc": "2026-10-15T04:08:42Z",
+   "quoted_lines": {
+    "937": "Claude can give a subagent a name by passing a `name` parameter on the Agent tool call, and may do so on its own, without asking you first. The name makes the subagent addressable: Claude can [message or resume it by name](#resume-subagents) after it finishes.",
+    "939": "In an interactive session with [agent teams](/docs/en/agent-teams) enabled, a subagent that Claude spawns from the main conversation with a `name` launches as a teammate instead, unless the call is a [fork](#fork-the-current-conversation) or passes `isolation` on the call itself. An `isolation` value in the subagent's frontmatter doesn't prevent it, and the teammate then runs in the main session's working directory. See [How Claude starts agent teams](/docs/en/agent-teams#how-claude-starts-agent-teams)."
+   }
+  },
+  {
+   "url": "https://code.claude.com/docs/en/hooks.md",
+   "sha256": "f5957ad68ec47adaed8c2462a0cb9fb04ccc979e066b3eec96f5342ec51728cc",
+   "bytes": 270841,
+   "fetched_utc": "2026-10-15T04:08:42Z",
+   "quoted_lines": {
+    "2853": "#### TeammateIdle decision control",
+    "2855": "TeammateIdle hooks support two ways to control teammate behavior:",
+    "2857": "* **Exit code 2**: the teammate receives the stderr message as feedback and continues working instead of going idle.",
+    "2858": "* **JSON `{\"continue\": false, \"stopReason\": \"...\"}`**: stops the teammate entirely, matching `Stop` hook behavior. The `stopReason` is shown to the user."
+   }
+  },
+  {
+   "url": "https://github.com/anthropics/claude-code/blob/94506ff0d3bd9185f1752da36e968775021fb48f/CHANGELOG.md",
+   "sha256": "8c6fdbbd692bd9b2e108e9946948aa77200b6c8ffec4f807ea9c8cee92545139",
+   "bytes": 1028694,
+   "fetched_utc": "2026-10-15T04:09:00Z",
+   "cited": "2.1.178: Agent teams removed TeamCreate and TeamDelete; with the variable set every session has one implicit team, and the Agent tool's name parameter spawns teammates directly"
+  }
+ ]
+}

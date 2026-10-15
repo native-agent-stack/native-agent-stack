@@ -5017,8 +5017,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.json",
-      "sha256": "b0b9d7949e07dd86ab80b34747cbc538a5eb6c97d1dec26e6684c0e1ffd7b2a1",
-      "bytes": 152660
+      "sha256": "860371b10f48b4f497d9098ebcdb29c31d038756018d47b2ca2bd96bc3b1154c",
+      "bytes": 154280
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.md",
@@ -5032,8 +5032,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/workers.md",
-      "sha256": "0c07dbfed9fbb0ef7f98155e63b989d47427d29cf7bb5693ed0fdf7ddf395bd3",
-      "bytes": 27627
+      "sha256": "c3a552d50ba5482993303d2a4653602af2b30948de91a0ac3cb3addb1276417e",
+      "bytes": 29235
     },
     {
       "path": ".claude/skills/native-skill-routing/SKILL.md",
@@ -20187,6 +20187,11 @@
       "bytes": 5505
     },
     {
+      "path": "evidence/artifacts/agent-lifecycle-20261015/sources.json",
+      "sha256": "d18a8ece1891b013c852b1e16fdfd5dfc067287e32a34ea529a7a4b52e386fd0",
+      "bytes": 4601
+    },
+    {
       "path": "evidence/artifacts/agentsview-044-qualification-20260927/README.md",
       "sha256": "5e22e9fe1b880e0770179a3b2d96766d7e44b7740b816fdbd2659899ac217d64",
       "bytes": 15075
@@ -21543,8 +21548,8 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/claude-native-slot-manifest.json",
-      "sha256": "b3db948a9878156abec03a3dc11764b1595c5c43b348d483c2a24355ca649e80",
-      "bytes": 238162
+      "sha256": "0ce3b077986260d5568b2cc5d0bf16a23efe780b058d80d431d05025e88aaa4c",
+      "bytes": 238331
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/cross-client-lines.json",
