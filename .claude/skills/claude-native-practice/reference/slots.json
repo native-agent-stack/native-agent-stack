@@ -1105,7 +1105,8 @@
     "practice_references.py; the 2026-10-09 candidate file (37 references, 11 new)"
    ],
    "overturn_when": "A guide is archived or goes stale under the 90-day rule, or a vendor publishes a maintained practice catalog.",
-   "supersedes": []
+   "supersedes": [],
+   "notes": "Screen-on-change (2026-10-15, command center ruling B3/W2): a reference with screen_paths counts in currency_due's practice_refs_ahead when a file matching them changed since its pin (practice_references.py reads the file list from the same compare call). Pin drift alone does not count: 23 of 26 references drift daily, and the best-practice guide's 134 commits after its 2026-09-27 pin changed practice text in 5 files. The count starts a screen of the changed files against the official docs at the pinned client (an adopt / reject / already-practised table with primary citations), then a re-pin by PR, which clears it. First run: shanraisshan/claude-code-best-practice 59dc4f04 to 294e0268."
   },
   {
    "id": "subagent-definitions",
@@ -2040,7 +2041,7 @@
    ],
    "overturn_when": "Current Renovate passes the 2026-10-02 overturn test: seven daily runs on the same runtime rows plus deliberately outdated canaries, with fewer missed pins and no lost archived or renamed flags.",
    "supersedes": [],
-   "notes": "Adjudicated: the incumbent stands; the refuter upheld it. Native client floor if the channel ever moves to stable: `minimumVersion` (any settings file); `requiredMinimumVersion` and `requiredMaximumVersion` are the managed startup gates. Dependabot was claude-code-action's only release tracker until its workflows were retired (2026-10-10). Integrity: the opt-in Monday propose job is model-free but holds contents and pull-requests write; schedules on a public repository pause after 60 days without activity."
+   "notes": "Adjudicated: the incumbent stands; the refuter upheld it. Native client floor if the channel ever moves to stable: `minimumVersion` (any settings file); `requiredMinimumVersion` and `requiredMaximumVersion` are the managed startup gates. Dependabot was claude-code-action's only release tracker until its workflows were retired (2026-10-10). Integrity: the opt-in Monday propose job is model-free but holds contents and pull-requests write; schedules on a public repository pause after 60 days without activity. Trigger, installed on the workstation 2026-10-15 (command center, W1): stack-currency.timer runs upstream-surface-watch.service, then currency_due.py --network, daily; the SessionStart currency notice prints the due counts. practice_client_behind (the watched Claude Code release is newer than this skill's client_version) starts this skill's step 2: screen the CHANGELOG delta against the slot rows, adopt by PR with citations, bump client_version, and move each headless role to the release through a retained, sha256-checked copy after a function check of its exact invocation (owner direction 2026-10-14). Host note: gh is a mise shim here, so the installed units carry a PATH drop-in with ~/.local/share/mise/shims; the template's PATH changes only on a second host's evidence."
   },
   {
    "id": "usage-cost-monitoring",

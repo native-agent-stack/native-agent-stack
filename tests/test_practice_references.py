@@ -97,6 +97,47 @@ def row_for(repository):
     return practice_references.classify(entry(repository), FIXTURES[repository], NOW)
 
 
+class ScreenPathTests(unittest.TestCase):
+    """screen_paths (CC ruling B3/W2, 2026-10-15): a reference whose practice text the lane screens on change names its
+    practice files; the report counts the changed files that match, so a commit that only touches the rest (auto-
+    generated changelogs, badges) is not a screen trigger."""
+
+    def screened(self, files, paths=("README.md", "best-practice/*"), comparison=("ahead", 134, 0)):
+        observation = observed("example/guide", head_sha=HEAD, comparison=comparison)
+        if files is not None:
+            observation["compare"]["files"] = list(files)
+        return practice_references.classify(dict(entry("example/guide"), screen_paths=list(paths)), observation, NOW)
+
+    def test_changed_practice_files_are_counted_and_named(self):
+        row = self.screened(["README.md", "best-practice/claude-settings.md", "changelog/best-practice/x.md", "CLAUDE.md"])
+        self.assertEqual(row["screen_paths_changed"], 2)
+        self.assertEqual(row["screen_paths_matched"], ["README.md", "best-practice/claude-settings.md"])
+
+    def test_commits_that_touch_no_practice_file_count_zero(self):
+        self.assertEqual(self.screened(["changelog/best-practice/x.md", "CLAUDE.md"])["screen_paths_changed"], 0)
+        self.assertEqual(self.screened([], comparison=("identical", 0, 0))["screen_paths_changed"], 0)
+
+    def test_an_unknown_file_list_is_none_never_zero(self):
+        self.assertIsNone(self.screened(None)["screen_paths_changed"])
+        # The API lists at most 300 files: a full list without a match cannot rule a match out.
+        self.assertIsNone(self.screened([f"other/{index}.md" for index in range(300)])["screen_paths_changed"])
+        self.assertEqual(self.screened(["README.md"] + [f"o/{i}" for i in range(299)])["screen_paths_changed"], 1)
+
+    def test_a_reference_without_screen_paths_reports_nothing_about_them(self):
+        row = practice_references.classify(entry("example/drifted"), FIXTURES["example/drifted"], NOW)
+        self.assertNotIn("screen_paths_changed", row)
+
+    def test_screen_paths_must_be_a_list_of_text(self):
+        for value in ([], [""], "README.md", [1]):
+            with self.subTest(value=value):
+                bad = catalog(("example/fresh",))
+                bad["references"][0]["screen_paths"] = value
+                self.assertTrue(any("screen_paths" in error for error in practice_references.validate_catalog(bad)))
+        good = catalog(("example/fresh",))
+        good["references"][0]["screen_paths"] = ["README.md", "best-practice/*"]
+        self.assertEqual(practice_references.validate_catalog(good), [])
+
+
 class ClassificationTests(unittest.TestCase):
     def test_fresh_pin_at_the_default_branch_head_has_no_flags(self):
         row = row_for("example/fresh")
@@ -475,6 +516,25 @@ class ObserveTests(unittest.TestCase):
                                                   "base_sha": PIN, "base_date": "2026-09-25T18:06:27Z"})
         row = practice_references.classify(entry("example/tool"), observation, NOW)
         self.assertEqual((row["flags"], row["commits_since_pin"], row["default_branch"]), (["drifted"], 4, "trunk"))
+
+    def test_an_observation_keeps_the_changed_file_names_when_the_entry_screens_paths(self):
+        # CC ruling B3/W2 (2026-10-15): the same compare response lists the changed files (up to the API's 300), so a
+        # reference with screen_paths needs no second call.
+        answers = {
+            "repos/example/tool": {"full_name": "example/tool", "archived": False, "default_branch": "trunk"},
+            "repos/example/tool/tags?per_page=1": [],
+            "repos/example/tool/commits/trunk": {"sha": HEAD, "commit": {"committer": {"date": iso(NOW)}}},
+            f"repos/example/tool/compare/{PIN}...{HEAD}?per_page=1": {
+                "status": "ahead", "ahead_by": 4, "behind_by": 0,
+                "base_commit": {"sha": PIN, "commit": {"committer": {"date": "2026-09-25T18:06:27Z"}}},
+                "files": [{"filename": "README.md"}, {"filename": "changelog/x.md"}]},
+        }
+        screened = dict(entry("example/tool"), screen_paths=["README.md"])
+        with mock.patch("subprocess.run", side_effect=self.fake_gh(answers, [], ())):
+            observation = practice_references.observe(screened)
+            plain = practice_references.observe(entry("example/tool"))
+        self.assertEqual(observation["compare"]["files"], ["README.md", "changelog/x.md"])
+        self.assertNotIn("files", plain["compare"])
 
     def test_missing_repository_is_not_compared(self):
         observation, calls = self.observe("example/gone", {})
