@@ -206,3 +206,31 @@ coverage), `blueprints/blind-catalog-convergence/audit_reports.py:26-65`
 (page identity and count assertions). These are repository integration controls,
 not a new tool/practice adoption claim. Any future promotion or measurement
 remains a PROPOSAL pending its own required evidence and CC approval.
+
+## Dated gap-resolution coverage correction
+
+The next GPT delta, retained by name as `GPT-VERDICT-92c95deff.md`, closes the
+previous six findings and identifies a second historical coverage consumer.
+At `92c95deff39b8106534407e0b75f5c94f53504bd`,
+`tests/test_gap_resolution_ledger.py:22-28` compares every current layer identity
+with the dated 32-row ledger, so the new pending scope fails coverage. The
+ledger's own `checked_at`, `scope` and `source_row_indexes` fields at that pin
+(`catalogs/landscape/gap-resolution-20260922.json:3-11`) explicitly describe the
+2026-09-22 source rows and preserve their original gaps and receipt bindings.
+
+The test now names that dated scope and excludes only registrations admitted
+by the existing `scripts/landscape.py:67-95` predicate at the reviewed pin, with
+repository wave/sweep history supplied. This follows the same native mechanism
+as `blueprints/blind-catalog-convergence/audit_reports.py:43-46` at that pin.
+Exact equality with all 32 unique ledger identities remains required. No
+historical ledger bytes, source-revision bindings, receipt checks or source-text
+checks are rewritten or waived.
+
+Before correction, the original seven-test module failed once on the extra
+`foundation/model-routes` identity. Added controls ran first against the old
+coverage logic: nine tests with four failures, comprising the original mismatch
+and the selected-winner, sealed-run and registered-prior-sweep cases. With shared
+admission applied, the nine gap-ledger tests plus the eight blind-audit tests and
+four registration tests pass: 21 tests, no failures, errors or skips. Negative
+controls also preserve refusal for an unmarked extra row and a missing dated
+row. These are local integration results, with no model request or sweep launch.

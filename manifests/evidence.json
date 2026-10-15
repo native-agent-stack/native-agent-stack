@@ -19293,8 +19293,8 @@
     },
     {
       "path": "docs/decisions/2026-10-15-model-routes-catalog-registration.md",
-      "sha256": "c357832d51db5e44cb92ec21f2dd96c95d60701f525bdfe6558f6afd132d16be",
-      "bytes": 12825
+      "sha256": "c8af209e542968c946f115aecd69d2a31ec5df8865a93d2b363bfe76e31785ad",
+      "bytes": 14604
     },
     {
       "path": "docs/decisions/2026-10-15-muse-toolchain-directory-grants.md",
@@ -41448,8 +41448,8 @@
     },
     {
       "path": "evidence/artifacts/model-routes-registration-20261015/controls.json",
-      "sha256": "14c7b4b1257f3f1fd88de2e34ee2d244f75741c0669163ac27cc87c98e0a85d8",
-      "bytes": 6288
+      "sha256": "faf1152ebf6a9a311855a755bc277bbeabb7820298367635c4411a759668fa6c",
+      "bytes": 7714
     },
     {
       "path": "evidence/artifacts/native-claude-coop-20260921/loki-discovery.json",
@@ -63598,8 +63598,8 @@
     },
     {
       "path": "tests/test_gap_resolution_ledger.py",
-      "sha256": "686fab880ea35dd0863d04a721d924158b76f0edde464af93f40fac1bd36b156",
-      "bytes": 5845
+      "sha256": "e2ec5545b0acc74438257e5aaa1de50a0a816ee18b29a36015318a938d3d1ca8",
+      "bytes": 8970
     },
     {
       "path": "tests/test_gap_wave_ledger.py",

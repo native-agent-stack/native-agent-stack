@@ -117,8 +117,38 @@
       "scope": "Final-tree registration, disposition citation, handbook summary, blind audit, committed new-WSL output/receipt and two architecture controls."
     }
   },
+  "gap_ledger_review_control": {
+    "review": "GPT-VERDICT-92c95deff.md",
+    "reviewed_commit": "92c95deff39b8106534407e0b75f5c94f53504bd",
+    "command": "python3 -m unittest tests.test_gap_resolution_ledger",
+    "before_existing_tests": {
+      "tests": 7,
+      "failures": 1,
+      "errors": 0,
+      "cause": "The dated ledger omits the current foundation/model-routes identity."
+    },
+    "before_added_controls": {
+      "tests": 9,
+      "failures": 4,
+      "errors": 0,
+      "cause": "The coverage mismatch and winner, sealed-run and prior-sweep controls fail before history-aware admission is applied."
+    },
+    "after": {
+      "command": "python3 -m unittest tests.test_gap_resolution_ledger tests.test_blind_layer_decisions tests.test_model_routes_registration",
+      "tests": 21,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "checks": [
+        "The ledger retains its exact 2026-09-22, 32-identity scope; only history-aware admitted unrun registrations may be excluded from current rows.",
+        "Winner, sealed-run and registered-prior-sweep mutations are refused with specific admission diagnostics.",
+        "An unmarked new row remains in coverage; a missing dated row still fails exact identity comparison.",
+        "Existing receipt, source-revision, source-text and historical digest checks remain enabled."
+      ]
+    }
+  },
   "boundary": [
-    "Fixture mutations are in-memory reads; no published row or frozen evidence is mutated by a test.",
+    "Fixture mutations are confined to in-memory projections and temporary test roots; no published row or frozen evidence is mutated by a test.",
     "No model request, account-state read, provider mutation, install, receipt registration or sweep dispatch occurs.",
     "The separate single-family initial sweeps are later PRIOR evidence, never this registration's verdict or FINAL.",
     "This is registration integrity evidence, not a route capability comparison or E2E adoption result."
