@@ -525,15 +525,15 @@
   },
   {
    "key": "claude:env:CLAUDE_CODE_TMPDIR",
-   "disposition": "declined",
-   "reason": "off on both hosts (read 2026-10-04)); the repository decision at docs/decisions/2026-09-28-terminal-experience.md:225 names it",
-   "source": "docs/decisions/2026-09-28-terminal-experience.md:225",
-   "carrier": null,
-   "value": null,
-   "scope": null,
-   "overturn": "the record is superseded by a measured result",
-   "reviewed_utc": "2026-10-04T18:55:00Z",
-   "version": "2.1.289"
+   "disposition": "enabled",
+   "reason": "applied on 2604 by the command center 2026-10-10T05:48Z (the /tmp tmpfs filled); the 2026-10-04 row wrongly called it off; template unchanged",
+   "source": "https://code.claude.com/docs/en/env-vars",
+   "carrier": "host user settings",
+   "value": "/var/tmp/claude-tmp",
+   "scope": "NativeStack2604",
+   "overturn": "the /tmp tmpfs is enlarged or no longer shared, or a release moves session temp files elsewhere",
+   "reviewed_utc": "2026-10-15T05:28:00Z",
+   "version": "2.1.300"
   },
   {
    "key": "claude:env:CLAUDE_CODE_WEBFETCH_DEADLINE_MS",
@@ -1150,14 +1150,14 @@
   {
    "key": "claude:setting:advisorModel",
    "disposition": "adopt-pending",
-   "reason": "The user's 2026-10-04 decision is Opus 5.5: NativeStack carries opus, 2604 renders it by the map's override (parity patch)",
+   "reason": "fable observed on 2604 since the 2026-10-06T21:28Z to 10-07T00:33Z window (actor unknown); the 10-04 rule: fable only when truly needed",
    "source": "docs/decisions/2026-09-27-model-currency.md:21",
    "carrier": "adoption/new-wsl/client-config-map.json (own override entry)",
    "value": "opus",
    "scope": "NativeStack2604",
-   "overturn": "the user names another advisor, or Fable 5.5 releases and benchmarks above Opus 5.5",
-   "reviewed_utc": "2026-10-04T18:55:00Z",
-   "version": "2.1.289"
+   "overturn": "the owner confirms fable as the standing advisor (then supersede the template and map), or asks for a revert to opus",
+   "reviewed_utc": "2026-10-15T05:28:00Z",
+   "version": "2.1.300"
   },
   {
    "key": "claude:setting:agent",
