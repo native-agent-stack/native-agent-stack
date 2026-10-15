@@ -632,6 +632,17 @@ def choose_slot(after: str | None = None) -> str:
 OPENCODE_OUTPUT_EVENTS = ("step_finish", "text", "reasoning", "tool_use")
 
 
+def opencode_interrupted_tool(event: dict) -> bool:
+    """A tool_use event for a tool OpenCode aborted because its stream failed: the processor's cleanup marks each tool
+    still running as status "error" with metadata.interrupted (anomalyco/opencode@53d1eabb
+    packages/opencode/src/session/processor.ts:585-607). The tool ran, but the run did not continue."""
+    part = event.get("part")
+    state = part.get("state") if isinstance(part, dict) else None
+    metadata = state.get("metadata") if isinstance(state, dict) else None
+    return (event.get("type") == "tool_use" and isinstance(state, dict) and state.get("status") == "error"
+            and isinstance(metadata, dict) and metadata.get("interrupted") is True)
+
+
 def first_call_refusal(log: Path, runtime: str) -> tuple[int | None, str] | None:
     """(status, text) of the run's first model call when it was refused before any billed output, else None.
 
@@ -644,8 +655,10 @@ def first_call_refusal(log: Path, runtime: str) -> tuple[int | None, str] | None
     OpenCode 1.18.35 (anomalyco/opencode@53d1eabb): `run --format json` emits step_finish for each finished step
     (packages/opencode/src/cli/cmd/run.ts:750) and an error event carrying the session error (:789), which for a
     provider refusal is {name, data: {statusCode, ...}} (packages/opencode/src/session/message-v2.ts:707-717,
-    packages/core/src/util/error.ts:55-60). Any output event first (OPENCODE_OUTPUT_EVENTS) means the run was billed or
-    acted, so nothing is retried."""
+    packages/core/src/util/error.ts:55-60). Any output event (OPENCODE_OUTPUT_EVENTS) means the run was billed or acted,
+    so nothing is retried. The whole log decides, not only what precedes the first error: an output event after it,
+    such as a tool the processor aborted, still means the run acted."""
+    refusal = None
     for line in log.read_text().split("\n"):
         try:
             event = json.loads(line)
@@ -664,9 +677,9 @@ def first_call_refusal(log: Path, runtime: str) -> tuple[int | None, str] | None
             return pi_refusal_status(text), text
         if event.get("type") in OPENCODE_OUTPUT_EVENTS:
             return None
-        if event.get("type") == "error":
-            return opencode_refusal(event.get("error"))
-    return None
+        if event.get("type") == "error" and refusal is None:
+            refusal = opencode_refusal(event.get("error"))
+    return refusal
 
 
 def body_status(text: str) -> int | None:
@@ -701,8 +714,8 @@ def credit_refused(log: Path, runtime: str) -> bool:
 def mid_run_refusal(log: Path, runtime: str) -> tuple[int | None, str] | None:
     """(status, text) of the run's LAST model call when it was refused after billed output, else None: the case
     first_call_refusal leaves to the run. Pi: the last assistant message_end ends on stopReason "error" while it, or an
-    earlier one, carried tokens. OpenCode: an error event after an output event (OPENCODE_OUTPUT_EVENTS), with no output
-    since."""
+    earlier one, carried tokens. OpenCode: an error event, with output (OPENCODE_OUTPUT_EVENTS) somewhere in the run and
+    none after it but tools the failed stream aborted."""
     refusal, billed = None, False
     for line in log.read_text().split("\n"):
         try:
@@ -720,8 +733,10 @@ def mid_run_refusal(log: Path, runtime: str) -> tuple[int | None, str] | None:
             text = message.get("errorMessage") if isinstance(message.get("errorMessage"), str) else ""
             refusal = (pi_refusal_status(text), text) if message.get("stopReason") == "error" else None
         elif event.get("type") in OPENCODE_OUTPUT_EVENTS:
-            billed, refusal = True, None
-        elif event.get("type") == "error" and billed:
+            billed = True
+            if not opencode_interrupted_tool(event):
+                refusal = None
+        elif event.get("type") == "error":
             refusal = opencode_refusal(event.get("error"))
     return refusal if billed else None
 
@@ -1203,12 +1218,24 @@ def active_worktree(workspace: Path) -> bool:
     return False
 
 
+# Every tracked, untracked and ignored change in a worktree: what cleanup_worktree keeps a worktree for.
+WORKTREE_STATUS = ("status", "--porcelain=v1", "-z", "--untracked-files=all", "--ignored")
+
+
+def worktree_status(workspace: Path) -> bytes | None:
+    """The worktree's status as cleanup_worktree reads it, or None when git cannot read it."""
+    try:
+        status = subprocess.run(["git", "-C", str(workspace), *WORKTREE_STATUS], capture_output=True)
+    except OSError:
+        return None
+    return status.stdout if status.returncode == 0 and isinstance(status.stdout, bytes) else None
+
+
 def cleanup_worktree(repository: Path, workspace: Path) -> dict:
     """Remove clean inactive native worktrees only, never using --force."""
     if active_worktree(workspace):
         return {"status": "retained_active"}
-    status = subprocess.run(["git", "-C", str(workspace), "status", "--porcelain=v1", "-z",
-                             "--untracked-files=all", "--ignored"], capture_output=True)
+    status = subprocess.run(["git", "-C", str(workspace), *WORKTREE_STATUS], capture_output=True)
     if status.returncode:
         return {"status": "retained_status_error", "exit_code": status.returncode}
     if status.stdout:
@@ -1372,6 +1399,13 @@ def launch(args):
                 # Each attempt has the whole --timeout-seconds.
                 timed = ["timeout", "--signal=TERM", "--kill-after=5s", str(args.timeout_seconds), *command]
                 exit_code = None
+                # OpenCode's log can miss a tool still running when its stream failed: the processor marks it aborted only
+                # after it has set the session idle, and `run` stops reading at that idle (anomalyco/opencode@53d1eabb
+                # packages/opencode/src/session/processor.ts:613-639, then :585-607, in the order of :689-690;
+                # packages/opencode/src/cli/cmd/run.ts:793-799). The worktree's own status, before and after the
+                # attempt, shows whether it acted there.
+                before = worktree_status(workspace) if runtime != "pi" and route == "claude" else None
+                acted = False
                 try:
                     with log.open("x", encoding="utf-8") as handle, errors.open("x", encoding="utf-8") as stderr:
                         log.chmod(0o600); errors.chmod(0o600)
@@ -1389,6 +1423,12 @@ def launch(args):
                         if not log.exists():
                             log.touch(mode=0o600)
                         outcome = attempt_outcome(log, runtime, route, exit_code)
+                        if outcome == "first_call_refused" and runtime != "pi":
+                            # A changed (or unreadable) status means the run acted before the refusal: never send the
+                            # brief again onto it. It stops on its slot as a mid-run refusal does.
+                            after = worktree_status(workspace)
+                            if before is None or after is None or after != before:
+                                outcome, acted = "credit_exhausted_mid_run", True
                         fact, in_flight = inference_facts(log, runtime), response_in_flight(log, runtime)
                     except (OSError, ValueError):
                         outcome, fact, in_flight = "error", no_facts(), True
@@ -1410,7 +1450,8 @@ def launch(args):
                     # OpenCode's `run --session` would continue it, but how it replays the refused turn is unverified, so
                     # ns-run does not resume it: the worktree is kept for whoever continues it by hand.
                     resume = {"status": "stopped_not_resumable", "reason": "credit_exhausted_mid_run",
-                              "session_id": (facts[-1]["native_session_ids"] or [None])[-1], "credential_loader_id": slot}
+                              "session_id": (facts[-1]["native_session_ids"] or [None])[-1], "credential_loader_id": slot,
+                              **({"detected_by": "worktree_status_changed"} if acted else {})}
                     break
                 # The session holds billed work after a mid-run refusal, and keeps it through every later refusal: a
                 # continuation refused on its first call by the next slot continues again, never restarts from the brief.

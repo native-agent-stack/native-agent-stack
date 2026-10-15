@@ -49,6 +49,11 @@ CREDIT_STREAM = ('{"type":"error","error":{"details":null,"type":"invalid_reques
                  '"request_id":"req_fixture"}             ')
 
 
+# A tool_use event as OpenCode 1.18.35 writes it for a tool its processor aborted when the stream failed (anomalyco/opencode@
+# 53d1eabb packages/opencode/src/session/processor.ts:585-607; run.ts:724-725 emits it as tool_use).
+ABORTED_TOOL = {"type": "tool_use", "part": {"type": "tool", "tool": "bash", "state": {
+    "status": "error", "error": "Tool execution aborted", "metadata": {"interrupted": True}}}}
+
 class PiLaunchFixture:
     """A pi-claude print launch against fixture slots, shared by the fill-first and mid-run failover tests."""
 
@@ -248,6 +253,10 @@ class FillFirstSlotTests(PiLaunchFixture, unittest.TestCase):
                     self.assertFalse(profiles.credit_refused(log, "opencode"))
             log.write_text(json.dumps({"type": "step_start", "part": {}}) + "\n" + refusal)
             self.assertTrue(profiles.credit_refused(log, "opencode"))
+            # SYNTHETIC order (the CC's read at 91918a34): an aborted tool written after the error. At the pin run.ts stops
+            # reading at the idle halt sets first, so this event is not written; the worktree check covers that case.
+            log.write_text(json.dumps({"type": "step_start", "part": {}}) + "\n" + refusal + json.dumps(ABORTED_TOOL) + "\n")
+            self.assertFalse(profiles.credit_refused(log, "opencode"))
 
 
 class MidRunFailoverTests(PiLaunchFixture, unittest.TestCase):
@@ -295,9 +304,11 @@ class MidRunFailoverTests(PiLaunchFixture, unittest.TestCase):
         code, receipt, calls = self.launch({order[0]: ["ok", (CREDIT_400, 40)]}, only_first, sessions=False)
         self.assertEqual((code, calls, receipt["resume"]["status"]), (1, [order[0]], "stopped_no_session"))
 
-    def opencode_launch(self, events, status):
-        """An opencode-claude print launch whose one attempt writes `events` and exits `status`. Returns (exit, receipt,
-        ledger rows, runtime calls, choose_slot calls, cleanup calls)."""
+    def opencode_launch(self, events, status, statuses=None):
+        """An opencode-claude print launch whose each attempt writes `events` and exits `status`; the worktree's status
+        reads `statuses` in turn (unchanged and clean by default). Returns (exit, receipt, ledger rows, runtime calls,
+        choose_slot calls, cleanup calls)."""
+        statuses = iter(statuses or [])
         with tempfile.TemporaryDirectory(dir="/var/tmp") as directory:
             state = Path(directory)
             root = state / "opencode-claude" / "roles/reviewer"
@@ -323,6 +334,8 @@ class MidRunFailoverTests(PiLaunchFixture, unittest.TestCase):
                     for event in events:
                         kwargs["stdout"].write(json.dumps(event) + "\n")
                     return subprocess.CompletedProcess(command, status)
+                if command[:2] == ["git", "-C"] and command[3:] == list(profiles.WORKTREE_STATUS):
+                    return subprocess.CompletedProcess(command, 0, stdout=next(statuses, b""), stderr=b"")
                 return subprocess.CompletedProcess(command, 0)
             args = argparse.Namespace(profile="opencode-claude", state_root=state, repository=state,
                                       role="evidence-reviewer", print=True, prompt="fixture", timeout_seconds=1,
@@ -377,6 +390,33 @@ class MidRunFailoverTests(PiLaunchFixture, unittest.TestCase):
                 # The step never finished, so its usage was never reported: the spend stays unknown.
                 self.assertEqual([(row["kind"], row.get("outcome"), row.get("attempt_outcome")) for row in rows],
                                  [("debit", None, None), ("settle", "unknown", "credit_exhausted_mid_run")])
+        # SYNTHETIC order (the CC's read at 91918a34): a tool still running when the stream fails is marked aborted after
+        # the error (processor.ts:585-607). If that event is written, the tool ran, so the brief is not sent again.
+        code, receipt, rows, calls, chosen, cleaned = self.opencode_launch(
+            [start, refused, {**ABORTED_TOOL, "sessionID": "ses_fixture1"}], 1)
+        self.assertEqual((code, len(calls), chosen, cleaned), (1, 1, 1, 0))
+        self.assertEqual(receipt["resume"]["status"], "stopped_not_resumable")
+
+    def test_a_first_call_refusal_that_changed_the_worktree_stops_instead_of_running_again(self):
+        # The pinned case behind the CC's read at 91918a34: a tool still running when the stream fails leaves only
+        # step_start and the error in the log (the processor marks it aborted after `run` stopped reading), but its
+        # effects are in the worktree. cleanup_worktree's own status, before and after the attempt, shows them.
+        start = {"type": "step_start", "sessionID": "ses_fixture1", "part": {}}
+        refused = {"type": "error", "sessionID": "ses_fixture1",
+                   "error": {"name": "APIError", "data": {"statusCode": 402, "message": "billing"}}}
+        code, receipt, rows, calls, chosen, cleaned = self.opencode_launch(
+            [start, refused], 1, statuses=[b"", b"?? fixture.txt\0"])
+        self.assertEqual((code, len(calls), chosen, cleaned), (1, 1, 1, 0))
+        self.assertEqual((receipt["resume"]["status"], receipt["resume"]["detected_by"]),
+                         ("stopped_not_resumable", "worktree_status_changed"))
+        self.assertEqual([(row["kind"], row.get("attempt_outcome")) for row in rows],
+                         [("debit", None), ("settle", "credit_exhausted_mid_run")])
+        # Unchanged, the same refusal is a first-call refusal: the run starts again on the next slot.
+        code, receipt, rows, calls, chosen, cleaned = self.opencode_launch([start, refused], 1)
+        self.assertEqual((len(calls), chosen), (2, 3))
+        self.assertIsNone(receipt["resume"])
+        self.assertEqual([(row["kind"], row.get("reason")) for row in rows if row["kind"] == "switch"],
+                         [("switch", "credit_exhausted (first_call)")])
 
     def test_opencode_mid_run_exhaustion_stops_on_its_slot_and_is_not_called_resumable(self):
         with tempfile.TemporaryDirectory(dir="/var/tmp") as directory:
@@ -747,6 +787,12 @@ class MidRunFailoverTests(PiLaunchFixture, unittest.TestCase):
                     self.assertEqual(profiles.attempt_outcome(log, "opencode", "claude", 1), "credit_exhausted_mid_run")
             log.write_text(start + refused)
             self.assertEqual(profiles.attempt_outcome(log, "opencode", "claude", 1), "first_call_refused")
+            # SYNTHETIC order, as above: a tool the failed stream aborted ran, so it bills the run without continuing it.
+            log.write_text(start + refused + json.dumps(ABORTED_TOOL) + "\n")
+            self.assertTrue(profiles.credit_exhausted_mid_run(log, "opencode"))
+            self.assertEqual(profiles.attempt_outcome(log, "opencode", "claude", 1), "credit_exhausted_mid_run")
+            log.write_text(step + refused + json.dumps(ABORTED_TOOL) + "\n")
+            self.assertEqual(profiles.attempt_outcome(log, "opencode", "claude", 1), "credit_exhausted_mid_run")
 
     def test_each_attempt_is_debited_and_settled_under_its_slot_with_a_switch_on_failover(self):
         order = self.worker().DEFAULT_KEYS
