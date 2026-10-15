@@ -3658,30 +3658,30 @@
   {
    "key": "claude:doc:memory",
    "disposition": "enabled",
-   "reason": "Re-read 2026-10-09 at 2.1.296: @import, AGENTS.md and auto-memory loading rules still hold; watch this exact body, reopen on any new digest.",
+   "reason": "Re-read 2026-10-15: @path imports, the AGENTS.md load table and auto memory's first 200 lines or 25KB still hold; watch this body.",
    "source": "https://code.claude.com/docs/en/memory",
    "carrier": "docs/decisions/2026-10-06-harness-context-budget-completion.md",
    "value": {
-    "sha256": "52c9ce2203d522ab02f6f5d9e6bede9998a9a71c9b2bf58fd237ca689e013161"
+    "sha256": "1ebf1bdc299fe03a8f7566f2da60b2bfca2bd0be7ccf5aa715e75171ac1e5a46"
    },
    "scope": "startup-instructions",
    "overturn": "A fetched body change reopens the audit; source review does not establish native token or runtime acceptance.",
-   "reviewed_utc": "2026-10-10T00:25:03Z",
-   "version": "2.1.296"
+   "reviewed_utc": "2026-10-15T01:41:19Z",
+   "version": "2.1.300"
   },
   {
    "key": "claude:doc:skills",
    "disposition": "enabled",
-   "reason": "Re-read 2026-10-09 at 2.1.296: skill content lifecycle and compaction limits (5,000 tokens each, 25,000 combined) hold; watch this body.",
+   "reason": "Re-read 2026-10-15: skill content lifecycle and compaction limits (5,000 tokens each, 25,000 combined) hold; watch this body.",
    "source": "https://code.claude.com/docs/en/skills",
    "carrier": "docs/decisions/2026-10-06-harness-context-budget-completion.md",
    "value": {
-    "sha256": "3a4428d15e821c576506d6a870844f8a9744cc69f85a63bd563e159b00eb0b11"
+    "sha256": "4d090296b0a4549865a7b5770b4ab33c6a522fc77a76c769dde589920f38c8fe"
    },
    "scope": "startup-instructions",
    "overturn": "A fetched body change reopens the audit; source review does not establish native token or runtime acceptance.",
-   "reviewed_utc": "2026-10-10T00:25:03Z",
-   "version": "2.1.296"
+   "reviewed_utc": "2026-10-15T01:41:19Z",
+   "version": "2.1.300"
   },
   {
    "key": "codex:doc:agents-md",
@@ -3780,6 +3780,54 @@
    "overturn": "A frozen-packet quality-parity result for a cheaper workflow-agent model, and a command center ruling on it.",
    "reviewed_utc": "2026-10-10T00:25:03Z",
    "version": "2.1.296"
+  },
+  {
+   "key": "claude:env:CLAUDE_CODE_ARTIFACT_PUBLISH_EDITS",
+   "disposition": "not-applicable",
+   "reason": "2.1.300: 0 stops small edits being applied while publishing an artifact. Artifacts are off here (enableArtifact false).",
+   "source": "https://code.claude.com/docs/en/env-vars",
+   "carrier": null,
+   "value": null,
+   "scope": "env var; unset",
+   "overturn": "The stack turns the Artifact tool on.",
+   "reviewed_utc": "2026-10-15T01:41:19Z",
+   "version": "2.1.300"
+  },
+  {
+   "key": "claude:env:CLAUDE_CODE_DISABLE_FILE_MENTIONS",
+   "disposition": "declined",
+   "reason": "2.1.299: @ mentions pass paths, not contents. A context saving changes a default only with paired quality parity.",
+   "source": "https://code.claude.com/docs/en/env-vars",
+   "carrier": null,
+   "value": null,
+   "scope": "env var; unset",
+   "overturn": "A paired same-task run shows path-only @ mentions at quality parity with lower context use.",
+   "reviewed_utc": "2026-10-15T01:41:19Z",
+   "version": "2.1.300"
+  },
+  {
+   "key": "claude:env:CLAUDE_CODE_IDLE_COMPACT_MIN_TOKENS",
+   "disposition": "default-on",
+   "reason": "2.1.299: idle compaction threshold, default 200K (floor 100K). Idle compaction was screened and adopted at the default.",
+   "source": "https://code.claude.com/docs/en/env-vars",
+   "carrier": null,
+   "value": null,
+   "scope": "env var; unset",
+   "overturn": "A measured lane shows idle compaction firing too early or too late at 200K.",
+   "reviewed_utc": "2026-10-15T01:41:19Z",
+   "version": "2.1.300"
+  },
+  {
+   "key": "claude:env:CLAUDE_CODE_YOU_SHOULD_KNOW_DEBUG",
+   "disposition": "declined",
+   "reason": "2.1.287: shows the You should know mod's last three checks. A debugging aid; nothing to set in normal sessions.",
+   "source": "https://code.claude.com/docs/en/env-vars",
+   "carrier": null,
+   "value": null,
+   "scope": "env var; unset",
+   "overturn": "The You should know mod is suspected of not checking and needs the debug line.",
+   "reviewed_utc": "2026-10-15T01:41:19Z",
+   "version": "2.1.300"
   },
   {
    "key": "claude:env:CLAUDE_CODE_OVERLOADED_RETRY_MAX_DELAY_MS",
