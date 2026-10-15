@@ -94,10 +94,13 @@ SWITCH_CLASSES = ("credit_exhausted", "revoked_key")
 # The binary is a retained copy outside ~/.local/share/claude/versions/: the native installer deletes old versions there,
 # keeping only the launcher's version, any version a running session uses and the two newest
 # (https://code.claude.com/docs/en/setup, home directories on network storage), and native auto-update is on. The copy is
-# checked at every tick against the linux-x64 checksum of the GPG-verified signed manifest of 2.1.299
-# (https://downloads.claude.ai/claude-code-releases/2.1.299/manifest.json, sha256 5052df4b...; CC, 2026-10-15).
-DEFAULT_CLAUDE_BIN = "~/.local/share/claude-retained/2.1.299/claude"
-DEFAULT_CLAUDE_BIN_SHA256 = "2d894a4b1bfaaa9aab72aeff7803e3c73bc2510f279a171f6b8f59f72d17d077"
+# checked at every tick against the linux-x64 checksum of the release's GPG-verified signed manifest. Pinned roles
+# follow the latest release through such a copy after a function check of their exact invocation (owner direction,
+# 2026-10-14, paraphrased: keep the headless roles on the latest client): 2.1.300, manifest
+# https://downloads.claude.ai/claude-code-releases/2.1.300/manifest.json (sha256 fb62dae2...), checked 2026-10-15
+# against 2.1.299 on claude_flags() with no key (identical init: tools Glob, Grep, Read; no MCP server; dontAsk).
+DEFAULT_CLAUDE_BIN = "~/.local/share/claude-retained/2.1.300/claude"
+DEFAULT_CLAUDE_BIN_SHA256 = "674deba0bba9aee479f4503c438b49303b6fdd304b9a471b14977aaec5215453"
 
 
 def credit_exhausted(status, text) -> bool:
@@ -638,7 +641,8 @@ def review_settings() -> dict:
 
 
 def claude_flags(input_view: str) -> list:
-    """claude -p's flags, each checked against `claude --help` of 2.1.299 (byte-identical to 2.1.296's). No positional
+    """claude -p's flags, each checked against `claude --help` of 2.1.299 (byte-identical to 2.1.296's) and of 2.1.300
+    (every flag present; only --restricted's description changed, dropping REPL from the tools it removes). No positional
     prompt: it comes on stdin."""
     return [
         "-p", "--model", MODEL, "--effort", EFFORT, "--max-budget-usd", str(BUDGET_USD),

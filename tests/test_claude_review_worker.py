@@ -1693,12 +1693,13 @@ class InvocationTest(unittest.TestCase):
     def test_settings_read_the_environment(self):
         settings = crw.settings_from({"HOME": "/h", "API_ACTIONS_LEDGER": "~/l.jsonl"})
         self.assertEqual(settings.keys, crw.DEFAULT_KEYS)
-        # The adopted client release: 2.1.299, which fixes two 2.1.296 faults that ran a headless tool call twice. Its binary
-        # is the retained copy outside versions/, which the native installer's cleanup does not touch (setup.md: it keeps only
-        # the launcher's version, running sessions' versions and the two newest), checked against the signed manifest digest.
-        self.assertEqual(crw.DEFAULT_CLAUDE_BIN, "~/.local/share/claude-retained/2.1.299/claude")
-        self.assertEqual(settings.claude_bin, Path("/h/.local/share/claude-retained/2.1.299/claude"))
-        self.assertEqual(crw.DEFAULT_CLAUDE_BIN_SHA256, "2d894a4b1bfaaa9aab72aeff7803e3c73bc2510f279a171f6b8f59f72d17d077")
+        # The adopted client release: 2.1.300, the latest (owner direction 2026-10-14: pinned roles follow the latest release
+        # after a function check). Its binary is the retained copy outside versions/, which the native installer's cleanup
+        # does not touch (setup.md: it keeps only the launcher's version, running sessions' versions and the two newest),
+        # checked against the signed manifest's linux-x64 digest.
+        self.assertEqual(crw.DEFAULT_CLAUDE_BIN, "~/.local/share/claude-retained/2.1.300/claude")
+        self.assertEqual(settings.claude_bin, Path("/h/.local/share/claude-retained/2.1.300/claude"))
+        self.assertEqual(crw.DEFAULT_CLAUDE_BIN_SHA256, "674deba0bba9aee479f4503c438b49303b6fdd304b9a471b14977aaec5215453")
         self.assertEqual(settings.claude_sha256, crw.DEFAULT_CLAUDE_BIN_SHA256)
         self.assertIsNone(crw.settings_from({"HOME": "/h", "CLAUDE_BIN": "/x/claude"}).claude_sha256)  # an override names its own
         self.assertEqual(crw.settings_from({"HOME": "/h", "CLAUDE_BIN": "/x/claude", "CLAUDE_BIN_SHA256": "0" * 64}).claude_sha256,
