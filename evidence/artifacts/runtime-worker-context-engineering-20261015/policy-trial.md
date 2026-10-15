@@ -1,6 +1,8 @@
-# TRIAL worker context policy
+# CANDIDATE worker context policy for TRIAL
 
-Status: **proposal only; not installed, enabled or measured**. This applies to an individual runtime worker's task state. It creates neither a command-center context lead nor another agent, scheduler, proxy or memory service. Existing authorization, ownership, review and fence rules override every convenience below.
+Status: **CANDIDATE design; not installed, enabled or measured**. This applies to an individual runtime worker's task state. It creates neither a command-center context lead nor another agent, scheduler, proxy or memory service. Existing authorization, ownership, review and fence rules override every convenience below.
+
+All implementation recommendations below are candidate trial behavior, not production requirements. Their source is this lane's design from the vendor building blocks in mechanisms.md and the prior planning_2b state-file experiment; neither validates this exact design. In particular, a maintained note is one candidate for the context-lead need, not the CC-defined meaning of that term. The 2026-10-15 20:48Z correction withdrew that CC definition. The 4/8 KiB budgets, update fields, acknowledgement convention and two-repetition warning are unmeasured candidate parameters. The boundary comparison tests only history continuity with those state conventions held equal; it cannot separately validate their format or sizes. Upstream native defaults, existing fences and session authorization are separately sourced constraints, not claims of a newly converged context policy.
 
 ## Thresholds and summary handling
 
@@ -15,7 +17,7 @@ Use the upstream mechanisms cited in [mechanisms.md](mechanisms.md). Record the 
 
 At a large upcoming read/tool result, inspect the harness's current context estimate if available. If the planned output cannot fit, choose a bounded vendor read/search or retain the large result as an artifact and read a relevant slice. Preserve exact bytes for edits, errors and source evidence. Unknown context use is an accounting gap, not zero. Avoid repeatedly summarizing a task with no new information; compaction itself consumes tokens and can destroy a warm prefix. Cache writes, summary calls and subsequent rereads all belong in the comparison denominator.
 
-## Relaunch boundaries
+## Candidate relaunch boundaries
 
 1. **New task, changed role/fence/provider authority, or unrelated subject:** finish or checkpoint the owned work, hand off explicitly, then use a fresh native session. Do not resume a broader-privilege transcript into a narrower worker and assume the new prompt erases it.
 2. **Same task, temporary interruption, matching workspace/profile/head:** explicit native resume is the supported baseline. Re-read current authority, lead, worktree status and recorded tests before edits. A WSL/process restart does not make an old partial verdict complete.
@@ -24,13 +26,13 @@ At a large upcoming read/tool result, inspect the harness's current context esti
 
 Never cross a boundary during a pending tool mutation, test process, commit, unresolved review read, broker action or unacknowledged handoff. Retain failed commands and owned dirty edits; do not clean them away to obtain a fresh-looking run. For read-only workers, the worker emits the proposed update and the owning writer changes task state. A handoff does not expand its recipient's authorization.
 
-## One actively maintained worker context lead
+## Candidate: a worker-maintained context note
 
 Proposed task-local file: **CONTEXT-LEAD.md**, in that worker's already authorized work/output area. This is a template convention, not an AGENTS.md or launcher edit in this PR. One named owner maintains it; parallel workers return evidence to that owner instead of racing shared writes. A persistent multi-session task can also keep TASK_STATE.json and PROGRESS.md as in the existing native-practice harness, with the lead linking to them rather than duplicating their history.
 
 Target at most **4 KiB UTF-8** for the lead's current-state body; move details to linked artifacts when it grows. This is a TRIAL budget, not a tokenizer estimate or reason to drop a hard constraint. If required authority cannot fit, keep it and record the excess. The first screen states task id, current head, scope/role/fence, current blocker and next action. Update it after a material decision, completed verification, changed head, blocker resolution or before any planned compaction/relaunch. Do not rewrite it on every token, read or clock tick.
 
-Each update must:
+Candidate update checklist:
 
 - Replace superseded facts with an explicit correction link; distinguish verified fact, source assertion, inference and unresolved question.
 - Carry unfinished work and failed attempts forward, with source/log/test path and pin/head. A remembered successful exit is not a current test result.
@@ -40,7 +42,7 @@ Each update must:
 
 Read the lead at worker start, after native compaction when must-keep state may have been summarized, and after resuming at a changed head. For Pi/OpenCode, use native instruction pointers or explicit reads; do not assume arbitrary @references load. For Claude subagents, pass the lead/brief explicitly because the parent's auto-memory is not inherited. For Muse, expose only the named approved file inside the fence; no shared-store grant or startup hook is implied.
 
-## Handoff template
+## Candidate handoff template
 
 Use a fresh handoff record for the boundary, referring to the maintained lead. Keep it self-contained for a reader with no prior conversation; ordinary target at most **8 KiB UTF-8**, with exact authority/constraints preserved if larger. The writer states what was actually verified; the receiver acknowledges custody before the previous owner relinquishes unfinished work.
 

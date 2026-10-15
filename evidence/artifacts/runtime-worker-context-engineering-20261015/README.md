@@ -1,8 +1,10 @@
 # Runtime-worker context engineering, 2026-10-15
 
-Status: **TRIAL proposal; research only**. Base `8053f14e7e0817d2502dff2bb284bfb7e1b0152f`.
+Status: **CANDIDATE designs for a future TRIAL; research only**. Base `8053f14e7e0817d2502dff2bb284bfb7e1b0152f`.
 
-Keep the harness's native compaction and session store. Maintain a small, worker-owned current-state file, save a verifiable handoff before a boundary, and use a fresh session for a new task or a changed authority/role. Whether a fresh session also beats native resume *within the same unfinished task* remains an unrun paired comparison. No new percentage threshold, memory product, framework default or autonomous context manager is adopted here.
+The candidate policy keeps the harness's native compaction and session store, adds a small worker-owned current-state file and a verifiable handoff, and proposes fresh sessions at selected boundaries. Whether a fresh session beats native resume *within the same unfinished task* remains an unrun paired comparison. No new percentage threshold, memory product, framework default or autonomous context manager is adopted here. A context lead is an unresolved practice need; the file format below is one candidate, not its required definition.
+
+The convergence correction of 2026-10-15 20:48Z withdraws the CC's 20:45Z context-lead definition and treats CC-designed practice specifics as candidates. This proposal predates that definition and does not rely on it. The implementation particulars here—including note fields, 4/8 KiB budgets and relaunch heuristics—are lane-designed candidates, supported by analogous upstream mechanisms but without matched evidence of improvement. They become practice only through upstream evidence at a pin and measured runs agreeing, under the resolution protocol. Other CC proposals about assignment matrices, halt/session mechanics, charters and horizon enforcement are not adopted by this research.
 
 | Record | Purpose |
 | --- | --- |

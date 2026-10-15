@@ -2,6 +2,8 @@
 
 Status: **one unrun paired comparison; TRIAL, pending named inputs**. This is a within-Claude-Code-*worker* contrast, not a test of command-center orchestration/context lead, framework selection or all four worker products. It does not establish policy parity for Pi, OpenCode or Muse.
 
+The lead-note format, byte budgets and boundary strategy are **candidate designs**, not requirements settled by CC practice proposals. This protocol's fixed controls and scoring gates bind only this experiment if later authorized. Holding the state convention equal in both arms isolates history continuity; a positive result cannot separately establish that convention or the byte budgets as practice. The 2026-10-15 20:48Z convergence correction is recorded in protocol.md.
+
 Question: on an unfinished task at a settled boundary, does a fresh worker with an explicit maintained handoff preserve quality and use less complete provider context than resuming the existing native conversation?
 
 ## Existing harness and custody
