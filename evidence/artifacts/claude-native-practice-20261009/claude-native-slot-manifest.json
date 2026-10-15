@@ -9,7 +9,7 @@
   "describes": "The 33 role-slot rows of .claude/skills/claude-native-practice/reference/slots.json as merged in #923, built before the follow-up that adds this file extended that file: the defaults the 2026-10-09 reading compared every practice against, so each citation's relation (agrees, extends, contradicts, not-covered) is relative to these rows. For the current defaults read current_decision_source.",
   "current_decision_source": {
    "path": ".claude/skills/claude-native-practice/reference/slots.json",
-   "sha256_when_labeled": "b0b9d7949e07dd86ab80b34747cbc538a5eb6c97d1dec26e6684c0e1ffd7b2a1",
+   "sha256_when_labeled": "d432a000bd790b888e890b9666e43d296f2e51759a0e35615139391f193aca19",
    "differs_from_this_snapshot_in": {
     "alternatives": [
      "model-effort-routing",
@@ -54,7 +54,7 @@
      "pr-review-pre-cue"
     ]
    },
-   "note": "The four routes carry the default extensions the command center accepted after the reading, each tagged [read 2026-10-09]; the two added alternatives are held candidates (classifier routing to Sonnet or Opus, Ralph-style headless loops); loops-completion's 'Ralph-style bash loops' moved from its rejections to that held alternative. Slot fields this export does not carry also differ (primary_sources and primary_sources_total on 24 slots; notes on prompt-caching, github-action, pr-review-pre-cue, release-tracking, skills-library and usage-cost-monitoring; the retired block of github-action), and so do the top-level selection_rule, status_values and cross_client. On 2026-10-10 the retirement of the Claude routes in GitHub (docs/decisions/2026-10-10-retire-in-github-claude-review.md) retired the github-action slot and the run in GitHub of pr-review-pre-cue, and restated the route of scheduled-tasks (GitHub Actions schedules repository jobs, Claude runs inside GitHub are retired (2026-10-10), so a scheduled Claude task runs locally); those rows differ from this snapshot in status, default, route, alternatives, overturn_when and evidence where listed."
+   "note": "The four routes carry the default extensions the command center accepted after the reading, each tagged [read 2026-10-09]; the two added alternatives are held candidates (classifier routing to Sonnet or Opus, Ralph-style headless loops); loops-completion's 'Ralph-style bash loops' moved from its rejections to that held alternative. Slot fields this export does not carry also differ (primary_sources and primary_sources_total on 24 slots; notes on client-core (the 2026-10-14 version pins), prompt-caching, github-action, pr-review-pre-cue, release-tracking, skills-library and usage-cost-monitoring; the retired block of github-action), and so do the top-level selection_rule, status_values and cross_client. On 2026-10-10 the retirement of the Claude routes in GitHub (docs/decisions/2026-10-10-retire-in-github-claude-review.md) retired the github-action slot and the run in GitHub of pr-review-pre-cue, and restated the route of scheduled-tasks (GitHub Actions schedules repository jobs, Claude runs inside GitHub are retired (2026-10-10), so a scheduled Claude task runs locally); those rows differ from this snapshot in status, default, route, alternatives, overturn_when and evidence where listed."
   }
  },
  "sources": {

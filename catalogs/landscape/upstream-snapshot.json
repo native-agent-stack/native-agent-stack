@@ -539,7 +539,7 @@
       "component_id": "claude-code",
       "repository": "https://github.com/anthropics/claude-code",
       "selected_repository_url": "https://github.com/anthropics/claude-code",
-      "selected_version": "2.1.295",
+      "selected_version": "2.1.300",
       "selected_source_pin": null,
       "checks": [
         {
@@ -7068,6 +7068,15 @@
       "api_commands": 4,
       "api_nonzero_results": 0,
       "methodology": "Add the selected Harbor component using the existing native gh api endpoint method: repository, latest stable release, selected commit and release tag commit. The latest release (v0.24.0) and both commit responses agree at b53b8134e1241686dca7759af188f987ecc48e8b. Summary counts include this four-call addition; every earlier component, star observation and dated refresh remains unchanged. This is public metadata verification, not a new host or provider acceptance run."
+    },
+    {
+      "checked_at": "2026-10-15T00:21:43Z",
+      "component_ids": ["claude-code"],
+      "api_commands": 0,
+      "api_nonzero_results": 0,
+      "evidence_class": "local_integration",
+      "source": "docs/decisions/2026-10-09-claude-code-floor.md",
+      "methodology": "Synchronize the selected-version mirror with the 2.1.300 native installer minimum and current stack manifest (addendum of 2026-10-14). The selected release is newer than the retained September 29 upstream observation; no new latest-release observation is asserted. Original checks, release metadata, timestamps and summary retain their recorded scope."
     }
   ]
 }

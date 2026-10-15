@@ -174,7 +174,7 @@ class NewWslProfileCliTests(unittest.TestCase):
     def test_negative_control_floor_rule_cannot_reject_a_newer_installed_release(self):
         data = self.load()
         row = next(row for row in data["entries"] if row["name"] == "Claude Code")
-        row["acceptance"]["scope"] += " Installed host 2.1.296 does not qualify selected 2.1.295."
+        row["acceptance"]["scope"] += " Installed host 2.1.301 does not qualify selected 2.1.300."
         result = self.fixture_cli(data)
         self.assertEqual(result.returncode, 2)
         self.assertIn("version floor", result.stderr)
