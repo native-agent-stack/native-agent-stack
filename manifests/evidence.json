@@ -15798,12 +15798,12 @@
     },
     {
       "path": "blueprints/us-equities/engine/patches/alpaca-source-references.patch",
-      "sha256": "fc1e2e31e2feaf07fa433bc6478c6769ac8b0aa31d828ada3b53dc306c5b75a6",
-      "bytes": 655
+      "sha256": "b6296dfbf403a311da5870c70c11f4a4ce3c8854f0cd20e13360fdf779a8e55c",
+      "bytes": 793
     },
     {
       "path": "blueprints/us-equities/engine/patches/alpaca.packages.lock.json",
-      "sha256": "f76d53b5915c799ea56cbffa8583d646de15934477e5e9ff5d70824ae43a401a",
+      "sha256": "8f0eebd87814fa272219d70dc154d0720386f05347639ee5ffd4cdc76bea6eac",
       "bytes": 13624
     },
     {
@@ -15933,8 +15933,8 @@
     },
     {
       "path": "blueprints/us-equities/engine/resolution.md",
-      "sha256": "bcfa70fc2a53716fc48eaeb56133eda3c66de9ef4d0b7188975f1c9c33c03bde",
-      "bytes": 12078
+      "sha256": "3befcc3a296d9d92efd18d8543641cc6ec0cb8fbf17135a50a51f6e5cfc2491e",
+      "bytes": 13893
     },
     {
       "path": "blueprints/us-equities/event-anchored-ranking/R2-COMPARISON.json",
@@ -60845,6 +60845,11 @@
       "path": "evidence/receipts/openresearch-0215-qualification-20261003.json",
       "sha256": "d31ec509e1e4ae96fb0eaf8d13062a712fce2d5c46ba271a1cee096b44b2fe34",
       "bytes": 7517
+    },
+    {
+      "path": "evidence/receipts/osv-alpaca-messagepack-relock-20261015.json",
+      "sha256": "be7ced1ef6eb3aa0e5a178ef3f57cccc3ab7cfcf438d37f3d42833eb6a8a7b25",
+      "bytes": 10946
     },
     {
       "path": "evidence/receipts/osv-captured-lumibot-lockchecks-20261005.json",
