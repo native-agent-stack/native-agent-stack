@@ -1,0 +1,659 @@
+#!/usr/bin/env bash
+# CC landing for horizon (private, owned by one account, no hosted CI, no merge queue; strict up-to-date + linear + squash): the local-first
+# lander. The ruleset on main requires the commit statuses lander/local-ci, lander/verdict-claude and lander/verdict-gpt at the head (strict),
+# and this script is the only merge path: it checks the local evidence, posts those three statuses at the exact head and merges pinned to it.
+# usage: HORIZON_CLAUDE_VERDICT=<file> HORIZON_GPT_VERDICT=<file> [HORIZON_MUSE_VERDICT=<file>] LOCAL_CI_RECEIPTS=<file>[:<file>...]
+#        horizon_land.sh <pr> <read-head-prefix>
+# Order: the arguments and the inputs, and the inputs of nas_land.sh and uet_land.sh refused, before any call -> the landing lock (horizon.lock)
+# -> the read head, which must be the pull request's head (no head-following) -> origin/main an ancestor of the head and GitHub reporting
+# neither BEHIND nor DIRTY (strict; the branch is never updated here) -> the verdicts (and GATES_DONE when one states a landing gate), the CI
+# receipts and main's CODEOWNERS (with GitHub's CODEOWNERS errors) -> a draft marked ready -> the three statuses posted at the head (from here
+# an EXIT trap revokes them unless the merge succeeded) -> the merge state polled until CLEAN -> the squash body with the lander's trailers,
+# the author address -> final_gate, fast reads only (the head, the verdicts, GATES_DONE and the receipts and their digests, the combined
+# status, CODEOWNERS, origin/main, the merge state) -> the squash merge pinned to the head -> its author.
+# Exit codes: 2 an argument or an input (before any call: the usage, the pull request's or the read head's form, a required input unset or
+# empty, a file name of another form, any input of nas_land.sh or uet_land.sh set, an empty value included; after the lock: a verdict or
+# receipt file missing, unreadable or holding a NUL byte, the same bytes in the Claude and GPT slots, a verdict refused, a verdict that
+# states a landing gate without a GATES_DONE naming the full head (correction #121), a description over 140 characters), 3 the read head not
+# resolvable or not the pull request's head (also at the final gate), 5 the receipts (the required command without a line at the head, or a
+# command whose last line at the head is not exit 0) or, at the final gate, the statuses, 6 the merge state not settled (neither CLEAN,
+# BLOCKED, BEHIND nor DIRTY after the poll, or at the final gate), 7 ready, the squash body or the merge failed, or a verdict, a receipt or
+# GATES_DONE changed after the statuses were posted (nothing merged), 8 BLOCKED, or main's CODEOWNERS not owned by the
+# merging account alone, 11 the no-reply author address could not be formed (nothing merged), 12 merged, but the merge commit's author is not
+# that address (correction #148), 13 not up to date with origin/main, origin/main unreadable, or moved (final gate), 14 another landing of this
+# repository holds the landing lock, or the lock cannot be taken (nothing merged), 15 a status POST failed (nothing merged; the statuses
+# posted are revoked), 129, 130 and 143 a hangup, an interrupt or a termination signal (the statuses posted are revoked).
+# No text from gh or its API is printed (#975 P2-2), and values from gh are used only in their typed shape (#975 round 3).
+set -u
+# Parsed whole before it runs: an edit while a landing runs cannot shift what the running copy executes (2026-10-09).
+{
+R=seathatflowsinourveins/horizon
+# CC correction #198: the merging account, whose no-reply address authors the squash merge (lg_author_email); the same account as the others'.
+LG_AUTHOR_LOGIN=${LG_AUTHOR_LOGIN:-seathatflowsinourveins}
+[ $# -eq 2 ] || { echo "usage: horizon_land.sh <pr> <read-head-prefix>, the inputs in variables (README): stop, nothing merged"; exit 2; }
+N=$1; E=$2
+[[ "$N" =~ ^[1-9][0-9]{0,9}$ ]] || { echo "the pull request is not a number: stop, nothing merged"; exit 2; }
+[[ "$E" =~ ^[0-9a-f]{7,40}$ ]] || { echo "#$N the read head prefix is not 7 to 40 lower-case hex digits: stop, nothing merged"; exit 2; }
+# The inputs of nas_land.sh and uet_land.sh (README, "A nas input in a uet landing"): this lander reads none of them and runs no Codex gate,
+# and each can be inherited, for example from another landing in the same shell, while the caller takes it to be in effect. So a SET
+# variable, an empty value included, stops here, before the lock and any call (exit 2). ${VAR+x} is empty only for an unset VAR (bash(1),
+# Parameter Expansion: "Omitting the colon tests only for a parameter that is unset", bash 5.3), the test uet_land.sh makes (#1075).
+[ -z "${SQUASH_BODY_FILE+x}" ] || { echo "#$N SQUASH_BODY_FILE is set, but it is nas-only (a nas_land.sh input): stop, nothing merged"; exit 2; }
+[ -z "${LOCAL_REVIEW_ADJUDICATION+x}" ] || { echo "#$N LOCAL_REVIEW_ADJUDICATION is set, but it is nas-only (a nas_land.sh input): stop, nothing merged"; exit 2; }
+[ -z "${LOCAL_REVIEW_WAIVER+x}" ] || { echo "#$N LOCAL_REVIEW_WAIVER is set, but it is nas-only (a nas_land.sh input): stop, nothing merged"; exit 2; }
+[ -z "${LOCAL_REVIEWS+x}" ] || { echo "#$N LOCAL_REVIEWS is set, but it is the Codex gate's (a nas_land.sh and uet_land.sh input): stop, nothing merged"; exit 2; }
+[ -z "${CODEX_LOCAL_REVIEW+x}" ] || { echo "#$N CODEX_LOCAL_REVIEW is set, but it is the Codex gate's (a nas_land.sh and uet_land.sh input): stop, nothing merged"; exit 2; }
+[ -z "${GPT_VERDICT+x}" ] || { echo "#$N GPT_VERDICT is set, but it is uet-only (a uet_land.sh input; here HORIZON_GPT_VERDICT): stop, nothing merged"; exit 2; }
+[ -z "${VERDICT_FILES+x}" ] || { echo "#$N VERDICT_FILES is set, but it is uet-only (a uet_land.sh input; here HORIZON_CLAUDE_VERDICT and HORIZON_GPT_VERDICT): stop, nothing merged"; exit 2; }
+# The inputs (README, "horizon_land.sh"). Each names a file by its path, as nas_land.sh's verdict files are named (its arguments), and the
+# file NAME, which the statuses and the trailers publish and every message prints (never the path), must be 1 to 60 of A-Z a-z 0-9 . _ -,
+# so a description stays short (below). LOCAL_CI_RECEIPTS is colon-separated, as LOCAL_REVIEWS is, so a path cannot hold ":" or a newline.
+hz_name() {  # <path> : rc 0 when the path's last part is a file name of that form
+  [[ "${1##*/}" =~ ^[A-Za-z0-9._-]{1,60}$ ]]
+}
+[ -n "${HORIZON_CLAUDE_VERDICT:-}" ] && hz_name "$HORIZON_CLAUDE_VERDICT" \
+  || { echo "#$N HORIZON_CLAUDE_VERDICT must name the Claude verdict, a file name of 1 to 60 of A-Z a-z 0-9 . _ - (README): stop, nothing merged"; exit 2; }
+[ -n "${HORIZON_GPT_VERDICT:-}" ] && hz_name "$HORIZON_GPT_VERDICT" \
+  || { echo "#$N HORIZON_GPT_VERDICT must name the GPT verdict, a file name of 1 to 60 of A-Z a-z 0-9 . _ - (README): stop, nothing merged"; exit 2; }
+[ -z "${HORIZON_MUSE_VERDICT+x}" ] || { [ -n "$HORIZON_MUSE_VERDICT" ] && hz_name "$HORIZON_MUSE_VERDICT"; } \
+  || { echo "#$N HORIZON_MUSE_VERDICT is set, but names no file of 1 to 60 of A-Z a-z 0-9 . _ - (unset it for no Muse read): stop, nothing merged"; exit 2; }
+[ -n "${LOCAL_CI_RECEIPTS:-}" ] && [[ "$LOCAL_CI_RECEIPTS" != *$'\n'* ]] \
+  || { echo "#$N LOCAL_CI_RECEIPTS must name the local CI receipts, colon-separated (README): stop, nothing merged"; exit 2; }
+RF=()
+IFS=: read -r -a RF <<< "$LOCAL_CI_RECEIPTS"
+[ "${#RF[@]}" -gt 0 ] || { echo "#$N LOCAL_CI_RECEIPTS names no receipt: stop, nothing merged"; exit 2; }
+for f in "${RF[@]}"; do
+  hz_name "$f" || { echo "#$N LOCAL_CI_RECEIPTS names a receipt whose file name is not 1 to 60 of A-Z a-z 0-9 . _ -: stop, nothing merged"; exit 2; }
+done
+G="git -C ${LANDING_HORIZON_REPO:-$HOME/code/horizon}"; COORD=${LANDING_COORD:-${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/coordination}
+LG_GIT=$G
+# >>> land-gate-fns
+# #975 round 4: the landing lock is descriptor 9 (lg_lock). Every child that waits, detaches or can outlive the script runs without it, so the
+# lock ends with the script: a git fetch starts `git maintenance run --auto --detach` (git v2.53.0 builtin/fetch.c:2725, run-command.c:1829-1837;
+# Documentation/config/maintenance.adoc:6-15 detaching is the default), which daemonizes (builtin/gc.c:1823-1827) keeping every descriptor
+# but 0-2 (setup.c:2083-2105), and gh, python3 and sleep are waited for. The script's own $(…) subshells hold descriptor 9 while they wait
+# on the gh or gate call they run, so after a signal ends the script the lock stays held until that call returns, and a landing started
+# meanwhile stops with exit 14 (fail closed; measured 2026-10-11: held for the rest of a 4 s child after SIGTERM, then free).
+git() { command git "$@" 9>&-; }
+gh() { command gh "$@" 9>&-; }
+python3() { command python3 "$@" 9>&-; }
+sleep() { command sleep "$@" 9>&-; }
+# One landing per repository at a time (#975 round 4, the CC's micro at 761810d7): the CC is the only lander, so serialized landings
+# close the base-move window against our own tooling; a merge made out of band (the owner, in the web UI) is not covered. lg_lock opens
+# <dir>/<repository name>.lock on descriptor 9 and takes an exclusive flock(1) without waiting (util-linux v2.41.3 flock.1.adoc:124-125,
+# the `exec 4<>file; flock -n 4` form; :68-69 -n; flock.c:189 exclusive by default, :351-363 a held lock exits 1 and prints nothing,
+# :392-399 any other failure names the descriptor, not the path; flock.1.adoc:78 the lock is dropped when the file is closed). The lock
+# is held until the script exits. Prints the reason and returns 14 when the lock is held or cannot be taken; nothing has run then.
+lg_lock() {  # <lock directory>
+  local lr
+  mkdir -p -- "$1" 2>/dev/null
+  { exec 9<>"$1/${R#*/}.lock"; } 2>/dev/null || { echo "#$N the landing lock cannot be opened (path withheld): stop, nothing merged"; return 14; }
+  flock -n 9 2>/dev/null; lr=$?
+  case "$lr" in
+    0) return 0 ;;
+    1) echo "#$N another landing of ${R#*/} holds the landing lock: stop, nothing merged" ;;
+    *) echo "#$N flock could not take the landing lock (exit $lr): stop, nothing merged" ;;
+  esac
+  return 14
+}
+# Correction #136 (2026-10-10), tested by trading-cc/land-patches-20261010/harness/run.py. Three decision points were loose or blind:
+# (1) a verdict file or record was accepted on "the head prefix anywhere AND PASS/ACK anywhere", which accepts a CHANGES_REQUESTED
+#     verdict that mentions ACK elsewhere (19 of 39 real Astra CHANGES_REQUESTED files) and a record whose PASS belongs to another head;
+# (2) change() hashed only the +/- lines of each file: it was blind to binary bytes, a mode change, a file name with a space or a
+#     non-ASCII character, a removed line starting "--" and an added line starting "++" (git patch-id sees all of them);
+# (3) the CI wait counted a commit status (trading-cc-read) as never completed (a commit status has .state, not .status).
+lg_hex8() { [[ "$1" =~ ^[0-9a-f]{8}$ ]]; }
+# #975 round 4 (GPT P2 at 761810d7): a verdict file, record or receipt is read ONCE (lg_text), and every decision about it is made on that
+# one text. Before, `head` read line 1 and `grep` the last verdict line, each from the file: a file removed between the two reads made grep
+# fail, `|| true` took that for "no verdict line", and line 1's ACK passed over a later CHANGES_REQUESTED; and head's and grep's
+# diagnostics, which name the path, were printed. A read that fails is now a refusal of its own, with a fixed reason. tr drops NUL bytes,
+# which bash reports (naming the script) when they reach a command substitution.
+lg_text() {  # <file> : prints the file's text; rc 1, and nothing printed, when it cannot be read
+  { tr -d '\000' < "$1"; } 2>/dev/null
+}
+# The verdict word of the LAST line that gives a verdict for the head, or nothing. A line gives one in these layouts only:
+#   "Gate line: PASS at <head>..."  /  "Verdict: ACK (by closure) at <head>..."     (CC and co-op layouts; the word is PASS|ACK|CHANGES_REQUESTED + [A-Z_0-9]*, then at most one parenthetical, then " at <head>")
+#   "...Verdict ... <head>...: PASS ..."  (records, kind=records: the head stands before the first colon, the word right after it)
+# Anything else (a pointer line, prose that mentions the head, a PASS elsewhere on the line) gives no verdict.
+lg_last_verdict() {  # <text> <8-hex head> <files|records>
+  local t=$1 h=$2 kind=$3 w r12 r3 line
+  w='((PASS|ACK|CHANGES_REQUESTED)[A-Z_0-9]*)'
+  r12='^(Gate line|Verdict): '$w'( \([^)]*\))? at '$h
+  r3='(^|[^A-Za-z])([Vv]erdict|VERDICT)[^:]*[^0-9a-f]'$h'[^:]*: *[*_` ]*'$w
+  if [ "$kind" = records ]; then
+    line=$(printf '%s\n' "$t" | grep -E "$r12|$r3" | tail -n 1)
+  else
+    line=$(printf '%s\n' "$t" | grep -E "$r12" | tail -n 1)
+  fi
+  if [[ "$line" =~ $r12 ]]; then echo "${BASH_REMATCH[2]}"
+  elif [ "$kind" = records ] && [[ "$line" =~ $r3 ]]; then echo "${BASH_REMATCH[3]}"
+  fi
+}
+# A verdict file is accepted by (a) its line 1 in the Astra layout "... <head>...: ACK|PASS ..." or (b) its last Gate line/Verdict line naming
+# the head with PASS|ACK[A-Z_0-9]*. CHANGES_REQUESTED anywhere on line 1, or as the word of that last line, rejects; a PASS/ACK anywhere
+# else in the file counts for nothing. Prints the reason on stdout when it rejects. lg_verdict_text_ok decides on a text that was read
+# once; lg_verdict_file_ok reads the file once and decides on that.
+lg_verdict_text_ok() {  # <text> <8-hex head prefix>
+  local t=$1 h=$2 l1 w re
+  lg_hex8 "$h" || { echo "head prefix '$h' is not 8 lower-case hex characters"; return 1; }
+  l1=${t%%$'\n'*}; l1=${l1//$'\r'/}
+  [[ "$l1" == *CHANGES_REQUESTED* ]] && { echo "line 1 carries CHANGES_REQUESTED"; return 1; }
+  w=$(lg_last_verdict "$t" "$h" files)
+  [[ "$w" == CHANGES_REQUESTED* ]] && { echo "the last Gate line/Verdict line naming $h is $w"; return 1; }
+  re='(^|[^0-9a-f])'$h'[0-9a-f]*[^:]*: *(ACK|PASS)([^A-Za-z0-9_]|$)'
+  [[ "$l1" =~ $re ]] && return 0
+  [[ "$w" == PASS* || "$w" == ACK* ]] && return 0
+  echo "no accepted verdict naming $h: line 1 must read '...$h...: ACK|PASS' or a Gate line/Verdict line must read 'PASS|ACK at $h'"; return 1
+}
+lg_verdict_file_ok() {  # <file> <8-hex head prefix>
+  local t
+  lg_hex8 "$2" || { echo "head prefix '$2' is not 8 lower-case hex characters"; return 1; }
+  [ -f "$1" ] || { echo "file missing"; return 1; }
+  t=$(lg_text "$1") || { echo "file unreadable"; return 1; }
+  lg_verdict_text_ok "$t" "$2"
+}
+# A receipt (GATES_DONE) is accepted when it names the head, from one read as above; rc 1, and nothing printed, otherwise.
+lg_receipt_ok() {  # <receipt file> <8-hex head prefix>
+  local t
+  [ -n "$1" ] && [ -f "$1" ] || return 1
+  t=$(lg_text "$1") || return 1
+  [[ "$t" == *"$2"* ]]
+}
+# A record (append-only, many heads) is accepted for a head when the LAST line that gives a verdict for it carries PASS or ACK (a section that
+# changes a verdict should end with "Gate line: <PASS|ACK|CHANGES_REQUESTED> at <head>"). Prints the reason on stdout when it rejects.
+lg_record_ok() {  # <record file> <8-hex head prefix>
+  local f=$1 h=$2 t w
+  lg_hex8 "$h" || { echo "head prefix '$h' is not 8 lower-case hex characters"; return 1; }
+  [ -f "$f" ] || { echo "record missing"; return 1; }
+  t=$(lg_text "$f") || { echo "record unreadable"; return 1; }
+  w=$(lg_last_verdict "$t" "$h" records)
+  [ -n "$w" ] || { echo "no Verdict/Gate line gives a verdict for $h"; return 1; }
+  [[ "$w" == PASS* || "$w" == ACK* ]] && return 0
+  echo "the last verdict line for $h is $w"; return 1
+}
+# The identity of a change: git patch-id (verbatim: whitespace counts; hunk positions do not) of the whole diff at -U0 --binary between
+# the commit and its own merge base with origin/main, so mode bits, binary bytes and every file name are in it and a rebase that only
+# moves context keeps it. LG_GIT is the git command with its repository, LG_EXCLUDE an optional pathspec to leave out. An empty change
+# has no identity (rc 1) and is refused; a change that is empty only because everything in it is excluded is identified by its file names.
+lg_change_id() {  # <commit>
+  local c=$1 b id names
+  b=$(${LG_GIT:-git} merge-base "$c" origin/main 2>/dev/null) || return 1
+  id=$(${LG_GIT:-git} -c core.quotePath=false -c diff.noprefix=false -c diff.mnemonicPrefix=false diff --no-color --no-ext-diff --no-textconv --no-renames -U0 --binary "$b" "$c" -- . ${LG_EXCLUDE:+"$LG_EXCLUDE"} 2>/dev/null | git patch-id --verbatim | cut -d' ' -f1)
+  if [ -n "$id" ]; then echo "$id"; return 0; fi
+  names=$(${LG_GIT:-git} -c core.quotePath=false diff --no-renames --name-only "$b" "$c" 2>/dev/null)
+  [ -n "$names" ] || return 1
+  echo "names:$(printf '%s\n' "$names" | sha256sum | cut -c1-40)"
+}
+lg_same_change() { local a b; a=$(lg_change_id "$1") || return 1; b=$(lg_change_id "$2") || return 1; [ "$a" = "$b" ]; }
+# CC 2026-10-10 (uet#58): an update-branch rebase does not reach every API view at once (the REST update-branch endpoint
+# answers 202 Accepted). 6 s after it, headRefOid still gave the read head while the CI view gave the rebased head, and the
+# landing stopped on its own rebase (exit 3). A head that moves during CI is followed only when it carries the read head's
+# change, at most 3 times per landing; any other move still stops, and the merge stays pinned with --match-head-commit.
+lg_follow_head() {  # <read head> <new head> <follows so far>
+  [ -n "${2:-}" ] && [ "${3:-0}" -lt 3 ] || return 1
+  ${LG_GIT:-git} fetch -q origin main 2>/dev/null
+  ${LG_GIT:-git} cat-file -e "$2^{commit}" 2>/dev/null || ${LG_GIT:-git} fetch -q origin "$2" 2>/dev/null || return 1
+  lg_same_change "$1" "$2"
+}
+# Correction #148 (2026-10-10): GitHub authors a squash merge with the account's primary email unless the merge names one, so every landing
+# published the owner's personal address. The merge names the no-reply form <id>+<login>@users.noreply.github.com (`gh pr merge -A`, gh 2.102.0);
+# the id comes from the public users API, because `gh api user` is refused by the secret-path guard. No stored address is ever printed.
+# CC correction #198 (2026-10-13): the login is the merging account, LG_AUTHOR_LOGIN, and R's owner only when that is unset. After the
+# transfer R's owner was an organization, and the squash merge failed with GraphQL "Invalid email address": the no-reply form belongs to a
+# user account, "ID+USERNAME@users.noreply.github.com" (github/docs@be38ec5d email-addresses-reference.md:47). A login of another shape than
+# GitHub's (at most 39 alphanumerics and single inner dashes, username-considerations-for-external-authentication.md:94, :103, :126-127)
+# is refused before any call. #1061 P3: users/<login> answers for an organization too, whose address then failed at the merge (exit 7, as
+# in #198); only an account of type User gives an id (otherwise exit 11, nothing merged). GET /users/{username} returns the private or the
+# public user schema (github/rest-api-description@58b1e0c0 api.github.com.json:88612-88614), whose `type` is a free string, "User" in the
+# example (:126248-126250, :160055-160058), while an organization's account reads "Organization" (the example at :311038); the check
+# takes the literal "User" alone, so another value or none gives no id.
+lg_author_email() {  # <owner/repo> : the account's no-reply address; rc 1 and nothing printed when the login or the id is not well formed
+  local login=${LG_AUTHOR_LOGIN:-${1%%/*}} id
+  [[ "$login" =~ ^[A-Za-z0-9](-?[A-Za-z0-9])*$ ]] && [ "${#login}" -le 39 ] || return 1
+  id=$(gh api "users/$login" --jq 'select(.type == "User") | .id' 2>/dev/null) || return 1
+  case "$id" in ''|*[!0-9]*) return 1 ;; esac
+  printf '%s+%s@users.noreply.github.com\n' "$id" "$login"
+}
+lg_author_check() {  # <owner/repo> <pr> <no-reply address> : after the merge, the merge commit's author is that address; prints text only, never the stored address
+  local mc="" ok="" i
+  for i in 1 2 3 4 5; do
+    mc=$(gh pr view "$2" -R "$1" --json mergeCommit --jq '.mergeCommit.oid // empty' 2>/dev/null)
+    [ -n "$mc" ] && break
+    sleep 3
+  done
+  [ -n "$mc" ] || { echo "#$2 author address NOT CHECKED: the merge commit is unreadable (correction #148)"; return 1; }
+  ok=$(gh api "repos/$1/commits/$mc" --jq ".commit.author.email == \"$3\"" 2>/dev/null)
+  [ "$ok" = true ] && { echo "#$2 author address on ${mc:0:8}: the no-reply form"; return 0; }
+  echo "#$2 author address on ${mc:0:8} is NOT the no-reply form (correction #148)"; return 1
+}
+# #975 (GPT P2-B and P2-C at af9d1901, 2026-10-11): what gh, git and the gate return is used only in its typed shape, and nothing else they
+# print reaches the output. A head is 40 lower-case hex digits, anything else is no head; lg_have fetches a commit the clone lacks, silently.
+lg_hex40() { [[ "$1" =~ ^[0-9a-f]{40}$ ]]; }
+lg_have() {  # <commit>
+  lg_hex40 "$1" || return 1
+  ${LG_GIT:-git} cat-file -e "$1^{commit}" 2>/dev/null || ${LG_GIT:-git} fetch -q origin "$1" 2>/dev/null
+}
+# codex_gate.py's output is echoed only when it is one of the gate's own status lines: one line that starts "Codex review ", "Codex
+# unavailable: ", "no Codex review " or "Codex gate error: ", in the characters those lines use, with exit code 0, 3, 4 or 5. Anything
+# else is one fixed line and 4: for a gate file that is missing or unreadable python3 prints "can't open file '<path>'" and exits 2
+# (CPython v3.13.16 Modules/main.c:403-410), and an exception outside the gate's handler, such as a syntax error, prints a traceback
+# and exits 1 (:437-441, :118-123; Doc/library/sys.rst:394-399). The read head goes to the gate, which counts only a review of it or of
+# the current head (#975 round 4).
+# Local reviews (2026-10-13, the owner's direction: reviews run locally, the connector cannot reach the organization's repository): when
+# LOCAL_REVIEWS or its alias CODEX_LOCAL_REVIEW is set (an empty value included, #1061 P1: it fell back to the connector, which cannot
+# answer; ${VAR+x} is empty only for an unset VAR, bash(1) Parameter Expansion: "Omitting the colon tests only for a parameter that is
+# unset", bash 5.3), the gate decides from the normalized review files they name (colon-separated). A file whose head_sha is not the read
+# head counts only when that head carries the read head's change, by this block's change identity (lg_same_change). The read head and each such head
+# go to the gate after the read head as "<head>:<git merge-base <head> origin/main>" (#1061 P1: a codex-review must have been reviewed
+# against that merge base; the first call fetches a head the clone lacks, lg_have). The gate's 2 (no file, a file malformed, incomplete,
+# of another head or of another base) is echoed when it is one of its "Local reviews: " lines; python3's own 2 is not.
+lg_gate() {  # <gate> <owner/repo> <pr> <read head> : prints one line; returns 0, 2, 3, 4 or 5
+  local g gr q="'" re part f h mb files=() more=() heads=() facts=()
+  re="^(Codex review |Codex unavailable: |no Codex review |Codex gate error: |Local reviews: )[A-Za-z0-9 :;,.()_+${q}-]*\$"
+  if [ -n "${LOCAL_REVIEWS+x}${CODEX_LOCAL_REVIEW+x}" ]; then
+    for part in "${LOCAL_REVIEWS-}" "${CODEX_LOCAL_REVIEW-}"; do
+      [ -n "$part" ] || continue
+      IFS=: read -r -a more <<< "$part"; files+=(${more[@]+"${more[@]}"})
+    done
+    heads=("$4")
+    for f in ${files[@]+"${files[@]}"}; do
+      [ -n "$f" ] || continue
+      h=$({ jq -r 'if type == "object" and (.head_sha | type) == "string" then .head_sha else empty end' < "$f"; } 2>/dev/null)
+      lg_hex40 "$h" && [[ " ${heads[*]} " != *" $h "* ]] || continue
+      lg_have "$h" && lg_same_change "$4" "$h" && heads+=("$h")
+    done
+    for h in "${heads[@]}"; do
+      lg_have "$h"; mb=$(${LG_GIT:-git} merge-base "$h" origin/main 2>/dev/null); lg_hex40 "$mb" || mb=
+      facts+=("$h:$mb")
+    done
+  fi
+  g=$(python3 -I "$1" "$2" "$3" "$4" ${facts[@]+"${facts[@]}"} 2>&1); gr=$?
+  case "$gr" in
+    0|3|4|5) ;;
+    2) [[ "$g" == "Local reviews: "* ]] || { echo "Codex gate failed with exit 2; details withheld"; return 4; } ;;
+    *) echo "Codex gate failed with exit $gr; details withheld"; return 4 ;;
+  esac
+  [[ "$g" =~ $re ]] || { echo "Codex gate printed no status line of its own; details withheld"; return 4; }
+  echo "$g"; return "$gr"
+}
+# Text that must not be printed (gh's merge diagnostic) is kept in a new file that mktemp makes under TMPDIR (mode 0600, sources in the
+# README), and only the file's name is printed; rc 1 and nothing printed when the file cannot be made or written (#975 P3-3: before, a
+# failed mktemp printed the template's path and the message named an empty file).
+lg_keep() {  # <file name prefix> <text>
+  local f
+  f=$(mktemp "${TMPDIR:-/tmp}/$1-XXXXXX" 2>/dev/null) || return 1
+  { printf '%s\n' "$2" > "$f"; } 2>/dev/null || { rm -f -- "$f" 2>/dev/null; return 1; }
+  echo "${f##*/}"
+}
+# <<< land-gate-fns
+# The shared block above is nas_land.sh's byte for byte; what follows is this lander's own. Of the block it uses the lock, lg_hex40 and
+# lg_have, the verdict acceptance (lg_verdict_text_ok, lg_last_verdict), the author address and its check, and lg_keep; it never runs
+# codex_gate.py (lg_gate), follows no head and has no change identity to keep (the head must be the read head).
+#
+# One read of a file that also tells a NUL byte: nas_land.sh's nas_read (nas_land.sh:392-404), the same body. read -d '' stops at a NUL
+# ("If delim is the empty string, read will terminate a line when it reads a NUL character", bash(1), read, bash 5.3) and returns zero
+# "unless end-of-file is encountered" (help read): a zero is a NUL. At the end of the file HR_TEXT holds the file's bytes exactly (measured
+# with bash 5.3.9 under C.UTF-8 and C: a CR, bytes that are not UTF-8 and trailing newlines kept), so the sha256 the lander posts is that of
+# the bytes it judged, from that one read, and a file swapped after the read cannot be posted as the one judged.
+hz_read() {  # <file> : sets HR_TEXT; rc 0 the text, 1 the file cannot be opened, 3 it holds a NUL byte (HR_TEXT empty then)
+  local fd rc
+  HR_TEXT=
+  { exec {fd}< "$1"; } 2>/dev/null || return 1
+  IFS= read -r -d '' -u "$fd" HR_TEXT 2>/dev/null; rc=$?
+  exec {fd}<&-
+  [ "$rc" != 0 ] || { HR_TEXT=; return 3; }
+  return 0
+}
+hz_sha() {  # <text> : prints the sha256 of the text's bytes, 64 lower-case hex digits (sha256sum's first field; README, "The sha256 forms")
+  local s
+  s=$(printf '%s' "$1" | sha256sum | cut -d' ' -f1)
+  [[ "$s" =~ ^[0-9a-f]{64}$ ]] && echo "$s"
+}
+# A verdict file, read once (hz_read): sets HV_NAME, HV_TEXT and HV_SHA, or prints the reason, the file named by its file name only, and
+# exits 2. The variable's value is the file's path.
+hz_load() {  # <variable>
+  local v=${!1-}
+  HV_NAME=${v##*/}; HV_TEXT=; HV_SHA=
+  [ -f "$v" ] || { echo "#$N $1 names no file: $HV_NAME: stop, nothing merged"; exit 2; }
+  hz_read "$v"
+  case $? in
+    1) echo "#$N $1 $HV_NAME is unreadable: stop, nothing merged"; exit 2 ;;
+    3) echo "#$N $1 $HV_NAME holds a NUL byte: stop, nothing merged"; exit 2 ;;
+  esac
+  HV_TEXT=$HR_TEXT
+  HV_SHA=$(hz_sha "$HV_TEXT") || { echo "#$N $1 $HV_NAME could not be hashed: stop, nothing merged"; exit 2; }
+}
+# The family of HV_TEXT: its LAST line that starts with "Family:" must read exactly "Family: <family>" (a trailing CR dropped), so a
+# verdict of one family cannot stand in another's slot. Silent when it does; otherwise prints the reason and exits 2.
+hz_family() {  # <variable> <family>
+  local f
+  f=$(printf '%s\n' "$HV_TEXT" | grep -E '^Family:' | tail -n 1); f=${f%$'\r'}
+  [ "$f" = "Family: $2" ] || { echo "#$N $1 $HV_NAME is not a $2 verdict (its last Family line must read 'Family: $2'): stop, nothing merged"; exit 2; }
+}
+# The word of HV_TEXT's LAST Gate line/Verdict line for the head's first 8 digits (lg_last_verdict's r12, nas_land.sh:174-176) when that line
+# names the FULL head (40 hex digits, then no further hex digit), or "none".
+hz_word() {
+  local w line full
+  w='((PASS|ACK|CHANGES_REQUESTED)[A-Z_0-9]*)'
+  line=$(printf '%s\n' "$HV_TEXT" | grep -E '^(Gate line|Verdict): '"$w"'( \([^)]*\))? at '"${EF:0:8}" | tail -n 1); line=${line%$'\r'}
+  full='^(Gate line|Verdict): '"$w"'( \([^)]*\))? at '"$EF"'([^0-9a-f]|$)'
+  if [[ "$line" =~ $full ]]; then echo "${BASH_REMATCH[2]}"; else echo none; fi
+}
+# A gating family's verdict, decided on the one text hz_load read: its family (hz_family); the acceptance of the other landers (correction
+# #136, lg_verdict_text_ok: CHANGES_REQUESTED on line 1 or as the last Gate line/Verdict line naming the head refuses); and, stricter (a
+# subset of what nas_land.sh accepts), that last line names the FULL head with PASS or ACK: "Verdict: PASS at <40 hex digits>". An 8-digit
+# prefix alone, and line 1's Astra layout alone, are refused here. Silent when it is accepted; otherwise prints the reason and exits 2.
+hz_judge() {  # <variable> <family>
+  local why w
+  hz_family "$1" "$2"
+  why=$(lg_verdict_text_ok "$HV_TEXT" "${EF:0:8}") || { echo "#$N $1 $HV_NAME is not an accepted PASS/ACK verdict for ${EF:0:8} ($why): stop, nothing merged"; exit 2; }
+  w=$(hz_word)
+  [[ "$w" == PASS* || "$w" == ACK* ]] \
+    || { echo "#$N $1 $HV_NAME: its last Gate line/Verdict line must name the full head, as 'Verdict: PASS at $EF' (an 8-digit prefix alone is refused here): stop, nothing merged"; exit 2; }
+}
+# Correction #121, carried as nas_land.sh's verdict_gate carries it (nas_land.sh:452, :461-466): a verdict whose text states a landing gate
+# (one of these four phrases, in any letter case) needs GATES_DONE=<a receipt naming the head>, written once the gate was run. Here it is the
+# FULL head, this lander's stricter head rule, checked with the shared block's lg_receipt_ok given the 40 digits (the receipt's text must hold
+# them), so a receipt that names the 8-digit prefix alone is refused. Each family's verdict counts, Muse's TRIAL one too (fail closed), and
+# without a stated gate GATES_DONE is not read, as in nas_land.sh.
+HZ_GATE_RE='landing gate|path to pass|before landing|landing condition'
+# GATES_DONE for the verdicts that state a gate (their file names in $1; none: nothing is read). lg_receipt_ok decides, and the file is then
+# read once with hz_read (a NUL byte stops) and that text must hold the head too, so the sha256 kept for the trailer and for final_gate (exit 7
+# when it changed) is that of bytes that passed the rule; its file name, published in the trailer, has the inputs' form. Sets GD_NAME and
+# GD_SHA (empty without a stated gate); prints the reason, the receipt named by its file name only, and exits 2 otherwise.
+gates_done_gate() {  # <verdict file names>
+  local v=${GATES_DONE:-}
+  GD_NAME=; GD_SHA=
+  [ -n "$1" ] || return 0
+  lg_receipt_ok "$v" "$EF" \
+    || { echo "#$N verdict$1 states a landing gate: set GATES_DONE=<a receipt naming the full head $EF> after running it: stop, nothing merged"; exit 2; }
+  hz_name "$v" || { echo "#$N GATES_DONE's file name is not 1 to 60 of A-Z a-z 0-9 . _ -: stop, nothing merged"; exit 2; }
+  GD_NAME=${v##*/}
+  hz_read "$v"
+  case $? in
+    1) echo "#$N GATES_DONE $GD_NAME is unreadable: stop, nothing merged"; exit 2 ;;
+    3) echo "#$N GATES_DONE $GD_NAME holds a NUL byte: stop, nothing merged"; exit 2 ;;
+  esac
+  [[ "$HR_TEXT" == *"$EF"* ]] || { echo "#$N GATES_DONE $GD_NAME no longer names $EF: stop, nothing merged"; exit 2; }
+  GD_SHA=$(hz_sha "$HR_TEXT") || { echo "#$N GATES_DONE $GD_NAME could not be hashed: stop, nothing merged"; exit 2; }
+}
+# The verdicts (README, "The verdicts and their families"). Claude's and GPT's gate, and they must be two texts (another sha256: one file in
+# both slots is one read, not two). Muse's is a TRIAL: its file, when the variable is set, must be there, readable and of its family, and
+# its word (hz_word, "none" without a line for the full head) is recorded in the squash body, never judged. A verdict of any of the three
+# that states a landing gate needs GATES_DONE (gates_done_gate). Sets C_*, G_*, M_* (NAME, SHA; M_WORD) and GD_*. Run first and again at
+# final_gate, which compares each sha256 with the one posted or recorded (exit 7).
+verdict_gate() {
+  local ct gt gated=
+  hz_load HORIZON_CLAUDE_VERDICT; C_NAME=$HV_NAME; C_SHA=$HV_SHA; ct=$HV_TEXT
+  hz_load HORIZON_GPT_VERDICT; G_NAME=$HV_NAME; G_SHA=$HV_SHA; gt=$HV_TEXT
+  [ "$G_SHA" != "$C_SHA" ] || { echo "#$N HORIZON_CLAUDE_VERDICT and HORIZON_GPT_VERDICT hold the same bytes: two families, two verdicts: stop, nothing merged"; exit 2; }
+  hz_judge HORIZON_GPT_VERDICT gpt
+  HV_NAME=$C_NAME; HV_SHA=$C_SHA; HV_TEXT=$ct
+  hz_judge HORIZON_CLAUDE_VERDICT claude
+  [[ ! "${ct,,}" =~ $HZ_GATE_RE ]] || gated+=" $C_NAME"
+  [[ ! "${gt,,}" =~ $HZ_GATE_RE ]] || gated+=" $G_NAME"
+  M_NAME=; M_SHA=; M_WORD=
+  if [ -n "${HORIZON_MUSE_VERDICT+x}" ]; then
+    hz_load HORIZON_MUSE_VERDICT; hz_family HORIZON_MUSE_VERDICT muse
+    M_NAME=$HV_NAME; M_SHA=$HV_SHA; M_WORD=$(hz_word)
+    [[ ! "${HV_TEXT,,}" =~ $HZ_GATE_RE ]] || gated+=" $M_NAME"
+  fi
+  gates_done_gate "$gated"
+}
+# The local CI receipts (README, "The CI receipts"): each file read once (hz_read; missing, unreadable or a NUL byte: exit 2), and of its
+# lines (a trailing CR dropped) only "CI: exit <code> at <head>: <command>" ones for this head count, the last for each command, in the
+# files' order. The required command must have one, and every command that has one must have exited 0 (exit 5). The lines are claims the
+# receipts make: nothing is run here. Sets RC_SHA, the sha256 of the lines "<sha256>  <file name>" of the files in order (sha256sum's form,
+# two spaces), and RC_LINES, one trailer line for each file. Run first and again at final_gate.
+HZ_REQUIRED='sh tests/hooks_test.sh'
+receipts_gate() {
+  local f name s line cmd sums= n=0 bad=0 re='^CI: exit ([0-9]{1,3}) at ([0-9a-f]{40}): (.+)$'
+  local -A last=()
+  RC_SHA=; RC_LINES=
+  for f in "${RF[@]}"; do
+    name=${f##*/}
+    [ -f "$f" ] || { echo "#$N LOCAL_CI_RECEIPTS names no file: $name: stop, nothing merged"; exit 2; }
+    hz_read "$f"
+    case $? in
+      1) echo "#$N receipt $name is unreadable: stop, nothing merged"; exit 2 ;;
+      3) echo "#$N receipt $name holds a NUL byte: stop, nothing merged"; exit 2 ;;
+    esac
+    s=$(hz_sha "$HR_TEXT") || { echo "#$N receipt $name could not be hashed: stop, nothing merged"; exit 2; }
+    sums+="$s  $name"$'\n'; RC_LINES+="${RC_LINES:+$'\n'}Lander-local-ci-receipt: $name sha256 $s"
+    while IFS= read -r line; do
+      line=${line%$'\r'}
+      [[ "$line" =~ $re ]] && [ "${BASH_REMATCH[2]}" = "$EF" ] || continue
+      last["${BASH_REMATCH[3]}"]=${BASH_REMATCH[1]}
+    done <<< "$HR_TEXT"
+  done
+  [ -n "${last[$HZ_REQUIRED]+x}" ] \
+    || { echo "#$N no receipt line for the required command '$HZ_REQUIRED' at $EF ('CI: exit <code> at <head>: <command>'): stop, nothing merged"; exit 5; }
+  for cmd in "${!last[@]}"; do
+    n=$((n + 1)); [ "${last[$cmd]}" = 0 ] || bad=$((bad + 1))
+  done
+  [ "$bad" = 0 ] || { echo "#$N $bad of the $n commands with a receipt line at ${EF:0:8} did not exit 0 (the last line of each counts; commands withheld): stop, nothing merged"; exit 5; }
+  RC_SHA=$(hz_sha "$sums") || { echo "#$N the receipts could not be hashed: stop, nothing merged"; exit 2; }
+}
+# main's CODEOWNERS (README, "CODEOWNERS"). GitHub takes the file from .github/, the top level or docs/, "in that order", the first it finds,
+# and a pull request "use[s] the version of CODEOWNERS from the base branch" (github/docs@be38ec5d about-code-owners.md:36, :44), so it is
+# read at the main that git ls-remote gave (never at the head, which could edit it). v1 accepts only a file each of whose rules is owned by
+# the merging account alone (the repository has no teams): a comment line starts with "#", an inline comment starts a word with "#" (:99),
+# and a rule with no owner (:140-146), another owner, an address or a team stops. GitHub skips a line it cannot parse (:79), so a line read
+# here as the merging account's could be no rule there: GitHub's own errors at that main must be none (GET .../codeowners/errors with ref,
+# github/rest-api-description@58b1e0c0 api.github.com.json:53272-53329; its reply's `errors` list, :147909-147969, is required at
+# :147966-147968; only the count is read). A file of 3 MB or more is not loaded (:52). Sets CO_PATH and CO_SHA (of its bytes); prints the
+# reason and exits 8 otherwise.
+codeowners_gate() {  # <main>
+  local m=$1 c e b t line tok n=0 rules=0 own toks=() me="@${LG_AUTHOR_LOGIN,,}" sz nul errs
+  CO_PATH=; CO_SHA=
+  for c in .github/CODEOWNERS CODEOWNERS docs/CODEOWNERS; do
+    e=$($G ls-tree "$m" -- "$c" 2>/dev/null)
+    [ -z "$e" ] || { CO_PATH=$c; break; }
+  done
+  [ -n "$CO_PATH" ] || { echo "#$N main ${m:0:8} has no CODEOWNERS (in .github/, at the top level or in docs/): stop, nothing merged"; exit 8; }
+  [[ "$e" =~ ^100(644|755)\ blob\ ([0-9a-f]{40,64})$'\t' ]] || { echo "#$N $CO_PATH on main ${m:0:8} is not a regular file: stop, nothing merged"; exit 8; }
+  b=${BASH_REMATCH[2]}
+  sz=$($G cat-file -s "$b" 2>/dev/null); [[ "$sz" =~ ^[0-9]+$ ]] && [ "$sz" -lt 3000000 ] \
+    || { echo "#$N $CO_PATH on main ${m:0:8} is unreadable or of 3 MB or more, which GitHub does not load: stop, nothing merged"; exit 8; }
+  nul=$({ $G cat-file blob "$b" | tr -dc '\000' | wc -c; } 2>/dev/null); nul=${nul//[[:space:]]/}
+  [ "$nul" = 0 ] || { echo "#$N $CO_PATH on main ${m:0:8} holds a NUL byte or is unreadable: stop, nothing merged"; exit 8; }
+  CO_SHA=$({ $G cat-file blob "$b" | sha256sum; } 2>/dev/null | cut -d' ' -f1)
+  [[ "$CO_SHA" =~ ^[0-9a-f]{64}$ ]] || { echo "#$N $CO_PATH on main ${m:0:8} could not be hashed: stop, nothing merged"; exit 8; }
+  t=$($G cat-file blob "$b" 2>/dev/null)
+  while IFS= read -r line; do
+    n=$((n + 1)); line=${line%$'\r'}
+    [[ "$line" == '#'* || "$line" =~ ^[[:space:]]*$ ]] && continue
+    read -r -a toks <<< "$line"
+    own=0
+    for tok in "${toks[@]:1}"; do
+      [[ "$tok" == '#'* ]] && break
+      [ "${tok,,}" = "$me" ] || { echo "#$N $CO_PATH on main ${m:0:8}, line $n, names an owner other than @$LG_AUTHOR_LOGIN (v1 takes the merging account alone): stop, nothing merged"; exit 8; }
+      own=$((own + 1))
+    done
+    [ "$own" -gt 0 ] || { echo "#$N $CO_PATH on main ${m:0:8}, line $n, is a rule with no owner (v1 takes the merging account alone): stop, nothing merged"; exit 8; }
+    rules=$((rules + 1))
+  done <<< "$t"
+  [ "$rules" -gt 0 ] || { echo "#$N $CO_PATH on main ${m:0:8} holds no rule: stop, nothing merged"; exit 8; }
+  errs=$(gh api "repos/$R/codeowners/errors?ref=$m" --jq 'if (.errors | type) == "array" then .errors | length else error("no errors list") end' 2>/dev/null) \
+    && [[ "$errs" =~ ^[0-9]+$ ]] || { echo "#$N GitHub's CODEOWNERS errors at main ${m:0:8} are unreadable (output withheld): stop, nothing merged"; exit 8; }
+  [ "$errs" = 0 ] || { echo "#$N GitHub reports $errs CODEOWNERS errors at main ${m:0:8} (their text withheld): stop, nothing merged"; exit 8; }
+}
+# The statuses (README, "The statuses"). The ruleset requires these three contexts at the head; each success is posted with the description
+# "<file name> sha256 <its sha256>" (local-ci: "receipts sha256 <RC_SHA>"), so the status names the bytes it stands for. A commit status
+# carries no app identity: anyone with write access can post one, so the ruleset is the backstop and the checks above are the gate.
+CTX_CI=lander/local-ci; CTX_CLAUDE=lander/verdict-claude; CTX_GPT=lander/verdict-gpt
+HZ_POSTED=; HZ_MERGED=
+# The POST (POST /repos/{owner}/{repo}/statuses/{sha}, "Create a commit status": state, description and context in the body,
+# github/rest-api-description@58b1e0c0 api.github.com.json:79150-79214; gh api -f adds "static string parameters to the request payload" and
+# then the method is POST, cli v2.102.0 pkg/cmd/api/api.go:104-110, :293, :295, :329-331). Its output is dropped: nothing gh returned is
+# printed (#975 P2-2). A failed POST stops with 15; the EXIT trap then revokes what was posted.
+hz_post() {  # <context> <description>
+  gh api "repos/$R/statuses/$EF" --method POST -f state=success -f context="$1" -f description="$2" >/dev/null 2>&1 \
+    || { echo "#$N the $1 status could not be posted at ${EF:0:8} (output withheld): stop, nothing merged"; exit 15; }
+}
+# The EXIT trap, set right before the first POST: unless the merge succeeded, each of the three contexts is posted as failure at the head, so
+# no success the lander posted outlives a landing that stopped. bash runs the EXIT trap on every exit ("Any trap on EXIT is executed before
+# the shell terminates", bash(1), exit, bash 5.3; an exit status kept, measured), and HUP, INT and TERM are trapped to exit (129, 130, 143),
+# so a signal revokes too, once the command bash waits for completes ("it will not execute the trap until the command completes", bash(1),
+# SIGNALS). A $(...) subshell does not run it (measured). SIGKILL cannot be trapped (README, Known gaps).
+hz_revoke() {
+  local c
+  [ -n "$HZ_POSTED" ] && [ -z "$HZ_MERGED" ] || return 0
+  for c in "$CTX_CI" "$CTX_CLAUDE" "$CTX_GPT"; do
+    if gh api "repos/$R/statuses/$EF" --method POST -f state=failure -f context="$c" -f description="revoked: the landing stopped before its merge" >/dev/null 2>&1; then
+      echo "#$N $c revoked at ${EF:0:8} (failure posted)"
+    else
+      echo "#$N $c could NOT be revoked at ${EF:0:8} (output withheld): post a failure for it before anything merges"
+    fi
+  done
+}
+# The combined status at the head, read as tcc_read_gate reads it (nas_land.sh:365-372: every page, gh's exit code kept apart from its output,
+# a reply that is not an array of pages refused). A context is "case-insensitive" (api.github.com.json:79208), so contexts are compared in
+# lower case. Each of the three must be listed once, success, with the description the lander posted, and no other lander/ context may be
+# listed. Only a fixed word comes out of jq: no description or state from the API is printed. Silent when it holds; otherwise exits 5.
+statuses_gate() {
+  local p sr s
+  p=$(gh api "repos/$R/commits/$EF/status?per_page=100" --paginate --slurp 2>/dev/null); sr=$?
+  [ "$sr" = 0 ] || { echo "#$N the statuses at ${EF:0:8} are unreadable (gh exit $sr, output withheld): stop, nothing merged"; exit 5; }
+  s=$(printf '%s' "$p" | jq -n -r --arg ci "$D_CI" --arg claude "$D_CLAUDE" --arg gpt "$D_GPT" 'input|if type == "array" and length > 0 then {"lander/local-ci": $ci, "lander/verdict-claude": $claude, "lander/verdict-gpt": $gpt} as $want|[.[].statuses[]|{c: (.context|ascii_downcase), s: .state, d: .description}|select(.c|startswith("lander/"))] as $l|([$l[]|select($want[.c] == null)]|length) as $other|[$want|to_entries[]|. as $e|[$l[]|select(.c == $e.key)] as $m|if ($m|length) == 0 then "missing \($e.key)" elif ($m|length) > 1 then "twice \($e.key)" elif $m[0].s != "success" then "state \($e.key)" elif $m[0].d != $e.value then "description \($e.key)" else empty end] as $bad|if $other > 0 then "other \($other)" elif ($bad|length) > 0 then $bad[0] else "ok" end else error("not a combined status") end' 2>/dev/null) \
+    && [[ "$s" =~ ^(ok|(missing|twice|state|description)\ lander/(local-ci|verdict-claude|verdict-gpt)|other\ [0-9]+)$ ]] \
+    || { echo "#$N the statuses at ${EF:0:8} are unreadable (not a combined status, output withheld): stop, nothing merged"; exit 5; }
+  case "$s" in
+    ok) return 0 ;;
+    missing\ *) echo "#$N ${s#missing } has no status at ${EF:0:8}: stop, nothing merged" ;;
+    twice\ *) echo "#$N ${s#twice } is listed twice at ${EF:0:8}: stop, nothing merged" ;;
+    state\ *) echo "#$N ${s#state } is no longer success at ${EF:0:8} (state withheld): stop, nothing merged" ;;
+    description\ *) echo "#$N ${s#description } at ${EF:0:8} carries another description than the lander posted (withheld): stop, nothing merged" ;;
+    *) echo "#$N ${s#other } other lander/ status context(s) at ${EF:0:8} (names withheld): stop, nothing merged" ;;
+  esac
+  exit 5
+}
+HZ_REBASE="rebase onto main, rerun the local CI at the new head, and get both verdicts for it"
+# GitHub's merge state, a capitalised word (#975 P2-B). CLEAN passes. BEHIND and DIRTY stop with 13 and the rebase instruction (the ruleset
+# is strict and the branch is never updated here: an update would be a new head that no receipt or verdict names), BLOCKED stops with 8 and
+# the count of unresolved review threads as a number or "unknown" (the query as nas_land.sh:673-674 builds it, owner and name from R), and
+# any other word, or none, stops with 6.
+merge_state() {  # <state> <where>
+  local open
+  case "$1" in
+    CLEAN) return 0 ;;
+    BEHIND|DIRTY) echo "#$N GitHub reports the pull request $1 $2: $HZ_REBASE: stop, nothing merged"; exit 13 ;;
+    BLOCKED)
+      open=$(gh api graphql -f query='query($owner: String!, $name: String!, $number: Int!) { repository(owner: $owner, name: $name) { pullRequest(number: $number) { reviewThreads(first: 100) { nodes { isResolved } } } } }' \
+        -f owner="${R%%/*}" -f name="${R#*/}" -F number="$N" --jq '[.data.repository.pullRequest.reviewThreads.nodes[]|select(.isResolved==false)]|length' 2>/dev/null)
+      case "$open" in ''|*[!0-9]*) open=unknown ;; esac
+      echo "#$N BLOCKED by the ruleset $2; unresolved review threads: $open. Not forcing: stop, nothing merged"; exit 8 ;;
+  esac
+  echo "#$N the merge state is ${1:-unreadable} $2, not CLEAN: stop, nothing merged"; exit 6
+}
+hz_ms() {  # : the pull request's mergeStateStatus, or nothing
+  local ms
+  ms=$(gh pr view "$N" -R "$R" --json mergeStateStatus --jq .mergeStateStatus 2>/dev/null); [[ "$ms" =~ ^[A-Z_]+$ ]] || ms=
+  echo "$ms"
+}
+# After the slow steps, final_gate reads every gate again, fast reads only and in this order, and nothing but the merge follows it (#975
+# round 4): the head (the read head, exit 3), the verdicts, GATES_DONE and the receipts (their acceptance, exit 2 and 5, then each sha256
+# equal to the one posted or recorded, exit 7), the combined status (exit 5), main's CODEOWNERS (exit 8), origin/main (git ls-remote: the main read at the
+# start, still an ancestor of the head, exit 13) and the merge state (CLEAN). What the reads cannot close is in the README.
+final_gate() {  # <pinned head>
+  local hd now
+  hd=$(gh pr view "$N" -R "$R" --json headRefOid --jq .headRefOid 2>/dev/null); lg_hex40 "$hd" || hd=
+  [ "$hd" = "$1" ] || { echo "#$N head moved to ${hd:-?} at the final gate: stop, nothing merged"; exit 3; }
+  verdict_gate
+  [ "$C_SHA" = "$P_C_SHA" ] && [ "$G_SHA" = "$P_G_SHA" ] || { echo "#$N a verdict changed after its status was posted (final gate): stop, nothing merged"; exit 7; }
+  [ "$M_SHA" = "$P_M_SHA" ] || { echo "#$N the Muse verdict changed after the squash body recorded it (final gate): stop, nothing merged"; exit 7; }
+  [ "$GD_NAME" = "$P_GD_NAME" ] && [ "$GD_SHA" = "$P_GD_SHA" ] \
+    || { echo "#$N GATES_DONE changed after the statuses were posted (final gate): stop, nothing merged"; exit 7; }
+  receipts_gate
+  [ "$RC_SHA" = "$P_RC_SHA" ] || { echo "#$N a receipt changed after the $CTX_CI status was posted (final gate): stop, nothing merged"; exit 7; }
+  statuses_gate
+  codeowners_gate "$MAIN"
+  [ "$CO_PATH" = "$P_CO_PATH" ] && [ "$CO_SHA" = "$P_CO_SHA" ] || { echo "#$N main's CODEOWNERS reads otherwise at the final gate: stop, nothing merged"; exit 8; }
+  now=$($G ls-remote origin refs/heads/main 2>/dev/null | cut -f1)
+  lg_hex40 "$now" || { echo "#$N origin/main is unreadable (git ls-remote failed) at the final gate: stop, nothing merged"; exit 13; }
+  [ "$now" = "$MAIN" ] && $G merge-base --is-ancestor "$MAIN" "$hd" 2>/dev/null \
+    || { echo "#$N origin/main moved from ${MAIN:0:8} to ${now:0:8} (final gate): $HZ_REBASE: stop, nothing merged"; exit 13; }
+  merge_state "$(hz_ms)" "at the final gate"
+  echo "#$N final gate at ${hd:0:8}: head, verdicts, receipts, statuses, CODEOWNERS, origin/main and the merge state read again"
+}
+lg_lock "${LANDING_LOCK_DIR:-$COORD/command-center/landing-locks}" || exit 14
+$G fetch -q origin main "pull/$N/head" 2>/dev/null
+EF=$($G rev-parse --verify -q "$E^{commit}" 2>/dev/null) || { $G fetch -q origin "$E" 2>/dev/null; EF=$($G rev-parse --verify -q "$E^{commit}" 2>/dev/null); }
+lg_hex40 "$EF" && [[ "$EF" == "$E"* ]] || { echo "#$N read head $E not resolvable: stop, nothing merged"; exit 3; }
+# The head must BE the read head: the verdicts and the receipts name it, and a rebase is a new head they do not name (no head-following).
+cur=$(gh pr view "$N" -R "$R" --json headRefOid --jq .headRefOid 2>/dev/null); lg_hex40 "$cur" || cur=
+[ "$cur" = "$EF" ] || { echo "#$N head ${cur:-?} is not the read head $EF: rerun the local CI and get both verdicts for the head: stop, nothing merged"; exit 3; }
+# Strict (the ruleset requires the branch up to date): origin/main, read with git ls-remote, must be an ancestor of the head, and GitHub must
+# not report BEHIND or DIRTY. The branch is never updated here (no gh pr update-branch): a rebase is the author's, at a new head.
+MAIN=$($G ls-remote origin refs/heads/main 2>/dev/null | cut -f1)
+lg_hex40 "$MAIN" || { echo "#$N origin/main is unreadable (git ls-remote failed): stop, nothing merged"; exit 13; }
+lg_have "$MAIN" && $G merge-base --is-ancestor "$MAIN" "$EF" 2>/dev/null \
+  || { echo "#$N head ${EF:0:8} is not up to date with origin/main ${MAIN:0:8}: $HZ_REBASE: stop, nothing merged"; exit 13; }
+ms=$(hz_ms)
+case "$ms" in BEHIND|DIRTY) merge_state "$ms" "before any status is posted" ;; esac
+# The local evidence, cheap reads before any change on GitHub: the verdicts, the receipts, main's CODEOWNERS. Each value is kept as posted
+# (P_*), for the squash body and for final_gate.
+verdict_gate
+echo "#$N verdicts: $C_NAME (claude) and $G_NAME (gpt) name $EF with PASS or ACK${M_NAME:+; $M_NAME (muse, TRIAL) says $M_WORD}${GD_NAME:+; a stated landing gate is receipted by $GD_NAME}"
+receipts_gate
+echo "#$N receipts at ${EF:0:8}: '$HZ_REQUIRED' and every command with a line at this head exited 0"
+codeowners_gate "$MAIN"
+echo "#$N $CO_PATH on main ${MAIN:0:8}: every rule is owned by @$LG_AUTHOR_LOGIN alone, and GitHub reports no error"
+P_C_SHA=$C_SHA; P_G_SHA=$G_SHA; P_M_NAME=$M_NAME; P_M_SHA=$M_SHA; P_M_WORD=$M_WORD; P_RC_SHA=$RC_SHA; P_RC_LINES=$RC_LINES
+P_CO_PATH=$CO_PATH; P_CO_SHA=$CO_SHA; P_GD_NAME=$GD_NAME; P_GD_SHA=$GD_SHA
+D_CI="receipts sha256 $RC_SHA"; D_CLAUDE="$C_NAME sha256 $C_SHA"; D_GPT="$G_NAME sha256 $G_SHA"
+# The description's bound: the REST description gives a commit status's description no maximum ("A short description of the status.",
+# api.github.com.json:79201-79205; github/docs@be38ec5d src/rest/data/fpt-2022-11-28/commits.json:10906 the same), and the docs state 140
+# characters for a deployment status's (deployments.json:6234), which this lander borrows as its own ceiling; with a file name of 60
+# characters at most a description has 132. A server that cut one short would fail final_gate's exact read (exit 5).
+for d in "$D_CI" "$D_CLAUDE" "$D_GPT"; do
+  [ "${#d}" -le 140 ] || { echo "#$N a status description would be longer than 140 characters: stop, nothing merged"; exit 2; }
+done
+# Slow steps: ready, the three POSTs, the merge state, the squash body, the author address.
+if [ "$(gh pr view "$N" -R "$R" --json isDraft --jq .isDraft 2>/dev/null)" = true ]; then
+  gh pr ready "$N" -R "$R" >/dev/null 2>&1 || { echo "#$N could not be marked ready: stop, nothing merged"; exit 7; }
+  echo "#$N marked ready at $(date -u +%FT%TZ)"
+fi
+trap hz_revoke EXIT
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
+HZ_POSTED=1
+hz_post "$CTX_CI" "$D_CI"
+hz_post "$CTX_CLAUDE" "$D_CLAUDE"
+hz_post "$CTX_GPT" "$D_GPT"
+echo "#$N $CTX_CI, $CTX_CLAUDE and $CTX_GPT posted as success at $EF"
+# GitHub recomputes the merge state after the statuses (asynchronously, as uet#58's update-branch view lagged, nas_land.sh:242-245), so a
+# BLOCKED or UNKNOWN right after the POSTs is polled for up to two minutes before it stops (8 or 6); BEHIND or DIRTY stops at once.
+ms=
+for i in $(seq 1 12); do
+  ms=$(hz_ms)
+  case "$ms" in CLEAN|BEHIND|DIRTY) break ;; esac
+  [ "$i" = 12 ] || sleep 10
+done
+merge_state "$ms" "after the statuses were posted"
+# The squash body: the body GitHub offers the merging account for a squash (viewerMergeBodyText(mergeType: SQUASH), read as nas_land.sh:672-676
+# reads it; exit 7 when the read fails), a blank line, and the lander's receipt for the self-audit as git trailers, one paragraph, last:
+# Lander-head, then one line for each status that is its posted description (Lander-local-ci with one Lander-local-ci-receipt line for each
+# receipt file, Lander-verdict-claude, Lander-verdict-gpt), the TRIAL Muse verdict when it is set, Lander-gates-done when a verdict states a
+# landing gate (correction #121), and Lander-codeowners. The merge takes it as
+# --body, as nas_land.sh does: --body-file would be read again when the merge call starts (cli v2.102.0 pkg/cmd/pr/merge/merge.go:146-153).
+nl=$'\n'
+mb=$(gh api graphql -f query='query($owner: String!, $name: String!, $number: Int!) { repository(owner: $owner, name: $name) { pullRequest(number: $number) { viewerMergeBodyText(mergeType: SQUASH) } } }' \
+  -f owner="${R%%/*}" -f name="${R#*/}" -F number="$N" --jq '.data.repository.pullRequest.viewerMergeBodyText | strings | "body:" + .' 2>/dev/null) \
+  && [[ "$mb" == body:* ]] || { echo "#$N the squash body could not be read (output withheld): stop, nothing merged"; exit 7; }
+mb=${mb#body:}
+TRAILERS="Lander-head: $EF${nl}Lander-local-ci: $D_CI${nl}$P_RC_LINES${nl}Lander-verdict-claude: $D_CLAUDE${nl}Lander-verdict-gpt: $D_GPT"
+[ -z "$P_M_NAME" ] || TRAILERS+="${nl}Lander-verdict-muse: TRIAL $P_M_WORD $P_M_NAME sha256 $P_M_SHA"
+[ -z "$P_GD_NAME" ] || TRAILERS+="${nl}Lander-gates-done: $P_GD_NAME sha256 $P_GD_SHA"
+TRAILERS+="${nl}Lander-codeowners: $P_CO_PATH sha256 $P_CO_SHA satisfied"
+BODY="${mb:+$mb$nl$nl}$TRAILERS"
+ae=$(lg_author_email "$R") || { echo "#$N cannot form the no-reply author address (correction #148): stop, nothing merged"; exit 11; }
+final_gate "$EF"
+out=$(gh pr merge "$N" -R "$R" --squash --body "$BODY" --match-head-commit "$EF" -A "$ae" 2>&1) || { cls=$(printf '%s' "$out" | grep -o -i -E 'not mergeable|head branch was modified|required status check|review|draft|merge conflict|protected branch|rate limit|authentication|not found' | head -1 | tr 'A-Z ' 'a-z_'); mf=$(lg_keep merge-fail "$out") && kept="gh output kept only in local file $mf in the temp directory (0600), never echoed" || kept="gh output could not be kept, and is not echoed"; echo "#$N merge failed (class: ${cls:-other}); $kept (#975 P2-2)"; exit 7; }
+HZ_MERGED=1
+sleep 4
+echo "#$N $(gh pr view "$N" -R "$R" --json state,mergeCommit,mergedAt --jq '"\(.state) \(.mergeCommit.oid) \(.mergedAt)"' 2>/dev/null)"
+lg_author_check "$R" "$N" "$ae" || exit 12
+exit 0
+}

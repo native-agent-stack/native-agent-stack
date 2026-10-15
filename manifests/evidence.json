@@ -63758,8 +63758,8 @@
     },
     {
       "path": "tests/test_landing_scripts.py",
-      "sha256": "4f5fb0e8e6d20b3b60e7b52216a99e8aa75668b61c9746de502e93a6177380ad",
-      "bytes": 396995
+      "sha256": "9640d93a65aaf70847ff456ce9397cb8ffadc8f0ab903ee0a3f1ed2105f33fe3",
+      "bytes": 458548
     },
     {
       "path": "tests/test_landscape.py",
@@ -64993,13 +64993,18 @@
     },
     {
       "path": "tools/landing/README.md",
-      "sha256": "68c72f2d5ddaa578d06367e64b05c98ab8ec546b6011f8f0aca6f20f320b024e",
-      "bytes": 142950
+      "sha256": "dfe7c46eba8e7fb30973e74b32aa21771041410177481d29a224b81555bba54e",
+      "bytes": 173751
     },
     {
       "path": "tools/landing/codex_gate.py",
       "sha256": "7afaa831c0763dd14c584d76b17465fa50993656cd63eec9fd0c4412fddb74b2",
       "bytes": 43046
+    },
+    {
+      "path": "tools/landing/horizon_land.sh",
+      "sha256": "3320c5ab0a312307fa47487a8d154f3fb138b32db41d1bcf1f54bf25f8582ce3",
+      "bytes": 54625
     },
     {
       "path": "tools/landing/nas_land.sh",
