@@ -4,10 +4,10 @@
   "source_main": "86bb669ad6c81b9adafdb222d545a1bf2aa95218",
   "evidence_class": "local_integration",
   "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
-  "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
+  "profile_sha256": "28ee491244cebdd4dbd0ad50e8a7038d8c3d717a15fc3b4707fa7cd3e776b470",
   "outputs": {
-    "docs/new-wsl-handbook.md": "4352377ae90828283e8ac3c078e386a633a12773f82a04565cfa22a575d04fb0",
-    "docs/new-wsl-handbook.json": "bb68a0d06802f17a02ac00ced40d582de339b800c5e646b818c46eafb0d6b474"
+    "docs/new-wsl-handbook.md": "f5e159bc53f8bbcdf414608b9f86433aa34ceddbbbbbe6c4161e02bc75ba3647",
+    "docs/new-wsl-handbook.json": "dbea86c1d7cb2d95357fab33c7a84885fd071dec14320af6a9b4f92c9912f3c0"
   },
   "inventory": {
     "layers": 37,
@@ -1054,6 +1054,22 @@
       "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
       "evidence_class": "local_integration",
       "scope": "Regenerated through the unchanged native builder after the Harbor stack-component registration changed two hashed inputs: the adoption recipe map gained harbor, and the architecture edition's Nemotron revision citation moved from stack line 2118 to 2141 (the cited revision is unchanged). No host, model or provider acceptance."
+    },
+    {
+      "recorded_at_utc": "2026-10-15T10:51:45Z",
+      "source_main": "420452059bc307e13121d9769096291b95cdbf42",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "check_command": "python3 scripts/build_new_wsl_handbook.py --check",
+      "check_exit_code": 0,
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "f5e159bc53f8bbcdf414608b9f86433aa34ceddbbbbbe6c4161e02bc75ba3647",
+        "docs/new-wsl-handbook.json": "dbea86c1d7cb2d95357fab33c7a84885fd071dec14320af6a9b4f92c9912f3c0"
+      },
+      "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+      "profile_sha256": "28ee491244cebdd4dbd0ad50e8a7038d8c3d717a15fc3b4707fa7cd3e776b470",
+      "evidence_class": "local_integration",
+      "scope": "Regenerated through the unchanged native builder after gap-ledger row B1-0006 (2026-10-15) re-pinned the profile's Claude Agent SDK from 0.2.163 (bundled CLI 2.1.286) to 0.2.167 (bundled CLI 2.1.300; anthropics/claude-agent-sdk-python@c10b52c674e5c709c7263544b38e8a5dad10e01d CHANGELOG.md:3-7 and :40-44, tag v0.2.167). Artifact and checksum are PyPI's published sdist digest, not rehashed. No install, host, model or provider acceptance."
     }
   ],
   "previous_outputs": [
@@ -1262,6 +1278,15 @@
         "docs/new-wsl-handbook.json": "fe0b6628bc589e59dc71a5a0fb6805ecab067e3f06043702919bf7f09ef9cba4"
       },
       "reason": "Harbor stack-component registration changes two hashed handbook inputs (adoption recipe map; architecture Nemotron stack-line citation); the previous maintained output binding is preserved as historical evidence."
+    },
+    {
+      "superseded_at_utc": "2026-10-15T10:51:45Z",
+      "source_main": "420452059bc307e13121d9769096291b95cdbf42",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "4352377ae90828283e8ac3c078e386a633a12773f82a04565cfa22a575d04fb0",
+        "docs/new-wsl-handbook.json": "bb68a0d06802f17a02ac00ced40d582de339b800c5e646b818c46eafb0d6b474"
+      },
+      "reason": "Gap-ledger row B1-0006 re-pins the profile's Claude Agent SDK to 0.2.167, a hashed handbook input; the previous maintained output binding is preserved as historical evidence."
     }
   ]
 }

@@ -241,7 +241,7 @@ have no default-install precedence.
 | Inspect AI | 0321960a92aa52390413ce011d67ffb5962a2b11 | [reviewed install source](https://github.com/UKGovernmentBEIS/inspect_ai/blob/0321960a92aa52390413ce011d67ffb5962a2b11/README.md) |
 | Harbor | 0.24.0 | [reviewed install source](https://github.com/harbor-framework/harbor/blob/b53b8134e1241686dca7759af188f987ecc48e8b/README.md) |
 | promptfoo | 0.123.1 | [reviewed install source](https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/README.md) |
-| Claude Agent SDK | 0.2.163 | [reviewed install source](https://github.com/anthropics/claude-agent-sdk-python/blob/1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7/README.md) |
+| Claude Agent SDK | 0.2.167 | [reviewed install source](https://github.com/anthropics/claude-agent-sdk-python/blob/c10b52c674e5c709c7263544b38e8a5dad10e01d/README.md) |
 | Codex TypeScript SDK | 0.159.3 | [reviewed install source](https://github.com/openai/codex/blob/rust-v0.159.3/sdk/typescript/README.md) |
 | Codex Python SDK | 0.160.0 | [reviewed install source](https://github.com/openai/codex/blob/rust-v0.160.0/sdk/python/README.md), [pip version syntax](https://pip.pypa.io/en/stable/cli/pip_install/) |
 | QMD | 2.8.3 | [reviewed install source](https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/README.md) |

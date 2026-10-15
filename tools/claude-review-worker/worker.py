@@ -101,6 +101,9 @@ def credit_exhausted(status, text) -> bool:
     return status == 402 or (status == 400 and "credit balance is too low" in (text or "").lower())
 DEFAULT_STATE = "~/.local/state/native-agent-stack/claude-review-worker"
 DEFAULT_TIMEOUT_SECONDS = 2700
+# The retry watchdog's cap on each request's wait through 429 and 529 errors (SANDBOX_ENV): a third of the default run
+# timeout, so a capacity stall ends in the client's own API error inside the run instead of at the kill.
+RETRY_WAIT_CAP_MS = DEFAULT_TIMEOUT_SECONDS * 1000 // 3
 DEFAULT_UPSTREAM = "~/code/upstream"
 UPSTREAM_LIMIT_BYTES = 20_000_000  # cited upstream files exported for one review, at most
 UPSTREAM_CITATIONS = 50            # citations considered per review, at most
@@ -160,6 +163,13 @@ SANDBOX_ENV = (
     # project, nested or imported. In 2.1.296 the managed, user and project memory loaders return nothing when it is
     # set; probes.py measures it against a control arm that loads the same files.
     ("CLAUDE_CODE_DISABLE_CLAUDE_MDS", "1"),
+    # Unattended retry (gap-ledger row C1-0001, 2026-10-15): https://code.claude.com/docs/en/env-vars.md:379-380 (fetched
+    # 2026-10-15T10:34:35Z, sha256 54351937e4d1) sets the watchdog for remote workers: 429 and 529 capacity errors are
+    # waited out, not failed after CLAUDE_CODE_MAX_RETRIES; a 429 that reports a spend limit or exhausted credits still
+    # fails at once, and the credit refusals credit_exhausted() reads are a 402 or a 400, so fill-first is unchanged.
+    # The cap needs 2.1.295 (anthropics/claude-code@94506ff0 CHANGELOG.md:384); DEFAULT_CLAUDE_BIN is 2.1.299. The run's
+    # own timeout still bounds everything, including the watchdog's longer retry of other transient errors.
+    ("CLAUDE_CODE_RETRY_WATCHDOG", "1"), ("CLAUDE_CODE_RETRY_WATCHDOG_MAX_WAIT_MS", str(RETRY_WAIT_CAP_MS)),
 )
 SANDBOX_UNSET = ("XDG_CONFIG_HOME", "XDG_RUNTIME_DIR", "XDG_STATE_HOME", "XDG_CACHE_HOME", "XDG_DATA_HOME")
 

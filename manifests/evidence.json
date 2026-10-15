@@ -4967,8 +4967,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/agent-sdks.md",
-      "sha256": "2e0543b97fafec67fed7ef1ff3b1bc4719e64f255f8faf33680683aa1de9cf4c",
-      "bytes": 2948
+      "sha256": "48c7cdc64a399f70c0dd16806c186d836c61907ad171818f1fd323ef0027c085",
+      "bytes": 6608
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/ci-supply-chain.md",
@@ -5017,8 +5017,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.json",
-      "sha256": "b0b9d7949e07dd86ab80b34747cbc538a5eb6c97d1dec26e6684c0e1ffd7b2a1",
-      "bytes": 152660
+      "sha256": "2b763879ab47c9e50ec9f197ebd7ce6959222580fabe9fc70071756f635ce8e1",
+      "bytes": 156324
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.md",
@@ -5522,12 +5522,12 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
+      "sha256": "28ee491244cebdd4dbd0ad50e8a7038d8c3d717a15fc3b4707fa7cd3e776b470",
       "bytes": 261886
     },
     {
       "path": "adoption/new-wsl-profile.md",
-      "sha256": "63383931ce83151ff3228863f9a565d8d3e78364ec3287ad7c8feeff63d0806f",
+      "sha256": "2abdf99418b55801f684b637e3bf612cbb582756e86f9b9c4352d54f92bd1b3f",
       "bytes": 27194
     },
     {
@@ -17468,8 +17468,8 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "bf487822050bda202410b00e980e5f8d8db07cf5900bcffe80f5042699028a38",
-      "bytes": 190328
+      "sha256": "c93434aff0dc36cab059f7863208f5257133504fad56b07ae33f56fc148d5d2b",
+      "bytes": 190737
     },
     {
       "path": "catalogs/landscape/README.md",
@@ -19568,12 +19568,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "bb68a0d06802f17a02ac00ced40d582de339b800c5e646b818c46eafb0d6b474",
+      "sha256": "dbea86c1d7cb2d95357fab33c7a84885fd071dec14320af6a9b4f92c9912f3c0",
       "bytes": 699356
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "4352377ae90828283e8ac3c078e386a633a12773f82a04565cfa22a575d04fb0",
+      "sha256": "f5e159bc53f8bbcdf414608b9f86433aa34ceddbbbbbe6c4161e02bc75ba3647",
       "bytes": 369789
     },
     {
@@ -21553,7 +21553,7 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/claude-native-slot-manifest.json",
-      "sha256": "b3db948a9878156abec03a3dc11764b1595c5c43b348d483c2a24355ca649e80",
+      "sha256": "03950f7c0a581dca2dbbe8b686b2e0b50180fa8f6b8d40af3206c25d5595e41f",
       "bytes": 238162
     },
     {
@@ -43813,8 +43813,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "2ae75db2cf89adee8dae05ac303dc9d61487befbb6e9fd0a02d63db3eefcafa0",
-      "bytes": 78495
+      "sha256": "316a8eae0e105385481d9bb162c25d33a548350823d436b5bffb3bc3f4b3c31a",
+      "bytes": 80316
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -63567,6 +63567,11 @@
       "bytes": 3900
     },
     {
+      "path": "tests/test_native_practice_ledger_rows_agent_sdks.py",
+      "sha256": "13ca11214100f318eece2edd85e51f041aa57b1e631cdce84a7cb09fabc8a45f",
+      "bytes": 9006
+    },
+    {
       "path": "tests/test_native_practice_meter_windows.py",
       "sha256": "05c3dcaaa7eb0e5afebb730423c3abb883ef21fd9c695affcc77dc3e857e1ded",
       "bytes": 9198
@@ -64473,8 +64478,8 @@
     },
     {
       "path": "tools/claude-review-worker/README.md",
-      "sha256": "469642c03517f3aa602accdf15b0d7caa3d89dcb4e83f24512e385eb70bd6a0d",
-      "bytes": 13903
+      "sha256": "bee8524bd999f1bc324be653215534b482fd1a038440c61d8a18359f3168d686",
+      "bytes": 14258
     },
     {
       "path": "tools/claude-review-worker/essential-paths.json",
@@ -64498,8 +64503,8 @@
     },
     {
       "path": "tools/claude-review-worker/worker.py",
-      "sha256": "9945985d788eed58f80d89bde37ebc5985d0ff439689192a92a03877cf1f45ea",
-      "bytes": 130449
+      "sha256": "447bd9b509c450bef54ae5b425bd65736e4956bb3d6ff5086fb19559ccbcd16a",
+      "bytes": 131546
     },
     {
       "path": "tools/credentials/anthropic_key_health.py",
