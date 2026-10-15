@@ -5407,7 +5407,7 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "3a8fc99486012f8f80d5525651a550467285442ec9df3c4bc849db25645c7fee",
+      "sha256": "c966a6352d11bd7f37754b099001ffe510259fbe5219716c7d3c3b87cdab7308",
       "bytes": 1229
     },
     {
@@ -62093,8 +62093,8 @@
     },
     {
       "path": "scripts/hooks/secret_path_guard.py",
-      "sha256": "e5e64e48569a776934feabd30c688a851d71fb963703a5fcd8c96430d6f99cab",
-      "bytes": 297091
+      "sha256": "5b1883acc0c0d45e7d8e7e1a23d4e5d6a2a8cec32a615d9e228bee2ea7aea87e",
+      "bytes": 297996
     },
     {
       "path": "scripts/host_name_scan.py",
@@ -64473,8 +64473,8 @@
     },
     {
       "path": "tools/credentials/credential_run.py",
-      "sha256": "d2be9711d4a31689ef126fc2bfe8268d6020b4d6e6d886d4e713e4b22a811ed9",
-      "bytes": 56018
+      "sha256": "f172722fd1f935888e3446c3302526651b713dd681c7157d6848ce5ae159cdf8",
+      "bytes": 57531
     },
     {
       "path": "tools/credentials/open_credential_terminal.sh",

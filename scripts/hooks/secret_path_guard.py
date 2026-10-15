@@ -3101,7 +3101,7 @@ def k4_runner_environment(texts: tuple[str, str], words_list: list[list[str]]) -
 
 
 K4_RUNNER_VALUE_COMMANDS = frozenset({"get", "print", "list", "token"})
-K4_RUNNER_OPTIONS = frozenset({"--only", "--check", "-h", "--help", "--"})
+K4_RUNNER_OPTIONS = frozenset({"--only", "--check", "-h", "--help", "--", "--term-grace"})
 
 
 def k4_runner_usage_reason(text: str, segments: list[list[str]]) -> str | None:
@@ -3116,6 +3116,21 @@ def k4_runner_usage_reason(text: str, segments: list[list[str]]) -> str | None:
         arguments = command_arguments(invocation)
         if arguments[:1] in (["-h"], ["--help"]):
             continue
+        # The sole new runner form: separate canonical integer seconds1-3600.
+        # Child arguments after -- remain the existing reader's responsibility.
+        options = arguments[:arguments.index('--')] if '--' in arguments else arguments
+        grace_seen = False
+        for index, option in enumerate(options):
+            if option.startswith('--term-grace='):
+                return "credential_run_usage"
+            if option == '--term-grace':
+                if (grace_seen or index == 0 or index + 1 >= len(options)
+                        or not re.fullmatch(r'[1-9][0-9]{0,3}', options[index + 1])
+                        or not 1 <= int(options[index + 1]) <= 3600):
+                    return "credential_run_usage"
+                grace_seen = True
+        if grace_seen and ('--' not in arguments or '--check' in options):
+            return "credential_run_usage"
         if not arguments or arguments[0] in K4_RUNNER_VALUE_COMMANDS or not (K4_RUNNER_OPTIONS - {"--only"}) & set(arguments):
             return "credential_run_usage"
     if (invocations or any(k4_runner_start(words) is not None for words in segments)) and k4_runner_mentions(text):
