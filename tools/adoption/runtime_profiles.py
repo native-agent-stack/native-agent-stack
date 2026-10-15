@@ -809,21 +809,24 @@ class SpendLedger:
     any worktree or key exists, a ledger that is unnamed, has no directory or cannot be written: a ledger created where
     no reader looks would hide the spend. Interactive launches are not ledgered yet."""
 
-    def __init__(self, path, profile: str, role: str | None, model: str):
+    def __init__(self, path, profile: str, role: str | None, model: str, state_root: Path):
         if not path or not str(path).strip():
             raise ProfileError("no API spend ledger named; launch refused")
         if not Path(path).parent.is_dir():
             raise ProfileError("API spend ledger directory missing; launch refused")
-        self.ledger = review_worker().Ledger(Path(path))
+        # One worker module for the Ledger and its LedgerError: module() executes the file anew on every call, so a
+        # second review_worker() would give a different LedgerError class that this except clause would never match.
+        worker = review_worker()
+        self.ledger = worker.Ledger(Path(path))
         self.detail = {"profile": profile, "role": role, "request_label": None}
-        self.model = model
+        self.model, self.state_root = model, Path(state_root).absolute()
         try:
             with self.ledger.locked():
                 os.close(os.open(self.ledger.path, os.O_WRONLY | os.O_APPEND | os.O_CREAT, 0o600))
             self.settle_orphans()
         except OSError:
             raise ProfileError("API spend ledger unwritable; launch refused") from None
-        except review_worker().LedgerError:
+        except worker.LedgerError:
             raise ProfileError("API spend ledger unreadable; launch refused") from None
 
     def settle_orphans(self) -> None:
@@ -837,11 +840,14 @@ class SpendLedger:
                 if (row.get("kind") != "debit" or row.get("workload") != LEDGER_WORKLOAD or row.get("ref") in closed
                         or "pid" not in detail or process_start(detail["pid"]) == detail.get("pid_start")):
                     continue
-                log = Path(detail.get("log") or "/nonexistent")
+                relative = detail.get("run_dir")
                 try:
-                    measured = inference_facts(log, detail.get("runtime") or "pi")["native_cost_usd"]
+                    if not isinstance(relative, str) or Path(relative).is_absolute() or ".." in Path(relative).parts:
+                        raise ValueError("no run directory under this state root")
+                    measured = inference_facts(self.state_root / relative / "events.jsonl",
+                                               detail.get("runtime") or "pi")["native_cost_usd"]
                 except (OSError, ValueError):
-                    measured = 0.0
+                    measured = 0.0  # another state root's run, or none: the reservation stands
                 self.ledger.append({"kind": "settle", "ts": utc(), "key": row.get("key"), "workload": LEDGER_WORKLOAD,
                                     "use_case": "ns-run orphaned attempt", "ref": row.get("ref"),
                                     "actual_usd": max(measured, ATTEMPT_RESERVE_USD), "outcome": "unknown",
@@ -850,12 +856,19 @@ class SpendLedger:
                                     "detail": detail})
                 closed.add(row.get("ref"))
 
-    def debit(self, ref: str, slot: str, run: str, log: Path, runtime: str) -> None:
+    def debit(self, ref: str, slot: str, run_dir: Path, runtime: str) -> None:
+        """Ledger rows are quoted into public records, so a row names the run directory relative to the state root,
+        never an absolute path; the orphan sweep resolves it against its own state root."""
+        try:
+            relative = str(Path(run_dir).absolute().relative_to(self.state_root))
+        except ValueError:
+            relative = None
         with self.ledger.locked():
             self.ledger.append({"kind": "debit", "ts": utc(), "key": slot, "workload": LEDGER_WORKLOAD, "ref": ref,
                                 "max_usd": ATTEMPT_RESERVE_USD,
-                                "detail": {**self.detail, "run": run, "log": str(log), "runtime": runtime,
-                                           "pid": os.getpid(), "pid_start": process_start(os.getpid())}})
+                                "detail": {**self.detail, "run": Path(run_dir).name, "run_dir": relative,
+                                           "runtime": runtime, "pid": os.getpid(),
+                                           "pid_start": process_start(os.getpid())}})
 
     def settle(self, ref: str, slot: str, run: str, facts: dict, outcome: str, in_flight: bool = False) -> None:
         """The attempt's measured cost. An attempt cut short or failed inside a response has an unknown cost: it settles
@@ -892,6 +905,8 @@ def resumable_receipt(path: Path, root: Path, repository: Path, profile: str, ro
     resume = receipt.get("resume") if isinstance(receipt.get("resume"), dict) else {}
     if (receipt.get("profile"), receipt.get("role")) != (profile, role) or resume.get("status") != "stopped_resumable":
         raise ProfileError("receipt is not a resumable stop of this profile and role; resume refused")
+    if (path.parent / "resumed-by.json").exists():
+        raise ProfileError("receipt already resumed; resume refused")
     workspace, session = Path(str(resume.get("retained_worktree"))), str(resume.get("session_id"))
 
     def git(*argv):
@@ -1214,8 +1229,16 @@ def launch(args):
         resumed = resumable_receipt(args.resume, root, args.repository.resolve(), profile, args.role)
     # Every print-mode Anthropic Console attempt is debited before its key is loaded and settled after; a missing,
     # homeless or unwritable ledger refuses the launch before any worktree or key exists.
-    ledger = SpendLedger(getattr(args, "ledger", None), profile, args.role, meta["model"]) \
+    ledger = SpendLedger(getattr(args, "ledger", None), profile, args.role, meta["model"], args.state_root) \
         if route == "claude" and args.print else None
+    if resumed:
+        # A receipt is resumed once: the claim is an exclusive create beside it, so a second --resume (or a concurrent
+        # one) is refused instead of continuing the same session twice.
+        try:
+            private_write(args.resume.parent / "resumed-by.json",
+                          json.dumps({"resumed_at": utc(), "by_pid": os.getpid()}) + "\n")
+        except FileExistsError:
+            raise ProfileError("receipt already resumed; resume refused") from None
     workspace = resumed["workspace"] if resumed else fresh_worktree(args.repository.resolve(), profile)
     aux = Path(meta["auxiliary_root"]) if meta.get("auxiliary_root") else None
     runtime_env = profile_environment(profile, args.state_root, role_scope, aux)
@@ -1331,7 +1354,7 @@ def launch(args):
                 log, errors = run / "events.jsonl", run / "stderr.log"
                 ref = "NSRUN:" + env["NS_RUNTIME_REQUEST_ID"] + ":" + str(len(attempts) + 1) + ":" + str(slot)
                 if ledger:
-                    ledger.debit(ref, slot, run.name, log, runtime)
+                    ledger.debit(ref, slot, run, runtime)
                 # GNU timeout owns the bounded process group and gives the credential
                 # runner its normal TERM cleanup grace; subprocess timeout is only an
                 # outer watchdog. This also bounds GPT descendants without credentials.
@@ -1381,6 +1404,13 @@ def launch(args):
                 # The session holds billed work after a mid-run refusal, and keeps it through every later refusal: a
                 # continuation refused on its first call by the next slot continues again, never restarts from the brief.
                 keep = outcome == "credit_exhausted_mid_run" or continuing
+                if keep and not any((root / "sessions").glob("*_" + session_id + ".jsonl")):
+                    # Billed work but no session file to continue (pi names it <time>_<id>.jsonl): stop with the
+                    # worktree kept, before any switch row. The brief is never sent again onto a worktree that may
+                    # already hold the run's edits.
+                    resume = {"status": "stopped_no_session", "reason": "credit_exhausted_mid_run",
+                              "session_id": session_id, "credential_loader_id": slot}
+                    break
                 try:
                     following = choose_slot(after=slot)
                 except ProfileError:
@@ -1393,18 +1423,12 @@ def launch(args):
                 if ledger:
                     ledger.switch(slot, following, "credit_exhausted (" + ("mid_run" if outcome == "credit_exhausted_mid_run"
                                                                           else "first_call") + ")")
-                if keep and any((root / "sessions").glob("*_" + session_id + ".jsonl")):
+                if keep:
                     resume = {**(resume if continuing and resume else {}), "status": "resumed",
                               "reason": resume["reason"] if continuing and resume else "credit_exhausted_mid_run",
                               "session_id": session_id, "from": resume["from"] if continuing and resume else slot,
                               "to": following}
                     continuing, prompt = True, CONTINUE_PROMPT
-                elif keep:
-                    # Billed work but no session file to continue (pi names it <time>_<id>.jsonl): stop with the worktree
-                    # kept. The brief is never sent again onto a worktree that may already hold the run's edits.
-                    resume = {"status": "stopped_no_session", "reason": "credit_exhausted_mid_run",
-                              "session_id": session_id, "credential_loader_id": slot}
-                    break
                 else:
                     session_id = uuid.uuid4().hex if session_id else None
                     prompt = first_prompt
@@ -1489,6 +1513,8 @@ def launch(args):
             # EX_TEMPFAIL (sysexits.h): `--resume <receipt>` continues it once a funded slot exists. A stop that
             # cannot be resumed is a plain failure.
             return 75 if resume["status"] == "stopped_resumable" else 1
+        if attempts[-1]["outcome"] == "error":
+            return exit_code or 2  # the log could not be read: never report success
         return exit_code or (2 if tracker_code else 0)
     else:
         result = subprocess.run(command, cwd=workspace, env=env)

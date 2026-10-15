@@ -141,8 +141,8 @@ class PiLaunchFixture:
                 finally:
                     self.cleanup_calls, self.worktree_calls = cleanup.call_count, worktree.call_count
                     path = Path(args.ledger)
-                    self.ledger_rows = ([json.loads(line) for line in path.read_text().splitlines()]
-                                        if path.is_file() else None)
+                    self.ledger_rows = ([json.loads(line) if line.startswith("{") else line
+                                         for line in path.read_text().splitlines()] if path.is_file() else None)
             printed = json.loads(out.getvalue().strip().splitlines()[-1])
             self.receipt_path = Path(printed["receipt"])
             receipt = json.loads(self.receipt_path.read_text())
@@ -281,6 +281,8 @@ class MidRunFailoverTests(PiLaunchFixture, unittest.TestCase):
         self.assertEqual((code, calls), (1, [order[0]]))
         self.assertEqual(receipt["resume"]["status"], "stopped_no_session")
         self.assertEqual(self.cleanup_calls, 0)
+        # The CC's F3: no switch row for a failover that never happened.
+        self.assertEqual([row["kind"] for row in self.ledger_rows], ["debit", "settle"])
 
     def test_opencode_mid_run_exhaustion_stops_on_its_slot_and_is_not_called_resumable(self):
         with tempfile.TemporaryDirectory(dir="/var/tmp") as directory:
@@ -429,6 +431,12 @@ class MidRunFailoverTests(PiLaunchFixture, unittest.TestCase):
                 receipt.write_text(json.dumps({"profile": "pi-claude", "role": None, "resume": {**stop, **change}}))
                 with self.subTest(why=why), self.assertRaisesRegex(profiles.ProfileError, "resume refused"):
                     profiles.resumable_receipt(receipt, root, repository, "pi-claude", None)
+            # The CC's F4: a receipt that was resumed once is refused.
+            receipt.write_text(json.dumps({"profile": "pi-claude", "role": None, "resume": stop}))
+            (receipt.parent / "resumed-by.json").write_text("{}\n")
+            with self.assertRaisesRegex(profiles.ProfileError, "already resumed"):
+                profiles.resumable_receipt(receipt, root, repository, "pi-claude", None)
+            (receipt.parent / "resumed-by.json").unlink()
             git("-C", str(kept), "switch", "-q", "-c", "other")
             receipt.write_text(json.dumps({"profile": "pi-claude", "role": None, "resume": stop}))
             with self.assertRaisesRegex(profiles.ProfileError, "worktree"):
@@ -447,6 +455,54 @@ class MidRunFailoverTests(PiLaunchFixture, unittest.TestCase):
                                             "researcher"]), 2)
         launched.assert_not_called()
 
+    def test_a_receipt_is_resumed_only_once(self):
+        # The CC's F4 at 5bea71f9: the first --resume claims the receipt, so a second one refuses.
+        order = self.worker().DEFAULT_KEYS
+        with tempfile.TemporaryDirectory(dir="/var/tmp") as directory:
+            state = Path(directory)
+            only_first = {slot: {"id": slot, "state": "missing"} for slot in order[1:]}
+            code, receipt, calls = self.launch({order[0]: ["ok", (CREDIT_STREAM, 40)]}, only_first, state=state)
+            stopped = self.receipt_path
+            fake = {"workspace": Path(receipt["resume"]["retained_worktree"]), "session_id": receipt["resume"]["session_id"],
+                    "receipt_run": stopped.parent.name, "from": order[0]}
+            with mock.patch.object(profiles, "resumable_receipt", return_value=fake):
+                code, receipt, calls = self.launch({}, resume=lambda state, root: stopped, state=state)
+                self.assertEqual(code, 0)
+                self.assertTrue((stopped.parent / "resumed-by.json").is_file())
+                with self.assertRaisesRegex(profiles.ProfileError, "already resumed"):
+                    self.launch({}, resume=lambda state, root: stopped, state=state)
+
+    def test_no_ledger_row_carries_an_absolute_path(self):
+        # The CC's F1 at 5bea71f9: ledger rows are quoted into public records; no value may be a private path.
+        order = self.worker().DEFAULT_KEYS
+        values = []
+
+        def walk(value):
+            if isinstance(value, dict):
+                for item in value.values():
+                    walk(item)
+            elif isinstance(value, list):
+                for item in value:
+                    walk(item)
+            elif isinstance(value, str):
+                values.append(value)
+        self.launch({order[0]: ["ok", (CREDIT_STREAM, 40)]})
+        for row in self.ledger_rows:
+            walk(row)
+        home = str(Path.home())
+        offending = [value for value in values if value.startswith("/") or value.startswith(home) or "/home/" in value]
+        self.assertEqual(offending, [])
+        self.assertTrue(any(row.get("detail", {}).get("run_dir") for row in self.ledger_rows))
+
+    def test_a_malformed_ledger_is_refused_as_unreadable(self):
+        # The CC's F2 at 5bea71f9: the worker's LedgerError must be caught as the class its Ledger raised.
+        with tempfile.TemporaryDirectory(dir="/var/tmp") as directory:
+            ledger = Path(directory) / "ledger.jsonl"
+            ledger.write_text("not json\n")
+            with self.assertRaisesRegex(profiles.ProfileError, "unreadable"):
+                self.launch({}, ledger=ledger)
+            self.assertEqual((self.commands, self.worktree_calls), ([], 0))
+
     def test_sigterm_during_an_attempt_settles_it_before_ns_run_ends(self):
         # The CC's P3: a terminated ns-run must not leave its debit open.
         order = self.worker().DEFAULT_KEYS
@@ -462,16 +518,17 @@ class MidRunFailoverTests(PiLaunchFixture, unittest.TestCase):
         # The CC's P3: SIGKILL runs no handler, so the next launch settles a debit whose ns-run process is gone.
         order = self.worker().DEFAULT_KEYS
         with tempfile.TemporaryDirectory(dir="/var/tmp") as directory:
-            ledger = Path(directory) / "ledger.jsonl"
-            log = Path(directory) / "events.jsonl"
-            with log.open("w") as handle:
+            state = Path(directory)
+            ledger = state / "ledger.jsonl"
+            (state / "pi-claude/runs/r0").mkdir(parents=True)
+            with (state / "pi-claude/runs/r0/events.jsonl").open("w") as handle:
                 pi_events(handle, tokens=3, cost=0.75)
-            live = {"pid": os.getpid(), "pid_start": profiles.process_start(os.getpid()), "log": str(log)}
-            gone = {"pid": os.getpid(), "pid_start": "-1", "log": str(log), "runtime": "pi"}
+            live = {"pid": os.getpid(), "pid_start": profiles.process_start(os.getpid()), "run_dir": "pi-claude/runs/r0"}
+            gone = {"pid": os.getpid(), "pid_start": "-1", "run_dir": "pi-claude/runs/r0", "runtime": "pi"}
             ledger.write_text("".join(json.dumps({"kind": "debit", "key": order[1], "workload": "NSRUN", "ref": ref,
                                                   "max_usd": 25.0, "detail": detail}) + "\n"
                                       for ref, detail in (("NSRUN:live", live), ("NSRUN:gone", gone))))
-            self.launch({}, ledger=ledger)
+            self.launch({}, ledger=ledger, state=state)
         settled = {row["ref"]: row for row in self.ledger_rows if row["kind"] == "settle"}
         self.assertNotIn("NSRUN:live", settled)
         self.assertEqual((settled["NSRUN:gone"]["outcome"], settled["NSRUN:gone"]["actual_usd"],
@@ -483,6 +540,7 @@ class MidRunFailoverTests(PiLaunchFixture, unittest.TestCase):
         code, receipt, calls = self.launch({}, raw={order[0]: b"\xff\xfe not utf-8\n"})
         self.assertEqual([(row["kind"], row.get("outcome")) for row in self.ledger_rows],
                          [("debit", None), ("settle", "unknown")])
+        self.assertEqual(code, 2)  # the CC's F5: a run whose log cannot be read never reports success
         null = json.dumps({"type": "message_end", "message": {"role": "assistant", "usage": None, "content": [],
                                                               "stopReason": "stop"}}).encode() + b"\n"
         code, receipt, calls = self.launch({}, raw={order[0]: null})
