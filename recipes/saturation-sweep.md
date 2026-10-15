@@ -33,9 +33,9 @@ python3 scripts/receipt_staleness.py --json --out "$WORK_DIR/receipt-staleness.j
 python3 scripts/saturation_ledger.py --report --staleness "$WORK_DIR/receipt-staleness.json"
 ```
 
-The due layers are every layer that is not a saturation candidate. A layer with a current reopen
-trigger is always due. Freeze the scope, meaning the layer list and each layer's
-`research-state.json` row, before starting, and keep its hashes:
+The due layers are every layer that is not a saturation candidate, planned layers included (see the
+end of this recipe). A layer with a current reopen trigger is always due. Freeze the scope, meaning
+the layer list and each layer's `research-state.json` or planned row, before starting, and keep its hashes:
 
 ```sh
 python3 scripts/saturation_ledger.py --scope > "$WORK_DIR/scope.json"
@@ -178,3 +178,13 @@ layer's count.
 
 `--append` never rewrites earlier records, and it never writes `research-state.json`. When a
 layer reaches `saturation_candidate`, the landscape owners decide whether to add `closure_refs`.
+
+## Planned layers
+
+A planned layer (a row of `catalogs/landscape/planned-layers.json`: a layer an approved plan names that
+has no landscape row yet) is swept like any other layer. `--scope` freezes its planned row's requirement
+hash, the report lists it, and `--append` binds its record to the sweep manifest's `lane_groupings` row
+(`catalogs/saturation/README.md`, Planned layers). A scope frozen before planned layers were sweepable
+lacks their hashes, so `build_inputs.py` refuses it at contract version 1; freeze it again. Append a
+planned layer's sweep before a verdict wave promotes the layer to a landscape row: after the promotion,
+`--append` reads it as a landscape layer, which that manifest has no section row for, and refuses the record.

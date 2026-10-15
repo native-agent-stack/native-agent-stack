@@ -7,11 +7,12 @@
                   [--contract-version 2 [--pull-upstream-facts]]
 
 Reads the frozen scope (`saturation_ledger.py --scope`, default <work-dir>/scope.json), catalogs/landscape/
-{foundation,us-equities}.json and research-state.json, the saturation ledger's last completed repository sweep, a
-baseline manifest (default: that sweep's manifest_ref) whose candidates count as known, and a catalog-freshness manifest
-(build_manifest.py over extract_layers.py + github_freshness.py output with an empty lanes record, or the
-catalog-freshness workflow's artifact) for each winner's pin against upstream. Writes <work-dir>/inputs/<layer_id>.json
-and <work-dir>/layers.json ([{catalog, layer_id, title, input}] in catalog order).
+{foundation,us-equities}.json, planned-layers.json and research-state.json, the saturation ledger's last completed
+repository sweep, a baseline manifest (default: that sweep's manifest_ref) whose candidates count as known, and a
+catalog-freshness manifest (build_manifest.py over extract_layers.py + github_freshness.py output with an empty lanes
+record, or the catalog-freshness workflow's artifact) for each winner's pin against upstream. Writes
+<work-dir>/inputs/<layer_id>.json and <work-dir>/layers.json ([{catalog, layer_id, title, input}] in catalog order, each
+catalog's landscape rows before its planned layers).
 
 Each modality keeps its own history: a ledger sweep's modality is named by its layers' catalogs (repository for
 foundation and us-equities, skills for skills; sweep_modality), and a run reads previous_sweep, and a repository run
@@ -19,7 +20,17 @@ its default baseline, from the last completed sweep of its own modality only. A 
 an empty previous_sweep and no baseline, and the summary line names the sweep it read ("previous ... sweep none").
 
 --seeds is an optional JSON object {"<layer_id>": ["candidate or note", ...]}: candidates other sessions asked this
-sweep to assess, shown to the discovery workers as seeded_candidates. An unknown layer id is an error.
+sweep to assess, shown to the discovery workers as seeded_candidates. A layer id the run builds no input for is an
+error, so a seed is never dropped.
+
+A planned layer (a row of catalogs/landscape/planned-layers.json: a layer an approved plan names that has no landscape
+row yet) is a repository layer of its own catalog: it gets an input after that catalog's landscape rows, with its
+planned row's requirement, acceptance and source, its requirement hash from the frozen scope (saturation_ledger.py
+--scope covers the planned rows; its planned_requirement_sha256), its previous sweep and its seeds. It has no sealed
+verdict, so winners, alternatives, open_gaps and components_vs_upstream are empty and verdict_note says so. A planned
+layer that also has a landscape row is an error (scripts/final_stack.py refuses the same collision). Contract version 2
+builds no planned layer yet, since its blind fit projection reads a verdict row: it refuses seeds for one, and its
+summary line counts the planned layers it did not build.
 
 winners, alternatives and open_gaps are copied from the row's sealed verdict, which only a new verdict wave re-records
 (tools/sota-convergence/README.md, "Record verdicts"), so an input dates them: verdict_checked_at is the row's
@@ -41,9 +52,9 @@ instead, one per lifecycle task, keyed by skill (owner/repo@name) rather than re
   build_inputs.py --work-dir W --modality skills [--scope W/scope.json] [--seeds seeds.json] [--repo-root .]
 
 --skills-scope prints the frozen scope in saturation_ledger.py --scope's format for the skills catalog (whose --scope
-covers research-state.json's layers only): each task's requirement_sha256 (saturation_ledger.skills_requirement_sha256:
-the sha256 of the canonical JSON of its lifecycle_task, requirement and overturn_when) under "skills/<layer_id>", and
-the platform-profile hash, both with the ledger's own functions. A skills layer input carries modality "skills", the
+covers the research-state.json and planned-layers.json layers only): each task's requirement_sha256
+(saturation_ledger.skills_requirement_sha256: the sha256 of the canonical JSON of its lifecycle_task, requirement and
+overturn_when) under "skills/<layer_id>", and the platform-profile hash, both with the ledger's own functions. A skills layer input carries modality "skills", the
 task, the installed skills' adoption/skills/manifest.json pins and invocation flags, the task's sources with their pins
 (and a stale source's maintenance record), and known_skills (the manifest's installed skills by repository, and its
 excluded skills by the manifest's own source text, each comma-separated name kept whole). The task's text, its open
@@ -91,6 +102,15 @@ VERDICT_NOTE = ("winners, alternatives and open_gaps are this layer's sealed ver
                 "components_vs_upstream[].pin is the pin the stack installs today. open_gaps_followup lists, by "
                 "open_gaps index, what a later gap wave recorded for that gap (status, receipts, waves, ledgers); "
                 "a gap without an entry has no follow-up on record.")
+# The planned layers (saturation_ledger.PLANNED_LAYERS): an approved plan's layers that have no landscape row yet.
+PLANNED_LAYERS = "catalogs/landscape/planned-layers.json"
+# The manifest section with a planned layer's lane rows (saturation_ledger.LANE_GROUPINGS; grouping_rows).
+LANE_GROUPINGS = "lane_groupings"
+PLANNED_NOTE = ("a planned layer (catalogs/landscape/planned-layers.json, the row planned.ref names): an approved plan "
+                "names it and no verdict has recorded its landscape row yet. winners, alternatives, open_gaps and "
+                "components_vs_upstream are empty because there is no sealed verdict, not because nothing qualifies; "
+                "there is no incumbent, so judge every proposal against requirement and acceptance. planned.source "
+                "names the approving record. A verdict wave records the layer's row after a sweep covers it.")
 # The skills modality's catalog, its layers' catalog name and its source kinds.
 SKILLS_CATALOG = "catalogs/landscape/skills-lifecycle.json"
 SKILLS_MANIFEST = "adoption/skills/manifest.json"
@@ -136,6 +156,13 @@ UPSTREAM_FACT_FIELDS = ("latest_release", "released_at", "pushed_at", "archived"
 def rows_by_layer(manifest: dict | None, catalog: str) -> dict:
     section = MANIFEST_SECTION[catalog]
     return {row.get("layer"): row for row in ((manifest or {}).get(section) or []) if isinstance(row, dict)}
+
+
+def grouping_rows(manifest: dict | None) -> dict:
+    """{layer: row} of a manifest's lane_groupings rows. A planned layer has no row in its catalog's section:
+    build_manifest.py files its lane rows under lane_groupings, the row saturation_ledger.binding_layer computes a
+    planned record's known and new from, so that row is a planned layer's baseline."""
+    return {row.get("layer"): row for row in ((manifest or {}).get(LANE_GROUPINGS) or []) if isinstance(row, dict)}
 
 
 def sweep_modality(sweep: dict) -> str | None:
@@ -601,13 +628,70 @@ def freeze_upstream_facts(inputs: list, pull=False) -> dict:
     return snapshot
 
 
+def check_planned(planned, catalogs: dict) -> list:
+    """[(index, row)] of the planned-layers rows. A row needs a landscape catalog, a lowercase layer_id and a
+    requirement; a planned layer listed twice or with a landscape row of its own is an error (scripts/final_stack.py
+    refuses the same collision)."""
+    if planned is None:
+        return []
+    if not isinstance(planned, list):
+        raise ValueError(f"{PLANNED_LAYERS}: layers must be a list")
+    names = [catalog for catalog, _ in CATALOG_FILES]
+    landscape = {(catalog, layer["layer_id"]) for catalog, _ in CATALOG_FILES for layer in catalogs[catalog]["layers"]}
+    rows, seen = [], set()
+    for index, row in enumerate(planned):
+        if not (isinstance(row, dict) and row.get("catalog") in names and isinstance(row.get("layer_id"), str)
+                and re.fullmatch(r"[a-z0-9][a-z0-9-]*", row["layer_id"])
+                and isinstance(row.get("requirement"), str) and row["requirement"].strip()):
+            raise ValueError(f"{PLANNED_LAYERS} layers[{index}] needs a catalog in {names}, a lowercase layer_id and "
+                             "a requirement")
+        key = (row["catalog"], row["layer_id"])
+        if key in landscape:
+            raise ValueError(f"planned layer {key[0]}/{key[1]} collides with its landscape row; remove it from "
+                             f"{PLANNED_LAYERS}")
+        if key in seen:
+            raise ValueError(f"planned layer {key[0]}/{key[1]} is listed more than once in {PLANNED_LAYERS}")
+        seen.add(key)
+        rows.append((index, row))
+    return rows
+
+
+def planned_input(index: int, row: dict, requirement, scope: dict, freshness: dict, baseline_row: dict,
+                  previous: dict, seeds: list) -> dict:
+    """A planned layer's input: every field of a landscape layer's input, with no sealed verdict to copy, then the
+    planned row's acceptance and its ref and source."""
+    known = {slug(item.get("repository")) for item in baseline_row.get("candidates") or []}
+    known.discard("")
+    return {
+        "catalog": row["catalog"], "layer_id": row["layer_id"], "title": row.get("title"),
+        "requirement": row["requirement"],
+        "research_status": None, "next_action": None,
+        "requirement_sha256": requirement, "platform_profiles_sha256": scope.get("platform_profiles_sha256"),
+        "winners": [], "alternatives": [],
+        "upstream_checked_at": freshness.get("checked_at"),
+        "components_vs_upstream": [],
+        "open_gaps": [], "open_gaps_followup": [],
+        "verdict_checked_at": None,
+        "verdict_note": PLANNED_NOTE,
+        "overturn_when": "",
+        "previous_sweep": previous,
+        "known_repositories": sorted(known),
+        "seeded_candidates": list(seeds),
+        "acceptance": row.get("acceptance"),
+        "planned": {"ref": f"{PLANNED_LAYERS}#/layers/{index}", "source": row.get("source")},
+    }
+
+
 def build_layer_inputs(catalogs: dict, research_state: dict, scope: dict, freshness: dict, baseline: dict | None,
                         ledger: dict, seeds=None, absent=None, followups=None, contract_version=1,
-                        record_sources=None, runtime_target=None, platform_requirements=None) -> list[dict]:
-    """One input object per landscape layer, in catalog order; raises on a layer missing from the frozen scope.
-    ``absent(entry)`` says whether a refuted ledger entry is refuted by absence (main() passes the ledger's
-    refuted_by_absence over this checkout's retained returns); without it every refuted entry stays refuted.
-    ``followups`` is join_gap_followups' first value; without it every open_gaps_followup is empty."""
+                        record_sources=None, runtime_target=None, platform_requirements=None,
+                        planned=None) -> list[dict]:
+    """One input object per landscape layer and, in contract version 1, per planned layer (``planned``: the rows of
+    planned-layers.json), in catalog order with each catalog's planned layers after its landscape rows; raises on a
+    layer missing from the frozen scope. ``absent(entry)`` says whether a refuted ledger entry is refuted by absence
+    (main() passes the ledger's refuted_by_absence over this checkout's retained returns); without it every refuted
+    entry stays refuted. ``followups`` is join_gap_followups' first value; without it every open_gaps_followup is
+    empty."""
     if contract_version not in (1, 2):
         raise ValueError("contract_version must be 1 or 2")
     if contract_version == 2 and not platform_requirements:
@@ -616,12 +700,19 @@ def build_layer_inputs(catalogs: dict, research_state: dict, scope: dict, freshn
     record_sources = record_sources or {}
     research = {(row["catalog"], row["layer_id"]): row for row in research_state.get("layers") or []}
     previous = previous_by_layer(last_completed(ledger, REPOSITORY), absent)
+    planned_layers = check_planned(planned, catalogs)
     all_ids = [layer["layer_id"] for catalog, _ in CATALOG_FILES for layer in catalogs[catalog]["layers"]]
-    duplicates = sorted({layer_id for layer_id in all_ids if all_ids.count(layer_id) > 1})
+    planned_ids = [row["layer_id"] for _, row in planned_layers]
+    built_ids = all_ids + (planned_ids if contract_version == 1 else [])
+    duplicates = sorted({layer_id for layer_id in built_ids if built_ids.count(layer_id) > 1})
     if duplicates:
         raise ValueError(f"layer ids repeat across catalogs (inputs/<layer_id>.json would collide): {duplicates}")
-    seeds = check_seeds(seeds, all_ids)
+    if contract_version == 2 and isinstance(seeds, dict) and set(seeds) & set(planned_ids):
+        raise ValueError("--seeds names planned layers that contract version 2 builds no input for (its blind fit "
+                         f"projection reads a verdict row): {sorted(set(seeds) & set(planned_ids))}")
+    seeds = check_seeds(seeds, built_ids)
     out, missing = [], []
+    planned_baseline = grouping_rows(baseline)
     for catalog, _ in CATALOG_FILES:
         baseline_rows, fresh_rows = rows_by_layer(baseline, catalog), rows_by_layer(freshness, catalog)
         for layer_index, layer in enumerate(catalogs[catalog]["layers"]):
@@ -678,6 +769,19 @@ def build_layer_inputs(catalogs: dict, research_state: dict, scope: dict, freshn
                 row["acceptance_gates"] = row["fit_projection"]["acceptance_gates"]
                 for key in ("platform_requirements", "platform_requirements_sha256"):
                     row[key] = row["fit_projection"][key]
+        if contract_version != 1:
+            continue
+        for planned_index, row in planned_layers:
+            if row["catalog"] != catalog:
+                continue
+            layer_id = row["layer_id"]
+            requirement = (scope.get("requirement_sha256") or {}).get(f"{catalog}/{layer_id}")
+            if not requirement:
+                missing.append(f"{catalog}/{layer_id}")
+            # Its baseline row is the manifest's lane_groupings row: it has none in this catalog's section.
+            out.append(planned_input(planned_index, row, requirement, scope, freshness,
+                                     planned_baseline.get(layer_id, {}), previous.get((catalog, layer_id), {}),
+                                     seeds.get(layer_id, [])))
     if missing:
         raise ValueError(f"the frozen scope has no requirement_sha256 for {missing}; refreeze it with "
                          "saturation_ledger.py --scope")
@@ -872,6 +976,9 @@ def main(argv=None) -> int:
         if baseline_path is None and previous_sweep and previous_sweep.get("manifest_ref"):
             baseline_path = repo / previous_sweep["manifest_ref"]
         catalogs = {catalog: load_json(repo / "catalogs" / "landscape" / name) for catalog, name in CATALOG_FILES}
+        planned_document = load_json(repo / PLANNED_LAYERS) if (repo / PLANNED_LAYERS).is_file() else {"layers": []}
+        if not isinstance(planned_document, dict):
+            raise ValueError(f"{PLANNED_LAYERS} must be a JSON object")
         led = ledger_module(REPO_ROOT)  # the ledger's rules from this checkout, applied to --repo-root's files
         scope = load_json(args.scope or work / "scope.json")
         platform_requirements = None
@@ -895,7 +1002,8 @@ def main(argv=None) -> int:
             record_sources=field_record_sources(repo, catalogs, ledger) if args.contract_version == 2 else None,
             runtime_target=load_json(repo / "catalogs/us-equities/runtime-target.json")
                            if args.contract_version == 2 and (repo / "catalogs/us-equities/runtime-target.json").is_file()
-                            else None, platform_requirements=platform_requirements)
+                            else None, platform_requirements=platform_requirements,
+            planned=planned_document.get("layers", []))
         if args.contract_version == 2:
             upstream_facts = freeze_upstream_facts(inputs, pull=args.pull_upstream_facts)
     except (ValueError, OSError, KeyError) as error:
@@ -917,7 +1025,12 @@ def main(argv=None) -> int:
                            "fit_input": str(screen_path), "facts_input": str(screen_path)}
                           if args.contract_version == 2 else {})})
     write_json(work / "layers.json", layers)
+    built_planned = sum(1 for x in inputs if "planned" in x)
+    # Contract version 2 builds no planned input (build_layer_inputs); say so rather than skip them silently.
+    unbuilt = len(planned_document.get("layers") or []) - built_planned if args.contract_version == 2 else 0
     print(f"{len(layers)} layers; {sum(1 for x in layers if x['catalog'] == 'foundation')} foundation; "
+          f"{built_planned} planned"
+          f"{f' ({unbuilt} not built: contract version 2 builds no planned input)' if unbuilt else ''}; "
           f"previous repository sweep {(previous_sweep or {}).get('sweep_id') or 'none'}; "
           f"baseline {baseline_path.name if baseline_path else 'none'}; seeds for "
           f"{sum(1 for x in inputs if x['seeded_candidates'])} layer(s); "

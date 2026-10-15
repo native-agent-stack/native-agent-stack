@@ -37,11 +37,14 @@ Each layer entry holds these fields:
 
 - `catalog` (`foundation`, `us-equities` or `skills`, the skills modality keyed by lifecycle task) and `layer_id`
 - `requirement_sha256`: the sha256 of the canonical JSON `{next_action, decision_ref}` from the
-  layer's `research-state.json` row
+  layer's `research-state.json` row. A planned layer (below) hashes `{requirement, acceptance}` from
+  its `catalogs/landscape/planned-layers.json` row, and a skills layer
+  `{lifecycle_task, requirement, overturn_when}` from its skills lifecycle task.
 - `platform_profiles_sha256`: the sha256 of the canonical `adoption/manifest.json#/platform_profiles`
 
   Both are the scope frozen before the run (`--scope`) when the layer cites a discovery return,
   which retains them; otherwise `--append` computes them from that day's files.
+- `planned`, computed by `--append`: `true` when the layer was a planned layer, absent otherwise.
 - `votes`: `retained`, `not_retained` or `not_returned`, with a `votes_note` unless `retained`
 - `discovery_ref`, required with `votes: retained`: `returns_ref#/pointer` to the layer's
   discovery return, `{catalog, layer_id, proposed[], requirement_sha256, platform_profiles_sha256}`
@@ -70,6 +73,31 @@ round as `not_adjudicated`, not as `refuted`.
 The sha256 values use canonical JSON: sorted keys, no whitespace, UTF-8. The first record chains
 to `{schema_version, policy}`, so changing `policy` also breaks the chain.
 
+### Planned layers
+
+A planned layer is a row of
+[`catalogs/landscape/planned-layers.json`](../landscape/planned-layers.json): a layer an approved
+plan names that has no landscape row yet. It is swept as a repository layer of its own catalog
+(`foundation` or `us-equities`). `--scope` freezes its requirement hash with the research-state
+layers, `--report` lists it after them, and `--append` records it. A `--report --json` row has
+`planned: true` and no `research_status`; the Markdown table shows `planned` in that column.
+A planned layer that also has a `research-state.json` row is refused, as
+`scripts/final_stack.py` refuses one that has a landscape row.
+
+A planned layer has no row in its catalog's section of the sweep's SOTA manifest:
+`build_manifest.py` files its lane rows under `lane_groupings`, in the same `candidates` shape,
+and writes the row even when the sweep proposed nothing for the layer (the empty row is the
+record of that sweep; a missing discovery still resets the count through its `retained_failure`). So
+`--append` marks its entry `planned: true`, and `--check` binds a marked entry to that
+`lane_groupings` row as it binds a landscape layer to its section row. `proposed` must equal the
+row's lane rows, survival must agree with them, and a survivor needs a surviving lane row and a
+source review naming the layer. A mark without that row is refused, whatever its form. The mark is
+durable. Once a verdict wave records the layer's landscape row and its research-state row, that row
+supplies the requirement hash, which `--report` shows as a `requirement_changed` reset, and the
+entries recorded while the layer was planned still check. Append a planned layer's sweep before
+that promotion: after it, `--append` reads the layer as a landscape layer, which the sweep's
+manifest has no section row for, and refuses the record.
+
 ## What `--check` verifies
 
 - The structure, calendar dates, and that `prev_sha256` and `head_sha256` match. Editing,
@@ -83,8 +111,9 @@ to `{schema_version, policy}`, so changing `policy` also breaks the chain.
   frozen `requirement_sha256` and `platform_profiles_sha256` must equal the layer's, so a scope
   change during the sweep stands as a current trigger rather than being recorded as tested. Every vote and discovery
   `ref` needs a JSON pointer: a retained vote must resolve in `returns_ref` (not the manifest, the
-  usage output or the run record) to an object with the same role and repository, and a lens vote
-  must resolve to that lens in this layer's lane row for the same repository.
+  usage output or the run record), under the layer's own collection `#/votes/<layer_id>/`, to an
+  object with the same role and repository, and a lens vote must resolve to that lens in this
+  layer's lane row for the same repository. Another layer's vote on the same repository is refused.
 - `lost_workers` must be exactly the children of `usage_ref` that never completed; leaving one out
   fails, and an absent list means none.
 - `workflow_run` must be the run `usage_ref` measured (the last segment of

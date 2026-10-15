@@ -94,6 +94,14 @@ def load(name):
     return module
 
 
+def load_tool(name):
+    """A tools/sota-convergence module, loaded as tests/test_sota_convergence.py loads it."""
+    spec = importlib.util.spec_from_file_location(f"sota_convergence_{name}", HARNESS.parent / f"{name}.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 build_args = load("build_args")
 build_inputs = load("build_inputs")
 codex_job = load("codex_job")
@@ -256,6 +264,16 @@ def write_codex_files(work: Path, res: dict) -> None:
 def scope_for(layers=(("foundation", "alpha"), ("us-equities", "beta"), ("foundation", "gamma"))):
     return {"platform_profiles_sha256": PLAT,
             "requirement_sha256": {f"{catalog}/{layer_id}": REQ for catalog, layer_id in layers}}
+
+
+# The planned layers' catalog and their documented requirement hash (saturation_ledger.planned_requirement_sha256),
+# spelled out so the planned-layer tests also run against a harness that has none.
+PLANNED_PATH = "catalogs/landscape/planned-layers.json"
+
+
+def planned_hash(row: dict) -> str:
+    return hashlib.sha256(json.dumps({"requirement": row.get("requirement"), "acceptance": row.get("acceptance")},
+                                     sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()).hexdigest()
 
 
 def child_usage_raw(run_id, labels, status="complete", transcript_root="/home/example/.claude/projects/p/s"):
@@ -626,6 +644,138 @@ class BuildInputsTests(unittest.TestCase):
         self.assertEqual(done.returncode, 2)
         self.assertIn("us-equities/beta", done.stderr)
 
+    PLANNED = {"catalog": "us-equities", "layer_id": "delta", "title": "Delta", "requirement": "delta req",
+               "acceptance": "delta acceptance", "source": {"record": "a dated plan", "approved": "2026-10-10"}}
+
+    def plan(self, *rows, scope=(("foundation", "alpha"), ("us-equities", "beta"), ("us-equities", "delta"))):
+        write_json(self.repo / PLANNED_PATH, {"schema_version": 1, "layers": list(rows)})
+        write_json(self.work / "scope.json", scope_for(scope))
+
+    def test_a_planned_layer_gets_an_input_that_carries_its_seeds(self):
+        # Before planned layers were sweepable, a seed for one was refused as "not in the landscape catalogs" (exit 2)
+        # and no input was built for it.
+        self.plan(self.PLANNED)
+        seeds = write_json(self.work / "seeds.json", {"delta": ["seeded planned thing"], "beta": ["seeded thing"]})
+        done = self.build("--seeds", seeds)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertIn("3 layers; 1 foundation; 1 planned;", done.stdout)
+        self.assertIn("seeds for 2 layer(s)", done.stdout)
+        delta = json.loads((self.work / "inputs/delta.json").read_text())
+        beta = json.loads((self.work / "inputs/beta.json").read_text())
+        self.assertEqual(delta["seeded_candidates"], ["seeded planned thing"])
+        self.assertEqual((delta["catalog"], delta["title"], delta["requirement"], delta["acceptance"]),
+                         ("us-equities", "Delta", "delta req", "delta acceptance"))
+        self.assertEqual(delta["planned"], {"ref": "catalogs/landscape/planned-layers.json#/layers/0",
+                                            "source": self.PLANNED["source"]})
+        self.assertEqual((delta["requirement_sha256"], delta["platform_profiles_sha256"]), (REQ, PLAT))
+        # No sealed verdict to copy, and the note says so.
+        self.assertEqual([delta[field] for field in ("winners", "alternatives", "open_gaps", "open_gaps_followup",
+                                                     "components_vs_upstream", "known_repositories")], [[]] * 6)
+        self.assertEqual((delta["verdict_checked_at"], delta["overturn_when"], delta["research_status"]),
+                         (None, "", None))
+        self.assertEqual(delta["verdict_note"], build_inputs.PLANNED_NOTE)
+        self.assertIn("no incumbent", delta["verdict_note"])
+        self.assertEqual((delta["upstream_checked_at"], delta["previous_sweep"]), ("2026-10-26", {}))
+        # Every field of a landscape input, plus the planned row's acceptance and its ref and source.
+        self.assertEqual(set(delta) - set(beta), {"acceptance", "planned"})
+        self.assertEqual(set(beta) - set(delta), set())
+        self.assertNotIn("planned", beta)
+        layers = json.loads((self.work / "layers.json").read_text())
+        self.assertEqual([(x["catalog"], x["layer_id"], x["title"]) for x in layers],
+                         [("foundation", "alpha", "Alpha"), ("us-equities", "beta", "Beta"),
+                          ("us-equities", "delta", "Delta")])
+
+    def test_a_planned_layer_reads_its_previous_sweep_from_the_ledger(self):
+        self.plan(self.PLANNED)
+        ledger = json.loads((self.repo / "catalogs/saturation/ledger.json").read_text())
+        ledger["sweeps"].append({"sweep_id": "sw-3", "status": "completed", "manifest_ref": "catalogs/m1.json",
+                                 "layers": [{"catalog": "us-equities", "layer_id": "delta", "planned": True,
+                                             "survived": [{"repo": "https://github.com/o/d"}], "refuted": []}]})
+        write_json(self.repo / "catalogs/saturation/ledger.json", ledger)
+        done = self.build()
+        self.assertEqual(done.returncode, 0, done.stderr)
+        delta = json.loads((self.work / "inputs/delta.json").read_text())
+        self.assertEqual(delta["previous_sweep"], {"sweep_id": "sw-3", "survived": ["https://github.com/o/d"],
+                                                   "refuted": []})
+
+    def test_a_planned_layer_counts_its_baseline_lane_groupings_candidates_as_known(self):
+        # Codex review of #1066 at 4b6019ca, P2: a planned layer has no row in its catalog's section of the baseline
+        # manifest (build_manifest.py files its lane rows under lane_groupings), so its input read an empty baseline
+        # row and listed known_repositories [] after an earlier sweep had proposed candidates for it.
+        self.plan(self.PLANNED)
+        manifest = json.loads((self.repo / "catalogs/m1.json").read_text())
+
+        def grouping(layer_id, repository):
+            return {"layer": layer_id, "lane": "sw-1", "selected": [], "alternatives_keep_but_compare": [],
+                    "candidates": [{"repository": repository, "lane": "sw-1"}], "open_gaps": []}
+
+        # beta, a landscape layer, binds to its section row, so a lane_groupings row named beta is never its baseline.
+        manifest["lane_groupings"] = [grouping("beta", "https://github.com/o/not-beta"),
+                                      grouping("delta", "https://github.com/o/delta-known.git")]
+        write_json(self.repo / "catalogs/m1.json", manifest)
+        done = self.build()
+        self.assertEqual(done.returncode, 0, done.stderr)
+        inputs = {layer_id: json.loads((self.work / f"inputs/{layer_id}.json").read_text())["known_repositories"]
+                  for layer_id in ("alpha", "beta", "delta")}
+        self.assertEqual(inputs, {"alpha": ["cli/cli", "facebook/react", "sharkdp/bat", "tauri-apps/tauri"],
+                                  "beta": [], "delta": ["o/delta-known"]})
+
+    def test_a_planned_layer_needs_its_frozen_scope_a_catalog_and_no_landscape_row(self):
+        self.plan(self.PLANNED, scope=(("foundation", "alpha"), ("us-equities", "beta")))
+        done = self.build()
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("the frozen scope has no requirement_sha256 for ['us-equities/delta']", done.stderr)
+        for row, message in ((dict(self.PLANNED, layer_id="beta"),
+                              "planned layer us-equities/beta collides with its landscape row"),
+                             (dict(self.PLANNED, catalog="skills"), "needs a catalog in"),
+                             (dict(self.PLANNED, layer_id="../escape"), "a lowercase layer_id"),
+                             (dict(self.PLANNED, requirement=""), "and a requirement")):
+            with self.subTest(message=message):
+                self.plan(row)
+                done = self.build()
+                self.assertEqual(done.returncode, 2)
+                self.assertIn(message, done.stderr)
+        self.plan(self.PLANNED, self.PLANNED)
+        done = self.build()
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("planned layer us-equities/delta is listed more than once", done.stderr)
+        # A planned id that repeats a landscape id of the other catalog would collide in inputs/<layer_id>.json.
+        self.plan(dict(self.PLANNED, layer_id="alpha"), scope=(("foundation", "alpha"), ("us-equities", "beta"),
+                                                               ("us-equities", "alpha")))
+        done = self.build()
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("layer ids repeat across catalogs", done.stderr)
+
+    def test_contract_version_2_builds_no_planned_layer_and_refuses_its_seeds(self):
+        catalogs = {catalog: json.loads((self.repo / "catalogs/landscape" / name).read_text())
+                    for catalog, name in build_inputs.CATALOG_FILES}
+        args = (catalogs, {"layers": []}, scope_for((("foundation", "alpha"), ("us-equities", "beta"),
+                                                     ("us-equities", "delta"))),
+                {"checked_at": "2026-10-26"}, None, {"sweeps": []})
+        with self.assertRaisesRegex(ValueError, r"contract version 2 builds no input for .*\['delta'\]"):
+            build_inputs.build_layer_inputs(*args, seeds={"delta": ["x"]}, contract_version=2,
+                                            platform_requirements={"linux-x86_64": "x"}, planned=[self.PLANNED])
+        # Contract version 1 builds the planned layer with its seed.
+        inputs = build_inputs.build_layer_inputs(*args, seeds={"delta": ["x"]}, planned=[self.PLANNED])
+        self.assertEqual([(row["layer_id"], row["seeded_candidates"]) for row in inputs],
+                         [("alpha", []), ("beta", []), ("delta", ["x"])])
+
+    def test_the_committed_planned_layers_build_inputs_from_this_checkouts_scope(self):
+        # The repository's own planned layers: saturation_ledger.py --scope freezes them and build_inputs.py builds
+        # an input for each, carrying a seed.
+        planned = [row for row in json.loads((ROOT / PLANNED_PATH).read_text())["layers"]]
+        if not planned:  # planned layers leave the catalog as verdict waves record their rows
+            self.skipTest("this checkout has no planned layer")
+        scope = write_json(self.work / "scope-root.json", sl.scope_hashes(ROOT))
+        seeds = write_json(self.work / "seeds-root.json", {planned[0]["layer_id"]: ["a seeded repository"]})
+        done = run([sys.executable, HARNESS / "build_inputs.py", "--work-dir", self.work, "--repo-root", ROOT,
+                    "--freshness-manifest", self.freshness, "--scope", scope, "--seeds", seeds])
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertIn(f"{len(planned)} planned;", done.stdout)
+        first = json.loads((self.work / "inputs" / f"{planned[0]['layer_id']}.json").read_text())
+        self.assertEqual((first["seeded_candidates"], first["requirement_sha256"]),
+                         (["a seeded repository"], planned_hash(planned[0])))
+
     def test_the_20260926_seeds_record_has_the_seeds_format(self):
         # A record of that run's inputs: its format is checked, not today's layer list.
         seeds = json.loads((HARNESS / "seeds-20260926.json").read_text(encoding="utf-8"))
@@ -779,6 +929,18 @@ class NeutralFieldTests(unittest.TestCase):
         model = next(candidate for candidate in screen["candidates"] if candidate["repository"] == repository)
         self.assertEqual(model["primary_sources"], [repository, repository + "/tree/main",
                          "https://huggingface.co/api/models/XiaomiMiMo/MiMo-V2.6-Distill-Qwen-9B"])
+
+    def test_v2_builds_no_planned_layer_and_says_so(self):
+        # Claude review of #1066 at f6c4f475, F2/F3: V2 skipped a planned layer silently, and no test reached the skip.
+        # A planned row, no seed for it and no frozen hash for it: V2 builds the landscape layers only.
+        write_json(self.repo / PLANNED_PATH, {"schema_version": 1, "layers": [BuildInputsTests.PLANNED]})
+        done = self.build("--contract-version", "2")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertIn("2 layers; 1 foundation; 0 planned (1 not built: contract version 2 builds no planned input);",
+                      done.stdout)
+        self.assertFalse((self.work / "inputs/delta.json").exists())
+        self.assertEqual([row["layer_id"] for row in json.loads((self.work / "layers.json").read_text())],
+                         ["alpha", "beta"])
 
     def test_v2_requirement_keeps_capability_words_that_are_only_repository_owner_fragments(self):
         path = self.repo / "catalogs/landscape/foundation.json"
@@ -1239,6 +1401,21 @@ class BuildArgsTests(unittest.TestCase):
         self.assertEqual(json.loads(line[len("const A = "):]), json.loads((work / "args.json").read_text()))
         with self.assertRaisesRegex(ValueError, "exactly one"):
             build_args.embed(source + "\nconst A = args\n", {})
+
+    def test_a_due_layer_without_an_input_is_named_not_dropped(self):
+        # Claude review of #1066 at 1765a420 (F2 residual): --due-report dropped a due layer that layers.json lacks,
+        # such as a planned layer in a contract-version-2 work directory, without a word. A due layer of another
+        # modality's catalog (skills here) belongs to another run and is not named.
+        work = stage_work(self)
+        report = write_json(work / "report.json", {"layers": [
+            {"catalog": "foundation", "layer_id": "alpha", "due": True},
+            {"catalog": "us-equities", "layer_id": "delta", "due": True},
+            {"catalog": "skills", "layer_id": "skills-debug", "due": True}]})
+        done = build(work, "--due-report", report)
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("due layers without an input in layers.json: ['delta']", done.stderr)
+        self.assertIn("contract version 2 builds no planned input", done.stderr)
+        self.assertFalse((work / "args.json").exists())
 
     def test_smoke_due_report_and_explicit_layer_selection(self):
         work = stage_work(self)
@@ -5229,22 +5406,39 @@ class LedgerIntegrationTests(unittest.TestCase):
         self.scope = sl.scope_hashes(self.root)
         self.base = f"evidence/artifacts/{LANE}"
 
-    def evidence(self, res, usage=None):
-        """Converted evidence; with `usage`, converted against that record (votes measured, efforts checked)."""
+    def evidence(self, res, usage=None, planned=(), catalog_layers=()):
+        """Converted evidence; with `usage`, converted against that record (votes measured, efforts checked). The
+        manifest gives each layer a row of its catalog's section. A run of `planned` layers, which have no landscape
+        row, gets the manifest the production build_manifest.py writes from the converted lanes: their lane rows
+        under lane_groupings. Such a run may also sweep `catalog_layers` (foundation layer ids), which that manifest
+        builds a foundation row for, as a sweep's catalog layers are."""
         out = convert.convert(res, self.scope, LANE, convert.resolved_models(usage), usage=usage)
         write_json(self.root / self.base / "returns.json", out["returns"])
         usage = usage or usage_record.record(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS), 0, "cmd", ROOT)
         write_json(self.root / f"{self.base}-attempts/child-usage-wf_fixture-1.json", usage)
-        sections = {"foundation": [], "trading": []}
-        for layer in out["lanes"]["lanes"][0]["result"]["layers"]:
-            catalog = next(x["catalog"] for x in out["layers"] if x["layer_id"] == layer["layer_id"])
-            rows = [{"repository": p["repository"], "lane": LANE,
-                     "adversarial_verification": {"survives": p["survives"], "votes": p["votes"]}}
-                    for p in out["lanes"]["lanes"][0]["proposals"] if p["layer"] == layer["layer_id"]]
-            section = sweep_common.MANIFEST_SECTION[catalog]
-            sections[section].append({"layer": layer["layer_id"], "candidates": rows,
-                                      ("components" if section == "foundation" else "entries"): []})
-        write_json(self.root / "catalogs/sota-convergence/manifest-20261026.json", {"checked_at": "2026-10-26", **sections})
+        if planned or catalog_layers:
+            self.assertEqual({x["layer_id"] for x in out["layers"]}, {*planned, *catalog_layers})
+            manifest = load_tool("build_manifest").build_manifest(
+                checked_at="2026-10-26", manifest_id="fixture", scope="fixture",
+                foundation_layers={"checked_at": "2026-10-26", "layers": [
+                    {"layer_id": layer_id, "title": layer_id.title(), "components": []}
+                    for layer_id in catalog_layers]},
+                trading_by_layer={"taxonomy": {}, "layers": {}},
+                freshness_doc={"count": 0, "generated_at": "2026-10-26T00:00:00+00:00", "repositories": {}},
+                lanes_doc=out["lanes"], reconciliations=[], taxonomy={})
+            write_json(self.root / "catalogs/sota-convergence/manifest-20261026.json", manifest)
+        else:
+            sections = {"foundation": [], "trading": []}
+            for layer in out["lanes"]["lanes"][0]["result"]["layers"]:
+                catalog = next(x["catalog"] for x in out["layers"] if x["layer_id"] == layer["layer_id"])
+                rows = [{"repository": p["repository"], "lane": LANE,
+                         "adversarial_verification": {"survives": p["survives"], "votes": p["votes"]}}
+                        for p in out["lanes"]["lanes"][0]["proposals"] if p["layer"] == layer["layer_id"]]
+                section = sweep_common.MANIFEST_SECTION[catalog]
+                sections[section].append({"layer": layer["layer_id"], "candidates": rows,
+                                          ("components" if section == "foundation" else "entries"): []})
+            write_json(self.root / "catalogs/sota-convergence/manifest-20261026.json",
+                       {"checked_at": "2026-10-26", **sections})
         reviews = []
         for survivor in out["survivors"]:
             name = survivor["repository"].rsplit("/", 2)[-2] + "-" + survivor["repository"].rsplit("/", 1)[-1]
@@ -5321,6 +5515,135 @@ class LedgerIntegrationTests(unittest.TestCase):
         record = ledger["sweeps"][0]
         self.assertEqual([layer["layer_id"] for layer in record["layers"]], ["alpha", "beta"])
         self.assertEqual(record["layers"][0]["requirement_sha256"], self.scope["requirement_sha256"]["foundation/alpha"])
+
+    def test_a_planned_layer_sweep_converts_appends_and_reads_as_no_winner(self):
+        # scripts/final_stack.py (test_a_completed_sweep_covering_a_planned_layer_is_no_winner) expects a completed
+        # sweep covering a planned layer to read as no-winner. Before planned layers were sweepable no tool could
+        # record one: saturation_ledger.py refused the layer ("is not a layer in ...research-state.json").
+        import final_stack
+        write_json(self.root / PLANNED_PATH, {"schema_version": 1, "layers": [
+            {"catalog": "foundation", "layer_id": "delta", "title": "Delta", "requirement": "delta req",
+             "acceptance": "delta acceptance", "source": {"record": "a dated ruling", "approved": "2026-10-13"}}]})
+        self.scope = sl.scope_hashes(self.root)
+        self.assertIn("foundation/delta", self.scope["requirement_sha256"])
+        D1, D2 = "https://github.com/o/delta-one", "https://github.com/o/delta-two"
+        delta = {"layer_id": "delta", "catalog": "foundation", "round": "first", "followup_reason": None,
+                 "claude_discover": discovery("delta", [D1]), "gpt6_discover": gpt6_entry(discovery("delta", [D2])),
+                 "merged": [merged_row(D1, ["claude"]), merged_row(D2, ["gpt6"])], "dropped": [],
+                 "facts": votes("delta", "facts", {D1: False, D2: False}),
+                 "fit_claude": votes("delta", "fit", {D1: False, D2: True}),
+                 "fit_gpt6": gpt6_entry(votes("delta", "fit", {D1: False, D2: False}))}
+        res = {"sweep": LANE, "first": [delta], "critic": {"followup_layers": [], "general": []},
+               "followups": [], "lost_first": []}
+        labels = [f"{role}:delta" for role in ("discover", "gpt6-discover", "refute-facts", "refute-fit",
+                                                "gpt6-refute-fit")] + ["critic"]
+        usage = usage_record.record(child_usage_raw("wf_fixture-1", labels), 0, "cmd", ROOT)
+        out, reviews = self.evidence(res, usage=usage, planned=("delta",))
+        # The production build_manifest.py output the record binds to: no foundation row, a lane_groupings row whose
+        # candidates are this lane's rows with their survival.
+        manifest = json.loads((self.root / "catalogs/sota-convergence/manifest-20261026.json").read_text())
+        grouping = manifest["lane_groupings"][0]
+        self.assertEqual((manifest["foundation"], grouping["layer"], grouping["lane"]), ([], "delta", LANE))
+        self.assertEqual([(row["repository"], row["lane"], row["adversarial_verification"]["survives"])
+                          for row in grouping["candidates"]], [(D1, LANE, True), (D2, LANE, False)])
+        empty = json.loads((self.root / sl.LEDGER).read_text())
+        self.assertEqual(final_stack.layer_status(any(("foundation", "delta") in sweep["covers"]
+                                                      for sweep in final_stack.completed_sweeps(empty)), None, {}),
+                         "unswept")
+        ledger = sl.append(self.root, empty, self.result(out, reviews))
+        self.assertEqual(sl.check_ledger(self.root, ledger), [])
+        record = ledger["sweeps"][0]["layers"][0]
+        self.assertEqual((record["catalog"], record["layer_id"], record["planned"]), ("foundation", "delta", True))
+        self.assertEqual(record["requirement_sha256"], self.scope["requirement_sha256"]["foundation/delta"])
+        self.assertEqual([entry["repo"] for entry in record["survived"]], [D1])
+        self.assertEqual(record["survived"][0]["source_review"], f"{self.base}/o-delta-one.json")
+        # The tool-produced ledger, read the way final_stack.py reads it: covered by a completed sweep, no verdict.
+        covering = [sweep for sweep in final_stack.completed_sweeps(ledger)
+                    if ("foundation", "delta") in sweep["covers"]]
+        self.assertEqual([sweep["sweep_id"] for sweep in covering], [LANE])
+        self.assertEqual(final_stack.layer_status(bool(covering), None, {}), "no-winner")
+
+    def plan_delta(self):
+        """The planned layer foundation/delta, with the scope frozen over it."""
+        write_json(self.root / PLANNED_PATH, {"schema_version": 1, "layers": [
+            {"catalog": "foundation", "layer_id": "delta", "title": "Delta", "requirement": "delta req",
+             "acceptance": "delta acceptance", "source": {"record": "a dated ruling", "approved": "2026-10-13"}}]})
+        self.scope = sl.scope_hashes(self.root)
+
+    @staticmethod
+    def empty_run(*layers, gpt6_discover=None):
+        """A completed run whose discovery proposes nothing in each (catalog, layer_id); every worker completed.
+        ``gpt6_discover`` replaces the GPT-6 discovery return of every layer (a failed job leaves it missing)."""
+        rounds = [{"layer_id": layer_id, "catalog": catalog, "round": "first", "followup_reason": None,
+                   "claude_discover": discovery(layer_id, []),
+                   "gpt6_discover": gpt6_discover or gpt6_entry(discovery(layer_id, [])),
+                   "merged": [], "dropped": [], "facts": votes(layer_id, "facts", {}),
+                   "fit_claude": votes(layer_id, "fit", {}), "fit_gpt6": gpt6_entry(votes(layer_id, "fit", {}))}
+                  for catalog, layer_id in layers]
+        labels = [f"{role}:{layer_id}" for _, layer_id in layers
+                  for role in ("discover", "gpt6-discover", "refute-facts", "refute-fit", "gpt6-refute-fit")]
+        usage = usage_record.record(child_usage_raw("wf_fixture-1", labels + ["critic"]), 0, "cmd", ROOT)
+        return ({"sweep": LANE, "first": rounds, "critic": {"followup_layers": [], "general": []}, "followups": [],
+                 "lost_first": []}, usage)
+
+    def appended_status(self, out, reviews, key):
+        """The ledger after appending this run's record, the derived state of ``key`` and its final_stack status."""
+        import final_stack
+        ledger = sl.append(self.root, json.loads((self.root / sl.LEDGER).read_text()), self.result(out, reviews))
+        self.assertEqual(sl.check_ledger(self.root, ledger), [])
+        covering = [sweep for sweep in final_stack.completed_sweeps(ledger) if key in sweep["covers"]]
+        return ledger, sl.derive(ledger)[key], final_stack.layer_status(bool(covering), None, {})
+
+    def test_a_planned_layer_whose_discovery_found_nothing_is_recorded_as_a_clean_sweep(self):
+        # Review of #1066 at 1765a420 (GPT P2, Claude N1): a completed planned-layer sweep with no proposal got no
+        # lane_groupings row from the production build_manifest.py, so --append refused the whole sweep record.
+        self.plan_delta()
+        res, usage = self.empty_run(("foundation", "delta"))
+        out, reviews = self.evidence(res, usage=usage, planned=("delta",))
+        self.assertEqual((out["layers"][0]["proposed"], out["returns"]["failures"]), ([], {}))
+        ledger, state, status = self.appended_status(out, reviews, ("foundation", "delta"))
+        record = ledger["sweeps"][0]["layers"][0]
+        self.assertEqual((record["planned"], record["proposed"], record["reopen"]), (True, [], []))
+        self.assertEqual((state["count"], state["reset"], status), (1, [], "no-winner"))
+        # The empty lane_groupings row the record binds to is the production manifest's record of the sweep.
+        manifest = json.loads((self.root / "catalogs/sota-convergence/manifest-20261026.json").read_text())
+        self.assertEqual(manifest["lane_groupings"], [{"layer": "delta", "lane": LANE, "selected": [],
+                                                       "alternatives_keep_but_compare": [], "candidates": [],
+                                                       "open_gaps": []}])
+
+    def test_a_planned_layer_whose_discovery_did_not_return_is_recorded_but_never_clean(self):
+        # The same review: the discovery_missing case (convert.py records the failure and a retained_failure reopen).
+        # The record appends, and the missing discovery resets the clean count instead of counting the sweep clean.
+        self.plan_delta()
+        res, usage = self.empty_run(("foundation", "delta"), gpt6_discover=gpt6_entry(None, "failed_exit_1"))
+        out, reviews = self.evidence(res, usage=usage, planned=("delta",))
+        self.assertEqual([failure["cause"] for failure in out["returns"]["failures"]["delta"]], ["discovery_missing"])
+        ledger, state, status = self.appended_status(out, reviews, ("foundation", "delta"))
+        self.assertEqual(ledger["sweeps"][0]["layers"][0]["planned"], True)
+        self.assertEqual((state["count"], status), (0, "no-winner"))
+        self.assertIn({"trigger": "retained_failure", "ref": f"{self.base}/returns.json#/failures/delta"},
+                      state["reset"])
+
+    def test_a_forged_planned_mark_on_a_swept_catalog_layer_has_no_lane_groupings_row(self):
+        # Guard (passes before and after the empty-grouping fix): the production manifest files a catalog layer under
+        # its section, never under lane_groupings, even when the layer is empty, so a hand-written planned: true on
+        # it is still refused.
+        res, usage = self.empty_run(("foundation", "gamma"))
+        out, reviews = self.evidence(res, usage=usage, catalog_layers=("gamma",))
+        manifest = json.loads((self.root / "catalogs/sota-convergence/manifest-20261026.json").read_text())
+        self.assertEqual(([row["layer"] for row in manifest["foundation"]], manifest["lane_groupings"]), (["gamma"], []))
+        ledger, state, status = self.appended_status(out, reviews, ("foundation", "gamma"))
+        gamma = ledger["sweeps"][0]["layers"][0]
+        self.assertNotIn("planned", gamma)
+        gamma["planned"] = True
+        previous = sl.genesis_sha256(ledger)
+        for record in ledger["sweeps"]:
+            record["prev_sha256"] = previous
+            previous = sl.record_sha256(record)
+        ledger["head_sha256"] = previous
+        errors = sl.check_ledger(self.root, ledger)
+        self.assertTrue(any("planned layer foundation/gamma has no lane_groupings row" in error for error in errors),
+                        errors)
 
     def test_the_ledger_rejects_a_vote_changed_after_conversion(self):
         out, reviews = self.evidence(synthetic_result())
