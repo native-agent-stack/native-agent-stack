@@ -19192,6 +19192,11 @@
       "bytes": 10680
     },
     {
+      "path": "docs/decisions/2026-10-15-unrun-registration-rules.md",
+      "sha256": "10c05e99847859f1c66ba5746ad5872a79ea6f7c115bfb243911d69e86d8f1a6",
+      "bytes": 9884
+    },
+    {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
       "sha256": "f646835af1648cfab7798f64626141c3964dfba4799d780dc728ea27f91f7f6c",
       "bytes": 15393
@@ -62038,8 +62043,8 @@
     },
     {
       "path": "scripts/component_matrix.py",
-      "sha256": "202d952952c361b7e17ee82740f7cd220e75cba2f3c7d9e82c433136d0fe0363",
-      "bytes": 80837
+      "sha256": "98f998864e9e9b12f354eb76efb1646a3c940bc4c2f2ba1c46736050b9936f37",
+      "bytes": 80924
     },
     {
       "path": "scripts/credential_boot_receipt.py",
@@ -62063,8 +62068,8 @@
     },
     {
       "path": "scripts/final_stack.py",
-      "sha256": "3ca3d089ee46a12f29f1e23ec63e145b45dde8e872bd565fb413ac868aa11398",
-      "bytes": 59235
+      "sha256": "80096cb19edde2a8ce658cdead076c97607e9f8e561d8a6bc4baacf7ad59fb0d",
+      "bytes": 59279
     },
     {
       "path": "scripts/freshness_propose.py",
@@ -62113,13 +62118,18 @@
     },
     {
       "path": "scripts/landscape.py",
-      "sha256": "d16b5625dd343972eb8efc508c8a642abf37cff8c39b3e22173d181f24a9c40e",
-      "bytes": 106393
+      "sha256": "8410c7c7184f770e1af255f3a7f7413de286deac9a1440150572884aabda39cc",
+      "bytes": 110592
     },
     {
       "path": "scripts/native_token_ci.py",
       "sha256": "fa83183c61407724083dfac2f5441859268a4de93663dae5d024eea7c733681d",
       "bytes": 117733
+    },
+    {
+      "path": "scripts/new_host_grand_list.py",
+      "sha256": "63203e77f7c37cbbe247dfba346bc238deaba0941fa2a736e5b4e8fea848de6d",
+      "bytes": 36907
     },
     {
       "path": "scripts/new_wsl_profile.py",
@@ -62218,8 +62228,8 @@
     },
     {
       "path": "scripts/validate_foundation.py",
-      "sha256": "8b21236a96c73a01d56de5a692e49a968bc79f8470ee476eac02f0a3c12cd4d2",
-      "bytes": 15403
+      "sha256": "f70d6f7db38a8ca9b35b068941a7e91cce114f08b0b11524d87349a355c72030",
+      "bytes": 17053
     },
     {
       "path": "scripts/validate_shard_weights.json",
@@ -63353,8 +63363,8 @@
     },
     {
       "path": "tests/test_layer_verdicts.py",
-      "sha256": "ee85d714bdd00edcc217e20441d0e59a2b3382c0533496428558d75b764c9267",
-      "bytes": 30275
+      "sha256": "7ef43644d36e2a685f56d7fcffeb5ecc0172bfabd151ef157de54b3a7395a013",
+      "bytes": 31532
     },
     {
       "path": "tests/test_lifecycle_capture.py",
@@ -63687,6 +63697,11 @@
       "bytes": 7047
     },
     {
+      "path": "tests/test_pending_catalog_registration.py",
+      "sha256": "d5714dd2a3c0df4ff30db8b767de004d151284bd68237af5871adb64b1d26865",
+      "bytes": 5648
+    },
+    {
       "path": "tests/test_pi_builder_output_budget.py",
       "sha256": "9f887c3788c4fe0a097a826e5367ba771718e425735df1b56f821da104b9dcdc",
       "bytes": 3086
@@ -63747,6 +63762,11 @@
       "bytes": 20781
     },
     {
+      "path": "tests/test_provenance_digest_custody.py",
+      "sha256": "655de5fd4d29768548b39f115052ede005624b76c48e426b641384c097f9fc51",
+      "bytes": 12597
+    },
+    {
       "path": "tests/test_public_starred.py",
       "sha256": "42f4bf432ea5c598d5215a5300d99deead51b6428909355735c56cdb302afdf3",
       "bytes": 34309
@@ -63765,6 +63785,16 @@
       "path": "tests/test_receipt_staleness.py",
       "sha256": "3bf62e631f72fc93740f4ebf361fd76d0da5c9b1743e7ba65542bea640e37fae",
       "bytes": 24084
+    },
+    {
+      "path": "tests/test_record_verdicts.py",
+      "sha256": "84ccf80829c182203ce4bacacc88b0442d7ad56f070cd459a66021b1ec8220c7",
+      "bytes": 164909
+    },
+    {
+      "path": "tests/test_registration_rules.py",
+      "sha256": "193acde5a952060f68a323c2b40b8876cd3a4c94dbca47f8425d775bf9c42f10",
+      "bytes": 12427
     },
     {
       "path": "tests/test_registry_rows.py",
@@ -64688,8 +64718,8 @@
     },
     {
       "path": "tools/sota-convergence/build_verdicts.py",
-      "sha256": "715c98a3ea23e71768326b19250cac5ce3e3bc1c568f540771ba64e45976a4ee",
-      "bytes": 27482
+      "sha256": "507b393aca9482ee5ccaa299f8e1770e11c3b5ddfd5e9e89dc93d66a7ce648f1",
+      "bytes": 27765
     },
     {
       "path": "tools/sota-convergence/codex_lane.py",
@@ -64875,6 +64905,11 @@
       "path": "tools/sota-convergence/reconciliations-20260922.json",
       "sha256": "a512097b7dc9b912e2e9efec0027f9d28cb9e836ee0c2d9ed93c97a81b9a1b5a",
       "bytes": 7097
+    },
+    {
+      "path": "tools/sota-convergence/record_verdicts.py",
+      "sha256": "38a9f25181667cf5a40620823d0ab02efb2144ed3ea22ba2b7b8516a7ee2c9a7",
+      "bytes": 94005
     },
     {
       "path": "tools/sota-convergence/schemas/compact-decision-start-closure-1.json",

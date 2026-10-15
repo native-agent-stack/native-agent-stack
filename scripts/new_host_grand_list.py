@@ -147,7 +147,17 @@ def validate_selected_manifest(relative: str, manifest: dict, matrix: dict) -> N
                     upstream = row.get("upstream") or {}
                     require(upstream.get("latest") is None or isinstance(upstream["latest"], str),
                             f"{label}.upstream.latest must be text or null")
-        expected = {row["layer_id"] for row in matrix["rows"] if row["catalog"] == catalog}
+        def unswept_registration(row):
+            convergence = row.get("convergence") or {}
+            return (row.get("registration_only") is True and row.get("verdict_status") == "pending_lanes"
+                    and row.get("independent_review") == "pending_lanes"
+                    and row.get("winners") == [] and row.get("alternatives") == []
+                    and row.get("adjudication_ref") is None and convergence.get("layer_state") == "pending_lanes"
+                    and convergence.get("manifest_layer_found") is False
+                    and convergence.get("winner_rows") == [] and convergence.get("recorded_winner_rows") == 0
+                    and convergence.get("in_use") == 0 and convergence.get("converged") == 0)
+        expected = {row["layer_id"] for row in matrix["rows"]
+                    if row["catalog"] == catalog and not unswept_registration(row)}
         require(expected <= present, f"{section} is missing report layers: {', '.join(sorted(expected - present))}")
 
 
@@ -306,6 +316,9 @@ def build() -> dict:
                          "compared with the newest one")
     validate_selected_manifest(manifest_path, manifest, matrix)
     mindex = manifest_index(manifest)
+    covered_layers = {(catalog, layer["layer"])
+                      for section, catalog in (("foundation", "foundation"), ("trading", "us-equities"))
+                      for layer in manifest.get(section, [])}
     pin_policy = sweep_pin_policy()
     adoption = load("adoption/manifest.json")
     profiles = profile_index(adoption)
@@ -357,7 +370,7 @@ def build() -> dict:
                 "why_selected": basis.get((row["catalog"], row["layer_id"], cid), {}).get("why_selected"),
                 "evidence_refs": basis.get((row["catalog"], row["layer_id"], cid), {}).get("evidence_refs", []),
             })
-        layers.append({
+        layer = {
             "catalog": row["catalog"],
             "layer_id": row["layer_id"],
             "title": row["title"],
@@ -367,7 +380,14 @@ def build() -> dict:
             "open_executable_now_gaps": row.get("open_executable_now_gaps"),
             "open_gaps": row.get("open_gaps"),
             "winners": winners,
-        })
+        }
+        if row.get("registration_only") is True:
+            covered = (row["catalog"], row["layer_id"]) in covered_layers
+            layer.update(registration_only=True, sweep_status="covered" if covered else "unswept",
+                         sweep_gap=("Covering sweep present; verdict lanes pending, no selected component."
+                                    if covered else
+                                    "Unrun scope registration; no covering sweep or selected component."))
+        layers.append(layer)
 
     hosts = build_hosts(hw)
 
@@ -554,7 +574,8 @@ def render_md(data: dict) -> str:
             for i, w in enumerate(layer["winners"] or [None]):
                 head = f"{md_cell(layer['title'])} | {md_cell(layer['decision'])}" if i == 0 else " | "
                 if w is None:
-                    lines.append(f"| {head} | — | — | — | — | — | — | {gap_cell(layer)} |")
+                    gap = md_cell(layer["sweep_gap"]) if layer.get("registration_only") else gap_cell(layer)
+                    lines.append(f"| {head} | — | — | — | — | — | — | {gap} |")
                     continue
                 pin = md_cell(w["pin"])
                 if w["pin_behind_upstream"] is True and w["upstream_latest"]:

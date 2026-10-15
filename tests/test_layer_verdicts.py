@@ -424,6 +424,24 @@ class WaveFreezeTests(LayerVerdictFixture):
         self.assertIn("us-equities/market-data-reference", output)
         self.assertIn("20260922", output)
 
+    def test_frozen_row_cannot_be_reclassified_as_an_unrun_registration(self):
+        self.two_waves()
+        path = "catalogs/landscape/us-equities.json"
+        trading = json.loads((self.root / path).read_text())
+        trading["layers"][0].update(
+            registration_only=True, verdict_status="pending_lanes", candidates=[], winners=[], alternatives=[],
+            lanes={"claude": {"run_id": "", "sealed_sha256": ""},
+                   "codex": {"run_id": "", "sealed_sha256": ""}, "agreement": "pending"},
+            open_gaps=["Attempt to erase a previously published verdict."])
+        self.write(path, trading)
+        before = {p: p.read_bytes() for p in (self.out_path(), self.later_out(),
+                   self.root / build_verdicts.WAVE_REGISTRY, self.root / "docs/grand-catalog-handbook.md")}
+        with self.assertRaisesRegex((ValueError, SystemExit), "registration_only.*registered wave.*20260922"):
+            build_verdicts.main(["--write", "--root", str(self.root)])
+        with self.assertRaisesRegex((ValueError, SystemExit), "registration_only.*registered wave.*20260922"):
+            build_verdicts.main(["--check", "--root", str(self.root)])
+        self.assertEqual({p: p.read_bytes() for p in before}, before)
+
     def test_frozen_row_comparison_is_type_strict(self):
         # A type-only rewrite (1 -> 1.0 or True) must not compare equal to the frozen entry.
         same_json = build_verdicts.__dict__["same_json"]
