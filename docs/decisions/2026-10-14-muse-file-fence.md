@@ -1,6 +1,7 @@
 # Native Muse Code file-access fence
 
-Status: ruled corrections implemented; CC Claude DELTA and GPT delta pending.
+Status: CC addendum-01 layout narrowing implemented, GPT verdict folded in;
+resulting-head CC DELTA and GPT fix5 delta pending.
 The single native reader smoke is a dated prior measurement. No default promotion.
 
 Muse Code 1.4.7's own shell sandbox permits filesystem reads outside a workspace,
@@ -92,12 +93,12 @@ reachable through a separate network service are outside this filesystem-only
 claim. No proxy credentials are inherited. The scope is an owner-approved reader
 smoke, not a hostile-code network qualification or builder/reviewer qualification.
 
-For shell-enabled builder/reviewer roles, linked Git worktrees (a `.git` file
-pointing outside the mounted tree), and symlinked Git metadata are refused
-before probe/log creation. Use a standalone checkout with local Git metadata
-for these roles. Reader remains allowed to consume a linked worktree's files;
-its shell tools are disabled and its common repository stays masked. This
-deliberate rejection avoids adding a grant for another repository's metadata.
+Every role, including reader, refuses pointer-file Git layouts and symlinked
+Git metadata before probe/log creation. Runs use their own clone with ordinary
+local `.git` directory metadata kept read-only. The fence contains no Git
+pointer-resolution path and makes no parity claim for pointer layouts.
+Linked worktrees are therefore outside accepted layouts. This implements
+`adjudication-pr1120-5cfb8346-20261015.addendum-01.md`, items1-3.
 
 Hooks/MCP/plugins are absent from immutable startup sources. The native echo
 probe demonstrates the planted extension sources do not start. This does not
@@ -233,7 +234,9 @@ describes defaults and the flat user settings layer. The regression exercises
 the real parser, OS probe and synthetic echo runtime, and confirms explicit
 invalid file choices still fail before any live execution.
 
-Shell-enabled roles reject linked Git worktrees before accepting a native argv.
+At the round-2 source state, shell-enabled roles rejected linked Git worktrees
+before accepting a native argv. This historical scope is superseded for every
+role by the addendum-01 decision above.
 Installed Git is `2.53.0`; upstream
 [`v2.53.0/Documentation/git-worktree.adoc`](https://github.com/git/git/blob/v2.53.0/Documentation/git-worktree.adoc),
 **DETAILS**, and
@@ -286,7 +289,7 @@ defines parent-death handling. CPython
 `Popen`, `wait`, `terminate` and `kill`, define the native interfaces used here.
 No custom filesystem or process supervisor is introduced.
 
-## CC upstream-parity completion
+## CC upstream-parity completion (historical, superseded by addendum-01)
 
 Authority: `adjudication-pr1120-5cfb8346-20261015.md`, items1-3 and loop stop;
 `GPT-VERDICT-5cfb83462.md`, blocker1. Implementation is confined to
@@ -308,3 +311,32 @@ included in the PR's own fixture style. Results are appended to
 Three GPT P3s are retained in the PR body Follow-ups. CC DELTA and GPT delta are
 required before any registry rebase. The sealed loop stop remains controlling;
 this record does not authorize another fix round or wider accepted layouts.
+
+## CC addendum-01: loop-stop layout decision
+
+The complete sealed addendum-01 was read and its fingerprint checked before
+work. Scope: `adjudication-pr1120-5cfb8346-20261015.addendum-01.md`, items1-4,
+and `MICRO-delta-d8afbf04.md`, P2-a. Isolation-class details remain there.
+The previous pointer-layout implementation is removed. No pointer file is
+read or resolved by the fence. Every role requires its own clone and refuses
+these layouts; ordinary directory metadata protection remains unchanged.
+
+`test_reader_git_pointer_refused` replaces the prior accepted-layout test.
+It fails against exact `d8afbf04` and passes with this decision. The ordinary
+directory, prior shell-role and artifact/lifetime controls remain green.
+Model-free tests do not qualify new live use. The full d8afbf04 GPT fix4 ACK
+and local review were read after the explicit co-op relay. Their in-scope
+disposition is included in this same commit; see
+`pr1120-d8afbf04/review_output.json`, finding1/location288-293, and
+`test_external_common_metadata_refused_for_every_role`. All accepted roles use
+their own clone; ordinary-directory metadata controls remain green.
+CC DELTA and GPT fix5 delta at max and fast are
+required on the resulting head. After those reads, findings below P1 route
+to Follow-ups under the sealed instruction. No rebase before both reads pass
+and the CC registry cue.
+
+`MICRO-delta-d8afbf04.md` P3-a/P3-b go to the PR body's Follow-ups. Removal of
+pointer layouts is the CC's disposition for the linked-worktree class. The
+ordinary-directory upstream source remains openai/codex `rust-v0.162.1`,
+`permissions.rs:2347-2367`; no pointer-layout equivalence is claimed.
+GPT fix4 FOLLOW-UPS1-3 are retained in the body. No other code scope is added.

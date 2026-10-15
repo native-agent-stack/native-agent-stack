@@ -32,7 +32,14 @@ HOST_ARTIFACT_NAMES = ('probe-echo.jsonl', 'probe-echo.stderr.log', 'fence-probe
 
 
 class UnsupportedGitWorktree(ValueError):
-    """A shell role would lose required Git metadata inside this fence."""
+    """The sealed CC loop stop requires a private clone for every role."""
+
+
+def require_own_clone(worktree):
+    # adjudication-pr1120-5cfb8346-20261015.addendum-01.md items 1-3.
+    git = worktree / '.git'
+    if git.is_file() or git.is_symlink() or (git / 'commondir').exists() or (git / 'commondir').is_symlink():
+        raise UnsupportedGitWorktree('linked Git worktrees refused; every role requires its own clone')
 
 
 def checked_path(value, *, directory=False):
@@ -77,12 +84,7 @@ def clean_env(home, logdir):
 
 def native_argv(lane, runtime, worktree, brief, logdir, role, steps):
     """Use the unchanged CC builder; never eval its shell-escaped dry-run."""
-    if role in ('builder', 'reviewer') and (
-            (worktree / '.git').is_file() or (worktree / '.git').is_symlink()):
-        # Git linked-worktree gitfiles point to common metadata outside this
-        # bind. Do not expose that repository or pretend Git inspection works.
-        raise UnsupportedGitWorktree(
-            'linked Git worktrees require reader role; shell roles need local Git metadata')
+    require_own_clone(worktree)
     env = clean_env(Path.home(), logdir)
     env.update(MUSE_BIN=str(runtime), MUSE_LANE_MODEL=MODEL,
                MUSE_LANE_MAX_MODEL_STEPS=str(steps))
@@ -168,6 +170,7 @@ class Fence:
     def __init__(self, worktree, brief, logdir, runtime, auth, settings=None, inputs=()):
         self.home = Path.home().resolve()
         self.worktree = checked_path(worktree, directory=True)
+        require_own_clone(self.worktree)
         self.brief = checked_path(brief)
         self.runtime = checked_path(runtime)
         # Metadata only: do not read/hash/copy auth, including in receipts.
@@ -203,28 +206,7 @@ class Fence:
 
     @contextlib.contextmanager
     def prepared(self):
-        # openai/codex rust-v0.162.1 permissions.rs:2360-2367,2573-2629.
-        # Resolve before any fenced execution; no new external grant is made.
-        git = self.worktree / '.git'
-        gitdir = None
-        if git.is_symlink():
-            raise ValueError('symlink Git metadata refused')
-        if git.is_file():
-            try:
-                prefix, raw = git.read_text().strip().split(':', 1)
-                if prefix.strip() != 'gitdir' or not raw.strip():
-                    raise ValueError('unresolved Git metadata')
-                target = Path(raw.strip())
-                if not target.is_absolute():
-                    target = git.parent / target
-                gitdir = target.resolve(strict=True)
-                if not gitdir.is_dir() or any(ord(c) < 32 for c in str(gitdir)):
-                    raise ValueError('unresolved Git metadata')
-            except (OSError, UnicodeError, RuntimeError) as exc:
-                raise ValueError('unresolved Git metadata') from exc
-            if any(gitdir == root or gitdir in root.parents
-                   for root in (self.worktree, self.logdir)):
-                raise ValueError('unsupported Git metadata overlap')
+        require_own_clone(self.worktree)
         # Host-only staging is outside every visible bind. No auth copy.
         with host_artifacts(self.logdir) as (self.artifacts, self.artifact_dirfd), \
                 tempfile.TemporaryDirectory(prefix="muse-fence-control-", dir="/var/tmp") as tmp:
@@ -244,9 +226,9 @@ class Fence:
             empty.mkdir()
             blank = stage / 'blank'
             blank.write_text('{}\n')
-            yield self.command(stage, home, empty, blank, gitdir)
+            yield self.command(stage, home, empty, blank)
 
-    def command(self, stage, home, empty, blank, gitdir):
+    def command(self, stage, home, empty, blank):
         # Empty root, rather than exposing host / and subtracting known secrets.
         args = ["bwrap", "--unshare-pid", "--unshare-ipc", "--unshare-uts",
                 "--die-with-parent", "--new-session", "--cap-drop", "ALL",
@@ -286,15 +268,6 @@ class Fence:
         if git.is_symlink():
             raise ValueError('symlink Git metadata refused')
         args += ['--ro-bind', str(git if git.exists() else empty), str(git)]
-        if gitdir is not None:
-            # Preserve existing visibility only. External targets stay absent;
-            # targets inside either writable bind receive a read-only overlay.
-            if any(root in gitdir.parents for root in (self.worktree, self.logdir)):
-                args += ['--ro-bind', str(gitdir), str(gitdir)]
-                temporary = self.logdir / 'tmp'
-                if gitdir == temporary or temporary in gitdir.parents:
-                    alias = Path('/tmp') / gitdir.relative_to(temporary)
-                    args += ['--ro-bind', str(gitdir), str(alias)]
         for name in HOST_ARTIFACT_NAMES:
             artifact = self.logdir / name
             args += ['--ro-bind', str(artifact), str(artifact)]
@@ -479,8 +452,8 @@ if __name__ == '__main__':
     try:
         raise SystemExit(main())
     except UnsupportedGitWorktree:
-        print('muse-file-fence: linked Git worktrees require reader role; '
-              'shell roles need local Git metadata', file=__import__('sys').stderr)
+        print('muse-file-fence: linked Git worktrees refused; every role requires its own clone',
+              file=__import__('sys').stderr)
         raise SystemExit(1)
     except (ValueError, OSError, subprocess.SubprocessError) as exc:
         # Do not serialize environment/config/payloads from exceptions.

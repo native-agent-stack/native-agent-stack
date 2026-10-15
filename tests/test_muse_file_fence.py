@@ -214,7 +214,7 @@ else:
 
     @unittest.skipUnless(os.environ.get('MUSE_FENCE_NATIVE_PROBE') == '1',
                          'explicit installed launcher model-free integration')
-    def test_linked_git_worktree_refused_for_shell_roles(self):
+    def test_linked_git_worktree_refused_for_every_role(self):
         common = self.root / 'common-repo'
         def git(*args):
             return subprocess.run(['git', *args], check=True, capture_output=True, text=True)
@@ -226,17 +226,11 @@ else:
         git('-C', str(common), 'worktree', 'add', '--quiet', '--detach', str(self.work))
         self.assertTrue((self.work / '.git').is_file())
         self.assertEqual(git('-C', str(self.work), 'diff', 'HEAD').returncode, 0)
-        # Keep the common repository masked: no metadata bind is introduced.
-        masked = self.run_fenced('import subprocess; assert subprocess.run('
-                                 + repr(['git', 'diff', 'HEAD']) + ').returncode == 128')
-        self.assertEqual(masked.returncode, 0, masked.stderr)
-        # The reader may use the tree as file inputs, but accepting shell roles
-        # would promise Git access that the hidden common metadata cannot give.
-        for role in ('reviewer', 'builder'):
+        for role in ('reviewer', 'builder', 'reader'):
             with self.subTest(role=role), self.assertRaisesRegex(ValueError, 'linked Git worktrees'):
                 native_argv(DEFAULT_LANE, self.runtime, self.work, self.brief, self.logs, role, 2)
-        self.assertIn('--disable-shell', native_argv(
-            DEFAULT_LANE, self.runtime, self.work, self.brief, self.logs, 'reader', 2))
+        with self.assertRaises(ValueError), self.fence.prepared():
+            self.fail('linked layout accepted by fence API')
 
     def run_model_free_probe(self):
         # Exercise the real OS payload; substitute only the final echo turn
@@ -413,28 +407,17 @@ for path in [root / '.git/config', root / '.git/fence-test-marker']:
 
     @unittest.skipUnless(os.environ.get('MUSE_FENCE_NATIVE_PROBE') == '1',
                          'explicit installed launcher model-free integration')
-    def test_reader_git_pointer_target_readonly(self):
-        """GPT-VERDICT-5cfb83462.md blocker 1, exercised through main()."""
+    def test_reader_git_pointer_refused(self):
+        """Sealed addendum-01 item 2; real CLI refusal before execution."""
         metadata = self.work / 'administration'
         subprocess.run(['git', 'init', '--quiet', '--separate-git-dir', str(metadata),
                         str(self.work)], check=True, capture_output=True)
-        original = (metadata / 'config').read_bytes()
         runtime = self.root / 'git-pointer-runtime'
         runtime.write_text('''#!/usr/bin/python3
 import json, sys
 from pathlib import Path
 if '--version' in sys.argv:
  print('Muse Code synthetic (1.4.7-R6101.1)'); raise SystemExit(0)
-if '--provider' not in sys.argv:
- root = Path(''' + repr(str(metadata)) + ''')
- for name in ['config', 'public-metadata-marker']:
-  try:
-   (root / name).write_text('public synthetic metadata fixture')
-  except OSError:
-   pass
-  else:
-   raise AssertionError('resolved Git metadata must be read-only')
- Path(''' + repr(str(self.work / 'ordinary-output')) + ''').write_text('allowed')
 print(json.dumps({'payload_type':'run.terminal.completed'}))
 ''')
         runtime.chmod(0o700)
@@ -447,12 +430,39 @@ print(json.dumps({'payload_type':'run.terminal.completed'}))
                         '--runtime', str(runtime), '--auth', str(self.auth),
                         '--settings', str(self.settings), '--role', 'reader',
                         str(self.work), str(self.brief), str(logs)]
-                with mock.patch('sys.argv', argv):
-                    self.assertEqual(main(), 0)
-                self.assertEqual((metadata / 'config').read_bytes(), original)
-                self.assertFalse((metadata / 'public-metadata-marker').exists())
-                self.assertEqual((self.work / 'ordinary-output').read_text(), 'allowed')
-                self.assertTrue(json.loads((logs / 'fence-probe.json').read_text())['pass'])
+                with mock.patch('sys.argv', argv), self.assertRaises(ValueError):
+                    main()
+                self.assertFalse(logs.exists(), 'layout refusal must precede run setup')
+
+    @unittest.skipUnless(os.environ.get('MUSE_FENCE_NATIVE_PROBE') == '1',
+                         'explicit installed launcher model-free integration')
+    def test_external_common_metadata_refused_for_every_role(self):
+        """Local pr1120-d8afbf04 review location 288-293, sealed scope."""
+        subprocess.run(['git', 'init', '--quiet', str(self.work)], check=True, capture_output=True)
+        common = self.work / 'common-administration'
+        shutil.copytree(self.work / '.git', common)
+        (self.work / '.git/commondir').write_text('../common-administration\n')
+        check = subprocess.run(['git', '-C', str(self.work), 'rev-parse', '--git-common-dir'],
+                               check=True, capture_output=True, text=True)
+        self.assertTrue(check.stdout.strip())
+        runtime = self.root / 'common-metadata-runtime'
+        runtime.write_text('''#!/usr/bin/python3
+import sys
+if '--version' in sys.argv:
+ print('Muse Code synthetic (1.4.7-R6101.1)')
+else:
+ print('{"payload_type":"run.terminal.completed"}')
+''')
+        runtime.chmod(0o700)
+        for role in ('reader', 'reviewer', 'builder'):
+            logs = self.root / ('common-metadata-logs-' + role)
+            argv = ['muse_file_fence.py', '--lane', str(DEFAULT_LANE), '--runtime', str(runtime),
+                    '--auth', str(self.auth), '--settings', str(self.settings), '--role', role,
+                    str(self.work), str(self.brief), str(logs)]
+            with self.subTest(role=role):
+                with mock.patch('sys.argv', argv), self.assertRaises(ValueError):
+                    main()
+                self.assertFalse(logs.exists(), 'layout refusal must precede run setup')
 
     @unittest.skipUnless(shutil.which('bwrap'), 'bubblewrap not installed')
     def test_unresolved_git_pointer_refused_before_execution(self):
@@ -461,32 +471,18 @@ print(json.dumps({'payload_type':'run.terminal.completed'}))
                 (self.work / '.git').write_text(content)
                 logs = self.root / ('invalid-pointer-logs-' + str(index))
                 logs.mkdir()
-                fence = Fence(self.work, self.brief, logs, self.runtime, self.auth, self.settings)
-                with self.assertRaises(ValueError), fence.prepared():
-                    self.fail('unresolved Git pointer accepted')
+                with self.assertRaises(ValueError):
+                    fence = Fence(self.work, self.brief, logs, self.runtime, self.auth, self.settings)
+                    with fence.prepared():
+                        self.fail('unresolved Git pointer accepted')
 
     @unittest.skipUnless(shutil.which('bwrap'), 'bubblewrap not installed')
-    def test_git_pointer_target_in_log_scratch_readonly(self):
+    def test_git_pointer_in_log_scratch_refused(self):
         metadata = self.logs / 'tmp/administration'
         subprocess.run(['git', 'init', '--quiet', '--separate-git-dir', str(metadata),
                         str(self.work)], check=True, capture_output=True)
-        original = (metadata / 'config').read_bytes()
-        script = f'''
-from pathlib import Path
-for root in [{str(metadata)!r}, '/tmp/administration']:
-    p = Path(root) / 'config'
-    assert p.read_bytes() == {original!r}
-    try:
-        p.write_text('public metadata fixture')
-    except OSError:
-        pass
-    else:
-        raise AssertionError('Git metadata must be read-only')
-Path({str(self.work / 'ordinary-output')!r}).write_text('allowed')
-'''
-        result = self.run_fenced(script)
-        self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual((metadata / 'config').read_bytes(), original)
+        with self.assertRaises(ValueError), self.fence.prepared():
+            self.fail('pointer layout accepted by fence API')
 
     @unittest.skipUnless(shutil.which('bwrap'), 'bubblewrap not installed')
     def test_bounded_run_timeout_returns_124(self):
