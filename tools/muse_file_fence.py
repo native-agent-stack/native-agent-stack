@@ -16,6 +16,7 @@ import json
 import os
 from pathlib import Path
 import shlex
+import stat
 import subprocess
 import tempfile
 
@@ -29,6 +30,56 @@ SYSTEM_FILES = ("/etc/resolv.conf", "/etc/hosts", "/etc/nsswitch.conf",
 PROJECT_MASKS = (".muse", ".mcp.json")
 HOST_ARTIFACT_NAMES = ('probe-echo.jsonl', 'probe-echo.stderr.log', 'fence-probe.json',
                        'muse-exec.jsonl', 'muse-exec.stderr.log', 'receipt.json')
+# Trusted policy, not supplied by a model or an arbitrary per-run allowlist.
+# CC ruling-f1-meta-fence-dirbind-20261015.md:9-15; bubblewrap v0.11.1 bwrap.xml.
+TOOLCHAIN_DIRECTORY_ALLOWLIST = frozenset({
+    Path.home() / '.local/share/mise/installs/go/1.25.12',
+})
+# These reserved store roots are an additional metadata-only refusal policy,
+# not a claim to recognize arbitrary secrets. Only the reviewed root above is
+# admitted; changing that inventory requires another reviewed policy change.
+TOOLCHAIN_STORE_NAMES = frozenset({
+    '.ssh', '.aws', '.azure', '.gnupg', '.kube', '.codex', '.claude', '.hcom',
+    '.config', '.local', '.cache', '.git', '.muse', '.mcp.json',
+    'sessions', 'state', 'auth.json', 'credentials', 'credentials.json',
+    '.netrc', '.npmrc', '.git-credentials',
+})
+
+
+class ToolchainDirectoryRefused(ValueError):
+    """A requested directory is outside the reviewed toolchain policy."""
+
+
+def require_toolchain_directory(path, home, private_files):
+    # CC ruling-f1-meta-fence-dirbind-20261015.md:9-15. Inspect components
+    # without resolving them; Codex rust-v0.162.1 bwrap.rs:1445-1485.
+    if path not in TOOLCHAIN_DIRECTORY_ALLOWLIST or '..' in path.parts:
+        raise ToolchainDirectoryRefused('toolchain directory refused')
+    for component in (*reversed(path.parents), path):
+        if component.is_symlink():
+            raise ToolchainDirectoryRefused('toolchain directory refused')
+    if not path.is_dir():
+        raise ToolchainDirectoryRefused('toolchain directory refused')
+    protected = [home / name for name in TOOLCHAIN_STORE_NAMES
+                 if name not in {'.local'}]
+    protected.append(home / '.local/state')
+    if (path.name.casefold() in TOOLCHAIN_STORE_NAMES
+            or any(part.casefold() in TOOLCHAIN_STORE_NAMES - {'.local'} for part in path.parts)
+            or any(not disjoint(path, store) for store in (*protected, *private_files))):
+        raise ToolchainDirectoryRefused('toolchain directory refused')
+    # Metadata only; do not follow links or open contents. Refuse the whole
+    # root on any unsupported entry rather than constructing a filtered tree.
+    pending = [path]
+    while pending:
+        with os.scandir(pending.pop()) as entries:
+            for entry in entries:
+                if entry.name.casefold() in TOOLCHAIN_STORE_NAMES:
+                    raise ToolchainDirectoryRefused('toolchain directory refused')
+                mode = entry.stat(follow_symlinks=False).st_mode
+                if stat.S_ISDIR(mode):
+                    pending.append(Path(entry.path))
+                elif not stat.S_ISREG(mode):
+                    raise ToolchainDirectoryRefused('toolchain directory refused')
 
 
 class UnsupportedGitWorktree(ValueError):
@@ -167,7 +218,8 @@ def run_bounded_fence(argv, *, stdout, stderr, timeout):
 
 
 class Fence:
-    def __init__(self, worktree, brief, logdir, runtime, auth, settings=None, inputs=()):
+    def __init__(self, worktree, brief, logdir, runtime, auth, settings=None, inputs=(),
+                 toolchain_dirs=()):
         self.home = Path.home().resolve()
         self.worktree = checked_path(worktree, directory=True)
         require_own_clone(self.worktree)
@@ -177,6 +229,7 @@ class Fence:
         self.auth = checked_path(auth)
         self.settings = checked_path(settings) if settings else None
         self.inputs = [checked_path(p) for p in inputs]
+        self.toolchain_dirs = list(dict.fromkeys(Path(p).absolute() for p in toolchain_dirs))
         self.logdir = Path(logdir).absolute()
         if self.logdir != self.logdir.resolve() or any(ord(c) < 32 for c in str(self.logdir)):
             raise ValueError("noncanonical log path")
@@ -203,10 +256,22 @@ class Fence:
                 raise ValueError("protected home input refused")
             if any(x in p.parts for x in PROJECT_MASKS):
                 raise ValueError("input would reopen project tool discovery")
+        self.require_toolchain_policy()
+
+    def require_toolchain_policy(self):
+        for path in self.toolchain_dirs:
+            require_toolchain_directory(path, self.home,
+                                        [p for p in (self.auth, self.settings) if p])
+            # Bidirectional source/target separation; bubblewrap v0.11.1
+            # bwrap.xml:251-259; Codex rust-v0.162.1 bwrap.rs:411-425.
+            if any(not disjoint(path, writable) for writable in
+                   (self.worktree, self.logdir, Path('/tmp'), Path('/proc'), Path('/dev'))):
+                raise ToolchainDirectoryRefused('toolchain directory refused')
 
     @contextlib.contextmanager
     def prepared(self):
         require_own_clone(self.worktree)
+        self.require_toolchain_policy()
         # Host-only staging is outside every visible bind. No auth copy.
         with host_artifacts(self.logdir) as (self.artifacts, self.artifact_dirfd), \
                 tempfile.TemporaryDirectory(prefix="muse-fence-control-", dir="/var/tmp") as tmp:
@@ -217,6 +282,9 @@ class Fence:
             config.write_text(json.dumps(sanitized_settings(self.settings)) + '\n')
             config.chmod(0o400)
             (home / '.config/muse/auth.json').touch(mode=0o400)
+            for path in self.toolchain_dirs:
+                if self.home in path.parents:
+                    (home / path.relative_to(self.home)).mkdir(parents=True, exist_ok=True)
             for path in (self.runtime, self.brief, *self.inputs):
                 if self.home in path.parents:
                     target = home / path.relative_to(self.home)
@@ -229,6 +297,7 @@ class Fence:
             yield self.command(stage, home, empty, blank)
 
     def command(self, stage, home, empty, blank):
+        self.require_toolchain_policy()
         # Empty root, rather than exposing host / and subtracting known secrets.
         args = ["bwrap", "--unshare-pid", "--unshare-ipc", "--unshare-uts",
                 "--die-with-parent", "--new-session", "--cap-drop", "ALL",
@@ -254,6 +323,8 @@ class Fence:
                  # Bind it before those overlays; a later symlink collides.
                  '--bind', str(self.logdir / 'tmp'), '/tmp']
         for path in dict.fromkeys([self.brief, *self.inputs]):
+            args += ['--ro-bind', str(path), str(path)]
+        for path in self.toolchain_dirs:
             args += ['--ro-bind', str(path), str(path)]
         for name in PROJECT_MASKS:
             path = self.worktree / name
@@ -342,6 +413,13 @@ for name, p in {{'brief': {str(fence.brief)!r}, 'runtime': {str(fence.runtime)!r
                  'settings': {str(fence.home/'.config/muse/settings.json')!r},
                  'sign-in': {str(fence.home/'.config/muse/auth.json')!r}}}.items():
     facts[name + '-ro'] = Path(p).is_file() and not os.access(p, os.W_OK)
+for p in {[str(p) for p in fence.toolchain_dirs]!r}:
+    try:
+        with tempfile.NamedTemporaryFile(dir=p, prefix='.muse-toolchain-ro-probe-'):
+            facts['toolchain-ro:' + p] = False
+    except OSError as exc:
+        import errno
+        facts['toolchain-ro:' + p] = Path(p).is_dir() and exc.errno in (errno.EROFS, errno.EACCES)
 facts['project-hooks-masked'] = not list(Path({str(fence.worktree/'.muse')!r}).iterdir())
 facts['project-config-ro'] = not os.access({str(fence.worktree/'.muse')!r}, os.W_OK)
 facts['git-metadata-ro'] = not os.access({str(fence.worktree/'.git')!r}, os.W_OK)
@@ -399,6 +477,8 @@ def main():
     parser.add_argument('--settings', type=Path,
                         help='explicit settings file (must exist); absent default uses inert defaults')
     parser.add_argument('--input', action='append', default=[], type=Path)
+    parser.add_argument('--toolchain-dir', action='append', default=[], type=Path,
+                        help='named read-only directory from the reviewed toolchain allowlist')
     parser.add_argument('--role', choices=['reader', 'reviewer', 'builder'], default='reader')
     parser.add_argument('--max-model-steps', type=int, default=2)
     parser.add_argument('--timeout', type=int, default=180)
@@ -417,7 +497,7 @@ def main():
         if default_settings.exists() or default_settings.is_symlink():
             settings = default_settings
     fence = Fence(options.worktree, options.brief, options.logdir, options.runtime,
-                  options.auth, settings, options.input)
+                  options.auth, settings, options.input, options.toolchain_dir)
     lane = checked_path(options.lane)
     lane_sha256 = hashlib.sha256(lane.read_bytes()).hexdigest()
     argv = native_argv(lane, fence.runtime, fence.worktree, fence.brief,
@@ -443,6 +523,7 @@ def main():
                        finished_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),
                        network='shared host network; no egress allowlist',
                        argv=argv, lane_sha256=lane_sha256)
+        receipt['toolchain_directories'] = [str(p) for p in fence.toolchain_dirs]
         write_json(fence.artifacts['receipt.json'], receipt)
     print(json.dumps({k: receipt[k] for k in ('exit_code', 'event_count', 'models', 'terminal_counts')}))
     return rc

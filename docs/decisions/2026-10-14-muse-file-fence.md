@@ -1,5 +1,9 @@
 # Native Muse Code file-access fence
 
+Directory-policy amendment: [2026-10-15 named toolchain grants](2026-10-15-muse-toolchain-directory-grants.md).
+Its explicit reviewed inventory supersedes the regular-file-only statement
+below for selected toolchain roots; dated prior measurements remain unchanged.
+
 Status: CC addendum-01 layout narrowing implemented, GPT verdict folded in;
 resulting-head CC DELTA and GPT fix5 delta pending.
 The single native reader smoke is a dated prior measurement. No default promotion.

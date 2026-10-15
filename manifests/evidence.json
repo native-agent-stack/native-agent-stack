@@ -19228,8 +19228,8 @@
     },
     {
       "path": "docs/decisions/2026-10-14-muse-file-fence.md",
-      "sha256": "ef5d8f35105989034cbe3e8e590011c27887ee94b99717de6c1cbcedcf85fafc",
-      "bytes": 21836
+      "sha256": "7fa2dc5e6c77473a55407d8d8ee77d5f8e114c525af751e6f37b1edcbd8e8370",
+      "bytes": 22103
     },
     {
       "path": "docs/decisions/2026-10-14-session-relaunch-after-wsl-restart.md",
@@ -19250,6 +19250,11 @@
       "path": "docs/decisions/2026-10-15-model-currency-landscape-check.md",
       "sha256": "2351ea7da59e6fc93556b4048efeec2be0288fa01bdbe36139c870d9b5a2e6ec",
       "bytes": 10680
+    },
+    {
+      "path": "docs/decisions/2026-10-15-muse-toolchain-directory-grants.md",
+      "sha256": "dbf4d10683700b5455de14e535abdfbc119e8a97b179563d8591cfc1575ec5f6",
+      "bytes": 4356
     },
     {
       "path": "docs/decisions/2026-10-15-unrun-registration-rules.md",
@@ -61557,6 +61562,11 @@
       "bytes": 4900
     },
     {
+      "path": "notes/muse-toolchain-directory-grants-20261015/controls.json",
+      "sha256": "2eabe024a485cbfff5f68841d6e7a8a2f6c5324a895c1fb398c1e8b7819db711",
+      "bytes": 1748
+    },
+    {
       "path": "notes/pi-builder-output-20261014/README.md",
       "sha256": "63e7cadf3792a6b3a39e7b3b15b58c2aceef504752e9dd3da314c447c66b66e5",
       "bytes": 4817
@@ -63722,6 +63732,11 @@
       "bytes": 33547
     },
     {
+      "path": "tests/test_muse_toolchain_dirs.py",
+      "sha256": "37ed35b0035545c4b1ef284ee1152c4706bacd969cdb6ad25a396d72c88e9ec0",
+      "bytes": 10422
+    },
+    {
       "path": "tests/test_nanosecond_replay.py",
       "sha256": "50c4be832b9b7fe1dadc196fcc6dcfa854267d2b1de89eec2c95fb6cc6776b48",
       "bytes": 6756
@@ -64818,8 +64833,8 @@
     },
     {
       "path": "tools/muse_file_fence.py",
-      "sha256": "eb353db4c3cba1d00179feaab61801588336f9124b07b756c8a93f33ef8b6132",
-      "bytes": 23790
+      "sha256": "d3a23639b61d409504088da0625e9fc721097aed78e881a6ffe06023c1922d11",
+      "bytes": 28268
     },
     {
       "path": "tools/omniroute/gateway_record.py",
