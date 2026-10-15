@@ -11467,6 +11467,41 @@
       "bytes": 21915
     },
     {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-15-mcp.install-check.sh.txt",
+      "sha256": "02f1443048ac7b1260114bf2f8a7442911d74388c54c56aab18b3ffd991fa47c",
+      "bytes": 3702
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-15-mcp.mcp-importers.py.txt",
+      "sha256": "85b4cef485c7af1eb0266a8352cb3b687e335d14b333f4174b0b1fa8b79af683",
+      "bytes": 3655
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-15-mcp.osv-after.ordinary.txt",
+      "sha256": "1e10ccbbb55cd30abf5901ef31094542a581b644be01d022efc9031f14b621d7",
+      "bytes": 6882
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-15-mcp.osv-before.ordinary.txt",
+      "sha256": "78d8225b40855fca2a69f2c38ae23197ca3822d1cb25e07dc348bf831c89d2ea",
+      "bytes": 7774
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-15-mcp.relock.sh.txt",
+      "sha256": "37b6dbe1054b2e411dcd8371c6a22e038226b6c38ba540eda22a159db566bdec",
+      "bytes": 4062
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-15-mcp.relock.txt",
+      "sha256": "3b11c09e53a87931a6f4fec6ccee9e9c8ac1e4b15a250c5f02ee2b1b4582be78",
+      "bytes": 4602
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-15-mcp.txt",
+      "sha256": "83d2698be5650e8ff050ada9e76a99d26511f29c6e045b01bdf2cf2af4e9fb6d",
+      "bytes": 28897
+    },
+    {
       "path": "blueprints/runtime-workers/openhands/evidence/repair-round-commands.json",
       "sha256": "89e32d55231db27386ed16dc077fa56dbd710c9c45f80433fa02c6b42e13b54e",
       "bytes": 24151
@@ -11643,7 +11678,7 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/pins.json",
-      "sha256": "ffc3000f7fb26bf601fc2ba7c291f52e5e57f88d2551681e182fe1ba700ac56a",
+      "sha256": "3612b4b74a139b08a37736feb672fc1957f4d028e23f94a7293815cddd29ffd3",
       "bytes": 4460
     },
     {
@@ -11663,13 +11698,13 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/requirements.lock",
-      "sha256": "32bc153428aaef2018adcdca53337e4a74b464ca94a96b9905e1bc6174503400",
+      "sha256": "a3303759da2895ecb87e0a9fa7e45878bb2588208615e6a6059704a98e71e396",
       "bytes": 106427
     },
     {
       "path": "blueprints/runtime-workers/openhands/research.md",
-      "sha256": "ba841b2f859bfa79b4df5000ed298436e03d7ceb7236f6eaff0acf818ccab4ea",
-      "bytes": 83150
+      "sha256": "10bc618a0d5793fb8f7f42d897aa23af88dda11cd0cc9a2fd689b36656bc4e54",
+      "bytes": 90828
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver.py",
@@ -60882,6 +60917,11 @@
       "bytes": 37224
     },
     {
+      "path": "evidence/receipts/osv-openhands-mcp-relock-20261015.json",
+      "sha256": "97433d5c7ecd5c3097ffd432ba8444ecb75d70372a2088f77b452b5187c6fbe4",
+      "bytes": 22568
+    },
+    {
       "path": "evidence/receipts/osv-openhands-oauthlib-relock-20261013.json",
       "sha256": "81df9998ee735fe1f139670940dfb7389355f7207818b857d1e307655b4ca6ed",
       "bytes": 19606
@@ -63853,8 +63893,8 @@
     },
     {
       "path": "tests/test_local_pages_policy_grants.py",
-      "sha256": "60488e1df995f0fef84869efae4c24e250248951c1825b8282946502ea9c2362",
-      "bytes": 27817
+      "sha256": "cb7f60e625f4746ddc5b03a3839ecf4b55050c1d07c79e06ad1ea2f2ed52c142",
+      "bytes": 28161
     },
     {
       "path": "tests/test_managed_block.py",
@@ -65053,8 +65093,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "e6c15cd535eacfae15a3c7d6684b41e15e6ec6f57c92eaddefc8ab85ffe3040f",
-      "bytes": 763761
+      "sha256": "c14f88d5e3ffed65da4450b69c232651a24edc08b4bc262b3f40506ad4be5c73",
+      "bytes": 763877
     },
     {
       "path": "tools/muse_file_fence.py",

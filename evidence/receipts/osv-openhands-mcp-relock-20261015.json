@@ -1,0 +1,321 @@
+{
+  "schema_version": 1,
+  "record": "OpenHands mcp 1.30.0 security relock, native integration receipt",
+  "purpose": "Clear GHSA-84m7-p3x7-pcfv (CVE-2026-59951) from the live OpenHands recipe lock by moving mcp 1.28.1 to 1.30.0, the lowest fixed release on the 1.x line, with the recipe's own paired uv relock; once OSV.dev carried the advisory (record modified 2026-10-15T20:30:08Z) the required osv-scanner check's scan step exits 1 on this lock",
+  "checked_commit": "5561321b43a419cfc7b2e854c345e944c88e4d37",
+  "also_checked": "a93ba0b8c289bbcc1ba43c8a044c0f50ffc32e52, main after #1178's squash merge; its tree (d8a46545ff414f5cd52830ee53217dae6b6c0e67) equals 5561321b's",
+  "observed_utc": "2026-10-15T20:55:51Z",
+  "observed_until_utc": "2026-10-15T21:39:30Z",
+  "authorization": "Command-center incident ruling of 2026-10-15: relock the OpenHands recipe lock through its own vendor lock path (the #1060 procedure) onto mcp 1.30.0, the lowest fixed 1.x release, moving only what the resolver requires, and stop and report if that needs a pinned SDK or another recipe pin to move. Later rulings the same day make this change the seed of a separate pull request in two local commits (20:58Z), add the fail-first run at main's a93ba0b8 and require pinned citations (21:18Z)",
+  "sources": [
+    "https://github.com/advisories/GHSA-84m7-p3x7-pcfv (gh api /advisories/GHSA-84m7-p3x7-pcfv, published 2026-10-15T20:13:13Z, updated 2026-10-15T20:13:14Z, read 2026-10-15T20:55:51Z)",
+    "https://github.com/modelcontextprotocol/python-sdk/security/advisories/GHSA-84m7-p3x7-pcfv (repository advisory, published and updated 2026-09-30T20:53:30Z, read 2026-10-15T21:20:33Z)",
+    "https://api.osv.dev/v1/vulns/GHSA-84m7-p3x7-pcfv (modified 2026-10-15T20:30:08.565001293Z, read 2026-10-15T20:58:09Z)",
+    "https://github.com/modelcontextprotocol/python-sdk/releases/tag/v1.30.0 (tag commit 8c2fa6eabacde869d75568e33b9d466b58c2f512, published 2026-09-07T14:03:59Z; release body lines 13-17, 33 and 38 name the fix)",
+    "https://github.com/modelcontextprotocol/python-sdk/pull/3426",
+    "https://github.com/modelcontextprotocol/python-sdk/pull/3395",
+    "https://github.com/modelcontextprotocol/python-sdk/commit/92120b4b0f50385af096592d7cee932fc1d994e7",
+    "https://github.com/modelcontextprotocol/python-sdk/commit/d2290ca3434731b68ea3e2270bc06a6e6575931b",
+    "https://github.com/modelcontextprotocol/python-sdk/blob/8c2fa6eabacde869d75568e33b9d466b58c2f512/src/mcp/server/streamable_http_manager.py#L42-L101",
+    "https://github.com/modelcontextprotocol/python-sdk/blob/777b8d06710c140e3606b0d4598e2aa48546c266/src/mcp/server/streamable_http_manager.py#L65-L74",
+    "https://pypi.org/pypi/mcp/1.30.0/json",
+    "https://pypi.org/pypi/mcp/1.28.1/json",
+    "https://pypi.org/pypi/fastmcp/3.2.0/json",
+    "https://pypi.org/pypi/browser-use/0.11.9/json",
+    "https://github.com/astral-sh/uv/blob/70fe1196a546e49148a73b1c592b2f74c33af80e/docs/concepts/projects/sync.md#L157-L182 (uv 0.12.22: uv lock --upgrade-package <package>==<version>)",
+    "https://github.com/astral-sh/uv/blob/70fe1196a546e49148a73b1c592b2f74c33af80e/docs/concepts/projects/sync.md#L35-L50 (uv lock --check)",
+    "https://github.com/astral-sh/uv/blob/70fe1196a546e49148a73b1c592b2f74c33af80e/docs/concepts/projects/export.md#L43-L55 (uv export --format requirements.txt)",
+    "https://github.com/astral-sh/uv/blob/70fe1196a546e49148a73b1c592b2f74c33af80e/docs/concepts/resolution.md#L142-L173 (environments), #L303-L309 (lockfile preferences), #L846-L852 (exclude-newer-package), #L891-L921 (a relative exclude-newer)",
+    "https://github.com/astral-sh/uv/blob/70fe1196a546e49148a73b1c592b2f74c33af80e/crates/uv-cli/src/lib.rs#L4102-L4110 (LockArgs --check), #L4157-L4158 (LockArgs flattens ResolverArgs), #L7506-L7509 (--upgrade-package), #L4757-L4764 (ExportArgs --format), #L4776-L4780 (--package), #L4811-L4813 (--no-annotate), #L4818-L4820 (--no-header), #L4900-L4913 (--no-emit-workspace), #L4982-L4986 (--frozen)",
+    "https://github.com/google/osv-scanner/releases/tag/v2.6.0",
+    "native-agent-stack@5561321b43a419cfc7b2e854c345e944c88e4d37:blueprints/runtime-workers/openhands/evidence/relock-2026-10-13-oauthlib.relock.sh.txt",
+    "native-agent-stack@5561321b43a419cfc7b2e854c345e944c88e4d37:.github/workflows/security-scan.yml:50-128"
+  ],
+  "lock": "blueprints/runtime-workers/openhands/requirements.lock",
+  "sha256_before": "32bc153428aaef2018adcdca53337e4a74b464ca94a96b9905e1bc6174503400",
+  "sha256": "a3303759da2895ecb87e0a9fa7e45878bb2588208615e6a6059704a98e71e396",
+  "moved_pins": [
+    {
+      "package": "mcp",
+      "before": "1.28.1",
+      "after": "1.30.0",
+      "reason": "First patched 1.x release for GHSA-84m7-p3x7-pcfv (CVE-2026-59951; affected >= 1.8.0, < 1.30.0 and >= 2.0.0, < 2.2.0), GitHub advisory record read 2026-10-15T20:55:51Z; the repository advisory and OSV.dev's record give the same two ranges. The resolver's own change list moves no other package"
+    }
+  ],
+  "reproduction": {
+    "evidence_class": "local_integration",
+    "uv_version": "0.12.22",
+    "uv_tag_commit": "70fe1196a546e49148a73b1c592b2f74c33af80e",
+    "sdk_source_archive_sha256": "2d3006de86eaec690a82e497fcd4459816637afe6e53f7da87783183792148a8",
+    "upstream_uv_lock_sha256": "d13a41b86c48e66e1719b19d8e2d3a315abfab87c257fb18881ce4e31075c910",
+    "command": "uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 --upgrade-package pyjwt==2.15.0 --upgrade-package urllib3==2.8.0 --upgrade-package litellm==1.93.2 --upgrade-package fsspec==2026.6.0 --upgrade-package multidict==6.9.1 --upgrade-package oauthlib==4.0.0 --upgrade-package mcp==1.30.0",
+    "export_command": "uv export --frozen --format requirements.txt --no-header --no-annotate --package openhands-tools --no-emit-workspace, then the pins.json wheel entries",
+    "flag_sources": "uv 0.12.22 docs/concepts/projects/sync.md:157-182 and :35-50, docs/concepts/projects/export.md:43-55, crates/uv-cli/src/lib.rs:4102-4110, 4157-4158, 7506-7509, 4757-4764, 4776-4780, 4811-4813, 4818-4820, 4900-4913 and 4982-4986 (sources above); the installed uv 0.12.22's uv lock --help and uv export --help list the same flags",
+    "workspace_edits": "The two resolution-only edits of the earlier relocks: environments = linux x86_64 in [tool.uv], and the litellm exclude-newer-package cap and pin; the workspace's exclude-newer = \"7 days\" applies (UV_NO_CONFIG unset)",
+    "resolver_exit": 0,
+    "lock_check_exit": 0,
+    "export_exit": 0,
+    "control_matches_before_bytes": true,
+    "uv_lock_diff": "the mcp package entry only: version, sdist and wheel lines",
+    "uv_change_list_delta": "Updated mcp v1.28.1 -> v1.30.0 is the only line the new run prints that the control does not",
+    "changed_package_blocks": [
+      "mcp"
+    ],
+    "export_diff_lines": "365-367",
+    "adopted_matches_native_export_exit": 0,
+    "adoption": "The new export, copied over requirements.lock; no line was edited by hand",
+    "other_exported_requirements_unchanged": true,
+    "sdk_build_lock_and_wheel_pins_unchanged": true,
+    "forced_changes": [],
+    "outputs": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-15-mcp.relock.sh.txt and .relock.txt"
+  },
+  "release_choice": {
+    "evidence_class": "source_review",
+    "version": "1.30.0",
+    "line": "1.x: 1.30.0 is the lowest fixed release there (1.29.0 and 1.29.1 are affected)",
+    "pypi_latest": "2.3.0",
+    "files": [
+      {
+        "filename": "mcp-1.30.0-py3-none-any.whl",
+        "sha256": "666edb5009503e1047c9d60346a756f94b261f05cc2625f23d41c728ffc484d0",
+        "uploaded": "2026-09-07T14:34:14.266679Z"
+      },
+      {
+        "filename": "mcp-1.30.0.tar.gz",
+        "sha256": "445414625fce5c295faa505bb11bacece661ab6f4028d57c935db57820b7a3e4",
+        "uploaded": "2026-09-07T14:34:15.845195Z"
+      }
+    ],
+    "exclude_newer": "Uploaded 2026-09-07, outside the workspace's 7-day exclude-newer window",
+    "requires_python": ">=3.10",
+    "requires_dist": "Identical to 1.28.1's list (anyio>=4.5, httpx-sse>=0.4, httpx<1.0.0,>=0.27.1, jsonschema>=4.20.0, pydantic-settings>=2.5.2, pydantic<3.0.0,>=2.11.0, pyjwt[crypto]>=2.10.1, python-multipart>=0.0.9, sse-starlette>=1.6.1, starlette>=0.27, typing-extensions>=4.9.0, typing-inspection>=0.4.1, uvicorn>=0.31.1, with the same markers and extras); the locked versions satisfy every entry",
+    "fix_surface": "python-sdk v1.30.0 (tag commit 8c2fa6eabacde869d75568e33b9d466b58c2f512) src/mcp/server/streamable_http_manager.py:42,45,99,101: DEFAULT_SESSION_IDLE_TIMEOUT = 30 * 60 and DEFAULT_MAX_SESSIONS = 10_000 become StreamableHTTPSessionManager's session_idle_timeout and max_sessions defaults. At v1.28.1 (tag commit 777b8d06710c140e3606b0d4598e2aa48546c266, the constructor at lines 65-74) session_idle_timeout defaults to None and max_sessions does not exist. Read by syntax tree from the two tags' files, not imported",
+    "fix_commits": "92120b4b0f50385af096592d7cee932fc1d994e7 (#3426, the 1.x backport) is one of the five commits from v1.29.1 to v1.30.0; d2290ca3434731b68ea3e2270bc06a6e6575931b (#3395) is in v2.1.1 to v2.2.0 (tag commit 9972c21aa42054fb1450c5fc614761ed11847ec6)",
+    "release_notes": "v1.30.0 body lines 13-17: idle Streamable HTTP sessions expire after 30 minutes with nothing in flight, at most 10 000 sessions, a 503 beyond, both off with None (#3426); line 33: the two FastMCP settings; line 38: the #3426 entry. The same body lists three other changes: a redirect is followed only within the MCP endpoint's origin by streamable_http_client and sse_client (#3448, lines 7-11), the OAuth client checks the authorization server's issuer (#3431, lines 19-22), and two new DeprecationWarnings (lines 24-27). v1.29.0 (tag commit 98b7159cb89274964055d2c016e3360a551280d0) and v1.29.1 (b22271305c59dfc7910f1493faea78cb1d396e48) add request body limits and fix tool-name validation, the FastMCP settings model and recursive output schemas",
+    "two_x_line": "2.2.0 also fixes the advisory, but fastmcp 3.2.0 requires mcp<2.0, so the 2.x line is outside the recipe's resolution"
+  },
+  "dependent_metadata": {
+    "evidence_class": "source_review",
+    "direct_dependents": [
+      {
+        "package": "fastmcp",
+        "version": "3.2.0",
+        "requirement": "mcp<2.0,>=1.24.0",
+        "fixed_version_permitted": true,
+        "source": "https://pypi.org/pypi/fastmcp/3.2.0/json and the new uv.lock"
+      },
+      {
+        "package": "browser-use",
+        "version": "0.11.9",
+        "requirement": "mcp>=1.10.1",
+        "fixed_version_permitted": true,
+        "source": "https://pypi.org/pypi/browser-use/0.11.9/json and the new uv.lock"
+      }
+    ],
+    "caps_below_fixed": [],
+    "workspace_declarations": "The SDK workspace at fcc102a declares no mcp requirement of its own; openhands-sdk requires fastmcp>=3.2.0,<4 (openhands-sdk/pyproject.toml:13)"
+  },
+  "hash_check": {
+    "evidence_class": "local_integration",
+    "script": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-05-fsspec.hash-check.py.txt (unchanged, argument mcp)",
+    "exit": 0,
+    "listed_hashes": 2,
+    "universal_wheel_and_sdist_verified": true,
+    "yanked": false,
+    "unlisted_supported_files": []
+  },
+  "install_check": {
+    "evidence_class": "local_integration",
+    "script": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-15-mcp.install-check.sh.txt",
+    "exit": 0,
+    "python": "3.13.16",
+    "isolated_environment": true,
+    "venv_exit": 0,
+    "hashed_build_install_exit": 0,
+    "hashed_runtime_install_exit": 0,
+    "uv_pip_check_exit": 0,
+    "active_packages_checked": 178,
+    "sdk_tool_import_exit": 0,
+    "mcp_import_exit": 0,
+    "session_manager_defaults": {
+      "session_idle_timeout": 1800,
+      "max_sessions": 10000
+    },
+    "fastmcp_client_smoke_exit": 0,
+    "fastmcp_client_smoke": "fastmcp 3.2.0 Client listed and called the one tool of an in-process FastMCP server over the in-memory transport (the installed wheel's fastmcp/client/transports/memory.py:14-23; add(2, 3) = 5); no network, no subprocess server",
+    "versions": {
+      "mcp": "1.30.0",
+      "fastmcp": "3.2.0",
+      "browser-use": "0.11.9",
+      "starlette": "1.3.1",
+      "sse-starlette": "3.0.2",
+      "uvicorn": "0.52.4",
+      "openhands-sdk": "1.49.6",
+      "openhands-tools": "1.49.6"
+    },
+    "limits": "Recipe install/import integration on the host network; no model request, image build or container acceptance"
+  },
+  "importer_review": {
+    "evidence_class": "source_review",
+    "script": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-15-mcp.mcp-importers.py.txt",
+    "py_files_searched_outside_mcp": 10873,
+    "importers": [
+      "browser_use",
+      "fastmcp",
+      "google",
+      "huggingface_hub",
+      "litellm",
+      "openhands"
+    ],
+    "openhands_imports": [
+      "mcp.client.auth.utils",
+      "mcp.shared._httpx_utils",
+      "mcp.types"
+    ],
+    "server_side_streamable_http": {
+      "fastmcp": "its own HTTP server (fastmcp/server/http.py builds a StreamableHTTPSessionManager), its event store and the FastMCP 1.x adapters",
+      "litellm": "the proxy's experimental MCP server (litellm/proxy/_experimental/mcp_server/server.py)"
+    },
+    "recipe_use": "Client only: the recipe's enabled MCP servers are stdio processes and its one HTTP entry, ai-memory, is disabled (config/mcp.template.json; host.py:361); the SDK's MCP code at fcc102a is client-side (openhands-sdk/openhands/sdk/mcp/client.py:1-8 on fastmcp's Client; the agent server's /mcp REST router, openhands-agent-server/openhands/agent_server/mcp_router.py:29-56, calls configured servers), and a search of the four SDK packages finds no MCP server-side HTTP import. The recipe runs neither a fastmcp HTTP server nor the LiteLLM proxy",
+    "limits": "Static text search of single-line import statements in the relocked venv; not a runtime trace. The relock follows the scan finding, not a reachability finding"
+  },
+  "osv_ingestion": {
+    "evidence_class": "native_proven",
+    "github_advisory": "published 2026-10-15T20:13:13Z, updated 20:13:14Z, not withdrawn; read with gh api /advisories/GHSA-84m7-p3x7-pcfv at 2026-10-15T20:55:51Z",
+    "repository_advisory": "modelcontextprotocol/python-sdk's own advisory, published 2026-09-30T20:53:30Z with the same ranges and patched versions",
+    "osv_record": "https://api.osv.dev/v1/vulns/GHSA-84m7-p3x7-pcfv read at 2026-10-15T20:58:09Z: published 2026-10-15T20:13:13Z, modified 2026-10-15T20:30:08.565001293Z, ECOSYSTEM ranges introduced 1.8.0 fixed 1.30.0 and introduced 2.0.0 fixed 2.2.0",
+    "osv_query": "https://api.osv.dev/v1/query at 2026-10-15T20:58:09Z: mcp 1.28.1 returns GHSA-84m7-p3x7-pcfv (alias CVE-2026-59951); mcp 1.30.0 returns no vulnerability",
+    "hosted_run_before_ingestion": "Run 38801792191 (Dependency and workflow security scan, pull_request, created 2026-10-15T20:25:15Z, head 5561321b), job 116652403677 osv-scanner: success, 20:25:18Z to 20:25:41Z, before OSV.dev modified its record; read with gh api at 2026-10-15T21:19:49Z",
+    "discriminating_evidence": "The local runs of the workflow's own scan step with the pinned OSV-Scanner after the record's modification: exit 1 with exactly this finding at 5561321b and at a93ba0b8, exit 0 on this change. The hosted pass at 5561321b predates the record and is no evidence either way",
+    "limits": "OSV.dev's ingestion time is inferred from the record's modified field; the hosted check was not re-run"
+  },
+  "osv": {
+    "evidence_class": "local_integration",
+    "version": "2.6.0",
+    "commit": "e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6",
+    "binary_sha256": "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108",
+    "installed_as": "A copy of a checksum-verified release download of osv-scanner_linux_amd64, checked again with the install step's sha256sum --check against OSV_SCANNER_SHA256 in its own RUNNER_TEMP",
+    "script": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-13-oauthlib.osv-scan-step.sh.txt (unchanged)",
+    "ordinary_inputs": 60,
+    "before": {
+      "tree": "5561321b43a419cfc7b2e854c345e944c88e4d37 (this worktree, clean)",
+      "started_utc": "2026-10-15T20:58:30Z",
+      "ended_utc": "2026-10-15T20:58:35Z",
+      "workflow_step_exit": 1,
+      "preflight": "Ran 23 tests, OK",
+      "ordinary_exit": 1,
+      "ordinary_packages": 1,
+      "ordinary_advisories": 1,
+      "findings": [
+        "GHSA-84m7-p3x7-pcfv, mcp 1.28.1, fixed 1.30.0, CVSS 7.5, blueprints/runtime-workers/openhands/requirements.lock"
+      ]
+    },
+    "before_main": {
+      "tree": "a93ba0b8c289bbcc1ba43c8a044c0f50ffc32e52 (a detached worktree under the task scratch, removed after the run)",
+      "started_utc": "2026-10-15T21:23:15Z",
+      "ended_utc": "2026-10-15T21:23:19Z",
+      "workflow_step_exit": 1,
+      "preflight": "Ran 23 tests, OK",
+      "ordinary_exit": 1,
+      "ordinary_packages": 1,
+      "ordinary_advisories": 1,
+      "findings": [
+        "GHSA-84m7-p3x7-pcfv, mcp 1.28.1, fixed 1.30.0, CVSS 7.5, blueprints/runtime-workers/openhands/requirements.lock"
+      ]
+    },
+    "after": {
+      "tree": "this change's tree before this receipt's result fields and the summary were written",
+      "started_utc": "2026-10-15T21:25:47Z",
+      "ended_utc": "2026-10-15T21:25:53Z",
+      "workflow_step_exit": 0,
+      "preflight": "Ran 23 tests, OK",
+      "ordinary_exit": 0,
+      "ordinary_packages": 0,
+      "ordinary_advisories": 0,
+      "result": "No issues found"
+    },
+    "single_lock": {
+      "command": "osv-scanner scan source --config .github/osv-scanner.toml --no-resolve --lockfile=requirements.txt:blueprints/runtime-workers/openhands/requirements.lock",
+      "before": {
+        "tree": "5561321b43a419cfc7b2e854c345e944c88e4d37",
+        "exit": 1,
+        "packages_scanned": 334,
+        "findings": [
+          "GHSA-84m7-p3x7-pcfv, mcp 1.28.1, fixed 1.30.0"
+        ]
+      },
+      "after": {
+        "tree": "this change",
+        "exit": 0,
+        "packages_scanned": 334,
+        "result": "No issues found"
+      }
+    },
+    "output_refs": {
+      "before": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-15-mcp.osv-before.ordinary.txt",
+      "after": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-15-mcp.osv-after.ordinary.txt",
+      "summary": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-15-mcp.txt",
+      "sanitization": "Only the scratch, checkout and home paths are replaced; native reports, arguments and partitions are preserved"
+    }
+  },
+  "tests": {
+    "evidence_class": "local_integration",
+    "timezone": "UTC",
+    "tree": "this change's final tree, except this tests block and the summary's section K, which record the run",
+    "earlier_run": "The same three groups on this change's tree before the summary, the after report, this receipt's result fields and the research.md citation edits, 2026-10-15T21:16:14Z to 21:22:41Z: 65, 950 (55 skipped) and 547 tests, all OK",
+    "zizmor": "1.30.1 on PATH, the version .github/requirements-ci.txt pins, so the push gate's real-zizmor test ran",
+    "groups": [
+      {
+        "modules": "tests.test_osv_lockfile_coverage tests.test_wsl_retrieval.RetiredRunnerTests",
+        "started_utc": "2026-10-15T21:32:48Z",
+        "ended_utc": "2026-10-15T21:32:55Z",
+        "ran": 65,
+        "skipped": 0,
+        "failures": 0,
+        "errors": 0,
+        "exit": 0
+      },
+      {
+        "modules": "the 16 tests/test_*.py modules that git grep -l -E 'runtime-workers/openhands|requirements\\.lock' -- tests names outside the local-pages set (among them tests.test_runtime_worker_openhands, its _resolver and _push_gate modules, tests.test_openhands_lock_binding and tests.test_receipt_sha256_key_custody), plus tests.test_provenance_digest_custody",
+        "started_utc": "2026-10-15T21:32:55Z",
+        "ended_utc": "2026-10-15T21:38:08Z",
+        "ran": 950,
+        "skipped": 55,
+        "failures": 0,
+        "errors": 0,
+        "exit": 0
+      },
+      {
+        "modules": "the 32 tests/test_local_pages*.py modules, tests.test_local_pages_policy_grants among them",
+        "started_utc": "2026-10-15T21:38:08Z",
+        "ended_utc": "2026-10-15T21:39:30Z",
+        "ran": 547,
+        "skipped": 0,
+        "failures": 0,
+        "errors": 0,
+        "exit": 0
+      }
+    ],
+    "recipe_cli_checks": "RESOLVER.md's python3 blueprints/runtime-workers/openhands/resolver.py --help and resolver.py run --help: exit 0 and 0",
+    "not_run": [
+      "run-e2e.sh and e2e/: a real attempt needs the installed prefix, the pinned images, the gateway and model calls; the coordinator runs it (README)",
+      "install.sh (host.py install): it installs into the host prefix and pulls the pinned images; the isolated install check above follows install-container.sh instead"
+    ]
+  },
+  "failed_attempts": [
+    {
+      "stage": "importer search, first run",
+      "cause": "The first version of the importer script flagged every module path containing streamable_http, so it counted client imports (mcp.client.streamable_http in fastmcp, huggingface_hub and litellm) as server side; the retained script separates client imports and flags only mcp.server.streamable_http, mcp.server.streamable_http_manager and mcp.server.fastmcp",
+      "adopted": false,
+      "exit": 0
+    }
+  ],
+  "not_covered": [
+    "The agent-server image's server binary, a PyInstaller build of upstream's unchanged uv.lock (sha256 d13a41b86c48e66e1719b19d8e2d3a315abfab87c257fb18881ce4e31075c910, mcp 1.28.1), and the grader venv keep their own locks; the inventory scans neither",
+    "No OpenHands task ran with the relocked venv; an installation that recorded the old lock digest must re-run install before the next run",
+    "OSV results hold for the scan time only: an advisory published later for any pinned package fails the required check again"
+  ],
+  "hosted_acceptance": "unobserved",
+  "cross_family_review": "None yet; this change is the seed of a separate pull request that the coordinator opens",
+  "overturn": "OSV lists an advisory for mcp 1.30.0 that only a later release fixes; an OpenHands run of the recipe fails with mcp 1.30.0 and passes with 1.28.1; a scanned lock pins mcp below 1.30.0 again (relock it; an ignore needs its own reachability review); or upstream's workspace publishes a lock with mcp 1.30.0 or later (the next relock follows that lock)"
+}
