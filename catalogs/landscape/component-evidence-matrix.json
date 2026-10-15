@@ -2999,6 +2999,52 @@
     },
     {
       "adjudication_ref": null,
+      "alternatives": [],
+      "catalog": "foundation",
+      "convergence": {
+        "all_rows": 0,
+        "components": [],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 0,
+            "true": 0,
+            "unknown": 0
+          },
+          "pin_current": {
+            "false": 0,
+            "true": 0,
+            "unknown": 0
+          },
+          "verdict_winner": {
+            "false": 0,
+            "true": 0,
+            "unknown": 0
+          }
+        },
+        "in_use": 0,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "pending_lanes",
+        "manifest_layer_found": false,
+        "recorded_winner_rows": 0,
+        "reopened_by": [],
+        "unresolved": [],
+        "verdict_checked_at": "2026-10-15",
+        "winner_rows": [],
+        "winners_without_manifest_row": []
+      },
+      "independent_review": "pending_lanes",
+      "layer_id": "model-routes",
+      "open_executable_now_gaps": null,
+      "open_gaps": null,
+      "registration_only": true,
+      "title": "Model routes",
+      "verdict_status": "pending_lanes",
+      "winners": []
+    },
+    {
+      "adjudication_ref": null,
       "alternatives": [
         {
           "disposition": "out_of_scope",
@@ -9280,7 +9326,7 @@
         "foundation": {
           "converged": 0,
           "in_use": 130,
-          "layers": 20,
+          "layers": 21,
           "share": 0.0,
           "unresolved": 0
         },
@@ -9350,7 +9396,7 @@
       "layer_states": {
         "confirmed_current": 0,
         "no_selection": 0,
-        "pending_lanes": 2,
+        "pending_lanes": 3,
         "recorded_reopened": 30
       },
       "manifest_layers_without_matrix_row": [],
@@ -9360,13 +9406,13 @@
         "path": "catalogs/sota-convergence/manifest-20261009.json"
       },
       "newest_verdict_checked_at": {
-        "foundation": "2026-09-22",
+        "foundation": "2026-10-15",
         "us-equities": "2026-09-22"
       },
       "overall": {
         "converged": 0,
         "in_use": 170,
-        "layers": 32,
+        "layers": 33,
         "share": 0.0,
         "unresolved": 0
       },
@@ -9853,6 +9899,11 @@
     },
     "needs_independent_review": [
       {
+        "catalog": "foundation",
+        "independent_review": "pending_lanes",
+        "layer_id": "model-routes"
+      },
+      {
         "catalog": "us-equities",
         "independent_review": "pending_lanes",
         "layer_id": "execution-broker"
@@ -9867,8 +9918,8 @@
       "alternatives": 183,
       "dual_lane_adjudicated": 10,
       "dual_lane_same_winner": 20,
-      "layers": 32,
-      "pending_lanes": 2,
+      "layers": 33,
+      "pending_lanes": 3,
       "single_lane": 0,
       "winners": 66
     }

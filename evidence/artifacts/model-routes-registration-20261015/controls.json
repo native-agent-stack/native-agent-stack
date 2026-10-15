@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "kind": "pending_scope_registration_controls",
+  "evidence_class": "local_integration",
+  "base": "8053f14e7e0817d2502dff2bb284bfb7e1b0152f",
+  "layer": "foundation/model-routes",
+  "registration_predecessor": "https://github.com/native-agent-stack/native-agent-stack/pull/1126",
+  "rules_pr": "https://github.com/native-agent-stack/native-agent-stack/pull/1130",
+  "before": {
+    "command": "python3 -m unittest tests.test_model_routes_registration",
+    "source": "Unchanged base catalog data with only the new regression module added",
+    "exit_code": 1,
+    "tests": 3,
+    "failures": 3,
+    "errors": 0,
+    "cause": "0 != 1: one explicit model-routes registration must be published",
+    "scope": "Behavioral failure on the absent catalog registration, not an import or fixture error"
+  },
+  "after": {
+    "command": "python3 -m unittest tests.test_model_routes_registration",
+    "exit_code": 0,
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "checks": [
+      "The real repository build_landscape join admits the exact pending-empty registration and scope sentence.",
+      "Removing registration_only refuses an empty verdict with the candidate diagnostic.",
+      "Adding a winner, sealed lane run or wave claim refuses the registration with the unrun-state diagnostic."
+    ]
+  },
+  "rules_suites": {
+    "command": "python3 -m unittest tests.test_registration_rules tests.test_pending_catalog_registration tests.test_layer_verdicts tests.test_record_verdicts tests.test_model_routes_registration",
+    "execution": "Native TestLoader/TextTestRunner, with fixture stdout/stderr captured only for output size",
+    "exit_code": 0,
+    "tests": 184,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "boundary": [
+    "Fixture mutations are in-memory reads; no published row or frozen evidence is mutated by a test.",
+    "No model request, account-state read, provider mutation, install, receipt registration or sweep dispatch occurs.",
+    "The separate single-family initial sweeps are later PRIOR evidence, never this registration's verdict or FINAL.",
+    "This is registration integrity evidence, not a route capability comparison or E2E adoption result."
+  ]
+}

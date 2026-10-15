@@ -17463,8 +17463,8 @@
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "5a72d2cd395bdef2dbc807e6172c9526256f2784aa0dcb7acbfcefeda4061f6f",
-      "bytes": 29964
+      "sha256": "a65ff96b1fc68448228d632fe1a32d3ffc91f31e5175f91b9e414c9a157c4cee",
+      "bytes": 31222
     },
     {
       "path": "catalogs/foundation/memory-rag-stacks-20261007.json",
@@ -17558,8 +17558,8 @@
     },
     {
       "path": "catalogs/landscape/candidate-quality-review.json",
-      "sha256": "dbb5de39e9f5af58c20e3b75b560386776a29a994207ebf73b499e22f7d46ed8",
-      "bytes": 152069
+      "sha256": "f4824f984ab11cd1e6db39c76327c728baadfa6ec7734c6fc69f3016bf5afc8e",
+      "bytes": 153764
     },
     {
       "path": "catalogs/landscape/claude-independent-discovery.json",
@@ -17568,18 +17568,18 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "095f424be1ad5f1ce539d31531575b1e37e072b2aed983e566c4c2f8e50ee410",
-      "bytes": 315354
+      "sha256": "44aea7a4d584e5b8404a54160d7a558900bde8b9664e708cecdc74c45916fba4",
+      "bytes": 316714
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "e482c30346bbe97fc06a8909a43e86d8d69a93983a443747f92ad7d3d8b9d46d",
-      "bytes": 338896
+      "sha256": "21c96cce64aa1adb5f469399bb98ab444a0fad97c889974b3225d0545caa9159",
+      "bytes": 339674
     },
     {
       "path": "catalogs/landscape/foundation.json",
-      "sha256": "55751afc9a6e3d2dd814d5ba35d811ea9424464ccc417234b8cb6d08864e48b8",
-      "bytes": 480209
+      "sha256": "ec11654a07714b213bea96e4ea5b8797fed0d1ba6cedef91c0b34777ad92514d",
+      "bytes": 483512
     },
     {
       "path": "catalogs/landscape/gap-closeouts/README.md",
@@ -17658,8 +17658,8 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "ef738033f69e8785cf14172e0b34d477b34d77710e38702614adef1863b4e1c7",
-      "bytes": 287964
+      "sha256": "bfe2a7d1098329e5975fe6062897ad986d038a8cc3030f15d84198c1bdba9219",
+      "bytes": 288437
     },
     {
       "path": "catalogs/landscape/planned-layers.json",
@@ -17668,8 +17668,8 @@
     },
     {
       "path": "catalogs/landscape/research-state.json",
-      "sha256": "fe142c1b8b8ec8b92d69ec5971d68028225899c101ffc43cea618883b119332a",
-      "bytes": 21449
+      "sha256": "a92df44cdc55cdb4311f761b25b26ae035f1fe515c093bcd5daf9928c669e340",
+      "bytes": 22144
     },
     {
       "path": "catalogs/landscape/skills-lifecycle.json",
@@ -18203,8 +18203,8 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "44b800aaf8f418defafb186ffeee24a099a72fb7020c9605f01ebc02d6214b5b",
-      "bytes": 33110
+      "sha256": "ea3d7b4600b46c67365294893e5e70e3f4952db7a922c73756817df0a109f485",
+      "bytes": 33339
     },
     {
       "path": "docs/contributing-evidence.md",
@@ -19292,6 +19292,11 @@
       "bytes": 10680
     },
     {
+      "path": "docs/decisions/2026-10-15-model-routes-catalog-registration.md",
+      "sha256": "3b430f04886df830bfc673be885d927072e6f9aaa0558901ad7c2749beb4acab",
+      "bytes": 7746
+    },
+    {
       "path": "docs/decisions/2026-10-15-muse-toolchain-directory-grants.md",
       "sha256": "dbf4d10683700b5455de14e535abdfbc119e8a97b179563d8591cfc1575ec5f6",
       "bytes": 4356
@@ -19658,8 +19663,8 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "c70da6919c046d5e9c3b697255b5450e7a6018cabc47a84decfea401d70f78ff",
-      "bytes": 19134
+      "sha256": "80f2f1da652996bd61916d1267e898101304f2a16cdc4f1951d4d194dab701b1",
+      "bytes": 19275
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
@@ -41440,6 +41445,11 @@
       "path": "evidence/artifacts/model-landscape-check-20261014/receipt.json",
       "sha256": "073e9bcfca252553e5df59ee671d71e6b0518393beb6ac628aec0b1e982b6249",
       "bytes": 3552
+    },
+    {
+      "path": "evidence/artifacts/model-routes-registration-20261015/controls.json",
+      "sha256": "9419ec60a31825d94f15b47a671aea5e6eb23c216511c6447588ac0c9a40f8ec",
+      "bytes": 2227
     },
     {
       "path": "evidence/artifacts/native-claude-coop-20260921/loki-discovery.json",
@@ -63895,6 +63905,11 @@
       "path": "tests/test_model_currency_propose.py",
       "sha256": "8695d7b69652cef3eca20369eac5c4dd1de60ec1f91f78353dcaa7fdf0a2efc6",
       "bytes": 17767
+    },
+    {
+      "path": "tests/test_model_routes_registration.py",
+      "sha256": "5179fe3fbabfe062871b87334d12b3a2db8054c1b40628673e68d4a1c13b18f2",
+      "bytes": 2973
     },
     {
       "path": "tests/test_mover_coverage_asof.py",
