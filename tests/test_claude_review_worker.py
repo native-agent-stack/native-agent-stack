@@ -644,6 +644,34 @@ class ReviewRunTest(unittest.TestCase):
         self.assertEqual((h.launcher.calls, h.rows()), ([], []))
         self.assertTrue(any("no longer matches its sha256 pin" in line for line in h.logs), h.logs)
 
+    def test_a_replacement_keeping_size_and_mtime_is_caught_by_a_fresh_hash(self):
+        # GPT read of #1127 fix1 at 795232e7 (P2): the identity cache keys on (path, size, mtime_ns), and a copy can
+        # keep both (python/cpython@cbc944f4 v3.13.16 Lib/shutil.py:348,385 copies nanosecond timestamps). The run
+        # hashes the file afresh, so a replacement after an earlier review warmed the cache starts nothing.
+        h = Harness(self)
+        repo, shas = h.repo("o/priv", heads={1: {"src/a.py": "a = 1\n"}, 2: {"src/b.py": "b = 2\n"}})
+        h.pulls("o/priv", [pull("o/priv", 1, shas[1], updated="2026-10-09T02:00:00Z"),
+                           pull("o/priv", 2, shas[2], updated="2026-10-09T01:00:00Z")])
+        h.queue([run_of(PASS_REPORT, cost=1.0)] * 2)
+        worker = h.worker([repo])
+        worker.settings = dataclasses.replace(worker.settings, claude_sha256=crw.sha256_file(h.claude))
+        run_keys, runs = worker.run_keys, []
+
+        def replace_before_the_second(*args, **kwargs):
+            runs.append(1)
+            if len(runs) == 2:
+                info, data = h.claude.stat(), h.claude.read_bytes()
+                h.claude.write_bytes(data[:-1] + (b" " if data[-1:] != b" " else b"\n"))  # same size, other bytes
+                os.utime(h.claude, ns=(info.st_atime_ns, info.st_mtime_ns))
+                self.assertEqual((h.claude.stat().st_size, h.claude.stat().st_mtime_ns), (info.st_size, info.st_mtime_ns))
+            return run_keys(*args, **kwargs)
+
+        worker.run_keys = replace_before_the_second
+        worker.tick()
+        self.assertEqual(len(runs), 2)
+        self.assertEqual((len(h.launcher.calls), [r["kind"] for r in h.rows()]), (1, ["debit", "settle"]))
+        self.assertTrue(any("no longer matches its sha256 pin" in line for line in h.logs), h.logs)
+
     def test_a_private_repository_gets_the_status_and_one_sanitized_comment(self):
         h = Harness(self)
         repo, sha = self.private(h)

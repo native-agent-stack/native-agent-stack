@@ -1957,11 +1957,13 @@ class Worker:
                 self.usable[key] = False
         return self.usable[key]
 
-    def binary_identity(self) -> dict:
+    def binary_identity(self, *, fresh: bool = False) -> dict:
+        """The client binary's sha256 and name. Cached by (path, size, mtime_ns) for reporting; ``fresh`` hashes the
+        file again, since a replacement can keep its size and mtime (shutil.copystat copies nanosecond timestamps)."""
         path = self.settings.claude_bin
         info = path.stat()
         key = (str(path), info.st_size, info.st_mtime_ns)
-        if self.binary.get("key") != key:
+        if fresh or self.binary.get("key") != key:
             self.binary = {"key": key, "sha256": sha256_file(path), "name": path.name}
         return {"sha256": self.binary["sha256"], "name": self.binary["name"]}
 
@@ -2051,7 +2053,12 @@ class Worker:
         no silent retry."""
         launcher = launcher or self.launcher
         label = f"{candidate.repo.name}#{candidate.pr}@{candidate.sha[:12]}"
-        binary = self.binary_identity()
+        try:
+            binary = self.binary_identity(fresh=True)  # every run hashes the file it is about to start
+        except OSError:
+            self.log(f"{label}: CLAUDE_BIN could not be read for its sha256 check; nothing runs")
+            return {"tries": [], "numbers": None, "stop": "no_stream",
+                    "unmet": ["the client binary could not be read for its sha256 check; no review ran"]}
         if self.settings.claude_sha256 and binary["sha256"] != self.settings.claude_sha256:
             # Replaced after the tick's check: nothing is debited or started (no_stream: not counted, the tick stops).
             self.log(f"{label}: CLAUDE_BIN no longer matches its sha256 pin (now {binary['sha256'][:12]}...); nothing runs")
