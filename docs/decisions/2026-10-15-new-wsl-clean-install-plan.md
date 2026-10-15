@@ -23,9 +23,18 @@ The owner's directions of 2026-10-15, paraphrased:
   paper lanes. LEAN may be used, paid if needed, where the evidence shows it fits.
 - **18:19Z, to this lane:** fully designed harness frameworks such as superpowers should power OpenCode, Pi and the other
   workers cleanly. The new WSL should carry the ecosystem's full clean stack.
+- **18:22Z, to the CC:** the distribution's name (`NativeHorizonNY`), New York as its native time zone, and every layer
+  of the two catalogs resolved, with no subset.
+- **19:12Z, to the CC:** the harness comes first. The new distribution must not become a second trading system that
+  cannot react fast or use its portfolio.
+  - It needs the current converged practice in every layer: context engineering for each agent, sessions that launch
+    seamlessly, the god view, the resolution practice, the CC practice with its evidence, the compounding manifest,
+    GitHub automation and the current models.
+  - The owner wants to see the installed skills of every agent and runtime worker.
+- **19:19Z-19:20Z, to the CC:** superpowers goes into Pi, OpenCode and the other harnesses as runtime workers.
 
-The CC recorded these in its direction record of 2026-10-15T18:09Z and its handover set of the same day (private
-records, cited by name only).
+The CC recorded these in its direction records of 2026-10-15 (18:09Z and 19:12Z, each with its addenda) and its
+handover set of the same day. These are private records, cited by name only.
 
 | Role | Owner of it |
 | --- | --- |
@@ -65,7 +74,9 @@ Per [the protocol](2026-10-11-layer-resolution-protocol.md), steps 1 to 3, at `o
 ## Every layer
 
 Every layer of `catalogs/landscape/final-stack.json` at `8053f14e7`: the 20 foundation and 12 trading layers of the two
-catalogs, plus `foundation/model-routes`, `us-equities/catalysts-sentiment` and `us-equities/judgment-features`. No subset.
+catalogs, plus `foundation/model-routes`, `us-equities/catalysts-sentiment` and `us-equities/judgment-features` (the
+table below). The file also holds 13 skills layers (`coverage.skills`; `summary.skills_layers` 13, `skills_swept` 0),
+listed after the table. No subset.
 
 - None is FINAL.
 - Each row's next action is the protocol's delta for that layer: adjudicate its carried survivors, close its FINAL
@@ -112,8 +123,37 @@ catalogs, plus `foundation/model-routes`, `us-equities/catalysts-sentiment` and 
 | `us-equities/security-supply-chain` | reopened | grype, syft, gitleaks | 7 | 16 | adjudicate 7 carried survivors; run pins for 1 drifted winner (F1); E2E and invoke evidence (FINAL 3-4) |
 | `us-equities/storage-compute` | reopened | data-duckdb | 1 | 11 | adjudicate 1 carried survivor; E2E and invoke evidence (FINAL 3-4) |
 
+**The 13 skills layers, all unswept:** `skills-agent-docs`, `skills-architecture`, `skills-browser`, `skills-ci-pr`,
+`skills-debug`, `skills-design-intake`, `skills-implement`, `skills-mcp-build`, `skills-research`, `skills-review`,
+`skills-security`, `skills-skill-lifecycle` and `skills-test`. Each is a GAP: its next action is an initial sweep scoped
+to its lifecycle task.
+
 The install plan installs each layer's current winners, as the plan's rows record them. A layer's next action changes
 what the new distribution installs only when its result lands.
+
+### Wave order (the owner's 19:12Z direction: the harness first)
+
+- **T1, together:**
+  - the trading-critical layers: `us-equities/execution-broker` and `backtesting-engine`, whose engine comparison
+    decides;
+  - the harness layers of the owner's areas below: `token-efficiency`, `durable-memory`, `code-navigation`,
+    `semantic-rag`, `document-retrieval`, `instructions-skills`, `native-clients`, `workers`, `isolation`,
+    `observation-inference`, `git-github-automation`, `ci-supply-chain`, `model-routes` and `agent-sdks`.
+- **T2:** `us-equities/market-data-reference`.
+- **T3:** every other layer, and the 13 skills layers.
+
+### The owner's areas, mapped to layers and plan rows
+
+| Owner's area | Catalog layers and records | Plan row |
+| --- | --- | --- |
+| Context engineering | token-efficiency, durable-memory, code-navigation, semantic-rag, document-retrieval, instructions-skills | Decisions 2 (stage C rows) and 6 |
+| Seamless launch | native-clients, workers, isolation; the session relaunch (#1116 and its follow-ups) | Decision 8 (re-pin); the session relaunch has **no plan row yet**: a gap for stage F |
+| God view | observation-inference, the session monitor | boundary condition 3; the observability rows wait for stage S |
+| Resolution practice | `docs/decisions/2026-10-11-layer-resolution-protocol.md` | this record's inputs and wave order |
+| CC practice and evidence | the claude-native-practice skill and its re-pin | Decision 8 |
+| Compounding manifest | the `final-stack.json` generator, the evidence manifests | the lineage-gap check (Decision 2); the generated status page (#1175) |
+| GitHub automation | git-github-automation, ci-supply-chain | stage C rows (worktrunk, gh, difftastic, zizmor, syft, actionlint) |
+| Models | model-routes (GAP, unswept), agent-sdks; Muse, OpenAI through OmniRoute, the Anthropic API | Decision 5; the `gpt-gateway` row (Decision 3); F5 sweeps model-routes |
 
 ## Decision 1: the base is the repository's new-WSL path; the 10-07 kit is superseded as an installer base
 
@@ -145,10 +185,10 @@ what the new distribution installs only when its result lands.
 | --- | --- | --- | --- |
 | R. Rehearsal | recipe R1 on a throwaway name, P1-P3, W1-W7 and F1-F3, then its removal | R1's proofs; the interop check after `--unregister` | the host isolation rules below |
 | A. Windows side and first boot | recipe P1-P3, W1-W7 and F1-F8 for the real name; `adoption/templates/wsl/` | the recipe's proofs and the stage-1 receipt | R removed with every proof held |
-| C. Stage 2: the install plan, the clients first (`install.sh` installs Claude Code and Codex by their native installers before the other rows) | recipe F9; `evidence/artifacts/new-wsl-install-plan-20261002/` (`install.sh`, `accept.sh`) | `check_plan.py`; the post-install stage of `accept.sh` | the CPU and memory caps below; F1's run pins as they land |
-| D. Client configuration | recipe F9: `tools/adoption/new_wsl_client_config.py --apply --host <host>` | `--check`; the apply receipt | the template-behind rows of the [reconciliation record](2026-10-15-claude-host-config-reconciliation.md) |
-| E. Sign-ins | recipe F9: `codex login`, then `claude`, by hand | the after-sign-in stage of `accept.sh` | the owner: credentials and sign-ins are the owner's |
-| S. Services | the plan's service-health stage | `accept.sh --stage service_health` | the per-row port gap below, closed |
+| C. Stage 2: the install plan, the clients first (`install.sh` installs Claude Code and Codex by their native installers before the other rows) | recipe F9; `evidence/artifacts/new-wsl-install-plan-20261002/` (`install.sh`, `accept.sh`) | `check_plan.py`; the post-install stage of `accept.sh` | the slice caps below; a no-start install path in the living plan (below); the gateway's composition tarball (below); F1's run pins as they land |
+| D. Client configuration | recipe F9: `tools/adoption/new_wsl_client_config.py --apply --host <host>` | `--check`; the apply receipt | the template-behind rows of the [reconciliation record](2026-10-15-claude-host-config-reconciliation.md); the memory-owner row (its executable); the per-row port change (the collector port, Decision 3) |
+| E. Sign-ins | recipe F9: `codex login`, then `claude`, by hand | the after-sign-in checks of `accept.sh` that need no service | the owner: credentials and sign-ins are the owner's |
+| S. Services | the plan's service-health stage, then the after-sign-in checks that need a service | `accept.sh --stage service_health`; `accept.sh --only <slot> --stage after_sign_in` for the eight rows whose check needs `omniroute.service` (mcp-inspector, grafana, inspect-ai, promptfoo, cross-family-review, gpt-gateway, agent-runtime-worker, lm-program-optimization) | the per-row port gap below, closed |
 | F. Records and lanes | GitHub clones; the continuity design's private records remote | the boundary receipt | the CC's handover index; trading-cc's move sheets |
 
 - **Order.** The new distribution runs neither `adoption/bootstrap-linux.sh --profile` nor `--configure-full-profile`
@@ -162,6 +202,18 @@ what the new distribution installs only when its result lands.
   - The comparison is recorded as owed, with the reason above. This is a recipe deviation taken on that evidence.
   - Unregistering is low-risk on this release: the recipe records the interop registration surviving both unregisters of
     2026-10-02 on WSL 3.0.1 (microsoft/WSL PR #40621). The check after each `--unregister` still runs.
+- **Interim stage C.** Until the no-start mode and the per-row ports land (Decision 3), stage C runs
+  `install.sh --only <slot>` in plan order for the rows whose install starts no service. It skips seven:
+  - `memory-owner`: it starts ai-memory on 29374, NativeStack2604's live memory owner, and points Codex hooks at
+    `127.0.0.1:29374` (`install.sh:453-472` at `8053f14e7`), which on the shared network would write into the live
+    store. Unregistering the new distribution cannot undo such writes.
+  - `local-model-server`: it enables Ollama for boot on 21434.
+  - `dagu`: its installer runs with `--service yes`.
+  - `gpt-gateway`: it needs the composition tarball.
+  - `container-engine`: already installed at F3.
+  - `embedding-model` and `local-generation-model`: named-only.
+  - After each row, a guard reads the listeners owned by the new distribution's own processes (`sudo ss -ltnp`, lines
+    with `users:`). It stops the run if one is still new 5 s after the row ends.
 - **Lineage gap.** The install plan's rows and the client-config map follow the 2026-10-01 definitive manifest and its
   later waves; neither reads `final-stack.json`. Once F1 lands, the proposed change is one check: it fails when an
   installed row's pin differs from its layer's landed run pin. Until then, the 28 report-only drift flags are the known
@@ -194,20 +246,55 @@ what the new distribution installs only when its result lands.
     (alerting), 21128 (gpt-gateway), 21300 and 21396 (loki), 21301 (grafana), 21318, 21333 and 21888 (the collector),
     21808 (session-analytics), 29374 (memory-owner) and the host template's 21633 and 28231. Only 21434 (the model
     server) is free.
-  - The recipe's mechanisms apply: F8 picks the host file's ports outside the workstation's set, and
-    `observability/backends/configure.py --port-overrides` moves the observability block.
-  - **Named gap on the living plan:** the other services' ports are fixed in the plan's configuration files. The proposed
-    change is one port parameter per service row, read from the host value file.
-  - Until that change lands, stage C runs `install.sh` and the post-install stage of `accept.sh` only, and no service of
-    the plan starts. Dagu's installer starts its unit, so a bind failure on 21080 is expected and is recorded as it
-    occurs.
+  - F8 picks the host file's ports outside the workstation's set (done: memory 23374, Qdrant 23633, embedder 23231).
+  - The collector's 21318 is the recipe's exception, a conflict to resolve before F9
+    (`adoption/platforms/linux-wsl2-new-distro.md:1068-1072` at `8053f14e7`): the client-configuration tool renders it
+    into both clients.
+    - Stage D therefore waits for the per-row port change, which gives NativeHorizonNY its own collector port.
+    - Until then nothing on NativeHorizonNY exports telemetry to 21318.
+  - `observability/backends/configure.py --port-overrides` is not the route for this plan: it renders the separate
+    `ecosystem-*` stack, while the plan's observability files come from its own renderer
+    (`evidence/artifacts/new-wsl-install-plan-20261002/config/observability_config.py`).
+  - **Named gap on the living plan, part 1: ports.** The services' ports are fixed in the plan's configuration and its
+    renderer. The proposed change is one port parameter per service row, read from the host value file and rendered by
+    the plan's own renderer.
+  - **Named gap, part 2: a no-start path.** The installer starts services as it installs: `systemctl --user enable
+    --now` for ai-memory (`install.sh:466-467` at `8053f14e7`, port 29374, which is bound), Ollama (`:739`) and Docker
+    (`:852`), and Dagu's installer runs with `--service yes`. It has no option to install without starting.
+    - The proposed change is a no-start mode of `install.sh`. Units are installed and reloaded but neither enabled nor
+      started; enabling alone would start them at the next boot through linger. Dagu's installer gets its no-service
+      mode. The change is covered by `check_plan.py` and a fail-first test.
+    - Parts 1 and 2 are one dispatched Codex lane (install-nostart). Its landing closes the CC read's P1-1 and the
+      local review's P1-2.
+    - Until both parts land, stage C runs only `install.sh --only <slot>` for the rows whose install starts no service.
+      The rows that start a service wait.
+  - **Gateway input.** The default `gpt-gateway` row needs the prebuilt composition tarball with its recorded size and
+    digest (`OMNIROUTE_COMPOSITION_TARBALL`, `install.sh:928` at `8053f14e7`). Neither the checkout nor an earlier stage supplies it.
+    Before that row runs, the tarball is copied from NativeStack2604's handover staging and its digest is checked;
+    without it, the row waits.
   - Which services account C depends on comes from trading-cc's sheet for C.
+- **Lanes.** They move under trading-cc's move sheets, in its order: A, then B, then IBKR.
+  - Each move has a STOP-HERE receipt on NativeStack2604 before it starts on the new distribution, so every paper
+    account has one writer.
+  - Which paper lane stays on NativeStack2604 was the owner's call: account C.
 - **CPU and memory.** WSL 3.0.1 and later give each distribution its own cgroup namespace (recipe; host WSL 3.0.3.0).
   - Idle class inside the new distribution yields only to its own processes, not to NativeStack2604's lanes. Account C
     trades in regular hours, after hours and overnight.
-  - The heavy stages therefore run in `systemd-run --user --scope` units with absolute limits: `CPUQuota=` and
-    `MemoryMax=`. The values are set from the load measured at the time, with headroom kept for NativeStack2604.
-  - The scope's `cpu.max` and `memory.max` are read back before the step starts.
+  - A scope around the invoking command does not contain the work the service manager or the Docker daemon starts: the
+    installer's user services, and the containers that rootless Docker runs (Harbor's `harbor run --force-build`, for
+    example).
+  - A command launched through `wsl.exe` lands in `/non-systemd`, outside every systemd slice. A `systemd-run --user
+    --scope` command lands under `user.slice/user-1000.slice/user@1000.service/app.slice` (measured on NativeHorizonNY,
+    2026-10-15, `/proc/self/cgroup`; the root's `cgroup.subtree_control` lists `cpu memory pids`).
+  - So the absolute limits go on the slices that contain all of that work, inside the new distribution:
+    `sudo systemctl set-property --runtime user.slice CPUQuota=<n>% MemoryMax=<n>G`, and the same on `system.slice`
+    for the system units that packages start.
+    - `user.slice` holds the user manager, its services, rootless Docker and its containers.
+    - Every heavy command runs inside `systemd-run --user --scope`, so it lands under `user.slice` too. Nothing heavy is
+      launched straight from `wsl.exe`.
+  - The values are set from the load measured at the time, with headroom kept for NativeStack2604.
+  - Before a heavy step, both slices' `cpu.max` and `memory.max` are read back from `/sys/fs/cgroup/`, along with the
+    step's own `/proc/<pid>/cgroup`.
   - NativeStack2604's `/sys/fs/cgroup/cpu.stat` and `cpu.pressure` are read before and after the first heavy step, so a
     claim that the step did not take from account C has a measurement.
 - **Disks.** No command touches NativeStack2604's disk (`Z:\WSL\NativeStack2604\ext4.vhdx`), the swap disk
@@ -238,8 +325,11 @@ what the new distribution installs only when its result lands.
     brokerages, against NautilusTrader's official IB adapter and the current native port.
   - Its dimensions: a paired same-task agent run, adapter maintenance at pins, backtest-to-paper parity, IBKR-lane
     latency, and cost, QuantConnect's tiers included.
-  - Its verdict is a named input. This row stays open until it lands; the new distribution installs no engine default
-    before then.
+  - Its verdict is a named input. This row stays open until it lands.
+  - No engine or trading profile installs before the verdict. The grand list's `research-runtime` profile (which adds
+    LEAN) and `trading-nautilus` are bootstrap profiles, which recipe F9 retires on this distribution, and neither is an
+    `install.sh` slot.
+  - The verdict names the engine's install route (the trading lane's own environment), and only then does it install.
 - **Brokers.**
   - IBKR: the high-frequency lane, today on NautilusTrader's official IB adapter (the backtesting-engine winner,
     2.0.0rc5), pending the engine comparison.
@@ -258,11 +348,11 @@ what the new distribution installs only when its result lands.
 
 | Worker | Record | On the new distribution |
 | --- | --- | --- |
-| Claude Code (headless, subagents, Workflows) | `foundation/native-clients` and `workers` winners; the practice skill | default, at stage B |
+| Claude Code (headless, subagents, Workflows) | `foundation/native-clients` and `workers` winners; the practice skill | default, through its native installer, the plan's first row (stage C); no superpowers at any scope (Decision 6) |
 | Codex native SDK and lanes | `us-equities/agents-models-workers` and `foundation/agent-sdks` winners | default |
-| Pi, OpenCode (`ns-run` profiles) | #1033 and `notes/runtime-profiles-20261012/`. Profiles remain trial; the W6 parallel-readers comparison is preregistered and not executed | TRIAL through the fence |
-| Muse Code | [2026-10-14-muse-file-fence.md](2026-10-14-muse-file-fence.md) and its 2026-10-15 directory-grants amendment; a CC delta is pending | TRIAL through the fence; no default promotion |
-| Jev (TypeSafe SDK) | `candidate:typesafe-ai-skills` (unpinned) in `foundation/instructions-skills`; #1168; the CC's Jev rulings | the trading fast path's typed classifier after its three receipts (Decision 4); SDK pinned at 0.7.2 until the scored run ends |
+| Pi, OpenCode (`ns-run` profiles) | #1033 and `notes/runtime-profiles-20261012/`. Profiles remain trial; the W6 parallel-readers comparison is preregistered and not executed | TRIAL through the fence, with superpowers inside each worker profile (Decision 6) |
+| Muse Code | [2026-10-14-muse-file-fence.md](2026-10-14-muse-file-fence.md) and its 2026-10-15 directory-grants amendment; a CC delta is pending | TRIAL through the fence, with superpowers through `.muse-plugin` inside the fence; no default promotion |
+| Jev (TypeSafe SDK) | `candidate:typesafe-ai-skills` (unpinned) in `foundation/instructions-skills`; #1168; the CC's Jev rulings | the trading fast path's typed classifier after its three receipts (Decision 4); SDK pinned at 0.7.2 until the scored run ends; no skill framework |
 | Harbor 0.24.0 | #1047 | container harness, as registered |
 
 Defaults change only on a layer's convergence. The model-routes layer is F5's.
@@ -274,25 +364,27 @@ Defaults change only on a layer's convergence. The model-routes layer is F5's.
   at the new head.
 - **Other skills candidates.** The carried survivor `mattpocock/skills` and the unpinned candidates `typesafe-ai-skills`
   and `openai-skills` are adjudicated in the same delta.
-- **Harness frameworks: superpowers enters as a TRIAL.** On 2026-10-15 (18:19Z) the owner asked for fully designed
-  harness frameworks to power the runtime workers cleanly (paraphrased).
-  - The screen at its release `v7.0.0` (2026-10-10) passes the supported-harness requirement. Its README documents an
-    install route per harness:
-    - Claude Code: `superpowers@claude-plugins-official`, the official marketplace;
-    - Codex: the official Codex plugin marketplace;
-    - OpenCode and Pi: the repository's `.opencode` and `.pi` folders, through those clients' own routes;
-    - Muse: `.muse-plugin`;
-    - others named in the README.
-  - On the new distribution it installs through each harness's own route, as TRIAL, beside the native composition. It is
-    not a default.
-  - The decision is a preregistered paired same-task comparison per harness (Claude Code, OpenCode, Pi): superpowers at
-    the `v7.0.0` commit against native composition, on a sealed task set, in the existing harnesses (promptfoo or the
-    skill-creator benchmark, blind judge plus exact checks).
-  - Its decision rule is the practice skill's `orchestration-frameworks` overturn rule: a framework becomes the default
-    only when it is ahead on quality at equal or lower cost. The readiness trigger is the TRIAL install on the new
-    distribution plus the sealed task set.
-  - ECC, the instructions-skills winner, joins the same comparison at its current head (its own delta above). The other
-    harness repositories in the practice-reference catalog stay references.
+- **Harness frameworks: superpowers enters as a TRIAL, inside the worker harnesses only.** The owner asked for fully
+  designed harness frameworks to power the runtime workers (2026-10-15, 18:19Z) and placed superpowers in Pi, OpenCode
+  and the other harnesses as runtime workers (19:19Z-19:20Z, paraphrased).
+  - **Pin.** #1033's profiles pin `bb92a77741419a4ab5f06e711a283343f1ada0c3` (`tools/adoption/runtime_profiles.py:45-46` at
+    `8053f14e7`). That is the commit of the release tag `v7.0.0` (annotated tag object `7f043e5e`; the GitHub compare
+    reads identical), so the pins agree.
+  - **Scope fence.** Its plugin's SessionStart hook (`hooks/hooks.json` at `v7.0.0`, matcher `startup|clear|compact`)
+    injects into every session where the plugin is enabled. So it installs only per worker profile:
+    - Pi: its `.pi` folder or the #1033 profiles;
+    - OpenCode: its `.opencode` folder or the #1033 profiles;
+    - Muse Code: `.muse-plugin`, through the Muse fence.
+  - **No Claude Code install at any scope.** Not `superpowers@claude-plugins-official` at user scope, and not at project
+    scope in a repository the core sessions use. The CC, trading, co-op and account-trader sessions run without it. Jev
+    takes no skill framework.
+  - **Decision.** A preregistered paired same-task comparison inside each worker harness, with superpowers against
+    without it, on a sealed task set, in the existing harnesses (promptfoo or the skill-creator benchmark, blind judge
+    plus exact checks). There is no Claude Code arm.
+    - Its decision rule is the practice skill's `orchestration-frameworks` overturn rule: a framework becomes the default
+      only when it is ahead on quality at equal or lower cost.
+    - The readiness trigger is the TRIAL install in the worker profiles plus the sealed task set.
+  - The other harness repositories in the practice-reference catalog stay references.
 - **Memory.** The durable-memory winner is ai-memory (2.6.6 live), with Hindsight deployed as the research-memory unit
   and recorded as its alternate.
   - The new distribution installs both as recorded.
@@ -307,11 +399,22 @@ The CC's Z: cleanup and CPU disposition plans of 2026-10-15 (private, by name) a
 - The CPU plan keeps every trading-adjacent process to the boundary.
 - Both are executed by the CC after the boundary, through its own guarded steps; this lane executes neither.
 
+## Decision 8: the native-clients re-pin and invoke tracking
+
+- **Re-pin, a named T1 row.** `final-stack.json` pins `foundation/native-clients` at claude-code 2.1.295 (its run pin).
+  Both distributions run 2.1.300; NativeHorizonNY's native installer gave 2.1.300 on 2026-10-15. The routes are #1128
+  (the floor and run pin at 2.1.300) and #1171 (the practice skill's currency).
+- **Invoke tracking from the first lane.** Each lane on NativeHorizonNY runs `tools/skill-usage/skill_usage.py` from its
+  first session. An installed skill with zero calls is a wiring defect to fix, or a role to retire, per the adoption
+  practice.
+- **The owner's view.** The CC's status page shows each agent's and worker's installed skills, labelled FINAL, TRIAL or
+  GAP. The per-layer half of that view is generated by #1175 from `final-stack.json`.
+
 ## The full stack
 
-The new distribution gets every installed row of the install plan. That is the definitive manifest's foundation set: 63
-rows, 60 of them by the default run. It then gets the grand list's trading profiles (`research-runtime`,
-`trading-nautilus`), the TRIAL rows above and the runtime workers of Decision 5.
+The new distribution gets every installed row of the install plan, in the stage order above. That is the definitive
+manifest's foundation set: 63 rows, 60 of them by the default run. It also gets the TRIAL rows and the runtime workers of
+Decisions 5 and 6. No engine or trading profile installs before the engine verdict (Decision 4).
 
 - Rows the plan marks measurement-only or named-only (Loki and Grafana; the two local-model rows) install only when
   their measurement or service runs.
@@ -341,7 +444,7 @@ One receipt that the owner confirms; the CC accepted these five conditions on 20
 2. The owner has signed in both clients, and the client configuration is applied with its receipt.
 3. The CC tooling runs: the tracker, the god view and hcom.
 4. Records are restored from GitHub and the private records remote.
-5. trading-cc has stopped account A's lane on NativeStack2604 and relaunched it on the new distribution.
+5. trading-cc has stopped the first moved lane on NativeStack2604 and relaunched it on the new distribution.
 
 Command-center authority moves only after the owner confirms the receipt. Account C stays on NativeStack2604.
 
@@ -357,7 +460,16 @@ Source review and four read-only checks at `8053f14e7`, each with exit 0:
 
 Also read: the practice-references freshness report of 2026-10-15 (Actions run 38695909735, report-only).
 
-Nothing has been installed, no distribution has been created, and no stage of this plan has run.
+Executed since, on 2026-10-15 (receipts in the lane's private run directory, by name):
+
+- **Stage R passed and was removed.** The rehearsal ran P1-P3, W1-W7 and F1-F3, with rootless Docker printing
+  `Hello from Docker!`, and was removed at 18:37:42Z with interop intact.
+- **Stage A passed through F8.** W5's paired isolation proof passed, with distinct cgroup namespaces and the 2604
+  baseline unchanged. The hostname is `nativehorizonny` and the time zone America/New_York.
+- **After the restart (Windows boot 18:55:12Z), F2-F5 passed.** They ran inside a capped user scope, together with the
+  plan's container-engine row (Docker 29.8.2, rootless).
+  - NativeStack2604's CPU pressure read `some avg10` 0.00 before and 0.16 after.
+- **Interim stage C is running.**
 
 ## Sources
 
@@ -373,11 +485,17 @@ Nothing has been installed, no distribution has been created, and no stage of th
   - [Basic commands for WSL](https://learn.microsoft.com/en-us/windows/wsl/basic-commands) (`--install --from-file`,
     `--terminate`, `--unregister`, `-l -v`);
   - host WSL 3.0.3.0, PowerShell 7.6.7.
-- systemd: [systemd.resource-control(5)](https://www.freedesktop.org/software/systemd/man/latest/systemd.resource-control.html)
-  (`CPUQuota=`, `MemoryMax=`, `CPUWeight=`), and [systemd-run(1)](https://www.freedesktop.org/software/systemd/man/latest/systemd-run.html)
-  (`--user --scope`).
-- Linux cgroup v2: [Control Group v2](https://docs.kernel.org/admin-guide/cgroup-v2.html) (`cpu.max`, `cpu.weight`,
-  `cpu.idle`, `memory.max`, PSI `cpu.pressure`).
+- systemd at `v259` (NativeHorizonNY runs systemd 259.5-0ubuntu3.4):
+  - [`man/systemd.resource-control.xml`](https://github.com/systemd/systemd/blob/v259/man/systemd.resource-control.xml)
+    (`CPUQuota=`, `MemoryMax=`, `CPUWeight=`);
+  - [`man/systemd-run.xml`](https://github.com/systemd/systemd/blob/v259/man/systemd-run.xml) (`--user --scope`);
+  - [`man/systemctl.xml`](https://github.com/systemd/systemd/blob/v259/man/systemctl.xml) (`set-property --runtime`;
+    `enable` against `--now`).
+- Linux at `v6.18` (the WSL kernel is 6.18.54.1):
+  [`Documentation/admin-guide/cgroup-v2.rst`](https://github.com/torvalds/linux/blob/v6.18/Documentation/admin-guide/cgroup-v2.rst)
+  (`cpu.max`, `cpu.weight`, `cpu.idle`, `memory.max`, PSI `cpu.pressure`).
+- Ubuntu 26.04.1 WSL image: sha256 `48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104`, Canonical's signed
+  `SHA256SUMS`, checked in P1. Codex: codex-cli 0.162.1, from the plan's native-installer row, which pins no version.
 - superpowers: [obra/superpowers `README.md` at `v7.0.0`](https://github.com/obra/superpowers/blob/v7.0.0/README.md),
   "Installation" (an install route per harness), and the release
   [v7.0.0](https://github.com/obra/superpowers/releases/tag/v7.0.0) (2026-10-10).
