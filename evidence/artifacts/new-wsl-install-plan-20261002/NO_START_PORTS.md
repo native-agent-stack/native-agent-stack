@@ -31,10 +31,11 @@ with no candidate selection, landscape comparison or default-owner reopening.
 - Host values select all declared listener ports through `service_ports()` in
   `config/observability_config.py`. The file remains a flat string map compatible
   with the existing host renderer. Memory uses `AI_MEMORY_URL`; the other ports
-  use the optional `NS_PORT_*` keys shown in `adoption/hosts/example.json`. The
+  use the complete `NS_PORT_*` key set shown in `adoption/hosts/example.json`. The
   WSL host template stays byte-identical to its frozen image-experiment input;
-  extending it is deferred to that experiment's owners. Unknown keys, invalid
-  port values and duplicate allocations fail before package installation.
+  extending it is deferred to that experiment's owners. Explicit host files, saved
+  allocations and no-start require every port key; missing/unknown keys, invalid
+  values and duplicate allocations fail before package installation.
 - Public source configs carry `@PORT_NAME@` markers. Install stages their expanded
   bytes in a temporary tree. Quoted upstream install/accept commands retain their
   original default-port spellings in the inventory and are expanded in one pass
@@ -47,8 +48,9 @@ with no candidate selection, landscape comparison or default-owner reopening.
   the unit's PORT environment alone could override this explicit argument.
 - Source checking audits every service row for bypassed activation, verifies
   unit registration, rejects literal service ports in config assets, and checks
-  allocation collisions. The external Ollama guard ports, synthetic alert label,
-  and worker closed-port negative control remain explicitly classified exceptions.
+  allocation collisions. Inspector and the alert closed-port control now have
+  independent allocations; external Ollama guard ports and the worker negative
+  control remain explicitly classified exceptions.
   `check_plan.py` inspects the literal list table without executing `install.sh`.
 - RTK's four exact-output hook checks set `RTK_SUPPRESS_HOOK_WARNING=1`; the
   missing-hook stderr warning no longer contaminates decisions on a fresh host.
@@ -165,5 +167,77 @@ assertions now inspect the default expansion, retaining the original digest and
 endpoint expectations. Shard 0's image experiment hashes the live host template;
 that template was restored to its exact `14048b84`/`8053f14e7` bytes, preserving
 SHA256 `4395aec846f1d418a55a862cb4db03906d2513d00fa596c190b56641f760f6b0`.
-The experiment and its frozen record remain unchanged. Operators add port
-overrides to their own host value file; renderer defaults keep existing behavior.
+The experiment and its frozen record remain unchanged. Operators complete their own host value file before isolated installation; the
+pure default renderer retains the previous bytes. The second-wave strict host
+contract below supersedes the first-wave optional-key behavior.
+
+## Second review wave: complete host selection and optional listeners
+
+This fold addresses `GPT-VERDICT-596ab33a6.md` and the co-op's CC addenda as one
+review wave. A complete explicit host file supersedes an inherited selector
+before staging. The candidate snapshot then governs both rendered assets and
+every dispatched command. The active snapshot changes only after all selected
+rows succeed; a failing row preserves the prior allocation. Explicit host files,
+saved allocations and no-start refuse missing port keys. These requirements
+supersede the first wave's partial host-file fallback. Memory's explicit
+`AI_MEMORY_URL` participates in validation, so memory 39374 and gateway 29374 are
+valid in both client renders. Codex's shell distro identity comes from the host
+file's `WSL_DISTRO_NAME`; missing or blank input is refused, with no distro default.
+
+Grafana gRPC is reserved but disabled by its upstream default. Ownership requires
+it only when the rendered configuration or an explicit enable selection enables
+it. Enabled, moved, absent and foreign-listener fixtures cover that path. Port
+9749 belongs to codebase-memory's optional UI, not trace-viewer. A missing native
+config can enable this UI when embedded assets exist; the install row now creates
+an explicit false native config before exposing the binary. Native bool/integer
+types are preserved, and conflicting files or symlinks fail without overwriting.
+The older `NS_PORT_TRACE_VIEWER` key remains a compatibility alias, with conflicting
+old/new declarations rejected.
+
+Inspector's probe port 16399 and the alert fixture's closed port 21997 are separate
+allocations. Inspector is rendered before recipe freezing/hash, retaining its
+ephemeral-range, occupied-socket and cleanup guards. The alert's failed-connect
+and no-listener checks both move together; neither predicate was removed. Both
+ports are excluded from running-listener requirements. Optional/metrics ports
+9749, 21302, 21888 and 21889 remain reserved against collisions. Ollama readiness
+uses the selected endpoint. Agentsview's actual plan default is 21808: its archive
+TOML overrides upstream's 8080 default. A conflicting archive config now fails,
+preventing publication of an allocation the retained file would not honor.
+
+Additional pinned sources checked for this fold:
+
+- [Grafana v13.2.3, pkg/setting/setting_grpc.go:113](https://github.com/grafana/grafana/blob/v13.2.3/pkg/setting/setting_grpc.go#L113)
+  makes gRPC disabled by default; `pkg/services/grpcserver/service.go` and
+  `pkg/registry/backgroundsvcs/adapter/manager.go` implement disabled-service
+  suppression. The retained mirror is commit `6193dc03311b631b9727b560d24369e683dc396e`.
+- [DeusData/codebase-memory-mcp v0.11.0, src/ui/config.c:124–157](https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/src/ui/config.c#L124)
+  covers missing-config auto-enablement and native JSON fields/types;
+  [src/foundation/platform.c:600–623](https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/src/foundation/platform.c#L600)
+  resolves `CBM_CACHE_DIR` or the native cache directory. The misleading false
+  macro alone is insufficient evidence. `src/main.c:3254–3264` applies CLI UI
+  changes after daemon bootstrap, motivating the configuration-first order.
+- [kenn-io/agentsview 413a87f7bfbd67b2815b1119ac51abc1efbeeaba, internal/config/config.go:1398,1651,2051](https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/internal/config/config.go#L2051)
+  selects the archive config and its port override; this corrects README's stale
+  8080 claim without changing the plan's default bytes.
+- [openai/codex rust-v0.161.0, codex-rs/protocol/src/shell_environment.rs:100–102,138–142](https://github.com/openai/codex/blob/rust-v0.161.0/codex-rs/protocol/src/shell_environment.rs#L138)
+  starts with an empty inherited map and applies explicit `set` values. The
+  [official configuration reference](https://developers.openai.com/codex/config-reference/)
+  corroborates `shell_environment_policy.set`.
+
+The original retained `review-port-probes.py` was run unchanged: memory and
+disabled-gRPC cases pass, while its staging case rejects the removed
+`--persist-ports` API. That case expects a partial host file and early publication,
+which conflict with the later complete-host/transaction requirements. The approved
+adapter, `tests/pr1180_port_review_probes.py`, retains all three behavioral
+assertions using complete fixtures and the staging/commit helpers, and adds two
+distro-identity cases. Against unchanged `596ab33a6` it reports four assertion
+failures plus the memory-allocation error; all five pass on this fold. See
+[review-wave-2-receipt.json](review-wave-2-receipt.json) for exact commands/results.
+
+| Material change | Review classification | Evidence |
+| --- | --- | --- |
+| No-start activation guards and complete host allocation | Required correction | Synthetic fixtures and source review; target acceptance pending |
+| Foreground observability services' user-unit form | **PROPOSAL** | Source-derived unit form and fake registration only; native lifecycle unmeasured |
+| Conflicting port config returns `needs_owner` | **Follow-ups** | Synthetic custody/transaction refusal tests |
+| Static inspection of the installer's `--list` table | **Follow-ups** | Source checker; avoids executing the installer for structural validation |
+| Frozen WSL template extension | **DEFERRED** | Original hash retained; superseding experiment record belongs to its owners |

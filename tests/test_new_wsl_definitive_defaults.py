@@ -2382,8 +2382,9 @@ class ModelServerGuard(unittest.TestCase):
                                    encoding="utf-8")
         for name in ("ollama", "curl"):
             (stub / name).chmod(0o755)
-        env = {key: value for key, value in os.environ.items() if key not in ("BASH_ENV", "ENV")}
-        env.update(STUB_DIR=str(stub), PATH=f"{stub}{os.pathsep}{os.environ.get('PATH', '')}")
+        env = {key: value for key, value in os.environ.items() if key not in ("BASH_ENV", "ENV", "NS2604_HOST_FILE")}
+        env.update(STUB_DIR=str(stub), PATH=f"{stub}{os.pathsep}{os.environ.get('PATH', '')}",
+                   plan_dir=str(PLAN), config_root=str(scratch / "config"))
         program = f"model_server_answers() {{\n{self.guard}\n}}\nmodel_server_answers"
         return subprocess.run(["bash", "-euo", "pipefail", "-c", program], env=env, capture_output=True, text=True,
                               timeout=60)
@@ -4388,7 +4389,11 @@ sys.exit(42 if fail else 0)
                 env.pop("MCP_AUTO_OPEN_ENABLED", None)
                 if inherited is not None:
                     env["MCP_AUTO_OPEN_ENABLED"] = inherited
-                result = subprocess.run(["bash", str(PLAN / "inspector-client-probe.sh"), str(root), "claude"],
+                renderer = runpy.run_path(str(PLAN / "config/observability_config.py"))
+                probe = root / "probe.sh"
+                probe.write_text(renderer["render_ports"]((PLAN / "inspector-client-probe.sh").read_text(),
+                                                          renderer["service_ports"]()))
+                result = subprocess.run(["bash", str(probe), str(root), "claude"],
                                         env=env, capture_output=True, text=True, timeout=20)
                 succeeds = inherited == "false" and occupied == "none"
                 self.assertEqual(result.returncode == 0, succeeds, result.stderr)

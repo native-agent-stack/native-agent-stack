@@ -1105,6 +1105,8 @@ def substitute(text: str, values: dict, suffix: str) -> str:
 
 def host_values(host: str, plan: dict, home: Path | None, wired_dirs: list) -> dict:
     values = dict(render_config.load_host_values(host))
+    if not isinstance(values.get("WSL_DISTRO_NAME"), str) or not values["WSL_DISTRO_NAME"].strip():
+        raise ConfigError("host value file must explicitly provide WSL_DISTRO_NAME; no distribution default is used")
     if home is not None:
         old, new = values["HOME"].rstrip("/"), str(home).rstrip("/")
         if not old and new:
@@ -1122,8 +1124,10 @@ def host_values(host: str, plan: dict, home: Path | None, wired_dirs: list) -> d
     # shells' set table names, for systemctl --user and rootless Docker (codex.config.additions.toml); a host value file
     # may name another.
     values.setdefault("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}")
-    ports = runpy.run_path(plan["port_renderer"])["service_ports"](
-        {key: value for key, value in values.items() if key.startswith("NS_PORT_")})
+    try:
+        ports = runpy.run_path(plan["port_renderer"])["service_ports"](values, require_complete=True)
+    except ValueError as error:
+        raise ConfigError(str(error)) from error
     values["OTEL_ENDPOINT"] = f"127.0.0.1:{ports['OTEL_HTTP']}"
     values["CODEX_MODEL"] = plan["codex_model"]
     if plan.get("ai_memory_bin"):
@@ -1139,9 +1143,13 @@ def wired_path_dirs(results: list) -> list:
 
 def render(root: Path, results: list, plan: dict, values: dict, manifest: dict | None = None) -> dict:
     """{file name: text} of the wired pieces."""
+    if not isinstance(values.get("WSL_DISTRO_NAME"), str) or not values["WSL_DISTRO_NAME"].strip():
+        raise ConfigError("host value file must explicitly provide WSL_DISTRO_NAME; no distribution default is used")
     wired = {v.piece.key: v for v in results if v.wired}
-    host_ports = runpy.run_path(plan["port_renderer"])["service_ports"](
-        {key: value for key, value in values.items() if key.startswith("NS_PORT_")})
+    try:
+        host_ports = runpy.run_path(plan["port_renderer"])["service_ports"](values, require_complete=True)
+    except ValueError as error:
+        raise ConfigError(str(error)) from error
     ports = {"collector_http_port": host_ports["OTEL_HTTP"], "collector_grpc_port": host_ports["OTEL_GRPC"],
              "gateway_port": host_ports["GATEWAY"]}
 
@@ -1519,8 +1527,15 @@ def rendered_mcp_endpoint_errors(root: Path) -> list:
         values = host_values(EXAMPLE_HOST, plan, None, wired_path_dirs(results))
         probe_values = dict(values)
         endpoint_keys = sorted(key for key in values if key.endswith(("_URL", "_ENDPOINT", "_HOST")))
-        for index, key in enumerate(endpoint_keys):
-            probe_values[key] = f"127.0.0.2:{30000 + index}"
+        allocated = set(runpy.run_path(plan["port_renderer"])["service_ports"](values, require_complete=True).values())
+        available = (port for port in range(30000, 65536) if port not in allocated)
+        for key in endpoint_keys:
+            # Keep the allocator's loopback contract while varying endpoints;
+            # synthetic probes must not invent collisions or split memory aliases.
+            port = next(available)
+            probe_values[key] = f"127.0.0.1:{port}"
+            if key == "AI_MEMORY_URL" and "NS_PORT_MEMORY" in probe_values:
+                probe_values["NS_PORT_MEMORY"] = str(port)
         before = render(root, results, plan, values, manifest)
         after = render(root, results, plan, probe_values, manifest)
 

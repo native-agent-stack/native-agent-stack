@@ -2172,7 +2172,7 @@ PY'
 state="${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/mcp-inspector"
 install -d -m 0700 -- "$state"
 session="$(mktemp -d "$state/clients.XXXXXXXX")"
-install -m 0600 -- "$plan_dir/inspector-client-probe.sh" "$session/probe.sh"
+python3 "$plan_dir/config/observability_config.py" command --config-root "$config_root" < "$plan_dir/inspector-client-probe.sh" > "$session/probe.sh"
 probe_sha="$(sha256sum "$session/probe.sh" | awk '"'"'{print $1}'"'"')"
 for client in claude codex; do
   mkdir -p -- "$session/$client-tmp"

@@ -1,5 +1,6 @@
 {
   "HOME": "/home/example",
+  "WSL_DISTRO_NAME": "NativeStack2604",
   "ECO_ROOT": "/home/example/.local/share/codex-ecosystem",
   "PROJECT_ROOT": "/home/example/code/agent-lab",
   "HOST_PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
@@ -26,5 +27,7 @@
   "NS_PORT_GATEWAY": "21128",
   "NS_PORT_GATEWAY_WS": "21129",
   "NS_PORT_GATEWAY_EMBED_WS": "21131",
-  "NS_PORT_TRACE_VIEWER": "9749"
+  "NS_PORT_CODE_GRAPH_UI": "9749",
+  "NS_PORT_INSPECTOR_PROBE": "16399",
+  "NS_PORT_ALERT_CLOSED": "21997"
 }

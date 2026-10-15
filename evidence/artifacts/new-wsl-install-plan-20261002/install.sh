@@ -242,6 +242,29 @@ run_command() {
   program="${program//\$plan_dir\/config/\$config_source_root}"
   bash -euo pipefail -c "$program"
 }
+stage_plan_sources() {
+  # Normalize explicit selection before any renderer or child command can read an inherited selector.
+  if [[ -n "$host_file" ]]; then
+    host_file="$(realpath -e -- "$host_file")" || return "$?"
+    export NS2604_HOST_FILE="$host_file"
+  fi
+  config_source_root="$(mktemp -d)"
+  config_source_root="$(cd -- "$config_source_root" && pwd)"
+  trap 'rm -rf -- "$config_source_root"' EXIT
+  local port_args=()
+  if [[ -n "$host_file" ]]; then port_args+=(--host-file "$host_file"); fi
+  python3 "$plan_dir/config/observability_config.py" stage --config-root "$config_root" \
+    --source-root "$plan_dir/config" --output-root "$config_source_root" "${port_args[@]}" || return "$?"
+  # Freeze the selected allocation, overriding any inherited host-file selector.
+  export NS2604_HOST_FILE="$config_source_root/.service-ports.json"
+}
+commit_allocation() {
+  # Publish only after every selected row (including dependencies) succeeds.
+  if $needs_execution && (( failed == 0 )); then
+    python3 "$plan_dir/config/observability_config.py" commit-ports --config-root "$config_root" \
+      --host-file "$config_source_root/.service-ports.json"
+  fi
+}
 interim_acknowledged() {
   # Planned. The gate of amendment 3 of the manifest's decision rule (the wave-2 code-search ruling, change 1: until
   # both families have acknowledged the rule amendment on the pull request, nothing is installed). An interim row's
@@ -261,18 +284,20 @@ interim_acknowledged() {
   fi
 }
 model_server_answers() {
-  # Planned. The two model rows create their models through the running model server; this plan starts no service (README.md).
-  if ! OLLAMA_HOST=127.0.0.1:21434 ollama ls >/dev/null 2>&1; then
-    printf 'The model server does not answer on 127.0.0.1:21434: start it (README.md, "The two local-model rows"), then run this row again.\n' >&2
+  # This guard probes the selected allocation and never starts the server.
+  local endpoint
+  endpoint="$(printf '%s' '127.0.0.1:21434' | python3 "$plan_dir/config/observability_config.py" command --config-root "$config_root")" || return "$?"
+  if ! OLLAMA_HOST="$endpoint" ollama ls >/dev/null 2>&1; then
+    printf 'The model server does not answer on %s: start it (README.md, "The two local-model rows"), then run this row again.\n' "$endpoint" >&2
     return 1
   fi
   # Planned. Both rows install what was measured on Ollama 0.35.0, so nothing is pulled or created unless the server that
   # answers reports that version; GET /api/version answers the running server's own version (server/routes.go:2023).
   # Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/api.md#L1824
   local version
-  version="$(curl -fsS http://127.0.0.1:21434/api/version | jq -r '.version')" || version=''
+  version="$(curl -fsS "http://$endpoint/api/version" | jq -r '.version')" || version=''
   if [[ "$version" != 0.35.0 ]]; then
-    printf 'The model server on 127.0.0.1:21434 reports version %s, not 0.35.0, the version both model rows were measured on: run the local-model-server row'\''s Ollama 0.35.0 there, then run this row again.\n' "${version:-unknown}" >&2
+    printf 'The model server on %s reports version %s, not 0.35.0, the version both model rows were measured on: run the local-model-server row'\''s Ollama 0.35.0 there, then run this row again.\n' "$endpoint" "${version:-unknown}" >&2
     return 1
   fi
 }
@@ -618,6 +643,9 @@ code-index() {
 }
 
 code-graph() {
+  copy_config 'codebase-memory-ui.json' || return "$?"
+  # Source: https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/src/ui/config.c#L124
+  run_command 'python3 "$plan_dir/config/observability_config.py" code-graph --config-root "$config_root" --source-root "$plan_dir/config"' || return "$?"
   # codebase-memory-mcp 0.11.0 | release-binary | planned
   # UNRUN on every distribution: added from the wave-3 batch of 2026-10-04 (the owner's decision, amendment 4), after every recorded run of this plan.
   # Planned. Source: https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/v0.11.0/README.md#L88 (the Linux archive of the release); https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0 (the asset; recipes/README.md records its sha256)
@@ -685,7 +713,7 @@ session-analytics() {
   # Planned. Source: https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/scripts/install.sh#L142; https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/internal/config/config.go#L2051 (owned launcher/placement glue)
   run_command 'e="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}"; mkdir -p "$e/tools/agentsview-0.44.0" "$e/bin" "$HOME/.local/bin"; for alias in "$e/bin/agentsview" "$HOME/.local/bin/agentsview"; do if [[ -e "$alias" || -L "$alias" ]]; then [[ -L "$alias" && ( "$(readlink -f -- "$alias")" == "$(readlink -m -- "$e/tools/agentsview-0.44.0/launcher")" || "$(readlink -f -- "$alias")" == "$(readlink -m -- "$e/tools/agentsview-0.44.0/agentsview")" || "$(readlink -f -- "$alias")" == "$(readlink -m -- "$e/tools/agentsview-0.43.0/launcher")" || "$(readlink -f -- "$alias")" == "$(readlink -m -- "$e/tools/agentsview-0.43.0/agentsview")" ) ]] || { printf "Existing agentsview alias belongs to another installation; retained.\n" >&2; exit 1; }; fi; done; tar -xzf "$e/downloads/agentsview-0.44.0/agentsview_0.44.0_linux_amd64.tar.gz" -C "$e/tools/agentsview-0.44.0"; [[ -x "$e/tools/agentsview-0.44.0/agentsview" ]]; install -m 0600 -- "$plan_dir/config/agentsview.sh" "$e/tools/agentsview-0.44.0/launcher"; chmod 0755 "$e/tools/agentsview-0.44.0/launcher"; ln -sfn "$e/tools/agentsview-0.44.0/launcher" "$e/bin/agentsview"; ln -sfn "$e/tools/agentsview-0.44.0/launcher" "$HOME/.local/bin/agentsview"' || return "$?"
   # Planned. Source: https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/internal/config/config.go#L2051 (owned archive config)
-  run_command 'd="${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/agentsview"; install -d -m 0700 "$d"; if [[ ! -e "$d/config.toml" ]]; then install -m 0600 -- "$plan_dir/config/agentsview.toml" "$d/config.toml"; elif ! cmp -s "$plan_dir/config/agentsview.toml" "$d/config.toml"; then printf "Existing agentsview config retained; review local archive settings before starting.\n" >&2; fi' || return "$?"
+  run_command 'd="${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/agentsview"; install -d -m 0700 "$d"; if [[ -L "$d/config.toml" ]]; then printf "needs_owner: existing agentsview config is a symlink; retained.\n" >&2; exit 1; elif [[ ! -e "$d/config.toml" ]]; then install -m 0600 -- "$plan_dir/config/agentsview.toml" "$d/config.toml"; elif ! cmp -s "$plan_dir/config/agentsview.toml" "$d/config.toml"; then printf "needs_owner: existing agentsview config differs from the host port render; retained.\n" >&2; exit 1; fi' || return "$?"
 }
 
 otel-collector-contrib() {
@@ -1215,12 +1243,7 @@ esac
 [[ -e "$repo_root/.git" ]] || { printf 'Run this plan from a checkout of the repository: %s is not a git checkout (see README.md).\n' "$repo_root" >&2; exit 1; }
 
 # Resolve every port before package changes, then stage only public repository templates.
-config_source_root="$(mktemp -d)"
-trap 'rm -rf -- "$config_source_root"' EXIT
-port_args=()
-if [[ -n "$host_file" ]]; then port_args+=(--host-file "$host_file"); fi
-python3 "$plan_dir/config/observability_config.py" stage --config-root "$config_root" \
-  --source-root "$plan_dir/config" --output-root "$config_source_root" --persist-ports "${port_args[@]}"
+stage_plan_sources
 
 # Planned. Package prerequisites, then mise/runtimes, user CLIs, containers, services.
 needs_execution=false
@@ -1351,4 +1374,5 @@ if selected 'lm-program-optimization'; then run_slot 'lm-program-optimization'; 
 if selected 'skill-vetting'; then run_slot 'skill-vetting'; fi
 if selected 'trajectory-analysis'; then run_slot 'trajectory-analysis'; fi
 if named 'mcp-protocol-conformance'; then run_slot 'mcp-protocol-conformance'; elif selected 'mcp-protocol-conformance'; then printf '%s | install | skipped\n' 'mcp-protocol-conformance'; fi
+commit_allocation || failed=1
 exit "$failed"

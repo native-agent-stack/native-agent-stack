@@ -150,7 +150,7 @@ def no_start_contract(rows, funcs, text, bad):
         if not row.get("service"):
             continue
         body = "\n".join(line for line in funcs.get(slot, "").splitlines() if not line.lstrip().startswith("#"))
-        if slot not in {"mineru", "session-analytics"} and not (
+        if slot not in {"mineru", "session-analytics", "code-graph"} and not (
                 ("systemd/user" in body and "systemctl --user daemon-reload" in body)
                 or f"{slot}) unit=" in registrar
                 or (slot == "local-model-server" and "systemctl --user daemon-reload" in body)):
@@ -165,6 +165,10 @@ def no_start_contract(rows, funcs, text, bad):
             bad("no-start", "container-engine: rootless setup starts Docker and must be skipped")
     if 'if [[ "${NS2604_NO_START:-0}" == 1 ]]; then\n    sudo systemctl mask docker.service docker.socket containerd.service' not in funcs.get("docker_engine_packages", ""):
         bad("no-start", "container-engine: package postinst activation must be blocked")
+    graph = funcs.get("code-graph", "")
+    if ('code-graph --config-root "$config_root"' not in graph
+            or graph.find('code-graph --config-root "$config_root"') > graph.find("fetch_verified")):
+        bad("no-start", "code-graph must install explicit disabled UI config before exposing its binary")
 
 
 def host_port_contract(plan_dir, rows, host_file, bad):
@@ -181,12 +185,12 @@ def host_port_contract(plan_dir, rows, host_file, bad):
         if port is not None and (row["slot"], port) not in renderer["SERVICE_PORTS"].values():
             bad("ports", f"{row['slot']}: declared listener default has no host port allocation")
     pattern = re.compile(r"(?<![\w-])(?:" + "|".join(defaults) + r")(?![\w])")
-    nonservice_ports = {"ollama.service": {18231, 18232}, "prometheus-alerts.test.yaml": {21997},
+    nonservice_ports = {"ollama.service": {18231, 18232},
                        "openhands-worker.py": {1}}  # closed-port negative control, never a listener
     for name, (slot, default) in renderer["SERVICE_PORTS"].items():
         if slot not in slots:
             bad("ports", f"{name}: unknown owning row {slot}")
-    for path in (plan_dir / "config").rglob("*"):
+    for path in [*(plan_dir / "config").rglob("*"), plan_dir / "inspector-client-probe.sh"]:
         if not path.is_file() or "__pycache__" in path.parts or path.name == "observability_config.py":
             continue
         text = path.read_text()
@@ -195,7 +199,7 @@ def host_port_contract(plan_dir, rows, host_file, bad):
         # explicit exceptions are external GPU-owner guards and a synthetic alert label.
         literal_ports = set() if path.suffix == ".fixture" else ports_in(active) - nonservice_ports.get(path.name, set())
         if pattern.search(active) or literal_ports:
-            bad("ports", f"config/{path.relative_to(plan_dir / 'config')}: literal service port; use @PORT_NAME@")
+            bad("ports", f"{path.relative_to(plan_dir)}: literal service port; use @PORT_NAME@")
         try:
             renderer["render_ports"](text, ports)
         except ValueError as error:
@@ -442,6 +446,17 @@ def main():
     install_funcs, accept_funcs = functions(install_text), functions(accept_text)
     no_start_contract(rows, install_funcs, install_text, bad)
     host_port_contract(plan_dir, rows, args.host_file, bad)
+    renderer = runpy.run_path(str(plan_dir / "config/observability_config.py"))
+    if renderer["SERVICE_PORTS"].get("CODE_GRAPH_UI") != ("code-graph", 9749):
+        bad("ports", "9749 belongs to codebase-memory's optional code-graph UI")
+    ui = plan_dir / "config/codebase-memory-ui.json"
+    if not ui.is_file() or json.loads(ui.read_text()) != {"ui_enabled": False, "ui_port": "@PORT_CODE_GRAPH_UI@"}:
+        bad("ports", "code-graph UI must have an explicit disabled default and a host-selected port")
+    if 'export NS2604_HOST_FILE="$config_source_root/.service-ports.json"' not in install_funcs.get("stage_plan_sources", ""):
+        bad("ports", "staging must pin the explicit selected allocation for commands and nested helpers")
+    if ('if $needs_execution && (( failed == 0 )); then' not in install_funcs.get("commit_allocation", "")
+            or 'commit_allocation || failed=1\nexit "$failed"' not in install_text):
+        bad("ports", "publish the allocation only after the selected install succeeds")
     if args.ss_output is not None:
         renderer = runpy.run_path(str(plan_dir / "config/observability_config.py"))
         try:
@@ -461,6 +476,12 @@ def main():
         bad("ports", "installed research helper requires the shared plan renderer")
     if "NS2604_HOST_FILE=%q" not in accept_funcs.get("research-harnesses", ""):
         bad("ports", "native research command must carry the host-file pointer through a scrubbed client shell")
+    if 'command --config-root "$config_root" < "$plan_dir/inspector-client-probe.sh" > "$session/probe.sh"' not in accept_funcs.get("mcp-inspector", ""):
+        bad("ports", "Inspector recipe must be host-rendered before its bytes are frozen for the native clients")
+    alert_program = accept_funcs.get("alerting", "")
+    if not all(token in alert_program for token in ('connect_ex(("127.0.0.1", 21997)) != 0',
+                                                    '"sport = :21997"', 'assert not listeners.stdout.strip()')):
+        bad("ports", "alerting requires its independent failed-connect and no-listener predicate")
 
     slots = [r["slot"] for r in rows]
     for slot, count in collections.Counter(slots).items():
@@ -837,6 +858,12 @@ def main():
     for name in sorted(config - copied - historical_gateway_configs - operator_examples):
         bad("config", f"config/{name} is copied by no install function")
     claims = collections.defaultdict(set)
+    port_renderer = runpy.run_path(str(plan_dir / "config/observability_config.py"))
+    default_ports = port_renderer["service_ports"]()
+    # Reserve every declared port, including optional and closed/probe ports.
+    # Expanding templates below retains auxiliary binding claims as well.
+    for owner, port in port_renderer["SERVICE_PORTS"].values():
+        claims[port].add(owner)
     # G4 configs wire existing listeners. Scrape/datasource/exporter targets and synthetic
     # promtool input-series labels are references, rather than additional listening sockets.
     observability_references = {
@@ -851,15 +878,25 @@ def main():
         "grafana-command-center.json": {21128, 21808},
         # Loki push plus the hcom bridge's freshness gauge to the Collector's OTLP/HTTP receiver.
         "ns2604-research-progress.service": {21300, 21318},
+        # These consume the gateway; they never bind its HTTP port.
+        "openhands-worker-skill.md": {21128},
+        "openhands-srt.json": {21128},
+        "openhands-job.json": {21128},
+        "gateway-effort-accept.py": {21128},
     }
     for r in rows:
         if (r.get("service") or {}).get("port") is not None:
             claims[r["service"]["port"]].add(r["slot"])
-        for path in r["config_paths"]:
+        paths = list(r["config_paths"])
+        paths.extend("$plan_dir/config/" + name for name in
+                     re.findall(r"copy_config '([^']+)'", install_funcs.get(r["slot"], "")))
+        paths.extend("$plan_dir/config/" + name for name in
+                     re.findall(r'\$plan_dir/config/([A-Za-z0-9._@/-]+)', "\n".join(r["commands"])))
+        for path in paths:
             name = next((asset for asset in sorted(config, key=len, reverse=True)
                          if path.endswith("/" + asset)), path.rsplit("/", 1)[-1])
             if name in config:
-                config_text = (plan_dir / "config" / name).read_text()
+                config_text = port_renderer["render_ports"]((plan_dir / "config" / name).read_text(), default_ports)
                 if r["slot"] == "research-harnesses" and name == "deer-flow-config.yaml":
                     # The embedded model consumes the gateway's base_url; it owns no listener.
                     config_text = "\n".join(line for line in config_text.splitlines()

@@ -1,6 +1,6 @@
 # New WSL install plan
 
-Current structural inventory (2026-10-15): 84 rows, 196 install commands and 113 acceptance entries (including two additional checks). D-ollama-2 carries the updated owner-approved user unit and removes the warmup asset; #713 supplies the additional rows. These counts describe the source, not host acceptance.
+Current structural inventory (2026-10-15): 84 rows, 197 install commands and 113 acceptance entries (including two additional checks). D-ollama-2 carries the updated owner-approved user unit and removes the warmup asset; #713 supplies the additional rows. These counts describe the source, not host acceptance.
 
 **Run the plan from a checkout of the repository** (step F7, "Clone origin/main", of `adoption/platforms/linux-wsl2-new-distro.md`). `worktrunk` and the convergence validators change into `repo_root`, the checkout three levels above this folder, so `install.sh` and `accept.sh` stop with a clear message when `repo_root` is not a git checkout (`install.sh --list` needs none).
 
@@ -45,22 +45,31 @@ steps, including their no-start behavior.
 
 Allocate ports in the same nonsecret host JSON used by client configuration.
 `NS_PORT_*` keys select listeners and their client/scrape targets; `AI_MEMORY_URL`
-remains the canonical memory endpoint. Add the optional port keys shown in
-`adoption/hosts/example.json` to the new distro's host value file and choose
-ports unoccupied by the other distributions. The legacy F8 template and its
-nine fields remain frozen by the planned image experiment; extending that
-template is deferred to its owners through a superseding experiment record.
-The plan's host overrides supersede F8's older fixed-collector-port restriction.
-The unchanged default WSL host template reproduces
-the previous config bytes. Supply `--host-file PATH` to install, acceptance,
-`check_plan.py`, or the plan's `config/observability_config.py`. Installation saves
-only the resolved allocation in `$config_root/.service-ports.json`; later runs
-reuse it unless given another host file. Client rendering reads the selected
-host's keys through that same renderer. Check occupied ports in the shared WSL
-namespace before choosing values. Differing operator files return `needs_owner`.
-The staged files, service commands, acceptance URLs, and pinned gateway wrapper's
-derived digest all use this allocation. See [NO_START_PORTS.md](NO_START_PORTS.md)
-for sources, fail-first fixtures, and the separate target-host acceptance boundary.
+remains the canonical memory endpoint. Explicit host files, saved allocations and
+`--no-start` require a complete allocation. Missing keys fail before installation;
+there is no fallback to NativeStack2604 ports in these modes. Use the complete
+key set in `adoption/hosts/example.json`, choosing ports unoccupied by the other
+distributions. Client configuration also requires an explicit `WSL_DISTRO_NAME`;
+it renders that identity into Codex's shell policy and refuses missing/blank input.
+The legacy F8 template and its nine fields remain frozen by the planned image
+experiment. Extending that template is DEFERRED to its owners through a
+superseding record; operators must complete their host file before using it.
+The plan's allocation supersedes F8's older fixed-collector-port restriction.
+The pure default renderer still reproduces the previous config bytes, including
+when given the frozen host template's values. This compatibility check does not
+make the incomplete template executable as an isolated host allocation.
+
+Supply `--host-file PATH` to install, acceptance, `check_plan.py`, or this plan's
+`config/observability_config.py`. The installer normalizes an explicit selection
+before staging, freezes the resolved candidate in its temporary source tree, and
+uses that candidate for all dispatched commands. Only successful completion of
+all selected rows publishes `$config_root/.service-ports.json`; a failed run
+preserves the prior allocation. Later runs reuse the saved allocation unless
+another host file is supplied. Differing operator port configuration returns
+`needs_owner` and prevents publication. Staged files, commands, acceptance URLs,
+client configuration and the gateway wrapper's derived digest share this source.
+See [NO_START_PORTS.md](NO_START_PORTS.md) for sources, fail-first fixtures and the
+separate target-host acceptance boundary.
 
 The three OmniRoute listeners have separate keys: `NS_PORT_GATEWAY` (21128),
 `NS_PORT_GATEWAY_WS` (21129), and `NS_PORT_GATEWAY_EMBED_WS` (21131). Research and
@@ -79,7 +88,18 @@ python3 config/observability_config.py listeners --plan-file install-plan.json -
 ```
 
 The default inventory contains 15 listeners; explicitly selecting a measurement
-row includes its listeners too. `--ss-output /path/to/ss.txt` supplies a recorded
+row includes its enabled listeners too. Grafana gRPC (21302) is reserved but
+required only when `[grpc_server] enabled = true` in the rendered config, or when
+explicitly selected with `--enabled-listener GRAFANA_GRPC`. Codebase-memory owns
+the optional UI port 9749: before exposing its executable, installation writes
+native `ui_enabled: false` and the allocated integer `ui_port` in its supported
+cache config. Conflicting native settings are retained and fail with `needs_owner`.
+Inspector's 16399 and the deliberately closed alert fixture's 21997 have separate
+allocations and are excluded from running-listener requirements. The Inspector
+recipe is rendered before it is frozen and hashed. Alert acceptance still requires
+both a failed connection and an empty listener census for its closed-port control.
+All reserved, optional and fixture ports remain in collision checks, including
+9749, 21302 and OTel's 21888/21889. `--ss-output /path/to/ss.txt` supplies a recorded
 or synthetic snapshot instead of executing ss. Before installation,
 `check_plan.py --host-file /path/to/host.json --ss-output /path/to/ss.txt` rejects
 foreign listeners on selected ports while allowing currently absent services.
@@ -508,7 +528,7 @@ destination values are recorded here.
 
 The G5 plan repair selected agentsview 0.43.0, Inspect AI 0.3.273 and Harbor 0.23.0 on 2026-10-04. The [2026-10-09 Harbor 0.24.0 amendment receipt](../harbor-0240-currency-20261009/receipt.json) supersedes that Harbor selection and supplies the current Harbor release, commit, wheel and checksum; the current operational owner is Harbor 0.24.0. [SOURCES.md](SOURCES.md), section "G5 analytics and evaluation sources", retains the original 0.23.0 Harbor observations as dated history and supplies the other G5 source pins, upstream operations and local assertions. The original decision is [2026-10-04-2604-e2e-fix-wave-g5-analytics-eval.md](../../../docs/decisions/2026-10-04-2604-e2e-fix-wave-g5-analytics-eval.md). These are plan changes; this builder ran no installation, service, provider evaluation or container trial on a distribution.
 
-- **Session analytics.** The verified release installs behind an owned launcher in both the ecosystem bin and `~/.local/bin`. Every invocation uses the owned archive directory, telemetry off, update checks off and upstream `archive_content=full` (2026-10-08, CC: full session content for live lane review; was `usage`; values per kenn-io/agentsview@413a87f7 internal/config/config.go:670-692). The supported `CLAUDE_PROJECTS_DIR` and `CODEX_SESSIONS_DIR` variables select the active Claude and Codex homes, including explicit `CLAUDE_CONFIG_DIR` and `CODEX_HOME` overrides. The archive configuration binds to `127.0.0.1:8080`; start it with `agentsview daemon start`, inspect it with `agentsview daemon status`, and stop it with `agentsview daemon stop`. Installation starts no daemon. The service stage runs upstream sync, session listing and daily usage reporting for both clients, requires nonempty session and token data, and retains their actual output privately. `--offline` uses fallback pricing; its costs are estimates.
+- **Session analytics.** The verified release installs behind an owned launcher in both the ecosystem bin and `~/.local/bin`. Every invocation uses the owned archive directory, telemetry off, update checks off and upstream `archive_content=full` (2026-10-08, CC: full session content for live lane review; was `usage`; values per kenn-io/agentsview@413a87f7 internal/config/config.go:670-692). The supported `CLAUDE_PROJECTS_DIR` and `CODEX_SESSIONS_DIR` variables select the active Claude and Codex homes, including explicit `CLAUDE_CONFIG_DIR` and `CODEX_HOME` overrides. The archive configuration binds to `127.0.0.1:21808` by default (`NS_PORT_AGENTSVIEW`); start it with `agentsview daemon start`, inspect it with `agentsview daemon status`, and stop it with `agentsview daemon stop`. Installation starts no daemon. The service stage runs upstream sync, session listing and daily usage reporting for both clients, requires nonempty session and token data, and retains their actual output privately. `--offline` uses fallback pricing; its costs are estimates.
 - **Harbor.** Installation also checks out the unchanged upstream `hello-user` task at the release's exact commit, since the wheel contains no examples. After rootless Docker starts, the service stage runs one oracle and one nop trial through `harbor run`, with `DOCKER_HOST=unix://$XDG_RUNTIME_DIR/docker.sock` explicit. It requires no model credential: the fixture pulls `ubuntu:24.04`. The upstream test's exception and verifier-reward assertions require 1.0 for oracle and 0.0 for nop; the local artifact checks also read each native `verifier/reward.txt` and require the positive reward gate to reject nop. Fresh run directories retain native job/trial results, verifier output and logs.
 - **Inspect AI.** The uv tool environment explicitly includes the optional provider SDK, `openai==3.24.0`. Installation checks out the unchanged `examples/theory_of_mind.py` at Inspect's exact release commit. The stage after sign-in evaluates one sample through the existing loopback gateway and `openai-api/omniroute/cx/gpt-6.1-sol`, then repeats it with an absent model. Inspect's own `inspect log dump --header-only` reads both logs. The positive gate requires success, one completed sample and nonempty scores; the negative run must produce an error log rejected by that same gate. Preserve the native logs and both control exit codes. This checks execution and scoring; no accuracy threshold is imposed. The keyless loopback uses a non-secret placeholder. If gateway authentication was enabled by the operator, provide `OMNIROUTE_API_KEY` through the existing credential runner.
 

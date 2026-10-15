@@ -116,6 +116,10 @@
     {
       "path": "grafana-research-grand.json",
       "sha256": "bc794124335f1f4bb900157d02cdabd00803897e9416d7161c443453dd91e541"
+    },
+    {
+      "path": "../inspector-client-probe.sh",
+      "sha256": "2f82b600dcebf957cfbec84bd85ba64b5abbafde20283392b03ff5dfa150f811"
     }
   ]
 }

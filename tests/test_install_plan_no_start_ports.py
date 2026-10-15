@@ -28,6 +28,16 @@ def module(path, name):
     return result
 
 
+def host_allocation(overrides=None):
+    """Complete, explicit fixture allocation; expected moved endpoints stay literal in tests."""
+    renderer = module(PLAN / "config/observability_config.py", "fixture_allocations")
+    values = {"NS_PORT_" + key: str(value) for key, value in renderer.service_ports().items()}
+    if overrides and "AI_MEMORY_URL" in overrides:
+        values.pop("NS_PORT_MEMORY", None)
+    values.update(overrides or {})
+    return values
+
+
 class NoStartTests(unittest.TestCase):
     def test_mineru_transient_start_is_deferred_in_no_start_mode(self):
         checker = module(PLAN / "check_plan.py", "mineru_start_check")
@@ -90,6 +100,7 @@ class NoStartTests(unittest.TestCase):
             root = Path(tmp)
             config = root / "config"
             config.mkdir()
+            (config / ".service-ports.json").write_text(json.dumps(host_allocation()))
             (config / "ns2604-prometheus.service").write_text("[Service]\nExecStart=/bin/true\n")
             grafana = root / ".local/bin/grafana"
             grafana.parent.mkdir(parents=True)
@@ -190,7 +201,7 @@ class HostPortTests(unittest.TestCase):
             (root / "config").mkdir()
             (root / "source").mkdir()
             (root / "source/probe.txt").write_text("http://127.0.0.1:31128")
-            (root / "config/.service-ports.json").write_text(json.dumps({"NS_PORT_GATEWAY": "31128"}))
+            (root / "config/.service-ports.json").write_text(json.dumps(host_allocation({"NS_PORT_GATEWAY": "31128"})))
             env = {"PATH": "/usr/bin:/bin", "plan_dir": str(PLAN), "config_root": str(root / "config"),
                    "config_source_root": str(root / "source")}
             program = 'test "$(cat "$plan_dir/config/probe.txt")" = "http://127.0.0.1:21128"'
@@ -207,15 +218,19 @@ class HostPortTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             host = root / "host.json"
-            host.write_text(json.dumps({"NS_PORT_GATEWAY": "31128", "AI_MEMORY_URL": "127.0.0.1:39374"}))
+            host.write_text(json.dumps(host_allocation({"NS_PORT_GATEWAY": "31128", "AI_MEMORY_URL": "127.0.0.1:39374"})))
             script = str(PLAN / "config/observability_config.py")
             common = [sys.executable, script]
             result = subprocess.run(common + ["stage", "--config-root", str(root / "config"),
                 "--source-root", str(PLAN / "config"), "--output-root", str(root / "staged"),
-                "--host-file", str(host), "--persist-ports"], text=True, capture_output=True)
+                "--host-file", str(host)], text=True, capture_output=True)
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertIn("serve --port 31128", (root / "staged/omniroute-serve.sh").read_text())
             self.assertIn("Environment=PORT=31128", (root / "staged/omniroute.service").read_text())
+            self.assertFalse((root / "config/.service-ports.json").exists())
+            committed = subprocess.run(common + ["commit-ports", "--config-root", str(root / "config"),
+                "--host-file", str(root / "staged/.service-ports.json")], text=True, capture_output=True)
+            self.assertEqual(committed.returncode, 0, committed.stderr)
             saved = (root / "config/.service-ports.json").read_bytes()
             command = subprocess.run(common + ["command", "--config-root", str(root / "config")],
                                      input="http://127.0.0.1:21128 http://127.0.0.1:29374", text=True, capture_output=True)
@@ -286,8 +301,8 @@ class HostPortTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             host = root / "host.json"
-            host.write_text(json.dumps({"NS_PORT_OTEL_HTTP": "31318", "NS_PORT_OTEL_GRPC": "31317",
-                                        "NS_PORT_GATEWAY": "31128", "NS_PORT_LOKI_HTTP": "31300"}))
+            host.write_text(json.dumps(host_allocation({"NS_PORT_OTEL_HTTP": "31318", "NS_PORT_OTEL_GRPC": "31317",
+                                        "NS_PORT_GATEWAY": "31128", "NS_PORT_LOKI_HTTP": "31300"})))
             out = root / "render"
             out.mkdir()
             result = subprocess.run([sys.executable, str(PLAN / "config/observability_config.py"), "otel",
@@ -359,6 +374,8 @@ class ReviewWave1Tests(unittest.TestCase):
         for selected_row, existing in cases:
             with self.subTest(row=selected_row, existing=existing), tempfile.TemporaryDirectory() as tmp:
                 root = Path(tmp)
+                (root / "config").mkdir()
+                (root / "config/.service-ports.json").write_text(json.dumps(host_allocation()))
                 unit = root / ".config/systemd/user/docker.service"
                 if existing:
                     unit.parent.mkdir(parents=True)
@@ -409,7 +426,7 @@ class ReviewWave1Tests(unittest.TestCase):
             host, snapshot = root / "host.json", root / "ss.txt"
             snapshot.write_text("LISTEN 0 128 127.0.0.1:21128 0.0.0.0:*\n")
             for moved in (False, True):
-                host.write_text(json.dumps({"NS_PORT_GATEWAY": "31128"} if moved else {}))
+                host.write_text(json.dumps(host_allocation({"NS_PORT_GATEWAY": "31128"} if moved else {})))
                 result = subprocess.run([sys.executable, str(PLAN / "check_plan.py"), "--host-file", str(host),
                                          "--ss-output", str(snapshot)], text=True, capture_output=True)
                 self.assertEqual(result.returncode, 0 if moved else 1, result.stderr)
@@ -480,7 +497,7 @@ class ReviewWave1Tests(unittest.TestCase):
     def test_runtime_profiles_reads_the_host_gateway(self):
         with tempfile.TemporaryDirectory() as tmp:
             host = Path(tmp) / "host.json"
-            host.write_text(json.dumps({"NS_PORT_GATEWAY": "41128"}))
+            host.write_text(json.dumps(host_allocation({"NS_PORT_GATEWAY": "41128"})))
             with mock.patch.dict(os.environ, {"NS2604_HOST_FILE": str(host)}):
                 profiles = module(ROOT / "tools/adoption/runtime_profiles.py", "wave_runtime_profiles")
             self.assertEqual(profiles.GATEWAY, "http://127.0.0.1:41128/v1")
@@ -492,7 +509,7 @@ class ReviewWave1Tests(unittest.TestCase):
         self.addCleanup(fixture.doCleanups)
         fixture.provide_timer()
         host = fixture.temp / "host.json"
-        host.write_text(json.dumps({"NS_PORT_GATEWAY": "41128"}))
+        host.write_text(json.dumps(host_allocation({"NS_PORT_GATEWAY": "41128"})))
         fixture.env["NS2604_HOST_FILE"] = str(host)
         result = fixture.run_script("fixture research query")
         self.assertEqual(result.returncode, 0, result.stderr)
@@ -517,6 +534,322 @@ class ReviewWave1Tests(unittest.TestCase):
 
     def test_absent_listener_is_rejected(self):
         self.assertTrue(any("absent" in error for error in self.ownership('LISTEN 0 128 127.0.0.1:49374 0.0.0.0:* users:(("other",pid=42,fd=3))\n')))
+
+
+class ReviewWave2Tests(unittest.TestCase):
+    def test_reserved_and_metrics_ports_remain_in_the_collision_set(self):
+        renderer = module(PLAN / "config/observability_config.py", "wave2_reserved_collisions")
+        for key in ("CODE_GRAPH_UI", "GRAFANA_GRPC", "OTEL_METRICS", "OTEL_EXPORTER"):
+            with self.subTest(key=key), self.assertRaisesRegex(ValueError, "claimed"):
+                renderer.service_ports({"NS_PORT_GATEWAY": str(renderer.SERVICE_PORTS[key][1])})
+
+    def test_clients_accept_the_plans_memory_gateway_allocation(self):
+        from tests import test_new_wsl_client_config as fixtures
+        cfg = fixtures.cfg
+        values = json.loads((ROOT / "adoption/hosts/example.json").read_text())
+        values.update(AI_MEMORY_URL="127.0.0.1:39374", NS_PORT_GATEWAY="29374")
+        plan = cfg.load_plan(ROOT)
+        with mock.patch.object(fixtures.render_config, "load_host_values", return_value=values):
+            resolved = cfg.host_values("fixture", plan, None, [])
+        results, manifest, _, errors, _ = cfg.analyse(ROOT)
+        self.assertEqual(errors, [])
+        files = cfg.render(ROOT, results, plan, resolved, manifest)
+        self.assertIn("127.0.0.1:39374", files["mcp-servers.json"])
+        self.assertIn("127.0.0.1:39374", files["codex.config.toml"])
+        self.assertIn("127.0.0.1:29374/v1", files["codex.omniroute.config.toml"])
+
+    def test_isolated_host_modes_refuse_missing_port_keys(self):
+        renderer = module(PLAN / "config/observability_config.py", "wave2_required_ports")
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            host = root / "partial.json"
+            host.write_text(json.dumps({"NS_PORT_GATEWAY": "41128"}))
+            with self.assertRaisesRegex(ValueError, "missing"):
+                renderer.load_service_ports(host, root)
+            with mock.patch.dict(os.environ, {"NS2604_NO_START": "1"}):
+                with self.assertRaisesRegex(ValueError, "missing"):
+                    renderer.load_service_ports(None, root)
+
+    def allocation_setup(self, root, extra=""):
+        checker = module(PLAN / "check_plan.py", "wave2_transaction_check")
+        source = (PLAN / "install.sh").read_text()
+        funcs = checker.functions(source)
+        names = ("stage_plan_sources", "commit_allocation", "run_command")
+        definitions = "\n".join(name + "() {\n" + funcs[name] + "\n}" for name in names if name in funcs)
+        if "stage_plan_sources" in funcs:
+            staging = "stage_plan_sources"
+        else:
+            staging = source[source.index('config_source_root="$(mktemp -d)"'):source.index("# Planned. Package prerequisites")]
+        script = definitions + "\n" + staging + "\n" + extra
+        return subprocess.run(["bash", "-euo", "pipefail", "-c", script], text=True, capture_output=True,
+            env={"PATH": "/usr/bin:/bin", "HOME": str(root), "plan_dir": str(PLAN),
+                 "config_root": str(root / "config"), "config_source_root": str(PLAN / "config"),
+                 "host_file": str(root / "B.json"), "NS2604_HOST_FILE": str(root / "A.json")})
+
+    def allocation_fixture(self, root):
+        (root / "config").mkdir()
+        original = json.dumps(host_allocation({"NS_PORT_GATEWAY": "31128"}))
+        (root / "A.json").write_text(original)
+        (root / "B.json").write_text(json.dumps(host_allocation({"NS_PORT_GATEWAY": "41128"})))
+        (root / "config/.service-ports.json").write_text(original)
+        return original
+
+    def test_failed_install_keeps_the_published_allocation(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            original = self.allocation_fixture(root)
+            result = self.allocation_setup(root, 'failed=1; needs_execution=true; if declare -F commit_allocation >/dev/null; then commit_allocation; fi; exit "$failed"')
+            self.assertEqual(result.returncode, 1, result.stderr)
+            self.assertEqual(json.loads((root / "config/.service-ports.json").read_text())["NS_PORT_GATEWAY"], "31128")
+            self.assertEqual((root / "config/.service-ports.json").read_text(), original)
+
+    def test_explicit_host_file_wins_inherited_selection_for_all_commands(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.allocation_fixture(root)
+            result = self.allocation_setup(root,
+                'run_command \'printf "%s\\n" http://127.0.0.1:21128/v1\'\n'
+                'run_command \'python3 "$plan_dir/config/observability_config.py" gateway --config-root "$config_root"\'')
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(result.stdout.splitlines(), ["http://127.0.0.1:41128/v1"] * 2)
+
+    def test_ollama_readiness_uses_the_allocated_endpoint(self):
+        checker = module(PLAN / "check_plan.py", "wave2_ollama")
+        body = checker.functions((PLAN / "install.sh").read_text())["model_server_answers"]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "config").mkdir()
+            (root / "config/.service-ports.json").write_text(json.dumps(host_allocation({"NS_PORT_OLLAMA": "31434"})))
+            script = ('ollama() { [[ "$OLLAMA_HOST" == 127.0.0.1:31434 ]]; }; '
+                      'curl() { [[ "$*" == *"http://127.0.0.1:31434/api/version"* ]] || return 99; printf "{}"; }; '
+                      'jq() { printf 0.35.0; };\nmodel_server_answers() {\n' + body + '\n}\nmodel_server_answers')
+            result = subprocess.run(["bash", "-euo", "pipefail", "-c", script], text=True, capture_output=True,
+                env={"PATH": "/usr/bin:/bin", "plan_dir": str(PLAN), "config_root": str(root / "config")})
+            self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_disabled_grafana_grpc_is_not_a_required_listener(self):
+        renderer = module(PLAN / "config/observability_config.py", "wave2_optional")
+        plan = json.loads((PLAN / "install-plan.json").read_text())
+        text = 'LISTEN 0 128 127.0.0.1:21301 0.0.0.0:* users:(("grafana",pid=42,fd=3))\n'
+        self.assertEqual(renderer.listener_ownership(plan, renderer.service_ports(), text, "grafana"), [])
+        enabled = renderer.listener_ownership(plan, renderer.service_ports(), text, "grafana",
+                                             enabled_optional={"GRAFANA_GRPC"})
+        self.assertTrue(any("21302 absent" in error for error in enabled))
+        with tempfile.TemporaryDirectory() as tmp:
+            config = Path(tmp)
+            (config / "grafana.ini").write_text("[grpc_server]\nenabled = true\naddress = 127.0.0.1:21302\n")
+            self.assertIn("GRAFANA_GRPC", renderer.configured_optional_listeners(config))
+
+    def test_enabled_grafana_grpc_requires_its_moved_owned_listener(self):
+        renderer = module(PLAN / "config/observability_config.py", "wave2_enabled_grpc")
+        plan = json.loads((PLAN / "install-plan.json").read_text())
+        ports = renderer.service_ports({"NS_PORT_GRAFANA_HTTP": "31301", "NS_PORT_GRAFANA_GRPC": "31302"})
+        http = 'LISTEN 0 128 127.0.0.1:31301 0.0.0.0:* users:(("grafana",pid=42,fd=3))\n'
+        grpc = 'LISTEN 0 128 127.0.0.1:31302 0.0.0.0:* users:(("grafana",pid=42,fd=4))\n'
+        with tempfile.TemporaryDirectory() as tmp:
+            config = Path(tmp)
+            (config / "grafana.ini").write_text("[grpc_server]\nenabled = true\naddress = 127.0.0.1:31302\n")
+            enabled = renderer.configured_optional_listeners(config)
+            self.assertEqual(renderer.listener_ownership(plan, ports, http, "grafana", enabled_optional=enabled),
+                             ["grafana/GRAFANA_GRPC: port 31302 absent"])
+            self.assertEqual(renderer.listener_ownership(plan, ports, http + grpc, "grafana", enabled_optional=enabled), [])
+            errors = renderer.listener_ownership(plan, ports, http + grpc.split(" users:", 1)[0] + "\n",
+                                                "grafana", enabled_optional=enabled)
+            self.assertTrue(any("31302" in error and "foreign" in error for error in errors), errors)
+
+    def test_codex_host_identity_is_explicit_and_required_for_direct_render(self):
+        from tests import test_new_wsl_client_config as fixtures
+        cfg = fixtures.cfg
+        values = json.loads((ROOT / "adoption/hosts/example.json").read_text())
+        values["WSL_DISTRO_NAME"] = "NativeHorizonNY"
+        plan = cfg.load_plan(ROOT)
+        results, manifest, _, errors, _ = cfg.analyse(ROOT)
+        self.assertEqual(errors, [])
+        with mock.patch.object(fixtures.render_config, "load_host_values", return_value=values):
+            resolved = cfg.host_values("fixture", plan, None, [])
+        import tomllib
+        config = tomllib.loads(cfg.render(ROOT, results, plan, resolved, manifest)["codex.config.toml"])
+        self.assertEqual(config["shell_environment_policy"]["set"]["WSL_DISTRO_NAME"], "NativeHorizonNY")
+        for missing in (None, "", "  "):
+            with self.subTest(missing=missing):
+                resolved["WSL_DISTRO_NAME"] = missing
+                with self.assertRaisesRegex(cfg.ConfigError, "WSL_DISTRO_NAME"):
+                    cfg.render(ROOT, results, plan, resolved, manifest)
+
+    def test_code_graph_has_an_explicit_disabled_ui_configuration(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = root / "config"
+            config.mkdir()
+            host = root / "host.json"
+            host.write_text(json.dumps(host_allocation({"NS_PORT_CODE_GRAPH_UI": "19749"})))
+            result = subprocess.run([sys.executable, str(PLAN / "config/observability_config.py"), "code-graph",
+                "--config-root", str(config), "--source-root", str(PLAN / "config"), "--host-file", str(host)],
+                env={"PATH": "/usr/bin:/bin", "HOME": tmp}, text=True, capture_output=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(json.loads((root / ".cache/codebase-memory-mcp/config.json").read_text()),
+                             {"ui_enabled": False, "ui_port": 19749})
+
+    def test_code_graph_port_owner_and_legacy_allocation_are_consistent(self):
+        renderer = module(PLAN / "config/observability_config.py", "wave2_graph_owner")
+        self.assertEqual(renderer.SERVICE_PORTS["CODE_GRAPH_UI"], ("code-graph", 9749))
+        self.assertEqual(renderer.service_ports({"NS_PORT_TRACE_VIEWER": "19749"})["CODE_GRAPH_UI"], 19749)
+        with self.assertRaisesRegex(ValueError, "disagree"):
+            renderer.service_ports({"NS_PORT_TRACE_VIEWER": "9749", "NS_PORT_CODE_GRAPH_UI": "19749"})
+
+    def test_code_graph_preserves_conflicting_operator_configuration(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = root / "config"
+            config.mkdir()
+            target = root / ".cache/codebase-memory-mcp/config.json"
+            target.parent.mkdir(parents=True)
+            for value in ({"ui_enabled": True, "ui_port": 9749}, {"ui_enabled": False, "ui_port": 9749.0}):
+                original = json.dumps(value)
+                target.write_text(original)
+                result = subprocess.run([sys.executable, str(PLAN / "config/observability_config.py"), "code-graph",
+                    "--config-root", str(config), "--source-root", str(PLAN / "config")],
+                    env={"PATH": "/usr/bin:/bin", "HOME": tmp}, text=True, capture_output=True)
+                self.assertEqual(result.returncode, 1)
+                self.assertIn("needs_owner", result.stderr)
+                self.assertEqual(target.read_text(), original)
+
+    def test_dagu_coordinator_and_agentsview_ports_are_host_selected(self):
+        renderer = module(PLAN / "config/observability_config.py", "wave2_auxiliary_ports")
+        ports = renderer.service_ports({"NS_PORT_DAGU_COORDINATOR": "25055", "NS_PORT_AGENTSVIEW": "31808"})
+        coordinator = renderer.render_ports((PLAN / "config/dagu-coordinator.conf").read_text(), ports)
+        self.assertIn("DAGU_COORDINATOR_PORT=25055", coordinator)
+        archive = renderer.render_ports(self.source("config/agentsview.toml"), ports)
+        self.assertIn("port = 31808", archive)
+        plan = json.loads((PLAN / "install-plan.json").read_text())
+        self.assertIn(25055, renderer.planned_listeners(plan, ports, "dagu"))
+        self.assertIn(31808, renderer.planned_listeners(plan, ports, "session-analytics"))
+
+    def test_existing_ui_configuration_is_not_an_installation_target(self):
+        renderer = module(PLAN / "config/observability_config.py", "wave2_optional_ui")
+        plan = json.loads((PLAN / "install-plan.json").read_text())
+        ports = renderer.service_ports({"NS_PORT_CODE_GRAPH_UI": "19749"})
+        self.assertNotIn(19749, renderer.planned_listeners(plan, ports))
+        enabled = renderer.planned_listeners(plan, ports, "code-graph", enabled_optional={"CODE_GRAPH_UI"})
+        self.assertEqual(enabled, {19749: "code-graph/CODE_GRAPH_UI"})
+
+    def test_agentsview_conflicting_archive_port_blocks_publication(self):
+        checker = module(PLAN / "check_plan.py", "wave2_agentsview_custody")
+        funcs = checker.functions((PLAN / "install.sh").read_text())
+        command = next(c for c in checker.run_commands("session-analytics", funcs, set())
+                       if 'd="${XDG_DATA_HOME' in c)
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "config").mkdir()
+            (root / "config/agentsview.toml").write_text("port = 31808\n")
+            target = root / "data/new-wsl-native-stack/agentsview/config.toml"
+            target.parent.mkdir(parents=True)
+            target.write_text("port = 21808\n")
+            result = subprocess.run(["bash", "-euo", "pipefail", "-c", command],
+                env={"PATH": "/usr/bin:/bin", "HOME": tmp, "plan_dir": tmp, "XDG_DATA_HOME": str(root / "data")},
+                text=True, capture_output=True)
+            self.assertNotEqual(result.returncode, 0, result.stderr)
+            self.assertIn("needs_owner", result.stderr)
+            self.assertEqual(target.read_text(), "port = 21808\n")
+
+    def test_successful_install_publishes_candidate_only_at_completion(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            original = self.allocation_fixture(root)
+            result = self.allocation_setup(root,
+                'cmp -s "$config_root/.service-ports.json" "$HOME/A.json"\n'
+                'failed=0; needs_execution=true; commit_allocation')
+            self.assertEqual(result.returncode, 0, result.stderr)
+            current = json.loads((root / "config/.service-ports.json").read_text())
+            self.assertEqual(current["NS_PORT_GATEWAY"], "41128")
+            self.assertNotEqual((root / "config/.service-ports.json").read_text(), original)
+
+    def test_inspector_is_rendered_before_the_frozen_recipe_hash(self):
+        checker = module(PLAN / "check_plan.py", "wave2_freeze")
+        body = checker.functions((PLAN / "accept.sh").read_text())["mcp-inspector"]
+        program = next(p for stage, _, _, p in checker.checks_of(body) if stage == "after_sign_in")
+        freeze = program[program.index('python3 "$plan_dir/config/observability_config.py" command'):program.index("for client in claude codex;")]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "config").mkdir()
+            (root / "session").mkdir()
+            host = root / "host.json"
+            host.write_text(json.dumps(host_allocation({"NS_PORT_INSPECTOR_PROBE": "26399"})))
+            result = subprocess.run(["bash", "-euo", "pipefail", "-c", freeze + '\nprintf "%s" "$probe_sha"'],
+                env={"PATH": "/usr/bin:/bin", "plan_dir": str(PLAN), "config_root": str(root / "config"),
+                     "session": str(root / "session"), "NS2604_HOST_FILE": str(host)}, text=True, capture_output=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            rendered = (root / "session/probe.sh").read_bytes()
+            self.assertEqual(result.stdout, hashlib.sha256(rendered).hexdigest())
+            self.assertIn(b"CLIENT_PORT=26399", rendered)
+
+    def test_checker_rejects_literal_probe_and_closed_fixture_ports(self):
+        checker = module(PLAN / "check_plan.py", "wave2_literal")
+        rows = json.loads((PLAN / "install-plan.json").read_text())["owners"]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "config").mkdir()
+            (root / "config/observability_config.py").write_text((PLAN / "config/observability_config.py").read_text())
+            (root / "inspector-client-probe.sh").write_text("curl http://127.0.0.1:16399/\n")
+            (root / "config/prometheus-alerts.test.yaml").write_text('targets: ["127.0.0.1:21997"]\n')
+            errors = []
+            checker.host_port_contract(root, rows, None, lambda tag, msg: errors.append(msg))
+            self.assertTrue(any("inspector-client-probe.sh: literal" in error for error in errors), errors)
+            self.assertTrue(any("prometheus-alerts.test.yaml: literal" in error for error in errors), errors)
+
+    def source(self, relative):
+        reference = os.environ.get("NS_TEST_CONFIG_REF")
+        path = PLAN / relative
+        if reference:
+            return subprocess.check_output(["git", "show", reference + ":" + str(path.relative_to(ROOT))], cwd=ROOT, text=True)
+        return path.read_text()
+
+    def test_grafana_grpc_and_gateway_consumers_follow_host_values(self):
+        renderer = module(PLAN / "config/observability_config.py", "wave2_config_ports")
+        ports = renderer.service_ports({"NS_PORT_GRAFANA_GRPC": "31302", "NS_PORT_GATEWAY": "31128"})
+        for name, expected in (("grafana.ini", "127.0.0.1:31302"),
+                               ("deer-flow-config.yaml", "127.0.0.1:31128/v1"),
+                               ("openhands-job.json", "127.0.0.1:31128/v1")):
+            with self.subTest(asset=name):
+                rendered = renderer.render_ports(self.source("config/" + name), ports)
+                self.assertIn(expected, rendered)
+
+    def test_inspector_probe_port_is_host_selected(self):
+        renderer = module(PLAN / "config/observability_config.py", "wave2_inspector_ports")
+        ports = renderer.service_ports({"NS_PORT_INSPECTOR_PROBE": "26399"})
+        rendered = renderer.render_ports(self.source("inspector-client-probe.sh"), ports)
+        self.assertIn("CLIENT_PORT=26399", rendered)
+        self.assertIn("http://127.0.0.1:26399/", rendered)
+        self.assertIn("sport = :26399", rendered)
+        self.assertNotIn("16399", rendered)
+
+    def test_closed_alert_port_has_its_own_predicate(self):
+        renderer = module(PLAN / "config/observability_config.py", "wave2_closed_ports")
+        checker = module(PLAN / "check_plan.py", "wave2_closed_check")
+        ports = renderer.service_ports({"NS_PORT_ALERT_CLOSED": "26397"})
+        body = checker.functions((PLAN / "accept.sh").read_text())["alerting"]
+        program = renderer.render_command(next(p for stage, _, _, p in checker.checks_of(body) if stage == "after_sign_in"), ports)
+        start = program.index("import socket\nimport subprocess\n")
+        predicate = program[start:program.index("\nPY", start)]
+        for errno, listeners in ((111, ""), (0, ""), (111, "LISTEN foreign\n"), (111, 'LISTEN owned users:(("fixture",pid=42))\n')):
+            with self.subTest(errno=errno, listeners=bool(listeners)), mock.patch("socket.socket") as sock, mock.patch("subprocess.run") as ss:
+                sock.return_value.__enter__.return_value.connect_ex.return_value = errno
+                ss.return_value.stdout = listeners
+                if errno != 0 and not listeners:
+                    exec(compile(predicate, "<closed-port-fixture>", "exec"), {})
+                    sock.return_value.__enter__.return_value.connect_ex.assert_called_once_with(("127.0.0.1", 26397))
+                    ss.assert_called_once_with(["ss", "-ltnH", "sport = :26397"], check=True, capture_output=True, text=True)
+                else:
+                    with self.assertRaises(AssertionError):
+                        exec(compile(predicate, "<closed-port-fixture>", "exec"), {})
+        plan = json.loads((PLAN / "install-plan.json").read_text())
+        self.assertNotIn(26397, renderer.planned_listeners(plan, ports, "alerting", program))
+
+    def test_probe_and_closed_ports_participate_in_collision_checks(self):
+        renderer = module(PLAN / "config/observability_config.py", "wave2_collision")
+        for key in ("NS_PORT_INSPECTOR_PROBE", "NS_PORT_ALERT_CLOSED"):
+            with self.subTest(key=key), self.assertRaisesRegex(ValueError, "claimed"):
+                renderer.service_ports({key: "26399", "NS_PORT_GATEWAY": "26399"})
 
 
 if __name__ == "__main__":

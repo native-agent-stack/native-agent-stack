@@ -9,6 +9,7 @@ The grafana action also renders the research dashboard's emitter units (observab
 adapted in ns2604-research-progress.service and .timer) into <config-root>/systemd/; install.sh installs them.
 """
 import argparse
+import configparser
 import hashlib
 import json
 import os
@@ -43,8 +44,14 @@ SERVICE_PORTS = {
     "GATEWAY": ("gpt-gateway", 21128),
     "GATEWAY_WS": ("gpt-gateway", 21129),
     "GATEWAY_EMBED_WS": ("gpt-gateway", 21131),
-    "TRACE_VIEWER": ("trace-viewer", 9749),
+    "CODE_GRAPH_UI": ("code-graph", 9749),
+    "INSPECTOR_PROBE": ("mcp-inspector", 16399),
+    "ALERT_CLOSED": ("alerting", 21997),
 }
+# Temporary probes and deliberately closed fixtures are allocations, not
+# listeners that stage S may demand to be running.
+NON_SERVICE_PORTS = frozenset({"INSPECTOR_PROBE", "ALERT_CLOSED"})
+OPTIONAL_LISTENERS = frozenset({"GRAFANA_GRPC", "CODE_GRAPH_UI"})
 PORT_MARKER = re.compile(r"@PORT_([A-Z_]+)@")
 FOREGROUND_UNITS = {
     "otel-collector-contrib": "ns2604-otel-collector.service",
@@ -54,12 +61,26 @@ FOREGROUND_UNITS = {
 }
 
 
-def service_ports(values=None):
+def service_ports(values=None, *, require_complete=False):
     """Resolve and validate the host's listener allocation before any writes."""
-    values = values or {}
+    values = dict(values or {})
+    # The first review head mislabeled codebase-memory's UI as trace-viewer.
+    # Retain old saved allocations while correcting its actual owning row.
+    if "NS_PORT_TRACE_VIEWER" in values:
+        old = values.pop("NS_PORT_TRACE_VIEWER")
+        if "NS_PORT_CODE_GRAPH_UI" in values and values["NS_PORT_CODE_GRAPH_UI"] != old:
+            raise ValueError("legacy TRACE_VIEWER and CODE_GRAPH_UI allocations disagree")
+        values.setdefault("NS_PORT_CODE_GRAPH_UI", old)
     unknown = {key for key in values if key.startswith("NS_PORT_")} - {"NS_PORT_" + key for key in SERVICE_PORTS}
     if unknown:
         raise ValueError("unknown service port keys: " + ", ".join(sorted(unknown)))
+    if require_complete:
+        required = {"NS_PORT_" + key for key in SERVICE_PORTS}
+        if "AI_MEMORY_URL" in values:
+            required.discard("NS_PORT_MEMORY")
+        missing = required - values.keys()
+        if missing:
+            raise ValueError("isolated host allocation missing explicit port keys: " + ", ".join(sorted(missing)))
     ports, claimed = {}, {}
     for name, (slot, default) in SERVICE_PORTS.items():
         value = values.get("NS_PORT_" + name, str(default))
@@ -84,14 +105,21 @@ def service_ports(values=None):
 def render_ports(text, ports):
     """Expand only named service-port markers; other template markers survive."""
     def replace(match):
-        if match[1] not in ports:
+        name = "CODE_GRAPH_UI" if match[1] == "TRACE_VIEWER" else match[1]
+        if name not in ports:
             raise ValueError("unknown service port marker " + match[0])
-        return str(ports[match[1]])
+        return str(ports[name])
     return PORT_MARKER.sub(replace, text)
 
 
 def render_asset(name, text, ports):
     """Derive the wrapper only from the composition's pinned default bytes."""
+    if name == "codebase-memory-ui.json":
+        settings = json.loads(render_ports(text, ports))
+        if settings.get("ui_enabled") is not False:
+            raise ValueError("new-distro codebase-memory UI must be explicitly disabled")
+        settings["ui_port"] = ports["CODE_GRAPH_UI"]
+        return json.dumps(settings, indent=2) + "\n"
     if name == "omniroute-serve.sh":
         original = render_ports(text, service_ports())
         if digest(original) != "672063a12174d46f7065ae7bb9adf1ed268c958cd264f64a25d0af3f74ae45bc":
@@ -134,7 +162,8 @@ def load_service_ports(host_file=None, config_root=None):
         raise ValueError("host value file does not exist")
     if not isinstance(values, dict):
         raise ValueError("host value file must be a JSON object")
-    return service_ports(values)
+    isolated = bool(host_file or (path and path.exists()) or os.environ.get("NS2604_NO_START") == "1")
+    return service_ports(values, require_complete=isolated)
 
 
 def default_config_root():
@@ -146,7 +175,7 @@ def gateway_url(host_file=None, config_root=None):
     return f"http://127.0.0.1:{ports['GATEWAY']}/v1"
 
 
-def planned_listeners(plan, ports, slot=None, program=""):
+def planned_listeners(plan, ports, slot=None, program="", enabled_optional=()):
     rows = {row["slot"]: row for row in plan["owners"]}
     if slot is not None and slot not in rows:
         raise ValueError("unknown listener owner row")
@@ -156,15 +185,24 @@ def planned_listeners(plan, ports, slot=None, program=""):
     # test calls both Alertmanager and Prometheus). Research also delegates to
     # external helpers whose gateway URL is no longer a literal in the program.
     referenced = {int(port) for port in re.findall(r"127\.0\.0\.1:(\d+)\b", program)}
-    owners.update(owner for name, (owner, _) in SERVICE_PORTS.items() if ports[name] in referenced)
+    owners.update(owner for name, (owner, _) in SERVICE_PORTS.items()
+                  if name not in NON_SERVICE_PORTS and ports[name] in referenced)
     if slot == "research-harnesses":
         owners.add("gpt-gateway")
+    for name in enabled_optional:
+        if name not in OPTIONAL_LISTENERS:
+            raise ValueError("unknown optional listener")
+        owner = SERVICE_PORTS[name][0]
+        if (slot is None and rows.get(owner, {}).get("installed")) or slot == owner:
+            owners.add(owner)
     if owners - {owner for owner, _ in SERVICE_PORTS.values()}:
         raise ValueError("planned listener owner has no host port allocation")
-    return {ports[name]: f"{owner}/{name}" for name, (owner, _) in SERVICE_PORTS.items() if owner in owners}
+    return {ports[name]: f"{owner}/{name}" for name, (owner, _) in SERVICE_PORTS.items()
+            if owner in owners and name not in NON_SERVICE_PORTS
+            and (name not in OPTIONAL_LISTENERS or name in enabled_optional)}
 
 
-def listener_ownership(plan, ports, text, slot=None, program=""):
+def listener_ownership(plan, ports, text, slot=None, program="", enabled_optional=()):
     """Inspect an ss snapshot; never probe or start a service.
 
     iproute2 v6.19.0 misc/ss.c:643-690,2455 collects visible /proc owners and
@@ -184,12 +222,30 @@ def listener_ownership(plan, ports, text, slot=None, program=""):
             owned = bool(re.search(r"\busers:\(\(.*\bpid=\d+", line))
             observed.setdefault(int(match[1]), []).append(owned)
     errors = []
-    for port, owner in sorted(planned_listeners(plan, ports, slot, program).items()):
+    for port, owner in sorted(planned_listeners(plan, ports, slot, program, enabled_optional).items()):
         if port not in observed:
             errors.append(f"{owner}: port {port} absent")
         elif not all(observed[port]):
             errors.append(f"{owner}: port {port} foreign or process owner invisible (no users: entry)")
     return errors
+
+
+def configured_optional_listeners(root, explicit=()):
+    """Rendered native settings and explicit enables select optional requirements."""
+    enabled = set(explicit)
+    grafana = root / "grafana.ini"
+    if grafana.is_file():
+        config = configparser.ConfigParser(interpolation=None)
+        try:
+            config.read_string(grafana.read_text())
+            if config.getboolean("grpc_server", "enabled", fallback=False):
+                enabled.add("GRAFANA_GRPC")
+        except (configparser.Error, ValueError) as error:
+            raise ValueError("invalid Grafana listener configuration") from error
+    graph = root / "codebase-memory-ui.json"
+    if graph.is_file() and json.loads(graph.read_text()).get("ui_enabled") is True:
+        enabled.add("CODE_GRAPH_UI")
+    return enabled
 
 
 PRISTINE = {
@@ -328,14 +384,15 @@ def destination():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("otel", "grafana", "alerting", "alerting-ready", "grafana-check", "prometheus", "stage", "command", "units", "gateway", "listeners"))
+    parser.add_argument("action", choices=("otel", "grafana", "alerting", "alerting-ready", "grafana-check", "prometheus", "stage", "command", "units", "gateway", "listeners", "commit-ports", "code-graph"))
     parser.add_argument("--config-root", type=Path)
     parser.add_argument("--source-root", type=Path)
     parser.add_argument("--tools-root", type=Path)
     parser.add_argument("--plan-file", type=Path)
     parser.add_argument("--host-file", type=Path, help="nonsecret host value JSON; NS_PORT_* values override defaults")
     parser.add_argument("--output-root", type=Path, help="stage: temporary rendered source tree")
-    parser.add_argument("--persist-ports", action="store_true", help="stage: save the nonsecret resolved allocation for later acceptance")
+    parser.add_argument("--enabled-listener", action="append", choices=sorted(OPTIONAL_LISTENERS), default=[],
+                        help="listeners: include an optional listener after its native configuration enables it")
     parser.add_argument("--slot", help="units/listeners: select one plan row")
     parser.add_argument("--ss-output", type=Path, help="listeners: read an ss fixture instead of executing sudo ss")
     parser.add_argument("--check-program", action="store_true", help="listeners: include service references from stdin")
@@ -358,7 +415,8 @@ def main():
             raise ValueError("listeners requires --plan-file")
         plan = json.loads(args.plan_file.read_text())
         program = sys.stdin.read() if args.check_program else ""
-        if not planned_listeners(plan, ports, args.slot, program):
+        enabled = configured_optional_listeners(root, args.enabled_listener)
+        if not planned_listeners(plan, ports, args.slot, program, enabled):
             return 0
         if args.ss_output:
             snapshot = args.ss_output.read_text()
@@ -367,13 +425,39 @@ def main():
             if result.returncode:
                 raise ValueError("listener ownership unavailable: sudo ss failed")
             snapshot = result.stdout
-        errors = listener_ownership(plan, ports, snapshot, args.slot, program)
+        errors = listener_ownership(plan, ports, snapshot, args.slot, program, enabled)
         if errors:
             print("\n".join(errors), file=sys.stderr)
             return 1
         return 0
     if args.action == "command":
         print(render_command(sys.stdin.read(), ports), end="")
+        return 0
+    if args.action == "commit-ports":
+        if args.host_file is None:
+            raise ValueError("commit-ports requires the successful installation's candidate --host-file")
+        target = root / ".service-ports.json"
+        if target.is_symlink():
+            raise ValueError("needs_owner: active allocation is a symlink; retained")
+        atomic(target, json.dumps({"NS_PORT_" + name: str(port) for name, port in ports.items()}, indent=2) + "\n")
+        return 0
+    if args.action == "code-graph":
+        # DeusData/codebase-memory-mcp v0.11.0 src/ui/config.c:124-157:
+        # a missing file AUTO-ENABLES embedded UI before MCP flags are applied.
+        # Native path resolver: src/foundation/platform.c:600-623.
+        rendered = render_asset("codebase-memory-ui.json", (source / "codebase-memory-ui.json").read_text(), ports)
+        cache = Path(os.environ.get("CBM_CACHE_DIR") or Path.home() / ".cache/codebase-memory-mcp")
+        target = cache / "config.json"
+        if target.is_symlink():
+            raise ValueError("needs_owner: codebase-memory UI configuration is a symlink; retained")
+        if target.exists():
+            current = json.loads(target.read_text())
+            if (not isinstance(current, dict) or type(current.get("ui_enabled")) is not bool
+                    or type(current.get("ui_port")) is not int or current != json.loads(rendered)):
+                raise ValueError("needs_owner: existing codebase-memory UI configuration differs; retained")
+        else:
+            atomic(target, rendered)
+        atomic(root / "codebase-memory-ui.json", rendered)
         return 0
     if args.action == "stage":
         if args.output_root is None or args.source_root is None:
@@ -384,8 +468,7 @@ def main():
                 # The renderer contains marker syntax, not a service config.
                 atomic(args.output_root / path.relative_to(source),
                        text if path.name == "observability_config.py" else render_asset(path.name, text, ports))
-        if args.persist_ports:
-            atomic(root / ".service-ports.json", json.dumps({"NS_PORT_" + name: str(port) for name, port in ports.items()}, indent=2) + "\n")
+        atomic(args.output_root / ".service-ports.json", json.dumps({"NS_PORT_" + name: str(port) for name, port in ports.items()}, indent=2) + "\n")
         return 0
     if args.action in ("grafana", "grafana-check"):
         # CPython@v3.13.16:Lib/pathlib/_abc.py:432-437, unlike exists(),
