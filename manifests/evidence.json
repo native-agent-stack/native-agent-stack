@@ -19193,8 +19193,8 @@
     },
     {
       "path": "docs/decisions/2026-10-15-unrun-registration-rules.md",
-      "sha256": "aa33f3a2e0c2b590bf626f48a6e46697bbb26579bca26535ec68c6ab6c52cafa",
-      "bytes": 9939
+      "sha256": "a8b087c328e8ac4ccfef6d69a23f5f0acec3cce3d96574f57b8f8d6d76e25c81",
+      "bytes": 9946
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -63763,8 +63763,8 @@
     },
     {
       "path": "tests/test_provenance_digest_custody.py",
-      "sha256": "1f264bd8271e0adcad7187c02d68fc30ffaed64ee007cd3d37587544375e84db",
-      "bytes": 11152
+      "sha256": "f31865920bd36e327af363a39aa1911c495eab05e550170c7a9993e4cb712d42",
+      "bytes": 11835
     },
     {
       "path": "tests/test_public_starred.py",

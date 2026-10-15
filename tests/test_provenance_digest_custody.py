@@ -28,6 +28,7 @@ SCANNED = ("evidence", "blueprints", "manifests")
 DIGEST = re.compile(r"[0-9a-f]{64}")
 FILE_KEYS = ("path", "file", "log", "output_path", "raw_path", "capture")
 HARBOR_RECEIPT = "evidence/receipts/harbor-smoke-20261012.json"
+REGISTRATION_RECORD = "docs/decisions/2026-10-15-unrun-registration-rules.md"
 
 LEGACY = {
     # file -> provenance digests that hash no published repository file, at the freeze (#1047)
@@ -141,6 +142,14 @@ class ProvenanceDigestCustodyTests(unittest.TestCase):
     def test_the_harbor_receipt_is_not_a_legacy_site(self):
         self.assertNotIn(HARBOR_RECEIPT, LEGACY)
         self.assertNotIn(HARBOR_RECEIPT, self.found)
+
+    def test_registration_record_cites_private_gpt_review_without_a_digest(self):
+        text = (ROOT / REGISTRATION_RECORD).read_text(encoding="utf-8")
+        citation = re.search(r"The Astra fix-one read\b.*?(?=added two P2 blockers)", text, re.DOTALL)
+        self.assertIsNotNone(citation, "identify the private GPT review citation for custody validation")
+        self.assertEqual(len(DIGEST.findall(citation.group(0))), 0,
+                         "the private GPT review is cited by name without any unpublished-byte digest")
+        self.assertIn("GPT-VERDICT-94f4c7649.md", citation.group(0))
 
 
 class SyntheticDetectorTests(unittest.TestCase):

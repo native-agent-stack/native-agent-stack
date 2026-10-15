@@ -121,8 +121,8 @@ scripts/final_stack.py:524-528, :660. The existing confined JSON loader,
 registered wave hashes and native recorder refusal path are reused. No gate,
 catalog, frozen wave, sweep record or selection changes with these rules.
 
-The Astra fix-one read at the same head, SHA256
-75223767b82ebef737cee494a1ed9edfd802f34d6a558e36264219becc5ff32e,
+The Astra fix-one read at the same head, retained privately as
+GPT-VERDICT-94f4c7649.md and cited here without a digest,
 added two P2 blockers to this same final bounded round. Both reproduced before
 correction: marked rows accepted malformed protocols, non-text overturn conditions
 and lane run bindings; taxonomy accepted the right layer ID from the wrong catalog
