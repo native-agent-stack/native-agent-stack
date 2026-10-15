@@ -27,6 +27,7 @@ def load(name, path):
 upstream = load('landed_latch_recut', LATCH / 'recut.py')
 flat = load('fixed_flat_recut', FLAT / 'recut.py')
 r3 = load('lane_b_r3_contract', Path(__file__).with_name('r3_contract.py'))
+replay_adapter = load('lane_b_r3_replay_adapter', Path(__file__).with_name('replay_adapter.py'))
 
 
 def isolate_launch(text, predecessor, *, canonical=None):
@@ -75,7 +76,7 @@ def seal(source, installed, output, source_sha256, installed_sha256, source_comm
                            cwd=installed, capture_output=True)
     if check.returncode:
         raise ValueError('installed_generation_manifest_refused')
-    for name in ('recut.py', 'flat_retirement.py', 'README.md', 'r3_contract.py'):
+    for name in ('recut.py', 'flat_retirement.py', 'README.md', 'r3_contract.py', 'replay_adapter.py'):
         path = 'blueprints/us-equities/paper-lane-latch/' + name
         if (ROOT / path).read_bytes() != pinned_file(source_commit, path):
             raise ValueError('recut_commit_binding_mismatch')
@@ -99,6 +100,10 @@ def seal(source, installed, output, source_sha256, installed_sha256, source_comm
     if scheduled not in payloads:
         raise ValueError('scheduled_source_not_in_manifest')
     payloads['scheduled_trial_r3.sh'] = r3.scheduler(payloads[scheduled].decode(), output).encode()
+    if 'dry_run.py' not in payloads:
+        raise ValueError('replay_driver_not_in_manifest')
+    payloads['dry_run.py'] = replay_adapter.driver(payloads['dry_run.py'].decode()).encode()
+    payloads['replay_adapter.py'] = Path(__file__).with_name('replay_adapter.py').read_bytes()
     payloads['issue_go.py'] = isolate_issuer(payloads['issue_go.py'].decode()).encode()
     for name in ('lane_latch.py', 'seq2_retirement.py'):
         payloads[name] = (LATCH / name).read_bytes()

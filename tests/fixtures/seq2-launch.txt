@@ -433,10 +433,24 @@ def run_stage(stage):
         value = binding(stage)
         instance = Path(value['instance'])
         paper = FROZEN / 'blueprints/us-equities/adaptive-paper'
+        def paper_output(output):
+            # Native outputs: 98 sizes inspected, 80 above 64KiB, max 407527B.
+            # A 1MiB cap leaves headroom without raising safe_json's GO limit.
+            # CPython v3.12.3 os.open/fstat and buffered read(size) bound this
+            # descriptor's bytes even if the native file grows after fstat.
+            limit = 1024 * 1024
+            with os.fdopen(os.open(output, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK), 'rb') as stream:
+                info = os.fstat(stream.fileno())
+                if not stat.S_ISREG(info.st_mode) or info.st_uid != os.geteuid() or info.st_size > limit:
+                    raise Refused('unsafe_input')
+                raw = stream.read(limit + 1)
+            if len(raw) > limit:
+                raise Refused('unsafe_input')
+            return json.loads(raw)
         def trial_result(rc, output):
             if rc != 0:
                 return rc
-            result = safe_json(output)
+            result = paper_output(output)
             if result.get('status') == 'recovery_only':
                 save(instance / 'recovery-run.json', {
                     'status': 'recovery_only', 'stage': stage, 'trial': value['trial'],
@@ -444,8 +458,10 @@ def run_stage(stage):
                     'native_output_sha256': sha(output),
                     'recovery_status': result.get('recovery_status')})
                 raise Refused('paper_start_recovery_only')
-            if result.get('status') != 'passed':
-                raise Refused('paper_trial_status_not_passed')
+            # Native exit-zero statuses at 8c95a50d runner.py:2273 and
+            # mover_runner.py:1043. Recovery-only remains separately refused.
+            if result.get('status') not in ('passed', 'completed_no_signals', 'held_overnight'):
+                raise Refused('paper_trial_status_not_successful')
             return rc
         if stage == 'pre':
             rc = keyed([PY, '-E', '-s', '-B', paper / 'mover_runner.py', 'paper',

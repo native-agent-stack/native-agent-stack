@@ -46,7 +46,10 @@ The lane B r3 preparation overlays only the canonical launcher's `keyed` and
 builder's exact source commit. It leaves the authenticated native runner and
 CONFIG files unchanged. Trial acceptance reads PRE `paper.json` or scheduled
 `paper-output.json`, records recovery-only starts separately and refuses them
-as trial evidence. A timeout sends TERM, permits 630 seconds for the cited
+as trial evidence. Native paper reads have a separate 1MiB cap (measured
+maximum407527B across98 outputs); the64KiB GO/control reader is unchanged.
+Native exit-zero statuses passed/completed_no_signals/held_overnight remain
+successful. A timeout sends TERM, permits 630 seconds for the cited
 recovery bounds, then KILL if still running; timeout remains refusal exit124.
 The scheduled Bash leader keeps a trap until its foreground runner ends.
 The generated root `scheduled_trial_r3.sh` retains the frozen script's logic
@@ -54,6 +57,12 @@ and native module directory, adding `--kill-after=670s` to its TERM900 wrapper.
 It does not alter the frozen input script. Wrapper hard deadline1570s exceeds
 900+630+10; the two read-only120s ingestion/gate commands gain1s KILL-after
 bounds, so loader1820s exceeds242s preparatory work plus1570s wrapper.
+
+New packets also emit a source-bound replay adapter. It updates retained SYN
+paper outputs, scheduler-name assertions and unit-budget expectations only
+in memory; all five archived replay files remain byte-identical. Run the new
+packet's own dry_run.py: it retains the full49-case minimum and all credential/
+process tripwires. A narrow CI contract probe is separate from that full drill.
 
 New-unit envelopes cover that full wait plus 30 seconds: RuntimeMaxSec at least
 5150s PRE, 1850s RTH and 780s GET-only pre-skip; TimeoutStopSec at least2140s

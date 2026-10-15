@@ -41,6 +41,7 @@ class Acceptance(unittest.TestCase):
         self.launch.binding = lambda stage: self.value
         self.native_status = 'recovery_only'
         self.native_rc = 0
+        self.output_bytes = 0
         self.calls = []
         self.launch.keyed = self.keyed
 
@@ -51,8 +52,10 @@ class Acceptance(unittest.TestCase):
             output = Path(argv[argv.index('--output') + 1])
         else:
             output = Path(environment['OUT_DIR']) / 'paper-output.json'
-            output.parent.mkdir(parents=True)
+            output.parent.mkdir(parents=True, exist_ok=True)
         self.launch.save(output, {'status': self.native_status, 'recovery_status': 'passed', 'started_as': 'paper'})
+        if self.output_bytes:
+            output.write_text(output.read_text().ljust(self.output_bytes))
         return self.native_rc
 
     def test_pre_recovery_only_exit_zero_is_refused_as_trial(self):
@@ -79,6 +82,41 @@ class Acceptance(unittest.TestCase):
     def test_nonzero_exit_remains_nonzero(self):
         self.native_status, self.native_rc = 'needs_attention', 3
         self.assertEqual(self.launch.run_stage('pre'), 3)
+
+    def test_136kb_native_success_is_accepted_without_raising_go_limit(self):
+        self.native_status, self.output_bytes = 'passed', 136292
+        for stage in ('pre', 'sip'):
+            with self.subTest(stage=stage):
+                self.assertEqual(self.launch.run_stage(stage), 0)
+        with self.assertRaisesRegex(self.launch.Refused, 'unsafe_input'):
+            self.launch.safe_json(self.instance / 'paper.json')
+
+    def test_136kb_recovery_only_keeps_a_nontrial_recovery_receipt(self):
+        self.output_bytes = 136292
+        for stage in ('pre', 'sip'):
+            with self.subTest(stage=stage):
+                with self.assertRaisesRegex(self.launch.Refused, 'paper_start_recovery_only'):
+                    self.launch.run_stage(stage)
+                receipt = self.launch.safe_json(self.instance / 'recovery-run.json')
+                self.assertIs(receipt['trial_evidence'], False)
+
+    def test_paper_reader_refuses_above_documented_one_mib_cap(self):
+        self.native_status, self.output_bytes = 'passed', 1024 * 1024 + 1
+        with self.assertRaisesRegex(self.launch.Refused, 'unsafe_input'):
+            self.launch.run_stage('pre')
+
+    def test_documented_native_exit_zero_statuses_remain_successful(self):
+        for status in ('completed_no_signals', 'held_overnight'):
+            self.native_status = status
+            for stage in ('pre', 'sip'):
+                with self.subTest(status=status, stage=stage):
+                    self.assertEqual(self.launch.run_stage(stage), 0)
+
+    def test_unknown_or_failed_native_status_is_refused_even_with_exit_zero(self):
+        for status in ('needs_attention', 'SYN_unknown', None):
+            self.native_status = status
+            with self.subTest(status=status), self.assertRaises(self.launch.Refused):
+                self.launch.run_stage('pre')
 
 
 class KillBudget(unittest.TestCase):
