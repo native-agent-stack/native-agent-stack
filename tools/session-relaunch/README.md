@@ -92,8 +92,12 @@ has checked that no tab of it is open:
 `/usr/bin/python3 -I "$T/session_relaunch.py" relaunch --reopen <name> --config "$S/config.json"` (repeat `--reopen`
 for more names; the run records them under `reopened`). A reopen is spent only by the call it makes
 (`resolved_through` in the session's record), so a reopen run that skips the session or stops before its call leaves it
-unresolved. A `--reopen` name that is not an unresolved session this relaunch still has to bring back is refused, exit 1,
-with a `refusals` entry in the state file, and nothing is opened.
+unresolved. A `--reopen` that cannot be carried out is refused, exit 1, and nothing is opened: a name that is not an
+unresolved session this relaunch still has to bring back, or any `--reopen` while the relaunch is complete, capped by
+`max_relaunches` or otherwise has nothing to relaunch. The refusal is recorded as a `refusals` entry in that boot's
+relaunch state file, under the run lock, with no run added. With no readable relaunch state for the boot (none was
+started, or the file cannot be read) there is nothing to add the entry to, and the refusal goes to stderr only. A dry
+run records nothing.
 
 Every relaunch run, the unit's or a direct one, holds an exclusive lock on `relaunch.lock` in the state directory
 (`fcntl.flock`). A run that finds it held is refused with exit 1 and writes and opens nothing, so a direct `--reopen` run

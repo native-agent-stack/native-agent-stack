@@ -446,6 +446,22 @@ def cmd_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[dic
         os.close(lock)
 
 
+def record_refusal(config: dict, prev_boot: str, names: list[str], reason: str) -> bool:
+    """Append a refused --reopen to the relaunch state of ``prev_boot`` (the caller holds the run lock), keeping its runs,
+    sessions and earlier refusals. A boot with no readable relaunch state keeps no record (nothing to add it to); the
+    refusal then goes to stderr only. True when a record was written."""
+    path = marker(config, "relaunch", prev_boot)
+    try:
+        state = json.loads(path.read_text(encoding="utf-8")) if path.exists() else None
+    except (OSError, ValueError):
+        return False
+    if not isinstance(state, dict):
+        return False
+    state.setdefault("refusals", []).append({"at": iso(now_utc()), "reopen": list(names), "reason": reason})
+    write_atomic(path, json.dumps(state, indent=1) + "\n")
+    return True
+
+
 def locked_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[dict], dry_run: bool,
                     reopen: frozenset[str]) -> dict:
     alive_rows = wait_client(config)
@@ -455,8 +471,10 @@ def locked_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[
     decided = plan(config, boot_id=boot_id, at=at, boots=boots, alive_rows=alive_rows)
     if decided["action"] != "relaunch":
         if reopen and not decided.get("refused"):
-            return refuse(f"--reopen {', '.join(sorted(reopen))}: nothing to relaunch ({decided['reason']})",
-                          prev_boot=decided.get("prev_boot"))
+            reason = f"--reopen {', '.join(sorted(reopen))}: nothing to relaunch ({decided['reason']})"
+            if not dry_run and decided.get("prev_boot"):
+                record_refusal(config, decided["prev_boot"], sorted(reopen), reason)
+            return refuse(reason, prev_boot=decided.get("prev_boot"))
         print(f"session_relaunch: nothing to relaunch: {decided['reason']}")
         return decided
     state, names = decided["state"], [row.get("name") for row, _ in decided["launch"]]
@@ -465,9 +483,8 @@ def locked_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[
     if bad:
         reason = (f"--reopen {', '.join(bad)}: not an unresolved session that this relaunch still has to bring back; "
                   "nothing was opened")
-        if state is not None:
-            state.setdefault("refusals", []).append({"at": iso(now_utc()), "reopen": bad, "reason": reason})
-            write_atomic(marker(config, "relaunch", decided["prev_boot"]), json.dumps(state, indent=1) + "\n")
+        if not dry_run:
+            record_refusal(config, decided["prev_boot"], bad, reason)
         return refuse(reason, prev_boot=decided["prev_boot"])
     if state is None:
         text = handoff_text(config, at=at, prev=decided["prev"], prev_end=decided["prev_end"],

@@ -480,6 +480,42 @@ class Relaunch(Fixture):
                 self.assertEqual(self.state()["refusals"][-1]["reopen"], [name])
         self.assertEqual(len(self.ps_calls()), 2)
 
+    def test_a_reopen_refused_by_a_complete_or_capped_relaunch_is_recorded(self):
+        # The GPT read of 7aad5a02 (GPT-VERDICT-7aad5a02f.md, P2; its reviewer regressions in test_review_paths.py:62): a
+        # --reopen refused because the relaunch is complete, or because the relaunch cap is reached, returned before the
+        # only writer of the refusal record. It now records the refusal in the existing state, under the run lock, with no
+        # run added and no tab call.
+        for label in ("complete", "capped"):
+            with self.subTest(case=label):
+                self.setUp()
+                self.crash_roster([row("trading-cc", "s")])
+                self.config.update(max_relaunches=20)
+                with mock.patch.dict(os.environ, {"FAKE_PS_LAUNCH": "1" if label == "complete" else "0"}):
+                    self.run_relaunch()
+                self.assertEqual(self.state()["status"], "complete" if label == "complete" else "partial")
+                if label == "capped":
+                    self.config.update(max_relaunches=1)
+                runs = len(self.state()["runs"])
+                decided = R.cmd_relaunch(
+                    self.config, boot_id=THIS, at=NOW + dt.timedelta(minutes=5), boots=BOOTS, dry_run=False,
+                    reopen={"trading-cc"})
+                self.assertTrue(decided.get("refused"))
+                self.assertEqual(len(self.ps_calls()), 1)
+                state = self.state()
+                self.assertEqual([entry["reopen"] for entry in state.get("refusals", [])], [["trading-cc"]])
+                self.assertEqual(len(state["runs"]), runs)
+
+    def test_a_dry_run_records_no_refusal(self):
+        # The same read's P3: the refusal write ran before the dry-run return. A dry run writes nothing.
+        self.crash_roster([row("trading-cc", "s"), row("ns2604-coop", "t")])
+        with mock.patch.dict(os.environ, {"FAKE_PS_LAUNCH": "0", "FAKE_PS_RC": "0"}):
+            self.run_relaunch()
+        before = R.marker(self.config, "relaunch", PREV).read_bytes()
+        decided = R.cmd_relaunch(self.config, boot_id=THIS, at=NOW + dt.timedelta(minutes=5), boots=BOOTS, dry_run=True,
+                                 reopen={"no-such-lane"})
+        self.assertTrue(decided.get("refused"))
+        self.assertEqual(R.marker(self.config, "relaunch", PREV).read_bytes(), before)
+
     def test_an_unreadable_live_list_before_the_first_call_opens_nothing(self):
         # The CC micro at 376f2bb9, F2 (P1): a failed pre-open query on attempt 0 went on to open a tab.
         self.crash_roster([row("trading-cc", "s")])
