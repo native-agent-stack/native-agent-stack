@@ -159,10 +159,12 @@ def cmd_snapshot(config: dict, *, boot_id: str, sessions: list[dict], at: dt.dat
 
 @contextlib.contextmanager
 def roster_lock(config: dict):
-    """An exclusive lock on roster.lock in the state directory (flock(2), released when the descriptor closes), held by
-    the timer's snapshot from its carry read to its roster write and by a relaunch while it saves its state and writes
-    the seed roster, so a snapshot never writes a carry read before that state over the seed. Both holders are short;
-    the relaunch's own run lock (relaunch.lock) is a different lock, held for the whole run."""
+    """An exclusive lock on roster.lock in the state directory, held by the timer's snapshot from its carry read to its
+    roster write and by a relaunch while it writes the seed roster and saves its state, so a snapshot never writes a
+    carry read before that state over the seed. Both holders are short; the relaunch's own run lock (relaunch.lock) is a
+    different lock, held for the whole run. fcntl.flock performs flock(2) on the descriptor (python/cpython v3.13.16,
+    cbc944f4, Doc/library/fcntl.rst:176-183), and the lock is released when all its descriptors are closed (Linux
+    man-pages tag man-pages-6.9.1, man/man2/flock.2:69-72), so os.close in the finally clause releases it."""
     fd = os.open(state_dir(config) / "roster.lock", os.O_RDWR | os.O_CREAT, 0o600)
     try:
         fcntl.flock(fd, fcntl.LOCK_EX)
@@ -563,12 +565,17 @@ def locked_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[
     state["runs"].append({"boot": boot_id, "started_at": iso(at), **({"reopened": reopened} if reopened else {})})
     state_path = marker(config, "relaunch", prev_boot)
     save = lambda: write_atomic(state_path, json.dumps(state, indent=1) + "\n")
-    # The state first, then this boot's roster at once (the live sessions and the earlier boot's rows not running yet),
-    # both under roster_lock: a crash before the timer's first snapshot still leaves the rows to the next boot, the
-    # timer carries them from the saved state, and no snapshot interleaves with the two writes.
+
+    def retire(names: set[str]) -> None:
+        """A row whose session the run saw running leaves the carry, so it is not carried again after it exits."""
+        state["carry"] = [row for row in state["carry"] if row.get("name") not in names]
+    # This boot's roster first (the live sessions and the earlier boot's rows not running yet), then the state, both
+    # under roster_lock: a boot stop between the two writes still leaves the seed as this boot's newest roster (an
+    # earlier timer snapshot of this boot can be empty), the timer carries the rows from the saved state afterwards,
+    # and no snapshot interleaves with the two writes.
     with roster_lock(config):
-        save()
         cmd_snapshot(config, boot_id=boot_id, sessions=alive_rows + carry, at=at)
+        save()
     handoff = Path(state["handoff"])
     for index, entry in enumerate(e for e in sessions if e["outcome"] == "pending"):
         if index:
@@ -577,6 +584,7 @@ def locked_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[
                                         reopening=entry["session_name"] in reopened)
         if entry["outcome"] != "running" and unresolved(entry):
             entry["outcome"] = unresolved_outcome(entry)  # e.g. a reopen that was skipped before its call
+        retire({entry["session_name"]} if entry["outcome"] == "running" else set())
         save()
     # Completion rests on this final read: a session seen running earlier in the run (it registered) and missing now
     # has exited, so it is absent, and its tab start is resolved (seen listed), so a rerun opens it again without a
@@ -590,6 +598,10 @@ def locked_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[
             elif entry["outcome"] == "running":
                 entry["outcome"] = "absent"
                 entry["resolved_through"] = len(entry.get("attempts") or [])
+        retire({entry["session_name"] for entry in sessions if entry["outcome"] == "running"})
+        # A session that registered and then exited is still to be brought back, so its row is carried again.
+        absent = {entry["session_name"] for entry in sessions if entry["outcome"] == "absent"}
+        state["carry"] += [row for row in carry if row.get("name") in absent and row not in state["carry"]]
     complete = final is not None and all(entry["outcome"] == "running" for entry in sessions)
     state["status"] = "complete" if complete else "partial"
     state["runs"][-1]["ended_at"] = iso(now_utc())

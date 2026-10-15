@@ -50,9 +50,12 @@ argv = sys.argv[1:]
 with open(os.environ["FAKE_PS_LOG"], "a") as log:
     log.write(json.dumps(argv) + "\\n")
 rc = int(os.environ.get("FAKE_PS_RC", "0"))
+launcher = argv[argv.index("-Name") + 1]
+if launcher in os.environ.get("FAKE_PS_FAIL_NAMES", "").split(","):
+    rc = 1
 if os.environ.get("FAKE_PS_LAUNCH", "1" if rc == 0 else "0") == "1":
     names = json.loads(os.environ["FAKE_PS_NAMES"])
-    launched = names[argv[argv.index("-Name") + 1]]
+    launched = names[launcher]
     path = os.environ["FAKE_AGENTS_JSON"]
     rows = json.load(open(path))
     gone = json.loads(os.environ.get("FAKE_PS_KILL", "{}")).get(argv[argv.index("-Name") + 1])
@@ -341,6 +344,23 @@ class Relaunch(Fixture):
         self.assertEqual([c[c.index("-Name") + 1] for c in self.ps_calls()], ["cc", "trading-cc", "coop", "cc"])
         self.assertEqual((self.state()["status"], set(self.outcomes().values())), ("complete", {"running"}))
 
+    def test_a_session_that_registers_and_then_exits_is_carried_again(self):
+        # Rebase resolution of #1141 onto #1145 (main's completion rule meets #1141's carry retirement): a session seen
+        # running and then missing from the final list is absent and still to be brought back, so a second crash in this
+        # boot finds its row in this boot's roster.
+        self.crash_roster()
+        os.environ["FAKE_PS_KILL"] = json.dumps({"trading-cc": "wsl-architecture-design"})
+        try:
+            self.run_relaunch()
+        finally:
+            del os.environ["FAKE_PS_KILL"]
+        self.assertEqual(self.outcomes()["wsl-architecture-design"], "absent")
+        self.assertIn("wsl-architecture-design", [row["name"] for row in self.state()["carry"]])
+        self.assertNotIn("trading-cc", [row["name"] for row in self.state()["carry"]])
+        self.assertEqual(self.main("snapshot", boot=THIS), 0)
+        roster = json.loads((R.roster_dir(self.config) / f"roster-{THIS}.json").read_text())
+        self.assertIn("wsl-architecture-design", {row["name"] for row in roster["sessions"]})
+
     def test_an_unreadable_final_list_never_completes_a_run(self):
         # The same finding: completion rests on a final live list that was read. When that read fails, the run is
         # partial (exit 1, the alert), and a rerun reads the list again and completes without a tab.
@@ -401,6 +421,47 @@ class Relaunch(Fixture):
         names = [r["name"] for r in roster["sessions"]]
         self.assertEqual(names.count("trading-cc"), 1)  # live, not carried a second time
         self.assertLessEqual({"wsl-architecture-design", "ns2604-coop", "trading-cc"}, set(names))
+
+    def test_a_lane_brought_back_by_a_partial_run_leaves_the_carry(self):
+        # Local review P2 at 474cf2b6 (:244-245): the carry was taken before any tab opened, so a lane the run brought
+        # back stayed carried; once it exited on purpose, the next snapshot listed its old row again and a second crash
+        # would relaunch it. A row leaves the carry when its session is seen running.
+        self.crash_roster()
+        with mock.patch.dict(os.environ, {"FAKE_PS_FAIL_NAMES": "trading-cc"}):
+            self.run_relaunch()
+        self.assertEqual(self.state()["status"], "partial")
+        self.assertEqual((self.outcomes()["wsl-architecture-design"], self.outcomes()["ns2604-coop"]), ("running", "running"))
+        self.agents.write_text("[]")  # the command center and the co-op exit on purpose later in this boot
+        self.assertEqual(self.main("snapshot", boot=THIS), 0)
+        roster = json.loads((R.roster_dir(self.config) / f"roster-{THIS}.json").read_text())
+        names = {r["name"] for r in roster["sessions"]}
+        self.assertIn("trading-cc", names)
+        self.assertFalse(names & {"wsl-architecture-design", "ns2604-coop"}, names)
+
+    def test_a_boot_stop_right_after_the_state_write_still_relaunches_from_the_seed(self):
+        # GPT read of #1141 at 474cf2b6 (P2, the reviewer's retained crash case): with the state saved before the seed
+        # roster, a boot stop between the two writes left the timer's empty roster of this boot as the newest, and the
+        # next boot opened nothing. The seed roster is written first, both under roster_lock.
+        self.crash_roster()
+        at = NOW + dt.timedelta(seconds=120)  # past the timer's 90 s boot delay: it has written an empty roster
+        self.roster(THIS, at, [])
+        real = R.write_atomic
+
+        def stop_after_the_state(path, text, *args, **kwargs):
+            real(path, text, *args, **kwargs)
+            if path == R.marker(self.config, "relaunch", PREV):
+                raise Interrupted()
+
+        with mock.patch.object(R, "write_atomic", side_effect=stop_after_the_state), self.assertRaises(Interrupted):
+            self.run_relaunch(at=at)
+        self.assertEqual(self.state()["status"], "in_progress")
+        start = at + dt.timedelta(minutes=10)
+        end = at + dt.timedelta(seconds=60)
+        boots = [BOOTS[0], dict(BOOTS[1], last_entry=int(end.timestamp() * 1e6)),
+                 {"index": 0, "boot_id": NEXT, "first_entry": int(start.timestamp() * 1e6),
+                  "last_entry": int(start.timestamp() * 1e6)}]
+        self.run_relaunch(boot=NEXT, at=start + dt.timedelta(seconds=30), boots=boots)
+        self.assertEqual([c[c.index("-Name") + 1] for c in self.ps_calls()], ["cc", "trading-cc", "coop"])
 
     def test_a_crash_before_the_first_minute_snapshot_is_recovered_by_the_next_boot(self):
         self.crash_roster()

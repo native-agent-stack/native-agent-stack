@@ -110,13 +110,17 @@ Every relaunch run, the unit's or a direct one, holds an exclusive lock on `rela
 (`fcntl.flock`). A run that finds it held is refused with exit 1 and writes and opens nothing, so a direct `--reopen` run
 never overlaps the unit's run.
 
-At its start a run saves its state, then writes this boot's roster as the live sessions plus the ended boot's rows not
-running yet. The minute snapshot keeps carrying those rows, minus the ones listed live, while the run is `in_progress`
+At its start a run writes this boot's roster as the live sessions plus the ended boot's rows not running yet, then saves
+its state. The minute snapshot keeps carrying those rows, minus the ones listed live, while the run is `in_progress`
 and after it ends `partial`, so a second crash leaves every session the relaunch has not brought back to the next boot.
-A second crash before the timer's first snapshot (90 s after boot) finds the run's own roster. The snapshot holds an
-exclusive lock on `roster.lock` in the state directory (`fcntl.flock`) from its carry read to its roster write, and a
-run holds it while it saves its state and writes that roster, so a snapshot never replaces it with a carry read before
-the state existed. Both hold it briefly; `relaunch.lock` is the run's own lock.
+A row leaves the carry once the run sees its session running, so a lane that came back and later exits on purpose is not
+carried again. A second crash before the timer's first snapshot (90 s after boot), or between the run's two writes,
+finds the run's own roster as this boot's newest. The snapshot holds an exclusive lock on `roster.lock` in the state
+directory from its carry read to its roster write, and a run holds it while it writes that roster and saves its state,
+so a snapshot never replaces it with a carry read before the state existed. Both hold it briefly; `relaunch.lock` is
+the run's own lock. Both locks are `fcntl.flock`, flock(2) on the descriptor (python/cpython v3.13.16, `cbc944f4`,
+`Doc/library/fcntl.rst:176-183`), released when the descriptor closes (Linux man-pages tag `man-pages-6.9.1`,
+`man/man2/flock.2:69-72`).
 
 The service's `TimeoutStartSec=900` bounds one run. A run stopped by it stays `in_progress` and is rerun as above; a
 call it stopped is left `in_flight`, so the rerun records that session as `uncertain` and does not open it.

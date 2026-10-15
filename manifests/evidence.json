@@ -52588,7 +52588,7 @@
     },
     {
       "path": "evidence/artifacts/session-relaunch-20261014/README.md",
-      "sha256": "37cc67c727d0982e21e2228d356cebcabb68d6d402a78a0c03013ccc3114d141",
+      "sha256": "f47c1ae78d7758be5fdfa4c5d4af756ff88ecdac23fb5301d597afe1eb1a7a54",
       "bytes": 2110
     },
     {
@@ -52618,8 +52618,8 @@
     },
     {
       "path": "evidence/artifacts/session-relaunch-20261014/receipts/sources.json",
-      "sha256": "a0c08c14cc9ae6c681ead63798fe7e758b6b885954b9ea44addb0ccf624ac0c8",
-      "bytes": 2712
+      "sha256": "62662a883e10105e2c2fff3ee19a8608beb8daf4f7042453eb46da4ab98b2990",
+      "bytes": 3556
     },
     {
       "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/advisory-before.log",
@@ -64618,8 +64618,8 @@
     },
     {
       "path": "tests/test_session_relaunch.py",
-      "sha256": "1c35b134d384121eebe13ff0c1886dc27947af0444cbaa7c6c970774d83500a3",
-      "bytes": 57789
+      "sha256": "8b37cc66472b0fd2a3a05ee41c47687d8e0293d0608e4afcb288b7db98db41a4",
+      "bytes": 61747
     },
     {
       "path": "tests/test_shell_parser_ci.py",
@@ -65298,8 +65298,8 @@
     },
     {
       "path": "tools/session-relaunch/README.md",
-      "sha256": "2f5614e5ca4b3a312b55bc3c840b36f3904fb88eda9fab616fbecc422f582ef5",
-      "bytes": 15259
+      "sha256": "2e040dc764ee3677f663751c2356f67d6d67a3ac7efca947786ca7c3744fdbc5",
+      "bytes": 15667
     },
     {
       "path": "tools/session-relaunch/config.example.json",
@@ -65308,8 +65308,8 @@
     },
     {
       "path": "tools/session-relaunch/session_relaunch.py",
-      "sha256": "e5fddab34746057c3f90efe7a1df6901ec0d6a9013c2b2f83bf4a7fe614c0bf1",
-      "bytes": 33229
+      "sha256": "45be48acfbb209de4e37ddf1df41c61fc836cf3e0d13dbead2524c95dabd36e2",
+      "bytes": 34286
     },
     {
       "path": "tools/session-relaunch/units/ns-session-relaunch.service",
