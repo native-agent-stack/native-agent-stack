@@ -1530,6 +1530,29 @@ class RepositoryWorkflowTests(unittest.TestCase):
         self.assertEqual(derived.unresolved, [])
 
 
+
+    def test_the_newest_delta_holds_at_its_declared_source_commit(self):
+        # The GPT read of #1121 at e8ddb40a: the newest delta kept four read locations from before a three-line move
+        # and claimed identity with the published head. Its totals still matched, so the bounded-baseline test above,
+        # which is stable under line moves on purpose, could not see it. The contract binds each delta to its measured
+        # source commit (advisory-gate-deltas.md, "Derive the new delta"); its recorded locations must be the native
+        # derivation's at that commit. A squash-merged pull request's commit can be absent from a later clone: the
+        # check then skips, and it runs wherever the commit resolves, as on the pull request itself.
+        tree, _ = self.derived()
+        evidence = Path("blueprints/runtime-workers/openhands/evidence")
+        index = json.loads((ROOT / evidence / "unclassified-gate-read-deltas.json").read_text())
+        delta = json.loads((ROOT / evidence / index["entries"][-1]["path"]).read_text())
+        source = delta.get("source_commit") or ""
+        self.assertRegex(source, r"^[0-9a-f]{40}$", "The newest delta binds the commit it was measured at")
+        present = subprocess.run([tree.git, "-C", tree.repo, "cat-file", "-e", source + "^{commit}"],
+                                 env=self.g.patch_policy.GIT_ENV, capture_output=True, timeout=120).returncode == 0
+        if not present:
+            self.skipTest("the newest delta's source commit is not in this clone (a squash-merged commit)")
+        pinned = self.g.derive_ci_protected(self.g.patch_policy.GitTree(tree.repo, source, git=tree.git)).advisory
+        baseline = json.loads((ROOT / delta["baseline_path"]).read_text())
+        self.assertEqual(sorted(set(pinned.unclassified) - set(baseline["unclassified"])), delta["added_locations"])
+        self.assertEqual(sorted(set(baseline["unclassified"]) - set(pinned.unclassified)), delta["removed_locations"])
+        self.assertEqual(len(pinned.unclassified), delta["derived_count"])
 class OwnedPathGateTests(unittest.TestCase):
     """Independent commit fixtures, using native git and unittest; never a live resolver.
 

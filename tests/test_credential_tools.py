@@ -455,6 +455,36 @@ class FileCustodyTests(unittest.TestCase):
         self.assertIn("key check passed", output)
         self.assert_nothing_of(data, output)
 
+    def test_a_failing_close_of_the_copy_still_removes_it_and_keeps_the_original(self):
+        # The from-file twin of the stdin close test (the local review's P2 at e8ddb40a): the kernel releases a
+        # descriptor before close() can fail, so retrying close() is wrong (Linux man-pages 6.19, close(2), "Dealing
+        # with error returns from close()"). Before the correction, the cleanup closed the copy again (EBADF) and
+        # skipped the unlink, leaving the temporary key in the store.
+        source = self.make_key()
+        data = source.read_bytes()
+        real_open, real_close = os.open, os.close
+        created, failed = [], []
+
+        def open_recording(path, flags, *args, **kwargs):
+            fd = real_open(path, flags, *args, **kwargs)
+            if flags & os.O_CREAT and not created:
+                created.append(fd)  # the temporary copy, the only file custody creates
+            return fd
+
+        def close_failing_on_the_copy(fd):
+            real_close(fd)
+            if created and fd == created[0] and not failed:
+                failed.append(fd)
+                raise OSError("simulated close failure")
+
+        with mock.patch.object(store_mod.os, "open", side_effect=open_recording), \
+                mock.patch.object(store_mod.os, "close", side_effect=close_failing_on_the_copy), \
+                self.assertRaisesRegex(store_mod.Refused, "nothing moved"):
+            self.custody(source)  # run_from_file reports a failed file operation as a refusal
+        self.assertEqual(failed, created[:1])
+        self.assertEqual(sorted(p.name for p in self.store.iterdir()) if self.store.exists() else [], [])
+        self.assertEqual(source.read_bytes(), data)  # nothing moved: the downloaded file stays
+
     def test_a_file_that_is_not_a_readable_key_is_refused_and_kept(self):
         for name, writer in (("random.pem", lambda p: p.write_bytes(os.urandom(1200))),
                              ("protected.pem", None)):

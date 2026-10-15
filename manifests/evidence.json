@@ -11488,8 +11488,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-read-deltas.json",
-      "sha256": "fcb043dfe900b5db3d5c33526e38c6dc266be4892edfddfccfdf535d3092853e",
-      "bytes": 1376
+      "sha256": "39f91d317a20a854ec09bcadc109e6f92b1cbd16b8723b6b1ab175940cae5b44",
+      "bytes": 1502
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
@@ -11560,6 +11560,11 @@
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261014-review-app-custody-delta.json",
       "sha256": "f33b98bd9d0a1c3262a370ebc2087d33acbb14d73f79dde44626f0bdd2673fcf",
       "bytes": 16567
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261015-review-app-custody-moved-delta.json",
+      "sha256": "5abdedb2188fa5b2f0b58340302be01d080a11562029428c47cd33449d5893de",
+      "bytes": 16679
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unit-pass.txt",
@@ -63008,8 +63013,8 @@
     },
     {
       "path": "tests/test_credential_tools.py",
-      "sha256": "fcdb789ae4024f36cb1926f32f72b7c2c2bccf299bedf605ea6bc47ff55125f6",
-      "bytes": 58568
+      "sha256": "98f770c1087a82e081ecd3d683b144c43ee4e575513f39e8872ad963d8b66464",
+      "bytes": 60323
     },
     {
       "path": "tests/test_currency_due.py",
@@ -63833,8 +63838,8 @@
     },
     {
       "path": "tests/test_runtime_worker_openhands_push_gate.py",
-      "sha256": "e1fc39348503694ad5647ff46ae4154dfd7675979721c832fbbd1184e2f7f0cc",
-      "bytes": 179931
+      "sha256": "da913d6d9fac8acaa65ef1c79416891b9a7ff42cc501164da823067a933a93bb",
+      "bytes": 181993
     },
     {
       "path": "tests/test_runtime_worker_openhands_resolver.py",
