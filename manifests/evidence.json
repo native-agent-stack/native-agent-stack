@@ -64598,8 +64598,8 @@
     },
     {
       "path": "tools/local-pages/README.md",
-      "sha256": "1ce7bfa5bfe10908d6d0954b49e11dc1c92b2722231fcb0a1f82549215474fbb",
-      "bytes": 35758
+      "sha256": "14d294af1400d6a0e646f4bcc5c149982b70b2ac8d1fc754b25f19621739d3b2",
+      "bytes": 37540
     },
     {
       "path": "tools/local-pages/architecture_mapping.json",
@@ -64623,8 +64623,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "3ec2c9e1267fb087714a3bb650ba185621021ed2d7b479fb7aad99920ba43881",
-      "bytes": 760297
+      "sha256": "c1406979770796d405533a2ef4cc95b570d17634313fcfec19cca05e72a34dda",
+      "bytes": 763446
     },
     {
       "path": "tools/muse_file_fence.py",

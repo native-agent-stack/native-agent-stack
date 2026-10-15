@@ -242,6 +242,30 @@ the refresh receipt itself, which it also refuses as `--receipt`. A full refresh
 renders them too and records their receipt under `architecture_layer_pages`; if
 they fail, a missing page gets an UNREPORTED placeholder.
 
+`overview.html` is the essential-only entry page, in eight sections: the two
+catalogs as a layer stack with their state counts and the FINAL count, the
+converged data-feed stack, the strategy shortlist, the runtime workers with
+their newest receipts, the finalize-all waves with the F1 and F2 status and the
+winners, run pins, survivors and next action per layer, the evidence (who
+produced each converged study's arms, with model family, and which judges
+converged it), Claude Code (run pin and prepared pin, CHANGELOG delta counts,
+best-practice slots), and GitHub's main CI and pull-request queue. Every source it reads is declared once in `overview_sources.json`
+(section, `source_policy.json` role, repo or state root, one exact path,
+what is read, readiness trigger), so a record can move by editing that map and
+its grant, without code changes. Repository records reuse the layer pages'
+Architecture roles; state records use the `overview` exact grants only, enforced
+by `source_policy.OverviewReads` before any open: no filename family authorizes a
+read, and the path in the map is the explicit pointer to the current record (a
+newer ROWS or convergence record is shown once its path and grant name it). Layer states and the FINAL count
+are `architecture_manifest.layer_manifest()` over the same committed records,
+so the page never claims a FINAL layer the protocol does not. A missing source
+renders as pending with its trigger; private state records appear by name only,
+and their digests stay in the nonserved receipt
+(`local-overview/1`), which lists the present and pending sources.
+`build_pages.py --overview-only --output-dir DIR --receipt FILE` renders the
+overview and the layer pages it links into; a full refresh renders it too and
+records it under `overview`.
+
 Inventory rows use canonical winner component-ID and candidate repository
 joins, followed by the reviewed `architecture_mapping.json` for remaining
 skills, agents, workflows and runtime automation. Each remaining unmapped item

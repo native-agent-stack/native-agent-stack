@@ -21608,5 +21608,109 @@
       "pin": "4d6cee1582f024d27319ee005117da5f15ebe269",
       "scope": "Excluded from architecture_supplement: this derived manifest duplicates the canonical landscape layer records and is presented by landscape.html. Its classification was reviewed at this pin; regenerated output bytes remain bound separately by manifests/evidence.json. planned-layers.json remains a granted supplement."
     }
-  ]
+  ],
+  "overview": {
+    "overview_cc_now": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/pages/cc-now.json"
+      }
+    ],
+    "overview_registry": [
+      {
+        "root": "repo",
+        "path": "manifests/evidence.json"
+      }
+    ],
+    "overview_runtime_profiles": [
+      {
+        "root": "repo",
+        "path": "notes/runtime-profiles-20261012/receipts/qualification.json"
+      }
+    ],
+    "overview_cc_slots": [
+      {
+        "root": "repo",
+        "path": ".claude/skills/claude-native-practice/reference/slots.json"
+      }
+    ],
+    "overview_finalize_f1": [
+      {
+        "root": "state",
+        "path": "coordination/ns2604-coop/work-20261012/finalize-f1-20261014/INDEX.json"
+      }
+    ],
+    "overview_feeds_arms": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/research-cc-role-20261008/ranked-feeds-20261014/README.md"
+      }
+    ],
+    "overview_strategies_arms": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/research-cc-role-20261008/extreme-mover-strategies-20261014/README.md"
+      }
+    ],
+    "overview_feeds_convergence": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/research-cc-role-20261008/ranked-feeds-20261014/CONVERGENCE-WS2-20261014.md"
+      }
+    ],
+    "overview_feeds_battery": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/research-cc-role-20261008/ranked-feeds-20261014/BATTERY-WS2-20261014.md"
+      }
+    ],
+    "overview_feeds_addendum": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/research-cc-role-20261008/ranked-feeds-20261014/CONVERGENCE-WS2-20261014.addendum-01.md"
+      }
+    ],
+    "overview_strategies_convergence": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/research-cc-role-20261008/extreme-mover-strategies-20261014/CONVERGENCE-WS5-20261015.md"
+      }
+    ],
+    "overview_strategies_replication": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/research-cc-role-20261008/extreme-mover-strategies-20261014/REPLICATION-WS5-20261015.md"
+      }
+    ],
+    "overview_finalize_rows": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/research-cc-role-20261008/finalize-all-20261014/ROWS-252babe4.md"
+      }
+    ],
+    "overview_finalize_plan": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/research-cc-role-20261008/finalize-all-20261014/PLAN-finalize-all-20261014.md"
+      }
+    ],
+    "overview_finalize_f2": [
+      {
+        "root": "state",
+        "path": "coordination/cc-native-practice-20261009/finalize-f2-20261014/F2-claude-side-20261014.md"
+      }
+    ],
+    "overview_cc_floor_prep": [
+      {
+        "root": "state",
+        "path": "coordination/cc-native-practice-20261009/floor-2300-20261014/FLOOR-2300-prep-20261014.md"
+      }
+    ],
+    "overview_cc_changelog": [
+      {
+        "root": "state",
+        "path": "coordination/cc-native-practice-20261009/floor-2300-20261014/changelog-2.1.296-2.1.300.md"
+      }
+    ]
+  }
 }

@@ -365,6 +365,78 @@ class ArchitectureReads:
                      "file_utc": datetime.fromtimestamp(info.st_mtime, timezone.utc).isoformat().replace("+00:00", "Z")}
 
 
+
+
+class OverviewReads:
+    """Authorize the overview page's source-map reads before any content access.
+
+    Grants are the committed policy's "overview" roles, exact repo or state
+    paths only: no filename family authorizes a read (an "overview_families"
+    key is refused), so the source map's path is both the grant it must match
+    and the explicit pointer to the current record. The source map selects
+    among these grants; it cannot extend them. final-stack.json stays on its
+    dedicated Architecture role, so no overview role may grant it.
+    """
+
+    limit_error = SourceReadLimitError
+
+    def __init__(self, root, state_root, policy_path=POLICY_PATH):
+        self.policy = load_policy(policy_path)
+        self.roots = {"repo": Path(root).absolute(), "state": Path(state_root).absolute()}
+        entries = self.policy.document.get("overview", {})
+        if not isinstance(entries, dict):
+            raise SourcePolicyError("overview permissions must be a role map")
+        self.allowed = {}
+        for role, paths in entries.items():
+            if not isinstance(role, str) or not role.startswith("overview_") or not isinstance(paths, list):
+                raise SourcePolicyError("invalid overview exact-path role")
+            self.allowed[role] = set()
+            for record in paths:
+                if not isinstance(record, dict) or set(record) != {"root", "path"} or record["root"] not in self.roots:
+                    raise SourcePolicyError("overview permission requires exactly a known root and a path")
+                relative = _relative(record["path"])
+                if (record["root"], relative) == ("repo", FINAL_STACK_PATH):
+                    raise SourcePolicyError("final-stack.json is read only through its dedicated Architecture role")
+                self.allowed[role].add((record["root"], relative))
+        if "overview_families" in self.policy.document:
+            raise SourcePolicyError("overview reads are exact-path grants only; overview_families is not accepted")
+
+    def validate(self, role, root, *, path=None, glob=None):
+        """Check one source-map declaration against its exact grant before anything is opened."""
+        if glob is not None or path is None:
+            raise SourcePolicyError("an overview source names exactly one path; a glob is not a grant")
+        relative = _relative(path)
+        if (root, relative) not in self.allowed.get(role, set()):
+            raise SourcePolicyError("overview role/path has no independent approval: " + str(role))
+
+    def authorize(self, role, path):
+        path = Path(path).absolute()
+        for root, base in self.roots.items():
+            try:
+                relative = path.relative_to(base).as_posix()
+            except ValueError:
+                continue
+            relative = _relative(relative)
+            if (root, relative) in self.allowed.get(role, set()):
+                return path
+        raise SourcePolicyError("overview role/path has no independent approval: " + str(role))
+
+
+    def read(self, role, path, max_bytes=MAX_SOURCE_BYTES):
+        path = self.authorize(role, path)
+        if isinstance(max_bytes, bool) or not isinstance(max_bytes, int) or max_bytes <= 0:
+            raise SourcePolicyError("overview read bound must be a positive integer")
+        _check_target(path)
+        with _open_regular(path, limit=max_bytes) as handle:
+            info = os.fstat(handle.fileno())
+            raw = handle.read(max_bytes + 1)
+        if len(raw) > max_bytes:
+            raise SourceReadLimitError("approved overview input exceeds its bounded read")
+        return raw, {"path": str(path), "role": role, "sha256": hashlib.sha256(raw).hexdigest(),
+                     "bytes": len(raw), "status": "independently authorized overview input",
+                     "file_utc": datetime.fromtimestamp(info.st_mtime, timezone.utc).isoformat().replace("+00:00", "Z")}
+
+
 @contextmanager
 def guard_native(native, root, state_root, spec_path, *, policy_path=POLICY_PATH):
     """Guard every original native file read, including forced and linked inputs.

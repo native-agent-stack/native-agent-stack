@@ -161,3 +161,69 @@ It left the following, with reasons:
 - **Diagram labels** keep diagram-design's uppercase eyebrow role for lanes and zones.
 - **Drift flags** stay verbatim final_stack.py output.
 - **Register length** follows from the brief's per-layer content.
+
+## Overview page
+
+`overview.html` answers one question per section, in a fixed order: where the layers
+stand, which data feeds converged, which strategies, which workers run with what
+receipt, which repositories win each layer and what closes it, what the page read,
+Claude Code, and GitHub. The audience opens the desk and wants the state in one pass,
+then follows a link to the Foundation or North-star page for detail.
+
+**Tokens.** The palette above is unchanged; the overview adds no color. Pending blocks
+use the pending token as a left rule, the dashed-ring glyph and the word "Pending",
+so no state is color alone. Headings use the Architecture pages' display serif,
+reading text the shared sans, monospace only pins, paths and record names.
+
+**Layout.** Left aligned, source order, one section per screen height where the
+content allows:
+
+```text
+title + lede
+count strip: FINAL sentence | states as figures | sources present
+section links (8)
+1 layer stack: trading band above foundation band, one cell per layer   <- the bold element
+2 feeds: statement | $0 signal table | baseline, lagging, gated | gaps | addendum results | pending block
+3 strategies: statement | family claim | caveats, ablations, selector and sizing   | pending block
+4 workers: worker | state | newest receipt
+5 repositories: finalize-all waves | F1 and F2 status | per catalog, shared state once | layer | winners | survivors | next action
+6 evidence: studies (arms by worker and model family, judges, result as stated) | repository records | private records | layer pages
+7 Claude Code: run pin and prepared pin | CHANGELOG counts per version | best-practice slots   | pending blocks
+8 GitHub: main CI, in review, landing queue
+```
+
+**Review before implementation.** The first plan gave each section a card and led
+with a large FINAL number. Cards would make eight unlike answers look alike, and a
+hero zero is a claim the protocol does not support. The plan instead uses ruled
+sections like the layer pages, a sentence for the FINAL count, and spends emphasis
+only on the layer stack. Section markers are not numbered on the page: the order
+is fixed but the sections are not a sequence. Repository rows put the layer key in
+the link title and shorten commit pins to 12 characters, which halved the table's
+height in the first browser pass.
+
+**Critique pass.** Sections 2 and 3 are sanitized projections of the convergence
+records: selected passages only, and any sentence, cell or lead that cites a path,
+digest or line, or names a declared drop term, is withheld. The plain statement
+("No measured winner yet.", "No live result; replication next.") stands until the
+named result record exists. The review against the brief then changed five things.
+The feeds lede no longer repeats a status the generator owns, so it cannot go stale.
+Captions that repeat the heading above their table are kept for screen readers only.
+A state shared by every catalog layer of a group is said once above its table
+instead of on 20 rows, which shortened the repositories section from 1958 to 1672
+px at 1440 wide. The strategy caveats, ablations and sizing sit in one row under the
+family claim. The pending main-CI block no longer names the record the section line
+already names. Left as they are: the figure's capitalised monospace labels, which
+the layer pages share, and the repositories and GitHub sections, which still exceed
+one screen at 34 layers and nine reviews.
+
+**Skills.** frontend-design (SKILL.md SHA-256
+`d91970639e9f5c37682ac7ab60094d35f1c7c1f38d731bd56396563aee10c1d3`) shaped the plan
+and the review above. diagram-design 2.6.73 (SKILL.md SHA-256
+`9cb173e6d30a9aa4af646f4eba4431ddb03dbbed23c041eaefdc13b1bf445826`, reference
+type-layers.md) set the figure: a layer stack of two full-width bands with index tags,
+a direction label, one focal band (the trading layers) and a bottom legend; one cell
+per layer, with equal cell widths across bands so the bands compare by length. The
+caption names only the states the figure draws. The dataviz skill bundled with
+Claude Code 2.1.300 set the strip as stat figures, not a chart; its validator again
+reports the shared status pair at light ΔE 15.8 normal and 7.1 protan, dark 13.8 and
+5.4, so each state carries its glyph and label as on the layer pages.
