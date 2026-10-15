@@ -113,11 +113,11 @@ Client 2.1.295, checked 2026-10-09. Index: [slots.md](slots.md).
 
 **Status:** recommendation (owner's choice). **Default:** Native per-role model and effort: subagent and skill frontmatter, the Agent tool's `model` and `effort` (2.1.292+), per-model `modelSettings`, and `--model`/`--effort` on headless jobs
 
-- **Route:** Opus 5.5 for judgment and build; Sonnet 5.5 or Haiku 5.5 only for a task class with a frozen paired A/B at parity; keep `CLAUDE_CODE_EFFORT_LEVEL` and `CLAUDE_CODE_SUBAGENT_MODEL_FORCE` unset, because they override frontmatter and per-call effort; Codex lanes through the gateway for fan-out research
+- **Route:** Opus 5.5 for judgment and build; Sonnet 5.5 or Haiku 5.5 only for a task class with a frozen paired A/B at parity; keep `CLAUDE_CODE_EFFORT_LEVEL`, `CLAUDE_CODE_SUBAGENT_MODEL_FORCE` and `CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL` (2.1.296: every workflow agent on one model) unset, because they override frontmatter and per-call model or effort; Codex lanes through the gateway for fan-out research
 - **Alternatives, ranked:** 1. Re-run failed attempts at a higher effort; 2. Native advisor pairing; 3. Classifier routing to Sonnet or Opus by task complexity (dynamic workflows post; candidate until the M7 paired A/B)
 - **Rejected:** musistudio/claude-code-router; `opusplan` as a default; A global `CLAUDE_CODE_EFFORT_LEVEL` pin; A cheaper subagent default without an A/B; `MAX_THINKING_TOKENS` caps
 - **Evidence:** sub-agents.md model resolution order; model-effort-O3, O5, O7; Measured here: promptfoo three-model extraction A/B, 60/60 each (one fixture class); #840 Haiku trial; Designed, not measured: J4 tiering (Opus census, Haiku sample, sealed 5% Opus re-read)
-- **Notes:** Model choices are the owner's; this row is a recommendation. The M7 effort sweep (high, xhigh, max on our tasks) is owed.
+- **Notes:** Model choices are the owner's; this row is a recommendation. The M7 effort sweep (high, xhigh, max on our tasks) is owed. The project settings' `effortLevel` "xhigh" comes from #479 (squash ba31dcd02, 2026-09-29): at 2.1.284 ultracode neither raised nor overrode effort, so a session with no saved level ran at medium (docs/decisions/2026-09-29-sonnet-5-5-dispatch.md); kept, recorded 2026-10-15 without a change.
 - **Supersedes:** R52 (Ultracode is a separate toggle since 2.1.284); AN-05 (`sonnet` resolves to Sonnet 5.5); M7 extended with Anthropic's published effort priors
 - **Overturn when:** The M7 sweep shows a lower effort at quality parity for a task class, or max scoring below xhigh; or a newer model release.
 - **Primary sources** (read 2026-10-09; 6 of 15 practices the refuters kept, measured first; fetch time and sha256 of the bytes read in the record's reading file):

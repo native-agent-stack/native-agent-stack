@@ -4982,13 +4982,13 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/git-github-automation.md",
-      "sha256": "8f654575424c45c3f92a4f932eed1e987ea81c019ba1995db0e0284c10d90165",
-      "bytes": 8497
+      "sha256": "610d0bf4109e7b51dd9571255ffe40287d9dc3734a1c514fccd29c9669b2da80",
+      "bytes": 8743
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/instructions-skills.md",
-      "sha256": "7fa69465f85dff3136ebf925924152bafe97bc6cde941ad09f408aa848a15f17",
-      "bytes": 10415
+      "sha256": "668dc61c901078eabb36a2bb06f61b5f0ce3497e49aaccc41aa1992ca8a71fe0",
+      "bytes": 10825
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/isolation.md",
@@ -5002,8 +5002,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/native-clients.md",
-      "sha256": "94d8b63e28355bd9d6ac7147b7c67de061ddb77476d0e763c371bf95eb416918",
-      "bytes": 18365
+      "sha256": "3c7c2786e69401dd5095a9388e0794108df5be548c7261b38efdee42e2db6028",
+      "bytes": 18750
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/observation-inference.md",
@@ -5017,8 +5017,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.json",
-      "sha256": "b0b9d7949e07dd86ab80b34747cbc538a5eb6c97d1dec26e6684c0e1ffd7b2a1",
-      "bytes": 152660
+      "sha256": "161fde1d59eeca372b60b2b9bbe05b2268f5892ec3d4cb6fc230e88f65d0bc74",
+      "bytes": 153703
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.md",
@@ -21548,8 +21548,8 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/claude-native-slot-manifest.json",
-      "sha256": "b3db948a9878156abec03a3dc11764b1595c5c43b348d483c2a24355ca649e80",
-      "bytes": 238162
+      "sha256": "de30a0640424c648daa9332337ab7d358b665f927004988c3e4ffd0dbcd95350",
+      "bytes": 238191
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/cross-client-lines.json",
@@ -63535,6 +63535,11 @@
       "path": "tests/test_native_practice_doc_corrections.py",
       "sha256": "04410b557212f2cd75a0ac37a5d6fd0addd9920d7f8caaf8a057a8d0ba9432e1",
       "bytes": 3900
+    },
+    {
+      "path": "tests/test_native_practice_ledger_rows_2.py",
+      "sha256": "fa50cdd847c0e65fbfb15c8e755d67084968471e1d0ec2880d1200e2ac98d237",
+      "bytes": 2371
     },
     {
       "path": "tests/test_native_practice_meter_windows.py",

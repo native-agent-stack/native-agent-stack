@@ -29,7 +29,7 @@ Client 2.1.295, checked 2026-10-09. Index: [slots.md](slots.md).
 - **Alternatives, ranked:** 1. Publisher marketplaces pinned by tag (current state)
 - **Rejected:** Packaging our own agents and skills as plugins; Managed marketplace allowlists on this host
 - **Evidence:** plugin-marketplaces reference (sha on plugin sources); plugins-marketplaces-O7, O8, O9
-- **Notes:** Our marketplaces use tags or no ref (context-mode, worktrunk, codex). codex 0.162.0 now ships the review capability codex-plugin-cc bridged: trial owed (currency).
+- **Notes:** Our marketplaces use tags or no ref (context-mode, worktrunk, codex). codex 0.162.0 now ships the review capability codex-plugin-cc bridged: trial owed (currency). `extraKnownMarketplaces` (settings-reference at 2.1.300): a repository's entries apply only after the workspace trust dialog for that folder (a `-p` run in an untrusted folder ignores them), and `autoUpdate` defaults true for `claude-plugins-official` and most official Anthropic marketplaces while third-party marketplaces default to false; set it explicitly on each entry (guide screen item 35, 2026-10-15).
 - **Supersedes:** M8 answered (no sha on marketplace sources); R56 reaffirmed
 - **Overturn when:** A release adds sha pins to marketplace sources, or a pinned commit becomes unreachable.
 - **Primary sources** (read 2026-10-09; 3 of 3 practices the refuters kept, measured first; fetch time and sha256 of the bytes read in the record's reading file):
