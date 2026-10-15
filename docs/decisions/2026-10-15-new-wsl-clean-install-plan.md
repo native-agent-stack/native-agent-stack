@@ -404,8 +404,9 @@ The CC's 19:46Z ruling 4 adds to these areas. Each addition falls in T1's harnes
         describes the UI as owned by one shared coordination daemon. So the UI stays disabled on NativeHorizonNY
         (`ui_enabled` in that home's `~/.cache/codebase-memory-mcp/config.json`) until it has its own per-row port and
         an ownership proof;
-      - session analytics binds 127.0.0.1:8080 from its archive configuration (`README.md:442`). That port is free on
-        NativeStack2604 today, and the ownership check covers it.
+      - session analytics binds 127.0.0.1:21808 from its archive configuration (`config/agentsview.toml:4`;
+        `install-plan.json:2888-2890`, which also refuses to start when the port is occupied). NativeStack2604 binds
+        21808, so the row gets its per-row port, and the ownership check covers it.
     - On the shared network these reach NativeStack2604's live services, against the CC's rule that its services and
       ports are left alone (18:09Z direction, addendum-01, ruling 1). A check would pass against the wrong
       distribution, the research-harnesses check (`accept.sh:2446-2474`, both clients) would route the new
