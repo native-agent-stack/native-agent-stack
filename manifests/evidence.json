@@ -11533,8 +11533,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-read-deltas.json",
-      "sha256": "1d617390cb65971935836b0a5732155ca7748f9ff79fe1223bbb9480d512fad8",
-      "bytes": 1256
+      "sha256": "3fe847a3dfb4115eab07d9dd4ae4605a2a9a1bc4211b6dc45c1b583c3f331aa5",
+      "bytes": 1364
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
@@ -11600,6 +11600,16 @@
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261014-pr1094-rebase-delta.json",
       "sha256": "5f81fe355c0fc06bff935047a6ea27ef16588917a9a537710d7692a0e1ec5872",
       "bytes": 16981
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261015-pr1166-delta.json",
+      "sha256": "29073b10d664ca79e5aca91429ecd51e59e40200186e96bcbc0940e2c46444c2",
+      "bytes": 1840
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261015-pr1166.json",
+      "sha256": "67cb2169e3a8c74ebb68ab95dc50f8d6838a13d2323c8983a28153b5904ec3c6",
+      "bytes": 31191
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unit-pass.txt",
@@ -19278,8 +19288,8 @@
     },
     {
       "path": "docs/decisions/2026-10-15-github-merge-queue-evaluation.md",
-      "sha256": "1a43fc2a782bb01bce0fe7789f2481f0374a2e6c7563e4164a523d7dbe9f3458",
-      "bytes": 26474
+      "sha256": "2eddcf9f78009502b0dfb49d3e6495c102abe9ef69398e80729dc594aa7c2296",
+      "bytes": 34197
     },
     {
       "path": "docs/decisions/2026-10-15-jev-trading-harness-build.md",
@@ -41370,6 +41380,11 @@
       "path": "evidence/artifacts/merge-queue-evaluation-20261015/baseline.json",
       "sha256": "bd7354f685de8550975db8c00344025692bd43722b1f3f2ab2e17e6501c1348c",
       "bytes": 20934
+    },
+    {
+      "path": "evidence/artifacts/merge-queue-evaluation-20261015/native-trial.json",
+      "sha256": "e43ead8bd2ff9af6eeabc4c65477f3243619b77505db207f2cc8b8d57e8f9953",
+      "bytes": 33839
     },
     {
       "path": "evidence/artifacts/merge-queue-evaluation-20261015/registry-migration-inventory.json",

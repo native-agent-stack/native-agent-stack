@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "kind": "gate_read_accounting_delta",
+  "date": "2026-10-15",
+  "source_commit": "0f3464b8bc30108fc53bb692da56c9f30b53fc0a",
+  "baseline_path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261015-pr1166.json",
+  "baseline_sha256": "67cb2169e3a8c74ebb68ab95dc50f8d6838a13d2323c8983a28153b5904ec3c6",
+  "mode": "monitoring_only",
+  "added_by_script": {},
+  "removed_by_script": {},
+  "added_shapes": [],
+  "removed_shapes": [],
+  "added_locations": [],
+  "derived_count": 359,
+  "derivation": {
+    "source": "blueprints/runtime-workers/openhands/resolver/push_gate.py:derive_ci_protected through native patch_policy.GitTree at source_commit",
+    "contract": "blueprints/runtime-workers/openhands/evidence/advisory-gate-deltas.md at e1b5288051292cfdb19e2ca64349e4da35ba0970",
+    "precedent": "unclassified-gate-reads-20261012-pr1016-delta.json and RepositoryWorkflowTests.test_newest_dated_delta_accepts_a_baseline_refresh_without_rewriting_history",
+    "replay": "python3 -m unittest tests.test_runtime_worker_openhands_push_gate",
+    "method": "Append a complete dated native snapshot. Relative additions and removals are empty because the new baseline includes every observed location and shape. The snapshot's source_change separately records the native comparison with parent e1b5288051292cfdb19e2ca64349e4da35ba0970: 353 to 359 sites, four record-enumeration sites, two historical-manifest observations and eleven line moves. The six additional sites retain their actual purposes rather than being labeled user-status observations.",
+    "interpretation": "Static monitoring accounting only; no worker permission or execution authority added. Historical snapshots, deltas and exact test assertions are unchanged."
+  },
+  "read_classifications": [],
+  "removed_locations": []
+}
