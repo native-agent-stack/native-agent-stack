@@ -68,7 +68,10 @@ ROWS_OLD = "| layer | state | winner | closes by | F1 receipt worker |\n|---|---
 ROWS_NEW = "| layer | state | winner | closes by | F1 receipt worker |\n|---|---|---|---|---|\n| foundation/alpha | reopened | tool-a | fixture next action | lane y |\n| us-equities/gamma | reopened | tool-d | gamma action | lane z |\n"
 # Synthetic records in the shape of the WS2 and WS5 convergence records; each carries a path, a digest, a
 # line reference or a declared drop term that the projection must withhold.
-WS2 = ("# Fixture convergence\n\n## Inputs\n- Fixture packet /var/tmp/fixture/packet (SHA256SUMS abc1234d...).\n\n"
+WS2 = ("# Fixture convergence\n\nTwo blind judges scored the arms. It claims no fixture return and no measured winner.\n\n"
+       "## Inputs\n- Fixture packet /var/tmp/fixture/packet (SHA256SUMS abc1234d...).\n"
+       "- Claude-family judge (Opus 9.9, fixture subagent): /var/tmp/fixture/judge.md, sha256 abc1234d...\n"
+       "- GPT-family judge (gpt-9-fixture xhigh, fixture runner): /var/tmp/fixture/verdict.md\n\n"
        "## Converged by both judges (fixture note)\n"
        "1. **Every fixture list lags by construction.** Lists are a baseline that fixture signals must beat. The list\n"
        "   comes from /var/tmp/fixture/lists.json.\n"
@@ -95,7 +98,7 @@ WS5 = ("# Fixture shortlist\n\n## Inputs\n1. **The one input shortlist family is
        "4. **Selector and sizing (fixture):**\n   - eligibility before fixture ranking;\n   - at most 2 fixture names, an account-level setting.\n\n"
        "## Disputed\n1. **Not this either.**\n")
 ADDENDUM = ("# Fixture convergence, ADDENDUM-01: fixture measurements (fixture record)\n\n"
-            "This is a new record. Measured on fixture-paper over REST, opening no new stream.\n"
+            "This is a new record. fixture-lane measured these on fixture-paper over REST, opening no new stream. All four results are author-run measurements with receipts.\n"
             "- Dispute #1 (fixture statuses entitlement): SETTLED, confirmed. The server said ok\n  (probe-1.json, abcdef12...).\n"
             "- Dispute #2 (fixture overnight coverage): SETTLED, no overnight history.\n"
             "  - Fixture bars: 3 of 90 in the window (fixture-overnight.json, 1234abcd...).\n"
@@ -103,6 +106,31 @@ ADDENDUM = ("# Fixture convergence, ADDENDUM-01: fixture measurements (fixture r
             "- Dispute #3 (fixture BOATS entitlement): SETTLED, real-time confirmed.\n  - A fixture snapshot returned 5 of 5 symbols.\n"
             "- FIXTURE-OPRA: historical access confirmed (HTTP 200; fixture-opra.json). Real-time is NOT yet\n"
             "  proven; the one-shot fixture check settles it.\nEffect: fixture rows are entitled.\n")
+
+PREP = ("# Fixture floor 9.9.2 prep\n\n## Signed manifest\n| Item | Value |\n|---|---|\n| Manifest | sha256 `" + "e" * 64 + "` |\n\n"
+        "## Source commit for the run pin\n\nThe fixture commit whose log first carries `## 9.9.2` is `" + "c" * 40 + "`. The one before, `"
+        + "d" * 40 + "`, tops at 9.9.1.\n")
+CHANGELOG = ("## 9.9.2\n\n- Added fixture alpha: with its detail\n- Fixed fixture bug one\n- Added fixture beta\n- Changed fixture gamma\n"
+             "- Improved fixture delta\n- Added fixture path note in ~/.fixture/x.md\n- Added fixture epsilon\n- Added fixture zeta\n\n"
+             "## 9.9.1\n\n- Fixed fixture bug two\n")
+SLOTS = {"client_version": "9.9.1", "checked_at": "2099-01-01", "status_values": {"default": "fixture", "trial": "fixture"},
+         "slots": [{"id": "slot-a", "status": "trial", "default": "Fixture default A; with a long tail"},
+                   {"id": "slot-b", "status": "default", "default": "Fixture default B", "client_version": "9.9.2"}]}
+PLAN = ("# Fixture plan\n\n## Waves\n**F1. Fixture receipts.** Trigger: inputs exist now. More text.\n\n"
+        "**F2. Fixture invoke.** Trigger: #9001 lands, then the fixture\nfollow-up lands. Detail.\n- a bullet\n\n**F3. Fixture no trigger.** Owners: fixture.\n")
+F1_INDEX = [{"spec": "a", "success": True, "receipt": "x"}, {"spec": "b", "success": True}, {"spec": "c", "success": False},
+            {"spec": "d", "state": "running"}, {"spec": "e", "state": "not-started"}]
+F2 = ("# Fixture F2\n\n**Top:** ignored.\n\n## Receipts (directory `receipts/`)\n| Receipt | Calls |\n|---|---|\n| r1 | 1 |\n| r2 | 2 |\n\n"
+      "**Inputs:**\n\n| File | sha |\n|---|---|\n| f | 1 |\n\n## Findings (no receipt)\n- **one:** x\n  - nested\n- **two:** y\n\n## Empty\nnothing here\n")
+ARMS = ("# Fixture arms\n\n| arm | file(s) | route and provenance | notes |\n|---|---|---|---|\n"
+        "| FixtureFlow | a.md | tools/fixture/dispatch as fixture-agent; run.x | none |\n| Fixture Codex | b.md | lane on cx/gpt-9-fixture max | ok |\n"
+        "| fixture-claude | c.md | ns-run (Opus 9.9, slot api-9) | ok |\n| Fixture Researcher | d.md | ~/.config/fixture/gpt-researcher.sh | sources 3 |\n")
+
+
+def write(base: Path, relative: str, text: str) -> None:
+    path = base / relative
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text)
 
 
 class Fixture:
@@ -229,7 +257,8 @@ class PendingTests(OverviewCase):
         fixture = Fixture(self.base, ws2=False, rows=False, cc_now=None)
         result, html = fixture.build(self.base)
         source_map = json.loads((HERE / "overview_sources.json").read_text())["sources"]
-        for key in ("feeds_convergence", "strategies_convergence", "claude_code_practice", "finalize_rows", "cc_now"):
+        for key in ("feeds_convergence", "strategies_convergence", "finalize_rows", "cc_now", "cc_floor_prep", "cc_changelog", "cc_slots",
+                    "finalize_plan", "finalize_f1", "finalize_f2"):
             self.assertIn(key, result["pending"])
             self.assertIn(source_map[key]["trigger"], html)
         self.assertIn("final_stack", result["present"])
@@ -322,19 +351,74 @@ class PendingTests(OverviewCase):
             self.assertNotIn(text, html)
 
 
-    def test_a_present_claude_code_record_shows_its_pin_and_both_tables(self):
-        fixture = Fixture(self.base)
-        record = ("# Fixture client record\n\nPinned client: 9.9.9 (fixture)\n\n## CHANGELOG delta 9.9.8 to 9.9.9\n| Version | Change |\n|---|---|\n| 9.9.9 | fixture change |\n\n"
-                  "## Best-practice screen\n| Practice | Verdict |\n|---|---|\n| fixture practice | fixture verdict |\n")
-        path = fixture.state / f"{STATE_DIR}/cc-native-practice-20261014/CLIENT-20990101.md"
-        path.parent.mkdir(parents=True)
-        path.write_text(record)
+    def test_claude_code_shows_the_run_pin_the_proposed_pin_the_changelog_counts_and_the_slots(self):
+        stack = final_stack()
+        stack["runs"].append({"id": "claude-code", "pin": "9.9.1", "source": "manifests/stack.json#/components/3"})
+        fixture = Fixture(self.base, stack=stack)
+        write(fixture.state, "coordination/cc-native-practice-20261009/floor-2300-20261014/FLOOR-2300-prep-20990101.md", PREP)
+        write(fixture.state, "coordination/cc-native-practice-20261009/floor-2300-20261014/changelog-9.9.1-9.9.2.md", CHANGELOG)
+        write(fixture.root, ".claude/skills/claude-native-practice/reference/slots.json", json.dumps(SLOTS))
+        data = DATA.model(fixture.root, fixture.state, commit="0" * 40)["claude_code"]
+        self.assertEqual(data["client"]["current"]["pin"], "9.9.1")
+        self.assertEqual({key: data["client"]["proposed"][key] for key in ("version", "commit", "carried")}, {"version": "9.9.2", "commit": "c" * 40, "carried": False})
+        self.assertEqual(data["changelog"]["versions"], [
+            {"version": "9.9.2", "counts": {"Added": 5, "Fixed": 1, "Changed": 1}, "other": 1, "items": ["Added fixture alpha…", "Added fixture beta", "Added fixture epsilon"]},
+            {"version": "9.9.1", "counts": {"Added": 0, "Fixed": 1, "Changed": 0}, "other": 0, "items": ["Fixed fixture bug two"]}])
+        self.assertEqual(data["slots"]["rows"], [{"slot": "slot-a", "status": "trial", "default": "Fixture default A…", "client_version": "9.9.1"},
+                                                 {"slot": "slot-b", "status": "default", "default": "Fixture default B", "client_version": "9.9.2"}])
         result, html = fixture.build(self.base)
-        self.assertIn("claude_code_practice", result["present"])
+        for key in ("cc_floor_prep", "cc_changelog", "cc_slots"):
+            self.assertIn(key, result["present"])
         section = html[html.index('id="ov-claude-code"'):html.index('id="ov-github"')]
-        self.assertIn("Pinned client 9.9.9", section)
-        for text in ("fixture change", "fixture verdict", "From <code>CLIENT-20990101.md</code> (private record, cited by name)."):
+        commit = "c" * 40
+        for text in (f'<code title="{commit}">{commit[:12]}</code>: proposed, lands with its pin PR.', "<code>FLOOR-2300-prep-20990101.md</code> (private record, cited by name)",
+                     "CHANGELOG delta 9.9.1 to 9.9.2", "2 slots, 1 default, 1 trial", "<code>slot-a</code>"):
             self.assertIn(text, section)
+        for text in ("e" * 64, "d" * 40, ".fixture/x.md"):
+            self.assertNotIn(text, section)
+        stack["runs"][-1]["pin"] = "9.9.2"  # final-stack.json now carries the prepared pin
+        write(fixture.root, "catalogs/landscape/final-stack.json", json.dumps(stack))
+        _, html = fixture.build(self.base)
+        self.assertIn("9.9.2 has landed as the run pin.", html)
+        self.assertNotIn("proposed, lands with its pin PR", html)
+
+    def test_finalize_all_shows_the_waves_the_f1_counts_and_the_f2_summary(self):
+        fixture = Fixture(self.base)
+        write(fixture.state, f"{STATE_DIR}/finalize-all-20261014/PLAN-finalize-all-20990101.md", PLAN)
+        write(fixture.state, "coordination/ns2604-coop/work-20261012/finalize-f1-20261014/INDEX.json", json.dumps(F1_INDEX))
+        write(fixture.state, "coordination/cc-native-practice-20261009/finalize-f2-20261014/F2-claude-side-20990101.md", F2)
+        data = DATA.model(fixture.root, fixture.state, commit="0" * 40)["repos"]["finalize"]
+        self.assertEqual(data["plan"]["waves"], [{"id": "F1", "title": "Fixture receipts", "trigger": "inputs exist now."},
+                                                 {"id": "F2", "title": "Fixture invoke", "trigger": "#9001 lands, then the fixture follow-up lands."},
+                                                 {"id": "F3", "title": "Fixture no trigger", "trigger": None}])
+        self.assertEqual((data["f1"]["arms"], data["f1"]["counts"]), (5, {"passed": 2, "failed": 1, "not started": 1, "running": 1}))
+        self.assertEqual(data["f2"]["groups"], [{"label": "Receipts", "count": 2}, {"label": "Findings", "count": 2}])
+        _, html = fixture.build(self.base)
+        section = html[html.index('id="ov-repos"'):html.index('id="overview-evidence"')]
+        for text in ("<strong>F2 Fixture invoke.</strong> Starts when: #9001 lands, then the fixture follow-up lands.", "5 arms: 2 passed, 1 failed, 1 not started, 1 running.",
+                     "<li>Receipts: 2</li>", "<code>F2-claude-side-20990101.md</code> (private record, cited by name)"):
+            self.assertIn(text, section)
+
+    def test_each_study_names_its_arms_workers_model_families_and_judges_without_a_winner(self):
+        fixture = Fixture(self.base)
+        write(fixture.state, f"{STATE_DIR}/ranked-feeds-20261014/README.md", ARMS)
+        write(fixture.state, f"{STATE_DIR}/ranked-feeds-20261014/CONVERGENCE-WS2-20990101.addendum-01.md", ADDENDUM)
+        studies = {item["label"]: item for item in DATA.model(fixture.root, fixture.state, commit="0" * 40)["evidence"]["studies"]}
+        ws2 = studies["WS2 data feeds for early entry"]
+        self.assertEqual(ws2["arms"]["rows"], [{"worker": "FixtureFlow", "model": None}, {"worker": "Fixture Codex", "model": "GPT family (gpt-9-fixture)"},
+                                               {"worker": "fixture-claude", "model": "Claude family (Opus 9.9)"}, {"worker": "Fixture Researcher", "model": None}])
+        self.assertEqual(ws2["judges"], ["Claude-family judge (Opus 9.9)", "GPT-family judge (gpt-9-fixture xhigh)"])
+        self.assertEqual((ws2["result"], ws2["claim"]), ("No measured winner yet.", "It claims no fixture return and no measured winner."))
+        self.assertEqual({key: ws2["addendum"][key] for key in ("producer", "model", "kind")},
+                         {"producer": "fixture-lane", "model": None, "kind": "All four results are author-run measurements with receipts."})
+        self.assertEqual(studies["WS5 extreme-mover strategies"]["record"]["status"], "pending")
+        _, html = fixture.build(self.base)
+        section = html[html.index('id="overview-evidence"'):html.index('id="ov-claude-code"')]
+        for text in ("Converged by 2 blind judges: Claude-family judge (Opus 9.9) and GPT-family judge (gpt-9-fixture xhigh).",
+                     "<strong>No measured winner yet.</strong>", "not stated in the record", "measured by fixture-lane; model not stated in the record."):
+            self.assertIn(text, section)
+        for text in ("api-9", "run.x", ".config", "tools/fixture", "/var/tmp/fixture", "abc1234d", "fixture-paper"):
+            self.assertNotIn(text, section)
 
 
 class QueueTests(OverviewCase):
@@ -377,7 +461,7 @@ class SourceMapPolicyTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as state:
             document, _, _, receipt = DATA.load_source_map(ROOT, Path(state))
         self.assertEqual(receipt["path"], "tools/local-pages/overview_sources.json")
-        self.assertEqual({entry["section"] for entry in document["sources"].values()}, set(DATA.SECTIONS) - {"evidence"})
+        self.assertEqual({entry["section"] for entry in document["sources"].values()}, set(DATA.SECTIONS))
         self.assertEqual(document["sources"]["final_stack"]["role"], "architecture_final_stack")
 
     def mutated(self, base: Path, change):

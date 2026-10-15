@@ -324,13 +324,36 @@ def _pin(pin: Any) -> str:
     return f"<code>{esc(text)}</code>"
 
 
+def _finalize(result: dict) -> str:
+    """The finalize-all plan's waves with their triggers, then the F1 and F2 status."""
+    plan, f1, f2 = result["plan"], result["f1"], result["f2"]
+    if plan["status"] == "present":
+        waves = "".join(f'<li><strong>{esc(wave["id"])} {esc(wave["title"])}.</strong> '
+                        + (f'Starts when: {esc(wave["trigger"])}' if wave["trigger"] else '<span class="ov-none">No trigger stated</span>') + "</li>" for wave in plan["waves"])
+        out = f'<h3>Finalize-all plan</h3><p class="ov-record">From {_record(plan)}.</p><ul class="ov-rows ov-waves">{waves}</ul>'
+    else:
+        out = f'<h3>Finalize-all plan</h3>{pending(plan)}'
+    cells = []
+    if f1["status"] == "present":
+        counts = ", ".join(f'{count} {name}' for name, count in f1["counts"].items())
+        cells.append(f'<div><dt>F1 upstream E2E receipts</dt><dd><p>{f1["arms"]} arms: {esc(counts)}.</p><p class="ov-trigger">From {_record(f1)}.</p></dd></div>')
+    else:
+        cells.append(f'<div><dt>F1 upstream E2E receipts</dt><dd>{pending(f1)}</dd></div>')
+    if f2["status"] == "present":
+        cells.append('<div><dt>F2 invoke evidence, Claude side</dt><dd>' + _items([f'{group["label"]}: {group["count"]}' for group in f2["groups"]])
+                     + f'<p class="ov-trigger">From {_record(f2)}.</p></dd></div>')
+    else:
+        cells.append(f'<div><dt>F2 invoke evidence, Claude side</dt><dd>{pending(f2)}</dd></div>')
+    return out + f'<dl class="ov-points">{"".join(cells)}</dl>'
+
+
 def repos(data: dict) -> str:
     result = data["repos"]
     if result["status"] != "present":
-        return "".join(pending(source) for source in result["missing"])
+        return _finalize(result["finalize"]) + "".join(pending(source) for source in result["missing"])
     note = (f'<p class="ov-record">Winners and run pins from <code>catalogs/landscape/final-stack.json</code>; next actions from {_record({"root": "state", "name": result["rows_record"]})}.</p>'
             if result["rows_record"] else "")
-    out = note + (pending(result["rows_pending"]) if result.get("rows_pending") else "")
+    out = _finalize(result["finalize"]) + note + (pending(result["rows_pending"]) if result.get("rows_pending") else "")
     for group in result["groups"]:
         # One state shared by every catalog layer is said once above the table instead of on every row.
         catalog_states = {row["state"] for row in group["rows"] if row["in_catalog"]}
@@ -357,23 +380,86 @@ def evidence(data: dict) -> str:
     result = data["evidence"]
     status = {"present": "read", "pending": "pending", "unreadable": "unreadable"}
     repository = "".join(f'<li><code>{esc(row["path"])}</code> <small>{esc(status.get(row["status"], row["status"]))}</small></li>' for row in result["repository"])
-    private = "".join(f'<li><code>{esc(row["name"])}</code> <small>{esc(status.get(row["status"], row["status"]))}</small></li>' for row in result["private"])
+    private = "".join(f'<li><code>{esc(row["name"])}</code> <small>' + (f'{esc(row["label"])} arms, ' if row.get("label") else "")
+                      + f'{esc(status.get(row["status"], row["status"]))}</small></li>' for row in result["private"])
     pages = "".join(f'<li><a href="{esc(row["page"])}">{esc(row["title"])}</a></li>' for row in result["pages"])
-    return (f'<div class="ov-evidence"><div><h3>Repository records</h3><ul class="lp-refs">{repository}</ul></div>'
+    return (_studies(result["studies"]) + f'<div class="ov-evidence"><div><h3>Repository records</h3><ul class="lp-refs">{repository}</ul></div>'
             f'<div><h3>Private records, by name</h3><ul class="lp-refs">{private}</ul></div>'
             f'<div><h3>Layer detail</h3><ul class="lp-refs">{pages}</ul><p class="ov-intro">Source locations live in <code>{esc(data["source_map"]["path"])}</code>.</p></div></div>')
 
 
+def _studies(studies: list[dict]) -> str:
+    """Per converged study: who produced each research arm, which judges converged it, and its result as the record states it."""
+    blocks = []
+    for item in studies:
+        record = item["record"]
+        if record["status"] != "present":
+            blocks.append(f'<div><h4>{esc(item["label"])}</h4>{pending(record)}</div>')
+            continue
+        arms = item["arms"]
+        if arms["status"] == "present":
+            rows = [[esc(arm["worker"]), esc(arm["model"]) if arm["model"] else '<span class="ov-none">not stated in the record</span>'] for arm in arms["rows"]]
+            arm_html = (_table(f'{item["label"]}: research arms', ["Research arm (worker)", "Model family"], rows, "ov-arms", hide_caption=True)
+                        + f'<p class="ov-trigger">Arms from {_record(arms)}.</p>')
+        else:
+            arm_html = pending(arms)
+        judged = " and ".join(item.get("judges") or [])
+        judges = (f'<p>Converged by {len(item["judges"])} {"blind " if item.get("blind") else ""}judges: {esc(judged)}.</p>' if judged
+                  else '<p class="lp-empty">The record names no judge.</p>')
+        result = item.get("result")
+        verdict = f'<p class="ov-verdict"><strong>{esc(result)}</strong>' + (f' The record: “{esc(item["claim"])}”' if item.get("claim") else "") + "</p>" if result else ""
+        extra = item.get("addendum")
+        addendum = ""
+        if extra:
+            who = esc(extra["producer"]) if extra["producer"] else "a producer the record does not name"
+            addendum = (f'<p>Addendum {_record(extra)}: measured by {who}; '
+                        + (f'model {esc(extra["model"])}.' if extra["model"] else "model not stated in the record.")
+                        + (f' {esc(extra["kind"])}' if extra["kind"] else "") + "</p>")
+        blocks.append(f'<div class="ov-study"><h4>{esc(item["label"])}</h4><p class="ov-record">{_record(record)}</p>{verdict}{arm_html}{judges}{addendum}</div>')
+    return f'<h3>Converged studies: who produced them</h3><div class="ov-columns">{"".join(blocks)}</div>' if blocks else ""
+
+
+def _client(client: dict) -> str:
+    current, proposed = client["current"], client["proposed"]
+    run = (f'{_pin(current["pin"])} <small>the {esc(current["run"])} run in <code>{esc(current["path"])}</code></small>' if current["pin"]
+           else f'<span class="ov-none">No {esc(current["run"])} run pin in <code>{esc(current["path"])}</code></span>')
+    if proposed["status"] != "present":
+        prepared = f'<span class="ov-none">Pending; ready when {esc(proposed["trigger"])}.</span>'
+    elif proposed["carried"]:
+        prepared = f'{esc(proposed["version"])} has landed as the run pin. <small>From {_record(proposed)}</small>'
+    else:
+        commit = f', source commit {_pin(proposed["commit"])}' if proposed["commit"] else ""
+        prepared = f'{esc(proposed["version"] or "no version stated")}{commit}: proposed, lands with its pin PR. <small>From {_record(proposed)}</small>'
+    return f'<dl class="lp-facts ov-client"><div><dt>Run pin</dt><dd>{run}</dd></div><div><dt>Prepared pin</dt><dd>{prepared}</dd></div></dl>'
+
+
+def _changelog(result: dict, kinds: list[str]) -> str:
+    if result["status"] != "present":
+        return f'<h3>CHANGELOG delta</h3>{pending(result)}'
+    versions = result["versions"]
+    if not versions:
+        return f'<h3>CHANGELOG delta</h3><p class="lp-empty">{_record(result)} has no version heading.</p>'
+    span = f'{versions[-1]["version"]} to {versions[0]["version"]}' if len(versions) > 1 else versions[0]["version"]
+    rows = [[f'<strong>{esc(version["version"])}</strong>'] + [str(version["counts"].get(kind, 0)) for kind in kinds] + [str(version["other"]), _items(version["items"], "ov-rows ov-tight")]
+            for version in versions]
+    return (f'<h3>CHANGELOG delta {esc(span)}</h3><p class="ov-record">From {_record(result)}. Versions without a heading there have no entries.</p>'
+            + _table(f"CHANGELOG delta {span}", ["Version"] + kinds + ["Other", "First items"], rows, "ov-changelog", hide_caption=True))
+
+
+def _slots(result: dict) -> str:
+    if result["status"] != "present":
+        return f'<h3>Best-practice slots</h3>{pending(result)}'
+    counts = ", ".join(f'{count} {status}' for status, count in result["counts"].items())
+    rows = [[f'<code>{esc(row["slot"])}</code>', esc(row["status"]), esc(row["default"]), esc(row["client_version"])] for row in result["rows"]]
+    return (f'<h3>Best-practice slots</h3><p class="ov-record">From {_record(result)}, checked at {esc(result["checked_at"])}: '
+            f'{len(result["rows"])} slots, {esc(counts)}.</p>'
+            + _table("Best-practice slots", ["Slot", "Status", "Default", "Client version"], rows, "ov-slots", hide_caption=True))
+
+
 def claude_code(data: dict) -> str:
     result = data["claude_code"]
-    if result["status"] != "present":
-        return pending(result)
-    out = f'<p class="ov-record">From {_record(result)}.</p><p class="lp-verdict">Pinned client {esc(result["pin"] or "not stated in the record")}</p>'
-    for name, title in (("changelog", "CHANGELOG delta"), ("screen", "Best-practice screen")):
-        table = result["tables"].get(name)
-        out += (_table(title, table["header"], [[esc(cell) for cell in row] for row in table["rows"]]) if table
-                else f'<p class="lp-empty">The record has no table under a heading naming "{esc(result["headings"].get(name))}".</p>')
-    return out
+    kinds = list(((data["sources"].get("cc_changelog") or {}).get("entry") or {}).get("kinds") or [])
+    return _client(result["client"]) + _changelog(result["changelog"], kinds) + _slots(result["slots"])
 
 
 def github(data: dict) -> str:
@@ -402,9 +488,9 @@ def render(data: dict) -> tuple[str, dict]:
             _section("ov-feeds", "Converged data feeds for early entry on extreme movers", "The signals both blind judges converged on, and the gaps in the live stack.", feeds(data)),
             _section("ov-strategies", "Strategies", "The extreme-mover strategy shortlist both blind judges converged on.", strategies(data)),
             _section("ov-workers", "Runtime workers, SDKs and harnesses", "Each worker's recorded state and its newest receipt. A worker without a named source says so.", workers(data)),
-            _section("ov-repos", "Repositories and candidates by layer", "Per layer: the winners at their run pins, the surviving candidates and the next action.", repos(data)),
-            _section("overview-evidence", "Evidence", "The records this page read. Private records are named, never quoted.", evidence(data)),
-            _section("ov-claude-code", "Claude Code", "The pinned client, the 2.1.295 to 2.1.300 CHANGELOG delta and the best-practice screen.", claude_code(data)),
+            _section("ov-repos", "Repositories and candidates by layer", "The finalize-all waves and their status, then per layer the winners at their run pins, the surviving candidates and the next action.", repos(data)),
+            _section("overview-evidence", "Evidence", "Who produced each converged study, and every record this page read. Private records are cited by name; their paths and digests stay out.", evidence(data)),
+            _section("ov-claude-code", "Claude Code", "The pinned client, the latest CHANGELOG delta and the best-practice slots.", claude_code(data)),
             _section("ov-github", "GitHub", "Main CI and the open pull-request queue from the command center's current view.", github(data))]
     links = sorted(set(re.findall(r'href="(architecture-[a-z-]+\.html(?:#[a-z0-9-]+)?)"', "".join(body))))
     counts = {"sections": len(SECTIONS), "detail_links": links, "workers": len(data["workers"]),

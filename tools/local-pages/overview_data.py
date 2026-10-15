@@ -587,16 +587,200 @@ def workers(document: dict, sources: dict, glance: dict) -> list[dict]:
     return result
 
 
-def claude_code(source: dict) -> dict:
+_VERSION = re.compile(r"\b\d+\.\d+\.\d+\b")
+_COMMIT = re.compile(r"\b[0-9a-f]{40}\b")
+
+
+def _short(text: str, limit: int) -> str:
+    """The text up to its first clause break, cut at a word boundary within the limit; an ellipsis marks a cut."""
+    head = re.split(r":\s|;\s|\s[–—]\s", text, maxsplit=1)[0].strip()
+    cut = head != text.strip()
+    if len(head) > limit:
+        head, cut = head[:limit].rsplit(" ", 1)[0], True
+    head = head.rstrip(" ,;:.")
+    return head + "…" if cut else head
+
+
+def client_pin(sources: dict) -> dict:
+    """The claude-code run pin in final-stack.json, and the prepared pin, proposed until final-stack.json carries it."""
+    prep = sources["cc_floor_prep"]
+    stack = sources["final_stack"]
+    run_id = prep["entry"].get("run", "claude-code")
+    content = stack.get("content") if stack["status"] == "present" else None
+    run = next((item for item in (content or {}).get("runs") or [] if isinstance(item, dict) and item.get("id") == run_id), None) if isinstance(content, dict) else None
+    current = {"pin": run.get("pin") if run else None, "run": run_id, "path": stack.get("path") or stack["declared"]}
+    if prep["status"] != "present":
+        return {"current": current, "proposed": _pending(prep)}
+    _, lines = md_section(prep["content"], prep["entry"]["under"])
+    body = plain(" ".join(lines))
+    version, commit = _VERSION.search(body), _COMMIT.search(body)
+    pinned = str(current["pin"] or "").split(";")[0].strip()
+    return {"current": current, "proposed": {**_record(prep), "version": version.group(0) if version else None,
+                                             "commit": commit.group(0) if commit else None, "carried": bool(version) and pinned == version.group(0)}}
+
+
+def changelog(source: dict) -> dict:
+    """Per version heading: the version, entries counted by their opening kind, and at most a few short items."""
     if source["status"] != "present":
         return _pending(source)
-    entry, text = source["entry"], source["content"]
-    label = entry["pin_label"].casefold()
-    pin = next((match.group(0) for line in text.splitlines() if label in line.casefold()
-                for match in [re.search(r"\d+\.\d+\.\d+", line)] if match), None)
-    tables = {name: table_under(text, heading) for name, heading in (entry.get("tables") or {}).items()}
-    return {"status": "present", "name": source["name"], "root": source["root"], "path": source.get("path"), "pin": pin, "tables": tables,
-            "headings": dict(entry.get("tables") or {})}
+    entry = source["entry"]
+    kinds, limit, chars = list(entry.get("kinds") or []), int(entry.get("items") or 0), int(entry.get("item_chars") or 90)
+    versions, current = [], None
+    for line in source["content"].splitlines():
+        heading = _HEADING.match(line)
+        if heading:
+            version = _VERSION.search(heading.group(2))
+            current = {"version": version.group(0), "counts": {kind: 0 for kind in kinds}, "other": 0, "entries": []} if version else None
+            if current:
+                versions.append(current)
+            continue
+        bullet = _BULLET.match(line)
+        if current is None or not bullet or bullet.group(1):
+            continue
+        text = plain(bullet.group(2))
+        kind = next((kind for kind in kinds if text.startswith(kind + " ")), None)
+        if kind:
+            current["counts"][kind] += 1
+        else:
+            current["other"] += 1
+        current["entries"].append((kind, text))
+    for version in versions:
+        # The first kinds come first (Added before Fixed), each in record order; an entry naming a path is skipped.
+        ordered = sorted((item for item in version.pop("entries") if item[0]), key=lambda item: kinds.index(item[0]))
+        version["items"] = [_short(text, chars) for _, text in ordered if not _withheld(text, [])][:limit]
+    return {**_record(source), "versions": versions}
+
+
+def slots(source: dict) -> dict:
+    """One compact row per practice slot: id, status, the default's first clause and the client version."""
+    if source["status"] != "present":
+        return _pending(source)
+    content, entry = source["content"], source["entry"]
+    if not isinstance(content, dict) or not isinstance(content.get("slots"), list):
+        return {**_pending(source), "status": "unreadable", "reason": "the record has no slots list"}
+    chars = int(entry.get("default_chars") or 110)
+    rows = [{"slot": slot.get("id"), "status": slot.get("status"), "default": _short(plain(str(slot.get("default") or "")), chars),
+             "client_version": slot.get("client_version") or content.get("client_version")} for slot in content["slots"] if isinstance(slot, dict)]
+    order = list(content.get("status_values") or {})
+    counts: dict[str, int] = {}
+    for row in sorted(rows, key=lambda row: order.index(row["status"]) if row["status"] in order else len(order)):
+        counts[str(row["status"])] = counts.get(str(row["status"]), 0) + 1
+    return {"status": "present", "root": "repo", "path": source["path"], "name": source["name"], "rows": rows, "counts": counts,
+            "client_version": content.get("client_version"), "checked_at": content.get("checked_at")}
+
+
+def claude_code(sources: dict) -> dict:
+    parts = {"client": client_pin(sources), "changelog": changelog(sources["cc_changelog"]), "slots": slots(sources["cc_slots"])}
+    present = parts["client"]["current"]["pin"] or any(parts[key]["status"] == "present" for key in ("changelog", "slots"))
+    return {"status": "present" if present else "pending", **parts}
+
+
+# ---------------------------------------------------------------- finalize-all
+def finalize(sources: dict) -> dict:
+    """The finalize-all waves with their triggers, the F1 receipt counts by result and the F2 Claude-side counts."""
+    plan_source, f1_source, f2_source = sources["finalize_plan"], sources["finalize_f1"], sources["finalize_f2"]
+    plan = _pending(plan_source)
+    if plan_source["status"] == "present":
+        entry, lines = plan_source["entry"], plan_source["content"].splitlines()
+        word, drop = entry.get("trigger_word", "Trigger:"), entry.get("drop_terms") or []
+        waves = []
+        for index, line in enumerate(lines):
+            lead = re.match(r"^\*\*(F\d+)\.\s+(.+?)\.?\*\*\s*(.*)$", line)
+            if not lead:
+                continue
+            paragraph = [lead.group(3)]
+            for following in lines[index + 1:]:
+                if not following.strip() or following.lstrip().startswith(("-", "*", "#")):
+                    break
+                paragraph.append(following.strip())
+            text = " ".join(paragraph)
+            after = text.split(word, 1)[1] if word in text else ""
+            kept = sentences(after, drop)
+            waves.append({"id": lead.group(1), "title": plain(lead.group(2)), "trigger": kept[0] if kept else None})
+        plan = {**_record(plan_source), "waves": waves}
+    f1 = _pending(f1_source)
+    if f1_source["status"] == "present":
+        arms = f1_source["content"] if isinstance(f1_source["content"], list) else []
+        counts: dict[str, int] = {}
+        for arm in (arm for arm in arms if isinstance(arm, dict)):
+            result = ("passed" if arm["success"] is True else "failed") if "success" in arm else str(arm.get("state") or "no receipt").replace("-", " ")
+            counts[result] = counts.get(result, 0) + 1
+        ordered = {key: counts.pop(key) for key in ("passed", "failed") if key in counts} | dict(sorted(counts.items()))
+        f1 = {**_record(f1_source), "arms": sum(ordered.values()), "counts": ordered}
+    f2 = _pending(f2_source)
+    if f2_source["status"] == "present":
+        text, tables, groups, heading = f2_source["content"], md_tables(f2_source["content"]), [], None
+        for line in text.splitlines():
+            match = re.match(r"^##\s+(.*)$", line)
+            if match:
+                heading = plain(match.group(1))
+                table = next((table for table in tables if table["heading"] == heading), None)
+                groups.append({"label": re.sub(r"\s*\([^()]*\)", "", heading).strip(), "count": len(table["rows"]) if table else 0, "table": bool(table)})
+            elif groups and not groups[-1]["table"] and re.match(r"^(?:[-*]\s+)?\*\*", line):
+                groups[-1]["count"] += 1
+        f2 = {**_record(f2_source), "groups": [{"label": group["label"], "count": group["count"]} for group in groups if group["count"]]}
+    return {"plan": plan, "f1": f1, "f2": f2}
+
+
+# ---------------------------------------------------------------- study provenance
+_CLAUDE_MODEL = re.compile(r"\b(Opus|Sonnet|Haiku)\s(\d+(?:\.\d+)?)\b")
+_CLAUDE_ID = re.compile(r"\bclaude-(opus|sonnet|haiku)-(\d+)-(\d+)\b")
+_GPT_MODEL = re.compile(r"\bgpt-\d[a-z0-9.-]*[a-z0-9]\b", re.I)
+
+
+def model_family(text: str) -> str | None:
+    """The model family and model a route names, or None when it names none."""
+    if match := _CLAUDE_MODEL.search(text):
+        return f"Claude family ({match.group(1)} {match.group(2)})"
+    if match := _CLAUDE_ID.search(text):
+        return f"Claude family ({match.group(1).capitalize()} {match.group(2)}.{match.group(3)})"
+    if match := _GPT_MODEL.search(text):
+        return f"GPT family ({match.group(0)})"
+    return None
+
+
+def study(sources: dict, arms_key: str) -> dict:
+    """Who produced a converged study: each research arm's worker and model family, the judges that converged it,
+    the record's own claim and the section's statement; private records by name only."""
+    arms_source = sources[arms_key]
+    entry = arms_source["entry"]
+    record_source = sources[entry["study"]]
+    result = {"label": entry.get("label") or entry["study"], "record": _record(record_source) if record_source["status"] == "present" else _pending(record_source)}
+    if arms_source["status"] == "present":
+        columns = entry.get("columns") or {}
+        table = table_with_column(arms_source["content"], columns.get("arm", "arm"))
+        arms = []
+        if table:
+            index = {name: column_index(table["header"], label) for name, label in columns.items()}
+            for row in table["rows"]:
+                cell = lambda name: row[index[name]] if index.get(name) is not None else ""
+                if cell("arm").strip():
+                    arms.append({"worker": cell("arm").strip(), "model": model_family(cell("route") + " " + cell("notes"))})
+        result["arms"] = {**_record(arms_source), "rows": arms}
+    else:
+        result["arms"] = _pending(arms_source)
+    if record_source["status"] == "present":
+        text = record_source["content"]
+        _, lines = md_section(text, record_source["entry"].get("inputs", "Inputs"))
+        judges = []
+        for line in lines:
+            match = re.match(r"^\s*[-*]\s+([A-Z][A-Za-z]*-family judge)\s*\(([^,;)]+)", plain(line))
+            if match:
+                judges.append(f"{match.group(1)} ({match.group(2).strip()})")
+        claim = next((sentence for sentence in sentences(" ".join(text.split("\n## ", 1)[0].splitlines()[1:])) if re.search(r"\bclaims no\b", sentence)), None)
+        # The section's plain statement ("No measured winner yet.") until a named result record exists, then that record.
+        statement = _statement(sources, record_source["entry"].get("result"))
+        result.update(judges=judges, blind=bool(re.search(r"\bblind judges?\b", text, re.I)), claim=claim,
+                      result=None if statement is None else statement["text"] if statement["status"] != "present" else f'{statement["label"]}: {statement["name"]}.')
+        addendum_key = record_source["entry"].get("addendum")
+        extra = sources.get(addendum_key) if addendum_key else None
+        if extra and extra["status"] == "present" and extra["name"].startswith(PurePosixPath(record_source["name"]).stem + "."):
+            intro = extra["content"].split("\n- ", 1)[0]
+            producer = re.search(r"(\S+)\s+" + re.escape(extra["entry"].get("producer", "measured these")), intro)
+            kept = sentences(" ".join(intro.splitlines()[1:]), extra["entry"].get("drop_terms") or [])
+            result["addendum"] = {**_record(extra), "producer": producer.group(1) if producer else None,
+                                  "model": model_family(intro), "kind": next((sentence for sentence in kept if "author-run" in sentence), None)}
+    return result
 
 
 def github(source: dict) -> dict:
@@ -621,12 +805,14 @@ def evidence(sources: dict, worker_rows: list[dict], glance: dict) -> dict:
         if source["root"] == "repo":
             repository.append({"path": source.get("path") or source["declared"], "status": source["status"], "section": source["section"]})
         else:
-            private.append({"name": source["name"], "status": source["status"], "section": source["section"], "trigger": source["trigger"]})
+            private.append({"name": source["name"], "status": source["status"], "section": source["section"], "trigger": source["trigger"],
+                            "label": source["entry"].get("label") if source["entry"].get("study") else None})
     cited = sorted({row["receipt"]["path"] for row in worker_rows if (row.get("receipt") or {}).get("status") == "present" and row["receipt"].get("root") == "repo"})
     known = {row["path"] for row in repository}
     repository += [{"path": path, "status": "present", "section": "workers"} for path in cited if path not in known]
     pages = [{"page": band["page"], "title": band["title"]} for band in glance.get("bands") or []]
-    return {"repository": repository, "private": private, "pages": pages}
+    studies = [study(sources, key) for key, source in sources.items() if source["entry"].get("study")]
+    return {"repository": repository, "private": private, "pages": pages, "studies": studies}
 
 
 def model(root: Path, state_root: Path, *, source_map: Path = SOURCE_MAP, policy_path: Path = SOURCE_POLICY_PATH, commit: str | None = None) -> dict:
@@ -639,8 +825,8 @@ def model(root: Path, state_root: Path, *, source_map: Path = SOURCE_MAP, policy
     worker_rows = workers(document, sources, glance)
     return {"commit": commit, "source_map": map_receipt, "sources": sources, "architecture": glance,
             "feeds": feeds(sources), "strategies": strategies(sources),
-            "workers": worker_rows, "repos": repos(sources, glance), "evidence": evidence(sources, worker_rows, glance),
-            "claude_code": claude_code(sources["claude_code_practice"]), "github": github(sources["cc_now"]),
+            "workers": worker_rows, "repos": {**repos(sources, glance), "finalize": finalize(sources)}, "evidence": evidence(sources, worker_rows, glance),
+            "claude_code": claude_code(sources), "github": github(sources["cc_now"]),
             "policy": dict(architecture_reads.policy.receipt)}
 
 

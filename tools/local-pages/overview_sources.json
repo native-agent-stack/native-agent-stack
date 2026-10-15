@@ -54,6 +54,7 @@
       "drop_terms": ["paper", "hub", "account", "owner"],
       "result": "feeds_battery",
       "addendum": "feeds_addendum",
+      "inputs": "Inputs",
       "trigger": "the command center records its WS2 convergence after both blind judges have scored the arms"
     },
     "feeds_addendum": {
@@ -64,6 +65,7 @@
       "reads": "a sanitized projection of the newest addendum to the convergence record shown: under the heading below, each top-level bullet of the form 'subject: result', as its subject (the parenthesised one, if any) and the sentences of it and its nested bullets that name a result word below. A parenthesised citation of a path, digest or line is dropped; any other sentence that cites one, or names a drop term, is withheld",
       "under": "addendum",
       "results": ["settled", "confirmed", "proven", "row"],
+      "producer": "measured these",
       "drop_terms": ["paper", "hub", "account", "owner"],
       "trigger": "the command center records entitlement measurements as an addendum to the WS2 convergence record"
     },
@@ -90,6 +92,7 @@
       "sizing": "sizing",
       "drop_terms": ["account", "owner"],
       "result": "strategies_replication",
+      "inputs": "Inputs",
       "trigger": "the command center records its WS5 convergence of the extreme-mover strategy shortlist"
     },
     "strategies_replication": {
@@ -115,6 +118,32 @@
       },
       "trigger": "the command center writes the finalize-all rows for every layer"
     },
+    "finalize_plan": {
+      "section": "repos",
+      "role": "overview_finalize_plan",
+      "root": "state",
+      "glob": "coordination/command-center/research-cc-role-20261008/finalize-all-20261014/PLAN-finalize-all-*.md",
+      "reads": "each wave paragraph opening with a bold 'F<n>. <title>.' lead: its id, its title and the first sentence after the trigger word below",
+      "trigger_word": "Trigger:",
+      "drop_terms": ["owner", "account"],
+      "trigger": "the command center writes its finalize-all plan"
+    },
+    "finalize_f1": {
+      "section": "repos",
+      "role": "overview_finalize_f1",
+      "root": "state",
+      "path": "coordination/ns2604-coop/work-20261012/finalize-f1-20261014/INDEX.json",
+      "reads": "the arm list: each arm's result (success true or false where a receipt exists, otherwise its state), counted by result",
+      "trigger": "the co-op publishes the F1 receipt index"
+    },
+    "finalize_f2": {
+      "section": "repos",
+      "role": "overview_finalize_f2",
+      "root": "state",
+      "glob": "coordination/cc-native-practice-20261009/finalize-f2-20261014/F2-claude-side-*.md",
+      "reads": "presence, and per second-level heading (without its parenthesised aside) a count: the rows of its first table, otherwise its entries that open with a bold lead",
+      "trigger": "cc-native-practice records the Claude side of F2"
+    },
     "registered_receipts": {
       "section": "workers",
       "role": "overview_registry",
@@ -131,18 +160,35 @@
       "reads": "status and tool_read_utc of the pi and OpenCode profile qualification",
       "trigger": "the runtime-profile qualification receipt is committed"
     },
-    "claude_code_practice": {
+    "cc_floor_prep": {
       "section": "claude_code",
-      "role": "overview_claude_code_practice",
+      "role": "overview_cc_floor_prep",
       "root": "state",
-      "glob": "coordination/command-center/research-cc-role-20261008/cc-native-practice-20261014/CLIENT-*.md",
-      "reads": "the version on the line naming the pin label below, and the first table under each heading below",
-      "pin_label": "Pinned client",
-      "tables": {
-        "changelog": "CHANGELOG",
-        "screen": "screen"
-      },
-      "trigger": "cc-native-practice records the pinned client, its 2.1.295 to 2.1.300 CHANGELOG delta and its best-practice screen"
+      "glob": "coordination/cc-native-practice-20261009/floor-2300-20261014/FLOOR-*-prep-*.md",
+      "reads": "under the heading below, the first version and the first 40-character commit: the proposed run pin, shown as proposed until the claude-code run in final-stack.json carries that version",
+      "under": "Source commit for the run pin",
+      "run": "claude-code",
+      "trigger": "cc-native-practice prepares the next Claude Code floor and run pin"
+    },
+    "cc_changelog": {
+      "section": "claude_code",
+      "role": "overview_cc_changelog",
+      "root": "state",
+      "glob": "coordination/cc-native-practice-20261009/floor-2300-20261014/changelog-*.md",
+      "reads": "per version heading: the version, the count of entries opening with each kind below (others counted together), and at most the item limit of short items, taken from the first kinds in order",
+      "kinds": ["Added", "Fixed", "Changed"],
+      "items": 3,
+      "item_chars": 90,
+      "trigger": "cc-native-practice cuts the CHANGELOG delta for the next floor"
+    },
+    "cc_slots": {
+      "section": "claude_code",
+      "role": "overview_cc_slots",
+      "root": "repo",
+      "path": ".claude/skills/claude-native-practice/reference/slots.json",
+      "reads": "client_version, status_values and slots[] (id, status, default, client_version where a slot carries its own), one row per slot with the default cut to its first clause",
+      "default_chars": 110,
+      "trigger": "the claude-native-practice skill commits its slot table"
     },
     "cc_now": {
       "section": "github",
@@ -156,6 +202,28 @@
         "main_ci": "main_ci"
       },
       "trigger": "the command center publishes its current view"
+    },
+    "feeds_arms": {
+      "section": "evidence",
+      "role": "overview_feeds_arms",
+      "root": "state",
+      "path": "coordination/command-center/research-cc-role-20261008/ranked-feeds-20261014/README.md",
+      "reads": "the arm table: per row the arm (the worker) and the model named in its route or notes cells, or 'not stated'; no route text, path or run id is shown",
+      "study": "feeds_convergence",
+      "label": "WS2 data feeds for early entry",
+      "columns": {"arm": "arm", "route": "route", "notes": "notes"},
+      "trigger": "the co-op records the WS2 arm reports"
+    },
+    "strategies_arms": {
+      "section": "evidence",
+      "role": "overview_strategies_arms",
+      "root": "state",
+      "path": "coordination/command-center/research-cc-role-20261008/extreme-mover-strategies-20261014/README.md",
+      "reads": "the arm table: per row the arm (the worker) and the model named in its route or notes cells, or 'not stated'; no route text, path or run id is shown",
+      "study": "strategies_convergence",
+      "label": "WS5 extreme-mover strategies",
+      "columns": {"arm": "arm", "route": "route", "notes": "notes"},
+      "trigger": "the co-op records the WS5 arm reports"
     }
   },
   "workers": [

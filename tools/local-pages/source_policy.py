@@ -375,7 +375,7 @@ class OverviewReads:
     Grants are the committed policy's "overview" roles (exact repo or state
     paths) and "overview_families" (one fixed directory, a literal filename
     prefix and suffix, an optional literal infix, and name tokens without
-    separators or dots). The source map
+    separators, with a dot only between digits). The source map
     selects among these grants; it cannot extend them. final-stack.json stays
     on its dedicated Architecture role, so no overview role may grant it.
     """
@@ -427,8 +427,9 @@ class OverviewReads:
         if not family or root != family["root"]:
             return False
         path = PurePosixPath(relative)
-        # Name tokens carry no dot, so a record's addendum (prefix, token, infix, token, suffix) is never the record.
-        token = r"[A-Za-z0-9_-]+"
+        # A name token carries a dot only between digits (a version such as 2.1.300), so a record's addendum
+        # (prefix, token, infix, token, suffix) is never the record.
+        token = r"(?:[A-Za-z0-9_-]|(?<=[0-9])\.(?=[0-9]))+"
         middle = token + (re.escape(family["infix"]) + token if "infix" in family else "")
         return path.parent.as_posix() == family["directory"] and bool(
             re.fullmatch(re.escape(family["prefix"]) + middle + re.escape(family["suffix"]), path.name))

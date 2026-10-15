@@ -186,9 +186,9 @@ section links (8)
 2 feeds: statement | $0 signal table | baseline, lagging, gated | gaps | addendum results | pending block
 3 strategies: statement | family claim | caveats, ablations, selector and sizing   | pending block
 4 workers: worker | state | newest receipt
-5 repositories: per catalog, shared state once | layer | winners at run pin | survivors | next action
-6 evidence: repository records | private records by name | layer pages
-7 Claude Code: pin, CHANGELOG delta, screen table     | pending block
+5 repositories: finalize-all waves | F1 and F2 status | per catalog, shared state once | layer | winners | survivors | next action
+6 evidence: studies (arms by worker and model family, judges, result as stated) | repository records | private records | layer pages
+7 Claude Code: run pin and prepared pin | CHANGELOG counts per version | best-practice slots   | pending blocks
 8 GitHub: main CI, in review, landing queue
 ```
 
