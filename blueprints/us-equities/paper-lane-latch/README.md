@@ -41,6 +41,24 @@ and native strict checksum before its runtime/config bytes are compared.
 No source seal is rewritten. The new receipt origin is the supplied currently
 installed bundle, so same-state-root historical handoffs need no relabeling.
 
+The lane B r3 preparation overlays only the canonical launcher's `keyed` and
+`run_stage` methods from `tests/fixtures/seq2-launch.txt`, selected from the
+builder's exact source commit. It leaves the authenticated native runner and
+CONFIG files unchanged. Trial acceptance reads PRE `paper.json` or scheduled
+`paper-output.json`, records recovery-only starts separately and refuses them
+as trial evidence. A timeout sends TERM, permits 630 seconds for the cited
+recovery bounds, then KILL if still running; timeout remains refusal exit124.
+The scheduled Bash leader keeps a trap until its foreground runner ends.
+
+New-unit envelopes cover that full wait plus 30 seconds: RuntimeMaxSec at least
+5150s PRE, 1850s RTH and 780s GET-only pre-skip; TimeoutStopSec at least1380s
+for trading recovery (720s native recovery timeout +630s grace +30s margin).
+The script's existing timeout900 sends TERM and has no kill-after setting;
+it is retained. These are new-packet construction values, not changes to any
+installed unit. The enclosing native runner's recovery bounds and CPython
+subprocess semantics are cited in
+`docs/decisions/2026-10-15-lane-b-r3-launcher-contract.md`.
+
 The packet uses canonical `-seq3` unit names. It embeds BOTH old-generation
 retirement checks so an enabled/active seq2 or seq2-flat watcher refuses new
 issuer admission. The shared seq3 retirement-inventory PR remains separately

@@ -7,6 +7,7 @@ import signal
 import subprocess
 import sys
 import tempfile
+import time
 import types
 import unittest
 from unittest.mock import patch
@@ -87,6 +88,19 @@ class KillBudget(unittest.TestCase):
         self.root = Path(self.temp.name)
         self.launch = launcher(self.root)
 
+    def ready_child(self, native_popen):
+        def spawn(*args, **kwargs):
+            child = native_popen(*args, **kwargs)
+            deadline = time.monotonic() + 10
+            while not (self.root / 'ready').exists():
+                if child.poll() is not None or time.monotonic() >= deadline:
+                    child.kill()
+                    child.wait()
+                    self.fail('SYN child did not reach its signal-blocked handshake')
+                time.sleep(0.005)
+            return child
+        return spawn
+
     def test_timeout_allows_late_armed_child_to_finish_recovery(self):
         loader = self.launch.FROZEN / 'tools/credentials/credential_run.py'
         loader.parent.mkdir(parents=True)
@@ -104,7 +118,8 @@ time.sleep(0.05)
 (root/'recovery-finished').write_text('SYN flat')
 ''')
         try:
-            rc = self.launch.keyed(['SYN-late-arm', self.root], timeout=0.2)
+            with patch.object(self.launch.subprocess, 'Popen', side_effect=self.ready_child(subprocess.Popen)):
+                rc = self.launch.keyed(['SYN-late-arm', self.root], timeout=0.2)
         except subprocess.TimeoutExpired:
             self.fail('timeout killed the child before its recovery handler was armed')
         self.assertNotEqual(rc, 0, 'a timed-out trial cannot become accepted trial evidence')
@@ -169,7 +184,8 @@ signal.pthread_sigmask(signal.SIG_UNBLOCK, {signal.SIGTERM})
         command = list(recorded[0])
         command[-1] = script
         try:
-            rc = actual_keyed(command, timeout=0.7)
+            with patch.object(self.launch.subprocess, 'Popen', side_effect=self.ready_child(subprocess.Popen)):
+                rc = actual_keyed(command, timeout=0.7)
         except subprocess.TimeoutExpired:
             self.fail('launcher killed the native credential relay during recovery')
         self.assertEqual(rc, 124)

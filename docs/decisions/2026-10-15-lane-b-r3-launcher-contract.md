@@ -15,7 +15,8 @@ At the r3 pin:
 - `runner.py:252-258` arms the recovery stop handler before unblocking TERM;
   `:300-308` blocks TERM/INT before the fresh-process exec.
 - `runner.py:3217` and `mover_runner.py:1063` identify recovery-only starts.
-- The preflight observers allow at most 50 requests. `transport.py:973` sets
+- The preflight observers (`runner.py:2715-2719`,
+  `mover_runner.py:622-627`) allow at most 50 requests. `transport.py:973` sets
   5-second connect and 5-second read timeouts for each request.
 - `recovery.py:94-98` bounds order work by
   `min(cleanup_seconds, limits.cleanup_seconds, 120)`, including port start
@@ -34,7 +35,7 @@ to the native command group and continues waiting for that command;
 does not load credentials or weaken its process/secret cleanup contract.
 The scheduler's Bash leader installs a TERM/INT no-op trap before sourcing
 the unchanged script. Bash defers a trap until its foreground command exits
-(Bash's maintained manual, Signals section); this keeps the native relay's
+(installed GNU Bash5.3.9 manual, Signals section); this keeps the native relay's
 leader alive during recovery instead of triggering group cleanup early. A
 test runs the actual credential relay API with empty synthetic environment
 and a late-armed child, verifying the recovery survives its 2-second cleanup
@@ -58,3 +59,14 @@ installation. It must land before r3 is placed in lane B's frozen runner.
 The current-runner rollover start is unaffected. The shared STOP publishers
 remain operators and guards; this task adds no STOP publisher or admission
 protocol. Existing deployed bundles are immutable and are not changed here.
+
+The enclosing unit must not expire before its child's grace. A separate
+recut/envelope commit overlays only the two canonical launcher methods into
+newly authenticated predecessor text and raises the NEW packet unit limits:
+PRE 4490+630+30=5150s, RTH1190+630+30=1850s, GET-only pre-skip120+630+30=780s;
+trading stop/recovery720+630+30=1380s. The 30 seconds is an explicit supervisor
+margin. Native runner/config bytes and scheduled script stay unchanged.
+systemd v259 commit9ca433482f2281d71718718705ca8cd3bf562ad6,
+`man/systemd.service.xml` sections RuntimeMaxSec and TimeoutStopSec, defines
+the enclosing runtime and stop-command timeouts. The existing script's
+`timeout900` sends TERM and has no KILL deadline, so it is retained.
