@@ -5017,8 +5017,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.json",
-      "sha256": "b0b9d7949e07dd86ab80b34747cbc538a5eb6c97d1dec26e6684c0e1ffd7b2a1",
-      "bytes": 152660
+      "sha256": "c310046d8c62323c482d05c31afd9aaeae544b5fc59445777597817da2fc51bf",
+      "bytes": 153088
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.md",
@@ -5032,8 +5032,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/workers.md",
-      "sha256": "0c07dbfed9fbb0ef7f98155e63b989d47427d29cf7bb5693ed0fdf7ddf395bd3",
-      "bytes": 27627
+      "sha256": "e0b242b888d993db5643dafca4292be0e114caba37abe38e9dc66725ed7215aa",
+      "bytes": 28055
     },
     {
       "path": ".claude/skills/native-skill-routing/SKILL.md",
@@ -17513,8 +17513,8 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "89a75127db40f9e60d3370ed6fa17b16724518f3a4d3f501221c0100cd992b47",
-      "bytes": 190328
+      "sha256": "abb2881310233e3491c6b25db91f872cc5a40d9c86e6c6bea4017fc21f771618",
+      "bytes": 190472
     },
     {
       "path": "catalogs/landscape/README.md",
@@ -21728,7 +21728,7 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/claude-native-slot-manifest.json",
-      "sha256": "b3db948a9878156abec03a3dc11764b1595c5c43b348d483c2a24355ca649e80",
+      "sha256": "d1676d690aa7495eb3ba2a5f3c69138bb6b19e584f1e9120ce5af7e0c41cf08c",
       "bytes": 238162
     },
     {
@@ -63940,6 +63940,11 @@
       "path": "tests/test_native_practice_doc_corrections.py",
       "sha256": "04410b557212f2cd75a0ac37a5d6fd0addd9920d7f8caaf8a057a8d0ba9432e1",
       "bytes": 3900
+    },
+    {
+      "path": "tests/test_native_practice_ledger_rows_1.py",
+      "sha256": "73d3a04fc70f7db522196825daaca16cbda233fe16936addf935c0f26a8a44dc",
+      "bytes": 2679
     },
     {
       "path": "tests/test_native_practice_meter_windows.py",
