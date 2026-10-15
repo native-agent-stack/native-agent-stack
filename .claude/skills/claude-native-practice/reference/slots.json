@@ -185,7 +185,7 @@
     "permission-modes.md",
     "settings-permissions-O7, O15, O16"
    ],
-   "notes": "Under bypass, writes to `.claude` and `.git` are auto-approved and no deny rule covers the guard's own files; any non-interactive run skips the trust dialog. The docs limit bypass to isolated containers or VMs; the recipe records bypass as an open owner decision (recipes/claude-native-profile.md:367).",
+   "notes": "Under bypass, writes to `.claude` and `.git` are auto-approved and no deny rule covers the guard's own files; any non-interactive run skips the trust dialog. The docs limit bypass to isolated containers or VMs; the recipe records bypass as an open owner decision (recipes/claude-native-profile.md:367). The Artifact tool, which publishes session output as a private web page on claude.ai, is off on NativeStack2604: its user settings hold `enableArtifact: false` (exact-key read, 2026-10-15), the key `/config` writes when its Artifacts row is turned off. Any settings file can turn the tool off and none can turn it back on, and the deprecated `disableArtifact: true` means the same (settings-reference.md:5427-5443, :5354-5360, client 2.1.300). It is recorded as this host's choice, not a template default: the `claude:setting:enableArtifact` row of catalogs/foundation/upstream-surface-dispositions.json (enabled, scope NativeStack2604); re-applying the template keeps it, because keys the template does not mention are kept from the live file (tools/adoption/apply_claude_settings.py:323-329; gap ledger A3-0031, 2026-10-15).",
    "overturn_when": "The owner reopens the permission mode, a release changes precedence or rule evaluation, or an incident shows a deny or hook gap.",
    "supersedes": [
     "M46 evidence sentence (auto start mode, 2.1.285)",
@@ -561,7 +561,7 @@
     "context-token-O3, O15, O16",
     "Measured upstream: compaction pays only on long runs (Anthropic, optimizing-for-cost-and-intelligence)"
    ],
-   "notes": "No quality loss measured or claimed: this is the native default; no override is set on the host or template.",
+   "notes": "No quality loss measured or claimed: this is the native default; no override is set on the host or template. Compacting before an idle gap is native since 2.1.299: idle compaction compacts an interactive terminal conversation on the one-hour cache TTL whose context has reached the 200,000-token threshold, about 54 minutes after its last request and shortly before the cache expires, so the next message sends a summary instead of the whole conversation (CHANGELOG.md:97-98 at anthropics/claude-code@94506ff0d3bd9185f1752da36e968775021fb48f; settings-reference.md:2964-2983 at client 2.1.300: default `true`, and Claude Code must be able to fetch feature flags). Keep it on: `idleCompaction` stays unset on the host and in the template (the command center's ruling of 2026-10-14 on its 2.1.299 screen); only the settings of a session that must keep its exact context across a wait longer than 54 minutes set it to `false`, and `DISABLE_AUTO_COMPACT` turns it off with auto-compaction. Hooks see it as an automatic compaction: PreCompact and PostCompact match it as `auto`, and the route's SessionStart `compact` hook fires on any automatic compaction (hooks.md:3251, :3283, :1214). `-p` workers are not interactive, so it does not reach them (gap ledger C3-0006, 2026-10-15).",
    "overturn_when": "A paired same-task run shows an earlier window keeps quality at lower cost, or a release changes compaction.",
    "supersedes": [
     "topic: auto-compact threshold (window now saved per model)",
@@ -579,7 +579,7 @@
      "relation": "extends",
      "evidence_kind": "asserted",
      "clients": "claude-code",
-     "native_mechanism": "Claude Code: manual `/compact <focus>` in top-level interactive sessions, with a Compact Instructions section in CLAUDE.md. Timing follows the native cache TTL buckets (5 minutes or 1 hour, per the prompt-caching route)."
+     "native_mechanism": "Claude Code: native idle compaction (2.1.299, on by default with `idleCompaction` unset) compacts an interactive conversation on the one-hour cache TTL that has reached 200,000 tokens about 54 minutes after its last request, before the cache expires; a manual `/compact <focus>` in a top-level interactive session, with a Compact Instructions section in CLAUDE.md, covers smaller conversations and the 5-minute bucket (TTL buckets per the prompt-caching route)."
     },
     {
      "title": "Using Claude Code: session management and 1M context | Claude by Anthropic",
@@ -1941,7 +1941,7 @@
     "M42",
     "M31"
    ],
-   "notes": "Ultrareview from a script runs as `claude ultrareview <PR#> --json`; `claude -p '/code-review ultra'` exits without findings. The run in GitHub (`claude-pr-toolkit-review.yml`, through #909) was retired on 2026-10-10 with the other Claude workflows, and the toolkit read never ran there (docs/decisions/2026-10-10-retire-in-github-claude-review.md; see github-action).",
+   "notes": "Ultrareview from a script runs as `claude ultrareview <PR#> --json`; `claude -p '/code-review ultra'` exits without findings. The run in GitHub (`claude-pr-toolkit-review.yml`, through #909) was retired on 2026-10-10 with the other Claude workflows, and the toolkit read never ran there (docs/decisions/2026-10-10-retire-in-github-claude-review.md; see github-action). A PR's description is published from a file and read back before the PR is reported or cued: write the body to a temporary file outside the repository, pass it to `gh pr create` or `gh pr edit` with `--body-file` (no shell interpolation), then compare `gh pr view <pr> --json body` with the file. Measured on 2026-10-11 against the description of #991 (restored afterwards): updates of 262,145, 262,199 (65,579 code points) and 1,048,577 UTF-8 bytes each got HTTP 200, and a GET read back the old description; an update of 262,144 bytes was stored. The catalog-freshness propose step does both (.github/workflows/catalog-freshness.yml). Source of the practice: fcakyon/claude-codex-settings@216ec221fb9899dfaa5371413583b9e08ca89085:plugins/github-dev/skills/create-pr/SKILL.md:35,40 (gap ledger B2-0004, 2026-10-15).",
    "primary_sources": [
     {
      "title": "Bringing Code Review to Claude Code",
