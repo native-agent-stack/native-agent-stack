@@ -19182,6 +19182,11 @@
       "bytes": 6429
     },
     {
+      "path": "docs/decisions/2026-10-14-session-relaunch-after-wsl-restart.md",
+      "sha256": "a16bde3428b14a259f526c32d0e433b9cc8c5934f5ffe4296abb8ce436ff4303",
+      "bytes": 6369
+    },
+    {
       "path": "docs/decisions/2026-10-15-model-currency-landscape-check.md",
       "sha256": "2351ea7da59e6fc93556b4048efeec2be0288fa01bdbe36139c870d9b5a2e6ec",
       "bytes": 10680
@@ -52127,6 +52132,41 @@
       "bytes": 6435
     },
     {
+      "path": "evidence/artifacts/session-relaunch-20261014/README.md",
+      "sha256": "ceba93929bfc0d5dc13d84387fc50a79a8e1e2ce558366297e2a2f681deb9706",
+      "bytes": 2110
+    },
+    {
+      "path": "evidence/artifacts/session-relaunch-20261014/probe/retro_dry_run.py",
+      "sha256": "67ae758b2a488f30b52d475b7d68ed643f71c22698ac62044450b685eb0e6367",
+      "bytes": 2095
+    },
+    {
+      "path": "evidence/artifacts/session-relaunch-20261014/probe/tab_probe.ps1",
+      "sha256": "4f385a0eba620c29612236d2b5ee144938f51dbb76cd7089e3c27c5b8c7fbecf",
+      "bytes": 409
+    },
+    {
+      "path": "evidence/artifacts/session-relaunch-20261014/probe/tab_probe.sh",
+      "sha256": "ac06341ee99f61fcd05e8d4e60c48b7040ab2156b02bc5129dea3b3c4a2fba91",
+      "bytes": 340
+    },
+    {
+      "path": "evidence/artifacts/session-relaunch-20261014/receipts/probes.json",
+      "sha256": "0c2ef8aa7f4a3dbea8ffe73831b1fa68df6e512fc7c767ba30e62fccde176b36",
+      "bytes": 4210
+    },
+    {
+      "path": "evidence/artifacts/session-relaunch-20261014/receipts/retro-handoff.md",
+      "sha256": "62d68b4bf38c765b9af1420c05da9165c66d37328915dd802b745180bef47d03",
+      "bytes": 3049
+    },
+    {
+      "path": "evidence/artifacts/session-relaunch-20261014/receipts/sources.json",
+      "sha256": "a0c08c14cc9ae6c681ead63798fe7e758b6b885954b9ea44addb0ccf624ac0c8",
+      "bytes": 2712
+    },
+    {
       "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/advisory-before.log",
       "sha256": "a5990dc467c5b27ada0a3333fe085b8e89fe2491c60347a8033c5fb7ac4ab90a",
       "bytes": 42047
@@ -63897,6 +63937,11 @@
       "bytes": 14063
     },
     {
+      "path": "tests/test_session_relaunch.py",
+      "sha256": "a2590561bb40e294ccc7a10d1b9d8b6ad46828ff87b29cb448d23693bf68e10d",
+      "bytes": 40507
+    },
+    {
       "path": "tests/test_shell_parser_ci.py",
       "sha256": "abbe643e6d448ef7cd0e84e31548a708c198922a4736e612663b3737dbab7297",
       "bytes": 43278
@@ -64560,6 +64605,36 @@
       "path": "tools/runtime-worker-evidence/test_gateway_observer.py",
       "sha256": "7ba28e15181fe15a259f3140862d53506e589b0bf56a31d0202efc3da529b93d",
       "bytes": 5277
+    },
+    {
+      "path": "tools/session-relaunch/README.md",
+      "sha256": "0b151cb32bb8a169f724b515c71a127870dcf0b3465641f25eb6562eb96fc362",
+      "bytes": 11384
+    },
+    {
+      "path": "tools/session-relaunch/config.example.json",
+      "sha256": "8ec003b53538b121820f7da765bef20e3ba944e94a7e82d42a3643d58a358044",
+      "bytes": 1355
+    },
+    {
+      "path": "tools/session-relaunch/session_relaunch.py",
+      "sha256": "b26393a11d59a2545f2d0916b473260b14c17e6a5da86d9e797f190ff19b3ab2",
+      "bytes": 30766
+    },
+    {
+      "path": "tools/session-relaunch/units/ns-session-relaunch.service",
+      "sha256": "9bbc5a1746fa48050fc13ddab68f9abfe7bac145bd7342a5dd22ce0bb7215e96",
+      "bytes": 870
+    },
+    {
+      "path": "tools/session-relaunch/units/ns-session-roster.service",
+      "sha256": "dcb7a847099c776ed46b2e300aa65c2e7907e474d9c6b67a9e41a57f8592a3dd",
+      "bytes": 471
+    },
+    {
+      "path": "tools/session-relaunch/units/ns-session-roster.timer",
+      "sha256": "ea9e9e269a8d9dcffb76c52b96ef4dd30635ca85d02f38552d1e4ebeeaf0df72",
+      "bytes": 266
     },
     {
       "path": "tools/skill-usage/README.md",

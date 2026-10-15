@@ -1,0 +1,28 @@
+{
+ "state_dir": "~/.local/state/native-agent-stack/session-relaunch",
+ "claude": "~/.local/bin/claude",
+ "powershell": "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+ "tab_opener": "E:\\wsl-maintenance\\relaunch-20261014\\open-tab.ps1",
+ "handoff_dir": "~/.local/state/native-agent-stack/coordination/command-center",
+ "transcript_tail": "~/.local/state/native-agent-stack/coordination/command-center/cc-tools/relaunch-20261014/transcript_tail.py",
+ "cc_session_name": "wsl-architecture-design",
+ "max_roster_age_s": 300,
+ "max_relaunches": 3,
+ "relaunch_window_s": 21600,
+ "cc_wait_s": 120,
+ "spacing_s": 5,
+ "tab_attempts": 3,
+ "tab_retry_pause_s": 10,
+ "tab_timeout_s": 120,
+ "settle_s": 60,
+ "client_wait_s": 120,
+ "poll_s": 5,
+ "profiles": [
+  {"session_name": "wsl-architecture-design", "launcher_name": "cc", "title": "CC wsl-architecture-design"},
+  {"session_name": "trading-cc", "launcher_name": "trading-cc", "title": "trading-cc"},
+  {"session_name": "ns2604-coop", "launcher_name": "coop", "title": "ns2604-coop"},
+  {"session_name": "api-actions", "launcher_name": "api-actions", "title": "api-actions"},
+  {"session_name": "native-agent-stack-d4", "launcher_name": "d4", "title": "native-agent-stack-d4"},
+  {"session_name": "cc-native-practice", "launcher_name": "cc-native-practice", "title": "cc-native-practice"}
+ ]
+}

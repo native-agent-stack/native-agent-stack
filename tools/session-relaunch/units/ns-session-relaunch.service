@@ -1,0 +1,15 @@
+# Once per boot: relaunch the sessions of an earlier boot's roster when that boot ended without a planned-restart marker.
+# A refused, skipped or partial run exits 1, and OnFailure= then runs the command center's stack-alert@ template (the
+# same handler as adoption/templates/systemd/mineru.service; systemd.unit(5), OnFailure=). Confirm the template is
+# loaded before enabling this unit: `systemctl --user show stack-alert@ns-session-relaunch.service.service --property=LoadState`.
+[Unit]
+Description=Relaunch the core Claude Code sessions after an unplanned WSL restart
+OnFailure=stack-alert@%n.service
+
+[Service]
+Type=oneshot
+TimeoutStartSec=900
+ExecStart=/usr/bin/python3 -I %h/.local/share/native-agent-stack/session-relaunch/session_relaunch.py relaunch --config %h/.local/state/native-agent-stack/session-relaunch/config.json
+
+[Install]
+WantedBy=default.target
