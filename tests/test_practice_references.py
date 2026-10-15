@@ -545,6 +545,31 @@ class ObserveTests(unittest.TestCase):
         self.assertEqual(observation["compare"]["files"], ["README.md", "changelog/x.md"])
         self.assertNotIn("files", plain["compare"])
 
+    def test_a_practice_file_renamed_out_of_the_screened_paths_still_counts(self):
+        # GPT read and local review of #1136 at 6162aa04 (P2, practice_references.py:353-355): only the new name was kept,
+        # so a practice file moved out of the screened paths matched nothing and cleared the notice. GitHub's compare
+        # lists a rename's old name as previous_filename (github/docs@be38ec5d,
+        # src/rest/data/fpt-2022-11-28/commits.json:5517); either name matching counts the entry once.
+        answers = {
+            "repos/example/guide": {"full_name": "example/guide", "archived": False, "default_branch": "main"},
+            "repos/example/guide/tags?per_page=1": [],
+            "repos/example/guide/commits/main": {"sha": HEAD, "commit": {"committer": {"date": iso(NOW)}}},
+            f"repos/example/guide/compare/{PIN}...{HEAD}?per_page=1": {
+                "status": "ahead", "ahead_by": 2, "behind_by": 0,
+                "base_commit": {"sha": PIN, "commit": {"committer": {"date": "2026-09-25T18:06:27Z"}}},
+                "files": [{"filename": "archive/claude-settings.md", "status": "renamed",
+                           "previous_filename": "best-practice/claude-settings.md"},
+                          {"filename": "best-practice/hooks.md", "status": "renamed",
+                           "previous_filename": "best-practice/old-hooks.md"},
+                          {"filename": "CLAUDE.md"}]},
+        }
+        screened = dict(entry("example/guide"), screen_paths=["README.md", "best-practice/*"])
+        with mock.patch("subprocess.run", side_effect=self.fake_gh(answers, [], ())):
+            observation = practice_references.observe(screened)
+        row = practice_references.classify(screened, observation, NOW)
+        self.assertEqual(row["screen_paths_changed"], 2)  # the moved-out file, and a rename inside (counted once)
+        self.assertIn("best-practice/claude-settings.md -> archive/claude-settings.md", row["screen_paths_matched"])
+
     def test_missing_repository_is_not_compared(self):
         observation, calls = self.observe("example/gone", {})
         self.assertEqual(calls, ["repos/example/gone"])

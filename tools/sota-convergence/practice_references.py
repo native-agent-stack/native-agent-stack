@@ -350,9 +350,17 @@ def observe(entry: dict) -> dict:
                 "base_date": ((base.get("commit") or {}).get("committer") or {}).get("date"),
             }
             if entry.get("screen_paths") and isinstance(comparison.get("files"), list):
-                # The same response lists the changed files (CC ruling B3/W2, 2026-10-15): no second call.
-                observation["compare"]["files"] = [item.get("filename") for item in comparison["files"]
-                                                   if isinstance(item, dict) and isinstance(item.get("filename"), str)]
+                # The same response lists the changed files (CC ruling B3/W2, 2026-10-15): no second call. A rename
+                # keeps its old name too (previous_filename; github/docs@be38ec5d,
+                # src/rest/data/fpt-2022-11-28/commits.json:5517), so a practice file moved out of the screened paths
+                # still matches.
+                items = [item for item in comparison["files"]
+                         if isinstance(item, dict) and isinstance(item.get("filename"), str)]
+                observation["compare"]["files"] = [item["filename"] for item in items]
+                renamed = {item["filename"]: item["previous_filename"] for item in items
+                           if isinstance(item.get("previous_filename"), str)}
+                if renamed:
+                    observation["compare"]["renamed_from"] = renamed
         else:
             observation["compare_error"] = error or "the comparison returned no status"
         return observation
@@ -494,8 +502,13 @@ def _screened(patterns: list, compare) -> tuple:
     files = compare.get("files")
     if not isinstance(files, list):
         return None, []
-    matched = [name for name in files if isinstance(name, str)
-               and any(fnmatch.fnmatchcase(name, pattern) for pattern in patterns)]
+    renamed = compare.get("renamed_from") if isinstance(compare.get("renamed_from"), dict) else {}
+    hit = lambda name: isinstance(name, str) and any(fnmatch.fnmatchcase(name, pattern) for pattern in patterns)
+    matched = []
+    for name in files:  # each changed entry once, whether its new name, its old name or both match
+        old = renamed.get(name) if isinstance(name, str) else None
+        if hit(name) or hit(old):
+            matched.append(f"{old} -> {name}" if isinstance(old, str) else name)
     if not matched and len(files) >= COMPARE_FILES_LIMIT:
         return None, []
     return len(matched), matched[:SCREEN_MATCHED_SAMPLES]

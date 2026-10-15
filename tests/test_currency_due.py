@@ -1725,6 +1725,26 @@ class PracticeRefsTests(unittest.TestCase):
                 self.assertIn("practice reference check incomplete", document["summary_line"])
 
 
+    def test_a_known_change_survives_another_reference_that_is_unknown(self):
+        # GPT read of #1136 at 6162aa04 (P2, currency_due.py:409): one screened reference whose change was unknown
+        # discarded another reference's known change, so no due-file was written. The known count and its details stay;
+        # the coverage stays "unknown" and the line names the gap.
+        checkout = Checkout(self)
+        checkout.set(SKILLS, stdout="{}", output_file=json.dumps(skills_report(("current",))))
+        checkout.set(cd.PRACTICE_REFS[0], practice_refs_report(("example/known", 1, ["README.md"]),
+                                                               ("example/unreachable", None, [])))
+        code, stdout, stderr = checkout.run("--dry-run", "--json", "--network")
+        self.assertEqual(code, 0, stderr)
+        document = json.loads(stdout)
+        self.assertEqual(document["due"]["practice_refs_ahead"], 1)
+        finding = next(item for item in document["details"] if item["kind"] == "practice_ref_ahead")
+        self.assertEqual(finding["repository"], "example/known")
+        self.assertEqual(document["details"][-1]["practice_refs"], "unknown")
+        self.assertIn(cd.PRACTICE_REFS_GAP, cd.gaps_of(document))  # with a count, the line shows counts only
+        code, _, stderr = checkout.run("--network")
+        self.assertEqual(code, 0, stderr)
+        self.assertTrue((checkout.state / cd.DUE_FILE).is_file())
+
 class ThisCheckoutTests(unittest.TestCase):
     def test_the_real_checks_run_dry_and_write_nothing(self):
         # The five-second budget is measured on the workstation by the acceptance command; this bound only

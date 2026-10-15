@@ -406,12 +406,14 @@ def practice_refs_findings(report) -> tuple[int | None, list[dict], dict]:
     if not isinstance(rows, list) or not all(isinstance(row, dict) for row in rows):
         return None, [], {"practice_refs": "unknown"}
     screened = [row for row in rows if "screen_paths_changed" in row]
-    if any(type(row["screen_paths_changed"]) is not int or row["screen_paths_changed"] < 0 for row in screened):
-        return None, [], {"practice_refs": "unknown"}
+    known = [row for row in screened if type(row["screen_paths_changed"]) is int and row["screen_paths_changed"] >= 0]
     details = [{"kind": "practice_ref_ahead", "repository": row.get("repository"), "pin": row.get("pin"),
                 "head": row.get("head_sha"), "changed": row["screen_paths_changed"],
                 "matched": [name for name in row.get("screen_paths_matched") or [] if isinstance(name, str)][:10]}
-               for row in screened if row["screen_paths_changed"] > 0]
+               for row in known if row["screen_paths_changed"] > 0]
+    if len(known) < len(screened):
+        # An unknown reference is a gap, but it never hides another reference's known change.
+        return (len(details) or None), details, {"practice_refs": "unknown"}
     return len(details), details, {"practice_refs": "checked"}
 
 
