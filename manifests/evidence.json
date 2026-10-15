@@ -17498,7 +17498,7 @@
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "ce8a3375eaf0594d2a336192082dcbce3836b850b523aef2555fbafde495c269",
+      "sha256": "7114fff53189eed022482d83542402166b23c9ff991740b7e08dce49968e0edc",
       "bytes": 309707
     },
     {
@@ -17608,8 +17608,8 @@
     },
     {
       "path": "catalogs/landscape/us-equities.json",
-      "sha256": "6aff6411e711dcf3f0a487f343bb0e45c319a0a9235763a54eae9316e1597b0e",
-      "bytes": 457364
+      "sha256": "764a773076665202f55ab291710e127da252f896c2f9a7ab1961b8aaf23e4005",
+      "bytes": 460990
     },
     {
       "path": "catalogs/saturation/README.md",
@@ -19180,6 +19180,11 @@
       "path": "docs/decisions/2026-10-13-strict-paper-url-gates.md",
       "sha256": "172927d56413762dc04f333cb6c236b1a85bb70a06740a8359c0d8cac904e8af",
       "bytes": 6429
+    },
+    {
+      "path": "docs/decisions/2026-10-15-observability-display-preregistration.md",
+      "sha256": "4244e36290694da3039f7bb90d6e3188a9b102bd0e4f51d862ba9d11e464fc14",
+      "bytes": 6020
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -58125,6 +58130,21 @@
       "path": "evidence/artifacts/w6-layer-verdict-20261011/resolution-delta.json",
       "sha256": "7e7622b64e46db95ba89a2e19f2dfadd3a09950d4cbe354a084029bb26fc887d",
       "bytes": 157635
+    },
+    {
+      "path": "evidence/artifacts/w6-observability-hosting-20261011/DISPLAY-AMENDMENT-20261015.md",
+      "sha256": "00e5873ef0bca9fdd614ba83a28967c22d71c1656324fd7ed207417d69f34b4e",
+      "bytes": 18134
+    },
+    {
+      "path": "evidence/artifacts/w6-observability-hosting-20261011/display-primary-sources.json",
+      "sha256": "44366d5e4259a97312fccf498c93ecc5f0d173d3508735188e042dde91828a40",
+      "bytes": 8265
+    },
+    {
+      "path": "evidence/artifacts/w6-observability-hosting-20261011/display-readiness-20261015.json",
+      "sha256": "918bce6f962b24244515b1a50dee500533440fb77c0fdc0acf1121921f6cf4f3",
+      "bytes": 3419
     },
     {
       "path": "evidence/artifacts/w6-observability-hosting-20261011/preregistration.json",

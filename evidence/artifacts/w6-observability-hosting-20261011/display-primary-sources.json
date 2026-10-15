@@ -1,0 +1,242 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-10-15T00:08:13Z",
+  "evidence_class": "source_review",
+  "comparison_id": "w6-us-equities-observability-hosting-20261011",
+  "boundary": "Direct reads at full upstream pins. No upstream package was installed or executed. Survey popularity and performance claims were not used as measured results.",
+  "repositories": [
+    {
+      "repository": "https://github.com/grafana/grafana",
+      "tag": "v13.2.3",
+      "pin": "6193dc03311b631b9727b560d24369e683dc396e",
+      "tag_resolved_to_pin": true,
+      "files": [
+        {
+          "path": "docs/sources/visualizations/panels-visualizations/visualizations/table/index.md",
+          "sha256": "f997f362b5f9a8bbe0a87f0ce18ed94671092fc3e6b4b5bd9eeae2fef3bbae6a",
+          "bytes": 40273,
+          "lines": [
+            307,
+            495,
+            497
+          ],
+          "finding": "Actions cells trigger unauthenticated API calls; forbid them in provisioning."
+        },
+        {
+          "path": "docs/sources/visualizations/panels-visualizations/visualizations/canvas/index.md",
+          "sha256": "5017fedbee72282f54bf8c7a972608f2e6b9ac65eca16e73edf2640e0dd582ea",
+          "bytes": 28169,
+          "lines": [
+            131,
+            133,
+            136,
+            250
+          ],
+          "finding": "Canvas Button elements can trigger API calls; hiding inline editing is not an enforcement boundary."
+        },
+        {
+          "path": "docs/sources/visualizations/panels-visualizations/query-transform-data/transform-data/index.md",
+          "sha256": "73ae12b953aaf13c6df7b5a072cc18677d57c977343a108001752487a81b2800",
+          "bytes": 81987,
+          "lines": [
+            616,
+            668,
+            669,
+            834,
+            842,
+            844,
+            944
+          ],
+          "finding": "Group by/Last and inner/outer field joins are shipped. Necessity of adding SQL for this workload is unproven, so arm A measures native transforms."
+        },
+        {
+          "path": "package.json",
+          "sha256": "a8b922a1e9c05e4491a79db23be5a25a61a3df2699fcec0458914f73d34ac20b",
+          "bytes": 21399,
+          "lines": [
+            12,
+            35,
+            476
+          ],
+          "finding": "Native build/test scripts and Yarn version govern future screen/build; no run is claimed."
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0",
+          "bytes": 34523,
+          "lines": [
+            1,
+            2
+          ],
+          "finding": "AGPL v3; assess the actual distribution/modification/serving obligations."
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/perspective-dev/perspective",
+      "tag": "v5.6.0",
+      "pin": "0842ad79117b0d4a589df1655f2679cad827f8a7",
+      "tag_resolved_to_pin": true,
+      "files": [
+        {
+          "path": "docs/md/use_cases/real_time_dashboard.md",
+          "sha256": "83a17214c8ddf5f9ef8637bdb8b2f3e4eedb59d9bf03c2dd0faaa4e1bb72e64f",
+          "bytes": 4896,
+          "lines": [
+            8,
+            13,
+            21,
+            106
+          ],
+          "finding": "Native incremental updates and keyed replacement; performance remains unmeasured here."
+        },
+        {
+          "path": "packages/viewer-datagrid/src/ts/types.ts",
+          "sha256": "e77b379cf5d2af128d6f0c1a6b88ecee0b0a693bc15e46e6e09a80479dc74c48",
+          "bytes": 22119,
+          "lines": [
+            65,
+            66,
+            71,
+            72,
+            394,
+            410
+          ],
+          "finding": "READ_ONLY is the default viewer mode; EDIT and legacy editable aliases exist."
+        },
+        {
+          "path": "docs/md/how_to/python/websocket.md",
+          "sha256": "9ca79669b3fe6683638dafb2b337163597ca85bc9bf037f7c36c69cffe2e0994",
+          "bytes": 5114,
+          "lines": [
+            76,
+            117,
+            122
+          ],
+          "finding": "General-purpose hosted Table calls can include update; readonly viewer alone does not enforce a readonly remote API."
+        },
+        {
+          "path": "docs/md/explanation/table/options.md",
+          "sha256": "bb6b63864d24e2a3cb9ee86cf7cc7fb0f9b288dcb0d39d23898942013f3459d4",
+          "bytes": 2553,
+          "lines": [
+            3,
+            5,
+            6,
+            9,
+            11,
+            12
+          ],
+          "finding": "Index provides in-place and partial updates/removals; index and limit cannot be combined."
+        },
+        {
+          "path": "package.json",
+          "sha256": "5f8bd38841a2ceda5e95e4314b15697c6d18ce97c3a8ffaa52672ec481cca5f1",
+          "bytes": 3439,
+          "lines": [
+            71,
+            77,
+            79,
+            80
+          ],
+          "finding": "Use native pnpm build/test entrypoints for the adopted path; no run is claimed."
+        },
+        {
+          "path": "LICENSE.md",
+          "sha256": "4339a06f638aa50ed33dbca17b29d8f397b6072837724054726e8c94f9ffe23b",
+          "bytes": 10541,
+          "lines": [
+            1,
+            90,
+            108
+          ],
+          "finding": "Apache-2.0 obligations remain part of the built-artifact gate."
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/tradingview/lightweight-charts",
+      "tag": "v5.2.1",
+      "pin": "b2ce010e4ad59f6556c9ed60e2b2b30feccdd2d1",
+      "tag_resolved_to_pin": true,
+      "files": [
+        {
+          "path": "README.md",
+          "sha256": "e32aae65b24825b9368a25c6de05e7a93c0fe9fff45e5c02cd24fa7e1de81db5",
+          "bytes": 7412,
+          "lines": [
+            38,
+            129,
+            131
+          ],
+          "finding": "NOTICE attribution and a user-visible tradingview.com link are required; attributionLogo satisfies the link requirement."
+        },
+        {
+          "path": "NOTICE",
+          "sha256": "f76c6afab94884448f0426e30d6e9d555ca7247894cd3484e477d2f87513036e",
+          "bytes": 101,
+          "lines": [
+            1,
+            2
+          ],
+          "finding": "Retain the TradingView Lightweight Charts attribution if included."
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "70c9d5382506dd184465425c08a99ad9bd6d9ac1313c252968ba0b585e5ef823",
+          "bytes": 11347,
+          "lines": [
+            1,
+            2
+          ],
+          "finding": "Apache-2.0 plus the separately required notice/link."
+        },
+        {
+          "path": "src/plugins/series-markers/wrapper.ts",
+          "sha256": "3a7883ecfd0f62568acc7b3279fe59430d8ed5137532aaa849a4b903dc90b1d6",
+          "bytes": 2775,
+          "lines": [
+            60,
+            67,
+            80
+          ],
+          "finding": "Native createSeriesMarkers API is retained for the reserved chart class."
+        },
+        {
+          "path": "src/plugins/series-markers/types.ts",
+          "sha256": "f48b9efa3fbd17402fcc70b9b7476457c69f5d530f2d094d8b7164dc11afd5a4",
+          "bytes": 2211,
+          "lines": [
+            10,
+            20
+          ],
+          "finding": "Marker positions/shapes are defined; no source bars or measured chart result exist in v1."
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/nautechsystems/nautilus_trader",
+      "tag": "v2.0.0rc5",
+      "pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "tag_resolved_to_pin": true,
+      "files": [
+        {
+          "path": "README.md",
+          "sha256": "8ad23af503e1aaaa455f879dafc69269dd8bf07ed133ac736da2117af5a690c9",
+          "bytes": 38450,
+          "lines": [
+            148,
+            149
+          ],
+          "finding": "UI dashboards are out of scope; engine selection is not dashboard qualification."
+        }
+      ]
+    }
+  ],
+  "source_url_rule": "Each file is available at repository/blob/pin/path; hashes cover raw UTF-8 upstream bytes, not a rendered page.",
+  "unverified_boundaries": [
+    "No global proof that every maintained upstream lacks the requested product.",
+    "No reproduced latency, readonly enforcement, ops cost or health convergence for an arm.",
+    "No full-session spool or qualified bar_1m input."
+  ]
+}
