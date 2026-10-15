@@ -1,6 +1,6 @@
 # New WSL install plan
 
-Current structural inventory (2026-10-15): 84 rows, 195 install commands and 113 acceptance entries (including two additional checks). D-ollama-2 carries the updated owner-approved user unit and removes the warmup asset; #713 supplies the additional rows. These counts describe the source, not host acceptance.
+Current structural inventory (2026-10-15): 84 rows, 196 install commands and 113 acceptance entries (including two additional checks). D-ollama-2 carries the updated owner-approved user unit and removes the warmup asset; #713 supplies the additional rows. These counts describe the source, not host acceptance.
 
 **Run the plan from a checkout of the repository** (step F7, "Clone origin/main", of `adoption/platforms/linux-wsl2-new-distro.md`). `worktrunk` and the convergence validators change into `repo_root`, the checkout three levels above this folder, so `install.sh` and `accept.sh` stop with a clear message when `repo_root` is not a git checkout (`install.sh --list` needs none).
 
@@ -34,9 +34,24 @@ can activate them. MinerU's daemon-dependent model/configuration step is deferre
 Existing enabled/running units keep their state; this option does not undo earlier
 activation. Foreground observability services receive disabled user units.
 
+`--only` retains the plan's declared dependency closure. In particular,
+`--only docker-compose --no-start` and the Harbor selection also install the
+rootless Docker prerequisite unit and reload systemd, without enabling or
+starting it or running rootless setup. This keeps provisioning in one pass;
+dependency dispatch inherits the same no-start flag as the selected row.
+`python3 check_plan.py --service-inventory` lists both roots and the transitive
+package installation, rootless setup, unit registration/reload and activation
+steps, including their no-start behavior.
+
 Allocate ports in the same nonsecret host JSON used by client configuration.
 `NS_PORT_*` keys select listeners and their client/scrape targets; `AI_MEMORY_URL`
-remains the canonical memory endpoint. The default WSL host template reproduces
+remains the canonical memory endpoint. Add the optional port keys shown in
+`adoption/hosts/example.json` to the new distro's host value file and choose
+ports unoccupied by the other distributions. The legacy F8 template and its
+nine fields remain frozen by the planned image experiment; extending that
+template is deferred to its owners through a superseding experiment record.
+The plan's host overrides supersede F8's older fixed-collector-port restriction.
+The unchanged default WSL host template reproduces
 the previous config bytes. Supply `--host-file PATH` to install, acceptance,
 `check_plan.py`, or the plan's `config/observability_config.py`. Installation saves
 only the resolved allocation in `$config_root/.service-ports.json`; later runs
@@ -46,6 +61,29 @@ namespace before choosing values. Differing operator files return `needs_owner`.
 The staged files, service commands, acceptance URLs, and pinned gateway wrapper's
 derived digest all use this allocation. See [NO_START_PORTS.md](NO_START_PORTS.md)
 for sources, fail-first fixtures, and the separate target-host acceptance boundary.
+
+The three OmniRoute listeners have separate keys: `NS_PORT_GATEWAY` (21128),
+`NS_PORT_GATEWAY_WS` (21129), and `NS_PORT_GATEWAY_EMBED_WS` (21131). Research and
+runtime profile helpers read the same saved allocation; an explicit
+`NS2604_HOST_FILE` selects a host JSON before GPT Researcher scrubs its environment.
+`accept.sh --host-file` propagates that nonsecret pointer to its helper processes.
+
+For stage S, service-health and after-sign-in checks run the listener-ownership
+gate before their programs, including cross-service targets and research's gateway.
+The gate executes `sudo ss -ltnpH` on the target distro and rejects an absent
+listener or one with no visible `users:` process entry. Run the whole planned
+listener inventory directly with:
+
+```sh
+python3 config/observability_config.py listeners --plan-file install-plan.json --host-file /path/to/host.json
+```
+
+The default inventory contains 15 listeners; explicitly selecting a measurement
+row includes its listeners too. `--ss-output /path/to/ss.txt` supplies a recorded
+or synthetic snapshot instead of executing ss. Before installation,
+`check_plan.py --host-file /path/to/host.json --ss-output /path/to/ss.txt` rejects
+foreign listeners on selected ports while allowing currently absent services.
+Neither fixture results nor a stale snapshot prove current listener ownership.
 
 A row is installed by the default run when the manifest row says it installs something, its outcome is not `not_installed` and its state is not `split`, or when it carries an interim install (amendment 3 of the manifest's decision rule, 2026-10-03): an interim installs beside a decided default that installs nothing, whatever that row's state, so code search (split), durable memory (waiting for its measurement) and context supply (a definitive no-install row) install their interims, while their decided defaults stay as the rounds recorded them. `check_plan.py` requires the plan to install every interim the manifest records, with the interim's owner and repository, and requires each interim row's install function to call `interim_acknowledged` first. Two rows the manifest marks as installing are not: MCP Inspector (run on demand with `npx`; mcporter owns MCP calls from scripts) and the base distribution (the image the plan runs on). Two installed rows are left out of the default run: the local-model creation rows. The separate local-model-server row now carries the lasting-owner boot-enabled unit described below.
 
@@ -80,8 +118,10 @@ Installed route counts: native-installer 5; none 14; npm-global 5; uv-tool 9; mi
 Docker requires uidmap, dbus-user-session, kernel/rootless prerequisites and its upstream user unit. Exact Engine 29.8.2/Compose 5.5.1 apt revisions come from repository metadata; missing versions fail. Harbor's CLI installed in round 1; its overall installer failed later in Docker setup. Keep this prerequisite gate for the real distribution.
 
 Upstream Docker and Dagu user setup normally starts their services during installation.
-The plan now controls activation separately: Dagu always uses no-service installation
-and its cited unit form, and `--no-start` also bypasses rootless Docker setup.
+With `--no-start`, Dagu uses no-service installation and its cited unit form,
+and the plan bypasses rootless Docker setup. Normal Dagu installation retains
+the vendor's service/bootstrap flow; a coordinator-port drop-in is installed
+before that flow can start the service. No-start defers that bootstrap flow.
 Other documented foreground/daemon starts, including Alertmanager's, are in
 [SOURCES.md](SOURCES.md#service-starts--separate-from-installation); their new user
 units are registered without activation. Service-health checks run after an

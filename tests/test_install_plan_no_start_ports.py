@@ -7,6 +7,7 @@ the plan's NO_START_PORTS.md record.
 import importlib.util
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import shlex
@@ -14,6 +15,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 PLAN = ROOT / "evidence/artifacts/new-wsl-install-plan-20261002"
@@ -314,6 +316,207 @@ class CitationAuditTests(unittest.TestCase):
             self.assertEqual(hashlib.sha256(line.encode()).hexdigest(), row["anchor_sha256"])
         history = audit["dated_history"]
         self.assertEqual(hashlib.sha256((ROOT / history["path"]).read_bytes()).hexdigest(), history["sha256"])
+
+
+class ReviewWave1Tests(unittest.TestCase):
+    def test_dagu_preserves_native_bootstrap_unless_no_start_is_selected(self):
+        source = (PLAN / "install.sh").read_text()
+        parser = "only=''" + source.split("only=''", 1)[1].split("\ndone\n", 1)[0] + "\ndone\n"
+        for args, expected in (([], "yes"), (["--no-start"], "no")):
+            result = subprocess.run(["bash", "-euo", "pipefail", "-c", parser + 'printf "%s" "$dagu_service_mode"',
+                                     "fixture", *args], env={"PATH": "/usr/bin:/bin"}, text=True, capture_output=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(result.stdout, expected)
+        checker = module(PLAN / "check_plan.py", "wave_dagu_bootstrap")
+        commands = checker.run_commands("dagu", checker.functions(source), set())
+        self.assertLess(next(i for i, command in enumerate(commands) if "20-ns2604-coordinator.conf" in command),
+                        next(i for i, command in enumerate(commands) if "scripts/installer.sh" in command))
+
+    def test_checker_lists_the_transitive_docker_lifecycle(self):
+        checker = module(PLAN / "check_plan.py", "wave_inventory")
+        source = (PLAN / "install.sh").read_text()
+        inventory = checker.transitive_service_inventory(checker.functions(source), source)
+        self.assertEqual({entry["selected_row"] for entry in inventory},
+                         {"docker-compose", "harbor-containerized-agent-e2e-runner"})
+        for entry in inventory:
+            self.assertEqual(entry["dependency"], "container-engine")
+            self.assertEqual({step["kind"] for step in entry["steps"]},
+                             {"package_install", "rootless_setup", "unit_registration", "activation"})
+
+    def test_no_start_covers_both_docker_dependency_selections(self):
+        checker = module(PLAN / "check_plan.py", "wave_dependency_check")
+        reference = os.environ.get("NS_TEST_INSTALL_REF")
+        source = (subprocess.check_output(["git", "show", reference + ":" + str((PLAN / "install.sh").relative_to(ROOT))],
+                                         cwd=ROOT, text=True) if reference else (PLAN / "install.sh").read_text())
+        functions = checker.functions(source)
+        dependency_selection = next(line for line in source.splitlines()
+                                    if line.startswith("for slot in ") and "needs_docker=true" in line)
+        dependency_dispatch = re.search(
+            r"^if \$needs_docker \|\| selected container-engine; then\n  run_slot container-engine\n.*?(?=^if \$needs_docker \|\| selected docker-compose;)",
+            source, re.M | re.S)[0]
+        cases = ((row, present) for row in ("docker-compose", "harbor-containerized-agent-e2e-runner")
+                 for present in (False, True))
+        for selected_row, existing in cases:
+            with self.subTest(row=selected_row, existing=existing), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                unit = root / ".config/systemd/user/docker.service"
+                if existing:
+                    unit.parent.mkdir(parents=True)
+                    unit.write_text("fixture pre-existing unit\n")
+                names = ("selected", "copy_config", "run_command", "activate_user_unit", "register_service_row",
+                         "container-engine", "docker_engine_packages", "run_slot")
+                definitions = "\n".join(name + "() {\n" + functions[name] + "\n}" for name in names if name in functions)
+                script = definitions + '\n' + (
+                    'systemctl() { printf "CALL %s\\n" "$*"; };\n'
+                    'sudo() { printf "ROOT %s\\n" "$*"; '
+                    'if [[ "$*" == "systemctl mask docker.service docker.socket containerd.service" ]]; then '
+                    ': > "$HOME/.package-units-masked"; '
+                    'elif [[ "$1" == apt-get && ! -f "$HOME/.package-units-masked" ]]; then printf "PACKAGE_START\\n"; fi; };\n'
+                    'docker_repository() { :; }; apt_release_version() { printf fixture; };\n'
+                    'dockerd-rootless-setuptool.sh() { printf "SETUP\\n"; mkdir -p "$HOME/.config/systemd/user"; '
+                    'printf "fixture setup unit\\n" > "$HOME/.config/systemd/user/docker.service"; };\n'
+                    'export -f systemctl sudo docker_repository docker_engine_packages apt_release_version dockerd-rootless-setuptool.sh\n'
+                    'if declare -F activate_user_unit >/dev/null; then export -f activate_user_unit; fi\n'
+                    'needs_docker=false; failed=0; last_rc=0\n'
+                ) + 'only=' + shlex.quote(selected_row) + '\n' + dependency_selection + '\n' + dependency_dispatch
+                result = subprocess.run(["bash", "-euo", "pipefail", "-c", script], text=True, capture_output=True,
+                    env={"PATH": "/usr/bin:/bin", "HOME": tmp, "XDG_RUNTIME_DIR": str(root / "run"),
+                         "NS2604_NO_START": "1", "plan_dir": str(PLAN), "config_root": str(root / "config"),
+                         "config_source_root": str(PLAN / "config"), "tool_root": str(root / "tools")})
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertIn("container-engine | install | 0", result.stdout)
+                self.assertIn("ROOT apt-get install", result.stdout)
+                self.assertNotRegex(result.stdout, r"\b(enable|start|restart|SETUP|PACKAGE_START)\b")
+                self.assertIn("CALL --user daemon-reload", result.stdout)
+                self.assertTrue(unit.is_file())
+
+    def test_native_research_command_carries_the_host_file_explicitly(self):
+        checker = module(PLAN / "check_plan.py", "wave_native_research")
+        body = checker.functions((PLAN / "accept.sh").read_text())["research-harnesses"]
+        program = next(p for stage, _, _, p in checker.checks_of(body) if stage == "after_sign_in")
+        assignment = next(line for line in program.splitlines() if "printf -v gpt_command " in line)
+        with tempfile.TemporaryDirectory() as tmp:
+            host = str(Path(tmp) / "host values.json")
+            result = subprocess.run(["bash", "-euo", "pipefail", "-c", assignment + '\nprintf "%s" "$gpt_command"'],
+                text=True, capture_output=True, env={"PATH": "/usr/bin:/bin", "client_state": tmp,
+                    "repo_root": str(ROOT), "NS2604_HOST_FILE": host, "gpt_marker": "fixture-complete"})
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("NS2604_HOST_FILE=" + host, shlex.split(result.stdout))
+
+    def test_plan_rejects_a_foreign_listener_in_a_supplied_snapshot(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            host, snapshot = root / "host.json", root / "ss.txt"
+            snapshot.write_text("LISTEN 0 128 127.0.0.1:21128 0.0.0.0:*\n")
+            for moved in (False, True):
+                host.write_text(json.dumps({"NS_PORT_GATEWAY": "31128"} if moved else {}))
+                result = subprocess.run([sys.executable, str(PLAN / "check_plan.py"), "--host-file", str(host),
+                                         "--ss-output", str(snapshot)], text=True, capture_output=True)
+                self.assertEqual(result.returncode, 0 if moved else 1, result.stderr)
+                if not moved:
+                    self.assertIn("21128 foreign", result.stdout)
+
+    def test_cited_acceptance_programs_use_host_ports(self):
+        renderer = module(PLAN / "config/observability_config.py", "wave_accept_ports")
+        checker = module(PLAN / "check_plan.py", "wave_accept_check")
+        functions = checker.functions((PLAN / "accept.sh").read_text())
+        ports = renderer.service_ports({"NS_PORT_MEMORY": "39374", "NS_PORT_ALERTMANAGER": "31093",
+                                        "NS_PORT_PROMETHEUS": "31090", "NS_PORT_GATEWAY": "31128"})
+        for slot, stage, expected in (("memory-owner", "service_health", "39374"),
+                                      ("alerting", "service_health", "31093"),
+                                      ("alerting", "after_sign_in", "31090"),
+                                      ("gpt-gateway", "service_health", "31128"),
+                                      ("research-harnesses", "post_install", "31128")):
+            with self.subTest(slot=slot, stage=stage):
+                program = next(p for s, _, _, p in checker.checks_of(functions[slot]) if s == stage)
+                rendered = renderer.render_command(program, ports)
+                self.assertIn("127.0.0.1:" + expected, rendered)
+                self.assertNotRegex(rendered, r"127\.0\.0\.1:(29374|21093|21090|21128)\b")
+
+    def test_all_gateway_listeners_move_and_require_visible_owners(self):
+        renderer = module(PLAN / "config/observability_config.py", "wave_ws_ports")
+        ports = renderer.service_ports({"NS_PORT_GATEWAY": "41128", "NS_PORT_GATEWAY_WS": "41129",
+                                        "NS_PORT_GATEWAY_EMBED_WS": "41131"})
+        unit = renderer.render_ports((PLAN / "config/omniroute.service").read_text(), ports)
+        self.assertIn("Environment=PORT=41128\n", unit)
+        self.assertIn("Environment=LIVE_WS_PORT=41129\n", unit)
+        self.assertIn("Environment=EMBED_WS_PROXY_PORT=41131\n", unit)
+        plan = json.loads((PLAN / "install-plan.json").read_text())
+        expected = renderer.planned_listeners(plan, ports, "gpt-gateway")
+        self.assertEqual(set(expected), {41128, 41129, 41131})
+        owned = lambda port: f'LISTEN 0 128 127.0.0.1:{port} 0.0.0.0:* users:(("fixture",pid=42,fd=3))\n'
+        self.assertEqual(renderer.listener_ownership(plan, ports, "".join(owned(p) for p in expected), "gpt-gateway"), [])
+        errors = renderer.listener_ownership(plan, ports, owned(41128) + "LISTEN 0 128 127.0.0.1:41129 0.0.0.0:*\n", "gpt-gateway")
+        self.assertTrue(any("41129 foreign" in error for error in errors))
+        self.assertTrue(any("41131 absent" in error for error in errors))
+        with self.assertRaisesRegex(ValueError, "claimed"):
+            renderer.service_ports({"NS_PORT_GATEWAY_WS": "41129", "NS_PORT_DAGU": "41129"})
+
+    def test_default_stage_s_enumerates_fifteen_planned_listeners(self):
+        renderer = module(PLAN / "config/observability_config.py", "wave_all_ports")
+        plan = json.loads((PLAN / "install-plan.json").read_text())
+        self.assertEqual(len(renderer.planned_listeners(plan, renderer.service_ports())), 15)
+
+    def test_foreign_listener_stops_the_acceptance_program(self):
+        checker = module(PLAN / "check_plan.py", "wave_gate_check")
+        body = checker.functions((PLAN / "accept.sh").read_text())["check"]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "bin").mkdir()
+            (root / "config").mkdir()
+            sudo = root / "bin/sudo"
+            sudo.write_text('#!/bin/sh\n[ "$*" = "ss -ltnpH" ] || exit 99\nprintf "%s\\n" "LISTEN 0 128 127.0.0.1:29374 0.0.0.0:*"\n')
+            sudo.chmod(0o755)
+            script = ('stage=service_health; failed=0; port_args=(); prepare_path() { :; };\ncheck() {\n'
+                      + body + '\n}\ncheck memory-owner health ' + shlex.quote('touch "$config_root/probe-ran"')
+                      + '\nexit "$failed"')
+            result = subprocess.run(["bash", "-euo", "pipefail", "-c", script], text=True, capture_output=True,
+                env={"PATH": str(root / "bin") + ":/usr/bin:/bin", "plan_dir": str(PLAN),
+                     "config_root": str(root / "config"), "config_source_root": str(root / "config")})
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("foreign", result.stderr)
+            self.assertFalse((root / "config/probe-ran").exists())
+
+    def test_runtime_profiles_reads_the_host_gateway(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            host = Path(tmp) / "host.json"
+            host.write_text(json.dumps({"NS_PORT_GATEWAY": "41128"}))
+            with mock.patch.dict(os.environ, {"NS2604_HOST_FILE": str(host)}):
+                profiles = module(ROOT / "tools/adoption/runtime_profiles.py", "wave_runtime_profiles")
+            self.assertEqual(profiles.GATEWAY, "http://127.0.0.1:41128/v1")
+
+    def test_research_helper_uses_the_host_gateway_before_scrubbing(self):
+        from tests import test_research_entry
+        fixture = test_research_entry.ResearchEntry()
+        fixture.setUp()
+        self.addCleanup(fixture.doCleanups)
+        fixture.provide_timer()
+        host = fixture.temp / "host.json"
+        host.write_text(json.dumps({"NS_PORT_GATEWAY": "41128"}))
+        fixture.env["NS2604_HOST_FILE"] = str(host)
+        result = fixture.run_script("fixture research query")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        run = fixture.run_dir(result)
+        self.assertEqual(json.loads((run / "config.json").read_text())["LLM_KWARGS"]["base_url"],
+                         "http://127.0.0.1:41128/v1")
+        self.assertEqual(json.loads((run / "cli-call.json").read_text())["env"]["OPENAI_BASE_URL"],
+                         "http://127.0.0.1:41128/v1")
+
+    def ownership(self, text):
+        renderer = module(PLAN / "config/observability_config.py", "listener_ports")
+        self.assertTrue(hasattr(renderer, "listener_ownership"), "stage-S ownership gate is absent")
+        plan = json.loads((PLAN / "install-plan.json").read_text())
+        ports = renderer.service_ports({"NS_PORT_MEMORY": "39374"})
+        return renderer.listener_ownership(plan, ports, text, slot="memory-owner")
+
+    def test_owned_listener_has_visible_process(self):
+        self.assertEqual(self.ownership('LISTEN 0 128 127.0.0.1:39374 0.0.0.0:* users:(("ai-memory",pid=42,fd=3))\n'), [])
+
+    def test_foreign_listener_is_rejected(self):
+        self.assertTrue(any("foreign" in error for error in self.ownership('LISTEN 0 128 127.0.0.1:39374 0.0.0.0:*\n')))
+
+    def test_absent_listener_is_rejected(self):
+        self.assertTrue(any("absent" in error for error in self.ownership('LISTEN 0 128 127.0.0.1:49374 0.0.0.0:* users:(("other",pid=42,fd=3))\n')))
 
 
 if __name__ == "__main__":

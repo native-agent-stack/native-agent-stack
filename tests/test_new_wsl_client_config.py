@@ -1134,7 +1134,7 @@ def foundation_rows() -> dict:
 
 def plan_ports() -> dict:
     """The plan's ports as the plan's own files state them, read without the tool."""
-    host = json.loads((ROOT / cfg.HOST_TEMPLATE_REL).read_text())
+    host = json.loads((ROOT / "adoption/hosts/example.json").read_text())
     return {"http": int(host["NS_PORT_OTEL_HTTP"]), "grpc": int(host["NS_PORT_OTEL_GRPC"]),
             "gateway": int(host["NS_PORT_GATEWAY"])}
 

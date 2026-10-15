@@ -47,9 +47,9 @@ class HarborCurrencyContracts(unittest.TestCase):
         inverse = text.split("The inverse restores", 1)[1]
         # Approved operative carrier inventory, separate from generated copies.
         required = (PROFILE, "adoption/new-wsl-profile.md", "consensus.json", "definitive-manifest.json",
-                    "install-plan.json", "owners.json", "install.sh:1099,1101", "accept.sh:2737",
+                    "install-plan.json", "owners.json", "install.sh:1104,1106", "accept.sh:2743",
                     "README.md", "harbor-worker-telemetry-accept.sh", "harbor-worker-telemetry-contract.md",
-                    "install.sh:1201")
+                    "install.sh:1206")
         for carrier in required:
             self.assertIn(carrier, inverse, carrier)
         for source in (PROFILE, "adoption/new-wsl-profile.md", PLAN + "/install-plan.json",

@@ -18,9 +18,11 @@ with no candidate selection, landscape comparison or default-owner reopening.
   with `tcp.enabled=false` on both distributions; this lane did not reproduce
   that observation. The fixture proves the normal transient start/stop pair and
   proves that no-start skips it, including daemon-dependent model configuration.
-- Dagu uses `--service no`, then the pinned upstream user-unit form with nonsecret
-  inline settings, including its coordinator port. Normal installation enables
-  and starts that unit through the common guarded activation helper.
+- With no-start, Dagu uses `--service no`, then installs its cited user-unit form
+  with nonsecret settings when a unit is absent. Existing units are preserved.
+  Normal installation retains the vendor's service/bootstrap flow. A coordinator
+  port drop-in is placed before the installer runs, so its first start uses the
+  selected port. No-start defers native bootstrap; normal installation completes it.
 - Docker's rootless setup tool starts and enables the unit internally, so the
   no-start path installs its pinned unit form without executing that tool.
   Rootful Docker/socket/containerd units are masked before package installation
@@ -29,7 +31,9 @@ with no candidate selection, landscape comparison or default-owner reopening.
 - Host values select all declared listener ports through `service_ports()` in
   `config/observability_config.py`. The file remains a flat string map compatible
   with the existing host renderer. Memory uses `AI_MEMORY_URL`; the other ports
-  use the `NS_PORT_*` keys shown in the WSL host template. Unknown keys, invalid
+  use the optional `NS_PORT_*` keys shown in `adoption/hosts/example.json`. The
+  WSL host template stays byte-identical to its frozen image-experiment input;
+  extending it is deferred to that experiment's owners. Unknown keys, invalid
   port values and duplicate allocations fail before package installation.
 - Public source configs carry `@PORT_NAME@` markers. Install stages their expanded
   bytes in a temporary tree. Quoted upstream install/accept commands retain their
@@ -81,8 +85,14 @@ with no candidate selection, landscape comparison or default-owner reopening.
 ## Reproduced fixtures and limits
 
 Every test/validator command ran through
-`systemd-run --user --scope -p CPUWeight=idle --quiet --`. No installer script,
-real installer, or real `systemctl enable/start` ran on the build host.
+`systemd-run --user --scope -p CPUWeight=idle --quiet --`. No installation script,
+real installer, or real `systemctl enable/start` ran on the build host. An early
+broad legacy test run did invoke `accept.sh` with a disposable HOME and stub curl,
+and included the observability suite's synthetic native-collector harness. Those
+overlooked harnesses exceeded the requested local fixture-only/no-script boundary;
+they were excluded from subsequent local runs and left to GitHub. The final
+targeted matrix uses extracted functions, fakes and source checks. Neither the
+earlier harnesses nor the current fixtures constitute NativeHorizonNY acceptance.
 
 | Change | Before | After | Evidence class |
 | --- | --- | --- | --- |
@@ -106,3 +116,54 @@ runs `install.sh --no-start --only memory-owner` with the intended host file,
 then verifies that the unit is disabled and that no new listener appeared.
 Fixtures prove command selection and rendering, not package installation,
 systemd behavior on that distro, or live listener ownership.
+
+## First review wave: research routing and listener ownership
+
+The research entry and runtime profiles now read `gateway_url()` from this plan's
+renderer, using an explicit `NS2604_HOST_FILE` or the saved nonsecret allocation.
+GPT Researcher resolves it before its existing `env -i` scrub. The installed
+research row also installs the renderer beside the copied helper. Acceptance
+propagates its explicit host-file pointer to external helpers and expands the
+cited memory, alerting/page-alert, gateway and DeerFlow checks through the same
+port allocation. `runtime_profiles.py` retains `GPT_MODEL` at line 43 and every
+other line locator; `gpt_researcher.sh:27` also stays fixed.
+
+Native-client research commands also carry `NS2604_HOST_FILE` explicitly through
+their shell boundary, because a client's environment policy may discard inherited
+variables. With no explicit host file, acceptance uses the installed allocation
+snapshot when present. The default endpoint is unchanged when neither exists.
+
+For the Docker dependency addendum, the policy remains a declared dependency
+closure: selecting docker-compose or Harbor can install container-engine, and
+`--no-start` propagates through that dispatch without activation. The fixture
+executes extracted selection/dispatch functions with fake package/service tools;
+against 8053f14e7 it observes `enable --now` both with an existing unit and a fresh
+one, while the current code installs/reloads without either setup or activation.
+`check_plan.py` checks that the flag is exported and not reset by dependency
+dispatch. This follows the same systemctl v259 enable/--now distinction above.
+
+The stage-S gate uses `sudo ss -ltnpH`, then requires a visible `users:` process
+entry for each selected planned listener before service-health or after-sign-in
+programs run. It includes cross-service references, research's gateway, and all
+three OmniRoute listeners. The complete default inventory is 15 listeners.
+Owned, foreign, absent, auxiliary-port and fail-before-probe cases use fixtures;
+this lane did not query live sockets. `check_plan.py --ss-output` supports the
+pre-install counterpart: foreign listeners conflict, absent services are allowed.
+
+Sources checked against the installed `ss --version` (iproute2-6.19.0):
+[iproute2 v6.19.0 man/man8/ss.8:24,43,162](https://github.com/iproute2/iproute2/blob/v6.19.0/man/man8/ss.8#L162)
+documents header suppression, listening sockets and process display;
+[misc/ss.c:643–690](https://github.com/iproute2/iproute2/blob/v6.19.0/misc/ss.c#L643)
+builds owners from visible `/proc` entries, and
+[misc/ss.c:2455](https://github.com/iproute2/iproute2/blob/v6.19.0/misc/ss.c#L2455)
+emits `users:`. No visible owner fails closed; it is not treated as a healthy
+service merely because another distro answers on the port.
+
+The first-head CI logs exposed two fixtures that still hashed/read raw port
+templates: Ollama unit custody (shard 3) and the hcom emitter (shard 4). Their
+assertions now inspect the default expansion, retaining the original digest and
+endpoint expectations. Shard 0's image experiment hashes the live host template;
+that template was restored to its exact `14048b84`/`8053f14e7` bytes, preserving
+SHA256 `4395aec846f1d418a55a862cb4db03906d2513d00fa596c190b56641f760f6b0`.
+The experiment and its frozen record remain unchanged. Operators add port
+overrides to their own host value file; renderer defaults keep existing behavior.

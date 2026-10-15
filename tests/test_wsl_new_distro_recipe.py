@@ -539,7 +539,7 @@ def host_template_errors(template: str, example: dict, recipe: str, user: str = 
         values = json.loads(string.Template(template).substitute(WSL_USER=user))
     except (KeyError, ValueError) as error:
         return errors + [f"the host template does not render to JSON: {error!r}"]
-    if sorted(values) != sorted(example):
+    if sorted(values) != sorted(key for key in example if not key.startswith("NS_PORT_")):
         errors.append(f"keys {sorted(values)} are not adoption/hosts/example.json's {sorted(example)}")
     ports = []
     for key in URL_KEYS:

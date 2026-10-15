@@ -126,6 +126,8 @@ def port_template(text):
 
 
 def load_service_ports(host_file=None, config_root=None):
+    if host_file is None and os.environ.get("NS2604_HOST_FILE"):
+        host_file = Path(os.environ["NS2604_HOST_FILE"])
     path = host_file or (config_root / ".service-ports.json" if config_root else None)
     values = json.loads(path.read_text()) if path and path.exists() else {}
     if host_file and not host_file.is_file():
@@ -133,6 +135,61 @@ def load_service_ports(host_file=None, config_root=None):
     if not isinstance(values, dict):
         raise ValueError("host value file must be a JSON object")
     return service_ports(values)
+
+
+def default_config_root():
+    return Path(os.environ.get("XDG_CONFIG_HOME", str(Path.home() / ".config"))) / "new-wsl-native-stack"
+
+
+def gateway_url(host_file=None, config_root=None):
+    ports = load_service_ports(host_file, config_root or default_config_root())
+    return f"http://127.0.0.1:{ports['GATEWAY']}/v1"
+
+
+def planned_listeners(plan, ports, slot=None, program=""):
+    rows = {row["slot"]: row for row in plan["owners"]}
+    if slot is not None and slot not in rows:
+        raise ValueError("unknown listener owner row")
+    owners = {name for name, row in rows.items() if (row.get("installed") if slot is None else name == slot)
+              and (row.get("service") or {}).get("port") is not None}
+    # Service checks may reference another local service (e.g. the page-alert
+    # test calls both Alertmanager and Prometheus). Research also delegates to
+    # external helpers whose gateway URL is no longer a literal in the program.
+    referenced = {int(port) for port in re.findall(r"127\.0\.0\.1:(\d+)\b", program)}
+    owners.update(owner for name, (owner, _) in SERVICE_PORTS.items() if ports[name] in referenced)
+    if slot == "research-harnesses":
+        owners.add("gpt-gateway")
+    if owners - {owner for owner, _ in SERVICE_PORTS.values()}:
+        raise ValueError("planned listener owner has no host port allocation")
+    return {ports[name]: f"{owner}/{name}" for name, (owner, _) in SERVICE_PORTS.items() if owner in owners}
+
+
+def listener_ownership(plan, ports, text, slot=None, program=""):
+    """Inspect an ss snapshot; never probe or start a service.
+
+    iproute2 v6.19.0 misc/ss.c:643-690,2455 collects visible /proc owners and
+    emits users: only when the socket inode has a visible process owner.
+    A foreign distro's listener has no users: entry in this PID namespace.
+    """
+    observed = {}
+    for line in text.splitlines():
+        fields = line.split()
+        if "LISTEN" not in fields:
+            continue
+        index = fields.index("LISTEN") + 3
+        if index >= len(fields):
+            continue
+        match = re.search(r":(\d+)$", fields[index])
+        if match:
+            owned = bool(re.search(r"\busers:\(\(.*\bpid=\d+", line))
+            observed.setdefault(int(match[1]), []).append(owned)
+    errors = []
+    for port, owner in sorted(planned_listeners(plan, ports, slot, program).items()):
+        if port not in observed:
+            errors.append(f"{owner}: port {port} absent")
+        elif not all(observed[port]):
+            errors.append(f"{owner}: port {port} foreign or process owner invisible (no users: entry)")
+    return errors
 
 
 PRISTINE = {
@@ -271,24 +328,50 @@ def destination():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("otel", "grafana", "alerting", "alerting-ready", "grafana-check", "prometheus", "stage", "command", "units"))
-    parser.add_argument("--config-root", type=Path, required=True)
+    parser.add_argument("action", choices=("otel", "grafana", "alerting", "alerting-ready", "grafana-check", "prometheus", "stage", "command", "units", "gateway", "listeners"))
+    parser.add_argument("--config-root", type=Path)
     parser.add_argument("--source-root", type=Path)
     parser.add_argument("--tools-root", type=Path)
     parser.add_argument("--plan-file", type=Path)
     parser.add_argument("--host-file", type=Path, help="nonsecret host value JSON; NS_PORT_* values override defaults")
     parser.add_argument("--output-root", type=Path, help="stage: temporary rendered source tree")
     parser.add_argument("--persist-ports", action="store_true", help="stage: save the nonsecret resolved allocation for later acceptance")
-    parser.add_argument("--slot", choices=tuple(FOREGROUND_UNITS))
+    parser.add_argument("--slot", help="units/listeners: select one plan row")
+    parser.add_argument("--ss-output", type=Path, help="listeners: read an ss fixture instead of executing sudo ss")
+    parser.add_argument("--check-program", action="store_true", help="listeners: include service references from stdin")
     parser.add_argument("--installed-units", action="store_true",
                         help="grafana-check: also verify the installed user units match the rendered candidates")
     # The emitter unit runs progress.py from this checkout. Default: three levels above the plan folder, as
     # install.sh derives repo_root.
     parser.add_argument("--repo-root", type=Path)
     args = parser.parse_args()
-    root = args.config_root
+    if args.config_root is None and args.action not in ("gateway", "listeners"):
+        parser.error("--config-root is required for this action")
+    root = args.config_root or default_config_root()
     source = args.source_root or root
     ports = load_service_ports(args.host_file, root)
+    if args.action == "gateway":
+        print(gateway_url(args.host_file, root))
+        return 0
+    if args.action == "listeners":
+        if args.plan_file is None:
+            raise ValueError("listeners requires --plan-file")
+        plan = json.loads(args.plan_file.read_text())
+        program = sys.stdin.read() if args.check_program else ""
+        if not planned_listeners(plan, ports, args.slot, program):
+            return 0
+        if args.ss_output:
+            snapshot = args.ss_output.read_text()
+        else:
+            result = subprocess.run(["sudo", "ss", "-ltnpH"], text=True, capture_output=True, timeout=30)
+            if result.returncode:
+                raise ValueError("listener ownership unavailable: sudo ss failed")
+            snapshot = result.stdout
+        errors = listener_ownership(plan, ports, snapshot, args.slot, program)
+        if errors:
+            print("\n".join(errors), file=sys.stderr)
+            return 1
+        return 0
     if args.action == "command":
         print(render_command(sys.stdin.read(), ports), end="")
         return 0
@@ -320,7 +403,7 @@ def main():
     if not data.is_absolute():
         raise ValueError("NS2604_OBSERVABILITY_DATA must be absolute")
     if args.action == "units":
-        if args.slot is None or args.tools_root is None:
+        if args.slot not in FOREGROUND_UNITS or args.tools_root is None:
             raise ValueError("units requires --slot and --tools-root")
         markers = {"@CONFIG_ROOT@": str(root), "@DATA_ROOT@": str(data), "@TOOLS_ROOT@": str(args.tools_root)}
         if args.slot == "grafana":

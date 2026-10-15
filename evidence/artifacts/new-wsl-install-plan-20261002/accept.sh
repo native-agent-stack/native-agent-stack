@@ -26,10 +26,11 @@ while (( $# )); do
   case "$1" in
     --only) (( $# >= 2 )) || { printf 'Missing --only slot.\n' >&2; exit 2; }; only="$2"; shift 2 ;;
     --stage) (( $# >= 2 )) || { printf 'Missing --stage value.\n' >&2; exit 2; }; stage="$2"; shift 2 ;;
-    --host-file) (( $# >= 2 )) || { printf 'Missing --host-file path.\n' >&2; exit 2; }; port_args=(--host-file "$2"); shift 2 ;;
+    --host-file) (( $# >= 2 )) || { printf 'Missing --host-file path.\n' >&2; exit 2; }; NS2604_HOST_FILE="$(realpath -- "$2")"; export NS2604_HOST_FILE; port_args=(--host-file "$NS2604_HOST_FILE"); shift 2 ;;
     *) usage; exit 2 ;;
   esac
 done
+if [[ -z "${NS2604_HOST_FILE:-}" && -f "$config_root/.service-ports.json" ]]; then export NS2604_HOST_FILE="$config_root/.service-ports.json"; fi
 case "$stage" in
   post_install|service_health|after_sign_in) ;;
   *) printf 'Unknown stage: %s\n' "$stage" >&2; usage; exit 2 ;;
@@ -66,6 +67,11 @@ check() {
   local slot="$1" program="$3" pending_kind="${4:-needs_user}" rc=0
   program="$(printf '%s' "$program" | python3 "$plan_dir/config/observability_config.py" command --config-root "$config_root" "${port_args[@]}")" || { failed=1; return 1; }
   program="${program//\$plan_dir\/config/\$config_source_root}"
+  if [[ "$stage" == service_health || "$stage" == after_sign_in ]]; then
+    if ! printf '%s' "$program" | python3 "$plan_dir/config/observability_config.py" listeners --config-root "$config_root" --plan-file "$plan_dir/install-plan.json" --slot "$slot" --check-program "${port_args[@]}"; then
+      failed=1; printf '%s | %s | 1\n' "$slot" "$stage"; return 0
+    fi
+  fi
   # Kind/source remain in JSON and beside each command. Suppress stdout, which
   # diagnostics/model examples can fill with private config; retain stderr/status.
   if prepare_path && bash -euo pipefail -c "$program" >/dev/null; then rc=0; else rc=$?; fi
@@ -2481,7 +2487,7 @@ for client in claude codex; do
   install -d -m 0700 -- "$client_state"
   gpt_marker="native-stage-complete:$client:$session:gptr"
   deer_marker="native-stage-complete:$client:$session:deerflow"
-  printf -v gpt_command '"'"'XDG_STATE_HOME=%q bash %q %q >%q 2>%q && printf "%%s\\n" %q'"'"' "$client_state" "$repo_root/tools/research/gpt_researcher.sh" "Ubuntu 26.04 WSL news this month" "$client_state/gptr.stdout" "$client_state/gptr.stderr" "$gpt_marker"
+  printf -v gpt_command '"'"'XDG_STATE_HOME=%q NS2604_HOST_FILE=%q bash %q %q >%q 2>%q && printf "%%s\\n" %q'"'"' "$client_state" "${NS2604_HOST_FILE:-}" "$repo_root/tools/research/gpt_researcher.sh" "Ubuntu 26.04 WSL news this month" "$client_state/gptr.stdout" "$client_state/gptr.stderr" "$gpt_marker"
   printf -v deer_command '"'"'XDG_STATE_HOME=%q DEER_FLOW_CONFIG_PATH=%q bash %q %q >%q 2>%q && printf "%%s\\n" %q'"'"' "$client_state" "$plan_dir/config/deer-flow-config.yaml" "$plan_dir/config/deer-flow-research.sh" "Research Ubuntu 26.04 WSL news this month; return a short answer with primary source URLs." "$client_state/deerflow.stdout" "$client_state/deerflow.stderr" "$deer_marker"
   execution="foreground shell calls with 1560000 ms timeouts, waiting for each to finish"
   if [[ "$client" == codex ]]; then

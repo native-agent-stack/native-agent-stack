@@ -105,10 +105,38 @@ def ports_in(text):
     return found
 
 
+def transitive_service_inventory(funcs, text):
+    """List the service lifecycle reached through named dependency roots."""
+    match = re.search(r"^for slot in (.*); do selected \"\$slot\" && needs_docker=true; done$", text, re.M)
+    roots = shlex.split(match[1]) if match else []
+    commands = run_commands("container-engine", funcs, set()) if "container-engine" in funcs else []
+    selectors = (
+        ("package_install", "docker_engine_packages", "mask rootful units before apt installation"),
+        ("rootless_setup", "dockerd-rootless-setuptool.sh install", "skip"),
+        ("unit_registration", "systemctl --user daemon-reload", "install/preserve unit, then daemon-reload"),
+        ("activation", "activate_user_unit docker.service", "skip enable and start"),
+    )
+    steps = [{"kind": kind, "command": command, "no_start": behavior}
+             for kind, marker, behavior in selectors for command in commands if marker in command]
+    return [{"selected_row": root, "dependency": "container-engine", "steps": steps} for root in roots]
+
+
 def no_start_contract(rows, funcs, text, bad):
     """Audit every service row, including native daemon rows without user units."""
     if '--no-start) NS2604_NO_START=1; dagu_service_mode=no;' not in text:
         bad("no-start", "install.sh must propagate --no-start to service activation and Dagu")
+    if "export NS2604_NO_START dagu_service_mode" not in text:
+        bad("no-start", "dependency commands must inherit the no-start flag")
+    dependency = re.search(r"^if \$needs_docker \|\| selected container-engine; then\n  run_slot container-engine\n.*?(?=^if \$needs_docker \|\| selected docker-compose;)", text, re.M | re.S)
+    if (dependency is None or "NS2604_NO_START=" in dependency[0]
+            or "NS2604_NO_START=" in funcs.get("run_slot", "")):
+        bad("no-start", "Docker dependency dispatch must retain the selected root's no-start policy")
+    inventory = transitive_service_inventory(funcs, text)
+    if {entry["selected_row"] for entry in inventory} != {"docker-compose", "harbor-containerized-agent-e2e-runner"}:
+        bad("no-start", "transitive service inventory must include both Docker dependency roots")
+    for entry in inventory:
+        if {step["kind"] for step in entry["steps"]} != {"package_install", "rootless_setup", "unit_registration", "activation"}:
+            bad("no-start", f"{entry['selected_row']}: incomplete transitive container-engine lifecycle inventory")
     activation = funcs.get("activate_user_unit", "")
     if 'if [[ "${NS2604_NO_START:-0}" != 1 ]]; then systemctl --user enable --now "$@"; fi' not in activation:
         bad("no-start", "user-unit activation must be guarded by NS2604_NO_START")
@@ -148,6 +176,10 @@ def host_port_contract(plan_dir, rows, host_file, bad):
         return
     slots = {row["slot"] for row in rows}
     defaults = {str(default) for slot, default in renderer["SERVICE_PORTS"].values()}
+    for row in rows:
+        port = (row.get("service") or {}).get("port")
+        if port is not None and (row["slot"], port) not in renderer["SERVICE_PORTS"].values():
+            bad("ports", f"{row['slot']}: declared listener default has no host port allocation")
     pattern = re.compile(r"(?<![\w-])(?:" + "|".join(defaults) + r")(?![\w])")
     nonservice_ports = {"ollama.service": {18231, 18232}, "prometheus-alerts.test.yaml": {21997},
                        "openhands-worker.py": {1}}  # closed-port negative control, never a listener
@@ -390,6 +422,9 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--plan-dir", type=pathlib.Path, default=here)
     ap.add_argument("--host-file", type=pathlib.Path)
+    ap.add_argument("--ss-output", type=pathlib.Path,
+                    help="target/fixture sudo ss -ltnpH snapshot: reject planned ports with invisible process owners")
+    ap.add_argument("--service-inventory", action="store_true", help="emit the checked transitive service lifecycle inventory")
     ap.add_argument("--manifest", type=pathlib.Path,
                     default=here.parent / "new-wsl-definitive-defaults-20261001" / "definitive-manifest.json")
     args = ap.parse_args()
@@ -407,6 +442,25 @@ def main():
     install_funcs, accept_funcs = functions(install_text), functions(accept_text)
     no_start_contract(rows, install_funcs, install_text, bad)
     host_port_contract(plan_dir, rows, args.host_file, bad)
+    if args.ss_output is not None:
+        renderer = runpy.run_path(str(plan_dir / "config/observability_config.py"))
+        try:
+            ports = renderer["load_service_ports"](args.host_file)
+            for error in renderer["listener_ownership"](plan, ports, args.ss_output.read_text()):
+                # A pre-install snapshot may have absent listeners. A foreign
+                # listener is an allocation conflict even before services start.
+                if " foreign " in error:
+                    bad("ports", error)
+        except (OSError, ValueError) as error:
+            bad("ports", str(error))
+    if 'listeners --config-root "$config_root" --plan-file "$plan_dir/install-plan.json" --slot "$slot" --check-program' not in accept_funcs.get("check", ""):
+        bad("listeners", "service/after-sign-in acceptance must verify listener ownership before executing its program")
+    if "export NS2604_HOST_FILE" not in accept_text:
+        bad("ports", "acceptance must propagate its explicit host file to external research helpers")
+    if "copy_config 'observability_config.py'" not in install_funcs.get("research-harnesses", ""):
+        bad("ports", "installed research helper requires the shared plan renderer")
+    if "NS2604_HOST_FILE=%q" not in accept_funcs.get("research-harnesses", ""):
+        bad("ports", "native research command must carry the host-file pointer through a scrubbed client shell")
 
     slots = [r["slot"] for r in rows]
     for slot, count in collections.Counter(slots).items():
@@ -825,6 +879,9 @@ def main():
         print("\n".join(problems))
         print(f"FAILED: {len(problems)} problem(s)")
         return 1
+    if args.service_inventory:
+        print(json.dumps(transitive_service_inventory(install_funcs, install_text), indent=2))
+        return 0
     additional_count = sum(len(entry.get("additional_checks", [])) for row in rows for entry in row["acceptance"].values())
     print(f"OK: {len(rows)} rows: {len(selected)} installed ({len(selected) - len(named_only)} by the default run, {len(named_only)} only when named), "
           f"{len(measured)} measurement-only, {len(excluded)} not installed; "

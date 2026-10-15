@@ -32,7 +32,7 @@ import uuid
 import stat
 import tempfile
 import threading
-
+import runpy
 import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -41,7 +41,7 @@ ROLES = ("evidence-reviewer", "security-reviewer", "stack-researcher", "source-s
          "stack-verifier", "isolated-builder")
 CLAUDE_MODEL = "claude-opus-5-5"
 GPT_MODEL = "cx/gpt-6.1-sol"
-GATEWAY = "http://127.0.0.1:21128/v1"
+GATEWAY = runpy.run_path(str(ROOT / "evidence/artifacts/new-wsl-install-plan-20261002/config/observability_config.py"))["gateway_url"]()
 SUPERPOWERS = "bb92a77741419a4ab5f06e711a283343f1ada0c3"
 SUPERPOWERS_PLUGIN = "superpowers@git+https://github.com/obra/superpowers.git#" + SUPERPOWERS
 PI_OTEL = "npm:@b1tank/pi-otel@0.5.0"  # b1tank/pi-otel@3cd674533a8d24c9b8a2a6a94072eec25466e128

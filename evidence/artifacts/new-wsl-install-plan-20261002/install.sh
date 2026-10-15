@@ -34,7 +34,7 @@ only=''
 list=false
 NS2604_NO_START=0
 host_file=''
-dagu_service_mode=no
+dagu_service_mode=yes
 while (( $# )); do
   case "$1" in
     --only) (( $# >= 2 )) || { printf 'Missing --only slot.\n' >&2; exit 2; }; only="$2"; shift 2 ;;
@@ -885,11 +885,15 @@ actionlint-kjanat() {
 
 dagu() {
   # Dagu | native-installer | planned
+  copy_config 'dagu-coordinator.conf' || return "$?"
+  # Source: https://github.com/dagucloud/dagu/blob/v2.18.2/internal/cmn/config/loader.go#L2266
+  # Source: https://github.com/systemd/systemd/blob/v259/man/systemd.unit.xml#L198
+  run_command 'mkdir -p "$HOME/.config/systemd/user/dagu.service.d"; install -m 0600 "$config_root/dagu-coordinator.conf" "$HOME/.config/systemd/user/dagu.service.d/20-ns2604-coordinator.conf"; systemctl --user daemon-reload' || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/dagucloud/dagu/v2.18.2/README.md#L105
   run_command 'curl -fsSL https://raw.githubusercontent.com/dagucloud/dagu/v2.18.2/scripts/installer.sh | bash -s -- --version v2.18.2 --no-prompt --service "$dagu_service_mode" --service-scope user --host 127.0.0.1 --port 21080 --open-browser no' || return "$?"
   copy_config 'dagu.service' || return "$?"
   # Source: https://github.com/dagucloud/dagu/blob/v2.18.2/scripts/installer.sh#L1666
-  run_command 'mkdir -p "$HOME/.config/systemd/user" "$HOME/.dagu"; install -m 0600 "$config_root/dagu.service" "$HOME/.config/systemd/user/dagu.service"; systemctl --user daemon-reload; activate_user_unit dagu.service' || return "$?"
+  run_command 'if [[ "$NS2604_NO_START" == 1 ]]; then mkdir -p "$HOME/.config/systemd/user" "$HOME/.dagu"; if [[ ! -e "$HOME/.config/systemd/user/dagu.service" && ! -L "$HOME/.config/systemd/user/dagu.service" ]]; then install -m 0600 "$config_root/dagu.service" "$HOME/.config/systemd/user/dagu.service"; fi; systemctl --user daemon-reload; fi' || return "$?"
 }
 
 docker-compose() {
@@ -1045,6 +1049,7 @@ research-deer-flow() {
 }
 
 research-harnesses() {
+  copy_config 'observability_config.py' || return "$?"
   copy_config 'gateway-effort-accept.py' || return "$?"
   # Planned. Keep both independent owners even when one installation fails.
   local status=0

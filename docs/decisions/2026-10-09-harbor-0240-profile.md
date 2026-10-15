@@ -132,11 +132,11 @@ selection before regenerating any derived output:
    the current0.24.0 release claim while retaining the historical repository
    timestamp qualification. Restore all
    executable mirrors together: the Scout wheel URL/checksum in
-   `install.sh:1099,1101` and version assertion in `accept.sh:2737`; the direct
+   `install.sh:1104,1106` and version assertion in `accept.sh:2743`; the direct
    Harbor wheel URL/checksum, version assertion and source-checkout commit
    in those same scripts; and the exact Harbor checkout in
    `config/harbor-worker-telemetry-accept.sh`. Restore the Scout plan summary
-   printed by `install.sh:1201`. Use the retained0.23.0 source records for
+   printed by `install.sh:1206`. Use the retained0.23.0 source records for
    its wheel checksum and commit. Update the adjacent install-plan `README.md`:
    its G5 paragraph must identify0.23.0 as the restored current selection,
    with the10-09/0.24.0 amendment retained only as dated reverted history;
