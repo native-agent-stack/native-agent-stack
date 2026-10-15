@@ -616,6 +616,8 @@ def build_row(root: Path, catalog: str, layer: dict, decisions: dict[str, list[d
         "winners": winners,
         "alternatives": alternatives,
     }
+    if layer.get("registration_only") is True:
+        row["registration_only"] = True
     return row, flip_violations
 
 

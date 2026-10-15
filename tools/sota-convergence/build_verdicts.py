@@ -51,7 +51,7 @@ from build_manifest import assert_no_leak, sanitize_value  # noqa: E402
 if str(HERE.parent.parent) not in sys.path:
     sys.path.insert(0, str(HERE.parent.parent))
 # The grandfathered run ids are defined once, next to the rules they exempt (scripts/landscape.py).
-from scripts.landscape import GRANDFATHERED_RUN_IDS  # noqa: E402
+from scripts.landscape import GRANDFATHERED_RUN_IDS, is_unrun_registration  # noqa: E402
 
 # Same character class scripts/landscape.py requires of lanes.<lane>.sealed_base
 # (re.fullmatch(r"evidence/artifacts/layer-verdicts-[0-9A-Za-z]+", ...)) and
@@ -161,9 +161,13 @@ def default_out(run_id: str) -> str:
     return f"catalogs/sota-convergence/layer-verdicts-{run_id}.json"
 
 
-def row_run_id(row: dict) -> str:
-    """The wave a ledger row belongs to: the run id of its ``lanes.sealed_base``, or the
-    2026-09-22 wave when the row carries none (scripts/landscape.py uses the same fallback)."""
+def row_run_id(row: dict) -> str | None:
+    """An explicit unrun registration has no wave. Every other ledger row uses
+    lanes.sealed_base or the historical 2026-09-22 fallback. Frozen rows are
+    never relabelled merely because their lane run IDs happen to be empty.
+    """
+    if is_unrun_registration(row):
+        return None
     sealed_base = (row.get("lanes") or {}).get("sealed_base") or SEALED_BASE_PREFIX + DEFAULT_RUN_ID
     if not isinstance(sealed_base, str) or not sealed_base.startswith(SEALED_BASE_PREFIX):
         raise SystemExit(f"{row.get('catalog')}/{row.get('layer_id')}: malformed lanes.sealed_base {sealed_base!r}")
@@ -249,7 +253,8 @@ def build_document(root: Path, checked_at: str, *, run_id: str = DEFAULT_RUN_ID,
     catalogs, counts = {}, {}
     for catalog, relative in LEDGER_FILES.items():
         ledger = load_json(root / relative)
-        rows = [build_verdict_row(row, sota_index.get(row["layer_id"], [])) for row in ledger.get("layers", [])]
+        rows = [build_verdict_row(row, sota_index.get(row["layer_id"], [])) for row in ledger.get("layers", [])
+                if not is_unrun_registration(row)]
         rows.sort(key=lambda item: item["layer_id"])
         catalogs[catalog] = rows
         counts[catalog] = {
@@ -493,7 +498,7 @@ def main(argv=None) -> int:
     requested = validate_run_id(args.run_id) if args.run_id is not None else None
     registry = load_registry(root)
     rows = ledger_rows(root)
-    row_runs = {row_run_id(row) for _, row in rows}
+    row_runs = {run for _, row in rows if (run := row_run_id(row)) is not None}
     known = row_runs | set(registry)
     current = max(known) if known else DEFAULT_RUN_ID
 

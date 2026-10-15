@@ -19192,6 +19192,11 @@
       "bytes": 10680
     },
     {
+      "path": "docs/decisions/2026-10-15-unrun-registration-rules.md",
+      "sha256": "b6d8e5e2c0527c2dd222d39076e537f4d97a241e330022f4229c5c5379b8601b",
+      "bytes": 4287
+    },
+    {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
       "sha256": "f646835af1648cfab7798f64626141c3964dfba4799d780dc728ea27f91f7f6c",
       "bytes": 15393
@@ -62038,8 +62043,8 @@
     },
     {
       "path": "scripts/component_matrix.py",
-      "sha256": "202d952952c361b7e17ee82740f7cd220e75cba2f3c7d9e82c433136d0fe0363",
-      "bytes": 80837
+      "sha256": "98f998864e9e9b12f354eb76efb1646a3c940bc4c2f2ba1c46736050b9936f37",
+      "bytes": 80924
     },
     {
       "path": "scripts/credential_boot_receipt.py",
@@ -62113,13 +62118,18 @@
     },
     {
       "path": "scripts/landscape.py",
-      "sha256": "d16b5625dd343972eb8efc508c8a642abf37cff8c39b3e22173d181f24a9c40e",
-      "bytes": 106393
+      "sha256": "8f35212d296da94ccb0e5774782f13cd979bbdabc4a0569e41614e00903a858d",
+      "bytes": 108624
     },
     {
       "path": "scripts/native_token_ci.py",
       "sha256": "fa83183c61407724083dfac2f5441859268a4de93663dae5d024eea7c733681d",
       "bytes": 117733
+    },
+    {
+      "path": "scripts/new_host_grand_list.py",
+      "sha256": "699385fb4b26a06a952a67dbb45bd1a81a19343cf4b4de094fa154eecadfc08d",
+      "bytes": 36430
     },
     {
       "path": "scripts/new_wsl_profile.py",
@@ -62218,8 +62228,8 @@
     },
     {
       "path": "scripts/validate_foundation.py",
-      "sha256": "8b21236a96c73a01d56de5a692e49a968bc79f8470ee476eac02f0a3c12cd4d2",
-      "bytes": 15403
+      "sha256": "6c811ed5e32a8f99dfe7990fea992ce883e5af052e23030bd234780719351d1c",
+      "bytes": 16685
     },
     {
       "path": "scripts/validate_shard_weights.json",
@@ -63687,6 +63697,11 @@
       "bytes": 7047
     },
     {
+      "path": "tests/test_pending_catalog_registration.py",
+      "sha256": "3ccdb4e5b588592815d76fbb30a5db0dadb07a82070a9ba2eee5e292b8d7e819",
+      "bytes": 1937
+    },
+    {
       "path": "tests/test_pi_builder_output_budget.py",
       "sha256": "9f887c3788c4fe0a097a826e5367ba771718e425735df1b56f821da104b9dcdc",
       "bytes": 3086
@@ -63747,6 +63762,11 @@
       "bytes": 20781
     },
     {
+      "path": "tests/test_provenance_digest_custody.py",
+      "sha256": "1f264bd8271e0adcad7187c02d68fc30ffaed64ee007cd3d37587544375e84db",
+      "bytes": 11152
+    },
+    {
       "path": "tests/test_public_starred.py",
       "sha256": "42f4bf432ea5c598d5215a5300d99deead51b6428909355735c56cdb302afdf3",
       "bytes": 34309
@@ -63765,6 +63785,16 @@
       "path": "tests/test_receipt_staleness.py",
       "sha256": "3bf62e631f72fc93740f4ebf361fd76d0da5c9b1743e7ba65542bea640e37fae",
       "bytes": 24084
+    },
+    {
+      "path": "tests/test_record_verdicts.py",
+      "sha256": "a868497fabff2bc562590aa0408c3c7d6e7c624a34990a8063eaa8251141e6d4",
+      "bytes": 161738
+    },
+    {
+      "path": "tests/test_registration_rules.py",
+      "sha256": "11749675cf7c7eaf98417bfde22c8100a2f8f4c37793f181fa78e63ffa89e5d6",
+      "bytes": 7498
     },
     {
       "path": "tests/test_registry_rows.py",
@@ -64688,8 +64718,8 @@
     },
     {
       "path": "tools/sota-convergence/build_verdicts.py",
-      "sha256": "715c98a3ea23e71768326b19250cac5ce3e3bc1c568f540771ba64e45976a4ee",
-      "bytes": 27482
+      "sha256": "e9f4026e2b0fc472719289f1388afa2a8238b691e42a7c78b0cdec4f78760ae9",
+      "bytes": 27699
     },
     {
       "path": "tools/sota-convergence/codex_lane.py",
@@ -64875,6 +64905,11 @@
       "path": "tools/sota-convergence/reconciliations-20260922.json",
       "sha256": "a512097b7dc9b912e2e9efec0027f9d28cb9e836ee0c2d9ed93c97a81b9a1b5a",
       "bytes": 7097
+    },
+    {
+      "path": "tools/sota-convergence/record_verdicts.py",
+      "sha256": "fd3eb4d1579bb381ab93f9638eace2ce624e45e9816152781fdb31c77d7a39d4",
+      "bytes": 93522
     },
     {
       "path": "tools/sota-convergence/schemas/compact-decision-start-closure-1.json",
