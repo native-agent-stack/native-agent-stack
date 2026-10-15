@@ -193,13 +193,18 @@ individual account. Account names and credit balances are not recorded here.
     center). Keys are not pooled; each spends its own account's credit.
     Quality work uses one key until Anthropic reports that key's credit
     exhausted, or answers 401 for a revoked key, and then moves to the next
-    in a fixed order: `anthropic-api-4`, `anthropic-api-3`, `anthropic-api-5`,
-    `anthropic-api`, `anthropic-api-2`, then `anthropic-api-6` to
-    `anthropic-api-10` as they are stored. `anthropic-api-3` serves the CI
-    review first and local quality work second. The owner set this order at
-    about 15:12Z on 2026-10-10 (relayed by the command center), moving
-    `anthropic-api-3` into it; the command center's 14:15Z record had kept
-    that slot for CI alone. Never round-robin. Anthropic's
+    in a fixed order: `anthropic-api-4`, `anthropic-api-3`, `anthropic-api-2`,
+    `anthropic-api-5`, `anthropic-api`, then `anthropic-api-6` to
+    `anthropic-api-10` as they are stored (`DEFAULT_KEYS` in
+    `tools/claude-review-worker/worker.py`, which ns-run also follows). The
+    owner set the first order at about 15:12Z on 2026-10-10 (relayed by the
+    command center), moving `anthropic-api-3` into it; the command center's
+    14:15Z record had kept that slot for CI alone. The owner's direction of
+    2026-10-11 at about 22:33Z (via the command center) put
+    `anthropic-api-2` third; `docs/decisions/2026-10-09-claude-review-worker.md`
+    records it. A key whose credit runs out mid-run moves an ns-run pi run to
+    the next key in the same session, and every ns-run attempt is debited and
+    settled in the API spend ledger under its slot id. Never round-robin. Anthropic's
     [prompt-caching page](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching)
     ("Cache storage and sharing", read 2026-10-10) states "Caches are
     isolated between organizations. Different organizations never share
