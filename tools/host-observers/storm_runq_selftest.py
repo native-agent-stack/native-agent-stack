@@ -185,7 +185,9 @@ with tempfile.TemporaryDirectory() as tmp:
     fk.proc(1, "systemd", "S", 0, 10, 1)
     cases = [("app", [f"app --root=/srv/{SENT}"], "app"), ("somecli", ["somecli", SENT], "somecli <arg>"), ("git", ["git", "status"], "git status"),
              ("npm", ["npm", "--opt-x", SENT, "run", "build"], "npm"), ("python3", ["python3", "-W", SENT, "run_x.py"], "python3 run_x.py"), ("bash", ["bash", "-lc", SENT], "bash -c"),
-             ("sudo", ["sudo", "-u", SENT, "git", "status"], "sudo git status"), ("my-secret-x", None, "<proc>")]
+             ("sudo", ["sudo", "-u", SENT, "git", "status"], "sudo git status"), ("my-secret-x", None, "<proc>"),
+             ("node", ["node", "--redirect-warnings", f"/tmp/{SENT}.log", "app.js"], "node"), ("python3", ["python3", "-mpytest", f"/w/{SENT}/test_a.py"], "python3 -m pytest"),
+             ("npm", ["npm", "run", SENT], "npm run <arg>"), ("timeout", ["timeout", SENT, "git", "status"], "timeout"), ("uv", ["uv", "run", "--with", SENT, "pytest"], "uv run")]
     for i, (comm, cmdline, _want) in enumerate(cases):
         fk.proc(300 + 10 * i, "claude", "S", 1, 5, 30 + i, ["claude"], "/w/a")
         fk.proc(301 + 10 * i, comm, "R", 300 + 10 * i, 100, 130 + i, cmdline, "/w/a/x")

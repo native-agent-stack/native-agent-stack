@@ -20,20 +20,22 @@ Together about 2% of one core while the IO sampler is in its window and about 0.
 
 `observability/host-observers/grafana-rules/` holds the three rule specs as deployed (the eth0 silence rule confirmed by the probe, the probe rule, the stale-probe warning); `observability/host-observers/promtool/` holds the PromQL tests of the silence expression and of the probe rule. The probe rule reads the probe's gauge only while the probe is fresh (a run within the last 300 s, the stale-probe warning's own limit): a stopped probe leaves its last gauge in the textfile, so a stale one reads no data in the probe rule and the warning owns that case.
 
-A command shape (the sampling kit's `storm_snapshot.py` reducer, used by the run-queue observer and the IO sampler) copies text from a command line in three places only: the program's base name, the base name of a script or the module of `-m`, and a word of a fixed vocabulary of subcommands. A process that rewrote its title into one string is named by the kernel's process name, and everything else, option values included, is dropped or replaced by a fixed marker.
+A command shape (the sampling kit's `storm_snapshot.py` reducer, used for the command line of a process by the snapshotter, the run-queue observer and the IO sampler) is the program's base name and nothing else of the command line except: for Python, what CPython itself would run, read with CPython's own option rules (the module of `-m`, the base name of the script, or the marker `-c`; python/cpython@v3.13.16, tag commit cbc944f4bc59, `Python/getopt.c:40-49` and `:75-90`, `Python/initconfig.c:2473-2500` and `:2636-2641`); for a shell, node or perl, the very first argument only, as an inline-code flag or a script file; for npm and uv, a subcommand of the runner's own vocabulary and a well-known tool or script name; for any other program, one word of a fixed subcommand vocabulary; and, behind a wrapper such as `timeout` or `sudo`, the command it runs, read the same way. Every other word, every option and the value it takes, and every word whose role the grammar does not name is dropped or shown as `<arg>`, `<redacted>` or `<proc>`; an option the tables do not know ends the extraction. A process that rewrote its title into one string is named by the kernel's process name.
+
+The boundary is demonstrated at the function, the snapshot record, the run-queue record and the IO window record and report: `storm_snapshot_selftest.py` runs 90 command lines for real against the installed interpreter (the reducer must name exactly what ran), checks 3000 seeded random command lines across the families with the sentinel in 14 shapes, and names the cases one by one; `storm_snapshot_mutants.py` plants 17 faults in the reducer. It covers the command line only: working directories, session names and kinds (`aggregate()`, `session_info()`) and cgroup names and wait symbols (`io_attribution.py`) are copied by their own code and are not reduced by it. The tables are derived from the installed tools' own help, retained with versions in `observability/host-observers/receipts/cli-help-20261014.txt`; on a host whose `timeout`, `env` or `sudo` is another implementation, an option the tables do not list ends the extraction at the wrapper.
 
 ## Install and inverse
 
 The units run the tools from `~/.local/share/native-agent-stack/host-observers/` and write below `~/.local/state/native-agent-stack/host-observers/`.
 
 ```
-install -d ~/.local/share/native-agent-stack/host-observers ~/.local/state/native-agent-stack/host-observers
-cp tools/host-observers/*.py ~/.local/share/native-agent-stack/host-observers/
+install -d ~/.local/share/native-agent-stack/host-observers ~/.local/state/native-agent-stack/host-observers ~/.config/native-agent-stack/monitoring/textfile
+cp tools/host-observers/*.py tools/host-observers/README.md ~/.local/share/native-agent-stack/host-observers/
 cp observability/host-observers/units/* ~/.config/systemd/user/ && systemctl --user daemon-reload
-systemctl --user enable --now native-fsync-canary.timer native-net-probe.timer native-io-attribution.service native-alert-watch.service
+systemctl --user enable --now native-fsync-canary.timer native-engine-delay-prom.timer native-net-probe.timer native-io-attribution.service native-alert-watch.service
 ```
 
-Adjust the textfile directory in the units (`~/.config/native-agent-stack/monitoring/textfile`) to the node exporter's `--collector.textfile.directory`. Inverse of each unit: `systemctl --user disable --now <unit>`, remove its file, and for the timers remove the `.prom` file they wrote.
+The textfile directory must exist before the timers first run (the writers do not create it); adjust it in the units (`~/.config/native-agent-stack/monitoring/textfile`) to the node exporter's `--collector.textfile.directory`. The README copied beside the tools is the one the units' `Documentation=` lines name. The delay sidecar (`native-engine-delay-prom.timer`) reads the engine delay logger's CSV from the E4 kit and writes a logger age of 999999 when there is none, or the age of the newest CSV file when that file holds no complete row. Inverse of each unit: `systemctl --user disable --now <unit>`, remove its file, and for the timers remove the `.prom` file they wrote.
 
 Alert rules: add a rule with `python3 tools/host-observers/grafana_rule_add.py add <provisioning file> <spec.json> --backup-dir <dir outside the provisioning directory>`, then restart Grafana (file-provisioned alert rules are read at start; the reload endpoint needs admin rights). `remove` is the inverse.
 
@@ -43,12 +45,13 @@ Alert rules: add a rule with `python3 tools/host-observers/grafana_rule_add.py a
 
 | Self-test | Checks | Planted faults caught |
 |---|---|---|
-| `host_observers_selftest.py` (canary, fsync probe, delay sidecar, IO daemon and its sanitized shapes) | 38 | 10 of 10 on 2026-10-14, from a throwaway script that is not kept here |
+| `host_observers_selftest.py` (canary, fsync probe, delay sidecar and its empty-CSV age, IO daemon and its sanitized shapes) | 42 | 10 of 10 on 2026-10-14, from a throwaway script that is not kept here |
 | `alert_tools_selftest.py` (replay, rule tool, watcher) | 60 | 26 of 26 (`--mutate`) |
 | `net_probe_selftest.py` | 18 | 8 of 8 (`--mutate`) |
-| `storm_snapshot_selftest.py`, `storm_runq_selftest.py`, `storm_snapshot_summary_selftest.py` | the files' own checks | not run |
+| `storm_snapshot_selftest.py` (command shapes, lanes, detector, live snapshot) | 114 | 17 of 17 (`storm_snapshot_mutants.py`) |
+| `storm_runq_selftest.py`, `storm_snapshot_summary_selftest.py` | 38, 43 | not run |
 
-`python3 tools/host-observers/<name>_selftest.py --mutate` repeats the fault pass for the two suites that carry one. Both run the suite on the unchanged code first (the control) and give no score when it does not pass, and neither counts a run that did not reach its summary as a caught fault. The PromQL tests (the silence expression and the probe rule) need `promtool` (Prometheus 3.15.0, from `PATH` or the `PROMTOOL` variable); the unittest skips them when the binary is absent.
+`python3 tools/host-observers/<name>_selftest.py --mutate` repeats the fault pass for the two suites that carry one, and `storm_snapshot_mutants.py` does it for the reducer. Each runs the suite on the unchanged code first (the control) and gives no score, and a non-zero exit, when it does not pass (the practice of the mutation-testing workflow in trailofbits/skills, mirrored at HEAD 0f44fe01dcb0, `plugins/mutation-testing/skills/mutation-testing/workflows/configuration.md:134-141`, measured here by `tests.test_host_observers.MutationRunnerTests` and `AlertMutationRunnerTests`). A mutant run that does not reach its summary is not counted as a caught fault, with one supported exception per runner that the code under test caused: `net_probe_selftest.py` counts a run that stopped on an exception raised inside `net_probe.py`, and `alert_tools_selftest.py` counts a group that crashed inside one of the three tools; a crash in the suite's own server or socket setup is BROKEN in both. The PromQL tests (the silence expression and the probe rule) need `promtool` (Prometheus 3.15.0, from `PATH` or the `PROMTOOL` variable); the unittest skips them when the binary is absent, as hosted CI does: the engine-checked result for the probe rule's freshness filter is an author-run result (receipt `observability/host-observers/receipts/fix-round-2-20261014.md`), reproducible with promtool 3.15.0.
 
 The storm snapshot self-test's live group check counts the group the way the tool does, with `os.walk`, which ignores a scandir error unless `onerror` is given and so yields nothing for a missing top (python/cpython@v3.13.16, tag commit cbc944f4bc59, `Lib/os.py:321` and `Lib/os.py:368-373`); a machine without the sessions cgroup therefore holds nothing, and the snapshot must hold nothing too.
 

@@ -11,7 +11,8 @@ The newest `engine-delay-*.csv` in --dir (summaries excluded) is read from its l
   engine_delay_samples, engine_delay_samples_ge_10ms
   engine_unit_active                                                              1 when the unit's newest sample is at most 10 s old
 and, whatever the units do:
-  engine_delay_logger_age_seconds                                                 seconds since the newest row of any kind (the logger writes a heartbeat a minute)
+  engine_delay_logger_age_seconds                                                 seconds since the newest row of any kind (the logger writes a heartbeat a minute); when the newest CSV holds
+                                                                                  no complete row, seconds since that file was last modified; 999999 when there is no CSV
   engine_delay_vm_busy_cores, engine_delay_group_cores                            the newest row's whole-VM and sessions-group busy cores
 No per-unit series are written for a unit with no sample in the window, so a stopped stage raises no alert. Percentiles use the budget tool's linear interpolation.
 """
@@ -135,6 +136,17 @@ def main():
         print("unreadable:", type(ex).__name__, ex, file=sys.stderr)
         return 1
     stages, newest_t, load = compute(rows, now, window)
+    if newest_t is None:
+        # The newest CSV holds no complete row (the logger created it and stopped before its first row, or it was cut). Its own modification time stands in for the newest row, so that the age grows from the
+        # moment the logger went quiet and a threshold on engine_delay_logger_age_seconds still fires; writing no age at all would hide the failure.
+        try:
+            newest_t = os.stat(path).st_mtime
+        except OSError:
+            newest_t = None
+    if newest_t is None:
+        write_atomic(out, "engine_delay_logger_age_seconds 999999\n")
+        print("no complete row and no readable modification time in", path, file=sys.stderr)
+        return 1
     write_atomic(out, render(stages, newest_t, load, now))
     return 0
 

@@ -4,6 +4,10 @@
   alert_tools_selftest.py [--tools DIR] [--only GROUP[,GROUP]] [--mutate]
 
 The real Prometheus, Grafana and rule files are never read or changed. --mutate copies the three tools, plants each fault in the copy, runs the groups that must notice it, and requires a failure.
+It runs the unmodified groups first (the control) and gives no score when they do not pass; a mutant run that does not reach the suite's summary, or whose only failures are groups that crashed outside the
+three tools on an operating-system or network error (the suite's own server or socket setup), is BROKEN and is not counted as caught; a crash inside a tool, or in the test code on any other exception (the tool's
+output was not what the test indexed), is caught. Reference for the control-first rule: trailofbits/skills (mirrored at HEAD 0f44fe01dcb0)
+plugins/mutation-testing/skills/mutation-testing/workflows/configuration.md:134-141; measured first-hand by tests.test_host_observers.MutationRunnerTests.
 """
 import argparse
 import copy
@@ -11,6 +15,7 @@ import http.server
 import importlib.util
 import json
 import os
+import re
 import shutil
 import stat
 import subprocess
@@ -18,6 +23,7 @@ import sys
 import tempfile
 import threading
 import time
+import traceback
 import urllib.parse
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -380,7 +386,7 @@ MUTANTS = [
     ("a duplicate uid is accepted", "grafana_rule_add.py", "        if any(r[\"uid\"] == spec.get(\"uid\") for g in new[\"groups\"] for r in g[\"rules\"]):", "        if False and any(r[\"uid\"] == spec.get(\"uid\") for g in new[\"groups\"] for r in g[\"rules\"]):", ["rule-add"]),
     ("the backup is world-readable", "grafana_rule_add.py", "fd = os.open(bak, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)", "fd = os.open(bak, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o644)", ["rule-add"]),
     ("the file mode is not kept", "grafana_rule_add.py", "mode = os.stat(path).st_mode & 0o777", "mode = 0o600", ["rule-add"]),
-    ("the original mode is left to the caller's umask", "grafana_rule_add.py", "os.fchmod(fd, mode)", "pass", ["rule-add"]),
+    ("the original mode is left to the caller's umask", "grafana_rule_add.py", "    os.fchmod(fd, mode)\n    with os.fdopen", "    pass\n    with os.fdopen", ["rule-add"]),
     ("removing an unknown uid succeeds", "grafana_rule_add.py", "if removed != 1:", "if removed < 0:", ["rule-add"]),
     ("a condition that names no query is accepted", "grafana_rule_add.py", "if r.get(\"condition\") not in refids:", "if False:", ["rule-add"]),
     ("an unknown group appends to the first group", "grafana_rule_add.py", "if name is None or g[\"name\"] == name:", "if True:", ["rule-add"]),
@@ -396,7 +402,33 @@ MUTANTS = [
 ]
 
 
+TOOL_FILES = ("alert_replay.py", "grafana_rule_add.py", "alert_watch.py")
+# exceptions of the operating system and the network: what a loopback server or socket that cannot be set up raises; the crash record carries the class name only
+INFRA_ERRORS = frozenset("OSError IOError PermissionError FileNotFoundError FileExistsError NotADirectoryError IsADirectoryError ConnectionError ConnectionRefusedError ConnectionResetError ConnectionAbortedError "
+                         "BrokenPipeError TimeoutError TimeoutExpired timeout gaierror herror URLError".split())
+SUMMARY = re.compile(r"^\d+ of \d+ checks passed in \d+ groups", re.M)
+CRASH = re.compile(r"^FAIL \[[^\]]+\] group \S+ crashed :: (\w+) in (\S+?): ")
+
+
+def classify(rc, out):
+    """'pass': the suite ran to its summary and every check held. 'caught': it ran to its summary and at least one check failed on an assertion, or a group crashed inside one of the three tools, or a group
+    crashed in the test code on an exception that is no operating-system or network error (the tool's output was not what the test indexed or parsed). 'broken': it did not reach its summary, or every failure
+    is a group that crashed on an operating-system or network error outside the tools (the suite's own server or socket setup, a timeout): that says nothing about the fault and is never counted as caught."""
+    if not SUMMARY.search(out):
+        return "broken"
+    fails = [ln for ln in out.splitlines() if ln.startswith("FAIL ")]
+    if rc == 0 and not fails:
+        return "pass"
+
+    def real(ln):
+        m = CRASH.match(ln)
+        return m is None or m.group(2) in TOOL_FILES or m.group(1) not in INFRA_ERRORS
+
+    return "caught" if rc != 0 and any(real(ln) for ln in fails) else "broken"
+
+
 def run_mutant(m):
+    """(name, 'caught' | 'missed' | 'broken', info)"""
     name, fname, old, new, groups = m
     with tempfile.TemporaryDirectory(prefix="alert-mut-") as d:
         for f in ("alert_replay.py", "grafana_rule_add.py", "alert_watch.py"):
@@ -404,25 +436,30 @@ def run_mutant(m):
         p = Path(d) / fname
         s = p.read_text()
         if s.count(old) != 1:
-            return name, None, f"text found {s.count(old)} times"
+            return name, "broken", f"text found {s.count(old)} times"
         p.write_text(s.replace(old, new))
-        r = subprocess.run([sys.executable, "-I", str(Path(__file__).resolve()), "--tools", d, "--only", ",".join(groups)], capture_output=True, text=True, timeout=600)
-        return name, r.returncode != 0, (r.stdout.strip().splitlines() or [""])[-1]
+        try:
+            r = subprocess.run([sys.executable, "-I", str(Path(__file__).resolve()), "--tools", d, "--only", ",".join(groups)], capture_output=True, text=True, timeout=600)
+        except subprocess.TimeoutExpired:
+            return name, "broken", "timed out"
+        verdict = classify(r.returncode, r.stdout)
+        return name, {"pass": "missed", "caught": "caught", "broken": "broken"}[verdict], (r.stdout.strip().splitlines() or [""])[-1]
 
 
 def mutate():
     union = sorted({g for m in MUTANTS for g in m[4]})
     r = subprocess.run([sys.executable, "-I", str(Path(__file__).resolve()), "--only", ",".join(union)], capture_output=True, text=True, timeout=900)
-    print(f"control: the unmodified files pass the {len(union)} groups the matrix uses: {'yes' if r.returncode == 0 else 'NO'}")
-    if r.returncode != 0:
-        print("\n".join(x for x in r.stdout.splitlines() if x.startswith("FAIL")))
+    print(f"control: the unmodified files pass the {len(union)} groups the matrix uses: {'yes' if classify(r.returncode, r.stdout) == 'pass' else 'NO'}")
+    if classify(r.returncode, r.stdout) != "pass":
+        print("\n".join(x for x in r.stdout.splitlines() if x.startswith("FAIL")) or r.stdout[-300:])
+        print("no mutation score is issued")
         return 1
     with ThreadPoolExecutor(max_workers=3) as ex:
         results = list(ex.map(run_mutant, MUTANTS))
     caught = 0
-    for name, c, info in results:
-        print(("caught  " if c else "MISSED  " if c is False else "BROKEN  ") + name + ("" if c else f"  [{info}]"))
-        caught += 1 if c else 0
+    for name, verdict, info in results:
+        print({"caught": "caught  ", "missed": "MISSED  ", "broken": "BROKEN  "}[verdict] + name + ("" if verdict == "caught" else f"  [{info}]"))
+        caught += verdict == "caught"
     print(f"{caught} of {len(MUTANTS)} planted faults caught")
     return 0 if caught == len(MUTANTS) else 1
 
@@ -449,7 +486,9 @@ def main():
             try:
                 GROUPS[n]()
             except Exception as ex:
-                ok(f"group {n} crashed", False, f"{type(ex).__name__}: {ex}")
+                frames = traceback.extract_tb(ex.__traceback__)
+                where = Path(frames[-1].filename).name if frames else "?"
+                ok(f"group {n} crashed", False, f"{type(ex).__name__} in {where}: {ex}")
     finally:
         for p in CLEAN:
             shutil.rmtree(p, ignore_errors=True)

@@ -48,7 +48,7 @@ def run(dirpath, seconds, rate, size, clock=time.perf_counter, sleep=time.sleep)
                 dfd = os.open(base, os.O_RDONLY)
             t0 = clock()
             slot, interval = 0, 1.0 / rate
-            n_slots = math.ceil(seconds * rate - 1e-9)      # the slots the schedule holds: those that start inside the run
+            n_slots = math.ceil(seconds * rate - 1e-9)      # the slots the schedule holds: those that start inside the run (no upstream mechanism: the schedule is this probe's own; first-hand measurement in host_observers_selftest.py, a 4 s first call in a 3 s run at 10 a second counts 29 late slots, not 39)
             while slot < n_slots:
                 due = t0 + slot * interval
                 now = clock()

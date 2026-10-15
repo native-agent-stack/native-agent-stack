@@ -56,7 +56,8 @@ check("pytest through python -m", S(["/home/example/.venv/bin/python3.13", "-m",
 check("script run keeps the script base name only", S(["python3", "/home/example/code/uet/tools/run_mutation.py", "--token", "abc"]) == "python3 run_mutation.py")
 check("-c drops the code", S(["python3", "-c", "import os; print(os.environ)"]) == "python3 -c")
 check("a key-looking script name is redacted", S(["python3", "/x/sk-abcdef123456.py"]) == "python3 <redacted>", S(["python3", "/x/sk-abcdef123456.py"]))
-check("a long opaque argument is redacted", S(["node", "A" * 40 + "B"]) == "node <redacted>")
+check("a long opaque argument is redacted", S(["somecli", "A" * 40 + "B"]) == "somecli <redacted>")
+check("a long opaque argument to node is not copied (only a script file would be)", S(["node", "A" * 40 + "B"]) == "node")
 check("a token passed to a non-interpreter is not kept", "ghp_" not in S(["curl", "ghp_abcdefghijkl", "https://x"]) and S(["curl", "ghp_abcdefghijkl"]) == "curl <redacted>")
 check("cargo test keeps the subcommand", S(["/usr/bin/cargo", "test", "--release"]) == "cargo test")
 check("a path argument to a non-interpreter is dropped", S(["rm", "/tmp/a/b"]) == "rm")
@@ -89,7 +90,59 @@ SHAPE_CASES = [
     ("inline code after a bundled flag is dropped (shell)", ["bash", "-lc", SENT], "", "bash -c"),
     ("inline code is dropped (node)", ["node", "-e", SENT], "", "node -e"),
     ("a bare word that is no script is not copied", ["python3", SENT], "", "python3"),
-    ("a node option value is not a script", ["node", "--max-old-space-size", SENT, "build.js"], "", "node build.js"),
+    ("an option before the script ends node's extraction (its value cannot be told from a script)", ["node", "--max-old-space-size", SENT, "build.js"], "", "node"),
+    ("a path-shaped option value of node is not taken for a script", ["node", "--redirect-warnings", f"/tmp/{SENT}.log", "app.js"], "", "node"),
+    ("a path-shaped option value of node after the script is not read either", ["node", "app.js", "--redirect-warnings", f"/tmp/{SENT}.log"], "", "node app.js"),
+    ("node's first argument as a script file", ["node", f"/w/{SENT}/build.js"], "", "node build.js"),
+    ("node with inline code, long form with a value", ["node", f"--eval={SENT}"], "", "node -e"),
+    ("a shell's option before the script ends the extraction", ["bash", "-x", f"/w/{SENT}.sh"], "", "bash"),
+    ("a shell script as the first argument", ["bash", "/w/x/run.sh", SENT], "", "bash run.sh"),
+    ("a long option of a shell with a value is not a script", ["bash", "--rcfile", f"/w/{SENT}.rc", "run.sh"], "", "bash"),
+    ("perl with inline code", ["perl", "-ne", SENT], "", "perl -e"),
+    ("perl with an option before the script", ["perl", "-w", f"/w/{SENT}.pl"], "", "perl"),
+    ("python: -W attached to its value", ["python3", f"-W{SENT}", "run_x.py"], "", "python3 run_x.py"),
+    ("python: -X attached to its value", ["python3", f"-X{SENT}", "run_x.py"], "", "python3 run_x.py"),
+    ("python: -X with its value as the next word", ["python3", "-X", SENT, "run_x.py"], "", "python3 run_x.py"),
+    ("python: a bundle ending in an option with a value", ["python3", "-uW", SENT, "run_x.py"], "", "python3 run_x.py"),
+    ("python: -m attached to its module, and what follows is the module's own", ["python3", "-mpytest", f"/w/{SENT}/test_a.py"], "", "python3 -m pytest"),
+    ("python: a bundle ending in -m", ["python3", "-Im", "pytest", f"/w/{SENT}/test_a.py"], "", "python3 -m pytest"),
+    ("python: -c attached to its code", ["python3", f"-c{SENT}", "run_x.py"], "", "python3 -c"),
+    ("python: a bundle with -c in the middle takes the rest as the code", ["python3", f"-Ic{SENT}", "run_x.py"], "", "python3 -c"),
+    ("python: what follows -c is the code's own arguments", ["python3", "-c", "pass", f"/w/{SENT}/run_x.py"], "", "python3 -c"),
+    ("python: the long option with an argument takes the next word", ["python3", "--check-hash-based-pycs", SENT, "run_x.py"], "", "python3 run_x.py"),
+    ("python: the long option with = is unknown to CPython, nothing runs", ["python3", f"--check-hash-based-pycs={SENT}", "run_x.py"], "", "python3"),
+    ("python: an unknown long option, nothing is read", ["python3", f"--{SENT}", "run_x.py"], "", "python3"),
+    ("python: an unknown short option, nothing is read", ["python3", "-Z", "run_x.py"], "", "python3"),
+    ("python: -- ends the options", ["python3", "-u", "--", "run_x.py"], "", "python3 run_x.py"),
+    ("python: a lone dash is standard input", ["python3", "-", f"/w/{SENT}/run_x.py"], "", "python3"),
+    ("python: -h prints and exits", ["python3", "-h", "run_x.py"], "", "python3"),
+    ("python: a missing argument", ["python3", "-W"], "", "python3"),
+    ("python: -m with a name that is no module name", ["python3", "-m", f"/w/{SENT}.py"], "", "python3 -m <arg>"),
+    ("npm: an unknown subcommand", ["npm", SENT], "", "npm <arg>"),
+    ("npm run: a script name that is not a well-known one", ["npm", "run", SENT], "", "npm run <arg>"),
+    ("npm run: a well-known script name", ["npm", "run", "build", "--", SENT], "", "npm run build"),
+    ("npm: an option before the subcommand", ["npm", f"--prefix=/w/{SENT}", "run", "build"], "", "npm"),
+    ("npm run: an option after the subcommand", ["npm", "run", "--workspace", SENT, "build"], "", "npm run"),
+    ("uv run: a target that is not a known tool", ["uv", "run", SENT], "", "uv run <arg>"),
+    ("uv run: an option before the target", ["uv", "run", "--with", SENT, "pytest"], "", "uv run"),
+    ("uv run: python with its own grammar", ["uv", "run", "python", "-m", "pytest", f"/w/{SENT}/test_a.py"], "", "uv run python -m pytest"),
+    ("uv run: python with an option value", ["uv", "run", "python", "-W", SENT, "run_x.py"], "", "uv run python run_x.py"),
+    ("uv run: a script file", ["uv", "run", f"/w/{SENT}/tool.py", SENT], "", "uv run tool.py"),
+    ("uv: a subcommand without a target", ["uv", "sync", "--frozen", SENT], "", "uv sync"),
+    ("npx: a tool that is not a known one", ["npx", SENT], "", "npx <arg>"),
+    ("uvx: a tool that is not a known one", ["uvx", f"{SENT}@1.0"], "", "uvx <arg>"),
+    ("bun: a subcommand of its own and what follows is dropped", ["bun", "run", SENT], "", "bun run"),
+    ("bun: an unknown word", ["bun", SENT], "", "bun <arg>"),
+    ("deno: no vocabulary, so a word is the marker", ["deno", "run", f"/w/{SENT}.ts"], "", "deno <arg>"),
+    ("timeout: a duration that is not a number ends the extraction", ["timeout", SENT, "python3", "run_x.py"], "", "timeout"),
+    ("timeout: a number, then the command", ["timeout", "5m", "python3", "run_x.py", SENT], "", "timeout python3 run_x.py"),
+    ("chrt: a priority that is not a number ends the extraction", ["chrt", "-r", SENT, "python3"], "", "chrt"),
+    ("chrt: a priority, then the command", ["chrt", "-r", "10", "git", "status"], "", "chrt git status"),
+    ("taskset: a CPU list that is not a number ends the extraction", ["taskset", "-c", SENT, "git"], "", "taskset"),
+    ("taskset: a CPU list, then the command", ["taskset", "-c", "0-3,8", "git", "log"], "", "taskset git log"),
+    ("env: assignments are skipped without being read", ["env", f"A={SENT}", f"B=/w/{SENT}", "python3", "run_x.py"], "", "env python3 run_x.py"),
+    ("a wrapper inside a wrapper", ["nice", "-n", "5", "timeout", "30", "git", "status"], "", "nice timeout git status"),
+    ("a wrapper nested beyond the depth limit (four wrappers are read, the fifth is an ordinary program)", ["nice"] * 6 + [f"/w/{SENT}.sh"], "", "nice nice nice nice nice <arg>"),
     ("a wrapper's option value is not the command (sudo)", ["sudo", "-u", SENT, "git", "status"], "", "sudo git status"),
     ("a wrapper's option value is not the command (timeout)", ["timeout", "-s", SENT, "5", "python3", "x.py"], "", "timeout python3 x.py"),
     ("a wrapper's option value is not the command (env)", ["env", "-u", SENT, "python3", "x.py"], "", "env python3 x.py"),
@@ -100,6 +153,148 @@ SHAPE_CASES = [
 for label, argv, comm, want in SHAPE_CASES:
     got = S(argv, comm)
     check(label, got == want and SENT not in got, (want, got))
+
+# ---- the Python rules against the installed interpreter: command lines built from valid options are run for real, and what the reducer says ran is what ran. The options and their values come from a
+# pool that includes the sentinel as a value (-W, -X) and as the arguments of the script, of the module and of the code, so the same lines also show that none of that text reaches the shape.
+import random
+import shutil
+import subprocess
+
+PROBE = 'import json, os, sys\nprint(json.dumps({"file": os.path.basename(sys.argv[0]), "args": sys.argv[1:]}))\n'
+interp_name = S([sys.executable]).split(" ")[0]
+if not re.match(r"^python[0-9.]*$", interp_name):
+    check("the installed interpreter is named python*, so the differential run applies (otherwise skipped)", True)
+else:
+    rng = random.Random(20261014)
+    flags = ["-B", "-s", "-S", "-u", "-E", "-b", "-O", "-OO", "-q", "-I", "-P", "-R", "-BsS", "-uq", "-Eb"]
+    valued = [["-W", "ignore"], ["-W", SENT], [f"-W{SENT}"], ["-X", "dev"], ["-X", SENT], [f"-X{SENT}"], ["-uW", SENT], ["-BX", SENT], ["--check-hash-based-pycs", "never"], ["--check-hash-based-pycs", "default"]]
+    with tempfile.TemporaryDirectory() as dtmp:
+        target = Path(dtmp) / "probe_target.py"
+        target.write_text(PROBE)
+        bad = []
+        ran = {"script": 0, "module": 0, "code": 0}
+        for n in range(90):
+            opts = []
+            for _ in range(rng.randint(0, 3)):
+                opts += rng.choice(valued) if rng.random() < 0.6 else [rng.choice(flags)]
+            kind = rng.choice(["script", "script2", "module", "module2", "code", "code2"])
+            if kind == "script":
+                tail, want_kind = [str(target), "arg1", SENT, f"/w/{SENT}.log"], "script"
+            elif kind == "script2":
+                tail, want_kind = ["--", str(target), SENT], "script"
+            elif kind == "module":
+                tail, want_kind = ["-m", "this", SENT], "module"
+            elif kind == "module2":
+                tail, want_kind = ["-mthis", f"/w/{SENT}"], "module"
+            elif kind == "code":
+                tail, want_kind = ["-c", "import sys\nprint('CODE', sys.argv[1:])", SENT], "code"
+            else:
+                tail, want_kind = ["-cprint('CODE')", f"/w/{SENT}/x.py"], "code"
+            argv = [sys.executable] + opts + tail
+            r = subprocess.run(argv, capture_output=True, text=True, timeout=60, cwd=dtmp)
+            if want_kind == "script":
+                real = f"{interp_name} probe_target.py" if r.returncode == 0 and '"file": "probe_target.py"' in r.stdout else None
+            elif want_kind == "module":
+                real = f"{interp_name} -m this" if r.returncode == 0 and "Zen of Python" in r.stdout else None
+            else:
+                real = f"{interp_name} -c" if r.returncode == 0 and "CODE" in r.stdout else None
+            ran[want_kind] += real is not None
+            got = S(argv)
+            if real is None or got != real or SENT in got:
+                bad.append((argv[1:], r.returncode, got, real))
+        check("90 valid command lines run for real: the reducer names exactly what the installed interpreter ran, every line ran, and the sentinel is in no shape",
+              not bad and all(v > 0 for v in ran.values()), (ran, bad[:2]))
+
+# ---- a seeded property over every family. Each line is built from benign program, subcommand, tool and script names; the sentinel, in 14 shapes (a word, a path, a script-named file, =, attached to an
+# option, @, a URL, spaces, quotes, a trailing slash, ./, ~/, a version), is placed only where the grammar does not name it as the program, the module or the script: as option values, as the
+# arguments after the target, as assignments, as the unknown subcommand or target of a runner, as the number a wrapper requires, and as garbage options. It must never reach the shape.
+rng = random.Random(7)
+FORMS = [SENT, f"/tmp/{SENT}.log", f"{SENT}.js", f"--opt={SENT}", f"-o{SENT}", f"@{SENT}", f"k={SENT}", f"https://h.example/{SENT}", f"{SENT} {SENT}", f"'{SENT}'", f"{SENT}/", f"./{SENT}", f"~/{SENT}", f"{SENT}@1.2"]
+NOSCRIPT = [f for f in FORMS if not re.search(r"\.(py|pyw|sh|bash|zsh|js|mjs|cjs|ts|mts|cts|rb|pl|php|lua|jl)$", f, re.I)]
+WRAPPER_NUMBERS = {"timeout": 1, "chrt": 1, "taskset": 1}       # the numbers these wrappers require before the command: a duration, a priority, a CPU list or mask
+OPTION_TOKENS = ["-x", "--flag", "-v", "--quiet", "-n", "--prefix", "--with", "--workspace", "-C", "-p", "-u", "--unknown-flag", "-W", "-X", "-m", "-c", "-e", "--eval", "--rcfile", "--redirect-warnings", "--"]
+BENIGN_INNER = [["git", "status"], ["python3", "run_x.py"], ["node", "build.js"], ["pytest", "-q"], ["cargo", "test"]]
+
+
+def junk(k):
+    return [rng.choice(FORMS) for _ in range(k)]
+
+
+def option_run(allow_values=True):
+    """Garbage in the option positions of the programs whose grammar is not read (npm): option tokens, each possibly followed by a value of any shape."""
+    out = []
+    for _ in range(rng.randint(0, 3)):
+        o = rng.choice(OPTION_TOKENS) if rng.random() < 0.7 else "-" + rng.choice(FORMS)
+        out.append(o)
+        if allow_values and rng.random() < 0.6:
+            out.append(rng.choice(FORMS))
+    return out
+
+
+def py_options():
+    """Options of the python command line with a known arity, so that no sentinel lands in the script position: flags, -W and -X with the value as the next word or attached, the long option with
+    its value as the next word, and an unknown option (after which nothing is read)."""
+    out = []
+    for _ in range(rng.randint(0, 3)):
+        r = rng.random()
+        if r < 0.35:
+            out.append(rng.choice(["-B", "-u", "-E", "-s", "-q", "-I", "-OO"]))
+        elif r < 0.65:
+            out += [rng.choice(["-W", "-X"]), rng.choice(FORMS)]
+        elif r < 0.8:
+            out.append(rng.choice(["-W", "-X"]) + rng.choice(FORMS))
+        elif r < 0.9:
+            out += ["--check-hash-based-pycs", rng.choice(FORMS)]
+        else:
+            out.append(rng.choice(["--" + rng.choice(FORMS), "-" + rng.choice(FORMS)]))
+    return out
+
+
+def gen_line():
+    fam = rng.choice(["python", "first_arg", "npm", "uv", "tool_runner", "generic", "wrapper"])
+    if fam == "python":
+        prog = rng.choice(["python3", "python3.13", "python"])
+        target = rng.choice([["bench.py"], ["-m", "pytest"], ["-c", "pass"], ["-mpytest"], ["--", "bench.py"]])
+        return [prog] + py_options() + target + junk(rng.randint(0, 3))
+    if fam == "first_arg":
+        prog = rng.choice(["node", "bash", "sh", "perl"])
+        first = rng.choice([["build.js"], ["-e"], ["-lc"]] + [[o] for o in OPTION_TOKENS[:6]])
+        return [prog] + first + junk(rng.randint(0, 4))
+    if fam == "npm":
+        sub = rng.choice([[], ["run"], ["exec"], ["install"], rng.choice(NOSCRIPT).split(" ")[:1]])
+        tgt = [] if not sub or sub[0] not in ("run", "exec") else rng.choice([[rng.choice(NOSCRIPT)], ["build"], ["--workspace", rng.choice(FORMS)]])
+        return ["npm"] + option_run(False)[:1] + sub + tgt + junk(rng.randint(0, 3))
+    if fam == "uv":
+        sub = rng.choice([["run"], ["sync"], ["pip"], [rng.choice(NOSCRIPT)]])
+        tgt = [] if sub[0] != "run" else rng.choice([[rng.choice(NOSCRIPT)], ["pytest"], ["python", "-W", rng.choice(FORMS), "bench.py"], ["--with", rng.choice(FORMS), "pytest"]])
+        return ["uv"] + sub + tgt + junk(rng.randint(0, 3))
+    if fam == "tool_runner":
+        return [rng.choice(["npx", "uvx", "bunx"])] + rng.choice([[rng.choice(NOSCRIPT)], ["eslint"], ["--yes", rng.choice(FORMS)]]) + junk(rng.randint(0, 3))
+    if fam == "generic":
+        prog = rng.choice(["git", "cargo", "docker", "systemctl", "somecli", "deno", "ruby", "bun", "restic", "gh"])
+        return [prog] + junk(rng.randint(0, 5))
+    name = rng.choice(sorted(ss.WRAPPERS))
+    plain, valued_flags = ss.WRAPPER_FLAGS[name]
+    opts = []
+    for _ in range(rng.randint(0, 3)):
+        if valued_flags and rng.random() < 0.5:
+            f = rng.choice(sorted(valued_flags))
+            opts += [f, rng.choice(FORMS)] if rng.random() < 0.7 else [f"{f}={rng.choice(FORMS)}" if f.startswith("--") else f + rng.choice(FORMS)]
+        elif plain:
+            opts.append(rng.choice(sorted(plain)))
+    nums = ["5"] * WRAPPER_NUMBERS.get(name, 0) if rng.random() < 0.7 else junk(WRAPPER_NUMBERS.get(name, 0))
+    assigns = [f"A={rng.choice(FORMS)}"] if name == "env" and rng.random() < 0.6 else []
+    inner = rng.choice(BENIGN_INNER) + junk(rng.randint(0, 3))
+    return [name] + opts + assigns + nums + inner
+
+
+leaks = []
+for n in range(3000):
+    argv = gen_line()
+    got = S(argv)
+    if SENT in got:
+        leaks.append((argv, got))
+check("3000 seeded random command lines across every family (python, node/shell/perl, npm, uv, tool runners, other programs, 13 wrappers): the sentinel, in 14 shapes, is in no shape", not leaks, leaks[:2])
 
 # the same cases at the snapshotter's output boundary: one lane each, serialized as the tool writes it
 t2, sess2 = {}, {}

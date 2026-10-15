@@ -5,6 +5,9 @@
 
 --mutate plants each fault in a copy of net_probe.py and requires the suite to fail on it. It first runs the suite on an unchanged copy (the control) and gives no score, and a non-zero exit,
 when the control does not pass or cannot run; a mutant run that stops outside net_probe.py (the suite's own socket setup, a timeout) is not counted as a caught fault.
+A mutant run that stops inside net_probe.py with an exception (the planted fault made the code raise) is counted as caught: the suite did not reach its summary, but the code under test is what failed.
+Reference for the control-first rule: trailofbits/skills (mirrored at HEAD 0f44fe01dcb0) plugins/mutation-testing/skills/mutation-testing/workflows/configuration.md:134-141, which has the unmodified test
+command verified to succeed before any mutant runs; measured first-hand here by tests.test_host_observers.MutationRunnerTests (a control that cannot run gives no score and a non-zero exit).
 """
 import argparse
 import importlib.util

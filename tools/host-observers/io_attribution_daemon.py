@@ -97,7 +97,9 @@ def prune(sm, alive):
 
 def rotate(sm):
     """Close a window while the sampling goes on: the closing snapshot is kept as the first one of the next window, so the interval between two records is counted in the second and not left out of
-    both; the scans start empty, so the closing sample's D-state threads stay with the window they closed."""
+    both; the scans start empty, so the closing sample's D-state threads stay with the window they closed. The counters it differences are cumulative (/proc/diskstats, cgroup io.stat, the pressure
+    totals: Linux Documentation/admin-guide/iostats.rst and accounting/psi.rst, which are UNMIRRORED here); first-hand measurement: host_observers_selftest.py runs the loop on an injected clock, where
+    two windows must cover the 200 s sampled (100 s and 100 s; the loop without this rotation gave 100 s and 80 s)."""
     sm.snaps, sm.scans = sm.snaps[-1:], []
 
 

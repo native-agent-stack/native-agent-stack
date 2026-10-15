@@ -80,7 +80,11 @@ def backup_and_replace(path, new_text, backup_dir=None):
     mode = os.stat(path).st_mode & 0o777
     tmp = f"{path}.tmp-{os.getpid()}"
     fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_EXCL, mode)
-    os.fchmod(fd, mode)         # os.open's mode is narrowed by the caller's umask; the file keeps the mode it had, so a Grafana running as another user can still read it
+    # os.open's mode is narrowed by the caller's umask; the file keeps the mode it had, so a Grafana running as another user can still read it. Mechanism, at its pin (python/cpython@v3.13.16, tag commit
+    # cbc944f4bc59): Doc/library/os.rst:1272-1275 "When computing mode, the current umask value is first masked out" (os.open) and :1027-1030 os.fchmod(fd, mode), "equivalent to os.chmod(fd, mode)". That chmod
+    # is not narrowed by the umask (the umask applies when a file is created) is POSIX chmod(2), which has no mirror here; it is measured first-hand by the umask 0077 regression of alert_tools_selftest.py (a 0644
+    # file stays 0644; without this call it becomes 0600).
+    os.fchmod(fd, mode)
     with os.fdopen(fd, "w") as f:
         f.write(new_text)
         f.flush()

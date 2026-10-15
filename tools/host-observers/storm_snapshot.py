@@ -9,11 +9,14 @@ group twice, --sample seconds apart, and appends one JSON line to OUT.jsonl: the
 ~/.claude/sessions/<pid>.json, the only file of that directory it opens, never the .key files), each lane's cores and its top command shapes with a process count and up to two working directories.
 OUT.log (next to it) gets a heartbeat every 10 minutes and any error. --once takes one snapshot now, whatever the load (for a dry run).
 
-Privacy: raw command lines are never stored. A shape names what a process is, never what it was given. Text is copied from a command line in three places only: the program's base name (a process
-that rewrote its title into one string is named by the kernel's process name instead, and nothing after it is read), the base name of a script or the module of `-m`, and one word of a fixed vocabulary
-of subcommands (SUBCOMMANDS, and the words a runner such as npm or uv takes). Everything else is dropped or replaced by a fixed marker: flags and the values they take, any other argument (<arg>),
-anything that looks like a key, token or long opaque string (<redacted>), the code after -c, and a process name that is not plain text (<proc>). The extraction stops at a flag whose arity it does not know,
-because the next word may be its value. Per-process views miss processes that live less than the sample window, so measured_cores is reported beside the group's cores.
+Privacy: raw command lines are never stored. A shape names what a process is, never what it was given. Text is copied from a command line in these places only: the program's base name (a process
+that rewrote its title into one string is named by the kernel's process name instead, and nothing after it is read); for Python, what CPython itself would run, read with CPython's own option rules
+(the module of `-m`, the base name of the script, or the marker `-c`); for a shell, node or perl, the very first argument only, as an inline-code flag or a script file; for npm and uv, a subcommand of
+the runner's own vocabulary and a well-known tool or script name; for any other program, one word of a fixed subcommand vocabulary; and, behind a wrapper such as timeout or sudo, the command it runs,
+read the same way. Everything else is dropped or replaced by a fixed marker: every option and the value it takes, any other argument (<arg>), anything that looks like a key, token or long opaque string
+(<redacted>), the code after -c, and a process name that is not plain text (<proc>). An option the tables do not know ends the extraction, because its next word may be its value. This covers the command
+line only: working directories, session names and kinds are copied by aggregate() and session_info(), and cgroup names and wait symbols by io_attribution.py, each by its own code. Per-process views miss
+processes that live less than the sample window, so measured_cores is reported beside the group's cores.
 """
 import json
 import os
@@ -35,13 +38,30 @@ COMM_RX = re.compile(r"^[A-Za-z0-9_.:@+ ,/-]{1,40}$")       # a kernel process n
 ASSIGN_RX = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
 NUMERIC_RX = re.compile(r"^(0x[0-9a-fA-F]+|[0-9][0-9.,-]*[smhd]?)$")       # a duration, a priority or a CPU mask
 SCRIPT_RX = re.compile(r"\.(py|pyw|sh|bash|zsh|js|mjs|cjs|ts|mts|cts|rb|pl|php|lua|jl)$", re.I)
-INTERPRETERS = re.compile(r"^(python[0-9.]*|node|nodejs|bash|sh|dash|zsh|deno|bun|ruby|perl|php)$")
-# What each interpreter family treats as inline code, and the short options that take the next word as a value. Checked against the installed python3, node, bash and perl --help on
-# 2026-10-14 (python3 -c, -m, -W, -X; node -e, -p, -r, -C; bash -c, -o, -O; perl -e, -E); ruby's -e and php's -r are from their documentation, neither is installed here.
-CODE_LETTERS = {"python": "c", "sh": "c", "node": "ep", "ruby": "e", "perl": "eE", "php": "r"}
-VALUED_SHORT = {"python": "WX", "node": "rC", "sh": "oO"}
-# Wrappers: (flags that take no value, flags that take the next word as a value), read from the installed tools' --help on 2026-10-14 (coreutils env, nice and timeout; util-linux
-# ionice and setsid; systemd-run; GNU time, xargs, stdbuf; sudo; chrt and taskset of util-linux). A flag a table does not list ends the extraction, because its next word may be its value.
+MODULE_RX = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)*$")
+PYTHON_RX = re.compile(r"^python[0-9.]*$")
+
+# ---- Python: the command line is read exactly as CPython reads it (python/cpython@v3.13.16, tag commit cbc944f4bc59): Python/getopt.c:40 SHORT_OPTS "bBc:dEhiIJm:OPqRsStuvVW:xX:?" (c, m, W and X take an
+# argument, attached to the letter or the next word; J is reserved), :44-49 the long options (only --check-hash-based-pycs takes an argument, as the next word, never with =), :75-90 "--", a lone "-",
+# --help and --version end or answer the scan; Python/initconfig.c:2473-2500 -c and -m are the last options (what follows is the code's or the module's own arguments) and :2636-2641 the first word
+# that is not an option is the script (a lone "-" is standard input). The same rules are checked against the installed interpreter in storm_snapshot_selftest.py.
+PY_FLAGS = frozenset("bBdEiIOPqRsStuvx")     # short options without an argument
+PY_ARGS = frozenset("cmWX")                  # short options with an argument
+PY_LONG_ARG = frozenset({"--check-hash-based-pycs"})
+
+# ---- Interpreters without a pinned grammar (a shell, node, perl): only the very first argument is read, and only as an inline-code flag or a script file; any option ends the extraction, because an
+# option's value cannot be told from a script. The flags are those of the installed bash, node and perl help (observability/host-observers/receipts/cli-help-20261014.txt).
+FIRST_ARG_INLINE = {
+    "sh": ((re.compile(r"^-[A-Za-z]*c[A-Za-z]*$"), "-c"),),
+    "node": ((re.compile(r"^(-e|--eval)(=.*)?$"), "-e"), (re.compile(r"^(-p|--print)(=.*)?$"), "-p")),
+    "perl": ((re.compile(r"^-[A-Za-z]*[eE]$"), "-e"),),
+}
+SHELLS = frozenset({"bash", "sh", "dash", "zsh"})
+
+# ---- Wrappers: (flags that take no value, flags that take the next word as a value), read from the installed tools' --help on 2026-10-14: uutils coreutils 0.10.0 (env, nice, timeout, nohup, stdbuf), util-linux
+# 2.41.3 (setsid, ionice, chrt, taskset), GNU findutils 4.10.0 (xargs), GNU Time (time), systemd 259 (systemd-run), sudo-rs 0.2.13 (sudo), retained with their versions in
+# observability/host-observers/receipts/cli-help-20261014.txt. Another implementation of the same command (GNU coreutils, the original sudo) may take options these tables do not list; such an option ends
+# the extraction at the wrapper, which is the safe direction, as does a required positional (a duration, a priority, a CPU list) that is not a number.
 WRAPPER_FLAGS = {
     "env": ({"-i", "--ignore-environment", "-0", "--null", "-v", "--debug"}, {"-u", "--unset", "-C", "--chdir", "-S", "--split-string", "-a", "--argv0"}),
     "nice": (set(), {"-n", "--adjustment"}),
@@ -62,14 +82,25 @@ WRAPPER_FLAGS = {
     "chrt": ({"-b", "--batch", "-f", "--fifo", "-i", "--idle", "-o", "--other", "-r", "--rr", "-R", "--reset-on-fork", "-m", "--max", "-v", "--verbose"}, {"-T", "--sched-runtime", "-P", "--sched-period", "-D", "--sched-deadline"}),
     "taskset": ({"-a", "--all-tasks", "-c", "--cpu-list"}, set()),
 }
-WRAPPERS = set(WRAPPER_FLAGS)
-# Runners: the package-manager style ones keep a subcommand and, after one of RUNNER_TARGETS, the program or script it runs; the tool runners keep the tool only.
-RUNNER_TARGETS = {"npm": {"run", "exec", "x", "run-script"}, "pnpm": {"run", "exec", "dlx", "x"}, "yarn": {"run", "exec", "dlx"}, "uv": {"run", "tool"}, "pipx": {"run"}}
-TOOL_RUNNERS = {"npx", "uvx", "bunx"}
-RUNNERS = TOOL_RUNNERS | set(RUNNER_TARGETS)
-RUNNER_FLAGS = {"-q", "--quiet", "--silent", "-y", "--yes", "--no-color", "--verbose", "--offline", "--frozen", "--locked", "--no-progress"}       # known to take no value
-# The subcommand words that are copied from a command line, program by program. Each word was found in the installed tool's own help on 2026-10-14 (git, gh, docker, systemctl, restic, pip,
-# apt); git's list is a subset of command-list.txt of git/git@v2.53.0 (tag commit 67ad42147a7a, the installed version); cargo is not installed here: its words are the built-in commands of
+WRAPPERS = frozenset(WRAPPER_FLAGS)
+WRAPPER_POSITIONALS = {"timeout": 1, "chrt": 1, "taskset": 1}       # numbers the wrapper requires before the command: a duration, a priority, a CPU list or mask
+
+# ---- Runners: the subcommand must be one of the runner's own (npm and uv from the installed `npm --help` and `uv --help`, 2026-10-14); after `run` or `exec` the target is read only when it is a known tool
+# or script name, a Python interpreter (its own grammar follows) or a script file; anything else is the marker <arg>. An option before or after the subcommand ends the extraction.
+RUNNER_SUBS = {
+    "npm": frozenset("access adduser approve-scripts audit bugs cache ci completion config dedupe deny-scripts deprecate diff dist-tag docs doctor edit exec explain explore find-dupes fund get help help-search "
+                     "init install install-ci-test install-scripts install-test link ll login logout ls org outdated owner pack ping pkg prefix profile prune publish query rebuild repo restart root run sbom "
+                     "search set shrinkwrap stage star stars start stop team test token trust undeprecate uninstall unpublish unstar update version view whoami".split()),
+    "uv": frozenset("auth run init add remove version sync lock export tree format check audit tool python pip venv build publish workspace cache self help".split()),
+}
+RUN_SUBS = {"npm": frozenset({"run", "exec"}), "uv": frozenset({"run"})}
+TOOL_RUNNERS = frozenset({"npx", "uvx", "bunx"})
+TARGET_WORDS = frozenset("pytest ruff mypy pyright black isort flake8 pylint tox nox coverage uvicorn gunicorn jupyter ipython mkdocs maturin hatch poetry pip eslint prettier tsc tsx ts-node jest vitest mocha "
+                         "playwright cypress webpack vite esbuild rollup turbo nx next nuxt astro storybook node npm npx cargo "
+                         "test build lint dev start format fmt typecheck check ci watch serve preview clean docs coverage e2e bench".split())
+
+# ---- Other programs: the one word that may follow is a subcommand of a fixed vocabulary. Each word was found in the installed tool's own help on 2026-10-14 (git, gh, docker, systemctl, restic, pip, apt,
+# bun); git's list is a subset of command-list.txt of git/git@v2.53.0 (tag commit 67ad42147a7a, the installed version); cargo is not installed here: its words are the built-in commands of
 # rust-lang/cargo@0.99.0 (tag commit 797e8a9bca27, src/bin/cargo/commands/mod.rs:3-44 and :95-133), plus clippy and fmt, which rustup installs as the external subcommands cargo-clippy and
 # cargo-fmt. A word that is not listed is never copied: it is shown as the fixed marker <arg>.
 SUBCOMMANDS = {
@@ -83,6 +114,7 @@ SUBCOMMANDS = {
     "restic": frozenset("backup check forget prune snapshots ls stats diff restore mount init unlock rewrite copy find cat tag generate version repair recover migrate".split()),
     "pip": frozenset("install uninstall list freeze show wheel download check config cache index inspect".split()),
     "apt": frozenset("update upgrade install remove autoremove list search show full-upgrade".split()),
+    "bun": frozenset("run test x repl exec install add remove update audit dedupe prune outdated link unlink publish patch pm info why build init create upgrade".split()),
 }
 SUBCOMMANDS["pip3"], SUBCOMMANDS["apt-get"] = SUBCOMMANDS["pip"], SUBCOMMANDS["apt"]
 
@@ -128,49 +160,100 @@ def _word(t):
     return t[:40] if WORD_RX.match(t[:48]) else "<arg>"
 
 
-def _interpreter(fam, rest):
-    """The words after an interpreter: `-m MODULE`, the marker of inline code (the code itself is never kept), or the base name of the script. A bare word that is neither a script (a path or
-    a script extension) nor key-looking is not copied, whether it is an option's value or an argument; a key-looking one shows as <redacted>."""
-    codes, valued = CODE_LETTERS.get(fam, ""), VALUED_SHORT.get(fam, "")
-    k = 0
-    while k < len(rest):
-        t = rest[k]
-        k += 1
-        if t.startswith("-") and len(t) > 1:
-            if fam == "node" and t in ("--eval", "--print"):
-                return ["-e" if t == "--eval" else "-p"]
-            if re.fullmatch(r"-[A-Za-z]+", t):
-                letters = t[1:]
-                if fam == "python" and letters.endswith("m"):
-                    return ["-m", _word(rest[k]) or ""] if k < len(rest) else ["-m"]
-                hit = next((c for c in codes if c in letters), None)
-                if hit:
-                    return ["-" + hit]
-                if letters[-1] in valued:
-                    k += 1                                  # the next word is this option's value
-            continue
-        if "=" in t or "://" in t:
-            continue
-        if "/" in t or SCRIPT_RX.search(t):
-            return [_word(t) or ""]
-        if SECRET_RX.search(t):
-            return ["<redacted>"]
-    return []
+def _script(t):
+    """A script file named on the command line: its base name when it is a path or has a script extension, else nothing (a bare word may be anything)."""
+    if t.startswith("-") or not ("/" in t or SCRIPT_RX.search(t)):
+        return []
+    w = _word(t)
+    return [w] if w else []
+
+
+def _python_target(rest):
+    """What `python [options] ...` runs, read as CPython reads it: ("code", None), ("module", name), ("script", path), or None when nothing is run or the line is not valid (an option that prints
+    and exits, an unknown option, a missing argument, standard input)."""
+    i, n = 0, len(rest)
+    while i < n:
+        t = rest[i]
+        if t == "--":
+            i += 1
+            break
+        if not t.startswith("-") or t == "-":
+            break
+        if t.startswith("--"):
+            if t in PY_LONG_ARG:
+                i += 2
+                continue
+            return None
+        i += 1
+        letters, j = t[1:], 0
+        while j < len(letters):
+            c = letters[j]
+            j += 1
+            if c in PY_FLAGS:
+                continue
+            if c in PY_ARGS:
+                if j < len(letters):
+                    value, j = letters[j:], len(letters)
+                elif i < n:
+                    value, i = rest[i], i + 1
+                else:
+                    return None
+                if c == "c":
+                    return ("code", None)
+                if c == "m":
+                    return ("module", value)
+                continue
+            return None
+    if i < n and rest[i] != "-":
+        return ("script", rest[i])
+    return None
+
+
+def _python(rest):
+    target = _python_target(rest)
+    if target is None:
+        return []
+    kind, value = target
+    if kind == "code":
+        return ["-c"]
+    if kind == "module":
+        return ["-m", value if (len(value) <= 40 and MODULE_RX.match(value) and not SECRET_RX.search(value)) else "<arg>"]
+    return _script(value)
+
+
+def _first_arg(fam, rest):
+    """A shell, node or perl: the first argument only, as an inline-code flag or a script file; any option ends the extraction."""
+    if not rest:
+        return []
+    t = rest[0]
+    for rx, marker in FIRST_ARG_INLINE.get(fam, ()):
+        if rx.match(t):
+            return [marker]
+    return _script(t)
+
+
+def _run_target(rest):
+    """The program or script a runner runs: a known tool or script name, a Python interpreter followed by its own grammar, a script file, else the marker <arg>; an option ends the extraction."""
+    if not rest or rest[0].startswith("-"):
+        return []
+    t = rest[0]
+    if PYTHON_RX.match(t):
+        return [t] + _python(rest[1:])
+    if t in TARGET_WORDS:
+        return [t]
+    if SCRIPT_RX.search(t) and "://" not in t and "=" not in t:
+        return _script(t)
+    return ["<arg>"]
 
 
 def _runner(b0, rest):
-    """The words after a runner (npm, uv, npx and the like): its subcommand and, after one that runs something, the program or script it runs; a tool runner keeps the tool only. The
-    extraction stops at the first option it does not know to be valueless, because the next word may be that option's value."""
-    words = []
-    for t in rest:
-        if t.startswith("-"):
-            if t in RUNNER_FLAGS or "=" in t:
-                continue
-            break
-        words.append(_word(t) or "")
-        if b0 in TOOL_RUNNERS or len(words) == 2 or words[0] not in RUNNER_TARGETS.get(b0, ()):
-            break
-    return [w for w in words if w]
+    """npm or uv: a subcommand of its own vocabulary and, after `run` or `exec`, the target; an option before the subcommand ends the extraction."""
+    if not rest or rest[0].startswith("-"):
+        return []
+    sub = rest[0]
+    if sub not in RUNNER_SUBS[b0]:
+        return ["<arg>"]
+    return [sub] + (_run_target(rest[1:]) if sub in RUN_SUBS[b0] else [])
 
 
 def _generic(b0, rest):
@@ -189,8 +272,8 @@ def _generic(b0, rest):
 
 
 def _wrapper(name, rest, depth):
-    """`name` plus the command it runs. Skipped without being read: KEY=VALUE assignments, bare numbers (a duration, a priority, a CPU mask) and the wrapper's own flags with the values
-    its table says they take. A flag the table does not list ends the extraction at the wrapper, because its next word may be its value."""
+    """`name` plus the command it runs. Skipped without being read: KEY=VALUE assignments, the numbers a wrapper requires (a duration, a priority, a CPU list) and the wrapper's own flags with the
+    values its table says they take. A flag the table does not list, or a required number that is not one, ends the extraction at the wrapper."""
     plain, valued = WRAPPER_FLAGS[name]
     i = 0
     while i < len(rest):
@@ -209,10 +292,14 @@ def _wrapper(name, rest, depth):
             else:
                 return name
             continue
-        if ASSIGN_RX.match(t) or NUMERIC_RX.match(t) or (name == "rtk" and t == "proxy"):
+        if ASSIGN_RX.match(t) or (name == "rtk" and t == "proxy"):
             i += 1
             continue
         break
+    for _ in range(WRAPPER_POSITIONALS.get(name, 0)):
+        if i >= len(rest) or not NUMERIC_RX.match(rest[i]):
+            return name
+        i += 1
     inner = _shape(rest[i:], "", depth + 1) if i < len(rest) else ""
     return (name + " " + inner).strip()[:80]
 
@@ -228,11 +315,18 @@ def _shape(argv, comm, depth):
     if b0 in WRAPPERS and depth < 4:
         return _wrapper(b0, rest, depth)
     out = [b0]
-    if INTERPRETERS.match(b0):
-        fam = "python" if b0.startswith("python") else "node" if b0 in ("node", "nodejs", "bun", "deno") else "sh" if b0 in ("bash", "sh", "dash", "zsh") else b0
-        out += _interpreter(fam, rest)
-    elif b0 in RUNNERS:
+    if PYTHON_RX.match(b0):
+        out += _python(rest)
+    elif b0 in SHELLS:
+        out += _first_arg("sh", rest)
+    elif b0 in ("node", "nodejs"):
+        out += _first_arg("node", rest)
+    elif b0 == "perl":
+        out += _first_arg("perl", rest)
+    elif b0 in RUNNER_SUBS:
         out += _runner(b0, rest)
+    elif b0 in TOOL_RUNNERS:
+        out += _run_target(rest)
     else:
         out += _generic(b0, rest)
     return " ".join(x for x in out if x)[:80]

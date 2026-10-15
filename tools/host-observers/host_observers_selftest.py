@@ -7,6 +7,7 @@ clock). The real machine is not read."""
 import importlib.util
 import json
 import os
+import re
 import signal
 import subprocess
 import sys
@@ -139,6 +140,25 @@ with tempfile.TemporaryDirectory() as d:
     check("CLI on a log whose rows are years in the past: exit 0, no per-stage lines (nothing is in the window), a large logger age", r.returncode == 0 and "engine_delay_p99_seconds" not in body and "engine_delay_logger_age_seconds" in body and not os.path.exists(out + ".tmp"), (r.stderr, body))
     r = subprocess.run([sys.executable, "-I", str(HERE / "engine_delay_prom.py"), "--dir", os.path.join(d, "nothing"), "--out", out], capture_output=True, text=True, timeout=30)
     check("no CSV at all: exit 1 and a logger age of 999999 written", r.returncode == 1 and "engine_delay_logger_age_seconds 999999" in Path(out).read_text(), r.stderr)
+
+    # a newest CSV with no complete row (the logger created it and stopped, or only a cut line is there): the age must still be written, counted from the file's last modification
+    for label, content in (("only the header", ",".join(HEADER) + "\n"), ("the header and a cut line", ",".join(HEADER) + "\n" + stamp(NOW) + ",paper-ready-sip-8c95a50d-seq2.serv"), ("nothing at all", "")):
+        d3 = Path(d) / ("empty-" + label.replace(" ", "-"))
+        d3.mkdir()
+        empty = d3 / "engine-delay-20261015.csv"
+        empty.write_text(content)
+        old_t = time.time() - 900
+        os.utime(empty, (old_t, old_t))
+        out3 = d3 / "e.prom"
+        r = subprocess.run([sys.executable, "-I", str(HERE / "engine_delay_prom.py"), "--dir", str(d3), "--out", str(out3), "--window", "300"], capture_output=True, text=True, timeout=30)
+        m = re.search(r"^engine_delay_logger_age_seconds ([0-9.]+)$", out3.read_text() if out3.exists() else "", re.M)
+        check(f"the newest CSV has {label}: exit 0 and a logger age of about 900 s (its modification time) is written, so a threshold on the age still fires", r.returncode == 0 and m is not None and 890 <= float(m.group(1)) <= 960, (r.returncode, out3.read_text() if out3.exists() else None, r.stderr))
+    ok_dir = Path(d) / "fresh-header"
+    ok_dir.mkdir()
+    (ok_dir / "engine-delay-20261015.csv").write_text(",".join(HEADER) + "\n")
+    r = subprocess.run([sys.executable, "-I", str(HERE / "engine_delay_prom.py"), "--dir", str(ok_dir), "--out", str(ok_dir / "e.prom")], capture_output=True, text=True, timeout=30)
+    m = re.search(r"^engine_delay_logger_age_seconds ([0-9.]+)$", (ok_dir / "e.prom").read_text(), re.M)
+    check("a CSV that was just created (a day rollover before the first row) reads as fresh, not as a failure", r.returncode == 0 and m is not None and float(m.group(1)) < 30, (r.returncode, (ok_dir / "e.prom").read_text()))
 check("no arguments: usage, exit 2", subprocess.run([sys.executable, "-I", str(HERE / "engine_delay_prom.py")], capture_output=True, text=True).returncode == 2)
 
 # ---- io_attribution_daemon: active hours
@@ -252,7 +272,9 @@ def add_dstate_proc(root, pid, comm, ppid, cmdline):
 
 IO_CASES = [("app", f"app --root=/srv/{SENT}\0".encode(), "app"), ("somecli", f"somecli\0{SENT}\0".encode(), "somecli <arg>"), ("git", b"git\0status\0", "git status"),
             ("npm", f"npm\0--opt-x\0{SENT}\0run\0build\0".encode(), "npm"), ("python3", f"python3\0-W\0{SENT}\0run_x.py\0".encode(), "python3 run_x.py"),
-            ("bash", f"bash\0-lc\0{SENT}\0".encode(), "bash -c"), ("sudo", f"sudo\0-u\0{SENT}\0git\0status\0".encode(), "sudo git status"), ("my-secret-x", None, "<proc>")]
+            ("bash", f"bash\0-lc\0{SENT}\0".encode(), "bash -c"), ("sudo", f"sudo\0-u\0{SENT}\0git\0status\0".encode(), "sudo git status"), ("my-secret-x", None, "<proc>"),
+            ("node", f"node\0--redirect-warnings\0/tmp/{SENT}.log\0app.js\0".encode(), "node"), ("python3", f"python3\0-mpytest\0/w/{SENT}/test_a.py\0".encode(), "python3 -m pytest"),
+            ("npm", f"npm\0run\0{SENT}\0".encode(), "npm run <arg>"), ("timeout", f"timeout\0{SENT}\0git\0status\0".encode(), "timeout"), ("uv", f"uv\0run\0--with\0{SENT}\0pytest\0".encode(), "uv run")]
 with tempfile.TemporaryDirectory() as d:
     root = build_fake(d)
     write_machine(root, 1)

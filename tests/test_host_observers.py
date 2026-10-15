@@ -125,6 +125,70 @@ class MutationRunnerTests(unittest.TestCase):
         self.assertIn("0 of 1 planted faults caught", text)
 
 
+class AlertMutationRunnerTests(unittest.TestCase):
+    """alert_tools_selftest.py --mutate counted every non-zero exit of a mutant run as a caught fault once its control had passed, so a later loopback-server or socket failure unrelated to the planted fault
+    scored as a detection (local review of PR 1115, 268928f0). It must tell an assertion failure, or a crash inside one of the three tools, from a run that never reached its summary or whose only
+    failures are groups that crashed in the suite's own setup."""
+
+    SUMMARY_FAIL = "7 of 9 checks passed in 7 groups, 2 FAILED\n"
+
+    def run_with_output(self, module, rc, out):
+        class Done:
+            returncode, stdout, stderr = rc, out, ""
+
+        with mock.patch.object(module.subprocess, "run", lambda *a, **k: Done):
+            return module.run_mutant(module.MUTANTS[0])
+
+    def test_failures_that_are_only_crashes_of_the_suites_own_setup_are_broken_not_caught(self):
+        module = load("alert_tools_selftest")
+        out = ("ok   [watch-live] a check\n"
+               "FAIL [watch-live] group watch-live crashed :: PermissionError in socket.py: [Errno 1] Operation not permitted\n"
+               "FAIL [replay-cli-fake-prometheus] group replay-cli-fake-prometheus crashed :: OSError in socketserver.py: [Errno 98] Address already in use\n" + self.SUMMARY_FAIL)
+        name, verdict, _info = self.run_with_output(module, 1, out)
+        self.assertEqual(verdict, "broken")
+
+    def test_a_run_that_never_reaches_its_summary_is_broken(self):
+        module = load("alert_tools_selftest")
+        self.assertEqual(self.run_with_output(module, 1, "ok   [watch-live] a check\n")[1], "broken")
+        self.assertEqual(self.run_with_output(module, -9, "")[1], "broken")
+
+    def test_an_assertion_failure_is_caught(self):
+        module = load("alert_tools_selftest")
+        out = "ok   [watch-events] a\nFAIL [watch-events] the FIRING line is printed :: got nothing\n" + self.SUMMARY_FAIL
+        self.assertEqual(self.run_with_output(module, 1, out)[1], "caught")
+
+    def test_a_crash_inside_one_of_the_three_tools_is_caught(self):
+        module = load("alert_tools_selftest")
+        out = "FAIL [replay-sim] group replay-sim crashed :: NameError in alert_replay.py: name 'x' is not defined\n" + self.SUMMARY_FAIL
+        self.assertEqual(self.run_with_output(module, 1, out)[1], "caught")
+
+    def test_a_crash_in_the_test_code_on_an_exception_that_is_no_os_or_network_error_is_caught(self):
+        """A mutant that changes the tool's output can make the test code index a list that is now empty: the group crashes, and the cause is the planted fault."""
+        module = load("alert_tools_selftest")
+        out = "FAIL [watch-events] group watch-events crashed :: IndexError in alert_tools_selftest.py: list index out of range\n" + self.SUMMARY_FAIL
+        self.assertEqual(self.run_with_output(module, 1, out)[1], "caught")
+
+    def test_a_crash_in_the_setup_beside_a_real_failure_is_caught_by_the_real_failure(self):
+        module = load("alert_tools_selftest")
+        out = ("FAIL [watch-live] group watch-live crashed :: PermissionError in socket.py: denied\n"
+               "FAIL [watch-events] the label match checks the value :: got True\n" + self.SUMMARY_FAIL)
+        self.assertEqual(self.run_with_output(module, 1, out)[1], "caught")
+
+    def test_a_clean_run_is_missed(self):
+        module = load("alert_tools_selftest")
+        self.assertEqual(self.run_with_output(module, 0, "ok   [watch-events] a\n9 of 9 checks passed in 7 groups\n")[1], "missed")
+
+    def test_a_suite_group_that_crashes_records_the_file_of_the_failing_frame(self):
+        """The classifier reads the file name out of the crash line, so the suite must write it."""
+        module = load("alert_tools_selftest")
+        module.GROUPS = {"boom": lambda: (_ for _ in ()).throw(OSError("denied"))}
+        module.RESULTS.clear()
+        out = io.StringIO()
+        with mock.patch.object(sys, "argv", ["alert_tools_selftest.py", "--only", "boom"]), contextlib.redirect_stdout(out):
+            module.main()
+        self.assertRegex(out.getvalue(), r"FAIL \[boom\] group boom crashed :: OSError in \S+\.py: denied")
+
+
 class RuleAndUnitTests(unittest.TestCase):
     def test_silence_rule_uses_the_expression_the_promql_test_checks(self):
         expr = (OBS / "promtool" / "net-silent-confirmed.expr").read_text().strip()
@@ -178,6 +242,23 @@ class RuleAndUnitTests(unittest.TestCase):
         for path in (TOOLS / "storm_snapshot_selftest.py", TOOLS / "README.md"):
             self.assertIn(pin, path.read_text(), path.name)
             self.assertIn("Lib/os.py:368-373", path.read_text(), path.name)
+
+    def test_the_permission_fix_cites_its_pinned_source(self):
+        """AGENTS.md, Code Review Rules, Corrections: the fchmod that keeps a rule file's mode under a restrictive umask cites the documentation of os.open (the umask is masked out of its mode) and os.fchmod, at
+        their pin, next to the call (local review of PR 1115, 268928f0)."""
+        text = (TOOLS / "grafana_rule_add.py").read_text()
+        call = text.index("os.fchmod(fd, mode)")
+        before = text[max(0, call - 1100):call]
+        self.assertIn("python/cpython@v3.13.16", before)
+        self.assertIn("Doc/library/os.rst:1272-1275", before)
+        self.assertIn(":1027-1030", before)
+
+    def test_the_mutation_runner_citations_name_their_reference_and_their_first_hand_measurement(self):
+        for name in ("net_probe_selftest.py", "alert_tools_selftest.py"):
+            text = (TOOLS / name).read_text()
+            self.assertIn("trailofbits/skills", text, name)
+            self.assertIn("configuration.md:134-141", text, name)
+            self.assertIn("MutationRunnerTests", text, name)
 
     def test_promql_test_with_promtool(self):
         promtool = os.environ.get("PROMTOOL") or shutil.which("promtool")
