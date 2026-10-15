@@ -1,0 +1,11 @@
+# Source-only OTLP resource policy; compose at the co-op's post-landing boundary.
+# grafana/loki v3.7.8 docs/sources/shared/otel.md, OTLP attribute mapping.
+# Retain the default label policy for every existing source. The live Collector
+# has only service.name and stream resource attributes, so it yields just those.
+limits_config:
+  otlp_config:
+    resource_attributes:
+      ignore_defaults: false
+      attributes_config:
+        - action: index_label
+          attributes: [stream]
