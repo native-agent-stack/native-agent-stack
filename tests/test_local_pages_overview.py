@@ -15,6 +15,7 @@ import re
 import sys
 import tempfile
 import unittest
+import unittest.mock
 
 ROOT = Path(__file__).resolve().parents[1]
 HERE = ROOT / "tools/local-pages"
@@ -550,6 +551,30 @@ class ComposerTests(unittest.TestCase):
                 if fragment:
                     self.assertIn(f'id="{fragment}"', target, (page, fragment))
             self.assertEqual(json.loads(receipt.read_text())["schema"], DATA.SCHEMA)
+
+    def test_overview_only_never_overwrites_the_refresh_receipt(self):
+        # The Architecture refresh rejects any other receipt kind, so a default --overview-only run that wrote the refresh
+        # receipt would leave the next full refresh UNREPORTED (the defect #1122 fixed for --layer-pages-only).
+        with tempfile.TemporaryDirectory() as base:
+            state, output = Path(base) / "state", Path(base) / "served"
+            refresh = state / "research/fullspeed-20261008/g5-stars-gap/local-pages/refresh-receipt.json"
+            refresh.parent.mkdir(parents=True)
+            refresh.write_text('{"schema": "full refresh"}\n')
+            stdout = io.StringIO()
+            with redirect_stdout(stdout):
+                code = PAGES.main(["--overview-only", "--output-dir", str(output), "--state-root", str(state)])
+            self.assertEqual(code, 0)
+            self.assertEqual(refresh.read_text(), '{"schema": "full refresh"}\n')
+            written = refresh.parent / "overview/overview-receipt.json"
+            self.assertEqual(json.loads(stdout.getvalue())["receipt"], str(written))
+            self.assertEqual(json.loads(written.read_text())["schema"], DATA.SCHEMA)
+            self.assertTrue((refresh.parent / "architecture/layer-pages-receipt.json").exists())
+            named = Path(base) / "elsewhere/refresh-receipt.json"
+            with redirect_stdout(io.StringIO()), unittest.mock.patch("sys.stderr", io.StringIO()), \
+                    self.assertRaises(SystemExit) as raised:
+                PAGES.main(["--overview-only", "--output-dir", str(output), "--state-root", str(state), "--receipt", str(named)])
+            self.assertEqual(raised.exception.code, 2)
+            self.assertFalse(named.exists())
 
     def test_navigation_lists_the_overview(self):
         html = PAGES.document("index", "Home", "", "scope", "", "2099-01-01T00:00:00Z", "a" * 64, []).decode()

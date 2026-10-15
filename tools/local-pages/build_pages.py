@@ -695,12 +695,18 @@ def main(argv: list[str] | None = None) -> int:
     output = args.output_dir or args.state_root / "coordination/command-center/local-pages"
     receipt = args.receipt or args.state_root / "research/fullspeed-20261008/g5-stars-gap/local-pages/refresh-receipt.json"
     if args.overview_only:
+        # As for --layer-pages-only: the refresh receipt records the last full refresh and is never written here.
+        refresh_receipt = receipt
+        if args.receipt is None:
+            receipt = refresh_receipt.parent / "overview/overview-receipt.json"
+        elif receipt.name == "refresh-receipt.json":
+            parser.exit(2, "local-pages: --overview-only never writes a refresh receipt; name another --receipt\n")
         try:
             refreshed = utc_now()
-            layers = load_local("architecture_builder").build_layer_pages(args.root, output, receipt.parent / "architecture/layer-pages-receipt.json",
+            layers = load_local("architecture_builder").build_layer_pages(args.root, output, layer_pages_receipt(refresh_receipt),
                                                                          state_root=args.state_root, generated=refreshed)
             result = load_local("overview_data").build_overview_page(args.root, args.state_root, output, receipt, generated=refreshed)
-        except (OSError, ValueError, KeyError, TypeError, AttributeError, ImportError) as error:
+        except LAYER_PAGE_ERRORS as error:
             parser.exit(1, f"local-pages: overview failed ({type(error).__name__}): {error}\n")
         print(json.dumps({"output_dir": str(output), "receipt": str(receipt), "generated_utc": result["generated_utc"], "commit": result["commit"],
                           "page": result["page"], "present": result["present"], "pending": result["pending"],
