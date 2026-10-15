@@ -1,0 +1,31 @@
+{
+  "attempted_calls": 161,
+  "command": [
+    "jev_trading_run.py",
+    "syn",
+    "--out",
+    "/var/tmp/syn"
+  ],
+  "created_at": "2026-10-15T06:13:22.023007+00:00",
+  "error_class": null,
+  "evidence_class": "SYN",
+  "exit_code": 0,
+  "failure_counts": {},
+  "input_sha256": {
+    "preregistration.json": "0078f45f07d2400885fd8bd63ac70ebe751a7dd86c187d41f6360fb8e118ddeb"
+  },
+  "kind": "run",
+  "network_transport": "FAKE",
+  "output_sha256": {
+    "calls.jsonl": "2cfdfc005cb3f3e53f8cb5f02fc8c62af8ca89b333a1d40c6b0870c5c6053c14",
+    "preregistration.json": "0078f45f07d2400885fd8bd63ac70ebe751a7dd86c187d41f6360fb8e118ddeb",
+    "report.json": "3a388d1ec7da9de3fce34383f705493efd872531789ef4cf0541923a1db4c2c8"
+  },
+  "projection": {
+    "kind": "private-provenance-redacted",
+    "note": "Original verification digests remain private. These hashes bind published projection bytes; superseded source digests without public preimages are omitted.",
+    "original": "<COORD>/ns2604-coop/lanes/jev-harness-private-fold/ea96de7a-evidence-originals/syn-before-final-audit/receipt.json"
+  },
+  "schema_version": 1,
+  "status": "COMPLETE"
+}

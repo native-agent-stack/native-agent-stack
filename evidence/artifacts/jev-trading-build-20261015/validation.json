@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "build_base": "0f4ee075b2ab3af1b099d5ca1ecb8cae02ee3f5b",
+  "corrected_head": "ea96de7aceb6088314753a94dc88b7232d1cc5f0",
+  "supersedes": "validation-before-review-fold.json",
+  "isolation": "bwrap: live / read-only; private /var/tmp removed after each run; fresh /dev and /proc; --unshare-net --die-with-parent; Python -B",
+  "numeric_dependencies": {"python": "3.12.3", "numpy": "2.5.3", "scipy": "1.18.1", "scikit-learn": "1.9.1"},
+  "final_tests": {
+    "command": ["<P1-python>", "-B", "-m", "unittest", "tests.test_jev_trading", "tests.test_jev_p1_casepack", "tests.test_jev_p1_scoring", "tests.test_provenance_digest_custody", "tests.test_published_digest_privacy", "tests.test_sota_sources_gate"],
+    "tests_run": 190,
+    "passed": 189,
+    "skipped": 1,
+    "exit_code": 0,
+    "skip_scope": "Existing host-name publication guard without its opt-in; the native pre-push hook runs the opted-in guard separately",
+    "trading_and_existing_p1": {"tests_run": 145, "skipped": 0, "exit_code": 0}
+  },
+  "native_sdk_mocktransport": {
+    "command": ["<P1-python>", "-B", "-m", "unittest", "tests.test_jev_trading_sdk", "tests.test_gap_crosswalk_sdk"],
+    "tests_run": 12,
+    "skipped": 0,
+    "exit_code": 0,
+    "wheel_version": "0.7.2",
+    "wheel_sha256": "0a961148187d52e18276ed7f2d02617cfac48e3b97673cb631a8749397d43d1e",
+    "install": "uv pip install --offline --no-config --no-build --no-deps --no-python-downloads --keyring-provider disabled --default-index https://pypi.org/simple --cache-dir /var/tmp/cache --target /var/tmp/packages --python <P1-python> <qualified-wheel> httpx2==2.13.1 httpcore2==2.13.1 truststore==0.10.4",
+    "cache_custody": "Read-only retained cache copied into private scratch; scratch packages and copied cache removed afterward",
+    "transport": "Vendor httpx2.MockTransport, synthetic authorization marker, socket.socket denied and no network namespace access",
+    "source": "typesafe-ai/typesafe-sdk-python@f078f1e208a0d885154dc758344ae4fce77ac168, _core/retry.py and _core/transport.py; existing adopted gap_crosswalk.call"
+  },
+  "guard_mutants": {
+    "receipt": "guard-mutants.json",
+    "count": 108,
+    "killed": 108,
+    "live_source_unchanged": true,
+    "initial_campaign": "106/107; haiku_usage_nonnegative survived because the new reservation check masked the target assertion",
+    "correction": "Reserve before invalid record(), assert invalid usage specifically; isolated rerun killed the remaining mutant. Then add per-arm retry accounting and its mutant; all 27 run.py mutants rerun against final source. Other module hashes unchanged."
+  },
+  "fail_first": [
+    {"test": "JevPrivateRecordCustodyTests.test_runtime_source_does_not_embed_private_authorization_digest; test_public_jev_evidence_has_no_private_record_or_review_digest_fields; test_private_record_citations_use_names_and_paths_only", "before": "Failed on public private-authority fields and citations", "after": "PASS; private bytes compared only from the owning private proof", "source": "Private brief/addendum and CC FULL by name/path; repository provenance custody contract at build_base"},
+    {"test": "TransportTests.test_scored_start_outside_credential_runner_has_no_scored_receipt", "before": "SCORED start did not refuse before receipt creation", "after": "PermissionError before directory creation and no dispatch", "source": "tools/credentials/credential_run.py parse_args/run_command at build_base"},
+    {"test": "TransportTests.test_sdk_adapter_delegates_to_the_pinned_native_transport", "before": "Native SDK transport seam absent; direct HTTP implementation", "after": "PASS, plus 12 native SDK MockTransport tests", "source": "typesafe-sdk 0.7.2 at f078f1e208a0d885154dc758344ae4fce77ac168; docs/decisions/2026-10-05-typesafe-sdk-transport.md"},
+    {"test": "TransportTests.test_billable_haiku_failures_consume_reservations_before_dispatch; test_haiku_first_cap_stop_latches_across_conditions_and_sets", "before": "Unknown usage recycled allowance; later smaller rows could dispatch after cap rejection", "after": "Two uncertain large reservations prevent a third call; first cap stop prevents all later rows", "source": "Private record decisions 4/8 and JV20/JV21/JV51/JV52 by name; original public HaikuBudget at corrected_head"},
+    {"test": "TransportTests.test_unknown_haiku_usage_keeps_its_budget_reservation", "before": {"head": "ea96de7aceb6088314753a94dc88b7232d1cc5f0", "calls": 619, "synthetic_admitted_upper_bounds_usd": "4.0235", "cap_usd": "3.3216", "reported_usd": "0", "exit_code": 1}, "after": {"modes": ["timeout", "malformed usage"], "calls_each": 511, "reserved_usd_each": "3.3215", "reported_actual_usd": null, "sticky_stop": true}, "source": "GPT full1 exact fake-only witness, verified on read-only original-head source overlays; private verdict cited by name only"},
+    {"test": "JevBudgetTests; TransportTests.test_jev_token_bound_stops_later_calls_without_successful_scores", "before": "Jev preflight and running token/USD bounds were not enforced", "after": "Per-model 0.386568 and combined 0.773136 caps with retained per-attempt reserves and sticky token stop", "source": "Private record decision 8/ADDENDUM-01 A2; TypeSafe API retained public capture and pinned SDK retry policy"},
+    {"test": "TransportTests.test_jev_retry_uncertainty_is_visible_in_each_arm_cost", "before": "Per-set usage_complete was true after a successful retry despite earlier attempts having unresolved charges; exit 1", "after": "Each arm retains known successful tokens but reports unknown actual USD and unresolved retry count; run-wide reservations already retained the exposure", "source": "typesafe-sdk 0.7.2 native retry-count contract and private decision 8 cost accounting"},
+    {"test": "TransportTests.test_jev_usage_above_context_ceiling_stops_and_is_not_known_spend", "before": "112 fake dispatches instead of 2; above-ceiling usage did not latch stop", "after": "2 fake dispatches, no VALID score, unknown upper bound and no trusted charge from the invalid usage", "source": "TypeSafe API default context ceiling and SDK usage schema at 0.7.2"},
+    {"test": "MetricsTests.test_ece_uses_the_accepted_returned_label_on_a_tie", "before": {"ece": 0.4, "exit_code": 1}, "after": {"ece": 0.6, "exit_code": 0}, "source": "p1_scoring.py expected_calibration_error at build_base: correctness is accepted prediction accuracy"},
+    {"test": "MetricsTests.test_paired_ece_interval_uses_the_same_accepted_label", "before": {"point_low_high": 0.2, "exit_code": 1}, "after": {"point_low_high": 0.4, "exit_code": 0}, "source": "Same ECE definition and scipy 1.18.1 stats.bootstrap; actual 10,000-draw clustered interval"},
+    {"test": "BaselineTests.test_native_factories_use_pinned_local_only_upstream_loaders", "before": "Expected revision 0bc2ac10dda6, actual superseded 4556d130; exit 1", "after": "PASS at retained prefix; full Hub revision remains unresolved offline", "source": "ProsusAI/finbert retained Hub metadata reference in screen-inputs.json"},
+    {"test": "TransportTests.test_model_minus_baseline_direction_is_preserved_by_run", "before": "Mutating the actual paired_metrics call to baseline-minus-model fails the named test", "after": "Perfect fake Jev vs uniform baseline has F1 difference +5/6 and Brier -2/3 for both models and every set", "source": "Private ADDENDUM-01 A3 joint BEATS rule; scipy 1.18.1 paired bootstrap"},
+    {"test": "JevPrivateRecordCustodyTests.test_jev_mutation_exports_omit_unpublished_failure_digests", "before": "3 failing assertions across both historical artifacts and mutation exporter", "after": "PASS; unsupported digests omitted with explicit historical projections", "source": "GPT full1 custody follow-up; existing repository provenance contract at build_base"}
+  ],
+  "review_verification_gaps": [
+    "Full finBERT Hub revision and new weights/config remain unresolved offline; research comparison retained without a licence exclusion",
+    "Original reader packets lacked private decision/JV captures, dataset preimages and several upstream mirrors; prior local frozen-source reproduction is separately retained",
+    "Native weights, paid Jev/Haiku/CLM execution, masker/auditor, acquisition and scored latency/cost remain NOT_RUN",
+    "Reviewer nested bubblewrap could not initialize its network namespace; local 108/108 isolated results are retained, independent replay remains a delta-read check",
+    "Reader archive limits affected socket/npm/git-history and read-only tmp tests; token-e2e history-dependent checks and merged native receipt remain co-op verification work",
+    "Reader reported test_new_wsl_definitive_defaults flaky; its serial pass did not establish a genuine merged-worktree pass",
+    "Exactly-1-percent wording requires owner reconciliation before any population extension; all frozen counts agree",
+    "Older unanchored registry locators predate this PR; follow-up must preserve their historical revision context",
+    "CI and both post-fold family deltas are separate co-op/trading-cc acceptance; no scored run authorized by this evidence"
+  ],
+  "repository_validation": {
+    "command": "python3 scripts/validate.py",
+    "status": "PASS",
+    "exit_code": 0,
+    "components": 71,
+    "hashed_files": 12074,
+    "profiles": 4,
+    "receipts": 240,
+    "initial_publication_preflight": "Failed because the historical SYN calls.jsonl was hash-listed but ignored/untracked. Force-added that exact synthetic fixture; the staged-tree rerun passed."
+  },
+  "scored_run": "NOT_RUN",
+  "build_network_calls": 0,
+  "credential_reads": 0
+}

@@ -243,5 +243,51 @@ class SyntheticDetectorTests(unittest.TestCase):
         self.assertEqual(findings(self.root), {})
 
 
+class JevPrivateRecordCustodyTests(unittest.TestCase):
+    """Private authorizations/reviews are name/path references, never public digests."""
+
+    def test_jev_mutation_exports_omit_unpublished_failure_digests(self):
+        root = ROOT / "evidence/artifacts/jev-trading-build-20261015"
+        for path in root.glob("guard-mutants*.json"):
+            with self.subTest(path=path.name):
+                self.assertNotIn('"failure_sha256"', path.read_text())
+        source = ROOT / "blueprints/native-skill-practice/p1/jev_trading_mutants.py"
+        self.assertNotIn('"failure_sha256"', source.read_text())
+
+    def test_runtime_source_does_not_embed_private_authorization_digest(self):
+        import ast
+        path = ROOT / "blueprints/native-skill-practice/p1/jev_trading_run.py"
+        found = 0
+        for node in ast.walk(ast.parse(path.read_text())):
+            if isinstance(node, ast.Assign) and isinstance(node.value, ast.Constant) and isinstance(node.value.value, str):
+                names = [target.id for target in node.targets if isinstance(target, ast.Name)]
+                if any("ADDENDUM" in name or "PRIVATE_RECORD" in name for name in names) and DIGEST.fullmatch(node.value.value):
+                    found += 1
+        self.assertEqual(found, 0, "private authorization digest must be read privately at runtime")
+
+    def test_public_jev_evidence_has_no_private_record_or_review_digest_fields(self):
+        private_keys = {"addendum_sha256", "record_sha256", "source_evidence_sha256", "two_family_reads", "amendment_sha256"}
+        def count(node):
+            if isinstance(node, dict):
+                return sum(len(DIGEST.findall(json.dumps(value))) if key in private_keys else count(value)
+                           for key, value in node.items())
+            if isinstance(node, list):
+                return sum(count(value) for value in node)
+            return 0
+        root = ROOT / "evidence/artifacts/jev-trading-build-20261015"
+        findings = {path.relative_to(ROOT).as_posix(): count(json.loads(path.read_text())) for path in root.rglob("*.json")}
+        self.assertEqual({path: n for path, n in findings.items() if n}, {}, "private evidence digest field counts only")
+
+    def test_private_record_citations_use_names_and_paths_only(self):
+        paths = ("blueprints/native-skill-practice/p1/JEV-TRADING.md",
+                 "docs/decisions/2026-10-15-jev-trading-harness-build.md")
+        for name in paths:
+            with self.subTest(path=name):
+                # These introductions cite private authority. Public upstream
+                # package/dataset digests belong to their later source sections.
+                text = "\n".join((ROOT / name).read_text().splitlines()[:20])
+                self.assertEqual(len(DIGEST.findall(text)), 0, "private citations contain a digest")
+
+
 if __name__ == "__main__":
     unittest.main()

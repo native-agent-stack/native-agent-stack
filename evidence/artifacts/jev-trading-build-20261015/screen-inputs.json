@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "evidence_class": "source_review",
+  "source_record": "coordination/ns2604-coop/work-20261012/jev-screen-20261015/SCREEN-jev-typesafe-20261015.md, section 5",
+  "status": "PROPOSED_NOT_RUN",
+  "activation": "Separate sealed addendum and each named input; not admitted by this build or BEATS",
+  "finbert": {
+    "repository": "ProsusAI/finbert",
+    "revision_prefix": "0bc2ac10dda6",
+    "full_revision": null,
+    "full_revision_status": "UNRESOLVED_OFFLINE",
+    "capture_record": "coordination/ns2604-coop/work-20261012/jev-screen-20261015/CLAUDE-ARM.md, retained Hub metadata read",
+    "licence": "cc-by-nc-sa-4.0",
+    "disposition": "USE for research comparison",
+    "redistribution": false,
+    "licence_gate_or_exclusion": false,
+    "native_weights_tested": false
+  },
+  "external_comparison": {
+    "source": "Stefan Jansen, Testing Jev on Financial Documents, insights.ml4trading.io, 2026-10-13; reported in the retained screen",
+    "task": "11-category 8-K classification with numbers and headings removed",
+    "filings": 3006,
+    "reported_percentages": {"jev-1.13.0": 79.3, "logistic_regression": 89.4, "lightgbm": 91.3},
+    "trained_models_overtake_at_labels": 800,
+    "primary_article_and_code_reverified_offline": false,
+    "harness_measurement": false,
+    "disposition": "Supports the existing joint macro-F1/Brier BEATS rule; does not replace it"
+  },
+  "rejected_integrations": [
+    {"repository": "virattt/ai-hedge-fund", "pin": "78b779c1", "reason": "judgments used in an order path"},
+    {"repository": "OpenByteInc/QuantDinger", "pin": "ba8cd667", "reason": "judgments used in an order path"}
+  ],
+  "proposed_tests": [
+    {"id": "T0", "scope": "Version parity and ten frozen drift cases", "readiness": "Versioned IDs, frozen requests and drift subset"},
+    {"id": "T1", "scope": "8-K item and within-item subtype comparisons", "readiness": "Acquisition receipt, ACCEPTANCE-DATETIME availability clock, after-hours regression and frozen labels"},
+    {"id": "T2", "scope": "Offerings, ATM and overhang against form rules and trained classifiers", "readiness": "Acquired corpus, labels and frozen training/holdout split"},
+    {"id": "T3", "scope": "Custody-cleared news and newness", "readiness": "Publisher availability clocks, custody clearance and deduplication baseline"},
+    {"id": "T4", "scope": "Going-concern interpretation against phrase rules", "readiness": "Frozen text, labels and deterministic phrase-rule comparator"},
+    {"id": "T5", "scope": "Halt notices and free-text cases", "readiness": "Timestamped notices, availability clock and frozen case/label packet"},
+    {"id": "T6", "scope": "Named, blind and wrong-identity cases plus existing canaries", "readiness": "Frozen identity transformations and separate audit inputs"},
+    {"id": "T7", "scope": "Post-model-release holdout", "readiness": "Verified release boundary and preregistered minimum case count"},
+    {"id": "T8", "scope": "Tradeability of admitted features only", "readiness": "Separate feature admission and upstream-engine historical end-to-end verification"},
+    {"id": "T9", "scope": "Order-path guard", "readiness": "Separate order-path admission; no build authorization"},
+    {"id": "T10", "scope": "Cost, p95 latency and coverage", "readiness": "Owning runner's scored receipts and complete workload ledgers"}
+  ]
+}

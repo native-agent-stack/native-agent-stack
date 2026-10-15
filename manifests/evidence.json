@@ -10567,9 +10567,54 @@
       "bytes": 23044
     },
     {
+      "path": "blueprints/native-skill-practice/p1/JEV-TRADING.md",
+      "sha256": "267a2487d8a9d29d6751ce5a712db57e1c973860bb5cff64ac4cf249f3f39197",
+      "bytes": 17900
+    },
+    {
       "path": "blueprints/native-skill-practice/p1/README.md",
-      "sha256": "c9fdd718cbb253feafe20c960e8a02ae07a52211faddb35e48fdf7890b718a93",
-      "bytes": 24918
+      "sha256": "7deee69531e9c128c14bf318c8839a43a1b4eeab9c9fbfd11b5433fcc15299dd",
+      "bytes": 25268
+    },
+    {
+      "path": "blueprints/native-skill-practice/p1/jev_trading_baselines.py",
+      "sha256": "c6353165d0dac35cd33d4703a9506d304670e5b3a1fed0762d594eae2c5f8b24",
+      "bytes": 7854
+    },
+    {
+      "path": "blueprints/native-skill-practice/p1/jev_trading_budget.py",
+      "sha256": "a17ccc157ca6a67589991e6a6bc2dead7a94df93a5d88baf79eaf3b7400c8e7c",
+      "bytes": 5123
+    },
+    {
+      "path": "blueprints/native-skill-practice/p1/jev_trading_canaries.py",
+      "sha256": "3e3ae0c32dbf4c5286b6028e8306c94e5e231c7f3fe69397c1fe8b5d006c7e23",
+      "bytes": 7207
+    },
+    {
+      "path": "blueprints/native-skill-practice/p1/jev_trading_cases.py",
+      "sha256": "540c4629c9ffe3dbc2b0d1104c8332a7f7dcd70b1e6fa55b07a91d1b2caa1d32",
+      "bytes": 7493
+    },
+    {
+      "path": "blueprints/native-skill-practice/p1/jev_trading_custody.py",
+      "sha256": "92757586e1ccbc4ca08ffbbd25102423fcba502608de05fdcf82621e466fabda",
+      "bytes": 5984
+    },
+    {
+      "path": "blueprints/native-skill-practice/p1/jev_trading_mutants.py",
+      "sha256": "264246e788fc974355528f12ecb256b0dd887c2575924cc9c3df12998961a9e6",
+      "bytes": 25041
+    },
+    {
+      "path": "blueprints/native-skill-practice/p1/jev_trading_run.py",
+      "sha256": "0c4f13d53234c7a313955147406ccd7fecabb572b77fb13027adedb60e1fb19b",
+      "bytes": 31127
+    },
+    {
+      "path": "blueprints/native-skill-practice/p1/jev_trading_scoring.py",
+      "sha256": "2b32407d36cb4cd580a0368eddfa5131ee63082f6b1cdc065b271f6d5bd195e0",
+      "bytes": 10844
     },
     {
       "path": "blueprints/native-skill-practice/p1/l_nli_provider.py",
@@ -19195,6 +19240,11 @@
       "path": "docs/decisions/2026-10-14-stream-integrity-followups.md",
       "sha256": "b2ea42bd0d9314292b8e5ce5b44307719f27679622956e55429685f3343ce077",
       "bytes": 13866
+    },
+    {
+      "path": "docs/decisions/2026-10-15-jev-trading-harness-build.md",
+      "sha256": "cbf1ff9120d3aa1e5687b53240896ecb54dccf6782eef833590851a4ddfc78fd",
+      "bytes": 8484
     },
     {
       "path": "docs/decisions/2026-10-15-model-currency-landscape-check.md",
@@ -37350,6 +37400,111 @@
       "path": "evidence/artifacts/jev-p1-20261003/freeze-manifest.draft.json",
       "sha256": "db5bd2869276d35d1e07bb3d2b6d1970fdee2f0f6459427d424be2bbc528c92f",
       "bytes": 5824
+    },
+    {
+      "path": "evidence/artifacts/jev-trading-build-20261015/README.md",
+      "sha256": "b3f623da72edb411952ddf7bf75cd2ade5784d937b7571692e94feb89de79c83",
+      "bytes": 3274
+    },
+    {
+      "path": "evidence/artifacts/jev-trading-build-20261015/frozen-source-check.json",
+      "sha256": "01cd581e3d15f9bf1cf149e9b05f0e30b5152f5b3100954edf8bc6637bf99156",
+      "bytes": 6271
+    },
+    {
+      "path": "evidence/artifacts/jev-trading-build-20261015/guard-mutants-before-final-audit.json",
+      "sha256": "bb21c99e70b414358b01fc31112db57d99f8c29f8e3503db9aaf4d332ee3837d",
+      "bytes": 27758
+    },
+    {
+      "path": "evidence/artifacts/jev-trading-build-20261015/guard-mutants-before-review-fold.json",
+      "sha256": "a765b6f9a94069ed97b6192b31cf9710a92e12e5536152dfa7c8be3e25620c5b",
+      "bytes": 28899
+    },
+    {
+      "path": "evidence/artifacts/jev-trading-build-20261015/guard-mutants.json",
+      "sha256": "8742af28153fa21d932b489a8e8567e14f9d4ac543f6aba0ae27359a118663e4",
+      "bytes": 54400
+    },
+    {
+      "path": "evidence/artifacts/jev-trading-build-20261015/screen-inputs.json",
+      "sha256": "2c3ac45f96da9b65de6590912218aff924d1b37e7e6628daddbb166ae34ac767",
+      "bytes": 3377
+    },
+    {
+      "path": "evidence/artifacts/jev-trading-build-20261015/source-review.json",
+      "sha256": "7931dd8527b0c0030579b19a62f97468a54c31e400bda65fa35c218038c21cb1",
+      "bytes": 3535
+    },
+    {
+      "path": "evidence/artifacts/jev-trading-build-20261015/syn-before-final-audit/calls.jsonl",
+      "sha256": "2cfdfc005cb3f3e53f8cb5f02fc8c62af8ca89b333a1d40c6b0870c5c6053c14",
+      "bytes": 131350
+    },
+    {
+      "path": "evidence/artifacts/jev-trading-build-20261015/syn-before-final-audit/preregistration.json",
+      "sha256": "0078f45f07d2400885fd8bd63ac70ebe751a7dd86c187d41f6360fb8e118ddeb",
+      "bytes": 11135
+    },
+    {
+      "path": "evidence/artifacts/jev-trading-build-20261015/syn-before-final-audit/receipt.json",
+      "sha256": "f56aafa4c817dac5fb331cee021d904f254baab52260fcece5bf73a794f5fbc6",
+      "bytes": 1142
+    },
+    {
+      "path": "evidence/artifacts/jev-trading-build-20261015/syn-before-final-audit/report.json",
+      "sha256": "3a388d1ec7da9de3fce34383f705493efd872531789ef4cf0541923a1db4c2c8",
+      "bytes": 24898
+    },
+    {
+      "path": "evidence/artifacts/jev-trading-build-20261015/syn-before-review-fold/calls.jsonl",
+      "sha256": "2cfdfc005cb3f3e53f8cb5f02fc8c62af8ca89b333a1d40c6b0870c5c6053c14",
+      "bytes": 131350
+    },
+    {
+      "path": "evidence/artifacts/jev-trading-build-20261015/syn-before-review-fold/preregistration.json",
+      "sha256": "4a67a13dad845603f4054e3b7c965cfaded2effc6a249226a3b10fd2b198d70e",
+      "bytes": 7333
+    },
+    {
+      "path": "evidence/artifacts/jev-trading-build-20261015/syn-before-review-fold/receipt.json",
+      "sha256": "73139108e3a0ef6362308a67aa5b202af0f62e1905d9b62c4777623877aee233",
+      "bytes": 1571
+    },
+    {
+      "path": "evidence/artifacts/jev-trading-build-20261015/syn-before-review-fold/report.json",
+      "sha256": "010ff904bde1c2bd80bea31290b9c0d86996708bafc04dc97bbcde585249b228",
+      "bytes": 24654
+    },
+    {
+      "path": "evidence/artifacts/jev-trading-build-20261015/syn/calls.jsonl",
+      "sha256": "2cfdfc005cb3f3e53f8cb5f02fc8c62af8ca89b333a1d40c6b0870c5c6053c14",
+      "bytes": 131350
+    },
+    {
+      "path": "evidence/artifacts/jev-trading-build-20261015/syn/preregistration.json",
+      "sha256": "9d457f042131bdccf4f604cdbf8d723fdea790220e2a4105e742286e0fa32708",
+      "bytes": 7914
+    },
+    {
+      "path": "evidence/artifacts/jev-trading-build-20261015/syn/receipt.json",
+      "sha256": "05acbfa001404a301c191da37e1654fe9f30afa877f0c9480391d5507e26cdf0",
+      "bytes": 2216
+    },
+    {
+      "path": "evidence/artifacts/jev-trading-build-20261015/syn/report.json",
+      "sha256": "1f0441dbf2e75b955fb13b51fd501764f2095acc18e2a3447c186e6752c38781",
+      "bytes": 25557
+    },
+    {
+      "path": "evidence/artifacts/jev-trading-build-20261015/validation-before-review-fold.json",
+      "sha256": "45b289c6f4dc0310d4d9443133eac7f84c246f12e1bc82a8cdd179909f2f2a5e",
+      "bytes": 4548
+    },
+    {
+      "path": "evidence/artifacts/jev-trading-build-20261015/validation.json",
+      "sha256": "e2bd80c2ce869371074344184ec7e660025c9195aa404ef2757c241232ee06f9",
+      "bytes": 9652
     },
     {
       "path": "evidence/artifacts/k4-timing-gc-20261003/summary.json",
@@ -63367,6 +63522,16 @@
       "bytes": 37886
     },
     {
+      "path": "tests/test_jev_trading.py",
+      "sha256": "3012558bb9a3ac51ef5a8c818a962d1b8b7f369e9b677a6ba0bda81b1cae39b2",
+      "bytes": 60247
+    },
+    {
+      "path": "tests/test_jev_trading_sdk.py",
+      "sha256": "223797d96a8195db2f5f119f98a008e8ba79bb3ed31078f13799e86bdd4df027",
+      "bytes": 3753
+    },
+    {
       "path": "tests/test_job_recovery.py",
       "sha256": "a985c9971492a945d8add60abf9fc77c5feab337c7f1fcd413643545024c4c20",
       "bytes": 3534
@@ -63818,8 +63983,8 @@
     },
     {
       "path": "tests/test_provenance_digest_custody.py",
-      "sha256": "655de5fd4d29768548b39f115052ede005624b76c48e426b641384c097f9fc51",
-      "bytes": 12597
+      "sha256": "e88d23d9c25186a2d373879d86fd8513b845fb1c897ccae69f1306599a7c2cd9",
+      "bytes": 15448
     },
     {
       "path": "tests/test_public_starred.py",

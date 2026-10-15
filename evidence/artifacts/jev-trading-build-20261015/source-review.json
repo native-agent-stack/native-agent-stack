@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "evidence_class": "source_review",
+  "network_requests": 0,
+  "current_screen_record": "coordination/ns2604-coop/work-20261012/jev-screen-20261015/SCREEN-jev-typesafe-20261015.md",
+  "finbert_revision_update": "screen-inputs.json; retained prefix 0bc2ac10dda6, full revision unresolved offline; the card/config captures below precede this update",
+  "sdk": {
+    "repository": "typesafe-ai/typesafe-sdk-python",
+    "version": "0.7.2",
+    "commit": "f078f1e208a0d885154dc758344ae4fce77ac168",
+    "wheel_sha256": "0a961148187d52e18276ed7f2d02617cfac48e3b97673cb631a8749397d43d1e",
+    "source": "src/typesafe_sdk/_core/retry.py, _core/transport.py, _core/response_types.py",
+    "native_transport": "tools/sota-convergence/gap_crosswalk.py::call",
+    "verification": "Qualified retained wheel verified offline; vendor MockTransport tests, no sockets or model calls"
+  },
+  "captures": {
+    "typesafe-api.md": {
+      "sha256": "6b760275f89341fe15cff80c28aacae94d7d0c0c99afcd987ec0bca680b5713a",
+      "bytes": 11344
+    },
+    "hf-card-finbert.md": {
+      "sha256": "23bf85400efe1e88cbe2bf79cec8c5ff81fe9806c599f3ca85e18288ab871008",
+      "bytes": 1476
+    },
+    "hf-config-finbert.json": {
+      "sha256": "f6449ddda85eb726207a40be59c0cd3bd4b142ccb27298d5e45f9ae3396b1abe",
+      "bytes": 758
+    },
+    "hf-card-nemotron-1b.md": {
+      "sha256": "6e811480c966ca54fca9a5cbd0e5ae60df15244bfc70bb9db155c2b92fa23f8e",
+      "bytes": 36297
+    },
+    "hf-card-clm-8b.md": {
+      "sha256": "4e738e65332f1cd55fb2767c37e634f1f650388cf42c2675b38291a1bedfb660",
+      "bytes": 5144
+    }
+  },
+  "installed_sources": {
+    "bootstrap": {
+      "module": "scipy.stats._resampling",
+      "sha256": "c32c8d5207d9c3ad54247bea9c19afc9afbf303fe60ca922ae86014fa5d04fdd",
+      "file": "_resampling.py",
+      "first_line": 297
+    },
+    "binomtest": {
+      "module": "scipy.stats._binomtest",
+      "sha256": "66c0a2c6717e806e51fb6ab102ad841a00e36922eb9e801b6336756eb4c7b42b",
+      "file": "_binomtest.py",
+      "first_line": 182
+    },
+    "f1_score": {
+      "module": "sklearn.metrics._classification",
+      "sha256": "e9cbb3811a13a2f69e51ae97d27605d4b28d5bdbcb5c136b63df7eaca2ada0a0",
+      "file": "_classification.py",
+      "first_line": 1429
+    },
+    "brier_score_loss": {
+      "module": "sklearn.metrics._classification",
+      "sha256": "e9cbb3811a13a2f69e51ae97d27605d4b28d5bdbcb5c136b63df7eaca2ada0a0",
+      "file": "_classification.py",
+      "first_line": 3702
+    },
+    "train_test_split": {
+      "module": "sklearn.model_selection._split",
+      "sha256": "78072f5c87abc9c42f88d49596b0db087643737b073841f8b8b2797588418ad6",
+      "file": "_split.py",
+      "first_line": 2779
+    },
+    "LogisticRegression": {
+      "module": "sklearn.linear_model._logistic",
+      "sha256": "1f4a019bfad745184ddf29f0ada8719e3f0a24c6659901683480ab6052f9915f",
+      "file": "_logistic.py",
+      "first_line": 974
+    }
+  },
+  "source_locator": "inspect.unwrap before getsourcefile; CPython 3.12 inspect.unwrap follows __wrapped__ to the original implementation",
+  "private_records": [
+    {
+      "name": "case-set decision",
+      "path": "us-equities-trading/docs/decisions/2026-10-11-jev-harness-case-sets.md"
+    },
+    {
+      "name": "JV1-JV52 evidence",
+      "path": "us-equities-trading/docs/decisions/evidence/jev-harness-sources-20261011.md"
+    },
+    {
+      "name": "ADDENDUM-01",
+      "path": "coordination/trading-cc/specs/jev-trading-20261015/JEV-HARNESS-ADDENDUM-01.md"
+    }
+  ]
+}
