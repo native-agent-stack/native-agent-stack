@@ -52,6 +52,14 @@ The owner's directions of 2026-10-15, paraphrased:
   the new distribution.
 - **20:04Z, to the CC:** install that full landscape, but enable each framework only for the sessions and agents it
   suits, as context engineering.
+- **20:09Z-20:18Z, to the CC:**
+  - each model family's runtime workers get their own full-landscape stack, including the fully harnessed SDK and
+    framework workers;
+  - GitHub automation covers the whole lifecycle, with reviews from more than one model family;
+  - a new private repository holds the new distribution's runtime ecosystem as code, with local-first enforcement
+    (Decision 1).
+- **20:41Z, to the CC:** full access at every layer on the new distribution, with GitHub automation at the highest
+  quality (Decision 10).
 
 The CC recorded these in its direction records of 2026-10-15 (18:09Z, 19:12Z and 19:46Z, each with its addenda) and its
 handover set of the same day. These are private records, cited by name only.
@@ -82,7 +90,8 @@ Per [the protocol](2026-10-11-layer-resolution-protocol.md), steps 1 to 3, at `o
   - the unswept model-routes layer (F5, a Codex lane);
   - the Claude Code 2.1.300 floor in the profiles (#1128);
   - practice-skill currency (#1171) and the gap-ledger rows (#1147, #1157, #1158, #1160, #1169);
-  - the trading lane's fast-path work (the H1 stream hub, scanner v1, the Jev classifier path) in the trading repository.
+  - the trading lane's fast-path work (the H1 stream hub, scanner v1) and its Jev feature path off the order path
+    (Decision 4), in the trading repository.
 
 **Delta only.** This record dispatches no new survey. Each change below is one of the protocol's delta kinds:
 
@@ -173,7 +182,7 @@ what the new distribution installs only when its result lands.
 | Resolution practice | `docs/decisions/2026-10-11-layer-resolution-protocol.md` | this record's inputs and wave order |
 | CC practice and evidence | the claude-native-practice skill and its re-pin | Decision 8 |
 | Compounding manifest | the `final-stack.json` generator, the evidence manifests | the lineage-gap check (Decision 2); the generated status page (#1175) |
-| GitHub automation | git-github-automation, ci-supply-chain | stage C rows (worktrunk, gh, difftastic, zizmor, syft, actionlint) |
+| GitHub automation | git-github-automation, ci-supply-chain | stage C rows (worktrunk, gh, difftastic, zizmor, syft, actionlint); the full-lifecycle, multi-family review automation in horizon (Decision 1, the CC's addendum-05 ruling 2); GitHub access (stage G, Decision 10) |
 | Models | model-routes (GAP, unswept), agent-sdks; Muse, OpenAI through OmniRoute, the Anthropic API | Decision 5; the `gpt-gateway` row (Decision 3); F5 sweeps model-routes |
 
 The CC's 19:46Z ruling 4 adds to these areas. Each addition falls in T1's harness layers and enters by the protocol:
@@ -204,11 +213,34 @@ The CC's 19:46Z ruling 4 adds to these areas. Each addition falls in T1's harnes
 - **Harvested as cited candidates:**
   - the always-loaded instruction budget check (8,192 bytes in total, 200 lines per file; the kit's last commit);
   - the checksummed guard-hook packaging (`plugin/hooks/SHA256SUMS`).
-- **A new repository: not now.** Every stage below runs from files already on main, with their checks. The kit was the
-  last new-repository attempt, and it stalled before any host use.
-  - Revisit if the boundary run shows the new distribution needs a host-private artifact that the public repository's
-    privacy rules keep out.
-  - The private records remote of the continuity design is the place for private state, not a new code repository.
+- **A new repository: superseded on 2026-10-15.** This decision first said "not now". The owner's directions of
+  16:09-16:18 ET, recorded in the CC's addenda 05, 06, 07 (with erratum-01) and 08 to its 19:12Z direction, replace it:
+  - horizon is the private home of NativeHorizonNY's runtime ecosystem as code. It was created as
+    `native-agent-stack/horizon` and moves to `seathatflowsinourveins/horizon` when the transfer lands. Only the
+    owner's personal account can give a private repository a ruleset; the organisation's free plan refuses one
+    (addendum-08). horizon covers host
+    configuration and install stages, the per-family runtime stacks and worker profiles, the role-assignment matrix,
+    the CC, co-op and god-view tooling, session relaunch, the multi-family GitHub automation, and the ecosystem's
+    self-maintenance (sweeps, practice audits, currency and invoke-rate checks).
+  - **Local-first enforcement.** The local gates are primary, and GitHub only refuses a merge that skipped them.
+    - The CC lander is the only merge path. It requires both families' verdict files bound to the head and the local
+      CI receipts at that head.
+    - The lander posts those results as required statuses at the head SHA (local CI and each review family's
+      verdict). A ruleset on main requires a pull request and those statuses, and blocks force-pushes and deletion.
+      A merge queue would still need Enterprise Cloud, and no hosted CI is required.
+    - Agents are denied pushes to main, and a pre-push hook in every clone refuses them.
+    - The self-maintenance audit alerts on any commit on main that the lander did not land.
+    - GitHub Actions there are optional, never required.
+  - **The split.** native-agent-stack stays the public source of research, catalogs, decisions and evidence;
+    us-equities-trading stays the private trading code; ecosystem-records stays the private sealed history. horizon
+    pins them by commit, copies nothing wholesale, and is seeded only from landed, converged pieces.
+  - The route followed addendum-05 ruling 3: an audit of the existing private repositories (keep, fix or retire), a
+    decision record, the owner's choice of name and visibility, then creation. api-actions created the repository on
+    2026-10-15 and owns that route's records, its landing mode and the repository-topology decision record. This
+    plan's stages still run from files on main until horizon's pieces land there.
+  - The text it replaces, kept as history: not now, because every stage runs from files already on main and the kit,
+    the last new-repository attempt, stalled before any host use. It was to be revisited only if the boundary run
+    showed a host-private artifact, and private state went to the continuity design's private records remote.
 
 ## Decision 2: the plan binds to generated sources, not to a hand-written tool list
 
@@ -220,8 +252,9 @@ The CC's 19:46Z ruling 4 adds to these areas. Each addition falls in T1's harnes
 | D. Client configuration | recipe F9: `tools/adoption/new_wsl_client_config.py --apply --host <host>` | `--check`; the apply receipt | the template-behind rows of the [reconciliation record](2026-10-15-claude-host-config-reconciliation.md); the memory-owner row (its executable); the per-row port change (the collector port, Decision 3) |
 | H. Harness landscape (Decision 9); it follows stage C, and is listed after D because its client-level installs need D | the co-op's screen tables; each candidate's vendor install path | one check per candidate, its recorded inverse, invoke wiring and a FINAL or TRIAL label; the role-assignment matrix's per-role checks | stage C; for client-level installs, stage D; for a candidate that starts a service, the port and isolation rules (Decisions 2 and 3) |
 | E. Sign-ins | recipe F9: `codex login`, then `claude`, by hand | the after-sign-in checks of `accept.sh` that read no service port | the owner: credentials and sign-ins are the owner's |
-| S. Services | the plan's service-health stage, then the after-sign-in checks that need a service | `accept.sh --stage service_health`; `accept.sh --only <slot> --stage after_sign_in` for the nine rows whose check needs the gateway (`omniroute.service`): mcp-inspector, grafana, inspect-ai, promptfoo, cross-family-review, gpt-gateway, agent-runtime-worker, lm-program-optimization and research-harnesses | the per-row port gap below, closed for the checks' own ports too; the listener-ownership check (Decision 3) |
-| F. Records and lanes | GitHub clones; the continuity design's private records remote | the boundary receipt | the CC's handover index; trading-cc's move sheets |
+| S. Services | in order: activation (after the port and isolation proofs, each service row's units are enabled and started with `systemctl --user enable --now`, and Dagu gets its installer's own service mode after its no-service install); the plan's service-health stage, which runs after the service starts (`evidence/artifacts/new-wsl-install-plan-20261002/README.md:41`); the gateway's provider sign-in (an owner act); then the after-sign-in checks that need a service | the activation receipt; `accept.sh --stage service_health`; `accept.sh --only <slot> --stage after_sign_in` for the nine rows whose check needs the gateway (`omniroute.service`): mcp-inspector, grafana, inspect-ai, promptfoo, cross-family-review, gpt-gateway, agent-runtime-worker, lm-program-optimization and research-harnesses | the per-row port gap below, closed for every listener and for the checks' own ports; the listener-ownership check (Decision 3) |
+| G. GitHub access (Decision 10) | api-actions' access manifest in horizon: identities, scopes, repositories, token lifetimes and each repository's required checks, as names and scopes only | the manifest's checks, the hooks in every clone, and the access audit | the manifest landed in horizon; the owner's steps (Owner acts) |
+| F. Records and lanes | GitHub clones; the continuity design's private records remote | the boundary receipt | stage G; the CC's handover index; trading-cc's move sheets |
 
 - **Order.** The new distribution runs neither `adoption/bootstrap-linux.sh --profile` nor `--configure-full-profile`
   (recipe F9). The install plan's `install.sh` order is the install order. `scripts/new_host_grand_list.py --check` (exit
@@ -237,8 +270,9 @@ The CC's 19:46Z ruling 4 adds to these areas. Each addition falls in T1's harnes
   - "Through F3" carries F3's return obligation. Its rootless-container proof needs an engine. When none is installed,
     the recipe records the check as owed, runs F4, F5 and the engine setup, then returns to the proof before F9 or R1's
     acceptance (`adoption/platforms/linux-wsl2-new-distro.md:954-961` at `8053f14e7`). An owed check is not a pass.
-  - A failed proof takes the recipe's recovery order (`:705-710`): terminate only the new distribution, export its
-    failed state, and unregister only that name.
+  - A failed proof takes the recipe's recovery order (`:707-710`): terminate only the new distribution, export its
+    failed state, and unregister only that name. The time-zone pair is the one exception: a mismatch is recorded and
+    stops the run for review, and that recovery does not run for it (`:705-707`).
 - **Interim stage C.** Until the no-start mode and the per-row ports land (Decision 3), stage C runs
   `install.sh --only <slot>` in plan order and skips seven rows:
   - `memory-owner`: it starts ai-memory on 29374, NativeStack2604's live memory owner, and points Codex hooks at
@@ -249,9 +283,20 @@ The CC's 19:46Z ruling 4 adds to these areas. Each addition falls in T1's harnes
   - `gpt-gateway`: it needs the composition tarball.
   - `container-engine`: already installed at F3.
   - `embedding-model` and `local-generation-model`: named-only.
-- **What the rows start (`install.sh` at `8053f14e7`).** The skipped rows hold every persistent start: `enable --now`
-  for ai-memory (`:467`), Ollama (`:739`) and Docker (`:852`), and Dagu's `--service yes` (`:830`). The rows that ran
-  are not all start-free:
+- **What the rows start (`install.sh` at `8053f14e7`).** The persistent starts are `enable --now` for ai-memory
+  (`:467`), Ollama (`:739`) and Docker (`:852`), and Dagu's `--service yes` (`:830`). Skipping their rows does not hold
+  them all, and the rows that ran are not all start-free:
+  - **Docker through a dependency.** Selecting `harbor-containerized-agent-e2e-runner` or `docker-compose` sets
+    `needs_docker` (`:1155`), and the installer then runs `run_slot container-engine` (`:1249-1250`) with no second
+    selection check (`:1183-1186`). That path installs the engine's packages and runs
+    `systemctl --user enable --now docker.service` (`:844-852`).
+    - Both rows ran in interim stage C, and each log shows `container-engine | install | 0`.
+    - The engine was already installed and active from F3, so the packages were already the newest and the user unit
+      stayed active and enabled. Rootless Docker serves a Unix socket, and the guard recorded no new listener after
+      either row.
+    - Excluding `container-engine` therefore did not keep the engine path from running, so the no-start mode has to
+      cover this dependency path too. Until it does, each of these two rows counts as a service-starting row under the
+      rule below, with F3's rootless-container proof as the engine's isolation proof.
   - `mineru` starts the MinerU server for its own commands and stops it on exit (`:380`). It ran in interim stage C,
     and its log shows `Server started` and `Server stopped`. Measured afterwards with the installed MinerU 4.0.10 on
     both distributions, `mineru server status --json` reports the socket `~/.mineru/doclib.sock` and `tcp.enabled`
@@ -301,6 +346,12 @@ The CC's 19:46Z ruling 4 adds to these areas. Each addition falls in T1's harnes
     (alerting), 21128 (gpt-gateway), 21300 and 21396 (loki), 21301 (grafana), 21318, 21333 and 21888 (the collector),
     21808 (session-analytics), 29374 (memory-owner) and the host template's 21633 and 28231. Only 21434 (the model
     server) is free.
+  - A row can bind more than one port. A second measurement on 2026-10-15 compared every port named in the plan's
+    `config/`, `install.sh` and `accept.sh` (at `8053f14e7`) with NativeStack2604's listeners. Four more are bound there:
+    - the gateway's WebSocket listeners 21129 and 21131 (`config/omniroute.service:22-23`, beside its 21128);
+    - the collector's OTLP receiver 21317 and its telemetry endpoint 21889 (`config/otel.yaml:9` and `:464`).
+    - So every listener a service row binds gets its own per-row port, not only the row's main port, and the stage-S
+      ownership check covers each one.
   - F8 picks the host file's ports outside the workstation's set (done: memory 23374, Qdrant 23633, embedder 23231).
   - The collector's 21318 is the recipe's exception, a conflict to resolve before F9
     (`adoption/platforms/linux-wsl2-new-distro.md:1068-1072` at `8053f14e7`): the client-configuration tool renders it
@@ -311,23 +362,34 @@ The CC's 19:46Z ruling 4 adds to these areas. Each addition falls in T1's harnes
     `ecosystem-*` stack, while the plan's observability files come from its own renderer
     (`evidence/artifacts/new-wsl-install-plan-20261002/config/observability_config.py`).
   - **Named gap on the living plan, part 1: ports.** The services' ports are fixed in the plan's configuration and its
-    renderer, and also in the checks and helpers that read them (at `8053f14e7`):
-    - `accept.sh:630` (ai-memory, 29374);
-    - `accept.sh:1038` and `:1091-1110` (Alertmanager 21093 and Prometheus 21090; the second raises a `severity=page`
-      alert);
-    - `accept.sh:2087` and `:2438`, `tools/research/gpt_researcher.sh:31` and `tools/adoption/runtime_profiles.py:44`
-      (the gateway, 21128).
+    renderer, and also in the checks, helpers and readers that dial them (at `8053f14e7`):
+    - ai-memory 29374: `accept.sh:630`;
+    - the collector 21333: `accept.sh:986`;
+    - Prometheus 21090 and Alertmanager 21093: `accept.sh:1001-1006`, `:1038` and `:1091-1110` (the last raises a
+      `severity=page` alert);
+    - Loki 21300 and Grafana 21301: `accept.sh:1149`, `:1166-1176` and `:1213`;
+    - Dagu 21080: `accept.sh:1543`;
+    - the gateway 21128: `accept.sh:1302-1311`, `:1427-1430`, `:2055`, `:2087-2088`, `:2294`, `:2438` and `:2641`;
+      `tools/research/gpt_researcher.sh:31`; `tools/adoption/runtime_profiles.py:44`, which `:308-309` and `:321-322`
+      use for the Pi and OpenCode GPT profiles;
+    - stage D's reader, `tools/adoption/new_wsl_client_config.py:379-388`, which takes the collector and gateway ports
+      from the plan's rows and writes the gateway port into Codex's `omniroute` base URL
+      (`adoption/new-wsl/client-config-map.json:814-818`).
+    - The model server's 21434 (`accept.sh:459`, `:1239-1279`) is free on NativeStack2604 today; the ownership check
+      covers it like the rest.
     - On the shared network these reach NativeStack2604's live services, against the CC's rule that its services and
       ports are left alone (18:09Z direction, addendum-01, ruling 1). A check would pass against the wrong
       distribution, the research-harnesses check (`accept.sh:2446-2474`, both clients) would route the new
       distribution's research runs through NativeStack2604's gateway, and the alerting check could page through its
       Alertmanager.
-    - The proposed change is one port parameter per service row, read from the host value file, rendered by the plan's
-      own renderer and read by those checks and helpers too.
-    - **Listener-ownership check (stage S).** Before a check reads a port, it confirms that a process of the new
-      distribution owns the listener (`sudo ss -ltnpH`, a line with `users:`; NativeStack2604's listeners show no
-      owner there). Otherwise the check fails: an answer from NativeStack2604 is never a pass.
-    - Until both land, no check that reads a service port runs on NativeHorizonNY, at stage E or later.
+    - The proposed change is one port parameter per listener of each service row (the gateway has three), read from
+      the host value file, rendered by the plan's own renderer and read by those checks and helpers too.
+    - **Listener-ownership check (stage S), keyed on the dialled port.** Before a check, helper or run dials a port,
+      it confirms that a process of the new distribution owns the listener on that same port (`sudo ss -ltnpH`, a line
+      with `users:`; NativeStack2604's listeners show no owner there). Otherwise it fails: an answer from
+      NativeStack2604 is never a pass.
+    - Until both land, nothing on NativeHorizonNY dials a service port, at stage E or later. Stage D waits for the
+      gateway's port as well as the collector's, since its reader writes both.
   - **Named gap, part 2: a no-start path.** The installer starts services as it installs: `systemctl --user enable
     --now` for ai-memory (`install.sh:466-467` at `8053f14e7`, port 29374, which is bound), Ollama (`:739`), Docker
     (`:852`) and Grafana's research-progress timer (`:725`), and Dagu's installer runs with `--service yes`. MinerU's
@@ -336,6 +398,15 @@ The CC's 19:46Z ruling 4 adds to these areas. Each addition falls in T1's harnes
     - The proposed change is a no-start mode of `install.sh`. Units are installed and reloaded but neither enabled nor
       started; enabling alone would start them at the next boot through linger. Dagu's installer gets its no-service
       mode. The change is covered by `check_plan.py` and a fail-first test.
+    - **Activation is its own step, at stage S.** Installing without starting leaves every service down, and the
+      service-health stage runs only after a service starts (`README.md:41`). So stage S opens with an activation
+      step, after the port and isolation proofs and before any health check:
+      - each service row's units are enabled and started (`systemctl --user enable --now <unit>`);
+      - Dagu gets its installer's own service mode. Upstream offers `--service` only at install time
+        (`scripts/installer.sh:113-114` and `:918-919` at the mirror's `58fed633`, v2.16.6; the plan pins v2.18.2,
+        which the install-nostart lane cites), so its pinned installer reruns with `--service yes --service-scope
+        user`.
+      - The activation receipt lists each unit's state and the listeners it opened, with each listener's owner.
     - Parts 1 and 2 are one dispatched Codex lane (install-nostart). Its landing closes the CC read's P1-1 and the
       local review's P1-2.
     - Until both parts land, a stage C row that starts a service, transiently or not, runs only after its port and
@@ -418,13 +489,25 @@ input and owns the design. This section records the target, its gates and what i
   probabilities (`typesafe-ai/skills` `65a39f39` (v0.5.7), `skills/typesafe-ai/SKILL.md:19-23`). A typed output fixes the
   interface; it does not make the classifier deterministic code. The CC's three earlier rulings listed Jev inside the
   fast path, and the addendum supersedes that wording:
-  - Jev, like any model, writes its typed outputs ahead of time as features with a timestamp and a time-to-live, into
-    the symbol's feature record. It goes live only after its three receipts.
-  - The scanner and the sizer read only features that are fresh at decision time. A missing or stale feature counts as
-    absent, and no decision blocks on one. Jev's latency (about 90 ms) then affects feature freshness, not order
-    latency.
-  - Whether Jev's features improve decisions stays OPEN in the research queue (`us-equities/judgment-features`), under
-    the preregistration standard. The candidate and its receipts stay.
+  - **An off-path producer.** Jev, like any model, publishes completed, validated, immutable feature artifacts ahead of
+    time. Each carries its source identity, `input_as_of`, `available_at`, `expires_at`, model, prompt and schema
+    versions, a content hash and its validation receipt. `available_at` cannot precede the input's readiness, the
+    answer, validation or publication. Jev goes live only after its three receipts.
+  - **A frozen-artifact read.** At its frozen decision cutoff, the deterministic scanner or sizer reads an admitted
+    artifact only when `available_at <= cutoff < expires_at`. It never calls, awaits, retries or polls Jev.
+    - A missing, expired or invalid artifact takes the lane's deterministic no-feature rule, so no decision blocks on
+      one.
+    - A later artifact never applies backward.
+    - Jev's latency (about 90 ms) then affects feature freshness, not order latency.
+  - **Ownership.** The feature's acceptance belongs to `us-equities/judgment-features` (point-in-time judgments with
+    `available_at`, `catalogs/landscape/planned-layers.json:25-27`). `agents-models-workers` only hosts the producer
+    runtime and does not count as a second layer win.
+  - **Conformance is unproved** until one named receipt, JEV-OFFPATH-FEATURE-ACCEPTANCE, exists. It must bind a numeric
+    freshness and expiry policy (none is chosen yet) and the producer and reader pins. It must also show that features
+    freeze before use, that a stale or failed producer cannot stall a decision, and that nothing leaks backward. The
+    existing synthetic Jev receipts are plumbing only. Whether the features improve decisions stays OPEN under the
+    preregistration standard, and the candidate keeps every gate. The co-op's RQ7 record of 2026-10-15 holds the full
+    contract.
 - **Where models work.** Models research and classify off this path. This restates the standing trading rule that models
   stay in research and deterministic code owns numeric, risk and order state (`blueprints/us-equities/AGENTS.md`, trading
   north star), and the trading repository's Authority section.
@@ -463,7 +546,7 @@ input and owns the design. This section records the target, its gates and what i
 | Codex native SDK and lanes | `us-equities/agents-models-workers` and `foundation/agent-sdks` winners | installed by the plan's rows, labelled TRIAL until their layers are FINAL |
 | Pi, OpenCode (`ns-run` profiles) | #1033 and `notes/runtime-profiles-20261012/`. Profiles remain trial; the W6 parallel-readers comparison is preregistered and not executed | TRIAL through the fence, with superpowers inside each worker profile (Decision 6) |
 | Muse Code | [2026-10-14-muse-file-fence.md](2026-10-14-muse-file-fence.md) and its 2026-10-15 directory-grants amendment; a CC delta is pending | TRIAL through the fence, with superpowers through `.muse-plugin` inside the fence; no default promotion |
-| Jev (TypeSafe SDK) | `candidate:typesafe-ai-skills` (unpinned in `final-stack.json`; screened at `65a39f39`, Decision 6) in `foundation/instructions-skills`; #1168; the CC's Jev rulings | a typed classifier off the order path that writes time-stamped features with a time-to-live, live after its three receipts (Decision 4); the Python SDK `typesafe-sdk==0.7.2` (`typesafe-ai/typesafe-sdk-python@v0.7.2`, `docs/decisions/2026-10-05-typesafe-sdk-transport.md:9-11`) until the scored run ends; no skill framework |
+| Jev (TypeSafe SDK) | `candidate:typesafe-ai-skills` (unpinned in `final-stack.json`; its screen at `65a39f39` is owed, Decision 6) in `foundation/instructions-skills`; #1168; the CC's Jev rulings | a typed classifier off the order path that publishes frozen feature artifacts with `available_at` and `expires_at`, live after its three receipts, its conformance unproved until JEV-OFFPATH-FEATURE-ACCEPTANCE (Decision 4); the Python SDK `typesafe-sdk==0.7.2` (`typesafe-ai/typesafe-sdk-python@v0.7.2`, `docs/decisions/2026-10-05-typesafe-sdk-transport.md:9-11`) until the scored run ends; no skill framework |
 | Harbor 0.24.0 | #1047 | container harness, as registered |
 
 Defaults change only on a layer's convergence. The model-routes layer is F5's.
@@ -474,8 +557,9 @@ Defaults change only on a layer's convergence. The model-routes layer is F5's.
   2026-10-15 counts 1,114 commits on its default branch after the catalogued pin. The delta: test the changed mechanism
   at the new head.
 - **Other skills candidates.** The carried survivor `mattpocock/skills` and the candidates `typesafe-ai-skills` and
-  `openai-skills`, unpinned in `final-stack.json`, are adjudicated in the same delta. Each is screened at a pin before
-  any TRIAL install: `typesafe-ai/skills` at `65a39f39` (v0.5.7). `openai/skills` is deprecated upstream: its
+  `openai-skills`, unpinned in `final-stack.json`, are adjudicated in the same delta. Each needs a screen at a pin
+  before any TRIAL install; `typesafe-ai/skills`'s screen is owed at `65a39f39` (v0.5.7), and no screen record exists
+  yet. `openai/skills` is deprecated upstream: its
   `README.md:1-2` at `49f948fa` names `openai/plugins` as the successor. So it does not install, and its successor
   enters only through its own screen (Decision 9).
 - **Harness frameworks: two families, each with its full cycle, all TRIAL.** The owner asked for fully designed
@@ -498,16 +582,15 @@ Defaults change only on a layer's convergence. The model-routes layer is F5's.
       ECC at a pinned commit of its current head, `typesafe-ai/skills` at `65a39f39`, and the carried
       `mattpocock/skills`, which the plan's `engineering-process-skills` row already installs (tag `v1.2.3`, skills CLI
       1.7.0). `openai/skills` is deprecated (above).
-    - **Install scope.** Each framework installs once, at user scope on NativeHorizonNY (`claude plugin install
-      <plugin>@<marketplace> --scope user`, Claude Code 2.1.301), and is disabled there (`claude plugin disable
-      --scope user`). The role-assignment matrix (Decision 9) enables it per project for the roles it suits
-      (`claude plugin enable --scope local`). These scopes come from the 2.1.301 CLI's help and have not been
-      exercised yet; each role's `system/init` check verifies that the local enable takes effect over the user-scope
-      disable.
-    - This supersedes the 19:12Z direction's ruling 3 (per profile or per project, never user scope). Its addendum-02
-      gives Claude sessions on NativeHorizonNY the frameworks, and its addendum-04 limits each framework to the roles it
-      suits. The fenced sessions stay clean by their fences.
-      NativeStack2604 gets no install.
+    - **Install scope: per project.** The role-assignment matrix (Decision 9) installs each framework per project,
+      for the roles it suits: `claude plugin install <plugin>@<marketplace> --scope local` in each role's own
+      checkout, so no shared settings file changes. The scopes come from Claude Code 2.1.301's help and have not been
+      exercised yet; each role's `system/init` check verifies the result.
+    - Nothing installs at user scope, so the 19:12Z direction's ruling 3 (per profile or per project, never user scope)
+      stands. Addendum-02 ruling 1 is what brings the frameworks to Claude Code sessions on NativeHorizonNY (superpowers
+      from the official marketplace, pinned), superseding addendum-01's exclusion of Claude Code. Addendum-04 limits
+      each framework to the roles it suits. The fenced sessions stay clean by their fences, and NativeStack2604 gets no
+      install.
   - Every framework is installed with one check and a recorded inverse, its plugin or skill uninstall.
   - **Fenced sessions stay clean through their existing fences, not by uninstalling.** These are the account traders
     (headless `claude -p` with tool and settings fences), the blind judges and reviewers, and the paired-run arms.
@@ -521,7 +604,16 @@ Defaults change only on a layer's convergence. The model-routes layer is F5's.
     existing harnesses (promptfoo or the skill-creator benchmark, blind judge plus exact checks).
     - A framework becomes a default only on the layer's multi-angle convergence, which includes the practice skill's
       `orchestration-frameworks` overturn rule (ahead on quality at equal or lower cost).
-    - The readiness trigger is the TRIAL installs plus the sealed task set.
+    - The readiness trigger is the TRIAL installs plus the sealed task set and, for a GPT arm, the new host's own
+      gateway (below).
+    - **GPT arms wait for the new host's gateway.** The Pi and OpenCode GPT profiles send their requests to the gateway
+      at 127.0.0.1:21128 (`tools/adoption/runtime_profiles.py:44`, used at `:308-309` and `:321-322`, at
+      `8053f14e7`), and `tools/research/gpt_researcher.sh:31` does the same. On the shared network that is
+      NativeStack2604's live gateway.
+      - So a GPT arm, or any run through those helpers, starts only after stage S's activation and listener-ownership
+        check have proved the new host's own gateway on its own port.
+      - It runs through that gateway, at the port the helpers read from the host value file (Decision 3).
+      - The Claude arms use the Anthropic provider directly and carry no gateway precondition.
   - Invoke tracking (Decision 8) covers every installed framework skill per lane.
   - The other harness repositories in the practice-reference catalog enter only through stage H's screens (Decision 9);
     until screened, they stay references.
@@ -565,6 +657,10 @@ not only superpowers. The CC's addendum-03 to its 19:12Z direction sets the rule
   - and the practice skill's `orchestration-frameworks` slot.
 - **Named input: the co-op's screen tables,** one per layer, over its full candidate set (the carried candidates in
   `final-stack.json` and the catalogs). A GAP layer gets its sweep first. An unscreened candidate never installs.
+- **Per model family** (the CC's addenda 05 and 06). The screens run for each family's own stack: Anthropic (Claude
+  Code, the Agent SDK, API slots), OpenAI (Codex and the GPT runtimes through OmniRoute), Meta (Muse Code through its
+  fence) and the research stack (DeerFlow, GPT Researcher). A family's runtime workers include its fully harnessed SDK
+  and framework workers, not only its native client. Role assignment applies inside each family.
 - **Each candidate that passes its screen at a pin** installs through its vendor's own path, with:
   - one check and a recorded inverse;
   - invoke wiring, so its use is measured per lane (Decision 8);
@@ -599,13 +695,42 @@ addendum-04 to its 19:12Z direction makes that the general rule.
 
 | Role | Where its enablement lives | Plain control profile | Check |
 | --- | --- | --- | --- |
-| Builder (Claude Code builder sessions and subagents, Codex build lanes) | per project, in the builder's worktree (`claude plugin enable --scope local`); per Codex lane (`codex plugin add`, codex-cli 0.162.1) | the same harness with no framework enabled | `system/init` or `codex plugin list` matches the matrix; invoke tracking |
+| Builder (Claude Code builder sessions and subagents, Codex build lanes) | per project, installed in the builder's worktree (`claude plugin install <plugin>@<marketplace> --scope local`); per Codex lane (`codex plugin add`, codex-cli 0.162.1) | the same harness with no framework enabled | `system/init` or `codex plugin list` matches the matrix; invoke tracking |
 | Reviewer and auditor, outside the fenced review sessions | per project | the same | the same |
 | Researcher (research lanes and workers) | per project or per research profile | the same | the same |
 | The CC and the co-op | per project, in their own checkouts | the same | the same |
 | Runtime workers: Pi, OpenCode, Muse Code | per worker profile: `.pi`, `.opencode`, `.muse-plugin` through the Muse fence | the worker's plain profile | the profile's listing; invoke tracking |
 | Fenced sessions: account traders (headless `claude -p`), blind judges and reviewers, paired-run control arms | their existing tool and settings fences | always plain | each fence's `system/init` lists no framework plugin or skill |
 | Jev | none | none: a typed classifier takes no framework | none |
+
+## Decision 10: GitHub access (stage G)
+
+The owner asked, through the CC at 20:41Z, for full access at every layer on the new distribution, with GitHub
+automation at the highest quality. The CC's addendum-09 to its 19:12Z direction makes it a GitHub access layer, kept
+as code in horizon as names and scopes only, never a secret value. It builds on
+[2026-09-22-github-automation-closure.md](2026-09-22-github-automation-closure.md),
+[2026-10-02-github-automation-practice.md](2026-10-02-github-automation-practice.md),
+[2026-10-09-review-verdict-app-identity.md](2026-10-09-review-verdict-app-identity.md) and
+[2026-10-10-retire-in-github-claude-review.md](2026-10-10-retire-in-github-claude-review.md).
+
+- **Named input: api-actions' access manifest in horizon.** It lists each identity's scopes, the repositories it can
+  reach and its token lifetime, plus each repository's required checks.
+- **Identities.**
+  - The owner signs in on the new host: `gh auth login` by device flow, git's credential helper through gh, and the
+    no-reply commit identity, never a `-c user.email` override.
+  - A new SSH key is generated on the new host and registered by the owner. No key file is copied from NativeStack2604.
+  - Commits are signed where a repository requires it.
+- **Automation identities, least privilege, short-lived tokens.** The review-verdict App identity posts the lander's
+  statuses and makes its merges; builders get contents on their own branches only; readers get read access only.
+- **Repositories.** native-agent-stack (public; the organisation's rulesets and merge queue), us-equities-trading and
+  horizon (private, each with a ruleset), and ecosystem-records (private on the organisation's free plan, so local-first).
+  The hooks (gitleaks on pre-commit and pre-push; a direct push to main refused) are installed in every clone.
+- **Runners and Actions.** Hosted CI stays optional for horizon and required as today for native-agent-stack. The
+  self-hosted runner pool moves by its own sheet, and Actions secrets stay main-only.
+- **The access audit** joins the self-maintenance loop: token expiries, scopes against the manifest, unused
+  identities, and any commit on a main branch that the lander did not land.
+- **The owner's steps** come at the boundary, and no agent performs them: sign in to gh, register the SSH key, approve
+  or install the App on each repository, and set any repository secret (Owner acts).
 
 ## The full stack
 
@@ -627,7 +752,11 @@ Each is the owner's own act and comes with its exact route. None is needed befor
 | Name and disk | before stage R (decided here; the owner may object) | `NativeHorizonNY` at `Z:\WSL\NativeHorizonNY`; the rehearsal uses a throwaway name in its own `Z:\WSL\<name>` folder |
 | Codex sign-in | stage E | in a terminal on the new distribution (`wsl.exe -d NativeHorizonNY`, or the Windows Terminal profile that WSL creates): `codex login`, then the browser sign-in |
 | Claude Code sign-in | stage E, after Codex (recipe F9) | in the same terminal: `claude`, then the browser sign-in it opens |
-| GitHub CLI, for the private repositories | stage F | `gh auth login --hostname github.com --git-protocol https --web` |
+| Gateway provider sign-in | stage S, after the gateway starts on its own ports and before the after-sign-in checks that need it; the client sign-ins do not provision it | in the same terminal, only when the account is absent: `~/.local/bin/omniroute --base-url http://127.0.0.1:<the gateway's own port> oauth start --provider codex --no-browser`, then the browser sign-in (`evidence/artifacts/new-wsl-install-plan-20261002/README.md:553-554`) |
+| GitHub sign-in | stage G | `gh auth login --hostname github.com --git-protocol https --web` (a one-time device code; gh 2.102.0), then `gh auth setup-git` for git's credential helper |
+| SSH key | stage G | a new key generated on the new host and registered by the owner (`gh ssh-key add`); no key file is copied from NativeStack2604 |
+| The review-verdict App | stage G | the owner approves or installs it on each repository the access manifest lists |
+| Repository secrets | stage G, only if the manifest names one | the owner sets each by name, per the key practice (Actions secrets main-only) |
 | Keys, by name only | stage F, per the CC's list of key names | `tools/credentials/open_credential_terminal.sh <entry-id>`, from the owner's own terminal on the new distribution; paper pairs with `--probe` |
 | IBKR session | when the IBKR lane moves | the gateway login with its second factor, per trading-cc's move sheet |
 | Purchases | none now | only if a verdict shows fit: the QuantConnect tier the engine comparison names, or the TradingView plan a TRIAL needs, each with its price |
@@ -641,7 +770,17 @@ restated condition 1 in that direction's addendum-02 (18:30Z). On the new distri
 1. The install plan's `accept.sh` reports every selected row ok in all three stages (post-install, service health,
    after sign-in) at a landed main commit. The addendum's restatement replaced `bootstrap --check`, because this
    distribution runs no bootstrap profile (recipe F9).
-2. The owner has signed in both clients, and the client configuration is applied with its receipt.
+   - **How the receipt reads it, per row** (for the CC to confirm). Rows declare different stages in `install-plan.json`
+     (`owners[].acceptance`, keyed by stage): `git` declares only `post_install`, and `memory-owner` declares
+     `post_install` and `service_health`.
+     - So each selected row must pass every acceptance entry it declares, each in its own stage.
+     - The receipt reads `accept.sh`'s per-row lines, not its exit status. The script prints `skipped` for a stage a row
+       does not declare and `(78)` for a pending check, and sets its exit status only on another non-zero result
+       (`accept.sh:42`, `:57-69` and its final `exit "$failed"`, at `8053f14e7`), so it can exit 0 with nothing proven.
+     - `skipped`, pending, or a declared check that cannot run is never ok, and it blocks the receipt.
+2. The owner has signed in both clients, and the client configuration is applied with its receipt. Per the CC's
+   addendum-09 to its 19:12Z direction, this also covers GitHub access: the owner's stage G steps are done, and the
+   access manifest's checks pass (Decision 10).
 3. The CC tooling runs: the tracker, the god view and hcom.
 4. Records are restored from GitHub and the private records remote.
 5. trading-cc has stopped the first moved lane on NativeStack2604 and relaunched it on the new distribution.
@@ -674,8 +813,13 @@ Executed since, on 2026-10-15 (receipts in the lane's private run directory, by 
   plan's container-engine row (Docker 29.8.2, rootless).
   - NativeStack2604's CPU pressure read `some avg10` 0.00 before and 0.16 after.
 - **Interim stage C ran, 19:09Z-19:25Z, and is stopped.** Of its 63 rows, 55 exited 0, seven were skipped as listed in
-  Decision 2, and `command-output` exited 1. Rerun with `RTK_SUPPRESS_HOOK_WARNING=1`, the fix the install-nostart lane
-  carries, it exited 0 and trusted the Codex hook.
+  Decision 2, and `command-output` exited 1. Rerun with `RTK_SUPPRESS_HOOK_WARNING=1` (the variable rtk reads to
+  suppress its missing-hook warning: `rtk-ai/rtk` `e001f773` (v0.51.0), `src/core/config.rs:298-313`), the fix the
+  install-nostart lane carries, it exited 0 and trusted the Codex hook.
+- **These corrections are documentation.** This record ships no executable change, so it carries no fail-first test of
+  its own. The executable regressions belong to the implementing lanes. The install-nostart lane's start-inventory,
+  per-listener port and ownership tests are fail-first, including the `--only` dependency dispatch and the package and
+  rootless setup of the engine path, and they are linked here when they land.
 
 ## Sources
 
