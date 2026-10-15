@@ -2,6 +2,7 @@
 """Run one command with one inventory entry's keys in its environment, and mask those keys in its output.
 
     python3 tools/credentials/credential_run.py <inventory-id> [--only NAME]... -- <command> [args...]
+    python3 tools/credentials/credential_run.py <inventory-id> [--only NAME]... --term-grace SECONDS -- <command> [args...]
     python3 tools/credentials/credential_run.py <inventory-id> --check
     python3 tools/credentials/credential_run.py --help
 
@@ -88,10 +89,12 @@ import set_credential as writer  # noqa: E402  (the writer's value grammar is th
 
 USAGE = """usage:
   credential_run.py <inventory-id> [--only NAME]... -- <command> [args...]
+  credential_run.py <inventory-id> [--only NAME]... --term-grace SECONDS -- <command> [args...]
   credential_run.py <inventory-id> --check
   credential_run.py --help
 Runs <command> with the entry's declared variables in its environment and masks their values in its output.
   --only NAME  inject only NAME, a variable the entry declares (repeatable)
+  --term-grace SECONDS  watchdog TERM grace, integer 1-3600; omitted keeps the existing default
   --check      print the names it would inject and the file state (ok, missing or unsafe); start nothing
 See docs/secret-storage.md#using-a-key."""
 ID = re.compile(r"[a-z0-9-]+")
@@ -954,8 +957,9 @@ class Watchdog:
     run_command. Its pipe is made after the command starts, and is not inheritable, so nothing the command starts can
     hold the write end open and keep the watchdog from seeing the runner die."""
 
-    def __init__(self, pgid: int):
+    def __init__(self, pgid: int, *, term_grace: int | None = None):
         self.process, self.pipe = None, -1
+        grace = TERM_GRACE_SECONDS if term_grace is None else term_grace_seconds(term_grace)
         if not WATCHDOG or not sys.executable:
             return
         try:
@@ -964,7 +968,7 @@ class Watchdog:
             return
         try:
             self.process = subprocess.Popen(
-                [sys.executable, "-I", "-S", "-c", WATCHDOG_CODE, str(pgid), str(TERM_GRACE_SECONDS)],
+                [sys.executable, "-I", "-S", "-c", WATCHDOG_CODE, str(pgid), str(grace)],
                 stdin=read, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, env={}, close_fds=True,
                 start_new_session=True)
         except (OSError, ValueError):
@@ -993,7 +997,9 @@ class Watchdog:
                     self.process.wait(timeout=KILL_WAIT_SECONDS)
 
 
-def run_command(command: list, environment: dict, needles: list) -> int:
+def run_command(command: list, environment: dict, needles: list, *, term_grace: int | None = None) -> int:
+    if term_grace is not None:
+        term_grace = term_grace_seconds(term_grace)
     started, pending, shutdown = [], [], []
 
     def forward(signum, _frame) -> None:
@@ -1023,7 +1029,7 @@ def run_command(command: list, environment: dict, needles: list) -> int:
     started.append(leader)
     watchdog, done = None, False
     try:
-        watchdog = Watchdog(leader.pid)
+        watchdog = Watchdog(leader.pid) if term_grace is None else Watchdog(leader.pid, term_grace=term_grace)
         for signum in pending:
             forward(signum, None)
         relay(leader, needles, shutdown)
@@ -1041,8 +1047,16 @@ def run_command(command: list, environment: dict, needles: list) -> int:
     return code if code >= 0 else 128 - code
 
 
+def term_grace_seconds(value) -> int:
+    """One explicit caller option; never include its input in a usage error."""
+    text = str(value)
+    if not re.fullmatch(r"[1-9][0-9]{0,3}", text) or not 1 <= int(text) <= 3600:
+        raise UsageError("--term-grace needs an integer from 1 to 3600")
+    return int(text)
+
+
 def parse_args(argv: list):
-    """(id, only, check, command), or None for --help."""
+    """(id, only, check, command, term_grace), or None for --help."""
     if not argv:
         raise UsageError("missing <inventory-id>")
     if argv[0] in ("-h", "--help"):
@@ -1051,6 +1065,7 @@ def parse_args(argv: list):
     if not ID.fullmatch(entry_id):
         raise UsageError("invalid <inventory-id>: lowercase letters, digits and '-' only")
     only, check, command, separated = [], False, [], False
+    term_grace = None
     while rest:
         word = rest.pop(0)
         if word == "--":
@@ -1062,17 +1077,23 @@ def parse_args(argv: list):
             only.append(rest.pop(0))
         elif word == "--check":
             check = True
+        elif word == "--term-grace":
+            if not rest or term_grace is not None:
+                raise UsageError("--term-grace requires one separate value")
+            term_grace = term_grace_seconds(rest.pop(0))
         elif word in ("-h", "--help"):
             return None
         else:
             raise UsageError("unknown option before --; the command goes after --")
     if check and separated:
         raise UsageError("--check starts no command; drop the part from --")
+    if check and term_grace is not None:
+        raise UsageError("--term-grace applies only to a command")
     if not check and not separated:
         raise UsageError("missing -- before the command")
     if not check and not command:
         raise UsageError("empty command after --")
-    return entry_id, only, check, command
+    return entry_id, only, check, command, term_grace
 
 
 def _main(argv: list, shown: list) -> int:
@@ -1080,7 +1101,7 @@ def _main(argv: list, shown: list) -> int:
     if request is None:
         print(USAGE)
         return 0
-    entry_id, only, check, command = request
+    entry_id, only, check, command, term_grace = request
     ensure_standard_descriptors()
     inventory = load_inventory()
     entry = find_entry(entry_id, inventory)
@@ -1111,6 +1132,9 @@ def _main(argv: list, shown: list) -> int:
               + ", ".join(f"{name} ({'public' if name in public else 'masked'})" for name in names))
         return 0
     environment = child_environment(inventory, entry, {name: values[name] for name in names}, os.environ)
+    if term_grace is not None:
+        return run_command(command, environment, needles_for(values, [n for n in names if n not in public]),
+                           term_grace=term_grace)
     return run_command(command, environment, needles_for(values, [n for n in names if n not in public]))
 
 
