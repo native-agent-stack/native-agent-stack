@@ -1,0 +1,19 @@
+The 15 mutants of CPA-V-03 (the hook's advice, the overlay, the two registrations, the applier's retirement of the replaced command). Each is one exact change to one file (the registrations: to both entries) in a scratch copy of the tree at main 77cc7ef42 with this change's files; then tests.test_coordinator_search_native_deny, tests.test_research_routing_guard and tests.test_new_wsl_client_config run with GITHUB_ACTIONS=true; a mutant is killed when the run fails. The unmutated copy passes first (258 tests, one skipped: the opt-in native probe).
+The first run of this set killed 14 of 15. The survivor, "the incoming template's own command is retired too", changed nothing a test could see: a template that still runs the replaced command puts the same command back, so only the host's own tuning of the entry (its timeout) tells the two apart. The test of that case now gives the host's entry a timeout and asserts that the one entry left is the host's, with it. The lines below are the run with that test.
+
+killed   (failed) the hook denies WebSearch again
+killed   (failed) the hint drops the dispatch command
+killed   (failed) the hint does not say that the call is not blocked here
+killed   (failed) an unmarked session is advised too
+killed   (failed) the registrations are the bare command again
+killed   (failed) the wrapper exits 1 when the file is missing
+killed   (failed) the wrapper runs the file unchecked
+killed   (failed) the overlay denies nothing
+killed   (failed) the overlay denies the fetch tools too
+killed   (failed) the replaced command is never retired
+killed   (failed) the replaced command is retired only without held-out carriers
+killed   (failed) a command that merely contains the replaced one is retired
+killed   (failed) retirement works without a known home
+killed   (failed) another spelling of the home is not matched
+killed   (failed) the incoming template's own command is retired too
+15 mutants, 15 killed, survivors: none

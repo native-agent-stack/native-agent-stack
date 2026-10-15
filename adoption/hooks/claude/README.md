@@ -16,11 +16,17 @@ Use [the CC #76 decision and application recipe](../../../docs/decisions/2026-10
 when applying the research gate through F9 or updating a CC/co-op launcher. The
 launcher sets a role and the exact native session ID; ordinary lanes and separately
 launched research sessions have neither marker. The generic ecosystem launcher
-does not set them. In a marked session, WebSearch returns the native denial and
-`tools/research/dispatch --question '<question>'` redirect. Targeted WebFetch and
+does not set them. Since CPA-V-03 ([the native-deny decision](../../../docs/decisions/2026-10-13-coordinator-search-native-deny.md))
+the WebSearch denial is the launch's, not this hook's: a marked coordinator is launched
+with `--settings` set to `adoption/templates/claude.coordinator.settings.template.json`
+(`permissions.deny: ["WebSearch"]`), which needs no runner and holds in every permission
+mode. This hook is advisory: in a marked session it keeps the
+`tools/research/dispatch --question '<question>'` redirect hint, and targeted WebFetch and
 context-mode fetches retain normal permissions and record requested verification
-URLs; UserPromptSubmit resets the turn counter. These are hook-protocol fixtures
-until the CC applies F9 and runs the fresh-session acceptance after landing.
+URLs; UserPromptSubmit resets the turn counter. Its two registrations keep the shell in control
+(`[ -f "$f" ] && python3 "$f"; true`: a missing or unreadable file and a runner that exits 2 end the command with
+status 0, never the 2 that blocks a prompt or a tool call), and the settings applier retires the earlier bare registration. These are hook-protocol fixtures until the CC applies
+the launch step and runs the fresh-session acceptance after landing.
 
 ## Held out of the default: the token-lane carriers
 

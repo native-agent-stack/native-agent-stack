@@ -1,0 +1,24 @@
+The tests of CPA-V-03 (the coordinator's WebSearch denial is native at launch; the hook is advisory; the registrations are existence-checked; the applier retires the replaced command) against the sources of ba6afd8d7 and against this head.
+
+== ba6afd8d7, main when the change was written (its sources, these test modules)
+   tests.test_coordinator_search_native_deny: Ran 13, FAILED (failures=4, errors=13, skipped=1)
+      ApplierRetirementTests.test_a_hook_the_host_wrote_for_itself_stays_even_when_it_runs_the_guard: 5 failing | module 'apply_claude_settings' has no attribute 'runs_superseded_hook'
+      ApplierRetirementTests.test_the_list_names_its_source_and_every_command_names_home_once: 1 failing | module 'apply_claude_settings' has no attribute 'SUPERSEDED_HOOK_COMMANDS'
+      ApplierRetirementTests.test_the_replaced_command_is_retired_and_exactly_one_registration_remains_per_event: 1 failing | '[ -f' not found in 'python3 "<HOME>/.claude/hooks/research-routing-guard.py"'
+      ApplierRetirementTests.test_the_replaced_command_is_retired_when_the_host_keeps_its_held_out_carriers: 1 failing | 'python3 "<HOME>/.claude/hooks/research-routing-guard.py"' unexpectedly found in ['python3 "<HOME>/.claude/hoo
+      ApplierRetirementTests.test_the_unrendered_spelling_and_another_spelling_of_the_home_are_retired: 3 failing | module 'apply_claude_settings' has no attribute 'runs_superseded_hook'
+      ApplierRetirementTests.test_without_a_known_home_nothing_is_retired: 1 failing | module 'apply_claude_settings' has no attribute 'runs_superseded_hook'
+      OverlayTests.test_the_overlay_denies_websearch_and_nothing_else: 1 failing | [Errno 2] No such file or directory: '/var/tmp/ccnp-tests/v03-base/adoption/templates/claude.coordinator.setti
+      RegistrationTests.test_a_missing_guard_file_is_not_an_exit_2: 2 failing | Tuples differ: (2, '', "python3: can't open file '/tmp/tm[86 chars]y\n") != (0, '', '')
+      RegistrationTests.test_a_present_guard_file_is_run_with_the_hook_input: 2 failing | 'additionalContext'
+   tests.test_research_routing_guard: Ran 14, FAILED (failures=2, errors=1)
+      ResearchRoutingGuardTests.test_both_coordinator_roles_receive_the_websearch_redirect_as_advice_and_no_decision: 2 failing | 'permissionDecision' unexpectedly found in {'hookEventName': 'PreToolUse', 'permissionDecision': 'deny', 'perm
+      ResearchRoutingGuardTests.test_the_websearch_advice_does_not_depend_on_writable_state: 1 failing | 'additionalContext'
+   tests.test_new_wsl_client_config: Ran 231, FAILED (failures=1)
+      RenderTests.test_coordinator_research_hooks_render_native_matchers_without_globally_marking_sessions: 1 failing | 0 != 1
+== this head
+   tests.test_coordinator_search_native_deny: Ran 13, OK
+   tests.test_research_routing_guard: Ran 14, OK
+   tests.test_new_wsl_client_config: Ran 231, OK
+
+12 tests fail or raise on ba6afd8d7: the overlay does not exist there, the hook still decides, the registrations are the bare python3 command (exit 2 on a missing file), and the applier has no retirement of a replaced command (two registrations would run beside each other).

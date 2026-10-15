@@ -1857,7 +1857,9 @@ class RenderTests(unittest.TestCase):
         settings = json.loads(self.files["settings.json"])
         self.assertNotIn("NAS_RESEARCH_COORDINATOR_ROLE", settings["env"])
         self.assertNotIn("NAS_RESEARCH_COORDINATOR_SESSION_ID", settings["env"])
-        command = 'python3 "/home/example/.claude/hooks/research-routing-guard.py"'
+        # CPA-V-03: registered with an existence check and without exec, so that neither a missing or unreadable file nor a runner that exits 2 can end the command with status 2 (which blocks a prompt or a
+        # tool call); advisory, so it fails open.
+        command = 'f="/home/example/.claude/hooks/research-routing-guard.py"; [ -f "$f" ] && python3 "$f"; true'
         groups = [group for group in settings["hooks"]["PreToolUse"]
                   if any(hook["command"] == command for hook in group["hooks"])]
         self.assertEqual(len(groups), 1)
@@ -3900,6 +3902,67 @@ class AcknowledgementGateTests(ApplyCase):
             self.assertIn("note: a real run refuses now: the render wires the interim installs of code-search, "
                           "memory-owner", out)
         self.assertEqual(tree(self.home), before)
+
+
+class ResearchSupersessionRecoveryTests(ApplyCase):
+    """CPA-V-03 round 1 (blocker 2 of the verdict file of the read of 74afed4eb): the recovery step's preflight merge passed no home, so the retirement of the replaced bare research command removed nothing, a
+    settings file that held both it and the current registrations was reported current, and the applier never ran (four registrations; one fetch logged twice)."""
+
+    GUARD = "research-routing-guard.py"
+    SESSION = "synthetic-research-session"
+
+    def legacy(self) -> str:
+        return f'python3 "{self.home}/.claude/hooks/{self.GUARD}"'
+
+    def research(self, settings: dict) -> list:
+        return [(event, hook["command"]) for event, groups in settings["hooks"].items() for group in groups
+                for hook in group["hooks"] if self.GUARD in hook.get("command", "")]
+
+    def fetch_records(self, settings: dict) -> int:
+        """Runs every PreToolUse registration that names the guard once, for one marked WebFetch, and counts the records the fetch log holds."""
+        state = self.base / "state"
+        environment = {"PATH": os.environ["PATH"], "HOME": str(self.home), "XDG_STATE_HOME": str(state),
+                       "NAS_RESEARCH_COORDINATOR_ROLE": "command-center", "NAS_RESEARCH_COORDINATOR_SESSION_ID": self.SESSION}
+        event = json.dumps({"session_id": self.SESSION, "hook_event_name": "PreToolUse", "tool_name": "WebFetch",
+                            "tool_input": {"url": "https://code.claude.com/docs/en/hooks", "prompt": "check"}})
+        for name, command in self.research(settings):
+            if name == "PreToolUse":
+                done = subprocess.run(["sh", "-c", command], input=event, text=True, capture_output=True, timeout=30, env=environment)
+                self.assertEqual(done.returncode, 0, done.stderr)
+        logs = list(state.glob("native-agent-stack/research-routing/*/verification.jsonl"))
+        self.assertEqual(len(logs), 1)
+        return len(logs[0].read_text(encoding="utf-8").splitlines())
+
+    def test_a_settings_file_that_holds_the_legacy_and_the_current_registrations_is_superseded_by_a_real_apply_and_the_next_apply_is_a_no_op(self):
+        self.installed_state()
+        code, out, err = self.apply()
+        self.assertEqual(code, 0, out[-800:] + err[-800:])
+        path = self.home / ".claude" / "settings.json"
+        settings = json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(sorted(event for event, _ in self.research(settings)), ["PreToolUse", "UserPromptSubmit"])
+        # a host that took the replaced command before this change and the current registrations after it
+        for event in ("PreToolUse", "UserPromptSubmit"):
+            group = {"hooks": [{"type": "command", "command": self.legacy(), "timeout": 5}]}
+            if event == "PreToolUse":
+                group["matcher"] = "^(WebSearch|WebFetch)$"
+            settings["hooks"][event].append(group)
+        path.write_text(json.dumps(settings, indent=2) + "\n", encoding="utf-8")
+        legacy_and_current = json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(len(self.research(legacy_and_current)), 4)
+        self.assertEqual(self.fetch_records(legacy_and_current), 2, "the two registrations of a PreToolUse event log one fetch twice")
+        shutil.rmtree(self.base / "state")
+        code, out, _ = self.apply()
+        self.assertEqual(code, 0, out[-800:])
+        self.assertIn("claude-settings applied", out.split("summary: ")[1], "a real apply, not the current branch")
+        repaired = json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(sorted(event for event, _ in self.research(repaired)), ["PreToolUse", "UserPromptSubmit"], "exactly one registration per event")
+        self.assertNotIn(self.legacy(), [command for _, command in self.research(repaired)])
+        self.assertEqual(self.fetch_records(repaired), 1, "one fetch, one record")
+        once = tree(self.home)
+        code, out, _ = self.apply()
+        self.assertEqual(code, 0, out[-800:])
+        self.assertEqual(tree(self.home), once)
+        self.assertIn("claude-settings current", out.split("summary: ")[1], "the next apply is a no-op")
 
 
 class RenderedScanTests(unittest.TestCase):

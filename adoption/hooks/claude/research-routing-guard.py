@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Route marked coordinators' search to research; record targeted fetch attempts.
+"""Route marked coordinators' research to the research runtime (advice); record targeted fetch attempts.
+
+CPA-V-03 (2026-10-13, docs/decisions/2026-10-13-coordinator-search-native-deny.md): the WebSearch denial is not this hook's. A marked coordinator is launched with
+`permissions.deny: ["WebSearch"]` in its own --settings overlay (adoption/templates/claude.coordinator.settings.template.json) or `--disallowedTools WebSearch`, which needs no
+runner and holds in every permission mode, so a runner that is missing, late or crashing cannot let the call through. This hook is advisory and may fail open: for a marked
+session it keeps the redirect hint to tools/research/dispatch and the fetch-URL log. Its registration is wrapped so that the shell stays in control (an existence check, no exec, a closing true): a missing or
+unreadable file and a runner that exits 2 all end the command with status 0, never the status 2 that blocks a prompt or a tool call.
 
 Claude Code 2.1.294 hook protocol: https://code.claude.com/docs/en/hooks
 (`PreToolUse` input/decision control and `UserPromptSubmit` input/decision control;
@@ -28,7 +34,7 @@ Neither credentials/configuration nor the transcript are read. URL userinfo,
 fragments and credential query parameters are omitted; only the supplied claim
 or source label is logged, never headers or the complete tool payload.
 
-Unmarked calls are silent and create no state. Search denial needs no state I/O.
+Unmarked calls are silent and create no state. The WebSearch hint needs no state I/O.
 Marked fetch/log/reset failures produce an explicit verification-unavailable
 warning and leave normal permissions intact; malformed marked hook input exits
 1 with a payload-free error (Claude's native nonblocking error contract).
@@ -205,9 +211,11 @@ def main():
     event = payload.get("hook_event_name")
     tool = payload.get("tool_name")
     if event == "PreToolUse" and tool == "WebSearch":
-        emit(event, permissionDecision="deny", permissionDecisionReason=(
-            f"Coordinator research must use the research runtime. Run {DISPATCH}; "
-            "it returns a cited result file. Targeted primary-source WebFetch remains available."
+        # Advice, never a decision: the denial is the launch's (see the module docstring), and a call that reaches this point came from a session launched without it.
+        emit(event, additionalContext=(
+            f"Coordinator research uses the research runtime. Run {DISPATCH}; it returns a cited result file. "
+            "A marked coordinator is launched with WebSearch denied (permissions.deny in its --settings overlay); this session was not, so the call is not blocked here. "
+            "Targeted primary-source WebFetch remains available."
         ))
         return 0
     if event != "UserPromptSubmit" and not (event == "PreToolUse" and tool in FETCH_TOOLS):
