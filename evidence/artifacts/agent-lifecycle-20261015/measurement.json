@@ -1,0 +1,24 @@
+{
+ "kind": "measurement",
+ "subject": "Does TeammateIdle continue false shut a teammate down?",
+ "client": "claude-code 2.1.300",
+ "measured_utc": "2026-10-15T04:20:15Z/2026-10-15T04:27:44Z",
+ "setup": "interactive session in tmux, scratch directory, --settings with CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 and one TeammateIdle hook printing continue false for names not starting mesh-; --strict-mcp-config with no servers; --permission-mode dontAsk with Agent, SendMessage and ListAgents allowed; teammates probe-a (stopped by the hook) and mesh-b (left alone), each asked for a fixed reply",
+ "observed": [
+  "probe-a: TeammateIdle fired 04:21:21.09Z; the lead received its final answer in the idle notification at 04:21:21.11Z",
+  "mesh-b: TeammateIdle fired 04:21:03.98Z; final answer received 04:21:04.05Z",
+  "ListAgents about 31 s later: both listed, idle",
+  "a message sent to both at 04:24:40Z: both replied (probe-a 04:25:19Z, mesh-b by 04:25:11Z); TeammateIdle fired again for both",
+  "a shutdown request to both at 04:26:32Z: probe-a sent shutdown_approved at 04:26:39.68Z; mesh-b sent no visible reply",
+  "ListAgents at 04:27:32Z: neither listed"
+ ],
+ "final_answer_reaches_lead": true,
+ "continue_false_shuts_down": false,
+ "shutdown_request_removes": true,
+ "transcript": {
+  "path_kind": "the lead session's own JSONL under ~/.claude/projects (not committed)",
+  "lines": 303
+ },
+ "evidence_class": "native_proven",
+ "measured_by": "cc-native-practice, on the command center's YES of 2026-10-15T04:18Z"
+}
