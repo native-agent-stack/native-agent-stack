@@ -155,5 +155,5 @@
   "mcp_tool_results": 0,
   "method": "loki_by.py sums 24-hour count_over_time chunks by skill_name (skill_activated) and mcp_server_name (tool_result); no synced plugin skill name and no plugin MCP server name appears among the 43 skill names and 19 server names counted"
  },
- "catalog": "none of the four is pinned in adoption/skills/manifest.json or any adoption pin. The source, anthropics/knowledge-work-plugins, has grand-catalog rows 447-450 (pin ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1): WATCH for instructions-skills and mcp-surfaces, OUT-OF-SCOPE for token-efficiency, all PROPOSED"
+ "catalog": "none of the four synced plugins is pinned in adoption/skills/manifest.json or any adoption pin. Their source, anthropics/knowledge-work-plugins, has four grand-catalog rows (catalogs/landscape/grand-catalog-20261008.json): 447 durable-memory: WATCH (SOURCE-REVIEW), pinned to the repository at ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1; 448 instructions-skills: PENDING, PROPOSED provisional WATCH, no pin; 449 mcp-surfaces: PENDING, PROPOSED provisional WATCH, no pin; 450 token-efficiency: PENDING, PROPOSED provisional OUT-OF-SCOPE, no pin. No row pins an individual synced plugin"
 }
