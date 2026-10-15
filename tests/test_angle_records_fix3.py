@@ -21,7 +21,12 @@ class FinalIntegrityTests(FixtureTestCase):
     def matrix(self, root):
         _write(root / "adoption/host-receipt.schema.json",
                (REPO_ROOT / "adoption/host-receipt.schema.json").read_text())
-        document, violations = cm.build_document(root)
+        try:
+            document, violations = cm.build_document(root)
+        except ValueError as error:
+            # FINAL now refuses at the matrix seam before final-stack reads it.
+            self.assertEqual(str(error), "admission under redesign")
+            return
         self.assertEqual(violations, [])
         _write_json(root / fs.MATRIX, document)
 

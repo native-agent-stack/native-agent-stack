@@ -42,14 +42,14 @@ try:
     from . import platform_status as platform_evidence
     from . import saturation_ledger
     from .catalog_decisions import InvalidDecisionIndex, load, require, safe_file, unique_json
-    from .landscape import ENFORCED_PLATFORMS, PLATFORM_KEYS, RECORDED_VERDICT_STATUSES
+    from .landscape import ENFORCED_PLATFORMS, PLATFORM_KEYS, RECORDED_VERDICT_STATUSES, refuse_final
     from .validate import PRIVATE_CONTENT
 except ImportError:  # running as a plain script, not a package
     import host_receipts
     import platform_status as platform_evidence
     import saturation_ledger
     from catalog_decisions import InvalidDecisionIndex, load, require, safe_file, unique_json
-    from landscape import ENFORCED_PLATFORMS, PLATFORM_KEYS, RECORDED_VERDICT_STATUSES
+    from landscape import ENFORCED_PLATFORMS, PLATFORM_KEYS, RECORDED_VERDICT_STATUSES, refuse_final
     from validate import PRIVATE_CONTENT
 
 
@@ -584,6 +584,7 @@ def build_row(root: Path, catalog: str, layer: dict, decisions: dict[str, list[d
               status_context: platform_evidence.StatusContext | None = None,
               winner_aliases: dict[str, tuple[str, ...]] | None = None,
               repo_layers: dict[str, set[str]] | None = None):
+    refuse_final(layer)
     if status_context is None:
         status_context = platform_evidence.load_context(root)
     layer_id = layer.get("layer_id")

@@ -43,7 +43,7 @@ class PendingRegistrationTests(unittest.TestCase):
     def test_empty_registration_cannot_claim_terminal_state_or_a_lane_run(self):
         self.layer.update(registration_only=True, candidates=[], winners=[], alternatives=[], open_gaps=["Await covering sweep."])
         self.layer["terminal_state"] = "FINAL"
-        with self.assertRaisesRegex(ValueError, "registration_only requires an empty, unsealed pending scope"):
+        with self.assertRaisesRegex(ValueError, "^admission under redesign$"):
             self.build()
         del self.layer["terminal_state"]
         self.layer["lanes"]["claude"]["run_id"] = "claimed-run"

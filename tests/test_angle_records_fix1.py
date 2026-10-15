@@ -206,9 +206,8 @@ class FinalFix1Tests(FixtureTestCase):
         # matrix built from the earlier "recorded" row hides the broken path.
         _write(root / "adoption/host-receipt.schema.json",
                (REPO_ROOT / "adoption/host-receipt.schema.json").read_text())
-        matrix, violations = cm.build_document(root)
-        self.assertEqual(violations, [])
-        _write_json(root / fs.MATRIX, matrix)
+        with self.assertRaisesRegex(ValueError, "^admission under redesign$"):
+            cm.build_document(root)
         self.assert_final_disabled(root)
 
 

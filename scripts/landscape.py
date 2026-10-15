@@ -20,6 +20,13 @@ except ImportError:
     import platform_status as platform_evidence
 
 MANIFEST = "catalogs/landscape/manifest.json"
+FINAL_ADMISSION_REFUSAL = "admission under redesign"
+
+
+def refuse_final(row, *, error_type=ValueError):
+    """Apply the shared refusal before registration or consumer processing."""
+    if "FINAL" in (row.get("terminal_state"), row.get("verdict_status")):
+        raise error_type(FINAL_ADMISSION_REFUSAL)
 
 
 def registration_history(root):
@@ -64,6 +71,7 @@ def is_unrun_registration(row, *, root=None):
     registration into the immutable 20260922 wave. Existing rows retain their
     historical fallback unless they carry this explicit marker.
     """
+    refuse_final(row)
     if "registration_only" not in row:
         return False
     lanes = row.get("lanes")
@@ -950,6 +958,8 @@ def _validate_verdict_schema(row, key):
 def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recipe_map, sota_pins,
                           status_context, lane_registry=None, wave_refs=None):
     """Validate common schema before applying any unrun or wave-specific rules."""
+    refuse_final(row)
+
     def evidence_maybe_empty(values, label):
         require(isinstance(values, list), label + " must be a list")
         return evidence(values, label) if values else []
@@ -1341,6 +1351,7 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
         nonempty(document.get("scope"), path + ".scope")
         require(isinstance(document.get("layers"), list), path + " needs layers")
         for position, row in enumerate(document["layers"]):
+            refuse_final(row)
             key = (row["catalog"], row["layer_id"])
             require(key[0] == catalog and key in expected, "unknown comparison layer: " + str(key))
             require(key not in seen, "duplicate comparison layer: " + str(key))

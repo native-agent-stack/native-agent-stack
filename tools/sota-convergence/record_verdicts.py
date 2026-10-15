@@ -100,6 +100,7 @@ from scripts.landscape import (  # noqa: E402
     packet_component_id, parse_retained_sha256sums, single_lane_authorizes, single_lane_decision_path_issue,
     withheld_packet_keys, adjudication_binding_issue, PACKET_KEYS_NAME, PACKET_KEYS_SCHEMA_VERSION,
     packet_keys_issue, packet_seals_candidates, unseal_packet, PROSE_EXPOSURE_NAME, expected_prose_exposed,
+    refuse_final,
 )
 # One platform-status rule for every caller (2026-09-23 peer audit, item 6): scripts/platform_status.py
 # (catalog PR #117) derives each platform's status from the host receipts and registered evidence;
@@ -729,6 +730,7 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
     exists for this layer. ``outcomes`` (when given) receives this layer's
     per-lane outcome for the run manifest: sealed, rejected with reasons, failed with the reason its
     lane runner listed in ``failures`` ((lane, catalog, layer_id) -> reason), or missing."""
+    refuse_final(row)
     grandfathered = is_grandfathered_run(run_date)
     if not grandfathered and status_context is None:
         # A new wave must derive platform status from receipts; never fall back to the legacy rule silently.

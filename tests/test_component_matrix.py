@@ -1043,7 +1043,7 @@ class ConvergenceByLayerTests(unittest.TestCase):
         self.assertEqual(document["summary"]["convergence"]["layer_states"], {
             "confirmed_current": 2, "no_selection": 2, "pending_lanes": 2, "recorded_reopened": 1})
 
-    def test_final_alias_preserves_generated_winner_factors_and_reopening(self):
+    def test_final_alias_refuses_matrix_generation(self):
         root, recorded = self._document()
         source = root / cm.LANDSCAPE_FILES["foundation"]
         catalog = json.loads(source.read_bytes())
@@ -1051,13 +1051,8 @@ class ConvergenceByLayerTests(unittest.TestCase):
             if row["layer_id"] in ("f-current", "f-reopened"):
                 row["verdict_status"] = "FINAL"
         _write_json(source, catalog)
-        aliased, violations = cm.build_document(root)
-        self.assertEqual(violations, [])
-        before, after = self._rows(recorded), self._rows(aliased)
-        for layer_id in ("f-current", "f-reopened"):
-            with self.subTest(layer=layer_id):
-                key = ("foundation", layer_id)
-                self.assertEqual(after[key], before[key])
+        with self.assertRaisesRegex(ValueError, "^admission under redesign$"):
+            cm.build_document(root)
 
     def test_foundation_factors_counts_and_unresolved_rows(self):
         _root, document = self._document()

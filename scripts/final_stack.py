@@ -37,6 +37,7 @@ import tomllib
 try:
     from . import angle_records, component_matrix, host_receipts, host_name_scan, saturation_ledger
     from .catalog_decisions import InvalidDecisionIndex, safe_file, unique_json
+    from .landscape import FINAL_ADMISSION_REFUSAL, refuse_final
     from .sweep_policy import DEFAULT_SWEEP_CADENCE_DAYS
 except ImportError:  # running as a plain script, not a package
     import angle_records
@@ -45,6 +46,7 @@ except ImportError:  # running as a plain script, not a package
     import host_name_scan
     import saturation_ledger
     from catalog_decisions import InvalidDecisionIndex, safe_file, unique_json
+    from landscape import FINAL_ADMISSION_REFUSAL, refuse_final
     from sweep_policy import DEFAULT_SWEEP_CADENCE_DAYS
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -86,7 +88,6 @@ REVIEW_DAYS = DEFAULT_SWEEP_CADENCE_DAYS
 # First matching rule wins (see DEFINITIONS); this is also the order of the summary counts.
 STATUS_ORDER = ("unswept", "no-winner", "reopened", "converged", "current")
 DEFINITIVE_STATUSES = ("current", "converged")
-FINAL_ADMISSION_REFUSAL = "admission under redesign"
 RUN_REASONS = ("unpinned", "held", "external", "unresolved")
 ROLES = ("winner", "alternate", "survivor", "candidate")
 PIN_DRIFT_VALUES = ("same", "differs", "unknown")
@@ -528,8 +529,7 @@ def trialled_repositories(row: dict) -> set[str]:
 
 
 def build_verdict(row: dict, matrix_row: dict, registry: dict, reopened_by: list[dict], *, root: Path = None) -> dict:
-    if "FINAL" in (row.get("terminal_state"), row.get("verdict_status")):
-        raise FinalStackError(FINAL_ADMISSION_REFUSAL)
+    refuse_final(row, error_type=FinalStackError)
     verdict_day = component_matrix.parse_iso_date(row.get("checked_at"))
     wave = row_run_id(row, root=root)
     registered = registry.get(wave)
@@ -596,11 +596,10 @@ def layer_status(covered: bool, state: str | None, convergence: dict) -> str:
 
 
 def terminal_state(row: dict, angle: dict) -> str | None:
+    refuse_final(row, error_type=FinalStackError)
+    refuse_final(angle, error_type=FinalStackError)
     claims = [state for state in (row.get("terminal_state"), angle.get("terminal_state"),
                                  "FINAL" if row.get("verdict_status") == "FINAL" else None) if state]
-    # Refuse every FINAL claim before any admission predicate can run.
-    if "FINAL" in claims:
-        raise FinalStackError(FINAL_ADMISSION_REFUSAL)
     if len(set(claims)) > 1:
         raise FinalStackError("conflicting terminal-state claims")
     return claims[0] if claims else None
@@ -840,8 +839,8 @@ def enforce_final(sources: Sources, layers: list[dict], runs: list[dict], angle_
     A matrix 'converged' status is a different concept.
     """
     # Keep the enforcement entry point fail-closed for direct callers too.
-    if any(layer.get("terminal_state") == "FINAL" for layer in layers):
-        raise FinalStackError(FINAL_ADMISSION_REFUSAL)
+    for layer in layers:
+        refuse_final(layer, error_type=FinalStackError)
     by_run = {run["id"]: run for run in runs}
     for layer in layers:
         if layer["terminal_state"] != "FINAL":
