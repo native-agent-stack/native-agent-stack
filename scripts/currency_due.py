@@ -140,6 +140,7 @@ PRACTICE_REFS_KEY = "practice_refs_ahead"
 LABELS[PRACTICE_REFS_KEY] = ("practice reference to screen", "practice references to screen")
 PRACTICE_CATALOG = "catalogs/foundation/practice-references.json"
 PRACTICE_REFS_GAP = "practice reference check incomplete"
+PRACTICE_CLIENT_GAP = "practice skill check incomplete"
 COUNT_KEYS = (*DUE_KEYS, SURFACE_KEY, PRACTICE_KEY, PRACTICE_REFS_KEY, MODEL_KEY)
 SURFACE_DIR = "surface-watch"
 SURFACE_FILE = "latest.json"
@@ -815,6 +816,8 @@ def aggregate(reports: dict, now: datetime, now_text: str, cadence_days: int, ro
         gaps.append("model check incomplete")
     if refs_coverage.get("practice_refs") == "unknown":
         gaps.append(PRACTICE_REFS_GAP)
+    if practice_coverage.get("practice_client") == "unknown":
+        gaps.append(PRACTICE_CLIENT_GAP)
     line = summary_line(due, command, skills_complete is not False, due_file_pointers(due_file, from_xdg),
                         tuple(gaps))
     return {"generated_at": now_text, "root": str(root), "due": due, "summary_line": line,
@@ -828,7 +831,8 @@ def gaps_of(document: dict) -> list[str]:
     return ((["the skill check was incomplete"] if coverage.get("skills_complete") is False else [])
             + ([SURFACE_GAPS[coverage["surface_watch"]]] if coverage.get("surface_watch") in SURFACE_GAPS else [])
             + (["model check incomplete"] if coverage.get("active_models") == "unknown" else [])
-            + ([PRACTICE_REFS_GAP] if coverage.get("practice_refs") == "unknown" else []))
+            + ([PRACTICE_REFS_GAP] if coverage.get("practice_refs") == "unknown" else [])
+            + ([PRACTICE_CLIENT_GAP] if coverage.get("practice_client") == "unknown" else []))
 
 
 def incomplete(document: dict) -> bool:

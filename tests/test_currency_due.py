@@ -1659,6 +1659,16 @@ class PracticeClientTests(unittest.TestCase):
                 self.assertEqual(document["details"][-1]["practice_client"], "unknown")
 
 
+    def test_an_unknown_practice_client_is_a_gap_never_nothing_due(self):
+        # Local review P2 at ecfe6dec (currency_due.py:828-831): "unknown" was not a gap, so with every count at zero the
+        # run printed "nothing due" and deleted the previous due-file.
+        document = self.document(self.checkout(watched="latest"))
+        self.assertEqual(document["details"][-1]["practice_client"], "unknown")
+        self.assertIn("practice skill check incomplete", cd.gaps_of(document))
+        self.assertTrue(cd.incomplete(document))
+        self.assertIn("practice skill check incomplete", document["summary_line"])
+
+
 class PracticeRefsTests(unittest.TestCase):
     """practice_refs_ahead (CC ruling B3/W2, 2026-10-15): references in catalogs/foundation/practice-references.json
     with screen_paths whose practice files changed since their pin (practice_references.py, the same tool the weekly

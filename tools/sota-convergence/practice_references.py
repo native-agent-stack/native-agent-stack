@@ -418,6 +418,8 @@ def classify(entry: dict, observation, now: datetime) -> dict:
         # a timeout included, is a fetch error.
         flags.add("missing" if gh_http_status(observation["error"]) == 404 else "fetch_error")
         errors.append(observation["error"])
+        if entry.get("screen_paths"):  # a screened reference that could not be fetched is unknown, never dropped
+            row["screen_paths_changed"], row["screen_paths_matched"] = None, []
         return _finish(row, flags, errors)
 
     archived = observation.get("archived") is True

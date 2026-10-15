@@ -123,6 +123,15 @@ class ScreenPathTests(unittest.TestCase):
         self.assertIsNone(self.screened([f"other/{index}.md" for index in range(300)])["screen_paths_changed"])
         self.assertEqual(self.screened(["README.md"] + [f"o/{i}" for i in range(299)])["screen_paths_changed"], 1)
 
+    def test_a_failed_fetch_of_a_screened_reference_is_unknown_never_dropped(self):
+        # Local review P2 at ecfe6dec (practice_references.py:479-480): a fetch failure returned before screen_paths, so the
+        # reference vanished from the screened set and currency_due reported the coverage "checked" with a zero count.
+        observation = {"error": "HTTP 403: API rate limit exceeded"}
+        row = practice_references.classify(dict(entry("example/guide"), screen_paths=["README.md"]), observation, NOW)
+        self.assertIn("screen_paths_changed", row)
+        self.assertIsNone(row["screen_paths_changed"])
+        self.assertIn("fetch_error", row["flags"])
+
     def test_a_reference_without_screen_paths_reports_nothing_about_them(self):
         row = practice_references.classify(entry("example/drifted"), FIXTURES["example/drifted"], NOW)
         self.assertNotIn("screen_paths_changed", row)
