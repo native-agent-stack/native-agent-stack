@@ -85,6 +85,53 @@ class FinalIntegrityTests(FixtureTestCase):
                         self.assertEqual(layer["terminal_state"], "FINAL")
                         self.assertEqual(layer["verdict"]["reopened_by"], [])
 
+    def test_post_verdict_scope_hashes_without_baseline_refuse_final(self):
+        for field in ("requirement_sha256", "platform_profiles_sha256"):
+            for baseline in ("absent", "missing_hash"):
+                for later_hash in ("a", "b"):
+                    with self.subTest(field=field, baseline=baseline, later_hash=later_hash):
+                        root, _, _ = self.measured()
+                        self.sweep(root, "2026-09-23", ident="first-after")
+                        self.sweep(root, "2026-09-24", ident="changed-after")
+                        path = root / fs.LEDGER
+                        ledger = json.loads(path.read_bytes())
+                        if baseline == "absent":
+                            ledger["sweeps"] = [sweep for sweep in ledger["sweeps"]
+                                                if sweep["date"] > "2026-09-22"]
+                        for sweep in ledger["sweeps"]:
+                            row = sweep["layers"][0]
+                            row.update(requirement_sha256="a" * 64, platform_profiles_sha256="a" * 64)
+                            if sweep["date"] == "2026-09-22":
+                                row.pop(field)
+                            elif sweep["date"] == "2026-09-24":
+                                row[field] = later_hash * 64
+                        _write_json(path, ledger)
+                        self.matrix(root)
+                        self.fresh_reject(root, "reopened sweep delta must be adjudicated")
+                        code, output = self.run_main(root, "--write")
+                        self.assertEqual(code, 1, output)
+                        self.assertFalse((root / fs.OUTPUT).exists())
+
+    def test_unchanged_scope_with_retained_baseline_preserves_final(self):
+        root, _, _ = self.measured()
+        self.sweep(root, "2026-09-23", ident="first-after")
+        self.sweep(root, "2026-09-24", ident="unchanged-after")
+        path = root / fs.LEDGER
+        ledger = json.loads(path.read_bytes())
+        for sweep in ledger["sweeps"]:
+            sweep["layers"][0].update(requirement_sha256="a" * 64, platform_profiles_sha256="a" * 64)
+        _write_json(path, ledger)
+        self.matrix(root)
+        code, output = self.run_main(root, "--write")
+        self.assertEqual(code, 0, output)
+        document = json.loads((root / fs.OUTPUT).read_bytes())
+        layer = self.layer(document, "layer-a")
+        self.assertEqual(layer["terminal_state"], "FINAL")
+        self.assertEqual(layer["verdict"]["reopened_by"], [])
+        self.assertEqual(document["summary"]["final_layers"], 1)
+        code, output = self.run_main(root, "--check")
+        self.assertEqual(code, 0, output)
+
     def test_retained_change_reopens_final_and_its_receipt_is_required(self):
         for retained in (True, False):
             with self.subTest(retained=retained):

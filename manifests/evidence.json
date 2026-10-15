@@ -62223,8 +62223,8 @@
     },
     {
       "path": "scripts/final_stack.py",
-      "sha256": "8682a061d1d988400ba1a528e229a219813cc2a487d923f1a0ab1516310ef308",
-      "bytes": 74548
+      "sha256": "ecd25ecb6f54de59123766ed39dce625930b489718b7d7df2175520e07b69a44",
+      "bytes": 74559
     },
     {
       "path": "scripts/freshness_propose.py",
@@ -62978,8 +62978,8 @@
     },
     {
       "path": "tests/test_angle_records_fix3.py",
-      "sha256": "c1820391943384fff0c65579a928efbe2799b3059de147c0b0640ee3ed2fa22d",
-      "bytes": 11041
+      "sha256": "0d629afe662772f1215e157c4c326dcb43a0ceea0c7b2373e60f3850eac13277",
+      "bytes": 13752
     },
     {
       "path": "tests/test_anthropic_key_health.py",

@@ -626,8 +626,8 @@ def final_reopened_by(sources: Sources, key: tuple[str, str], later: list[dict],
         for row in sweep["record"]["layers"]:
             if (row["catalog"], row["layer_id"]) != key:
                 continue
-            # The ledger's retained scope hashes reset independently of reopen markers.
-            changed = changed or any(baseline_row.get(field) not in (None, row.get(field))
+            # An unknown pre-verdict scope cannot establish that later scope is unchanged.
+            changed = changed or baseline is None or any(baseline_row.get(field) != row.get(field)
                                      for field in ("requirement_sha256", "platform_profiles_sha256"))
             markers = row.get("reopen") or []
             if not isinstance(markers, list):
