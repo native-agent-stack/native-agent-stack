@@ -1597,6 +1597,66 @@ class NewWaveFixture(RecordVerdictsFixture):
 
 
 class NewWaveLaneIdentityTests(NewWaveFixture):
+    def empty_registration(self):
+        from scripts.landscape import is_unrun_registration
+        path = self.root / record_verdicts.LEDGER_FILES["foundation"]
+        document = json.loads(path.read_text())
+        row = next(row for row in document["layers"] if row["layer_id"] == "wave-same-layer")
+        row.update(registration_only=True, candidates=[], winners=[], alternatives=[],
+                   open_gaps=["Await screened candidate promotion and independent lane verdicts."])
+        self.write(record_verdicts.LEDGER_FILES["foundation"], document)
+        self.assertTrue(is_unrun_registration(row, root=self.root))
+        build_landscape(self.root)
+
+    def publication_bytes(self):
+        return {path.relative_to(self.root).as_posix(): path.read_bytes()
+                for path in self.root.rglob("*") if path.is_file()}
+
+    def test_empty_registration_first_lanes_refuse_before_any_publication(self):
+        self.empty_registration()
+        catalog = self.both_lanes("wave-same-layer")
+        before = self.publication_bytes()
+        with self.assertRaisesRegex(SystemExit, "registration_only requires screened ledger candidates"):
+            self.run_wave()
+        self.assertEqual(self.publication_bytes(), before)
+        self.assertIs(self.load_row(catalog, "wave-same-layer")["registration_only"], True)
+        build_landscape(self.root)
+
+    def test_empty_registration_codex_only_refuses_before_any_publication(self):
+        self.empty_registration()
+        catalog = self.both_lanes("wave-same-layer")
+        (self.work_dir / "claude" / "foundation__wave-same-layer.json").unlink()
+        before = self.publication_bytes()
+        with self.assertRaisesRegex(SystemExit, "registration_only requires screened ledger candidates"):
+            self.run_wave()
+        self.assertEqual(self.publication_bytes(), before)
+        row = self.load_row(catalog, "wave-same-layer")
+        self.assertIs(row["registration_only"], True)
+        self.assertEqual(row["verdict_status"], "pending_lanes")
+        self.assertEqual(row["winners"], [])
+        build_landscape(self.root)
+
+    def test_missing_returns_leave_the_valid_empty_registration_unchanged(self):
+        self.empty_registration()
+        before = self.load_row("foundation", "wave-same-layer")
+        code, output = self.run_wave()
+        self.assertEqual(code, 0, output)
+        self.assertEqual(self.load_row("foundation", "wave-same-layer"), before)
+
+    def test_wholly_rejected_returns_leave_the_valid_empty_registration_unchanged(self):
+        self.empty_registration()
+        before = self.load_row("foundation", "wave-same-layer")
+        self.both_lanes("wave-same-layer")
+        for lane in ("claude", "codex"):
+            path = self.work_dir / lane / "foundation__wave-same-layer.json"
+            data = json.loads(path.read_text())
+            data["packet_sha256"] = "f" * 64
+            path.write_text(json.dumps(data))
+        code, output = self.run_wave()
+        self.assertEqual(code, 1, output)
+        self.assertIn("packet_sha256 does not match", output)
+        self.assertEqual(self.load_row("foundation", "wave-same-layer"), before)
+
     def test_a_complete_new_wave_records_and_validates(self):
         catalog = self.both_lanes("wave-same-layer")
         code, output = self.run_wave()

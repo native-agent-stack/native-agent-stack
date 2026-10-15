@@ -829,6 +829,13 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
     if not valid:
         return []
 
+    if "registration_only" in row:
+        # Packets may supply screened candidates while the ledger is still
+        # empty. Do not infer v1 selection roles from a single lane or publish
+        # a sealed row that the unchanged candidate checks will reject.
+        raise SystemExit(f"{catalog}/{layer_id}: registration_only requires screened ledger candidates "
+                         "and marker retirement before recording lanes; no verdict or sealed output was published")
+
     if "claude" in valid and "codex" in valid:
         agreement = ("same_winner"
                      if component_ids_for(valid["claude"], candidates_by_key)

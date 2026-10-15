@@ -1,0 +1,36 @@
+{
+  "schema": "muse-file-fence-fix/1",
+  "reviewed_head": "604d905a156dd7083d2b4e4dc25446933ca26f5f",
+  "review_sha256": "0b535fe89713acc0fa26b712a494f4343a85eedce0dea5866cffc71663897aee",
+  "fix_round": 1,
+  "evidence_class": "local_integration",
+  "regressions": [
+    {
+      "test": "test_probe_preserves_existing_worktree_and_log_files",
+      "before": "FAIL: existing worktree marker deleted by mandatory probe",
+      "after": "PASS: existing worktree and log files retain bytes and inode; probe temporary files cleaned"
+    },
+    {
+      "test": "test_tmp_brief_and_input_mounts_remain_readonly",
+      "before": "FAIL: bubblewrap cannot create symlink at existing /tmp directory",
+      "after": "PASS: brief and declared input readable and read-only; undeclared sibling masked; temporary write only in log tmp tree"
+    },
+    {
+      "test": "test_declared_worktree_input_readonly_overlay",
+      "before": "ERROR: ValueError read-only dependency overlaps writable tree",
+      "after": "PASS: declared worktree input read-only and preserved; ordinary worktree file writable"
+    }
+  ],
+  "before_command": "python3 -B -m unittest -v tests.test_muse_file_fence.MuseFenceTests.test_probe_preserves_existing_worktree_and_log_files tests.test_muse_file_fence.MuseFenceTests.test_tmp_brief_and_input_mounts_remain_readonly tests.test_muse_file_fence.MuseFenceTests.test_declared_worktree_input_readonly_overlay",
+  "before_exit_code": 1,
+  "after_command": "MUSE_FENCE_NATIVE_PROBE=1 python3 -B -m unittest tests.test_muse_file_fence -v",
+  "after_exit_code": 0,
+  "after_tests": 14,
+  "retained_guards": "Log-local input and worktree-local runtime still refused; sign-in disjointness unchanged",
+  "live_calls_this_round": 0,
+  "native_boundary": "Native echo model-free extension controls rerun; original one live reader smoke retained at its recorded source state",
+  "sources": [
+    "https://github.com/containers/bubblewrap/blob/124c4cdf4321f63ef17a1cb0ce8f9dd45bd7adbe/bwrap.xml",
+    "https://github.com/python/cpython/blob/v3.13.16/Lib/tempfile.py"
+  ]
+}
