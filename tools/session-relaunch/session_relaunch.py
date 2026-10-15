@@ -320,7 +320,8 @@ TAB_STARTS = ("opened", "timeout", "in_flight")  # call results after which a ta
 def unresolved(entry: dict) -> bool:
     """A tab start of this session may have been issued and the session was never seen listed: a call since the last
     reopen (`resolved_through`) opened, timed out or is recorded in flight. Only an explicit `--reopen <name>` opens the
-    session again, and a reopen counts only once its own call is recorded."""
+    session again, and a reopen counts only once its own call is recorded. A session seen listed and later found
+    absent has its calls resolved too (`resolved_through` moves past them), since its tab start did register."""
     if entry.get("outcome") == "running":
         return False
     calls = (entry.get("attempts") or [])[entry.get("resolved_through", 0):]
@@ -544,13 +545,20 @@ def locked_relaunch(config: dict, *, boot_id: str, at: dt.datetime, boots: list[
         if entry["outcome"] != "running" and unresolved(entry):
             entry["outcome"] = unresolved_outcome(entry)  # e.g. a reopen that was skipped before its call
         save()
+    # Completion rests on this final read: a session seen running earlier in the run (it registered) and missing now
+    # has exited, so it is absent, and its tab start is resolved (seen listed), so a rerun opens it again without a
+    # --reopen. An unreadable final list leaves the run partial; a rerun reads it again.
     final = list_sessions(config["claude"])
     if final is not None:
         live = {row.get("name") for row in final}
         for entry in sessions:
             if entry["session_name"] in live:
                 entry["outcome"] = "running"
-    state["status"] = "complete" if all(entry["outcome"] == "running" for entry in sessions) else "partial"
+            elif entry["outcome"] == "running":
+                entry["outcome"] = "absent"
+                entry["resolved_through"] = len(entry.get("attempts") or [])
+    complete = final is not None and all(entry["outcome"] == "running" for entry in sessions)
+    state["status"] = "complete" if complete else "partial"
     state["runs"][-1]["ended_at"] = iso(now_utc())
     save()
     print(f"session_relaunch: handoff {handoff} (sha256 {state['handoff_sha256']}); {state['status']}: "

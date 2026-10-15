@@ -14,7 +14,7 @@ command center that the sessions had not come back by themselves. This folder ho
 Not measured: a relaunch at a real boot, which waits for the next restart; the distro start after a WSL service
 restart, which is the host lane's part.
 
-Re-run the tests with `python3 -m unittest tests.test_session_relaunch` (51 tests; the client and PowerShell are
+Re-run the tests with `python3 -m unittest tests.test_session_relaunch` (53 tests; the client and PowerShell are
 stand-ins). Re-run the retro dry run with
 `python3 -I evidence/artifacts/session-relaunch-20261014/probe/retro_dry_run.py tools/session-relaunch/session_relaunch.py tools/session-relaunch/config.example.json /tmp/retro.md <rows.json>`
 on a host whose journal still lists the boot `a84c7d5283d54dee8de81e0c792dcaa0`. `<rows.json>` holds the seven

@@ -72,8 +72,10 @@ sha256, each run (`boot`, `started_at`, `ended_at`), and each session's tab call
 | `skipped` | the live list could not be read before a call, so no call was made |
 | `uncertain` | a call timed out after `tab_timeout_s` (120 s), or the run stopped inside a call, and the session was not listed |
 | `unconfirmed` | the opener returned rc 0 but the session was not listed within the settle wait |
+| `absent` | listed earlier in this run but missing from its final live list: it registered, then exited |
 
-The status is `in_progress` from the run's start, then `complete` when every session is listed, else `partial`. The
+The status is `in_progress` from the run's start, then `complete` when the live list read at the run's end lists
+every session, else `partial` (also when that last read fails). The
 live list is read before every tab call, and a call is made only when that read lists the session as absent. Each
 call is recorded in the state file (`in_flight`) before it is made. Its result is saved together with the provisional
 outcome (`unconfirmed` after rc 0, `uncertain` after a timeout) before the settle wait, so a run stopped while it waits
@@ -83,7 +85,8 @@ never repeated, because a tab may already be open: the run waits for the session
 
 A rerun of an `in_progress` or `partial` relaunch reuses its sealed handoff (refused when the file is missing or its
 sha256 differs). It opens again only the sessions that are not running and whose earlier calls cannot have started a
-tab (`pending`, `failed`, `skipped`). A session with a call since its last reopen that opened, timed out or is still
+tab (`pending`, `failed`, `skipped`, and `absent`, whose tab start registered before it exited). A session with a
+call since its last reopen that opened, timed out or is still
 `in_flight` is unresolved and stays as it is (`unconfirmed` or `uncertain`), because its first `claude -n` may still
 register. The next boot reruns the relaunch by
 itself when no roster of this boot exists; within this boot the command center reruns it with

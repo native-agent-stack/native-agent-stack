@@ -52,6 +52,8 @@ if os.environ.get("FAKE_PS_LAUNCH", "1" if rc == 0 else "0") == "1":
     launched = names[argv[argv.index("-Name") + 1]]
     path = os.environ["FAKE_AGENTS_JSON"]
     rows = json.load(open(path))
+    gone = json.loads(os.environ.get("FAKE_PS_KILL", "{}")).get(argv[argv.index("-Name") + 1])
+    rows = [r for r in rows if r["name"] != gone]  # a session that registered earlier exits as this tab opens
     rows.append({"name": launched, "kind": "interactive", "sessionId": "new", "cwd": "/w", "pid": "1", "status": "busy"})
     json.dump(rows, open(path, "w"))
     print("opened " + launched, flush=True)
@@ -318,6 +320,41 @@ class Relaunch(Fixture):
         self.agents.write_text(json.dumps([row(n, "by-hand") for n in ("wsl-architecture-design", "trading-cc", "ns2604-coop")]))
         self.run_relaunch(at=NOW + dt.timedelta(minutes=5))
         self.assertEqual(len(self.ps_calls()), 6)
+        self.assertEqual((self.state()["status"], set(self.outcomes().values())), ("complete", {"running"}))
+
+    def test_a_session_that_registers_and_then_exits_leaves_a_recoverable_partial_state(self):
+        # Local review P2 at 7aad5a02 (:533; the final pass at c8d7fa9e :547-553): the command center registered, then
+        # exited as the next tab opened. Its earlier running outcome stood, the run said complete, and plan() refused
+        # every later rerun as already relaunched. Completion now rests on the final live list, and the session seen
+        # running has its tab start resolved, so a rerun opens it again without a --reopen.
+        self.crash_roster()
+        os.environ["FAKE_PS_KILL"] = json.dumps({"trading-cc": "wsl-architecture-design"})
+        self.run_relaunch()
+        self.assertEqual(self.state()["status"], "partial")
+        self.assertEqual(self.outcomes(), {"wsl-architecture-design": "absent", "trading-cc": "running",
+                                           "ns2604-coop": "running"})
+        del os.environ["FAKE_PS_KILL"]
+        self.run_relaunch(at=NOW + dt.timedelta(minutes=5))
+        self.assertEqual([c[c.index("-Name") + 1] for c in self.ps_calls()], ["cc", "trading-cc", "coop", "cc"])
+        self.assertEqual((self.state()["status"], set(self.outcomes().values())), ("complete", {"running"}))
+
+    def test_an_unreadable_final_list_never_completes_a_run(self):
+        # The same finding: completion rests on a final live list that was read. When that read fails, the run is
+        # partial (exit 1, the alert), and a rerun reads the list again and completes without a tab.
+        self.crash_roster()
+        done, real_one, real_list = [], R.relaunch_one, R.list_sessions
+
+        def one(*args, **kwargs):
+            done.append(real_one(*args, **kwargs))
+            return done[-1]
+
+        with mock.patch.object(R, "relaunch_one", side_effect=one), \
+                mock.patch.object(R, "list_sessions", side_effect=lambda claude: None if len(done) == 3 else real_list(claude)):
+            self.run_relaunch()
+        self.assertEqual(done, ["running"] * 3)
+        self.assertEqual(self.state()["status"], "partial")
+        self.run_relaunch(at=NOW + dt.timedelta(minutes=5))
+        self.assertEqual(len(self.ps_calls()), 3)
         self.assertEqual((self.state()["status"], set(self.outcomes().values())), ("complete", {"running"}))
 
     def test_a_crash_before_the_first_minute_snapshot_is_recovered_by_the_next_boot(self):
