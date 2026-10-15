@@ -2098,6 +2098,10 @@
     },
     {
       "root": "repo",
+      "path": "scripts/model_currency_tracking.py"
+    },
+    {
+      "root": "repo",
       "path": "scripts/native_token_ci.py"
     },
     {

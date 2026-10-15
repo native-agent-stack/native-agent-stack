@@ -1,7 +1,9 @@
 """Offline day-five policy and native issue delivery; no network/model calls."""
 import copy
 import json
+import os
 from pathlib import Path
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -122,6 +124,39 @@ class CurrencyIssueTests(unittest.TestCase):
 
 
 class CurrencyWorkflowTests(unittest.TestCase):
+    def test_queued_event_resolves_current_main_before_checkout_and_plan(self):
+        job = load_workflow((ROOT / ".github/workflows/catalog-freshness.yml").read_text())["jobs"]["model-currency"]
+        steps = job["steps"]
+        self.assertTrue(any(s.get("id") == "current_main" for s in steps),
+                        "queued/rerun event SHA must not supply the review inventory")
+        resolver = next(s for s in steps if s.get("id") == "current_main")
+        checkout = next(s for s in steps if s.get("uses", "").startswith("actions/checkout@"))
+        self.assertEqual(checkout["with"]["ref"], "${{ steps.current_main.outputs.sha }}")
+        self.assertLess(steps.index(resolver), steps.index(checkout))
+        plan = next(s for s in steps if "scripts/model_currency_tracking.py" in s.get("run", ""))
+        self.assertLess(steps.index(checkout), steps.index(plan))
+        self.assertEqual(resolver["env"]["GH_TOKEN"], "${{ github.token }}")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            native = root / "gh"
+            native.write_text("#!/usr/bin/env python3\nimport os,sys\n"
+                              "assert sys.argv[1:] == ['api','repos/owner/repo/git/ref/heads/main','--jq','.object.sha']\n"
+                              "print(os.environ['FIXTURE_MAIN_SHA'])\n")
+            native.chmod(0o755)
+            output = root / "output"
+            environment = {**os.environ, "PATH": str(root) + os.pathsep + os.environ["PATH"],
+                           "GITHUB_SHA": "a" * 40, "REPOSITORY": "owner/repo", "GITHUB_OUTPUT": str(output)}
+            for current, expected in (("b" * 40, 0), ("", 1), ("main", 1)):
+                with self.subTest(current=current):
+                    output.unlink(missing_ok=True)
+                    result = subprocess.run(["bash", "-e", "-o", "pipefail", "-c", resolver["run"]],
+                                            env={**environment, "FIXTURE_MAIN_SHA": current}, capture_output=True, text=True)
+                    self.assertEqual(result.returncode, expected)
+                    if expected == 0:
+                        self.assertEqual(output.read_text().strip(), "sha=" + "b" * 40)
+                    else:
+                        self.assertFalse(output.exists(), "invalid resolution must not provide a checkout ref")
+
     def test_issue_job_is_independent_main_only_minimum_token_and_no_model(self):
         workflow = load_workflow((ROOT / ".github/workflows/catalog-freshness.yml").read_text())
         job = workflow["jobs"]["model-currency"]

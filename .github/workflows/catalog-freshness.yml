@@ -42,9 +42,21 @@ jobs:
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
         with:
           egress-policy: audit
+      - name: Resolve current main independently of the queued event SHA
+        id: current_main
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          pin="$(gh api "repos/$REPOSITORY/git/ref/heads/main" --jq '.object.sha')"
+          [[ "$pin" =~ ^[0-9a-f]{40}$ ]] || exit 1
+          printf 'sha=%s\n' "$pin" >> "$GITHUB_OUTPUT"
       - name: Check out main inventory
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ steps.current_main.outputs.sha }}
           persist-credentials: false
       - name: Check age gate and delivery invariants offline
         run: python3 -m unittest tests.test_model_currency_tracking -v
