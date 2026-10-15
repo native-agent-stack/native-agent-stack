@@ -113,7 +113,11 @@
           "use": "Practices: small PRs, squash merge, /code-review, auto mode, /loop, --bare, background tasks, attribution. Stale claims: /review, /security-review flags, the 3-day /loop, the PRINT_BG_WAIT description."
         }
       ],
-      "record": "docs/decisions/2026-09-28-community-sweep.md"
+      "record": "docs/decisions/2026-09-28-community-sweep.md",
+      "screen_paths": [
+        "README.md",
+        "best-practice/*"
+      ]
     },
     {
       "repository": "hesreallyhim/awesome-claude-code",

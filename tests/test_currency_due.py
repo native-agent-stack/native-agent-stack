@@ -58,6 +58,17 @@ sys.exit(spec.get("code", 0))
 """
 
 
+def practice_refs_report(*screened):
+    """practice_references.py's report (build_report(); a row per reference). ``screened`` is (repository, changed,
+    matched) for references with screen_paths; one reference without screen_paths is always present."""
+    rows = [{"repository": "example/plain", "role": "community", "pin": "0" * 40, "flags": ["drifted"],
+             "status": "drifted", "commits_since_pin": 9}]
+    rows += [{"repository": repository, "role": "community", "pin": "1" * 40, "head_sha": "2" * 40, "flags": ["drifted"],
+              "status": "drifted", "commits_since_pin": 134, "screen_paths_changed": changed,
+              "screen_paths_matched": list(matched)} for repository, changed, matched in screened]
+    return {"schema": "practice-references-freshness/1", "references": rows, "summary": {"references": len(rows)}}
+
+
 def staleness_report(*flagged):
     """receipt_staleness.py --json (assess(), receipt_staleness.py:156-164); ``flagged`` is (component, flags) pairs.
     One unflagged row is always present."""
@@ -194,6 +205,7 @@ class Checkout:
         self.set(SATURATION, saturation_report([("foundation/workers", False, "sweep-a")]))
         self.set(cd.ACTIVE_MODELS[0], {"schema_version": 1, "status": "current", "stale_count": 0,
                                       "findings": [], "errors": []})
+        self.set(cd.PRACTICE_REFS[0], practice_refs_report())
         self.write_ledger(ledger(("sweep-a", "2026-09-29", "completed")))
         # The user manager's answer that run() hands the script instead of this host's: {unit: properties}, or a string
         # saying why it could not be asked. No unit by default.
@@ -633,7 +645,7 @@ class IncompleteSkillCheckTests(unittest.TestCase):
         self.assertEqual(code, 0, stderr)
         document = json.loads(checkout.due_file.read_text(encoding="utf-8"))
         self.assertEqual(document["due"], {"pins_behind": 1, "stale_receipts": 2, "due_layers": 0,
-                                           "reopen_triggers": 1, "host_alerts": 0})
+                                           "reopen_triggers": 1, "host_alerts": 0, "practice_refs_ahead": 0})
         coverage = document["details"][-1]
         self.assertEqual((coverage["skills_complete"], coverage["skills_fetch_errors"], coverage["skills_unresolved"]),
                          (False, 1, 1))
@@ -732,7 +744,7 @@ class DetailsCommandTests(unittest.TestCase):
         checkout.set(SKILLS, stdout="{}", output_file=json.dumps(skills_report(("skill-drift",))))
         document = self.notice(checkout, "--network")
         self.assertEqual(document["due"], {"pins_behind": 1, "stale_receipts": 0, "due_layers": 0,
-                                           "reopen_triggers": 0, "host_alerts": 0})
+                                           "reopen_triggers": 0, "host_alerts": 0, "practice_refs_ahead": 0})
         self.assertEqual(document["summary_line"], f"stack currency: 1 pin behind; details: {checkout.command('--network')}")
         again = self.reproduced(checkout, document)
         self.assertEqual((again["due"], again["summary_line"]), (document["due"], document["summary_line"]))
@@ -1138,7 +1150,7 @@ class SurfaceWatchTests(unittest.TestCase):
 
     def report(self, checkout: Checkout, generated_at: str = "2026-09-29T12:00:00Z", unreviewed=None,
                raw: str | None = None, sources=None, run_at: str | None = None, kinds_not_observed=None,
-               schema_version: object = 1) -> None:
+               schema_version: object = 1, versions=None) -> None:
         path = checkout.state / "surface-watch" / "latest.json"
         path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
         if sources is None:
@@ -1151,6 +1163,8 @@ class SurfaceWatchTests(unittest.TestCase):
                     "summary_line": "surface watch: 3 unreviewed of 3 new; details: python3 x --dry-run"}
         if schema_version is self.NO_VERSION:
             del document["schema_version"]
+        if versions is not None:
+            document["versions"] = versions
         path.write_text(raw if raw is not None else json.dumps(document), encoding="utf-8")
 
     def document(self, checkout: Checkout) -> dict:
@@ -1572,13 +1586,164 @@ class SurfaceWatchTests(unittest.TestCase):
         self.assertNotIn("surface_unreviewed", document["due"])
         self.assertIsNone(document["details"][-1]["surface_watch"])
 
-    def test_the_line_keeps_its_limit_with_all_seven_counts(self):
+    def test_the_line_keeps_its_limit_with_every_count(self):
         due = {key: 9999 for key in cd.COUNT_KEYS}
         line = cd.summary_line(due, "python3 ~/code/native-agent-stack-live/scripts/currency_due.py --dry-run")
         self.assertLessEqual(len(line), 160)
         self.assertTrue(line.endswith("; details: python3 ~/code/native-agent-stack-live/scripts/currency_due.py "
                                       "--dry-run"))
 
+
+class PracticeClientTests(unittest.TestCase):
+    """practice_client_behind (CC ruling B3/W2, 2026-10-15): the Claude Code release the fresh surface-watch report
+    watched (versions.claude_code.watched) is newer than the client_version of the inspected checkout's practice skill
+    (.claude/skills/claude-native-practice/reference/slots.json), so the skill's step 2 (screen the CHANGELOG delta
+    against the slot rows) is due. Offline: it reads the same report surface_unreviewed reads, and only while that
+    report is fresh."""
+
+    surface = SurfaceWatchTests()
+
+    def checkout(self, client_version="2.1.295", watched="2.1.300", fresh=True) -> Checkout:
+        checkout = Checkout(self)
+        if client_version is not None:
+            slots = checkout.root / cd.PRACTICE_SLOTS
+            slots.parent.mkdir(parents=True, exist_ok=True)
+            slots.write_text(json.dumps({"client_version": client_version, "slots": []}), encoding="utf-8")
+        versions = None if watched is None else {"claude_code": {"watched": watched, "channel": "latest"}}
+        self.surface.report(checkout, unreviewed=[], versions=versions,
+                            generated_at="2026-09-29T12:00:00Z" if fresh else "2026-09-20T12:00:00Z")
+        return checkout
+
+    def document(self, checkout: Checkout) -> dict:
+        code, stdout, stderr = checkout.run("--dry-run", "--json")
+        self.assertEqual(code, 0, stderr)
+        return json.loads(stdout)
+
+    def test_a_newer_watched_release_than_the_practice_pages_is_due(self):
+        checkout = self.checkout()
+        document = self.document(checkout)
+        self.assertEqual(document["due"]["practice_client_behind"], 1)
+        finding = next(item for item in document["details"] if item["kind"] == "practice_behind")
+        self.assertEqual((finding["client_version"], finding["watched"]), ("2.1.295", "2.1.300"))
+        self.assertIn("1 practice skill behind", document["summary_line"])
+        self.assertEqual(document["details"][-1]["practice_client"], "behind")
+        code, stdout, stderr = checkout.run("--dry-run")
+        self.assertIn("practice skill: pages at 2.1.295, client 2.1.300", stdout)
+        self.assertIn(".claude/skills/claude-native-practice/SKILL.md", stdout)
+
+    def test_versions_compare_as_numbers_not_text(self):
+        document = self.document(self.checkout(client_version="2.1.99", watched="2.1.300"))
+        self.assertEqual(document["due"]["practice_client_behind"], 1)
+        document = self.document(self.checkout(client_version="2.1.300", watched="2.1.99"))
+        self.assertEqual(document["due"]["practice_client_behind"], 0)
+        self.assertEqual(document["details"][-1]["practice_client"], "current")
+
+    def test_pages_at_the_watched_release_are_current(self):
+        document = self.document(self.checkout(client_version="2.1.300"))
+        self.assertEqual(document["due"]["practice_client_behind"], 0)
+        self.assertNotIn("practice skill", document["summary_line"])
+
+    def test_no_count_without_a_fresh_watch_or_without_the_skill(self):
+        for label, kwargs in (("stale watch", {"fresh": False}), ("no practice skill", {"client_version": None})):
+            with self.subTest(case=label):
+                document = self.document(self.checkout(**kwargs))
+                self.assertNotIn("practice_client_behind", document["due"])
+                self.assertIsNone(document["details"][-1]["practice_client"])
+
+    def test_an_unreadable_version_is_unknown_never_a_count(self):
+        for label, kwargs in (("no watched version", {"watched": None}), ("watched not a version", {"watched": "latest"}),
+                              ("client not a version", {"client_version": "2.1"})):
+            with self.subTest(case=label):
+                document = self.document(self.checkout(**kwargs))
+                self.assertNotIn("practice_client_behind", document["due"])
+                self.assertEqual(document["details"][-1]["practice_client"], "unknown")
+
+
+    def test_an_unknown_practice_client_is_a_gap_never_nothing_due(self):
+        # Local review P2 at ecfe6dec (currency_due.py:828-831): "unknown" was not a gap, so with every count at zero the
+        # run printed "nothing due" and deleted the previous due-file.
+        document = self.document(self.checkout(watched="latest"))
+        self.assertEqual(document["details"][-1]["practice_client"], "unknown")
+        self.assertIn("practice skill check incomplete", cd.gaps_of(document))
+        self.assertTrue(cd.incomplete(document))
+        self.assertIn("practice skill check incomplete", document["summary_line"])
+
+
+class PracticeRefsTests(unittest.TestCase):
+    """practice_refs_ahead (CC ruling B3/W2, 2026-10-15): references in catalogs/foundation/practice-references.json
+    with screen_paths whose practice files changed since their pin (practice_references.py, the same tool the weekly
+    workflow runs). A network check: it runs only with --network, as the skill check does."""
+
+    def test_changed_practice_files_of_a_screened_reference_are_due_with_network(self):
+        checkout = Checkout(self)
+        checkout.set(cd.PRACTICE_REFS[0], practice_refs_report(
+            ("shanraisshan/claude-code-best-practice", 5, ["README.md", "best-practice/claude-settings.md"]),
+            ("example/quiet", 0, [])))
+        checkout.set(SKILLS, stdout="{}", output_file=json.dumps(skills_report(("current",))))
+        code, stdout, stderr = checkout.run("--dry-run", "--json", "--network")
+        self.assertEqual(code, 0, stderr)
+        document = json.loads(stdout)
+        self.assertEqual(document["due"]["practice_refs_ahead"], 1)
+        finding = next(item for item in document["details"] if item["kind"] == "practice_ref_ahead")
+        self.assertEqual((finding["repository"], finding["changed"]), ("shanraisshan/claude-code-best-practice", 5))
+        self.assertIn("1 practice reference to screen", document["summary_line"])
+        self.assertEqual(document["details"][-1]["practice_refs"], "checked")
+        arguments = checkout.recorded(cd.PRACTICE_REFS[0])
+        self.assertEqual(arguments[:2], ["--catalog", str(checkout.root / cd.PRACTICE_CATALOG)])
+        code, text, _ = checkout.run("--dry-run", "--network")
+        self.assertIn("practice reference: shanraisshan/claude-code-best-practice, 5 practice file(s) changed", text)
+
+    def test_drift_without_a_screened_change_is_not_due(self):
+        checkout = Checkout(self)
+        checkout.set(SKILLS, stdout="{}", output_file=json.dumps(skills_report(("current",))))
+        code, stdout, stderr = checkout.run("--dry-run", "--json", "--network")
+        self.assertEqual(code, 0, stderr)
+        self.assertEqual(json.loads(stdout)["due"]["practice_refs_ahead"], 0)
+
+    def test_it_is_a_network_check(self):
+        checkout = Checkout(self)
+        checkout.set(cd.PRACTICE_REFS[0], practice_refs_report(("example/guide", 3, ["README.md"])))
+        code, stdout, _ = checkout.run("--dry-run", "--json")
+        self.assertEqual(code, 0)
+        self.assertNotIn("practice_refs_ahead", json.loads(stdout)["due"])
+        self.assertIsNone(checkout.recorded(cd.PRACTICE_REFS[0]))
+        self.assertIsNone(json.loads(stdout)["details"][-1]["practice_refs"])
+
+    def test_an_unknown_screened_change_or_a_failed_check_is_a_gap_never_nothing_due(self):
+        cases = {"unknown change": dict(report=practice_refs_report(("example/guide", None, []))),
+                 "check failed": dict(stdout="not json", code=2)}
+        for label, spec in cases.items():
+            with self.subTest(case=label):
+                checkout = Checkout(self)
+                checkout.set(SKILLS, stdout="{}", output_file=json.dumps(skills_report(("current",))))
+                checkout.set(cd.PRACTICE_REFS[0], spec.get("report"), stdout=spec.get("stdout"), code=spec.get("code", 0))
+                code, stdout, stderr = checkout.run("--dry-run", "--json", "--network")
+                self.assertEqual(code, 0, stderr)
+                document = json.loads(stdout)
+                self.assertNotIn("practice_refs_ahead", document["due"])
+                self.assertEqual(document["details"][-1]["practice_refs"], "unknown")
+                self.assertIn("practice reference check incomplete", document["summary_line"])
+
+
+    def test_a_known_change_survives_another_reference_that_is_unknown(self):
+        # GPT read of #1136 at 6162aa04 (P2, currency_due.py:409): one screened reference whose change was unknown
+        # discarded another reference's known change, so no due-file was written. The known count and its details stay;
+        # the coverage stays "unknown" and the line names the gap.
+        checkout = Checkout(self)
+        checkout.set(SKILLS, stdout="{}", output_file=json.dumps(skills_report(("current",))))
+        checkout.set(cd.PRACTICE_REFS[0], practice_refs_report(("example/known", 1, ["README.md"]),
+                                                               ("example/unreachable", None, [])))
+        code, stdout, stderr = checkout.run("--dry-run", "--json", "--network")
+        self.assertEqual(code, 0, stderr)
+        document = json.loads(stdout)
+        self.assertEqual(document["due"]["practice_refs_ahead"], 1)
+        finding = next(item for item in document["details"] if item["kind"] == "practice_ref_ahead")
+        self.assertEqual(finding["repository"], "example/known")
+        self.assertEqual(document["details"][-1]["practice_refs"], "unknown")
+        self.assertIn(cd.PRACTICE_REFS_GAP, cd.gaps_of(document))  # with a count, the line shows counts only
+        code, _, stderr = checkout.run("--network")
+        self.assertEqual(code, 0, stderr)
+        self.assertTrue((checkout.state / cd.DUE_FILE).is_file())
 
 class ThisCheckoutTests(unittest.TestCase):
     def test_the_real_checks_run_dry_and_write_nothing(self):
@@ -1616,11 +1781,17 @@ class UnitTemplateTests(unittest.TestCase):
     def test_the_service_is_a_guarded_oneshot_that_only_the_timer_starts(self):
         for setting in ("Type=oneshot", "UMask=0077", "NoNewPrivileges=true",
                         "Environment=PYTHONDONTWRITEBYTECODE=1",
-                        "ExecStart=/usr/bin/python3 @REPOSITORY@/scripts/currency_due.py"):
+                        "ExecStart=/usr/bin/python3 @REPOSITORY@/scripts/currency_due.py --network"):
             self.assertIn(setting, self.service)
         self.assertNotIn("[Install]", self.service)
         directives = [line for line in self.service if line and not line.startswith("#")]
-        self.assertFalse(any("--network" in line for line in directives))
+        # CC ruling B3/W2 (2026-10-15): the daily run makes the read-only network checks (skill pins and the
+        # practice references), so --network is on ExecStart and the start timeout covers their bounds.
+        self.assertEqual([line for line in directives if "--network" in line],
+                         ["ExecStart=/usr/bin/python3 @REPOSITORY@/scripts/currency_due.py --network"])
+        timeout = next(line for line in directives if line.startswith("TimeoutStartSec="))
+        bounds = sum(check[2] for check in (cd.RECEIPTS, cd.LAYERS, cd.PINS, cd.SKILLS, cd.PRACTICE_REFS, cd.ACTIVE_MODELS))
+        self.assertGreaterEqual(int(timeout.removeprefix("TimeoutStartSec=")), bounds)
         # The version probes of adoption_status.py --pinned-versions resolve through PATH (shutil.which), and the
         # user manager's own PATH lacks the ecosystem bin directory.
         search_path = next(line for line in directives if line.startswith("Environment=PATH="))
@@ -1633,6 +1804,7 @@ class UnitTemplateTests(unittest.TestCase):
         flags = shlex.split(execstart.removeprefix("ExecStart="))[2:]
         checkout = Checkout(self)
         checkout.something_due()
+        checkout.set(SKILLS, stdout="{}", output_file=json.dumps(skills_report(("current",))))
         code, _, stderr = checkout.run(*flags)
         self.assertEqual(code, 0, stderr)
         summary = json.loads(checkout.due_file.read_text(encoding="utf-8"))["summary_line"]

@@ -263,7 +263,7 @@ class ModelCurrencyPrivateOutputTests(unittest.TestCase):
     def test_daily_timer_uses_proposal_preflight_and_keeps_existing_due_file_command(self):
         service = (ROOT / "adoption/templates/systemd/stack-currency.service").read_text()
         self.assertIn("ExecStartPre=-/usr/bin/python3 @REPOSITORY@/scripts/freshness_propose.py --model-currency", service)
-        self.assertIn("ExecStart=/usr/bin/python3 @REPOSITORY@/scripts/currency_due.py", service)
+        self.assertIn("ExecStart=/usr/bin/python3 @REPOSITORY@/scripts/currency_due.py --network", service)
         self.assertIn("Nice=19", service)
         self.assertIn("IOSchedulingClass=idle", service)
         self.assertNotIn("install.sh", service)

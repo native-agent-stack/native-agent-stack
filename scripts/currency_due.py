@@ -4,8 +4,9 @@
 The proposed daily user timer adoption/templates/systemd/stack-currency.timer can run this after host adoption.
 It runs this checkout's own
 read-only checks as subprocesses, with the arguments their weekly workflows use, reads the host's own status, and
-aggregates seven possible counts: five base counts, a surface-watch count when
-its report is fresh, and a stale-model count when the selector check finds drift:
+aggregates nine possible counts: five base counts, a surface-watch count when
+its report is fresh, a practice-skill count from the same report, a practice-reference count with --network, and a
+stale-model count when the selector check finds drift:
 
 - pins_behind: components whose platform pin's version probe did not observe the pinned version
   (scripts/adoption_status.py --pinned-versions --json, the "mismatched" ids of each selected profile, each id
@@ -38,6 +39,14 @@ its report is fresh, and a stale-model count when the selector check finds drift
   ("surface watch stale"), unreadable ("surface watch output unreadable") or only partly observed
   ("surface watch incomplete") is a check that could not answer, as an incomplete skill check is (below). None of
   these is a count or an error (docs/upstream-surface-watch.md);
+- practice_client_behind (command center ruling B3/W2, 2026-10-15): 1 when the fresh surface report's watched Claude
+  Code release (versions.claude_code.watched) is newer than client_version in the checkout's
+  .claude/skills/claude-native-practice/reference/slots.json, compared as release numbers; 0 when it is not. Without a
+  fresh report or the practice skill there is no count; a version that is not a release number is "unknown";
+- practice_refs_ahead (the same ruling, --network only): the references in catalogs/foundation/practice-references.json
+  with screen_paths whose matching files changed since their pin (tools/sota-convergence/practice_references.py, the
+  weekly workflow's own tool). A failed check, or a screened reference whose change is unknown, is the gap "practice
+  reference check incomplete", never "nothing due";
 - stale_models: active model selectors that differ from the committed versioned comparison snapshot
   (scripts/active_model_currency.py check --json). An unknown or expired live model report is a coverage gap,
   never evidence that no model selectors are due (docs/active-model-currency.md).
@@ -119,7 +128,20 @@ LABELS = {"pins_behind": ("pin behind", "pins behind"),
 SURFACE_KEY = "surface_unreviewed"
 MODEL_KEY = "stale_models"
 LABELS[MODEL_KEY] = ("stale model selector", "stale model selectors")
-COUNT_KEYS = (*DUE_KEYS, SURFACE_KEY, MODEL_KEY)
+# The practice skill's client_version against the Claude Code release the fresh surface report watched (CC ruling B3/W2,
+# 2026-10-15): when the client is newer, the skill's step 2 (screen the CHANGELOG delta against the slot rows) is due.
+PRACTICE_KEY = "practice_client_behind"
+LABELS[PRACTICE_KEY] = ("practice skill behind", "practice skills behind")
+PRACTICE_SLOTS = ".claude/skills/claude-native-practice/reference/slots.json"
+VERSION_TEXT = re.compile(r"[0-9]+(?:\.[0-9]+){2,3}")  # a release number as Claude Code prints it, such as 2.1.300
+# References in the practice-references catalog whose screen_paths changed since their pin (CC ruling B3/W2): the lane
+# screens the changed practice text against the official docs and re-pins. A network check, as the skill check is.
+PRACTICE_REFS_KEY = "practice_refs_ahead"
+LABELS[PRACTICE_REFS_KEY] = ("practice reference to screen", "practice references to screen")
+PRACTICE_CATALOG = "catalogs/foundation/practice-references.json"
+PRACTICE_REFS_GAP = "practice reference check incomplete"
+PRACTICE_CLIENT_GAP = "practice skill check incomplete"
+COUNT_KEYS = (*DUE_KEYS, SURFACE_KEY, PRACTICE_KEY, PRACTICE_REFS_KEY, MODEL_KEY)
 SURFACE_DIR = "surface-watch"
 SURFACE_FILE = "latest.json"
 SURFACE_MAX_AGE_DAYS = 3
@@ -187,6 +209,7 @@ LAYERS = ("scripts/saturation_ledger.py", frozenset({0}), 120)
 PINS = ("scripts/adoption_status.py", frozenset({0, 2}), 600)
 SKILLS = ("tools/adoption/runtime_skill_freshness.py", frozenset({0, 1}), 900)
 ACTIVE_MODELS = ("scripts/active_model_currency.py", frozenset({0, 1, 2}), 30)
+PRACTICE_REFS = ("tools/sota-convergence/practice_references.py", frozenset({0}), 600)
 
 
 class CheckError(Exception):
@@ -328,6 +351,13 @@ def collect(root: Path, now_text: str, network: bool, state: Path | None = None)
             except (OSError, UnicodeError):
                 raise CheckError(f"{Path(SKILLS[0]).name} wrote no report") from None
             skills = parse_report(Path(SKILLS[0]).name, skills_text)
+    practice_refs = None
+    if network:
+        try:
+            practice_refs = parse_report(Path(PRACTICE_REFS[0]).name, run_check(
+                root, PRACTICE_REFS, ["--catalog", str(root / PRACTICE_CATALOG), "--root", str(root), "--now", now_text]))
+        except CheckError as error:
+            practice_refs = {"error": str(error)[:200]}
     host = surface = None
     if state is not None:
         host = {"backup": read_record(state / BACKUP_RECORD), "restore": read_record(state / RESTORE_RECORD),
@@ -345,7 +375,64 @@ def collect(root: Path, now_text: str, network: bool, state: Path | None = None)
         models = {"schema_version": 1, "status": "unknown", "stale_count": 0,
                   "findings": [], "errors": ["active model check could not answer"]}
     return {"receipts": receipts, "layers": layers, "pins": pins, "skills": skills, "sweep_dates": sweep_dates(root),
-            "host": host, "surface": surface, "active_models": models}
+            "host": host, "surface": surface, "active_models": models, "practice": read_practice(root),
+            "practice_refs": practice_refs}
+
+
+def read_practice(root: Path):
+    """The checkout's practice skill as {"client_version": value}; None when the checkout has no practice skill, and
+    {"error": ...} when its slots file cannot be read."""
+    record = read_record(root / PRACTICE_SLOTS)
+    if record is None or set(record) == {"error"}:
+        return record
+    return {"client_version": record.get("client_version")}
+
+
+def release_number(value):
+    """A release number as a tuple of integers, or None for anything else (versions compare as numbers, not text)."""
+    if not isinstance(value, str) or not VERSION_TEXT.fullmatch(value):
+        return None
+    return tuple(int(part) for part in value.split("."))
+
+
+def practice_refs_findings(report) -> tuple[int | None, list[dict], dict]:
+    """(count or None, details, coverage fields) from practice_references.py's report: the references with
+    screen_paths whose matching files changed since their pin. None without --network (coverage None); a failed check,
+    a malformed report or a screened reference whose change is unknown (screen_paths_changed None) is "unknown", a gap,
+    never "nothing due"."""
+    if report is None:
+        return None, [], {"practice_refs": None}
+    rows = report.get("references") if isinstance(report, dict) else None
+    if not isinstance(rows, list) or not all(isinstance(row, dict) for row in rows):
+        return None, [], {"practice_refs": "unknown"}
+    screened = [row for row in rows if "screen_paths_changed" in row]
+    known = [row for row in screened if type(row["screen_paths_changed"]) is int and row["screen_paths_changed"] >= 0]
+    details = [{"kind": "practice_ref_ahead", "repository": row.get("repository"), "pin": row.get("pin"),
+                "head": row.get("head_sha"), "changed": row["screen_paths_changed"],
+                "matched": [name for name in row.get("screen_paths_matched") or [] if isinstance(name, str)][:10]}
+               for row in known if row["screen_paths_changed"] > 0]
+    if len(known) < len(screened):
+        # An unknown reference is a gap, but it never hides another reference's known change.
+        return (len(details) or None), details, {"practice_refs": "unknown"}
+    return len(details), details, {"practice_refs": "checked"}
+
+
+def practice_findings(practice, surface, surface_coverage: dict) -> tuple[int | None, list[dict], dict]:
+    """(count or None, details, coverage fields): 1 when the fresh surface report's watched Claude Code release is
+    newer than the practice skill's client_version, else 0. No count without a practice skill or a fresh report
+    (coverage None); a version that is not a release number is "unknown", never a count."""
+    if practice is None or surface_coverage.get("surface_watch") != SURFACE_FRESH:
+        return None, [], {"practice_client": None}
+    record = (surface or {}).get("record") or {}
+    versions = record.get("versions") if isinstance(record, dict) else None
+    claude = versions.get("claude_code") if isinstance(versions, dict) else None
+    watched = claude.get("watched") if isinstance(claude, dict) else None
+    client = practice.get("client_version")
+    if release_number(watched) is None or release_number(client) is None:
+        return None, [], {"practice_client": "unknown"}
+    if release_number(watched) <= release_number(client):
+        return 0, [], {"practice_client": "current"}
+    return 1, [{"kind": "practice_behind", "client_version": client, "watched": watched}], {"practice_client": "behind"}
 
 
 def report_options(network: bool, cadence_days: int) -> list[str]:
@@ -685,6 +772,11 @@ def aggregate(reports: dict, now: datetime, now_text: str, cadence_days: int, ro
     details += alerts
     surface_count, surface_details, surface_coverage = surface_findings(reports.get("surface"), now)
     details += surface_details
+    practice_count, practice_details, practice_coverage = practice_findings(reports.get("practice"),
+                                                                            reports.get("surface"), surface_coverage)
+    details += practice_details
+    refs_count, refs_details, refs_coverage = practice_refs_findings(reports.get("practice_refs"))
+    details += refs_details
 
     models = reports.get("active_models")
     model_count = 0
@@ -705,11 +797,16 @@ def aggregate(reports: dict, now: datetime, now_text: str, cadence_days: int, ro
     details.append({"kind": "coverage", "pins_unchecked": len(unchecked), "due_layers_total": due_total,
                     "sweep_cadence_days": cadence_days, "network": skills is not None,
                     "skills_complete": skills_complete, "skills_fetch_errors": skills_errors,
-                    "skills_unresolved": skills_unresolved, **host_coverage, **surface_coverage, **model_coverage})
+                    "skills_unresolved": skills_unresolved, **host_coverage, **surface_coverage, **practice_coverage,
+                    **refs_coverage, **model_coverage})
     due = {"pins_behind": pins_behind, "stale_receipts": stale_receipts, "due_layers": due_layers,
            "reopen_triggers": reopen_triggers, "host_alerts": len(alerts)}
     if surface_count is not None:
         due[SURFACE_KEY] = surface_count
+    if practice_count is not None:
+        due[PRACTICE_KEY] = practice_count
+    if refs_count is not None:
+        due[PRACTICE_REFS_KEY] = refs_count
     if model_count:
         due[MODEL_KEY] = model_count
     command = details_command(root, skills is not None, cadence_days)
@@ -719,6 +816,10 @@ def aggregate(reports: dict, now: datetime, now_text: str, cadence_days: int, ro
     gaps = [gap] if gap else []
     if model_coverage.get("active_models") == "unknown":
         gaps.append("model check incomplete")
+    if refs_coverage.get("practice_refs") == "unknown":
+        gaps.append(PRACTICE_REFS_GAP)
+    if practice_coverage.get("practice_client") == "unknown":
+        gaps.append(PRACTICE_CLIENT_GAP)
     line = summary_line(due, command, skills_complete is not False, due_file_pointers(due_file, from_xdg),
                         tuple(gaps))
     return {"generated_at": now_text, "root": str(root), "due": due, "summary_line": line,
@@ -731,7 +832,9 @@ def gaps_of(document: dict) -> list[str]:
     coverage = document["details"][-1]
     return ((["the skill check was incomplete"] if coverage.get("skills_complete") is False else [])
             + ([SURFACE_GAPS[coverage["surface_watch"]]] if coverage.get("surface_watch") in SURFACE_GAPS else [])
-            + (["model check incomplete"] if coverage.get("active_models") == "unknown" else []))
+            + (["model check incomplete"] if coverage.get("active_models") == "unknown" else [])
+            + ([PRACTICE_REFS_GAP] if coverage.get("practice_refs") == "unknown" else [])
+            + ([PRACTICE_CLIENT_GAP] if coverage.get("practice_client") == "unknown" else []))
 
 
 def incomplete(document: dict) -> bool:
@@ -811,6 +914,13 @@ def render_text(document: dict) -> str:
             more = "" if item["count"] <= len(item["keys"]) else f" and {item['count'] - len(item['keys'])} more"
             lines.append(f"  upstream switches: {item['count']} new without a disposition (watch of "
                          f"{item['generated_at']}): {', '.join(str(key) for key in item['keys'])}{more}")
+        elif kind == "practice_ref_ahead":
+            matched = ", ".join(str(name) for name in item.get("matched") or [])
+            lines.append(f"  practice reference: {item['repository']}, {item['changed']} practice file(s) changed since "
+                         f"{str(item.get('pin'))[:12]}: {matched}")
+        elif kind == "practice_behind":
+            lines.append(f"  practice skill: pages at {item['client_version']}, client {item['watched']} watched; "
+                         f"the CHANGELOG delta is due for screening")
         elif kind == "coverage":
             network = ("off" if not item["network"] else "on" if item["skills_complete"] else
                        f"on, incomplete ({item['skills_fetch_errors']} error(s), {item['skills_unresolved']} "
@@ -844,6 +954,12 @@ def render_text(document: dict) -> str:
     if due.get(SURFACE_KEY):
         actions.append("upstream switches: python3 scripts/upstream_surface_watch.py --dry-run and "
                        "docs/upstream-surface-watch.md")
+    if due.get(PRACTICE_REFS_KEY):
+        actions.append("practice references: screen the changed files against the official docs at the pinned client, "
+                       "then re-pin catalogs/foundation/practice-references.json")
+    if due.get(PRACTICE_KEY):
+        actions.append("practice skill: step 2 of .claude/skills/claude-native-practice/SKILL.md "
+                       "(screen the CHANGELOG delta against reference/slots.md)")
     if document["details"][-1].get("surface_watch") in SURFACE_GAPS:
         actions.append("surface watch: journalctl --user -u upstream-surface-watch.service, then "
                        "python3 scripts/upstream_surface_watch.py --network --dry-run")

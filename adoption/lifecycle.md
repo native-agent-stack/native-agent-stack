@@ -228,9 +228,10 @@ owned disposable service; do not stop it to clean up another component.
 Added after `v2026.09.26.2`: a daily user timer keeps the next session's
 currency notice current without a check at startup.
 [`stack-currency.service`](templates/systemd/stack-currency.service) runs
-`python3 scripts/currency_due.py`, which runs the receipt, pin and saturation
-checks, counts the unreviewed Claude Code and Codex switches in the upstream-surface
-watch's latest report, and writes `${XDG_STATE_HOME:-~/.local/state}/native-agent-stack/currency-due.json`
+`python3 scripts/currency_due.py --network`, which runs the receipt, pin and saturation
+checks and the read-only network checks (runtime-worker skill pins, and the practice references whose
+practice files changed since their pin), counts the unreviewed Claude Code and Codex switches and whether the
+practice skill is behind the Claude Code release in the upstream-surface watch's latest report, and writes `${XDG_STATE_HOME:-~/.local/state}/native-agent-stack/currency-due.json`
 (mode 0600) only while something is due; a SessionStart hook prints its one
 line ([decision](../docs/decisions/2026-09-30-session-currency-notice.md)).
 The service `Wants=` and runs `After=`

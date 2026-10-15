@@ -9,7 +9,11 @@ signed-in ``gh`` CLI:
   (pin drift), or that the pin no longer resolves;
 * whether the repository is stale in the sense of the OpenSSF Scorecard Maintained
   check: archived, or no default-branch commit in the last 90 days;
-* whether the repository was renamed or transferred, or is missing.
+* whether the repository was renamed or transferred, or is missing;
+* for a reference with ``screen_paths`` (fnmatch patterns; command center ruling B3/W2, 2026-10-15), how many of the files
+  changed since the pin match them (``screen_paths_changed``, with up to 20 names in ``screen_paths_matched``), read from
+  the same comparison's file list: 0 for an identical pin, None when the list was not observed or holds the API's 300
+  files without a match. scripts/currency_due.py --network counts the references with a nonzero value.
 
 It writes a deterministic JSON report (``--out``) and a Markdown table for a job summary
 (``--markdown``). Drift, staleness, renames, missing repositories and fetch errors are
@@ -86,6 +90,7 @@ repository.
 from __future__ import annotations
 
 import argparse
+import fnmatch
 import json
 import re
 import sys
@@ -119,7 +124,11 @@ TOP_LEVEL_TEXT = ("scope", "pin_rule", "stars_at_check_rule")
 TOP_LEVEL_KEYS = frozenset(TOP_LEVEL_REQUIRED + TOP_LEVEL_TEXT + ("freshness_check",))
 DIMENSION_KEYS = frozenset({"id", "description", "topics"})
 ENTRY_REQUIRED = ("repository", "role", "pin", "pin_date", "stars_at_check", "used_for", "record")
-ENTRY_OPTIONAL = ("paths_read", "release", "prior_pin")
+ENTRY_OPTIONAL = ("paths_read", "release", "prior_pin", "screen_paths")
+# GitHub REST "Compare two commits" lists at most 300 changed files (docs.github.com/en/rest/commits/commits
+# #compare-two-commits); a full list with no match cannot rule a match out.
+COMPARE_FILES_LIMIT = 300
+SCREEN_MATCHED_SAMPLES = 20
 
 # Validators use fullmatch(): "$" alone also matches just before a trailing newline.
 REPOSITORY_RE = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?/[A-Za-z0-9._-]{1,100}$")
@@ -206,6 +215,10 @@ def _validate_entry(entry, label, dimension_ids, checked_at) -> list:
             errors.append(f"{label}.paths_read: expected a non-empty list of non-empty text")
     if "release" in entry and not _is_text(entry["release"]):
         errors.append(f"{label}.release: expected non-empty text")
+    if "screen_paths" in entry:
+        patterns = entry["screen_paths"]
+        if not isinstance(patterns, list) or not patterns or not all(_is_text(pattern) for pattern in patterns):
+            errors.append(f"{label}.screen_paths: expected a non-empty list of non-empty fnmatch patterns")
     if "prior_pin" in entry:
         prior = entry["prior_pin"]
         if (not isinstance(prior, dict) or set(prior) != {"pin", "release"} or not _is_sha(prior["pin"])
@@ -336,6 +349,18 @@ def observe(entry: dict) -> dict:
                 "base_sha": base.get("sha"),
                 "base_date": ((base.get("commit") or {}).get("committer") or {}).get("date"),
             }
+            if entry.get("screen_paths") and isinstance(comparison.get("files"), list):
+                # The same response lists the changed files (CC ruling B3/W2, 2026-10-15): no second call. A rename
+                # keeps its old name too (previous_filename; github/docs@be38ec5d,
+                # src/rest/data/fpt-2022-11-28/commits.json:5517), so a practice file moved out of the screened paths
+                # still matches.
+                items = [item for item in comparison["files"]
+                         if isinstance(item, dict) and isinstance(item.get("filename"), str)]
+                observation["compare"]["files"] = [item["filename"] for item in items]
+                renamed = {item["filename"]: item["previous_filename"] for item in items
+                           if isinstance(item.get("previous_filename"), str)}
+                if renamed:
+                    observation["compare"]["renamed_from"] = renamed
         else:
             observation["compare_error"] = error or "the comparison returned no status"
         return observation
@@ -401,6 +426,8 @@ def classify(entry: dict, observation, now: datetime) -> dict:
         # a timeout included, is a fetch error.
         flags.add("missing" if gh_http_status(observation["error"]) == 404 else "fetch_error")
         errors.append(observation["error"])
+        if entry.get("screen_paths"):  # a screened reference that could not be fetched is unknown, never dropped
+            row["screen_paths_changed"], row["screen_paths_matched"] = None, []
         return _finish(row, flags, errors)
 
     archived = observation.get("archived") is True
@@ -459,7 +486,32 @@ def classify(entry: dict, observation, now: datetime) -> dict:
     elif head_time is not None:
         flags.add("fetch_error")
         errors.append("pin comparison not observed")
+    if entry.get("screen_paths"):
+        row["screen_paths_changed"], row["screen_paths_matched"] = _screened(entry["screen_paths"], compare)
     return _finish(row, flags, errors)
+
+
+def _screened(patterns: list, compare) -> tuple:
+    """(count, names) of the changed files since the pin that match ``patterns`` (fnmatch, where * also spans /):
+    0 for an identical pin, None when the comparison or its file list was not observed, or when a list at the API's
+    COMPARE_FILES_LIMIT holds no match (a truncated list cannot rule one out)."""
+    if not isinstance(compare, dict):
+        return None, []
+    if compare.get("status") == "identical":
+        return 0, []
+    files = compare.get("files")
+    if not isinstance(files, list):
+        return None, []
+    renamed = compare.get("renamed_from") if isinstance(compare.get("renamed_from"), dict) else {}
+    hit = lambda name: isinstance(name, str) and any(fnmatch.fnmatchcase(name, pattern) for pattern in patterns)
+    matched = []
+    for name in files:  # each changed entry once, whether its new name, its old name or both match
+        old = renamed.get(name) if isinstance(name, str) else None
+        if hit(name) or hit(old):
+            matched.append(f"{old} -> {name}" if isinstance(old, str) else name)
+    if not matched and len(files) >= COMPARE_FILES_LIMIT:
+        return None, []
+    return len(matched), matched[:SCREEN_MATCHED_SAMPLES]
 
 
 def _iso(moment: datetime) -> str:
