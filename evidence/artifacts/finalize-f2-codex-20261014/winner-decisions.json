@@ -1,6 +1,6 @@
 [
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "other-consumer",
     "host_version": null,
     "id": "affaan-m/ECC",
@@ -9,7 +9,7 @@
     "scope": "skill-loader role"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "cli-attribution-gap",
     "host_version": null,
     "id": "agent-browser",
@@ -27,7 +27,7 @@
     "scope": "Codex MCP registration"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "other-consumer",
     "host_version": null,
     "id": "candidate:actions-attest",
@@ -36,8 +36,8 @@
     "scope": "runtime/service/CI consumer"
   },
   {
-    "calls": 2,
-    "disposition": "host-run-drift",
+    "calls": null,
+    "disposition": "cli-attribution-gap",
     "host_version": "0.12.22",
     "id": "candidate:astral-sh-uv",
     "path": "reasons/not-invoked-candidate-astral-sh-uv.json",
@@ -45,8 +45,8 @@
     "scope": "Codex shell/CLI role"
   },
   {
-    "calls": 116,
-    "disposition": "host-run-drift",
+    "calls": null,
+    "disposition": "cli-attribution-gap",
     "host_version": "2.102.0",
     "id": "candidate:cli-cli",
     "path": "reasons/not-invoked-candidate-cli-cli.json",
@@ -54,7 +54,7 @@
     "scope": "Codex shell/CLI role"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "other-consumer",
     "host_version": null,
     "id": "candidate:openai-skills",
@@ -63,7 +63,7 @@
     "scope": "skill-loader role"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "other-consumer",
     "host_version": null,
     "id": "candidate:typesafe-ai-skills",
@@ -72,7 +72,7 @@
     "scope": "skill-loader role"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "cli-attribution-gap",
     "host_version": "20.0.26",
     "id": "ccusage",
@@ -81,7 +81,7 @@
     "scope": "Codex shell/CLI role"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "other-consumer",
     "host_version": null,
     "id": "claude-code",
@@ -90,7 +90,7 @@
     "scope": "runtime/service/CI consumer"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "host-run-drift",
     "host_version": "0.162.1",
     "id": "codex",
@@ -99,7 +99,7 @@
     "scope": "Codex client"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "other-consumer-attribution-gap",
     "host_version": "0.162.1",
     "id": "codex-native-sdk",
@@ -108,7 +108,7 @@
     "scope": "runtime SDK caller"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "cli-attribution-gap",
     "host_version": "2.18.2",
     "id": "dagu",
@@ -117,7 +117,7 @@
     "scope": "Codex shell/CLI role"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "other-consumer",
     "host_version": null,
     "id": "data-alpaca-py",
@@ -126,7 +126,7 @@
     "scope": "runtime/service/CI consumer"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "other-consumer",
     "host_version": null,
     "id": "data-duckdb",
@@ -135,7 +135,7 @@
     "scope": "runtime/service/CI consumer"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "other-consumer",
     "host_version": null,
     "id": "data-dvc",
@@ -144,7 +144,7 @@
     "scope": "runtime/service/CI consumer"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "other-consumer",
     "host_version": null,
     "id": "data-edgartools",
@@ -153,7 +153,7 @@
     "scope": "runtime/service/CI consumer"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "other-consumer",
     "host_version": null,
     "id": "data-exchange-calendars",
@@ -162,7 +162,7 @@
     "scope": "runtime/service/CI consumer"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "other-consumer",
     "host_version": null,
     "id": "data-mlflow",
@@ -171,7 +171,7 @@
     "scope": "runtime/service/CI consumer"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "other-consumer",
     "host_version": null,
     "id": "data-pandera",
@@ -180,7 +180,7 @@
     "scope": "runtime/service/CI consumer"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "cli-attribution-gap",
     "host_version": "0.71.0",
     "id": "difftastic",
@@ -189,7 +189,7 @@
     "scope": "Codex shell/CLI role"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "other-consumer",
     "host_version": null,
     "id": "fastapi",
@@ -198,7 +198,7 @@
     "scope": "runtime/service/CI consumer"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "other-consumer",
     "host_version": null,
     "id": "foundation-agent-retrieval-bench",
@@ -225,16 +225,16 @@
     "scope": "Codex MCP registration"
   },
   {
-    "calls": 78,
-    "disposition": "invoke",
+    "calls": null,
+    "disposition": "cli-attribution-gap",
     "host_version": "8.30.1",
     "id": "gitleaks",
-    "path": "receipts/invoke-gitleaks.json",
+    "path": "reasons/not-invoked-gitleaks.json",
     "pin": "8.30.1; source 83d9cd684c87d95d656c1458ef04895a7f1cbd8e",
     "scope": "Codex shell/CLI role"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "other-consumer",
     "host_version": null,
     "id": "grype",
@@ -252,7 +252,7 @@
     "scope": "Codex MCP registration"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "other-consumer",
     "host_version": null,
     "id": "inspect-ai",
@@ -261,7 +261,7 @@
     "scope": "runtime/service/CI consumer"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "other-consumer",
     "host_version": null,
     "id": "lean",
@@ -270,7 +270,7 @@
     "scope": "runtime/service/CI consumer"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "other-consumer",
     "host_version": null,
     "id": "loki",
@@ -279,7 +279,7 @@
     "scope": "runtime/service/CI consumer"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "cli-attribution-gap",
     "host_version": null,
     "id": "markitdown",
@@ -288,7 +288,7 @@
     "scope": "Codex shell/CLI role"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "cli-attribution-gap",
     "host_version": null,
     "id": "mcp-inspector",
@@ -297,7 +297,7 @@
     "scope": "Codex shell/CLI role"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "cli-attribution-gap",
     "host_version": "0.14.2",
     "id": "mcporter",
@@ -306,7 +306,7 @@
     "scope": "Codex shell/CLI role"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "other-consumer",
     "host_version": null,
     "id": "nautilustrader",
@@ -315,7 +315,7 @@
     "scope": "runtime/service/CI consumer"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "other-consumer",
     "host_version": null,
     "id": "nextjs",
@@ -324,7 +324,7 @@
     "scope": "runtime/service/CI consumer"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "cli-attribution-gap",
     "host_version": null,
     "id": "openresearch",
@@ -333,7 +333,7 @@
     "scope": "Codex shell/CLI role"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "other-consumer",
     "host_version": null,
     "id": "opentelemetry-collector-contrib",
@@ -342,7 +342,7 @@
     "scope": "runtime/service/CI consumer"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "cli-attribution-gap",
     "host_version": null,
     "id": "playwright-test",
@@ -351,7 +351,7 @@
     "scope": "Codex shell/CLI role"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "cli-attribution-gap",
     "host_version": null,
     "id": "poppler",
@@ -360,7 +360,7 @@
     "scope": "Codex shell/CLI role"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "other-consumer",
     "host_version": null,
     "id": "postgresql",
@@ -369,7 +369,7 @@
     "scope": "runtime/service/CI consumer"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "other-consumer",
     "host_version": null,
     "id": "prometheus",
@@ -387,7 +387,7 @@
     "scope": "Codex MCP registration"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "other-consumer",
     "host_version": null,
     "id": "qdrant",
@@ -405,25 +405,25 @@
     "scope": "Codex MCP registration"
   },
   {
-    "calls": 2,
-    "disposition": "invoke-pending-registration",
+    "calls": null,
+    "disposition": "cli-attribution-gap",
     "host_version": "0.19.1",
     "id": "restic",
-    "path": "receipts/invoke-restic.json",
+    "path": "reasons/not-invoked-restic.json",
     "pin": "0.19.1; source 6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf",
     "scope": "Codex shell/CLI role"
   },
   {
-    "calls": 1158,
-    "disposition": "invoke-pending-registration",
+    "calls": null,
+    "disposition": "cli-attribution-gap",
     "host_version": "0.51.0",
     "id": "rtk",
-    "path": "receipts/invoke-rtk.json",
+    "path": "reasons/not-invoked-rtk.json",
     "pin": "0.51.0; source e001f773f80b22b7dc4c7a79521b30e35aaef026",
     "scope": "Codex shell/CLI role"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "other-consumer",
     "host_version": null,
     "id": "sandbox-runtime",
@@ -441,7 +441,7 @@
     "scope": "Codex MCP registration"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "other-consumer",
     "host_version": null,
     "id": "skfolio",
@@ -459,7 +459,7 @@
     "scope": "Codex MCP registration"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "cli-attribution-gap",
     "host_version": "1.54.1",
     "id": "syft",
@@ -468,8 +468,8 @@
     "scope": "Codex shell/CLI role"
   },
   {
-    "calls": 439,
-    "disposition": "host-run-drift",
+    "calls": null,
+    "disposition": "cli-attribution-gap",
     "host_version": "259.5-0ubuntu3.4",
     "id": "systemd",
     "path": "reasons/not-invoked-systemd.json",
@@ -477,7 +477,7 @@
     "scope": "Codex shell/CLI role"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "cli-attribution-gap",
     "host_version": null,
     "id": "tavily-cli",
@@ -486,7 +486,7 @@
     "scope": "Codex shell/CLI role"
   },
   {
-    "calls": 0,
+    "calls": null,
     "disposition": "other-consumer",
     "host_version": null,
     "id": "vllm",
@@ -495,20 +495,20 @@
     "scope": "runtime/service/CI consumer"
   },
   {
-    "calls": 5,
-    "disposition": "invoke",
+    "calls": null,
+    "disposition": "cli-attribution-gap",
     "host_version": "0.80.0",
     "id": "worktrunk",
-    "path": "receipts/invoke-worktrunk.json",
+    "path": "reasons/not-invoked-worktrunk.json",
     "pin": "0.80.0; source b49ca7eea9b03145791a5b94eccaf9c59412ed37",
     "scope": "Codex shell/CLI role"
   },
   {
-    "calls": 1,
-    "disposition": "invoke",
+    "calls": null,
+    "disposition": "cli-attribution-gap",
     "host_version": "1.30.1",
     "id": "zizmor",
-    "path": "receipts/invoke-zizmor.json",
+    "path": "reasons/not-invoked-zizmor.json",
     "pin": "1.30.1; source 99a054ed9283c90abdd2d5b9fb5101d27dde9783",
     "scope": "Codex shell/CLI role"
   }

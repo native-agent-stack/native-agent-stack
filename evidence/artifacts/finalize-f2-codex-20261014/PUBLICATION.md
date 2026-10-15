@@ -1,8 +1,6 @@
 # Codex invocation evidence publication
 
-This evidence-only publication covers the Codex side of the fixed 24-hour window 2026-10-13T23:58:06Z to 2026-10-14T23:58:06Z. It retains eight invocation receipts, including two aliases of one SocratiCode observation, and 49 scoped reasons for all 57 frozen winner IDs. The Claude-side invocation receipts are outside this PR. Cross-client and runtime rows in the frozen inventory are present only to make their exclusion and consumer explicit.
-
-The receipt counts, windows and component/run identities are unchanged from private staging. Native sample thread/item identifiers are omitted from the public export. Four receipts match the complete frozen run at 252babe4040e39173cc178317c67699371806df6; RTK, restic and the two SocratiCode alias rows match only the prospective F1 pin identities. No FINAL layer or current host upgrade is asserted. Source-pin completion and subsequent angle-record registration retain their own review and landing requirements.
+This evidence-only publication covers the Codex side of the fixed24-hour window2026-10-13T23:58:06Z..2026-10-14T23:58:06Z. It now retains threeMCPinvocation receipts(two unique observations) and54scoped reasons for all57frozen winnerIDs. The five earlier CLIpositive receipts are superseded by attribution gaps;their historical prefix matches are not execution evidence. Serena130 binds the frozen complete run;SocratiCode64and its alias require prospectiveF1registration. No layerFINAL or upgrade is asserted.
 
 ## Open wiring defects and follow-ups
 
@@ -21,13 +19,9 @@ No host configuration, default routing, shared winner selection or role is chang
 
 ## Publication correction and validation
 
-Native host-name scanning of the private staging candidate refused 24 locations before any commit or push. The public export normalizes local paths, resolves recorder roots portably and projects only public F1 source facts. Private source-table locations/digests and pre-normalization digests are not published. SHA256SUMS and all dependent hashes bind the published bytes. The private staging packet remains unchanged and is referenced by name only in private coordination.
+Current dispositions cite Astra full1 findings1-3 and local v4 findings1-3. Finding1 is recorded by citation only. The generator consumes published inputs without private sample identifiers, and the checker uses retained hash-bound verbatim pinned definitions rather than unpublished Git history. Ambiguous shell parsing is rejected;previousCLIreceipt claims are replaced by attribution gaps for the original window. No historical scan is repeated or silently reclassified as a new run.
 
-The same native scanner then reported zero matches. Whole-tree validation separately refused local session identifiers in ten candidate files; the public projection now omits these samples without publishing hashes of their original bytes. Eight receipt predicates pass against the pinned FINAL functions, with four explicitly prospective F1 identities; 16 missing/wrong-commit negative controls reject. Twelve synthetic executable-prefix controls pass; they are not invocation evidence. The existing native counter source is unchanged. Publication scans and repository validation are recorded in the PR body and native hook output.
-
-Collector and recorder sources are retained in this directory. The home-path-normalized measure_cli.py/check_receipts.py are publication copies, not a new enumeration of sessions. Re-executing a collector would create a new measurement; this PR rechecks the retained data and predicates instead.
-
-## Upstream sources by Codex role
+correction-regression.json records five failures at the exact reviewed head,then six passing tests including16retained vectors. All57builder outputs reproduce;the checker passes3MCPpredicates/54nonblank reasons and rejects6negative pin controls even in a history-free copied packet. Unknown calls are null,with instrumentation-gap classification. Private metadata remains name-only provenance;all dependent public hashes and native registrations are refreshed.\n\n## Upstream sources by Codex role
 
 The table includes invocations, measured endpoint zeros and unresolved CLI/SDK attribution. A source pin is not an invocation claim. Full frozen repositories, source pointers, run identities and projected F1 tag facts remain in input-provenance.json and pin-resolution-projection.json.
 

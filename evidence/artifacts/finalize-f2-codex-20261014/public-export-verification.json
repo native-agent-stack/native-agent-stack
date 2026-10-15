@@ -1,29 +1,18 @@
 {
   "kind": "public_export_verification",
   "evidence_class": "local_integration",
-  "native_host_scan_before": {
-    "status": "refused",
-    "findings": 24,
-    "values_suppressed": true
-  },
-  "native_host_scan_after": {
-    "status": "pass",
-    "findings": 0
-  },
-  "measurement_fields_compared": [
-    "component_id",
-    "repository",
-    "pin",
-    "calls",
-    "window_start",
-    "window_end",
-    "registration_pending",
-    "binds_frozen_run"
+  "review_dispositions": [
+    "Astra full1 findings1-3",
+    "local v4 findings1-3"
   ],
-  "receipts_compared": 8,
-  "measurement_field_mismatches": 0,
-  "private_source_digest_policy": "Omitted; dependent digests bind only the public export.",
-  "native_sample_identifiers": "Omitted from public counts/receipts; original private sample identifiers and their pre-normalization digests are not published.",
-  "whole_tree_publication_preflight": {"status_before": "refused", "files_with_native_identifier_findings": 10},
+  "measurement_window": "2026-10-13T23:58:06Z..2026-10-14T23:58:06Z",
+  "current_mcp_receipts": 3,
+  "unique_mcp_observations": 2,
+  "current_reasons": 54,
+  "withdrawn_cli_receipts": 5,
+  "prior_cli_prefix_matches": "Unvalidated historical estimates only;not execution lower bounds.",
+  "mcp_counts_unchanged": true,
+  "native_sample_identifiers": "Omitted;no private raw-output digests published.",
+  "private_source_digest_policy": "Name-only metadata provenance;dependent digests bind public bytes.",
   "scanner_configuration_changed": false
 }

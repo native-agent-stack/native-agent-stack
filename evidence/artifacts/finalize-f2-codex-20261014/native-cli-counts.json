@@ -1,15 +1,6 @@
 {
-  "cli_counts": {
-    "candidate:astral-sh-uv": 2,
-    "candidate:cli-cli": 116,
-    "gitleaks": 78,
-    "restic": 2,
-    "rtk": 1158,
-    "systemd": 439,
-    "worktrunk": 5,
-    "zizmor": 1
-  },
-  "cli_scope": "successful native parent commands only; executable/wrapper prefix; bounded file snapshot",
+  "cli_counts": {},
+  "cli_scope": "Unresolved historical prefix attribution; prior candidate counts are not verified execution or a lower bound.",
   "client_tool_calls_by_version": {
     "0.162.1": 14846
   },
@@ -34,5 +25,17 @@
   "unregistered_window_threads": 195,
   "window_end": "2026-10-14T23:58:06Z",
   "window_start": "2026-10-13T23:58:06Z",
-  "window_threads": 214
+  "window_threads": 214,
+  "unvalidated_cli_prefix_matches": {
+    "candidate:astral-sh-uv": 2,
+    "candidate:cli-cli": 116,
+    "gitleaks": 78,
+    "restic": 2,
+    "rtk": 1158,
+    "systemd": 439,
+    "worktrunk": 5,
+    "zizmor": 1
+  },
+  "cli_execution_verified": false,
+  "attribution_status": "Prior CLI attribution invalidated; not remeasured. All CLI rows require child/hook completion evidence."
 }

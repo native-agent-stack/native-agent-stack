@@ -15,6 +15,12 @@
       "20.0.26"
     ]
   },
+  "codex": {
+    "version_method": "codex --version and native session_meta.cli_version",
+    "version_tokens": [
+      "0.162.1"
+    ]
+  },
   "dagu": {
     "executable_mtime_utc": "2026-10-05T16:22:01.095694Z",
     "exit_code": 0,
@@ -66,7 +72,6 @@
   },
   "promptfoo": {
     "metadata_mtime_utc": "2026-10-08T04:54:48.276009Z",
-    "metadata_sha256": "deb8f6569cd90b7ceb17dd57bc051bcd17401bf489ab2dd4019448ffaf37e101",
     "version_tokens": [
       "0.124.0"
     ]
@@ -105,7 +110,6 @@
   },
   "socraticode": {
     "metadata_mtime_utc": "2026-10-07T20:33:59.565806Z",
-    "metadata_sha256": "d8d4ef0f9a271a3453a8241b587e627c997a7e316d761b7a4daf22865f2c8ca9",
     "version_tokens": [
       "1.16.0"
     ]
@@ -138,10 +142,10 @@
     "executable_mtime_utc": "2026-09-27T21:09:08Z",
     "exit_code": 0,
     "resolved_executable": "~/.local/share/mise/installs/worktrunk/0.80.0/wt",
+    "version_method": "mise ls worktrunk --json: installed true; resolved install directory 0.80.0; --version emitted no parseable version",
     "version_tokens": [
       "0.80.0"
-    ],
-    "version_method": "mise ls worktrunk --json: installed true; resolved install directory 0.80.0; --version emitted no parseable version"
+    ]
   },
   "zizmor": {
     "executable_mtime_utc": "2026-10-11T09:40:17.598907Z",
@@ -150,11 +154,5 @@
     "version_tokens": [
       "1.30.1"
     ]
-  },
-  "codex": {
-    "version_tokens": [
-      "0.162.1"
-    ],
-    "version_method": "codex --version and native session_meta.cli_version"
   }
 }

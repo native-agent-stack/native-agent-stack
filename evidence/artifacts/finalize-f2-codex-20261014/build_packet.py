@@ -49,7 +49,9 @@ def main():
         mcp_calls = sum(n for server, n in counts['mcp_counts'].items()
                         if server.replace('_', '-').lower() == component.lower()
                         or component == 'socraticode' and server.lower().endswith('_socraticode')) if component in MCP else 0
-        cli_calls = counts['cli_counts'].get(component, 0)
+        cli_verified = counts.get('cli_execution_verified') is True
+        cli_calls = counts['cli_counts'].get(component, 0) if cli_verified else 0
+        unvalidated_cli = counts.get('unvalidated_cli_prefix_matches', {}).get(component)
         calls = mcp_calls + cli_calls
         if component == 'codex':
             # The client labels its own completed native items with cli_version.
@@ -68,7 +70,8 @@ def main():
                        'attribution': 'measure_cli.py', 'attribution_sha256': digest(HERE / 'measure_cli.py'),
                        'counts_file': 'native-cli-counts.json', 'counts_sha256': digest(HERE / 'native-cli-counts.json'),
                        'host_versions_file': 'host-versions.json', 'host_versions_sha256': digest(HERE / 'host-versions.json'),
-                       'scope': counts['scope'], 'count_is_lower_bound': bool(cli_calls),
+                       'scope': counts['scope'], 'count_is_lower_bound': bool(cli_calls and cli_verified),
+                       'cli_execution_verified': cli_verified,
                        'organic_use_claim': False}
         base = {'component_id': ident, 'repository': normalized(row['repository']), 'client': 'codex',
                 'window_start': counts['window_start'], 'window_end': counts['window_end'],
@@ -76,19 +79,20 @@ def main():
                 'frozen_run_pin_parsed': canonical, 'host_version': host_version,
                 'host_differs_from_frozen_run': bool(host_version and canonical.get('version') and host_version != canonical['version']),
                 'layers': row['layers'], 'consumer': scope,
-                'observed_mcp_calls': mcp_calls, 'observed_cli_calls_lower_bound': cli_calls,
+                'observed_mcp_calls': mcp_calls,
+                'observed_cli_calls_lower_bound': cli_calls if cli_verified else None,
+                'unvalidated_cli_prefix_matches': unvalidated_cli,
                 'measurement': measurement}
         if positive:
             path = f'receipts/invoke-{slug}.json'
             value = {**base, 'kind': 'invocation', 'pin': pin, 'calls': calls,
                      'evidence_class': 'native_proven',
-                     'unit': 'completed native MCP/CLI attempts; CLI first-executable attribution is a lower bound',
+                     'unit': 'completed native MCP attempts; historical CLI prefix matches are not credited',
                      'registration_pending': pending_identity, 'pin_pending': not bool(commit),
                      'binds_frozen_run': not pending_identity,
-                     'pin_binding': ('Native completed item identity plus installed version/source metadata predating the window; source identity is the retained upstream tag completion. MCP events have no per-call binary-version label; historical registration continuity is not independently attested.' + (' Serena uv-receipt revision c6fbd1c5932df2494ffa0020af5a9fbe80b82143; receipt SHA256 d24fa8ed952a35cddcbabd9018773e1d83deda3715c96a95ac80e12ef06be163; mtime 2026-10-05T16:09:43.989908Z.' if component == 'serena' else '')),
+                     'pin_binding': ('Native completed MCP item identity plus installed version/source metadata predating the window; source identity is the retained upstream tag completion. MCP events have no per-call binary-version label; historical registration continuity is not independently attested.' + (' Serena uv-receipt.toml is name-only provenance; its recorded public source revision is c6fbd1c5932df2494ffa0020af5a9fbe80b82143.' if component == 'serena' else '')),
                      'source_pin_table_sha256': inputs['pin_resolution_sha256'],
                      'same_observation_as': component if component != ident else None,
-                     'sample_ids': counts['sample_ids'].get('mcp:' + component, []) or counts['sample_ids'].get(component, []),
                      'not_evidence': 'installation alone, organic use, upstream quality, or unseen nested/hook/library execution'}
             disposition = 'invoke-pending-registration' if pending_identity else 'invoke'
         else:
@@ -109,7 +113,7 @@ def main():
                 reason = f'Consumer Codex MCP registration: zero completed {component} MCP calls and zero directly attributed CLI calls in the measured native window. Missing recorded wiring is a Codex dispatcher invocation of this enabled endpoint; where the slot row names Codex, this is the CC-defined wiring flag for the owner to fix or retire. Hook/service activity is not represented by this endpoint counter, and is not silently credited.'
                 disposition = 'codex-dispatch-wiring-flag'
             elif component in CLI:
-                reason = f'Consumer Codex shell/CLI role: zero directly attributed {component} first-executable calls. Nested shell, Python subprocesses and native hooks are not counted by this bounded adapter, so actual execution remains unknown. Missing instrumentation is completed child/hook identity at its run pin. If a slot explicitly names Codex and a complete counter confirms zero, the owner must wire that role or retire it; this partial view alone does not establish a wiring defect.'
+                reason = f'Consumer Codex shell/CLI role: actual execution remains unknown. Prior shell-prefix matches, when present, are not invocation evidence and were not remeasured for this window. Missing instrumentation is completed child/hook identity at its run pin, covering nested shell/Python commands and wrappers. If a slot explicitly names Codex and a complete counter confirms zero, the owner must wire that role or retire it; this incomplete view does not establish a wiring defect.'
                 disposition = 'cli-attribution-gap'
             else:
                 consumer = 'Claude Code native client/worker slots' if ident == 'claude-code' else 'skills loader' if scope == 'skill-loader role' else 'runtime workers, service or CI roles in ' + ', '.join(row['layers'])
@@ -117,14 +121,17 @@ def main():
                 if not row.get('run_id'):
                     reason += ' The frozen winner also lacks a run identity, so an exact-pin receipt cannot yet be formed.'
                 disposition = 'other-consumer'
-            value = {**base, 'kind': 'non_invocation_reason', 'calls': 0,
-                     'calls_definition': 'zero eligible calls at the target identity; observed lower bounds retained separately',
+            unknown = disposition in {'cli-attribution-gap', 'other-consumer', 'other-consumer-attribution-gap', 'host-run-drift', 'host-identity-unverified'}
+            value = {**base, 'kind': 'invocation_attribution_gap' if unknown else 'non_invocation_reason',
+                     'calls': None if unknown else 0,
+                     'calls_definition': 'null means unknown execution/identity; zero is reserved for observed MCP endpoint non-invocation',
                      'not_invoked_reason': reason, 'disposition': disposition, 'target_pin': pin,
                      'source_pin_table_sha256': inputs['pin_resolution_sha256']}
         files[path] = json.dumps(value, indent=2, sort_keys=True) + '\n'
-        decisions.append({'id': ident, 'scope': scope, 'calls': calls, 'disposition': disposition,
+        decisions.append({'id': ident, 'scope': scope, 'calls': value['calls'], 'disposition': disposition,
                           'path': path, 'pin': pin, 'host_version': host_version})
-        table.append(f'| {ident} | {scope} | {calls} | {run.get("pin") or "NO RUN"} | {host_version or "unverified/not this client"} | {disposition} | {path} |')
+        shown_calls = value['calls'] if value['calls'] is not None else 'unknown'
+        table.append(f'| {ident} | {scope} | {shown_calls} | {run.get("pin") or "NO RUN"} | {host_version or "unverified/not this client"} | {disposition} | {path} |')
     files['winner-decisions.json'] = json.dumps(decisions, indent=2, sort_keys=True) + '\n'
     files['CODEX-WINNERS.md'] = ('# Frozen winners and Codex consumers\n\n'
         'Inventory: 252babe4040e39173cc178317c67699371806df6, 57 unique component IDs. '

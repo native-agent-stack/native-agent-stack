@@ -1,14 +1,13 @@
 """Run the frozen FINAL receipt predicates; explicitly separate prospective F1 binding.
 
-Reference: Claude-side check_receipts.py SHA256 ddee6f90123072a4f4f580c418607cd32e9aa5b0e3dd30b902e0b3884afa8c33.
+Reference: Claude-side check_receipts.py (name-only provenance).
 This does not promote a layer or run the whole FINAL stack protocol.
 """
 from pathlib import Path
-import ast
+from datetime import datetime
 import hashlib
 import json
 import re
-import subprocess
 import sys
 import types
 
@@ -17,31 +16,22 @@ REPO = Path(__file__).resolve().parents[3]
 REF = '252babe4040e39173cc178317c67699371806df6'
 
 def main():
-    sys.path.insert(0, str(REPO / 'scripts'))
-    # Use the pinned protocol's own sibling dependencies, without checkout or
-    # changing the held worktree. These modules are loaded from git objects.
-    for name in ('host_receipts', 'angle_records'):
-        source = subprocess.run(['git', 'show', REF + ':scripts/' + name + '.py'], cwd=REPO,
-                                capture_output=True, check=True).stdout
-        dependency = types.ModuleType(name)
-        dependency.__file__ = str(REPO / 'scripts' / (name + '.py'))
-        sys.modules[name] = dependency
-        exec(compile(source, dependency.__file__, 'exec'), dependency.__dict__)
-    sys.path.insert(0, str(REPO / 'scripts'))
-    raw = subprocess.run(['git', 'show', REF + ':scripts/final_stack.py'], cwd=REPO,
-                         capture_output=True, check=True).stdout
-    module = types.ModuleType('frozen_f2_final_stack')
-    module.__file__ = str(REPO / 'scripts/final_stack.py')
-    sys.modules[module.__name__] = module
-    # Execute the verbatim pinned functions and their pin grammar, without
-    # importing unrelated generator dependencies from this older worktree.
-    tree = ast.parse(raw)
-    names = {'VERSION', 'COMMIT', 'COMMIT_PATTERN', 'PIN_FORMS', 'UNPINNED'}
-    nodes = [node for node in tree.body if
-             isinstance(node, ast.FunctionDef) and node.name in {'parse_pin', 'complete_final_pin'}
-             or isinstance(node, ast.Assign) and any(isinstance(target, ast.Name) and target.id in names for target in node.targets)]
-    module.__dict__.update(re=re, angle_records=sys.modules['angle_records'], host_receipts=sys.modules['host_receipts'])
-    exec(compile(ast.Module(body=nodes, type_ignores=[]), module.__file__, 'exec'), module.__dict__)
+    manifest = json.loads((HERE / 'validator-sources/manifest.json').read_text())
+    sources = {row['path'].rsplit('/', 1)[-1]: row for row in manifest['files']}
+    modules = {}
+    for name in ('host_receipts.py', 'angle_records.py', 'final_stack.py'):
+        row = sources[name]
+        raw = (HERE / row['path']).read_bytes()
+        if row['pin'] != REF or hashlib.sha256(raw).hexdigest() != row['sha256']:
+            raise ValueError('pinned predicate source hash mismatch')
+        dependency = types.ModuleType('f2_pinned_' + name.removesuffix('.py'))
+        dependency.__file__ = str(HERE / row['path'])
+        dependency.__dict__.update(re=re, datetime=datetime)
+        exec(compile(raw, dependency.__file__, 'exec'), dependency.__dict__)
+        modules[name] = dependency
+    module = modules['final_stack.py']
+    module.angle_records = modules['angle_records.py']
+    module.host_receipts = modules['host_receipts.py']
     inputs = json.loads((HERE / 'input-provenance.json').read_text())
     decisions = json.loads((HERE / 'winner-decisions.json').read_text())
     pins = {p['component']: p for p in inputs['pins']}
@@ -89,7 +79,7 @@ def main():
         failures.append('winner coverage mismatch')
     if any(not x['omitted_commit_rejected'] or not x['wrong_commit_rejected'] for x in controls):
         failures.append('negative pin control accepted')
-    print(json.dumps({'checked_against': REF, 'final_stack_source_sha256': hashlib.sha256(raw).hexdigest(),
+    print(json.dumps({'checked_against': REF, 'final_stack_source_sha256': sources['final_stack.py']['source_file_sha256'],
                       'receipts': checked, 'non_invocation_reasons': len(decisions) - len(checked),
                       'negative_controls': controls, 'failures': failures,
                       'limit': 'predicate/shape validation only; pending pin records are not registered FINAL evidence'}, sort_keys=True))

@@ -10,21 +10,6 @@
       "wrong_commit_rejected": true
     },
     {
-      "id": "gitleaks",
-      "omitted_commit_rejected": true,
-      "wrong_commit_rejected": true
-    },
-    {
-      "id": "restic",
-      "omitted_commit_rejected": true,
-      "wrong_commit_rejected": true
-    },
-    {
-      "id": "rtk",
-      "omitted_commit_rejected": true,
-      "wrong_commit_rejected": true
-    },
-    {
       "id": "serena",
       "omitted_commit_rejected": true,
       "wrong_commit_rejected": true
@@ -33,44 +18,13 @@
       "id": "socraticode",
       "omitted_commit_rejected": true,
       "wrong_commit_rejected": true
-    },
-    {
-      "id": "worktrunk",
-      "omitted_commit_rejected": true,
-      "wrong_commit_rejected": true
-    },
-    {
-      "id": "zizmor",
-      "omitted_commit_rejected": true,
-      "wrong_commit_rejected": true
     }
   ],
-  "non_invocation_reasons": 49,
+  "non_invocation_reasons": 54,
   "receipts": [
     {
       "calls": 64,
       "id": "foundation-socraticode",
-      "matches_frozen_run": false,
-      "matches_prospective_F1_run": true,
-      "status": "PASS"
-    },
-    {
-      "calls": 78,
-      "id": "gitleaks",
-      "matches_frozen_run": true,
-      "matches_prospective_F1_run": true,
-      "status": "PASS"
-    },
-    {
-      "calls": 2,
-      "id": "restic",
-      "matches_frozen_run": false,
-      "matches_prospective_F1_run": true,
-      "status": "PASS"
-    },
-    {
-      "calls": 1158,
-      "id": "rtk",
       "matches_frozen_run": false,
       "matches_prospective_F1_run": true,
       "status": "PASS"
@@ -86,20 +40,6 @@
       "calls": 64,
       "id": "socraticode",
       "matches_frozen_run": false,
-      "matches_prospective_F1_run": true,
-      "status": "PASS"
-    },
-    {
-      "calls": 5,
-      "id": "worktrunk",
-      "matches_frozen_run": true,
-      "matches_prospective_F1_run": true,
-      "status": "PASS"
-    },
-    {
-      "calls": 1,
-      "id": "zizmor",
-      "matches_frozen_run": true,
       "matches_prospective_F1_run": true,
       "status": "PASS"
     }

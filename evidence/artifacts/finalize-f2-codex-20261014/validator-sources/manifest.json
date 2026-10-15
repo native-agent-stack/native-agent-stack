@@ -1,0 +1,85 @@
+{
+  "files": [
+    {
+      "path": "validator-sources/final_stack.py",
+      "pin": "252babe4040e39173cc178317c67699371806df6",
+      "repository": "https://github.com/native-agent-stack/native-agent-stack",
+      "selected_line_spans": [
+        [
+          123,
+          123
+        ],
+        [
+          124,
+          124
+        ],
+        [
+          125,
+          125
+        ],
+        [
+          126,
+          127
+        ],
+        [
+          128,
+          128
+        ],
+        [
+          308,
+          319
+        ],
+        [
+          706,
+          721
+        ]
+      ],
+      "sha256": "e4b86f7725c5bcae4e70b6006da745a237e9ad499b10e77b7ef6ab3ff4d0562f",
+      "source_file_sha256": "151d0a5a7c721ab6d713532fff12c81b654a58bcebd0e20a18174273e3f9777b",
+      "source_path": "scripts/final_stack.py"
+    },
+    {
+      "path": "validator-sources/host_receipts.py",
+      "pin": "252babe4040e39173cc178317c67699371806df6",
+      "repository": "https://github.com/native-agent-stack/native-agent-stack",
+      "selected_line_spans": [
+        [
+          544,
+          544
+        ],
+        [
+          547,
+          572
+        ]
+      ],
+      "sha256": "4a78f049ab13875a0d8485dbdb9f40165dacd3818f81199989f39207b2a33380",
+      "source_file_sha256": "c3dc47cdab33e2ed2f1473700774a006a34c6218d6cd7ceb36f33d7f71f0fd6f",
+      "source_path": "scripts/host_receipts.py"
+    },
+    {
+      "path": "validator-sources/angle_records.py",
+      "pin": "252babe4040e39173cc178317c67699371806df6",
+      "repository": "https://github.com/native-agent-stack/native-agent-stack",
+      "selected_line_spans": [
+        [
+          28,
+          28
+        ],
+        [
+          31,
+          32
+        ],
+        [
+          35,
+          41
+        ]
+      ],
+      "sha256": "e548bab9eeed5f84201a2f48f6d08f48b53dfe60b893dfd70e4e585348d835f9",
+      "source_file_sha256": "4bfcd7f540ebe4d3984bf99e2ff7130d1b97c432630c17a90171ed699e4815b4",
+      "source_path": "scripts/angle_records.py"
+    }
+  ],
+  "kind": "pinned_predicate_source_snapshots",
+  "pin": "252babe4040e39173cc178317c67699371806df6",
+  "selection": "Verbatim required definitions and grammar; no changed predicate implementation. Standard-library imports supplied by checker."
+}

@@ -144,5 +144,6 @@
       "since": "2026-10-13T23:58:06Z",
       "until": "2026-10-14T23:58:06Z"
     }
-  }
+  },
+  "cli_limits": "The raw rtk counter is a lexical prefix observation,not evidence that the binary started. This correction does not credit it as native invocation."
 }

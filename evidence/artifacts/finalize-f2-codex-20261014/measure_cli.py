@@ -1,9 +1,9 @@
 """Bounded F2 attribution adapter; counts native completed items, emits no command text.
 
 Reuses the repository's codex_counter owner/dedup/argv semantics. This supplements,
-not replaces, its MCP measurement. CLI counts are conservative lower bounds:
-only the first executable of a completed shell command, with transparent env,
-timeout, rtk proxy and systemd-run wrappers. Nested scripts and hooks stay unknown.
+not replaces, its MCP measurement. CLI attribution accepts only a single literal
+command without shell operators, redirections, expansions or wrapper traversal.
+Nested scripts, wrapper children and hooks stay unknown.
 """
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -33,50 +33,23 @@ def executable(command):
     text, unresolved = counter._USAGE.resolve_command(command)
     if unresolved or '\n' in text:
         return [], 'multiline_or_non_posix'
-    # Unrelated literal executables cannot contribute a winner count. Avoid
-    # tokenizing their often very large quoted Python/JSON bodies. Quoted first
-    # words, assignments and transparent wrappers still take the full parser.
-    first = re.match(r'^\s*([^\s\"\';&|]+)', text)
-    if first:
-        token = first.group(1)
-        if '=' not in token and os.path.basename(token) not in {*CLI, 'env', 'timeout'}:
-            return [], None
-    lexer = shlex.shlex(text, posix=True)
-    lexer.whitespace_split = True
-    lexer.commenters = ''
-    def word():
-        return next(lexer, None)
-    # The caller only supplies successful native parent commands. Read the
-    # executable/wrapper prefix lazily; quoted argument bodies are irrelevant.
-    found = []
+    # Bash performs redirection and expansion before starting a command.
+    # shlex is lexical analysis; parent rc0 cannot prove a child started after
+    # a failed redirect masked by || true or a compact function definition.
+    # Reject these forms even inside quoted arguments: false negatives are
+    # acceptable for this bounded attribution; false positives are not.
+    if any(char in text for char in '\n\r;&|<>(){}$`\\*?[]#'):
+        return [], 'ambiguous_shell_execution'
     try:
-        token = word()
-        while token:
-            while token and (token == 'env' or '=' in token and not token.startswith('/')):
-                token = word()
-            if not token:
-                break
-            name = os.path.basename(token)
-            following = word()
-            if following in {'()', '('}:
-                return [], 'shell_function_definition'
-            if name in CLI:
-                found.append(CLI[name])
-            if name == 'rtk' and following == 'proxy':
-                token = word()
-            elif name == 'systemd-run':
-                for _ in range(128):
-                    if following in {None, '--'}:
-                        break
-                    following = word()
-                token = word() if following == '--' else None
-            elif name == 'timeout' and following and not following.startswith('-'):
-                token = word()
-            else:
-                break
+        words = shlex.split(text, posix=True)
     except ValueError:
-        return [], 'unparsed_shell_prefix'
-    return sorted(set(found)), None
+        return [], 'unparsed_shell_command'
+    if not words:
+        return [], None
+    name = os.path.basename(words[0])
+    if name in {'env', 'timeout', 'systemd-run'} or '=' in words[0]:
+        return [], 'wrapper_or_assignment_unmeasured'
+    return [CLI[name]] if name in CLI else [], None
 
 def main():
     roots, aliases, parents = counter.registry('~/.hcom/hcom.db', None)
@@ -185,8 +158,10 @@ def main():
     print(json.dumps({'window_start': START.isoformat().replace('+00:00', 'Z'),
                       'window_end': END.isoformat().replace('+00:00', 'Z'),
                       'scope': 'all default/private native roots; current registry aliases for dedup; no organic-use claim',
-                      'cli_scope': 'successful native parent commands only; executable/wrapper prefix; bounded file snapshot',
-                      'cli_counts': counts, 'mcp_counts': mcp, 'client_tool_calls_by_version': client_versions,
+                      'cli_scope': 'single literal successful parent commands only; child binary identity remains unverified',
+                      'cli_execution_verified': False, 'cli_counts': {},
+                      'unvalidated_cli_prefix_matches': counts,
+                      'mcp_counts': mcp, 'client_tool_calls_by_version': client_versions,
                       'diagnostics': diagnostics,
                       'files_considered': len(metas), 'window_threads': len(window_threads),
                       'unregistered_window_threads': len(unregistered_threads)}, sort_keys=True))

@@ -1,6 +1,6 @@
 {
-  "calls": 0,
-  "calls_definition": "zero eligible calls at the target identity; observed lower bounds retained separately",
+  "calls": null,
+  "calls_definition": "null means unknown execution/identity; zero is reserved for observed MCP endpoint non-invocation",
   "client": "codex",
   "component_id": "loki",
   "consumer": "runtime/service/CI consumer",
@@ -12,32 +12,33 @@
   },
   "host_differs_from_frozen_run": false,
   "host_version": null,
-  "kind": "non_invocation_reason",
+  "kind": "invocation_attribution_gap",
   "layers": [
     "foundation/observation-inference"
   ],
   "measurement": {
     "attribution": "measure_cli.py",
-    "attribution_sha256": "2abd869e26906c17b073ee39889286acf6049723fc8350948bd7bdd03fa4f8ac",
+    "attribution_sha256": "8b762f3b2312aa54a9feec92095b9e83747fb0e1b5aff2d46a2039bd86a5b7fb",
+    "cli_execution_verified": false,
     "count_is_lower_bound": false,
     "counter": "tools/invocation-monitoring/codex_counter.py",
     "counter_sha256": "06b569826c76c2dc9455fccd3e004329e71f791483b42b33571fad21910dc8e3",
     "counter_summary": "counter-summary.json",
     "counts_file": "native-cli-counts.json",
-    "counts_sha256": "302b3b89ea9627f54b79fbfce4283af980d8372f59ab391df7e664398be415ce",
+    "counts_sha256": "16f0ac125a7b3e7d8a5d13d1a2d11e277c8c649cc585f1080b96f06c206f0116",
     "host_versions_file": "host-versions.json",
-    "host_versions_sha256": "e21e1d1e94769e4d9f70d79dedd8c22bb6b4842330d156a3085523ad6b991dff",
+    "host_versions_sha256": "cc5a9b1da749f87e0c21baa0d82bd43bd10a36156eb04666a5fcf73eb8b7f9d1",
     "organic_use_claim": false,
     "scope": "all default/private native roots; current registry aliases for dedup; no organic-use claim"
   },
   "not_invoked_reason": "Consumer runtime workers, service or CI roles in foundation/observation-inference: no Codex MCP/CLI consumer is established for this winner by the frozen row or current Codex registration. This counter does not instrument that consumer; its Codex-call count is not a non-use verdict. Retain the owning consumer receipt or this scoped reason; do not retire a shared role on a Codex zero.",
-  "observed_cli_calls_lower_bound": 0,
+  "observed_cli_calls_lower_bound": null,
   "observed_mcp_calls": 0,
-  "publication": "Local paths normalized and native sample identifiers omitted; hashes bind only this public export. Measured counts/window/component identities unchanged.",
   "repository": "github.com/grafana/loki",
   "run_id": "loki",
   "source_pin_table_sha256": "e345afc0913b36d179bbffe53933d2f8ca60dea41e35f0f58bc265306f4119b9",
   "target_pin": "3.7.8; source 09e6ce2ff1bdc19763a10265b870c86f51c98655",
+  "unvalidated_cli_prefix_matches": null,
   "window_end": "2026-10-14T23:58:06Z",
   "window_start": "2026-10-13T23:58:06Z"
 }
