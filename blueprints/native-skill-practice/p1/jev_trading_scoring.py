@@ -47,11 +47,12 @@ def prediction(probabilities: dict, labels, choice: str | None = None) -> Predic
 def _metrics(truth, answers, labels) -> dict:
     if not len(truth):
         return {"macro_f1": None, "brier": None, "ece": None}
+    labels = sorted(labels)
     proba = np.array([[a.probabilities[l] for l in labels] for a in answers])
     predicted = [a.label for a in answers]
     return {"macro_f1": float(f1_score(truth, predicted, labels=list(labels), average="macro", zero_division=0)),
             "brier": float(brier_score_loss(truth, proba, labels=list(labels), scale_by_half=False)),
-            "ece": expected_calibration_error(proba.max(axis=1), np.asarray(predicted) == np.asarray(truth))["ece"]}
+            "ece": expected_calibration_error(proba.max(axis=1), np.array(labels)[proba.argmax(axis=1)] == np.asarray(truth))["ece"]}
 
 
 def _wilson(successes: int, n: int):
@@ -90,6 +91,7 @@ def arm_metrics(pack: CaseSet, outputs: dict[int, Prediction | None], *, ordered
 
 def _contributions(truth, answers, labels):
     """Additive row statistics; summing them preserves duplicate/conflicting rows."""
+    labels = sorted(labels)
     n = len(truth)
     k = len(labels)
     y = np.array([labels.index(t) for t in truth])
@@ -101,7 +103,7 @@ def _contributions(truth, answers, labels):
     indicator = np.eye(15)[bins]
     return np.column_stack((np.ones(n), target * predicted, target, predicted,
         ((target - p) ** 2).sum(axis=1), indicator,
-        indicator * (chosen == y)[:, None], indicator * p.max(axis=1)[:, None]))
+        indicator * (p.argmax(axis=1) == y)[:, None], indicator * p.max(axis=1)[:, None]))
 
 
 def _from_sums(sums):

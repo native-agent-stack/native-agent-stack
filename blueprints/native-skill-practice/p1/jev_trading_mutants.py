@@ -32,7 +32,7 @@ MUTANTS = [
     ("probability_choice", "scoring", 'if choice is not None and (choice not in labels or probabilities[choice] != probabilities[best]):', "if False:", "TransportTests.test_response_shapes_usage_and_safe_error_retention"),
     ("tie_order", "scoring", "best = max(labels, key=probabilities.__getitem__)", "best = max(reversed(labels), key=probabilities.__getitem__)", "MetricsTests.test_probability_validation_and_exact_one_percent_boundary"),
     ("brier_scaling", "scoring", "scale_by_half=False", "scale_by_half=True", "MetricsTests.test_record_worked_example_and_failure_inclusive_population"),
-    ("ece_not_confidence", "scoring", 'expected_calibration_error(proba.max(axis=1), np.asarray(predicted) == np.asarray(truth))', 'expected_calibration_error((3 * proba.max(axis=1) - 1) / 2, np.asarray(predicted) == np.asarray(truth))', "MetricsTests.test_record_worked_example_and_failure_inclusive_population"),
+    ("ece_not_confidence", "scoring", 'expected_calibration_error(proba.max(axis=1), np.array(labels)[proba.argmax(axis=1)] == np.asarray(truth))', 'expected_calibration_error((3 * proba.max(axis=1) - 1) / 2, np.array(labels)[proba.argmax(axis=1)] == np.asarray(truth))', "MetricsTests.test_record_worked_example_and_failure_inclusive_population"),
     ("sentinel_miss", "scoring", 'else "__MISSING__" for r in pack.scored]', 'else r.label for r in pack.scored]', "MetricsTests.test_record_worked_example_and_failure_inclusive_population"),
     ("incomplete_boundary", "scoring", '"incomplete": failures / n > 0.01', '"incomplete": failures / n >= 0.01', "MetricsTests.test_probability_validation_and_exact_one_percent_boundary"),
     ("bootstrap_clusters", "scoring", 'groups = [g for g in groups if g]', 'groups = [[i] for i in range(len(shared))]', "MetricsTests.test_cluster_intervals_match_independent_sklearn_resampling"),
@@ -109,8 +109,8 @@ MUTANTS = [
     ("haiku_frozen_run_order", "run", 'if haiku_configs and haiku_configs[0]["run_order"] != haiku_order:', 'if False:', "TransportTests.test_haiku_declared_order_must_equal_actual_order_before_calls"),
     ("ordered_arm_diagnostic", "scoring", 'if ordered_options else {"status": "NOT_APPLICABLE"}', 'if True else {"status": "NOT_APPLICABLE"}', "MetricsTests.test_unordered_baseline_has_no_first_position_diagnostic"),
     ("haiku_usage_mask", "run", 'usage = _masked_response({"usage": answer}, name)["usage"]', 'usage = {key: answer[key] for key in ("input_tokens", "output_tokens")}', "TransportTests.test_fake_haiku_gate_order_and_malformed_usage_are_retained_safely"),
-    ("ece_tied_label_point", "scoring", 'np.asarray(predicted) == np.asarray(truth)', 'np.array(labels)[proba.argmax(axis=1)] == np.asarray(truth)', "MetricsTests.test_ece_uses_the_accepted_returned_label_on_a_tie"),
-    ("ece_tied_label_bootstrap", "scoring", '(chosen == y)[:, None]', '(p.argmax(axis=1) == y)[:, None]', "MetricsTests.test_paired_ece_interval_uses_the_same_accepted_label"),
+    ("ece_tied_label_point", "scoring", 'np.array(labels)[proba.argmax(axis=1)] == np.asarray(truth)', 'np.asarray(predicted) == np.asarray(truth)', "MetricsTests.test_ece_uses_frozen_sorted_argmax_on_a_tie"),
+    ("ece_tied_label_bootstrap", "scoring", '(p.argmax(axis=1) == y)[:, None]', '(chosen == y)[:, None]', "MetricsTests.test_paired_ece_interval_uses_frozen_sorted_argmax"),
     ("model_minus_baseline", "run", 'paired_metrics(pack, all_raw[model][name], baseline_outputs[b])', 'paired_metrics(pack, baseline_outputs[b], all_raw[model][name])', "TransportTests.test_model_minus_baseline_direction_is_preserved_by_run"),
     ("finbert_current_prefix", "baselines", '"finbert": "0bc2ac10dda6"', '"finbert": "4556d13015211d73dccd3fdd39d39232506f3e43"', "BaselineTests.test_native_factories_use_pinned_local_only_upstream_loaders"),
     ("haiku_reserve_before_dispatch", "baselines", 'self.reserved += cost', 'self.reserved += 0', "TransportTests.test_unknown_haiku_usage_keeps_its_budget_reservation"),
@@ -127,6 +127,11 @@ MUTANTS = [
     ("native_start_before_receipt", "run", 'require_credential_run()\n        transport.prepare()', 'transport.prepare()', "TransportTests.test_scored_start_outside_credential_runner_has_no_scored_receipt"),
     ("pending_sec_rules", "baselines", 'return {"status": "NOT_RUN", "reason": "8-K predicates, Item 6.06 tests, code hash and acquisition clock are not frozen"}', 'return {"status": "RAN", "reason": "acquisition clock"}', "TransportTests.test_pending_sets_have_no_acquisition_or_admission"),
     ("jev_arm_retry_accounting", "run", 'unresolved_retries += retries', 'unresolved_retries += 0', "TransportTests.test_jev_retry_uncertainty_is_visible_in_each_arm_cost"),
+    ("scored_content_before_dispatch", "run", '            verify_content(pack)', '            pass', "TransportTests.test_scored_rejects_changed_content_with_unchanged_ids"),
+    ("frozen_training_content", "cases", 'pack.manifest()["content_sha256"] != CONTENT_PINS[pack.name]', 'pack.manifest()["content_sha256"]["scored"] != CONTENT_PINS[pack.name]["scored"]', "TransportTests.test_scored_rejects_changed_content_with_unchanged_ids"),
+    ("partial_haiku_receipt", "run", '"haiku_spend": haiku_budget.snapshot() if haiku_budget else {"status": "NOT_RUN"}', '"haiku_spend": {"status": "NOT_RUN"}', "TransportTests.test_partial_receipt_keeps_haiku_exposure_after_two_completed_calls"),
+    ("partial_haiku_reserved", "baselines", '"reserved_usd": str(self.reserved)', '"reserved_usd": "0"', "TransportTests.test_partial_receipt_keeps_haiku_exposure_after_two_completed_calls"),
+    ("partial_haiku_uncertain", "baselines", 'self.uncertain_calls + int(active)', 'self.uncertain_calls', "TransportTests.test_partial_receipt_keeps_haiku_exposure_after_two_completed_calls"),
 ]
 
 

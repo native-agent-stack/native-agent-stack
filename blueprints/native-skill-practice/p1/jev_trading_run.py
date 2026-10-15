@@ -22,7 +22,7 @@ import numpy as np
 from scipy import stats
 
 from jev_trading_cases import (LABELS, SEED, SOURCE_PINS, ID_PINS, Case, assemble, build_frozen_sets,
-                               id_hash, json_bytes, option_order, require_dependencies, sha256, verify_lists)
+                               id_hash, json_bytes, option_order, require_dependencies, sha256, verify_content, verify_lists)
 from jev_trading_canaries import freeze_dates, shift_dates
 from jev_trading_baselines import PINS, HaikuBudget, clm_status, pending_rules_status
 from jev_trading_custody import ADDENDUM_REFERENCE, SDK_VERSION, require_credential_run, verify_attestation
@@ -174,6 +174,7 @@ def preregistration(packs, evidence_class, transport, baseline_meta, attestation
     if evidence_class == "SCORED":
         for name, pack in packs.items():
             verify_lists(pack, ID_PINS[name])
+            verify_content(pack)
         public_attestation = verify_attestation(attestation)
     metadata = {}
     for name in packs:
@@ -291,6 +292,9 @@ def run(packs, output_dir: Path, transport, *, evidence_class, command, baseline
     baseline_adapters = baseline_adapters or {}
     baseline_meta = baseline_meta or {}
     jev_budget = None
+    # Available to the final receipt even when preregistration fails. Configure
+    # only after validating the frozen workload, before any dispatch.
+    haiku_budget = None
     try:
         for name, entries in baseline_meta.items():
             for arm, metadata in entries.items():
@@ -452,12 +456,7 @@ def run(packs, output_dir: Path, transport, *, evidence_class, command, baseline
         report["harness_beats"] = {m: harness_beats({n: report["models"][m][n]["beats"] for n in packs}) for m in MODELS}
         report["failure_counts"] = dict(failures)
         report["jev_spend"] = jev_budget.snapshot()
-        report["haiku_spend"] = {"workload": haiku_configs[0]["workload"],
-            "usd": str(haiku_budget.spent) if not haiku_budget.reserved else None,
-            "known_usd": str(haiku_budget.spent), "reserved_usd": str(haiku_budget.reserved),
-            "upper_bound_usd": str(haiku_budget.spent + haiku_budget.reserved),
-            "uncertain_calls": haiku_budget.uncertain_calls, "stopped": haiku_budget.stopped,
-            "cap_usd": str(haiku_budget.cap), "ledger": "owning api-actions workload is the authoritative spend record"} if haiku_budget else {"status": "NOT_RUN"}
+        report["haiku_spend"] = haiku_budget.snapshot() if haiku_budget else {"status": "NOT_RUN"}
         output_hashes["report.json"] = _write_new(output_dir / "report.json", report)
         status, exit_code = ("COMPLETE_WITH_FAILURES" if failures else "COMPLETE"), 0
     except BaseException as exc:
@@ -472,6 +471,7 @@ def run(packs, output_dir: Path, transport, *, evidence_class, command, baseline
             "input_sha256": input_hashes, "output_sha256": output_hashes,
             "attempted_calls": attempted, "failure_counts": dict(failures), "error_class": error_class,
             "jev_spend": jev_budget.snapshot() if jev_budget else None,
+            "haiku_spend": haiku_budget.snapshot() if haiku_budget else {"status": "NOT_RUN"},
             "created_at": datetime.now(timezone.utc).isoformat(), "network_transport": "FAKE" if evidence_class == "SYN" else "TypeSafe SDK 0.7.2"}
         validate_receipt(receipt)
         _write_new(output_dir / "receipt.json", receipt)

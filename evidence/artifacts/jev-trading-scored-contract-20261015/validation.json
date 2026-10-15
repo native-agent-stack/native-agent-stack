@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "base": "0263ceed3b17476995622d5d08facae96e46aa3b",
+  "scope": "Three adjudicated scored-contract P2s from PR 1150",
+  "source_records": [
+    "coordination/trading-cc/specs/jev-trading-20261015/JEV-FEATURE-LIST-v1.md",
+    "coordination/trading-cc/specs/jev-trading-20261015/JEV-HARNESS-ADDENDUM-01.md",
+    "us-equities-trading@a91a4cdd29e8aedab9f0b9784252bdb2bb60ae62:docs/decisions/2026-10-11-jev-harness-case-sets.md:233-235"
+  ],
+  "isolation": "bwrap read-only live root; private /var/tmp removed per run; fresh /dev and /proc; --unshare-net --die-with-parent; Python -B",
+  "runtime": {"python": "3.12.3", "numpy": "2.5.3", "scipy": "1.18.1", "scikit-learn": "1.9.1"},
+  "red": {
+    "before_production_changes": true,
+    "tests": 5,
+    "failing_assertions_or_subtests": 11,
+    "exit_code": 1,
+    "cases": [
+      {"test": "TransportTests.test_scored_rejects_changed_content_with_unchanged_ids", "failures": 6, "observation": "Label and text changes in scored, original-training and final-training partitions retained ID hashes and were all accepted"},
+      {"test": "MetricsTests.test_ece_uses_frozen_sorted_argmax_on_a_tie", "failures": 1, "actual": 0.6, "expected": 0.4},
+      {"test": "MetricsTests.test_paired_ece_interval_uses_frozen_sorted_argmax", "failures": 1, "actual_point": 0.4, "expected_point": 0.2},
+      {"test": "TransportTests.test_partial_receipt_keeps_haiku_exposure_after_two_completed_calls", "failures": 2, "observation": "KeyboardInterrupt and SystemExit on third fake Haiku call retained two journal rows but omitted the Haiku snapshot"},
+      {"test": "TransportTests.test_failed_preflight_receipt_has_no_haiku_exposure", "failures": 1, "observation": "Early FAILED receipt lacked explicit NOT_RUN Haiku state"}
+    ]
+  },
+  "green": {
+    "command": ["<P1-python>", "-B", "-m", "unittest", "tests.test_jev_trading", "tests.test_jev_p1_casepack", "tests.test_jev_p1_scoring", "tests.test_provenance_digest_custody"],
+    "tests": 168,
+    "skipped": 0,
+    "exit_code": 0,
+    "tie_ece": 0.4,
+    "paired_ece_point_low_high": 0.2,
+    "partial_haiku_after_two_completed_calls": {"known_usd": "0.00003", "reserved_usd": "0.0002", "upper_bound_usd": "0.00023", "open_reservation_usd": "0.0002", "uncertain_calls": 1, "interrupted_call": true, "actual_total_usd": null, "cap_usd": "3.3216", "workload": "synthetic-partial-haiku"}
+  },
+  "retained_source_reproduction": {
+    "source": "../jev-trading-build-20261015/frozen-source-check.json",
+    "public_source_files": 5,
+    "content_partitions_reproduced": 9,
+    "valid_frozen_preregistration": true,
+    "relabeled_TFN_accepted_before": true,
+    "relabeled_TFN_refused_after": true,
+    "transport_invocations": 0,
+    "private_proof": "Synthetic temporary provenance only; no real authorization or credential used"
+  },
+  "mutants": {"receipt": "guard-mutants.json", "count": 113, "killed": 113, "source_unchanged": true},
+  "repository_validation": {"command": "python3 scripts/validate.py", "status": "PASS", "exit_code": 0, "components": 71, "hashed_files": 12139, "profiles": 4, "receipts": 240},
+  "scored_execution": "NOT_RUN",
+  "provider_network_calls": 0,
+  "credential_store_reads": 0
+}

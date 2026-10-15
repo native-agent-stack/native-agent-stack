@@ -60,6 +60,12 @@ The nine record list hashes and two date-subset hashes must all match. Source
 bytes and full generated lists stay in the coordination area; public evidence
 contains counts and hashes.
 
+SCORED preregistration also compares the exact ordered text/label/id content of
+all three partitions (original training, final training and scored) to the nine
+public dataset-derived pins retained in `frozen-source-check.json`. Matching
+IDs alone is insufficient. Relabelled or preprocessed packs refuse before any
+transport invocation. SYN fixtures keep their separate synthetic population.
+
 ```sh
 "$JEV_SCORING_PYTHON" -B blueprints/native-skill-practice/p1/jev_trading_run.py \
   build --sources <coordination>/sources.json --out <private>/frozen-sets.json
@@ -132,9 +138,12 @@ their rows, including conflicting labels. McNemar and Wilson use the original
 lowest-id representatives; a failed representative is never replaced. The
 vectorized resampling statistic uses additive confusion, squared-error and ECE
 bin sums, cross-checked against independent sklearn point computations. Both
-point and bootstrapped ECE use the accepted `Prediction.label` for correctness
-and maximum probability for confidence. A supplied maximum-probability tie
-choice is retained; without a supplied choice, the first sorted label wins.
+point and bootstrapped ECE use maximum probability and sorted-label argmax for
+correctness: the first label in sorted order wins a tie. This is the frozen
+decision-6 convention, unchanged by ADDENDUM-01 A4. The accepted returned choice
+remains the prediction used by other statistics; it does not replace ECE's
+preregistered argmax rule. The later scored-contract correction supersedes the
+accepted-choice ECE implementation recorded in the original build evidence.
 
 Exactly 1% failures is complete under decision 6's **exceeds 1%** definition.
 ADDENDUM-01 also contains "below 1%" wording; the frozen sizes 1,454, 2,388 and
@@ -155,7 +164,13 @@ again before every call. The journal retains exact Jev request wire bytes so
 canonical JSON cannot erase the option order. Responses retain allowed typed
 fields, response-model identity and usage; arbitrary error/refusal text and
 headers are omitted. The receipt records the command, exit code, input/output
-hashes and failures. Interruptions preserve the partial journal and receipt;
+hashes and failures. Every receipt includes Haiku accounting, or explicit
+`NOT_RUN` when no workload was configured. The budget state is initialized
+before protected execution and configured only after workload validation.
+An interruption retains known spend, all reservations, upper bound, workload,
+cap, uncertain calls and the open interrupted-call reservation; it never
+releases an unknown charge. The owning workload ledger still reconciles it.
+Interruptions preserve the partial journal and receipt;
 existing run directories and artifacts are not overwritten.
 
 The SYN fixture uses invented sentences, fake probability vectors and synthetic
@@ -220,9 +235,11 @@ It supports retaining the existing joint F1/Brier BEATS requirement.
   accidental-start check, not authentication against a hostile same-user process.
   Private proof validation checks bytes, not the meaning of reviewer approval;
   trading-cc retains that acceptance decision.
-- ECE correction: `p1_scoring.py::expected_calibration_error` at the same
-  repository base, whose `correct` argument is prediction accuracy. The two
-  tie regressions cover the point and actual 10,000-draw clustered interval.
+- Frozen ECE contract: private
+  `us-equities-trading@a91a4cdd29e8aedab9f0b9784252bdb2bb60ae62:docs/decisions/2026-10-11-jev-harness-case-sets.md:233–235`;
+  `coordination/trading-cc/specs/jev-trading-20261015/JEV-HARNESS-ADDENDUM-01.md`, A4.
+  P1 supplies bin accumulation; the sealed rule supplies its correctness input.
+  The two tie regressions cover the point and actual 10,000-draw interval.
 - [Financial PhraseBank loader](https://huggingface.co/datasets/takala/financial_phrasebank/blob/8d3fe0c36d5feec6b3cc5e455b0fcb4820fb9964/financial_phrasebank.py),
   ISO-8859-1 and last-`@` parsing; TFN
   `ccbe24de388e287beb92dd393a335c376b350ac3`; FOMC
@@ -244,3 +261,6 @@ It supports retaining the existing joint F1/Brier BEATS requirement.
 
 The bounded layer-resolution record and measured build evidence are in
 [`evidence/artifacts/jev-trading-build-20261015`](../../../evidence/artifacts/jev-trading-build-20261015/).
+The three adjudicated scored-contract corrections and their superseding RED/GREEN
+evidence are in
+[`jev-trading-scored-contract-20261015`](../../../evidence/artifacts/jev-trading-scored-contract-20261015/).
