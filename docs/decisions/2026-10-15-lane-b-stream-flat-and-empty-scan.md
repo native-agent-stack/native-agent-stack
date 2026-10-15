@@ -70,6 +70,61 @@ The frozen runtime and CONFIG bytes and all already sealed packets stay intact.
 
 ## Fail-first validation and limits
 
+### Correction to the initial #1172 candidate
+
+At initial candidate `e111051b3f68aeacfa1b58e20b619508d3b9c535`, the
+positive recovery fixtures supplied the inner engine receipt directly. They
+missed two real consumer/producer boundaries. Pinned primary sources establish:
+
+- `paper-readiness-seq3/recut.py:114-136` at the base replaces the entire
+  `stop_mark` through `recover_stage` span. A helper inside that span is
+  removed for direct fixture consumers. Keep it before `stop_mark`; keep a
+  single helper and call when the later r3 graft consumes an already rewritten
+  fixture. The landed seq3 implementation and its source pin remain unchanged.
+- `adaptive-paper/runner.py:2889-2901` at the base overwrites the saved public
+  recovery mode with `adaptive_paper`. RTH gating must use that public CLI
+  contract, rather than the inner `official_sdk_recovery` mode. The mover
+  producer retains its inner mode; missing required preflight evidence still
+  refuses. No native producer or frozen runtime bytes are changed.
+
+Correction regressions call the actual `runner.py recover` parser/main,
+config loader, public-preflight summary, projection and output writer with
+fixture credential/account/transport/engine boundaries. Saved output is
+consumed directly, without rewriting its mode or decorating it in the test.
+A successful saved CLI receipt through direct seq3 rewriting fails with the
+missing-helper NameError before the fix. A real saved RTH CLI stream-refusal
+receipt has adaptive_paper and integer0/0/0 but fails recovery_not_flat before
+the mode correction. Both pass with the prepared corrections. The direct
+stage-latch module is explicitly included in the correction test scope.
+
+These CLI tests use scratch ledger/state and fake boundaries only. They do
+not claim a native broker run or connect a lane credential/stream. Existing
+inner-engine fixtures remain unit coverage, separate from this public CLI
+output coverage. The initial test-set receipt is retained as its actual
+limited scope, not promoted to coverage of the omitted boundaries.
+
+The CC's same-head read also identified an incomplete downstream proof
+contract: the fallback writes `stream-flat-probe.json`, but the inherited
+`verify_handoff` at initial fixture:213-217 considers only the two legacy
+filenames. Extend the fixed per-instance allowlist under the SAME recorded
+`native_recover_sha256`; retain ownership, flatness, configuration, bundle,
+trial, boot and drain checks. Graft the canonical validator into generated
+packets as well as fixing the fixture. A stale legacy file must not take
+priority over the exact recorded proof; no matching proof still refuses.
+
+The next-stage regression consumes actual RTH CLI output, performs the real
+GET observer recovery, then drives the real next-stage issuer and binding.
+Before this correction the issuer refuses `previous_native_recover_hash`.
+After it, issuance/binding pass; tampering with the stream proof still refuses
+under that same hash check. Authority, clock, unit inventory and all GO/state
+files in the test are SYN fixtures. This does not issue a real GO or run a unit.
+
+The pinned mover CLI does not publish the required preflight counters. That
+missing evidence remains a refusal for this new stream-error path; no zero
+counts are inferred from an empty ledger. Its ordinary no-owned-trial GET
+fallback is unchanged. Operational qualification of the new path is therefore
+the public RTH CLI contract exercised here, not a claim about missing PRE data.
+
 `tests.test_lane_b_stream_flat_fallback` exercises the emitted private-latch
 launcher and the actual GET observer/preflight with fixture HTTP answers.
 It never reads a credential or opens a real stream. The empty-traded-symbol

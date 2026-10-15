@@ -35,12 +35,13 @@ def launcher(text, canonical):
     expected = ast.parse(canonical)
     all_methods = {node.name: ast.get_source_segment(canonical, node) for node in expected.body
                    if isinstance(node, ast.FunctionDef)}
-    methods = {name: all_methods[name] for name in ('keyed', 'run_stage') if name in all_methods}
-    if set(methods) != {'keyed', 'run_stage'}:
+    contracts = {'keyed', 'run_stage', 'verify_handoff'}
+    methods = {name: all_methods[name] for name in contracts if name in all_methods}
+    if set(methods) != contracts:
         raise ValueError('canonical_launcher_contract_missing')
     nodes = [node for node in ast.parse(text).body if isinstance(node, ast.FunctionDef)
              and node.name in methods]
-    if len(nodes) != 2 or {node.name for node in nodes} != set(methods):
+    if len(nodes) != len(contracts) or {node.name for node in nodes} != contracts:
         raise ValueError('predecessor_launcher_contract_shape')
     lines = text.splitlines(keepends=True)
     for node in sorted(nodes, key=lambda item: item.lineno, reverse=True):
@@ -48,10 +49,25 @@ def launcher(text, canonical):
     result = ''.join(lines)
     helper = all_methods.get('rest_flat_after_stream_failure')
     call = '        rc, output = native_recover(stage, active)\n'
-    entry = 'def recover_stage(stage):\n'
+    entry = 'def stop_mark(stage):\n'
     if helper is None or result.count(call) != 1 or result.count(entry) != 1:
         raise ValueError('predecessor_stream_fallback_shape')
-    result = result.replace(call, call + '        rc, output = rest_flat_after_stream_failure(stage, active, rc, output)\n')
+    fallback_call = '        rc, output = rest_flat_after_stream_failure(stage, active, rc, output)\n'
+    if result.count(fallback_call) == 0:
+        result = result.replace(call, call + fallback_call)
+    elif result.count(fallback_call) != 1 or call + fallback_call not in result:
+        raise ValueError('predecessor_stream_fallback_call_shape')
+    helpers = [node for node in ast.parse(result).body if isinstance(node, ast.FunctionDef)
+               and node.name == 'rest_flat_after_stream_failure']
+    if len(helpers) > 1:
+        raise ValueError('predecessor_stream_fallback_helper_shape')
+    if helpers:
+        lines = result.splitlines(keepends=True)
+        node = helpers[0]
+        lines[node.lineno - 1:node.end_lineno] = []
+        result = ''.join(lines)
+    # seq3 rewrite_launch replaces the WHOLE stop_mark..recover_stage span.
+    # Keep this definition outside that span for direct-rewriter consumers.
     result = result.replace(entry, helper + '\n\n' + entry)
     ast.parse(result)
     return result

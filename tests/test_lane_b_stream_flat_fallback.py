@@ -1,13 +1,16 @@
 """Persistent stream refusal uses the actual GET observer on SYN HTTP answers."""
-from contextlib import ExitStack, contextmanager
+from contextlib import ExitStack, contextmanager, nullcontext
 import asyncio
+import hashlib
 import importlib.util
 import io
+import json
 from pathlib import Path
 import sys
+import time
 from types import SimpleNamespace
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import AsyncMock, Mock, patch
 
 from tests import test_pre_skip_flat_probe as observer_fixtures
 from tests import test_lane_b_r3_launcher as launcher_fixtures
@@ -15,6 +18,75 @@ from tests import test_lane_b_r3_launcher as launcher_fixtures
 ROOT = Path(__file__).resolve().parents[1]
 LATCH = ROOT / 'blueprints/us-equities/paper-readiness-seq3'
 STREAM_ERROR = 'stream authentication/subscription/quote readiness failed (quotes_disconnected,start_not_ready)'
+
+
+def actual_rth_cli_receipt(fixture, output, *, passed=False, stage='lev1'):
+    """Run the real recover parser/config/summary/projection/save path.
+
+    Only account/credential/network/engine boundaries are fixtures. In
+    particular, do not fabricate or postprocess the public mode decoration.
+    """
+    runner = observer_fixtures.load('runner', fixture.paper / 'runner.py')
+    recovery = observer_fixtures.load('recovery', fixture.paper / 'recovery.py')
+    safety = sys.modules['safety']
+    config_path = fixture.bundle / 'configs' / (stage + '.json')
+    config_doc = json.loads((fixture.paper / 'config.json').read_text())
+    config_path.write_text(json.dumps(config_doc))
+    config, limits, _ = runner.load_config(config_path)
+    fingerprint = 'syn-cli-account'
+    state_root = output.parent / 'native-state'
+    state_dir = state_root / fingerprint / 'adaptive'
+    state_dir.mkdir(parents=True)
+    ledger = safety.Ledger(state_dir / 'ledger.sqlite3', limits)
+    ledger.close()
+    config_sha = runner.config_digest(config, config_path.read_bytes(), limits=limits)
+    runner.save(state_dir / 'trial.json', {
+        'trial_id': 'syn-cli-trial', 'phase': 'running', 'status': 'running',
+        'started_at': time.time() - 1, 'baseline_cash': '100000', 'config_sha256': config_sha})
+    observation = {
+        'account': {'status': 'ACTIVE', 'currency': 'USD', 'cash': '100000', 'equity': '100000',
+                    'buying_power': '100000', 'trading_blocked': False, 'account_blocked': False,
+                    'trade_suspended_by_user': False},
+        'account_identity_sha256': fingerprint,
+        'clock': {'is_open': True, 'received_at_ns': time.time_ns(), 'timestamp_ns': time.time_ns(),
+                  'next_close_ns': time.time_ns() + 3600 * 10**9},
+        'positions': [], 'orders': [], 'open_orders_complete': True,
+        'assets': [{'symbol': symbol, 'status': 'active', 'tradable': True} for symbol in config['symbols']],
+        'quotes': [{'symbol': symbol, 'ts_ns': time.time_ns()} for symbol in config['symbols']], 'quote_errors': {}}
+    answer = fixture.answer
+    def complete_quote_fixture(path):
+        if path == '/stocks/quotes/latest':
+            return {symbol: {'bp': '100', 'ap': '101', 'bs': 10, 'as': 10, 't': '2026-10-14T14:00:00Z'}
+                    for symbol in config['symbols']}
+        return answer(path)
+    fixture.answer = complete_quote_fixture
+    inner = {'mode': 'official_sdk_recovery', 'status': 'passed' if passed else 'needs_attention',
+             'flat': passed, 'positions': [], 'unresolved_orders': [],
+             'broker_positions_last_observed': [] if passed else None,
+             'reconciliation': {'positions': 0, 'open_orders': 0} if passed else None,
+             'errors': [] if passed else ['TransportError'],
+             'error_details': [] if passed else [{'code': 'TransportError', 'type': 'TransportError',
+                                                 'message': STREAM_ERROR}],
+             'cancel_attempt_client_ids': [], 'exit_attempt_client_ids': [], 'buy_submissions': 0}
+    argv = ['runner.py', 'recover', '--credentials', 'keychain-env', '--config', str(config_path),
+            '--output', str(output), '--state-root', str(state_root)]
+    with ExitStack() as stack:
+        for obj, name, value in [
+                (runner, 'paper_credentials', lambda *_: (None, None)),
+                (runner, 'check_order_contract_boundary', lambda *_: {}),
+                (runner, 'preflight', lambda *_, **__: observation),
+                (runner, 'validate_preflight', lambda *_, **__: time.time() + 3600),
+                (runner, 'account_lock_fingerprint', lambda *_: nullcontext()),
+                (runner, 'AlpacaPaperTransport', Mock()),
+                (runner, 'DEFAULT_STOP', fixture.root / 'SYN-STOP'),
+                (safety, 'DEFAULT_STOP', fixture.root / 'SYN-STOP'),
+                (recovery, 'recover', AsyncMock(return_value=inner)),
+                (runner.signal, 'signal', Mock())]:
+            stack.enter_context(patch.object(obj, name, value))
+        stack.enter_context(patch.object(sys, 'argv', argv))
+        stack.enter_context(patch('sys.stdout', io.StringIO()))
+        rc = runner.main()
+    return rc, json.loads(output.read_text())
 
 
 class StreamFlatFallback(unittest.TestCase):
@@ -170,6 +242,102 @@ class EmptyScanOutcome(unittest.TestCase):
         self.assertIn('INFO', stdout.getvalue())
         self.assertNotIn('refused', stdout.getvalue())
         self.assertFalse((launch.STATE / 'completed').exists())
+
+
+class NativeCLIRewriteContract(unittest.TestCase):
+    def test_successful_runner_cli_output_survives_direct_seq3_fixture_rewrite(self):
+        with StreamFlatFallback().scenario() as (fixture, launch, instance, native):
+            rc, result = actual_rth_cli_receipt(fixture, native, passed=True)
+            self.assertEqual((rc, result['mode']), (0, 'adaptive_paper'))
+            upstream = observer_fixtures.load('direct_seq3_rewriter', LATCH / 'recut.py')
+            canonical = (ROOT / 'tests/fixtures/seq2-launch.txt').read_text()
+            text = upstream.rewrite_launch(canonical, '1' * 64, hashlib.sha256(canonical.encode()).hexdigest())
+            launch_file = fixture.bundle / 'launch.py'
+            launch_file.write_text(text)
+            direct = observer_fixtures.load('direct_seq3_launch', launch_file)
+            for name in ('STATE', 'HOST_STOP', 'STOP', 'verify_bundle', 'verify_runtime', 'keyed'):
+                setattr(direct, name, getattr(launch, name))
+            active_path = fixture.state / 'active/pre.json'
+            active = direct.safe_json(active_path)
+            active.update(stage='lev1', config_sha256=direct.sha(direct.config('lev1')))
+            direct.save(fixture.state / 'active/lev1.json', active)
+            active_path.unlink()  # SYN fixture has exactly one active RTH stage.
+            direct.native_recover = Mock(return_value=(rc, native))
+            self.assertEqual(direct.recover_stage('lev1'), 0)
+            self.assertTrue(direct.safe_json(instance / 'handoff.json')['flat'])
+            direct.keyed.assert_not_called()
+
+    def test_actual_rth_recover_cli_stream_failure_reaches_rest_and_records_flat(self):
+        with StreamFlatFallback().scenario() as (fixture, launch, instance, native):
+            rc, result = actual_rth_cli_receipt(fixture, native)
+            self.assertEqual((rc, result['mode']), (3, 'adaptive_paper'))
+            self.assertEqual(tuple(result['preflight'][k] for k in
+                                   ('position_count', 'open_order_count', 'orders_submitted')), (0, 0, 0))
+            active = launch.safe_json(fixture.state / 'active/pre.json')
+            active.update(stage='lev1', config_sha256=launch.sha(launch.config('lev1')))
+            launch.save(fixture.state / 'active/lev1.json', active)
+            (fixture.state / 'active/pre.json').unlink()
+            launch.native_recover = Mock(return_value=(rc, native))
+            self.assertEqual(launch.recover_stage('lev1'), 0)
+            launch.keyed.assert_called_once()
+            self.assertIn(('GET', '/positions'), fixture.calls)
+            self.assertIn(('GET', '/orders'), fixture.calls)
+            handoff = launch.safe_json(instance / 'handoff.json')
+            self.assertTrue(handoff['flat'])
+            self.assertEqual((handoff['positions'], handoff['open_orders']), (0, 0))
+
+    def test_actual_rth_cli_fallback_proof_admits_next_stage_and_rejects_tampering(self):
+        with StreamFlatFallback().scenario() as (fixture, launch, instance, native):
+            rc, result = actual_rth_cli_receipt(fixture, native)
+            self.assertEqual((rc, result['mode']), (3, 'adaptive_paper'))
+            active = launch.safe_json(fixture.state / 'active/pre.json')
+            active.update(stage='lev1', config_sha256=launch.sha(launch.config('lev1')))
+            launch.save(fixture.state / 'active/lev1.json', active)
+            (fixture.state / 'active/pre.json').unlink()
+            launch.native_recover = Mock(return_value=(rc, native))
+            with patch.object(launch.time, 'monotonic', return_value=100):
+                self.assertEqual(launch.recover_stage('lev1'), 0)
+            probe = instance / 'stream-flat-probe.json'
+            original = probe.read_bytes()
+            # A stale legacy candidate must not take priority over the exact
+            # proof fingerprint carried by this handoff.
+            launch.save(instance / 'flat-probe.json', {'status': 'passed', 'flat': True,
+                'positions': [], 'unresolved_orders': [], 'reconciliation': {'positions': 0, 'open_orders': 0},
+                'kind': 'SYN stale legacy proof'})
+            launch.config('lev2').write_bytes(launch.config('lev1').read_bytes())
+            request = {'issuer': 'CC through co-op', 'bundle_sha256': launch.sha(fixture.bundle / 'SHA256SUMS'),
+                       'config_hashes': {stage: launch.sha(launch.config(stage)) for stage in ('lev1', 'lev2')}}
+            launch.save(fixture.bundle / 'GO-BINDING-REQUEST.json', request)
+            authority = fixture.root / 'SYN-authority.md'
+            authority.write_text('SYN authority for ' + request['bundle_sha256'])
+            # The pre-existing scratch operator file remains untouched. This
+            # scenario's admission controls are separate absent scratch paths.
+            launch.HOST_STOP = fixture.root / 'admission-host-STOP'
+            launch.assert_seq2_watchers_retired = Mock(return_value=[])
+            launch.session_now = lambda: ('RTH', '2026-10-14')
+            issuer_path = fixture.bundle / 'issue_go.py'
+            spec = importlib.util.spec_from_file_location('next_stage_builder',
+                ROOT / 'blueprints/us-equities/paper-lane-latch/recut.py')
+            builder = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(builder)
+            issuer_path.write_text(builder.isolate_issuer((ROOT / 'tests/fixtures/seq2-issue-go.txt').read_text()))
+            with patch.dict(sys.modules, {'launch': launch}), \
+                 patch.object(launch.time, 'monotonic', return_value=161):
+                issuer = observer_fixtures.load('next_stage_real_issuer', issuer_path)
+                issuer.writer_units = Mock(return_value=[])
+                answer = issuer.issue('lev2', 'syn-next-lev2', authority, launch.sha(authority), False)
+                slot = fixture.state / 'ready/lev2'
+                self.assertEqual((slot / 'GO.sha256').read_text().strip(), launch.sha(slot / 'GO.json'))
+                self.assertEqual(launch.safe_json(fixture.state / 'ready/lev2/GO.json')['previous_recover_sha256'],
+                                 launch.sha(fixture.state / 'completed/2026-10-14/lev1.json'))
+                damaged = launch.safe_json(probe)
+                damaged['SYN_tampered'] = True
+                launch.save(probe, damaged)
+                with self.assertRaisesRegex(launch.Refused, 'previous_native_recover_hash'):
+                    issuer.issue('lev2', 'syn-next-check', authority, launch.sha(authority), True)
+                probe.write_bytes(original)  # Restore only this SYN fixture for the binding check.
+                value = launch.binding('lev2')
+                self.assertEqual(value['trial'], 'syn-next-lev2')
 
 
 if __name__ == '__main__':

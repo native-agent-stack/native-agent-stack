@@ -210,11 +210,20 @@ def verify_handoff(previous, date):
     if not re.fullmatch(r'[a-z0-9-]{1,24}', trial):
         raise Refused('previous_recover_trial')
     instance = STATE/'instances'/trial
-    native = instance/('flat-probe.json' if (instance/'flat-probe.json').is_file() else 'recover.json')
-    output = safe_json(native)
-    proof = output.get('reconciliation') or {}
-    if sha(native) != value.get('native_recover_sha256'):
+    native, output = None, None
+    # Fixed per-instance paths only. A stale legacy proof cannot override the
+    # exact native/REST receipt fingerprint carried by this handoff.
+    for name in ('stream-flat-probe.json', 'flat-probe.json', 'recover.json'):
+        candidate = instance / name
+        if not candidate.is_file():
+            continue
+        candidate_output = safe_json(candidate)
+        if sha(candidate) == value.get('native_recover_sha256'):
+            native, output = candidate, candidate_output
+            break
+    if native is None:
         raise Refused('previous_native_recover_hash')
+    proof = output.get('reconciliation') or {}
     if not (value.get('flat') is True and value.get('positions') == 0 and value.get('open_orders') == 0
             and output.get('status') == 'passed' and output.get('flat') is True
             and output.get('positions') == [] and output.get('unresolved_orders') == []
@@ -504,34 +513,20 @@ def run_stage(stage):
                     'lane-b-scheduled', ROOT / 'scheduled_trial_r3.sh'], timeout=1190, environment=environment)
         return trial_result(rc, instance / 'scheduled/paper-output.json')
 
-def stop_mark(stage):
-    # Own the latch only if this hook creates it. An existing STOP, including a
-    # human abort during the run, must never be silently cleared by recovery.
-    active_path = STATE / 'active' / (stage + '.json')
-    if not active_path.is_file():
-        return 0
-    active = safe_json(active_path)
-    try:
-        descriptor = os.open(STOP, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
-        os.close(descriptor)
-        owned = True
-    except FileExistsError:
-        owned = False
-    save(Path(active['instance']) / 'stop-hook.json', {'created_by_hook': owned})
-    return 0
-
 def rest_flat_after_stream_failure(stage, active, rc, output):
     """Narrow startup-only fallback; native receipt remains unchanged.
 
     Native transport.py:1793-1800 emits this exact readiness error before
     recovery.py's first snapshot/order work. Reuse the GET-only observer from
     recover_stage's existing no_owned_trial_to_recover path, never a stream retry.
+    runner.py:2890-2891 publishes RTH recovery mode=adaptive_paper; the
+    mover producer retains the inner mode. Match the public producer by stage.
     """
     if rc != 3 or not output.is_file():
         return rc, output
     result = safe_json(output)
     preflight, details = result.get('preflight'), result.get('error_details')
-    if (result.get('mode') != 'official_sdk_recovery' or result.get('status') != 'needs_attention'
+    if (result.get('mode') != ('official_sdk_recovery' if stage == 'pre' else 'adaptive_paper') or result.get('status') != 'needs_attention'
             or result.get('flat') is not False or result.get('errors') != ['TransportError']
             or not isinstance(preflight, dict) or not isinstance(details, list) or len(details) != 1
             or not isinstance(details[0], dict) or details[0].get('type') != 'TransportError'
@@ -565,6 +560,23 @@ def rest_flat_after_stream_failure(stage, active, rc, output):
     # A failed observer may emit no file. Preserve native failure evidence so
     # ordinary recovery validation still writes a refusing handoff.
     return (probe_rc, probe) if probe.is_file() else (rc, output)
+
+
+def stop_mark(stage):
+    # Own the latch only if this hook creates it. An existing STOP, including a
+    # human abort during the run, must never be silently cleared by recovery.
+    active_path = STATE / 'active' / (stage + '.json')
+    if not active_path.is_file():
+        return 0
+    active = safe_json(active_path)
+    try:
+        descriptor = os.open(STOP, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
+        os.close(descriptor)
+        owned = True
+    except FileExistsError:
+        owned = False
+    save(Path(active['instance']) / 'stop-hook.json', {'created_by_hook': owned})
+    return 0
 
 
 def recover_stage(stage):

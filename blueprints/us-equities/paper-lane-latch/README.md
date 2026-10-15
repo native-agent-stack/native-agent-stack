@@ -59,7 +59,7 @@ predecessor need not contain a driver. This builder does not call #1113's
 `recut()`; the #1117 builder still constructs the flat-proof intermediate.
 
 The lane B preparation overlays the canonical launcher's `keyed` and
-`run_stage` methods and its narrow `rest_flat_after_stream_failure` hook from
+`run_stage` and `verify_handoff` methods and its narrow `rest_flat_after_stream_failure` hook from
 `tests/fixtures/seq2-launch.txt`, selected from the builder's exact source
 commit. The hook is inserted after native recovery, preserving the source
 generation's private-latch and handoff code. It leaves the authenticated native runner and
@@ -82,6 +82,17 @@ observer rc0, passed/flat=true and complete REST0/0 proof. An absent observer
 output preserves the native failed receipt and records a refusing handoff.
 No native retry or live stream is added. The observer fits the already
 reserved120s fallback slot; the enclosing recovery budgets do not change.
+
+RTH qualification uses the public `runner.py recover` mode `adaptive_paper`,
+not the inner recovery mode. The mover producer does not emit the required
+preflight counters, so that missing evidence keeps PRE stream failures closed;
+zero counts are never inferred. The ordinary no-owned-trial fallback remains.
+The emitted handoff validator recognizes `stream-flat-probe.json` alongside
+the two legacy paths only when its exact hash matches the handoff's existing
+`native_recover_sha256`. Bundle/config/trial/flatness/boot/drain checks stay
+in force. A stale legacy file cannot override the recorded stream proof, and
+a tampered proof cannot admit the next stage. This validator is grafted into
+new packets, not just changed in the canonical fixture.
 
 An authenticated PRE `scan_empty`/`not_started` receipt with zero submitted
 orders is a clean no-trade stage. The launcher verifies its config and scan
