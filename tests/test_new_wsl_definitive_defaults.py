@@ -1565,6 +1565,11 @@ class Manifest(unittest.TestCase):
         def added(doc, sid="command-output"):
             return next(row for row in doc["wave3"]["add_rows"] if row["slot_id"] == sid)
 
+        # A dated record name is not a digest (the local review of #1161 at c95453a1, P2; the command center's adjudication
+        # at e21a7b61): a relay record named with an eight-digit date assembles.
+        self.assertIsNone(attempt(lambda d: w3(d)["authority"].update(
+            relay_record="the command center's coordination records of 20261004 (outside the repository)")))
+
         def amended(doc, sid):
             return next(entry for entry in doc["wave3"]["amend_rows"] if entry["slot_id"] == sid)
 

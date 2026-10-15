@@ -4,7 +4,7 @@
 
 ## Context
 
-Round 1 (2026-10-04, 11 packets, 48 proposed jobs) applied the 2026-10-01 rule: "no extra install unless measured evidence shows a challenger's gain". The user had also said not to rerun tests, so no candidate could show a measured gain. Round 1 adopted no new tool: 38 jobs were not adopted and 10 only configured existing owners. That included jobs whose need the deciders agreed was real, such as Codex in CI.
+Round 1 (2026-10-04, 11 packets, 48 proposed jobs) applied the 2026-10-01 rule that nothing extra is installed unless measured evidence shows a challenger's gain. The user had also said not to rerun tests, so no candidate could show a measured gain. Round 1 adopted no new tool: 38 jobs were not adopted and 10 only configured existing owners. That included jobs whose need the deciders agreed was real, such as Codex in CI.
 
 A side note put two options to the user: allow small targeted tests, or let clearly documented gaps be filled without a test. The user answered at about 20:50Z; in a dated paraphrase (the exact words stay in the command center's private records):
 

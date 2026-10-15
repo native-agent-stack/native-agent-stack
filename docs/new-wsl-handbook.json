@@ -210,7 +210,7 @@
         },
         "consensus": {
           "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-          "sha256": "407e4b9f0be2181bd6004e17f2d1378b899a54c301c15a6a6f9199be1313234e"
+          "sha256": "1c7c038d05418c7994dedac6bde21875638b9bff1ab501acc1f0c7aff9bca91b"
         },
         "convergence": {
           "file": "convergence.json",
@@ -1560,7 +1560,7 @@
               "records": [
                 {
                   "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
-                  "sha256": "62eaf252d00250ee50db8069ba730b1b600dddb8260bdb17443e7d6dd5a3c7c1"
+                  "sha256": "ed2ce799e3b8a3821ea424a635f68d744c1ffc6da9070ff094825ff9826b290f"
                 }
               ],
               "repository": "https://github.com/MinishLab/semble; https://github.com/giancarloerra/SocratiCode",
@@ -1858,7 +1858,7 @@
               "records": [
                 {
                   "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
-                  "sha256": "62eaf252d00250ee50db8069ba730b1b600dddb8260bdb17443e7d6dd5a3c7c1"
+                  "sha256": "ed2ce799e3b8a3821ea424a635f68d744c1ffc6da9070ff094825ff9826b290f"
                 }
               ],
               "repository": "https://github.com/akitaonrails/ai-memory",
@@ -2403,7 +2403,7 @@
                 "records": [
                   {
                     "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
-                    "sha256": "62eaf252d00250ee50db8069ba730b1b600dddb8260bdb17443e7d6dd5a3c7c1"
+                    "sha256": "ed2ce799e3b8a3821ea424a635f68d744c1ffc6da9070ff094825ff9826b290f"
                   }
                 ],
                 "repository": "https://github.com/mksglu/context-mode",
@@ -8007,7 +8007,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "91631098625ddc0f5902e7a95ac57f1e25731692bed55ba80704b50e2be4865e"
+      "sha256": "13a37e1cf7307039751311bca9c77e7c72400c968ad439b9f7e3ba410924143a"
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -8031,7 +8031,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-      "sha256": "407e4b9f0be2181bd6004e17f2d1378b899a54c301c15a6a6f9199be1313234e"
+      "sha256": "1c7c038d05418c7994dedac6bde21875638b9bff1ab501acc1f0c7aff9bca91b"
     },
     {
       "path": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",

@@ -6,8 +6,8 @@
   "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
   "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
   "outputs": {
-    "docs/new-wsl-handbook.md": "97cca087e9d2c7289adc0d0ceee7c3f2ed3be95c2bfd06d62ff859b6b595749a",
-    "docs/new-wsl-handbook.json": "910fc5628b05a30a525f8945f7caea33f81454bb053db9755dae1d0ea786bc5e"
+    "docs/new-wsl-handbook.md": "3dbc136e7477a25691d15759f486e9fd403e409c400cfc4d6bb76bb460fe671f",
+    "docs/new-wsl-handbook.json": "cf1b6a84861bdeb0cff55420351ba0db4831e9a6e075e9a19ecd47d09c7aa40a"
   },
   "inventory": {
     "layers": 37,
@@ -1118,6 +1118,22 @@
       "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
       "evidence_class": "local_integration",
       "scope": "final owner-quote scrub commit of #1161 (CC adjudication 2026-10-15T14:52Z): the remaining relayed sentence and single-quoted owner words carry dated paraphrases; regenerated through the builders"
+    },
+    {
+      "recorded_at_utc": "2026-10-15T16:08:37Z",
+      "source_main": "420452059bc307e13121d9769096291b95cdbf42",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "check_command": "python3 scripts/build_new_wsl_handbook.py --check",
+      "check_exit_code": 0,
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "3dbc136e7477a25691d15759f486e9fd403e409c400cfc4d6bb76bb460fe671f",
+        "docs/new-wsl-handbook.json": "cf1b6a84861bdeb0cff55420351ba0db4831e9a6e075e9a19ecd47d09c7aa40a"
+      },
+      "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+      "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
+      "evidence_class": "local_integration",
+      "scope": "final adjudicated owner-quote scrub commit of #1161 (CC adjudication 2026-10-15T15:51Z): possessive owner attributions in the hashed records carry dated paraphrases; regenerated through the builders"
     }
   ],
   "previous_outputs": [
@@ -1363,6 +1379,15 @@
         "docs/new-wsl-handbook.json": "1a2eea1707c9828de37bee2bed4d655c7d57512f401a0b845eaa493863ab6e80"
       },
       "reason": "The last relayed owner sentence and single-quoted owner words in the hashed records became dated paraphrases (the command center's adjudication of #1161 at 9371e2ad), which changed the regenerated outputs."
+    },
+    {
+      "superseded_at_utc": "2026-10-15T16:01:04Z",
+      "source_main": "420452059bc307e13121d9769096291b95cdbf42",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "97cca087e9d2c7289adc0d0ceee7c3f2ed3be95c2bfd06d62ff859b6b595749a",
+        "docs/new-wsl-handbook.json": "910fc5628b05a30a525f8945f7caea33f81454bb053db9755dae1d0ea786bc5e"
+      },
+      "reason": "Possessive owner attributions in the hashed records (the user's requirement, direction or directive followed by quoted words) became dated paraphrases (the command center's adjudication of #1161 at e21a7b61), which changed the regenerated outputs."
     }
   ]
 }

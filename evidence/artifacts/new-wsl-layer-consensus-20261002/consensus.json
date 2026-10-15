@@ -518,7 +518,7 @@
   "records": {
    "wave2_records": {
     "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
-    "sha256": "62eaf252d00250ee50db8069ba730b1b600dddb8260bdb17443e7d6dd5a3c7c1"
+    "sha256": "ed2ce799e3b8a3821ea424a635f68d744c1ffc6da9070ff094825ff9826b290f"
    }
   },
   "acknowledgements": [
@@ -634,7 +634,7 @@
      "records": [
       {
        "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
-       "sha256": "62eaf252d00250ee50db8069ba730b1b600dddb8260bdb17443e7d6dd5a3c7c1"
+       "sha256": "ed2ce799e3b8a3821ea424a635f68d744c1ffc6da9070ff094825ff9826b290f"
       }
      ],
      "configuration": {
@@ -683,7 +683,7 @@
      "records": [
       {
        "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
-       "sha256": "62eaf252d00250ee50db8069ba730b1b600dddb8260bdb17443e7d6dd5a3c7c1"
+       "sha256": "ed2ce799e3b8a3821ea424a635f68d744c1ffc6da9070ff094825ff9826b290f"
       }
      ],
      "configuration": {
@@ -733,7 +733,7 @@
      "records": [
       {
        "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
-       "sha256": "62eaf252d00250ee50db8069ba730b1b600dddb8260bdb17443e7d6dd5a3c7c1"
+       "sha256": "ed2ce799e3b8a3821ea424a635f68d744c1ffc6da9070ff094825ff9826b290f"
       }
      ],
      "configuration": {
@@ -1377,11 +1377,11 @@
   "records": {
    "decision_record": {
     "path": "docs/decisions/2026-10-04-2604-e2e-fix-wave.md",
-    "sha256": "3b4ba79caf769879fc3965c6fe0e2acb661b350fc4045200b84e32c1deb99fdb"
+    "sha256": "c858c7d3940d1810dc905f6cb15424faf6f4a14076b9fba804c4764d5e3d6e5c"
    },
    "quality_rule": {
     "path": "docs/decisions/2026-10-04-repository-quality-rule.md",
-    "sha256": "772751b9bc68a1377747721109f74233a01847eeb96aa6f8110997d3e1990e5d"
+    "sha256": "c41afa0a75982730f34ab05868e56403e56cee9ecc3d1884ccc9619a86184931"
    },
    "round2_extract": {
     "path": "evidence/artifacts/new-wsl-fix-wave-20261004/repository-quality-promptfoo.json",
@@ -1447,11 +1447,11 @@
    },
    "quality_rule": {
     "path": "docs/decisions/2026-10-04-repository-quality-rule.md",
-    "sha256": "772751b9bc68a1377747721109f74233a01847eeb96aa6f8110997d3e1990e5d"
+    "sha256": "c41afa0a75982730f34ab05868e56403e56cee9ecc3d1884ccc9619a86184931"
    },
    "round2_extract": {
     "path": "evidence/artifacts/final-architecture-round2-20261004/verdicts.json",
-    "sha256": "f10b9e32d32f989bb239c0e5717e7dc4b3835a882d13633c19659ee2774c8975"
+    "sha256": "02027aa9d99764842ea783988af9d4bf37f424e38a128c65267df4dfd3bf7945"
    }
   },
   "acknowledgements": [],

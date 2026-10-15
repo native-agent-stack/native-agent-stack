@@ -18697,6 +18697,11 @@
       "bytes": 36513
     },
     {
+      "path": "docs/decisions/2026-10-04-2604-e2e-fix-wave.md",
+      "sha256": "c858c7d3940d1810dc905f6cb15424faf6f4a14076b9fba804c4764d5e3d6e5c",
+      "bytes": 37919
+    },
+    {
       "path": "docs/decisions/2026-10-04-ci-least-privilege.md",
       "sha256": "01ff8c7f2913e77733d69942c6a3c469e17257165ef0d7e9cfb492a00759754b",
       "bytes": 44388
@@ -18760,6 +18765,11 @@
       "path": "docs/decisions/2026-10-04-pwsh7-windows-guidance.md",
       "sha256": "8f5e0f1b66df663e1e83860f286098fb3cbdc0644c10a12f32d502d327c1d6f1",
       "bytes": 16799
+    },
+    {
+      "path": "docs/decisions/2026-10-04-repository-quality-rule.md",
+      "sha256": "c41afa0a75982730f34ab05868e56403e56cee9ecc3d1884ccc9619a86184931",
+      "bytes": 4028
     },
     {
       "path": "docs/decisions/2026-10-04-round2-plan-g1-messaging.md",
@@ -19718,12 +19728,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "910fc5628b05a30a525f8945f7caea33f81454bb053db9755dae1d0ea786bc5e",
+      "sha256": "cf1b6a84861bdeb0cff55420351ba0db4831e9a6e075e9a19ecd47d09c7aa40a",
       "bytes": 699751
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "97cca087e9d2c7289adc0d0ceee7c3f2ed3be95c2bfd06d62ff859b6b595749a",
+      "sha256": "3dbc136e7477a25691d15759f486e9fd403e409c400cfc4d6bb76bb460fe671f",
       "bytes": 369789
     },
     {
@@ -22868,7 +22878,7 @@
     },
     {
       "path": "evidence/artifacts/final-architecture-round2-20261004/integration-resolutions.json",
-      "sha256": "8e12eb25447bdbaab7552546383e9f635fa83406476e3c6508b25c956e04f4b6",
+      "sha256": "be6c5b544506300e166bd13b0e2629484289dfc63e864ab60dcf648cb8dc1433",
       "bytes": 101093
     },
     {
@@ -22883,8 +22893,8 @@
     },
     {
       "path": "evidence/artifacts/final-architecture-round2-20261004/verdicts.json",
-      "sha256": "f10b9e32d32f989bb239c0e5717e7dc4b3835a882d13633c19659ee2774c8975",
-      "bytes": 320430
+      "sha256": "02027aa9d99764842ea783988af9d4bf37f424e38a128c65267df4dfd3bf7945",
+      "bytes": 320496
     },
     {
       "path": "evidence/artifacts/foundation-closure-20260921/claude-review.md",
@@ -43703,7 +43713,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "91631098625ddc0f5902e7a95ac57f1e25731692bed55ba80704b50e2be4865e",
+      "sha256": "13a37e1cf7307039751311bca9c77e7c72400c968ad439b9f7e3ba410924143a",
       "bytes": 235504
     },
     {
@@ -44458,8 +44468,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "4a2d22a066de68686298042635ec3bd4606ef4c07a1726f2c5aa4ef7295c18e6",
-      "bytes": 85385
+      "sha256": "e5ff7ae45440eb32782c7f2a458f2772ca2868e640e902db8d7404c24a4c65bc",
+      "bytes": 87039
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -44993,7 +45003,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-      "sha256": "407e4b9f0be2181bd6004e17f2d1378b899a54c301c15a6a6f9199be1313234e",
+      "sha256": "1c7c038d05418c7994dedac6bde21875638b9bff1ab501acc1f0c7aff9bca91b",
       "bytes": 144364
     },
     {
@@ -45003,8 +45013,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
-      "sha256": "62eaf252d00250ee50db8069ba730b1b600dddb8260bdb17443e7d6dd5a3c7c1",
-      "bytes": 92400
+      "sha256": "ed2ce799e3b8a3821ea424a635f68d744c1ffc6da9070ff094825ff9826b290f",
+      "bytes": 92484
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/README.md",
@@ -63202,6 +63212,11 @@
       "bytes": 3014
     },
     {
+      "path": "tests/fixtures/owner-quote-baseline.json",
+      "sha256": "6350c8b8e6bfd3906c41b70efddbc3ffc4989bcca2d723fdf610ce3497f9f092",
+      "bytes": 17557
+    },
+    {
       "path": "tests/fixtures/skill_usage/codex_lanes/rollout-2026-10-19T04-00-00-lanes-before.jsonl.fixture",
       "sha256": "b54ff0bf58f9eaf936b995fbdd3593bec586aac7045470465a2f028a5ed8c0c9",
       "bytes": 444
@@ -64443,8 +64458,8 @@
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
-      "sha256": "8093db163133ee08c4b4be0706063d81e1faf1f4a0c07dd0d7a12eead8dc1814",
-      "bytes": 316613
+      "sha256": "f3ba3a61a8776ae772f8087e712729ff98c0c7643465e18b81e247144ec11d5c",
+      "bytes": 316999
     },
     {
       "path": "tests/test_new_wsl_handbook.py",
@@ -64540,6 +64555,11 @@
       "path": "tests/test_overfitting_riskl_parity.py",
       "sha256": "ed2dbdc9108109a50da5ffca6561ef0a7695f36fef4784d754cc2420f40e9d94",
       "bytes": 15821
+    },
+    {
+      "path": "tests/test_owner_quote_publication.py",
+      "sha256": "2b34b715aa39215ebda6590fd007eb0911d7dcc662674548abdb7e5c6e2defe4",
+      "bytes": 14938
     },
     {
       "path": "tests/test_paired_runs_results.py",

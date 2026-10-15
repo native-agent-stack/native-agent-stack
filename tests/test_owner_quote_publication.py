@@ -27,15 +27,26 @@ PARAPHRASE = re.compile(r"^\s*>\s*the (?:owner|user), \d{4}-\d{2}-\d{2} \(paraph
 SPEECH = (r"(?<![\w-])(?:ask(?:s|ed|ing)?|answer(?:s|ed)?|request(?:s|ed)?|said|says|told|wrote|words|"
           r"quot(?:e|es|ed|ing)|verbatim)(?![\w-])")
 GAP = "[^\"“”|]"
-# An opening quote mark: a double quote, a typographic single quote, or a straight single quote that opens a word (not an
-# apostrophe inside or after one).
-QUOTE = "(?:[\"“”‘’]|(?<![\\w])'(?=\\w))"
-# The owner and a speech word close together, then a quote mark, or a closing quote mark followed by them, within one line.
+# An opening quote mark: a double quote, an opening typographic single quote, or a straight or typographic single quote
+# that opens a word (not an apostrophe inside or after one, as in the team’s or it’s).
+QUOTE = "(?:[\"“”‘]|(?<![\\w])['’](?=\\w))"
+# A closing quote mark: a double quote, or a single quote that ends a word or its punctuation.
+CLOSE = "(?:[\"“”]|(?<=[\\w.,!?])['’](?!\\w))"
+# The owner and a speech word close together, then a quote mark, or a closing quote mark followed by them, within one
+# sentence.
 ATTRIBUTED = re.compile(rf"(?:{OWNER}{GAP}{{0,80}}?{SPEECH}|{SPEECH}{GAP}{{0,80}}?{OWNER}){GAP}{{0,160}}?{QUOTE}"
-                        rf"|[\"“”]{GAP}{{0,30}}?{OWNER}{GAP}{{0,30}}?{SPEECH}", re.IGNORECASE)
+                        rf"|{CLOSE}{GAP}{{0,30}}?{OWNER}{GAP}{{0,30}}?{SPEECH}", re.IGNORECASE)
 # An attribution without a speech word: the owner, then within a short span a colon and a quote mark ("The user to this
 # session: ..."). The command center's adjudication of #1161 at 9371e2ad (P2-2).
 INTRODUCED = re.compile(rf"{OWNER}{GAP}{{0,60}}?:\s*{QUOTE}", re.IGNORECASE)
+# An attribution by possessive: the owner's (or the user's) words, direction or requirement, then within a short span a
+# quoted phrase of two or more words, with no speech word or colon. The command center's adjudication of #1161 at
+# e21a7b61 (P1). The phrase must open on a letter and close on the line, so a string literal's closing delimiter in code
+# ("the user's home directory") is not a quotation, nor is a quoted dated-paraphrase prefix.
+DATED = r"(?!the (?:owner|user), \d{4}-\d{2}-\d{2} \(paraphrased\))"
+QUOTED_PHRASE = (rf"(?:[\"“‘]{DATED}[^\W\d_][^\"“”‘’\n]{{0,200}}?\s[^\"“”‘’\n]{{0,200}}?[\"”’]"
+                 rf"|(?<!\w)'{DATED}[^\W\d_][^'\n]{{0,200}}?\s[^'\n]{{0,200}}?'(?!\w))")
+POSSESSED = re.compile(rf"(?<![\w-])(?:owner|user)(?:'s|’s)(?![\w-]){GAP}{{0,80}}?{QUOTED_PHRASE}", re.IGNORECASE)
 # A line that calls the owner's text verbatim.
 VERBATIM_CLAIM = re.compile(rf"{OWNER}[^\n.]{{0,80}}verbatim|verbatim[^\n.]{{0,80}}{OWNER}", re.IGNORECASE)
 # A field that holds the owner's words.
@@ -49,6 +60,15 @@ BLOCK_INTRO = re.compile(rf"{OWNER}[^\n]{{0,160}}(?:verbatim|quoted|said|wrote|a
 
 
 JSON_STRING = re.compile(r'"((?:[^"\\]|\\.)*)"')
+# Markdown wraps prose across physical lines: a paragraph runs on until a blank line or a line that opens a
+# new block (a list item, heading, table row or code fence); block-quote lines join only each other. The command
+# center's adjudication of #1161 at e21a7b61 (the GPT read's and the local review's P2s, line boundaries).
+# Plain-text files here are mostly captures, logs and code copies, read line by line.
+WRAPPED = (".md", ".markdown", ".rst")
+BLOCK_START = re.compile(r"^\s*(?:[-*+]\s|\d+[.)]\s|#|\||```|~~~)")
+FENCE = re.compile(r"^\s*(?:```|~~~)")
+# A sentence ends at . ! or ? and whitespace before a capital letter; an attribution never reaches into the next one.
+SENTENCE_END = re.compile(r"(?<=[.!?])\s+(?=[A-Z])")
 
 
 def prose(line, as_json):
@@ -65,21 +85,69 @@ def prose(line, as_json):
     return texts
 
 
-def line_hits(text, as_json=False):
-    """1-based line numbers of owner-attribution hits in a text, never the text itself."""
+def units(lines, as_json, wrapped):
+    """(text, starts) for each unit of prose, where starts maps offsets in the text to the 1-based lines joined into it:
+    each physical line (each JSON string value on its own), or in wrapped text each paragraph, list item or block quote."""
+    if as_json or not wrapped:
+        for number, line in enumerate(lines, 1):
+            for part in prose(line, as_json):
+                yield part, [(0, number)]
+        return
+    text, starts, quoted, fenced = "", [], False, False
+    for number, line in enumerate(lines, 1):
+        stripped = line.lstrip()
+        is_quote = not fenced and stripped.startswith(">")
+        body = stripped[1:].strip() if is_quote else line.strip()
+        alone = fenced or FENCE.match(line) or (BLOCK_START.match(body) and body[:1] in "#|")
+        if FENCE.match(line):
+            fenced = not fenced
+        if alone or not body or not text or is_quote != quoted or BLOCK_START.match(body):
+            if text:
+                yield text, starts
+            text, starts, quoted = "", [], is_quote
+            if alone:
+                yield line, [(0, number)]
+                continue
+            if not body:
+                continue
+        else:
+            text += " "
+        starts.append((len(text), number))
+        text += body
+    if text:
+        yield text, starts
+
+
+def sentences(text):
+    """(offset, sentence) for each sentence of a unit."""
+    begin = 0
+    for end in SENTENCE_END.finditer(text):
+        yield begin, text[begin:end.start()]
+        begin = end.end()
+    yield begin, text[begin:]
+
+
+def line_hits(text, as_json=False, wrapped=True):
+    """1-based line numbers of owner-attribution hits in a text, never the text itself: each attribution is matched
+    within one sentence and located at the line where it starts. Text is read as wrapped prose unless it is JSON or the
+    caller says otherwise (scan() wraps only Markdown and reStructuredText)."""
     lines = text.splitlines()
     owner_record = bool(OWNER_RECORD.search(text))
-    found = []
+    found = set()
+    for unit, starts in units(lines, as_json, wrapped):
+        for begin, sentence in sentences(unit):
+            for detector in (ATTRIBUTED, INTRODUCED, POSSESSED, VERBATIM_CLAIM):
+                match = detector.search(sentence)
+                if match:
+                    found.add(max(number for at, number in starts if at <= begin + match.start()))
     for number, line in enumerate(lines, 1):
-        hit = (any(ATTRIBUTED.search(part) or INTRODUCED.search(part) or VERBATIM_CLAIM.search(part)
-                   for part in prose(line, as_json))
-               or WORDS_KEY.search(line) or (owner_record and VERBATIM_KEY.search(line)))
+        hit = WORDS_KEY.search(line) or (owner_record and VERBATIM_KEY.search(line))
         if not hit and line.lstrip().startswith(">") and not PARAPHRASE.match(line):
             before = next((lines[index] for index in range(number - 2, max(-1, number - 5), -1) if lines[index].strip()), "")
             hit = BLOCK_INTRO.search(before)
         if hit:
-            found.append(number)
-    return found
+            found.add(number)
+    return sorted(found)
 
 
 def tracked_files(root=ROOT):
@@ -107,7 +175,7 @@ def scan(root=ROOT):
             text = path.read_text(encoding="utf-8")
         except (OSError, UnicodeDecodeError):
             continue
-        lines = line_hits(text, as_json=name.endswith((".json", ".jsonl")))
+        lines = line_hits(text, as_json=name.endswith((".json", ".jsonl")), wrapped=name.endswith(WRAPPED))
         if lines:
             found[name] = lines
     return found
@@ -131,10 +199,25 @@ class OwnerQuotePublication(unittest.TestCase):
                   "field": '{"owner_words": "light every fixture lane now"}',
                   "block": "The owner wrote at 10:00Z:\n\n> light every fixture lane now",
                   "no speech word": 'The user to this session: "light every fixture lane now".',
-                  "single quotes": "the record keeps the owner's words 'light every fixture lane now'"}
+                  "single quotes": "the record keeps the owner's words 'light every fixture lane now'",
+                  "possessive": "The user's recorded direction is 'light every fixture lane now'.",
+                  "single quotes before the speaker": "'light every fixture lane now,' the owner said.",
+                  "typographic quotes before the speaker": "‘light every fixture lane now,’ the owner said."}
         for label, text in quoted.items():
             with self.subTest(case=label):
                 self.assertTrue(line_hits(text))
+        # Wrapped prose: the attribution and its quotation on separate physical lines of one paragraph or list item,
+        # located at the attribution's line; a code fence and a separate paragraph do not join.
+        wrapped = {"wrapped after the attribution": ("Notes\n\nThe owner asked:\n\"light every fixture lane now\"", [3]),
+                   "wrapped list item": ("- The owner asked on 2026-10-04\n  for this: \"light every fixture lane now\"", [1]),
+                   "wrapped block quote": ("> The owner asked on 2026-10-04\n> for this: \"light every fixture lane now\"", [1])}
+        for label, (text, lines) in wrapped.items():
+            with self.subTest(case=label):
+                self.assertEqual(line_hits(text, wrapped=True), lines)
+        for label, text in {"separate paragraphs": 'The owner asked for lit lanes.\n\n"Delivered" runs count.',
+                            "code fence": 'The owner asked:\n```\n"light every fixture lane now"\n```'}.items():
+            with self.subTest(case=label):
+                self.assertEqual(line_hits(text, wrapped=True), [])
         self.assertTrue(line_hits('{"kind": "owner_decision", "verbatim": "light every fixture lane now"}', as_json=True))
         self.assertTrue(line_hits('{"note": "The owner asked: \\"light every fixture lane now\\"."}', as_json=True))
         self.assertEqual(line_hits('{"paraphrase": "the owner, 2026-10-15 (paraphrased): they asked for lit lanes"}',
@@ -143,7 +226,14 @@ class OwnerQuotePublication(unittest.TestCase):
                    "protocol": 'The contract counts "delivered" runs.',
                    "slot": 'the memory-owner row quotes the release notes: "fixture notes"',
                    "verbatim elsewhere": '{"verbatim": "a test needle"}',
-                   "apostrophes": "the owner's decision and the user's rule stand; it's the lane's call"}
+                   "apostrophes": "the owner's decision and the user's rule stand; it's the lane's call",
+                   "string literal": 'help="the user\'s home directory", default="~"',
+                   "format string": 'raise SystemExit(f"the owner\'s outcome: {identifier}")',
+                   "paraphrase prefix": "the owner's paraphrase begins 'the owner, 2026-10-04 (paraphrased): '",
+                   "typographic apostrophes": "the owner, 2026-10-15 (paraphrased): they asked to respect the team’s "
+                                              "defaults; it’s the lane’s call",
+                   "a separate quoted sentence": "the owner, 2026-10-15 (paraphrased): they asked for every fixture lane "
+                                                 "to be lit. The contract counts \"delivered\" runs."}
         for label, text in passing.items():
             with self.subTest(case=label):
                 self.assertEqual(line_hits(text), [])
