@@ -13503,8 +13503,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "683b42acf7668986dfbf9302f030070fd8bed1b5a9e37090932cab60956eb9af",
-      "bytes": 172519
+      "sha256": "83d96448634e7f4bbcec6a5399680e0efd358b4f0cf512a63fb80995d876d5e1",
+      "bytes": 172770
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runtime_lock.py",
@@ -13538,8 +13538,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "884913bdd196b59ca084723f270984221092e27562c1c71d7f4df7e41810dade",
-      "bytes": 10362
+      "sha256": "f1a9a8644b5f0580d6015b2cb77776e37035a6424550a9b8e72b2dc48447e2db",
+      "bytes": 10483
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/start_readiness.py",
@@ -19193,8 +19193,8 @@
     },
     {
       "path": "docs/decisions/2026-10-14-stream-integrity-followups.md",
-      "sha256": "ac5c3eac5b70e69e01a91d907265445b12876fd9b30863a9eb25612f2d1d4ed3",
-      "bytes": 8018
+      "sha256": "491cd925a9dd6c71f0f90ce3a462a3b32ad48c4996ed3fe1a48990cf2cf30460",
+      "bytes": 10079
     },
     {
       "path": "docs/decisions/2026-10-15-model-currency-landscape-check.md",
@@ -60708,8 +60708,8 @@
     },
     {
       "path": "evidence/receipts/stream-integrity-followups-20261014.json",
-      "sha256": "61f9c8150b473b3f146da335f4c5a4c23c1e3f0d8088de98c40e889cd7c4f07f",
-      "bytes": 3065
+      "sha256": "7d5535258131d9e79a76e57b2891e7913a35f8dfb1a95ec6f97ac99701a018b4",
+      "bytes": 4534
     },
     {
       "path": "evidence/receipts/suite-parallelism-trial-20261003.json",
@@ -62567,6 +62567,11 @@
       "bytes": 304
     },
     {
+      "path": "tests/integration/stream_integrity_followups.py",
+      "sha256": "ee16917b1355602401f8d0fd8dee723df33c39eba3d932f3f023eb24bf3d56a7",
+      "bytes": 12464
+    },
+    {
       "path": "tests/local_pages_architecture_policy_fixture.py",
       "sha256": "903c8e73e8596f943a3073312539a7f721a5613b9d22a8c35e385677c27e9271",
       "bytes": 4506
@@ -62738,8 +62743,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_stream_followups.py",
-      "sha256": "d0c89d5b899e594b1b23eb0e4e9d736eec307e859d3935ef532bac903c560ce5",
-      "bytes": 15183
+      "sha256": "9ee80621f3eef2c2201b6dd4ef06990e616accf99f6066c8e4bacb652f3f8650",
+      "bytes": 4983
     },
     {
       "path": "tests/test_adaptive_paper_transport.py",

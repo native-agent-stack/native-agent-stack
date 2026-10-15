@@ -11,9 +11,21 @@ conditions are satisfied.
 
 run_native now ends its loop on an observation-integrity-loss reason, before
 another rebalance can try an owned exit through that unusable transport.
-Its ordinary bounded shutdown and existing owned-residual recovery path remain;
-this does not bypass cancellation, reconciliation, exact config or order gates.
+Before breaking, it disables admissions and calls cancel_expired with
+all_entries=True on the loss tick. The initial handoff patch incorrectly skipped
+that cancellation; the correction restores the existing cancellation policy
+before teardown or a fresh recovery start/snapshot can fail. This requests entry
+cancellation; it does not claim a broker acknowledgement or fill result.
+Its ordinary bounded shutdown and existing owned-residual recovery path remain,
+including reconciliation, exact config and order gates.
 Quote silence alone retains its prior pause/reconciliation behavior.
+
+The resting-entry regression uses the real AdaptiveStrategy.cancel_expired
+policy and GuardedSession DELETE path with a synthetic HTTP endpoint. A newly
+resting buy is not yet timed out. At 9e1892b1 the loss tick reaches teardown
+without requesting its cancellation; the case fails. After correction the
+DELETE is observed at the loss tick, before native teardown, even when no fresh
+recovery is run. Handoff remains within one tick with zero refused-exit submits.
 
 The held-position regression uses the actual loop, real GuardedSession and
 Ledger reservations, and the actual recovery routine with synthetic ports and
@@ -34,9 +46,9 @@ every prior state. It observes that local pre-HTTP refusals consume reservations
 the fix prevents this loop from repeatedly spending them after integrity loss.
 
 F1 additionally requires integrity-loss SubmissionNotSent to be PERMANENT under
-the #1091 exit bridge. That bridge is a named landing dependency; it is not
-reimplemented here. At this preparation point #1091 is unlanded. Permanent
-classification and a fail-first covering both classification and immediate
+the exit bridge from #1091's re-scoped successor PR. #1091 is PARKED by the CC.
+Permanent classification is REQUIRED and pending on that successor; its bridge
+is not reimplemented here. A fail-first covering both classification and immediate
 handoff must be added from its merged bytes before F1/deploy completion.
 
 ## F2: stop SDK batch processing after irreversible loss
@@ -88,6 +100,14 @@ separate authorized native measurements.
   [transport.py:957-971](https://github.com/native-agent-stack/native-agent-stack/blob/c67bd78bebdd48d642307e3a91d5f791a9d1aad7/blueprints/us-equities/adaptive-paper/transport.py#L957),
   [transport.py:1576-1661](https://github.com/native-agent-stack/native-agent-stack/blob/c67bd78bebdd48d642307e3a91d5f791a9d1aad7/blueprints/us-equities/adaptive-paper/transport.py#L1576).
   The loop, atomic Ledger budget and FIFO remain the selected implementation.
+- The cancellation-order correction reuses
+  [9e1892b1 native_strategy.py:1400-1422](https://github.com/native-agent-stack/native-agent-stack/blob/9e1892b142c2608b86b4e45432857fb0ab8bd70c/blueprints/us-equities/adaptive-paper/native_strategy.py#L1400)
+  (all resting entries selected by all_entries=True) and
+  [transport.py:946-998](https://github.com/native-agent-stack/native-agent-stack/blob/9e1892b142c2608b86b4e45432857fb0ab8bd70c/blueprints/us-equities/adaptive-paper/transport.py#L946)
+  (DELETE is an allowed cancel; the integrity guard applies only to submits).
+  CPython's pinned public unittest discovery/runner mechanisms, already adopted
+  by scripts/run_integration_tests.py, run every tests/integration module and
+  reject any skip. No replacement cancellation or test harness is introduced.
 - alpacahq/alpaca-py v0.44.0 at
   [cc4cb3b7, data/live/websocket.py:222-229](https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/alpaca/data/live/websocket.py#L222)
   defines the supported stop_ws signal; its
@@ -110,6 +130,11 @@ F3's control also loads the old combined test because this is a coverage defect,
 not a claim that its existing production counter is absent. Parent mutations
 record the underlying unittest failures separately from their driver exit.
 Named modules run on the pinned runtime inside a no-network namespace.
+F1 handoff, the resting-entry cancellation regression and F2 SDK-batch coverage
+now live in tests/integration/stream_integrity_followups.py with no skip guards.
+The locked CI integration job discovers them through scripts/run_integration_tests.py,
+whose runner fails on empty or skipped cases. SDK-free F3-F5 stay in the ordinary
+unit module. F2 remains PARTIAL for arbitrary healthy successful batches, as above.
 Synthetic native lifecycle, actual upstream SDK execution, real journal/risk
 arithmetic and actual broker acceptance remain distinct evidence classes.
 

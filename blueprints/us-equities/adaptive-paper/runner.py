@@ -1877,6 +1877,9 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
                 # refused exits until duration+cleanup (and spending slots).
                 strategy.enabled = False
                 controller.stop = True
+                # Loss gates submits, not cancels. Reduce resting-entry risk
+                # on this tick, before teardown or a fresh recovery can fail.
+                strategy.cancel_expired(now, config["order_timeout_seconds"], all_entries=True)
                 break
             serious_gap = any("stale" not in str(reason) for reason in health.get("reasons", []))
             if strategy.started and serious_gap:
