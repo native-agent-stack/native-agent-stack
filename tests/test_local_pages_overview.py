@@ -94,6 +94,15 @@ WS5 = ("# Fixture shortlist\n\n## Inputs\n1. **The one input shortlist family is
        "   They enter only as on/off ablations of the fixture row:\n   - fixture filter one;\n   - a fixture gate (see cafe1234).\n"
        "4. **Selector and sizing (fixture):**\n   - eligibility before fixture ranking;\n   - at most 2 fixture names, an account-level setting.\n\n"
        "## Disputed\n1. **Not this either.**\n")
+ADDENDUM = ("# Fixture convergence, ADDENDUM-01: fixture measurements (fixture record)\n\n"
+            "This is a new record. Measured on fixture-paper over REST, opening no new stream.\n"
+            "- Dispute #1 (fixture statuses entitlement): SETTLED, confirmed. The server said ok\n  (probe-1.json, abcdef12...).\n"
+            "- Dispute #2 (fixture overnight coverage): SETTLED, no overnight history.\n"
+            "  - Fixture bars: 3 of 90 in the window (fixture-overnight.json, 1234abcd...).\n"
+            "  - Row 9's overnight part is therefore a fixture forward capture only.\n"
+            "- Dispute #3 (fixture BOATS entitlement): SETTLED, real-time confirmed.\n  - A fixture snapshot returned 5 of 5 symbols.\n"
+            "- FIXTURE-OPRA: historical access confirmed (HTTP 200; fixture-opra.json). Real-time is NOT yet\n"
+            "  proven; the one-shot fixture check settles it.\nEffect: fixture rows are entitled.\n")
 
 
 class Fixture:
@@ -250,6 +259,33 @@ class PendingTests(OverviewCase):
         for text in ("/var/tmp/fixture", "abc1234d", "beef1234", "probe.py", "paper-x", "(above)", "step one", "Every row is a test candidate"):
             self.assertNotIn(text, section)
 
+    def test_the_ws2_addendum_renders_its_entitlement_results_by_name(self):
+        fixture = Fixture(self.base)
+        directory = fixture.state / STATE_DIR / "ranked-feeds-20261014"
+        (directory / "CONVERGENCE-WS2-20990101.addendum-01.md").write_text(ADDENDUM)
+        glob = f"{STATE_DIR}/ranked-feeds-20261014/CONVERGENCE-WS2-*.md"
+        members = POLICY.OverviewReads(fixture.root, fixture.state).match("overview_feeds_convergence", "state", glob)
+        self.assertEqual([path.name for path in members], ["CONVERGENCE-WS2-20990101.md"])  # an addendum is not the record
+        data = DATA.model(fixture.root, fixture.state, commit="0" * 40)["feeds"]
+        self.assertEqual(data["addendum"]["results"], [
+            {"subject": "Fixture statuses entitlement", "sentences": ["SETTLED, confirmed."]},
+            {"subject": "Fixture overnight coverage", "sentences": ["SETTLED, no overnight history.", "Row 9's overnight part is therefore a fixture forward capture only."]},
+            {"subject": "Fixture BOATS entitlement", "sentences": ["SETTLED, real-time confirmed."]},
+            {"subject": "FIXTURE-OPRA", "sentences": ["historical access confirmed.", "Real-time is NOT yet proven; the one-shot fixture check settles it."]}])
+        result, html = fixture.build(self.base)
+        self.assertIn("feeds_addendum", result["present"])
+        section = html[html.index('id="ov-feeds"'):html.index('id="ov-strategies"')]
+        for text in ("<code>CONVERGENCE-WS2-20990101.addendum-01.md</code> (private record, cited by name)",
+                     "<li><strong>Fixture statuses entitlement:</strong> SETTLED, confirmed.</li>",
+                     "<li><strong>Fixture BOATS entitlement:</strong> SETTLED, real-time confirmed.</li>",
+                     "<li><strong>FIXTURE-OPRA:</strong> historical access confirmed. Real-time is NOT yet proven; the one-shot fixture check settles it.</li>"):
+            self.assertIn(text, section)
+        for text in ("probe-1.json", "abcdef12", "1234abcd", "fixture-opra.json", "fixture-paper", "3 of 90", "5 of 5", "The server said ok", "Effect:"):
+            self.assertNotIn(text, section)
+        (directory / "CONVERGENCE-WS2-20991231.addendum-01.md").write_text(ADDENDUM)  # the newest addendum now belongs to another record
+        _, html = fixture.build(self.base)
+        self.assertNotIn("Fixture statuses entitlement", html)
+
     def test_the_ws5_record_renders_the_family_caveats_ablations_and_sizing(self):
         fixture = Fixture(self.base)
         path = fixture.state / f"{STATE_DIR}/extreme-mover-strategies-20261014/CONVERGENCE-WS5-20990101.md"
@@ -260,7 +296,7 @@ class PendingTests(OverviewCase):
                                           "caveats": ["Commission was $0.01/share.", "There was no sealed out-of-sample test and no fixture slippage model.",
                                                       "The fixture recreation covers 2001 only, inside the sample."]})
         self.assertEqual(data["ablations"], {"lead": "The other fixture templates lack results", "intro": "They enter only as on/off ablations of the fixture row:",
-                                             "rows": ["Fixture filter one"]})
+                                             "rows": ["Fixture filter one", "A fixture gate"]})  # the cited digest aside is dropped
         self.assertEqual(data["sizing"], {"lead": "Selector and sizing (fixture)", "rows": ["Eligibility before fixture ranking"]})
         result, html = fixture.build(self.base)
         self.assertIn("strategies_convergence", result["present"])

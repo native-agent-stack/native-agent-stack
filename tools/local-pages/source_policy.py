@@ -374,7 +374,8 @@ class OverviewReads:
 
     Grants are the committed policy's "overview" roles (exact repo or state
     paths) and "overview_families" (one fixed directory, a literal filename
-    prefix and suffix, and a name token without separators). The source map
+    prefix and suffix, an optional literal infix, and name tokens without
+    separators or dots). The source map
     selects among these grants; it cannot extend them. final-stack.json stays
     on its dedicated Architecture role, so no overview role may grant it.
     """
@@ -405,25 +406,32 @@ class OverviewReads:
         self.families = {}
         for role, record in families.items():
             if not isinstance(role, str) or not role.startswith("overview_") or not isinstance(record, dict) \
-                    or set(record) != {"root", "directory", "prefix", "suffix"} or record["root"] not in self.roots:
-                raise SourcePolicyError("overview family requires exactly a root, directory, prefix and suffix")
-            if not isinstance(record["prefix"], str) or not record["prefix"] or not re.fullmatch(_FAMILY_TOKEN, record["prefix"]) \
+                    or set(record) - {"infix"} != {"root", "directory", "prefix", "suffix"} or record["root"] not in self.roots:
+                raise SourcePolicyError("overview family requires exactly a root, directory, prefix and suffix, and at most an infix")
+            literals = [record["prefix"]] + ([record["infix"]] if "infix" in record else [])
+            if not all(isinstance(text, str) and text and re.fullmatch(_FAMILY_TOKEN, text) for text in literals) \
                     or record["suffix"] not in _FAMILY_SUFFIXES:
-                raise SourcePolicyError("overview family names a literal prefix and a .md or .json suffix")
+                raise SourcePolicyError("overview family names a literal prefix, an optional literal infix and a .md or .json suffix")
             self.families[role] = {**record, "directory": _relative(record["directory"])}
 
     def pattern(self, role):
         """The family's glob in source-map form, or None when the role has no family."""
         family = self.families.get(role)
-        return f'{family["directory"]}/{family["prefix"]}*{family["suffix"]}' if family else None
+        if not family:
+            return None
+        middle = f'*{family["infix"]}*' if "infix" in family else "*"
+        return f'{family["directory"]}/{family["prefix"]}{middle}{family["suffix"]}'
 
     def _family_match(self, role, root, relative):
         family = self.families.get(role)
         if not family or root != family["root"]:
             return False
         path = PurePosixPath(relative)
+        # Name tokens carry no dot, so a record's addendum (prefix, token, infix, token, suffix) is never the record.
+        token = r"[A-Za-z0-9_-]+"
+        middle = token + (re.escape(family["infix"]) + token if "infix" in family else "")
         return path.parent.as_posix() == family["directory"] and bool(
-            re.fullmatch(re.escape(family["prefix"]) + r"[A-Za-z0-9._-]+" + re.escape(family["suffix"]), path.name))
+            re.fullmatch(re.escape(family["prefix"]) + middle + re.escape(family["suffix"]), path.name))
 
     def validate(self, role, root, *, path=None, glob=None):
         """Check one source-map declaration against its grant before anything is opened."""

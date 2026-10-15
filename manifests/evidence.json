@@ -64563,8 +64563,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "56f194e8526ae71d69342888ebf7b45d5eeb4a66de859fdf0d6b00103bbb8908",
-      "bytes": 762102
+      "sha256": "30e586c5ffe8c8d6441c550f4a73595dfe5662afd0efba6a5c018be5e1326e11",
+      "bytes": 762350
     },
     {
       "path": "tools/omniroute/gateway_record.py",

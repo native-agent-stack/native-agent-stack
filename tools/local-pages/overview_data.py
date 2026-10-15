@@ -245,10 +245,22 @@ def _withheld(text: str, terms: list[re.Pattern]) -> bool:
     return bool(_PATH.search(text) or _DIGEST.search(text) or _LINE_REF.search(text) or any(term.search(text) for term in terms))
 
 
+_PAREN = re.compile(r"\s*\(([^()]*)\)")
+
+
+def _uncited(text: str, terms: list[re.Pattern]) -> str:
+    """The text without its parenthesised asides that cite a path, digest or line or name a declared label."""
+    previous = None
+    while previous != text:
+        previous, text = text, _PAREN.sub(lambda match: "" if _withheld(match.group(1), terms) else match.group(0), text)
+    return text
+
+
 def sentences(text: str, drop: list[str] = ()) -> list[str]:
-    """The passage's plain sentences, without any that cite a path, digest or line or name a declared label."""
+    """The passage's plain sentences: a citation aside is dropped and the claim kept; a sentence that still cites a
+    path, digest or line or names a declared label is withheld."""
     terms = _terms(list(drop))
-    parts = (part.strip() for part in _SENTENCE.split(plain(_CROSS_REF.sub("", text))))
+    parts = (part.strip() for part in _SENTENCE.split(_uncited(plain(_CROSS_REF.sub("", text)), terms)))
     return [part for part in parts if part and not _withheld(part, terms)]
 
 
@@ -416,6 +428,35 @@ def _record(source: dict) -> dict:
     return {"status": "present", "name": source["name"], "root": source["root"], "path": source.get("path")}
 
 
+def addendum(sources: dict, key: str | None, record: dict) -> dict | None:
+    """The newest addendum to the convergence record shown: each top-level "subject: result" bullet as its subject
+    and the kept sentences of it and its nested bullets that name a declared result word, by record name only."""
+    if not key:
+        return None
+    source = sources[key]
+    if source["status"] != "present":
+        return _pending(source)
+    if not source["name"].startswith(PurePosixPath(record["name"]).stem + "."):
+        return {**_record(source), "status": "other", "record": record["name"]}
+    entry = source["entry"]
+    drop, words = entry.get("drop_terms") or [], entry.get("results") or []
+    terms = _terms(drop)
+    _, lines = md_section(source["content"], entry["under"])
+    results = []
+    for kind, nodes in outline(lines)["blocks"]:
+        for node in nodes if kind == "list" else []:
+            label = re.match(r"([^:]{1,80}):\s+(.*)", plain(node["text"]))
+            if not label:
+                continue
+            inner = re.search(r"\(([^()]+)\)\s*$", label.group(1))
+            subject = _clean((inner.group(1) if inner else label.group(1)).strip(), terms)
+            passages = [label.group(2)] + [child["text"] for child in _nodes(node)]
+            kept = [sentence for passage in passages for sentence in sentences(passage, drop) if any(_phrase(sentence, word) for word in words)]
+            if subject:
+                results.append({"subject": subject[:1].upper() + subject[1:], "sentences": kept})
+    return {**_record(source), "results": results}
+
+
 def feeds(sources: dict) -> dict:
     """The WS2 convergence as a sanitized projection: the $0 early-signal table, the baseline, the lagging or
     conditioning signals, the gated paid rows and the live-stack gaps, by record name only."""
@@ -451,7 +492,7 @@ def feeds(sources: dict) -> dict:
             if name and not _withheld(name, terms):
                 gaps.append({"name": name[:1].upper() + name[1:], "sentences": details})
     return {**_record(source), "table": table, "caption": caption, "column": entry["table"], "heading": heading, "points": projected,
-            "gaps": gaps, "statement": _statement(sources, entry.get("result"))}
+            "gaps": gaps, "statement": _statement(sources, entry.get("result")), "addendum": addendum(sources, entry.get("addendum"), source)}
 
 
 def strategies(sources: dict) -> dict:

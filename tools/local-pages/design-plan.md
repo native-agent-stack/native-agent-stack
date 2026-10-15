@@ -183,7 +183,7 @@ title + lede
 count strip: FINAL sentence | states as figures | sources present
 section links (8)
 1 layer stack: trading band above foundation band, one cell per layer   <- the bold element
-2 feeds: statement | $0 signal table | baseline, lagging, gated | live-stack gaps   | pending block
+2 feeds: statement | $0 signal table | baseline, lagging, gated | gaps | addendum results | pending block
 3 strategies: statement | family claim | caveats, ablations, selector and sizing   | pending block
 4 workers: worker | state | newest receipt
 5 repositories: per catalog, shared state once | layer | winners at run pin | survivors | next action

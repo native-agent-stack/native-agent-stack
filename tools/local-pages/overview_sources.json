@@ -53,7 +53,19 @@
       },
       "drop_terms": ["paper", "hub", "account", "owner"],
       "result": "feeds_battery",
+      "addendum": "feeds_addendum",
       "trigger": "the command center records its WS2 convergence after both blind judges have scored the arms"
+    },
+    "feeds_addendum": {
+      "section": "feeds",
+      "role": "overview_feeds_addendum",
+      "root": "state",
+      "glob": "coordination/command-center/research-cc-role-20261008/ranked-feeds-20261014/CONVERGENCE-WS2-*.addendum-*.md",
+      "reads": "a sanitized projection of the newest addendum to the convergence record shown: under the heading below, each top-level bullet of the form 'subject: result', as its subject (the parenthesised one, if any) and the sentences of it and its nested bullets that name a result word below. A parenthesised citation of a path, digest or line is dropped; any other sentence that cites one, or names a drop term, is withheld",
+      "under": "addendum",
+      "results": ["settled", "confirmed", "proven", "row"],
+      "drop_terms": ["paper", "hub", "account", "owner"],
+      "trigger": "the command center records entitlement measurements as an addendum to the WS2 convergence record"
     },
     "feeds_battery": {
       "section": "feeds",

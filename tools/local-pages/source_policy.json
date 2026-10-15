@@ -21642,6 +21642,13 @@
       "prefix": "BATTERY-WS2-",
       "suffix": ".md"
     },
+    "overview_feeds_addendum": {
+      "root": "state",
+      "directory": "coordination/command-center/research-cc-role-20261008/ranked-feeds-20261014",
+      "prefix": "CONVERGENCE-WS2-",
+      "infix": ".addendum-",
+      "suffix": ".md"
+    },
     "overview_strategies_convergence": {
       "root": "state",
       "directory": "coordination/command-center/research-cc-role-20261008/extreme-mover-strategies-20261014",

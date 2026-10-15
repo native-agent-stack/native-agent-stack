@@ -240,7 +240,21 @@ def feeds(data: dict) -> str:
                           for gap in result["gaps"]) + "</ul>")
     else:
         missing.append("the live-stack gaps")
-    return out + _missing(missing)
+    return out + entitlements(result.get("addendum")) + _missing(missing)
+
+
+def entitlements(extra: dict | None) -> str:
+    """The addendum's results under the gaps, by record name; a line with its trigger until it exists."""
+    if not extra:
+        return ""
+    if extra["status"] == "other":
+        return f'<p class="ov-trigger">The newest addendum, {_record(extra)}, belongs to another convergence record than {esc(extra["record"])}.</p>'
+    if extra["status"] != "present":
+        return f'<p class="ov-trigger">Entitlement results: {esc(extra["status"])}; ready when {esc(extra["trigger"])}.</p>'
+    rows = "".join(f'<li><strong>{esc(row["subject"])}:</strong>' + (f' {esc(" ".join(row["sentences"]))}' if row["sentences"] else "") + "</li>"
+                   for row in extra["results"])
+    return (f'<h3>Entitlement results</h3><p class="ov-record">From the addendum {_record(extra)}.</p>'
+            + (f'<ul class="ov-gaps">{rows}</ul>' if rows else '<p class="lp-empty">The addendum states no result.</p>'))
 
 
 def strategies(data: dict) -> str:
