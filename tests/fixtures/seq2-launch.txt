@@ -395,8 +395,24 @@ def keyed(command, *, timeout, environment=None):
     # echoed into agent messages or parsed as an instruction.
     log = STATE / 'command-output.log'
     with log.open('a') as stream:
-        result = subprocess.run(argv, env=environment, stdout=stream, stderr=stream, timeout=timeout)
-    return result.returncode
+        with subprocess.Popen(argv, env=environment, stdout=stream, stderr=stream) as child:
+            try:
+                return child.wait(timeout=timeout)
+            except subprocess.TimeoutExpired:
+                # r3 cb0e7d34: preflight 50*(5s connect+5s read),
+                # bounded cleanup <=120s, then teardown <=10s: 630s.
+                # credential_run forwards TERM to the native command group.
+                try:
+                    child.terminate()
+                except ProcessLookupError:
+                    pass
+                try:
+                    child.wait(timeout=50 * (5 + 5) + 120 + 10)
+                except subprocess.TimeoutExpired:
+                    child.kill()
+                    child.wait()
+                # A timeout remains a refusal even if recovery finishes rc0.
+                return 124
 
 def native_recover(stage, active):
     instance = Path(active['instance'])
@@ -416,17 +432,37 @@ def run_stage(stage):
         value = binding(stage)
         instance = Path(value['instance'])
         paper = FROZEN / 'blueprints/us-equities/adaptive-paper'
+        def trial_result(rc, output):
+            if rc != 0:
+                return rc
+            result = safe_json(output)
+            if result.get('status') == 'recovery_only':
+                save(instance / 'recovery-run.json', {
+                    'status': 'recovery_only', 'stage': stage, 'trial': value['trial'],
+                    'trial_evidence': False, 'native_exit_code': rc,
+                    'native_output_sha256': sha(output),
+                    'recovery_status': result.get('recovery_status')})
+                raise Refused('paper_start_recovery_only')
+            if result.get('status') != 'passed':
+                raise Refused('paper_trial_status_not_passed')
+            return rc
         if stage == 'pre':
-            return keyed([PY, '-E', '-s', '-B', paper / 'mover_runner.py', 'paper',
+            rc = keyed([PY, '-E', '-s', '-B', paper / 'mover_runner.py', 'paper',
                           '--env-file', credential_pointer(),
                           '--config', config(stage), '--scan', instance / 'scan.json',
                           '--trial', value['trial'], '--state-root', value['state_root'],
                           '--output', instance / 'paper.json'], timeout=4490)
+            return trial_result(rc, instance / 'paper.json')
         environment = dict(os.environ)
         environment.update(TRIAL=value['trial'], CONFIG=str(config(stage)),
                            ENV_FILE=str(credential_pointer()),
                            STATE_ROOT=value['state_root'], OUT_DIR=str(instance / 'scheduled'), PY=str(PY))
-        return keyed(['/usr/bin/bash', paper / 'scheduled_trial.sh'], timeout=1190, environment=environment)
+        # Keep the scheduler shell alive while a deferred-TERM runner recovers;
+        # Bash runs this trap after its foreground command finishes. Otherwise
+        # credential_run would observe its group leader exit and clean the group.
+        rc = keyed(['/usr/bin/bash', '-c', 'trap ":" TERM INT; source "$1"',
+                    'lane-b-scheduled', paper / 'scheduled_trial.sh'], timeout=1190, environment=environment)
+        return trial_result(rc, instance / 'scheduled/paper-output.json')
 
 def stop_mark(stage):
     # Own the latch only if this hook creates it. An existing STOP, including a

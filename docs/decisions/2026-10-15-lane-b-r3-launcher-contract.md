@@ -1,0 +1,60 @@
+# Lane B launcher acceptance and recovery timeout
+
+The shared runner start-path r3 is native-agent-stack commit
+`cb0e7d348d564520eb0911476d9d4b0f227952ea`, parent
+`303baca4cfe45db815366f1f49a0f137b8b9b42b`. It can complete an outstanding
+recovery instead of starting a trial and return exit zero with status
+`recovery_only`. Lane B must read the actual paper output, reject that status
+as trial evidence, and record a separate `recovery-run.json`. A successful
+trial still requires `passed`; a nonzero native exit remains nonzero. PRE reads
+`paper.json`; scheduled stages read `scheduled/paper-output.json`.
+
+The launcher must also leave recovery time after its normal command timeout.
+At the r3 pin:
+
+- `runner.py:252-258` arms the recovery stop handler before unblocking TERM;
+  `:300-308` blocks TERM/INT before the fresh-process exec.
+- `runner.py:3217` and `mover_runner.py:1063` identify recovery-only starts.
+- The preflight observers allow at most 50 requests. `transport.py:973` sets
+  5-second connect and 5-second read timeouts for each request.
+- `recovery.py:94-98` bounds order work by
+  `min(cleanup_seconds, limits.cleanup_seconds, 120)`, including port start
+  at `:223`; `:329` gives teardown at most 10 seconds.
+
+The resulting minimum recovery grace is **50 × (5 + 5) + 120 + 10 = 630
+seconds**, after TERM, before KILL. These are the cited request/order/teardown
+bounds; process scheduling and a network peer's incremental read behaviour
+are not measured wall-clock guarantees. The child returning zero during this
+grace still leaves a timed-out trial refused with exit 124.
+
+Use the existing credential runner unchanged. Its `run_command` forwards TERM
+to the native command group and continues waiting for that command;
+`tools/credentials/credential_run.py:996-1041` at current-main source commit
+`89e89852161d8157e464f4bd07c2b5c747ad4706` records that mechanism. This task
+does not load credentials or weaken its process/secret cleanup contract.
+The scheduler's Bash leader installs a TERM/INT no-op trap before sourcing
+the unchanged script. Bash defers a trap until its foreground command exits
+(Bash's maintained manual, Signals section); this keeps the native relay's
+leader alive during recovery instead of triggering group cleanup early. A
+test runs the actual credential relay API with empty synthetic environment
+and a late-armed child, verifying the recovery survives its 2-second cleanup
+threshold. It never calls the credential inventory/loader entry point.
+
+Primary subprocess reference: CPython v3.12.3 commit
+`f6650f9ad73359051f3e558c2431a109bc016664`, `Lib/subprocess.py:548-571`
+shows that `run(timeout=...)` kills a timed-out child immediately. Its POSIX
+`Popen.terminate`, `Popen.kill` and `Popen.wait` provide the supported
+TERM/wait/KILL sequence used here. No process supervisor or signal mechanism
+is reimplemented.
+
+Fail-first tests execute the launcher fixture: PRE and scheduled recovery-only
+exit-zero results were previously accepted; the fake child blocks TERM before
+arming its handler and used to be killed before it could finish. A separate
+child double verifies the exact 630-second grace and KILL ordering without
+waiting ten minutes. All state/output is synthetic and no provider is called.
+
+This is an issuer/daemon change. Both families and the CC read the PR before
+installation. It must land before r3 is placed in lane B's frozen runner.
+The current-runner rollover start is unaffected. The shared STOP publishers
+remain operators and guards; this task adds no STOP publisher or admission
+protocol. Existing deployed bundles are immutable and are not changed here.
