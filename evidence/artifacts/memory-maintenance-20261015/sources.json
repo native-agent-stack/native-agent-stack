@@ -1,0 +1,130 @@
+{
+ "schema": "memory-maintenance-sources/1",
+ "read_at": "2026-10-15T05:53:39Z",
+ "facts_record": {
+  "what": "The cc-native-practice lane's read-only fact-finding for the command center's memory-maintenance task (FACTS.md, run window 2026-10-15T04:39:40Z to 04:50:14Z). It stays in the command center's private coordination state; every line this file quotes was re-read from that record's saved copies or re-measured for this file.",
+  "sha256": "63099f1b4af2eba7a6b76c862918ef36d6aa62fc26f0b20937903a51ce47add9"
+ },
+ "docs": [
+  {
+   "id": "memory-docs",
+   "url": "https://code.claude.com/docs/en/memory.md",
+   "fetched_utc": "2026-10-15T04:39:50Z",
+   "sha256": "1ebf1bdc299fe03a8f7566f2da60b2bfca2bd0be7ccf5aa715e75171ac1e5a46",
+   "bytes": 51382,
+   "fetched_with": "scripts/fetch_docs.py (python urllib, User-Agent curl/8); the live page at fetch time, not a copy pinned to a client version",
+   "lines": {
+    "31": "| **Loaded into** | Every session | Every session (first 200 lines or 25KB) |",
+    "516": "To store auto memory in a different location, set `autoMemoryDirectory` in your `settings.json`. It is read from any [settings scope](/docs/en/settings#settings-precedence): user, project, local, policy, or `--settings`.",
+    "526": "When you set it in a project's `.claude/settings.json` or `.claude/settings.local.json`, Claude Code honors it under the same [workspace trust rule as hooks in settings files](/docs/en/permissions#what-runs-before-you-trust-a-folder). While [`permissions.blockReadsOutsideWorkingDirectories`](/docs/en/settings-reference#permissions-blockreadsoutsideworkingdirectories) is on, Claude Code loads no auto memory from a directory that a [repository-supplied settings file](/docs/en/permissions#when-your-local-settings-file-needs-trust) chooses and saves none to it, wherever that directory sits.",
+    "528": "The directory contains a `MEMORY.md` index and one topic file per memory:",
+    "546": "The first 200 lines of `MEMORY.md`, or the first 25KB, whichever comes first, are loaded at the start of every conversation. Content beyond that threshold is not loaded at session start. Claude keeps `MEMORY.md` concise by moving detailed notes into separate topic files.",
+    "548": "After Claude writes to `MEMORY.md`, Claude Code measures the file against the 200-line and 25KB read limits. If the file is near a limit, Claude Code reminds Claude to shorten it: keep one line per entry, move detail into topic files, and merge or drop stale entries. If the file is over a limit, the write still succeeds, but Claude Code returns an [error telling Claude to rewrite the index](/docs/en/errors#memory-index-is-over-its-read-limit), because everything past the limit is dropped on the next load.",
+    "550": "This limit applies only to `MEMORY.md`. Claude Code loads a CLAUDE.md file of up to 4 MiB in full and skips a larger file. Shorter files produce better adherence."
+   }
+  },
+  {
+   "id": "errors-docs",
+   "url": "https://code.claude.com/docs/en/errors.md",
+   "fetched_utc": "2026-10-15T04:40:18Z",
+   "sha256": "d28fbfce1925693bcca6448782bdb106b618e7a62f1352cb64d40bc3834bbc03",
+   "bytes": 500627,
+   "lines": {
+    "4275": "Error: this write left the memory index at MEMORY.md at 214 lines, over its 200-line read limit. The write succeeded, but everything past the limit is silently dropped each time the index is loaded — entries at the end are already invisible to readers. Rewrite it to under 140 lines now: keep one line per entry, move detail into topic files, and merge or drop stale entries.",
+    "4278": "Only the content that loads counts toward the limits. YAML frontmatter and block-level HTML comments are stripped before the index is loaded, so they're excluded from the measurement. Before v2.1.211, Claude Code measured the raw file, and frontmatter or comments could trigger this error even when the loaded content fit."
+   }
+  },
+  {
+   "id": "settings-reference",
+   "url": "https://code.claude.com/docs/en/settings-reference.md",
+   "fetched_utc": "2026-10-15T04:39:50Z",
+   "sha256": "8ba90434d2801f9e7b3dc44e304bea0e3ca94c25d540cdcf9763369deeb355e4",
+   "bytes": 425177,
+   "lines": {
+    "617": "| [`autoMemoryDirectory`](#automemorydirectory) | Store [auto memory](/docs/en/memory#auto-memory) in a directory you choose | Memory and context | Any file |",
+    "618": "| [`autoMemoryEnabled`](#automemoryenabled) | Turn [auto memory](/docs/en/memory#auto-memory) off or on | Memory and context | Any file |",
+    "1644": "When [`autoMemoryDirectory`](#automemorydirectory) comes from the project's `.claude/settings.json`, or from a `.claude/settings.local.json` [treated as repository-supplied](/docs/en/permissions#when-your-local-settings-file-needs-trust), Claude Code loads no [auto memory](/docs/en/memory#storage-location) from that directory and saves none to it."
+   },
+   "note": "Line 1644 sits in the permissions.blockReadsOutsideWorkingDirectories section, so it describes the block, as memory.md:526 does."
+  },
+  {
+   "id": "changelog",
+   "url": "https://github.com/anthropics/claude-code/blob/94506ff0d3bd9185f1752da36e968775021fb48f/CHANGELOG.md",
+   "fetched_utc": "2026-10-15T04:39:57Z",
+   "fetched_with": "gh api repos/anthropics/claude-code/contents/CHANGELOG.md?ref=94506ff0d3bd9185f1752da36e968775021fb48f (raw); top section ## 2.1.300",
+   "sha256": "8c6fdbbd692bd9b2e108e9946948aa77200b6c8ffec4f807ea9c8cee92545139",
+   "bytes": 1028694,
+   "lines": {
+    "1392": {"version": "2.1.284", "text": "- Improved auto-memory loading: invisible characters and tags that imitate Claude Code's own markup are neutralized in `MEMORY.md` and recalled memory notes before they reach Claude"},
+    "2555": {"version": "2.1.268", "text": "- Improved the MEMORY.md truncation warning to say how many lines were cut and where the cut starts"},
+    "4098": {"version": "2.1.211", "text": "- Improved the memory index over-limit warning to measure only loaded content, excluding frontmatter and HTML comments"},
+    "4139": {"version": "2.1.210", "text": "- Memory writes that leave a MEMORY.md index over its read limit now produce an explicit error instead of silent truncation"},
+    "4580": {"version": "2.1.186", "text": "- Improved memory: the agent is now reminded to compact its `MEMORY.md` index when nearing the size limit"},
+    "6619": {"version": "2.1.83", "text": "- Memory: `MEMORY.md` index now truncates at 25KB as well as 200 lines"},
+    "6844": {"version": "2.1.74", "text": "- Added `autoMemoryDirectory` setting to configure a custom directory for auto-memory storage"}
+   },
+   "zero_hits": "Case-insensitive autodream, auto-dream, dream and consolidat: 0 lines in this CHANGELOG and 0 in the memory, settings-reference and errors pages (FACTS Q1)."
+  }
+ ],
+ "binary": {
+  "client": "Claude Code 2.1.300 (claude --version), the realpath of ~/.local/bin/claude on 2026-10-15",
+  "location": "~/.local/share/claude/versions/2.1.300",
+  "sha256": "674deba0bba9aee479f4503c438b49303b6fdd304b9a471b14977aaec5215453",
+  "bytes": 266972344,
+  "measured_at": "2026-10-15T05:56:04Z",
+  "how": "Fixed-string search of the binary (mmap, re.escape); offsets are byte offsets of the first byte of the quoted text, and each quote was checked byte for byte at its offset at measured_at, together with every other quote in this file against its source (59 quotes, 0 mismatches). The text is minified JavaScript of the Bun bundle; identifiers are build-specific. The readings are INFERENCE from that code unless a doc line says the same.",
+  "reads": [
+   {"id": "settings-description", "offset": 110781324, "also_at": [216641350], "text": "Enable background memory consolidation (auto-dream). When set, overrides the server-side default.", "reading": "The description of autoDreamEnabled; no docs page lists the key."},
+   {"id": "settings-schema", "offset": 216641304, "text": "autoDreamEnabled:()=>M().optional().describe(\"Enable background memory consolidation (auto-dream). When set, overrides the server-side default.\")", "reading": "The key is in the client's settings schema, between autoMemoryDirectory's description and showThinkingSummaries."},
+   {"id": "gate", "offset": 233150543, "text": "function K(){return k(\"tengu_onyx_plover\",null)}function GWt(){let e=K();return e?.enabled===!0||e?.available===!0}function vet(){if(!GWt())return!1;let e=ut().autoDreamEnabled;if(e!==void 0)return e;return K()?.enabled===!0}", "reading": "Auto-dream runs only when the cached flag has enabled or available true; then autoDreamEnabled, when set, overrides the flag's enabled default. With the flag read on 2026-10-15 (enabled false, no available key) the setting has no effect."},
+   {"id": "thresholds", "offset": 233157250, "text": "minHours:24,minSessions:5", "reading": "The default scheduling thresholds; the flag's positive minHours and minSessions replace them (FACTS Q1)."},
+   {"id": "lock-path", "offset": 232910514, "literal_offset": 232910521, "text": "var g=\".consolidate-lock\",y=3600000;function c(e){return A(e,g)}", "reading": "The lock is join(<memory directory>, .consolidate-lock); a lock younger than 3,600,000 ms whose holder PID is alive blocks a second run."},
+   {"id": "last-consolidated-at", "offset": 232911093, "text": "try{return(await p(c(e))).mtimeMs}catch{return 0}", "reading": "lastConsolidatedAt is the lock's mtime (p = stat from fs/promises), and 0 when there is no lock."},
+   {"id": "rollback", "offset": 232911895, "text": "await k(o,\"\");let i=n/1000;await D(o,i,i)", "reading": "A failed run writes the previous time back onto the lock (D = utimes from fs/promises), or unlinks the lock when that time was 0, so a lock mtime can move back."},
+   {"id": "memory-dir", "offset": 218720181, "text": "function xi(){let e=hM().resolve();if(e===null)throw new zM;return e}", "reading": "The lock functions default to xi(), which resolves the memory directory: the same chunk declares var kin=\"auto memory files are allowed for writing\" at 218720546."},
+   {"id": "caps-declaration", "offset": 219416424, "text": "var Xu=\"MEMORY.md\",S$=200,Yie=25000,wPr=4*Yie,wIe=200,Xie=4096;function Cft(t){let r=t.trim();return{trimmed:r,lineCount:Nt(r,`\n`)+1,byteCount:r.length}}", "reading": "The caps beside the file name literal (step B of the extraction). Lines are the newlines of the trimmed text + 1, and the size is the trimmed string's length, which counts UTF-16 code units."},
+   {"id": "load-warning-anchor", "offset": 221127750, "also_at": [109039814], "text": "Only part of it was loaded", "reading": "Step A of the extraction reads the warning template in the 1,200 bytes before this text; across both occurrences it binds one identifier pair, S$ and Yie."},
+   {"id": "write-time-check", "offset": 225621868, "text": "var FPo=0.8,t5=0.7;function vfe({rawSizeBytes:e,surfaceCap:n,splicedSizeBytes:r,spliceCap:s,spliceActive:h}){return n!==void 0&&(!h||e/n>=r/s)?{sizeBytes:e,byteCap:n}:{sizeBytes:r,byteCap:s}}", "reading": "The reminder after a write starts at 0.8 of a cap and the rewrite target is 0.7 of it (floor(200 x 0.7) = 140, errors.md:4275). Without a surface cap, vfe picks the spliced size."},
+   {"id": "write-time-call", "offset": 225760764, "text": "vfe({rawSizeBytes:V.bytesTotal,surfaceCap:H,splicedSizeBytes:Q.byteCount,spliceCap:Yie,spliceActive:K})", "reading": "Q is Cft() of the index text, so the spliced size is the trimmed string's length in UTF-16 code units. H is y?.promptIndexMaxBytes (225760453), where y is a user-scope memory mount whose promptIndex is MEMORY.md; with no such mount the write-time check measures code units against Yie, as the loader does. This settles the measure FACTS Q2 left open, for a host without that mount."}
+  ]
+ },
+ "server_flag": {
+  "source": "cachedGrowthBookFeatures.tengu_onyx_plover in ~/.claude.json, read in-process; only the enabled and available fields are published",
+  "read_at": "2026-10-15T05:54:27Z",
+  "enabled": false,
+  "available": "absent"
+ },
+ "ai_memory": {
+  "installed": "ai-memory 2.6.3 (ai-memory --version, 2026-10-15T05:53:39Z)",
+  "repository": "https://github.com/akitaonrails/ai-memory",
+  "tag": "v2.6.3",
+  "tag_object": "e40a3678b6b9e41893302a0ade757cf97ee27b23",
+  "commit": "385b81ea95f7b73ede7146d0ae606c4caa7b43c1",
+  "pin_checked": "gh api repos/akitaonrails/ai-memory/git/refs/tags/v2.6.3 and git/tags/<tag object>, 2026-10-15T05:53:39Z; the lines are git show <commit>:<file> from the local mirror",
+  "lines": [
+   {"locator": "docs/ARCHITECTURE.md:721-722", "text": "2. **Single-writer SQLite actor.** All writes go through one `mpsc`\n   channel to one dedicated OS thread. (cognee #2717.)"},
+   {"locator": "docs/ARCHITECTURE.md:828-833", "text": "[maintenance]                      # scheduled server jobs (run outside hook latency)\nenabled = true                     # master switch for the scheduled jobs below\nforget_sweep_interval_secs = 86400 # retention forget sweep; 0 disables. Cadence persists\n                                   # across restarts; overdue work starts after a bounded delay\nlint_interval_secs = 86400         # rule-based wiki lint; 0 disables (same persistence)\nembedding_backfill_interval_secs = 0  # embedding backfill; 0 = off (may call a paid provider)"},
+   {"locator": "docs/install.md:2457-2469", "text": "Scheduled maintenance is configured in `[maintenance]` in `config.toml`.\nBy default, rule-based lint and forget sweep run daily outside hook\nlatency across every existing workspace/project. Embedding backfill is\nsupported but defaults to off because it can call a paid provider; if you\nenable `embedding_backfill_interval_secs` after configuring an embedder,\neach scheduled tick backfills every existing workspace/project and may\nincrease provider usage accordingly.\n\nForget sweep and rule-based lint persist their last successful completion. On\nrestart, a job that is not due waits only its remaining interval; a never-run\nor overdue job runs once after a bounded startup delay. Failed runs are not\nrecorded as successful and retry after that bounded delay. Embedding backfill\nremains opt-in and keeps its interval-only behavior (no startup catch-up)."},
+   {"locator": "crates/ai-memory-cli/src/config.rs:37", "text": "pub const DEFAULT_SERVER_URL: &str = \"http://127.0.0.1:49374\";"},
+   {"locator": "crates/ai-memory-cli/src/config.rs:705", "text": "            server_url: env_string(\"AI_MEMORY_SERVER_URL\"),"},
+   {"locator": "crates/ai-memory-cli/src/commands/lint.rs:1", "text": "//! `ai-memory lint` — thin HTTP client for the M8 lint pass."},
+   {"locator": "crates/ai-memory-cli/src/commands/lint.rs:10", "text": "/// Request sent to `POST /admin/lint`."},
+   {"locator": "crates/ai-memory-cli/src/commands/forget_sweep.rs:1", "text": "//! `ai-memory forget-sweep` — thin HTTP client for the M8 retention sweep."},
+   {"locator": "crates/ai-memory-cli/src/commands/forget_sweep.rs:10", "text": "/// Request sent to `POST /admin/forget-sweep`."},
+   {"locator": "crates/ai-memory-mcp/src/server.rs:320-321", "text": "- `memory_consolidate` — compiles session observations into wiki \\\n  pages on the SERVER'S model. For an explicit, in-session \\"},
+   {"locator": "crates/ai-memory-mcp/src/server.rs:327-329", "text": "  `session_id`). Keep `memory_consolidate` for sessions you did not \\\n  take part in and headless runs. Also runs on PreCompact, and at \\\n  session end only when AI_MEMORY_CONSOLIDATE_ON_SESSION_END is set. \\"},
+   {"locator": "crates/ai-memory-mcp/src/server.rs:1160-1162", "text": "    #[serde(default)]\n    dry_run: Option<bool>,\n    /// If true, M7b multi-page atomic fan-out. Default false (single page)."}
+  ],
+  "help_captures": [
+   {"command": "ai-memory --help", "captured_utc": "2026-10-15T04:43:12Z", "sha256": "cbc803f0f7a26ec2c9bf49c371c5f38b0d856e9ce2bfdac4214f74b163dee5f7", "consolidate_lines": 0, "lines": {"43": "  forget-sweep                Run the M8 retention sweep over episodic pages", "44": "  lint                        Run the M8 lint pass (stale / duplicates + optional LLM contradiction)"}},
+   {"command": "ai-memory lint --help", "captured_utc": "2026-10-15T04:43:12Z", "sha256": "99df31f2c866a112a02cdb08281b24eba5406ac737a39db16cd77964098f2525", "lines": {"11": "      --dry-run", "12": "          Compute findings but don't write `wiki/_lint/report.md`", "17": "      --no-llm", "18": "          Run only rule-based checks; skip the LLM contradiction pass. Lets you get fast results without consuming LLM tokens when a provider is configured"}},
+   {"command": "ai-memory forget-sweep --help", "captured_utc": "2026-10-15T04:43:12Z", "sha256": "b8727bfd2c616dcde556dfab8af8de8c9a25dc08219789ee3e1919f4fbce4272", "lines": {"11": "      --dry-run", "12": "          Report what would be evicted without actually mutating"}}
+  ],
+  "listeners": {"read_at": "2026-10-15T05:53:32Z", "command": "ss -ltn", "29374": "127.0.0.1:29374 (the ai-memory server)", "49374": "no listener"}
+ },
+ "repository": [
+  {"locator": "docs/memory-landscape-maintenance.md:90-94", "text": "[maintenance]\nenabled = true\nforget_sweep_interval_secs = 0\nlint_interval_secs = 86400\nembedding_backfill_interval_secs = 3600"},
+  {"locator": "docs/memory-landscape-maintenance.md:97-99", "text": "Within the shown maintenance/scheduler tables, the page-sweep interval (upstream\ndefault 86,400 seconds) and embedding-backfill interval (default off) are the\nselected deviations. Learning was disabled in this deployment and is now restored"},
+  {"locator": "adoption/drafts/memory-maintenance-20261008/README.md:23", "text": "| `ai-lint` | Daily 03:15 UTC | `ai-memory lint --dry-run --no-llm` | Resolve exact native project scope and effective server maintenance scheduling; avoid a duplicate built-in lint job |"}
+ ]
+}

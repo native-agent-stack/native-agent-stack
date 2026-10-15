@@ -5002,8 +5002,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/native-clients.md",
-      "sha256": "94d8b63e28355bd9d6ac7147b7c67de061ddb77476d0e763c371bf95eb416918",
-      "bytes": 18365
+      "sha256": "9b454914c8c9479535f46ca0c9597852dffabe6eee16c62d564ec51ec60d16ba",
+      "bytes": 20957
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/observation-inference.md",
@@ -5017,13 +5017,13 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.json",
-      "sha256": "b0b9d7949e07dd86ab80b34747cbc538a5eb6c97d1dec26e6684c0e1ffd7b2a1",
-      "bytes": 152660
+      "sha256": "d246552dd00f83790e23a9346db8b87b95503e956b0ac6c93a7d9a6f8b205273",
+      "bytes": 155260
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.md",
-      "sha256": "947a33617736dc0a66c8802a98019639d1d71e1aca2f84ed705e9c71db5800c2",
-      "bytes": 12648
+      "sha256": "543cc74196955749753140abfe0e2d2072ed3723fa7d96605f3a68a1dab1b3f7",
+      "bytes": 12834
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/token-efficiency.md",
@@ -21553,8 +21553,8 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/claude-native-slot-manifest.json",
-      "sha256": "b3db948a9878156abec03a3dc11764b1595c5c43b348d483c2a24355ca649e80",
-      "bytes": 238162
+      "sha256": "31f760623377e8956848878f5c290b2da41765520b884bb3f342fbcac61c4e14",
+      "bytes": 238657
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/cross-client-lines.json",
@@ -40905,6 +40905,51 @@
       "path": "evidence/artifacts/memory-lifecycle-probe-20260921/verification.json",
       "sha256": "d827cc6baf134f9f1b3e6a4a5d3f4d675d8c1d563386d9a735b1bc7797504eea",
       "bytes": 3915
+    },
+    {
+      "path": "evidence/artifacts/memory-maintenance-20261015/README.md",
+      "sha256": "3ebe9c9a5b8d1458d43915a032b4155a1c9e3fa138d1a889f3942bd0f445e8a9",
+      "bytes": 4801
+    },
+    {
+      "path": "evidence/artifacts/memory-maintenance-20261015/extract-results.json",
+      "sha256": "e251c127247c82b9e3d3ae19140cce5530bb4f930556c2eb182f007082daddcd",
+      "bytes": 3159
+    },
+    {
+      "path": "evidence/artifacts/memory-maintenance-20261015/index-measurement.json",
+      "sha256": "a3673e0b9319f1ac1ba2dfedbb436e1c785ffe8f8a20c7604460b5506997e945",
+      "bytes": 3483
+    },
+    {
+      "path": "evidence/artifacts/memory-maintenance-20261015/js-trim-set.json",
+      "sha256": "486631bf46a0fc9a1240e9c2403d912d3362371827600643b8c031c6f5bc5860",
+      "bytes": 1221
+    },
+    {
+      "path": "evidence/artifacts/memory-maintenance-20261015/probe/js_trim_set.js",
+      "sha256": "c374b915e1a2c77c8c2bb6c5457b5e12e1cc27335bfa4a75a7d84a5fb9462a0c",
+      "bytes": 599
+    },
+    {
+      "path": "evidence/artifacts/memory-maintenance-20261015/scripts/extract_memory_index_limits.py",
+      "sha256": "0591a8f6f50c6937a007ff4419199c9de95aa22e75d4e700069c0fd22e32e277",
+      "bytes": 3482
+    },
+    {
+      "path": "evidence/artifacts/memory-maintenance-20261015/scripts/fetch_docs.py",
+      "sha256": "1c76633394a5d85ed4ced31c908fc7acd5d4fb8f545a24283da98727f88b6b00",
+      "bytes": 1186
+    },
+    {
+      "path": "evidence/artifacts/memory-maintenance-20261015/scripts/memory_index_sizes.py",
+      "sha256": "15e25f9435ee39206a65b4e93e8f1c1ae0f886d79d904673f26cbd5160f11d9f",
+      "bytes": 1963
+    },
+    {
+      "path": "evidence/artifacts/memory-maintenance-20261015/sources.json",
+      "sha256": "0f6c92fd2618fac73ddcd07e95f205230b7e82cd191e66ec82899d0c23114074",
+      "bytes": 17797
     },
     {
       "path": "evidence/artifacts/memory-rag-lifecycle-20260921/catalog-lifecycle.png",

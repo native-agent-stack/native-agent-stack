@@ -1,0 +1,11 @@
+# Every 6 hours, the first run 10 minutes after boot; each run takes a few seconds (it hashes and scans the client binary).
+[Unit]
+Description=Check the Claude Code memory indexes every 6 hours
+
+[Timer]
+OnBootSec=10min
+OnUnitActiveSec=6h
+AccuracySec=1min
+
+[Install]
+WantedBy=timers.target
