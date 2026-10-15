@@ -28,8 +28,9 @@ URLs first pass jsonschema's supported RFC 3986 validator, pinned as the require
 `rfc3986-validator==0.1.1` dependency in `.github/requirements-ci.txt`, then
 CPython's URL parser checks the scheme, host, userinfo and port. Direct URI
 validation remains active when optional `FormatChecker` registrations are
-absent; clean errors never echo a rejected value. A screened candidate needs a resolved full commit
-or release identity; unknown, whitespace and malformed pins cannot qualify A1.
+absent; clean errors never echo a rejected value. A screened candidate needs a
+resolved full commit, release identity or explicitly sourced versioned model
+identity; unknown, whitespace and malformed pins cannot qualify A1.
 
 | Angle | Meaning | Default weight |
 | --- | --- | --- |
@@ -88,6 +89,23 @@ its UTC read time, or a committed receipt path. Repository reads used the
 registered exact mirror commits with lazy fetch and optional locks disabled.
 UNMIRRORED and unresolved pins remain explicit gaps. Private coordination
 inputs, account details and their digests are not publication sources.
+
+A screened A1 needs at least one citation whose `repository` and `pin` equal
+the candidate's complete current values. A repository citation already names
+both. A URL or receipt citation can additionally record those two fields;
+they must be present together. This binding includes release text and any
+recorded source commit. Changing the repository or pin while retaining the
+old citations refuses validation and derives `INSUFFICIENT`.
+
+For a provider model, the bound URL or receipt citation also declares
+`pin_kind: model`. Its pin is a versioned model identifier, such as
+`muse-wonder-full-1.0` or `gpt-6.1-sol`; a bare routing alias such as
+`gpt-reserve` cannot pass. The model spelling alone cannot opt a source into
+this identity type. The recorded citation asserts which exact provider/model
+was screened. These checks validate the binding and identifier structure;
+they do not contact a provider, authenticate a page, prove the citation's
+claim, or complete a capability screen. Existing unscreened routes retain
+their evidence gaps.
 
 A2 retains OpenSSF Scorecard's published result plus GitHub release and CI
 snapshots. A missing Scorecard result remains a gap. Its assessed commit can

@@ -68,6 +68,7 @@ class FinalFix1Tests(FixtureTestCase):
         doc["layers"][0]["winners"][0]["pin"] = selected
         _write_json(source, doc)
         record["candidates"][0]["pin"] = selected
+        record["candidates"][0]["angles"]["A1"]["sources"][0]["pin"] = selected
         record["final_evidence"][0]["run_pin"] = selected
         paired = root / "evidence/artifacts/fixture/paired.json"
         comparison = json.loads(paired.read_bytes())

@@ -1037,7 +1037,9 @@ def _angle_fixture() -> dict:
             "verdict": "CONVERGED", "provisional": True, "measure_next": None,
             "angles": {angle: {"score": "+" if angle != "A6" else "U", "read_at": stamp,
                                 "sources": [{"kind": "url", "url": "https://example.org/fixture",
-                                             "read_at": stamp}] if angle != "A6" else [],
+                                             "read_at": stamp,
+                                             **({"repository": "https://github.com/example/widget", "pin": COMMIT_A}
+                                                if angle == "A1" else {})}] if angle != "A6" else [],
                                 "note": "Synthetic source control."}
                        for angle in ("A1", "A2", "A3", "A4", "A5", "A6")},
         }],

@@ -25,6 +25,7 @@ DISQUALIFIERS = (None, "missing_capability", "abandoned")
 RESOLVED_PIN = re.compile(
     r"(?:[0-9a-f]{40}|v?\d+(?:\.\d+)+(?:[A-Za-z][0-9A-Za-z]*)?(?:[-.+~][0-9A-Za-z]+)*"
     r"(?:(?: @ |; source )[0-9a-f]{40})?)")
+MODEL_PIN = re.compile(r"[a-z][a-z0-9]*(?:-[a-z][a-z0-9]*)*-\d+(?:[.-]\d+)*(?:-[a-z][a-z0-9]*)*")
 UTC_TIMESTAMP = re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z")
 
 
@@ -79,6 +80,27 @@ def effective_weights(record: dict) -> dict[str, Decimal]:
     return weights
 
 
+def bound_a1_sources(candidate: dict) -> list[dict]:
+    """A capability citation belongs to the complete current candidate identity."""
+    angles = candidate.get("angles")
+    a1 = angles.get("A1") if isinstance(angles, dict) else None
+    sources = a1.get("sources") if isinstance(a1, dict) else None
+    if not isinstance(sources, list):
+        return []
+    return [source for source in sources if isinstance(source, dict)
+            and source.get("repository") == candidate.get("repository")
+            and source.get("pin") == candidate.get("pin")]
+
+
+def resolved_a1_pin(candidate: dict) -> bool:
+    """A versioned model ID needs an explicit, identity-bound model source."""
+    pin = candidate.get("pin")
+    return isinstance(pin, str) and bool(
+        RESOLVED_PIN.fullmatch(pin) or (
+            MODEL_PIN.fullmatch(pin)
+            and any(source.get("pin_kind") == "model" for source in bound_a1_sources(candidate))))
+
+
 def derive(record: dict, candidate: dict) -> dict:
     """R0, R1(v2), R2, R3(v2), R5, in that order; no single-angle admission."""
     if candidate["disqualifier"] not in DISQUALIFIERS:
@@ -90,7 +112,8 @@ def derive(record: dict, candidate: dict) -> dict:
     coverage = sum((weights[a] for a in scores), Decimal(0))
     if candidate["disqualifier"] is not None:
         verdict = "REJECTED"
-    elif not candidate["a1_screened"] or "A1" not in scores or len(scores) < 4:
+    elif (not candidate["a1_screened"] or not resolved_a1_pin(candidate) or not bound_a1_sources(candidate)
+          or "A1" not in scores or len(scores) < 4):
         verdict = "INSUFFICIENT"
     elif "+" in scores.values() and "-" in scores.values():
         verdict = "DISAGREE"
@@ -110,8 +133,7 @@ def validate_record(record: dict, schema: dict, *, label: str, sources=None) -> 
     if isinstance(record, dict) and isinstance(record.get("candidates"), list):
         for candidate in record["candidates"]:
             if isinstance(candidate, dict) and candidate.get("a1_screened") is True:
-                pin = candidate.get("pin")
-                if not isinstance(pin, str) or not RESOLVED_PIN.fullmatch(pin):
+                if not resolved_a1_pin(candidate):
                     raise AngleRecordError(f"{label}: A1 screen requires a resolved pin identity")
         stated = timestamp(record.get("weights_stated_at"))
         validate_reads(record, stated)
@@ -131,6 +153,8 @@ def validate_record(record: dict, schema: dict, *, label: str, sources=None) -> 
         identities.add(ident)
         if candidate["a1_screened"] and candidate["angles"]["A1"]["score"] == "U":
             raise AngleRecordError(f"{label}: A1 screen requires a known pin and a sourced score")
+        if candidate["a1_screened"] and not bound_a1_sources(candidate):
+            raise AngleRecordError(f"{label}: A1 evidence must name the current repository and pin")
         for angle, cell in candidate["angles"].items():
             if stated >= timestamp(cell["read_at"]):
                 raise AngleRecordError(f"{label}: weights must be stated before scoring")

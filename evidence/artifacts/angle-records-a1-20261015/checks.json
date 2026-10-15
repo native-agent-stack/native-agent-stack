@@ -1,0 +1,42 @@
+{
+  "evidence_class": "synthetic",
+  "limits": "Identity-binding fixtures only; no candidate installation, provider call, capability qualification or FINAL admission.",
+  "base": "51279d4f63d87b2d19de722cad786d7293417ac8",
+  "branch_base": "e35a6b6dfa2269c354ac526b1dab2bc7255f5bdc",
+  "fail_first": {
+    "tests": [
+      "A1IdentityTests.test_pin_change_with_unchanged_a1_citations_is_refused",
+      "A1IdentityTests.test_repository_change_with_unchanged_a1_citations_is_refused",
+      "A1IdentityTests.test_stale_identity_cannot_derive_converged",
+      "A1IdentityTests.test_resolved_model_identity_with_bound_url_evidence_is_accepted"
+    ],
+    "base_test_count": 4,
+    "base_assertion_failures": 4,
+    "base_model_subtest_errors": 3,
+    "base_exit": 1,
+    "boundary": "New control module executed against the exact landed base using its native validate_record and derive interfaces."
+  },
+  "focused": {
+    "command": "python3 -m unittest tests.test_angle_records_identity",
+    "tests": 9,
+    "exit": 0
+  },
+  "affected": {
+    "command": "python3 -m unittest tests.test_angle_records tests.test_angle_records_identity tests.test_angle_records_fix1 tests.test_final_stack",
+    "tests": 140,
+    "exit": 0
+  },
+  "generated": {
+    "command": "python3 scripts/final_stack.py --write",
+    "exit": 0
+  },
+  "primary_source": {
+    "repository": "https://github.com/python-jsonschema/jsonschema",
+    "pin": "a7277432b0f7bcd0551f6e589d30457017125df4",
+    "path": "jsonschema/_keywords.py",
+    "line": 243,
+    "file_sha256": "afcfc3aea01f9fa40bc109e65c4820bde89253e51a20bda9da7b8f20d7a57c57",
+    "read_at": "2026-10-15T13:50:29Z",
+    "dependentRequired_matches_installed_jsonschema_4_26_0": true
+  }
+}
