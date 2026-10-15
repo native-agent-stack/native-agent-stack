@@ -43,11 +43,11 @@ def build_plan(root: Path) -> dict:
         check = row.get("landscape_check")
         checked = check["date"] if check else None
         # Without a prior landscape check, the release's day43 is the first
-        # failing date. Request review two days before it, not on that date.
+        # failing date. Match checked rows' day5 -> day8 three-day interval.
         release_deadline = (date.fromisoformat(observation["effective_release_date"])
                             + timedelta(days=document["policy"]["max_release_age_days"] + 1))
         no_check_due = (not check and date.fromisoformat(review["generated_at"][:10])
-                        >= release_deadline - timedelta(days=document["policy"]["refresh_lead_days"]))
+                        >= release_deadline - timedelta(days=document["policy"]["refresh_lead_days"] + 1))
         if not observation["refresh_due"] and not no_check_due:
             continue
         invalid = (date.fromisoformat(checked) + timedelta(days=document["policy"]["max_landscape_age_days"] + 1)

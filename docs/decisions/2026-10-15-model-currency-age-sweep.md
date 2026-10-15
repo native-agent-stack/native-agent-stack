@@ -53,9 +53,9 @@ checkout, default workflow permissions remain empty, and it uses only the native
 `GITHUB_TOKEN`. No model/provider credentials are added.
 
 `scripts/model_currency_tracking.py` calls the existing
-`collect_model_currency(..., offline=True)` calculation and consumes only
-`refresh_due` rows, including the existing pre-release-age transition behavior.
-For a row without a landscape check, delivery now begins two days before its
+`collect_model_currency(..., offline=True)` calculation and consumes
+`refresh_due` rows plus the no-check release-age lead described below.
+For a row without a landscape check, delivery begins three days before its
 effective release reaches day43 (the first invalid date), rather than waiting
 until validation already fails. Effective package release dates are retained
 for package-bound rows; no release/check date or validator rule is changed.
@@ -70,12 +70,17 @@ No-check rows at the rebased main inventory are `claude-opus-5-5`,
 `headroom-bge-onnx`, `headroom-minilm-onnx`,
 `headroom-technique-router-onnx`, `headroom-siglip-onnx`,
 `markitdown-magika-standard-v3-3` and `codebase-memory-static-nomic`.
-The actual MinerU ONNX row's September10 release means review is due October21,
-before its October23 failure date. The regression uses that committed row and
-checks October20 (not due),21/22 (due, not expired),23 (due, expired).
+The MinerU ONNX row's September10 release means review is due October20,
+before its October23 failure date, matching check-age5 to first-invalid-age8.
+The regression freezes those dates in a synthetic inventory() row, never reads
+the mutable live catalog, and checks October19(not due),20/21/22(due, not expired),
+23(due, expired). Legitimate future landscape checks and unrelated catalog dates
+therefore cannot invalidate this historical timing fixture.
 
-At reviewed `fd849227`, the new test fails on October21/22 (request absent)
-and October23 (no first-invalid date); at the fold all four dates pass.
+Historical fail-first at reviewed `fd849227` lacked October21/22 requests and
+October23 first-invalid date. The subsequent `879ce432` two-day-lead fold is
+superseded: the three-day test fails at October20 on that code, and the new
+fixture-isolation guard fails its live-catalog read. Both pass after this fix.
 Runtime parser/YAML skip controls now plant a synthetic recorded gap in the
 child test module and run the real tripwire; empty committed gap sets no longer
 make those branches vacuous. The workflow's interpreter comment follows its
