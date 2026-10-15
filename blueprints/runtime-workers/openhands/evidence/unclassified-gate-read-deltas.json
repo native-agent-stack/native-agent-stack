@@ -44,6 +44,14 @@
     {
       "date": "2026-10-14",
       "path": "unclassified-gate-reads-20261014-pr1094-rebase-delta.json"
+    },
+    {
+      "date": "2026-10-14",
+      "path": "unclassified-gate-reads-20261014-review-app-custody-delta.json"
+    },
+    {
+      "date": "2026-10-15",
+      "path": "unclassified-gate-reads-20261015-review-app-custody-moved-delta.json"
     }
   ]
 }

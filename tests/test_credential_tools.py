@@ -455,6 +455,36 @@ class FileCustodyTests(unittest.TestCase):
         self.assertIn("key check passed", output)
         self.assert_nothing_of(data, output)
 
+    def test_a_failing_close_of_the_copy_still_removes_it_and_keeps_the_original(self):
+        # The from-file twin of the stdin close test (the local review's P2 at e8ddb40a): the kernel releases a
+        # descriptor before close() can fail, so retrying close() is wrong (Linux man-pages 6.19, close(2), "Dealing
+        # with error returns from close()"). Before the correction, the cleanup closed the copy again (EBADF) and
+        # skipped the unlink, leaving the temporary key in the store.
+        source = self.make_key()
+        data = source.read_bytes()
+        real_open, real_close = os.open, os.close
+        created, failed = [], []
+
+        def open_recording(path, flags, *args, **kwargs):
+            fd = real_open(path, flags, *args, **kwargs)
+            if flags & os.O_CREAT and not created:
+                created.append(fd)  # the temporary copy, the only file custody creates
+            return fd
+
+        def close_failing_on_the_copy(fd):
+            real_close(fd)
+            if created and fd == created[0] and not failed:
+                failed.append(fd)
+                raise OSError("simulated close failure")
+
+        with mock.patch.object(store_mod.os, "open", side_effect=open_recording), \
+                mock.patch.object(store_mod.os, "close", side_effect=close_failing_on_the_copy), \
+                self.assertRaisesRegex(store_mod.Refused, "nothing moved"):
+            self.custody(source)  # run_from_file reports a failed file operation as a refusal
+        self.assertEqual(failed, created[:1])
+        self.assertEqual(sorted(p.name for p in self.store.iterdir()) if self.store.exists() else [], [])
+        self.assertEqual(source.read_bytes(), data)  # nothing moved: the downloaded file stays
+
     def test_a_file_that_is_not_a_readable_key_is_refused_and_kept(self):
         for name, writer in (("random.pem", lambda p: p.write_bytes(os.urandom(1200))),
                              ("protected.pem", None)):
@@ -695,6 +725,127 @@ class _Response:
 
     def read(self):  # pragma: no cover - the probe must never read the body
         raise AssertionError("body read")
+
+
+@unittest.skipUnless(shutil.which("openssl"), "openssl is needed to generate and check the synthetic keys")
+class StoreFromStdinTests(unittest.TestCase):
+    """set_credential.py --from-stdin (2026-10-14): a key handed over on stdin into a new 0600 key file; create-only,
+    key-file entries only, and the source is never touched. Every key is generated per test."""
+
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.base = Path(tmp.name)
+        self.env = {"HOME": str(self.base / "home"), "XDG_CONFIG_HOME": str(self.base / "cfg")}
+        self.store = self.base / "cfg" / "native-agent-stack"
+        self.pem = self.make_key("k.pem")
+
+    def make_key(self, name, *extra) -> bytes:
+        path = self.base / name
+        subprocess.run(["openssl", "genpkey", "-algorithm", "RSA", "-pkeyopt", "rsa_keygen_bits:2048", *extra,
+                        "-out", str(path)], check=True, capture_output=True, timeout=60)
+        return path.read_bytes()
+
+    def piped(self, data, entry="github-review-app", **kwargs):
+        out = io.StringIO()
+        code = store_mod.run_from_stdin(entry, env=self.env, data=data, out=out,
+                                        isolated_start=kwargs.pop("isolated_start", True), **kwargs)
+        return code, out.getvalue()
+
+    def test_stores_a_piped_key_in_a_new_private_file(self):
+        with mock.patch.object(store_mod.os, "replace", side_effect=AssertionError("os.replace overwrites")):
+            code, output = self.piped(self.pem)
+        self.assertEqual((code, output), (0, "github-review-app: stored\n"))
+        path = self.store / "github-review-app.pem"
+        self.assertEqual(path.read_bytes(), self.pem)
+        info = os.lstat(path)
+        self.assertEqual((stat.S_IMODE(info.st_mode), info.st_nlink), (0o600, 1))
+        self.assertEqual([p.name for p in self.store.iterdir()], ["github-review-app.pem"])
+
+    def test_never_replaces_a_stored_key(self):
+        self.assertEqual(self.piped(self.pem)[0], 0)
+        other = self.make_key("other.pem")
+        with self.assertRaisesRegex(store_mod.Refused, "never replaces"):
+            self.piped(other)
+        self.assertEqual((self.store / "github-review-app.pem").read_bytes(), self.pem)
+
+    def test_a_key_that_appears_after_the_pre_check_is_kept_by_the_create_only_link(self):
+        # The pre-check (os.path.lexists, then fstatat through the store handle) can race with another writer; the final
+        # name comes only from os.link, which fails with EEXIST rather than replace. A key planted after the pre-check,
+        # while openssl checks the temporary copy, must survive, and the temporary name must be gone. An implementation
+        # that renames instead (os.rename or os.replace overwrite) fails this test.
+        planted = self.make_key("planted.pem")
+        real_check = store_mod.key_file_valid
+
+        def check_then_plant(dfd, name, openssl):
+            ok = real_check(dfd, name, openssl)
+            (self.store / "github-review-app.pem").write_bytes(planted)
+            return ok
+
+        with mock.patch.object(store_mod, "key_file_valid", side_effect=check_then_plant), \
+                self.assertRaisesRegex(store_mod.Refused, "never replaces"):
+            self.piped(self.pem)
+        self.assertEqual((self.store / "github-review-app.pem").read_bytes(), planted)
+        self.assertEqual([p.name for p in self.store.iterdir()], ["github-review-app.pem"])
+
+    def test_the_temporary_copy_is_private_from_its_creation(self):
+        # 0600 is the mode os.open creates the file with, not only the fchmod after it: with fchmod disabled and a zero
+        # umask, the stored key still has mode 0600 (a 0644 create followed by chmod fails here).
+        old = os.umask(0)
+        self.addCleanup(os.umask, old)
+        with mock.patch.object(store_mod.os, "fchmod"):
+            self.assertEqual(self.piped(self.pem)[0], 0)
+        self.assertEqual(stat.S_IMODE(os.lstat(self.store / "github-review-app.pem").st_mode), 0o600)
+
+    def test_a_failing_close_still_removes_the_temporary_copy(self):
+        # If closing the temporary file raises, the cleanup must not close it again (EBADF) and skip the unlink.
+        real_close = os.close
+        calls = []
+
+        def close_failing_once(fd):
+            calls.append(fd)
+            real_close(fd)
+            if len(calls) == 1:
+                raise OSError("simulated close failure")
+
+        with mock.patch.object(store_mod.os, "close", side_effect=close_failing_once), \
+                self.assertRaisesRegex(OSError, "simulated close failure"):
+            self.piped(self.pem)
+        self.assertEqual(list(self.store.iterdir()), [])
+
+    def test_refuses_data_that_is_not_a_readable_key_and_leaves_nothing(self):
+        protected = self.make_key("p.pem", "-aes256", "-pass", "pass:" + os.urandom(8).hex())
+        for name, data in (("random", os.urandom(1200)), ("protected", protected), ("empty", b""),
+                           ("oversized", b"x" * (store_mod.MAX_KEY_FILE_BYTES + 1))):
+            with self.subTest(data=name), self.assertRaises(store_mod.Refused):
+                self.piped(data)
+            self.assertFalse((self.store / "github-review-app.pem").exists())
+            self.assertEqual(list(self.store.iterdir()) if self.store.exists() else [], [])
+
+    def test_refuses_a_value_entry_a_terminal_and_a_start_without_minus_I_minus_S(self):
+        for entry in ("tavily", "alpaca-paper", "no-such-entry"):
+            with self.subTest(entry=entry), self.assertRaises(store_mod.Refused):
+                self.piped(self.pem, entry=entry)
+        with self.assertRaisesRegex(store_mod.Refused, "-I -S"):
+            self.piped(self.pem, isolated_start=False)
+        tty = mock.Mock()
+        tty.isatty.return_value = True
+        with self.assertRaisesRegex(store_mod.Refused, "never typed"):
+            store_mod.run_from_stdin("github-review-app", env=self.env, stdin=tty, out=io.StringIO(),
+                                     isolated_start=True)
+        self.assertFalse(self.store.exists() and any(self.store.iterdir()))
+
+    def test_the_command_line_needs_minus_I_minus_S_and_prints_only_the_entry(self):
+        env = {"PATH": "/usr/bin:/bin", **self.env}
+        command = [sys.executable, "-I", str(TOOLS / "set_credential.py"), "github-review-app", "--from-stdin"]
+        refused = subprocess.run(command, input=self.pem, capture_output=True, timeout=60, env=env)
+        self.assertEqual(refused.returncode, 2)
+        self.assertIn(b"-I -S", refused.stderr)
+        command.insert(2, "-S")
+        done = subprocess.run(command, input=self.pem, capture_output=True, timeout=60, env=env)
+        self.assertEqual((done.returncode, done.stdout, done.stderr), (0, b"github-review-app: stored\n", b""))
+        both = subprocess.run([*command, "--from-env"], input=self.pem, capture_output=True, timeout=60, env=env)
+        self.assertEqual(both.returncode, 2)
 
 
 def headers(**values):
