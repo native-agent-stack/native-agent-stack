@@ -20824,6 +20824,10 @@
       },
       {
         "root": "repo",
+        "path": "evidence/receipts/osv-alpaca-messagepack-relock-20261015.json"
+      },
+      {
+        "root": "repo",
         "path": "evidence/receipts/osv-captured-lumibot-lockchecks-20261005.json"
       },
       {

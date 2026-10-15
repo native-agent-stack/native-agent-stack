@@ -15798,12 +15798,12 @@
     },
     {
       "path": "blueprints/us-equities/engine/patches/alpaca-source-references.patch",
-      "sha256": "fc1e2e31e2feaf07fa433bc6478c6769ac8b0aa31d828ada3b53dc306c5b75a6",
-      "bytes": 655
+      "sha256": "b6296dfbf403a311da5870c70c11f4a4ce3c8854f0cd20e13360fdf779a8e55c",
+      "bytes": 793
     },
     {
       "path": "blueprints/us-equities/engine/patches/alpaca.packages.lock.json",
-      "sha256": "f76d53b5915c799ea56cbffa8583d646de15934477e5e9ff5d70824ae43a401a",
+      "sha256": "8f0eebd87814fa272219d70dc154d0720386f05347639ee5ffd4cdc76bea6eac",
       "bytes": 13624
     },
     {
@@ -15933,8 +15933,8 @@
     },
     {
       "path": "blueprints/us-equities/engine/resolution.md",
-      "sha256": "bcfa70fc2a53716fc48eaeb56133eda3c66de9ef4d0b7188975f1c9c33c03bde",
-      "bytes": 12078
+      "sha256": "3befcc3a296d9d92efd18d8543641cc6ec0cb8fbf17135a50a51f6e5cfc2491e",
+      "bytes": 13893
     },
     {
       "path": "blueprints/us-equities/event-anchored-ranking/R2-COMPARISON.json",
@@ -60847,6 +60847,11 @@
       "bytes": 7517
     },
     {
+      "path": "evidence/receipts/osv-alpaca-messagepack-relock-20261015.json",
+      "sha256": "be7ced1ef6eb3aa0e5a178ef3f57cccc3ab7cfcf438d37f3d42833eb6a8a7b25",
+      "bytes": 10946
+    },
+    {
       "path": "evidence/receipts/osv-captured-lumibot-lockchecks-20261005.json",
       "sha256": "f211de55c2cbbf1f712c35f51bbe846f8a08341d24a240b51e654a6df6fd2b6c",
       "bytes": 2891
@@ -63848,8 +63853,8 @@
     },
     {
       "path": "tests/test_local_pages_policy_grants.py",
-      "sha256": "d01e30c83f6507bfdcb5b49358451bcbd8b770c9a69b175bdb371241f100b815",
-      "bytes": 27528
+      "sha256": "60488e1df995f0fef84869efae4c24e250248951c1825b8282946502ea9c2362",
+      "bytes": 27817
     },
     {
       "path": "tests/test_managed_block.py",
@@ -65048,8 +65053,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "5a08bcb1ec18415d9c63841ef5a4293a02fe628df9fddbf37d2c7da3de541631",
-      "bytes": 763640
+      "sha256": "e6c15cd535eacfae15a3c7d6684b41e15e6ec6f57c92eaddefc8ab85ffe3040f",
+      "bytes": 763761
     },
     {
       "path": "tools/muse_file_fence.py",
