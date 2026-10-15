@@ -102,8 +102,8 @@ class SkillDoctorParsing(unittest.TestCase):
         rows = S.parse_skill_doctor_text(text)
         self.assertEqual(set(rows), {"gh-fix-ci", "typesafe-ai", "tdd", "diagnosing-bugs",
                                       "grill-me", "codeql"})
-        self.assertEqual(rows["gh-fix-ci"], {"source": "userSettings", "context_tokens": 110,
-                                              "tokens_7d": 340, "uses": 6, "last_used": "2 days ago"})
+        cells = {"source": "userSettings", "context_tokens": 110, "tokens_7d": 340, "uses": 6, "last_used": "2 days ago"}
+        self.assertEqual(rows["gh-fix-ci"], {**cells, "listings": [cells]})  # one row: one listing (DuplicateListings)
         self.assertEqual(rows["typesafe-ai"]["uses"], 0)
         self.assertEqual(rows["typesafe-ai"]["last_used"], "never")
         self.assertIsNone(rows["grill-me"]["context_tokens"])  # "-" = not in the current listing
@@ -1056,6 +1056,230 @@ class RenderTextAndCli(unittest.TestCase):
         self.assertFalse(report["claude"]["measured"])
         self.assertTrue(report["claude"]["refused"])
         self.assertIn("skill_usage:", stderr.getvalue())
+
+
+def doctor_result(text: str) -> str:
+    """A `claude -p /skill-doctor --output-format json` result object carrying `text`, as a zero-cost local command prints it."""
+    return json.dumps({"type": "result", "subtype": "success", "is_error": False, "total_cost_usd": 0, "num_turns": 0,
+                       "result": text})
+
+
+class DuplicateListings(unittest.TestCase):
+    """A name /skill-doctor prints on more than one row. The fixture holds three rows of one 2026-10-15 run on Claude Code 2.1.300,
+    byte for byte: claude-native-practice from userSettings and from projectSettings, and one single-listed control."""
+
+    def setUp(self):
+        self.text = (FIXTURES / "skill-doctor-duplicate.txt").read_text(encoding="utf-8")
+
+    def test_every_row_of_a_name_is_kept_in_table_order(self):
+        rows = S.parse_skill_doctor_text(self.text)
+        cells = {"context_tokens": 130, "tokens_7d": 870_500_000, "uses": 141, "last_used": "today"}
+        self.assertEqual(rows["claude-native-practice"]["listings"],
+                         [{"source": "userSettings", **cells}, {"source": "projectSettings", **cells}])
+        self.assertEqual(rows["typesafe-ai"]["listings"],
+                         [{"source": "userSettings", "context_tokens": 230, "tokens_7d": 1_500_000, "uses": 15, "last_used": "4 days"}])
+
+    def test_the_name_keyed_cells_are_unchanged(self):
+        # The keys current consumers read (parse_claude_output, build_report through claude_row) keep the cells of the name's
+        # last row, as before; the rows of a listing differ only in source on 2.1.300 (its table prints name-keyed cells).
+        row = S.parse_skill_doctor_text(self.text)["claude-native-practice"]
+        self.assertEqual({key: row[key] for key in ("source", "context_tokens", "tokens_7d", "uses", "last_used")},
+                         {"source": "projectSettings", "context_tokens": 130, "tokens_7d": 870_500_000, "uses": 141,
+                          "last_used": "today"})
+
+    def test_every_printed_row_is_one_listing(self):
+        listings = S.parse_skill_doctor_listings(self.text)
+        self.assertEqual([(listing["skill"], listing["source"]) for listing in listings],
+                         [("typesafe-ai", "userSettings"), ("claude-native-practice", "userSettings"),
+                          ("claude-native-practice", "projectSettings")])
+
+    def test_the_report_names_the_duplicate_with_its_sources_and_one_listing_cost(self):
+        claude = S.parse_claude_output(doctor_result(self.text))
+        self.assertNotIn("error", claude)
+        report = S.build_report(load_fixture_manifest(), claude=claude, codex_scan=S.scan_codex_roots([], [], now=S.parse_iso(NOW), windows=[7]),
+                                lock_installed_at={}, now=S.parse_iso(NOW), windows=[7])
+        self.assertEqual(report["duplicate_listings"], [{
+            "name": "claude-native-practice", "sources": ["userSettings", "projectSettings"], "rows": 2,
+            "context_tokens_per_row": [130, 130], "table_context_tokens": 260, "listing_context_tokens": 130}])
+        self.assertIn("duplicate_listings", report["limits"])
+
+    def test_rows_that_print_different_costs_have_no_single_listing_cost(self):
+        text = self.text.replace("projectSettings     ~130", "projectSettings     ~140")
+        (entry,) = S.duplicate_listings(S.parse_skill_doctor_text(text))
+        self.assertEqual((entry["table_context_tokens"], entry["listing_context_tokens"]), (270, None))
+
+    def test_rows_built_without_listings_are_one_listing_each(self):
+        # tests/test_skill_usage_daily.py and other callers build rows by hand, without the listings key.
+        self.assertEqual(S.duplicate_listings({"x": {"source": "userSettings", "context_tokens": 40, "tokens_7d": None,
+                                                     "uses": 0, "last_used": "never"}}), [])
+
+    def test_text_output_names_the_duplicate(self):
+        claude = S.parse_claude_output(doctor_result(self.text))
+        claude["origin"] = "file"
+        report = S.build_report(load_fixture_manifest(), claude=claude, codex_scan=S.scan_codex_roots([], [], now=S.parse_iso(NOW), windows=[7]),
+                                lock_installed_at={}, now=S.parse_iso(NOW), windows=[7])
+        self.assertIn("claude-native-practice (userSettings, projectSettings)", S.render_text(report))
+
+
+class NotMeasuredSkillDoctor(unittest.TestCase):
+    """A /skill-doctor result that parses to zero rows is never an empty pass: it is refused as not measured."""
+
+    def setUp(self):
+        # A table whose rows no longer match (its uses column lost the "×"): the text is there, no row parses.
+        self.changed = (FIXTURES / "skill-doctor-duplicate.txt").read_text(encoding="utf-8").replace("×", "x")
+
+    def test_a_non_empty_text_that_parses_to_no_row_is_not_measured(self):
+        for shape, raw in (("text", self.changed), ("json", doctor_result(self.changed))):
+            with self.subTest(shape=shape):
+                parsed = S.parse_claude_output(raw)
+                self.assertIn("not measured", parsed.get("error", ""))
+                self.assertIn("no line of it is a table row", parsed["error"])
+                self.assertEqual(parsed["rows"], {})
+
+    def test_zero_rows_while_the_config_lists_skill_usage_is_not_measured(self):
+        parsed = S.parse_claude_output(doctor_result(""), skill_usage=lambda: {"tdd": 3, "grill-me": 0})
+        self.assertIn("not measured", parsed.get("error", ""))
+        self.assertIn("skillUsage lists 2 skills", parsed["error"])
+        self.assertEqual((parsed["rows"], parsed["total_cost_usd"], parsed["num_turns"]), ({}, 0, 0))
+
+    def test_zero_rows_with_neither_text_nor_skill_usage_is_not_measured_either(self):
+        for usage in (None, lambda: None, lambda: {}):
+            with self.subTest(usage=usage):
+                self.assertIn("not measured", S.parse_claude_output(doctor_result(""), skill_usage=usage).get("error", ""))
+
+    def test_skill_usage_is_read_only_when_no_row_parses(self):
+        def unexpected():
+            raise AssertionError("skillUsage was read for a table with rows")
+        parsed = S.parse_claude_output((FIXTURES / "skill-doctor-sample.json").read_text(), skill_usage=unexpected)
+        self.assertNotIn("error", parsed)
+
+    def test_a_run_carries_the_skill_usage_check(self):
+        runner = lambda argv, **kw: subprocess.CompletedProcess(argv, 0, doctor_result(""), "")
+        result = S.run_skill_doctor(runner=runner, skill_usage=lambda: {"tdd": 3})
+        self.assertIn("skillUsage lists 1 skill", result.get("error", ""))
+
+    def test_the_skill_usage_read_keeps_names_and_counts_only(self):
+        config = Path(self.enterContext(tempfile.TemporaryDirectory())) / ".claude.json"
+        config.write_text(json.dumps({"numStartups": 9, "oauthAccount": {"accountUuid": "never-read"},
+                                      "skillUsage": {"tdd": {"usageCount": 3, "lastUsedAt": 1760500000000},
+                                                     "grill-me": {"usageCount": 0, "lastUsedAt": 1760400000000},
+                                                     "broken": {"lastUsedAt": 1}}}), encoding="utf-8")
+        self.assertEqual(S.claude_skill_usage(config), {"tdd": 3, "grill-me": 0})
+        self.assertIsNone(S.claude_skill_usage(config.parent / "absent.json"))
+        config.write_text("{not json", encoding="utf-8")
+        self.assertIsNone(S.claude_skill_usage(config))
+
+    def test_the_config_path_is_the_clients(self):
+        # Claude Code 2.1.300 reads join(CLAUDE_CONFIG_DIR || home, ".claude" + suffix + ".json"), suffix "" with production OAuth.
+        self.assertEqual(S.claude_config_path({"CLAUDE_CONFIG_DIR": "/cfg"}, home="/fixture-home"), Path("/cfg/.claude.json"))
+        self.assertEqual(S.claude_config_path({}, home="/fixture-home"), Path("/fixture-home/.claude.json"))
+        self.assertEqual(S.claude_config_path({"HOME": "/fixture-env-home"}), Path("/fixture-env-home/.claude.json"))
+
+    def test_main_reports_the_refusal_with_the_config_it_was_given(self):
+        tmp = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        capture, config = tmp / "skill-doctor.json", tmp / ".claude.json"
+        capture.write_text(doctor_result(""), encoding="utf-8")
+        config.write_text(json.dumps({"skillUsage": {"tdd": {"usageCount": 3, "lastUsedAt": 1}}}), encoding="utf-8")
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            code = S.main(["--manifest", str(FIXTURES / "manifest.json"), "--now", NOW, "--claude-skill-doctor", str(capture),
+                           "--claude-config", str(config), "--json"])
+        self.assertEqual(code, 0)
+        claude = json.loads(stdout.getvalue())["claude"]
+        self.assertEqual((claude["measured"], claude["refused"]), (False, True))
+        self.assertIn("skillUsage lists 1 skill", claude["reason"])
+        self.assertIn("not measured", stderr.getvalue())
+
+
+PLUGIN_TABLE = """Skills loaded this session
+
+  skill                             source           context  7d tokens   uses  last used
+  codex:review                      codex                ~20          -     0×  never
+  codex:rescue                      codex                  -          -     0×  never
+  context-mode:ctx-stats            context-mode        ~100       2.0k     1×  9 days
+  context-mode:ctx-doctor           context-mode        ~100          -     0×  never
+  diagram-design:diagram            diagram-design       ~70       1.2k     1×  2 days
+  edge:old                          edge                 ~50          -     2×  7 days
+  near:recent                       near                 ~50          -     2×  6 days
+  unlisted:quiet                    unlisted               -          -     0×  never
+  dated:mark                        dated                ~40          -     3×  Oct 12
+  plainname                         odd                  ~25          -     0×  never
+  tdd                               userSettings         ~40          -     0×  never
+  anthropic-skills:docs             claude.ai sync      ~330          -     0×  never
+  srv:tool                          mcp                  ~30          -     0×  never
+"""
+
+
+class PluginListingReport(unittest.TestCase):
+    """The per-source report and the synced-plugin guard: a plugin whose skills are listed and all unused for 7 days."""
+
+    def build(self, exceptions=frozenset(), text=PLUGIN_TABLE):
+        claude = S.parse_claude_output(doctor_result(text))
+        self.assertNotIn("error", claude)
+        return S.build_report(load_fixture_manifest(), claude=claude, codex_scan=S.scan_codex_roots([], [], now=S.parse_iso(NOW), windows=[7]),
+                              lock_installed_at={}, now=S.parse_iso(NOW), windows=[7], plugin_exceptions=exceptions)
+
+    def test_each_source_is_grouped_with_its_kind_and_totals(self):
+        sources = self.build()["listing_sources"]
+        self.assertEqual(sources["codex"], {"kind": "plugin", "skills": 2, "listed": 1, "context_tokens": 20, "uses": 0, "unused_7d": True})
+        self.assertEqual(sources["context-mode"], {"kind": "plugin", "skills": 2, "listed": 2, "context_tokens": 200, "uses": 1,
+                                                   "unused_7d": True})
+        self.assertEqual(sources["diagram-design"]["unused_7d"], False)
+        self.assertEqual(sources["unlisted"], {"kind": "plugin", "skills": 1, "listed": 0, "context_tokens": 0, "uses": 0, "unused_7d": True})
+        self.assertIsNone(sources["dated"]["unused_7d"])  # "Oct 12" cannot be put in order: not shown unused
+        self.assertEqual({name: sources[name]["kind"] for name in ("odd", "userSettings", "claude.ai sync", "mcp")},
+                         {"odd": "other", "userSettings": "settings", "claude.ai sync": "synced", "mcp": "mcp"})
+
+    def test_a_listed_plugin_unused_for_seven_days_is_reported(self):
+        report = self.build()
+        self.assertEqual(report["plugins_unused_7d"], ["codex", "context-mode", "edge"])
+        self.assertEqual(report["plugins_excepted"], [])
+        self.assertIn("plugins unused 7d: codex, context-mode, edge", S.render_text(report))
+
+    def test_the_seven_day_boundary_follows_the_clients_whole_days(self):
+        # 2.1.300 prints daysSinceUse = floor(age / 1 day): "7 days" is at least 7 days ago, "6 days" is inside the window.
+        sources = self.build()["listing_sources"]
+        self.assertEqual((sources["edge"]["unused_7d"], sources["near"]["unused_7d"]), (True, False))
+
+    def test_an_exception_moves_a_plugin_out_of_the_report(self):
+        report = self.build(exceptions={"codex"})
+        self.assertEqual(report["plugins_unused_7d"], ["context-mode", "edge"])
+        self.assertEqual(report["plugins_excepted"], ["codex"])
+
+    def test_the_exceptions_file_starts_empty_with_a_comment(self):
+        document = json.loads((ROOT / "tools/skill-usage/plugin-exceptions.json").read_text(encoding="utf-8"))
+        self.assertEqual(sorted(document), ["comment", "exceptions"])
+        self.assertTrue(document["comment"].strip())
+        self.assertEqual(document["exceptions"], [])
+        self.assertEqual(S.load_plugin_exceptions(S.DEFAULT_PLUGIN_EXCEPTIONS), set())
+
+    def test_a_malformed_exceptions_file_is_refused(self):
+        path = Path(self.enterContext(tempfile.TemporaryDirectory())) / "exceptions.json"
+        for document in ({"exceptions": "codex"}, {"exceptions": [{"plugin": 3}]}, {"exceptions": [{"reason": "x"}]}, ["codex"]):
+            with self.subTest(document=document):
+                path.write_text(json.dumps(document), encoding="utf-8")
+                with self.assertRaises(ValueError):
+                    S.load_plugin_exceptions(path)
+
+    def test_main_reads_the_exceptions_file(self):
+        tmp = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        capture, exceptions = tmp / "skill-doctor.txt", tmp / "exceptions.json"
+        capture.write_text(PLUGIN_TABLE, encoding="utf-8")
+        exceptions.write_text(json.dumps({"comment": "test", "exceptions": [{"plugin": "edge", "direction": "kept on a dated direction",
+                                                                              "recorded": "2026-10-15"}]}), encoding="utf-8")
+        stdout = io.StringIO()
+        with contextlib.redirect_stdout(stdout):
+            code = S.main(["--manifest", str(FIXTURES / "manifest.json"), "--now", NOW, "--claude-skill-doctor", str(capture),
+                           "--plugin-exceptions", str(exceptions), "--json"])
+        self.assertEqual(code, 0)
+        report = json.loads(stdout.getvalue())
+        self.assertEqual((report["plugins_unused_7d"], report["plugins_excepted"]), (["codex", "context-mode"], ["edge"]))
+
+    def test_no_plugin_report_without_a_measured_table(self):
+        report = S.build_report(load_fixture_manifest(), claude=None, codex_scan=S.scan_codex_roots([], [], now=S.parse_iso(NOW), windows=[7]),
+                                lock_installed_at={}, now=S.parse_iso(NOW), windows=[7])
+        self.assertEqual([report[key] for key in ("duplicate_listings", "listing_sources", "plugins_unused_7d", "plugins_excepted")],
+                         [None, None, None, None])
 
 
 LANES_SINCE = "2026-10-20T00:00:00Z"

@@ -1,0 +1,10 @@
+Skills loaded this session
+
+  skill                             source           context  7d tokens   uses  last used
+  typesafe-ai                       userSettings        ~230       1.5m    15×  4 days
+  claude-native-practice            userSettings        ~130     870.5m   141×  today
+  claude-native-practice            projectSettings     ~130     870.5m   141×  today
+
+  context = this skill's one-line listing in the system prompt, included every turn
+  (dash = not in the current listing, costs nothing; full SKILL.md loads only when it runs)
+  7d tokens = tokens attributed to the skill over the last 7 days of sessions on this machine

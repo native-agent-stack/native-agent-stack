@@ -4987,8 +4987,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/instructions-skills.md",
-      "sha256": "7fa69465f85dff3136ebf925924152bafe97bc6cde941ad09f408aa848a15f17",
-      "bytes": 10415
+      "sha256": "18c415f00d12657971c13470a9c83fb148222d3622ec05a34688b03ac9c1d788",
+      "bytes": 12235
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/isolation.md",
@@ -5017,8 +5017,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.json",
-      "sha256": "b0b9d7949e07dd86ab80b34747cbc538a5eb6c97d1dec26e6684c0e1ffd7b2a1",
-      "bytes": 152660
+      "sha256": "9882f93b17f0a31661f66e0c471d5d7e24d46b81ddae25b9c8d65c2596bd5afe",
+      "bytes": 154482
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.md",
@@ -18643,7 +18643,7 @@
     },
     {
       "path": "docs/decisions/2026-10-04-pwsh7-windows-guidance.md",
-      "sha256": "8f5e0f1b66df663e1e83860f286098fb3cbdc0644c10a12f32d502d327c1d6f1",
+      "sha256": "5a66e7f09883d5506307e9b7fb212f1ec146311eda22fd4b52f9de6effefcb38",
       "bytes": 16799
     },
     {
@@ -21553,7 +21553,7 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/claude-native-slot-manifest.json",
-      "sha256": "b3db948a9878156abec03a3dc11764b1595c5c43b348d483c2a24355ca649e80",
+      "sha256": "d6432eeba687333ef881f615346fc9d5a242e2be3395a4df125a589ef4549ed8",
       "bytes": 238162
     },
     {
@@ -52362,6 +52362,16 @@
       "bytes": 6747
     },
     {
+      "path": "evidence/artifacts/skills-listing-20261015/listing-attachments.json",
+      "sha256": "59efca0f5d6e51383d8770f24578e46e54366bfbd4ecee84bfba2e80c3d8318d",
+      "bytes": 2206
+    },
+    {
+      "path": "evidence/artifacts/skills-listing-20261015/skill-doctor-rows.json",
+      "sha256": "ff49f4084541bc2124b8a60fc6246f558af60d0d7ec1a6df390ac4291bf5790f",
+      "bytes": 11126
+    },
+    {
       "path": "evidence/artifacts/skills-listing-restore-20260928/README.md",
       "sha256": "13dc826b75e8160c11b31a2d7afef22754b6f5660fe6db9a1af721dff9cd3fd0",
       "bytes": 12541
@@ -62527,6 +62537,11 @@
       "bytes": 2411
     },
     {
+      "path": "tests/fixtures/skill_usage/skill-doctor-duplicate.txt",
+      "sha256": "c226fe0ef7c9e9fe0051d569d9e324079d84fb6aef263e00627f77da657d00c0",
+      "bytes": 651
+    },
+    {
       "path": "tests/fixtures/skill_usage/skill-doctor-nonzero-cost.json",
       "sha256": "6a1689992126635cd3412065b4a65c875c9cc48c8f69b660751c0c1a29803aef",
       "bytes": 2899
@@ -63577,6 +63592,11 @@
       "bytes": 68258
     },
     {
+      "path": "tests/test_native_practice_skills_listing.py",
+      "sha256": "62a1e0d220a691c46e6bdc38e69157fa4624fa26c00760fade78a2718bae9ba3",
+      "bytes": 6574
+    },
+    {
       "path": "tests/test_native_practice_snapshot_provenance.py",
       "sha256": "519686053443eb767abca0dd8067886bde1271e9aecbb12ef55b42424620abd7",
       "bytes": 8762
@@ -64038,8 +64058,8 @@
     },
     {
       "path": "tests/test_skill_usage.py",
-      "sha256": "18cc554e12513db0331a2eba74d503d635bab941393fd10a12e397e903fcb8bf",
-      "bytes": 276027
+      "sha256": "d5e7fa79ac2bc7470cc157fd1b9238ef85506c178e84563af9b794de83196dc3",
+      "bytes": 291393
     },
     {
       "path": "tests/test_skill_usage_daily.py",
@@ -64703,13 +64723,18 @@
     },
     {
       "path": "tools/skill-usage/README.md",
-      "sha256": "4a603c06bef574515481b8794c1ae264dd2e5bff1911e96e2adb2ec1b97e3277",
-      "bytes": 57941
+      "sha256": "e8461cc5d3261f9599a398c2351df23007ffbb9a0b2210e34e9b5f6212171e1e",
+      "bytes": 60388
     },
     {
       "path": "tools/skill-usage/daily_skill_usage.py",
       "sha256": "1936dc7c54fc098431017eb769b4caf8914616698435a53b4146ed76b44b9d07",
       "bytes": 11118
+    },
+    {
+      "path": "tools/skill-usage/plugin-exceptions.json",
+      "sha256": "d3b77866f0de694e1281db87136e3d3b59057d7e1491716ecf94790073ef4168",
+      "bytes": 529
     },
     {
       "path": "tools/skill-usage/runtime_usage.py",
@@ -64718,8 +64743,8 @@
     },
     {
       "path": "tools/skill-usage/skill_usage.py",
-      "sha256": "0c16c817238bf687596a14e5fccc129e2703544cb3d053d46c13466c1c784a96",
-      "bytes": 161317
+      "sha256": "aa9f0349bbb06386c5e6e153d84f6e34d9d1abcb26b93291f3006a37f44d28f5",
+      "bytes": 175710
     },
     {
       "path": "tools/skill-usage/stage_routing_eval.py",
