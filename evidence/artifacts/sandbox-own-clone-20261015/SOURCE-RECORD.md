@@ -5,7 +5,7 @@ This is the reviewable record behind the own-clone correction in `docs/decisions
 ## Client binary
 
 - Claude Code **2.1.300**, linux-x64, at `~/.local/share/claude/versions/2.1.300`.
-- **sha256** `674deba0bba9aee479f4503c438b49303b6fdd304b9a471b14977aaec5215453`. This equals the linux-x64 checksum in the signed 2.1.300 release manifest; the GPG check is recorded in `docs/decisions/2026-10-09-claude-code-floor.md`'s 2026-10-14 addendum.
+- **sha256** `674deba0bba9aee479f4503c438b49303b6fdd304b9a471b14977aaec5215453`. This equals the linux-x64 checksum in the signed 2.1.300 release manifest. The GPG check is retained here: `release-signature-2.1.300.json`, re-run 2026-10-15T11:23:49Z against the manifest, signature and key kept in `release-2.1.300/`. The result was a good signature from key `31DDDE24DDFAB679F42D7BD2BAA929FF1A7ECACE`, and the manifest's linux-x64 checksum and size equal the installed file's.
 - Offsets below are byte offsets into that file, re-read 2026-10-15T05:10Z.
 
 | Offset | What it shows (bytes at the offset, abridged) |

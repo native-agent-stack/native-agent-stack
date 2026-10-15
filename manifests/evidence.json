@@ -51998,13 +51998,33 @@
     },
     {
       "path": "evidence/artifacts/sandbox-own-clone-20261015/SOURCE-RECORD.md",
-      "sha256": "6e9c85680f9497e2c908c43d3e6d13eb2269162c9ed7623f6392621c8cfd2c8d",
-      "bytes": 4740
+      "sha256": "c3ba775346349c6014e55640317af5eded214559a45c9a8c19c8603af97f1288",
+      "bytes": 4961
     },
     {
       "path": "evidence/artifacts/sandbox-own-clone-20261015/probe.sh",
       "sha256": "a8e36ec71ded42a03241add067b49d647ce950ea669c7fe8561f01275d2fa739",
       "bytes": 1436
+    },
+    {
+      "path": "evidence/artifacts/sandbox-own-clone-20261015/release-2.1.300/claude-code.asc",
+      "sha256": "bd70a5e4a268002704024ceba7f8446024114e94f3f0bdd11c23a9e592be81c6",
+      "bytes": 1688
+    },
+    {
+      "path": "evidence/artifacts/sandbox-own-clone-20261015/release-2.1.300/manifest.json",
+      "sha256": "fb62dae2893ff954bbf8caa9f4b9345737b98a210e3a6085bf9feec9ddf5d9ca",
+      "bytes": 1897
+    },
+    {
+      "path": "evidence/artifacts/sandbox-own-clone-20261015/release-2.1.300/manifest.json.sig",
+      "sha256": "a6ab3967d23a57edc237c2ff9ba9619366fe76f5f3c72b408a89b90026957b85",
+      "bytes": 833
+    },
+    {
+      "path": "evidence/artifacts/sandbox-own-clone-20261015/release-signature-2.1.300.json",
+      "sha256": "5d509e16adfc149a6d0a2abf44b6a02e3c2f01b76a7b649c357134f48268222a",
+      "bytes": 1949
     },
     {
       "path": "evidence/artifacts/sdk-runtime-adoption-20261008/decisions.json",
@@ -63503,8 +63523,8 @@
     },
     {
       "path": "tests/test_native_practice_sandbox_own_clone.py",
-      "sha256": "753e7da07ce60c3ec886e438a35bf44413d2b0da34d7b77d4a9cf3ee266df057",
-      "bytes": 4055
+      "sha256": "ff382c416f741436cfa32a160d73aaa8b526a0806cd578829d40868dd680ee82",
+      "bytes": 5595
     },
     {
       "path": "tests/test_native_practice_snapshot_provenance.py",

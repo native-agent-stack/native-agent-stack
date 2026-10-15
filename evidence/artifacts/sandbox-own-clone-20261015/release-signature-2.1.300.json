@@ -1,0 +1,41 @@
+{
+ "kind": "signature_verification",
+ "subject": "Claude Code 2.1.300 release manifest and the installed linux-x64 binary",
+ "fetched_utc": "2026-10-15T11:23:49Z",
+ "verified_by": "cc-native-practice, on the command center's standing release rule for #1129 (2026-10-15)",
+ "sources": {
+  "manifest": {
+   "url": "https://downloads.claude.ai/claude-code-releases/2.1.300/manifest.json",
+   "file": "release-2.1.300/manifest.json",
+   "sha256": "fb62dae2893ff954bbf8caa9f4b9345737b98a210e3a6085bf9feec9ddf5d9ca"
+  },
+  "signature": {
+   "url": "https://downloads.claude.ai/claude-code-releases/2.1.300/manifest.json.sig",
+   "file": "release-2.1.300/manifest.json.sig",
+   "sha256": "a6ab3967d23a57edc237c2ff9ba9619366fe76f5f3c72b408a89b90026957b85"
+  },
+  "key": {
+   "url": "https://downloads.claude.ai/keys/claude-code.asc",
+   "file": "release-2.1.300/claude-code.asc",
+   "sha256": "bd70a5e4a268002704024ceba7f8446024114e94f3f0bdd11c23a9e592be81c6"
+  }
+ },
+ "method": "gpg --homedir <empty, mode 0700> --batch --import claude-code.asc; gpg --homedir <same> --batch --verify manifest.json.sig manifest.json",
+ "signer_fingerprint": "31DDDE24DDFAB679F42D7BD2BAA929FF1A7ECACE",
+ "gpg_result": "Good signature from \"Anthropic Claude Code Release Signing <security@anthropic.com>\" [unknown]",
+ "manifest": {
+  "version": "2.1.300",
+  "commit": "c6733ae1276880507ca0c5b053ae18fb0df090d6",
+  "buildDate": "2026-10-14T13:29:53Z"
+ },
+ "linux_x64": {
+  "checksum": "674deba0bba9aee479f4503c438b49303b6fdd304b9a471b14977aaec5215453",
+  "size": 266972344
+ },
+ "installed": {
+  "path": "~/.local/share/claude/versions/2.1.300",
+  "sha256": "674deba0bba9aee479f4503c438b49303b6fdd304b9a471b14977aaec5215453",
+  "size": 266972344
+ },
+ "note": "the trust level [unknown] means only that the key is not certified in the empty keyring; the fingerprint is the one Anthropic publishes with the key, and the same check on 2026-10-14 is in #1128's floor addendum"
+}

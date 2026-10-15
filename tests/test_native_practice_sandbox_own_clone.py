@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import json
 import re
+import hashlib
 import unittest
 from pathlib import Path
 
@@ -65,6 +66,24 @@ class SandboxSideEffectRows(unittest.TestCase):
         for offset in ("110513208", "216332417", "216588603"):
             self.assertIn(offset, record)
         self.assertTrue((ROOT / "evidence/artifacts/sandbox-own-clone-20261015/probe.sh").is_file())
+
+    def test_the_signature_check_the_record_claims_is_retained_and_binds_the_binary(self):
+        # GPT read of #1129 at efa0b45a (P2): the record said the GPG check was in the floor decision's 2026-10-14
+        # addendum, which this tree does not contain. The check is retained beside the record, with the public manifest,
+        # signature and key it verified, and the manifest's linux-x64 checksum equals the binary the offsets refer to.
+        base = ROOT / "evidence/artifacts/sandbox-own-clone-20261015"
+        record = (base / "SOURCE-RECORD.md").read_text(encoding="utf-8")
+        self.assertIn("release-signature-2.1.300.json", record)
+        for cited in set(re.findall(r"docs/decisions/[\w.-]+\.md", record)):
+            self.assertIn("2.1.300", (ROOT / cited).read_text(encoding="utf-8"), cited)
+        receipt = json.loads((base / "release-signature-2.1.300.json").read_text(encoding="utf-8"))
+        for source in receipt["sources"].values():
+            self.assertEqual(hashlib.sha256((base / source["file"]).read_bytes()).hexdigest(), source["sha256"])
+        manifest = json.loads((base / "release-2.1.300/manifest.json").read_text(encoding="utf-8"))
+        binary = "674deba0bba9aee479f4503c438b49303b6fdd304b9a471b14977aaec5215453"
+        self.assertEqual((manifest["version"], manifest["platforms"]["linux-x64"]["checksum"]), ("2.1.300", binary))
+        self.assertEqual(receipt["installed"]["sha256"], binary)
+        self.assertTrue(receipt["gpg_result"].startswith("Good signature"))
 
 if __name__ == "__main__":
     unittest.main()
