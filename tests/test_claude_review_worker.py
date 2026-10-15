@@ -23,6 +23,7 @@ import tempfile
 import threading
 import time
 import unittest
+from unittest import mock
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -621,6 +622,27 @@ class ReviewRunTest(unittest.TestCase):
         call = json.loads(h.claude_log.read_text().splitlines()[0])
         self.assertEqual(call["argv"][-1], "--verbose")  # no positional prompt: it came on stdin
         self.assertEqual(call["prompt"], prompt)
+
+    def test_a_binary_that_changes_after_preflight_starts_no_run(self):
+        # CC micro F3 (2026-10-15): the run hashes the binary again before its first debit and compares that hash with
+        # the pin, so a binary replaced between the tick's check and the run is never started and nothing is debited.
+        h = Harness(self)
+        repo, _ = self.private(h)
+        h.queue([run_of(REPORT)])
+        worker = h.worker([repo])
+        worker.settings = dataclasses.replace(worker.settings, claude_sha256=crw.sha256_file(h.claude))
+        checked = worker.preflight
+
+        def preflight_then_replace(*args, **kwargs):
+            problems = checked(*args, **kwargs)
+            with open(h.claude, "a", encoding="utf-8") as handle:
+                handle.write("# replaced after the check\n")
+            return problems
+
+        worker.preflight = preflight_then_replace
+        worker.tick()
+        self.assertEqual((h.launcher.calls, h.rows()), ([], []))
+        self.assertTrue(any("no longer matches its sha256 pin" in line for line in h.logs), h.logs)
 
     def test_a_private_repository_gets_the_status_and_one_sanitized_comment(self):
         h = Harness(self)
@@ -1678,8 +1700,8 @@ class InvocationTest(unittest.TestCase):
         self.assertEqual((started, h.rows()), ([], []))  # no run started and nothing debited
 
     def test_preflight_refuses_a_client_binary_that_fails_its_sha256_check(self):
-        # B2 (CC, 2026-10-15): the worker runs a retained copy of 2.1.299 and checks it at every tick; a binary whose sha256
-        # is not the pinned one stops the tick before any key is read.
+        # B2 (CC, 2026-10-15): the worker runs a retained copy of the adopted release (2.1.300) and checks it at every tick;
+        # a binary whose sha256 is not the pinned one stops the tick before any key is read.
         h = Harness(self)
         repo, _ = h.repo("o/priv", heads={1: {"a.py": "a\n"}})
         digest = hashlib.sha256(h.claude.read_bytes()).hexdigest()
@@ -1689,6 +1711,32 @@ class InvocationTest(unittest.TestCase):
                 worker = crw.Worker([repo], settings, h.env(), clock=h.clock, log=h.logs.append, bwrap="")
                 problems = worker.preflight(sandbox=False)
                 self.assertEqual(any("CLAUDE_BIN failed its sha256 check" in p for p in problems), refused, problems)
+
+    def test_an_unreadable_client_binary_is_a_recorded_refusal(self):
+        # GPT full1 P3-3 and CC micro F2 (2026-10-15): an OSError from the hash read (unreadable, or removed after the
+        # is_file check) is a "not ready" problem on the tick's own record path, not a traceback.
+        h = Harness(self)
+        repo, _ = h.repo("o/priv", heads={1: {"a.py": "a\n"}})
+        settings = crw.Settings(h.state, h.ledger_path, KEYS, h.claude, False, 60, claude_sha256="0" * 64)
+        worker = crw.Worker([repo], settings, h.env(), clock=h.clock, log=h.logs.append, bwrap="")
+        original = crw.file_sha256
+        self.addCleanup(setattr, crw, "file_sha256", original)
+        crw.file_sha256 = mock.Mock(side_effect=PermissionError(13, "Permission denied"))
+        self.assertEqual(worker.tick(), 1)
+        self.assertTrue(any(line.startswith("not ready: CLAUDE_BIN could not be read") for line in h.logs), h.logs)
+        ticks = [json.loads(line) for line in (h.state / "ticks.jsonl").read_text().splitlines()]
+        self.assertIn("CLAUDE_BIN could not be read", ticks[-1]["skipped"])
+
+    def test_an_override_without_its_digest_never_builds_a_worker(self):
+        # GPT full1 blocker 1 (2026-10-15): the reader ran a full fixture review with CLAUDE_BIN set and no digest. The
+        # command line now stops at the settings with exit 2, before a worker, a launcher or a GitHub call exists.
+        h = Harness(self)
+        env = {"HOME": str(h.base), "API_ACTIONS_LEDGER": str(h.ledger_path), "CLAUDE_BIN": str(h.claude)}
+        with mock.patch.dict(os.environ, env, clear=True), \
+                mock.patch.object(crw, "Worker", side_effect=AssertionError("a worker was built")), \
+                contextlib.redirect_stderr(io.StringIO()) as err:
+            self.assertEqual(crw.main(["select"]), 2)
+        self.assertIn("CLAUDE_BIN_SHA256", err.getvalue())
 
     def test_settings_read_the_environment(self):
         settings = crw.settings_from({"HOME": "/h", "API_ACTIONS_LEDGER": "~/l.jsonl"})
@@ -1701,7 +1749,15 @@ class InvocationTest(unittest.TestCase):
         self.assertEqual(settings.claude_bin, Path("/h/.local/share/claude-retained/2.1.300/claude"))
         self.assertEqual(crw.DEFAULT_CLAUDE_BIN_SHA256, "674deba0bba9aee479f4503c438b49303b6fdd304b9a471b14977aaec5215453")
         self.assertEqual(settings.claude_sha256, crw.DEFAULT_CLAUDE_BIN_SHA256)
-        self.assertIsNone(crw.settings_from({"HOME": "/h", "CLAUDE_BIN": "/x/claude"}).claude_sha256)  # an override names its own
+        # An override fails closed (GPT full1 blocker 1 and CC micro F1, 2026-10-15): another path needs its own digest, an
+        # empty digest is none, and the default path, however it is spelled, keeps the default digest.
+        for env in ({"CLAUDE_BIN": "/x/claude"}, {"CLAUDE_BIN": "/x/claude", "CLAUDE_BIN_SHA256": ""}):
+            with self.subTest(env=env), self.assertRaisesRegex(crw.ConfigError, "CLAUDE_BIN_SHA256"):
+                crw.settings_from({"HOME": "/h", **env})
+        for spelled in (crw.DEFAULT_CLAUDE_BIN, "/h/.local/share/claude-retained/2.1.300/claude"):
+            with self.subTest(spelled=spelled):
+                self.assertEqual(crw.settings_from({"HOME": "/h", "CLAUDE_BIN": spelled}).claude_sha256,
+                                 crw.DEFAULT_CLAUDE_BIN_SHA256)
         self.assertEqual(crw.settings_from({"HOME": "/h", "CLAUDE_BIN": "/x/claude", "CLAUDE_BIN_SHA256": "0" * 64}).claude_sha256,
                          "0" * 64)
         with self.assertRaises(crw.ConfigError):

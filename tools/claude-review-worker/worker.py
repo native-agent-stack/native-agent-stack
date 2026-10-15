@@ -321,12 +321,19 @@ def settings_from(env: dict) -> Settings:
     timeout = env.get("CLAUDE_REVIEW_TIMEOUT_SECONDS", str(DEFAULT_TIMEOUT_SECONDS))
     if not re.fullmatch(r"[0-9]{2,5}", timeout):
         raise ConfigError("CLAUDE_REVIEW_TIMEOUT_SECONDS must be a whole number of seconds")
-    claude_sha256 = env.get("CLAUDE_BIN_SHA256") or (None if "CLAUDE_BIN" in env else DEFAULT_CLAUDE_BIN_SHA256)
-    if claude_sha256 is not None and not re.fullmatch(r"[0-9a-f]{64}", claude_sha256):
-        raise ConfigError("CLAUDE_BIN_SHA256 must be a 64-hex sha256")
     ledger = env.get("API_ACTIONS_LEDGER", "")
     home = env.get("HOME", str(Path.home()))
     expand = lambda value: Path(value.replace("~", home, 1) if value.startswith("~") else value)  # noqa: E731
+    # The binary never runs unchecked: an override keeps the default digest only when it names the default path, and
+    # any other path needs its own CLAUDE_BIN_SHA256 (an empty one is none).
+    claude_sha256 = env.get("CLAUDE_BIN_SHA256") or None
+    if claude_sha256 is None:
+        if "CLAUDE_BIN" in env and expand(env["CLAUDE_BIN"]) != expand(DEFAULT_CLAUDE_BIN):
+            raise ConfigError("CLAUDE_BIN names another binary than the default, so CLAUDE_BIN_SHA256 must give its "
+                              "64-hex sha256; nothing runs on an unpinned client binary")
+        claude_sha256 = DEFAULT_CLAUDE_BIN_SHA256
+    if not re.fullmatch(r"[0-9a-f]{64}", claude_sha256):
+        raise ConfigError("CLAUDE_BIN_SHA256 must be a 64-hex sha256")
     return Settings(
         state=expand(env.get("CLAUDE_REVIEW_STATE", DEFAULT_STATE)),
         ledger=expand(ledger) if ledger else None,
@@ -1656,9 +1663,15 @@ class Worker:
             problems.append("API_ACTIONS_LEDGER is not set; nothing is spent without a ledger")
         if not self.settings.claude_bin.is_file():
             problems.append("CLAUDE_BIN is not a file")
-        elif self.settings.claude_sha256 and file_sha256(self.settings.claude_bin) != self.settings.claude_sha256:
-            problems.append(f"CLAUDE_BIN failed its sha256 check (expected {self.settings.claude_sha256[:12]}...); "
-                            "nothing runs on a client binary that is not the pinned one")
+        elif self.settings.claude_sha256:
+            try:
+                actual = file_sha256(self.settings.claude_bin)
+            except OSError as error:  # unreadable, or removed after is_file: a recorded refusal, not a traceback
+                problems.append(f"CLAUDE_BIN could not be read for its sha256 check ({type(error).__name__}); nothing runs")
+            else:
+                if actual != self.settings.claude_sha256:
+                    problems.append(f"CLAUDE_BIN failed its sha256 check (expected {self.settings.claude_sha256[:12]}...); "
+                                    "nothing runs on a client binary that is not the pinned one")
         if isinstance(self.launcher, SandboxLauncher):
             if not CREDENTIAL_RUN.is_file():
                 problems.append("tools/credentials/credential_run.py is missing")
@@ -2039,6 +2052,11 @@ class Worker:
         launcher = launcher or self.launcher
         label = f"{candidate.repo.name}#{candidate.pr}@{candidate.sha[:12]}"
         binary = self.binary_identity()
+        if self.settings.claude_sha256 and binary["sha256"] != self.settings.claude_sha256:
+            # Replaced after the tick's check: nothing is debited or started (no_stream: not counted, the tick stops).
+            self.log(f"{label}: CLAUDE_BIN no longer matches its sha256 pin (now {binary['sha256'][:12]}...); nothing runs")
+            return {"tries": [], "numbers": None, "stop": "no_stream",
+                    "unmet": ["the client binary no longer matches its sha256 pin; no review ran"]}
         tries, numbers, stop, unmet = [], None, "no_stream", []
         previous, skipped = None, 0
         for index, key in enumerate(self.settings.keys):

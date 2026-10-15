@@ -110,8 +110,8 @@ prompt says the check covers citation presence only.
    # CLAUDE_BIN=~/.local/share/claude-retained/2.1.300/claude          # the pinned native binary, a retained copy outside
    #   versions/ (the native installer's cleanup keeps only the launcher's, running and two newest versions there)
    # CLAUDE_BIN_SHA256=674deba0bba9aee479f4503c438b49303b6fdd304b9a471b14977aaec5215453   # checked at every tick; the
-   #   default binary's digest is built in (the signed 2.1.300 manifest's linux-x64 checksum); a CLAUDE_BIN override
-   #   is checked only when this is set
+   #   default binary's digest is built in (the signed 2.1.300 manifest's linux-x64 checksum); a CLAUDE_BIN naming
+   #   another path needs this line too, or the worker stops at its settings (exit 2): no binary runs unchecked
    # CLAUDE_REVIEW_STATE=~/.local/state/native-agent-stack/claude-review-worker
    # CLAUDE_REVIEW_TIMEOUT_SECONDS=2700
    # CLAUDE_REVIEW_UPSTREAM=~/code/upstream   # the local upstream mirrors, read as git objects only
@@ -148,6 +148,14 @@ prompt says the check covers citation presence only.
 - Review a head again: move its attempt marker out of `attempts/`; the next tick treats the head as new.
 - A head refused for its diff size or its own size needs a paths-limited review by other means; the worker has no
   paths option. (The `paths` input of `claude-pr-review.yml` was one such means until #981 removed that workflow.)
+- Roll the client back to the previous retained release: in `~/.config/claude-review-worker.env`, set the pair
+  `CLAUDE_BIN=~/.local/share/claude-retained/2.1.299/claude` and
+  `CLAUDE_BIN_SHA256=2d894a4b1bfaaa9aab72aeff7803e3c73bc2510f279a171f6b8f59f72d17d077` (the linux-x64 checksum in the
+  2.1.299 release manifest, size 265342136). Check it first with `sha256sum` on that path and `<path> --version`, then run
+  `probes.py offline` with the same two variables set, and enable nothing while a check fails. The next tick checks
+  the pair before any key is read. Undo by removing both lines. Nothing under `claude-retained/` is touched by the
+  native installer's cleanup; the rule that moves this pin to each new release after a function check of the exact
+  invocation is the floor record's addendum (#1128).
 
 ## Posting
 
