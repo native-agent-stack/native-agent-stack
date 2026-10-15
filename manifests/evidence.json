@@ -63853,8 +63853,8 @@
     },
     {
       "path": "tests/test_local_pages_policy_grants.py",
-      "sha256": "d01e30c83f6507bfdcb5b49358451bcbd8b770c9a69b175bdb371241f100b815",
-      "bytes": 27528
+      "sha256": "60488e1df995f0fef84869efae4c24e250248951c1825b8282946502ea9c2362",
+      "bytes": 27817
     },
     {
       "path": "tests/test_managed_block.py",
@@ -65053,8 +65053,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "5a08bcb1ec18415d9c63841ef5a4293a02fe628df9fddbf37d2c7da3de541631",
-      "bytes": 763640
+      "sha256": "e6c15cd535eacfae15a3c7d6684b41e15e6ec6f57c92eaddefc8ab85ffe3040f",
+      "bytes": 763761
     },
     {
       "path": "tools/muse_file_fence.py",
