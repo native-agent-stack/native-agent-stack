@@ -7,14 +7,39 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 CODE = ROOT / 'blueprints/us-equities/paper-lane-latch'
 REPLAY = ROOT / 'blueprints/us-equities/paper-open-e2e/seq2-replay'
+REPLAY_COMMIT = '000ae0e39e20b947f1bd700e0257f781c069898d'
 
 
-def source_packet(root):
+def replay_record(root):
+    """SYN authority input, authenticated by the real landed Git blob reader."""
+    directory = 'blueprints/us-equities/paper-open-e2e/seq2-replay/'
+    blobs = {path.name: subprocess.check_output(
+        ['git', 'cat-file', 'blob', REPLAY_COMMIT + ':' + directory + path.name], cwd=ROOT)
+        for path in REPLAY.glob('test_*.py')}
+    record = root / 'SYN-replay-inventory.md'
+    record.write_text('# SYN authenticated replay record\n'
+                      '- **Source commit:** native-agent-stack main ' + REPLAY_COMMIT + '\n'
+                      '- **Directory:** ' + directory + '\n'
+                      '| File | Bytes | sha256 |\n| --- | ---: | --- |\n' +
+                      ''.join('| ' + name + ' | ' + str(len(raw)) + ' | ' +
+                              hashlib.sha256(raw).hexdigest() + ' |\n'
+                              for name, raw in sorted(blobs.items())))
+    return record, blobs
+
+
+def builder_and_head():
+    spec = importlib.util.spec_from_file_location('r3_replay_builder', CODE / 'recut.py')
+    builder = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(builder)
+    head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
+    return builder, head
+
+
+def source_packet(root, *, include_replay=True):
     source = root / 'source'
     source.mkdir()
     files = {
@@ -29,6 +54,9 @@ def source_packet(root):
             (ROOT / 'blueprints/us-equities/adaptive-paper/scheduled_trial.sh').read_bytes(),
     }
     files.update({p.name: p.read_bytes() for p in REPLAY.glob('test_*.py')})
+    if not include_replay:
+        files = {name: raw for name, raw in files.items()
+                 if name != 'dry_run.py' and not name.startswith('test_')}
     stages = ('record', 'scan', 'pre', 'pre-skip', 'sip', 'lev1', 'lev2', 'lev4', 'edge2', 'edge8', 'iex')
     for stage in stages:
         files['configs/' + stage + '.json'] = b'{}\n'
@@ -62,15 +90,12 @@ class RetainedReplay(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
             source = source_packet(root)
-            spec = importlib.util.spec_from_file_location('r3_replay_builder', CODE / 'recut.py')
-            builder = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(builder)
+            builder, head = builder_and_head()
             digest = hashlib.sha256((source / 'SHA256SUMS').read_bytes()).hexdigest()
             output = root / 'new-uninstalled-packet'
-            # Bind current uncommitted generator bytes only in this SYN fixture.
-            # The real private-context drill uses actual Git bindings separately.
-            with patch.object(builder, 'pinned_file', side_effect=lambda pin, path: (ROOT / path).read_bytes()):
-                builder.seal(source, source, output, digest, digest, '1' * 40)
+            # Required-suite integration: use real Git objects and the actual
+            # landed source guards. A stale composition pin must fail CI.
+            builder.seal(source, source, output, digest, digest, head)
             for name in ('test_wiring.py', 'test_go_issuer.py', 'test_sequencing.py',
                          'test_unit_contracts.py', 'test_data_wiring.py'):
                 self.assertEqual((output / name).read_bytes(), (source / name).read_bytes())
@@ -109,6 +134,68 @@ raise SystemExit(0 if receipt['status']=='passed' else 1)
             self.assertEqual(receipt['keyed_tripwire_hits'], 0)
             self.assertEqual(receipt['subprocess_tripwire_hits'], 0)
             self.assertEqual(receipt['services_started'], 0)
+
+    def test_missing_predecessor_replay_uses_authenticated_record_and_pinned_driver(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            source = source_packet(root, include_replay=False)
+            original = (source / 'SHA256SUMS').read_bytes()
+            digest = hashlib.sha256(original).hexdigest()
+            record, blobs = replay_record(root)
+            expected = hashlib.sha256(record.read_bytes()).hexdigest()
+            builder, head = builder_and_head()
+            output = root / 'new-uninstalled-packet'
+            receipt = builder.seal(source, source, output, digest, digest, head,
+                                   replay_inventory_path=record, replay_inventory_sha256=expected)
+            self.assertEqual((source / 'SHA256SUMS').read_bytes(), original)
+            self.assertFalse((source / 'dry_run.py').exists())
+            self.assertEqual((output / 'REPLAY-INVENTORY.md').read_bytes(), record.read_bytes())
+            for name, raw in blobs.items():
+                self.assertFalse((source / name).exists())
+                self.assertEqual((output / name).read_bytes(), raw)
+            pinned_driver = builder.pinned_file(builder.LANDED,
+                'blueprints/us-equities/paper-readiness-seq3/dry_run.py').decode()
+            self.assertEqual((output / 'dry_run.py').read_text(), builder.replay_adapter.driver(pinned_driver))
+            provenance = receipt['replay_inventory']
+            self.assertEqual(provenance['commit'], REPLAY_COMMIT)
+            self.assertEqual(provenance['record_sha256'], expected)
+            request = json.loads((output / 'GO-BINDING-REQUEST.json').read_text())
+            self.assertEqual(request['replay_inventory'], provenance)
+            self.assertEqual(receipt['original_source_sha256'], digest)
+            strict = subprocess.run(['sha256sum', '--strict', '--quiet', '-c', 'SHA256SUMS'],
+                                    cwd=output, capture_output=True, text=True)
+            self.assertEqual(strict.returncode, 0, strict.stderr)
+
+    def test_absent_or_invalid_replay_authority_refuses_before_output(self):
+        builder, head = builder_and_head()
+        for variant, reason in [('absent', 'replay_inventory_required'),
+                                ('path-only', 'replay_inventory_pair_required'),
+                                ('hash-only', 'replay_inventory_pair_required'),
+                                ('bad-hash', 'replay_inventory_hash_mismatch'),
+                                ('conflict', 'replay_inventory_source_conflict')]:
+            with self.subTest(variant=variant), tempfile.TemporaryDirectory() as folder:
+                root = Path(folder)
+                source = source_packet(root, include_replay=variant == 'conflict')
+                record, blobs = replay_record(root)
+                if variant == 'conflict':
+                    name = next(iter(blobs))
+                    raw = b'# SYN conflicting inventoried replay\n'
+                    (source / name).write_bytes(raw)
+                    manifest = source / 'SHA256SUMS'
+                    manifest.write_text(''.join(
+                        (hashlib.sha256(raw).hexdigest() + '  ' + name if row.endswith('  ' + name) else row) + '\n'
+                        for row in manifest.read_text().splitlines()))
+                digest = hashlib.sha256((source / 'SHA256SUMS').read_bytes()).hexdigest()
+                expected = hashlib.sha256(record.read_bytes()).hexdigest()
+                kwargs = {}
+                if variant in ('path-only', 'bad-hash', 'conflict'):
+                    kwargs['replay_inventory_path'] = record
+                if variant in ('hash-only', 'bad-hash', 'conflict'):
+                    kwargs['replay_inventory_sha256'] = '0' * 64 if variant == 'bad-hash' else expected
+                output = root / 'new-uninstalled-packet'
+                with self.assertRaisesRegex(ValueError, reason):
+                    builder.seal(source, source, output, digest, digest, head, **kwargs)
+                self.assertFalse(output.exists())
 
 
 if __name__ == '__main__':

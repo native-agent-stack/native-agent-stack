@@ -1,4 +1,4 @@
-"""Compose the landed #1087 private latch with immutable #1117 flat proofs.
+"""Compose the landed #1113 latch/replay APIs with immutable #1117 flat proofs.
 
 Build-only: no credentials, broker, GO, installation, unit or account action.
 """
@@ -11,8 +11,10 @@ import re
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[3]
-LANDED = '943d5ba27b21aba01df1c2df6f63ef4b7e10fd36'
-FLAT_HEAD = '1ebb4d25e140dc1c8bce1b7f2e53c8c74ff575d8'
+LANDED = 'e1c28c3201d2f152cd8f171e74262270626e1560'
+# Same four helper blobs as the reviewed branch head, now anchored to the
+# reachable #1117 squash commit so a normal full-history CI checkout has them.
+FLAT_HEAD = 'edf832907676735ca6fa58c598213b544ca7510c'
 LATCH = ROOT / 'blueprints/us-equities/paper-readiness-seq3'
 FLAT = ROOT / 'blueprints/us-equities/paper-flat-proof'
 
@@ -54,15 +56,19 @@ def pinned_file(pin, path):
     return result.stdout
 
 
-def seal(source, installed, output, source_sha256, installed_sha256, source_commit):
+def seal(source, installed, output, source_sha256, installed_sha256, source_commit,
+         *, replay_inventory_path=None, replay_inventory_sha256=None):
     source, installed, output = Path(source).resolve(), Path(installed).resolve(), Path(output).resolve()
     if installed == output or output.is_relative_to(installed):
         raise ValueError('installed_generation_is_immutable')
     # Bind the reused algorithms/helpers to their reviewed Git pins, not memory.
-    for path in ('recut.py', 'lane_latch.py', 'seq2_retirement.py'):
+    latch_sources = {}
+    for path in ('recut.py', 'lane_latch.py', 'seq2_retirement.py', 'dry_run.py'):
         name = 'blueprints/us-equities/paper-readiness-seq3/' + path
-        if (ROOT / name).read_bytes() != pinned_file(LANDED, name):
+        raw = pinned_file(LANDED, name)
+        if (ROOT / name).read_bytes() != raw:
             raise ValueError('landed_latch_source_pin_mismatch')
+        latch_sources[path] = raw
     for path in ('recut.py', 'recover_pre_skip.py', 'observe_flat.py', 'README.md'):
         name = 'blueprints/us-equities/paper-flat-proof/' + path
         if (ROOT / name).read_bytes() != pinned_file(FLAT_HEAD, name):
@@ -76,6 +82,21 @@ def seal(source, installed, output, source_sha256, installed_sha256, source_comm
                            cwd=installed, capture_output=True)
     if check.returncode:
         raise ValueError('installed_generation_manifest_refused')
+    if (replay_inventory_path is None) != (replay_inventory_sha256 is None):
+        raise ValueError('replay_inventory_pair_required')
+    source_inventory = (source / 'SHA256SUMS').read_bytes()
+    if flat.sha(source_inventory) != source_sha256:
+        raise ValueError('predecessor_seal_mismatch')
+    source_rows = upstream.inventory_rows(source_inventory)
+    record_raw, replay_blobs, provenance = None, {}, None
+    if replay_inventory_path is not None:
+        record_raw, replay_blobs, provenance = upstream.replay_inventory(
+            replay_inventory_path, replay_inventory_sha256)
+        if any(name in source_rows and source_rows[name] != flat.sha(raw)
+               for name, raw in replay_blobs.items()):
+            raise ValueError('replay_inventory_source_conflict')
+    elif not set(upstream.REPLAY_SOURCES) <= source_rows.keys():
+        raise ValueError('replay_inventory_required')
     for name in ('recut.py', 'flat_retirement.py', 'README.md', 'r3_contract.py', 'replay_adapter.py'):
         path = 'blueprints/us-equities/paper-lane-latch/' + name
         if (ROOT / path).read_bytes() != pinned_file(source_commit, path):
@@ -100,15 +121,18 @@ def seal(source, installed, output, source_sha256, installed_sha256, source_comm
     if scheduled not in payloads:
         raise ValueError('scheduled_source_not_in_manifest')
     payloads['scheduled_trial_r3.sh'] = r3.scheduler(payloads[scheduled].decode(), output).encode()
-    if 'dry_run.py' not in payloads:
-        raise ValueError('replay_driver_not_in_manifest')
-    payloads['dry_run.py'] = replay_adapter.driver(payloads['dry_run.py'].decode()).encode()
+    # #1113 authenticates these separate Git inputs without retroactively
+    # adding them to the original predecessor seal. Consume captured blobs,
+    # not unlisted physical files beside that immutable predecessor.
+    payloads.update(replay_blobs)
+    if record_raw is not None:
+        payloads['REPLAY-INVENTORY.md'] = record_raw
+    payloads['dry_run.py'] = replay_adapter.driver(latch_sources['dry_run.py'].decode()).encode()
     payloads['replay_adapter.py'] = Path(__file__).with_name('replay_adapter.py').read_bytes()
     payloads['issue_go.py'] = isolate_issuer(payloads['issue_go.py'].decode()).encode()
     for name in ('lane_latch.py', 'seq2_retirement.py'):
-        payloads[name] = (LATCH / name).read_bytes()
+        payloads[name] = latch_sources[name]
     payloads['flat_retirement.py'] = Path(__file__).with_name('flat_retirement.py').read_bytes()
-    # The shared seq3 inventory remains untouched for its separately assigned PR.
     payloads['launch.py'] = payloads['launch.py'].replace(
         b'from seq2_retirement import assert_retired', b'from flat_retirement import assert_retired')
     notes = Path(__file__).with_name('README.md').read_bytes()
@@ -152,6 +176,8 @@ def seal(source, installed, output, source_sha256, installed_sha256, source_comm
                    bundle_file_count=len(payloads), deployment_revision='lane-b-private-stage-latch',
                    activation='TONIGHT SESSION BOUNDARY only after Astra + CC micro and explicit CC authorization',
                    retirement='Retire every seq2 AND seq2-flat path/service first; no active trial or pending GO')
+    if provenance is not None:
+        request['replay_inventory'] = provenance
     request_path.chmod(0o600)
     request_path.write_text(json.dumps(request, indent=2) + '\n')
     request_path.chmod(0o400)
@@ -160,6 +186,8 @@ def seal(source, installed, output, source_sha256, installed_sha256, source_comm
                'predecessor_bundle_sha256': installed_sha256, 'original_source_sha256': source_sha256,
                'manifest_entries': len(payloads), 'removed_host_touches': removed,
                'runtime_and_configs_equal_installed': True, 'broker_calls': 0, 'unit_installation': False}
+    if provenance is not None:
+        receipt['replay_inventory'] = provenance
     receipt_path = output / 'RECUT-RECEIPT.json'
     receipt_path.chmod(0o600)
     receipt_path.write_text(json.dumps(receipt, indent=2) + '\n')
@@ -175,8 +203,12 @@ def main():
         parser.add_argument('--' + name, type=Path, required=True)
     for name in ('source-sha256', 'installed-sha256', 'source-commit'):
         parser.add_argument('--' + name, required=True)
+    parser.add_argument('--replay-inventory', type=Path,
+                        help='separate CC-authenticated Git replay record when source rows are absent')
+    parser.add_argument('--replay-inventory-sha256', help='expected record hash from the CC')
     args = parser.parse_args()
-    result = seal(args.source, args.installed, args.output, args.source_sha256, args.installed_sha256, args.source_commit)
+    result = seal(args.source, args.installed, args.output, args.source_sha256, args.installed_sha256, args.source_commit,
+                  replay_inventory_path=args.replay_inventory, replay_inventory_sha256=args.replay_inventory_sha256)
     print(json.dumps({'status': result['status'], 'manifest_entries': result['manifest_entries'],
                       'removed_host_touches': result['removed_host_touches'], 'unit_installation': False}))
 

@@ -5,7 +5,7 @@ launcher stop-mark opens it, then the unit's shell touch updates it. A normal
 stage end therefore stops independent lanes before recovery removes the file.
 Removing the touch alone still leaves the launcher write.
 
-This recut adopts the already merged #1087 mechanism. Operator host STOP and
+This recut adopts the landed #1113 composition of the #1087 mechanism. Operator host STOP and
 lane-b/STOP remain read-only. Stage end creates a private `.stage-hook-latch`
 under the owned mode0700 instance; non-flat recovery retains it. Launcher and
 issuer admission see both operator paths and all outstanding private markers.
@@ -15,13 +15,13 @@ still honors the canonical host abort; no runtime or CONFIG byte changes.
 
 ## Sources and composition
 
-Reference: native-agent-stack #1087 merged at
-`943d5ba27b21aba01df1c2df6f63ef4b7e10fd36`:
+Reference: native-agent-stack #1113 merged at
+`e1c28c3201d2f152cd8f171e74262270626e1560` (including the #1087 mechanism):
 
-- `paper-readiness-seq3/recut.py:31-86` relocates admission to lane/private
+- `paper-readiness-seq3/recut.py`'s `rewrite_launch` relocates admission to lane/private
   marker checks and replaces stage stop-mark/recover ownership handling.
-- `recut.py:89-98` updates issuer admission and retirement proof;
-  `:127-138` removes the redundant shell touch from all eight stage services.
+- `rewrite_issuer` updates issuer admission and retirement proof;
+  `rewrite_unit` removes the redundant shell touch from all eight stage services.
 - `lane_latch.py:21-48` implements fail-closed pending-marker detection;
   `:79-95` creates and hashes an exact private marker;
   `:98-127` clears only the exact owned marker using descriptor-relative unlink.
@@ -31,15 +31,32 @@ Reference: native-agent-stack #1087 merged at
   It never changes the shared module inventory. CPython3.12.3's supported
   `types.FunctionType` supplies that isolated binding.
 
-Flat proof fixes come from #1117 head
-`1ebb4d25e140dc1c8bce1b7f2e53c8c74ff575d8`: its existing native recutter,
-observer and failed-observation receipts. `seal()` checks all reused source
+Flat proof fixes come from #1117 landed commit
+`edf832907676735ca6fa58c598213b544ca7510c`: its existing native recutter,
+observer and failed-observation receipts. Its four consumed helper blobs are
+byte-identical to the reviewed branch head `1ebb4d25e140dc1c8bce1b7f2e53c8c74ff575d8`;
+the landed pin makes them available in normal full-main-history CI checkouts.
+`seal()` checks all reused source
 bytes against those exact published Git blobs and its own source commit.
 The original deployment is authenticated by its externally supplied seal.
 The currently installed generation is separately authenticated by its seal
 and native strict checksum before its runtime/config bytes are compared.
 No source seal is rewritten. The new receipt origin is the supplied currently
 installed bundle, so same-state-root historical handoffs need no relabeling.
+
+The additional #1113 APIs consumed are `inventory_rows(raw)` and
+`replay_inventory(path, expected_sha256)`, plus its `REPLAY_SOURCES` contract.
+The first parses the original sealed inventory; the second authenticates a
+separate authority record and captures its five exact landed Git blobs.
+When the original seal lacks replay rows, both `--replay-inventory PATH` and
+`--replay-inventory-sha256 EXPECTED` are required. The expected digest comes
+from the CC separately, never from discovery beside the source. Existing
+inventoried replay rows must agree with the record. Record bytes/provenance
+and captured replay blobs enter only the new packet; the original inventory
+and its receipt origin stay unchanged. An unlisted physical replay file is
+never used. The replay driver comes from #1113's pinned `dry_run.py`, so the
+predecessor need not contain a driver. This builder does not call #1113's
+`recut()`; the #1117 builder still constructs the flat-proof intermediate.
 
 The lane B r3 preparation overlays only the canonical launcher's `keyed` and
 `run_stage` methods from `tests/fixtures/seq2-launch.txt`, selected from the
@@ -80,9 +97,9 @@ subprocess semantics are cited in
 The packet uses canonical `-seq3` unit names. It embeds BOTH old-generation
 retirement checks so an enabled/active seq2 or seq2-flat watcher refuses new
 issuer admission. The shared seq3 retirement-inventory PR remains separately
-required before any later general seq3 recut/changeover. This composition does
-not consume #1113's unlanded alternate replay inventory API or claim that
-historical replay files belong to their predecessor seal.
+required before any later general seq3 recut/changeover. The separate replay
+record establishes first authenticated Git provenance; it does not claim
+historical replay files belonged to their predecessor seal.
 
 ## Verification and boundary changeover
 
@@ -96,6 +113,12 @@ historical replay files belong to their predecessor seal.
 3. Normal one commit/push and new destination seal, native strict checksum,
    runtime/config comparison and systemd-analyze unit-parser checks. No broker
    or runtime activation is part of this build.
+   The required unittest discovery suite includes
+   `tests.test_lane_b_r3_replay.RetainedReplay.test_emitted_packet_retained_lifecycle_and_unit_contracts`:
+   it uses actual Git pin checks, without a pin-reader mock, and refuses stale
+   composition pins with `landed_latch_source_pin_mismatch`. Additional tests
+   cover absent replay rows/driver, authenticated capture, retained source
+   seal, invalid authority and conflicting inventoried rows.
 4. Lane B stays HELD today. Astra and CC micro review this exact head/packet.
    Tonight's SESSION BOUNDARY only: the co-op/CC verifies old active trials
    completed/flat, no pending GO, and retires EVERY seq2 and seq2-flat path
