@@ -32,6 +32,8 @@ The owner's directions of 2026-10-15, paraphrased:
     GitHub automation and the current models.
   - The owner wants to see the installed skills of every agent and runtime worker.
 - **19:19Z-19:20Z, to the CC:** superpowers goes into Pi, OpenCode and the other harnesses as runtime workers.
+- **19:22Z, to the CC:** Claude sessions get their own full harness cycles too, with the converged frameworks
+  installed, superpowers and beyond. The CC's addendum-02 records this and supersedes the 19:20Z exclusion of Claude Code.
 
 The CC recorded these in its direction records of 2026-10-15 (18:09Z and 19:12Z, each with its addenda) and its
 handover set of the same day. These are private records, cited by name only.
@@ -348,7 +350,7 @@ what the new distribution installs only when its result lands.
 
 | Worker | Record | On the new distribution |
 | --- | --- | --- |
-| Claude Code (headless, subagents, Workflows) | `foundation/native-clients` and `workers` winners; the practice skill | default, through its native installer, the plan's first row (stage C); no superpowers at any scope (Decision 6) |
+| Claude Code (headless, subagents, Workflows) | `foundation/native-clients` and `workers` winners; the practice skill | default, through its native installer, the plan's first row (stage C); the harness frameworks as TRIAL (Decision 6) |
 | Codex native SDK and lanes | `us-equities/agents-models-workers` and `foundation/agent-sdks` winners | default |
 | Pi, OpenCode (`ns-run` profiles) | #1033 and `notes/runtime-profiles-20261012/`. Profiles remain trial; the W6 parallel-readers comparison is preregistered and not executed | TRIAL through the fence, with superpowers inside each worker profile (Decision 6) |
 | Muse Code | [2026-10-14-muse-file-fence.md](2026-10-14-muse-file-fence.md) and its 2026-10-15 directory-grants amendment; a CC delta is pending | TRIAL through the fence, with superpowers through `.muse-plugin` inside the fence; no default promotion |
@@ -364,26 +366,41 @@ Defaults change only on a layer's convergence. The model-routes layer is F5's.
   at the new head.
 - **Other skills candidates.** The carried survivor `mattpocock/skills` and the unpinned candidates `typesafe-ai-skills`
   and `openai-skills` are adjudicated in the same delta.
-- **Harness frameworks: superpowers enters as a TRIAL, inside the worker harnesses only.** The owner asked for fully
-  designed harness frameworks to power the runtime workers (2026-10-15, 18:19Z) and placed superpowers in Pi, OpenCode
-  and the other harnesses as runtime workers (19:19Z-19:20Z, paraphrased).
-  - **Pin.** #1033's profiles pin `bb92a77741419a4ab5f06e711a283343f1ada0c3` (`tools/adoption/runtime_profiles.py:45-46` at
-    `8053f14e7`). That is the commit of the release tag `v7.0.0` (annotated tag object `7f043e5e`; the GitHub compare
-    reads identical), so the pins agree.
-  - **Scope fence.** Its plugin's SessionStart hook (`hooks/hooks.json` at `v7.0.0`, matcher `startup|clear|compact`)
-    injects into every session where the plugin is enabled. So it installs only per worker profile:
-    - Pi: its `.pi` folder or the #1033 profiles;
-    - OpenCode: its `.opencode` folder or the #1033 profiles;
+- **Harness frameworks: two families, each with its full cycle, all TRIAL.** The owner asked for fully designed
+  harness frameworks for the runtime workers (2026-10-15, 18:19Z), placed superpowers in the worker harnesses
+  (19:19Z-19:20Z), and gave Claude sessions their own cycles too (19:22Z), all paraphrased.
+  - **Runtime workers, per worker profile.**
+    - Pi: its `.pi` folder or the #1033 profiles.
+    - OpenCode: its `.opencode` folder or the #1033 profiles.
     - Muse Code: `.muse-plugin`, through the Muse fence.
-  - **No Claude Code install at any scope.** Not `superpowers@claude-plugins-official` at user scope, and not at project
-    scope in a repository the core sessions use. The CC, trading, co-op and account-trader sessions run without it. Jev
-    takes no skill framework.
-  - **Decision.** A preregistered paired same-task comparison inside each worker harness, with superpowers against
-    without it, on a sealed task set, in the existing harnesses (promptfoo or the skill-creator benchmark, blind judge
-    plus exact checks). There is no Claude Code arm.
-    - Its decision rule is the practice skill's `orchestration-frameworks` overturn rule: a framework becomes the default
-      only when it is ahead on quality at equal or lower cost.
-    - The readiness trigger is the TRIAL install in the worker profiles plus the sealed task set.
+    - Pin: #1033's `bb92a77741419a4ab5f06e711a283343f1ada0c3` (`tools/adoption/runtime_profiles.py:45-46` at
+      `8053f14e7`). That is the commit of the release tag `v7.0.0` (annotated tag object `7f043e5e`; the GitHub compare
+      reads identical).
+  - **Claude Code sessions on NativeHorizonNY.**
+    - superpowers through the official marketplace, `superpowers@claude-plugins-official`. That marketplace
+      (`anthropics/claude-plugins-official` main `8f814f49`, 2026-10-15) pins the plugin at
+      `5bf4e78011075bcfc0dc295f0724994cd123ee71`, release v6.4.1 (2026-09-19), two commits behind `v7.0.0`. The Claude
+      Code arm therefore runs v6.4.1 while the worker arms run v7.0.0. Each comparison is within one harness, so the
+      difference does not confound it.
+    - "Beyond" it, the instructions-skills candidates: ECC at a pinned commit of its current head, plus the carried
+      `mattpocock/skills`, `typesafe-ai-skills` and `openai-skills`. Each goes through its vendor's path.
+      `mattpocock/skills` is already installed by the plan's `engineering-process-skills` row (tag `v1.2.3`, skills CLI
+      1.7.0).
+  - Every framework is installed with one check and a recorded inverse, its plugin or skill uninstall.
+  - **Fenced sessions stay clean through their existing fences, not by uninstalling.** These are the account traders
+    (headless `claude -p` with tool and settings fences), the blind judges and reviewers, and the paired-run arms.
+    - The plugin's SessionStart hook (`hooks/hooks.json` at `v7.0.0`, matcher `startup|clear|compact`) injects into
+      every session where the plugin is enabled. So after stage E, each fence is checked: its `system/init` record must
+      list no framework plugin or skill.
+    - No trading session gets a framework before its own paired check. Jev takes no skill framework. NativeStack2604 is
+      unchanged.
+  - **Decision.** A preregistered paired same-task comparison inside each harness: Claude Code, Pi, OpenCode and Muse
+    Code. One arm runs with the framework and the control arm disables it per project, on a sealed task set, in the
+    existing harnesses (promptfoo or the skill-creator benchmark, blind judge plus exact checks).
+    - A framework becomes a default only on the layer's multi-angle convergence, which includes the practice skill's
+      `orchestration-frameworks` overturn rule (ahead on quality at equal or lower cost).
+    - The readiness trigger is the TRIAL installs plus the sealed task set.
+  - Invoke tracking (Decision 8) covers every installed framework skill per lane.
   - The other harness repositories in the practice-reference catalog stay references.
 - **Memory.** The durable-memory winner is ai-memory (2.6.6 live), with Hindsight deployed as the research-memory unit
   and recorded as its alternate.
