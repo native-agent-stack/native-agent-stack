@@ -11,21 +11,49 @@ conditions are satisfied.
 
 run_native now ends its loop on an observation-integrity-loss reason, before
 another rebalance can try an owned exit through that unusable transport.
-Before breaking, it disables admissions and calls cancel_expired with
-all_entries=True on the loss tick. The initial handoff patch incorrectly skipped
-that cancellation; the correction restores the existing cancellation policy
-before teardown or a fresh recovery start/snapshot can fail. This requests entry
-cancellation; it does not claim a broker acknowledgement or fill result.
+On the loss tick it disables admissions and calls cancel_expired with
+all_entries=True. This selects resting entries and the existing policy's timed-out,
+non-halted exits. The initial handoff patch skipped selection; its first correction
+selected cancellations but still let native shutdown discard their queued work.
+The current correction keeps the native session running while waiting for BOTH
+the strategy's native terminal callback and the journal's terminal observation
+for every requested cancellation (including requests already queued). Queuing,
+cancel_requested=True and a DELETE acknowledgement alone do not satisfy this wait.
+A racing terminal fill, expiry or rejection also closes the order safely.
+The configured order_timeout_seconds bounds the entire wait, including a busy
+dispatcher or operation lock. During that wait no rebalance occurs and admissions
+remain disabled. If the deadline expires or the native task ends first, the
+receipt records unconfirmed counts/status and the adapter error
+integrity_loss_cancellation_unconfirmed; unresolved journal orders are retained
+for the existing residual recovery path. No terminal result is fabricated.
 Its ordinary bounded shutdown and existing owned-residual recovery path remain,
 including reconciliation, exact config and order gates.
 Quote silence alone retains its prior pause/reconciliation behavior.
 
-The resting-entry regression uses the real AdaptiveStrategy.cancel_expired
+The historical virtual resting-entry regression uses the real AdaptiveStrategy.cancel_expired
 policy and GuardedSession DELETE path with a synthetic HTTP endpoint. A newly
 resting buy is not yet timed out. At 9e1892b1 the loss tick reaches teardown
-without requesting its cancellation; the case fails. After correction the
-DELETE is observed at the loss tick, before native teardown, even when no fresh
-recovery is run. Handoff remains within one tick with zero refused-exit submits.
+without requesting its cancellation; the case fails. Its synchronous stub's
+DELETE-before-teardown ordering does not establish production dispatch. The
+fixture now explicitly models its terminal callback; native ordering is tested
+separately, through a real rc5 LiveNode in stream_cancel_dispatch.py.
+
+The real-node fail-first at cd81cc15 holds a resting entry's submit dispatcher for
+0.6 seconds after loss, beyond the node's up-to-0.1-second stop polling plus
+0.2-second post-stop delay. Native Strategy.cancel_order, both execution queues,
+the real adapter and native terminal callbacks all run; only the broker port and
+one-order strategy decision are synthetic. No fresh recovery is invoked. At the
+parent, completed teardown discards the queued cancel: zero port.cancel calls,
+one active entry and one unresolved journal order, one assertion failure and no
+test errors/skips. After correction the observed order is loss, dispatcher
+release, port cancellation, terminal confirmation, then session.stop, with no
+active or unresolved order. A second real-node case returns pending_cancel only;
+at its configured one-second deadline the order remains unresolved and the
+outcome is needs_attention. This is native dispatch/confirmation evidence with a
+synthetic broker, not venue acceptance or a universal shutdown-latency bound.
+Handoff with pending cancellations can take the configured order timeout plus
+ordinary teardown; the prior one-tick measurement applies to its no-resting-order
+fixture, not to this confirmation wait.
 
 The held-position regression uses the actual loop, real GuardedSession and
 Ledger reservations, and the actual recovery routine with synthetic ports and
@@ -108,6 +136,21 @@ separate authorized native measurements.
   CPython's pinned public unittest discovery/runner mechanisms, already adopted
   by scripts/run_integration_tests.py, run every tests/integration module and
   reject any skip. No replacement cancellation or test harness is introduced.
+- The native dispatch correction is based on nautechsystems/nautilus_trader
+  v2.0.0rc5 at 1b0a49d2792a9432a3aca3fcb617ce7a630d905e:
+  [trading/src/python/strategy.rs:2001](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/trading/src/python/strategy.rs#L2001)
+  and [execution/src/engine/mod.rs:185-196](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/execution/src/engine/mod.rs#L185)
+  queue native execution commands;
+  [live/src/python/runtime.rs:177-211,834-867](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/live/src/python/runtime.rs#L834)
+  serializes Python client operations and
+  [disconnect:685-697](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/live/src/python/runtime.rs#L685)
+  discards queued work. The
+  [node stop grace:1786-1801,2360-2373](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/live/src/node/mod.rs#L2360)
+  is finite. The vendor's
+  [test_client_runtime.py:193-228](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/python/tests/unit/live/test_client_runtime.py#L193)
+  demonstrates disconnect dropping queued work. The installed rc5 runtime and
+  clean pinned mirror were checked; this regression uses a real LiveNode and
+  adapter, without replacing native cancellation with synchronous HTTP.
 - alpacahq/alpaca-py v0.44.0 at
   [cc4cb3b7, data/live/websocket.py:222-229](https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/alpaca/data/live/websocket.py#L222)
   defines the supported stop_ws signal; its
@@ -130,8 +173,10 @@ F3's control also loads the old combined test because this is a coverage defect,
 not a claim that its existing production counter is absent. Parent mutations
 record the underlying unittest failures separately from their driver exit.
 Named modules run on the pinned runtime inside a no-network namespace.
-F1 handoff, the resting-entry cancellation regression and F2 SDK-batch coverage
-now live in tests/integration/stream_integrity_followups.py with no skip guards.
+F1 handoff, the historical virtual cancellation regression and F2 SDK-batch coverage
+live in tests/integration/stream_integrity_followups.py with no skip guards.
+The real-native dispatch/confirmation and deadline cases live in
+tests/integration/stream_cancel_dispatch.py, also without skip guards.
 The locked CI integration job discovers them through scripts/run_integration_tests.py,
 whose runner fails on empty or skipped cases. SDK-free F3-F5 stay in the ordinary
 unit module. F2 remains PARTIAL for arbitrary healthy successful batches, as above.

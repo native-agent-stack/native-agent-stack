@@ -44,6 +44,7 @@ def integrity_handoff_probe(*, resting_entry=False, recover_after=True):
     from tests import test_adaptive_paper_recovery as fixtures
     epoch=1800000000.0;clock=[0.0];refused=[];freeze_at=[];lifecycle=[]
     pending={'resting-entry':{'side':'buy','symbol':'SPY','created':epoch}} if resting_entry else {}
+    resting_info=pending.get('resting-entry',{})
     cancel_pending=native_strategy.AdaptiveStrategy.cancel_expired
     actual_sleep=asyncio.sleep
     with tempfile.TemporaryDirectory(dir='/var/tmp') as directory:
@@ -85,6 +86,10 @@ def integrity_handoff_probe(*, resting_entry=False, recover_after=True):
                 cancel_expired=cancel_pending
                 def cancel_order(self,client_id):
                     session.request('DELETE',transport.PAPER_URL+'/v2/orders/'+str(UUID(int=1)))
+                    # This legacy virtual probe has no native dispatcher. Model
+                    # its terminal callback explicitly; the real-node ordering
+                    # regression lives in stream_cancel_dispatch.py.
+                    asyncio.get_running_loop().call_soon(self.pending.pop,str(client_id),None)
                 def rebalance(self,now,*,force_exit=False):
                     if not force_exit:return None
                     self.n+=1;cid=f'refused-exit-{self.n}'
@@ -123,7 +128,7 @@ def integrity_handoff_probe(*, resting_entry=False, recover_after=True):
                 active=ledger.db.execute("SELECT COUNT(*) FROM requests WHERE kind='submit' AND at>?",(epoch+clock[0]-60,)).fetchone()[0]
                 if not recover_after:
                     return {'freeze_at':freeze_at[0],'handoff_at':at_handoff,
-                            'resting_entry_cancel_requested':pending['resting-entry'].get('cancel_requested',False),
+                            'resting_entry_cancel_requested':resting_info.get('cancel_requested',False),
                             'lifecycle':lifecycle,'refused_exit_submit_reservations':spent}
                 recovery_controller=fixtures.Controller(ledger)
                 class RecoveryPort(fixtures.FakePort):

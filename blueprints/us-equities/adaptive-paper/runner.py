@@ -1729,6 +1729,36 @@ def _final_corporate_action_guard_summary(strategy, held_symbols, now):
             "pending_needs_attention_held": sorted(pending_needs_attention_held)}
 
 
+async def _wait_for_integrity_cancellations(controller, strategy, requested, native_task, timeout_seconds):
+    """Keep native dispatch alive until requested cancels have terminal evidence.
+
+    cancel_requested only means queued. Require both the native terminal callback
+    (pending removed) and the durable terminal observation (not unresolved).
+    A racing fill/expiry is terminal too; a DELETE acknowledgement alone is not.
+    """
+    deadline = time.monotonic() + timeout_seconds
+    while True:
+        unresolved = {intent.client_id for intent in controller.ledger.unresolved()}
+        unconfirmed = requested.intersection(set(strategy.pending) | unresolved)
+        if not unconfirmed:
+            status = "confirmed"
+            break
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            status = "deadline_expired"
+            break
+        if native_task.done():
+            status = "native_session_ended"
+            break
+        # Yield through the owner loop so both native command queues and
+        # terminal events can run. The configured order timeout bounds the
+        # entire wait, including a busy dispatcher or transport operation lock.
+        await asyncio.sleep(min(.1, remaining))
+    return {"status": status, "requested_count": len(requested),
+            "confirmed_count": len(requested) - len(unconfirmed),
+            "unconfirmed_count": len(unconfirmed), "timeout_seconds": timeout_seconds}
+
+
 async def run_native(controller, policy_config, assets, trial_id, config, baseline_cash, *, account_fingerprint="simulation",
                      log_directory=None, ca_refresh_state=None):
     from native_adapter import build_node
@@ -1805,6 +1835,7 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
     started = time.monotonic()
     last_reconciliation = started
     cleanup_started = None
+    integrity_loss_cancellations = None
     reconciliation = None
     boundary_receipts = []
     ledger_adopted = False  # D1: one-shot seed of the local ledger from the
@@ -1872,14 +1903,21 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
             health = getattr(port, "health", {})
             if OBSERVATION_INTEGRITY_LOSS_REASONS.intersection(health.get("reasons", ())):
                 # Unknown order/position state cannot authorize another sell.
-                # Stop this session now; main's owned-residual path uses a
+                # Stop rebalancing now; main's owned-residual path uses a
                 # fresh transport and durable recovery rather than retrying
                 # refused exits until duration+cleanup (and spending slots).
                 strategy.enabled = False
                 controller.stop = True
-                # Loss gates submits, not cancels. Reduce resting-entry risk
-                # on this tick, before teardown or a fresh recovery can fail.
+                # Native cancel_order queues work; do not disconnect its
+                # dispatcher until terminal confirmation or the bounded wait.
+                pending_before_cancel = dict(strategy.pending)
                 strategy.cancel_expired(now, config["order_timeout_seconds"], all_entries=True)
+                requested = {cid for cid, info in pending_before_cancel.items()
+                             if info.get("cancel_requested")}
+                integrity_loss_cancellations = await _wait_for_integrity_cancellations(
+                    controller, strategy, requested, task, config["order_timeout_seconds"])
+                if integrity_loss_cancellations["unconfirmed_count"]:
+                    session.errors.append("integrity_loss_cancellation_unconfirmed")
                 break
             serious_gap = any("stale" not in str(reason) for reason in health.get("reasons", []))
             if strategy.started and serious_gap:
@@ -2061,6 +2099,8 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
               # "held_overnight" while either is non-empty.
               "corporate_action_guard": _final_corporate_action_guard_summary(
                   strategy, held_symbols_now, time.time())}
+    if integrity_loss_cancellations is not None:
+        outcome["integrity_loss_cancellations"] = integrity_loss_cancellations
     if leverage_policy is not None:
         capital = Decimal(config["capital_usd"])
         peak_effective_leverage = (peak_gross_exposure_usd / capital) if capital else Decimal("0")

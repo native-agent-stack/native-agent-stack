@@ -13503,8 +13503,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "83d96448634e7f4bbcec6a5399680e0efd358b4f0cf512a63fb80995d876d5e1",
-      "bytes": 172770
+      "sha256": "46f217dc06bc4d47b32d831e851c53f635b60fe2582fbf1a650c0a3f273de096",
+      "bytes": 174945
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runtime_lock.py",
@@ -13538,8 +13538,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "f1a9a8644b5f0580d6015b2cb77776e37035a6424550a9b8e72b2dc48447e2db",
-      "bytes": 10483
+      "sha256": "9129f062b2ab3390e473f9c44235670b196d947c7331889722ae9582ce5c966d",
+      "bytes": 10600
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/start_readiness.py",
@@ -19193,8 +19193,8 @@
     },
     {
       "path": "docs/decisions/2026-10-14-stream-integrity-followups.md",
-      "sha256": "491cd925a9dd6c71f0f90ce3a462a3b32ad48c4996ed3fe1a48990cf2cf30460",
-      "bytes": 10079
+      "sha256": "b2ea42bd0d9314292b8e5ce5b44307719f27679622956e55429685f3343ce077",
+      "bytes": 13866
     },
     {
       "path": "docs/decisions/2026-10-15-model-currency-landscape-check.md",
@@ -60708,8 +60708,8 @@
     },
     {
       "path": "evidence/receipts/stream-integrity-followups-20261014.json",
-      "sha256": "7d5535258131d9e79a76e57b2891e7913a35f8dfb1a95ec6f97ac99701a018b4",
-      "bytes": 4534
+      "sha256": "adc48c4ac243869e4e46fe9e1f7e9788a5cc2888ef31bbf98435f4c3afb7e512",
+      "bytes": 7321
     },
     {
       "path": "evidence/receipts/suite-parallelism-trial-20261003.json",
@@ -62567,9 +62567,14 @@
       "bytes": 304
     },
     {
+      "path": "tests/integration/stream_cancel_dispatch.py",
+      "sha256": "18b8a800355f64201b19fc0961a1de88cc2b8f00532f621297d7b5b87e5bf0d5",
+      "bytes": 8210
+    },
+    {
       "path": "tests/integration/stream_integrity_followups.py",
-      "sha256": "ee16917b1355602401f8d0fd8dee723df33c39eba3d932f3f023eb24bf3d56a7",
-      "bytes": 12464
+      "sha256": "9e37ada153aaffc8c4ffe003036647e5c18587c54b83a0754b36832d9b240a5d",
+      "bytes": 12824
     },
     {
       "path": "tests/local_pages_architecture_policy_fixture.py",
