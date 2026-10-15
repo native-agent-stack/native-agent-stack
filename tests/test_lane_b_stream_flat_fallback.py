@@ -5,7 +5,9 @@ import hashlib
 import importlib.util
 import io
 import json
+import os
 from pathlib import Path
+import stat
 import sys
 import time
 from types import SimpleNamespace
@@ -210,6 +212,70 @@ class StreamFlatFallback(unittest.TestCase):
                 self.assertEqual(fixture.calls, [])
                 self.assertFalse(launch.safe_json(instance / 'handoff.json')['flat'])
                 self.assertTrue((fixture.state / 'active/pre.json').exists())
+
+
+class HandoffCandidateIsolation(unittest.TestCase):
+    @contextmanager
+    def completed_recovery(self):
+        with StreamFlatFallback().scenario() as (fixture, launch, instance, native):
+            launch.save(native, {'status': 'passed', 'flat': True, 'positions': [],
+                'unresolved_orders': [], 'reconciliation': {'positions': 0, 'open_orders': 0}})
+            launch.native_recover = Mock(return_value=(0, native))
+            with patch.object(launch.time, 'monotonic', return_value=100):
+                self.assertEqual(launch.recover_stage('pre'), 0)
+            launch.keyed.assert_not_called()
+            with patch.object(launch.time, 'monotonic', return_value=161):
+                yield launch, instance, native
+
+    @contextmanager
+    def bad_candidate(self, launch, instance, variant):
+        candidate = instance / 'stream-flat-probe.json'
+        # Give every bad candidate different bytes from the valid native proof.
+        payload = {'status': 'passed', 'flat': True, 'positions': [], 'unresolved_orders': [],
+                   'reconciliation': {'positions': 0, 'open_orders': 0}, 'kind': 'SYN unrelated'}
+        launch.save(candidate, payload)
+        digest = launch.sha(candidate)
+        with ExitStack() as stack:
+            if variant == 'oversized':
+                candidate.write_text(' ' * 65537)
+                digest = launch.sha(candidate)
+            elif variant == 'symlink':
+                target = instance / 'SYN-symlink-target.json'
+                candidate.rename(target)
+                candidate.symlink_to(target)
+            elif variant == 'unreadable':
+                candidate.chmod(0)
+                stack.callback(candidate.chmod, 0o600)
+            elif variant in ('foreign-owner', 'wrong-type'):
+                actual_fstat = os.fstat
+                def metadata(fd):
+                    info = actual_fstat(fd)
+                    if Path(os.readlink('/proc/self/fd/' + str(fd))) == candidate:
+                        return SimpleNamespace(st_uid=info.st_uid + (variant == 'foreign-owner'),
+                            st_mode=stat.S_IFDIR if variant == 'wrong-type' else info.st_mode,
+                            st_size=info.st_size)
+                    return info
+                stack.enter_context(patch.object(launch.os, 'fstat', side_effect=metadata))
+            yield candidate, digest
+
+    def test_unsafe_unrelated_candidate_cannot_hide_valid_bound_native_receipt(self):
+        for variant in ('oversized', 'foreign-owner', 'wrong-type', 'symlink', 'unreadable'):
+            with self.subTest(variant=variant), self.completed_recovery() as (launch, instance, native):
+                with self.bad_candidate(launch, instance, variant):
+                    _, value, selected = launch.verify_handoff('pre', '2026-10-14')
+                self.assertEqual(selected, native)
+                self.assertTrue(value['flat'])
+
+    def test_unsafe_bound_candidate_cannot_admit_without_eligible_matching_proof(self):
+        for variant in ('oversized', 'foreign-owner', 'wrong-type', 'symlink', 'unreadable'):
+            with self.subTest(variant=variant), self.completed_recovery() as (launch, instance, native):
+                with self.bad_candidate(launch, instance, variant) as (_, digest):
+                    path = launch.STATE / 'completed/2026-10-14/pre.json'
+                    value = launch.safe_json(path)
+                    value['native_recover_sha256'] = digest
+                    launch.save(path, value)
+                    with self.assertRaises(launch.Refused):
+                        launch.verify_handoff('pre', '2026-10-14')
 
 
 class EmptyScanOutcome(unittest.TestCase):

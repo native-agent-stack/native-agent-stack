@@ -215,19 +215,22 @@ def verify_handoff(previous, date):
     # exact native/REST receipt fingerprint carried by this handoff.
     for name in ('stream-flat-probe.json', 'flat-probe.json', 'recover.json'):
         candidate = instance / name
-        if not candidate.is_file():
-            continue
         # Keep the existing 64KiB/owner/regular-file boundary. CPython
         # v3.12.3 os.open/fstat/read capture one bounded snapshot; hash those
         # bytes BEFORE JSON decoding so an unrelated partial write is ignored.
         limit = 65536
-        with os.fdopen(os.open(candidate, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK), 'rb') as stream:
-            info = os.fstat(stream.fileno())
-            if not stat.S_ISREG(info.st_mode) or info.st_uid != os.geteuid() or info.st_size > limit:
-                raise Refused('unsafe_input')
-            raw = stream.read(limit + 1)
+        # Candidate eligibility is local to this path. An unrelated unsafe
+        # file must not hide a later eligible hash-matching native receipt.
+        try:
+            with os.fdopen(os.open(candidate, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK), 'rb') as stream:
+                info = os.fstat(stream.fileno())
+                if not stat.S_ISREG(info.st_mode) or info.st_uid != os.geteuid() or info.st_size > limit:
+                    continue
+                raw = stream.read(limit + 1)
+        except OSError:
+            continue
         if len(raw) > limit:
-            raise Refused('unsafe_input')
+            continue
         if hashlib.sha256(raw).hexdigest() == value.get('native_recover_sha256'):
             native, output = candidate, json.loads(raw)
             break

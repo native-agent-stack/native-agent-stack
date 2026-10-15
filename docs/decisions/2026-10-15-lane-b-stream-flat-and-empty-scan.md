@@ -71,6 +71,12 @@ All native locators below are at base
 - [systemd259](https://github.com/systemd/systemd/blob/v259/man/systemd.unit.xml),
   OnFailure: activates on a failed unit; clean process exit avoids that failure
   for the no-trade outcome. A genuine recovery failure still remains a failure.
+- [util-linux v2.41.3](https://github.com/util-linux/util-linux/tree/v2.41.3),
+  `sys-utils/unshare.1.adoc`, `--user`, `--map-current-user`, `--net`, and
+  `sys-utils/unshare.c`: supported namespace invocation for the correction's
+  network-disabled tests. The installed binary reports2.41.3; the measured
+  child preserves the caller uid and has no routes. This is test isolation,
+  not a change to any trading service or the runtime selection.
 
 No new adapter, credential loader, broker transport or dependency is added.
 The frozen runtime and CONFIG bytes and all already sealed packets stay intact.
@@ -121,7 +127,12 @@ priority over the exact recorded proof; no matching proof still refuses.
 
 The next-stage regression consumes actual RTH CLI output, performs the real
 GET observer recovery, then drives the real next-stage issuer and binding.
-Before this correction the issuer refuses `previous_native_recover_hash`.
+On the unchanged initial head `e111051b`, the three CLI regressions fail with
+one missing-helper `NameError` and two `recovery_not_flat` errors. The
+next-stage case does not yet reach proof selection at that head. A separate
+isolated consumer RED applies the helper-placement and public-mode corrections
+first, then observes the issuer refusing `previous_native_recover_hash` before
+the validator correction. These are distinct intermediate states and captures.
 After it, issuance/binding pass; tampering with the stream proof still refuses
 under that same hash check. Authority, clock, unit inventory and all GO/state
 files in the test are SYN fixtures. This does not issue a real GO or run a unit.
@@ -145,17 +156,73 @@ The held local proof-selection P2 and GPT's retry P2 describe the same defect:
 a partial nonmatching stream receipt raises JSONDecodeError before the native
 receipt bound by the handoff is reached. The bounded descriptor reader checks
 regular-file type, owner and the existing64KiB cap, hashes the captured bytes,
-then decodes only the matching candidate. CPython v3.12.3's supported
-`os.open`/`fstat`, buffered `read(size)`, `hashlib.sha256` and `json.loads`
+then decodes only the matching candidate. CPython v3.12.3 at
+`f6650f9ad73359051f3e558c2431a109bc016664` supplies the precise mechanisms:
+`Modules/posixmodule.c:10207` (`os.open`), `:11137` (`os.fstat`),
+`Modules/_io/bufferedio.c:944` (bounded buffered read), and
+`Lib/json/__init__.py:333` (JSON byte decoding). These supported
 interfaces implement this snapshot; the regression verifies a successful
 real native recovery remains admissible beside that partial stream file.
 
 The scratch next-stage regression now fixtures `lane_latch.assert_issuer_python`
-because host-interpreter qualification is a separate native gate. A simulated
+because host-interpreter qualification is a separate native gate, at the
+native base's `paper-readiness-seq3/lane_latch.py:13-18`, inserted into the
+issuer by `paper-readiness-seq3/recut.py:150-154`. A simulated
 CPython3.13 host fails `issuer_python_3_12_required` before this test-only fix,
 then reaches the real issuer/proof/binding paths after it. Production's3.12
 issuer gate is unchanged. The record also explicitly describes the replaced
 handoff validator and the public preflight submission counter's limitation.
+
+### Candidate isolation correction to reviewed head 98de31a0
+
+The prior bounded reader fixed partial nonmatching JSON, but an ineligible
+unrelated path still aborted the entire search before a valid bound native
+receipt. Eligibility now applies separately to each fixed candidate path.
+Unreadable, non-regular, foreign-owned, oversized and symlinked files are
+skipped; captured reads remain bounded, and only a safe hash-matching snapshot
+is decoded. No eligible match still refuses `previous_native_recover_hash`.
+The CPython source locators above explain the descriptor and error boundary;
+the native base's fixture `verify_handoff` supplies the original fixed-path
+hash binding, not an arbitrary filename from the handoff.
+
+`HandoffCandidateIsolation` uses the generated launcher's `recover_stage`
+with a fake successful native recovery, then exercises the actual verifier.
+It does not call the runner CLI. Five unrelated-candidate subcases on frozen
+98de31a0 fail: three `unsafe_input` errors, a symlink open error and an
+unreadable-file permission error. Complementary controls bind each unsafe
+candidate itself and require refusal when there is no eligible matching
+proof. Ownership/type are descriptor-stat fixtures, not host ownership edits;
+all files and handoffs are scratch SYN. Execution runs in a network namespace
+without routes, including any tests that import transport.
+
+### Publication-safe documentary execution record
+
+The earlier CC P3 record checks were manual publication checks, not committed
+unit tests. The check's three predicates were: the body says three RED tests
+and identifies T:289 as `recovery_not_flat`; README and body explicitly say
+the graft replaces the handoff validator; and both distinguish the fixed-zero
+submission field from REST flatness. The retained execution capture is:
+
+```text
+Before the record correction (rc1):
+CC-P3-1 correct RED count and RTH failure: FAIL
+CC-P3-2 describe replaced validator: FAIL
+CC-P3-3 distinguish fixed submission field from REST flatness: FAIL
+After the record correction (rc0):
+CC-P3-1 correct RED count and RTH failure: PASS
+CC-P3-2 describe replaced validator: PASS
+CC-P3-3 distinguish fixed submission field from REST flatness: PASS
+```
+
+The corrected initial-head CLI capture separately ran
+`python -E -s -B -m unittest -v tests.test_lane_b_stream_flat_fallback.NativeCLIRewriteContract`
+with only the three-case test module copied onto frozen e111051b production:
+three tests, three errors, rc1 (one `NameError`, two `recovery_not_flat`).
+The isolated consumer capture ran after the helper/mode corrections and
+reported one test, one `previous_native_recover_hash` error, rc1. These
+publication-safe excerpts omit raw host paths and private-log fingerprints;
+the original captures are retained privately. They are historical execution
+records, distinct from exact-head GREEN and native trading qualification.
 
 The pinned mover CLI does not publish the required preflight counters. That
 missing evidence remains a refusal for this new stream-error path; no zero
