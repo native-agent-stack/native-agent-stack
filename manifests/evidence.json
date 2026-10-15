@@ -5017,8 +5017,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.json",
-      "sha256": "4e994e162f2defb70e5060516e98420747f2505afb689240377510bbc2c8b011",
-      "bytes": 159332
+      "sha256": "051254abb4906b83ff46b7628210510d6c3110a3c312b09a7d106a8de57dac17",
+      "bytes": 159393
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.md",
@@ -5032,8 +5032,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/workers.md",
-      "sha256": "44cd37d4122060ef6ede47aa98d80835cb4cce256feea77e1e4a6423f35cce6d",
-      "bytes": 29612
+      "sha256": "3ac12ae1fd47f86a0a63c33a371611cf3e747fd9c80b972fe4da53d095e5724c",
+      "bytes": 29673
     },
     {
       "path": ".claude/skills/native-skill-routing/SKILL.md",
@@ -21738,8 +21738,8 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/claude-native-slot-manifest.json",
-      "sha256": "46909b9caad532e035f655dbde545547d86b446e8e88d59a74497c00242ae2c9",
-      "bytes": 238317
+      "sha256": "6d967ef1ffad22c137125d1c7a7e2672b7b7e3548029f8cb41819364625fc679",
+      "bytes": 238531
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/cross-client-lines.json",
@@ -63983,8 +63983,8 @@
     },
     {
       "path": "tests/test_native_practice_currency.py",
-      "sha256": "1d637078c14f672a773cc8f62c46fd1461da2c2d08e387c87c6bb7aad6c653c8",
-      "bytes": 13856
+      "sha256": "57f2f7e05c1345af8cef89b72f622ba3ec30e0a1b13fa419f4743e5fdb377370",
+      "bytes": 14377
     },
     {
       "path": "tests/test_native_practice_doc_corrections.py",

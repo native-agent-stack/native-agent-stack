@@ -241,6 +241,13 @@ class DeltaTests(unittest.TestCase):
                 self.assertIn(f"- **Notes:** {self.slots[slot_id]['notes']}\n", section)
                 self.assertNotIn("is proposed to the command center", self.slots[slot_id]["notes"])
 
+    def test_every_page_evidence_line_is_the_join_of_its_slots_json_list(self):
+        """The command center's MICRO read of #1171 at 0b1c8be9 (P2): the record says each row's evidence is the same
+        text in slots.json and on its page, so every page's Evidence line is the '; ' join of the row's list, in order."""
+        for slot_id, slot in self.slots.items():
+            with self.subTest(slot=slot_id):
+                self.assertIn(f"- **Evidence:** {'; '.join(slot['evidence'])}\n", page_section(slot_id))
+
 
 if __name__ == "__main__":
     unittest.main()
