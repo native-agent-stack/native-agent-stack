@@ -15,10 +15,17 @@ targets, completion and scale-in handling, refusal pacing and reconciliation,
 typed native denial handling, integrity-loss cancellation, isolated fixtures,
 and the integration with landed #1119. Its historical evidence remains in
 [the sell-chunk decision](2026-10-13-adaptive-paper-sell-chunks.md). The new
-behavior is confined to reason priority in `exits.py` and the durable commitment
-and cancel-acknowledgement paths in `native_strategy.py`.
+behavior at the initial head was confined to reason priority in `exits.py` and
+the durable commitment and cancel-acknowledgement paths in `native_strategy.py`.
 
-## Problem and decision
+The initial #1170 head `93f34f01057a9eb68dc07d098a8c3755670959a0` received a
+CC changes-requested full read and a GPT full1 ACK. The CC's further P1 and
+ruled P2 are resolved by the [fold below](#pricing-basis-and-session-rearm-fold),
+which supersedes the initial use of durable strength as an order pricing label.
+The earlier results remain dated evidence, not a claim that both full reads
+accepted the initial head.
+
+## Initial problem and decision at 93f34f01
 
 With 100 shares held at 100.00, a quote of 100.50 triggers a full take-profit
 target of zero. The $10,000 envelope permits an initial 99-share limit at
@@ -74,7 +81,7 @@ not grant permission to bypass them. These fixtures establish exit mechanics;
 they do not establish a broker fill, strategy profitability or operating
 qualification.
 
-## Fail-first evidence
+## Initial fail-first evidence
 
 Receipts are in
 `evidence/artifacts/adaptive-paper-committed-exit-priority-20261015/`.
@@ -129,7 +136,7 @@ namespace, an explicit checkout source root, and private fixture state.
   in the sell-chunk decision. No new engine, adapter, dependency or harness is
   adopted, and no landscape layer is reopened by this bounded correction.
 
-## Review brief and provenance
+## Initial review brief and provenance
 
 Review the full carried change from main, explicitly including the
 **unchanged-target, changed-reason** sequence and a stronger reason arriving
@@ -148,3 +155,72 @@ All other recorded P3 follow-ups remain separate. No live paper unit,
 credential store, broker endpoint, runtime lock, STOP or ISSUER-HOLD is used or
 changed by this work. Tests use private temporary guard paths and block host
 STOP access before filesystem inspection.
+
+## Pricing basis and session rearm fold
+
+At the reviewed head, a prior `quote_stale` commitment outranked a later
+take-profit and stop. After a stale-quote tick, a fresh 100.50 quote rested 99
+shares at 100.48, labelled `market` from the durable reason. A later 99.70 stop
+also compared as `market`; at 100 bps no cancel was requested. The same issue
+affected risk-off, gap and corporate-action commitments followed by stop or
+trailing signals, and stop followed by trailing under the volatility preset.
+The fixed strength order was not a correct order-pricing selector.
+
+The durable target and strength reason are retained. A separate `pricing`
+record stores the reason and price rule of the exit priced on the current
+tick: the session `limit` rule where applicable, otherwise the current exit's
+`REASON_PRICE_RULE`, defaulting to `market`. A tick proposing no new exit keeps
+that basis across ticks and journal reopen. A legacy commitment without a
+recorded basis uses a neutral `committed_exit` label and `market`, never its
+durable strength reason as an order label.
+
+Resting orders record this basis, and replacement compares it explicitly.
+Any basis change forces cancel-then-replace regardless of price tolerance.
+While cancellation is pending, another basis or target change updates the
+durable state without placing another sell. At acknowledgement, the strategy
+uses the latest basis and re-reads owned quantity minus the current committed
+target. It then applies the existing whole-share envelope. Thus a confirmed
+40-share fill leaves a 60-share replacement; a target strengthened from a
+50-share reduction to flat permits the current 100-share residual instead of
+reusing the earlier staged 50. Cancellation confirmation and the existing
+acknowledgement-time freshness, session and refusal checks remain required.
+
+The session-refusal amendment is separate: `outside_allowed_session` is now
+`session_closed`, not definitive. The no-HTTP transport bridge preserves its
+known, value-free name independently of whether its lifetime is permanent or
+session-scoped. Only a validated controller window with `market_open is True`
+and at least one second before its close releases this refusal. The runner
+supplies that window to the strategy; recovery supplies the same explicit
+window at its exit gate. Reopened legacy records carrying the earlier
+definitive classification follow the same rule. No manual reconciliation is
+needed, and other definitive or integrity-loss refusals retain their gates.
+
+Fail-first evidence is retained in
+`evidence/artifacts/adaptive-paper-committed-exit-priority-20261015/fold1/`.
+Nine new test methods produced 29 assertion failures at the reviewed parent,
+with no errors or skips. These cover all five ruled pricing sequences at
+0/100 bps, residual growth during cancellation, basis replay without a new
+signal, next-session strategy exit, and next-session recovery including a
+legacy journal. The corrected focused run passes 16 methods, including the
+seven initial cases. The bounded regression run passes 585 tests: 217 core,
+159 transport/stream, 202 policy/extended/corporate-action and seven native
+integration tests, with no failures/errors/skips. The same 14 temporary-directory
+ResourceWarnings remain disclosed.
+
+The cheap GPT P3 is folded: `tests/test_shared_runner_review_citations.py`
+permanently guards the four name-only review-reference collections and the
+helper citation. Synthetic negative controls reject reintroduced digest/
+content-binding fields and digests disguised as names; no unpublished values
+are embedded in fixtures. Adjacent rejection/accounting/mover diagnostics,
+unversioned source comments and historical host-local locators remain separate
+follow-ups in the PR body.
+
+The mechanism references are the reviewed, published parent:
+[strength-to-action coupling](https://github.com/native-agent-stack/native-agent-stack/blob/93f34f01057a9eb68dc07d098a8c3755670959a0/blueprints/us-equities/adaptive-paper/native_strategy.py#L1121),
+[price/basis replacement gate](https://github.com/native-agent-stack/native-agent-stack/blob/93f34f01057a9eb68dc07d098a8c3755670959a0/blueprints/us-equities/adaptive-paper/native_strategy.py#L1388),
+[refusal lifetime](https://github.com/native-agent-stack/native-agent-stack/blob/93f34f01057a9eb68dc07d098a8c3755670959a0/blueprints/us-equities/adaptive-paper/safety.py#L1114),
+[the existing window-admission condition](https://github.com/native-agent-stack/native-agent-stack/blob/93f34f01057a9eb68dc07d098a8c3755670959a0/blueprints/us-equities/adaptive-paper/safety.py#L1224),
+and [the typed no-HTTP bridge](https://github.com/native-agent-stack/native-agent-stack/blob/93f34f01057a9eb68dc07d098a8c3755670959a0/blueprints/us-equities/adaptive-paper/transport.py#L140).
+The policy ruling is `ruling-cc-20261015T1717Z-pr1170-pricing-basis.md`; read
+records are `MICRO-full-93f34f01.md` and `GPT-VERDICT-93f34f010.md`, all cited
+by name only. No unpublished review/helper digest is bound.

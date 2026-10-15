@@ -13273,8 +13273,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/exits.py",
-      "sha256": "de417b6d055fca1062dae9a6809cf1fe2ce255dca068b78d233eb3ff57e18b91",
-      "bytes": 10528
+      "sha256": "a47163dd246a8fff7d87d77287e4d7e31d04dbc1707b6b607186d3d8624a286e",
+      "bytes": 10679
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/exploration.py",
@@ -13488,8 +13488,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native_strategy.py",
-      "sha256": "a3fdc6e598fcddd6455d4d2feb1cc929e7c052f99d132216bae5ade3347fd81b",
-      "bytes": 95764
+      "sha256": "07d60a28e038e56b872d9a8ff98eaaad57d6c618f42e0ccf70c9c051f4fbac68",
+      "bytes": 97055
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/receipt.json",
@@ -13528,8 +13528,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/recovery.py",
-      "sha256": "43f8176a01a321e976e527e10d2b29b82258e718de85a3239bd37430a40fecbc",
-      "bytes": 22226
+      "sha256": "505ea38c60994234b322aa007f7238536ab84eb61d339b59e63d9f026f90d993",
+      "bytes": 22382
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/registry.json",
@@ -13548,8 +13548,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "95168de280292c141071d79731b0130d271776e6677662c1538555e4f71f8cac",
-      "bytes": 176316
+      "sha256": "2bff539543b39f0397fdfb6c2a43e3333191494d748cca8f2cd45a88212bceac",
+      "bytes": 176424
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runtime_lock.py",
@@ -13558,8 +13558,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/safety.py",
-      "sha256": "140856337a13721c852c2c6bd30a2066712c46e3282273f2685ae54dcf6b781b",
-      "bytes": 113076
+      "sha256": "54d415895147d8d540a5dcf8470fe60cfc0d97524a4f38d69bcbe56ed6951e2a",
+      "bytes": 114163
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/scheduled_trial.sh",
@@ -13583,8 +13583,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "5b8641e59bd88f41eb9c62d4df8e7e37dee9943314d87a4158ee8d7424244d9c",
-      "bytes": 10954
+      "sha256": "b19b4ff7b921ff00ea49c57992a017f373553c14e64d6ae6f0bc7e2e92716ff9",
+      "bytes": 11072
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/start_readiness.py",
@@ -13603,8 +13603,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/transport.py",
-      "sha256": "170309e0f32d5e1274546d6ff0c1dedb4cbd204c8efc0d48e9bf9edec3a3d702",
-      "bytes": 112770
+      "sha256": "b4675ecf047d777ccd7303d77ccdcc5aa0155557781337ccfe19f6126049a9ef",
+      "bytes": 112828
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/README.md",
@@ -19223,8 +19223,8 @@
     },
     {
       "path": "docs/decisions/2026-10-13-adaptive-paper-sell-chunks.md",
-      "sha256": "279c9dfd466016c5620a5ae0f601996bac039e46bbcd5f178341f84ea615c220",
-      "bytes": 50260
+      "sha256": "239377d5542174718cb2e3bce18844a8eea2b5d84a31692e739643109f918a16",
+      "bytes": 50731
     },
     {
       "path": "docs/decisions/2026-10-13-claude-agent-drift-check.md",
@@ -19298,8 +19298,8 @@
     },
     {
       "path": "docs/decisions/2026-10-15-shared-runner-committed-exit-priority.md",
-      "sha256": "c08c39eb34ab21abccb62bceae8e3fbccd13c86d6063acbbc26027c613a6e7f3",
-      "bytes": 9036
+      "sha256": "ef9d776ed0a11b0690615d16a24bcc5f8c0ea55375f077df1ea70c5e7beec548",
+      "bytes": 14506
     },
     {
       "path": "docs/decisions/2026-10-15-unrun-registration-rules.md",
@@ -19950,6 +19950,41 @@
       "path": "evidence/artifacts/actionlint-successor-swap-20260928/receipt.json",
       "sha256": "a722aabd25d7d46f1779563ec67c012c36d4e983985014f0d913841923141b56",
       "bytes": 40237
+    },
+    {
+      "path": "evidence/artifacts/adaptive-paper-committed-exit-priority-20261015/fold1/green-focused.txt",
+      "sha256": "66f04841dfb9048c500f88d37ef3f28d9ac9f753e3be8883031aef222fb72e60",
+      "bytes": 3186
+    },
+    {
+      "path": "evidence/artifacts/adaptive-paper-committed-exit-priority-20261015/fold1/receipt.json",
+      "sha256": "a85424e92269af2cdc9fb0950b473e36180d44ab830c40441454479ffe1d8382",
+      "bytes": 4127
+    },
+    {
+      "path": "evidence/artifacts/adaptive-paper-committed-exit-priority-20261015/fold1/red-final-parent-replay.txt",
+      "sha256": "f6f183e312a64b361a91045ea548b5b7d5295aead3116ccfbd6abc336458f096",
+      "bytes": 32925
+    },
+    {
+      "path": "evidence/artifacts/adaptive-paper-committed-exit-priority-20261015/fold1/red-next-session-recovery.txt",
+      "sha256": "cf212a6c341ebe2275a9fda87e4e3a9ee7368d57b6d4bb037a3c67e277e48c63",
+      "bytes": 2109
+    },
+    {
+      "path": "evidence/artifacts/adaptive-paper-committed-exit-priority-20261015/fold1/red-pricing-and-strategy.txt",
+      "sha256": "7bbcf57f7029f276c51e97f99c86681a99c0fdfa771b424a52a432a0afcb65a7",
+      "bytes": 26932
+    },
+    {
+      "path": "evidence/artifacts/adaptive-paper-committed-exit-priority-20261015/fold1/red-residual-and-replay.txt",
+      "sha256": "002c48be5777fd9656237a3f74ef427723b2626a62441474798b685758a9bf69",
+      "bytes": 3973
+    },
+    {
+      "path": "evidence/artifacts/adaptive-paper-committed-exit-priority-20261015/fold1/runtime-tests.json",
+      "sha256": "951a7b0a85354bb3d84755e9fc275ab1c9c559024da3cb1191150198ae2b0209",
+      "bytes": 4437
     },
     {
       "path": "evidence/artifacts/adaptive-paper-committed-exit-priority-20261015/green-tests.txt",
@@ -63078,8 +63113,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_exit_priority.py",
-      "sha256": "3b62be3042e2c5c57de5dfdc1f193bd81b70318cb971934f512663a3657ab8ed",
-      "bytes": 8678
+      "sha256": "aeaa769d18c0742e73c796e79ce9e64d520b88a8164ed6c1c59eaa27b74e312b",
+      "bytes": 26024
     },
     {
       "path": "tests/test_adaptive_paper_exit_quote_age.py",
@@ -63173,8 +63208,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_recovery.py",
-      "sha256": "7a65e2f879f3e68aa63c31d62d5311169eff6c9f226a67be194a1404881a9e7b",
-      "bytes": 63453
+      "sha256": "ebf43f63804a432a80efdb51a3099ae899ae3fdbc6767a122389c9a10d60d2de",
+      "bytes": 66574
     },
     {
       "path": "tests/test_adaptive_paper_runner.py",
@@ -63193,8 +63228,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_sell_chunks.py",
-      "sha256": "319f2c93eab3aa54eb418963d3de33f73ee0ea8feb8c22fe2a078bdd9b08bbe3",
-      "bytes": 71909
+      "sha256": "cd77ec40fdf40b78de26b948a55c433d380fd13bd1c7be87b3450e7b08a91de6",
+      "bytes": 72655
     },
     {
       "path": "tests/test_adaptive_paper_sessions.py",
@@ -64560,6 +64595,11 @@
       "path": "tests/test_session_relaunch.py",
       "sha256": "2aa1ab7ae5f7bb09e6e959a0ead24ba2bcc5e63739d28c8986f23e6a98d98c30",
       "bytes": 43014
+    },
+    {
+      "path": "tests/test_shared_runner_review_citations.py",
+      "sha256": "520bdda3ec3d7cec8b51f6e0e22c145ba9f31bd438df9d83d7c99f873aa8d717",
+      "bytes": 3198
     },
     {
       "path": "tests/test_shell_parser_ci.py",

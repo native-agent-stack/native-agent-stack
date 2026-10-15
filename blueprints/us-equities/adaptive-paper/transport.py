@@ -23,7 +23,7 @@ from xml.etree import ElementTree
 from zoneinfo import ZoneInfo
 
 from feeds import DATA_FEEDS, is_qualified_feed
-from safety import EXIT_NOT_SENT_PREFIX, PERMANENT_EXIT_LOCAL_REFUSALS, SafetyError, exit_retry_seconds
+from safety import EXIT_NOT_SENT_PREFIX, NAMED_EXIT_LOCAL_REFUSALS, SafetyError, exit_retry_seconds
 
 SDK_VERSION = "0.44.0"
 SDK_COMMIT = "cc4cb3b7ba50ae250e621983c2779047fb16bb28"
@@ -143,9 +143,10 @@ class SubmissionNotSent(TransportError):
 
     def __init__(self, message, *, refusal_code=None, retry_after=0):
         super().__init__(message)
-        # Keep only known value-free permanent codes across the privacy boundary.
+        # Keep only known value-free local codes across the privacy boundary.
+        # Their lifetime (permanent or session-scoped) belongs to the ledger.
         code = message if refusal_code is None else refusal_code
-        self.refusal_code = code if isinstance(code, str) and code in PERMANENT_EXIT_LOCAL_REFUSALS else None
+        self.refusal_code = code if isinstance(code, str) and code in NAMED_EXIT_LOCAL_REFUSALS else None
         self.retry_after = exit_retry_seconds(retry_after)
 
 
@@ -154,9 +155,9 @@ def exit_not_sent_reason(error):
     if getattr(error, "not_sent", False) is not True:
         raise TypeError("exit_not_sent_reason requires pre-wire not_sent proof")
     code = getattr(error, "refusal_code", None)
-    if code is None and str(error) in PERMANENT_EXIT_LOCAL_REFUSALS:
+    if code is None and str(error) in NAMED_EXIT_LOCAL_REFUSALS:
         code = str(error)
-    reason = EXIT_NOT_SENT_PREFIX + (code if isinstance(code, str) and code in PERMANENT_EXIT_LOCAL_REFUSALS else "temporary")
+    reason = EXIT_NOT_SENT_PREFIX + (code if isinstance(code, str) and code in NAMED_EXIT_LOCAL_REFUSALS else "temporary")
     wait = exit_retry_seconds(getattr(error, "retry_after", 0))
     return reason + (f":retry_after={wait}" if wait else "")
 

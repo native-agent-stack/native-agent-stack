@@ -868,6 +868,67 @@ class RecoveryTests(unittest.TestCase):
         self.assertIn("outside_allowed_session", result["errors"])
         self.assertEqual(self.port.submissions, [])
 
+    def close_refusal_then_next_session(self, *, legacy=False):
+        from datetime import datetime, timezone
+        from transport import SubmissionNotSent
+        close = datetime(2026, 10, 13, 20, tzinfo=timezone.utc).timestamp()
+        next_open = datetime(2026, 10, 14, 13, 30, tzinfo=timezone.utc).timestamp()
+        clock = [close - 1.5]
+        self.ledger.close()
+        self.ledger = Ledger(Path(self.temp.name) / 'session.sqlite', RiskLimits(cleanup_seconds=3))
+        self.controller = Controller(self.ledger)
+        self.controller.clock = lambda: clock[0]
+        self.controller.close = close
+        self.start = close - 600
+        self.ledger.start_trial(self.start)
+
+        class CloseBeforeWire(FakePort):
+            async def submit(port, payload):
+                clock[0] = close - .5
+                try:
+                    return await super().submit(payload)
+                except SafetyError as error:
+                    if str(error) == 'outside_allowed_session':
+                        raise SubmissionNotSent(str(error)) from None
+                    raise
+
+        self.port = self.controller.port = CloseBeforeWire(self.controller)
+        with patch.object(time, 'time_ns', side_effect=lambda: int(clock[0] * 1e9)):
+            self.original_buy(observed=True)
+            first = self.recover()
+            self.assertFalse(first['flat'])
+            self.assertEqual(self.port.submissions, [])
+            refusal = self.ledger.exit_state('SPY')['refusal']
+            self.assertIn('outside_allowed_session', refusal['reason'])
+            if legacy:
+                state = self.ledger.exit_state('SPY')
+                state['refusal']['classification'] = 'definitive'
+                self.ledger.record_exit_state('SPY', state, transition='fixture_legacy_session_refusal')
+            # Reopen the durable journal and replace the stopped transport, as
+            # a next-session recovery invocation does. No reconciliation reset.
+            path, limits = self.ledger.path, self.ledger.limits
+            self.ledger.close()
+            self.ledger = Ledger(path, limits)
+            self.controller.ledger = self.ledger
+            old = self.port
+            self.port = self.controller.port = FakePort(self.controller)
+            self.port.rows, self.port.qty, self.port.cash = old.rows, old.qty, old.cash
+            clock[0] = next_open
+            self.controller.close = next_open + 6.5 * 3600
+            with patch.object(self.ledger, 'reconcile_exit_refusal',
+                              side_effect=AssertionError('must not need a manual reconcile')):
+                second = self.recover()
+        self.assertEqual(second['errors'], [])
+        self.assertTrue(second['flat'])
+        self.assertEqual(len(self.port.submissions), 1)
+        self.assertNotIn('refusal', self.ledger.exit_state('SPY'))
+
+    def test_close_refusal_rearms_next_session_recovery(self):
+        self.close_refusal_then_next_session()
+
+    def test_legacy_closed_session_refusal_rearms_after_journal_reopen(self):
+        self.close_refusal_then_next_session(legacy=True)
+
     def test_cleanup_client_id_advances_past_prior_durable_cleanup(self):
         self.original_buy(observed=True)
         cid = "rec-fault-test-0000042"

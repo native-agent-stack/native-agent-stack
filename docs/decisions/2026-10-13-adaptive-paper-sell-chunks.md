@@ -268,9 +268,13 @@ retryable; only known value-free permanent local codes cross the guard as
 such. Entry reasons, admission, dropped-entry behavior and re-decision are
 unchanged.
 
-The final CC amendment supersedes the earlier provisional permanent cap list.
-Only `global_stop_latched` and `outside_allowed_session` are named permanent
-pre-wire local reasons. Entry quantity/notional ceilings do not refuse an
+The then-current CC amendment superseded the earlier provisional permanent cap list.
+The closed-session lifetime stated in this dated amendment is superseded by
+the [#1170 pricing-basis and session-rearm fold](2026-10-15-shared-runner-committed-exit-priority.md#pricing-basis-and-session-rearm-fold):
+`outside_allowed_session` is session-scoped and re-arms on a validated open
+window, including legacy records. It no longer requires manual reconciliation.
+That amendment named `global_stop_latched` and `outside_allowed_session` as
+permanent pre-wire local reasons. Entry quantity/notional ceilings do not refuse an
 ownership-bounded sell: the ledger first proves owned quantity net of pending
 sells and records any over-entry-cap reduction. The oversell check remains.
 The existing shared adaptive/recovery helper still chunks deterministically
@@ -324,8 +328,9 @@ Transient causes now pace attempts indefinitely, never changing classification
 by count. The journal stores `retry_at = now + max(5, known_wait_seconds)`.
 The controller passes its actual durable-budget wait as numeric metadata; the
 final HTTP guard preserves only the finite nonnegative duration through the
-privacy-safe native reason. Raw errors remain sanitized. STOP, closed session
-and refusals without no-HTTP proof retain definitive behavior. Entries retain
+privacy-safe native reason. Raw errors remain sanitized. In this dated round,
+STOP, closed session and refusals without no-HTTP proof retained definitive
+behavior; the later #1170 fold supersedes the closed-session lifetime. Entries retain
 their rejection/drop path.
 
 After three consecutive transient refusals the journal emits `needs_attention`

@@ -93,6 +93,8 @@ REASON_PRICE_RULE = {
 # even when both target zero. Force exits precede the corporate-action and gap
 # guards (corporate_actions.py); neither a weaker signal nor a tighter quantity
 # target may downgrade that protection. Unknown reasons rank below known ones.
+# This order never selects an order label or price_rule; the strategy tracks
+# the current pricing basis separately from this durable strength reason.
 EXIT_REASON_STRENGTH = {
     "rebalance": 0,
     "portfolio_rotation": 1,

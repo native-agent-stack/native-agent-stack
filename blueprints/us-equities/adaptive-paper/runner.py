@@ -1791,6 +1791,7 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
     strategy = AdaptiveStrategy(policy, controller.ledger, trial_id,
                                 event_sink=controller.events.append, transport=controller.port,
                                 session_policy=session_policy,
+                                exit_session_window=lambda now: (controller.market_open, controller.close),
                                 account_multiplier=config.get("_account_multiplier"),
                                 halted=controller.is_halted,
                                 corporate_action_guard=_corporate_action_guard_for_strategy(

@@ -1,0 +1,41 @@
+test_close_refusal_rearms_next_session_recovery (tests.test_adaptive_paper_recovery.RecoveryTests.test_close_refusal_rearms_next_session_recovery) ... FAIL
+test_legacy_closed_session_refusal_rearms_after_journal_reopen (tests.test_adaptive_paper_recovery.RecoveryTests.test_legacy_closed_session_refusal_rearms_after_journal_reopen) ... FAIL
+
+======================================================================
+FAIL: test_close_refusal_rearms_next_session_recovery (tests.test_adaptive_paper_recovery.RecoveryTests.test_close_refusal_rearms_next_session_recovery)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_recovery.py", line 927, in test_close_refusal_rearms_next_session_recovery
+    self.close_refusal_then_next_session()
+  File "<checkout>/tests/test_adaptive_paper_recovery.py", line 921, in close_refusal_then_next_session
+    self.assertEqual(second['errors'], [])
+AssertionError: Lists differ: ['SafetyError'] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+'SafetyError'
+
+- ['SafetyError']
++ []
+
+======================================================================
+FAIL: test_legacy_closed_session_refusal_rearms_after_journal_reopen (tests.test_adaptive_paper_recovery.RecoveryTests.test_legacy_closed_session_refusal_rearms_after_journal_reopen)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_recovery.py", line 930, in test_legacy_closed_session_refusal_rearms_after_journal_reopen
+    self.close_refusal_then_next_session(legacy=True)
+  File "<checkout>/tests/test_adaptive_paper_recovery.py", line 921, in close_refusal_then_next_session
+    self.assertEqual(second['errors'], [])
+AssertionError: Lists differ: ['SafetyError'] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+'SafetyError'
+
+- ['SafetyError']
++ []
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.304s
+
+FAILED (failures=2)

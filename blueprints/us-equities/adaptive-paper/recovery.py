@@ -305,7 +305,9 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
                 ledger.record_exit_state(symbol, exit_state, transition="explicit_recovery_full_exit")
             # Shared whole-share rule: only a one-share owned reduction can exceed
             # the notional cap, and reserve_intent logs that exception durably.
-            if not ledger.exit_retry_allowed(symbol, controller.clock()):
+            if not ledger.exit_retry_allowed(symbol, controller.clock(),
+                                            market_open=controller.market_open,
+                                            session_close=controller.close):
                 refusal = ledger.exit_state(symbol)["refusal"]
                 raise SafetyError("recovery_exit_refused:" + refusal["classification"] + ":" + refusal["reason"])
             quantity = ledger.owned_exit_quantity(position.qty, position.qty, price, bid)

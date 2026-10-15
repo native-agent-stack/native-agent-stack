@@ -25,7 +25,8 @@ class AdaptiveStrategy(Strategy):
 
     def __init__(self, policy: AdaptivePolicy, ledger, trial_id: str, *, event_sink=None,
                   transport=None, stop_file=None, clock=time.time, account_multiplier=None, halted=None,
-                  corporate_action_guard=None, exit_session_at=None, session_policy=None):
+                  corporate_action_guard=None, exit_session_at=None, session_policy=None,
+                  exit_session_window=None):
         self.policy = policy
         self.ledger = ledger
         self.trial_id = trial_id
@@ -37,6 +38,7 @@ class AdaptiveStrategy(Strategy):
         if exit_session_at is None and (session_policy or {}).get("extended_hours", False):
             exit_session_at = lambda now: session_at(datetime.fromtimestamp(now, timezone.utc)).kind
         self._exit_session_at = exit_session_at
+        self._exit_session_window = exit_session_window
         self._exit_pending_attention = {}
         self._exit_attention_next = None
         # E4: a symbol halted, paused or quotation-only per the status stream or an
@@ -900,6 +902,16 @@ class AdaptiveStrategy(Strategy):
             bid=quote.bid if quote else None, ask=quote.ask if quote else None,
         ), self.policy.config)
 
+    def _exit_retry_allowed(self, symbol, now):
+        if not hasattr(self.ledger, "exit_retry_allowed"):
+            return True
+        window = getattr(self, "_exit_session_window", None)
+        if window is None:
+            return self.ledger.exit_retry_allowed(symbol, now)
+        market_open, close = window(now)
+        return self.ledger.exit_retry_allowed(symbol, now,
+            market_open=market_open, session_close=close)
+
     def _flag_exit_position(self, symbol, decision):
         if self._exit_attention_next is not None:
             self._exit_attention_next[symbol] = decision.reason
@@ -1115,6 +1127,7 @@ class AdaptiveStrategy(Strategy):
         # Commit the original target, not a fraction of each successive remainder.
         # Durable held quantities include fills; outstanding orders remain serialized
         # by busy below. Replay loads the same target/refusal state from the journal.
+        action_bases = {}
         if hasattr(self.ledger, "exit_state"):
             proposed = {s: (q, r) for s, side, q, r in actions if side == "sell"}
             continued = []
@@ -1125,6 +1138,7 @@ class AdaptiveStrategy(Strategy):
                 state = self.ledger.exit_state(s)
                 if s in proposed:
                     reduction, reason = proposed[s]
+                    pricing_reason = reason
                     # A repeated fractional exit keeps its original target until
                     # the ledger re-arms it on a confirmed scale-in after completion.
                     # An absolute allocation cut can strengthen the same reason.
@@ -1133,17 +1147,28 @@ class AdaptiveStrategy(Strategy):
                     if not repeated_partial:
                         target = max(Decimal(0), qty - reduction)
                         if state.get("reason") and not state.get("completed"):
-                            # Quantity and urgency strengthen independently. A
-                            # full TP and stop both target zero, but the stop's
-                            # price rule must still reach cancel-then-replace.
+                            # This reason records commitment strength only.
+                            # Pricing follows this tick's exit independently.
                             target = min(target, Decimal(state["target"]))
                             reason = stronger_exit_reason(state["reason"], reason)
                         if (not state.get("reason") or state.get("completed")
                                 or target != Decimal(state["target"]) or reason != state["reason"]):
                             state.update(target=str(target), reason=reason, completed=False)
                             self.ledger.record_exit_state(s, state, transition="commit_reduction")
+                    pricing = {"reason": pricing_reason,
+                               "price_rule": ("limit" if getattr(self.policy, "exit_session", "RTH")
+                                              in {"PRE", "POST"} else
+                                              REASON_PRICE_RULE.get(pricing_reason, "market"))}
+                    if state.get("pricing") != pricing:
+                        state["pricing"] = pricing
+                        self.ledger.record_exit_state(s, state, transition="exit_pricing_basis")
                 if state.get("reason") and not state.get("completed") and qty > Decimal(state["target"]):
-                    continued.append((s, "sell", qty - Decimal(state["target"]), state["reason"]))
+                    # No newly proposed exit keeps the last recorded basis,
+                    # including across restart. Legacy commitments without one
+                    # use an explicit neutral label, never the strength reason.
+                    pricing = state.get("pricing", {"reason": "committed_exit", "price_rule": "market"})
+                    action_bases[s] = pricing["price_rule"]
+                    continued.append((s, "sell", qty - Decimal(state["target"]), pricing["reason"]))
                 elif state.get("reason") and not state.get("completed"):
                     state["completed"] = True
                     self.ledger.record_exit_state(s, state, transition="target_reached")
@@ -1157,8 +1182,7 @@ class AdaptiveStrategy(Strategy):
                                  and self.ledger.exit_state(s).get("reason")
                                  and not self.ledger.exit_state(s).get("completed"))]
         for symbol, side, quantity, reason in actions:
-            if side == "sell" and hasattr(self.ledger, "exit_retry_allowed") \
-                    and not self.ledger.exit_retry_allowed(symbol, now):
+            if side == "sell" and not self._exit_retry_allowed(symbol, now):
                 refusal = self.ledger.exit_state(symbol)["refusal"]
                 self._flag_exit_position(symbol, ExitDecision(
                     "exit_refused:" + refusal["classification"] + ":" + refusal["reason"],
@@ -1222,7 +1246,8 @@ class AdaptiveStrategy(Strategy):
                     # broker, or even before it was known whether the
                     # eventual replacement would itself be refused (stale
                     # quote, cap, reject).
-                    self.replace_exit(symbol, now, quantity, reason)
+                    self.replace_exit(symbol, now, quantity, reason,
+                                      price_rule=action_bases.get(symbol))
                 continue
             price_str = (session_exit.limit_price if session_exit is not None
                          and session_exit.price_rule == "limit" else
@@ -1254,7 +1279,7 @@ class AdaptiveStrategy(Strategy):
                 # replace_exit's docstring).
                 self.pending[client_id]["price_rule"] = (session_exit.price_rule
                     if session_exit is not None and session_exit.price_rule == "limit"
-                    else REASON_PRICE_RULE.get(reason, "market"))
+                    else action_bases.get(symbol, REASON_PRICE_RULE.get(reason, "market")))
                 self.pending[client_id]["price"] = price_str
             busy.add(symbol)
             if side == "sell":
@@ -1280,7 +1305,7 @@ class AdaptiveStrategy(Strategy):
                 return client_id
         return None
 
-    def replace_exit(self, symbol, now, quantity, reason):
+    def replace_exit(self, symbol, now, quantity, reason, *, price_rule=None):
         """Cancel-then-replace `symbol`'s resting exit order (deliverable 2).
 
         native_adapter.py rejects order modify (see its `_modify_order`),
@@ -1387,7 +1412,7 @@ class AdaptiveStrategy(Strategy):
         resting = self.pending[client_id]
         price_rule = (session_exit.price_rule if session_exit is not None
                       and session_exit.price_rule == "limit" else
-                      REASON_PRICE_RULE.get(reason, "market"))
+                      price_rule if price_rule is not None else REASON_PRICE_RULE.get(reason, "market"))
         old_price_rule = resting.get("price_rule", "market")
         quote = self.policy.latest.get(symbol)
         price_changed = False
@@ -1449,16 +1474,15 @@ class AdaptiveStrategy(Strategy):
         removed as dead/write-only."""
         symbol = replacement["symbol"]
         self._exit_replace_busy.discard(symbol)
-        # A stronger signal can arrive while cancellation is outstanding.
-        # Refresh the staged reason before the acknowledgement-time guards and
-        # submission; the old stage must not restore a weaker price rule.
+        # Another basis can arrive while cancellation is outstanding. Strength
+        # never selects a price rule: refresh from the last priced exit instead.
+        pricing = None
         if hasattr(self.ledger, "exit_state"):
             state = self.ledger.exit_state(symbol)
             if state.get("reason") and not state.get("completed"):
-                reason = stronger_exit_reason(replacement["reason"], state["reason"])
-                if reason != replacement["reason"]:
-                    replacement = {**replacement, "reason": reason,
-                                   "price_rule": REASON_PRICE_RULE.get(reason, "market")}
+                pricing = state.get("pricing")
+                if pricing is not None:
+                    replacement = {**replacement, **pricing}
         quote = self.policy.latest.get(symbol)
         max_age = sell_quote_age_seconds(self.policy.config)
         session_exit = self._session_exit_decision(symbol, now, replacement["reason"])
@@ -1496,10 +1520,10 @@ class AdaptiveStrategy(Strategy):
                      limit_price(quote.bid, quote.ask, "sell"))
         price_rule = (session_exit.price_rule if session_exit is not None
                       and session_exit.price_rule == "limit" else
-                      REASON_PRICE_RULE.get(reason, "market") if session_exit is not None
+                      REASON_PRICE_RULE.get(reason, "market") if session_exit is not None and pricing is None
                       else replacement["price_rule"])
         remaining = self.ledger.positions().get(symbol)
-        if hasattr(self.ledger, "exit_retry_allowed") and not self.ledger.exit_retry_allowed(symbol, now):
+        if not self._exit_retry_allowed(symbol, now):
             refusal = self.ledger.exit_state(symbol)["refusal"]
             self._flag_exit_position(symbol, ExitDecision(
                 "exit_refused:" + refusal["classification"] + ":" + refusal["reason"],
@@ -1509,7 +1533,7 @@ class AdaptiveStrategy(Strategy):
         if hasattr(self.ledger, "exit_state"):
             state = self.ledger.exit_state(symbol)
             if state.get("reason") and remaining:
-                quantity = min(Decimal(str(quantity)), max(Decimal(0), remaining.qty - Decimal(state["target"])))
+                quantity = max(Decimal(0), remaining.qty - Decimal(state["target"]))
         order_quantity = self._sell_chunk(symbol, quantity, price_str, quote.bid)
         if order_quantity <= 0:
             self._flag_unrepresentable_sell(symbol)

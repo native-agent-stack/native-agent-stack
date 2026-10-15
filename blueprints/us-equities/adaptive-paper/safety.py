@@ -44,9 +44,10 @@ DEFINITIVE_REFUSAL_STATUSES = (401, 403, 404)
 EXIT_NOT_SENT_PREFIX = "exit_submission_not_sent:"
 PERMANENT_EXIT_LOCAL_REFUSALS = frozenset({
     "global_stop_latched",                    # host STOP latch
-    "outside_allowed_session",               # closed session
     "recovery_observation_integrity_lost",    # permanent for this observation session
 })
+SESSION_EXIT_LOCAL_REFUSALS = frozenset({"outside_allowed_session"})
+NAMED_EXIT_LOCAL_REFUSALS = PERMANENT_EXIT_LOCAL_REFUSALS | SESSION_EXIT_LOCAL_REFUSALS
 # Native OrderDeniedReason / OrderDeniedCode, nautilus_trader 1b0a49d2.
 # The publisher defines these as local, never-venue denials. Only the leading
 # code is canonical; diagnostic suffixes must not control policy.
@@ -105,7 +106,7 @@ DEFINITIVE_EXIT_REFUSALS = PERMANENT_EXIT_LOCAL_REFUSALS | frozenset({
 TRANSIENT_EXIT_REFUSALS = frozenset({
     "quote_stale", "quote_not_fresh", "outstanding_order_cap_reached", "submission_rate_exceeded",
     "submission_rate_deferred", "request_budget_wait_exceeded", "order_size_cap_exceeded",
-})
+}) | SESSION_EXIT_LOCAL_REFUSALS
 # The one 422 treated as a definitive refusal: Alpaca states that orders in excess
 # of the minimum price variance "will be rejected" and documents the body code
 # 42210000 with "sub-penny increment does not fulfill minimum pricing criteria".
@@ -1111,10 +1112,25 @@ class Ledger:
             state.pop(key, None)
         self.record_exit_state(symbol, state, transition="explicit_cancel:" + reason)
 
-    def exit_retry_allowed(self, symbol, now):
-        refusal = self.exit_state(symbol).get("refusal")
-        return not refusal or (refusal["classification"] == "transient"
-                               and now >= refusal["retry_at"])
+    def exit_retry_allowed(self, symbol, now, *, market_open=False, session_close=None):
+        with self._lock:
+            state = self.exit_state(symbol)
+            refusal = state.get("refusal")
+            if not refusal:
+                return True
+            code = refusal["reason"].removeprefix(EXIT_NOT_SENT_PREFIX).partition(":retry_after=")[0]
+            if code in SESSION_EXIT_LOCAL_REFUSALS:
+                # Use the caller's validated session window, not a calendar or
+                # arbitrary delay guessed by this ledger. Also re-arm journals
+                # written by the earlier definitive-refusal classification.
+                if (market_open is True and session_close is not None
+                        and instant(session_close) - instant(now) >= 1):
+                    state.pop("refusal")
+                    self.record_exit_state(symbol, state, transition="exit_session_reopened")
+                    return True
+                return False
+            return (refusal["classification"] == "transient"
+                    and now >= refusal["retry_at"])
 
     def record_exit_refusal(self, symbol, reason, now, *, reconcile_client_id=None, native_denied=False):
         # Only explicitly known contract/policy failures are definitive. Unknown
@@ -1143,6 +1159,8 @@ class Ledger:
                     pass
         if (pre_wire or native_denied) and local_reason == "recovery_observation_integrity_lost":
             classification = "integrity_lost"
+        elif local_reason in SESSION_EXIT_LOCAL_REFUSALS:
+            classification = "session_closed"
         elif local_reason in DEFINITIVE_EXIT_REFUSALS:
             classification = "definitive"
         elif pre_wire or reason in TRANSIENT_EXIT_REFUSALS:

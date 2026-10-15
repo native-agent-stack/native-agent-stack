@@ -820,7 +820,8 @@ class CommittedExitRegressions(unittest.TestCase):
     def test_owned_two_share_reduction_is_exempt_from_entry_size_caps(self):
         self.exercise_owned_cap_probe(2)
 
-    def permanent_http_guard(self, code, *, qty='1', price='100', symbol='AAPL', market_open=True):
+    def permanent_http_guard(self, code, *, qty='1', price='100', symbol='AAPL', market_open=True,
+                             classification='definitive'):
         import transport
         t = self.f
         def guard(kind, client_id=None):
@@ -842,7 +843,7 @@ class CommittedExitRegressions(unittest.TestCase):
             http.assert_not_called()
         self.assertEqual(caught.exception.refusal_code, code)
         state = t.ledger.record_exit_refusal('AAPL', transport.exit_not_sent_reason(caught.exception), t.clock[0])
-        self.assertEqual(state['classification'], 'definitive')
+        self.assertEqual(state['classification'], classification)
         self.assertFalse(t.ledger.exit_retry_allowed('AAPL', t.clock[0] + 100))
 
     def test_host_stop_latch_is_a_named_permanent_pre_wire_refusal(self):
@@ -858,8 +859,16 @@ class CommittedExitRegressions(unittest.TestCase):
         self.assertEqual(self.f.ledger.record_exit_refusal('SPY', 'order_size_cap_exceeded',
                          self.f.clock[0])['classification'], 'transient')
 
-    def test_closed_session_is_a_named_permanent_pre_wire_refusal(self):
-        self.permanent_http_guard('outside_allowed_session', market_open=False)
+    def test_closed_session_is_a_named_session_scoped_pre_wire_refusal(self):
+        self.permanent_http_guard('outside_allowed_session', market_open=False,
+                                  classification='session_closed')
+        t = self.f
+        self.assertFalse(t.ledger.exit_retry_allowed('AAPL', t.clock[0],
+                         market_open=False, session_close=t.clock[0] + 3600))
+        self.assertFalse(t.ledger.exit_retry_allowed('AAPL', t.clock[0],
+                         market_open=True, session_close=t.clock[0] + .5))
+        self.assertTrue(t.ledger.exit_retry_allowed('AAPL', t.clock[0],
+                        market_open=True, session_close=t.clock[0] + 3600))
 
     def test_any_unenumerated_submission_not_sent_remains_transient_after_many_refusals(self):
         import transport
@@ -925,12 +934,14 @@ class CommittedExitRegressions(unittest.TestCase):
         self.assertNotIn(str(cid), t.strategy.pending)
         self.assertEqual(t.ledger.exit_state('MSFT'), {})
 
-    def test_named_permanent_codes_survive_submission_not_sent_subclasses(self):
+    def test_named_local_codes_survive_submission_not_sent_subclasses(self):
         import transport
-        from safety import PERMANENT_EXIT_LOCAL_REFUSALS
+        from safety import NAMED_EXIT_LOCAL_REFUSALS, PERMANENT_EXIT_LOCAL_REFUSALS
         self.assertEqual(PERMANENT_EXIT_LOCAL_REFUSALS, {
+            'global_stop_latched', 'recovery_observation_integrity_lost'})
+        self.assertEqual(NAMED_EXIT_LOCAL_REFUSALS, {
             'global_stop_latched', 'outside_allowed_session', 'recovery_observation_integrity_lost'})
-        for code in PERMANENT_EXIT_LOCAL_REFUSALS:
+        for code in NAMED_EXIT_LOCAL_REFUSALS:
             with self.subTest(code=code):
                 error = transport.OrderContractRefused(code)
                 self.assertEqual(error.refusal_code, code)
