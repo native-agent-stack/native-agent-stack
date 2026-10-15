@@ -1,6 +1,6 @@
 # Scheduling (`scheduling-supervision`)
 
-Client 2.1.295, checked 2026-10-09. Index: [slots.md](slots.md).
+Client 2.1.300, checked 2026-10-15. Index: [slots.md](slots.md).
 
 ## scheduled-tasks
 
