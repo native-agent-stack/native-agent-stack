@@ -312,8 +312,9 @@ def _receipt_cell(receipt: dict) -> str:
         return esc(receipt["reason"])
     if receipt["status"] != "present":
         return f'Pending: {_record(receipt)}; ready when {esc(receipt["trigger"])}.'
-    date = f' <small>{esc(receipt["date"])}' + (f', newest of {receipt["count"]} registered' if receipt["count"] > 1 else "") + "</small>" if receipt.get("date") else ""
-    return f'<code>{esc(receipt["path"])}</code>{date}'
+    # The page reads the receipt's registry row, never the receipt itself, so the cell says it is a reference.
+    date = (esc(receipt["date"]) + (f', newest of {receipt["count"]} registered' if receipt["count"] > 1 else "") + "; ") if receipt.get("date") else ""
+    return f'<code>{esc(receipt["path"])}</code> <small>{date}registry reference, not opened</small>'
 
 
 def workers(data: dict) -> str:
@@ -389,7 +390,7 @@ def repos(data: dict) -> str:
 
 def evidence(data: dict) -> str:
     result = data["evidence"]
-    status = {"present": "read", "pending": "pending", "unreadable": "unreadable"}
+    status = {"present": "read", "pending": "pending", "unreadable": "unreadable", "registered": "registry reference, not opened"}
     repository = "".join(f'<li><code>{esc(row["path"])}</code> <small>{esc(status.get(row["status"], row["status"]))}</small></li>' for row in result["repository"])
     private = "".join(f'<li><code>{esc(row["name"])}</code> <small>' + (f'{esc(row["label"])} arms, ' if row.get("label") else "")
                       + f'{esc(status.get(row["status"], row["status"]))}</small></li>' for row in result["private"])

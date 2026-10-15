@@ -560,8 +560,13 @@ def strategies(sources: dict) -> dict:
 
 
 def _receipt_date(path: str) -> str | None:
-    match = re.search(r"(20\d{2})(\d{2})(\d{2})(?!\d)", PurePosixPath(path).name)
-    return "-".join(match.groups()) if match else None
+    """The date a registered receipt's path carries: its file name's, else its nearest dated directory's
+    (evidence/artifacts/<name>-<date>/receipt.json)."""
+    for part in reversed(PurePosixPath(path).parts):
+        match = re.search(r"(20\d{2})(\d{2})(\d{2})(?!\d)", part)
+        if match:
+            return "-".join(match.groups())
+    return None
 
 
 def workers(document: dict, sources: dict, glance: dict) -> list[dict]:
@@ -847,7 +852,8 @@ def evidence(sources: dict, worker_rows: list[dict], glance: dict) -> dict:
                             "label": source["entry"].get("label") if source["entry"].get("study") else None})
     cited = sorted({row["receipt"]["path"] for row in worker_rows if (row.get("receipt") or {}).get("status") == "present" and row["receipt"].get("root") == "repo"})
     known = {row["path"] for row in repository}
-    repository += [{"path": path, "status": "present", "section": "workers"} for path in cited if path not in known]
+    # A worker's receipt is cited from its registry row; the page never opens the receipt itself.
+    repository += [{"path": path, "status": "registered", "section": "workers"} for path in cited if path not in known]
     pages = [{"page": band["page"], "title": band["title"]} for band in glance.get("bands") or []]
     studies = [study(sources, key) for key, source in sources.items() if source["entry"].get("study")]
     return {"repository": repository, "private": private, "pages": pages, "studies": studies}

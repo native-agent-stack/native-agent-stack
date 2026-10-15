@@ -254,6 +254,34 @@ class GeneratedFactsTests(OverviewCase):
         self.assertEqual(html.count("No state source yet"), 2)
         self.assertNotIn("index-20991231", html)  # an inventory is not an execution receipt
 
+    def test_a_receipt_dated_by_its_directory_is_ranked_by_that_date(self):
+        # The local review's P2 at e1f72b230: only the file name was searched, so evidence/artifacts/<name>-<date>/
+        # receipt.json had no date and ranked behind any older dated file name.
+        fixture = Fixture(self.base)
+        manifest = fixture.root / "manifests/evidence.json"
+        document = json.loads(manifest.read_text())
+        document["receipts"].append({"path": "evidence/artifacts/tool-a-run-20990401/receipt.json", "kind": "native_cli_e2e",
+                                     "component_ids": ["codex"]})
+        manifest.write_text(json.dumps(document))
+        rows = {row["name"]: row for row in DATA.model(fixture.root, fixture.state, commit="0" * 40)["workers"]}
+        self.assertEqual((rows["Codex"]["receipt"]["path"], rows["Codex"]["receipt"]["date"]),
+                         ("evidence/artifacts/tool-a-run-20990401/receipt.json", "2099-04-01"))
+
+    def test_a_receipt_cited_from_the_registry_is_never_said_to_be_read(self):
+        # The local review's P2 at e1f72b230: the page reads the registry row, not the receipt, so wherever the page
+        # renders that receipt it says it is a registry reference, never a read.
+        fixture = Fixture(self.base)
+        data = DATA.model(fixture.root, fixture.state, commit="0" * 40)["evidence"]
+        cited = next(row for row in data["repository"] if row["path"] == "evidence/receipts/tool-a-smoke-20990305.json")
+        self.assertEqual(cited["status"], "registered")
+        _, html = fixture.build(self.base)
+        receipt = "<code>evidence/receipts/tool-a-smoke-20990305.json</code> "
+        evidence = html[html.index('id="overview-evidence"'):]
+        self.assertIn(receipt + "<small>registry reference, not opened</small>", evidence)
+        self.assertNotIn(receipt + "<small>read</small>", evidence)
+        workers = html[html.index('id="ov-workers"'):html.index('id="ov-workers"') + 20000]
+        self.assertIn(receipt + "<small>2099-03-05, newest of 2 registered; registry reference, not opened</small>", workers)
+
 
 class PendingTests(OverviewCase):
     def test_missing_sources_render_pending_with_their_trigger_and_the_receipt_lists_them(self):
