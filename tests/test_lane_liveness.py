@@ -379,6 +379,18 @@ class LimitDetails(MonitorCase):
             f"session={SID} reset={RESET} blocked_for=600"])
         self.assertFalse([line for line in lines if line.startswith("[lanes] forged")])
 
+    def test_no_printed_field_can_split_a_line(self):
+        # The command center's FULL read of #1162 at ff43d609 (P3-3): the CC acts on these lines, so a newline in a
+        # session name or in waitingFor must not start a forged line in NEW, NEEDS-INPUT, GONE or any other report.
+        forged = chr(10) + "[lanes] 2026-10-15T10:30:00Z LIMIT-BLOCKED: forged"
+        waiting = dict(row(state="working", name="lane" + forged), status="waiting", waitingFor="input needed" + forged)
+        lines = self.run_monitor([[], [waiting], [waiting], []], Clock("2026-10-15T10:30:00Z"))
+        self.assertFalse([line for line in lines if line.startswith("[lanes] 2026-10-15T10:30:00Z LIMIT-BLOCKED: forged")],
+                         lines)
+        self.assertTrue(all(line.startswith("[lanes]") for line in lines), lines)
+        reports = [line.split(": ", 1)[0].rsplit(" ", 1)[-1] for line in lines if ": lane?" in line]
+        self.assertEqual(reports, ["NEW", "NEEDS-INPUT", "GONE"], lines)
+
     def test_default_paths_under_home(self):
         home = self.tmp / "home"
         with mock.patch.dict(os.environ, {"HOME": str(home)}):

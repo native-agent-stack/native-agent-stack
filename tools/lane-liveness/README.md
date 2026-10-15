@@ -6,7 +6,7 @@ supported read of session state from outside Claude Code (agent-view docs, line 
 systemd user units. It prints one line per meaningful change and stays quiet on live lanes. The Monitor feeds each
 line to the session that armed it (tools reference, line 39).
 
-v2.2 is v2.1 (the host-only `lane_liveness_v2_1.py`, sha256 `43b8c9275e5c…`) with its reports unchanged, plus the
+v2.2 is v2.1 (the host-only `lane_liveness_v2_1.py`, cited by name: it is not in the repository) with its reports unchanged, plus the
 `LIMIT-BLOCKED` report described below. One v2.1 edge changed: a client reply that is not a JSON array now counts
 as unreadable, like invalid JSON. v2.1 stopped on `null` and reported every session `GONE` on a JSON object. The
 script makes no model call and sends nothing to any session.

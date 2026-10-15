@@ -77,8 +77,10 @@ def sessions(rows):
     for r in rows:
         if not isinstance(r, dict) or r.get("pid") is None:
             continue  # a finished background row with no process: not a live lane
-        key = (str(r.get("name") or "-"), str(r.get("kind")), str(r.get("pid")))
-        out[key] = (client_of(r.get("pid")), r.get("waitingFor") or None)
+        # Every printed field is one line (the command center's FULL read of #1162, P3-3): a control character in a
+        # name, a waitingFor or a client name cannot start a forged report line.
+        key = (one_line(r.get("name") or "-"), one_line(r.get("kind")), one_line(r.get("pid")))
+        out[key] = (one_line(client_of(r.get("pid"))), one_line(r.get("waitingFor")) if r.get("waitingFor") else None)
     return out
 
 
@@ -92,8 +94,13 @@ def units(patterns):
     for line in done.stdout.splitlines():
         parts = line.split()
         if len(parts) >= 4:
-            out[parts[0]] = f"{parts[2]}/{parts[3]}"  # ACTIVE/SUB
+            out[one_line(parts[0])] = one_line(f"{parts[2]}/{parts[3]}")  # ACTIVE/SUB
     return out
+
+
+def one_line(value):
+    """A printed field with its control characters replaced (CONTROL), so a report stays one line."""
+    return CONTROL.sub("?", str(value))
 
 
 def label(key):
