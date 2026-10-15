@@ -37,7 +37,10 @@ class SyncedPluginsRowTests(unittest.TestCase):
         if self.template_sets_off():
             self.skipTest("the template turns the sync off; the exception no longer applies")
         row = self.row()
-        self.assertEqual(row["disposition"], "defer-user")
+        # 2026-10-15T05:07Z: the keep decision was superseded; the sync stays on by default and each plugin is disabled.
+        self.assertEqual(row["disposition"], "default-on")
+        self.assertIn("superseded in part on 2026-10-15T05:07Z", (ROOT / DECISION).read_text(encoding="utf-8"))
+        self.assertIn("claude plugin disable <id> --scope user", (ROOT / DECISION).read_text(encoding="utf-8"))
         self.assertEqual(row["source"].rsplit(":", 1)[0], DECISION)
         decision = (ROOT / DECISION).read_text(encoding="utf-8")
         for plugin in json.loads(INVENTORY.read_text(encoding="utf-8"))["plugins"]:

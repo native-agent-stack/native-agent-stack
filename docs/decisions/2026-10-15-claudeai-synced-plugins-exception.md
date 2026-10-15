@@ -1,6 +1,6 @@
 # claude.ai synced plugins: an owner-synced exception to the pin policy (2026-10-15)
 
-**Status:** accepted by the command center, 2026-10-15T03:07Z. The command center is asking the owner whether to keep these plugins.
+**Status:** superseded in part on 2026-10-15T05:07Z. On the owner's direction of 2026-10-15 (01:05 ET, paraphrased by the command center: resolve the synced plugins cleanly with current practice), after the listing-cost measurement below, the command center disabled each of the four plugins with the native CLI, `claude plugin disable <id> --scope user`. That wrote `"<name>@synced": false` into `enabledPlugins` in user settings for bigdata-com, lseg, daloopa and cowork-plugin-management, and `claude plugin list` shows them disabled. The keep decision below is superseded. The sync itself stays on, because `syncClaudeAiPlugins` stays unset, so a plugin the account adds later still arrives and is caught by the trigger. Inverse: `claude plugin enable <id> --scope user`.
 
 **Corrects:** the `claude:setting:syncClaudeAiPlugins` row in `catalogs/foundation/upstream-surface-dispositions.json`. On 2026-10-04 that row said "off on both hosts". In fact the settings template has never set the key, and Claude Code honours only `false`, so the sync was on. The row is now `defer-user` and cites this record. `tests/test_claudeai_synced_plugins_exception.py` fails on the old row.
 

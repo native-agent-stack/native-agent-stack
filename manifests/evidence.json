@@ -17468,8 +17468,8 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "94997389d0b2bae6078b467a279b1f2d5938425108136b9986bee032c860bb58",
-      "bytes": 190372
+      "sha256": "417a8a23100cbb79153959a47595e51edf5ca24b23d835591681c3f7950d3403",
+      "bytes": 190438
     },
     {
       "path": "catalogs/landscape/README.md",
@@ -19188,8 +19188,8 @@
     },
     {
       "path": "docs/decisions/2026-10-15-claudeai-synced-plugins-exception.md",
-      "sha256": "5875485317c9f027f3ad6dbe7ce0c024f6bd424ad8b2e58c70f4ae7cc1afbbdc",
-      "bytes": 4475
+      "sha256": "436b7bc4ce3b6612136f5bccd9990787aba88769c6b79c2227034e4f196fa946",
+      "bytes": 5118
     },
     {
       "path": "docs/decisions/2026-10-15-model-currency-landscape-check.md",
@@ -63008,8 +63008,8 @@
     },
     {
       "path": "tests/test_claudeai_synced_plugins_exception.py",
-      "sha256": "9dd2c9962264d676738c21791eddd866e3dacc801c7943e01e6333be7307c7f5",
-      "bytes": 3070
+      "sha256": "a2879fa3e276810ca738b32f2048f52d3bfbcdd051a2d631ad7a5d5922fbde79",
+      "bytes": 3415
     },
     {
       "path": "tests/test_codex_agents.py",

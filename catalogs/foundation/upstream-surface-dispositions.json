@@ -2217,13 +2217,13 @@
   },
   {
    "key": "claude:setting:syncClaudeAiPlugins",
-   "disposition": "defer-user",
-   "reason": "owner-synced exception: key unset, so the sync is on (4 plugins, 0 calls); the 2026-10-04 row wrongly called it off",
+   "disposition": "default-on",
+   "reason": "sync left on (key unset); each synced plugin is disabled per plugin in enabledPlugins (owner direction 2026-10-15); the 2026-10-04 row wrongly called it off",
    "source": "docs/decisions/2026-10-15-claudeai-synced-plugins-exception.md:5",
    "carrier": null,
    "value": null,
    "scope": null,
-   "overturn": "the first invoke hit on a synced plugin: a catalog pin or the flip; or the owner chooses off",
+   "overturn": "a synced plugin is wanted: enable it per plugin and pin it through the catalog; or the owner turns the whole sync off",
    "reviewed_utc": "2026-10-15T03:09:39Z",
    "version": "2.1.300"
   },
