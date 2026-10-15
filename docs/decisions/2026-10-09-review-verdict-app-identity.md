@@ -1,6 +1,6 @@
 # Review verdicts carry a GitHub App identity
 
-Date: 2026-10-09. Status: accepted by the foundation CC on 2026-10-09; updated 2026-10-14 (see Update 2026-10-14: the App as registered). The App is registered and installed; its key waits on custody. Until the CC has verified enforcement (see Transition), the interim rule below stays in force.
+Date: 2026-10-09. Status: accepted by the foundation CC on 2026-10-09; updated 2026-10-14 (see Update 2026-10-14: the App as registered). The App is registered and installed, and its key is in custody (2026-10-14 23:58Z: a JWT signed with the stored key got GitHub's `GET /app` answer for App ID 5292606). Until the CC has verified enforcement (see Transition), the interim rule below stays in force.
 
 ## Owner direction
 
@@ -101,20 +101,22 @@ reports it (`GET /apps/seathat-review-checks`, read 2026-10-14 22:52Z, no token)
     (`GET /orgs/native-agent-stack/installations`, owner token, read 2026-10-14 22:56Z). The command center's browser
     record names its one repository, native-agent-stack/native-agent-stack.
   - 170771928 on the owner's account, us-equities-trading only, per the command center's browser record. The owner's
-    token cannot list a user installation (GitHub answers 403 without an App-authorized token), so the App's own
-    `GET /app/installations` confirms it once the key is in custody.
+    token cannot list a user installation (GitHub answers 403 without an App-authorized token); the App's own
+    `GET /app/installations` listed it, with selected repositories, after custody (2026-10-14 23:58Z).
 - **Public, not "Only on this account":** the repositories now span the organization and the owner's account, and
   GitHub installs an App on an account other than its owner's only when the App is public [visibility]. That
   deviates from Owner step 1. Anyone can now install the App on their own repositories, which gives it no access to
   ours. The landing predicate keys on the App's ID and on check runs posted on our heads, and only our two
   installations can post those.
 
-Key custody replaces Owner step 3's manual move, and Decision 4 is otherwise unchanged. The owner downloaded one key on
-2026-10-12. A script hands the downloaded file to `set_credential.py github-review-app --from-stdin` on standard input, so
-no agent context reads the key. The writer is create-only, checks the stored copy with `openssl pkey -noout` and
-prints only `github-review-app: stored`. A JWT signed with the stored key must then get GitHub's `GET /app` answer for
-App ID 5292606 [jwt]. The downloaded copy stays in place: deleting a credential is the owner's decision, asked after
-that check. The landing script stays on the interim rule until the Transition receipt (checks 1-6) exists.
+Key custody replaces Owner step 3's manual move, and Decision 4 changes: it said no agent reads, prints or copies the
+key; now an agent-run script hands the file to the writer, which copies it unread, so the rule is that no agent context
+reads or prints the key. The owner downloaded one key on 2026-10-12. A script hands the downloaded file to
+`set_credential.py github-review-app --from-stdin` on standard input, so no agent context reads the key. The writer is
+create-only, checks the stored copy with `openssl pkey -noout` and prints only `github-review-app: stored`. A JWT signed
+with the stored key must then get GitHub's `GET /app` answer for App ID 5292606 [jwt]. The downloaded copy stays in
+place: deleting a credential is the owner's decision, asked after that check. The landing script stays on the interim
+rule until the Transition receipt (checks 1-6) exists.
 
 ## Owner steps
 

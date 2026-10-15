@@ -477,7 +477,10 @@ The command opens a new terminal window: Windows Terminal on WSL2 (or a console 
   of replacing a file that appeared in between. It prints only `<id>: stored`. Unlike `--from-file` it never touches
   the source: the source stays where it is, and deleting it is the owner's decision after the stored key has been
   checked with the provider (for the review App, a JWT signed with the stored key must get GitHub's `GET /app` answer
-  for the App's ID). Rotation stays with `--from-file`, whose hidden `replace` needs the operator.
+  for the App's ID). Rotation stays with `--from-file`, whose hidden `replace` needs the operator. A kill between the
+  temporary write and the link leaves `.github-review-app.pem.<16 hex>.tmp` (the key, 0600) in the store: the
+  checker lists it by name as `undeclared_store_file`, the writer never takes it for the stored key, and the
+  operator deletes it by hand, as for `--from-env`.
 - **Paper rate limit:** `tools/credentials/alpaca_rate_limit_probe.py` sends one read-only `GET /v2/account` to the fixed paper host. It follows no redirect, reads no response body and places no order. It saves only the HTTP status and the `x-ratelimit-*` headers, under `${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/rate-limit/`, where a later session can read them. `x-ratelimit-limit` is Alpaca's own per-account calls-per-minute figure (200 on the standard tier), so measuring it never needs order traffic. Agents may run it with `--env-file "$PAPER_ENV_FILE"`.
 
 Live broker keys are out of scope for this repository. Live trading is handled outside it, and no tool here accepts a live endpoint.

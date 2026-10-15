@@ -739,6 +739,50 @@ class StoreFromStdinTests(unittest.TestCase):
             self.piped(other)
         self.assertEqual((self.store / "github-review-app.pem").read_bytes(), self.pem)
 
+    def test_a_key_that_appears_after_the_pre_check_is_kept_by_the_create_only_link(self):
+        # The pre-check (os.path.lexists, then fstatat through the store handle) can race with another writer; the final
+        # name comes only from os.link, which fails with EEXIST rather than replace. A key planted after the pre-check,
+        # while openssl checks the temporary copy, must survive, and the temporary name must be gone. An implementation
+        # that renames instead (os.rename or os.replace overwrite) fails this test.
+        planted = self.make_key("planted.pem")
+        real_check = store_mod.key_file_valid
+
+        def check_then_plant(dfd, name, openssl):
+            ok = real_check(dfd, name, openssl)
+            (self.store / "github-review-app.pem").write_bytes(planted)
+            return ok
+
+        with mock.patch.object(store_mod, "key_file_valid", side_effect=check_then_plant), \
+                self.assertRaisesRegex(store_mod.Refused, "never replaces"):
+            self.piped(self.pem)
+        self.assertEqual((self.store / "github-review-app.pem").read_bytes(), planted)
+        self.assertEqual([p.name for p in self.store.iterdir()], ["github-review-app.pem"])
+
+    def test_the_temporary_copy_is_private_from_its_creation(self):
+        # 0600 is the mode os.open creates the file with, not only the fchmod after it: with fchmod disabled and a zero
+        # umask, the stored key still has mode 0600 (a 0644 create followed by chmod fails here).
+        old = os.umask(0)
+        self.addCleanup(os.umask, old)
+        with mock.patch.object(store_mod.os, "fchmod"):
+            self.assertEqual(self.piped(self.pem)[0], 0)
+        self.assertEqual(stat.S_IMODE(os.lstat(self.store / "github-review-app.pem").st_mode), 0o600)
+
+    def test_a_failing_close_still_removes_the_temporary_copy(self):
+        # If closing the temporary file raises, the cleanup must not close it again (EBADF) and skip the unlink.
+        real_close = os.close
+        calls = []
+
+        def close_failing_once(fd):
+            calls.append(fd)
+            real_close(fd)
+            if len(calls) == 1:
+                raise OSError("simulated close failure")
+
+        with mock.patch.object(store_mod.os, "close", side_effect=close_failing_once), \
+                self.assertRaisesRegex(OSError, "simulated close failure"):
+            self.piped(self.pem)
+        self.assertEqual(list(self.store.iterdir()), [])
+
     def test_refuses_data_that_is_not_a_readable_key_and_leaves_nothing(self):
         protected = self.make_key("p.pem", "-aes256", "-pass", "pass:" + os.urandom(8).hex())
         for name, data in (("random", os.urandom(1200)), ("protected", protected), ("empty", b""),

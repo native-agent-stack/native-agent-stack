@@ -122,7 +122,7 @@ def load_file_entry(entry_id: str, root: Path = ROOT, env=None) -> dict:
         raise Refused(f"unknown entry id {entry_id!r}; see {cs.INVENTORY}")
     if entry["store"]["kind"] != "private_file" or entry["class"] not in KEY_FILE_CLASSES \
             or entry["status"] not in OPERATOR_STATUSES:
-        raise Refused(f"{entry_id}: --from-file takes only an operator-supplied private key file "
+        raise Refused(f"{entry_id}: --from-file and --from-stdin take only an operator-supplied private key file "
                       f"(class {entry['class']}, store {entry['store']['kind']})")
     store_root = cs.expand_template(cs.STORE_ROOT, env)
     path = cs.expand_template(entry["store"]["path_template"], env)
@@ -234,8 +234,8 @@ def run_from_file(entry_id: str, *, env=None, uid=None, ask=None, prompt=getpass
                         raise Refused("source grew past the size of a key file; nothing moved")
                     os.write(fd, chunk)
                 os.fsync(fd)
-                os.close(fd)
-                fd = -1
+                closing, fd = fd, -1  # cleared first: a failing close never reaches a second one
+                os.close(closing)
                 if not key_file_valid(dfd, tmp, openssl):
                     raise Refused("the file is not a private key openssl can read without a passphrase; "
                                   "nothing moved, the downloaded file stays where it is")
@@ -244,7 +244,10 @@ def run_from_file(entry_id: str, *, env=None, uid=None, ask=None, prompt=getpass
                 os.fsync(dfd)
             except BaseException:
                 if fd >= 0:
-                    os.close(fd)
+                    try:
+                        os.close(fd)
+                    except OSError:
+                        pass
                 try:
                     os.unlink(tmp, dir_fd=dfd)
                 except FileNotFoundError:
@@ -506,8 +509,8 @@ def run_from_stdin(entry_id: str, *, env=None, uid=None, data: bytes | None = No
             while view:
                 view = view[os.write(fd, view):]
             os.fsync(fd)
-            os.close(fd)
-            fd = -1
+            closing, fd = fd, -1  # cleared first: a failing close never reaches a second one
+            os.close(closing)
             if not key_file_valid(dfd, tmp, openssl):
                 raise Refused("the input is not a private key openssl can read without a passphrase; nothing stored")
             try:
@@ -516,7 +519,10 @@ def run_from_stdin(entry_id: str, *, env=None, uid=None, data: bytes | None = No
                 raise exists from None
         finally:
             if fd >= 0:
-                os.close(fd)
+                try:
+                    os.close(fd)
+                except OSError:
+                    pass
             try:
                 os.unlink(tmp, dir_fd=dfd)
             except FileNotFoundError:

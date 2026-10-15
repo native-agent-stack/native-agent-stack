@@ -19593,8 +19593,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "d37d4d721879cab5febd09d7cbc946d813952b5f8b845acaed320bb02e61223b",
-      "bytes": 208672
+      "sha256": "297d22d81dadc73c0c51d715c04f1e6cff838f0361295da200c2984ef78f208a",
+      "bytes": 208962
     },
     {
       "path": "docs/stack.md",
@@ -63008,8 +63008,8 @@
     },
     {
       "path": "tests/test_credential_tools.py",
-      "sha256": "3d6943029dca2e20a65c3a62a9207d4869454a8b36d272ea871e68bbc2766add",
-      "bytes": 56125
+      "sha256": "fcdb789ae4024f36cb1926f32f72b7c2c2bccf299bedf605ea6bc47ff55125f6",
+      "bytes": 58568
     },
     {
       "path": "tests/test_currency_due.py",
@@ -64438,8 +64438,8 @@
     },
     {
       "path": "tools/credentials/set_credential.py",
-      "sha256": "644c9b7beb49c5d1431088d229d923a4a7d02057762d23e3a17dbb45716ec778",
-      "bytes": 31534
+      "sha256": "3484e8d62d0fae6aae7e6a32556e9b27f1ac2b5a22172f7770506d94492c38d8",
+      "bytes": 31884
     },
     {
       "path": "tools/invocation-monitoring/README.md",
