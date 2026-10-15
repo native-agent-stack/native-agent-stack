@@ -19182,6 +19182,11 @@
       "bytes": 6429
     },
     {
+      "path": "docs/decisions/2026-10-14-trading-live-projection-v1.md",
+      "sha256": "3a0d7e6aabd27930369db0947578cde6a0f9307e83696d21b097c2e756ff3098",
+      "bytes": 8437
+    },
+    {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
       "sha256": "f646835af1648cfab7798f64626141c3964dfba4799d780dc728ea27f91f7f6c",
       "bytes": 15393
@@ -61897,6 +61902,21 @@
       "bytes": 7704
     },
     {
+      "path": "observability/trading-live-collector.yaml",
+      "sha256": "3eef8d1d1c0dcb1d4612d7590fc9f7a4674a50b6282e542227496d014292747c",
+      "bytes": 3202
+    },
+    {
+      "path": "observability/trading-live-loki.yaml",
+      "sha256": "e8ff0f993acf4b82fb0b8b46dc9571639f7dbb83960f07545487d38ff89c093d",
+      "bytes": 488
+    },
+    {
+      "path": "observability/trading_live.py",
+      "sha256": "2989d4eb9555947fe8d6a622a8adee6bf2f5bee2f611c060ae6b2a5627393d78",
+      "bytes": 23307
+    },
+    {
       "path": "recipes/README.md",
       "sha256": "9a3d20b35b69dd1d998340d14b1f87ad4cb8ac6159aa2dfcef4f3f0dedfaf4a4",
       "bytes": 134596
@@ -64065,6 +64085,11 @@
       "path": "tests/test_trading_handbook_sizing.py",
       "sha256": "4e8589283b4515616c7d458e775912e22ddf5272b1546d0a05d1849a72afbc03",
       "bytes": 2930
+    },
+    {
+      "path": "tests/test_trading_live_projection.py",
+      "sha256": "19513da814e56fc8be363407501a572a984040941a1f148f3620ed5e02f44c7d",
+      "bytes": 29527
     },
     {
       "path": "tests/test_tvly_keyring.py",

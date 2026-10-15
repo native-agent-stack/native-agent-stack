@@ -1,0 +1,45 @@
+# Additive overlay; existing Collector components are never edited.
+# open-telemetry/opentelemetry-collector-contrib v0.162.0
+# receiver/filelogreceiver/README.md: storage, start_at and on_truncate.
+# processor/transformprocessor/README.md: log statements and keep_keys.
+receivers:
+  file_log/trading_live:
+    include: ["${env:NS2604_OBSERVABILITY_DATA}/trading-lanes/live.jsonl"]
+    start_at: beginning
+    # filelog namespaces its stored offset by this distinct receiver component ID.
+    storage: file_storage
+    on_truncate: read_whole_file
+    include_file_name: false
+    include_file_path: false
+    max_log_size: 8MiB
+    retry_on_failure:
+      enabled: true
+      max_elapsed_time: 0s
+    operators:
+      - type: json_parser
+        on_error: drop_quiet
+        parse_from: body
+        parse_to: attributes
+processors:
+  transform/trading_live:
+    error_mode: propagate
+    log_statements:
+      - context: log
+        statements:
+          - keep_keys(resource.attributes, [])
+          - set(resource.attributes["service.name"], "trading-lanes")
+          - set(resource.attributes["stream"], "live")
+          - set(resource.schema_url, "")
+          - keep_keys(instrumentation_scope.attributes, [])
+          - set(instrumentation_scope.name, "trading-live")
+          - set(instrumentation_scope.version, "")
+          - set(instrumentation_scope.schema_url, "")
+          - keep_keys(attributes, ["v", "lane", "kind", "t_ms", "seq", "run", "session", "observed_ms", "order_key", "symbol", "side", "qty", "limit_price", "outside_rth", "quote_bid", "quote_ask", "quote_arrival_ms", "quote_age_ms", "status", "filled", "remaining", "avg_fill_price", "last_fill_price", "exec_qty", "exec_price", "exec_time_ms", "cum_qty", "commission", "commission_currency", "realized_pnl", "code", "net_liquidation", "total_cash_value", "avg_cost", "daily_pnl", "unrealized_pnl", "position", "value", "messages", "peak_per_second", "total", "calc_version", "event_key", "round_key", "slots", "held", "held_symbols", "added_impulse", "added_trend", "round_seconds", "round_tool_calls", "rank", "eligible", "group", "asset_class", "halt_prone", "score", "move_pct", "rvol", "spread_bps", "quote_age_s", "trade_age_s", "vwap", "last", "bid", "ask", "band_pct", "range_pct", "fade_pct", "stop_pct", "trail_pct", "session_dollar_vol", "vol_session", "ref_close", "ret_3m_pct", "ret_ytd_pct", "reasons", "reason_count", "ranked", "top_symbols", "ok", "notional", "equity_cap", "drift_pct", "drift_ref_last", "quote_mid", "quote_time_ms", "cap_binding", "refusals", "catalyst_present", "price", "booked_qty", "booked_avg", "delta_qty", "delta_price", "repeat", "reason", "realized_usd", "position_closed", "remaining_qty", "match", "exit_mode", "held_count", "mismatch_count", "resting_exit_count", "equity", "adopted_symbols", "clock", "open_orders", "positions", "fills", "orders", "realized_total_usd", "exit_reason_counts", "row_id"])
+          - set(body, String(attributes))
+          - keep_keys(attributes, [])
+service:
+  pipelines:
+    logs/trading_live:
+      receivers: [file_log/trading_live]
+      processors: [memory_limiter, transform/trading_live, batch]
+      exporters: [otlphttp/loki]
