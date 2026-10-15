@@ -368,8 +368,10 @@ def repos(data: dict) -> str:
         shared = next(iter(catalog_states)) if len(catalog_states) == 1 and None not in catalog_states else None
         rows = []
         for row in group["rows"]:
-            planned = ("" if row["in_catalog"] else " <small>in the finalize-all record only, not yet in the catalog file</small>" if row.get("rows_only")
-                       else " <small>planned, outside the catalog file" + (f'; {esc(row["status"])}' if shared and row["status"] else "") + "</small>")
+            # With the State column dropped, a layer outside the catalog files says its own recorded state in its note.
+            own = f'; {esc(row["status"])}' if shared and row["status"] else ""
+            planned = ("" if row["in_catalog"] else f" <small>in the finalize-all record only, not yet in the catalog file{own}</small>" if row.get("rows_only")
+                       else f" <small>planned, outside the catalog file{own}</small>")
             link = (f'<a href="{esc(row["page"])}#{anchor(row["layer"])}" title="{esc(row["layer"])}">{esc(row["title"])}</a>' if row["in_catalog"]
                     else f'<a href="{esc(row["page"])}" title="{esc(row["layer"])}">{esc(row["title"])}</a>{planned}')
             state = f'<span class="lp-state-cell">{glyph(row["state"])}{esc(STATE_TEXT[row["state"]])}</span>' if row["state"] else esc(row["status"] or "no state")

@@ -631,6 +631,12 @@ class MicroFixTests(OverviewCase):
         self.assertIn("3 catalog layers, 1 planned outside the catalog files and 1 listed only in the finalize-all record.", section)
         self.assertIn("in the finalize-all record only, not yet in the catalog file", section)
         self.assertIn("F5 delta sweep -&gt; F4 adjudication", section)
+        # The fixture's catalog layers share one state, so the State column is dropped and the record's own state must
+        # be said in the layer's row (the Astra and local-review P2 at 487fc280c).
+        self.assertIn("ov-shared", section)
+        at = section.index('title="foundation/omega"')
+        row = section[section.rindex("<tr", 0, at):section.index("</tr>", at)]
+        self.assertIn("in the finalize-all record only, not yet in the catalog file; unswept", row)
 
     def test_a_scheduled_check_is_said_as_its_readiness_trigger_never_a_date(self):
         fixture = Fixture(self.base)
