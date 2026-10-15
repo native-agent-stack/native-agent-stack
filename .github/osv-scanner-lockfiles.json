@@ -26,6 +26,10 @@
       "parser": "requirements.txt"
     },
     {
+      "path": ".github/requirements-ci-schema.in",
+      "parser": "requirements.txt"
+    },
+    {
       "path": ".github/requirements-ci.txt",
       "parser": "requirements.txt"
     },

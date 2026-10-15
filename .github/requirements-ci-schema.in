@@ -1,0 +1,4 @@
+# Direct inputs for the schema-validation block of requirements-ci.txt.
+# Constrain against the current CI lock to preserve all selected versions.
+jsonschema==4.26.0
+rfc3986-validator==0.1.1

@@ -28,7 +28,8 @@
       "repository": "python-jsonschema/jsonschema",
       "pin": "a7277432b0f7bcd0551f6e589d30457017125df4",
       "path": "jsonschema/_format.py",
-      "line": 307,
+      "line": 313,
+      "locator_correction": "2026-10-15T14:42:37Z: pinned source re-read; line 307 imports the validator and line 313 calls it. The original source pin and read record are preserved.",
       "claim": "The upstream URI checker calls the exported validate_rfc3986 function with rule URI."
     },
     {

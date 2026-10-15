@@ -5092,8 +5092,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "cba06a43e1b0c1fadaea82c75e412b4344fcf03f17bea3d0830bd765414ec6fb",
-      "bytes": 16138
+      "sha256": "1d9f16c2d31f5c8433f3947f0c5fa5a9282218fb13f4904edcc56f207f7ce27f",
+      "bytes": 16237
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -5111,9 +5111,14 @@
       "bytes": 12281
     },
     {
+      "path": ".github/requirements-ci-schema.in",
+      "sha256": "73ecf50c931e02bfa7f5808f00c31d25e9bd1b8cf54b91826d530e8620b468b6",
+      "bytes": 191
+    },
+    {
       "path": ".github/requirements-ci.txt",
-      "sha256": "70284e31eff0b705be1fd2c2770bcce068fa8c787d02a700f50fe77f76aa150a",
-      "bytes": 13346
+      "sha256": "594fb48b0b52f423c6d41b0dc7392d9ac5a6895f5262f0452bdef5d8b5ff01fb",
+      "bytes": 13536
     },
     {
       "path": ".github/requirements-validation.txt",
@@ -17558,8 +17563,8 @@
     },
     {
       "path": "catalogs/landscape/angles/README.md",
-      "sha256": "4c588669d0d89f91f1ed09d2cdec0ea9d2ea10f1b36d1cc17d0972890954fd6a",
-      "bytes": 15543
+      "sha256": "005d38dd5f5fc90c31fbf1faf23b398f6337d4f85fe7c718db3c37ee67b448b8",
+      "bytes": 16898
     },
     {
       "path": "catalogs/landscape/angles/foundation-agent-sdks.json",
@@ -17583,8 +17588,8 @@
     },
     {
       "path": "catalogs/landscape/angles/schema.json",
-      "sha256": "e4dc3f9dd1c9c00108b33aa9cc5c378987d32da43d7b479ec2371f1e427b3055",
-      "bytes": 12820
+      "sha256": "9a09a68f7eb7f811f18c416da7fc1544d21b358559758e000cffdaabee19f4e1",
+      "bytes": 12827
     },
     {
       "path": "catalogs/landscape/blind-convergence.json",
@@ -17608,8 +17613,8 @@
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "0270f74ecf6ab097a1f565f5f1848395d9690e951cde4c0216930e332292e825",
-      "bytes": 339603
+      "sha256": "cfbddf96bb7e283a92826e78fd162829bd11e8ce9116b291ca34b954c1e55598",
+      "bytes": 339777
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -19233,7 +19238,7 @@
     },
     {
       "path": "docs/decisions/2026-10-12-angle-records-final-check.md",
-      "sha256": "ccc714ce335d8fe2eb28e6a05f1ff11d5d594972560d7983c4a648e3780a7181",
+      "sha256": "76b8274591ca56bf694fc13d8dce9a68d901de8ae79084cedc160d15c64bff2e",
       "bytes": 23902
     },
     {
@@ -19320,6 +19325,11 @@
       "path": "docs/decisions/2026-10-15-a1-identity-binding.md",
       "sha256": "de6cbec9416cb6c075d20c0333a5253ab5b3b0f06ae146d7d078ce61814f8362",
       "bytes": 8591
+    },
+    {
+      "path": "docs/decisions/2026-10-15-final-evidence-qualification.md",
+      "sha256": "aa9a049a8789bcbcbd5c7dfc389c660495e36b87aa929f065dc7ca900d0eb92b",
+      "bytes": 6484
     },
     {
       "path": "docs/decisions/2026-10-15-jev-scored-contract-corrections.md",
@@ -20443,8 +20453,8 @@
     },
     {
       "path": "evidence/artifacts/angle-records-20261012/fix2-source-reads.json",
-      "sha256": "cffd0ae6aaafec073bf9cc7b8ada57cf62ebd1b24f8586cd53a539b984eb2e6c",
-      "bytes": 2470
+      "sha256": "bc789c3c13e278cbbe878624edd67347363cdbc55df2e40261b92d39553f0f5c",
+      "bytes": 2655
     },
     {
       "path": "evidence/artifacts/angle-records-20261012/fix3-checks.json",
@@ -23080,6 +23090,16 @@
       "path": "evidence/artifacts/final-durable-memory-20261016/validation-outputs/default-weights-stated.txt",
       "sha256": "5a4b3cc42145d69f54793707c66da52d176af6c3a98cce481d851fff595ff152",
       "bytes": 167
+    },
+    {
+      "path": "evidence/artifacts/final-evidence-qualification-20261015/checks.json",
+      "sha256": "47cded4eaadedd11eda3ace5248cb53b9c7433a3c5ac64d756f3fe541a56297e",
+      "bytes": 3659
+    },
+    {
+      "path": "evidence/artifacts/final-evidence-qualification-20261015/source-reads.json",
+      "sha256": "15db3a232ff2c6cde2abc07667348b4cb5bcea7e68b1fb5a0703eda9ceaedef6",
+      "bytes": 1144
     },
     {
       "path": "evidence/artifacts/foundation-closure-20260921/claude-review.md",
@@ -63018,8 +63038,8 @@
     },
     {
       "path": "scripts/final_stack.py",
-      "sha256": "3b29a722563df44b6485c0b039b5330c331fc1ae55a43c10ea2e82c8f515c024",
-      "bytes": 85843
+      "sha256": "6045f1d0ce3d5b912496c291b21aa04d449209bf5879eb17c46aa6dbf2b62a6a",
+      "bytes": 92923
     },
     {
       "path": "scripts/freshness_propose.py",
@@ -63773,8 +63793,8 @@
     },
     {
       "path": "tests/test_angle_records_fix3.py",
-      "sha256": "11987e6a9e4ce17981d5e6f8c3018af75f8beb35d80ba15e76379eb8971c0404",
-      "bytes": 16020
+      "sha256": "82b460ded9080fd1ab6865ffc6bde1ac05ced3c3a524ecad2304fa0367a9bd39",
+      "bytes": 16343
     },
     {
       "path": "tests/test_angle_records_identity.py",
@@ -64098,8 +64118,13 @@
     },
     {
       "path": "tests/test_final_admission.py",
-      "sha256": "1389108c9c5ac99e74eb490a52650689a4a601f30e4f754a74aa710b9ef6a2ca",
-      "bytes": 11325
+      "sha256": "d93b5653a34bae36446829de6a8f83e3959bae5efc1174eb47a4bce6a862a789",
+      "bytes": 11328
+    },
+    {
+      "path": "tests/test_final_admission_checks.py",
+      "sha256": "3f27140fee40444ec1d2c65c7143e8a77cfb1aa76b41579149259751dd6caa27",
+      "bytes": 17689
     },
     {
       "path": "tests/test_final_disabled.py",
@@ -64107,9 +64132,14 @@
       "bytes": 4590
     },
     {
+      "path": "tests/test_final_history_ordering.py",
+      "sha256": "37680d4f678cd84b02d320792a4876c2583ce1673b6e6377285ef5dccd9ae821",
+      "bytes": 7875
+    },
+    {
       "path": "tests/test_final_ordering.py",
-      "sha256": "b0fb4cbaa2c300555f317d2529045cb1377f413795d99fd12584d7a0c7197052",
-      "bytes": 6945
+      "sha256": "a6d06f2e5765f0cdbb4eb3d33a6c3d2220b4a0e6a13a68f35fd6b856d6152770",
+      "bytes": 5442
     },
     {
       "path": "tests/test_final_registration_refusal.py",
@@ -64120,6 +64150,11 @@
       "path": "tests/test_final_stack.py",
       "sha256": "04cb6cfbbea6cdc22d44aa46b78441a59c793212854215f7a64dbf2168993ca1",
       "bytes": 79674
+    },
+    {
+      "path": "tests/test_final_stack_dependencies.py",
+      "sha256": "be226d6f54b750903730bb79fd490f9029d65f80d5107f9541021caa9a38491e",
+      "bytes": 2357
     },
     {
       "path": "tests/test_financial_data.py",
@@ -64408,8 +64443,8 @@
     },
     {
       "path": "tests/test_local_pages_architecture_manifest.py",
-      "sha256": "67d6cc2dd8b6908336f68faad0c994410fd1f1ecfafa89261e753d27f47bda28",
-      "bytes": 28443
+      "sha256": "8024c909974e7bcb8b6f84efe65a86e6eb4ff814d29586b411471ecb453b01f0",
+      "bytes": 28470
     },
     {
       "path": "tests/test_local_pages_architecture_sources.py",
@@ -65633,8 +65668,8 @@
     },
     {
       "path": "tools/local-pages/architecture_manifest.py",
-      "sha256": "ea4d5a1bed9771cd6da92bb3a2f55aadb52a5acc08721cae32500379905b43f7",
-      "bytes": 53582
+      "sha256": "96585cd6f67f1baaf59a33a84c8f08b66fe6c4b8f2607156ec2d8659b37c7d3b",
+      "bytes": 54212
     },
     {
       "path": "tools/local-pages/architecture_mapping.json",
@@ -65788,8 +65823,8 @@
     },
     {
       "path": "tools/sota-convergence/build_verdicts.py",
-      "sha256": "dcefeadb78dc2f26a8e46712d5f70a72b90ef750fb0cb37a51518ce72e43041f",
-      "bytes": 28095
+      "sha256": "e1606401cb95c4c78191c342c301ef90ae504eecfbafe60c647c8b6347e37f99",
+      "bytes": 28131
     },
     {
       "path": "tools/sota-convergence/codex_lane.py",
@@ -65978,8 +66013,8 @@
     },
     {
       "path": "tools/sota-convergence/record_verdicts.py",
-      "sha256": "742277546f2006070ed221137f775dd351ef9362040906ffe0fa91c9187b8a57",
-      "bytes": 94045
+      "sha256": "902247fb3caf5ebfb2f53aa37ff01f8618d3eae972494f2497deec7962640289",
+      "bytes": 94075
     },
     {
       "path": "tools/sota-convergence/schemas/compact-decision-start-closure-1.json",

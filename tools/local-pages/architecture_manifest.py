@@ -56,8 +56,8 @@ RUNGS = ("sim", "paper", "live")
 
 
 def layer_status(verdict_status: Any) -> str:
-    """Recorded/FINAL is adopted; pending_lanes is candidate, no_selection is planned."""
-    return {"recorded": "adopted", "FINAL": "adopted", "pending_lanes": "candidate", "no_selection": "planned"}.get(verdict_status, "unreported")
+    """Only recorded is adopted; an old FINAL claim has no current qualification."""
+    return {"recorded": "adopted", "pending_lanes": "candidate", "no_selection": "planned"}.get(verdict_status, "unreported")
 
 
 def winner_status(e2e_state: Any) -> str:
@@ -558,6 +558,15 @@ def layer_manifest(root: Path, page: str, final_stack: dict, catalog: dict, matr
     """
     config = LAYER_PAGES[page]
     catalog_id = config["catalog"]
+    current = [layer for layer in _list(final_stack.get("layers"))
+               if isinstance(layer, dict) and layer.get("catalog") == catalog_id]
+    current += _list(catalog.get("layers"))
+    current += [row for row in _list(matrix.get("rows"))
+                if isinstance(row, dict) and row.get("catalog") == catalog_id]
+    if any(isinstance(layer, dict) and "FINAL" in (layer.get("terminal_state"), layer.get("verdict_status"),
+                                                  (layer.get("verdict") or {}).get("status"))
+           for layer in current):
+        raise ValueError("FINAL snapshot requires a successful current admission check")
     catalog_rows = {row.get("layer_id"): (index, row) for index, row in enumerate(_list(catalog.get("layers"))) if isinstance(row, dict)}
     runs = {run.get("id"): run for run in _list(final_stack.get("runs")) if isinstance(run, dict)}
     matrix_rows = _matrix_index(matrix)

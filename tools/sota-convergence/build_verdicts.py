@@ -51,7 +51,7 @@ from build_manifest import assert_no_leak, sanitize_value  # noqa: E402
 if str(HERE.parent.parent) not in sys.path:
     sys.path.insert(0, str(HERE.parent.parent))
 # The grandfathered run ids are defined once, next to the rules they exempt (scripts/landscape.py).
-from scripts.landscape import GRANDFATHERED_RUN_IDS, RECORDED_VERDICT_STATUSES, is_unrun_registration  # noqa: E402
+from scripts.landscape import GRANDFATHERED_RUN_IDS, RECORDED_VERDICT_STATUSES, is_unrun_registration, refuse_final  # noqa: E402
 
 # Same character class scripts/landscape.py requires of lanes.<lane>.sealed_base
 # (re.fullmatch(r"evidence/artifacts/layer-verdicts-[0-9A-Za-z]+", ...)) and
@@ -114,6 +114,7 @@ def platform_status_summary(winners: list) -> dict:
 
 
 def build_verdict_row(row: dict, sota_components: list) -> dict:
+    refuse_final(row)
     winners = row.get("winners") or []
     alternatives = row.get("alternatives") or []
     recipe_refs = sorted({winner["recipe_ref"] for winner in winners if winner.get("recipe_ref")})
