@@ -17,6 +17,8 @@ name: Dependency and workflow security scan
 # docs/decisions/2026-09-22-github-automation-closure.md.
 
 on:
+  merge_group:
+    types: [checks_requested]
   pull_request:
   push:
     branches: [main]
@@ -63,7 +65,7 @@ jobs:
       - name: Scan every listed lockfile and manifest (fails on any unignored vulnerability)
         shell: bash
         env:
-          WRITE_SARIF: ${{ github.event_name != 'pull_request' }}
+          WRITE_SARIF: ${{ github.event_name != 'pull_request' && github.event_name != 'merge_group' }}
         run: |
           # `shell: bash` runs with -e; turn it off so a findings exit (1) is captured and
           # both SARIF results are still written, then fail with the worst observed status.
@@ -129,7 +131,7 @@ jobs:
       - name: Keep the OSV-Scanner SARIF for the upload job
         # !cancelled(): a findings exit fails the scan step, and its SARIF must still reach
         # code scanning; a scanner error leaves no SARIF, so this step then fails too.
-        if: ${{ !cancelled() && github.event_name != 'pull_request' }}
+        if: ${{ !cancelled() && github.event_name != 'pull_request' && github.event_name != 'merge_group' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: osv-scanner-sarif-${{ github.run_id }}-${{ github.run_attempt }}
@@ -139,8 +141,8 @@ jobs:
 
   osv-sarif-upload:
     needs: osv-scanner
-    # Runs after a findings failure of osv-scanner too (!cancelled()); never on pull_request.
-    if: ${{ !cancelled() && github.event_name != 'pull_request' }}
+    # Findings still upload on main; PR/merge-group scans retain only read scopes.
+    if: ${{ !cancelled() && github.event_name != 'pull_request' && github.event_name != 'merge_group' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
@@ -167,7 +169,7 @@ jobs:
           category: osv-scanner
 
   zizmor-online:
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' && github.event_name != 'merge_group'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
@@ -206,7 +208,7 @@ jobs:
 
   zizmor-sarif-upload:
     needs: zizmor-online
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' && github.event_name != 'merge_group'
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:

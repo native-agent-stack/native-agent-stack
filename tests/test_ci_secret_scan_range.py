@@ -118,6 +118,26 @@ class CiSecretScanRangeTests(unittest.TestCase):
         self.assert_range("push", {"before": self.base, "after": self.feature_two},
                           self.base, self.feature_two, (self.feature_one, self.feature_two))
 
+    def test_merge_group_scans_every_commit_since_its_payload_base(self):
+        side = self.commit("queued side", self.main)
+        group = self.commit("queue group", self.main, side)
+        self.checkout(group)
+        payload = {"action": "checks_requested", "merge_group": {
+            "base_sha": self.main, "head_sha": group}}
+        self.assert_range("merge_group", payload, self.main, group, (side, group))
+
+    def test_merge_group_rejects_missing_stale_empty_or_unrelated_boundaries(self):
+        unrelated = self.commit("unrelated queue base")
+        for base, head in ((None, self.feature_two), (ZERO_SHA, self.feature_two),
+                           (self.base, self.main), (self.feature_two, self.feature_two),
+                           (unrelated, self.feature_two)):
+            with self.subTest(base=base, head=head):
+                self.assert_rejected("merge_group", {"action": "checks_requested", "merge_group": {
+                    "base_sha": base, "head_sha": head}})
+        self.assert_rejected("merge_group", {})
+        self.assert_rejected("merge_group", {"action": "destroyed", "merge_group": {
+            "base_sha": self.base, "head_sha": self.feature_two}})
+
     def test_unverified_push_boundaries_fail_closed_without_publishing_scanner_inputs(self):
         abandoned = self.commit("abandoned branch", self.base)
         for before in (ZERO_SHA, abandoned, "f" * 40):

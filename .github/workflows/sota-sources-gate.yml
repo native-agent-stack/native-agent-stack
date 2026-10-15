@@ -23,7 +23,7 @@ jobs:
     # Top rule: every change names the maintained repository or published reference it installs or follows. This job
     # fails a pull request whose description lacks a non-empty "SOTA sources" section (## or ###), reading the body
     # from the current PR through actions/github-script; a retrieval error fails the action and no body text reaches a shell.
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
     runs-on: ubuntu-24.04
     timeout-minutes: 2
     permissions:
@@ -37,11 +37,62 @@ jobs:
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
+            let number = context.issue.number;
+            let queued = null;
+            if (context.eventName === 'merge_group') {
+              const group = context.payload.merge_group;
+              if (context.payload.action !== 'checks_requested' ||
+                  !/^refs\/heads\/.+/.test(group?.base_ref || '') ||
+                  !/^[0-9a-f]{40}$/.test(group?.base_sha || '') ||
+                  !/^[0-9a-f]{40}$/.test(group?.head_sha || '') ||
+                  group.head_sha !== context.sha) {
+                throw new Error('SOTA sources: invalid merge-group identity; failing closed.');
+              }
+              const branch = group.base_ref.slice('refs/heads/'.length);
+              // Native queue association, never a PR number parsed from a temporary ref.
+              // github/docs@0226a2d7 schema.docs.graphql: MergeQueueEntry baseCommit/headCommit.
+              const {repository} = await github.graphql(`
+                query($owner: String!, $repo: String!, $branch: String!) {
+                  repository(owner: $owner, name: $repo) {
+                    mergeQueue(branch: $branch) {
+                      entries(first: 2) {
+                        totalCount pageInfo { hasNextPage }
+                        nodes {
+                          baseCommit { oid } headCommit { oid }
+                          pullRequest { number state baseRefName headRefOid }
+                        }
+                      }
+                    }
+                  }
+                }`, {owner: context.repo.owner, repo: context.repo.repo, branch});
+              const entries = repository?.mergeQueue?.entries;
+              // The evaluated configuration admits one PR. Larger queues need a separately
+              // reviewed all-member binding; truncation or ambiguity must never pass.
+              if (entries?.totalCount !== 1 || entries?.nodes?.length !== 1 ||
+                  entries?.pageInfo?.hasNextPage !== false) {
+                throw new Error('SOTA sources: expected exactly one native queue entry; failing closed.');
+              }
+              const entry = entries.nodes[0];
+              queued = entry?.pullRequest;
+              if (entry?.baseCommit?.oid !== group.base_sha || entry?.headCommit?.oid !== group.head_sha ||
+                  queued?.state !== 'OPEN' || queued?.baseRefName !== branch ||
+                  !Number.isSafeInteger(queued?.number) || queued.number < 1 ||
+                  !/^[0-9a-f]{40}$/.test(queued?.headRefOid || '')) {
+                throw new Error('SOTA sources: stale or unbound queue entry; failing closed.');
+              }
+              number = queued.number;
+            }
             const {data: pullRequest} = await github.rest.pulls.get({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              pull_number: context.issue.number
+              pull_number: number
             });
+            if (queued && (pullRequest.number !== number || pullRequest.state !== 'open' ||
+                pullRequest.base?.ref !== queued.baseRefName ||
+                pullRequest.base?.sha !== context.payload.merge_group.base_sha ||
+                pullRequest.head?.sha !== queued.headRefOid)) {
+              throw new Error('SOTA sources: the current PR no longer matches this group; failing closed.');
+            }
             const body = pullRequest.body || '';
             const match = body.match(/^#{2,3}[ \t]+SOTA sources[ \t]*$([\s\S]*?)(?=^#{2,3}[ \t]|(?![\s\S]))/m);
             const content = match ? match[1].replace(/<!--[\s\S]*?-->/g, '').trim() : '';

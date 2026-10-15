@@ -89,9 +89,14 @@ const {script, payloads} = JSON.parse(fs.readFileSync(0, 'utf8'));
     const outcome = {failed: null, info: null, requests: []};
     const core = {setFailed: (message) => { outcome.failed = String(message); },
                   info: (message) => { outcome.info = String(message); }};
-    const context = {payload, repo: {owner: 'fixture-owner', repo: 'fixture-repo'},
+    const context = {payload, eventName: payload.event_name || 'pull_request',
+                     sha: payload.checkout_sha, repo: {owner: 'fixture-owner', repo: 'fixture-repo'},
                      issue: {number: payload.pull_request?.number || 17}};
-    const github = {rest: {pulls: {get: async (parameters) => {
+    const github = {graphql: async (query, parameters) => {
+      outcome.requests.push({query, ...parameters});
+      if (payload.queue_error) throw new Error(payload.queue_error);
+      return {repository: {mergeQueue: payload.current_queue ?? null}};
+    }, rest: {pulls: {get: async (parameters) => {
       outcome.requests.push(parameters);
       if (payload.retrieval_error) throw new Error(payload.retrieval_error);
       return {data: payload.current_pull_request ?? payload.pull_request ?? {}};
@@ -175,6 +180,55 @@ class GateIdentityTests(unittest.TestCase):
 
 @unittest.skipUnless(NODE, "node unavailable; CI's runner images carry it")
 class GateBehaviourTests(unittest.TestCase):
+    def test_merge_group_checks_the_live_body_of_its_unique_queued_pull_request(self):
+        payload = self.merge_group_payload()
+        for path in (VALIDATE, GATE):
+            with self.subTest(workflow=path.name):
+                outcome, = run_check(inline_script(sota_job(path)), [payload])
+                self.assertIsNone(outcome["failed"], outcome)
+                self.assertEqual(outcome["requests"][-1]["pull_number"], 42)
+                self.assertEqual(outcome["requests"][0]["branch"], "mq-trial-20261015")
+
+    @staticmethod
+    def merge_group_payload():
+        group = {"base_ref": "refs/heads/mq-trial-20261015", "base_sha": "a" * 40,
+                 "head_sha": "b" * 40}
+        entry = {"baseCommit": {"oid": "a" * 40}, "headCommit": {"oid": "b" * 40},
+                 "pullRequest": {"number": 42, "state": "OPEN", "baseRefName": "mq-trial-20261015",
+                                 "headRefOid": "c" * 40}}
+        current = {"number": 42, "state": "open", "base": {"ref": "mq-trial-20261015", "sha": "a" * 40},
+                   "head": {"sha": "c" * 40}, "body": "## SOTA sources\n- https://github.com/github/docs\n"}
+        return {"event_name": "merge_group", "action": "checks_requested", "merge_group": group,
+                "checkout_sha": "b" * 40, "current_pull_request": current,
+                "current_queue": {"entries": {"totalCount": 1, "nodes": [entry],
+                                               "pageInfo": {"hasNextPage": False}}}}
+
+    def test_merge_group_fails_closed_on_missing_ambiguous_stale_or_unbound_metadata(self):
+        cases = []
+        for field, value in (("current_queue", None), ("action", "destroyed"),
+                             ("checkout_sha", "d" * 40), ("queue_error", "unavailable")):
+            payload = self.merge_group_payload()
+            payload[field] = value
+            cases.append(payload)
+        for field, value in (("totalCount", 2), ("nodes", []), ("pageInfo", {"hasNextPage": True})):
+            payload = self.merge_group_payload()
+            payload["current_queue"]["entries"][field] = value
+            cases.append(payload)
+        for field in ("baseCommit", "headCommit"):
+            payload = self.merge_group_payload()
+            payload["current_queue"]["entries"]["nodes"][0][field] = {"oid": "d" * 40}
+            cases.append(payload)
+        for field, value in (("head", {"sha": "d" * 40}),
+                             ("base", {"ref": "main", "sha": "a" * 40}),
+                             ("state", "closed"), ("body", "## SOTA sources\n<!-- removed -->")):
+            payload = self.merge_group_payload()
+            payload["current_pull_request"][field] = value
+            cases.append(payload)
+        for path in (VALIDATE, GATE):
+            for index, outcome in enumerate(run_check(inline_script(sota_job(path)), cases)):
+                with self.subTest(workflow=path.name, case=index):
+                    self.assertIsNotNone(outcome["failed"], outcome)
+
     def test_both_copies_pass_and_fail_the_same_descriptions(self):
         payloads = [payload for _, payload, _ in CASES]
         outcomes = {name: run_check(inline_script(sota_job(path)), payloads)

@@ -1,6 +1,8 @@
 name: PR metadata gates
 
 on:
+  merge_group:
+    types: [checks_requested]
   push:
     branches: [main]
   pull_request:
@@ -58,7 +60,7 @@ jobs:
         shell: bash
         env:
           EVENT_NAME: ${{ github.event_name }}
-          # The pull request's base branch (GITHUB_BASE_REF): the gate judges only pull requests into main.
+          # Main, plus the explicitly authorized temporary queue trial branch.
           PR_BASE_REF: ${{ github.base_ref }}
           # Cross-check only: the base is the checked-out merge commit's first parent.
           PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
@@ -66,6 +68,9 @@ jobs:
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           # The pushed range's previous commit on main.
           PUSH_BEFORE_SHA: ${{ github.event.before }}
+          GROUP_BASE_REF: ${{ github.event.merge_group.base_ref }}
+          GROUP_BASE_SHA: ${{ github.event.merge_group.base_sha }}
+          GROUP_HEAD_SHA: ${{ github.event.merge_group.head_sha }}
         run: |
           set -euo pipefail
           case "$EVENT_NAME" in
@@ -73,7 +78,7 @@ jobs:
               # A pull request into another branch is not judged against main, and retargeting it to
               # main later re-runs this job (the edited type): fail closed rather than pass a base the
               # gate does not protect.
-              if [ "${PR_BASE_REF:-}" != "main" ]; then
+              if [ "${PR_BASE_REF:-}" != "main" ] && [ "${PR_BASE_REF:-}" != "mq-trial-20261015" ]; then
                 echo "::error::verdict-review-gate: the pull request's base branch is '${PR_BASE_REF:-}', not main; the gate judges only pull requests into main (retarget it to main); failing closed"
                 exit 1
               fi
@@ -111,6 +116,28 @@ jobs:
                 exit 1
               fi
               ;;
+            merge_group)
+              # A squash queue group need not have the PR merge's two-parent shape.
+              # Bind HEAD to the webhook SHA and compare the entire group with its
+              # explicit base. Never fall through to workflow_dispatch's HEAD^1.
+              case "${GROUP_BASE_REF:-}" in
+                refs/heads/main|refs/heads/mq-trial-20261015) ;;
+                *) echo "::error::verdict-review-gate: unsupported merge-group base"; exit 1 ;;
+              esac
+              if [[ ! "${GROUP_BASE_SHA:-}" =~ ^[0-9a-f]{40}$ ]] \
+                || [[ ! "${GROUP_HEAD_SHA:-}" =~ ^[0-9a-f]{40}$ ]] \
+                || [ "$GROUP_HEAD_SHA" != "$(git rev-parse --verify HEAD)" ] \
+                || [ "$GROUP_BASE_SHA" = "$GROUP_HEAD_SHA" ]; then
+                echo "::error::verdict-review-gate: invalid merge-group commit identity"
+                exit 1
+              fi
+              base="$GROUP_BASE_SHA"
+              if ! git merge-base --is-ancestor "$base" HEAD \
+                || ! git merge-base --is-ancestor "$base" "refs/remotes/origin/${GROUP_BASE_REF#refs/heads/}"; then
+                echo "::error::verdict-review-gate: merge-group base is outside the checkout or target branch"
+                exit 1
+              fi
+              ;;
             push)
               base="${PUSH_BEFORE_SHA:-}"
               # A branch-creating push has an all-zero before: there is no base to judge against.
@@ -119,10 +146,11 @@ jobs:
                 exit 1
               fi
               ;;
-            *)
+            workflow_dispatch)
               # workflow_dispatch has no base in its payload: compare with the parent.
               base="$(git rev-parse --verify 'HEAD^1^{commit}')"
               ;;
+            *) echo "::error::verdict-review-gate: unsupported event"; exit 1 ;;
           esac
           # The rules come from the base: run the base commit's gate (and the code it imports) against
           # this checkout, so a pull request cannot weaken the gate that judges it. Only the pull
@@ -148,7 +176,7 @@ jobs:
     # (## or ###). It reads the current body through the official actions/github-script
     # (github.com/actions/github-script, v9.0.0; docs.github.com/en/rest/pulls/pulls#get-a-pull-request).
     # A retrieval error fails the action; no body text reaches a shell.
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
     runs-on: ubuntu-24.04
     timeout-minutes: 2
     permissions:
@@ -162,11 +190,62 @@ jobs:
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
+            let number = context.issue.number;
+            let queued = null;
+            if (context.eventName === 'merge_group') {
+              const group = context.payload.merge_group;
+              if (context.payload.action !== 'checks_requested' ||
+                  !/^refs\/heads\/.+/.test(group?.base_ref || '') ||
+                  !/^[0-9a-f]{40}$/.test(group?.base_sha || '') ||
+                  !/^[0-9a-f]{40}$/.test(group?.head_sha || '') ||
+                  group.head_sha !== context.sha) {
+                throw new Error('SOTA sources: invalid merge-group identity; failing closed.');
+              }
+              const branch = group.base_ref.slice('refs/heads/'.length);
+              // Native queue association, never a PR number parsed from a temporary ref.
+              // github/docs@0226a2d7 schema.docs.graphql: MergeQueueEntry baseCommit/headCommit.
+              const {repository} = await github.graphql(`
+                query($owner: String!, $repo: String!, $branch: String!) {
+                  repository(owner: $owner, name: $repo) {
+                    mergeQueue(branch: $branch) {
+                      entries(first: 2) {
+                        totalCount pageInfo { hasNextPage }
+                        nodes {
+                          baseCommit { oid } headCommit { oid }
+                          pullRequest { number state baseRefName headRefOid }
+                        }
+                      }
+                    }
+                  }
+                }`, {owner: context.repo.owner, repo: context.repo.repo, branch});
+              const entries = repository?.mergeQueue?.entries;
+              // The evaluated configuration admits one PR. Larger queues need a separately
+              // reviewed all-member binding; truncation or ambiguity must never pass.
+              if (entries?.totalCount !== 1 || entries?.nodes?.length !== 1 ||
+                  entries?.pageInfo?.hasNextPage !== false) {
+                throw new Error('SOTA sources: expected exactly one native queue entry; failing closed.');
+              }
+              const entry = entries.nodes[0];
+              queued = entry?.pullRequest;
+              if (entry?.baseCommit?.oid !== group.base_sha || entry?.headCommit?.oid !== group.head_sha ||
+                  queued?.state !== 'OPEN' || queued?.baseRefName !== branch ||
+                  !Number.isSafeInteger(queued?.number) || queued.number < 1 ||
+                  !/^[0-9a-f]{40}$/.test(queued?.headRefOid || '')) {
+                throw new Error('SOTA sources: stale or unbound queue entry; failing closed.');
+              }
+              number = queued.number;
+            }
             const {data: pullRequest} = await github.rest.pulls.get({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              pull_number: context.issue.number
+              pull_number: number
             });
+            if (queued && (pullRequest.number !== number || pullRequest.state !== 'open' ||
+                pullRequest.base?.ref !== queued.baseRefName ||
+                pullRequest.base?.sha !== context.payload.merge_group.base_sha ||
+                pullRequest.head?.sha !== queued.headRefOid)) {
+              throw new Error('SOTA sources: the current PR no longer matches this group; failing closed.');
+            }
             const body = pullRequest.body || '';
             const match = body.match(/^#{2,3}[ \t]+SOTA sources[ \t]*$([\s\S]*?)(?=^#{2,3}[ \t]|(?![\s\S]))/m);
             const content = match ? match[1].replace(/<!--[\s\S]*?-->/g, '').trim() : '';

@@ -10,6 +10,9 @@ Gitleaks v8.30.1 passes --log-opts to git log (sources/git.go at
 requires --diff-merges to emit merge patches; first-parent diff formatting
 does not restrict parent traversal. Full backstops require both
 --ci-backstop and GITHUB_ACTIONS=true; local scans remain PR-range only.
+Merge groups use their explicit base/head pair, per github/docs at
+0226a2d78cf2be40ee3d769ec5661638461af0cc,
+content/actions/reference/workflows-and-actions/events-that-trigger-workflows.md.
 """
 
 from __future__ import annotations
@@ -88,6 +91,15 @@ def select_range(event_name: str, event: dict, *, ci_backstop: bool = False) -> 
             if not (ancestor(base, start) or ancestor(start, base)):
                 raise RangeError("The PR payload base and merge base are on unrelated lines")
             reason = "pull-request-merge-first-parent"
+    elif event_name == "merge_group":
+        group = event.get("merge_group")
+        if event.get("action") != "checks_requested" or not isinstance(group, dict):
+            raise RangeError("The checks_requested merge_group payload is missing")
+        start = event_commit(group.get("base_sha"), "merge_group.base_sha")
+        group_head = event_commit(group.get("head_sha"), "merge_group.head_sha")
+        if group_head != head:
+            raise RangeError("merge_group.head_sha does not match the checked-out HEAD")
+        reason = "merge-group-base"
     elif event_name == "push":
         after = event_commit(event.get("after"), "push.after")
         if after != head:
@@ -120,8 +132,8 @@ def select_range(event_name: str, event: dict, *, ci_backstop: bool = False) -> 
         mode = "full"
         reason = "dispatch-ci-full-history" if event_name == "workflow_dispatch" else "schedule-ci-full-history"
     else:
-        # merge_group is not a trigger in this workflow. New event types require an
-        # explicit scope policy and tests instead of silently scanning full history.
+        # New event types require an explicit scope policy and tests instead of
+        # silently scanning full history.
         raise RangeError("Unsupported event: no secret-scan range policy")
 
     if mode == "range":

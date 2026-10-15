@@ -5142,8 +5142,8 @@
     },
     {
       "path": ".github/workflows/dependency-review.yml",
-      "sha256": "861a5e0eb2dd6e1d253e43c67602fcada04f80cac0ac379b0268db480812e889",
-      "bytes": 1549
+      "sha256": "7b415e2cdfedf7935545a089d351fca640a184b99759346f4444a8abe05faa96",
+      "bytes": 1950
     },
     {
       "path": ".github/workflows/frozen-evidence-risk.yml",
@@ -5182,8 +5182,8 @@
     },
     {
       "path": ".github/workflows/pr-metadata.yml",
-      "sha256": "3f0d77d6d28e2c1a15905a277cff15326a75c4960e37f634e2a2c12e2e7bffe6",
-      "bytes": 9927
+      "sha256": "0434f12e56763c894cd6e4bbb583b8f61609f5a15ec22d3e31c9c6a1720dea35",
+      "bytes": 14706
     },
     {
       "path": ".github/workflows/practice-references-freshness.yml",
@@ -5217,13 +5217,13 @@
     },
     {
       "path": ".github/workflows/security-scan.yml",
-      "sha256": "44547b18f6b2551fb488cfeadaf7b1acb4d0432274f0787fe092ce2a7397d937",
-      "bytes": 12313
+      "sha256": "7d393b90e64f639dca91a3c7da11e95b950d9145e40b1a1a6d1bdbb2152ef259",
+      "bytes": 12537
     },
     {
       "path": ".github/workflows/sota-sources-gate.yml",
-      "sha256": "468a1d1b8b765823dc5175f546c236cdf026669de2581e8149c1ef68177274e7",
-      "bytes": 3020
+      "sha256": "1dcf330c36d5378fb3c70a0fa779636238f25e93cb4fe6df4055516950b8fac2",
+      "bytes": 6144
     },
     {
       "path": ".github/workflows/supply-chain.yml",
@@ -5232,13 +5232,13 @@
     },
     {
       "path": ".github/workflows/token-report.yml",
-      "sha256": "bb4d75b0c9beceee398f0e8fafbc94a83f35d0e393fe1bcb63204d44de9ec7b3",
-      "bytes": 1086
+      "sha256": "cc6521d6beb08d56e43e025e2845603960b6fca45015185357df1096b149ff5d",
+      "bytes": 1131
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "2625973cbe8b5aa17d84a9e2309ce90bdd06872afddcd005b58b40bd5b786fb4",
-      "bytes": 50453
+      "sha256": "9f16beaba71b65b52f1f3ba573b5bc0eebaed72d37d4605c71601a05c63664f1",
+      "bytes": 50621
     },
     {
       "path": ".gitignore",
@@ -19280,6 +19280,11 @@
       "path": "docs/decisions/2026-10-15-jev-trading-harness-build.md",
       "sha256": "cbf1ff9120d3aa1e5687b53240896ecb54dccf6782eef833590851a4ddfc78fd",
       "bytes": 8484
+    },
+    {
+      "path": "docs/decisions/2026-10-15-merge-queue-trial-readiness.md",
+      "sha256": "e439c04af63d6bb54d2c5385d183aecde7e0e64ba9eedf841c7ea548d3fb5c1e",
+      "bytes": 9317
     },
     {
       "path": "docs/decisions/2026-10-15-model-currency-landscape-check.md",
@@ -62363,8 +62368,8 @@
     },
     {
       "path": "scripts/ci_secret_scan_range.py",
-      "sha256": "a3f6ad6cbc9cac0e48f3713c4d6ec10db0a17e9d58de0d2154d4c3ae8a9b19f7",
-      "bytes": 7976
+      "sha256": "0c6be855a9f24cf1b120a16a0b6f90d337c5885ca6c7192adc5bfc70512639eb",
+      "bytes": 8681
     },
     {
       "path": "scripts/codex_quota.py",
@@ -63288,8 +63293,8 @@
     },
     {
       "path": "tests/test_ci_secret_scan_range.py",
-      "sha256": "f5a7f502d2d7211d06f785b676020c6351a8f2097223f993d853fe9f09130625",
-      "bytes": 15233
+      "sha256": "1810cd4eea0666bf42294f5dae0f460bcb693096cc8ef5f523f136abac1a4813",
+      "bytes": 16437
     },
     {
       "path": "tests/test_claude_federation_diagnostics.py",
@@ -64438,8 +64443,8 @@
     },
     {
       "path": "tests/test_sota_sources_gate.py",
-      "sha256": "869038ea7c6261e335e942934b335789e9f3e883ee172835a1c0828ea4afa870",
-      "bytes": 16230
+      "sha256": "3d831a477ec3a39649f87083afe0081094fecec06ce2f009944b8a47fe741374",
+      "bytes": 19567
     },
     {
       "path": "tests/test_spy_parity.py",
@@ -64633,8 +64638,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "f8e329097b6644ff128930c6eca9ab1f9d5a9746c8104598e627b6c7ebe380ba",
-      "bytes": 153040
+      "sha256": "bf2f6d79a2b3e155d0fb2a1b8b11fde1bed4eb88ff1ac4c3f6c86a80f2c4daaa",
+      "bytes": 157325
     },
     {
       "path": "tests/test_workflow_policy.py",

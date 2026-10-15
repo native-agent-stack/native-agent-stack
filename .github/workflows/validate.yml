@@ -1,6 +1,8 @@
 name: Validate published evidence
 
 on:
+  merge_group:
+    types: [checks_requested]
   push:
     branches: [main]
   pull_request:
@@ -173,7 +175,7 @@ jobs:
       - name: Validate manifests and evidence integrity
         if: matrix.shard == 0
         env:
-          NATIVE_AGENT_REGISTRATION_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          NATIVE_AGENT_REGISTRATION_BASE: ${{ github.event.merge_group.base_sha || github.event.pull_request.base.sha || github.event.before }}
           NATIVE_AGENT_REGISTRATION_BEFORE: ${{ steps.registry_history.outputs.before_refs }}
         run: python3 scripts/validate.py
       - name: Validate host evidence contribution receipts
@@ -184,7 +186,8 @@ jobs:
         shell: bash
         env:
           BASE_REF: ${{ github.base_ref }}
-        run: python3 scripts/release_due.py --strict-if-repinned "origin/${BASE_REF:-main}" | tee -a "$GITHUB_STEP_SUMMARY"
+          GROUP_BASE_SHA: ${{ github.event.merge_group.base_sha }}
+        run: python3 scripts/release_due.py --strict-if-repinned "${GROUP_BASE_SHA:-origin/${BASE_REF:-main}}" | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Validate catalog evidence and coverage joins
         if: matrix.shard == 0
         run: python3 scripts/validate_catalogs.py

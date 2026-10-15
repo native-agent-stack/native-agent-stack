@@ -392,9 +392,14 @@ class ScorecardTests(unittest.TestCase):
 class DependencyReviewTests(unittest.TestCase):
     text = (WORKFLOWS / "dependency-review.yml").read_text(encoding="utf-8")
 
-    def test_runs_on_pull_requests_only_and_fails_on_high(self):
+    def test_runs_on_pull_requests_and_merge_groups_and_fails_on_high(self):
         trigger = self.text.split("\non:\n", 1)[1].split("\n\n", 1)[0]
-        self.assertEqual([line.strip() for line in trigger.splitlines() if line.strip()], ["pull_request:"])
+        self.assertEqual([line.strip() for line in trigger.splitlines() if line.strip()],
+                         ["merge_group:", "types: [checks_requested]", "pull_request:"])
+        for key in ("base", "head"):
+            self.assertIn(f"{key}-ref: ${{{{ github.event.merge_group.{key}_sha || "
+                          f"github.event.pull_request.{key}.sha }}}}", self.text)
+        self.assertIn("github.event_name == 'pull_request'", self.text)
         self.assertIn("fail-on-severity: high", self.text)
         self.assertNotIn("warn-only:", self.text)
         self.assertRegex(self.text.split("\njobs:\n", 1)[0], NO_SCOPE)
@@ -403,6 +408,28 @@ class DependencyReviewTests(unittest.TestCase):
         for block in blocks:
             self.assertEqual(block, {"contents": "read"})
         self.assertNotRegex(self.text, INLINE_GRANT, "no inline read-all/write-all form")
+
+
+class MergeGroupWorkflowTests(unittest.TestCase):
+    def test_every_required_check_has_an_unfiltered_checks_requested_trigger(self):
+        owners = {"validate": "validate.yml", "secret-scan": "validate.yml",
+                  "token-report": "token-report.yml", "dependency-review": "dependency-review.yml",
+                  "osv-scanner": "security-scan.yml", "verdict-review-gate": "pr-metadata.yml",
+                  "sota-sources": "pr-metadata.yml"}
+        for check, filename in owners.items():
+            with self.subTest(check=check):
+                text = (WORKFLOWS / filename).read_text(encoding="utf-8")
+                trigger = text.split("\non:\n", 1)[1].split("\n\n", 1)[0]
+                self.assertRegex(trigger, r"(?m)^  merge_group:\n    types: \[checks_requested\]$")
+                self.assertNotIn("paths:", trigger)
+        metadata = jobs((WORKFLOWS / "pr-metadata.yml").read_text(encoding="utf-8"))
+        self.assertIn("github.event_name == 'merge_group'", metadata["sota-sources"])
+
+    def test_merge_group_security_scans_never_acquire_sarif_write_permissions(self):
+        scan = jobs((WORKFLOWS / "security-scan.yml").read_text(encoding="utf-8"))
+        for job in ("osv-sarif-upload", "zizmor-online", "zizmor-sarif-upload"):
+            self.assertIn("github.event_name != 'merge_group'", block_if(scan[job]))
+        self.assertEqual(scopes(scan["osv-scanner"]), [{"contents": "read"}])
 
 
 def scopes(text):
@@ -799,7 +826,7 @@ class VerdictReviewGateTests(unittest.TestCase):
         self.assertIn("git rev-parse --verify --quiet 'HEAD^3^{commit}'", assertion)
         self.assertRegex(assertion, r"failing closed\"\n +exit 1\n +fi")
 
-    def run_gate_step(self, repository, head, pr_head, event="pull_request", base_ref="main"):
+    def run_gate_step(self, repository, head, pr_head, event="pull_request", base_ref="main", group=None):
         """Execute the step's script in ``repository`` checked out at ``head``, with a stub python3
         that records the gate invocation instead of running it."""
         subprocess.run(["git", "-C", str(repository), "checkout", "--quiet", "--detach", head], check=True)
@@ -816,8 +843,45 @@ class VerdictReviewGateTests(unittest.TestCase):
                            PR_BASE_REF=base_ref,
                            RUNNER_TEMP=str(scratch), GITHUB_WORKSPACE=str(repository),
                            GITHUB_STEP_SUMMARY=str(scratch / "summary.md"))
+        if group is not None:
+            environment.update(GROUP_BASE_REF=group.get("base_ref", ""),
+                               GROUP_BASE_SHA=group.get("base_sha", ""),
+                               GROUP_HEAD_SHA=group.get("head_sha", ""))
         return subprocess.run(["bash", "-c", self.run_script()], cwd=repository, env=environment,
                               capture_output=True, text=True)
+
+    def test_merge_group_uses_its_full_payload_range_and_the_base_gate(self):
+        repository = self.make_pull_request_repository(gate="base")
+        base, head = self.commits["base"], self.commits["pr2"]
+        group = {"base_ref": "refs/heads/main", "base_sha": base, "head_sha": head}
+        passed = self.run_gate_step(repository, head, head, event="merge_group", group=group)
+        self.assertEqual(passed.returncode, 0, passed.stdout + passed.stderr)
+        self.assertIn(f"--base {base}", passed.stdout)
+        self.assertRegex(passed.stdout, r"gate-invoked \S+/gate-base/scripts/verdict_review_gate\.py")
+        self.assertNotIn(f"--base {self.commits['pr1']}", passed.stdout)
+
+    def test_merge_group_rejects_wrong_head_base_or_branch_before_running_gate(self):
+        repository = self.make_pull_request_repository(gate="base")
+        head = self.commits["pr2"]
+        good = {"base_ref": "refs/heads/main", "base_sha": self.commits["base"], "head_sha": head}
+        cases = [{}]
+        for key, value in (("head_sha", self.commits["pr1"]), ("base_sha", head),
+                           ("base_sha", self.commits["stack_merge"]),
+                           ("base_sha", "--all"), ("base_ref", "refs/heads/develop")):
+            cases.append({**good, key: value})
+        for group in cases:
+            with self.subTest(group=group):
+                failed = self.run_gate_step(repository, head, head, event="merge_group", group=group)
+                self.assertNotEqual(failed.returncode, 0, failed.stdout + failed.stderr)
+                self.assertNotIn("gate-invoked", failed.stdout)
+
+    def test_trial_pull_request_keeps_the_same_merge_parent_and_base_gate_guards(self):
+        repository = self.make_pull_request_repository(gate="base")
+        subprocess.run(["git", "-C", str(repository), "update-ref",
+                        "refs/remotes/origin/mq-trial-20261015", self.commits["base"]], check=True)
+        for head, expected in ((self.commits["merge"], 0), (self.commits["pr2"], 1)):
+            result = self.run_gate_step(repository, head, self.commits["pr2"], base_ref="mq-trial-20261015")
+            self.assertEqual(result.returncode, expected, result.stdout + result.stderr)
 
     def make_pull_request_repository(self, gate="added"):
         """base -> pr1 -> pr2 on branch pr, and the merge of pr2 into base. ``gate`` places
