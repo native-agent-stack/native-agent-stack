@@ -9294,7 +9294,7 @@
       },
       "definitions": [
         {
-          "definition": "Exactly one of: pending_lanes (the verdict ledger row's verdict_status is pending_lanes); no_selection (verdict_status no_selection, or a recorded verdict with no winners; scripts/landscape.py allows no other status); recorded_reopened (a recorded verdict, and a completed sweep in catalogs/saturation/ledger.json that covers the layer is dated after the row's checked_at); confirmed_current (a recorded verdict that no covering completed sweep is dated after). A sweep on the verdict's own date is not after it, a stopped sweep never counts, and a row without an ISO checked_at counts every covering completed sweep as after it.",
+          "definition": "Exactly one of: pending_lanes (the verdict ledger row's verdict_status is pending_lanes); no_selection (verdict_status no_selection, or a recorded verdict with no winners; scripts/landscape.py allows no other status); recorded_reopened (a recorded verdict, and a completed sweep in catalogs/saturation/ledger.json that covers the layer is dated after the row's checked_at); confirmed_current (a recorded verdict that no covering completed sweep is dated after). A sweep on the verdict's own date is not after it, a stopped sweep never counts, and a row without an ISO checked_at counts every covering completed sweep as after it. FINAL uses recorded-verdict semantics in this join; scripts/final_stack.py independently enforces its terminal-state conditions.",
           "term": "layer_state"
         },
         {

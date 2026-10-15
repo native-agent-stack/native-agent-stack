@@ -152,6 +152,17 @@ class FixtureTestCase(unittest.TestCase):
     def layer(document, layer_id) -> dict:
         return next(layer for layer in document["layers"] if layer["layer_id"] == layer_id)
 
+    def assert_final_disabled(self, root):
+        """Both CLI paths refuse FINAL without changing an existing artifact."""
+        path = root / fs.OUTPUT
+        previous = path.read_bytes() if path.exists() else None
+        for mode in ("--write", "--check"):
+            with self.subTest(mode=mode):
+                code, output = self.run_main(root, mode)
+                self.assertEqual(code, 1, output)
+                self.assertIn("admission under redesign", output)
+                self.assertEqual(path.read_bytes() if path.exists() else None, previous)
+
     @staticmethod
     def run_main(root: Path, *args, native_scan=False, private_names=("fixture-private-account",)) -> tuple[int, str]:
         buffer = io.StringIO()
@@ -1007,6 +1018,205 @@ class CheckTests(FixtureTestCase):
         self.assertEqual(self.run_main(root, "--write")[0], 0)
         self.assertEqual(readers(), before)
         self.assertEqual(before, ({"widget"}, {"widget-cli": ("widget",)}, {"1.0.0"}))
+
+
+def _angle_fixture() -> dict:
+    """Synthetic, fully sourced convergence control, not a candidate measurement."""
+    stamp = "2026-10-12T21:34:46Z"
+    return {
+        "schema_version": 1, "rule_version": "angle-convergence/2", "catalog": "foundation",
+        "layer_id": "layer-a", "weights_stated_at": "2026-10-12T21:32:22Z",
+        "weights": {"A1": .20, "A2": .20, "A3": .15, "A4": .15, "A5": .20, "A6": .10},
+        "weight_reason": "Synthetic v2 default-weight control.", "published_evaluations_available": True,
+        "disclosure": "Synthetic fixture; no real candidate score or runtime claim.",
+        "resolution_inputs": [], "gaps": [], "final_evidence": [],
+        "candidates": [{
+            "id": "widget", "name": "Widget", "repository": "https://github.com/example/widget",
+            "pin": COMMIT_A, "role": "fixture", "a1_screened": True, "a6_comparative": False,
+            "confounds": ["Synthetic fixture."], "disqualifier": None,
+            "verdict": "CONVERGED", "provisional": True, "measure_next": None,
+            "angles": {angle: {"score": "+" if angle != "A6" else "U", "read_at": stamp,
+                                "sources": [{"kind": "url", "url": "https://example.org/fixture",
+                                             "read_at": stamp}] if angle != "A6" else [],
+                                "note": "Synthetic source control."}
+                       for angle in ("A1", "A2", "A3", "A4", "A5", "A6")},
+        }],
+    }
+
+
+class AngleEnforcementTests(FixtureTestCase):
+    def prepare(self, *, final=False, evidence_class="native_proven", run=True):
+        root = self.root()
+        initial_sweep = _sweep("fixture", "2026-09-22", [("foundation", "layer-a")])
+        initial_sweep["layers"][0].update(requirement_sha256="a" * 64,
+                                         platform_profiles_sha256="a" * 64, reopen=[])
+        _fixture(root, foundation=[_layer("layer-a", winners=[_winner("widget", pin=COMMIT_A)],
+                                         terminal_state="FINAL" if final else None)],
+                 stack=[{"id": "widget", "repository": "https://github.com/example/widget",
+                         "version": "1.0.0", "source_pin": COMMIT_A}] if run else [],
+                 sweeps=[initial_sweep])
+        record = _angle_fixture()
+        if final:
+            c = record["candidates"][0]
+            c.update(a6_comparative=True, provisional=False)
+            paired = "evidence/artifacts/fixture/paired.json"
+            c["angles"]["A6"].update(score="+", sources=[{"kind": "receipt", "path": paired}])
+            arms = []
+            for ident in ("a", "b"):
+                native = f"evidence/artifacts/fixture/arm-{ident}.txt"
+                _write(root / native, "Synthetic native result stand-in.\n")
+                arms.append({"id": ident, "native_output": native})
+            _write_json(root / paired, {"kind": "comparative", "evidence_class": "native_proven",
+                "completed": True, "harness": "paired", "repository": c["repository"], "pin": c["pin"],
+                "confounds": ["Synthetic policy control, not a real measured comparison."], "arms": arms})
+        wave_path = "catalogs/sota-convergence/layer-verdicts-20260922.json"
+        _write_json(root / wave_path, {"layers": [{"layer_id": "layer-a", "fixture": True}]})
+        _write_json(root / "catalogs/sota-convergence/layer-verdict-waves.json", {"waves": [{
+            "run_id": "20260922", "path": wave_path,
+            "manifest": "catalogs/sota-convergence/manifest-20260922.json",
+            "sha256": hashlib.sha256((root / wave_path).read_bytes()).hexdigest()}]})
+        record["final_evidence"] = [{"candidate_id": "widget", "run_pin": COMMIT_A,
+                                      "e2e_receipt": "evidence/artifacts/fixture/e2e.json",
+                                      "invoke_receipt": "evidence/artifacts/fixture/invoke.json",
+                                      "not_invoked_reason": None}]
+        _write_json(root / "evidence/artifacts/fixture/e2e.json", {
+            "kind": "upstream_e2e", "repository": "https://github.com/example/widget", "pin": COMMIT_A,
+            "evidence_class": evidence_class, "success": True,
+            "upstream_sources": [{"kind": "repo", "repository": "https://github.com/example/widget",
+                                   "pin": COMMIT_A, "path": "README.md", "line": 1}],
+            "commands": [{"phase": "install", "command": "fixture install", "exit_code": 0},
+                         {"phase": "test", "command": "fixture test", "exit_code": 0}]})
+        _write_json(root / "evidence/artifacts/fixture/invoke.json", {
+            "kind": "invocation", "repository": "https://github.com/example/widget", "pin": COMMIT_A,
+            "evidence_class": evidence_class, "window_start": "2026-10-12T21:32:22Z",
+            "window_end": "2026-10-12T21:34:46Z", "calls": 1})
+        directory = root / "catalogs/landscape/angles"
+        directory.mkdir(parents=True, exist_ok=True)
+        schema = REPO_ROOT / "catalogs/landscape/angles/schema.json"
+        if schema.exists():
+            shutil.copyfile(schema, directory / "schema.json")
+        path = directory / "foundation-layer-a.json"
+        _write_json(path, record)
+        return root, path, record
+
+    def assert_check_rejects(self, mutate, reason, *, final=False, run=True):
+        root, path, record = self.prepare(final=final, run=run)
+        if not final:
+            _write(root / fs.OUTPUT, fs.serialize(fs.build_document(root)))
+        mutate(record, root)
+        _write_json(path, record)
+        code, output = self.run_main(root, "--check")
+        self.assertEqual(code, 1, output)
+        self.assertIn(reason, output)
+
+    def test_check_rejects_weight_sum(self):
+        self.assert_check_rejects(lambda r, _: r["weights"].update(A1=.30), "weight sum must equal 1")
+
+    def test_check_rejects_weights_stated_after_scoring(self):
+        self.assert_check_rejects(lambda r, _: r.update(weights_stated_at="2026-10-12T21:34:47Z"), "before scoring")
+
+    def test_check_rejects_score_without_source(self):
+        self.assert_check_rejects(lambda r, _: r["candidates"][0]["angles"]["A3"].update(sources=[]), "score without source")
+
+    def test_check_rejects_verdict_that_does_not_rederive(self):
+        self.assert_check_rejects(lambda r, _: r["candidates"][0].update(verdict="REJECTED"), "stated verdict does not re-derive")
+
+    def test_final_disabled_with_winner_without_convergence(self):
+        def mutate(record, _):
+            candidate = record["candidates"][0]
+            candidate["angles"]["A3"]["score"] = "-"
+            candidate.update(verdict="DISAGREE", provisional=False, measure_next="Compare the disagreement.")
+        self.assert_check_rejects(mutate, "admission under redesign", final=True)
+
+    def test_final_disabled_with_missing_evidence_class(self):
+        root, path, record = self.prepare(final=True)
+        source = root / "catalogs/landscape/foundation.json"
+        doc = json.loads(source.read_bytes())
+        del doc["layers"][0]["winners"][0]["evidence_class"]
+        _write_json(source, doc)
+        self.assert_final_disabled(root)
+
+    def test_final_disabled_with_missing_run_pin(self):
+        root, _, _ = self.prepare(final=True, run=False)
+        self.assert_final_disabled(root)
+
+    def test_final_disabled_with_missing_e2e_receipt(self):
+        self.assert_check_rejects(lambda r, _: r["final_evidence"][0].update(e2e_receipt=None),
+                                  "admission under redesign", final=True)
+
+    def test_final_disabled_with_missing_invoke_evidence_and_reason(self):
+        self.assert_check_rejects(lambda r, _: r["final_evidence"][0].update(invoke_receipt=None),
+                                  "admission under redesign", final=True)
+
+    def test_final_disabled_with_bound_receipts_and_non_invocation_reason(self):
+        for reason in (None, "The role is retained for recovery; it was not needed in this measured window."):
+            with self.subTest(reason=reason):
+                root, path, record = self.prepare(final=True)
+                if reason:
+                    record["final_evidence"][0].update(invoke_receipt=None, not_invoked_reason=reason)
+                    _write_json(path, record)
+                self.assert_final_disabled(root)
+
+    def test_missing_records_are_reported_as_gaps(self):
+        document = self.build(foundation=[_layer("layer-a")])
+        self.assertEqual(self.layer(document, "layer-a")["angles"]["status"], "missing")
+        self.assertEqual(document["summary"]["angles"]["missing"], 1)
+
+    def test_final_disabled_with_misbound_or_synthetic_execution_receipts(self):
+        for field, mutation in (("e2e_receipt", {"pin": COMMIT_B}),
+                                ("e2e_receipt", {"evidence_class": "synthetic"}),
+                                ("invoke_receipt", {"calls": 0}),
+                                ("invoke_receipt", {"calls": True}),
+                                ("invoke_receipt", {"window_end": "2026-10-12T21:32:22Z"})):
+            with self.subTest(field=field, mutation=mutation):
+                root, _, record = self.prepare(final=True)
+                path = root / record["final_evidence"][0][field]
+                receipt = json.loads(path.read_bytes())
+                receipt.update(mutation)
+                _write_json(path, receipt)
+                self.assert_final_disabled(root)
+
+    def test_nonfinal_pin_and_review_flags_remain_report_only(self):
+        root = self.root()
+        _fixture(root, foundation=[_layer("layer-a", winners=[_winner("widget", pin=COMMIT_A)])],
+                 sweeps=[_sweep("fixture", "2026-09-22", [("foundation", "layer-a")])])
+        _write(root / fs.OUTPUT, fs.serialize(fs.build_document(root)))
+        code, output = self.run_main(root, "--check", "--today", "2026-10-23")
+        self.assertEqual(code, 0, output)
+        self.assertIn("report-only", output)
+
+    def test_a_comparative_flag_cannot_turn_a_smoke_receipt_into_a6(self):
+        root, path, record = self.prepare()
+        _write(root / fs.OUTPUT, fs.serialize(fs.build_document(root)))
+        c = record["candidates"][0]
+        c.update(a6_comparative=True, provisional=False)
+        c["angles"]["A6"].update(score="+", sources=[
+            {"kind": "receipt", "path": "evidence/artifacts/fixture/smoke.json"}])
+        _write_json(root / "evidence/artifacts/fixture/smoke.json", {
+            "kind": "smoke", "evidence_class": "native_proven", "success": True})
+        _write_json(path, record)
+        code, output = self.run_main(root, "--check")
+        self.assertEqual(code, 1, output)
+        self.assertIn("comparative upstream run", output)
+
+    def test_comparative_a6_binds_and_tracks_native_outputs(self):
+        root, path, record = self.prepare()
+        c = record["candidates"][0]
+        c.update(a6_comparative=True, provisional=False)
+        receipt_path = "evidence/artifacts/fixture/paired.json"
+        c["angles"]["A6"].update(score="+", sources=[{"kind": "receipt", "path": receipt_path}])
+        native_paths = ["evidence/artifacts/fixture/arm-a.txt", "evidence/artifacts/fixture/arm-b.txt"]
+        for native in native_paths:
+            _write(root / native, "Synthetic stand-in for an upstream result artifact.\n")
+        _write_json(root / receipt_path, {
+            "kind": "comparative", "evidence_class": "native_proven", "completed": True,
+            "harness": "paired", "repository": c["repository"], "pin": c["pin"],
+            "confounds": ["Synthetic policy control, not a measured comparison."],
+            "arms": [{"id": ident, "native_output": native} for ident, native in zip(("a", "b"), native_paths)]})
+        _write_json(path, record)
+        document = fs.build_document(root)
+        self.assertTrue(all(p in document["sources"] for p in native_paths))
+        self.assertFalse(self.layer(document, "layer-a")["angles"]["candidates"][0]["provisional"])
 
 
 class RepositoryTests(unittest.TestCase):

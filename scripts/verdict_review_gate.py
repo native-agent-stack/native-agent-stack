@@ -109,6 +109,7 @@ for _path in (ROOT, TOOL_DIR):
 # family and adjudication rules; the verdict tools own the ledger/registry paths and packet format.
 from scripts.landscape import (  # noqa: E402
     DEFAULT_SEALED_BASE, GRANDFATHERED_RUN_IDS, LANE_FAMILIES, LANES, MANIFEST, RUN_MANIFEST_NAME,
+    RECORDED_VERDICT_STATUSES,
     PACKET_KEYS_NAME, SEALED_BASE_PREFIX, judge_adjudication, lane_model_issue, packet_keys_issue,
     packet_seals_candidates, run_id_of, run_manifest_row_issue, unseal_packet, withheld_packet_keys,
 )
@@ -585,7 +586,7 @@ class RowCheck:
         if returns:
             self.check_overturn_protocol(returns)
         self.check_status(status, recomputed, returns, candidates, sealed_base, packet_sha256)
-        if status != "recorded":
+        if status not in RECORDED_VERDICT_STATUSES:
             if self.row.get("winners"):
                 self.fail(f"a {status!r} row carries winners; only a recorded verdict names winners")
             if self.row.get("alternatives") or self.row.get("verdict_overturn_when"):
@@ -627,7 +628,8 @@ class RowCheck:
                       "'recorded' or 'pending_lanes' from the sealed evidence)")
             return
         expected, reason = self.expected_status(recomputed, returns, candidates, sealed_base, packet_sha256)
-        if expected is not None and status != expected:
+        actual = "recorded" if status in RECORDED_VERDICT_STATUSES else status
+        if expected is not None and actual != expected:
             self.fail(f"verdict_status is {status!r} but record_verdicts.py writes {expected!r} for the sealed "
                       f"evidence ({reason})")
 
@@ -847,7 +849,7 @@ class RowCheck:
         lanes.adjudication_sha256 and by the run manifest entry's adjudication {outcome, sealed, sha256};
         a recorded disagree row must carry it, and only a disagree row may."""
         stored = self.lanes.get(ADJUDICATION_SHA256_FIELD)
-        if agreement == "disagree" and status == "recorded" and stored is None:
+        if agreement == "disagree" and status in RECORDED_VERDICT_STATUSES and stored is None:
             self.fail(f"lanes.{ADJUDICATION_SHA256_FIELD} is absent; a recorded disagree row binds its sealed "
                       "adjudication")
             return

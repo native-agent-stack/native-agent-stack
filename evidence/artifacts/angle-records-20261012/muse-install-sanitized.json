@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "evidence_class": "native_proven",
+  "kind": "installation_observation",
+  "observed_at": "2026-10-13T02:53:22Z",
+  "product": "Muse Code",
+  "pin": "1.4.6-R6000.1",
+  "installation": {
+    "upstream_installer": "https://dev.meta.ai/install.sh",
+    "exit_code": 0,
+    "version_reported": "1.4.6-R6000.1",
+    "release_manifest_matches": true
+  },
+  "source_review": {
+    "full_model_id": "muse-wonder-full-1.0",
+    "model_selection": "Identifier retained from installed command/documentation evidence; no successful Full-model invocation is asserted here."
+  },
+  "sources": [
+    {
+      "kind": "url",
+      "url": "https://dev.meta.ai/docs/muse-code",
+      "read_at": "2026-10-13T02:53:02Z",
+      "capture_path": "evidence/artifacts/angle-records-20261012/source-captures/muse-overview.txt"
+    },
+    {
+      "kind": "url",
+      "url": "https://dev.meta.ai/docs/muse-code/configuration",
+      "read_at": "2026-10-13T02:53:02Z",
+      "capture_path": "evidence/artifacts/angle-records-20261012/source-captures/muse-configuration.txt"
+    },
+    {
+      "kind": "url",
+      "url": "https://dev.meta.ai/docs/muse-code/extending",
+      "read_at": "2026-10-13T02:53:02Z",
+      "capture_path": "evidence/artifacts/angle-records-20261012/source-captures/muse-extending.txt"
+    },
+    {
+      "kind": "url",
+      "url": "https://dev.meta.ai/docs/muse-code/subscriptions",
+      "read_at": "2026-10-13T02:53:02Z",
+      "capture_path": "evidence/artifacts/angle-records-20261012/source-captures/muse-subscriptions.txt"
+    }
+  ],
+  "limits": [
+    "Installation/version observation only; this is A1 evidence and not comparative A6.",
+    "Native role screening, complete Full-model invocation and Standard-mode confirmation remain unverified.",
+    "No home paths, machine identity, settings contents, launcher bytes, credential values or private digests are retained.",
+    "This lane read the sanitized observation; it performed no candidate install or model call."
+  ]
+}

@@ -20,6 +20,13 @@ except ImportError:
     import platform_status as platform_evidence
 
 MANIFEST = "catalogs/landscape/manifest.json"
+FINAL_ADMISSION_REFUSAL = "admission under redesign"
+
+
+def refuse_final(row, *, error_type=ValueError):
+    """Apply the shared refusal before registration or consumer processing."""
+    if "FINAL" in (row.get("terminal_state"), row.get("verdict_status")):
+        raise error_type(FINAL_ADMISSION_REFUSAL)
 
 
 def registration_history(root):
@@ -64,6 +71,7 @@ def is_unrun_registration(row, *, root=None):
     registration into the immutable 20260922 wave. Existing rows retain their
     historical fallback unless they carry this explicit marker.
     """
+    refuse_final(row)
     if "registration_only" not in row:
         return False
     lanes = row.get("lanes")
@@ -96,7 +104,8 @@ EVIDENCE_KINDS = {
 DECISIONS = {"retain", "adjust", "keep_but_compare"}
 
 # Layer-verdict schema v2 (catalogs/landscape/{foundation,us-equities}.json).
-VERDICT_STATUSES = {"pending_lanes", "recorded", "no_selection"}
+RECORDED_VERDICT_STATUSES = {"recorded", "FINAL"}
+VERDICT_STATUSES = {"pending_lanes", "no_selection"} | RECORDED_VERDICT_STATUSES
 WINNER_EVIDENCE_CLASSES = {
     "native_proven", "local_integration", "synthetic", "source_review", "measured_comparison",
 }
@@ -949,6 +958,8 @@ def _validate_verdict_schema(row, key):
 def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recipe_map, sota_pins,
                           status_context, lane_registry=None, wave_refs=None):
     """Validate common schema before applying any unrun or wave-specific rules."""
+    refuse_final(row)
+
     def evidence_maybe_empty(values, label):
         require(isinstance(values, list), label + " must be a list")
         return evidence(values, label) if values else []
@@ -1154,7 +1165,7 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
     verdict_overturn_when = row.get("verdict_overturn_when", "")
     status = row["verdict_status"]
     chosen_lane = None
-    if status == "recorded":
+    if status in RECORDED_VERDICT_STATUSES:
         require(bool(winners), str(key) + " recorded verdict needs at least one winner")
         require(bool(alternatives), str(key) + " recorded verdict needs at least one alternative")
         for winner in winners:
@@ -1208,7 +1219,7 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
         verify_new_wave_row(row, key, root=root, sealed_base=sealed_base, wave=wave, lanes_field=lanes_field,
                             parsed_returns=parsed_returns, retained_packet=retained_packet,
                             packet_sha256=packet_sha256, winners=winners,
-                            chosen_lane=chosen_lane if status == "recorded" else None, wave_refs=wave_refs)
+                            chosen_lane=chosen_lane if status in RECORDED_VERDICT_STATUSES else None, wave_refs=wave_refs)
 
 
 def verify_new_wave_row(row, key, *, root, sealed_base, wave, lanes_field, parsed_returns, retained_packet,
@@ -1340,6 +1351,7 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
         nonempty(document.get("scope"), path + ".scope")
         require(isinstance(document.get("layers"), list), path + " needs layers")
         for position, row in enumerate(document["layers"]):
+            refuse_final(row)
             key = (row["catalog"], row["layer_id"])
             require(key[0] == catalog and key in expected, "unknown comparison layer: " + str(key))
             require(key not in seen, "duplicate comparison layer: " + str(key))

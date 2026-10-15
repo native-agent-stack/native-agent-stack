@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-13T04:26:25Z",
+  "evidence_class": "local_integration",
+  "base_head": "fe64079381e7faaa6d115c5355330034831080d9",
+  "before_correction": {
+    "mechanism_basis": "The directory/URI mechanisms were unchanged from base_head when their new controls first ran; this was the working tree with new tests, not a complete prior checkout.",
+    "command": "python3 -m unittest tests.test_angle_records_fix1.FinalFix1Tests.test_directory_aliases_and_newline_are_not_upstream_file_citations tests.test_angle_records_fix1.RecordFix1Tests.test_malformed_https_uris_are_refused_without_format_registrations",
+    "exit_code": 1,
+    "tests": 2,
+    "failed_subtests": 9,
+    "alias_failures": "The real landscape validator rejected the alias, the newly generated matrix lost its winner factors/reopening and final-stack raised stale; the narrative and status-count controls each failed before correction."
+  },
+  "affected_modules": {
+    "command": "python3 -m unittest tests.test_angle_records tests.test_angle_records_fix1 tests.test_final_stack tests.test_landscape tests.test_component_matrix tests.test_layer_verdicts tests.test_resolution_protocol_docs tests.test_gap_closeouts tests.test_local_pages_policy_grants tests.test_local_pages_source_policy tests.test_local_pages_architecture_inventory",
+    "exit_code": 0,
+    "tests": 427,
+    "summary": "Ran 427 tests in 186.143s\n\nOK",
+    "after_final_count_adjustment": {
+      "command": "python3 -m unittest tests.test_layer_verdicts",
+      "exit_code": 0,
+      "tests": 28,
+      "summary": "Ran 28 tests in 0.108s\n\nOK"
+    }
+  },
+  "mutation_controls": {
+    "evidence_class": "synthetic",
+    "method": "In-memory guard substitutions with fresh-output refusal tests; no production file was mutated.",
+    "removed_guards": [
+      {"guard": "eligibility", "test_passed": false, "failures": 1, "errors": 0},
+      {"guard": "entitlement", "test_passed": false, "failures": 2, "errors": 0},
+      {"guard": "receipt binding", "test_passed": false, "failures": 2, "errors": 0},
+      {"guard": "invocation count", "test_passed": false, "failures": 1, "errors": 0},
+      {"guard": "invocation type", "test_passed": false, "failures": 1, "errors": 0},
+      {"guard": "invocation window", "test_passed": false, "failures": 1, "errors": 0},
+      {"guard": "RFC3986 syntax", "test_passed": false, "failures": 3, "errors": 0}
+    ]
+  },
+  "generated": {
+    "matrix_rows": 32,
+    "matrix_flip_rule_violations": 0,
+    "final_stack_layers": 35,
+    "angle_records": 4,
+    "missing_angle_records": 31,
+    "final_layers": 0
+  },
+  "final_registration_validation": "This receipt precedes its own registration. Final registered-state validate/final-stack and publication outputs are reported in the PR body and lane report after all files are registered; no pre-registration validation count is presented as final.",
+  "limits": [
+    "Named affected modules only; no full suite, candidate qualification, comparative model trial or model call.",
+    "E2E/comparative receipt controls are synthetic and do not establish a real FINAL winner.",
+    "Missing independent historical source captures and installation/invocation bytes remain unverified.",
+    "The package repository is UNMIRRORED; the primary public wheel excerpt and registry fields are retained separately.",
+    "Graph coverage/search transport was closed; bounded exact source reads were used for verification."
+  ]
+}

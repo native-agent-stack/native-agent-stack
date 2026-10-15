@@ -35,15 +35,18 @@ import tempfile
 import tomllib
 
 try:
-    from . import component_matrix, host_receipts, host_name_scan, saturation_ledger
+    from . import angle_records, component_matrix, host_receipts, host_name_scan, saturation_ledger
     from .catalog_decisions import InvalidDecisionIndex, safe_file, unique_json
+    from .landscape import FINAL_ADMISSION_REFUSAL, refuse_final
     from .sweep_policy import DEFAULT_SWEEP_CADENCE_DAYS
 except ImportError:  # running as a plain script, not a package
+    import angle_records
     import component_matrix
     import host_receipts
     import host_name_scan
     import saturation_ledger
     from catalog_decisions import InvalidDecisionIndex, safe_file, unique_json
+    from landscape import FINAL_ADMISSION_REFUSAL, refuse_final
     from sweep_policy import DEFAULT_SWEEP_CADENCE_DAYS
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -62,7 +65,8 @@ SCOPE = (
     "One row per layer of the final stack: the landscape verdict rows and the planned layers, each with its status, "
     "verdict wave and next review, winners with their verdict and run pins, alternates, unadjudicated sweep "
     "survivors, open gaps, research state, saturation and the found-to-adopted funnel; the run pins; the intake; and "
-    "a repository and component index. A read-only join of evidence recorded elsewhere; it selects nothing."
+    "a repository and component index; sourced angle summaries and explicit FINAL checks. A read-only join of "
+    "evidence recorded elsewhere; it selects nothing."
 )
 OUTPUT = "catalogs/landscape/final-stack.json"
 LANDSCAPE_MANIFEST = "catalogs/landscape/manifest.json"
@@ -90,7 +94,7 @@ PIN_DRIFT_VALUES = ("same", "differs", "unknown")
 # Reason codes of is_definitive, closest to definitive first.
 NOT_DEFINITIVE_REASONS = ("stale", "reopened", "no-winner", "unswept", "not-winner", "untracked")
 # A verdict that was recorded (a winner set or an explicit no selection) is reviewed; pending lanes have none yet.
-REVIEWED_VERDICTS = ("recorded", "no_selection")
+REVIEWED_VERDICTS = ("recorded", "no_selection", "FINAL")
 # Landscape rows that count as trialled until W5's comparison ledger exists: measured_comparison evidence
 # (scripts/landscape.py WINNER_EVIDENCE_CLASSES, EVIDENCE_KINDS) or a measured_tradeoff disposition.
 MEASURED_EVIDENCE = (("evidence_class", "measured_comparison"), ("evidence_kind", "measured_comparison"),
@@ -132,7 +136,8 @@ DEFINITIONS = (
      "no-winner (the verdict is pending_lanes or no_selection, or there are no winners); reopened (a completed sweep "
      "covering the layer is dated after the verdict's checked_at, component_matrix layer_state recorded_reopened); "
      "converged (layer_state confirmed_current and the matrix converged count equals its in_use count, which is "
-     "above 0); current (otherwise)."),
+     "above 0); current (otherwise). For an explicit FINAL claim, a later sweep reopens only with a named, "
+     "retained change reference; a date-only matrix reopening does not revoke FINAL."),
     ("verdict.next_review",
      "The verdict's checked_at plus policy.review_days, for a recorded or no_selection verdict; null for pending "
      "lanes and planned layers. It is a date, never a staleness: --check --today D flags a layer when D is past it."),
@@ -162,7 +167,9 @@ DEFINITIONS = (
      "a later survival or missing-vote-only re-proposal; surviving: an unresolved survival or missing-vote proposal dated after the "
      "verdict; trialled: landscape rows "
      "with measured_comparison evidence or a measured_tradeoff disposition; adopted: winners with a run pin."),
-    ("survivors", "The unresolved repositories of the funnel, with their latest survival or the missing-vote-only sweep and date that opened or reopened them."),
+    ("survivors", "The unresolved repositories of the funnel, with their latest survival or the missing-vote-only sweep and date that opened or reopened them. "
+     "For explicit FINAL claims, replay the cumulative set without a verdict-date filter: only retained substantive "
+     "refutation or an explicit retained verdict disposition settles a survivor, never age or omission."),
     ("index",
      "by_repository (normalized) and by_component_id (winners) map to every layer and role (winner, alternate, "
      "survivor, candidate) that names them."),
@@ -522,6 +529,7 @@ def trialled_repositories(row: dict) -> set[str]:
 
 
 def build_verdict(row: dict, matrix_row: dict, registry: dict, reopened_by: list[dict], *, root: Path = None) -> dict:
+    refuse_final(row, error_type=FinalStackError)
     verdict_day = component_matrix.parse_iso_date(row.get("checked_at"))
     wave = row_run_id(row, root=root)
     registered = registry.get(wave)
@@ -587,8 +595,360 @@ def layer_status(covered: bool, state: str | None, convergence: dict) -> str:
     return "current"
 
 
+def terminal_state(row: dict, angle: dict) -> str | None:
+    refuse_final(row, error_type=FinalStackError)
+    refuse_final(angle, error_type=FinalStackError)
+    claims = [state for state in (row.get("terminal_state"), angle.get("terminal_state"),
+                                 "FINAL" if row.get("verdict_status") == "FINAL" else None) if state]
+    if len(set(claims)) > 1:
+        raise FinalStackError("conflicting terminal-state claims")
+    return claims[0] if claims else None
+
+
+def retained_final_reference(sources: Sources, ref, reason: str):
+    """A FINAL lifecycle decision must point at retained, hash-bound evidence."""
+    try:
+        if not isinstance(ref, str) or not ref:
+            raise ValueError
+        path, _, pointer = ref.partition("#")
+        value = (saturation_ledger.resolve_pointer(sources.json(path), pointer) if pointer
+                 else sources.read_bytes(path))
+        if not value:
+            raise ValueError
+        return value
+    except (FinalStackError, saturation_ledger.LedgerError, TypeError, ValueError):
+        raise FinalStackError(reason) from None
+
+
+def final_reopened_by(sources: Sources, key: tuple[str, str], later: list[dict],
+                      baseline: dict | None) -> list[dict]:
+    """FINAL admits only explicitly complete, unchanged retained post-anchor rows."""
+    baseline_row = next((row for row in baseline["record"]["layers"]
+                         if (row["catalog"], row["layer_id"]) == key), {}) if baseline else {}
+    fields = ("requirement_sha256", "platform_profiles_sha256")
+    if (baseline is None or baseline["record"].get("status") != "completed"
+        or not all(isinstance(baseline_row.get(field), str)
+                   and saturation_ledger.HEX64.fullmatch(baseline_row[field]) for field in fields)):
+        raise FinalStackError("FINAL baseline requires retained complete scope hashes")
+    reopened = []
+    for sweep in later:
+        admitted = sweep["record"].get("status") == "completed"
+        for row in sweep["record"]["layers"]:
+            if (row["catalog"], row["layer_id"]) != key:
+                continue
+            admitted = admitted and len([candidate for candidate in sweep["record"]["layers"]
+                if (candidate["catalog"], candidate["layer_id"]) == key]) == 1
+            markers = row.get("reopen")
+            if not isinstance(markers, list):
+                raise FinalStackError("FINAL reopening requires retained change evidence")
+            for marker in markers:
+                if not isinstance(marker, dict) or marker.get("trigger") not in saturation_ledger.REOPEN_TRIGGERS:
+                    raise FinalStackError("FINAL reopening requires retained change evidence")
+                retained_final_reference(sources, marker.get("ref"),
+                                         "FINAL reopening requires retained change evidence")
+            admitted = admitted and all(isinstance(row.get(field), str)
+                and saturation_ledger.HEX64.fullmatch(row[field])
+                and row[field] == baseline_row[field] for field in fields)
+            admitted = admitted and not markers and not saturation_ledger.material_pending(row)
+        if not admitted:
+            reopened.append({"sweep_id": sweep["sweep_id"], "date": sweep["date"]})
+    return reopened
+
+
+def final_covering_sweeps(ledger: dict, key: tuple[str, str]) -> list[dict]:
+    """Retained FINAL history in ledger order, without date/status/cutoff filtering."""
+    covering = []
+    seen = set()
+    for ledger_index, record in enumerate(ledger["sweeps"]):
+        layers = record.get("layers")
+        if not isinstance(layers, list) or not layers or not all(isinstance(row, dict)
+                and isinstance(row.get("catalog"), str) and isinstance(row.get("layer_id"), str)
+                for row in layers):
+            raise FinalStackError("FINAL sweep history requires retained layer records")
+        if any((row.get("catalog"), row.get("layer_id")) == key for row in layers):
+            sweep_id = record.get("sweep_id")
+            if not isinstance(sweep_id, str) or not sweep_id or sweep_id in seen:
+                raise FinalStackError("FINAL sweep history requires unique retained sweep ids")
+            seen.add(sweep_id)
+            covering.append({"ledger_index": ledger_index, "sweep_id": sweep_id, "date": record.get("date"),
+                             "manifest_ref": record.get("manifest_ref"), "record": record})
+    return covering
+
+
+def final_v2_refutes_on_merit(sources: Sources, entry: dict, layer: dict) -> bool:
+    """Recognize native retained V2 screens by recomputing their supported outcome."""
+    target_of = saturation_ledger.ref_resolver(sources.json)
+    try:
+        discovery = target_of(layer.get("discovery_ref"))
+        source = discovery.get("source_field") if isinstance(discovery, dict) else None
+        documents = discovery.get("screen_judgments") if isinstance(discovery, dict) else None
+        if (not isinstance(source, dict) or source.get("contract_version") != 2
+            or not isinstance(documents, dict) or set(documents) != set(saturation_ledger.ROLES)
+            or not all(isinstance(documents[role], list) for role in saturation_ledger.ROLES)
+            or any(source.get(field) != layer.get(field) for field in
+                   ("contract_version", "catalog", "layer_id", "requirement_sha256", "platform_profiles_sha256"))
+            or saturation_ledger.v2_field_sha256(source) != source.get("field_sha256")):
+            return False
+        members = [member for member in _dicts(source.get("eligible_field"))
+                   if member.get("candidate_key") == entry.get("candidate_key")]
+        if (len(members) != 1 or members[0].get("repository") != entry.get("repository")
+            or members[0].get("evidence_key") != entry.get("evidence_key")):
+            return False
+        member = members[0]
+        if host_receipts.normalize_repository(entry.get("repo")) != host_receipts.normalize_repository(
+                member["repository"]):
+            return False
+        conflict = saturation_ledger.v2_provenance_conflict(documents)
+        screens = {role: saturation_ledger.v2_screen(role, documents[role], member, source, conflict)
+                   for role in saturation_ledger.ROLES}
+        outcome = saturation_ledger.v2_member_outcome(member, screens)
+        if (outcome.get("status") != "not_credible" or outcome.get("disposition") != "refuted"
+            or any(entry.get(field) != value for field, value in outcome.items())):
+            return False
+        for role in saturation_ledger.ROLES:
+            vote = entry.get(role)
+            if not isinstance(vote, dict) or vote.get("vote") != screens[role]["status"]:
+                return False
+            expected = {"contract_version": 2, "role": role, "candidate_key": member["candidate_key"],
+                        "repository": member["repository"], "evidence_key": member["evidence_key"],
+                        "judgments": documents[role], **screens[role]}
+            if target_of(vote.get("ref")) != expected:
+                return False
+        return True
+    except (FinalStackError, saturation_ledger.LedgerError, KeyError, TypeError, ValueError):
+        return False
+
+
+def final_disposition_index(sources: Sources, references: list, sweep_indices: dict) -> int | None:
+    """A recorder-preserved evidence ref must name a known covering ledger event."""
+    positions = []
+    target_of = saturation_ledger.ref_resolver(sources.json)
+    for reference in references:
+        retained_final_reference(sources, reference, "FINAL survivor disposition requires retained evidence")
+        try:
+            target = target_of(reference)
+        except (FinalStackError, saturation_ledger.LedgerError, TypeError, ValueError):
+            continue
+        if isinstance(target, dict):
+            position = sweep_indices.get(target.get("sweep_id"))
+            if position is not None:
+                positions.append(position)
+    return max(positions) if positions else None
+
+
+def final_unresolved_survivors(sources: Sources, row: dict, covering: list[dict]) -> list[dict]:
+    """Replay all survivor history; age, omission and a missing vote never settle it."""
+    pending = {}
+    pending_positions = {}
+    sweep_indices = {sweep["sweep_id"]: sweep["ledger_index"] for sweep in covering}
+
+    def mark_pending(identity, sweep):
+        pending[identity] = {"repository": identity, "sweep_id": sweep["sweep_id"], "date": sweep["date"]}
+        pending_positions[identity] = sweep["ledger_index"]
+
+    def retained_merit(entry, layer) -> bool:
+        if layer.get("contract_version") == 2:
+            return final_v2_refutes_on_merit(sources, entry, layer)
+        if "lens_votes" in entry:
+            votes = entry.get("lens_votes") or []
+        else:
+            votes = [entry.get(role) for role in saturation_ledger.ROLES]
+        for vote in votes:
+            if not isinstance(vote, dict) or vote.get("vote") != "refuted":
+                continue
+            try:
+                target = saturation_ledger.ref_resolver(sources.json)(vote.get("ref"))
+            except (FinalStackError, saturation_ledger.LedgerError, TypeError, ValueError):
+                continue
+            if saturation_ledger.refutes_on_merit(target) is True:
+                return True
+        return False
+
+    for sweep in covering:
+        for layer in sweep["record"]["layers"]:
+            if (layer["catalog"], layer["layer_id"]) != (row["catalog"], row["layer_id"]):
+                continue
+            for candidate in saturation_ledger.material_pending(layer):
+                repo = host_receipts.normalize_repository(candidate.get("repository", candidate.get("repo")))
+                identity = repo or candidate.get("candidate_key")
+                if identity:
+                    mark_pending(identity, sweep)
+            answered = {host_receipts.normalize_repository(candidate.get("repo"))
+                        for field in ("survived", "refuted") for candidate in _dicts(layer.get(field))}
+            for proposal in layer.get("proposed") or []:
+                repo = host_receipts.normalize_repository(proposal)
+                if repo and repo not in answered:
+                    mark_pending(repo, sweep)
+            for candidate in _dicts(layer.get("survived")):
+                repo = host_receipts.normalize_repository(candidate.get("repo"))
+                if repo:
+                    mark_pending(repo, sweep)
+            for candidate in _dicts(layer.get("refuted")):
+                repo = host_receipts.normalize_repository(candidate.get("repo"))
+                if not repo:
+                    continue
+                if retained_merit(candidate, layer):
+                    pending.pop(repo, None)
+                    pending_positions.pop(repo, None)
+                else:
+                    mark_pending(repo, sweep)
+    settled = {}
+    for winner in _dicts(row.get("winners")):
+        repo = host_receipts.normalize_repository(winner.get("repository"))
+        position = final_disposition_index(sources, winner.get("evidence_refs") or [], sweep_indices)
+        if repo and position is not None:
+            settled[repo] = position
+    for alternative in _dicts(row.get("alternatives")):
+        refs = alternative.get("evidence_refs")
+        if (alternative.get("disposition") not in {"observed_failure", "measured_tradeoff", "overlap", "out_of_scope",
+                                                    "unqualified", "conditional"}
+            or not isinstance(alternative.get("why_not_default"), str) or not alternative["why_not_default"].strip()
+            or not isinstance(refs, list) or not refs):
+            continue
+        repo = host_receipts.normalize_repository(alternative.get("repository"))
+        position = final_disposition_index(sources, refs, sweep_indices)
+        if repo and position is not None:
+            settled[repo] = max(settled.get(repo, -1), position)
+    return sorted((survivor for repo, survivor in pending.items() if not (
+        repo in settled and settled[repo] >= pending_positions[repo])),
+        key=lambda survivor: survivor["repository"])
+
+
+def complete_final_pin(text, run: dict) -> bool:
+    """FINAL uses the complete recorded run identity, not shared-field drift matching.
+
+    A supplied commit must be present in runs[]. A receipt cannot drop a
+    recorded commit and rely on a matching release name instead.
+    """
+    parsed = parse_pin(text).get("pin_parsed")
+    canonical = run.get("pin_parsed")
+    if not parsed or not canonical:
+        return False
+    if canonical.get("commit"):
+        if parsed.get("commit") != canonical["commit"]:
+            return False
+    elif parsed.get("commit"):
+        return False
+    return all(canonical.get(key) == value for key, value in parsed.items() if value is not None)
+
+
+def enforce_final(sources: Sources, layers: list[dict], runs: list[dict], angle_inputs: dict) -> None:
+    """Refuse every explicit FINAL claim while admission is under redesign.
+
+    The historical predicates below remain inactive until a separate redesign.
+    A matrix 'converged' status is a different concept.
+    """
+    # Keep the enforcement entry point fail-closed for direct callers too.
+    for layer in layers:
+        refuse_final(layer, error_type=FinalStackError)
+    by_run = {run["id"]: run for run in runs}
+    for layer in layers:
+        if layer["terminal_state"] != "FINAL":
+            continue
+        key = (layer["catalog"], layer["layer_id"])
+
+        def fail(reason):
+            raise FinalStackError(f"FINAL {layer_key(*key)}: {reason}")
+
+        if layer["status"] not in DEFINITIVE_STATUSES:
+            fail("reopened sweep delta must be adjudicated before FINAL"
+                 if layer["status"] == "reopened"
+                 else f"non-definitive status {layer['status']} cannot be FINAL")
+        if layer["survivors"]:
+            fail("cumulative unresolved survivors require retained dispositions before FINAL")
+        entry = angle_inputs.get(key)
+        if entry is None or not layer["winners"]:
+            fail("requires winners and a CONVERGED angle record")
+        verdict = layer["verdict"] or {}
+        wave = verdict.get("wave_doc") or {}
+        if not all(verdict.get(k) for k in ("date", "wave", "next_review")) or not wave.get("path"):
+            fail("condition 1 requires a recorded verdict, wave and next_review")
+        try:
+            raw = sources.read_bytes(wave["path"])
+        except FinalStackError:
+            fail("condition 1 verdict wave is not retained")
+        if hashlib.sha256(raw).hexdigest() != wave.get("sha256"):
+            fail("condition 1 verdict wave hash does not match")
+        record = entry["record"]
+        bound = {e["candidate_id"]: e for e in record["final_evidence"]}
+        for winner in layer["winners"]:
+            repository = host_receipts.normalize_repository(winner["repository"])
+            run = by_run.get(winner["run"])
+            if not winner.get("evidence_class"):
+                fail("condition 1 winner has no evidence class")
+            if run is None or not run.get("pin") or winner["pin_drift"] != "same":
+                fail("condition 2 winner requires a matching run pin in runs[]")
+            if not complete_final_pin(winner["verdict_pin"], run):
+                fail("condition 2 requires a complete FINAL pin identity in runs[]")
+            candidates = [c for c in record["candidates"]
+                          if host_receipts.normalize_repository(c["repository"]) == repository
+                          and complete_final_pin(c["pin"], run)]
+            if len(candidates) != 1:
+                fail("winner requires one CONVERGED angle verdict at its complete FINAL pin identity")
+            candidate = candidates[0]
+            if candidate.get("final_eligible") is False:
+                fail("final_eligible is false for this winner")
+            if (candidate.get("entitlement") or {}).get("status") in ("pending", "unverified"):
+                fail("entitlement remains unverified for this winner")
+            if candidate["verdict"] != "CONVERGED":
+                fail("winner requires one CONVERGED angle verdict at its run pin")
+            if candidate["provisional"] or not candidate["a6_comparative"]:
+                fail("winner requires NON-provisional CONVERGED evidence with comparative A6")
+            evidence = bound.get(candidate["id"]) or {}
+            if not complete_final_pin(evidence.get("run_pin"), run):
+                fail("FINAL evidence requires the complete FINAL pin identity")
+
+            def receipt(field, condition):
+                path = evidence.get(field)
+                if not path:
+                    fail(f"condition {condition} requires {field}")
+                try:
+                    value = sources.json(path)
+                except FinalStackError:
+                    fail(f"condition {condition} receipt is unavailable")
+                if (not isinstance(value, dict) or value.get("evidence_class") != "native_proven"
+                    or host_receipts.normalize_repository(value.get("repository")) != repository
+                    or not complete_final_pin(value.get("pin"), run)):
+                    fail(f"condition {condition} receipt must bind native evidence to repository and complete FINAL pin identity")
+                return value
+
+            e2e = receipt("e2e_receipt", 3)
+            schema = sources.json(angle_records.SCHEMA)
+            contract = {"$schema": schema["$schema"], "$defs": schema["$defs"],
+                        "$ref": "#/$defs/upstream_e2e"}
+            validator = angle_records.Draft202012Validator(contract)
+            if next(validator.iter_errors(e2e), None) is not None:
+                fail("condition 3 receipt has invalid commands or citations")
+            phases = {c.get("phase") for c in _dicts(e2e.get("commands"))
+                      if c.get("command") and type(c.get("exit_code")) is int and c["exit_code"] == 0}
+            cited = e2e.get("upstream_sources") or []
+            upstream = [s for s in _dicts(cited) if s.get("kind") == "repo" and s.get("path") and s.get("line")
+                        and host_receipts.normalize_repository(s.get("repository")) == repository
+                        and complete_final_pin(s.get("pin"), run)]
+            if (e2e.get("kind") != "upstream_e2e" or e2e.get("success") is not True
+                or not {"install", "test"}.issubset(phases) or not upstream
+                or any(c.get("exit_code") != 0 for c in _dicts(e2e.get("commands")))):
+                fail("condition 3 requires successful upstream install and test commands with pinned citations")
+            if evidence.get("invoke_receipt"):
+                invoke = receipt("invoke_receipt", 4)
+                try:
+                    start, end = (angle_records.timestamp(invoke[k]) for k in ("window_start", "window_end"))
+                    valid_window = start.tzinfo is not None and end.tzinfo is not None and start < end
+                except (KeyError, TypeError, ValueError):
+                    valid_window = False
+                if (invoke.get("kind") != "invocation" or not valid_window
+                    or type(invoke.get("calls")) is not int or invoke["calls"] <= 0):
+                    fail("condition 4 requires positive invocation calls in a measured window")
+            elif not (evidence.get("not_invoked_reason") or "").strip():
+                fail("condition 4 requires invoke evidence or a recorded non-invocation reason")
+
+
 def build_document(root: Path) -> dict:
     sources = Sources(root)
+    try:
+        angle_inputs = angle_records.load_records(sources)
+    except angle_records.AngleRecordError as error:
+        raise FinalStackError(str(error)) from error
     landscape = landscape_rows(sources)
     planned = planned_rows(sources, landscape)
     research_state, matrix, skills, ledger = (sources.json(relative)
@@ -620,11 +980,13 @@ def build_document(root: Path) -> dict:
     runs_by_id = {run["id"]: run for run in runs}
 
     layers = []
-    for key in sorted(set(landscape) | set(planned)):
+    for key in sorted(set(landscape) | set(planned) | set(angle_inputs)):
         catalog, layer_id = key
-        entry = landscape.get(key) or planned[key]
+        entry = landscape.get(key) or planned.get(key) or {
+            "row": {"title": layer_id, "candidates": []}, "source": angle_inputs[key]["path"]}
         row = entry["row"]
         is_landscape = key in landscape
+        resolved_terminal = terminal_state(row, (angle_inputs.get(key) or {}).get("record") or {})
         matrix_row = matrix_rows.get(key) or {}
         convergence = matrix_row.get("convergence") or {}
         covering = [sweep for sweep in sweeps if key in sweep["covers"]]
@@ -641,6 +1003,23 @@ def build_document(root: Path) -> dict:
                 raise FinalStackError(f"{MATRIX} is stale for {layer_key(*key)}: layer_state {recorded[0]!r}, "
                                       f"reopened by {recorded[1]!r}; the ledger gives {state!r}, {reopened_by!r}. "
                                       "Run python3 scripts/component_matrix.py --write first")
+            if resolved_terminal == "FINAL":
+                # Preserve the matrix's ordinary dated metric, then apply the
+                # protocol's consumed-sweep anchor in retained append-only order.
+                covering = final_covering_sweeps(ledger, key)
+                consumed = (registry.get(row_run_id(row)) or {}).get("manifest")
+                matches = [sweep for sweep in covering if isinstance(consumed, str) and consumed
+                           and sweep["manifest_ref"] == consumed]
+                if len(matches) != 1:
+                    raise FinalStackError("FINAL baseline requires one retained consumed covering sweep")
+                sources.read_bytes(consumed)
+                baseline = matches[0]
+                later = [sweep for sweep in covering if sweep["ledger_index"] > baseline["ledger_index"]]
+                reopened_by = final_reopened_by(sources, key, later, baseline)
+                if reopened_by:
+                    state = "recorded_reopened"
+                elif state == "recorded_reopened":
+                    state = "confirmed_current"
         held = isinstance(row.get("current_adoption_status"), str) and row["current_adoption_status"].startswith("held")
         winners = [build_winner(winner, matrix_row, runs_by_repository, runs_by_id, held)
                    for winner in _dicts(row.get("winners"))] if is_landscape else []
@@ -649,6 +1028,8 @@ def build_document(root: Path) -> dict:
                             for repository, (outcome, sweep_id, day) in layer_outcomes["latest"].items()
                             if outcome == "survived" and (verdict_day is None or date.fromisoformat(day) > verdict_day)),
                            key=lambda survivor: survivor["repository"])
+        if resolved_terminal == "FINAL":
+            survivors = final_unresolved_survivors(sources, {**row, "catalog": catalog}, covering)
         recorded_repositories = {host_receipts.normalize_repository(item.get("repository"))
                                  for role in ("winners", "alternatives", "candidates") for item in _dicts(row.get(role))}
         layers.append({
@@ -657,6 +1038,8 @@ def build_document(root: Path) -> dict:
             "title": row.get("title"),
             "source": entry["source"],
             "status": layer_status(bool(covering), state if is_landscape else None, convergence),
+            "terminal_state": resolved_terminal,
+            "angles": angle_records.summary(angle_inputs.get(key)),
             "verdict": build_verdict(row, matrix_row, registry, reopened_by, root=root) if is_landscape else None,
             "winners": winners,
             "alternates": [{field: alternative.get(field) for field in
@@ -676,6 +1059,8 @@ def build_document(root: Path) -> dict:
                                 if winner["run"] is not None} - {None}),
             },
         })
+
+    enforce_final(sources, layers, runs, angle_inputs)
 
     skills_coverage = []
     for task in _dicts(skills.get("tasks")):
@@ -774,6 +1159,9 @@ def build_summary(layers: list[dict], runs: list[dict], skills_coverage: list[di
     overall = ((matrix.get("summary") or {}).get("convergence") or {}).get("overall") or {}
     return {
         "layers": len(layers),
+        "angles": {status: sum(layer["angles"]["status"] == status for layer in layers)
+                   for status in ("recorded", "missing")},
+        "final_layers": sum(layer["terminal_state"] == "FINAL" for layer in layers),
         "status": {status: sum(1 for layer in layers if layer["status"] == status) for status in STATUS_ORDER},
         "winners": len(winners),
         "pin_parse": {"parsed": sum(1 for winner in winners if "pin_parsed" in winner),

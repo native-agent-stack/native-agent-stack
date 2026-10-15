@@ -42,14 +42,14 @@ try:
     from . import platform_status as platform_evidence
     from . import saturation_ledger
     from .catalog_decisions import InvalidDecisionIndex, load, require, safe_file, unique_json
-    from .landscape import ENFORCED_PLATFORMS, PLATFORM_KEYS
+    from .landscape import ENFORCED_PLATFORMS, PLATFORM_KEYS, RECORDED_VERDICT_STATUSES, refuse_final
     from .validate import PRIVATE_CONTENT
 except ImportError:  # running as a plain script, not a package
     import host_receipts
     import platform_status as platform_evidence
     import saturation_ledger
     from catalog_decisions import InvalidDecisionIndex, load, require, safe_file, unique_json
-    from landscape import ENFORCED_PLATFORMS, PLATFORM_KEYS
+    from landscape import ENFORCED_PLATFORMS, PLATFORM_KEYS, RECORDED_VERDICT_STATUSES, refuse_final
     from validate import PRIVATE_CONTENT
 
 
@@ -111,7 +111,9 @@ CONVERGENCE_DEFINITIONS = (
      "status); recorded_reopened (a recorded verdict, and a completed sweep in " + SATURATION_LEDGER_FILE
      + " that covers the layer is dated after the row's checked_at); confirmed_current (a recorded verdict that "
      "no covering completed sweep is dated after). A sweep on the verdict's own date is not after it, a stopped "
-     "sweep never counts, and a row without an ISO checked_at counts every covering completed sweep as after it."),
+     "sweep never counts, and a row without an ISO checked_at counts every covering completed sweep as after it. "
+     "FINAL uses recorded-verdict semantics in this join; scripts/final_stack.py independently enforces its "
+     "terminal-state conditions."),
     ("in_use",
      "The layer's rows in the newest committed sweep manifest (" + SWEEP_MANIFEST_DIR + "/manifest-YYYYMMDD.json "
      "with the latest checked_at; foundation[].components for a foundation layer, trading[].entries for a "
@@ -582,6 +584,7 @@ def build_row(root: Path, catalog: str, layer: dict, decisions: dict[str, list[d
               status_context: platform_evidence.StatusContext | None = None,
               winner_aliases: dict[str, tuple[str, ...]] | None = None,
               repo_layers: dict[str, set[str]] | None = None):
+    refuse_final(layer)
     if status_context is None:
         status_context = platform_evidence.load_context(root)
     layer_id = layer.get("layer_id")
@@ -849,7 +852,7 @@ def classify_layer_state(layer: dict, later_sweeps: list[dict]) -> str:
     status = layer.get("verdict_status")
     if status == "pending_lanes":
         return "pending_lanes"
-    if status != "recorded" or not (layer.get("winners") or []):
+    if status not in RECORDED_VERDICT_STATUSES or not (layer.get("winners") or []):
         return "no_selection"
     return "recorded_reopened" if later_sweeps else "confirmed_current"
 
@@ -872,7 +875,7 @@ def build_layer_convergence(catalog: str, layer: dict, row: dict, context: dict)
     later = [sweep for sweep in context["sweeps"]
              if covered in sweep["covers"] and (verdict_day is None or sweep["day"] > verdict_day)]
     state = classify_layer_state(layer, later)
-    recorded_winners = row["winners"] if layer.get("verdict_status") == "recorded" else []
+    recorded_winners = row["winners"] if layer.get("verdict_status") in RECORDED_VERDICT_STATUSES else []
     e2e_states: dict[str, list[str]] = {}
     for winner in recorded_winners:
         entry = (winner.get("platforms") or {}).get(CONVERGENCE_PLATFORM)

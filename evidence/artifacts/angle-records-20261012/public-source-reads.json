@@ -1,0 +1,2177 @@
+{
+  "schema_version": 1,
+  "evidence_class": "source_review",
+  "read_at": "2026-10-12T21:47:43Z",
+  "method": "Fresh reads of the registered read-only upstream mirror commits and public documented endpoints. Scored fields and separate compliance metadata are retained. No tokens, installs, model calls, custom metrics or comparative executions.",
+  "runtime": [
+    {
+      "id": "claude-code",
+      "repository": "https://github.com/anthropics/claude-code",
+      "pin": "3deb873687379f0c199a69fdaccc65f0865f7a29",
+      "mirror_status": "MIRRORED",
+      "previous_verdict": "CONVERGED",
+      "previous_signs": {
+        "A1": "+",
+        "A2": "+",
+        "A3": "+",
+        "A4": "+",
+        "A5": "+",
+        "A6": "U"
+      },
+      "scorecard": {
+        "url": "https://api.scorecard.dev/projects/github.com/anthropics/claude-code",
+        "read_at": "2026-10-12T21:42:29Z",
+        "status": 404,
+        "gap": "Public endpoint unavailable; no credential or alternate authentication attempted."
+      },
+      "project": {
+        "url": "https://api.deps.dev/v3/projects/github.com%2Fanthropics%2Fclaude-code",
+        "read_at": "2026-10-12T21:42:29Z",
+        "status": 200,
+        "fields": {
+          "projectKey": {
+            "id": "github.com/anthropics/claude-code"
+          },
+          "starsCount": 150194,
+          "forksCount": 26206
+        }
+      },
+      "release": {
+        "url": "https://api.github.com/repos/anthropics/claude-code/releases/latest",
+        "read_at": "2026-10-12T21:42:29Z",
+        "status": 200,
+        "fields": {
+          "tag_name": "v2.1.296",
+          "published_at": "2026-10-09T19:28:59Z",
+          "prerelease": false,
+          "draft": false
+        }
+      },
+      "ci": {
+        "url": "https://api.github.com/repos/anthropics/claude-code/actions/runs?per_page=5",
+        "read_at": "2026-10-12T21:42:30Z",
+        "status": 200,
+        "fields": [
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "3deb873687379f0c199a69fdaccc65f0865f7a29"
+          },
+          {
+            "status": "completed",
+            "conclusion": "skipped",
+            "head_sha": "3deb873687379f0c199a69fdaccc65f0865f7a29"
+          },
+          {
+            "status": "in_progress",
+            "conclusion": null,
+            "head_sha": "3deb873687379f0c199a69fdaccc65f0865f7a29"
+          },
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "3deb873687379f0c199a69fdaccc65f0865f7a29"
+          },
+          {
+            "status": "in_progress",
+            "conclusion": null,
+            "head_sha": "3deb873687379f0c199a69fdaccc65f0865f7a29"
+          }
+        ]
+      },
+      "licence_note": {
+        "spdx_id": null,
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2Fanthropics%2Fclaude-code",
+          "read_at": "2026-10-12T21:42:29Z"
+        },
+        "read_at": "2026-10-12T21:42:29Z",
+        "note": "Compliance only; it never changes any score, verdict or arm list."
+      }
+    },
+    {
+      "id": "codex-cli",
+      "repository": "https://github.com/openai/codex",
+      "pin": "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d",
+      "mirror_status": "MIRRORED",
+      "previous_verdict": "CONVERGED",
+      "previous_signs": {
+        "A1": "+",
+        "A2": "+",
+        "A3": "+",
+        "A4": "+",
+        "A5": "+",
+        "A6": "U"
+      },
+      "scorecard": {
+        "url": "https://api.scorecard.dev/projects/github.com/openai/codex",
+        "read_at": "2026-10-12T21:42:29Z",
+        "status": 200,
+        "fields": {
+          "date": "2026-10-05",
+          "repo": {
+            "name": "github.com/openai/codex",
+            "commit": "5b0b2530354052b9194156d70d4c94a439368342"
+          },
+          "scorecard": {
+            "version": "v5.5.1-0.20260928043300-ac4b58443938",
+            "commit": "ac4b584439389e57f8d56d925f7fef245d8dda1f"
+          },
+          "score": 6,
+          "checks": [
+            {
+              "name": "Maintained",
+              "score": 10
+            },
+            {
+              "name": "Code-Review",
+              "score": 0
+            },
+            {
+              "name": "Dangerous-Workflow",
+              "score": 10
+            },
+            {
+              "name": "Branch-Protection",
+              "score": 4
+            }
+          ]
+        }
+      },
+      "project": {
+        "url": "https://api.deps.dev/v3/projects/github.com%2Fopenai%2Fcodex",
+        "read_at": "2026-10-12T21:42:29Z",
+        "status": 200,
+        "fields": {
+          "projectKey": {
+            "id": "github.com/openai/codex"
+          },
+          "starsCount": 128197,
+          "forksCount": 20113
+        }
+      },
+      "release": {
+        "url": "https://api.github.com/repos/openai/codex/releases/latest",
+        "read_at": "2026-10-12T21:42:29Z",
+        "status": 200,
+        "fields": {
+          "tag_name": "rust-v0.162.1",
+          "published_at": "2026-10-09T19:44:51Z",
+          "prerelease": false,
+          "draft": false
+        }
+      },
+      "ci": {
+        "url": "https://api.github.com/repos/openai/codex/actions/runs?per_page=5",
+        "read_at": "2026-10-12T21:42:30Z",
+        "status": 200,
+        "fields": [
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "0c329ad2c9d5a2592128a1d536c66e16f9397e46"
+          },
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "0c329ad2c9d5a2592128a1d536c66e16f9397e46"
+          },
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "0c329ad2c9d5a2592128a1d536c66e16f9397e46"
+          },
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "0c329ad2c9d5a2592128a1d536c66e16f9397e46"
+          },
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "0c329ad2c9d5a2592128a1d536c66e16f9397e46"
+          }
+        ]
+      },
+      "licence_note": {
+        "spdx_id": "Apache-2.0",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2Fopenai%2Fcodex",
+          "read_at": "2026-10-12T21:42:29Z"
+        },
+        "read_at": "2026-10-12T21:42:29Z",
+        "note": "Compliance only; it never changes any score, verdict or arm list."
+      }
+    },
+    {
+      "id": "pi",
+      "repository": "https://github.com/earendil-works/pi",
+      "pin": "04566631c2b51fb688486bc1f040f60d1518c126",
+      "mirror_status": "MIRRORED",
+      "previous_verdict": "CONVERGED",
+      "previous_signs": {
+        "A1": "+",
+        "A2": "+",
+        "A3": "+",
+        "A4": "+",
+        "A5": "U",
+        "A6": "+"
+      },
+      "scorecard": {
+        "url": "https://api.scorecard.dev/projects/github.com/earendil-works/pi",
+        "read_at": "2026-10-12T21:42:29Z",
+        "status": 404,
+        "gap": "Public endpoint unavailable; no credential or alternate authentication attempted."
+      },
+      "project": {
+        "url": "https://api.deps.dev/v3/projects/github.com%2Fearendil-works%2Fpi",
+        "read_at": "2026-10-12T21:42:29Z",
+        "status": 200,
+        "fields": {
+          "projectKey": {
+            "id": "github.com/earendil-works/pi"
+          },
+          "starsCount": 112900,
+          "forksCount": 14338
+        }
+      },
+      "release": {
+        "url": "https://api.github.com/repos/earendil-works/pi/releases/latest",
+        "read_at": "2026-10-12T21:42:29Z",
+        "status": 200,
+        "fields": {
+          "tag_name": "v1.1.0",
+          "published_at": "2026-10-07T22:26:31Z",
+          "prerelease": false,
+          "draft": false
+        }
+      },
+      "ci": {
+        "url": "https://api.github.com/repos/earendil-works/pi/actions/runs?per_page=5",
+        "read_at": "2026-10-12T21:42:30Z",
+        "status": 200,
+        "fields": [
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "7bd01fb92485c06f92ecfff7ccf3197148bc16af"
+          },
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "7bd01fb92485c06f92ecfff7ccf3197148bc16af"
+          },
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "7bd01fb92485c06f92ecfff7ccf3197148bc16af"
+          },
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "7bd01fb92485c06f92ecfff7ccf3197148bc16af"
+          },
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "7bd01fb92485c06f92ecfff7ccf3197148bc16af"
+          }
+        ]
+      },
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2Fearendil-works%2Fpi",
+          "read_at": "2026-10-12T21:42:29Z"
+        },
+        "read_at": "2026-10-12T21:42:29Z",
+        "note": "Compliance only; it never changes any score, verdict or arm list."
+      }
+    },
+    {
+      "id": "oh-my-pi",
+      "repository": "https://github.com/can1357/oh-my-pi",
+      "pin": "5d0aaffaf1f987503ce129a642fb6e30339615af",
+      "mirror_status": "MIRRORED",
+      "previous_verdict": "INSUFFICIENT",
+      "previous_signs": {
+        "A1": "+",
+        "A2": "0",
+        "A3": "0",
+        "A4": "+",
+        "A5": "U",
+        "A6": "0"
+      },
+      "scorecard": {
+        "url": "https://api.scorecard.dev/projects/github.com/can1357/oh-my-pi",
+        "read_at": "2026-10-12T21:42:29Z",
+        "status": 404,
+        "gap": "Public endpoint unavailable; no credential or alternate authentication attempted."
+      },
+      "project": {
+        "url": "https://api.deps.dev/v3/projects/github.com%2Fcan1357%2Foh-my-pi",
+        "read_at": "2026-10-12T21:42:29Z",
+        "status": 200,
+        "fields": {
+          "projectKey": {
+            "id": "github.com/can1357/oh-my-pi"
+          },
+          "starsCount": 34459,
+          "forksCount": 3731
+        }
+      },
+      "release": {
+        "url": "https://api.github.com/repos/can1357/oh-my-pi/releases/latest",
+        "read_at": "2026-10-12T21:42:29Z",
+        "status": 200,
+        "fields": {
+          "tag_name": "v18.10.3",
+          "published_at": "2026-10-12T19:23:53Z",
+          "prerelease": false,
+          "draft": false
+        }
+      },
+      "ci": {
+        "url": "https://api.github.com/repos/can1357/oh-my-pi/actions/runs?per_page=5",
+        "read_at": "2026-10-12T21:42:30Z",
+        "status": 200,
+        "fields": [
+          {
+            "status": "completed",
+            "conclusion": "action_required",
+            "head_sha": "b1b586d5346c7239f29cc04eda7682669578d50d"
+          },
+          {
+            "status": "completed",
+            "conclusion": "action_required",
+            "head_sha": "b1b586d5346c7239f29cc04eda7682669578d50d"
+          },
+          {
+            "status": "completed",
+            "conclusion": "action_required",
+            "head_sha": "7c0c78513a279c792682d086ad668399595348e3"
+          },
+          {
+            "status": "completed",
+            "conclusion": "action_required",
+            "head_sha": "7c0c78513a279c792682d086ad668399595348e3"
+          },
+          {
+            "status": "completed",
+            "conclusion": "action_required",
+            "head_sha": "2e264811b40b75041bb53d6beb08a84c3ee37502"
+          }
+        ]
+      },
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2Fcan1357%2Foh-my-pi",
+          "read_at": "2026-10-12T21:42:29Z"
+        },
+        "read_at": "2026-10-12T21:42:29Z",
+        "note": "Compliance only; it never changes any score, verdict or arm list."
+      }
+    },
+    {
+      "id": "opencode-1x",
+      "repository": "https://github.com/anomalyco/opencode",
+      "pin": "a34961825be13a31daa76f33a8b47efcd198cfef",
+      "mirror_status": "MIRRORED",
+      "previous_verdict": "INSUFFICIENT",
+      "previous_signs": {
+        "A1": "+",
+        "A2": "0",
+        "A3": "+",
+        "A4": "+",
+        "A5": "0",
+        "A6": "0"
+      },
+      "scorecard": {
+        "url": "https://api.scorecard.dev/projects/github.com/anomalyco/opencode",
+        "read_at": "2026-10-12T21:42:29Z",
+        "status": 404,
+        "gap": "Public endpoint unavailable; no credential or alternate authentication attempted."
+      },
+      "project": {
+        "url": "https://api.deps.dev/v3/projects/github.com%2Fanomalyco%2Fopencode",
+        "read_at": "2026-10-12T21:42:29Z",
+        "status": 200,
+        "fields": {
+          "projectKey": {
+            "id": "github.com/anomalyco/opencode"
+          },
+          "starsCount": 212164,
+          "forksCount": 28258
+        }
+      },
+      "release": {
+        "url": "https://api.github.com/repos/anomalyco/opencode/releases/latest",
+        "read_at": "2026-10-12T21:42:29Z",
+        "status": 200,
+        "fields": {
+          "tag_name": "v1.19.0",
+          "published_at": "2026-10-11T01:39:22Z",
+          "prerelease": false,
+          "draft": false
+        }
+      },
+      "ci": {
+        "url": "https://api.github.com/repos/anomalyco/opencode/actions/runs?per_page=5",
+        "read_at": "2026-10-12T21:42:30Z",
+        "status": 200,
+        "fields": [
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "cdde754087c60ea37364fcd75f59d45024874344"
+          },
+          {
+            "status": "in_progress",
+            "conclusion": null,
+            "head_sha": "cdde754087c60ea37364fcd75f59d45024874344"
+          },
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "cdde754087c60ea37364fcd75f59d45024874344"
+          },
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "cdde754087c60ea37364fcd75f59d45024874344"
+          },
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "f83934c7bc50678091df36d41203c38e631a6ba8"
+          }
+        ]
+      },
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2Fanomalyco%2Fopencode",
+          "read_at": "2026-10-12T21:42:29Z"
+        },
+        "read_at": "2026-10-12T21:42:29Z",
+        "note": "Compliance only; it never changes any score, verdict or arm list."
+      }
+    },
+    {
+      "id": "opencode-2x",
+      "repository": "https://github.com/anomalyco/opencode",
+      "pin": "a34961825be13a31daa76f33a8b47efcd198cfef",
+      "mirror_status": "MIRRORED",
+      "previous_verdict": "INSUFFICIENT",
+      "previous_signs": {
+        "A1": "U",
+        "A2": "0",
+        "A3": "0",
+        "A4": "0",
+        "A5": "U",
+        "A6": "+"
+      },
+      "scorecard": {
+        "url": "https://api.scorecard.dev/projects/github.com/anomalyco/opencode",
+        "read_at": "2026-10-12T21:42:30Z",
+        "status": 404,
+        "gap": "Public endpoint unavailable; no credential or alternate authentication attempted."
+      },
+      "project": {
+        "url": "https://api.deps.dev/v3/projects/github.com%2Fanomalyco%2Fopencode",
+        "read_at": "2026-10-12T21:42:30Z",
+        "status": 200,
+        "fields": {
+          "projectKey": {
+            "id": "github.com/anomalyco/opencode"
+          },
+          "starsCount": 212164,
+          "forksCount": 28258
+        }
+      },
+      "release": {
+        "url": "https://api.github.com/repos/anomalyco/opencode/releases/latest",
+        "read_at": "2026-10-12T21:42:30Z",
+        "status": 200,
+        "fields": {
+          "tag_name": "v1.19.0",
+          "published_at": "2026-10-11T01:39:22Z",
+          "prerelease": false,
+          "draft": false
+        }
+      },
+      "ci": {
+        "url": "https://api.github.com/repos/anomalyco/opencode/actions/runs?per_page=5",
+        "read_at": "2026-10-12T21:42:30Z",
+        "status": 200,
+        "fields": [
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "cdde754087c60ea37364fcd75f59d45024874344"
+          },
+          {
+            "status": "in_progress",
+            "conclusion": null,
+            "head_sha": "cdde754087c60ea37364fcd75f59d45024874344"
+          },
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "cdde754087c60ea37364fcd75f59d45024874344"
+          },
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "cdde754087c60ea37364fcd75f59d45024874344"
+          },
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "f83934c7bc50678091df36d41203c38e631a6ba8"
+          }
+        ]
+      },
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2Fanomalyco%2Fopencode",
+          "read_at": "2026-10-12T21:42:30Z"
+        },
+        "read_at": "2026-10-12T21:42:30Z",
+        "note": "Compliance only; it never changes any score, verdict or arm list."
+      }
+    },
+    {
+      "id": "goose",
+      "repository": "https://github.com/aaif-goose/goose",
+      "pin": "4617040c7b650b37d599bdaa08d3790572c19ae8",
+      "mirror_status": "MIRRORED",
+      "previous_verdict": "DISAGREE",
+      "previous_signs": {
+        "A1": "+",
+        "A2": "+",
+        "A3": "0",
+        "A4": "0",
+        "A5": "0",
+        "A6": "-"
+      },
+      "scorecard": {
+        "url": "https://api.scorecard.dev/projects/github.com/aaif-goose/goose",
+        "read_at": "2026-10-12T21:42:30Z",
+        "status": 200,
+        "fields": {
+          "date": "2026-10-12T20:14:23Z",
+          "repo": {
+            "name": "github.com/aaif-goose/goose",
+            "commit": "69de89c50cc01d4e0187d6645bf3618729873f74"
+          },
+          "scorecard": {
+            "version": "v5.5.0",
+            "commit": "c395761df6afe1a69e476bc60a013a94bcbc153f"
+          },
+          "score": 5.8,
+          "checks": [
+            {
+              "name": "Maintained",
+              "score": 10
+            },
+            {
+              "name": "Code-Review",
+              "score": 9
+            },
+            {
+              "name": "Dangerous-Workflow",
+              "score": 0
+            },
+            {
+              "name": "Branch-Protection",
+              "score": 8
+            },
+            {
+              "name": "CI-Tests",
+              "score": 10
+            }
+          ]
+        }
+      },
+      "project": {
+        "url": "https://api.deps.dev/v3/projects/github.com%2Faaif-goose%2Fgoose",
+        "read_at": "2026-10-12T21:42:30Z",
+        "status": 200,
+        "fields": {
+          "projectKey": {
+            "id": "github.com/aaif-goose/goose"
+          },
+          "starsCount": 54968,
+          "forksCount": 6360
+        }
+      },
+      "release": {
+        "url": "https://api.github.com/repos/aaif-goose/goose/releases/latest",
+        "read_at": "2026-10-12T21:42:30Z",
+        "status": 200,
+        "fields": {
+          "tag_name": "v1.54.0",
+          "published_at": "2026-10-08T18:44:54Z",
+          "prerelease": false,
+          "draft": false
+        }
+      },
+      "ci": {
+        "url": "https://api.github.com/repos/aaif-goose/goose/actions/runs?per_page=5",
+        "read_at": "2026-10-12T21:42:30Z",
+        "status": 200,
+        "fields": [
+          {
+            "status": "completed",
+            "conclusion": "failure",
+            "head_sha": "999fd6be4db0fea032178b49d02d9e522d0b8ff9"
+          },
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "999fd6be4db0fea032178b49d02d9e522d0b8ff9"
+          },
+          {
+            "status": "completed",
+            "conclusion": "skipped",
+            "head_sha": "69de89c50cc01d4e0187d6645bf3618729873f74"
+          },
+          {
+            "status": "completed",
+            "conclusion": "skipped",
+            "head_sha": "69de89c50cc01d4e0187d6645bf3618729873f74"
+          },
+          {
+            "status": "completed",
+            "conclusion": "skipped",
+            "head_sha": "69de89c50cc01d4e0187d6645bf3618729873f74"
+          }
+        ]
+      },
+      "licence_note": {
+        "spdx_id": "Apache-2.0",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2Faaif-goose%2Fgoose",
+          "read_at": "2026-10-12T21:42:30Z"
+        },
+        "read_at": "2026-10-12T21:42:30Z",
+        "note": "Compliance only; it never changes any score, verdict or arm list."
+      }
+    },
+    {
+      "id": "hermes-agent",
+      "repository": "https://github.com/NousResearch/hermes-agent",
+      "pin": "3569e8461ea721623fa16e6f01fb636157989fe6",
+      "mirror_status": "MIRRORED",
+      "previous_verdict": "DISAGREE",
+      "previous_signs": {
+        "A1": "+",
+        "A2": "-",
+        "A3": "+",
+        "A4": "+",
+        "A5": "U",
+        "A6": "0"
+      },
+      "scorecard": {
+        "url": "https://api.scorecard.dev/projects/github.com/NousResearch/hermes-agent",
+        "read_at": "2026-10-12T21:42:30Z",
+        "status": 404,
+        "gap": "Public endpoint unavailable; no credential or alternate authentication attempted."
+      },
+      "project": {
+        "url": "https://api.deps.dev/v3/projects/github.com%2FNousResearch%2Fhermes-agent",
+        "read_at": "2026-10-12T21:42:30Z",
+        "status": 200,
+        "fields": {
+          "projectKey": {
+            "id": "github.com/nousresearch/hermes-agent"
+          },
+          "starsCount": 252939,
+          "forksCount": 54783
+        }
+      },
+      "release": {
+        "url": "https://api.github.com/repos/NousResearch/hermes-agent/releases/latest",
+        "read_at": "2026-10-12T21:42:30Z",
+        "status": 200,
+        "fields": {
+          "tag_name": "v0.21.7",
+          "published_at": "2026-10-12T05:53:41Z",
+          "prerelease": false,
+          "draft": false
+        }
+      },
+      "ci": {
+        "url": "https://api.github.com/repos/NousResearch/hermes-agent/actions/runs?per_page=5",
+        "read_at": "2026-10-12T21:42:30Z",
+        "status": 200,
+        "fields": [
+          {
+            "status": "in_progress",
+            "conclusion": null,
+            "head_sha": "53df274b08f2bbbe82bb67bb50c7571952e95809"
+          },
+          {
+            "status": "completed",
+            "conclusion": "action_required",
+            "head_sha": "248f58b9ed4b986d132e328357d90c6372f1301d"
+          },
+          {
+            "status": "completed",
+            "conclusion": "action_required",
+            "head_sha": "248f58b9ed4b986d132e328357d90c6372f1301d"
+          },
+          {
+            "status": "completed",
+            "conclusion": "action_required",
+            "head_sha": "248f58b9ed4b986d132e328357d90c6372f1301d"
+          },
+          {
+            "status": "in_progress",
+            "conclusion": null,
+            "head_sha": "53df274b08f2bbbe82bb67bb50c7571952e95809"
+          }
+        ]
+      },
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2FNousResearch%2Fhermes-agent",
+          "read_at": "2026-10-12T21:42:30Z"
+        },
+        "read_at": "2026-10-12T21:42:30Z",
+        "note": "Compliance only; it never changes any score, verdict or arm list."
+      }
+    },
+    {
+      "id": "cline",
+      "repository": "https://github.com/cline/cline",
+      "pin": "8eba11b2703f5b12d3f415544be37ffc0ca03be1",
+      "mirror_status": "MIRRORED",
+      "previous_verdict": "DISAGREE",
+      "previous_signs": {
+        "A1": "+",
+        "A2": "0",
+        "A3": "0",
+        "A4": "+",
+        "A5": "U",
+        "A6": "-"
+      },
+      "scorecard": {
+        "url": "https://api.scorecard.dev/projects/github.com/cline/cline",
+        "read_at": "2026-10-12T21:42:30Z",
+        "status": 404,
+        "gap": "Public endpoint unavailable; no credential or alternate authentication attempted."
+      },
+      "project": {
+        "url": "https://api.deps.dev/v3/projects/github.com%2Fcline%2Fcline",
+        "read_at": "2026-10-12T21:42:30Z",
+        "status": 200,
+        "fields": {
+          "projectKey": {
+            "id": "github.com/cline/cline"
+          },
+          "starsCount": 69873,
+          "forksCount": 7604
+        }
+      },
+      "release": {
+        "url": "https://api.github.com/repos/cline/cline/releases/latest",
+        "read_at": "2026-10-12T21:42:30Z",
+        "status": 200,
+        "fields": {
+          "tag_name": "desktop-v0.0.45",
+          "published_at": "2026-10-08T06:50:30Z",
+          "prerelease": false,
+          "draft": false
+        }
+      },
+      "ci": {
+        "url": "https://api.github.com/repos/cline/cline/actions/runs?per_page=5",
+        "read_at": "2026-10-12T21:42:30Z",
+        "status": 200,
+        "fields": [
+          {
+            "status": "completed",
+            "conclusion": "skipped",
+            "head_sha": "55d32c22ab50a928865dfaa4f9356600a966a7bc"
+          },
+          {
+            "status": "completed",
+            "conclusion": "skipped",
+            "head_sha": "55d32c22ab50a928865dfaa4f9356600a966a7bc"
+          },
+          {
+            "status": "completed",
+            "conclusion": "skipped",
+            "head_sha": "38abca55b652e8bff492746415b162487beb9091"
+          },
+          {
+            "status": "completed",
+            "conclusion": "action_required",
+            "head_sha": "38abca55b652e8bff492746415b162487beb9091"
+          },
+          {
+            "status": "completed",
+            "conclusion": "action_required",
+            "head_sha": "38abca55b652e8bff492746415b162487beb9091"
+          }
+        ]
+      },
+      "licence_note": {
+        "spdx_id": "Apache-2.0",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2Fcline%2Fcline",
+          "read_at": "2026-10-12T21:42:30Z"
+        },
+        "read_at": "2026-10-12T21:42:30Z",
+        "note": "Compliance only; it never changes any score, verdict or arm list."
+      }
+    },
+    {
+      "id": "qwen-code",
+      "repository": "https://github.com/QwenLM/qwen-code",
+      "pin": "aaf97b869dfcc4cf529ada1b036cad9b18695486",
+      "mirror_status": "MIRRORED",
+      "previous_verdict": "INSUFFICIENT",
+      "previous_signs": {
+        "A1": "+",
+        "A2": "+",
+        "A3": "0",
+        "A4": "0",
+        "A5": "U",
+        "A6": "0"
+      },
+      "scorecard": {
+        "url": "https://api.scorecard.dev/projects/github.com/QwenLM/qwen-code",
+        "read_at": "2026-10-12T21:42:30Z",
+        "status": 200,
+        "fields": {
+          "date": "2026-10-12",
+          "repo": {
+            "name": "github.com/QwenLM/qwen-code",
+            "commit": "14cc19b4bdc87ff7f4e5bfc720a2590b70dd3766"
+          },
+          "scorecard": {
+            "version": "v5.6.0",
+            "commit": "61e84743356275f6ffca23b1b2f2cb945e19eb96"
+          },
+          "score": 4.2,
+          "checks": [
+            {
+              "name": "Maintained",
+              "score": 10
+            },
+            {
+              "name": "Code-Review",
+              "score": 10
+            },
+            {
+              "name": "Dangerous-Workflow",
+              "score": 0
+            },
+            {
+              "name": "Branch-Protection",
+              "score": 0
+            }
+          ]
+        }
+      },
+      "project": {
+        "url": "https://api.deps.dev/v3/projects/github.com%2FQwenLM%2Fqwen-code",
+        "read_at": "2026-10-12T21:42:30Z",
+        "status": 200,
+        "fields": {
+          "projectKey": {
+            "id": "github.com/qwenlm/qwen-code"
+          },
+          "starsCount": 28375,
+          "forksCount": 3174
+        }
+      },
+      "release": {
+        "url": "https://api.github.com/repos/QwenLM/qwen-code/releases/latest",
+        "read_at": "2026-10-12T21:42:30Z",
+        "status": 200,
+        "fields": {
+          "tag_name": "sdk-typescript-v0.1.19",
+          "published_at": "2026-10-11T11:42:33Z",
+          "prerelease": false,
+          "draft": false
+        }
+      },
+      "ci": {
+        "url": "https://api.github.com/repos/QwenLM/qwen-code/actions/runs?per_page=5",
+        "read_at": "2026-10-12T21:42:31Z",
+        "status": 200,
+        "fields": [
+          {
+            "status": "completed",
+            "conclusion": "skipped",
+            "head_sha": "18f80f56666a347a2b67b2ef98099cc58356b253"
+          },
+          {
+            "status": "completed",
+            "conclusion": "skipped",
+            "head_sha": "18f80f56666a347a2b67b2ef98099cc58356b253"
+          },
+          {
+            "status": "completed",
+            "conclusion": "cancelled",
+            "head_sha": "18f80f56666a347a2b67b2ef98099cc58356b253"
+          },
+          {
+            "status": "completed",
+            "conclusion": "skipped",
+            "head_sha": "18f80f56666a347a2b67b2ef98099cc58356b253"
+          },
+          {
+            "status": "completed",
+            "conclusion": "cancelled",
+            "head_sha": "18f80f56666a347a2b67b2ef98099cc58356b253"
+          }
+        ]
+      },
+      "licence_note": {
+        "spdx_id": "Apache-2.0",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2FQwenLM%2Fqwen-code",
+          "read_at": "2026-10-12T21:42:30Z"
+        },
+        "read_at": "2026-10-12T21:42:30Z",
+        "note": "Compliance only; it never changes any score, verdict or arm list."
+      }
+    },
+    {
+      "id": "jcode",
+      "repository": "https://github.com/1jehuang/jcode",
+      "pin": "b3d4e2143670dd5aeafc81649d85eabdf1bc9d18",
+      "mirror_status": "MIRRORED",
+      "previous_verdict": "INSUFFICIENT",
+      "previous_signs": {
+        "A1": "+",
+        "A2": "0",
+        "A3": "0",
+        "A4": "0",
+        "A5": "U",
+        "A6": "U"
+      },
+      "scorecard": {
+        "url": "https://api.scorecard.dev/projects/github.com/1jehuang/jcode",
+        "read_at": "2026-10-12T21:42:30Z",
+        "status": 404,
+        "gap": "Public endpoint unavailable; no credential or alternate authentication attempted."
+      },
+      "project": {
+        "url": "https://api.deps.dev/v3/projects/github.com%2F1jehuang%2Fjcode",
+        "read_at": "2026-10-12T21:42:30Z",
+        "status": 200,
+        "fields": {
+          "projectKey": {
+            "id": "github.com/1jehuang/jcode"
+          },
+          "starsCount": 20320,
+          "forksCount": 2360
+        }
+      },
+      "release": {
+        "url": "https://api.github.com/repos/1jehuang/jcode/releases/latest",
+        "read_at": "2026-10-12T21:42:30Z",
+        "status": 200,
+        "fields": {
+          "tag_name": "v0.95.0",
+          "published_at": "2026-10-12T00:43:40Z",
+          "prerelease": false,
+          "draft": false
+        }
+      },
+      "ci": {
+        "url": "https://api.github.com/repos/1jehuang/jcode/actions/runs?per_page=5",
+        "read_at": "2026-10-12T21:42:31Z",
+        "status": 200,
+        "fields": [
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "b3d4e2143670dd5aeafc81649d85eabdf1bc9d18"
+          },
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "b3d4e2143670dd5aeafc81649d85eabdf1bc9d18"
+          },
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "b3d4e2143670dd5aeafc81649d85eabdf1bc9d18"
+          },
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "b3d4e2143670dd5aeafc81649d85eabdf1bc9d18"
+          },
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "8410b955db6a82e7bbdfe3053c6186e0e67832cb"
+          }
+        ]
+      },
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2F1jehuang%2Fjcode",
+          "read_at": "2026-10-12T21:42:30Z"
+        },
+        "read_at": "2026-10-12T21:42:30Z",
+        "note": "Compliance only; it never changes any score, verdict or arm list."
+      }
+    },
+    {
+      "id": "deepseek-harness",
+      "repository": "https://github.com/deepseek-ai/deepseek-harness",
+      "pin": "d743267388641bc76f17c45ce8b4c231aed1d32c",
+      "mirror_status": "MIRRORED",
+      "previous_verdict": "DISAGREE",
+      "previous_signs": {
+        "A1": "+",
+        "A2": "-",
+        "A3": "+",
+        "A4": "+",
+        "A5": "U",
+        "A6": "U"
+      },
+      "scorecard": {
+        "url": "https://api.scorecard.dev/projects/github.com/deepseek-ai/deepseek-harness",
+        "read_at": "2026-10-12T21:42:30Z",
+        "status": 404,
+        "gap": "Public endpoint unavailable; no credential or alternate authentication attempted."
+      },
+      "project": {
+        "url": "https://api.deps.dev/v3/projects/github.com%2Fdeepseek-ai%2Fdeepseek-harness",
+        "read_at": "2026-10-12T21:42:30Z",
+        "status": 200,
+        "fields": {
+          "projectKey": {
+            "id": "github.com/deepseek-ai/deepseek-harness"
+          },
+          "starsCount": 247143,
+          "forksCount": 29682
+        }
+      },
+      "release": {
+        "url": "https://api.github.com/repos/deepseek-ai/deepseek-harness/releases/latest",
+        "read_at": "2026-10-12T21:42:30Z",
+        "status": 404,
+        "gap": "Public endpoint unavailable; no credential or alternate authentication attempted."
+      },
+      "ci": {
+        "url": "https://api.github.com/repos/deepseek-ai/deepseek-harness/actions/runs?per_page=5",
+        "read_at": "2026-10-12T21:42:31Z",
+        "status": 200,
+        "fields": [
+          {
+            "status": "completed",
+            "conclusion": "failure",
+            "head_sha": "477b4f420553e8a52c2fbccc464d7561b239c443"
+          },
+          {
+            "status": "completed",
+            "conclusion": "failure",
+            "head_sha": "477b4f420553e8a52c2fbccc464d7561b239c443"
+          },
+          {
+            "status": "completed",
+            "conclusion": "failure",
+            "head_sha": "477b4f420553e8a52c2fbccc464d7561b239c443"
+          },
+          {
+            "status": "completed",
+            "conclusion": "failure",
+            "head_sha": "46a7f68b0922371ce7144b668b90e377d8e799f4"
+          },
+          {
+            "status": "completed",
+            "conclusion": "failure",
+            "head_sha": "00102833dfaee1da9f48a3a8eae9d34005a75218"
+          }
+        ]
+      },
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2Fdeepseek-ai%2Fdeepseek-harness",
+          "read_at": "2026-10-12T21:42:30Z"
+        },
+        "read_at": "2026-10-12T21:42:30Z",
+        "note": "Compliance only; it never changes any score, verdict or arm list."
+      }
+    },
+    {
+      "id": "deep-agents",
+      "repository": "https://github.com/langchain-ai/deepagents",
+      "pin": "a7f97e4d529db5566a0d187ee86b8996bd45ff98",
+      "mirror_status": "MIRRORED",
+      "previous_verdict": "INSUFFICIENT",
+      "previous_signs": {
+        "A1": "+",
+        "A2": "+",
+        "A3": "0",
+        "A4": "0",
+        "A5": "+",
+        "A6": "U"
+      },
+      "scorecard": {
+        "url": "https://api.scorecard.dev/projects/github.com/langchain-ai/deepagents",
+        "read_at": "2026-10-12T21:42:30Z",
+        "status": 404,
+        "gap": "Public endpoint unavailable; no credential or alternate authentication attempted."
+      },
+      "project": {
+        "url": "https://api.deps.dev/v3/projects/github.com%2Flangchain-ai%2Fdeepagents",
+        "read_at": "2026-10-12T21:42:31Z",
+        "status": 200,
+        "fields": {
+          "projectKey": {
+            "id": "github.com/langchain-ai/deepagents"
+          },
+          "starsCount": 30008,
+          "forksCount": 4212
+        }
+      },
+      "release": {
+        "url": "https://api.github.com/repos/langchain-ai/deepagents/releases/latest",
+        "read_at": "2026-10-12T21:42:31Z",
+        "status": 200,
+        "fields": {
+          "tag_name": "deepagents==0.7.24",
+          "published_at": "2026-10-12T04:46:40Z",
+          "prerelease": false,
+          "draft": false
+        }
+      },
+      "ci": {
+        "url": "https://api.github.com/repos/langchain-ai/deepagents/actions/runs?per_page=5",
+        "read_at": "2026-10-12T21:42:31Z",
+        "status": 200,
+        "fields": [
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "b7e777fb55023a78c88ed055bc846f52a334ae76"
+          },
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "b7e777fb55023a78c88ed055bc846f52a334ae76"
+          },
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "d41c6cd122a309e08fb099e0996028ee2ca887e8"
+          },
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "c23705a1c06e5821b22c4686b026dd5f99326ef6"
+          },
+          {
+            "status": "completed",
+            "conclusion": "skipped",
+            "head_sha": "c23705a1c06e5821b22c4686b026dd5f99326ef6"
+          }
+        ]
+      },
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2Flangchain-ai%2Fdeepagents",
+          "read_at": "2026-10-12T21:42:31Z"
+        },
+        "read_at": "2026-10-12T21:42:31Z",
+        "note": "Compliance only; it never changes any score, verdict or arm list."
+      }
+    },
+    {
+      "id": "strands",
+      "repository": "https://github.com/strands-agents/harness-sdk",
+      "pin": "38afb968e1f40aa47546ead09a22ec031bd345de",
+      "mirror_status": "MIRRORED",
+      "previous_verdict": "INSUFFICIENT",
+      "previous_signs": {
+        "A1": "+",
+        "A2": "+",
+        "A3": "0",
+        "A4": "0",
+        "A5": "U",
+        "A6": "U"
+      },
+      "scorecard": {
+        "url": "https://api.scorecard.dev/projects/github.com/strands-agents/harness-sdk",
+        "read_at": "2026-10-12T21:42:31Z",
+        "status": 404,
+        "gap": "Public endpoint unavailable; no credential or alternate authentication attempted."
+      },
+      "project": {
+        "url": "https://api.deps.dev/v3/projects/github.com%2Fstrands-agents%2Fharness-sdk",
+        "read_at": "2026-10-12T21:42:31Z",
+        "status": 200,
+        "fields": {
+          "projectKey": {
+            "id": "github.com/strands-agents/harness-sdk"
+          },
+          "starsCount": 8751,
+          "forksCount": 1346
+        }
+      },
+      "release": {
+        "url": "https://api.github.com/repos/strands-agents/harness-sdk/releases/latest",
+        "read_at": "2026-10-12T21:42:31Z",
+        "status": 200,
+        "fields": {
+          "tag_name": "python/v1.60.0",
+          "published_at": "2026-10-12T19:37:14Z",
+          "prerelease": false,
+          "draft": false
+        }
+      },
+      "ci": {
+        "url": "https://api.github.com/repos/strands-agents/harness-sdk/actions/runs?per_page=5",
+        "read_at": "2026-10-12T21:42:31Z",
+        "status": 200,
+        "fields": [
+          {
+            "status": "completed",
+            "conclusion": "skipped",
+            "head_sha": "58158f7e9df920c58f15e25faec86324dcdb0157"
+          },
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "58158f7e9df920c58f15e25faec86324dcdb0157"
+          },
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "927df8eb31cbb9e6a0557262de5099d69b65e984"
+          },
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "58158f7e9df920c58f15e25faec86324dcdb0157"
+          },
+          {
+            "status": "completed",
+            "conclusion": "failure",
+            "head_sha": "046c900ece0947ef0382a022dbde20867ea51f0e"
+          }
+        ]
+      },
+      "licence_note": {
+        "spdx_id": "Apache-2.0",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2Fstrands-agents%2Fharness-sdk",
+          "read_at": "2026-10-12T21:42:31Z"
+        },
+        "read_at": "2026-10-12T21:42:31Z",
+        "note": "Compliance only; it never changes any score, verdict or arm list."
+      }
+    },
+    {
+      "id": "kilo-code",
+      "repository": "https://github.com/Kilo-Org/kilocode",
+      "pin": "UNVERIFIED",
+      "mirror_status": "UNMIRRORED",
+      "previous_verdict": "INSUFFICIENT",
+      "previous_signs": {
+        "A1": "+",
+        "A2": "0",
+        "A3": "0",
+        "A4": "+",
+        "A5": "U",
+        "A6": "0"
+      },
+      "scorecard": {
+        "url": "https://api.scorecard.dev/projects/github.com/Kilo-Org/kilocode",
+        "read_at": "2026-10-12T21:42:31Z",
+        "status": 404,
+        "gap": "Public endpoint unavailable; no credential or alternate authentication attempted."
+      },
+      "project": {
+        "url": "https://api.deps.dev/v3/projects/github.com%2FKilo-Org%2Fkilocode",
+        "read_at": "2026-10-12T21:42:31Z",
+        "status": 200,
+        "fields": {
+          "projectKey": {
+            "id": "github.com/kilo-org/kilocode"
+          },
+          "starsCount": 27524,
+          "forksCount": 3238
+        }
+      },
+      "release": {
+        "url": "https://api.github.com/repos/Kilo-Org/kilocode/releases/latest",
+        "read_at": "2026-10-12T21:42:31Z",
+        "status": 200,
+        "fields": {
+          "tag_name": "jetbrains/v7.1.9",
+          "published_at": "2026-10-08T00:16:29Z",
+          "prerelease": false,
+          "draft": false
+        }
+      },
+      "ci": {
+        "url": "https://api.github.com/repos/Kilo-Org/kilocode/actions/runs?per_page=5",
+        "read_at": "2026-10-12T21:42:31Z",
+        "status": 200,
+        "fields": [
+          {
+            "status": "completed",
+            "conclusion": "action_required",
+            "head_sha": "cbc51f9e682b74aad4da23b4e673a5ae235d466a"
+          },
+          {
+            "status": "completed",
+            "conclusion": "action_required",
+            "head_sha": "cbc51f9e682b74aad4da23b4e673a5ae235d466a"
+          },
+          {
+            "status": "completed",
+            "conclusion": "action_required",
+            "head_sha": "cbc51f9e682b74aad4da23b4e673a5ae235d466a"
+          },
+          {
+            "status": "completed",
+            "conclusion": "action_required",
+            "head_sha": "cbc51f9e682b74aad4da23b4e673a5ae235d466a"
+          },
+          {
+            "status": "completed",
+            "conclusion": "action_required",
+            "head_sha": "cbc51f9e682b74aad4da23b4e673a5ae235d466a"
+          }
+        ]
+      },
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2FKilo-Org%2Fkilocode",
+          "read_at": "2026-10-12T21:42:31Z"
+        },
+        "read_at": "2026-10-12T21:42:31Z",
+        "note": "Compliance only; it never changes any score, verdict or arm list."
+      }
+    },
+    {
+      "id": "openclaw",
+      "repository": "https://github.com/openclaw/openclaw",
+      "pin": "UNVERIFIED",
+      "mirror_status": "UNMIRRORED",
+      "previous_verdict": "INSUFFICIENT",
+      "previous_signs": {
+        "A1": "U",
+        "A2": "0",
+        "A3": "+",
+        "A4": "+",
+        "A5": "U",
+        "A6": "U"
+      },
+      "scorecard": {
+        "url": "https://api.scorecard.dev/projects/github.com/openclaw/openclaw",
+        "read_at": "2026-10-12T21:42:31Z",
+        "status": 404,
+        "gap": "Public endpoint unavailable; no credential or alternate authentication attempted."
+      },
+      "project": {
+        "url": "https://api.deps.dev/v3/projects/github.com%2Fopenclaw%2Fopenclaw",
+        "read_at": "2026-10-12T21:42:31Z",
+        "status": 200,
+        "fields": {
+          "projectKey": {
+            "id": "github.com/openclaw/openclaw"
+          },
+          "starsCount": 391504,
+          "forksCount": 82300
+        }
+      },
+      "release": {
+        "url": "https://api.github.com/repos/openclaw/openclaw/releases/latest",
+        "read_at": "2026-10-12T21:42:31Z",
+        "status": 200,
+        "fields": {
+          "tag_name": "v2026.10.2",
+          "published_at": "2026-10-12T05:34:44Z",
+          "prerelease": false,
+          "draft": false
+        }
+      },
+      "ci": {
+        "url": "https://api.github.com/repos/openclaw/openclaw/actions/runs?per_page=5",
+        "read_at": "2026-10-12T21:42:36Z",
+        "status": 200,
+        "fields": [
+          {
+            "status": "completed",
+            "conclusion": "skipped",
+            "head_sha": "e871b5ea32dab41daf37f795eec1922236fa5d13"
+          },
+          {
+            "status": "completed",
+            "conclusion": "skipped",
+            "head_sha": "e871b5ea32dab41daf37f795eec1922236fa5d13"
+          },
+          {
+            "status": "completed",
+            "conclusion": "skipped",
+            "head_sha": "e871b5ea32dab41daf37f795eec1922236fa5d13"
+          },
+          {
+            "status": "completed",
+            "conclusion": "skipped",
+            "head_sha": "e871b5ea32dab41daf37f795eec1922236fa5d13"
+          },
+          {
+            "status": "completed",
+            "conclusion": "skipped",
+            "head_sha": "e871b5ea32dab41daf37f795eec1922236fa5d13"
+          }
+        ]
+      },
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2Fopenclaw%2Fopenclaw",
+          "read_at": "2026-10-12T21:42:31Z"
+        },
+        "read_at": "2026-10-12T21:42:31Z",
+        "note": "Compliance only; it never changes any score, verdict or arm list."
+      }
+    },
+    {
+      "id": "openhands-sdk",
+      "repository": "https://github.com/OpenHands/software-agent-sdk",
+      "pin": "54daf056bd863bb46f922a2fe9324dd736b37ff6",
+      "mirror_status": "MIRRORED",
+      "previous_verdict": "DISAGREE",
+      "previous_signs": {
+        "A1": "+",
+        "A2": "0",
+        "A3": "-",
+        "A4": "+",
+        "A5": "0",
+        "A6": "+"
+      },
+      "scorecard": {
+        "url": "https://api.scorecard.dev/projects/github.com/OpenHands/software-agent-sdk",
+        "read_at": "2026-10-12T21:42:31Z",
+        "status": 404,
+        "gap": "Public endpoint unavailable; no credential or alternate authentication attempted."
+      },
+      "project": {
+        "url": "https://api.deps.dev/v3/projects/github.com%2FOpenHands%2Fsoftware-agent-sdk",
+        "read_at": "2026-10-12T21:42:31Z",
+        "status": 200,
+        "fields": {
+          "projectKey": {
+            "id": "github.com/openhands/software-agent-sdk"
+          },
+          "starsCount": 1238,
+          "forksCount": 642
+        }
+      },
+      "release": {
+        "url": "https://api.github.com/repos/OpenHands/software-agent-sdk/releases/latest",
+        "read_at": "2026-10-12T21:42:31Z",
+        "status": 200,
+        "fields": {
+          "tag_name": "v1.54.0",
+          "published_at": "2026-10-09T18:36:49Z",
+          "prerelease": false,
+          "draft": false
+        }
+      },
+      "ci": {
+        "url": "https://api.github.com/repos/OpenHands/software-agent-sdk/actions/runs?per_page=5",
+        "read_at": "2026-10-12T21:42:31Z",
+        "status": 200,
+        "fields": [
+          {
+            "status": "completed",
+            "conclusion": "skipped",
+            "head_sha": "b109a215319d465d4a4938de4abdd609cf5ce59f"
+          },
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "b109a215319d465d4a4938de4abdd609cf5ce59f"
+          },
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "b109a215319d465d4a4938de4abdd609cf5ce59f"
+          },
+          {
+            "status": "completed",
+            "conclusion": "skipped",
+            "head_sha": "b109a215319d465d4a4938de4abdd609cf5ce59f"
+          },
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "b109a215319d465d4a4938de4abdd609cf5ce59f"
+          }
+        ]
+      },
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2FOpenHands%2Fsoftware-agent-sdk",
+          "read_at": "2026-10-12T21:42:31Z"
+        },
+        "read_at": "2026-10-12T21:42:31Z",
+        "note": "Compliance only; it never changes any score, verdict or arm list."
+      }
+    },
+    {
+      "id": "openhands-cli",
+      "repository": "https://github.com/OpenHands/OpenHands-CLI",
+      "pin": "UNVERIFIED",
+      "mirror_status": "UNMIRRORED",
+      "previous_verdict": "INSUFFICIENT",
+      "previous_signs": {
+        "A1": "U",
+        "A2": "-",
+        "A3": "-",
+        "A4": "U",
+        "A5": "U",
+        "A6": "U"
+      },
+      "scorecard": {
+        "url": "https://api.scorecard.dev/projects/github.com/OpenHands/OpenHands-CLI",
+        "read_at": "2026-10-12T21:42:31Z",
+        "status": 404,
+        "gap": "Public endpoint unavailable; no credential or alternate authentication attempted."
+      },
+      "project": {
+        "url": "https://api.deps.dev/v3/projects/github.com%2FOpenHands%2FOpenHands-CLI",
+        "read_at": "2026-10-12T21:42:31Z",
+        "status": 200,
+        "fields": {
+          "projectKey": {
+            "id": "github.com/openhands/openhands-cli"
+          },
+          "starsCount": 263,
+          "forksCount": 120
+        }
+      },
+      "release": {
+        "url": "https://api.github.com/repos/OpenHands/OpenHands-CLI/releases/latest",
+        "read_at": "2026-10-12T21:42:31Z",
+        "status": 200,
+        "fields": {
+          "tag_name": "1.16.0",
+          "published_at": "2026-05-08T15:56:44Z",
+          "prerelease": false,
+          "draft": false
+        }
+      },
+      "ci": {
+        "url": "https://api.github.com/repos/OpenHands/OpenHands-CLI/actions/runs?per_page=5",
+        "read_at": "2026-10-12T21:42:31Z",
+        "status": 200,
+        "fields": [
+          {
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "0403f1a79a9fc62a6c7be21c17d7b51f64245ad2"
+          },
+          {
+            "status": "completed",
+            "conclusion": "action_required",
+            "head_sha": "52b3246b23023c92bbd220cede02476d4601da3f"
+          },
+          {
+            "status": "completed",
+            "conclusion": "action_required",
+            "head_sha": "52b3246b23023c92bbd220cede02476d4601da3f"
+          },
+          {
+            "status": "completed",
+            "conclusion": "action_required",
+            "head_sha": "52b3246b23023c92bbd220cede02476d4601da3f"
+          },
+          {
+            "status": "completed",
+            "conclusion": "action_required",
+            "head_sha": "52b3246b23023c92bbd220cede02476d4601da3f"
+          }
+        ]
+      },
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2FOpenHands%2FOpenHands-CLI",
+          "read_at": "2026-10-12T21:42:31Z"
+        },
+        "read_at": "2026-10-12T21:42:31Z",
+        "note": "Compliance only; it never changes any score, verdict or arm list."
+      }
+    },
+    {
+      "id": "freebuff",
+      "repository": "https://github.com/CodebuffAI/freebuff",
+      "pin": "UNVERIFIED",
+      "mirror_status": "UNMIRRORED",
+      "previous_verdict": "INSUFFICIENT",
+      "previous_signs": {
+        "A1": "U",
+        "A2": "-",
+        "A3": "0",
+        "A4": "+",
+        "A5": "U",
+        "A6": "U"
+      },
+      "scorecard": {
+        "url": "https://api.scorecard.dev/projects/github.com/CodebuffAI/freebuff",
+        "read_at": "2026-10-12T21:42:31Z",
+        "status": 404,
+        "gap": "Public endpoint unavailable; no credential or alternate authentication attempted."
+      },
+      "project": {
+        "url": "https://api.deps.dev/v3/projects/github.com%2FCodebuffAI%2Ffreebuff",
+        "read_at": "2026-10-12T21:42:31Z",
+        "status": 200,
+        "fields": {
+          "projectKey": {
+            "id": "github.com/codebuffai/freebuff"
+          },
+          "starsCount": 13450,
+          "forksCount": 1431
+        }
+      },
+      "release": {
+        "url": "https://api.github.com/repos/CodebuffAI/freebuff/releases/latest",
+        "read_at": "2026-10-12T21:42:31Z",
+        "status": 404,
+        "gap": "Public endpoint unavailable; no credential or alternate authentication attempted."
+      },
+      "ci": {
+        "url": "https://api.github.com/repos/CodebuffAI/freebuff/actions/runs?per_page=5",
+        "read_at": "2026-10-12T21:42:32Z",
+        "status": 200,
+        "fields": [
+          {
+            "status": "completed",
+            "conclusion": "failure",
+            "head_sha": "190f694d77b70eebe0141e382d29e7ad535f1533"
+          },
+          {
+            "status": "completed",
+            "conclusion": "failure",
+            "head_sha": "be0ffc6026fe033a9ecb9fed83c35df8aaaeeed9"
+          },
+          {
+            "status": "completed",
+            "conclusion": "failure",
+            "head_sha": "b2ae023f6a19cd6c69785d0dc3c7c2583953c489"
+          },
+          {
+            "status": "completed",
+            "conclusion": "failure",
+            "head_sha": "07c466a03af965344b487bc700c8ca11e8e2e082"
+          },
+          {
+            "status": "completed",
+            "conclusion": "failure",
+            "head_sha": "7c263babf5c6261383ac570078b40c9788e43195"
+          }
+        ]
+      },
+      "licence_note": {
+        "spdx_id": "Apache-2.0",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2FCodebuffAI%2Ffreebuff",
+          "read_at": "2026-10-12T21:42:31Z"
+        },
+        "read_at": "2026-10-12T21:42:31Z",
+        "note": "Compliance only; it never changes any score, verdict or arm list."
+      }
+    },
+    {
+      "id": "mini-swe-agent",
+      "repository": "https://github.com/SWE-agent/mini-swe-agent",
+      "pin": "04d809ceab9df28f9adaed044884180159172930",
+      "mirror_status": "MIRRORED",
+      "previous_verdict": "CONVERGED",
+      "previous_signs": {
+        "A1": "+",
+        "A2": "0",
+        "A3": "0",
+        "A4": "+",
+        "A5": "+",
+        "A6": "0"
+      },
+      "scorecard": {
+        "url": "https://api.scorecard.dev/projects/github.com/SWE-agent/mini-swe-agent",
+        "read_at": "2026-10-12T21:42:31Z",
+        "status": 404,
+        "gap": "Public endpoint unavailable; no credential or alternate authentication attempted."
+      },
+      "project": {
+        "url": "https://api.deps.dev/v3/projects/github.com%2FSWE-agent%2Fmini-swe-agent",
+        "read_at": "2026-10-12T21:42:31Z",
+        "status": 200,
+        "fields": {
+          "projectKey": {
+            "id": "github.com/swe-agent/mini-swe-agent"
+          },
+          "starsCount": 8231,
+          "forksCount": 1129
+        }
+      },
+      "release": {
+        "url": "https://api.github.com/repos/SWE-agent/mini-swe-agent/releases/latest",
+        "read_at": "2026-10-12T21:42:31Z",
+        "status": 200,
+        "fields": {
+          "tag_name": "v2.4.6",
+          "published_at": "2026-07-23T03:12:33Z",
+          "prerelease": false,
+          "draft": false
+        }
+      },
+      "ci": {
+        "url": "https://api.github.com/repos/SWE-agent/mini-swe-agent/actions/runs?per_page=5",
+        "read_at": "2026-10-12T21:42:32Z",
+        "status": 200,
+        "fields": [
+          {
+            "status": "completed",
+            "conclusion": "failure",
+            "head_sha": "04d809ceab9df28f9adaed044884180159172930"
+          },
+          {
+            "status": "completed",
+            "conclusion": "failure",
+            "head_sha": "04d809ceab9df28f9adaed044884180159172930"
+          },
+          {
+            "status": "completed",
+            "conclusion": "failure",
+            "head_sha": "04d809ceab9df28f9adaed044884180159172930"
+          },
+          {
+            "status": "completed",
+            "conclusion": "action_required",
+            "head_sha": "e2d12d84eb2f1e585a3e9f13caf75bf020ba50b4"
+          },
+          {
+            "status": "completed",
+            "conclusion": "action_required",
+            "head_sha": "e2d12d84eb2f1e585a3e9f13caf75bf020ba50b4"
+          }
+        ]
+      },
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2FSWE-agent%2Fmini-swe-agent",
+          "read_at": "2026-10-12T21:42:31Z"
+        },
+        "read_at": "2026-10-12T21:42:31Z",
+        "note": "Compliance only; it never changes any score, verdict or arm list."
+      }
+    }
+  ],
+  "npm_downloads": {
+    "claude-code": {
+      "url": "https://api.npmjs.org/downloads/point/last-week/%40anthropic-ai%2Fclaude-code",
+      "read_at": "2026-10-12T21:44:02Z",
+      "status": 200,
+      "fields": {
+        "downloads": 12502712,
+        "start": "2026-10-05",
+        "end": "2026-10-11",
+        "package": "@anthropic-ai/claude-code"
+      }
+    },
+    "codex-cli": {
+      "url": "https://api.npmjs.org/downloads/point/last-week/%40openai%2Fcodex",
+      "read_at": "2026-10-12T21:44:02Z",
+      "status": 200,
+      "fields": {
+        "downloads": 23862567,
+        "start": "2026-10-05",
+        "end": "2026-10-11",
+        "package": "@openai/codex"
+      }
+    },
+    "pi": {
+      "url": "https://api.npmjs.org/downloads/point/last-week/%40earendil-works%2Fpi-coding-agent",
+      "read_at": "2026-10-12T21:44:02Z",
+      "status": 200,
+      "fields": {
+        "downloads": 4156854,
+        "start": "2026-10-05",
+        "end": "2026-10-11",
+        "package": "@earendil-works/pi-coding-agent"
+      }
+    },
+    "oh-my-pi": {
+      "url": "https://api.npmjs.org/downloads/point/last-week/%40oh-my-pi%2Fpi-coding-agent",
+      "read_at": "2026-10-12T21:44:02Z",
+      "status": 200,
+      "fields": {
+        "downloads": 196149,
+        "start": "2026-10-05",
+        "end": "2026-10-11",
+        "package": "@oh-my-pi/pi-coding-agent"
+      }
+    },
+    "opencode-1x": {
+      "url": "https://api.npmjs.org/downloads/point/last-week/opencode-ai",
+      "read_at": "2026-10-12T21:44:02Z",
+      "status": 200,
+      "fields": {
+        "downloads": 2988524,
+        "start": "2026-10-05",
+        "end": "2026-10-11",
+        "package": "opencode-ai"
+      }
+    },
+    "opencode-2x": {
+      "url": "https://api.npmjs.org/downloads/point/last-week/%40opencode%2Fcli",
+      "read_at": "2026-10-12T21:44:02Z",
+      "status": 200,
+      "fields": {
+        "downloads": 197075,
+        "start": "2026-10-05",
+        "end": "2026-10-11",
+        "package": "@opencode/cli"
+      }
+    },
+    "cline": {
+      "url": "https://api.npmjs.org/downloads/point/last-week/cline",
+      "read_at": "2026-10-12T21:44:02Z",
+      "status": 200,
+      "fields": {
+        "downloads": 65829,
+        "start": "2026-10-05",
+        "end": "2026-10-11",
+        "package": "cline"
+      }
+    },
+    "qwen-code": {
+      "url": "https://api.npmjs.org/downloads/point/last-week/%40qwen-code%2Fqwen-code",
+      "read_at": "2026-10-12T21:44:02Z",
+      "status": 200,
+      "fields": {
+        "downloads": 66107,
+        "start": "2026-10-05",
+        "end": "2026-10-11",
+        "package": "@qwen-code/qwen-code"
+      }
+    },
+    "jcode": {
+      "url": "https://api.npmjs.org/downloads/point/last-week/jcode",
+      "read_at": "2026-10-12T21:44:02Z",
+      "status": 200,
+      "fields": {
+        "downloads": 6,
+        "start": "2026-10-05",
+        "end": "2026-10-11",
+        "package": "jcode"
+      }
+    },
+    "deepseek-harness": {
+      "url": "https://api.npmjs.org/downloads/point/last-week/%40deepseek-ai%2Fdeepseek-harness",
+      "read_at": "2026-10-12T21:44:02Z",
+      "status": "unavailable"
+    },
+    "kilo-code": {
+      "url": "https://api.npmjs.org/downloads/point/last-week/%40kilocode%2Fcli",
+      "read_at": "2026-10-12T21:44:02Z",
+      "status": 200,
+      "fields": {
+        "downloads": 28342,
+        "start": "2026-10-05",
+        "end": "2026-10-11",
+        "package": "@kilocode/cli"
+      }
+    },
+    "openclaw": {
+      "url": "https://api.npmjs.org/downloads/point/last-week/openclaw",
+      "read_at": "2026-10-12T21:44:02Z",
+      "status": 200,
+      "fields": {
+        "downloads": 3946280,
+        "start": "2026-10-05",
+        "end": "2026-10-11",
+        "package": "openclaw"
+      }
+    },
+    "freebuff": {
+      "url": "https://api.npmjs.org/downloads/point/last-week/freebuff",
+      "read_at": "2026-10-12T21:44:03Z",
+      "status": 200,
+      "fields": {
+        "downloads": 23218,
+        "start": "2026-10-05",
+        "end": "2026-10-11",
+        "package": "freebuff"
+      }
+    }
+  },
+  "published_terminal_bench": {
+    "url": "https://www.tbench.ai/leaderboard",
+    "read_at": "2026-10-12T21:44:03Z",
+    "rows": [
+      {
+        "agent": "Claude Code",
+        "model": "Opus 5.5",
+        "effort": "max",
+        "accuracy": 64.85,
+        "date": "2026-09-22"
+      },
+      {
+        "agent": "Claude Code",
+        "model": "Sonnet 5.5",
+        "effort": "max",
+        "accuracy": 61.82,
+        "date": "2026-09-28"
+      },
+      {
+        "agent": "Codex",
+        "model": "GPT-6 Astra",
+        "effort": "max",
+        "accuracy": 58.18,
+        "date": "2026-09-03"
+      },
+      {
+        "agent": "Codex",
+        "model": "GPT-6.1 Sol",
+        "effort": "max",
+        "accuracy": 58.18,
+        "date": "2026-09-29"
+      },
+      {
+        "agent": "Claude Code",
+        "model": "Fable 5.1",
+        "effort": "max",
+        "accuracy": 57.88,
+        "date": "2026-09-01"
+      },
+      {
+        "agent": "Codex",
+        "model": "GPT-6 Astra",
+        "effort": "xhigh",
+        "accuracy": 57.88,
+        "date": "2026-09-03"
+      },
+      {
+        "agent": "Codex",
+        "model": "GPT-6 Astra",
+        "effort": "high",
+        "accuracy": 57.88,
+        "date": "2026-09-03"
+      },
+      {
+        "agent": "Claude Code",
+        "model": "Fable 5.1",
+        "effort": "xhigh",
+        "accuracy": 57.88,
+        "date": "2026-09-01"
+      },
+      {
+        "agent": "Claude Code",
+        "model": "Fable 5.1",
+        "effort": "high",
+        "accuracy": 54.55,
+        "date": "2026-09-01"
+      },
+      {
+        "agent": "Codex",
+        "model": "GPT-6 Astra",
+        "effort": "medium",
+        "accuracy": 54.24,
+        "date": "2026-09-03"
+      },
+      {
+        "agent": "Claude Code",
+        "model": "Fable 5.1",
+        "effort": "medium",
+        "accuracy": 53.94,
+        "date": "2026-09-01"
+      },
+      {
+        "agent": "Claude Code",
+        "model": "Opus 5",
+        "effort": "xhigh",
+        "accuracy": 53.94,
+        "date": "2026-07-24"
+      },
+      {
+        "agent": "Claude Code",
+        "model": "Opus 5",
+        "effort": "max",
+        "accuracy": 51.82,
+        "date": "2026-07-24"
+      },
+      {
+        "agent": "Codex",
+        "model": "GPT-6 Astra",
+        "effort": "low",
+        "accuracy": 50.61,
+        "date": "2026-09-03"
+      },
+      {
+        "agent": "Claude Code",
+        "model": "Opus 5",
+        "effort": "high",
+        "accuracy": 50.3,
+        "date": "2026-07-24"
+      },
+      {
+        "agent": "Codex",
+        "model": "GPT-6 Sol",
+        "effort": "max",
+        "accuracy": 49.39,
+        "date": "2026-09-22"
+      },
+      {
+        "agent": "Claude Code",
+        "model": "Opus 5",
+        "effort": "medium",
+        "accuracy": 44.85,
+        "date": "2026-07-24"
+      },
+      {
+        "agent": "Claude Code",
+        "model": "Fable 5",
+        "effort": "max",
+        "accuracy": 44.55,
+        "date": "2026-06-09"
+      },
+      {
+        "agent": "Claude Code",
+        "model": "Fable 5.1",
+        "effort": "low",
+        "accuracy": 43.33,
+        "date": "2026-09-01"
+      },
+      {
+        "agent": "Claude Code",
+        "model": "GLM-5.3",
+        "effort": "max",
+        "accuracy": 41.82,
+        "date": "2026-08-14"
+      },
+      {
+        "agent": "Codex",
+        "model": "GPT-5.6 Sol",
+        "effort": "max",
+        "accuracy": 37.27,
+        "date": "2026-06-26"
+      },
+      {
+        "agent": "Claude Code",
+        "model": "GLM-5.3-Flash",
+        "effort": "none",
+        "accuracy": 35.76,
+        "date": "2026-08-26"
+      },
+      {
+        "agent": "Claude Code",
+        "model": "Opus 5",
+        "effort": "low",
+        "accuracy": 34.85,
+        "date": "2026-07-24"
+      },
+      {
+        "agent": "Claude Code",
+        "model": "Qwen3.8-Max-0902",
+        "effort": "max",
+        "accuracy": 26.97,
+        "date": "2026-09-02"
+      },
+      {
+        "agent": "Claude Code",
+        "model": "Opus 4.8",
+        "effort": "max",
+        "accuracy": 23.64,
+        "date": "2026-05-28"
+      },
+      {
+        "agent": "Codex",
+        "model": "GPT-5.6 Terra",
+        "effort": "max",
+        "accuracy": 21.52,
+        "date": "2026-06-26"
+      },
+      {
+        "agent": "mini-SWE-agent",
+        "model": "Gemini 3.8 Flash",
+        "effort": "high",
+        "accuracy": 19.09,
+        "date": "2026-09-02"
+      },
+      {
+        "agent": "Codex",
+        "model": "GPT-5.6 Luna",
+        "effort": "max",
+        "accuracy": 17.27,
+        "date": "2026-06-26"
+      },
+      {
+        "agent": "Codex",
+        "model": "GPT-6 Luna",
+        "effort": "max",
+        "accuracy": 16.36,
+        "date": "2026-09-22"
+      },
+      {
+        "agent": "Claude Code",
+        "model": "Sonnet 5",
+        "effort": "max",
+        "accuracy": 12.42,
+        "date": "2026-06-30"
+      },
+      {
+        "agent": "mini-SWE-agent",
+        "model": "Gemini 3.7 Flash",
+        "effort": "high",
+        "accuracy": 11.21,
+        "date": "2026-08-13"
+      }
+    ]
+  },
+  "limits": [
+    "Published Scorecard and CI commits may differ from capability pins.",
+    "Terminal-Bench agent/model/date rows are not controlled harness comparisons.",
+    "No full independent community consensus or global adoption share is measured.",
+    "Original v1 signs/verdicts are history; current source scores may be more conservative when an original assertion cannot be reproduced."
+  ]
+}

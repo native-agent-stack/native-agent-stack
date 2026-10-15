@@ -51,7 +51,7 @@ from build_manifest import assert_no_leak, sanitize_value  # noqa: E402
 if str(HERE.parent.parent) not in sys.path:
     sys.path.insert(0, str(HERE.parent.parent))
 # The grandfathered run ids are defined once, next to the rules they exempt (scripts/landscape.py).
-from scripts.landscape import GRANDFATHERED_RUN_IDS, is_unrun_registration  # noqa: E402
+from scripts.landscape import GRANDFATHERED_RUN_IDS, RECORDED_VERDICT_STATUSES, is_unrun_registration  # noqa: E402
 
 # Same character class scripts/landscape.py requires of lanes.<lane>.sealed_base
 # (re.fullmatch(r"evidence/artifacts/layer-verdicts-[0-9A-Za-z]+", ...)) and
@@ -257,9 +257,12 @@ def build_document(root: Path, checked_at: str, *, run_id: str = DEFAULT_RUN_ID,
                 if not is_unrun_registration(row, root=root)]
         rows.sort(key=lambda item: item["layer_id"])
         catalogs[catalog] = rows
+        # Preserve historical wave bytes when no alias exists, while counting
+        # every FINAL row if a new wave actually carries that status.
+        statuses = STATUS_ORDER + (("FINAL",) if any(r["verdict_status"] == "FINAL" for r in rows) else ())
         counts[catalog] = {
             "layers": len(rows),
-            "by_status": {status: sum(1 for r in rows if r["verdict_status"] == status) for status in STATUS_ORDER},
+            "by_status": {status: sum(1 for r in rows if r["verdict_status"] == status) for status in statuses},
         }
 
     return {
@@ -346,12 +349,12 @@ def render_lanes_line(row: dict) -> str:
 
 
 def render_row_narrative(row: dict) -> str:
-    """A ``recorded`` row gets a full ``#### <title> (<layer_id>)`` block
+    """A ``recorded`` row (including the ``FINAL`` alias) gets a full ``#### <title> (<layer_id>)`` block
     (winner(s), alternatives, the full untruncated ``overturn_when``, open
     gaps, lane agreement + both run ids); every other row (``pending_lanes``
     or ``no_selection``) renders as a single "pending -- ..." bullet line,
     since there is nothing yet to narrate beyond why it is still open."""
-    if row["verdict_status"] != "recorded":
+    if row["verdict_status"] not in RECORDED_VERDICT_STATUSES:
         gaps = "; ".join(row.get("open_gaps") or []) or "no lane has run"
         label = "no selection" if row["verdict_status"] == "no_selection" else "pending"
         return f"- **{row.get('title') or row['layer_id']}** ({row['layer_id']}): {label} — {gaps}"

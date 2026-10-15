@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "recorded_at": "2026-10-13T03:09:28Z",
+  "base_commit": "c63c83a822f2687c3e7aed2d3b3ede0413119c9b",
+  "replayed_original_commit": "c7dbb078dabe2d1b226eddc409e0133e6c3e7e37",
+  "scope": "One review fix round: exact FINAL identity and receipt types, terminal-state reconciliation, measured convergence, resolved A1, explicit chronology/formats, neutral trial eligibility, sanitized Muse A1 observation and static repository inventory grant.",
+  "checks": [
+    {
+      "command": "python3 -m unittest tests.test_angle_records tests.test_angle_records_fix1 tests.test_final_stack tests.test_resolution_protocol_docs tests.test_local_pages_policy_grants tests.test_local_pages_source_policy tests.test_local_pages_architecture_inventory",
+      "started_at": "2026-10-13T03:05:06Z",
+      "ended_at": "2026-10-13T03:08:21Z",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ".............................................................................................................................................................................................................\n----------------------------------------------------------------------\nRan 205 tests in 195.431s\n\nOK\n"
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "started_at": "2026-10-13T03:08:24Z",
+      "ended_at": "2026-10-13T03:09:26Z",
+      "exit_code": 0,
+      "stdout": "{\"components\": 71, \"hashed_files\": 11881, \"profiles\": 4, \"receipts\": 240, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.\n",
+      "stderr": ""
+    },
+    {
+      "command": "python3 scripts/final_stack.py --check",
+      "started_at": "2026-10-13T03:09:26Z",
+      "ended_at": "2026-10-13T03:09:27Z",
+      "exit_code": 0,
+      "stdout": "{\"layers\": 35, \"status\": \"checked\", \"status_counts\": {\"converged\": 0, \"current\": 0, \"no-winner\": 2, \"reopened\": 30, \"unswept\": 3}}\nflag (report-only): 7 winner(s) without a run pin: unpinned 3 (foundation/ci-supply-chain candidate:actions-attest, foundation/instructions-skills candidate:typesafe-ai-skills, foundation/instructions-skills candidate:openai-skills); held 1 (us-equities/identity-provenance data-dvc); external 0; unresolved 3 (us-equities/evaluation-experiments foundation-agent-retrieval-bench, us-equities/evaluation-experiments inspect-ai, us-equities/security-supply-chain grype)\nflag (report-only): 28 winner(s) whose run pin differs from the verdict pin: foundation/agent-sdks codex: verdict 0.155.1, run 0.160.0; foundation/ci-supply-chain syft: verdict 1.52.0, run 1.54.0; foundation/document-retrieval markitdown: verdict 0.1.7, run 0.1.8; foundation/durable-memory ai-memory: verdict 2.3.2, run 2.4.1; foundation/git-github-automation worktrunk: verdict 0.79.0, run 0.80.0; foundation/hosting-services nextjs: verdict 16.3.5, run 16.3.8; foundation/isolation worktrunk: verdict 0.79.0, run 0.80.0; foundation/isolation sandbox-runtime: verdict 0.0.77, run 0.0.79; foundation/mcp-surfaces mcporter: verdict 0.13.13, run 0.14.2; foundation/mcp-surfaces mcp-inspector: verdict 2.7.0, run 2.9.0; foundation/native-clients claude-code: verdict 2.1.278, run 2.1.295; foundation/native-clients codex: verdict 0.155.1, run 0.160.0; foundation/observation-inference opentelemetry-collector-contrib: verdict 0.161.0, run 0.162.0; foundation/observation-inference prometheus: verdict 3.14.0, run 3.15.0; foundation/semantic-rag socraticode: verdict 1.14.0, run 1.15.0; foundation/semantic-rag vllm: verdict 0.25.0, run 0.30.0; foundation/token-efficiency rtk: verdict 0.49.0, run 0.51.0; foundation/token-efficiency headroom: verdict 0.37.0, run 0.40.0; foundation/token-efficiency ccusage: verdict 20.0.24, run 20.0.26; foundation/web-research agent-browser: verdict 0.38.1, run 0.38.2; foundation/web-research openresearch: verdict 0.2.7, run 0.2.15; foundation/workers claude-code: verdict 2.1.278, run 2.1.295; foundation/workers worktrunk: verdict 0.79.0, run 0.80.0; us-equities/agents-models-workers foundation-ai-memory: verdict v2.3.1, run 2.4.1; us-equities/agents-models-workers foundation-socraticode: verdict v1.14.0, run 1.15.0; us-equities/market-data-reference data-edgartools: verdict v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a, run 5.61.1; us-equities/research-factors-ml data-edgartools: verdict v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a, run 5.61.1; us-equities/security-supply-chain syft: verdict v1.52.0, run 1.54.0\nflag (report-only): 6 winner(s) whose pin drift is unknown (an unpinned or unparsed pin, or no shared field): foundation/git-github-automation candidate:cli-cli: verdict unpinned, run 2.101.0; foundation/recovery-portability candidate:astral-sh-uv: verdict unpinned, run 0.12.17; us-equities/agents-models-workers codex-native-sdk: verdict CLI rust-v0.155.1; Python openai-codex 0.154.0, run 0.160.0; us-equities/backtesting-engine nautilustrader: verdict 2.0.0rc5 (tag v2.0.0rc5; source pin from evidence/receipts/native-nautilus-v2-20260920.json — commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e), run 2.0.0rc5; us-equities/portfolio-risk skfolio: verdict 1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee, run 1.7.0; us-equities/research-factors-ml skfolio: verdict 1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee, run 1.7.0\nflag (report-only): next_review not evaluated; pass --today YYYY-MM-DD\n",
+      "stderr": ""
+    },
+    {
+      "command": "python3 scripts/final_stack.py --check --today 2026-10-13",
+      "started_at": "2026-10-13T03:09:27Z",
+      "ended_at": "2026-10-13T03:09:28Z",
+      "exit_code": 0,
+      "stdout": "{\"layers\": 35, \"status\": \"checked\", \"status_counts\": {\"converged\": 0, \"current\": 0, \"no-winner\": 2, \"reopened\": 30, \"unswept\": 3}}\nflag (report-only): 7 winner(s) without a run pin: unpinned 3 (foundation/ci-supply-chain candidate:actions-attest, foundation/instructions-skills candidate:typesafe-ai-skills, foundation/instructions-skills candidate:openai-skills); held 1 (us-equities/identity-provenance data-dvc); external 0; unresolved 3 (us-equities/evaluation-experiments foundation-agent-retrieval-bench, us-equities/evaluation-experiments inspect-ai, us-equities/security-supply-chain grype)\nflag (report-only): 28 winner(s) whose run pin differs from the verdict pin: foundation/agent-sdks codex: verdict 0.155.1, run 0.160.0; foundation/ci-supply-chain syft: verdict 1.52.0, run 1.54.0; foundation/document-retrieval markitdown: verdict 0.1.7, run 0.1.8; foundation/durable-memory ai-memory: verdict 2.3.2, run 2.4.1; foundation/git-github-automation worktrunk: verdict 0.79.0, run 0.80.0; foundation/hosting-services nextjs: verdict 16.3.5, run 16.3.8; foundation/isolation worktrunk: verdict 0.79.0, run 0.80.0; foundation/isolation sandbox-runtime: verdict 0.0.77, run 0.0.79; foundation/mcp-surfaces mcporter: verdict 0.13.13, run 0.14.2; foundation/mcp-surfaces mcp-inspector: verdict 2.7.0, run 2.9.0; foundation/native-clients claude-code: verdict 2.1.278, run 2.1.295; foundation/native-clients codex: verdict 0.155.1, run 0.160.0; foundation/observation-inference opentelemetry-collector-contrib: verdict 0.161.0, run 0.162.0; foundation/observation-inference prometheus: verdict 3.14.0, run 3.15.0; foundation/semantic-rag socraticode: verdict 1.14.0, run 1.15.0; foundation/semantic-rag vllm: verdict 0.25.0, run 0.30.0; foundation/token-efficiency rtk: verdict 0.49.0, run 0.51.0; foundation/token-efficiency headroom: verdict 0.37.0, run 0.40.0; foundation/token-efficiency ccusage: verdict 20.0.24, run 20.0.26; foundation/web-research agent-browser: verdict 0.38.1, run 0.38.2; foundation/web-research openresearch: verdict 0.2.7, run 0.2.15; foundation/workers claude-code: verdict 2.1.278, run 2.1.295; foundation/workers worktrunk: verdict 0.79.0, run 0.80.0; us-equities/agents-models-workers foundation-ai-memory: verdict v2.3.1, run 2.4.1; us-equities/agents-models-workers foundation-socraticode: verdict v1.14.0, run 1.15.0; us-equities/market-data-reference data-edgartools: verdict v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a, run 5.61.1; us-equities/research-factors-ml data-edgartools: verdict v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a, run 5.61.1; us-equities/security-supply-chain syft: verdict v1.52.0, run 1.54.0\nflag (report-only): 6 winner(s) whose pin drift is unknown (an unpinned or unparsed pin, or no shared field): foundation/git-github-automation candidate:cli-cli: verdict unpinned, run 2.101.0; foundation/recovery-portability candidate:astral-sh-uv: verdict unpinned, run 0.12.17; us-equities/agents-models-workers codex-native-sdk: verdict CLI rust-v0.155.1; Python openai-codex 0.154.0, run 0.160.0; us-equities/backtesting-engine nautilustrader: verdict 2.0.0rc5 (tag v2.0.0rc5; source pin from evidence/receipts/native-nautilus-v2-20260920.json — commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e), run 2.0.0rc5; us-equities/portfolio-risk skfolio: verdict 1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee, run 1.7.0; us-equities/research-factors-ml skfolio: verdict 1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee, run 1.7.0\nflag (report-only): --today 2026-10-13: 0 layer(s) past next_review\n",
+      "stderr": ""
+    }
+  ],
+  "red_controls": {
+    "original_review_head": "df5f32f790b7672f6e72e62cfb75939e00aee0ef",
+    "observed_at": "2026-10-13T02:55:52Z",
+    "command": "Fourteen fix-round controls against original production modules and current synthetic fixtures.",
+    "exit_code": 1,
+    "result": "Ran 14 tests; FAILED (failures=24, errors=2), including subtests. Fresh-output tests reproduced accepted conflicting commits, malformed citations/commands, masked FINAL, provisional/reopened FINAL, arbitrary screened pins and missing read-time ordering. The invalid-time and FINAL-alias cases errored before correction. The newly required neutral schema/eligibility and capture coverage controls also failed before their changes.",
+    "scope_limit": "This is an in-memory substitution of original production modules using synthetic fixtures, not a full original-checkout run."
+  },
+  "mutation_checks": {
+    "mutation_controls": [
+      {
+        "guard": "weight sum must equal 1",
+        "removed": true,
+        "control": "test_check_rejects_weight_sum",
+        "control_failed": true,
+        "failures": 1,
+        "errors": 0
+      },
+      {
+        "guard": "score without source",
+        "removed": true,
+        "control": "test_check_rejects_score_without_source",
+        "control_failed": true,
+        "failures": 1,
+        "errors": 0
+      },
+      {
+        "guard": "winner requires one CONVERGED angle verdict at its run pin",
+        "removed": true,
+        "control": "test_final_rejects_winner_without_convergence",
+        "control_failed": true,
+        "failures": 1,
+        "errors": 0
+      },
+      {
+        "guard": "condition {condition} requires {field}",
+        "removed": true,
+        "control": "test_final_rejects_missing_e2e_receipt",
+        "control_failed": true,
+        "failures": 1,
+        "errors": 0
+      },
+      {
+        "guard": "condition 4 requires invoke evidence or a recorded non-invocation reason",
+        "removed": true,
+        "control": "test_final_rejects_missing_invoke_evidence_and_reason",
+        "control_failed": true,
+        "failures": 1,
+        "errors": 0
+      }
+    ],
+    "observed_at": "2026-10-13T02:51:12Z"
+  },
+  "rebase": {
+    "rebased_head": "c7dbb078dabe2d1b226eddc409e0133e6c3e7e37",
+    "before": "8398bef3ff54b57d188630f0e470afe8fd81c584",
+    "after": "4c97345cde4d43e71a8af7360c245a0604e30cdd",
+    "equal": false,
+    "base": "c63c83a822f2687c3e7aed2d3b3ede0413119c9b",
+    "status": "clean",
+    "context_free_before": "e3ec5779b5cefd1153cf918138d32cf6667e5ce5",
+    "context_free_after": "e3ec5779b5cefd1153cf918138d32cf6667e5ce5",
+    "identical_edit_lines": true,
+    "explanation": "Standard patch IDs differ only through changed final-stack context; all added/removed non-registry lines match and the context-free patch IDs are identical. Registry was restored from current main and re-derived with owning helpers."
+  },
+  "grant": {
+    "proposal_pin": "c7dbb078dabe2d1b226eddc409e0133e6c3e7e37",
+    "added_paths": [
+      {
+        "path": "scripts/angle_records.py",
+        "root": "repo"
+      }
+    ],
+    "pre_fix_result": "The two existing genuine-worktree inventory controls failed; 25-test module passed after the exact static grant update."
+  },
+  "follow_ups": [
+    "Four-angle acceptance policy evidence remains a research question; no candidate-design change is made in this fix round.",
+    "Historical line locators stay at their recorded revisions.",
+    "Pre-existing registry machine-name text is unchanged by these additions.",
+    "Full raw responses for initial source reads were not retained; current readable excerpts and field snapshots have bounded claims.",
+    "No layer is FINAL; no candidate install, model call or comparative run was performed by this lane."
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "base_commit": "703d588c",
+  "recorded_at": "2026-10-12T22:34:34Z",
+  "scope": "Bounded angle/final-stack/protocol module checks and existing shard-0 final-stack checks. No full suite, candidate install, credential read or model request.",
+  "checks": [
+    {
+      "command": "python3 scripts/validate.py",
+      "started_at": "2026-10-12T22:33:30Z",
+      "ended_at": "2026-10-12T22:34:30Z",
+      "exit_code": 0,
+      "stdout": "{\"components\": 70, \"hashed_files\": 11866, \"profiles\": 4, \"receipts\": 239, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.\n",
+      "stderr": ""
+    },
+    {
+      "command": "python3 -m unittest tests.test_angle_records tests.test_final_stack tests.test_resolution_protocol_docs",
+      "started_at": "2026-10-12T22:30:14Z",
+      "ended_at": "2026-10-12T22:33:29Z",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "....................................................................................................................\n----------------------------------------------------------------------\nRan 116 tests in 195.226s\n\nOK\n"
+    },
+    {
+      "command": "python3 scripts/final_stack.py --check",
+      "started_at": "2026-10-12T22:34:33Z",
+      "ended_at": "2026-10-12T22:34:33Z",
+      "exit_code": 0,
+      "stdout": "{\"layers\": 35, \"status\": \"checked\", \"status_counts\": {\"converged\": 0, \"current\": 0, \"no-winner\": 2, \"reopened\": 30, \"unswept\": 3}}\nflag (report-only): 7 winner(s) without a run pin: unpinned 3 (foundation/ci-supply-chain candidate:actions-attest, foundation/instructions-skills candidate:typesafe-ai-skills, foundation/instructions-skills candidate:openai-skills); held 1 (us-equities/identity-provenance data-dvc); external 0; unresolved 3 (us-equities/evaluation-experiments foundation-agent-retrieval-bench, us-equities/evaluation-experiments inspect-ai, us-equities/security-supply-chain grype)\nflag (report-only): 28 winner(s) whose run pin differs from the verdict pin: foundation/agent-sdks codex: verdict 0.155.1, run 0.160.0; foundation/ci-supply-chain syft: verdict 1.52.0, run 1.54.0; foundation/document-retrieval markitdown: verdict 0.1.7, run 0.1.8; foundation/durable-memory ai-memory: verdict 2.3.2, run 2.4.1; foundation/git-github-automation worktrunk: verdict 0.79.0, run 0.80.0; foundation/hosting-services nextjs: verdict 16.3.5, run 16.3.8; foundation/isolation worktrunk: verdict 0.79.0, run 0.80.0; foundation/isolation sandbox-runtime: verdict 0.0.77, run 0.0.79; foundation/mcp-surfaces mcporter: verdict 0.13.13, run 0.14.2; foundation/mcp-surfaces mcp-inspector: verdict 2.7.0, run 2.9.0; foundation/native-clients claude-code: verdict 2.1.278, run 2.1.295; foundation/native-clients codex: verdict 0.155.1, run 0.160.0; foundation/observation-inference opentelemetry-collector-contrib: verdict 0.161.0, run 0.162.0; foundation/observation-inference prometheus: verdict 3.14.0, run 3.15.0; foundation/semantic-rag socraticode: verdict 1.14.0, run 1.15.0; foundation/semantic-rag vllm: verdict 0.25.0, run 0.30.0; foundation/token-efficiency rtk: verdict 0.49.0, run 0.51.0; foundation/token-efficiency headroom: verdict 0.37.0, run 0.40.0; foundation/token-efficiency ccusage: verdict 20.0.24, run 20.0.26; foundation/web-research agent-browser: verdict 0.38.1, run 0.38.2; foundation/web-research openresearch: verdict 0.2.7, run 0.2.15; foundation/workers claude-code: verdict 2.1.278, run 2.1.295; foundation/workers worktrunk: verdict 0.79.0, run 0.80.0; us-equities/agents-models-workers foundation-ai-memory: verdict v2.3.1, run 2.4.1; us-equities/agents-models-workers foundation-socraticode: verdict v1.14.0, run 1.15.0; us-equities/market-data-reference data-edgartools: verdict v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a, run 5.61.1; us-equities/research-factors-ml data-edgartools: verdict v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a, run 5.61.1; us-equities/security-supply-chain syft: verdict v1.52.0, run 1.54.0\nflag (report-only): 6 winner(s) whose pin drift is unknown (an unpinned or unparsed pin, or no shared field): foundation/git-github-automation candidate:cli-cli: verdict unpinned, run 2.101.0; foundation/recovery-portability candidate:astral-sh-uv: verdict unpinned, run 0.12.17; us-equities/agents-models-workers codex-native-sdk: verdict CLI rust-v0.155.1; Python openai-codex 0.154.0, run 0.160.0; us-equities/backtesting-engine nautilustrader: verdict 2.0.0rc5 (tag v2.0.0rc5; source pin from evidence/receipts/native-nautilus-v2-20260920.json — commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e), run 2.0.0rc5; us-equities/portfolio-risk skfolio: verdict 1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee, run 1.7.0; us-equities/research-factors-ml skfolio: verdict 1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee, run 1.7.0\nflag (report-only): next_review not evaluated; pass --today YYYY-MM-DD\n",
+      "stderr": ""
+    },
+    {
+      "command": "python3 scripts/final_stack.py --check --today 2026-10-12",
+      "started_at": "2026-10-12T22:34:34Z",
+      "ended_at": "2026-10-12T22:34:34Z",
+      "exit_code": 0,
+      "stdout": "{\"layers\": 35, \"status\": \"checked\", \"status_counts\": {\"converged\": 0, \"current\": 0, \"no-winner\": 2, \"reopened\": 30, \"unswept\": 3}}\nflag (report-only): 7 winner(s) without a run pin: unpinned 3 (foundation/ci-supply-chain candidate:actions-attest, foundation/instructions-skills candidate:typesafe-ai-skills, foundation/instructions-skills candidate:openai-skills); held 1 (us-equities/identity-provenance data-dvc); external 0; unresolved 3 (us-equities/evaluation-experiments foundation-agent-retrieval-bench, us-equities/evaluation-experiments inspect-ai, us-equities/security-supply-chain grype)\nflag (report-only): 28 winner(s) whose run pin differs from the verdict pin: foundation/agent-sdks codex: verdict 0.155.1, run 0.160.0; foundation/ci-supply-chain syft: verdict 1.52.0, run 1.54.0; foundation/document-retrieval markitdown: verdict 0.1.7, run 0.1.8; foundation/durable-memory ai-memory: verdict 2.3.2, run 2.4.1; foundation/git-github-automation worktrunk: verdict 0.79.0, run 0.80.0; foundation/hosting-services nextjs: verdict 16.3.5, run 16.3.8; foundation/isolation worktrunk: verdict 0.79.0, run 0.80.0; foundation/isolation sandbox-runtime: verdict 0.0.77, run 0.0.79; foundation/mcp-surfaces mcporter: verdict 0.13.13, run 0.14.2; foundation/mcp-surfaces mcp-inspector: verdict 2.7.0, run 2.9.0; foundation/native-clients claude-code: verdict 2.1.278, run 2.1.295; foundation/native-clients codex: verdict 0.155.1, run 0.160.0; foundation/observation-inference opentelemetry-collector-contrib: verdict 0.161.0, run 0.162.0; foundation/observation-inference prometheus: verdict 3.14.0, run 3.15.0; foundation/semantic-rag socraticode: verdict 1.14.0, run 1.15.0; foundation/semantic-rag vllm: verdict 0.25.0, run 0.30.0; foundation/token-efficiency rtk: verdict 0.49.0, run 0.51.0; foundation/token-efficiency headroom: verdict 0.37.0, run 0.40.0; foundation/token-efficiency ccusage: verdict 20.0.24, run 20.0.26; foundation/web-research agent-browser: verdict 0.38.1, run 0.38.2; foundation/web-research openresearch: verdict 0.2.7, run 0.2.15; foundation/workers claude-code: verdict 2.1.278, run 2.1.295; foundation/workers worktrunk: verdict 0.79.0, run 0.80.0; us-equities/agents-models-workers foundation-ai-memory: verdict v2.3.1, run 2.4.1; us-equities/agents-models-workers foundation-socraticode: verdict v1.14.0, run 1.15.0; us-equities/market-data-reference data-edgartools: verdict v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a, run 5.61.1; us-equities/research-factors-ml data-edgartools: verdict v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a, run 5.61.1; us-equities/security-supply-chain syft: verdict v1.52.0, run 1.54.0\nflag (report-only): 6 winner(s) whose pin drift is unknown (an unpinned or unparsed pin, or no shared field): foundation/git-github-automation candidate:cli-cli: verdict unpinned, run 2.101.0; foundation/recovery-portability candidate:astral-sh-uv: verdict unpinned, run 0.12.17; us-equities/agents-models-workers codex-native-sdk: verdict CLI rust-v0.155.1; Python openai-codex 0.154.0, run 0.160.0; us-equities/backtesting-engine nautilustrader: verdict 2.0.0rc5 (tag v2.0.0rc5; source pin from evidence/receipts/native-nautilus-v2-20260920.json — commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e), run 2.0.0rc5; us-equities/portfolio-risk skfolio: verdict 1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee, run 1.7.0; us-equities/research-factors-ml skfolio: verdict 1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee, run 1.7.0\nflag (report-only): --today 2026-10-12: 0 layer(s) past next_review\n",
+      "stderr": ""
+    }
+  ],
+  "fail_before": {
+    "observed_at": "2026-10-12T21:36:08Z",
+    "command": "python3 -m unittest tests.test_final_stack.AngleEnforcementTests",
+    "exit_code": 1,
+    "result": "Ran 11 tests; FAILED (failures=9, errors=1). The nine rejection controls failed against the previous builder and the missing-record summary was absent. The valid-receipt control passed."
+  },
+  "boundaries": [
+    "Policy fixture receipts are synthetic stand-ins, not candidate E2E or comparative runs.",
+    "No layer is marked FINAL; four records cover 34 candidates/routes while 31 layers retain missing-record gaps.",
+    "A6 is empty for the initial candidates. OpenAI deployed pool/gateway entitlement remains unverified."
+  ],
+  "licence_policy": {
+    "disqualifiers": [
+      null,
+      "missing_capability",
+      "abandoned"
+    ],
+    "compliance_field": "licence_note: SPDX id, source and UTC read_at; no effect on scores, verdicts or arms.",
+    "fail_before": {
+      "observed_at": "2026-10-12T22:23:22Z",
+      "scope": "Two licence tests against pre-correction staged schema/rule",
+      "exit_code": 1,
+      "result": "Ran 2 tests; FAILED (failures=1, errors=3). The old schema lacked the compliance-note field and accepted a self-consistent licence disqualifier."
+    },
+    "after": "Both controls pass in the 116-test affected-module run. Different SPDX identifiers and an unknown identifier preserve the entire derived result and candidate arm list."
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-13T08:40:57Z",
+  "base_head": "8b336b80c345444f073cca74281c725fd5e0d4b9",
+  "evidence_class": "local_integration",
+  "scope": "Four FINAL-evidence integrity cases: retained reopening, cumulative survivor dispositions, metadata receipt retention and downstream alias consumers.",
+  "before_correction": {
+    "command": "python3 -m unittest tests.test_angle_records_fix3 tests.test_local_pages_architecture_manifest.ManifestProjectionTests.test_final_alias_preserves_adopted_matrix_and_desk_projection tests.test_verdict_review_gate.StatusDerivationTests.test_final_alias_preserves_sealed_recorded_verdict_checks tests.test_verdict_review_gate.StatusDerivationTests.test_final_alias_cannot_promote_pending_sealed_evidence",
+    "exit_code": 1,
+    "tests": 11,
+    "assertion_or_subtest_failures": 15,
+    "errors": 0,
+    "summary": "Ran 11 tests in 1.255s\n\nFAILED (failures=15)",
+    "basis": "Final fix3 control set independently replayed against base_head production. Corrects the earlier partial 9-test/13-failure set; this historical result does not include the later blocker controls."
+  },
+  "affected_modules": {
+    "command": "python3 -m unittest tests.test_angle_records tests.test_angle_records_fix1 tests.test_angle_records_fix3 tests.test_final_stack tests.test_verdict_review_gate tests.test_local_pages_architecture_manifest tests.test_landscape tests.test_component_matrix tests.test_layer_verdicts tests.test_resolution_protocol_docs tests.test_local_pages_policy_grants tests.test_local_pages_source_policy tests.test_local_pages_architecture_inventory",
+    "exit_code": 0,
+    "tests": 607,
+    "summary": "Ran 607 tests in 169.498s\n\nOK",
+    "full_suite": false
+  },
+  "mutation_controls": {
+    "evidence_class": "synthetic",
+    "method": "Seven in-memory production guard reversals; every designated test fails with assertions and zero errors, rather than relying on source-output drift.",
+    "results": [
+      {"guard": "survivor FINAL guard", "test_passed": false, "assertion_failures": 2, "errors": 0},
+      {"guard": "no-change FINAL reopening", "test_passed": false, "assertion_failures": 1, "errors": 0},
+      {"guard": "metadata receipt read", "test_passed": false, "assertion_failures": 2, "errors": 0},
+      {"guard": "architecture FINAL status", "test_passed": false, "assertion_failures": 1, "errors": 0},
+      {"guard": "architecture FINAL desk", "test_passed": false, "assertion_failures": 1, "errors": 0},
+      {"guard": "review gate check_status alias", "test_passed": false, "assertion_failures": 1, "errors": 0},
+      {"guard": "review gate winner alias", "test_passed": false, "assertion_failures": 1, "errors": 0}
+    ]
+  },
+  "primary_references": [
+    {"repository": "native-agent-stack/native-agent-stack", "pin": "8b336b80c345444f073cca74281c725fd5e0d4b9", "path": "docs/decisions/2026-10-11-layer-resolution-protocol.md", "line": 50},
+    {"repository": "native-agent-stack/native-agent-stack", "pin": "8b336b80c345444f073cca74281c725fd5e0d4b9", "path": "docs/decisions/2026-10-11-layer-resolution-protocol.md", "line": 62},
+    {"repository": "native-agent-stack/native-agent-stack", "pin": "8b336b80c345444f073cca74281c725fd5e0d4b9", "path": "scripts/saturation_ledger.py", "line": 625},
+    {"repository": "native-agent-stack/native-agent-stack", "pin": "8b336b80c345444f073cca74281c725fd5e0d4b9", "path": "scripts/final_stack.py", "line": 195},
+    {"repository": "native-agent-stack/native-agent-stack", "pin": "8b336b80c345444f073cca74281c725fd5e0d4b9", "path": "scripts/landscape.py", "line": 33}
+  ],
+  "generated": {"layers": 35, "final_layers": 0, "angle_records": 4, "missing_angle_records": 31},
+  "registration_boundary": "This receipt precedes its own registration. Final validate/final-stack/publication outputs are reported in the PR body and lane report after all changed files are registered.",
+  "limits": [
+    "All new lifecycle, metadata and alias receipts are synthetic controls, not native candidate qualification or comparative runs.",
+    "The matrix's ordinary date-based metric remains separate from FINAL's retained-change rule.",
+    "The review gate remains trusted from the base in CI; future alias verdicts use this compatibility after it lands.",
+    "Historical primary captures, invocation offsets and the selection-policy research follow-ups remain unchanged.",
+    "Graph transport was closed; bounded exact source reads were used."
+  ]
+}

@@ -548,6 +548,30 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
         with self.assertRaisesRegex(ValueError, "verdict_status is unknown"):
             self.build()
 
+    def test_final_alias_refuses_after_recorded_verdict_control(self):
+        self.seal_claude_run()
+        self.layer.update(self.recorded_fields(verdict_status="recorded"))
+        data = self.build()
+        self.assertEqual(data["layers"][0]["verdict_status"], "recorded")
+        self.assertEqual(data["layers"][0]["winners"][0]["component_id"], "selected")
+        self.layer["verdict_status"] = "FINAL"
+        with self.assertRaisesRegex(ValueError, "^admission under redesign$"):
+            self.build()
+        self.layer["winners"] = []
+        with self.assertRaisesRegex(ValueError, "^admission under redesign$"):
+            self.build()
+
+    def test_new_wave_final_alias_refuses_before_sealed_winner_validation(self):
+        lanes = self.seal_new_wave()
+        self.layer.update(self.recorded_fields(verdict_status="recorded", lanes=lanes))
+        self.build()
+        self.layer["winners"][0]["component_id"] = "wrong-component"
+        with self.assertRaisesRegex(ValueError, "sealed winner set"):
+            self.build()
+        self.layer["verdict_status"] = "FINAL"
+        with self.assertRaisesRegex(ValueError, "^admission under redesign$"):
+            self.build()
+
     def test_recorded_verdict_needs_at_least_one_winner_and_one_alternative(self):
         self.seal_claude_run()
         self.layer.update(self.recorded_fields(winners=[]))

@@ -56,8 +56,8 @@ RUNGS = ("sim", "paper", "live")
 
 
 def layer_status(verdict_status: Any) -> str:
-    """Matrix verdict_status: recorded is adopted, pending_lanes is candidate, no_selection is planned."""
-    return {"recorded": "adopted", "pending_lanes": "candidate", "no_selection": "planned"}.get(verdict_status, "unreported")
+    """Recorded/FINAL is adopted; pending_lanes is candidate, no_selection is planned."""
+    return {"recorded": "adopted", "FINAL": "adopted", "pending_lanes": "candidate", "no_selection": "planned"}.get(verdict_status, "unreported")
 
 
 def winner_status(e2e_state: Any) -> str:
@@ -274,7 +274,7 @@ def _desk(matrix: dict | None, gates: dict | None, runtime: dict | None) -> dict
         result = []
         for layer_id in layer_ids:
             row = rows.get(layer_id)
-            if row and row["verdict_status"] != "recorded":
+            if row and row["verdict_status"] not in ("recorded", "FINAL"):
                 result.append({"name": row["title"], "kind": "verdict " + row["verdict_status"].replace("_", " "), "status": row["status"], "layer": layer_id})
             for winner in (row or {}).get("winners", []):
                 result.append({"name": winner["id"], "kind": "winner", "status": winner["status"], "layer": layer_id, "host_e2e": winner["host_e2e"]})

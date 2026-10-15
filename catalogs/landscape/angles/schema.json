@@ -1,0 +1,574 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Sourced layer angle record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "rule_version",
+    "catalog",
+    "layer_id",
+    "weights",
+    "weights_stated_at",
+    "weight_reason",
+    "published_evaluations_available",
+    "disclosure",
+    "resolution_inputs",
+    "gaps",
+    "candidates",
+    "final_evidence"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "rule_version": {
+      "const": "angle-convergence/2"
+    },
+    "catalog": {
+      "$ref": "#/$defs/id"
+    },
+    "layer_id": {
+      "$ref": "#/$defs/id"
+    },
+    "weights": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5",
+        "A6"
+      ],
+      "properties": {
+        "A1": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "A2": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "A3": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "A4": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "A5": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "A6": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "weights_stated_at": {
+      "$ref": "#/$defs/time"
+    },
+    "weight_reason": {
+      "$ref": "#/$defs/text"
+    },
+    "published_evaluations_available": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "disclosure": {
+      "$ref": "#/$defs/text"
+    },
+    "resolution_inputs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/path"
+      }
+    },
+    "gaps": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/text"
+      }
+    },
+    "candidates": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/candidate"
+      }
+    },
+    "final_evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/final"
+      }
+    },
+    "terminal_state": {
+      "enum": [
+        "FINAL",
+        "SCHEDULED",
+        "RETIRED",
+        "NON_TERMINAL"
+      ]
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "time": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "Z$"
+    },
+    "path": {
+      "type": "string",
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[A-Za-z0-9_.\\-/]+(?![\\s\\S])"
+    },
+    "source_file": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/path"
+        },
+        {
+          "pattern": "^(?:[A-Za-z0-9_.-]+/)*(?!\\.{1,2}(?![\\s\\S]))[A-Za-z0-9_.-]+(?![\\s\\S])"
+        }
+      ]
+    },
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://[^@\\s]+$"
+    },
+    "source": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "repository",
+            "pin",
+            "path",
+            "line"
+          ],
+          "properties": {
+            "kind": {
+              "const": "repo"
+            },
+            "repository": {
+              "$ref": "#/$defs/url"
+            },
+            "pin": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "path": {
+              "$ref": "#/$defs/path"
+            },
+            "line": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "url",
+            "read_at"
+          ],
+          "properties": {
+            "kind": {
+              "const": "url"
+            },
+            "url": {
+              "$ref": "#/$defs/url"
+            },
+            "read_at": {
+              "$ref": "#/$defs/time"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "path"
+          ],
+          "properties": {
+            "kind": {
+              "const": "receipt"
+            },
+            "path": {
+              "$ref": "#/$defs/path"
+            }
+          }
+        }
+      ]
+    },
+    "angle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "score",
+        "read_at",
+        "sources",
+        "note"
+      ],
+      "properties": {
+        "score": {
+          "enum": [
+            "+",
+            "0",
+            "-",
+            "U"
+          ]
+        },
+        "read_at": {
+          "$ref": "#/$defs/time"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/source"
+          }
+        },
+        "note": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "repository",
+        "pin",
+        "role",
+        "a1_screened",
+        "a6_comparative",
+        "confounds",
+        "angles",
+        "disqualifier",
+        "verdict",
+        "provisional",
+        "measure_next"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "$ref": "#/$defs/text"
+        },
+        "repository": {
+          "$ref": "#/$defs/url"
+        },
+        "pin": {
+          "$ref": "#/$defs/text"
+        },
+        "role": {
+          "$ref": "#/$defs/text"
+        },
+        "a1_screened": {
+          "type": "boolean"
+        },
+        "a6_comparative": {
+          "type": "boolean"
+        },
+        "confounds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/text"
+          }
+        },
+        "angles": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "A1",
+            "A2",
+            "A3",
+            "A4",
+            "A5",
+            "A6"
+          ],
+          "properties": {
+            "A1": {
+              "$ref": "#/$defs/angle"
+            },
+            "A2": {
+              "$ref": "#/$defs/angle"
+            },
+            "A3": {
+              "$ref": "#/$defs/angle"
+            },
+            "A4": {
+              "$ref": "#/$defs/angle"
+            },
+            "A5": {
+              "$ref": "#/$defs/angle"
+            },
+            "A6": {
+              "$ref": "#/$defs/angle"
+            }
+          }
+        },
+        "disqualifier": {
+          "enum": [
+            null,
+            "missing_capability",
+            "abandoned"
+          ]
+        },
+        "verdict": {
+          "enum": [
+            "CONVERGED",
+            "DISAGREE",
+            "INSUFFICIENT",
+            "REJECTED"
+          ]
+        },
+        "provisional": {
+          "type": "boolean"
+        },
+        "measure_next": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "previous_verdict": {
+          "$ref": "#/$defs/text"
+        },
+        "licence_note": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "spdx_id",
+            "source",
+            "read_at",
+            "note"
+          ],
+          "properties": {
+            "spdx_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "minLength": 1
+            },
+            "source": {
+              "$ref": "#/$defs/source"
+            },
+            "read_at": {
+              "$ref": "#/$defs/time"
+            },
+            "note": {
+              "$ref": "#/$defs/text"
+            }
+          }
+        },
+        "adoption_status": {
+          "enum": [
+            "CURRENT",
+            "TRIAL",
+            "NOT_ADOPTED",
+            "COMPARISON_ARM"
+          ]
+        },
+        "entitlement": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "sources",
+            "note"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "documented",
+                "pending",
+                "conflict",
+                "unverified"
+              ]
+            },
+            "sources": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/source"
+              }
+            },
+            "note": {
+              "$ref": "#/$defs/text"
+            }
+          }
+        },
+        "mirror_status": {
+          "enum": [
+            "MIRRORED",
+            "UNMIRRORED",
+            "PIN_UNAVAILABLE"
+          ]
+        },
+        "trial_permitted": {
+          "type": "boolean"
+        },
+        "final_eligible": {
+          "type": "boolean"
+        },
+        "basis": {
+          "const": "operator decision, recorded privately"
+        }
+      }
+    },
+    "final": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_id",
+        "run_pin",
+        "e2e_receipt",
+        "invoke_receipt",
+        "not_invoked_reason"
+      ],
+      "properties": {
+        "candidate_id": {
+          "$ref": "#/$defs/id"
+        },
+        "run_pin": {
+          "$ref": "#/$defs/text"
+        },
+        "e2e_receipt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/path"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "invoke_receipt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/path"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "not_invoked_reason": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
+      }
+    },
+    "upstream_e2e": {
+      "type": "object",
+      "required": [
+        "kind",
+        "repository",
+        "pin",
+        "evidence_class",
+        "success",
+        "upstream_sources",
+        "commands"
+      ],
+      "properties": {
+        "kind": {
+          "const": "upstream_e2e"
+        },
+        "repository": {
+          "$ref": "#/$defs/url"
+        },
+        "pin": {
+          "$ref": "#/$defs/text"
+        },
+        "evidence_class": {
+          "const": "native_proven"
+        },
+        "success": {
+          "const": true
+        },
+        "upstream_sources": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/$defs/source"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "const": "repo"
+                  },
+                  "path": {
+                    "$ref": "#/$defs/source_file"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "commands": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "required": [
+              "phase",
+              "command",
+              "exit_code"
+            ],
+            "properties": {
+              "phase": {
+                "$ref": "#/$defs/text"
+              },
+              "command": {
+                "$ref": "#/$defs/text"
+              },
+              "exit_code": {
+                "type": "integer",
+                "const": 0
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

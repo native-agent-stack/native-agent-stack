@@ -1,0 +1,31 @@
+Public source: https://dev.meta.ai/docs/muse-code/configuration
+Read at: 2026-10-13T02:53:02Z
+HTTP status: 200
+Capture: selected readable source text; embedded scripts/styles omitted.
+
+Configuration and context - Meta Model APISkip to contentMeta Model APISearchProductDashboardStart hereOverviewQuickstartAuthenticationModelsPricing and rate limitsSDKs and librariesCapabilitiesTool callingTool searchSearch groundingImage understandingImage generationSpeech to textVideo understandingMedia segmentationFile handlingReasoningStructured outputPrompt cachingToken countingProtocolsChoosing an APIResponses APIChat Completions APIMessages APICookbookAll recipesAPI fundamentalsAgent patternsUse casesBuilding with Muse CodeMuse ImageMuse Voice TranscribeMuse CodeOverviewAuthentication and billingSubscriptionsPermissions and safetyWorking with the agentWorkflowsSession messagingRewind a conversationConfiguration and contextExtending and automatingChangelogOpen-weight modelsOverviewMuse GlimmerMuse GlimmerOverviewGet the modelPrompting guideQuantizationSpeculative decodingRun inferenceDeploy with vLLMDeploy with SGLangDeploy with llama.cppDeploy with ExecuTorchRun with Together AICustomizationFine-tuning (SFT)Reinforcement learningAgent guidesCoding agentsAgent frameworksComputer useSAMOverviewSegmenting with promptsReading segmentation outputClient librariesAPI referenceIntroductionError handlingResponsesResponsesOverviewCreate a responseRetrieve a responseDelete a responseCancel a responseCount input tokensSchemasChat completionsChat completionsOverviewCreate a chat completionSchemasMessagesMessagesOverviewCreate a messageCount tokensSchemasFilesFilesOverviewUpload a fileList filesRetrieve a fileRetrieve file contentDelete a fileSchemasImagesImagesOverviewGenerate an imageEdit an imageSchemasVoiceVoiceOverviewTranscribe a recordingTranscribe in realtimeSchemasModelsModelsOverviewList modelsRetrieve a modelSchemasStatusHelpHelp Center
+terminal-UI preferences, including voice, reasoning display, and the terminal theme (tui.terminal_background, set with /theme)
+MCP servers
+a first-class hooks block, plus a managed_hooks_path pointer (see hooks)
+To delete saved sessions you haven't opened for a while, set session_retention_days to a number of days. Leave it unset to keep sessions forever. Retention works on macOS and Linux only for now. To set it for a single run, pass -c session_retention_days=N.
+settings.json must set "schema_version": 1. A file that omits that key fails every command at startup with malformed settings file. An unrecognized value fails with unsupported settings schema version. A missing file is fine, because Muse Code applies defaults. Create the file only when you have something to set, and always include "schema_version": 1.
+Project instructions with AGENTS.md
+muse init seeds your project's agent rules. It writes a single AGENTS.md into the current directory. It creates no other files, and does not change settings.json:
+bashmuse init # write AGENTS.md in the current directorymuse init --dry-run # show what it would write, change nothing
+Without --force, it stops if AGENTS.md already exists. With --force, it overwrites the file completely, so save any existing content first.
+How Muse Code loads instruction files. From your workspace root, Muse Code walks up to the nearest .git boundary. At each directory level, it checks AGENTS.md, CLAUDE.md, .agents/AGENTS.md, then .claude/CLAUDE.md; the first existing file in that order wins for that level. Precedence when guidance conflicts:
+Your machine-wide user rules always load. Project rules load only after you trust the workspace. On an untrusted checkout, Muse Code ignores project AGENTS.md and CLAUDE.md until you trust it.
+Set reasoning effort
+--reasoning-effort trades latency for depth: none, minimal, low, medium, high (default), xhigh, max, ultra. Change it mid-session with /effort.
+bashmuse --reasoning-effort medium
+Premium reasoning levels
+xhigh is an optional premium-precision level, and max is the deepest reasoning level — extended reasoning beyond xhigh. Muse Code offers max in both Standard and Contributor mode. ultra is a client-side setting that maps to each provider's highest supported reasoning level and can make Muse Code delegate more aggressively; where a provider doesn't support it, a request for ultra runs at xhigh. The Meta provider does not accept none; other providers can support it.
+Muse Code has two launch surfaces with separate flag sets: the interactive TUI (muse …) and headless (muse exec …). Some flags exist on only one.
+--model <id>, --reasoning-effort <level>: model and reasoning depth.
+--subagent-worktree-isolation: compatibility flag. Isolation is requested per subagent; the flag does not isolate every child.
+Headless only (muse exec …):
+--json (emit JSONL events), --prompt-file <path> (read the prompt from a file), --max-model-steps <n> (cap the run).
+muse exec accepts both approval flags. They configure the policy before the run starts. A headless run has no interactive UI for answering a human approval prompt, so choose a policy that can complete unattended or expect the held action to remain unresolved.
+Both muse --no-session-log and muse exec --no-session-log run without retained session state, which disables resume and the other retained-session features. Generated inline workflow scripts then use process-lifetime temporary storage, which cannot support retained recovery.
+Muse Code reads committed project memory into the model's context even in an untrusted workspace. Skills, rules, and hooks differ: they load only after you trust it. Treat a repo's MEMORY.md as a prompt-injection surface, and review it on checkouts you don't control.
+Package reusable instructions and tools as skills the agent can load on demand.

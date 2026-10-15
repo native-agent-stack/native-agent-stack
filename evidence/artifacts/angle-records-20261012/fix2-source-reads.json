@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "evidence_class": "source_review",
+  "read_at": "2026-10-13T04:08:24Z",
+  "claims": [
+    {
+      "repository": "python-jsonschema/jsonschema",
+      "pin": "a7277432b0f7bcd0551f6e589d30457017125df4",
+      "path": "jsonschema/_keywords.py",
+      "line": 215,
+      "claim": "Schema patterns use re.search; the pattern must enforce its own strict boundaries."
+    },
+    {
+      "repository": "python/cpython",
+      "pin": "cbc944f4bc59639a444dd971c737788ba2283a91",
+      "path": "Doc/library/re.rst",
+      "line": 826,
+      "claim": "The dollar anchor also matches before a final newline."
+    },
+    {
+      "repository": "python/cpython",
+      "pin": "cbc944f4bc59639a444dd971c737788ba2283a91",
+      "path": "Doc/library/urllib.parse.rst",
+      "line": 416,
+      "claim": "urlsplit and urlparse do not validate inputs."
+    },
+    {
+      "repository": "python-jsonschema/jsonschema",
+      "pin": "a7277432b0f7bcd0551f6e589d30457017125df4",
+      "path": "jsonschema/_format.py",
+      "line": 307,
+      "claim": "The upstream URI checker calls the exported validate_rfc3986 function with rule URI."
+    },
+    {
+      "repository": "python-jsonschema/jsonschema",
+      "pin": "a7277432b0f7bcd0551f6e589d30457017125df4",
+      "path": "pyproject.toml",
+      "line": 64,
+      "claim": "format-nongpl supports rfc3986-validator greater than 0.1.0."
+    }
+  ],
+  "package": {
+    "name": "rfc3986-validator",
+    "version": "0.1.1",
+    "repository": "https://github.com/naimetti/rfc3986-validator",
+    "mirror": "UNMIRRORED",
+    "metadata_url": "https://pypi.org/pypi/rfc3986-validator/0.1.1/json",
+    "read_at": "2026-10-13T04:08:24Z",
+    "http_status": 200,
+    "wheel_url": "https://files.pythonhosted.org/packages/9e/51/17023c0f8f1869d8806b979a2bffa3f861f26a3f1a66b094288323fba52f/rfc3986_validator-0.1.1-py2.py3-none-any.whl",
+    "wheel_read_at": "2026-10-13T04:11:01Z",
+    "wheel_http_status": 200,
+    "public_registry_wheel_hash_verified": true,
+    "source_path": "rfc3986_validator.py",
+    "line": 93,
+    "readable_excerpt": "evidence/artifacts/angle-records-20261012/source-captures/rfc3986-validator.txt"
+  },
+  "limits": [
+    "Only primary-source excerpts and selected public package fields are retained; no complete upstream checkout is claimed for the UNMIRRORED package.",
+    "URI syntax and relative-file locator validation do not establish source authenticity or actual candidate performance."
+  ]
+}
