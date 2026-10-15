@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "evidence_class": "source_review",
+  "recorded_at": "2026-10-15",
+  "scope": "Evidence integrity only; no candidate runtime test or model invocation.",
+  "integrity": {
+    "validation_kind": "artifact structural and citation checks, not candidate execution",
+    "tables": {
+      "semantic-rag.anthropic": 41,
+      "semantic-rag.openai": 41,
+      "semantic-rag.research": 41,
+      "document-retrieval.anthropic": 39,
+      "document-retrieval.openai": 39,
+      "document-retrieval.research": 39,
+      "web-research.anthropic": 62,
+      "web-research.openai": 62,
+      "web-research.research": 62
+    },
+    "rows": 426,
+    "original_inventory_rows": 126,
+    "source_files_checked": 115,
+    "passes": [
+      "document-retrieval.anthropic:tobi/qmd",
+      "document-retrieval.openai:tobi/qmd"
+    ],
+    "failures": [],
+    "git_identity_is_noreply": true
+  },
+  "citation_audit": {
+    "file": "citation-audit-retrieval.json",
+    "pinned_files": 115,
+    "invalid_line_ranges": 0
+  },
+  "repository_validation": {
+    "command": "python3 scripts/validate.py",
+    "exit_code": 0,
+    "result": {
+      "components": 71,
+      "hashed_files": 12160,
+      "profiles": 4,
+      "receipts": 240,
+      "status": "passed"
+    },
+    "boundary": "This successful pass preceded citation deduplication. A fresh validation after final registration is required before commit; its output is recorded in the PR description."
+  },
+  "earlier_attempt": {
+    "command": "python3 scripts/validate.py",
+    "outcome": "tool timeout after 60000 ms; not counted as pass",
+    "resolution": "Reran using a resumable command; exit 0 above."
+  },
+  "remaining_review_gates": [
+    "co-op GPT read",
+    "CC Claude read"
+  ],
+  "new_repository_scripts": 0,
+  "candidate_installs": 0,
+  "candidate_code_execution": 0,
+  "keyed_candidate_api_calls": 0,
+  "model_invocations": 0
+}
