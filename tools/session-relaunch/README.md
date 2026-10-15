@@ -95,12 +95,16 @@ has checked that no tab of it is open:
 `/usr/bin/python3 -I "$T/session_relaunch.py" relaunch --reopen <name> --config "$S/config.json"` (repeat `--reopen`
 for more names; the run records them under `reopened`). A reopen is spent only by the call it makes
 (`resolved_through` in the session's record), so a reopen run that skips the session or stops before its call leaves it
-unresolved. A `--reopen` that cannot be carried out is refused, exit 1, and nothing is opened: a name that is not an
-unresolved session this relaunch still has to bring back, or any `--reopen` while the relaunch is complete, capped by
-`max_relaunches` or otherwise has nothing to relaunch. The refusal is recorded as a `refusals` entry in that boot's
-relaunch state file, under the run lock, with no run added. With no readable relaunch state for the boot (none was
-started, or the file cannot be read) there is nothing to add the entry to, and the refusal goes to stderr only. A dry
-run records nothing.
+unresolved. A `--reopen` that cannot be carried out is refused, exit 1, nothing is opened, and the reason goes to
+stderr. Two kinds of refusal are also recorded, as a `refusals` entry in the ended boot's relaunch state file, under the
+run lock, with no run added: a name that is not an unresolved session this relaunch still has to bring back, and any
+`--reopen` while the relaunch has nothing to relaunch (for example it is complete, or capped by `max_relaunches`).
+Either is recorded only when that state file already exists and can be read, and never in a dry run. No other refusal
+is recorded: another run holds the run lock, the client gives no session list, the journal has no entry for the ended
+boot, the relaunch state cannot be read, or the sealed handoff of an unfinished relaunch is missing or changed. A dry
+run writes no relaunch state, roster, refusal or handoff, but like every run it takes the run lock: it creates
+`relaunch.lock` in the state directory, creating the directory too when it is missing, and sets the directory to mode
+0700.
 
 Every relaunch run, the unit's or a direct one, holds an exclusive lock on `relaunch.lock` in the state directory
 (`fcntl.flock`). A run that finds it held is refused with exit 1 and writes and opens nothing, so a direct `--reopen` run
@@ -115,6 +119,33 @@ call it stopped is left `in_flight`, so the rerun records that session as `uncer
 
 A refused, skipped or `partial` run exits 1, the unit fails, and `OnFailure=stack-alert@%n.service` runs the command
 center's alert handler.
+
+## Mechanisms: vendor behaviour and local policy
+
+Three mechanisms come from Python and Linux; what the tool does with each is its own policy. The Python sources are the
+3.14 library docs, for the unit's interpreter (`/usr/bin/python3` is 3.14.4 here; the docs, read on 2026-10-15, render
+as 3.14.8 and carry the same sentences as CPython's `Doc/library/` at tag `v3.14.4`).
+
+- **Run lock.** Policy: every relaunch run, a dry run too, opens `relaunch.lock` with `O_CREAT` and takes
+  `LOCK_EX | LOCK_NB`; a run that finds it held is refused instead of waiting, and the descriptor is closed when the run
+  ends. Vendor: `fcntl.flock` performs flock(2) and raises `OSError` when the call fails
+  (https://docs.python.org/3.14/library/fcntl.html#fcntl.flock). flock(2) applies an advisory lock, a `LOCK_NB` request
+  on a held lock fails with `EWOULDBLOCK`, and the lock is released when all descriptors of the open file are closed
+  (https://man7.org/linux/man-pages/man2/flock.2.html, Linux man-pages 6.19). So a killed run leaves the file but not
+  the lock, and the lock orders relaunch runs only: a process that does not take it is not stopped.
+- **Call timeouts.** Policy: a tab call may take `tab_timeout_s` (120 s), and a `claude agents --json` or
+  `journalctl --list-boots` call 60 s. A timed-out client call counts as no session list and a timed-out journal call
+  as no journal entry; a timed-out tab call is recorded as `timeout` and never repeated, because its tab may already be
+  open. Vendor: "If the timeout expires, the child process will be killed and waited for. The
+  TimeoutExpired exception will be re-raised after the child process has terminated."
+  (https://docs.python.org/3.14/library/subprocess.html#subprocess.run).
+- **Atomic replacement.** Policy: `write_atomic` writes a temporary file made by `mkstemp` in the target's own directory,
+  sets its mode and replaces the target with it; rosters, the relaunch state, the planned-restart marker and the handoff
+  are written this way. Vendor: "The operation may fail if src and dst are on different filesystems. If successful, the
+  renaming will be an atomic operation (this is a POSIX requirement)."
+  (https://docs.python.org/3.14/library/os.html#os.replace), hence the temporary file in the same directory. The tool
+  does not call `fsync`: a reader sees the old file or the new one whole, and the cited guarantee is atomicity, not
+  durability across a crash.
 
 ## Private files
 
@@ -161,4 +192,7 @@ roster.
 
 ## Tests
 
-`python3 -m unittest tests.test_session_relaunch`, which uses stand-ins for the client and PowerShell.
+`python3 -m unittest tests.test_session_relaunch`, which uses stand-ins for the client and PowerShell. The publication
+check (`PublicationSurfaces`) scans 14 files: the decision record and every file under `tools/session-relaunch/` and
+`evidence/artifacts/session-relaunch-20261014/`; it does not scan the test module, `manifests/evidence.json`, PR bodies
+or commit messages.
