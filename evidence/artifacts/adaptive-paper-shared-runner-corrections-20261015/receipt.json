@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "evidence_class": "synthetic",
+  "parent_commit": "e63d70d87e141f2455c717347793ad3ac379d3a2",
+  "scope": "One forward correction commit for the PARK list and integrated #1084 F1; prior READY-FOR-READS is withdrawn.",
+  "runtime": {
+    "python": "3.12.3",
+    "nautilus_trader": "2.0.0rc5",
+    "priority": "nice -n 19"
+  },
+  "review_inputs": [
+    {
+      "file": "adjudication-pr1091-e2755161-20261014.md"
+    },
+    {
+      "file": "adjudication-pr1091-e2755161-20261014.addendum-01.md"
+    },
+    {
+      "file": "pr1084-claude-micro-9084d29b.md"
+    },
+    {
+      "file": "adjudication-pr1084-9084d29b-20261014.md"
+    },
+    {
+      "file": "pr1091-claude-micro-e2755161.md"
+    }
+  ],
+  "review_input_verification": "All supplied records read whole and hashes verified; referenced #1091 micro resolves the two P2 descriptions.",
+  "source_refs": [
+    "https://github.com/native-agent-stack/native-agent-stack/blob/e63d70d87e141f2455c717347793ad3ac379d3a2/blueprints/us-equities/adaptive-paper/native_strategy.py#L1116-L1149",
+    "https://github.com/native-agent-stack/native-agent-stack/blob/e63d70d87e141f2455c717347793ad3ac379d3a2/blueprints/us-equities/adaptive-paper/recovery.py#L125-L343",
+    "https://github.com/native-agent-stack/native-agent-stack/blob/e63d70d87e141f2455c717347793ad3ac379d3a2/blueprints/us-equities/adaptive-paper/runner.py#L1849-L2015",
+    "https://github.com/native-agent-stack/native-agent-stack/blob/e63d70d87e141f2455c717347793ad3ac379d3a2/blueprints/us-equities/adaptive-paper/safety.py#L1021-L1110",
+    "https://github.com/native-agent-stack/native-agent-stack/blob/e63d70d87e141f2455c717347793ad3ac379d3a2/blueprints/us-equities/adaptive-paper/transport.py#L953-L1010",
+    "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/model/src/events/order/rejected.rs#L59-L60",
+    "https://github.com/python/cpython/blob/v3.12.3/Objects/genobject.c",
+    "https://github.com/python/cpython/blob/v3.12.3/Lib/asyncio/timeouts.py"
+  ],
+  "tested_source_sha256": {
+    "blueprints/us-equities/adaptive-paper/native_strategy.py": "7b7a8b41b4cc60326c1e48a4d65e493293789665c1d22e6dfe751485bb0e95b1",
+    "blueprints/us-equities/adaptive-paper/recovery.py": "3bd0060f89aec0423a676a16bdebfdeafce2ec2f6249f0f08722ef5a4187c406",
+    "blueprints/us-equities/adaptive-paper/runner.py": "6d861653d60e700237461ad8033bc5be09231d3635aa9e7109a2110832e5bb9d",
+    "blueprints/us-equities/adaptive-paper/safety.py": "330f179ec13bf6c78e3f9fa517eaea1db459d5cd511ae53600b4142f647b592a",
+    "tests/test_adaptive_paper_sell_chunks.py": "9b207613cf7a84efa5f92e220ed7ae2c039befbadf549fc22cbb42bf0382b5c7",
+    "tests/test_adaptive_paper_recovery.py": "49a2019eb6229ebddc6d90fa3cc49f91bc4ac7f6f88b55cc1cf887e7c29a0b2d"
+  },
+  "fail_first": {
+    "production_commit": "e63d70d87e141f2455c717347793ad3ac379d3a2",
+    "production_modified": false,
+    "baseline_changes": "Only the two test modules containing the new regressions were overlaid.",
+    "command": "nice -n 19 <pinned-runtime-python> -m unittest -v <tests below>",
+    "tests": [
+      "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_same_reason_lower_rebalance_target_reduces_again",
+      "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_completed_rebalance_does_not_sell_a_later_scale_in",
+      "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_reconciled_flat_fill_without_callback_allows_new_entry",
+      "tests.test_adaptive_paper_recovery.RecoveryTests.test_in_try_deadline_does_not_permanently_refuse_later_recovery",
+      "tests.test_adaptive_paper_recovery.RecoveryTests.test_in_try_integrity_loss_does_not_permanently_refuse_later_recovery",
+      "tests.test_adaptive_paper_recovery.RecoveryTests.test_deadline_before_submit_coroutine_starts_retains_no_http_proof",
+      "tests.test_adaptive_paper_recovery.PerSymbolRecoveryExits.test_one_symbols_retry_window_does_not_end_recovery",
+      "tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_final_wire_integrity_refusal_requires_a_fresh_recovery_session",
+      "tests.test_adaptive_paper_recovery.RecoveryTests.test_fresh_reconciled_recovery_releases_only_integrity_loss_refusal",
+      "tests.test_adaptive_paper_sell_chunks.NativeSellRisk.test_integrity_loss_hands_off_held_position_without_spending_exit_budget"
+    ],
+    "timestamp": "2026-10-15T06:11:03.305174+00:00",
+    "return_code": 1,
+    "tests_run": 10,
+    "failures": 10,
+    "errors": 0,
+    "skipped": 0,
+    "wall_seconds": 8.341,
+    "output": "evidence/artifacts/adaptive-paper-shared-runner-corrections-20261015/red-tests.txt"
+  },
+  "acceptance": {
+    "command": "nice -n 19 <pinned-runtime-python> -m unittest -v tests.test_adaptive_paper_sell_chunks tests.test_adaptive_paper_recovery tests.test_adaptive_paper_safety",
+    "timestamp": "2026-10-15T06:12:07.549746+00:00",
+    "return_code": 0,
+    "tests_run": 183,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "original_tests": 173,
+    "new_tests": 10,
+    "wall_seconds": 40.512,
+    "output": "evidence/artifacts/adaptive-paper-shared-runner-corrections-20261015/green-tests.txt"
+  },
+  "adjacent_integration": {
+    "command": "nice -n 19 <pinned-runtime-python> -m unittest -v tests.test_adaptive_paper_runner.IntegratedRunner.test_native_adaptive_policy_reaches_ledger_and_flat_reconciliation tests.test_adaptive_paper_stream_backpressure",
+    "return_code": 0,
+    "tests_run": 24,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "wall_seconds": 4.828,
+    "output": "evidence/artifacts/adaptive-paper-shared-runner-corrections-20261015/integration-tests.txt"
+  },
+  "f1": {
+    "base": {
+      "held_at_handoff": {
+        "AAPL": "1"
+      },
+      "loss_to_handoff_seconds": 4.122,
+      "post_loss_submit_budget_calls": [
+        [
+          "native",
+          0
+        ]
+      ],
+      "recovery_status": "needs_attention"
+    },
+    "corrected": {
+      "held_at_handoff": {
+        "AAPL": "1"
+      },
+      "loss_to_handoff_seconds": 0.34,
+      "post_loss_submit_budget_calls": [
+        [
+          "recovery",
+          0
+        ]
+      ],
+      "recovery_status": "passed"
+    },
+    "measurement": "Real rc5 LiveNode, runner, controller, durable request budget and fresh recovery; simulated quotes and broker fills."
+  },
+  "boundaries": [
+    "No broker or keyed calls, credential-store access, live unit operation, or host guard/lock modification.",
+    "All ledgers, guard files and lock roots are isolated fixtures.",
+    "The integrity_lost refusal is permanent for the damaged observation session; only a healthy, reconciled recovery with no unresolved orders releases it.",
+    "In-try invocation guards and a coroutine deadline before execution retain no-HTTP transient provenance; ambiguous attempts and other definitive refusals remain blocked.",
+    "Existing indefinite transient pacing and original partial-take-profit targets are preserved.",
+    "ResourceWarning output from existing temporary-directory cleanup is retained; warning-free execution is not claimed.",
+    "Observed handoff latency is local synthetic evidence, not a live operating bound or broker acceptance."
+  ]
+}

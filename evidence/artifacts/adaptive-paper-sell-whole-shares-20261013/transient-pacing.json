@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "evidence_class": "synthetic",
+  "parent": "4b3332a0a5d67a071dba296a0c399b84c12ec31a",
+  "direction": "CC 2026-10-14 02:40: transient causes pace retry and never become definitive by count",
+  "sources": [
+    "https://github.com/native-agent-stack/native-agent-stack/blob/4b3332a0a5d67a071dba296a0c399b84c12ec31a/blueprints/us-equities/adaptive-paper/safety.py#L1043-L1064",
+    "https://github.com/native-agent-stack/native-agent-stack/blob/4b3332a0a5d67a071dba296a0c399b84c12ec31a/blueprints/us-equities/adaptive-paper/runner.py#L938-L970",
+    "https://github.com/native-agent-stack/native-agent-stack/blob/4b3332a0a5d67a071dba296a0c399b84c12ec31a/blueprints/us-equities/adaptive-paper/transport.py#L974-L986"
+  ],
+  "fail_first": {
+    "tests": 3,
+    "rc": 1,
+    "failures": 3,
+    "owned_shares_remaining_each": 100,
+    "cases": [
+      "60-second real durable budget deferral, continuous two-second strategy ticks",
+      "30-second final-guard stale quote, then fresh",
+      "40-second stale interval, continued attempts paced at least five seconds apart"
+    ]
+  },
+  "policy": {
+    "transient_count_changes_classification": false,
+    "retry_interval": "max(5 seconds, carried finite nonnegative known wait)",
+    "attention_after_consecutive_refusals": 3,
+    "reset": "accepted exit, before a fill; durable observation and native callback",
+    "definitive": "STOP latch, closed session, refusal without no-HTTP proof",
+    "entries": "unchanged admission and drop/re-decide behavior"
+  },
+  "verification": {
+    "command": "pinned-runtime-python -B -m unittest tests.test_adaptive_paper_transport tests.test_adaptive_paper_native tests.test_adaptive_paper_recovery tests.test_adaptive_paper_safety tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions",
+    "execution": "systemd user scope CPUWeight=idle",
+    "tests": 342,
+    "rc": 0,
+    "coverage": "Three sustained-window fail-first cases now pass; acceptance before fill, durable attention and replay, numeric wait sanitation, definitive and entry parity remain covered",
+    "excluded": "NativeSellRisk real-clock session cases, legacy SELL-cap assertion and other CC follow-ups",
+    "intermediate_failures": "Nested transaction in the acceptance reset and a missing average_price test argument were corrected before the final 342-test run; not counted as parent failures."
+  },
+  "limits": [
+    "Actual Controller, GuardedSession and adapter method; HTTP and fills simulated",
+    "No broker, credential, activation or paper acceptance",
+    "Historical exhaustion receipts remain dated and superseded",
+    "NativeSellRisk wall-clock fixtures and other CC follow-ups are unchanged"
+  ]
+}

@@ -1,0 +1,143 @@
+test_same_reason_lower_rebalance_target_reduces_again (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_same_reason_lower_rebalance_target_reduces_again) ... FAIL
+test_completed_rebalance_does_not_sell_a_later_scale_in (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_completed_rebalance_does_not_sell_a_later_scale_in) ... FAIL
+test_reconciled_flat_fill_without_callback_allows_new_entry (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_reconciled_flat_fill_without_callback_allows_new_entry) ... FAIL
+test_in_try_deadline_does_not_permanently_refuse_later_recovery (tests.test_adaptive_paper_recovery.RecoveryTests.test_in_try_deadline_does_not_permanently_refuse_later_recovery) ... FAIL
+test_in_try_integrity_loss_does_not_permanently_refuse_later_recovery (tests.test_adaptive_paper_recovery.RecoveryTests.test_in_try_integrity_loss_does_not_permanently_refuse_later_recovery) ... FAIL
+test_deadline_before_submit_coroutine_starts_retains_no_http_proof (tests.test_adaptive_paper_recovery.RecoveryTests.test_deadline_before_submit_coroutine_starts_retains_no_http_proof) ... FAIL
+test_one_symbols_retry_window_does_not_end_recovery (tests.test_adaptive_paper_recovery.PerSymbolRecoveryExits.test_one_symbols_retry_window_does_not_end_recovery) ... FAIL
+test_final_wire_integrity_refusal_requires_a_fresh_recovery_session (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_final_wire_integrity_refusal_requires_a_fresh_recovery_session) ... FAIL
+test_fresh_reconciled_recovery_releases_only_integrity_loss_refusal (tests.test_adaptive_paper_recovery.RecoveryTests.test_fresh_reconciled_recovery_releases_only_integrity_loss_refusal) ... FAIL
+test_integrity_loss_hands_off_held_position_without_spending_exit_budget (tests.test_adaptive_paper_sell_chunks.NativeSellRisk.test_integrity_loss_hands_off_held_position_without_spending_exit_budget) ... F1_MEASUREMENT {"held_at_handoff": {"AAPL": "1"}, "loss_to_handoff_seconds": 4.122, "post_loss_submit_budget_calls": [["native", 0.0]], "recovery_status": "needs_attention"}
+FAIL
+
+======================================================================
+FAIL: test_same_reason_lower_rebalance_target_reduces_again (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_same_reason_lower_rebalance_target_reduces_again)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 254, in test_same_reason_lower_rebalance_target_reduces_again
+    self.assertEqual([D(str(o.quantity)) for o in t.orders], [D(50), D(25)])
+AssertionError: Lists differ: [Decimal('50')] != [Decimal('50'), Decimal('25')]
+
+Second list contains 1 additional elements.
+First extra element 1:
+Decimal('25')
+
+- [Decimal('50')]
++ [Decimal('50'), Decimal('25')]
+
+======================================================================
+FAIL: test_completed_rebalance_does_not_sell_a_later_scale_in (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_completed_rebalance_does_not_sell_a_later_scale_in)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 266, in test_completed_rebalance_does_not_sell_a_later_scale_in
+    self.assertEqual([(o.side.name.lower(), D(str(o.quantity))) for o in t.orders],
+AssertionError: Lists differ: [('sell', Decimal('50')), ('buy', Decimal('49')), ('sell', Decimal('49'))] != [('sell', Decimal('50')), ('buy', Decimal('49'))]
+
+First list contains 1 additional elements.
+First extra element 2:
+('sell', Decimal('49'))
+
+- [('sell', Decimal('50')), ('buy', Decimal('49')), ('sell', Decimal('49'))]
+?                                  -------------------------
+
++ [('sell', Decimal('50')), ('buy', Decimal('49'))]
+
+======================================================================
+FAIL: test_reconciled_flat_fill_without_callback_allows_new_entry (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_reconciled_flat_fill_without_callback_allows_new_entry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 290, in test_reconciled_flat_fill_without_callback_allows_new_entry
+    self.assertEqual([(o.side.name.lower(), D(str(o.quantity))) for o in t.orders],
+AssertionError: Lists differ: [('sell', Decimal('100'))] != [('sell', Decimal('100')), ('buy', Decimal('10'))]
+
+Second list contains 1 additional elements.
+First extra element 1:
+('buy', Decimal('10'))
+
+- [('sell', Decimal('100'))]
++ [('sell', Decimal('100')), ('buy', Decimal('10'))]
+
+======================================================================
+FAIL: test_in_try_deadline_does_not_permanently_refuse_later_recovery (tests.test_adaptive_paper_recovery.RecoveryTests.test_in_try_deadline_does_not_permanently_refuse_later_recovery)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_recovery.py", line 351, in test_in_try_deadline_does_not_permanently_refuse_later_recovery
+    self.interrupted_before_submit_recovers_later('deadline')
+  File "<checkout>/tests/test_adaptive_paper_recovery.py", line 338, in interrupted_before_submit_recovers_later
+    self.assertEqual(self.ledger.exit_state('SPY')['refusal']['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_in_try_integrity_loss_does_not_permanently_refuse_later_recovery (tests.test_adaptive_paper_recovery.RecoveryTests.test_in_try_integrity_loss_does_not_permanently_refuse_later_recovery)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_recovery.py", line 354, in test_in_try_integrity_loss_does_not_permanently_refuse_later_recovery
+    self.interrupted_before_submit_recovers_later('integrity')
+  File "<checkout>/tests/test_adaptive_paper_recovery.py", line 338, in interrupted_before_submit_recovers_later
+    self.assertEqual(self.ledger.exit_state('SPY')['refusal']['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_deadline_before_submit_coroutine_starts_retains_no_http_proof (tests.test_adaptive_paper_recovery.RecoveryTests.test_deadline_before_submit_coroutine_starts_retains_no_http_proof)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_recovery.py", line 357, in test_deadline_before_submit_coroutine_starts_retains_no_http_proof
+    self.interrupted_before_submit_recovers_later('preawait_deadline')
+  File "<checkout>/tests/test_adaptive_paper_recovery.py", line 338, in interrupted_before_submit_recovers_later
+    self.assertEqual(self.ledger.exit_state('SPY')['refusal']['classification'], 'transient')
+AssertionError: 'definitive' != 'transient'
+- definitive
++ transient
+
+
+======================================================================
+FAIL: test_one_symbols_retry_window_does_not_end_recovery (tests.test_adaptive_paper_recovery.PerSymbolRecoveryExits.test_one_symbols_retry_window_does_not_end_recovery)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_recovery.py", line 896, in test_one_symbols_retry_window_does_not_end_recovery
+    self.assertEqual(result['status'], 'passed', result['errors'])
+AssertionError: 'needs_attention' != 'passed'
+- needs_attention
++ passed
+ : ['SafetyError']
+
+======================================================================
+FAIL: test_final_wire_integrity_refusal_requires_a_fresh_recovery_session (tests.test_adaptive_paper_sell_chunks.CommittedExitRegressions.test_final_wire_integrity_refusal_requires_a_fresh_recovery_session)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 319, in test_final_wire_integrity_refusal_requires_a_fresh_recovery_session
+    self.assertEqual(reason, 'exit_submission_not_sent:recovery_observation_integrity_lost')
+AssertionError: 'exit_submission_not_sent:temporary' != 'exit_submission_not_sent:recovery_observation_integrity_lost'
+- exit_submission_not_sent:temporary
++ exit_submission_not_sent:recovery_observation_integrity_lost
+
+
+======================================================================
+FAIL: test_fresh_reconciled_recovery_releases_only_integrity_loss_refusal (tests.test_adaptive_paper_recovery.RecoveryTests.test_fresh_reconciled_recovery_releases_only_integrity_loss_refusal)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_recovery.py", line 363, in test_fresh_reconciled_recovery_releases_only_integrity_loss_refusal
+    self.assertEqual(refusal['classification'], 'integrity_lost')
+AssertionError: 'transient' != 'integrity_lost'
+- transient
++ integrity_lost
+
+
+======================================================================
+FAIL: test_integrity_loss_hands_off_held_position_without_spending_exit_budget (tests.test_adaptive_paper_sell_chunks.NativeSellRisk.test_integrity_loss_hands_off_held_position_without_spending_exit_budget)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_adaptive_paper_sell_chunks.py", line 870, in test_integrity_loss_hands_off_held_position_without_spending_exit_budget
+    self.assertLess(elapsed, 2, metrics)
+AssertionError: 4.121510066004703 not less than 2 : {'loss_to_handoff_seconds': 4.122, 'held_at_handoff': {'AAPL': '1'}, 'post_loss_submit_budget_calls': [('native', 0.0)], 'recovery_status': 'needs_attention'}
+
+----------------------------------------------------------------------
+Ran 10 tests in 7.114s
+
+FAILED (failures=10)

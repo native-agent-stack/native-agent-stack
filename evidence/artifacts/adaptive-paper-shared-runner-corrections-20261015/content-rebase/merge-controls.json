@@ -1,0 +1,136 @@
+{
+  "source_hash_red": {
+    "head": "52924b028c8419b48042f80b088ec3135a0f8084",
+    "command": [
+      "unshare",
+      "-rn",
+      "--",
+      "python3",
+      "-B",
+      "-m",
+      "unittest",
+      "-v",
+      "tests.test_adaptive_paper_source_hashes_manifest"
+    ],
+    "return_code": 1,
+    "wall_seconds": 0.097,
+    "stdout": "",
+    "stderr": "test_dot_and_dotdot_segments_are_refused (tests.test_adaptive_paper_source_hashes_manifest.KeyShapeRejectsDotSegments.test_dot_and_dotdot_segments_are_refused) ... ok\ntest_ordinary_repo_paths_are_accepted (tests.test_adaptive_paper_source_hashes_manifest.KeyShapeRejectsDotSegments.test_ordinary_repo_paths_are_accepted) ... ok\ntest_engine_lock_is_registered_without_extending_the_privacy_allowlist (tests.test_adaptive_paper_source_hashes_manifest.SourceHashesManifestIsHonest.test_engine_lock_is_registered_without_extending_the_privacy_allowlist) ... ok\ntest_every_entry_is_the_named_files_actual_sha256 (tests.test_adaptive_paper_source_hashes_manifest.SourceHashesManifestIsHonest.test_every_entry_is_the_named_files_actual_sha256) ... FAIL\ntest_every_key_is_a_real_repo_path_under_adaptive_paper_or_tests (tests.test_adaptive_paper_source_hashes_manifest.SourceHashesManifestIsHonest.test_every_key_is_a_real_repo_path_under_adaptive_paper_or_tests) ... ok\ntest_every_value_is_exactly_64_lowercase_hex (tests.test_adaptive_paper_source_hashes_manifest.SourceHashesManifestIsHonest.test_every_value_is_exactly_64_lowercase_hex) ... ok\ntest_manifest_has_no_duplicate_keys (tests.test_adaptive_paper_source_hashes_manifest.SourceHashesManifestIsHonest.test_manifest_has_no_duplicate_keys) ... ok\ntest_manifest_is_a_flat_string_to_string_object (tests.test_adaptive_paper_source_hashes_manifest.SourceHashesManifestIsHonest.test_manifest_is_a_flat_string_to_string_object) ... ok\n\n======================================================================\nFAIL: test_every_entry_is_the_named_files_actual_sha256 (tests.test_adaptive_paper_source_hashes_manifest.SourceHashesManifestIsHonest.test_every_entry_is_the_named_files_actual_sha256)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<reviewed-tree>/tests/test_adaptive_paper_source_hashes_manifest.py\", line 101, in test_every_entry_is_the_named_files_actual_sha256\n    self.assertEqual(mismatched, {},\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^\n                     f\"manifest entries whose recorded sha256 does not match the file's actual content: \"\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                     f\"{mismatched}\")\n                     ^^^^^^^^^^^^^^^^\nAssertionError: {'tests/test_adaptive_paper_sell_chunks.py[157 chars]e3'}} != {}\n+ {}\n- {'tests/test_adaptive_paper_sell_chunks.py': {'actual': '319f2c93eab3aa54eb418963d3de33f73ee0ea8feb8c22fe2a078bdd9b08bbe3',\n-                                               'expected': 'c34ec7b51349a33d59a1eb197287fae4643ed13e5aaf1704fc576df87f5e5dae'}} : manifest entries whose recorded sha256 does not match the file's actual content: {'tests/test_adaptive_paper_sell_chunks.py': {'expected': 'c34ec7b51349a33d59a1eb197287fae4643ed13e5aaf1704fc576df87f5e5dae', 'actual': '319f2c93eab3aa54eb418963d3de33f73ee0ea8feb8c22fe2a078bdd9b08bbe3'}}\n\n----------------------------------------------------------------------\nRan 8 tests in 0.028s\n\nFAILED (failures=1)\n"
+  },
+  "source_hash_green": {
+    "candidate": "resolved final 52924b02 replay on fda24cfe before continuation",
+    "return_code": 0,
+    "stdout": "",
+    "stderr": "test_dot_and_dotdot_segments_are_refused (tests.test_adaptive_paper_source_hashes_manifest.KeyShapeRejectsDotSegments.test_dot_and_dotdot_segments_are_refused) ... ok\ntest_ordinary_repo_paths_are_accepted (tests.test_adaptive_paper_source_hashes_manifest.KeyShapeRejectsDotSegments.test_ordinary_repo_paths_are_accepted) ... ok\ntest_engine_lock_is_registered_without_extending_the_privacy_allowlist (tests.test_adaptive_paper_source_hashes_manifest.SourceHashesManifestIsHonest.test_engine_lock_is_registered_without_extending_the_privacy_allowlist) ... ok\ntest_every_entry_is_the_named_files_actual_sha256 (tests.test_adaptive_paper_source_hashes_manifest.SourceHashesManifestIsHonest.test_every_entry_is_the_named_files_actual_sha256) ... ok\ntest_every_key_is_a_real_repo_path_under_adaptive_paper_or_tests (tests.test_adaptive_paper_source_hashes_manifest.SourceHashesManifestIsHonest.test_every_key_is_a_real_repo_path_under_adaptive_paper_or_tests) ... ok\ntest_every_value_is_exactly_64_lowercase_hex (tests.test_adaptive_paper_source_hashes_manifest.SourceHashesManifestIsHonest.test_every_value_is_exactly_64_lowercase_hex) ... ok\ntest_manifest_has_no_duplicate_keys (tests.test_adaptive_paper_source_hashes_manifest.SourceHashesManifestIsHonest.test_manifest_has_no_duplicate_keys) ... ok\ntest_manifest_is_a_flat_string_to_string_object (tests.test_adaptive_paper_source_hashes_manifest.SourceHashesManifestIsHonest.test_manifest_is_a_flat_string_to_string_object) ... ok\n\n----------------------------------------------------------------------\nRan 8 tests in 0.028s\n\nOK\n"
+  },
+  "transport_incoming_only_red": {
+    "candidate": "incoming-only transport resolution during replay of 03faf1e8c",
+    "transport_sha256": "5075461af21c097f2a611a2e33c9f1cbbbe0478f9750151559ac7c15c9858c34",
+    "command": [
+      "unshare",
+      "-rn",
+      "--",
+      "<pinned-runtime-python>",
+      "-B",
+      "-m",
+      "unittest",
+      "-v",
+      "tests.test_adaptive_paper_stream_followups.StreamFollowups.test_real_submit_keeps_integrity_refusal_reason_without_http"
+    ],
+    "return_code": 1,
+    "stdout": "",
+    "stderr": "test_real_submit_keeps_integrity_refusal_reason_without_http (tests.test_adaptive_paper_stream_followups.StreamFollowups.test_real_submit_keeps_integrity_refusal_reason_without_http) ... FAIL\n\n======================================================================\nFAIL: test_real_submit_keeps_integrity_refusal_reason_without_http (tests.test_adaptive_paper_stream_followups.StreamFollowups.test_real_submit_keeps_integrity_refusal_reason_without_http)\n----------------------------------------------------------------------\ntransport.SubmissionNotSent: submission prevented before HTTP request\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"<repo>/tests/test_adaptive_paper_stream_followups.py\", line 51, in test_real_submit_keeps_integrity_refusal_reason_without_http\n    with self.assertRaisesRegex(transport.SubmissionNotSent,'^recovery_observation_integrity_lost$'):\nAssertionError: \"^recovery_observation_integrity_lost$\" does not match \"submission prevented before HTTP request\"\n\n----------------------------------------------------------------------\nRan 1 test in 0.002s\n\nFAILED (failures=1)\n"
+  },
+  "transport_combined_intermediate_green": {
+    "candidate": "combined fixed messages and typed provenance at replay 03faf1e8c",
+    "transport_sha256": "3bcfb9534ca5bc40a78b18305010cc9df6045b714dad29d0d8c1e0ffd6449175",
+    "command": [
+      "unshare",
+      "-rn",
+      "--",
+      "<pinned-runtime-python>",
+      "-B",
+      "-m",
+      "unittest",
+      "-v",
+      "tests.test_adaptive_paper_stream_followups.StreamFollowups.test_real_submit_keeps_integrity_refusal_reason_without_http"
+    ],
+    "return_code": 0,
+    "stdout": "",
+    "stderr": "test_real_submit_keeps_integrity_refusal_reason_without_http (tests.test_adaptive_paper_stream_followups.StreamFollowups.test_real_submit_keeps_integrity_refusal_reason_without_http) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.002s\n\nOK\n"
+  },
+  "native_mid_tick_source_heads_red": [
+    {
+      "head": "52924b028c8419b48042f80b088ec3135a0f8084",
+      "overlay": "#1119 native fixture plus a case injecting integrity loss in mark_to_market between the two health checks",
+      "fixture_sha256": "de4605714830a47f210d0caed81f126de9214ba09a6cd166991d36e5502aa476",
+      "command": [
+        "unshare",
+        "-rn",
+        "--",
+        "nice",
+        "-n",
+        "19",
+        "<pinned-runtime-python>",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "tests.integration.stream_cancel_dispatch.NativeCancelDispatch.test_mid_tick_loss_waits_for_native_cancel_without_another_rebalance"
+      ],
+      "return_code": 1,
+      "wall_seconds": 2.911,
+      "stdout": "",
+      "stderr": "test_mid_tick_loss_waits_for_native_cancel_without_another_rebalance (tests.integration.stream_cancel_dispatch.NativeCancelDispatch.test_mid_tick_loss_waits_for_native_cancel_without_another_rebalance) ... 2026-10-15T12:46:40.355006494Z [ERROR] ADAPTIVE-001.ALPACA: Client ALPACA abandoned queued operation _cancel_order\nFAIL\n\n======================================================================\nFAIL: test_mid_tick_loss_waits_for_native_cancel_without_another_rebalance (tests.integration.stream_cancel_dispatch.NativeCancelDispatch.test_mid_tick_loss_waits_for_native_cancel_without_another_rebalance)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<reviewed-tree>/tests/integration/stream_cancel_dispatch.py\", line 61, in test_mid_tick_loss_waits_for_native_cancel_without_another_rebalance\n    self.assertEqual(result[\"cancel_calls\"], 1, result)\nAssertionError: 0 != 1 : {'events': ['loss', 'loss_during_mark', 'session_stop'], 'cancel_calls': 0, 'confirmed_before_stop': False, 'active_at_stop': 1, 'unresolved': 1, 'adapter_errors': [], 'cancellations': None, 'status': 'needs_attention', 'elapsed': 0.6517097750038374}\n\n----------------------------------------------------------------------\nRan 1 test in 0.958s\n\nFAILED (failures=1)\n",
+      "production_diff": ""
+    },
+    {
+      "head": "fda24cfe436310658755a75e5b6b7865512c8df1",
+      "overlay": "#1119 native fixture plus a case injecting integrity loss in mark_to_market between the two health checks",
+      "fixture_sha256": "de4605714830a47f210d0caed81f126de9214ba09a6cd166991d36e5502aa476",
+      "command": [
+        "unshare",
+        "-rn",
+        "--",
+        "nice",
+        "-n",
+        "19",
+        "<pinned-runtime-python>",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "tests.integration.stream_cancel_dispatch.NativeCancelDispatch.test_mid_tick_loss_waits_for_native_cancel_without_another_rebalance"
+      ],
+      "return_code": 1,
+      "wall_seconds": 2.526,
+      "stdout": "",
+      "stderr": "test_mid_tick_loss_waits_for_native_cancel_without_another_rebalance (tests.integration.stream_cancel_dispatch.NativeCancelDispatch.test_mid_tick_loss_waits_for_native_cancel_without_another_rebalance) ... FAIL\n\n======================================================================\nFAIL: test_mid_tick_loss_waits_for_native_cancel_without_another_rebalance (tests.integration.stream_cancel_dispatch.NativeCancelDispatch.test_mid_tick_loss_waits_for_native_cancel_without_another_rebalance)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<landed-main-tree>/tests/integration/stream_cancel_dispatch.py\", line 63, in test_mid_tick_loss_waits_for_native_cancel_without_another_rebalance\n    self.assertNotIn(\"rebalance_after_loss\", result[\"events\"], result)\nAssertionError: 'rebalance_after_loss' unexpectedly found in ['loss', 'loss_during_mark', 'rebalance_after_loss', 'dispatcher_released', 'cancel_dispatched', 'confirmed', 'session_stop'] : {'events': ['loss', 'loss_during_mark', 'rebalance_after_loss', 'dispatcher_released', 'cancel_dispatched', 'confirmed', 'session_stop'], 'cancel_calls': 1, 'confirmed_before_stop': True, 'active_at_stop': 0, 'unresolved': 0, 'adapter_errors': [], 'cancellations': {'status': 'confirmed', 'requested_count': 1, 'confirmed_count': 1, 'unconfirmed_count': 0, 'timeout_seconds': 2}, 'status': 'completed_no_signals', 'elapsed': 1.433150967990514}\n\n----------------------------------------------------------------------\nRan 1 test in 1.697s\n\nFAILED (failures=1)\n",
+      "production_diff": ""
+    }
+  ],
+  "native_confirmation_intermediate_green": {
+    "candidate": "combined runner resolution at replay d3c3a4e9 after derived files resolved",
+    "fixture_sha256": "de4605714830a47f210d0caed81f126de9214ba09a6cd166991d36e5502aa476",
+    "runner_sha256": "95168de280292c141071d79731b0130d271776e6677662c1538555e4f71f8cac",
+    "command": [
+      "unshare",
+      "-rn",
+      "--",
+      "nice",
+      "-n",
+      "19",
+      "<pinned-runtime-python>",
+      "-B",
+      "-m",
+      "unittest",
+      "-v",
+      "tests.integration.stream_cancel_dispatch"
+    ],
+    "return_code": 0,
+    "wall_seconds": 5.734,
+    "stdout": "",
+    "stderr": "test_integrity_loss_cancel_ack_without_terminal_confirmation_stays_unresolved (tests.integration.stream_cancel_dispatch.NativeCancelDispatch.test_integrity_loss_cancel_ack_without_terminal_confirmation_stays_unresolved) ... ok\ntest_integrity_loss_waits_for_real_native_cancel_confirmation_before_stop (tests.integration.stream_cancel_dispatch.NativeCancelDispatch.test_integrity_loss_waits_for_real_native_cancel_confirmation_before_stop) ... ok\ntest_mid_tick_loss_waits_for_native_cancel_without_another_rebalance (tests.integration.stream_cancel_dispatch.NativeCancelDispatch.test_mid_tick_loss_waits_for_native_cancel_without_another_rebalance) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 4.908s\n\nOK\n"
+  },
+  "note": "The final runtime suite repeats the affected transport and native confirmation cases on the complete resolved source. The source-head controls change only test fixtures; production bytes remain untouched."
+}

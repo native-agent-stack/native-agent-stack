@@ -797,7 +797,10 @@ class AlpacaExecutionClient(ExecutionClient):
             self.observe(result)
         except Exception as error:
             if getattr(error, "definitive_rejection", False) is True:
-                self.generate_order_rejected(order, str(error), self.clock.timestamp_ns(), False)
+                from transport import SubmissionNotSent, exit_not_sent_reason
+                reason = (exit_not_sent_reason(error) if order.side == OrderSide.SELL
+                          and getattr(error, "not_sent", False) is True else str(error))
+                self.generate_order_rejected(order, reason, self.clock.timestamp_ns(), False)
             else:
                 self.session.fail("unknown_submit:" + cid + ":" + type(error).__name__)
 

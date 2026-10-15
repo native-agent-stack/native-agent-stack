@@ -11,6 +11,7 @@ import importlib.util
 from pathlib import Path
 import sys
 import time
+from types import SimpleNamespace
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -375,18 +376,12 @@ class NotionalMaxOrderQtyTests(unittest.TestCase):
         self.assertEqual(limits.effective_max_order_qty("200"), D("5"))
 
     def test_reserve_intent_uses_the_quote_price_not_the_limit_price_for_the_notional_cap(self):
-        """D4 (round 3), end-to-end via reserve_intent. For a SELL, using
-        a lower reference price (the pre-fix behavior used the order's own
-        limit price -- here 60.00, well below the quote's bid) inflates
-        floor(notional/price): old cap = floor(3000/60.00) = 50, clamped
-        by max_order_qty=60 to 50 -- would have let a 35-share sell
-        through (35*60.00 = 2100 <= max_order_notional_usd, so the
-        separate qty*price check would not itself have refused it
-        either). The live quote's own bid of 100.00 gives the correct cap:
-        floor(3000/100.00) = 30. 35 shares must now be refused; 30 must
-        still be accepted (the position is large enough for both, built
-        up via two smaller buys that each individually clear the same
-        notional-mode cap at the ask)."""
+        """Entry capacity uses the quote; owned sells are exempt from that cap.
+
+        A 35-share owned reduction exceeds the quote-derived 30-share entry
+        cap and is accepted. Outstanding sells still reserve ownership:
+        after reserving 35 of 40 shares, only five remain available to sell.
+        """
         import tempfile
         with tempfile.TemporaryDirectory() as root:
             limits = replace(RiskLimits(), max_order_qty_mode="notional", max_order_qty=D("60"),
@@ -397,8 +392,8 @@ class NotionalMaxOrderQtyTests(unittest.TestCase):
             quote = Quote("SPY", "100.00", "100.01", now)
             # Build a 40-share position via two buys (each: qty=20 <=
             # effective_max_order_qty(quote_price=100.01)=floor(3000/100.01)=29,
-            # cost 20*100.01=2000.2 <= 3000), comfortably covering both
-            # sell attempts below.
+            # cost 20*100.01=2000.2 <= 3000). Pending sells below must
+            # remain bounded by this total ownership of 40 shares.
             for cid, broker_id in (("buy-1", "broker-buy-1"), ("buy-2", "broker-buy-2")):
                 ledger.reserve_intent(cid, "SPY", "buy", "20", "100.01", quote=quote, now=now,
                                       market_open=True, session_close=now + 3600, stop_file=Path(root) / "STOP")
@@ -407,14 +402,18 @@ class NotionalMaxOrderQtyTests(unittest.TestCase):
             # Direct unit-level confirmation of the price-source distinction.
             self.assertEqual(limits.effective_max_order_qty("60.00"), D("50"))  # fallback path
             self.assertEqual(limits.effective_max_order_qty("60.00", quote_price="100.00"), D("30"))
-            with self.assertRaises(SafetyError):
-                ledger.reserve_intent("sell-1", "SPY", "sell", "35", "60.00", quote=quote,
+            owned_sell = ledger.reserve_intent("sell-1", "SPY", "sell", "35", "60.00", quote=quote,
+                                              now=now, market_open=True, session_close=now + 3600,
+                                              stop_file=Path(root) / "STOP")
+            self.assertEqual(owned_sell.qty, D("35"))
+            with self.assertRaisesRegex(SafetyError, "sell_exceeds_owned_unreserved_position"):
+                ledger.reserve_intent("oversell", "SPY", "sell", "30", "60.00", quote=quote,
                                       now=now, market_open=True, session_close=now + 3600,
                                       stop_file=Path(root) / "STOP")
-            reserved = ledger.reserve_intent("sell-2", "SPY", "sell", "30", "60.00", quote=quote,
+            reserved = ledger.reserve_intent("sell-2", "SPY", "sell", "5", "60.00", quote=quote,
                                              now=now, market_open=True, session_close=now + 3600,
                                              stop_file=Path(root) / "STOP")
-            self.assertEqual(reserved.qty, D("30"))
+            self.assertEqual(reserved.qty, D("5"))
             ledger.close()
 
 
@@ -458,6 +457,11 @@ class ReplaceExitTests(unittest.TestCase):
             self.config = config
 
     class _FakeLedger:
+        limits = RiskLimits(max_order_qty=D(5))
+
+        def positions(self):
+            return {"AAPL": SimpleNamespace(qty=D(5), average_cost=D(100))}
+
         def intents(self):
             return []
 
@@ -1242,6 +1246,7 @@ class RebalanceBusySymbolReplaceExitTests(unittest.TestCase):
     class _FakeLedger:
         def __init__(self, position):
             self._position = position
+            self.limits = RiskLimits(max_order_qty=D(5))
 
         def positions(self):
             return {"AAPL": self._position}
@@ -1397,6 +1402,7 @@ class GapStopFireOnceOnlyAfterSubmitTests(unittest.TestCase):
     class _FakeLedger:
         def __init__(self, position):
             self._position = position
+            self.limits = RiskLimits(max_order_qty=D(5))
 
         def positions(self):
             return {"AAPL": self._position}
@@ -1567,8 +1573,8 @@ class GapStopFireOnceOnlyAfterSubmitTests(unittest.TestCase):
     # -- D6 (round 4): a truncated (by max_shares) gap-stop submit must not
     #    mark fire-once, leaving the remainder protected --------------
 
-    def test_direct_submit_truncated_by_max_shares_leaves_the_stop_armed(self):
-        # max_shares=5 (this class's _FakePolicyConfig); held qty=10 means
+    def test_direct_submit_truncated_by_ledger_share_cap_leaves_the_stop_armed(self):
+        # Ledger max_order_qty=5; held qty=10 means
         # the order factory receives only 5, truncating the sell.
         strategy = self.strategy(held_qty=D("10"))
         strategy.policy.latest["AAPL"] = self._Q(100.0, 100.02, 2000.0)
@@ -1579,7 +1585,7 @@ class GapStopFireOnceOnlyAfterSubmitTests(unittest.TestCase):
         self.assertEqual(strategy._gap_stop_applied, set())  # remainder still unprotected -> stays armed
 
     def test_direct_submit_of_the_full_quantity_marks_fire_once(self):
-        # held qty=5 == max_shares: the full quantity is submitted, no
+        # held qty=5 == ledger cap: the full quantity is submitted, no
         # truncation, so fire-once is correctly marked.
         strategy = self.strategy(held_qty=D("5"))
         strategy.policy.latest["AAPL"] = self._Q(100.0, 100.02, 2000.0)
@@ -1589,7 +1595,7 @@ class GapStopFireOnceOnlyAfterSubmitTests(unittest.TestCase):
         self.assertEqual(strategy._fake_order_factory.calls[0]["quantity"], "5")
         self.assertEqual(strategy._gap_stop_applied, {"AAPL"})
 
-    def test_replacement_submit_truncated_by_max_shares_leaves_the_stop_armed(self):
+    def test_replacement_submit_truncated_by_ledger_share_cap_leaves_the_stop_armed(self):
         """The same D6 truncation guard applies to the cancel-then-replace
         path (_submit_replacement_exit), not just the direct submit."""
         strategy = self.strategy(held_qty=D("10"))

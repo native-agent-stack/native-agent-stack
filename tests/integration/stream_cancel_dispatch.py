@@ -56,12 +56,29 @@ class NativeCancelDispatch(unittest.TestCase):
         self.assertEqual(result["status"], "needs_attention", result)
         self.assertLess(result["elapsed"], 3, result)
 
-    def exercise(self, *, confirm=True, timeout=2):
+    def test_mid_tick_loss_waits_for_native_cancel_without_another_rebalance(self):
+        result = self.exercise(loss_during_mark=True)
+        self.assertEqual(result["cancel_calls"], 1, result)
+        self.assertTrue(result["confirmed_before_stop"], result)
+        self.assertNotIn("rebalance_after_loss", result["events"], result)
+        self.assertEqual(result["unresolved"], 0, result)
+        self.assertEqual(result["adapter_errors"], [], result)
+        self.assertEqual(result["cancellations"], {"status": "confirmed", "requested_count": 1,
+            "confirmed_count": 1, "unconfirmed_count": 0, "timeout_seconds": 2}, result)
+        self.assertLess(result["events"].index("loss_during_mark"),
+                        result["events"].index("dispatcher_released"), result)
+        self.assertLess(result["events"].index("confirmed"),
+                        result["events"].index("session_stop"), result)
+
+    def exercise(self, *, confirm=True, timeout=2, loss_during_mark=False):
         events = []
         original_stop = native_adapter.NativeSession.stop
+        original_mark = Ledger.mark_to_market
 
         class RestingEntry(native_strategy.AdaptiveStrategy):
             def rebalance(self, now, *, force_exit=False):
+                if loss_during_mark and "loss" in events:
+                    events.append("rebalance_after_loss")
                 if not self.enabled or getattr(self, "placed", False):
                     return
                 self.placed = True
@@ -88,9 +105,14 @@ class NativeCancelDispatch(unittest.TestCase):
                 self.orders[payload["client_order_id"]] = row
                 await invoke(self.sink_observation, dict(row))
                 await invoke(self.on_order, dict(row))
-                self.health["reasons"] = ["queue_overflow"]
-                self.ready = False
-                events.append("loss")
+                if loss_during_mark:
+                    self.defer_loss_until_mark = True
+                    while self.defer_loss_until_mark:
+                        await asyncio.sleep(.01)
+                else:
+                    self.health["reasons"] = ["queue_overflow"]
+                    self.ready = False
+                    events.append("loss")
                 await asyncio.sleep(.6)
                 events.append("dispatcher_released")
                 return dict(row)
@@ -117,6 +139,17 @@ class NativeCancelDispatch(unittest.TestCase):
                     self.task.cancel()
                     await asyncio.gather(self.task, return_exceptions=True)
 
+        def mark(ledger, *args, **kwargs):
+            result = original_mark(ledger, *args, **kwargs)
+            # run_native marks between its first health check and the check
+            # after snapshot/refresh work. Keep the native dispatcher blocked.
+            if loss_during_mark and getattr(port, "defer_loss_until_mark", False):
+                port.defer_loss_until_mark = False
+                port.health["reasons"] = ["queue_overflow"]
+                port.ready = False
+                events.extend(("loss", "loss_during_mark"))
+            return result
+
         def stop(session):
             events.append("session_stop")
             session.port.confirmed_before_stop = session.port.confirmed
@@ -136,6 +169,7 @@ class NativeCancelDispatch(unittest.TestCase):
                     controller = runner.Controller(ledger, time.time()+3600, market_open=True)
                     port = controller.port = Port(controller)
                     with patch.object(native_strategy, "AdaptiveStrategy", RestingEntry), \
+                         patch.object(Ledger, "mark_to_market", mark), \
                          patch.object(native_adapter.NativeSession, "stop", stop):
                         outcome = asyncio.run(asyncio.wait_for(runner.run_native(controller, policy,
                             [{"symbol": "SPY"}], "cancel-dispatch-fixture", config, "100000"), 15))
