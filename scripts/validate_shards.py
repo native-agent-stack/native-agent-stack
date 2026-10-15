@@ -151,7 +151,10 @@ def assignment(inventory, shards, weights, fallback):
     seconds = {row["module"]: (weights.get(row["module"], fallback) if row["case_count"] else 0.0) for row in inventory}
     mapping = {}
     for module in sorted(seconds, key=lambda name: (-seconds[name], name)):
-        shard = min(range(shards), key=lambda number: (loads[number], number))
+        # validate.yml gives shard 0 additional validators (111 s median in
+        # the 2026-10-15 timing table). Keep the largest modules off that
+        # fixed work when loads tie; native suites remain indivisible.
+        shard = min(range(shards), key=lambda number: (loads[number], number == 0, number))
         mapping[module] = shard
         loads[shard] += seconds[module]
     return mapping, "duration-weighted-native-modules", {}
