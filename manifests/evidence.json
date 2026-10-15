@@ -19183,8 +19183,8 @@
     },
     {
       "path": "docs/decisions/2026-10-13-trading-lanes-dashboard.md",
-      "sha256": "6a889651e5f3ab7d128c82a57f083090f38a4ed2d533288ddff592579b764d69",
-      "bytes": 18491
+      "sha256": "43e19d3933c613f3492e9cb004472d80442b7619a1728a032ff64ced33f3af2e",
+      "bytes": 20250
     },
     {
       "path": "docs/decisions/2026-10-14-muse-file-fence.md",
@@ -44013,8 +44013,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/grafana-trading-lanes.json",
-      "sha256": "fbe0c21ab25c555d88ca6c1b20327ca5c67803a69c82e9248bce68988df390de",
-      "bytes": 112563
+      "sha256": "baca8b7833ae5b502782ebc56561bdd304f84c34467b680f798af32084e87172",
+      "bytes": 112656
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/grafana.ini",
@@ -44153,8 +44153,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/otel.yaml",
-      "sha256": "4b103f0bcdc6a57f8be7316bd56c951d1fb40acc84a5154d8957d7b3bfd8d5fb",
-      "bytes": 53465
+      "sha256": "caa518b39ffa7bf0ec24cac7b278d1a6488b5d68cc70c3f17dcfa1d0d3bbf282",
+      "bytes": 54916
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/prometheus-alerts.test.yaml",
@@ -62008,8 +62008,8 @@
     },
     {
       "path": "observability/trading_dashboard.py",
-      "sha256": "29fb5b420a811a401c01a246206547f79e262478a9a16a7c774dd54f807debad",
-      "bytes": 7624
+      "sha256": "a62093e025cc407796343e0abc245a1a5ea4c46545fd3b0228a37e5ecf6fcc2e",
+      "bytes": 7614
     },
     {
       "path": "observability/trading_receipts.py",
@@ -63693,8 +63693,8 @@
     },
     {
       "path": "tests/test_ns2604_dashboards.py",
-      "sha256": "8d6d2d6ed4ac8b67f9a5791672a2329127b9952a5fe0f4795157de36e950805d",
-      "bytes": 27180
+      "sha256": "2f481bd13edd2331b0bc0151a24f4d12be03c8c3ad1b2236188cf5842698dfc9",
+      "bytes": 29950
     },
     {
       "path": "tests/test_ns_movers_decision_display.py",

@@ -29,7 +29,7 @@ def dashboard():
                  "recorded events. Submissions are not fills. **Unavailable** means the source does not record the metric. "
                  "Receipt time and status expose stale/ended runs; a fresh observation does not make a prior session live. "
                  "Event freshness follows each lane's own cadence: C12min, lanea20min, laneb13min; I-llm cadence unrecorded. "
-                 "IBKR has no session tonight; its last session is retained. I-llm stays not live until wired."}}]
+                 "IBKR's Status field distinguishes Active from No session; timestamps show the latest source event. I-llm stays not live until wired."}}]
     specs = (("orders_per_min", "Orders/min", "suffix:orders/min"), ("fills_per_min", "Fills/min", "suffix:fills/min"),
              ("cancels_per_min", "Cancels/min", "suffix:cancels/min"), ("cash_use_ratio", "Cash use / equity", "percentunit"),
              ("open_positions", "Open positions", "short"), ("realized_pnl_usd", "Realized P&L", "currencyUSD"),
@@ -57,8 +57,8 @@ def dashboard():
                                        "colorMode": "value", "graphMode": "none", "textMode": "auto"},
                            "targets": [{"refId": "A", "expr": expression(lane, field), "queryType": "instant"}]})
             identifier += 1
-        panels.append({"id": identifier, "type": "stat", "title": lane + (" · No session since / last receipt" if lane == "IBKR" else " · Last receipt time"),
-                       "description": "IBKR: no session since this receipt time. I-llm: source Unix seconds, Not recorded until live. Other lanes: source timestamp, not observation time.",
+        panels.append({"id": identifier, "type": "stat", "title": lane + " · Last receipt time",
+                       "description": "Source event timestamp, not observation time. IBKR's Status field distinguishes Active from No session. I-llm: source Unix seconds, Not recorded until live.",
                        "datasource": SOURCE, "gridPos": {"x": 0, "y": y + 5, "w": 24, "h": 2},
                        "fieldConfig": {"defaults": {"unit": "none" if lane == "I-llm" else "dateTimeAsIso", "noValue": "Not recorded", "mappings": [{"type": "value", "options": {"-1" if lane == "I-llm" else "-1000": {"text": "Not recorded"}}}]}, "overrides": []},
                        "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": False}, "graphMode": "none", "textMode": "value"},
@@ -67,7 +67,7 @@ def dashboard():
         y += 7
         if lane == "IBKR":
             panels.append({"id": identifier, "type": "timeseries", "title": "IBKR wire messages/s", "datasource": SOURCE,
-                           "description": "Own last-session wire mean/peak. No session tonight; these are retained receipt values. 45/s governor, 50/s broker cap are constants.",
+                           "description": "Own selected-session wire mean/peak from receipts; consult Status for Active or No session. 45/s governor, 50/s broker cap are constants.",
                            "gridPos": {"x": 0, "y": y, "w": 24, "h": 5},
                            "fieldConfig": {"defaults": {"unit": "ops", "min": 0,
                               "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": None}, {"color": "orange", "value": 45}, {"color": "red", "value": 50}]},

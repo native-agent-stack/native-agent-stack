@@ -23,6 +23,45 @@ def exprs(board):
 
 
 class Ns2604DashboardTests(unittest.TestCase):
+    def test_fresh_install_renderer_carries_trading_collector_route_with_dashboard(self):
+        with tempfile.TemporaryDirectory() as scratch:
+            root = Path(scratch)
+            config, data = root / "config", root / "data"
+            config.mkdir()
+            env = dict(os.environ, NS2604_OBSERVABILITY_DATA=str(data))
+            renderer = PLAN / "config/observability_config.py"
+            for action in ("otel", "grafana"):
+                result = subprocess.run([sys.executable, str(renderer), action, "--config-root", str(config),
+                                         "--source-root", str(PLAN / "config"), "--repo-root", str(ROOT)],
+                                        env=env, capture_output=True, text=True)
+                self.assertEqual(0, result.returncode, result.stderr)
+            self.assertTrue((config / "ecosystem-grafana-dashboards/trading-lanes.json").is_file())
+            rendered = (config / "otel.yaml").read_text()
+            for marker in ("file_log/trading_lanes:", "transform/trading_projection:", "logs/trading_lanes:",
+                           "trading-lanes/observations.jsonl", "receivers: [file_log/trading_lanes]",
+                           "processors: [memory_limiter, transform/trading_projection, batch]"):
+                self.assertIn(marker, rendered)
+            if shutil.which("otelcol-contrib"):
+                result = subprocess.run(["otelcol-contrib", "validate", "--config=" + str(config / "otel.yaml")],
+                                        env=env, capture_output=True, text=True)
+                self.assertEqual(0, result.returncode, result.stderr)
+
+    def test_ibkr_copy_uses_status_for_no_session_and_neutral_source_time(self):
+        board = G.dashboards()["grafana-trading-lanes.json"]
+        status = next(p for p in board["panels"] if p.get("title") == "IBKR · Status")
+        mappings = status["fieldConfig"]["defaults"]["mappings"][0]["options"]
+        self.assertEqual("Active", mappings["1"]["text"])
+        self.assertEqual("No session", mappings["4"]["text"])
+        self.assertNotRegex(json.dumps(board), r"(?i)no session tonight|no session since|no session exists")
+        self.assertTrue(any(p.get("title") == "IBKR · Last receipt time" for p in board["panels"]))
+
+    def test_block_status_correction_names_a_version_bound_producer_reference(self):
+        text = (ROOT / "docs/decisions/2026-10-13-trading-lanes-dashboard.md").read_text()
+        source_rows = [line for line in text.splitlines() if line.startswith("| ibkr_pre_series.py |")]
+        self.assertEqual(1, len(source_rows))
+        self.assertIn("source-ref:ns2604-pr1106-status-producer-refs-20261014/block-writer", source_rows[0])
+        self.assertIn("41-45, 287", source_rows[0])
+
     def test_trading_lanes_board_has_each_receipt_lane_and_broker_wire_thresholds(self):
         board = G.dashboards().get("grafana-trading-lanes.json")
         self.assertIsNotNone(board, "The provisioned dashboard set must contain Trading lanes")

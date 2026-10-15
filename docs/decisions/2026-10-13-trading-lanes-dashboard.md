@@ -189,7 +189,9 @@ fix commit. Lane-health changes stay on their own branch.
 The out-of-tree producers are **unversioned**: these observations are not
 repository pins. The private, sealed manifest
 `ns2604-pr1106-producer-refs-20261014` binds each reference below to its
-source path, SHA256, byte count and exact mtime. It is retained with the
+source path, SHA256, byte count and exact mtime for the original four rows.
+The block-writer row uses its separately named status-producer manifest
+described in the current-series correction below. The original is retained with the
 lane's read-fix packet as `producer-references.json`. No producer body was
 copied. Private paths, digests and diagnostic text stay out of publication.
 This metadata identifies the inspected version; it does not supply a public
@@ -201,6 +203,7 @@ source checkout or independently reproduce native event/cadence evidence.
 | ibkr_series4.sh | source-ref:ns2604-pr1106-producer-refs-20261014/ibkr-series4 | 43, 45 |
 | ibkr_series.sh | source-ref:ns2604-pr1106-producer-refs-20261014/ibkr-series | 40, 42 |
 | series_line.py | source-ref:ns2604-pr1106-producer-refs-20261014/series-line | 12 |
+| ibkr_pre_series.py | source-ref:ns2604-pr1106-status-producer-refs-20261014/block-writer | 41-45, 287 |
 
 These references qualify the earlier correctness citations above. They do
 not convert the missing native witnesses into independently verified
@@ -248,11 +251,37 @@ diagnostics are never exported, and missing metrics remain unavailable.
 No exported field or other pending review disposition changes in this round.
 The mixed-format synthetic regression fails on71ac2733 and passes after.
 
-Primary source: standalone ibkr_pre_series.py:287, the existing producer's
-block completion writer; retained privately by version-bound metadata in
-the status-fix packet. No source body or diagnostic was copied. Earlier
+Primary source: standalone ibkr_pre_series.py:41-45,287, the existing producer's
+block completion writer, at the inspected version identified by
+source-ref:ns2604-pr1106-status-producer-refs-20261014/block-writer.
+The private manifest producer-references.json in the named
+landscape-live-foundation.pr1106-provision-fix-20261015 packet preserves the
+original status-fix path/SHA256/size/mtime binding. No source body or diagnostic
+was copied. Earlier
 session grammar remains bound by the producer references above. Native
 file transport still follows Collector0.162.0 filelog/transform references.
+
+## Install route and status-copy correction (2026-10-15)
+
+The clean install's otel action now provisions the same native Trading
+lanes receiver/transform/pipeline as the retained acceptance overlay. It
+ships in the installed otel.yaml, so the supported single-config launch and
+validation path carries the route without a manually installed drop-in.
+Existing source receivers/transforms/pipelines are retained. Operator-owned
+configuration custody remains with the renderer's existing refusal path.
+
+The renderer fail-first test installs both otel and grafana into empty
+synthetic roots and verifies the generated data route plus its dashboard.
+Installed Contrib0.162.0 validates that generated config. The configuration
+uses its pinned filelogreceiver/transformprocessor contract listed above;
+no new transport or runtime service is introduced.
+
+IBKR's No session statement now comes only from its status-code mapping.
+Receipt-time and wire prose remain neutral when a newer start becomes Active.
+The status-copy and block-producer-reference regressions also fail before
+this correction. Producer source identity is metadata only and unversioned;
+the named reference makes its inspected revision identifiable without
+publishing private source bytes or digests.
 
 ## Per-lane receipt freshness correction
 

@@ -28,7 +28,7 @@
       },
       "options": {
         "mode": "markdown",
-        "content": "Read-only projections of each lane's own receipts. Refreshed by the existing observer. Rates for A/B and IBKR are receipt stage averages; C and POST arms use the trailing minute of recorded events. Submissions are not fills. **Unavailable** means the source does not record the metric. Receipt time and status expose stale/ended runs; a fresh observation does not make a prior session live. Event freshness follows each lane's own cadence: C12min, lanea20min, laneb13min; I-llm cadence unrecorded. IBKR has no session tonight; its last session is retained. I-llm stays not live until wired."
+        "content": "Read-only projections of each lane's own receipts. Refreshed by the existing observer. Rates for A/B and IBKR are receipt stage averages; C and POST arms use the trailing minute of recorded events. Submissions are not fills. **Unavailable** means the source does not record the metric. Receipt time and status expose stale/ended runs; a fresh observation does not make a prior session live. Event freshness follows each lane's own cadence: C12min, lanea20min, laneb13min; I-llm cadence unrecorded. IBKR's Status field distinguishes Active from No session; timestamps show the latest source event. I-llm stays not live until wired."
       }
     },
     {
@@ -584,7 +584,7 @@
       "id": 11,
       "type": "stat",
       "title": "A \u00b7 Last receipt time",
-      "description": "IBKR: no session since this receipt time. I-llm: source Unix seconds, Not recorded until live. Other lanes: source timestamp, not observation time.",
+      "description": "Source event timestamp, not observation time. IBKR's Status field distinguishes Active from No session. I-llm: source Unix seconds, Not recorded until live.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -1184,7 +1184,7 @@
       "id": 21,
       "type": "stat",
       "title": "B \u00b7 Last receipt time",
-      "description": "IBKR: no session since this receipt time. I-llm: source Unix seconds, Not recorded until live. Other lanes: source timestamp, not observation time.",
+      "description": "Source event timestamp, not observation time. IBKR's Status field distinguishes Active from No session. I-llm: source Unix seconds, Not recorded until live.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -1784,7 +1784,7 @@
       "id": 31,
       "type": "stat",
       "title": "C \u00b7 Last receipt time",
-      "description": "IBKR: no session since this receipt time. I-llm: source Unix seconds, Not recorded until live. Other lanes: source timestamp, not observation time.",
+      "description": "Source event timestamp, not observation time. IBKR's Status field distinguishes Active from No session. I-llm: source Unix seconds, Not recorded until live.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -2384,7 +2384,7 @@
       "id": 41,
       "type": "stat",
       "title": "lanea \u00b7 Last receipt time",
-      "description": "IBKR: no session since this receipt time. I-llm: source Unix seconds, Not recorded until live. Other lanes: source timestamp, not observation time.",
+      "description": "Source event timestamp, not observation time. IBKR's Status field distinguishes Active from No session. I-llm: source Unix seconds, Not recorded until live.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -2984,7 +2984,7 @@
       "id": 51,
       "type": "stat",
       "title": "laneb \u00b7 Last receipt time",
-      "description": "IBKR: no session since this receipt time. I-llm: source Unix seconds, Not recorded until live. Other lanes: source timestamp, not observation time.",
+      "description": "Source event timestamp, not observation time. IBKR's Status field distinguishes Active from No session. I-llm: source Unix seconds, Not recorded until live.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -3583,8 +3583,8 @@
     {
       "id": 61,
       "type": "stat",
-      "title": "IBKR \u00b7 No session since / last receipt",
-      "description": "IBKR: no session since this receipt time. I-llm: source Unix seconds, Not recorded until live. Other lanes: source timestamp, not observation time.",
+      "title": "IBKR \u00b7 Last receipt time",
+      "description": "Source event timestamp, not observation time. IBKR's Status field distinguishes Active from No session. I-llm: source Unix seconds, Not recorded until live.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"
@@ -3639,7 +3639,7 @@
         "type": "loki",
         "uid": "ns2604-loki"
       },
-      "description": "Own last-session wire mean/peak. No session tonight; these are retained receipt values. 45/s governor, 50/s broker cap are constants.",
+      "description": "Own selected-session wire mean/peak from receipts; consult Status for Active or No session. 45/s governor, 50/s broker cap are constants.",
       "gridPos": {
         "x": 0,
         "y": 45,
@@ -4253,7 +4253,7 @@
       "id": 72,
       "type": "stat",
       "title": "I-llm \u00b7 Last receipt time",
-      "description": "IBKR: no session since this receipt time. I-llm: source Unix seconds, Not recorded until live. Other lanes: source timestamp, not observation time.",
+      "description": "Source event timestamp, not observation time. IBKR's Status field distinguishes Active from No session. I-llm: source Unix seconds, Not recorded until live.",
       "datasource": {
         "type": "loki",
         "uid": "ns2604-loki"

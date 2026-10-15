@@ -3,6 +3,21 @@
 # The service and native validate command both require NS2604_OBSERVABILITY_DATA.
 # Native OTLP only. Prompt/tool content and account identifiers are dropped; selected correlation IDs stay private.
 receivers:
+  # Native provisioned Trading lanes route; matches observability/trading-collector.yaml.
+  file_log/trading_lanes:
+    include: ["${env:NS2604_OBSERVABILITY_DATA}/trading-lanes/observations.jsonl"]
+    start_at: beginning
+    storage: file_storage
+    include_file_name: false
+    include_file_path: false
+    retry_on_failure:
+      enabled: true
+      max_elapsed_time: 0s
+    operators:
+      - type: json_parser
+        on_error: drop_quiet
+        parse_from: body
+        parse_to: attributes
   otlp:
     protocols:
       grpc:
@@ -80,6 +95,19 @@ receivers:
     include: ["${env:NS2604_OBSERVABILITY_DATA}/harbor-otel/*.jsonl"]
     start_at: beginning
 processors:
+  # Contrib0.162.0 transformprocessor: supported keep_keys/set, propagate errors.
+  transform/trading_projection:
+    error_mode: propagate
+    log_statements:
+      - context: log
+        statements:
+          - keep_keys(resource.attributes, [])
+          - set(resource.attributes["service.name"], "trading-lanes")
+          - keep_keys(instrumentation_scope.attributes, [])
+          - set(instrumentation_scope.name, "trading-lanes")
+          - set(instrumentation_scope.version, "")
+          - keep_keys(attributes, ["lane", "observed_unix", "source_unix", "orders_per_min", "fills_per_min", "cancels_per_min", "cash_use_ratio", "open_positions", "realized_pnl_usd", "status_code", "ended_by_code", "wire_mean_per_s", "wire_peak_per_s"])
+          - set(body, attributes)
   # #408 no-run-label contract; opentelemetry-collector-contrib v0.162.0
   # processor/transformprocessor/README.md and pkg/ottl/ottlfuncs/func_delete_matching_keys.go.
   # Applied to every exported metric route before conversion/batching; writer identity and values stay intact.
@@ -567,6 +595,10 @@ service:
                 host: 127.0.0.1
                 port: 21888
   pipelines:
+    logs/trading_lanes:
+      receivers: [file_log/trading_lanes]
+      processors: [memory_limiter, transform/trading_projection, batch]
+      exporters: [otlphttp/loki]
     logs:
       receivers: [otlp]
       processors: [memory_limiter, transform/tool_names, transform/privacy, batch]
