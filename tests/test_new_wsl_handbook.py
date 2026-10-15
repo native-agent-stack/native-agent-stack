@@ -96,7 +96,8 @@ def attributed_quotations(text):
 def owner_quotations(value, kept=frozenset(), path=""):
     """The locators of every owner quotation in a JSON value, never its text: a field that holds the owner's words
     (owner_verbatim and the like, or verbatim in an object of the owner's decision) and a string with an attributed
-    quotation. `kept` names the paths that a separately defined contract requires (see relay_contract_paths)."""
+    quotation. `kept` names paths a separately defined contract requires; none is kept since the relay contract carries
+    a dated paraphrase (command center ruling 2026-10-15T12:38Z)."""
     found = []
     if isinstance(value, dict):
         owners = value.get("kind") == "owner_decision" or bool(re.search(SPEAKER, str(value.get("by", "")), re.IGNORECASE))
@@ -112,28 +113,6 @@ def owner_quotations(value, kept=frozenset(), path=""):
     elif isinstance(value, str) and attributed_quotations(value):
         found.append(f"{path}: a quotation attributed to the owner or the user")
     return found
-
-
-def relay_contract_paths(consensus):
-    """The owner batches' authority.verbatim paths of the layer-consensus record, while assemble_manifest.py requires them.
-
-    The assembler's OWNER_AUTHORITY_FIELDS lists `verbatim`, and its check_owner_batch refuses a batch whose relaying
-    decision record, hashed in the batch, does not contain it. Removing that is a change to the relay contract, outside
-    this paraphrase; once the assembler stops requiring the field, no path is kept and the check below covers these fields
-    too. The manifest and the handbook never carry them (the manifest keeps the authority's kind, date and relaying record
-    only).
-
-    TEMPORARY (command center ruling 2026-10-15T12:19Z, P1): the follow-up PR on branch
-    claude/cc-native-practice-relay-contract-scrub-20261015 changes the relay contract to a dated paraphrase plus a hash
-    binding to a private record, scrubs these three fields and the relaying decision records, and removes this
-    exemption."""
-    spec = importlib.util.spec_from_file_location("assemble_manifest_relay_contract", ROOT / ASSEMBLER)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    if "verbatim" not in module.OWNER_AUTHORITY_FIELDS:
-        return frozenset()
-    return frozenset(f"/{key}/authority/verbatim" for key, batch in consensus.items()
-                     if re.fullmatch(r"wave[0-9]+", key) and module.is_owner_batch(batch))
 
 
 class NewWslHandbookTests(unittest.TestCase):
@@ -1876,14 +1855,13 @@ class OwnerQuotationTests(unittest.TestCase):
                  "memory": 'the memory-owner row quotes the release notes: "fixture notes"'}
         self.assertEqual(owner_quotations(value), [])
         self.assertEqual(attributed_quotations(paraphrase + '. The contract counts "delivered" runs.'), 0)
-        # A path that a separately defined contract requires is kept out of the findings; relay_contract_paths names them.
-        kept = {"authority": {"kind": "owner_decision", "verbatim": self.WORDS}}
-        self.assertEqual(owner_quotations(kept, frozenset({"/authority/verbatim"})), [])
+        # A verbatim field in an owner decision is always a finding: the relay contract carries a dated paraphrase.
+        relayed = {"authority": {"kind": "owner_decision", "verbatim": self.WORDS}}
+        self.assertEqual(owner_quotations(relayed), ["/authority/verbatim: a field that holds the owner's words"])
 
     def test_the_canonical_inputs_and_the_generated_handbook_carry_no_owner_quotation(self):
         consensus = json.loads((ROOT / CONSENSUS_SOURCE).read_text(encoding="utf-8"))
-        kept = relay_contract_paths(consensus)
-        found = [CONSENSUS_SOURCE + where for where in owner_quotations(consensus, kept)]
+        found = [CONSENSUS_SOURCE + where for where in owner_quotations(consensus)]
         for name in (DEFAULTS_SOURCE, handbook.OUTPUTS[1]):
             found += [name + where for where in owner_quotations(json.loads((ROOT / name).read_text(encoding="utf-8")))]
         markdown = attributed_quotations((ROOT / handbook.OUTPUTS[0]).read_text(encoding="utf-8"))
@@ -1891,6 +1869,21 @@ class OwnerQuotationTests(unittest.TestCase):
             found.append(f"{handbook.OUTPUTS[0]}: {markdown} sentences attribute a quotation to the owner or the user")
         self.assertEqual(found, [], "paraphrase owner chat with its date ('the owner, <date> (paraphrased): ...'); never quote it")
 
+
+    def test_the_relaying_decision_records_carry_the_paraphrase_not_the_words(self):
+        # Command center ruling 2026-10-15T12:38Z (P1): each owner batch's committed relaying decision record states the
+        # batch's dated paraphrase as a block quote and calls nothing the owner's verbatim words.
+        consensus = json.loads((ROOT / CONSENSUS_SOURCE).read_text(encoding="utf-8"))
+        for key, batch in consensus.items():
+            if not (re.fullmatch(r"wave[0-9]+", key) and isinstance(batch, dict)
+                    and (batch.get("authority") or {}).get("kind") == "owner_decision"):
+                continue
+            authority = batch["authority"]
+            with self.subTest(batch=key):
+                self.assertNotIn("verbatim", authority)
+                text = (ROOT / authority["relayed_by"]).read_text(encoding="utf-8")
+                self.assertIn("\n> " + authority["paraphrase"] + "\n", text)
+                self.assertIsNone(re.search(r"(?:quoted|order,) verbatim", text))
 
 if __name__ == "__main__":
     unittest.main()

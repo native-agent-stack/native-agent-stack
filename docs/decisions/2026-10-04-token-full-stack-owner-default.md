@@ -2,7 +2,7 @@
 
 > Note for the command center: session `wsl-architecture-design` may replace the text of this record, but keep its path.
 > `evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json` hashes this file (`wave3.records.decision_record`)
-> and the manifest's assembler checks that it quotes the owner's words and names every slot the batch changes, so a new
+> and the manifest's assembler checks that it states the batch's dated paraphrase and names every slot the batch changes, so a new
 > text needs that sha256 updated and the manifest, its tables and the handbook regenerated.
 
 ## Decision
@@ -36,15 +36,15 @@ part belongs to session `wsl-architecture-design`.
 
 ## The owner's order
 
-The order, verbatim, as the harness relayed it to the command-center session `wsl-architecture-design` on 2026-10-04;
-the same first sentence reached session `native-agent-stack-99` directly, and the coordination brief of that session
-relays the whole text:
+The order as the harness relayed it to the command-center session `wsl-architecture-design` on 2026-10-04 (the same
+first sentence reached session `native-agent-stack-99` directly, and the coordination brief of that session relays
+the whole text), in a dated paraphrase; the exact words stay in the command center's private records (the no-owner-quote rule of 2026-10-14 supersedes the earlier verbatim quotation):
 
-> WE NEED TO ENABLE FULL SOTA STACKS FOR THE TOKEN EFFICIENCY REPOS INSTALL CLEANLY MAKE SURETHEY LIVE SEAMLESSLY AS OUR NATIVE WORKFLWO FOR FUTURE SESSION DEFAULT TO LAUNCH AND INVOKE ,CLENA RESOLUTE AND REPORT THE MAIN SESSION WHEN READY with real new session launched e2e monitor invoke rate and upstream commands e2e with using of the sota related full lifecycle skills, the token save is essential layer make sure we are monitored token use and sota token save repos invoke rate with new session launched e2e m keep resolute untill the upstream are fully resoluted and live within our native workflow including ultracode subagent,experimental agent team in our wsl with upstream commands for showing the real saved and sota resoluted practices upstream clean installed
+> the owner, 2026-10-04 (paraphrased): enable the full state-of-the-art token-efficiency stack, installed cleanly so it runs seamlessly as the native workflow that future sessions launch and invoke by default; report to the main session when it is ready, proven end to end with a newly launched session, monitored invoke rates and token use, and upstream commands, using the related full-lifecycle skills; and keep at it until the upstream tools are fully resolved and live in the native workflow, including ultracode subagents and the experimental agent teams, with upstream commands that show the real savings.
 
 Earlier in the same turn, to session `native-agent-stack-99`:
 
-> for the sota features form changelogs, make sure we enabled all latest sota ones into our wsl and new wsl and keep maitnaced updated latest sota aligned
+> the owner, 2026-10-04 (paraphrased): enable every latest state-of-the-art feature the changelogs list, on both the current and the new WSL distribution, and keep them maintained and aligned with the latest releases.
 
 The record reads the order this way: the token-efficiency repositories are the core rows of
 `docs/token-efficiency-stack.json` with RTK, context-mode and the token-lane carriers, wanted on both NativeStack and

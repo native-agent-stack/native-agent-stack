@@ -386,7 +386,11 @@ WAVE = re.compile(r"wave(?P<number>[2-9]|[1-9][0-9]+)")
 OWNER_BATCH_FIELDS = (("date_utc", str), ("meaning", str), ("owner_rule", str), ("no_install_rule_exception", str),
                       ("authority", dict), ("records", dict), ("acknowledgements", list), ("acknowledgements_owed", list),
                       ("add_rows", list), ("amend_rows", list))
-OWNER_AUTHORITY_FIELDS = ("kind", "date_utc", "decision", "verbatim", "relayed_by", "rule_basis")
+# The owner's decision is carried as a dated paraphrase; the exact words stay in the command center's private record,
+# which relay_record names by name and location only (command center ruling 2026-10-15T12:38Z; the no-owner-quote rule of
+# 2026-10-14 supersedes the round-2 resolution to quote the owner exactly).
+OWNER_AUTHORITY_FIELDS = ("kind", "date_utc", "decision", "paraphrase", "relay_record", "relayed_by", "rule_basis")
+DIGEST_LIKE = re.compile(r"[0-9a-fA-F]{7,}|sha-?256", re.IGNORECASE)
 # Amendment 4: a row the owner adds has this kind and outcome; a row whose decided default installs nothing and which the
 # owner gives a default keeps its kind and takes OWNER_DEFAULT_OUTCOME. Neither is definitive: the state is resolved. The
 # fields an owner default replaces are OVERTURNED_FIELDS, kept on the row under overturned.fields.
@@ -516,7 +520,8 @@ def batch_repositories(batch):
 
 def check_owner_batch(name, batch):
     """An owner batch (amendment 4): its shape, records and acknowledgements, and the owner's decision it rests on. The decision
-    is the one the hashed record named by authority.relayed_by states: that record quotes the owner's words verbatim and names
+    is the one the hashed record named by authority.relayed_by states: that record states the batch's dated paraphrase of the
+    owner's decision (the exact words stay in the private record relay_record names, never by a digest) and names
     every slot the batch adds or amends (as `slot`) and every repository they install, so the record, not the batch's own
     text, says what the owner decided. No acknowledgement is owed, since no family consensus is the batch's authority."""
     if not isinstance(batch, dict) or set(batch) != {key for key, _ in OWNER_BATCH_FIELDS} or not all(
@@ -540,8 +545,14 @@ def check_owner_batch(name, batch):
         raise ValueError(f"consensus {name}: the owner's decision is relayed by {authority['relayed_by']}, which is not one of "
                          "the batch's hashed records")
     text = (ROOT / refs[0]["path"]).read_text(encoding="utf-8")
-    if authority["verbatim"] not in text:
-        raise ValueError(f"consensus {name}: {authority['relayed_by']} does not quote the owner's words verbatim")
+    prefix = f"the owner, {authority['date_utc']} (paraphrased): "
+    if not authority["paraphrase"].startswith(prefix):
+        raise ValueError(f"consensus {name}: the owner's paraphrase begins {prefix!r}")
+    if DIGEST_LIKE.search(authority["relay_record"]):
+        raise ValueError(f"consensus {name}: relay_record names the private record by name and location, never by a digest")
+    if authority["paraphrase"] not in text:
+        raise ValueError(f"consensus {name}: {authority['relayed_by']} does not state the batch's paraphrase of the owner's "
+                         "decision")
     for sid in changed_slots(batch):
         if not isinstance(sid, str) or f"`{sid}`" not in text:
             raise ValueError(f"consensus {name}: {authority['relayed_by']} does not name the slot {sid}")

@@ -768,14 +768,15 @@
    "kind": "owner_decision",
    "date_utc": "2026-10-04",
    "decision": "install the full token-efficiency stack (the core rows of docs/token-efficiency-stack.json with RTK, context-mode and the token-lane carriers) cleanly on the new distribution, as the default every future session launches and invokes",
-   "verbatim": "WE NEED TO ENABLE FULL SOTA STACKS FOR THE TOKEN EFFICIENCY REPOS INSTALL CLEANLY MAKE SURETHEY LIVE SEAMLESSLY AS OUR NATIVE WORKFLWO FOR FUTURE SESSION DEFAULT TO LAUNCH AND INVOKE ,CLENA RESOLUTE AND REPORT THE MAIN SESSION WHEN READY with real new session launched e2e monitor invoke rate and upstream commands e2e with using of the sota related full lifecycle skills, the token save is essential layer make sure we are monitored token use and sota token save repos invoke rate with new session launched e2e m keep resolute untill the upstream are fully resoluted and live within our native workflow including ultracode subagent,experimental agent team in our wsl with upstream commands for showing the real saved and sota resoluted practices upstream clean installed",
+   "paraphrase": "the owner, 2026-10-04 (paraphrased): enable the full state-of-the-art token-efficiency stack, installed cleanly so it runs seamlessly as the native workflow that future sessions launch and invoke by default; report to the main session when it is ready, proven end to end with a newly launched session, monitored invoke rates and token use, and upstream commands, using the related full-lifecycle skills; and keep at it until the upstream tools are fully resolved and live in the native workflow, including ultracode subagents and the experimental agent teams, with upstream commands that show the real savings.",
+   "relay_record": "the command center's private coordination records of 2026-10-04: the harness relay to session wsl-architecture-design and the coordination brief of session native-agent-stack-99 (outside the repository)",
    "relayed_by": "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
    "rule_basis": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md, section Overturn: 'For the rule: the user asks again for arms on the clean install'; wave2.interim_rule: 'The authority is the owner's dated decision, as the record that relays it states it'"
   },
   "records": {
    "decision_record": {
     "path": "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
-    "sha256": "d6d0ba48d8881d746bdb9d4dc214339c2f8dba9842fad4152675437811a818d5"
+    "sha256": "e255627bd1eef63bac3ec5ec7b44b1e039c6b2dc34e33a5558fb42b87f954048"
    }
   },
   "acknowledgements": [],
@@ -1368,14 +1369,15 @@
    "kind": "owner_decision",
    "date_utc": "2026-10-04",
    "decision": "fill documented gaps by the candidate repository's own quality evidence, without a new local trial, and finalize the architecture for the clean install (the repository-quality rule, applied by decide round 2)",
-   "verbatim": "with the repos quality itself resolute our architecture with the sota repos's own quality and finalize for the architecture for us to clean install",
+   "paraphrase": "the owner, 2026-10-04 (paraphrased): resolve the architecture by the candidate repositories' own quality, and finalize it for the clean install.",
+   "relay_record": "the command center's private coordination records of 2026-10-04, about 20:50Z (outside the repository)",
    "relayed_by": "docs/decisions/2026-10-04-2604-e2e-fix-wave.md",
    "rule_basis": "docs/decisions/2026-10-04-repository-quality-rule.md (decide round 2); amendment 4's owner default (wave3.owner_rule)"
   },
   "records": {
    "decision_record": {
     "path": "docs/decisions/2026-10-04-2604-e2e-fix-wave.md",
-    "sha256": "e60ca8cf00843aafeee60871ee638252c2a942688653c79669b6a96bccaadb4a"
+    "sha256": "7a772f7406df2dcf7d8d16f263e2e246f9b345afe4bddc7e03ec65683b24c801"
    },
    "quality_rule": {
     "path": "docs/decisions/2026-10-04-repository-quality-rule.md",
@@ -1433,14 +1435,15 @@
    "kind": "owner_decision",
    "date_utc": "2026-10-04",
    "decision": "fill documented gaps by the candidate repository's own quality evidence, without a new local trial, and finalize the architecture for the clean install (the repository-quality rule); decide round 2 and its Opus verification named the owners",
-   "verbatim": "with the repos quality itself resolute our architecture with the sota repos's own quality and finalize for the architecture for us to clean install",
+   "paraphrase": "the owner, 2026-10-04 (paraphrased): resolve the architecture by the candidate repositories' own quality, and finalize it for the clean install.",
+   "relay_record": "the command center's private coordination records of 2026-10-04, about 20:50Z (outside the repository)",
    "relayed_by": "docs/decisions/2026-10-04-final-architecture-round2.md",
    "rule_basis": "docs/decisions/2026-10-04-repository-quality-rule.md (decide round 2); amendment 4's owner rows and owner defaults (wave3.owner_rule)"
   },
   "records": {
    "decision_record": {
     "path": "docs/decisions/2026-10-04-final-architecture-round2.md",
-    "sha256": "98b57badb6779c9ef09c7ad3ba54773c1428042fe3cdf6f39362259741d10768"
+    "sha256": "41a5890b867b0f2f283ff42753b8b9c3366b7361c95ad889616433289569a3d5"
    },
    "quality_rule": {
     "path": "docs/decisions/2026-10-04-repository-quality-rule.md",

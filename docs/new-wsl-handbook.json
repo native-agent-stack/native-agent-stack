@@ -210,7 +210,7 @@
         },
         "consensus": {
           "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-          "sha256": "6284660b3fae00ce7ee12c0a4a4081a9e889e0956c162025fa1e333c4081148c"
+          "sha256": "0c7bf9d9fcd9f5ecd17fe515c0b501a1942947a637d55252aa1da3089e4cb7dc"
         },
         "convergence": {
           "file": "convergence.json",
@@ -8007,7 +8007,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "65887e7ec59ad2989be225d27175b53e2682ba329fa951062cea81ffefb3a08d"
+      "sha256": "7b899e3e5efa7c7bf5f2bb33eecdc97171ce3213be61efce629d6387a759bca6"
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -8031,7 +8031,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-      "sha256": "6284660b3fae00ce7ee12c0a4a4081a9e889e0956c162025fa1e333c4081148c"
+      "sha256": "0c7bf9d9fcd9f5ecd17fe515c0b501a1942947a637d55252aa1da3089e4cb7dc"
     },
     {
       "path": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",

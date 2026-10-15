@@ -6,8 +6,8 @@
   "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
   "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
   "outputs": {
-    "docs/new-wsl-handbook.md": "fc76c9cd638086fea49f99d423796cfbf6e474ba54a3c9ab15ae3f78b469b920",
-    "docs/new-wsl-handbook.json": "4a43c627140093b4c758eaa75134242917fca1ca98a68984762ba9f2c4559299"
+    "docs/new-wsl-handbook.md": "b773dfad62ffca3097e50ebebb7f1dd7e0d5be146bdb440b10c082e29eeeb371",
+    "docs/new-wsl-handbook.json": "383694f6c9eefd566b84204e77e0fb5749024a675555cf8a4900551669d6995c"
   },
   "inventory": {
     "layers": 37,
@@ -1070,6 +1070,22 @@
       "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
       "evidence_class": "local_integration",
       "scope": "Regenerated through the unchanged native builder after the layer-consensus record replaced its owner quotations with dated, attributed paraphrases (the GPT read of #1128 at bd3eecfe5, blocker 1) and assemble_manifest.py rebuilt the definitive manifest from it; the agent-messaging and context-supply records of the handbook carry the paraphrases. No host, model or provider acceptance."
+    },
+    {
+      "recorded_at_utc": "2026-10-15T12:42:29Z",
+      "source_main": "420452059bc307e13121d9769096291b95cdbf42",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "check_command": "python3 scripts/build_new_wsl_handbook.py --check",
+      "check_exit_code": 0,
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "b773dfad62ffca3097e50ebebb7f1dd7e0d5be146bdb440b10c082e29eeeb371",
+        "docs/new-wsl-handbook.json": "383694f6c9eefd566b84204e77e0fb5749024a675555cf8a4900551669d6995c"
+      },
+      "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+      "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
+      "evidence_class": "local_integration",
+      "scope": "relay-contract scrub (command center ruling 2026-10-15T12:38Z): the owner batches' authority carries a dated paraphrase and relay_record; the three relaying decision records state the paraphrase; regenerated through the builders"
     }
   ],
   "previous_outputs": [
@@ -1287,6 +1303,14 @@
         "docs/new-wsl-handbook.json": "bb68a0d06802f17a02ac00ced40d582de339b800c5e646b818c46eafb0d6b474"
       },
       "reason": "The layer-consensus record's owner quotations became dated, attributed paraphrases (the GPT read of #1128 at bd3eecfe5, blocker 1), which changes the definitive manifest and both outputs; the previous maintained output binding is preserved as historical evidence."
+    },
+    {
+      "superseded_at_utc": "2026-10-15T12:42:29Z",
+      "source_main": "420452059bc307e13121d9769096291b95cdbf42",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "fc76c9cd638086fea49f99d423796cfbf6e474ba54a3c9ab15ae3f78b469b920",
+        "docs/new-wsl-handbook.json": "4a43c627140093b4c758eaa75134242917fca1ca98a68984762ba9f2c4559299"
+      }
     }
   ]
 }
