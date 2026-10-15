@@ -1,0 +1,14 @@
+{
+  "allowed_fields": true,
+  "base_commit": "8053f14e7e0817d2502dff2bb284bfb7e1b0152f",
+  "builder_sha256": "6aaab9105ce2552efc83a86974c32e25fe7a810539a4ec3aa3486b2bccc92aa9",
+  "command": "python3 scripts/build_ecosystem.py --refresh-stars --starred-output evidence/artifacts/stars-jev-manifest-routing-20261015/public-starred.refreshed.json",
+  "count": 380,
+  "endpoint": "https://api.github.com/users/seathatflowsinourveins/starred?per_page=100",
+  "exit_code": 0,
+  "kind": "native_builder_public_refresh",
+  "new_count": 7,
+  "observed_at": "2026-10-15T20:04:28Z",
+  "raw_api_retained": false,
+  "snapshot_sha256": "7b9d607eecdf6157cd35624024d2a805a53d77702f3d3d3982d492bee23f67c7"
+}

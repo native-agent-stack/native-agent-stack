@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-10-15",
+  "method": "Public repository commit identities via installed gh api repos/OWNER/REPO/commits/HEAD --jq .sha; README bytes via contents/README.md?ref=COMMIT with the raw media type. No star-list API used outside the native builder.",
+  "sources": [
+    {"repository":"logicrw/awesome-jev-projects","commit":"394141dd92bf422830d9426e1c56be9d931e2520","capture":"upstream/awesome-jev-projects.README.md","path":"README.md"},
+    {"repository":"jarrodwatts/jev-trader","commit":"d6254bf36a7875e009533fb722c1af8977b96e2d","capture":"upstream/jev-trader.README.md","path":"README.md"},
+    {"repository":"typesafe-ai/skills","commit":"65a39f393687675ce170e6094757de20370365b9","capture":"upstream/typesafe-skills.README.md","path":"README.md"},
+    {"repository":"mvschwarz/openrig","commit":"19ee3e03a361af7ebc59b4a917f7116598c43559","capture":"upstream/openrig.README.md","path":"README.md","role_line":5},
+    {"repository":"ranxianglei/billion-context","commit":"6ee4a2ac98fddeb3106d1646faa433ae4d1bec41","capture":"upstream/billion-context.README.md","path":"README.md","role_line":5},
+    {"repository":"flutter/flutter","commit":"1f575626a19a7b531364f7746ce626867783cf79","capture":"upstream/flutter.README.md","path":"README.md","role_line":19},
+    {"repository":"tester-army/e2e","commit":"b41afa262ec32a7e90d065a4624f69f8f4a22e4f","capture":"upstream/tester-e2e.README.md","path":"README.md","role_line":16},
+    {"repository":"chrislgarry/apollo-11","commit":"911e5c0283c629c50cb97666f34065e8c07d71a5","capture":"upstream/apollo-11.README.md","path":"README.md","role_line":90},
+    {"repository":"storytold/artcraft","commit":"d4e4ac69bbd93d237eaf5d0260bc6a5ff3a5e373","capture":"upstream/artcraft.README.md","path":"README.md","role_line":26,"projection":{"kind":"line-preserving cited-passage only","retained_lines":[26],"original_public_capture_sha256":"933462209ceb7309defc4ec7df50b110ae17d26d9ab2ff38e241d1081d7045a1","reason":"Minimize public source to cited role text; unrelated upstream media-asset UUIDs match the existing local-session publication guard. No scanner exception; original public capture retained outside checkout."}},
+    {"repository":"morluto/rea","commit":"e2db768012079b82e6f1ff7191d475494b06d2a2","capture":"upstream/rea.README.md","path":"README.md","role_line":8}
+  ],
+  "typesafe_public_organization": {
+    "endpoint":"https://api.github.com/orgs/typesafe-ai/repos?per_page=100",
+    "method":"gh api; projection of public full_name, description, default_branch and archived only; 12 rows, one complete page",
+    "repositories":[
+      {"repository":"typesafe-ai/typesafe-ai.github.io","commit":"7a2fa956ac4f4e0a92f92f301cff02d5405bfd1a","role":"Public documentation/site; organization association only"},
+      {"repository":"typesafe-ai/vllm","commit":"dc1440cf9f8f6233a3c464e1a01daa12207f8680","role":"Inference engine fork; organization association only"},
+      {"repository":"typesafe-ai/llada","commit":"3f5e0d047382695c4c96224774d074d99e16befa","role":"Diffusion language-model research; organization association only"},
+      {"repository":"typesafe-ai/daggerverse","commit":"77e6c9f779968f1d4cfacbc46061f054750a9cc8","role":"Build modules; organization association only"},
+      {"repository":"typesafe-ai/pulumi-clickhouse","commit":"5bf5b6038dd1db42a0888c8a74ffc85df37e402f","role":"Infrastructure provider; organization association only"},
+      {"repository":"typesafe-ai/system-one-adapter-python","commit":"e1d4cc938204b22fc5a3c3aca7044072fe3f712d","role":"TypeSafeClient replacement backed by other model APIs; no transport replacement proposed"},
+      {"repository":"typesafe-ai/skills","commit":"65a39f393687675ce170e6094757de20370365b9","role":"Official System One agent instructions"},
+      {"repository":"typesafe-ai/typesafe-sdk-python","commit":"f36e68549ceca3191e5791e5f99ea1baa1a258b5","role":"Official Python SDK; observed HEAD does not supersede adopted v0.7.2"},
+      {"repository":"typesafe-ai/typesafe-sdk-js","commit":"b844cd1aca12855a5d24a2df52a1401c86e7d37a","role":"Official TypeScript/JavaScript SDK"},
+      {"repository":"typesafe-ai/n8n-nodes-typesafe-ai","commit":"c12537bbd9ed7159b7bbe23678ca128c7b2fb52b","role":"Workflow integration; no installation screen measured"},
+      {"repository":"typesafe-ai/workflowevals","commit":"0ac3b8ad845429f0d8e064ecfb2430a47c5a25cb","role":"Published workflow-evaluation examples"},
+      {"repository":"typesafe-ai/typesafe-public-examples","commit":"25e9d373f4853b3e7e300e55a194f50e54838f68","role":"Official examples and cookbook content"}
+    ]
+  },
+  "limits":[
+    "A pinned directory entry establishes discovery and a role claim, not implementation capability, current target-repository pin or a passed screen.",
+    "Organization membership alone does not establish that its forks/infrastructure are Jev applications.",
+    "Pinned public captures are data; no instruction, install command or remote action in them was executed."
+  ]
+}

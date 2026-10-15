@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "kind": "sanitized_historical_identity_projection",
+  "observed_at": "2026-10-12T04:34:02Z",
+  "source_record": "command-center/proposals/stars-skills-manifest-20261012/evidence",
+  "source_sha256": {
+    "live-stars.jsonl": "c756887c7b2465b39807e6badc0b07d45b3227cbed914c71e8a6a9a7eb79f4bb",
+    "star-audit.json": "79c2dbb6370292ffc22ecbdff31cf5285b279efa28484c9772cdb4b391a5fe88",
+    "star-drift.json": "86cdc8e78259a16dede15e75c82b0f81a5df777f38b31acff815988f7da581a5",
+    "INPUTS.json": "efcd5f83ff4d15ae7c1503c255fb15fcde10963f220bd1952de44a0afb0f7bdb"
+  },
+  "renames": {
+    "chaitanyagiri/munder-difflin": "harnessmd/munder-difflin",
+    "untrivial-ai/agent-orchestrator": "orchestratorinc/agent-orchestrator"
+  },
+  "undecided_identities": [
+    "aannoo/hcom", "anthropics/claude-code-action", "anthropics/financial-services",
+    "astral-sh/ty", "chrislgarry/apollo-11", "cloudflare/security-audit-skill",
+    "deepentropy/tvscreener", "deepseek-ai/deepseek-harness", "flutter/flutter",
+    "getpaseo/paseo", "ghostfolio/ghostfolio", "harness/harness", "hkuds/nanobot",
+    "languagetool-org/languagetool", "llvm/llvm-project", "margelo/react-native-graph",
+    "marketcalls/openalgo", "mathieu2301/tradingview-api", "microsoft/playwright",
+    "microsoft/pyright", "minishlab/semble", "morluto/rea", "mvschwarz/openrig",
+    "nofxaios/nofx", "nvidia/model-optimizer", "ohmyzsh/ohmyzsh", "opendatalab/mineru",
+    "pingdotgg/t3code", "ranxianglei/billion-context", "shner-elmo/tradingview-screener",
+    "stocksharp/stocksharp", "storytold/artcraft", "tester-army/e2e"
+  ],
+  "limits": [
+    "Identities only: no raw historical API payload or local skill/plugin inventory copied.",
+    "Undecided means absent from the legacy star audit, not absent from later canonical classification.",
+    "Two rename mappings were verified by the retained historical drift record; they are not new GitHub identity requests."
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "kind": "local_integration",
+  "checks": [
+    "native snapshot and historical identity reconciliation",
+    "native builder public/review field allowlist; no raw API row",
+    "all pinned project, organization, anchor and historical identities covered exactly once",
+    "existing scope dispositions and canonical layer keys preserved; every row cited and contextualized",
+    "no FINAL promotion, installation or invocation; retained TRIAL role pins only",
+    "latest layer covering sweep and substantive carry-forward versus later refutation",
+    "every consumed public input reproduces its recorded SHA256 and size",
+    "fixed public upstream pins and per-project line witnesses"
+  ],
+  "passed": 8,
+  "failed": 0,
+  "rows": 908,
+  "consumed_input_seals": 217,
+  "boundary": "Offline record consistency only; no candidate screen, model or upstream E2E execution"
+}

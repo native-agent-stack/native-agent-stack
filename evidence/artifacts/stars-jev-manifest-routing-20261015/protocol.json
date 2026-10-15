@@ -1,0 +1,947 @@
+{
+  "authority": {
+    "record": "command-center/research-cc-role-20261008/direction-cc-20261015T1946Z-north-star-new-wsl-takeover.md",
+    "ruling": 4,
+    "sha256": "4dfcb47245607bd3b3fb53bbdd49a561b1b157beccf02f9309623b23ffa2ad82",
+    "verification": "Exact local bytes hash checked; authority prose and unpublished data not copied"
+  },
+  "base_commit": "8053f14e7e0817d2502dff2bb284bfb7e1b0152f",
+  "coordination_protocol_sha256": "d35af84758a6eb78a468ae775766543c1bbd63e61b7886e0baff0505b8db95ff",
+  "inputs": {
+    "AGENTS.md": {
+      "bytes": 4320,
+      "sha256": "badc1a93731095641e71ae1bf1d5ae5d5021e522c1da62926ddc65268f5c10a1"
+    },
+    "adoption/skills/manifest.json": {
+      "bytes": 64651,
+      "sha256": "f55d6065c4022b8b8164a8cd6c70bb83f78968c0e289579c3642ebc08fa4d724"
+    },
+    "blueprints/native-skill-practice/typesafe-result.json": {
+      "bytes": 16827,
+      "sha256": "16b1771e9f53d5c489808c494548f75351bc699291c107e0536d5c519e4d6a25"
+    },
+    "blueprints/us-equities/AGENTS.md": {
+      "bytes": 5941,
+      "sha256": "4a1d3f125f3e8c77484b736e592777fa887991d6dc1cd43d941b4cd621f68719"
+    },
+    "blueprints/us-equities/authenticated-data/native-receipt.json": {
+      "bytes": 12256,
+      "sha256": "ad49cf581b4add46de77bb717d3e2d9dcae0c5b44a08cc7b831a2922361ca657"
+    },
+    "blueprints/us-equities/data/receipt.json": {
+      "bytes": 842,
+      "sha256": "9a2338f3d064571c6f60a5b9a15c618252b281fd9df84349340d07abe8b7d75c"
+    },
+    "blueprints/us-equities/engine-nautilus/equity-replay/receipt.json": {
+      "bytes": 9299,
+      "sha256": "deb72b1d9a54f6e1d56783ea72ee55bb176bd5862c6a6f49cc1c86e6de4c4294"
+    },
+    "blueprints/us-equities/historical-simulation/receipt.json": {
+      "bytes": 56665,
+      "sha256": "06ec065647abd91a0ca2b13da25dd75c3ccd159a3244a241a3207c58b36f95d9"
+    },
+    "blueprints/us-equities/hosting/receipt.json": {
+      "bytes": 4873,
+      "sha256": "a7311c35dfb25d6c8f5212435095c1bbc91cde407490a9d61bf895cd1fe9f6cc"
+    },
+    "blueprints/us-equities/identity-readiness/native-receipt.json": {
+      "bytes": 51698,
+      "sha256": "97cc1a0b03f8d59d56eeb4e1bfdd805f32c047c350208c03fadb5d2f6308abc5"
+    },
+    "blueprints/us-equities/lifecycle-sample/native-receipt.json": {
+      "bytes": 10895,
+      "sha256": "6ae8b6dd8c0222ee3c078b59a738277a61b6f4a2d14bae647f7365c989a7ea81"
+    },
+    "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json": {
+      "bytes": 4066,
+      "sha256": "272566a22d25937bc2e6bdd0a45674b318e21468a1631c9ec9e0827f4f6882c0"
+    },
+    "blueprints/us-equities/research-efficiency/native-receipt.json": {
+      "bytes": 42248,
+      "sha256": "18969aa21eabad2b5a5cc23fcc6baa527f76ff68f664f2645cb57334e7571451"
+    },
+    "blueprints/us-equities/research-evaluation/receipt.json": {
+      "bytes": 69972,
+      "sha256": "92a2c4c1984c7cd38af21fbc9b5290395805fed3177522b19d408ad50c59d56b"
+    },
+    "blueprints/us-equities/research-runtime/receipt.json": {
+      "bytes": 7412,
+      "sha256": "90c5b91d0a740288ca2f0aa6a5e1f7c26e184b0511bfb468909f654389e0540e"
+    },
+    "blueprints/us-equities/retrieval-evaluation/receipt.json": {
+      "bytes": 24115,
+      "sha256": "19ce8a42ae578f43d5cae7237da37c7020b73811883e12201319eca4fad34f0d"
+    },
+    "blueprints/us-equities/state-recovery/memory/receipt.json": {
+      "bytes": 6015,
+      "sha256": "027c8e9c512ad0edb7a0c1c5ff5b2a98204082649d8520ff01d0c9cd41e22e59"
+    },
+    "blueprints/us-equities/state-recovery/qdrant/receipt.json": {
+      "bytes": 3951,
+      "sha256": "6db569a01981aebf5622f39877ffdc7bd300766fb1b065fb71eed840b29fee59"
+    },
+    "blueprints/us-equities/workers/receipt.json": {
+      "bytes": 9036,
+      "sha256": "2e8e5742bae1629b951d87cb140d53e2f1cc04dc88f77e65de183bc8a7a1c5f6"
+    },
+    "catalogs/convergence-practice/public-starred.json": {
+      "bytes": 766096,
+      "sha256": "5844d47174a586f0ccba1a8e4d99d86f092313a516cb64858bd7c90dc28630f9"
+    },
+    "catalogs/convergence-practice/starred-convergence-20261010.json": {
+      "bytes": 1271534,
+      "sha256": "e9b66183cb4f15a64065b22c0cd689ac4b32d3133732605bb68c26d931697712"
+    },
+    "catalogs/foundation/automation.json": {
+      "bytes": 37380,
+      "sha256": "42097070a283e8c93f659b14a0ceae7aab8b597377754eaff2f219f333223fce"
+    },
+    "catalogs/foundation/community-practice-20260920.json": {
+      "bytes": 37274,
+      "sha256": "3be2e20d06643032dccf9ce24fdaac369c21afdf705ee9e024ede1cb74c9d056"
+    },
+    "catalogs/foundation/decisions.json": {
+      "bytes": 140670,
+      "sha256": "ea9ea339a2fda04b779f3782930ef234c9e39f79ec7a6c4f79156e49a4240107"
+    },
+    "catalogs/foundation/memory-stack-20260925.json": {
+      "bytes": 105311,
+      "sha256": "a5d2b9647e044b7140f6952d36d27c5b6f2f78490452101895d33ac748faeb45"
+    },
+    "catalogs/landscape/candidate-quality-review.json": {
+      "bytes": 152069,
+      "sha256": "dbb5de39e9f5af58c20e3b75b560386776a29a994207ebf73b499e22f7d46ed8"
+    },
+    "catalogs/landscape/final-stack.json": {
+      "bytes": 338896,
+      "sha256": "e482c30346bbe97fc06a8909a43e86d8d69a93983a443747f92ad7d3d8b9d46d"
+    },
+    "catalogs/landscape/foundation.json": {
+      "bytes": 480209,
+      "sha256": "55751afc9a6e3d2dd814d5ba35d811ea9424464ccc417234b8cb6d08864e48b8"
+    },
+    "catalogs/landscape/native-practice.json": {
+      "bytes": 19759,
+      "sha256": "9b15860a6b24060eba318e712bee9e1f5e0d124d72a4fba15d6021c9645ab0d6"
+    },
+    "catalogs/landscape/us-equities.json": {
+      "bytes": 457364,
+      "sha256": "6aff6411e711dcf3f0a487f343bb0e45c319a0a9235763a54eae9316e1597b0e"
+    },
+    "catalogs/saturation/README.md": {
+      "bytes": 12036,
+      "sha256": "65b35374209ae8abf0d37154e4664cdcac98d5415f02b4583a9c479b4bf4436e"
+    },
+    "catalogs/saturation/ledger.json": {
+      "bytes": 413173,
+      "sha256": "b6ca3220516a515bd6dec13f122f48acdd8ef738565f9c0145839d99dd0c21f2"
+    },
+    "catalogs/sota-convergence/layer-verdict-waves.json": {
+      "bytes": 651,
+      "sha256": "7f7056066fec1d5ea6e6cc5e243a668e509b1d74add94ec3d74cbd3025ebc756"
+    },
+    "catalogs/sota-convergence/layer-verdicts-20260922.json": {
+      "bytes": 609126,
+      "sha256": "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de"
+    },
+    "catalogs/sota-convergence/manifest-20260923.json": {
+      "bytes": 1118651,
+      "sha256": "304d75dd0dabb02ba46191161732c17d234c3608a194f538c6bee6b64b8069c8"
+    },
+    "catalogs/sota-convergence/manifest-20260926.json": {
+      "bytes": 1548502,
+      "sha256": "a72177d162f84ba827028a7bff5ebc78ea9195c7a99ed2b411c75f7869b20e0e"
+    },
+    "catalogs/sota-convergence/manifest-20260929.json": {
+      "bytes": 1149103,
+      "sha256": "af4e0314b28acafe2b5e8a0bce71d1ced2efe911a3c3757557b23bd71c63c9ee"
+    },
+    "catalogs/sota-convergence/manifest-20261009.json": {
+      "bytes": 269693,
+      "sha256": "3f061eeb261a91e8eec0f586bc135179e56bacd6216adcf9ddfa526877879153"
+    },
+    "catalogs/us-equities/agents-operations.json": {
+      "bytes": 98675,
+      "sha256": "6a2d32e89757d375e6eea75c14c1fbd8768399e59349659ffd76a1ad978146f5"
+    },
+    "catalogs/us-equities/data-evaluation-followup.json": {
+      "bytes": 23660,
+      "sha256": "69d5e63545bee97e392551bfd72eb048c84beaa69c2c462f116a6f461110abaa"
+    },
+    "catalogs/us-equities/data-readiness-review.json": {
+      "bytes": 6308,
+      "sha256": "bcd52c1c5aa5f8adf56f0e130a97ec563666d1ccc6fd4d3a77eeb9c0f54db3ea"
+    },
+    "catalogs/us-equities/data-research.json": {
+      "bytes": 99719,
+      "sha256": "8daa7ea2ff5f29036351468bb12bb464546c0ae63440d694f2088a6103194845"
+    },
+    "catalogs/us-equities/engines-strategies.json": {
+      "bytes": 113507,
+      "sha256": "048967637d3bd0e7f429d564ad1b9da0d070b49d0ca81e2404a9a4584b66f118"
+    },
+    "catalogs/us-equities/foundation-memory.json": {
+      "bytes": 80204,
+      "sha256": "26510ab3cc3e6d6be21758ff1c1b0132542cfc16e2595169df4472005e001e5d"
+    },
+    "catalogs/us-equities/hosting-source-review.json": {
+      "bytes": 13801,
+      "sha256": "36973af4a3aee223db652540e86a8708b100143b47413a0032c7b093b42c63f1"
+    },
+    "catalogs/us-equities/runtime-target.json": {
+      "bytes": 29756,
+      "sha256": "bd318252b220d2e611fa9baa21031359f0fbb8d07e1a7bb6a65f67c9cb02eb41"
+    },
+    "catalogs/us-equities/star-audit.json": {
+      "bytes": 643988,
+      "sha256": "79c2dbb6370292ffc22ecbdff31cf5285b279efa28484c9772cdb4b391a5fe88"
+    },
+    "docs/acceptance-evidence-policy.md": {
+      "bytes": 6112,
+      "sha256": "1a7ce4aa3e05986f72d417f76ee7ae4f34dadee922156dc379ea26e3f625cce1"
+    },
+    "docs/automation-upgrade-evidence.json": {
+      "bytes": 10044,
+      "sha256": "afe31d3eec6b14f69721a810f8719d3326154c9f2e2fadedeb5e292bb92ca7df"
+    },
+    "docs/candidate-quality-review-20260921.md": {
+      "bytes": 11603,
+      "sha256": "f38e43c404dd39a421267941ce6a162968334b4db0996f2af81db972a3297bd8"
+    },
+    "docs/dashboard-gap-resolution.md": {
+      "bytes": 2962,
+      "sha256": "a28617634c8c6fd7bc866810328f7658aa84ea375c571bbc7b8b9365b9cd4602"
+    },
+    "docs/decisions/2026-10-05-typesafe-sdk-transport.md": {
+      "bytes": 9226,
+      "sha256": "d197ab297186fe55e6c83624c78a06ead264e00d66a7fe2d5e62cfc1b653dbd6"
+    },
+    "docs/decisions/2026-10-11-layer-resolution-protocol.md": {
+      "bytes": 10622,
+      "sha256": "010e39f2a915cc1ea1e163d56cb0f8cbfbd9cedb14a9fd7f78b2defd24648c58"
+    },
+    "docs/decisions/2026-10-11-starred-finalization.md": {
+      "bytes": 12766,
+      "sha256": "65d339790291609f8aeebf302ffe56cac5a27434b43db904e4831e03646431cb"
+    },
+    "docs/decisions/2026-10-15-jev-scored-contract-corrections.md": {
+      "bytes": 3859,
+      "sha256": "d4f80209a55e2f27ac426a0a070fc6257a4a38c864ccc10099d46d4739e9d737"
+    },
+    "docs/decisions/2026-10-15-jev-trading-harness-build.md": {
+      "bytes": 8484,
+      "sha256": "cbf1ff9120d3aa1e5687b53240896ecb54dccf6782eef833590851a4ddfc78fd"
+    },
+    "docs/foundation-closure-20260921.md": {
+      "bytes": 19475,
+      "sha256": "6c9b8acd56ea82ddd2841b3e7f638ee9d980bb648b519e116f5771f8a5ea0e4b"
+    },
+    "docs/foundation-convergence-20260921.md": {
+      "bytes": 7028,
+      "sha256": "2a8fe0a5f1bc9008d322a9199cec5c9750ab0d141c755852bb68cfad2d3a71d3"
+    },
+    "docs/foundation-rd-readiness.md": {
+      "bytes": 10019,
+      "sha256": "b4fdad6fb9a5c4f8db6046ea2b784583747c633bd63dfb8b37ccd7eeaf54e33a"
+    },
+    "docs/full-stack-convergence.md": {
+      "bytes": 11546,
+      "sha256": "57e95de9a4376d2f211858928d13413118ed12620d563f0c5544e0f4a444514e"
+    },
+    "docs/github-automation.md": {
+      "bytes": 106136,
+      "sha256": "493052e05ac60606d3a0be4e6d3d9f83c02b40463c2c98e80508e793f560c5fc"
+    },
+    "docs/hf-memory-model-qualification.md": {
+      "bytes": 7017,
+      "sha256": "beb6b7b165fce95ce5f501b39ab226089bb3aa5d73a46d2f21d8083ae47756e5"
+    },
+    "docs/memory-landscape-maintenance.md": {
+      "bytes": 19928,
+      "sha256": "c0f50770c3118c0b5e62e01a3c12516aee7c051639904ad44da5c091a8ae6403"
+    },
+    "docs/native-memory-rag-lifecycle.md": {
+      "bytes": 18641,
+      "sha256": "f344de2a27114e9d36bc18036fe7cec4829c771d7b79230e6a603b96538c0b2c"
+    },
+    "docs/native-skill-practice-20260921.md": {
+      "bytes": 10597,
+      "sha256": "2acc1dc060996d3e2abd734053142ce7fce17ca9b604d8f8a8456058d01e6544"
+    },
+    "docs/native-telemetry-resolution.md": {
+      "bytes": 5499,
+      "sha256": "3ba6612f7eb83a47de8ca959eae57efcb36de3e3d8bff0ff4d5a61dc59de55c1"
+    },
+    "docs/portable-userspace-install-20260921.md": {
+      "bytes": 8842,
+      "sha256": "2bab62c10c38469dfe5b7a44aedc9af92d8d12effebc7784d908a5c3df3f4771"
+    },
+    "docs/promptfoo-upstream-retrieval.md": {
+      "bytes": 5247,
+      "sha256": "af73fafcc415e7917ed254b18ec38b5207c34592d7291c4a383c052ba38d5f72"
+    },
+    "docs/token-native-saturation.md": {
+      "bytes": 11221,
+      "sha256": "3aebda839dcce15004f41c1744c3c7dd1b6e57373169447a09ab7e3d607280f7"
+    },
+    "docs/token-practice.md": {
+      "bytes": 65882,
+      "sha256": "1d10996d3dd7f2d2d5ccabf98b125232e582cca628180bdd0a2a7eb2f67e3f44"
+    },
+    "evidence/artifacts/foundation-rd-20260921/qmd-comparison.json": {
+      "bytes": 3338,
+      "sha256": "0c0216ddb2a4bf29c42eea18126602b4f4fdef6e6bb957759fd1bc31e18c3653"
+    },
+    "evidence/artifacts/landscape-sweep-20260923/anthropics-claude-code-action.json": {
+      "bytes": 3133,
+      "sha256": "3def2204893bc2df60d65a50ef5a9d2d2494d8a9c3bbf56f53ce85a6bb35d257"
+    },
+    "evidence/artifacts/landscape-sweep-20260923/betterleaks-betterleaks.json": {
+      "bytes": 2039,
+      "sha256": "c01632833de3bd4700416f250eab5d1a18cfad84add3fcba4382a895956c7e24"
+    },
+    "evidence/artifacts/landscape-sweep-20260923/datalab-to-marker.json": {
+      "bytes": 2278,
+      "sha256": "c283eb9a8c254f61311d7640ae8ecc59d1873bddd55b65d6f54f3d7c98d303fd"
+    },
+    "evidence/artifacts/landscape-sweep-20260923/exa-labs-exa-mcp-server.json": {
+      "bytes": 1543,
+      "sha256": "ee102a697e91aecef91e6170cbe3d8071dee81328eab0b44af08f3aa6776407a"
+    },
+    "evidence/artifacts/landscape-sweep-20260923/grafana-tempo.json": {
+      "bytes": 1810,
+      "sha256": "35fa627ba09194e9b2dd119963f46373e38ea90b6ce71a86ce34a8acd552f176"
+    },
+    "evidence/artifacts/landscape-sweep-20260923/lightgbm-org-lightgbm.json": {
+      "bytes": 1862,
+      "sha256": "770faea1a967a524e5060c5d6ef34d3b2963b972d0d751d90d98729a2ff883d4"
+    },
+    "evidence/artifacts/landscape-sweep-20260923/microsoft-rd-agent.json": {
+      "bytes": 2121,
+      "sha256": "d99c0ee451e3128a13a744fa3c1121f9cf5d58dcfe15f0f23dc6737b6c64086f"
+    },
+    "evidence/artifacts/landscape-sweep-20260923/ollama-ollama.json": {
+      "bytes": 1563,
+      "sha256": "a21bc0b12ec95c1b8631852be2f4e1d6088114c05e51f53f2394d4952444b504"
+    },
+    "evidence/artifacts/landscape-sweep-20260923/opendatalab-mineru.json": {
+      "bytes": 1877,
+      "sha256": "76e52c9ecae5e87f8006ee8e2b85117fbd2b611b25a633a8ab1c8d0124838d0b"
+    },
+    "evidence/artifacts/landscape-sweep-20260923/paddlepaddle-paddleocr.json": {
+      "bytes": 1846,
+      "sha256": "3571f9400d931202581a357fba4172100a40311af86bed8829946f6fc17be3ea"
+    },
+    "evidence/artifacts/landscape-sweep-20260923/trufflesecurity-trufflehog.json": {
+      "bytes": 2174,
+      "sha256": "3c66c6ba6d3ab26c5dd0dc8bd75c7fc42417f5333268fd37b3ef7656f4c5c973"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/anthropics-claude-code.json": {
+      "bytes": 1864,
+      "sha256": "87598b45ebbe955e41535a79747faff5058c2f7fe31f8d469ae79ce1c01d56c9"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/anthropics-financial-services.json": {
+      "bytes": 2154,
+      "sha256": "85126fcbf6d4bd0e4800cdedb9910e5755966dfd61ffb407dcac3a0e92bcce4d"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/apify-mcpc.json": {
+      "bytes": 2276,
+      "sha256": "4054f45221759e13c8dcd08b6fe7561de94e9774a8a58da6820fb59a7b7d4594"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/ataraxy-labs-sem.json": {
+      "bytes": 2318,
+      "sha256": "d5941508b47482eaa2ecac477e93b94f3c6ed097b5b1a46357a6f70da28d61b3"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/bashtage-linearmodels.json": {
+      "bytes": 1843,
+      "sha256": "047223b1f8f225f912cd541fe821eba08448143e2cc28627d2d50a7eb21fd83b"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/betterleaks-betterleaks.json": {
+      "bytes": 1947,
+      "sha256": "59de51f632996cc9c3b193d333c6777f08725525e92833c69d28c21718122991"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/boostsecurityio-poutine.json": {
+      "bytes": 2126,
+      "sha256": "b7a8c930f024e9abf3b7ff817ba25707c7dbcd387fa010c5954231b04248cff2"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/boxed-mutmut.json": {
+      "bytes": 1531,
+      "sha256": "d4b79b9e4d85efce4303e721b6d035b1fd00bd4ddfaed83dfb9983ef60ccc44d"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/chainguard-dev-malcontent.json": {
+      "bytes": 1964,
+      "sha256": "ad7b412b8b646fdf49aa9441599b027e301e527f9e5f5f89a9a0ddda7c855526"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/chdb-io-chdb.json": {
+      "bytes": 2183,
+      "sha256": "4e92ce3295c989edaf370600226b35b26e79538c3c5367b4d51ee28d1a449c31"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/cisco-ai-defense-skill-scanner.json": {
+      "bytes": 2105,
+      "sha256": "b7e30ea2ab39aeca408902141f7dc79a99c6ba9f8240f34327a14d719583abc8"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/cli-cli.json": {
+      "bytes": 1833,
+      "sha256": "491e55232c6eb364913236d392662066abf1e20f0705f0d151339921afe570e8"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/comet-ml-opik.json": {
+      "bytes": 2474,
+      "sha256": "872611fedd941de6fa54cf1188557a9de4fc9cf0da6bfe6143012c3f88bd4c4b"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/csingley-ibflex.json": {
+      "bytes": 1693,
+      "sha256": "040262547112d83f3e23a0240096f9e920c77f27e20dca3eb1897a526837f0da"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/dagucloud-dagu.json": {
+      "bytes": 2643,
+      "sha256": "00ca83374af469cce1678136f2dfca1f118ce9b67add9dd37ae6ef0deaf4a33f"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/databento-databento-python.json": {
+      "bytes": 1937,
+      "sha256": "e89c70a1c7ea934d981ac5d3c4cba299e1493c91dc91cceebfcc07dd59643cc4"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/datadog-guarddog.json": {
+      "bytes": 2335,
+      "sha256": "3f8a93e270e3723e35d09ca16bcb28c4f21c2913a8f8888e15255551fa1e7703"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/datadog-toto.json": {
+      "bytes": 1783,
+      "sha256": "654ceab55248869b5606b2aa3fa2657a13392536c5b972cd7ff41c5a170fb663"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/dfahrn-securities-master.json": {
+      "bytes": 2359,
+      "sha256": "dadc31ef2cc0901433569e649968f2df7d1a38f3cd9fcfb25a60a6fba01777ee"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/earendil-works-absurd.json": {
+      "bytes": 1659,
+      "sha256": "366a6b4e56d18e535033b2fa52e5eae38601e65c0c5091683adab2e14a5fe28f"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/embeddings-benchmark-mteb.json": {
+      "bytes": 1638,
+      "sha256": "2e124a621c15ecb25acc6f660e755a82de7638fdfcca1a533bbb11b9a90890e5"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/extrange-ibkr-docker.json": {
+      "bytes": 2174,
+      "sha256": "7ed25819ac58a4859dd2be4c9b46ac7d74feb5b740d7d842f407acc53efaa127"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/falk-brauer-kumo-nautilus-alpaca-adapter.json": {
+      "bytes": 2108,
+      "sha256": "cb47d11224e338fc6ddb5cdac1f286d9cf3bdb0a69ce36048ed6f8dc986221d9"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/flyteorg-flyte.json": {
+      "bytes": 1932,
+      "sha256": "5c9d931571fe56813777a1228e4641f61280b94678b43c2762efd1067aff9647"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/gitguardian-ggshield.json": {
+      "bytes": 1762,
+      "sha256": "cd0eed376404495b746ed098323f76ba185f6d514f7c03f772b9876630c71718"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/gnzsnz-ib-gateway-docker.json": {
+      "bytes": 1874,
+      "sha256": "2136c07b69eceaa1416d72e1c4071bb38f51a1b23e630db394b335d5ca996bcd"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/grafana-tempo.json": {
+      "bytes": 1954,
+      "sha256": "09119f1b1ddbd4e9204beaf7e99cee6ad36014a5b6019831fbfd037d7a71c692"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/hf-xingchen-agi-xing4-0-29b-a4b.json": {
+      "bytes": 2090,
+      "sha256": "e7daace45cc39d50c73fa16ea8e0081ced3cb61c3c31ef30ff8f88e1b17abd18"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/hydrosquall-tiingo-python.json": {
+      "bytes": 1709,
+      "sha256": "97c8ee1c956acad8af03b0b8974e5446210e75bd5a3c0cdeb3c6a3f3686e59e0"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/ib-api-reloaded-ib-async.json": {
+      "bytes": 2463,
+      "sha256": "6de22a003cb3556d7112d62bc3e925af09d95f5443962160202ed308df31d9f7"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/ibcalpha-ibc.json": {
+      "bytes": 2037,
+      "sha256": "c6434ce556e23fe4c66b7c8f980a61e81bcc1e61eb0fc85f1a6774ff4183a5e2"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/langchain-ai-langmem.json": {
+      "bytes": 1453,
+      "sha256": "c9093973d56cffc6314813d09eaa17d914b002163c2cc7fd1f83f206ba1b396b"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/lgai-research-exaone-forecast.json": {
+      "bytes": 1909,
+      "sha256": "f5824e00c7380907d4774ad72aa93142aee503e82a64d0bda46d0e07084bce6c"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/man-group-arcticdb.json": {
+      "bytes": 2190,
+      "sha256": "c7dd074ddea55095943ffc2c2c9e306d596221db85f8c85b6c55a74b0fe7bdb8"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/massive-com-client-python.json": {
+      "bytes": 1934,
+      "sha256": "bf316958696e0f31989e1c92837e4c025255e139cfd0ac2a5ee52f5badc134c7"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/microsoft-pg-durable.json": {
+      "bytes": 1871,
+      "sha256": "da4bf4c27ee6a12ae49cf6df6f8f35767eeaaed75ea5c446fa295f52ddd7bfb4"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/modelcontextprotocol-conformance.json": {
+      "bytes": 1660,
+      "sha256": "91cdf8611bc0348979cc7ced8df49ddc351f0010906724b020e71a77b9611714"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/mongodb-kingfisher.json": {
+      "bytes": 1827,
+      "sha256": "24c8ef5ccbbc76dc0d02f36fcfb6df7e6ed1dbd5020a1ce27f53cd6f2b845a67"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/nautechsystems-nautilus-ibapi.json": {
+      "bytes": 1666,
+      "sha256": "1f02abc68caaccc981eb13dce7fd76073c6905ff6da9178105b369fcb482677f"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/nautechsystems-nautilus-trader.json": {
+      "bytes": 1692,
+      "sha256": "ea1a6a31a15d5dbbce3666cb25f8ee5d7059e4f97f23fa32682021167e76051d"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/nvidia-dcgm-exporter.json": {
+      "bytes": 2081,
+      "sha256": "8637290f0278befb4ada7fd88c943589878ea1a4d272100fc36471bedd48e7f6"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/ollama-ollama.json": {
+      "bytes": 1415,
+      "sha256": "1510b312dd7e795aef76665c7cf91135d93eed5f653f03941fb6babbdff13304"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/oxen-ai-oxen.json": {
+      "bytes": 1833,
+      "sha256": "97654b6b20266879b7f207cf2bcaca2dfc5d6260832f1a2aacdeea07204a5086"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/praetorian-inc-noseyparker.json": {
+      "bytes": 1685,
+      "sha256": "44221b4791eab238a9e4282c97ff4f4d56f35f8c7abf59f7886fbf512fbe243e"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/pypi-pypi-attestations.json": {
+      "bytes": 1729,
+      "sha256": "e0493cf74a988d66cb1b1130de89d1598d4f838ad7f17936ea4612bf377ebac1"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/restic-rest-server.json": {
+      "bytes": 1882,
+      "sha256": "1668732618e86ee6f0b3fdb7db369c226fea643a7605ae5ff4244473c899bc24"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/returns.json": {
+      "bytes": 3114964,
+      "sha256": "ea7e8ed285639a247df91d0c64d9378e080bc820170e9fc773434488397f4600"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/shiyu-coder-kronos.json": {
+      "bytes": 2138,
+      "sha256": "cafc4a005db518f0be31fc68a8067bf983529692d8e0c94bb04814268c6904fd"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/sixty-north-cosmic-ray.json": {
+      "bytes": 1462,
+      "sha256": "27fe3e333629610b7529001c73c75423bdb369c3704da089e9f23ad99a5ec942"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/slsa-framework-slsa-verifier.json": {
+      "bytes": 2204,
+      "sha256": "bdfecbc4f1f1b5d43b3f0570f1dd110c2557fedc93540c41eeda185bda63107e"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/temporalio-temporal.json": {
+      "bytes": 1999,
+      "sha256": "36f2c3b2d8ccd6f64848be5cd72bfc98e88501b5309ac110107274859497f772"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/traceloop-openllmetry.json": {
+      "bytes": 1969,
+      "sha256": "76b0cd0dfd2fb297dca3e4d7f91fb5968cae618096ae66c746b1af0ce324568a"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/ukgovernmentbeis-inspect-ai.json": {
+      "bytes": 1717,
+      "sha256": "a63f5e70ec1cae645a8ebd0dc42af0c7cd6ff5d63b8b6776bc56409162691503"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/utkuozdemir-nvidia-gpu-exporter.json": {
+      "bytes": 1799,
+      "sha256": "507a25c54a215d7c4cd2847e73ebf1206aa03f021ff9e73ed9ec567a6756e2ea"
+    },
+    "evidence/artifacts/landscape-sweep-20260926/wboayue-rust-ibapi.json": {
+      "bytes": 2072,
+      "sha256": "3657cf1d8a5119864a59bcf7a595af831ac832728840bd5a83db73db6f80aba0"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/abhigyanpatwari-gitnexus.json": {
+      "bytes": 1661,
+      "sha256": "3d511c2784e38f98b0fcc1d49474f2caf66a2e74bfd1d81080443f8b7f3abe1f"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/adbar-trafilatura.json": {
+      "bytes": 2233,
+      "sha256": "c88a931a329499a9ef702703fb51841275375ac8b8e4b1e9e3c828b2bef04f6a"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/agentproto-ts.json": {
+      "bytes": 2601,
+      "sha256": "26fde660fcca6ba0434939322fc3240b1fefd4edde9ce1999b6143be0bc5b9d9"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/anthropics-claude-plugins-official.json": {
+      "bytes": 1818,
+      "sha256": "9c1594ba4e535870385cef9f73aa9af1b80aa170a124006318827474c3bc5d0c"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/arabold-docs-mcp-server.json": {
+      "bytes": 2121,
+      "sha256": "746b524ee3706d68134ffd34bd3ca7e9fcbb505c1f4e11289e4267c1b828c2f9"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/ataraxy-labs-sem.json": {
+      "bytes": 2318,
+      "sha256": "e5e4dae7dc9b850a0c5291b60b7fed785bde6dc2895db8dbe773d3a71cfca77d"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/betterleaks-betterleaks.json": {
+      "bytes": 1920,
+      "sha256": "8597ad91135017b0f9ee73dd4a416c4f5caaae93a607323f742fba4700df36f1"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/boostsecurityio-poutine.json": {
+      "bytes": 2126,
+      "sha256": "24193903078471b7270cd744bc9cc539823c132947c21351e3e3258df89846dd"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/boxlite-ai-boxlite.json": {
+      "bytes": 2013,
+      "sha256": "65fdd1c168640ee5c01125fbd32d255150a586be63e66c2079ace5c93b89b9d8"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/conductor-oss-conductor.json": {
+      "bytes": 1971,
+      "sha256": "1b52f328964d4755ee8bbbb0dda1a5824b46ac1d0582e8f513c9a8535aabcf63"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/dagucloud-dagu.json": {
+      "bytes": 2643,
+      "sha256": "3bfe5693e766f1452fccd0fee1a797aa13e3903d08b34f216db5de41ac54624a"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/docling-project-docling.json": {
+      "bytes": 2393,
+      "sha256": "59fd1ec7d6920fe378fa94db54a4bf1210289b6ee24fad67a89cfe1a5f6b7c80"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/gitguardian-ggshield.json": {
+      "bytes": 1762,
+      "sha256": "5d296677a99108323868916d0152e90464321c31febb6832bb91ab760e2e7556"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/github-copilot-sdk.json": {
+      "bytes": 1681,
+      "sha256": "6764e80e51e578a900ccdf89e89117b3becf86bcbca8084a59080d0873e29089"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/kjanat-actionlint.json": {
+      "bytes": 2047,
+      "sha256": "b2dbe5cb1db5f7508cefabc0fee9000cac980ea7e972c85372fe92def643ff1d"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/lightonai-next-plaid.json": {
+      "bytes": 1599,
+      "sha256": "b25e01be4b89964d6ccc9a85192e3cf784bdaf4598ac5d76540c57afb20b7124"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/lockedinlabs-ai-agent-console.json": {
+      "bytes": 2071,
+      "sha256": "807e1f1bc837f55c9a11f2ac8a7315f04f755744b8cc6e44d683f199ff6e20de"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/mattpocock-skills.json": {
+      "bytes": 1672,
+      "sha256": "7a5192a17a8f1274c2cf1a23e804a213d029445870d4d11e00d543a1a7d0ea91"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/mempalace-mempalace.json": {
+      "bytes": 2123,
+      "sha256": "6e69e9ff6d4f792950b2b1daf5fd07bc119ab32c4ab4ca79a83e30221e633bda"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/mibayy-token-savior.json": {
+      "bytes": 1774,
+      "sha256": "ce7d1937a1c0801555736936bdacf1fe95274aa94bfbb4fabd9bddb9ef08fad1"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/microsoft-pg-durable.json": {
+      "bytes": 1871,
+      "sha256": "ab6b3db1cdc6796353e41880b14e8e35b4f30cf7c92bfb0e851ed0581cd507ca"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/minishlab-semble.json": {
+      "bytes": 2013,
+      "sha256": "4f56924e9dbc70eac1733ab55ee1abe2ae884f08136bff27c1abecbb7596140c"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/ojuschugh1-sqz.json": {
+      "bytes": 2099,
+      "sha256": "ca4896e3d1cbbf1a288f676e34ca9794354b47a674aadd751c94e98de13e2b7e"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/ollama-ollama.json": {
+      "bytes": 1406,
+      "sha256": "999f71b8445d004bea6cc74428a8793b88fadc345f1df2a573f51474bc9b8867"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/openai-codex.json": {
+      "bytes": 1618,
+      "sha256": "dea5f06f98b77d18513a4640ced7798e7ded75bfdf5d7eabdcfbf509e3642ef1"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/opendatalab-mineru.json": {
+      "bytes": 2425,
+      "sha256": "10d1bfb8b8faa9d5a6d7408f0bf1200666cb8e823af69a2efd886d790391652e"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/paritok-official-paritok-4b-v1.json": {
+      "bytes": 2471,
+      "sha256": "2d7b7d94b3b932881d127664d163b9607a44c8e057860988032a85d35ec6a992"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/praetorian-inc-noseyparker.json": {
+      "bytes": 1685,
+      "sha256": "9f59f643e801499b801e995a608e4700a3f902ba2bdf1e775e1e5d1152a17ad9"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/restatedev-restate.json": {
+      "bytes": 1943,
+      "sha256": "91832b9b85b8791f1aaf4861b67eb6b81f4a9e7dab0204d4cfd542b149f2c7a6"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/returns.json": {
+      "bytes": 2378440,
+      "sha256": "2f93067652c0f1e8e4f3d726895d2017eafef018412e47e9bc9b48e7ef931a9c"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/rhysd-actionlint.json": {
+      "bytes": 1870,
+      "sha256": "8d6e7c74f742d64ca1d9ddca4da6f2700ef3f24822ba64e34920363222453cf9"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/rohitg00-agentmemory.json": {
+      "bytes": 2510,
+      "sha256": "bc88c1018fe292fa96c823602bf2bcbcfdfc8a2314fd3646acce4b54607b84e0"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/superradcompany-microsandbox.json": {
+      "bytes": 2220,
+      "sha256": "cb934e53579c13aa0ce94b0bc123692d8c18e326cf30a13704dced1dde4d0d4c"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/tigerless-labs-agent-memory.json": {
+      "bytes": 2563,
+      "sha256": "efb233c0b4c7a8031ede2baa6c66edf0e3aaeebc4b4923e984d88e06a43bc8b1"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/ukgovernmentbeis-inspect-ai.json": {
+      "bytes": 1717,
+      "sha256": "b03b6e0b4f0a49beefbd917e0f290b165898503dbbad51ab0aa8fcff46bdb8a5"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/vectifyai-pageindex.json": {
+      "bytes": 2465,
+      "sha256": "ec4602d1db36727ebe977ab48f6f7e8f3adb174b3dd248fe2562ec99f6087f6e"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/vectorize-io-hindsight.json": {
+      "bytes": 1888,
+      "sha256": "34da4a04ff22b523dc62b8d7968cf25f873c9d599e32949baecd4f3f4391eceb"
+    },
+    "evidence/artifacts/landscape-sweep-20260929/vshulcz-deja-vu.json": {
+      "bytes": 2160,
+      "sha256": "1ecffbbd16d616fe5a3728d23cf16824fd84579c55544c4fc131086486b628d1"
+    },
+    "evidence/artifacts/landscape-sweep-20261009-pine/arose26-pinescript-langium.json": {
+      "bytes": 1941,
+      "sha256": "b70eed9caf7988665c6a79a1731ec536882ba37479560b8852320b043ad02680"
+    },
+    "evidence/artifacts/landscape-sweep-20261009-pine/elbakramer-pynescript.json": {
+      "bytes": 1667,
+      "sha256": "2854b27c93951eba97cdc3390a9be9998e5968c53a85c80f648b934c5ef16cfa"
+    },
+    "evidence/artifacts/landscape-sweep-20261009-pine/folknor-pine-oracle.json": {
+      "bytes": 2217,
+      "sha256": "644ad3cd5bdcc4fda990de2a9270e8ef5f210f2a3efbae17355d344d9511bc51"
+    },
+    "evidence/artifacts/landscape-sweep-20261009-pine/luxalgo-pinets.json": {
+      "bytes": 1777,
+      "sha256": "4a3ff379c088dfe4c4fa9970735c9a822cc951bc93bae003422c727ca1568904"
+    },
+    "evidence/artifacts/landscape-sweep-20261009-pine/pineforge-4pass-pineforge-codegen-oss.json": {
+      "bytes": 2259,
+      "sha256": "6cea6e67ea0284eae4f0e46fcc853d8a8950ad38559522ce83f3eeb7a47a0db8"
+    },
+    "evidence/artifacts/landscape-sweep-20261009-pine/pynesys-pynecore.json": {
+      "bytes": 2204,
+      "sha256": "6a36d6cf7b86f16007f74e16bb9b6eb795fb26b576b8449441aad4168e5b8137"
+    },
+    "evidence/artifacts/landscape-sweep-20261009-pine/returns.json": {
+      "bytes": 253490,
+      "sha256": "8b91d1acc81d71d8a911916cd1869a4d0a5742f95bb529c76d321c9793e2f961"
+    },
+    "evidence/artifacts/landscape-sweep-20261009-pine/s7cret-backtest-engine.json": {
+      "bytes": 1623,
+      "sha256": "b49a2055540b21e281f5a8ee58ae422b10a86ac00895a511c9f22f72ad767567"
+    },
+    "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-code-navigation-20260922.json": {
+      "bytes": 7867,
+      "sha256": "6b6f28b6b9e9ebaed145b8a954a4283d6ff2af0bf08cce340ceb61914a7c6c7b"
+    },
+    "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-document-retrieval-20260922.json": {
+      "bytes": 6568,
+      "sha256": "3fa8f2e48f935f65c3f0e26b516b04cf07b9de1933d6c43a1b464f50129d53c7"
+    },
+    "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-instructions-skills-20260922.json": {
+      "bytes": 8286,
+      "sha256": "7f5bf390f10197cdd55cdc4b4f7c5ce9c7399523bd608cedb03733cd086a8a5e"
+    },
+    "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-observation-inference-20260922.json": {
+      "bytes": 8766,
+      "sha256": "cf40e53a81ac24f912681b8e163d0e78594591ee5ad944aa621c166878b0a989"
+    },
+    "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-token-efficiency-20260922.json": {
+      "bytes": 8809,
+      "sha256": "8dba265d88f12e5e3673cdb0a914e55a3d8fe9afcbc4d90a7ff703eb03966c7a"
+    },
+    "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-web-research-20260922.json": {
+      "bytes": 8095,
+      "sha256": "ea4202c13a72477e02ae9f0101f2b57b90a71ac5fd4269ccd916bd265ebee530"
+    },
+    "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-workers-20260922.json": {
+      "bytes": 7938,
+      "sha256": "87e5e823efa81870bfea7b9594f637f777427e6a633fc714936d3a3d3060c253"
+    },
+    "evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-data-quality-orchestration-20260922.json": {
+      "bytes": 7866,
+      "sha256": "576502af80bf28355bff483eb372623d03df1bb7ab7116ff8b9f0756c151c5ac"
+    },
+    "evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-evaluation-experiments-20260922.json": {
+      "bytes": 7698,
+      "sha256": "258368007cbffdd166e281e99568a660f7c49622c1072c61b71ece33766973cd"
+    },
+    "evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-execution-broker-20260922.json": {
+      "bytes": 10128,
+      "sha256": "7999f224e199e3cba5f3bd23ddd013556c3204f154a5a3abcc0b0d1b8b0453b7"
+    },
+    "evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-identity-provenance-20260922.json": {
+      "bytes": 6981,
+      "sha256": "f517d516fc7f6c5f12ea2aafbfceefd523a4d180b1b4ed19565fe29f25d6057d"
+    },
+    "evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-observability-hosting-20260922.json": {
+      "bytes": 11256,
+      "sha256": "55abedca7d7eeae00a66c8958db98015f3cf3092c8a3992b09c390974295b694"
+    },
+    "evidence/artifacts/memory-landscape-20260921/sources.json": {
+      "bytes": 5245,
+      "sha256": "90fc6c4489de1ec4b4c33b13c27c2e3fb84798a78695b6b2d5858cbd280f69fc"
+    },
+    "evidence/artifacts/memory-stack-20260925/README.md": {
+      "bytes": 10909,
+      "sha256": "889cabc39af850db4c228089aa089e738e23182d6793b0beffb3fd0c60727567"
+    },
+    "evidence/artifacts/memory-stack-20260925/convergence.json": {
+      "bytes": 140717,
+      "sha256": "48b3ae02c01eb71569599292e164a921fed0a3fc750e566259ef9f395471c0ed"
+    },
+    "evidence/artifacts/stars-jev-manifest-routing-20261015/historical-undecided.json": {
+      "bytes": 1958,
+      "sha256": "9793ebf0ebe91b892df1375ff380694b051078f2402d2ebb8a56bdcf5c02635a"
+    },
+    "evidence/artifacts/stars-jev-manifest-routing-20261015/public-starred.refreshed.json": {
+      "bytes": 772758,
+      "sha256": "7b9d607eecdf6157cd35624024d2a805a53d77702f3d3d3982d492bee23f67c7"
+    },
+    "evidence/artifacts/stars-jev-manifest-routing-20261015/upstream-sources.json": {
+      "bytes": 5025,
+      "sha256": "86ff08efa0c1ac5f7d955ae4c23d832659be545348214527913c5bab2b6e2c0e"
+    },
+    "evidence/artifacts/stars-jev-manifest-routing-20261015/upstream/apollo-11.README.md": {
+      "bytes": 6093,
+      "sha256": "51742a8bfc44fd5bc5b32776ebfe11a1d009e55611c35feb4b61ca1fc8d5e7fe"
+    },
+    "evidence/artifacts/stars-jev-manifest-routing-20261015/upstream/artcraft.README.md": {
+      "bytes": 249,
+      "sha256": "fdee41b8e2603512751f0379b19de91d6413ddfaaf4343131b6b7edc662a06a0"
+    },
+    "evidence/artifacts/stars-jev-manifest-routing-20261015/upstream/awesome-jev-projects.README.md": {
+      "bytes": 573524,
+      "sha256": "6ca97fb01e01fe4a35ce3972ab2dc46dce65d108840cfc46567344d8f15de194"
+    },
+    "evidence/artifacts/stars-jev-manifest-routing-20261015/upstream/billion-context.README.md": {
+      "bytes": 56255,
+      "sha256": "fd570896cb885c849c3bca971a94f0846df946dbd866166d2a9a2e84eab188f7"
+    },
+    "evidence/artifacts/stars-jev-manifest-routing-20261015/upstream/flutter.README.md": {
+      "bytes": 6946,
+      "sha256": "4bc9b330ef1c690f06adb0f90c25018c980977ad47d25d88efca11f45e91930a"
+    },
+    "evidence/artifacts/stars-jev-manifest-routing-20261015/upstream/jev-trader.README.md": {
+      "bytes": 5726,
+      "sha256": "409bdc2ee95316d33059dca0b2c1d621f6b96dcba7eb475237fe1ab541de2b1a"
+    },
+    "evidence/artifacts/stars-jev-manifest-routing-20261015/upstream/openrig.README.md": {
+      "bytes": 38081,
+      "sha256": "4c0862e6e39e2d39721e626b71748f9790bb634618db946323b9378a8e812d7d"
+    },
+    "evidence/artifacts/stars-jev-manifest-routing-20261015/upstream/rea.README.md": {
+      "bytes": 22177,
+      "sha256": "6856a965e4b6cc3ca7b4211c7cfa63fc59e6aa638b30bdb38c46a5eb3e4cfdb2"
+    },
+    "evidence/artifacts/stars-jev-manifest-routing-20261015/upstream/tester-e2e.README.md": {
+      "bytes": 5333,
+      "sha256": "cec51074048b5bb8cffa6982a3264f05c6e4d772cd4de6bbbc4710b4b7deeacd"
+    },
+    "evidence/artifacts/stars-jev-manifest-routing-20261015/upstream/typesafe-skills.README.md": {
+      "bytes": 1336,
+      "sha256": "799ce1dc39dc1cb98977f930610bf693a26d1a78e5912b860014447d97390282"
+    },
+    "evidence/receipts/foundation-native-20260920.json": {
+      "bytes": 25017,
+      "sha256": "92a1f872fc730bac644b6eac27ace8e3102b13829273c79945e408a0075f89a5"
+    },
+    "evidence/receipts/native-nautilus-ci-20260920.json": {
+      "bytes": 13303,
+      "sha256": "a0d17cc26dff8ef3c4ed076060b1e98f68cf946e5319509454c2b4cf7c56a108"
+    },
+    "evidence/receipts/native-nautilus-v2-20260920.json": {
+      "bytes": 37084,
+      "sha256": "bed404eb64cd07724b935c96b03938ffb414f862183811a1b9c26a6c60d3c443"
+    },
+    "scripts/build_ecosystem.py": {
+      "bytes": 89670,
+      "sha256": "acf147bdaf28b0dd837ff4cc776cb897fdc6edfc203966f7d51c3f18798344df"
+    },
+    "scripts/public_starred.py": {
+      "bytes": 24443,
+      "sha256": "6aaab9105ce2552efc83a86974c32e25fe7a810539a4ec3aa3486b2bccc92aa9"
+    },
+    "tools/starred-maintenance/README.md": {
+      "bytes": 12493,
+      "sha256": "60178e2b8dd7ff17a7b42fb81f41ce1790699dc8a3423e107c53e80337f7f2f2"
+    }
+  },
+  "kind": "reverified_resolution_protocol",
+  "preserved_old_worktree": {
+    "action": "untouched in old worktree; fresh branch/worktree from origin/main",
+    "sha256": [
+      "40cdf0eb029358d92eb709519f2be40f5d4a86e764699da932838e1778116638",
+      "9e3719797163c22d28bb02e81df694a6c7c6f895956dea835f0185ca2ef60648"
+    ],
+    "tracked_diff": "none",
+    "untracked": "blobs/ contains two DocVortex middle JSON artifacts; not a tracked #1016 change; original producer provenance unverified"
+  },
+  "step_1": {
+    "canonical_count": 373,
+    "canonical_retrieved_at": "2026-10-10T16:32:37Z",
+    "final_layers_at_base": 0,
+    "finalization_count": 373,
+    "legacy_audit_checked_at": "2026-09-19",
+    "legacy_audit_count": 357,
+    "out_of_scope": 58,
+    "wave_registry": {
+      "generated_by": "tools/sota-convergence/build_verdicts.py",
+      "schema_version": 1,
+      "scope": "One entry per layer-verdict wave document. Every wave older than the newest is frozen: build_verdicts.py --check verifies it byte for byte against this sha256 and against the ledger rows whose lanes.sealed_base names it, and --write refuses to rewrite it.",
+      "waves": [
+        {
+          "checked_at": "2026-09-22",
+          "manifest": "catalogs/sota-convergence/manifest-20260922.json",
+          "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+          "run_id": "20260922",
+          "sha256": "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de"
+        }
+      ]
+    }
+  },
+  "step_2": {
+    "completed_sweeps": [
+      "landscape-sweep-20260923",
+      "landscape-sweep-20260926",
+      "landscape-sweep-20260929",
+      "landscape-sweep-20261009-pine"
+    ],
+    "layer_contexts": "evidence/artifacts/stars-jev-manifest-routing-20261015/layer-contexts.json",
+    "missing_return_is_adjudication": false,
+    "omission_clears_survivor": false,
+    "pending_unappended_sweep": "None supplied; revisit on retained newer evidence"
+  },
+  "step_3": {
+    "delta": "New/legacy-undecided star identities plus all pinned Jev directory project identities and the public TypeSafe organization projection; no re-adjudication of prior scope, no installs or runtime selection",
+    "summary": {
+      "dispositions": {
+        "OUT-OF-SCOPE": 155,
+        "already adjudicated": 23,
+        "seed for next sweep": 730
+      },
+      "final_layers_at_base": 0,
+      "jev_directory_plus_org_identities": 875,
+      "jev_project_entries": 864,
+      "legacy_now_classified": 26,
+      "legacy_undecided": 33,
+      "manifest_labels": {
+        "GAP": 905,
+        "TRIAL": 3
+      },
+      "new_stars": 7,
+      "routing_rows": 908,
+      "unstarred": 0
+    }
+  }
+}
