@@ -1,0 +1,915 @@
+{
+  "schema_version": 1,
+  "trial": "mq-native-single-pr-20261015",
+  "recorded_at": "2026-10-15T15:42:54.242314+00:00",
+  "status": "closed_after_startup_failure_and_administrative_termination",
+  "repository": "native-agent-stack/native-agent-stack",
+  "pull_request": 1164,
+  "head_sha": "df71a6c231ed9cc87609041cc5f8c720d33355e1",
+  "base_ref": "refs/heads/mq-trial-20261015",
+  "base_sha": "e1b5288051292cfdb19e2ca64349e4da35ba0970",
+  "evidence_classes": {
+    "native_api": "native_proven",
+    "native_git_conflict": "local_integration",
+    "workflow_selection_and_policy_semantics": "source_review",
+    "operator_act_times": "reported native execution, independently checked by resulting API state"
+  },
+  "admission": {
+    "preflight_at": "2026-10-15T15:15:04.232325+00:00",
+    "head_and_base_verified": true,
+    "approved_rule_matches": true,
+    "queue_was_empty": true,
+    "required_checks": [
+      {
+        "name": "validate",
+        "id": 116500067939,
+        "app_id": 15368,
+        "status": "completed",
+        "conclusion": "success",
+        "completed_at": "2026-10-15T15:14:06Z",
+        "details_url": "https://github.com/native-agent-stack/native-agent-stack/actions/runs/38748105773/job/116500067939"
+      },
+      {
+        "name": "token-report",
+        "id": 116466995281,
+        "app_id": 15368,
+        "status": "completed",
+        "conclusion": "success",
+        "completed_at": "2026-10-15T14:12:27Z",
+        "details_url": "https://github.com/native-agent-stack/native-agent-stack/actions/runs/38748105704/job/116466995281"
+      },
+      {
+        "name": "secret-scan",
+        "id": 116466996190,
+        "app_id": 15368,
+        "status": "completed",
+        "conclusion": "success",
+        "completed_at": "2026-10-15T14:32:36Z",
+        "details_url": "https://github.com/native-agent-stack/native-agent-stack/actions/runs/38748105773/job/116466996190"
+      },
+      {
+        "name": "dependency-review",
+        "id": 116467015499,
+        "app_id": 15368,
+        "status": "completed",
+        "conclusion": "success",
+        "completed_at": "2026-10-15T14:20:40Z",
+        "details_url": "https://github.com/native-agent-stack/native-agent-stack/actions/runs/38748105423/job/116467015499"
+      },
+      {
+        "name": "osv-scanner",
+        "id": 116466993959,
+        "app_id": 15368,
+        "status": "completed",
+        "conclusion": "success",
+        "completed_at": "2026-10-15T14:08:33Z",
+        "details_url": "https://github.com/native-agent-stack/native-agent-stack/actions/runs/38748105509/job/116466993959"
+      },
+      {
+        "name": "verdict-review-gate",
+        "id": 116497835556,
+        "app_id": 15368,
+        "status": "completed",
+        "conclusion": "success",
+        "completed_at": "2026-10-15T15:07:42Z",
+        "details_url": "https://github.com/native-agent-stack/native-agent-stack/actions/runs/38756967476/job/116497835556"
+      },
+      {
+        "name": "sota-sources",
+        "id": 116497834970,
+        "app_id": 15368,
+        "status": "completed",
+        "conclusion": "success",
+        "completed_at": "2026-10-15T15:04:40Z",
+        "details_url": "https://github.com/native-agent-stack/native-agent-stack/actions/runs/38756967476/job/116497834970"
+      }
+    ],
+    "lg_change_id": "888ea2a5a43f4e97c08ae8d0ff9a4693136a73bc",
+    "rebase_change_id_preserved": true,
+    "review_and_cue": "Both independent reads and adjudication were complete; the command center reported both head-bound verdict files passed lg_verdict_file_ok and explicitly authorized enqueue after CI. Private review contents and digests are not published.",
+    "cue_time": "2026-10-15T15:02Z",
+    "cue_time_precision": "minute",
+    "expected_head_oid": "df71a6c231ed9cc87609041cc5f8c720d33355e1",
+    "bypass_used": false
+  },
+  "enqueue": {
+    "requested_at": "2026-10-15T15:15:35.727933+00:00",
+    "received_at": "2026-10-15T15:15:37.316034+00:00",
+    "exit_code": 0,
+    "response": {
+      "data": {
+        "enqueuePullRequest": {
+          "mergeQueueEntry": {
+            "id": "MQE_lQDOUg_LrM8AAAABIouWEs4ABLKMzgNJNPc",
+            "state": "QUEUED",
+            "position": 1,
+            "enqueuedAt": "2026-10-15T15:15:36Z",
+            "baseCommit": null,
+            "headCommit": null,
+            "pullRequest": {
+              "number": 1164,
+              "headRefOid": "df71a6c231ed9cc87609041cc5f8c720d33355e1",
+              "baseRefName": "mq-trial-20261015"
+            }
+          }
+        }
+      }
+    }
+  },
+  "event_observation": {
+    "event": "merge_group",
+    "group_sha": "b630c5168445503fdf5bfdf44d9a7f18b31c6d2b",
+    "group_ref": "refs/heads/gh-readonly-queue/mq-trial-20261015/pr-1164-e1b5288051292cfdb19e2ca64349e4da35ba0970",
+    "base_sha": "e1b5288051292cfdb19e2ca64349e4da35ba0970",
+    "base_ref": "refs/heads/mq-trial-20261015",
+    "first_queue_build_observed_at": "2026-10-15T15:15:59.108279+00:00",
+    "queue_state_observed": "AWAITING_CHECKS",
+    "raw_webhook_payload_retained": false,
+    "payload_fields_class": "API projection from genuine merge_group Actions runs, native queue entry and Git ref readbacks; not a raw webhook or synthetic event",
+    "activity_type_raw_value": null,
+    "activity_type_source_boundary": "The frozen workflows subscribe to checks_requested; raw GITHUB_EVENT_PATH was not uploaded.",
+    "workflow_runs": [
+      {
+        "run_id": 38758783592,
+        "attempt": 1,
+        "path": ".github/workflows/validate.yml",
+        "event": "merge_group",
+        "head_sha": "b630c5168445503fdf5bfdf44d9a7f18b31c6d2b",
+        "head_branch": "gh-readonly-queue/mq-trial-20261015/pr-1164-e1b5288051292cfdb19e2ca64349e4da35ba0970",
+        "created_at": "2026-10-15T15:15:55Z",
+        "updated_at": "2026-10-15T15:15:55Z",
+        "status": "completed",
+        "conclusion": "startup_failure",
+        "url": "https://github.com/native-agent-stack/native-agent-stack/actions/runs/38758783592",
+        "jobs_total": 0,
+        "artifacts_total": 0,
+        "check_suite": {
+          "id": 105034859428,
+          "app_id": 15368,
+          "app_slug": "github-actions",
+          "head_sha": "b630c5168445503fdf5bfdf44d9a7f18b31c6d2b",
+          "status": "completed",
+          "conclusion": "startup_failure",
+          "latest_check_runs_count": 0
+        }
+      },
+      {
+        "run_id": 38758785123,
+        "attempt": 1,
+        "path": ".github/workflows/token-report.yml",
+        "event": "merge_group",
+        "head_sha": "b630c5168445503fdf5bfdf44d9a7f18b31c6d2b",
+        "head_branch": "gh-readonly-queue/mq-trial-20261015/pr-1164-e1b5288051292cfdb19e2ca64349e4da35ba0970",
+        "created_at": "2026-10-15T15:15:56Z",
+        "updated_at": "2026-10-15T15:15:56Z",
+        "status": "completed",
+        "conclusion": "startup_failure",
+        "url": "https://github.com/native-agent-stack/native-agent-stack/actions/runs/38758785123",
+        "jobs_total": 0,
+        "artifacts_total": 0,
+        "check_suite": {
+          "id": 105034864819,
+          "app_id": 15368,
+          "app_slug": "github-actions",
+          "head_sha": "b630c5168445503fdf5bfdf44d9a7f18b31c6d2b",
+          "status": "completed",
+          "conclusion": "startup_failure",
+          "latest_check_runs_count": 0
+        }
+      },
+      {
+        "run_id": 38758788988,
+        "attempt": 1,
+        "path": ".github/workflows/dependency-review.yml",
+        "event": "merge_group",
+        "head_sha": "b630c5168445503fdf5bfdf44d9a7f18b31c6d2b",
+        "head_branch": "gh-readonly-queue/mq-trial-20261015/pr-1164-e1b5288051292cfdb19e2ca64349e4da35ba0970",
+        "created_at": "2026-10-15T15:15:57Z",
+        "updated_at": "2026-10-15T15:15:57Z",
+        "status": "completed",
+        "conclusion": "startup_failure",
+        "url": "https://github.com/native-agent-stack/native-agent-stack/actions/runs/38758788988",
+        "jobs_total": 0,
+        "artifacts_total": 0,
+        "check_suite": {
+          "id": 105034875998,
+          "app_id": 15368,
+          "app_slug": "github-actions",
+          "head_sha": "b630c5168445503fdf5bfdf44d9a7f18b31c6d2b",
+          "status": "completed",
+          "conclusion": "startup_failure",
+          "latest_check_runs_count": 0
+        }
+      },
+      {
+        "run_id": 38758787069,
+        "attempt": 1,
+        "path": ".github/workflows/pr-metadata.yml",
+        "event": "merge_group",
+        "head_sha": "b630c5168445503fdf5bfdf44d9a7f18b31c6d2b",
+        "head_branch": "gh-readonly-queue/mq-trial-20261015/pr-1164-e1b5288051292cfdb19e2ca64349e4da35ba0970",
+        "created_at": "2026-10-15T15:15:57Z",
+        "updated_at": "2026-10-15T15:15:57Z",
+        "status": "completed",
+        "conclusion": "startup_failure",
+        "url": "https://github.com/native-agent-stack/native-agent-stack/actions/runs/38758787069",
+        "jobs_total": 0,
+        "artifacts_total": 0,
+        "check_suite": {
+          "id": 105034870298,
+          "app_id": 15368,
+          "app_slug": "github-actions",
+          "head_sha": "b630c5168445503fdf5bfdf44d9a7f18b31c6d2b",
+          "status": "completed",
+          "conclusion": "startup_failure",
+          "latest_check_runs_count": 0
+        }
+      },
+      {
+        "run_id": 38758791317,
+        "attempt": 1,
+        "path": ".github/workflows/security-scan.yml",
+        "event": "merge_group",
+        "head_sha": "b630c5168445503fdf5bfdf44d9a7f18b31c6d2b",
+        "head_branch": "gh-readonly-queue/mq-trial-20261015/pr-1164-e1b5288051292cfdb19e2ca64349e4da35ba0970",
+        "created_at": "2026-10-15T15:15:58Z",
+        "updated_at": "2026-10-15T15:15:58Z",
+        "status": "completed",
+        "conclusion": "startup_failure",
+        "url": "https://github.com/native-agent-stack/native-agent-stack/actions/runs/38758791317",
+        "jobs_total": 0,
+        "artifacts_total": 0,
+        "check_suite": {
+          "id": 105034882060,
+          "app_id": 15368,
+          "app_slug": "github-actions",
+          "head_sha": "b630c5168445503fdf5bfdf44d9a7f18b31c6d2b",
+          "status": "completed",
+          "conclusion": "startup_failure",
+          "latest_check_runs_count": 0
+        }
+      }
+    ],
+    "annotations": [
+      {
+        "run_id": 38758783592,
+        "url": "https://github.com/native-agent-stack/native-agent-stack/actions/runs/38758783592",
+        "http_status": 200,
+        "annotations": [
+          "Event 'merge_group' is not allowed to trigger Actions workflows. Workflow file: '.github/workflows/validate.yml'."
+        ]
+      },
+      {
+        "run_id": 38758785123,
+        "url": "https://github.com/native-agent-stack/native-agent-stack/actions/runs/38758785123",
+        "http_status": 200,
+        "annotations": [
+          "Event 'merge_group' is not allowed to trigger Actions workflows. Workflow file: '.github/workflows/token-report.yml'."
+        ]
+      },
+      {
+        "run_id": 38758788988,
+        "url": "https://github.com/native-agent-stack/native-agent-stack/actions/runs/38758788988",
+        "http_status": 200,
+        "annotations": [
+          "Event 'merge_group' is not allowed to trigger Actions workflows. Workflow file: '.github/workflows/dependency-review.yml'."
+        ]
+      },
+      {
+        "run_id": 38758787069,
+        "url": "https://github.com/native-agent-stack/native-agent-stack/actions/runs/38758787069",
+        "http_status": 200,
+        "annotations": []
+      },
+      {
+        "run_id": 38758791317,
+        "url": "https://github.com/native-agent-stack/native-agent-stack/actions/runs/38758791317",
+        "http_status": 200,
+        "annotations": [
+          "Event 'merge_group' is not allowed to trigger Actions workflows. Workflow file: '.github/workflows/security-scan.yml'."
+        ]
+      }
+    ]
+  },
+  "group_contexts": [
+    {
+      "name": "validate",
+      "expected_app_id": 15368,
+      "check_run": "not_reported",
+      "workflow_run_id": 38758783592,
+      "workflow_suite_app_id": 15368,
+      "workflow_conclusion": "startup_failure",
+      "jobs_started": 0
+    },
+    {
+      "name": "secret-scan",
+      "expected_app_id": 15368,
+      "check_run": "not_reported",
+      "workflow_run_id": 38758783592,
+      "workflow_suite_app_id": 15368,
+      "workflow_conclusion": "startup_failure",
+      "jobs_started": 0
+    },
+    {
+      "name": "token-report",
+      "expected_app_id": 15368,
+      "check_run": "not_reported",
+      "workflow_run_id": 38758785123,
+      "workflow_suite_app_id": 15368,
+      "workflow_conclusion": "startup_failure",
+      "jobs_started": 0
+    },
+    {
+      "name": "dependency-review",
+      "expected_app_id": 15368,
+      "check_run": "not_reported",
+      "workflow_run_id": 38758788988,
+      "workflow_suite_app_id": 15368,
+      "workflow_conclusion": "startup_failure",
+      "jobs_started": 0
+    },
+    {
+      "name": "osv-scanner",
+      "expected_app_id": 15368,
+      "check_run": "not_reported",
+      "workflow_run_id": 38758791317,
+      "workflow_suite_app_id": 15368,
+      "workflow_conclusion": "startup_failure",
+      "jobs_started": 0
+    },
+    {
+      "name": "verdict-review-gate",
+      "expected_app_id": 15368,
+      "check_run": "not_reported",
+      "workflow_run_id": 38758787069,
+      "workflow_suite_app_id": 15368,
+      "workflow_conclusion": "startup_failure",
+      "jobs_started": 0
+    },
+    {
+      "name": "sota-sources",
+      "expected_app_id": 15368,
+      "check_run": "not_reported",
+      "workflow_run_id": 38758787069,
+      "workflow_suite_app_id": 15368,
+      "workflow_conclusion": "startup_failure",
+      "jobs_started": 0
+    }
+  ],
+  "group_check_runs_total": 0,
+  "workflow_source_selection": {
+    "selection": "event-associated group commit/ref",
+    "runtime_checkout_observed": false,
+    "sources": [
+      "github/docs@0226a2d78cf2be40ee3d769ec5661638461af0cc:data/reusables/actions/about-triggers.md:14-18",
+      "github/docs@0226a2d78cf2be40ee3d769ec5661638461af0cc:content/actions/reference/workflows-and-actions/events-that-trigger-workflows.md:374-398",
+      "github/docs@0226a2d78cf2be40ee3d769ec5661638461af0cc:content/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue.md:84,93"
+    ],
+    "boundary": "Documented workflow selection is group-head based. Zero jobs started, so a runtime checkout or step execution was not measured."
+  },
+  "startup_cause": {
+    "observed_at": "2026-10-15T15:26:02.937862+00:00",
+    "policy": {
+      "id": 6423,
+      "name": "Allowed workflow events",
+      "source_type": "Repository",
+      "enforcement": "active",
+      "conditions": {
+        "workflow_path": {
+          "include": [
+            "~ALL"
+          ],
+          "exclude": []
+        }
+      },
+      "rules": [
+        {
+          "type": "restrict_action_events",
+          "parameters": {
+            "allowed_events": [
+              "push",
+              "pull_request",
+              "schedule",
+              "workflow_dispatch"
+            ]
+          }
+        }
+      ],
+      "created_at": "2026-10-04T09:47:23.646-04:00",
+      "updated_at": "2026-10-04T09:47:34.426-04:00"
+    },
+    "commands": [
+      "gh api repos/native-agent-stack/native-agent-stack/actions/policies?has_parents=true",
+      "gh api repos/native-agent-stack/native-agent-stack/actions/policies/6423"
+    ],
+    "source": "github/docs@0226a2d78cf2be40ee3d769ec5661638461af0cc:content/actions/concepts/about-actions-policies.md:19,32-35",
+    "finding": "Active repository policy 6423 covers every workflow and omits merge_group from its allowed events. It directly explains the event-denial annotations.",
+    "preflight_correction": "General Actions permissions were checked, but the separate Actions Policies surface was missed before enqueue. The governing documentation already existed at the original source pin.",
+    "organization_policy": "UNCHECKED: HTTP 403; no added scope or re-authentication",
+    "policy_changed": false
+  },
+  "codeql": {
+    "default_setup_before": {
+      "state": "configured",
+      "query_suite": "default",
+      "languages": [
+        "actions",
+        "csharp",
+        "go",
+        "javascript",
+        "javascript-typescript",
+        "python",
+        "rust",
+        "typescript"
+      ],
+      "runner_type": "standard",
+      "schedule": "weekly"
+    },
+    "group_protection_exception": {
+      "source": "github/docs@0226a2d78cf2be40ee3d769ec5661638461af0cc:content/code-security/concepts/code-scanning/merge-protection.md:27,37-38",
+      "applies_to_merge_queue_groups": false,
+      "consequence": "Rule presence does not enforce group analysis or alert thresholds."
+    },
+    "observations": [
+      {
+        "observed_at": "2026-10-15T15:18:09.183841+00:00",
+        "read_exit_code": 0,
+        "analysis_count": 0,
+        "analyses": []
+      },
+      {
+        "observed_at": "2026-10-15T15:22:09.413396+00:00",
+        "read_exit_code": 0,
+        "analysis_count": 0,
+        "analyses": []
+      },
+      {
+        "observed_at": "2026-10-15T15:33:53.288485+00:00",
+        "read_exit_code": 0,
+        "analysis_count": 0,
+        "analyses": []
+      },
+      {
+        "observed_at": "2026-10-15T15:40:47.844293+00:00",
+        "http_status": 200,
+        "read_exit_code": 0,
+        "analysis_count": 0,
+        "analyses": []
+      }
+    ],
+    "query": "gh api repos/native-agent-stack/native-agent-stack/code-scanning/analyses?ref=refs%2Fheads%2Fgh-readonly-queue%2Fmq-trial-20261015%2Fpr-1164-e1b5288051292cfdb19e2ca64349e4da35ba0970&tool_name=CodeQL&per_page=100",
+    "interpretation": "No CodeQL analysis was observed for the exact group ref at these times, during and after this policy-blocked trial. This does not prove permanent absence or qualify default setup after a policy correction."
+  },
+  "protected_base_probe": {
+    "commit": "692c9463740746138177665612693995596d075e",
+    "local_merge_tree": {
+      "command": "git merge-tree --write-tree --name-only --no-messages 692c9463740746138177665612693995596d075e df71a6c231ed9cc87609041cc5f8c720d33355e1",
+      "exit_code": 1,
+      "conflicts": [
+        "manifests/evidence.json"
+      ]
+    },
+    "push_attempts_reported": 1,
+    "operator_reported_refusal_at": "2026-10-15T15:20:59Z",
+    "cli_error_reported": "GH013",
+    "native_rule_suite_command": "gh api repos/native-agent-stack/native-agent-stack/rulesets/rule-suites/4544322016",
+    "native_rule_suite": {
+      "id": 4544322016,
+      "before_sha": "e1b5288051292cfdb19e2ca64349e4da35ba0970",
+      "after_sha": "692c9463740746138177665612693995596d075e",
+      "ref": "refs/heads/mq-trial-20261015",
+      "pushed_at": "2026-10-15T11:20:58-04:00",
+      "result": "fail",
+      "evaluation_result": null,
+      "rule_evaluations": [
+        {
+          "rule_source": {
+            "type": "secret_scanning"
+          },
+          "enforcement": "active",
+          "result": "pass",
+          "rule_type": "secret_scanning"
+        },
+        {
+          "rule_source": {
+            "type": "ruleset",
+            "id": 25165370,
+            "name": "mq-trial-20261015"
+          },
+          "enforcement": "active",
+          "result": "fail",
+          "rule_type": "merge_queue",
+          "details": "Changes must be made through the merge queue"
+        },
+        {
+          "rule_source": {
+            "type": "ruleset",
+            "id": 25165370,
+            "name": "mq-trial-20261015"
+          },
+          "enforcement": "active",
+          "result": "fail",
+          "rule_type": "required_status_checks",
+          "details": "7 of 7 required status checks are expected."
+        },
+        {
+          "rule_source": {
+            "type": "ruleset",
+            "id": 25165370,
+            "name": "mq-trial-20261015"
+          },
+          "enforcement": "active",
+          "result": "pass",
+          "rule_type": "code_scanning"
+        }
+      ]
+    },
+    "interpretation": "The protected-base push was refused. No hosted registry conflict or conflict-driven queue ejection was induced. The code_scanning pass in this push rule-suite is not a group analysis."
+  },
+  "outcome": {
+    "kind": "administrative termination after workflow startup failure",
+    "merged": false,
+    "merge_commit_sha": null,
+    "natural_queue_ejection_observed": false,
+    "natural_queue_ejection_reason": null,
+    "pr_closed_at": "2026-10-15T15:30:55Z",
+    "enqueue_to_pr_close_seconds": 919,
+    "timing_label": "enqueue to administrative PR closure, not enqueue-to-merge or natural ejection",
+    "timeline_observed_at": "2026-10-15T15:42:54.242314+00:00",
+    "timeline_query": "query { repository(owner:\"native-agent-stack\",name:\"native-agent-stack\") { pullRequest(number:1164) { state mergedAt headRefOid mergeQueueEntry {id state} timelineItems(last:20,itemTypes:[ADDED_TO_MERGE_QUEUE_EVENT,REMOVED_FROM_MERGE_QUEUE_EVENT,MERGED_EVENT,CLOSED_EVENT]) { pageInfo {hasPreviousPage} nodes {__typename ... on AddedToMergeQueueEvent {createdAt} ... on RemovedFromMergeQueueEvent {createdAt reason beforeCommit {oid}} ... on MergedEvent {createdAt commit {oid}} ... on ClosedEvent {createdAt}} } } } }",
+    "timeline": {
+      "state": "CLOSED",
+      "mergedAt": null,
+      "headRefOid": "df71a6c231ed9cc87609041cc5f8c720d33355e1",
+      "mergeQueueEntry": null,
+      "timelineItems": {
+        "pageInfo": {
+          "hasPreviousPage": false
+        },
+        "nodes": [
+          {
+            "__typename": "AddedToMergeQueueEvent",
+            "createdAt": "2026-10-15T15:15:37Z"
+          },
+          {
+            "__typename": "ClosedEvent",
+            "createdAt": "2026-10-15T15:30:56Z"
+          }
+        ]
+      }
+    }
+  },
+  "inverse": {
+    "performed_by": "command center",
+    "rule_delete_reported": {
+      "id": 25165370,
+      "at": "2026-10-15T15:30:54Z",
+      "http_status": 204
+    },
+    "base_delete_reported": {
+      "ref": "refs/heads/mq-trial-20261015",
+      "at": "2026-10-15T15:30:55Z",
+      "http_status": 204
+    },
+    "first_verified_at": "2026-10-15T15:35:50.124208+00:00",
+    "rule_get_status": 404,
+    "base_get_status": 404,
+    "residual_ref_observation": {
+      "observed_at": "2026-10-15T15:35:50.124208+00:00",
+      "refs": [
+        {
+          "ref": "refs/heads/gh-readonly-queue/mq-trial-20261015/pr-1164-e1b5288051292cfdb19e2ca64349e4da35ba0970",
+          "sha": "b630c5168445503fdf5bfdf44d9a7f18b31c6d2b"
+        }
+      ]
+    },
+    "residual_delete_reported": {
+      "at": "2026-10-15T15:37:37Z",
+      "http_status": 204
+    },
+    "final_readback": {
+      "observed_at": "2026-10-15T15:40:47.844293+00:00",
+      "readbacks": {
+        "group_ref": {
+          "command": "gh api repos/native-agent-stack/native-agent-stack/git/ref/heads/gh-readonly-queue/mq-trial-20261015/pr-1164-e1b5288051292cfdb19e2ca64349e4da35ba0970",
+          "http_status": 404,
+          "exit_code": 1,
+          "response": {
+            "message": "Not Found",
+            "documentation_url": "https://docs.github.com/rest/git/refs#get-a-reference",
+            "status": "404"
+          }
+        },
+        "all_queue_refs": {
+          "command": "gh api repos/native-agent-stack/native-agent-stack/git/matching-refs/heads/gh-readonly-queue/",
+          "http_status": 200,
+          "exit_code": 0,
+          "response": []
+        },
+        "trial_rule": {
+          "command": "gh api repos/native-agent-stack/native-agent-stack/rulesets/25165370",
+          "http_status": 404,
+          "exit_code": 1,
+          "response": {
+            "message": "Not Found",
+            "documentation_url": "https://docs.github.com/rest/repos/rules#get-a-repository-ruleset",
+            "status": "404"
+          }
+        },
+        "trial_branch": {
+          "command": "gh api repos/native-agent-stack/native-agent-stack/git/ref/heads/mq-trial-20261015",
+          "http_status": 404,
+          "exit_code": 1,
+          "response": {
+            "message": "Not Found",
+            "documentation_url": "https://docs.github.com/rest/git/refs#get-a-reference",
+            "status": "404"
+          }
+        },
+        "codeql": {
+          "command": "gh api repos/native-agent-stack/native-agent-stack/code-scanning/analyses?ref=refs%2Fheads%2Fgh-readonly-queue%2Fmq-trial-20261015%2Fpr-1164-e1b5288051292cfdb19e2ca64349e4da35ba0970&tool_name=CodeQL&per_page=100",
+          "http_status": 200,
+          "exit_code": 0,
+          "response": []
+        }
+      },
+      "operator_reported_group_ref_delete_at": "2026-10-15T15:37:37Z",
+      "operator_reported_delete_status": 204
+    },
+    "cleanup_complete": true,
+    "main_rule_23739774_exactly_matches_pretrial_readback": true,
+    "remaining_rulesets": [
+      {
+        "id": 24132241,
+        "name": "Agent branches: no history rewrite",
+        "target": "branch",
+        "source_type": "Repository",
+        "source": "native-agent-stack/native-agent-stack",
+        "enforcement": "active"
+      },
+      {
+        "id": 23739774,
+        "name": "Native foundation required checks",
+        "target": "branch",
+        "source_type": "Repository",
+        "source": "native-agent-stack/native-agent-stack",
+        "enforcement": "active"
+      },
+      {
+        "id": 23859358,
+        "name": "Native foundation tag creation",
+        "target": "tag",
+        "source_type": "Repository",
+        "source": "native-agent-stack/native-agent-stack",
+        "enforcement": "active"
+      },
+      {
+        "id": 23829417,
+        "name": "Native foundation tag protection",
+        "target": "tag",
+        "source_type": "Repository",
+        "source": "native-agent-stack/native-agent-stack",
+        "enforcement": "active"
+      }
+    ],
+    "all_four_rulesets_unchanged_reported_by_operator": true,
+    "mutations_by_build_lane": false,
+    "main_rule_before": {
+      "id": 23739774,
+      "name": "Native foundation required checks",
+      "target": "branch",
+      "source_type": "Repository",
+      "source": "native-agent-stack/native-agent-stack",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "refs/heads/main"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "required_status_checks",
+          "parameters": {
+            "strict_required_status_checks_policy": false,
+            "do_not_enforce_on_create": false,
+            "required_status_checks": [
+              {
+                "context": "validate",
+                "integration_id": 15368
+              },
+              {
+                "context": "token-report",
+                "integration_id": 15368
+              },
+              {
+                "context": "secret-scan",
+                "integration_id": 15368
+              },
+              {
+                "context": "dependency-review",
+                "integration_id": 15368
+              },
+              {
+                "context": "osv-scanner",
+                "integration_id": 15368
+              },
+              {
+                "context": "verdict-review-gate",
+                "integration_id": 15368
+              },
+              {
+                "context": "sota-sources",
+                "integration_id": 15368
+              }
+            ]
+          }
+        },
+        {
+          "type": "deletion"
+        },
+        {
+          "type": "non_fast_forward"
+        },
+        {
+          "type": "required_linear_history"
+        },
+        {
+          "type": "pull_request",
+          "parameters": {
+            "required_approving_review_count": 0,
+            "dismiss_stale_reviews_on_push": true,
+            "required_reviewers": [],
+            "require_code_owner_review": false,
+            "dismissal_restriction": {
+              "enabled": false,
+              "allowed_actors": []
+            },
+            "require_last_push_approval": false,
+            "required_review_thread_resolution": true,
+            "require_extra_approval_for_unattributed_changes": true,
+            "allowed_merge_methods": [
+              "squash"
+            ]
+          }
+        },
+        {
+          "type": "code_scanning",
+          "parameters": {
+            "code_scanning_tools": [
+              {
+                "tool": "CodeQL",
+                "security_alerts_threshold": "high_or_higher",
+                "alerts_threshold": "errors"
+              }
+            ]
+          }
+        }
+      ],
+      "node_id": "RRS_lACqUmVwb3NpdG9yec5SD8uszgFqPX4",
+      "created_at": "2026-09-20T18:01:06.075-04:00",
+      "updated_at": "2026-10-04T21:42:03.690-04:00",
+      "bypass_actors": [],
+      "current_user_can_bypass": "never",
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/native-agent-stack/native-agent-stack/rulesets/23739774"
+        },
+        "html": {
+          "href": "https://github.com/native-agent-stack/native-agent-stack/rules/23739774"
+        }
+      }
+    },
+    "main_rule_before_observed_at": "2026-10-15T13:59:26.276047+00:00",
+    "main_rule_after": {
+      "id": 23739774,
+      "name": "Native foundation required checks",
+      "target": "branch",
+      "source_type": "Repository",
+      "source": "native-agent-stack/native-agent-stack",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "refs/heads/main"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "required_status_checks",
+          "parameters": {
+            "strict_required_status_checks_policy": false,
+            "do_not_enforce_on_create": false,
+            "required_status_checks": [
+              {
+                "context": "validate",
+                "integration_id": 15368
+              },
+              {
+                "context": "token-report",
+                "integration_id": 15368
+              },
+              {
+                "context": "secret-scan",
+                "integration_id": 15368
+              },
+              {
+                "context": "dependency-review",
+                "integration_id": 15368
+              },
+              {
+                "context": "osv-scanner",
+                "integration_id": 15368
+              },
+              {
+                "context": "verdict-review-gate",
+                "integration_id": 15368
+              },
+              {
+                "context": "sota-sources",
+                "integration_id": 15368
+              }
+            ]
+          }
+        },
+        {
+          "type": "deletion"
+        },
+        {
+          "type": "non_fast_forward"
+        },
+        {
+          "type": "required_linear_history"
+        },
+        {
+          "type": "pull_request",
+          "parameters": {
+            "required_approving_review_count": 0,
+            "dismiss_stale_reviews_on_push": true,
+            "required_reviewers": [],
+            "require_code_owner_review": false,
+            "dismissal_restriction": {
+              "enabled": false,
+              "allowed_actors": []
+            },
+            "require_last_push_approval": false,
+            "required_review_thread_resolution": true,
+            "require_extra_approval_for_unattributed_changes": true,
+            "allowed_merge_methods": [
+              "squash"
+            ]
+          }
+        },
+        {
+          "type": "code_scanning",
+          "parameters": {
+            "code_scanning_tools": [
+              {
+                "tool": "CodeQL",
+                "security_alerts_threshold": "high_or_higher",
+                "alerts_threshold": "errors"
+              }
+            ]
+          }
+        }
+      ],
+      "node_id": "RRS_lACqUmVwb3NpdG9yec5SD8uszgFqPX4",
+      "created_at": "2026-09-20T18:01:06.075-04:00",
+      "updated_at": "2026-10-04T21:42:03.690-04:00",
+      "bypass_actors": [],
+      "current_user_can_bypass": "never",
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/native-agent-stack/native-agent-stack/rulesets/23739774"
+        },
+        "html": {
+          "href": "https://github.com/native-agent-stack/native-agent-stack/rules/23739774"
+        }
+      }
+    }
+  },
+  "ordinary_lander_baseline": {
+    "pull_request": 1148,
+    "head_sha": "6028d29eb004b60cfbd729cfbd9ff3f5d75446fa",
+    "merge_commit_sha": "e1b5288051292cfdb19e2ca64349e4da35ba0970",
+    "merged_at": "2026-10-15T13:51:29Z",
+    "cue_time": null,
+    "lock_time": null
+  },
+  "adoption_prerequisites": [
+    "Separate reviewed security change: permit merge_group only for the gate workflow paths while preserving event restrictions elsewhere and accounting for policy layering; inspect effective actor/event policies before a fresh authorized trial.",
+    "Separate explicit group-level CodeQL policy: ruleset code-scanning protection exempts groups. Qualify the advanced-setup and required-status design, including processing completion, exact group identity and native alert thresholds, before main adoption."
+  ],
+  "limitations": [
+    "Seven required contexts were unreported on the group SHA; no group test, scanner or metadata job executed.",
+    "Five genuine event runs and their Actions app identity are observed, but no raw webhook payload or runner checkout was captured.",
+    "The organization policy remains unchecked; the directly observed repository restriction is sufficient to explain this failure.",
+    "No policy or workflow change, rerun, second queue entry, bypass, successful native queue merge, or population speed/ejection claim was made.",
+    "The root registry format remains legacy; independent-record behavior is a separate opt-in local reference implementation."
+  ],
+  "sealed_at": "2026-10-15T15:45:28Z"
+}

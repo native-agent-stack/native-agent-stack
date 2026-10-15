@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-15",
+  "evidence_class": "local_integration",
+  "fixture_class": "synthetic disposable Git repositories",
+  "source_revision_before": "39b3fcaf5bcb96c8a672fb6198972dffd3d9937a",
+  "after_source": "reference implementation in this PR; root remains legacy",
+  "git_version": "2.53.0",
+  "resource_scope": "systemd-run --user --scope -p CPUWeight=idle",
+  "merge_driver": "native default; global and system Git configuration disabled in fixtures",
+  "red_before_green": [
+    {
+      "test": "tests.test_evidence_manifest.EvidenceRegistrationMergeTests.test_independent_registrations_merge_without_touching_the_shared_seed",
+      "before_exit": 1,
+      "before_observation": "The real legacy register_file entry point updated the same files[] array on both branches. git merge-tree --write-tree returned 1 and named manifests/evidence.json as its only conflict.",
+      "after_observation": "The explicitly opted-in writer creates separate deterministic record files. Native merge-tree returns 0; the seed and authored metadata are unchanged and both exact hash/byte records are present."
+    },
+    {
+      "test": "tests.test_evidence_manifest.EvidenceRegistrationMergeTests.test_git_registration_validation_uses_the_recorded_hash_and_rejects_tampering",
+      "before_exit": 1,
+      "before_observation": "The legacy Git-tree reader rejected the registered fragment artifact as a required registration row missing.",
+      "after_observation": "The explicit record_fragments=True reference option accepts matching bytes, then rejects modified artifact bytes with SHA-256 mismatch at Git head. Default production callers remain on the legacy reader."
+    },
+    {
+      "test": "tests.test_evidence_manifest.EvidenceRegistrationMergeTests.test_an_enabled_seed_cannot_be_rewritten_to_restore_shared_file_registration",
+      "before_exit": 1,
+      "before_observation": "The deliberate shared-array rewrite was accepted; the regression failed because InvalidPublication was not raised.",
+      "after_observation": "The explicitly enabled historical validator rejects changes to the frozen files[] seed."
+    },
+    {
+      "test": "tests.test_evidence_manifest.EvidenceRegistrationMergeTests.test_checker_rejects_a_malformed_record_instead_of_checking_only_the_seed",
+      "before_exit": 1,
+      "before_observation": "The checker returned 0 after inspecting only the sorted seed, ignoring a bad fragment hash and boolean byte count; the regression failed.",
+      "after_observation": "The checker returns 1 for malformed fragment metadata."
+    }
+  ],
+  "green_command": "python3 -m unittest tests.test_evidence_manifest tests.test_registry_rows -q",
+  "green_exit": 0,
+  "green_tests": 43,
+  "green_skips": 0,
+  "green_seconds": 5.641,
+  "additional_boundaries": [
+    "Competing changes to the same evidence record retain a native conflict.",
+    "publication_review, unknown record fields and unknown top-level metadata survive assembly.",
+    "No marker retains byte-exact legacy register_file output and creates no fragment directory.",
+    "Tombstones cannot hide still-tracked evidence.",
+    "Rendering does not read artifact bytes, refresh expected hashes or rewrite source records.",
+    "Historical assembly does not borrow records from the current checkout.",
+    "Misnamed and duplicate records, duplicate JSON keys, filesystem/Git-tree symlinks, path escapes and recursive registry registration fail.",
+    "Prior fragment history retains registration intent for non-evidence files after a later row deletion."
+  ],
+  "not_measured": [
+    "Hosted merge-queue behavior of the proposed registry format.",
+    "Production reader/writer migration or root activation.",
+    "Population conflict or ejection rate, multi-entry throughput or stable CI speedup."
+  ]
+}

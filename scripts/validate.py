@@ -714,7 +714,7 @@ def validate(root: Path, *, today: date | None = None) -> dict[str, int]:
 
 
 def validate_registration_rows(root: Path, base_ref: str, *, before_ref: str | None = None,
-                               head_ref: str = "HEAD") -> None:
+                               head_ref: str = "HEAD", record_fragments: bool = False) -> None:
     """Enforce docs/lanes.md:119-126 on committed Git trees.
 
     A synchronize event's previous head preserves the PR's own new-file
@@ -722,7 +722,14 @@ def validate_registration_rows(root: Path, base_ref: str, *, before_ref: str | N
     GitHub's webhook-pull-request-synchronize schema requires before/after
     (github/rest-api-description@58b1e0c0). No private packet is an input.
     """
+    # Explicit reference-implementation option only. Production callers retain
+    # their raw registry contract until the separately reviewed reader migration.
     root = root.resolve()
+    if record_fragments:
+        try:
+            from . import evidence_manifest
+        except ImportError:
+            import evidence_manifest
     environment = {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
 
     def git(*arguments):
@@ -735,8 +742,11 @@ def validate_registration_rows(root: Path, base_ref: str, *, before_ref: str | N
 
     def rows(ref, *, historical=False):
         try:
-            document = json.loads(git("show", ref + ":manifests/evidence.json"),
-                                  object_pairs_hook=_json_without_duplicates)
+            if record_fragments:
+                document = evidence_manifest.load_at(root, ref, git=git)
+            else:
+                document = json.loads(git("show", ref + ":manifests/evidence.json"),
+                                      object_pairs_hook=_json_without_duplicates)
             records = document["files"]
             if not isinstance(records, list) or any(not isinstance(row, dict)
                     or not isinstance(row.get("path"), str) for row in records):
@@ -769,6 +779,18 @@ def validate_registration_rows(root: Path, base_ref: str, *, before_ref: str | N
             raise ValueError("not the exact Git root")
         base, head = revision(base_ref), revision(head_ref)
         baseline, current = rows(base, historical=True), rows(head)
+        if record_fragments:
+            try:
+                base_seed = json.loads(git("show", base + ":manifests/evidence.json"),
+                                       object_pairs_hook=_json_without_duplicates)
+            except (subprocess.CalledProcessError, ValueError):
+                base_seed = {}
+            if isinstance(base_seed, dict) and evidence_manifest.uses_records(base_seed):
+                head_seed = json.loads(git("show", head + ":manifests/evidence.json"),
+                                       object_pairs_hook=_json_without_duplicates)
+                if (not evidence_manifest.uses_records(head_seed)
+                        or head_seed.get("files") != base_seed.get("files")):
+                    raise InvalidPublication("frozen files[] seed changed: register file changes in per-path records")
         tracked = names("ls-tree", "-r", "--name-only", "-z", head)
         changed = names("diff", "--no-renames", "--diff-filter=AMT", "--name-only", "-z", base, head, "--")
         required = changed & baseline.keys()
@@ -781,8 +803,11 @@ def validate_registration_rows(root: Path, base_ref: str, *, before_ref: str | N
         for tip in sorted(history):
             old_base = git("merge-base", base, tip).decode().strip()
             previous_base = rows(old_base, historical=True)
+            registry_paths = ["manifests/evidence.json"]
+            if record_fragments:
+                registry_paths.append(evidence_manifest.RECORDS)
             commits = git("rev-list", "--full-history", tip, "^" + old_base,
-                          "--", "manifests/evidence.json").decode().splitlines()
+                          "--", *registry_paths).decode().splitlines()
             for commit in commits:
                 required |= {name for name, row in rows(commit, historical=True).items()
                              if row != previous_base.get(name) and name in tracked}

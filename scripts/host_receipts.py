@@ -713,8 +713,18 @@ def register_file(root: Path, relative_path: str) -> None:
     conflict-friendly inserts instead of always appending at the end."""
     evidence_path = safe_file(root, "manifests/evidence.json")
     evidence = json.loads(evidence_path.read_text(encoding="utf-8"), object_pairs_hook=unique_json)
+    try:
+        from . import evidence_manifest
+    except ImportError:
+        import evidence_manifest
     target = safe_file(root, relative_path)
     raw = target.read_bytes()
+    if evidence_manifest.uses_records(evidence):
+        current = evidence_manifest.load(root)
+        previous = next((row for row in current["files"] if row["path"] == relative_path), {})
+        record = {**previous, "path": relative_path, "sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)}
+        evidence_manifest.write_record(root, record)
+        return
     record = {"path": relative_path, "sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)}
     files = evidence.setdefault("files", [])
     for index, existing in enumerate(files):

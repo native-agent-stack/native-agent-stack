@@ -1,0 +1,4663 @@
+{
+  "schema_version": 1,
+  "status": "complete pinned literal inventory plus inspected indirect reader closure; activation is a separate PR",
+  "source_revision": "39b3fcaf5bcb96c8a672fb6198972dffd3d9937a",
+  "access_date": "2026-10-15",
+  "pr_base_delta": {
+    "revision": "e1b5288051292cfdb19e2ca64349e4da35ba0970",
+    "method": "Inspect changed runtime source files between source_revision and this PR base for the same registry references; retain the complete original inventory and updated locations below.",
+    "new_direct_reference_consumers": [],
+    "already_inventoried_changed_consumers": [
+      {"path": "scripts/component_matrix.py", "reference_lines": [269, 1405, 1408, 1409]},
+      {"path": "scripts/final_stack.py", "reference_lines": [19, 1430]},
+      {"path": "scripts/verdict_review_gate.py", "reference_lines": [18, 22, 195, 196, 550, 558, 561, 1046, 1057, 1166]},
+      {"path": "tools/sota-convergence/record_verdicts.py", "reference_lines": [520]}
+    ]
+  },
+  "root_format_changed": false,
+  "discovery": {
+    "command": "git grep -n -I -E 'evidence[.]json|register_file[(]|evidence_manifest' 39b3fcaf5bcb96c8a672fb6198972dffd3d9937a --",
+    "scope": "All tracked text at the pinned tree, including retained evidence and substring false positives. Raw content is not copied. Line numbers name that tree, not the later prototype delta.",
+    "reference_files": 503,
+    "matching_lines": 1568
+  },
+  "indirect_consumers": [
+    {
+      "path": "scripts/catalog_decisions.py",
+      "seam": "load(root, relative)",
+      "migration": "Common strict reader used by landscape, component_matrix and build_ecosystem; compose explicitly rather than silently changing every JSON read."
+    },
+    {
+      "path": "scripts/landscape.py",
+      "seam": "catalog_decisions.load import",
+      "migration": "Preserve sealed/receipt integrity through its delegated reader."
+    },
+    {
+      "path": "tools/north-star/build_readiness.py",
+      "seam": "Receipts.get/document and build readiness files[] hash join",
+      "migration": "Bind every fragment to confined bounded reads and retained source provenance, then assemble."
+    },
+    {
+      "path": "tools/local-pages/source_policy.py",
+      "seam": "Policy, ArchitectureReads and OverviewReads authorization",
+      "migration": "Explicitly authorize narrow registry metadata without broadening arbitrary body reads."
+    },
+    {
+      "path": "tools/local-pages/overview_data.py",
+      "seam": "overview_sources.json consumer",
+      "migration": "Retain exact source scope and complete projection provenance."
+    },
+    {
+      "path": "tools/local-pages/evidence_sources.py",
+      "seam": "native receipt projection helpers",
+      "migration": "Retain receipt identity and hash semantics after callers migrate."
+    },
+    {
+      "path": ".github/workflows/validate.yml",
+      "seam": "PR history retrieval and scripts/validate.py invocation",
+      "migration": "Fragment-aware historical validation must be explicitly enabled only after readers migrate; preserve all prior heads."
+    },
+    {
+      "path": "tools/local-pages/build_pages.py",
+      "seam": "architecture and overview module orchestration",
+      "migration": "Ensure caches and rebuilt pages consume the same complete projection."
+    }
+  ],
+  "references": [
+    {
+      "path": ".github/dependabot.yml",
+      "lines": [
+        14
+      ],
+      "category": "frozen_source_policy_comment"
+    },
+    {
+      "path": ".github/workflows/adoption-bootstrap.yml",
+      "lines": [
+        32,
+        119
+      ],
+      "category": "path_filter_and_test_selection"
+    },
+    {
+      "path": ".github/workflows/catalog-freshness.yml",
+      "lines": [
+        249,
+        367
+      ],
+      "category": "automated_writer_staging"
+    },
+    {
+      "path": "README.md",
+      "lines": [
+        291
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "adoption/manifest.json",
+      "lines": [
+        58
+      ],
+      "category": "registry_location_contract"
+    },
+    {
+      "path": "adoption/platforms/linux-wsl2-new-distro.md",
+      "lines": [
+        1239
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "adoption/update.md",
+      "lines": [
+        3,
+        86
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "blueprints/blind-catalog-convergence/experiment.json",
+      "lines": [
+        241
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "blueprints/convergence-practice/ci-security/README.md",
+      "lines": [
+        70
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-transport-recovery/README.md",
+      "lines": [
+        32
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-transport-recovery/audit.py",
+      "lines": [
+        26
+      ],
+      "category": "different_evidence_json_or_jsonl_file"
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-transport-recovery/experiment.json",
+      "lines": [
+        130,
+        169,
+        208
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-transport-recovery/test_transport_evidence.py",
+      "lines": [
+        20
+      ],
+      "category": "different_evidence_json_or_jsonl_file"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/lane/gold.py",
+      "lines": [
+        9
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/lane/t2.md",
+      "lines": [
+        1
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/README.md",
+      "lines": [
+        310
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/v4/README.md",
+      "lines": [
+        375
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/gate-reads-set-diff-20261004.json",
+      "lines": [
+        429,
+        949
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/owned-path-gate-fail-first.txt",
+      "lines": [
+        136,
+        140,
+        208,
+        268,
+        337,
+        391
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/phase1-commands.json",
+      "lines": [
+        161
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/phase1-followup-commands.json",
+      "lines": [
+        145
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/phase2-commands.json",
+      "lines": [
+        14,
+        537,
+        591
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/push-gate-fail-first.txt",
+      "lines": [
+        1456,
+        1837,
+        3374,
+        3884,
+        3892,
+        4277,
+        4404,
+        4433,
+        4485,
+        4768,
+        4772,
+        4891,
+        4915,
+        5028
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.review-opus.md",
+      "lines": [
+        9,
+        10,
+        60
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.review-sol-G1.json",
+      "lines": [
+        165,
+        236
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.review-sol-G1.prompt.txt",
+      "lines": [
+        18,
+        37
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.review-sol-G2.json",
+      "lines": [
+        135,
+        145
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.review-sol-G2.prompt.txt",
+      "lines": [
+        18,
+        37
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.txt",
+      "lines": [
+        507,
+        515,
+        519,
+        534,
+        540,
+        543,
+        544,
+        547,
+        549,
+        550
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-rubric-7.txt",
+      "lines": [
+        9
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.txt",
+      "lines": [
+        195
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/repair-round-commands.json",
+      "lines": [
+        17
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/round2-verification.md",
+      "lines": [
+        70
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/round3-verification.md",
+      "lines": [
+        5,
+        37,
+        734
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/research.md",
+      "lines": [
+        492,
+        493,
+        515
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "blueprints/runtime-workers/skills/research.md",
+      "lines": [
+        117,
+        186,
+        204
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "blueprints/runtime-workers/skills/validation.json",
+      "lines": [
+        205,
+        228,
+        238,
+        302,
+        312,
+        351,
+        429,
+        761
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "blueprints/token-native-focus/saturation-audit.json",
+      "lines": [
+        11
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "blueprints/trials-20260926/security-repair-sources.md",
+      "lines": [
+        56,
+        57
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "blueprints/trials-20260926/withdrawn-host-receipts-validate.txt",
+      "lines": [
+        2
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/receipts/xnys-primary-20261005/repair-round-2.json",
+      "lines": [
+        431,
+        548
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/receipts/xnys-primary-20261005/repair-round-3.json",
+      "lines": [
+        234,
+        237
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/README.md",
+      "lines": [
+        242
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/README.md",
+      "lines": [
+        255,
+        263,
+        286
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/preregistration.json",
+      "lines": [
+        64,
+        1019
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/repository-checks.json",
+      "lines": [
+        11,
+        150,
+        328,
+        378,
+        379,
+        380
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "blueprints/us-equities/hosting/backup/selected-files.txt",
+      "lines": [
+        3
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "blueprints/us-equities/hosting/backup/source.sha256",
+      "lines": [
+        3
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "blueprints/us-equities/mover-v3/data-pins.json",
+      "lines": [
+        35
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "blueprints/us-equities/mover-v3/protocol-core-draft.json",
+      "lines": [
+        925,
+        961
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "blueprints/us-equities/overnight-volume/README.md",
+      "lines": [
+        180
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "blueprints/us-equities/rnd-wave1-20261006/d6-class-review-20261006.json",
+      "lines": [
+        6649
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "blueprints/us-equities/rnd-wave1-20261006/deviations-20261006-2.json",
+      "lines": [
+        182
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "blueprints/us-equities/rnd-wave1-20261006/deviations-20261006-3.json",
+      "lines": [
+        49
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "blueprints/us-equities/routing/README.md",
+      "lines": [
+        17
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/README.md",
+      "lines": [
+        398
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "blueprints/us-equities/sim-capacity/experiment.json",
+      "lines": [
+        256
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "catalogs/convergence-practice/sources/starred-protected-20261011.json",
+      "lines": [
+        1040,
+        2466,
+        3806
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "catalogs/convergence-practice/starred-convergence-20261010.json",
+      "lines": [
+        1165,
+        17152
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "catalogs/foundation/README.md",
+      "lines": [
+        106
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "catalogs/foundation/automation.json",
+      "lines": [
+        284
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "catalogs/foundation/manifest.json",
+      "lines": [
+        13
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "catalogs/landscape/candidate-quality-review.json",
+      "lines": [
+        1287
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "catalogs/landscape/foundation.json",
+      "lines": [
+        3095
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "catalogs/landscape/gap-closeouts/README.md",
+      "lines": [
+        17,
+        23
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "catalogs/landscape/gap-resolution-20260922.json",
+      "lines": [
+        685,
+        719,
+        1063,
+        1064,
+        1067
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "catalogs/landscape/skills-lifecycle.json",
+      "lines": [
+        154
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "catalogs/north-star/readiness.json",
+      "lines": [
+        19255
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "catalogs/saturation/README.md",
+      "lines": [
+        80
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260923.json",
+      "lines": [
+        14707,
+        17167
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260929.json",
+      "lines": [
+        6366,
+        11659,
+        11661
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "catalogs/us-equities/README.md",
+      "lines": [
+        240,
+        241,
+        255,
+        258,
+        260,
+        263
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/contributing-evidence.md",
+      "lines": [
+        22,
+        245,
+        324,
+        515
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-09-22-actions-hardening-fix-round.md",
+      "lines": [
+        51,
+        148
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-09-22-codeql-first-analysis.md",
+      "lines": [
+        82,
+        83,
+        88
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-09-22-github-automation-closure.md",
+      "lines": [
+        393,
+        765,
+        1266,
+        1477,
+        1538,
+        1545,
+        1760
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-09-23-bot-pr-dispatch.md",
+      "lines": [
+        20
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-09-23-generated-explorer-sorted-manifest.md",
+      "lines": [
+        12,
+        20,
+        75,
+        94,
+        96,
+        106,
+        107,
+        145,
+        183,
+        187,
+        191,
+        192
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-09-25-codex-broker-reaper.md",
+      "lines": [
+        643,
+        649,
+        656,
+        674,
+        685,
+        693,
+        760,
+        764,
+        770,
+        783,
+        856,
+        868,
+        876,
+        958,
+        963,
+        967,
+        968,
+        1036,
+        1136,
+        1139,
+        1170
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-09-25-longmemeval-frozen-npm-lock.md",
+      "lines": [
+        42,
+        204,
+        273
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
+      "lines": [
+        14,
+        129
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-09-25-top-rule-sota-sources.md",
+      "lines": [
+        14,
+        49
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-09-26-codex-worker-lane.md",
+      "lines": [
+        1067
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-09-26-harness-rules-cleanup.md",
+      "lines": [
+        121
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-09-26-token-workflow-hardening.md",
+      "lines": [
+        43,
+        89
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-09-27-prompt-audit-resolution.md",
+      "lines": [
+        635
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-09-28-community-sweep.md",
+      "lines": [
+        622,
+        623
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
+      "lines": [
+        56
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-09-28-openhands-resolver-isolation.md",
+      "lines": [
+        513
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-09-28-terminal-experience.md",
+      "lines": [
+        12
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-09-28-top-rule-templates.md",
+      "lines": [
+        258
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-09-30-omniroute-rebuild.md",
+      "lines": [
+        17
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-09-30-rule-text-every-layer.md",
+      "lines": [
+        208
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
+      "lines": [
+        417
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
+      "lines": [
+        29,
+        707
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-03-compaction-window-ab-retirement.md",
+      "lines": [
+        44,
+        237,
+        274,
+        283,
+        302,
+        306,
+        310,
+        311,
+        312,
+        313,
+        336,
+        347,
+        350,
+        354,
+        355,
+        356,
+        357,
+        374
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-03-foundation-catalog-drift.md",
+      "lines": [
+        226
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-03-gpt-lane-omniroute-failover.md",
+      "lines": [
+        207,
+        314
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-03-macos-ci-scope.md",
+      "lines": [
+        55,
+        202,
+        352,
+        543,
+        823,
+        871,
+        882,
+        917,
+        1096,
+        1124,
+        1206,
+        1209
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-03-new-wsl-local-models.md",
+      "lines": [
+        294
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-03-omniroute-3851-pin.md",
+      "lines": [
+        276
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-03-pr561-token-lifecycle-retirement.md",
+      "lines": [
+        272
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-03-retire-gpt6-lane-compression-ab.md",
+      "lines": [
+        497
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-03-retire-pr-515-catalog-index.md",
+      "lines": [
+        117,
+        123
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-03-retire-pr320-loki-denominator-host-receipts.md",
+      "lines": [
+        238
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-03-suite-parallelism-trial-outcome.md",
+      "lines": [
+        14
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-03-sweep-gpt6-route-settlement.md",
+      "lines": [
+        5,
+        146
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g1-clients.md",
+      "lines": [
+        165
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g2-mcp-workers.md",
+      "lines": [
+        168
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g3-code-docs.md",
+      "lines": [
+        132
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md",
+      "lines": [
+        7
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g5-analytics-eval.md",
+      "lines": [
+        100
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md",
+      "lines": [
+        193
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g7-git.md",
+      "lines": [
+        197
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g8-base-gateway.md",
+      "lines": [
+        14,
+        116
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-04-nautilus-prerelease-freshness.md",
+      "lines": [
+        154,
+        233,
+        306
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-04-ns2604-verified-e2e.md",
+      "lines": [
+        11
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-04-pwsh7-windows-guidance.md",
+      "lines": [
+        142
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-04-round2-plan-g3-tools.md",
+      "lines": [
+        140
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-04-rtk-file-list-control.md",
+      "lines": [
+        146
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-04-trading-2604-preparation.md",
+      "lines": [
+        202
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-05-dagu-mise-pin-move.md",
+      "lines": [
+        71,
+        73,
+        74,
+        75,
+        77,
+        78,
+        79,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        108,
+        110,
+        111,
+        112,
+        113,
+        115,
+        116,
+        120,
+        121,
+        127,
+        138,
+        140,
+        141,
+        142,
+        143,
+        144,
+        154,
+        155,
+        156,
+        159,
+        160,
+        166,
+        167,
+        168,
+        169,
+        170,
+        171,
+        172,
+        173,
+        174,
+        175,
+        176,
+        177,
+        178,
+        179,
+        180,
+        181,
+        182,
+        183,
+        184,
+        185,
+        186,
+        187,
+        188,
+        189,
+        190,
+        191,
+        192,
+        193,
+        194,
+        195,
+        196,
+        197,
+        198,
+        199,
+        200,
+        201,
+        202,
+        203,
+        204,
+        205,
+        206,
+        207,
+        208,
+        209,
+        210,
+        211,
+        212,
+        213,
+        214,
+        215,
+        216,
+        217,
+        218,
+        219,
+        220,
+        221,
+        222,
+        223,
+        224,
+        225,
+        226,
+        227,
+        228,
+        229,
+        230,
+        231,
+        232,
+        233,
+        234,
+        235,
+        236,
+        237,
+        238,
+        239,
+        240,
+        241,
+        242,
+        243,
+        244,
+        245,
+        246,
+        247,
+        248,
+        249,
+        250,
+        251,
+        252,
+        253,
+        254,
+        255,
+        256,
+        257,
+        258,
+        259,
+        260,
+        261,
+        262,
+        263,
+        264,
+        265,
+        266,
+        267,
+        268,
+        269,
+        270,
+        271,
+        272,
+        273,
+        274,
+        275,
+        276,
+        277,
+        278,
+        279,
+        280,
+        281,
+        282,
+        283,
+        284,
+        285,
+        286,
+        287,
+        288,
+        289,
+        290,
+        291,
+        292,
+        293,
+        294,
+        295,
+        296,
+        297,
+        298,
+        299,
+        300,
+        301,
+        302,
+        303,
+        304,
+        305,
+        306,
+        307,
+        308,
+        309,
+        311,
+        313,
+        314,
+        315,
+        319,
+        321,
+        354,
+        387,
+        388,
+        389,
+        390,
+        391,
+        392,
+        393,
+        394,
+        395,
+        396,
+        397,
+        398,
+        400,
+        407,
+        440,
+        450
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-05-disk-headroom-enospc.md",
+      "lines": [
+        10,
+        323
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-05-harness-context-budget.md",
+      "lines": [
+        14
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-05-macos-ci-advisory.md",
+      "lines": [
+        142
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-05-main-checkout-backup-disposition.md",
+      "lines": [
+        74,
+        194,
+        277,
+        326,
+        356,
+        381
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-05-official-upstream-never-rebuild.md",
+      "lines": [
+        19,
+        81
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-05-user-facing-local-time.md",
+      "lines": [
+        172,
+        224,
+        252,
+        355,
+        371
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-07-instruction-core.md",
+      "lines": [
+        284,
+        311
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-08-decision-record-index.md",
+      "lines": [
+        57
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-08-orchestration-adoption.json",
+      "lines": [
+        17
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-08-orchestration-adoption.md",
+      "lines": [
+        21
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-08-philosophy-only-rules.md",
+      "lines": [
+        32
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-09-anthropic-api-additional-keys.md",
+      "lines": [
+        56
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-09-harbor-0240-profile.md",
+      "lines": [
+        152
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-09-readiness-evidence-binding.md",
+      "lines": [
+        41,
+        83
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-10-claude-federation-diagnostics.md",
+      "lines": [
+        90
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-10-daily-skill-invoke-rate.md",
+      "lines": [
+        561
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-10-retire-macos-ci.md",
+      "lines": [
+        197,
+        202,
+        206
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-10-shared-gap-closeouts.md",
+      "lines": [
+        63
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-11-code-scanning-repo-level.md",
+      "lines": [
+        124
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-11-compounding-rule-text.md",
+      "lines": [
+        92
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-11-landscape-postrun-accounting.md",
+      "lines": [
+        182
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-12-converged-candidates-only.md",
+      "lines": [
+        40,
+        175,
+        336
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-12-e-series-promptfoo-configs.md",
+      "lines": [
+        158,
+        176,
+        202
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-12-harbor-parallel-runtimes.md",
+      "lines": [
+        13,
+        457,
+        590
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/decisions/2026-10-15-credential-term-grace-callers.json",
+      "lines": [
+        492
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/direct-results.md",
+      "lines": [
+        3
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/ecosystem/README.md",
+      "lines": [
+        109,
+        208
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/evidence.md",
+      "lines": [
+        28
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/foundation-layer-map-20261008.md",
+      "lines": [
+        9
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/github-automation.md",
+      "lines": [
+        52,
+        154,
+        369,
+        1077,
+        1101,
+        1262
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/harness-defaults.md",
+      "lines": [
+        50,
+        196,
+        319,
+        351
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/lanes.md",
+      "lines": [
+        26,
+        98,
+        104,
+        106,
+        108,
+        117,
+        124,
+        128,
+        134,
+        135,
+        192
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/native-rollout-20260925-sim.md",
+      "lines": [
+        446
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/next-host-stages.md",
+      "lines": [
+        19,
+        140,
+        142,
+        166
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/tasks/2026-09-20-automation-resolution.md",
+      "lines": [
+        59,
+        82
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/tasks/2026-09-20-github-automation.md",
+      "lines": [
+        54
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/tasks/2026-09-22-new-machine-install.md",
+      "lines": [
+        34,
+        166,
+        184,
+        216
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "docs/token-efficiency-stack.json",
+      "lines": [
+        1176,
+        1181,
+        1686,
+        1696,
+        2485,
+        2865,
+        2870,
+        2875,
+        2880,
+        3239,
+        3249,
+        3254,
+        3584,
+        3589,
+        4326,
+        4336,
+        5066
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/receipt.json",
+      "lines": [
+        706
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-swap-20260928/README.md",
+      "lines": [
+        16
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-swap-20260928/receipt.json",
+      "lines": [
+        13,
+        739,
+        760
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/adoption-status-truth-20260926/review-2/checker-tests-before.txt",
+      "lines": [
+        31,
+        33,
+        35
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/agentsview-044-qualification-20260927/README.md",
+      "lines": [
+        196
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/agentsview-044-qualification-20260927/qualification.json",
+      "lines": [
+        267
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/betterleaks-parity-20260927/README.md",
+      "lines": [
+        502
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/betterleaks-parity-20260927/run-record.json",
+      "lines": [
+        564,
+        667
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/blind-comparison-20260923/battery_catalog.py",
+      "lines": [
+        154
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/catalog-freshness-residuals-20261003/pr613-source-review.json",
+      "lines": [
+        30,
+        253,
+        524,
+        531,
+        552,
+        559,
+        580,
+        591,
+        596
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/catalog-reconciliation-20260922/adjudication.json",
+      "lines": [
+        19
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/catalog-runtime-review-20260921/completion-source-packet.json",
+      "lines": [
+        1
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/catalog-runtime-review-20260921/frozen-20-layer-packet.json",
+      "lines": [
+        288
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/catalog-runtime-review-20260921/source-excerpts.json",
+      "lines": [
+        391
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/catalog-runtime-review-20260921/successful-claude-prompt.txt",
+      "lines": [
+        5
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/child-lane-baseline-20260926/skill-invoke-rate.json",
+      "lines": [
+        490
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/claude-federation-docs-20261010/README.md",
+      "lines": [
+        36
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/claude-native-practice-20261009/verification.json",
+      "lines": [
+        6145,
+        6194,
+        6195
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/cloudflare-audit-skill-trial-20260927/README.md",
+      "lines": [
+        61
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/cloudflare-audit-skill-trial-20260927/delta.json",
+      "lines": [
+        420,
+        429,
+        547,
+        673,
+        763
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/codeql-quality-measure-20260927/summarize_sarif.py",
+      "lines": [
+        54
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/codeql-quality-measure-20260927/triage.py",
+      "lines": [
+        73
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/codex-skill-read-exception-20261006/receipt.json",
+      "lines": [
+        43
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1-20261003/judgments/move-hold-judges.json",
+      "lines": [
+        10,
+        18,
+        26,
+        34,
+        42,
+        50,
+        58,
+        66,
+        74
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1-20261003/judgments/repair-round-2-replies.md",
+      "lines": [
+        38,
+        83,
+        103,
+        128
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1-20261003/judgments/repair-round-replies.md",
+      "lines": [
+        7,
+        253,
+        270,
+        295
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1-20261003/judgments/review-round-findings.json",
+      "lines": [
+        57,
+        62,
+        63,
+        122
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1b-20261003/acceptance.json",
+      "lines": [
+        387,
+        412
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1b-20261003/agent-browser/qualification-record.json",
+      "lines": [
+        60
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1b-20261003/judgments/repair-round-replies.md",
+      "lines": [
+        120,
+        124,
+        141,
+        161
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1b-20261003/judgments/review-round-findings.json",
+      "lines": [
+        16,
+        41,
+        53
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/decision-records-20261008/index.json",
+      "lines": [
+        384
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/disk-headroom-enospc-20261005/receipt.json",
+      "lines": [
+        293
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/eval-install-repairs-20260926/gpt6-cross-family-review.md",
+      "lines": [
+        5
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/final-architecture-round2-20261004/integration-resolutions.json",
+      "lines": [
+        469,
+        1001,
+        1459,
+        1582,
+        1774
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/controls/round3-module.py.txt",
+      "lines": [
+        16,
+        147,
+        168,
+        319
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/controls/round4-module.py.txt",
+      "lines": [
+        26,
+        186,
+        207,
+        365
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/controls/round5-module.py.txt",
+      "lines": [
+        32,
+        204,
+        229,
+        432
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/runs.json",
+      "lines": [
+        49
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/execution-broker/capture-alpaca-wire-serialization.json",
+      "lines": [
+        42
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/workers/worktrunk-crash-cleanup-probe.json",
+      "lines": [
+        12
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/foundation__agent-sdks/README.md",
+      "lines": [
+        141,
+        240
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/foundation__agent-sdks/preregistration-round3.json",
+      "lines": [
+        70
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/foundation__isolation/README.md",
+      "lines": [
+        250
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/foundation__workers/README.md",
+      "lines": [
+        36
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/instructions-skills/frozen-skill-arm-ab.json",
+      "lines": [
+        101,
+        107
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/raw/socraticode_session_raw.json",
+      "lines": [
+        1
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/11-socraticode-raw.json",
+      "lines": [
+        623,
+        827
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/12-socraticode-raw.json",
+      "lines": [
+        79,
+        147,
+        283,
+        487,
+        691,
+        759,
+        827,
+        1235,
+        1303,
+        1371,
+        1507,
+        1575,
+        1643,
+        1847,
+        1915,
+        2051,
+        2187
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave3-20260923/instructions-skills/forced-skill-arm-ab.json",
+      "lines": [
+        94,
+        100
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave3-20260923/instructions-skills/typesafe-extended-label-set.json",
+      "lines": [
+        101
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave3-20260923/native-clients/arm-comparison-research-task.json",
+      "lines": [
+        145
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave3-20260923/native-clients/sdk-vs-cli-resume-comparison.json",
+      "lines": [
+        203
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/hcom-relaxation-20261006/probe-receipt.json",
+      "lines": [
+        19
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/host-upgrade-20260924/foundation-alignment.json",
+      "lines": [
+        50,
+        98
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/host-upgrade-20260924/upgrade-evidence.json",
+      "lines": [
+        8
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/ibkr-pacing-20261013/PUBLICATION.md",
+      "lines": [
+        27
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/jcodemunch-route-args-20260927/probes.json",
+      "lines": [
+        13
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926/README.md",
+      "lines": [
+        548
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+      "lines": [
+        7735,
+        11434,
+        13610,
+        18277,
+        22133,
+        22134
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/layer-closure-assessment-20261001/foundation.json",
+      "lines": [
+        1242,
+        1406,
+        1472,
+        1547,
+        1707,
+        1863,
+        1909,
+        2606,
+        2666,
+        2667,
+        2749,
+        2806,
+        2809,
+        2890,
+        2891,
+        2955
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/layer-closure-assessment-20261001/us-equities.json",
+      "lines": [
+        96,
+        160,
+        1610,
+        1616,
+        1617,
+        1697,
+        1736
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/adjudication-inputs/foundation__document-retrieval.json",
+      "lines": [
+        97,
+        103
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-document-retrieval-20260922.json",
+      "lines": [
+        13,
+        21,
+        37
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/foundation-document-retrieval-20260922.json",
+      "lines": [
+        99,
+        106,
+        112
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/claude/foundation-mcp-surfaces-20260922.json",
+      "lines": [
+        26,
+        61,
+        76
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/layer-verdicts-20260922/codex/foundation-secrets-credentials-20260922.json",
+      "lines": [
+        58
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/local-model-server-gate-20261001/receipt.json",
+      "lines": [
+        746
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/local-model-server-gate-confirmatory-20261001/receipt.json",
+      "lines": [
+        888
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/mac-model-hosting-20260927/port-record-20261003.md",
+      "lines": [
+        62
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/macos-ci-scope-20261003/README.md",
+      "lines": [
+        27,
+        28,
+        46
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/macos-ci-scope-20261003/files_of.json",
+      "lines": [
+        1
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/macos-ci-scope-20261003/lists_r2.json",
+      "lines": [
+        1
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/macos-ci-scope-20261003/macos_ci_evidence.py",
+      "lines": [
+        2,
+        100
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/macos-ci-scope-20261003/macos_ci_summary.py",
+      "lines": [
+        1,
+        6
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/macos-ci-scope-20261003/main_6112.json",
+      "lines": [
+        1
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/macos-ci-scope-20261003/modcount.json",
+      "lines": [
+        1
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/memory-stack-20260925/experiment.json",
+      "lines": [
+        347,
+        1116
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/native-rollout-20260925/sim/adaptive-paper.json",
+      "lines": [
+        6
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-role-mcp-followup-20261002/trials.json",
+      "lines": [
+        1
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/native-skill-finalization-20260930/operations.json",
+      "lines": [
+        282
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/settlements.json",
+      "lines": [
+        31
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-fix-wave-20261004/frozen-inputs/linux-wsl2-new-distro.md.txt",
+      "lines": [
+        1192
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
+      "lines": [
+        557
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "lines": [
+        704
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/VALIDATION.md",
+      "lines": [
+        38,
+        146,
+        413
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
+      "lines": [
+        674
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/omniroute-canary-check.py",
+      "lines": [
+        7
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/omniroute-canary-install.sh",
+      "lines": [
+        24,
+        52,
+        86
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+      "lines": [
+        115
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/validation.json",
+      "lines": [
+        304,
+        330
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/claude-review-held-topics.md",
+      "lines": [
+        142
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/checks/receipt-bindings.txt",
+      "lines": [
+        3,
+        4,
+        5
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/checks/repo-checks-at-head.txt",
+      "lines": [
+        13
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/receipt.json",
+      "lines": [
+        97,
+        113,
+        143
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/scripts/receipt_bindings.py.txt",
+      "lines": [
+        3,
+        14,
+        31,
+        55
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/scripts/run_delta_outputs.sh.txt",
+      "lines": [
+        113,
+        131
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/adjudication/claude.AB.json",
+      "lines": [
+        137
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/adjudication/claude.BA.json",
+      "lines": [
+        125,
+        156
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/adjudication/input.AB.md",
+      "lines": [
+        46,
+        136
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/adjudication/input.BA.md",
+      "lines": [
+        46,
+        149
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/controls/dashboard-bound-before.txt",
+      "lines": [
+        10
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/adjudication/attempt2/adjudication-inputs/x5.AB.json",
+      "lines": [
+        34,
+        69,
+        108,
+        155
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/adjudication/attempt2/adjudication-inputs/x5.BA.json",
+      "lines": [
+        61,
+        96,
+        123,
+        170
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/adjudication/attempt2/claude.AB.json",
+      "lines": [
+        23,
+        75,
+        110
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/adjudication/attempt2/claude.BA.json",
+      "lines": [
+        23,
+        79,
+        106
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/adjudication/attempt2/gpt6.AB.json",
+      "lines": [
+        38,
+        58
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/adjudication/attempt2/gpt6.BA.json",
+      "lines": [
+        35,
+        38,
+        55,
+        62
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/adjudication/attempt2/judge-actions.json",
+      "lines": [
+        103,
+        108,
+        113,
+        118,
+        143,
+        148,
+        158,
+        163,
+        249,
+        264,
+        314,
+        324,
+        334,
+        556,
+        565,
+        684,
+        694,
+        703,
+        874,
+        1000,
+        1004,
+        1015
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/adjudication/attempt2/packets/x5.json",
+      "lines": [
+        4
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/adjudication/attempt2/prompts/judge-AB.txt",
+      "lines": [
+        39,
+        74,
+        113,
+        160,
+        195
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/adjudication/attempt2/prompts/judge-BA.txt",
+      "lines": [
+        66,
+        101,
+        128,
+        175,
+        195
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/controls/register_files.py",
+      "lines": [
+        13
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/final/adjudication/adjudication-inputs/x5c.AB.json",
+      "lines": [
+        29,
+        33,
+        41,
+        164
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/final/adjudication/adjudication-inputs/x5c.BA.json",
+      "lines": [
+        29,
+        33,
+        41,
+        136
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/final/adjudication/amendment.diff",
+      "lines": [
+        25,
+        27,
+        28
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/final/adjudication/build_adjudication_final.py",
+      "lines": [
+        149
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/final/adjudication/build_root_final.py",
+      "lines": [
+        32
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/final/adjudication/claude.BA.json",
+      "lines": [
+        70
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/final/adjudication/gpt6.AB.json",
+      "lines": [
+        58
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/final/adjudication/gpt6.BA.json",
+      "lines": [
+        58
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/final/adjudication/outcome-actions.md",
+      "lines": [
+        13,
+        16
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/final/adjudication/packets/x5c.json",
+      "lines": [
+        4
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/final/adjudication/prompts/judge-AB.txt",
+      "lines": [
+        34,
+        38,
+        46,
+        169,
+        268
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/final/adjudication/prompts/judge-BA.txt",
+      "lines": [
+        34,
+        38,
+        46,
+        141,
+        268
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/final/build_lane_a2.py",
+      "lines": [
+        30,
+        175,
+        205
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/final/packets/packet.md",
+      "lines": [
+        12,
+        56,
+        195,
+        297,
+        303,
+        305,
+        307,
+        314,
+        321,
+        325,
+        434,
+        436,
+        437
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/final/prompts/gpt6-prompt.txt",
+      "lines": [
+        19,
+        63,
+        202,
+        304,
+        310,
+        312,
+        314,
+        321,
+        328,
+        332,
+        441,
+        443,
+        444
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/final/proposal.diff",
+      "lines": [
+        25,
+        27,
+        28
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/review/claude-brief.txt",
+      "lines": [
+        16,
+        36
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/review/gpt6-prompt.txt",
+      "lines": [
+        11
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/round1/claude-brief.txt",
+      "lines": [
+        48
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/round1/claude.json",
+      "lines": [
+        7,
+        31,
+        60,
+        95,
+        105,
+        140,
+        150,
+        197
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/round1/gpt6-prompt.txt",
+      "lines": [
+        48
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/lane-a/round1/packet.md",
+      "lines": [
+        42
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/packet.md",
+      "lines": [
+        33
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/review-444/claude-brief.txt",
+      "lines": [
+        25,
+        106
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/review-444/gpt6-prompt.txt",
+      "lines": [
+        23,
+        48
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/review/claude-brief.txt",
+      "lines": [
+        4,
+        18
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/review/claude-review.md",
+      "lines": [
+        29,
+        84,
+        104
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/review/gpt6-pr1-prompt.txt",
+      "lines": [
+        3
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/review/gpt6-pr2-prompt.txt",
+      "lines": [
+        2
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/review/gpt6-review-pr2.md",
+      "lines": [
+        4
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/round1/claude.json",
+      "lines": [
+        28
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-an13-m45-20260928/adjudication/claude.BA.json",
+      "lines": [
+        8,
+        39
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-an13-m45-20260928/adjudication/packets/m5.AB.json",
+      "lines": [
+        25
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-an13-m45-20260928/adjudication/packets/m5.BA.json",
+      "lines": [
+        25
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-an13-m45-20260928/adjudication/prompts/judge-AB.txt",
+      "lines": [
+        59
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-an13-m45-20260928/adjudication/prompts/judge-BA.txt",
+      "lines": [
+        59
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-an13-m45-20260928/review/claude-brief.txt",
+      "lines": [
+        29,
+        31
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-an13-m45-20260928/review/gpt6-prompt.txt",
+      "lines": [
+        23,
+        75
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-an13-m45-20260928/round1/returns/claude-m45.json",
+      "lines": [
+        96,
+        131
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-an13-m45-20260928/round1/returns/gpt6-m45.json",
+      "lines": [
+        48,
+        59
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-an13-m45-20260928/round1/runner/audit-judge-m45.json",
+      "lines": [
+        1
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-an13-m45-20260928/scripts/make_m5_adjudication.py",
+      "lines": [
+        61
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/rtk-fold-harbor-20261004/README.md",
+      "lines": [
+        25,
+        29
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/rtk-fold-harbor-20261004/source-hashes.json",
+      "lines": [
+        3
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/advisory-before.log",
+      "lines": [
+        1
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/advisory-tests.log",
+      "lines": [
+        308
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/cc-fix/landing-old-baseline-control.log",
+      "lines": [
+        1
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/cc-fix/landing-rebase.json",
+      "lines": [
+        52
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/cc-fix/landing-required-modules.log",
+      "lines": [
+        187
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/cc-fix/receipt.json",
+      "lines": [
+        18
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/cc-fix/required-modules.log",
+      "lines": [
+        308
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/sota-convergence-review-20260922/manifest-citation-review.json",
+      "lines": [
+        623
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/claude-review.json",
+      "lines": [
+        372,
+        377
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/owner-reconciliation.json",
+      "lines": [
+        111
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/README.md",
+      "lines": [
+        30,
+        138,
+        199
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/langgraph.json",
+      "lines": [
+        40
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results.json",
+      "lines": [
+        36,
+        37,
+        304,
+        311
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/suite-parallelism-trial-20261003/README.md",
+      "lines": [
+        10
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/suite-parallelism-trial-20261003/experiment.json",
+      "lines": [
+        110
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/suite-parallelism-trial-20261003/preregistration-experiment.json.txt",
+      "lines": [
+        31,
+        112
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/t19-catalog-refresh-20261009/review-receipt.json",
+      "lines": [
+        290
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/build_final_prompts.py",
+      "lines": [
+        28,
+        91
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/build_post_gpt_prompts.py",
+      "lines": [
+        28,
+        95
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/final-results.json",
+      "lines": [
+        151
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/final-verification.json",
+      "lines": [
+        69,
+        70,
+        71,
+        188,
+        190,
+        199,
+        200,
+        209,
+        210,
+        211
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/postgpt-results.json",
+      "lines": [
+        337,
+        405,
+        965,
+        1082
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recheck-results.json",
+      "lines": [
+        879
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recheck-verification.json",
+      "lines": [
+        81,
+        109,
+        110,
+        159,
+        169,
+        179,
+        189,
+        190
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/results.json",
+      "lines": [
+        146,
+        172,
+        354,
+        584,
+        1170,
+        1772,
+        2040
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/verification.json",
+      "lines": [
+        68,
+        70,
+        120,
+        129,
+        139,
+        208,
+        218,
+        228
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/token-adoption-e2e-20260926/README.md",
+      "lines": [
+        652,
+        740
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json",
+      "lines": [
+        152
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/token-e2e-ultracode-20260925/review-e1e2-20260927.md",
+      "lines": [
+        92
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/token-e2e-ultracode-laptop-20260926/receipt.json",
+      "lines": [
+        201,
+        204,
+        230,
+        236
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/README.md",
+      "lines": [
+        147,
+        163,
+        168
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/ai-memory.json",
+      "lines": [
+        479,
+        483,
+        539
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/codebase-memory-mcp.json",
+      "lines": [
+        543,
+        583,
+        588,
+        593
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/context-mode.json",
+      "lines": [
+        393,
+        397,
+        423,
+        438,
+        443,
+        458
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/gpt-tokenizer.json",
+      "lines": [
+        373,
+        377,
+        397,
+        412,
+        432
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/headroom.json",
+      "lines": [
+        392,
+        402,
+        422,
+        437,
+        457,
+        462
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/jcodemunch-mcp.json",
+      "lines": [
+        224,
+        232,
+        504,
+        524
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/mcporter.json",
+      "lines": [
+        349,
+        379
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/qmd.json",
+      "lines": [
+        485,
+        525,
+        530,
+        550
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/rtk.json",
+      "lines": [
+        519,
+        529,
+        554
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/serena.json",
+      "lines": [
+        459,
+        463,
+        469,
+        475,
+        499,
+        514,
+        524
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/socraticode.json",
+      "lines": [
+        429,
+        439,
+        445,
+        479,
+        489,
+        499,
+        504
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/toon.json",
+      "lines": [
+        436,
+        446,
+        460,
+        465,
+        470,
+        480,
+        495
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/gpt6-reviews.json",
+      "lines": [
+        57,
+        289,
+        333,
+        380,
+        560,
+        702,
+        749,
+        799
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/returned-results-subset.json",
+      "lines": [
+        4958,
+        4999
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/artifacts/token-workflow-hardening-20260926/README.md",
+      "lines": [
+        123
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "evidence/artifacts/w4-grand-catalog-counts-20261011/receipt.json",
+      "lines": [
+        250
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--codex--use--20260926-4.json",
+      "lines": [
+        57
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--codex--use--20260926-5.json",
+      "lines": [
+        57
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--codex--use--20260926.json",
+      "lines": [
+        54
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--inspect-ai--use--20260926-2.json",
+      "lines": [
+        78
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--inspect-ai--use--20260926.json",
+      "lines": [
+        71
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--promptfoo--use--20260926-2.json",
+      "lines": [
+        78
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--promptfoo--use--20260926.json",
+      "lines": [
+        70
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--rtk--use--20260925.json",
+      "lines": [
+        40
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--socraticode--install--20260926-2.json",
+      "lines": [
+        64
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/receipts/claude-max-default-effort-20260929.json",
+      "lines": [
+        374
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/receipts/codex-serena-startup-port-20261003.json",
+      "lines": [
+        1699,
+        3130
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/receipts/dagu-mise-pin-qualification-20261005.json",
+      "lines": [
+        488,
+        644,
+        788
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/receipts/dependabot-alert-16-dismissal-20261003.json",
+      "lines": [
+        8,
+        14,
+        59,
+        60,
+        71,
+        124
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/receipts/edgartools-5600-pin-move-20261004.json",
+      "lines": [
+        40,
+        80
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/receipts/github-ci-measurements-20261003.json",
+      "lines": [
+        162
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/receipts/gpt-tokenizer-400-qualification-20260929.json",
+      "lines": [
+        22
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/receipts/mcporter-0142-qualification-20261003.json",
+      "lines": [
+        36,
+        48
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/receipts/native-sdk-role-mcp-followup-20261002.json",
+      "lines": [
+        1
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/receipts/ns2604-e2e-20261004.json",
+      "lines": [
+        20,
+        429,
+        461
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/receipts/osv-frozen-macos-next-1638-20261007.json",
+      "lines": [
+        155
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json",
+      "lines": [
+        191
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/receipts/osv-openhands-litellm-relock-20260930.json",
+      "lines": [
+        18,
+        518
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/receipts/osv-openhands-pyjwt-relock-20260930.json",
+      "lines": [
+        357
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/receipts/osv-split-hardening-port-20261003.json",
+      "lines": [
+        643,
+        1575,
+        1578,
+        1725,
+        1727,
+        1823,
+        1825
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/receipts/osv-urllib3-next-20260930.json",
+      "lines": [
+        275
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/receipts/rtk-fold-harbor-20261004.json",
+      "lines": [
+        280
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/receipts/suite-parallelism-trial-20261003.json",
+      "lines": [
+        21,
+        35
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/receipts/trading-unattended-hosting-recovery-r3-20261005.json",
+      "lines": [
+        167
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "evidence/receipts/wsl-lock-frozen-rename-20261004.json",
+      "lines": [
+        133
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "manifests/evidence.json",
+      "lines": [
+        4253,
+        4269,
+        8410,
+        18030,
+        19415,
+        22545,
+        37180,
+        37190,
+        39910,
+        44085,
+        55015,
+        55020
+      ],
+      "category": "legacy_seed_and_root_format_contract"
+    },
+    {
+      "path": "notes/muse-file-fence-20261014/ruled-extra.json",
+      "lines": [
+        20
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "observability/grand-dashboard/capacity-loki-result.json",
+      "lines": [
+        1
+      ],
+      "category": "retained_data_or_snapshot_reference"
+    },
+    {
+      "path": "observability/grand-dashboard/progress.py",
+      "lines": [
+        17,
+        19,
+        229,
+        247
+      ],
+      "category": "bounded_receipts_count_only"
+    },
+    {
+      "path": "recipes/README.md",
+      "lines": [
+        3
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "recipes/saturation-sweep.md",
+      "lines": [
+        106
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "recipes/sota-convergence-practice.md",
+      "lines": [
+        204,
+        216,
+        229,
+        329
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "scripts/active_model_currency.py",
+      "lines": [
+        181
+      ],
+      "category": "registry_change_exclusion"
+    },
+    {
+      "path": "scripts/build_ecosystem.py",
+      "lines": [
+        39
+      ],
+      "category": "receipts_projection_consumer"
+    },
+    {
+      "path": "scripts/component_matrix.py",
+      "lines": [
+        267,
+        1402,
+        1405,
+        1406
+      ],
+      "category": "receipt_integrity_reader_and_generated_writer"
+    },
+    {
+      "path": "scripts/evidence_manifest.py",
+      "lines": [
+        2,
+        11,
+        12,
+        27,
+        72
+      ],
+      "category": "normalizer_and_explicit_reference_projection"
+    },
+    {
+      "path": "scripts/final_stack.py",
+      "lines": [
+        19,
+        1042
+      ],
+      "category": "delegated_registration_writer"
+    },
+    {
+      "path": "scripts/freshness_propose.py",
+      "lines": [
+        13,
+        29,
+        749,
+        752,
+        845,
+        848,
+        859,
+        910
+      ],
+      "category": "receipt_metadata_and_file_writer"
+    },
+    {
+      "path": "scripts/hardware_profile.py",
+      "lines": [
+        436,
+        503
+      ],
+      "category": "delegated_registration_writer"
+    },
+    {
+      "path": "scripts/host_receipts.py",
+      "lines": [
+        7,
+        700,
+        710,
+        711,
+        714,
+        1094,
+        1112,
+        1115,
+        1213,
+        1362,
+        1423,
+        1428,
+        1799
+      ],
+      "category": "registration_writer_and_receipt_reader"
+    },
+    {
+      "path": "scripts/local_pages_policy_grants.py",
+      "lines": [
+        124
+      ],
+      "category": "historical_git_grant_derivation"
+    },
+    {
+      "path": "scripts/new_host_grand_list.py",
+      "lines": [
+        636
+      ],
+      "category": "delegated_registration_writer"
+    },
+    {
+      "path": "scripts/platform_status.py",
+      "lines": [
+        36
+      ],
+      "category": "derived_status_consumer"
+    },
+    {
+      "path": "scripts/release_due.py",
+      "lines": [
+        16,
+        50
+      ],
+      "category": "registry_change_exclusion"
+    },
+    {
+      "path": "scripts/saturation_ledger.py",
+      "lines": [
+        74,
+        739
+      ],
+      "category": "registered_hash_integrity_reader"
+    },
+    {
+      "path": "scripts/validate.py",
+      "lines": [
+        451,
+        571,
+        590,
+        738,
+        750,
+        756,
+        757,
+        785
+      ],
+      "category": "filesystem_integrity_and_historical_registration"
+    },
+    {
+      "path": "scripts/validate_convergence.py",
+      "lines": [
+        206
+      ],
+      "category": "declared_record_discovery"
+    },
+    {
+      "path": "scripts/validate_foundation.py",
+      "lines": [
+        31
+      ],
+      "category": "receipts_metadata_consumer"
+    },
+    {
+      "path": "scripts/validate_shard_weights.json",
+      "lines": [
+        154
+      ],
+      "category": "configuration_or_fixture_reference"
+    },
+    {
+      "path": "scripts/verdict_review_gate.py",
+      "lines": [
+        18,
+        22,
+        194,
+        195,
+        549,
+        557,
+        560,
+        1044,
+        1055,
+        1164
+      ],
+      "category": "head_and_base_sealed_review_binding"
+    },
+    {
+      "path": "tests/fixtures/harbor_currency_predecessors/README.md.fixture",
+      "lines": [
+        554
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/local_pages_architecture_policy_fixture.py",
+      "lines": [
+        24,
+        42
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_adaptive_paper_source_hashes_manifest.py",
+      "lines": [
+        81
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_adoption_bootstrap_macos.py",
+      "lines": [
+        3852
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_adoption_status.py",
+      "lines": [
+        3874,
+        3885
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_bootstrap_integrity_drivers.py",
+      "lines": [
+        40
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_capability_gate.py",
+      "lines": [
+        392
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_catalog_freshness_propose.py",
+      "lines": [
+        7,
+        595,
+        635,
+        641,
+        966
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_claude_federation_diagnostics.py",
+      "lines": [
+        50
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_claude_lane.py",
+      "lines": [
+        61,
+        98,
+        270
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_codex_lane.py",
+      "lines": [
+        1322
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_component_matrix.py",
+      "lines": [
+        70,
+        72
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_convergence_contract.py",
+      "lines": [
+        325
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_ecosystem_manifest.py",
+      "lines": [
+        188,
+        1946
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_edgartools_pin_move.py",
+      "lines": [
+        62
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_evidence_manifest.py",
+      "lines": [
+        1,
+        11,
+        33,
+        37,
+        66,
+        68
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_final_stack.py",
+      "lines": [
+        132,
+        656,
+        728,
+        748,
+        806,
+        815,
+        831,
+        842,
+        847,
+        879,
+        886,
+        929,
+        936
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_foundation_catalog.py",
+      "lines": [
+        30,
+        56,
+        102,
+        136,
+        138
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_frozen_macos_variant_no_use.py",
+      "lines": [
+        35,
+        253,
+        278,
+        482
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_gap_closeouts.py",
+      "lines": [
+        45,
+        53,
+        55,
+        59,
+        65,
+        84,
+        93,
+        95,
+        122,
+        124,
+        141,
+        143,
+        184,
+        207,
+        216,
+        219,
+        225,
+        231,
+        238,
+        245,
+        252,
+        258,
+        289,
+        291,
+        360
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_grand_dashboard.py",
+      "lines": [
+        79,
+        84,
+        87,
+        92,
+        94
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_grype_known_cve_fixture.py",
+      "lines": [
+        47
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_hardware_profile.py",
+      "lines": [
+        378,
+        443,
+        444,
+        606,
+        617
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_host_receipts.py",
+      "lines": [
+        59,
+        80,
+        274,
+        363,
+        373,
+        679,
+        769,
+        779,
+        861,
+        1052,
+        1281,
+        1746,
+        1757,
+        1763,
+        1769,
+        1771,
+        1773,
+        1780,
+        2159,
+        2168,
+        2572,
+        2579,
+        2613,
+        2620
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_install_claude_profile.py",
+      "lines": [
+        1088
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_jev_p1_casepack.py",
+      "lines": [
+        688,
+        693
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_landing_scripts.py",
+      "lines": [
+        1437,
+        1463,
+        1476,
+        1575,
+        1595,
+        1600,
+        1604
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_landscape.py",
+      "lines": [
+        520,
+        882,
+        887
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_lane_packets.py",
+      "lines": [
+        1078,
+        1263,
+        1278,
+        1336
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_local_pages_architecture_cache.py",
+      "lines": [
+        23,
+        78
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_local_pages_architecture_evidence_boundary.py",
+      "lines": [
+        33,
+        60,
+        129,
+        130,
+        162
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_local_pages_architecture_evidence_fix.py",
+      "lines": [
+        26,
+        51,
+        147,
+        151
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_local_pages_architecture_inventory.py",
+      "lines": [
+        188
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_local_pages_architecture_landscape_exclusions.py",
+      "lines": [
+        189
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_local_pages_architecture_manifest.py",
+      "lines": [
+        403
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_local_pages_architecture_policy.py",
+      "lines": [
+        35,
+        90,
+        207
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_local_pages_architecture_read_boundary.py",
+      "lines": [
+        129,
+        193,
+        545
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_local_pages_architecture_sources.py",
+      "lines": [
+        282
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_local_pages_overview.py",
+      "lines": [
+        147,
+        261
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_local_pages_policy_grants.py",
+      "lines": [
+        49
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_local_pages_source_policy.py",
+      "lines": [
+        68,
+        159,
+        242,
+        245
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_native_practice_snapshot_provenance.py",
+      "lines": [
+        120
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_new_host_grand_list.py",
+      "lines": [
+        231
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_new_wsl_client_config.py",
+      "lines": [
+        813,
+        822
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_north_star_readiness.py",
+      "lines": [
+        176,
+        190
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_platform_status.py",
+      "lines": [
+        43
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_plugin_skill_identity_receipts.py",
+      "lines": [
+        26
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_published_digest_privacy.py",
+      "lines": [
+        465
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_record_verdicts.py",
+      "lines": [
+        1050,
+        1052,
+        1507,
+        2184,
+        2186
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_registry_rows.py",
+      "lines": [
+        27,
+        47,
+        70,
+        94,
+        106,
+        107,
+        136,
+        148,
+        158,
+        179,
+        190,
+        194,
+        196,
+        204,
+        221,
+        225
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_release_pin_contents.py",
+      "lines": [
+        112,
+        127,
+        156,
+        179
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_runtime_worker_openhands.py",
+      "lines": [
+        502
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_saturation_ledger.py",
+      "lines": [
+        560
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_secret_path_guard.py",
+      "lines": [
+        1317
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_stack_lifecycle.py",
+      "lines": [
+        18,
+        107
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_token_e2e_grader.py",
+      "lines": [
+        657,
+        661,
+        668,
+        1046,
+        1063,
+        2030,
+        5035,
+        5278
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_trading_handbook_publication.py",
+      "lines": [
+        99,
+        155
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_us_equities_hosting.py",
+      "lines": [
+        386
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_validate.py",
+      "lines": [
+        69,
+        135,
+        190,
+        192,
+        413
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_verdict_flip_candidates.py",
+      "lines": [
+        56
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_verdict_review_gate.py",
+      "lines": [
+        4,
+        167,
+        442,
+        445,
+        450,
+        460,
+        462,
+        1880
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tests/test_workflow_hardening.py",
+      "lines": [
+        2375
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tools/adoption/host-baseline.md",
+      "lines": [
+        201
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "tools/landing/README.md",
+      "lines": [
+        27
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "tools/landing/nas_land.sh",
+      "lines": [
+        120,
+        123,
+        347,
+        542
+      ],
+      "category": "change_identity_exclusion_and_current_base_checks"
+    },
+    {
+      "path": "tools/local-pages/README.md",
+      "lines": [
+        395
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "tools/local-pages/architecture_builder.py",
+      "lines": [
+        396
+      ],
+      "category": "bounded_provenance_and_cache_signature"
+    },
+    {
+      "path": "tools/local-pages/architecture_evidence.py",
+      "lines": [
+        183,
+        207
+      ],
+      "category": "bounded_registry_and_receipt_integrity"
+    },
+    {
+      "path": "tools/local-pages/architecture_mapping.json",
+      "lines": [
+        165
+      ],
+      "category": "source_registry_location"
+    },
+    {
+      "path": "tools/local-pages/overview_sources.json",
+      "lines": [
+        153
+      ],
+      "category": "source_registry_location"
+    },
+    {
+      "path": "tools/local-pages/source_policy.json",
+      "lines": [
+        57,
+        1582,
+        2057,
+        2859,
+        3995,
+        6971,
+        6995,
+        7491,
+        12591,
+        12599,
+        14039,
+        15771,
+        18395,
+        18399,
+        21562,
+        21576,
+        21583,
+        21613,
+        21626
+      ],
+      "category": "exact_source_grants_and_derivation"
+    },
+    {
+      "path": "tools/north-star/README.md",
+      "lines": [
+        91
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "tools/north-star/sources.json",
+      "lines": [
+        6
+      ],
+      "category": "source_registry_location"
+    },
+    {
+      "path": "tools/sota-convergence/README.md",
+      "lines": [
+        542,
+        770,
+        860,
+        1149,
+        1294
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/README.md",
+      "lines": [
+        549,
+        648
+      ],
+      "category": "operating_document_or_retained_decision"
+    },
+    {
+      "path": "tools/sota-convergence/lane_packets.py",
+      "lines": [
+        93,
+        368,
+        385,
+        566,
+        662,
+        669,
+        1267,
+        1284
+      ],
+      "category": "registered_hash_and_receipt_reader"
+    },
+    {
+      "path": "tools/sota-convergence/merge_fragments.py",
+      "lines": [
+        874
+      ],
+      "category": "delegated_registration_writer"
+    },
+    {
+      "path": "tools/sota-convergence/receipt-component-aliases.json",
+      "lines": [
+        9
+      ],
+      "category": "receipt_identity_contract"
+    },
+    {
+      "path": "tools/sota-convergence/record_verdicts.py",
+      "lines": [
+        519
+      ],
+      "category": "generated_index_exclusion"
+    },
+    {
+      "path": "tools/token-e2e/calibration/T5.json",
+      "lines": [
+        64
+      ],
+      "category": "configuration_or_fixture_reference"
+    },
+    {
+      "path": "tools/token-e2e/calibration/oracle-controls.json",
+      "lines": [
+        217,
+        218,
+        220,
+        237,
+        238,
+        240,
+        259,
+        260,
+        262
+      ],
+      "category": "configuration_or_fixture_reference"
+    },
+    {
+      "path": "tools/token-e2e/grade.py",
+      "lines": [
+        818,
+        916,
+        1112
+      ],
+      "category": "different_evidence_json_or_jsonl_file"
+    },
+    {
+      "path": "tools/token-e2e/judge.py",
+      "lines": [
+        792
+      ],
+      "category": "different_evidence_json_or_jsonl_file"
+    },
+    {
+      "path": "tools/token-report/test_token_manifest.py",
+      "lines": [
+        78,
+        83
+      ],
+      "category": "test_fixture_or_repository_contract"
+    },
+    {
+      "path": "tools/token-report/token_manifest.py",
+      "lines": [
+        904
+      ],
+      "category": "exact_capture_receipts_metadata_only"
+    }
+  ],
+  "activation_requirements": [
+    "Migrate every files[] reader and all historical Git-tree readers; keep legacy snapshots readable.",
+    "Audit every writer, staged-path allowlist, rollback and generated-report registration; preserve receipts[] and convergence_records[].",
+    "Bind every fragment into bounded local-pages/north-star source grants, provenance and cache signatures before enabling the format.",
+    "Review change-id, release-drift, generated-index and PR-history path exclusions; preserve review/cue authorization.",
+    "Extend repository-contract fixtures to both formats; preserve old literal snapshots and tests.",
+    "Update operational instructions and external raw-JSON clients to use an explicit generated projection; do not rewrite historical evidence.",
+    "Only then change the root format in a separate reviewed PR."
+  ]
+}
