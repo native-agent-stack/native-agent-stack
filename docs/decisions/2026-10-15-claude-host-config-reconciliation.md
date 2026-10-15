@@ -51,8 +51,8 @@ definitive manifest, so the map and template must gain it) or **host retire** (n
 | 12 | marketplace | trailofbits | present | absent | no piece | `2026-10-01-new-wsl-definitive-defaults.md:58` (definitive slot); the install plan adds the marketplace; `adoption/skills/manifest.json` (eight trial rows) | none | template behind: the install plan adds it, the map does not name it |
 | 13 | marketplace | typesafe-ai | present | absent | no piece | `2026-10-13-plugin-skill-identity.md:9-10, 119-120` (the vendor's plugin route); `adoption/skills/manifest.json:96` | #1153 disables the plugin copy | follow #1153; the skill is the layer candidate |
 | 14 | marketplace | worktrunk | present | absent | no piece | as row 7 | none | template behind, as row 7 |
-| 15 | hook | codebase-memory-mcp: PostToolUse Read, PreToolUse Grep/Glob/Bash, SessionStart startup/resume/clear/compact, SubagentStart (7) | present | absent (server wired, slot:code-graph) | no piece | none adopts them; pre-manifest hold-outs: `2026-09-25-codex-mcp-scope.md:75-76` (never run the vendor's `install` subcommand, which edits client configs) | #776 records the 2026-10-06 vendor install run that wrote them, with no map entry | host retire, pending CC (written by the vendor installer against the hold-out) |
-| 16 | hook | serena-hooks: SessionStart activate, SessionEnd cleanup (2) | present | absent (server wired, slot:serena) | no piece | hold-outs: `2026-09-27-claude-harness-settings.md:47` (the optional hooks are not added to the template); `2026-10-02-new-wsl-client-configuration.md:737-738` (not wired) | none | host retire, pending CC (writer not identified) |
+| 15 | hook | codebase-memory-mcp: PostToolUse Read, PreToolUse Grep/Glob/Bash, SessionStart startup/resume/clear/compact, SubagentStart (7) | present | absent (server wired, slot:code-graph) | no piece | adopted: `2026-10-07-clean-upstream-install-finalizes-a-candidate.md:124` (registration, agents and hooks, final). It is later than the hold-out `2026-09-25-codex-mcp-scope.md:75-76`, which forbade the vendor's `install` subcommand that edits client configs | #776 records the 2026-10-06 vendor install run that wrote them, with no map entry | template behind: the map and template gain the hooks by PR; host keep |
+| 16 | hook | serena-hooks: SessionStart activate, SessionEnd cleanup (2) | present | absent (server wired, slot:serena) | no piece | adopted: `2026-10-07-clean-upstream-install-finalizes-a-candidate.md:125` (registration and the vendor's hooks, final). It is later than the hold-outs `2026-09-27-claude-harness-settings.md:47` (the optional hooks are not added to the template) and `2026-10-02-new-wsl-client-configuration.md:737-738` (not wired) | none | template behind: the map and template gain the hooks by PR; host keep |
 | 17 | hook | context-mode-cache-heal.mjs: SessionStart | present | absent | not_wired | `client-config-map.json:163-168`: the context-mode plugin writes this hook and deploys its file itself; a second writer would compete | none | host keep (the plugin's own entry; never a template piece) |
 | 18 | hook | cc-clock-context: PreToolUse (write tools, SendMessage), UserPromptSubmit (2) | present | absent | no piece | none; a host-authored script in no repository, informational only | #955 mentions it only | UNRESOLVED: no record; the CC decides record-and-template or retire |
 | 19 | hook | ai-memory: UserPromptSubmit command hook | present | absent (eight other ai-memory events wired, slot:memory-owner) | no piece | hold-out: `docs/token-efficiency-stack.json:3409` (prompt capture off by design) | #800 records the CC's 2026-10-06 run of the vendor's hook installer with prompt capture on | UNRESOLVED: owned by #800 |
@@ -80,20 +80,20 @@ command and `permissions.defaultMode`.
 
 | Disposition | Rows |
 | --- | --- |
-| template behind: the map and template gain the piece by PR | 7, 12, 14 (the install plan installs them; the map does not name them) |
+| template behind: the map and template gain the piece by PR | 7, 12, 14 (the install plan installs them; the map does not name them); 15, 16 (adopted on 2026-10-07; the map does not name the hooks) |
 | follow an open PR | 6, 11, 23 (#901); 13 and 8 (#1153); 27 (#1111); 2 (#807); 19 (#800); 28 (#829 and the G6 inventory) |
 | host keep by ruling or as a recorded host choice | 1, 2, 3, 17, 21, 25 |
 | host fix, pending CC | 20, 22, 29, 33 |
-| host retire, pending CC | 15, 16, 26, 32 |
+| host retire, pending CC | 26, 32 |
 | owner item | 31, 35 |
 | UNRESOLVED | 4 and 10 (the map and the template disagree), 5 and 9, 18, 24, 34 |
 | equivalent today; no change | 30 |
 
-For the new distribution, rows 7, 12 and 14 are the only template gap that changes what the clean render installs.
+For the new distribution, rows 7, 12, 14, 15 and 16 are the template gaps that change what the clean render installs.
 
 ## Next actions
 
-1. Template-behind rows (7, 12, 14): one map and template change, sequenced against the open PRs that touch
+1. Template-behind rows (7, 12, 14, 15, 16): one map and template change, sequenced against the open PRs that touch
    `adoption/new-wsl/client-config-map.json` (#1051, #1089, #1109, #1111, #1151 and older ones from 2026-10-06 to 10-09).
 2. Host rows: a reviewed diff for the command center. NativeStack2604 stays its host until the boundary, so its
    configuration stays the command center's until then (the CC's direction of 2026-10-15, 19:46Z: every paper lane and
