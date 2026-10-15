@@ -17468,7 +17468,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "bf487822050bda202410b00e980e5f8d8db07cf5900bcffe80f5042699028a38",
+      "sha256": "89a75127db40f9e60d3370ed6fa17b16724518f3a4d3f501221c0100cd992b47",
       "bytes": 190328
     },
     {
@@ -18413,7 +18413,7 @@
     },
     {
       "path": "docs/decisions/2026-09-30-task-model-routing.md",
-      "sha256": "eb3b44b811222ddbea0dee58df629241f314041ab68ef54855844c1346fd4353",
+      "sha256": "5f9492dd70f9751a54f9ba903fd31745f93300bc938987626dc085a78baca254",
       "bytes": 46749
     },
     {
@@ -63853,8 +63853,8 @@
     },
     {
       "path": "tests/test_runtime_profiles.py",
-      "sha256": "82e064796fcb0be9c34dddc701eedc0699422bdefb7aa40ba1a16240b713c7e8",
-      "bytes": 62274
+      "sha256": "da53b9b0a8afffffa3f1cb4f218da8ccb567181f593d8fbaf33821f9cf10ace6",
+      "bytes": 77251
     },
     {
       "path": "tests/test_runtime_publication.py",
@@ -64333,8 +64333,8 @@
     },
     {
       "path": "tools/adoption/runtime_profiles.py",
-      "sha256": "71d8495b27e2df5a7eb6ffa889946118259716c197831d2e4b3fa4f9e7e33215",
-      "bytes": 91587
+      "sha256": "e62d6686825cc1dca40d908c853bde5c585a822039380b31d25d44bc7f794856",
+      "bytes": 103364
     },
     {
       "path": "tools/adoption/runtime_skill_freshness.py",

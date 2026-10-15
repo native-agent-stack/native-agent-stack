@@ -17,6 +17,8 @@ import argparse
 from unittest import mock
 import io
 import shutil
+import signal
+import contextlib
 from contextlib import redirect_stdout
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -57,13 +59,16 @@ class PiLaunchFixture:
         spec.loader.exec_module(mod)
         return mod
 
-    def launch(self, slot_outcomes, health_rows=None, ends=None, ledger=None, raises=None, sessions=True):
+    def launch(self, slot_outcomes, health_rows=None, ends=None, ledger=None, raises=None, sessions=True,
+               resume=None, state=None, sigterm=None, raw=None):
         """A pi-claude print launch whose runtime writes, per slot, its turns: "ok" (a completed turn), a refusal text
         (refused before billed output) or (refusal, tokens) (refused after billed output), one turn or a list; then
         ends with status `ends[slot]` (0 when absent; "watchdog" raises the outer subprocess timeout); a slot in
         `raises` raises OSError. Like pi, it keeps a <time>_<id>.jsonl session file for a --session-id unless
-        `sessions` is false. Returns (exit, receipt, runtime calls); the runtime commands, ledger rows, CC record and
-        cleanup calls are kept on self."""
+        `sessions` is false. `resume(state, root)` returns a receipt path for --resume; `state` reuses a directory; a
+        slot in `sigterm` sends SIGTERM to this process after its turns; `raw[slot]` is written as bytes. Returns (exit,
+        receipt, runtime calls); the runtime commands, cwds, ledger rows, CC record and cleanup calls are kept on
+        self."""
         real_module = profiles.module
         rows = health_rows or {}
 
@@ -73,35 +78,49 @@ class PiLaunchFixture:
                 return [rows.get(slot, {"id": slot, "state": "stored", "validity": "valid"}) for slot in selected]
 
         calls = []
-        with tempfile.TemporaryDirectory(dir="/var/tmp") as directory:
-            state = Path(directory)
+        with contextlib.ExitStack() as stack:
+            state = state or Path(stack.enter_context(tempfile.TemporaryDirectory(dir="/var/tmp")))
             root, workspace = state / "pi-claude", state / "worktree"
-            root.mkdir(); workspace.mkdir()
+            root.mkdir(exist_ok=True); workspace.mkdir(exist_ok=True)
             (root / "profile.json").write_text(json.dumps({"status": "trial", "pi_bin": "/fixture/pi",
                                                           "model": "fixture", "effort": "high", "roles": {}}))
             args = argparse.Namespace(profile="pi-claude", state_root=state, repository=state,
                                       role=None, print=True, prompt="fixture", timeout_seconds=1,
-                                      ledger=ledger if ledger is not None else state / "ledger.jsonl")
-            self.commands = []
+                                      ledger=ledger if ledger is not None else state / "ledger.jsonl",
+                                      resume=resume(state, root) if resume else None)
+            self.commands, self.cwds = [], []
 
             def runtime(command, **kwargs):
                 if command[0] == "timeout":
                     slot = next(s for s in self.worker().DEFAULT_KEYS if s in command)
                     calls.append(slot)
                     self.commands.append(command)
+                    self.cwds.append(kwargs["cwd"])
                     if slot in (raises or ()):
                         raise OSError("fixture")
+                    if slot in (raw or {}):
+                        Path(kwargs["stdout"].name).write_bytes(raw[slot])
+                        return subprocess.CompletedProcess(command, 0)
                     if sessions and "--session-id" in command:
                         (root / "sessions").mkdir(exist_ok=True)
                         (root / "sessions" / ("fixture_" + command[command.index("--session-id") + 1] + ".jsonl")).touch()
                     turns = slot_outcomes.get(slot, "ok")
                     for turn in [turns] if isinstance(turns, (str, tuple)) else turns:
-                        if turn == "ok":
+                        if turn == "inflight":
+                            # A response that started streaming and never ended: no message_end, no usage reported.
+                            partial = {"role": "assistant", "content": [], "stopReason": "stop",
+                                       "usage": {"input": 9, "output": 3, "totalTokens": 12, "cost": {"total": 0.01}}}
+                            for kind in ("message_start", "message_update"):
+                                kwargs["stdout"].write(json.dumps({"type": kind, "message": partial}) + "\n")
+                        elif turn == "ok":
                             pi_events(kwargs["stdout"], tokens=12, cost=0.5)
                         elif isinstance(turn, tuple):
                             pi_events(kwargs["stdout"], error=turn[0], tokens=turn[1], cost=0.25)
                         else:
                             pi_events(kwargs["stdout"], error=turn)
+                    if slot in (sigterm or ()):
+                        kwargs["stdout"].flush()
+                        os.kill(os.getpid(), signal.SIGTERM)
                     end = (ends or {}).get(slot, 0)
                     if end == "watchdog":
                         raise subprocess.TimeoutExpired(command, kwargs["timeout"])
@@ -125,7 +144,8 @@ class PiLaunchFixture:
                     self.ledger_rows = ([json.loads(line) for line in path.read_text().splitlines()]
                                         if path.is_file() else None)
             printed = json.loads(out.getvalue().strip().splitlines()[-1])
-            receipt = json.loads(Path(printed["receipt"]).read_text())
+            self.receipt_path = Path(printed["receipt"])
+            receipt = json.loads(self.receipt_path.read_text())
             self.record = Path(printed["record"]).read_text()
         return code, receipt, calls
 
@@ -244,7 +264,8 @@ class MidRunFailoverTests(PiLaunchFixture, unittest.TestCase):
                 self.assertEqual(first, second)
                 self.assertEqual((brief, cont), (["fixture"], [profiles.CONTINUE_PROMPT]))
                 self.assertEqual(receipt["resume"], {"status": "resumed", "reason": "credit_exhausted_mid_run",
-                                                     "session_id": first, "from": order[0], "to": order[1]})
+                                                     "session_id": first, "from": order[0], "to": order[1],
+                                                     "final_outcome": "ended"})
                 self.assertEqual([a["outcome"] for a in receipt["attempts"]], ["credit_exhausted_mid_run", "ended"])
                 self.assertEqual(receipt["credit_refused_slots"], [])
                 self.assertEqual(receipt["credential_loader_id"], order[1])
@@ -253,16 +274,15 @@ class MidRunFailoverTests(PiLaunchFixture, unittest.TestCase):
                 self.assertEqual(receipt["inference"]["native_cost_usd"], 1.25)
                 self.assertEqual(self.cleanup_calls, 1)
 
-    def test_a_missing_session_file_restarts_with_the_brief_instead_of_continuing(self):
+    def test_billed_work_without_a_session_file_stops_and_never_resends_the_brief(self):
+        # The CC's P1 at e3dcee9d: the brief is never sent again onto a worktree that may hold the run's edits.
         order = self.worker().DEFAULT_KEYS
         code, receipt, calls = self.launch({order[0]: ["ok", (CREDIT_400, 40)]}, sessions=False)
-        self.assertEqual(calls, [order[0], order[1]])
-        (first, brief), (second, again) = map(self.session_and_prompt, self.commands)
-        self.assertNotEqual(first, second)
-        self.assertEqual((brief, again), (["fixture"], ["fixture"]))
-        self.assertEqual(receipt["resume"]["status"], "restarted_no_session")
+        self.assertEqual((code, calls), (1, [order[0]]))
+        self.assertEqual(receipt["resume"]["status"], "stopped_no_session")
+        self.assertEqual(self.cleanup_calls, 0)
 
-    def test_opencode_mid_run_exhaustion_stops_resumable_on_its_slot(self):
+    def test_opencode_mid_run_exhaustion_stops_on_its_slot_and_is_not_called_resumable(self):
         with tempfile.TemporaryDirectory(dir="/var/tmp") as directory:
             state = Path(directory)
             root = state / "opencode-claude" / "roles/reviewer"
@@ -299,13 +319,188 @@ class MidRunFailoverTests(PiLaunchFixture, unittest.TestCase):
                 code = profiles.launch(args)
             receipt = json.loads(Path(json.loads(out.getvalue().strip().splitlines()[-1])["receipt"]).read_text())
             rows = [json.loads(line) for line in (state / "ledger.jsonl").read_text().splitlines()]
-        self.assertEqual((code, len(calls), choose.call_count, cleanup.call_count), (75, 1, 1, 0))
+        self.assertEqual((code, len(calls), choose.call_count, cleanup.call_count), (1, 1, 1, 0))
         self.assertEqual({k: receipt["resume"][k] for k in ("status", "session_id", "credential_loader_id")},
-                         {"status": "stopped_resumable", "session_id": "ses_fixture1",
+                         {"status": "stopped_not_resumable", "session_id": "ses_fixture1",
                           "credential_loader_id": "anthropic-api-4"})
         self.assertEqual([(row["kind"], row["key"], row.get("actual_usd"), row.get("outcome")) for row in rows],
                          [("debit", "anthropic-api-4", None, None),
                           ("settle", "anthropic-api-4", 0.5, "credit_exhausted_mid_run")])
+
+    def test_a_resumed_session_is_never_restarted_from_the_brief(self):
+        # The local review's P1 at e3dcee9d: credit runs out mid-run on the first slot, then the next slot refuses the
+        # continuation's FIRST call. The session still holds the billed work, so the run continues it on a third slot.
+        order = self.worker().DEFAULT_KEYS
+        code, receipt, calls = self.launch({order[0]: ["ok", (CREDIT_STREAM, 40)], order[1]: CREDIT_400})
+        self.assertEqual((code, calls), (0, [order[0], order[1], order[2]]))
+        sessions, prompts = zip(*map(self.session_and_prompt, self.commands))
+        self.assertEqual(len(set(sessions)), 1)
+        self.assertEqual(list(prompts), [["fixture"], [profiles.CONTINUE_PROMPT], [profiles.CONTINUE_PROMPT]])
+        self.assertEqual({k: receipt["resume"][k] for k in ("status", "from", "to", "final_outcome")},
+                         {"status": "resumed", "from": order[0], "to": order[2], "final_outcome": "ended"})
+        self.assertEqual([row["reason"] for row in self.ledger_rows if row["kind"] == "switch"],
+                         ["credit_exhausted (mid_run)", "credit_exhausted (first_call)"])
+        # With no third slot, the run stops resumable instead of ending 0 on a refused continuation.
+        two = {slot: {"id": slot, "state": "missing"} for slot in order[2:]}
+        code, receipt, calls = self.launch({order[0]: ["ok", (CREDIT_STREAM, 40)], order[1]: CREDIT_400}, two)
+        self.assertEqual((code, calls), (75, [order[0], order[1]]))
+        self.assertEqual({k: receipt["resume"][k] for k in ("status", "from", "credential_loader_id")},
+                         {"status": "stopped_resumable", "from": order[0], "credential_loader_id": order[1]})
+        self.assertEqual(self.cleanup_calls, 0)
+
+    def test_an_attempt_cut_short_inside_a_response_settles_as_unknown_spend(self):
+        # The local review's P2 at e3dcee9d: killed while a paid response streams, the attempt reported no usage for
+        # it; settling the measured amount would publish an under-count as actual spend.
+        order = self.worker().DEFAULT_KEYS
+        code, receipt, calls = self.launch({order[0]: ["ok", "inflight"]}, ends={order[0]: 137})
+        settle = [row for row in self.ledger_rows if row["kind"] == "settle"][-1]
+        self.assertEqual((settle["outcome"], settle["attempt_outcome"]), ("unknown", "cut_short"))
+        self.assertEqual((settle["actual_usd"], settle["measured_lower_bound_usd"]),
+                         (profiles.ATTEMPT_RESERVE_USD, 0.5))
+        self.assertFalse(receipt["attempts"][0]["spend_known"])
+        # Cut short between responses, the measured amount is the whole cost.
+        code, receipt, calls = self.launch({order[0]: ["ok"]}, ends={order[0]: 137})
+        settle = [row for row in self.ledger_rows if row["kind"] == "settle"][-1]
+        self.assertEqual((settle["outcome"], settle["actual_usd"]), ("cut_short", 0.5))
+        self.assertTrue(receipt["attempts"][0]["spend_known"])
+
+    def test_resume_continues_a_stopped_run_in_its_kept_worktree_and_session(self):
+        # The CC's P2 at e3dcee9d: exit 75 must have a consumer. --resume <receipt> continues the same pi session in
+        # the kept worktree (pi resolves a session per cwd: session-manager.ts:1874-1886), then cleans it up.
+        order = self.worker().DEFAULT_KEYS
+        with tempfile.TemporaryDirectory(dir="/var/tmp") as directory:
+            state = Path(directory)
+            only_first = {slot: {"id": slot, "state": "missing"} for slot in order[1:]}
+            code, receipt, calls = self.launch({order[0]: ["ok", (CREDIT_STREAM, 40)]}, only_first, state=state)
+            self.assertEqual(code, 75)
+            session, stopped = receipt["resume"]["session_id"], self.receipt_path
+            kept = Path(receipt["resume"]["retained_worktree"])
+            fake = {"workspace": kept, "session_id": session, "receipt_run": stopped.parent.name, "from": order[0]}
+            with mock.patch.object(profiles, "resumable_receipt", return_value=fake) as check:
+                code, receipt, calls = self.launch({}, resume=lambda state, root: stopped, state=state)
+            self.assertEqual(check.call_args.args[0], stopped)
+        self.assertEqual((code, calls, self.worktree_calls, self.cleanup_calls), (0, [order[0]], 0, 1))
+        self.assertEqual(self.cwds, [kept])
+        self.assertEqual(self.session_and_prompt(self.commands[0]), (session, [profiles.CONTINUE_PROMPT]))
+        self.assertEqual({k: receipt["resume"][k] for k in ("status", "reason", "session_id", "final_outcome")},
+                         {"status": "resumed", "reason": "resumed_from_receipt", "session_id": session,
+                          "final_outcome": "ended"})
+        self.assertEqual(receipt["resumed_from"], stopped.parent.name)
+
+    def test_resume_refuses_anything_but_a_resumable_stop_of_this_profile(self):
+        with tempfile.TemporaryDirectory(dir="/var/tmp") as directory:
+            root = Path(directory) / "pi-claude"
+            (root / "runs" / "r1").mkdir(parents=True)
+            receipt = root / "runs" / "r1" / "receipt.json"
+            outside = Path(directory) / "receipt.json"
+            for document, path, why in (
+                    ({"profile": "pi-claude", "role": None, "resume": {"status": "resumed"}}, receipt, "resumable stop"),
+                    ({"profile": "pi-gpt", "role": None, "resume": {"status": "stopped_resumable"}}, receipt,
+                     "resumable stop"),
+                    ({"profile": "pi-claude", "role": None, "resume": {"status": "stopped_resumable"}}, outside, "runs"),
+                    ({"profile": "pi-claude", "role": None, "resume": {"status": "stopped_resumable",
+                      "retained_worktree": directory, "session_id": "x"}}, receipt, "worktree")):
+                with self.subTest(why=why, path=path.name):
+                    path.write_text(json.dumps(document))
+                    with self.assertRaisesRegex(profiles.ProfileError, "resume refused"):
+                        profiles.resumable_receipt(path, root, Path(directory), "pi-claude", None)
+
+    def test_resume_accepts_a_kept_ns_run_worktree_of_this_repository(self):
+        # The positive control on real git: the kept worktree must share the repository's common dir and sit on an
+        # ns-run branch of this profile, and the session file must exist.
+        with tempfile.TemporaryDirectory(dir="/var/tmp") as directory:
+            base = Path(directory)
+            repository, kept, root = base / "repo", base / "kept", base / "pi-claude"
+            git = lambda *argv: subprocess.run(["git", *argv], check=True, capture_output=True)
+            git("init", "-q", "-b", "main", str(repository))
+            git("-C", str(repository), "-c", "user.name=fixture", "-c", "user.email=fixture@users.noreply.github.com",
+                "commit", "-q", "--allow-empty", "-m", "base")
+            git("-C", str(repository), "worktree", "add", "-q", "-b", "runtime/pi-claude-0123456789ab", str(kept))
+            (root / "runs" / "r1").mkdir(parents=True)
+            (root / "sessions").mkdir()
+            (root / "sessions" / "2026-10-15T00-00-00-000Z_feedface.jsonl").write_text("{}\n")
+            receipt = root / "runs" / "r1" / "receipt.json"
+            stop = {"status": "stopped_resumable", "retained_worktree": str(kept), "session_id": "feedface",
+                    "credential_loader_id": "anthropic-api-4", "from": "anthropic-api-4"}
+            receipt.write_text(json.dumps({"profile": "pi-claude", "role": None, "resume": stop}))
+            found = profiles.resumable_receipt(receipt, root, repository, "pi-claude", None)
+            self.assertEqual((found["workspace"], found["session_id"], found["receipt_run"]), (kept, "feedface", "r1"))
+            for change, why in (({"session_id": "missing"}, "session"),):
+                receipt.write_text(json.dumps({"profile": "pi-claude", "role": None, "resume": {**stop, **change}}))
+                with self.subTest(why=why), self.assertRaisesRegex(profiles.ProfileError, "resume refused"):
+                    profiles.resumable_receipt(receipt, root, repository, "pi-claude", None)
+            git("-C", str(kept), "switch", "-q", "-c", "other")
+            receipt.write_text(json.dumps({"profile": "pi-claude", "role": None, "resume": stop}))
+            with self.assertRaisesRegex(profiles.ProfileError, "worktree"):
+                profiles.resumable_receipt(receipt, root, repository, "pi-claude", None)
+
+    def test_the_run_command_takes_resume_without_a_brief_and_needs_one_without_it(self):
+        with mock.patch.object(profiles, "launch", return_value=0) as launched:
+            self.assertEqual(profiles.main(["run", "--state-root", "/x", "--repository", "/x", "--resume",
+                                            "/x/runs/r1/receipt.json", "pi-claude", "researcher"]), 0)
+        args = launched.call_args.args[0]
+        self.assertEqual((args.prompt, args.resume, args.role, args.print),
+                         (None, Path("/x/runs/r1/receipt.json"), "stack-researcher", True))
+        with mock.patch.object(profiles, "launch", return_value=0) as launched, \
+                contextlib.redirect_stderr(io.StringIO()):
+            self.assertEqual(profiles.main(["run", "--state-root", "/x", "--repository", "/x", "pi-claude",
+                                            "researcher"]), 2)
+        launched.assert_not_called()
+
+    def test_sigterm_during_an_attempt_settles_it_before_ns_run_ends(self):
+        # The CC's P3: a terminated ns-run must not leave its debit open.
+        order = self.worker().DEFAULT_KEYS
+        before = signal.getsignal(signal.SIGTERM)  # a test runner may have its own
+        with self.assertRaises(SystemExit) as stop:
+            self.launch({order[0]: ["ok", "inflight"]}, sigterm={order[0]})
+        self.assertEqual(stop.exception.code, 128 + signal.SIGTERM)
+        self.assertEqual([(row["kind"], row.get("outcome")) for row in self.ledger_rows],
+                         [("debit", None), ("settle", "unknown")])
+        self.assertIs(signal.getsignal(signal.SIGTERM), before)
+
+    def test_an_orphaned_debit_is_settled_as_unknown_by_the_next_launch(self):
+        # The CC's P3: SIGKILL runs no handler, so the next launch settles a debit whose ns-run process is gone.
+        order = self.worker().DEFAULT_KEYS
+        with tempfile.TemporaryDirectory(dir="/var/tmp") as directory:
+            ledger = Path(directory) / "ledger.jsonl"
+            log = Path(directory) / "events.jsonl"
+            with log.open("w") as handle:
+                pi_events(handle, tokens=3, cost=0.75)
+            live = {"pid": os.getpid(), "pid_start": profiles.process_start(os.getpid()), "log": str(log)}
+            gone = {"pid": os.getpid(), "pid_start": "-1", "log": str(log), "runtime": "pi"}
+            ledger.write_text("".join(json.dumps({"kind": "debit", "key": order[1], "workload": "NSRUN", "ref": ref,
+                                                  "max_usd": 25.0, "detail": detail}) + "\n"
+                                      for ref, detail in (("NSRUN:live", live), ("NSRUN:gone", gone))))
+            self.launch({}, ledger=ledger)
+        settled = {row["ref"]: row for row in self.ledger_rows if row["kind"] == "settle"}
+        self.assertNotIn("NSRUN:live", settled)
+        self.assertEqual((settled["NSRUN:gone"]["outcome"], settled["NSRUN:gone"]["actual_usd"],
+                          settled["NSRUN:gone"]["measured_lower_bound_usd"]), ("unknown", 25.0, 0.75))
+
+    def test_an_unreadable_log_or_null_usage_never_skips_the_settle(self):
+        # The CC's P3: the settle sits in a finally that a decode error or a null usage cannot skip.
+        order = self.worker().DEFAULT_KEYS
+        code, receipt, calls = self.launch({}, raw={order[0]: b"\xff\xfe not utf-8\n"})
+        self.assertEqual([(row["kind"], row.get("outcome")) for row in self.ledger_rows],
+                         [("debit", None), ("settle", "unknown")])
+        null = json.dumps({"type": "message_end", "message": {"role": "assistant", "usage": None, "content": [],
+                                                              "stopReason": "stop"}}).encode() + b"\n"
+        code, receipt, calls = self.launch({}, raw={order[0]: null})
+        self.assertEqual([(row["kind"], row.get("outcome"), row.get("actual_usd")) for row in self.ledger_rows],
+                         [("debit", None, None), ("settle", "ended", 0.0)])
+
+    def test_an_empty_or_homeless_ledger_is_refused_and_nothing_is_created(self):
+        # The CC's P3: --ledger "" would name the current directory; a missing directory would hide the spend.
+        with self.assertRaises(SystemExit):
+            with contextlib.redirect_stderr(io.StringIO()):
+                profiles.parser().parse_args(["run", "--state-root", "/x", "--repository", "/x", "--ledger", "",
+                                              "pi-claude", "researcher", "brief.md"])
+        with tempfile.TemporaryDirectory(dir="/var/tmp") as directory:
+            homeless = Path(directory) / "missing" / "ledger.jsonl"
+            with self.assertRaisesRegex(profiles.ProfileError, "directory missing"):
+                self.launch({}, ledger=homeless)
+            self.assertFalse(homeless.parent.exists())
+            self.assertEqual((self.commands, self.worktree_calls), ([], 0))
 
     def test_a_first_call_refusal_starts_a_fresh_session_with_the_brief(self):
         order = self.worker().DEFAULT_KEYS
@@ -386,13 +581,13 @@ class MidRunFailoverTests(PiLaunchFixture, unittest.TestCase):
                                                         "cache_write": 0}})
         self.assertEqual((last["actual_usd"], last["outcome"]), (0.5, "ended"))
         self.assertEqual((switch["from"], switch["to"], switch["reason"]),
-                         (order[0], order[1], "credit_exhausted_mid_run"))
+                         (order[0], order[1], "credit_exhausted (mid_run)"))
         # A row names the slot, never a key value or the variable that carries it.
         text = json.dumps(rows)
         self.assertNotIn("ANTHROPIC_API_KEY", text)
         self.assertNotRegex(text, r"sk-ant-")
         self.launch({order[0]: CREDIT_400})
-        self.assertEqual(self.ledger_rows[2]["reason"], "credit_exhausted_first_call")
+        self.assertEqual(self.ledger_rows[2]["reason"], "credit_exhausted (first_call)")
         self.assertEqual(self.ledger_rows[1]["actual_usd"], 0)
 
     def test_an_attempt_that_raises_is_still_settled(self):
