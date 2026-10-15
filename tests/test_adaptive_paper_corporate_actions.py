@@ -22,6 +22,7 @@ from unittest import mock
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "blueprints/us-equities/adaptive-paper"
 sys.path.insert(0, str(SOURCE))
+from safety import RiskLimits  # noqa: E402
 
 import corporate_actions as CA  # noqa: E402 (path inserted above)
 import sessions  # noqa: E402
@@ -1016,6 +1017,7 @@ class RebalanceCorporateActionGuardTests(unittest.TestCase):
     class _FakeLedger:
         def __init__(self, positions=None):
             self._positions = positions or {}
+            self.limits = RiskLimits(max_order_qty=D(5))
 
         def intents(self):
             return []

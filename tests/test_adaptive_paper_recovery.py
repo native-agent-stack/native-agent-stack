@@ -302,6 +302,78 @@ class RecoveryTests(unittest.TestCase):
         self.assertEqual(result["buy_submissions"], 0)
         return result
 
+    def interrupted_before_submit_recovers_later(self, condition):
+        self.original_buy(observed=True)
+        clock = RecoveryClock()
+        epoch = self.start + 1000
+        self.controller.clock = lambda: epoch + clock.now
+        quantity = self.ledger.owned_exit_quantity
+
+        def interrupt(*args):
+            result = quantity(*args)
+            if condition == 'integrity':
+                self.port.health['reasons'] = ['queue_overflow']
+            elif condition == 'deadline':
+                clock.now = 3
+                self.port.publish_quote()
+            return result
+
+        if condition == 'preawait_deadline':
+            submit = self.port.submit
+
+            def expire_before_await(payload):
+                clock.now = 3
+                self.port.publish_quote()
+                return submit(payload)
+
+            self.port.submit = expire_before_await
+
+        with patch('recovery.time', clock), patch.object(
+                self.ledger, 'owned_exit_quantity', side_effect=interrupt):
+            first = self.recover()
+        expected = ('recovery_observation_integrity_lost' if condition == 'integrity'
+                    else 'recovery_deadline_reached')
+        self.assertEqual(first['errors'], [expected])
+        self.assertEqual(self.port.submissions, [])
+        self.assertEqual(self.ledger.exit_state('SPY')['refusal']['classification'], 'transient')
+        previous = self.port
+        self.port = self.controller.port = FakePort(self.controller)
+        self.port.rows = dict(previous.rows)
+        self.port.cash, self.port.qty = previous.cash, previous.qty
+        clock.now = 10
+        with patch('recovery.time', clock):
+            second = self.recover()
+        self.assertEqual(second['status'], 'passed', second['errors'])
+        self.assertEqual(self.ledger.positions(), {})
+        self.assertEqual(len(self.port.submissions), 1)
+
+    def test_in_try_deadline_does_not_permanently_refuse_later_recovery(self):
+        self.interrupted_before_submit_recovers_later('deadline')
+
+    def test_in_try_integrity_loss_does_not_permanently_refuse_later_recovery(self):
+        self.interrupted_before_submit_recovers_later('integrity')
+
+    def test_deadline_before_submit_coroutine_starts_retains_no_http_proof(self):
+        self.interrupted_before_submit_recovers_later('preawait_deadline')
+
+    def test_fresh_reconciled_recovery_releases_only_integrity_loss_refusal(self):
+        self.original_buy(observed=True)
+        refusal = self.ledger.record_exit_refusal('SPY',
+            'exit_submission_not_sent:recovery_observation_integrity_lost', self.controller.clock())
+        self.assertEqual(refusal['classification'], 'integrity_lost')
+        self.port.external_position = True
+        refused = self.recover()
+        self.assertEqual(refused['status'], 'needs_attention')
+        self.assertEqual(self.port.submissions, [])
+        self.assertEqual(self.ledger.exit_state('SPY')['refusal']['classification'], 'integrity_lost')
+        previous = self.port
+        self.port = self.controller.port = FakePort(self.controller)
+        self.port.rows = dict(previous.rows)
+        self.port.cash, self.port.qty = previous.cash, previous.qty
+        result = self.recover()
+        self.assertEqual(result['status'], 'passed', result['errors'])
+        self.assertEqual(self.ledger.positions(), {})
+
     def test_crash_after_post_reconciles_original_id_without_resubmitting(self):
         self.original_buy(observed=False)
         result = self.recover()
@@ -311,13 +383,13 @@ class RecoveryTests(unittest.TestCase):
         self.assertNotEqual(self.port.submissions[0]["client_order_id"], "entry-1")
         self.assertEqual(self.port.snapshots, 2)
 
-    def test_partial_buy_cancel_then_exact_nine_decimal_exit_after_expired_trial(self):
+    def test_fractional_residual_requires_attention_without_fractional_sell(self):
         self.original_buy("0.123456789", "partially_filled")
         result = self.recover()
-        self.assertEqual(result["status"], "passed")
+        self.assertEqual(result["status"], "needs_attention")
         self.assertEqual(self.port.cancelled, ["entry-1"])
-        self.assertEqual(self.port.submissions[0]["qty"], "0.123456789")
-        self.assertEqual(self.port.snapshots, 3)
+        self.assertEqual(self.port.submissions, [])
+        self.assertEqual(self.ledger.positions()["SPY"].qty, Decimal("0.123456789"))
         self.assertEqual(self.ledger.accounting().halted_reason, "recovery_only")
 
     def test_notional_mode_exit_uses_whole_shares_within_the_ledger_cap(self):
@@ -341,6 +413,42 @@ class RecoveryTests(unittest.TestCase):
         self.assertEqual((result["status"], result["errors"]), ("passed", []))
         self.assertTrue(result["flat"])
         self.assertEqual([(p["qty"], p["limit_price"]) for p in self.port.submissions], [("10", "99.98"), ("1", "99.98")])
+
+    def test_appreciated_single_share_recovery_exceeds_only_notional_cap(self):
+        self.ledger.close()
+        self.ledger = Ledger(Path(self.temp.name) / "one-share.sqlite", RiskLimits(
+            cleanup_seconds=3, max_order_qty="100", max_order_qty_mode="notional",
+            max_order_notional_usd="100.01"))
+        self.controller = Controller(self.ledger)
+        self.port = self.controller.port = FakePort(self.controller)
+        self.ledger.start_trial(self.start)
+        self.original_buy()
+        self.port.publish_quote = lambda: self.port.on_quote({"symbol": "SPY", "bid": "110.00",
+            "ask": "110.01", "ts_ns": int(self.controller.clock() * 1e9)})
+        result = self.recover()
+        self.assertEqual((result["status"], result["errors"]), ("passed", []))
+        self.assertTrue(result["flat"])
+        self.assertEqual([(p["qty"], p["limit_price"]) for p in self.port.submissions], [("1", "109.98")])
+        self.assertEqual(self.ledger.db.execute(
+            "SELECT count(*) FROM events WHERE kind='exit_cap_exceeded_reduce_only'").fetchone()[0], 1)
+
+    def test_definitive_exit_refusal_survives_journal_reopen_and_blocks_recovery(self):
+        self.original_buy()
+        self.ledger.record_exit_refusal("SPY", "only_USD_equity_limit_DAY_supported", self.start)
+        path, limits = self.ledger.path, self.ledger.limits
+        self.ledger.close()
+        self.ledger = Ledger(path, limits)
+        self.controller = Controller(self.ledger)
+        self.port.c = self.controller
+        self.controller.port = self.port
+        result = self.recover()
+        self.assertEqual(result["status"], "needs_attention")
+        self.assertEqual(self.port.submissions, [])
+        self.assertEqual(self.ledger.positions()["SPY"].qty, Decimal(1))
+        self.assertTrue(any("recovery_exit_refused:definitive:" in e["message"]
+                            for e in result["error_details"]), result)
+        self.assertEqual(self.ledger.exit_state("SPY")["refusal"]["reason"],
+                         "only_USD_equity_limit_DAY_supported")
 
     def test_pending_cancel_cannot_authorize_sell(self):
         self.original_buy("0.5", "partially_filled")
@@ -608,6 +716,115 @@ class RecoveryTests(unittest.TestCase):
         self.assertTrue(result["unresolved_orders"][0]["submit_attempted"])
         self.assertNotIn("secret", str(result))
 
+    def reconciled_ambiguous_exit(self, *, deadline=False, status='canceled', mover=False, transport_error=False):
+        self.original_buy()
+        self.port.mode = 'ambiguous_submit'
+        if deadline:
+            self.config['cleanup_seconds'] = .5
+            submit = self.port.submit
+
+            async def awaiting_response(payload):
+                try:
+                    return await submit(payload)
+                except TimeoutError:
+                    await asyncio.Future()
+
+            self.port.submit = awaiting_response
+        elif transport_error:
+            submit = self.port.submit
+
+            async def ambiguous_response(payload):
+                from transport import AmbiguousSubmission
+                try:
+                    return await submit(payload)
+                except TimeoutError as exc:
+                    raise AmbiguousSubmission('provider secret must not escape') from exc
+
+            self.port.submit = ambiguous_response
+        first = self.recover()
+        self.assertEqual(first['status'], 'needs_attention')
+        self.assertEqual(len(self.port.submissions), 1)
+        attempted = self.ledger.intents()[-1]
+        self.assertTrue(attempted.submit_attempted)
+        self.assertFalse(attempted.terminal)
+        previous = self.port
+        self.port = self.controller.port = FakePort(self.controller)
+        self.port.symbols = ('SPY',)
+        self.port.rows = dict(previous.rows)
+        self.port.cash, self.port.qty = previous.cash, previous.qty
+        payload = previous.submissions[0]
+        filled = status == 'filled'
+        self.port.rows[attempted.client_id] = dict(payload, id='broker-reconciled-exit',
+            status=status, filled_qty=payload['qty'] if filled else '0',
+            filled_avg_price=payload['limit_price'] if filled else None, updated_at_ns=time.time_ns())
+        if filled:
+            self.port.qty -= Decimal(payload['qty'])
+            self.port.cash += Decimal(payload['qty']) * Decimal(payload['limit_price'])
+        self.config['cleanup_seconds'] = 3
+        if mover:
+            from mover_runner import recover_mover
+            second = asyncio.run(recover_mover(self.controller, self.meta, self.config))
+        else:
+            second = self.recover()
+        self.assertEqual(second['status'], 'passed', second['errors'])
+        self.assertEqual(self.ledger.positions(), {})
+        self.assertEqual(len(self.port.submissions), 0 if filled else 1)
+        self.assertNotIn('refusal', self.ledger.exit_state('SPY'))
+        self.assertTrue(self.ledger.exit_retry_allowed('SPY', self.controller.clock()))
+        if not filled:
+            self.assertNotEqual(self.port.submissions[0]['client_order_id'], attempted.client_id)
+
+    def test_ambiguous_exit_reconciles_cancelled_id_before_retry(self):
+        self.reconciled_ambiguous_exit()
+
+    def test_post_submit_deadline_reconciles_cancelled_id_before_retry(self):
+        self.reconciled_ambiguous_exit(deadline=True)
+
+    def test_ambiguous_unfilled_exit_is_cancelled_before_retry(self):
+        self.reconciled_ambiguous_exit(status='new')
+
+    def test_shared_journal_ambiguous_exit_allows_mover_recovery(self):
+        self.reconciled_ambiguous_exit(mover=True)
+
+    def test_transport_ambiguous_submission_reconciles_before_retry(self):
+        self.reconciled_ambiguous_exit(transport_error=True)
+
+    def test_ambiguous_fill_reconciled_flat_does_not_poison_later_exits(self):
+        self.reconciled_ambiguous_exit(status='filled')
+
+    def test_ambiguous_exit_missing_from_snapshot_cannot_retry(self):
+        self.original_buy()
+        self.port.mode = 'ambiguous_submit'
+        self.recover()
+        previous = self.port
+        self.port = self.controller.port = FakePort(self.controller)
+        self.port.rows = dict(previous.rows)
+        self.port.cash, self.port.qty = previous.cash, previous.qty
+        second = self.recover()
+        self.assertEqual(second['status'], 'needs_attention')
+        self.assertIn('submitted_intent_absent', second['errors'])
+        self.assertEqual(self.port.submissions, [])
+        self.assertTrue(self.ledger.unresolved()[0].submit_attempted)
+
+    def test_foreign_exception_text_is_absent_from_refusal_journal_and_next_receipt(self):
+        import json
+        self.original_buy()
+        self.port.mode = 'ambiguous_submit'
+        self.recover()
+        refusal = self.ledger.exit_state('SPY')['refusal']
+        previous = self.port
+        self.port = self.controller.port = FakePort(self.controller)
+        self.port.rows = dict(previous.rows)
+        self.port.cash, self.port.qty = previous.cash, previous.qty
+        payload = previous.submissions[0]
+        self.port.rows[payload['client_order_id']] = dict(payload, id='broker-reconciled-exit',
+            status='canceled', filled_qty='0', filled_avg_price=None, updated_at_ns=time.time_ns())
+        next_receipt = self.recover()
+        self.assertNotIn('provider secret must not escape', json.dumps(next_receipt))
+        self.assertNotIn('provider secret must not escape', json.dumps(refusal))
+        self.assertEqual(refusal['reason'], 'TimeoutError')
+        self.assertEqual(refusal['classification'], 'transient_with_reconcile')
+
     def test_explicit_pre_wire_refusal_can_release_pending_intent(self):
         self.original_buy()
         self.port.mode = "local_not_sent"
@@ -746,6 +963,48 @@ class PerSymbolRecoveryExits(unittest.TestCase):
     deadline; a residual left for want of a quote is named in stale_symbols."""
 
     setUp, tearDown, recover = RecoveryTests.setUp, RecoveryTests.tearDown, RecoveryTests.recover
+
+    def test_one_symbols_retry_window_does_not_end_recovery(self):
+        self.ledger.close()
+        self.ledger = Ledger(Path(self.temp.name) / 'retry.sqlite', RiskLimits(cleanup_seconds=10))
+        self.controller = Controller(self.ledger)
+        self.ledger.start_trial(self.start)
+        self.config['cleanup_seconds'] = 10
+        self.hold(TwoSymbolPort(self.controller))
+        clock = RecoveryClock()
+        epoch = self.start + 1000
+        self.controller.clock = lambda: epoch + clock.now
+        self.ledger.record_exit_refusal('PFSA', 'exit_submission_not_sent:temporary', epoch)
+        clock.now = 1
+        attempts = []
+        submit = self.port.submit
+
+        async def observed_submit(payload):
+            attempts.append((payload['symbol'], clock.now))
+            return await submit(payload)
+
+        self.port.submit = observed_submit
+
+        async def advance():
+            while not attempts:
+                await asyncio.sleep(0)
+            clock.now = 6
+            self.port.publish_quote()
+
+        async def exercise():
+            updates = asyncio.create_task(advance())
+            try:
+                return await asyncio.wait_for(
+                    recover(self.controller, self.meta, self.config, reconcile_fn=proof), 5)
+            finally:
+                updates.cancel()
+                await asyncio.gather(updates, return_exceptions=True)
+
+        with patch('recovery.time', clock):
+            result = asyncio.run(exercise())
+        self.assertEqual(result['status'], 'passed', result['errors'])
+        self.assertEqual(attempts, [('SRZN', 1), ('PFSA', 6)])
+        self.assertEqual(self.ledger.positions(), {})
 
     def recover_with_updates(self, clock, updates):
         self.controller.clock = lambda: self.start + 1000
