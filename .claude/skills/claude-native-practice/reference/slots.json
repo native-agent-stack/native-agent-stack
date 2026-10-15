@@ -151,14 +151,16 @@
    ],
    "rejections": [
     "thedotmack/claude-mem over native memory (no measured gain)",
-    "Repository-tracked auto memory (a repository-supplied `autoMemoryDirectory` is inert)"
+    "Repository-tracked auto memory (memory.md:516,526: a project's `autoMemoryDirectory` is honored once the folder is trusted, and ignored while `permissions.blockReadsOutsideWorkingDirectories` is on; memory stays outside the repository)"
    ],
    "evidence": [
     "memory.md auto-memory section",
     "memory-O9 (2.1.284: markup neutralized in MEMORY.md)",
-    "settings-reference `autoMemoryDirectory` scope"
+    "settings-reference `autoMemoryDirectory` scope",
+    "memory-maintenance-20261015 (2.1.300 binary: auto-dream gate, `.consolidate-lock`, index caps and their measure; ai-memory 2.6.3 at 385b81ea)"
    ],
-   "overturn_when": "Paired runs show auto memory lowers quality, or dropping the index keeps quality at lower cost; or a release changes its defaults.",
+   "notes": "Consolidation (auto-dream): user settings carry `autoDreamEnabled: true`, applied by the command center on 2026-10-15 at 00:45 ET after the owner asked that memories consolidate on their own. It is inert while the server flag `tengu_onyx_plover` is off: the 2.1.300 binary reads the setting only when the cached flag has `enabled` or `available` true, and the flag read that day had `enabled` false and no `available` key; no docs page or CHANGELOG line through 2.1.300 mentions auto-dream. The client keeps the last consolidation time as the mtime of `.consolidate-lock` in the memory directory. Index limits: memory.md:546 loads the first 200 lines of `MEMORY.md` or the first 25KB, whichever comes first; the 2.1.300 binary measures the trimmed text in UTF-16 code units and, after a write, reminds from 80% of a cap and errors over it (errors.md:4275). `tools/memory-index-guard` (a systemd user timer, every 6 h) reads both caps from the installed binary, measures every index (warn at 80%, alert at 90%) and keeps a private snapshot of each memory directory, so the first consolidation's edits can be diffed (evidence/artifacts/memory-maintenance-20261015/). Durable memory (ai-memory 2.6.3, the memory of record this route names; it has no slot row): there is no `consolidate` CLI, only the MCP tool `memory_consolidate`, run with `dry_run` first; `ai-memory lint --dry-run --no-llm` and `ai-memory forget-sweep --dry-run` are HTTP clients of the running server, whose writes go through one single-writer actor (ARCHITECTURE.md:721-722 at 385b81ea). Scheduled maintenance is the server's built-in `[maintenance]` table (install.md:2457-2469: rule-based lint and forget sweep daily by default); this host runs lint daily and the sweep at 0, a recorded deviation (docs/memory-landscape-maintenance.md:90-94, :97-99), so no extra timer is added, as the 2026-10-08 drafts also avoid a duplicate built-in lint job (adoption/drafts/memory-maintenance-20261008/README.md:23). The CLI's default server port 49374 differs from this host's server on 29374, so a manual run passes the unit's `--config`.",
+   "overturn_when": "Paired runs show auto memory lowers quality, or dropping the index keeps quality at lower cost; or a release changes its defaults; or the `tengu_onyx_plover` flag becomes enabled or available, and then a paired check of the first dream run's edits against the guard's snapshot decides whether consolidation stays on.",
    "supersedes": [
     "The 'index about 22 KB' note of the 2026-10-04 dispatch record (now about 3 KB)"
    ]

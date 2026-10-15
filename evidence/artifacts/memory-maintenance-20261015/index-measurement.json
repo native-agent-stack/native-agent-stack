@@ -1,0 +1,31 @@
+{
+ "schema": "memory-maintenance-index-measurement/1",
+ "measured_at": "2026-10-15T05:56:51Z",
+ "by": "tools/memory-index-guard/memory_index_guard.py as committed with this file, run once read-only on this host with --state-dir in a scratch directory (default binary, ~/.claude and ~/.claude.json); exit 0",
+ "names": "Project directory names with the account's home directory masked as -home-<user>-. Names, lines, sizes and percents only: no memory content and no digest of a memory file.",
+ "limits": {"line_cap": 200, "size_cap": 25000, "from": "the 2.1.300 binary, identifiers S$ and Yie (extract-results.json)"},
+ "thresholds": {"warn": 0.8, "alert": 0.9},
+ "measure": "lines = newlines of the JavaScript-trimmed text + 1; code_units = its UTF-16 length, the size the client compares with the size cap; utf8_bytes = the file size on disk",
+ "indexes": [
+  {"project": "-home-<user>--local-state-native-agent-stack-research-client-checks-run-qJgn8Hnn", "lines": 1, "code_units": 182, "utf8_bytes": 187, "lines_pct": 0.5, "size_pct": 0.73, "utf8_bytes_pct": 0.75, "status": "ok"},
+  {"project": "-home-<user>--local-state-native-agent-stack-runtime-workers-openhands-accept-Jhnqf82x", "lines": 1, "code_units": 190, "utf8_bytes": 193, "lines_pct": 0.5, "size_pct": 0.76, "utf8_bytes_pct": 0.77, "status": "ok"},
+  {"project": "-home-<user>-code-librarium-course", "lines": 19, "code_units": 4764, "utf8_bytes": 4803, "lines_pct": 9.5, "size_pct": 19.06, "utf8_bytes_pct": 19.21, "status": "ok"},
+  {"project": "-home-<user>-code-native-agent-stack", "lines": 125, "code_units": 19974, "utf8_bytes": 20225, "lines_pct": 62.5, "size_pct": 79.9, "utf8_bytes_pct": 80.9, "status": "ok"},
+  {"project": "-home-<user>-code-us-equities-trading", "lines": 138, "code_units": 18639, "utf8_bytes": 18930, "lines_pct": 69.0, "size_pct": 74.56, "utf8_bytes_pct": 75.72, "status": "ok"}
+ ],
+ "stripped_parts_present": "none of the five indexes has YAML frontmatter or an HTML comment, so these numbers are the loaded measure, not an upper bound",
+ "earlier_measurement": {
+  "measured_at": "2026-10-15T04:45:18Z",
+  "by": "scripts/memory_index_sizes.py (FACTS Q4), an independent implementation of the same measure",
+  "rows": [
+   {"project": "-home-<user>--local-state-native-agent-stack-research-client-checks-run-qJgn8Hnn", "trim_lines": 1, "trim_units": 182, "utf8_bytes": 187},
+   {"project": "-home-<user>--local-state-native-agent-stack-runtime-workers-openhands-accept-Jhnqf82x", "trim_lines": 1, "trim_units": 190, "utf8_bytes": 193},
+   {"project": "-home-<user>-code-librarium-course", "trim_lines": 19, "trim_units": 4764, "utf8_bytes": 4803},
+   {"project": "-home-<user>-code-native-agent-stack", "trim_lines": 124, "trim_units": 19763, "utf8_bytes": 20012},
+   {"project": "-home-<user>-code-us-equities-trading", "trim_lines": 137, "trim_units": 18481, "utf8_bytes": 18770}
+  ],
+  "agreement": "The three indexes unchanged between the runs give the same numbers in both implementations; the native-agent-stack and us-equities-trading indexes grew by one line each in the 71 minutes between them."
+ },
+ "auto_dream": {"autoDreamEnabled": true, "flag": {"enabled": false, "available": "absent"}, "gate_open": false, "effective": false, "memory_dirs": 890, "locks": 0, "new_consolidations": 0},
+ "reading": "No index is at 90% of a cap. The native-agent-stack index is at 79.9% of the size cap in code units (80.9% in UTF-8 bytes), 0.1 point below the client's 80% reminder."
+}

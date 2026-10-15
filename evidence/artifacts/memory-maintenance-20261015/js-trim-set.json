@@ -1,0 +1,20 @@
+{
+ "schema": "memory-maintenance-js-trim/1",
+ "measured_at": "2026-10-15T05:48:13Z",
+ "probe": "probe/js_trim_set.js",
+ "method": "Each engine ran the probe once: every code point from U+0000 to U+10FFFF except the surrogate range, as a one-character string, kept when String.prototype.trim() returned the empty string. The guard's JS_TRIM must equal this list (tests/test_memory_index_guard.py).",
+ "why_two_engines": "The 2.1.300 client is a Bun build (its chunks are marked // @bun @bytecode), so Bun's engine is the one the loader runs on; Node is the second engine, and both return the same list.",
+ "engines": [
+  {
+   "engine": "bun 1.4.2",
+   "removed": [9, 10, 11, 12, 13, 32, 160, 5760, 8192, 8193, 8194, 8195, 8196, 8197, 8198, 8199, 8200, 8201, 8202, 8232, 8233, 8239, 8287, 12288, 65279],
+   "astral_length": 2
+  },
+  {
+   "engine": "node v24.21.0",
+   "removed": [9, 10, 11, 12, 13, 32, 160, 5760, 8192, 8193, 8194, 8195, 8196, 8197, 8198, 8199, 8200, 8201, 8202, 8232, 8233, 8239, 8287, 12288, 65279],
+   "astral_length": 2
+  }
+ ],
+ "python_str_strip_differs": "Python's str.strip() with no argument also removes U+001C-U+001F and U+0085 and keeps U+FEFF, so the guard spells the set out by code point."
+}

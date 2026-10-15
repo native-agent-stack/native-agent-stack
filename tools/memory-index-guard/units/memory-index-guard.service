@@ -1,0 +1,15 @@
+# Every 6 h (memory-index-guard.timer): measure the Claude Code memory indexes against the caps read from the installed client
+# and watch for background memory consolidation (auto-dream). Exit 1 (an index at 90% of a cap, or a new consolidation) or 2
+# (the guard's own state cannot be read or written) fails the unit, and OnFailure= runs the command center's stack-alert@
+# template (the same handler as tools/session-relaunch/units/ns-session-relaunch.service; systemd.unit(5), OnFailure=).
+# Confirm the template is loaded before enabling the timer:
+# `systemctl --user show stack-alert@memory-index-guard.service.service --property=LoadState`.
+[Unit]
+Description=Check the Claude Code memory indexes and auto-dream consolidation
+OnFailure=stack-alert@%n.service
+
+[Service]
+Type=oneshot
+CPUWeight=idle
+TimeoutStartSec=300
+ExecStart=/usr/bin/python3 -I %h/.local/share/native-agent-stack/memory-index-guard/memory_index_guard.py --state-dir %h/.local/state/native-agent-stack/memory-index-guard
