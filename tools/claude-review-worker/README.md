@@ -57,7 +57,10 @@ directory), deleted after the run. The inner bubblewrap is the filesystem fence.
 `/review/main` and the input directory at `/review/input` (both read-only), a fresh `CLAUDE_CONFIG_DIR` at
 `/review/config` (writable, deleted after the run) and the pinned binary. There is no `/home`, so the gh login, the key
 store and every other host file are absent. No CLAUDE.md memory of any kind is loaded: every session runs with
-`CLAUDE_CODE_DISABLE_CLAUDE_MDS=1` (the instruction fence). The flags and settings are listed in `claude_flags()` and
+`CLAUDE_CODE_DISABLE_CLAUDE_MDS=1` (the instruction fence). A capacity error (429 or 529) is waited out instead of
+ending the run: `CLAUDE_CODE_RETRY_WATCHDOG=1` with `CLAUDE_CODE_RETRY_WATCHDOG_MAX_WAIT_MS=900000`, 15 minutes per
+request, a third of the default run timeout ([env-vars](https://code.claude.com/docs/en/env-vars), 2.1.295 or later);
+a 429 for a spend limit or exhausted credits still fails at once. The flags and settings are listed in `claude_flags()` and
 `review_settings()` in `worker.py`, each checked against `claude --help` of 2.1.299 (byte-identical to 2.1.296's).
 
 A trading head (every `us-equities-trading` head, and a `native-agent-stack` head that changes one of its

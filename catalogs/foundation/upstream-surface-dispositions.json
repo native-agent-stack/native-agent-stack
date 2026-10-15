@@ -429,15 +429,15 @@
   },
   {
    "key": "claude:env:CLAUDE_CODE_RETRY_WATCHDOG",
-   "disposition": "baseline-unreviewed",
-   "reason": "off on both hosts (read 2026-10-04)); no repository decision record that names it was verified",
+   "disposition": "enabled",
+   "reason": "the unattended review worker sets it (gap-ledger C1-0001, 2026-10-15; env-vars.md:379, remote workers); probes and interactive sessions stay off",
    "source": "https://code.claude.com/docs/en/env-vars.md",
-   "carrier": null,
-   "value": null,
-   "scope": null,
-   "overturn": null,
-   "reviewed_utc": "2026-10-04T18:55:00Z",
-   "version": "2.1.289"
+   "carrier": "tools/claude-review-worker/worker.py (SANDBOX_ENV)",
+   "value": "1",
+   "scope": "claude-review-worker (unattended claude -p)",
+   "overturn": "a measured review run in which waiting out 429/529 hid a fault that failing fast would have surfaced, or a release changes which 429s the watchdog waits out",
+   "reviewed_utc": "2026-10-15T10:54:34Z",
+   "version": "2.1.300"
   },
   {
    "key": "claude:env:CLAUDE_CODE_SESSIONEND_HOOKS_TIMEOUT_MS",
@@ -3807,15 +3807,15 @@
   },
   {
    "key": "claude:env:CLAUDE_CODE_RETRY_WATCHDOG_MAX_WAIT_MS",
-   "disposition": "declined",
-   "reason": "2.1.295: caps 429/529 waits only when CLAUDE_CODE_RETRY_WATCHDOG is set. The watchdog is off on both hosts, so there is nothing to cap.",
+   "disposition": "enabled",
+   "reason": "2.1.295: caps each request's 429/529 wait under CLAUDE_CODE_RETRY_WATCHDOG; the review worker sets 900000, a third of its 2700 s run timeout (C1-0001)",
    "source": "https://code.claude.com/docs/en/env-vars",
-   "carrier": null,
-   "value": null,
-   "scope": "env var; unset",
-   "overturn": "A decision to enable CLAUDE_CODE_RETRY_WATCHDOG for unattended lanes; then set a cap with it.",
-   "reviewed_utc": "2026-10-10T00:25:03Z",
-   "version": "2.1.296"
+   "carrier": "tools/claude-review-worker/worker.py (RETRY_WAIT_CAP_MS)",
+   "value": "900000",
+   "scope": "claude-review-worker (unattended claude -p)",
+   "overturn": "the worker's run timeout changes (keep the cap below it), or measured capacity stalls routinely outlast the 15-minute cap",
+   "reviewed_utc": "2026-10-15T10:54:34Z",
+   "version": "2.1.300"
   },
   {
    "key": "claude:env:CLAUDE_CODE_WEB_SEARCH_REFILLS_PER_HOUR",

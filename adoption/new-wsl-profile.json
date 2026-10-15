@@ -1991,7 +1991,7 @@
       "repository": "https://github.com/anthropics/claude-agent-sdk-python",
       "layer_id": "agent-sdks",
       "owner_layer_id": "agent-sdks",
-      "pin": "0.2.163",
+      "pin": "0.2.167",
       "component_id": null,
       "source_selection_layer": "agent-sdks",
       "source_selection_name": "Claude Agent SDK",
@@ -2003,32 +2003,32 @@
       "default_install": false,
       "blocking_gaps": [],
       "artifact": {
-        "name": "claude_agent_sdk-0.2.163.tar.gz",
-        "url": "https://files.pythonhosted.org/packages/9b/74/635d38e2ef813a2d1ba4ff7f3de736c35ee3bce9ebf4a5b7e89f3293604f/claude_agent_sdk-0.2.163.tar.gz"
+        "name": "claude_agent_sdk-0.2.167.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/ba/cd/0dd391195a3d2c7aed32165ec23458248f541c0fd115b44b37e2a31b08e2/claude_agent_sdk-0.2.167.tar.gz"
       },
       "checksum": {
         "algorithm": "sha256",
-        "value": "269821ad5acff5967522ff15f444b0598840fd9bdc45c645de569a5478061a53",
-        "source": "https://pypi.org/pypi/claude-agent-sdk/0.2.163/json",
+        "value": "06c9b8137f39c5dd8d0959321267c1de006f0458f5a27f645dfbffe479f8e207",
+        "source": "https://pypi.org/pypi/claude-agent-sdk/0.2.167/json",
         "kind": "artifact"
       },
       "integrity_observation": "published_digest_not_rehashed",
       "install": {
-        "command": "pip install claude-agent-sdk==0.2.163",
-        "source": "https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.163/README.md",
+        "command": "pip install claude-agent-sdk==0.2.167",
+        "source": "https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.167/README.md",
         "execution_status": "UNRUN",
         "prerequisites": [
-          "Owned Python environment and pip for claude-agent-sdk 0.2.163."
+          "Owned Python environment and pip for claude-agent-sdk 0.2.167."
         ],
         "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "acceptance": {
         "command": "pip install -e \".[dev]\" && python -m pytest tests/ -v --cov=claude_agent_sdk --cov-report=xml",
-        "source": "https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.163/.github/workflows/test.yml",
+        "source": "https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.167/.github/workflows/test.yml",
         "evidence_class": "upstream_test_command_not_executed",
         "execution_status": "UNRUN",
         "prerequisites": [
-          "Run from the v0.2.163 source checkout in the upstream Python test environment with its development extras.",
+          "Run from the v0.2.167 source checkout in the upstream Python test environment with its development extras.",
           "This selects tests/, not the separate authenticated e2e-tests/ workflow."
         ],
         "scope": "Unchanged upstream source tests; no native sign-in, authenticated SDK turn, provider or new-host acceptance.",
@@ -2041,12 +2041,12 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/agent-sdks.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/anthropics/claude-agent-sdk-python/blob/1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7/README.md",
+        "https://github.com/anthropics/claude-agent-sdk-python/blob/c10b52c674e5c709c7263544b38e8a5dad10e01d/README.md",
         "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       ],
       "release": {
-        "tag": "0.2.163",
-        "source": "https://pypi.org/pypi/claude-agent-sdk/0.2.163/json",
+        "tag": "0.2.167",
+        "source": "https://pypi.org/pypi/claude-agent-sdk/0.2.167/json",
         "kind": "native_package_release"
       },
       "source_pin_kind": "release_or_artifact_version"
