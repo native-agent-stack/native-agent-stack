@@ -455,5 +455,6 @@ under `C:\Program Files\ClaudeCode`, created on 2026-10-14.
 - They stay, as a client-core watch item re-checked when the Windows client is next upgraded, because a
   `managed-settings.d` that cannot be read as a directory makes a session exit at startup by the docs' rule.
 
-The lane's working records hold the binary offsets, the probe script and the results (LEAD-C-sandbox-20261015.md and
-its addendum 01).
+The binary offsets (pinned to the 2.1.300 binary's sha256), the probe script and its results, the CHANGELOG lines and the
+docs quotes are in [evidence/artifacts/sandbox-own-clone-20261015/SOURCE-RECORD.md](../../evidence/artifacts/sandbox-own-clone-20261015/SOURCE-RECORD.md),
+which also marks what is inference (the bind-to-placeholder step).

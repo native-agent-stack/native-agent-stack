@@ -18958,8 +18958,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-claude-code-native-practice.md",
-      "sha256": "ca68193c8280bd14a07d38c812d4e1c8850b6f98d1aa07069830c80b592a5156",
-      "bytes": 56609
+      "sha256": "05b6c42e8202ea1df7d20f284aee69fc0a0b9144a9f2ed58fd4edfa6d3d0a9c4",
+      "bytes": 56818
     },
     {
       "path": "docs/decisions/2026-10-09-claude-review-worker.md",
@@ -51997,6 +51997,16 @@
       "bytes": 11884
     },
     {
+      "path": "evidence/artifacts/sandbox-own-clone-20261015/SOURCE-RECORD.md",
+      "sha256": "6e9c85680f9497e2c908c43d3e6d13eb2269162c9ed7623f6392621c8cfd2c8d",
+      "bytes": 4740
+    },
+    {
+      "path": "evidence/artifacts/sandbox-own-clone-20261015/probe.sh",
+      "sha256": "a8e36ec71ded42a03241add067b49d647ce950ea669c7fe8561f01275d2fa739",
+      "bytes": 1436
+    },
+    {
       "path": "evidence/artifacts/sdk-runtime-adoption-20261008/decisions.json",
       "sha256": "108903768a1239ec7d078121d47e3b154efe8934b97876ac1084e03e4f9d1c42",
       "bytes": 121681
@@ -63493,8 +63503,8 @@
     },
     {
       "path": "tests/test_native_practice_sandbox_own_clone.py",
-      "sha256": "010c7bc660af406ab8f2734097e3b8868b468f1059a3a781c885de471af25032",
-      "bytes": 3042
+      "sha256": "753e7da07ce60c3ec886e438a35bf44413d2b0da34d7b77d4a9cf3ee266df057",
+      "bytes": 4055
     },
     {
       "path": "tests/test_native_practice_snapshot_provenance.py",

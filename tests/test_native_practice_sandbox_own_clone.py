@@ -53,5 +53,18 @@ class SandboxSideEffectRows(unittest.TestCase):
         self.assertTrue(re.search(r"re-check when the Windows client is next upgraded", notes), notes)
 
 
+    def test_the_correction_links_a_reviewable_source_record_with_pinned_locators(self):
+        # Local review P2 at 6a6c3bf7 (decision :458-459): the correction cited the lane's working files for its binary
+        # offsets and probes. It now links an in-repository record that pins the binary by sha256 and gives each offset.
+        decision = (ROOT / "docs/decisions/2026-10-09-claude-code-native-practice.md").read_text(encoding="utf-8")
+        record_path = "evidence/artifacts/sandbox-own-clone-20261015/SOURCE-RECORD.md"
+        self.assertIn(record_path, decision)
+        self.assertNotIn("LEAD-C-sandbox-20261015.md", decision)
+        record = (ROOT / record_path).read_text(encoding="utf-8")
+        self.assertIn("674deba0bba9aee479f4503c438b49303b6fdd304b9a471b14977aaec5215453", record)
+        for offset in ("110513208", "216332417", "216588603"):
+            self.assertIn(offset, record)
+        self.assertTrue((ROOT / "evidence/artifacts/sandbox-own-clone-20261015/probe.sh").is_file())
+
 if __name__ == "__main__":
     unittest.main()
