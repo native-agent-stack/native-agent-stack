@@ -6,8 +6,11 @@ import unittest
 from unittest import mock
 
 from scripts import component_matrix, final_stack, new_host_grand_list as grand
+from scripts import validate_shards
 from tests import test_foundation_catalog as foundation_fixtures
 from tests import test_layer_verdicts as wave_fixtures
+from tests import test_landscape as landscape_fixtures
+from tests import test_pending_catalog_registration as pending_fixtures
 import build_verdicts
 
 
@@ -35,6 +38,18 @@ def matrix_row():
 
 
 class RegistrationRuleTests(unittest.TestCase):
+    def test_pending_module_discovery_preserves_parallel_native_ownership(self):
+        inventory = []
+        for module in (landscape_fixtures, pending_fixtures):
+            suite = unittest.TestLoader().loadTestsFromModule(module)
+            cases = list(validate_shards.leaves(suite))
+            inventory.append({"module": module.__name__, "case_count": len(cases),
+                              "origins": sorted({type(case).__module__ for case in cases})})
+        _, strategy, shared = validate_shards.assignment(inventory, 8, {}, 1.0)
+        self.assertEqual(strategy, "duration-weighted-native-modules")
+        self.assertEqual(shared, {})
+        self.assertEqual(inventory[1]["origins"], [pending_fixtures.__name__])
+
     def test_matrix_preserves_registration_marker_without_any_winner(self):
         with tempfile.TemporaryDirectory() as temporary:
             row, violations = component_matrix.build_row(
@@ -68,6 +83,15 @@ class RegistrationRuleTests(unittest.TestCase):
             mutation(fixture)
             result, _ = fixture.run_check()
             self.assertEqual(result.returncode, 1, result.stdout)
+
+    def test_additional_taxonomy_layer_cannot_omit_registration_and_borrow_capability(self):
+        fixture = self.foundation_fixture()
+        del fixture.manifest["layers"][-1]["registration_only"]
+        fixture.decision["layer_ids"] = [*fixture.decision["layer_ids"], "model-routes"]
+        (fixture.root / "catalogs/landscape/foundation.json").unlink()
+        result, _ = fixture.run_check()
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("additional taxonomy layer needs registration_only", result.stdout)
 
     def test_unrun_registration_has_no_wave_or_wave_document(self):
         row = registration()
@@ -108,12 +132,15 @@ class RegistrationRuleTests(unittest.TestCase):
                 with self.assertRaisesRegex(SystemExit, "missing report layers: model-routes"):
                     grand.validate_selected_manifest("fixture.json", manifest, {"rows": [row]})
 
-    def test_grand_list_retains_the_unswept_scope_and_its_gap(self):
+    def grand_list_fixture(self, *, swept=False, matrix_found=None):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            files = {"catalogs/landscape/component-evidence-matrix.json": {"rows": [matrix_row()], "summary": {}},
+            matrix = matrix_row()
+            matrix["convergence"]["manifest_layer_found"] = swept if matrix_found is None else matrix_found
+            files = {"catalogs/landscape/component-evidence-matrix.json": {"rows": [matrix], "summary": {}},
                      "catalogs/sota-convergence/manifest-20260920.json": {
-                         "checked_at": "2026-09-20", "foundation": [], "trading": []},
+                         "checked_at": "2026-09-20", "foundation": [
+                             {"layer": "model-routes", "components": []}] if swept else [], "trading": []},
                      "adoption/manifest.json": {"profiles": [], "recipe_map": {}},
                      "adoption/hardware-profiles.json": {"hosts": []},
                      **{path: {"tools": []} for path in grand.PIN_FILES.values()},
@@ -123,11 +150,25 @@ class RegistrationRuleTests(unittest.TestCase):
                 (root / path).parent.mkdir(parents=True, exist_ok=True)
                 (root / path).write_text(json.dumps(value))
             with mock.patch.object(grand, "ROOT", root):
-                document = grand.build()
-            row = document["layers"][0]
-            self.assertEqual(row["winners"], [])
-            self.assertEqual(row["sweep_status"], "unswept")
-            self.assertIn(row["sweep_gap"], grand.render_md(document))
+                return grand.build()
+
+    def test_grand_list_retains_the_unswept_scope_and_its_gap(self):
+        document = self.grand_list_fixture()
+        row = document["layers"][0]
+        self.assertEqual(row["winners"], [])
+        self.assertEqual(row["sweep_status"], "unswept")
+        self.assertIn(row["sweep_gap"], grand.render_md(document))
+
+    def test_covering_sweep_is_retained_while_registration_awaits_verdict_lanes(self):
+        for matrix_found in (True, False):
+            with self.subTest(matrix_found=matrix_found):
+                document = self.grand_list_fixture(swept=True, matrix_found=matrix_found)
+                row = document["layers"][0]
+                self.assertEqual(row["sweep_status"], "covered")
+                self.assertEqual(row["winners"], [])
+                self.assertIn("verdict lanes pending", row["sweep_gap"])
+                self.assertIn(row["sweep_gap"], grand.render_md(document))
+                self.assertNotIn("no covering sweep", grand.render_md(document))
 
 
 if __name__ == "__main__":

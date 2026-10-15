@@ -1597,6 +1597,37 @@ class NewWaveFixture(RecordVerdictsFixture):
 
 
 class NewWaveLaneIdentityTests(NewWaveFixture):
+    def test_first_lane_record_clears_registration_after_screened_candidates_arrive(self):
+        # The fixture candidates represent the preceding screen. The recorder
+        # owns the transition from registration into a sealed lane run.
+        path = self.root / record_verdicts.LEDGER_FILES["foundation"]
+        document = json.loads(path.read_text())
+        row = next(row for row in document["layers"] if row["layer_id"] == "wave-same-layer")
+        row["registration_only"] = True
+        self.write(record_verdicts.LEDGER_FILES["foundation"], document)
+        catalog = self.both_lanes("wave-same-layer")
+        code, output = self.run_wave()
+        self.assertEqual(code, 0, output)
+        recorded = self.load_row(catalog, "wave-same-layer")
+        self.assertNotIn("registration_only", recorded)
+        self.assertEqual(recorded["verdict_status"], "recorded")
+        build_landscape(self.root)
+
+    def test_first_codex_lane_ends_registration_without_recording_a_winner(self):
+        path = record_verdicts.LEDGER_FILES["foundation"]
+        document = json.loads((self.root / path).read_text())
+        next(row for row in document["layers"] if row["layer_id"] == "wave-same-layer")["registration_only"] = True
+        self.write(path, document)
+        catalog = self.both_lanes("wave-same-layer")
+        (self.work_dir / "claude" / "foundation__wave-same-layer.json").unlink()
+        code, output = self.run_wave()
+        self.assertEqual(code, 0, output)
+        row = self.load_row(catalog, "wave-same-layer")
+        self.assertNotIn("registration_only", row)
+        self.assertEqual(row["verdict_status"], "pending_lanes")
+        self.assertEqual(row["winners"], [])
+        build_landscape(self.root)
+
     def test_a_complete_new_wave_records_and_validates(self):
         catalog = self.both_lanes("wave-same-layer")
         code, output = self.run_wave()

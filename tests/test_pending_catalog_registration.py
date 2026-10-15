@@ -1,13 +1,13 @@
 """Register a named pending layer without inventing a candidate or winner."""
 import unittest
 
-from tests.test_landscape import LandscapeTests
+from tests import test_landscape as landscape_fixtures
 
 
 class PendingRegistrationTests(unittest.TestCase):
-    setUp = LandscapeTests.setUp
-    write = LandscapeTests.write
-    build = LandscapeTests.build
+    setUp = landscape_fixtures.LandscapeTests.setUp
+    write = landscape_fixtures.LandscapeTests.write
+    build = landscape_fixtures.LandscapeTests.build
 
     def test_named_pending_row_accepts_empty_candidates_without_promoting_a_winner(self):
         self.layer.update(candidates=[], winners=[], alternatives=[],

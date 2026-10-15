@@ -92,6 +92,9 @@ def validate_foundation(root: Path) -> dict:
     registered_layers = set()
     for identifier, layer in layers.items():
         expected = {"id", "title", "purpose", "selection", "activation", "lifecycle_scope", "next_gap"}
+        if identifier not in LAYERS:
+            require(layer.get("registration_only") is True, identifier,
+                    "additional taxonomy layer needs registration_only")
         if "registration_only" in layer:
             require(layer["registration_only"] is True, identifier, "registration_only must be true")
             expected.add("registration_only")

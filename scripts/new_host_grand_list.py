@@ -316,6 +316,9 @@ def build() -> dict:
                          "compared with the newest one")
     validate_selected_manifest(manifest_path, manifest, matrix)
     mindex = manifest_index(manifest)
+    covered_layers = {(catalog, layer["layer"])
+                      for section, catalog in (("foundation", "foundation"), ("trading", "us-equities"))
+                      for layer in manifest.get(section, [])}
     pin_policy = sweep_pin_policy()
     adoption = load("adoption/manifest.json")
     profiles = profile_index(adoption)
@@ -379,8 +382,11 @@ def build() -> dict:
             "winners": winners,
         }
         if row.get("registration_only") is True:
-            layer.update(registration_only=True, sweep_status="unswept",
-                         sweep_gap="Unrun scope registration; no covering sweep or selected component.")
+            covered = (row["catalog"], row["layer_id"]) in covered_layers
+            layer.update(registration_only=True, sweep_status="covered" if covered else "unswept",
+                         sweep_gap=("Covering sweep present; verdict lanes pending, no selected component."
+                                    if covered else
+                                    "Unrun scope registration; no covering sweep or selected component."))
         layers.append(layer)
 
     hosts = build_hosts(hw)

@@ -50,6 +50,37 @@ account, runtime or adoption claim follows from these schema tests.
 
 ## Sources and next readiness input
 
+Round-one local review at 5277796785096286d86c83d2b2dc0ad1ace3fddd
+(review SHA256 5294a89d3b846032004862774d7456353968e90be30e8f2ce7c56c61bbaa5af1)
+found four consumer gaps. Each correction has a behavioral fail-first regression:
+
+- Native unittest module discovery collected an imported LandscapeTests class
+  again, causing validate_shards.assignment to choose serial-native-fixture-fallback.
+  Importing its module preserves one owner per native case and eight-way planning.
+- An unmarked additional taxonomy layer borrowed an existing capability decision
+  and passed without any matching catalog. Extra layers now require the explicit
+  registration marker and its existing matching-scope checks.
+- record_verdicts accepted and sealed the first valid lane returns but retained
+  registration_only, leaving a recorded row rejected by the next consumer.
+  The recorder removes that marker when valid lane processing mutates the row;
+  missing or wholly rejected returns still leave the row untouched. New-wave
+  controls cover both agreeing lanes and a sole Codex lane with no recorded winner.
+- A pending registration with actual covering sweep membership was published as
+  unswept. The grand-list joins layer membership from the selected sweep manifest,
+  including empty component lists, and reports pending verdict lanes separately.
+  Controls exercise both current and stale matrix coverage flags.
+
+Pinned correction mechanisms at the reviewed head 52777967:
+scripts/validate_shards.py:94-163 (native module ownership and shared-fixture fallback),
+scripts/validate_foundation.py:88-113 (additional taxonomy and matching registration),
+tools/sota-convergence/record_verdicts.py:720-741, :827-829, :1014-1043
+(no-op when no lane is valid; mutation once returns are sealed), and
+scripts/new_host_grand_list.py:91-163, :311-318, :381-383
+(selected manifest coverage and registration reporting). The upstream discovery
+mechanism is python/cpython v3.13.16 Lib/unittest/loader.py, loadTestsFromModule:
+it collects every module-bound TestCase subclass, including imported classes.
+These corrections introduce no catalog, verdict-row, wave or generated output edits.
+
 Native source at `a339425ca56ec3fb87dff0fa8ad5dffc83354168`:
 
 - scripts/landscape.py:854-859 and :1264-1318: pending verdict containers and

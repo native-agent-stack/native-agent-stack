@@ -1013,6 +1013,9 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
 
     overturn_protocol = choose_overturn_protocol(valid)
 
+    # A valid sealed lane ends the unrun registration state, including when
+    # agreement remains pending. Missing or rejected returns above leave it intact.
+    row.pop("registration_only", None)
     row["verdict_status"] = verdict_status
     row["winners"] = sanitize_value(winners)
     row["alternatives"] = sanitize_value(alternatives)
