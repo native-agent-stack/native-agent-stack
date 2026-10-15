@@ -1962,6 +1962,23 @@ class NegativeControlTests(unittest.TestCase):
 class TestCommittedCatalogs(unittest.TestCase):
     """Repository integration checks of the two committed catalogs (not fixtures)."""
 
+    def test_every_name_a_re_baseline_added_has_a_disposition_row(self):
+        # The command center's FULL read of #1155 at bf9153af (P2): the baseline grandfathers its names, so a name it adds
+        # drops out of `unreviewed` and currency_due. A name added at a re-baseline must therefore have a row (at least
+        # `baseline-unreviewed`, rules and docs/upstream-surface-watch.md:192-193). Names that predate the 2.1.296
+        # baseline (f165498aa) were grandfathered under the earlier rule and are not checked here.
+        try:
+            earlier = json.loads(subprocess.run(
+                ["git", "-C", str(ROOT), "show", "f165498aa:" + usw.BASELINE_PATH],
+                capture_output=True, text=True, check=True, timeout=60).stdout)
+        except (OSError, subprocess.SubprocessError, ValueError):
+            self.skipTest("the 2.1.296 baseline is read from git history")
+        current = json.loads((ROOT / usw.BASELINE_PATH).read_text(encoding="utf-8"))
+        rows = {row["key"] for row in json.loads((ROOT / usw.DISPOSITIONS_PATH).read_text(encoding="utf-8"))["rows"]}
+        added = sorted(f"{kind}:{name}" for kind, names in current["kinds"].items()
+                       for name in set(names) - set(earlier["kinds"].get(kind, [])))
+        self.assertEqual([key for key in added if key not in rows], [])
+
     def test_the_committed_dispositions_catalog_validates(self):
         code = usw.main(["--check-dispositions"])
         self.assertEqual(code, 0)

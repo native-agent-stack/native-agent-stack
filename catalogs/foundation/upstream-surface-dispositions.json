@@ -3878,6 +3878,54 @@
    "version": "2.1.296"
   },
   {
+   "key": "claude:env:CLAUDE_CODE_ARTIFACT_PUBLISH_EDITS",
+   "disposition": "baseline-unreviewed",
+   "reason": "added to the baseline at the 2.1.300 re-baseline (#1155); its first ruling is the dispositions review's",
+   "source": "https://code.claude.com/docs/en/env-vars.md",
+   "carrier": null,
+   "value": null,
+   "scope": null,
+   "overturn": null,
+   "reviewed_utc": "2026-10-15T14:20:00Z",
+   "version": "2.1.300"
+  },
+  {
+   "key": "claude:env:CLAUDE_CODE_DISABLE_FILE_MENTIONS",
+   "disposition": "baseline-unreviewed",
+   "reason": "added to the baseline at the 2.1.300 re-baseline (#1155); its first ruling is the dispositions review's",
+   "source": "https://code.claude.com/docs/en/env-vars.md",
+   "carrier": null,
+   "value": null,
+   "scope": null,
+   "overturn": null,
+   "reviewed_utc": "2026-10-15T14:20:00Z",
+   "version": "2.1.300"
+  },
+  {
+   "key": "claude:env:CLAUDE_CODE_IDLE_COMPACT_MIN_TOKENS",
+   "disposition": "baseline-unreviewed",
+   "reason": "added to the baseline at the 2.1.300 re-baseline (#1155); its first ruling is the dispositions review's",
+   "source": "https://code.claude.com/docs/en/env-vars.md",
+   "carrier": null,
+   "value": null,
+   "scope": null,
+   "overturn": null,
+   "reviewed_utc": "2026-10-15T14:20:00Z",
+   "version": "2.1.300"
+  },
+  {
+   "key": "claude:env:CLAUDE_CODE_YOU_SHOULD_KNOW_DEBUG",
+   "disposition": "baseline-unreviewed",
+   "reason": "added to the baseline at the 2.1.300 re-baseline (#1155); its first ruling is the dispositions review's",
+   "source": "https://code.claude.com/docs/en/env-vars.md",
+   "carrier": null,
+   "value": null,
+   "scope": null,
+   "overturn": null,
+   "reviewed_utc": "2026-10-15T14:20:00Z",
+   "version": "2.1.300"
+  },
+  {
    "key": "codex:feature:cli_daybreak",
    "disposition": "declined",
    "reason": "Under-development opt-in Daybreak controls and automatic access-program selection in CLI clients; native-off in 0.162.1; access programs are an account choice.",
