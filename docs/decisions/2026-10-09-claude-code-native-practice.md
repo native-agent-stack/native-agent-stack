@@ -424,3 +424,37 @@ something run 5 measured (none of the 5 heads was a docs, pages or generated-rep
 second trial measures run-to-run variation on them; one brief; medium effort only; the judge and refuter are one family; the fence denies the client's persisted tool outputs and refused the
 runs that tried to read them (3 Opus runs in trial 2, 2 in trial 1); costs are API-list-equivalent, not billed. The preregistration is sha256 `66f87a9eb2b9`, the result record
 `5642e6a1b989`, and the registration allows no third trial.
+
+## Addendum (2026-10-15): the vendor sandbox's side effects on a shared repository and on Windows
+
+**The own-clone rule (command center ruling of 2026-10-15).** A sandboxed Claude Code session runs in its own clone,
+never in the shared main checkout or one of its worktrees.
+- The 2.1.300 binary's sandbox write-protects `.git/config`, `.git/config.lock`, `.git/config.worktree` and its lock,
+  `.git/hooks`, `.git/worktrees`, `.gitmodules`, `.github` and more.
+- For a protected path that does not exist, bwrap creates an empty read-only placeholder on the real filesystem.
+- A worktree's common directory is the main `.git`. So sandboxed runs in two worktrees of this repository left
+  `.git/config.lock` in the shared `.git`, and every lane's git config writes failed while it existed: from
+  2026-10-14T23:59:29Z until it was removed with its stat recorded at 2026-10-15T00:50:33Z, and again at 01:04Z.
+- The lane that ran them has since moved to its own clone.
+- Interim: a stale 0-byte 0444 `.git/config.lock` with no git or sandboxed process running is removed with its stat
+  recorded, and an alert fires when one persists more than 10 minutes. The alert only reports; it deletes nothing.
+
+**The env-scrub subprocess sandbox.** "Bash stayed sandboxed with `--settings` `sandbox.enabled` false" turned out to be
+`CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1`.
+- CHANGELOG 2.1.98 adds a PID-namespace subprocess sandbox when that variable is set.
+- A measured run on 2.1.300 with the scrub and `sandbox.enabled` false showed NSpid 6 and Seccomp 2, with PID 1 a bwrap
+  process. A write outside the working directory was still allowed.
+- So the setting is honoured, and the scrub adds its own isolation. A lane that runs sandbox-runtime's own tests runs
+  without the scrub.
+
+**Windows placeholders.** The same runs left 0-byte read-only `managed-settings.json` and `managed-settings.d` (a file)
+under `C:\Program Files\ClaudeCode`, created on 2026-10-14.
+- The managed-settings docs count an empty `managed-settings.json` as `{}`.
+- WSL reads that file only for `wslInheritsWindowsSettings`.
+- Both WSL 2.1.300 and Windows `claude.exe` 2.1.270 start past managed settings.
+- They stay, as a client-core watch item re-checked when the Windows client is next upgraded, because a
+  `managed-settings.d` that cannot be read as a directory makes a session exit at startup by the docs' rule.
+
+The binary offsets (pinned to the 2.1.300 binary's sha256), the probe script and its results, the CHANGELOG lines and the
+docs quotes are in [evidence/artifacts/sandbox-own-clone-20261015/SOURCE-RECORD.md](../../evidence/artifacts/sandbox-own-clone-20261015/SOURCE-RECORD.md),
+which also marks what is inference (the bind-to-placeholder step).

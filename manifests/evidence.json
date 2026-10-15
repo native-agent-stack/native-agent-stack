@@ -4992,8 +4992,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/isolation.md",
-      "sha256": "75c6b3fc6869840bdfe2b417d1ab10a1f91286448711e66ee3a3ca06632283d4",
-      "bytes": 3017
+      "sha256": "8d45c668b1f884ee884f533710b255b510b443b8b17545d5199fc3e128ebc4b7",
+      "bytes": 4240
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/mcp-surfaces.md",
@@ -5002,8 +5002,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/native-clients.md",
-      "sha256": "94d8b63e28355bd9d6ac7147b7c67de061ddb77476d0e763c371bf95eb416918",
-      "bytes": 18365
+      "sha256": "6ed2ae6ed99c4b8eb0d8fe72fd5a4ec0ef1451ffbd52fb39101be1d90e603fbe",
+      "bytes": 18946
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/observation-inference.md",
@@ -5017,8 +5017,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.json",
-      "sha256": "b0b9d7949e07dd86ab80b34747cbc538a5eb6c97d1dec26e6684c0e1ffd7b2a1",
-      "bytes": 152660
+      "sha256": "15ca212222e2dc693cace10892d08e6afa9755d2652ae6c85762c89a5afdad82",
+      "bytes": 154468
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.md",
@@ -18958,8 +18958,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-claude-code-native-practice.md",
-      "sha256": "98947f11f2a3eb693c9c31b3fff6e58e1f20d476411aa49f42f66888d43c6d47",
-      "bytes": 54090
+      "sha256": "05b6c42e8202ea1df7d20f284aee69fc0a0b9144a9f2ed58fd4edfa6d3d0a9c4",
+      "bytes": 56818
     },
     {
       "path": "docs/decisions/2026-10-09-claude-review-worker.md",
@@ -21553,8 +21553,8 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/claude-native-slot-manifest.json",
-      "sha256": "b3db948a9878156abec03a3dc11764b1595c5c43b348d483c2a24355ca649e80",
-      "bytes": 238162
+      "sha256": "96ea808d5acc6e2a23c4f88fb694c3683b61d69afce83cb432a235724b690766",
+      "bytes": 238259
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/cross-client-lines.json",
@@ -52017,6 +52017,36 @@
       "bytes": 11884
     },
     {
+      "path": "evidence/artifacts/sandbox-own-clone-20261015/SOURCE-RECORD.md",
+      "sha256": "c3ba775346349c6014e55640317af5eded214559a45c9a8c19c8603af97f1288",
+      "bytes": 4961
+    },
+    {
+      "path": "evidence/artifacts/sandbox-own-clone-20261015/probe.sh",
+      "sha256": "a8e36ec71ded42a03241add067b49d647ce950ea669c7fe8561f01275d2fa739",
+      "bytes": 1436
+    },
+    {
+      "path": "evidence/artifacts/sandbox-own-clone-20261015/release-2.1.300/claude-code.asc",
+      "sha256": "bd70a5e4a268002704024ceba7f8446024114e94f3f0bdd11c23a9e592be81c6",
+      "bytes": 1688
+    },
+    {
+      "path": "evidence/artifacts/sandbox-own-clone-20261015/release-2.1.300/manifest.json",
+      "sha256": "fb62dae2893ff954bbf8caa9f4b9345737b98a210e3a6085bf9feec9ddf5d9ca",
+      "bytes": 1897
+    },
+    {
+      "path": "evidence/artifacts/sandbox-own-clone-20261015/release-2.1.300/manifest.json.sig",
+      "sha256": "a6ab3967d23a57edc237c2ff9ba9619366fe76f5f3c72b408a89b90026957b85",
+      "bytes": 833
+    },
+    {
+      "path": "evidence/artifacts/sandbox-own-clone-20261015/release-signature-2.1.300.json",
+      "sha256": "5d509e16adfc149a6d0a2abf44b6a02e3c2f01b76a7b649c357134f48268222a",
+      "bytes": 1949
+    },
+    {
       "path": "evidence/artifacts/sdk-runtime-adoption-20261008/decisions.json",
       "sha256": "108903768a1239ec7d078121d47e3b154efe8934b97876ac1084e03e4f9d1c42",
       "bytes": 121681
@@ -63575,6 +63605,11 @@
       "path": "tests/test_native_practice_retired_routes.py",
       "sha256": "e4c775e9388eba391dfa58ae751b5b2927b6e4c3c5c290e0708446ea490c29a6",
       "bytes": 68258
+    },
+    {
+      "path": "tests/test_native_practice_sandbox_own_clone.py",
+      "sha256": "ff382c416f741436cfa32a160d73aaa8b526a0806cd578829d40868dd680ee82",
+      "bytes": 5595
     },
     {
       "path": "tests/test_native_practice_snapshot_provenance.py",
