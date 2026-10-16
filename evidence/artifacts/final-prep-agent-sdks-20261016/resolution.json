@@ -1,0 +1,181 @@
+{
+  "base": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+  "catalog_ref": "catalogs/landscape/foundation.json#/layers/16",
+  "covering_sweeps": [
+    {
+      "layer_ref": "catalogs/saturation/ledger.json#/sweeps/1/layers/16",
+      "manifest_ref": "catalogs/sota-convergence/manifest-20260923.json",
+      "reopen": [],
+      "returns_ref": null,
+      "status": "completed",
+      "survived": [],
+      "sweep_id": "landscape-sweep-20260923",
+      "votes": "not_retained"
+    },
+    {
+      "layer_ref": "catalogs/saturation/ledger.json#/sweeps/3/layers/16",
+      "manifest_ref": "catalogs/sota-convergence/manifest-20260926.json",
+      "reopen": [
+        {
+          "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/agent-sdks",
+          "trigger": "retained_failure"
+        }
+      ],
+      "returns_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+      "status": "completed",
+      "survived": [],
+      "sweep_id": "landscape-sweep-20260926",
+      "votes": "retained"
+    },
+    {
+      "layer_ref": "catalogs/saturation/ledger.json#/sweeps/4/layers/16",
+      "manifest_ref": "catalogs/sota-convergence/manifest-20260929.json",
+      "reopen": [
+        {
+          "ref": "receipt_staleness:linux-wsl2-x86_64/codex",
+          "trigger": "pin_moved"
+        },
+        {
+          "ref": "receipt_staleness:macos-arm64/codex",
+          "trigger": "pin_moved"
+        }
+      ],
+      "returns_ref": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+      "status": "completed",
+      "survived": [
+        {
+          "facts": {
+            "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/agent-sdks/2/facts",
+            "vote": "not_refuted"
+          },
+          "fit": {
+            "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/agent-sdks/2/fit",
+            "vote": "not_refuted"
+          },
+          "repo": "https://github.com/github/copilot-sdk",
+          "source_review": "evidence/artifacts/landscape-sweep-20260929/github-copilot-sdk.json"
+        },
+        {
+          "facts": {
+            "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/agent-sdks/5/facts",
+            "vote": "not_refuted"
+          },
+          "fit": {
+            "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/agent-sdks/5/fit",
+            "vote": "not_refuted"
+          },
+          "repo": "https://github.com/agentproto/ts",
+          "source_review": "evidence/artifacts/landscape-sweep-20260929/agentproto-ts.json"
+        }
+      ],
+      "sweep_id": "landscape-sweep-20260929",
+      "votes": "retained"
+    }
+  ],
+  "cumulative_survivors": [
+    "https://github.com/agentproto/ts",
+    "https://github.com/github/copilot-sdk"
+  ],
+  "final_admission": "closed; no terminal-state or angle-registry edit",
+  "gate_chain": "#1163 then #1167 then PIN-RULES then opening PR, per common brief; not declared landed here",
+  "latest_candidate_outcomes": {
+    "https://github.com/agentclientprotocol/python-sdk": {
+      "disposition": "refuted",
+      "ref": "catalogs/saturation/ledger.json#/sweeps/3/layers/16",
+      "sweep_id": "landscape-sweep-20260926"
+    },
+    "https://github.com/agentproto/ts": {
+      "disposition": "survived",
+      "ref": "catalogs/saturation/ledger.json#/sweeps/4/layers/16",
+      "sweep_id": "landscape-sweep-20260929"
+    },
+    "https://github.com/anthropics/claude-agent-sdk-python": {
+      "disposition": "refuted",
+      "ref": "catalogs/saturation/ledger.json#/sweeps/4/layers/16",
+      "sweep_id": "landscape-sweep-20260929"
+    },
+    "https://github.com/earendil-works/pi": {
+      "disposition": "refuted",
+      "ref": "catalogs/saturation/ledger.json#/sweeps/4/layers/16",
+      "sweep_id": "landscape-sweep-20260929"
+    },
+    "https://github.com/github/copilot-sdk": {
+      "disposition": "survived",
+      "ref": "catalogs/saturation/ledger.json#/sweeps/4/layers/16",
+      "sweep_id": "landscape-sweep-20260929"
+    },
+    "https://github.com/google/adk-python": {
+      "disposition": "refuted",
+      "ref": "catalogs/saturation/ledger.json#/sweeps/1/layers/16",
+      "sweep_id": "landscape-sweep-20260923"
+    },
+    "https://github.com/langchain-ai/deepagents": {
+      "disposition": "refuted",
+      "ref": "catalogs/saturation/ledger.json#/sweeps/4/layers/16",
+      "sweep_id": "landscape-sweep-20260929"
+    },
+    "https://github.com/langchain-ai/langgraph": {
+      "disposition": "refuted",
+      "ref": "catalogs/saturation/ledger.json#/sweeps/3/layers/16",
+      "sweep_id": "landscape-sweep-20260926"
+    },
+    "https://github.com/microsoft/agent-framework": {
+      "disposition": "refuted",
+      "ref": "catalogs/saturation/ledger.json#/sweeps/4/layers/16",
+      "sweep_id": "landscape-sweep-20260929"
+    },
+    "https://github.com/openai/openai-agents-python": {
+      "disposition": "refuted",
+      "ref": "catalogs/saturation/ledger.json#/sweeps/3/layers/16",
+      "sweep_id": "landscape-sweep-20260926"
+    },
+    "https://github.com/openhands/software-agent-sdk": {
+      "disposition": "refuted",
+      "ref": "catalogs/saturation/ledger.json#/sweeps/4/layers/16",
+      "sweep_id": "landscape-sweep-20260929"
+    },
+    "https://github.com/pydantic/pydantic-ai": {
+      "disposition": "refuted",
+      "ref": "catalogs/saturation/ledger.json#/sweeps/1/layers/16",
+      "sweep_id": "landscape-sweep-20260923"
+    },
+    "https://github.com/strands-agents/harness-sdk": {
+      "disposition": "refuted",
+      "ref": "catalogs/saturation/ledger.json#/sweeps/1/layers/16",
+      "sweep_id": "landscape-sweep-20260923"
+    }
+  },
+  "latest_sweep": "landscape-sweep-20260929",
+  "newer_unappended_sweep": "None supplied or referenced in these current committed inputs; newly retained evidence supersedes before dispatch",
+  "preexisting_open_gaps": [
+    "The only executed Codex SDK vs Claude Agent SDK comparison is unresolved and publication-ineligible, with 'no arm accepted as a winner' (evidence/artifacts/comparison-progress-20260922/summary.json lines 133-151). Recovery was not run and artifact acceptance has no pinned judge.",
+    "The Codex cancel submission has no native returned receipt: arm_status no_receipt, usage not_requested (worker-receipts-followup.json lines 152-176). Claude Agent SDK interruption reports usage as unavailable. Neither shows actual provider consumption.",
+    "c4 isolation is unverified. The SDK overlays env onto the parent environment, and read-only permissions do not make inherited MCP servers or hooks read-only (blueprints/us-equities/workers/README.md lines 53-57; receipt.json line 110). The recorded tool events came from the host's Context Mode server.",
+    "native_worker.py line 77 creates ephemeral threads, so the c4 integration has not shown multi-turn resume. Custom-tool registration through the SDK is also unobserved. The 'start/run/resume' wording in the foundation closure is a project description, not an observation.",
+    "In the c4 receipt, two of three native turns failed their extraction task, blocked by the project root and by approval policy (receipt.json lines 132-220).",
+    "The receipt's actual research prompt is private (research-prompt.txt, distributed false, receipt.json lines 126-130). blueprints/us-equities/workers/research-task.md is a blank template, so that receipt cannot be reproduced from repository fixtures.",
+    "Version skew: the receipt records openai-codex 0.154.0 against native 0.155.1, while the packet pin is 0.155.1. The foundation closure asks for a version change to be qualified before promotion.",
+    "The foundation decision's evidence_ids cite only token-practice-coverage-20260920, not the us-equities worker receipt or the workers comparison (catalogs/foundation/decisions.json lines 2838-2840). Its next_gap cites SDK table lines 78-84, but the table is at lines 80-86 of docs/foundation-closure-20260921.md.",
+    "The only evidence for OpenHands (remote/container), LangGraph (checkpoints) and Temporal (durable replay) is source review.",
+    "No matched execution compares the candidate SDKs on structured events, custom tools or session control.",
+    "The Codex receipt demonstrates a bounded programmatic worker with existing MCP tools; it does not establish arbitrary custom-tool registration or complete event handling.",
+    "SDK cancellation, provider billing cessation, distributed recovery and exactly-once effects remain unqualified.",
+    "The recorded file-tool scope failure and subsequent approval-blocked override remain unresolved acceptance boundaries.",
+    "CLI session-resume evidence does not independently qualify SDK resume behavior."
+  ],
+  "survivor_disposition": "carried and disputed, not re-adjudicated; co-op two-family review decides the bounded next comparison or gap disposition",
+  "wave": {
+    "generated_by": "tools/sota-convergence/build_verdicts.py",
+    "schema_version": 1,
+    "scope": "One entry per layer-verdict wave document. Every wave older than the newest is frozen: build_verdicts.py --check verifies it byte for byte against this sha256 and against the ledger rows whose lanes.sealed_base names it, and --write refuses to rewrite it.",
+    "waves": [
+      {
+        "checked_at": "2026-09-22",
+        "manifest": "catalogs/sota-convergence/manifest-20260922.json",
+        "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+        "run_id": "20260922",
+        "sha256": "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de"
+      }
+    ]
+  }
+}

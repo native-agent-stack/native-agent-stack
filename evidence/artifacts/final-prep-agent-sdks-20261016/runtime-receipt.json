@@ -1,0 +1,163 @@
+{
+  "commands": [
+    {
+      "command": "git clone --depth 1 --branch rust-v0.160.0 https://github.com/openai/codex /var/tmp/ns2604-g5-agent-sdks-run/work/codex",
+      "cwd": "work",
+      "ended": "2026-10-16T05:13:49Z",
+      "exit_code": 0,
+      "n": 1,
+      "output": "output-01.txt",
+      "output_projection": "selected public native output; raw scratch bytes/digest not exported",
+      "output_sha256": "967770d403c844890066fe22179c9e7201172c6a892d8a50199ec61208031c9b",
+      "phase": "clone",
+      "seconds": 6.0,
+      "started": "2026-10-16T05:13:43Z"
+    },
+    {
+      "command": "git rev-parse HEAD",
+      "cwd": "work/codex",
+      "ended": "2026-10-16T05:13:49Z",
+      "exit_code": 0,
+      "n": 2,
+      "output": "output-02.txt",
+      "output_projection": "selected public native output; raw scratch bytes/digest not exported",
+      "output_sha256": "0133952b696360a6d5f4a12d936bf0bb054cdcac7601650e0bfb04e264bcab77",
+      "phase": "verify",
+      "seconds": 0.0,
+      "started": "2026-10-16T05:13:49Z"
+    },
+    {
+      "command": "env -i PATH=/var/tmp/ns2604-g5-agent-sdks-run/bin:/usr/bin:/bin HOME=/var/tmp/ns2604-g5-agent-sdks-run/work/home npm_config_cache=/var/tmp/ns2604-g5-agent-sdks-run/tmp/npm npm_config_userconfig=/dev/null npm install --prefix /var/tmp/ns2604-g5-agent-sdks-run/work/tools @openai/codex@0.160.0 pnpm@10.34.5",
+      "cwd": "work",
+      "ended": "2026-10-16T05:13:59Z",
+      "exit_code": 0,
+      "n": 3,
+      "output": "output-03.txt",
+      "output_projection": "selected public native output; raw scratch bytes/digest not exported",
+      "output_sha256": "8a99ba883e6e1bf36d1b003e850b1c87daff397f0e63b549debd419540f8a7c3",
+      "phase": "install",
+      "seconds": 10.2,
+      "started": "2026-10-16T05:13:49Z"
+    },
+    {
+      "command": "env -i PATH=/var/tmp/ns2604-g5-agent-sdks-run/work/tools/node_modules/.bin:/var/tmp/ns2604-g5-agent-sdks-run/bin:/usr/bin:/bin HOME=/var/tmp/ns2604-g5-agent-sdks-run/work/home TMPDIR=/var/tmp/ns2604-g5-agent-sdks-run/tmp npm_config_cache=/var/tmp/ns2604-g5-agent-sdks-run/tmp/npm npm_config_userconfig=/dev/null pnpm install --frozen-lockfile --store-dir /var/tmp/ns2604-g5-agent-sdks-run/tmp/pnpm-store",
+      "cwd": "work/codex",
+      "ended": "2026-10-16T05:14:09Z",
+      "exit_code": 0,
+      "n": 4,
+      "output": "output-04.txt",
+      "output_projection": "selected public native output; raw scratch bytes/digest not exported",
+      "output_sha256": "8a99ba883e6e1bf36d1b003e850b1c87daff397f0e63b549debd419540f8a7c3",
+      "phase": "install",
+      "seconds": 9.4,
+      "started": "2026-10-16T05:13:59Z"
+    },
+    {
+      "command": "env -i PATH=/var/tmp/ns2604-g5-agent-sdks-run/bin:/usr/bin:/bin HOME=/var/tmp/ns2604-g5-agent-sdks-run/work/home CODEX_HOME=/var/tmp/ns2604-g5-agent-sdks-run/work/codex-home /var/tmp/ns2604-g5-agent-sdks-run/work/tools/node_modules/.bin/codex --version",
+      "cwd": "work",
+      "ended": "2026-10-16T05:14:09Z",
+      "exit_code": 0,
+      "n": 5,
+      "output": "output-05.txt",
+      "output_projection": "selected public native output; raw scratch bytes/digest not exported",
+      "output_sha256": "f6464b8cc67af75deb2589fe1dbcde152fc15ffb76a91de1cf0686b4623afb1e",
+      "phase": "verify",
+      "seconds": 0.3,
+      "started": "2026-10-16T05:14:09Z"
+    },
+    {
+      "command": "env -i PATH=/var/tmp/ns2604-g5-agent-sdks-run/work/tools/node_modules/.bin:/var/tmp/ns2604-g5-agent-sdks-run/bin:/usr/bin:/bin HOME=/var/tmp/ns2604-g5-agent-sdks-run/work/home TMPDIR=/var/tmp/ns2604-g5-agent-sdks-run/tmp CODEX_HOME=/var/tmp/ns2604-g5-agent-sdks-run/work/codex-home CODEX_EXEC_PATH=/var/tmp/ns2604-g5-agent-sdks-run/work/tools/node_modules/.bin/codex pnpm -r --filter ./sdk/typescript run test",
+      "cwd": "work/codex",
+      "ended": "2026-10-16T05:17:46Z",
+      "exit_code": 0,
+      "n": 6,
+      "output": "output-06.txt",
+      "output_projection": "selected public native output; raw scratch bytes/digest not exported",
+      "output_sha256": "02906a7ebc77df3d66c3c4f1481bde182efc8949622a4978e1692659071a976c",
+      "phase": "test",
+      "seconds": 217.0,
+      "started": "2026-10-16T05:14:09Z"
+    },
+    {
+      "command": "python3 /var/tmp/ns2604-g5-agent-sdks-run/bin/invoke.py",
+      "cwd": "work",
+      "ended": "2026-10-16T05:17:47Z",
+      "exit_code": 0,
+      "n": 7,
+      "output": "output-07.txt",
+      "output_projection": "selected public native output; raw scratch bytes/digest not exported",
+      "output_sha256": "ece30d78a86e2d76aa06d0194773b17b16cdb0a26d23d0fcd07b83f6e192d767",
+      "phase": "invoke",
+      "seconds": 1.0,
+      "started": "2026-10-16T05:17:46Z"
+    }
+  ],
+  "counts": {
+    "filtered_tests": 0,
+    "suites_passed": 5,
+    "suites_total": 5,
+    "tests_passed": 48,
+    "tests_total": 48
+  },
+  "evidence_class": "local_integration",
+  "hostwide_install": false,
+  "kind": "upstream_e2e_preparation",
+  "layer": "foundation/agent-sdks",
+  "limits": [
+    "The source checkout is the official TypeScript SDK implementation at the release commit; its package.json has0.0.0-dev, not a separately claimed npm SDK release.",
+    "Vendor mocked response tests do not prove real model quality or paid-provider operation.",
+    "No host-wide install, full production harness lifecycle, custom-tool/MCP/hook role qualification, comparative A6 or FINAL admission.",
+    "No third-party model, provider or credential store accessed; scratch processes had a closed environment and isolated HOME/CODEX_HOME.",
+    "Two npm-path attempts and a recorder-overlap/missing-home attempt preserved separately; final receipt uses only7 unique sequential successful steps."
+  ],
+  "native_component_execution": "Real official Codex subprocesses; loopback vendor response fixtures and local protocol only",
+  "pin": "0.160.0; source a956835d020762cb2b570053af06f643a11c0ecc",
+  "provider_calls": 0,
+  "repository": "https://github.com/openai/codex",
+  "retry_policy": "No failed attempt or duplicate step suppressed in this fresh run",
+  "success": true,
+  "upstream_sources": [
+    {
+      "line": 42,
+      "path": "README.md",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "repository": "https://github.com/openai/codex",
+      "why": "Official npm CLI install at exact release"
+    },
+    {
+      "line": 127,
+      "path": ".github/workflows/sdk.yml",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "repository": "https://github.com/openai/codex",
+      "why": "Frozen-lockfile vendor dependency install"
+    },
+    {
+      "line": 136,
+      "path": ".github/workflows/sdk.yml",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "repository": "https://github.com/openai/codex",
+      "why": "Complete vendor SDK test-package target; no suite/test filter"
+    },
+    {
+      "line": 7,
+      "path": "sdk/typescript/tests/testCodex.ts",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "repository": "https://github.com/openai/codex",
+      "why": "Vendor executable override uses official release binary at same source pin"
+    },
+    {
+      "line": 24,
+      "path": "sdk/typescript/tests/testCodex.ts",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "repository": "https://github.com/openai/codex",
+      "why": "Vendor loopback mock provider; no paid model or credential connection"
+    },
+    {
+      "line": 72,
+      "path": "codex-rs/app-server/tests/suite/v2/connection_handling_stdio_tests.rs",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "repository": "https://github.com/openai/codex",
+      "why": "Native stdio initialize request and response contract"
+    }
+  ]
+}

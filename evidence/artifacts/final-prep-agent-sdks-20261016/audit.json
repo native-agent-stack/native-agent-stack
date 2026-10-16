@@ -1,0 +1,15 @@
+{
+  "kind": "local_integration",
+  "checks": [
+    "complete role-distinct pin sources, five drifts and existing run retained",
+    "native packet delta matches winner plus both cumulative survivors",
+    "all six angles disputed, fixed weights, no verdict promotion or new score",
+    "seven unique sequential successful commands with published-output hashes",
+    "actual native handshake output bound, adoption-window gap not erased",
+    "all consumed public committed inputs retain exact hashes",
+    "no home paths or generated session identifiers in publication projections"
+  ],
+  "passed": 7,
+  "failed": 0,
+  "boundary": "Evidence consistency only; no model comparison or FINAL admission"
+}

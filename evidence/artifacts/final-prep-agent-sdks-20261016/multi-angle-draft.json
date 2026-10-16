@@ -1,0 +1,190 @@
+{
+  "adjudication": "NOT_RUN; two-family reads owned by co-op",
+  "candidates": [
+    {
+      "angles": {
+        "A1": {
+          "disputed": true,
+          "note": "Supported CLI-backed TypeScript start/run/resume seam; local mock tests separate from full live harness, custom-tool/MCP/hook/isolation coverage",
+          "score": "U",
+          "sources": [
+            "primary-source-review.json",
+            "runtime-receipt.json"
+          ]
+        },
+        "A2": {
+          "disputed": true,
+          "note": "Bounded exact-commit CI conclusions retained, including failures/skips. Release workflow success is not SDK CI success. No all-history security claim.",
+          "score": "0",
+          "sources": [
+            "sources/codex-ci.json"
+          ]
+        },
+        "A3": {
+          "disputed": true,
+          "note": "Public stars/forks are popularity only; independent community consensus for this role not established",
+          "score": "U",
+          "sources": [
+            "sources/codex-community.json"
+          ]
+        },
+        "A4": {
+          "disputed": true,
+          "note": "Registry downloads are requests across versions, not unique adopters, model traffic or net native usage; agentproto registry row unverified",
+          "score": "U",
+          "sources": [
+            "sources/codex-usage.json"
+          ]
+        },
+        "A5": {
+          "disputed": true,
+          "note": "No matched published evaluation verified at this exact pin for required structured events/custom tools/session control; unknown is not absence, retain fixed weight",
+          "score": "U",
+          "sources": []
+        },
+        "A6": {
+          "disputed": true,
+          "note": "Fresh local upstream tests and local invoke are A1/local-integration, not comparative A6. Historical workers comparison unresolved and publication-ineligible. No new model/comparison executed",
+          "score": "U",
+          "sources": [
+            "runtime-receipt.json",
+            "invoke.json"
+          ]
+        }
+      },
+      "final_admitted": false,
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "proposed_disposition": "GAP pending two-family review, exact pin E2E scope and measured adoption invoke",
+      "repository": "https://github.com/openai/codex",
+      "role": "existing winner, pin drift under qualification",
+      "score_computed": false,
+      "screen_status": "narrow SDK source screen and credential-free execution only"
+    },
+    {
+      "angles": {
+        "A1": {
+          "disputed": true,
+          "note": "Pinned source advertises required orchestration/session seam; independently qualify same-role fit before promotion",
+          "score": "U",
+          "sources": [
+            "primary-source-review.json",
+            "runtime-receipt.json"
+          ]
+        },
+        "A2": {
+          "disputed": true,
+          "note": "Bounded exact-commit CI conclusions retained, including failures/skips. Release workflow success is not SDK CI success. No all-history security claim.",
+          "score": "0",
+          "sources": [
+            "sources/agentproto-ci.json"
+          ]
+        },
+        "A3": {
+          "disputed": true,
+          "note": "Public stars/forks are popularity only; independent community consensus for this role not established",
+          "score": "U",
+          "sources": [
+            "sources/agentproto-community.json"
+          ]
+        },
+        "A4": {
+          "disputed": true,
+          "note": "Registry downloads are requests across versions, not unique adopters, model traffic or net native usage; agentproto registry row unverified",
+          "score": "U",
+          "sources": []
+        },
+        "A5": {
+          "disputed": true,
+          "note": "No matched published evaluation verified at this exact pin for required structured events/custom tools/session control; unknown is not absence, retain fixed weight",
+          "score": "U",
+          "sources": []
+        },
+        "A6": {
+          "disputed": true,
+          "note": "Fresh local upstream tests and local invoke are A1/local-integration, not comparative A6. Historical workers comparison unresolved and publication-ineligible. No new model/comparison executed",
+          "score": "U",
+          "sources": []
+        }
+      },
+      "final_admitted": false,
+      "pin": "08605fbe43a5c71e65f9561fd1d2b92abcbe9c4c",
+      "proposed_disposition": "GAP pending two-family review, exact pin E2E scope and measured adoption invoke",
+      "repository": "https://github.com/agentproto/ts",
+      "role": "cumulative survivor, unqualified alternative",
+      "score_computed": false,
+      "screen_status": "retained source review; no new installation screen or runtime test"
+    },
+    {
+      "angles": {
+        "A1": {
+          "disputed": true,
+          "note": "Pinned source advertises required orchestration/session seam; independently qualify same-role fit before promotion",
+          "score": "U",
+          "sources": [
+            "primary-source-review.json",
+            "runtime-receipt.json"
+          ]
+        },
+        "A2": {
+          "disputed": true,
+          "note": "Bounded exact-commit CI conclusions retained, including failures/skips. Release workflow success is not SDK CI success. No all-history security claim.",
+          "score": "0",
+          "sources": [
+            "sources/copilot-ci.json"
+          ]
+        },
+        "A3": {
+          "disputed": true,
+          "note": "Public stars/forks are popularity only; independent community consensus for this role not established",
+          "score": "U",
+          "sources": [
+            "sources/copilot-community.json"
+          ]
+        },
+        "A4": {
+          "disputed": true,
+          "note": "Registry downloads are requests across versions, not unique adopters, model traffic or net native usage; agentproto registry row unverified",
+          "score": "U",
+          "sources": [
+            "sources/copilot-usage.json"
+          ]
+        },
+        "A5": {
+          "disputed": true,
+          "note": "No matched published evaluation verified at this exact pin for required structured events/custom tools/session control; unknown is not absence, retain fixed weight",
+          "score": "U",
+          "sources": []
+        },
+        "A6": {
+          "disputed": true,
+          "note": "Fresh local upstream tests and local invoke are A1/local-integration, not comparative A6. Historical workers comparison unresolved and publication-ineligible. No new model/comparison executed",
+          "score": "U",
+          "sources": []
+        }
+      },
+      "final_admitted": false,
+      "pin": "f5d9685f55286061e12763ed15a73c4469609881",
+      "proposed_disposition": "GAP pending two-family review, exact pin E2E scope and measured adoption invoke",
+      "repository": "https://github.com/github/copilot-sdk",
+      "role": "cumulative survivor, unqualified alternative",
+      "score_computed": false,
+      "screen_status": "retained source review; no new installation screen or runtime test"
+    }
+  ],
+  "catalog": "foundation",
+  "existing_record_gap": "Committed angle file covers deep-agents and strands, not the Codex winner plus carried survivors. Preserve it, propose this role-complete delta to co-op.",
+  "kind": "multi_angle_record_draft",
+  "layer_id": "agent-sdks",
+  "new_weight_choice": false,
+  "published_evaluations_available": null,
+  "rule_version": "angle-convergence/2",
+  "supersedes_existing_verdict": false,
+  "weights": {
+    "A1": 0.2,
+    "A2": 0.2,
+    "A3": 0.15,
+    "A4": 0.15,
+    "A5": 0.2,
+    "A6": 0.1
+  }
+}

@@ -1,0 +1,1 @@
+{"phase": "clone", "exit_code": 0, "status": "completed", "scope": "own scratch only"}

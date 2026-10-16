@@ -1,0 +1,1 @@
+{"boundary": "local protocol handshake only; no model inference", "credential_environment": "closed allowlist", "method": "initialize", "native_process": "codex-cli 0.160.0 app-server", "provider_requests": 0, "request_id": 1, "success": true, "thread_or_turn_requests": 0}

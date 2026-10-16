@@ -1,0 +1,27 @@
+{
+  "command": "python3 /var/tmp/ns2604-g5-agent-sdks-run/bin/invoke.py",
+  "component_id": "codex",
+  "exit_code": 0,
+  "gap": "Production/adoption-now SDK worker invoke with converged skills/MCP/hooks/memory/telemetry/roles remains unmeasured at this pin; this local handshake is narrow evidence, not a substitute",
+  "kind": "native_component_invoke",
+  "layer": "foundation/agent-sdks",
+  "measured_window": {
+    "end": "2026-10-16T05:17:47Z",
+    "start": "2026-10-16T05:17:46Z"
+  },
+  "method": "initialize",
+  "output": "output-07.txt",
+  "output_sha256": "ece30d78a86e2d76aa06d0194773b17b16cdb0a26d23d0fcd07b83f6e192d767",
+  "pin": "0.160.0; source a956835d020762cb2b570053af06f643a11c0ecc",
+  "provider_requests": 0,
+  "qualifies_adoption_window": false,
+  "scope": "Actual native app-server process and JSON-RPC response, after full vendor SDK suite",
+  "thread_or_turn_requests": 0,
+  "upstream_source": {
+    "line": 72,
+    "path": "codex-rs/app-server/tests/suite/v2/connection_handling_stdio_tests.rs",
+    "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+    "repository": "https://github.com/openai/codex",
+    "why": "Native stdio initialize request and response contract"
+  }
+}

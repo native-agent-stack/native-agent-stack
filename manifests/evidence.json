@@ -22887,6 +22887,156 @@
       "bytes": 319713
     },
     {
+      "path": "evidence/artifacts/final-prep-agent-sdks-20261016/README.md",
+      "sha256": "2bf7246660aa8d8c50651a2689a9a81bf1dd4d543639cb9c7298ba15216c6aba",
+      "bytes": 11021
+    },
+    {
+      "path": "evidence/artifacts/final-prep-agent-sdks-20261016/assemble_runtime.py",
+      "sha256": "725f98c1c55f9d186791b0a54cb337e2b2936c355d4b09e5f348a080a8e8594d",
+      "bytes": 6759
+    },
+    {
+      "path": "evidence/artifacts/final-prep-agent-sdks-20261016/audit.json",
+      "sha256": "1e45721676c3e06ce342852694176cdf3873cda6db64a4214110b7aab1d3f42e",
+      "bytes": 701
+    },
+    {
+      "path": "evidence/artifacts/final-prep-agent-sdks-20261016/audit.py",
+      "sha256": "2f59ef18dc2df8edfb7000e197c9dec986226ff6c2fd4d50486ad3c867505fcd",
+      "bytes": 3846
+    },
+    {
+      "path": "evidence/artifacts/final-prep-agent-sdks-20261016/build_record.py",
+      "sha256": "cd4a10ac3811d4ff0ca79ad57396e3b0e9695a89016fba3f1464e6fbc79646c7",
+      "bytes": 15970
+    },
+    {
+      "path": "evidence/artifacts/final-prep-agent-sdks-20261016/invoke.json",
+      "sha256": "c5106f7f7f63e4a4d234f4665ef5aacda04c6dca3f42e3befa005c5d991b93a0",
+      "bytes": 1200
+    },
+    {
+      "path": "evidence/artifacts/final-prep-agent-sdks-20261016/lane-packet-projection.json",
+      "sha256": "d84fd0cb43876fd59be2532a5c87ff49820e9f2853b7ff5604c1a3fa3bce0f49",
+      "bytes": 1374
+    },
+    {
+      "path": "evidence/artifacts/final-prep-agent-sdks-20261016/multi-angle-draft.json",
+      "sha256": "d58749d770afa609e018af1375fe6bc6f23e42448c68d4d53fb0ea1f73e36ea0",
+      "bytes": 7679
+    },
+    {
+      "path": "evidence/artifacts/final-prep-agent-sdks-20261016/native_invoke.py",
+      "sha256": "5bbe20eab58e4fbbaeda4fc581485ef06fa12c79dadd59c9ee539f31dcb2a86d",
+      "bytes": 2085
+    },
+    {
+      "path": "evidence/artifacts/final-prep-agent-sdks-20261016/output-01.txt",
+      "sha256": "967770d403c844890066fe22179c9e7201172c6a892d8a50199ec61208031c9b",
+      "bytes": 87
+    },
+    {
+      "path": "evidence/artifacts/final-prep-agent-sdks-20261016/output-02.txt",
+      "sha256": "0133952b696360a6d5f4a12d936bf0bb054cdcac7601650e0bfb04e264bcab77",
+      "bytes": 41
+    },
+    {
+      "path": "evidence/artifacts/final-prep-agent-sdks-20261016/output-03.txt",
+      "sha256": "8a99ba883e6e1bf36d1b003e850b1c87daff397f0e63b549debd419540f8a7c3",
+      "bytes": 89
+    },
+    {
+      "path": "evidence/artifacts/final-prep-agent-sdks-20261016/output-04.txt",
+      "sha256": "8a99ba883e6e1bf36d1b003e850b1c87daff397f0e63b549debd419540f8a7c3",
+      "bytes": 89
+    },
+    {
+      "path": "evidence/artifacts/final-prep-agent-sdks-20261016/output-05.txt",
+      "sha256": "f6464b8cc67af75deb2589fe1dbcde152fc15ffb76a91de1cf0686b4623afb1e",
+      "bytes": 18
+    },
+    {
+      "path": "evidence/artifacts/final-prep-agent-sdks-20261016/output-06.txt",
+      "sha256": "02906a7ebc77df3d66c3c4f1481bde182efc8949622a4978e1692659071a976c",
+      "bytes": 310
+    },
+    {
+      "path": "evidence/artifacts/final-prep-agent-sdks-20261016/output-07.txt",
+      "sha256": "ece30d78a86e2d76aa06d0194773b17b16cdb0a26d23d0fcd07b83f6e192d767",
+      "bytes": 274
+    },
+    {
+      "path": "evidence/artifacts/final-prep-agent-sdks-20261016/pin-reconciliation.json",
+      "sha256": "ab203894c287ec33ededcbfd985581474b8da69f9861628acf65caff3edc70c5",
+      "bytes": 4626
+    },
+    {
+      "path": "evidence/artifacts/final-prep-agent-sdks-20261016/primary-source-review.json",
+      "sha256": "66122d4f562d4d0663cd642a50139c0b042bd09970514e36b28cacb77157b737",
+      "bytes": 4478
+    },
+    {
+      "path": "evidence/artifacts/final-prep-agent-sdks-20261016/resolution.json",
+      "sha256": "cf408a262395b0ba0910ab96b79cf644c3b263cfb5ce1c5499b94bf0527479d5",
+      "bytes": 9593
+    },
+    {
+      "path": "evidence/artifacts/final-prep-agent-sdks-20261016/run-sequential.sh",
+      "sha256": "4ff74dae1c61867b332cbba61e5b530770741d94c22b01525620a80a06c81e78",
+      "bytes": 1352
+    },
+    {
+      "path": "evidence/artifacts/final-prep-agent-sdks-20261016/runtime-receipt.json",
+      "sha256": "e7da66f0497d2913a085356b42765cbcd37a80f0f808206249542674b908ce04",
+      "bytes": 7683
+    },
+    {
+      "path": "evidence/artifacts/final-prep-agent-sdks-20261016/source-seals.json",
+      "sha256": "6343ebb2dda0e8a265965e6470e2d089c94e8471f39177a39f648c018b7301c9",
+      "bytes": 4275
+    },
+    {
+      "path": "evidence/artifacts/final-prep-agent-sdks-20261016/sources/agentproto-ci.json",
+      "sha256": "d68ea38f343fc1bd830dfb5a9ed74e01e7fe45812238702a93a5b673a24446b1",
+      "bytes": 1257
+    },
+    {
+      "path": "evidence/artifacts/final-prep-agent-sdks-20261016/sources/agentproto-community.json",
+      "sha256": "9630e3f6ff9750fc012c4e31841f639bdb58acbdc2829cd8dbcbe468a3b99962",
+      "bytes": 86
+    },
+    {
+      "path": "evidence/artifacts/final-prep-agent-sdks-20261016/sources/codex-ci.json",
+      "sha256": "a7345c95ba7c4ebec3ed991866fbecd0a06c78939f3c8f7c3a9a01c30dba4088",
+      "bytes": 254
+    },
+    {
+      "path": "evidence/artifacts/final-prep-agent-sdks-20261016/sources/codex-community.json",
+      "sha256": "261437db8598e8b2babe5b7cb2e8fe851b768ab5bf3b5f485c1693f0116945df",
+      "bytes": 93
+    },
+    {
+      "path": "evidence/artifacts/final-prep-agent-sdks-20261016/sources/codex-usage.json",
+      "sha256": "7a564976a34e4e2a32a21257db32d192d5b0a5b5ff7a1d2cb6f532fe012403eb",
+      "bytes": 289
+    },
+    {
+      "path": "evidence/artifacts/final-prep-agent-sdks-20261016/sources/copilot-ci.json",
+      "sha256": "d8afbc7213f8eeed5bf9c85e890b4f8ebb970189951784211ee6fa3114698ec0",
+      "bytes": 788
+    },
+    {
+      "path": "evidence/artifacts/final-prep-agent-sdks-20261016/sources/copilot-community.json",
+      "sha256": "d8b9a23a0457bab30eb65faa437184bc041d92123c27be2da892d53f696e2227",
+      "bytes": 97
+    },
+    {
+      "path": "evidence/artifacts/final-prep-agent-sdks-20261016/sources/copilot-usage.json",
+      "sha256": "83165510f5f4f8061006c11a369f4bbd57de73a73fb071da4beb412748df682d",
+      "bytes": 293
+    },
+    {
       "path": "evidence/artifacts/foundation-closure-20260921/claude-review.md",
       "sha256": "ff34c3db7e67e4d96e9a1d0d154a0c7e8c01f42eade511302f963ad05a1d2c4c",
       "bytes": 6271

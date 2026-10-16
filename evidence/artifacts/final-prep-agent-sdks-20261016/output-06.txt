@@ -1,0 +1,10 @@
+PASS tests/exec.test.ts
+PASS tests/abort.test.ts (6.097 s)
+PASS tests/runStreamed.test.ts (10.479 s)
+PASS tests/run.test.ts (41.277 s)
+PASS tests/mcpConformance.test.ts (212.844 s)
+Test Suites: 5 passed, 5 total
+Tests:       48 passed, 48 total
+Snapshots:   0 total
+Time:        214.363 s
+Ran all test suites.
