@@ -5047,8 +5047,8 @@
     },
     {
       "path": ".gitattributes",
-      "sha256": "3cbc89e7d470f2e43109efbf2f655d4abb2e1d01bfdb92aa7939df49687191b8",
-      "bytes": 1311
+      "sha256": "d99c6ecac8ce13b8d5dd96fef888965bcd108bf6a6faaa0c7fa5880993d5cf19",
+      "bytes": 1667
     },
     {
       "path": ".github/CODEOWNERS",
@@ -22883,8 +22883,8 @@
     },
     {
       "path": "evidence/artifacts/execution-broker-recapture-20261016/CAPTURES.md",
-      "sha256": "2a5eb49a4c57954a882edcc7475864f440e028d835ab1983549ae95b8f868903",
-      "bytes": 7991
+      "sha256": "285fb63abe2ec9a216aada2ef621a77c9835b3ea787f9c6d1559131a75f07aa7",
+      "bytes": 10257
     },
     {
       "path": "evidence/artifacts/execution-broker-recapture-20261016/GAPS.md",
@@ -22893,22 +22893,22 @@
     },
     {
       "path": "evidence/artifacts/execution-broker-recapture-20261016/OFFLINE.md",
-      "sha256": "71cea23ed9657b0bf759479a01295d76ca3507ea2e3d52f6f24a26816525ffd4",
-      "bytes": 8011
+      "sha256": "a0a6767d12c711862b19c018cc51ff5e1b5ef01a791e9d229d944f319f0a7776",
+      "bytes": 8863
     },
     {
       "path": "evidence/artifacts/execution-broker-recapture-20261016/PUBLIC-SHA256SUMS",
-      "sha256": "3b86b4bf12ce324894e610528ecc911cc4cf18c1093083d3275b47f8151782b8",
-      "bytes": 19287
+      "sha256": "c55b000da6e280d3e2c8b36ef4ad654c5b2c42b737da04ec7f386dba53f1aab4",
+      "bytes": 24055
     },
     {
       "path": "evidence/artifacts/execution-broker-recapture-20261016/README.md",
-      "sha256": "c634137b91afb90b3b3c1d9ef759173259c3a0b08370182f9d4fbe234ade813c",
-      "bytes": 9347
+      "sha256": "d2c41e48abc146e26954df2068b61df46d5cca53e8a1c35924919b85ec1f7fd4",
+      "bytes": 9358
     },
     {
       "path": "evidence/artifacts/execution-broker-recapture-20261016/angles.md",
-      "sha256": "704fc78a0ea980bebfb331cb4f1a7b34c4af262254a731526a309883e21ef207",
+      "sha256": "e642c316a30ed6ee5e31a892cf289a280a949d6079f793148146d320f09ed768",
       "bytes": 7495
     },
     {
@@ -23048,8 +23048,8 @@
     },
     {
       "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold1/ibflex-install/stdout.txt",
-      "sha256": "4efc74066fbd1e15606c1da2276bfcfa71b4ebcd00ee45097fd5c6311d0267b4",
-      "bytes": 5796
+      "sha256": "e1118be5ebc2cf7196d67c3f6f8e4ba04c00719f1b1b921b927f29501de949b0",
+      "bytes": 5763
     },
     {
       "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold1/ibflex-offline-tests/argv.json",
@@ -23680,6 +23680,216 @@
       "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold1/uv-sync-help/stdout.txt",
       "sha256": "453a121c64d1987511201fbc1d1672fef905eda51c34d0f836b47e860be3ca1b",
       "bytes": 11200
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-cache-key-green/argv.json",
+      "sha256": "3dc2fcd2232762e826889b7fcc31957b78a91229a54df76cf5322b0fb91c97e9",
+      "bytes": 130
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-cache-key-green/cwd.txt",
+      "sha256": "5b89ccee01d41ea0baa4daade344b11ad8ae41e1f85521acde59f302b27d3d37",
+      "bytes": 11
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-cache-key-green/ended.txt",
+      "sha256": "336b213e636a3f88d286cba1c276d4eab4a0adb5ae04bef948947e2da543bfe1",
+      "bytes": 33
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-cache-key-green/rc.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-cache-key-green/started.txt",
+      "sha256": "d61c30fe1f3451eadd47f5f5bcedb8860a37070fa8058486de63164c840c8ced",
+      "bytes": 33
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-cache-key-green/stderr.txt",
+      "sha256": "55638197866ca06243697e5052c1a7a70d7e146a57b6f9820cfa7240cb23fc42",
+      "bytes": 1046
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-cache-key-green/stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-cache-key-red/argv.json",
+      "sha256": "3dc2fcd2232762e826889b7fcc31957b78a91229a54df76cf5322b0fb91c97e9",
+      "bytes": 130
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-cache-key-red/cwd.txt",
+      "sha256": "5b89ccee01d41ea0baa4daade344b11ad8ae41e1f85521acde59f302b27d3d37",
+      "bytes": 11
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-cache-key-red/ended.txt",
+      "sha256": "c1760cafc9408b8981e0731a22cbfd64d9a6a852afcdd63c1edd17e78fa8af15",
+      "bytes": 33
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-cache-key-red/rc.txt",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-cache-key-red/started.txt",
+      "sha256": "8100991cd4ace1d090f2fe461239fcc2c3c28dd77f0a52a91838db98add1cf14",
+      "bytes": 33
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-cache-key-red/stderr.txt",
+      "sha256": "0c4348d73939d942101190434b10cbefecac78eb524432f220348bf81bceb9b9",
+      "bytes": 2228
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-cache-key-red/stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-masker-green/argv.json",
+      "sha256": "3dc2fcd2232762e826889b7fcc31957b78a91229a54df76cf5322b0fb91c97e9",
+      "bytes": 130
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-masker-green/cwd.txt",
+      "sha256": "5b89ccee01d41ea0baa4daade344b11ad8ae41e1f85521acde59f302b27d3d37",
+      "bytes": 11
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-masker-green/ended.txt",
+      "sha256": "1375b6a90f55700e36391ef1d937afafa8f3fb200405445d08d31df8ce0e0a06",
+      "bytes": 33
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-masker-green/rc.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-masker-green/started.txt",
+      "sha256": "94498996aa815758ba45bd3757511360eb5ef0fdcc2c0a23d3524666383acf95",
+      "bytes": 33
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-masker-green/stderr.txt",
+      "sha256": "14012d7377fb2fe9b9829cba03fed562655508ba58eb419125b2fda6ad708033",
+      "bytes": 1230
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-masker-green/stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-masker-tested-source/argv.json",
+      "sha256": "1f7d912b08517fd4b92d1282450efd33169c6fa4cb6fe7ed8c2bf4cddebf44c7",
+      "bytes": 128
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-masker-tested-source/cwd.txt",
+      "sha256": "5b89ccee01d41ea0baa4daade344b11ad8ae41e1f85521acde59f302b27d3d37",
+      "bytes": 11
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-masker-tested-source/ended.txt",
+      "sha256": "ea355b44fc90293bcdd27afa2a1e76808ec7b8e09837fc19b53d4ff5861631a8",
+      "bytes": 33
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-masker-tested-source/rc.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-masker-tested-source/started.txt",
+      "sha256": "507c65af27926cb0f56b77ff5d754fff7b08af7f30b1c80108ee8fd608150a50",
+      "bytes": 33
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-masker-tested-source/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-masker-tested-source/stdout.txt",
+      "sha256": "6aa986f9045be668c49f49b029de00529bc735c0188c8671fc8d819a6ee574ea",
+      "bytes": 232
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-swap-forward-mutant-red/argv.json",
+      "sha256": "119f8b2b529eec95860fec69f155a6d809e63651daf180a73888928db3ea3590",
+      "bytes": 148
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-swap-forward-mutant-red/cwd.txt",
+      "sha256": "5b89ccee01d41ea0baa4daade344b11ad8ae41e1f85521acde59f302b27d3d37",
+      "bytes": 11
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-swap-forward-mutant-red/ended.txt",
+      "sha256": "8f44162df4a0033e3afdd478e480621c16cc0fd2130e3d873476631763573712",
+      "bytes": 33
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-swap-forward-mutant-red/rc.txt",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-swap-forward-mutant-red/started.txt",
+      "sha256": "ed10adf30528888e8c56ed38caac33f69e0b2c074089931301e87d3e8bb5ef4a",
+      "bytes": 33
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-swap-forward-mutant-red/stderr.txt",
+      "sha256": "53cd40dfaa560e6863cc846c25ed9f95fe4a1dfcec585462214472eae8086537",
+      "bytes": 2222
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-swap-forward-mutant-red/stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-swap-reverse-mutant-red/argv.json",
+      "sha256": "342b6ef5fe22e3c7da68b69e04df6ad2d2607a5cf69e8b5deeb7ca584101db2c",
+      "bytes": 156
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-swap-reverse-mutant-red/cwd.txt",
+      "sha256": "5b89ccee01d41ea0baa4daade344b11ad8ae41e1f85521acde59f302b27d3d37",
+      "bytes": 11
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-swap-reverse-mutant-red/ended.txt",
+      "sha256": "b9f2c4e9b9307d2bca8fd1ece231fae96d9cab7be7804feddb4b49fb6b3884a6",
+      "bytes": 33
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-swap-reverse-mutant-red/rc.txt",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-swap-reverse-mutant-red/started.txt",
+      "sha256": "f9353854f5bf7abe7ce5e482563f0ab004f06c4c2c79826ccb5c5537907beaf8",
+      "bytes": 33
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-swap-reverse-mutant-red/stderr.txt",
+      "sha256": "2bfbea382ca77726e07f5c046f2130e2b269b8947613e0d84c03efbfdf77183c",
+      "bytes": 2222
+    },
+    {
+      "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/fold2/fold2-swap-reverse-mutant-red/stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
     },
     {
       "path": "evidence/artifacts/execution-broker-recapture-20261016/masked/masker-tests/argv.json",

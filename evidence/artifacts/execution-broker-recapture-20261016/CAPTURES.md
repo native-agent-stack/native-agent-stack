@@ -2,7 +2,8 @@
 
 Every file under `masked/` is labelled by this document as a **deterministic
 masked derivative of native capture**. Streams are byte-preserving except
-for declared literal private-path replacement. No result, error, count or
+for declared literal private-path, build-digest and private-source cache-key
+replacement. No result, error, count or
 line is added, omitted, decoded or summarized. Empty streams stay empty.
 Files are not authored observations.json or packet-receipt.json substitutes.
 
@@ -43,10 +44,20 @@ The failed setup's absent executable is marked `<UNAVAILABLE_UV_PATH>`.
 The digest value itself stays private; it is not a wildcard/summary operation.
 The published test uses only a synthetic repeated-digit value to exercise it.
 
+The second fold also declares pip's exact private-source SHA224 cache key as
+`<PRIVATE_SOURCE_CACHE_KEY>`. pip26.2.1 hashes the source URL and interpreter
+inputs and shards the key as two/two/two/remaining hex characters:
+[pypa/pip@634a6ec cache.py:27-30,50-73](https://github.com/pypa/pip/blob/634a6ec/src/pip/_internal/cache.py#L27-L73)
+and [wheel_builder.py:49-50,88,196](https://github.com/pypa/pip/blob/634a6ec/src/pip/_internal/wheel_builder.py#L49-L50).
+The private map declares the full56-hex literal; the masker replaces both its
+plain spelling and that exact sharded spelling. It does not match arbitrary
+hex strings. `masked/fold1/ibflex-install/stdout.txt:73` is re-masked from its
+unchanged raw capture; the source key itself is never published here.
+
 The rule compiles escaped byte literals, longest-first with a lexical tie
 break, and substitutes in a single pass. All other bytes remain unchanged.
 No recursive replacement, newline normalization, decoding or general secret
-scanning occurs. Only declared path or build-digest literals change. Inputs are path/cwd/command/stream records,
+scanning occurs. Only declared path, build-digest or cache-key literals change. Inputs are path/cwd/command/stream records,
 not credential data. The private map and exact raw command stay private.
 Failure to match a path does not certify privacy: native publication scanning
 is a separate check. Files with no matching private path are byte-identical
@@ -66,6 +77,10 @@ with `/b` while `/b` is another key: expected `/b <B>` differs from a
 sequential rescanning implementation's `<B> <B>`. A separately retained
 sequential-mutant run fails that assertion; the original disjoint-placeholder
 test did not establish it. No credential is read by these controls.
+The stronger second-fold control uses the swap map `{/a: /b, /b: /a}` in
+both insertion orders, expecting `/b /a` from original `/a /b`. Synthetic
+sequential replacers fail for both forward and reverse traversal. This proves
+simultaneous replacement independently of either sequential ordering.
 
 The recorder's raw native files cannot be reconstructed from this public tree,
 and no such reconstruction is claimed. The co-op must privately verify that
@@ -114,3 +129,21 @@ Only these named sets have supplied publication custody. Repository validator,
 registry/view, privacy and staged-leak checks are supporting release work, not
 additional published PASS receipts or execution-broker evidence. The PR body
 must not claim a supplied custody result for checks outside this table.
+
+## Fold2 publication-boundary correction
+
+`masked/fold2/` adds six seven-file native capture sets under the same rule:
+
+| Raw name / public subdirectory | Purpose / scope |
+| --- | --- |
+| `fold2-cache-key-red` | Five-test run with the new synthetic install-line regression on the prior masker: rc1, SHA224 map rejected |
+| `fold2-cache-key-green` | Same five-test run after the cache-key correction: rc0 |
+| `fold2-swap-forward-mutant-red`, `fold2-swap-reverse-mutant-red` | Explicit synthetic sequential faults, each failing both swap-map insertion orders; rc1, not production failures |
+| `fold2-masker-green` | Final six synthetic publication-boundary tests: rc0 |
+| `fold2-masker-tested-source` | Native SHA256 of the two final published code files; public-source binding only |
+
+The prior `masker-tested-source` and four-test `masker-fold-green` captures
+remain historical. The new six-test/source captures bind the corrected code.
+The raw fold1 streams stay unchanged. Only the newly declared cache-key
+replacement changes a previously supplied derivative. Supporting private
+sweep/validation work is not supplied layer qualification evidence.

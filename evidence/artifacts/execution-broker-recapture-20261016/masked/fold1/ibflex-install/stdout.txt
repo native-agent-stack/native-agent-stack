@@ -70,7 +70,7 @@ Building wheels for collected packages: ibflex
   Building editable for ibflex (pyproject.toml): started
   Building editable for ibflex (pyproject.toml): finished with status 'done'
   Created wheel for ibflex: filename=ibflex-1.1-0.editable-py3-none-any.whl size=8320 sha256=<UNPUBLISHED_BUILD_SHA256>
-  Stored in directory: <FOLD_SCRATCH>/tmp/pip-ephem-wheel-cache-at4xz32s/wheels/2c/46/dd/aff50c2739f785a7533e1e77838df583b0f2bd9aa45a40a587
+  Stored in directory: <FOLD_SCRATCH>/tmp/pip-ephem-wheel-cache-at4xz32s/wheels/<PRIVATE_SOURCE_CACHE_KEY>
 Successfully built ibflex
 Installing collected packages: urllib3, typing_extensions, ruff, pygments, pluggy, pathspec, packaging, mypy_extensions, librt, iniconfig, idna, ibflex, charset_normalizer, certifi, ast-serialize, types-requests, requests, pytest, mypy
 

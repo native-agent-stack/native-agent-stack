@@ -52,7 +52,16 @@ not supply it (the pinned README:15-17 states that boundary).
 Both installs use only throwaway prefixes under the marked `<FOLD_SCRATCH>`.
 Native argv shows `env -i` with scratch HOME/cache/tmp and no credential
 variables. Test argv adds a fresh network namespace via
-`unshare --user --map-current-user --net`; it does not contact a gateway.
+`unshare --user --map-current-user --net`. The installed util-linux2.41.3
+`unshare(1)` (`--net`) creates a separate network namespace; the installed
+Linux man-pages6.17 `network_namespaces(7)` DESCRIPTION documents isolated
+network devices, protocol stacks and routing tables. See
+[util-linux v2.41.3 unshare(1)](https://github.com/util-linux/util-linux/blob/v2.41.3/sys-utils/unshare.1.adoc)
+and [Linux man-pages6.17 network_namespaces(7)](https://git.kernel.org/pub/scm/docs/man-pages/man-pages.git/tree/man/man7/network_namespaces.7?h=man-pages-6.17).
+These captures run in that isolated namespace without a configured gateway.
+ibflex at `dad9fd3c` has no suite-level network guard; its Flex client is only
+mocked at [tests/test_client.py:61,96](https://github.com/csingley/ibflex/blob/dad9fd3c1edf133c4a4394cdc3c57bae82d466a3/tests/test_client.py#L61).
+The external namespace supplies the network boundary for that suite.
 All suite/setup/install jobs use idle-class systemd scope. No unit is enabled.
 The existing closed trading runtime is not used for either suite.
 

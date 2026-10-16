@@ -1,0 +1,5 @@
+[
+  "sha256sum",
+  "tools/sota-convergence/mask_execution_broker_capture.py",
+  "tests/test_execution_broker_capture_mask.py"
+]

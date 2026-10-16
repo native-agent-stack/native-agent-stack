@@ -28,14 +28,14 @@ and was not run by this lane. No owner wording is reproduced.
 
 | Component context (not layer winners) | Pin value and exact source |
 | --- | --- |
-| Nautilus component run record | `catalogs/landscape/final-stack.json:10906-10914`:2.0.0rc5/source1b0a49d2792a9432a3aca3fcb617ce7a630d905e |
+| Nautilus component run record | `catalogs/landscape/final-stack.json:10906-10914`:2.0.0rc5 / source `1b0a49d2792a9432a3aca3fcb617ce7a630d905e` |
 | Alpaca SDK component run record | `catalogs/landscape/final-stack.json:10421-10429`:0.44.0 |
 | Component inventory | `manifests/stack.json:1971-1973` and `:1440-1442`:same rc5 and0.44.0 versions |
 | Native source binding | `catalogs/landscape/lockfile-source-identities.json:7-17`:Nautilus2.0.0rc5/source1b0a49d2 and published artifact identities |
 | Package lock | `blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock:1531-1538` and `:104-105`:rc5 and0.44.0; package artifact records are not broker acceptance |
 | Scoped October1 review | `evidence/artifacts/new-wsl-layer-reviews-20261001/execution-broker.json:41,97,139`:recorded rc5/source1b0a49d2, Alpaca0.44.0 and historical LEAN985ef30; dated context only |
 | Historical paper version mismatch | `catalogs/us-equities/runtime-target.json:58,63`:old1.231.0/Python IB adapter/ibapi10.45.1 paper result does not qualify the selected rc5 IBKR destination |
-| rc5-bound Rust transport client | `catalogs/us-equities/runtime-target.json:122` and `docs/decisions/2026-10-13-engine-currency.md:69-71`:rc5/source1b0a49d2 uses Rust `ibapi =3.3.0`; rc6 also retains3.3.0, while the frozen develop sourceca478e42f434d2ce185493f2bb42d112a88d1ffe uses5.0.0. These are separate pins, not the historical Python ibapi10.45.1 |
+| rc5-bound Rust transport client | `catalogs/us-equities/runtime-target.json:122` and `docs/decisions/2026-10-13-engine-currency.md:69-71`:rc5/source1b0a49d2 uses Rust `ibapi =3.3.0`; rc6 also retains3.3.0, while the frozen develop source `ca478e42f434d2ce185493f2bb42d112a88d1ffe` uses5.0.0. These are separate pins, not the historical Python ibapi10.45.1 |
 | Recorded runtime acceptance | `evidence/receipts/runtime-final-native-24-acceptance-20261008.json:14,21-23`:dated24-case/rc0 statement; `:68-71` explicitly excludes broker/paper/engineE2E. No new authentication of the historical private capture |
 | Installed broker package versions | GAP-NO-NATIVE-VERSION-CAPTURE in `GAPS.md`; no old transcript reused. `masked/runtime-python-version/stdout.txt:1` is only the interpreter's version |
 
@@ -45,7 +45,7 @@ package2.1.0 is a recorded version at
 `evidence/artifacts/new-wsl-layer-reviews-20261001/execution-broker.json:505`,
 not newly proven package-to-Git provenance. The Gateway image pin is absent
 at that same record's732; a source commit is not a container-image digest.
-The carried rust-ibapi sourcebe449c84efd1b52e4a296751d3d6edba2ca53552 is
+The carried rust-ibapi source `be449c84efd1b52e4a296751d3d6edba2ca53552` is
 separate again: its retained README cites a v3-to-v4 migration guide at
 `evidence/artifacts/landscape-sweep-20260926/wboayue-rust-ibapi.json:31`.
 The exact survivor's [Cargo.toml:7](https://github.com/wboayue/rust-ibapi/blob/be449c84efd1b52e4a296751d3d6edba2ca53552/Cargo.toml#L7)

@@ -3,8 +3,11 @@
 Reference: CPython v3.13.16 Lib/re/__init__.py (escape, compile),
 Modules/_sre/sre.c (Pattern.sub), Lib/pathlib/_abc.py (read_bytes/write_bytes),
 Lib/json/__init__.py (loads).
-Only declared literal private paths and unpublished build digests are replaced,
-longest-first, in one pass. A digest entry masks a captured build-tool fingerprint;
+Only declared literal private paths, unpublished build digests and private-source
+cache keys are replaced. pip's SHA224 key is accepted in plain and sharded form
+(pypa/pip@634a6ec src/pip/_internal/cache.py:27-30,50-85;
+wheel_builder.py:49-50,88,196). These are explicit literals, not hash wildcards,
+replaced longest-first in one pass. A digest entry masks a captured build-tool fingerprint;
 it is never copied into a public map or recomputed as a public receipt value.
 No output is summarized, filtered, decoded or assigned a new command result.
 The private map is supplied separately to the co-op; publish only its marked
@@ -34,11 +37,18 @@ def mask_bytes(raw, mapping):
         if not isinstance(path, str):
             raise ValueError('literal mapping keys must be strings')
         is_path = path.startswith('/') and path != '/'
-        is_build_digest = re.fullmatch(r'[0-9a-f]{64}', path) is not None
-        if (not (is_path or is_build_digest) or not isinstance(placeholder, str)
+        is_digest = re.fullmatch(r'(?:[0-9a-f]{56}|[0-9a-f]{64})', path) is not None
+        if (not (is_path or is_digest) or not isinstance(placeholder, str)
                 or re.fullmatch(r'<[A-Z][A-Z0-9_]*>', placeholder) is None):
-            raise ValueError('map requires absolute paths or build digests and marked placeholders')
+            raise ValueError('map requires absolute paths, SHA224 cache keys or SHA256 build digests and marked placeholders')
     values = {key.encode('utf-8'): value.encode('ascii') for key, value in mapping.items()}
+    for key, value in mapping.items():
+        if re.fullmatch(r'[0-9a-f]{56}', key):
+            # pip Cache._get_cache_path_parts splits the declared SHA224 key
+            # into two/two/two/remaining hex characters. Mask that exact spelling
+            # too, so replacing a private source URL cannot leave its oracle.
+            sharded = '/'.join((key[:2], key[2:4], key[4:6], key[6:]))
+            values[sharded.encode('ascii')] = value.encode('ascii')
     return replace_literals(raw, values)
 
 
