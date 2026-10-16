@@ -14,16 +14,21 @@ the FINAL predicate (scripts/final_stack.py, enforce_final):
   with positive calls in a measured window, or a recorded not_invoked_reason.
 It also lists the missing multi-angle record and the carried survivors. Rows come in the FINAL wave's order, each with
 its tier: T1-trading (the layers that carry the owner's trading capabilities), then T1-harness, then the rest (T3).
+The skills layers of coverage.skills[] close T3: each is a GAP until its sweep's verdict is recorded, with an initial
+sweep scoped to its lifecycle task as the next action (docs/decisions/2026-10-15-new-wsl-clean-install-plan.md,
+"The 13 skills layers" and the wave order's T3).
 
---check (the default) rebuilds the page and exits 1 when the checked-in file differs; --write writes it.
+--check (the default) rebuilds the page and exits 1 when the checked-in bytes differ; --write replaces the page whole.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
+import tempfile
 from pathlib import Path
 
 try:
@@ -216,14 +221,23 @@ def build_rows(stack: dict, records: dict | None = None, root: Path | None = Non
         record = records.get((item.get("angles") or {}).get("path"))
         rows.append({"layer": key, "status": item.get("status"), "state": _state(item), "winners": winners,
                      "missing": _missing(item, runs, record, root), "next_action": next_action})
+    # final_stack.py keys a skills layer as (SKILLS, layer_id) and records only whether a sweep covered it; no verdict or
+    # winner of it is in final-stack.json yet, so it is a GAP either way.
+    skills = []
+    for task in (stack.get("coverage") or {}).get("skills") or []:
+        swept = bool(task.get("swept"))
+        skills.append({"layer": f'{final_stack.SKILLS}/{task["layer_id"]}', "status": "swept" if swept else "unswept",
+                       "state": "GAP", "winners": [], "missing": ["verdict"] if swept else ["no completed sweep"],
+                       "next_action": ("record the sweep's verdict" if swept else
+                                       f'initial sweep scoped to the {task.get("lifecycle_task")} lifecycle task')})
     rank, tier = {}, {}
     for name, keys in TIERS:
         for key in keys:
             rank[key], tier[key] = len(rank), name
-    for r in rows:
+    for r in rows + skills:
         r["tier"] = tier.get(r["layer"], REST)
     rows.sort(key=lambda r: (rank.get(r["layer"], len(rank)), r["layer"]))
-    return rows
+    return rows + sorted(skills, key=lambda r: r["layer"])
 
 
 # Every value the page reads or derives becomes literal text through _cell, one rule from the GFM spec and its reference
@@ -244,6 +258,7 @@ def _cell(value) -> str:
 def render(stack: dict, records: dict | None = None, root: Path | None = None) -> str:
     rows = build_rows(stack, records, root)
     counts = {state: sum(r["state"] == state for r in rows) for state in ("FINAL", "TRIAL", "GAP")}
+    skills = len((stack.get("coverage") or {}).get("skills") or [])
     lines = [
         "# Layer status",
         "",
@@ -252,7 +267,8 @@ def render(stack: dict, records: dict | None = None, root: Path | None = None) -
         "[layer-resolution protocol](decisions/2026-10-11-layer-resolution-protocol.md): a recorded verdict, a run pin, "
         "an upstream E2E at that pin and invoke evidence. TRIAL marks recorded winners whose FINAL conditions are "
         "incomplete; GAP marks a layer with no winner or no completed sweep. Rows are in the FINAL wave's order: "
-        "T1-trading (the layers that carry the owner's trading capabilities), then T1-harness, then the rest (T3).",
+        "T1-trading (the layers that carry the owner's trading capabilities), then T1-harness, then the rest (T3), "
+        f"closed by the {skills} skills layers of the coverage.",
         "",
         f"**{len(rows)} layers:** {counts['FINAL']} FINAL, {counts['TRIAL']} TRIAL, {counts['GAP']} GAP.",
         "",
@@ -277,16 +293,27 @@ def main(argv: list[str] | None = None) -> int:
     mode.add_argument("--write", action="store_true", help="rebuild and write the page")
     args = parser.parse_args(argv)
     stack = load(args.root / SOURCE)
-    built = render(stack, angle_records(stack, args.root), args.root)
+    built = render(stack, angle_records(stack, args.root), args.root).encode("utf-8")
     output = args.root / OUTPUT
     if args.write:
-        output.write_text(built, encoding="utf-8")
+        # A temporary file in the page's own directory, then os.replace: an interrupted write leaves the old page whole
+        # (python/cpython v3.13.16 Doc/library/os.rst:2754-2760, os.replace: "the renaming will be an atomic operation").
+        descriptor, temporary = tempfile.mkstemp(prefix=f".{output.name}.", dir=output.parent)
+        try:
+            with os.fdopen(descriptor, "wb") as stream:
+                stream.write(built)
+            os.replace(temporary, output)
+        except BaseException:
+            Path(temporary).unlink(missing_ok=True)
+            raise
         print(f"wrote {OUTPUT}")
         return 0
-    if not output.exists() or output.read_text(encoding="utf-8") != built:
+    # Bytes, not decoded text: a CRLF-only or encoding-only change is stale too.
+    if not output.exists() or output.read_bytes() != built:
         print(f"{OUTPUT} is stale: run python3 scripts/layer_status_page.py --write", file=sys.stderr)
         return 1
-    print(json.dumps({"status": "passed", "layers": len(stack.get("layers") or [])}))
+    print(json.dumps({"status": "passed", "layers": len(stack.get("layers") or []),
+                      "skills_layers": len((stack.get("coverage") or {}).get("skills") or [])}))
     return 0
 
 
