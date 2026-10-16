@@ -461,6 +461,40 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
                 {"evidence": ["https://sourcegraph.com/blog/announcing-scip"]}, extra]
         path.write_text(json.dumps({"foundation": rows}, indent=1))
 
+    def _list_table_fixture(self, target: Path, relative: str, extra: dict) -> None:
+        """The pinned awesome-list table's shape: a list from a Sourcegraph-owned repository (the rule's keyword)
+        with its commit pins on their own indented "commit" lines."""
+        path = target / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        lists = [{"repository": "sourcegraph/fixture-list", "pin": {"commit": HEX40, "rule": "recorded pin"},
+                  "recorded_pins": [{"population": "starred", "commit": HEX40}], **extra}]
+        path.write_text(json.dumps({"lists": lists}, indent=1))
+
+    def test_g_list_table_commit_pins_are_not_detected(self):
+        """The pinned awesome-list table's "commit" lines (git commit ids of public lists) are exempt."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            self._list_table_fixture(target, "catalogs/landscape/coverage/awesome-lists-20261016.json", {})
+            findings = self._scan(target)
+            self.assertEqual([f for f in findings if f["RuleID"] == "sourcegraph-access-token"], [],
+                             "commit pins in the reviewed list table must not be flagged")
+
+    def test_g2_list_table_other_fields_and_other_paths_stay_detected(self):
+        """Only "commit" lines of that exact file are exempt: a 40-hex value under another field in the file, and
+        the same commit lines in any other file, are still sourcegraph-access-token findings."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            self._list_table_fixture(target, "catalogs/landscape/coverage/awesome-lists-20261016.json", {"token": HEX40})
+            self._list_table_fixture(target, "catalogs/landscape/coverage/awesome-lists-20261017.json", {})
+            by_file = {}
+            for f in self._scan(target):
+                if f["RuleID"] == "sourcegraph-access-token":
+                    by_file.setdefault(f["File"], []).append(f["StartLine"])
+            self.assertEqual(len(by_file.get("catalogs/landscape/coverage/awesome-lists-20261016.json", [])), 1,
+                             f"the non-commit token line in the reviewed table must still be detected: {by_file}")
+            self.assertEqual(len(by_file.get("catalogs/landscape/coverage/awesome-lists-20261017.json", [])), 2,
+                             f"commit lines outside the exact reviewed path must still be detected: {by_file}")
+
     def test_d_manifest_pin_commit_ids_are_not_detected(self):
         """The dated SOTA manifest's "pin" git commit ids (plain or "<version> @ <id>") are exempt."""
         with tempfile.TemporaryDirectory() as tmp:
