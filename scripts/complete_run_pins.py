@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Resolve exact release tags and fill separate run-source fields, without upgrades.
+"""Resolve exact run-source identities and fill separate fields, without upgrades.
 
 Git v2.53.0 Documentation/git-ls-remote.adoc OUTPUT defines annotated tag
 objects and peeled ^{} refs. This module reuses the retained F1 resolver;
@@ -13,7 +13,9 @@ for a later separately reviewed fill, never overwrite the original report.
 from __future__ import annotations
 
 import argparse
+import base64
 from datetime import datetime, timezone
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -37,7 +39,8 @@ EXCLUSIONS = {"claude-code": "Owned by the separate version-changing Claude Code
 def targets(document: dict) -> list[dict]:
     winners = {winner.get("run") for layer in document["layers"] for winner in layer["winners"]}
     return [run for run in document["runs"] if run["id"] in winners
-            and run.get("pin_parsed", {}).get("version")
+            and (run.get("pin_parsed", {}).get("version")
+                 or OID.fullmatch(run.get("source_commit_claim") or ""))
             and not run["pin_parsed"].get("commit")]
 
 
@@ -112,6 +115,73 @@ def verified_commit(proof, component: str, version: str, repository: str) -> str
     return parsed["peeled_commit"]
 
 
+def verified_commit_object(proof, component: str, commit: str, repository: str) -> str | None:
+    """Verify retained native fetch/cat-file output for an exact commit-only pin.
+
+    Git v2.53.0 Documentation/pull-fetch-param.adoc:30-33 accepts an exact
+    object ID; git-cat-file.adoc:57-63 supplies its typed raw body. The object
+    ID hashes type/length/NUL/body (user-manual.adoc:4090-4118).
+    """
+    if (not isinstance(proof, dict) or not isinstance(commit, str) or not OID.fullmatch(commit)
+            or not isinstance(repository, str) or not repository or not isinstance(component, str) or not component
+            or proof.get("kind") != "git_commit_object" or proof.get("component") != component
+            or proof.get("version") is not None or proof.get("commit") != commit
+            or proof.get("peeled_commit") != commit or proof.get("status") != "resolved"
+            or host_receipts.normalize_repository(proof.get("repository")) != repository
+            or any(type(proof.get(key)) is not int or proof[key] != 0
+                   for key in ("init_exit_code", "exit_code", "object_exit_code"))
+            or proof.get("init_command") != ["git", "init", "--bare", "--quiet", "--object-format=sha1"]
+            or proof.get("object_command") != ["git", "cat-file", "commit", commit]):
+        return None
+    url = "https://" + repository + (".git" if repository.startswith("github.com/") else "")
+    if proof.get("command") != ["git", "fetch", "--no-tags", "--depth=1", url, commit]:
+        return None
+    encoded = proof.get("object_base64")
+    if not isinstance(encoded, str) or len(encoded) > 2 ** 21:
+        return None
+    try:
+        body = base64.b64decode(encoded, validate=True)
+    except ValueError:
+        return None
+    if len(body) > 2 ** 20:
+        return None
+    actual = hashlib.sha1(b"commit " + str(len(body)).encode("ascii") + b"\0" + body,
+                          usedforsecurity=False).hexdigest()
+    return commit if actual == commit else None
+
+
+def resolve_commit_object(row, commit, runner, environment, directory):
+    """Fetch the exact commit identity in a new, isolated bare repository."""
+    row = {**row, "kind": "git_commit_object", "commit": commit}
+    if not isinstance(commit, str) or not OID.fullmatch(commit):
+        return {**row, "status": "gap", "reason": "commit_identity_missing"}
+    url = "https://" + row["repository"] + (".git" if row["repository"].startswith("github.com/") else "")
+    commands = [["git", "init", "--bare", "--quiet", "--object-format=sha1"],
+                ["git", "fetch", "--no-tags", "--depth=1", url, commit],
+                ["git", "cat-file", "commit", commit]]
+    observed = {**row, "stderr": "", "stderr_present": False, "stderr_policy": "raw stderr withheld"}
+    for command, command_key, code_key in zip(commands, ("init_command", "command", "object_command"),
+                                              ("init_exit_code", "exit_code", "object_exit_code")):
+        observed[command_key] = command
+        try:
+            result = runner(command, capture_output=True, text=False, timeout=45, check=False,
+                            env=environment, cwd=directory)
+        except subprocess.TimeoutExpired as error:
+            return {**observed, "status": "gap", "reason": "lookup_timeout", code_key: None,
+                    "stderr_present": observed["stderr_present"] or bool(error.stderr)}
+        observed[code_key] = result.returncode
+        observed["stderr_present"] |= bool(result.stderr)
+        if result.returncode:
+            return {**observed, "status": "gap", "reason": "lookup_failed"}
+    if len(result.stdout) > 2 ** 20:
+        return {**observed, "status": "gap", "reason": "commit_object_too_large"}
+    observed.update(object_base64=base64.b64encode(result.stdout).decode("ascii"),
+                    peeled_commit=commit, status="resolved")
+    if verified_commit_object(observed, row["component"], commit, row["repository"]) is None:
+        return {**observed, "status": "gap", "reason": "commit_object_mismatch"}
+    return observed
+
+
 def resolve(run: dict, runner=subprocess.run) -> dict:
     row = {"component": run["id"], "version": run["pin_parsed"]["version"],
            "repository": run["repository"], "source": run["source"], "original_pin": run["pin"]}
@@ -120,7 +190,7 @@ def resolve(run: dict, runner=subprocess.run) -> dict:
     repository = run["repository"] or ""
     if not re.fullmatch(r"github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+|git\.launchpad\.net/ubuntu/\+source/[a-z0-9+.-]+", repository):
         return {**row, "status": "gap", "reason": "repository_missing_or_unsupported"}
-    names = tag_names(row["component"], row["version"])
+    names = tag_names(row["component"], row["version"]) if row["version"] else []
     command = ["git", "ls-remote", "https://" + repository + (".git" if repository.startswith("github.com/") else "")]
     command.extend("refs/tags/" + tag + suffix for tag in names for suffix in ("", "^{}"))
     git_environment = {
@@ -131,6 +201,9 @@ def resolve(run: dict, runner=subprocess.run) -> dict:
     }
     try:
         with tempfile.TemporaryDirectory(prefix="source-tag-query-", dir="/var/tmp") as directory:
+            if row["version"] is None:
+                return resolve_commit_object(row, run.get("source_commit_claim") or run["pin_parsed"].get("commit"),
+                                             runner, git_environment, directory)
             result = runner(command, capture_output=True, text=True, timeout=45, check=False,
                             env=git_environment, cwd=directory)
     except subprocess.TimeoutExpired as error:
@@ -152,7 +225,8 @@ def render_table(rows: list[dict]) -> str:
              "| --- | --- | --- | --- | --- |"]
     for row in rows:
         lines.append("| " + " | ".join(str(value) for value in (
-            row["component"], row["version"], row.get("tag", row.get("reason", "gap")),
+            row["component"], row["version"], row.get("tag", row.get("reason", "commit object (no tag)"
+                if row.get("kind") == "git_commit_object" and row.get("status") == "resolved" else "gap")),
             row.get("tag_object") or ("lightweight" if row.get("status") == "resolved" else "gap"),
             row.get("peeled_commit", "gap"))) + " |")
     return "\n".join(lines) + "\n"
@@ -183,8 +257,11 @@ def apply_report(root: Path, relative: str) -> dict:
         if row.get("component") in EXCLUSIONS:
             raise ValueError("component is separately owned; source fill refused")
         run = current.get(row["component"])
-        commit = verified_commit(row, row["component"], row["version"], row["repository"])
+        commit = (verified_commit_object(row, row["component"], row.get("commit"), row["repository"])
+                  if row["version"] is None else
+                  verified_commit(row, row["component"], row["version"], row["repository"]))
         if (not run or not commit or run["repository"] != row["repository"] or run["source"] != row["source"]
+                or run["pin"] != row.get("original_pin")
                 or run.get("pin_parsed", {}).get("version") != row["version"]):
             raise ValueError("resolution no longer matches the run identity or exact tag proof")
         path, _, selector = row["source"].partition("#")
@@ -194,8 +271,11 @@ def apply_report(root: Path, relative: str) -> dict:
             raw = safe_file(root, path).read_text()
             documents[path] = tomllib.loads(raw) if path == final_stack.LOCKFILE else json.loads(raw)
         entry = pointer(documents[path], selector)
-        if entry.get("version") != row["version"]:
+        source_identity = final_stack.record_pin(entry.get("version")).get("pin_parsed", {})
+        if source_identity.get("version") != row["version"]:
             raise ValueError("source version changed; refuse an implicit upgrade")
+        if source_identity.get("commit") and source_identity["commit"] != commit:
+            raise ValueError("an existing source commit disagrees; adjudication required")
         if path == final_stack.LOCKFILE:
             artifacts = sorted({a["hash"] for a in [entry.get("sdist", {}), *entry.get("wheels", [])] if a.get("hash")})
             if (not artifacts or artifacts != row.get("artifact_sha256")

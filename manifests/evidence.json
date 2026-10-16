@@ -17613,8 +17613,8 @@
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "34f811465e3f62106be2b6210f334c4f65d2d8572019b56c6bcd3d7952130d72",
-      "bytes": 342645
+      "sha256": "270ca4f473df21f6c008c2d27aae8869ba85d1df0d84e0cffe4adf1e406574bd",
+      "bytes": 342668
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -19358,8 +19358,8 @@
     },
     {
       "path": "docs/decisions/2026-10-16-pin-source-rules.md",
-      "sha256": "e4222a35c40c82fd6551d7df361dbc75a6dabbba524791e056c3ac7281d9cbd4",
-      "bytes": 15740
+      "sha256": "0a524998d728b2834cb4a9a9047a458e3f365f45466172308719dba80b2566fa",
+      "bytes": 20339
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -49018,8 +49018,8 @@
     },
     {
       "path": "evidence/artifacts/pin-source-rules-20261016/controls.json",
-      "sha256": "92a38ee6273de9bc41f529426cc74eb04b65953e55bf9ec695063bfb183e24f3",
-      "bytes": 7895
+      "sha256": "83f3849c9e0d8a009654e490516a1b7c2efebad65b37beba6a4872528fd0397b",
+      "bytes": 11121
     },
     {
       "path": "evidence/artifacts/pin-source-rules-20261016/nautilus-tag-proof.json",
@@ -49033,8 +49033,8 @@
     },
     {
       "path": "evidence/artifacts/pin-source-rules-20261016/tag-spelling-witnesses.json",
-      "sha256": "09e8d1301ebd6b44bde77d4a5d249ab80684b1a189dd52602a6aff87a0037588",
-      "bytes": 3908
+      "sha256": "19951533855306eccf2c7890fcee3dfc894eeee2a42342bcce82c3bffaf78613",
+      "bytes": 3913
     },
     {
       "path": "evidence/artifacts/plugin-skill-identity-20261013/README.md",
@@ -62653,8 +62653,8 @@
     },
     {
       "path": "scripts/complete_run_pins.py",
-      "sha256": "7c2e298f3ac713b868e9cd3eca47015c787cfacd31ece9081de590d022171ba9",
-      "bytes": 14980
+      "sha256": "806911d8d9e811b6caecaa667bdd627e687770159585f591a9ee4b5c9b3e862a",
+      "bytes": 20053
     },
     {
       "path": "scripts/component_matrix.py",
@@ -62683,8 +62683,8 @@
     },
     {
       "path": "scripts/final_stack.py",
-      "sha256": "2659d17c156b2404407276427f197ffccd7af24b5631c4e60de5880c0f150a8a",
-      "bytes": 87923
+      "sha256": "e541e0aa590c0405952cbc25ecb9653615381869c6751ea423aba47ed4b8d323",
+      "bytes": 88798
     },
     {
       "path": "scripts/freshness_propose.py",
@@ -63718,8 +63718,8 @@
     },
     {
       "path": "tests/test_distribution_source_identity.py",
-      "sha256": "5235029bc06a33e9b0f7b52afffe55635d21fcfd9f3419e95d7c8387d743e463",
-      "bytes": 4665
+      "sha256": "3f5cc346b8224cda2a8071950a3c41128ba3c904d3454a4abe2d810556470e62",
+      "bytes": 6048
     },
     {
       "path": "tests/test_document_ingestion.py",
@@ -64578,8 +64578,8 @@
     },
     {
       "path": "tests/test_run_pin_sources.py",
-      "sha256": "b8cfeccac193458c9a4b83dd81ffcbdb72951092aca88e38e740f2d87fa89c50",
-      "bytes": 23962
+      "sha256": "8787bc78370fb7c49773d2e515d84aedf6b55427f9b8209473386b102f88c30e",
+      "bytes": 32299
     },
     {
       "path": "tests/test_runtime_boot.py",
@@ -65453,8 +65453,8 @@
     },
     {
       "path": "tools/sota-convergence/build_verdicts.py",
-      "sha256": "dcefeadb78dc2f26a8e46712d5f70a72b90ef750fb0cb37a51518ce72e43041f",
-      "bytes": 28095
+      "sha256": "c55564ee5a414ab7aec2ad0cfb25d88c7f28cc0debf2ad2ca5444e9c4c06b361",
+      "bytes": 28214
     },
     {
       "path": "tools/sota-convergence/codex_lane.py",
@@ -65643,8 +65643,8 @@
     },
     {
       "path": "tools/sota-convergence/record_verdicts.py",
-      "sha256": "742277546f2006070ed221137f775dd351ef9362040906ffe0fa91c9187b8a57",
-      "bytes": 94045
+      "sha256": "9909c9d07026178c9cba96a64725ed2c4bb172689d07957b44a974a9787cba7b",
+      "bytes": 94184
     },
     {
       "path": "tools/sota-convergence/schemas/compact-decision-start-closure-1.json",

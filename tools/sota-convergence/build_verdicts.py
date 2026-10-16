@@ -124,6 +124,7 @@ def build_verdict_row(row: dict, sota_components: list) -> dict:
         "verdict_status": row.get("verdict_status"),
         "winners": [
             {"component_id": winner.get("component_id"), "repository": winner.get("repository"),
+             **{field: winner[field] for field in ("source_identity_kind", "upstream_repository") if field in winner},
              "pin": winner.get("pin"), "evidence_class": winner.get("evidence_class"),
              "why_selected": winner.get("why_selected"), "recipe_ref": winner.get("recipe_ref"),
              "platform_status": winner.get("platform_status")}

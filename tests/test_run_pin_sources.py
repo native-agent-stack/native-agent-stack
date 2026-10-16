@@ -2,6 +2,7 @@
 import copy
 import ast
 import json
+import hashlib
 import os
 from pathlib import Path
 import re
@@ -17,6 +18,12 @@ PUBLISHED_ROOT = ROOT
 
 
 class PublishedSourceContractTests(unittest.TestCase):
+    def test_tag_witness_repository_matches_the_actual_queried_url(self):
+        path = ROOT / "evidence/artifacts/pin-source-rules-20261016/tag-spelling-witnesses.json"
+        for row in json.loads(path.read_text())["rows"]:
+            with self.subTest(component=row["component"]):
+                self.assertEqual(pins.host_receipts.normalize_repository(row["command"][2]), row["repository"])
+
     def test_record_pin_citation_matches_the_function_at_its_pinned_base(self):
         base = "8dfe8b588de22451364857b4be4683fb35f57a7d"
         source = subprocess.run(["git", "show", base + ":scripts/final_stack.py"], cwd=ROOT,
@@ -112,6 +119,61 @@ class TagResolutionTests(unittest.TestCase):
 
 
 class OfflineApplicationTests(fixtures.FixtureTestCase):
+    def test_commit_only_pin_resolves_and_binds_a_typed_object_without_a_version(self):
+        root = self.root()
+        body = ("tree " + "a" * 40 + "\nauthor Fixture <fixture@example.invalid> 0 +0000\n"
+                "committer Fixture <fixture@example.invalid> 0 +0000\n\nSynthetic commit proof.\n").encode()
+        commit = hashlib.sha1(b"commit " + str(len(body)).encode() + b"\0" + body, usedforsecurity=False).hexdigest()
+        native_oid = subprocess.run(["git", "hash-object", "-t", "commit", "--stdin"], input=body,
+                                    capture_output=True, check=True).stdout.decode().strip()
+        self.assertEqual(commit, native_oid)
+        fixtures._fixture(root, stack=[{"id": "commit-only", "repository": "https://github.com/example/commit-only",
+                                      "version": commit}])
+        run = next(row for row in final_stack.build_document(root)["runs"] if row["id"] == "commit-only")
+        self.assertIsNone(run["pin_parsed"]["version"])
+        self.assertFalse(final_stack.complete_final_pin(commit, run))
+        self.assertEqual([row["id"] for row in pins.targets({"layers": [{"winners": [{"run": "commit-only"}]}],
+                                                           "runs": [run]})], ["commit-only"])
+        native = Mock(side_effect=[Mock(returncode=0, stdout=b"", stderr=b""),
+                                   Mock(returncode=0, stdout=b"", stderr=b"private fetch diagnostic"),
+                                   Mock(returncode=0, stdout=body, stderr=b"")])
+        proof = pins.resolve(run, native)
+        self.assertEqual(proof["status"], "resolved")
+        self.assertNotIn("private fetch diagnostic", json.dumps(proof))
+        relative = "evidence/artifacts/source-fill-fixture/commit-only.json"
+        path = root / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps({"rows": [proof]}))
+        pins.apply_report(root, relative)
+        after = next(row for row in final_stack.build_document(root)["runs"] if row["id"] == "commit-only")
+        self.assertTrue(final_stack.complete_final_pin(commit, after))
+        self.assertIsNone(after["pin_parsed"]["version"])
+        self.assertEqual(json.loads((root / final_stack.STACK).read_text())["components"][0]["version"], commit)
+        for change in ({"object_base64": "dGFtcGVyZWQ="}, {"commit": "f" * 40},
+                       {"exit_code": 1}, {"object_exit_code": 1},
+                       {"repository": "github.com/example/foreign"}, {"component": "foreign"},
+                       {"command": ["git", "fetch", "https://github.com/example/foreign", commit]},
+                       {"object_command": ["git", "cat-file", "blob", commit]}):
+            with self.subTest(changed=tuple(change)):
+                path.write_text(json.dumps({"rows": [{**proof, **change}]}))
+                invalid = next(row for row in final_stack.build_document(root)["runs"] if row["id"] == "commit-only")
+                self.assertFalse(final_stack.complete_final_pin(commit, invalid))
+
+    def test_unverified_commit_claim_cannot_complete_even_a_version_only_receipt(self):
+        root = self.root()
+        fixtures._fixture(root, pins_linux=[{"id": "agentsview", "url": "https://github.com/example/agentsview",
+                                           "version": "0.44.0", "commit": "a" * 40}])
+        run = next(row for row in final_stack.build_document(root)["runs"] if row["id"] == "agentsview")
+        self.assertEqual(run["source_commit_claim"], "a" * 40)
+        self.assertEqual(run["source_proof_status"], "not_verified")
+        for markers in ({"source_commit_claim": "a" * 40}, {"source_proof_status": "not_verified"},
+                        {"source_commit_claim": "a" * 40, "source_proof_status": "not_verified"}):
+            with self.subTest(markers=tuple(markers)):
+                identity = {"pin_parsed": {"version": "0.44.0", "commit": None}, **markers}
+                self.assertFalse(final_stack.complete_final_pin("0.44.0", identity))
+                self.assertFalse(final_stack.complete_final_pin("a" * 40, identity))
+        self.assertFalse(final_stack.complete_final_pin("0.44.0", run))
+
     def test_all_nonlock_commit_sources_need_proof_before_receipt_binding(self):
         for kind in ("adoption", "stack", "runtime"):
             with self.subTest(kind=kind):
@@ -147,6 +209,33 @@ class OfflineApplicationTests(fixtures.FixtureTestCase):
                 after = next(row for row in final_stack.build_runs(final_stack.run_records(final_stack.Sources(root)))
                              if row["repository"] == "github.com/example/widget")
                 self.assertTrue(final_stack.complete_final_pin(commit, after))
+
+    def test_stack_and_runtime_proofs_accept_only_repository_joined_component_ids(self):
+        root = self.root()
+        repository = "https://github.com/example/engine"
+        relative = "evidence/artifacts/source-fill-fixture/engine-alias-proof.json"
+        fixtures._fixture(root, stack=[
+            {"id": "selected-engine", "repository": repository, "version": "1.2.3", "source_pin": "b" * 40},
+            {"id": "engine-alias", "repository": repository, "version": "1.2.3", "source_pin": "b" * 40,
+             "source_proof": relative},
+            {"id": "foreign", "repository": "https://github.com/example/foreign", "version": "1.2.3"}],
+            engine={"repository": repository, "requested_version": "1.2.3", "source_commit": "b" * 40,
+                    "source_proof": relative})
+        run = next(row for row in final_stack.build_document(root)["runs"] if row["id"] == "selected-engine")
+        proof = pins.resolve(run, Mock(return_value=Mock(returncode=0, stdout=(
+            "a" * 40 + " refs/tags/v1.2.3\n" + "b" * 40 + " refs/tags/v1.2.3^{}\n"), stderr="")))
+        path = root / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        for component, accepted in (("selected-engine", True), ("foreign", False)):
+            path.write_text(json.dumps({**proof, "component": component}))
+            records = final_stack.run_records(final_stack.Sources(root))
+            targets = [record for record in records if record["source"] in {
+                final_stack.STACK + "#/components/1", final_stack.RUNTIME_TARGET + "#/engine"}]
+            self.assertEqual(len(targets), 2)
+            for record in targets:
+                with self.subTest(component=component, source=record["source"]):
+                    bound = final_stack.build_runs([record])[0]
+                    self.assertEqual(final_stack.complete_final_pin("b" * 40, bound), accepted)
 
     def test_invalid_report_destination_refuses_before_any_upstream_query(self):
         root = self.root()
@@ -253,6 +342,32 @@ class OfflineApplicationTests(fixtures.FixtureTestCase):
         with self.assertRaisesRegex(ValueError, "run identity"):
             pins.apply_report(root, relative)
         self.assertEqual(path.read_bytes(), before)
+
+    def test_supported_decorated_version_fills_preserve_raw_pins_and_refuse_stale_plans(self):
+        for raw_pin in ("v1.2.3", "1.2.3 @ " + "b" * 40):
+            with self.subTest(raw_pin=raw_pin):
+                root = self.root()
+                fixtures._fixture(root, stack=[{"id": "widget", "repository": "https://github.com/example/widget",
+                                              "version": raw_pin}])
+                run = next(row for row in final_stack.build_document(root)["runs"] if row["id"] == "widget")
+                proof = pins.resolve(run, Mock(return_value=Mock(returncode=0, stdout=(
+                    "a" * 40 + " refs/tags/v1.2.3\n" + "b" * 40 + " refs/tags/v1.2.3^{}\n"), stderr="")))
+                relative = "evidence/artifacts/source-fill-fixture/decorated.json"
+                report = root / relative
+                report.parent.mkdir(parents=True, exist_ok=True)
+                report.write_text(json.dumps({"rows": [proof]}))
+                pins.apply_report(root, relative)
+                source = root / final_stack.STACK
+                document = json.loads(source.read_text())
+                self.assertEqual(document["components"][0]["version"], raw_pin)
+                bound = next(row for row in final_stack.build_document(root)["runs"] if row["id"] == "widget")
+                self.assertTrue(final_stack.complete_final_pin("b" * 40, bound))
+                document["components"][0]["version"] = "1.2.3"
+                source.write_text(json.dumps(document))
+                before = source.read_bytes()
+                with self.assertRaisesRegex(ValueError, "resolution no longer matches|source pin changed"):
+                    pins.apply_report(root, relative)
+                self.assertEqual(source.read_bytes(), before)
 
     def test_apply_cannot_override_the_separately_owned_claude_code_exclusion(self):
         root, relative, proof = self.prepare()

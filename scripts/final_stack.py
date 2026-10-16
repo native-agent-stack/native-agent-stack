@@ -170,7 +170,8 @@ DEFINITIONS = (
     ("runs[].source_commit_claim and runs[].source_proof_status",
      "A commit claimed by an adoption, stack or runtime source without matching retained proof remains "
      "informational as source_commit_claim, with source_proof_status not_verified and no pin_parsed.commit. "
-     "It cannot complete a commit-cited receipt. Matching source_proof is required for every run-pin source."),
+     "It cannot complete any receipt, including a version-only receipt. Matching source_proof is required "
+     "for every run-pin source."),
     ("winners[].run",
      "The runs[] id whose repository is the winner's (a run without a repository joins only by the same id), or "
      "null with run_reason held (the layer's current_adoption_status is held), external (scripts/final_stack.py "
@@ -402,6 +403,10 @@ def lock_source_proof(sources: Sources, binding: dict, *, component_ids=()) -> s
         return None
     if not isinstance(proof, dict) or proof.get("component") not in {binding.get("package"), *component_ids}:
         return None
+    if binding.get("version") is None and binding.get("commit"):
+        return complete_run_pins.verified_commit_object(
+            proof, proof["component"], binding["commit"],
+            host_receipts.normalize_repository(binding.get("repository")))
     return complete_run_pins.verified_commit(
         proof, proof["component"], binding.get("version"),
         host_receipts.normalize_repository(binding.get("repository")))
@@ -415,7 +420,7 @@ def proof_backed_record_pin(sources: Sources, text, commit, *, component, reposi
         return parsed
     claimed = identity["commit"]
     binding = {"package": component, "version": identity.get("version"),
-               "repository": repository, "source_proof": reference}
+               "commit": claimed, "repository": repository, "source_proof": reference}
     if reference is not None and lock_source_proof(sources, binding, component_ids=component_ids) == claimed:
         return parsed
     return {**parsed, "pin_parsed": {**identity, "commit": None},
@@ -506,7 +511,10 @@ def run_records(sources: Sources) -> list[dict]:
                         "repository": stack_repository[component["id"]], "pin": component.get("version"),
                         "parsed": proof_backed_record_pin(
                             sources, component.get("version"), component.get("source_pin"), component=component["id"],
-                            repository=stack_repository[component["id"]], reference=component.get("source_proof")),
+                            repository=stack_repository[component["id"]], reference=component.get("source_proof"),
+                            component_ids=(candidate["id"] for candidate in stack_components
+                                           if stack_repository.get(candidate.get("id"))
+                                           == stack_repository[component["id"]])),
                         "source": f"{STACK}#/components/{index}", "platform": None})
 
     runtime = sources.json(RUNTIME_TARGET)
@@ -520,7 +528,9 @@ def run_records(sources: Sources) -> list[dict]:
                     "parsed": proof_backed_record_pin(
                         sources, engine.get("requested_version"), engine.get("source_commit"),
                         component=(repository or "engine").rsplit("/", 1)[-1], repository=repository,
-                        reference=engine.get("source_proof")),
+                        reference=engine.get("source_proof"), component_ids=(
+                            component["id"] for component in stack_components
+                            if stack_repository.get(component.get("id")) == repository)),
                     "source": f"{RUNTIME_TARGET}#{RUNTIME_ENGINE_POINTER}", "platform": None})
     return records
 
@@ -917,6 +927,8 @@ def complete_final_pin(text, run: dict) -> bool:
     A supplied commit must be present in runs[]. A receipt cannot drop a
     recorded commit and rely on a matching release name instead.
     """
+    if run.get("source_commit_claim") is not None or run.get("source_proof_status") == "not_verified":
+        return False
     parsed = parse_pin(text).get("pin_parsed")
     canonical = run.get("pin_parsed")
     if not parsed or not canonical:

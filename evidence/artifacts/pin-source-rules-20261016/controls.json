@@ -34,7 +34,8 @@
   },
   "ownership": {
     "final_stack_changed_existing_functions": [
-      "run_records"
+      "run_records",
+      "complete_final_pin"
     ],
     "final_stack_added_functions": [
       "lock_source_proof",
@@ -46,7 +47,7 @@
     ],
     "landscape_added_functions": [],
     "comparison": "AST dumps at the base versus current source, excluding location attributes.",
-    "boundary": "The landscape changes are legacy identity call sites only. Every other existing function, including FINAL admission/refusal/current-snapshot functions, is unchanged.",
+    "boundary": "Legacy source identity/proof changes plus the CC197078 explicit early complete_final_pin refusal for source_commit_claim/not_verified; existing matching logic and every FINAL activation/current-snapshot function stay unchanged.",
     "catalog_decisions_changed_existing_functions": [
       "build_index"
     ],
@@ -157,5 +158,69 @@
     "grant_proposal_command": "python3 scripts/local_pages_policy_grants.py --root . --pin f2ef44c5281946364de2436a76b89445258df2ae",
     "retry_contract": "One-use original run-identity plan; replay refuses before writes and preserves every retained fixture file and generated result. Existing refusal behavior documented/tested, no retry implementation claimed.",
     "freshness": "Actual normalized package repository identity with explicit GitHub transfer compatibility, distinct from upstream-project coverage equivalence."
+  },
+  "cc_completion_fold": {
+    "reviews": [
+      "MICRO-delta-37609bd9.md",
+      "pr1209-80ce8d8f/review_output.json"
+    ],
+    "reviewed_commit": "80ce8d8ffbafd381c29b215bfb610921a4a8ac43",
+    "before": {
+      "completion_guard": {
+        "tests": 1,
+        "failures": 4,
+        "errors": 0
+      },
+      "stack_runtime_aliases": {
+        "tests": 1,
+        "failures": 2,
+        "errors": 0
+      },
+      "distribution_producer_consumer": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 1,
+        "diagnostic": "distribution source URL requires an explicit OS-distribution package marker"
+      },
+      "decorated_versions": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 2
+      },
+      "commit_only_inventory": {
+        "tests": 1,
+        "failures": 1,
+        "errors": 0
+      },
+      "witness_url": {
+        "tests": 1,
+        "failures": 1,
+        "errors": 0
+      }
+    },
+    "initial_producer_test_setup": "Wrong fixture-class lookup was corrected before reproducing the actual producer refusal; not counted as regression evidence.",
+    "broad_capture_attempt": "Capture timed out at 200 seconds with no final result; not a pass or a completed test failure.",
+    "source_contract": "Any unverified claimed commit blocks all receipts, including version-only receipts. Matching version-tag or exact typed-object proof is required.",
+    "commit_only_contract": "Isolated native bare Git fetch of the exact upstream object, typed cat-file commit bytes, retained binary body base64, offline Git object-ID hash reproduction; no release version inferred. Only synthetic fetch observations plus native hash-object fixture cross-check here.",
+    "aliases": "Same normalized source repository required on all paths; unrelated repository IDs remain refused.",
+    "versions": "Parsed version comparison plus independent exact original_pin and source-pointer stale-plan guards; conflicting embedded commits refuse.",
+    "producer": "Both record_verdicts.build_winners and build_verdicts.build_verdict_row preserve the two explicit distribution identity fields when present.",
+    "monitoring": {
+      "count_before": 354,
+      "count_after": 354,
+      "script_counters_unchanged": true,
+      "shape_multiplicities_unchanged": true,
+      "source_line_moves_only": true,
+      "historical_bytes_unchanged": true,
+      "permission_change": false
+    },
+    "after": {
+      "command": "python3 -m unittest tests.test_run_pin_sources tests.test_nautilus_run_pin tests.test_distribution_source_identity tests.test_catalog_decisions tests.test_landscape tests.test_final_stack.PinTests tests.test_final_stack.RunTests tests.test_final_stack.RepositoryTests tests.test_local_pages_policy_grants tests.test_record_verdicts.SameWinnerTests tests.test_record_verdicts.PinFallbackTests",
+      "tests": 211,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "execution": "Native unittest in an idle-class scope; bounded source/consumer selection plus actual same-winner and pin-fallback producer round trips. Earlier broad-capture timeout is not a pass."
+    }
   }
 }

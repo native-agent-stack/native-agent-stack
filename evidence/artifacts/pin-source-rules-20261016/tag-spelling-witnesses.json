@@ -73,7 +73,7 @@
     {
       "component": "poppler",
       "version": "26.09.0",
-      "repository": "github.com/tsdgeos/poppler_mirror",
+      "repository": "gitlab.freedesktop.org/poppler/poppler",
       "command": [
         "git",
         "ls-remote",

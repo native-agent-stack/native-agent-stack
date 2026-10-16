@@ -160,7 +160,7 @@
       "term": "runs[].source"
     },
     {
-      "definition": "A commit claimed by an adoption, stack or runtime source without matching retained proof remains informational as source_commit_claim, with source_proof_status not_verified and no pin_parsed.commit. It cannot complete a commit-cited receipt. Matching source_proof is required for every run-pin source.",
+      "definition": "A commit claimed by an adoption, stack or runtime source without matching retained proof remains informational as source_commit_claim, with source_proof_status not_verified and no pin_parsed.commit. It cannot complete any receipt, including a version-only receipt. Matching source_proof is required for every run-pin source.",
       "term": "runs[].source_commit_claim and runs[].source_proof_status"
     },
     {

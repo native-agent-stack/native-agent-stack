@@ -6,12 +6,15 @@ from scripts import landscape
 from scripts import catalog_decisions
 from tests import test_landscape as fixtures
 from tests import test_catalog_decisions as index_fixtures
+from tests import test_record_verdicts as verdict_fixtures
 
 
 class DistributionSourceTests(unittest.TestCase):
     setUp = fixtures.LandscapeTests.setUp
     write = fixtures.LandscapeTests.write
     build = fixtures.LandscapeTests.build
+    recorded_fields = fixtures.LayerVerdictSchemaV2Tests.recorded_fields
+    seal_claude_run = fixtures.LayerVerdictSchemaV2Tests.seal_claude_run
 
     def marked_package(self):
         self.layer["candidates"][0].update(
@@ -39,6 +42,22 @@ class DistributionSourceTests(unittest.TestCase):
                 self.write("foundation.json", self.foundation)
                 with self.assertRaisesRegex(ValueError, "candidate needs a canonical public repository URL"):
                     self.build()
+
+    def test_native_winner_producers_preserve_distribution_identity_for_the_consumer(self):
+        self.marked_package()
+        candidate = {**self.candidate, "component_id": "selected", "pin": "1", "recipe_ref": "selected-recipe"}
+        lane = {"winner_keys": ["selected"], "why_selected": "Passed the native scoped operation",
+                "winner_evidence_class": "native_proven", "winner_evidence_refs": ["receipt.json"]}
+        winners = verdict_fixtures.record_verdicts.build_winners(lane, {"selected": candidate}, "foundation.json", {})
+        self.seal_claude_run()
+        self.layer.update(self.recorded_fields(winners=winners))
+        self.write("foundation.json", self.foundation)
+        self.assertEqual(self.build()["layers"][0]["verdict_status"], "recorded")
+        producer = verdict_fixtures.load_module("distribution_build_verdicts", "build_verdicts.py")
+        projected = producer.build_verdict_row(self.layer, [])["winners"][0]
+        for field in ("repository", "source_identity_kind", "upstream_repository"):
+            self.assertEqual(winners[0][field], candidate[field])
+            self.assertEqual(projected[field], candidate[field])
 
     def selected_package(self):
         self.marked_package()

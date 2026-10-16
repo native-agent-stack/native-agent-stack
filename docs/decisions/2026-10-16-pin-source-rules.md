@@ -57,7 +57,8 @@ The distribution bridge accepts only an explicitly marked
 GitHub upstream-project identity. `catalog_identity` maps that upstream only for
 legacy index coverage; the actual candidate, winner and run repository stays
 the package source. Unmarked and foreign sources remain refused. Winner pin
-equality, receipt identity, platform qualification and FINAL paths are unchanged.
+equality and platform qualification are unchanged by the bridge. The separate
+CC-ruled source-claim refusal in `complete_final_pin` is documented below.
 The fallback repository table remains limited to packages absent from the stack;
 the already selected Nautilus repository is not duplicated there.
 
@@ -72,16 +73,21 @@ including the deferred systemd source identity. The named routing inputs are
 PIN-RULES lands FIRST. The separate FINAL-opening PR rebases onto it once; FINAL
 must not activate before the wrong-commit guard. Its owner keeps qualified
 admission and current-snapshot checks in `final_stack.py`, plus FINAL admission
-and refusal paths in `landscape.py`. This change owns only lock-entry source
-identity/proof, the repository fallback table, and `catalog_identity` with legacy
-callers. The second lander regenerates final-stack and re-registers evidence
-against then-current main. Neither lane edits the other's functions.
+and refusal paths in `landscape.py`. This change owns run-source identity/proof,
+the repository fallback table, and `catalog_identity` with legacy callers.
+The CC's later ruling explicitly adds an early source-claim refusal to
+`complete_final_pin`; its existing pin-matching logic stays intact. The opening
+owner preserves that guard on its single rebase. The second lander regenerates
+final-stack and re-registers evidence against then-current main.
 
 PIN-DATA follows landed rules on current main. Systemd requires a supported new
 run/wave and its retained evidence; the frozen scheduling-supervision row is not
 rewritten here. No source-pin data fills or version upgrades are published by
-this rules PR. The generated document changes only by tracking the existing
-Nautilus proof as an additional input.
+this rules PR. The generated document tracks the full-spelling Nautilus proof
+and marks 31 unproved source commits informational; the resulting drift and
+summary changes follow that fail-closed source projection. The instructions-
+skills ECC and backtesting-engine lean commit-only drift changes from same to
+unknown. No input pin or frozen verdict bytes change.
 
 ## Regression and primary sources
 
@@ -107,8 +113,10 @@ Primary mechanisms reused:
 - `git/git v2.53.0`, `Documentation/git-ls-remote.adoc`, OUTPUT: exact tag refs
   and peeled annotated objects. The parser composes Git's supported output;
   no replacement Git implementation or dependency is introduced.
-- `nautechsystems/nautilus_trader` at the rc5 tag/peeled commit above, with its
-  public native query retained by #1197. No new live-source observation is claimed.
+- `nautechsystems/nautilus_trader` at the rc5 tag/peeled commit above. A new
+  retained native full-spelling query supersedes #1197's single-spelling query,
+  confirming the same commit. Additional sanitized public tag/ref witnesses
+  are source observations only, without runtime or adoption acceptance claims.
 - `python/cpython v3.13.16`, `Lib/unittest/case.py`, `Lib/unittest/loader.py`,
   `Lib/ast.py`: the existing assertion/discovery harness and pinned-source span
   verification. No concrete TestCase is imported into another collected module.
@@ -160,9 +168,10 @@ in the controls record rather than relabelling that failing run as passing.
 proof requirement to adoption `tools[].commit`, stack `source_pin`, and runtime
 `source_commit`. A claimed commit without matching retained proof now remains
 `source_commit_claim` information, with `source_proof_status=not_verified` and
-no `pin_parsed.commit`. The existing receipt-binding function therefore refuses
-it. The source-path wrapper changes neither `record_pin` syntax parsing nor any
-FINAL admission/refusal/current-snapshot function. Offline fills now write the
+no `pin_parsed.commit`. That projection alone did not refuse a version-only
+receipt: the CC reproduced that bypass and ruled the early completion guard
+below. `record_pin` syntax parsing and FINAL activation/current-snapshot
+functions stay unchanged. Offline fills now write the
 consumed `source_proof` reference for both adoption and stack entries.
 
 Each source-path fixture first reproduces unproved receipt completion, then
@@ -253,3 +262,62 @@ P2s and retry/freshness P3s. The shared producer is now
 `catalog_decisions.catalog_identity`, imported by landscape. The two expressly
 authorized legacy fixture migrations above remain the only changed FINAL-stack
 fixtures. Partial read files and unpublished review digests are not evidence.
+
+## CC completion refusal and native source round trips
+
+`MICRO-delta-37609bd9.md` confirms at `80ce8d8f` that dropping an unproved
+commit while keeping its version accidentally lets a version-only receipt
+complete. The CC's ruling requires `complete_final_pin` to refuse every receipt
+while `source_commit_claim` is present or `source_proof_status` is `not_verified`.
+The existing matching rules follow this new guard unchanged. The regression
+first reproduced four failures (claim alone, status alone, both and the actual
+generated run); all now refuse. This narrow source-custody guard is the explicit
+exception to the earlier unchanged-helper ownership boundary. It grants no
+FINAL activation or qualification; the opening owner preserves it on rebase.
+
+Stack and runtime proof consumption now use the same normalized-repository
+component-ID scope as adoption and lock bindings. Their positive controls first
+failed twice, then passed; unrelated-repository IDs remain refused. The local
+review `pr1209-80ce8d8f/review_output.json` adds three producer/application issues
+to the same ruled fold:
+
+- Commit-only pins keep their version null and exact original commit. The
+  resolver now has a separate typed-object route, not a guessed release tag.
+  In a new isolated bare SHA-1 repository, native Git fetches that exact refspec
+  with depth one and no tags (required tree/blob objects may also be fetched),
+  and `git cat-file commit <OID>` supplies its body. The retained
+  proof records the commands, successful exit codes and base64 body (at most
+  one MiB), never raw stderr. Offline verification requires the same repository
+  and repository-scoped component ID and recomputes the typed Git object ID.
+  Missing objects, failed fetches, malformed or mismatched bodies remain gaps.
+  No real upstream fetch, source fill or runtime operation is claimed by the
+  synthetic round-trip test. Native `git hash-object -t commit --stdin`
+  independently reproduces the fixture OID; changed body/type/commit/repository,
+  component or return codes cannot bind. This retains a verification route for
+  ECC/lean-style historical commits without silently assigning a version.
+- `record_verdicts.build_winners` and `build_verdicts.build_verdict_row` carry
+  `source_identity_kind` and `upstream_repository` when present. The actual
+  producer-to-landscape test first reproduced the missing distribution-marker
+  refusal, then passed without hand-editing the generated winner. GitHub rows
+  gain no fields. An initial test setup lookup named the wrong fixture class;
+  it was corrected before the real producer failure and is not counted as
+  regression evidence.
+- Offline fills compare parsed version identity while separately requiring
+  the original raw pin and source pointer to match the retained plan. Both
+  `v1.2.3` and `1.2.3 @ <commit>` first raised real apply errors and now preserve
+  their original version text; a changed raw pin still refuses before writes.
+  An embedded differing commit also refuses adjudication-free replacement.
+
+The Poppler spelling witness now names the actual queried GitLab repository;
+its command/output stay unchanged. The five-row consistency check first failed
+on that mismatch and now passes. It is a query witness, not proof for the
+different GitHub mirror. Earlier stale generated-output and live-observation
+prose above is corrected to describe the final projection and retained queries.
+
+Primary source for commit-only verification: `git/git v2.53.0`,
+`Documentation/pull-fetch-param.adoc:30-33` (fully spelled object refspec, included
+by `git-fetch.adoc:49`), `Documentation/git-cat-file.adoc:57-63` (typed contents),
+and `Documentation/user-manual.adoc:4090-4118` (typed object header and hash).
+These pinned primary bytes were read for this correction; the installed native
+Git reports 2.53.0. This is observation consistency, not signed provenance or
+an artifact-to-source build-equivalence claim.

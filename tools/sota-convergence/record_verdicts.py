@@ -579,6 +579,8 @@ def build_winners(lane_data: dict, candidates_by_key: dict, ledger_path: str,
         winners.append({
             "component_id": component_id,
             "repository": candidate.get("repository"),
+            **{field: candidate[field] for field in ("source_identity_kind", "upstream_repository")
+               if field in candidate},
             "pin": pin,
             "evidence_class": evidence_class,
             "why_selected": why_selected,
