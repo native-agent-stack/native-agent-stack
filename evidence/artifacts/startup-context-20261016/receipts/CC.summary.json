@@ -35,11 +35,11 @@
   {
    "variant": "+qmd",
    "component": "qmd",
-   "total_tokens": 25600,
+   "total_tokens": 25700,
    "servers_not_connected": [],
    "component_loaded": true,
    "baseline_differs": [],
-   "over_control": 500,
+   "over_control": 600,
    "mcp_tokens_by_server": {
     "qmd": 2308,
     "serena": 8872
@@ -84,8 +84,8 @@
    "baseline_differs": [],
    "over_control": 1700,
    "mcp_tokens_by_server": {
-    "context-mode": 10652,
-    "serena": 8904
+    "plugin_context-mode_context-mode": 10789,
+    "serena": 8907
    },
    "mcp_tools_deferred": true
   }

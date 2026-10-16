@@ -34,13 +34,23 @@ python3 tools/startup-context/startup_context.py parse <saved stream result>
   loads them: the plugin root's `.mcp.json` first, then each `mcpServers` shape in `plugin.json` in order, with a later
   name replacing an earlier one and `${CLAUDE_PLUGIN_ROOT}` rendered to the install path
   (`plugins-reference.md:152`, `:301-317`, fetched 2026-10-16T04:50:27Z, sha256 `16b6dafd91d4a258`). An MCP bundle
-  (`.mcpb`, `.dxt`) is refused. Such a component loads when its server connects and its plugin is listed.
+  (`.mcpb`, `.dxt`) is refused.
+  - **Native names.** Each server keeps the name Claude Code gives a plugin's server, `plugin:<plugin>:<server>`, so its
+    tools are named `mcp__plugin_<plugin>_<server>__*` as in a normal session. This was measured at 2.1.301: the init
+    event of a $0 `/context` run lists the server by that name.
+  - **Ownership.** All of a plugin's servers belong to its component. The component loads when every one of them connects
+    and the plugin is listed. None of them counts as a baseline difference.
+  - **Where plugins are read.** The plugin registry is read from the client's configuration directory, which is
+    `CLAUDE_CONFIG_DIR` when set and `~/.claude` otherwise (`env-vars.md:435`, fetched 2026-10-15T20:05:21Z, sha256
+    `26d89d476a05970b`).
 
 ## What a receipt holds
 
 Names, token counts, each server's status, the loaded plugins and the variant's flags. Never an absolute home path (a
 path under home is shown as `~/...`, the dash-encoded home in a project directory as `-~-`, any other absolute path as
-`<absolute path outside home>`), an environment value or a host name. Inline `--settings` are kept with every value
+`<absolute path outside home>`), an environment value or a host name. Flags are read in one spelling first
+(`--flag=value` is split into `--flag value`), so a value is recognized by its flag however it was written, and a repeated
+flag is read at each place. Inline `--settings` are kept with every value
 under a key that can hold a credential or an environment value (`env`, `apiKeyHelper`, any key with key, token,
 secret, password, credential or auth in its name) shown as `<redacted>`. Values of 1,000 tokens and more are the client's own rounding to the nearest 100.
 

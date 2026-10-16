@@ -134,14 +134,31 @@ def installer():
     return module
 
 
+def config_dir() -> Path:
+    """The configuration directory the measured client reads, settings and plugins included: CLAUDE_CONFIG_DIR when set
+    (env-vars.md:435, "default: ~/.claude"), else ~/.claude. run_context passes the environment on unchanged."""
+    return Path(os.environ.get("CLAUDE_CONFIG_DIR") or Path.home() / ".claude")
+
+
+def plugin_name(variant: dict) -> str:
+    """The plugin a variant names, without its marketplace (`name@marketplace`); empty when it names none."""
+    return (variant.get("plugin") or "").split("@")[0]
+
+
+def plugin_server_key(plugin: str, server: str) -> str:
+    """The name Claude Code gives a plugin's MCP server, `plugin:<plugin>:<server>`, from which its tools are named
+    mcp__plugin_<plugin>_<server>__*; measured at 2.1.301 (the init event of a $0 /context run lists the server by it)."""
+    return f"plugin:{plugin}:{server}"
+
+
 def plugin_servers(plugin: str) -> dict:
     """The MCP servers an installed plugin declares, loaded as Claude Code loads them: the plugin root's .mcp.json
     first, then each shape of `mcpServers` in .claude-plugin/plugin.json in order (a .json file path or an inline map,
     or an array of either), a later name replacing an earlier one; an MCP bundle (.mcpb, .dxt) is refused. The install
     path comes from ~/.claude/plugins/installed_plugins.json and renders ${CLAUDE_PLUGIN_ROOT}. --strict-mcp-config
     loads no MCP server outside --mcp-config, a plugin's included, so a plugin variant passes its plugin's servers
-    there (README, "The launch")."""
-    installed = json.loads((Path.home() / ".claude" / "plugins" / "installed_plugins.json").read_text(encoding="utf-8"))
+    there (README, "The launch"), under their native names (plugin_server_key)."""
+    installed = json.loads((config_dir() / "plugins" / "installed_plugins.json").read_text(encoding="utf-8"))
     entries = (installed.get("plugins") or {}).get(plugin) or []
     if not entries:
         raise SystemExit(f"startup_context: plugin {plugin} is not installed")
@@ -154,10 +171,13 @@ def plugin_servers(plugin: str) -> dict:
         return source.get("mcpServers", source)
 
     servers = from_file(".mcp.json") if (root / ".mcp.json").exists() else {}
-    declared = json.loads((root / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8")).get("mcpServers")
+    manifest = json.loads((root / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8"))
+    declared = manifest.get("mcpServers")
     for shape in declared if isinstance(declared, list) else [declared] if declared else []:
         servers.update(from_file(shape) if isinstance(shape, str) else shape)
-    return json.loads(json.dumps(servers).replace("${CLAUDE_PLUGIN_ROOT}", str(root)))
+    name = manifest.get("name") or plugin.split("@")[0]
+    rendered = json.loads(json.dumps(servers).replace("${CLAUDE_PLUGIN_ROOT}", str(root)))
+    return {plugin_server_key(name, server): spec for server, spec in rendered.items()}
 
 
 def mcp_config(names: list[str], directory: Path, plugin: str | None = None) -> Path:
@@ -175,7 +195,7 @@ def mcp_config(names: list[str], directory: Path, plugin: str | None = None) -> 
     if set(extra) & set(chosen):
         raise SystemExit(f"startup_context: plugin {plugin} declares a server the variant already lists")
     chosen.update(extra)
-    path = directory / f"mcp-{'-'.join(sorted(chosen)) or 'none'}.json"
+    path = directory / f"mcp-{'-'.join(sorted(name.replace(':', '_') for name in chosen)) or 'none'}.json"
     path.write_text(json.dumps({"mcpServers": chosen}, indent=1), encoding="utf-8")
     os.chmod(path, 0o600)
     return path
@@ -223,10 +243,21 @@ def client_version(claude: str) -> str:
     return done.stdout.strip().split(" ")[0] if done.returncode == 0 else "unknown"
 
 
+def split_flags(argv: list[str]) -> list[str]:
+    """argv with every `--flag=value` split into `--flag value`: the one spelling shown_flags reads, so a value is
+    recognized by its flag however it was written, and a repeated flag is read at each place."""
+    split = []
+    for item in argv:
+        flag, equals, value = item.partition("=")
+        split += [flag, value] if item.startswith("--") and equals else [item]
+    return split
+
+
 def shown_flags(argv: list[str], home: str) -> list[str]:
-    """Flags as a receipt may show them: a generated --mcp-config file by its server set, inline --settings sanitized
-    (sanitized), every other value through private_text."""
+    """Flags as a receipt may show them, each spelling read through split_flags: a generated --mcp-config file by its
+    server set, every --settings value sanitized (sanitized), every other value through private_text."""
     shown = []
+    argv = split_flags(argv)
     for index, flag in enumerate(argv):
         previous = argv[index - 1] if index else None
         if previous == "--mcp-config":
@@ -268,26 +299,38 @@ def measure(launch: dict, out: Path, claude: str, home: str) -> dict:
     return summary(launch, receipts, out)
 
 
+def owned_servers(variant: dict, names) -> set[str]:
+    """The servers among `names` that belong to the variant's component: the component's own server, and every server
+    of its plugin (plugin_server_key)."""
+    plugin = plugin_name(variant)
+    return {name for name in names
+            if name == variant.get("component") or (plugin and name.startswith(plugin_server_key(plugin, "")))}
+
+
 def loaded_component(variant: dict, receipt: dict) -> bool | None:
-    """Whether the variant's component loaded: its MCP server connected, and its plugin (when the variant names one)
-    in the init event's list; a component without a server loads when it is listed as a plugin. None for the control.
-    A delta is reported only for a component that loaded."""
+    """Whether the variant's component loaded: every server it owns (owned_servers) connected, and its plugin (when the
+    variant names one) in the init event's list; a component without a server loads when it is listed as a plugin.
+    None for the control. A delta is reported only for a component that loaded."""
     component = variant.get("component")
     if component is None:
         return None
     statuses = {s["name"]: s["status"] for s in receipt["mcp_servers"]}
-    plugin = (variant.get("plugin") or "").split("@")[0]
-    if component in statuses:
-        return statuses[component] == "connected" and (not plugin or plugin in receipt["plugins"])
+    plugin = plugin_name(variant)
+    mine = owned_servers(variant, statuses)
+    if plugin and plugin not in receipt["plugins"]:
+        return False
+    if mine:
+        return all(statuses[name] == "connected" for name in mine)
     return (plugin or component) in receipt["plugins"]
 
 
 def baseline_differs(variant: dict, receipt: dict, control: dict) -> list[str]:
-    """What the variant and the control do not share in the same state, its own component and plugin aside: a server
-    connected in one run only, or a plugin listed in one run only. A delta over the control needs this empty."""
-    own = {variant.get("component"), (variant.get("plugin") or "").split("@")[0]}
+    """What the variant and the control do not share in the same state, the component, its plugin and every server they
+    own aside: a server connected in one run only, or a plugin listed in one run only. A delta over the control needs
+    this empty."""
     base = {s["name"]: s["status"] for s in control["mcp_servers"]}
     mine = {s["name"]: s["status"] for s in receipt["mcp_servers"]}
+    own = {variant.get("component"), plugin_name(variant)} | owned_servers(variant, set(base) | set(mine))
     servers = sorted(name for name in (set(base) | set(mine)) - own if base.get(name) != mine.get(name))
     plugins = sorted((set(control["plugins"]) ^ set(receipt["plugins"])) - own)
     return servers + [f"plugin {name}" for name in plugins]

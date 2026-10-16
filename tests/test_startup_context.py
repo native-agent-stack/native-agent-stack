@@ -50,7 +50,7 @@ if "--settings" in argv:
     enabled = [k.split("@")[0] for k, v in json.loads(argv[argv.index("--settings") + 1]).get("enabledPlugins", {}).items() if v]
 init = {"type": "system", "subtype": "init", "plugins": [{"name": n} for n in ["fixture-plugin", *enabled]],
         "mcp_servers": [{"name": n, "status": "failed" if n in failed else "connected"} for n in servers]}
-text = open(os.environ["FAKE_REPORT_DIR"] + "/" + ("extra" if "extra" in servers else "base")).read()
+text = open(os.environ["FAKE_REPORT_DIR"] + "/" + ("extra" if any(n.split(":")[-1] == "extra" for n in servers) else "base")).read()
 print(json.dumps(init))
 print(json.dumps({"type": "result", "is_error": False, "num_turns": int(os.environ.get("FAKE_TURNS", "0")),
                   "total_cost_usd": float(os.environ.get("FAKE_COST", "0")), "result": text}))
@@ -150,6 +150,17 @@ class Measure(unittest.TestCase):
         self.assertNotIn(HOME, text)
         self.assertNotIn("/srv/elsewhere", text)
         shown = json.loads(json.loads(text)["flags"][json.loads(text)["flags"].index("--settings") + 1])
+        # The co-op's local review at 3a1f8618 (P1, :234-240): the equals form and a repeated flag went unsanitized.
+        other = "synthetic-" + "w" * 24
+        launch = dict(self.launch, variants=[dict(self.launch["variants"][0], flags=[
+            "--settings=" + json.dumps({"env": {"FIXTURE_TOKEN": secret}}), "--settings", json.dumps({"env": {"B": other}}),
+            "--add-dir=" + HOME + "/elsewhere"])])
+        S.measure(launch, self.tmp / "out2", str(self.claude), HOME)
+        text2 = (self.tmp / "out2" / "fixture-role.control.json").read_text()
+        for value in (secret, other, HOME):
+            self.assertNotIn(value, text2)
+        self.assertEqual(S.split_flags(["--settings={}", "-v", "--model", "m", "x=y"]),
+                         ["--settings", "{}", "-v", "--model", "m", "x=y"])
         self.assertEqual(shown["env"], {"FIXTURE_API_KEY": "<redacted>", "FIXTURE_DIR": "<redacted>"})
         self.assertEqual(shown["enabledPlugins"], {"p@m": True})
         self.assertEqual(shown["statusLine"], {"command": "~/bin/status"})
@@ -184,10 +195,13 @@ class Measure(unittest.TestCase):
         with mock.patch.object(S.Path, "home", return_value=home):
             doc = S.measure(launch, self.tmp / "out", str(self.claude), str(home))
         config = [json.loads(line) for line in self.log.read_text().splitlines()][1]
-        self.assertIn("mcp-extra-fixture.json", [Path(flag).name for flag in config])
+        # The co-op's local review at 3a1f8618 (P2, :174-177): the plugin's server keeps its native name.
+        self.assertIn("mcp-fixture-plugin_p_extra.json", [Path(flag).name for flag in config])
+        receipt = json.loads((self.tmp / "out" / "fixture-role.+p.json").read_text())
+        self.assertIn({"name": "plugin:p:extra", "status": "connected"}, receipt["mcp_servers"])
         row = doc["rows"][1]
         self.assertEqual((row["component_loaded"], row["over_control"]), (True, 600))
-        with mock.patch.object(S.Path, "home", return_value=home), mock.patch.dict(os.environ, {"FAKE_FAILED": "extra"}):
+        with mock.patch.object(S.Path, "home", return_value=home), mock.patch.dict(os.environ, {"FAKE_FAILED": "plugin:p:extra"}):
             row = S.measure(launch, self.tmp / "out2", str(self.claude), str(home))["rows"][1]
         self.assertEqual((row["component_loaded"], row["over_control"]), (False, None))
 
@@ -205,11 +219,40 @@ class Measure(unittest.TestCase):
         (home / ".claude" / "plugins" / "installed_plugins.json").write_text(json.dumps(
             {"version": 2, "plugins": {"q@m": [{"installPath": str(root)}]}}))
         with mock.patch.object(S.Path, "home", return_value=home):
-            self.assertEqual(S.plugin_servers("q@m"), {"a": {"command": "one"}, "b": {"command": "two"},
-                                                       "c": {"command": str(root) + "/c"}})
+            self.assertEqual(S.plugin_servers("q@m"), {"plugin:q:a": {"command": "one"}, "plugin:q:b": {"command": "two"},
+                                                       "plugin:q:c": {"command": str(root) + "/c"}})
             (root / ".claude-plugin" / "plugin.json").write_text(json.dumps({"name": "q", "mcpServers": "./x.mcpb"}))
             with self.assertRaises(SystemExit):
                 S.plugin_servers("q@m")
+
+    def test_every_server_of_the_plugin_is_its_own_not_a_baseline_change(self):
+        # The co-op's local review at 3a1f8618 (P2, :288-291): with a plugin of several servers, the ones other than the
+        # component's counted as baseline changes, so no delta was ever given.
+        variant = {"component": "a", "plugin": "q@m"}
+        control = {"mcp_servers": [{"name": "fixture", "status": "connected"}], "plugins": ["x"]}
+        receipt = {"mcp_servers": [{"name": "fixture", "status": "connected"}, {"name": "plugin:q:a", "status": "connected"},
+                                   {"name": "plugin:q:b", "status": "connected"}, {"name": "plugin:q:c", "status": "connected"}],
+                   "plugins": ["x", "q"]}
+        self.assertEqual(S.baseline_differs(variant, receipt, control), [])
+        self.assertTrue(S.loaded_component(variant, receipt))
+        receipt["mcp_servers"][3]["status"] = "failed"
+        self.assertFalse(S.loaded_component(variant, receipt))
+
+    def test_plugin_metadata_comes_from_the_active_config_directory(self):
+        # The co-op's local review at 3a1f8618 (P2, :144-145): the registry was read from ~/.claude even when
+        # CLAUDE_CONFIG_DIR points the client elsewhere.
+        active = self.tmp / "profile"
+        root = self.tmp / "profile-plugin"
+        (root / ".claude-plugin").mkdir(parents=True)
+        (root / ".claude-plugin" / "plugin.json").write_text(json.dumps({"name": "r", "mcpServers": {"s": {"command": "x"}}}))
+        (active / "plugins").mkdir(parents=True)
+        (active / "plugins" / "installed_plugins.json").write_text(json.dumps(
+            {"version": 2, "plugins": {"r@m": [{"installPath": str(root)}]}}))
+        empty_home = self.tmp / "empty-home"
+        empty_home.mkdir()
+        with mock.patch.object(S.Path, "home", return_value=empty_home), \
+                mock.patch.dict(os.environ, {"CLAUDE_CONFIG_DIR": str(active)}):
+            self.assertEqual(S.plugin_servers("r@m"), {"plugin:r:s": {"command": "x"}})
 
     def test_the_committed_context_mode_variant_loads_its_plugin_server(self):
         launch = json.loads((ROOT / "tools" / "startup-context" / "launches" / "CC.json").read_text())

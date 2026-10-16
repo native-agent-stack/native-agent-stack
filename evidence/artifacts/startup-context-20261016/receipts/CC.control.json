@@ -4,7 +4,7 @@
  "family": "claude-code",
  "variant": "control",
  "component": null,
- "measured_at": "2026-10-16T04:45:07Z",
+ "measured_at": "2026-10-16T05:36:56Z",
  "client_version": "2.1.301",
  "cwd": ".",
  "flags": [

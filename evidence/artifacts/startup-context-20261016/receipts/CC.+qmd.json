@@ -4,7 +4,7 @@
  "family": "claude-code",
  "variant": "+qmd",
  "component": "qmd",
- "measured_at": "2026-10-16T04:49:06Z",
+ "measured_at": "2026-10-16T05:40:56Z",
  "client_version": "2.1.301",
  "cwd": ".",
  "flags": [
@@ -41,7 +41,7 @@
  ],
  "report": {
   "model": "claude-opus-5-5",
-  "total_tokens": 25600,
+  "total_tokens": 25700,
   "window_tokens": 1000000,
   "categories": [
    {
@@ -82,7 +82,7 @@
    },
    {
     "category": "Free space",
-    "tokens": 941400
+    "tokens": 941300
    },
    {
     "category": "Autocompact buffer",

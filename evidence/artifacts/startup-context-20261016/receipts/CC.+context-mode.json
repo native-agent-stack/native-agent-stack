@@ -4,13 +4,13 @@
  "family": "claude-code",
  "variant": "+context-mode",
  "component": "context-mode",
- "measured_at": "2026-10-16T04:49:24Z",
+ "measured_at": "2026-10-16T05:41:21Z",
  "client_version": "2.1.301",
  "cwd": ".",
  "flags": [
   "--strict-mcp-config",
   "--mcp-config",
-  "mcp-context-mode-serena.json",
+  "mcp-plugin_context-mode_context-mode-serena.json",
   "--settings",
   "{\"enabledPlugins\": {\"context-mode@context-mode\": true}}",
   "--model",
@@ -24,7 +24,7 @@
    "status": "connected"
   },
   {
-   "name": "context-mode",
+   "name": "plugin:context-mode:context-mode",
    "status": "connected"
   }
  ],
@@ -59,7 +59,7 @@
    },
    {
     "category": "MCP tools (deferred)",
-    "tokens": 19600
+    "tokens": 19700
    },
    {
     "category": "System tools (deferred)",
@@ -92,59 +92,59 @@
   ],
   "mcp_tools": [
    {
-    "tool": "mcp__context-mode__ctx_batch_execute",
-    "server": "context-mode",
+    "tool": "mcp__plugin_context-mode_context-mode__ctx_batch_execute",
+    "server": "plugin_context-mode_context-mode",
     "tokens": 1700
    },
    {
-    "tool": "mcp__context-mode__ctx_doctor",
-    "server": "context-mode",
-    "tokens": 136
+    "tool": "mcp__plugin_context-mode_context-mode__ctx_doctor",
+    "server": "plugin_context-mode_context-mode",
+    "tokens": 143
    },
    {
-    "tool": "mcp__context-mode__ctx_execute",
-    "server": "context-mode",
+    "tool": "mcp__plugin_context-mode_context-mode__ctx_execute",
+    "server": "plugin_context-mode_context-mode",
     "tokens": 1900
    },
    {
-    "tool": "mcp__context-mode__ctx_execute_file",
-    "server": "context-mode",
+    "tool": "mcp__plugin_context-mode_context-mode__ctx_execute_file",
+    "server": "plugin_context-mode_context-mode",
     "tokens": 1200
    },
    {
-    "tool": "mcp__context-mode__ctx_fetch_and_index",
-    "server": "context-mode",
-    "tokens": 1400
+    "tool": "mcp__plugin_context-mode_context-mode__ctx_fetch_and_index",
+    "server": "plugin_context-mode_context-mode",
+    "tokens": 1500
    },
    {
-    "tool": "mcp__context-mode__ctx_index",
-    "server": "context-mode",
+    "tool": "mcp__plugin_context-mode_context-mode__ctx_index",
+    "server": "plugin_context-mode_context-mode",
     "tokens": 1200
    },
    {
-    "tool": "mcp__context-mode__ctx_insight",
-    "server": "context-mode",
-    "tokens": 209
+    "tool": "mcp__plugin_context-mode_context-mode__ctx_insight",
+    "server": "plugin_context-mode_context-mode",
+    "tokens": 216
    },
    {
-    "tool": "mcp__context-mode__ctx_purge",
-    "server": "context-mode",
-    "tokens": 913
+    "tool": "mcp__plugin_context-mode_context-mode__ctx_purge",
+    "server": "plugin_context-mode_context-mode",
+    "tokens": 921
    },
    {
-    "tool": "mcp__context-mode__ctx_search",
-    "server": "context-mode",
+    "tool": "mcp__plugin_context-mode_context-mode__ctx_search",
+    "server": "plugin_context-mode_context-mode",
     "tokens": 1700
    },
    {
-    "tool": "mcp__context-mode__ctx_stats",
-    "server": "context-mode",
-    "tokens": 129
+    "tool": "mcp__plugin_context-mode_context-mode__ctx_stats",
+    "server": "plugin_context-mode_context-mode",
+    "tokens": 137
    },
    {
-    "tool": "mcp__context-mode__ctx_upgrade",
-    "server": "context-mode",
-    "tokens": 165
+    "tool": "mcp__plugin_context-mode_context-mode__ctx_upgrade",
+    "server": "plugin_context-mode_context-mode",
+    "tokens": 172
    },
    {
     "tool": "mcp__serena__delete_memory",
@@ -159,17 +159,17 @@
    {
     "tool": "mcp__serena__find_declaration",
     "server": "serena",
-    "tokens": 536
+    "tokens": 537
    },
    {
     "tool": "mcp__serena__find_implementations",
     "server": "serena",
-    "tokens": 507
+    "tokens": 508
    },
    {
     "tool": "mcp__serena__find_referencing_symbols",
     "server": "serena",
-    "tokens": 443
+    "tokens": 444
    },
    {
     "tool": "mcp__serena__find_symbol",
@@ -769,8 +769,8 @@
    }
   ],
   "mcp_tokens_by_server": {
-   "context-mode": 10652,
-   "serena": 8904
+   "plugin_context-mode_context-mode": 10789,
+   "serena": 8907
   },
   "mcp_tools_deferred": true
  }
