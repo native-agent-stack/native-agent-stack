@@ -1,0 +1,926 @@
+{
+  "schema_version": 1,
+  "rule_version": "angle-convergence/2",
+  "catalog": "foundation",
+  "layer_id": "observation-inference",
+  "weights": {
+    "A1": 0.2,
+    "A2": 0.2,
+    "A3": 0.15,
+    "A4": 0.15,
+    "A5": 0.2,
+    "A6": 0.1
+  },
+  "weights_stated_at": "2026-10-16T05:08:35Z",
+  "weight_reason": "Retain the existing repository six-angle defaults. Published evaluation availability is unverified, so no transfer of A5 weight. This draft does not change canonical angle records.",
+  "published_evaluations_available": null,
+  "disclosure": "PREPARATION ONLY. Prior verdicts and source screens were visible. Every scored sign is a PROPOSAL for two-family adjudication, not a measured value or permission to install. Fresh re-captures after the weight statement are native stdout/stderr, deterministically masked with published rule/tests. Earlier unretained output summaries are excluded. The full pipeline, production adoption and comparative A6 remain gaps; FINAL bindings are empty.",
+  "resolution_inputs": [
+    "catalogs/landscape/foundation.json",
+    "catalogs/landscape/final-stack.json",
+    "catalogs/sota-convergence/layer-verdict-waves.json",
+    "catalogs/sota-convergence/layer-verdicts-20260922.json",
+    "catalogs/saturation/ledger.json",
+    "catalogs/sota-convergence/manifest-20260926.json",
+    "catalogs/sota-convergence/manifest-20260929.json",
+    "evidence/artifacts/landscape-sweep-20260926/returns.json",
+    "evidence/artifacts/landscape-sweep-20260929/returns.json",
+    "evidence/artifacts/final-prep-observation-inference-20261016/lane-packet-selection.json",
+    "evidence/artifacts/final-prep-observation-inference-20261016/F1-run-pin.json"
+  ],
+  "gaps": [
+    "G1: Canonical verdict/run/complete source identities remain unreconciled until the owning gate lands the proposal.",
+    "G2: No full current-tuple privacy-filtered live-service E2E; task constraints prohibit service connections.",
+    "G3: Native CLI invocation exists, but no new real native-runtime adoption window or production counter reconciliation.",
+    "G4: Collector exact-tag build-and-test failure and Loki release-workflow failures require relevance/root-cause adjudication.",
+    "G5: A3/A4/A5 coverage is unverified for the bounded role/pins; no artificial positive scores or weight transfer.",
+    "G6: No compliant comparative A6 or macOS arm64 execution.",
+    "G7: Six carried survivors remain unadjudicated; supplemental Tempo comparison-role carry cannot be silently discarded.",
+    "G8: FINAL admission gate chain remains closed; this evidence contains no final_evidence bindings.",
+    "Integrity correction: original C10 collector digest mismatched the published artifact because hashing began before download completion. Keep C10; only new sequential C38 plus equality/timing regression supports current archive verification. Original fixture inputs are historical GAPs; fresh input-bound smokes replace them for present claims."
+  ],
+  "candidates": [
+    {
+      "id": "opentelemetry-collector-contrib",
+      "name": "opentelemetry-collector-contrib",
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+      "pin": "ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+      "role": "Recorded layer winner; proposed reconciled run 0.162.0 is preparation only.",
+      "a1_screened": true,
+      "a6_comparative": false,
+      "adoption_status": "CURRENT",
+      "confounds": [
+        "Source screen and native offline smoke are A1 only; current live-service state was not inspected.",
+        "Linux/WSL2 scratch execution does not establish macOS arm64 acceptance.",
+        "Historical qualification at other pins or different workloads is not transferred to this run tuple.",
+        "Integrity rebuild: native raw retained privately, masked derivative/rule/tests published; co-op reproduction is required before PR opening."
+      ],
+      "angles": {
+        "A1": {
+          "score": "+",
+          "read_at": "2026-10-16T08:35:43Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/44-collector-upstream-config-bound.json"
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/45-collector-repository-config-bound.json"
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/38-archive-checksums-sequential.stdout.txt"
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/fixture-bindings.json"
+            }
+          ],
+          "note": "PROPOSAL assessment only. Current native offline checks 44-collector-upstream-config-bound, 45-collector-repository-config-bound exited zero (envelope exit_code lines 14, 15). Later sequential archive hashes at captures/38-archive-checksums-sequential.stdout.txt:1 match the independent vendor digest; verifier output is captures/38b-archive-binding-green.stdout.txt:1. C10 is a retained collector mismatch/ordering mistake, not verification. fixture-bindings.json binds current fixture bytes before/after use; historical C26/C27/C29/C30 input identity remains GAP. These are A1 offline checks, never full service E2E or comparative A6."
+        },
+        "A2": {
+          "score": "0",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt"
+            }
+          ],
+          "note": "PROPOSAL assessment. Mixed/disputed: exact-tag push metadata has 11 successful workflows and a failed build-and-test. Static validation passes cannot explain that failure or lift the existing release hold. Root cause, tests affected and corrected-pin evidence remain owed. Exact source lines: captures/07-collector-ci.stdout.txt:2 (12 returned workflows), :1833/:1842 (build-and-test/failure); all conclusions are indexed in public-source-reads.json."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "Independent community/adopter consensus at this component/pin remains unverified. No stars-only or incumbency-based score is substituted."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "Comparable net-usage evidence is not retained for this pinned role. Artifact availability and installation are not usage; no new landscape survey was dispatched."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "A relevant independent published evaluation and its workload/version match remain unverified. Availability is null, not false; no A5 weight is transferred."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/receipts/otelcol-contrib-0162-qualification-20261003.json"
+            }
+          ],
+          "note": "No new comparative native workload run. Offline smokes are A1. Historical receipts retain their original pin/workload/confounds and do not satisfy this run's comparative-evidence contract."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Resolve exact-tag build-and-test failure from its primary job evidence; after the gate permits a live fixture, compare privacy/counter fidelity and delivery/recovery at the frozen tuple."
+    },
+    {
+      "id": "prometheus",
+      "name": "prometheus",
+      "repository": "https://github.com/prometheus/prometheus",
+      "pin": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "role": "Recorded layer winner; proposed reconciled run 3.15.0 is preparation only.",
+      "a1_screened": true,
+      "a6_comparative": false,
+      "adoption_status": "CURRENT",
+      "confounds": [
+        "Source screen and native offline smoke are A1 only; current live-service state was not inspected.",
+        "Linux/WSL2 scratch execution does not establish macOS arm64 acceptance.",
+        "Historical qualification at other pins or different workloads is not transferred to this run tuple.",
+        "Integrity rebuild: native raw retained privately, masked derivative/rule/tests published; co-op reproduction is required before PR opening."
+      ],
+      "angles": {
+        "A1": {
+          "score": "+",
+          "read_at": "2026-10-16T08:35:43Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/46-prometheus-upstream-config-bound.json"
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/47-prometheus-rule-test-bound.json"
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/38-archive-checksums-sequential.stdout.txt"
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/fixture-bindings.json"
+            }
+          ],
+          "note": "PROPOSAL assessment only. Current native offline checks 46-prometheus-upstream-config-bound, 47-prometheus-rule-test-bound exited zero (envelope exit_code lines 15, 15). Later sequential archive hashes at captures/38-archive-checksums-sequential.stdout.txt:2 match the independent vendor digest; verifier output is captures/38b-archive-binding-green.stdout.txt:1. C10 is a retained collector mismatch/ordering mistake, not verification. fixture-bindings.json binds current fixture bytes before/after use; historical C26/C27/C29/C30 input identity remains GAP. These are A1 offline checks, never full service E2E or comparative A6. Static case inventory: captures/22-fixture-prometheus-tests.stdout.txt:34,104,112,128,137,171; native C47 output reports SUCCESS only."
+        },
+        "A2": {
+          "score": "0",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/08-prometheus-ci.stdout.txt"
+            }
+          ],
+          "note": "PROPOSAL assessment. Three exact-commit CI conclusions succeeded at captures/08-prometheus-ci.stdout.txt:15,252,489. This is bounded CI evidence only; archive equality belongs to the separate A1 check. Responsiveness and wider engineering quality remain unverified."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "Independent community/adopter consensus at this component/pin remains unverified. No stars-only or incumbency-based score is substituted."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "Comparable net-usage evidence is not retained for this pinned role. Artifact availability and installation are not usage; no new landscape survey was dispatched."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "A relevant independent published evaluation and its workload/version match remain unverified. Availability is null, not false; no A5 weight is transferred."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/receipts/prometheus-3150-qualification-20260926.json"
+            }
+          ],
+          "note": "No new comparative native workload run. Offline smokes are A1. Historical receipts retain their original pin/workload/confounds and do not satisfy this run's comparative-evidence contract."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Retain a preregistered current-tuple native task/counter and recovery comparison, with matched workload and unambiguous task attribution."
+    },
+    {
+      "id": "loki",
+      "name": "loki",
+      "repository": "https://github.com/grafana/loki",
+      "pin": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+      "role": "Recorded layer winner; proposed reconciled run 3.7.8 is preparation only.",
+      "a1_screened": true,
+      "a6_comparative": false,
+      "adoption_status": "CURRENT",
+      "confounds": [
+        "Source screen and native offline smoke are A1 only; current live-service state was not inspected.",
+        "Linux/WSL2 scratch execution does not establish macOS arm64 acceptance.",
+        "Historical qualification at other pins or different workloads is not transferred to this run tuple.",
+        "Integrity rebuild: native raw retained privately, masked derivative/rule/tests published; co-op reproduction is required before PR opening."
+      ],
+      "angles": {
+        "A1": {
+          "score": "+",
+          "read_at": "2026-10-16T08:35:43Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/48-loki-config-bound.json"
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/38-archive-checksums-sequential.stdout.txt"
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/fixture-bindings.json"
+            }
+          ],
+          "note": "PROPOSAL assessment only. Current native offline checks 48-loki-config-bound exited zero (envelope exit_code lines 14). Later sequential archive hashes at captures/38-archive-checksums-sequential.stdout.txt:3 match the independent vendor digest; verifier output is captures/38b-archive-binding-green.stdout.txt:1. C10 is a retained collector mismatch/ordering mistake, not verification. fixture-bindings.json binds current fixture bytes before/after use; historical C26/C27/C29/C30 input identity remains GAP. These are A1 offline checks, never full service E2E or comparative A6."
+        },
+        "A2": {
+          "score": "0",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/09-loki-ci.stdout.txt"
+            }
+          ],
+          "note": "PROPOSAL assessment. Mixed/disputed: exact-commit metadata includes successful release/security workflows but failures in LogQL Analyzer and Helm tagged release PR. Failure relevance is not established by status alone; do not clear or invent a hard disqualifier. Exact source lines: captures/09-loki-ci.stdout.txt:6/:15 and :234/:243 (the two named failures); :471,703,935,1166 are successes."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "Independent community/adopter consensus at this component/pin remains unverified. No stars-only or incumbency-based score is substituted."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "Comparable net-usage evidence is not retained for this pinned role. Artifact availability and installation are not usage; no new landscape survey was dispatched."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "A relevant independent published evaluation and its workload/version match remain unverified. Availability is null, not false; no A5 weight is transferred."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "observability/backends/receipt.json"
+            }
+          ],
+          "note": "No new comparative native workload run. Offline smokes are A1. Historical receipts retain their original pin/workload/confounds and do not satisfy this run's comparative-evidence contract."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Determine whether the two failed tag workflows affect the selected binary; qualify filtered-ingest/query/restart behavior in a separately authorized isolated live fixture."
+    },
+    {
+      "id": "mlx-lm",
+      "name": "ml-explore/mlx-lm",
+      "repository": "https://github.com/ml-explore/mlx-lm",
+      "pin": "a9bd8af5c02118882af735cef60705d2efce9fd0",
+      "role": "Carried survivor; CANDIDATE comparison role only, not an installation or default.",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "adoption_status": "NOT_ADOPTED",
+      "confounds": [
+        "Prior A1 screen is unmerged evidence in public PR #1192, not approval or convergence.",
+        "The 2026-09-29/09-26 carry records are older than this screen pin; role relevance and pin delta need adjudication.",
+        "Integrity rebuild: native raw retained privately, masked derivative/rule/tests published; co-op reproduction is required before PR opening.",
+        "Current-base carried survivor row has no version/commit; this candidate pin comes only from unmerged #1192 and is not a selected or qualified run."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/native-agent-stack/native-agent-stack",
+              "pin": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+              "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+              "line": 2252
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/native-agent-stack/native-agent-stack",
+              "pin": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+              "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+              "line": 2515
+            }
+          ],
+          "note": "PROPOSAL assessment. Optional inference model/backend/family-route and actual-workload qualification remain unbound; no model is downloaded or invoked. Pin source: evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json:2252 at d4efff9d; screen gap: :2515. Current-base final-stack carried row 7108-7110 contains no run pin. F1-run-pin.json records this unmerged-screen-only identity drift."
+        },
+        "A2": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/native-agent-stack/native-agent-stack",
+              "pin": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+              "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+              "line": 2252
+            }
+          ],
+          "note": "PROPOSAL assessment. No new engineering-quality adjudication in this bounded preparation; earlier maintenance facts alone do not establish a scored A2."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "Independent community consensus for this carried role is not established in retained candidate-specific evidence."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "Comparable net usage for the carried role is not established; no popularity proxy is substituted."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "Workload/version-matched published evaluation availability remains unverified."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "No comparative run performed; this candidate was not installed or executed."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Optional inference model/backend/family-route and actual-workload qualification remain unbound; no model is downloaded or invoked. Co-op two-family adjudication must first settle the role and named evidence gap.",
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "repo",
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "pin": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+          "path": "evidence/artifacts/harness-screens-20261015/candidate-facts-ops.json",
+          "line": 824
+        },
+        "read_at": "2026-10-16T05:21:23Z",
+        "note": "Reused dated public screen compliance note, not a fresh licence survey and never a verdict ground. Exact SPDX scalar citation, not the file's opening brace."
+      }
+    },
+    {
+      "id": "llama-swap",
+      "name": "mostlygeek/llama-swap",
+      "repository": "https://github.com/mostlygeek/llama-swap",
+      "pin": "d1e743fea64324c990e16e951ac2ea1678f02228",
+      "role": "Carried survivor; CANDIDATE comparison role only, not an installation or default.",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "adoption_status": "NOT_ADOPTED",
+      "confounds": [
+        "Prior A1 screen is unmerged evidence in public PR #1192, not approval or convergence.",
+        "The 2026-09-29/09-26 carry records are older than this screen pin; role relevance and pin delta need adjudication.",
+        "Integrity rebuild: native raw retained privately, masked derivative/rule/tests published; co-op reproduction is required before PR opening.",
+        "Current-base carried survivor row has no version/commit; this candidate pin comes only from unmerged #1192 and is not a selected or qualified run."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/native-agent-stack/native-agent-stack",
+              "pin": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+              "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+              "line": 2565
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/native-agent-stack/native-agent-stack",
+              "pin": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+              "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+              "line": 2837
+            }
+          ],
+          "note": "PROPOSAL assessment. Proxy model/server/profile, shutdown and privacy logging contract remain unbound; compatible API syntax does not establish a family model route. Pin source: evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json:2565 at d4efff9d; screen gap: :2837. Current-base final-stack carried row 7113-7115 contains no run pin. F1-run-pin.json records this unmerged-screen-only identity drift."
+        },
+        "A2": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/native-agent-stack/native-agent-stack",
+              "pin": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+              "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+              "line": 2565
+            }
+          ],
+          "note": "PROPOSAL assessment. No new engineering-quality adjudication in this bounded preparation; earlier maintenance facts alone do not establish a scored A2."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "Independent community consensus for this carried role is not established in retained candidate-specific evidence."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "Comparable net usage for the carried role is not established; no popularity proxy is substituted."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "Workload/version-matched published evaluation availability remains unverified."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "No comparative run performed; this candidate was not installed or executed."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Proxy model/server/profile, shutdown and privacy logging contract remain unbound; compatible API syntax does not establish a family model route. Co-op two-family adjudication must first settle the role and named evidence gap.",
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "repo",
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "pin": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+          "path": "evidence/artifacts/harness-screens-20261015/candidate-facts-ops.json",
+          "line": 874
+        },
+        "read_at": "2026-10-16T05:21:23Z",
+        "note": "Reused dated public screen compliance note, not a fresh licence survey and never a verdict ground. Exact SPDX scalar citation, not the file's opening brace."
+      }
+    },
+    {
+      "id": "dcgm-exporter",
+      "name": "nvidia/dcgm-exporter",
+      "repository": "https://github.com/nvidia/dcgm-exporter",
+      "pin": "fafd151148052628061a80450b4ee037a5fa0c3c",
+      "role": "Carried survivor; CANDIDATE comparison role only, not an installation or default.",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "adoption_status": "NOT_ADOPTED",
+      "confounds": [
+        "Prior A1 screen is unmerged evidence in public PR #1192, not approval or convergence.",
+        "The 2026-09-29/09-26 carry records are older than this screen pin; role relevance and pin delta need adjudication.",
+        "Integrity rebuild: native raw retained privately, masked derivative/rule/tests published; co-op reproduction is required before PR opening.",
+        "Current-base carried survivor row has no version/commit; this candidate pin comes only from unmerged #1192 and is not a selected or qualified run."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/native-agent-stack/native-agent-stack",
+              "pin": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+              "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+              "line": 2889
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/native-agent-stack/native-agent-stack",
+              "pin": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+              "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+              "line": 3134
+            }
+          ],
+          "note": "PROPOSAL assessment. WSL2/DCGM version pairing, selected-field privileges and macOS/remote route remain unverified; hardware metrics are not worker attribution. Pin source: evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json:2889 at d4efff9d; screen gap: :3134. Current-base final-stack carried row 7118-7120 contains no run pin. F1-run-pin.json records this unmerged-screen-only identity drift."
+        },
+        "A2": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/native-agent-stack/native-agent-stack",
+              "pin": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+              "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+              "line": 2889
+            }
+          ],
+          "note": "PROPOSAL assessment. No new engineering-quality adjudication in this bounded preparation; earlier maintenance facts alone do not establish a scored A2."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "Independent community consensus for this carried role is not established in retained candidate-specific evidence."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "Comparable net usage for the carried role is not established; no popularity proxy is substituted."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "Workload/version-matched published evaluation availability remains unverified."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "No comparative run performed; this candidate was not installed or executed."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "WSL2/DCGM version pairing, selected-field privileges and macOS/remote route remain unverified; hardware metrics are not worker attribution. Co-op two-family adjudication must first settle the role and named evidence gap.",
+      "licence_note": {
+        "spdx_id": "Apache-2.0",
+        "source": {
+          "kind": "repo",
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "pin": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+          "path": "evidence/artifacts/harness-screens-20261015/candidate-facts-ops.json",
+          "line": 924
+        },
+        "read_at": "2026-10-16T05:21:23Z",
+        "note": "Reused dated public screen compliance note, not a fresh licence survey and never a verdict ground. Exact SPDX scalar citation, not the file's opening brace."
+      }
+    },
+    {
+      "id": "ollama",
+      "name": "ollama/ollama",
+      "repository": "https://github.com/ollama/ollama",
+      "pin": "d919272e53593d1d55d40e1180eaa06dfbede3ac",
+      "role": "Carried survivor; CANDIDATE comparison role only, not an installation or default.",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "adoption_status": "NOT_ADOPTED",
+      "confounds": [
+        "Prior A1 screen is unmerged evidence in public PR #1192, not approval or convergence.",
+        "The 2026-09-29/09-26 carry records are older than this screen pin; role relevance and pin delta need adjudication.",
+        "Integrity rebuild: native raw retained privately, masked derivative/rule/tests published; co-op reproduction is required before PR opening.",
+        "Current-base carried survivor row has no version/commit; this candidate pin comes only from unmerged #1192 and is not a selected or qualified run."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/native-agent-stack/native-agent-stack",
+              "pin": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+              "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+              "line": 3185
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/native-agent-stack/native-agent-stack",
+              "pin": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+              "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+              "line": 3423
+            }
+          ],
+          "note": "PROPOSAL assessment. Specific model/workload/family endpoint and content/privacy settings remain unbound; no service or inference is started. Pin source: evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json:3185 at d4efff9d; screen gap: :3423. Current-base final-stack carried row 7123-7125 contains no run pin. F1-run-pin.json records this unmerged-screen-only identity drift."
+        },
+        "A2": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/native-agent-stack/native-agent-stack",
+              "pin": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+              "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+              "line": 3185
+            }
+          ],
+          "note": "PROPOSAL assessment. No new engineering-quality adjudication in this bounded preparation; earlier maintenance facts alone do not establish a scored A2."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "Independent community consensus for this carried role is not established in retained candidate-specific evidence."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "Comparable net usage for the carried role is not established; no popularity proxy is substituted."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "Workload/version-matched published evaluation availability remains unverified."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "No comparative run performed; this candidate was not installed or executed."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Specific model/workload/family endpoint and content/privacy settings remain unbound; no service or inference is started. Co-op two-family adjudication must first settle the role and named evidence gap.",
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "repo",
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "pin": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+          "path": "evidence/artifacts/harness-screens-20261015/candidate-facts-ops.json",
+          "line": 979
+        },
+        "read_at": "2026-10-16T05:21:23Z",
+        "note": "Reused dated public screen compliance note, not a fresh licence survey and never a verdict ground. Exact SPDX scalar citation, not the file's opening brace."
+      }
+    },
+    {
+      "id": "openllmetry",
+      "name": "traceloop/openllmetry",
+      "repository": "https://github.com/traceloop/openllmetry",
+      "pin": "be498301c40c55155e6d0678b63943093cda14d1",
+      "role": "Carried survivor; CANDIDATE comparison role only, not an installation or default.",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "adoption_status": "NOT_ADOPTED",
+      "confounds": [
+        "Prior A1 screen is unmerged evidence in public PR #1192, not approval or convergence.",
+        "The 2026-09-29/09-26 carry records are older than this screen pin; role relevance and pin delta need adjudication.",
+        "Integrity rebuild: native raw retained privately, masked derivative/rule/tests published; co-op reproduction is required before PR opening.",
+        "Current-base carried survivor row has no version/commit; this candidate pin comes only from unmerged #1192 and is not a selected or qualified run."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/native-agent-stack/native-agent-stack",
+              "pin": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+              "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+              "line": 5045
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/native-agent-stack/native-agent-stack",
+              "pin": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+              "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+              "line": 5295
+            }
+          ],
+          "note": "PROPOSAL assessment. Dependency platform coverage and named runtime instrumentation binding remain unverified; default external endpoint/content capture requires an explicit local policy. Pin source: evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json:5045 at d4efff9d; screen gap: :5295. Current-base final-stack carried row 7128-7130 contains no run pin. F1-run-pin.json records this unmerged-screen-only identity drift."
+        },
+        "A2": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/native-agent-stack/native-agent-stack",
+              "pin": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+              "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+              "line": 5045
+            }
+          ],
+          "note": "PROPOSAL assessment. No new engineering-quality adjudication in this bounded preparation; earlier maintenance facts alone do not establish a scored A2."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "Independent community consensus for this carried role is not established in retained candidate-specific evidence."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "Comparable net usage for the carried role is not established; no popularity proxy is substituted."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "Workload/version-matched published evaluation availability remains unverified."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "No comparative run performed; this candidate was not installed or executed."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Dependency platform coverage and named runtime instrumentation binding remain unverified; default external endpoint/content capture requires an explicit local policy. Co-op two-family adjudication must first settle the role and named evidence gap.",
+      "licence_note": {
+        "spdx_id": "Apache-2.0",
+        "source": {
+          "kind": "repo",
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "pin": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+          "path": "evidence/artifacts/harness-screens-20261015/candidate-facts-ops.json",
+          "line": 1259
+        },
+        "read_at": "2026-10-16T05:21:23Z",
+        "note": "Reused dated public screen compliance note, not a fresh licence survey and never a verdict ground. Exact SPDX scalar citation, not the file's opening brace."
+      }
+    },
+    {
+      "id": "nvidia-gpu-exporter",
+      "name": "utkuozdemir/nvidia_gpu_exporter",
+      "repository": "https://github.com/utkuozdemir/nvidia_gpu_exporter",
+      "pin": "87afc069c5ce6a37b13db58989ec0f30d9b87217",
+      "role": "Carried survivor; CANDIDATE comparison role only, not an installation or default.",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "adoption_status": "NOT_ADOPTED",
+      "confounds": [
+        "Prior A1 screen is unmerged evidence in public PR #1192, not approval or convergence.",
+        "The 2026-09-29/09-26 carry records are older than this screen pin; role relevance and pin delta need adjudication.",
+        "Integrity rebuild: native raw retained privately, masked derivative/rule/tests published; co-op reproduction is required before PR opening.",
+        "Current-base carried survivor row has no version/commit; this candidate pin comes only from unmerged #1192 and is not a selected or qualified run."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/native-agent-stack/native-agent-stack",
+              "pin": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+              "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+              "line": 5351
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/native-agent-stack/native-agent-stack",
+              "pin": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+              "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+              "line": 5610
+            }
+          ],
+          "note": "PROPOSAL assessment. Scope/inverse and approved remote-scrape target remain unbound; the Mac/Rosetta route is not Apple GPU telemetry. Pin source: evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json:5351 at d4efff9d; screen gap: :5610. Current-base final-stack carried row 7133-7135 contains no run pin. F1-run-pin.json records this unmerged-screen-only identity drift."
+        },
+        "A2": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/native-agent-stack/native-agent-stack",
+              "pin": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+              "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+              "line": 5351
+            }
+          ],
+          "note": "PROPOSAL assessment. No new engineering-quality adjudication in this bounded preparation; earlier maintenance facts alone do not establish a scored A2."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "Independent community consensus for this carried role is not established in retained candidate-specific evidence."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "Comparable net usage for the carried role is not established; no popularity proxy is substituted."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "Workload/version-matched published evaluation availability remains unverified."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "No comparative run performed; this candidate was not installed or executed."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Scope/inverse and approved remote-scrape target remain unbound; the Mac/Rosetta route is not Apple GPU telemetry. Co-op two-family adjudication must first settle the role and named evidence gap.",
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "repo",
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "pin": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+          "path": "evidence/artifacts/harness-screens-20261015/candidate-facts-ops.json",
+          "line": 1304
+        },
+        "read_at": "2026-10-16T05:21:23Z",
+        "note": "Reused dated public screen compliance note, not a fresh licence survey and never a verdict ground. Exact SPDX scalar citation, not the file's opening brace."
+      }
+    },
+    {
+      "id": "tempo-carried-comparison",
+      "name": "Tempo retained comparison-role reconciliation",
+      "repository": "https://github.com/grafana/tempo",
+      "pin": "3.0.3",
+      "role": "Existing keep_but_compare role expressly retained in both 2026-09-29 fit reads; absent from current six-row derived survivor list. Included only for carry reconciliation, not a new discovery or admitted arm.",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "adoption_status": "NOT_ADOPTED",
+      "confounds": [
+        "The targeted-candidate promotion was refuted, while both readers explicitly retained the earlier comparison role.",
+        "No fresh source-commit/host screen or install is performed for this supplementary carry check.",
+        "Integrity rebuild: native raw retained privately, masked derivative/rule/tests published; co-op reproduction is required before PR opening."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/native-agent-stack/native-agent-stack",
+              "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+              "line": 10969
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/native-agent-stack/native-agent-stack",
+              "pin": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+              "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+              "line": 10989
+            }
+          ],
+          "note": "PROPOSAL assessment. Carry-role and exact run pin require resolution before any new screen/trial."
+        },
+        "A2": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "PROPOSAL assessment. Not re-surveyed."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "Not re-surveyed."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "Not re-surveyed."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "Published evaluation availability for the retained role remains unverified."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T06:27:50Z",
+          "sources": [],
+          "note": "No comparative run."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Two-family adjudication must decide whether the explicit keep_but_compare carry was substantively settled; later omission or targeted-promotion refutation alone does not establish retirement."
+    }
+  ],
+  "final_evidence": []
+}

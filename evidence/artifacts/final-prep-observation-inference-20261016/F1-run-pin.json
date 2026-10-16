@@ -1,0 +1,715 @@
+{
+  "schema_version": 2,
+  "record_class": "derived_source_index_and_pin_proposal_not_native_receipt",
+  "catalog": "foundation",
+  "layer_id": "observation-inference",
+  "status": "PROPOSAL_ONLY",
+  "base_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+  "assessed_at": "2026-10-16T06:27:50Z",
+  "proposal": "Preserve selected run tuple Collector Contrib 0.162.0, Prometheus 3.15.0, Loki 3.7.8; reconcile exact identities without changing the canonical registry.",
+  "components": [
+    {
+      "component_id": "opentelemetry-collector-contrib",
+      "proposed_run_pin": {
+        "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+        "version": {
+          "value": "0.162.0",
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/31-collector-version.stdout.txt",
+            "line": 1
+          }
+        },
+        "commit": {
+          "value": "ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/34-collector-tag-object.stdout.txt",
+            "line": 11
+          }
+        }
+      },
+      "canonical_verdict": {
+        "version": {
+          "value": "0.161.0",
+          "source": {
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "catalogs/landscape/final-stack.json",
+            "line": 7183
+          }
+        },
+        "commit": {
+          "value": null,
+          "source": {
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "catalogs/landscape/final-stack.json",
+            "line": 7182
+          }
+        }
+      },
+      "canonical_run": {
+        "version": {
+          "value": "0.162.0",
+          "source": {
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "catalogs/landscape/final-stack.json",
+            "line": 10999
+          }
+        },
+        "commit": {
+          "value": null,
+          "source": {
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "catalogs/landscape/final-stack.json",
+            "line": 10998
+          }
+        }
+      },
+      "canonical_stack": {
+        "version": {
+          "value": "0.162.0",
+          "source": {
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "manifests/stack.json",
+            "line": 1102
+          }
+        },
+        "source_pin": {
+          "value": null,
+          "source": {
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "manifests/stack.json",
+            "line": 1125
+          }
+        }
+      },
+      "clean_install_plan": {
+        "source": {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+          "line": 141
+        },
+        "detail": "This layer row identifies the three winners, six survivors and two F1 drifts; it supplies no extra version or source commit."
+      },
+      "last_committed_version_specific_evidence_named_by_stack": {
+        "path": "evidence/receipts/otelcol-contrib-0162-qualification-20261003.json",
+        "version": {
+          "value": "0.162.0",
+          "source": {
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "evidence/receipts/otelcol-contrib-0162-qualification-20261003.json",
+            "line": 19
+          }
+        },
+        "commit": {
+          "value": "ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+          "source": {
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "evidence/receipts/otelcol-contrib-0162-qualification-20261003.json",
+            "line": 23
+          }
+        },
+        "recorded_at": {
+          "value": "2026-10-03T05:55:06.824136+00:00",
+          "source": {
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "evidence/receipts/otelcol-contrib-0162-qualification-20261003.json",
+            "line": 5
+          }
+        },
+        "scope": "The package qualification/backends receipt named by the current stack is retained at the cited base. Other later usage receipts are not silently transferred or claimed exhaustively reviewed."
+      },
+      "installed_PATH": {
+        "version": {
+          "value": "0.162.0",
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/14-path-collector.stdout.txt",
+            "line": 1
+          }
+        },
+        "command_and_rc": {
+          "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/14-path-collector.json",
+          "line": 13
+        },
+        "observation_time": {
+          "value": "2026-10-16T06:23:19.847575Z",
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/14-path-collector.json",
+            "line": 14
+          }
+        },
+        "scope": "Actual read-only PATH --version; not proof of service state, unit activation or full source provenance."
+      },
+      "drifts": [
+        "Verdict 0.161.0 versus selected run/PATH/scratch qualification 0.162.0.",
+        "Current run/stack source_commit is null; the existing 0.162.0 qualification and newly read tag identify ae8c507510f48f433ab47dd1c6b01a59d6c388b5.",
+        "Distribution f6159a775dad1e21433c49bd8450673dd13ed4d3 and core 62cdad2ea133239380b44d20d84eb26e114779b6 are distinct repositories/identities, not substitutes for the contrib source commit.",
+        "Prior screen at d4efff9d: observation-inference.anthropic.json:3469-3470 records v0.163.0/df849b54; :3735-3736 records the unbound distribution. Those candidate facts do not supersede the canonical 0.162.0 run.",
+        "README deployment wording (observability/README.md:30-31 at the base) and the release hold (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117 at the base) are historical text, not service-state observations. This lane inspected no service/unit."
+      ],
+      "admission": "No new default, pin mutation or FINAL admission; proposal pending two-family review.",
+      "drift_sources": [
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+          "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+          "line": 3469
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+          "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+          "line": 3470
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+          "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+          "line": 3735
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+          "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+          "line": 3736
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "observability/README.md",
+          "line": 30
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "observability/README.md",
+          "line": 31
+        },
+        {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "docs/decisions/2026-10-04-2604-e2e-fix-wave.md",
+          "line": 117
+        }
+      ]
+    },
+    {
+      "component_id": "prometheus",
+      "proposed_run_pin": {
+        "repository": "https://github.com/prometheus/prometheus",
+        "version": {
+          "value": "3.15.0",
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/32-prometheus-version.stdout.txt",
+            "line": 1
+          }
+        },
+        "commit": {
+          "value": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+          "source": {
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "manifests/stack.json",
+            "line": 1163
+          }
+        }
+      },
+      "canonical_verdict": {
+        "version": {
+          "value": "3.14.0",
+          "source": {
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "catalogs/landscape/final-stack.json",
+            "line": 7205
+          }
+        },
+        "commit": {
+          "value": null,
+          "source": {
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "catalogs/landscape/final-stack.json",
+            "line": 7204
+          }
+        }
+      },
+      "canonical_run": {
+        "version": {
+          "value": "3.15.0",
+          "source": {
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "catalogs/landscape/final-stack.json",
+            "line": 11096
+          }
+        },
+        "commit": {
+          "value": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+          "source": {
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "catalogs/landscape/final-stack.json",
+            "line": 11095
+          }
+        }
+      },
+      "canonical_stack": {
+        "version": {
+          "value": "3.15.0",
+          "source": {
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "manifests/stack.json",
+            "line": 1135
+          }
+        },
+        "source_pin": {
+          "value": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+          "source": {
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "manifests/stack.json",
+            "line": 1163
+          }
+        }
+      },
+      "clean_install_plan": {
+        "source": {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+          "line": 141
+        },
+        "detail": "This layer row identifies the three winners, six survivors and two F1 drifts; it supplies no extra version or source commit."
+      },
+      "last_committed_version_specific_evidence_named_by_stack": {
+        "path": "evidence/receipts/prometheus-3150-qualification-20260926.json",
+        "version": {
+          "value": "3.15.0",
+          "source": {
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "evidence/receipts/prometheus-3150-qualification-20260926.json",
+            "line": 30
+          }
+        },
+        "commit": {
+          "value": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+          "source": {
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "evidence/receipts/prometheus-3150-qualification-20260926.json",
+            "line": 33
+          }
+        },
+        "recorded_at": {
+          "value": "2026-09-26T10:11:46Z",
+          "source": {
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "evidence/receipts/prometheus-3150-qualification-20260926.json",
+            "line": 5
+          }
+        },
+        "scope": "The package qualification/backends receipt named by the current stack is retained at the cited base. Other later usage receipts are not silently transferred or claimed exhaustively reviewed."
+      },
+      "installed_PATH": {
+        "version": {
+          "value": "3.15.0",
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/15-path-prometheus.stdout.txt",
+            "line": 1
+          }
+        },
+        "command_and_rc": {
+          "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/15-path-prometheus.json",
+          "line": 13
+        },
+        "observation_time": {
+          "value": "2026-10-16T06:23:19.492458Z",
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/15-path-prometheus.json",
+            "line": 14
+          }
+        },
+        "scope": "Actual read-only PATH --version; not proof of service state, unit activation or full source provenance."
+      },
+      "drifts": [
+        "Verdict 3.14.0 versus selected run/PATH/qualification 3.15.0.",
+        "observability/README.md:32 still names 3.14.0 while observability/backends/README.md:10 names 3.15.0; neither prose string overrides the receipted run record."
+      ],
+      "admission": "No new default, pin mutation or FINAL admission; proposal pending two-family review."
+    },
+    {
+      "component_id": "loki",
+      "proposed_run_pin": {
+        "repository": "https://github.com/grafana/loki",
+        "version": {
+          "value": "3.7.8",
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/33-loki-version.stdout.txt",
+            "line": 1
+          }
+        },
+        "commit": {
+          "value": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+          "source": {
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "manifests/stack.json",
+            "line": 1201
+          }
+        }
+      },
+      "canonical_verdict": {
+        "version": {
+          "value": "3.7.8",
+          "source": {
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "catalogs/landscape/final-stack.json",
+            "line": 7227
+          }
+        },
+        "commit": {
+          "value": null,
+          "source": {
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "catalogs/landscape/final-stack.json",
+            "line": 7226
+          }
+        }
+      },
+      "canonical_run": {
+        "version": {
+          "value": "3.7.8",
+          "source": {
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "catalogs/landscape/final-stack.json",
+            "line": 10840
+          }
+        },
+        "commit": {
+          "value": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+          "source": {
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "catalogs/landscape/final-stack.json",
+            "line": 10839
+          }
+        }
+      },
+      "canonical_stack": {
+        "version": {
+          "value": "3.7.8",
+          "source": {
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "manifests/stack.json",
+            "line": 1173
+          }
+        },
+        "source_pin": {
+          "value": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+          "source": {
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "manifests/stack.json",
+            "line": 1201
+          }
+        }
+      },
+      "clean_install_plan": {
+        "source": {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+          "line": 141
+        },
+        "detail": "This layer row identifies the three winners, six survivors and two F1 drifts; it supplies no extra version or source commit."
+      },
+      "last_committed_version_specific_evidence_named_by_stack": {
+        "path": "observability/backends/receipt.json",
+        "version": {
+          "value": "3.7.8",
+          "source": {
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "observability/backends/receipt.json",
+            "line": 17
+          }
+        },
+        "commit": {
+          "value": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+          "source": {
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "observability/backends/receipt.json",
+            "line": 18
+          }
+        },
+        "recorded_at": {
+          "value": "2026-09-19",
+          "source": {
+            "repository": "https://github.com/native-agent-stack/native-agent-stack",
+            "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+            "path": "observability/backends/receipt.json",
+            "line": 3
+          }
+        },
+        "scope": "The package qualification/backends receipt named by the current stack is retained at the cited base. Other later usage receipts are not silently transferred or claimed exhaustively reviewed."
+      },
+      "installed_PATH": {
+        "version": {
+          "value": "3.7.8",
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/16-path-loki.stdout.txt",
+            "line": 1
+          }
+        },
+        "command_and_rc": {
+          "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/16-path-loki.json",
+          "line": 13
+        },
+        "observation_time": {
+          "value": "2026-10-16T06:23:19.556724Z",
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/16-path-loki.json",
+            "line": 14
+          }
+        },
+        "scope": "Actual read-only PATH --version; not proof of service state, unit activation or full source provenance."
+      },
+      "drifts": [
+        "No version drift between verdict, run, package qualification and PATH observation; verdict lacks a source commit while run/qualification provide it."
+      ],
+      "admission": "No new default, pin mutation or FINAL admission; proposal pending two-family review."
+    }
+  ],
+  "collector_repository_identity_tuple": [
+    {
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+      "commit": {
+        "value": "ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+        "source": {
+          "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/34-collector-tag-object.stdout.txt",
+          "line": 11
+        }
+      }
+    },
+    {
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector-releases",
+      "commit": {
+        "value": "f6159a775dad1e21433c49bd8450673dd13ed4d3",
+        "source": {
+          "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/35-distribution-tag-object.stdout.txt",
+          "line": 11
+        }
+      }
+    },
+    {
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector",
+      "commit": {
+        "value": "62cdad2ea133239380b44d20d84eb26e114779b6",
+        "source": {
+          "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/36-core-tag-object.stdout.txt",
+          "line": 11
+        }
+      }
+    }
+  ],
+  "custody": "All native measurements point to labelled masked captures reproducible from private raw files with mask_capture.py. Earlier unretained summaries/projections are not used. Historical record facts remain source review.",
+  "survivor_pin_drift": [
+    {
+      "candidate_id": "mlx-lm",
+      "repository": "ml-explore/mlx-lm",
+      "canonical_carried_record": {
+        "source": {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 7108
+        },
+        "line_end": 7110,
+        "fields_present": [
+          "date",
+          "repository",
+          "sweep_id"
+        ],
+        "run_pin": "ABSENT in this carried row; not a selected run"
+      },
+      "draft_candidate_pin": {
+        "value": "a9bd8af5c02118882af735cef60705d2efce9fd0",
+        "source": {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+          "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+          "line": 2252
+        }
+      },
+      "drift": "Pin exists only in the public but unmerged #1192 candidate screen at d4efff9d. Current-base carried record provides no version/commit. This is an unresolved identity drift; no trial, selected run or canonical adoption is inferred.",
+      "status": "GAP pending two-family carry/pin adjudication"
+    },
+    {
+      "candidate_id": "llama-swap",
+      "repository": "mostlygeek/llama-swap",
+      "canonical_carried_record": {
+        "source": {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 7113
+        },
+        "line_end": 7115,
+        "fields_present": [
+          "date",
+          "repository",
+          "sweep_id"
+        ],
+        "run_pin": "ABSENT in this carried row; not a selected run"
+      },
+      "draft_candidate_pin": {
+        "value": "d1e743fea64324c990e16e951ac2ea1678f02228",
+        "source": {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+          "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+          "line": 2565
+        }
+      },
+      "drift": "Pin exists only in the public but unmerged #1192 candidate screen at d4efff9d. Current-base carried record provides no version/commit. This is an unresolved identity drift; no trial, selected run or canonical adoption is inferred.",
+      "status": "GAP pending two-family carry/pin adjudication"
+    },
+    {
+      "candidate_id": "dcgm-exporter",
+      "repository": "nvidia/dcgm-exporter",
+      "canonical_carried_record": {
+        "source": {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 7118
+        },
+        "line_end": 7120,
+        "fields_present": [
+          "date",
+          "repository",
+          "sweep_id"
+        ],
+        "run_pin": "ABSENT in this carried row; not a selected run"
+      },
+      "draft_candidate_pin": {
+        "value": "fafd151148052628061a80450b4ee037a5fa0c3c",
+        "source": {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+          "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+          "line": 2889
+        }
+      },
+      "drift": "Pin exists only in the public but unmerged #1192 candidate screen at d4efff9d. Current-base carried record provides no version/commit. This is an unresolved identity drift; no trial, selected run or canonical adoption is inferred.",
+      "status": "GAP pending two-family carry/pin adjudication"
+    },
+    {
+      "candidate_id": "ollama",
+      "repository": "ollama/ollama",
+      "canonical_carried_record": {
+        "source": {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 7123
+        },
+        "line_end": 7125,
+        "fields_present": [
+          "date",
+          "repository",
+          "sweep_id"
+        ],
+        "run_pin": "ABSENT in this carried row; not a selected run"
+      },
+      "draft_candidate_pin": {
+        "value": "d919272e53593d1d55d40e1180eaa06dfbede3ac",
+        "source": {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+          "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+          "line": 3185
+        }
+      },
+      "drift": "Pin exists only in the public but unmerged #1192 candidate screen at d4efff9d. Current-base carried record provides no version/commit. This is an unresolved identity drift; no trial, selected run or canonical adoption is inferred.",
+      "status": "GAP pending two-family carry/pin adjudication"
+    },
+    {
+      "candidate_id": "openllmetry",
+      "repository": "traceloop/openllmetry",
+      "canonical_carried_record": {
+        "source": {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 7128
+        },
+        "line_end": 7130,
+        "fields_present": [
+          "date",
+          "repository",
+          "sweep_id"
+        ],
+        "run_pin": "ABSENT in this carried row; not a selected run"
+      },
+      "draft_candidate_pin": {
+        "value": "be498301c40c55155e6d0678b63943093cda14d1",
+        "source": {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+          "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+          "line": 5045
+        }
+      },
+      "drift": "Pin exists only in the public but unmerged #1192 candidate screen at d4efff9d. Current-base carried record provides no version/commit. This is an unresolved identity drift; no trial, selected run or canonical adoption is inferred.",
+      "status": "GAP pending two-family carry/pin adjudication"
+    },
+    {
+      "candidate_id": "nvidia-gpu-exporter",
+      "repository": "utkuozdemir/nvidia_gpu_exporter",
+      "canonical_carried_record": {
+        "source": {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+          "path": "catalogs/landscape/final-stack.json",
+          "line": 7133
+        },
+        "line_end": 7135,
+        "fields_present": [
+          "date",
+          "repository",
+          "sweep_id"
+        ],
+        "run_pin": "ABSENT in this carried row; not a selected run"
+      },
+      "draft_candidate_pin": {
+        "value": "87afc069c5ce6a37b13db58989ec0f30d9b87217",
+        "source": {
+          "repository": "https://github.com/native-agent-stack/native-agent-stack",
+          "commit": "d4efff9d42ac324b6424f6cf34a2df129cce320b",
+          "path": "evidence/artifacts/harness-screens-20261015/observation-inference.anthropic.json",
+          "line": 5351
+        }
+      },
+      "drift": "Pin exists only in the public but unmerged #1192 candidate screen at d4efff9d. Current-base carried record provides no version/commit. This is an unresolved identity drift; no trial, selected run or canonical adoption is inferred.",
+      "status": "GAP pending two-family carry/pin adjudication"
+    }
+  ]
+}

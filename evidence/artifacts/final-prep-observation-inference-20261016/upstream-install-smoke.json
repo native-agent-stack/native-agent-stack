@@ -1,0 +1,546 @@
+{
+  "schema_version": 2,
+  "record_class": "derived_claim_index_not_native_run_output",
+  "capture_class": "deterministically_masked_native_capture",
+  "catalog": "foundation",
+  "layer_id": "observation-inference",
+  "base_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+  "source": "capture-index.json and its exact native command/output files",
+  "platform": {
+    "value": "Linux/WSL2 x86_64 execution scope",
+    "classification": "task host profile; no macOS run claimed"
+  },
+  "artifacts": [
+    {
+      "capture_id": "01-collector-release",
+      "artifact": {
+        "name": {
+          "value": "otelcol-contrib_0.162.0_linux_amd64.tar.gz",
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/01-collector-release.stdout.txt",
+            "line": 2347
+          }
+        },
+        "size": {
+          "value": 112285869,
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/01-collector-release.stdout.txt",
+            "line": 2372
+          }
+        },
+        "digest": {
+          "value": "sha256:fcc063749f730f8c21fe29f2d340ff174f5f1c5885bd3156fb6c985a3036fcc3",
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/01-collector-release.stdout.txt",
+            "line": 2373
+          }
+        },
+        "browser_download_url": {
+          "value": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.162.0/otelcol-contrib_0.162.0_linux_amd64.tar.gz",
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/01-collector-release.stdout.txt",
+            "line": 2377
+          }
+        }
+      },
+      "download": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/04-download-collector.json",
+        "line": 22
+      },
+      "extraction": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/11-extract-collector.json",
+        "line": 16
+      },
+      "actual_checksum": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/38-archive-checksums-sequential.stdout.txt",
+        "line": 1
+      },
+      "historical_checksum_observation": {
+        "source": {
+          "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/10-archive-checksums.stdout.txt",
+          "line": 1
+        },
+        "status": "MISMATCH: collector file was partial; C10 started before C04 finished. Never an archive verification."
+      },
+      "verification": {
+        "classification": "derived equality and ordering judgment",
+        "checksum_command": {
+          "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/38-archive-checksums-sequential.json",
+          "line": 15
+        },
+        "check": {
+          "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/38b-archive-binding-green.stdout.txt",
+          "line": 1
+        },
+        "method": "verify_bindings.py compares each native checksum to that asset's independent public release digest and requires checksum start after every download finished.",
+        "scope": "Later sequential verification of retained scratch archives; it does not retroactively validate the early C10 observation or rewrite extraction history."
+      }
+    },
+    {
+      "capture_id": "02-prometheus-release",
+      "artifact": {
+        "name": {
+          "value": "prometheus-3.15.0.linux-amd64.tar.gz",
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/02-prometheus-release.stdout.txt",
+            "line": 439
+          }
+        },
+        "size": {
+          "value": 111651578,
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/02-prometheus-release.stdout.txt",
+            "line": 464
+          }
+        },
+        "digest": {
+          "value": "sha256:2a542df32eac02ee17b9d844fb2aa1de00dafa5476579ba8a3ba862e9d572ea0",
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/02-prometheus-release.stdout.txt",
+            "line": 465
+          }
+        },
+        "browser_download_url": {
+          "value": "https://github.com/prometheus/prometheus/releases/download/v3.15.0/prometheus-3.15.0.linux-amd64.tar.gz",
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/02-prometheus-release.stdout.txt",
+            "line": 469
+          }
+        }
+      },
+      "download": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/05-download-prometheus.json",
+        "line": 22
+      },
+      "extraction": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/12-extract-prometheus.json",
+        "line": 16
+      },
+      "actual_checksum": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/38-archive-checksums-sequential.stdout.txt",
+        "line": 2
+      },
+      "historical_checksum_observation": {
+        "source": {
+          "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/10-archive-checksums.stdout.txt",
+          "line": 2
+        },
+        "status": "Digest matches the published value in C10, but this multi-file checksum capture started before all downloads completed."
+      },
+      "verification": {
+        "classification": "derived equality and ordering judgment",
+        "checksum_command": {
+          "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/38-archive-checksums-sequential.json",
+          "line": 15
+        },
+        "check": {
+          "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/38b-archive-binding-green.stdout.txt",
+          "line": 1
+        },
+        "method": "verify_bindings.py compares each native checksum to that asset's independent public release digest and requires checksum start after every download finished.",
+        "scope": "Later sequential verification of retained scratch archives; it does not retroactively validate the early C10 observation or rewrite extraction history."
+      }
+    },
+    {
+      "capture_id": "03-loki-release",
+      "artifact": {
+        "name": {
+          "value": "loki-linux-amd64.zip",
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/03-loki-release.stdout.txt",
+            "line": 1195
+          }
+        },
+        "size": {
+          "value": 46214710,
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/03-loki-release.stdout.txt",
+            "line": 1220
+          }
+        },
+        "digest": {
+          "value": "sha256:62aea42c9cba52cd1642b3666ab37019a0ce4c24ab50b07e85dccc8d812f7d61",
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/03-loki-release.stdout.txt",
+            "line": 1221
+          }
+        },
+        "browser_download_url": {
+          "value": "https://github.com/grafana/loki/releases/download/v3.7.8/loki-linux-amd64.zip",
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/03-loki-release.stdout.txt",
+            "line": 1225
+          }
+        }
+      },
+      "download": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/06-download-loki.json",
+        "line": 22
+      },
+      "extraction": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/13-extract-loki.json",
+        "line": 16
+      },
+      "actual_checksum": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/38-archive-checksums-sequential.stdout.txt",
+        "line": 3
+      },
+      "historical_checksum_observation": {
+        "source": {
+          "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/10-archive-checksums.stdout.txt",
+          "line": 3
+        },
+        "status": "Digest matches the published value in C10, but this multi-file checksum capture started before all downloads completed."
+      },
+      "verification": {
+        "classification": "derived equality and ordering judgment",
+        "checksum_command": {
+          "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/38-archive-checksums-sequential.json",
+          "line": 15
+        },
+        "check": {
+          "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/38b-archive-binding-green.stdout.txt",
+          "line": 1
+        },
+        "method": "verify_bindings.py compares each native checksum to that asset's independent public release digest and requires checksum start after every download finished.",
+        "scope": "Later sequential verification of retained scratch archives; it does not retroactively validate the early C10 observation or rewrite extraction history."
+      }
+    }
+  ],
+  "installation_scope": "Official archives extracted only inside <SCRATCH>; no package-manager install, systemd action, host config or service start.",
+  "smokes": [
+    {
+      "id": "44-collector-upstream-config-bound",
+      "claim": "native offline smoke",
+      "command_rc": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/44-collector-upstream-config-bound.json",
+        "line": 14
+      },
+      "native_stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/44-collector-upstream-config-bound.stdout.txt",
+        "line": 1
+      },
+      "native_stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/44-collector-upstream-config-bound.stderr.txt",
+        "line": 1
+      },
+      "evidence_limit": "Native offline CLI execution only; does not establish live service behavior.",
+      "fixture_binding": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/fixture-bindings.json",
+        "scope": "Before-file capture and post-smoke cmp bind actual inputs; original run has a historical binding GAP."
+      }
+    },
+    {
+      "id": "45-collector-repository-config-bound",
+      "claim": "native offline smoke",
+      "command_rc": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/45-collector-repository-config-bound.json",
+        "line": 15
+      },
+      "native_stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/45-collector-repository-config-bound.stdout.txt",
+        "line": 1
+      },
+      "native_stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/45-collector-repository-config-bound.stderr.txt",
+        "line": 1
+      },
+      "evidence_limit": "Native offline CLI execution only; does not establish live service behavior.",
+      "fixture_binding": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/fixture-bindings.json",
+        "scope": "Before-file capture and post-smoke cmp bind actual inputs; original run has a historical binding GAP."
+      }
+    },
+    {
+      "id": "46-prometheus-upstream-config-bound",
+      "claim": "native offline smoke",
+      "command_rc": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/46-prometheus-upstream-config-bound.json",
+        "line": 15
+      },
+      "native_stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/46-prometheus-upstream-config-bound.stdout.txt",
+        "line": 1
+      },
+      "native_stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/46-prometheus-upstream-config-bound.stderr.txt",
+        "line": 1
+      },
+      "evidence_limit": "Native offline CLI execution only; does not establish live service behavior.",
+      "fixture_binding": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/fixture-bindings.json",
+        "scope": "Shipped archive configuration; current content capture remains outside the five disputed fixture-file bindings."
+      }
+    },
+    {
+      "id": "47-prometheus-rule-test-bound",
+      "claim": "native upstream synthetic rule test",
+      "command_rc": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/47-prometheus-rule-test-bound.json",
+        "line": 15
+      },
+      "native_stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/47-prometheus-rule-test-bound.stdout.txt",
+        "line": 1
+      },
+      "native_stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/47-prometheus-rule-test-bound.stderr.txt",
+        "line": 1
+      },
+      "evidence_limit": "Native offline CLI execution only; does not establish live service behavior.",
+      "fixture_binding": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/fixture-bindings.json",
+        "scope": "Before-file capture and post-smoke cmp bind actual inputs; original run has a historical binding GAP."
+      }
+    },
+    {
+      "id": "48-loki-config-bound",
+      "claim": "native offline smoke",
+      "command_rc": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/48-loki-config-bound.json",
+        "line": 14
+      },
+      "native_stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/48-loki-config-bound.stdout.txt",
+        "line": 1
+      },
+      "native_stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/48-loki-config-bound.stderr.txt",
+        "line": 1
+      },
+      "evidence_limit": "Native offline CLI execution only; does not establish live service behavior.",
+      "fixture_binding": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/fixture-bindings.json",
+        "scope": "Before-file capture and post-smoke cmp bind actual inputs; original run has a historical binding GAP."
+      }
+    },
+    {
+      "id": "31-collector-version",
+      "claim": "scratch binary native version",
+      "command_rc": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/31-collector-version.json",
+        "line": 13
+      },
+      "native_stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/31-collector-version.stdout.txt",
+        "line": 1
+      },
+      "native_stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/31-collector-version.stderr.txt",
+        "line": 1
+      },
+      "evidence_limit": "Native offline CLI execution only; does not establish live service behavior."
+    },
+    {
+      "id": "32-prometheus-version",
+      "claim": "scratch binary native version",
+      "command_rc": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/32-prometheus-version.json",
+        "line": 13
+      },
+      "native_stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/32-prometheus-version.stdout.txt",
+        "line": 1
+      },
+      "native_stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/32-prometheus-version.stderr.txt",
+        "line": 1
+      },
+      "evidence_limit": "Native offline CLI execution only; does not establish live service behavior."
+    },
+    {
+      "id": "33-loki-version",
+      "claim": "scratch binary native version",
+      "command_rc": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/33-loki-version.json",
+        "line": 13
+      },
+      "native_stdout": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/33-loki-version.stdout.txt",
+        "line": 1
+      },
+      "native_stderr": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/33-loki-version.stderr.txt",
+        "line": 1
+      },
+      "evidence_limit": "Native offline CLI execution only; does not establish live service behavior."
+    }
+  ],
+  "fixture_case_inventory": {
+    "classification": "DERIVED static fixture counts, not native test-reported counts",
+    "source": {
+      "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/22-fixture-prometheus-tests.stdout.txt",
+      "line": 6
+    },
+    "method": "Parse upstream tests sequence; count five mapping groups, promql_expr_test entries and alert_rule_test entries. Native promtool stdout reports only SUCCESS.",
+    "groups": [
+      {
+        "line": 8,
+        "promql_expr_test": {
+          "line": 34,
+          "count": 12
+        },
+        "source": {
+          "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/22-fixture-prometheus-tests.stdout.txt",
+          "line": 8
+        }
+      },
+      {
+        "line": 100,
+        "promql_expr_test": {
+          "line": 104,
+          "count": 1
+        },
+        "source": {
+          "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/22-fixture-prometheus-tests.stdout.txt",
+          "line": 100
+        }
+      },
+      {
+        "line": 112,
+        "promql_expr_test": {
+          "line": 112,
+          "count": 2
+        },
+        "source": {
+          "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/22-fixture-prometheus-tests.stdout.txt",
+          "line": 112
+        }
+      },
+      {
+        "line": 123,
+        "promql_expr_test": {
+          "line": 128,
+          "count": 1
+        },
+        "alert_rule_test": {
+          "line": 137,
+          "count": 4
+        },
+        "source": {
+          "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/22-fixture-prometheus-tests.stdout.txt",
+          "line": 123
+        }
+      },
+      {
+        "line": 164,
+        "promql_expr_test": {
+          "line": 171,
+          "count": 6
+        },
+        "source": {
+          "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/22-fixture-prometheus-tests.stdout.txt",
+          "line": 164
+        }
+      }
+    ],
+    "total_groups": 5,
+    "total_promql_cases": 22,
+    "total_alert_cases": 4
+  },
+  "result": {
+    "scope": "Five fresh offline validations/tests C44-C48 plus the three retained scratch version calls C31-C33 exited zero; current archived bytes are verified only by later sequential C38. No service E2E claim.",
+    "full_service_e2e": "GAP",
+    "macos_execution": "GAP",
+    "comparative_A6": "GAP"
+  },
+  "upstream_mechanisms": [
+    {
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector",
+      "pin": "62cdad2ea133239380b44d20d84eb26e114779b6",
+      "path": "otelcol/command_validate.go",
+      "line": 15,
+      "url": "https://github.com/open-telemetry/opentelemetry-collector/blob/62cdad2ea133239380b44d20d84eb26e114779b6/otelcol/command_validate.go#L15"
+    },
+    {
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector-releases",
+      "pin": "f6159a775dad1e21433c49bd8450673dd13ed4d3",
+      "path": "distributions/otelcol-contrib/.goreleaser.yaml",
+      "line": 35,
+      "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/blob/f6159a775dad1e21433c49bd8450673dd13ed4d3/distributions/otelcol-contrib/.goreleaser.yaml#L35"
+    },
+    {
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+      "pin": "ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+      "path": "processor/transformprocessor/README.md",
+      "line": 63,
+      "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/ae8c507510f48f433ab47dd1c6b01a59d6c388b5/processor/transformprocessor/README.md#L63"
+    },
+    {
+      "repository": "https://github.com/prometheus/prometheus",
+      "pin": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "path": "README.md",
+      "line": 44,
+      "url": "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/README.md#L44"
+    },
+    {
+      "repository": "https://github.com/prometheus/prometheus",
+      "pin": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "path": "docs/configuration/unit_testing_rules.md",
+      "line": 6,
+      "url": "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/docs/configuration/unit_testing_rules.md#L6"
+    },
+    {
+      "repository": "https://github.com/prometheus/prometheus",
+      "pin": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "path": "cmd/promtool/unittest_test.go",
+      "line": 29,
+      "url": "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/cmd/promtool/unittest_test.go#L29"
+    },
+    {
+      "repository": "https://github.com/grafana/loki",
+      "pin": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+      "path": "docs/sources/setup/install/local.md",
+      "line": 43,
+      "url": "https://github.com/grafana/loki/blob/09e6ce2ff1bdc19763a10265b870c86f51c98655/docs/sources/setup/install/local.md#L43"
+    },
+    {
+      "repository": "https://github.com/grafana/loki",
+      "pin": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+      "path": "cmd/loki/main.go",
+      "line": 89,
+      "url": "https://github.com/grafana/loki/blob/09e6ce2ff1bdc19763a10265b870c86f51c98655/cmd/loki/main.go#L89"
+    }
+  ],
+  "limits": [
+    "Collector DryRun validates configuration without running the Collector; Loki VerifyConfig exits before service construction.",
+    "Prometheus upstream rule tests execute a synthetic data fixture; they do not query a service or establish production traffic reconciliation.",
+    "Native binaries were used; their full upstream build/test suites were not run.",
+    "No privacy canary was sent through a live pipeline, no uptime/restart/storage recovery tested, and no runtime/model invoked.",
+    "No existing release hold is lifted by these smokes."
+  ],
+  "custody": "Native output is only in the captures/ files. This JSON indexes claims, not an invented driver summary presented as run output. All old inline strings/install summaries were replaced with fresh captured command records.",
+  "inverse": {
+    "status": "Retain only inside scratch for reviewer reproduction; no service exists to stop.",
+    "scope": "Only task-owned scratch artifacts; do not remove existing host binaries or data."
+  },
+  "fixture_bindings": {
+    "path": "evidence/artifacts/final-prep-observation-inference-20261016/fixture-bindings.json",
+    "scope": "Five actual fixture files captured before fresh smoke and compared afterward; source hashes bind published masked bytes. Earlier C26/C27/C29/C30 historical input identity remains GAP."
+  },
+  "correction": {
+    "previous_head": "5e5d94bbdc70f4f97a3bae9b2bd804a209de1a3e",
+    "failure": "The old record incorrectly treated C10 rc=0 as digest verification despite a collector mismatch and out-of-order execution.",
+    "historical_capture": {
+      "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/10-archive-checksums.json",
+      "line": 25
+    },
+    "download_finished": {
+      "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/04-download-collector.json",
+      "line": 23
+    },
+    "fail_first": {
+      "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/54-binding-tests-red.stderr.txt",
+      "line": 1
+    },
+    "corrected_checksum": {
+      "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/38-archive-checksums-sequential.stdout.txt",
+      "line": 1
+    },
+    "upstream_basis": {
+      "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/01-collector-release.stdout.txt",
+      "line": 2373
+    },
+    "regression": "test_archive_bindings.py checks all three actual/published equalities, all download/checksum ordering, mismatch controls for each archive and five fixture bindings."
+  }
+}

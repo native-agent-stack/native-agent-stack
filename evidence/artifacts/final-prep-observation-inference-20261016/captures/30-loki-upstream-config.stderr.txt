@@ -1,0 +1,1 @@
+level=info ts=2026-10-16T06:24:06.489585152Z caller=main.go:109 msg="config is valid"

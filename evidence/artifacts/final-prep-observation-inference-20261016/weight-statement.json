@@ -1,0 +1,11 @@
+{
+  "catalog": "foundation",
+  "layer_id": "observation-inference",
+  "status": "PREPARATION_ONLY",
+  "rule_version": "angle-convergence/2",
+  "weights_stated_at": "2026-10-16T05:08:35Z",
+  "weights": {"A1": 0.20, "A2": 0.20, "A3": 0.15, "A4": 0.15, "A5": 0.20, "A6": 0.10},
+  "reason": "Retain the repository's existing six-angle weights; no adjustment based on observed candidate results. Published-evaluation availability remains unverified, so no weight transfer is claimed.",
+  "disclosure": "Prior screens and historical winner evidence were already visible. This is disclosed re-verification and draft preparation, not a blind comparison or FINAL admission.",
+  "source": "catalogs/landscape/angles/README.md:36-41 at caa224140a2d04ba5f3d0ca320c487a75f9c9ea1"
+}

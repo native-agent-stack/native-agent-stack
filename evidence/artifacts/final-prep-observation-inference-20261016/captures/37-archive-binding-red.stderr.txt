@@ -1,0 +1,37 @@
+test_claimed_verification_matches_all_three_release_digests_after_downloads (test_archive_bindings.ArchiveBindingTests.test_claimed_verification_matches_all_three_release_digests_after_downloads)
+Fails at 5e5d94bb's actual C10 claim; passes only after a new capture. ... FAIL
+test_retained_partial_download_capture_is_rejected (test_archive_bindings.ArchiveBindingTests.test_retained_partial_download_capture_is_rejected) ... FAIL
+
+======================================================================
+FAIL: test_claimed_verification_matches_all_three_release_digests_after_downloads (test_archive_bindings.ArchiveBindingTests.test_claimed_verification_matches_all_three_release_digests_after_downloads)
+Fails at 5e5d94bb's actual C10 claim; passes only after a new capture.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<CHECKOUT>/evidence/artifacts/final-prep-observation-inference-20261016/test_archive_bindings.py", line 20, in test_claimed_verification_matches_all_three_release_digests_after_downloads
+    self.assertEqual(problems, [], "Native checksum must equal each published digest and start after every download finishes")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['otelcol-contrib_0.162.0_linux_amd64.tar.[144 chars]ted'] != []
+
+First list contains 2 additional elements.
+First extra element 0:
+'otelcol-contrib_0.162.0_linux_amd64.tar.gz: actual checksum differs from published release digest'
+
++ []
+- ['otelcol-contrib_0.162.0_linux_amd64.tar.gz: actual checksum differs from '
+-  'published release digest',
+-  'otelcol-contrib_0.162.0_linux_amd64.tar.gz: checksum started before download '
+-  'completed'] : Native checksum must equal each published digest and start after every download finishes
+
+======================================================================
+FAIL: test_retained_partial_download_capture_is_rejected (test_archive_bindings.ArchiveBindingTests.test_retained_partial_download_capture_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<CHECKOUT>/evidence/artifacts/final-prep-observation-inference-20261016/test_archive_bindings.py", line 24, in test_retained_partial_download_capture_is_rejected
+    self.assertTrue(any("collector" in problem and "differs" in problem for problem in problems))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.051s
+
+FAILED (failures=2)

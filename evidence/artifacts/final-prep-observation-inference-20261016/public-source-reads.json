@@ -1,0 +1,723 @@
+{
+  "schema_version": 2,
+  "record_class": "derived_source_index_not_http_capture",
+  "capture_class": "deterministically_masked_native_capture",
+  "assessed_at": "2026-10-16T06:27:50Z",
+  "source": "Full native curl HTTP response bytes are retained as masked files in captures/. This record only locates selected fields; it never substitutes a projection for those response captures.",
+  "release_assets": [
+    {
+      "capture_id": "01-collector-release",
+      "fields": {
+        "name": {
+          "value": "otelcol-contrib_0.162.0_linux_amd64.tar.gz",
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/01-collector-release.stdout.txt",
+            "line": 2347
+          }
+        },
+        "size": {
+          "value": 112285869,
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/01-collector-release.stdout.txt",
+            "line": 2372
+          }
+        },
+        "digest": {
+          "value": "sha256:fcc063749f730f8c21fe29f2d340ff174f5f1c5885bd3156fb6c985a3036fcc3",
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/01-collector-release.stdout.txt",
+            "line": 2373
+          }
+        },
+        "browser_download_url": {
+          "value": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.162.0/otelcol-contrib_0.162.0_linux_amd64.tar.gz",
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/01-collector-release.stdout.txt",
+            "line": 2377
+          }
+        }
+      }
+    },
+    {
+      "capture_id": "02-prometheus-release",
+      "fields": {
+        "name": {
+          "value": "prometheus-3.15.0.linux-amd64.tar.gz",
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/02-prometheus-release.stdout.txt",
+            "line": 439
+          }
+        },
+        "size": {
+          "value": 111651578,
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/02-prometheus-release.stdout.txt",
+            "line": 464
+          }
+        },
+        "digest": {
+          "value": "sha256:2a542df32eac02ee17b9d844fb2aa1de00dafa5476579ba8a3ba862e9d572ea0",
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/02-prometheus-release.stdout.txt",
+            "line": 465
+          }
+        },
+        "browser_download_url": {
+          "value": "https://github.com/prometheus/prometheus/releases/download/v3.15.0/prometheus-3.15.0.linux-amd64.tar.gz",
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/02-prometheus-release.stdout.txt",
+            "line": 469
+          }
+        }
+      }
+    },
+    {
+      "capture_id": "03-loki-release",
+      "fields": {
+        "name": {
+          "value": "loki-linux-amd64.zip",
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/03-loki-release.stdout.txt",
+            "line": 1195
+          }
+        },
+        "size": {
+          "value": 46214710,
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/03-loki-release.stdout.txt",
+            "line": 1220
+          }
+        },
+        "digest": {
+          "value": "sha256:62aea42c9cba52cd1642b3666ab37019a0ce4c24ab50b07e85dccc8d812f7d61",
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/03-loki-release.stdout.txt",
+            "line": 1221
+          }
+        },
+        "browser_download_url": {
+          "value": "https://github.com/grafana/loki/releases/download/v3.7.8/loki-linux-amd64.zip",
+          "source": {
+            "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/03-loki-release.stdout.txt",
+            "line": 1225
+          }
+        }
+      }
+    }
+  ],
+  "collector_identity_tuple": [
+    {
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+      "commit": {
+        "value": "ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+        "source": {
+          "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/34-collector-tag-object.stdout.txt",
+          "line": 11
+        }
+      }
+    },
+    {
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector-releases",
+      "commit": {
+        "value": "f6159a775dad1e21433c49bd8450673dd13ed4d3",
+        "source": {
+          "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/35-distribution-tag-object.stdout.txt",
+          "line": 11
+        }
+      }
+    },
+    {
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector",
+      "commit": {
+        "value": "62cdad2ea133239380b44d20d84eb26e114779b6",
+        "source": {
+          "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/36-core-tag-object.stdout.txt",
+          "line": 11
+        }
+      }
+    }
+  ],
+  "engineering_snapshots": [
+    {
+      "capture_id": "07-collector-ci",
+      "total_count": {
+        "value": 12,
+        "source": {
+          "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+          "line": 2
+        }
+      },
+      "runs": [
+        {
+          "name": {
+            "value": "load-tests",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 6
+            }
+          },
+          "conclusion": {
+            "value": "success",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 15
+            }
+          },
+          "url": {
+            "value": "https://github.com/open-telemetry/opentelemetry-collector-contrib/actions/runs/36550320947",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 20
+            }
+          }
+        },
+        {
+          "name": {
+            "value": "golden",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 237
+            }
+          },
+          "conclusion": {
+            "value": "success",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 246
+            }
+          },
+          "url": {
+            "value": "https://github.com/open-telemetry/opentelemetry-collector-contrib/actions/runs/36550319562",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 251
+            }
+          }
+        },
+        {
+          "name": {
+            "value": "telemetrygen",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 465
+            }
+          },
+          "conclusion": {
+            "value": "success",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 474
+            }
+          },
+          "url": {
+            "value": "https://github.com/open-telemetry/opentelemetry-collector-contrib/actions/runs/36550319820",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 479
+            }
+          }
+        },
+        {
+          "name": {
+            "value": "Lychee Config Check",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 693
+            }
+          },
+          "conclusion": {
+            "value": "success",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 702
+            }
+          },
+          "url": {
+            "value": "https://github.com/open-telemetry/opentelemetry-collector-contrib/actions/runs/36550319864",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 707
+            }
+          }
+        },
+        {
+          "name": {
+            "value": "codeowners",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 921
+            }
+          },
+          "conclusion": {
+            "value": "success",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 930
+            }
+          },
+          "url": {
+            "value": "https://github.com/open-telemetry/opentelemetry-collector-contrib/actions/runs/36550320036",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 935
+            }
+          }
+        },
+        {
+          "name": {
+            "value": "prometheus-compliance-tests",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 1149
+            }
+          },
+          "conclusion": {
+            "value": "success",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 1158
+            }
+          },
+          "url": {
+            "value": "https://github.com/open-telemetry/opentelemetry-collector-contrib/actions/runs/36550319788",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 1163
+            }
+          }
+        },
+        {
+          "name": {
+            "value": "build-and-test-arm",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 1377
+            }
+          },
+          "conclusion": {
+            "value": "success",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 1386
+            }
+          },
+          "url": {
+            "value": "https://github.com/open-telemetry/opentelemetry-collector-contrib/actions/runs/36550319842",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 1391
+            }
+          }
+        },
+        {
+          "name": {
+            "value": "e2e-tests-windows",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 1605
+            }
+          },
+          "conclusion": {
+            "value": "success",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 1614
+            }
+          },
+          "url": {
+            "value": "https://github.com/open-telemetry/opentelemetry-collector-contrib/actions/runs/36550319680",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 1619
+            }
+          }
+        },
+        {
+          "name": {
+            "value": "build-and-test",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 1833
+            }
+          },
+          "conclusion": {
+            "value": "failure",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 1842
+            }
+          },
+          "url": {
+            "value": "https://github.com/open-telemetry/opentelemetry-collector-contrib/actions/runs/36550319609",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 1847
+            }
+          }
+        },
+        {
+          "name": {
+            "value": "e2e-tests",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 2061
+            }
+          },
+          "conclusion": {
+            "value": "success",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 2070
+            }
+          },
+          "url": {
+            "value": "https://github.com/open-telemetry/opentelemetry-collector-contrib/actions/runs/36550319566",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 2075
+            }
+          }
+        },
+        {
+          "name": {
+            "value": "build-and-test-windows",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 2289
+            }
+          },
+          "conclusion": {
+            "value": "success",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 2298
+            }
+          },
+          "url": {
+            "value": "https://github.com/open-telemetry/opentelemetry-collector-contrib/actions/runs/36550319591",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 2303
+            }
+          }
+        },
+        {
+          "name": {
+            "value": "build-and-test-darwin",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 2517
+            }
+          },
+          "conclusion": {
+            "value": "success",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 2526
+            }
+          },
+          "url": {
+            "value": "https://github.com/open-telemetry/opentelemetry-collector-contrib/actions/runs/36550319833",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/07-collector-ci.stdout.txt",
+              "line": 2531
+            }
+          }
+        }
+      ],
+      "scope": "Exact requested head/tag query; workflow state is source evidence, not proof of cause or universal engineering quality."
+    },
+    {
+      "capture_id": "08-prometheus-ci",
+      "total_count": {
+        "value": 3,
+        "source": {
+          "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/08-prometheus-ci.stdout.txt",
+          "line": 2
+        }
+      },
+      "runs": [
+        {
+          "name": {
+            "value": "CI",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/08-prometheus-ci.stdout.txt",
+              "line": 6
+            }
+          },
+          "conclusion": {
+            "value": "success",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/08-prometheus-ci.stdout.txt",
+              "line": 15
+            }
+          },
+          "url": {
+            "value": "https://github.com/prometheus/prometheus/actions/runs/36110866318",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/08-prometheus-ci.stdout.txt",
+              "line": 20
+            }
+          }
+        },
+        {
+          "name": {
+            "value": "CI",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/08-prometheus-ci.stdout.txt",
+              "line": 243
+            }
+          },
+          "conclusion": {
+            "value": "success",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/08-prometheus-ci.stdout.txt",
+              "line": 252
+            }
+          },
+          "url": {
+            "value": "https://github.com/prometheus/prometheus/actions/runs/36107676657",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/08-prometheus-ci.stdout.txt",
+              "line": 257
+            }
+          }
+        },
+        {
+          "name": {
+            "value": "CI",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/08-prometheus-ci.stdout.txt",
+              "line": 480
+            }
+          },
+          "conclusion": {
+            "value": "success",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/08-prometheus-ci.stdout.txt",
+              "line": 489
+            }
+          },
+          "url": {
+            "value": "https://github.com/prometheus/prometheus/actions/runs/36107576777",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/08-prometheus-ci.stdout.txt",
+              "line": 494
+            }
+          }
+        }
+      ],
+      "scope": "Exact requested head/tag query; workflow state is source evidence, not proof of cause or universal engineering quality."
+    },
+    {
+      "capture_id": "09-loki-ci",
+      "total_count": {
+        "value": 6,
+        "source": {
+          "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/09-loki-ci.stdout.txt",
+          "line": 2
+        }
+      },
+      "runs": [
+        {
+          "name": {
+            "value": "LogQL Analyzer",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/09-loki-ci.stdout.txt",
+              "line": 6
+            }
+          },
+          "conclusion": {
+            "value": "failure",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/09-loki-ci.stdout.txt",
+              "line": 15
+            }
+          },
+          "url": {
+            "value": "https://github.com/grafana/loki/actions/runs/35242914737",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/09-loki-ci.stdout.txt",
+              "line": 20
+            }
+          }
+        },
+        {
+          "name": {
+            "value": "Helm tagged release PR",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/09-loki-ci.stdout.txt",
+              "line": 234
+            }
+          },
+          "conclusion": {
+            "value": "failure",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/09-loki-ci.stdout.txt",
+              "line": 243
+            }
+          },
+          "url": {
+            "value": "https://github.com/grafana/loki/actions/runs/35242914633",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/09-loki-ci.stdout.txt",
+              "line": 248
+            }
+          }
+        },
+        {
+          "name": {
+            "value": "Snyk Monitor Scanning",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/09-loki-ci.stdout.txt",
+              "line": 462
+            }
+          },
+          "conclusion": {
+            "value": "success",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/09-loki-ci.stdout.txt",
+              "line": 471
+            }
+          },
+          "url": {
+            "value": "https://github.com/grafana/loki/actions/runs/35242915717",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/09-loki-ci.stdout.txt",
+              "line": 476
+            }
+          }
+        },
+        {
+          "name": {
+            "value": "Snyk Monitor Scanning",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/09-loki-ci.stdout.txt",
+              "line": 694
+            }
+          },
+          "conclusion": {
+            "value": "success",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/09-loki-ci.stdout.txt",
+              "line": 703
+            }
+          },
+          "url": {
+            "value": "https://github.com/grafana/loki/actions/runs/35227630842",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/09-loki-ci.stdout.txt",
+              "line": 708
+            }
+          }
+        },
+        {
+          "name": {
+            "value": "Prepare Patch Release PR",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/09-loki-ci.stdout.txt",
+              "line": 926
+            }
+          },
+          "conclusion": {
+            "value": "success",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/09-loki-ci.stdout.txt",
+              "line": 935
+            }
+          },
+          "url": {
+            "value": "https://github.com/grafana/loki/actions/runs/35227630707",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/09-loki-ci.stdout.txt",
+              "line": 940
+            }
+          }
+        },
+        {
+          "name": {
+            "value": "create release",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/09-loki-ci.stdout.txt",
+              "line": 1157
+            }
+          },
+          "conclusion": {
+            "value": "success",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/09-loki-ci.stdout.txt",
+              "line": 1166
+            }
+          },
+          "url": {
+            "value": "https://github.com/grafana/loki/actions/runs/35227629615",
+            "source": {
+              "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/09-loki-ci.stdout.txt",
+              "line": 1171
+            }
+          }
+        }
+      ],
+      "scope": "Exact requested head/tag query; workflow state is source evidence, not proof of cause or universal engineering quality."
+    }
+  ],
+  "upstream_sources": [
+    {
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector",
+      "pin": "62cdad2ea133239380b44d20d84eb26e114779b6",
+      "path": "otelcol/command_validate.go",
+      "line": 15,
+      "url": "https://github.com/open-telemetry/opentelemetry-collector/blob/62cdad2ea133239380b44d20d84eb26e114779b6/otelcol/command_validate.go#L15"
+    },
+    {
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector-releases",
+      "pin": "f6159a775dad1e21433c49bd8450673dd13ed4d3",
+      "path": "distributions/otelcol-contrib/.goreleaser.yaml",
+      "line": 35,
+      "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/blob/f6159a775dad1e21433c49bd8450673dd13ed4d3/distributions/otelcol-contrib/.goreleaser.yaml#L35"
+    },
+    {
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+      "pin": "ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+      "path": "processor/transformprocessor/README.md",
+      "line": 63,
+      "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/ae8c507510f48f433ab47dd1c6b01a59d6c388b5/processor/transformprocessor/README.md#L63"
+    },
+    {
+      "repository": "https://github.com/prometheus/prometheus",
+      "pin": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "path": "README.md",
+      "line": 44,
+      "url": "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/README.md#L44"
+    },
+    {
+      "repository": "https://github.com/prometheus/prometheus",
+      "pin": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "path": "docs/configuration/unit_testing_rules.md",
+      "line": 6,
+      "url": "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/docs/configuration/unit_testing_rules.md#L6"
+    },
+    {
+      "repository": "https://github.com/prometheus/prometheus",
+      "pin": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "path": "cmd/promtool/unittest_test.go",
+      "line": 29,
+      "url": "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/cmd/promtool/unittest_test.go#L29"
+    },
+    {
+      "repository": "https://github.com/grafana/loki",
+      "pin": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+      "path": "docs/sources/setup/install/local.md",
+      "line": 43,
+      "url": "https://github.com/grafana/loki/blob/09e6ce2ff1bdc19763a10265b870c86f51c98655/docs/sources/setup/install/local.md#L43"
+    },
+    {
+      "repository": "https://github.com/grafana/loki",
+      "pin": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+      "path": "cmd/loki/main.go",
+      "line": 89,
+      "url": "https://github.com/grafana/loki/blob/09e6ce2ff1bdc19763a10265b870c86f51c98655/cmd/loki/main.go#L89"
+    }
+  ],
+  "custody": "See capture-index.json. Full native responses, no standalone private fingerprints. Scores and gaps are declared proposals in angle-record-draft.json."
+}

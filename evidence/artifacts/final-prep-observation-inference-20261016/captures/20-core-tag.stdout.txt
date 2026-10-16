@@ -1,0 +1,10 @@
+{
+  "ref": "refs/tags/v0.162.0",
+  "node_id": "MDM6UmVmMTg1ODYxMTczOnJlZnMvdGFncy92MC4xNjIuMA==",
+  "url": "https://api.github.com/repos/open-telemetry/opentelemetry-collector/git/refs/tags/v0.162.0",
+  "object": {
+    "sha": "7340d4812100c04aa7b8b32c28c3f61ddbc95e74",
+    "type": "tag",
+    "url": "https://api.github.com/repos/open-telemetry/opentelemetry-collector/git/tags/7340d4812100c04aa7b8b32c28c3f61ddbc95e74"
+  }
+}

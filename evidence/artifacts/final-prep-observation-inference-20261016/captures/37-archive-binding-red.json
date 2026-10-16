@@ -1,0 +1,43 @@
+{
+  "argv": [
+    "python3",
+    "-m",
+    "unittest",
+    "-v",
+    "test_archive_bindings.py"
+  ],
+  "capture_class": "deterministically_masked_native_capture",
+  "capture_id": "37-archive-binding-red",
+  "cwd": "<CHECKOUT>/evidence/artifacts/final-prep-observation-inference-20261016",
+  "environment": {
+    "LANG": "C.UTF-8",
+    "PATH": "<USER_HOME>/.local/share/codex-ecosystem/bin:<USER_HOME>/.local/bin:<USER_HOME>/.codex/packages/standalone/releases/0.162.1-x86_64-unknown-linux-musl/codex-path:<USER_HOME>/.local/share/mise/installs/ast-grep/0.45.3:<USER_HOME>/.local/share/mise/installs/betterleaks/1.9.0:<USER_HOME>/.local/share/mise/installs/bun/1.4.2/bin:<USER_HOME>/.local/share/mise/installs/difftastic/0.71.0/.mise-bins:<USER_HOME>/.local/share/mise/installs/github-cli/2.102.0/gh_2.102.0_linux_amd64/bin:<USER_HOME>/.local/share/mise/installs/github-kjanat-actionlint/1.17.0:<USER_HOME>/.local/share/mise/installs/gitleaks/8.30.1:<USER_HOME>/.local/share/mise/installs/node/24.21.0/bin:<USER_HOME>/.local/share/mise/installs/ollama/0.35.0/bin:<USER_HOME>/.local/share/mise/installs/python/3.13.16/bin:<USER_HOME>/.local/share/mise/installs/restic/0.19.1:<USER_HOME>/.local/share/mise/installs/syft/1.54.1:<USER_HOME>/.local/share/mise/installs/uv/0.12.22/.mise-bins:<USER_HOME>/.local/share/mise/installs/worktrunk/0.80.0/.mise-bins:<USER_HOME>/.local/share/mise/installs/zizmor/1.30.1:<USER_HOME>/.local/share/mise/shims:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
+  },
+  "exit_code": 1,
+  "finished_at": "2026-10-16T08:30:44.156727Z",
+  "mask_placeholders": [
+    "<CHECKOUT>",
+    "<LOCAL_HOST>",
+    "<SCRATCH>",
+    "<USER_HOME>"
+  ],
+  "masking_rule": "mask_capture.py: literal UTF-8 replacements, longest first; unchanged nonmatching bytes",
+  "raw_capture_name": "37-archive-binding-red",
+  "started_at": "2026-10-16T08:30:43.990789Z",
+  "streams": {
+    "stderr": {
+      "bytes": 2744,
+      "hash_scope": "published masked bytes only",
+      "path": "37-archive-binding-red.stderr.txt",
+      "sha256": "13a8adf8921c4937530e29ea9660fa18cb54a0a0a97fc44bc6a1ce03fb3ebe4c"
+    },
+    "stdout": {
+      "bytes": 0,
+      "hash_scope": "published masked bytes only",
+      "path": "37-archive-binding-red.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "timed_out": false,
+  "timeout_seconds": 60
+}

@@ -1,0 +1,1 @@
+otelcol-contrib version 0.162.0

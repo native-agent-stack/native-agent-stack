@@ -1,0 +1,40 @@
+{
+  "argv": [
+    "cat",
+    "<SCRATCH>/fixtures/repository-collector.yaml"
+  ],
+  "capture_class": "deterministically_masked_native_capture",
+  "capture_id": "40-fixture-repository-collector-read",
+  "cwd": "<SCRATCH>",
+  "environment": {
+    "LANG": "C.UTF-8",
+    "PATH": "<USER_HOME>/.local/share/codex-ecosystem/bin:<USER_HOME>/.local/bin:<USER_HOME>/.codex/packages/standalone/releases/0.162.1-x86_64-unknown-linux-musl/codex-path:<USER_HOME>/.local/share/mise/installs/ast-grep/0.45.3:<USER_HOME>/.local/share/mise/installs/betterleaks/1.9.0:<USER_HOME>/.local/share/mise/installs/bun/1.4.2/bin:<USER_HOME>/.local/share/mise/installs/difftastic/0.71.0/.mise-bins:<USER_HOME>/.local/share/mise/installs/github-cli/2.102.0/gh_2.102.0_linux_amd64/bin:<USER_HOME>/.local/share/mise/installs/github-kjanat-actionlint/1.17.0:<USER_HOME>/.local/share/mise/installs/gitleaks/8.30.1:<USER_HOME>/.local/share/mise/installs/node/24.21.0/bin:<USER_HOME>/.local/share/mise/installs/ollama/0.35.0/bin:<USER_HOME>/.local/share/mise/installs/python/3.13.16/bin:<USER_HOME>/.local/share/mise/installs/restic/0.19.1:<USER_HOME>/.local/share/mise/installs/syft/1.54.1:<USER_HOME>/.local/share/mise/installs/uv/0.12.22/.mise-bins:<USER_HOME>/.local/share/mise/installs/worktrunk/0.80.0/.mise-bins:<USER_HOME>/.local/share/mise/installs/zizmor/1.30.1:<USER_HOME>/.local/share/mise/shims:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
+  },
+  "exit_code": 0,
+  "finished_at": "2026-10-16T08:31:53.971801Z",
+  "mask_placeholders": [
+    "<CHECKOUT>",
+    "<LOCAL_HOST>",
+    "<SCRATCH>",
+    "<USER_HOME>"
+  ],
+  "masking_rule": "mask_capture.py: literal UTF-8 replacements, longest first; unchanged nonmatching bytes",
+  "raw_capture_name": "40-fixture-repository-collector-read",
+  "started_at": "2026-10-16T08:31:53.955094Z",
+  "streams": {
+    "stderr": {
+      "bytes": 0,
+      "hash_scope": "published masked bytes only",
+      "path": "40-fixture-repository-collector-read.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "bytes": 52872,
+      "hash_scope": "published masked bytes only",
+      "path": "40-fixture-repository-collector-read.stdout.txt",
+      "sha256": "cdc11e88efb22a3cb883c14ffada133f044cab1a6a2d6efa95a1210c76daac7e"
+    }
+  },
+  "timed_out": false,
+  "timeout_seconds": 180
+}
