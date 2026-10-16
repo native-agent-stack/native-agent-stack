@@ -210,11 +210,33 @@ def verify_handoff(previous, date):
     if not re.fullmatch(r'[a-z0-9-]{1,24}', trial):
         raise Refused('previous_recover_trial')
     instance = STATE/'instances'/trial
-    native = instance/('flat-probe.json' if (instance/'flat-probe.json').is_file() else 'recover.json')
-    output = safe_json(native)
-    proof = output.get('reconciliation') or {}
-    if sha(native) != value.get('native_recover_sha256'):
+    native, output = None, None
+    # Fixed per-instance paths only. A stale legacy proof cannot override the
+    # exact native/REST receipt fingerprint carried by this handoff.
+    for name in ('stream-flat-probe.json', 'flat-probe.json', 'recover.json'):
+        candidate = instance / name
+        # Keep the existing 64KiB/owner/regular-file boundary. CPython
+        # v3.12.3 os.open/fstat/read capture one bounded snapshot; hash those
+        # bytes BEFORE JSON decoding so an unrelated partial write is ignored.
+        limit = 65536
+        # Candidate eligibility is local to this path. An unrelated unsafe
+        # file must not hide a later eligible hash-matching native receipt.
+        try:
+            with os.fdopen(os.open(candidate, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK), 'rb') as stream:
+                info = os.fstat(stream.fileno())
+                if not stat.S_ISREG(info.st_mode) or info.st_uid != os.geteuid() or info.st_size > limit:
+                    continue
+                raw = stream.read(limit + 1)
+        except OSError:
+            continue
+        if len(raw) > limit:
+            continue
+        if hashlib.sha256(raw).hexdigest() == value.get('native_recover_sha256'):
+            native, output = candidate, json.loads(raw)
+            break
+    if native is None:
         raise Refused('previous_native_recover_hash')
+    proof = output.get('reconciliation') or {}
     if not (value.get('flat') is True and value.get('positions') == 0 and value.get('open_orders') == 0
             and output.get('status') == 'passed' and output.get('flat') is True
             and output.get('positions') == [] and output.get('unresolved_orders') == []
@@ -448,9 +470,48 @@ def run_stage(stage):
                 raise Refused('unsafe_input')
             return json.loads(raw), hashlib.sha256(raw).hexdigest()
         def trial_result(rc, output):
+            result, output_sha256 = None, None
+            # Immutable native mover_runner.py:592-601,701-703 returns2 for
+            # an empty validated scan. CC rules this a clean no-trade stage.
+            if stage == 'pre' and rc in (0, 2) and output.is_file():
+                empty, output_sha256 = paper_output(output)
+                result = empty
+                if (empty.get('kind') == 'mover_trial_receipt' and empty.get('status') == 'not_started'
+                        and empty.get('reason') == 'scan_empty' and empty.get('stage') == 'validation'
+                        and type(empty.get('orders_submitted')) is int and empty['orders_submitted'] == 0):
+                    # Native mover_runner.py:690,701-703 at 8053f14e uses the
+                    # loaded config AND effective RiskLimits, not raw CONFIG
+                    # bytes, for exploratory receipts (exploration.py:45-51).
+                    # binding(stage) retains its separate raw CONFIG seal.
+                    sys.path.insert(0, str(paper))
+                    from mover import load_mover_config
+                    loaded, limits, _ = load_mover_config(config(stage))
+                    raw_config = config(stage).read_bytes()
+                    # Unlabelled legacy frozen producers predate exploration.py
+                    # and use the raw digest. Never require a new runtime module
+                    # for those unchanged producers. Labelled configs use the
+                    # native effective digest, including loaded risk limits.
+                    if 'paper_lane' in loaded or 'evidence_class' in loaded:
+                        from exploration import config_digest
+                        expected_config = config_digest(loaded, raw_config, limits=limits)
+                    else:
+                        expected_config = hashlib.sha256(raw_config).hexdigest()
+                    if empty.get('config_sha256') != expected_config:
+                        raise Refused('empty_scan_config_digest_mismatch')
+                    scan, scan_sha256 = paper_output(instance / 'scan.json')
+                    if scan.get('symbols') != [] or empty.get('scan_sha256') != scan_sha256:
+                        raise Refused('empty_scan_receipt_binding_mismatch')
+                    event = {'level': 'INFO', 'event': 'no_trade', 'reason': 'scan_empty',
+                             'stage': stage, 'trial': value['trial'], 'trial_evidence': False,
+                             'native_exit_code': rc, 'native_output_sha256': output_sha256,
+                             'evaluated_counts': {'selected_symbols': 0, 'orders_submitted': 0}}
+                    save(instance / 'no-trade.json', event)
+                    print(json.dumps(event))
+                    return 0
             if rc != 0:
                 return rc
-            result, output_sha256 = paper_output(output)
+            if result is None:
+                result, output_sha256 = paper_output(output)
             if result.get('status') == 'recovery_only':
                 save(instance / 'recovery-run.json', {
                     'status': 'recovery_only', 'stage': stage, 'trial': value['trial'],
@@ -483,6 +544,57 @@ def run_stage(stage):
                     'lane-b-scheduled', ROOT / 'scheduled_trial_r3.sh'], timeout=1190, environment=environment)
         return trial_result(rc, instance / 'scheduled/paper-output.json')
 
+def rest_flat_after_stream_failure(stage, active, rc, output):
+    """Narrow startup-only fallback; native receipt remains unchanged.
+
+    Native transport.py:1793-1800 emits this exact readiness error before
+    recovery.py's first snapshot/order work. Reuse the GET-only observer from
+    recover_stage's existing no_owned_trial_to_recover path, never a stream retry.
+    runner.py:2890-2891 publishes RTH recovery mode=adaptive_paper; the
+    mover producer retains the inner mode. Match the public producer by stage.
+    runner.py:554 fixes public_preflight orders_submitted at zero. It is an
+    eligibility field only; flatness rests on the REST counts, never that zero.
+    """
+    if rc != 3 or not output.is_file():
+        return rc, output
+    result = safe_json(output)
+    preflight, details = result.get('preflight'), result.get('error_details')
+    if (result.get('mode') != ('official_sdk_recovery' if stage == 'pre' else 'adaptive_paper') or result.get('status') != 'needs_attention'
+            or result.get('flat') is not False or result.get('errors') != ['TransportError']
+            or not isinstance(preflight, dict) or not isinstance(details, list) or len(details) != 1
+            or not isinstance(details[0], dict) or details[0].get('type') != 'TransportError'
+            or details[0].get('code') != 'TransportError'
+            or result.get('positions') != [] or result.get('unresolved_orders') != []
+            or result.get('cancel_attempt_client_ids') != [] or result.get('exit_attempt_client_ids') != []
+            or type(result.get('buy_submissions')) is not int or result['buy_submissions'] != 0
+            or result.get('reconciliation') is not None or result.get('broker_positions_last_observed') is not None):
+        return rc, output
+    if any(type(preflight.get(key)) is not int or preflight[key] != 0
+           for key in ('position_count', 'open_order_count', 'orders_submitted')):
+        return rc, output
+    message = details[0].get('message')
+    match = re.fullmatch(r'stream authentication/subscription/quote readiness failed \(([a-z_]+(?:,[a-z_]+)*)\)',
+                         message) if isinstance(message, str) else None
+    if match is None:
+        return rc, output
+    reasons = set(match.group(1).split(','))
+    # Only native stream-start reasons. Event loss, identity, REST/snapshot,
+    # order/cancel ambiguity and teardown failures must keep refusing.
+    stream_reasons = {'start_not_ready', 'quote_stale', 'quote_timestamp_stale',
+                      'halt_status_subscription_rejected',
+                      *(channel + suffix for channel in ('quotes', 'orders')
+                        for suffix in ('_disconnected', '_subscription_rejected', '_control_error',
+                                       '_thread_failed', '_thread_stopped'))}
+    if 'start_not_ready' not in reasons or not reasons <= stream_reasons:
+        return rc, output
+    probe = Path(active['instance']) / 'stream-flat-probe.json'
+    probe_rc = keyed([PY, '-E', '-s', '-B', ROOT/'observe_flat.py', stage,
+                      '--config', config(stage), '--output', probe], timeout=120)
+    # A failed observer may emit no file. Preserve native failure evidence so
+    # ordinary recovery validation still writes a refusing handoff.
+    return (probe_rc, probe) if probe.is_file() else (rc, output)
+
+
 def stop_mark(stage):
     # Own the latch only if this hook creates it. An existing STOP, including a
     # human abort during the run, must never be silently cleared by recovery.
@@ -499,6 +611,7 @@ def stop_mark(stage):
     save(Path(active['instance']) / 'stop-hook.json', {'created_by_hook': owned})
     return 0
 
+
 def recover_stage(stage):
     verify_bundle()
     verify_runtime()
@@ -511,6 +624,7 @@ def recover_stage(stage):
             raise Refused('recovery_config_binding_mismatch')
         before = STOP.stat(follow_symlinks=False)
         rc, output = native_recover(stage, active)
+        rc, output = rest_flat_after_stream_failure(stage, active, rc, output)
         if output.is_file():
             refused = safe_json(output)
             if rc in (2,3) and refused.get('reason') in ('no_owned_trial_to_recover', 'no_mover_trial_to_recover'):

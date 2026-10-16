@@ -58,9 +58,11 @@ never used. The replay driver comes from #1113's pinned `dry_run.py`, so the
 predecessor need not contain a driver. This builder does not call #1113's
 `recut()`; the #1117 builder still constructs the flat-proof intermediate.
 
-The lane B r3 preparation overlays only the canonical launcher's `keyed` and
-`run_stage` methods from `tests/fixtures/seq2-launch.txt`, selected from the
-builder's exact source commit. It leaves the authenticated native runner and
+The lane B preparation overlays the canonical launcher's `keyed` and
+`run_stage` and `verify_handoff` methods and its narrow `rest_flat_after_stream_failure` hook from
+`tests/fixtures/seq2-launch.txt`, selected from the builder's exact source
+commit. The hook is inserted after native recovery; the graft replaces the handoff validator
+with the canonical proof-aware validator and retains the source generation's private-latch/recovery code. It leaves the authenticated native runner and
 CONFIG files unchanged. Trial acceptance reads PRE `paper.json` or scheduled
 `paper-output.json`, records recovery-only starts separately and refuses them
 as trial evidence. Native paper reads have a separate 1MiB cap (measured
@@ -68,6 +70,46 @@ maximum407527B across98 outputs); the64KiB GO/control reader is unchanged.
 Native exit-zero statuses passed/completed_no_signals/held_overnight remain
 successful. A timeout sends TERM, permits 630 seconds for the cited
 recovery bounds, then KILL if still running; timeout remains refusal exit124.
+
+A persistent stream-readiness failure can occur when a flat stage traded no
+symbols. Native zero counts alone remain insufficient to certify flatness.
+Only a single native stream-start TransportError, strict integer0/0/0
+position/open-order/submission preflight, no local positions/unresolved
+orders and no submit/cancel/exit activity may invoke the existing GET-only
+`observe_flat.py`. Unknown/non-stream/integrity/teardown errors and nonzero or
+missing native counts refuse. The normal handoff validator still requires
+observer rc0, passed/flat=true and complete REST0/0 proof. An absent observer
+output preserves the native failed receipt and records a refusing handoff.
+No native retry or live stream is added. The observer fits the already
+reserved120s fallback slot; the enclosing recovery budgets do not change.
+At the cited base, `runner.py:554` sets `orders_submitted` fixed at zero in
+public preflight. This field is eligibility only: flatness rests on the REST counts.
+
+RTH qualification uses the public `runner.py recover` mode `adaptive_paper`,
+not the inner recovery mode. The mover producer does not emit the required
+preflight counters, so that missing evidence keeps PRE stream failures closed;
+zero counts are never inferred. The ordinary no-owned-trial fallback remains.
+The emitted handoff validator recognizes `stream-flat-probe.json` alongside
+the two legacy paths only when its exact hash matches the handoff's existing
+`native_recover_sha256`. Bundle/config/trial/flatness/boot/drain checks stay
+in force. The reader captures bounded owned regular-file bytes and compares
+their hash before decoding the matching JSON, so an unrelated partial stream
+file cannot hide a valid native receipt. A stale legacy file cannot override the recorded stream proof, and
+a tampered proof cannot admit the next stage. This validator is grafted into
+new packets, not just changed in the canonical fixture.
+
+An authenticated PRE `scan_empty`/`not_started` receipt with zero submitted
+orders is a clean no-trade stage. The launcher verifies the native effective
+`config_digest` (loaded mover config plus effective RiskLimits for exploratory
+lane B), scan hash and empty selected-symbol list. The raw CONFIG seal remains
+separately checked at admission. It records `no-trade.json` with an
+INFO event and evaluated counts selected_symbols0/orders_submitted0, and
+returns0 even when the immutable runner returned its legacy no-start code2.
+The native receipt stays unchanged. This creates no trial evidence or flat
+proof; the normal recovery hook still runs. Service exit0 avoids OnFailure
+for the empty scan itself. The native scan has no evaluated-universe count,
+so none is inferred or invented. Other refused, malformed or nonzero-order
+outcomes remain refusals.
 The scheduled Bash leader defers its TERM/INT exiting traps until its
 foreground runner ends, then returns143/130 without starting any later command.
 The generated root `scheduled_trial_r3.sh` retains the frozen script's logic
