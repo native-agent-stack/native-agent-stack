@@ -1220,6 +1220,23 @@ class AngleEnforcementTests(FixtureTestCase):
         self.assertTrue(all(p in document["sources"] for p in native_paths))
         self.assertFalse(self.layer(document, "layer-a")["angles"]["candidates"][0]["provisional"])
 
+    def test_a1_receipt_identity_is_preserved_in_the_native_summary(self):
+        root, path, record = self.prepare()
+        candidate = record["candidates"][0]
+        receipt = "evidence/artifacts/fixture/a1.json"
+        candidate["angles"]["A1"]["sources"] = [{
+            "kind": "receipt", "path": receipt,
+            "repository": candidate["repository"], "pin": candidate["pin"],
+        }]
+        _write_json(root / receipt, {"repository": candidate["repository"], "pin": candidate["pin"]})
+        _write_json(path, record)
+        document = fs.build_document(root)
+        self.assertEqual(self.layer(document, "layer-a")["angles"]["candidates"][0]["verdict"], "CONVERGED")
+        self.assertIn(receipt, document["sources"])
+        _write_json(root / receipt, {"repository": candidate["repository"], "pin": COMMIT_B})
+        with self.assertRaisesRegex(fs.FinalStackError, "A1 evidence.*current repository and pin"):
+            fs.build_document(root)
+
 
 class RepositoryTests(unittest.TestCase):
     def test_real_noncommit_source_pins_are_retained_in_declared_runs(self):

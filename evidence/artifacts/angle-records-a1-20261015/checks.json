@@ -14,21 +14,67 @@
     "base_assertion_failures": 4,
     "base_model_subtest_errors": 3,
     "base_exit": 1,
-    "boundary": "New control module executed against the exact landed base using its native validate_record and derive interfaces."
+    "boundary": "Historical four-control definitions at 0d87fdae executed against the exact landed base using native validate_record and derive. Shared-fixture URL-schema failures in broader base runs are compatibility results, not additional causal controls."
   },
   "focused": {
-    "command": "python3 -m unittest tests.test_angle_records_identity",
-    "tests": 9,
+    "command": "python3 -m unittest tests.test_angle_records_identity tests.test_final_stack.AngleEnforcementTests.test_a1_receipt_identity_is_preserved_in_the_native_summary",
+    "tests": 16,
     "exit": 0
   },
   "affected": {
-    "command": "python3 -m unittest tests.test_angle_records tests.test_angle_records_identity tests.test_angle_records_fix1 tests.test_final_stack",
-    "tests": 140,
-    "exit": 0
+    "command": "python3 -m unittest tests.test_angle_records tests.test_angle_records_identity tests.test_angle_records_fix1 tests.test_final_stack tests.test_final_disabled",
+    "tests": 153,
+    "exit": 0,
+    "seconds": 203.553,
+    "idle_class": true
   },
   "generated": {
     "command": "python3 scripts/final_stack.py --write",
     "exit": 0
+  },
+  "original_software_causal_replay": {
+    "base": "51279d4f63d87b2d19de722cad786d7293417ac8",
+    "methods": [
+      "A1IdentityTests.test_pin_change_with_unchanged_a1_citations_is_refused",
+      "A1IdentityTests.test_repository_change_with_unchanged_a1_citations_is_refused",
+      "A1IdentityTests.test_stale_identity_cannot_derive_converged"
+    ],
+    "tests": 3,
+    "assertion_failures": 4,
+    "errors": 0,
+    "exit": 1,
+    "boundary": "Exact base validator and schema; each software control replaces A1 with a base-supported repository citation before validation. No extended URL fields are used for the causal software mutation."
+  },
+  "fold_fail_first": {
+    "base": "0d87fdae8b19fc4825401d8bf03c687a301f9e98",
+    "tests": 7,
+    "assertion_failures": 22,
+    "errors": 0,
+    "exit": 1,
+    "boundary": "Exact frozen-head angle validator, final-stack implementation and schema, with the new native-interface regression methods. No schema/fixture setup errors counted as causal failures.",
+    "controls": [
+      {"test": "A1IdentityTests.test_floating_or_unverified_model_ids_cannot_validate_as_snapshots", "failures": 9},
+      {"test": "A1IdentityTests.test_floating_model_identity_cannot_derive_converged", "failures": 3},
+      {"test": "A1IdentityTests.test_model_type_cannot_use_the_software_pin_fallback", "failures": 3},
+      {"test": "A1IdentityTests.test_relabelled_a1_receipt_cannot_hide_its_own_stale_identity", "failures": 4},
+      {"test": "A1IdentityTests.test_unread_a1_receipt_cannot_derive_converged_from_citation_labels", "failures": 1},
+      {"test": "A1IdentityTests.test_model_pin_change_keeps_the_old_screen_bound_to_the_old_model", "failures": 1},
+      {"test": "AngleEnforcementTests.test_a1_receipt_identity_is_preserved_in_the_native_summary", "failures": 1}
+    ]
+  },
+  "historical_model_positive": {
+    "test": "A1IdentityTests.test_documented_historical_snapshots_are_not_refused_for_age",
+    "cases": 8,
+    "exit": 0,
+    "policy": "No model-age, retirement or generation cutoff. Currency is maintenance; exact historical snapshot identity remains valid."
+  },
+  "provider_source_roster_audit": {
+    "supported_snapshot_ids": 84,
+    "pinned_sdk_source_files": 5,
+    "official_snapshot_table_supplements": 1,
+    "unmapped_ids": 0,
+    "source_record": "evidence/artifacts/angle-records-a1-20261015/provider-snapshot-sources.json",
+    "limits": "Source membership and snapshot/alias identity checks only; no model invocation, availability claim, current capability qualification or default selection."
   },
   "primary_source": {
     "repository": "https://github.com/python-jsonschema/jsonschema",

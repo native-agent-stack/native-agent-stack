@@ -17558,8 +17558,8 @@
     },
     {
       "path": "catalogs/landscape/angles/README.md",
-      "sha256": "c03f8d1cd03a0679b7920fd1fb58a11c5dd1bb69136d532cc06c966a4672a8e3",
-      "bytes": 14555
+      "sha256": "4c588669d0d89f91f1ed09d2cdec0ea9d2ea10f1b36d1cc17d0972890954fd6a",
+      "bytes": 15543
     },
     {
       "path": "catalogs/landscape/angles/foundation-agent-sdks.json",
@@ -19318,8 +19318,8 @@
     },
     {
       "path": "docs/decisions/2026-10-15-a1-identity-binding.md",
-      "sha256": "260f2e2cc7de8a4862c0068b464ce6c9454bf018a144ef0781759061ed117a78",
-      "bytes": 3542
+      "sha256": "de6cbec9416cb6c075d20c0333a5253ab5b3b0f06ae146d7d078ce61814f8362",
+      "bytes": 8591
     },
     {
       "path": "docs/decisions/2026-10-15-jev-scored-contract-corrections.md",
@@ -20508,8 +20508,13 @@
     },
     {
       "path": "evidence/artifacts/angle-records-a1-20261015/checks.json",
-      "sha256": "e7fe4a53ba5a422ff4d259e2676c73d6091120efa22776528f518297d7738431",
-      "bytes": 1720
+      "sha256": "907725aa9f20935796f824783adf2c2cbebde05518831882be10c6f1b4b624fb",
+      "bytes": 4597
+    },
+    {
+      "path": "evidence/artifacts/angle-records-a1-20261015/provider-snapshot-sources.json",
+      "sha256": "6f38a62d6abc252d304af4b559537032093ac6782f30c825e8368af19522f46e",
+      "bytes": 4783
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/.gitattributes",
@@ -62773,8 +62778,8 @@
     },
     {
       "path": "scripts/angle_records.py",
-      "sha256": "f516b7091deb18f2a3c23a6e4cb72493b593c1d4a9114e2b33e623d3a18c3478",
-      "bytes": 14115
+      "sha256": "69c9a00ee03bc8eb952fceda50be8467db9e8f5817b22cbe879bfd933e0a9d91",
+      "bytes": 17855
     },
     {
       "path": "scripts/build_ecosystem.py",
@@ -62833,8 +62838,8 @@
     },
     {
       "path": "scripts/final_stack.py",
-      "sha256": "4223d05642a5c6952dd6843010b474ad74ec4f7dd33b6e73321bd2d7982b3e12",
-      "bytes": 84061
+      "sha256": "04be4e6fff7bb2bf3acb76917433ba0e5bac8f939d436b4cc494b86d26826c2d",
+      "bytes": 84078
     },
     {
       "path": "scripts/freshness_propose.py",
@@ -63593,8 +63598,8 @@
     },
     {
       "path": "tests/test_angle_records_identity.py",
-      "sha256": "33cb9335fd2fa9202a5f5925d80f0d0d012578746c0faa611080f1bd83daaa15",
-      "bytes": 6172
+      "sha256": "16d9c9d2289ce6a7a38f14ccca74a03d8e3f721f0e3a743560cd42be2009e13c",
+      "bytes": 11685
     },
     {
       "path": "tests/test_anthropic_key_health.py",
@@ -63933,8 +63938,8 @@
     },
     {
       "path": "tests/test_final_stack.py",
-      "sha256": "7f7e9f8ce1e9dbbfe74216c76383848b45d52af03828f38de4775e6b4294f8ab",
-      "bytes": 78700
+      "sha256": "04cb6cfbbea6cdc22d44aa46b78441a59c793212854215f7a64dbf2168993ca1",
+      "bytes": 79674
     },
     {
       "path": "tests/test_financial_data.py",

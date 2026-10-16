@@ -23,35 +23,97 @@ matched the installed jsonschema 4.26.0 function exactly. No dependency or
 replacement validator is introduced.
 
 A bound URL or receipt may explicitly identify a model pin with
-`pin_kind: model`. It must use a versioned identifier with a named prefix,
-a numeric generation and optional named suffixes. This supports the model
-identities already retained in
-[the route record](../../catalogs/landscape/angles/foundation-model-routes.json)
-without treating an untyped model spelling or an unversioned routing alias
-as a resolved commit/release. Identity typing is part of the cited evidence,
-so a model change cannot reuse the old source binding.
+`pin_kind: model`. The initial name grammar at
+`0d87fdae8b19fc4825401d8bf03c687a301f9e98` was wrong: it also accepted floating
+aliases. It is replaced by exact provider-documented snapshot identities.
+The supported roster includes current and historical snapshots from the
+pinned provider sources. These are identity-validation inputs, not a model
+selection or capability qualification. Currency is separate maintenance: an
+older exact snapshot is accepted, including retired snapshots retained as
+historical evidence. No age or generation cutoff is applied. Unverified
+provider identities remain unscreened until their provider source is admitted;
+a name's numeric shape grants no resolution.
 
-The rejected alternative was to infer model resolution from any nonempty
-pin string. That would also admit `HEAD`, generic aliases and unresolved
-route names. Keeping only commit/release syntax would preserve the current
-false refusal of documented model identities. An independently retained
-provider resolution mechanism could supersede the explicit model-source
-contract if it can verify the same identity without promoting aliases.
+The OpenAI identities are present in
+[`openai/openai-python` v3.31.0 at 86cae50785fb7b7bf2a5d2383370b214b304acd2, chat_model.py:8-96](https://github.com/openai/openai-python/blob/86cae50785fb7b7bf2a5d2383370b214b304acd2/src/openai/types/shared/chat_model.py#L8-L96)
+and the official
+[Astra](https://developers.openai.com/api/docs/models/gpt-6-astra) and
+[Sol](https://developers.openai.com/api/docs/models/gpt-6.1-sol) snapshot tables.
+Additional dated OpenAI snapshots are present in
+[`all_models.py:14-28` at the same pin](https://github.com/openai/openai-python/blob/86cae50785fb7b7bf2a5d2383370b214b304acd2/src/openai/types/shared/all_models.py#L14-L28).
+The official [GPT-5.4 snapshot table](https://developers.openai.com/api/docs/models/gpt-5.4)
+also retains the exact historical `gpt-5.4-2026-03-05` identity. The SDK's alias
+literals are excluded; accepting a client spelling does not make it a snapshot.
+The current Anthropic identities are present in
+[`anthropics/anthropic-sdk-python` v1.15.0 at bcd55fe1d3f0f1240765f8cef04295b67337f55a, model.py:8-27](https://github.com/anthropics/anthropic-sdk-python/blob/bcd55fe1d3f0f1240765f8cef04295b67337f55a/src/anthropic/types/model.py#L8-L27).
+Anthropic's [model-versioning contract](https://platform.claude.com/docs/en/about-claude/models/model-ids-and-versions)
+identifies its dateless model IDs from generation 4.6 onward as pinned
+snapshots; this differs from earlier dateless aliases. Requiring a calendar
+suffix would therefore reject a documented current snapshot. The
+[provider source record](../../evidence/artifacts/angle-records-a1-20261015/provider-snapshot-sources.json)
+retains the SDK pins and official documentation references. Older dated
+Anthropic snapshots are retained from
+[v0.51.0 at e42451ab3f14443c0ed8076b17032a6d8986b6bf, model.py:11-20](https://github.com/anthropics/anthropic-sdk-python/blob/e42451ab3f14443c0ed8076b17032a6d8986b6bf/src/anthropic/types/model.py#L11-L20)
+and
+[v0.55.0 at 472c51ebec9fca647df9f39e0da1ca77c221a62f, model.py:14-22](https://github.com/anthropics/anthropic-sdk-python/blob/472c51ebec9fca647df9f39e0da1ca77c221a62f/src/anthropic/types/model.py#L14-L22).
+Historical dated IDs remain recognizable when a later SDK omits them.
+`test_documented_historical_snapshots_are_not_refused_for_age` covers old
+OpenAI and Anthropic generations, both dated and documented dateless forms.
+
+Model typing cannot fall through to the software commit/release parser.
+The exact snapshot still needs a current bound source; changing the model
+while retaining the old citation reports the identity-binding error rather
+than claiming that the new, documented snapshot is unresolved.
+The [old preflight diagnostic at 0d87fdae:133-137](https://github.com/native-agent-stack/native-agent-stack/blob/0d87fdae8b19fc4825401d8bf03c687a301f9e98/scripts/angle_records.py#L133-L137)
+conflated those causes; `test_model_pin_change_keeps_the_old_screen_bound_to_the_old_model`
+asserts the binding cause explicitly.
+
+A receipt's citation labels alone cannot establish A1 identity. The qualifier
+now reads its JSON through the native source loader and compares the receipt's
+own repository and full pin, following the existing
+[`validate_comparison` receipt equality at 0d87fdae, angle_records.py:203-209](https://github.com/native-agent-stack/native-agent-stack/blob/0d87fdae8b19fc4825401d8bf03c687a301f9e98/scripts/angle_records.py#L203-L209).
+A stale, foreign, malformed or unread A1 receipt refuses. The native `derive`
+entry point accepts the same optional source loader; without it, receipt-only
+A1 evidence yields `INSUFFICIENT`. A correctly labelled repository citation
+cannot mask a receipt with another identity.
+
+The same source loader is carried into the native generated angle summary,
+whose caller is
+[`final_stack.build_document` at 0d87fdae:1042](https://github.com/native-agent-stack/native-agent-stack/blob/0d87fdae8b19fc4825401d8bf03c687a301f9e98/scripts/final_stack.py#L1042).
+`test_a1_receipt_identity_is_preserved_in_the_native_summary` fails without
+that propagation, then checks the accepted summary, retained receipt source
+and refusal after the receipt's own pin changes. This is an A1 receipt data
+flow change; the separate generation-only import work stays in #1167.
+
+The rejected alternatives are a permissive name grammar and inference from
+any nonempty pin. Both can promote mutable aliases. Keeping only dated or
+commit/release syntax also rejects current provider snapshots. A future
+provider resolver can supersede the exact supported identities only with
+pinned provider evidence and regression controls preserving alias refusal.
 
 ## Verification and limits
 
 The native `validate_record` and `derive` interfaces are the test boundaries.
-Four controls ran against the exact landed base before the correction:
-pin mutation, repository mutation, stale-identity derivation and resolved
-model identity acceptance. They produced four assertion failures and three
-model subtest errors. The affected control names and final commands are
-retained in the [check record](../../evidence/artifacts/angle-records-a1-20261015/checks.json).
-Additional controls retain valid commit/release identities and reject generic,
-partially bound or untyped model sources.
+The three original software identity controls replace the shared fixture's
+A1 URL with a base-compatible repository citation before the mutation. Their
+before/after results establish repository/pin binding. The original aggregate
+base replay also encountered failures caused by the shared fixture's new URL
+fields, which the old schema disallows. Those aggregate failures are fixture
+compatibility results and must not be counted as additional causal controls.
+Provider-model acceptance separately exercises the new URL identity contract.
+The [check record](../../evidence/artifacts/angle-records-a1-20261015/checks.json)
+retains the historical results and this distinction; no synthetic provider
+name is treated as provider-documented evidence.
+
+The fold's fail-first cases at the frozen head separately reject floating or
+unverified model identities, block model-typed software-pin fallback, read
+receipt-owned identity, refuse unread receipt derivation, and identify the
+correct cause of a stale model binding. The supported current snapshots and
+native software identities are positive controls.
 
 All capability examples in the regression module are synthetic. The checks
-verify structural binding; they do not authenticate upstream citations or
-execute provider capability tests. No existing candidate is newly screened,
+verify identity binding, including retained receipt contents; they do not
+authenticate upstream pages or execute provider capability tests. No existing candidate is newly screened,
 selected or qualified, and FINAL admission remains under its separate
 redesign. Source-bound A1 remains one necessary input to multi-angle
 convergence, never sufficient evidence for adoption by itself.

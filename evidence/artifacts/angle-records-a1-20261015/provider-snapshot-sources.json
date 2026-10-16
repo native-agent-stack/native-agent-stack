@@ -1,0 +1,78 @@
+{
+  "evidence_class": "source_review",
+  "observed_at": "2026-10-16T03:52:21Z",
+  "purpose": "Replace a permissive model-name grammar with exact provider-documented snapshot identities.",
+  "sources": [
+    {
+      "repository": "https://github.com/openai/openai-python",
+      "release": "v3.31.0",
+      "pin": "86cae50785fb7b7bf2a5d2383370b214b304acd2",
+      "path": "src/openai/types/shared/chat_model.py",
+      "lines": [8, 96],
+      "identity_scope": "Documented named snapshots, full-date snapshots, and historical compact-date snapshots; mutable alias literals in this file are excluded.",
+      "examples": ["gpt-6-astra", "gpt-6.1-sol", "gpt-5.6-sol", "gpt-5-2025-08-07", "gpt-4-0613"],
+      "provider_references": [
+        "https://developers.openai.com/api/docs/models/gpt-6-astra",
+        "https://developers.openai.com/api/docs/models/gpt-6.1-sol",
+        "https://developers.openai.com/api/docs/models/gpt-6-sol",
+        "https://developers.openai.com/api/docs/models/gpt-6-luna",
+        "https://developers.openai.com/api/docs/models/gpt-5.6-sol",
+        "https://developers.openai.com/api/docs/models/gpt-5.6-terra",
+        "https://developers.openai.com/api/docs/models/gpt-5.6-luna",
+        "https://developers.openai.com/api/docs/deprecations"
+      ],
+      "verification": "Official model pages were fetched and their snapshot tables inspected; the exact IDs are also present in the SDK source at the recorded release commit."
+    },
+    {
+      "repository": "https://github.com/anthropics/anthropic-sdk-python",
+      "release": "v1.15.0",
+      "pin": "bcd55fe1d3f0f1240765f8cef04295b67337f55a",
+      "path": "src/anthropic/types/model.py",
+      "lines": [8, 27],
+      "identity_scope": "Dated snapshots and provider-documented dateless snapshots from generation 4.6 onward. Earlier dateless 4.5 aliases are excluded.",
+      "examples": ["claude-opus-5-5", "claude-opus-4-6", "claude-sonnet-4-5-20250929"],
+      "provider_references": [
+        "https://platform.claude.com/docs/en/about-claude/models/overview",
+        "https://platform.claude.com/docs/en/about-claude/models/model-ids-and-versions"
+      ],
+      "verification": "Official model overview and versioning pages were fetched. The provider documents dateless IDs from generation 4.6 onward as pinned snapshots; the exact ID is present at the recorded SDK release commit."
+    },
+    {
+      "repository": "https://github.com/openai/openai-python",
+      "release": "v3.31.0",
+      "pin": "86cae50785fb7b7bf2a5d2383370b214b304acd2",
+      "path": "src/openai/types/shared/all_models.py",
+      "lines": [14, 28],
+      "identity_scope": "Dated Responses-model snapshots; the corresponding undated aliases are excluded.",
+      "examples": ["o1-pro-2025-03-19", "o3-pro-2025-06-10", "gpt-5-pro-2025-10-06"]
+    },
+    {
+      "repository": "https://github.com/anthropics/anthropic-sdk-python",
+      "release": "v0.51.0",
+      "pin": "e42451ab3f14443c0ed8076b17032a6d8986b6bf",
+      "path": "src/anthropic/types/model.py",
+      "lines": [11, 20],
+      "identity_scope": "Historical dated Claude 3 and 3.5/3.7 snapshots; latest aliases in this file are excluded.",
+      "examples": ["claude-3-opus-20240229", "claude-3-7-sonnet-20250219"]
+    },
+    {
+      "repository": "https://github.com/anthropics/anthropic-sdk-python",
+      "release": "v0.55.0",
+      "pin": "472c51ebec9fca647df9f39e0da1ca77c221a62f",
+      "path": "src/anthropic/types/model.py",
+      "lines": [14, 22],
+      "identity_scope": "Historical dated Claude 4 snapshots, including the documented alternative dated spellings.",
+      "examples": ["claude-opus-4-20250514", "claude-sonnet-4-20250514", "claude-4-opus-20250514", "claude-4-sonnet-20250514"]
+    },
+    {
+      "provider_reference": "https://developers.openai.com/api/docs/models/gpt-5.4",
+      "section": "Snapshots",
+      "snapshot_pin": "gpt-5.4-2026-03-05",
+      "retained_identity_excerpt": "gpt-5.4-2026-03-05",
+      "verification": "Fetched the official page and inspected its exact dated snapshot table; the undated gpt-5.4 alias is not admitted."
+    }
+  ],
+  "currency_policy": "Identity recognition does not fail for an older generation, deprecated status, or age. Currency is maintenance rather than a merge gate. Historical exact snapshots remain accepted; availability and capability are separate claims.",
+  "source_membership_audit": {"supported_snapshot_ids": 84, "pinned_sdk_source_files": 5, "official_snapshot_table_supplements": 1, "unmapped_ids": 0},
+  "limits": "No SDK installation, model invocation, capability comparison, current candidate screen, default selection or FINAL admission. Unknown provider identities remain unverified; this record makes no claim that a similarly shaped name is a snapshot."
+}
