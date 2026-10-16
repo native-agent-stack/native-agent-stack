@@ -1,0 +1,1 @@
+weights must be stated before scoring

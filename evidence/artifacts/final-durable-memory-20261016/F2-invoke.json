@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "kind": "native_component_invocation_evidence",
+  "catalog": "foundation",
+  "layer_id": "durable-memory",
+  "recorded_at": "2026-10-16T05:41:54Z",
+  "repository": "https://github.com/akitaonrails/ai-memory",
+  "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+  "version": "2.6.6",
+  "evidence_class": "native_proven",
+  "claim": "The isolated publisher release executable answered --version and executed its native init command.",
+  "invocations": [
+    {
+      "label": "native-version",
+      "command": [
+        "<SCRATCH>/prefix/ai-memory",
+        "--version"
+      ],
+      "cwd": "<SCRATCH>",
+      "started_at": "2026-10-16T05:39:08.517690+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.017,
+      "output_file": "outputs/native-version.txt",
+      "capture": "masked_native_capture",
+      "raw_capture_name": "native-version.txt",
+      "output_sha256": "5ccfbee4a0dbd43b9f3c37bcf12512a12bb6c9ad0f2a74613460313a17e81c97",
+      "masking_rule": "mask_capture.py:16; exact scratch-prefix byte replacement with <SCRATCH>; all other bytes preserved",
+      "command_placeholders": {
+        "<SCRATCH>": "Private scratch root; exact argv and cwd retained in raw-native-commands.jsonl, named only."
+      },
+      "output_line_count": 1,
+      "comparison_note": "These are distinct native commands with separately retained captures: native-version runs <SCRATCH>/prefix/ai-memory --version at 2026-10-16T05:39:08.517690+00:00; host-version-readonly runs ai-memory --version at 2026-10-16T05:40:08.839096+00:00. Both report ai-memory 2.6.6, so identical output bytes are expected. The host probe serves F1 and is not isolated-install or E2E evidence."
+    },
+    {
+      "label": "native-init",
+      "command": [
+        "<SCRATCH>/prefix/ai-memory",
+        "--data-dir",
+        "<SCRATCH>/memory-raw",
+        "init"
+      ],
+      "cwd": "<SCRATCH>",
+      "started_at": "2026-10-16T05:40:08.527889+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.025,
+      "output_file": "outputs/native-init.txt",
+      "capture": "masked_native_capture",
+      "raw_capture_name": "native-init.txt",
+      "output_sha256": "900f6c21177681a71e44cf21b4b966d17b12a525c76cce41f316baec209f0f29",
+      "masking_rule": "mask_capture.py:16; exact scratch-prefix byte replacement with <SCRATCH>; all other bytes preserved",
+      "command_placeholders": {
+        "<SCRATCH>": "Private scratch root; exact argv and cwd retained in raw-native-commands.jsonl, named only."
+      },
+      "output_line_count": 7
+    },
+    {
+      "label": "native-init-layout",
+      "command": [
+        "stat",
+        "--printf=%F %n\n",
+        "<SCRATCH>/memory-raw/wiki",
+        "<SCRATCH>/memory-raw/raw",
+        "<SCRATCH>/memory-raw/db",
+        "<SCRATCH>/memory-raw/models"
+      ],
+      "cwd": "<SCRATCH>",
+      "started_at": "2026-10-16T05:40:08.553290+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.005,
+      "output_file": "outputs/native-init-layout.txt",
+      "capture": "masked_native_capture",
+      "raw_capture_name": "native-init-layout.txt",
+      "output_sha256": "c77709a288f30b2862ba9436c0a68171777221645ba65684183da2bd483150be",
+      "masking_rule": "mask_capture.py:16; exact scratch-prefix byte replacement with <SCRATCH>; all other bytes preserved",
+      "command_placeholders": {
+        "<SCRATCH>": "Private scratch root; exact argv and cwd retained in raw-native-commands.jsonl, named only."
+      },
+      "output_line_count": 4
+    }
+  ],
+  "native_component_invoked": true,
+  "native_client_memory_invoked": false,
+  "native_client_memory_calls": 0,
+  "final_invoke_qualification": false,
+  "not_invoked_reason": "No Codex/Claude MCP memory call, real native-client capture lifecycle, retrieval window or resumed handoff was exercised at this pin. CLI initialization is not a native-client memory-use receipt.",
+  "observed_init_layout": {
+    "wiki": true,
+    "raw": true,
+    "db": true,
+    "models": true,
+    "method": "Native stat output after init; generated configuration contents are never read.",
+    "source": "outputs/native-init-layout.txt:1",
+    "source_lines": [
+      1,
+      4
+    ]
+  },
+  "upstream_source": {
+    "kind": "repo",
+    "repository": "https://github.com/akitaonrails/ai-memory",
+    "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+    "path": "crates/ai-memory-cli/src/commands/init.rs",
+    "line": 60
+  },
+  "capture_policy": {
+    "kind": "masked_native_capture",
+    "raw_custody": "Raw native files and exact command journal retained privately, named raw-native-outputs/<label>.txt and raw-native-commands.jsonl. No raw-capture digest is published.",
+    "published_hash": "SHA-256 of each published derivative's bytes only.",
+    "masking_rule": "mask_capture.py:16",
+    "masking_tests": "tests/test_final_memory_mask.py",
+    "replacement": "Exact scratch-root bytes -> <SCRATCH>. No decoding, newline conversion, ANSI removal or content generation.",
+    "supersession": "All unpublished normalized first-pass captures and the recorder-generated cargo-unavailable message are withdrawn. This receipt uses re-captured native output; env itself produced the missing-cargo error."
+  },
+  "claim_sources": [
+    "outputs/native-version.txt:1",
+    "outputs/native-init.txt:7",
+    "outputs/native-init-layout.txt:1"
+  ]
+}

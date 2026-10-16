@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "kind": "repository_record_validation_and_review",
+  "scope": "Repository metadata validation and corrective evidence-read timing only; these outputs are not candidate E2E results or model comparisons.",
+  "rule_version": "angle-convergence/2",
+  "ruling": "MICRO-full-ea48abdd.md; co-op ruled single-fold instructions",
+  "changed_code": false,
+  "commands": [
+    {
+      "label": "angle-validator-before",
+      "command": [
+        "python3",
+        "-c",
+        "import json,sys\nfrom pathlib import Path\nsys.path.insert(0, 'scripts')\nfrom angle_records import validate_record, derive, AngleRecordError\nroot = Path.cwd()\npath = 'evidence/artifacts/final-durable-memory-20261016/angles-draft.json'\nrecord = json.loads((root / path).read_text())\nschema = json.loads((root / 'catalogs/landscape/angles/schema.json').read_text())\ntry:\n    validate_record(record, schema, label=path)\nexcept AngleRecordError as error:\n    print(str(error))\n    raise SystemExit(1)\nprint(json.dumps({'status': 'passed', 'rule_version': record['rule_version'],\n    'candidate_count': len(record['candidates']),\n    'derived': [{'id': row['id'], **derive(record, row)} for row in record['candidates']]}))\n"
+      ],
+      "cwd": "<REPO>",
+      "started_at": "2026-10-16T06:33:46.287566+00:00",
+      "exit_code": 1,
+      "elapsed_seconds": 0.170156,
+      "raw_capture_name": "angle-validator-before.txt",
+      "output_file": "validation-outputs/angle-validator-before.txt",
+      "output_sha256": "06a5584128c3212756d4b15ac0f94aebdc1bb7648301c8a50854b5d511e7555a",
+      "capture": "masked_native_capture"
+    },
+    {
+      "label": "default-weights-stated",
+      "command": [
+        "python3",
+        "-c",
+        "import datetime,json,sys;sys.path.insert(0,'scripts');from angle_records import DEFAULT_WEIGHTS;print(json.dumps({'weights':DEFAULT_WEIGHTS,'stated_at':datetime.datetime.now(datetime.timezone.utc).isoformat().replace('+00:00','Z'),'source':'scripts/angle_records.py:22'}))"
+      ],
+      "cwd": "<REPO>",
+      "started_at": "2026-10-16T06:33:46.796628+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.187746,
+      "raw_capture_name": "default-weights-stated.txt",
+      "output_file": "validation-outputs/default-weights-stated.txt",
+      "output_sha256": "5a4b3cc42145d69f54793707c66da52d176af6c3a98cce481d851fff595ff152",
+      "capture": "masked_native_capture"
+    },
+    {
+      "label": "angle-evidence-readback",
+      "command": [
+        "python3",
+        "-c",
+        "import datetime,json\nfrom pathlib import Path\nroot = Path.cwd()\nbase = root / 'evidence/artifacts/final-durable-memory-20261016'\nscreen_path = base / 'screen-delta.json'\nscreens = json.loads(screen_path.read_text())['rows']\nrecord = json.loads((base / 'angles-draft.json').read_text())\ngap_path = base / 'gaps.json'\ngap_record = json.loads(gap_path.read_text())\nfor candidate in record['candidates']:\n    screen = next(row for row in screens if row['repository'].lower() == candidate['repository'].lower())\n    reviewed = {}\n    for angle, cell in candidate['angles'].items():\n        evidence = [str(screen_path.relative_to(root))]\n        # Re-assess the retained source-screen facts and current named gaps.\n        # These are reused primary-source readings, not a new upstream survey.\n        supporting_requirements = [(row['id'], row['result']) for row in screen['requirements']]\n        current_gaps = json.loads(gap_path.read_text())\n        for source in cell['sources']:\n            if source['kind'] == 'receipt':\n                path = root / source['path']\n                path.read_bytes()\n                evidence.append(source['path'])\n                if path.name in ['E2E-attempt.json', 'F2-invoke.json']:\n                    receipt = json.loads(path.read_text())\n                    for command in receipt.get('commands', receipt.get('invocations', [])):\n                        (base / command['output_file']).read_bytes()\n                        evidence.append(str((base / command['output_file']).relative_to(root)))\n        reviewed[angle] = {\n            'read_at': datetime.datetime.now(datetime.timezone.utc).isoformat().replace('+00:00','Z'),\n            'retained_score': cell['score'],\n            'read_paths': sorted(set(evidence + [str(gap_path.relative_to(root))])),\n            'source_status': 'corrective review of retained evidence; original upstream acquisition times stay in screen-delta.json',\n        }\n    print(json.dumps({'candidate_id': candidate['id'], 'requirements_reviewed': supporting_requirements, 'angles': reviewed}))\nprint(json.dumps({'gap_review_at': datetime.datetime.now(datetime.timezone.utc).isoformat().replace('+00:00','Z'),\n                  'gap_ids': [gap['id'] for gap in gap_record['gaps']]}))\n"
+      ],
+      "cwd": "<REPO>",
+      "started_at": "2026-10-16T06:34:59.791059+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.050324,
+      "raw_capture_name": "angle-evidence-readback.txt",
+      "output_file": "validation-outputs/angle-evidence-readback.txt",
+      "output_sha256": "71b7afcc70e0326c9c7e76ec981defb694602201b41917735ad0c36f495ada12",
+      "capture": "masked_native_capture"
+    },
+    {
+      "label": "angle-validator-after",
+      "command": [
+        "python3",
+        "-c",
+        "import json,sys\nfrom pathlib import Path\nsys.path.insert(0, 'scripts')\nfrom angle_records import validate_record, derive, AngleRecordError\nfrom final_stack import Sources\nroot = Path.cwd()\npath = 'evidence/artifacts/final-durable-memory-20261016/angles-draft.json'\nrecord = json.loads((root / path).read_text())\nschema = json.loads((root / 'catalogs/landscape/angles/schema.json').read_text())\ntry:\n    validate_record(record, schema, label=path, sources=Sources(root))\nexcept AngleRecordError as error:\n    print(str(error))\n    raise SystemExit(1)\nprint(json.dumps({'status': 'passed', 'rule_version': record['rule_version'],\n    'candidate_count': len(record['candidates']),\n    'derived': [{'id': row['id'], **derive(record, row)} for row in record['candidates']]}))\n"
+      ],
+      "cwd": "<REPO>",
+      "started_at": "2026-10-16T06:36:42.265965+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.293199,
+      "raw_capture_name": "angle-validator-after.txt",
+      "output_file": "validation-outputs/angle-validator-after.txt",
+      "output_sha256": "179cbbf2a76deecd99621efc768002c5d043052b6c3f0245ee726b546905b73a",
+      "capture": "masked_native_capture"
+    }
+  ],
+  "masking": {
+    "rule": "mask_capture.py:13-16",
+    "changed": false,
+    "published_hashes": "SHA-256 of published derivative bytes only",
+    "raw_custody": "ruled-fold/raw/<label>.txt and ruled-fold/commands.jsonl, retained privately and cited by name only",
+    "command_placeholders": {
+      "<REPO>": "Private checkout root; exact cwd/argv retained privately",
+      "<SCRATCH>": "Private isolated scratch root"
+    },
+    "tests": "tests/test_final_memory_mask.py"
+  },
+  "validation": {
+    "before": {
+      "exit_code": 1,
+      "source": "validation-outputs/angle-validator-before.txt:1",
+      "reason": "weights must be stated before scoring"
+    },
+    "after": {
+      "exit_code": 0,
+      "source": "validation-outputs/angle-validator-after.txt:1",
+      "result": "validate_record with Sources and derive both ran; nine INSUFFICIENT results re-derived with provisional false."
+    },
+    "source": "scripts/angle_records.py:58-65,109-175",
+    "code_note": "The repository validator and its schema are unchanged. The same native function validates the record before and after correction; the final invocation also resolves receipt references through final_stack.Sources."
+  },
+  "timing": {
+    "weights_statement": "validation-outputs/default-weights-stated.txt:1",
+    "source_review": "validation-outputs/angle-evidence-readback.txt:1-9",
+    "gap_review": "validation-outputs/angle-evidence-readback.txt:10",
+    "meaning": "Actual times of the corrective review of retained source-screen facts, current gaps and supporting published native captures. These are not invented original upstream acquisition times and not new runtime measurements.",
+    "licence_review": "ai-memory LICENSE:1 at 04a9e8f576de67e1d2282ee29415d1b0d5b979c8 was read through the pinned mirror at 2026-10-16T06:35:00.053418Z; the value comes from that tool read."
+  },
+  "operator_metadata": "trial_permitted, final_eligible and basis omitted together; no operator permission decision is asserted.",
+  "unresolved": "Nine insufficient verdicts, no winner, all existing E2E/invoke/comparison gaps remain."
+}
