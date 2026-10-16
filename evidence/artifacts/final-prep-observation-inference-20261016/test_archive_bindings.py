@@ -62,6 +62,37 @@ class ArchiveBindingTests(unittest.TestCase):
         self.assertEqual(len(document["bindings"]), 5)
         self.assertEqual(verify_fixtures(ROOT / "captures", document["bindings"]), [])
 
+    def test_smoke_argv_and_working_directory_must_match_the_fixture_binding(self):
+        """Synthetic mutations must not retain a valid input identity claim."""
+        bindings = json.loads((ROOT / "fixture-bindings.json").read_text())["bindings"]
+        for identity in sorted({row["smoke_capture"] for row in bindings}):
+            for field in ("argv", "cwd"):
+                with self.subTest(capture=identity, field=field), tempfile.TemporaryDirectory() as temporary:
+                    root = Path(temporary)
+                    shutil.copytree(ROOT / "captures", root / "captures")
+                    path = root / "captures" / (identity + ".json")
+                    metadata = json.loads(path.read_text())
+                    metadata[field] = ["unrelated-command"] if field == "argv" else "<SCRATCH>/unrelated-directory"
+                    path.write_text(json.dumps(metadata))
+                    problems = verify_fixtures(root / "captures", bindings)
+                    self.assertTrue(any("smoke command" in problem for problem in problems), problems)
+
+    def test_custodied_fixture_hash_mismatch_is_rejected_without_public_payloads(self):
+        """Synthetic internally consistent envelope mutation; source digest stays fixed."""
+        bindings = json.loads((ROOT / "fixture-bindings.json").read_text())["bindings"]
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            shutil.copytree(ROOT / "captures", root / "captures")
+            path = root / "captures/39-fixture-collector-read.json"
+            metadata = json.loads(path.read_text())
+            stream = metadata["streams"]["stdout"]
+            self.assertNotIn("path", stream)
+            stream["sha256"] = "0" * 64
+            stream["upstream"]["sha256"] = "0" * 64
+            path.write_text(json.dumps(metadata))
+            problems = verify_fixtures(root / "captures", bindings)
+            self.assertTrue(any("actual fixture differs" in problem for problem in problems), problems)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -34,9 +34,21 @@
     },
     "stdout": {
       "bytes": 5626,
-      "hash_scope": "published masked bytes only",
-      "path": "22-fixture-prometheus-tests.stdout.txt",
-      "sha256": "9178ff7a479b40e7a97f19bea487c51f0082b3f91a57362edf5abe42902852c7"
+      "hash_scope": "pinned public upstream file bytes; payload retained in licensed private vendor custody",
+      "retention": "licensed_private_vendor_custody",
+      "sha256": "9178ff7a479b40e7a97f19bea487c51f0082b3f91a57362edf5abe42902852c7",
+      "upstream": {
+        "bytes": 5626,
+        "commit": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+        "license_url": "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/LICENSE",
+        "notice_urls": [
+          "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/NOTICE"
+        ],
+        "path": "cmd/promtool/testdata/unittest.yml",
+        "repository": "https://github.com/prometheus/prometheus",
+        "sha256": "9178ff7a479b40e7a97f19bea487c51f0082b3f91a57362edf5abe42902852c7",
+        "url": "https://raw.githubusercontent.com/prometheus/prometheus/5241a27fe3c6983549fccc32f6e65917408c63cd/cmd/promtool/testdata/unittest.yml"
+      }
     }
   },
   "timed_out": false,

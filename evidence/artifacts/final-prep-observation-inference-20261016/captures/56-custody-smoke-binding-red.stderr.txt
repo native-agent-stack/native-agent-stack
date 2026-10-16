@@ -1,0 +1,209 @@
+test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads (test_upstream_custody.UpstreamCustodyTests.test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads)
+Fails on the eight whole-file payloads at the reviewed 099f699c head. ... 
+  test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads (test_upstream_custody.UpstreamCustodyTests.test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads) (capture='21-fixture-collector')
+Fails on the eight whole-file payloads at the reviewed 099f699c head. ... FAIL
+  test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads (test_upstream_custody.UpstreamCustodyTests.test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads) (capture='22-fixture-prometheus-tests')
+Fails on the eight whole-file payloads at the reviewed 099f699c head. ... FAIL
+  test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads (test_upstream_custody.UpstreamCustodyTests.test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads) (capture='23-fixture-prometheus-rules')
+Fails on the eight whole-file payloads at the reviewed 099f699c head. ... FAIL
+  test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads (test_upstream_custody.UpstreamCustodyTests.test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads) (capture='24-fixture-loki')
+Fails on the eight whole-file payloads at the reviewed 099f699c head. ... FAIL
+  test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads (test_upstream_custody.UpstreamCustodyTests.test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads) (capture='39-fixture-collector-read')
+Fails on the eight whole-file payloads at the reviewed 099f699c head. ... FAIL
+  test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads (test_upstream_custody.UpstreamCustodyTests.test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads) (capture='41-fixture-rule-tests-read')
+Fails on the eight whole-file payloads at the reviewed 099f699c head. ... FAIL
+  test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads (test_upstream_custody.UpstreamCustodyTests.test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads) (capture='42-fixture-rules-read')
+Fails on the eight whole-file payloads at the reviewed 099f699c head. ... FAIL
+  test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads (test_upstream_custody.UpstreamCustodyTests.test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads) (capture='43-fixture-loki-read')
+Fails on the eight whole-file payloads at the reviewed 099f699c head. ... FAIL
+test_all_five_fixture_files_match_sources_and_bracketed_smokes (test_archive_bindings.ArchiveBindingTests.test_all_five_fixture_files_match_sources_and_bracketed_smokes) ... ok
+test_claimed_verification_matches_all_three_release_digests_after_downloads (test_archive_bindings.ArchiveBindingTests.test_claimed_verification_matches_all_three_release_digests_after_downloads)
+Fails at 5e5d94bb's actual C10 claim; passes only after a new capture. ... ok
+test_each_archive_mismatch_is_rejected_even_with_valid_capture_hashes (test_archive_bindings.ArchiveBindingTests.test_each_archive_mismatch_is_rejected_even_with_valid_capture_hashes)
+Synthetic mutations of each public checksum; none is a native run. ... ok
+test_matching_digest_before_download_completion_is_rejected (test_archive_bindings.ArchiveBindingTests.test_matching_digest_before_download_completion_is_rejected)
+Synthetic ordering mutation independent of the digest comparison. ... ok
+test_retained_partial_download_capture_is_rejected (test_archive_bindings.ArchiveBindingTests.test_retained_partial_download_capture_is_rejected) ... ok
+test_smoke_argv_and_working_directory_must_match_the_fixture_binding (test_archive_bindings.ArchiveBindingTests.test_smoke_argv_and_working_directory_must_match_the_fixture_binding)
+Synthetic mutations must not retain a valid input identity claim. ... 
+  test_smoke_argv_and_working_directory_must_match_the_fixture_binding (test_archive_bindings.ArchiveBindingTests.test_smoke_argv_and_working_directory_must_match_the_fixture_binding) (capture='44-collector-upstream-config-bound', field='argv')
+Synthetic mutations must not retain a valid input identity claim. ... FAIL
+  test_smoke_argv_and_working_directory_must_match_the_fixture_binding (test_archive_bindings.ArchiveBindingTests.test_smoke_argv_and_working_directory_must_match_the_fixture_binding) (capture='44-collector-upstream-config-bound', field='cwd')
+Synthetic mutations must not retain a valid input identity claim. ... FAIL
+  test_smoke_argv_and_working_directory_must_match_the_fixture_binding (test_archive_bindings.ArchiveBindingTests.test_smoke_argv_and_working_directory_must_match_the_fixture_binding) (capture='45-collector-repository-config-bound', field='argv')
+Synthetic mutations must not retain a valid input identity claim. ... FAIL
+  test_smoke_argv_and_working_directory_must_match_the_fixture_binding (test_archive_bindings.ArchiveBindingTests.test_smoke_argv_and_working_directory_must_match_the_fixture_binding) (capture='45-collector-repository-config-bound', field='cwd')
+Synthetic mutations must not retain a valid input identity claim. ... FAIL
+  test_smoke_argv_and_working_directory_must_match_the_fixture_binding (test_archive_bindings.ArchiveBindingTests.test_smoke_argv_and_working_directory_must_match_the_fixture_binding) (capture='47-prometheus-rule-test-bound', field='argv')
+Synthetic mutations must not retain a valid input identity claim. ... FAIL
+  test_smoke_argv_and_working_directory_must_match_the_fixture_binding (test_archive_bindings.ArchiveBindingTests.test_smoke_argv_and_working_directory_must_match_the_fixture_binding) (capture='47-prometheus-rule-test-bound', field='cwd')
+Synthetic mutations must not retain a valid input identity claim. ... FAIL
+  test_smoke_argv_and_working_directory_must_match_the_fixture_binding (test_archive_bindings.ArchiveBindingTests.test_smoke_argv_and_working_directory_must_match_the_fixture_binding) (capture='48-loki-config-bound', field='argv')
+Synthetic mutations must not retain a valid input identity claim. ... FAIL
+  test_smoke_argv_and_working_directory_must_match_the_fixture_binding (test_archive_bindings.ArchiveBindingTests.test_smoke_argv_and_working_directory_must_match_the_fixture_binding) (capture='48-loki-config-bound', field='cwd')
+Synthetic mutations must not retain a valid input identity claim. ... FAIL
+
+======================================================================
+FAIL: test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads (test_upstream_custody.UpstreamCustodyTests.test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads) (capture='21-fixture-collector')
+Fails on the eight whole-file payloads at the reviewed 099f699c head.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<CHECKOUT>/evidence/artifacts/final-prep-observation-inference-20261016/test_upstream_custody.py", line 27, in test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads
+    self.assertFalse(payload.exists(), "Whole upstream bytes require licensed private vendor custody")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false : Whole upstream bytes require licensed private vendor custody
+
+======================================================================
+FAIL: test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads (test_upstream_custody.UpstreamCustodyTests.test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads) (capture='22-fixture-prometheus-tests')
+Fails on the eight whole-file payloads at the reviewed 099f699c head.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<CHECKOUT>/evidence/artifacts/final-prep-observation-inference-20261016/test_upstream_custody.py", line 27, in test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads
+    self.assertFalse(payload.exists(), "Whole upstream bytes require licensed private vendor custody")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false : Whole upstream bytes require licensed private vendor custody
+
+======================================================================
+FAIL: test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads (test_upstream_custody.UpstreamCustodyTests.test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads) (capture='23-fixture-prometheus-rules')
+Fails on the eight whole-file payloads at the reviewed 099f699c head.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<CHECKOUT>/evidence/artifacts/final-prep-observation-inference-20261016/test_upstream_custody.py", line 27, in test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads
+    self.assertFalse(payload.exists(), "Whole upstream bytes require licensed private vendor custody")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false : Whole upstream bytes require licensed private vendor custody
+
+======================================================================
+FAIL: test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads (test_upstream_custody.UpstreamCustodyTests.test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads) (capture='24-fixture-loki')
+Fails on the eight whole-file payloads at the reviewed 099f699c head.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<CHECKOUT>/evidence/artifacts/final-prep-observation-inference-20261016/test_upstream_custody.py", line 27, in test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads
+    self.assertFalse(payload.exists(), "Whole upstream bytes require licensed private vendor custody")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false : Whole upstream bytes require licensed private vendor custody
+
+======================================================================
+FAIL: test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads (test_upstream_custody.UpstreamCustodyTests.test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads) (capture='39-fixture-collector-read')
+Fails on the eight whole-file payloads at the reviewed 099f699c head.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<CHECKOUT>/evidence/artifacts/final-prep-observation-inference-20261016/test_upstream_custody.py", line 27, in test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads
+    self.assertFalse(payload.exists(), "Whole upstream bytes require licensed private vendor custody")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false : Whole upstream bytes require licensed private vendor custody
+
+======================================================================
+FAIL: test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads (test_upstream_custody.UpstreamCustodyTests.test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads) (capture='41-fixture-rule-tests-read')
+Fails on the eight whole-file payloads at the reviewed 099f699c head.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<CHECKOUT>/evidence/artifacts/final-prep-observation-inference-20261016/test_upstream_custody.py", line 27, in test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads
+    self.assertFalse(payload.exists(), "Whole upstream bytes require licensed private vendor custody")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false : Whole upstream bytes require licensed private vendor custody
+
+======================================================================
+FAIL: test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads (test_upstream_custody.UpstreamCustodyTests.test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads) (capture='42-fixture-rules-read')
+Fails on the eight whole-file payloads at the reviewed 099f699c head.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<CHECKOUT>/evidence/artifacts/final-prep-observation-inference-20261016/test_upstream_custody.py", line 27, in test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads
+    self.assertFalse(payload.exists(), "Whole upstream bytes require licensed private vendor custody")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false : Whole upstream bytes require licensed private vendor custody
+
+======================================================================
+FAIL: test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads (test_upstream_custody.UpstreamCustodyTests.test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads) (capture='43-fixture-loki-read')
+Fails on the eight whole-file payloads at the reviewed 099f699c head.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<CHECKOUT>/evidence/artifacts/final-prep-observation-inference-20261016/test_upstream_custody.py", line 27, in test_whole_upstream_streams_have_pinned_envelopes_without_public_payloads
+    self.assertFalse(payload.exists(), "Whole upstream bytes require licensed private vendor custody")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false : Whole upstream bytes require licensed private vendor custody
+
+======================================================================
+FAIL: test_smoke_argv_and_working_directory_must_match_the_fixture_binding (test_archive_bindings.ArchiveBindingTests.test_smoke_argv_and_working_directory_must_match_the_fixture_binding) (capture='44-collector-upstream-config-bound', field='argv')
+Synthetic mutations must not retain a valid input identity claim.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<CHECKOUT>/evidence/artifacts/final-prep-observation-inference-20261016/test_archive_bindings.py", line 78, in test_smoke_argv_and_working_directory_must_match_the_fixture_binding
+    self.assertTrue(any("smoke command" in problem for problem in problems), problems)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : []
+
+======================================================================
+FAIL: test_smoke_argv_and_working_directory_must_match_the_fixture_binding (test_archive_bindings.ArchiveBindingTests.test_smoke_argv_and_working_directory_must_match_the_fixture_binding) (capture='44-collector-upstream-config-bound', field='cwd')
+Synthetic mutations must not retain a valid input identity claim.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<CHECKOUT>/evidence/artifacts/final-prep-observation-inference-20261016/test_archive_bindings.py", line 78, in test_smoke_argv_and_working_directory_must_match_the_fixture_binding
+    self.assertTrue(any("smoke command" in problem for problem in problems), problems)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : []
+
+======================================================================
+FAIL: test_smoke_argv_and_working_directory_must_match_the_fixture_binding (test_archive_bindings.ArchiveBindingTests.test_smoke_argv_and_working_directory_must_match_the_fixture_binding) (capture='45-collector-repository-config-bound', field='argv')
+Synthetic mutations must not retain a valid input identity claim.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<CHECKOUT>/evidence/artifacts/final-prep-observation-inference-20261016/test_archive_bindings.py", line 78, in test_smoke_argv_and_working_directory_must_match_the_fixture_binding
+    self.assertTrue(any("smoke command" in problem for problem in problems), problems)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : []
+
+======================================================================
+FAIL: test_smoke_argv_and_working_directory_must_match_the_fixture_binding (test_archive_bindings.ArchiveBindingTests.test_smoke_argv_and_working_directory_must_match_the_fixture_binding) (capture='45-collector-repository-config-bound', field='cwd')
+Synthetic mutations must not retain a valid input identity claim.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<CHECKOUT>/evidence/artifacts/final-prep-observation-inference-20261016/test_archive_bindings.py", line 78, in test_smoke_argv_and_working_directory_must_match_the_fixture_binding
+    self.assertTrue(any("smoke command" in problem for problem in problems), problems)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : []
+
+======================================================================
+FAIL: test_smoke_argv_and_working_directory_must_match_the_fixture_binding (test_archive_bindings.ArchiveBindingTests.test_smoke_argv_and_working_directory_must_match_the_fixture_binding) (capture='47-prometheus-rule-test-bound', field='argv')
+Synthetic mutations must not retain a valid input identity claim.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<CHECKOUT>/evidence/artifacts/final-prep-observation-inference-20261016/test_archive_bindings.py", line 78, in test_smoke_argv_and_working_directory_must_match_the_fixture_binding
+    self.assertTrue(any("smoke command" in problem for problem in problems), problems)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : []
+
+======================================================================
+FAIL: test_smoke_argv_and_working_directory_must_match_the_fixture_binding (test_archive_bindings.ArchiveBindingTests.test_smoke_argv_and_working_directory_must_match_the_fixture_binding) (capture='47-prometheus-rule-test-bound', field='cwd')
+Synthetic mutations must not retain a valid input identity claim.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<CHECKOUT>/evidence/artifacts/final-prep-observation-inference-20261016/test_archive_bindings.py", line 78, in test_smoke_argv_and_working_directory_must_match_the_fixture_binding
+    self.assertTrue(any("smoke command" in problem for problem in problems), problems)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : []
+
+======================================================================
+FAIL: test_smoke_argv_and_working_directory_must_match_the_fixture_binding (test_archive_bindings.ArchiveBindingTests.test_smoke_argv_and_working_directory_must_match_the_fixture_binding) (capture='48-loki-config-bound', field='argv')
+Synthetic mutations must not retain a valid input identity claim.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<CHECKOUT>/evidence/artifacts/final-prep-observation-inference-20261016/test_archive_bindings.py", line 78, in test_smoke_argv_and_working_directory_must_match_the_fixture_binding
+    self.assertTrue(any("smoke command" in problem for problem in problems), problems)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : []
+
+======================================================================
+FAIL: test_smoke_argv_and_working_directory_must_match_the_fixture_binding (test_archive_bindings.ArchiveBindingTests.test_smoke_argv_and_working_directory_must_match_the_fixture_binding) (capture='48-loki-config-bound', field='cwd')
+Synthetic mutations must not retain a valid input identity claim.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<CHECKOUT>/evidence/artifacts/final-prep-observation-inference-20261016/test_archive_bindings.py", line 78, in test_smoke_argv_and_working_directory_must_match_the_fixture_binding
+    self.assertTrue(any("smoke command" in problem for problem in problems), problems)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : []
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.293s
+
+FAILED (failures=16)

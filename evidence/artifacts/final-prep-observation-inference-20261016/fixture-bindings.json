@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "record_class": "derived_native_fixture_binding_index",
-  "hash_scope": "Every file hash is of the published masked stdout containing the complete actual file. Raw hashes remain private in native command envelopes. The private co-op reproduction compares native raw file reads too.",
+  "hash_scope": "Four upstream file digests bind pinned public upstream bytes retained in licensed private vendor custody. Repository-config digests bind published masked stdout. Public verification compares stream digests; the co-op separately checks private raw bytes against vendor copies.",
   "historical_gap": "Original C26/C27/C29/C30 did not capture input file bytes at their run time. Current snapshots cannot retroactively prove their historical inputs. Those runs are retained with this named GAP; new C44/C45/C47/C48 have before-read and after-cmp evidence.",
   "bindings": [
     {
@@ -11,19 +11,27 @@
       "smoke_capture": "44-collector-upstream-config-bound",
       "after_cmp_capture": "49-fixture-collector-unchanged",
       "historical_capture_with_gap": "26-collector-upstream-config",
-      "published_file_sha256": "9a92a49383cf72c86419dc5da3ee7188859879bdad5265c1256aabd080d75585",
-      "published_file_bytes": 1758,
       "hash_source": {
         "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/39-fixture-collector-read.json",
         "line": 35
       },
-      "source_bytes": {
-        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/21-fixture-collector.stdout.txt"
+      "method": "Native cat records the actual file before smoke; native cmp --silent after smoke compares that fixture path with retained raw cat bytes. verify_bindings.py compares source/read stream sha256 values and the fixed binding digest, checks source/read/smoke/compare timing and return codes, and binds cat/cmp/smoke argv plus smoke cwd. GNU diffutils 3.12 cmp: status 0 means no differences, 1 differences, 2 trouble; --silent prints nothing (official manual read 2026-10-16: https://www.gnu.org/software/diffutils/manual/html_node/Invoking-cmp.html and https://www.gnu.org/software/diffutils/manual/html_node/cmp-Options.html). Version is captured in C58; historical executable identity is not retroactively established.",
+      "file_sha256": "9a92a49383cf72c86419dc5da3ee7188859879bdad5265c1256aabd080d75585",
+      "file_bytes": 1758,
+      "source_envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/21-fixture-collector.json",
+        "line": 39
       },
-      "actual_file_bytes": {
-        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/39-fixture-collector-read.stdout.txt"
+      "actual_file_envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/39-fixture-collector-read.json",
+        "line": 35
       },
-      "method": "Native cat captures the actual file before smoke; native cmp --silent after smoke compares that fixture path with retained raw cat bytes. Published source and file bytes compare equal; verify_bindings.py checks timing/order and command return codes."
+      "smoke_argv": [
+        "<SCRATCH>/otel/otelcol-contrib",
+        "validate",
+        "--config=<SCRATCH>/fixtures/otel-upstream.yaml"
+      ],
+      "smoke_cwd": "<SCRATCH>"
     },
     {
       "fixture_path": "<SCRATCH>/fixtures/repository-collector.yaml",
@@ -32,19 +40,27 @@
       "smoke_capture": "45-collector-repository-config-bound",
       "after_cmp_capture": "50-fixture-repository-unchanged",
       "historical_capture_with_gap": "27-collector-repository-config",
-      "published_file_sha256": "cdc11e88efb22a3cb883c14ffada133f044cab1a6a2d6efa95a1210c76daac7e",
-      "published_file_bytes": 52872,
       "hash_source": {
         "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/40-fixture-repository-collector-read.json",
         "line": 35
       },
-      "source_bytes": {
-        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/25-fixture-repository-collector.stdout.txt"
+      "method": "Native cat records the actual file before smoke; native cmp --silent after smoke compares that fixture path with retained raw cat bytes. verify_bindings.py compares source/read stream sha256 values and the fixed binding digest, checks source/read/smoke/compare timing and return codes, and binds cat/cmp/smoke argv plus smoke cwd. GNU diffutils 3.12 cmp: status 0 means no differences, 1 differences, 2 trouble; --silent prints nothing (official manual read 2026-10-16: https://www.gnu.org/software/diffutils/manual/html_node/Invoking-cmp.html and https://www.gnu.org/software/diffutils/manual/html_node/cmp-Options.html). Version is captured in C58; historical executable identity is not retroactively established.",
+      "file_sha256": "cdc11e88efb22a3cb883c14ffada133f044cab1a6a2d6efa95a1210c76daac7e",
+      "file_bytes": 52872,
+      "source_envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/25-fixture-repository-collector.json",
+        "line": 36
       },
-      "actual_file_bytes": {
-        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/40-fixture-repository-collector-read.stdout.txt"
+      "actual_file_envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/40-fixture-repository-collector-read.json",
+        "line": 35
       },
-      "method": "Native cat captures the actual file before smoke; native cmp --silent after smoke compares that fixture path with retained raw cat bytes. Published source and file bytes compare equal; verify_bindings.py checks timing/order and command return codes."
+      "smoke_argv": [
+        "<SCRATCH>/otel/otelcol-contrib",
+        "validate",
+        "--config=<SCRATCH>/fixtures/repository-collector.yaml"
+      ],
+      "smoke_cwd": "<SCRATCH>"
     },
     {
       "fixture_path": "<SCRATCH>/fixtures/unittest.yml",
@@ -53,19 +69,28 @@
       "smoke_capture": "47-prometheus-rule-test-bound",
       "after_cmp_capture": "51-fixture-rule-tests-unchanged",
       "historical_capture_with_gap": "29-prometheus-upstream-rule-test",
-      "published_file_sha256": "9178ff7a479b40e7a97f19bea487c51f0082b3f91a57362edf5abe42902852c7",
-      "published_file_bytes": 5626,
       "hash_source": {
         "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/41-fixture-rule-tests-read.json",
         "line": 35
       },
-      "source_bytes": {
-        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/22-fixture-prometheus-tests.stdout.txt"
+      "method": "Native cat records the actual file before smoke; native cmp --silent after smoke compares that fixture path with retained raw cat bytes. verify_bindings.py compares source/read stream sha256 values and the fixed binding digest, checks source/read/smoke/compare timing and return codes, and binds cat/cmp/smoke argv plus smoke cwd. GNU diffutils 3.12 cmp: status 0 means no differences, 1 differences, 2 trouble; --silent prints nothing (official manual read 2026-10-16: https://www.gnu.org/software/diffutils/manual/html_node/Invoking-cmp.html and https://www.gnu.org/software/diffutils/manual/html_node/cmp-Options.html). Version is captured in C58; historical executable identity is not retroactively established.",
+      "file_sha256": "9178ff7a479b40e7a97f19bea487c51f0082b3f91a57362edf5abe42902852c7",
+      "file_bytes": 5626,
+      "source_envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/22-fixture-prometheus-tests.json",
+        "line": 39
       },
-      "actual_file_bytes": {
-        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/41-fixture-rule-tests-read.stdout.txt"
+      "actual_file_envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/41-fixture-rule-tests-read.json",
+        "line": 35
       },
-      "method": "Native cat captures the actual file before smoke; native cmp --silent after smoke compares that fixture path with retained raw cat bytes. Published source and file bytes compare equal; verify_bindings.py checks timing/order and command return codes."
+      "smoke_argv": [
+        "<SCRATCH>/prometheus-3.15.0.linux-amd64/promtool",
+        "test",
+        "rules",
+        "unittest.yml"
+      ],
+      "smoke_cwd": "<SCRATCH>/fixtures"
     },
     {
       "fixture_path": "<SCRATCH>/fixtures/rules.yml",
@@ -74,19 +99,28 @@
       "smoke_capture": "47-prometheus-rule-test-bound",
       "after_cmp_capture": "52-fixture-rules-unchanged",
       "historical_capture_with_gap": "29-prometheus-upstream-rule-test",
-      "published_file_sha256": "b64f5889a6bf3ab9648ea0f77e6d0767db872257b58fe344cfc80ee9ff3c1c07",
-      "published_file_bytes": 771,
       "hash_source": {
         "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/42-fixture-rules-read.json",
         "line": 35
       },
-      "source_bytes": {
-        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/23-fixture-prometheus-rules.stdout.txt"
+      "method": "Native cat records the actual file before smoke; native cmp --silent after smoke compares that fixture path with retained raw cat bytes. verify_bindings.py compares source/read stream sha256 values and the fixed binding digest, checks source/read/smoke/compare timing and return codes, and binds cat/cmp/smoke argv plus smoke cwd. GNU diffutils 3.12 cmp: status 0 means no differences, 1 differences, 2 trouble; --silent prints nothing (official manual read 2026-10-16: https://www.gnu.org/software/diffutils/manual/html_node/Invoking-cmp.html and https://www.gnu.org/software/diffutils/manual/html_node/cmp-Options.html). Version is captured in C58; historical executable identity is not retroactively established.",
+      "file_sha256": "b64f5889a6bf3ab9648ea0f77e6d0767db872257b58fe344cfc80ee9ff3c1c07",
+      "file_bytes": 771,
+      "source_envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/23-fixture-prometheus-rules.json",
+        "line": 39
       },
-      "actual_file_bytes": {
-        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/42-fixture-rules-read.stdout.txt"
+      "actual_file_envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/42-fixture-rules-read.json",
+        "line": 35
       },
-      "method": "Native cat captures the actual file before smoke; native cmp --silent after smoke compares that fixture path with retained raw cat bytes. Published source and file bytes compare equal; verify_bindings.py checks timing/order and command return codes."
+      "smoke_argv": [
+        "<SCRATCH>/prometheus-3.15.0.linux-amd64/promtool",
+        "test",
+        "rules",
+        "unittest.yml"
+      ],
+      "smoke_cwd": "<SCRATCH>/fixtures"
     },
     {
       "fixture_path": "<SCRATCH>/fixtures/loki-upstream.yaml",
@@ -95,19 +129,27 @@
       "smoke_capture": "48-loki-config-bound",
       "after_cmp_capture": "53-fixture-loki-unchanged",
       "historical_capture_with_gap": "30-loki-upstream-config",
-      "published_file_sha256": "b0512247b74062a2df69acdd26f1292fb7750d41330b3ee34d36d7511456ef90",
-      "published_file_bytes": 1558,
       "hash_source": {
         "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/43-fixture-loki-read.json",
         "line": 35
       },
-      "source_bytes": {
-        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/24-fixture-loki.stdout.txt"
+      "method": "Native cat records the actual file before smoke; native cmp --silent after smoke compares that fixture path with retained raw cat bytes. verify_bindings.py compares source/read stream sha256 values and the fixed binding digest, checks source/read/smoke/compare timing and return codes, and binds cat/cmp/smoke argv plus smoke cwd. GNU diffutils 3.12 cmp: status 0 means no differences, 1 differences, 2 trouble; --silent prints nothing (official manual read 2026-10-16: https://www.gnu.org/software/diffutils/manual/html_node/Invoking-cmp.html and https://www.gnu.org/software/diffutils/manual/html_node/cmp-Options.html). Version is captured in C58; historical executable identity is not retroactively established.",
+      "file_sha256": "b0512247b74062a2df69acdd26f1292fb7750d41330b3ee34d36d7511456ef90",
+      "file_bytes": 1558,
+      "source_envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/24-fixture-loki.json",
+        "line": 39
       },
-      "actual_file_bytes": {
-        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/43-fixture-loki-read.stdout.txt"
+      "actual_file_envelope": {
+        "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/43-fixture-loki-read.json",
+        "line": 35
       },
-      "method": "Native cat captures the actual file before smoke; native cmp --silent after smoke compares that fixture path with retained raw cat bytes. Published source and file bytes compare equal; verify_bindings.py checks timing/order and command return codes."
+      "smoke_argv": [
+        "<SCRATCH>/loki/loki-linux-amd64",
+        "-verify-config=true",
+        "-config.file=<SCRATCH>/fixtures/loki-upstream.yaml"
+      ],
+      "smoke_cwd": "<SCRATCH>"
     }
   ]
 }

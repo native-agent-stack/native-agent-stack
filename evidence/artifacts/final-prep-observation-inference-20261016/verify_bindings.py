@@ -29,6 +29,15 @@ def capture(directory, identity):
     streams = {}
     for name in ("stdout", "stderr"):
         info = metadata["streams"][name]
+        if info.get("retention") == "licensed_private_vendor_custody":
+            source = info["upstream"]
+            if (name != "stdout" or "path" in info
+                    or info["sha256"] != source["sha256"] or info["bytes"] != source["bytes"]
+                    or not re.fullmatch(r"[0-9a-f]{40}", source["commit"])
+                    or "/" + source["commit"] + "/" not in source["url"]):
+                raise ValueError("invalid pinned upstream custody envelope")
+            streams[name] = None  # Public verification has metadata, not private payload bytes.
+            continue
         data = (directory / info["path"]).read_bytes()
         if len(data) != info["bytes"] or hashlib.sha256(data).hexdigest() != info["sha256"]:
             raise ValueError("published capture bytes do not match envelope")
@@ -43,6 +52,9 @@ def verify_archives(directory, checksum_id):
         problems.append("checksum command did not complete successfully")
     hashes = {}
     for line in streams["stdout"].decode("ascii").splitlines():
+        # uutils/coreutils@28b6856d7b215bf844b4223589cb54ade84f5223:
+        # src/uucore/src/lib/features/checksum/compute.rs:205-220 (untagged output).
+        # This parser is scoped to the three simple, unescaped archive filenames.
         match = re.fullmatch(r"([0-9a-f]{64}) [ *](.+)", line)
         if match is None or match[2] in hashes:
             problems.append("malformed or duplicate checksum record")
@@ -66,16 +78,17 @@ def verify_archives(directory, checksum_id):
 
 
 def verify_fixtures(directory, bindings):
-    """Check captured file bytes against sources and bracketed native uses."""
+    """Compare stream digests and bracketed native uses; vendor custody is separate."""
     directory = Path(directory)
     problems = []
     for binding in bindings:
-        source_meta, source = capture(directory, binding["source_capture"])
-        read_meta, actual = capture(directory, binding["read_capture"])
+        source_meta, _ = capture(directory, binding["source_capture"])
+        read_meta, _ = capture(directory, binding["read_capture"])
         smoke, _ = capture(directory, binding["smoke_capture"])
         after, _ = capture(directory, binding["after_cmp_capture"])
         name = binding["fixture_path"]
-        if source["stdout"] != actual["stdout"]:
+        if (source_meta["streams"]["stdout"]["sha256"] != read_meta["streams"]["stdout"]["sha256"]
+                or read_meta["streams"]["stdout"]["sha256"] != binding["file_sha256"]):
             problems.append(name + ": actual fixture differs from captured source")
         for metadata in (source_meta, read_meta, smoke, after):
             if metadata["exit_code"] != 0 or metadata["timed_out"]:
@@ -87,6 +100,8 @@ def verify_fixtures(directory, bindings):
         expected = ["cmp", "--silent", name, "<SCRATCH>/raw/" + binding["read_capture"] + "/stdout.bin"]
         if read_meta["argv"] != ["cat", name] or after["argv"] != expected:
             problems.append(name + ": native fixture command does not bind the named file")
+        if smoke["argv"] != binding["smoke_argv"] or smoke["cwd"] != binding["smoke_cwd"]:
+            problems.append(name + ": smoke command or working directory does not bind the named fixture")
     return problems
 
 

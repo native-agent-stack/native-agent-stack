@@ -4,6 +4,9 @@
 Private mapping is {"<MARKED_PLACEHOLDER>": "literal private text", ...}.
 Longest UTF-8 byte sequence wins; all nonmatching bytes remain unchanged.
 No regex removal, line filtering, output synthesis or JSON API projection occurs.
+The explicit upstream-custody manifest retains whole public upstream files in
+licensed private vendor custody; their public stream envelopes retain source
+URL, pin, byte count and digest without publishing their payloads here.
 CPython 3.13 bytes.replace/hashlib/json documentation, read 2026-10-16:
 https://docs.python.org/3.13/library/stdtypes.html#bytes.replace
 https://docs.python.org/3.13/library/hashlib.html
@@ -49,8 +52,16 @@ def mask_value(value, pairs):
     return value
 
 
-def publish(raw_dir, output_dir, mapping):
+def publish(raw_dir, output_dir, mapping, custody=None):
     pairs = replacements(mapping)
+    if custody is None:
+        custody = json.loads(Path(__file__).with_name("upstream-custody.json").read_text())
+    upstream_streams = {}
+    for source in custody["sources"]:
+        for identity in source["capture_ids"]:
+            if identity in upstream_streams:
+                raise ValueError("duplicate upstream custody capture")
+            upstream_streams[identity] = {key: value for key, value in source.items() if key != "capture_ids"}
     raw_dir, output_dir = Path(raw_dir), Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     count = 0
@@ -72,6 +83,18 @@ def publish(raw_dir, output_dir, mapping):
                 raise ValueError("private capture stream integrity mismatch")
             masked = mask_bytes(raw, pairs)
             name = directory.name + "." + stream + ".txt"
+            if stream == "stdout" and directory.name in upstream_streams:
+                source = upstream_streams[directory.name]
+                digest = hashlib.sha256(raw).hexdigest()
+                if raw != masked or digest != source["sha256"] or len(raw) != source["bytes"]:
+                    raise ValueError("upstream custody stream differs from pinned public source")
+                (output_dir / name).unlink(missing_ok=True)
+                public["streams"][stream] = {
+                    "bytes": len(raw), "sha256": digest,
+                    "hash_scope": "pinned public upstream file bytes; payload retained in licensed private vendor custody",
+                    "retention": "licensed_private_vendor_custody", "upstream": source,
+                }
+                continue
             (output_dir / name).write_bytes(masked)
             public["streams"][stream] = {
                 "path": name, "bytes": len(masked), "sha256": hashlib.sha256(masked).hexdigest(),

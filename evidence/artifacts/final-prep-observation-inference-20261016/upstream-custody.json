@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "record_class": "pinned_public_upstream_stream_custody_index",
+  "policy": "CC custody ruling on PR #1216, 2026-10-16, named only. Four whole upstream files are retained with LICENSE and PROVENANCE.md in private horizon vendor custody; eight public stdout payloads are omitted. No private raw digest or private record fingerprint is published.",
+  "sources": [
+    {
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector-releases",
+      "commit": "f6159a775dad1e21433c49bd8450673dd13ed4d3",
+      "url": "https://raw.githubusercontent.com/open-telemetry/opentelemetry-collector-releases/f6159a775dad1e21433c49bd8450673dd13ed4d3/distributions/otelcol-contrib/config.yaml",
+      "sha256": "9a92a49383cf72c86419dc5da3ee7188859879bdad5265c1256aabd080d75585",
+      "bytes": 1758,
+      "capture_ids": [
+        "21-fixture-collector",
+        "39-fixture-collector-read"
+      ],
+      "path": "distributions/otelcol-contrib/config.yaml",
+      "license_url": "https://github.com/open-telemetry/opentelemetry-collector-releases/blob/f6159a775dad1e21433c49bd8450673dd13ed4d3/LICENSE",
+      "notice_urls": []
+    },
+    {
+      "repository": "https://github.com/prometheus/prometheus",
+      "commit": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "url": "https://raw.githubusercontent.com/prometheus/prometheus/5241a27fe3c6983549fccc32f6e65917408c63cd/cmd/promtool/testdata/unittest.yml",
+      "sha256": "9178ff7a479b40e7a97f19bea487c51f0082b3f91a57362edf5abe42902852c7",
+      "bytes": 5626,
+      "capture_ids": [
+        "22-fixture-prometheus-tests",
+        "41-fixture-rule-tests-read"
+      ],
+      "path": "cmd/promtool/testdata/unittest.yml",
+      "license_url": "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/LICENSE",
+      "notice_urls": [
+        "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/NOTICE"
+      ]
+    },
+    {
+      "repository": "https://github.com/prometheus/prometheus",
+      "commit": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "url": "https://raw.githubusercontent.com/prometheus/prometheus/5241a27fe3c6983549fccc32f6e65917408c63cd/cmd/promtool/testdata/rules.yml",
+      "sha256": "b64f5889a6bf3ab9648ea0f77e6d0767db872257b58fe344cfc80ee9ff3c1c07",
+      "bytes": 771,
+      "capture_ids": [
+        "23-fixture-prometheus-rules",
+        "42-fixture-rules-read"
+      ],
+      "path": "cmd/promtool/testdata/rules.yml",
+      "license_url": "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/LICENSE",
+      "notice_urls": [
+        "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/NOTICE"
+      ]
+    },
+    {
+      "repository": "https://github.com/grafana/loki",
+      "commit": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+      "url": "https://raw.githubusercontent.com/grafana/loki/09e6ce2ff1bdc19763a10265b870c86f51c98655/cmd/loki/loki-local-config.yaml",
+      "sha256": "b0512247b74062a2df69acdd26f1292fb7750d41330b3ee34d36d7511456ef90",
+      "bytes": 1558,
+      "capture_ids": [
+        "24-fixture-loki",
+        "43-fixture-loki-read"
+      ],
+      "path": "cmd/loki/loki-local-config.yaml",
+      "license_url": "https://github.com/grafana/loki/blob/09e6ce2ff1bdc19763a10265b870c86f51c98655/LICENSE",
+      "notice_urls": []
+    }
+  ]
+}

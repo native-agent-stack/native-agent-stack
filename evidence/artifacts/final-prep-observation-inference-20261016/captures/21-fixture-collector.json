@@ -34,9 +34,19 @@
     },
     "stdout": {
       "bytes": 1758,
-      "hash_scope": "published masked bytes only",
-      "path": "21-fixture-collector.stdout.txt",
-      "sha256": "9a92a49383cf72c86419dc5da3ee7188859879bdad5265c1256aabd080d75585"
+      "hash_scope": "pinned public upstream file bytes; payload retained in licensed private vendor custody",
+      "retention": "licensed_private_vendor_custody",
+      "sha256": "9a92a49383cf72c86419dc5da3ee7188859879bdad5265c1256aabd080d75585",
+      "upstream": {
+        "bytes": 1758,
+        "commit": "f6159a775dad1e21433c49bd8450673dd13ed4d3",
+        "license_url": "https://github.com/open-telemetry/opentelemetry-collector-releases/blob/f6159a775dad1e21433c49bd8450673dd13ed4d3/LICENSE",
+        "notice_urls": [],
+        "path": "distributions/otelcol-contrib/config.yaml",
+        "repository": "https://github.com/open-telemetry/opentelemetry-collector-releases",
+        "sha256": "9a92a49383cf72c86419dc5da3ee7188859879bdad5265c1256aabd080d75585",
+        "url": "https://raw.githubusercontent.com/open-telemetry/opentelemetry-collector-releases/f6159a775dad1e21433c49bd8450673dd13ed4d3/distributions/otelcol-contrib/config.yaml"
+      }
     }
   },
   "timed_out": false,

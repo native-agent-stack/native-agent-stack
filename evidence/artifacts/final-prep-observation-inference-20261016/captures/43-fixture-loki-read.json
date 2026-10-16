@@ -30,9 +30,19 @@
     },
     "stdout": {
       "bytes": 1558,
-      "hash_scope": "published masked bytes only",
-      "path": "43-fixture-loki-read.stdout.txt",
-      "sha256": "b0512247b74062a2df69acdd26f1292fb7750d41330b3ee34d36d7511456ef90"
+      "hash_scope": "pinned public upstream file bytes; payload retained in licensed private vendor custody",
+      "retention": "licensed_private_vendor_custody",
+      "sha256": "b0512247b74062a2df69acdd26f1292fb7750d41330b3ee34d36d7511456ef90",
+      "upstream": {
+        "bytes": 1558,
+        "commit": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+        "license_url": "https://github.com/grafana/loki/blob/09e6ce2ff1bdc19763a10265b870c86f51c98655/LICENSE",
+        "notice_urls": [],
+        "path": "cmd/loki/loki-local-config.yaml",
+        "repository": "https://github.com/grafana/loki",
+        "sha256": "b0512247b74062a2df69acdd26f1292fb7750d41330b3ee34d36d7511456ef90",
+        "url": "https://raw.githubusercontent.com/grafana/loki/09e6ce2ff1bdc19763a10265b870c86f51c98655/cmd/loki/loki-local-config.yaml"
+      }
     }
   },
   "timed_out": false,

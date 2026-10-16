@@ -369,8 +369,12 @@
   "fixture_case_inventory": {
     "classification": "DERIVED static fixture counts, not native test-reported counts",
     "source": {
-      "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/22-fixture-prometheus-tests.stdout.txt",
-      "line": 6
+      "path": "cmd/promtool/testdata/unittest.yml",
+      "line": 6,
+      "repo": "https://github.com/prometheus/prometheus",
+      "commit": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "url": "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/cmd/promtool/testdata/unittest.yml#L6",
+      "sha256": "9178ff7a479b40e7a97f19bea487c51f0082b3f91a57362edf5abe42902852c7"
     },
     "method": "Parse upstream tests sequence; count five mapping groups, promql_expr_test entries and alert_rule_test entries. Native promtool stdout reports only SUCCESS.",
     "groups": [
@@ -381,8 +385,12 @@
           "count": 12
         },
         "source": {
-          "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/22-fixture-prometheus-tests.stdout.txt",
-          "line": 8
+          "path": "cmd/promtool/testdata/unittest.yml",
+          "line": 8,
+          "repo": "https://github.com/prometheus/prometheus",
+          "commit": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+          "url": "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/cmd/promtool/testdata/unittest.yml#L8",
+          "sha256": "9178ff7a479b40e7a97f19bea487c51f0082b3f91a57362edf5abe42902852c7"
         }
       },
       {
@@ -392,8 +400,12 @@
           "count": 1
         },
         "source": {
-          "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/22-fixture-prometheus-tests.stdout.txt",
-          "line": 100
+          "path": "cmd/promtool/testdata/unittest.yml",
+          "line": 100,
+          "repo": "https://github.com/prometheus/prometheus",
+          "commit": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+          "url": "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/cmd/promtool/testdata/unittest.yml#L100",
+          "sha256": "9178ff7a479b40e7a97f19bea487c51f0082b3f91a57362edf5abe42902852c7"
         }
       },
       {
@@ -403,8 +415,12 @@
           "count": 2
         },
         "source": {
-          "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/22-fixture-prometheus-tests.stdout.txt",
-          "line": 112
+          "path": "cmd/promtool/testdata/unittest.yml",
+          "line": 112,
+          "repo": "https://github.com/prometheus/prometheus",
+          "commit": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+          "url": "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/cmd/promtool/testdata/unittest.yml#L112",
+          "sha256": "9178ff7a479b40e7a97f19bea487c51f0082b3f91a57362edf5abe42902852c7"
         }
       },
       {
@@ -418,8 +434,12 @@
           "count": 4
         },
         "source": {
-          "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/22-fixture-prometheus-tests.stdout.txt",
-          "line": 123
+          "path": "cmd/promtool/testdata/unittest.yml",
+          "line": 123,
+          "repo": "https://github.com/prometheus/prometheus",
+          "commit": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+          "url": "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/cmd/promtool/testdata/unittest.yml#L123",
+          "sha256": "9178ff7a479b40e7a97f19bea487c51f0082b3f91a57362edf5abe42902852c7"
         }
       },
       {
@@ -429,8 +449,12 @@
           "count": 6
         },
         "source": {
-          "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/22-fixture-prometheus-tests.stdout.txt",
-          "line": 164
+          "path": "cmd/promtool/testdata/unittest.yml",
+          "line": 164,
+          "repo": "https://github.com/prometheus/prometheus",
+          "commit": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+          "url": "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/cmd/promtool/testdata/unittest.yml#L164",
+          "sha256": "9178ff7a479b40e7a97f19bea487c51f0082b3f91a57362edf5abe42902852c7"
         }
       }
     ],
@@ -516,7 +540,7 @@
   },
   "fixture_bindings": {
     "path": "evidence/artifacts/final-prep-observation-inference-20261016/fixture-bindings.json",
-    "scope": "Five actual fixture files captured before fresh smoke and compared afterward; source hashes bind published masked bytes. Earlier C26/C27/C29/C30 historical input identity remains GAP."
+    "scope": "Five actual fixture files captured before fresh smoke and compared afterward; four upstream hashes bind pinned public source bytes retained in licensed private vendor custody, and the repository-config hash binds published masked bytes. Earlier C26/C27/C29/C30 historical input identity remains GAP."
   },
   "correction": {
     "previous_head": "5e5d94bbdc70f4f97a3bae9b2bd804a209de1a3e",
@@ -531,7 +555,12 @@
     },
     "fail_first": {
       "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/54-binding-tests-red.stderr.txt",
-      "line": 1
+      "line": 3,
+      "summary_lines": [
+        31,
+        32,
+        33
+      ]
     },
     "corrected_checksum": {
       "path": "evidence/artifacts/final-prep-observation-inference-20261016/captures/38-archive-checksums-sequential.stdout.txt",
