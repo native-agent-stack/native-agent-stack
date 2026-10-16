@@ -166,6 +166,43 @@ class ProvenanceDigestCustodyTests(unittest.TestCase):
                          "cite unpublished records by name without a digest")
 
 
+class ModelCurrencyPrivateCitationTests(unittest.TestCase):
+    """The corrected October 7 record cites private packets by name (PR #1201 P1)."""
+
+    def test_private_source_record_citations_have_no_digest_or_prefix(self):
+        text = (ROOT / "docs/decisions/2026-10-07-model-currency-enforcement.md").read_text()
+        sections = (
+            ("initial", r"The command center's model refresh\b.*?(?=The current catalog)"),
+            ("later", r"The later living source record\b.*?(?=The CC\nreports)"),
+        )
+        for name, pattern in sections:
+            with self.subTest(citation=name):
+                citation = re.search(pattern, text, re.DOTALL)
+                self.assertIsNotNone(citation, "private citation must remain identifiable")
+                held = re.findall(r"(?<![A-Za-z0-9_])[0-9a-f]{5,64}(?![A-Za-z0-9_])", citation.group(0))
+                self.assertEqual(len(held), 0, "private citation digest/prefix count; never print values")
+                self.assertTrue("model-currency-wf_5053494c-265.json" in citation.group(0),
+                                "cite the actual private packet name")
+
+    def test_linked_source_review_and_checks_use_name_only_private_references(self):
+        private_fields = {"source_packet_sha256", "current_source_packet_sha256",
+                          "previous_source_packet_sha256", "proposal_sha256", "stderr_sha256"}
+
+        def locations(node, prefix=""):
+            if isinstance(node, dict):
+                return [prefix + "/" + key for key in node if key in private_fields] + [
+                    site for key, value in node.items() for site in locations(value, prefix + "/" + key)]
+            if isinstance(node, list):
+                return [site for i, value in enumerate(node) for site in locations(value, prefix + f"/{i}")]
+            return []
+
+        directory = ROOT / "evidence/artifacts/model-currency-enforcement-20261007"
+        found = {name: locations(json.loads((directory / name).read_text()))
+                 for name in ("fill-source-review.json", "j826-checks.json")}
+        self.assertEqual({name: sites for name, sites in found.items() if sites}, {},
+                         "private reference fields by file/locator only; cite records by name")
+
+
 class SyntheticDetectorTests(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
@@ -323,8 +360,10 @@ def git_bytes(*args: str, data: bytes | None = None) -> bytes:
 
 
 def pin_blob_digests() -> set[str]:
-    """sha256 of every blob at MODEL_ROUTES_PIN that HEAD's tree does not hold; HEAD's files are hashed from the checkout."""
-    head = {entry.split()[2] for entry in git_bytes("ls-tree", "-r", "-z", "HEAD").decode().split("\0") if entry}
+    """Hash pinned blobs except those whose unchanged HEAD bytes are already hashed from the checkout."""
+    changed = set(git_bytes("diff", "--name-only", "-z", "HEAD").decode().split("\0"))
+    head = {entry.split()[2] for entry in git_bytes("ls-tree", "-r", "-z", "HEAD").decode().split("\0")
+            if entry and entry.split("\t", 1)[1] not in changed}
     pinned = {entry.split()[2] for entry in git_bytes("ls-tree", "-r", "-z", MODEL_ROUTES_PIN).decode().split("\0")
               if entry and entry.split()[1] == "blob"}
     data = git_bytes("cat-file", "--batch", data="".join(f"{oid}\n" for oid in sorted(pinned - head)).encode())
@@ -350,6 +389,35 @@ def pinned_computed_hashes(fields: dict) -> dict:
         result = subprocess.run([sys.executable, "-I", "-B", "-c", PINNED_COMPUTE, directory], input=json.dumps(fields),
                                 capture_output=True, text=True, check=True)
     return json.loads(result.stdout)
+
+
+class PinnedBlobDigestTests(unittest.TestCase):
+    def check_checkout(self, changed: bool):
+        from unittest.mock import patch
+        oid = "1" * 40
+        path = "catalogs/landscape/final-stack.json"
+        blob = b"published run input\n"
+        tree = f"100644 blob {oid}\t{path}\0".encode()
+
+        def fixture(*args, data=None):
+            if args[0] == "ls-tree":
+                return tree
+            if args[0] == "diff":
+                return (path + "\0").encode() if changed else b""
+            if args[:2] == ("cat-file", "--batch"):
+                return f"{oid} blob {len(blob)}\n".encode() + blob + b"\n" if data else b""
+            raise AssertionError("unexpected Git fixture command")
+
+        with patch(__name__ + ".git_bytes", side_effect=fixture):
+            return hashlib.sha256(blob).hexdigest() in pin_blob_digests()
+
+    def test_modified_checkout_still_resolves_public_pinned_blob(self):
+        self.assertTrue(self.check_checkout(changed=True),
+                        "a modified checkout must resolve the original published blob at the run pin")
+
+    def test_unchanged_checkout_skips_duplicate_blob_read(self):
+        self.assertFalse(self.check_checkout(changed=False),
+                         "unchanged published bytes are already hashed from the checkout")
 
 
 class ModelRoutesClaudeHalfCustodyTests(unittest.TestCase):

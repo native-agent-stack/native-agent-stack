@@ -189,6 +189,7 @@ class Checkout:
         self.script.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(ROOT / "scripts/currency_due.py", self.script)
         shutil.copyfile(ROOT / "scripts/sweep_policy.py", self.script.parent / "sweep_policy.py")
+        shutil.copyfile(ROOT / "scripts/validate.py", self.script.parent / "validate.py")
         self.set(STALENESS, staleness_report())
         self.set(PINNED, pinned_report())
         self.set(SATURATION, saturation_report([("foundation/workers", False, "sweep-a")]))
@@ -409,6 +410,54 @@ class CountTests(unittest.TestCase):
         code, stdout, stderr = checkout.run("--dry-run", "--json", *extra)
         self.assertEqual(code, 0, stderr)
         return json.loads(stdout)
+
+    def test_inventory_age_is_persisted_and_does_not_fail_the_run(self):
+        checkout = Checkout(self)
+        path = checkout.root / "catalogs/foundation/model-currency.json"
+        path.parent.mkdir(parents=True)
+        path.write_text(json.dumps({
+            "schema_version": 1, "inventory_status": "complete",
+            "policy": {"max_release_age_days": 42, "max_landscape_age_days": 7, "refresh_lead_days": 2},
+            "packages": [], "models": [{
+                "id": "reader", "role": "document reading", "consumer": "fixture", "model_id": "vendor/model",
+                "revision": "a" * 40, "release_date": "2026-08-01", "checked_at": "2026-09-30",
+                "release_source": "https://huggingface.co/vendor/model", "status": "in_use",
+                "release_line": {"kind": "huggingface", "repository": "vendor/model", "ref": "main"},
+            }],
+        }), encoding="utf-8")
+        code, stdout, stderr = checkout.run("--json")
+        self.assertEqual(code, 0, stderr)
+        document = json.loads(stdout)
+        self.assertEqual(document["due"].get("models_past_window"), 1)
+        self.assertTrue(checkout.due_file.is_file())
+        self.assertEqual(json.loads(checkout.due_file.read_text())["due"]["models_past_window"], 1)
+        findings = [item["finding"] for item in document["details"] if item["kind"] == "model_past_window"]
+        self.assertEqual(len(findings), 1)
+        self.assertIn("reader: release older than 42 days", findings[0])
+        self.assertIn("1 model past its currency window", document["summary_line"])
+        self.assertIn(findings[0], cd.render_text(document))
+
+        previous = checkout.due_file.read_bytes()
+        path.write_text("{", encoding="utf-8")
+        code, stdout, stderr = checkout.run("--json")
+        self.assertEqual(code, 0, stderr)
+        document = json.loads(stdout)
+        self.assertNotIn("models_past_window", document["due"])
+        self.assertEqual(document["details"][-1]["model_inventory"], "unknown")
+        self.assertIn("model inventory unreadable", document["summary_line"])
+        self.assertEqual(checkout.due_file.read_bytes(), previous)
+
+    def test_structurally_invalid_inventory_is_a_gap_not_zero_due(self):
+        checkout = Checkout(self)
+        path = checkout.root / "catalogs/foundation/model-currency.json"
+        path.parent.mkdir(parents=True)
+        for content in ('{"schema_version":1,"models":null}', '[]'):
+            with self.subTest(content=content):
+                path.write_text(content, encoding="utf-8")
+                document = self.document(checkout)
+                self.assertNotIn("models_past_window", document["due"])
+                self.assertEqual(document["details"][-1].get("model_inventory"), "unknown")
+                self.assertIn("model inventory unreadable", cd.gaps_of(document))
 
     def test_layers_are_due_once_the_monthly_sweep_cadence_has_passed(self):
         # recipes/saturation-sweep.md: "Sweep only the due layers, at most monthly ..., or sooner when a
@@ -1600,7 +1649,7 @@ class ThisCheckoutTests(unittest.TestCase):
             document = json.loads(result.stdout)
             self.assertEqual(list(document), ["generated_at", "root", "due", "summary_line", "details_command",
                                           "details"])
-            self.assertEqual(list(document["due"]), list(cd.DUE_KEYS))
+            self.assertEqual([key for key in document["due"] if key != cd.INVENTORY_KEY], list(cd.DUE_KEYS))
             self.assertEqual(document["details"][-1]["active_models"], "current")
             self.assertTrue(all(isinstance(value, int) and value >= 0 for value in document["due"].values()))
             self.assertLessEqual(len(document["summary_line"]), 160)

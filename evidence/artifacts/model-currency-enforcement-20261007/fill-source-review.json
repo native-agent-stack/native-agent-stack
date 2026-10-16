@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "kind": "model_currency_fill_source_review",
-  "source_packet_sha256": "44679fd1d26dfec36b3b57cdbde2df4290d1b068118562cb8811bf3eb7cd6941",
-  "proposal_sha256": "12d36eb2c38bb02c88fb4fbd67e1f86ce435372835ebc52678f660d7e6839868",
+  "source_packet_record": "model-currency-wf_5053494c-265.json (initial October 7 refresh; private record cited by name only)",
+  "proposal_record": "currency-model-fill-proposal-20261007.json (private preparation; name only)",
   "evidence_class": "source_review",
   "inventory_status": "pending",
   "model_rows": 20,
@@ -216,7 +216,7 @@
       "artifact": {
         "git_blob": "e669a1120903d93417f57a1aedd1bc0000819b8b",
         "size_bytes": 3163737,
-        "source_packet_sha256": "fe2d2eb49c5f88a9e0a6c048e15d6ffdf86235519c2afc535044de433169ec8c"
+        "source_packet_record": "model-currency-wf_5053494c-265.json, roles[7] (private source observation; no packet digest retained)"
       },
       "effective_age_basis": "Latest Magika package release is older than 42 days, so this row carries the October 7 landscape exception."
     },

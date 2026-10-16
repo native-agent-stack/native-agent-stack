@@ -253,6 +253,13 @@ def model_currency_problems(document, today: date | None = None, *, enforce_age=
     return errors
 
 
+def model_currency_due(document, today: date | None = None) -> list[str]:
+    """Project age findings for publication and the daily maintenance notice."""
+    today = today if today is not None else datetime.now(timezone.utc).date()
+    structural = set(model_currency_problems(document, today, enforce_age=False))
+    return [problem for problem in model_currency_problems(document, today) if problem not in structural]
+
+
 def _json_without_duplicates(pairs):
     result = {}
     for key, value in pairs:
@@ -402,12 +409,20 @@ class Validator:
                 seen.add(route_id)
                 if not self.text(selected, f"model-route currency {source}.{model_key}"):
                     continue
-                currency_id = row.get("model_currency_id") if inline_bindings else bindings.get(route_id)
+                currency_id = bindings.get(route_id)
                 if not isinstance(currency_id, str) or currency_id not in models:
-                    self.error(f"model-route currency {source} {route_id}: missing or unknown model-currency row")
+                    self.error(f"model-route currency {source} {route_id}: missing or unknown model-currency row; "
+                               "registered route binding required")
+                    continue
+                if inline_bindings and row.get("model_currency_id") != currency_id:
+                    self.error(f"model-route currency {source} {route_id}: model_currency_id does not match "
+                               "the registered route binding")
                     continue
                 report["checked_routes"] += 1
                 normalized = selected
+                # OmniRoute v3.8.51, c1e30b7676975feb298b49eff6ff58923c04b89e:
+                # open-sse/config/providers/registry/{codex,muse-code}/index.ts declares
+                # these provider IDs and aliases. This comparison does not prove route availability.
                 for prefix in ("cx/", "codex/", "mc/", "muse-code/"):
                     if normalized.startswith(prefix):
                         normalized = normalized[len(prefix):]
@@ -441,7 +456,7 @@ class Validator:
             self.error("model-route currency: C2 route-currency.json is required alongside its returns")
         elif (self.root / merge_path).exists():
             merged = self.load(merge_path)
-            route_rows = self.sequence(merged.get("routes"), f"model-route currency {merge_path}.routes")
+            route_rows = self.sequence(merged.get("routes", []), f"model-route currency {merge_path}.routes")
             inspect_routes(route_rows, merge_path, "route_id", "model_id", inline_bindings=True)
             component_rows = self.sequence(merged.get("components", []), f"model-route currency {merge_path}.components")
             package_rows = inventory.get("packages")
@@ -460,7 +475,17 @@ class Validator:
                     elif release.get("kind") == "pypi" and isinstance(release.get("package"), str):
                         identity = "https://pypi.org/project/" + release["package"]
                 repository = row.get("repository")
-                if identity is None or not isinstance(repository, str) or repository.rstrip("/") != identity.rstrip("/"):
+                matches = identity is not None and isinstance(repository, str)
+                if matches and release.get("kind") == "github_release":
+                    # Import lazily: host_receipts imports this module's PRIVATE_CONTENT.
+                    try:
+                        from .host_receipts import normalize_repository
+                    except ImportError:  # running scripts/validate.py directly
+                        from host_receipts import normalize_repository
+                    matches = normalize_repository(repository) == normalize_repository(identity)
+                elif matches:
+                    matches = repository.rstrip("/") == identity.rstrip("/")
+                if not matches:
                     self.error("model-route currency: C2 component identity does not match its package source")
             declared = [row.get("repository") for row in [*route_rows, *component_rows] if isinstance(row, dict)]
             if any(not isinstance(value, str) or not value for value in declared) or len(declared) != len(set(
@@ -817,8 +842,7 @@ class Validator:
             currency_today = self.today if self.today is not None else datetime.now(timezone.utc).date()
             structural = model_currency_problems(inventory, currency_today, enforce_age=False)
             self.errors.extend(structural)
-            currency_notices = [problem for problem in model_currency_problems(inventory, currency_today)
-                                if problem not in structural]
+            currency_notices = model_currency_due(inventory, currency_today)
             route_currency = self.check_model_route_currency(inventory)
         elif any((self.root / path).exists() for path in (
                 MODEL_ROUTE_BINDINGS_PATH, MODEL_ROUTE_ANGLE_PATH, MODEL_ROUTE_GPT_PATH,

@@ -2,9 +2,30 @@
   "schema_version": 1,
   "evidence_class": "local_integration",
   "date": "2026-10-16",
-  "tests_command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- python3 -B -m unittest tests.test_model_currency tests.test_validate -q",
-  "observed_test_count": 120,
+  "tests_command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- python3 -B -m unittest tests.test_model_currency tests.test_validate tests.test_currency_due tests.test_model_currency_propose tests.test_provenance_digest_custody -q",
+  "observed_test_count": 278,
   "result": "passed",
+  "review_round": {
+    "closure_table": "review-closure.md",
+    "integrated_main": "30542e70560147c19049016d19aa3f264515c92f",
+    "private_reviews": ["MICRO-full-a943dd3a.md", "GPT-VERDICT-a943dd3ae.md", "review_output.json"],
+    "privacy_red_green": "Two new tests first produced three assertion failures (counts/field locations only), then passed after name-only citation cleanup.",
+    "behavior_red_green": [
+      "Equivalent GitHub URL/case/suffix normalization, both imported and CLI validator paths",
+      "Component-only C2 proposal bound to a package row",
+      "Unregistered C2 route rejected even with an inline inventory row",
+      "Persisted inventory-age count with exit 0, unreadable and malformed inventory coverage gaps",
+      "Current guide describes maintenance reporting and held Haiku 5.5 proposal"
+    ],
+    "existing_guard_mutations": {
+      "baseline": "passed; no claim of fail-first production defects",
+      "expected_assertion_failures": {"duplicate_binding": 1, "duplicate_source": 1, "duplicate_repository": 1, "gpt_layer_count": 2, "malformed_binding": 3, "malformed_source": 3},
+      "unexpected_errors": 0
+    },
+    "integration_regression": "First merged-tree run: 275/276 passed. The custody helper skipped an original public pinned blob because HEAD still held it while the pending merge changed the checkout. A synthetic regression failed first; the helper now includes modified checkout paths in its pinned reads. Six focused controls passed, followed by all 278 affected tests. No evidence digest allowlist was added.",
+    "primary_captures": "UPSTREAM-PINS-20261016.json",
+    "follow_up": "active-model-coverage-followup.json; nonblocking, underlying failure subtype not retained"
+  },
   "related_consumer_checks": {
     "command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- python3 -B -m unittest tests.test_model_currency tests.test_validate tests.test_currency_due tests.test_model_currency_propose -q",
     "tests": 237,

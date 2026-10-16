@@ -3,6 +3,8 @@
 Status: proposed for review. Base: `5bab63233ef90260bec4a8ee0cec4f5e4431776c`.
 Read date: 2026-10-16. This is the separate binding prerequisite for C2 publication; the privacy-only #1177 rebuild remains independent.
 
+The combined review correction incorporates main at `30542e70560147c19049016d19aa3f264515c92f`; the manifest conflict is resolved by re-registering the retained files from both sides.
+
 ## Decision
 
 Use the existing `scripts/validate.py` publication command to check explicit references into `catalogs/foundation/model-currency.json`. The new `catalogs/foundation/model-route-bindings.json` maps stable route IDs from the carried angle record and retained family proposals to inventory row IDs.
@@ -16,6 +18,8 @@ This decision supersedes the publication-failure behavior in [2026-10-07 model-c
 The [2026-10-15 rollover incident](2026-10-15-model-currency-landscape-check.md) records nine October 7 landscape exceptions becoming eight days old at UTC rollover. Publication then failed because time had advanced. The corrected publication path reports those due rows with exit 0 in `model_currency_notices` and appends them to the GitHub Actions step summary. This keeps maintenance work visible without using age alone to prevent publication.
 
 The 42-day release and seven-day landscape windows remain the maintenance windows. `model_currency_problems` still computes their due findings. Malformed JSON, structural errors, invalid or future dates, invalid source references and broken joins continue to fail. The publication caller separates structural problems from age findings; it does not remove the inventory rows or silently refresh their dates. No automatic deployment follows a report.
+
+The daily collector uses the same `model_currency_due` projection and persists `models_past_window`, its detail rows and the session notice. An unreadable or structurally invalid inventory is a `model inventory unreadable` coverage gap; it preserves an earlier due file. Age findings and this gap keep the existing exit behavior. The timer's existing `freshness_propose.py --model-currency` pre-step supplies refresh proposals; the collector does not add another proposal invocation.
 
 For already reviewed inputs, read the carried angle candidates and, when present, #1177's `sweep-manifest.json`. Match their stable IDs through the new mapping; retain their historical bytes and votes. Known `cx/`, `codex/`, `mc/` and `muse-code/` prefixes are removed only for the comparison notice. A non-model placeholder on the rejected Muse foreign-subscription route remains visible as a difference notice; its binding names the Full family for traceability and does not qualify that route.
 
@@ -43,7 +47,9 @@ Alongside `evidence/artifacts/model-routes-sweep-merge-20261015/returns.json`, C
 }
 ```
 
-The union of route and component identities must equal the retained `discovery["model-routes"].proposed` set, without duplicates. Component-only proposals such as the gateway reference an existing package row and must match its canonical GitHub repository or PyPI project identity. A model route cannot bypass its model-row reference by being mislabeled as an unrelated component. Every model route references an existing model row. Missing fields fail consistency; an older selected model still passes with a notice. The table must also be registered as published evidence under the normal ledger/manifest rules.
+The union of route and component identities must equal the retained `discovery["model-routes"].proposed` set, without duplicates. Every C2 route ID must already be registered in `model-route-bindings.json`, and its inline `model_currency_id` must agree with that registry. New route IDs therefore require a registry entry before publication. An inline inventory ID cannot bypass this join.
+
+Component-only proposals such as the gateway reference an existing package row. A component-only table may omit `routes`. GitHub identity comparisons reuse `scripts/host_receipts.py`'s `normalize_repository()`; this accepts case and equivalent URL forms while retaining the exact proposal spelling for coverage. PyPI identities retain their canonical comparison. A model route cannot be relabeled as an unrelated component to bypass its row reference. Missing fields fail consistency; an older selected model still passes with a notice. The table also follows the ordinary evidence-registration rules.
 
 ## Inventory refresh proposal
 
@@ -59,9 +65,26 @@ The missing-reference check failed first because the old CLI accepted a nonexist
 
 Tests exercise the publication boundary with synthetic documents. They establish join behavior, not provider capability, live model currency, account access, deployment or quality. New model-source changes belong to normal maintenance and reported refresh.
 
+The review correction adds fail-first checks for equivalent GitHub repository spelling, component-only C2 proposals, unregistered C2 route IDs, the daily inventory-age feed, unreadable/invalid inventory gaps, the current guide and private citations. Duplicate binding/source/repository, malformed row and GPT-layer-count guards already worked; isolated guard-removal controls establish that the new tests detect their removal. They are not claimed as baseline failures.
+
+Main integration also exposed a custody-test optimization that treated HEAD blobs as unchanged checkout files. The retained final-stack input still exactly matches the published run pin, but a pending merge changes the checkout before HEAD advances. The existing helper in `tests/test_provenance_digest_custody.py` at the base is corrected to fetch pinned blobs for modified paths. A synthetic case failed before this correction; the unchanged-file optimization has a passing control. The accepted public pin and digest rules are unchanged.
+
+The edited October 7 decision and its two linked evidence records now cite private source packets and proposals by name. Private command-output digests are omitted while their recorded summaries remain. The privacy regression first failed on the two citation paragraphs and linked field locations, then passed; failure output contains counts/locators only. This corrects the current records without rewriting Git history or republishing private values.
+
+The [primary capture index](../../evidence/artifacts/model-route-currency-consistency-20261016/UPSTREAM-PINS-20261016.json) separates dated vendor excerpts from our findings. The co-op receives the named public base-validator copy for independent review; the Full capture includes only the already-public native receipt lines. No private record or unretained response is hashed.
+
+### Follow-up: active-model coverage
+
+The timer prerequisite is satisfied by `stack-currency-timer-receipt-20261016.md`, cited by name only. Its persisted `active_models: unknown` is a real coverage gap. The [bounded diagnosis](../../evidence/artifacts/model-route-currency-consistency-20261016/active-model-coverage-followup.json) verifies the versioned catalog under the lane and timer interpreters and checks the deployed source. The collector discards the diagnostic subtype, so the retained receipt cannot distinguish timeout from another process/report failure. The service duration is consistent with a timeout but does not prove one.
+
+The host owner should retain a sanitized failure category and duration on the next approved collector run. A full host-selector rerun would scan protected private roots outside this lane. This remains a nonblocking Follow-up; no timeout, timer or host settings are changed speculatively.
+
 ## Sources
 
 - Existing validator and tests at `5bab63233ef90260bec4a8ee0cec4f5e4431776c`: `scripts/validate.py`, `tests/test_model_currency.py`, `tests/test_validate.py`.
+- Existing repository equivalence at that pin: `scripts/host_receipts.py:547`, `normalize_repository()`, reused through a lazy import to preserve both CLI and package import paths.
+- Existing custody helper at that pin: `tests/test_provenance_digest_custody.py`, `pin_blob_digests()`. Its public-pin lookup is retained; the optimization now distinguishes modified checkout files from unchanged HEAD bytes, with a fail-first synthetic regression.
+- OmniRoute v3.8.51, commit `c1e30b7676975feb298b49eff6ff58923c04b89e`: [Codex registry](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/config/providers/registry/codex/index.ts) declares `codex`/`cx`; [Muse registry](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/config/providers/registry/muse-code/index.ts) declares `muse-code`/`mc`. Read 2026-10-16; prefix removal is a comparison convenience, not route availability evidence.
 - [python/cpython v3.13.16, Lib/unittest/case.py](https://github.com/python/cpython/blob/v3.13.16/Lib/unittest/case.py): the installed test harness and assertions.
 - [GitHub Actions job-summary protocol](https://docs.github.com/en/actions/reference/workflow-commands-for-github-actions#adding-a-job-summary), read 2026-10-16: append Markdown to the runner-provided `GITHUB_STEP_SUMMARY` file.
 - The superseded [October 7 enforcement](2026-10-07-model-currency-enforcement.md), [October 15 rollover incident](2026-10-15-model-currency-landscape-check.md), and the name-only addendum-19 item 4 citation above establish the policy change.

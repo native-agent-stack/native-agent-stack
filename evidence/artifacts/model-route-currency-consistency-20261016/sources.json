@@ -2,6 +2,7 @@
   "schema_version": 1,
   "evidence_class": "source_review",
   "read_at": "2026-10-16",
+  "primary_captures": "UPSTREAM-PINS-20261016.json",
   "custody": "Only the published excerpts/paraphrases below are retained and registered. No digest of an unretained webpage, private direction or review is published.",
   "sources": [
     {
@@ -74,6 +75,7 @@
     "mechanism": "Append Markdown to the runner-provided GITHUB_STEP_SUMMARY file; preserve existing summary text."
   },
   "limits": [
+    "UPSTREAM-SRC-openai.md, UPSTREAM-SRC-anthropic.md and UPSTREAM-SRC-meta.md retain dated primary wording independently of these findings. UPSTREAM-SRC-native-full.md retains only the public pinned identifier receipt. The co-op receives the reproducible public base-validator source copy for review packaging.",
     "Public source review, not account entitlement, effective route invocation or model comparison.",
     "Exact Full ID remains based on the published pinned native receipt; no native process ran in this change.",
     "Background-Haiku proposal changes inventory metadata only; no runtime setting or deployment was switched."

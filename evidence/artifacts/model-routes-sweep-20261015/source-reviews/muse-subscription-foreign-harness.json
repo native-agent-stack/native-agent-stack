@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "id": "source-review-muse-subscription-foreign-harness",
+  "kind": "upstream_provenance",
+  "evidence_class": "source_review",
+  "catalog": "foundation",
+  "layer_id": "model-routes",
+  "read_at": "2026-10-15",
+  "candidate_id": "muse-subscription-foreign-harness",
+  "repository": "https://dev.meta.ai/docs/models",
+  "role_identity": "https://dev.meta.ai/docs/models#route=muse-subscription-foreign-harness",
+  "carried": true,
+  "carried_verdict": "REJECTED",
+  "proposal_label": "not_adopted",
+  "model": {
+    "value": "muse-code-subscription is a route label, not an inference model id.",
+    "verification": "UNVERIFIED",
+    "gap": "F5-G-MUSE-FOREIGN",
+    "cheapest_check": "Require a vendor-supported, independently entitled route and exact model id; a successful request alone cannot close this gap.",
+    "sources": [
+      "https://dev.meta.ai/docs/models",
+      "https://dev.meta.ai/legal/terms-of-service"
+    ],
+    "read_at": "2026-10-15"
+  },
+  "route": {
+    "value": "Foreign harness reusing a Muse Code subscription credential.",
+    "verification": "UNVERIFIED",
+    "gap": "F5-G-MUSE-FOREIGN",
+    "cheapest_check": "Read current vendor route/credential support. Do not perform a model call to infer eligibility.",
+    "sources": [
+      "https://dev.meta.ai/legal/terms-of-service",
+      "https://dev.meta.ai/docs/models"
+    ],
+    "read_at": "2026-10-15"
+  },
+  "pin": {
+    "value": null,
+    "verification": "UNVERIFIED",
+    "gap": "F5-G-CLIENT",
+    "cheapest_check": "Read the named client's --version output; no invocation.",
+    "sources": [],
+    "read_at": "2026-10-15"
+  },
+  "effort": {
+    "value": "No qualified model/effort mapping.",
+    "verification": "UNVERIFIED",
+    "gap": "F5-G-MUSE-FOREIGN",
+    "cheapest_check": "Establish supported route identity first.",
+    "sources": [],
+    "read_at": "2026-10-15"
+  },
+  "tier": {
+    "value": "Coding-harness subscription credential is restricted to its coding harness (terms section 3.2).",
+    "verification": "VERIFIED",
+    "sources": [
+      "https://dev.meta.ai/legal/terms-of-service"
+    ],
+    "read_at": "2026-10-15"
+  },
+  "limits": {
+    "value": null,
+    "verification": "UNVERIFIED",
+    "gap": "F5-G-MUSE-FOREIGN",
+    "cheapest_check": "Establish supported route identity first.",
+    "sources": [],
+    "read_at": "2026-10-15"
+  },
+  "pricing": {
+    "value": "Subscription reuse does not establish an API plan.",
+    "verification": "UNVERIFIED",
+    "gap": "F5-G-MUSE-FOREIGN",
+    "cheapest_check": "Establish an independently entitled Model API route before measuring.",
+    "sources": [],
+    "read_at": "2026-10-15"
+  },
+  "adoption_status": {
+    "value": "NOT_ADOPTED",
+    "verification": "VERIFIED",
+    "sources": [
+      "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:catalogs/landscape/angles/foundation-model-routes.json"
+    ],
+    "read_at": "2026-10-15",
+    "boundary": "Verified carried classification at the base; this does not prove today's configured account, transport or usage."
+  },
+  "facts_adjudication": {
+    "author_family": "openai",
+    "canonical_facts_vote": false,
+    "summary": "Retain the carried REJECTED disposition. Public sources keep Wonder Full out of Model API and restrict coding-harness subscription credentials to their harness. This is a route/capability boundary, not a license-quality score."
+  },
+  "fit_adjudication": {
+    "role": "gpt6-refute-fit:model-routes",
+    "refuted": false,
+    "confidence": 0.86,
+    "reasoning": "The not_adopted label survives refutation: the intended subscription route is not a documented general API alternative. A separate Model API route is already represented by the Wonder/Spark candidates."
+  },
+  "formal_sweep_survivor": false,
+  "angle_status": {
+    "A1": "Partial documented capability; route/host qualification incomplete.",
+    "A2": "Route-specific engineering quality not independently established.",
+    "A3": "Route-specific community consensus not established.",
+    "A4": "Net usage not measured.",
+    "A5": "Published vendor capability/positioning only; no independent cross-route evaluation retained.",
+    "A6": "No executed comparative run."
+  },
+  "comparison_that_would_overturn": "Reopen only on new primary evidence of a supported route, or an independently entitled API route. No keyed measurement is proposed for unsupported subscription reuse.",
+  "sources": [
+    "https://dev.meta.ai/docs/models",
+    "https://dev.meta.ai/docs/muse-code/subscriptions",
+    "https://dev.meta.ai/legal/terms-of-service",
+    "https://dev.meta.ai/docs/coding-agents",
+    "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:catalogs/landscape/angles/foundation-model-routes.json",
+    "OmniRoute@sha256:c10ada7126c3a339b6c87b1371bd4d5a7a8a26ad4b2664daac2208130c4fe1be:open-sse/config/providers/registry/muse-code/index.ts:41"
+  ],
+  "limitations": [
+    "SINGLE-FAMILY (GPT), source-review initial sweep; the same Codex session authored discovery and fit, so these are not independent judgments.",
+    "Claude discovery, Claude facts refutation, Claude fit refutation and completeness critic were not run. No formal survivors, clean sweep, saturation, FINAL verdict or default change is claimed.",
+    "Only unkeyed loopback model listings and client version/help were probed. No inference, keyed API request, Muse process, credential file, environment file, OmniRoute data directory or account record was inspected.",
+    "Model/API documentation establishes advertised capabilities and prices, not current account entitlement, effective gateway effort/tier, billing or comparative quality.",
+    "Repository, wave and ledger files remain unchanged. Proposed ledger record is not append-ready: the model-routes research-state row and normal harness usage/workflow receipts do not exist.",
+    "The exact user-dispatched model/effort/tier are requested metadata; no private rollout or usage files were read to verify actual execution."
+  ]
+}

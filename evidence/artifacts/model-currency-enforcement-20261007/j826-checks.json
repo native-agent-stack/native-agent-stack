@@ -15,14 +15,14 @@
       "exit_code": 0,
       "returned_summary": "Ran 113 tests in 0.944s; OK",
       "evidence_class": "synthetic_and_local_integration",
-      "stderr_sha256": "7b5452c3cc56cdf65c2e78f03e2b0af2593c7065a3205e4cc6d85350c1def300"
+      "stderr_custody": "Unpublished command output; the returned summary above is retained without a digest."
     },
     {
       "command": "python3 -B -m unittest tests.test_mineru_user_unit",
       "exit_code": 0,
       "returned_summary": "Ran 8 tests in 0.001s; OK after the dated guard-gap clarification",
       "evidence_class": "synthetic_and_structural_validation",
-      "stderr_sha256": "698d16d7b93c4bd9707d3cfacda6fb1e0fea99ed0cda6e69bedc42772940540a"
+      "stderr_custody": "Unpublished command output; the returned summary above is retained without a digest."
     },
     {
       "command": "Offline actual-catalog policy check with today=2026-10-07 and component/decision-prefix comparisons",
@@ -56,9 +56,9 @@
   "background_ruling": {
     "evidence_class": "source_review_and_command_center_ruling",
     "ruling_at_utc": "2026-10-07T04:15:00Z",
-    "current_source_packet_sha256": "941c0061085c030d1484809a5726088fa584e83ce2b336ac9d1bf106efcd74cb",
-    "previous_source_packet_sha256": "44679fd1d26dfec36b3b57cdbde2df4290d1b068118562cb8811bf3eb7cd6941",
-    "proposal_sha256": "cc8e79beebc274671c006ef0accb9ccaa96f02843329653dcc6995b01c162975",
+    "current_source_packet_record": "model-currency-wf_5053494c-265.json (October 7 04:15Z amendment; name only)",
+    "previous_source_packet_record": "model-currency-wf_5053494c-265.json (initial October 7 refresh; name only)",
+    "proposal_record": "currency-j826b-haiku-proposal-20261007.json (private preparation; name only)",
     "model_id": "claude-haiku-4-5-20251001",
     "release_date": "2025-10-15",
     "date_basis": "Vendor public launch date; the earlier model-ID suffix identifies its snapshot.",

@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "reason": "Several carried candidates share one documentation repository URL. The v1 role schema has repository but no candidate_key. Explicit URL-fragment identity keys prevent collapsing different clients/models. Fragments are identity tags, not claimed source section anchors.",
+  "compatibility": "Owner must pass these exact repository strings to later Claude roles and validate the eventual conversion; no ledger merge or catalog normalization is performed here.",
+  "candidates": [
+    {
+      "candidate_id": "muse-code-wonder-full",
+      "repository": "https://dev.meta.ai/docs/muse-code#route=muse-code-wonder-full",
+      "primary_source": "https://dev.meta.ai/docs/muse-code",
+      "carried": true
+    },
+    {
+      "candidate_id": "muse-code-wonder-api",
+      "repository": "https://dev.meta.ai/docs/models#route=muse-code-wonder-api",
+      "primary_source": "https://dev.meta.ai/docs/models",
+      "carried": true
+    },
+    {
+      "candidate_id": "codex-wonder-api",
+      "repository": "https://dev.meta.ai/docs/models#route=codex-wonder-api",
+      "primary_source": "https://dev.meta.ai/docs/models",
+      "carried": true
+    },
+    {
+      "candidate_id": "opencode-wonder-api",
+      "repository": "https://dev.meta.ai/docs/models#route=opencode-wonder-api",
+      "primary_source": "https://dev.meta.ai/docs/models",
+      "carried": true
+    },
+    {
+      "candidate_id": "claude-code-wonder-api",
+      "repository": "https://dev.meta.ai/docs/models#route=claude-code-wonder-api",
+      "primary_source": "https://dev.meta.ai/docs/models",
+      "carried": true
+    },
+    {
+      "candidate_id": "harness-spark-api",
+      "repository": "https://dev.meta.ai/docs/models#route=harness-spark-api",
+      "primary_source": "https://dev.meta.ai/docs/models",
+      "carried": true
+    },
+    {
+      "candidate_id": "muse-subscription-foreign-harness",
+      "repository": "https://dev.meta.ai/docs/models#route=muse-subscription-foreign-harness",
+      "primary_source": "https://dev.meta.ai/docs/models",
+      "carried": true
+    },
+    {
+      "candidate_id": "codex-gpt-6-1-sol",
+      "repository": "https://developers.openai.com/codex/models#route=codex-gpt-6-1-sol",
+      "primary_source": "https://developers.openai.com/codex/models",
+      "carried": true
+    },
+    {
+      "candidate_id": "codex-gpt-6-astra",
+      "repository": "https://developers.openai.com/codex/models#route=codex-gpt-6-astra",
+      "primary_source": "https://developers.openai.com/codex/models",
+      "carried": true
+    },
+    {
+      "candidate_id": "codex-gpt-6-luna",
+      "repository": "https://developers.openai.com/codex/models#route=codex-gpt-6-luna",
+      "primary_source": "https://developers.openai.com/codex/models",
+      "carried": true
+    },
+    {
+      "candidate_id": "claude-code-claude-opus-5-5",
+      "repository": "https://code.claude.com/docs/en/model-config#route=claude-code-claude-opus-5-5",
+      "primary_source": "https://code.claude.com/docs/en/model-config",
+      "carried": true
+    },
+    {
+      "candidate_id": "claude-code-claude-sonnet-5-5",
+      "repository": "https://code.claude.com/docs/en/model-config#route=claude-code-claude-sonnet-5-5",
+      "primary_source": "https://code.claude.com/docs/en/model-config",
+      "carried": true
+    },
+    {
+      "candidate_id": "claude-code-claude-haiku-5-5",
+      "repository": "https://code.claude.com/docs/en/model-config#route=claude-code-claude-haiku-5-5",
+      "primary_source": "https://code.claude.com/docs/en/model-config",
+      "carried": true
+    },
+    {
+      "candidate_id": "openai-pool-foreign-harness",
+      "repository": "https://developers.openai.com/codex/models#route=openai-pool-foreign-harness",
+      "primary_source": "https://developers.openai.com/codex/models",
+      "carried": true
+    },
+    {
+      "candidate_id": "anthropic-api-claude-fable-5-1",
+      "repository": "https://platform.claude.com/docs/en/models/fable-5-1/overview#route=anthropic-api-claude-fable-5-1",
+      "primary_source": "https://platform.claude.com/docs/en/models/fable-5-1/overview",
+      "carried": false
+    }
+  ]
+}

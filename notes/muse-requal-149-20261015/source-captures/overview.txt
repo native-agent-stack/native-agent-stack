@@ -1,0 +1,264 @@
+Muse Code - Meta Model API
+Skip to content
+Meta Model API
+Search
+Product
+Dashboard
+Start here
+Overview
+Quickstart
+Authentication
+Models
+Pricing and rate limits
+SDKs and libraries
+Capabilities
+Tool calling
+Tool search
+Search grounding
+Image understanding
+Image generation
+Speech to text
+Video understanding
+Media segmentation
+File handling
+Reasoning
+Structured output
+Prompt caching
+Token counting
+Protocols
+Choosing an API
+Responses API
+Chat Completions API
+Messages API
+Cookbook
+All recipes
+Meta Model API
+Meta Model API
+API fundamentals
+Agent patterns
+Use cases
+Building with Muse Code
+Muse Image
+Muse Voice Transcribe
+Segment Anything Model
+Open-weight models
+Open-weight models
+Run locally
+Post-training
+Muse Code
+Overview
+Authentication and billing
+Subscriptions
+Permissions and safety
+Working with the agent
+Workflows
+Session messaging
+Rewind a conversation
+Configuration and context
+Extending and automating
+Changelog
+Open-weight models
+Overview
+Muse Spark Open
+Muse Spark Open
+Overview
+Get the model
+Prompting guide
+Recommended settings
+Run inference
+Hardware platforms
+Post-training
+Muse Glimmer
+Muse Glimmer
+Overview
+Get the model
+Prompting guide
+Quantization
+Speculative decoding
+Run inference
+Hardware platforms
+Post-training
+Agent guides
+Coding agents
+Agent frameworks
+Computer use
+SAM
+Overview
+Segmenting with prompts
+Reading segmentation output
+Client libraries
+API reference
+Introduction
+Error handling
+Responses
+Responses
+Overview
+Create a response
+Retrieve a response
+Delete a response
+Cancel a response
+Count input tokens
+Schemas
+Chat completions
+Chat completions
+Overview
+Create a chat completion
+Schemas
+Messages
+Messages
+Overview
+Create a message
+Count tokens
+Schemas
+Files
+Files
+Overview
+Upload a file
+List files
+Retrieve a file
+Retrieve file content
+Delete a file
+Schemas
+Images
+Images
+Overview
+Generate an image
+Edit an image
+Schemas
+Voice
+Voice
+Overview
+Transcribe a recording
+Transcribe in realtime
+Schemas
+Models
+Models
+Overview
+List models
+Retrieve a model
+Schemas
+Status
+Help
+Help Center
+Muse Code
+Table of contents
+Muse Code is Meta's coding agent for the terminal and CI, built for
+Muse Spark
+. Run it in a project and it plans, edits, and runs commands to do a task, with approvals and an OS sandbox on from the first run.
+Muse Code and the
+Model API
+are two ways to use the same model. Call the API directly when you build your own agent or app. Run Muse Code when you want a ready-made coding agent at the command line or in a pipeline.
+Workflows
+coordinate parallel and staged agent work when the installed build includes the workflow engine and the rollout is enabled. They are not available on every build or platform.
+Session messaging
+lets independent live sessions exchange handoffs, review requests, and status updates.
+Install
+Install Muse Code with the one-line installer. It puts a native
+muse
+binary on your path.
+macOS and Linux
+macOS and Linux
+Windows
+Windows
+←
+→
+to navigate
+bash
+curl -fsSL https://dev.meta.ai/install.sh
+|
+sh
+powershell
+irm https://dev.meta.ai/install.ps1 | iex
+Confirm it's on your path:
+bash
+muse --version
+First run
+Run
+muse
+in any project directory to start an interactive session. On first entry Muse Code asks whether to
+trust the workspace
+(which loads its skills, rules, and hooks) and prompts you to authenticate with a browser sign-in or an API key. The default model is
+muse-spark-1.2
+.
+bash
+cd /path/to/your/project
+muse
+Reopen the sign-in options any time from an interactive session with
+/login
+. For a non-interactive environment such as
+CI
+, set
+META_API_KEY
+instead. See
+authentication and billing
+for the full sign-in and billing setup flows.
+Interactive or headless
+The same binary runs two ways:
+Interactive
+:
+muse
+opens a terminal UI for a back-and-forth session with slash commands, approvals, and live status. See
+working with the agent
+.
+Headless
+:
+muse exec "<prompt>"
+runs one prompt to completion for scripts and CI. See
+headless and CI
+.
+Platform support
+Muse Code runs on macOS, Linux, and Windows from one codebase. A few capabilities work differently on Windows:
+PowerShell replaces Bash.
+Agent-run commands use PowerShell syntax and Windows command-line tools.
+The sandbox may prompt for administrator approval.
+Windows can show a User Account Control (UAC) prompt the first time the
+sandbox
+initializes. Normal use does not require running as administrator.
+Voice input is unavailable
+on Windows. See
+voice input
+.
+Session messaging is unavailable
+on Windows. It is supported on macOS and Linux. See
+session messaging
+.
+Drive it from your own program
+Beyond the CLI, you can drive a Muse Code session from your own program over a stable, versioned session protocol.
+muse serve
+runs the protocol, and
+muse schema
+prints its JSON schema. The TypeScript SDK wraps the protocol: install it with
+npm install @muse-code/sdk
+. A quickstart, cookbook recipes, and a generated API reference are in
+the Muse Code SDK docs
+(opens in new tab)
+.
+What to read next
+Authentication and billing
+: sign in, API keys, and plans.
+Permissions and safety
+: approval modes, staged shell review, and the sandbox.
+Working with the agent
+: slash commands to steer a session, manage context, set goals, and more.
+Rewind a conversation
+: branch from an earlier message while preserving the original session and workspace files.
+Workflows
+: check availability, coordinate parallel and staged agent work, monitor runs, and save repeatable workflows.
+Session messaging
+: send handoffs, review requests, and status updates between live local sessions.
+Configuration and context
+: settings, project instructions, model selection, and memory.
+Extending and automating
+: subagents, skills, hooks, MCP, and headless runs.
+Next steps
+Sign in and set up billing in
+authentication and billing
+.
+Understand the guardrails before your first real task in
+permissions and safety
+.
+On this page
+Please confirm your identity
+For added security, you need to confirm your identity. You will be taken to your single sign-on provider, where you can enter your password.
+Cancel
+Continue

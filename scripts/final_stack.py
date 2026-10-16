@@ -102,11 +102,13 @@ MEASURED_EVIDENCE = (("evidence_class", "measured_comparison"), ("evidence_kind"
 
 # Run-pin sources, highest precedence first. A component is the normalized repository (or, without one, its id).
 LOCKFILE = "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock"
+LOCKFILE_SOURCES = "catalogs/landscape/lockfile-source-identities.json"
 PIN_FILES = (("linux-x86_64", "adoption/pins-linux-x86_64.json"), ("macos-arm64", "adoption/pins-macos-arm64.json"))
 STACK = component_matrix.STACK_FILE
 RUNTIME_TARGET = "catalogs/us-equities/runtime-target.json"
 RUNTIME_ENGINE_POINTER = "/engine"
-RUN_PIN_SOURCES_TEXT = (f"the allowlisted lockfile {LOCKFILE} (its root package's direct requirements), "
+RUN_PIN_SOURCES_TEXT = (f"the allowlisted lockfile {LOCKFILE} (its root package's direct requirements, with exact "
+                        + f"version/artifact source identities from {LOCKFILE_SOURCES}), "
                         + ", ".join(path for _platform, path in PIN_FILES)
                         + f" tools[].version, {STACK} version/source_pin and {RUNTIME_TARGET}#{RUNTIME_ENGINE_POINTER}")
 # The lockfile records no repository. A requirement whose name is a manifests/stack.json id takes that component's
@@ -153,6 +155,10 @@ DEFINITIONS = (
      "When the chosen source supplies a nonempty noncommit source pin, source_pin retains its original text. "
      "source_pin_kind is sha256 for a 64-hex artifact digest and tag for other retained values. A 40-hex Git "
      "source pin is merged into pin_parsed.commit instead. No missing source pin is invented."),
+    ("runs[].source",
+     "The pointer to the record supplying the complete run pin. For an exact lock-source supplement match, "
+     "this points into " + LOCKFILE_SOURCES + " bindings; that binding's source points back to the unchanged "
+     "lock entry whose version and complete artifact hash set were matched. The lock itself records no Git commit."),
     ("winners[].run",
      "The runs[] id whose repository is the winner's (a run without a repository joins only by the same id), or "
      "null with run_reason held (the layer's current_adoption_status is held), external (scripts/final_stack.py "
@@ -375,6 +381,18 @@ def run_records(sources: Sources) -> list[dict]:
     records = []
 
     lock = sources.toml(LOCKFILE)
+    bindings = {}
+    if sources.path(LOCKFILE_SOURCES).exists():
+        supplement = sources.json(LOCKFILE_SOURCES)
+        if (not isinstance(supplement, dict) or supplement.get("schema_version") != 1
+                or supplement.get("lockfile") != LOCKFILE or not isinstance(supplement.get("bindings"), list)):
+            raise FinalStackError(f"{LOCKFILE_SOURCES}: unknown schema or lockfile")
+        for binding_index, binding in enumerate(supplement["bindings"]):
+            if not isinstance(binding, dict) or not isinstance(binding.get("source"), str):
+                raise FinalStackError(f"{LOCKFILE_SOURCES}: binding requires a source pointer")
+            if binding["source"] in bindings:
+                raise FinalStackError(f"{LOCKFILE_SOURCES}: duplicate source identity")
+            bindings[binding["source"]] = (binding_index, binding)
     packages = _dicts(lock.get("package"))
     # uv 0.12.17 (635500036e1705961315e86447f0fab0a8ddb309),
     # crates/uv-lock/src/lock/mod.rs:3600-3607: editable/virtual roots have the empty
@@ -393,8 +411,25 @@ def run_records(sources: Sources) -> list[dict]:
             raise FinalStackError(f"{LOCKFILE}: {len(matches)} package entries for requirement {name}")
         index, package = matches[0]
         repository = stack_repository.get(name) or host_receipts.normalize_repository(LOCKFILE_REPOSITORIES.get(name))
-        records.append({"rank": 0, "id": name, "repository": repository, "pin": package.get("version"),
-                        "parsed": record_pin(package.get("version")), "source": f"{LOCKFILE}#/package/{index}",
+        source = f"{LOCKFILE}#/package/{index}"
+        pin = package.get("version")
+        parsed = record_pin(pin)
+        if source in bindings:
+            binding_index, binding = bindings[source]
+            artifacts = sorted({artifact["hash"] for artifact in
+                                [package.get("sdist", {}), *package.get("wheels", [])] if artifact.get("hash")})
+            if (binding.get("package") == name and binding.get("version") == pin
+                    and artifacts and binding.get("artifact_sha256") == artifacts
+                    and repository is not None
+                    and host_receipts.normalize_repository(binding.get("repository")) == repository
+                    and isinstance(binding.get("commit"), str) and COMMIT_PATTERN.fullmatch(binding["commit"])):
+                parsed = record_pin(pin, binding["commit"])
+                pin = f"{pin}; source {binding['commit']}"
+                source = f"{LOCKFILE_SOURCES}#/bindings/{binding_index}"
+            else:
+                parsed = {"pin_parse": "unparsed"}
+        records.append({"rank": 0, "id": name, "repository": repository, "pin": pin,
+                        "parsed": parsed, "source": source,
                         "platform": None})
 
     for platform_order, (platform, relative) in enumerate(PIN_FILES):

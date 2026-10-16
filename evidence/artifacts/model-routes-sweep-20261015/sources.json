@@ -1,0 +1,248 @@
+{
+  "schema_version": 1,
+  "read_at": "2026-10-15",
+  "sources": [
+    {
+      "id": "anthModels",
+      "url": "https://platform.claude.com/docs/en/about-claude/models/overview",
+      "read_at": "2026-10-15",
+      "evidence_class": "source_review",
+      "pin": "Dated live vendor documentation; no immutable page revision claimed"
+    },
+    {
+      "id": "anthPricing",
+      "url": "https://platform.claude.com/docs/en/about-claude/pricing",
+      "read_at": "2026-10-15",
+      "evidence_class": "source_review",
+      "pin": "Dated live vendor documentation; no immutable page revision claimed"
+    },
+    {
+      "id": "anthRelease",
+      "url": "https://platform.claude.com/docs/en/release-notes/overview",
+      "read_at": "2026-10-15",
+      "evidence_class": "source_review",
+      "pin": "Dated live vendor documentation; no immutable page revision claimed"
+    },
+    {
+      "id": "anthEffort",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/effort",
+      "read_at": "2026-10-15",
+      "evidence_class": "source_review",
+      "pin": "Dated live vendor documentation; no immutable page revision claimed"
+    },
+    {
+      "id": "anthMessages",
+      "url": "https://platform.claude.com/docs/en/api/messages",
+      "read_at": "2026-10-15",
+      "evidence_class": "source_review",
+      "pin": "Dated live vendor documentation; no immutable page revision claimed"
+    },
+    {
+      "id": "opus",
+      "url": "https://platform.claude.com/docs/en/models/opus-5-5/overview",
+      "read_at": "2026-10-15",
+      "evidence_class": "source_review",
+      "pin": "Dated live vendor documentation; no immutable page revision claimed"
+    },
+    {
+      "id": "sonnet",
+      "url": "https://platform.claude.com/docs/en/models/sonnet-5-5/overview",
+      "read_at": "2026-10-15",
+      "evidence_class": "source_review",
+      "pin": "Dated live vendor documentation; no immutable page revision claimed"
+    },
+    {
+      "id": "haiku",
+      "url": "https://platform.claude.com/docs/en/models/haiku-5-5/overview",
+      "read_at": "2026-10-15",
+      "evidence_class": "source_review",
+      "pin": "Dated live vendor documentation; no immutable page revision claimed"
+    },
+    {
+      "id": "fable",
+      "url": "https://platform.claude.com/docs/en/models/fable-5-1/overview",
+      "read_at": "2026-10-15",
+      "evidence_class": "source_review",
+      "pin": "Dated live vendor documentation; no immutable page revision claimed"
+    },
+    {
+      "id": "codex",
+      "url": "https://developers.openai.com/codex/models",
+      "read_at": "2026-10-15",
+      "evidence_class": "source_review",
+      "pin": "Dated live vendor documentation; no immutable page revision claimed"
+    },
+    {
+      "id": "astra",
+      "url": "https://developers.openai.com/api/docs/models/gpt-6-astra",
+      "read_at": "2026-10-15",
+      "evidence_class": "source_review",
+      "pin": "Dated live vendor documentation; no immutable page revision claimed"
+    },
+    {
+      "id": "sol",
+      "url": "https://developers.openai.com/api/docs/models/gpt-6.1-sol",
+      "read_at": "2026-10-15",
+      "evidence_class": "source_review",
+      "pin": "Dated live vendor documentation; no immutable page revision claimed"
+    },
+    {
+      "id": "luna",
+      "url": "https://developers.openai.com/api/docs/models/gpt-6-luna",
+      "read_at": "2026-10-15",
+      "evidence_class": "source_review",
+      "pin": "Dated live vendor documentation; no immutable page revision claimed"
+    },
+    {
+      "id": "config",
+      "url": "https://developers.openai.com/codex/config-reference",
+      "read_at": "2026-10-15",
+      "evidence_class": "source_review",
+      "pin": "Dated live vendor documentation; no immutable page revision claimed"
+    },
+    {
+      "id": "gateway",
+      "url": "https://developers.openai.com/codex/enterprise/sign-in-with-chatgpt-through-a-gateway",
+      "read_at": "2026-10-15",
+      "evidence_class": "source_review",
+      "pin": "Dated live vendor documentation; no immutable page revision claimed"
+    },
+    {
+      "id": "metaModels",
+      "url": "https://dev.meta.ai/docs/models",
+      "read_at": "2026-10-15",
+      "evidence_class": "source_review",
+      "pin": "Dated live vendor documentation; no immutable page revision claimed"
+    },
+    {
+      "id": "metaCode",
+      "url": "https://dev.meta.ai/docs/muse-code",
+      "read_at": "2026-10-15",
+      "evidence_class": "source_review",
+      "pin": "Dated live vendor documentation; no immutable page revision claimed"
+    },
+    {
+      "id": "metaConfig",
+      "url": "https://dev.meta.ai/docs/muse-code/configuration",
+      "read_at": "2026-10-15",
+      "evidence_class": "source_review",
+      "pin": "Dated live vendor documentation; no immutable page revision claimed"
+    },
+    {
+      "id": "metaAgents",
+      "url": "https://dev.meta.ai/docs/coding-agents",
+      "read_at": "2026-10-15",
+      "evidence_class": "source_review",
+      "pin": "Dated live vendor documentation; no immutable page revision claimed"
+    },
+    {
+      "id": "metaPricing",
+      "url": "https://dev.meta.ai/docs/pricing-rate-limits",
+      "read_at": "2026-10-15",
+      "evidence_class": "source_review",
+      "pin": "Dated live vendor documentation; no immutable page revision claimed"
+    },
+    {
+      "id": "metaSubscriptions",
+      "url": "https://dev.meta.ai/docs/muse-code/subscriptions",
+      "read_at": "2026-10-15",
+      "evidence_class": "source_review",
+      "pin": "Dated live vendor documentation; no immutable page revision claimed"
+    },
+    {
+      "id": "metaReasoning",
+      "url": "https://dev.meta.ai/docs/reasoning",
+      "read_at": "2026-10-15",
+      "evidence_class": "source_review",
+      "pin": "Dated live vendor documentation; no immutable page revision claimed"
+    },
+    {
+      "id": "metaTerms",
+      "url": "https://dev.meta.ai/legal/terms-of-service",
+      "read_at": "2026-10-15",
+      "evidence_class": "source_review",
+      "pin": "Dated live vendor documentation; no immutable page revision claimed"
+    },
+    {
+      "id": "omniRelease",
+      "url": "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.51",
+      "read_at": "2026-10-15",
+      "evidence_class": "source_review",
+      "pin": "v3.8.51 / c1e30b7676975feb298b49eff6ff58923c04b89e"
+    },
+    {
+      "id": "omniChangelog",
+      "url": "https://raw.githubusercontent.com/diegosouzapw/OmniRoute/v3.8.51/CHANGELOG.md",
+      "read_at": "2026-10-15",
+      "evidence_class": "source_review",
+      "pin": "v3.8.51 / c1e30b7676975feb298b49eff6ff58923c04b89e"
+    }
+  ],
+  "installed_skill": {
+    "repository": "https://github.com/anthropics/skills",
+    "pin": "dbd4588f9e1033efb41dad4bef2f7947c8993d44",
+    "root": "~/.claude/plugins/marketplaces/anthropic-agent-skills/skills/claude-api",
+    "files": [
+      {
+        "path": "SKILL.md",
+        "sha256": "40537cca17c4aa86e4ce83ced39efcbfb1204905e3cf4c4ff98f2eab011e4b7f"
+      },
+      {
+        "path": "shared/models.md",
+        "sha256": "c1af1f093d46fd58e50ef3e8e28d339650f333059bfc49a63d01d0175675161b"
+      }
+    ],
+    "sections": [
+      "SKILL.md model/pricing table lines 180-225 and live-capability caveat",
+      "shared/models.md exact model IDs and model/API migration caveats"
+    ],
+    "boundary": "Cached skill references were checked against fetched vendor pages; the skill's keyed Models API suggestion was not executed."
+  },
+  "failed_lookups": [
+    {
+      "url": "https://raw.githubusercontent.com/diegosouzapw/OmniRoute/2a41147b7/CHANGELOG.md",
+      "result": "404; resolved release notes through the actual v3.8.51 tag, not the local build label."
+    },
+    {
+      "url": "https://api.github.com/repos/diegosouzapw/OmniRoute/commits/2a41147b7",
+      "result": "422; deployed source lineage stays open."
+    },
+    {
+      "url": "https://dev.meta.ai/docs/openai-compatibility",
+      "result": "404; used documented /docs/coding-agents."
+    },
+    {
+      "url": "https://dev.meta.ai/legal/model-api-terms",
+      "result": "404; used /legal/terms-of-service."
+    },
+    {
+      "url": "https://platform.claude.com/docs/en/api/messages",
+      "result": "Context-mode fetch succeeded; later direct urllib follow-up returned 403. Tier details were not established and stay UNVERIFIED."
+    }
+  ],
+  "call_accounting": {
+    "web_search": 1,
+    "web_fetch_completed_attempts_lower_bound": 34,
+    "gh_api_research_calls": 5,
+    "uncertain_attempts": "One six-URL fetch was started without awaiting completion, so its completion/cache state is unretained; do not infer zero usage.",
+    "boundary": "These are session source-review counts, not an executed landscape worker budget or model-token receipt."
+  },
+  "source_disagreements": [
+    {
+      "topic": "Sonnet 5.5 cache-read price",
+      "installed_skill_usd_per_million": 0.2,
+      "live_pricing_multiplier": 0.05,
+      "live_base_input_usd_per_million": 2,
+      "derived_live_price": 0.1,
+      "verdict": "UNVERIFIED: reconciliation required; neither inference usage nor billing measured.",
+      "gap": "F5-G-SONNET-CACHE"
+    },
+    {
+      "topic": "Spark output ceiling",
+      "vendor_opencode_config": 131072,
+      "gateway_listing": 65536,
+      "verdict": "Different source surfaces; actual acceptance remains UNVERIFIED.",
+      "gap": "F5-G-LIMITS"
+    }
+  ]
+}

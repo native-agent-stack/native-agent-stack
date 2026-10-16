@@ -1,4 +1,5 @@
 """Model-free OS boundary regressions; no real credential or network request."""
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -11,7 +12,7 @@ import unittest
 from unittest import mock
 
 from tools.muse_file_fence import (Fence, sanitized_settings, clean_env, native_argv,
-                                  probe, main, DEFAULT_LANE, VERSION)
+                                  probe, main, DEFAULT_LANE, DEFAULT_RUNTIME)
 
 
 class MuseFenceTests(unittest.TestCase):
@@ -176,7 +177,7 @@ print(json.dumps(out))
         runtime.write_text('''#!/usr/bin/python3
 import sys
 if '--version' in sys.argv:
- print('Muse Code synthetic (1.4.7-R6101.1)')
+ print('Muse Code synthetic (1.4.9-R6297.1)')
 else:
  print('{"payload_type":"run.terminal.completed"}')
 ''')
@@ -189,6 +190,7 @@ else:
                 str(self.work), str(self.brief), str(logs)]
         plan = [str(runtime), 'exec', '--model', 'synthetic', '--reasoning-effort', 'max']
         with mock.patch('pathlib.Path.home', return_value=home), \
+                mock.patch('tools.muse_file_fence.RUNTIME_SHA256', hashlib.sha256(runtime.read_bytes()).hexdigest()), \
                 mock.patch('sys.argv', argv), \
                 mock.patch('tools.muse_file_fence.native_argv', return_value=plan):
             self.assertEqual(main(), 0)
@@ -335,7 +337,7 @@ Path({str(self.work / 'ordinary-write')!r}).write_text('allowed')
 import json, sys
 from pathlib import Path
 if '--version' in sys.argv:
- print('Muse Code synthetic (1.4.7-R6101.1)'); raise SystemExit(0)
+ print('Muse Code synthetic (1.4.9-R6297.1)'); raise SystemExit(0)
 echo = '--provider' in sys.argv
 if echo == ''' + repr(phase == 'probe') + ''':
  for name, target in ''' + repr([
@@ -374,6 +376,7 @@ print(json.dumps({'payload_type':'run.terminal.completed'}))
                 str(self.work), str(self.brief), str(logs)]
         plan = [str(runtime), 'exec', '--model', 'synthetic', '--reasoning-effort', 'max']
         with mock.patch('sys.argv', argv), \
+                mock.patch('tools.muse_file_fence.RUNTIME_SHA256', hashlib.sha256(runtime.read_bytes()).hexdigest()), \
                 mock.patch('tools.muse_file_fence.native_argv', return_value=plan):
             self.assertEqual(main(), 0)
         self.assertEqual(preserved.read_bytes(), b'public synthetic preserved fixture\n')
@@ -417,7 +420,7 @@ for path in [root / '.git/config', root / '.git/fence-test-marker']:
 import json, sys
 from pathlib import Path
 if '--version' in sys.argv:
- print('Muse Code synthetic (1.4.7-R6101.1)'); raise SystemExit(0)
+ print('Muse Code synthetic (1.4.9-R6297.1)'); raise SystemExit(0)
 print(json.dumps({'payload_type':'run.terminal.completed'}))
 ''')
         runtime.chmod(0o700)
@@ -449,7 +452,7 @@ print(json.dumps({'payload_type':'run.terminal.completed'}))
         runtime.write_text('''#!/usr/bin/python3
 import sys
 if '--version' in sys.argv:
- print('Muse Code synthetic (1.4.7-R6101.1)')
+ print('Muse Code synthetic (1.4.9-R6297.1)')
 else:
  print('{"payload_type":"run.terminal.completed"}')
 ''')
@@ -503,7 +506,7 @@ else:
 import sys, time
 from pathlib import Path
 if '--version' in sys.argv:
- print('Muse Code synthetic (1.4.7-R6101.1)'); raise SystemExit(0)
+ print('Muse Code synthetic (1.4.9-R6297.1)'); raise SystemExit(0)
 if '--provider' in sys.argv:
  print('{"payload_type":"run.terminal.completed"}'); raise SystemExit(0)
 for i in range(300):
@@ -512,11 +515,15 @@ for i in range(300):
 ''')
         runtime.chmod(0o700)
         logs = self.root / 'lifetime-logs'
-        cli = Path(__file__).resolve().parents[1] / 'tools/muse_file_fence.py'
+        # This synthetic lifetime control supplies its fixture's trusted pin
+        # in the test process; the production CLI has no pin override option.
+        fixture_sha = hashlib.sha256(runtime.read_bytes()).hexdigest()
+        cli = ('from tools import muse_file_fence as m; '
+               + 'm.RUNTIME_SHA256 = ' + repr(fixture_sha) + '; raise SystemExit(m.main())')
         child_fds = []
         with (self.root / 'lifetime.stdout').open('w') as out, \
                 (self.root / 'lifetime.stderr').open('w') as err:
-            launcher = subprocess.Popen(['python3', '-B', str(cli), '--lane', str(DEFAULT_LANE),
+            launcher = subprocess.Popen(['python3', '-B', '-c', cli, '--lane', str(DEFAULT_LANE),
                 '--runtime', str(runtime), '--auth', str(self.auth), '--settings', str(self.settings),
                 '--timeout', '30', str(self.work), str(self.brief), str(logs)],
                 stdout=out, stderr=err, start_new_session=True)
@@ -551,7 +558,7 @@ for i in range(300):
     @unittest.skipUnless(os.environ.get('MUSE_FENCE_NATIVE_PROBE') == '1',
                          'explicit installed-client model-free integration')
     def test_native_echo_cannot_start_extensions(self):
-        runtime = Path.home() / f'.local/bin/muse-bin-{VERSION}'
+        runtime = DEFAULT_RUNTIME
         def hooks(marker):
             return {'SessionStart': [{'hooks': [{'type': 'command', 'command':
                 '/usr/bin/touch ' + str(self.logs / marker)}]}]}

@@ -7,12 +7,14 @@ model/package age and landscape-review record; it does not set runtime defaults.
 
 The model inventory is [model-currency.json](../catalogs/foundation/model-currency.json),
 with its [schema](../catalogs/foundation/model-currency.schema.json). The current
-partial inventory declares 21 artifact/model-consumer rows and seven package
+partial inventory declares 26 artifact/model-consumer rows and seven package
 snapshots, and remains `pending`. The [dated fill provenance](../evidence/artifacts/model-currency-enforcement-20261007/fill-source-review.json)
 records eight unresolved groups and the sources for each date and exact revision.
 This is not evidence that every installed or shipped model has been inventoried
 or is current. The command center owns the ruled selections and any model switch.
-This automation proposes reviews; it neither installs nor selects a model.
+This automation proposes reviews; it neither installs nor selects a model. The
+[October 16 extension](decisions/2026-10-16-model-route-currency-consistency.md)
+adds five held route identities and records a held background-Haiku refresh proposal.
 
 Each model row records its role, consumer, model identifier, exact revision,
 release date and primary URL, check date and `in_use`, `held` or `package_bound`
@@ -44,18 +46,27 @@ python3 scripts/validate.py
 python3 scripts/validate.py --today 2026-10-07
 ```
 
-A release more than 42 days old fails unless the model's `landscape_check` is
-at most seven days old. A check records primary sources, the newer candidates
+A release more than 42 days old is due for maintenance when its `landscape_check`
+is missing or more than seven days old. Publication returns exit 0 for this age
+condition and retains it in `model_currency_notices` and the CI step summary.
+The daily collector persists `models_past_window` in its due file, which supplies
+the session-start notice. A check records primary sources, the newer candidates
 considered, each rejection reason, the overall hold reason and the model's
 overturn trigger. An empty candidate list needs a sourced explanation that no
 newer qualifying candidate was found. Exactly 42 days and exactly seven days
-remain valid; future or malformed dates and missing source URLs fail.
+remain inside the maintenance windows; future or malformed dates, malformed
+records and invalid or missing source URLs still fail publication validation.
+
+An unreadable or structurally invalid inventory is a `model inventory unreadable`
+coverage gap in the daily collector. It preserves any previous due file and does
+not claim that nothing is due. The timer's existing model-currency proposal step
+continues to produce refresh requests before the collector writes the notice.
 
 A `package_bound` model joins `package.id` and `package.version` to a package
 row's `id` and `latest_version`. The shipping package's release date supplies
 the effective age. The weight identity, original release date and source remain
-recorded, even if old. An old shipping package still needs the same seven-day
-landscape exception. A declared latest package is a recorded claim, not proof
+recorded, even if old. An old shipping package becomes due under the same seven-day
+landscape-review window. A declared latest package is a recorded claim, not proof
 of upstream currency: the daily check separately compares the primary source.
 Every model retains its origin `release_line`, including package-bound rows.
 Hub origins require an exact 40-character SHA regardless of the effective age.
@@ -107,9 +118,10 @@ still need the lane's release, security and integrity gates, including cooldown.
 
 The two-day advance refresh is included. The collector opens `refresh_landscape`
 on day five after every declared landscape check, including before its model
-crosses the 42-day bar. Days six and seven remain valid; an older release fails
-on day eight. Missing checks on an older release also propose a refresh. These are review requests; they do
-not renew the check date or hide an expired exception.
+crosses the 42-day bar. Days six and seven remain inside the review window; an
+older release produces an age-due notice on day eight. Missing checks on an older
+release also propose a refresh. These review requests retain the original check
+date and keep an expired review visible.
 
 Dated JSON and Markdown proposals are appended under
 `$XDG_STATE_HOME/native-agent-stack/model-currency`, or the native per-user state

@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "status": "follow_up",
+  "id": "active-model-host-coverage",
+  "evidence_class": "local_integration",
+  "read_at": "2026-10-16",
+  "source_receipt": "stack-currency-timer-receipt-20261016.md",
+  "custody": "Receipt read in place; named only. No private source text, digest, account field or configuration value is retained.",
+  "observed": {
+    "persisted_active_models": "unknown",
+    "known_stale_selector_count": 0,
+    "versioned_catalog_check": "passed under both lane and timer interpreters",
+    "timer_interpreter": "3.14.4",
+    "service_result": "success",
+    "service_main_seconds": 36.097,
+    "active_check_timeout_seconds": 30
+  },
+  "source_findings": [
+    "The deployed checker matches its committed source and the versioned comparison catalog is accepted at the receipt's run time.",
+    "currency_due.collect replaces check exceptions with a generic unknown report; aggregate retains the coverage state but not the underlying error detail.",
+    "The receipt therefore does not establish whether the unknown came from a timeout, invalid output or host-source coverage."
+  ],
+  "hypothesis": {
+    "name": "active-check timeout",
+    "status": "unproven",
+    "basis": "The service main duration is compatible with the 30-second check budget plus other checks; duration alone is not a reproduction."
+  },
+  "scope_boundary": "No full --host rerun: that scanner traverses private configuration/tool roots and another repository outside this lane's read constraints. No timer rerun, timeout change or credential access was performed.",
+  "next_evidence": "The host checker owner retains only the failure category, check duration and sanitized report status/error classification from the existing authorized run path. Then reproduce the specific failure at that boundary.",
+  "blocking": false
+}

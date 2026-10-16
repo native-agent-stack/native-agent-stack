@@ -1,0 +1,257 @@
+{
+  "schema_version": 1,
+  "proposal_only": true,
+  "append_ready": false,
+  "owners_review_gates": [
+    "Missing Claude family discovery/facts/fit and completeness critic.",
+    "Absent canonical research-state requirement row; proposed hash is explicit but not registered.",
+    "Closed-vendor route identity adaptation and ordinary role-budget deviation require review.",
+    "workflow_run and executed prompts/child-usage evidence unavailable; usage.json is not a substitute.",
+    "No protected catalog/ledger changes are included."
+  ],
+  "proposed_record": {
+    "sweep_id": "model-routes-initial-gpt-20261015",
+    "date": "2026-10-15",
+    "workflow_run": null,
+    "status": "stopped",
+    "manifest_ref": "evidence/artifacts/model-routes-sweep-20261015/sweep-manifest.json",
+    "manifest_sha256": "cee95876c0a2efcd052a889e4d8b19709e576bce68328c1abd81f50bcde2d5e4",
+    "lane": "model-routes-initial-gpt-20261015",
+    "prompts_sha256": null,
+    "usage_ref": "evidence/artifacts/model-routes-sweep-20261015/usage.json",
+    "usage_sha256": "e1c52d0adcb3c661808cc832dd9c0a962a97b2a88edecb65cd8746c1a19ec15a",
+    "lower_bound_usage": true,
+    "returns_ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json",
+    "returns_sha256": "0dbb9ffed73c2534877e7b405ab0df0be9b03941328cb47a30afd51071ee37d4",
+    "record_ref": "evidence/artifacts/model-routes-sweep-20261015/PROTOCOL.md",
+    "prev_sha256": "ec575b95c05587504ff5da7b298cece2f28ef97a159141b92f5a5db82997f886",
+    "layers": [
+      {
+        "catalog": "foundation",
+        "layer_id": "model-routes",
+        "requirement_sha256": "c3ffea932766854386890f23c1c1c982071264ef05a4b04398d1ea2e2c728766",
+        "platform_profiles_sha256": "cc6f4bef036223ea12a4fb637945a43c9de3a7dec1a55c0b4acf2be8303b76ba",
+        "votes": "retained",
+        "votes_note": "Required Anthropic facts and fit votes are missing. Fourteen proposals have no returned refuting vote but are refuted by absence; the foreign OpenAI comparison additionally has a GPT uncertainty refutation. The retained not_adopted Muse subscription label does not admit that route.",
+        "discovery_ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json#/discovery/model-routes",
+        "calls": {
+          "web_search": 1,
+          "web_fetch": 34,
+          "gh_api": 5
+        },
+        "proposed": [
+          "https://dev.meta.ai/docs/muse-code#route=muse-code-wonder-full",
+          "https://dev.meta.ai/docs/models#route=muse-code-wonder-api",
+          "https://dev.meta.ai/docs/models#route=codex-wonder-api",
+          "https://dev.meta.ai/docs/models#route=opencode-wonder-api",
+          "https://dev.meta.ai/docs/models#route=claude-code-wonder-api",
+          "https://dev.meta.ai/docs/models#route=harness-spark-api",
+          "https://dev.meta.ai/docs/models#route=muse-subscription-foreign-harness",
+          "https://developers.openai.com/codex/models#route=codex-gpt-6-1-sol",
+          "https://developers.openai.com/codex/models#route=codex-gpt-6-astra",
+          "https://developers.openai.com/codex/models#route=codex-gpt-6-luna",
+          "https://code.claude.com/docs/en/model-config#route=claude-code-claude-opus-5-5",
+          "https://code.claude.com/docs/en/model-config#route=claude-code-claude-sonnet-5-5",
+          "https://code.claude.com/docs/en/model-config#route=claude-code-claude-haiku-5-5",
+          "https://developers.openai.com/codex/models#route=openai-pool-foreign-harness",
+          "https://platform.claude.com/docs/en/models/fable-5-1/overview#route=anthropic-api-claude-fable-5-1"
+        ],
+        "known": [
+          "https://dev.meta.ai/docs/muse-code#route=muse-code-wonder-full",
+          "https://dev.meta.ai/docs/models#route=muse-code-wonder-api",
+          "https://dev.meta.ai/docs/models#route=codex-wonder-api",
+          "https://dev.meta.ai/docs/models#route=opencode-wonder-api",
+          "https://dev.meta.ai/docs/models#route=claude-code-wonder-api",
+          "https://dev.meta.ai/docs/models#route=harness-spark-api",
+          "https://dev.meta.ai/docs/models#route=muse-subscription-foreign-harness",
+          "https://developers.openai.com/codex/models#route=codex-gpt-6-1-sol",
+          "https://developers.openai.com/codex/models#route=codex-gpt-6-astra",
+          "https://developers.openai.com/codex/models#route=codex-gpt-6-luna",
+          "https://code.claude.com/docs/en/model-config#route=claude-code-claude-opus-5-5",
+          "https://code.claude.com/docs/en/model-config#route=claude-code-claude-sonnet-5-5",
+          "https://code.claude.com/docs/en/model-config#route=claude-code-claude-haiku-5-5",
+          "https://developers.openai.com/codex/models#route=openai-pool-foreign-harness"
+        ],
+        "new": [
+          "https://platform.claude.com/docs/en/models/fable-5-1/overview#route=anthropic-api-claude-fable-5-1"
+        ],
+        "survived": [],
+        "refuted": [
+          {
+            "repo": "https://dev.meta.ai/docs/muse-code#route=muse-code-wonder-full",
+            "facts": {
+              "vote": "refuted",
+              "ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json#/votes/model-routes/0/facts"
+            },
+            "fit": {
+              "vote": "refuted",
+              "ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json#/votes/model-routes/0/fit"
+            }
+          },
+          {
+            "repo": "https://dev.meta.ai/docs/models#route=muse-code-wonder-api",
+            "facts": {
+              "vote": "refuted",
+              "ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json#/votes/model-routes/1/facts"
+            },
+            "fit": {
+              "vote": "refuted",
+              "ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json#/votes/model-routes/1/fit"
+            }
+          },
+          {
+            "repo": "https://dev.meta.ai/docs/models#route=codex-wonder-api",
+            "facts": {
+              "vote": "refuted",
+              "ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json#/votes/model-routes/2/facts"
+            },
+            "fit": {
+              "vote": "refuted",
+              "ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json#/votes/model-routes/2/fit"
+            }
+          },
+          {
+            "repo": "https://dev.meta.ai/docs/models#route=opencode-wonder-api",
+            "facts": {
+              "vote": "refuted",
+              "ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json#/votes/model-routes/3/facts"
+            },
+            "fit": {
+              "vote": "refuted",
+              "ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json#/votes/model-routes/3/fit"
+            }
+          },
+          {
+            "repo": "https://dev.meta.ai/docs/models#route=claude-code-wonder-api",
+            "facts": {
+              "vote": "refuted",
+              "ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json#/votes/model-routes/4/facts"
+            },
+            "fit": {
+              "vote": "refuted",
+              "ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json#/votes/model-routes/4/fit"
+            }
+          },
+          {
+            "repo": "https://dev.meta.ai/docs/models#route=harness-spark-api",
+            "facts": {
+              "vote": "refuted",
+              "ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json#/votes/model-routes/5/facts"
+            },
+            "fit": {
+              "vote": "refuted",
+              "ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json#/votes/model-routes/5/fit"
+            }
+          },
+          {
+            "repo": "https://dev.meta.ai/docs/models#route=muse-subscription-foreign-harness",
+            "facts": {
+              "vote": "refuted",
+              "ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json#/votes/model-routes/6/facts"
+            },
+            "fit": {
+              "vote": "refuted",
+              "ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json#/votes/model-routes/6/fit"
+            }
+          },
+          {
+            "repo": "https://developers.openai.com/codex/models#route=codex-gpt-6-1-sol",
+            "facts": {
+              "vote": "refuted",
+              "ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json#/votes/model-routes/7/facts"
+            },
+            "fit": {
+              "vote": "refuted",
+              "ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json#/votes/model-routes/7/fit"
+            }
+          },
+          {
+            "repo": "https://developers.openai.com/codex/models#route=codex-gpt-6-astra",
+            "facts": {
+              "vote": "refuted",
+              "ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json#/votes/model-routes/8/facts"
+            },
+            "fit": {
+              "vote": "refuted",
+              "ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json#/votes/model-routes/8/fit"
+            }
+          },
+          {
+            "repo": "https://developers.openai.com/codex/models#route=codex-gpt-6-luna",
+            "facts": {
+              "vote": "refuted",
+              "ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json#/votes/model-routes/9/facts"
+            },
+            "fit": {
+              "vote": "refuted",
+              "ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json#/votes/model-routes/9/fit"
+            }
+          },
+          {
+            "repo": "https://code.claude.com/docs/en/model-config#route=claude-code-claude-opus-5-5",
+            "facts": {
+              "vote": "refuted",
+              "ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json#/votes/model-routes/10/facts"
+            },
+            "fit": {
+              "vote": "refuted",
+              "ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json#/votes/model-routes/10/fit"
+            }
+          },
+          {
+            "repo": "https://code.claude.com/docs/en/model-config#route=claude-code-claude-sonnet-5-5",
+            "facts": {
+              "vote": "refuted",
+              "ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json#/votes/model-routes/11/facts"
+            },
+            "fit": {
+              "vote": "refuted",
+              "ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json#/votes/model-routes/11/fit"
+            }
+          },
+          {
+            "repo": "https://code.claude.com/docs/en/model-config#route=claude-code-claude-haiku-5-5",
+            "facts": {
+              "vote": "refuted",
+              "ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json#/votes/model-routes/12/facts"
+            },
+            "fit": {
+              "vote": "refuted",
+              "ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json#/votes/model-routes/12/fit"
+            }
+          },
+          {
+            "repo": "https://developers.openai.com/codex/models#route=openai-pool-foreign-harness",
+            "facts": {
+              "vote": "refuted",
+              "ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json#/votes/model-routes/13/facts"
+            },
+            "fit": {
+              "vote": "refuted",
+              "ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json#/votes/model-routes/13/fit"
+            }
+          },
+          {
+            "repo": "https://platform.claude.com/docs/en/models/fable-5-1/overview#route=anthropic-api-claude-fable-5-1",
+            "facts": {
+              "vote": "refuted",
+              "ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json#/votes/model-routes/14/facts"
+            },
+            "fit": {
+              "vote": "refuted",
+              "ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json#/votes/model-routes/14/fit"
+            }
+          }
+        ],
+        "reopen": [
+          {
+            "trigger": "retained_failure",
+            "ref": "evidence/artifacts/model-routes-sweep-20261015/returns.json#/failures/model-routes"
+          }
+        ]
+      }
+    ],
+    "notes": "Not appendable as-is. Null fields explicitly retain unavailable canonical harness inputs; do not invent them. Known marks the angle-carried set only, not prior substantive adjudication."
+  },
+  "prepared_role_contract_sha256": "353dc30bd7675992f148125bb9f2ff2d29ba0aa26f7718414d3fcbbbd591194e"
+}

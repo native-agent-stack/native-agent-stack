@@ -4,8 +4,8 @@
 The proposed daily user timer adoption/templates/systemd/stack-currency.timer can run this after host adoption.
 It runs this checkout's own
 read-only checks as subprocesses, with the arguments their weekly workflows use, reads the host's own status, and
-aggregates seven possible counts: five base counts, a surface-watch count when
-its report is fresh, and a stale-model count when the selector check finds drift:
+aggregates eight possible counts: five base counts, a surface-watch count when
+its report is fresh, a stale-model count and a model-inventory maintenance count:
 
 - pins_behind: components whose platform pin's version probe did not observe the pinned version
   (scripts/adoption_status.py --pinned-versions --json, the "mismatched" ids of each selected profile, each id
@@ -41,6 +41,10 @@ its report is fresh, and a stale-model count when the selector check finds drift
 - stale_models: active model selectors that differ from the committed versioned comparison snapshot
   (scripts/active_model_currency.py check --json). An unknown or expired live model report is a coverage gap,
   never evidence that no model selectors are due (docs/active-model-currency.md).
+- models_past_window: inventory rows past the 42-day release window without a landscape check from the last seven
+  days (scripts/validate.py model_currency_due). Publication reports these; this count persists them in the session
+  notice. An unreadable or structurally invalid inventory is a coverage gap ("model inventory unreadable"). The
+  timer's existing freshness_propose.py --model-currency pre-step supplies refresh proposals.
 
 When any count is nonzero it writes ${XDG_STATE_HOME:-~/.local/state}/native-agent-stack/currency-due.json
 atomically (a temporary file in the same directory, fsync, mode 0600, os.replace):
@@ -119,7 +123,9 @@ LABELS = {"pins_behind": ("pin behind", "pins behind"),
 SURFACE_KEY = "surface_unreviewed"
 MODEL_KEY = "stale_models"
 LABELS[MODEL_KEY] = ("stale model selector", "stale model selectors")
-COUNT_KEYS = (*DUE_KEYS, SURFACE_KEY, MODEL_KEY)
+INVENTORY_KEY = "models_past_window"
+LABELS[INVENTORY_KEY] = ("model past its currency window", "models past their currency window")
+COUNT_KEYS = (*DUE_KEYS, SURFACE_KEY, MODEL_KEY, INVENTORY_KEY)
 SURFACE_DIR = "surface-watch"
 SURFACE_FILE = "latest.json"
 SURFACE_MAX_AGE_DAYS = 3
@@ -306,6 +312,25 @@ def query_units(units, systemctl: str = "systemctl"):
     return states
 
 
+def inventory_due(root: Path, now_text: str) -> list[str] | None:
+    """Age findings, [] when this checkout has no inventory, or None for an unreadable/invalid inventory."""
+    try:
+        from .validate import MODEL_CURRENCY_PATH, Validator, model_currency_due, model_currency_problems
+    except ImportError:  # running as a plain script from the checkout
+        from validate import MODEL_CURRENCY_PATH, Validator, model_currency_due, model_currency_problems
+    try:
+        if not (root / MODEL_CURRENCY_PATH).exists():
+            return []
+        today = date.fromisoformat(now_text[:10])
+        reader = Validator(root, today=today)
+        document = reader.load(MODEL_CURRENCY_PATH)
+        if reader.errors or model_currency_problems(document, today, enforce_age=False):
+            return None
+        return model_currency_due(document, today)
+    except (OSError, UnicodeError, ValueError):
+        return None
+
+
 def collect(root: Path, now_text: str, network: bool, state: Path | None = None) -> dict:
     """Each check's report. The receipt report reaches saturation_ledger.py as a file, the way
     .github/workflows/saturation-tracking.yml composes them, in a temporary directory outside the checkout. With a state
@@ -345,7 +370,8 @@ def collect(root: Path, now_text: str, network: bool, state: Path | None = None)
         models = {"schema_version": 1, "status": "unknown", "stale_count": 0,
                   "findings": [], "errors": ["active model check could not answer"]}
     return {"receipts": receipts, "layers": layers, "pins": pins, "skills": skills, "sweep_dates": sweep_dates(root),
-            "host": host, "surface": surface, "active_models": models}
+            "host": host, "surface": surface, "active_models": models,
+            "model_inventory": inventory_due(root, now_text)}
 
 
 def report_options(network: bool, cadence_days: int) -> list[str]:
@@ -702,16 +728,25 @@ def aggregate(reports: dict, now: datetime, now_text: str, cadence_days: int, ro
             model_count = models["stale_count"]
             details += [{"kind": "stale_model", **item} for item in models["findings"]]
 
+    inventory = reports.get("model_inventory", [])
+    inventory_valid = isinstance(inventory, list) and all(isinstance(item, str) for item in inventory)
+    inventory_coverage = {} if inventory_valid else {"model_inventory": "unknown"}
+    if inventory_valid:
+        details += [{"kind": "model_past_window", "finding": item} for item in inventory]
+
     details.append({"kind": "coverage", "pins_unchecked": len(unchecked), "due_layers_total": due_total,
                     "sweep_cadence_days": cadence_days, "network": skills is not None,
                     "skills_complete": skills_complete, "skills_fetch_errors": skills_errors,
-                    "skills_unresolved": skills_unresolved, **host_coverage, **surface_coverage, **model_coverage})
+                    "skills_unresolved": skills_unresolved, **host_coverage, **surface_coverage, **model_coverage,
+                    **inventory_coverage})
     due = {"pins_behind": pins_behind, "stale_receipts": stale_receipts, "due_layers": due_layers,
            "reopen_triggers": reopen_triggers, "host_alerts": len(alerts)}
     if surface_count is not None:
         due[SURFACE_KEY] = surface_count
     if model_count:
         due[MODEL_KEY] = model_count
+    if inventory_valid and inventory:
+        due[INVENTORY_KEY] = len(inventory)
     command = details_command(root, skills is not None, cadence_days)
     if due_file is None:  # a direct caller: the default state directory, as main() would resolve it
         due_file, from_xdg = default_state_dir() / DUE_FILE, os.path.isabs(os.environ.get("XDG_STATE_HOME") or "")
@@ -719,6 +754,8 @@ def aggregate(reports: dict, now: datetime, now_text: str, cadence_days: int, ro
     gaps = [gap] if gap else []
     if model_coverage.get("active_models") == "unknown":
         gaps.append("model check incomplete")
+    if inventory_coverage:
+        gaps.append("model inventory unreadable")
     line = summary_line(due, command, skills_complete is not False, due_file_pointers(due_file, from_xdg),
                         tuple(gaps))
     return {"generated_at": now_text, "root": str(root), "due": due, "summary_line": line,
@@ -731,7 +768,8 @@ def gaps_of(document: dict) -> list[str]:
     coverage = document["details"][-1]
     return ((["the skill check was incomplete"] if coverage.get("skills_complete") is False else [])
             + ([SURFACE_GAPS[coverage["surface_watch"]]] if coverage.get("surface_watch") in SURFACE_GAPS else [])
-            + (["model check incomplete"] if coverage.get("active_models") == "unknown" else []))
+            + (["model check incomplete"] if coverage.get("active_models") == "unknown" else [])
+            + (["model inventory unreadable"] if coverage.get("model_inventory") == "unknown" else []))
 
 
 def incomplete(document: dict) -> bool:
@@ -773,6 +811,8 @@ def render_text(document: dict) -> str:
         kind = item["kind"]
         if kind == "stale_model":
             lines.append(f"  model: {item.get('path')}:{item.get('line')} {item.get('model')} -> {item.get('expected')}")
+        elif kind == "model_past_window":
+            lines.append(f"  model inventory: {item['finding']}")
         elif kind == "pin_mismatch":
             lines.append(f"  pin: {item['component_id']} did not report its pin {item['pinned_version']} "
                          f"({', '.join(str(profile) for profile in item['profiles'])})")
@@ -844,6 +884,8 @@ def render_text(document: dict) -> str:
     if due.get(SURFACE_KEY):
         actions.append("upstream switches: python3 scripts/upstream_surface_watch.py --dry-run and "
                        "docs/upstream-surface-watch.md")
+    if due.get(INVENTORY_KEY) or document["details"][-1].get("model_inventory") == "unknown":
+        actions.append("model inventory: docs/model-currency.md and the timer's existing model-currency refresh proposal")
     if document["details"][-1].get("surface_watch") in SURFACE_GAPS:
         actions.append("surface watch: journalctl --user -u upstream-surface-watch.service, then "
                        "python3 scripts/upstream_surface_watch.py --network --dry-run")

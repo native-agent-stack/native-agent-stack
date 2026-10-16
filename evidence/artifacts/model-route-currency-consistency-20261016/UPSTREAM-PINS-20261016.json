@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "read_at": "2026-10-16",
+  "evidence_class": "source_review",
+  "capture_method": "Unkeyed public HTTP reads; bounded vendor wording retained separately from the findings. The native receipt is read from its published Git object.",
+  "custody": "Register only the retained capture files. No hash of an unretained page, private direction, review, packet or command log is retained.",
+  "captures": [
+    {
+      "path": "UPSTREAM-SRC-openai.md",
+      "sources": [
+        "https://developers.openai.com/api/docs/changelog.md#september-2026",
+        "https://developers.openai.com/api/docs/models/gpt-6-luna.md"
+      ],
+      "model_id": "gpt-6-luna",
+      "release_date": "2026-09-22",
+      "pin_kind": "dated public-document capture; no immutable upstream document revision"
+    },
+    {
+      "path": "UPSTREAM-SRC-anthropic.md",
+      "sources": [
+        "https://platform.claude.com/docs/en/release-notes/overview.md#october-7-2026",
+        "https://platform.claude.com/docs/en/models/haiku-5-5/overview"
+      ],
+      "model_id": "claude-haiku-5-5",
+      "release_date": "2026-10-07",
+      "pin_kind": "dated public-document capture; no immutable upstream document revision"
+    },
+    {
+      "path": "UPSTREAM-SRC-meta.md",
+      "sources": [
+        "https://dev.meta.ai/resources/blog/build-with-muse-wonder",
+        "https://dev.meta.ai/docs/models",
+        "https://research.meta.ai/blog/introducing-muse-spark-1-3"
+      ],
+      "model_ids": ["muse-wonder-1.0", "muse-spark-1.3"],
+      "product": "Muse Wonder Full (subscription native Muse Code only)",
+      "release_dates": {"Wonder and Full": "2026-10-12", "Spark 1.3": "2026-09-02"},
+      "pin_kind": "dated public-document capture; no immutable upstream document revision"
+    },
+    {
+      "path": "UPSTREAM-SRC-native-full.md",
+      "sources": [
+        "https://github.com/native-agent-stack/native-agent-stack/blob/5bab63233ef90260bec4a8ee0cec4f5e4431776c/docs/decisions/2026-10-14-muse-file-fence.md#L123-L129"
+      ],
+      "pin": "5bab63233ef90260bec4a8ee0cec4f5e4431776c",
+      "model_id": "muse-wonder-full-1.0",
+      "pin_kind": "immutable published Git object; bounded native-receipt excerpt"
+    }
+  ],
+  "reproducible_code_sources": [
+    {
+      "url": "https://github.com/native-agent-stack/native-agent-stack/blob/5bab63233ef90260bec4a8ee0cec4f5e4431776c/scripts/validate.py",
+      "pin": "5bab63233ef90260bec4a8ee0cec4f5e4431776c",
+      "capture_command": "git show 5bab63233ef90260bec4a8ee0cec4f5e4431776c:scripts/validate.py",
+      "review_copy": "UPSTREAM-SRC-base-validator.py (supplied through the co-op; reproducible from this public object)"
+    },
+    {
+      "url": "https://github.com/native-agent-stack/native-agent-stack/blob/5bab63233ef90260bec4a8ee0cec4f5e4431776c/scripts/host_receipts.py#L547",
+      "pin": "5bab63233ef90260bec4a8ee0cec4f5e4431776c",
+      "mechanism": "normalize_repository is reused for C2 GitHub component identity"
+    },
+    {
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/config/providers/registry/codex/index.ts",
+      "pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "mechanism": "provider codex; alias cx"
+    },
+    {
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/config/providers/registry/muse-code/index.ts",
+      "pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "mechanism": "provider muse-code; alias mc"
+    }
+  ],
+  "limits": [
+    "These primary captures support public identity, date and availability claims, not route execution or default adoption.",
+    "Review packaging should carry these captures and the named public Git source copy; a reviewer must not infer primary verification from sources.json alone."
+  ]
+}
