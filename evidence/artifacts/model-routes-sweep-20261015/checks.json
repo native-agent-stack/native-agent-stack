@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "checked_at": "2026-10-15T19:50:40.884222+00:00",
+  "python": "3.13.16",
+  "jsonschema": "4.26.0",
+  "checks": [
+    {
+      "name": "gpt6-discover-model-routes.json unchanged upstream schema",
+      "result": "pass"
+    },
+    {
+      "name": "gpt6-refute-fit-model-routes.json unchanged upstream schema",
+      "result": "pass"
+    },
+    {
+      "name": "All 14 carried candidates covered exactly; one new candidate",
+      "result": "pass"
+    },
+    {
+      "name": "Identity sets and required missing-family aggregation",
+      "result": "pass"
+    },
+    {
+      "name": "All proposed ledger vote pointers resolve to matching repository/role",
+      "result": "pass"
+    },
+    {
+      "name": "OpenCode vendor-recommended Responses adapter",
+      "result": "pass",
+      "fail_before": "Draft incorrectly selected Chat Completions; the same assertion failed before source-backed correction.",
+      "source": "https://dev.meta.ai/docs/coding-agents#opencode-config (read 2026-10-15)"
+    },
+    {
+      "name": "Protected catalog/convergence/ledger paths unchanged",
+      "result": "pass"
+    }
+  ],
+  "custody_correction": {
+    "read_at": "2026-10-16",
+    "review": "GPT-VERDICT-6ecd0e74d.md",
+    "private_source_policy": "Review and direction are cited by name only; no private-source bytes or digest values are retained.",
+    "tests": [
+      {
+        "name": "tests.test_published_digest_privacy.ModelRoutesCustodyTests.test_direction_provenance_is_name_only",
+        "before_exit": 1,
+        "before_result": "Assertion failure: private direction provenance contained fields beyond its name and custody statement.",
+        "after_exit": 0,
+        "after_result": "Passed after retaining only the name and custody statement."
+      },
+      {
+        "name": "tests.test_published_digest_privacy.ModelRoutesCustodyTests.test_listing_does_not_bind_an_unpublished_response",
+        "before_exit": 1,
+        "before_result": "Assertion failure: an unretained response had a digest field.",
+        "after_exit": 0,
+        "after_result": "Passed after removing that field; the sanitized artifact remains registered separately."
+      }
+    ],
+    "command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- python3 -B -m unittest tests.test_published_digest_privacy.ModelRoutesCustodyTests -v",
+    "source": "python/cpython@v3.13.16:Lib/unittest/case.py:734-745 (assertFalse and assertTrue), read from the installed Python 3.13.16 source; https://github.com/python/cpython/blob/v3.13.16/Lib/unittest/case.py#L734",
+    "assertion_privacy": "Assertions receive booleans rather than artifact values, so a failure does not print private digest values."
+  },
+  "publication_validation": {
+    "required_command": "systemd-run --user --scope -p CPUWeight=idle --quiet -- python3 scripts/validate.py",
+    "first_attempt": "exit 1: the new artifact files were not yet hash-registered; no other reported failures.",
+    "final_result": "Retained in the PR description after registering all artifacts and before commit."
+  },
+  "limitations": [
+    "Data/schema validation, not runtime/model invocation or an independent review.",
+    "No new script or runtime test suite was added."
+  ]
+}

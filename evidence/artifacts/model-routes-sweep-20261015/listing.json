@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "observed_at": "2026-10-15T19:36:11.714443+00:00",
+  "command": "curl --fail --silent --show-error http://127.0.0.1:21128/v1/models",
+  "authorization_header_sent": false,
+  "total_model_ids": 1274,
+  "selected_models": [
+    {
+      "id": "cx/gpt-6-astra",
+      "api_format": "responses",
+      "context_length": 872000,
+      "max_output_tokens": 128000,
+      "supported_endpoints": [
+        "responses"
+      ],
+      "max_input_tokens": 872000
+    },
+    {
+      "id": "cx/gpt-6.1-sol",
+      "api_format": "responses",
+      "context_length": 872000,
+      "max_output_tokens": 128000,
+      "supported_endpoints": [
+        "responses"
+      ],
+      "max_input_tokens": 872000
+    },
+    {
+      "id": "cx/gpt-6-luna",
+      "api_format": "responses",
+      "context_length": 872000,
+      "max_output_tokens": 128000,
+      "supported_endpoints": [
+        "responses"
+      ],
+      "max_input_tokens": 872000
+    },
+    {
+      "id": "mc/muse-spark-1.3",
+      "effort_tiers": [
+        "minimal",
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "context_length": 1048576,
+      "max_output_tokens": 65536,
+      "max_input_tokens": 1048576
+    },
+    {
+      "id": "muse-code/muse-spark-1.3",
+      "effort_tiers": [
+        "minimal",
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "context_length": 1048576,
+      "max_output_tokens": 65536,
+      "max_input_tokens": 1048576
+    }
+  ],
+  "wonder_ids_under_muse_code": [],
+  "retained_fields": "Model IDs, protocol and capability limits only; account/owner/permission fields excluded.",
+  "raw_response_retained": false,
+  "conclusions": [
+    "The three cx GPT-6 candidate IDs are advertised.",
+    "No Wonder ID is advertised under mc/ or muse-code/. Passthrough support does not establish that it works.",
+    "Listing is not an inference, entitlement or quota test."
+  ],
+  "sources": [
+    "OmniRoute@sha256:cb2a82f1fe8661468b51df578ede6409cb57a359591f8e25541969cf9f71f469:open-sse/config/providers/registry/codex/index.ts:10",
+    "OmniRoute@sha256:c10ada7126c3a339b6c87b1371bd4d5a7a8a26ad4b2664daac2208130c4fe1be:open-sse/config/providers/registry/muse-code/index.ts:41",
+    "OmniRoute@sha256:cb7c78ff2c0fcdebfdc815a174770f346af6d5eccda581a3ff3b2d9b8f588aaf:open-sse/config/providers/shared.ts:339"
+  ]
+}

@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "id": "source-review-opencode-wonder-api",
+  "kind": "upstream_provenance",
+  "evidence_class": "source_review",
+  "catalog": "foundation",
+  "layer_id": "model-routes",
+  "read_at": "2026-10-15",
+  "candidate_id": "opencode-wonder-api",
+  "repository": "https://dev.meta.ai/docs/models",
+  "role_identity": "https://dev.meta.ai/docs/models#route=opencode-wonder-api",
+  "carried": true,
+  "carried_verdict": "INSUFFICIENT",
+  "proposal_label": "keep_but_compare",
+  "model": {
+    "value": "muse-wonder-1.0",
+    "verification": "VERIFIED",
+    "sources": [
+      "https://dev.meta.ai/docs/models"
+    ],
+    "read_at": "2026-10-15",
+    "boundary": "Current public identifier; account availability is not established."
+  },
+  "route": {
+    "value": {
+      "client": "OpenCode",
+      "provider": "Meta Model API with independent pay-as-you-go credential",
+      "model": "muse-wonder-1.0",
+      "endpoint": "https://api.meta.ai/v1/responses",
+      "endpoint_class": "OpenAI Responses via @ai-sdk/openai"
+    },
+    "verification": "VERIFIED",
+    "sources": [
+      "https://dev.meta.ai/docs/coding-agents",
+      "https://dev.meta.ai/docs/models"
+    ],
+    "read_at": "2026-10-15",
+    "boundary": "The vendor recommends @ai-sdk/openai with encrypted reasoning replay. The Chat Completions @ai-sdk/openai-compatible alternative loses cross-turn reasoning continuity. Host configuration and Wonder-specific parity remain untested."
+  },
+  "pin": {
+    "value": null,
+    "verification": "UNVERIFIED",
+    "gap": "F5-G-CLIENT",
+    "cheapest_check": "Read the named client's --version output; no invocation.",
+    "sources": [],
+    "read_at": "2026-10-15"
+  },
+  "effort": {
+    "value": "minimal, low, medium, high, xhigh, max; none rejected. Responses uses reasoning.effort; Chat Completions uses reasoning_effort.",
+    "verification": "VERIFIED",
+    "sources": [
+      "https://dev.meta.ai/docs/reasoning"
+    ],
+    "read_at": "2026-10-15",
+    "boundary": "Spark 1.3 Contributor does not support max despite the gateway registry advertising it; contributor mode is outside this trial."
+  },
+  "tier": {
+    "value": "Standard pay-as-you-go; Wonder API has no Contributor option.",
+    "verification": "VERIFIED",
+    "sources": [
+      "https://dev.meta.ai/docs/pricing-rate-limits",
+      "https://dev.meta.ai/docs/models"
+    ],
+    "read_at": "2026-10-15",
+    "boundary": "For Spark, Standard is the candidate. Full subscription is a different route."
+  },
+  "limits": {
+    "value": {
+      "context": 1048576,
+      "max_output": "UNVERIFIED"
+    },
+    "verification": "VERIFIED",
+    "sources": [
+      "https://dev.meta.ai/docs/coding-agents"
+    ],
+    "read_at": "2026-10-15",
+    "boundary": "Vendor Codex configuration advertises 1,048,576; actual protocol/client cap not measured. F5-G-META-API."
+  },
+  "pricing": {
+    "value": {
+      "input": 4,
+      "cached_input": 0.2,
+      "output": 20,
+      "unit": "USD/MTok, Standard"
+    },
+    "verification": "VERIFIED",
+    "sources": [
+      "https://dev.meta.ai/docs/pricing-rate-limits"
+    ],
+    "read_at": "2026-10-15",
+    "boundary": "Independent pay-as-you-go billing; no installation, credential acquisition or spend authorized."
+  },
+  "adoption_status": {
+    "value": "NOT_ADOPTED",
+    "verification": "VERIFIED",
+    "sources": [
+      "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:catalogs/landscape/angles/foundation-model-routes.json"
+    ],
+    "read_at": "2026-10-15",
+    "boundary": "Verified carried classification at the base; this does not prove today's configured account, transport or usage."
+  },
+  "facts_adjudication": {
+    "author_family": "openai",
+    "canonical_facts_vote": false,
+    "summary": "muse-wonder-1.0 is the API model, distinct from subscription Wonder Full. Meta documents the selected coding-agent protocol; actual installed client configuration, tool fidelity and entitlement are unverified."
+  },
+  "fit_adjudication": {
+    "role": "gpt6-refute-fit:model-routes",
+    "refuted": false,
+    "confidence": 0.86,
+    "reasoning": "Keep as a conditional comparison candidate: this distinct client/protocol can test harness parity or cost/capability against existing routes. No source-only result justifies adoption or starting a keyed trial."
+  },
+  "formal_sweep_survivor": false,
+  "angle_status": {
+    "A1": "Partial documented capability; route/host qualification incomplete.",
+    "A2": "Route-specific engineering quality not independently established.",
+    "A3": "Route-specific community consensus not established.",
+    "A4": "Net usage not measured.",
+    "A5": "Published vendor capability/positioning only; no independent cross-route evaluation retained.",
+    "A6": "No executed comparative run."
+  },
+  "comparison_that_would_overturn": "After the harness screen and CC approval, run identical frozen tasks in the named client through Meta's documented endpoint, preserving reasoning replay and tool schemas; compare success, latency, tokens and actual cost.",
+  "sources": [
+    "https://dev.meta.ai/docs/models",
+    "https://dev.meta.ai/docs/coding-agents",
+    "https://dev.meta.ai/docs/pricing-rate-limits",
+    "https://dev.meta.ai/docs/reasoning",
+    "https://dev.meta.ai/docs/muse-code/configuration",
+    "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:catalogs/landscape/angles/foundation-model-routes.json"
+  ],
+  "limitations": [
+    "SINGLE-FAMILY (GPT), source-review initial sweep; the same Codex session authored discovery and fit, so these are not independent judgments.",
+    "Claude discovery, Claude facts refutation, Claude fit refutation and completeness critic were not run. No formal survivors, clean sweep, saturation, FINAL verdict or default change is claimed.",
+    "Only unkeyed loopback model listings and client version/help were probed. No inference, keyed API request, Muse process, credential file, environment file, OmniRoute data directory or account record was inspected.",
+    "Model/API documentation establishes advertised capabilities and prices, not current account entitlement, effective gateway effort/tier, billing or comparative quality.",
+    "Repository, wave and ledger files remain unchanged. Proposed ledger record is not append-ready: the model-routes research-state row and normal harness usage/workflow receipts do not exist.",
+    "The exact user-dispatched model/effort/tier are requested metadata; no private rollout or usage files were read to verify actual execution."
+  ]
+}

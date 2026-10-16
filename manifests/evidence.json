@@ -41497,6 +41497,181 @@
       "bytes": 3552
     },
     {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/GAPS.md",
+      "sha256": "461b62f973237e307a7ae07f31dec8cc385860fcac1c409d8f0fbff7afe0db96",
+      "bytes": 7465
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/PROTOCOL.md",
+      "sha256": "296a485632478129df215990b424401311c8cbc44d40256c9d5a157fcae9d5e5",
+      "bytes": 2000
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/README.md",
+      "sha256": "133416147066808358923b91a46774979c2057b2aed53c3adeded7a233ab2cb3",
+      "bytes": 2294
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/ROUTES.md",
+      "sha256": "72b48db753b7660ae6e2ee35d5a61ebd9d5af317dc3641d0ab099e826a9ffe4e",
+      "bytes": 8572
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/candidate-identity-map.json",
+      "sha256": "81184cbf1d49c3d66ed2a4ee70b15d7ea5b9782b2ae0db7e8d97fc9d1ee03979",
+      "bytes": 4162
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/checks.json",
+      "sha256": "d5a8b98af68a14d8ce4baa1845e5cf23e181af800acc78639f673057c56a6aa8",
+      "bytes": 3282
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/custody-scan.json",
+      "sha256": "0b7ad6fecbfd686bc017199ff31b7d4b2225a1ad6513c082b91afc0ff8e29fb8",
+      "bytes": 1433
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/deployed-source-review.json",
+      "sha256": "167d2d65f396772f3f07a11f11a3c92d628b2362c7437011c48d5530a1ced2d7",
+      "bytes": 20680
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/gpt6-discover-model-routes.json",
+      "sha256": "6b21ff4e4bfee29b8c95c648057c5f5fd9c1da8129834652828e9d9604ef4226",
+      "bytes": 28386
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/gpt6-refute-fit-model-routes.json",
+      "sha256": "7e896b13086e438a8dad8fb9a1e297b039c28b397b7b0619a9b493f497189c8a",
+      "bytes": 15974
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/listing.json",
+      "sha256": "d3a192bede7ed0bf9271d35804e21e3bd097ad10777460e9615c1620ecce1503",
+      "bytes": 2442
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/named-gaps.json",
+      "sha256": "af8dc9490ec5d3114916b015489a040d05bc91abcd95ee96a9a939497ce2ad3d",
+      "bytes": 8349
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/proposed-ledger-record.json",
+      "sha256": "9ce75f163299d9a82d62e711bb3c4344ee82c970c9f0b5430f59adc6523eb75b",
+      "bytes": 12635
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/protocol.json",
+      "sha256": "cd7ab3715c8919eebfe922af76bf274b145b116e94dd942076d0783b126bec32",
+      "bytes": 4608
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/returns.json",
+      "sha256": "0dbb9ffed73c2534877e7b405ab0df0be9b03941328cb47a30afd51071ee37d4",
+      "bytes": 91791
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/role-contract.md",
+      "sha256": "353dc30bd7675992f148125bb9f2ff2d29ba0aa26f7718414d3fcbbbd591194e",
+      "bytes": 1365
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/scope.json",
+      "sha256": "ae92e0d4c87cd8a5f70cc847898890b00587dee7ee1988d082bcc05b7c1e0a36",
+      "bytes": 2912
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/source-reviews/anthropic-api-claude-fable-5-1.json",
+      "sha256": "e90fbcbfed4dd44620b33732b719ad146788fc8745835443486b5b66d18e79a4",
+      "bytes": 5700
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/source-reviews/claude-code-claude-haiku-5-5.json",
+      "sha256": "489700815ad105be9310556f0353d8b28155ab8b6bfe26ac2452fee9abb989da",
+      "bytes": 7298
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/source-reviews/claude-code-claude-opus-5-5.json",
+      "sha256": "3287f7cfbdd691a06de878d8cac98d99acf4b4aa2bb7d1873da5e5e4a0009844",
+      "bytes": 7265
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/source-reviews/claude-code-claude-sonnet-5-5.json",
+      "sha256": "ea8d3534b762603b8415b6c5477bc394d5f2f99ab1981fc0a112bf7abc65b44a",
+      "bytes": 7396
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/source-reviews/claude-code-wonder-api.json",
+      "sha256": "8ec3fce9b13ecd704c2edeb83a3a74533dc14852e8624877c0d1d0bd593178e5",
+      "bytes": 6425
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/source-reviews/codex-gpt-6-1-sol.json",
+      "sha256": "4f84c7ca91efa04c338502d7990d132726197c62e92ec0d10c06a1c1ac2505f0",
+      "bytes": 8511
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/source-reviews/codex-gpt-6-astra.json",
+      "sha256": "c7787dbc035d7aeb4019132be6154623f91c98c45f4c64c3e48002c82afa2362",
+      "bytes": 8511
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/source-reviews/codex-gpt-6-luna.json",
+      "sha256": "c2de203779fa646d5c630a9893f027e99efc9bbe6efc67a38da56c32f8d682cc",
+      "bytes": 8512
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/source-reviews/codex-wonder-api.json",
+      "sha256": "faab7afc1c21f270e7c8d7a98407d7558ee9eddaedca1daf971d4c01030f025b",
+      "bytes": 6401
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/source-reviews/harness-spark-api.json",
+      "sha256": "afe4577efdf3d44bb0aed53b53269dbcc446e107aae212a4371653ad8944c999",
+      "bytes": 6835
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/source-reviews/muse-code-wonder-api.json",
+      "sha256": "f398d75a737a6a94fefeea486e4b88a4c4bd24cab6c89a6a35777f800265f228",
+      "bytes": 6658
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/source-reviews/muse-code-wonder-full.json",
+      "sha256": "c330b97c5a78833d03bb7bc3d9f62e9875d73ebd17e31d55677ec74ae88cbf1a",
+      "bytes": 7805
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/source-reviews/muse-subscription-foreign-harness.json",
+      "sha256": "dbf719f5d6673155cae4fdf559913aa709574ae9edbcb42b37a70a648beb4df2",
+      "bytes": 6044
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/source-reviews/openai-pool-foreign-harness.json",
+      "sha256": "04cff6ab44c5743acd8a18718e3d1d4d5bb64e75922a2e0494792bf60e7c2770",
+      "bytes": 6028
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/source-reviews/opencode-wonder-api.json",
+      "sha256": "d85a8051d92bb910eb47d73213ce49d8f811e62df47a3c14087c194a161a45da",
+      "bytes": 6572
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/sources.json",
+      "sha256": "d85428e25bd38d779c13240aa16ddb73d44d74b0c72a5e388f9198c16d31def7",
+      "bytes": 9373
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/sweep-manifest.json",
+      "sha256": "cee95876c0a2efcd052a889e4d8b19709e576bce68328c1abd81f50bcde2d5e4",
+      "bytes": 8203
+    },
+    {
+      "path": "evidence/artifacts/model-routes-sweep-20261015/usage.json",
+      "sha256": "e1c52d0adcb3c661808cc832dd9c0a962a97b2a88edecb65cd8746c1a19ec15a",
+      "bytes": 619
+    },
+    {
       "path": "evidence/artifacts/model-routes-sweep-claude-20261015-attempts/build_input.py",
       "sha256": "0b2c37319278823dd0968b33aea87ea31118c000115023a8a017d16518f1b0db",
       "bytes": 7716

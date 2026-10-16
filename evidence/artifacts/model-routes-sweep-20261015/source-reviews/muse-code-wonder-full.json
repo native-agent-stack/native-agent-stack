@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "id": "source-review-muse-code-wonder-full",
+  "kind": "upstream_provenance",
+  "evidence_class": "source_review",
+  "catalog": "foundation",
+  "layer_id": "model-routes",
+  "read_at": "2026-10-15",
+  "candidate_id": "muse-code-wonder-full",
+  "repository": "https://dev.meta.ai/docs/muse-code",
+  "role_identity": "https://dev.meta.ai/docs/muse-code#route=muse-code-wonder-full",
+  "carried": true,
+  "carried_verdict": "INSUFFICIENT",
+  "proposal_label": "keep_but_compare",
+  "model": {
+    "value": "muse-wonder-full-1.0 (carried exact id); Muse Wonder Full (verified product name)",
+    "verification": "UNVERIFIED",
+    "gap": "F5-G-MUSE-ID",
+    "cheapest_check": "Under CC approval and after fence HOLD is resolved, inspect the native model metadata/reader receipt. Public pages name Wonder Full; the unkeyed gateway list has no Wonder id.",
+    "sources": [
+      "https://dev.meta.ai/docs/models",
+      "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:docs/decisions/2026-10-14-muse-file-fence.md:7",
+      "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:catalogs/landscape/angles/foundation-model-routes.json"
+    ],
+    "read_at": "2026-10-15"
+  },
+  "route": {
+    "value": {
+      "client": "Native Muse Code",
+      "provider": "Native Meta subscription; distinct from OmniRoute muse-code/mc",
+      "endpoint_class": "Managed subscription inference; exact native endpoint not established"
+    },
+    "verification": "VERIFIED",
+    "sources": [
+      "https://dev.meta.ai/docs/models",
+      "https://dev.meta.ai/docs/muse-code/subscriptions",
+      "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:docs/decisions/2026-10-14-muse-file-fence.md:7"
+    ],
+    "read_at": "2026-10-15",
+    "boundary": "Gateway muse-code maps to Meta /v1/responses but does not advertise Wonder Full. Its availability through that gateway is UNVERIFIED and NOT_ADOPTED."
+  },
+  "pin": {
+    "value": "Fence record names Muse Code 1.4.7 / muse-bin-1.4.7-R6101.1; current executable not invoked.",
+    "verification": "UNVERIFIED",
+    "gap": "F5-G-MUSE-ID",
+    "cheapest_check": "Read the already-approved native receipt under CC review; no Muse command is authorized in this lane.",
+    "sources": [
+      "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:docs/decisions/2026-10-14-muse-file-fence.md:7"
+    ],
+    "read_at": "2026-10-15"
+  },
+  "effort": {
+    "value": "Wonder Full supports max in Muse Code.",
+    "verification": "VERIFIED",
+    "sources": [
+      "https://dev.meta.ai/docs/reasoning",
+      "https://dev.meta.ai/docs/muse-code/configuration"
+    ],
+    "read_at": "2026-10-15",
+    "boundary": "max on muse-wonder-1.0 does not select Wonder Full."
+  },
+  "tier": {
+    "value": "Power Usage or Maximum Usage subscription; Standard and Contributor modes are separate.",
+    "verification": "VERIFIED",
+    "sources": [
+      "https://dev.meta.ai/docs/models",
+      "https://dev.meta.ai/docs/muse-code/subscriptions"
+    ],
+    "read_at": "2026-10-15",
+    "boundary": "Fence requires contributor mode off and web tools disabled; HOLD stays in force."
+  },
+  "limits": {
+    "value": "Current exact Full context/output and per-account quota not established.",
+    "verification": "UNVERIFIED",
+    "gap": "F5-G-MUSE-ID",
+    "cheapest_check": "Read native model capability metadata through a CC-approved fenced inspection.",
+    "sources": [
+      "https://dev.meta.ai/docs/models"
+    ],
+    "read_at": "2026-10-15"
+  },
+  "pricing": {
+    "value": "Monthly Muse Code Power Usage or Maximum Usage plan class; no Model API per-token price for Full.",
+    "verification": "VERIFIED",
+    "sources": [
+      "https://dev.meta.ai/docs/muse-code/subscriptions",
+      "https://dev.meta.ai/docs/models"
+    ],
+    "read_at": "2026-10-15",
+    "boundary": "Current regional price and account plan not inspected."
+  },
+  "adoption_status": {
+    "value": "TRIAL",
+    "verification": "VERIFIED",
+    "sources": [
+      "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:catalogs/landscape/angles/foundation-model-routes.json"
+    ],
+    "read_at": "2026-10-15",
+    "boundary": "Verified carried classification at the base; this does not prove today's configured account, transport or usage."
+  },
+  "facts_adjudication": {
+    "author_family": "openai",
+    "canonical_facts_vote": false,
+    "summary": "Wonder Full is a separate subscription-only product, not the max setting on Wonder API. The source-reviewed native fence is held and is a filesystem boundary, with shared networking. No gateway Full availability or native invocation was established today."
+  },
+  "fit_adjudication": {
+    "role": "gpt6-refute-fit:model-routes",
+    "refuted": false,
+    "confidence": 0.86,
+    "reasoning": "Keep only the conditional native Muse Code reader trial. Preserve all fence gates and the lack of builder/reviewer qualification; do not promote the gateway alias or infer Full availability from passthroughModels."
+  },
+  "formal_sweep_survivor": false,
+  "angle_status": {
+    "A1": "Partial documented capability; route/host qualification incomplete.",
+    "A2": "Route-specific engineering quality not independently established.",
+    "A3": "Route-specific community consensus not established.",
+    "A4": "Net usage not measured.",
+    "A5": "Published vendor capability/positioning only; no independent cross-route evaluation retained.",
+    "A6": "No executed comparative run."
+  },
+  "comparison_that_would_overturn": "After named fence reviews and explicit CC authorization, run the existing fenced reader smoke, then preregister a comparable full-harness task comparison. No trial runs in this sweep.",
+  "sources": [
+    "https://dev.meta.ai/docs/models",
+    "https://dev.meta.ai/docs/muse-code",
+    "https://dev.meta.ai/docs/muse-code/subscriptions",
+    "https://dev.meta.ai/docs/reasoning",
+    "https://dev.meta.ai/docs/muse-code/configuration",
+    "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:docs/decisions/2026-10-14-muse-file-fence.md:7",
+    "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:docs/decisions/2026-10-15-muse-toolchain-directory-grants.md:13",
+    "OmniRoute@sha256:c10ada7126c3a339b6c87b1371bd4d5a7a8a26ad4b2664daac2208130c4fe1be:open-sse/config/providers/registry/muse-code/index.ts:41",
+    "evidence/artifacts/model-routes-sweep-20261015/listing.json",
+    "native-agent-stack/native-agent-stack@8053f14e7e0817d2502dff2bb284bfb7e1b0152f:catalogs/landscape/angles/foundation-model-routes.json"
+  ],
+  "limitations": [
+    "SINGLE-FAMILY (GPT), source-review initial sweep; the same Codex session authored discovery and fit, so these are not independent judgments.",
+    "Claude discovery, Claude facts refutation, Claude fit refutation and completeness critic were not run. No formal survivors, clean sweep, saturation, FINAL verdict or default change is claimed.",
+    "Only unkeyed loopback model listings and client version/help were probed. No inference, keyed API request, Muse process, credential file, environment file, OmniRoute data directory or account record was inspected.",
+    "Model/API documentation establishes advertised capabilities and prices, not current account entitlement, effective gateway effort/tier, billing or comparative quality.",
+    "Repository, wave and ledger files remain unchanged. Proposed ledger record is not append-ready: the model-routes research-state row and normal harness usage/workflow receipts do not exist.",
+    "The exact user-dispatched model/effort/tier are requested metadata; no private rollout or usage files were read to verify actual execution."
+  ]
+}

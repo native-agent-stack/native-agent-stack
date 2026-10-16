@@ -1,0 +1,744 @@
+{
+  "schema_version": 1,
+  "evidence_class": "source_review",
+  "read_at": "2026-10-15T19:36:11.714443+00:00",
+  "listener_binding": {
+    "port": 21128,
+    "observed_pid": 1616,
+    "method": "ss listener PID; /proc/PID/cwd symlink only; no cmdline/environment inspection",
+    "package_root": "~/.local/share/omniroute-builds/omniroute-3.8.51-2a41147b7-affinity-pr15167-drain/lib/node_modules/omniroute"
+  },
+  "package": {
+    "name": "omniroute",
+    "version": "3.8.51",
+    "build_label": "omniroute-3.8.51-2a41147b7-affinity-pr15167-drain",
+    "package_sha256": "b002c54561bd762f41c7f4cafe6809ac5d5e58bbe175ce0399eb7c1df5b0baf6"
+  },
+  "upstream_release": {
+    "tag": "v3.8.51",
+    "commit": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+    "tag_object": "770faa7144f58ada625afc6efe572c8335484ec4",
+    "published_at": "2026-09-30T01:41:50Z",
+    "sources": [
+      "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.51",
+      "https://raw.githubusercontent.com/diegosouzapw/OmniRoute/v3.8.51/CHANGELOG.md"
+    ]
+  },
+  "lineage_gap": "The local build-name short commit 2a41147b7 returned HTTP 422 from the public upstream commit API. Package version is verified; full deployed git lineage remains UNVERIFIED (F5-G-OMNI-PIN).",
+  "release_comparison": {
+    "different": [
+      "open-sse/config/providers/registry/codex/index.ts"
+    ],
+    "equal": [
+      "open-sse/config/providers/registry/muse-code/index.ts",
+      "open-sse/config/museCode.ts",
+      "open-sse/config/providers/shared.ts",
+      "src/lib/providers/requestDefaults.ts"
+    ],
+    "method": "SHA256 and byte equality against raw files at c1e30b7676975feb298b49eff6ff58923c04b89e; no candidate code executed."
+  },
+  "files": [
+    {
+      "path": "open-sse/config/providers/registry/codex/index.ts",
+      "sha256": "cb2a82f1fe8661468b51df578ede6409cb57a359591f8e25541969cf9f71f469",
+      "excerpts": [
+        {
+          "line": 1,
+          "text": "import type { RegistryEntry } from \"../../shared.ts\";"
+        },
+        {
+          "line": 2,
+          "text": "import {"
+        },
+        {
+          "line": 3,
+          "text": "  GPT_5_6_CODEX_CAPABILITIES,"
+        },
+        {
+          "line": 4,
+          "text": "  GPT_5_5_CODEX_CAPABILITIES,"
+        },
+        {
+          "line": 5,
+          "text": "  getCodexDefaultHeaders,"
+        },
+        {
+          "line": 6,
+          "text": "  resolvePublicCred,"
+        },
+        {
+          "line": 7,
+          "text": "} from \"../../shared.ts\";"
+        },
+        {
+          "line": 8,
+          "text": ""
+        },
+        {
+          "line": 9,
+          "text": "export const codexProvider: RegistryEntry = {"
+        },
+        {
+          "line": 10,
+          "text": "  id: \"codex\","
+        },
+        {
+          "line": 11,
+          "text": "  alias: \"cx\","
+        },
+        {
+          "line": 12,
+          "text": "  format: \"openai-responses\","
+        },
+        {
+          "line": 13,
+          "text": "  executor: \"codex\","
+        },
+        {
+          "line": 14,
+          "text": "  // Codex /responses is upstream-streaming even when the client requested stream:false."
+        },
+        {
+          "line": 15,
+          "text": "  // Mark it forceStream so chatCore drains terminal SSE into JSON instead of waiting for EOF."
+        },
+        {
+          "line": 16,
+          "text": "  forceStream: true,"
+        },
+        {
+          "line": 17,
+          "text": "  baseUrl: \"https://chatgpt.com/backend-api/codex/responses\","
+        },
+        {
+          "line": 18,
+          "text": "  reasoningTransport: \"opaque\","
+        },
+        {
+          "line": 19,
+          "text": "  authType: \"oauth\","
+        },
+        {
+          "line": 20,
+          "text": "  authHeader: \"bearer\","
+        },
+        {
+          "line": 21,
+          "text": "  defaultContextLength: 400000,"
+        },
+        {
+          "line": 22,
+          "text": "  headers: getCodexDefaultHeaders(),"
+        },
+        {
+          "line": 30,
+          "text": "  models: ["
+        },
+        {
+          "line": 31,
+          "text": "    // Astra shares GPT-5.6's Codex limits: the live OAuth catalog reports"
+        },
+        {
+          "line": 32,
+          "text": "    // max_context_window=872000 (context_window=272000 is the pricing tier)."
+        },
+        {
+          "line": 33,
+          "text": "    { id: \"gpt-6-astra\", name: \"GPT 6 Astra\", ...GPT_5_6_CODEX_CAPABILITIES },"
+        },
+        {
+          "line": 34,
+          "text": "    { id: \"gpt-6-astra-ultra\", name: \"GPT 6 Astra (Ultra)\", ...GPT_5_6_CODEX_CAPABILITIES },"
+        },
+        {
+          "line": 69,
+          "text": "    // GPT-6.1 Sol: low..ultra effort aliases, same windows as Sol."
+        },
+        {
+          "line": 70,
+          "text": "    // https://developers.openai.com/api/docs/models/gpt-6.1-sol"
+        },
+        {
+          "line": 71,
+          "text": "    { id: \"gpt-6.1-sol\", name: \"GPT 6.1 Sol\", ...GPT_5_6_CODEX_CAPABILITIES },"
+        },
+        {
+          "line": 72,
+          "text": "    { id: \"gpt-6.1-sol-ultra\", name: \"GPT 6.1 Sol (Ultra)\", ...GPT_5_6_CODEX_CAPABILITIES },"
+        },
+        {
+          "line": 73,
+          "text": "    { id: \"gpt-6.1-sol-max\", name: \"GPT 6.1 Sol (Max)\", ...GPT_5_6_CODEX_CAPABILITIES },"
+        },
+        {
+          "line": 74,
+          "text": "    { id: \"gpt-6.1-sol-xhigh\", name: \"GPT 6.1 Sol (xHigh)\", ...GPT_5_6_CODEX_CAPABILITIES, timeoutMs: 1200000 },"
+        },
+        {
+          "line": 75,
+          "text": "    { id: \"gpt-6.1-sol-high\", name: \"GPT 6.1 Sol (High)\", ...GPT_5_6_CODEX_CAPABILITIES, timeoutMs: 1200000 },"
+        },
+        {
+          "line": 76,
+          "text": "    { id: \"gpt-6.1-sol-medium\", name: \"GPT 6.1 Sol (Medium)\", ...GPT_5_6_CODEX_CAPABILITIES },"
+        },
+        {
+          "line": 77,
+          "text": "    { id: \"gpt-6.1-sol-low\", name: \"GPT 6.1 Sol (Low)\", ...GPT_5_6_CODEX_CAPABILITIES },"
+        },
+        {
+          "line": 78,
+          "text": "    { id: \"gpt-6-luna\", name: \"GPT 6 Luna\", ...GPT_5_6_CODEX_CAPABILITIES },"
+        },
+        {
+          "line": 79,
+          "text": "    { id: \"gpt-6-luna-max\", name: \"GPT 6 Luna (Max)\", ...GPT_5_6_CODEX_CAPABILITIES },"
+        },
+        {
+          "line": 80,
+          "text": "    {"
+        }
+      ]
+    },
+    {
+      "path": "open-sse/config/providers/registry/muse-code/index.ts",
+      "sha256": "c10ada7126c3a339b6c87b1371bd4d5a7a8a26ad4b2664daac2208130c4fe1be",
+      "excerpts": [
+        {
+          "line": 8,
+          "text": "const MUSE_SPARK_THINKING = [\"minimal\", \"low\", \"medium\", \"high\", \"xhigh\", \"max\"] as const;"
+        },
+        {
+          "line": 9,
+          "text": ""
+        },
+        {
+          "line": 10,
+          "text": "function museSparkModel("
+        },
+        {
+          "line": 11,
+          "text": "  id: string,"
+        },
+        {
+          "line": 12,
+          "text": "  name: string,"
+        },
+        {
+          "line": 13,
+          "text": "  options: { vision?: boolean; thinking?: readonly string[] } = {}"
+        },
+        {
+          "line": 14,
+          "text": ") {"
+        },
+        {
+          "line": 15,
+          "text": "  return {"
+        },
+        {
+          "line": 16,
+          "text": "    id,"
+        },
+        {
+          "line": 17,
+          "text": "    name,"
+        },
+        {
+          "line": 18,
+          "text": "    contextLength: 1048576,"
+        },
+        {
+          "line": 19,
+          "text": "    maxOutputTokens: 65536,"
+        },
+        {
+          "line": 20,
+          "text": "    supportsReasoning: true,"
+        },
+        {
+          "line": 21,
+          "text": "    supportsXHighEffort: true,"
+        },
+        {
+          "line": 22,
+          "text": "    supportedThinkingEfforts: options.thinking ?? MUSE_SPARK_THINKING,"
+        },
+        {
+          "line": 23,
+          "text": "    toolCalling: true,"
+        },
+        {
+          "line": 24,
+          "text": "    supportsVision: options.vision !== false,"
+        },
+        {
+          "line": 25,
+          "text": "    targetFormat: \"openai-responses\" as const,"
+        },
+        {
+          "line": 26,
+          "text": "    unsupportedParams: [\"logprobs\", \"topLogprobs\", \"logitBias\"],"
+        },
+        {
+          "line": 41,
+          "text": "  id: \"muse-code\","
+        },
+        {
+          "line": 42,
+          "text": "  alias: \"mc\","
+        },
+        {
+          "line": 43,
+          "text": "  baseUrl: MUSE_CODE_RESPONSES_URL,"
+        },
+        {
+          "line": 44,
+          "text": "  extraHeaders: { \"User-Agent\": MUSE_CODE_INFERENCE_USER_AGENT },"
+        },
+        {
+          "line": 45,
+          "text": "  passthroughModels: true,"
+        },
+        {
+          "line": 46,
+          "text": "  reasoningTransport: \"opaque\","
+        },
+        {
+          "line": 47,
+          "text": "  defaultContextLength: 200000,"
+        },
+        {
+          "line": 48,
+          "text": "  models: ["
+        },
+        {
+          "line": 49,
+          "text": "    museSparkModel(\"muse-spark-1.3\", \"Muse Spark 1.3\"),"
+        },
+        {
+          "line": 50,
+          "text": "    museSparkModel(\"muse-spark-1.3-contributor\", \"Muse Spark 1.3 Contributor\"),"
+        },
+        {
+          "line": 51,
+          "text": "    museSparkModel(\"muse-spark-1.2\", \"Muse Spark 1.2\", {"
+        },
+        {
+          "line": 52,
+          "text": "      thinking: [\"minimal\", \"low\", \"medium\", \"high\", \"xhigh\"],"
+        },
+        {
+          "line": 53,
+          "text": "    }),"
+        },
+        {
+          "line": 54,
+          "text": "    museSparkModel(\"muse-spark-1.2-contributor\", \"Muse Spark 1.2 Contributor\", {"
+        },
+        {
+          "line": 55,
+          "text": "      thinking: [\"minimal\", \"low\", \"medium\", \"high\", \"xhigh\"],"
+        },
+        {
+          "line": 56,
+          "text": "    }),"
+        },
+        {
+          "line": 57,
+          "text": "    museSparkModel(\"muse-spark-1.1\", \"Muse Spark 1.1\", {"
+        },
+        {
+          "line": 58,
+          "text": "      vision: false,"
+        }
+      ]
+    },
+    {
+      "path": "open-sse/config/providers/shared.ts",
+      "sha256": "cb7c78ff2c0fcdebfdc815a174770f346af6d5eccda581a3ff3b2d9b8f588aaf",
+      "excerpts": [
+        {
+          "line": 332,
+          "text": "// Codex OAuth catalog limits. The live OAuth `/codex/models` endpoint reports"
+        },
+        {
+          "line": 333,
+          "text": "// `context_window` (~272K, the first pricing tier) alongside"
+        },
+        {
+          "line": 334,
+          "text": "// `max_context_window` (~872K, the real usable window); requests past the"
+        },
+        {
+          "line": 335,
+          "text": "// pricing tier succeed upstream (verified: gpt-5.6-luna-xhigh served 380-390K"
+        },
+        {
+          "line": 336,
+          "text": "// input tokens with HTTP 200). The static catalog must advertise the usable"
+        },
+        {
+          "line": 337,
+          "text": "// window so the conservative discovery merge (`Math.min`) does not cap the"
+        },
+        {
+          "line": 338,
+          "text": "// live value at the pricing tier."
+        },
+        {
+          "line": 339,
+          "text": "export const GPT_5_6_CODEX_CAPABILITIES = {"
+        },
+        {
+          "line": 340,
+          "text": "  targetFormat: \"openai-responses\","
+        },
+        {
+          "line": 341,
+          "text": "  toolCalling: true,"
+        },
+        {
+          "line": 342,
+          "text": "  supportsReasoning: true,"
+        },
+        {
+          "line": 343,
+          "text": "  supportsVision: true,"
+        },
+        {
+          "line": 344,
+          "text": "  supportsXHighEffort: true,"
+        },
+        {
+          "line": 345,
+          "text": "  contextLength: 872000,"
+        },
+        {
+          "line": 346,
+          "text": "  maxInputTokens: 872000,"
+        },
+        {
+          "line": 347,
+          "text": "  maxOutputTokens: 128000,"
+        },
+        {
+          "line": 348,
+          "text": "} as const;"
+        }
+      ]
+    },
+    {
+      "path": "open-sse/config/museCode.ts",
+      "sha256": "e7b7f3dc7b1187a275fac3446eec4d57ea64b482e525deaa7471a443dff11fc3",
+      "excerpts": [
+        {
+          "line": 18,
+          "text": "export const MUSE_CODE_API_BASE_URL = \"https://api.meta.ai/v1\";"
+        },
+        {
+          "line": 19,
+          "text": "export const MUSE_CODE_RESPONSES_URL = `${MUSE_CODE_API_BASE_URL}/responses`;"
+        }
+      ]
+    },
+    {
+      "path": "src/lib/providers/requestDefaults.ts",
+      "sha256": "f9ed676e244fc504deae354bb5dee46be5a242a24526d6e1017296ed34110043",
+      "excerpts": [
+        {
+          "line": 59,
+          "text": "export type CodexServiceTier = \"default\" | \"priority\" | \"flex\";"
+        },
+        {
+          "line": 60,
+          "text": ""
+        },
+        {
+          "line": 61,
+          "text": "export function normalizeCodexServiceTier(value: unknown): CodexServiceTier | undefined {"
+        },
+        {
+          "line": 62,
+          "text": "  const normalized = normalizeString(value);"
+        },
+        {
+          "line": 63,
+          "text": "  if (!normalized) return undefined;"
+        },
+        {
+          "line": 64,
+          "text": "  if (normalized === \"fast\" || normalized === \"priority\") return \"priority\";"
+        },
+        {
+          "line": 65,
+          "text": "  if (normalized === \"default\" || normalized === \"flex\") return normalized;"
+        },
+        {
+          "line": 66,
+          "text": "  return undefined;"
+        },
+        {
+          "line": 67,
+          "text": "}"
+        }
+      ]
+    },
+    {
+      "path": "open-sse/executors/codex/reasoningSuffix.ts",
+      "sha256": "e6709380c42b76fe115861df83afc9a00be64bba3e5fdf615ec910094d5901c9",
+      "excerpts": [
+        {
+          "line": 1,
+          "text": "export const CODEX_EFFORT_ORDER = ["
+        },
+        {
+          "line": 2,
+          "text": "  \"none\","
+        },
+        {
+          "line": 3,
+          "text": "  \"low\","
+        },
+        {
+          "line": 4,
+          "text": "  \"medium\","
+        },
+        {
+          "line": 5,
+          "text": "  \"high\","
+        },
+        {
+          "line": 6,
+          "text": "  \"xhigh\","
+        },
+        {
+          "line": 7,
+          "text": "  \"max\","
+        },
+        {
+          "line": 8,
+          "text": "  \"ultra\","
+        },
+        {
+          "line": 9,
+          "text": "] as const;"
+        },
+        {
+          "line": 10,
+          "text": "export type CodexEffortLevel = (typeof CODEX_EFFORT_ORDER)[number];"
+        },
+        {
+          "line": 11,
+          "text": "export const CODEX_MAX_ALIAS_MODELS = new Set(["
+        },
+        {
+          "line": 12,
+          "text": "  \"gpt-5.6-sol\","
+        },
+        {
+          "line": 13,
+          "text": "  \"gpt-5.6-terra\","
+        },
+        {
+          "line": 14,
+          "text": "  \"gpt-5.6-luna\","
+        },
+        {
+          "line": 15,
+          "text": "  \"gpt-6-astra\","
+        },
+        {
+          "line": 16,
+          "text": "  \"gpt-6-sol\","
+        },
+        {
+          "line": 17,
+          "text": "  \"gpt-6-luna\","
+        },
+        {
+          "line": 18,
+          "text": "  \"gpt-6.1-sol\","
+        },
+        {
+          "line": 19,
+          "text": "]);"
+        },
+        {
+          "line": 20,
+          "text": "export const CODEX_ULTRA_ALIAS_MODELS = new Set(["
+        },
+        {
+          "line": 21,
+          "text": "  \"gpt-5.6-sol\","
+        },
+        {
+          "line": 22,
+          "text": "  \"gpt-5.6-terra\","
+        },
+        {
+          "line": 23,
+          "text": "  \"gpt-6-astra\","
+        },
+        {
+          "line": 24,
+          "text": "  \"gpt-6-sol\","
+        },
+        {
+          "line": 25,
+          "text": "  \"gpt-6.1-sol\","
+        },
+        {
+          "line": 26,
+          "text": "]);"
+        },
+        {
+          "line": 27,
+          "text": ""
+        },
+        {
+          "line": 28,
+          "text": "/** Highest effort a max/ultra-tier base model accepts, or null for other models. */"
+        },
+        {
+          "line": 29,
+          "text": "export function getCodexAliasEffortCap(model: string): CodexEffortLevel | null {"
+        },
+        {
+          "line": 30,
+          "text": "  if (CODEX_ULTRA_ALIAS_MODELS.has(model)) return \"ultra\";"
+        },
+        {
+          "line": 31,
+          "text": "  if (CODEX_MAX_ALIAS_MODELS.has(model)) return \"max\";"
+        },
+        {
+          "line": 32,
+          "text": "  return null;"
+        },
+        {
+          "line": 33,
+          "text": "}"
+        },
+        {
+          "line": 34,
+          "text": ""
+        },
+        {
+          "line": 35,
+          "text": "export function splitCodexReasoningSuffix(model: unknown): {"
+        },
+        {
+          "line": 36,
+          "text": "  baseModel: string;"
+        },
+        {
+          "line": 37,
+          "text": "  effort: CodexEffortLevel | null;"
+        },
+        {
+          "line": 38,
+          "text": "} {"
+        },
+        {
+          "line": 39,
+          "text": "  const modelId = typeof model === \"string\" ? model : \"\";"
+        },
+        {
+          "line": 40,
+          "text": "  const maxTierMatch = /^(.+?)(?:-(max|ultra)|\\((max|ultra)\\))$/.exec(modelId);"
+        },
+        {
+          "line": 41,
+          "text": "  if (maxTierMatch) {"
+        },
+        {
+          "line": 42,
+          "text": "    const [, baseModel, hyphenEffort, parenthesizedEffort] = maxTierMatch;"
+        },
+        {
+          "line": 43,
+          "text": "    const effort = hyphenEffort ?? parenthesizedEffort;"
+        },
+        {
+          "line": 44,
+          "text": "    const supportedModels = parenthesizedEffort"
+        },
+        {
+          "line": 45,
+          "text": "      ? CODEX_MAX_ALIAS_MODELS"
+        },
+        {
+          "line": 46,
+          "text": "      : effort === \"ultra\""
+        },
+        {
+          "line": 47,
+          "text": "        ? CODEX_ULTRA_ALIAS_MODELS"
+        },
+        {
+          "line": 48,
+          "text": "        : CODEX_MAX_ALIAS_MODELS;"
+        },
+        {
+          "line": 49,
+          "text": "    if (supportedModels.has(baseModel)) {"
+        },
+        {
+          "line": 50,
+          "text": "      return { baseModel, effort: effort as CodexEffortLevel };"
+        },
+        {
+          "line": 51,
+          "text": "    }"
+        },
+        {
+          "line": 52,
+          "text": "  }"
+        },
+        {
+          "line": 53,
+          "text": ""
+        },
+        {
+          "line": 54,
+          "text": "  for (const effort of [\"none\", \"low\", \"medium\", \"high\", \"xhigh\"] as const) {"
+        },
+        {
+          "line": 55,
+          "text": "    if (modelId.endsWith(`-${effort}`)) {"
+        },
+        {
+          "line": 56,
+          "text": "      return { baseModel: modelId.slice(0, -`-${effort}`.length), effort };"
+        },
+        {
+          "line": 57,
+          "text": "    }"
+        },
+        {
+          "line": 58,
+          "text": "  }"
+        },
+        {
+          "line": 59,
+          "text": "  return { baseModel: modelId, effort: null };"
+        },
+        {
+          "line": 60,
+          "text": "}"
+        }
+      ]
+    }
+  ],
+  "mechanism_findings": [
+    "codex alias cx uses ChatGPT backend Responses; current local registry includes gpt-6.1-sol.",
+    "muse-code alias mc uses https://api.meta.ai/v1/responses and supports passthrough models, but lists Spark, not Wonder Full.",
+    "Gateway GPT capability source and live list advertise 872000 context/input, whereas official API pages advertise 1050000 context.",
+    "Gateway advertises max on Spark 1.3 Contributor; current Meta reasoning documentation says Contributor does not support max. This is an untested conflict, not authorization to call it."
+  ],
+  "limitations": [
+    "Packaged source and listener cwd do not prove every loaded compiled byte matches this source. No request trace or build manifest was read.",
+    "Read only package source and metadata; no OmniRoute operational data directory or credentials."
+  ]
+}
