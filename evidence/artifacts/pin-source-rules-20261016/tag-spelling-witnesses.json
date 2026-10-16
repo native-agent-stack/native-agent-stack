@@ -1,0 +1,114 @@
+{
+  "evidence_class": "source_review",
+  "capture_context": "Retained F1 public native ref queries from 2026-10-14/15; these are spelling witnesses, not new observations or applied pins. Raw stderr omitted.",
+  "rows": [
+    {
+      "component": "ccusage",
+      "version": "20.0.26",
+      "repository": "github.com/ccusage/ccusage",
+      "command": [
+        "git",
+        "ls-remote",
+        "https://github.com/ccusage/ccusage.git",
+        "refs/tags/ccusage@20.0.26",
+        "refs/tags/ccusage@20.0.26^{}",
+        "refs/tags/@ccusage/ccusage@20.0.26",
+        "refs/tags/@ccusage/ccusage@20.0.26^{}",
+        "refs/tags/v20.0.26",
+        "refs/tags/v20.0.26^{}",
+        "refs/tags/20.0.26",
+        "refs/tags/20.0.26^{}"
+      ],
+      "exit_code": 0,
+      "stdout": "d9821088b98aa536c7a385aa1a4579d6fa02269b\trefs/tags/v20.0.26\n",
+      "tag": "v20.0.26",
+      "tag_object": null,
+      "peeled_commit": "d9821088b98aa536c7a385aa1a4579d6fa02269b",
+      "status": "resolved"
+    },
+    {
+      "component": "codex",
+      "version": "0.160.0",
+      "repository": "github.com/openai/codex",
+      "command": [
+        "git",
+        "ls-remote",
+        "https://github.com/openai/codex.git",
+        "refs/tags/rust-v0.160.0",
+        "refs/tags/rust-v0.160.0^{}",
+        "refs/tags/v0.160.0",
+        "refs/tags/v0.160.0^{}",
+        "refs/tags/0.160.0",
+        "refs/tags/0.160.0^{}"
+      ],
+      "exit_code": 0,
+      "stdout": "79b1b666f2e8551f8abbbca34957227f67f3f553\trefs/tags/rust-v0.160.0\na956835d020762cb2b570053af06f643a11c0ecc\trefs/tags/rust-v0.160.0^{}\n",
+      "tag": "rust-v0.160.0",
+      "tag_object": "79b1b666f2e8551f8abbbca34957227f67f3f553",
+      "peeled_commit": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "status": "resolved"
+    },
+    {
+      "component": "mcp-inspector",
+      "version": "2.9.0",
+      "repository": "github.com/modelcontextprotocol/inspector",
+      "command": [
+        "git",
+        "ls-remote",
+        "https://github.com/modelcontextprotocol/inspector.git",
+        "refs/tags/@modelcontextprotocol/inspector@2.9.0",
+        "refs/tags/@modelcontextprotocol/inspector@2.9.0^{}",
+        "refs/tags/v2.9.0",
+        "refs/tags/v2.9.0^{}",
+        "refs/tags/2.9.0",
+        "refs/tags/2.9.0^{}"
+      ],
+      "exit_code": 0,
+      "stdout": "ae865a19178ddf6f375780a02e9c77c4cf4da184\trefs/tags/2.9.0\n",
+      "tag": "2.9.0",
+      "tag_object": null,
+      "peeled_commit": "ae865a19178ddf6f375780a02e9c77c4cf4da184",
+      "status": "resolved"
+    },
+    {
+      "component": "poppler",
+      "version": "26.09.0",
+      "repository": "github.com/tsdgeos/poppler_mirror",
+      "command": [
+        "git",
+        "ls-remote",
+        "https://gitlab.freedesktop.org/poppler/poppler.git",
+        "refs/tags/poppler-26.09.0",
+        "refs/tags/poppler-26.09.0^{}"
+      ],
+      "exit_code": 0,
+      "stdout": "cd58510145725f4870c3e51dbbf2b03ea97e4887\trefs/tags/poppler-26.09.0\ne661b7b61a1b1feeb3193e5eced6274cc03e0ffa\trefs/tags/poppler-26.09.0^{}\n",
+      "tag": "poppler-26.09.0",
+      "tag_object": "cd58510145725f4870c3e51dbbf2b03ea97e4887",
+      "peeled_commit": "e661b7b61a1b1feeb3193e5eced6274cc03e0ffa",
+      "status": "resolved"
+    },
+    {
+      "component": "postgresql",
+      "version": "18.6",
+      "repository": "github.com/postgres/postgres",
+      "command": [
+        "git",
+        "ls-remote",
+        "https://github.com/postgres/postgres.git",
+        "refs/tags/REL_18_6",
+        "refs/tags/REL_18_6^{}",
+        "refs/tags/v18.6",
+        "refs/tags/v18.6^{}",
+        "refs/tags/18.6",
+        "refs/tags/18.6^{}"
+      ],
+      "exit_code": 0,
+      "stdout": "724edf9bde9d356724ad384a2e196edc3c9f80f7\trefs/tags/REL_18_6\n",
+      "tag": "REL_18_6",
+      "tag_object": null,
+      "peeled_commit": "724edf9bde9d356724ad384a2e196edc3c9f80f7",
+      "status": "resolved"
+    }
+  ]
+}

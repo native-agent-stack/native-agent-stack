@@ -129,6 +129,23 @@ def identity(value):
     return value
 
 
+def catalog_identity(repository, record=None):
+    """One legacy-index mapping shared by selected-source producer and consumers.
+
+    This does not rewrite the source record or alter actual repository matching.
+    """
+    if (isinstance(repository, str) and re.fullmatch(
+            r"https://git\.launchpad\.net/ubuntu/\+source/[a-z0-9][a-z0-9+.-]*", repository)):
+        require(isinstance(record, dict) and record.get("source_identity_kind") == "os_distribution_package",
+                "distribution source URL requires an explicit OS-distribution package marker")
+        upstream = record.get("upstream_repository")
+        require(isinstance(upstream, str) and re.fullmatch(
+            r"https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", upstream),
+            "distribution source package needs a canonical upstream-project repository")
+        return identity(upstream)
+    return identity(repository)
+
+
 def aliases_for(root):
     data = load(root, f"{BASE}/coverage.json")
     require(isinstance(data, dict) and isinstance(data.get("aliases"), dict), "coverage aliases must be an object")
@@ -198,7 +215,7 @@ def build_index(root: Path, sources=None):
             current_stars = set()
         for number, entry in enumerate(collection):
             require(isinstance(entry, dict), "source entry must be an object")
-            name = canonical(identity(entry.get(spec["repository_field"])), aliases)
+            name = canonical(catalog_identity(entry.get(spec["repository_field"]), entry), aliases)
             if spec == CURRENT_STAR_SOURCE:
                 current_stars.add(name)
             record = records.setdefault(name, {"repository": f"https://github.com/{name}",

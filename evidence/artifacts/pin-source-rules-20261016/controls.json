@@ -33,17 +33,129 @@
     "execution": "Native unittest in an idle-class scope; real repository proof replay plus temporary-root source/application controls."
   },
   "ownership": {
-    "final_stack_changed_existing_functions": ["run_records"],
-    "final_stack_added_functions": ["lock_source_proof"],
-    "landscape_changed_existing_functions": ["validate_verdict_row", "build_landscape"],
-    "landscape_added_functions": ["catalog_identity"],
+    "final_stack_changed_existing_functions": [
+      "run_records"
+    ],
+    "final_stack_added_functions": [
+      "lock_source_proof",
+      "proof_backed_record_pin"
+    ],
+    "landscape_changed_existing_functions": [
+      "validate_verdict_row",
+      "build_landscape"
+    ],
+    "landscape_added_functions": [],
     "comparison": "AST dumps at the base versus current source, excluding location attributes.",
-    "boundary": "The landscape changes are legacy identity call sites only. Every other existing function, including FINAL admission/refusal/current-snapshot functions, is unchanged."
+    "boundary": "The landscape changes are legacy identity call sites only. Every other existing function, including FINAL admission/refusal/current-snapshot functions, is unchanged.",
+    "catalog_decisions_changed_existing_functions": [
+      "build_index"
+    ],
+    "catalog_decisions_added_functions": [
+      "catalog_identity"
+    ]
+  },
+  "local_review_fold": {
+    "review": "pr1209-f2ef44c5/review_output.json",
+    "reviewed_commit": "f2ef44c5281946364de2436a76b89445258df2ae",
+    "before": {
+      "tests": 4,
+      "failures": 3,
+      "errors": 1,
+      "scope": "Two actual-source freshness refusals and retained-report refusal fail; the marked selected component hits the real index producer's GitHub-only identity refusal.",
+      "error_diagnostic": "InvalidDecisionIndex: repository URL must identify a public GitHub repository"
+    },
+    "first_broader_run": {
+      "tests": 144,
+      "failures": 0,
+      "errors": 2,
+      "cause": "Existing explicit GitHub transfer aliases were initially rejected by the tightened freshness comparison; that compatibility path is preserved only between actual GitHub repositories."
+    },
+    "after": {
+      "command": "python3 -m unittest tests.test_distribution_source_identity tests.test_catalog_decisions tests.test_run_pin_sources tests.test_nautilus_run_pin tests.test_landscape tests.test_final_stack.PinTests tests.test_final_stack.RunTests",
+      "tests": 163,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "scope": "Real index producer round-trip, package freshness positive/refusal controls, applied proof-report lifecycle preservation and existing index/landscape/source-pin/parser consumers."
+    },
+    "publication": "Prepared during the hold; published only after the co-op released the complete local, CC FULL and GPT full1 review wave."
+  },
+  "cc_full_fold": {
+    "review": "MICRO-full-f2ef44c5.md",
+    "before_policy_grant": {
+      "tests": 25,
+      "failures": 2,
+      "errors": 0
+    },
+    "before_nonlock_source_guards": {
+      "tests": 1,
+      "failures": 3,
+      "errors": 0,
+      "scope": "Adoption tools.commit, stack.source_pin and runtime.source_commit each completed the same commit-cited pin without proof."
+    },
+    "before_apply_references": {
+      "tests": 2,
+      "failures": 0,
+      "errors": 2,
+      "scope": "Exact reviewed apply_report code writes stack and adoption commits with no consumed source_proof reference; each test hits KeyError source_proof after the native fill, not during fixture setup."
+    },
+    "before_resolver_controls": {
+      "tests": 2,
+      "failures": 2,
+      "errors": 0,
+      "scope": "An incomplete spelling query and inherited Git configuration/raw stderr fail the new refusal/privacy controls."
+    },
+    "after_regeneration": {
+      "command": "python3 -m unittest tests.test_run_pin_sources tests.test_nautilus_run_pin tests.test_distribution_source_identity tests.test_catalog_decisions tests.test_landscape tests.test_final_stack.PinTests tests.test_final_stack.RunTests tests.test_final_stack.RepositoryTests tests.test_local_pages_policy_grants",
+      "tests": 200,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "fixture_migrations": [
+      "test_only_the_engine_repository_version_and_commit_are_copied",
+      "test_equal_version_only_lock_keeps_conflicting_lower_commit_sources_visible"
+    ],
+    "fixture_boundary": "Only these two legacy source-path fixtures gain retained proof and proof-less refusal controls; every original assertion remains, with no FINAL activation/refusal test or code change.",
+    "generated_projection": {
+      "unproved_claims_informational": 31,
+      "proof_backed_commit_runs": [
+        "nautilus-trader"
+      ],
+      "input_data": "Catalog, source binding, version, uv.lock and frozen-wave bytes unchanged; generated run/drift/summary projection follows the fail-closed ruling."
+    }
   },
   "limits": [
     "Retained-observation consistency is not a signed upstream provenance or artifact-to-source build-equivalence claim.",
     "No catalog winner, run source binding, runtime version, uv.lock, frozen verdict or wave changes.",
-    "The generated final-stack input set gains the existing public Nautilus observation hash.",
+    "The generated final-stack input set tracks a new full-spelling public Nautilus observation; its source commit is unchanged. All other unproved commit claims remain informational.",
     "PIN-RULES lands before the separate qualified FINAL opening; PIN-DATA follows rules."
-  ]
+  ],
+  "gpt_full_fold": {
+    "review": "GPT-VERDICT-f2ef44c52.md",
+    "monitoring_before": {
+      "command": "python3 -m unittest tests.test_runtime_worker_openhands_push_gate",
+      "tests": 127,
+      "failures": 2,
+      "errors": 0,
+      "skipped": 0
+    },
+    "monitoring_native_derivation": {
+      "previous_accounted_count": 353,
+      "current_count": 354,
+      "new_location": "scripts/complete_run_pins.py:240",
+      "historical_bytes": "unchanged",
+      "permission_change": false,
+      "artifact": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261016-pr1209-pin-rules-delta.json"
+    },
+    "source_and_grant_after": {
+      "tests": 201,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "grant_proposal_command": "python3 scripts/local_pages_policy_grants.py --root . --pin f2ef44c5281946364de2436a76b89445258df2ae",
+    "retry_contract": "One-use original run-identity plan; replay refuses before writes and preserves every retained fixture file and generated result. Existing refusal behavior documented/tested, no retry implementation claimed.",
+    "freshness": "Actual normalized package repository identity with explicit GitHub transfer compatibility, distinct from upstream-project coverage equivalence."
+  }
 }

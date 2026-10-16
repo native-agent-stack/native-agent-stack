@@ -1,0 +1,31 @@
+{
+  "evidence_class": "source_review",
+  "checked_on": "2026-10-16",
+  "component": "systemd",
+  "version": "255.4-1ubuntu8.17",
+  "repository": "git.launchpad.net/ubuntu/+source/systemd",
+  "command": [
+    "git",
+    "ls-remote",
+    "https://git.launchpad.net/ubuntu/+source/systemd",
+    "refs/tags/import/255.4-1ubuntu8.17",
+    "refs/tags/import/255.4-1ubuntu8.17^{}",
+    "refs/tags/v255.4-1ubuntu8.17",
+    "refs/tags/v255.4-1ubuntu8.17^{}",
+    "refs/tags/255.4-1ubuntu8.17",
+    "refs/tags/255.4-1ubuntu8.17^{}"
+  ],
+  "exit_code": 0,
+  "stdout": "ae2287bb3d2035931bcb1028136c7cc0c508bc2d\trefs/tags/import/255.4-1ubuntu8.17\n080f998fadef77df1f9c6814c721b0b5de824537\trefs/tags/import/255.4-1ubuntu8.17^{}\n",
+  "stderr": "",
+  "stderr_present": false,
+  "stderr_policy": "raw stderr withheld",
+  "status": "resolved",
+  "tag": "import/255.4-1ubuntu8.17",
+  "tag_ref": "refs/tags/import/255.4-1ubuntu8.17",
+  "tag_object": "ae2287bb3d2035931bcb1028136c7cc0c508bc2d",
+  "ref_object": "ae2287bb3d2035931bcb1028136c7cc0c508bc2d",
+  "tag_kind": "annotated",
+  "peeled_commit": "080f998fadef77df1f9c6814c721b0b5de824537",
+  "boundary": "Public source URL/tag witness only, queried with isolated Git configuration and HTTPS. No systemd source pin, package, catalog, verdict or runtime change is applied."
+}

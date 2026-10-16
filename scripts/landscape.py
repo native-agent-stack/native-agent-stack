@@ -13,11 +13,12 @@ import re
 from urllib.parse import urlsplit
 
 try:
-    from .catalog_decisions import canonical, identity, load, safe_file
-    from . import platform_status as platform_evidence
+    from .catalog_decisions import canonical, catalog_identity, identity, load, safe_file
+    from . import host_receipts, platform_status as platform_evidence
 except ImportError:
-    from catalog_decisions import canonical, identity, load, safe_file
+    from catalog_decisions import canonical, catalog_identity, identity, load, safe_file
     import platform_status as platform_evidence
+    import host_receipts
 
 MANIFEST = "catalogs/landscape/manifest.json"
 FINAL_ADMISSION_REFUSAL = "admission under redesign"
@@ -94,24 +95,6 @@ def is_unrun_registration(row, *, root=None):
     published = registration_history(root).get(key)
     require(published is None, f"registration_only {key} already belongs to {published}")
     return True
-def catalog_identity(repository, record=None):
-    """Use an explicitly marked package's upstream only for the legacy index.
-
-    The actual candidate/winner/run repository remains the distribution source.
-    Receipt identity and FINAL admission are not changed by this coverage bridge.
-    """
-    if (isinstance(repository, str) and re.fullmatch(
-            r"https://git\.launchpad\.net/ubuntu/\+source/[a-z0-9][a-z0-9+.-]*", repository)):
-        require(isinstance(record, dict) and record.get("source_identity_kind") == "os_distribution_package",
-                "distribution source URL requires an explicit OS-distribution package marker")
-        upstream = record.get("upstream_repository")
-        require(isinstance(upstream, str) and re.fullmatch(
-            r"https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", upstream),
-            "distribution source package needs a canonical upstream-project repository")
-        return identity(upstream)
-    return identity(repository)
-
-
 DISPOSITIONS = {
     "selected", "observed_failure", "measured_tradeoff", "overlap",
     "out_of_scope", "unqualified", "conditional",
@@ -1520,8 +1503,16 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
                 "freshness selected version differs from current manifest")
         require(row.get("selected_source_pin") == selected.get("source_pin"),
                 "freshness selected source pin differs from current manifest")
-        require(canonical(catalog_identity(row.get("selected_repository_url"), row), aliases)
-                == canonical(catalog_identity(selected.get("repository"), selected), aliases),
+        observed_repository = host_receipts.normalize_repository(row.get("selected_repository_url"))
+        selected_repository = host_receipts.normalize_repository(selected.get("repository"))
+        # Existing explicit GitHub transfers remain aliases. A distribution
+        # source must match its actual package path, never its upstream project.
+        github_transfer = (isinstance(observed_repository, str) and isinstance(selected_repository, str)
+                           and observed_repository.startswith("github.com/")
+                           and selected_repository.startswith("github.com/")
+                           and canonical(identity(observed_repository.removeprefix("github.com/")), aliases)
+                           == canonical(identity(selected_repository.removeprefix("github.com/")), aliases))
+        require(observed_repository == selected_repository or github_transfer,
                 "freshness selected repository differs from current manifest")
     stars = freshness.get("stars", {})
     require(stars.get("status") == "checked", "current public-star snapshot is not checked")

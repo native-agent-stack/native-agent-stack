@@ -499,11 +499,32 @@ class RunTests(FixtureTestCase):
                 {"source": "manifests/stack.json#/components/0", "pin": "1.0.0"},
                 {"source": fs.RUNTIME_TARGET + "#" + fs.RUNTIME_ENGINE_POINTER, "pin": "1.0.0"}])):
             with self.subTest(lower_commit=lower_commit):
-                document = self.build(lock={"widget": "1.0.0"},
+                root = self.root()
+                _fixture(root, lock={"widget": "1.0.0"},
                     stack=[{"id": "widget", "repository": "https://github.com/example/widget",
                             "version": "1.0.0", "source_pin": COMMIT_A}],
                     engine={"repository": "https://github.com/example/widget", "requested_version": "1.0.0",
                             "source_commit": lower_commit})
+                unproved = fs.run_records(fs.Sources(root))
+                for record in unproved:
+                    if record["parsed"].get("source_commit_claim"):
+                        self.assertIsNone(record["parsed"]["pin_parsed"]["commit"])
+                        self.assertFalse(fs.complete_final_pin(record["parsed"]["source_commit_claim"],
+                                                              fs.build_runs([record])[0]))
+                for path, selector, commit in ((fs.STACK, "components", COMMIT_A),
+                                                (fs.RUNTIME_TARGET, "engine", lower_commit)):
+                    relative = "evidence/artifacts/proof-fixture/" + selector + ".json"
+                    _write_json(root / relative, {
+                        "component": "widget", "version": "1.0.0", "repository": "github.com/example/widget",
+                        "command": ["git", "ls-remote", "https://github.com/example/widget.git",
+                                    "refs/tags/v1.0.0", "refs/tags/v1.0.0^{}", "refs/tags/1.0.0", "refs/tags/1.0.0^{}"],
+                        "exit_code": 0, "stdout": commit + "\trefs/tags/v1.0.0\n",
+                        "tag_object": None, "peeled_commit": commit})
+                    source = json.loads((root / path).read_text())
+                    entry = source[selector][0] if selector == "components" else source[selector]
+                    entry["source_proof"] = relative
+                    _write_json(root / path, source)
+                document = fs.build_document(root)
                 run = fs.run_pin(document, "widget")
                 self.assertEqual(run["pin_parsed"], {"version": "1.0.0", "commit": None})
                 self.assertEqual(run["conflicts"], expected)
@@ -636,10 +657,26 @@ class RunTests(FixtureTestCase):
         self.assertEqual(self.layer(document, "layer-a")["winners"][0]["run_reason"], "external")
 
     def test_only_the_engine_repository_version_and_commit_are_copied(self):
-        document = self.build(engine={
+        root = self.root()
+        _fixture(root, engine={
             "repository": "https://github.com/example/engine", "requested_version": "3.0.0rc1",
             "source_commit": COMMIT_B, "install_command": "uv pip install --python \"$ENGINE_ENV/bin/python\" engine",
             "host": "fixture-host-name"})
+        unproved = fs.run_pin(fs.build_document(root), "https://github.com/example/engine")
+        self.assertEqual(unproved["source_commit_claim"], COMMIT_B)
+        self.assertFalse(fs.complete_final_pin(COMMIT_B, unproved))
+        relative = "evidence/artifacts/proof-fixture/engine.json"
+        _write_json(root / relative, {
+            "component": "engine", "version": "3.0.0rc1", "repository": "github.com/example/engine",
+            "command": ["git", "ls-remote", "https://github.com/example/engine.git",
+                        "refs/tags/v3.0.0rc1", "refs/tags/v3.0.0rc1^{}",
+                        "refs/tags/3.0.0rc1", "refs/tags/3.0.0rc1^{}"],
+            "exit_code": 0, "stdout": COMMIT_B + "\trefs/tags/v3.0.0rc1\n",
+            "tag_object": None, "peeled_commit": COMMIT_B})
+        source = json.loads((root / fs.RUNTIME_TARGET).read_text())
+        source["engine"]["source_proof"] = relative
+        _write_json(root / fs.RUNTIME_TARGET, source)
+        document = fs.build_document(root)
         run = fs.run_pin(document, "https://github.com/example/engine")
         self.assertEqual((run["id"], run["pin"], run["pin_parsed"]),
                          ("engine", "3.0.0rc1", {"version": "3.0.0rc1", "commit": COMMIT_B}))

@@ -11568,8 +11568,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-read-deltas.json",
-      "sha256": "1d617390cb65971935836b0a5732155ca7748f9ff79fe1223bbb9480d512fad8",
-      "bytes": 1256
+      "sha256": "a5c7412259a074549d09ae653aa29d196eb9baa7017fe2eb42e92dc82fa47ceb",
+      "bytes": 1374
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
@@ -11635,6 +11635,11 @@
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261014-pr1094-rebase-delta.json",
       "sha256": "5f81fe355c0fc06bff935047a6ea27ef16588917a9a537710d7692a0e1ec5872",
       "bytes": 16981
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261016-pr1209-pin-rules-delta.json",
+      "sha256": "57588f770315e5a36fa4c99249dbd18739578a262491519682bb75b00a73fae7",
+      "bytes": 53304
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unit-pass.txt",
@@ -17608,8 +17613,8 @@
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "f8835da6a47925e7758d24fea6bfe0feec3dc34e3f1205b4daf08e267f9c7ba6",
-      "bytes": 339743
+      "sha256": "34f811465e3f62106be2b6210f334c4f65d2d8572019b56c6bcd3d7952130d72",
+      "bytes": 342645
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -19353,8 +19358,8 @@
     },
     {
       "path": "docs/decisions/2026-10-16-pin-source-rules.md",
-      "sha256": "75aee25f7bd1b2098a70b6b80cfd3828e98bdfe7d4165d464058217e69919897",
-      "bytes": 7064
+      "sha256": "e4222a35c40c82fd6551d7df361dbc75a6dabbba524791e056c3ac7281d9cbd4",
+      "bytes": 15740
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -49013,8 +49018,23 @@
     },
     {
       "path": "evidence/artifacts/pin-source-rules-20261016/controls.json",
-      "sha256": "bcbfa6429be82ab21b7a8412268fb647f810e537e58654b3d1b7c497fff3f246",
-      "bytes": 2714
+      "sha256": "92a38ee6273de9bc41f529426cc74eb04b65953e55bf9ec695063bfb183e24f3",
+      "bytes": 7895
+    },
+    {
+      "path": "evidence/artifacts/pin-source-rules-20261016/nautilus-tag-proof.json",
+      "sha256": "ce3b41c349089e12d7726f33e5a690d9f277ef3f702c17146c3dd82111f990a0",
+      "bytes": 1442
+    },
+    {
+      "path": "evidence/artifacts/pin-source-rules-20261016/systemd-source-query.json",
+      "sha256": "a6ba37b1a1784613bee1eefcb51bff83d24ee4f3597a06b6f7ed66ca2a957e4c",
+      "bytes": 1311
+    },
+    {
+      "path": "evidence/artifacts/pin-source-rules-20261016/tag-spelling-witnesses.json",
+      "sha256": "09e8d1301ebd6b44bde77d4a5d249ab80684b1a189dd52602a6aff87a0037588",
+      "bytes": 3908
     },
     {
       "path": "evidence/artifacts/plugin-skill-identity-20261013/README.md",
@@ -62613,8 +62633,8 @@
     },
     {
       "path": "scripts/catalog_decisions.py",
-      "sha256": "98ca164a332baf46b0429ac93e4272af4dedd26a2647dcf493f321bb1169d65e",
-      "bytes": 14769
+      "sha256": "3b2f4733d75918bcba43a5cb5b70c2e32c592f71b6c95727529579eb7ddf0564",
+      "bytes": 15706
     },
     {
       "path": "scripts/check_text_digests.py",
@@ -62633,8 +62653,8 @@
     },
     {
       "path": "scripts/complete_run_pins.py",
-      "sha256": "f108f05ba107dcdc343a2ada99bc62b9bdf28fe63f7d7caf7d787609ffe3665b",
-      "bytes": 13491
+      "sha256": "7c2e298f3ac713b868e9cd3eca47015c787cfacd31ece9081de590d022171ba9",
+      "bytes": 14980
     },
     {
       "path": "scripts/component_matrix.py",
@@ -62663,8 +62683,8 @@
     },
     {
       "path": "scripts/final_stack.py",
-      "sha256": "b0369fb068741a6d7b2deda67d10577e72211924bfb274e11760968e5b8d6f0e",
-      "bytes": 85580
+      "sha256": "3feb1fd3dabdf950f89f6c39d93e1fed49fff2645a2ae8474de5435f69f69b82",
+      "bytes": 87655
     },
     {
       "path": "scripts/freshness_propose.py",
@@ -62713,8 +62733,8 @@
     },
     {
       "path": "scripts/landscape.py",
-      "sha256": "ef987c1786a12aaac07130ddb091391d97d3b8416127eb4fd20f786ad2c4c4d5",
-      "bytes": 112422
+      "sha256": "79616bba09fe372df06913738f782f678fd342959b2512c162e6294c84924ada",
+      "bytes": 112217
     },
     {
       "path": "scripts/native_token_ci.py",
@@ -63698,8 +63718,8 @@
     },
     {
       "path": "tests/test_distribution_source_identity.py",
-      "sha256": "774ff7d065af788824cf510c8e55913c44fc2c62360e6758ada7c213a2764fbb",
-      "bytes": 1769
+      "sha256": "5235029bc06a33e9b0f7b52afffe55635d21fcfd9f3419e95d7c8387d743e463",
+      "bytes": 4665
     },
     {
       "path": "tests/test_document_ingestion.py",
@@ -63763,8 +63783,8 @@
     },
     {
       "path": "tests/test_final_stack.py",
-      "sha256": "e77d8344592573fa002a5c44ae418cd0aac7ec604744871b79ff7428f339b5cd",
-      "bytes": 78508
+      "sha256": "ed53b0a68e77db5f1bccfc454308449d6b5480b9298d4edb7dd659acd1db222c",
+      "bytes": 81139
     },
     {
       "path": "tests/test_financial_data.py",
@@ -64273,8 +64293,8 @@
     },
     {
       "path": "tests/test_nautilus_run_pin.py",
-      "sha256": "d4736989ded2696323bc0b1c93f15dacd973ac11c632d78f19d4f3ff4b3fe25d",
-      "bytes": 7166
+      "sha256": "644d7401d1bc52f63dfc1925c691258849d81284ee99935f7a24e6e5b6e87d53",
+      "bytes": 7241
     },
     {
       "path": "tests/test_new_host_grand_list.py",
@@ -64558,8 +64578,8 @@
     },
     {
       "path": "tests/test_run_pin_sources.py",
-      "sha256": "2b481220349369a3f158ab2eb7e8b930bfab3c36590f97ae449af2f1776e4780",
-      "bytes": 10316
+      "sha256": "b90345769f29181c73f70ef74048ba2d0529d7a924f9f0452fb19a542c699c16",
+      "bytes": 21894
     },
     {
       "path": "tests/test_runtime_boot.py",
@@ -65303,8 +65323,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "173656f32c874d30c85f7240ce8f5be8a9151f67cc771678348b691dafa53ae7",
-      "bytes": 764798
+      "sha256": "b4f162655efa8c8e95babd39d3439052e05340837add939f051837c2a4189bd8",
+      "bytes": 764878
     },
     {
       "path": "tools/muse_file_fence.py",

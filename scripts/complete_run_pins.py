@@ -4,15 +4,22 @@
 Git v2.53.0 Documentation/git-ls-remote.adoc OUTPUT defines annotated tag
 objects and peeled ^{} refs. This module reuses the retained F1 resolver;
 offline proof validation never calls Git, installs a package or selects a winner.
+
+Resolution reports are one-use plans for their original run-source identities.
+After a lock fill, the run points to its source supplement: replaying the old
+plan refuses before writing. Retain the report as proof; use a new report path
+for a later separately reviewed fill, never overwrite the original report.
 """
 from __future__ import annotations
 
 import argparse
 from datetime import datetime, timezone
 import json
+import os
 from pathlib import Path
 import re
 import subprocess
+import tempfile
 import tomllib
 
 try:
@@ -89,7 +96,7 @@ def verified_commit(proof, component: str, version: str, repository: str) -> str
     allowed_tags = tag_names(component, version)
     tags = [ref[len("refs/tags/"):] for ref in command[3::2] if ref.startswith("refs/tags/")]
     expected = ["refs/tags/" + tag + suffix for tag in tags for suffix in ("", "^{}")]
-    if (not tags or len(set(tags)) != len(tags) or any(tag not in allowed_tags for tag in tags)
+    if (tags != allowed_tags
             or command[3:] != expected):
         return None
     stdout = proof.get("stdout")
@@ -116,15 +123,25 @@ def resolve(run: dict, runner=subprocess.run) -> dict:
     names = tag_names(row["component"], row["version"])
     command = ["git", "ls-remote", "https://" + repository + (".git" if repository.startswith("github.com/") else "")]
     command.extend("refs/tags/" + tag + suffix for tag in names for suffix in ("", "^{}"))
+    git_environment = {
+        "PATH": os.environ.get("PATH", os.defpath), "LANG": "C.UTF-8", "LC_ALL": "C.UTF-8",
+        "GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull,
+        "GIT_CONFIG_SYSTEM": os.devnull, "GIT_CONFIG_COUNT": "0", "GIT_TERMINAL_PROMPT": "0",
+        "GIT_ASKPASS": "/bin/false", "SSH_ASKPASS": "/bin/false", "GIT_ALLOW_PROTOCOL": "https",
+    }
     try:
-        result = runner(command, capture_output=True, text=True, timeout=45, check=False)
+        with tempfile.TemporaryDirectory(prefix="source-tag-query-", dir="/var/tmp") as directory:
+            result = runner(command, capture_output=True, text=True, timeout=45, check=False,
+                            env=git_environment, cwd=directory)
     except subprocess.TimeoutExpired as error:
         def decoded(value):
             return value.decode(errors="replace") if isinstance(value, bytes) else value or ""
         return {**row, "command": command, "status": "gap", "reason": "lookup_timeout",
-                "exit_code": None, "stdout": decoded(error.stdout), "stderr": decoded(error.stderr)}
+                "exit_code": None, "stdout": decoded(error.stdout), "stderr": "",
+                "stderr_present": bool(error.stderr), "stderr_policy": "raw stderr withheld"}
     observed = {**row, "command": command, "exit_code": result.returncode,
-                "stdout": result.stdout, "stderr": result.stderr}
+                "stdout": result.stdout, "stderr": "", "stderr_present": bool(result.stderr),
+                "stderr_policy": "raw stderr withheld"}
     if result.returncode:
         return {**observed, "status": "gap", "reason": "lookup_failed"}
     return {**observed, **parse_remote(result.stdout, names)}
@@ -142,7 +159,7 @@ def render_table(rows: list[dict]) -> str:
 
 
 def apply_report(root: Path, relative: str) -> dict:
-    """Plan all fills before writing; preserve versions, artifacts and existing bindings."""
+    """Apply a one-use plan; refuse stale identity before writing any source file."""
     try:
         from . import final_stack
     except ImportError:
@@ -196,6 +213,7 @@ def apply_report(root: Path, relative: str) -> dict:
             if isinstance(previous, str) and OID.fullmatch(previous) and previous != commit:
                 raise ValueError("an existing source commit disagrees; adjudication required")
             entry[field] = commit
+            entry["source_proof"] = relative + "#/rows/" + str(index)
             updates.append({"source": row["source"], "field": field, "previous": previous, "commit": commit})
     for path, document in documents.items():
         if path != final_stack.LOCKFILE:
@@ -220,6 +238,8 @@ def main(argv=None):
         raise ValueError("resolution report must be a repository artifact JSON")
     output = safe_file(args.root, args.resolve)
     table = safe_file(args.root, str(Path(args.resolve).with_suffix(".tags.md")))
+    if output.exists() or table.exists():
+        raise ValueError("resolution report or table already exists; choose a new retained report path")
     try:
         from . import final_stack
     except ImportError:
@@ -234,9 +254,14 @@ def main(argv=None):
             row["artifact_sha256"] = sorted({a["hash"] for a in [entry.get("sdist", {}), *entry.get("wheels", [])] if a.get("hash")})
         rows.append(row)
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps({"schema_version": 1, "kind": "run_pin_tag_resolution",
-                                 "recorded_at": datetime.now(timezone.utc).isoformat(), "rows": rows}, indent=2) + "\n")
-    table.write_text(render_table(rows))
+    try:
+        with output.open("x", encoding="utf-8") as retained:
+            retained.write(json.dumps({"schema_version": 1, "kind": "run_pin_tag_resolution",
+                                       "recorded_at": datetime.now(timezone.utc).isoformat(), "rows": rows}, indent=2) + "\n")
+        with table.open("x", encoding="utf-8") as retained:
+            retained.write(render_table(rows))
+    except FileExistsError as error:
+        raise ValueError("resolution report or table already exists; choose a new retained report path") from error
     print(json.dumps({"resolved": sum(row["status"] == "resolved" for row in rows),
                       "gaps": sum(row["status"] == "gap" for row in rows)}))
     return 0

@@ -31,7 +31,8 @@ class NautilusRunPinTests(fixtures.FixtureTestCase):
         proof.write_text(json.dumps({
             "component": "nautilus-trader", "version": "2.0.0rc5", "repository": REPOSITORY,
             "command": ["git", "ls-remote", "https://" + REPOSITORY + ".git",
-                        "refs/tags/v2.0.0rc5", "refs/tags/v2.0.0rc5^{}"],
+                        "refs/tags/v2.0.0rc5", "refs/tags/v2.0.0rc5^{}",
+                        "refs/tags/2.0.0rc5", "refs/tags/2.0.0rc5^{}"],
             "exit_code": 0, "stderr": "",
             "stdout": "b" * 40 + "\trefs/tags/v2.0.0rc5\n" + COMMIT + "\trefs/tags/v2.0.0rc5^{}\n",
             "tag_object": "b" * 40, "peeled_commit": COMMIT}))
@@ -133,7 +134,7 @@ class NautilusRunPinTests(fixtures.FixtureTestCase):
         sources = final_stack.Sources(ROOT)
         record = next(row for row in final_stack.run_records(sources) if row["id"] == "nautilus-trader")
         self.assertEqual(record["parsed"]["pin_parsed"]["commit"], COMMIT)
-        self.assertIn("evidence/artifacts/nautilus-run-pin-20261016/tag-resolution.json", sources.hashes)
+        self.assertIn("evidence/artifacts/pin-source-rules-20261016/nautilus-tag-proof.json", sources.hashes)
 
 
 if __name__ == "__main__":

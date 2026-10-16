@@ -107,7 +107,7 @@ LOCKFILE_SOURCES = "catalogs/landscape/lockfile-source-identities.json"
 # Compatibility for the source observation already published by #1197. New
 # PIN-DATA entries carry source_proof explicitly; no commit is hardcoded here.
 LOCKFILE_SOURCE_PROOFS = {
-    ("nautilus-trader", "2.0.0rc5"): "evidence/artifacts/nautilus-run-pin-20261016/tag-resolution.json",
+    ("nautilus-trader", "2.0.0rc5"): "evidence/artifacts/pin-source-rules-20261016/nautilus-tag-proof.json",
 }
 PIN_FILES = (("linux-x86_64", "adoption/pins-linux-x86_64.json"), ("macos-arm64", "adoption/pins-macos-arm64.json"))
 STACK = component_matrix.STACK_FILE
@@ -167,6 +167,10 @@ DEFINITIONS = (
      "The pointer to the record supplying the complete run pin. For an exact lock-source supplement match, "
      "this points into " + LOCKFILE_SOURCES + " bindings; that binding's source points back to the unchanged "
      "lock entry whose version and complete artifact hash set were matched. The lock itself records no Git commit."),
+    ("runs[].source_commit_claim and runs[].source_proof_status",
+     "A commit claimed by an adoption, stack or runtime source without matching retained proof remains "
+     "informational as source_commit_claim, with source_proof_status not_verified and no pin_parsed.commit. "
+     "It cannot complete a commit-cited receipt. Matching source_proof is required for every run-pin source."),
     ("winners[].run",
      "The runs[] id whose repository is the winner's (a run without a repository joins only by the same id), or "
      "null with run_reason held (the layer's current_adoption_status is held), external (scripts/final_stack.py "
@@ -380,7 +384,7 @@ def github_repository(url) -> str | None:
             if isinstance(url, str) and host_receipts.GITHUB_REPOSITORY_PATTERN.match(url.strip().lower()) else None)
 
 
-def lock_source_proof(sources: Sources, binding: dict) -> str | None:
+def lock_source_proof(sources: Sources, binding: dict, *, component_ids=()) -> str | None:
     """Match a source claim to its retained exact-version Git observation offline."""
     reference = binding.get("source_proof")
     if reference is None:
@@ -396,9 +400,26 @@ def lock_source_proof(sources: Sources, binding: dict) -> str | None:
             proof = pointer(proof, selector)
     except (FinalStackError, InvalidDecisionIndex, OSError, ValueError):
         return None
+    if not isinstance(proof, dict) or proof.get("component") not in {binding.get("package"), *component_ids}:
+        return None
     return complete_run_pins.verified_commit(
-        proof, binding.get("package"), binding.get("version"),
+        proof, proof["component"], binding.get("version"),
         host_receipts.normalize_repository(binding.get("repository")))
+
+
+def proof_backed_record_pin(sources: Sources, text, commit, *, component, repository, reference):
+    """Keep an unproved commit as information, never as a receipt-binding commit."""
+    parsed = record_pin(text, commit)
+    identity = parsed.get("pin_parsed")
+    if not identity or not identity.get("commit"):
+        return parsed
+    claimed = identity["commit"]
+    binding = {"package": component, "version": identity.get("version"),
+               "repository": repository, "source_proof": reference}
+    if reference is not None and lock_source_proof(sources, binding) == claimed:
+        return parsed
+    return {**parsed, "pin_parsed": {**identity, "commit": None},
+            "source_commit_claim": claimed, "source_proof_status": "not_verified"}
 
 
 def run_records(sources: Sources) -> list[dict]:
@@ -452,7 +473,9 @@ def run_records(sources: Sources) -> list[dict]:
                     and repository is not None
                     and host_receipts.normalize_repository(binding.get("repository")) == repository
                     and isinstance(binding.get("commit"), str) and COMMIT_PATTERN.fullmatch(binding["commit"])
-                    and lock_source_proof(sources, binding) == binding["commit"]):
+                    and lock_source_proof(sources, binding, component_ids=(
+                        component["id"] for component in stack_components
+                        if host_receipts.normalize_repository(component.get("repository")) == repository)) == binding["commit"]):
                 parsed = record_pin(pin, binding["commit"])
                 pin = f"{pin}; source {binding['commit']}"
                 source = f"{LOCKFILE_SOURCES}#/bindings/{binding_index}"
@@ -469,7 +492,9 @@ def run_records(sources: Sources) -> list[dict]:
                 raise FinalStackError(f"{relative}: tools[{index}] needs an id")
             repository = stack_repository.get(tool["id"]) or github_repository(tool.get("url"))
             records.append({"rank": 1 + platform_order, "id": tool["id"], "repository": repository,
-                            "pin": tool.get("version"), "parsed": record_pin(tool.get("version"), tool.get("commit")),
+                            "pin": tool.get("version"), "parsed": proof_backed_record_pin(
+                                sources, tool.get("version"), tool.get("commit"), component=tool["id"],
+                                repository=repository, reference=tool.get("source_proof")),
                             "source": f"{relative}#/tools/{index}", "platform": platform})
 
     for index, component in enumerate(stack_components):
@@ -477,7 +502,9 @@ def run_records(sources: Sources) -> list[dict]:
             raise FinalStackError(f"{STACK}: components[{index}] needs an id")
         records.append({"rank": 1 + len(PIN_FILES), "id": component["id"],
                         "repository": stack_repository[component["id"]], "pin": component.get("version"),
-                        "parsed": record_pin(component.get("version"), component.get("source_pin")),
+                        "parsed": proof_backed_record_pin(
+                            sources, component.get("version"), component.get("source_pin"), component=component["id"],
+                            repository=stack_repository[component["id"]], reference=component.get("source_proof")),
                         "source": f"{STACK}#/components/{index}", "platform": None})
 
     runtime = sources.json(RUNTIME_TARGET)
@@ -488,7 +515,10 @@ def run_records(sources: Sources) -> list[dict]:
     repository = host_receipts.normalize_repository(engine.get("repository"))
     records.append({"rank": 2 + len(PIN_FILES), "id": (repository or "engine").rsplit("/", 1)[-1],
                     "repository": repository, "pin": engine.get("requested_version"),
-                    "parsed": record_pin(engine.get("requested_version"), engine.get("source_commit")),
+                    "parsed": proof_backed_record_pin(
+                        sources, engine.get("requested_version"), engine.get("source_commit"),
+                        component=(repository or "engine").rsplit("/", 1)[-1], repository=repository,
+                        reference=engine.get("source_proof")),
                     "source": f"{RUNTIME_TARGET}#{RUNTIME_ENGINE_POINTER}", "platform": None})
     return records
 

@@ -116,3 +116,140 @@ Primary mechanisms reused:
 Trusting a claimed commit alone or reading the current remote HEAD would change
 identity. Reopen only on retained changed-tag, artifact or source evidence; no
 FINAL conclusion or operational default follows from this source check alone.
+
+## Producer, freshness and proof-custody review corrections
+
+The local review `pr1209-f2ef44c5/review_output.json` identifies three P2s at
+`f2ef44c5281946364de2436a76b89445258df2ae`. Its native index producer still
+calls `identity` directly (`scripts/catalog_decisions.py:184-215`), so a marked
+selected package accepted by the landscape cannot regenerate its required
+index. The narrow fix shares `catalog_identity` from the index module and uses
+it in both producer and legacy consumers, preserving the original source URL.
+No FINAL admission, refusal, or qualification function changes.
+
+The upstream-project bridge is coverage identity, not freshness identity.
+`scripts/landscape.py:1523-1525` at that reviewed pin wrongly accepts the old
+GitHub source or a different package path declaring the same upstream. The
+freshness check now compares the actual normalized repositories. Existing
+explicit GitHub transfer aliases remain supported only between GitHub sources;
+a distribution source must match its actual package path. Matching-package,
+stale-GitHub, different-package and existing transfer controls exercise this
+boundary.
+
+The native resolver's report and sibling tag table are now create-only.
+`scripts/complete_run_pins.py:237-238` at the reviewed pin overwrites an applied
+report when its completed lock run drops out of the target inventory, invalidating
+the retained source-proof pointer. Existing output paths now refuse before any
+query, and exclusive file creation also prevents a late overwrite. An end-to-end
+fixture applies a real lock supplement, generates a commit-bound run, then
+attempts re-resolution and verifies that the report, table and generated document
+remain unchanged. Unreferenced existing reports and tables are protected too;
+supersession requires a new path and separately reviewed reference migration.
+
+The four primary controls first reproduced three assertion failures and one
+intended runtime `InvalidDecisionIndex` from the real producer. After correction,
+the selected-source producer, actual freshness and applied-proof controls pass
+alongside their native consumers. The first broader run caught two inherited-test
+expectations for explicit GitHub aliases; preserving that existing transfer path
+resolved them while retaining strict package identity. Counts remain separated
+in the controls record rather than relabelling that failing run as passing.
+
+## CC all-source proof ruling and source citations
+
+`MICRO-full-f2ef44c5.md` and the co-op's fail-closed ruling extend the same
+proof requirement to adoption `tools[].commit`, stack `source_pin`, and runtime
+`source_commit`. A claimed commit without matching retained proof now remains
+`source_commit_claim` information, with `source_proof_status=not_verified` and
+no `pin_parsed.commit`. The existing receipt-binding function therefore refuses
+it. The source-path wrapper changes neither `record_pin` syntax parsing nor any
+FINAL admission/refusal/current-snapshot function. Offline fills now write the
+consumed `source_proof` reference for both adoption and stack entries.
+
+Each source-path fixture first reproduces unproved receipt completion, then
+proves the same source/commit is refused without proof and accepted with proof.
+The apply controls separately reproduce the missing reference for both JSON
+source forms. Proof component/run ids may differ from lock package names only
+when joined by the same repository's selected stack identity; a real lock-fill
+round trip covers that distinction.
+
+The same read reproduced two native policy-grant test failures: the new utility
+was absent from the exact repository inventory. Its single sorted grant is now
+recorded in `tools/local-pages/source_policy.json`. No wildcard or runtime
+discovery grant is added. Primary mechanism at the reviewed pin:
+`scripts/local_pages_policy_grants.py:40-62` and
+`tests/test_local_pages_policy_grants.py:112-137`.
+
+Source proof must query every recognized exact-version tag spelling, including
+both `v<version>` and `<version>`; matching more than one spelling remains
+ambiguous. The new public `nautilus-tag-proof.json` queries both and explicitly
+supersedes the earlier single-spelling observation without changing its commit.
+`tag-spelling-witnesses.json` retains the original public Git query/output
+witnesses for the component-specific query alternatives (Codex `rust-v`,
+PostgreSQL `REL_`, Poppler `poppler-`, and the npm package tag prefixes).
+Those alternatives are queries, not assumptions about source identity. Only a
+unique observed ref supplies a commit. The sanitized native Launchpad query in
+`systemd-source-query.json` witnesses the exact package URL and public
+`import/255.4-1ubuntu8.17` ref; it applies no systemd pin or runtime change.
+
+The uv artifact fields follow `astral-sh/uv` commit
+`635500036e1705961315e86447f0fab0a8ddb309` (0.12.17):
+`crates/uv-lock/src/lock/serialize.rs:509-554` serializes `sdist` and wheel
+hashes as each hash's string; `crates/uv-pypi-types/src/simple_json.rs:626-644`
+`HashAlgorithm`, `HashDigest` and `Digest` define the algorithm and validated
+lowercase hexadecimal representation. The lock's `sha256:` strings are artifact
+identities, separate from Git source commits. No wheel-to-commit build claim is
+inferred by comparing them.
+
+Native `--resolve` now uses an isolated temporary cwd and an explicit Git
+environment disabling global/system config, inherited config injection,
+prompts and non-HTTPS protocols. Raw stderr is never published; records retain
+only its presence and the exit/result classification. This follows
+`git/git v2.53.0`, `Documentation/git.adoc:742-763,970-975` (configuration,
+prompt and protocol environment controls). Synthetic hostile-config/stderr
+controls fail before this correction and pass after it.
+
+The two specifically ruled legacy fixture migrations preserve every original
+assertion in `tests/test_final_stack.py`:
+`test_only_the_engine_repository_version_and_commit_are_copied` and
+`test_equal_version_only_lock_keeps_conflicting_lower_commit_sources_visible`.
+They add retained native-output fixture proof after first asserting the
+proof-less variant remains informational and cannot bind. No FINAL activation
+test or refusal code changes; the opening takes these fixtures on its single
+rebase. Stale generated-document expectations are resolved only by native
+regeneration, not by weakening their assertions.
+
+## Complete review-wave fold
+
+The last read, `GPT-VERDICT-f2ef44c52.md`, repeats the Architecture grant
+finding from `MICRO-full-f2ef44c5.md`. The native proposal command
+`python3 scripts/local_pages_policy_grants.py --root . --pin
+f2ef44c5281946364de2436a76b89445258df2ae` identifies the exact utility path;
+the manually reviewed inventory grants that path only. All 25 native policy
+grant tests pass as part of the 201-test post-fold selection.
+
+The same read identifies missing native monitoring accounting. The unchanged
+`push_gate.derive_ci_protected` reader derives 354 unclassified locations from
+the current executable source, against 353 previously accounted locations.
+The utility's additional path validation is classified as monitoring only.
+`unclassified-gate-reads-20261016-pr1209-pin-rules-delta.json` appends that
+observation and current line moves against the immutable baseline; the index
+only appends an entry, and every historical baseline and delta retains its
+bytes. No worker permission or policy changes. Before this append, the full
+127-test native gate module reproduces exactly two failures in monitoring
+accounting, with no errors or skips. Committed-head replay verifies the append.
+
+The lock-report retry contract is explicitly one use: the report names the
+original lock pointer, and a successful fill changes the generated source to
+the supplement pointer. Reapplying the old plan refuses before writes. The
+regression snapshots every fixture file after the first successful apply and
+checks that replay preserves the binding, version, artifact hashes, proof and
+generated result. This records existing refusal behavior rather than claiming
+a new retry implementation. A later fill needs a separately retained report.
+
+The final fold closes the local producer/freshness/report-custody P2s; the CC
+Architecture P1 and source-proof P2; the CC proof-completeness, resolver privacy,
+source citation and lock/run-identifier P3s; and the GPT Architecture/monitoring
+P2s and retry/freshness P3s. The shared producer is now
+`catalog_decisions.catalog_identity`, imported by landscape. The two expressly
+authorized legacy fixture migrations above remain the only changed FINAL-stack
+fixtures. Partial read files and unpublished review digests are not evidence.

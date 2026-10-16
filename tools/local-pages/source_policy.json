@@ -2038,6 +2038,10 @@
     },
     {
       "root": "repo",
+      "path": "scripts/complete_run_pins.py"
+    },
+    {
+      "root": "repo",
       "path": "scripts/component_matrix.py"
     },
     {

@@ -1,0 +1,33 @@
+{
+  "component": "nautilus-trader",
+  "version": "2.0.0rc5",
+  "repository": "github.com/nautechsystems/nautilus_trader",
+  "source": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock#/package/99",
+  "original_pin": "2.0.0rc5",
+  "command": [
+    "git",
+    "ls-remote",
+    "https://github.com/nautechsystems/nautilus_trader.git",
+    "refs/tags/v2.0.0rc5",
+    "refs/tags/v2.0.0rc5^{}",
+    "refs/tags/2.0.0rc5",
+    "refs/tags/2.0.0rc5^{}"
+  ],
+  "exit_code": 0,
+  "stdout": "34de0d6f886a9fe8359f9d6590f43f53c86b1d32\trefs/tags/v2.0.0rc5\n1b0a49d2792a9432a3aca3fcb617ce7a630d905e\trefs/tags/v2.0.0rc5^{}\n",
+  "stderr": "",
+  "stderr_present": false,
+  "stderr_policy": "raw stderr withheld",
+  "status": "resolved",
+  "tag": "v2.0.0rc5",
+  "tag_ref": "refs/tags/v2.0.0rc5",
+  "tag_object": "34de0d6f886a9fe8359f9d6590f43f53c86b1d32",
+  "ref_object": "34de0d6f886a9fe8359f9d6590f43f53c86b1d32",
+  "tag_kind": "annotated",
+  "peeled_commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+  "checked_on": "2026-10-16",
+  "evidence_class": "source_review",
+  "environment": "Isolated temporary cwd; explicit Git environment disables system/global configuration, prompts and non-HTTPS protocols; raw stderr withheld.",
+  "supersedes": "evidence/artifacts/nautilus-run-pin-20261016/tag-resolution.json",
+  "reason": "Query both recognized exact-version tag spellings to detect ambiguity; the peeled source commit is unchanged."
+}
