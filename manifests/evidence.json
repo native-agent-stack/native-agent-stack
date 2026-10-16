@@ -62838,8 +62838,8 @@
     },
     {
       "path": "scripts/final_stack.py",
-      "sha256": "04be4e6fff7bb2bf3acb76917433ba0e5bac8f939d436b4cc494b86d26826c2d",
-      "bytes": 84078
+      "sha256": "3b29a722563df44b6485c0b039b5330c331fc1ae55a43c10ea2e82c8f515c024",
+      "bytes": 85843
     },
     {
       "path": "scripts/freshness_propose.py",
@@ -65478,8 +65478,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "173656f32c874d30c85f7240ce8f5be8a9151f67cc771678348b691dafa53ae7",
-      "bytes": 764798
+      "sha256": "63cdac3d500229b69c9a1177242871fd6b891ad637028e4208f9a4706a5d8bd7",
+      "bytes": 764878
     },
     {
       "path": "tools/muse_file_fence.py",

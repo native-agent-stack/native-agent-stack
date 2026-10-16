@@ -874,6 +874,25 @@ def final_candidates(record: dict, repository: str | None, run: dict) -> list[di
             and complete_final_pin(c["pin"], run)]
 
 
+def final_candidate(record: dict, repository: str | None, run: dict) -> dict:
+    """The one angle-record candidate that qualifies a winner for FINAL: the only candidate for its repository at its
+    complete FINAL pin identity, final-eligible, with its entitlement verified, CONVERGED, non-provisional and with
+    comparative A6. Raises FinalStackError with enforce_final's reason otherwise."""
+    candidates = final_candidates(record, repository, run)
+    if len(candidates) != 1:
+        raise FinalStackError("winner requires one CONVERGED angle verdict at its complete FINAL pin identity")
+    candidate = candidates[0]
+    if candidate.get("final_eligible") is False:
+        raise FinalStackError("final_eligible is false for this winner")
+    if (candidate.get("entitlement") or {}).get("status") in ("pending", "unverified"):
+        raise FinalStackError("entitlement remains unverified for this winner")
+    if candidate["verdict"] != "CONVERGED":
+        raise FinalStackError("winner requires one CONVERGED angle verdict at its run pin")
+    if candidate["provisional"] or not candidate["a6_comparative"]:
+        raise FinalStackError("winner requires NON-provisional CONVERGED evidence with comparative A6")
+    return candidate
+
+
 def final_evidence_receipt(sources: Sources, evidence: dict, field: str, condition: int,
                            repository: str | None, run: dict) -> dict:
     """The receipt a FINAL evidence binding names in field: an existing JSON file under the root that binds
@@ -979,18 +998,10 @@ def enforce_final(sources: Sources, layers: list[dict], runs: list[dict], angle_
                 fail("condition 2 winner requires a matching run pin in runs[]")
             if not complete_final_pin(winner["verdict_pin"], run):
                 fail("condition 2 requires a complete FINAL pin identity in runs[]")
-            candidates = final_candidates(record, repository, run)
-            if len(candidates) != 1:
-                fail("winner requires one CONVERGED angle verdict at its complete FINAL pin identity")
-            candidate = candidates[0]
-            if candidate.get("final_eligible") is False:
-                fail("final_eligible is false for this winner")
-            if (candidate.get("entitlement") or {}).get("status") in ("pending", "unverified"):
-                fail("entitlement remains unverified for this winner")
-            if candidate["verdict"] != "CONVERGED":
-                fail("winner requires one CONVERGED angle verdict at its run pin")
-            if candidate["provisional"] or not candidate["a6_comparative"]:
-                fail("winner requires NON-provisional CONVERGED evidence with comparative A6")
+            try:
+                candidate = final_candidate(record, repository, run)
+            except FinalStackError as error:
+                fail(str(error))
             evidence = bound.get(candidate["id"]) or {}
             if not complete_final_pin(evidence.get("run_pin"), run):
                 fail("FINAL evidence requires the complete FINAL pin identity")

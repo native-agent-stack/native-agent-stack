@@ -318,6 +318,66 @@ class LiteralCellTests(unittest.TestCase):
         self.assertNotIn("\n# SYN heading", self.built)
 
 
+def _candidate(cid, repository, version, **fields):
+    return {"id": cid, "repository": repository, "pin": version, "verdict": "CONVERGED", "provisional": False,
+            "a6_comparative": True, **fields}
+
+
+COVERAGE_STACK = {
+    "checked_at": "2026-10-16",
+    "runs": [{"id": "r-a", "pin": "1.2.3", "pin_parsed": {"commit": None, "version": "1.2.3"}},
+             {"id": "r-b", "pin": "4.5.6", "pin_parsed": {"commit": None, "version": "4.5.6"}}],
+    "layers": [{
+        **layer("foundation", "coverage-fixture", "reopened", angles="recorded"),
+        "angles": {"status": "recorded", "path": "angles/coverage.json"},
+        "winners": [
+            {**winner("alpha", "r-a"), "repository": "https://github.com/x/alpha", "verdict_pin": "1.2.3",
+             "pin_drift": "same"},
+            {**winner("beta", "r-b"), "repository": "https://github.com/x/beta", "verdict_pin": "4.5.6",
+             "pin_drift": "same"},
+        ],
+    }],
+}
+
+
+class WinnerCoverageTests(unittest.TestCase):
+    """The co-op's local review of f1a97039 and GPT's cumulative micro of a3eaa62f..f1a97039 (P2, the CC's re-ruling of
+    2026-10-16): the multi-angle gap clears only when the layer's angle record covers each selected winner as
+    enforce_final requires it (final_stack.final_candidate): one candidate for the winner's repository at its complete
+    run pin, final-eligible, CONVERGED, non-provisional and with comparative A6."""
+
+    def missing(self, candidates):
+        records = {"angles/coverage.json": {"candidates": candidates, "final_evidence": []}}
+        return page.build_rows(COVERAGE_STACK, records)[0]["missing"]
+
+    def test_a_record_covering_only_alternatives_leaves_the_gap(self):
+        missing = self.missing([_candidate("other", "https://github.com/x/other", "9.9.9")])
+        self.assertIn("multi-angle record: alpha, beta", missing)
+
+    def test_a_record_covering_every_winner_clears_the_gap(self):
+        missing = self.missing([_candidate("a", "https://github.com/x/alpha", "1.2.3"),
+                                _candidate("b", "https://github.com/x/beta", "4.5.6")])
+        self.assertFalse([m for m in missing if m.startswith("multi-angle record")])
+
+    def test_wrong_pin_or_unqualified_coverage_leaves_the_winner_uncovered(self):
+        for change in ({"pin": "1.2.4"}, {"provisional": True}, {"verdict": "DIVERGED"}, {"a6_comparative": False},
+                       {"final_eligible": False}, {"entitlement": {"status": "pending"}}):
+            with self.subTest(change=change):
+                missing = self.missing([_candidate("a", "https://github.com/x/alpha", "1.2.3", **change),
+                                        _candidate("b", "https://github.com/x/beta", "4.5.6")])
+                self.assertIn("multi-angle record: alpha", missing)
+        missing = self.missing([_candidate("a1", "https://github.com/x/alpha", "1.2.3"),
+                                _candidate("a2", "https://github.com/x/alpha", "1.2.3"),
+                                _candidate("b", "https://github.com/x/beta", "4.5.6")])
+        self.assertIn("multi-angle record: alpha", missing)
+
+    def test_agent_sdks_and_workers_report_their_uncovered_winners(self):
+        stack = page.load(ROOT / page.SOURCE)
+        rows = {r["layer"]: r for r in page.build_rows(stack, page.angle_records(stack, ROOT), ROOT)}
+        self.assertIn("multi-angle record: codex", rows["foundation/agent-sdks"]["missing"])
+        self.assertIn("multi-angle record: claude-code, worktrunk", rows["foundation/workers"]["missing"])
+
+
 class TierInventoryTests(unittest.TestCase):
     def test_every_tier_layer_exists_in_final_stack(self):
         self.assertEqual(page.unknown_tier_layers(page.load(ROOT / page.SOURCE)), set())

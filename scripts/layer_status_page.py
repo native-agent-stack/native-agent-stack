@@ -130,6 +130,18 @@ def _bound_evidence(w: dict, run: dict | None, record: dict | None) -> dict | No
     return evidence
 
 
+def _covered(w: dict, run: dict | None, record: dict | None) -> bool:
+    """The angle record covers the winner as enforce_final requires: one qualified candidate for its repository at its
+    complete run pin (final_stack.final_candidate). A record that covers only other candidates covers no winner."""
+    if run is None or not record:
+        return False
+    try:
+        final_stack.final_candidate(record, host_receipts.normalize_repository(w.get("repository")), run)
+    except (final_stack.FinalStackError, KeyError, TypeError):
+        return False
+    return True
+
+
 def _condition_holds(check, root: Path | None, w: dict, run: dict | None, record: dict | None) -> bool:
     """Run one of final_stack's condition checks (check_condition_3 or check_condition_4) on the winner's bound
     evidence, reading receipts under root. A missing, failed or wrong-pin receipt fails it."""
@@ -166,6 +178,10 @@ def _missing(item: dict, runs: dict, record: dict | None = None, root: Path | No
         missing.append("invoke evidence: " + ", ".join(no_invoke))
     if (item.get("angles") or {}).get("status") != "recorded":
         missing.append("multi-angle record")
+    else:
+        uncovered = [w.get("component_id") for w in winners if not _covered(w, runs.get(w.get("run")), record)]
+        if uncovered:
+            missing.append("multi-angle record: " + ", ".join(uncovered))
     survivors = {s.get("repository") if isinstance(s, dict) else str(s) for s in (item.get("survivors") or [])}
     if survivors:
         missing.append(f"{len(survivors)} carried survivor{'' if len(survivors) == 1 else 's'}")
