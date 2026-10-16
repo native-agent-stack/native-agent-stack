@@ -4,8 +4,8 @@
     {
       "angles": {
         "A1": {
-          "disputed": true,
-          "note": "Supported CLI-backed TypeScript start/run/resume seam; local mock tests separate from full live harness, custom-tool/MCP/hook/isolation coverage",
+          "disputed": false,
+          "note": "Codex source and five-suite fixture execution support the narrow TypeScript CLI seam; complete production harness qualification remains unmeasured.",
           "score": "U",
           "sources": [
             "primary-source-review.json",
@@ -14,81 +14,46 @@
           "observation_citations": []
         },
         "A2": {
-          "disputed": true,
-          "note": "Recorded release workflow success is not SDK CI success. Historical bounded observations only; no all-history claim or score.",
-          "score": "U",
-          "sources": [
-            "sources/codex-ci.json"
-          ],
-          "observation_citations": [
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/codex-ci.json",
-              "line": 3
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/codex-ci.json",
-              "line": 4
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/codex-ci.json",
-              "line": 7
-            }
-          ]
-        },
-        "A3": {
-          "disputed": true,
-          "note": "Historical undated stars/forks snapshot; no at-time or independent consensus claim; fresh capture prerequisite remains",
-          "score": "U",
-          "sources": [
-            "sources/codex-community.json"
-          ],
-          "observation_citations": [
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/codex-community.json",
-              "line": 3
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/codex-community.json",
-              "line": 5
-            }
-          ]
-        },
-        "A4": {
-          "disputed": true,
-          "note": "Historical registry requests across versions, not unique users/net usage. Published SDK package is not exact source0.0.0-dev/native CLI artifact; no artifact equivalence. Agentproto row unverified.",
-          "score": "U",
-          "sources": [
-            "sources/codex-usage.json"
-          ],
-          "observation_citations": [
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/codex-usage.json",
-              "line": 2
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/codex-usage.json",
-              "line": 3
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/codex-usage.json",
-              "line": 5
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/codex-usage.json",
-              "line": 6
-            }
-          ]
-        },
-        "A5": {
-          "disputed": true,
-          "note": "No matched published evaluation verified at this exact pin for required structured events/custom tools/session control; unknown is not absence, retain fixed weight",
+          "disputed": false,
+          "note": null,
           "score": "U",
           "sources": [],
           "observation_citations": []
         },
+        "A3": {
+          "disputed": false,
+          "note": null,
+          "score": "U",
+          "sources": [],
+          "observation_citations": []
+        },
+        "A4": {
+          "disputed": false,
+          "note": null,
+          "score": "U",
+          "sources": [],
+          "observation_citations": []
+        },
+        "A5": {
+          "disputed": false,
+          "note": null,
+          "score": "U",
+          "sources": [],
+          "uncertainty_policy_citation": {
+            "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+            "line": 32,
+            "path": "catalogs/landscape/angles/foundation-agent-sdks.json"
+          },
+          "observation_citations": []
+        },
         "A6": {
-          "disputed": true,
-          "note": "Fresh local upstream tests and local invoke are A1/local-integration, not comparative A6. Historical workers comparison unresolved and publication-ineligible. No new model/comparison executed",
+          "classification_policy_citation": {
+            "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+            "line": 15,
+            "path": "catalogs/landscape/angles/foundation-agent-sdks.json"
+          },
+          "disputed": false,
+          "note": "Codex fixture tests and local initialize capture are A1/local integration, not a matched comparison.",
           "score": "U",
           "sources": [
             "runtime-receipt.json",
@@ -113,8 +78,8 @@
     {
       "angles": {
         "A1": {
-          "disputed": true,
-          "note": "Pinned source advertises required orchestration/session seam; independently qualify same-role fit before promotion",
+          "disputed": false,
+          "note": "agentproto source review names runtime adapters; no agentproto native installation or worker execution is qualified here.",
           "score": "U",
           "sources": [
             "primary-source-review.json"
@@ -122,110 +87,46 @@
           "observation_citations": []
         },
         "A2": {
-          "disputed": true,
-          "note": "Recorded CI success and skipped agent-command workflows have different roles. Historical bounded observations only; no all-history claim or score.",
+          "disputed": false,
+          "note": null,
           "score": "U",
-          "sources": [
-            "sources/agentproto-ci.json"
-          ],
-          "observation_citations": [
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/agentproto-ci.json",
-              "line": 3
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/agentproto-ci.json",
-              "line": 4
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/agentproto-ci.json",
-              "line": 7
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/agentproto-ci.json",
-              "line": 11
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/agentproto-ci.json",
-              "line": 12
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/agentproto-ci.json",
-              "line": 15
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/agentproto-ci.json",
-              "line": 19
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/agentproto-ci.json",
-              "line": 20
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/agentproto-ci.json",
-              "line": 23
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/agentproto-ci.json",
-              "line": 27
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/agentproto-ci.json",
-              "line": 28
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/agentproto-ci.json",
-              "line": 31
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/agentproto-ci.json",
-              "line": 35
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/agentproto-ci.json",
-              "line": 36
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/agentproto-ci.json",
-              "line": 39
-            }
-          ]
+          "sources": [],
+          "observation_citations": []
         },
         "A3": {
-          "disputed": true,
-          "note": "Historical undated stars/forks snapshot; no at-time or independent consensus claim; fresh capture prerequisite remains",
+          "disputed": false,
+          "note": null,
           "score": "U",
-          "sources": [
-            "sources/agentproto-community.json"
-          ],
-          "observation_citations": [
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/agentproto-community.json",
-              "line": 3
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/agentproto-community.json",
-              "line": 5
-            }
-          ]
+          "sources": [],
+          "observation_citations": []
         },
         "A4": {
-          "disputed": true,
-          "note": "Historical registry requests across versions, not unique users/net usage. Published SDK package is not exact source0.0.0-dev/native CLI artifact; no artifact equivalence. Agentproto row unverified.",
+          "disputed": false,
+          "note": null,
           "score": "U",
           "sources": [],
           "observation_citations": []
         },
         "A5": {
-          "disputed": true,
-          "note": "No matched published evaluation verified at this exact pin for required structured events/custom tools/session control; unknown is not absence, retain fixed weight",
+          "disputed": false,
+          "note": null,
           "score": "U",
           "sources": [],
+          "uncertainty_policy_citation": {
+            "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+            "line": 32,
+            "path": "catalogs/landscape/angles/foundation-agent-sdks.json"
+          },
           "observation_citations": []
         },
         "A6": {
-          "disputed": true,
-          "note": "Fresh local upstream tests and local invoke are A1/local-integration, not comparative A6. Historical workers comparison unresolved and publication-ineligible. No new model/comparison executed",
+          "classification_policy_citation": {
+            "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+            "line": 15,
+            "path": "catalogs/landscape/angles/foundation-agent-sdks.json"
+          },
+          "disputed": false,
+          "note": null,
           "score": "U",
           "sources": [],
           "observation_citations": []
@@ -247,8 +148,8 @@
     {
       "angles": {
         "A1": {
-          "disputed": true,
-          "note": "Pinned source advertises required orchestration/session seam; independently qualify same-role fit before promotion",
+          "disputed": false,
+          "note": "Copilot SDK pinned README describes programmatic agent workflows; no Copilot SDK runtime or full application acceptance is qualified here.",
           "score": "U",
           "sources": [
             "primary-source-review.json"
@@ -256,105 +157,46 @@
           "observation_citations": []
         },
         "A2": {
-          "disputed": true,
-          "note": "Recorded Issue Classification Agent succeeds; SDK build/test and CodeQL fail; no cause/capability conclusion follows. Historical bounded observations only; no all-history claim or score.",
-          "score": "U",
-          "sources": [
-            "sources/copilot-ci.json"
-          ],
-          "observation_citations": [
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/copilot-ci.json",
-              "line": 3
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/copilot-ci.json",
-              "line": 4
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/copilot-ci.json",
-              "line": 7
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/copilot-ci.json",
-              "line": 11
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/copilot-ci.json",
-              "line": 12
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/copilot-ci.json",
-              "line": 15
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/copilot-ci.json",
-              "line": 19
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/copilot-ci.json",
-              "line": 20
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/copilot-ci.json",
-              "line": 23
-            }
-          ]
-        },
-        "A3": {
-          "disputed": true,
-          "note": "Historical undated stars/forks snapshot; no at-time or independent consensus claim; fresh capture prerequisite remains",
-          "score": "U",
-          "sources": [
-            "sources/copilot-community.json"
-          ],
-          "observation_citations": [
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/copilot-community.json",
-              "line": 3
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/copilot-community.json",
-              "line": 5
-            }
-          ]
-        },
-        "A4": {
-          "disputed": true,
-          "note": "Historical registry requests across versions, not unique users/net usage. Published SDK package is not exact source0.0.0-dev/native CLI artifact; no artifact equivalence. Agentproto row unverified.",
-          "score": "U",
-          "sources": [
-            "sources/copilot-usage.json"
-          ],
-          "observation_citations": [
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/copilot-usage.json",
-              "line": 2
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/copilot-usage.json",
-              "line": 3
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/copilot-usage.json",
-              "line": 5
-            },
-            {
-              "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/copilot-usage.json",
-              "line": 6
-            }
-          ]
-        },
-        "A5": {
-          "disputed": true,
-          "note": "No matched published evaluation verified at this exact pin for required structured events/custom tools/session control; unknown is not absence, retain fixed weight",
+          "disputed": false,
+          "note": null,
           "score": "U",
           "sources": [],
           "observation_citations": []
         },
+        "A3": {
+          "disputed": false,
+          "note": null,
+          "score": "U",
+          "sources": [],
+          "observation_citations": []
+        },
+        "A4": {
+          "disputed": false,
+          "note": null,
+          "score": "U",
+          "sources": [],
+          "observation_citations": []
+        },
+        "A5": {
+          "disputed": false,
+          "note": null,
+          "score": "U",
+          "sources": [],
+          "uncertainty_policy_citation": {
+            "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+            "line": 32,
+            "path": "catalogs/landscape/angles/foundation-agent-sdks.json"
+          },
+          "observation_citations": []
+        },
         "A6": {
-          "disputed": true,
-          "note": "Fresh local upstream tests and local invoke are A1/local-integration, not comparative A6. Historical workers comparison unresolved and publication-ineligible. No new model/comparison executed",
+          "classification_policy_citation": {
+            "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+            "line": 15,
+            "path": "catalogs/landscape/angles/foundation-agent-sdks.json"
+          },
+          "disputed": false,
+          "note": null,
           "score": "U",
           "sources": [],
           "observation_citations": []
@@ -375,6 +217,7 @@
     }
   ],
   "catalog": "foundation",
+  "dispute_rule": "disputed=true requires retained opposing angle conclusions; missing/unverified evidence alone is a gap. No opposing conclusions established in this draft.",
   "existing_record_gap": "Committed angle file covers deep-agents and strands, not the Codex winner plus carried survivors. Preserve it, propose this role-complete delta to co-op.",
   "kind": "multi_angle_record_draft",
   "layer_id": "agent-sdks",

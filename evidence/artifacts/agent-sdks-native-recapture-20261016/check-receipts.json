@@ -98,5 +98,158 @@
     "masking_rule": "mask_capture.py: masked_aux(); literal root replacements only",
     "masking_test": "test_mask_capture.py",
     "co_op_private_reproduction": "pending"
+  },
+  {
+    "name": "fold-regression-tests",
+    "exit_code": 0,
+    "started": "2026-10-16T07:44:50.898673+00:00",
+    "ended": "2026-10-16T07:44:51.065772+00:00",
+    "command_with_marked_placeholders": [
+      "python3",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "evidence/artifacts/agent-sdks-native-recapture-20261016",
+      "-p",
+      "test_*.py",
+      "-v"
+    ],
+    "cwd_with_marked_placeholders": "<REVIEW_CHECKOUT>",
+    "capture_class": "deterministically_masked_native_capture",
+    "private_capture_name": "fold-regression-tests.log",
+    "output": "fold-regression-tests.txt",
+    "output_sha256": "6b961e1fb9c55e3386550df5931de1f9440df8ec476279b168d4a1583c8a8052",
+    "masking_rule": "mask_capture.py: masked_aux(); literal root replacements only",
+    "masking_test": "test_mask_capture.py",
+    "co_op_private_reproduction": "pending"
+  },
+  {
+    "name": "fold-staged-secrets",
+    "exit_code": 0,
+    "started": "2026-10-16T07:46:18.660447+00:00",
+    "ended": "2026-10-16T07:46:19.225393+00:00",
+    "command_with_marked_placeholders": [
+      "gitleaks",
+      "git",
+      "--staged",
+      "--redact",
+      "--no-banner"
+    ],
+    "cwd_with_marked_placeholders": "<REVIEW_CHECKOUT>",
+    "capture_class": "deterministically_masked_native_capture",
+    "private_capture_name": "fold-staged-secrets.log",
+    "output": "fold-staged-secrets.txt",
+    "output_sha256": "28b6d324e26180cb39af801b6469f9257603cfcf8e1de0c0152d716e0e196130",
+    "masking_rule": "mask_capture.py: masked_aux(); literal root replacements only",
+    "masking_test": "test_mask_capture.py",
+    "co_op_private_reproduction": "pending"
+  },
+  {
+    "name": "fold-regression-tests-final",
+    "exit_code": 0,
+    "started": "2026-10-16T07:46:54.590675+00:00",
+    "ended": "2026-10-16T07:46:54.775249+00:00",
+    "command_with_marked_placeholders": [
+      "python3",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "evidence/artifacts/agent-sdks-native-recapture-20261016",
+      "-p",
+      "test_*.py",
+      "-v"
+    ],
+    "cwd_with_marked_placeholders": "<REVIEW_CHECKOUT>",
+    "capture_class": "deterministically_masked_native_capture",
+    "private_capture_name": "fold-regression-tests-final.log",
+    "output": "fold-regression-tests-final.txt",
+    "output_sha256": "21a87c23a3c94b301550baa7afeafb6f827a3b3fa90247eeaf8d129ab1efaa6b",
+    "masking_rule": "mask_capture.py: masked_aux(); literal root replacements only",
+    "masking_test": "test_mask_capture.py",
+    "co_op_private_reproduction": "pending"
+  },
+  {
+    "name": "fold-manifest-check",
+    "exit_code": 0,
+    "started": "2026-10-16T07:47:41.325533+00:00",
+    "ended": "2026-10-16T07:47:41.390191+00:00",
+    "command_with_marked_placeholders": [
+      "python3",
+      "scripts/evidence_manifest.py",
+      "--check"
+    ],
+    "cwd_with_marked_placeholders": "<REVIEW_CHECKOUT>",
+    "capture_class": "deterministically_masked_native_capture",
+    "private_capture_name": "fold-manifest-check.log",
+    "output": "fold-manifest-check.txt",
+    "output_sha256": "71f84bddd3b8d394a89dd0a679e78d550ae5df16afa5a726a0ac173960ab2199",
+    "masking_rule": "mask_capture.py: masked_aux(); literal root replacements only",
+    "masking_test": "test_mask_capture.py",
+    "co_op_private_reproduction": "pending"
+  },
+  {
+    "name": "fold-regression-before",
+    "exit_code": 1,
+    "started": "2026-10-16T07:48:10.731802+00:00",
+    "ended": "2026-10-16T07:48:10.865214+00:00",
+    "command_with_marked_placeholders": [
+      "python3",
+      "-B",
+      "-c",
+      "import importlib.util,pathlib,unittest; p=pathlib.Path(\"evidence/artifacts/agent-sdks-native-recapture-20261016\"); s=importlib.util.spec_from_file_location(\"original_recorder\",\"<SCRATCH_ARM>/bin/recorder.py\"); old=importlib.util.module_from_spec(s);s.loader.exec_module(old);import sys;sys.path.insert(0,str(p));import test_recording;test_recording.recorder=old;result=unittest.TextTestRunner(verbosity=2).run(unittest.TestSuite([test_recording.RecorderTests(\"test_usage_names_committed_script\"),test_recording.RecorderTests(\"test_existing_ledger_handle_is_closed\")]));sys.exit(0 if result.wasSuccessful() else 1)"
+    ],
+    "cwd_with_marked_placeholders": "<REVIEW_CHECKOUT>",
+    "capture_class": "deterministically_masked_native_capture",
+    "private_capture_name": "fold-regression-before.log",
+    "output": "fold-regression-before.txt",
+    "output_sha256": "c688f5db6f1e6273e11aea2dcbbde4521bc4b44e174b5868ce1cad637b7a12fb",
+    "masking_rule": "mask_capture.py: masked_aux(); literal root replacements only",
+    "masking_test": "test_mask_capture.py",
+    "co_op_private_reproduction": "pending"
+  },
+  {
+    "name": "fold-whitespace-check",
+    "exit_code": 0,
+    "started": "2026-10-16T07:48:47.435720+00:00",
+    "ended": "2026-10-16T07:48:47.495104+00:00",
+    "command_with_marked_placeholders": [
+      "git",
+      "diff",
+      "--cached",
+      "--check",
+      "--",
+      ".",
+      ":(exclude)evidence/artifacts/agent-sdks-native-recapture-20261016/output-04.txt"
+    ],
+    "cwd_with_marked_placeholders": "<REVIEW_CHECKOUT>",
+    "capture_class": "deterministically_masked_native_capture",
+    "private_capture_name": "fold-whitespace-check.log",
+    "output": "fold-whitespace-check.txt",
+    "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "masking_rule": "mask_capture.py: masked_aux(); literal root replacements only",
+    "masking_test": "test_mask_capture.py",
+    "co_op_private_reproduction": "pending"
+  },
+  {
+    "name": "fold-validation",
+    "exit_code": 0,
+    "started": "2026-10-16T07:47:42.054982+00:00",
+    "ended": "2026-10-16T07:48:48.300121+00:00",
+    "command_with_marked_placeholders": [
+      "python3",
+      "scripts/validate.py"
+    ],
+    "cwd_with_marked_placeholders": "<REVIEW_CHECKOUT>",
+    "capture_class": "deterministically_masked_native_capture",
+    "private_capture_name": "fold-validation.log",
+    "output": "fold-validation.txt",
+    "output_sha256": "1143395c8d80cc1beda7301a49c70c24e1a51ca936531f6fe6b7ed84f5397be0",
+    "masking_rule": "mask_capture.py: masked_aux(); literal root replacements only",
+    "masking_test": "test_mask_capture.py",
+    "co_op_private_reproduction": "pending"
   }
 ]

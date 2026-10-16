@@ -38,7 +38,7 @@ class EvidenceIntegrityTests(unittest.TestCase):
             self.assertEqual(set(candidate['angles']), {'A1', 'A2', 'A3', 'A4', 'A5', 'A6'})
             for angle in candidate['angles'].values():
                 self.assertEqual(angle['score'], 'U')
-                self.assertTrue(angle['disputed'])
+                self.assertFalse(angle['disputed'])
             if candidate['repository'] != 'https://github.com/openai/codex':
                 self.assertNotIn('runtime-receipt.json', candidate['angles']['A1']['sources'])
 
@@ -57,6 +57,21 @@ class EvidenceIntegrityTests(unittest.TestCase):
             self.assertNotIn('log_sha256', text)
             self.assertNotIn('raw_sha256', text)
             self.assertNotIn('/home/', text)
+
+    def test_historical_host_and_unsupported_snapshots_are_explicit(self):
+        pins = load('pin-reconciliation.json')
+        host = next(x for x in pins['sources'] if x['kind'] == 'committed_host_capture')
+        self.assertEqual(host['value'], 'codex-cli 0.161.0')
+        self.assertEqual(host['citation']['line'], 290)
+        self.assertTrue(pins['reason_citations'])
+        primary = load('primary-source-review.json')
+        self.assertEqual(primary['public_snapshots'], [])
+        self.assertIsNone(primary['official_docs'])
+        self.assertTrue(primary['pin_rule_citation'])
+        for candidate in load('multi-angle-draft.json')['candidates']:
+            for key in ['A2', 'A3', 'A4']:
+                self.assertIsNone(candidate['angles'][key]['note'])
+                self.assertFalse(candidate['angles'][key]['sources'])
 
 
 if __name__ == '__main__':

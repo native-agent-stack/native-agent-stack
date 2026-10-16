@@ -7,13 +7,36 @@
     "verdict0.155.1 versus run0.160.0",
     "macOS0.155.1 versus linux0.160.0",
     "plan-observed0.162.1 versus run0.160.0; current installed version not captured",
+    "committed historical host0.161.0 versus run0.160.0",
     "historical packet0.157.1 versus run0.160.0",
     "historical Python SDK0.154.0 and later Python0.160.0 candidate are distinct wrappers from the official TypeScript SDK source tested here"
   ],
   "historical_f1": "Exact release mapping is cited from the committed SDK source receipt; native source-pin capture independently records the checked-out release commit.",
   "layer": "foundation/agent-sdks",
   "proposed_run_pin": "0.160.0; source a956835d020762cb2b570053af06f643a11c0ecc",
-  "reason": "Preserve current linux F1 run version and exact upstream release commit; newly qualify this assigned run without silently adopting host0.162.1. A unified newer-version change requires its own explicit reconciliation and evidence.",
+  "reason": "Preserve the cited Linux run0.160.0 and release source for this preparation; historical host0.161.0 and plan observation0.162.1 do not silently replace that run. No deployment pin change follows.",
+  "reason_citations": [
+    {
+      "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+      "line": 10541,
+      "path": "catalogs/landscape/final-stack.json"
+    },
+    {
+      "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+      "line": 54,
+      "path": "adoption/pins-linux-x86_64.json"
+    },
+    {
+      "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+      "line": 46,
+      "path": "evidence/receipts/omniroute-sdk-worker-0160-20261003.json"
+    },
+    {
+      "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+      "line": 7,
+      "path": "AGENTS.md"
+    }
+  ],
   "sources": [
     {
       "citation": {
@@ -85,6 +108,26 @@
     {
       "citation": {
         "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+        "line": 290,
+        "path": "evidence/artifacts/sdk-runtime-adoption-20261008/observations.json"
+      },
+      "kind": "committed_host_capture",
+      "limit": "Historical committed host observation, not a fresh measurement of the current host",
+      "rc_citation": {
+        "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+        "line": 289,
+        "path": "evidence/artifacts/sdk-runtime-adoption-20261008/observations.json"
+      },
+      "related_sdk_surface_citation": {
+        "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+        "line": 164,
+        "path": "docs/decisions/2026-10-08-sdk-runtime-worker-adoption.md"
+      },
+      "value": "codex-cli 0.161.0"
+    },
+    {
+      "citation": {
+        "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
         "line": 7,
         "path": "blueprints/us-equities/workers/receipt.json"
       },
@@ -107,7 +150,7 @@
       "value": "Python SDK0.160.0 with bundled native CLI0.160.0; historical B3 candidate receipt, not a new runtime adoption"
     },
     {
-      "gap": "Earlier observation not captured; no installed-version receipt claimed here. Plan observation has its own source citation.",
+      "gap": "No fresh current-host capture in this run. Historical committed host0.161.0 and plan observation0.162.1 have separate cited source roles.",
       "kind": "read_only_host_version",
       "value": null
     },

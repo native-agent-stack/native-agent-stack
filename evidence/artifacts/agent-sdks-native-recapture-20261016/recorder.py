@@ -1,7 +1,7 @@
 """One recorded step of an F1 upstream_e2e recipe (CC FINALIZE-ALL, 2026-10-14). The arm runs every recipe command through
 this wrapper, so a receipt's phases and exit codes come from the harness, never from the model's report.
 
-  python3 f1_step.py <arm dir> <phase> [--cwd <dir under the arm dir>] -- <command> [args...]
+  python3 recorder.py <arm dir> <phase> [--cwd <dir under the arm dir>] -- <command> [args...]
 
 Runs the command (argv, no shell; for a pipeline pass `bash -c '<text>'` explicitly), with its stdout and stderr in
 <arm dir>/logs/<n>-<phase>.log, and appends one JSON line to <arm dir>/steps.jsonl: n, phase, command (the argv joined as
@@ -26,7 +26,7 @@ def now() -> str:
 
 def main(argv) -> int:
     if len(argv) < 4 or "--" not in argv:
-        print("usage: f1_step.py <arm dir> <phase> [--cwd DIR] -- <command> [args...]", file=sys.stderr)
+        print("usage: recorder.py <arm dir> <phase> [--cwd DIR] -- <command> [args...]", file=sys.stderr)
         return 2
     split = argv.index("--")
     head, command = argv[:split], argv[split + 1:]
@@ -46,7 +46,10 @@ def main(argv) -> int:
     (arm / "logs").mkdir(parents=True, exist_ok=True)
     cwd.mkdir(parents=True, exist_ok=True)
     steps = arm / "steps.jsonl"
-    n = sum(1 for _ in steps.open()) + 1 if steps.exists() else 1
+    n = 1
+    if steps.exists():
+        with steps.open() as previous:
+            n += sum(1 for _ in previous)
     log = arm / "logs" / f"{n:03d}-{phase}.log"
     started, t0 = now(), time.time()
     with open(log, "wb") as handle:
@@ -54,7 +57,7 @@ def main(argv) -> int:
             code = subprocess.run(command, cwd=cwd, stdout=handle, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
                                   check=False).returncode
         except FileNotFoundError:
-            handle.write(f"f1_step: command not found: {command[0]}\n".encode())
+            handle.write(f"recorder: command not found: {command[0]}\n".encode())
             code = 127
     row = {"n": n, "phase": phase, "command": shlex.join(command), "cwd": str(cwd.relative_to(arm)) or ".",
            "exit_code": code, "started": started, "ended": now(), "seconds": round(time.time() - t0, 1),

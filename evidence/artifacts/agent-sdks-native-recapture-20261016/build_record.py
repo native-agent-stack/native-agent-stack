@@ -116,6 +116,11 @@ def main(run_root, primary_root, packet_file):
          'citation': cite(plan, '| `foundation/agent-sdks` |')},
         {'kind': 'plan_observed_cli', 'value': '0.162.1, native installer row unpinned',
          'citation': cite(plan, 'Codex: codex-cli 0.162.1')},
+        {'kind': 'committed_host_capture', 'value': 'codex-cli 0.161.0',
+         'citation': cite('evidence/artifacts/sdk-runtime-adoption-20261008/observations.json', '"version_output": "codex-cli 0.161.0"'),
+         'rc_citation': cite_after('evidence/artifacts/sdk-runtime-adoption-20261008/observations.json', '"native_clients": [', '"rc": 0'),
+         'related_sdk_surface_citation': cite('docs/decisions/2026-10-08-sdk-runtime-worker-adoption.md', '| Standalone TypeScript SDK 0.160.0'),
+         'limit': 'Historical committed host observation, not a fresh measurement of the current host'},
         {'kind': 'historical_original_native_worker', 'value': 'Python openai-codex0.154.0 driving native0.155.1; historical task, not this pin',
          'citation': cite('blueprints/us-equities/workers/receipt.json', '0.155.1')},
         {'kind': 'later_committed_sdk_review_candidate', 'value': 'Python SDK0.160.0 with bundled native CLI0.160.0; historical B3 candidate receipt, not a new runtime adoption',
@@ -124,7 +129,7 @@ def main(run_root, primary_root, packet_file):
          'limit': 'The published Python candidate shares this native source pin; this fresh upstream TypeScript test package does not replace or qualify its separate Python worker integration'},
     ]
     pin_inputs.append({'kind': 'read_only_host_version', 'value': None,
-                       'gap': 'Earlier observation not captured; no installed-version receipt claimed here. Plan observation has its own source citation.'})
+                       'gap': 'No fresh current-host capture in this run. Historical committed host0.161.0 and plan observation0.162.1 have separate cited source roles.'})
     packet = json.loads(packet_file.read_text())
     packet_winner = next(c for c in packet['candidates'] if c['repository'] == 'https://github.com/openai/codex')
     pin_inputs.append({'kind': 'historical_manifest_packet', 'value': packet_winner.get('pin'),
@@ -133,11 +138,13 @@ def main(run_root, primary_root, packet_file):
     write('pin-reconciliation.json', {
         'base': BASE, 'layer': 'foundation/agent-sdks', 'component': 'codex',
         'proposed_run_pin': '0.160.0; source ' + PIN,
-        'reason': 'Preserve current linux F1 run version and exact upstream release commit; newly qualify this assigned run without silently adopting host0.162.1. A unified newer-version change requires its own explicit reconciliation and evidence.',
+        'reason': 'Preserve the cited Linux run0.160.0 and release source for this preparation; historical host0.161.0 and plan observation0.162.1 do not silently replace that run. No deployment pin change follows.',
+        'reason_citations': [pin_inputs[2]['citation'], pin_inputs[2]['adoption_citation'], cite('evidence/receipts/omniroute-sdk-worker-0160-20261003.json', PIN), cite('AGENTS.md', '- Decide by evidence:')],
         'sources': pin_inputs,
         'historical_f1': 'Exact release mapping is cited from the committed SDK source receipt; native source-pin capture independently records the checked-out release commit.',
         'drifts': ['verdict0.155.1 versus run0.160.0', 'macOS0.155.1 versus linux0.160.0',
                     'plan-observed0.162.1 versus run0.160.0; current installed version not captured',
+                    'committed historical host0.161.0 versus run0.160.0',
                    'historical packet0.157.1 versus run0.160.0',
                    'historical Python SDK0.154.0 and later Python0.160.0 candidate are distinct wrappers from the official TypeScript SDK source tested here'],
         'catalog_mutated': False, 'FINAL_admitted': False})
@@ -163,11 +170,6 @@ def main(run_root, primary_root, packet_file):
           'final_admission': 'closed; no terminal-state or angle-registry edit',
           'gate_chain': '#1163 then #1167 then PIN-RULES then opening PR, per common brief; not declared landed here'})
 
-    primary = []
-    for filename in sorted(PRIMARY.glob('*-ci.json')) + sorted(PRIMARY.glob('*-community.json')) + sorted(PRIMARY.glob('*-usage.json')):
-        value = json.loads(filename.read_text())
-        write('sources/' + filename.name, value)
-        primary.append('sources/' + filename.name)
     source_candidates = [
         ('openai/codex', PIN, RUN / 'work/codex/sdk/typescript/README.md', 'sdk/typescript/README.md', [5, 10, 21, 22, 31, 100, 104, 105]),
         ('agentproto/ts', '08605fbe43a5c71e65f9561fd1d2b92abcbe9c4c', PRIMARY / 'agentproto-ts.README.md', 'README.md', [5, 26, 52, 169, 170]),
@@ -185,9 +187,12 @@ def main(run_root, primary_root, packet_file):
         source_records.append({'repository': repo, 'pin': pin, 'pin_citation': pin_citation, 'path': rel, 'excerpts': excerpts,
                                'evidence_class': 'source_review', 'target_installed': repo == 'openai/codex'})
     write('primary-source-review.json', {'kind': 'source_review', 'sources': source_records,
-          'public_snapshots': primary,
-          'official_docs': 'https://developers.openai.com/codex/sdk (fetched; official Node18+ TypeScript thread install/start/continue/resume documentation)',
-          'pin_rule': 'Exact upstream release source and vendor tests outrank current mutable docs; snapshots at other times do not prove pin capability'})
+          'public_snapshots': [],
+          'omitted_snapshots_gap': 'CI/community/registry summaries dropped: original response bytes, read times and transformation provenance were not captured. No findings from those summaries are retained.',
+          'official_docs': None,
+          'official_docs_gap': 'No retained native official-document fetch capture; no fetched-document claim used.',
+          'pin_rule': 'Check installed/version-pinned source before mutable official docs; snapshots at other times do not prove pin capability',
+          'pin_rule_citation': cite('AGENTS.md', '- Upstream is the truth:')})
     draft = []
     pins = {r[0]: r[1] for r in source_candidates}
     for repo in ['openai/codex', 'agentproto/ts', 'github/copilot-sdk']:
@@ -198,24 +203,23 @@ def main(run_root, primary_root, packet_file):
             'role': 'existing winner, pin drift under qualification' if is_winner else 'cumulative survivor, unqualified alternative',
             'screen_status': 'narrow SDK source screen and credential-free execution only' if is_winner else 'retained source review; no new installation screen or runtime test',
             'angles': {
-                'A1': {'score': 'U', 'disputed': True, 'sources': ['primary-source-review.json'] + (['runtime-receipt.json'] if is_winner else []),
-                       'note': 'Supported CLI-backed TypeScript start/run/resume seam; local mock tests separate from full live harness, custom-tool/MCP/hook/isolation coverage' if is_winner else 'Pinned source advertises required orchestration/session seam; independently qualify same-role fit before promotion'},
-                'A2': {'score': 'U', 'disputed': True, 'sources': ['sources/' + key + '-ci.json'],
-                       'note': {'codex': 'Recorded release workflow success is not SDK CI success.', 'agentproto': 'Recorded CI success and skipped agent-command workflows have different roles.', 'copilot': 'Recorded Issue Classification Agent succeeds; SDK build/test and CodeQL fail; no cause/capability conclusion follows.'}[key] + ' Historical bounded observations only; no all-history claim or score.'},
-                'A3': {'score': 'U', 'disputed': True, 'sources': ['sources/' + key + '-community.json'],
-                       'note': 'Historical undated stars/forks snapshot; no at-time or independent consensus claim; fresh capture prerequisite remains'},
-                'A4': {'score': 'U', 'disputed': True, 'sources': ['sources/' + key + '-usage.json'] if key != 'agentproto' else [],
-                       'note': 'Historical registry requests across versions, not unique users/net usage. Published SDK package is not exact source0.0.0-dev/native CLI artifact; no artifact equivalence. Agentproto row unverified.'},
-                'A5': {'score': 'U', 'disputed': True, 'sources': [],
-                       'note': 'No matched published evaluation verified at this exact pin for required structured events/custom tools/session control; unknown is not absence, retain fixed weight'},
-                'A6': {'score': 'U', 'disputed': True, 'sources': ['runtime-receipt.json', 'invoke.json'] if is_winner else [],
-                       'note': 'Fresh local upstream tests and local invoke are A1/local-integration, not comparative A6. Historical workers comparison unresolved and publication-ineligible. No new model/comparison executed'},
+                'A1': {'score': 'U', 'disputed': False, 'sources': ['primary-source-review.json'] + (['runtime-receipt.json'] if is_winner else []),
+                       'note': {'codex': 'Codex source and five-suite fixture execution support the narrow TypeScript CLI seam; complete production harness qualification remains unmeasured.', 'agentproto': 'agentproto source review names runtime adapters; no agentproto native installation or worker execution is qualified here.', 'copilot': 'Copilot SDK pinned README describes programmatic agent workflows; no Copilot SDK runtime or full application acceptance is qualified here.'}[key]},
+                'A2': {'score': 'U', 'disputed': False, 'sources': [], 'note': None},
+                'A3': {'score': 'U', 'disputed': False, 'sources': [], 'note': None},
+                'A4': {'score': 'U', 'disputed': False, 'sources': [], 'note': None},
+                'A5': {'score': 'U', 'disputed': False, 'sources': [], 'note': None,
+                       'uncertainty_policy_citation': cite('catalogs/landscape/angles/foundation-agent-sdks.json', 'Published evaluation availability is not fully verified')},
+                'A6': {'score': 'U', 'disputed': False, 'sources': ['runtime-receipt.json', 'invoke.json'] if is_winner else [],
+                       'note': 'Codex fixture tests and local initialize capture are A1/local integration, not a matched comparison.' if is_winner else None,
+                       'classification_policy_citation': cite('catalogs/landscape/angles/foundation-agent-sdks.json', 'Installs and smokes are A1; none is counted as comparative A6.')},
             }, 'proposed_disposition': 'GAP pending two-family review, exact pin E2E scope and measured adoption invoke',
             'final_admitted': False, 'score_computed': False})
     write('multi-angle-draft.json', {'kind': 'multi_angle_record_draft', 'catalog': 'foundation',
           'layer_id': 'agent-sdks', 'rule_version': 'angle-convergence/2',
           'weights': prior_angles['weights'], 'weight_citations': {key: cite('catalogs/landscape/angles/foundation-agent-sdks.json', '"' + key + '": ' + str(value)) for key, value in prior_angles['weights'].items()}, 'new_weight_choice': False,
           'published_evaluations_available': None, 'candidates': draft,
+          'dispute_rule': 'disputed=true requires retained opposing angle conclusions; missing/unverified evidence alone is a gap. No opposing conclusions established in this draft.',
           'existing_record_gap': 'Committed angle file covers deep-agents and strands, not the Codex winner plus carried survivors. Preserve it, propose this role-complete delta to co-op.',
           'supersedes_existing_verdict': False, 'adjudication': 'NOT_RUN; two-family reads owned by co-op'})
     write('source-seals.json', {'base': BASE, 'public_repository_inputs': SOURCES,

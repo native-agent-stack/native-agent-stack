@@ -8,9 +8,12 @@ The proposed evidence run preserves Codex CLI **0.160.0**, source
 `a956835d020762cb2b570053af06f643a11c0ecc` (`rust-v0.160.0`).
 [pin-reconciliation.json](pin-reconciliation.json) records source-role drift and
 exact supporting lines: historical winner0.155.1, historical packet0.157.1,
-Linux run0.160.0, macOS0.155.1, and plan observation0.162.1. The host observation
-has no retained native capture and is a GAP; it is not a new installed-state
-claim. Python SDK/native historical evidence and this upstream TypeScript SDK
+Linux run0.160.0, macOS0.155.1, committed historical host0.161.0 and plan
+observation0.162.1. The historical host capture is cited at
+`evidence/artifacts/sdk-runtime-adoption-20261008/observations.json:286-290`;
+the distinct SDK surface is cited at
+`docs/decisions/2026-10-08-sdk-runtime-worker-adoption.md:164`.
+A fresh current-host observation remains a GAP. Python SDK/native historical evidence and this upstream TypeScript SDK
 test remain separate integrations. The source SDK package is `0.0.0-dev`;
 no published npm SDK version equivalence is claimed.
 
@@ -29,7 +32,8 @@ co-op. Raw digests stay in the private recorder; they are not exported.
 [mask_capture.py](mask_capture.py) checks those private seals and replaces only
 the exact scratch-root token with `<SCRATCH_ARM>`. The no-match case preserves
 bytes unchanged. Auxiliary captures replace the exact checkout, packet and
-check roots with `<REVIEW_CHECKOUT>`, `<PACKET_SCRATCH>` and `<PRIVATE_CHECKS>`.
+check roots with `<REVIEW_CHECKOUT>`, `<PACKET_SCRATCH>`, `<PRIVATE_CHECKS>` and
+`<ADDITIONAL_CHECKS_1>` for the scoped fold checks.
 Commands carry those marked placeholders; exact commands remain private.
 [test_mask_capture.py](test_mask_capture.py) tests preservation with explicitly
 synthetic fixtures; fixtures never stand in for native runs.
@@ -79,20 +83,20 @@ survivor pins are left intact; they are unknown packet fields, not alternative
 pins. No survivor is installed or adjudicated by this preparation.
 
 [multi-angle-draft.json](multi-angle-draft.json) preserves the existing v2
-weights with exact source-line citations. Every angle stays unknown/disputed;
+weights with exact source-line citations. Every angle stays unknown;
 no numeric score or candidate selection is computed. Survivor A1 cites its own
 source review and never the Codex runtime receipt. SDK capability is separate
 from full-harness qualification.
 
-The historical CI snapshots retain differing roles: Codex release success is
-not SDK-test success; agentproto CI success and skipped agent workflows are
-different observations; Copilot Issue Classification Agent success coexists
-with SDK build/test and CodeQL failures. No failure cause or candidate rejection
-is inferred. Community snapshots are undated popularity, not at-time consensus.
-Registry downloads are cross-version package requests, not exact-artifact net
-usage; `@openai/codex-sdk` is distinct from the CLI/source artifacts tested here.
-Matched published evaluations and comparative A6 remain unknown. These source
-reviews retain gaps; none is treated as newly recorded native evidence.
+Uncaptured CI/community/registry summaries and the unsupported official-docs
+fetch claim are dropped. They supply no engineering-quality, consensus or usage
+conclusions. Missing evidence is a gap, not a disagreement between angles:
+`disputed` is false unless opposing angle conclusions are actually retained.
+No such disagreement is established here. Candidate A1 notes name their own
+supported source/execution evidence. A2-A5 notes are absent where evidence is
+unverified; survivor A6 notes are absent. Codex A6 explicitly classifies its
+local fixture run as A1, citing the committed angle-policy line. Evaluation
+uncertainty cites the existing policy that unknown is not none.
 
 ## Sources and reproduction
 
@@ -111,17 +115,32 @@ The co-op's **agent-sdks masked reproduction check passed**: all 17 checked
 files were byte-identical (11 native outputs, four auxiliary outputs and their
 two receipt indices), with all recorded output hashes, command/rc rows,
 44 registrations and both test suites verified. The `pending` fields in the
-unchanged receipt indices retain their precheck state; this later custody result
-supersedes that state. Raw captures remain private, named only.
+receipt indices retain their precheck state; [custody-record.json](custody-record.json)
+separately records this later result and the checked head. New fold captures
+require their own co-op reproduction PASS at the fold head before push.
+Raw captures remain private, named only.
 
 `build_record.py` takes `--run-root <SCRATCH_ARM>`,
 `--primary-root <PRIMARY_SOURCE_SCRATCH>` and `--packet-file <PACKET_FILE>`;
 private source locations are supplied at invocation rather than published as
-constants. This source-only correction leaves the verified masker and all
-derivatives unchanged.
+constants. The fold extends the masker with a testable auxiliary masking
+function and additional check roots. Eleven native outputs remain unchanged;
+the extended masker and new check derivatives undergo private re-verification.
 
-Native
-`lane_packets.py` generation and offline tests are captured separately by
+Native `lane_packets.py` generation, offline tests and gate checks are captured by
 [record_aux.py](record_aux.py), with full masked output and return code in
 [check-receipts.json](check-receipts.json). Derived indices are labelled as such;
 they are not native output. A missing capture remains a named GAP.
+
+[test_recording.py](test_recording.py) tests full-byte/return-code recording,
+sequential rows, invalid cwd/name rejection, missing-command failure,
+non-overwrite behavior and auxiliary masking, using labelled synthetic fixtures.
+The recorder's usage and failure diagnostic now name the committed filename;
+the original executed script remains private. The new ledger-handle test fails
+against the original recorder and passes with an explicit context manager for
+the prior-ledger read. The original-script baseline has two expected regression
+failures (rc1); it is retained as `fold-regression-before.txt`, not relabelled
+as a passing check. The initial 20-test capture retains its ResourceWarning;
+the final 21-test capture passes after the handle correction. Native component
+output bytes remain unchanged. Gate outputs are indexed by check name in `check-receipts.json`;
+the PR body cites only gate results with retained native captures.

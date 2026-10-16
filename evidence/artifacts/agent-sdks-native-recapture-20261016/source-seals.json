@@ -2,6 +2,10 @@
   "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
   "privacy": "Only committed public input bytes sealed; no co-op/CC/private record hashes",
   "public_repository_inputs": {
+    "AGENTS.md": {
+      "bytes": 4320,
+      "sha256": "badc1a93731095641e71ae1bf1d5ae5d5021e522c1da62926ddc65268f5c10a1"
+    },
     "adoption/pins-linux-x86_64.json": {
       "bytes": 35096,
       "sha256": "964d085d8fe2cb8aba3d44678938e34a2b1d8b6e320227db4152352a0d0e2449"
@@ -62,6 +66,10 @@
       "bytes": 1149103,
       "sha256": "af4e0314b28acafe2b5e8a0bce71d1ced2efe911a3c3757557b23bd71c63c9ee"
     },
+    "docs/decisions/2026-10-08-sdk-runtime-worker-adoption.md": {
+      "bytes": 31210,
+      "sha256": "6a8b6e8ee76eb04d7ab6036d0435805f6063b45ee6c48bf2f3b1fe9d65da8f57"
+    },
     "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md": {
       "bytes": 100830,
       "sha256": "18a250dc0e52d1459805720ac9b9a15f89c32a7d171d522e4aa30e8fe095555f"
@@ -93,6 +101,10 @@
     "evidence/artifacts/landscape-sweep-20260929/returns.json": {
       "bytes": 2378440,
       "sha256": "2f93067652c0f1e8e4f3d726895d2017eafef018412e47e9bc9b48e7ef931a9c"
+    },
+    "evidence/artifacts/sdk-runtime-adoption-20261008/observations.json": {
+      "bytes": 89936,
+      "sha256": "212af1da8d35c262ebe172956aceaaafe5345bb3a5157f9f485f9bc0caae8b42"
     },
     "evidence/receipts/omniroute-sdk-worker-0160-20261003.json": {
       "bytes": 149558,

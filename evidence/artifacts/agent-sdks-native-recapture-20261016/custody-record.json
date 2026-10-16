@@ -1,0 +1,21 @@
+{
+  "kind": "independent_masked_capture_custody",
+  "review_record_name": "agent-sdks masked reproduction check",
+  "checked_head": "43cbc5f6249e25410e686adc034224022d49c5ea",
+  "result": "PASS",
+  "checked_files": 17,
+  "native_outputs": 11,
+  "auxiliary_outputs": 4,
+  "receipt_indices": 2,
+  "command_rc_rows_verified": 15,
+  "native_output_hashes_verified": 11,
+  "auxiliary_output_hashes_verified": 4,
+  "registry_rows_verified": 44,
+  "mask_tests_passed": 6,
+  "integrity_tests_passed": 5,
+  "supersedes": "The precheck pending fields in unchanged runtime-receipt.json and the original check-receipts.json entries",
+  "raw_custody": "agent-sdks replacement sequential run and auxiliary checks; retained privately by name only",
+  "full_review_record_name": "MICRO-full-43cbc5f6.md",
+  "scope": "The named earlier reproduction PASS qualifies the unchanged eleven native outputs and original four auxiliary outputs. Additional fold captures require a fresh co-op reproduction PASS at the fold head before push; that later result is recorded separately by name. No claim of a future PASS is made here.",
+  "script_update": "recorder.py usage and missing-command diagnostic name the committed filename; the prior-ledger read now closes its handle. The executed original recorder.py remains in private capture bin/. Successful capture behavior and native output bytes remain unchanged."
+}

@@ -1,0 +1,25 @@
+test_usage_names_committed_script (test_recording.RecorderTests.test_usage_names_committed_script) ... FAIL
+test_existing_ledger_handle_is_closed (test_recording.RecorderTests.test_existing_ledger_handle_is_closed) ... FAIL
+
+======================================================================
+FAIL: test_usage_names_committed_script (test_recording.RecorderTests.test_usage_names_committed_script)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<REVIEW_CHECKOUT>/evidence/artifacts/agent-sdks-native-recapture-20261016/test_recording.py", line 59, in test_usage_names_committed_script
+    self.assertIn('recorder.py', out.getvalue())
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'recorder.py' not found in 'usage: f1_step.py <arm dir> <phase> [--cwd DIR] -- <command> [args...]\n'
+
+======================================================================
+FAIL: test_existing_ledger_handle_is_closed (test_recording.RecorderTests.test_existing_ledger_handle_is_closed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<REVIEW_CHECKOUT>/evidence/artifacts/agent-sdks-native-recapture-20261016/test_recording.py", line 75, in test_existing_ledger_handle_is_closed
+    self.assertFalse([w for w in observed if issubclass(w.category, ResourceWarning)])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: [<warnings.WarningMessage object at 0x7baa1d73aba0>] is not false
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.031s
+
+FAILED (failures=2)

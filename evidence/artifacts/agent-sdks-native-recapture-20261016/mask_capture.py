@@ -21,6 +21,13 @@ def mask(raw: bytes, scratch_root: bytes) -> bytes:
     return raw.replace(scratch_root, MARKER)
 
 
+def masked_aux(raw: bytes, replacements: list[tuple[bytes, bytes]]) -> bytes:
+    """Apply the declared literal substitutions without parsing or summarizing."""
+    for old, new in replacements:
+        raw = raw.replace(old, new)
+    return raw
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--private-root", type=Path, required=True)
@@ -28,6 +35,7 @@ def main():
     parser.add_argument("--private-checks", type=Path)
     parser.add_argument("--checkout-root", type=Path)
     parser.add_argument("--packet-root", type=Path)
+    parser.add_argument("--additional-checks", type=Path, action='append', default=[])
     args = parser.parse_args()
     root = args.private_root.resolve()
     out = args.out.resolve()
@@ -84,28 +92,26 @@ def main():
             if path:
                 replacements.append((bytes(path.resolve()), marker))
 
-        def masked_aux(raw):
-            for old, new in replacements:
-                raw = raw.replace(old, new)
-            return raw
-
-        check_root = args.private_checks.resolve()
-        for line in (check_root / 'checks.jsonl').read_text().splitlines():
-            row = json.loads(line)
+        check_roots = [args.private_checks.resolve()] + [p.resolve() for p in args.additional_checks]
+        for i, check_root in enumerate(check_roots[1:], 1):
+            replacements.append((bytes(check_root), f'<ADDITIONAL_CHECKS_{i}>'.encode()))
+        entries = [(p, json.loads(line)) for p in check_roots
+                   for line in (p / 'checks.jsonl').read_text().splitlines()]
+        for check_root, row in entries:
             raw_path = (check_root / row['log']).resolve()
             if not raw_path.is_relative_to(check_root):
                 raise ValueError('check output escapes private capture')
             raw = raw_path.read_bytes()
             if hashlib.sha256(raw).hexdigest() != row['raw_sha256']:
                 raise ValueError('check output integrity mismatch')
-            output = masked_aux(raw)
+            output = masked_aux(raw, replacements)
             name = row['name'] + '.txt'
             (out / name).write_bytes(output)
             checks.append({
                 'name': row['name'], 'exit_code': row['exit_code'],
                 'started': row['started'], 'ended': row['ended'],
-                'command_with_marked_placeholders': [masked_aux(arg.encode()).decode() for arg in row['command']],
-                'cwd_with_marked_placeholders': masked_aux(row['cwd'].encode()).decode(),
+                'command_with_marked_placeholders': [masked_aux(arg.encode(), replacements).decode() for arg in row['command']],
+                'cwd_with_marked_placeholders': masked_aux(row['cwd'].encode(), replacements).decode(),
                 'capture_class': 'deterministically_masked_native_capture',
                 'private_capture_name': row['log'], 'output': name,
                 'output_sha256': hashlib.sha256(output).hexdigest(),

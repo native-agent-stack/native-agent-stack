@@ -20348,8 +20348,8 @@
     },
     {
       "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/README.md",
-      "sha256": "965cd5f5a5021df0d45edb6ed80e3cb368f166b6a3ed8728f46f9aba7d22d59f",
-      "bytes": 7822
+      "sha256": "88da8d841462a6f43806d16ebd11e824388e677287cbe0e8644d5d931de8336b",
+      "bytes": 9249
     },
     {
       "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/bootstrap.sh",
@@ -20358,13 +20358,13 @@
     },
     {
       "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/build_record.py",
-      "sha256": "a39612bb478eda57db9f80629370356a6a2b6cade0a65deee3da0c5150672691",
-      "bytes": 17535
+      "sha256": "d230d8187c0162226a359191be5f90871d776d36758286edf8ad8e9d1cf3e614",
+      "bytes": 17959
     },
     {
       "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/check-receipts.json",
-      "sha256": "133d771d35cb70d900a61cdd4bed151f7ca65032301bde7f90618d0b2961ec60",
-      "bytes": 3585
+      "sha256": "eb0abf16aa6d1fc008e305bca15e2ad197e9539c6fc6b604dfd5aa153b54b9c0",
+      "bytes": 9903
     },
     {
       "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/claim-sources.json",
@@ -20377,9 +20377,49 @@
       "bytes": 6613
     },
     {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/custody-record.json",
+      "sha256": "258c4f85abac0e8567a1e9ad0adc584a65b043f88260f0062d39f64bbc13589e",
+      "bytes": 1390
+    },
+    {
       "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/evidence-integrity-tests.txt",
       "sha256": "e92e760c9aa2974a6e6a3e49e5e9673807c1d65230b49e28a24d51b2543be390",
       "bytes": 944
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/fold-manifest-check.txt",
+      "sha256": "71f84bddd3b8d394a89dd0a679e78d550ae5df16afa5a726a0ac173960ab2199",
+      "bytes": 37
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/fold-regression-before.txt",
+      "sha256": "c688f5db6f1e6273e11aea2dcbbde4521bc4b44e174b5868ce1cad637b7a12fb",
+      "bytes": 1685
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/fold-regression-tests-final.txt",
+      "sha256": "21a87c23a3c94b301550baa7afeafb6f827a3b3fa90247eeaf8d129ab1efaa6b",
+      "bytes": 3069
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/fold-regression-tests.txt",
+      "sha256": "6b961e1fb9c55e3386550df5931de1f9440df8ec476279b168d4a1583c8a8052",
+      "bytes": 3297
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/fold-staged-secrets.txt",
+      "sha256": "28b6d324e26180cb39af801b6469f9257603cfcf8e1de0c0152d716e0e196130",
+      "bytes": 108
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/fold-validation.txt",
+      "sha256": "1143395c8d80cc1beda7301a49c70c24e1a51ca936531f6fe6b7ed84f5397be0",
+      "bytes": 162
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/fold-whitespace-check.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
     },
     {
       "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/invoke.json",
@@ -20393,8 +20433,8 @@
     },
     {
       "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/mask_capture.py",
-      "sha256": "99c49c00338c05df6d8bfabf931606364aaf30bfc7dbfb52cb0ae28fe2789c74",
-      "bytes": 6018
+      "sha256": "2c79860c8f370de05b01fdbbba18549d4350450ee732b858a36220dceb5b68ca",
+      "bytes": 6526
     },
     {
       "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/masking-tests.txt",
@@ -20403,8 +20443,8 @@
     },
     {
       "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/multi-angle-draft.json",
-      "sha256": "1d47d9335ffc41a55b181373a93cbf89b5d278a023b8a02df263f003aa8fe7cb",
-      "bytes": 16804
+      "sha256": "ea06c28f2a1cc4df22d831b1a98ce6e62ae35bf302aaacb76f895bd0fc7dd1e5",
+      "bytes": 8925
     },
     {
       "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/native_invoke.py",
@@ -20473,13 +20513,13 @@
     },
     {
       "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/pin-reconciliation.json",
-      "sha256": "a4939580cfbe80f0f2d85e87e1dfc7ddac589b6912842b2e80c821a631c51444",
-      "bytes": 4796
+      "sha256": "9b05796e2a5ae788273661ab1a325cfe135fb6694561f913aa6ed8e4a82124a6",
+      "bytes": 6208
     },
     {
       "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/primary-source-review.json",
-      "sha256": "b34bbc93475ace681f48f02ecb4990096b3ce2f94c0686ddd2dfd3d6adfd44a5",
-      "bytes": 5367
+      "sha256": "93df9b0cef8c244cdfb1bf10249f34ebcac7d5b252e74bc95dc3d822f56b13f3",
+      "bytes": 5392
     },
     {
       "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/record_aux.py",
@@ -20488,8 +20528,8 @@
     },
     {
       "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/recorder.py",
-      "sha256": "f3e3c8469730c8ec53f39cef7982680a6bb53bea1fc26a76e3cea6b095342bed",
-      "bytes": 3151
+      "sha256": "efa6df8256d865b7cbf33d1920649e47425403091d6691ae8c330bb8f344d331",
+      "bytes": 3202
     },
     {
       "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/repository-validation.txt",
@@ -20513,58 +20553,23 @@
     },
     {
       "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/source-seals.json",
-      "sha256": "d8e3079a763a22d361616b8d7556481d0a520c9d7dff2a12f5524b315cc78ed0",
-      "bytes": 4275
-    },
-    {
-      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/agentproto-ci.json",
-      "sha256": "d68ea38f343fc1bd830dfb5a9ed74e01e7fe45812238702a93a5b673a24446b1",
-      "bytes": 1257
-    },
-    {
-      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/agentproto-community.json",
-      "sha256": "9630e3f6ff9750fc012c4e31841f639bdb58acbdc2829cd8dbcbe468a3b99962",
-      "bytes": 86
-    },
-    {
-      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/codex-ci.json",
-      "sha256": "a7345c95ba7c4ebec3ed991866fbecd0a06c78939f3c8f7c3a9a01c30dba4088",
-      "bytes": 254
-    },
-    {
-      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/codex-community.json",
-      "sha256": "261437db8598e8b2babe5b7cb2e8fe851b768ab5bf3b5f485c1693f0116945df",
-      "bytes": 93
-    },
-    {
-      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/codex-usage.json",
-      "sha256": "7a564976a34e4e2a32a21257db32d192d5b0a5b5ff7a1d2cb6f532fe012403eb",
-      "bytes": 289
-    },
-    {
-      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/copilot-ci.json",
-      "sha256": "d8afbc7213f8eeed5bf9c85e890b4f8ebb970189951784211ee6fa3114698ec0",
-      "bytes": 788
-    },
-    {
-      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/copilot-community.json",
-      "sha256": "d8b9a23a0457bab30eb65faa437184bc041d92123c27be2da892d53f696e2227",
-      "bytes": 97
-    },
-    {
-      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/sources/copilot-usage.json",
-      "sha256": "83165510f5f4f8061006c11a369f4bbd57de73a73fb071da4beb412748df682d",
-      "bytes": 293
+      "sha256": "0f1bc077f35186196f730dea7c89241d6028529d3c78b7fb016b1582ea99fbb6",
+      "bytes": 4771
     },
     {
       "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/test_evidence_integrity.py",
-      "sha256": "f86ce71bb5af6df51f49039e32149a693898cd792de945496feb0dd2a5c602a2",
-      "bytes": 2999
+      "sha256": "282b7bc403fd9e1fe5c439e0c4e5de3ecfcf22ae985fdca9fd5dd209143a2660",
+      "bytes": 3848
     },
     {
       "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/test_mask_capture.py",
       "sha256": "5ded731e67c62375af9edd7b616549b5d9653c6aa25142ced75d4e70cd3787e3",
       "bytes": 1774
+    },
+    {
+      "path": "evidence/artifacts/agent-sdks-native-recapture-20261016/test_recording.py",
+      "sha256": "89783986543515b82e9763ac257cfc6b223fcf79c89a028847b9596b5c9dad15",
+      "bytes": 5128
     },
     {
       "path": "evidence/artifacts/agentsview-044-qualification-20260927/README.md",

@@ -1,17 +1,15 @@
 {
   "kind": "source_review",
-  "official_docs": "https://developers.openai.com/codex/sdk (fetched; official Node18+ TypeScript thread install/start/continue/resume documentation)",
-  "pin_rule": "Exact upstream release source and vendor tests outrank current mutable docs; snapshots at other times do not prove pin capability",
-  "public_snapshots": [
-    "sources/agentproto-ci.json",
-    "sources/codex-ci.json",
-    "sources/copilot-ci.json",
-    "sources/agentproto-community.json",
-    "sources/codex-community.json",
-    "sources/copilot-community.json",
-    "sources/codex-usage.json",
-    "sources/copilot-usage.json"
-  ],
+  "official_docs": null,
+  "official_docs_gap": "No retained native official-document fetch capture; no fetched-document claim used.",
+  "omitted_snapshots_gap": "CI/community/registry summaries dropped: original response bytes, read times and transformation provenance were not captured. No findings from those summaries are retained.",
+  "pin_rule": "Check installed/version-pinned source before mutable official docs; snapshots at other times do not prove pin capability",
+  "pin_rule_citation": {
+    "base": "65d66a370d9a5f129662d14c84f2820e940b3a83",
+    "line": 6,
+    "path": "AGENTS.md"
+  },
+  "public_snapshots": [],
   "sources": [
     {
       "evidence_class": "source_review",
