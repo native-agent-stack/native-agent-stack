@@ -18333,8 +18333,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-top-rule-sota-sources.md",
-      "sha256": "6d3f575b608c77b9bd1f976c3a67e509181afe758f534eac4f7e30df4457da77",
-      "bytes": 5226
+      "sha256": "cad201db7ab80158953442b655a72099e628b402b706869db9de335b57ce437c",
+      "bytes": 5250
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
@@ -18598,8 +18598,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-currency-wave-w1.md",
-      "sha256": "c05f4b990e731342483a51883be8e5563a2d7fa07d936b18fff6cdf5d9e1bce5",
-      "bytes": 50522
+      "sha256": "eaf461ccf9f5bb3454f34b0154b4f63623a74d55a11533e5333b2288ae904907",
+      "bytes": 50610
     },
     {
       "path": "docs/decisions/2026-10-03-currency-wave-w1b.md",
@@ -18840,6 +18840,11 @@
       "path": "docs/decisions/2026-10-05-ns2604-foundation-requalification.md",
       "sha256": "44d667b2b63de07784aa8816c65bd8949ed91bfb83a8cc77b69c52516663fc6d",
       "bytes": 30081
+    },
+    {
+      "path": "docs/decisions/2026-10-05-official-upstream-never-rebuild.md",
+      "sha256": "5f0890ab3757e9270d69b1e4a97ea5088d72e16cf823dd25db46c967f1dfb8a5",
+      "bytes": 20100
     },
     {
       "path": "docs/decisions/2026-10-05-omniroute-gateway-composition.md",
@@ -22678,8 +22683,8 @@
     },
     {
       "path": "evidence/artifacts/delegated-decisions-20260928/coordination.md",
-      "sha256": "ab29ece2c67374690251c8b811af6024e91fe56a37a1195cc09e1d2ce6704fe9",
-      "bytes": 4764
+      "sha256": "1d3f9f12a8e0e946b5c6a9566b4c681f8daed43d399fbf37914772d4291a7eb5",
+      "bytes": 4763
     },
     {
       "path": "evidence/artifacts/delegated-decisions-20260928/gpt6-runs.json",
@@ -63213,7 +63218,7 @@
     },
     {
       "path": "tests/fixtures/owner-quote-baseline.json",
-      "sha256": "6350c8b8e6bfd3906c41b70efddbc3ffc4989bcca2d723fdf610ce3497f9f092",
+      "sha256": "7ac1bede364ac4d89cd29cf77b099fdd75de29296ebed2c1b5d7a76968677ec0",
       "bytes": 17557
     },
     {
@@ -64558,8 +64563,8 @@
     },
     {
       "path": "tests/test_owner_quote_publication.py",
-      "sha256": "b20c2e65c6df754abffd881920755048d5d5672dc7d6277ddedf68f4cbc2339e",
-      "bytes": 15528
+      "sha256": "5c9d2eeea2f10750d6e915eb9d44a7cd0f93b62ef2641c844ffe7c6de69aa9f4",
+      "bytes": 20053
     },
     {
       "path": "tests/test_paired_runs_results.py",

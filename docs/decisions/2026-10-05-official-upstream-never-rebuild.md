@@ -12,9 +12,10 @@ They also required SOTA references across platforms, trading engines and runtime
 
 Carry the owner's official-upstream rule into existing-host, portable, scaffold and new-WSL instructions, including the trading lane, using the pinned SDK, MCP and IBKR source guides above. This serves US-equities research, historical simulation and independently qualified broker paper operation using maintained upstream components.
 
-The original job 072 sentence below was superseded by the October 5 PR #726 repair addendum. It records that job's wording, not the owner's direct instruction:
-
-> Prefer the maintainer's own organization repositories (the vendor's GitHub org, such as alpacahq for Alpaca) and their clean releases, and never rebuild, fork or wrap what an upstream already ships.
+Job 072's original sentence was superseded by the October 5 PR #726 repair addendum. Restated here in other words
+(2026-10-16), it put the vendor's own organization and its clean releases first (for Alpaca, the alpacahq organization),
+and it ruled out re-creating, forking or wrapping anything a maintainer already publishes. It recorded that job's
+wording, not a direct instruction.
 
 The trading clause names the vendor-owned SDK, optional MCP server, engine and official IBKR API distribution. An upstream adapter is reused when shipped; glue is limited to a demonstrated upstream gap and cites its source at a pin. Release discovery is evidence for the instruction, not an upgrade directive. `catalogs/us-equities/runtime-target.json` and `manifests/evidence.json` remain under their lane/coordinator ownership.
 

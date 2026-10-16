@@ -9,7 +9,7 @@ Retained 2026-09-28 by the coordinator session (`native-agent-stack-a9`). Peer m
 
 2. **Coordinator's reading.** The installed `SKILL.md` is byte-identical to the pin (sha256 `2befe7fc…`). L20 and L28 conflict with `AGENTS.md:16`; see the decision record, § M4. It was sent to both peers before the GPT-6 verdict returned.
 
-3. **Skills-trial owner** (`cloudflare-security-audit-sota-review`). Its first position, before the rule was raised:
+3. **Skills-trial lane** (`cloudflare-security-audit-sota-review`). Its first position, before the rule was raised:
    > M4: keep the isolated-builder preload for now.
 
    After reading the full `SKILL.md`:

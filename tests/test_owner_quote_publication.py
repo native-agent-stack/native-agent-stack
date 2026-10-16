@@ -13,8 +13,9 @@ Bounds (the command center's adjudication of #1161 at 9bcb8133, 2026-10-15); eac
 - a file over MAX_BYTES (8 MB) is not scanned (the scanner's size bound);
 - several attributions in one line or one paragraph count once, so a quotation added beside a counted one leaves the
   count unchanged (C1: the detector's restructure);
-- a block-quote introduction wrapped across lines is not detected (C3: a CommonMark parser, a PROPOSAL routed to the
-  layer-resolution protocol).
+- a block quote is attributed by the paragraph or list item just above it, read whole, when that names the owner and ends
+  with a colon (the ruling of 2026-10-16 at 768d9cc0, which also closed C3, an introduction wrapped across lines); an
+  introduction further away is not read (a CommonMark parser stays a PROPOSAL routed to the layer-resolution protocol).
 """
 import json
 import os
@@ -62,9 +63,9 @@ WORDS_KEY = re.compile(r'"(?:owner_words|owner_verbatim|owner_quote|owner_quotat
 # A verbatim field in a file that records owner decisions.
 VERBATIM_KEY = re.compile(r'"verbatim"\s*:\s*"[^"]')
 OWNER_RECORD = re.compile(r'"(?:owner_decision|owner_decisions)"')
-# A block quote introduced by a line that attributes it to the owner.
-BLOCK_INTRO = re.compile(rf"{OWNER}[^\n]{{0,160}}(?:verbatim|quoted|said|wrote|asked|answer(?:ed)?|order|words)[^\n]{{0,80}}:\s*$",
-                         re.IGNORECASE)
+# A block quote introduced by a sentence that names the owner and ends with a colon, with or without a speech word. The
+# command center's ruling of 2026-10-16 on #1161 at 768d9cc0 (a count read found real block quotes introduced without one).
+BLOCK_INTRO = re.compile(rf"{OWNER}[^\n]{{0,600}}:\s*$", re.IGNORECASE)
 
 
 JSON_STRING = re.compile(r'"((?:[^"\\]|\\.)*)"')
@@ -135,6 +136,24 @@ def sentences(text):
     yield begin, text[begin:]
 
 
+def introduction(lines, number, wrapped):
+    """The text that introduces a block quote whose first line is the 1-based `number`: the nearest line with content
+    within three lines above it, and in wrapped text the whole paragraph or list item that line ends, joined, since the
+    attribution can sit in an earlier sentence of it. The command center's ruling of 2026-10-16 on #1161 at 768d9cc0."""
+    index = next((i for i in range(number - 2, max(-1, number - 5), -1) if lines[i].strip().lstrip(">").strip()), None)
+    if index is None:
+        return ""
+    if not wrapped or lines[index].lstrip().startswith(">"):
+        return lines[index]
+    start = index
+    while start > 0 and not BLOCK_START.match(lines[start].strip()):
+        above = lines[start - 1]
+        if not above.strip() or above.lstrip().startswith(">") or FENCE.match(above):
+            break
+        start -= 1
+    return " ".join(line.strip() for line in lines[start:index + 1])
+
+
 def line_hits(text, as_json=False, wrapped=True):
     """1-based line numbers of owner-attribution hits in a text, never the text itself: each attribution is matched
     within one sentence and located at the line where it starts. Text is read as wrapped prose unless it is JSON or the
@@ -150,9 +169,8 @@ def line_hits(text, as_json=False, wrapped=True):
                     found.add(max(number for at, number in starts if at <= begin + match.start()))
     for number, line in enumerate(lines, 1):
         hit = WORDS_KEY.search(line) or (owner_record and VERBATIM_KEY.search(line))
-        if not hit and line.lstrip().startswith(">") and not PARAPHRASE.match(line):
-            before = next((lines[index] for index in range(number - 2, max(-1, number - 5), -1) if lines[index].strip()), "")
-            hit = BLOCK_INTRO.search(before)
+        if not hit and line.lstrip().startswith(">") and line.strip().lstrip(">").strip() and not PARAPHRASE.match(line):
+            hit = BLOCK_INTRO.search(introduction(lines, number, wrapped and not as_json))
         if hit:
             found.add(number)
     return sorted(found)
@@ -245,6 +263,41 @@ class OwnerQuotePublication(unittest.TestCase):
         for label, text in passing.items():
             with self.subTest(case=label):
                 self.assertEqual(line_hits(text), [])
+
+    def test_a_block_quote_introduced_by_a_wrapped_sentence_is_found(self):
+        """The command center's ruling of 2026-10-16 on #1161 at 768d9cc0: a count read found real block quotes whose
+        introduction the check at BLOCK_INTRO missed, the class its adjudication at 9bcb8133 recorded as C3 (an
+        introduction wrapped across lines). The introduction is the last sentence of the paragraph above the quote, read
+        whole. Synthetic text only."""
+        found = {"wrapped introduction": ("Notes.\n\nOn 2026-01-02 the owner wrote this to the fixture\nlane, in their "
+                                          "own words:\n\n> keep the lanterns lit on every shelf", [6]),
+                 "wrapped, no blank line": ("On 2026-01-02 the owner wrote this to the fixture\nlane, in their own "
+                                            "words:\n> keep the lanterns lit on every shelf", [3]),
+                 "one line, as before": ("The owner wrote at 10:00Z:\n\n> keep the lanterns lit on every shelf", [3]),
+                 "no speech word": ("The owner's 2026-01-02 decision sets the shelf rule; its wording\nfollows the "
+                                    "owner's line:\n\n> keep the lanterns lit on every shelf", [4]),
+                 "inside a block quote": ("> The owner's notes for the next unit:\n>\n> - keep the lanterns lit on "
+                                          "every shelf", [3]),
+                 "the owner in an earlier sentence": ("The owner's 2026-01-02 decision sets the shelf rule. Its wording\n"
+                                                      "follows:\n\n> keep the lanterns lit on every shelf", [4]),
+                 "the owner in a list item's label": ("1. **The owner** (2026-01-02). Their first position:\n   > keep "
+                                                      "the lanterns lit on every shelf", [2])}
+        for label, (text, lines) in found.items():
+            with self.subTest(case=label):
+                self.assertEqual(line_hits(text, wrapped=True), lines)
+        passing = {"no owner in the introduction": ("On 2026-01-02 the lead wrote this to the fixture\nlane, in their "
+                                                    "own words:\n\n> keep the lanterns lit on every shelf"),
+                   "a dated paraphrase under it": ("On 2026-01-02 the owner wrote this to the fixture\nlane, in their own "
+                                                   "words:\n\n> the owner, 2026-01-02 (paraphrased): they asked that "
+                                                   "every shelf stay lit"),
+                   "a separate paragraph between": ("The owner wrote these words:\n\nThe lead then asked for a list.\n\n> "
+                                                    "keep the lanterns lit on every shelf"),
+                   "a role owner": "The handoffs to the component owners:\n\n> - keep the lanterns lit on every shelf",
+                   "a hyphenated role": "The memory-owner row lists:\n\n> keep the lanterns lit on every shelf",
+                   "no colon": "The owner set the shelf rule on 2026-01-02.\n\n> keep the lanterns lit on every shelf"}
+        for label, text in passing.items():
+            with self.subTest(case=label):
+                self.assertEqual(line_hits(text, wrapped=True), [])
 
     def test_the_baseline_holds_names_and_counts_only(self):
         document = json.loads(BASELINE.read_text(encoding="utf-8"))
