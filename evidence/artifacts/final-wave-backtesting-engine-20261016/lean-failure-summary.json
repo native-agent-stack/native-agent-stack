@@ -1,0 +1,69 @@
+{
+  "representation": "DERIVED diagnostic/source index; NOT a native run receipt",
+  "native_failed_run_at": "native/lean-host-failure.capture:5",
+  "native_rc_at": "native/lean-host-failure.capture:12",
+  "original_native_test_result_at": "native/lean-initial-host-abort.trx:12",
+  "mode_source_at": "native/lean-host-failure.capture:1",
+  "E2E": "GAP; no successful run",
+  "F2": "GAP; SDK/restore/build are not an engine invoke",
+  "raw_custody": "Private initial/lean-results/alpaca-model.trx, named only",
+  "upstream_restore_advisories": [
+    {
+      "package": "DotNetZip",
+      "version": "1.16.0",
+      "severity": "high",
+      "url": "https://github.com/advisories/GHSA-xhg6-9j5j-w4vf",
+      "source_at": "logs/lean-restore-invariant.stdout.log:2",
+      "scope": "Observed NuGet warning in masked native stream, not independent advisory adjudication"
+    },
+    {
+      "package": "System.Drawing.Common",
+      "version": "4.7.0",
+      "severity": "critical",
+      "url": "https://github.com/advisories/GHSA-rxg9-xrhp-64gj",
+      "source_at": "logs/lean-restore-invariant.stdout.log:3",
+      "scope": "Observed NuGet warning in masked native stream, not independent advisory adjudication"
+    },
+    {
+      "package": "System.Net.Http.WinHttpHandler",
+      "version": "4.4.0",
+      "severity": "high",
+      "url": "https://github.com/advisories/GHSA-6xh7-4v2w-36q6",
+      "source_at": "logs/lean-restore-invariant.stdout.log:38",
+      "scope": "Observed NuGet warning in masked native stream, not independent advisory adjudication"
+    },
+    {
+      "package": "System.Private.ServiceModel",
+      "version": "4.4.0",
+      "severity": "high",
+      "url": "https://github.com/advisories/GHSA-jc8g-xhw5-6x46",
+      "source_at": "logs/lean-restore-invariant.stdout.log:39",
+      "scope": "Observed NuGet warning in masked native stream, not independent advisory adjudication"
+    },
+    {
+      "package": "System.Private.ServiceModel",
+      "version": "4.4.0",
+      "severity": "moderate",
+      "url": "https://github.com/advisories/GHSA-p9wx-v264-q34p",
+      "source_at": "logs/lean-restore-invariant.stdout.log:40",
+      "scope": "Observed NuGet warning in masked native stream, not independent advisory adjudication"
+    },
+    {
+      "package": "System.ServiceModel.Primitives",
+      "version": "4.4.0",
+      "severity": "high",
+      "url": "https://github.com/advisories/GHSA-jc8g-xhw5-6x46",
+      "source_at": "logs/lean-restore-invariant.stdout.log:41",
+      "scope": "Observed NuGet warning in masked native stream, not independent advisory adjudication"
+    },
+    {
+      "package": "System.ServiceModel.Primitives",
+      "version": "4.4.0",
+      "severity": "moderate",
+      "url": "https://github.com/advisories/GHSA-p9wx-v264-q34p",
+      "source_at": "logs/lean-restore-invariant.stdout.log:42",
+      "scope": "Observed NuGet warning in masked native stream, not independent advisory adjudication"
+    }
+  ],
+  "advisory_scope": "Warnings retained as limitations; historical dependency remediation is not reproduced. Native captures, not this summary, support the run claims."
+}

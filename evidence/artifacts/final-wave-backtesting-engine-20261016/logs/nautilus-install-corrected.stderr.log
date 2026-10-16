@@ -1,0 +1,9 @@
+Using Python 3.12.3 environment at: [SCRATCH]/nautilus-venv
+Resolved 6 packages in 119ms
+Installed 6 packages in 53ms
+ + iniconfig==2.3.0
+ + nautilus-trader==2.0.0rc5
+ + packaging==26.3
+ + pluggy==1.7.0
+ + pygments==2.21.0
+ + pytest==9.1.1

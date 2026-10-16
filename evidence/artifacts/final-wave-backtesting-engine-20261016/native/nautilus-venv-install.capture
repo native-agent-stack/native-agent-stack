@@ -1,0 +1,5 @@
+Script started on 2026-10-16 01:47:14-04:00 [COMMAND="env UV_CACHE_DIR=[RECAPTURE]/uv-cache uv venv --python [USER_ROOT]/.local/bin/python3.12 [RECAPTURE]/runtime" <not executed on terminal>]
+Using CPython 3.12.3 interpreter at: [USER_ROOT]/.local/bin/python3.12
+Creating virtual environment at: [RECAPTURE]/runtime
+
+Script done on 2026-10-16 01:47:14-04:00 [COMMAND_EXIT_CODE="0"]

@@ -1,0 +1,3 @@
+Script started on 2026-10-16 01:46:30-04:00 [COMMAND="curl --fail --location --silent --show-error https://api.github.com/repos/nautechsystems/nautilus_trader/tarball/1b0a49d2792a9432a3aca3fcb617ce7a630d905e --output [RECAPTURE]/nautilus-source.tar.gz" <not executed on terminal>]
+
+Script done on 2026-10-16 01:46:33-04:00 [COMMAND_EXIT_CODE="0"]

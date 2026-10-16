@@ -1,0 +1,19 @@
+Script started on 2026-10-16 02:11:01-04:00 [COMMAND="ulimit -c 0; env -i PATH=/usr/bin:/bin LANG=C.UTF-8 DOTNET_CLI_TELEMETRY_OPTOUT=1 DOTNET_NOLOGO=1 [SCRATCH]/dotnet/dotnet --version" <not executed on terminal>]
+Process terminated.
+Couldn't find a valid ICU package installed on the system. Please install libicu (or icu-libs) using your package manager and try again. Alternatively you can set the configuration flag System.Globalization.Invariant to true if you want to run with no globalization support. Please see https://aka.ms/dotnet-missing-libicu for more information.
+   at System.Environment.FailFast(System.Runtime.CompilerServices.StackCrawlMarkHandle, System.String, System.Runtime.CompilerServices.ObjectHandleOnStack, System.String)
+   at System.Environment.FailFast(System.Threading.StackCrawlMark ByRef, System.String, System.Exception, System.String)
+   at System.Environment.FailFast(System.String)
+   at System.Globalization.GlobalizationMode+Settings..cctor()
+   at System.Globalization.CultureData.CreateCultureWithInvariantData()
+   at System.Globalization.CultureData.get_Invariant()
+   at System.Globalization.TextInfo..cctor()
+   at System.String.ToLowerInvariant()
+   at System.Text.EncodingHelper.GetEncodingFromCharset()
+   at System.ConsolePal.GetConsoleEncoding()
+   at System.Console.get_OutputEncoding()
+   at Microsoft.DotNet.Cli.AutomaticEncodingRestorer..ctor()
+   at Microsoft.DotNet.Cli.Program.Main(System.String[])
+Aborted
+
+Script done on 2026-10-16 02:11:02-04:00 [COMMAND_EXIT_CODE="134"]

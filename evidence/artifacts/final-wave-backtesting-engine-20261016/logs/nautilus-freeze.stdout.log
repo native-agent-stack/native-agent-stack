@@ -1,0 +1,15 @@
+fsspec==2026.9.0
+iniconfig==2.3.0
+msgspec==0.22.0
+nautilus-trader==2.0.0rc5
+numpy==2.5.4
+packaging==26.3
+pandas==3.0.6
+pluggy==1.7.0
+pyarrow==25.0.1
+pygments==2.21.0
+pytest==9.1.1
+pytest-asyncio==1.4.0
+python-dateutil==2.9.0.post0
+six==1.17.0
+typing-extensions==4.16.0

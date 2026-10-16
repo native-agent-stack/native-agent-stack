@@ -1,0 +1,12 @@
+Script started on 2026-10-16 01:47:48-04:00 [COMMAND="bwrap --unshare-net --ro-bind / / --bind [SCRATCH] [SCRATCH] --tmpfs /tmp --proc /proc --dev /dev --chdir [SCRATCH]/lean-source env -i PATH=/usr/bin:/bin LANG=C.UTF-8 TMPDIR=/tmp DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 DOTNET_CLI_TELEMETRY_OPTOUT=1 DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1 DOTNET_NOLOGO=1 DOTNET_CLI_HOME=[SCRATCH]/dotnet-home NUGET_PACKAGES=[SCRATCH]/nuget DOTNET_PROCESSOR_COUNT=2 [SCRATCH]/dotnet/dotnet test Tests/QuantConnect.Tests.csproj --no-build --no-restore --filter FullyQualifiedName~AlpacaBrokerageModelTests --verbosity minimal -m:1" <not executed on terminal>]
+Test run for [SCRATCH]/lean-source/Tests/bin/Debug/QuantConnect.Tests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+The active test run was aborted. Reason: Test host process crashed : 20261016 05:47:54.509 ERROR:: LocalDiskMapFileProvider.GetMapFileResolver(sgx): The specified directory does not exist: ../../../Data/equity/sgx/map_files
+Unhandled exception. System.InvalidOperationException: GIL must always be released, and it must be released from the same thread that acquired it.
+   at Python.Runtime.Py.GILState.Finalize()
+   at System.GC.RunFinalizers()
+
+
+Test Run Aborted.
+
+Script done on 2026-10-16 01:47:54-04:00 [COMMAND_EXIT_CODE="1"]

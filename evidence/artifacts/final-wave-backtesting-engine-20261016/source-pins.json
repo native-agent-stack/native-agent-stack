@@ -1,0 +1,56 @@
+{
+  "representation": "public source identities only; verbatim third-party code stays in private horizon custody",
+  "sources": [
+    {
+      "repository": "nautechsystems/nautilus_trader",
+      "pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "source_path": "python/tests/conftest.py",
+      "source_url": "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/python/tests/conftest.py",
+      "sha256": "0913c2b00133a47e8aea94d295f6f176266164d30dccb2c837f5b1af94434a60",
+      "bytes": 3373,
+      "custody_name_only": "horizon:vendor/nautilus-trader/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/python/tests/conftest.py",
+      "license": "LGPL-3.0"
+    },
+    {
+      "repository": "nautechsystems/nautilus_trader",
+      "pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "source_path": "python/tests/unit/backtest/test_backtest_configs.py",
+      "source_url": "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/python/tests/unit/backtest/test_backtest_configs.py",
+      "sha256": "49f819961cbb08cf1cbae8de3dce13d48609b032e8b2def32932d25198505c1a",
+      "bytes": 24149,
+      "custody_name_only": "horizon:vendor/nautilus-trader/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/python/tests/unit/backtest/test_backtest_configs.py",
+      "license": "LGPL-3.0"
+    },
+    {
+      "repository": "nautechsystems/nautilus_trader",
+      "pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "source_path": "python/tests/unit/backtest/test_backtest_engine_default_ids.py",
+      "source_url": "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/python/tests/unit/backtest/test_backtest_engine_default_ids.py",
+      "sha256": "d58f8eaed0dd0fbfc221a2dade3527d8f6c8d87a3abdf251989cd1712dae6ba5",
+      "bytes": 14069,
+      "custody_name_only": "horizon:vendor/nautilus-trader/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/python/tests/unit/backtest/test_backtest_engine_default_ids.py",
+      "license": "LGPL-3.0"
+    },
+    {
+      "repository": "nautechsystems/nautilus_trader",
+      "pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "source_path": "python/tests/unit/backtest/test_backtest_engine_statistics.py",
+      "source_url": "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/python/tests/unit/backtest/test_backtest_engine_statistics.py",
+      "sha256": "a4ebd1d31449c785acaef7a7a77d5f1760808e8c6eb0d73caf23c2d92f9387e6",
+      "bytes": 3217,
+      "custody_name_only": "horizon:vendor/nautilus-trader/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/python/tests/unit/backtest/test_backtest_engine_statistics.py",
+      "license": "LGPL-3.0"
+    },
+    {
+      "repository": "QuantConnect/Lean",
+      "pin": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+      "source_path": "Tests/Common/Brokerages/AlpacaBrokerageModelTests.cs",
+      "source_url": "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Tests/Common/Brokerages/AlpacaBrokerageModelTests.cs",
+      "sha256": "4d82ec021cb1f9031bd9cee4827af3b491f3f3b95fb0e828f1b45be83837e1fe",
+      "bytes": 3828,
+      "custody_name_only": "horizon:vendor/lean/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Tests/Common/Brokerages/AlpacaBrokerageModelTests.cs",
+      "license": "Apache-2.0",
+      "existing_binding_at": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/source-pins.json:7"
+    }
+  ]
+}
