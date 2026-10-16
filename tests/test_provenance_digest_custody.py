@@ -298,10 +298,12 @@ HEX_RUN = re.compile(r"(?<![0-9a-f])[0-9a-f]{64,}(?![0-9a-f])")
 ABBREVIATED_DIGEST = re.compile(r"(?<![0-9A-Za-z])[0-9a-f]{7,63}(?:\.\.\.|…)")
 PINNED_SOURCES = tuple(f"tools/sota-convergence/landscape-sweep/{name}" for name in (
     "build_args.py", "codex_job.py", "make_prompt.py", "sweep_common.py", "templates.json")) + (
-    "scripts/saturation_ledger.py", "adoption/manifest.json", "adoption/skills/manifest.json")
+    "scripts/saturation_ledger.py", "adoption/manifest.json", "adoption/skills/manifest.json",
+    "catalogs/saturation/ledger.json")
 # Runs in a child process over PINNED_SOURCES as they were at MODEL_ROUTES_PIN, so no harness module this process loaded
 # is reused: the run's fill_build (date 2026-10-15, one layer, the skills manifest's checked_at, repository modality) and
-# prompts_sha256, and the ledger's requirement_sha256 (over stdin's fields) and platform_profiles_sha256.
+# prompts_sha256, the ledger's requirement_sha256 (over stdin's fields), platform_profiles_sha256, and the public
+# last ledger record's canonical hash (or genesis when empty).
 PINNED_COMPUTE = r'''
 import json, sys
 from pathlib import Path
@@ -312,9 +314,14 @@ skills = json.loads((root / build_args.SKILLS_MANIFEST).read_text(encoding="utf-
 frozen = build_args.fill_build(build_args.load_templates(), "2026-10-15", 1, skills["checked_at"],
                                build_args.REPOSITORY_MODALITY)
 adoption = json.loads((root / saturation_ledger.ADOPTION).read_text(encoding="utf-8"))
+ledger = json.loads((root / "catalogs/saturation/ledger.json").read_text(encoding="utf-8"))
+predecessor = (saturation_ledger.record_sha256(ledger["sweeps"][-1]) if ledger["sweeps"]
+               else saturation_ledger.genesis_sha256(ledger))
+assert predecessor == ledger["head_sha256"], "the public run-pin ledger head must recompute"
 print(json.dumps({"prompts_sha256": sweep_common.prompts_sha256(frozen),
                   "requirement_sha256": saturation_ledger.requirement_sha256(json.load(sys.stdin)),
-                  "platform_profiles_sha256": saturation_ledger.platform_profiles_sha256(adoption)}))
+                  "platform_profiles_sha256": saturation_ledger.platform_profiles_sha256(adoption),
+                  "ledger_head_sha256": predecessor}))
 '''
 
 
@@ -340,7 +347,7 @@ def pin_blob_digests() -> set[str]:
 
 
 def pinned_computed_hashes(fields: dict) -> dict:
-    """The three hashes the record names, recomputed from tracked bytes at MODEL_ROUTES_PIN (PINNED_COMPUTE)."""
+    """Recompute requirement, platform, prompt and ledger hashes from published run-pin inputs."""
     import sys
     with tempfile.TemporaryDirectory() as directory:
         for relative in PINNED_SOURCES:
