@@ -1,0 +1,295 @@
+{
+  "schema_version": 1,
+  "kind": "final_wave_layer_packet_delta",
+  "catalog": "foundation",
+  "layer_id": "durable-memory",
+  "recorded_at": "2026-10-16T05:24:49Z",
+  "base_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+  "comparison_state": "PREPARATION_ONLY",
+  "requirement": "Keep scoped decisions, handoffs and useful learning available across native Codex and Claude with inspectable capture, deletion and recovery.",
+  "generator": {
+    "path": "tools/sota-convergence/lane_packets.py",
+    "commands": [
+      "python3 tools/sota-convergence/lane_packets.py --root . --out <SCRATCH>/lane-packets --catalog foundation --manifest catalogs/sota-convergence/manifest-20260929.json --manifest-newcomers --registered-receipts --gap-receipts --checked-at 2026-10-16",
+      "python3 tools/sota-convergence/lane_packets.py --root . --out <SCRATCH>/lane-packets-0926 --catalog foundation --manifest catalogs/sota-convergence/manifest-20260926.json --manifest-newcomers --registered-receipts --checked-at 2026-10-16"
+    ],
+    "exit_codes": [
+      0,
+      0
+    ],
+    "blind": false,
+    "note": "Only this layer's incumbent plus the eight cumulative survivors are retained. Generated 09-29 output omits three carried inputs; they are restored from the 09-26 packet and W6 census. Other generated layers and non-delta candidates are not reviewed or published.",
+    "command_placeholders": {
+      "<SCRATCH>": "Private throwaway scratch root; exact commands retained in the lane's private tool transcript."
+    },
+    "capture_gap": "Generator rc 0 was observed in native tool output, but no standalone raw capture was retained. The published object is a source-derived packet, not a measured receipt."
+  },
+  "resolution_inputs": [
+    "catalogs/landscape/foundation.json",
+    "catalogs/landscape/final-stack.json",
+    "catalogs/sota-convergence/layer-verdict-waves.json",
+    "catalogs/sota-convergence/layer-verdicts-20260922.json",
+    "catalogs/saturation/ledger.json",
+    "catalogs/sota-convergence/manifest-20260926.json",
+    "catalogs/sota-convergence/manifest-20260929.json",
+    "evidence/artifacts/landscape-sweep-20260926/returns.json",
+    "evidence/artifacts/landscape-sweep-20260929/returns.json",
+    "evidence/artifacts/w6-layer-verdict-20261011/resolution-delta.json",
+    "evidence/artifacts/w6-layer-verdict-20261011/comparisons/durable-memory.json"
+  ],
+  "carry_count": 8,
+  "candidate_count": 9,
+  "candidates": [
+    {
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "prior_comparison_pin": "89bd8ded3c1ab8b769cf99417d038ed0364403c8",
+      "proposed_source_pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+      "pin_changed": true,
+      "role_ids": [
+        "shared_memory_backend",
+        "native_memory_capture"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids",
+      "packet_origins": [
+        {
+          "manifest_wave": "20260926",
+          "key": "c10",
+          "pin": "2.3.2"
+        },
+        {
+          "manifest_wave": "20260929",
+          "key": "c9",
+          "pin": "2.4.1"
+        }
+      ],
+      "disposition": "UNRESOLVED; retained for the co-op's two-family adjudication"
+    },
+    {
+      "repository": "https://github.com/anthropics/claude-code",
+      "prior_comparison_pin": "3deb873687379f0c199a69fdaccc65f0865f7a29",
+      "proposed_source_pin": "03b5892ee77de289bcd5dfa39f541525ade74aff",
+      "pin_changed": true,
+      "role_ids": [
+        "native_file_session_memory"
+      ],
+      "dependency": true,
+      "selection_scope": "dependency qualification only; not ranked as a standalone end-to-end layer winner",
+      "packet_origins": [
+        {
+          "manifest_wave": "20260926",
+          "key": "c15",
+          "pin": null
+        }
+      ],
+      "disposition": "UNRESOLVED; retained for the co-op's two-family adjudication"
+    },
+    {
+      "repository": "https://github.com/langchain-ai/langmem",
+      "prior_comparison_pin": "48e3c11f5bb527282c7d5339c6a87a0b35abccfc",
+      "proposed_source_pin": "48e3c11f5bb527282c7d5339c6a87a0b35abccfc",
+      "pin_changed": false,
+      "role_ids": [
+        "memory_management_primitives"
+      ],
+      "dependency": true,
+      "selection_scope": "dependency qualification only; not ranked as a standalone end-to-end layer winner",
+      "packet_origins": [
+        {
+          "manifest_wave": "20260926",
+          "key": "c12",
+          "pin": null
+        }
+      ],
+      "disposition": "UNRESOLVED; retained for the co-op's two-family adjudication"
+    },
+    {
+      "repository": "https://github.com/rohitg00/agentmemory",
+      "prior_comparison_pin": "7ee162844956626d8b00ba459df169d542d4af9d",
+      "proposed_source_pin": "8bf0c827aaaada297896b2b6efe2a64651ae9389",
+      "pin_changed": true,
+      "role_ids": [
+        "shared_memory_backend",
+        "native_memory_capture"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids",
+      "packet_origins": [
+        {
+          "manifest_wave": "20260926",
+          "key": "c6",
+          "pin": null
+        },
+        {
+          "manifest_wave": "20260929",
+          "key": "c3",
+          "pin": null
+        }
+      ],
+      "disposition": "UNRESOLVED; retained for the co-op's two-family adjudication"
+    },
+    {
+      "repository": "https://github.com/MemPalace/MemPalace",
+      "prior_comparison_pin": "1f0803a31958b30320418356b2db88c4ed9c27f9",
+      "proposed_source_pin": "602d796c699cabba2971982cd9dccbbf46abfe79",
+      "pin_changed": true,
+      "role_ids": [
+        "shared_memory_backend",
+        "native_memory_capture"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids",
+      "packet_origins": [
+        {
+          "manifest_wave": "20260926",
+          "key": "c2",
+          "pin": null
+        },
+        {
+          "manifest_wave": "20260929",
+          "key": "c13",
+          "pin": null
+        }
+      ],
+      "disposition": "UNRESOLVED; retained for the co-op's two-family adjudication"
+    },
+    {
+      "repository": "https://github.com/vshulcz/deja-vu",
+      "prior_comparison_pin": "aa521f3f1abb9aa5449e7812652be371f3f23be9",
+      "proposed_source_pin": "0fb72c044f9c75444d270275424de29dca62e536",
+      "pin_changed": true,
+      "role_ids": [
+        "shared_memory_backend",
+        "native_memory_capture"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids",
+      "packet_origins": [
+        {
+          "manifest_wave": "20260926",
+          "key": "c11",
+          "pin": null
+        },
+        {
+          "manifest_wave": "20260929",
+          "key": "c11",
+          "pin": null
+        }
+      ],
+      "disposition": "UNRESOLVED; retained for the co-op's two-family adjudication"
+    },
+    {
+      "repository": "https://github.com/vbcherepanov/total-agent-memory",
+      "prior_comparison_pin": "f2f124fec90dc977f4610a1ea90aa05f5b916e56",
+      "proposed_source_pin": "9b67f708b4fdd88afe69fb4092bbede33dadd600",
+      "pin_changed": true,
+      "role_ids": [
+        "shared_memory_backend",
+        "native_memory_capture"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids",
+      "packet_origins": [
+        {
+          "manifest_wave": "20260926",
+          "key": "c7",
+          "pin": null
+        }
+      ],
+      "disposition": "UNRESOLVED; retained for the co-op's two-family adjudication"
+    },
+    {
+      "repository": "https://github.com/vectorize-io/hindsight",
+      "prior_comparison_pin": "a9eeed77f9bce99d8f97d39a30d3281747300824",
+      "proposed_source_pin": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+      "pin_changed": true,
+      "role_ids": [
+        "shared_memory_backend",
+        "native_memory_capture"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids",
+      "packet_origins": [
+        {
+          "manifest_wave": "20260926",
+          "key": "c4",
+          "pin": null
+        },
+        {
+          "manifest_wave": "20260929",
+          "key": "c4",
+          "pin": null
+        }
+      ],
+      "disposition": "UNRESOLVED; retained for the co-op's two-family adjudication"
+    },
+    {
+      "repository": "https://github.com/tigerless-labs/agent-memory",
+      "prior_comparison_pin": "aca58578ab386e4d422a97bcf32c2af2f3e57316",
+      "proposed_source_pin": "c395acc4708c545c4b5395f8a2cb1e3a3ababd14",
+      "pin_changed": true,
+      "role_ids": [
+        "shared_memory_backend",
+        "native_memory_capture"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids",
+      "packet_origins": [
+        {
+          "manifest_wave": "20260929",
+          "key": "c12",
+          "pin": null
+        }
+      ],
+      "disposition": "UNRESOLVED; retained for the co-op's two-family adjudication"
+    }
+  ],
+  "role_checks": {
+    "shared_memory_backend": {
+      "case_ids": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "mandatory_checks": [
+        "Exact source-grounded recall and full source read for all frozen positive/negative/superseded notes",
+        "Project isolation, deletion and clean-target restore",
+        "Evaluate matched newest-model panels with full cost; no incumbent preference",
+        "Update/delete/project-isolation/restore contract holds"
+      ]
+    },
+    "native_memory_capture": {
+      "case_ids": [
+        5
+      ],
+      "mandatory_checks": [
+        "Both native-client fixtures capture the same fictional outcomes through upstream's own supported capture path",
+        "No extra default capture owner or cross-project leakage",
+        "Supersession/deletion reaches recall after restart",
+        "Capture or index identical isolated cross-client fictional outcomes through native supported paths with exact source references",
+        "No substitute private transcript or protected source is ingested"
+      ]
+    },
+    "native_file_session_memory": {
+      "case_ids": [
+        6
+      ],
+      "mandatory_checks": [
+        "Native file/session control preserves exact fictional facts and resume identity",
+        "Same downstream model/query sees source files; control is not declared a shared backend"
+      ]
+    },
+    "memory_management_primitives": {
+      "case_ids": [
+        7
+      ],
+      "mandatory_checks": [
+        "Upstream native primitives write/update/delete/search the exact fixture through an isolated supported store",
+        "Application-owned integration boundary is explicit; primitives alone are not cross-client capture"
+      ]
+    }
+  },
+  "boundary": "Existing W6 roles and checks are preserved. Proposed source-pin updates do not amend the frozen comparison or authorize its run. No later omission or whole-layer adapter failure settles a dependency's role."
+}

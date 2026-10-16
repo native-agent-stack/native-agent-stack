@@ -1,0 +1,5 @@
+usage: external_relay_smoke.py [-h] --ai-memory-bin AI_MEMORY_BIN
+                               --relay-bin RELAY_BIN
+                               [--timeout-seconds TIMEOUT_SECONDS]
+                               [--artifacts-parent ARTIFACTS_PARENT]
+external_relay_smoke.py: error: --relay-bin is not an executable file: <SCRATCH>/prefix/ai-memory-relay

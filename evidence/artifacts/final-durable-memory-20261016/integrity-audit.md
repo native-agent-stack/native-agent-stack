@@ -1,0 +1,36 @@
+# Receipt integrity audit before publication
+
+This preparation was rebuilt before its first PR publication in response to the FINAL-wave receipt integrity addenda, cited by name. The first unpublished capture pass is withdrawn. It decoded native output as text, and it supplied a generated error string when Cargo was absent. Neither is used by the published execution records.
+
+The second capture pass records native subprocess stdout/stderr as bytes without decoding or replacement. Its raw files stay private under the name `raw-native-outputs`, with exact argv, working directory and return code in `raw-native-commands.jsonl`. The co-op receives their location privately. No digest of an unpublished raw file is in this PR.
+
+Published outputs are deterministic masked derivatives. `mask_capture.py:13-16` replaces the exact scratch-prefix bytes with `<SCRATCH>` and preserves every other byte. Commands use the same marked placeholder. This follows Python's documented [`bytes.replace`](https://docs.python.org/3/library/stdtypes.html#bytes.replace) operation, consulted 2026-10-16; it does not parse or regenerate native output. The matching custody tests are `tests/test_final_memory_mask.py:23`. They cover binary/ANSI/CRLF preservation, empty output, prefix validation and command-line reproduction without changing the source. The command journal in `E2E-attempt.json` contains hashes of the published bytes only.
+
+| Claim | Retained witness and exact scope | Audit disposition |
+| --- | --- | --- |
+| Historical catalog winner 2.3.2 | Base `caa224140a2d04ba5f3d0ca320c487a75f9c9ea1`, `catalogs/landscape/final-stack.json:5699` | Source fact. Citation tightened from the nearby component-name line to the actual value line. |
+| Plan narrative 2.6.6, plan row 2.5.2 | Same base, `docs/decisions/2026-10-15-new-wsl-clean-install-plan.md:684`; `adoption/new-wsl-profile.json:3004` | Two distinct source facts, never collapsed into one observed install. |
+| Linux run 2.4.1; macOS 2.3.2 | Same base, `catalogs/landscape/final-stack.json:10396`, `adoption/pins-linux-x86_64.json:156`, `adoption/pins-macos-arm64.json:154` | Exact source lines now point to values. No operational file changed. |
+| Last W6 source record 2.6.0 | Same base, `evidence/artifacts/w6-layer-verdict-20261011/primary-sources.json:702-703` | Source-review history only; not a 2.6.0 measured run. |
+| Existing executable answers 2.6.6 | `outputs/host-version-readonly.txt:1`; native command and rc 0 in the journal | Real read-only invocation. No daemon/client ownership inference. |
+| Release tag resolves to the proposed commit | `outputs/upstream-tag-resolution.txt:1-2` | Native `git ls-remote` capture; public tag-object and peeled-commit values. |
+| Archive checksum verification succeeds | `outputs/verify-release-checksum.txt:1` | Native `sha256sum -c`, rc 0. The archive digest in F1 is the public publisher artifact digest. |
+| Release extraction succeeds | `outputs/install-release-prefix.txt` is exactly empty; rc 0 in the command journal | Empty output is preserved, not replaced with a fabricated success message. |
+| Hook suite: 189 passed, 0 failed | `outputs/upstream-hook-tests.txt:187` | Unchanged upstream test execution. Its inputs are synthetic fixtures, explicitly labelled as such. This is not a live-client capture result. |
+| Relay diagnostics: four tests passed | `outputs/upstream-relay-tests.txt:3,5` | Unchanged upstream unit tests. The directory name `e2e` does not make these four diagnostic tests a complete E2E. |
+| Cargo unavailable, rc 127 | `outputs/upstream-cargo-tests.txt:1`; `/usr/bin/env cargo t --locked` | Re-captured native `env` error. The earlier recorder-generated stand-in is withdrawn. No Rust test count is invented. |
+| Relay E2E blocked, rc 2 | `outputs/upstream-external-relay-e2e.txt:5` | Native argparse error for the missing companion, before server startup. No smoke success is claimed. |
+| Keyed handoff smoke not run | ai-memory@`04a9e8f576de67e1d2282ee29415d1b0d5b979c8`: `tests/e2e/handoff_smoke.sh:6-8,30-35` | Named gap. No output file, return code or model result is manufactured. |
+| Isolated binary version and initialization | `outputs/native-version.txt:1`, `outputs/native-init.txt:7`; both rc 0 | Native component invocation only. No Codex/Claude memory-tool invocation is claimed. |
+| Initialization created four directories | `outputs/native-init-layout.txt:1-4`; native `stat`, rc 0 | Replaces a driver's former existence summary with native captured metadata. Configuration contents remain unread. |
+| Exported test source identity | `outputs/upstream-source-hashes.txt:1-7`; `source-witness.json` binds publicly retrievable blobs | Public upstream hashes match the source used by the tests. The original export has no standalone capture and is labelled preparation history, not a receipt. |
+| Hindsight recovery capability | Hindsight@`39c65ffe2f140d0c84cee58566cad8900c5b9908`: `hindsight-docs/docs/developer/admin-cli.md:7-22,190-271`; `uv.lock:3443-3451` | Fresh source evidence for the explicit PostgreSQL/locked-pg0 route. No backup, restore, retain or recall execution is asserted. |
+| Nine-candidate census and role boundary | Base W6 `comparisons/durable-memory.json`; `lane-packet-delta.json` | Source-derived draft: one incumbent and eight carried survivors. The two dependency/control roles are preserved. Packet-generator transcript output is not presented as a measured receipt. |
+| A1 scores | `screen-delta.json`, with each requirement's pinned source citation; `angles-draft.json` A1 sources | Analyst judgments from source. ai-memory, Deja-vu and the explicit Hindsight route are source eligible; narrower dependency roles are not silently screened by whole-layer evidence. |
+| A2 scores | ai-memory pinned CI/test entrypoints and the bounded native captures; other candidates remain U | Limited engineering evidence. Test success does not imply release superiority or comparative lifecycle success. |
+| A3 and A4 | `angles-draft.json` records U and the missing independent consensus/usage windows | Named evidence gaps; no popularity or installation count substitutes for them. |
+| A5 | Hindsight@`39c65ffe2f140d0c84cee58566cad8900c5b9908`: `README.md:5,44-50`; U in the draft | Vendor-linked evaluation availability only. Claimed independent reproduction is not certified here. |
+| A6 | Bounded ai-memory captures above; U and `a6_comparative: false` for all nine | No matched memory comparison. Tests using fixtures are not relabelled as live memory usefulness. |
+| Weights and final disposition | `angles-draft.json`, `gaps.json` | Proposed analyst choices, not measured output. All nine remain INSUFFICIENT; no FINAL admission or canonical terminal disposition is changed. |
+
+The named full-E2E, native-client invocation, platform/migration, comparative-quality and remaining-angle gaps remain open. No missing capture is represented by a reconstructed transcript. The co-op's private reproduction check and independent two-family reads remain pending.

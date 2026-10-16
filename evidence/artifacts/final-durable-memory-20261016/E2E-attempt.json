@@ -1,0 +1,597 @@
+{
+  "schema_version": 1,
+  "kind": "upstream_qualification_attempt",
+  "catalog": "foundation",
+  "layer_id": "durable-memory",
+  "recorded_at": "2026-10-16T05:41:54Z",
+  "repository": "https://github.com/akitaonrails/ai-memory",
+  "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+  "version": "2.6.6",
+  "status": "PARTIAL_GAP",
+  "upstream_e2e_success": false,
+  "isolation": {
+    "scratch_root": "<SCRATCH>",
+    "new_host_install": false,
+    "service_enabled": false,
+    "live_service_connection": false,
+    "model_invocations": 0,
+    "credential_reads": false,
+    "environment": "Child commands receive only PATH, LANG and scratch-local TMPDIR/XDG/AI_MEMORY_DATA_DIR plus disabled Git global configuration. No API credentials are forwarded.",
+    "retention": "Binaries/state remain only in scratch. Raw captures remain private. Published files are deterministic masked derivatives."
+  },
+  "install": {
+    "method": "Publisher's prebuilt release archive, sidecar verification and prefix extraction",
+    "adaptation": "The upstream documented GitHub-backend route downloads, verifies and extracts this archive. The same publisher archive is fetched directly and extracted into scratch to avoid global mise activation.",
+    "upstream_source": {
+      "kind": "repo",
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+      "path": "docs/install.md",
+      "line": 1801
+    }
+  },
+  "test_results": [
+    {
+      "suite": "tests/hooks/test_lib.sh",
+      "assertions_passed": 189,
+      "assertions_failed": 0,
+      "exit_code": 0,
+      "classification": "unchanged upstream shell smoke; isolated fixture state",
+      "result_source": "outputs/upstream-hook-tests.txt:187",
+      "result_basis": "189 passed, 0 failed"
+    },
+    {
+      "suite": "python3 -m unittest discover -s tests/e2e -p test_*.py",
+      "tests_run": 4,
+      "exit_code": 0,
+      "classification": "upstream relay diagnostic unit tests, not the relay E2E",
+      "result_source": "outputs/upstream-relay-tests.txt:3",
+      "result_basis": "Ran 4 tests; OK at line 5"
+    },
+    {
+      "suite": "/usr/bin/env cargo t --locked",
+      "tests_run": null,
+      "exit_code": 127,
+      "classification": "not executed; tool unavailable",
+      "result_source": "outputs/upstream-cargo-tests.txt:1",
+      "result_basis": "env reported cargo unavailable; rc 127 is the recorder result"
+    },
+    {
+      "suite": "tests/e2e/external_relay_smoke.py",
+      "tests_run": null,
+      "exit_code": 2,
+      "classification": "argument validation failed for absent relay companion; no E2E server started",
+      "result_source": "outputs/upstream-external-relay-e2e.txt:5",
+      "result_basis": "relay executable missing; rc 2 is the recorder result"
+    },
+    {
+      "suite": "tests/e2e/handoff_smoke.sh",
+      "tests_run": null,
+      "exit_code": null,
+      "classification": "not run: requires keyed model calls",
+      "result_source": "https://github.com/akitaonrails/ai-memory/blob/04a9e8f576de67e1d2282ee29415d1b0d5b979c8/tests/e2e/handoff_smoke.sh#L30",
+      "result_basis": "GEMINI_API_KEY required; no capture exists"
+    }
+  ],
+  "commands": [
+    {
+      "label": "download-archive",
+      "command": [
+        "curl",
+        "-q",
+        "-fL",
+        "--retry",
+        "2",
+        "--max-time",
+        "300",
+        "-o",
+        "ai-memory-linux-x86_64.tar.gz",
+        "https://github.com/akitaonrails/ai-memory/releases/download/v2.6.6/ai-memory-linux-x86_64.tar.gz"
+      ],
+      "cwd": "<SCRATCH>",
+      "started_at": "2026-10-16T05:38:45.701580+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.308,
+      "output_file": "outputs/download-archive.txt",
+      "capture": "masked_native_capture",
+      "raw_capture_name": "download-archive.txt",
+      "output_sha256": "b6b954441962a676a0b514af7eaf8402c80f0c190a76eef8c863a6c683311f6f",
+      "masking_rule": "mask_capture.py:16; exact scratch-prefix byte replacement with <SCRATCH>; all other bytes preserved",
+      "command_placeholders": {
+        "<SCRATCH>": "Private scratch root; exact argv and cwd retained in raw-native-commands.jsonl, named only."
+      },
+      "output_line_count": 11
+    },
+    {
+      "label": "download-checksum",
+      "command": [
+        "curl",
+        "-q",
+        "-fL",
+        "--retry",
+        "2",
+        "--max-time",
+        "300",
+        "-o",
+        "ai-memory-linux-x86_64.tar.gz.sha256",
+        "https://github.com/akitaonrails/ai-memory/releases/download/v2.6.6/ai-memory-linux-x86_64.tar.gz.sha256"
+      ],
+      "cwd": "<SCRATCH>",
+      "started_at": "2026-10-16T05:38:46.009555+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.224,
+      "output_file": "outputs/download-checksum.txt",
+      "capture": "masked_native_capture",
+      "raw_capture_name": "download-checksum.txt",
+      "output_sha256": "99a9921ea87a2eda7e579e209e420c1289817eeda4d065d65d1734183b82ac79",
+      "masking_rule": "mask_capture.py:16; exact scratch-prefix byte replacement with <SCRATCH>; all other bytes preserved",
+      "command_placeholders": {
+        "<SCRATCH>": "Private scratch root; exact argv and cwd retained in raw-native-commands.jsonl, named only."
+      },
+      "output_line_count": 11
+    },
+    {
+      "label": "verify-release-checksum",
+      "command": [
+        "sha256sum",
+        "-c",
+        "ai-memory-linux-x86_64.tar.gz.sha256"
+      ],
+      "cwd": "<SCRATCH>",
+      "started_at": "2026-10-16T05:38:46.233475+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.02,
+      "output_file": "outputs/verify-release-checksum.txt",
+      "capture": "masked_native_capture",
+      "raw_capture_name": "verify-release-checksum.txt",
+      "output_sha256": "4cf9beca8201431f08123596d1063a0d4f52419632a9c1d48cf5efb8b6bc672b",
+      "masking_rule": "mask_capture.py:16; exact scratch-prefix byte replacement with <SCRATCH>; all other bytes preserved",
+      "command_placeholders": {
+        "<SCRATCH>": "Private scratch root; exact argv and cwd retained in raw-native-commands.jsonl, named only."
+      },
+      "output_line_count": 1
+    },
+    {
+      "label": "release-archive-list",
+      "command": [
+        "tar",
+        "-tzf",
+        "ai-memory-linux-x86_64.tar.gz"
+      ],
+      "cwd": "<SCRATCH>",
+      "started_at": "2026-10-16T05:38:46.253603+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.469,
+      "output_file": "outputs/release-archive-list.txt",
+      "capture": "masked_native_capture",
+      "raw_capture_name": "release-archive-list.txt",
+      "output_sha256": "4a5bbd217c017b8449032c1ed1e1dcf6d7782290c0730cf9f36d7126863f1afe",
+      "masking_rule": "mask_capture.py:16; exact scratch-prefix byte replacement with <SCRATCH>; all other bytes preserved",
+      "command_placeholders": {
+        "<SCRATCH>": "Private scratch root; exact argv and cwd retained in raw-native-commands.jsonl, named only."
+      },
+      "output_line_count": 215
+    },
+    {
+      "label": "install-release-prefix",
+      "command": [
+        "tar",
+        "--no-same-owner",
+        "-xzf",
+        "ai-memory-linux-x86_64.tar.gz",
+        "-C",
+        "<SCRATCH>/prefix"
+      ],
+      "cwd": "<SCRATCH>",
+      "started_at": "2026-10-16T05:39:06.287783+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.634,
+      "output_file": "outputs/install-release-prefix.txt",
+      "capture": "masked_native_capture",
+      "raw_capture_name": "install-release-prefix.txt",
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "masking_rule": "mask_capture.py:16; exact scratch-prefix byte replacement with <SCRATCH>; all other bytes preserved",
+      "command_placeholders": {
+        "<SCRATCH>": "Private scratch root; exact argv and cwd retained in raw-native-commands.jsonl, named only."
+      },
+      "output_line_count": 0
+    },
+    {
+      "label": "native-version",
+      "command": [
+        "<SCRATCH>/prefix/ai-memory",
+        "--version"
+      ],
+      "cwd": "<SCRATCH>",
+      "started_at": "2026-10-16T05:39:08.517690+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.017,
+      "output_file": "outputs/native-version.txt",
+      "capture": "masked_native_capture",
+      "raw_capture_name": "native-version.txt",
+      "output_sha256": "5ccfbee4a0dbd43b9f3c37bcf12512a12bb6c9ad0f2a74613460313a17e81c97",
+      "masking_rule": "mask_capture.py:16; exact scratch-prefix byte replacement with <SCRATCH>; all other bytes preserved",
+      "command_placeholders": {
+        "<SCRATCH>": "Private scratch root; exact argv and cwd retained in raw-native-commands.jsonl, named only."
+      },
+      "output_line_count": 1
+    },
+    {
+      "label": "native-help",
+      "command": [
+        "<SCRATCH>/prefix/ai-memory",
+        "--help"
+      ],
+      "cwd": "<SCRATCH>",
+      "started_at": "2026-10-16T05:39:08.534930+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.017,
+      "output_file": "outputs/native-help.txt",
+      "capture": "masked_native_capture",
+      "raw_capture_name": "native-help.txt",
+      "output_sha256": "90c8134b41ba008a63cf62b03fc95ed1257000c3222b1d9a853ee929946dcacb",
+      "masking_rule": "mask_capture.py:16; exact scratch-prefix byte replacement with <SCRATCH>; all other bytes preserved",
+      "command_placeholders": {
+        "<SCRATCH>": "Private scratch root; exact argv and cwd retained in raw-native-commands.jsonl, named only."
+      },
+      "output_line_count": 86
+    },
+    {
+      "label": "native-init-help",
+      "command": [
+        "<SCRATCH>/prefix/ai-memory",
+        "init",
+        "--help"
+      ],
+      "cwd": "<SCRATCH>",
+      "started_at": "2026-10-16T05:39:08.552628+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.02,
+      "output_file": "outputs/native-init-help.txt",
+      "capture": "masked_native_capture",
+      "raw_capture_name": "native-init-help.txt",
+      "output_sha256": "14f2d9f07df7fd3645cee4d69464bafd782f25871a813eae390b567b86f5a9a5",
+      "masking_rule": "mask_capture.py:16; exact scratch-prefix byte replacement with <SCRATCH>; all other bytes preserved",
+      "command_placeholders": {
+        "<SCRATCH>": "Private scratch root; exact argv and cwd retained in raw-native-commands.jsonl, named only."
+      },
+      "output_line_count": 18
+    },
+    {
+      "label": "native-backup-help",
+      "command": [
+        "<SCRATCH>/prefix/ai-memory",
+        "backup",
+        "--help"
+      ],
+      "cwd": "<SCRATCH>",
+      "started_at": "2026-10-16T05:39:08.572662+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.027,
+      "output_file": "outputs/native-backup-help.txt",
+      "capture": "masked_native_capture",
+      "raw_capture_name": "native-backup-help.txt",
+      "output_sha256": "3e24414ef1bda4026cb14b72882fe756262d3fcaad33297ad687359d4c19b3fb",
+      "masking_rule": "mask_capture.py:16; exact scratch-prefix byte replacement with <SCRATCH>; all other bytes preserved",
+      "command_placeholders": {
+        "<SCRATCH>": "Private scratch root; exact argv and cwd retained in raw-native-commands.jsonl, named only."
+      },
+      "output_line_count": 18
+    },
+    {
+      "label": "native-restore-help",
+      "command": [
+        "<SCRATCH>/prefix/ai-memory",
+        "restore",
+        "--help"
+      ],
+      "cwd": "<SCRATCH>",
+      "started_at": "2026-10-16T05:39:08.599793+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.016,
+      "output_file": "outputs/native-restore-help.txt",
+      "capture": "masked_native_capture",
+      "raw_capture_name": "native-restore-help.txt",
+      "output_sha256": "17f4375bdbcfd079662f88b248de0b94ee056ab17ad8660e09373783ad90f874",
+      "masking_rule": "mask_capture.py:16; exact scratch-prefix byte replacement with <SCRATCH>; all other bytes preserved",
+      "command_placeholders": {
+        "<SCRATCH>": "Private scratch root; exact argv and cwd retained in raw-native-commands.jsonl, named only."
+      },
+      "output_line_count": 21
+    },
+    {
+      "label": "upstream-hook-tests",
+      "command": [
+        "sh",
+        "tests/hooks/test_lib.sh"
+      ],
+      "cwd": "<SCRATCH>/source",
+      "started_at": "2026-10-16T05:39:07.246450+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 15.227,
+      "output_file": "outputs/upstream-hook-tests.txt",
+      "capture": "masked_native_capture",
+      "raw_capture_name": "upstream-hook-tests.txt",
+      "output_sha256": "d09d00632e7c6cb2feaa761c73c7bf3b6368a728f1396ee7be608c1a29561f6f",
+      "masking_rule": "mask_capture.py:16; exact scratch-prefix byte replacement with <SCRATCH>; all other bytes preserved",
+      "command_placeholders": {
+        "<SCRATCH>": "Private scratch root; exact argv and cwd retained in raw-native-commands.jsonl, named only."
+      },
+      "output_line_count": 187
+    },
+    {
+      "label": "upstream-relay-tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/e2e",
+        "-p",
+        "test_*.py"
+      ],
+      "cwd": "<SCRATCH>/source",
+      "started_at": "2026-10-16T05:39:22.473513+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.286,
+      "output_file": "outputs/upstream-relay-tests.txt",
+      "capture": "masked_native_capture",
+      "raw_capture_name": "upstream-relay-tests.txt",
+      "output_sha256": "cfc2e5c7745a039ad4dd5df4e9fad0525586cedfc2496a272ba27dcfc4300945",
+      "masking_rule": "mask_capture.py:16; exact scratch-prefix byte replacement with <SCRATCH>; all other bytes preserved",
+      "command_placeholders": {
+        "<SCRATCH>": "Private scratch root; exact argv and cwd retained in raw-native-commands.jsonl, named only."
+      },
+      "output_line_count": 5
+    },
+    {
+      "label": "upstream-cargo-tests",
+      "command": [
+        "/usr/bin/env",
+        "cargo",
+        "t",
+        "--locked"
+      ],
+      "cwd": "<SCRATCH>/source",
+      "started_at": "2026-10-16T05:39:22.760004+00:00",
+      "exit_code": 127,
+      "elapsed_seconds": 0.006,
+      "output_file": "outputs/upstream-cargo-tests.txt",
+      "capture": "masked_native_capture",
+      "raw_capture_name": "upstream-cargo-tests.txt",
+      "output_sha256": "ad159ed83e58798ee1ed48d24f089538a4e79c1424d1dc111249c29da2f4b38e",
+      "masking_rule": "mask_capture.py:16; exact scratch-prefix byte replacement with <SCRATCH>; all other bytes preserved",
+      "command_placeholders": {
+        "<SCRATCH>": "Private scratch root; exact argv and cwd retained in raw-native-commands.jsonl, named only."
+      },
+      "output_line_count": 2
+    },
+    {
+      "label": "native-init",
+      "command": [
+        "<SCRATCH>/prefix/ai-memory",
+        "--data-dir",
+        "<SCRATCH>/memory-raw",
+        "init"
+      ],
+      "cwd": "<SCRATCH>",
+      "started_at": "2026-10-16T05:40:08.527889+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.025,
+      "output_file": "outputs/native-init.txt",
+      "capture": "masked_native_capture",
+      "raw_capture_name": "native-init.txt",
+      "output_sha256": "900f6c21177681a71e44cf21b4b966d17b12a525c76cce41f316baec209f0f29",
+      "masking_rule": "mask_capture.py:16; exact scratch-prefix byte replacement with <SCRATCH>; all other bytes preserved",
+      "command_placeholders": {
+        "<SCRATCH>": "Private scratch root; exact argv and cwd retained in raw-native-commands.jsonl, named only."
+      },
+      "output_line_count": 7
+    },
+    {
+      "label": "native-init-layout",
+      "command": [
+        "stat",
+        "--printf=%F %n\n",
+        "<SCRATCH>/memory-raw/wiki",
+        "<SCRATCH>/memory-raw/raw",
+        "<SCRATCH>/memory-raw/db",
+        "<SCRATCH>/memory-raw/models"
+      ],
+      "cwd": "<SCRATCH>",
+      "started_at": "2026-10-16T05:40:08.553290+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.005,
+      "output_file": "outputs/native-init-layout.txt",
+      "capture": "masked_native_capture",
+      "raw_capture_name": "native-init-layout.txt",
+      "output_sha256": "c77709a288f30b2862ba9436c0a68171777221645ba65684183da2bd483150be",
+      "masking_rule": "mask_capture.py:16; exact scratch-prefix byte replacement with <SCRATCH>; all other bytes preserved",
+      "command_placeholders": {
+        "<SCRATCH>": "Private scratch root; exact argv and cwd retained in raw-native-commands.jsonl, named only."
+      },
+      "output_line_count": 4
+    },
+    {
+      "label": "host-version-readonly",
+      "command": [
+        "ai-memory",
+        "--version"
+      ],
+      "cwd": "<SCRATCH>",
+      "started_at": "2026-10-16T05:40:08.839096+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.017,
+      "output_file": "outputs/host-version-readonly.txt",
+      "capture": "masked_native_capture",
+      "raw_capture_name": "host-version-readonly.txt",
+      "output_sha256": "5ccfbee4a0dbd43b9f3c37bcf12512a12bb6c9ad0f2a74613460313a17e81c97",
+      "masking_rule": "mask_capture.py:16; exact scratch-prefix byte replacement with <SCRATCH>; all other bytes preserved",
+      "command_placeholders": {
+        "<SCRATCH>": "Private scratch root; exact argv and cwd retained in raw-native-commands.jsonl, named only."
+      },
+      "output_line_count": 1
+    },
+    {
+      "label": "upstream-external-relay-e2e",
+      "command": [
+        "python3",
+        "tests/e2e/external_relay_smoke.py",
+        "--ai-memory-bin",
+        "<SCRATCH>/prefix/ai-memory",
+        "--relay-bin",
+        "<SCRATCH>/prefix/ai-memory-relay",
+        "--artifacts-parent",
+        "<SCRATCH>/relay-e2e"
+      ],
+      "cwd": "<SCRATCH>/source",
+      "started_at": "2026-10-16T05:40:08.856854+00:00",
+      "exit_code": 2,
+      "elapsed_seconds": 0.089,
+      "output_file": "outputs/upstream-external-relay-e2e.txt",
+      "capture": "masked_native_capture",
+      "raw_capture_name": "upstream-external-relay-e2e.txt",
+      "output_sha256": "a9d896dc73bcd61837ee3fc0a595e28c8197bd9d9db8fcfb494af97c3d767573",
+      "masking_rule": "mask_capture.py:16; exact scratch-prefix byte replacement with <SCRATCH>; all other bytes preserved",
+      "command_placeholders": {
+        "<SCRATCH>": "Private scratch root; exact argv and cwd retained in raw-native-commands.jsonl, named only."
+      },
+      "output_line_count": 5
+    },
+    {
+      "label": "upstream-tag-resolution",
+      "command": [
+        "git",
+        "ls-remote",
+        "https://github.com/akitaonrails/ai-memory.git",
+        "refs/tags/v2.6.6*"
+      ],
+      "cwd": "<SCRATCH>",
+      "started_at": "2026-10-16T05:40:09.198187+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.206,
+      "output_file": "outputs/upstream-tag-resolution.txt",
+      "capture": "masked_native_capture",
+      "raw_capture_name": "upstream-tag-resolution.txt",
+      "output_sha256": "aa8c198cca59e16c4d646b876ac4dbaa2a517126a7735e903f024c9adb3dbf9f",
+      "masking_rule": "mask_capture.py:16; exact scratch-prefix byte replacement with <SCRATCH>; all other bytes preserved",
+      "command_placeholders": {
+        "<SCRATCH>": "Private scratch root; exact argv and cwd retained in raw-native-commands.jsonl, named only."
+      },
+      "output_line_count": 2
+    },
+    {
+      "label": "upstream-source-hashes",
+      "command": [
+        "sha256sum",
+        "tests/hooks/test_lib.sh",
+        "hooks/_lib.sh",
+        "tests/e2e/test_external_relay_smoke.py",
+        "tests/e2e/external_relay_smoke.py",
+        ".cargo/config.toml",
+        "rust-toolchain.toml",
+        "Cargo.toml"
+      ],
+      "cwd": "<SCRATCH>/source",
+      "started_at": "2026-10-16T05:40:09.404394+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.008,
+      "output_file": "outputs/upstream-source-hashes.txt",
+      "capture": "masked_native_capture",
+      "raw_capture_name": "upstream-source-hashes.txt",
+      "output_sha256": "635b16efa2fcaa48513cacd51dcf15aa81b45317eeec0797723fddbb27048753",
+      "masking_rule": "mask_capture.py:16; exact scratch-prefix byte replacement with <SCRATCH>; all other bytes preserved",
+      "command_placeholders": {
+        "<SCRATCH>": "Private scratch root; exact argv and cwd retained in raw-native-commands.jsonl, named only."
+      },
+      "output_line_count": 7
+    },
+    {
+      "label": "recorder-time",
+      "command": [
+        "date",
+        "-u",
+        "+%Y-%m-%dT%H:%M:%SZ"
+      ],
+      "cwd": "<SCRATCH>",
+      "started_at": "2026-10-16T05:40:09.412618+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.004,
+      "output_file": "outputs/recorder-time.txt",
+      "capture": "masked_native_capture",
+      "raw_capture_name": "recorder-time.txt",
+      "output_sha256": "7d5b5282526019b6acc1d2fc7691afd0201df087fafafa39794111753287ac8b",
+      "masking_rule": "mask_capture.py:16; exact scratch-prefix byte replacement with <SCRATCH>; all other bytes preserved",
+      "command_placeholders": {
+        "<SCRATCH>": "Private scratch root; exact argv and cwd retained in raw-native-commands.jsonl, named only."
+      },
+      "output_line_count": 1
+    }
+  ],
+  "upstream_sources": [
+    {
+      "kind": "repo",
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+      "path": "tests/hooks/test_lib.sh",
+      "line": 1
+    },
+    {
+      "kind": "repo",
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+      "path": "tests/e2e/test_external_relay_smoke.py",
+      "line": 1
+    },
+    {
+      "kind": "repo",
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+      "path": ".cargo/config.toml",
+      "line": 1
+    },
+    {
+      "kind": "repo",
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+      "path": "tests/e2e/external_relay_smoke.py",
+      "line": 1
+    },
+    {
+      "kind": "repo",
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+      "path": ".github/workflows/ci.yml",
+      "line": 98
+    },
+    {
+      "kind": "repo",
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+      "path": "tests/e2e/handoff_smoke.sh",
+      "line": 6
+    }
+  ],
+  "gaps": [
+    "E2E-RUST",
+    "E2E-RELAY",
+    "E2E-KEYED-HANDOFF",
+    "F2-NATIVE-CLIENTS",
+    "COMPARE-NINE-ARMS",
+    "HINDSIGHT-RECOVERY-RUN",
+    "PLATFORM-MIGRATION",
+    "ANGLES-A3-A4-A5",
+    "NEWER-AI-MEMORY"
+  ],
+  "integrity_checked_at": "2026-10-16T05:41:54Z",
+  "capture_policy": {
+    "kind": "masked_native_capture",
+    "raw_custody": "Raw native files and exact command journal retained privately, named raw-native-outputs/<label>.txt and raw-native-commands.jsonl. No raw-capture digest is published.",
+    "published_hash": "SHA-256 of each published derivative's bytes only.",
+    "masking_rule": "mask_capture.py:16",
+    "masking_tests": "tests/test_final_memory_mask.py",
+    "replacement": "Exact scratch-root bytes -> <SCRATCH>. No decoding, newline conversion, ANSI removal or content generation.",
+    "supersession": "All unpublished normalized first-pass captures and the recorder-generated cargo-unavailable message are withdrawn. This receipt uses re-captured native output; env itself produced the missing-cargo error."
+  }
+}

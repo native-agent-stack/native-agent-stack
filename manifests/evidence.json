@@ -22887,6 +22887,161 @@
       "bytes": 319713
     },
     {
+      "path": "evidence/artifacts/final-durable-memory-20261016/E2E-attempt.json",
+      "sha256": "5d74d7bfc4024ea95b4fc80922df7f7e245c5f930a149d7976f72188f1250fba",
+      "bytes": 23463
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/F1-run-pin.json",
+      "sha256": "972b1243f089b260e44843deea64314735fbd6649653ea34d05204bd9bb13e08",
+      "bytes": 6050
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/F2-invoke.json",
+      "sha256": "0d5c65d8949bb61021329524692123de8914861778b4860e87ce40292f579a6b",
+      "bytes": 4925
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/README.md",
+      "sha256": "5c3320d53360712cc3d5fc1d8bca97693f15e78944ab2060d64ec2f163a92224",
+      "bytes": 15309
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/angles-draft.json",
+      "sha256": "254442f34738381294c72d1a8cea0f21e04bc4c6cf2749077a1d68089192010e",
+      "bytes": 51366
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/gaps.json",
+      "sha256": "a87218c10ecd8fa7cf8eac3e434d44243fd513848644edafc445c30e19f09648",
+      "bytes": 5706
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/integrity-audit.md",
+      "sha256": "38c0162444ab1626252511b1e7475d6bf317bd2d953ec72632cfa2351ee7fe27",
+      "bytes": 7029
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/lane-packet-delta.json",
+      "sha256": "5f16a8f6d4a76112931aa1bf167cc45e71ff3b5f2d1b459eeed14a21b5c109dd",
+      "bytes": 11119
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/mask_capture.py",
+      "sha256": "133e60fcd52055563755ed716992cddd88add573d4c044d00276941ec2f05755",
+      "bytes": 1255
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/outputs/download-archive.txt",
+      "sha256": "b6b954441962a676a0b514af7eaf8402c80f0c190a76eef8c863a6c683311f6f",
+      "bytes": 704
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/outputs/download-checksum.txt",
+      "sha256": "99a9921ea87a2eda7e579e209e420c1289817eeda4d065d65d1734183b82ac79",
+      "bytes": 704
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/outputs/host-version-readonly.txt",
+      "sha256": "5ccfbee4a0dbd43b9f3c37bcf12512a12bb6c9ad0f2a74613460313a17e81c97",
+      "bytes": 16
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/outputs/install-release-prefix.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/outputs/native-backup-help.txt",
+      "sha256": "3e24414ef1bda4026cb14b72882fe756262d3fcaad33297ad687359d4c19b3fb",
+      "bytes": 542
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/outputs/native-help.txt",
+      "sha256": "90c8134b41ba008a63cf62b03fc95ed1257000c3222b1d9a853ee929946dcacb",
+      "bytes": 10820
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/outputs/native-init-help.txt",
+      "sha256": "14f2d9f07df7fd3645cee4d69464bafd782f25871a813eae390b567b86f5a9a5",
+      "bytes": 520
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/outputs/native-init-layout.txt",
+      "sha256": "c77709a288f30b2862ba9436c0a68171777221645ba65684183da2bd483150be",
+      "bytes": 143
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/outputs/native-init.txt",
+      "sha256": "900f6c21177681a71e44cf21b4b966d17b12a525c76cce41f316baec209f0f29",
+      "bytes": 1202
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/outputs/native-restore-help.txt",
+      "sha256": "17f4375bdbcfd079662f88b248de0b94ee056ab17ad8660e09373783ad90f874",
+      "bytes": 589
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/outputs/native-version.txt",
+      "sha256": "5ccfbee4a0dbd43b9f3c37bcf12512a12bb6c9ad0f2a74613460313a17e81c97",
+      "bytes": 16
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/outputs/recorder-time.txt",
+      "sha256": "7d5b5282526019b6acc1d2fc7691afd0201df087fafafa39794111753287ac8b",
+      "bytes": 21
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/outputs/release-archive-list.txt",
+      "sha256": "4a5bbd217c017b8449032c1ed1e1dcf6d7782290c0730cf9f36d7126863f1afe",
+      "bytes": 6722
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/outputs/upstream-cargo-tests.txt",
+      "sha256": "ad159ed83e58798ee1ed48d24f089538a4e79c1424d1dc111249c29da2f4b38e",
+      "bytes": 88
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/outputs/upstream-external-relay-e2e.txt",
+      "sha256": "a9d896dc73bcd61837ee3fc0a595e28c8197bd9d9db8fcfb494af97c3d767573",
+      "bytes": 359
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/outputs/upstream-hook-tests.txt",
+      "sha256": "d09d00632e7c6cb2feaa761c73c7bf3b6368a728f1396ee7be608c1a29561f6f",
+      "bytes": 9826
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/outputs/upstream-relay-tests.txt",
+      "sha256": "cfc2e5c7745a039ad4dd5df4e9fad0525586cedfc2496a272ba27dcfc4300945",
+      "bytes": 102
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/outputs/upstream-source-hashes.txt",
+      "sha256": "635b16efa2fcaa48513cacd51dcf15aa81b45317eeec0797723fddbb27048753",
+      "bytes": 623
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/outputs/upstream-tag-resolution.txt",
+      "sha256": "aa8c198cca59e16c4d646b876ac4dbaa2a517126a7735e903f024c9adb3dbf9f",
+      "bytes": 119
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/outputs/verify-release-checksum.txt",
+      "sha256": "4cf9beca8201431f08123596d1063a0d4f52419632a9c1d48cf5efb8b6bc672b",
+      "bytes": 34
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/screen-delta.json",
+      "sha256": "3c7a21922a4198fd59aa25f0e4a2158cfaa946309919ac15a45ee006a8bd0094",
+      "bytes": 80757
+    },
+    {
+      "path": "evidence/artifacts/final-durable-memory-20261016/source-witness.json",
+      "sha256": "a25bc3ace5c1da6107a667979c6463b7f89a930fe2e97068f371460c050cff34",
+      "bytes": 3095
+    },
+    {
       "path": "evidence/artifacts/foundation-closure-20260921/claude-review.md",
       "sha256": "ff34c3db7e67e4d96e9a1d0d154a0c7e8c01f42eade511302f963ad05a1d2c4c",
       "bytes": 6271

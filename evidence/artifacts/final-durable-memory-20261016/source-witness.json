@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "kind": "upstream_source_export_witness",
+  "recorded_at": "2026-10-16T05:24:49Z",
+  "source_export_commands": [
+    {
+      "command": "git archive --format=tar --output=<SCRATCH>/source.tar 04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+      "cwd": "existing pinned upstream mirror; private local path omitted",
+      "exit_code": 0,
+      "classification": "Historical preparation command; no original stdout capture retained. Public source hashes were subsequently captured natively; this is not an execution receipt."
+    },
+    {
+      "command": "tar -xf <SCRATCH>/source.tar -C <SCRATCH>/source",
+      "exit_code": 0,
+      "classification": "Historical preparation command; no original stdout capture retained. Public source hashes were subsequently captured natively; this is not an execution receipt."
+    }
+  ],
+  "hash_policy": "Hashes bind publicly retrievable upstream blobs at the stated commit, not private mirror metadata, configuration or test data.",
+  "files": [
+    {
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+      "path": "tests/hooks/test_lib.sh",
+      "sha256": "1719ce71b934deb8064b216bd07b034eec1c950492b5a52acf7616fdee7d82da",
+      "export_matches": true
+    },
+    {
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+      "path": "hooks/_lib.sh",
+      "sha256": "26a1ae0f570ad8fcf4e90888aa4815e26a01dc36a7f02917a97a4ff4bab7ac97",
+      "export_matches": true
+    },
+    {
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+      "path": "tests/e2e/test_external_relay_smoke.py",
+      "sha256": "46c22bcc4e3f7099ffa93376f5c5c9b5ab94ff7d82f745bdecfa652e4e340349",
+      "export_matches": true
+    },
+    {
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+      "path": "tests/e2e/external_relay_smoke.py",
+      "sha256": "6c2de0aa3251db83ef3b38e6ee1941023b5ba50110141ef290db01bd03c3935d",
+      "export_matches": true
+    },
+    {
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+      "path": ".cargo/config.toml",
+      "sha256": "128bc5d5280d0c5a9f4f1455c600dd369c58b82708dc5d95239b8026d589499e",
+      "export_matches": true
+    },
+    {
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+      "path": "rust-toolchain.toml",
+      "sha256": "0abe45038b7a3234eb7d050ac4df8c0683ca44396daeadd9a61cf12dbd5d5df3",
+      "export_matches": true
+    },
+    {
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+      "path": "Cargo.toml",
+      "sha256": "d973714351e1c3cd21636ec69f63237ccd7fb221e5fed45528adafbcc52bde39",
+      "export_matches": true
+    }
+  ],
+  "native_hash_capture": "outputs/upstream-source-hashes.txt:1"
+}

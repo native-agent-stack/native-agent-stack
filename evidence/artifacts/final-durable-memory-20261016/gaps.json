@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "kind": "final_wave_gap_disposition_draft",
+  "catalog": "foundation",
+  "layer_id": "durable-memory",
+  "recorded_at": "2026-10-16T05:24:49Z",
+  "proposed_disposition": "GAP",
+  "adjudicated": false,
+  "final_admission_requested": false,
+  "gaps": [
+    {
+      "id": "E2E-RUST",
+      "status": "GAP",
+      "blocker": "/usr/bin/env cargo t --locked exited 127: native env output says cargo is unavailable. The full Rust/nextest tier was not executed.",
+      "source": {
+        "kind": "repo",
+        "repository": "https://github.com/akitaonrails/ai-memory",
+        "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+        "path": "CONTRIBUTING.md",
+        "line": 51
+      },
+      "next_check": "Provision Rust 1.95 and cargo-nextest only inside a new isolated scratch, then run the pinned upstream full tier."
+    },
+    {
+      "id": "E2E-RELAY",
+      "status": "GAP",
+      "blocker": "The upstream isolated external relay E2E exited 2 before starting a server because ai-memory-relay is absent from the release prefix.",
+      "source": {
+        "kind": "repo",
+        "repository": "https://github.com/akitaonrails/ai-memory",
+        "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+        "path": "tests/e2e/external_relay_smoke.py",
+        "line": 202
+      },
+      "next_check": "Build the same-pin companion in scratch using the upstream CI command at .github/workflows/ci.yml:98, then rerun the unchanged script."
+    },
+    {
+      "id": "E2E-KEYED-HANDOFF",
+      "status": "GAP",
+      "blocker": "The upstream handoff smoke requires GEMINI_API_KEY and two model calls; it was not run.",
+      "source": {
+        "kind": "repo",
+        "repository": "https://github.com/akitaonrails/ai-memory",
+        "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+        "path": "tests/e2e/handoff_smoke.sh",
+        "line": 6
+      },
+      "next_check": "An authorized credential-bearing evaluation window is required; do not infer this from CLI initialization or mocked tests."
+    },
+    {
+      "id": "F2-NATIVE-CLIENTS",
+      "status": "GAP",
+      "blocker": "The native release executable was invoked, but no Codex/Claude memory tool, hook lifecycle or measured native-client session was invoked at 2.6.6.",
+      "source": {
+        "kind": "receipt",
+        "path": "evidence/artifacts/final-durable-memory-20261016/F2-invoke.json"
+      },
+      "next_check": "Capture actual native-client memory calls and invocation-window receipts in isolated approved profiles."
+    },
+    {
+      "id": "COMPARE-NINE-ARMS",
+      "status": "GAP",
+      "blocker": "No matched role-specific memory comparison ran; all eight cumulative survivors remain unresolved. The frozen W6 comparison has older source pins and unmet model-panel inputs.",
+      "source": {
+        "kind": "receipt",
+        "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/durable-memory.json"
+      },
+      "next_check": "Adjudicate the proposed pin deltas, seal the common newest-supported model panel and execute the existing role checks in scratch."
+    },
+    {
+      "id": "HINDSIGHT-RECOVERY-RUN",
+      "status": "GAP",
+      "blocker": "PostgreSQL/pg0 0.15.2 recovery is now documented at Hindsight 1.0.0, but no backup/restore, retain/recall or native capture run was performed.",
+      "source": {
+        "kind": "repo",
+        "repository": "https://github.com/vectorize-io/hindsight",
+        "pin": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+        "path": "hindsight-docs/docs/developer/admin-cli.md",
+        "line": 190
+      },
+      "next_check": "Execute the same-pin upstream backup/restore tests on a fresh isolated pg0 database with the required embedding fixture; compare exact scoped recovery against ai-memory."
+    },
+    {
+      "id": "PLATFORM-MIGRATION",
+      "status": "GAP",
+      "blocker": "Only Linux x86_64 release execution was observed. macOS arm64, upgrade from existing stores, clean-target restoration and client rebinding remain unmeasured.",
+      "source": {
+        "kind": "receipt",
+        "path": "evidence/artifacts/final-durable-memory-20261016/E2E-attempt.json"
+      },
+      "next_check": "Qualify the proposed pin on each required platform using fictional stores and upstream operations."
+    },
+    {
+      "id": "ANGLES-A3-A4-A5",
+      "status": "GAP",
+      "blocker": "No new independent community/adoption measurement, package-usage window, or method-comparable published-evaluation analysis was collected. Hindsight's README links a vendor evaluation and asserts external replication; those assertions are not independent verification.",
+      "source": {
+        "kind": "repo",
+        "repository": "https://github.com/vectorize-io/hindsight",
+        "pin": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+        "path": "README.md",
+        "line": 44
+      },
+      "next_check": "Adjudicate these existing named angle gaps without launching a general candidate sweep."
+    },
+    {
+      "id": "NEWER-AI-MEMORY",
+      "status": "GAP",
+      "blocker": "The separate 3.0.0 source screen does not qualify the 2.6.6 runtime or prove the older pin preferable. No 2.6.6 versus 3.0.0 migration or matched comparison ran.",
+      "source": {
+        "kind": "url",
+        "url": "https://github.com/native-agent-stack/native-agent-stack/blob/75777efa265dde1154a5524dbe69cb5dbf6eb7df/evidence/artifacts/harness-screens-20261015/durable-memory.anthropic.json",
+        "read_at": "2026-10-16T05:24:49Z"
+      },
+      "next_check": "Use source changes and measured migration/quality evidence to adjudicate a later run-pin supersession; deployment incumbency gives no merit preference."
+    }
+  ]
+}

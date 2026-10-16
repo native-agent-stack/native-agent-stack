@@ -1,0 +1,1984 @@
+{
+  "schema_version": 1,
+  "kind": "pinned_source_screen_delta",
+  "catalog": "foundation",
+  "layer_id": "durable-memory",
+  "recorded_at": "2026-10-16T05:24:49Z",
+  "scope": "One incumbent and exactly eight carried survivors; no discovery. Reuse same-pin source facts from the published screen head; read the changed ai-memory pin and Hindsight recovery gap fresh.",
+  "rows": [
+    {
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+      "tag": "v2.6.6",
+      "role_ids": [
+        "shared_memory_backend",
+        "native_memory_capture"
+      ],
+      "requirements": [
+        {
+          "id": "scoped-durable-records",
+          "result": "PASS",
+          "reason": "One shared store carries typed handoffs across native clients; project scopes remain explicit.",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/akitaonrails/ai-memory",
+              "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+              "path": "README.md",
+              "line": 26
+            }
+          ]
+        },
+        {
+          "id": "native-client-access",
+          "result": "PASS",
+          "reason": "The support matrix names Claude Code and Codex; this is documented capability, not a new native-client run.",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/akitaonrails/ai-memory",
+              "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+              "path": "README.md",
+              "line": 119
+            }
+          ]
+        },
+        {
+          "id": "inspectable-capture",
+          "result": "PASS",
+          "reason": "The zero-LLM capture path produces readable pages; mutations have an audit log.",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/akitaonrails/ai-memory",
+              "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+              "path": "README.md",
+              "line": 59
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/akitaonrails/ai-memory",
+              "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+              "path": "README.md",
+              "line": 83
+            }
+          ]
+        },
+        {
+          "id": "deletion",
+          "result": "PASS",
+          "reason": "Lifecycle documentation defines project/session cascade scope, logical deletion and optional compaction.",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/akitaonrails/ai-memory",
+              "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+              "path": "docs/lifecycle-ops.md",
+              "line": 11
+            }
+          ]
+        },
+        {
+          "id": "recovery",
+          "result": "PASS",
+          "reason": "Documented online SQLite/wiki backup and guarded staged restore exist; the actual restore remains unrun.",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/akitaonrails/ai-memory",
+              "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+              "path": "docs/lifecycle-ops.md",
+              "line": 20
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/akitaonrails/ai-memory",
+              "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+              "path": "docs/lifecycle-ops.md",
+              "line": 25
+            }
+          ]
+        },
+        {
+          "id": "maintenance",
+          "result": "PASS",
+          "reason": "A tagged 2.6.6 release and same-version source were verified, with CI and test entrypoints. This is activity, not comparative engineering quality.",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/akitaonrails/ai-memory",
+              "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+              "path": "Cargo.toml",
+              "line": 38
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/akitaonrails/ai-memory",
+              "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+              "path": ".github/workflows/ci.yml",
+              "line": 80
+            }
+          ]
+        },
+        {
+          "id": "linux-wsl2-x86_64",
+          "result": "PASS",
+          "reason": "Linux and WSL2 are documented; the release archive route explicitly names Linux x86_64.",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/akitaonrails/ai-memory",
+              "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+              "path": "README.md",
+              "line": 114
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/akitaonrails/ai-memory",
+              "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+              "path": "docs/install.md",
+              "line": 1812
+            }
+          ]
+        },
+        {
+          "id": "macos-arm64",
+          "result": "PASS",
+          "reason": "The documented release archive route names macos-aarch64; execution on that platform is still a gap.",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/akitaonrails/ai-memory",
+              "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+              "path": "docs/install.md",
+              "line": 1814
+            }
+          ]
+        },
+        {
+          "id": "headless",
+          "result": "PASS",
+          "reason": "A native HTTP server entrypoint and bind address are documented.",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/akitaonrails/ai-memory",
+              "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+              "path": "docs/install.md",
+              "line": 1843
+            }
+          ]
+        },
+        {
+          "id": "profile-or-project-scoping",
+          "result": "PASS",
+          "reason": "Data-directory override supports isolated instances, and the hook installer distinguishes user-wide and per-repository opt-in.",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/akitaonrails/ai-memory",
+              "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+              "path": "docs/install.md",
+              "line": 1847
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/akitaonrails/ai-memory",
+              "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+              "path": "docs/install.md",
+              "line": 94
+            }
+          ]
+        }
+      ],
+      "result": "PASS",
+      "meaning": "Source-screened and TRIAL-eligible; not a FINAL verdict.",
+      "fresh": true
+    },
+    {
+      "repository": "https://github.com/anthropics/claude-code",
+      "pin": "03b5892ee77de289bcd5dfa39f541525ade74aff",
+      "tag": "v2.1.301",
+      "role_ids": [
+        "native_file_session_memory"
+      ],
+      "dependency": true,
+      "source_reuse": {
+        "pr": 1193,
+        "head": "75777efa265dde1154a5524dbe69cb5dbf6eb7df",
+        "path": "evidence/artifacts/harness-screens-20261015/durable-memory.anthropic.json",
+        "parallel_openai_row": "evidence/artifacts/harness-screens-20261015/durable-memory.openai.json"
+      },
+      "requirements": [
+        {
+          "id": "scoped-durable-records",
+          "result": "PASS",
+          "reason": "Native project MEMORY.md/topic files keep local durable guidance. #1181 mechanisms.md:48-57 at 4bd1ff3a supplies the 2.1.301 source boundary and child-memory caveat.",
+          "citations": [
+            {
+              "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+              "commit": "4bd1ff3ab46430c3d37dcccfac18178fb7f08212",
+              "path": "evidence/artifacts/runtime-worker-context-engineering-20261015/mechanisms.md",
+              "lines": [
+                48,
+                57
+              ],
+              "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/4bd1ff3ab46430c3d37dcccfac18178fb7f08212/evidence/artifacts/runtime-worker-context-engineering-20261015/mechanisms.md#L48"
+            }
+          ]
+        },
+        {
+          "id": "native-client-access",
+          "result": "FAIL",
+          "reason": "Native auto memory is Claude-local. The reused source explicitly does not establish cross-harness shared memory, so it does not satisfy this layer's cross-Codex/Claude contract as a complete memory candidate.",
+          "citations": [
+            {
+              "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+              "commit": "4bd1ff3ab46430c3d37dcccfac18178fb7f08212",
+              "path": "evidence/artifacts/runtime-worker-context-engineering-20261015/survivors.md",
+              "lines": [
+                23,
+                23
+              ],
+              "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/4bd1ff3ab46430c3d37dcccfac18178fb7f08212/evidence/artifacts/runtime-worker-context-engineering-20261015/survivors.md#L23"
+            }
+          ]
+        },
+        {
+          "id": "inspectable-capture",
+          "result": "PASS",
+          "reason": "Auto memory files are plain Markdown and /memory exposes them for audit/editing.",
+          "citations": [
+            {
+              "url": "https://code.claude.com/docs/en/memory#audit-and-edit-your-memory",
+              "read_at": "2026-10-15"
+            }
+          ]
+        },
+        {
+          "id": "deletion",
+          "result": "PASS",
+          "reason": "The vendor explicitly permits editing/deleting the memory files and disabling autoMemoryEnabled per project.",
+          "citations": [
+            {
+              "url": "https://code.claude.com/docs/en/memory",
+              "read_at": "2026-10-15",
+              "sections": [
+                "Audit and edit your memory",
+                "Enable or disable auto memory"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "recovery",
+          "result": "UNKNOWN",
+          "reason": "No native backup/restore contract for the complete memory store was established by #1181 or the reviewed memory page. Plain files are inspectable, but that alone is not a recovery receipt.",
+          "citations": [
+            {
+              "url": "https://code.claude.com/docs/en/memory",
+              "read_at": "2026-10-15"
+            }
+          ]
+        },
+        {
+          "id": "maintenance",
+          "result": "PASS",
+          "reason": "Not archived; the supplied primary-source receipt has a default-branch commit within the fixed 90-day window. This proves activity, not all engineering quality angles.",
+          "citations": [
+            {
+              "url": "https://api.github.com/repos/anthropics/claude-code",
+              "read_at": "2026-10-15T20:03Z",
+              "source": "gh-facts-20261015T2003Z.json or the documented anonymous correction read"
+            },
+            {
+              "url": "https://api.github.com/repos/anthropics/claude-code/commits?per_page=1",
+              "read_at": "2026-10-15T20:03Z",
+              "source": "gh-facts-20261015T2003Z.json or the documented anonymous correction read"
+            }
+          ]
+        },
+        {
+          "id": "linux-wsl2-x86_64",
+          "result": "PASS",
+          "reason": "Vendor setup documents Linux/WSL2 and macOS supported platforms; this row reuses version 2.1.301, not a new native launch.",
+          "citations": [
+            {
+              "url": "https://code.claude.com/docs/en/setup",
+              "read_at": "2026-10-15"
+            }
+          ]
+        },
+        {
+          "id": "macos-arm64",
+          "result": "PASS",
+          "reason": "Vendor setup documents Linux/WSL2 and macOS supported platforms; this row reuses version 2.1.301, not a new native launch.",
+          "citations": [
+            {
+              "url": "https://code.claude.com/docs/en/setup",
+              "read_at": "2026-10-15"
+            }
+          ]
+        },
+        {
+          "id": "headless",
+          "result": "PASS",
+          "reason": "The reused 2.1.301 worker mechanism documents headless -p/resume; ordinary child agents do not inherit parent auto-memory by default.",
+          "citations": [
+            {
+              "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/4bd1ff3ab46430c3d37dcccfac18178fb7f08212/evidence/artifacts/runtime-worker-context-engineering-20261015/mechanisms.md#L54",
+              "read_at": "2026-10-15"
+            }
+          ]
+        },
+        {
+          "id": "profile-or-project-scoping",
+          "result": "PASS",
+          "reason": "Project-derived memory paths and project autoMemoryEnabled settings are documented. Child memory is a separate setting; no inherited blanket access is inferred.",
+          "citations": [
+            {
+              "url": "https://code.claude.com/docs/en/memory#storage-location",
+              "read_at": "2026-10-15"
+            }
+          ]
+        },
+        {
+          "id": "family-route",
+          "result": "PASS",
+          "reason": "The candidate's documented route is bounded by the capability and scope findings above.",
+          "citations": [
+            {
+              "repository": "https://github.com/anthropics/claude-code",
+              "commit": "03b5892ee77de289bcd5dfa39f541525ade74aff",
+              "path": "README.md",
+              "lines": [
+                17,
+                28
+              ],
+              "url": "https://github.com/anthropics/claude-code/blob/03b5892ee77de289bcd5dfa39f541525ade74aff/README.md#L17"
+            },
+            {
+              "url": "https://code.claude.com/docs/en/mcp",
+              "read_at": "2026-10-15",
+              "sections": [
+                "Local scope",
+                "Project scope",
+                "Managing your servers"
+              ]
+            }
+          ]
+        }
+      ],
+      "standalone_screen_result": "FAIL",
+      "role_screen_result": "UNKNOWN",
+      "role_note": "The whole-layer cross-client failure does not reject this retained dependency/control role. That role needs its own qualification against W6 role_checks.",
+      "amendment": null
+    },
+    {
+      "repository": "https://github.com/langchain-ai/langmem",
+      "pin": "48e3c11f5bb527282c7d5339c6a87a0b35abccfc",
+      "tag": null,
+      "role_ids": [
+        "memory_management_primitives"
+      ],
+      "dependency": true,
+      "source_reuse": {
+        "pr": 1193,
+        "head": "75777efa265dde1154a5524dbe69cb5dbf6eb7df",
+        "path": "evidence/artifacts/harness-screens-20261015/durable-memory.anthropic.json",
+        "parallel_openai_row": "evidence/artifacts/harness-screens-20261015/durable-memory.openai.json"
+      },
+      "requirements": [
+        {
+          "id": "scoped-durable-records",
+          "result": "UNKNOWN",
+          "reason": "The library delegates persistence to a LangGraph BaseStore; the README example uses InMemoryStore, so durable recovery is a host/backend choice rather than a proved default.",
+          "citations": [
+            {
+              "repository": "https://github.com/langchain-ai/langmem",
+              "commit": "48e3c11f5bb527282c7d5339c6a87a0b35abccfc",
+              "path": "README.md",
+              "lines": [
+                35,
+                55
+              ],
+              "url": "https://github.com/langchain-ai/langmem/blob/48e3c11f5bb527282c7d5339c6a87a0b35abccfc/README.md#L35"
+            }
+          ]
+        },
+        {
+          "id": "native-client-access",
+          "result": "FAIL",
+          "reason": "The documented product is application-level extraction/memory tools for LangGraph agents, not a shipped native Codex/Claude MCP or hook adapter at this pin.",
+          "citations": [
+            {
+              "repository": "https://github.com/langchain-ai/langmem",
+              "commit": "48e3c11f5bb527282c7d5339c6a87a0b35abccfc",
+              "path": "README.md",
+              "lines": [
+                3,
+                13
+              ],
+              "url": "https://github.com/langchain-ai/langmem/blob/48e3c11f5bb527282c7d5339c6a87a0b35abccfc/README.md#L3"
+            }
+          ]
+        },
+        {
+          "id": "inspectable-capture",
+          "result": "PASS",
+          "reason": "It exposes explicit manage/search memory tools with a namespace in application code.",
+          "citations": [
+            {
+              "repository": "https://github.com/langchain-ai/langmem",
+              "commit": "48e3c11f5bb527282c7d5339c6a87a0b35abccfc",
+              "path": "README.md",
+              "lines": [
+                35,
+                55
+              ],
+              "url": "https://github.com/langchain-ai/langmem/blob/48e3c11f5bb527282c7d5339c6a87a0b35abccfc/README.md#L35"
+            }
+          ]
+        },
+        {
+          "id": "deletion",
+          "result": "UNKNOWN",
+          "reason": "The README does not establish the deployed persistent store's delete semantics or identity boundaries.",
+          "citations": [
+            {
+              "repository": "https://github.com/langchain-ai/langmem",
+              "commit": "48e3c11f5bb527282c7d5339c6a87a0b35abccfc",
+              "path": "README.md",
+              "lines": [
+                35,
+                55
+              ],
+              "url": "https://github.com/langchain-ai/langmem/blob/48e3c11f5bb527282c7d5339c6a87a0b35abccfc/README.md#L35"
+            }
+          ]
+        },
+        {
+          "id": "recovery",
+          "result": "UNKNOWN",
+          "reason": "No chosen persistent BaseStore or recovery route is provided by the example.",
+          "citations": [
+            {
+              "repository": "https://github.com/langchain-ai/langmem",
+              "commit": "48e3c11f5bb527282c7d5339c6a87a0b35abccfc",
+              "path": "README.md",
+              "lines": [
+                35,
+                55
+              ],
+              "url": "https://github.com/langchain-ai/langmem/blob/48e3c11f5bb527282c7d5339c6a87a0b35abccfc/README.md#L35"
+            }
+          ]
+        },
+        {
+          "id": "maintenance",
+          "result": "PASS",
+          "reason": "Not archived; the supplied primary-source receipt has a default-branch commit within the fixed 90-day window. This proves activity, not all engineering quality angles.",
+          "citations": [
+            {
+              "url": "https://api.github.com/repos/langchain-ai/langmem",
+              "read_at": "2026-10-15T20:03Z",
+              "source": "gh-facts-20261015T2003Z.json or the documented anonymous correction read"
+            },
+            {
+              "url": "https://api.github.com/repos/langchain-ai/langmem/commits?per_page=1",
+              "read_at": "2026-10-15T20:03Z",
+              "source": "gh-facts-20261015T2003Z.json or the documented anonymous correction read"
+            }
+          ]
+        },
+        {
+          "id": "linux-wsl2-x86_64",
+          "result": "UNKNOWN",
+          "reason": "No complete Linux x86_64/macOS arm64 persistent deployment is specified by the library example.",
+          "citations": [
+            {
+              "repository": "https://github.com/langchain-ai/langmem",
+              "commit": "48e3c11f5bb527282c7d5339c6a87a0b35abccfc",
+              "path": "README.md",
+              "lines": [
+                18,
+                55
+              ],
+              "url": "https://github.com/langchain-ai/langmem/blob/48e3c11f5bb527282c7d5339c6a87a0b35abccfc/README.md#L18"
+            }
+          ]
+        },
+        {
+          "id": "macos-arm64",
+          "result": "UNKNOWN",
+          "reason": "No complete Linux x86_64/macOS arm64 persistent deployment is specified by the library example.",
+          "citations": [
+            {
+              "repository": "https://github.com/langchain-ai/langmem",
+              "commit": "48e3c11f5bb527282c7d5339c6a87a0b35abccfc",
+              "path": "README.md",
+              "lines": [
+                18,
+                55
+              ],
+              "url": "https://github.com/langchain-ai/langmem/blob/48e3c11f5bb527282c7d5339c6a87a0b35abccfc/README.md#L18"
+            }
+          ]
+        },
+        {
+          "id": "headless",
+          "result": "PASS",
+          "reason": "The Python API and application integration are headless; this is not itself a native host integration.",
+          "citations": [
+            {
+              "repository": "https://github.com/langchain-ai/langmem",
+              "commit": "48e3c11f5bb527282c7d5339c6a87a0b35abccfc",
+              "path": "README.md",
+              "lines": [
+                35,
+                55
+              ],
+              "url": "https://github.com/langchain-ai/langmem/blob/48e3c11f5bb527282c7d5339c6a87a0b35abccfc/README.md#L35"
+            }
+          ]
+        },
+        {
+          "id": "profile-or-project-scoping",
+          "result": "PASS",
+          "reason": "The source supplies explicit namespaces for manage/search tools.",
+          "citations": [
+            {
+              "repository": "https://github.com/langchain-ai/langmem",
+              "commit": "48e3c11f5bb527282c7d5339c6a87a0b35abccfc",
+              "path": "README.md",
+              "lines": [
+                51,
+                55
+              ],
+              "url": "https://github.com/langchain-ai/langmem/blob/48e3c11f5bb527282c7d5339c6a87a0b35abccfc/README.md#L51"
+            }
+          ]
+        },
+        {
+          "id": "family-route",
+          "result": "FAIL",
+          "reason": "No shipped native Claude/SDK memory adapter into the required shared native-client layer was established; the README is a LangGraph application example.",
+          "citations": [
+            {
+              "repository": "https://github.com/langchain-ai/langmem",
+              "commit": "48e3c11f5bb527282c7d5339c6a87a0b35abccfc",
+              "path": "README.md",
+              "lines": [
+                35,
+                55
+              ],
+              "url": "https://github.com/langchain-ai/langmem/blob/48e3c11f5bb527282c7d5339c6a87a0b35abccfc/README.md#L35"
+            },
+            {
+              "url": "https://code.claude.com/docs/en/mcp",
+              "read_at": "2026-10-15",
+              "sections": [
+                "Local scope",
+                "Project scope",
+                "Managing your servers"
+              ]
+            }
+          ]
+        }
+      ],
+      "standalone_screen_result": "FAIL",
+      "role_screen_result": "UNKNOWN",
+      "role_note": "The whole-layer cross-client failure does not reject this retained dependency/control role. That role needs its own qualification against W6 role_checks.",
+      "amendment": null
+    },
+    {
+      "repository": "https://github.com/rohitg00/agentmemory",
+      "pin": "8bf0c827aaaada297896b2b6efe2a64651ae9389",
+      "tag": "v0.9.30",
+      "role_ids": [
+        "shared_memory_backend",
+        "native_memory_capture"
+      ],
+      "dependency": false,
+      "source_reuse": {
+        "pr": 1193,
+        "head": "75777efa265dde1154a5524dbe69cb5dbf6eb7df",
+        "path": "evidence/artifacts/harness-screens-20261015/durable-memory.anthropic.json",
+        "parallel_openai_row": "evidence/artifacts/harness-screens-20261015/durable-memory.openai.json"
+      },
+      "requirements": [
+        {
+          "id": "scoped-durable-records",
+          "result": "PASS",
+          "reason": "The service persists shared memories and exposes remember/observe/context/search/forget operations.",
+          "citations": [
+            {
+              "repository": "https://github.com/rohitg00/agentmemory",
+              "commit": "8bf0c827aaaada297896b2b6efe2a64651ae9389",
+              "path": "README.md",
+              "lines": [
+                827,
+                827
+              ],
+              "url": "https://github.com/rohitg00/agentmemory/blob/8bf0c827aaaada297896b2b6efe2a64651ae9389/README.md#L827"
+            }
+          ]
+        },
+        {
+          "id": "native-client-access",
+          "result": "PASS",
+          "reason": "The candidate explicitly names Claude Code, Codex, Pi, OpenCode and any MCP client.",
+          "citations": [
+            {
+              "repository": "https://github.com/rohitg00/agentmemory",
+              "commit": "8bf0c827aaaada297896b2b6efe2a64651ae9389",
+              "path": "README.md",
+              "lines": [
+                10,
+                10
+              ],
+              "url": "https://github.com/rohitg00/agentmemory/blob/8bf0c827aaaada297896b2b6efe2a64651ae9389/README.md#L10"
+            }
+          ]
+        },
+        {
+          "id": "inspectable-capture",
+          "result": "PASS",
+          "reason": "Native plugins/hooks plus the viewer and explicit import/recall interfaces expose captured observations. Only selected profile inputs may be admitted.",
+          "citations": [
+            {
+              "repository": "https://github.com/rohitg00/agentmemory",
+              "commit": "8bf0c827aaaada297896b2b6efe2a64651ae9389",
+              "path": "README.md",
+              "lines": [
+                645,
+                676
+              ],
+              "url": "https://github.com/rohitg00/agentmemory/blob/8bf0c827aaaada297896b2b6efe2a64651ae9389/README.md#L645"
+            }
+          ]
+        },
+        {
+          "id": "deletion",
+          "result": "PASS",
+          "reason": "The source names mem::forget and /forget, distinct from uninstall.",
+          "citations": [
+            {
+              "repository": "https://github.com/rohitg00/agentmemory",
+              "commit": "8bf0c827aaaada297896b2b6efe2a64651ae9389",
+              "path": "README.md",
+              "lines": [
+                676,
+                676
+              ],
+              "url": "https://github.com/rohitg00/agentmemory/blob/8bf0c827aaaada297896b2b6efe2a64651ae9389/README.md#L676"
+            }
+          ]
+        },
+        {
+          "id": "recovery",
+          "result": "UNKNOWN",
+          "reason": "The README links remote backup/rotation setup but a complete selected data-store recovery contract was not established. The MCP shim alone is not the server.",
+          "citations": [
+            {
+              "repository": "https://github.com/rohitg00/agentmemory",
+              "commit": "8bf0c827aaaada297896b2b6efe2a64651ae9389",
+              "path": "README.md",
+              "lines": [
+                945,
+                945
+              ],
+              "url": "https://github.com/rohitg00/agentmemory/blob/8bf0c827aaaada297896b2b6efe2a64651ae9389/README.md#L945"
+            }
+          ]
+        },
+        {
+          "id": "maintenance",
+          "result": "PASS",
+          "reason": "Not archived; the supplied primary-source receipt has a default-branch commit within the fixed 90-day window. This proves activity, not all engineering quality angles.",
+          "citations": [
+            {
+              "url": "https://api.github.com/repos/rohitg00/agentmemory",
+              "read_at": "2026-10-15T20:03Z",
+              "source": "gh-facts-20261015T2003Z.json or the documented anonymous correction read"
+            },
+            {
+              "url": "https://api.github.com/repos/rohitg00/agentmemory/commits?per_page=1",
+              "read_at": "2026-10-15T20:03Z",
+              "source": "gh-facts-20261015T2003Z.json or the documented anonymous correction read"
+            }
+          ]
+        },
+        {
+          "id": "linux-wsl2-x86_64",
+          "result": "UNKNOWN",
+          "reason": "macOS/Linux and WSL2 paths are documented, but the separately pinned iii-engine and native runtime artifacts must be verified for x86_64/arm64.",
+          "citations": [
+            {
+              "repository": "https://github.com/rohitg00/agentmemory",
+              "commit": "8bf0c827aaaada297896b2b6efe2a64651ae9389",
+              "path": "README.md",
+              "lines": [
+                97,
+                115
+              ],
+              "url": "https://github.com/rohitg00/agentmemory/blob/8bf0c827aaaada297896b2b6efe2a64651ae9389/README.md#L97"
+            }
+          ]
+        },
+        {
+          "id": "macos-arm64",
+          "result": "UNKNOWN",
+          "reason": "macOS/Linux and WSL2 paths are documented, but the separately pinned iii-engine and native runtime artifacts must be verified for x86_64/arm64.",
+          "citations": [
+            {
+              "repository": "https://github.com/rohitg00/agentmemory",
+              "commit": "8bf0c827aaaada297896b2b6efe2a64651ae9389",
+              "path": "README.md",
+              "lines": [
+                97,
+                115
+              ],
+              "url": "https://github.com/rohitg00/agentmemory/blob/8bf0c827aaaada297896b2b6efe2a64651ae9389/README.md#L97"
+            }
+          ]
+        },
+        {
+          "id": "headless",
+          "result": "UNKNOWN",
+          "reason": "The canonical first run is an interactive setup; the exact noninteractive service/bootstrap recipe with a bound provider/profile is not established by that example.",
+          "citations": [
+            {
+              "repository": "https://github.com/rohitg00/agentmemory",
+              "commit": "8bf0c827aaaada297896b2b6efe2a64651ae9389",
+              "path": "README.md",
+              "lines": [
+                105,
+                115
+              ],
+              "url": "https://github.com/rohitg00/agentmemory/blob/8bf0c827aaaada297896b2b6efe2a64651ae9389/README.md#L105"
+            }
+          ]
+        },
+        {
+          "id": "profile-or-project-scoping",
+          "result": "PASS",
+          "reason": "--data-dir/AGENTMEMORY_DATA_DIR override persistent state; explicit roots must be reused on restarts. They do not automatically stop globally installed hook capture.",
+          "citations": [
+            {
+              "repository": "https://github.com/rohitg00/agentmemory",
+              "commit": "8bf0c827aaaada297896b2b6efe2a64651ae9389",
+              "path": "README.md",
+              "lines": [
+                115,
+                115
+              ],
+              "url": "https://github.com/rohitg00/agentmemory/blob/8bf0c827aaaada297896b2b6efe2a64651ae9389/README.md#L115"
+            }
+          ]
+        },
+        {
+          "id": "family-route",
+          "result": "PASS",
+          "reason": "The candidate's documented route is bounded by the capability and scope findings above.",
+          "citations": [
+            {
+              "repository": "https://github.com/rohitg00/agentmemory",
+              "commit": "8bf0c827aaaada297896b2b6efe2a64651ae9389",
+              "path": "README.md",
+              "lines": [
+                97,
+                115
+              ],
+              "url": "https://github.com/rohitg00/agentmemory/blob/8bf0c827aaaada297896b2b6efe2a64651ae9389/README.md#L97"
+            },
+            {
+              "url": "https://code.claude.com/docs/en/mcp",
+              "read_at": "2026-10-15",
+              "sections": [
+                "Local scope",
+                "Project scope",
+                "Managing your servers"
+              ]
+            }
+          ]
+        }
+      ],
+      "standalone_screen_result": "INCOMPLETE",
+      "role_screen_result": "UNKNOWN",
+      "role_note": "Native capability remains source-only; paired role-specific performance and lifecycle tests are unrun.",
+      "amendment": null
+    },
+    {
+      "repository": "https://github.com/MemPalace/MemPalace",
+      "pin": "602d796c699cabba2971982cd9dccbbf46abfe79",
+      "tag": "v3.11.0",
+      "role_ids": [
+        "shared_memory_backend",
+        "native_memory_capture"
+      ],
+      "dependency": false,
+      "source_reuse": {
+        "pr": 1193,
+        "head": "75777efa265dde1154a5524dbe69cb5dbf6eb7df",
+        "path": "evidence/artifacts/harness-screens-20261015/durable-memory.anthropic.json",
+        "parallel_openai_row": "evidence/artifacts/harness-screens-20261015/durable-memory.openai.json"
+      },
+      "requirements": [
+        {
+          "id": "scoped-durable-records",
+          "result": "PASS",
+          "reason": "Persistent verbatim memory is scoped by palace/backend namespaces; source content is kept rather than summarized away.",
+          "citations": [
+            {
+              "repository": "https://github.com/mempalace/mempalace",
+              "commit": "602d796c699cabba2971982cd9dccbbf46abfe79",
+              "path": "README.md",
+              "lines": [
+                27,
+                32
+              ],
+              "url": "https://github.com/mempalace/mempalace/blob/602d796c699cabba2971982cd9dccbbf46abfe79/README.md#L27"
+            }
+          ]
+        },
+        {
+          "id": "native-client-access",
+          "result": "PASS",
+          "reason": "The documented stdio MCP deployment serves compatible native clients; setup skills are a separate installation choice.",
+          "citations": [
+            {
+              "repository": "https://github.com/mempalace/mempalace",
+              "commit": "602d796c699cabba2971982cd9dccbbf46abfe79",
+              "path": "README.md",
+              "lines": [
+                110,
+                160
+              ],
+              "url": "https://github.com/mempalace/mempalace/blob/602d796c699cabba2971982cd9dccbbf46abfe79/README.md#L110"
+            }
+          ]
+        },
+        {
+          "id": "inspectable-capture",
+          "result": "PASS",
+          "reason": "Verbatim storage and explicit mining/transcript mounts provide an inspectable source boundary; retention claims are vendor statements until trialled.",
+          "citations": [
+            {
+              "repository": "https://github.com/mempalace/mempalace",
+              "commit": "602d796c699cabba2971982cd9dccbbf46abfe79",
+              "path": "README.md",
+              "lines": [
+                27,
+                32
+              ],
+              "url": "https://github.com/mempalace/mempalace/blob/602d796c699cabba2971982cd9dccbbf46abfe79/README.md#L27"
+            }
+          ]
+        },
+        {
+          "id": "deletion",
+          "result": "UNKNOWN",
+          "reason": "The reviewed README/backup module does not establish scoped deletion across all selected backend copies/indexes.",
+          "citations": [
+            {
+              "repository": "https://github.com/mempalace/mempalace",
+              "commit": "602d796c699cabba2971982cd9dccbbf46abfe79",
+              "path": "mempalace/backups.py",
+              "lines": [
+                1,
+                15
+              ],
+              "url": "https://github.com/mempalace/mempalace/blob/602d796c699cabba2971982cd9dccbbf46abfe79/mempalace/backups.py#L1"
+            }
+          ]
+        },
+        {
+          "id": "recovery",
+          "result": "UNKNOWN",
+          "reason": "The module writes/prunes timestamped backups with a default count of 10, but this alone is not a verified complete restore route for the selected backend.",
+          "citations": [
+            {
+              "repository": "https://github.com/mempalace/mempalace",
+              "commit": "602d796c699cabba2971982cd9dccbbf46abfe79",
+              "path": "mempalace/backups.py",
+              "lines": [
+                1,
+                15
+              ],
+              "url": "https://github.com/mempalace/mempalace/blob/602d796c699cabba2971982cd9dccbbf46abfe79/mempalace/backups.py#L1"
+            }
+          ]
+        },
+        {
+          "id": "maintenance",
+          "result": "PASS",
+          "reason": "Not archived; the supplied primary-source receipt has a default-branch commit within the fixed 90-day window. This proves activity, not all engineering quality angles.",
+          "citations": [
+            {
+              "url": "https://api.github.com/repos/mempalace/mempalace",
+              "read_at": "2026-10-15T20:03Z",
+              "source": "gh-facts-20261015T2003Z.json or the documented anonymous correction read"
+            },
+            {
+              "url": "https://api.github.com/repos/mempalace/mempalace/commits?per_page=1",
+              "read_at": "2026-10-15T20:03Z",
+              "source": "gh-facts-20261015T2003Z.json or the documented anonymous correction read"
+            }
+          ]
+        },
+        {
+          "id": "linux-wsl2-x86_64",
+          "result": "UNKNOWN",
+          "reason": "Compiled ChromaDB/ONNX and backend choices affect platform support. The README explicitly distinguishes unsupported native Termux; complete Linux x86_64/macOS arm64 wheels remain to be bound.",
+          "citations": [
+            {
+              "repository": "https://github.com/mempalace/mempalace",
+              "commit": "602d796c699cabba2971982cd9dccbbf46abfe79",
+              "path": "README.md",
+              "lines": [
+                99,
+                105
+              ],
+              "url": "https://github.com/mempalace/mempalace/blob/602d796c699cabba2971982cd9dccbbf46abfe79/README.md#L99"
+            }
+          ]
+        },
+        {
+          "id": "macos-arm64",
+          "result": "UNKNOWN",
+          "reason": "Compiled ChromaDB/ONNX and backend choices affect platform support. The README explicitly distinguishes unsupported native Termux; complete Linux x86_64/macOS arm64 wheels remain to be bound.",
+          "citations": [
+            {
+              "repository": "https://github.com/mempalace/mempalace",
+              "commit": "602d796c699cabba2971982cd9dccbbf46abfe79",
+              "path": "README.md",
+              "lines": [
+                99,
+                105
+              ],
+              "url": "https://github.com/mempalace/mempalace/blob/602d796c699cabba2971982cd9dccbbf46abfe79/README.md#L99"
+            }
+          ]
+        },
+        {
+          "id": "headless",
+          "result": "PASS",
+          "reason": "A documented Docker stdio MCP route keeps stdin open; CLI and MCP are available without the optional setup skill.",
+          "citations": [
+            {
+              "repository": "https://github.com/mempalace/mempalace",
+              "commit": "602d796c699cabba2971982cd9dccbbf46abfe79",
+              "path": "README.md",
+              "lines": [
+                110,
+                160
+              ],
+              "url": "https://github.com/mempalace/mempalace/blob/602d796c699cabba2971982cd9dccbbf46abfe79/README.md#L110"
+            }
+          ]
+        },
+        {
+          "id": "profile-or-project-scoping",
+          "result": "PASS",
+          "reason": "The candidate documents backend namespaces and explicit palace/transcript mounts; use only the selected profile's inputs and writable palace.",
+          "citations": [
+            {
+              "repository": "https://github.com/mempalace/mempalace",
+              "commit": "602d796c699cabba2971982cd9dccbbf46abfe79",
+              "path": "README.md",
+              "lines": [
+                138,
+                160
+              ],
+              "url": "https://github.com/mempalace/mempalace/blob/602d796c699cabba2971982cd9dccbbf46abfe79/README.md#L138"
+            }
+          ]
+        },
+        {
+          "id": "family-route",
+          "result": "PASS",
+          "reason": "The candidate's documented route is bounded by the capability and scope findings above.",
+          "citations": [
+            {
+              "repository": "https://github.com/mempalace/mempalace",
+              "commit": "602d796c699cabba2971982cd9dccbbf46abfe79",
+              "path": "README.md",
+              "lines": [
+                75,
+                96
+              ],
+              "url": "https://github.com/mempalace/mempalace/blob/602d796c699cabba2971982cd9dccbbf46abfe79/README.md#L75"
+            },
+            {
+              "url": "https://code.claude.com/docs/en/mcp",
+              "read_at": "2026-10-15",
+              "sections": [
+                "Local scope",
+                "Project scope",
+                "Managing your servers"
+              ]
+            }
+          ]
+        }
+      ],
+      "standalone_screen_result": "INCOMPLETE",
+      "role_screen_result": "UNKNOWN",
+      "role_note": "Native capability remains source-only; paired role-specific performance and lifecycle tests are unrun.",
+      "amendment": null
+    },
+    {
+      "repository": "https://github.com/vshulcz/deja-vu",
+      "pin": "0fb72c044f9c75444d270275424de29dca62e536",
+      "tag": "v0.22.1",
+      "role_ids": [
+        "shared_memory_backend",
+        "native_memory_capture"
+      ],
+      "dependency": false,
+      "source_reuse": {
+        "pr": 1193,
+        "head": "75777efa265dde1154a5524dbe69cb5dbf6eb7df",
+        "path": "evidence/artifacts/harness-screens-20261015/durable-memory.anthropic.json",
+        "parallel_openai_row": "evidence/artifacts/harness-screens-20261015/durable-memory.openai.json"
+      },
+      "requirements": [
+        {
+          "id": "scoped-durable-records",
+          "result": "PASS",
+          "reason": "The retained session index can recall older work and hand off between native agents; it is history retrieval, not a claim of current authority.",
+          "citations": [
+            {
+              "repository": "https://github.com/vshulcz/deja-vu",
+              "commit": "0fb72c044f9c75444d270275424de29dca62e536",
+              "path": "README.md",
+              "lines": [
+                60,
+                79
+              ],
+              "url": "https://github.com/vshulcz/deja-vu/blob/0fb72c044f9c75444d270275424de29dca62e536/README.md#L60"
+            }
+          ]
+        },
+        {
+          "id": "native-client-access",
+          "result": "PASS",
+          "reason": "The source explicitly describes Claude/Codex/OpenCode sharing an index and cross-agent handoff.",
+          "citations": [
+            {
+              "repository": "https://github.com/vshulcz/deja-vu",
+              "commit": "0fb72c044f9c75444d270275424de29dca62e536",
+              "path": "README.md",
+              "lines": [
+                70,
+                79
+              ],
+              "url": "https://github.com/vshulcz/deja-vu/blob/0fb72c044f9c75444d270275424de29dca62e536/README.md#L70"
+            }
+          ]
+        },
+        {
+          "id": "inspectable-capture",
+          "result": "PASS",
+          "reason": "show/ctx/recall/blame expose retained history and source spans; the binary alone works without integration hooks.",
+          "citations": [
+            {
+              "repository": "https://github.com/vshulcz/deja-vu",
+              "commit": "0fb72c044f9c75444d270275424de29dca62e536",
+              "path": "README.md",
+              "lines": [
+                145,
+                148
+              ],
+              "url": "https://github.com/vshulcz/deja-vu/blob/0fb72c044f9c75444d270275424de29dca62e536/README.md#L145"
+            }
+          ]
+        },
+        {
+          "id": "deletion",
+          "result": "PASS",
+          "reason": "deja forget drops sessions and keeps them dropped across rebuilds; exclude filters can omit projects or entire harness stores.",
+          "citations": [
+            {
+              "repository": "https://github.com/vshulcz/deja-vu",
+              "commit": "0fb72c044f9c75444d270275424de29dca62e536",
+              "path": "README.md",
+              "lines": [
+                181,
+                184
+              ],
+              "url": "https://github.com/vshulcz/deja-vu/blob/0fb72c044f9c75444d270275424de29dca62e536/README.md#L181"
+            }
+          ]
+        },
+        {
+          "id": "recovery",
+          "result": "PASS",
+          "reason": "Session restoration and sync export/import/ssh provide documented recovery/transfer paths. A restored old span is not automatically written over the current original.",
+          "citations": [
+            {
+              "repository": "https://github.com/vshulcz/deja-vu",
+              "commit": "0fb72c044f9c75444d270275424de29dca62e536",
+              "path": "README.md",
+              "lines": [
+                228,
+                236
+              ],
+              "url": "https://github.com/vshulcz/deja-vu/blob/0fb72c044f9c75444d270275424de29dca62e536/README.md#L228"
+            }
+          ]
+        },
+        {
+          "id": "maintenance",
+          "result": "PASS",
+          "reason": "Not archived; the supplied primary-source receipt has a default-branch commit within the fixed 90-day window. This proves activity, not all engineering quality angles.",
+          "citations": [
+            {
+              "url": "https://api.github.com/repos/vshulcz/deja-vu",
+              "read_at": "2026-10-15T20:03Z",
+              "source": "gh-facts-20261015T2003Z.json or the documented anonymous correction read"
+            },
+            {
+              "url": "https://api.github.com/repos/vshulcz/deja-vu/commits?per_page=1",
+              "read_at": "2026-10-15T20:03Z",
+              "source": "gh-facts-20261015T2003Z.json or the documented anonymous correction read"
+            }
+          ]
+        },
+        {
+          "id": "linux-wsl2-x86_64",
+          "result": "PASS",
+          "reason": "The pinned installer supports darwin/linux and maps x86_64/amd64 plus arm64/aarch64 release artifacts. WSL2 uses Linux amd64; this is source support, not a host run.",
+          "citations": [
+            {
+              "repository": "https://github.com/vshulcz/deja-vu",
+              "commit": "0fb72c044f9c75444d270275424de29dca62e536",
+              "path": "install.sh",
+              "lines": [
+                27,
+                36
+              ],
+              "url": "https://github.com/vshulcz/deja-vu/blob/0fb72c044f9c75444d270275424de29dca62e536/install.sh#L27"
+            }
+          ]
+        },
+        {
+          "id": "macos-arm64",
+          "result": "PASS",
+          "reason": "The pinned installer supports darwin/linux and maps x86_64/amd64 plus arm64/aarch64 release artifacts. WSL2 uses Linux amd64; this is source support, not a host run.",
+          "citations": [
+            {
+              "repository": "https://github.com/vshulcz/deja-vu",
+              "commit": "0fb72c044f9c75444d270275424de29dca62e536",
+              "path": "install.sh",
+              "lines": [
+                27,
+                36
+              ],
+              "url": "https://github.com/vshulcz/deja-vu/blob/0fb72c044f9c75444d270275424de29dca62e536/install.sh#L27"
+            }
+          ]
+        },
+        {
+          "id": "headless",
+          "result": "PASS",
+          "reason": "The binary-alone CLI supports index/search/show/ctx/blame and --json without integration setup.",
+          "citations": [
+            {
+              "repository": "https://github.com/vshulcz/deja-vu",
+              "commit": "0fb72c044f9c75444d270275424de29dca62e536",
+              "path": "README.md",
+              "lines": [
+                145,
+                148
+              ],
+              "url": "https://github.com/vshulcz/deja-vu/blob/0fb72c044f9c75444d270275424de29dca62e536/README.md#L145"
+            }
+          ]
+        },
+        {
+          "id": "profile-or-project-scoping",
+          "result": "PASS",
+          "reason": "Project search filters and persistent project/harness exclusion rules are documented. An owned profile index must exclude fenced transcript directories before ingestion.",
+          "citations": [
+            {
+              "repository": "https://github.com/vshulcz/deja-vu",
+              "commit": "0fb72c044f9c75444d270275424de29dca62e536",
+              "path": "README.md",
+              "lines": [
+                60,
+                63
+              ],
+              "url": "https://github.com/vshulcz/deja-vu/blob/0fb72c044f9c75444d270275424de29dca62e536/README.md#L60"
+            }
+          ]
+        },
+        {
+          "id": "family-route",
+          "result": "PASS",
+          "reason": "Native coding-client/shell-worker route only; a bare API/SDK slot needs its existing authorized tool host, not an invented adapter.",
+          "citations": [
+            {
+              "repository": "https://github.com/vshulcz/deja-vu",
+              "commit": "0fb72c044f9c75444d270275424de29dca62e536",
+              "path": "README.md",
+              "lines": [
+                117,
+                148
+              ],
+              "url": "https://github.com/vshulcz/deja-vu/blob/0fb72c044f9c75444d270275424de29dca62e536/README.md#L117"
+            },
+            {
+              "url": "https://code.claude.com/docs/en/mcp",
+              "read_at": "2026-10-15",
+              "sections": [
+                "Local scope",
+                "Project scope",
+                "Managing your servers"
+              ]
+            }
+          ]
+        }
+      ],
+      "standalone_screen_result": "PASS",
+      "role_screen_result": "PASS",
+      "role_note": "Native capability remains source-only; paired role-specific performance and lifecycle tests are unrun.",
+      "amendment": null
+    },
+    {
+      "repository": "https://github.com/vbcherepanov/total-agent-memory",
+      "pin": "9b67f708b4fdd88afe69fb4092bbede33dadd600",
+      "tag": "v14.9.0",
+      "role_ids": [
+        "shared_memory_backend",
+        "native_memory_capture"
+      ],
+      "dependency": false,
+      "source_reuse": {
+        "pr": 1193,
+        "head": "75777efa265dde1154a5524dbe69cb5dbf6eb7df",
+        "path": "evidence/artifacts/harness-screens-20261015/durable-memory.anthropic.json",
+        "parallel_openai_row": "evidence/artifacts/harness-screens-20261015/durable-memory.openai.json"
+      },
+      "requirements": [
+        {
+          "id": "scoped-durable-records",
+          "result": "PASS",
+          "reason": "Persistent local memory stores decisions, facts, lessons, sessions and a temporal graph. Personal/team deployments are distinct choices.",
+          "citations": [
+            {
+              "repository": "https://github.com/vbcherepanov/total-agent-memory",
+              "commit": "9b67f708b4fdd88afe69fb4092bbede33dadd600",
+              "path": "README.md",
+              "lines": [
+                10,
+                26
+              ],
+              "url": "https://github.com/vbcherepanov/total-agent-memory/blob/9b67f708b4fdd88afe69fb4092bbede33dadd600/README.md#L10"
+            }
+          ]
+        },
+        {
+          "id": "native-client-access",
+          "result": "PASS",
+          "reason": "The README explicitly names Claude Code, Codex and any MCP client and provides generic stdio registration.",
+          "citations": [
+            {
+              "repository": "https://github.com/vbcherepanov/total-agent-memory",
+              "commit": "9b67f708b4fdd88afe69fb4092bbede33dadd600",
+              "path": "README.md",
+              "lines": [
+                10,
+                26
+              ],
+              "url": "https://github.com/vbcherepanov/total-agent-memory/blob/9b67f708b4fdd88afe69fb4092bbede33dadd600/README.md#L10"
+            }
+          ]
+        },
+        {
+          "id": "inspectable-capture",
+          "result": "PASS",
+          "reason": "The documented server instructions require explicit recall/update and session state operations; tool responses and source data remain inspectable, with automatic hooks optional.",
+          "citations": [
+            {
+              "repository": "https://github.com/vbcherepanov/total-agent-memory",
+              "commit": "9b67f708b4fdd88afe69fb4092bbede33dadd600",
+              "path": "src/server_instructions.py",
+              "lines": [
+                24,
+                39
+              ],
+              "url": "https://github.com/vbcherepanov/total-agent-memory/blob/9b67f708b4fdd88afe69fb4092bbede33dadd600/src/server_instructions.py#L24"
+            }
+          ]
+        },
+        {
+          "id": "deletion",
+          "result": "PASS",
+          "reason": "The pinned server declares memory_delete and memory_forget as destructive and has explicit soft/hard delete handlers. This establishes a deletion interface, not erasure from every history/backup.",
+          "citations": [
+            {
+              "repository": "https://github.com/vbcherepanov/total-agent-memory",
+              "commit": "9b67f708b4fdd88afe69fb4092bbede33dadd600",
+              "path": "src/server.py",
+              "lines": [
+                4933,
+                4942
+              ],
+              "url": "https://github.com/vbcherepanov/total-agent-memory/blob/9b67f708b4fdd88afe69fb4092bbede33dadd600/src/server.py#L4933"
+            },
+            {
+              "repository": "https://github.com/vbcherepanov/total-agent-memory",
+              "commit": "9b67f708b4fdd88afe69fb4092bbede33dadd600",
+              "path": "src/server.py",
+              "lines": [
+                5246,
+                5265
+              ],
+              "url": "https://github.com/vbcherepanov/total-agent-memory/blob/9b67f708b4fdd88afe69fb4092bbede33dadd600/src/server.py#L5246"
+            },
+            {
+              "repository": "https://github.com/vbcherepanov/total-agent-memory",
+              "commit": "9b67f708b4fdd88afe69fb4092bbede33dadd600",
+              "path": "src/server.py",
+              "lines": [
+                7099,
+                7118
+              ],
+              "url": "https://github.com/vbcherepanov/total-agent-memory/blob/9b67f708b4fdd88afe69fb4092bbede33dadd600/src/server.py#L7099"
+            }
+          ]
+        },
+        {
+          "id": "recovery",
+          "result": "UNKNOWN",
+          "reason": "The team backup guide provides a substantial restore contract, but the selected personal stdio installation must not inherit a team-server backup guarantee without matching layout/configuration.",
+          "citations": [
+            {
+              "repository": "https://github.com/vbcherepanov/total-agent-memory",
+              "commit": "9b67f708b4fdd88afe69fb4092bbede33dadd600",
+              "path": "docs/TEAM_BACKUP.md",
+              "lines": [
+                13,
+                26
+              ],
+              "url": "https://github.com/vbcherepanov/total-agent-memory/blob/9b67f708b4fdd88afe69fb4092bbede33dadd600/docs/TEAM_BACKUP.md#L13"
+            }
+          ]
+        },
+        {
+          "id": "maintenance",
+          "result": "PASS",
+          "reason": "Not archived; the supplied primary-source receipt has a default-branch commit within the fixed 90-day window. This proves activity, not all engineering quality angles.",
+          "citations": [
+            {
+              "url": "https://api.github.com/repos/vbcherepanov/total-agent-memory",
+              "read_at": "2026-10-15T20:03Z",
+              "source": "gh-facts-20261015T2003Z.json or the documented anonymous correction read"
+            },
+            {
+              "url": "https://api.github.com/repos/vbcherepanov/total-agent-memory/commits?per_page=1",
+              "read_at": "2026-10-15T20:03Z",
+              "source": "gh-facts-20261015T2003Z.json or the documented anonymous correction read"
+            }
+          ]
+        },
+        {
+          "id": "linux-wsl2-x86_64",
+          "result": "PASS",
+          "reason": "The installation guide explicitly covers WSL2 and macOS Apple Silicon/Intel; multi-arch Docker is an alternative, not the selected personal route.",
+          "citations": [
+            {
+              "repository": "https://github.com/vbcherepanov/total-agent-memory",
+              "commit": "9b67f708b4fdd88afe69fb4092bbede33dadd600",
+              "path": "docs/installation.md",
+              "lines": [
+                1,
+                45
+              ],
+              "url": "https://github.com/vbcherepanov/total-agent-memory/blob/9b67f708b4fdd88afe69fb4092bbede33dadd600/docs/installation.md#L1"
+            }
+          ]
+        },
+        {
+          "id": "macos-arm64",
+          "result": "PASS",
+          "reason": "The installation guide explicitly covers WSL2 and macOS Apple Silicon/Intel; multi-arch Docker is an alternative, not the selected personal route.",
+          "citations": [
+            {
+              "repository": "https://github.com/vbcherepanov/total-agent-memory",
+              "commit": "9b67f708b4fdd88afe69fb4092bbede33dadd600",
+              "path": "docs/installation.md",
+              "lines": [
+                1,
+                45
+              ],
+              "url": "https://github.com/vbcherepanov/total-agent-memory/blob/9b67f708b4fdd88afe69fb4092bbede33dadd600/docs/installation.md#L1"
+            }
+          ]
+        },
+        {
+          "id": "headless",
+          "result": "PASS",
+          "reason": "The setup wizard never starts in MCP stdio, pipes or CI; noninteractive setup flags are documented for deployments.",
+          "citations": [
+            {
+              "repository": "https://github.com/vbcherepanov/total-agent-memory",
+              "commit": "9b67f708b4fdd88afe69fb4092bbede33dadd600",
+              "path": "docs/installation.md",
+              "lines": [
+                51,
+                62
+              ],
+              "url": "https://github.com/vbcherepanov/total-agent-memory/blob/9b67f708b4fdd88afe69fb4092bbede33dadd600/docs/installation.md#L51"
+            }
+          ]
+        },
+        {
+          "id": "profile-or-project-scoping",
+          "result": "PASS",
+          "reason": "TAM_MEMORY_DIR scopes local memory. Separate personal/team modes and project identities must be selected deliberately; use an isolated root for this proposal.",
+          "citations": [
+            {
+              "repository": "https://github.com/vbcherepanov/total-agent-memory",
+              "commit": "9b67f708b4fdd88afe69fb4092bbede33dadd600",
+              "path": "README.md",
+              "lines": [
+                158,
+                158
+              ],
+              "url": "https://github.com/vbcherepanov/total-agent-memory/blob/9b67f708b4fdd88afe69fb4092bbede33dadd600/README.md#L158"
+            }
+          ]
+        },
+        {
+          "id": "family-route",
+          "result": "PASS",
+          "reason": "The candidate's documented MCP route composes with this family's scoped native MCP configuration. This does not imply native lifecycle hooks or API-model invocation.",
+          "citations": [
+            {
+              "repository": "https://github.com/vbcherepanov/total-agent-memory",
+              "commit": "9b67f708b4fdd88afe69fb4092bbede33dadd600",
+              "path": "README.md",
+              "lines": [
+                42,
+                95
+              ],
+              "url": "https://github.com/vbcherepanov/total-agent-memory/blob/9b67f708b4fdd88afe69fb4092bbede33dadd600/README.md#L42"
+            },
+            {
+              "repository": "https://github.com/vbcherepanov/total-agent-memory",
+              "commit": "9b67f708b4fdd88afe69fb4092bbede33dadd600",
+              "path": "docs/installation.md",
+              "lines": [
+                34,
+                62
+              ],
+              "url": "https://github.com/vbcherepanov/total-agent-memory/blob/9b67f708b4fdd88afe69fb4092bbede33dadd600/docs/installation.md#L34"
+            },
+            {
+              "url": "https://code.claude.com/docs/en/mcp",
+              "read_at": "2026-10-15",
+              "sections": [
+                "Local scope",
+                "Project scope",
+                "Managing your servers"
+              ]
+            }
+          ]
+        }
+      ],
+      "standalone_screen_result": "INCOMPLETE",
+      "role_screen_result": "UNKNOWN",
+      "role_note": "Native capability remains source-only; paired role-specific performance and lifecycle tests are unrun.",
+      "amendment": null
+    },
+    {
+      "repository": "https://github.com/vectorize-io/hindsight",
+      "pin": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+      "tag": "v1.0.0",
+      "role_ids": [
+        "shared_memory_backend",
+        "native_memory_capture"
+      ],
+      "dependency": false,
+      "source_reuse": {
+        "pr": 1193,
+        "head": "75777efa265dde1154a5524dbe69cb5dbf6eb7df",
+        "path": "evidence/artifacts/harness-screens-20261015/durable-memory.anthropic.json",
+        "parallel_openai_row": "evidence/artifacts/harness-screens-20261015/durable-memory.openai.json"
+      },
+      "requirements": [
+        {
+          "id": "scoped-durable-records",
+          "result": "PASS",
+          "reason": "retain/recall/reflect operate on named banks; the source describes durable learned context.",
+          "citations": [
+            {
+              "repository": "https://github.com/vectorize-io/hindsight",
+              "commit": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+              "path": "README.md",
+              "lines": [
+                137,
+                147
+              ],
+              "url": "https://github.com/vectorize-io/hindsight/blob/39c65ffe2f140d0c84cee58566cad8900c5b9908/README.md#L137"
+            }
+          ]
+        },
+        {
+          "id": "native-client-access",
+          "result": "PASS",
+          "reason": "The native coding-agent matrix names Claude, Codex, OpenCode and generic MCP. Automatic installers and direct MCP are separate routes.",
+          "citations": [
+            {
+              "repository": "https://github.com/vectorize-io/hindsight",
+              "commit": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+              "path": "README.md",
+              "lines": [
+                243,
+                269
+              ],
+              "url": "https://github.com/vectorize-io/hindsight/blob/39c65ffe2f140d0c84cee58566cad8900c5b9908/README.md#L243"
+            }
+          ]
+        },
+        {
+          "id": "inspectable-capture",
+          "result": "PASS",
+          "reason": "The bank MCP/API exposes retained memories and metadata; generated reflections are derived content, not task authority.",
+          "citations": [
+            {
+              "repository": "https://github.com/vectorize-io/hindsight",
+              "commit": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+              "path": "hindsight-docs/docs/developer/mcp-server.md",
+              "lines": [
+                110,
+                121
+              ],
+              "url": "https://github.com/vectorize-io/hindsight/blob/39c65ffe2f140d0c84cee58566cad8900c5b9908/hindsight-docs/docs/developer/mcp-server.md#L110"
+            }
+          ]
+        },
+        {
+          "id": "deletion",
+          "result": "PASS",
+          "reason": "Delete/clear/invalidate operations are explicitly marked destructive in MCP metadata; a selected bank/data scope is required.",
+          "citations": [
+            {
+              "repository": "https://github.com/vectorize-io/hindsight",
+              "commit": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+              "path": "hindsight-docs/docs/developer/mcp-server.md",
+              "lines": [
+                110,
+                121
+              ],
+              "url": "https://github.com/vectorize-io/hindsight/blob/39c65ffe2f140d0c84cee58566cad8900c5b9908/hindsight-docs/docs/developer/mcp-server.md#L110"
+            }
+          ]
+        },
+        {
+          "id": "recovery",
+          "result": "PASS",
+          "reason": "For the explicitly selected PostgreSQL route, hindsight-api 1.0.0 supplies hindsight-admin backup/restore; uv.lock binds pg0-embedded 0.15.2. Backup includes operational state, uses REPEATABLE READ, and restore replaces the target schema. Source capability only; no recovery run.",
+          "citations": [
+            {
+              "repository": "https://github.com/vectorize-io/hindsight",
+              "commit": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+              "path": "hindsight-docs/docs/developer/admin-cli.md",
+              "lines": [
+                7,
+                22
+              ]
+            },
+            {
+              "repository": "https://github.com/vectorize-io/hindsight",
+              "commit": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+              "path": "hindsight-docs/docs/developer/admin-cli.md",
+              "lines": [
+                190,
+                271
+              ]
+            },
+            {
+              "repository": "https://github.com/vectorize-io/hindsight",
+              "commit": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+              "path": "hindsight-api/pyproject.toml",
+              "lines": [
+                7,
+                23
+              ]
+            },
+            {
+              "repository": "https://github.com/vectorize-io/hindsight",
+              "commit": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+              "path": "uv.lock",
+              "lines": [
+                3443,
+                3451
+              ]
+            },
+            {
+              "repository": "https://github.com/vectorize-io/hindsight",
+              "commit": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+              "path": "hindsight-api-slim/tests/test_admin_backup_restore.py",
+              "lines": [
+                249,
+                278
+              ]
+            }
+          ]
+        },
+        {
+          "id": "maintenance",
+          "result": "PASS",
+          "reason": "Not archived; the supplied primary-source receipt has a default-branch commit within the fixed 90-day window. This proves activity, not all engineering quality angles.",
+          "citations": [
+            {
+              "url": "https://api.github.com/repos/vectorize-io/hindsight",
+              "read_at": "2026-10-15T20:03Z",
+              "source": "gh-facts-20261015T2003Z.json or the documented anonymous correction read"
+            },
+            {
+              "url": "https://api.github.com/repos/vectorize-io/hindsight/commits?per_page=1",
+              "read_at": "2026-10-15T20:03Z",
+              "source": "gh-facts-20261015T2003Z.json or the documented anonymous correction read"
+            }
+          ]
+        },
+        {
+          "id": "linux-wsl2-x86_64",
+          "result": "PASS",
+          "reason": "The README explicitly lists Linux x86_64/ARM64 and macOS Apple Silicon support for packaged deployment options; the chosen API/backend still needs install-stage verification.",
+          "citations": [
+            {
+              "repository": "https://github.com/vectorize-io/hindsight",
+              "commit": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+              "path": "README.md",
+              "lines": [
+                164,
+                183
+              ],
+              "url": "https://github.com/vectorize-io/hindsight/blob/39c65ffe2f140d0c84cee58566cad8900c5b9908/README.md#L164"
+            }
+          ]
+        },
+        {
+          "id": "macos-arm64",
+          "result": "PASS",
+          "reason": "The README explicitly lists Linux x86_64/ARM64 and macOS Apple Silicon support for packaged deployment options; the chosen API/backend still needs install-stage verification.",
+          "citations": [
+            {
+              "repository": "https://github.com/vectorize-io/hindsight",
+              "commit": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+              "path": "README.md",
+              "lines": [
+                164,
+                183
+              ],
+              "url": "https://github.com/vectorize-io/hindsight/blob/39c65ffe2f140d0c84cee58566cad8900c5b9908/README.md#L164"
+            }
+          ]
+        },
+        {
+          "id": "headless",
+          "result": "PASS",
+          "reason": "The API server and bank-specific HTTP MCP endpoint are documented headless interfaces.",
+          "citations": [
+            {
+              "repository": "https://github.com/vectorize-io/hindsight",
+              "commit": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+              "path": "README.md",
+              "lines": [
+                94,
+                101
+              ],
+              "url": "https://github.com/vectorize-io/hindsight/blob/39c65ffe2f140d0c84cee58566cad8900c5b9908/README.md#L94"
+            }
+          ]
+        },
+        {
+          "id": "profile-or-project-scoping",
+          "result": "PASS",
+          "reason": "A bank-specific /mcp/{bank_id}/ endpoint and explicit bank_id API calls provide the scoped interface; use a distinct admitted bank/profile.",
+          "citations": [
+            {
+              "repository": "https://github.com/vectorize-io/hindsight",
+              "commit": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+              "path": "README.md",
+              "lines": [
+                137,
+                147
+              ],
+              "url": "https://github.com/vectorize-io/hindsight/blob/39c65ffe2f140d0c84cee58566cad8900c5b9908/README.md#L137"
+            }
+          ]
+        },
+        {
+          "id": "family-route",
+          "result": "PASS",
+          "reason": "The candidate's documented MCP route composes with this family's scoped native MCP configuration. This does not imply native lifecycle hooks or API-model invocation.",
+          "citations": [
+            {
+              "repository": "https://github.com/vectorize-io/hindsight",
+              "commit": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+              "path": "README.md",
+              "lines": [
+                94,
+                101
+              ],
+              "url": "https://github.com/vectorize-io/hindsight/blob/39c65ffe2f140d0c84cee58566cad8900c5b9908/README.md#L94"
+            },
+            {
+              "repository": "https://github.com/vectorize-io/hindsight",
+              "commit": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+              "path": "README.md",
+              "lines": [
+                261,
+                269
+              ],
+              "url": "https://github.com/vectorize-io/hindsight/blob/39c65ffe2f140d0c84cee58566cad8900c5b9908/README.md#L261"
+            },
+            {
+              "url": "https://code.claude.com/docs/en/mcp",
+              "read_at": "2026-10-15",
+              "sections": [
+                "Local scope",
+                "Project scope",
+                "Managing your servers"
+              ]
+            }
+          ]
+        }
+      ],
+      "standalone_screen_result": "PASS",
+      "role_screen_result": "PASS",
+      "role_note": "Native capability remains source-only; paired role-specific performance and lifecycle tests are unrun.",
+      "amendment": "New primary-source read resolves the earlier recovery UNKNOWN for the selected PostgreSQL/locked-pg0 route. The screen PR is unchanged pending its separate combined review fold."
+    },
+    {
+      "repository": "https://github.com/tigerless-labs/agent-memory",
+      "pin": "c395acc4708c545c4b5395f8a2cb1e3a3ababd14",
+      "tag": null,
+      "role_ids": [
+        "shared_memory_backend",
+        "native_memory_capture"
+      ],
+      "dependency": false,
+      "source_reuse": {
+        "pr": 1193,
+        "head": "75777efa265dde1154a5524dbe69cb5dbf6eb7df",
+        "path": "evidence/artifacts/harness-screens-20261015/durable-memory.anthropic.json",
+        "parallel_openai_row": "evidence/artifacts/harness-screens-20261015/durable-memory.openai.json"
+      },
+      "requirements": [
+        {
+          "id": "scoped-durable-records",
+          "result": "PASS",
+          "reason": "Markdown records are source of truth; the SQLite index is rebuildable. Decisions, provenance, corrections and time validity are explicit.",
+          "citations": [
+            {
+              "repository": "https://github.com/tigerless-labs/agent-memory",
+              "commit": "c395acc4708c545c4b5395f8a2cb1e3a3ababd14",
+              "path": "README.md",
+              "lines": [
+                69,
+                112
+              ],
+              "url": "https://github.com/tigerless-labs/agent-memory/blob/c395acc4708c545c4b5395f8a2cb1e3a3ababd14/README.md#L69"
+            }
+          ]
+        },
+        {
+          "id": "native-client-access",
+          "result": "PASS",
+          "reason": "Claude Code, Codex and any shell/MCP host can use the same core store. The selected direct CLI route does not run setup.",
+          "citations": [
+            {
+              "repository": "https://github.com/tigerless-labs/agent-memory",
+              "commit": "c395acc4708c545c4b5395f8a2cb1e3a3ababd14",
+              "path": "README.md",
+              "lines": [
+                18,
+                19
+              ],
+              "url": "https://github.com/tigerless-labs/agent-memory/blob/c395acc4708c545c4b5395f8a2cb1e3a3ababd14/README.md#L18"
+            }
+          ]
+        },
+        {
+          "id": "inspectable-capture",
+          "result": "PASS",
+          "reason": "Explicit record/correct/trace operations retain Markdown and version history rather than hiding capture in a hosted summarizer.",
+          "citations": [
+            {
+              "repository": "https://github.com/tigerless-labs/agent-memory",
+              "commit": "c395acc4708c545c4b5395f8a2cb1e3a3ababd14",
+              "path": "README.md",
+              "lines": [
+                69,
+                112
+              ],
+              "url": "https://github.com/tigerless-labs/agent-memory/blob/c395acc4708c545c4b5395f8a2cb1e3a3ababd14/README.md#L69"
+            }
+          ]
+        },
+        {
+          "id": "deletion",
+          "result": "PASS",
+          "reason": "mem delete ends current validity; historical records remain available for as-of recall/trace. This is temporal deletion, not physical erasure.",
+          "citations": [
+            {
+              "repository": "https://github.com/tigerless-labs/agent-memory",
+              "commit": "c395acc4708c545c4b5395f8a2cb1e3a3ababd14",
+              "path": "README.md",
+              "lines": [
+                97,
+                112
+              ],
+              "url": "https://github.com/tigerless-labs/agent-memory/blob/c395acc4708c545c4b5395f8a2cb1e3a3ababd14/README.md#L97"
+            }
+          ]
+        },
+        {
+          "id": "recovery",
+          "result": "PASS",
+          "reason": "The source explicitly documents deleting/rebuilding the index from the Markdown store; keep original files and history. No independent off-host restore is claimed.",
+          "citations": [
+            {
+              "repository": "https://github.com/tigerless-labs/agent-memory",
+              "commit": "c395acc4708c545c4b5395f8a2cb1e3a3ababd14",
+              "path": "README.md",
+              "lines": [
+                69,
+                92
+              ],
+              "url": "https://github.com/tigerless-labs/agent-memory/blob/c395acc4708c545c4b5395f8a2cb1e3a3ababd14/README.md#L69"
+            }
+          ]
+        },
+        {
+          "id": "maintenance",
+          "result": "PASS",
+          "reason": "Not archived; the supplied primary-source receipt has a default-branch commit within the fixed 90-day window. This proves activity, not all engineering quality angles.",
+          "citations": [
+            {
+              "url": "https://api.github.com/repos/tigerless-labs/agent-memory",
+              "read_at": "2026-10-15T20:03Z",
+              "source": "gh-facts-20261015T2003Z.json or the documented anonymous correction read"
+            },
+            {
+              "url": "https://api.github.com/repos/tigerless-labs/agent-memory/commits?per_page=1",
+              "read_at": "2026-10-15T20:03Z",
+              "source": "gh-facts-20261015T2003Z.json or the documented anonymous correction read"
+            }
+          ]
+        },
+        {
+          "id": "linux-wsl2-x86_64",
+          "result": "UNKNOWN",
+          "reason": "The checkout/uv installation is documented but a complete Linux x86_64/macOS arm64 dependency/artifact contract was not established; there is no PyPI release to assume.",
+          "citations": [
+            {
+              "repository": "https://github.com/tigerless-labs/agent-memory",
+              "commit": "c395acc4708c545c4b5395f8a2cb1e3a3ababd14",
+              "path": "README.md",
+              "lines": [
+                139,
+                150
+              ],
+              "url": "https://github.com/tigerless-labs/agent-memory/blob/c395acc4708c545c4b5395f8a2cb1e3a3ababd14/README.md#L139"
+            }
+          ]
+        },
+        {
+          "id": "macos-arm64",
+          "result": "UNKNOWN",
+          "reason": "The checkout/uv installation is documented but a complete Linux x86_64/macOS arm64 dependency/artifact contract was not established; there is no PyPI release to assume.",
+          "citations": [
+            {
+              "repository": "https://github.com/tigerless-labs/agent-memory",
+              "commit": "c395acc4708c545c4b5395f8a2cb1e3a3ababd14",
+              "path": "README.md",
+              "lines": [
+                139,
+                150
+              ],
+              "url": "https://github.com/tigerless-labs/agent-memory/blob/c395acc4708c545c4b5395f8a2cb1e3a3ababd14/README.md#L139"
+            }
+          ]
+        },
+        {
+          "id": "headless",
+          "result": "PASS",
+          "reason": "The mem CLI and JSON interface are documented; native setup/provider probes are not part of this direct route.",
+          "citations": [
+            {
+              "repository": "https://github.com/tigerless-labs/agent-memory",
+              "commit": "c395acc4708c545c4b5395f8a2cb1e3a3ababd14",
+              "path": "README.md",
+              "lines": [
+                218,
+                224
+              ],
+              "url": "https://github.com/tigerless-labs/agent-memory/blob/c395acc4708c545c4b5395f8a2cb1e3a3ababd14/README.md#L218"
+            }
+          ]
+        },
+        {
+          "id": "profile-or-project-scoping",
+          "result": "PASS",
+          "reason": "AGENT_MEMORY_STORE selects the source-of-truth store and --store is used in CLI examples. Set a separate explicit root for each admitted profile.",
+          "citations": [
+            {
+              "repository": "https://github.com/tigerless-labs/agent-memory",
+              "commit": "c395acc4708c545c4b5395f8a2cb1e3a3ababd14",
+              "path": "README.md",
+              "lines": [
+                163,
+                194
+              ],
+              "url": "https://github.com/tigerless-labs/agent-memory/blob/c395acc4708c545c4b5395f8a2cb1e3a3ababd14/README.md#L163"
+            }
+          ]
+        },
+        {
+          "id": "family-route",
+          "result": "PASS",
+          "reason": "Native coding-client/shell-worker route only; a bare API/SDK slot needs its existing authorized tool host, not an invented adapter.",
+          "citations": [
+            {
+              "repository": "https://github.com/tigerless-labs/agent-memory",
+              "commit": "c395acc4708c545c4b5395f8a2cb1e3a3ababd14",
+              "path": "README.md",
+              "lines": [
+                139,
+                150
+              ],
+              "url": "https://github.com/tigerless-labs/agent-memory/blob/c395acc4708c545c4b5395f8a2cb1e3a3ababd14/README.md#L139"
+            },
+            {
+              "url": "https://code.claude.com/docs/en/mcp",
+              "read_at": "2026-10-15",
+              "sections": [
+                "Local scope",
+                "Project scope",
+                "Managing your servers"
+              ]
+            }
+          ]
+        }
+      ],
+      "standalone_screen_result": "INCOMPLETE",
+      "role_screen_result": "UNKNOWN",
+      "role_note": "Native capability remains source-only; paired role-specific performance and lifecycle tests are unrun.",
+      "amendment": null
+    }
+  ],
+  "limits": [
+    "No canonical screen/angle/catalog mutation.",
+    "A1 eligibility admits only an isolated trial; all source reads remain distinct from execution.",
+    "Claude native memory and LangMem remain dependency controls, not standalone shared-backend contenders.",
+    "The proposed pin deltas do not silently amend the frozen W6 comparison."
+  ]
+}

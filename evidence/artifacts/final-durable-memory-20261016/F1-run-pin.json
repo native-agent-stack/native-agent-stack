@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "kind": "run_pin_reconciliation_proposal",
+  "catalog": "foundation",
+  "layer_id": "durable-memory",
+  "checked_at": "2026-10-16T05:24:49Z",
+  "base_commit": "caa224140a2d04ba5f3d0ca320c487a75f9c9ea1",
+  "status": "PROPOSED_NO_PIN_MUTATION",
+  "sources": [
+    {
+      "path": "catalogs/landscape/final-stack.json",
+      "line": 5699,
+      "value": "historical winner ai-memory 2.3.2",
+      "note": "The layer is reopened; this is a historical verdict pin, not a current FINAL winner.",
+      "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L5699"
+    },
+    {
+      "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+      "line": 133,
+      "value": "reopened; ai-memory; eight carried survivors",
+      "note": "The layer row itself has no version.",
+      "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/docs/decisions/2026-10-15-new-wsl-clean-install-plan.md#L133"
+    },
+    {
+      "path": "docs/decisions/2026-10-15-new-wsl-clean-install-plan.md",
+      "line": 684,
+      "value": "ai-memory 2.6.6 live; Hindsight research-memory alternate",
+      "note": "Architectural narrative, not an execution receipt.",
+      "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/docs/decisions/2026-10-15-new-wsl-clean-install-plan.md#L684"
+    },
+    {
+      "path": "adoption/new-wsl-profile.json",
+      "line": 3004,
+      "value": "2.5.2",
+      "note": "The executable install-plan row differs from the narrative and live version.",
+      "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/adoption/new-wsl-profile.json#L3004"
+    },
+    {
+      "path": "catalogs/landscape/final-stack.json",
+      "line": 10396,
+      "value": "2.4.1",
+      "note": "Derived run pin; source is adoption/pins-linux-x86_64.json#/tools/7.",
+      "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/catalogs/landscape/final-stack.json#L10396"
+    },
+    {
+      "path": "adoption/pins-linux-x86_64.json",
+      "line": 156,
+      "value": "2.4.1",
+      "note": "Operational Linux source pin.",
+      "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/adoption/pins-linux-x86_64.json#L156"
+    },
+    {
+      "path": "adoption/pins-macos-arm64.json",
+      "line": 154,
+      "value": "2.3.2",
+      "note": "Separate macOS operational pin; Linux evidence cannot move it.",
+      "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/adoption/pins-macos-arm64.json#L154"
+    },
+    {
+      "path": "evidence/artifacts/w6-layer-verdict-20261011/primary-sources.json",
+      "line": 702,
+      "value": "v2.6.0 / 89bd8ded3c1ab8b769cf99417d038ed0364403c8",
+      "note": "Last committed W6 source record; source_review, not a 2.6.0 E2E.",
+      "url": "https://github.com/native-agent-stack/native-agent-stack/blob/caa224140a2d04ba5f3d0ca320c487a75f9c9ea1/evidence/artifacts/w6-layer-verdict-20261011/primary-sources.json#L702"
+    },
+    {
+      "kind": "observed_host_version",
+      "value": "ai-memory 2.6.6",
+      "command": [
+        "ai-memory",
+        "--version"
+      ],
+      "exit_code": 0,
+      "evidence": "evidence/artifacts/final-durable-memory-20261016/outputs/host-version-readonly.txt:1",
+      "note": "Read-only pre-existing binary probe; it does not prove the active service, hooks or clients use this binary.",
+      "capture": "masked_native_capture",
+      "receipt": "E2E-attempt.json#/commands/host-version-readonly"
+    }
+  ],
+  "proposed_run_pin": {
+    "repository": "https://github.com/akitaonrails/ai-memory",
+    "tag": "v2.6.6",
+    "commit": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+    "version": "2.6.6",
+    "reason": "Use one explicit 2.x qualification pin matching the plan's stated deployed version, with a fresh source screen, publisher-verified isolated release and same-pin upstream tests. This is a bounded reconciliation target, not evidence of superiority over 3.0.0 or any survivor.",
+    "tag_resolution": {
+      "annotated_tag_object": "bc79858954d4636dc0d70d960a89249515c88381",
+      "commit": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+      "sources": [
+        "https://api.github.com/repos/akitaonrails/ai-memory/git/ref/tags/v2.6.6",
+        "https://api.github.com/repos/akitaonrails/ai-memory/git/tags/bc79858954d4636dc0d70d960a89249515c88381"
+      ],
+      "read_at": "2026-10-16T05:24:49Z",
+      "native_capture": "outputs/upstream-tag-resolution.txt:1"
+    },
+    "release_archive": {
+      "url": "https://github.com/akitaonrails/ai-memory/releases/download/v2.6.6/ai-memory-linux-x86_64.tar.gz",
+      "sha256": "b0de4f2002be388170aa81a91252832aa5d234b3511196806d0ca1708de75353",
+      "verification": "sha256sum -c against the publisher's .sha256 sidecar; exit 0",
+      "receipt": "outputs/verify-release-checksum.txt:1"
+    }
+  },
+  "drift_versions": [
+    "2.3.2",
+    "2.4.1",
+    "2.5.2",
+    "2.6.0",
+    "2.6.6"
+  ],
+  "newer_source_boundary": {
+    "tag": "v3.0.0",
+    "commit": "dbe928e3b64414c619435df887ed344ff83887a5",
+    "source_pr": 1193,
+    "source_head": "75777efa265dde1154a5524dbe69cb5dbf6eb7df",
+    "runtime_qualified": false
+  },
+  "limits": [
+    "No operational pin, install plan, catalog, canonical angle record or default changes.",
+    "A local --version result does not establish daemon or native-client ownership.",
+    "Full qualification and adoption remain blocked on the named E2E, invoke and convergence gaps."
+  ],
+  "integrity_checked_at": "2026-10-16T05:41:54Z",
+  "integrity_note": "F1 exact value lines were re-read at the base; host version and release tag were re-captured natively. Unpublished first-pass normalized captures are withdrawn."
+}

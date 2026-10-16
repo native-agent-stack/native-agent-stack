@@ -1,0 +1,4 @@
+directory <SCRATCH>/memory-raw/wiki
+directory <SCRATCH>/memory-raw/raw
+directory <SCRATCH>/memory-raw/db
+directory <SCRATCH>/memory-raw/models

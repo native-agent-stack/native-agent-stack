@@ -1,0 +1,1183 @@
+{
+  "schema_version": 1,
+  "rule_version": "angle-convergence/2",
+  "catalog": "foundation",
+  "layer_id": "durable-memory",
+  "weights": {
+    "A1": 0.25,
+    "A2": 0.15,
+    "A3": 0.1,
+    "A4": 0.1,
+    "A5": 0.15,
+    "A6": 0.25
+  },
+  "weights_stated_at": "2026-10-16T05:24:49Z",
+  "weight_reason": "Proposed before any comparative scoring: give capability and our matched lifecycle/quality measurement equal emphasis, with engineering quality and applicable evaluations next. All six angles remain required; weights cannot turn UNKNOWN into convergence or defeat a hard disqualifier.",
+  "published_evaluations_available": true,
+  "disclosure": "Draft only, not blind and not admitted to the canonical angle directory. No comparison scoring ran. Use the existing W6 role-specific checks; these source-pin proposals need an explicit re-freeze before any comparison. All nine verdicts remain INSUFFICIENT. The co-op owns the two-family adjudication. A fresh Hindsight recovery read fills a previous source gap without changing the separate screen PR or claiming runtime success. Receipt integrity was rechecked after the first draft: measurement summaries bind the rebuilt masked native captures, while angle scores, weights and dispositions are source-derived analyst judgments, never native output.",
+  "resolution_inputs": [
+    "catalogs/landscape/foundation.json",
+    "catalogs/landscape/final-stack.json",
+    "catalogs/sota-convergence/layer-verdict-waves.json",
+    "catalogs/sota-convergence/layer-verdicts-20260922.json",
+    "catalogs/saturation/ledger.json",
+    "catalogs/sota-convergence/manifest-20260926.json",
+    "catalogs/sota-convergence/manifest-20260929.json",
+    "evidence/artifacts/landscape-sweep-20260926/returns.json",
+    "evidence/artifacts/landscape-sweep-20260929/returns.json",
+    "evidence/artifacts/w6-layer-verdict-20261011/resolution-delta.json",
+    "evidence/artifacts/w6-layer-verdict-20261011/comparisons/durable-memory.json",
+    "evidence/artifacts/final-durable-memory-20261016/F1-run-pin.json",
+    "evidence/artifacts/final-durable-memory-20261016/screen-delta.json",
+    "evidence/artifacts/final-durable-memory-20261016/E2E-attempt.json",
+    "evidence/artifacts/final-durable-memory-20261016/F2-invoke.json"
+  ],
+  "gaps": [
+    "E2E-RUST: cargo t --locked exited 127: cargo is unavailable. The full Rust/nextest tier was not executed.",
+    "E2E-RELAY: The upstream isolated external relay E2E exited 2 before starting a server because ai-memory-relay is absent from the release prefix.",
+    "E2E-KEYED-HANDOFF: The upstream handoff smoke requires GEMINI_API_KEY and two model calls; it was not run.",
+    "F2-NATIVE-CLIENTS: The native release executable was invoked, but no Codex/Claude memory tool, hook lifecycle or measured native-client session was invoked at 2.6.6.",
+    "COMPARE-NINE-ARMS: No matched role-specific memory comparison ran; all eight cumulative survivors remain unresolved. The frozen W6 comparison has older source pins and unmet model-panel inputs.",
+    "HINDSIGHT-RECOVERY-RUN: PostgreSQL/pg0 0.15.2 recovery is now documented at Hindsight 1.0.0, but no backup/restore, retain/recall or native capture run was performed.",
+    "PLATFORM-MIGRATION: Only Linux x86_64 release execution was observed. macOS arm64, upgrade from existing stores, clean-target restoration and client rebinding remain unmeasured.",
+    "ANGLES-A3-A4-A5: No new independent community/adoption measurement, package-usage window, or method-comparable published-evaluation analysis was collected. Hindsight's README links a vendor evaluation and asserts external replication; those assertions are not independent verification.",
+    "NEWER-AI-MEMORY: The separate 3.0.0 source screen does not qualify the 2.6.6 runtime or prove the older pin preferable. No 2.6.6 versus 3.0.0 migration or matched comparison ran."
+  ],
+  "candidates": [
+    {
+      "id": "akitaonrails-ai-memory",
+      "name": "ai-memory",
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+      "role": "shared_memory_backend; native_memory_capture",
+      "a1_screened": true,
+      "a6_comparative": false,
+      "confounds": [
+        "The W6 comparison was not run or re-frozen at these proposed source pins.",
+        "No native-client memory invocation window was measured at the proposed ai-memory run pin.",
+        "The shell smoke and Python diagnostic tests are fixture tests; native init only qualifies initialization."
+      ],
+      "angles": {
+        "A1": {
+          "score": "+",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/akitaonrails/ai-memory",
+              "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+              "path": "README.md",
+              "line": 26
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/akitaonrails/ai-memory",
+              "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+              "path": "README.md",
+              "line": 119
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/akitaonrails/ai-memory",
+              "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+              "path": "README.md",
+              "line": 59
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/akitaonrails/ai-memory",
+              "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+              "path": "README.md",
+              "line": 83
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/akitaonrails/ai-memory",
+              "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+              "path": "docs/lifecycle-ops.md",
+              "line": 11
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/akitaonrails/ai-memory",
+              "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+              "path": "docs/lifecycle-ops.md",
+              "line": 20
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/akitaonrails/ai-memory",
+              "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+              "path": "docs/lifecycle-ops.md",
+              "line": 25
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/akitaonrails/ai-memory",
+              "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+              "path": "Cargo.toml",
+              "line": 38
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/akitaonrails/ai-memory",
+              "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+              "path": ".github/workflows/ci.yml",
+              "line": 80
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/akitaonrails/ai-memory",
+              "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+              "path": "README.md",
+              "line": 114
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/akitaonrails/ai-memory",
+              "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+              "path": "docs/install.md",
+              "line": 1812
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/akitaonrails/ai-memory",
+              "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+              "path": "docs/install.md",
+              "line": 1814
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/akitaonrails/ai-memory",
+              "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+              "path": "docs/install.md",
+              "line": 1843
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/akitaonrails/ai-memory",
+              "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+              "path": "docs/install.md",
+              "line": 1847
+            }
+          ],
+          "note": "Documented capability at this pin passes the stated source screen; it does not establish useful learning, quality or default fitness."
+        },
+        "A2": {
+          "score": "+",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/akitaonrails/ai-memory",
+              "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+              "path": ".github/workflows/ci.yml",
+              "line": 80
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/akitaonrails/ai-memory",
+              "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+              "path": "CONTRIBUTING.md",
+              "line": 48
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-durable-memory-20261016/E2E-attempt.json"
+            }
+          ],
+          "note": "The pinned project ships CI/full-test commands; 189 shell assertions and 4 Python diagnostic tests passed here. The Rust/full E2E tier did not run. This bounded engineering evidence does not establish relative quality."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No independent community-consensus delta was established; historical co-op model votes are not community evidence."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No comparable package-download or deployed-use window was measured. Stars, installation incumbency and native CLI invocation counts are not substitutes for net usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No method-matched published evaluation was established in this bounded delta. Absence of a retrieved result is not a negative merit finding."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-durable-memory-20261016/E2E-attempt.json"
+            },
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-durable-memory-20261016/F2-invoke.json"
+            }
+          ],
+          "note": "The release executed --version and init; isolated upstream hook/diagnostic tests passed. No paired semantic recall, learned-write quality, deletion/restore, cost or native-client lifecycle comparison ran."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": true,
+      "measure_next": "Resolve remaining A1 gaps, adjudicate the pin delta and run the preserved role-specific W6 cases with matched models and complete usage receipts.",
+      "previous_verdict": "Historical adopted candidate; reopened at 2.3.2; newer source and operating pins disagree.",
+      "adoption_status": "CURRENT",
+      "trial_permitted": true,
+      "final_eligible": false,
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "repo",
+          "repository": "https://github.com/akitaonrails/ai-memory",
+          "pin": "04a9e8f576de67e1d2282ee29415d1b0d5b979c8",
+          "path": "LICENSE",
+          "line": 1
+        },
+        "read_at": "2026-10-16T05:24:49Z",
+        "note": "Compliance note only; it does not affect the verdict."
+      }
+    },
+    {
+      "id": "anthropics-claude-code",
+      "name": "claude-code",
+      "repository": "https://github.com/anthropics/claude-code",
+      "pin": "03b5892ee77de289bcd5dfa39f541525ade74aff",
+      "role": "native_file_session_memory (dependency/control only)",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "confounds": [
+        "The W6 comparison was not run or re-frozen at these proposed source pins.",
+        "No native-client memory invocation window was measured at the proposed ai-memory run pin.",
+        "Whole-layer cross-client failures cannot settle the narrower dependency role."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+              "pin": "4bd1ff3ab46430c3d37dcccfac18178fb7f08212",
+              "path": "evidence/artifacts/runtime-worker-context-engineering-20261015/mechanisms.md",
+              "line": 48
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+              "pin": "4bd1ff3ab46430c3d37dcccfac18178fb7f08212",
+              "path": "evidence/artifacts/runtime-worker-context-engineering-20261015/survivors.md",
+              "line": 23
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/anthropics/claude-code",
+              "pin": "03b5892ee77de289bcd5dfa39f541525ade74aff",
+              "path": "README.md",
+              "line": 17
+            }
+          ],
+          "note": "The retained role is a dependency/control. Existing whole-layer screen failures are disclosed in screen-delta.json, but this narrower role remains unqualified."
+        },
+        "A2": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-durable-memory-20261016/screen-delta.json"
+            }
+          ],
+          "note": "The reused screen records maintenance at the source pin. A maintained-repository screen is not a full engineering-quality assessment; no new A2 adjudication."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No independent community-consensus delta was established; historical co-op model votes are not community evidence."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No comparable package-download or deployed-use window was measured. Stars, installation incumbency and native CLI invocation counts are not substitutes for net usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No method-matched published evaluation was established in this bounded delta. Absence of a retrieved result is not a negative merit finding."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No new measured run for this candidate. Existing historical or source-only records cannot be promoted to the proposed pin."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": true,
+      "measure_next": "Qualify only the preserved W6 dependency/control role on its fixed fictional cases after the source-pin amendment is adjudicated.",
+      "previous_verdict": "FAIL in the separate A1 whole-layer screen; retained as an unresolved survivor here.",
+      "adoption_status": "COMPARISON_ARM",
+      "trial_permitted": false,
+      "final_eligible": false
+    },
+    {
+      "id": "langchain-ai-langmem",
+      "name": "langmem",
+      "repository": "https://github.com/langchain-ai/langmem",
+      "pin": "48e3c11f5bb527282c7d5339c6a87a0b35abccfc",
+      "role": "memory_management_primitives (dependency/control only)",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "confounds": [
+        "The W6 comparison was not run or re-frozen at these proposed source pins.",
+        "No native-client memory invocation window was measured at the proposed ai-memory run pin.",
+        "Whole-layer cross-client failures cannot settle the narrower dependency role."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/langchain-ai/langmem",
+              "pin": "48e3c11f5bb527282c7d5339c6a87a0b35abccfc",
+              "path": "README.md",
+              "line": 35
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/langchain-ai/langmem",
+              "pin": "48e3c11f5bb527282c7d5339c6a87a0b35abccfc",
+              "path": "README.md",
+              "line": 3
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/langchain-ai/langmem",
+              "pin": "48e3c11f5bb527282c7d5339c6a87a0b35abccfc",
+              "path": "README.md",
+              "line": 18
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/langchain-ai/langmem",
+              "pin": "48e3c11f5bb527282c7d5339c6a87a0b35abccfc",
+              "path": "README.md",
+              "line": 51
+            }
+          ],
+          "note": "The retained role is a dependency/control. Existing whole-layer screen failures are disclosed in screen-delta.json, but this narrower role remains unqualified."
+        },
+        "A2": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-durable-memory-20261016/screen-delta.json"
+            }
+          ],
+          "note": "The reused screen records maintenance at the source pin. A maintained-repository screen is not a full engineering-quality assessment; no new A2 adjudication."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No independent community-consensus delta was established; historical co-op model votes are not community evidence."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No comparable package-download or deployed-use window was measured. Stars, installation incumbency and native CLI invocation counts are not substitutes for net usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No method-matched published evaluation was established in this bounded delta. Absence of a retrieved result is not a negative merit finding."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No new measured run for this candidate. Existing historical or source-only records cannot be promoted to the proposed pin."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": true,
+      "measure_next": "Qualify only the preserved W6 dependency/control role on its fixed fictional cases after the source-pin amendment is adjudicated.",
+      "previous_verdict": "FAIL in the separate A1 whole-layer screen; retained as an unresolved survivor here.",
+      "adoption_status": "COMPARISON_ARM",
+      "trial_permitted": false,
+      "final_eligible": false
+    },
+    {
+      "id": "rohitg00-agentmemory",
+      "name": "agentmemory",
+      "repository": "https://github.com/rohitg00/agentmemory",
+      "pin": "8bf0c827aaaada297896b2b6efe2a64651ae9389",
+      "role": "shared_memory_backend; native_memory_capture",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "confounds": [
+        "The W6 comparison was not run or re-frozen at these proposed source pins.",
+        "No native-client memory invocation window was measured at the proposed ai-memory run pin."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/rohitg00/agentmemory",
+              "pin": "8bf0c827aaaada297896b2b6efe2a64651ae9389",
+              "path": "README.md",
+              "line": 827
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/rohitg00/agentmemory",
+              "pin": "8bf0c827aaaada297896b2b6efe2a64651ae9389",
+              "path": "README.md",
+              "line": 10
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/rohitg00/agentmemory",
+              "pin": "8bf0c827aaaada297896b2b6efe2a64651ae9389",
+              "path": "README.md",
+              "line": 645
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/rohitg00/agentmemory",
+              "pin": "8bf0c827aaaada297896b2b6efe2a64651ae9389",
+              "path": "README.md",
+              "line": 676
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/rohitg00/agentmemory",
+              "pin": "8bf0c827aaaada297896b2b6efe2a64651ae9389",
+              "path": "README.md",
+              "line": 945
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/rohitg00/agentmemory",
+              "pin": "8bf0c827aaaada297896b2b6efe2a64651ae9389",
+              "path": "README.md",
+              "line": 97
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/rohitg00/agentmemory",
+              "pin": "8bf0c827aaaada297896b2b6efe2a64651ae9389",
+              "path": "README.md",
+              "line": 105
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/rohitg00/agentmemory",
+              "pin": "8bf0c827aaaada297896b2b6efe2a64651ae9389",
+              "path": "README.md",
+              "line": 115
+            }
+          ],
+          "note": "Source requirements still unresolved: recovery: UNKNOWN, linux-wsl2-x86_64: UNKNOWN, macos-arm64: UNKNOWN, headless: UNKNOWN"
+        },
+        "A2": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-durable-memory-20261016/screen-delta.json"
+            }
+          ],
+          "note": "The reused screen records maintenance at the source pin. A maintained-repository screen is not a full engineering-quality assessment; no new A2 adjudication."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No independent community-consensus delta was established; historical co-op model votes are not community evidence."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No comparable package-download or deployed-use window was measured. Stars, installation incumbency and native CLI invocation counts are not substitutes for net usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No method-matched published evaluation was established in this bounded delta. Absence of a retrieved result is not a negative merit finding."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No new measured run for this candidate. Existing historical or source-only records cannot be promoted to the proposed pin."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": true,
+      "measure_next": "Resolve remaining A1 gaps, adjudicate the pin delta and run the preserved role-specific W6 cases with matched models and complete usage receipts.",
+      "previous_verdict": "INCOMPLETE in the separate A1 whole-layer screen; retained as an unresolved survivor here.",
+      "adoption_status": "COMPARISON_ARM",
+      "trial_permitted": false,
+      "final_eligible": false
+    },
+    {
+      "id": "mempalace-mempalace",
+      "name": "MemPalace",
+      "repository": "https://github.com/MemPalace/MemPalace",
+      "pin": "602d796c699cabba2971982cd9dccbbf46abfe79",
+      "role": "shared_memory_backend; native_memory_capture",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "confounds": [
+        "The W6 comparison was not run or re-frozen at these proposed source pins.",
+        "No native-client memory invocation window was measured at the proposed ai-memory run pin."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/mempalace/mempalace",
+              "pin": "602d796c699cabba2971982cd9dccbbf46abfe79",
+              "path": "README.md",
+              "line": 27
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/mempalace/mempalace",
+              "pin": "602d796c699cabba2971982cd9dccbbf46abfe79",
+              "path": "README.md",
+              "line": 110
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/mempalace/mempalace",
+              "pin": "602d796c699cabba2971982cd9dccbbf46abfe79",
+              "path": "mempalace/backups.py",
+              "line": 1
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/mempalace/mempalace",
+              "pin": "602d796c699cabba2971982cd9dccbbf46abfe79",
+              "path": "README.md",
+              "line": 99
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/mempalace/mempalace",
+              "pin": "602d796c699cabba2971982cd9dccbbf46abfe79",
+              "path": "README.md",
+              "line": 138
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/mempalace/mempalace",
+              "pin": "602d796c699cabba2971982cd9dccbbf46abfe79",
+              "path": "README.md",
+              "line": 75
+            }
+          ],
+          "note": "Source requirements still unresolved: deletion: UNKNOWN, recovery: UNKNOWN, linux-wsl2-x86_64: UNKNOWN, macos-arm64: UNKNOWN"
+        },
+        "A2": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-durable-memory-20261016/screen-delta.json"
+            }
+          ],
+          "note": "The reused screen records maintenance at the source pin. A maintained-repository screen is not a full engineering-quality assessment; no new A2 adjudication."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No independent community-consensus delta was established; historical co-op model votes are not community evidence."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No comparable package-download or deployed-use window was measured. Stars, installation incumbency and native CLI invocation counts are not substitutes for net usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No method-matched published evaluation was established in this bounded delta. Absence of a retrieved result is not a negative merit finding."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No new measured run for this candidate. Existing historical or source-only records cannot be promoted to the proposed pin."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": true,
+      "measure_next": "Resolve remaining A1 gaps, adjudicate the pin delta and run the preserved role-specific W6 cases with matched models and complete usage receipts.",
+      "previous_verdict": "INCOMPLETE in the separate A1 whole-layer screen; retained as an unresolved survivor here.",
+      "adoption_status": "COMPARISON_ARM",
+      "trial_permitted": false,
+      "final_eligible": false
+    },
+    {
+      "id": "vshulcz-deja-vu",
+      "name": "deja-vu",
+      "repository": "https://github.com/vshulcz/deja-vu",
+      "pin": "0fb72c044f9c75444d270275424de29dca62e536",
+      "role": "shared_memory_backend; native_memory_capture",
+      "a1_screened": true,
+      "a6_comparative": false,
+      "confounds": [
+        "The W6 comparison was not run or re-frozen at these proposed source pins.",
+        "No native-client memory invocation window was measured at the proposed ai-memory run pin."
+      ],
+      "angles": {
+        "A1": {
+          "score": "+",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vshulcz/deja-vu",
+              "pin": "0fb72c044f9c75444d270275424de29dca62e536",
+              "path": "README.md",
+              "line": 60
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vshulcz/deja-vu",
+              "pin": "0fb72c044f9c75444d270275424de29dca62e536",
+              "path": "README.md",
+              "line": 70
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vshulcz/deja-vu",
+              "pin": "0fb72c044f9c75444d270275424de29dca62e536",
+              "path": "README.md",
+              "line": 145
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vshulcz/deja-vu",
+              "pin": "0fb72c044f9c75444d270275424de29dca62e536",
+              "path": "README.md",
+              "line": 181
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vshulcz/deja-vu",
+              "pin": "0fb72c044f9c75444d270275424de29dca62e536",
+              "path": "README.md",
+              "line": 228
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vshulcz/deja-vu",
+              "pin": "0fb72c044f9c75444d270275424de29dca62e536",
+              "path": "install.sh",
+              "line": 27
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vshulcz/deja-vu",
+              "pin": "0fb72c044f9c75444d270275424de29dca62e536",
+              "path": "README.md",
+              "line": 117
+            }
+          ],
+          "note": "Documented capability at this pin passes the stated source screen; it does not establish useful learning, quality or default fitness."
+        },
+        "A2": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-durable-memory-20261016/screen-delta.json"
+            }
+          ],
+          "note": "The reused screen records maintenance at the source pin. A maintained-repository screen is not a full engineering-quality assessment; no new A2 adjudication."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No independent community-consensus delta was established; historical co-op model votes are not community evidence."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No comparable package-download or deployed-use window was measured. Stars, installation incumbency and native CLI invocation counts are not substitutes for net usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No method-matched published evaluation was established in this bounded delta. Absence of a retrieved result is not a negative merit finding."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No new measured run for this candidate. Existing historical or source-only records cannot be promoted to the proposed pin."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": true,
+      "measure_next": "Resolve remaining A1 gaps, adjudicate the pin delta and run the preserved role-specific W6 cases with matched models and complete usage receipts.",
+      "previous_verdict": "PASS in the separate A1 whole-layer screen; retained as an unresolved survivor here.",
+      "adoption_status": "COMPARISON_ARM",
+      "trial_permitted": true,
+      "final_eligible": false
+    },
+    {
+      "id": "vbcherepanov-total-agent-memory",
+      "name": "total-agent-memory",
+      "repository": "https://github.com/vbcherepanov/total-agent-memory",
+      "pin": "9b67f708b4fdd88afe69fb4092bbede33dadd600",
+      "role": "shared_memory_backend; native_memory_capture",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "confounds": [
+        "The W6 comparison was not run or re-frozen at these proposed source pins.",
+        "No native-client memory invocation window was measured at the proposed ai-memory run pin."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vbcherepanov/total-agent-memory",
+              "pin": "9b67f708b4fdd88afe69fb4092bbede33dadd600",
+              "path": "README.md",
+              "line": 10
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vbcherepanov/total-agent-memory",
+              "pin": "9b67f708b4fdd88afe69fb4092bbede33dadd600",
+              "path": "src/server_instructions.py",
+              "line": 24
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vbcherepanov/total-agent-memory",
+              "pin": "9b67f708b4fdd88afe69fb4092bbede33dadd600",
+              "path": "src/server.py",
+              "line": 4933
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vbcherepanov/total-agent-memory",
+              "pin": "9b67f708b4fdd88afe69fb4092bbede33dadd600",
+              "path": "src/server.py",
+              "line": 5246
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vbcherepanov/total-agent-memory",
+              "pin": "9b67f708b4fdd88afe69fb4092bbede33dadd600",
+              "path": "src/server.py",
+              "line": 7099
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vbcherepanov/total-agent-memory",
+              "pin": "9b67f708b4fdd88afe69fb4092bbede33dadd600",
+              "path": "docs/TEAM_BACKUP.md",
+              "line": 13
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vbcherepanov/total-agent-memory",
+              "pin": "9b67f708b4fdd88afe69fb4092bbede33dadd600",
+              "path": "docs/installation.md",
+              "line": 1
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vbcherepanov/total-agent-memory",
+              "pin": "9b67f708b4fdd88afe69fb4092bbede33dadd600",
+              "path": "docs/installation.md",
+              "line": 51
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vbcherepanov/total-agent-memory",
+              "pin": "9b67f708b4fdd88afe69fb4092bbede33dadd600",
+              "path": "README.md",
+              "line": 158
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vbcherepanov/total-agent-memory",
+              "pin": "9b67f708b4fdd88afe69fb4092bbede33dadd600",
+              "path": "README.md",
+              "line": 42
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vbcherepanov/total-agent-memory",
+              "pin": "9b67f708b4fdd88afe69fb4092bbede33dadd600",
+              "path": "docs/installation.md",
+              "line": 34
+            }
+          ],
+          "note": "Source requirements still unresolved: recovery: UNKNOWN"
+        },
+        "A2": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-durable-memory-20261016/screen-delta.json"
+            }
+          ],
+          "note": "The reused screen records maintenance at the source pin. A maintained-repository screen is not a full engineering-quality assessment; no new A2 adjudication."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No independent community-consensus delta was established; historical co-op model votes are not community evidence."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No comparable package-download or deployed-use window was measured. Stars, installation incumbency and native CLI invocation counts are not substitutes for net usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No method-matched published evaluation was established in this bounded delta. Absence of a retrieved result is not a negative merit finding."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No new measured run for this candidate. Existing historical or source-only records cannot be promoted to the proposed pin."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": true,
+      "measure_next": "Resolve remaining A1 gaps, adjudicate the pin delta and run the preserved role-specific W6 cases with matched models and complete usage receipts.",
+      "previous_verdict": "INCOMPLETE in the separate A1 whole-layer screen; retained as an unresolved survivor here.",
+      "adoption_status": "COMPARISON_ARM",
+      "trial_permitted": false,
+      "final_eligible": false
+    },
+    {
+      "id": "vectorize-io-hindsight",
+      "name": "hindsight",
+      "repository": "https://github.com/vectorize-io/hindsight",
+      "pin": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+      "role": "shared_memory_backend; native_memory_capture",
+      "a1_screened": true,
+      "a6_comparative": false,
+      "confounds": [
+        "The W6 comparison was not run or re-frozen at these proposed source pins.",
+        "No native-client memory invocation window was measured at the proposed ai-memory run pin.",
+        "Recovery capability is documented for PostgreSQL and pg0-embedded 0.15.2, but no database or restore ran.",
+        "Published benchmark and external-replication statements are vendor claims unless independently established."
+      ],
+      "angles": {
+        "A1": {
+          "score": "+",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vectorize-io/hindsight",
+              "pin": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+              "path": "README.md",
+              "line": 137
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vectorize-io/hindsight",
+              "pin": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+              "path": "README.md",
+              "line": 243
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vectorize-io/hindsight",
+              "pin": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+              "path": "hindsight-docs/docs/developer/mcp-server.md",
+              "line": 110
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vectorize-io/hindsight",
+              "pin": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+              "path": "hindsight-docs/docs/developer/admin-cli.md",
+              "line": 7
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vectorize-io/hindsight",
+              "pin": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+              "path": "hindsight-docs/docs/developer/admin-cli.md",
+              "line": 190
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vectorize-io/hindsight",
+              "pin": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+              "path": "hindsight-api/pyproject.toml",
+              "line": 7
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vectorize-io/hindsight",
+              "pin": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+              "path": "uv.lock",
+              "line": 3443
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vectorize-io/hindsight",
+              "pin": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+              "path": "hindsight-api-slim/tests/test_admin_backup_restore.py",
+              "line": 249
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vectorize-io/hindsight",
+              "pin": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+              "path": "README.md",
+              "line": 164
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vectorize-io/hindsight",
+              "pin": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+              "path": "README.md",
+              "line": 94
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vectorize-io/hindsight",
+              "pin": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+              "path": "README.md",
+              "line": 261
+            }
+          ],
+          "note": "The fresh recovery read completes the source requirements for the explicit PostgreSQL/locked-pg0 route. Native lifecycle parity is still unmeasured."
+        },
+        "A2": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vectorize-io/hindsight",
+              "pin": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+              "path": "hindsight-api-slim/tests/test_admin_backup_restore.py",
+              "line": 249
+            }
+          ],
+          "note": "Pinned backup coverage/restore tests exist. Their existence is source evidence; no execution, release-quality trend or responsiveness assessment was added."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "The README asserts external replication, but no independent source was verified in this delta. No community-consensus score is inferred."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No comparable package-download or deployed-use window was measured. Stars, installation incumbency and native CLI invocation counts are not substitutes for net usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vectorize-io/hindsight",
+              "pin": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+              "path": "README.md",
+              "line": 5
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/vectorize-io/hindsight",
+              "pin": "39c65ffe2f140d0c84cee58566cad8900c5b9908",
+              "path": "README.md",
+              "line": 44
+            }
+          ],
+          "note": "A paper and LongMemEval benchmark are linked by the vendor. The evaluation's model/corpus/cost settings and the asserted independent replication were not read or reproduced here, and do not cover all cross-client capture/deletion/recovery requirements."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No new measured run for this candidate. Existing historical or source-only records cannot be promoted to the proposed pin."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": true,
+      "measure_next": "Run same-pin upstream backup/restore on an isolated locked PostgreSQL backend, then compare native capture, recovery, source-grounded recall, abstention, learning quality and total usage against ai-memory under the same frozen cases/model panel.",
+      "previous_verdict": "INCOMPLETE in the separate A1 whole-layer screen; retained as an unresolved survivor here.",
+      "adoption_status": "COMPARISON_ARM",
+      "trial_permitted": true,
+      "final_eligible": false
+    },
+    {
+      "id": "tigerless-labs-agent-memory",
+      "name": "agent-memory",
+      "repository": "https://github.com/tigerless-labs/agent-memory",
+      "pin": "c395acc4708c545c4b5395f8a2cb1e3a3ababd14",
+      "role": "shared_memory_backend; native_memory_capture",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "confounds": [
+        "The W6 comparison was not run or re-frozen at these proposed source pins.",
+        "No native-client memory invocation window was measured at the proposed ai-memory run pin."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/tigerless-labs/agent-memory",
+              "pin": "c395acc4708c545c4b5395f8a2cb1e3a3ababd14",
+              "path": "README.md",
+              "line": 69
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/tigerless-labs/agent-memory",
+              "pin": "c395acc4708c545c4b5395f8a2cb1e3a3ababd14",
+              "path": "README.md",
+              "line": 18
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/tigerless-labs/agent-memory",
+              "pin": "c395acc4708c545c4b5395f8a2cb1e3a3ababd14",
+              "path": "README.md",
+              "line": 97
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/tigerless-labs/agent-memory",
+              "pin": "c395acc4708c545c4b5395f8a2cb1e3a3ababd14",
+              "path": "README.md",
+              "line": 139
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/tigerless-labs/agent-memory",
+              "pin": "c395acc4708c545c4b5395f8a2cb1e3a3ababd14",
+              "path": "README.md",
+              "line": 218
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/tigerless-labs/agent-memory",
+              "pin": "c395acc4708c545c4b5395f8a2cb1e3a3ababd14",
+              "path": "README.md",
+              "line": 163
+            }
+          ],
+          "note": "Source requirements still unresolved: linux-wsl2-x86_64: UNKNOWN, macos-arm64: UNKNOWN"
+        },
+        "A2": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [
+            {
+              "kind": "receipt",
+              "path": "evidence/artifacts/final-durable-memory-20261016/screen-delta.json"
+            }
+          ],
+          "note": "The reused screen records maintenance at the source pin. A maintained-repository screen is not a full engineering-quality assessment; no new A2 adjudication."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No independent community-consensus delta was established; historical co-op model votes are not community evidence."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No comparable package-download or deployed-use window was measured. Stars, installation incumbency and native CLI invocation counts are not substitutes for net usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No method-matched published evaluation was established in this bounded delta. Absence of a retrieved result is not a negative merit finding."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-16T05:24:49Z",
+          "sources": [],
+          "note": "No new measured run for this candidate. Existing historical or source-only records cannot be promoted to the proposed pin."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": true,
+      "measure_next": "Resolve remaining A1 gaps, adjudicate the pin delta and run the preserved role-specific W6 cases with matched models and complete usage receipts.",
+      "previous_verdict": "INCOMPLETE in the separate A1 whole-layer screen; retained as an unresolved survivor here.",
+      "adoption_status": "COMPARISON_ARM",
+      "trial_permitted": false,
+      "final_eligible": false
+    }
+  ],
+  "final_evidence": [],
+  "terminal_state": "NON_TERMINAL"
+}
